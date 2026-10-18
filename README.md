@@ -56,7 +56,7 @@ the development toolchain.
 
 Install these prerequisites:
 
-- Windows 11 and [Git](https://git-scm.com/install/windows).
+- Windows and [Git](https://git-scm.com/install/windows). Tested on Windows 11; other Windows versions have not been verified.
 - [uv](https://docs.astral.sh/uv/getting-started/installation/) and Python 3.11 or newer, as required by [pyproject.toml](pyproject.toml).
 - Rust with the MSVC toolchain, Microsoft C++ Build Tools with the **Desktop development with C++** workload, and a Windows SDK. Follow the [Tauri Windows prerequisites](https://v2.tauri.app/start/prerequisites/#windows) and [Windows SDK guidance](https://learn.microsoft.com/en-us/windows/apps/windows-sdk/).
 - Microsoft Edge WebView2, described in the [Tauri WebView2 setup](https://v2.tauri.app/start/prerequisites/#webview2).
