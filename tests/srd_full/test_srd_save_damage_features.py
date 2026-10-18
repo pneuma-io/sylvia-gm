@@ -6,6 +6,28 @@ from tests.srd_full.test_srd_action_budget import SRD, _run
 from tests.srd_full.test_srd_unarmed_creatures import _case
 
 
+@pytest.mark.parametrize("ability,half,three_quarters,bonus", [
+    ("dexterity", ["hero"], [], 2),
+    ("dexterity", [], ["hero"], 5),
+    ("dexterity", ["hero"], ["hero"], 5),
+    ("constitution", ["hero"], ["hero"], 0),
+])
+def test_area_save_cover_changes_only_the_actual_dexterity_save(
+    ability, half, three_quarters, bonus,
+):
+    state, data = _case()
+    state[f"{SRD}.entities"]["hero"]["saving_throw_modifiers"] = {ability: 7}
+    result = _run(
+        "resolve_spell_area_save_damage_target", state, participant_data=data,
+        target="hero", save_ability=ability, spell_save_dc=15, damage_total=10,
+        damage_type="fire", success_damage="half", construct_save_disadvantage=False,
+        half_cover_targets=half, three_quarters_cover_targets=three_quarters,
+    ).result["context"]
+    assert result["_spell_save_cover_bonus"] == bonus
+    assert result["_card_d20_modifier"] == 7 + bonus
+    assert len(result["_spell_summary_rows"]) == len(result["_spell_detail_rows"]) == 1
+
+
 @pytest.mark.parametrize("class_id,level", [("monk", 7), ("rogue", 7)])
 @pytest.mark.parametrize("save_modifier,expected_damage", [(30, 0), (-30, 15)])
 def test_evasion_changes_real_area_damage_before_resistance_and_temporary_hp(

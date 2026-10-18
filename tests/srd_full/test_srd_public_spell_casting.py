@@ -11,7 +11,7 @@ import pytest
 from sylvia_gm import dice
 from sylvia_gm.agent._stateless_mcp import StatelessMcpMechanics
 from sylvia_gm.application.authority import ActionCommand, AuthorityOwner, CampaignCreate
-from tests.srd_full.full_package_fixture import bundled_srd_archive
+from sylvia_gm.application.bundled_packages import bundled_srd_archive
 from sylvia_gm.domain.authority import (
     ActionStatus,
     Participant,

@@ -102,7 +102,7 @@ def test_only_long_rest_restores_wholeness_uses(kind, remaining):
 @pytest.mark.parametrize("level,wisdom,expected", [(5, 16, 0), (6, 8, 1), (6, 16, 3)])
 def test_creation_derives_wholeness_pool_from_feature_and_wisdom(level, wisdom, expected):
     from sylvia_gm.application.initial_character_state import materialize_initial_character_state
-    from tests.srd_full.test_reusable_participants import (
+    from tests.test_reusable_participants import (
         _participant,
         _participant_authority,
         _starting_state,

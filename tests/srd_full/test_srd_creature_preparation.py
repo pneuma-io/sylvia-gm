@@ -6,7 +6,7 @@ from sylvia_gm.agent._stateless_mcp import StatelessMcpMechanics
 from sylvia_gm.application.authority import ActionCommand
 from sylvia_gm.domain.authority import ActionStatus, WriterRole
 from sylvia_gm.domain.errors import CommandRejected
-from tests.srd_full import test_srd_ability_checks as checks
+from tests import test_srd_ability_checks as checks
 
 PACKAGE_ID = checks.PACKAGE_ID
 case = checks.case
@@ -78,6 +78,20 @@ def test_exact_preparation_retry_returns_original_receipt_without_new_mutation(c
     assert case.snapshot("checks") == saved
 
 
+@pytest.mark.parametrize("facts", [{}, {"proficiency_bonus": 3, "challenge_rating_eighths": 16}])
+def test_preparation_preserves_known_numeric_facts_and_leaves_unknown_facts_null(case, facts):
+    receipt = _prepare(
+        case, spells=[{"spell": "fire_bolt", "uses_per_day": 0}],
+        spellcasting_ability="intelligence", spellcasting_modifier=2,
+        spell_attack_bonus=5, spell_save_dc=13, constitution_save=1, **facts,
+    )
+    assert receipt.status is ActionStatus.COMMITTED, receipt.result
+    creature = case.snapshot("checks").state[f"{PACKAGE_ID}.entities"]["dera"]
+    for field in ("proficiency_bonus", "challenge_rating_eighths"):
+        assert creature[field] == facts.get(field)
+    assert creature["spellcasting_profile"]["proficiency_bonus"] == facts.get("proficiency_bonus")
+
+
 def test_preparation_retains_multiattack_and_rejects_invalid_component_lists(case):
     routine = [{"attack": "Claw", "count": 2}, {"attack": "Bite", "count": 1}]
     assert _prepare(case, multiattack=routine).status is ActionStatus.COMMITTED
@@ -120,6 +134,7 @@ def test_agreed_end_closes_active_turn_preserves_actors_and_allows_next_opponent
             "light_extra_attack_available": False, "light_extra_attack_used": False,
             "light_attack_source_weapons": [], "light_attack_source_weapon": None,
             "bonus_action_available": True, "reaction_available": True,
+            "fighting_actor_ids": [],
             "flurry_attacks_remaining": 0, "jump_distance_multiplier": 1,
         }
         for actor_id, actor in before.state[f"{PACKAGE_ID}.entities"].items()

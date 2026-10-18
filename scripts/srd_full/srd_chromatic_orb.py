@@ -281,95 +281,36 @@ def _clear_sink(effects):
     return result
 
 
-def _leap_part(tool, *, prefix):
-    """Retain the real zone gate and distinguish saved context from computation."""
-    effects = tool["effects"]
-    anchors = [
-        row
-        for rows in _effect_lists(effects)
-        for row in rows
-        if row.get("set", {}).get("field") == "_spell_critical_hit"
-    ]
-    expected = _set("_spell_critical_hit", "_spell_attack_kind == 'critical_hit'")
-    if anchors.count(expected) != 1:
-        raise ValueError("Orb needs one exact original critical-hit computation.")
-    remaining = [row for row in anchors if row != expected]
-    if remaining:
-        initial = _set("_spell_critical_hit", None)
-        restored = _set(
-            "_spell_critical_hit", "_spell_hit_event.spell_attack_context._spell_critical_hit"
-        )
-        saved = [
-            initial,
-            _when("_spell_hit_event.spell_attack_context._spell_critical_hit != null", [restored]),
-        ]
-        pairs = [i for i in range(len(effects) - 1) if effects[i : i + 2] == saved]
-        if prefix or remaining != [initial, restored] or len(pairs) != 1:
-            raise ValueError("Orb rejects unsupported critical initialization or restoration.")
-    direct = [index for index, row in enumerate(effects) if row == expected]
-    if direct:
-        split = direct[0] + 1
-        result = deepcopy(effects[:split] if prefix else effects[split:])
-        rows = result
-    else:
-        starts = [
-            index
-            for index, row in enumerate(effects)
-            if row == _set("_magic_zone_effect_allowed", True)
-        ]
-        if len(starts) != 1:
-            raise ValueError("Orb needs one actual magic-zone receiving group.")
-        start = starts[0]
-        check = _when(
-            "lasting_state.has_spell_magic_zones == true",
-            [
-                _call(
-                    "check_srd_magic_zone_effect",
-                    {
-                        "source_subject": "{_caster_state_id}",
-                        "target_subject": "{_target_id}",
-                        "effect_kind": "spell",
-                        "actual_spell_level": "{slot_level}",
-                    },
-                    ("_magic_zone_effect_allowed", "_magic_zone_blocking_source_ids"),
-                )
-            ],
-        )
-        if start + 2 >= len(effects) or effects[start + 1] != check:
-            raise ValueError("Orb rejects a changed magic-zone source/target check.")
-        gate = effects[start + 2]
-        if (
-            set(gate) != {"condition", "on_true", "on_false"}
-            or gate["condition"] != "_magic_zone_effect_allowed == true"
-        ):
-            raise ValueError("Orb needs the complete actual magic-zone branches.")
-        matches = [index for index, row in enumerate(gate["on_true"]) if row == expected]
-        if len(matches) != 1 or remaining and pairs[0] + 1 >= start:
-            raise ValueError("Orb's exact computation must follow saved context in the zone gate.")
-        split = matches[0] + 1
-        result = deepcopy(effects[: start + 3] if prefix else effects)
-        result[start + 2]["on_true"] = deepcopy(
-            gate["on_true"][:split] if prefix else gate["on_true"][split:]
-        )
-        rows = result[start + 2]["on_true"]
-    if prefix:
-        rows[:] = [
-            row
-            for row in rows
-            if not (
-                row.get("set", {}).get("field")
-                in {"_orb_source", "_orb_pending_action_id", "_orb_same_d8"}
-                or row.get("condition") == "spell == 'chromatic_orb'"
-                and "_orb_source" in str(row)
-            )
-        ]
-    return result
-
-
 def _leap_tools(leaf, finish):
     """Reuse the actual one-roll prefix and saved hit suffix in the existing pending frame."""
-    prefix = _leap_part(leaf, prefix=True)
-    suffix = _clear_sink(_leap_part(finish, prefix=False))
+    split = (
+        next(
+            i
+            for i, e in enumerate(leaf["effects"])
+            if e.get("set", {}).get("field") == "_spell_critical_hit"
+        )
+        + 1
+    )
+    prefix = deepcopy(leaf["effects"][:split])
+    prefix = [
+        e
+        for e in prefix
+        if not (
+            e.get("set", {}).get("field")
+            in {"_orb_source", "_orb_pending_action_id", "_orb_same_d8"}
+            or e.get("condition") == "spell == 'chromatic_orb'"
+            and "_orb_source" in str(e)
+        )
+    ]
+    suffix_start = (
+        next(
+            i
+            for i, e in enumerate(finish["effects"])
+            if e.get("set", {}).get("field") == "_spell_critical_hit"
+        )
+        + 1
+    )
+    suffix = _clear_sink(deepcopy(finish["effects"][suffix_start:]))
     suffix = [
         e
         for e in suffix

@@ -6,11 +6,9 @@ from copy import deepcopy
 if __package__:
     from .srd_actor_spell_modifiers import _emit
     from .srd_timed_actor_defenses import _load_runtime
-    from .srd_warding_bond_damage import _receiving_start
 else:
     from srd_actor_spell_modifiers import _emit
     from srd_timed_actor_defenses import _load_runtime
-    from srd_warding_bond_damage import _receiving_start
 
 PRESENTATION_FIELDS = frozenset(
     {
@@ -45,24 +43,6 @@ def _strings(value):
 def _without_presentation_snapshot(original, fields=PRESENTATION_FIELDS):
     """Remove only unused outputs, failing if a retained consumer needs any removed value."""
     tool = deepcopy(original)
-    if any(
-        effect.get("set", {}).get("field") == "_tp_received_object" for effect in tool["effects"]
-    ):
-        try:
-            start = _receiving_start(tool["effects"])
-        except ValueError as error:
-            raise SystemExit(
-                "Prismatic needs the exact native object receiving boundary."
-            ) from error
-        if tool["effects"][start].get("set", {}).get("field") != "_tp_received_object":
-            raise SystemExit("Prismatic needs the exact native object receiving boundary.")
-        # These are genuine receiving receipts, produced in either native branch, not
-        # unused scalar presentation snapshots. Keep their guarded writes and exports.
-        receiving_fields = {"_hp_after", "_hp_lost", "_temp_hp_after", "_is_alive_after"}
-        assigned = {effect.get("set", {}).get("field") for effect in _effects(tool["effects"])}
-        if not (fields & receiving_fields) <= assigned:
-            raise SystemExit("Prismatic needs all native receiving receipt assignments.")
-        fields = fields - receiving_fields
     removed = [effect for effect in tool["effects"] if effect.get("set", {}).get("field") in fields]
     if len(removed) != len(fields) or {effect["set"]["field"] for effect in removed} != fields:
         raise SystemExit("Prismatic needs the exact final typed owner's presentation outputs.")

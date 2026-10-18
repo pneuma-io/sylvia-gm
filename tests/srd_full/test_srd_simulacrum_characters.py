@@ -6,7 +6,7 @@ from dataclasses import replace
 import pytest
 
 from sylvia_gm.domain.errors import RulesetPreconditionRejected
-from tests.srd_full import test_srd_simulacrum as sim
+from tests import test_srd_simulacrum as sim
 from tests.srd_full.test_srd_extended_casting import _begin
 from tests.srd_full.test_srd_spell_wave3_information import _entity
 
@@ -239,7 +239,7 @@ def test_public_paid_pc_original_reopens_for_independent_slot_cast_and_exact_ret
     from sylvia_gm.application.authority import AuthorityOwner
     from sylvia_gm.domain.authority import ActionStatus
     from sylvia_gm.domain.package_library import canonical_json_bytes
-    from tests.srd_full import test_srd_plant_growth as growth
+    from tests import test_srd_plant_growth as growth
     from tests.srd_full.test_srd_npc_spell_casting import _act
 
     monkeypatch.setattr(growth, "PUBLIC_TOOLS", REPAIR_TOOLS | TURN_TOOLS)

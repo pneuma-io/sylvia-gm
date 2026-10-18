@@ -14,7 +14,7 @@ from sylvia_gm.application.authority import (
     CampaignCreate,
     ResolveMechanicsChoiceCommand,
 )
-from tests.srd_full.full_package_fixture import bundled_srd_archive
+from sylvia_gm.application.bundled_packages import bundled_srd_archive
 from sylvia_gm.application.package_runtime import AuthorityMemoryStateBridge
 from sylvia_gm.application.plan_state_admission import validate_plan_state
 from sylvia_gm.domain.authority import (

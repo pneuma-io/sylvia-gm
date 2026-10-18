@@ -1460,8 +1460,7 @@ def _dwelling_tools(tools, changed):
 def _bind_selected_recovery(changed):
     recovery = changed["cast_srd_recovery"]
     choices = [kind for kind in SELECTED_KINDS if "dispel_srd_" + kind + "_owned_source" in changed]
-    legacy_marker = " and ".join("recovery_choice != " + repr(kind) for kind in choices)
-    marker = "recovery_choice not in _recovery_source_owners"
+    marker = " and ".join("recovery_choice != " + repr(kind) for kind in choices)
     ordinary_marker = "_recovery_selected_source != true"
     ordinary = []
     source_conditions = {
@@ -1486,8 +1485,6 @@ def _bind_selected_recovery(changed):
 
     def wrap(effects, guarded=False):
         for i, effect in enumerate(effects):
-            if effect.get("condition") == legacy_marker:
-                effect["condition"] = marker
             protected = guarded or effect.get("condition") == marker
             if effect.get("call") == "dispel_srd_target_sources" and not protected:
                 effects[i] = _when(marker, [effect])

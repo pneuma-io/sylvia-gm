@@ -14,18 +14,17 @@ import yaml
 from scripts.srd_full.srd_contingency_removal import bind_runtime
 from scripts.srd_full.srd_spell_removal_adoption import _bind_selected_recovery
 from scripts.srd_full.srd_timed_actor_defenses import _load_runtime
+
 from sylvia_gm import dice
 from sylvia_gm.application.authority import AuthorityOwner
-from tests.srd_full.full_package_fixture import _archive, _srd_drafts
+from sylvia_gm.application.bundled_packages import _archive, _srd_drafts
 from sylvia_gm.application.package_materialization import NormalizedPackageDraft
 from sylvia_gm.domain.authority import ActionStatus
 from sylvia_gm.domain.errors import RulesetPreconditionRejected
 from sylvia_gm.domain.package_library import canonical_json_bytes
 from sylvia_gm.runtime._schema_validator import validate_ruleset_data
-from sylvia_gm.spatial import admit_spatial_scene
-
-from tests.srd_full import test_srd_contingency_spell as parent
-from tests.srd_full import test_srd_public_spell_casting as public_casting
+from tests import test_srd_contingency_spell as parent
+from tests import test_srd_public_spell_casting as public_casting
 from tests.srd_full.test_srd_npc_spell_casting import _act
 
 force, ROOT, SRD, POOL = parent.force, parent.ROOT, parent.SRD, parent.POOL
@@ -136,16 +135,9 @@ def _owners(monkeypatch):
 
 
 def _cast(monkeypatch):
-    # Read the complete current scene before parent._state temporarily binds its headers.
-    raw_scene = force.objects._state()[f"{SRD}.state"]["spatial_scene"]
-    scene = admit_spatial_scene(raw_scene)
-    state, data, params = parent._state(monkeypatch)
-    assert state[f"{SRD}.state"].get("spatial_scene") is None
-    state[f"{SRD}.state"]["spatial_scene"] = scene.as_payload()
-    assert admit_spatial_scene(state[f"{SRD}.state"]["spatial_scene"]).snapshot_id == (
-        scene.snapshot_id
-    )
-    sid = parent._finish_setup(state, data, params)
+    scene = deepcopy(force.objects._state()[f"{SRD}.state"]["spatial_scene"])
+    state, data, params, sid = parent._cast(monkeypatch)
+    state[f"{SRD}.state"]["spatial_scene"] = scene
     for collection in (
         data["wizard_spellbook"],
         data["spellcasting_grants"][0]["spells"],

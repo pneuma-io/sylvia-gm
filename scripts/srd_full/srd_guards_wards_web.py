@@ -870,11 +870,7 @@ def _movement_tools():
 def _bind_ground_routes(tools):
     """Extend the actual ground-route leaf, including the delegated environment segment."""
     changed = {}
-    for name in (
-        "move_srd_scene_creature_node",
-        "move_srd_scene_creature_environment_segment",
-        "move_srd_scene_creature_celestial_segment",
-    ):
+    for name in ("move_srd_scene_creature_node", "move_srd_scene_creature_environment_segment"):
         if name not in tools:
             continue
         node = deepcopy(tools[name])

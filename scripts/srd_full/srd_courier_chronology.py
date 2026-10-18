@@ -468,7 +468,6 @@ def _step():
                                     "destination": "{_scene_actor_position}",
                                     "mode": "{_courier_mode}",
                                     "movement_distance": "{_scene_movement_distance}",
-                                    "movement_start": "{_chronology_origin}",
                                 },
                             ),
                             _call(
@@ -592,7 +591,7 @@ def _controller():
 
 
 def _movement_aftermath(tools):
-    """Retain final segment and outer observers with the real pre-move origin."""
+    """Keep final observers after the physical route branch, including expanded ward guards."""
     node = deepcopy(tools["move_srd_scene_creature_node"])
     routes = [
         i
@@ -602,61 +601,13 @@ def _movement_aftermath(tools):
             for item in effect.get("on_true", [])
         )
     ]
-    if len(routes) == 1:
-        aftermath = node["effects"][routes[0] + 1 :]
-    elif routes:
-        raise ValueError("Courier rejects ambiguous physical route owners.")
-    else:
-        segment = tools["move_srd_scene_creature_celestial_segment"]
-        segment_routes = [
-            i
-            for i, effect in enumerate(segment["effects"])
-            if any(item == _set("_ground_route_ids", []) for item in effect.get("on_true", []))
-        ]
-        expected = _call(
-            "move_srd_scene_creature_celestial_segment",
-            {
-                "actor_state": "{_actor_state_id}",
-                "destination": "{destination}",
-                "mode": "{mode}",
-                "difficult_terrain": "{difficult_terrain}",
-                "lasting_state": "{_lasting_state_id}",
-                "witness_state_ids": "{witness_state_ids}",
-                "levitate_source_id": "{levitate_source_id}",
-                "time_stop_state": "{_time_stop_state_id}",
-            },
-            [
-                "_scene_movement_distance",
-                "_scene_movement_cost",
-                "_scene_actor_position",
-                "_scene_actor_entity_id",
-            ],
-        )
-        outer = [
-            i
-            for i, effect in enumerate(node["effects"])
-            if effect.get("condition") == "len(celestial_entry_choices) > 0"
-            and effect.get("on_false") == [expected]
-        ]
-        if len(segment_routes) != 1 or len(outer) != 1:
-            raise ValueError("Courier requires one exact final physical route/delegation.")
-        route = segment["effects"][segment_routes[0]]
-        if route.get("condition") != (
-            "lasting_state.has_spell_environments == true or "
-            "lasting_state.has_guarded_web_sections == true"
-        ):
-            raise ValueError("Courier rejects a changed final ground-route predicate.")
-        aftermath = deepcopy(segment["effects"][segment_routes[0] + 1 :])
-        aftermath += node["effects"][outer[0] + 1 :]
+    if len(routes) != 1:
+        raise ValueError("Courier chronology requires the final owning environment route branch.")
     node["effects"] = [
         _set("_scene_movement_distance", "movement_distance"),
-        _set("_tsunami_move_start", "movement_start"),
-        *aftermath,
+        *node["effects"][routes[0] + 1 :],
     ]
-    node["parameters"] += [
-        _parameter("movement_distance", "number"),
-        _parameter("movement_start", "array", items={"type": "number"}, min_items=3, max_items=3),
-    ]
+    node["parameters"].append(_parameter("movement_distance", "number"))
     return node
 
 

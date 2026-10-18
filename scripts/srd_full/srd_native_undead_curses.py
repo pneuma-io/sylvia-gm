@@ -437,20 +437,10 @@ def _maximum_zero_death_tool(tools):
             from srd_qualified_packet_implementations import _expanded_core
 
         packet["effects"] = _expanded_core(tools["execute_srd_qualified_composite_packet"], True)
-    # True Polymorph owns the object branch; native curses use its genuine ordinary branch.
-    effects = packet["effects"]
-    if any(e.get("set", {}).get("field") == "_tp_received_object" for e in effects):
-        if __package__:
-            from .srd_warding_bond_damage import _receiving_start
-        else:
-            from srd_warding_bond_damage import _receiving_start
-
-        start = _receiving_start(effects)
-        effects = effects[start + 1]["on_false"]
-    ordinary_zero = "target.hp == 0 and target.creature_kind == 'monster'"
-    guarded_zero = "(" + ordinary_zero + ") and target.astral_projection_role != 'form'"
     zero = [
-        effect for effect in effects if effect.get("condition") in (ordinary_zero, guarded_zero)
+        effect
+        for effect in packet["effects"]
+        if effect.get("condition") == "target.hp == 0 and target.creature_kind == 'monster'"
     ]
     if len(zero) != 1:
         raise ValueError("Native maximum-zero death needs the actual final monster-zero boundary.")
@@ -506,20 +496,11 @@ def _maximum_zero_death_tool(tools):
         ),
     )
 
-    death.append(_set("_native_mummy_maximum_zero_death", True))
-    if zero[0]["condition"] == guarded_zero:
-        # Keep the final receiver's Astral form protection with its unchanged death suffix.
-        death = [
-            _set("_native_mummy_maximum_zero_death", False),
-            _when("target_state.astral_projection_role != 'form'", death),
-        ]
-
     return _tool(
         "Apply this authenticated native maximum-zero instant death through final death owners.",
         [
             _entity("target_state"),
             _parameter("source_id"),
-            _parameter("hp_before", "integer", minimum=0, model_hidden=True),
             _optional("lasting_state", resolve="entity", default="state"),
         ],
         [
@@ -538,7 +519,6 @@ def _maximum_zero_death_tool(tools):
                 "target_state.is_alive == true",
                 "Use only this actual native curse's real maximum-zero body.",
             ),
-            _set("_hp_before", "hp_before"),
             _set("_native_maximum_concentration_target", None),
             _when(
                 "target_state.concentration_target_state_id != null",
@@ -550,6 +530,7 @@ def _maximum_zero_death_tool(tools):
                 ],
             ),
             *death,
+            _set("_native_mummy_maximum_zero_death", True),
         ],
     )
 
@@ -619,7 +600,6 @@ def _mummy_maximum_tools(tools):
                     _when(
                         "_native_mummy_daily_prevented != true",
                         [
-                            _set("_native_mummy_daily_hp_before", "target_state.hp"),
                             _set(
                                 "_native_mummy_daily_applied",
                                 "min(target_state.max_hp, _native_mummy_daily_reduction)",
@@ -686,7 +666,6 @@ def _mummy_maximum_tools(tools):
                                         {
                                             "target_state": "{_target_state_id}",
                                             "source_id": "{source_id}",
-                                            "hp_before": "{_native_mummy_daily_hp_before}",
                                             "lasting_state": "{_lasting_state_id}",
                                         },
                                         ("_native_mummy_maximum_zero_death",),

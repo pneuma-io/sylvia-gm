@@ -17,7 +17,6 @@
         "entity_creation.v1",
         "participant_mutation.v1",
         "required_starting_state.v1",
-        "runtime_choice_sequences.v1",
         "runtime_immutable_collections.v1",
         "runtime_require.v1",
         "starting_state_validation.v1"

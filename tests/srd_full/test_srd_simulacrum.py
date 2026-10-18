@@ -1,17 +1,14 @@
 """Simulacrum uses the actual native body, casting clock, resources and recovery owners."""
 
-import json
 import os
-import subprocess
 from copy import deepcopy
-from pathlib import Path
 
 import pytest
 import yaml
 
 from sylvia_gm.domain.errors import RulesetPreconditionRejected
-from tests.srd_full import test_srd_awaken as awaken
-from tests.srd_full import test_srd_magic_jar as jar
+from tests import test_srd_awaken as awaken
+from tests import test_srd_magic_jar as jar
 from tests.srd_full.test_srd_extended_casting import _begin
 from tests.srd_full.test_srd_spell_wave3_information import _entity, _scene
 
@@ -186,24 +183,9 @@ def test_actual_zero_hit_points_melts_only_the_source_owned_duplicate():
     assert state[f"{SRD}.state"]["created_actor_records"]["snow"]["active"] is False
 
 
-@pytest.mark.parametrize("completed_rounds", [0, 37])
-def test_original_leaving_then_returning_does_not_erase_twelve_hour_proximity_failure(
-    completed_rounds,
-):
+def test_original_leaving_then_returning_does_not_erase_twelve_hour_proximity_failure():
     state, data, params = _case()
     _begin_cast(state, data, params)
-    if completed_rounds:
-        _run(
-            "continue_srd_spell_cast",
-            state,
-            data,
-            caster_state="hero",
-            elapsed_rounds=completed_rounds,
-            uninterrupted=True,
-            verbal_component_available=True,
-            somatic_component_available=True,
-            material_component_available=True,
-        )
     for destination in ([11, 0, 0], [3, 0, 0]):
         _run(
             "move_srd_scene_creature",
@@ -216,9 +198,7 @@ def test_original_leaving_then_returning_does_not_erase_twelve_hour_proximity_fa
         )
     assert _target(state, "hero")["extended_casting"]["simulacrum_proximity_broken"] is True
     slot = _target(state, "hero")["resources"]["spell_slot_7"]
-    materials = deepcopy(_target(state, "hero")["spell_materials"])
-    channel = deepcopy(_target(state, "hero")["extended_casting"])
-    receipt = _run(
+    _run(
         "continue_srd_spell_cast",
         state,
         data,
@@ -232,120 +212,6 @@ def test_original_leaving_then_returning_does_not_erase_twelve_hour_proximity_fa
     assert _target(state, "hero")["extended_casting"] is None
     assert _target(state, "hero")["resources"]["spell_slot_7"] == slot
     assert "snow" not in state[f"{SRD}.entities"]
-    assert _target(state, "hero")["spell_materials"] == materials
-    assert receipt.result["status"] == "committed"
-    assert channel["progress_rounds"] == completed_rounds
-    _assert_interrupted_card(receipt.result, completed_rounds, channel["required_rounds"])
-    saved = deepcopy(receipt.result)
-    _target(state, "hero")["name"] = "Later caster"
-    _run("advance_srd_lasting_time", state, data, elapsed_rounds=1)
-    assert receipt.result == saved
-
-
-def _assert_interrupted_card(result, completed_rounds, required_rounds):
-    card = result.get("result_card")
-    assert isinstance(card, dict), "Committed interruption needs its own saved continuation receipt"
-    assert card["title"] == "Simulacrum"
-    assert card["summary"] == [
-        {"label": "Casting", "value": "Interrupted", "emphasis": True},
-        {"label": "Rounds completed", "value": completed_rounds, "emphasis": False},
-        {"label": "Rounds required", "value": required_rounds, "emphasis": False},
-    ]
-    assert card["details"] == [] and card["actions"] == []
-    assert result["context"]["caster_state"]["extended_casting"] is None
-    assert "_continued_cast_requirements" not in result["context"]
-    source = Path(__file__).parents[2] / "src-tauri/frontend/app.js"
-    script = """
-const fs = require('fs'), assert = require('node:assert/strict');
-global.window = {}; global.document = {addEventListener(){}};
-eval(fs.readFileSync(process.argv[1], 'utf8'));
-const html = window.SylviaGMFrontend.toolResultMarkup({
-  tool_name: 'continue_srd_spell_cast', result: JSON.parse(process.argv[2])
-}, '');
-assert(html.includes('Simulacrum') && html.includes('Interrupted'));
-assert(html.includes('result-card-compact'));
-assert(!html.includes('Operation completed') && !html.includes('Ready to finish'));
-assert(!html.includes('Later caster') && !html.includes('Actual host'));
-"""
-    subprocess.run(
-        ["node", "-e", script, str(source), json.dumps(result)],
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-
-
-def test_public_interrupted_continuation_survives_reopen_and_replay(tmp_path, monkeypatch):
-    from sylvia_gm.application.authority import AuthorityOwner
-    from sylvia_gm.domain.authority import ActionStatus
-    from sylvia_gm.domain.errors import MechanicsRejected
-    from tests.srd_full import test_srd_public_spell_casting as public
-    from tests.srd_full.test_srd_npc_spell_casting import _act
-
-    # Public admission and the direct fixture must bind the same genuine composed runtime.
-    assert (jar.budget.ROOT / "runtime/ruleset.yaml").read_bytes() == (
-        public.ROOT / "rulesets/dnd-srd-5.2.1/runtime/ruleset.yaml"
-    ).read_bytes()
-    state, data, params = _case()
-    monkeypatch.setattr(public, "_spell_case", lambda _spell: (state, data, params))
-    database = tmp_path / "interrupted-continuation.db"
-    with AuthorityOwner.open(database, "casting-owner") as owner:
-        public._create_spell_campaign(owner, "simulacrum")
-        begun, _ = _act(owner, "begin_srd_spell_cast", **(_begin(params) | {"target": "beast"}))
-        assert begun.status is ActionStatus.COMMITTED
-        for destination in ([11, 0, 0], [3, 0, 0]):
-            moved, _ = _act(
-                owner,
-                "move_srd_scene_creature",
-                actor_state="beast",
-                destination=destination,
-                mode="walk",
-                difficult_terrain=False,
-            )
-            assert moved.status is ActionStatus.COMMITTED
-        before = owner.snapshot("casting")
-        channel = before.state[f"{SRD}.entities"]["hero"]["extended_casting"]
-        assert channel["simulacrum_proximity_broken"] is True
-        receipt, command = _act(
-            owner,
-            "continue_srd_spell_cast",
-            caster_state="hero",
-            elapsed_rounds=7200,
-            uninterrupted=True,
-            verbal_component_available=True,
-            somatic_component_available=True,
-            material_component_available=True,
-        )
-        assert receipt.status is ActionStatus.COMMITTED
-        _assert_interrupted_card(
-            receipt.result, channel["progress_rounds"], channel["required_rounds"]
-        )
-        after = owner.snapshot("casting")
-        for field in ("resources", "spell_materials"):
-            assert (
-                after.state[f"{SRD}.entities"]["hero"][field]
-                == before.state[f"{SRD}.entities"]["hero"][field]
-            )
-        assert "snow" not in after.state[f"{SRD}.entities"]
-        saved_result = deepcopy(receipt.result)
-    with AuthorityOwner.open(database, "casting-owner") as owner:
-        assert owner.saved_action_receipt("casting", command.action_id) == receipt
-        assert owner.execute_action(command) == receipt
-        assert owner.snapshot("casting") == after
-        elapsed, _ = _act(owner, "advance_srd_lasting_time", elapsed_rounds=1)
-        assert elapsed.status is ActionStatus.COMMITTED
-        later = owner.snapshot("casting")
-        with pytest.raises(MechanicsRejected, match="no uninterrupted"):
-            _act(owner, "continue_srd_spell_cast", caster_state="hero", uninterrupted=True)
-        assert owner.snapshot("casting") == later
-        assert owner.execute_action(command) == receipt
-        assert owner.snapshot("casting") == later
-        assert owner.saved_action_receipt("casting", command.action_id).result == saved_result
-    with AuthorityOwner.open(database, "casting-owner") as owner:
-        assert owner.snapshot("casting") == later
-        assert owner.execute_action(command) == receipt
-        assert owner.snapshot("casting") == later
-        assert owner.saved_action_receipt("casting", command.action_id).result == saved_result
 
 
 def test_real_recast_retires_only_prior_owned_body_and_consumes_new_paid_cost():
@@ -558,38 +424,17 @@ def test_until_dispelled_body_does_not_gain_a_finite_free_dismissal_receipt():
 
 
 def test_owner_emission_repeats_without_duplicate_cast_repair_damage_or_turn_hooks():
-    from scripts.srd_full.srd_simulacrum_consumers import _declare_interrupted_continuation_receipt
+    from scripts.srd_full.srd_simulacrum import extend_runtime
+    from scripts.srd_full.srd_simulacrum_consumers import bind_consumers
+    from scripts.srd_full.srd_simulacrum_turns import bind_turn_consumers
 
     text = (jar.budget.ROOT / "runtime/ruleset.yaml").read_text()
-    native = yaml.load(text, Loader=yaml.CSafeLoader)
-    without = deepcopy(native)
-    tool = without["tools"]["continue_srd_spell_cast"]
-
-    # Remove only this declaration's captures, retaining all existing mechanics.
-    def remove_captures(effects):
-        for effect in effects:
-            for branch in ("on_true", "on_false"):
-                if branch in effect:
-                    effect[branch] = [
-                        child
-                        for child in effect[branch]
-                        if not child.get("set", {}).get("field", "").startswith("_continued_")
-                    ]
-                    remove_captures(effect[branch])
-
-    remove_captures(tool["effects"])
 
     def compose(value):
-        parsed = yaml.load(value, Loader=yaml.CSafeLoader)
-        _declare_interrupted_continuation_receipt(
-            parsed["tools"]["continue_srd_spell_cast"],
-            parsed["definitions"]["spell_casting"]["simulacrum"]["name"],
-        )
-        return yaml.dump(parsed, Dumper=yaml.CSafeDumper, sort_keys=False)
+        return bind_turn_consumers(bind_consumers(extend_runtime(value)))
 
-    first = compose(yaml.dump(without, Dumper=yaml.CSafeDumper, sort_keys=False))
+    first = compose(text)
     second = compose(first)
-    assert yaml.load(first, Loader=yaml.CSafeLoader) == native
     assert yaml.load(first, Loader=yaml.CSafeLoader) == yaml.load(second, Loader=yaml.CSafeLoader)
 
 
@@ -602,7 +447,7 @@ def test_public_real_twelve_hour_cast_reopens_for_actual_dispel_and_all_retries(
     from sylvia_gm.application.authority import AuthorityOwner
     from sylvia_gm.domain.authority import ActionStatus
     from sylvia_gm.domain.package_library import canonical_json_bytes
-    from tests.srd_full import test_srd_plant_growth as growth
+    from tests import test_srd_plant_growth as growth
     from tests.srd_full.test_srd_npc_spell_casting import _act
 
     monkeypatch.setattr(growth, "PUBLIC_TOOLS", REPAIR_TOOLS | TURN_TOOLS)

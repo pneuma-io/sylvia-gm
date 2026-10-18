@@ -692,7 +692,7 @@ MANIFEST_PARAMETER_CONSTRAINTS: dict[str, dict[str, dict[str, Any]]] = {
         "name": {"minLength": 1, "maxLength": 120},
         "source": {"minLength": 1, "maxLength": 1000},
     },
-    "restore_hit_points": {"amount": {"minimum": 1}},
+    "restore_hit_points": {"amount": {"minimum": 0}},
 }
 
 

@@ -27,10 +27,10 @@ from sylvia_gm.domain.authority import owned_payload
 from sylvia_gm.domain.errors import RulesetPreconditionRejected
 from sylvia_gm.domain.package_library import ToolDeclaration
 from sylvia_gm.runtime._schema_validator import validate_ruleset_data
-from tests.srd_full import test_srd_action_budget as actions
-from tests.srd_full import test_srd_prismatic_wall as wall
-from tests.srd_full import test_srd_spell_object_content as objects
-from tests.srd_full import test_srd_spell_result_cards as cards
+from tests import test_srd_action_budget as actions
+from tests import test_srd_prismatic_wall as wall
+from tests import test_srd_spell_object_content as objects
+from tests import test_srd_spell_result_cards as cards
 
 ROOT = Path(__file__).resolve().parents[2]
 SRD = objects.SRD
@@ -38,7 +38,7 @@ BASE = Path(
     os.environ.get("FC14_SOLID_WALL_RUNTIME", ROOT / "rulesets/dnd-srd-5.2.1/runtime/ruleset.yaml")
 )
 SOURCE_PARENT = Path(
-    os.environ.get("FC14_SOLID_WALL_SOURCE_PARENT", ROOT / "scripts/srd_full/srd_spell_source_instances.py")
+    os.environ.get("FC14_SOLID_WALL_SOURCE_PARENT", ROOT / "scripts/srd_spell_source_instances.py")
 )
 
 

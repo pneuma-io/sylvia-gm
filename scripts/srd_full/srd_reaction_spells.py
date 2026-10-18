@@ -2177,14 +2177,12 @@ def _complete_cast_window(complete, cast):
     cleanup += 1
     tail = effects[cleanup:]
     effects[cleanup:] = [
-        _set("_pending_completion_kind", "state.pending_srd_actions[pending_action_id].kind"),
-        _set("_pending_completion_stage", "state.pending_srd_actions[pending_action_id].stage"),
         _set(
             "_keep_spell_hit_open",
-            "_pending_completion_kind == "
-            "'spell_attack' and _pending_completion_stage == "
+            "state.pending_srd_actions[pending_action_id].kind == "
+            "'spell_attack' and state.pending_srd_actions[pending_action_id].stage == "
             "'spell_attack_reaction' or "
-            "_pending_completion_kind == 'teleport_resolution'",
+            "state.pending_srd_actions[pending_action_id].kind == 'teleport_resolution'",
         ),
         _when("_keep_spell_hit_open != true", tail),
     ]

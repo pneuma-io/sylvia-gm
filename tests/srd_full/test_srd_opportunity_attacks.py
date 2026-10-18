@@ -104,7 +104,7 @@ def test_public_character_reaction_reopens_pending_and_retries_once(tmp_path, we
 
     from sylvia_gm.agent._stateless_mcp import StatelessMcpMechanics
     from sylvia_gm.application.authority import ActionCommand, AuthorityOwner, CampaignCreate
-    from tests.srd_full.full_package_fixture import bundled_srd_archive
+    from sylvia_gm.application.bundled_packages import bundled_srd_archive
     from sylvia_gm.domain.authority import ActionStatus, StateValue, WriterRole
     from tests.srd_full.test_srd_second_wind import _installed_fighter
 

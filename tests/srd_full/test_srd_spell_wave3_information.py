@@ -792,7 +792,7 @@ def test_public_information_cast_reopens_retries_then_consumes_saved_source(
     from sylvia_gm.agent._stateless_mcp import StatelessMcpMechanics
     from sylvia_gm.application.authority import AuthorityOwner
     from sylvia_gm.domain.authority import ActionStatus
-    from tests.srd_full import test_srd_public_spell_casting as public
+    from tests import test_srd_public_spell_casting as public
     from tests.srd_full.test_srd_npc_spell_casting import _act
 
     monkeypatch.setattr(public, "_spell_case", _case)
@@ -921,7 +921,7 @@ def test_public_npc_information_cast_uses_its_saved_daily_use_then_communicates(
     from sylvia_gm.agent._stateless_mcp import StatelessMcpMechanics
     from sylvia_gm.application.authority import AuthorityOwner
     from sylvia_gm.domain.authority import ActionStatus
-    from tests.srd_full import test_srd_public_spell_casting as public
+    from tests import test_srd_public_spell_casting as public
     from tests.srd_full.test_srd_npc_spell_casting import _act, _prepare_mage
 
     def npc_case(spell):

@@ -24,7 +24,7 @@ def test_end_turn_removes_only_the_selected_condition_and_records_it(condition):
     result = _run("end_combat_turn", state, participant_data=data, self_restoration=condition)
     hero = state[f"{SRD}.entities"]["hero"]
     remaining = [c for c in ["charmed", "frightened", "poisoned"] if c != condition]
-    assert hero["conditions"] == remaining
+    assert sorted(hero["conditions"]) == sorted(remaining)
     assert "Self-Restoration" in str(result.result["result_card"])
     assert state[f"{SRD}.combat"]["turn_active"] is False
     before = deepcopy(state)
@@ -33,13 +33,17 @@ def test_end_turn_removes_only_the_selected_condition_and_records_it(condition):
     assert state == before
 
 
-@pytest.mark.parametrize("level,cause,expected", [
-    (10, "lack_of_food_or_drink", 0), (9, "lack_of_food_or_drink", 1), (10, "other", 1),
-])
+@pytest.mark.parametrize(
+    "level,cause,expected",
+    [
+        (10, "lack_of_food_or_drink", 0),
+        (9, "lack_of_food_or_drink", 1),
+        (10, "other", 1),
+    ],
+)
 def test_only_earned_self_restoration_prevents_food_or_drink_exhaustion(level, cause, expected):
     state, data = _monk(level)
-    _run("gain_srd_exhaustion", state, participant_data=data,
-         target="hero", levels=1, cause=cause)
+    _run("gain_srd_exhaustion", state, participant_data=data, target="hero", levels=1, cause=cause)
     hero = state[f"{SRD}.entities"]["hero"]
     assert hero["exhaustion_level"] == expected
     assert ("exhaustion" in hero["conditions"]) is (expected > 0)
@@ -63,23 +67,41 @@ def test_end_turn_without_selection_keeps_conditions_and_npc_food_exhaustion_sti
     state, data = _monk()
     _run("end_combat_turn", state, participant_data=data)
     assert state[f"{SRD}.entities"]["hero"]["conditions"] == ["charmed", "frightened", "poisoned"]
-    _run("gain_srd_exhaustion", state, participant_data=data,
-         target="guard", levels=1, cause="lack_of_food_or_drink")
+    _run(
+        "gain_srd_exhaustion",
+        state,
+        participant_data=data,
+        target="guard",
+        levels=1,
+        cause="lack_of_food_or_drink",
+    )
     assert state[f"{SRD}.entities"]["guard"]["exhaustion_level"] == 1
 
 
-@pytest.mark.parametrize("seed,recovered,died", [
-    (1, False, False), (5, True, False), (31, False, True),
-])
+@pytest.mark.parametrize(
+    "seed,recovered,died",
+    [
+        (1, False, False),
+        (5, True, False),
+        (31, False, True),
+    ],
+)
 def test_automatic_death_save_requests_a_choice_only_when_a_living_turn_ends(
-    monkeypatch, seed, recovered, died,
+    monkeypatch,
+    seed,
+    recovered,
+    died,
 ):
     monkeypatch.setattr(dice, "_rng", Random(seed))
     monkeypatch.setattr(dice, "set_seed", lambda _seed: None)
     state, data = _monk()
     state[f"{SRD}.entities"]["hero"].update(
-        hp=0, stable=False, conditions=["unconscious", "poisoned"],
-        death_successes=0, death_failures=1, stable_recovery_hours_remaining=0,
+        hp=0,
+        stable=False,
+        conditions=["unconscious", "poisoned"],
+        death_successes=0,
+        death_failures=1,
+        stable_recovery_hours_remaining=0,
     )
     before = deepcopy(state)
     result = _run("death_saving_throw", state, participant_data=data)
@@ -107,47 +129,77 @@ def test_death_save_choice_resumes_same_roll_and_removes_only_selection(monkeypa
     monkeypatch.setattr(dice, "set_seed", lambda _seed: None)
     state, data = _monk()
     state[f"{SRD}.entities"]["hero"].update(
-        hp=0, stable=False, death_successes=0, death_failures=0,
+        hp=0,
+        stable=False,
+        death_successes=0,
+        death_failures=0,
         stable_recovery_hours_remaining=0,
     )
     context = MechanicContext(
-        campaign_id="budget", turn_id="turn", action_id="death",
-        state=owned_payload(state), parameters=owned_payload({}),
-        participants=owned_payload({"hero": {"participant_id": "hero",
-            "kind": "player_character", "validation_status": "validated",
-            "package_id": SRD, "data": {"name": "Monk", **data}}}),
+        campaign_id="budget",
+        turn_id="turn",
+        action_id="death",
+        state=owned_payload(state),
+        parameters=owned_payload({}),
+        participants=owned_payload(
+            {
+                "hero": {
+                    "participant_id": "hero",
+                    "kind": "player_character",
+                    "validation_status": "validated",
+                    "package_id": SRD,
+                    "data": {"name": "Monk", **data},
+                }
+            }
+        ),
     )
     monkeypatch.setattr(dice, "_rng", Random(1))
     waiting = _mechanic("death_saving_throw")(context)
     assert waiting.mutations == ()
     assert [o.option_id for o in waiting.choice.options] == [
-        "none", "charmed", "frightened", "poisoned",
+        "none",
+        "charmed",
+        "frightened",
+        "poisoned",
     ]
     monkeypatch.setattr(dice, "_rng", Random(1))
-    result = _mechanic("death_saving_throw")(replace(context, choice_resolution=
-        MechanicsChoiceResolution(waiting.choice.choice_id, selection, waiting.choice)))
+    result = _mechanic("death_saving_throw")(
+        replace(
+            context,
+            choice_resolution=MechanicsChoiceResolution(
+                waiting.choice.choice_id, selection, waiting.choice
+            ),
+        )
+    )
     saved = {f"{m.namespace}.{m.key}": m.value for m in result.mutations}
     hero = saved[f"{SRD}.entities"]["hero"]
     assert hero["death_failures"] == 1
     assert hero["hp"] == 0
-    assert hero["conditions"] == [c for c in ["charmed", "frightened", "poisoned"]
-                                   if c != selection]
+    assert sorted(hero["conditions"]) == sorted(
+        c for c in ["charmed", "frightened", "poisoned"] if c != selection
+    )
     assert saved[f"{SRD}.combat"]["turn_active"] is False
     assert ("Self-Restoration" in str(result.result["result_card"])) is (selection != "none")
 
 
 def test_ending_encounter_preserves_selected_end_turn_restoration_and_its_result():
     state, data = _monk()
-    result = _run("end_combat_encounter", state, participant_data=data,
-                  end_reason="fighting_stopped", self_restoration="frightened")
+    result = _run(
+        "end_combat_encounter",
+        state,
+        participant_data=data,
+        end_reason="fighting_stopped",
+        self_restoration="frightened",
+    )
     assert "frightened" not in state[f"{SRD}.entities"]["hero"]["conditions"]
     assert "Self-Restoration" in str(result.result["result_card"])
 
 
-
-@pytest.mark.parametrize("death_save,reroll", [(False, False), (True, False), (True, True)])
+@pytest.mark.parametrize("death_save", [False, True])
 def test_public_self_restoration_reopens_and_replays_without_another_removal(
-    tmp_path, monkeypatch, death_save, reroll,
+    tmp_path,
+    monkeypatch,
+    death_save,
 ):
     import io
     from dataclasses import replace
@@ -159,89 +211,86 @@ def test_public_self_restoration_reopens_and_replays_without_another_removal(
         CampaignCreate,
         ResolveMechanicsChoiceCommand,
     )
-    from tests.srd_full.full_package_fixture import bundled_srd_archive
     from sylvia_gm.domain.authority import ActionStatus, StateValue, WriterRole
+    from tests.srd_full.test_srd_disciplined_survivor import _native_archive
     from tests.srd_full.test_srd_second_wind import _installed_fighter
 
     database = tmp_path / "self-restoration.db"
-    state, data = _monk(14 if reroll else 10)
-    if reroll:
-        state[f"{SRD}.entities"]["hero"].update(
-            resources={"focus_point": 14}, resource_maxima={"focus_point": 14},
-        )
-    state[f"{SRD}.combat"].update(active_actor_kind="character", active_actor_can_act=True,
-                                 active_actor_at_zero_hp=False)
+    state, data = _monk()
+    state[f"{SRD}.combat"].update(
+        active_actor_kind="character", active_actor_can_act=True, active_actor_at_zero_hp=False
+    )
     if death_save:
-        monkeypatch.setattr(dice, "set_seed",
-                            lambda seed: setattr(dice, "_rng", Random(2 if reroll else 1)))
-        state[f"{SRD}.combat"].update(active_actor_can_act=False,
-                                     active_actor_at_zero_hp=True, active_actor_stable=False)
+        monkeypatch.setattr(dice, "set_seed", lambda seed: setattr(dice, "_rng", Random(1)))
+        state[f"{SRD}.combat"].update(
+            active_actor_can_act=False, active_actor_at_zero_hp=True, active_actor_stable=False
+        )
         state[f"{SRD}.entities"]["hero"].update(
-            hp=0, stable=False, death_successes=0, death_failures=0,
+            hp=0,
+            stable=False,
+            death_successes=0,
+            death_failures=0,
             stable_recovery_hours_remaining=0,
         )
     with AuthorityOwner.open(database, "test") as owner:
-        package = owner.install_package_archive(io.BytesIO(bundled_srd_archive()), install_id="srd")
+        # This current-source native selection does not qualify the full bundled package.
+        package = owner.install_package_archive(io.BytesIO(_native_archive()), install_id="srd")
         actor = _installed_fighter(package.package_lock, fighter=True)
         actor = replace(actor, data={**actor.data, **data})
-        owner.create_campaign(CampaignCreate(
-            campaign_id="self-restoration", display_name="Synthetic Monk", writer=WriterRole.DM,
-            package_lock=package.package_lock, turn_id="turn", participants=(actor,),
-            initial_state=tuple(StateValue(SRD, key, state[f"{SRD}.{key}"])
-                                for key in ("combat", "entities", "state")),
-        ))
+        owner.create_campaign(
+            CampaignCreate(
+                campaign_id="self-restoration",
+                display_name="Synthetic Monk",
+                writer=WriterRole.DM,
+                package_lock=package.package_lock,
+                turn_id="turn",
+                participants=(actor,),
+                initial_state=tuple(
+                    StateValue(SRD, key, state[f"{SRD}.{key}"])
+                    for key in ("combat", "entities", "state")
+                ),
+            )
+        )
         action = ActionCommand(
-            campaign_id="self-restoration", action_id="end", idempotency_key="end",
-            owner_id="test", writer=WriterRole.DM, expected_revision=0, turn_id="turn",
-            package_id=SRD, tool_name="death_saving_throw" if death_save else "end_combat_turn",
+            campaign_id="self-restoration",
+            action_id="end",
+            idempotency_key="end",
+            owner_id="test",
+            writer=WriterRole.DM,
+            expected_revision=0,
+            turn_id="turn",
+            package_id=SRD,
+            tool_name="death_saving_throw" if death_save else "end_combat_turn",
             parameters={} if death_save else {"self_restoration": "poisoned"},
         )
         receipt = StatelessMcpMechanics(owner).execute_action(action)
         if death_save:
             assert receipt.status == "awaiting_choice"
             assert owner.snapshot("self-restoration").revision == 0
-    if reroll:
-        with AuthorityOwner.open(database, "test") as owner:
-            assert owner.execute_action(action) == receipt
-            baseline = owner.snapshot("self-restoration")
-            reroll_choice = ResolveMechanicsChoiceCommand(
-                campaign_id="self-restoration", action_id="end", resolution_id="reroll-save",
-                owner_id="test", expected_revision=0, choice_id=receipt.choice.choice_id,
-                option_id="first",
-            )
-            receipt = owner.resolve_mechanics_choice(reroll_choice)
-            assert receipt.status == "awaiting_choice"
-            assert receipt.choice_sequence == 1
-            assert owner.snapshot("self-restoration") == baseline
-            assert owner.resolve_mechanics_choice(reroll_choice) == receipt
     with AuthorityOwner.open(database, "test") as owner:
         assert owner.execute_action(action) == receipt
         if death_save:
             choice = ResolveMechanicsChoiceCommand(
-                campaign_id="self-restoration", action_id="end", resolution_id="remove-poison",
-                owner_id="test", expected_revision=0, choice_id=receipt.choice.choice_id,
+                campaign_id="self-restoration",
+                action_id="end",
+                resolution_id="remove-poison",
+                owner_id="test",
+                expected_revision=0,
+                choice_id=receipt.choice.choice_id,
                 option_id="poisoned",
-                choice_sequence=1 if reroll else 0,
             )
             receipt = owner.resolve_mechanics_choice(choice)
         assert receipt.status is ActionStatus.COMMITTED, receipt.result
         saved = owner.snapshot("self-restoration")
-        assert saved.state[f"{SRD}.entities"]["hero"]["conditions"] == ["charmed", "frightened"]
+        assert sorted(saved.state[f"{SRD}.entities"]["hero"]["conditions"]) == [
+            "charmed",
+            "frightened",
+        ]
         assert "Self-Restoration" in str(receipt.result["result_card"])
-        if reroll:
-            assert saved.revision == 1
-            assert len(saved.actions) == 1
-            assert saved.state[f"{SRD}.entities"]["hero"]["resources"]["focus_point"] == 13
-            details = {row["label"]: row["value"]
-                       for row in receipt.result["result_card"]["details"]}
-            assert details["Focus spent on reroll"] == 1
-            assert details["Original save total"] == 7
     with AuthorityOwner.open(database, "test") as owner:
         assert owner.snapshot("self-restoration").state == saved.state
         assert owner.execute_action(action) == receipt
         if death_save:
             assert owner.resolve_mechanics_choice(choice) == receipt
             assert saved.state[f"{SRD}.entities"]["hero"]["death_failures"] == 1
-        if reroll:
-            assert owner.resolve_mechanics_choice(reroll_choice) == receipt
         assert owner.snapshot("self-restoration").state == saved.state

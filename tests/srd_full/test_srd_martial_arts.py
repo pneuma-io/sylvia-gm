@@ -184,7 +184,7 @@ def test_flurry_can_use_strength_while_armored_and_cannot_carry_to_next_turn():
 @pytest.mark.parametrize("level,expected", [(1, 0), (2, 2), (10, 10)])
 def test_creation_derives_focus_from_monk_level(level, expected):
     from sylvia_gm.application.initial_character_state import materialize_initial_character_state
-    from tests.srd_full.test_reusable_participants import (
+    from tests.test_reusable_participants import (
         _participant,
         _participant_authority,
         _starting_state,
@@ -258,7 +258,7 @@ def test_public_bonus_strikes_survive_reopen_after_action_spent_and_restore_on_r
     from sylvia_gm import dice
     from sylvia_gm.agent._stateless_mcp import StatelessMcpMechanics
     from sylvia_gm.application.authority import ActionCommand, AuthorityOwner, CampaignCreate
-    from tests.srd_full.full_package_fixture import bundled_srd_archive
+    from sylvia_gm.application.bundled_packages import bundled_srd_archive
     from sylvia_gm.domain.authority import ActionStatus, StateValue, WriterRole
     from tests.srd_full.test_srd_second_wind import _installed_fighter
 
@@ -511,7 +511,7 @@ def test_public_focus_action_reopens_and_preserves_real_effects(tmp_path, featur
 
     from sylvia_gm.agent._stateless_mcp import StatelessMcpMechanics
     from sylvia_gm.application.authority import ActionCommand, AuthorityOwner, CampaignCreate
-    from tests.srd_full.full_package_fixture import bundled_srd_archive
+    from sylvia_gm.application.bundled_packages import bundled_srd_archive
     from sylvia_gm.domain.authority import ActionStatus, StateValue, WriterRole
     from tests.srd_full.test_srd_second_wind import _installed_fighter
 

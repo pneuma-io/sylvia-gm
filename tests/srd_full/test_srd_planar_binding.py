@@ -12,15 +12,15 @@ from scripts.srd_full.build_srd_5_2_1_mechanics import _tool_schema
 from scripts.srd_full.srd_control_binding import DURATION_ROUNDS, PUBLIC_TOOLS, extend_runtime
 
 from sylvia_gm import dice
-from tests.srd_full import full_package_fixture as bundled_packages
+from sylvia_gm.application import bundled_packages
 from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.application.package_materialization import NormalizedPackageDraft
 from sylvia_gm.domain.authority import ActionStatus
 from sylvia_gm.domain.errors import RulesetPreconditionRejected
 from sylvia_gm.domain.package_library import canonical_json_bytes
-from tests.srd_full import test_srd_action_budget as budget
-from tests.srd_full import test_srd_public_spell_casting as public_casting
-from tests.srd_full import test_srd_spell_result_cards as cards
+from tests import test_srd_action_budget as budget
+from tests import test_srd_public_spell_casting as public_casting
+from tests import test_srd_spell_result_cards as cards
 from tests.srd_full.test_srd_extended_casting import _begin
 from tests.srd_full.test_srd_illusion_removals import _prepare
 from tests.srd_full.test_srd_npc_spell_casting import _act

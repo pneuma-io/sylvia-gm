@@ -22,7 +22,7 @@ from sylvia_gm.domain.authority import owned_payload
 from sylvia_gm.domain.errors import RulesetPreconditionRejected
 from sylvia_gm.domain.package_library import ToolDeclaration
 from sylvia_gm.runtime._schema_validator import validate_ruleset_data
-from tests.srd_full import test_srd_spell_object_content as objects
+from tests import test_srd_spell_object_content as objects
 
 SRD = objects.SRD
 ROOT = Path(__file__).resolve().parents[2]

@@ -10,13 +10,13 @@ import yaml
 from scripts.srd_full.srd_plant_growth import PROFILE, PUBLIC_TOOLS, YEAR_TICKS, extend_runtime
 from scripts.srd_full.srd_plant_growth_consumers import bind_consumers
 
-from tests.srd_full import full_package_fixture as bundled_packages
+from sylvia_gm.application import bundled_packages
 from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.application.package_materialization import NormalizedPackageDraft
 from sylvia_gm.domain.authority import ActionStatus
 from sylvia_gm.domain.errors import RulesetPreconditionRejected
 from sylvia_gm.domain.package_library import canonical_json_bytes
-from tests.srd_full import test_srd_magic_jar as jar
+from tests import test_srd_magic_jar as jar
 from tests.srd_full.test_srd_extended_casting import _begin
 from tests.srd_full.test_srd_npc_spell_casting import _act
 from tests.srd_full.test_srd_spell_wave3_information import _entity, _scene

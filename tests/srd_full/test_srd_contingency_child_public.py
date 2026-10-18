@@ -11,8 +11,8 @@ import pytest
 from sylvia_gm import dice
 from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.domain.authority import ActionStatus
-from tests.srd_full import test_srd_contingency_combined_public as combined
-from tests.srd_full import test_srd_public_spell_casting as public_casting
+from tests import test_srd_contingency_combined_public as combined
+from tests import test_srd_public_spell_casting as public_casting
 from tests.srd_full.test_srd_npc_spell_casting import _act
 
 ROOT = Path(__file__).resolve().parents[2]

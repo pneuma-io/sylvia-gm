@@ -13,14 +13,14 @@ from scripts.srd_full.srd_spell_removals import extend_runtime as removal_runtim
 from scripts.srd_full.srd_spell_source_instances import extend_runtime as source_runtime
 
 from sylvia_gm import dice
-from tests.srd_full import full_package_fixture as bundled_packages
+from sylvia_gm.application import bundled_packages
 from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.application.package_materialization import NormalizedPackageDraft
 from sylvia_gm.domain.authority import ActionStatus
 from sylvia_gm.domain.errors import RulesetPreconditionRejected
-from tests.srd_full import test_srd_action_budget as budget
-from tests.srd_full import test_srd_public_spell_casting as public_casting
-from tests.srd_full import test_srd_spell_result_cards as cards
+from tests import test_srd_action_budget as budget
+from tests import test_srd_public_spell_casting as public_casting
+from tests import test_srd_spell_result_cards as cards
 from tests.srd_full.test_srd_extended_casting import _begin
 from tests.srd_full.test_srd_illusion_removals import _prepare
 from tests.srd_full.test_srd_npc_spell_casting import _act

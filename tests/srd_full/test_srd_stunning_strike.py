@@ -185,3 +185,219 @@ def test_stun_expiry_preserves_sources_and_explicit_removal_stays_removed(
     _run("begin_combat_turn", state, participant_data=data)
     stunned = "stunned" in state[f"{SRD}.entities"]["guard"]["conditions"]
     assert stunned is (other_source != "removed")
+
+
+# New repair controls for appending to the isolated test_srd_stunning_strike.py.
+# New controls verified under the assigned isolated CPU lease.
+
+
+def _install_stunned_removal_control(state, *, caster, target, spell, kind="stunned"):
+    """Produce the established source record through its native installer."""
+    return _run(
+        "install_srd_turn_effect",
+        state,
+        caster_state=caster,
+        target_state=target,
+        lasting_state="state",
+        spell=spell,
+        effect_label=spell,
+        kind=kind,
+        expiry_owner="caster",
+        expiry_phase="start",
+        magnitude=0,
+        dice_count=0,
+        damage_die="d4",
+        damage_type="bludgeoning",
+    )
+
+
+def test_stunned_removal_clears_matching_target_sources_and_preserves_other_effects(monkeypatch):
+    state, data = _monk(monkeypatch)
+    state[f"{SRD}.entities"]["other"] = deepcopy(state[f"{SRD}.entities"]["guard"])
+    _strike(state, data, "damage", use_stunning_strike=True, stunning_forego_save=True)
+    _install_stunned_removal_control(state, caster="guard", target="guard", spell="another_stun")
+    _install_stunned_removal_control(
+        state, caster="hero", target="other", spell="other_target_stun"
+    )
+    _install_stunned_removal_control(
+        state, caster="guard", target="guard", spell="independent_poison", kind="poisoned"
+    )
+    effects = deepcopy(state[f"{SRD}.state"]["turn_effects"])
+    matching = [e for e in effects if e["kind"] == "stunned" and e["target"] == "guard"]
+    assert {(e["spell"], e["caster"], e["target"]) for e in matching} == {
+        ("stunning_strike", "hero", "guard"),
+        ("another_stun", "guard", "guard"),
+    }
+    assert all(isinstance(e, dict) and isinstance(e["target"], str) for e in effects)
+    kept = [e for e in effects if e["kind"] != "stunned" or e["target"] != "guard"]
+    other_before = deepcopy(state[f"{SRD}.entities"]["other"])
+    resources_before = deepcopy(state[f"{SRD}.entities"]["hero"]["resources"])
+
+    _run("remove_srd_condition", state, target="guard", condition="stunned")
+
+    assert state[f"{SRD}.state"]["turn_effects"] == kept
+    guard = state[f"{SRD}.entities"]["guard"]
+    assert "stunned" not in guard["conditions"] and "poisoned" in guard["conditions"]
+    assert guard["turn_effect_stunned"] is False
+    assert guard["turn_effect_unowned_stunned"] is False
+    assert state[f"{SRD}.entities"]["other"] == other_before
+    assert state[f"{SRD}.entities"]["hero"]["resources"] == resources_before
+    _run("project_srd_turn_modifiers", state, target_state="guard", lasting_state="state")
+    assert "stunned" not in state[f"{SRD}.entities"]["guard"]["conditions"]
+    assert state[f"{SRD}.state"]["turn_effects"] == kept
+
+
+def _create_source_stunned_defense_campaign(owner):
+    """Admit actual native activation and source-owned Stunned through the saved owner."""
+    import io
+    from dataclasses import replace
+
+    from sylvia_gm.application.authority import CampaignCreate
+    from sylvia_gm.domain.authority import StateValue, WriterRole
+    from tests.srd_full.test_srd_disciplined_survivor import _monk as defense_monk
+    from tests.srd_full.test_srd_second_wind import _installed_fighter
+    from tests.srd_full.test_srd_superior_defense import _activate, _defense_archive
+
+    state, data = defense_monk(18)
+    state[f"{SRD}.entities"]["hero"].update(
+        hp=100, max_hp=100, temp_hp=0, damage_resistances=["cold", "force"]
+    )
+    _activate(state, data)
+    assert state[f"{SRD}.entities"]["hero"]["superior_defense_expires_tick"] == 20
+    assert state[f"{SRD}.entities"]["hero"]["resources"]["focus_point"] == 15
+    _install_stunned_removal_control(
+        state, caster="guard", target="hero", spell="source_owned_stun"
+    )
+    assert state[f"{SRD}.entities"]["hero"]["superior_defense_expires_tick"] is None
+    assert "stunned" in state[f"{SRD}.entities"]["hero"]["conditions"]
+    assert state[f"{SRD}.state"]["turn_effects"][0]["target"] == "hero"
+    state[f"{SRD}.combat"].update(
+        encounter_active=False, turn_active=False, phase="awaiting_turn_start"
+    )
+    package = owner.install_package_archive(
+        io.BytesIO(_defense_archive()), install_id="source-stunned-defense"
+    )
+    actor = _installed_fighter(package.package_lock, fighter=True)
+    actor = replace(actor, data={**actor.data, **data})
+    owner.create_campaign(
+        CampaignCreate(
+            campaign_id="defense",
+            display_name="Source-owned Stunned removal",
+            writer=WriterRole.DM,
+            package_lock=package.package_lock,
+            turn_id="turn",
+            participants=(actor,),
+            initial_state=tuple(
+                StateValue(SRD, key, state[f"{SRD}.{key}"])
+                for key in ("combat", "entities", "state")
+            ),
+        )
+    )
+
+
+def test_stunned_removal_rejects_unsupported_source_selector_without_state_change(tmp_path):
+    from sylvia_gm.application.authority import AuthorityOwner
+    from sylvia_gm.domain.errors import MechanicsRejected
+    from tests.srd_full.test_srd_superior_defense import _defense_action
+
+    with AuthorityOwner.open(tmp_path / "stunned-source-selector.db", "test") as owner:
+        owner.set_admin_full_audit(True)
+        _create_source_stunned_defense_campaign(owner)
+        before = owner.snapshot("defense")
+        command = _defense_action(
+            "remove_srd_condition",
+            "unsupported-source",
+            0,
+            target="hero",
+            condition="stunned",
+            source_id="guard",
+        )
+        with pytest.raises(MechanicsRejected) as rejected:
+            owner.execute_action(command)
+        assert rejected.value.state_changed is False
+        assert {(issue.path, issue.kind) for issue in rejected.value.validation_issues} == {
+            ("source_id", "unexpected_field")
+        }
+        assert owner.snapshot("defense") == before
+
+
+@pytest.mark.parametrize("lifecycle", ["explicit_removal", "native_expiry"])
+def test_source_owned_stunned_reopens_retries_and_keeps_defense_terminated(tmp_path, lifecycle):
+    from sylvia_gm.application.authority import AuthorityOwner
+    from sylvia_gm.domain.authority import ActionStatus
+    from tests.srd_full.test_srd_superior_defense import _defense_action
+
+    database = tmp_path / f"source-stunned-{lifecycle}.db"
+    with AuthorityOwner.open(database, "test") as owner:
+        owner.set_admin_full_audit(True)
+        _create_source_stunned_defense_campaign(owner)
+        seeded = owner.snapshot("defense")
+        assert seeded.revision == 0 and seeded.actions == ()
+    command = (
+        _defense_action("remove_srd_condition", "remove", 0, target="hero", condition="stunned")
+        if lifecycle == "explicit_removal"
+        else _defense_action("advance_srd_lasting_time", "expiry", 0, elapsed_rounds=1)
+    )
+    with AuthorityOwner.open(database, "test") as owner:
+        owner.set_admin_full_audit(True)
+        assert owner.snapshot("defense") == seeded
+        receipt = owner.execute_action(command)
+        assert receipt.status is ActionStatus.COMMITTED
+        removed = owner.snapshot("defense")
+        assert removed.revision == 1 and len(removed.actions) == 1
+        assert removed.state[f"{SRD}.state"]["turn_effects"] == []
+        hero = removed.state[f"{SRD}.entities"]["hero"]
+        assert "stunned" not in hero["conditions"]
+        assert hero["superior_defense_expires_tick"] is None
+        assert hero["resources"]["focus_point"] == 15
+    with AuthorityOwner.open(database, "test") as owner:
+        owner.set_admin_full_audit(True)
+        assert owner.execute_action(command) == receipt
+        assert owner.snapshot("defense") == removed
+        projection = _defense_action("advance_srd_lasting_time", "later-time", 1, elapsed_rounds=1)
+        projected_receipt = owner.execute_action(projection)
+        projected = owner.snapshot("defense")
+        assert projected_receipt.status is ActionStatus.COMMITTED
+        assert projected.state[f"{SRD}.state"]["turn_effects"] == []
+        assert projected.state[f"{SRD}.state"]["superior_defense_target_ids"] == []
+        assert "stunned" not in projected.state[f"{SRD}.entities"]["hero"]["conditions"]
+        assert projected.state[f"{SRD}.entities"]["hero"]["superior_defense_expires_tick"] is None
+    with AuthorityOwner.open(database, "test") as owner:
+        owner.set_admin_full_audit(True)
+        assert owner.snapshot("defense") == projected
+        fire = _defense_action(
+            "apply_srd_damage",
+            "fire",
+            2,
+            target="hero",
+            amount=21,
+            adjustment=0,
+            damage_type="fire",
+        )
+        fire_receipt = owner.execute_action(fire)
+        assert fire_receipt.status is ActionStatus.COMMITTED
+        assert owner.snapshot("defense").state[f"{SRD}.entities"]["hero"]["hp"] == 79
+        force = _defense_action(
+            "apply_srd_damage",
+            "force",
+            3,
+            target="hero",
+            amount=21,
+            adjustment=0,
+            damage_type="force",
+        )
+        force_receipt = owner.execute_action(force)
+        assert force_receipt.status is ActionStatus.COMMITTED
+        saved = owner.snapshot("defense")
+        hero = saved.state[f"{SRD}.entities"]["hero"]
+        assert hero["hp"] == 69 and hero["damage_resistances"] == ["cold", "force"]
+        assert hero["resources"]["focus_point"] == 15
+        assert hero["superior_defense_expires_tick"] is None
+        assert saved.revision == 4 and len(saved.actions) == 4
+    with AuthorityOwner.open(database, "test") as owner:
+        owner.set_admin_full_audit(True)
+        assert owner.execute_action(command) == receipt
+        assert owner.execute_action(projection) == projected_receipt
+        assert owner.execute_action(fire) == fire_receipt
+        assert owner.execute_action(force) == force_receipt
+        assert owner.snapshot("defense") == saved

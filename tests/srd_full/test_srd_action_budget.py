@@ -12,9 +12,10 @@ from pathlib import Path
 import pytest
 import yaml
 from scripts.srd_full.build_srd_5_2_1_mechanics import _tool_schema
+
 from sylvia_gm.agent._stateless_mcp import StatelessMcpMechanics
 from sylvia_gm.application.authority import ActionCommand, AuthorityOwner, CampaignCreate
-from tests.srd_full.full_package_fixture import bundled_srd_archive
+from sylvia_gm.application.bundled_packages import bundled_srd_archive
 from sylvia_gm.application.package_runtime import PackageRuntimeError, materialize_package_mechanic
 from sylvia_gm.domain.authority import (
     ActionStatus,
@@ -25,7 +26,6 @@ from sylvia_gm.domain.authority import (
 )
 from sylvia_gm.domain.errors import RulesetPreconditionRejected
 from sylvia_gm.domain.package_library import ToolDeclaration
-from sylvia_gm.runtime._parameter_declarations import resolve_parameter_declarations
 from tests.srd_full.test_srd_second_wind import _installed_fighter
 
 SRD = "wotc.srd.5.2.1"
@@ -35,9 +35,7 @@ ROOT = Path(__file__).resolve().parents[2] / "rulesets/dnd-srd-5.2.1"
 @lru_cache
 def _runtime_definition(runtime_bytes):
     """Reuse the unchanged package definition; every mechanic still owns its mutable state."""
-    return resolve_parameter_declarations(
-        yaml.load(runtime_bytes, Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))
-    )
+    return yaml.load(runtime_bytes, Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))
 
 
 @lru_cache

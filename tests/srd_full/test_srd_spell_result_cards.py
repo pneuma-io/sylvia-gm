@@ -18,7 +18,7 @@ from tests.srd_full.test_srd_attack_budget import SRD, _combat_case
 
 @lru_cache
 def _spell_definitions():
-    root = Path(__file__).parents[2]
+    root = Path(__file__).parents[1]
     runtime = yaml.safe_load(
         (root / "rulesets/dnd-srd-5.2.1/runtime/ruleset.yaml").read_text(encoding="utf-8"),
     )
@@ -28,7 +28,7 @@ def _spell_definitions():
 @lru_cache
 def _casting_headers():
     inventory = json.loads(
-        (Path(__file__).parents[2] / "rulesets/dnd-srd-5.2.1/content/spell-status-inventory.json")
+        (Path(__file__).parents[1] / "rulesets/dnd-srd-5.2.1/content/spell-status-inventory.json")
         .read_text(encoding="utf-8")
     )
     return {row["id"]: row["casting_requirements"] for row in inventory["spells"]}
@@ -250,7 +250,7 @@ def test_large_attack_and_area_cast_keeps_primary_and_every_area_result(save_mod
     assert card["details"][0]["label"] == card["details"][1]["label"] == "Guard"
     assert card["details"][-1]["label"] == "Target 62"
     assert len(card["summary"]) <= 16
-    source = Path(__file__).parents[2] / "src-tauri/frontend/app.js"
+    source = Path(__file__).parents[1] / "src-tauri/frontend/app.js"
     script = """
 const fs = require('fs'), assert = require('node:assert/strict');
 global.window = {}; global.document = {addEventListener(){}};

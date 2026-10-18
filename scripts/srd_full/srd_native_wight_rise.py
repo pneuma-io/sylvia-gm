@@ -5,7 +5,6 @@ from copy import deepcopy
 
 if __package__:
     from .srd_divination_spells import _normalize
-    from .srd_native_receiving_boundary import native_receiving_boundary
     from .srd_native_wight_actions import WIGHT_BLOCK, _validate_source
     from .srd_spell_summoning import (
         _choose,
@@ -28,7 +27,6 @@ if __package__:
     from .srd_timed_senses import _loop, _optional, _public, _push, _replace_tools
 else:
     from srd_divination_spells import _normalize
-    from srd_native_receiving_boundary import native_receiving_boundary
     from srd_native_wight_actions import WIGHT_BLOCK, _validate_source
     from srd_spell_summoning import (
         _choose,
@@ -671,8 +669,15 @@ def _rise_packet(packet):
     packet = deepcopy(packet)
     if "record_srd_native_wight_rise" in str(packet["effects"]):
         return packet
-    boundary = native_receiving_boundary(packet["effects"])
-    boundary.ordinary[boundary.completion_index : boundary.completion_index] = [
+    before = [
+        i for i, e in enumerate(packet["effects"]) if e.get("set", {}).get("field") == "_hp_before"
+    ]
+    after = [
+        i for i, e in enumerate(packet["effects"]) if e.get("set", {}).get("field") == "_hp_after"
+    ]
+    if len(before) != 1 or len(after) != 1:
+        raise ValueError("Retain the final actual Life Drain receiving HP/death suffix.")
+    packet["effects"][after[0] : after[0]] = [
         _when(
             "_native_rise_was_alive == true and _native_rise_was_type == 'humanoid' and "
             "_native_rise_old_death == null and target.is_alive == false and "
@@ -689,7 +694,7 @@ def _rise_packet(packet):
             ],
         ),
     ]
-    boundary.ordinary[boundary.hp_before_index + 1 : boundary.hp_before_index + 1] = [
+    packet["effects"][before[0] : before[0]] = [
         _set("_native_rise_was_alive", "target.is_alive"),
         _set("_native_rise_was_type", "target.creature_type"),
         _set("_native_rise_old_death", None),
@@ -746,10 +751,15 @@ def _fortitude(tools):
     return fort
 
 
-def _bind_lethal(tool, composite, qualified, *, native_fist=False):
+def _bind_lethal(tool, composite, qualified):
     tool = deepcopy(tool)
-    boundary = native_receiving_boundary(tool["effects"], native_fist=native_fist)
-    lethal = [boundary.monster_zero]
+    lethal = [
+        e
+        for e in _walk(tool["effects"])
+        if e.get("condition") == "target.hp == 0 and target.creature_kind == 'monster'"
+    ]
+    if len(lethal) != 1:
+        raise ValueError("Bind native Fortitude only at the actual zero-HP pre-death boundary.")
     if "resolve_srd_native_wight_zombie_fortitude" in str(lethal[0]):
         return tool
     radiant = "damage_type == 'radiant' and _effective_damage > 0"
@@ -849,8 +859,6 @@ def bind_native_wight_rise_consumers(text):
         ("apply_srd_composite_damage", True, False),
         ("apply_srd_qualifying_damage", False, True),
         ("apply_srd_qualifying_composite_damage", True, True),
-        ("apply_srd_native_mummy_fist_packet", True, True),
-        ("apply_srd_native_wight_life_drain_packet", False, True),
     ):
         if name not in tools:
             continue
@@ -869,12 +877,7 @@ def bind_native_wight_rise_consumers(text):
             if tools[name]["effects"][0] != expected or core not in tools:
                 raise ValueError("Bind only this actual qualified packet's exact named delegate.")
             selected = core
-        tool = _bind_lethal(
-            changed.get(selected, tools[selected]),
-            composite,
-            qualified,
-            native_fist=name == "apply_srd_native_mummy_fist_packet",
-        )
+        tool = _bind_lethal(tools[selected], composite, qualified)
         if tool != tools[selected]:
             changed[selected] = tool
     for name in ("resolve_srd_revival", "complete_srd_reincarnation_internal"):

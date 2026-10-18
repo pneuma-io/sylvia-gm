@@ -639,21 +639,9 @@ def _saved_packet(tools, name):
     tool = _expanded_packet(tools, name)
     next(p for p in tool["parameters"] if p["name"] == "target")["resolve"] = "entity"
     tool["parameters"].append(_parameter(EVENT, model_hidden=True))
-    if __package__:
-        from .srd_warding_bond_damage import _receiving_start
-    else:
-        from srd_warding_bond_damage import _receiving_start
-
-    hp = _receiving_start(tool["effects"])
-    if (
-        sum(
-            effect.get("set", {}).get("field") == "_hp_before"
-            for rows in _lists(tool["effects"])
-            for effect in rows
-        )
-        != 1
-    ):
-        raise ValueError("Saved hit rejects an extra or missing HP-before initializer.")
+    hp = next(
+        i for i, e in enumerate(tool["effects"]) if e.get("set", {}).get("field") == "_hp_before"
+    )
     prefix, suffix = tool["effects"][:hp], deepcopy(tool["effects"][hp:])
     if (
         sum(

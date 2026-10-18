@@ -5,7 +5,6 @@ from copy import deepcopy
 if __package__:
     from .srd_attack_damage_components import _printed_component
     from .srd_native_mummy_actions import _native_body_tool
-    from .srd_native_receiving_boundary import native_receiving_boundary
     from .srd_native_undead_curses import MUMMY_BLOCK, _validate_sources
     from .srd_spell_summoning import _choose, _created_undead_additional_profiles, _walk
     from .srd_timed_actor_defenses import (
@@ -22,7 +21,6 @@ if __package__:
 else:
     from srd_attack_damage_components import _printed_component
     from srd_native_mummy_actions import _native_body_tool
-    from srd_native_receiving_boundary import native_receiving_boundary
     from srd_native_undead_curses import MUMMY_BLOCK, _validate_sources
     from srd_spell_summoning import _choose, _created_undead_additional_profiles, _walk
     from srd_timed_actor_defenses import (
@@ -93,23 +91,51 @@ def _dust_effects():
 def _fist_packet_tool(tools):
     """Add only native curse and Dust to the passed completed receiving lifecycle."""
     packet = _actual_composite_body(tools)
-    boundary = native_receiving_boundary(packet["effects"])
-    effects = boundary.ordinary
-    death = deepcopy(boundary.still_zero)
+    snapshots = [
+        i
+        for i, effect in enumerate(packet["effects"])
+        if effect.get("set", {}).get("field") == "_hp_before"
+    ]
+    monsters = [
+        effect
+        for effect in packet["effects"]
+        if effect.get("condition") == "target.hp == 0 and target.creature_kind == 'monster'"
+    ]
+    if len(snapshots) != 1 or len(monsters) != 1:
+        raise ValueError("Fist needs one genuine HP snapshot and final monster-zero boundary.")
+    suffixes = [
+        effect["on_true"]
+        for effect in monsters[0]["on_true"]
+        if effect.get("condition") == "target.hp == 0"
+    ]
+    if len(suffixes) != 1 or not any(
+        e.get("call") == "record_srd_actual_death" for e in suffixes[0]
+    ):
+        raise ValueError("Fist must preserve the actual still-zero death suffix after Fortitude.")
+    death = deepcopy(suffixes[0])
+    if {"apply_condition": {"target": "target", "condition": "dead"}} not in death:
+        raise ValueError("Native Dust needs the actual death condition, not a numeric verdict.")
     # Both branches retain the original death callbacks; surviving Ward/Fortitude runs neither.
-    boundary.still_zero[0:0] = [_when("_hp_before > 0 and _effective_damage > 0", _dust_effects())]
-    monster_index = effects.index(boundary.monster_zero)
-    boundary.massive_zero["condition"] += " and _mummy_fist_dust != true"
-    effects.insert(
+    suffixes[0][0:0] = [_when("_hp_before > 0 and _effective_damage > 0", _dust_effects())]
+    monster_index = packet["effects"].index(monsters[0])
+    massive = [
+        effect
+        for effect in packet["effects"]
+        if effect.get("condition") == "target.hp == 0 and target.creature_kind == 'character' "
+        "and _remaining_damage >= target.max_hp"
+    ]
+    if len(massive) != 1:
+        raise ValueError("Preserve one actual massive-damage death boundary after native Dust.")
+    massive[0]["condition"] += " and _mummy_fist_dust != true"
+    packet["effects"].insert(
         monster_index + 1,
         _when(
             "target.creature_kind == 'character' and target.hp == 0 and "
-            "target.is_alive == true and _hp_before > 0 and _effective_damage > 0 and "
-            "target.astral_projection_role != 'form'",
+            "target.is_alive == true and _hp_before > 0 and _effective_damage > 0",
             _dust_effects() + death,
         ),
     )
-    effects[boundary.hp_before_index + 1 : boundary.hp_before_index + 1] = [
+    packet["effects"][snapshots[0] + 1 : snapshots[0] + 1] = [
         _call(
             "install_srd_native_mummy_rot",
             {

@@ -4,6 +4,7 @@ import re
 from copy import deepcopy
 
 import yaml
+
 from sylvia_gm.runtime._parameter_declarations import resolve_parameter_declarations
 
 
@@ -66,18 +67,7 @@ def _tool(description, parameters, effects, pre_conditions=()):
             if isinstance(value, list):
                 return [bind_lasting(child) for child in value]
             if isinstance(value, dict):
-                result = {}
-                for key, child in value.items():
-                    if key in {"spatial_query", "spatial_mutation"} and isinstance(child, dict):
-                        result[key] = {
-                            field: re.sub(r"^lasting_state\.", "state.", item)
-                            if field == "scene" and isinstance(item, str)
-                            else bind_lasting(item)
-                            for field, item in child.items()
-                        }
-                    else:
-                        result[key] = bind_lasting(child)
-                return result
+                return {key: bind_lasting(child) for key, child in value.items()}
             return value
 
         effects = bind_lasting(effects)

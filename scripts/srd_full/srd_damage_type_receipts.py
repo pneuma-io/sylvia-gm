@@ -108,19 +108,7 @@ def bind_runtime(text):
     changed = {}
     for name in OWNERS:
         tool = deepcopy(tools[name])
-        accepted_superior_prefix = {
-            "call": "resolve_srd_superior_defense",
-            "params": {"target_state": "{target}"},
-            "export_context": {"_superior_defense_active": "_superior_defense_active"},
-        }
-        effects = tool["effects"]
-        if effects[:1] == [accepted_superior_prefix]:
-            effects = effects[1:]
-        if any(
-            not isinstance(effect, dict)
-            or any(key in effect for key in ("call", "params", "export_context"))
-            for effect in effects[:1]
-        ):
+        if any(effect.get("call") for effect in tool["effects"][:1]):
             raise SystemExit("Typed receipt must bind the expanded final qualified owner.")
         if any(p["name"] == "component_3_damage_type" for p in tool["parameters"]):
             raise SystemExit("Typed receipt needs the actual third-component producer first.")

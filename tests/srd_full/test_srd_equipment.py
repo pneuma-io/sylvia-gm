@@ -11,7 +11,7 @@ from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.application.initial_character_state import materialize_initial_character_state
 from sylvia_gm.domain.authority import ActionStatus
 from sylvia_gm.domain.errors import CommandRejected, MechanicsRejected, RulesetPreconditionRejected
-from tests.srd_full.test_reusable_participants import _participant, _participant_authority, _starting_state
+from tests.test_reusable_participants import _participant, _participant_authority, _starting_state
 from tests.srd_full.test_srd_action_budget import SRD, _run, _state
 from tests.srd_full.test_srd_advancement import award, build, command, create, resolve
 from tests.srd_full.test_srd_attack_budget import _attack, _combat_case

@@ -6,27 +6,24 @@ from copy import deepcopy
 from pathlib import Path
 
 import pytest
-from scripts.srd_full import srd_contingency_child_casting as child
+from scripts import srd_contingency_child_casting as child
 from scripts.srd_full.srd_actor_spell_modifiers import _emit
 from scripts.srd_full.srd_control_behaviors import _param, _walk
 from scripts.srd_full.srd_timed_actor_defenses import _load_runtime
 
-from tests.srd_full import test_srd_contingency_child_casting as native
-from tests.srd_full import test_srd_contingency_recovery_children as recovery
+from tests import test_srd_contingency_child_casting as native
+from tests import test_srd_contingency_recovery_children as recovery
 
-ADOPTION = native.CURRENT / "scripts/srd_full/srd_spell_removal_adoption.py"
+ADOPTION = native.CURRENT / "scripts/srd_spell_removal_adoption.py"
 PARENT = Path(
     str(Path(__file__).resolve().parents[2] / "tests/fixtures/srd-full-external/test-srd-contingency-recovery-binding/selected-runtime.yaml")
 )
 
 
-FINAL_SHA = None
-
-
 def _actual_effect_group_forwarding(text):
     """Apply only the original adapter's actual parameter/forwarding statements."""
     assert hashlib.sha256(ADOPTION.read_bytes()).hexdigest() == (
-        "e42ce1c4a31c3d22fb3a8324eac94b8177511331cc425cba1c6f5844f0172bb3"
+        "b21333a295d2260ed85f64f9a924bf512eac54975c4a0e7d7cda2eed3d52ce42"
     )
     source = ast.parse(ADOPTION.read_text())
     owner = next(
@@ -52,7 +49,9 @@ def _actual_effect_group_forwarding(text):
 
 
 def test_actual_late_recovery_adapter_binds_self_choices_and_preserves_native_suffix(monkeypatch):
-    assert hashlib.sha256(PARENT.read_bytes()).hexdigest() == FINAL_SHA
+    assert hashlib.sha256(PARENT.read_bytes()).hexdigest() == (
+        "0dfd38a8b61952ab9cafc0a672ee9cecff5a7548f46916e1b3591356aa4f8c1b"
+    )
     text = recovery._actual_native_recovery_suffix(PARENT.read_text())
     text = _actual_effect_group_forwarding(text)
     original = _load_runtime(text)["tools"]
@@ -84,7 +83,11 @@ def test_actual_late_recovery_adapter_binds_self_choices_and_preserves_native_su
             n.get("call") == "read_srd_native_mummy_rot" for n in _walk(final[name]["effects"])
         )
     assert child.bind_release(emitted) == emitted
-    actual_call = child._actual_dispatch(original, "recovery")
+    actual_call = next(
+        n
+        for n in _walk(original["cast_spell"]["effects"])
+        if n.get("call") == "cast_srd_recovery" and "target_state" in n["params"]
+    )
     with monkeypatch.context() as patch:
         patch.setattr(child, "SELECTED", dict(child.SELECTED, dispel_magic="recovery"))
         with pytest.raises(ValueError, match="genuine retained effect-group"):

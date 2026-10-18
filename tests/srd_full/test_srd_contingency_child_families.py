@@ -7,17 +7,18 @@ from pathlib import Path
 from random import Random
 
 import pytest
-from scripts.srd_full import srd_contingency_child_casting as child
+from scripts import srd_contingency_child_casting as child
 from scripts.srd_full.srd_control_behaviors import _walk
+
 from sylvia_gm import dice
 from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.domain.authority import ActionStatus
 from sylvia_gm.runtime._effect_executor import execute_effects
 from sylvia_gm.runtime._types import ExecutionContext
-from tests.srd_full import test_srd_contingency_child_casting as native
-from tests.srd_full import test_srd_contingency_child_public as prior
-from tests.srd_full import test_srd_contingency_combined_public as combined
-from tests.srd_full import test_srd_public_spell_casting as public_casting
+from tests import test_srd_contingency_child_casting as native
+from tests import test_srd_contingency_child_public as prior
+from tests import test_srd_contingency_combined_public as combined
+from tests import test_srd_public_spell_casting as public_casting
 from tests.srd_full.test_srd_npc_spell_casting import _act
 
 PROOF = Path(
@@ -35,14 +36,7 @@ def test_retained_native_effects_and_nonpayment_guards_are_preserved():
             continue
         original = tools[name]
         retained = child._retained_family(original)
-        expected = deepcopy(original["effects"])
-        if family == "detection_mask_spell":
-            initializer = next(
-                n["set"] for n in expected if n.get("set", {}).get("field") == "_mask_subject"
-            )
-            assert initializer["value"] == "mask_subject"
-            initializer["value"] = "_caster_state_id"
-        assert retained["effects"] == expected
+        assert retained["effects"] == original["effects"]
         assert retained["metadata"] == original["metadata"]
         assert not any("decrement" in node for node in _walk(retained["effects"]))
         assert not any(
@@ -63,7 +57,7 @@ def test_retained_native_effects_and_nonpayment_guards_are_preserved():
 
 def test_self_choices_use_only_printed_abilities_and_damage_types():
     tools, definitions = native.actual.__wrapped__()
-    assert len(child._selected(definitions)) == 45
+    assert len(child._selected(definitions)) == 42
     assert "constitution" not in child.ABILITIES
     assert "constitution" in child._choice()["enum_values"]  # Restoration's native choice.
     preparation = deepcopy(tools["prepare_srd_contingent_child"])

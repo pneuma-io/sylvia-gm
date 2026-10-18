@@ -14,13 +14,13 @@ from scripts.srd_full.srd_timed_actor_defenses import _load_runtime
 
 from sylvia_gm import dice
 from sylvia_gm.application.authority import AuthorityOwner
-from tests.srd_full.full_package_fixture import _archive, _srd_drafts
+from sylvia_gm.application.bundled_packages import _archive, _srd_drafts
 from sylvia_gm.application.package_materialization import NormalizedPackageDraft
 from sylvia_gm.domain.authority import ActionStatus
 from sylvia_gm.domain.package_library import canonical_json_bytes
-from tests.srd_full import test_srd_public_spell_casting as public_casting
-from tests.srd_full import test_srd_solid_spell_walls as schema_owner
-from tests.srd_full import test_srd_spell_result_cards as cards
+from tests import test_srd_public_spell_casting as public_casting
+from tests import test_srd_solid_spell_walls as schema_owner
+from tests import test_srd_spell_result_cards as cards
 from tests.srd_full.test_srd_npc_spell_casting import _act
 
 ROOT = Path(__file__).resolve().parents[2]

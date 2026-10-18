@@ -18,7 +18,6 @@ if __package__:
         _when,
     )
     from .srd_extended_casting import INCAPACITATED
-    from .srd_spell_detection_masks import CREATURE_TYPES as MASK_CREATURE_TYPES
     from .srd_timed_actor_defenses import _load_runtime
 else:
     from srd_actor_spell_modifiers import _call, _emit
@@ -36,7 +35,6 @@ else:
         _when,
     )
     from srd_extended_casting import INCAPACITATED
-    from srd_spell_detection_masks import CREATURE_TYPES as MASK_CREATURE_TYPES
     from srd_timed_actor_defenses import _load_runtime
 
 
@@ -63,7 +61,6 @@ DISPATCHES = {
     "illumination_spell": "cast_spell_illumination_spell",
     "illusion_image": "cast_srd_image_spell",
     "illusion_appearance": "cast_srd_appearance_spell",
-    "detection_mask_spell": "apply_srd_detection_mask",
 }
 SELECTED = {
     "mage_armor": "timed_actor_defense",
@@ -108,9 +105,6 @@ SELECTED = {
     "mirror_image": "illusion_image",
     "disguise_self": "illusion_appearance",
     "seeming": "illusion_appearance",
-    "arcanists_magic_aura": "detection_mask_spell",
-    "nondetection": "detection_mask_spell",
-    "pass_without_trace": "detection_mask_spell",
 }
 CHOICE = "contingent_effect_choice"
 IDS = "_contingent_child_ids"
@@ -129,22 +123,8 @@ INFORMATION_CHOICES = {
     "information_seen_close": False,
 }
 APPEARANCE_SPECS = "appearance_specs"
-MASK_TYPE = "mask_creature_type"
-RETAINED_SELECTIONS = (
-    RECOVERY_ITEM,
-    RECOVERY_SOURCE,
-    *INFORMATION_CHOICES,
-    APPEARANCE_SPECS,
-    MASK_TYPE,
-)
-NATIVE_PROFILE_RANGE = {
-    "invisibility": 0,
-    "greater_invisibility": 0,
-    "mirror_image": 0,
-    "arcanists_magic_aura": 5,
-    "nondetection": 5,
-    "pass_without_trace": 0,
-}
+RETAINED_SELECTIONS = (RECOVERY_ITEM, RECOVERY_SOURCE, *INFORMATION_CHOICES, APPEARANCE_SPECS)
+NATIVE_ZERO_RANGE_SELF = {"invisibility", "greater_invisibility", "mirror_image"}
 RECOVERY_CHOICES = (
     "exhaustion",
     "charmed",
@@ -189,10 +169,7 @@ def _selected(definitions):
             or not 1 <= row["base_level"] <= 5
             or not (
                 row.get("range_kind") in {"self", "touch", "distance"}
-                or (
-                    spell in NATIVE_PROFILE_RANGE
-                    and row.get("range_feet") == NATIVE_PROFILE_RANGE[spell]
-                )
+                or (spell in NATIVE_ZERO_RANGE_SELF and row.get("range_feet") == 0)
                 or (
                     family == "instantaneous_multi_target_healing"
                     and row.get("targeting_mode") == "visible_point_sphere"
@@ -268,14 +245,6 @@ def _add_choice(tool):
             raise ValueError("Retain the native factual information choices.")
         if not existing:
             tool["parameters"].append(descriptor)
-    descriptor = _param(
-        MASK_TYPE, "enum", required=False, default="humanoid", enum_values=MASK_CREATURE_TYPES
-    )
-    existing = [p for p in tool["parameters"] if p["name"] == MASK_TYPE]
-    if existing and existing != [descriptor]:
-        raise ValueError("Retain the actual Magic Aura creature-type choice.")
-    if not existing:
-        tool["parameters"].append(descriptor)
 
 
 def _native_information_selection(tool):
@@ -294,40 +263,7 @@ def _native_information_selection(tool):
     return deepcopy(matches)
 
 
-def _native_mask_selection(tool):
-    """Reuse the actual willing-creature Mask selection before either setup cost is paid."""
-    aura = [e for e in tool["effects"] if e.get("condition") == "spell == 'arcanists_magic_aura'"]
-    if len(aura) != 2:
-        raise ValueError("Retain Magic Aura's native creature selection and separate history.")
-    choices = [
-        e
-        for e in aura
-        if len(e.get("on_true", ())) == 1
-        and e["on_true"][0].get("condition") == "_mask_subject_object == true"
-    ]
-    if len(choices) != 1:
-        raise ValueError("Retain the native creature versus object Mask selection.")
-    creature = choices[0]["on_true"][0]["on_false"]
-    if [n.get("call") for n in creature if "call" in n] != ["resolve_srd_magical_creature_type"]:
-        raise ValueError("Use the native physical type owner for the creature Mask.")
-    if any(n.get("set", {}).get("field", "_mask_type") != "_mask_type" for n in creature):
-        raise ValueError("Mask choice validation cannot install an effect before setup.")
-    return [
-        _call(
-            "resolve_srd_detection_mask_subject",
-            {"subject": "{_caster_state_id}"},
-            ("_mask_scene", "_mask_scene_kind", "_mask_subject_actor", "_mask_subject_object"),
-        ),
-        _require(
-            "_mask_scene_kind == 'entity' and _mask_subject_actor == _caster_state_id and "
-            "_mask_subject_object != true",
-            "The contingent mask affects only its actual self creature.",
-        ),
-        _when("spell == 'arcanists_magic_aura'", deepcopy(creature)),
-    ]
-
-
-def _prepare(tool, selected, *, native_curses=False, information_selection=(), mask_selection=()):
+def _prepare(tool, selected, *, native_curses=False, information_selection=()):
     """Extend actual preparation; no child effect, concentration or material spend occurs here."""
     _add_choice(tool)
     old = "spell == 'false_life' or spell == 'water_breathing'"
@@ -361,15 +297,9 @@ def _prepare(tool, selected, *, native_curses=False, information_selection=(), m
                 recovery_source_sequence="_contingent_recovery_source_sequence",
                 **{name: name for name in INFORMATION_CHOICES},
                 appearance_specs=APPEARANCE_SPECS,
-                mask_creature_type=MASK_TYPE,
             )
     validations = [
         *deepcopy(information_selection),
-        *(
-            [_when("_spell_definition.family == 'detection_mask_spell'", deepcopy(mask_selection))]
-            if mask_selection
-            else []
-        ),
         _when(
             "_spell_definition.family == 'illusion_appearance'",
             [
@@ -582,7 +512,6 @@ def _prepare(tool, selected, *, native_curses=False, information_selection=(), m
         RECOVERY_SOURCE + " != ''",
         "spell == 'greater_restoration' or " + RECOVERY_ITEM + " != ''",
         "_spell_definition.family == 'illusion_appearance'",
-        "_spell_definition.family == 'detection_mask_spell'",
     }
     tool["effects"] = [
         e
@@ -785,7 +714,6 @@ def _dispatch(call):
         "{_forego_save_targets}": [],
         "{_target_id}": "{_target_state_id}",
         "{_recovery_target}": "{_target_state_id}",
-        "{_information_self_target_id}": "{_target_state_id}",
         "{_modifier_dispatch_targets}": "{_contingent_self_targets}",
         "{_modifier_forego_targets}": "{_contingent_self_targets}",
         "{actor_spell_choice}": "{_contingency_child.effect_choice}",
@@ -866,74 +794,7 @@ def _dispatch(call):
         "{script_handwriting}": "",
         "{script_readers}": [],
         "{witness_state_ids}": [],
-        "{mask_subject}": "{_target_state_id}",
-        "{mask_willing}": True,
-        "{mask_creature_type}": "{_contingency_child.mask_creature_type}",
-        "{mask_chosen_creatures}": [],
-        "{mask_object_aura}": "magical",
-        "{mask_school}": "illusion",
-        "{mask_end_description}": "",
-        "{mask_end_after_rounds}": 0,
     }
-    # The production final tail captures these same native choices in its owned dictionary.
-    for name in (
-        "spell",
-        "material_item_ids",
-        "information_position",
-        "information_sense",
-        "information_kind",
-        "information_subject",
-        "information_familiar",
-        "information_seen_close",
-        "information_obvious_place",
-        "illumination_object",
-        "illumination_position",
-        "illumination_points",
-        "illumination_combined",
-        "illumination_color",
-        "illusion_position",
-        "illusion_size",
-        "illusion_lighting",
-        "illusion_description",
-        "illusion_minor_mode",
-        "illusion_subject_kind",
-        "illusion_opaque",
-        "illusion_sound",
-        "illusion_sound_volume",
-        "illusion_smell",
-        "illusion_temperature",
-        "illusion_trigger",
-        "illusion_trigger_modality",
-        "illusion_performance_seconds",
-        "phantasm_dangerous",
-        "phantasm_damage_appearance",
-        "project_image_location",
-        "appearance_specs",
-        "appearance_position",
-        "appearance_cube_min",
-        "appearance_description",
-        "appearance_sound",
-        "appearance_smell",
-        "appearance_terrain_kind",
-        "appearance_tactile_kind",
-        "script_surface",
-        "script_original",
-        "script_apparent",
-        "script_language",
-        "script_handwriting",
-        "script_readers",
-        "mask_subject",
-        "mask_willing",
-        "mask_creature_type",
-        "mask_chosen_creatures",
-        "mask_object_aura",
-        "mask_school",
-        "mask_end_description",
-        "mask_end_after_rounds",
-    ):
-        replacements["{_retained_cast_tail_choices." + name + "}"] = deepcopy(
-            replacements["{" + name + "}"]
-        )
     for key, value in result["params"].items():
         if key in source_bindings:
             continue
@@ -955,27 +816,6 @@ def _dispatch(call):
 def _retained_family(tool):
     """Reuse native effects, replacing only continued preparation with the paid source witness."""
     result = deepcopy(tool)
-    if any(p["name"] == "mask_subject" for p in result["parameters"]):
-        initializers = [
-            n
-            for n in result["effects"]
-            if n.get("set", {}).get("field") == "_mask_subject"
-            and (
-                n["set"]["value"] == "mask_subject"
-                or (
-                    n["set"]["value"] == "_caster_state_id"
-                    and any(p["name"] == SOURCE_PARAM for p in result["parameters"])
-                )
-            )
-        ]
-        if len(initializers) != 1 and not (
-            len(initializers) == 2
-            and all(n["set"]["value"] == "_caster_state_id" for n in initializers)
-            and any(p["name"] == SOURCE_PARAM for p in result["parameters"])
-        ):
-            raise ValueError("Retain the native mask's exact subject initializer.")
-        # The private copy is self-only; use its authenticated ID without parameter auto-resolution.
-        initializers[0]["set"]["value"] = "_caster_state_id"
     completion_guard = normalized_tool(
         "Owning completion",
         [],
@@ -1340,80 +1180,6 @@ def _appearance_eligibility():
     ]
 
 
-def _mask_eligibility():
-    """An absent self or changed native type consumes the mask without a strict-leaf rollback."""
-    return [
-        _set(
-            "_contingent_mask_valid",
-            "_contingent_self_scene.metadata.participant_ref == _target_state_id and "
-            "_contingent_self_scene.metadata.is_object != true",
-        ),
-        _when(
-            "_contingency_child.spell == 'arcanists_magic_aura'",
-            [
-                _set(
-                    "_contingent_mask_valid",
-                    "_contingent_mask_valid == true and target_state.creature_type != null and "
-                    "_contingency_child.mask_creature_type != target_state.creature_type and "
-                    "(_contingent_self_scene.metadata.creature_type == null or "
-                    "_contingent_self_scene.metadata.creature_type == target_state.creature_type)",
-                ),
-            ],
-        ),
-        _when(
-            "_contingent_mask_valid != true",
-            [
-                _set("_contingent_effect_eligible", False),
-                _set(
-                    "_contingent_no_effect_reason", "'the saved creature mask no longer fits self'"
-                ),
-            ],
-        ),
-    ]
-
-
-def _actual_dispatch(tools, family):
-    """Resolve the unique native call before or after retained-tail factoring."""
-    name = DISPATCHES[family]
-    if not isinstance(tools.get(name), dict):
-        raise ValueError(f"Retain the actual native dispatch provider for {family}.")
-    cast = tools.get("cast_spell")
-    if not isinstance(cast, dict) or not isinstance(cast.get("effects"), list):
-        raise ValueError(f"Retain the actual paid-cast dispatch provider for {family}.")
-    final_tail = "finish_srd_retained_cast_tail"
-    tail_families = {
-        "timed_senses",
-        "information_spell",
-        "illumination_spell",
-        "illusion_image",
-        "illusion_appearance",
-        "detection_mask_spell",
-    }
-    owner = cast
-    links = [n for n in _walk(cast["effects"]) if n.get("call") == final_tail]
-    if family in tail_families and (final_tail in tools or links):
-        tail = tools.get(final_tail)
-        if not isinstance(tail, dict):
-            raise ValueError(
-                f"Unsupported final-layout fixture for {family}: missing {final_tail}."
-            )
-        if (
-            len(links) != 1
-            or links[0].get("params", {}).get("_retained_cast_tail_choices")
-            != "{_retained_cast_tail_choices}"
-            or tail.get("metadata", {}).get("retained_spell_reactions_v1") is not True
-            or any(n.get("call") == name for n in _walk(cast["effects"]))
-        ):
-            raise ValueError(f"Retain the actual final paid-cast tail for {family}.")
-        owner = tail
-    matches = [n for n in _walk(owner["effects"]) if n.get("call") == name]
-    if family == "recovery":
-        matches = [n for n in matches if "target_state" in n.get("params", {})]
-    if len(matches) != 1:
-        raise ValueError(f"Retain exactly one actual {family} dispatch for Contingency.")
-    return matches[0]
-
-
 def bind_release(text):
     """Bind after final native Recovery/Source owners, before Jar/receivers/outer capture."""
     runtime = _load_runtime(text)
@@ -1428,13 +1194,15 @@ def bind_release(text):
         selected,
         native_curses=native_curses,
         information_selection=_native_information_selection(tools[DISPATCHES["information_spell"]]),
-        mask_selection=_native_mask_selection(tools[DISPATCHES["detection_mask_spell"]]),
     )
-    # Keep resolved parameters last, matching the actual loader's field order.
-    preparation["parameters"] = preparation.pop("parameters")
     changed["prepare_srd_contingent_child"] = preparation
     for family, name in DISPATCHES.items():
-        calls[family] = _dispatch(_actual_dispatch(tools, family))
+        matches = [n for n in _walk(tools["cast_spell"]["effects"]) if n.get("call") == name]
+        if family == "recovery":
+            matches = [n for n in matches if "target_state" in n.get("params", {})]
+        if len(matches) != 1:
+            raise ValueError(f"Retain exactly one actual {family} dispatch for Contingency.")
+        calls[family] = _dispatch(matches[0])
         if family not in {"timed_actor_defense", "timed_actor_modifier", "timed_senses"}:
             retained_name = "release_srd_contingent_" + family
             changed[retained_name] = _retained_family(tools[name])
@@ -1540,7 +1308,6 @@ def bind_release(text):
                         "_contingency_child.family == 'illumination_spell' or "
                         "_contingency_child.family == 'illusion_image' or "
                         "_contingency_child.family == 'illusion_appearance' or "
-                        "_contingency_child.family == 'detection_mask_spell' or "
                         "_contingency_child.spell == 'mass_cure_wounds'",
                         _self_scene_eligibility(),
                     ),
@@ -1548,11 +1315,6 @@ def bind_release(text):
                         "_contingency_child.family == 'illusion_appearance' and "
                         "_contingent_effect_eligible == true",
                         _appearance_eligibility(),
-                    ),
-                    _when(
-                        "_contingency_child.family == 'detection_mask_spell' and "
-                        "_contingent_effect_eligible == true",
-                        _mask_eligibility(),
                     ),
                     _when(
                         "_contingency_child.spell == 'mass_cure_wounds' and "
@@ -1608,7 +1370,6 @@ def bind_release(text):
         ],
     )
     child = deepcopy(tools["release_srd_contingent_spell"])
-    child["parameters"] = child.pop("parameters")
     alive = [
         n for n in _walk(child["effects"]) if n.get("condition") == "target_state.is_alive == true"
     ]

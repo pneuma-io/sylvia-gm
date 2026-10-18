@@ -27,6 +27,7 @@ if __package__:
     from scripts.srd_full.srd_fighting_styles import level_up_effects as style_level_up_effects
     from scripts.srd_full.srd_fighting_styles import tool as fighting_style_tool
     from scripts.srd_full.srd_spell_grants import character_validation
+    from scripts.srd_full.srd_transformation_spells import extend_equipment_runtime
 else:
     from build_srd_5_2_1_mechanics import RESOURCE_NAMES, _tool_schema
     from srd_equipment import (
@@ -43,6 +44,7 @@ else:
     from srd_fighting_styles import level_up_effects as style_level_up_effects
     from srd_fighting_styles import tool as fighting_style_tool
     from srd_spell_grants import character_validation
+    from srd_transformation_spells import extend_equipment_runtime
 
 ROOT = Path(__file__).resolve().parents[2] / "rulesets" / "dnd-srd-5.2.1"
 PACKAGE_ID = "wotc.srd.5.2.1"
@@ -452,6 +454,17 @@ def short_rest_tool():
             set_value(
                 "_short_rest_healing",
                 "max(1, _short_rest_hit_die_roll.total + _short_rest_hit_die_roll.modifier)",
+            ),
+            conditional(
+                "target_state.spell_beacon_of_hope == true",
+                [
+                    set_value(
+                        "_beacon_hit_die_maximum",
+                        "max(1, _short_rest_hit_die_roll.count * _short_rest_hit_die_roll.sides "
+                        "+ _short_rest_hit_die_roll.modifier)",
+                    ),
+                    set_value("_short_rest_healing", "_beacon_hit_die_maximum"),
+                ],
             ),
             {"decrement": {"field": "{_target_state_id}.resources.hit_die", "amount": 1}},
             {"heal": {"target": "target_state", "amount": "_short_rest_healing"}},
@@ -1721,6 +1734,7 @@ def main():
             **equipment_definitions(),
         },
     )
+    runtime = extend_equipment_runtime(runtime)
     runtime_path.write_text(runtime, encoding="utf-8")
     identity_path = ROOT / "package-identity.json"
     identity = json.loads(identity_path.read_text(encoding="utf-8"))

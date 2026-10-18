@@ -21,8 +21,12 @@ def _rows(card, section="summary"):
 def test_natural_twenty_death_save_keeps_the_recovered_characters_turn(monkeypatch):
     state, data = _combat_case()
     state[f"{SRD}.entities"]["hero"].update(
-        hp=0, stable=False, conditions=["unconscious", "prone"],
-        death_successes=0, death_failures=0, stable_recovery_hours_remaining=0,
+        hp=0,
+        stable=False,
+        conditions=["unconscious", "prone"],
+        death_successes=0,
+        death_failures=0,
+        stable_recovery_hours_remaining=0,
     )
     state[f"{SRD}.combat"]["turn_active"] = False
     _run("begin_combat_turn", state)
@@ -40,17 +44,29 @@ def test_natural_twenty_death_save_keeps_the_recovered_characters_turn(monkeypat
 def test_unrecovered_death_save_runs_end_turn_effects(monkeypatch, kind):
     state, data = _combat_case()
     state[f"{SRD}.entities"]["hero"].update(
-        hp=0, stable=False, conditions=["unconscious"], turns_started=0,
-        death_successes=0, death_failures=1, stable_recovery_hours_remaining=0,
+        hp=0,
+        stable=False,
+        conditions=["unconscious"],
+        turns_started=0,
+        death_successes=0,
+        death_failures=1,
+        stable_recovery_hours_remaining=0,
     )
     _run(
-        "install_srd_turn_effect", state, caster_state="hero",
+        "install_srd_turn_effect",
+        state,
+        caster_state="hero",
         target_state="guard" if kind == "healing_block" else "hero",
-        lasting_state="state", spell="chill_touch" if kind == "healing_block" else "acid_arrow",
+        lasting_state="state",
+        spell="chill_touch" if kind == "healing_block" else "acid_arrow",
         effect_label="Chill Touch" if kind == "healing_block" else "Acid Arrow",
-        kind=kind, expiry_owner="caster", expiry_phase="end",
-        magnitude=0, dice_count=0 if kind == "healing_block" else 1,
-        damage_die="d4", damage_type="acid",
+        kind=kind,
+        expiry_owner="caster",
+        expiry_phase="end",
+        magnitude=0,
+        dice_count=0 if kind == "healing_block" else 1,
+        damage_die="d4",
+        damage_type="acid",
     )
     if kind == "healing_block":
         assert state[f"{SRD}.entities"]["guard"]["hit_point_recovery_blocked"] is True
@@ -68,22 +84,40 @@ def test_unrecovered_death_save_runs_end_turn_effects(monkeypatch, kind):
         assert "Acid Arrow" in _rows(result["result_card"], "details")["End of turn"]
 
 
-@pytest.mark.parametrize("seed,successes,failures,exhaustion,outcome,hp,alive,stable", [
-    (31, 0, 1, 0, "Died", 0, False, False),
-    (5, 0, 0, 0, "Regained 1 HP", 1, True, False),
-    (0, 2, 0, 0, "Stable", 0, True, True),
-    (1, 0, 0, 0, "Failure", 0, True, False),
-    (0, 0, 0, 2, "Failure", 0, True, False),
-])
+@pytest.mark.parametrize(
+    "seed,successes,failures,exhaustion,outcome,hp,alive,stable",
+    [
+        (31, 0, 1, 0, "Died", 0, False, False),
+        (5, 0, 0, 0, "Regained 1 HP", 1, True, False),
+        (0, 2, 0, 0, "Stable", 0, True, True),
+        (1, 0, 0, 0, "Failure", 0, True, False),
+        (0, 0, 0, 2, "Failure", 0, True, False),
+    ],
+)
 def test_death_save_card_preserves_natural_roll_and_final_state(
-    monkeypatch, seed, successes, failures, exhaustion, outcome, hp, alive, stable,
+    monkeypatch,
+    seed,
+    successes,
+    failures,
+    exhaustion,
+    outcome,
+    hp,
+    alive,
+    stable,
 ):
     _rolls(monkeypatch, seed)
     state, data = _combat_case()
     hero = state[f"{SRD}.entities"]["hero"]
-    hero.update(name="Budget Hero", hp=0, stable=False, conditions=["unconscious"],
-                death_successes=successes, death_failures=failures,
-                exhaustion_level=exhaustion, stable_recovery_hours_remaining=0)
+    hero.update(
+        name="Budget Hero",
+        hp=0,
+        stable=False,
+        conditions=["unconscious"],
+        death_successes=successes,
+        death_failures=failures,
+        exhaustion_level=exhaustion,
+        stable_recovery_hours_remaining=0,
+    )
     result = _run("death_saving_throw", state, participant_data=data).result
     card = result.get("result_card")
     assert card is not None
@@ -100,16 +134,31 @@ def test_death_save_card_preserves_natural_roll_and_final_state(
 def test_stabilization_card_reports_check_and_committed_recovery(monkeypatch, modifier, expected):
     _rolls(monkeypatch, 0)
     state, _ = _combat_case()
-    state[f"{SRD}.entities"]["hero"].update(name="Budget Hero", hp=0, stable=False,
-        death_successes=1, death_failures=1, stable_recovery_hours_remaining=0,
-        conditions=["unconscious"])
-    result = _run("stabilize_character", state, target="hero", medicine_modifier=modifier,
-                  advantage=False, disadvantage=False).result
+    state[f"{SRD}.entities"]["hero"].update(
+        name="Budget Hero",
+        hp=0,
+        stable=False,
+        death_successes=1,
+        death_failures=1,
+        stable_recovery_hours_remaining=0,
+        conditions=["unconscious"],
+    )
+    result = _run(
+        "stabilize_character",
+        state,
+        target="hero",
+        medicine_modifier=modifier,
+        advantage=False,
+        disadvantage=False,
+    ).result
     card = result.get("result_card")
     assert card is not None
     assert _rows(card)["Outcome"] == expected
     assert card["equation"] == {
-        "die_sides": 20, "roll": 13, "modifier": modifier, "total": 13 + modifier,
+        "die_sides": 20,
+        "roll": 13,
+        "modifier": modifier,
+        "total": 13 + modifier,
     }
     assert state[f"{SRD}.entities"]["hero"]["stable"] is (modifier > 0)
 
@@ -118,11 +167,19 @@ def test_stabilization_card_reports_check_and_committed_recovery(monkeypatch, mo
 def test_grapple_escape_card_retains_dc_after_success_clears_it(dc, expected):
     state, data = _combat_case()
     data["skill_proficiencies"] = ["athletics"]
-    state[f"{SRD}.entities"]["hero"].update(conditions=["grappled"], grapple_escape_dc=dc,
-                                            grappled_by="guard")
-    result = _run("escape_srd_grapple_action", state, participant_data=data,
-                  actor="hero", actor_state="hero", ability="strength",
-                  advantage=False, disadvantage=False).result
+    state[f"{SRD}.entities"]["hero"].update(
+        conditions=["grappled"], grapple_escape_dc=dc, grappled_by="guard"
+    )
+    result = _run(
+        "escape_srd_grapple_action",
+        state,
+        participant_data=data,
+        actor="hero",
+        actor_state="hero",
+        ability="strength",
+        advantage=False,
+        disadvantage=False,
+    ).result
     card = result.get("result_card")
     assert card is not None
     assert _rows(card)["Outcome"] == expected
@@ -136,14 +193,32 @@ def test_opportunity_card_matches_committed_damage_and_reaction(monkeypatch):
     state, data = _combat_case()
     state[f"{SRD}.entities"]["hero"].update(name="Budget Hero", armor_class=1)
     state[f"{SRD}.entities"]["guard"].update(
-        available_reactions=["opportunity_attack"], reaction_available=True, melee_reach=5,
+        available_reactions=["opportunity_attack"],
+        reaction_available=True,
+        melee_reach=5,
     )
-    _run("trigger_opportunity_attack", state, participant_data=data,
-         reactor_state="guard", actor_can_see_target=True, target_can_see_actor=True,
-         attack_distance=5, attack_modifier=3, damage_dice_count=1, damage_die_size="6",
-         damage_modifier=1, damage_type="piercing")
-    result = _run("resolve_opportunity_attack", state, target_is_charmer=False,
-                  fear_source_in_sight=False, advantage=False, disadvantage=False).result
+    _run(
+        "trigger_opportunity_attack",
+        state,
+        participant_data=data,
+        reactor_state="guard",
+        actor_can_see_target=True,
+        target_can_see_actor=True,
+        attack_distance=5,
+        attack_modifier=3,
+        damage_dice_count=1,
+        damage_die_size="6",
+        damage_modifier=1,
+        damage_type="piercing",
+    )
+    result = _run(
+        "resolve_opportunity_attack",
+        state,
+        target_is_charmer=False,
+        fear_source_in_sight=False,
+        advantage=False,
+        disadvantage=False,
+    ).result
     card = result.get("result_card")
     assert card is not None
     assert card["title"] == "Opportunity Attack"
@@ -153,3 +228,51 @@ def test_opportunity_card_matches_committed_damage_and_reaction(monkeypatch):
     assert card["equation"]["modifier"] == 3
     assert state[f"{SRD}.entities"]["guard"]["reaction_available"] is False
     assert state[f"{SRD}.combat"]["pending_reaction"] is None
+
+
+@pytest.mark.parametrize("source", ["hero", "guard", None, ""])
+def test_delayed_damage_keeps_source_identity_and_normal_damage_rules(monkeypatch, source):
+    """A caster ID may equal the loaded target ID without becoming a string comparison."""
+    state, data = _combat_case()
+    hero = state[f"{SRD}.entities"]["hero"]
+    hero.update(hp=20, temp_hp=1, damage_resistances=["acid"])
+    _rolls(monkeypatch, 0)
+    result = _run(
+        "resolve_srd_delayed_spell_damage",
+        state,
+        participant_data=data,
+        target_state="hero",
+        dice_count=1,
+        damage_die="d4",
+        damage_type="acid",
+        effect_label="Acid Arrow",
+        source_state_id=source,
+    ).result
+    context = result["context"]
+    assert context["_delayed_roll"]["total"] == 4
+    assert context["_delayed_damage_applied"] == 2
+    assert hero is not state[f"{SRD}.entities"]["hero"]
+    assert state[f"{SRD}.entities"]["hero"]["hp"] == 19
+    assert state[f"{SRD}.entities"]["hero"]["temp_hp"] == 0
+    assert "Acid Arrow" in context["_delayed_row"]["value"]
+    assert state[f"{SRD}.combat"]["action_available"] is True
+
+
+def test_delayed_damage_still_applies_the_casters_ray_penalty(monkeypatch):
+    state, data = _combat_case()
+    state[f"{SRD}.entities"]["hero"].update(spell_ray_of_enfeeblement=True)
+    _rolls(monkeypatch, 0)
+    result = _run(
+        "resolve_srd_delayed_spell_damage",
+        state,
+        participant_data=data,
+        target_state="hero",
+        dice_count=2,
+        damage_die="d4",
+        damage_type="acid",
+        effect_label="Acid Arrow",
+        source_state_id="hero",
+    ).result
+    assert result["context"]["_delayed_roll"]["results"] == [4, 4]
+    assert result["context"]["_delayed_roll"]["total"] == 7
+    assert state[f"{SRD}.entities"]["hero"]["hp"] == 13

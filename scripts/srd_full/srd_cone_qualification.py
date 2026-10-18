@@ -1,4 +1,4 @@
-"""Exact finite circular Cone intersection with admitted boxes along horizontal or vertical axes."""
+"""Exact finite circular Cone intersection with admitted vertical box creatures."""
 
 if __package__:
     from .srd_actor_spell_modifiers import _call, _entity, _parameter, _require, _set, _tool, _when
@@ -60,28 +60,22 @@ def _frame(source_index="source_index", target_index="target_index"):
         _set("_cone_source", "state.spatial_scene.entities[source_index]"),
         _set("_cone_target", "state.spatial_scene.entities[target_index]"),
         _require(
-            "_cone_source.active == true and _cone_source.footprint.kind == 'box' and "
+            "_cone_source.active == true and _cone_source.footprint.kind == 'box'",
+            "Cone origin currently requires an active admitted box footprint.",
+        ),
+        _require(
             "_cone_source.metadata.plane != null and _cone_target.metadata.plane != null",
-            "Cone entries need their actual planes and an active box source footprint.",
+            "Cone entries need their actual planes.",
         ),
         _set("_cone_heading", "_cone_source.facing"),
-        _set("_cone_vertical", 0),
         _when(
             "len(direction) != 0",
             [
                 _require(
-                    "len(direction) == 2 or (len(direction) == 3 and (direction[2] == 0 or "
-                    "(direction[0] == 0 and direction[1] == 0)))",
-                    "Choose a horizontal or vertical Cone direction; tilted axes remain unsupported.",
+                    "len(direction) == 2 or (len(direction) == 3 and direction[2] == 0)",
+                    "Cone qualification currently supports horizontal chosen directions.",
                 ),
                 _set("_cone_heading", ["direction[0]", "direction[1]"]),
-                _when(
-                    "len(direction) == 3 and direction[2] != 0",
-                    [
-                        _set("_cone_heading", ["direction[2]", 0]),
-                        _set("_cone_vertical", 1),
-                    ],
-                ),
             ],
         ),
         _set(
@@ -124,9 +118,9 @@ def _frame(source_index="source_index", target_index="target_index"):
         _set(
             "_srd_cone_origin",
             [
-                "_cone_source.position[0] + (1 - _cone_vertical) * _cone_axis[0] * _cone_surface_distance",
-                "_cone_source.position[1] + (1 - _cone_vertical) * _cone_axis[1] * _cone_surface_distance",
-                "_cone_source.position[2] + _cone_source.height * 0.5 * (1 + _cone_vertical * _cone_axis[0])",
+                "_cone_source.position[0] + _cone_axis[0] * _cone_surface_distance",
+                "_cone_source.position[1] + _cone_axis[1] * _cone_surface_distance",
+                "_cone_source.position[2] + _cone_source.height * 0.5",
             ],
         ),
         _when(
@@ -160,10 +154,7 @@ def _frame(source_index="source_index", target_index="target_index"):
                 f"{source_index} >= 0 and {source_index} < len(state.spatial_scene.entities)"
             )
         plane = next(e for e in effects if "Cone entries" in e.get("require", {}).get("error", ""))
-        plane["require"]["condition"] = (
-            "_cone_source.active == true and _cone_source.footprint.kind == 'box' and "
-            "_cone_source.metadata.plane != null"
-        )
+        plane["require"]["condition"] = "_cone_source.metadata.plane != null"
     source = next(e for e in effects if e.get("set", {}).get("field") == "_cone_source")
     if source_index is None:
         effects.remove(source)
@@ -173,20 +164,6 @@ def _frame(source_index="source_index", target_index="target_index"):
 
 
 def _box_bounds():
-    """Select the original or vertical frame without duplicating the resolver graph."""
-    low = [f"_cone_target.position[{axis}] - _cone_target.footprint.half_extents[{axis}]" for axis in range(2)]
-    high = [f"_cone_target.position[{axis}] + _cone_target.footprint.half_extents[{axis}]" for axis in range(2)]
-    low.append("_cone_target.position[2]")
-    high.append("_cone_target.position[2] + _cone_target.height")
-
-    def coordinate(original_axis, vertical_axis, boundary):
-        values = low if boundary == 'low' else high
-        horizontal = f"{values[original_axis]} - _srd_cone_origin[{original_axis}]"
-        vertical = f"{values[vertical_axis]} - _srd_cone_origin[{vertical_axis}]"
-        return f"(1 - _cone_vertical) * ({horizontal}) + _cone_vertical * ({vertical})"
-
-    below = coordinate(2, 1, 'low')
-    above = coordinate(2, 1, 'high')
     return [
         _require(
             "_cone_target.footprint.kind == 'box'",
@@ -195,11 +172,26 @@ def _box_bounds():
         _set(
             "_cone_box",
             {
-                "x0": coordinate(0, 2, 'low'),
-                "x1": coordinate(0, 2, 'high'),
-                "y0": coordinate(1, 0, 'low'),
-                "y1": coordinate(1, 0, 'high'),
-                "z": f"max({below}, 0, -({above}))",
+                "x0": (
+                    "_cone_target.position[0] - _cone_target.footprint.half_extents[0] - "
+                    "_srd_cone_origin[0]"
+                ),
+                "x1": (
+                    "_cone_target.position[0] + _cone_target.footprint.half_extents[0] - "
+                    "_srd_cone_origin[0]"
+                ),
+                "y0": (
+                    "_cone_target.position[1] - _cone_target.footprint.half_extents[1] - "
+                    "_srd_cone_origin[1]"
+                ),
+                "y1": (
+                    "_cone_target.position[1] + _cone_target.footprint.half_extents[1] - "
+                    "_srd_cone_origin[1]"
+                ),
+                "z": (
+                    "max(_cone_target.position[2] - _srd_cone_origin[2], 0, "
+                    "_srd_cone_origin[2] - _cone_target.position[2] - _cone_target.height)"
+                ),
             },
         ),
     ]
@@ -459,7 +451,6 @@ def cone_tools():
             _require("_cone_source != null", "Cone source needs its actual admitted proxy."),
             *_frame(None, None),
             _set("_srd_cone_axis", "_cone_axis"),
-            _when("_cone_vertical == 1", [_set("_srd_cone_axis", [])]),
             _set("_srd_cone_source", "_cone_source"),
             _each(
                 "_cone_scene_entities",

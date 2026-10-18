@@ -50,122 +50,6 @@ def _public(tool):
     return tool
 
 
-def _declare_continuation_progress(tool):
-    """Attach recorded progress at the existing lookup and progress mutation."""
-    effects = tool["effects"]
-    lookup = next(
-        i for i, effect in enumerate(effects) if effect.get("store_as") == "_casting_requirements"
-    )
-    label = _set("_continued_spell_label", "_casting_requirements.name")
-    if effects[lookup + 1] != label:
-        effects.insert(lookup + 1, label)
-    increment = next(
-        i
-        for i, effect in enumerate(effects)
-        if effect.get("set")
-        == {
-            "field": "caster_state.extended_casting.progress_rounds",
-            "value": "caster_state.extended_casting.progress_rounds + elapsed_rounds",
-        }
-    )
-    captures = [
-        _set("_continued_cast_stage", "'progressing'"),
-        _set("_continued_cast_rounds", "caster_state.extended_casting.progress_rounds"),
-        _set("_continued_cast_required_rounds", "caster_state.extended_casting.required_rounds"),
-        _when(
-            "caster_state.extended_casting.progress_rounds >= "
-            "caster_state.extended_casting.required_rounds",
-            [_set("_continued_cast_stage", "'ready_to_finish'")],
-        ),
-    ]
-    if effects[increment + 1 : increment + 1 + len(captures)] != captures:
-        effects[increment + 1 : increment + 1] = captures
-
-
-def _declare_continuation_outer(tool):
-    """Declare the outer receipt and export only its four recorded scalar facts."""
-
-    def delegates(value):
-        if isinstance(value, dict):
-            if value.get("call") == "continue_srd_spell_cast_internal":
-                yield value
-            for child in value.values():
-                yield from delegates(child)
-        elif isinstance(value, list):
-            for child in value:
-                yield from delegates(child)
-
-    calls = list(delegates(tool["effects"]))
-    assert len(calls) == 1, "Expected the existing private continuation delegate"
-    calls[0]["export_context"] = {
-        field: field
-        for field in (
-            "_continued_spell_label",
-            "_continued_cast_stage",
-            "_continued_cast_rounds",
-            "_continued_cast_required_rounds",
-        )
-    }
-    tool["metadata"]["result_card"] = {
-        "version": 1,
-        "title": {"path": "context._continued_spell_label"},
-        "footprint": "compact",
-        "summary": [
-            {
-                "label": "Casting",
-                "value": {
-                    "path": "context._continued_cast_stage",
-                    "labels": {
-                        "progressing": "Progressing",
-                        "ready_to_finish": "Ready to finish",
-                        "interrupted": "Interrupted",
-                    },
-                },
-                "emphasis": True,
-            },
-            {
-                "label": "Rounds completed",
-                "value": {"path": "context._continued_cast_rounds"},
-            },
-            {
-                "label": "Rounds required",
-                "value": {"path": "context._continued_cast_required_rounds"},
-            },
-        ],
-        "details": [],
-    }
-
-
-def _bind_private_casting_clock(tool):
-    """Retain settlement order while fixing the two public wrappers to package state."""
-    tool["parameters"] = [p for p in tool["parameters"] if p["name"] != "lasting_state"]
-
-    def bind(value):
-        if isinstance(value, str):
-            if value == "{_lasting_state_id}":
-                return "state"
-            return re.sub(r"\blasting_state\.", "state.", value)
-        if isinstance(value, list):
-            return [bind(child) for child in value]
-        if isinstance(value, dict):
-            return {key: bind(child) for key, child in value.items()}
-        return value
-
-    tool["effects"] = bind(tool["effects"])
-    if "pre_conditions" in tool:
-        tool["pre_conditions"] = bind(tool["pre_conditions"])
-
-
-def bind_private_casting_clocks(text):
-    """Final composition hook: later settlement owners must not expose a selectable clock."""
-    tools = _load_runtime(text)["tools"]
-    for name in sorted(PUBLIC_TOOLS):
-        tool = deepcopy(tools[name])
-        _bind_private_casting_clock(tool)
-        text = _render_tool(text, name, tool)
-    return text
-
-
 def _casting_rounds():
     effects = [_set("_required_casting_rounds", 0)]
     for timing, rounds in CASTING_ROUNDS.items():
@@ -970,8 +854,6 @@ def extend_runtime(text, *, spell_ids=None):
             "spellbook_readable",
         )
     ]
-    _declare_continuation_progress(changed["continue_srd_spell_cast"])
-
     changed["interrupt_srd_extended_casting"] = _tool(
         "End a longer casting if it belongs to this actor; its slot and materials remain unspent.",
         [_entity("caster_state")],
@@ -1137,8 +1019,6 @@ def extend_runtime(text, *, spell_ids=None):
                 )
             }
             changed[name]["metadata"]["result_card"] = deepcopy(cast["metadata"]["result_card"])
-        elif name == "continue_srd_spell_cast":
-            _declare_continuation_outer(changed[name])
     for name, tool in changed.items():
         text = _render_tool(text, name, tool)
     return text

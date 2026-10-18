@@ -23,22 +23,9 @@ def _effects(effects):
             yield from _effects(effect["for_each"]["do"])
 
 
-FLAG = "_effective_damage_lifecycle_needed"
-
-
 def _receiving_guard(existing, rest):
-    """Preserve OR short-circuit order using two independently bounded predicates."""
-    if len(existing) > 500 or len(rest) > 500:
-        raise ValueError("Receiving predicate exceeds the unchanged expression limit")
-    mark = {"set": {"field": FLAG, "value": True}}
-    return [
-        {"set": {"field": FLAG, "value": False}},
-        {
-            "condition": existing,
-            "on_true": [deepcopy(mark)],
-            "on_false": [{"condition": rest, "on_true": [deepcopy(mark)]}],
-        },
-    ]
+    """Retain every group: the neutral parser gives AND and OR equal precedence."""
+    return f"({existing}) or ({rest})".replace("_effective_damage > 0", "_effective_damage>0")
 
 
 def bind_runtime(text):
@@ -63,10 +50,7 @@ def bind_runtime(text):
     changed = {}
     for name in OWNERS:
         original = tools[name]
-        already_joined = rest in list(_effects(original["effects"]))
-        if already_joined and any(
-            effect.get("condition") == FLAG + " == true" for effect in original["effects"]
-        ):
+        if rest in list(_effects(original["effects"])):
             continue
         tool = deepcopy(original)
         groups = [
@@ -78,20 +62,8 @@ def bind_runtime(text):
         if len(groups) != 1:
             raise SystemExit("Composite rest interruption needs one completed observer boundary.")
         group = groups[0]
-        existing = group["condition"]
-        if already_joined:
-            suffix = (" or (" + rest["condition"] + ")").replace(
-                "_effective_damage > 0", "_effective_damage>0"
-            )
-            if not existing.endswith(suffix):
-                raise ValueError("Previously joined receiving predicate has an unknown boundary")
-            existing = existing[: -len(suffix)]
-        predicates = _receiving_guard(existing, rest["condition"])
-        index = tool["effects"].index(group)
-        tool["effects"][index:index] = predicates
-        group["condition"] = FLAG + " == true"
-        if not already_joined:
-            group["on_true"].insert(0, deepcopy(rest))
+        group["condition"] = _receiving_guard(group["condition"], rest["condition"])
+        group["on_true"].insert(0, deepcopy(rest))
         changed[name] = tool
     if not changed:
         return text

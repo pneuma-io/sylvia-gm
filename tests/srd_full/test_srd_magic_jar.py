@@ -12,14 +12,14 @@ from scripts.srd_full.srd_magic_jar import PUBLIC_TOOLS, extend_runtime
 from scripts.srd_full.srd_magic_jar_consumers import bind_consumers
 
 from sylvia_gm import dice
-from tests.srd_full import full_package_fixture as bundled_packages
+from sylvia_gm.application import bundled_packages
 from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.domain.authority import ActionStatus, MechanicContext, owned_payload
 from sylvia_gm.domain.errors import RulesetPreconditionRejected
-from tests.srd_full import test_srd_action_budget as budget
-from tests.srd_full import test_srd_planar_binding as binding
-from tests.srd_full import test_srd_public_spell_casting as public_casting
-from tests.srd_full import test_srd_spell_result_cards as cards
+from tests import test_srd_action_budget as budget
+from tests import test_srd_planar_binding as binding
+from tests import test_srd_public_spell_casting as public_casting
+from tests import test_srd_spell_result_cards as cards
 from tests.srd_full.test_srd_extended_casting import _begin
 from tests.srd_full.test_srd_illusion_removals import _prepare
 from tests.srd_full.test_srd_npc_spell_casting import _act, _prepare_mage

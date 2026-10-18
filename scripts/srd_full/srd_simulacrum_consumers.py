@@ -24,42 +24,6 @@ def _lists(effects):
                 yield from _lists(effect[key])
 
 
-def _declare_interrupted_continuation_receipt(tool, spell_name):
-    """Capture existing channel facts before observation can commit its cleanup."""
-    lists = list(_lists(tool["effects"]))
-    selected = [
-        effect["on_true"]
-        for effects in lists
-        for effect in effects
-        if effect.get("condition") == "caster_state.extended_casting.spell == 'simulacrum'"
-    ]
-    interrupted = [
-        effect["on_true"]
-        for effects in lists
-        for effect in effects
-        if effect.get("condition") == "_sim_proximity_failed == true"
-    ]
-    assert len(selected) == len(interrupted) == 1, (
-        "Expected the existing Simulacrum continuation branches"
-    )
-    before = selected[0]
-    observe = next(
-        i
-        for i, effect in enumerate(before)
-        if effect.get("call") == "observe_srd_simulacrum_channel"
-    )
-    captures = [
-        _set("_continued_spell_label", repr(spell_name)),
-        _set("_continued_cast_rounds", "caster_state.extended_casting.progress_rounds"),
-        _set("_continued_cast_required_rounds", "caster_state.extended_casting.required_rounds"),
-    ]
-    if before[max(0, observe - len(captures)) : observe] != captures:
-        before[observe:observe] = captures
-    stage = _set("_continued_cast_stage", "'interrupted'")
-    if interrupted[0][0] != stage:
-        interrupted[0].insert(0, stage)
-
-
 def _channel_tools():
     return {
         "observe_srd_simulacrum_channel": _tool_scene(
@@ -569,8 +533,7 @@ def _dispel_tool():
 
 def bind_consumers(text):
     """Compose only source-qualified hooks; ordinary living damage/healing stay cheap."""
-    runtime = _load_runtime(text)
-    tools = runtime["tools"]
+    tools = _load_runtime(text)["tools"]
     changed = _channel_tools() | _repair_tools() | {"dispel_srd_simulacrum_source": _dispel_tool()}
     recovery = deepcopy(tools["cast_srd_recovery"])
     branch = "spell == 'dispel_magic' and recovery_choice == 'simulacrum'"
@@ -681,10 +644,6 @@ def bind_consumers(text):
             ordinary_continuation,
         ),
     ]
-    _declare_interrupted_continuation_receipt(
-        continue_cast,
-        runtime["definitions"]["spell_casting"]["simulacrum"]["name"],
-    )
     changed["continue_srd_spell_cast"] = continue_cast
     for name in ("cast_spell", "cast_spell_outside_combat"):
         tool = deepcopy(tools[name])

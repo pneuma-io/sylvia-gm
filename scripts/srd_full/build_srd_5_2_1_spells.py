@@ -166,7 +166,6 @@ if __package__:
     from .srd_environment_wind_wall import bind_runtime_consumers as bind_wind_wall
     from .srd_exploration_cast_delegate import bind_runtime as bind_exploration_cast_delegate
     from .srd_extended_casting import PUBLIC_TOOLS as EXTENDED_CASTING_TOOLS
-    from .srd_extended_casting import bind_private_casting_clocks
     from .srd_extended_casting import extend_runtime as extend_casting
     from .srd_feather_fall import bind_runtime_consumers as bind_feather_fall_consumers
     from .srd_feather_fall import extend_runtime as extend_feather_fall
@@ -721,7 +720,6 @@ else:
     from srd_environment_wind_wall import bind_runtime_consumers as bind_wind_wall
     from srd_exploration_cast_delegate import bind_runtime as bind_exploration_cast_delegate
     from srd_extended_casting import PUBLIC_TOOLS as EXTENDED_CASTING_TOOLS
-    from srd_extended_casting import bind_private_casting_clocks
     from srd_extended_casting import extend_runtime as extend_casting
     from srd_feather_fall import bind_runtime_consumers as bind_feather_fall_consumers
     from srd_feather_fall import extend_runtime as extend_feather_fall
@@ -1506,38 +1504,6 @@ def _spell_declaration(text: str) -> dict[str, Any]:
     return declaration
 
 
-def _project_final_spell_selector_copies(text, definitions):
-    """Refresh actual exact-selector copies after the public declaration projection."""
-    from copy import deepcopy
-
-    if __package__:
-        from .srd_timed_senses import _replace_tools
-    else:
-        from srd_timed_senses import _replace_tools
-
-    text = _replace_generated_block(
-        text,
-        SPELL_SELECTOR_START,
-        SPELL_SELECTOR_END,
-        [f"          - {spell_id}" for spell_id in definitions],
-    )
-    runtime = _load_runtime(text)
-    public = next(p for p in runtime["tools"][SPELL_TOOL]["parameters"] if p["name"] == "spell")
-    if public["enum_values"] != list(definitions):
-        raise ValueError("Public spell selector differs from its exact declaration keys")
-    changed = {}
-    for name in ("begin_srd_spell_action", "prepare_srd_contingent_child"):
-        tool = deepcopy(runtime["tools"][name])
-        parameters = [p for p in tool["parameters"] if p["name"] == "spell"]
-        if len(parameters) != 1 or parameters[0].get("type") != public.get("type"):
-            raise ValueError("Exact spell selector copy has an unsupported declaration")
-        parameters[0]["enum_values"] = list(public["enum_values"])
-        changed[name] = tool
-    # Keep exact family predicates on one line for the unchanged composition check.
-    changed[SPELL_TOOL] = deepcopy(runtime["tools"][SPELL_TOOL])
-    return _replace_tools(text, changed, width=1000)
-
-
 def _compile_runtime(
     declaration: dict[str, Any],
     runtime_source: str,
@@ -1920,7 +1886,12 @@ def _compile_runtime(
     runtime_text = bind_exploration_cast_delegate(runtime_text)
     runtime_text = bind_tsunami_completion(runtime_text, SPELL_SUPPORT_TOOLS)
     runtime_text = bind_numeric_spell_distances(runtime_text)
-    runtime_text = _project_final_spell_selector_copies(runtime_text, definitions)
+    runtime_text = _replace_generated_block(
+        runtime_text,
+        SPELL_SELECTOR_START,
+        SPELL_SELECTOR_END,
+        [f"          - {spell_id}" for spell_id in definitions],
+    )
     definition_lines = [
         "    "
         + spell_id
@@ -1978,7 +1949,6 @@ def _compile_runtime(
             for source, policy in sorted(grants.items())
         ],
     )
-    runtime_text = bind_private_casting_clocks(runtime_text)
     runtime = _load_runtime(runtime_text)
     _validate_spell_composition(definitions, requirements, runtime, runtime_text)
     if runtime.get("definitions", {}).get("spell_grants") != grants:
@@ -2041,29 +2011,6 @@ def _validate_spell_composition(
             and ordinary_casting_time == "Action (Overgrowth) or 8 hours (Enrichment)"
         ):
             ordinary_casting_time = "Action"
-        conditional_bonus_headers = {
-            "divine_smite": (
-                "Bonus Action, which you take immediately after hitting a target with "
-                "a Melee weapon or an Unarmed Strike"
-            ),
-            "ensnaring_strike": (
-                "Bonus Action, which you take immediately after hitting a creature with a weapon"
-            ),
-            "searing_smite": (
-                "Bonus Action, which you take immediately after hitting a target with "
-                "a Melee weapon or an Unarmed Strike"
-            ),
-            "shining_smite": (
-                "Bonus Action, which you take immediately after hitting a creature "
-                "with a Melee weapon or an Unarmed Strike"
-            ),
-        }
-        if (
-            family == "attack_rider_spell"
-            and definition["casting_time"] == "bonus_action"
-            and ordinary_casting_time == conditional_bonus_headers.get(spell_id)
-        ):
-            ordinary_casting_time = "Bonus Action"
         if definition["casting_time"] == "reaction":
             ordinary_casting_time = ordinary_casting_time.split(",", 1)[0]
         if definition["casting_time"] != ordinary_casting_time.lower().replace(" ", "_"):
@@ -2071,21 +2018,12 @@ def _validate_spell_composition(
         duration = header["duration"]
         if ("Concentration" in duration) != (definition.get("concentration") is True):
             raise SystemExit(f"Spell concentration disagrees with its SRD header: {spell_id}")
-        retained_zero_durations = {
-            ("simulacrum", "simulacrum_spell"): "Until dispelled",
-        }
         if "duration_rounds" in definition and not (
-            (
-                (spell_id, family) in retained_zero_durations
-                and duration == retained_zero_durations[(spell_id, family)]
-                and definition["duration_rounds"] == 0
-            )
-            or (spell_id, family)
+            (spell_id, family)
             in {
                 ("command", "timed_control_orders"),
                 ("plant_growth", "plant_growth_spell"),
                 ("awaken", "awaken_spell"),
-                ("divine_smite", "attack_rider_spell"),
             }
             and duration == "Instantaneous"
             and definition["duration_rounds"] == 0

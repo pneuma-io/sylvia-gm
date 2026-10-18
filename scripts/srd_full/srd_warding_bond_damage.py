@@ -114,59 +114,6 @@ def _receiving_fortitude(effects):
     return effects
 
 
-def _receiving_start(effects):
-    """Select a supported complete receiving boundary, never an arbitrary nested marker."""
-    flat = [
-        i for i, effect in enumerate(effects) if effect.get("set", {}).get("field") == "_hp_before"
-    ]
-    wrapped = [
-        i
-        for i, effect in enumerate(effects)
-        if effect.get("set", {}).get("field") == "_tp_received_object"
-    ]
-    if len(flat) + len(wrapped) != 1:
-        raise ValueError("Warding Bond needs one supported complete receiving boundary.")
-    if flat:
-        start = flat[0]
-        if effects[start] != _set("_hp_before", "target.hp"):
-            raise ValueError("Warding Bond needs the native flat HP initializer.")
-        return start
-    start = wrapped[0]
-    initializer = _set(
-        "_tp_received_object",
-        "target.true_polymorph_object_source_id != null and target.is_object == true",
-    )
-    if effects[start] != initializer or start + 1 >= len(effects):
-        raise ValueError("Warding Bond needs the actual True Polymorph initializer.")
-    receiving = effects[start + 1]
-    exports = (
-        "_hp_before",
-        "_hp_after",
-        "_temp_hp_before",
-        "_temp_hp_after",
-        "_hp_lost",
-        "_is_alive_after",
-        "_object_destroyed",
-    )
-    object_call = _call(
-        "receive_srd_true_polymorph_object_damage",
-        {"target": "{target}", "amount": "{_effective_damage}"},
-        exports,
-    )
-    ordinary = receiving.get("on_false", [])
-    if (
-        set(receiving) != {"condition", "on_true", "on_false"}
-        or receiving.get("condition") != "_tp_received_object == true"
-        or receiving.get("on_true") != [object_call]
-        or not ordinary
-        or ordinary[0] != _set("_hp_before", "target.hp")
-        or sum(e.get("set", {}).get("field") == "_hp_before" for e in ordinary) != 1
-    ):
-        raise ValueError("Warding Bond needs both exact True Polymorph receiving branches.")
-    # Keep initializer, complete conditional and every later receiving effect together.
-    return start
-
-
 def _reflection_tool(tools):
     """Mitigate the saved post-recipient types, then reuse one unchanged composite HP suffix."""
     owner = tools["apply_srd_composite_damage"]
@@ -175,7 +122,9 @@ def _reflection_tool(tools):
         for i, e in enumerate(owner["effects"])
         if e.get("set", {}).get("field") == "_component_1_effective_damage"
     )
-    hp = _receiving_start(owner["effects"])
+    hp = next(
+        i for i, e in enumerate(owner["effects"]) if e.get("set", {}).get("field") == "_hp_before"
+    )
     kinds = next(
         p["enum_values"] for p in owner["parameters"] if p["name"] == "component_1_damage_type"
     )

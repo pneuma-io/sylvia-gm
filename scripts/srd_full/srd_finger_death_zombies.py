@@ -601,12 +601,7 @@ def _fortitude_packet(tool, composite, qualified):
     lethal = [
         e
         for e in _walk(tool["effects"])
-        if e.get("condition")
-        in (
-            "target.hp == 0 and target.creature_kind == 'monster'",
-            "(target.hp == 0 and target.creature_kind == 'monster') "
-            "and target.astral_projection_role != 'form'",
-        )
+        if e.get("condition") == "target.hp == 0 and target.creature_kind == 'monster'"
     ]
     if len(lethal) != 1:
         raise ValueError("Keep the actual nested zero-HP monster boundary.")

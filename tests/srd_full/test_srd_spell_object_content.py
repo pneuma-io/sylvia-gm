@@ -24,13 +24,13 @@ from scripts.srd_full.srd_timed_senses import _replace_tools
 
 from sylvia_gm import dice
 from sylvia_gm.application.authority import AuthorityOwner
-from tests.srd_full.full_package_fixture import _archive, _srd_drafts
+from sylvia_gm.application.bundled_packages import _archive, _srd_drafts
 from sylvia_gm.application.package_materialization import NormalizedPackageDraft
 from sylvia_gm.application.package_runtime import PackageRuntimeError, materialize_package_mechanic
 from sylvia_gm.domain.authority import ActionStatus, MechanicContext, StateValue, owned_payload
 from sylvia_gm.domain.errors import MechanicsRejected, RulesetPreconditionRejected
 from sylvia_gm.domain.package_library import ToolDeclaration, canonical_json_bytes
-from tests.srd_full import test_srd_public_spell_casting as public_casting
+from tests import test_srd_public_spell_casting as public_casting
 from tests.srd_full.test_srd_npc_spell_casting import _act, _prepare_mage
 from tests.srd_full.test_srd_scene_relations import _state as _scene_state
 

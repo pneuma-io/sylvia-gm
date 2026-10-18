@@ -427,6 +427,11 @@ def change_equipment_tool():
                 assign("actor_state.worn_armor", "_equipment_new"),
             ]},
         ]},
+        {"condition": "slot == 'armor' and _equipment_new != null", "on_true": [
+            {"call": "retire_srd_armored_actor_defenses", "params": {
+                "target_state": "{_actor_state_id}",
+            }},
+        ]},
         {"condition": "actor != null", "on_true": [
             {"call": "resolve_srd_equipment", "params": {
                 "actor": "{_actor_id}", "actor_state": "{_actor_state_id}",
@@ -442,7 +447,11 @@ def change_equipment_tool():
         assign("actor_state.armor_speed_penalty", "_equipment_speed_penalty"),
         assign("actor_state.armor_untrained", "_equipment_untrained_armor"),
         assign("actor_state.armor_stealth_disadvantage", "_equipment_stealth_disadvantage"),
-        assign("actor_state.speed", "_equipment_speed"),
+        assign("_equipment_spell_speed_bonus", 0),
+        {"condition": "actor_state.spell_speed_bonus != null", "on_true": [
+            assign("_equipment_spell_speed_bonus", "actor_state.spell_speed_bonus"),
+        ]},
+        assign("actor_state.speed", "_equipment_speed + _equipment_spell_speed_bonus"),
         assign("actor_state.climb_speed", "_equipment_climb_speed"),
         assign("actor_state.swim_speed", "_equipment_swim_speed"),
         {"call": "refresh_srd_movement_budget", "params": {"actor_state": "{_actor_state_id}"}},
@@ -521,14 +530,65 @@ def movement_budget_tool():
             {"condition": "combat.movement_spent != null", "on_true": [
                 {"set": {"field": "_movement_spent", "value": "combat.movement_spent"}},
             ]},
-            {"condition": "actor_state.spell_speed_reduction != null", "on_true": [
+            {"condition": "actor_state.spell_speed_reduction != null and "
+                          "actor_state.spell_freedom_of_movement != true", "on_true": [
                 {"set": {"field": "_movement_reduction",
                          "value": "actor_state.spell_speed_reduction"}},
             ]},
-            {"set": {"field": "_movement_speed", "value": "max(0, actor_state.speed "
+            {"set": {"field": "_movement_speed", "value": "actor_state.speed"}},
+            {"condition": "combat.movement_mode == 'swim'", "on_true": [
+                {"set": {"field": "_movement_speed", "value": 0}},
+                {"condition": "actor_state.swim_speed != null", "on_true": [
+                    {"set": {"field": "_movement_speed", "value": "actor_state.swim_speed"}},
+                ]},
+                {"condition": "actor_state.spell_freedom_of_movement == true", "on_true": [
+                    {"set": {"field": "_movement_speed",
+                             "value": "max(_movement_speed, actor_state.speed)"}},
+                ]},
+            ]},
+            {"condition": "combat.movement_mode == 'fly'", "on_true": [
+                {"set": {"field": "_movement_speed", "value": 0}},
+                {"condition": "actor_state.flying_speed != null", "on_true": [
+                    {"set": {"field": "_movement_speed", "value": "actor_state.flying_speed"}},
+                ]},
+                {"condition": "actor_state.spell_flying_speed != null", "on_true": [
+                    {"set": {"field": "_movement_speed",
+                             "value": "max(_movement_speed, actor_state.spell_flying_speed)"}},
+                ]},
+            ]},
+            {"condition": "combat.movement_mode == 'climb' or combat.movement_mode == 'ceiling'",
+             "on_true": [
+                {"set": {"field": "_movement_speed", "value": 0}},
+                {"condition": "actor_state.climb_speed != null", "on_true": [
+                    {"set": {"field": "_movement_speed", "value": "actor_state.climb_speed"}},
+                ]},
+                {"condition": "actor_state.spell_spider_climb == true", "on_true": [
+                    {"set": {"field": "_movement_speed",
+                             "value": "max(_movement_speed, actor_state.speed)"}},
+                ]},
+            ]},
+            {"set": {"field": "_movement_speed", "value": "max(0, _movement_speed "
                      "- actor_state.exhaustion_level * 5 - _movement_reduction)"}},
+            {"condition": "actor_state.spell_haste == true", "on_true": [
+                {"set": {"field": "_movement_speed", "value": "_movement_speed * 2"}},
+            ]},
+            {"condition": "actor_state.spell_slow == true and "
+                          "actor_state.spell_freedom_of_movement != true", "on_true": [
+                {"set": {"field": "_movement_speed", "value": "_movement_speed // 2"}},
+            ]},
+            {"condition": "actor_state.haste_lethargy == true", "on_true": [
+                {"set": {"field": "_movement_speed", "value": 0}},
+            ]},
             {"condition": "actor_state.turn_speed_halved == true", "on_true": [
                 {"set": {"field": "_movement_speed", "value": "_movement_speed // 2"}},
+            ]},
+            {"condition": "(actor_state.timed_control_speed_zero == true and "
+                          "actor_state.spell_freedom_of_movement != true) or "
+                          "actor_state.control_dancing == true or "
+                          "(actor_state.control_confusion_active == true and "
+                          "(actor_state.control_confusion_mode == 'idle' or "
+                          "actor_state.control_confusion_mode == 'attack'))", "on_true": [
+                {"set": {"field": "_movement_speed", "value": 0}},
             ]},
             {"set": {"field": "combat.movement_remaining", "value": "max(0, "
                      "_movement_speed * (1 + _movement_dashes) - _movement_spent)"}},

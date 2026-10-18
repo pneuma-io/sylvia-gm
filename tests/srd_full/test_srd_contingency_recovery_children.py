@@ -11,7 +11,7 @@ from pathlib import Path
 from random import Random
 
 import pytest
-from scripts.srd_full import srd_contingency_child_casting as child
+from scripts import srd_contingency_child_casting as child
 from scripts.srd_full.srd_control_behaviors import _walk
 from scripts.srd_full.srd_timed_actor_defenses import _load_runtime
 
@@ -20,10 +20,10 @@ from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.domain.authority import ActionStatus
 from sylvia_gm.runtime._effect_executor import execute_effects
 from sylvia_gm.runtime._types import ExecutionContext
-from tests.srd_full import test_srd_contingency_child_casting as native
-from tests.srd_full import test_srd_contingency_child_public as prior
-from tests.srd_full import test_srd_contingency_combined_public as combined
-from tests.srd_full import test_srd_public_spell_casting as public_casting
+from tests import test_srd_contingency_child_casting as native
+from tests import test_srd_contingency_child_public as prior
+from tests import test_srd_contingency_combined_public as combined
+from tests import test_srd_public_spell_casting as public_casting
 from tests.srd_full.test_srd_npc_spell_casting import _act
 
 PROOF = Path(
@@ -48,7 +48,7 @@ def _actual_native_recovery_suffix(text):
     owner = _native_curses()
     source = Path(owner.__file__)
     assert hashlib.sha256(source.read_bytes()).hexdigest() == (
-        "04843839e0fc717dc1ffd2a651dafe2802d3106d1218b5fdca607c54f296de9b"
+        "0de366d8f99e49f129bd26cc4e4966f89c5218e9528c29d6a79764b1d39f9f11"
     )
     owner._validate_sources()
     function = next(

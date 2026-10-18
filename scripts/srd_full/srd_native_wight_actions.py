@@ -8,7 +8,6 @@ from pathlib import Path
 if __package__:
     from .srd_native_mummy_actions import _native_body_tool
     from .srd_native_mummy_fist import _actual_composite_body
-    from .srd_native_receiving_boundary import native_receiving_boundary
     from .srd_native_undead_curses import MUMMY_BLOCK
     from .srd_spell_summoning import (
         _created_actor_attack_geometry_tool,
@@ -29,7 +28,6 @@ if __package__:
 else:
     from srd_native_mummy_actions import _native_body_tool
     from srd_native_mummy_fist import _actual_composite_body
-    from srd_native_receiving_boundary import native_receiving_boundary
     from srd_native_undead_curses import MUMMY_BLOCK
     from srd_spell_summoning import (
         _created_actor_attack_geometry_tool,
@@ -101,11 +99,21 @@ def _wight_actor_tools(tools):
 def _maximum_loss_effects(tools):
     """Receive only the actual packet's fresh typed damage before final presentation snapshots."""
     packet = _actual_composite_body(tools, composite=False)
-    boundary = native_receiving_boundary(packet["effects"])
-    death = deepcopy(boundary.still_zero)
-    maximum_zero = "target.max_hp == 0 and target.is_alive == true"
-    if boundary.monster_zero["condition"].endswith("target.astral_projection_role != 'form'"):
-        maximum_zero += " and target.astral_projection_role != 'form'"
+    zeros = [
+        e
+        for e in packet["effects"]
+        if e.get("condition") == "target.hp == 0 and target.creature_kind == 'monster'"
+    ]
+    if len(zeros) != 1:
+        raise ValueError("Life Drain requires the actual final monster-zero boundary.")
+    suffixes = [e["on_true"] for e in zeros[0]["on_true"] if e.get("condition") == "target.hp == 0"]
+    if len(suffixes) != 1 or not any(
+        e.get("call") == "record_srd_actual_death" for e in suffixes[0]
+    ):
+        raise ValueError("Preserve the actual still-zero receiving death suffix.")
+    death = deepcopy(suffixes[0])
+    if {"apply_condition": {"target": "target", "condition": "dead"}} not in death:
+        raise ValueError("Native maximum zero needs the genuine death condition.")
     death_index = next(i for i, e in enumerate(death) if e.get("call") == "record_srd_actual_death")
     death.insert(
         death_index + 1,
@@ -210,7 +218,7 @@ def _maximum_loss_effects(tools):
                         _set("target.hp", "min(target.hp, target.max_hp)"),
                         _set("target.bloodied", "target.hp <= floor(target.max_hp * 0.5)"),
                         _when(
-                            maximum_zero,
+                            "target.max_hp == 0 and target.is_alive == true",
                             [
                                 _set("_wight_maximum_zero_death", True),
                                 _set("_wight_concentration_target", None),
@@ -244,10 +252,12 @@ def _life_drain_packet(tools):
     observers = [p for p in packet["parameters"] if p["name"] == "observe_damage_type"]
     if len(observers) != 1 or "necrotic" not in observers[0]["enum_values"]:
         raise ValueError("Life Drain requires the actual final matching-type damage receipt.")
-    boundary = native_receiving_boundary(packet["effects"])
-    boundary.ordinary[boundary.completion_index : boundary.completion_index] = (
-        _maximum_loss_effects(tools)
-    )
+    snapshots = [
+        i for i, e in enumerate(packet["effects"]) if e.get("set", {}).get("field") == "_hp_after"
+    ]
+    if len(snapshots) != 1:
+        raise ValueError("Life Drain requires one actual final HP presentation boundary.")
+    packet["effects"][snapshots[0] : snapshots[0]] = _maximum_loss_effects(tools)
     packet["effects"][0:0] = [
         _call(
             "qualify_srd_native_wight_body",

@@ -1098,13 +1098,13 @@ def _respiration_tools():
     }
 
 
-def _replace_tools(text, changed, width=105):
+def _replace_tools(text, changed):
     """Replace only owned tool fragments, preserving generated markers and public casting alias."""
     if not changed:
         return text
     fragments = _ToolFragments(text)
     for name, tool in changed.items():
-        rendered = yaml.dump({name: tool}, Dumper=_RuntimeDumper, sort_keys=False, width=width)
+        rendered = yaml.dump({name: tool}, Dumper=_RuntimeDumper, sort_keys=False, width=105)
         rendered = "".join(
             "  " + line if line.strip() else line for line in rendered.splitlines(True)
         )

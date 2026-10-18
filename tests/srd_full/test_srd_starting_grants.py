@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from sylvia_gm.agent._content_definition_tool import content_definition_tool
-from tests.srd_full.full_package_fixture import (
+from sylvia_gm.application.bundled_packages import (
     bundled_rift_authority,
     bundled_rift_participant_declaration,
 )
@@ -14,7 +14,7 @@ from sylvia_gm.application.reusable_participants import (
 )
 from sylvia_gm.application.schema_admission import validate_parameters
 from sylvia_gm.domain.errors import CommandRejected, MechanicsRejected
-from tests.srd_full.test_reusable_participants import (
+from tests.test_reusable_participants import (
     _participant,
     _participant_authority,
     _starting_state,

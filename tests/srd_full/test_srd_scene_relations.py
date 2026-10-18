@@ -6,7 +6,7 @@ import pytest
 
 from sylvia_gm import dice
 from sylvia_gm.domain.errors import RulesetPreconditionRejected
-from tests.srd_full.test_spatial_engine import _geometry
+from tests.test_spatial_engine import _geometry
 from tests.srd_full.test_srd_action_budget import _run
 from tests.srd_full.test_srd_spell_result_cards import SRD, _spell_case
 

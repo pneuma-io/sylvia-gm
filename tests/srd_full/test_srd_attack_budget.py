@@ -143,4 +143,3 @@ def test_multiattack_limits_each_named_component_and_preserves_remaining_on_reje
     assert state[f"{SRD}.combat"]["attack_available"] is False
     with pytest.raises(RulesetPreconditionRejected):
         _npc_attack(state, "Bite")
-

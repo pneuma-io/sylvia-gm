@@ -17,7 +17,7 @@ def _rows(card, section="summary"):
 def test_short_rest_card_uses_selected_die_and_actual_capped_recovery(sides, constitution):
     state = _state()
     state[f"{SRD}.state"] = {}
-    state[f"{SRD}.combat"].update(encounter_active=False, turn_active=False)
+    state[f"{SRD}.combat"]["encounter_active"] = False
     state[f"{SRD}.entities"]["hero"].update(
         name="Budget Hero", hp=19, max_hp=20, hit_die_size=sides,
         constitution_modifier=constitution, resources={"hit_die": 2},

@@ -55,6 +55,22 @@ def test_dodge_loses_its_attack_benefit_when_a_spell_reduces_speed_to_zero(monke
     assert len(attack.result["context"]["_attack_roll"]["results"]) == 1
 
 
+def test_timed_armor_floor_changes_later_creature_attack(monkeypatch):
+    monkeypatch.setattr(dice, "_rng", Random(0))
+    monkeypatch.setattr(dice, "set_seed", lambda _seed: None)
+    state, data, parameters = _spell_case("barkskin")
+    guard = state[f"{SRD}.entities"]["guard"]
+    guard.update(armor_class=12, hp=100, max_hp=100, temp_hp=0)
+    _run("cast_spell", state, participant_data=data, **parameters)
+    _next(state, "other")
+    attack = _npc_attack(state, "Spear", actor="other", target="guard",
+                         use_multiattack=False, attack_modifier=0)
+    assert attack.result["context"]["_attack_roll"]["total"] == 13
+    assert attack.result["context"]["_effective_target_armor_class"] == 17
+    assert attack.result["context"]["_attack_outcome"] == "miss"
+    assert state[f"{SRD}.entities"]["guard"]["hp"] == 100
+
+
 @pytest.mark.parametrize("disadvantage", [False, True])
 def test_next_attack_advantage_is_consumed_even_if_cancelled_or_attack_misses(
     monkeypatch,
