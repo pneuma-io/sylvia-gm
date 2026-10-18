@@ -1,0 +1,594 @@
+format_id: sylvia-gm-srd-spell-mechanics-declaration
+format_version: 28
+source_sha256: 8974902d109d6e63672d7c490bde9ccf052410503d9cfa768237154fbc5e3d87
+general_rules:
+  casting_time:
+    corpus: spells
+    page: 105
+    source_heading: Casting Time
+    next_heading: One Spell with a Spell Slot per Turn
+    not_yet_mapped:
+      - Reaction casting triggers and reaction-budget eligibility
+      - casting times of 1 minute or longer
+  combining_spell_effects:
+    corpus: spells
+    page: 106
+    source_heading: Combining Spell Effects
+    next_heading: null
+    not_yet_mapped: []
+  concentration:
+    corpus: rules_glossary
+    page: 179
+    source_heading: Concentration
+    next_heading: Condition
+    not_yet_mapped:
+      - environmental concentration-ending phenomena beyond encoded damage and conditions
+  cover:
+    corpus: playing_the_game
+    page: 15
+    source_heading: Cover
+    next_heading: Ranged Attacks
+    not_yet_mapped:
+      - Total Cover and engine-computed obstruction or line-of-effect authority
+  dodge_action:
+    corpus: rules_glossary
+    page: 181
+    source_heading: Dodge [Action]
+    next_heading: Emanation [Area of Effect]
+    not_yet_mapped: []
+  duration:
+    corpus: spells
+    page: 106
+    source_heading: Duration
+    next_heading: Effects
+    not_yet_mapped:
+      - duration units and dismissal semantics outside the bounded lasting-effect family
+  one_spell_with_a_spell_slot_per_turn:
+    corpus: spells
+    page: 105
+    source_heading: One Spell with a Spell Slot per Turn
+    next_heading: Reaction and Bonus Action Triggers
+    not_yet_mapped: []
+spells:
+  acid_arrow:
+    source:
+      page: 107
+      source_heading: Acid Arrow
+      next_heading: Acid SplASh
+      not_yet_mapped:
+        - non-creature targets
+        - spellcasting class, preparation, and component eligibility
+    definition: {"family": "spell_attack_damage", "casting_time": "action", "scaling_mode": "slot_level", "base_level": 2, "base_dice": 4, "dice_per_slot_level": 1, "cantrip_upgrade_dice": 0, "upgrade_level_1": 5, "upgrade_level_2": 11, "upgrade_level_3": 17, "damage_die": "d4", "damage_type_mode": "fixed", "allows_acid": true, "allows_bludgeoning": false, "allows_cold": false, "allows_fire": false, "allows_force": false, "allows_lightning": false, "allows_necrotic": false, "allows_piercing": false, "allows_poison": false, "allows_psychic": false, "allows_radiant": false, "allows_slashing": false, "allows_thunder": false, "miss_damage": "half", "attack_kind": "ranged", "range_kind": "distance", "range_feet": 90, "requires_sight": false, "turn_effect": {"label": "Acid Arrow", "kind": "delayed_damage", "expiry_owner": "target", "expiry_phase": "end", "magnitude": 0, "dice_count": 2, "damage_type": "acid", "description": "Delayed Acid damage is saved for the end of the target's next turn, including higher-slot scaling."}}
+  acid_splash:
+    source:
+      page: 107
+      source_heading: Acid SplASh
+      next_heading: Aid
+      not_yet_mapped:
+        - engine-computed sphere geometry, affected-target selection, and line of effect
+        - spellcasting class, cantrip preparation, and component eligibility
+    definition: {family: instantaneous_area_save_damage, casting_time: action, scaling_mode: caster_level, base_level: 0, base_dice: 1, dice_per_slot_level: 0, cantrip_upgrade_dice: 1, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, damage_die: d6, damage_type: acid, save_ability: dexterity, success_damage: none, targeting_profile: area, origin_kind: point, range_feet: 60, area_shape: sphere, area_size_feet: 5, area_width_feet: 0, base_targets: 0, targets_per_slot_level: 0, secondary_range_feet: 0, construct_save_disadvantage: false}
+  bane:
+    source:
+      page: 112
+      source_heading: Bane
+      next_heading: Banishment
+      not_yet_mapped:
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: multi_target_concentration_d20_modifier, casting_time: action, base_level: 1, range_kind: distance, range_feet: 30, requires_sight: true, duration_rounds: 10, concentration: true, base_targets: 3, targets_per_slot_level: 1, trigger: attack_roll_or_saving_throw, initial_save: charisma, operation: subtract_roll, modifier_die: d4}
+  befuddlement:
+    source:
+      page: 112
+      source_heading: Befuddlement
+      next_heading: Bestow Curse
+      not_yet_mapped:
+        - prohibition on spellcasting and the Magic action after a failed save
+        - repeated saving throws every 30 days and Greater Restoration, Heal, or Wish termination
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: single_target_save_damage, casting_time: action, scaling_mode: slot_level, base_level: 8, base_dice: 10, dice_per_slot_level: 0, cantrip_upgrade_dice: 0, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, damage_die: d12, flat_damage: 0, damage_type: psychic, save_ability: intelligence, success_damage: half, range_kind: distance, range_feet: 150, targeting_sense: sight, ignore_partial_cover: false, plant_auto_fail: false}
+  bless:
+    source:
+      page: 113
+      source_heading: Bless
+      next_heading: Blight
+      not_yet_mapped:
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: multi_target_concentration_d20_modifier, casting_time: action, base_level: 1, range_kind: distance, range_feet: 30, requires_sight: false, duration_rounds: 10, concentration: true, base_targets: 3, targets_per_slot_level: 1, trigger: attack_roll_or_saving_throw, initial_save: none, operation: add_roll, modifier_die: d4}
+  blight:
+    source:
+      page: 113
+      source_heading: Blight
+      next_heading: Blindness/Deafness
+      not_yet_mapped:
+        - nonmagical plant object targeting and withering
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: single_target_save_damage, casting_time: action, scaling_mode: slot_level, base_level: 4, base_dice: 8, dice_per_slot_level: 1, cantrip_upgrade_dice: 0, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, damage_die: d8, flat_damage: 0, damage_type: necrotic, save_ability: constitution, success_damage: half, range_kind: distance, range_feet: 30, targeting_sense: sight, ignore_partial_cover: false, plant_auto_fail: true}
+  blindness_deafness:
+    source:
+      page: 113
+      source_heading: Blindness/Deafness
+      next_heading: Blink
+      not_yet_mapped:
+        - spellcasting class, preparation, and component eligibility
+    definition: {"family": "multi_target_timed_repeating_save_condition", "casting_time": "action", "base_level": 2, "range_kind": "distance", "range_feet": 120, "targeting_sense": "sight", "duration_rounds": 10, "concentration": false, "base_targets": 1, "targets_per_slot_level": 1, "save_ability": "constitution", "condition_choice": "blinded_or_deafened", "repeat_save_timing": "end_of_target_turn", "repeat_save_success": "ends_source", "required_creature_type": "any"}
+  burning_hands:
+    source:
+      page: 114
+      source_heading: Burning Hands
+      next_heading: Call Lightning
+      not_yet_mapped:
+        - engine-computed cone geometry, affected-target selection, and line of effect
+        - flammable-object ignition
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: instantaneous_area_save_damage, casting_time: action, scaling_mode: slot_level, base_level: 1, base_dice: 3, dice_per_slot_level: 1, cantrip_upgrade_dice: 0, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, damage_die: d6, damage_type: fire, save_ability: dexterity, success_damage: half, targeting_profile: area, origin_kind: self, range_feet: 0, area_shape: cone, area_size_feet: 15, area_width_feet: 0, base_targets: 0, targets_per_slot_level: 0, secondary_range_feet: 0, construct_save_disadvantage: false}
+  chain_lightning:
+    source:
+      page: 114
+      source_heading: Chain Lightning
+      next_heading: Charm Monster
+      not_yet_mapped:
+        - engine-computed initial and secondary target selection and 30-foot secondary-target adjacency
+        - object targets
+        - spellcasting class, preparation, material, and component eligibility
+    definition: {family: instantaneous_area_save_damage, casting_time: action, scaling_mode: slot_level, base_level: 6, base_dice: 10, dice_per_slot_level: 0, cantrip_upgrade_dice: 0, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, damage_die: d8, damage_type: lightning, save_ability: dexterity, success_damage: half, targeting_profile: chain, origin_kind: primary_target, range_feet: 150, area_shape: chain, area_size_feet: 0, area_width_feet: 0, base_targets: 4, targets_per_slot_level: 1, secondary_range_feet: 30, construct_save_disadvantage: false}
+  chill_touch:
+    source:
+      page: 115
+      source_heading: Chill Touch
+      next_heading: Chromatic Orb
+      not_yet_mapped:
+        - object targets
+        - spellcasting class, cantrip preparation, and component eligibility
+    definition: {"family": "spell_attack_damage", "casting_time": "action", "scaling_mode": "caster_level", "base_level": 0, "base_dice": 1, "dice_per_slot_level": 0, "cantrip_upgrade_dice": 1, "upgrade_level_1": 5, "upgrade_level_2": 11, "upgrade_level_3": 17, "damage_die": "d10", "damage_type_mode": "fixed", "allows_acid": false, "allows_bludgeoning": false, "allows_cold": false, "allows_fire": false, "allows_force": false, "allows_lightning": false, "allows_necrotic": true, "allows_piercing": false, "allows_poison": false, "allows_psychic": false, "allows_radiant": false, "allows_slashing": false, "allows_thunder": false, "miss_damage": "none", "attack_kind": "melee", "range_kind": "touch", "range_feet": 0, "requires_sight": false, "turn_effect": {"label": "Chill Touch", "kind": "healing_block", "expiry_owner": "caster", "expiry_phase": "end", "magnitude": 0, "dice_count": 0, "damage_type": "necrotic", "description": "Cannot regain Hit Points until the end of the caster's next turn."}}
+  chromatic_orb:
+    source:
+      page: 115
+      source_heading: Chromatic Orb
+      next_heading: Circle of Death
+      not_yet_mapped:
+        - equal-d8 leap triggering, repeat attacks, new damage rolls, hop cap, and per-cast target uniqueness
+        - non-creature targets
+        - spellcasting class, preparation, 50+ GP diamond, and component eligibility
+    definition: {family: spell_attack_damage, casting_time: action, scaling_mode: slot_level, base_level: 1, base_dice: 3, dice_per_slot_level: 1, cantrip_upgrade_dice: 0, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, damage_die: d8, damage_type_mode: selected, allows_acid: true, allows_bludgeoning: false, allows_cold: true, allows_fire: true, allows_force: false, allows_lightning: true, allows_necrotic: false, allows_piercing: false, allows_poison: true, allows_psychic: false, allows_radiant: false, allows_slashing: false, allows_thunder: true, miss_damage: none, attack_kind: ranged, range_kind: distance, range_feet: 90, requires_sight: false}
+  circle_of_death:
+    source:
+      page: 115
+      source_heading: Circle of Death
+      next_heading: Clairvoyance
+      not_yet_mapped:
+        - engine-computed sphere geometry, affected-target selection, and line of effect
+        - spellcasting class, preparation, material component, and component eligibility
+    definition: {family: instantaneous_area_save_damage, casting_time: action, scaling_mode: slot_level, base_level: 6, base_dice: 8, dice_per_slot_level: 2, cantrip_upgrade_dice: 0, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, damage_die: d8, damage_type: necrotic, save_ability: constitution, success_damage: half, targeting_profile: area, origin_kind: point, range_feet: 150, area_shape: sphere, area_size_feet: 60, area_width_feet: 0, base_targets: 0, targets_per_slot_level: 0, secondary_range_feet: 0, construct_save_disadvantage: false}
+  cone_of_cold:
+    source:
+      page: 117
+      source_heading: Cone of Cold
+      next_heading: Confusion
+      not_yet_mapped:
+        - engine-computed cone geometry, affected-target selection, and line of effect
+        - frozen-statue death rider
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: instantaneous_area_save_damage, casting_time: action, scaling_mode: slot_level, base_level: 5, base_dice: 8, dice_per_slot_level: 1, cantrip_upgrade_dice: 0, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, damage_die: d8, damage_type: cold, save_ability: constitution, success_damage: half, targeting_profile: area, origin_kind: self, range_feet: 0, area_shape: cone, area_size_feet: 60, area_width_feet: 0, base_targets: 0, targets_per_slot_level: 0, secondary_range_feet: 0, construct_save_disadvantage: false}
+  cure_wounds:
+    source:
+      page: 121
+      source_heading: Cure Wounds
+      next_heading: Dancing Lights
+      not_yet_mapped:
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: spell_healing, casting_time: action, base_level: 1, base_dice: 2, dice_per_slot_level: 2, healing_die: d8, range_kind: touch, range_feet: 0, requires_sight: false}
+  disintegrate:
+    source:
+      page: 124
+      source_heading: Disintegrate
+      next_heading: Dispel Evil and Good
+      not_yet_mapped:
+        - object and magical-force targets, automatic object disintegration, and object geometry
+        - zero-Hit-Point disintegration and revival restrictions
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: single_target_save_damage, casting_time: action, scaling_mode: slot_level, base_level: 6, base_dice: 10, dice_per_slot_level: 3, cantrip_upgrade_dice: 0, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, damage_die: d6, flat_damage: 40, damage_type: force, save_ability: dexterity, success_damage: none, range_kind: distance, range_feet: 60, targeting_sense: sight, ignore_partial_cover: false, plant_auto_fail: false}
+  dissonant_whispers:
+    source:
+      page: 124
+      source_heading: Dissonant Whispers
+      next_heading: null
+      not_yet_mapped:
+        - forced Reaction movement, safest-route selection, and movement/path authority
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: single_target_save_damage, casting_time: action, scaling_mode: slot_level, base_level: 1, base_dice: 3, dice_per_slot_level: 1, cantrip_upgrade_dice: 0, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, damage_die: d6, flat_damage: 0, damage_type: psychic, save_ability: wisdom, success_damage: half, range_kind: distance, range_feet: 60, targeting_sense: sight, ignore_partial_cover: false, plant_auto_fail: false}
+  eldritch_blast:
+    source:
+      page: 127
+      source_heading: Eldritch Blast
+      next_heading: Elementalism
+      not_yet_mapped:
+        - object targets
+        - upfront complete ray allocation and adaptive mid-cast retargeting
+        - external per-attack-roll modifiers and effect consumption
+        - spellcasting class, cantrip preparation, and component eligibility
+    definition: {family: multi_spell_attack_damage, casting_time: action, scaling_mode: caster_level, base_level: 0, base_attacks: 1, attacks_per_slot_level: 0, cantrip_upgrade_attacks: 1, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, dice_per_attack: 1, damage_die: d10, damage_type: force, range_feet: 120, requires_sight: false}
+  enhance_ability:
+    source:
+      page: 127
+      source_heading: Enhance Ability
+      next_heading: Enlarge/Reduce
+      not_yet_mapped:
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: multi_target_concentration_ability_advantage, casting_time: action, base_level: 2, range_kind: touch, range_feet: 0, requires_willing: true, duration_rounds: 600, concentration: true, base_targets: 1, targets_per_slot_level: 1, trigger: ability_check, selection: ability_per_target, operation: grant_advantage}
+  false_life:
+    source:
+      page: 129
+      source_heading: False Life
+      next_heading: null
+      not_yet_mapped:
+        - Temporary Hit Point expiration when finishing a Long Rest
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: self_temporary_hit_points, casting_time: action, base_level: 1, base_dice: 2, temporary_hit_point_die: d4, flat_bonus: 4, temporary_hit_points_per_slot_level: 5, range_kind: self, range_feet: 0}
+  finger_of_death:
+    source:
+      page: 131
+      source_heading: Finger of Death
+      next_heading: Fireball
+      not_yet_mapped:
+        - delayed Humanoid-to-Zombie creation and command lifecycle
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: single_target_save_damage, casting_time: action, scaling_mode: slot_level, base_level: 7, base_dice: 7, dice_per_slot_level: 0, cantrip_upgrade_dice: 0, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, damage_die: d8, flat_damage: 30, damage_type: necrotic, save_ability: constitution, success_damage: half, range_kind: distance, range_feet: 60, targeting_sense: sight, ignore_partial_cover: false, plant_auto_fail: false}
+  fire_bolt:
+    source:
+      page: 132
+      source_heading: Fire Bolt
+      next_heading: Fire Shield
+      not_yet_mapped:
+        - flammable-object ignition and object targets
+        - spellcasting class, cantrip preparation, and component eligibility
+    definition: {family: spell_attack_damage, casting_time: action, scaling_mode: caster_level, base_level: 0, base_dice: 1, dice_per_slot_level: 0, cantrip_upgrade_dice: 1, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, damage_die: d10, damage_type_mode: fixed, allows_acid: false, allows_bludgeoning: false, allows_cold: false, allows_fire: true, allows_force: false, allows_lightning: false, allows_necrotic: false, allows_piercing: false, allows_poison: false, allows_psychic: false, allows_radiant: false, allows_slashing: false, allows_thunder: false, miss_damage: none, attack_kind: ranged, range_kind: distance, range_feet: 120, requires_sight: false}
+  fire_storm:
+    source:
+      page: 132
+      source_heading: Fire Storm
+      next_heading: Flame Blade
+      not_yet_mapped:
+        - engine-computed ten-cube geometry, contiguity, affected-target selection, and line of effect
+        - igniting flammable objects that are not worn or carried
+        - bounded authoritative target projections above 64 creatures
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: instantaneous_area_save_damage, casting_time: action, scaling_mode: slot_level, base_level: 7, base_dice: 7, dice_per_slot_level: 0, cantrip_upgrade_dice: 0, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, damage_die: d10, damage_type: fire, save_ability: dexterity, success_damage: half, targeting_profile: area, origin_kind: point, range_feet: 150, area_shape: cube, area_size_feet: 10, area_width_feet: 0, base_targets: 0, targets_per_slot_level: 0, secondary_range_feet: 0, construct_save_disadvantage: false}
+  fireball:
+    source:
+      page: 131
+      source_heading: Fireball
+      next_heading: Otherworldly Steed
+      not_yet_mapped:
+        - engine-computed sphere geometry, affected-target selection, and line of effect
+        - flammable-object ignition
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: instantaneous_area_save_damage, casting_time: action, scaling_mode: slot_level, base_level: 3, base_dice: 8, dice_per_slot_level: 1, cantrip_upgrade_dice: 0, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, damage_die: d6, damage_type: fire, save_ability: dexterity, success_damage: half, targeting_profile: area, origin_kind: point, range_feet: 150, area_shape: sphere, area_size_feet: 20, area_width_feet: 0, base_targets: 0, targets_per_slot_level: 0, secondary_range_feet: 0, construct_save_disadvantage: false}
+  flame_strike:
+    source:
+      page: 132
+      source_heading: Flame Strike
+      next_heading: Flaming Sphere
+      not_yet_mapped:
+        - engine-computed cylinder geometry, affected-target selection, and line of effect
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: instantaneous_area_save_composite_damage, casting_time: action, scaling_mode: slot_level, base_level: 5, component_1_base_dice: 5, component_1_dice_per_slot_level: 1, component_1_damage_die: d6, component_1_damage_type: fire, component_2_base_dice: 5, component_2_dice_per_slot_level: 1, component_2_damage_die: d6, component_2_damage_type: radiant, save_ability: dexterity, success_damage: half, origin_kind: point, range_feet: 60, area_shape: cylinder, area_radius_feet: 10, area_height_feet: 40, area_point_count: 1, construct_save_disadvantage: false}
+  freezing_sphere:
+    source:
+      page: 134
+      source_heading: Freezing Sphere
+      next_heading: Gaseous Form
+      not_yet_mapped:
+        - engine-computed sphere geometry, affected-target selection, and line of effect
+        - water freezing, Restrained condition, and escape mechanics
+        - held-globe transfer, throw or sling, and delayed-explosion mode
+        - bounded authoritative target projections above 64 creatures
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: instantaneous_area_save_damage, casting_time: action, scaling_mode: slot_level, base_level: 6, base_dice: 10, dice_per_slot_level: 1, cantrip_upgrade_dice: 0, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, damage_die: d6, damage_type: cold, save_ability: constitution, success_damage: half, targeting_profile: area, origin_kind: point, range_feet: 300, area_shape: sphere, area_size_feet: 60, area_width_feet: 0, base_targets: 0, targets_per_slot_level: 0, secondary_range_feet: 0, construct_save_disadvantage: false}
+  guidance:
+    source:
+      page: 138
+      source_heading: Guidance
+      next_heading: Guiding Bolt
+      not_yet_mapped:
+        - spellcasting class, cantrip preparation, and component eligibility
+        - external concentration-save modifiers and environmental termination phenomena
+    definition: {family: lasting_reactive_concentration, casting_time: action, base_level: 0, range_kind: touch, range_feet: 0, requires_willing: true, duration_rounds: 10, concentration: true, trigger: skill_ability_check, selection: skill, operation: add_roll, modifier_die: d4, uses_per_turn: 0}
+  guiding_bolt:
+    source:
+      page: 138
+      source_heading: Guiding Bolt
+      next_heading: Gust of Wind
+      not_yet_mapped:
+        - spellcasting class, preparation, and component eligibility
+    definition: {"family": "spell_attack_damage", "casting_time": "action", "scaling_mode": "slot_level", "base_level": 1, "base_dice": 4, "dice_per_slot_level": 1, "cantrip_upgrade_dice": 0, "upgrade_level_1": 5, "upgrade_level_2": 11, "upgrade_level_3": 17, "damage_die": "d6", "damage_type_mode": "fixed", "allows_acid": false, "allows_bludgeoning": false, "allows_cold": false, "allows_fire": false, "allows_force": false, "allows_lightning": false, "allows_necrotic": false, "allows_piercing": false, "allows_poison": false, "allows_psychic": false, "allows_radiant": true, "allows_slashing": false, "allows_thunder": false, "miss_damage": "none", "attack_kind": "ranged", "range_kind": "distance", "range_feet": 120, "requires_sight": false, "turn_effect": {"label": "Guiding Bolt", "kind": "next_attack_advantage", "expiry_owner": "caster", "expiry_phase": "end", "magnitude": 0, "dice_count": 0, "damage_type": "radiant", "description": "The next attack against the target has Advantage before the end of the caster's next turn."}}
+  harm:
+    source:
+      page: 139
+      source_heading: Harm
+      next_heading: Haste
+      not_yet_mapped:
+        - persistent Hit Point maximum reduction and its minimum-1 bound
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: single_target_save_damage, casting_time: action, scaling_mode: slot_level, base_level: 6, base_dice: 14, dice_per_slot_level: 0, cantrip_upgrade_dice: 0, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, damage_die: d6, flat_damage: 0, damage_type: necrotic, save_ability: constitution, success_damage: half, range_kind: distance, range_feet: 60, targeting_sense: sight, ignore_partial_cover: false, plant_auto_fail: false}
+  heal:
+    source:
+      page: 139
+      source_heading: Heal
+      next_heading: Healing Word
+      not_yet_mapped:
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: instantaneous_restoration, casting_time: action, base_level: 6, range_kind: distance, range_feet: 60, requires_sight: true, healing_mode: fixed_scaled, base_healing: 70, healing_per_slot_level: 10, condition_removal_mode: all_declared, ends_blinded: true, ends_charmed: false, ends_deafened: true, ends_frightened: false, ends_paralyzed: false, ends_poisoned: true, ends_stunned: false, offers_prone_reaction_stand: false}
+  healing_word:
+    source:
+      page: 139
+      source_heading: Healing Word
+      next_heading: Heat Metal
+      not_yet_mapped:
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: spell_healing, casting_time: bonus_action, base_level: 1, base_dice: 2, dice_per_slot_level: 2, healing_die: d4, range_kind: distance, range_feet: 60, requires_sight: true}
+  hold_monster:
+    source:
+      pages: [140, 141]
+      source_heading: Hold Monster
+      next_heading: Hold Person
+      not_yet_mapped:
+        - armor-training eligibility shared with all spellcasting
+    definition: {"family": "multi_target_timed_repeating_save_condition", "casting_time": "action", "base_level": 5, "range_kind": "distance", "range_feet": 90, "targeting_sense": "sight", "duration_rounds": 10, "concentration": true, "base_targets": 1, "targets_per_slot_level": 1, "save_ability": "wisdom", "condition_choice": "paralyzed", "repeat_save_timing": "end_of_target_turn", "repeat_save_success": "ends_source", "required_creature_type": "any"}
+  hold_person:
+    source:
+      page: 141
+      source_heading: Hold Person
+      next_heading: Holy Aura
+      not_yet_mapped:
+        - armor-training eligibility shared with all spellcasting
+    definition: {"family": "multi_target_timed_repeating_save_condition", "casting_time": "action", "base_level": 2, "range_kind": "distance", "range_feet": 60, "targeting_sense": "sight", "duration_rounds": 10, "concentration": true, "base_targets": 1, "targets_per_slot_level": 1, "save_ability": "wisdom", "condition_choice": "paralyzed", "repeat_save_timing": "end_of_target_turn", "repeat_save_success": "ends_source", "required_creature_type": "humanoid"}
+  ice_knife:
+    source:
+      page: 141
+      source_heading: Ice Knife
+      next_heading: Ice Storm
+      not_yet_mapped:
+        - engine-computed 5-foot burst geometry, affected-target selection, and line of effect
+        - bounded authoritative target projections above 64 creatures
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: instantaneous_attack_area_save_damage, casting_time: action, base_level: 1, attack_base_dice: 1, attack_damage_die: d10, attack_damage_type: piercing, area_base_dice: 2, area_dice_per_slot_level: 1, area_damage_die: d6, area_damage_type: cold, save_ability: dexterity, success_damage: none, attack_kind: ranged, range_feet: 60, requires_sight: false, area_shape: sphere, area_size_feet: 5, primary_must_be_affected: true, construct_save_disadvantage: false}
+  ice_storm:
+    source:
+      page: 141
+      source_heading: Ice Storm
+      next_heading: null
+      not_yet_mapped:
+        - engine-computed cylinder geometry, affected-target selection, and line of effect
+        - Difficult Terrain until the end of the caster's next turn
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: instantaneous_area_save_composite_damage, casting_time: action, scaling_mode: slot_level, base_level: 4, component_1_base_dice: 2, component_1_dice_per_slot_level: 0, component_1_damage_die: d10, component_1_damage_type: bludgeoning, component_2_base_dice: 4, component_2_dice_per_slot_level: 0, component_2_damage_die: d6, component_2_damage_type: cold, save_ability: dexterity, success_damage: half, origin_kind: point, range_feet: 300, area_shape: cylinder, area_radius_feet: 20, area_height_feet: 40, area_point_count: 1, construct_save_disadvantage: false}
+  inflict_wounds:
+    source:
+      page: 143
+      source_heading: Inflict Wounds
+      next_heading: Insect Plague
+      not_yet_mapped:
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: single_target_save_damage, casting_time: action, scaling_mode: slot_level, base_level: 1, base_dice: 2, dice_per_slot_level: 1, cantrip_upgrade_dice: 0, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, damage_die: d10, flat_damage: 0, damage_type: necrotic, save_ability: constitution, success_damage: half, range_kind: touch, range_feet: 0, targeting_sense: none, ignore_partial_cover: false, plant_auto_fail: false}
+  lesser_restoration:
+    source:
+      page: 144
+      source_heading: Lesser Restoration
+      next_heading: Levitate
+      not_yet_mapped:
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: instantaneous_restoration, casting_time: bonus_action, base_level: 2, range_kind: touch, range_feet: 0, requires_sight: false, healing_mode: none, base_healing: 0, healing_per_slot_level: 0, condition_removal_mode: selected_one, ends_blinded: true, ends_charmed: false, ends_deafened: true, ends_frightened: false, ends_paralyzed: true, ends_poisoned: true, ends_stunned: false, offers_prone_reaction_stand: false}
+  lightning_bolt:
+    source:
+      page: 144
+      source_heading: Lightning Bolt
+      next_heading: Locate Animals or Plants
+      not_yet_mapped:
+        - engine-computed line geometry, direction, affected-target selection, and line of effect
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: instantaneous_area_save_damage, casting_time: action, scaling_mode: slot_level, base_level: 3, base_dice: 8, dice_per_slot_level: 1, cantrip_upgrade_dice: 0, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, damage_die: d6, damage_type: lightning, save_ability: dexterity, success_damage: half, targeting_profile: area, origin_kind: self, range_feet: 0, area_shape: line, area_size_feet: 100, area_width_feet: 5, base_targets: 0, targets_per_slot_level: 0, secondary_range_feet: 0, construct_save_disadvantage: false}
+  magic_missile:
+    source:
+      page: 146
+      source_heading: Magic Missile
+      next_heading: Magic Mouth
+      not_yet_mapped:
+        - multiple-target allocation
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: automatic_force_projectiles, casting_time: action, base_level: 1, base_projectiles: 3, projectiles_per_slot_level: 1, damage_die: d4, flat_damage_per_projectile: 1, damage_type: force, range_feet: 120, requires_sight: true}
+  mass_cure_wounds:
+    source:
+      page: 147
+      source_heading: Mass Cure Wounds
+      next_heading: Mass Heal
+      not_yet_mapped:
+        - engine-computed sphere geometry, affected-target selection, and line of effect
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: instantaneous_multi_target_healing, casting_time: action, base_level: 5, base_dice: 5, dice_per_slot_level: 1, healing_die: d8, range_feet: 60, max_targets: 6, targeting_mode: visible_point_sphere, area_size_feet: 30, requires_origin_sight: true, requires_each_target_sight: false}
+  mass_healing_word:
+    source:
+      page: 148
+      source_heading: Mass Healing Word
+      next_heading: Mass Suggestion
+      not_yet_mapped:
+        - engine-derived pairwise range, sight, and clear-path projection
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: instantaneous_multi_target_healing, casting_time: bonus_action, base_level: 3, base_dice: 2, dice_per_slot_level: 1, healing_die: d4, range_feet: 60, max_targets: 6, targeting_mode: visible_targets, area_size_feet: 0, requires_origin_sight: false, requires_each_target_sight: true}
+  meteor_swarm:
+    source:
+      page: 149
+      source_heading: Meteor Swarm
+      next_heading: Mind Blank
+      not_yet_mapped:
+        - engine-computed four-point selection, sphere geometry, affected-target selection, and line of effect
+        - object damage and ignition
+        - bounded authoritative target projections above 64 creatures
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: instantaneous_area_save_composite_damage, casting_time: action, scaling_mode: slot_level, base_level: 9, component_1_base_dice: 20, component_1_dice_per_slot_level: 0, component_1_damage_die: d6, component_1_damage_type: fire, component_2_base_dice: 20, component_2_dice_per_slot_level: 0, component_2_damage_die: d6, component_2_damage_type: bludgeoning, save_ability: dexterity, success_damage: half, origin_kind: point, range_feet: 5280, area_shape: multi_sphere, area_radius_feet: 40, area_height_feet: 0, area_point_count: 4, construct_save_disadvantage: false}
+  poison_spray:
+    source:
+      page: 153
+      source_heading: Poison Spray
+      next_heading: Polymorph
+      not_yet_mapped:
+        - spellcasting class, cantrip preparation, and component eligibility
+    definition: {family: spell_attack_damage, casting_time: action, scaling_mode: caster_level, base_level: 0, base_dice: 1, dice_per_slot_level: 0, cantrip_upgrade_dice: 1, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, damage_die: d12, damage_type_mode: fixed, allows_acid: false, allows_bludgeoning: false, allows_cold: false, allows_fire: false, allows_force: false, allows_lightning: false, allows_necrotic: false, allows_piercing: false, allows_poison: true, allows_psychic: false, allows_radiant: false, allows_slashing: false, allows_thunder: false, miss_damage: none, attack_kind: ranged, range_kind: distance, range_feet: 30, requires_sight: false}
+  power_word_heal:
+    source:
+      page: 154
+      source_heading: Power Word Heal
+      next_heading: Power Word Kill
+      not_yet_mapped:
+        - separately prompted target-controlled Reaction choice after spell resolution
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: instantaneous_restoration, casting_time: action, base_level: 9, range_kind: distance, range_feet: 60, requires_sight: true, healing_mode: full, base_healing: 0, healing_per_slot_level: 0, condition_removal_mode: all_declared, ends_blinded: false, ends_charmed: true, ends_deafened: false, ends_frightened: true, ends_paralyzed: true, ends_poisoned: true, ends_stunned: true, offers_prone_reaction_stand: true}
+  power_word_kill:
+    source:
+      page: 154
+      source_heading: Power Word Kill
+      next_heading: Power Word Stun
+      not_yet_mapped:
+        - Death Ward and other instant-death prevention or replacement effects
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: instantaneous_threshold_death_damage, casting_time: action, base_level: 9, range_feet: 60, requires_sight: true, hit_point_threshold: 100, above_threshold_dice: 12, damage_die: d12, damage_type: psychic}
+  protection_from_energy:
+    source:
+      page: 157
+      source_heading: Protection from Energy
+      next_heading: Protection from Evil and Good
+      not_yet_mapped:
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: single_target_concentration_damage_resistance, casting_time: action, base_level: 3, range_kind: touch, range_feet: 0, requires_willing: true, duration_rounds: 600, concentration: true, selection: damage_type, resists_acid: true, resists_bludgeoning: false, resists_cold: true, resists_fire: true, resists_force: false, resists_lightning: true, resists_necrotic: false, resists_piercing: false, resists_poison: false, resists_psychic: false, resists_radiant: false, resists_slashing: false, resists_thunder: true, operation: grant_resistance}
+  ray_of_frost:
+    source:
+      page: 157
+      source_heading: Ray of Frost
+      next_heading: null
+      not_yet_mapped:
+        - spellcasting class, cantrip preparation, and component eligibility
+    definition: {"family": "spell_attack_damage", "casting_time": "action", "scaling_mode": "caster_level", "base_level": 0, "base_dice": 1, "dice_per_slot_level": 0, "cantrip_upgrade_dice": 1, "upgrade_level_1": 5, "upgrade_level_2": 11, "upgrade_level_3": 17, "damage_die": "d8", "damage_type_mode": "fixed", "allows_acid": false, "allows_bludgeoning": false, "allows_cold": true, "allows_fire": false, "allows_force": false, "allows_lightning": false, "allows_necrotic": false, "allows_piercing": false, "allows_poison": false, "allows_psychic": false, "allows_radiant": false, "allows_slashing": false, "allows_thunder": false, "miss_damage": "none", "attack_kind": "ranged", "range_kind": "distance", "range_feet": 60, "requires_sight": false, "turn_effect": {"label": "Ray of Frost", "kind": "speed_reduction", "expiry_owner": "caster", "expiry_phase": "start", "magnitude": 10, "dice_count": 0, "damage_type": "cold", "description": "Speed reduced by 10 feet until the start of the caster's next turn."}}
+  ray_of_sickness:
+    source:
+      page: 158
+      source_heading: Ray of Sickness
+      next_heading: Reincarnate
+      not_yet_mapped:
+        - Poisoned condition until the end of the caster's next turn
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: spell_attack_damage, casting_time: action, scaling_mode: slot_level, base_level: 1, base_dice: 2, dice_per_slot_level: 1, cantrip_upgrade_dice: 0, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, damage_die: d8, damage_type_mode: fixed, allows_acid: false, allows_bludgeoning: false, allows_cold: false, allows_fire: false, allows_force: false, allows_lightning: false, allows_necrotic: false, allows_piercing: false, allows_poison: true, allows_psychic: false, allows_radiant: false, allows_slashing: false, allows_thunder: false, miss_damage: none, attack_kind: ranged, range_kind: distance, range_feet: 60, requires_sight: false}
+  sacred_flame:
+    source:
+      page: 159
+      source_heading: Sacred Flame
+      next_heading: Sanctuary
+      not_yet_mapped:
+        - spellcasting class, cantrip preparation, and component eligibility
+    definition: {family: single_target_save_damage, casting_time: action, scaling_mode: caster_level, base_level: 0, base_dice: 1, dice_per_slot_level: 0, cantrip_upgrade_dice: 1, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, damage_die: d8, flat_damage: 0, damage_type: radiant, save_ability: dexterity, success_damage: none, range_kind: distance, range_feet: 60, targeting_sense: sight, ignore_partial_cover: true, plant_auto_fail: false}
+  scorching_ray:
+    source:
+      page: 159
+      source_heading: Scorching Ray
+      next_heading: null
+      not_yet_mapped:
+        - object targets
+        - upfront complete ray allocation and adaptive mid-cast retargeting
+        - external per-attack-roll modifiers and effect consumption
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: multi_spell_attack_damage, casting_time: action, scaling_mode: slot_level, base_level: 2, base_attacks: 3, attacks_per_slot_level: 1, cantrip_upgrade_attacks: 0, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, dice_per_attack: 2, damage_die: d6, damage_type: fire, range_feet: 120, requires_sight: false}
+  shatter:
+    source:
+      page: 161
+      source_heading: Shatter
+      next_heading: Shield
+      not_yet_mapped:
+        - engine-computed sphere geometry, affected-target selection, and line of effect
+        - nonmagical unattended object damage
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: instantaneous_area_save_damage, casting_time: action, scaling_mode: slot_level, base_level: 2, base_dice: 3, dice_per_slot_level: 1, cantrip_upgrade_dice: 0, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, damage_die: d8, damage_type: thunder, save_ability: constitution, success_damage: half, targeting_profile: area, origin_kind: point, range_feet: 60, area_shape: sphere, area_size_feet: 10, area_width_feet: 0, base_targets: 0, targets_per_slot_level: 0, secondary_range_feet: 0, construct_save_disadvantage: true}
+  shield_of_faith:
+    source:
+      page: 162
+      source_heading: Shield of Faith
+      next_heading: Shillelagh
+      not_yet_mapped:
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: single_target_concentration_armor_class_bonus, casting_time: bonus_action, base_level: 1, range_kind: distance, range_feet: 60, requires_sight: false, duration_rounds: 100, concentration: true, operation: add, armor_class_bonus: 2}
+  shocking_grasp:
+    source:
+      page: 162
+      source_heading: Shocking Grasp
+      next_heading: Silence
+      not_yet_mapped:
+        - spellcasting class, cantrip preparation, and component eligibility
+    definition: {family: spell_attack_damage, prevents_opportunity_attacks: true, casting_time: action, scaling_mode: caster_level, base_level: 0, base_dice: 1, dice_per_slot_level: 0, cantrip_upgrade_dice: 1, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, damage_die: d8, damage_type_mode: fixed, allows_acid: false, allows_bludgeoning: false, allows_cold: false, allows_fire: false, allows_force: false, allows_lightning: true, allows_necrotic: false, allows_piercing: false, allows_poison: false, allows_psychic: false, allows_radiant: false, allows_slashing: false, allows_thunder: false, miss_damage: none, attack_kind: melee, range_kind: touch, range_feet: 0, requires_sight: false}
+  spare_the_dying:
+    source:
+      page: 163
+      source_heading: Spare the Dying
+      next_heading: null
+      not_yet_mapped:
+        - spellcasting class, cantrip preparation, and component eligibility
+    definition: {family: instantaneous_stabilization, casting_time: action, base_level: 0, base_range_feet: 15, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, upgrade_range_feet_1: 30, upgrade_range_feet_2: 60, upgrade_range_feet_3: 120}
+  starry_wisp:
+    source:
+      page: 165
+      source_heading: Starry Wisp
+      next_heading: Stinking Cloud
+      not_yet_mapped:
+        - temporary Dim Light and suppression of the Invisible condition's benefit
+        - object targets
+        - spellcasting class, cantrip preparation, and component eligibility
+    definition: {family: spell_attack_damage, casting_time: action, scaling_mode: caster_level, base_level: 0, base_dice: 1, dice_per_slot_level: 0, cantrip_upgrade_dice: 1, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, damage_die: d8, damage_type_mode: fixed, allows_acid: false, allows_bludgeoning: false, allows_cold: false, allows_fire: false, allows_force: false, allows_lightning: false, allows_necrotic: false, allows_piercing: false, allows_poison: false, allows_psychic: false, allows_radiant: true, allows_slashing: false, allows_thunder: false, miss_damage: none, attack_kind: ranged, range_kind: distance, range_feet: 60, requires_sight: false}
+  stoneskin:
+    source:
+      page: 165
+      source_heading: Stoneskin
+      next_heading: Storm of Vengeance
+      not_yet_mapped:
+        - consumption and valuation of the 100+ GP diamond-dust material component
+        - spellcasting class, preparation, and other component eligibility
+    definition: {family: single_target_concentration_damage_resistance, casting_time: action, base_level: 4, range_kind: touch, range_feet: 0, requires_willing: true, duration_rounds: 600, concentration: true, selection: none, resists_acid: false, resists_bludgeoning: true, resists_cold: false, resists_fire: false, resists_force: false, resists_lightning: false, resists_necrotic: false, resists_piercing: true, resists_poison: false, resists_psychic: false, resists_radiant: false, resists_slashing: true, resists_thunder: false, operation: grant_resistance}
+  sunburst:
+    source:
+      page: 167
+      source_heading: Sunburst
+      next_heading: Symbol
+      not_yet_mapped:
+        - engine-computed sphere geometry, affected-target selection, and line of effect
+        - Blinded condition and repeated end-of-turn saving throws
+        - dispelling spell-created Darkness
+        - bounded authoritative target projections above 64 creatures
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: instantaneous_area_save_damage, casting_time: action, scaling_mode: slot_level, base_level: 8, base_dice: 12, dice_per_slot_level: 0, cantrip_upgrade_dice: 0, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, damage_die: d6, damage_type: radiant, save_ability: constitution, success_damage: half, targeting_profile: area, origin_kind: point, range_feet: 150, area_shape: sphere, area_size_feet: 60, area_width_feet: 0, base_targets: 0, targets_per_slot_level: 0, secondary_range_feet: 0, construct_save_disadvantage: false}
+  thunderwave:
+    source:
+      page: 169
+      source_heading: Thunderwave
+      next_heading: Time Stop
+      not_yet_mapped:
+        - engine-computed cube geometry, affected-target selection, and line of effect
+        - creature and unsecured-object pushing
+        - 300-foot audible boom
+        - bounded authoritative target projections above 64 creatures
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: instantaneous_area_save_damage, casting_time: action, scaling_mode: slot_level, base_level: 1, base_dice: 2, dice_per_slot_level: 1, cantrip_upgrade_dice: 0, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, damage_die: d8, damage_type: thunder, save_ability: constitution, success_damage: half, targeting_profile: area, origin_kind: self, range_feet: 0, area_shape: cube, area_size_feet: 15, area_width_feet: 0, base_targets: 0, targets_per_slot_level: 0, secondary_range_feet: 0, construct_save_disadvantage: false}
+  vicious_mockery:
+    source:
+      pages: [171, 172]
+      source_heading: Vicious Mockery
+      next_heading: Vitriolic Sphere
+      not_yet_mapped:
+        - Disadvantage on the target's next attack roll before the end of its next turn
+        - spellcasting class, cantrip preparation, and component eligibility
+    definition: {family: single_target_save_damage, casting_time: action, scaling_mode: caster_level, base_level: 0, base_dice: 1, dice_per_slot_level: 0, cantrip_upgrade_dice: 1, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, damage_die: d6, flat_damage: 0, damage_type: psychic, save_ability: wisdom, success_damage: none, range_kind: distance, range_feet: 60, targeting_sense: sight_or_hearing, ignore_partial_cover: false, plant_auto_fail: false}
+  vitriolic_sphere:
+    source:
+      page: 172
+      source_heading: Vitriolic Sphere
+      next_heading: Wall of Fire
+      not_yet_mapped:
+        - engine-computed sphere geometry, affected-target selection, and line of effect
+        - delayed 5d4 Acid damage at the end of the target's next turn
+        - bounded authoritative target projections above 64 creatures
+        - spellcasting class, preparation, and component eligibility
+    definition: {family: instantaneous_area_save_damage, casting_time: action, scaling_mode: slot_level, base_level: 4, base_dice: 10, dice_per_slot_level: 2, cantrip_upgrade_dice: 0, upgrade_level_1: 5, upgrade_level_2: 11, upgrade_level_3: 17, damage_die: d4, damage_type: acid, save_ability: dexterity, success_damage: half, targeting_profile: area, origin_kind: point, range_feet: 150, area_shape: sphere, area_size_feet: 20, area_width_feet: 0, base_targets: 0, targets_per_slot_level: 0, secondary_range_feet: 0, construct_save_disadvantage: false}

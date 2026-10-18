@@ -1,0 +1,54 @@
+{
+  "format_id": "sylvia-gm-package-identity-source",
+  "format_version": 1,
+  "primary": {
+    "id": "wotc.srd.5.2.1",
+    "version": "0.3.1",
+    "role": "primary",
+    "content_kind": "ruleset",
+    "label": "D&D SRD 5.2.1",
+    "publisher": "Pneuma IO",
+    "source_sha256": "8974902d109d6e63672d7c490bde9ccf052410503d9cfa768237154fbc5e3d87",
+    "compatibility": {
+      "host_contract": 1,
+      "runtime_format": 1,
+      "requires": [
+        "character_rule_results.v1",
+        "entity_creation.v1",
+        "participant_mutation.v1",
+        "required_starting_state.v1",
+        "runtime_choice_sequences.v1",
+        "runtime_immutable_collections.v1",
+        "runtime_require.v1",
+        "starting_state_validation.v1"
+      ]
+    },
+    "minimum_model_capability_tier": "sylvia.capability.t06",
+    "content_declarations": "content/content-declarations.json",
+    "dependencies": [
+      {
+        "namespace": "rules_reference",
+        "kind": "rules_reference",
+        "id": "wotc.srd.5.2.1.reference",
+        "version": "5.2.1"
+      }
+    ]
+  },
+  "reference": {
+    "id": "wotc.srd.5.2.1.reference",
+    "version": "5.2.1",
+    "role": "dependency",
+    "content_kind": "support",
+    "label": "D&D SRD 5.2.1 Reference",
+    "publisher": "Pneuma IO",
+    "source_sha256": "8974902d109d6e63672d7c490bde9ccf052410503d9cfa768237154fbc5e3d87",
+    "compatibility": {
+      "host_contract": 1,
+      "runtime_format": 1,
+      "requires": []
+    },
+    "minimum_model_capability_tier": "sylvia.capability.t00",
+    "content_declarations": "content/reference-content-declarations.json",
+    "dependencies": []
+  }
+}
