@@ -1,0 +1,45 @@
+{
+  "productName": "Sylvia GM",
+  "version": "0.3.0-alpha.1",
+  "identifier": "com.pneuma-io.sylvia-gm",
+  "build": {
+    "frontendDist": "frontend",
+    "beforeDevCommand": "",
+    "beforeBuildCommand": "uv run --locked --all-extras python src-tauri/scripts/build_owner_sidecar.py"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [],
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' asset: data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src ipc: http://ipc.localhost; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "nsis",
+    "resources": {
+      "../LICENSE": "licenses/LICENSE",
+      "../rulesets/srd-lite/ATTRIBUTION.md": "licenses/SRD-5.2.1.md",
+      "../campaign-settings/severed-lands/ATTRIBUTION.md": "licenses/Severed-Lands.md",
+      "../COPYRIGHT": "licenses/COPYRIGHT",
+      "../LICENSING-STATUS.md": "licenses/LICENSING-STATUS.md",
+      "../SYLVIA-ADDITIONAL-PERMISSIONS.md": "licenses/SYLVIA-ADDITIONAL-PERMISSIONS.md",
+      "../licenses/MIT-PREVIOUS-GRANT.txt": "licenses/MIT-PREVIOUS-GRANT.txt",
+      "../dependency-notices.txt": "licenses/dependency-notices.txt",
+      "../licenses/DEPENDENCY-NOTICES-STATUS.md": "licenses/DEPENDENCY-NOTICES-STATUS.md",
+      "../licenses/RUST-STDLIB-COPYRIGHT": "licenses/RUST-STDLIB-COPYRIGHT",
+      "../licenses/RUST-STDLIB-COPYRIGHT-library.html": "licenses/RUST-STDLIB-COPYRIGHT-library.html",
+      "../licenses/RUST-STDLIB-LICENSE-APACHE": "licenses/RUST-STDLIB-LICENSE-APACHE",
+      "../licenses/RUST-STDLIB-LICENSE-MIT": "licenses/RUST-STDLIB-LICENSE-MIT",
+      "../licenses/COVERED-SOURCE.zip": "licenses/COVERED-SOURCE.zip",
+      "../licenses/COVERED-SOURCE-MAP.json": "licenses/COVERED-SOURCE-MAP.json",
+      "../licenses/COVERED-SOURCE-README.md": "licenses/COVERED-SOURCE-README.md"
+    },
+    "externalBin": [
+      "binaries/sylvia-gm-owner"
+    ],
+    "icon": [
+      "icons/icon.ico"
+    ]
+  }
+}

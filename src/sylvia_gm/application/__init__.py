@@ -1,0 +1,1 @@
+"""Alpha application authority package."""

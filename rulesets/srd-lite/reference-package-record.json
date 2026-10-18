@@ -1,0 +1,141 @@
+{
+  "capabilities": [
+    "dnd.srd.5.2.1.corpus"
+  ],
+  "compatibility": {
+    "host_contract": 1,
+    "requires": [],
+    "runtime_format": 1
+  },
+  "content_declarations": "content/reference-content-declarations.json",
+  "content_kind": "support",
+  "content_sha256": "ad3da5b65b26ed1fb5076ef30ffd764713bc52deadfe5d5ae6e83b8078651461",
+  "dependencies": [],
+  "files": [
+    {
+      "bytes": 1833,
+      "path": "ATTRIBUTION.md",
+      "sha256": "ce05e62160b94330f89556f3de06111633fb1805d73aa52a3d3207b45a0048bf"
+    },
+    {
+      "bytes": 268,
+      "path": "COPYRIGHT",
+      "sha256": "a98189c65a14b3272198b30922bcfcc73f1238b50fcb6ffe625ca84539f6600d"
+    },
+    {
+      "bytes": 4563,
+      "path": "LICENSE",
+      "sha256": "ffcca38841adb694b6f380647e15f17c446a4d1656fed51a1e2041d064c94cc8"
+    },
+    {
+      "bytes": 5552,
+      "path": "LICENSING-STATUS.md",
+      "sha256": "bb99fa06191abd529a0f1846ebb745295d85d453084cf6fc7ff2d9a376ebb979"
+    },
+    {
+      "bytes": 1066,
+      "path": "MIT-PREVIOUS-GRANT.txt",
+      "sha256": "080da975ab9c98fa80a50323554250e7ec9ec23e540d6b2a9e41ca80f9555544"
+    },
+    {
+      "bytes": 7385,
+      "path": "SYLVIA-ADDITIONAL-PERMISSIONS.md",
+      "sha256": "1a75f6813d3d9a427e2ffac178b906f5da232a3388a7c7414df7dd441f41d4ca"
+    },
+    {
+      "bytes": 2993,
+      "path": "content/corpus-index.json",
+      "sha256": "45288ddeca87a735d8da72b764c0bc264d221a1cfce94712c023338d3bd03fe3"
+    },
+    {
+      "bytes": 64033,
+      "path": "content/corpus/animals.json",
+      "sha256": "abe1a7bb35c2fe6af64c14cd58c81ba61f84991a6c897dd0b66eb60e97e22bf1"
+    },
+    {
+      "bytes": 38514,
+      "path": "content/corpus/character_creation.json",
+      "sha256": "55001d79b3c8aac311a58a178ee3ef39307d46278437d16150d119e23694df5c"
+    },
+    {
+      "bytes": 17200,
+      "path": "content/corpus/character_origins.json",
+      "sha256": "89b4a84f58c95fb21e40fdd71aaf7b9c00a7359be0b918e85e0c1f66bd750510"
+    },
+    {
+      "bytes": 191590,
+      "path": "content/corpus/classes.json",
+      "sha256": "4a8bd029cbd158e4ac284dded64742130dca8ec293761a003d70e209d70ea8c7"
+    },
+    {
+      "bytes": 32151,
+      "path": "content/corpus/contents.json",
+      "sha256": "832c39135032c2af1bfb678f4a57d74316b224dfe31251eda53cb65e4fb117b7"
+    },
+    {
+      "bytes": 56745,
+      "path": "content/corpus/equipment.json",
+      "sha256": "1a36f4ed3c1953b6cbf8ad29708c63f727ad6ba7de5c3aa4008734a1ef9aa75d"
+    },
+    {
+      "bytes": 8366,
+      "path": "content/corpus/feats.json",
+      "sha256": "92b934285a2b1400df3ddb1ff0af0a53fbc6d33744e0f63135e78f968525287d"
+    },
+    {
+      "bytes": 48772,
+      "path": "content/corpus/gameplay_toolbox.json",
+      "sha256": "2f9d94bf83451548630a467c8c9f91c5d9d0c8a4a9661d7e700724791b2fbc6f"
+    },
+    {
+      "bytes": 1668,
+      "path": "content/corpus/legal_information.json",
+      "sha256": "160957304f2b847bda94910caf447febfff3ab2db50f92eb15ef504c89c66e1a"
+    },
+    {
+      "bytes": 229190,
+      "path": "content/corpus/magic_items.json",
+      "sha256": "b2ebf81dd27c19b0763a14f8ec08eaa611a32cb0804969e4f88d2f6d4e6735b0"
+    },
+    {
+      "bytes": 341620,
+      "path": "content/corpus/monsters.json",
+      "sha256": "3135e55729bfa23fff404aabc2ec0935f7dd40a5326b63e9f3225f7b35039758"
+    },
+    {
+      "bytes": 62802,
+      "path": "content/corpus/playing_the_game.json",
+      "sha256": "b6ec82e6ab11366e1e77ebbc1d02559ecfd8e525fd2a2c9e66cb624f6c7fc524"
+    },
+    {
+      "bytes": 71356,
+      "path": "content/corpus/rules_glossary.json",
+      "sha256": "489e7e343d72d27baa6487273145e529d3394cb011bfc1d1ec5d5ba06bceed45"
+    },
+    {
+      "bytes": 331146,
+      "path": "content/corpus/spells.json",
+      "sha256": "b45fa14e10abc9a65083e3be8285fd747e67c468c49e5567fc5c16faeda3a0d0"
+    },
+    {
+      "bytes": 2276,
+      "path": "content/reference-content-declarations.json",
+      "sha256": "a16818b601a1c46ead30e1ca52316e7c4f825c86a06ac5e0fe459cf45ce56900"
+    }
+  ],
+  "id": "pneuma.srd.5.2.1.reference",
+  "metadata": {
+    "label": "D&D SRD 5.2.1 Reference"
+  },
+  "minimum_model_capability_tier": "sylvia.capability.t00",
+  "participant_artifacts": [],
+  "prompt_fragments": [],
+  "provenance": {
+    "publisher": "Pneuma IO",
+    "source_sha256": "8974902d109d6e63672d7c490bde9ccf052410503d9cfa768237154fbc5e3d87"
+  },
+  "role": "dependency",
+  "tools": [],
+  "ui_surfaces": [],
+  "version": "5.2.1"
+}

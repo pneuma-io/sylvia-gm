@@ -1,0 +1,108 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sylvia-gm"
+version = "0.3.0-alpha.1"
+description = "Sylvia GM — source-available AI game-running desktop application"
+readme = "README.md"
+license = {file = "LICENSE"}
+# Standard PolyForm Noncommercial plus separately adopted Sylvia Additional Permissions
+# (revision 3, 16 October 2026); see LICENSING-STATUS.md for scope and exclusions.
+# Prior grants and third-party terms remain.
+requires-python = ">=3.11"
+authors = [
+    {name = "Daniel Young"}
+]
+keywords = ["ttrpg", "dungeon-master", "ai", "rpg"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Games/Entertainment :: Role-Playing",
+]
+
+dependencies = [
+    "pyyaml>=6.0",
+    "openai>=1.0",
+    "anthropic>=0.49,<1.0",
+    "httpx>=0.25",
+    "pydantic>=2.0",
+    "python-dotenv>=1.0",
+    "jsonschema>=4.26.0",
+    "mcp==2.0.0",
+    "aiohttp>=3.14.1",
+    "tiktoken>=0.5.0",
+    "pypdf==6.15.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "ruff>=0.1",
+    "mypy>=1.0",
+    "pyinstaller>=6.0",
+]
+
+[project.scripts]
+sylvia-gm = "sylvia_gm.main:main"
+sylvia-gm-owner = "sylvia_gm.interfaces.owner_process:main"
+
+[tool.setuptools]
+license-files = ["LICENSE", "COPYRIGHT", "LICENSING-STATUS.md", "SYLVIA-ADDITIONAL-PERMISSIONS.md", "licenses/MIT-PREVIOUS-GRANT.txt"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"sylvia_gm.campaign" = ["the-rift-awakening.json"]
+"sylvia_gm.agent" = ["skills/*/SKILL.md", "skills/*/references/*.md", "skills/*/references/*.json"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+src = ["src"]
+exclude = [".venv", ".git", "__pycache__", "data", "campaigns"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "C4", "SIM"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+ignore_missing_imports = true
+exclude = ["tests/"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+    "--strict-config",
+]
+
+markers = [
+    "anyio: mark a test as an async test (uses anyio backend)",
+    "asyncio: mark a test as an async test (uses asyncio backend)",
+    "slow: mark a test as slow (requires network, may be flaky)",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+    "pyinstaller>=6.0",
+]

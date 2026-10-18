@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A spoiler-free guide to 16 Severed Lands adventures for SRD Lite: reduced spell list, 117 supported spells, without consumables. Find a campaign and make a shortlist.">
+  <title>Find your next story · Severed Lands</title>
+  <style>
+    :root { color-scheme:light; --paper:#f5f2e9; --card:#fffdf7; --ink:#24382f; --sub:#58665d; --line:#d5d9ce; --green:#254e3d; --on-green:#fffdf7; --soft:#e7ece2; --ochre:#86552c; --ochre-soft:#f0e2cf; --focus:#ae572b; --serif:Georgia,'Times New Roman',serif; --sans:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; scroll-padding-top:24px; }
+    body { margin:0; background:var(--paper); color:var(--ink); font:15px/1.65 var(--sans); }
+    button,input,select { font:inherit; }
+    button,a,input,select,summary { -webkit-tap-highlight-color:transparent; }
+    button,a { touch-action:manipulation; }
+    button { cursor:pointer; color:inherit; }
+    button:disabled { cursor:default; opacity:.45; }
+    :focus-visible { outline:3px solid var(--focus); outline-offset:4px; }
+    a { color:inherit; }
+    h1,h2,h3,p { margin:0; }
+    [hidden] { display:none!important; }
+    .wrap { width:min(1180px,calc(100% - 64px)); margin-inline:auto; }
+    .skip { position:absolute; top:-80px; left:20px; padding:10px 16px; background:var(--card); z-index:10; }
+    .skip:focus { top:12px; }
+    .masthead { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:24px 0; border-bottom:1px solid var(--line); }
+    .brand { font-size:12px; font-weight:750; letter-spacing:.17em; text-transform:uppercase; display:flex; align-items:center; gap:12px; }
+    .brand-mark { width:20px; height:26px; border:2px solid currentColor; border-bottom:0; border-radius:12px 12px 0 0; position:relative; }
+    .brand-mark:after { content:''; position:absolute; inset:5px 4px 0; border:1px solid currentColor; border-bottom:0; border-radius:8px 8px 0 0; }
+    .edition { color:var(--sub); font-size:12px; }
+    .hero { display:grid; grid-template-columns:1.16fr 1fr; gap:60px; padding:62px 0 52px; align-items:center; }
+    .eyebrow { color:var(--ochre); font-size:11px; letter-spacing:.15em; text-transform:uppercase; font-weight:750; }
+    h1 { font:normal clamp(44px,5.5vw,72px)/1.03 var(--serif); letter-spacing:-.045em; margin:16px 0 20px; max-width:570px; }
+    .intro { font-size:17px; color:var(--sub); max-width:490px; }
+    .overview { display:flex; flex-wrap:wrap; gap:8px 18px; margin-top:25px; color:var(--sub); font-size:12px; }
+    .overview span+span:before { content:'·'; padding-right:18px; }
+    .featured { position:relative; overflow:hidden; background:var(--green); color:var(--on-green); padding:30px 32px; border-radius:4px; }
+    .featured:before,.featured:after { content:''; pointer-events:none; position:absolute; width:210px; height:255px; border:1px solid currentColor; opacity:.12; border-radius:110px 110px 0 0; right:-82px; bottom:-95px; transform:rotate(-16deg); }
+    .featured:after { width:174px; height:232px; right:-64px; bottom:-90px; }
+    .featured .eyebrow { color:inherit; opacity:.8; }
+    .featured h2 { font:normal 34px/1.12 var(--serif); letter-spacing:-.025em; margin:12px 0; }
+    .featured p { max-width:375px; color:inherit; opacity:.93; }
+    .featured .feature-meta { font-size:12px; margin-top:18px; opacity:.75; }
+    .feature-button { display:inline-flex; align-items:center; gap:26px; margin-top:22px; padding:9px 0; border:0; border-bottom:1px solid currentColor; color:inherit; background:none; font-weight:600; position:relative; }
+    .feature-button:hover { gap:34px; }
+    .collection { padding-bottom:40px; }
+    .section-heading { display:flex; align-items:baseline; justify-content:space-between; gap:16px; border-top:1px solid var(--line); padding-top:28px; margin-bottom:22px; }
+    .section-heading h2 { font:normal 30px/1.2 var(--serif); letter-spacing:-.025em; }
+    #result-count { color:var(--sub); font-size:13px; white-space:nowrap; }
+    .filters { display:grid; gap:17px; padding-bottom:24px; }
+    .formats { display:flex; flex-wrap:wrap; gap:7px; }
+    .format,.small-button { background:transparent; border:1px solid var(--line); border-radius:4px; padding:7px 13px; font-size:13px; min-height:40px; }
+    .format:hover,.small-button:hover { background:var(--soft); border-color:var(--sub); }
+    .format[aria-pressed=true],.small-button[aria-pressed=true] { background:var(--green); color:var(--on-green); border-color:var(--green); }
+    .format .count { opacity:.7; font-size:11px; margin-left:6px; }
+    .filter-row { display:grid; grid-template-columns:1.5fr 1fr 1fr auto; gap:12px; align-items:end; }
+    label { display:block; font-size:11px; text-transform:uppercase; letter-spacing:.07em; font-weight:650; color:var(--sub); margin-bottom:6px; }
+    input,select { width:100%; background:var(--card); color:var(--ink); border:1px solid var(--line); border-radius:4px; padding:10px 12px; font-size:14px; min-height:44px; }
+    input::placeholder { color:var(--sub); opacity:.9; }
+    .shortlist-filter { min-height:44px; white-space:nowrap; }
+    .filter-bottom { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+    .scope-note { color:var(--sub); font-size:12px; max-width:750px; }
+    .text-button { border:0; background:none; padding:4px 0; text-decoration:underline; text-underline-offset:4px; font-size:13px; }
+    .grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }
+    .plan { display:flex; flex-direction:column; background:var(--card); border:1px solid var(--line); border-radius:4px; padding:24px; position:relative; }
+    .plan.flagship { border-top:3px solid var(--green); padding-top:22px; }
+    .card-head { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:18px; }
+    .scope { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--sub); }
+    .number { color:var(--sub); font:italic 17px var(--serif); }
+    .gameplay { font-size:13px; line-height:1.6; color:var(--sub); margin:0 0 18px; }
+    .gameplay strong { display:block; font-size:10px; text-transform:uppercase; letter-spacing:.09em; color:var(--ink); margin-bottom:4px; }
+    .plan h3 { font:normal 26px/1.16 var(--serif); letter-spacing:-.025em; margin-bottom:12px; }
+    .pitch { font-size:14px; }
+    .why { margin-top:18px; padding-top:16px; border-top:1px solid var(--line); font-size:13px; color:var(--sub); }
+    .why strong { display:block; margin-bottom:5px; color:var(--ink); font-size:11px; letter-spacing:.06em; text-transform:uppercase; }
+    .tags { display:flex; flex-wrap:wrap; gap:6px; margin:18px 0; }
+    .tag { font-size:10px; letter-spacing:.035em; text-transform:uppercase; color:var(--sub); }
+    .tag+.tag:before { content:' / '; padding-right:6px; color:var(--line); }
+    .character-label { font-size:11px; color:var(--ochre); background:var(--ochre-soft); align-self:start; padding:3px 8px; border-radius:3px; margin:0 0 18px; }
+    .card-actions { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:auto; padding-top:10px; }
+    .explore { border:0; background:none; font-weight:650; font-size:12px; padding:10px 0; text-align:left; }
+    .explore:hover { text-decoration:underline; text-underline-offset:4px; }
+    .save { display:flex; align-items:center; gap:5px; font-size:12px; background:none; border:1px solid var(--line); border-radius:4px; min-height:38px; padding:6px 9px; }
+    .save[aria-pressed=true] { color:var(--green); background:var(--soft); border-color:var(--green); }
+    .save:hover { border-color:var(--sub); }
+    .save svg { width:14px; height:16px; }
+    .empty { text-align:center; padding:60px 24px; border:1px dashed var(--line); border-radius:4px; }
+    .empty h3 { font:normal 28px var(--serif); margin-bottom:10px; }
+    .empty p { color:var(--sub); margin-bottom:18px; }
+    .bottom-note { display:flex; gap:20px; justify-content:space-between; align-items:center; margin-top:25px; font-size:12px; color:var(--sub); }
+    .surprise { border:1px solid var(--green); background:var(--green); color:var(--on-green); border-radius:4px; padding:9px 16px; font-size:13px; white-space:nowrap; }
+    .surprise:hover { filter:brightness(1.12); }
+    footer { border-top:1px solid var(--line); padding:25px 0 35px; display:flex; justify-content:space-between; align-items:flex-start; gap:30px; color:var(--sub); font-size:12px; }
+    footer p { max-width:680px; }
+    footer .back-top { white-space:nowrap; text-underline-offset:4px; }
+    dialog { background:var(--card); color:var(--ink); border:1px solid var(--line); border-radius:6px; padding:0; width:min(710px,calc(100% - 28px)); max-height:90vh; max-height:90dvh; box-shadow:0 20px 80px #102a2440; }
+    dialog::backdrop { background:#142c24aa; backdrop-filter:blur(3px); }
+    .dialog-top { display:flex; justify-content:space-between; align-items:center; padding:16px 28px; border-bottom:1px solid var(--line); position:sticky; top:0; background:var(--card); z-index:1; }
+    .close { border:1px solid var(--line); background:transparent; border-radius:4px; padding:5px 11px; min-height:36px; font-size:12px; }
+    .detail { padding:30px 36px 34px; }
+    .detail h2 { font:normal clamp(30px,5vw,43px)/1.08 var(--serif); letter-spacing:-.03em; margin:10px 0 16px; }
+    .detail .lead { color:var(--sub); font-size:17px; margin-bottom:24px; }
+    .detail-block { margin:24px 0; }
+    .detail-block h3 { font-size:11px; font-weight:750; letter-spacing:.1em; text-transform:uppercase; color:var(--sub); margin-bottom:8px; }
+    .detail-why { padding:20px 22px; background:var(--soft); border-left:3px solid var(--green); border-radius:0 4px 4px 0; }
+    .detail-why h3 { color:var(--green); }
+    .detail .feel { font-style:italic; color:var(--sub); font-family:var(--serif); font-size:18px; }
+    .detail-actions { display:flex; justify-content:space-between; align-items:center; gap:20px; border-top:1px solid var(--line); padding-top:20px; margin-top:24px; }
+    .detail-actions .save { min-height:44px; padding:8px 14px; }
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+    @media(max-width:1050px) { .grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .hero { gap:30px; } .filter-row { grid-template-columns:1.3fr 1fr 1fr; } .shortlist-filter { grid-column:1/-1; justify-self:start; } }
+    @media(max-width:650px) { .wrap { width:calc(100% - 32px); } .masthead { padding:18px 0; } .edition { display:none; } .hero { grid-template-columns:1fr; padding:36px 0; gap:28px; } h1 { font-size:51px; max-width:340px; } .intro { font-size:16px; } .featured { padding:25px; } .featured h2 { font-size:30px; } .grid { grid-template-columns:1fr; } .filter-row { grid-template-columns:1fr 1fr; } .search-field { grid-column:1/-1; } .shortlist-filter { grid-column:auto; } .formats { gap:6px; } .format { padding:7px 10px; font-size:12px; } .section-heading h2 { font-size:27px; } .plan { padding:24px; } .bottom-note,footer { flex-direction:column; align-items:flex-start; gap:16px; } .detail { padding:25px 24px; } .dialog-top { padding:12px 20px; } .detail-actions { flex-wrap:wrap; } }
+    @media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+    @media(prefers-color-scheme:dark) { :root { color-scheme:dark; --paper:#192620; --card:#21322a; --ink:#e8eade; --sub:#b6c4b7; --line:#405449; --green:#bdd4b9; --on-green:#192c21; --soft:#30463a; --ochre:#dfb483; --ochre-soft:#483d2e; --focus:#efb074; } .featured { background:#304e3d; color:#eef0df; } .save[aria-pressed=true] { border-color:var(--sub); } }
+    @media print { :root { color-scheme:light; --paper:#fff; --card:#fff; --ink:#111; --sub:#444; --line:#bbb; --green:#222; --on-green:#fff; --soft:#eee; } .wrap { width:100%; } .hero { padding:20px 0; gap:30px; } h1 { font-size:42px; } .filters,.card-actions,.feature-button,.bottom-note,.back-top,.skip,dialog { display:none!important; } .grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .plan { break-inside:avoid; padding:16px; } .plan h3 { font-size:22px; } .featured { background:#eee; color:#111; } footer { padding-bottom:0; } }
+  </style>
+</head>
+<body id="top">
+  <a class="skip" href="#collection">Skip to the campaigns</a>
+  <header class="wrap masthead">
+    <div class="brand"><span class="brand-mark" aria-hidden="true"></span>Severed Lands</div>
+    <div class="edition">Sylvia GM · A spoiler-free campaign field guide</div>
+  </header>
+  <main class="wrap">
+    <section class="hero" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">Pick a place to begin</p>
+        <h1 id="page-title">Find your<br>next story.</h1>
+        <p class="intro">A rescue at a broken crossing. A delve beneath shifting streets. A whole life in another world. There’s more than one way into the Severed Lands.</p>
+        <p class="overview"><span>16 adventures</span><span>5 formats</span><span>1 pre-made hero</span></p>
+        <p class="scope-note" style="margin-top:16px">SRD Lite: reduced spell list (117 supported spells), without consumables. Consumables belong to future SRD Full. The app and bundled content remain in development.</p>
+      </div>
+      <aside class="featured" aria-labelledby="featured-title">
+        <p class="eyebrow">The flagship · Six acts</p>
+        <h2 id="featured-title">The Rift Awakening</h2>
+        <p>For the long journey: find your feet in a strange world, get to know its people and follow a mystery that reaches far beyond your first clearing.</p>
+        <p class="feature-meta">Exploration · Found family · Consequential choices</p>
+        <button class="feature-button" type="button" data-open="the-rift-awakening" id="feature-open">Explore the flagship <span aria-hidden="true">↗</span></button>
+      </aside>
+    </section>
+    <section class="collection" id="collection" aria-labelledby="collection-title">
+      <div class="section-heading"><h2 id="collection-title" tabindex="-1">The collection</h2><p id="result-count" role="status" aria-live="polite">16 Plans</p></div>
+      <div class="filters">
+        <div class="formats" role="group" aria-label="Campaign length">
+          <button type="button" class="format" data-format="all" aria-pressed="true">Everything <span class="count">16</span></button>
+          <button type="button" class="format" data-format="Combat scenario" aria-pressed="false">Short combat <span class="count">6</span></button>
+          <button type="button" class="format" data-format="One-shot" aria-pressed="false">One-shots <span class="count">4</span></button>
+          <button type="button" class="format" data-format="Two-act campaign" aria-pressed="false">Two acts <span class="count">3</span></button>
+          <button type="button" class="format" data-format="Three-act campaign" aria-pressed="false">Three acts <span class="count">2</span></button>
+          <button type="button" class="format" data-format="Flagship" aria-pressed="false">Six-act flagship <span class="count">1</span></button>
+        </div>
+        <div class="filter-row">
+          <div class="search-field"><label for="search">Find a story</label><input type="search" id="search" placeholder="Try a title, a rescue, a place…" autocomplete="off"></div>
+          <div><label for="theme">What draws you in?</label><select id="theme"><option value="all">Any kind of adventure</option></select></div>
+          <div><label for="character">Your character</label><select id="character"><option value="all">Either way</option><option value="compatible">Bring my own</option><option value="fixed">A pre-made protagonist</option></select></div>
+          <button type="button" class="small-button shortlist-filter" id="shortlist-toggle" aria-pressed="false">My shortlist <span id="saved-count">0</span></button>
+        </div>
+        <div class="filter-bottom"><p class="scope-note">Choose by scope, not a stopwatch. Acts describe the story’s shape; combat counts are prepared encounters, with room for clever avoidance.</p><button type="button" class="text-button" id="reset" hidden>Clear filters</button></div>
+      </div>
+      <div class="grid" id="plans"></div>
+      <div class="empty" id="empty" hidden><h3 id="empty-title">No stories in this corner.</h3><p id="empty-message">Try another mood or loosen a filter.</p><button type="button" class="small-button" id="empty-reset">Show every Plan</button></div>
+      <div class="bottom-note"><p id="storage-note">Save the ones that catch your eye. Your shortlist stays in this browser.</p><button type="button" class="surprise" id="surprise">Surprise me from these Plans <span aria-hidden="true">↗</span></button></div>
+      <noscript><p>This interactive guide needs JavaScript to show its campaign cards and filters. All content is contained in this file; no internet connection is needed.</p></noscript>
+    </section>
+  </main>
+  <footer class="wrap"><p>Prepared for Sylvia GM · Severed Lands with D&D 5e rules.<br>Each Plan is a separate starting point. These introductions reveal premises and play styles, not hidden answers or endings.</p><a class="back-top" href="#top">Back to the beginning ↑</a></footer>
+  <dialog id="plan-dialog" aria-labelledby="detail-title">
+    <div class="dialog-top"><span class="scope" id="detail-scope"></span><button class="close" type="button" id="close-dialog" autofocus>Close <span aria-hidden="true">×</span></button></div>
+    <div class="detail" id="detail-content"></div>
+  </dialog>
+  <p class="sr-only" id="save-status" role="status" aria-live="polite"></p>
+  <script type="application/json" id="campaign-data">[
+  {
+    "id": "the-rift-awakening",
+    "title": "The Rift Awakening",
+    "format": "Flagship",
+    "acts": 6,
+    "character_mode": "compatible",
+    "pitch": "Find your place in the Severed Lands, a strange world of ancient Doors, dangerous frontiers and people who dream of home. Build friendships, explore its regions and decide whose hopes deserve your trust in an expansive six-act campaign.",
+    "line": "Make another world your home.",
+    "themes": [
+      "Exploration",
+      "Mystery",
+      "Relationships"
+    ],
+    "why": "Choose this when you want the full Severed Lands experience: a long journey, recurring friends, competing loyalties and decisions that still matter several acts later.",
+    "experience": "Begin quietly in an uncanny forest clearing and find your bearings at your own pace. Beyond it lie settlements to know, dangerous country to explore and ancient Doors at the centre of people’s hopes. There is room for small jobs, personal ambitions and friendships alongside the larger mystery. This is the flagship to settle into, rather than a quick sample of the setting.",
+    "role": "Bring a compatible character and discover who they become here. Optional companions can share the journey. The opening leaves your character’s earlier actions and personal history for you to establish.",
+    "feel": "Wonder, survival, found family and a growing sense of responsibility.",
+    "number": 1,
+    "gameplay": "A sustained D&D journey through combat, exploration, character advancement and dangerous expeditions, with companions and choices that carry across six acts."
+  },
+  {
+    "id": "last-cart-through",
+    "title": "Last Cart Through",
+    "format": "Combat scenario",
+    "acts": 1,
+    "character_mode": "compatible",
+    "pitch": "A broken Guild wagon blocks a forest crossing. Keep its driver safe while hungry Rifthounds close in.",
+    "prepared_combats": 1,
+    "line": "One wagon. One bad crossing.",
+    "themes": [
+      "Tactics",
+      "Rescue"
+    ],
+    "why": "Pick this for immediate, readable stakes. You can make a difference quickly, and protecting people gives the fight a purpose beyond defeating an enemy.",
+    "experience": "A broken wagon turns an ordinary forest journey into a small crisis. Watch the hungry creatures closing in, work with the driver and decide what is worth risking to get away. The fun comes from using the ground, dividing your attention and finding a practical solution under pressure. Once the wagon’s fate is settled, the adventure gives you its aftermath and ends.",
+    "feel": "A sharp burst of danger with a human face.",
+    "number": 2,
+    "gameplay": "One prepared defensive fight. Use terrain, protect the driver and choose between attacking, repairing and getting people clear."
+  },
+  {
+    "id": "the-quarry-turns",
+    "title": "The Quarry Turns",
+    "format": "Combat scenario",
+    "acts": 1,
+    "character_mode": "compatible",
+    "pitch": "A Rift-touched boar has made a supply trail impassable. Choose your ground before the hunt becomes a charge.",
+    "prepared_combats": 1,
+    "line": "Be the hunter. Mind the charge.",
+    "themes": [
+      "Tactics",
+      "Exploration"
+    ],
+    "why": "Play it if you like reading terrain and preparing for a dangerous opponent. Your approach to the hunt is part of the encounter, not just its introduction.",
+    "experience": "A Rift-touched boar has claimed a supply trail, and someone has to make the route usable again. Scout the ground, consider how the animal moves and decide how closely you want to engage it. This is a compact outdoor challenge with space for caution, ingenuity and a change of plan when the quarry refuses to cooperate.",
+    "feel": "A tense wilderness hunt with room to think.",
+    "number": 3,
+    "gameplay": "One prepared hunt. Scout the ground, use cover and positioning, and handle the quarry’s charge through actual attacks and checks."
+  },
+  {
+    "id": "hold-the-rope",
+    "title": "Hold the Rope",
+    "format": "Combat scenario",
+    "acts": 1,
+    "character_mode": "compatible",
+    "pitch": "A surveyor hangs below a Cairnfields crossing. Clear the approach, then keep the rescue line intact.",
+    "prepared_combats": 2,
+    "line": "Win the crossing. Bring someone home.",
+    "themes": [
+      "Tactics",
+      "Rescue"
+    ],
+    "why": "Choose this if a rescue sounds more exciting than a duel. Getting through the first obstacle matters because someone is still depending on you afterward.",
+    "experience": "A surveyor is stranded below a Cairnfields crossing. Reaching them is only part of the problem: you also have to keep a precarious rescue working while the crossing remains contested. Two prepared encounters give the scenario a clear change of pressure, and decisions made on the approach affect what you can do when the rope really matters.",
+    "feel": "Urgent, exposed and focused on getting someone out.",
+    "number": 4,
+    "gameplay": "Two prepared fights linked by a rope rescue. Climbing, positioning and protecting the rescue route compete for your attention."
+  },
+  {
+    "id": "dead-inventory",
+    "title": "Dead Inventory",
+    "format": "Combat scenario",
+    "acts": 1,
+    "character_mode": "compatible",
+    "pitch": "A recovered suit of Warden armour wakes during an Athenaeum stocktake. Get the porters out before the storeroom becomes wreckage.",
+    "prepared_combats": 1,
+    "line": "The stocktake has started hitting back.",
+    "themes": [
+      "Tactics",
+      "Rescue"
+    ],
+    "why": "Try it for a contained crisis in an unusual arena. The storeroom, its contents and the people inside it give you more to think about than a monster’s health.",
+    "experience": "A recovered suit of Warden armour wakes during a routine Athenaeum stocktake. Suddenly an archive’s work space is a dangerous place to stand. Work out how to protect the porters and regain control before the room is wrecked. The small location makes the situation easy to grasp, while ancient machinery gives it a distinctly Severed Lands flavour.",
+    "feel": "Contained chaos among things that should have stayed on shelves.",
+    "number": 5,
+    "gameplay": "One prepared fight in a crowded storeroom. Use cover, control the approach and evacuate workers while dealing with a construct."
+  },
+  {
+    "id": "the-sparring-debt",
+    "title": "The Sparring Debt",
+    "format": "Combat scenario",
+    "acts": 1,
+    "character_mode": "compatible",
+    "pitch": "A Lodge trainee owes the town an exhibition. Stand in for two friendly bouts and give the audience something worth remembering.",
+    "prepared_combats": 2,
+    "line": "A little pride. A willing audience.",
+    "themes": [
+      "Tactics",
+      "Relationships"
+    ],
+    "why": "Choose this for a lighter combat outing. You get two contrasting bouts, a social reason to care and the pleasure of discovering what your character is like in front of a crowd.",
+    "experience": "A Lodge trainee owes the town an exhibition, and you can help make it happen. Agree the terms, step into the ring and meet two opponents in friendly competition. Style, sportsmanship and the way you handle an awkward moment matter alongside your attacks. The bouts are intended to be friendly, but their agreed limits still need to be respected.",
+    "feel": "Good-natured rivalry and a chance to show some personality.",
+    "number": 6,
+    "gameplay": "Two friendly combat bouts. Try your attacks, movement and defensive choices under clear stop conditions, carrying resources between bouts."
+  },
+  {
+    "id": "no-one-left-below",
+    "title": "No One Left Below",
+    "format": "Combat scenario",
+    "acts": 1,
+    "character_mode": "compatible",
+    "pitch": "A salvage crew is trapped in a Hollows cellar. Open a way in, then bring them out before the district shifts.",
+    "prepared_combats": 2,
+    "line": "The way in is only half the job.",
+    "themes": [
+      "Tactics",
+      "Rescue"
+    ],
+    "why": "Play this for a small dungeon rescue with a strong reason to keep moving. The return journey has its own demands, so spending everything on the way in is a real choice.",
+    "experience": "A salvage crew is trapped beneath a district of the Hollows that will not stay still forever. Open a route through the cellar, reach the people below and work out how to bring them back. Two prepared encounters frame the extraction, but your attention also belongs on the crew, your remaining resources and the changing place around you.",
+    "feel": "Close quarters, dwindling options and practical heroism.",
+    "number": 7,
+    "gameplay": "Two prepared fights around a cellar extraction. Clear access, protect the crew and carry your actual wounds and resources into the escape."
+  },
+  {
+    "id": "the-cartographers-wake",
+    "title": "The Cartographer’s Wake",
+    "format": "One-shot",
+    "acts": 1,
+    "character_mode": "compatible",
+    "pitch": "A stolen chart at a Nexus wake points to a sealed survey vault. Track the thieves, brave the old works and recover the mapmaker’s last expedition record.",
+    "line": "Follow the stolen chart underground.",
+    "themes": [
+      "Mystery",
+      "Dungeon",
+      "Exploration"
+    ],
+    "why": "Choose this for a mystery that quickly gets boots on stone: useful clues, a compact ruin and several ways to outwit what stands between you and the map.",
+    "experience": "A mapmaker’s wake is interrupted by a theft. Follow the trail from a Nexus bookshop into an abandoned survey annex, where tight passages and old machinery make recovering the chart a practical adventure. You can investigate carefully, force a route or use your character’s tricks to reach the missing record.",
+    "feel": "A personal mystery with dust, steel and a little dungeon ingenuity.",
+    "number": 8,
+    "prepared_combats": 2,
+    "recommended_level": "2",
+    "gameplay": "Two prepared fights, a trapped passage, locked access and a guarded recovery. Investigation, thieves’ tools, positioning and spells can all change your route."
+  },
+  {
+    "id": "a-light-on-breathing-street",
+    "title": "A Light on Breathing Street",
+    "format": "One-shot",
+    "acts": 1,
+    "character_mode": "compatible",
+    "pitch": "A lost townhouse returns to the Hollows with a lamp burning upstairs. Explore its trapped rooms, confront hostile Rift echoes and get a family keepsake out before the street shifts.",
+    "line": "The house is back. Get out before it goes.",
+    "themes": [
+      "Dungeon",
+      "Horror",
+      "Exploration"
+    ],
+    "why": "Play this for a haunted-house delve with a clear objective. Light, escape routes and the choice to spend one more spell matter as much as your nerve.",
+    "experience": "A townhouse has returned to the shifting streets of the Hollows, and someone wants a keepsake recovered from inside. Explore connected rooms, find another way upstairs and prepare your exit while the house shows signs that its stay may be brief. The eerie details lead into danger you can investigate and confront.",
+    "feel": "Uncanny rooms, hostile shadows and a return to daylight you earn.",
+    "number": 9,
+    "prepared_combats": 2,
+    "recommended_level": "2",
+    "gameplay": "Two prepared undead encounters, trap saves, alternate stairs and a rope escape. Track light, HP, spell slots and the cost of pressing deeper."
+  },
+  {
+    "id": "the-honest-thief",
+    "title": "The Honest Thief",
+    "format": "One-shot",
+    "acts": 1,
+    "character_mode": "compatible",
+    "pitch": "Recover stolen wages from a guarded Thornwall counting-house. Scout the rooms, beat its locks and traps, and get the money and a witness through a dangerous exit.",
+    "line": "Get the wages. Find a way out.",
+    "themes": [
+      "Heist",
+      "Stealth",
+      "Tactics"
+    ],
+    "why": "Pick this if you enjoy making a plan and adapting when a patrol ruins it. A quiet route is possible, but the counting-house is ready to fight back.",
+    "experience": "Workers in Thornwall are owed their wages. A guarded counting-house offers a chance to retrieve both the money and the records behind it. Scout the building, choose your entry and work out how to get everyone who trusts you back through an exit. Your equipment and abilities can make the difference between a clean job and a running confrontation.",
+    "feel": "A small, risky job with plenty of room for a clever character.",
+    "number": 10,
+    "prepared_combats": 2,
+    "recommended_level": "2",
+    "gameplay": "Patrol timing, stealth, pickpocketing, locks, a trapped strongbox and two prepared confrontations. A successful heist can avoid combat through actual preparation."
+  },
+  {
+    "id": "the-bell-below",
+    "title": "The Bell Below",
+    "format": "One-shot",
+    "acts": 1,
+    "character_mode": "compatible",
+    "pitch": "A scavengers’ warning bell has vanished into the tunnels beneath the Hollows. Descend through a flooded Warden workhouse, fight its hungry inhabitants and haul the bell back to daylight.",
+    "prepared_combats": 2,
+    "recommended_level": "2",
+    "line": "Something down there has your bell.",
+    "themes": [
+      "Dungeon",
+      "Rescue",
+      "Exploration"
+    ],
+    "why": "Choose this for a straightforward dungeon outing with an awkward prize. Getting to the bell is only part of the problem; bringing it up is where your kit earns its keep.",
+    "experience": "The Hollows’ scavengers rely on a warning bell, now lost beneath a collapsed workhouse. Descend into flooded rooms, find the hauling route and deal with the creatures that have made the place their home. There is useful salvage below, but you will need light, a way across the water and a plan for carrying your reward.",
+    "gameplay": "Two prepared creature encounters, water traversal, light management, a dangerous hoist and real carrying limits. Ropes, tools and supplies offer useful alternatives.",
+    "feel": "Wet boots, a heavy load and an honest day’s adventuring.",
+    "number": 11
+  },
+  {
+    "id": "the-long-way-round",
+    "title": "The Long Way Round",
+    "format": "Two-act campaign",
+    "acts": 2,
+    "character_mode": "compatible",
+    "pitch": "Track a missing caravan into the Verdant Margin, break it out of a raider-held wayhouse and escort the survivors through a forest that has swallowed the road.",
+    "line": "The rescue ends where the escort begins.",
+    "themes": [
+      "Wilderness",
+      "Rescue",
+      "Survival"
+    ],
+    "why": "Play this when you want victory in one fight to change the next problem. The people, medicine and equipment you save shape the difficult journey home.",
+    "experience": "A missing Guild caravan draws you into the growing Verdant Margin. First find the travellers and break the hold on their refuge; then guide a wounded, loaded group through a road the forest has swallowed. Choose between difficult routes, make camp when you can and decide what is worth carrying.",
+    "feel": "Practical heroism, hard travel and people worth getting home.",
+    "number": 12,
+    "prepared_combats": 3,
+    "recommended_level": "2",
+    "gameplay": "Three prepared fights across a wayhouse rescue and wilderness escort. Tracking, cover, doors, medical aid, rope crossings, rations and recovery all matter."
+  },
+  {
+    "id": "a-debt-in-iron",
+    "title": "A Debt in Iron",
+    "format": "Two-act campaign",
+    "acts": 2,
+    "character_mode": "fixed",
+    "pitch": "As Lodge trainee Tavin Bell, retrieve a pledged Warden relic from a dangerous salvage vault, then defend the crew carrying it out while deciding how to face your mentor’s debt.",
+    "protagonist": "Tavin Bell",
+    "line": "A borrowed relic. Your name on the debt.",
+    "themes": [
+      "Dungeon",
+      "Tactics",
+      "Obligation"
+    ],
+    "why": "Pick this for a ready-made character with a personal reason to enter a dangerous ruin. You get the immediate purpose of a short quest and consequences that belong to you.",
+    "experience": "Lodge trainee Tavin Bell pledged a borrowed relic to help a mentor. Recovering it means entering a Warden vault, handling its machinery and finding a way back past people with claims of their own. The obligation supplies the reason to adventure; your decisions determine how Tavin puts things right.",
+    "role": "Play Tavin Bell, the included level-1 Fighter. The borrowed relic and mentor’s debt are part of Tavin’s authored history; how you handle them is yours to choose.",
+    "feel": "Steel, old machinery and the chance to earn back trust.",
+    "number": 13,
+    "prepared_combats": 2,
+    "recommended_level": "1",
+    "gameplay": "Two prepared fights, a vault guardian, counterweight machinery and a contested crossing. Use a level-1 Fighter’s real gear and recovery abilities alongside tools and terrain."
+  },
+  {
+    "id": "the-scavengers-accord",
+    "title": "The Scavengers’ Accord",
+    "format": "Two-act campaign",
+    "acts": 2,
+    "character_mode": "compatible",
+    "pitch": "Two crews need the same route into a newly returned Hollows storehouse. Scout a monster-held district, open its dangerous vault and bring the salvage out before their rivalry turns violent.",
+    "line": "Settle the claim. Survive the salvage.",
+    "themes": [
+      "Dungeon",
+      "Exploration",
+      "Rivalry"
+    ],
+    "why": "Choose this if you like bargains that help you do something dangerous. Allies can bring a rope, a key or another pair of hands when the salvage starts.",
+    "experience": "Two crews claim the same newly returned district in the Hollows. Survey its unsafe streets, help workers caught in the ruins and arrange access to a promising storehouse. Then put those agreements to use on an expedition where the ground, the mechanisms and the inhabitants all have a say.",
+    "feel": "A risky delve where good working relationships have practical value.",
+    "number": 14,
+    "prepared_combats": 2,
+    "recommended_level": "2",
+    "gameplay": "Two prepared monster fights, climbing and rescue, a trapped storehouse and a timed salvage haul. Earlier cooperation changes your equipment and access routes."
+  },
+  {
+    "id": "the-company-of-the-lost",
+    "title": "The Company of the Lost",
+    "format": "Three-act campaign",
+    "acts": 3,
+    "character_mode": "compatible",
+    "pitch": "Build a salvage company through three dangerous Hollows jobs: a beast-haunted storehouse, a flooded records depot and a contested Warden vault. Your crew’s future depends on what you bring back together.",
+    "line": "Three jobs. A crew worth coming back for.",
+    "themes": [
+      "Dungeon",
+      "Found family",
+      "Exploration"
+    ],
+    "why": "Play this for recurring companions and workers whose trust is earned in dangerous places. You build something lasting across a series of connected expeditions.",
+    "experience": "A few overlooked salvage workers are ready for another chance. Lead them through a trial recovery, a flooded depot and a contested archive vault, using what you learn and recover to prepare the next job. Decide how the company divides pay and risk as its work becomes more ambitious.",
+    "feel": "A grubby little expedition company becoming something its people can believe in.",
+    "number": 15,
+    "prepared_combats": 4,
+    "recommended_level": "2",
+    "gameplay": "Four prepared encounters across three linked sites, with one dependent on an unresolved dispute. Hoists, water, locks, undead, guarded machinery and extraction make crew planning useful."
+  },
+  {
+    "id": "the-map-of-tomorrow",
+    "title": "The Map of Tomorrow",
+    "format": "Three-act campaign",
+    "acts": 3,
+    "character_mode": "compatible",
+    "pitch": "Survey a broken route across the Cairnfields. Climb ruined marker stations, survive Riftbeasts and reclaim a guarded causeway so the next caravan has a road worth trusting.",
+    "line": "Make a route the next traveller can trust.",
+    "themes": [
+      "Wilderness",
+      "Exploration",
+      "Survival"
+    ],
+    "why": "Pick this if you want exploration to produce a tangible result. Your map becomes useful because you have climbed the ground, dealt with its dangers and tested the crossing yourself.",
+    "experience": "Two charts disagree about a Cairnfields approach. Survey ruined markers, choose between pillar ledges and predator country, and reach a causeway that could give the next caravan a better road. Information, tools and supplies from earlier legs help you tackle the final site.",
+    "feel": "Wind through stone pillars, hard-won bearings and a road you helped reopen.",
+    "number": 16,
+    "prepared_combats": 4,
+    "recommended_level": "2",
+    "gameplay": "Four prepared encounters across marker ruins, a wilderness crossing and a guarded causeway. Climbing gear, traps, route choices, rations and genuine rest decisions shape the expedition."
+  }
+]</script>
+  <script>
+    (() => {
+      'use strict';
+      const plans = JSON.parse(document.getElementById('campaign-data').textContent);
+      const byId = new Map(plans.map(plan => [plan.id, plan]));
+      const grid = document.getElementById('plans');
+      const dialog = document.getElementById('plan-dialog');
+      const search = document.getElementById('search');
+      const theme = document.getElementById('theme');
+      const character = document.getElementById('character');
+      const shortlistToggle = document.getElementById('shortlist-toggle');
+      const storageKey = 'severed-lands-player-guide-shortlist-v1';
+      const bookmark = '<svg viewBox="0 0 16 19" fill="none" aria-hidden="true"><path d="M3 2h10v15l-5-3-5 3V2Z" stroke="currentColor" stroke-width="1.4"/></svg>';
+      let format = 'all';
+      let shortlistOnly = false;
+      let activeId = null;
+      let originId = null;
+      let saved = new Set();
+      let storageAvailable = true;
+      try {
+        const previous = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        if (Array.isArray(previous)) saved = new Set(previous.filter(id => byId.has(id)));
+      } catch { storageAvailable = false; }
+
+      // Only deliberately authored player-facing copy enters the rendered report.
+      const escape = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+      const normalise = value => value.toLocaleLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[’']/g, '');
+      const scope = plan => plan.format === 'Combat scenario' ? `${plan.prepared_combats} prepared ${plan.prepared_combats === 1 ? 'combat' : 'combats'}` : plan.format === 'Flagship' ? 'Flagship · Six acts' : plan.format;
+      const saveButton = (id, prefix) => `<button type="button" class="save" data-save="${id}" id="${prefix}-save-${id}" aria-pressed="${saved.has(id)}" aria-label="${saved.has(id) ? 'Remove' : 'Save'} ${escape(byId.get(id).title)} ${saved.has(id) ? 'from' : 'to'} shortlist">${bookmark}<span>${saved.has(id) ? 'Saved' : 'Save'}</span></button>`;
+
+      [...new Set(plans.flatMap(plan => plan.themes))].sort().forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        theme.append(option);
+      });
+
+      // Filters combine; a surprise selection uses this same visible set.
+      function matchingPlans() {
+        const query = normalise(search.value.trim());
+        return plans.filter(plan =>
+          (format === 'all' || plan.format === format) &&
+          (theme.value === 'all' || plan.themes.includes(theme.value)) &&
+          (character.value === 'all' || plan.character_mode === character.value) &&
+          (!shortlistOnly || saved.has(plan.id)) &&
+          (!query || normalise([plan.title, plan.pitch, plan.line, plan.why, plan.experience, plan.gameplay, plan.feel, plan.protagonist || '', ...plan.themes].join(' ')).includes(query))
+        );
+      }
+
+      function render() {
+        const visible = matchingPlans();
+        grid.innerHTML = visible.map(plan => `<article class="plan ${plan.format === 'Flagship' ? 'flagship' : ''}" aria-labelledby="title-${plan.id}">
+          <div class="card-head"><span class="scope">${escape(scope(plan))}</span><span class="number" aria-hidden="true">${String(plan.number).padStart(2,'0')}</span></div>
+          <h3 id="title-${plan.id}">${escape(plan.title)}</h3>
+          <p class="pitch">${escape(plan.pitch)}</p>
+          <div class="why"><strong>Why play it</strong>${escape(plan.why)}</div>
+          <div class="gameplay"><strong>D&D play</strong>${escape(plan.gameplay)}</div>
+          <div class="tags" aria-label="Themes">${plan.themes.map(tag => `<span class="tag">${escape(tag)}</span>`).join('')}</div>
+          ${plan.character_mode === 'fixed' ? `<p class="character-label">Play as ${escape(plan.protagonist)}</p>` : ''}
+          <div class="card-actions"><button type="button" class="explore" data-open="${plan.id}" id="open-${plan.id}" aria-label="Explore ${escape(plan.title)}">Explore this Plan <span aria-hidden="true">↗</span></button>${saveButton(plan.id,'card')}</div>
+        </article>`).join('');
+        document.getElementById('result-count').textContent = `${visible.length} of ${plans.length} Plans`;
+        document.getElementById('saved-count').textContent = saved.size;
+        shortlistToggle.setAttribute('aria-pressed', String(shortlistOnly));
+        document.getElementById('empty').hidden = visible.length > 0;
+        const emptyShortlist = shortlistOnly && saved.size === 0;
+        document.getElementById('empty-title').textContent = emptyShortlist ? 'Your next story is still out there.' : 'No stories in this corner.';
+        document.getElementById('empty-message').textContent = emptyShortlist ? 'Save a Plan that catches your eye, then find it here.' : 'Try another mood or loosen a filter.';
+        document.getElementById('surprise').disabled = visible.length === 0;
+        document.getElementById('reset').hidden = format === 'all' && theme.value === 'all' && character.value === 'all' && !search.value && !shortlistOnly;
+        if (!storageAvailable) document.getElementById('storage-note').textContent = 'Save the ones that catch your eye. Your shortlist lasts while this guide is open.';
+        document.querySelectorAll('[data-format]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.format === format)));
+      }
+
+      function renderDetail(plan) {
+        document.getElementById('detail-scope').textContent = scope(plan);
+        const role = plan.role || 'Bring a compatible character of your own. You do not need to have played The Rift Awakening first; this is a separate adventure with its own beginning and conclusion.';
+        document.getElementById('detail-content').innerHTML = `
+          <p class="eyebrow">${escape(plan.themes.join(' · '))}</p>
+          <h2 id="detail-title">${escape(plan.title)}</h2>
+          <p class="lead">${escape(plan.line)}</p>
+          <div class="detail-block"><h3>What it’s about</h3><p>${escape(plan.experience)}</p></div>
+          <div class="detail-block detail-why"><h3>This could be your story if…</h3><p>${escape(plan.why)}</p></div>
+          <div class="detail-block"><h3>D&D at the table</h3><p>${escape(plan.gameplay)}</p>${plan.recommended_level ? `<p class="scope">Prepared for a solo level-${escape(plan.recommended_level)} character, with adjustments for the actual party.</p>` : ''}</div>
+          <div class="detail-block"><h3>Your role</h3><p>${escape(role)}</p></div>
+          <p class="feel">${escape(plan.feel)}</p>
+          <div class="detail-actions">${saveButton(plan.id,'detail')}<span class="scope">Spoiler-free introduction</span></div>`;
+      }
+
+      function showDetail(id, origin) {
+        const plan = byId.get(id);
+        if (!plan) return;
+        activeId = id;
+        originId = origin?.id || null;
+        renderDetail(plan);
+        dialog.showModal();
+        dialog.scrollTop = 0;
+        document.getElementById('close-dialog').focus();
+      }
+
+      function toggleSaved(id, button) {
+        if (!byId.has(id)) return;
+        saved.has(id) ? saved.delete(id) : saved.add(id);
+        try { localStorage.setItem(storageKey, JSON.stringify([...saved])); }
+        catch { storageAvailable = false; }
+        const focusId = button.id;
+        render();
+        if (dialog.open && activeId) renderDetail(byId.get(activeId));
+        const focusTarget = document.getElementById(focusId);
+        (focusTarget || shortlistToggle).focus({preventScroll:true});
+        document.getElementById('save-status').textContent = `${byId.get(id).title} ${saved.has(id) ? 'saved to' : 'removed from'} your shortlist.`;
+      }
+
+      function clearFilters() {
+        format = 'all'; theme.value = 'all'; character.value = 'all'; search.value = ''; shortlistOnly = false;
+        render();
+      }
+
+      document.addEventListener('click', event => {
+        const button = event.target.closest('button');
+        if (!button) return;
+        if (button.dataset.open) showDetail(button.dataset.open, button);
+        if (button.dataset.save) toggleSaved(button.dataset.save, button);
+        if (button.dataset.format) { format = button.dataset.format; render(); }
+      });
+      search.addEventListener('input', render);
+      theme.addEventListener('change', render);
+      character.addEventListener('change', render);
+      shortlistToggle.addEventListener('click', () => { shortlistOnly = !shortlistOnly; render(); });
+      document.getElementById('reset').addEventListener('click', () => { clearFilters(); search.focus(); });
+      document.getElementById('empty-reset').addEventListener('click', () => { clearFilters(); search.focus(); });
+      document.getElementById('surprise').addEventListener('click', event => {
+        const choices = matchingPlans();
+        if (choices.length) showDetail(choices[Math.floor(Math.random()*choices.length)].id, event.currentTarget);
+      });
+      document.getElementById('close-dialog').addEventListener('click', () => dialog.close());
+      dialog.addEventListener('click', event => {
+        if (event.target !== dialog) return;
+        const box = dialog.getBoundingClientRect();
+        if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) dialog.close();
+      });
+      dialog.addEventListener('close', () => {
+        (document.getElementById(originId) || document.getElementById('collection-title')).focus({preventScroll:true});
+        activeId = null;
+      });
+      render();
+    })();
+  </script>
+</body>
+</html>

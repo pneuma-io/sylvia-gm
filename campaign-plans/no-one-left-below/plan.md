@@ -1,0 +1,254 @@
+# No One Left Below
+
+> GM preparation: contains adventure spoilers.
+
+## Premise
+
+A salvage crew is trapped in a Hollows cellar. Open a way in, then bring them out before the district shifts.
+
+Tone: Tense rescue with room for mercy
+
+Two short encounters connected by decisions about survivors, loads and the escape route.
+
+## Character entry
+
+```json
+{
+  "custom_companions": {
+    "maximum": 2,
+    "minimum": 0
+  },
+  "player_character": {
+    "mode": "compatible"
+  },
+  "required_companions": []
+}
+```
+
+## Boundaries
+
+Apply the player’s selected content boundaries; offer a less intense presentation where needed.
+
+## Starting location
+
+```json
+{
+  "id": "the-hollows",
+  "path": "locations/the-hollows.md"
+}
+```
+
+## Opening direction
+
+Begin outside the collapsed cellar. Let the player hear the crew and see both the blocked stairs and narrow drain before committing to entry.
+
+## Starting facts and state
+
+```json
+{
+  "entities": [],
+  "facts": [
+    {
+      "fact": "The party stands at a collapsed Hollows shopfront. Three salvage workers are alive in the cellar below; a scraping creature guards the open stair.",
+      "id": "opening-1",
+      "known_by": [
+        "player"
+      ]
+    },
+    {
+      "fact": "A narrow drain reaches the same cellar. Violet shimmer has begun along the neighbouring walls, an early phasing warning. There is time for a considered approach, not an immediate unavoidable collapse.",
+      "id": "opening-2",
+      "known_by": [
+        "player"
+      ]
+    }
+  ],
+  "mechanics": [
+    {
+      "key": "state",
+      "namespace": "sylvia.srd-lite.bg3",
+      "value": {
+        "advancement": {
+          "allocation": "The Player Character and Companions start and remain at level 2. Story success, defeat, combat and optional jobs never award advancement. Grant only the adventure's actually earned money, possessions and narrative rewards. Any lower-level encounter-variant notes are authoring guidance for a separately revised Plan, not permission to override this declaration in play.",
+          "maximum_level": 2,
+          "method": "fixed",
+          "recipients": "whole_party",
+          "starting_level": 2,
+          "timing": "This edition stays at level 2 throughout its authored adventure and optional continuation. It awards no XP or level increases; changing that policy requires an explicitly revised Plan."
+        }
+      }
+    }
+  ]
+}
+```
+
+## Private truths and reveal conditions
+
+## In and out
+
+Reach the trapped workers and extract the people the party chooses to help.
+
+Character entry and scope. Recommended level 1–3; one player with zero to 2 optional companions. This is guidance, not an enforced level limit. The chosen character can accept the immediate invitation, negotiate terms or decline. Establish any needed local context openly without inventing prior player actions.
+
+Crew leader Anja Bale: protects her people and conceals a broken ankle to avoid being left. She will abandon the haul if asked plainly. Her lieutenant Ress wants the heavy coffer recovered because the crew borrowed money for this expedition.
+
+Dimi, the youngest worker: knows the drain route and admits it leads past a rat nest. They can guide someone small enough through; their value is information, not compulsory heroism.
+
+Entry. The stair descends fifteen feet to a storage landing. A solitary Tunnel Wretch scavenges the spilled food there. It understands an offered meal and retreats if given room. A short fight, distraction or crawl through the drain reaches the crew. Its presence is visible before engagement.
+
+The load. In the cellar, Anja’s ankle makes fast walking impossible without help. Ress’s coffer is a two-person burden containing ordinary recovered tools and saleable plates, not a world-changing relic. A canvas sheet can become a drag sling. Dimi’s route knowledge is freely shared once the player asks how to leave.
+
+Changed route. The first serious groan shifts a slab across the stairs but does not crush anyone without warning. A leverage solution can reopen them with a risky delay; the drain remains an alternative. Explain that carrying the coffer makes the drain difficult. If the player secured the stair during entry, reward it with a usable exit and let the rat encounter be bypassed.
+
+Extraction. Rats defending the drain’s food cache can be distracted with rations, driven away or fought. They pursue food only to the drain mouth. Mark a final phasing warning after a substantial delay, then give the player a clear last withdrawal choice. Resolve the warning as established fiction, not a secret number of chat messages.
+
+Aftermath. The crew’s sponsor pays 20 gp for the recovered people. Recovering tools can cover the crew’s debt; leaving them costs income, not the right to survive. Anja and Ress can argue about that cost in the closing scene while acknowledging the rescuer’s choices.
+
+### Objectives
+
+objective-1
+
+### Approaches and branches
+
+Secure the stairs on entry to preserve the more comfortable exit.
+
+Use the drain and sacrifice cargo for a faster extraction.
+
+Trade food to the creatures and concentrate on carrying the injured worker; both fights can be avoided.
+
+### Consequences
+
+A saved rope, propped door or negotiated creature changes the exit. Preserve those advantages.
+
+Record the rescued workers by name and what cargo survived. A companion does not vanish because the player chose a different route.
+
+All linked objective conditions are required, including the named closing event. Carry optional promises forward; they neither replace nor extend this ending.
+
+### Prepared encounters
+
+Encounter one: a weakened Tunnel Wretch, AC 11, HP 8, speed 25 ft, initiative +1, claws +3 for 1d4+1 slashing, one attack. It retreats from injury or accepts food. Use the Setting creature as the fictional reference and disclose this weaker scavenger adaptation.
+
+Encounter two: two Rift-touched cellar rats, each AC 11, HP 3, speed 20 ft, initiative +1, bite +2 for 1 piercing, no disease or added powers. They protect a food heap; opening another food source diverts them. For a larger or stronger party, adjust opposition before engagement without multiplying the two prepared encounters. Use actual encounter, attack and damage tools.
+
+### Encounter adjudication
+
+Read the selected party before committing opposition. The written encounter is a suggested baseline, not automatic level scaling. Resolve checks, attacks, damage, resources and combat turns through the admitted D&D SRD Ruleset; narrate only committed results. Preserve negotiation, surrender, retreat and established positions.
+
+### Setting sources
+
+locations/the-hollows.md
+
+factions/hollows-crews.md
+
+content/monsters/tunnel-wretch.md
+
+content/monsters/rifthollowed-rat.md
+
+## Campaign objectives
+
+```json
+{
+  "completion_conditions": [
+    "The rescue attempt has ended: Anja, Ress and Dimi have reached a stable street, or the party has withdrawn there with each worker identified as rescued, still below or lost according to what was actually observed. Do not invent the fate of someone left unseen.",
+    "Record whether the coffer and tools reached the street or were left below, together with Anja's injury and the real condition of the other workers.",
+    "Closing event: the crew sponsor receives the headcount and report on stable ground, responds to the recovered people or failed rescue, and settles the payment actually earned. The surviving crew states whether it is leaving the haul; another retrieval is optional."
+  ],
+  "description": "Reach the trapped workers and extract the people the party chooses to help.",
+  "id": "objective-1",
+  "title": "In and out"
+}
+```
+
+## Intended ending or ongoing final act
+
+```json
+{
+  "mode": "finite",
+  "outcomes": [
+    {
+      "after_story": null,
+      "conditions": [
+        "The rescue attempt has ended: Anja, Ress and Dimi have reached a stable street, or the party has withdrawn there with each worker identified as rescued, still below or lost according to what was actually observed. Do not invent the fate of someone left unseen.",
+        "Record whether the coffer and tools reached the street or were left below, together with Anja's injury and the real condition of the other workers.",
+        "Closing event: the crew sponsor receives the headcount and report on stable ground, responds to the recovered people or failed rescue, and settles the payment actually earned. The surviving crew states whether it is leaving the haul; another retrieval is optional."
+      ],
+      "id": "adventure-settled",
+      "immediate_aftermath": [
+        "Closing event: the crew sponsor receives the headcount and report on stable ground, responds to the recovered people or failed rescue, and settles the payment actually earned. The surviving crew states whether it is leaving the haul; another retrieval is optional."
+      ],
+      "open_world": true,
+      "outcome": "This adventure has reached its authored closing event with the actual successes or losses acknowledged. Its earned result and continuing consequences remain true."
+    }
+  ]
+}
+```
+
+## GM guidance
+
+Use this Plan as private preparation within Severed Lands. Ground play in the accepted party and starting facts. The named new people and incidents belong to this adventure; existing Setting facts and earned consequences remain authoritative. Give the player concrete information for a first decision, follow their chosen approach, and keep private answers concealed until discovered.
+
+Make the named main problem and its leads accessible. Read the current act and all linked objective conditions before framing its main quest and reassess when a required result occurs. All listed conditions and the closing event are required; explicit alternatives satisfy only their own condition. Optional scenes can be deferred without adding gates. A completed side job does not replace the main story. Do not fabricate success or mark unplayed later acts complete after an early departure.
+
+Objectives express opportunities, not mandatory conduct. A refusal, changed allegiance or early discovery can change the route or end the job. Carry forward established consequences instead of restoring a preferred plot.
+
+Read this preparation and its relevant Setting sources. Keep a concise record of named promises, discovered evidence, lost resources and NPC attitudes. The preparation contains the core answer and resolutions; incidental dialogue and connective description remain the GM’s work.
+
+Conclude after the bounded problem and immediate aftermath are resolved. Offer a short epilogue choice; begin a further adventure only if the player asks to continue.
+
+## Completion and aftermath
+
+The rescue attempt has ended: Anja, Ress and Dimi have reached a stable street, or the party has withdrawn there with each worker identified as rescued, still below or lost according to what was actually observed. Do not invent the fate of someone left unseen.
+
+Record whether the coffer and tools reached the street or were left below, together with Anja's injury and the real condition of the other workers.
+
+Closing event: the crew sponsor receives the headcount and report on stable ground, responds to the recovered people or failed rescue, and settles the payment actually earned. The surviving crew states whether it is leaving the haul; another retrieval is optional.
+
+## Failure and withdrawal
+
+Use the explicit failed-attempt outcome and closing report in the current objective. An intention to withdraw, an unrelated side task or delegation alone does not satisfy it. An early departure leaves unplayed later objectives unfinished.
+
+Resolve defeat, unconsciousness, death and recovery under the selected Ruleset and agreed boundaries; no scripted rescue cancels committed results.
+
+## Optional continuation
+
+Only after resolving this adventure, ask whether the player wants to pursue a surviving relationship or optional lead. The ending does not depend on accepting.
+
+## Side opportunities
+
+## Mechanics requiring GM adjudication
+
+The Plan does not implement new engine procedures. Its fictional deadlines, NPC attitudes, narrative projects and noncombat outcomes are GM adjudication; use existing Ruleset tools for encoded uncertainty and committed mechanical results.
+
+Phasing warnings, carrying arrangements and passage clearing are GM adjudication using relevant checks, not a simulated building-collapse system.
+
+## Referenced Setting files
+
+```json
+{
+  "creatures": [
+    {
+      "id": "tunnel-wretch",
+      "path": "content/monsters/tunnel-wretch.md"
+    },
+    {
+      "id": "rifthollowed-rat",
+      "path": "content/monsters/rifthollowed-rat.md"
+    }
+  ],
+  "factions": [
+    {
+      "id": "hollows-crews",
+      "path": "factions/hollows-crews.md"
+    }
+  ],
+  "items": [],
+  "locations": [
+    {
+      "id": "the-hollows",
+      "path": "locations/the-hollows.md"
+    }
+  ],
+  "lore": [],
+  "npcs": []
+}
+```

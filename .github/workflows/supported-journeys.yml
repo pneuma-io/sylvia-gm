@@ -1,0 +1,228 @@
+name: Supported journeys
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      qualification:
+        description: 'Affected checks, full combined-candidate qualification, or runner comparison'
+        type: choice
+        options: [affected, full, benchmark, browser]
+        default: full
+      post_launch_ci_budget:
+        description: 'Explicit future post-launch full mode: 1800-second deterministic budget'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  selection:
+    name: Explain required checks
+    runs-on: windows-latest
+    outputs:
+      native: ${{ steps.select.outputs.native }}
+      ui: ${{ steps.select.outputs.ui }}
+      mode: ${{ steps.select.outputs.mode }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Record source, diff and reasons
+        id: select
+        shell: pwsh
+        run: |
+          $mode = @()
+          if ('${{ github.event_name }}' -eq 'workflow_dispatch' -and '${{ inputs.qualification }}' -eq 'full') { $mode = @('--full') }
+          python scripts/select_checks.py @mode --output "$env:RUNNER_TEMP/selection.json"
+          exit $LASTEXITCODE
+      - uses: actions/upload-artifact@v7
+        with:
+          name: check-selection-${{ github.run_id }}
+          path: ${{ runner.temp }}/selection.json
+          if-no-files-found: error
+          retention-days: 14
+
+  deterministic-journeys:
+    name: ${{ needs.selection.outputs.mode == 'full' && 'Full combined-candidate deterministic qualification' || 'Affected PR checks' }}
+    needs: selection
+    if: inputs.qualification != 'benchmark' && inputs.qualification != 'browser'
+    runs-on: windows-latest
+    env:
+      PYTHONUTF8: '1'
+      SYLVIA_RETAIN_SUCCESSFUL_FIXTURES: '0'
+    steps:
+      - name: Record job timing
+        shell: pwsh
+        run: '"JOURNEY_JOB_STARTED=$([DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds())" >> $env:GITHUB_ENV'
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/download-artifact@v7
+        with:
+          name: check-selection-${{ github.run_id }}
+          path: ${{ runner.temp }}/selection
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          python-version: '3.11'
+          version: '0.12.19'
+      - uses: actions/setup-node@v7
+        if: needs.selection.outputs.ui == 'true'
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Install locked test dependencies
+        run: uv sync --locked --all-extras --dev
+      - name: Install locked browser-test dependency
+        if: needs.selection.outputs.ui == 'true'
+        run: npm ci --prefix tests --ignore-scripts
+      - name: Check touched document links
+        run: python scripts/check_document_links.py --selection-manifest "${{ runner.temp }}/selection/selection.json"
+      - name: Run selected checks with live case progress
+        shell: pwsh
+        run: |
+          $capacity = Get-CimInstance Win32_OperatingSystem
+          @{ logical_cpus = [Environment]::ProcessorCount; memory_bytes = [long]$capacity.TotalVisibleMemorySize * 1024; free_memory_bytes = [long]$capacity.FreePhysicalMemory * 1024; runner = $env:RUNNER_NAME } | ConvertTo-Json | Tee-Object -FilePath "$env:RUNNER_TEMP/runner-capacity.json"
+          "JOURNEY_TEST_STARTED=$([DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds())" >> $env:GITHUB_ENV
+          $env:SYLVIA_EXPECTED_REVISION = "${{ github.sha }}"
+          $budget = @()
+          if ('${{ github.event_name }}' -eq 'workflow_dispatch' -and '${{ inputs.qualification }}' -eq 'full' -and '${{ inputs.post_launch_ci_budget }}' -eq 'true') { $budget = @('--ci') }
+          .venv/Scripts/python.exe scripts/check_supported_journeys.py @budget --selection-manifest "$env:RUNNER_TEMP/selection/selection.json" --jobs 2 --case-workers 1 --scheduler case --output-dir "$env:RUNNER_TEMP/supported-journeys" 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP/supported-journeys-runner.log"
+          $testExit = $LASTEXITCODE
+          "JOURNEY_TEST_FINISHED=$([DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds())" >> $env:GITHUB_ENV
+          "JOURNEY_TEST_EXIT=$testExit" >> $env:GITHUB_ENV
+          exit $testExit
+      - name: Stage compact diagnostics even after an early exception
+        if: always()
+        shell: pwsh
+        run: |
+          $raw = Join-Path $env:RUNNER_TEMP 'supported-journeys'
+          $retained = Join-Path $env:RUNNER_TEMP 'retained-diagnostics'
+          $testExit = 1
+          if ($env:JOURNEY_TEST_EXIT) { $testExit = [int]$env:JOURNEY_TEST_EXIT }
+          python scripts/stage_journey_diagnostics.py --raw $raw --destination $retained --runner-log "$env:RUNNER_TEMP/supported-journeys-runner.log" --exit-code $testExit
+          $stageExit = $LASTEXITCODE
+          if (-not (Test-Path -LiteralPath "$retained/summary.json")) {
+            New-Item -ItemType Directory -Path $retained -Force | Out-Null
+            @{ status = 'incomplete'; passed = $false; complete_gate = $false; reason = 'Diagnostic staging or runner setup failed'; runner_exit_code = $testExit } | ConvertTo-Json | Set-Content -LiteralPath "$retained/summary.json"
+          }
+          Copy-Item -LiteralPath "$env:RUNNER_TEMP/selection/selection.json" -Destination "$retained/selection.json" -ErrorAction Continue
+          if (Test-Path -LiteralPath "$env:RUNNER_TEMP/runner-capacity.json") { Copy-Item -LiteralPath "$env:RUNNER_TEMP/runner-capacity.json" -Destination "$retained/runner-capacity.json" }
+          python scripts/stage_journey_diagnostics.py --refresh --destination $retained
+          if ($LASTEXITCODE) { $stageExit = $LASTEXITCODE }
+          "JOURNEY_UPLOAD_STARTED=$([DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds())" >> $env:GITHUB_ENV
+          exit $stageExit
+      - name: Retain compact synthetic diagnostics
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: supported-journeys-${{ github.sha }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/retained-diagnostics/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Report setup, test and upload timing separately
+        if: always()
+        shell: pwsh
+        run: |
+          $finished = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+          if ($env:JOURNEY_TEST_STARTED) { "Setup/dependencies: $([math]::Round(([long]$env:JOURNEY_TEST_STARTED - [long]$env:JOURNEY_JOB_STARTED) / 1000, 1)) seconds" >> $env:GITHUB_STEP_SUMMARY }
+          if ($env:JOURNEY_TEST_FINISHED) { "Collection and test wall time: $([math]::Round(([long]$env:JOURNEY_TEST_FINISHED - [long]$env:JOURNEY_TEST_STARTED) / 1000, 1)) seconds" >> $env:GITHUB_STEP_SUMMARY }
+          if ($env:JOURNEY_UPLOAD_STARTED) { "Artifact upload: $([math]::Round(($finished - [long]$env:JOURNEY_UPLOAD_STARTED) / 1000, 1)) seconds" >> $env:GITHUB_STEP_SUMMARY }
+          "Total job through diagnostics: $([math]::Round(($finished - [long]$env:JOURNEY_JOB_STARTED) / 1000, 1)) seconds" >> $env:GITHUB_STEP_SUMMARY
+
+  rust-tests:
+    name: Windows Rust tests (affected native or full qualification)
+    needs: selection
+    if: needs.selection.outputs.native == 'true' && inputs.qualification != 'benchmark' && inputs.qualification != 'browser'
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          python-version: '3.11'
+          version: '0.12.19'
+      - name: Install locked build dependencies
+        run: uv sync --locked --all-extras --dev
+      - name: Build declared owner sidecar for compile-time resources
+        run: uv run --locked --all-extras python src-tauri/scripts/build_owner_sidecar.py
+      - name: Compile all Rust targets and run their tests
+        run: cargo test --locked --all-targets --manifest-path src-tauri/Cargo.toml
+
+  runner-comparison:
+    name: Representative runner comparison (not release acceptance)
+    needs: selection
+    if: inputs.qualification == 'benchmark'
+    runs-on: windows-latest
+    env:
+      PYTHONUTF8: '1'
+      SYLVIA_RETAIN_SUCCESSFUL_FIXTURES: '0'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          python-version: '3.11'
+          version: '0.12.19'
+      - run: uv sync --locked --all-extras --dev
+      - name: Compare identical workload with one/two workers and fixture affinity
+        shell: pwsh
+        run: |
+          $capacity = Get-CimInstance Win32_OperatingSystem
+          @{ logical_cpus = [Environment]::ProcessorCount; memory_bytes = [long]$capacity.TotalVisibleMemorySize * 1024; free_memory_bytes = [long]$capacity.FreePhysicalMemory * 1024; runner = $env:RUNNER_NAME } | ConvertTo-Json | Set-Content -LiteralPath "$env:RUNNER_TEMP/runner-capacity.json"
+          .venv/Scripts/python.exe scripts/benchmark_journeys.py --output-dir "$env:RUNNER_TEMP/comparison"
+          exit $LASTEXITCODE
+      - name: Stage comparison diagnostics
+        if: always()
+        shell: pwsh
+        run: |
+          $root = Join-Path $env:RUNNER_TEMP 'comparison'
+          $stage = Join-Path $env:RUNNER_TEMP 'comparison-retained'
+          New-Item -ItemType Directory -Path $stage | Out-Null
+          Copy-Item -LiteralPath "$env:RUNNER_TEMP/runner-capacity.json" -Destination "$stage/runner-capacity.json" -ErrorAction Continue
+          Get-ChildItem -LiteralPath $root -File -Filter '*.json' | Copy-Item -Destination $stage
+          Get-ChildItem -LiteralPath $root -Directory | ForEach-Object {
+            python scripts/stage_journey_diagnostics.py --raw $_.FullName --destination (Join-Path $stage $_.Name)
+            if ($LASTEXITCODE) { throw 'Comparison diagnostic staging failed' }
+          }
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: runner-comparison-${{ github.run_id }}
+          path: ${{ runner.temp }}/comparison-retained/
+          if-no-files-found: error
+          retention-days: 14
+
+  isolated-browser-comparison:
+    name: Browser controls without heavy Python contention
+    needs: selection
+    if: inputs.qualification == 'benchmark' || inputs.qualification == 'browser'
+    runs-on: windows-latest
+    env:
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          python-version: '3.11'
+          version: '0.12.19'
+      - name: Install the saved-choice fixture's locked Python dependencies
+        run: uv sync --locked --all-extras --dev
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - run: npm ci --prefix tests --ignore-scripts
+      - name: Run unchanged browser and JavaScript assertions
+        shell: pwsh
+        run: |
+          $ui = python -c "from scripts.check_supported_journeys import UI_JOURNEY; print('\n'.join(UI_JOURNEY))"
+          $env:SYLVIA_TEST_PYTHON = Join-Path $env:GITHUB_WORKSPACE '.venv/Scripts/python.exe'
+          node --test --test-concurrency=2 --test-reporter=tap @ui 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP/ui-controls.log"
+          exit $LASTEXITCODE
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: isolated-browser-comparison-${{ github.run_id }}
+          path: ${{ runner.temp }}/ui-controls.log
+          if-no-files-found: error
+          retention-days: 14

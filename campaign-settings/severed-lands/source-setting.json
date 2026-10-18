@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "name": "Severed Lands",
+    "slug": "severed-lands",
+    "version": "1.0.0",
+    "extends": "srd-5.1",
+    "description": "A fractured realm cut off from its origin by the Rift — a cascading dimensional wound. Riftborn survivors, dying Anchor Doors, and a world where geography itself bends.",
+    "authors": ["Pneuma IO"],
+    "license": "MIT AND CC-BY-4.0",
+    "license_notice": "ATTRIBUTION.md"
+  },
+  "rules_mods": {
+    "classes_add": [],
+    "classes_modify": [],
+    "subclasses_add": [
+      "barbarian-path-of-the-rift-touched",
+      "bard-college-of-echoes",
+      "cleric-anchor-domain",
+      "druid-circle-of-the-riftwild",
+      "fighter-warden-knight",
+      "monk-way-of-the-veil",
+      "paladin-oath-of-remembrance",
+      "ranger-riftstalker",
+      "rogue-hollowblade",
+      "sorcerer-riftblood",
+      "warlock-the-deep-rift",
+      "wizard-school-of-warden-studies"
+    ],
+    "variant_rules": [
+      "rift-touched-condition",
+      "rift-surge-environmental-effects",
+      "phase-step-movement"
+    ]
+  }
+}

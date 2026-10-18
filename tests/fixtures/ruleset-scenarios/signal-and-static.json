@@ -1,0 +1,42 @@
+{
+  "format": 1,
+  "scenarios": [{
+    "id": "intrusion-cost-and-recovery",
+    "description": "Resolve an intrusion, apply its cost, and clear interference with a program.",
+    "covers": ["resolve_intrusion", "apply_operation_cost", "run_program"],
+    "initial_state": [{"key": "state", "value": {
+      "stress": 0, "wounds": 0, "resources": {"charge": 5},
+      "conditions": {"interference": false}, "advancement": {"intrusion": 0},
+      "last_check": {"skill": null, "total": 0, "outcome": null},
+      "last_program": {"name": null, "result": 0}
+    }}],
+    "participants": [],
+    "rolls": [{"sides": 6, "value": 4}, {"sides": 6, "value": 3}],
+    "steps": [{
+      "kind": "gm_turn",
+      "message": "Resolve the intrusion, apply its cost and run the recovery program.",
+      "replies": [
+        {"kind": "tool", "tool": "resolve_intrusion", "arguments": {"skill": "invented", "pressure": 6}},
+        {"kind": "tool", "tool": "resolve_intrusion", "arguments": {"skill": "intrusion", "pressure": 6}},
+        {"kind": "tool", "tool": "apply_operation_cost", "arguments": {"stress": -1, "wounds": 1, "charge_spent": 2, "progress": 3}},
+        {"kind": "tool", "tool": "apply_operation_cost", "arguments": {"stress": 2, "wounds": 1, "charge_spent": 2, "progress": 3}},
+        {"kind": "tool", "tool": "run_program", "arguments": {"program": "invented", "amount": 2}},
+        {"kind": "tool", "tool": "run_program", "arguments": {"program": "ghost_route", "amount": 2}},
+        {"kind": "narration", "text": "The intrusion succeeds and the recovery program clears interference."}
+      ],
+      "expect": [
+        {"subject": "tool_results", "path": [0, "result", "status"], "equals": "rejected"},
+        {"subject": "tool_results", "path": [2, "result", "status"], "equals": "rejected"},
+        {"subject": "tool_results", "path": [4, "result", "status"], "equals": "rejected"},
+        {"subject": "state", "path": ["sylvia-gm.conformance.signal-static.state", "last_check", "total"], "equals": 7},
+        {"subject": "state", "path": ["sylvia-gm.conformance.signal-static.state", "last_check", "outcome"], "equals": "clear"},
+        {"subject": "state", "path": ["sylvia-gm.conformance.signal-static.state", "stress"], "equals": 2},
+        {"subject": "state", "path": ["sylvia-gm.conformance.signal-static.state", "wounds"], "equals": 1},
+        {"subject": "state", "path": ["sylvia-gm.conformance.signal-static.state", "resources", "charge"], "equals": 0},
+        {"subject": "state", "path": ["sylvia-gm.conformance.signal-static.state", "advancement", "intrusion"], "equals": 3},
+        {"subject": "state", "path": ["sylvia-gm.conformance.signal-static.state", "conditions", "interference"], "equals": false},
+        {"subject": "state", "path": ["sylvia-gm.conformance.signal-static.state", "last_program", "result"], "equals": 2}
+      ]
+    }]
+  }]
+}

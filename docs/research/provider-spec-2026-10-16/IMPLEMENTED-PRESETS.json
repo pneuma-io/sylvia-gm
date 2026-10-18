@@ -1,0 +1,257 @@
+{
+  "chatgpt_subscription": {
+    "name": "ChatGPT subscription",
+    "mode": "subscription",
+    "base_url": "https://chatgpt.com",
+    "credential_required": false,
+    "endpoint_editable": false,
+    "default_transport": "codex_app_server",
+    "setup_hint": "Sign in from Accounts using the installed Codex runtime.",
+    "setup_url": "https://developers.openai.com/codex/auth"
+  },
+  "lm_studio": {
+    "name": "LM Studio",
+    "mode": "local",
+    "base_url": "http://127.0.0.1:1234/v1",
+    "credential_required": false,
+    "endpoint_editable": true,
+    "default_transport": "chat_completions",
+    "launch_hint": "Start the LM Studio local server, then detect or find models.",
+    "setup_hint": "Load a model in LM Studio, then start its server from the Developer tab.",
+    "setup_url": "https://lmstudio.ai/docs/developer/core/server"
+  },
+  "ollama": {
+    "name": "Ollama",
+    "mode": "local",
+    "base_url": "http://127.0.0.1:11434/v1",
+    "credential_required": false,
+    "endpoint_editable": true,
+    "default_transport": "chat_completions",
+    "launch_hint": "Start Ollama before connecting. Sylvia GM does not launch it.",
+    "setup_hint": "Start Ollama with a downloaded model. Use your server's address and context setting.",
+    "setup_url": "https://docs.ollama.com/api/openai-compatibility"
+  },
+  "llama_cpp": {
+    "name": "llama.cpp server",
+    "mode": "local",
+    "base_url": "http://127.0.0.1:9931/v1",
+    "credential_required": false,
+    "endpoint_editable": true,
+    "default_transport": "chat_completions",
+    "launch_hint": "Start llama-server with an appropriate chat template and tool support.",
+    "setup_hint": "Start llama-server with your model and a tool-capable chat template. Match its port below.",
+    "setup_url": "https://github.com/ggml-org/llama.cpp/tree/master/tools/server"
+  },
+  "vllm": {
+    "name": "vLLM",
+    "mode": "local",
+    "base_url": "http://127.0.0.1:8000/v1",
+    "credential_required": false,
+    "endpoint_editable": true,
+    "default_transport": "chat_completions",
+    "launch_hint": "Start the vLLM OpenAI-compatible server before connecting.",
+    "setup_hint": "Start vLLM with a chat model and tool-call parser. Enter its key only if authentication is enabled.",
+    "setup_url": "https://docs.vllm.ai/en/latest/serving/online_serving/openai_compatible_server/"
+  },
+  "localai": {
+    "name": "LocalAI",
+    "mode": "local",
+    "base_url": "http://127.0.0.1:8080/v1",
+    "credential_required": false,
+    "endpoint_editable": true,
+    "default_transport": "chat_completions",
+    "launch_hint": "Start LocalAI before connecting. The port is editable.",
+    "setup_hint": "Start LocalAI with a chat model. Match its address and enter a key if your server requires one.",
+    "setup_url": "https://localai.io/docs/getting-started/"
+  },
+  "opencode_go": {
+    "name": "OpenCode Go",
+    "mode": "byok",
+    "base_url": "https://opencode.ai/inference/go/v1",
+    "credential_required": true,
+    "endpoint_editable": false,
+    "default_transport": "chat_completions",
+    "setup_hint": "Use the key from your OpenCode Go workspace. Model access depends on your Go plan.",
+    "setup_url": "https://opencode.ai/docs/go/"
+  },
+  "opencode_zen": {
+    "name": "OpenCode Zen",
+    "mode": "byok",
+    "base_url": "https://opencode.ai/inference/v1",
+    "credential_required": true,
+    "endpoint_editable": false,
+    "default_transport": "chat_completions",
+    "setup_hint": "Copy your OpenCode Zen API key from its workspace, then find models.",
+    "setup_url": "https://opencode.ai/docs/zen/"
+  },
+  "openrouter": {
+    "name": "OpenRouter",
+    "mode": "byok",
+    "base_url": "https://openrouter.ai/api/v1",
+    "credential_required": true,
+    "endpoint_editable": false,
+    "default_transport": "chat_completions",
+    "setup_hint": "Use an OpenRouter API key. Model limits come from OpenRouter's own catalogue.",
+    "setup_url": "https://openrouter.ai/settings/keys"
+  },
+  "featherless": {
+    "name": "Featherless",
+    "mode": "byok",
+    "base_url": "https://api.featherless.ai/v1",
+    "credential_required": true,
+    "endpoint_editable": false,
+    "default_transport": "chat_completions",
+    "setup_hint": "Copy a key from your Featherless dashboard. Your plan may allow less context than the model maximum.",
+    "setup_url": "https://featherless.ai/docs/quickstart-guide"
+  },
+  "openai": {
+    "name": "OpenAI API",
+    "mode": "byok",
+    "base_url": "https://api.openai.com/v1",
+    "credential_required": true,
+    "endpoint_editable": false,
+    "default_transport": "responses",
+    "setup_hint": "Create an OpenAI API key in your project. ChatGPT sign-in is available separately under Accounts.",
+    "setup_url": "https://platform.openai.com/api-keys"
+  },
+  "groq": {
+    "name": "Groq",
+    "mode": "byok",
+    "base_url": "https://api.groq.com/openai/v1",
+    "credential_required": true,
+    "endpoint_editable": false,
+    "default_transport": "chat_completions",
+    "setup_hint": "Create a GroqCloud API key, then choose a chat model available to your project.",
+    "setup_url": "https://console.groq.com/keys"
+  },
+  "together": {
+    "name": "Together AI",
+    "mode": "byok",
+    "base_url": "https://api.together.ai/v1",
+    "credential_required": true,
+    "endpoint_editable": false,
+    "default_transport": "chat_completions",
+    "setup_hint": "Create an API key in your Together project. Select the full provider/model identifier.",
+    "setup_url": "https://api.together.ai/settings/projects/~current/api-keys"
+  },
+  "deepseek": {
+    "name": "DeepSeek API",
+    "mode": "byok",
+    "base_url": "https://api.deepseek.com",
+    "credential_required": true,
+    "endpoint_editable": false,
+    "default_transport": "chat_completions",
+    "setup_hint": "Use a DeepSeek platform API key. Your DeepSeek chat sign-in is not an API key.",
+    "setup_url": "https://api-docs.deepseek.com/quick_start"
+  },
+  "anthropic": {
+    "name": "Anthropic",
+    "mode": "byok",
+    "base_url": "https://api.anthropic.com/v1",
+    "credential_required": true,
+    "endpoint_editable": false,
+    "default_transport": "anthropic_messages",
+    "setup_hint": "Use a Claude API key from Claude Console. Claude subscription sign-in is separate.",
+    "setup_url": "https://platform.claude.com/docs/en/api/overview"
+  },
+  "gemini": {
+    "name": "Google Gemini",
+    "mode": "byok",
+    "base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
+    "credential_required": true,
+    "endpoint_editable": false,
+    "default_transport": "chat_completions",
+    "setup_hint": "Use a Gemini API key from Google AI Studio. Select a model that supports tools.",
+    "setup_url": "https://ai.google.dev/gemini-api/docs/openai"
+  },
+  "xai": {
+    "name": "xAI",
+    "mode": "byok",
+    "base_url": "https://api.x.ai/v1",
+    "credential_required": true,
+    "endpoint_editable": false,
+    "default_transport": "responses",
+    "setup_hint": "Use an xAI API key from your team. Grok app subscriptions are separate.",
+    "setup_url": "https://docs.x.ai/developers/quickstart"
+  },
+  "mistral": {
+    "name": "Mistral",
+    "mode": "byok",
+    "base_url": "https://api.mistral.ai/v1",
+    "credential_required": true,
+    "endpoint_editable": true,
+    "default_transport": "chat_completions",
+    "setup_hint": "Use a Mistral API key and the endpoint assigned to your workspace.",
+    "setup_url": "https://docs.mistral.ai/getting-started/quickstart"
+  },
+  "minimax": {
+    "name": "MiniMax",
+    "mode": "byok",
+    "base_url": "https://api.minimax.io/anthropic/v1",
+    "credential_required": true,
+    "endpoint_editable": false,
+    "default_transport": "anthropic_messages",
+    "setup_hint": "Use a MiniMax platform API key. Enter the documented model ID if discovery is unavailable.",
+    "setup_url": "https://platform.minimax.io/docs/api-reference/text-anthropic-api"
+  },
+  "moonshot": {
+    "name": "Kimi / Moonshot",
+    "mode": "byok",
+    "base_url": "https://api.moonshot.ai/v1",
+    "credential_required": true,
+    "endpoint_editable": false,
+    "default_transport": "chat_completions",
+    "setup_hint": "Use a Moonshot platform API key. This uses the ordinary API, not Kimi Code.",
+    "setup_url": "https://platform.kimi.ai/docs/guide/start-using-kimi-api"
+  },
+  "zai": {
+    "name": "Z.AI",
+    "mode": "byok",
+    "base_url": "https://api.z.ai/api/paas/v4",
+    "credential_required": true,
+    "endpoint_editable": false,
+    "default_transport": "chat_completions",
+    "setup_hint": "Use a Z.AI API key for the standard API. Coding Plan keys use a separate service.",
+    "setup_url": "https://docs.z.ai/guides/overview/quick-start"
+  },
+  "alibaba": {
+    "name": "Alibaba Model Studio",
+    "mode": "byok",
+    "base_url": "https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
+    "credential_required": true,
+    "endpoint_editable": true,
+    "default_transport": "chat_completions",
+    "setup_hint": "Match the API endpoint to your key's region and workspace. Singapore is shown by default.",
+    "setup_url": "https://www.alibabacloud.com/help/en/model-studio/base-url"
+  },
+  "fireworks": {
+    "name": "Fireworks AI",
+    "mode": "byok",
+    "base_url": "https://api.fireworks.ai/inference/v1",
+    "credential_required": true,
+    "endpoint_editable": false,
+    "default_transport": "chat_completions",
+    "setup_hint": "Use a Fireworks API key and the full model or deployment identifier.",
+    "setup_url": "https://docs.fireworks.ai/tools-sdks/openai-compatibility"
+  },
+  "cerebras": {
+    "name": "Cerebras",
+    "mode": "byok",
+    "base_url": "https://api.cerebras.ai/v1",
+    "credential_required": true,
+    "endpoint_editable": false,
+    "default_transport": "chat_completions",
+    "setup_hint": "Use a Cerebras Inference API key and select an available tool-capable model.",
+    "setup_url": "https://inference-docs.cerebras.ai/resources/openai"
+  },
+  "custom": {
+    "name": "Custom OpenAI-Compatible",
+    "mode": "custom",
+    "base_url": "",
+    "credential_required": false,
+    "endpoint_editable": true,
+    "default_transport": "chat_completions",
+    "launch_hint": "Enter the exact API base URL for an already-running endpoint.",
+    "setup_hint": "Enter your service's API base URL and any required key. Unknown model limits can be entered under Advanced."
+  }
+}

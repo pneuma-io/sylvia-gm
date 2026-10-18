@@ -1,0 +1,8 @@
+{
+  "name": "sylvia-gm-browser-tests",
+  "private": true,
+  "description": "Locked browser dependency for the supported-journey UI checks.",
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "id": "sylvia-gm.conformance.signal-setting",
+  "version": "0.1.0",
+  "role": "dependency",
+  "metadata": {
+    "label": "Signal and Static Conformance Setting"
+  },
+  "provenance": {
+    "publisher": "sylvia-gm-conformance",
+    "source_sha256": "4444444444444444444444444444444444444444444444444444444444444444"
+  },
+  "compatibility": {
+    "host_contract": 1,
+    "runtime_format": 1,
+    "requires": []
+  },
+  "minimum_model_capability_tier": "sylvia.capability.t02",
+  "dependencies": [],
+  "capabilities": [
+    "signal-static.setting"
+  ],
+  "tools": [],
+  "prompt_fragments": [],
+  "ui_surfaces": [],
+  "participant_artifacts": [],
+  "content_declarations": "content/content-declarations.json"
+}

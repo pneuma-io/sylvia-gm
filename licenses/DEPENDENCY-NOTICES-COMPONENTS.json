@@ -1,0 +1,2490 @@
+{
+  "schema": 1,
+  "notice_path": "dependency-notices.txt",
+  "notice_sha256": "8da903a977ca567b8f9277f5ef6b95afc97b1de00cf83134adf3b864fe766110",
+  "notice_bytes": 406444,
+  "preserved_prefix": {
+    "bytes": 35127,
+    "sha256": "fe412ad5a1768e161a2772905419202e71478abaffbcb6213c429006fa4e61de",
+    "scope": "Accepted bounded Candidate21 document, unchanged."
+  },
+  "component_rows": 92,
+  "original_legal_and_header_references": 175,
+  "distinct_appended_byte_sequences": 101,
+  "ranges": [
+    {
+      "sha256": "5361ac9dc58f2ef5fd2e9b09c68297c17f04950909bbc8023bdb82eacf22c2b0",
+      "bytes": 1081,
+      "byte_start": 36261,
+      "byte_end_exclusive": 37342,
+      "components": [
+        {
+          "row_id": "P07",
+          "distribution": "anyio",
+          "version": "4.14.2",
+          "upstream_member": "anyio-4.14.2.dist-info/licenses/LICENSE",
+          "wheel_sha256": "9f505dda5ac9f0c8309b5e8bd445a8c2bf7246f3ce950121e45ea15bc41d1494",
+          "kind": "complete original legal member"
+        }
+      ]
+    },
+    {
+      "sha256": "cb5e8e7e5f4a3988e1063c142c60dc2df75605f4c46515e776e3aca6df976e14",
+      "bytes": 11325,
+      "byte_start": 37588,
+      "byte_end_exclusive": 48913,
+      "components": [
+        {
+          "row_id": "P16",
+          "distribution": "distro",
+          "version": "1.9.0",
+          "upstream_member": "distro-1.9.0.dist-info/LICENSE",
+          "wheel_sha256": "7bffd925d65168f85027d8da9af6bddab658135b840670a223589bc0c8ef02b2",
+          "kind": "complete original legal member"
+        }
+      ]
+    },
+    {
+      "sha256": "dfe514a337ae8417abd31a8af707bbd6172b03e5430bb083e145899ea97a3eea",
+      "bytes": 1084,
+      "byte_start": 49193,
+      "byte_end_exclusive": 50277,
+      "components": [
+        {
+          "row_id": "P17",
+          "distribution": "docstring-parser",
+          "version": "0.18.0",
+          "upstream_member": "docstring_parser-0.18.0.dist-info/licenses/LICENSE.md",
+          "wheel_sha256": "b3fcbed555c47d8479be0796ef7e19c2670d428d72e96da63f3a40122860374b",
+          "kind": "complete original legal member"
+        }
+      ]
+    },
+    {
+      "sha256": "5e13dbbc1d120fc2a03cecde7c91424ae2d7de11b63d58ded2f4431e261ee50d",
+      "bytes": 1071,
+      "byte_start": 50640,
+      "byte_end_exclusive": 51711,
+      "components": [
+        {
+          "row_id": "P32",
+          "distribution": "mcp",
+          "version": "2.0.0",
+          "upstream_member": "mcp-2.0.0.dist-info/licenses/LICENSE",
+          "wheel_sha256": "1cb4c75d2d2c7b8c1d756355e5d82a39f2822cc7f13e22a2051d7ca3592349d6",
+          "kind": "complete original legal member"
+        },
+        {
+          "row_id": "P33",
+          "distribution": "mcp-types",
+          "version": "2.0.0",
+          "upstream_member": "mcp_types-2.0.0.dist-info/licenses/LICENSE",
+          "wheel_sha256": "6b2de797ca2797f568b79529e1b25948e34de511bcc0bd82fef1039a6d1b8eb0",
+          "kind": "complete original legal member"
+        }
+      ]
+    },
+    {
+      "sha256": "a50450da1d53cd777b80ced77c58ff96abe0ccd879706bd142c3ec20e245f0b4",
+      "bytes": 1204,
+      "byte_start": 51984,
+      "byte_end_exclusive": 53188,
+      "components": [
+        {
+          "row_id": "P36",
+          "distribution": "mypy-extensions",
+          "version": "1.1.0",
+          "upstream_member": "mypy_extensions-1.1.0.dist-info/licenses/LICENSE",
+          "wheel_sha256": "1be4cccdb0f2482337c4743e60421de3a356cd97508abadd57d47403e94f5505",
+          "kind": "complete original legal member"
+        }
+      ]
+    },
+    {
+      "sha256": "91d0baaff00773038e72c0a1fc9d5d2d38706b7a2b9c04f34296608f931b9cd0",
+      "bytes": 27666,
+      "byte_start": 53483,
+      "byte_end_exclusive": 81149,
+      "components": [
+        {
+          "row_id": "P49",
+          "distribution": "pyinstaller-hooks-contrib",
+          "version": "2026.6",
+          "upstream_member": "pyinstaller_hooks_contrib-2026.6.dist-info/licenses/LICENSE",
+          "wheel_sha256": "fd13b8ac126b35361175edacd41a0d97080b75dd5f4b594ecefefff969509dd3",
+          "kind": "complete original legal member"
+        }
+      ]
+    },
+    {
+      "sha256": "d5219c1a3845290dfe53d1ffd8331c618bf1da0423260b61909b8114b4003576",
+      "bytes": 401,
+      "byte_start": 81457,
+      "byte_end_exclusive": 81858,
+      "components": [
+        {
+          "row_id": "P49",
+          "distribution": "pyinstaller-hooks-contrib",
+          "version": "2026.6",
+          "upstream_member": "_pyinstaller_hooks_contrib/rthooks/pyi_rth_cryptography_openssl.py",
+          "wheel_sha256": "fd13b8ac126b35361175edacd41a0d97080b75dd5f4b594ecefefff969509dd3",
+          "kind": "exact original source-header excerpt"
+        }
+      ]
+    },
+    {
+      "sha256": "bb2816d29551aca559270690dceb929719e56ae2ee115652bc30c56c225b1470",
+      "bytes": 401,
+      "byte_start": 82156,
+      "byte_end_exclusive": 82557,
+      "components": [
+        {
+          "row_id": "P49",
+          "distribution": "pyinstaller-hooks-contrib",
+          "version": "2026.6",
+          "upstream_member": "_pyinstaller_hooks_contrib/rthooks/pyi_rth_pywintypes.py",
+          "wheel_sha256": "fd13b8ac126b35361175edacd41a0d97080b75dd5f4b594ecefefff969509dd3",
+          "kind": "exact original source-header excerpt"
+        }
+      ]
+    },
+    {
+      "sha256": "80619b7049f08c81683ad0e01f08f257a840652dd71ee83146d36658c7d2c2b9",
+      "bytes": 1556,
+      "byte_start": 82826,
+      "byte_end_exclusive": 84382,
+      "components": [
+        {
+          "row_id": "P54",
+          "distribution": "python-dotenv",
+          "version": "1.2.2",
+          "upstream_member": "python_dotenv-1.2.2.dist-info/licenses/LICENSE",
+          "wheel_sha256": "1d8214789a24de455a8b8bd8ae6fe3c6b69a5e3d64aa8a8e5d68e694bbcb285a",
+          "kind": "complete original legal member"
+        }
+      ]
+    },
+    {
+      "sha256": "42dcd63495f87b4eb7c7757afa379bb55a53f94afd7a5f657d9adf57236e515c",
+      "bytes": 1057,
+      "byte_start": 84649,
+      "byte_end_exclusive": 85706,
+      "components": [
+        {
+          "row_id": "P59",
+          "distribution": "referencing",
+          "version": "0.37.0",
+          "upstream_member": "referencing-0.37.0.dist-info/licenses/COPYING",
+          "wheel_sha256": "381329a9f99628c9069361716891d34ad94af76e461dcb0335825aecc7692231",
+          "kind": "complete original legal member"
+        }
+      ]
+    },
+    {
+      "sha256": "86da0f01aeae46348a3c3d465195dc1ceccde79f79e87769a64b8da04b2a4741",
+      "bytes": 1023,
+      "byte_start": 85987,
+      "byte_end_exclusive": 87010,
+      "components": [
+        {
+          "row_id": "P66",
+          "distribution": "setuptools",
+          "version": "84.0.0",
+          "upstream_member": "setuptools/_vendor/backports.tarfile-1.2.0.dist-info/LICENSE",
+          "wheel_sha256": "51a52592b3b99e102b609654876bd65f19f999935166d1352678931132b0c670",
+          "kind": "complete original legal member"
+        }
+      ]
+    },
+    {
+      "sha256": "9755a18519666e5f0f4cae3daad3d7012bcae48a600b31237d75e9fe134e6683",
+      "bytes": 1076,
+      "byte_start": 87297,
+      "byte_end_exclusive": 88373,
+      "components": [
+        {
+          "row_id": "P68",
+          "distribution": "setuptools",
+          "version": "84.0.0",
+          "upstream_member": "setuptools/_vendor/jaraco_context-6.1.0.dist-info/licenses/LICENSE",
+          "wheel_sha256": "51a52592b3b99e102b609654876bd65f19f999935166d1352678931132b0c670",
+          "kind": "complete original legal member"
+        }
+      ]
+    },
+    {
+      "sha256": "5a57cb4db85e2a2dd88c290628908add57e3451449e0a9a71fdfb38776fd759d",
+      "bytes": 1076,
+      "byte_start": 88662,
+      "byte_end_exclusive": 89738,
+      "components": [
+        {
+          "row_id": "P69",
+          "distribution": "setuptools",
+          "version": "84.0.0",
+          "upstream_member": "setuptools/_vendor/jaraco_functools-4.4.0.dist-info/licenses/LICENSE",
+          "wheel_sha256": "51a52592b3b99e102b609654876bd65f19f999935166d1352678931132b0c670",
+          "kind": "complete original legal member"
+        }
+      ]
+    },
+    {
+      "sha256": "3b2f81fe21d181c499c59a256c8e1968455d6689d269aa85373bfb6af41da3bf",
+      "bytes": 13936,
+      "byte_start": 90017,
+      "byte_end_exclusive": 103953,
+      "components": [
+        {
+          "row_id": "P83",
+          "distribution": "typing-extensions",
+          "version": "4.16.0",
+          "upstream_member": "typing_extensions-4.16.0.dist-info/licenses/LICENSE",
+          "wheel_sha256": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
+          "kind": "complete original legal member"
+        }
+      ]
+    },
+    {
+      "sha256": "804b59b25f2c31bd278f9202a19ae49a3945aa2664387e2d0a128c7cacc61ec3",
+      "bytes": 1090,
+      "byte_start": 104230,
+      "byte_end_exclusive": 105320,
+      "components": [
+        {
+          "row_id": "P84",
+          "distribution": "typing-inspection",
+          "version": "0.4.3",
+          "upstream_member": "typing_inspection-0.4.3.dist-info/licenses/LICENSE",
+          "wheel_sha256": "5f42b23858a91e0b4ef521f5418f03a0da3c9216fd2995ef5e73463100e676cd",
+          "kind": "complete original legal member"
+        }
+      ]
+    },
+    {
+      "sha256": "a61d06e8f7be57928e71e800eb9273b05cb8868c484108afe41e4305bb320dde",
+      "bytes": 1132,
+      "byte_start": 105959,
+      "byte_end_exclusive": 107091,
+      "components": [
+        {
+          "row_id": "N07",
+          "distribution": "libffi CPython Windows source fork",
+          "version": "3.4.2 / 16fad4855b3d8c03b5910e405ff3a04395b39a98",
+          "source_commit": "16fad4855b3d8c03b5910e405ff3a04395b39a98",
+          "upstream_member": "LICENSE",
+          "kind": "complete original source license",
+          "original_sha256": "a61d06e8f7be57928e71e800eb9273b05cb8868c484108afe41e4305bb320dde"
+        }
+      ]
+    },
+    {
+      "sha256": "9afb8970cd29fc1031fa647278e4bef613399e2e3468a1e3a397f4d158c6101c",
+      "bytes": 1153,
+      "byte_start": 107250,
+      "byte_end_exclusive": 108403,
+      "components": [
+        {
+          "row_id": "N07",
+          "distribution": "libffi CPython Windows source fork",
+          "version": "3.4.2 / 16fad4855b3d8c03b5910e405ff3a04395b39a98",
+          "source_commit": "16fad4855b3d8c03b5910e405ff3a04395b39a98",
+          "upstream_member": "python/licenses/LICENSE.libffi.txt in official release20260623",
+          "kind": "complete original supplier notice; source LICENSE also retained",
+          "original_sha256": "9afb8970cd29fc1031fa647278e4bef613399e2e3468a1e3a397f4d158c6101c"
+        }
+      ]
+    },
+    {
+      "sha256": "832f4655d207fc0bda4f867ac9a2fbf72c0173407f0306d446852d9b7813a0cd",
+      "bytes": 1356,
+      "byte_start": 108545,
+      "byte_end_exclusive": 109901,
+      "components": [
+        {
+          "row_id": "N07",
+          "distribution": "libffi CPython Windows source fork",
+          "version": "3.4.2 / 16fad4855b3d8c03b5910e405ff3a04395b39a98",
+          "source_commit": "16fad4855b3d8c03b5910e405ff3a04395b39a98",
+          "upstream_member": "src/prep_cif.c complete leading legal comment",
+          "kind": "exact complete original source-header comment",
+          "original_sha256": "832f4655d207fc0bda4f867ac9a2fbf72c0173407f0306d446852d9b7813a0cd"
+        }
+      ]
+    },
+    {
+      "sha256": "04da9bcb02fc38a66854ead3552ab85d60cf7d9dba3e2ade92bb491bf156fb19",
+      "bytes": 1331,
+      "byte_start": 110040,
+      "byte_end_exclusive": 111371,
+      "components": [
+        {
+          "row_id": "N07",
+          "distribution": "libffi CPython Windows source fork",
+          "version": "3.4.2 / 16fad4855b3d8c03b5910e405ff3a04395b39a98",
+          "source_commit": "16fad4855b3d8c03b5910e405ff3a04395b39a98",
+          "upstream_member": "src/types.c complete leading legal comment",
+          "kind": "exact complete original source-header comment",
+          "original_sha256": "04da9bcb02fc38a66854ead3552ab85d60cf7d9dba3e2ade92bb491bf156fb19"
+        }
+      ]
+    },
+    {
+      "sha256": "5e3c3b6c331d4b4f7cb243a41cb49089a361c4f3c43e22e6198ebfe3ba807bf3",
+      "bytes": 1334,
+      "byte_start": 111512,
+      "byte_end_exclusive": 112846,
+      "components": [
+        {
+          "row_id": "N07",
+          "distribution": "libffi CPython Windows source fork",
+          "version": "3.4.2 / 16fad4855b3d8c03b5910e405ff3a04395b39a98",
+          "source_commit": "16fad4855b3d8c03b5910e405ff3a04395b39a98",
+          "upstream_member": "src/raw_api.c complete leading legal comment",
+          "kind": "exact complete original source-header comment",
+          "original_sha256": "5e3c3b6c331d4b4f7cb243a41cb49089a361c4f3c43e22e6198ebfe3ba807bf3"
+        }
+      ]
+    },
+    {
+      "sha256": "6ec1f124dc6d7f309a4e45c49bd827a9aa261222ccbd4d309a413019bb88f9cd",
+      "bytes": 1451,
+      "byte_start": 112992,
+      "byte_end_exclusive": 114443,
+      "components": [
+        {
+          "row_id": "N07",
+          "distribution": "libffi CPython Windows source fork",
+          "version": "3.4.2 / 16fad4855b3d8c03b5910e405ff3a04395b39a98",
+          "source_commit": "16fad4855b3d8c03b5910e405ff3a04395b39a98",
+          "upstream_member": "src/java_raw_api.c complete leading legal comment",
+          "kind": "exact complete original source-header comment",
+          "original_sha256": "6ec1f124dc6d7f309a4e45c49bd827a9aa261222ccbd4d309a413019bb88f9cd"
+        }
+      ]
+    },
+    {
+      "sha256": "d38518cd669a0e31d481e15caa189b891ffbfed9ba98b648fc301af0d1b991be",
+      "bytes": 1544,
+      "byte_start": 114585,
+      "byte_end_exclusive": 116129,
+      "components": [
+        {
+          "row_id": "N07",
+          "distribution": "libffi CPython Windows source fork",
+          "version": "3.4.2 / 16fad4855b3d8c03b5910e405ff3a04395b39a98",
+          "source_commit": "16fad4855b3d8c03b5910e405ff3a04395b39a98",
+          "upstream_member": "src/closures.c complete leading legal comment",
+          "kind": "exact complete original source-header comment",
+          "original_sha256": "d38518cd669a0e31d481e15caa189b891ffbfed9ba98b648fc301af0d1b991be"
+        }
+      ]
+    },
+    {
+      "sha256": "eedb334eec0aed22b39a0a7f43389a84a7bea4376b6dee1dfb49d92244d78ccb",
+      "bytes": 1375,
+      "byte_start": 116268,
+      "byte_end_exclusive": 117643,
+      "components": [
+        {
+          "row_id": "N07",
+          "distribution": "libffi CPython Windows source fork",
+          "version": "3.4.2 / 16fad4855b3d8c03b5910e405ff3a04395b39a98",
+          "source_commit": "16fad4855b3d8c03b5910e405ff3a04395b39a98",
+          "upstream_member": "src/tramp.c complete leading legal comment",
+          "kind": "exact complete original source-header comment",
+          "original_sha256": "eedb334eec0aed22b39a0a7f43389a84a7bea4376b6dee1dfb49d92244d78ccb"
+        }
+      ]
+    },
+    {
+      "sha256": "a1b4f28ac2f9253fb91ad879faa1a1384787e6933be05e7c9b6835dbd78f4714",
+      "bytes": 1367,
+      "byte_start": 117787,
+      "byte_end_exclusive": 119154,
+      "components": [
+        {
+          "row_id": "N07",
+          "distribution": "libffi CPython Windows source fork",
+          "version": "3.4.2 / 16fad4855b3d8c03b5910e405ff3a04395b39a98",
+          "source_commit": "16fad4855b3d8c03b5910e405ff3a04395b39a98",
+          "upstream_member": "src/x86/ffiw64.c complete leading legal comment",
+          "kind": "exact complete original source-header comment",
+          "original_sha256": "a1b4f28ac2f9253fb91ad879faa1a1384787e6933be05e7c9b6835dbd78f4714"
+        }
+      ]
+    },
+    {
+      "sha256": "85d248c5229cfdc8ea226606ba82551662b7f3d0144fc003e67d802ed6c19489",
+      "bytes": 1478,
+      "byte_start": 119301,
+      "byte_end_exclusive": 120779,
+      "components": [
+        {
+          "row_id": "N07",
+          "distribution": "libffi CPython Windows source fork",
+          "version": "3.4.2 / 16fad4855b3d8c03b5910e405ff3a04395b39a98",
+          "source_commit": "16fad4855b3d8c03b5910e405ff3a04395b39a98",
+          "upstream_member": "src/x86/ffitarget.h complete leading legal comment",
+          "kind": "exact complete original source-header comment",
+          "original_sha256": "85d248c5229cfdc8ea226606ba82551662b7f3d0144fc003e67d802ed6c19489"
+        }
+      ]
+    },
+    {
+      "sha256": "41e34b6a2ffb8e57618e647a0f70e36bfd6a25ef76199a50bb8127b7657cb619",
+      "bytes": 1368,
+      "byte_start": 120923,
+      "byte_end_exclusive": 122291,
+      "components": [
+        {
+          "row_id": "N07",
+          "distribution": "libffi CPython Windows source fork",
+          "version": "3.4.2 / 16fad4855b3d8c03b5910e405ff3a04395b39a98",
+          "source_commit": "16fad4855b3d8c03b5910e405ff3a04395b39a98",
+          "upstream_member": "include/ffi.h.in complete leading legal comment",
+          "kind": "exact complete original source-header comment",
+          "original_sha256": "41e34b6a2ffb8e57618e647a0f70e36bfd6a25ef76199a50bb8127b7657cb619"
+        }
+      ]
+    },
+    {
+      "sha256": "4fa1bed11b9220aad871e755bcd5d52ca92f9ece182f41ffad9d9de080ff45c5",
+      "bytes": 1518,
+      "byte_start": 122439,
+      "byte_end_exclusive": 123957,
+      "components": [
+        {
+          "row_id": "N07",
+          "distribution": "libffi CPython Windows source fork",
+          "version": "3.4.2 / 16fad4855b3d8c03b5910e405ff3a04395b39a98",
+          "source_commit": "16fad4855b3d8c03b5910e405ff3a04395b39a98",
+          "upstream_member": "include/ffi_common.h complete leading legal comment",
+          "kind": "exact complete original source-header comment",
+          "original_sha256": "4fa1bed11b9220aad871e755bcd5d52ca92f9ece182f41ffad9d9de080ff45c5"
+        }
+      ]
+    },
+    {
+      "sha256": "d87d218dd908b3243ec4cbc72af400e5b7437513ea9d9229291d0812b8464fec",
+      "bytes": 673,
+      "byte_start": 124056,
+      "byte_end_exclusive": 124729,
+      "components": [
+        {
+          "row_id": "N10",
+          "distribution": "XZ Utils liblzma",
+          "version": "5.8.3",
+          "upstream_member": "python/licenses/LICENSE.liblzma.txt in official release20260623",
+          "source_archive_sha256": "3d3a1b973af218114f4f889bbaa2f4c037deaae0c8e815eec381c3d546b974a0",
+          "kind": "complete original component notice",
+          "original_sha256": "d87d218dd908b3243ec4cbc72af400e5b7437513ea9d9229291d0812b8464fec"
+        }
+      ]
+    },
+    {
+      "sha256": "0af8f1b807512aae39c2ac1aa4d0cae65cabecb6fd554b8439a5162a0d6eca55",
+      "bytes": 1487,
+      "byte_start": 124806,
+      "byte_end_exclusive": 126293,
+      "components": [
+        {
+          "row_id": "N16",
+          "distribution": "Microsoft WebView2 SDK static loader x64",
+          "version": "1.0.3650.58",
+          "source_archive_sha256": "911a472128c82ac8baa0c486c23342cc9dd6e7dc50d754e676726642ca065c60",
+          "upstream_member": "LICENSE.txt",
+          "kind": "complete original SDK text; wrapper MIT does not replace it",
+          "original_sha256": "0af8f1b807512aae39c2ac1aa4d0cae65cabecb6fd554b8439a5162a0d6eca55"
+        }
+      ]
+    },
+    {
+      "sha256": "106423785c5b7eba0a8e61d1837f2132e9c828e20ad530f565d981c1df60dd90",
+      "bytes": 3894,
+      "byte_start": 126369,
+      "byte_end_exclusive": 130263,
+      "components": [
+        {
+          "row_id": "N16",
+          "distribution": "Microsoft WebView2 SDK static loader x64",
+          "version": "1.0.3650.58",
+          "source_archive_sha256": "911a472128c82ac8baa0c486c23342cc9dd6e7dc50d754e676726642ca065c60",
+          "upstream_member": "NOTICE.txt",
+          "kind": "complete original SDK text; wrapper MIT does not replace it",
+          "original_sha256": "106423785c5b7eba0a8e61d1837f2132e9c828e20ad530f565d981c1df60dd90"
+        }
+      ]
+    },
+    {
+      "sha256": "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f",
+      "bytes": 126,
+      "byte_start": 130321,
+      "byte_end_exclusive": 130447,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "aho-corasick",
+          "version": "1.1.4",
+          "upstream_member": "aho-corasick-1.1.4/COPYING",
+          "source_archive_sha256": "ddd31a130427c27518df266943a5308ed92d4b226cc639f5a8f1002816174301",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "memchr",
+          "version": "2.8.3",
+          "upstream_member": "memchr-2.8.3/COPYING",
+          "source_archive_sha256": "cf8baf1c55e62ffcace7a9f06f4bd9cd3f0c4beb022d3b367256b91b87513d98",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "walkdir",
+          "version": "2.5.0",
+          "upstream_member": "walkdir-2.5.0/COPYING",
+          "source_archive_sha256": "29790946404f91d9c5d06f9874efddea1dc06c5efe94541a7d6863108e3a5e4b",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "winapi-util",
+          "version": "0.1.11",
+          "upstream_member": "winapi-util-0.1.11/COPYING",
+          "source_archive_sha256": "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f"
+        }
+      ]
+    },
+    {
+      "sha256": "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f",
+      "bytes": 1081,
+      "byte_start": 130509,
+      "byte_end_exclusive": 131590,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "aho-corasick",
+          "version": "1.1.4",
+          "upstream_member": "aho-corasick-1.1.4/LICENSE-MIT",
+          "source_archive_sha256": "ddd31a130427c27518df266943a5308ed92d4b226cc639f5a8f1002816174301",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "memchr",
+          "version": "2.8.3",
+          "upstream_member": "memchr-2.8.3/LICENSE-MIT",
+          "source_archive_sha256": "cf8baf1c55e62ffcace7a9f06f4bd9cd3f0c4beb022d3b367256b91b87513d98",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "walkdir",
+          "version": "2.5.0",
+          "upstream_member": "walkdir-2.5.0/LICENSE-MIT",
+          "source_archive_sha256": "29790946404f91d9c5d06f9874efddea1dc06c5efe94541a7d6863108e3a5e4b",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f"
+        }
+      ]
+    },
+    {
+      "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+      "bytes": 9723,
+      "byte_start": 131647,
+      "byte_end_exclusive": 141370,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "anyhow",
+          "version": "1.0.104",
+          "upstream_member": "anyhow-1.0.104/LICENSE-APACHE",
+          "source_archive_sha256": "330a5ed07fa54e4702c9d6c4174f74427fc0ef6e214bbd677ae50a5099946470",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "itoa",
+          "version": "1.0.18",
+          "upstream_member": "itoa-1.0.18/LICENSE-APACHE",
+          "source_archive_sha256": "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "semver",
+          "version": "1.0.28",
+          "upstream_member": "semver-1.0.28/LICENSE-APACHE",
+          "source_archive_sha256": "8a7852d02fc848982e0c167ef163aaff9cd91dc640ba85e263cb1ce46fae51cd",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "serde",
+          "version": "1.0.228",
+          "upstream_member": "serde-1.0.228/LICENSE-APACHE",
+          "source_archive_sha256": "9a8e94ea7f378bd32cbbd37198a4a91436180c5bb472411e48b5ec2e2124ae9e",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "serde_core",
+          "version": "1.0.228",
+          "upstream_member": "serde_core-1.0.228/LICENSE-APACHE",
+          "source_archive_sha256": "41d385c7d4ca58e59fc732af25c3983b67ac852c1a25000afe1175de458b67ad",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "serde_json",
+          "version": "1.0.150",
+          "upstream_member": "serde_json-1.0.150/LICENSE-APACHE",
+          "source_archive_sha256": "e8014e44b4736ed0538adeecded0fce2a272f22dc9578a7eb6b2d9993c74cfb9",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+        }
+      ]
+    },
+    {
+      "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+      "bytes": 1023,
+      "byte_start": 141424,
+      "byte_end_exclusive": 142447,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "anyhow",
+          "version": "1.0.104",
+          "upstream_member": "anyhow-1.0.104/LICENSE-MIT",
+          "source_archive_sha256": "330a5ed07fa54e4702c9d6c4174f74427fc0ef6e214bbd677ae50a5099946470",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "itoa",
+          "version": "1.0.18",
+          "upstream_member": "itoa-1.0.18/LICENSE-MIT",
+          "source_archive_sha256": "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "once_cell",
+          "version": "1.21.4",
+          "upstream_member": "once_cell-1.21.4/LICENSE-MIT",
+          "source_archive_sha256": "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "semver",
+          "version": "1.0.28",
+          "upstream_member": "semver-1.0.28/LICENSE-MIT",
+          "source_archive_sha256": "8a7852d02fc848982e0c167ef163aaff9cd91dc640ba85e263cb1ce46fae51cd",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "serde",
+          "version": "1.0.228",
+          "upstream_member": "serde-1.0.228/LICENSE-MIT",
+          "source_archive_sha256": "9a8e94ea7f378bd32cbbd37198a4a91436180c5bb472411e48b5ec2e2124ae9e",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "serde_core",
+          "version": "1.0.228",
+          "upstream_member": "serde_core-1.0.228/LICENSE-MIT",
+          "source_archive_sha256": "41d385c7d4ca58e59fc732af25c3983b67ac852c1a25000afe1175de458b67ad",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "serde_json",
+          "version": "1.0.150",
+          "upstream_member": "serde_json-1.0.150/LICENSE-MIT",
+          "source_archive_sha256": "e8014e44b4736ed0538adeecded0fce2a272f22dc9578a7eb6b2d9993c74cfb9",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "zmij",
+          "version": "1.0.21",
+          "upstream_member": "zmij-1.0.21/LICENSE-MIT",
+          "source_archive_sha256": "b8848ee67ecc8aedbaf3e4122217aff892639231befc6a1b58d29fff4c2cabaa",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+        }
+      ]
+    },
+    {
+      "sha256": "c0c56f26d9c051cac4d200c34c84e7ae9aaa853e01a982a1df08b09931e518ae",
+      "bytes": 1483,
+      "byte_start": 142519,
+      "byte_end_exclusive": 144002,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "brotli-decompressor",
+          "version": "5.0.3",
+          "upstream_member": "brotli-decompressor-5.0.3/LICENSE",
+          "source_archive_sha256": "3a32acac15fe1967bc3986b2a6347dffc965602354ea6f450ad07e8bfd253583",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "c0c56f26d9c051cac4d200c34c84e7ae9aaa853e01a982a1df08b09931e518ae"
+        }
+      ]
+    },
+    {
+      "sha256": "45f522cacecb1023856e46df79ca625dfc550c94910078bd8aec6e02880b3d42",
+      "bytes": 1055,
+      "byte_start": 144048,
+      "byte_end_exclusive": 145103,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "bytes",
+          "version": "1.12.1",
+          "upstream_member": "bytes-1.12.1/LICENSE",
+          "source_archive_sha256": "fc652a48c352aef3ea3aed32080501cf3ef6ed5da78602a020c991775b0aff04",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "45f522cacecb1023856e46df79ca625dfc550c94910078bd8aec6e02880b3d42"
+        }
+      ]
+    },
+    {
+      "sha256": "ebaac853b53fec0ed475796f533ce676912a4df9ad9d8a621fa76d5060591e10",
+      "bytes": 1074,
+      "byte_start": 145143,
+      "byte_end_exclusive": 146217,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "cfb",
+          "version": "0.7.3",
+          "upstream_member": "cfb-0.7.3/LICENSE",
+          "source_archive_sha256": "d38f2da7a0a2c4ccf0065be06397cc26a81f4e528be095826eee9d4adbb8c60f",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "ebaac853b53fec0ed475796f533ce676912a4df9ad9d8a621fa76d5060591e10"
+        }
+      ]
+    },
+    {
+      "sha256": "2773e20df8f4c52a026b5b578c7f2457341f5aa3fb6612fd87e1d2e1bd8f48ad",
+      "bytes": 10863,
+      "byte_start": 146272,
+      "byte_end_exclusive": 157135,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "cookie",
+          "version": "0.18.1",
+          "upstream_member": "cookie-0.18.1/LICENSE-APACHE",
+          "source_archive_sha256": "4ddef33a339a91ea89fb53151bd0a4689cfce27055c291dfa69945475d22c747",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "2773e20df8f4c52a026b5b578c7f2457341f5aa3fb6612fd87e1d2e1bd8f48ad"
+        }
+      ]
+    },
+    {
+      "sha256": "f28420c1906af38be726cd7842798f0194b27c41d6051c0d1e9ee348b8a4a0ea",
+      "bytes": 1091,
+      "byte_start": 157187,
+      "byte_end_exclusive": 158278,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "cookie",
+          "version": "0.18.1",
+          "upstream_member": "cookie-0.18.1/LICENSE-MIT",
+          "source_archive_sha256": "4ddef33a339a91ea89fb53151bd0a4689cfce27055c291dfa69945475d22c747",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "f28420c1906af38be726cd7842798f0194b27c41d6051c0d1e9ee348b8a4a0ea"
+        }
+      ]
+    },
+    {
+      "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+      "bytes": 10847,
+      "byte_start": 158355,
+      "byte_end_exclusive": 169202,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "crossbeam-channel",
+          "version": "0.5.16",
+          "upstream_member": "crossbeam-channel-0.5.16/LICENSE-APACHE",
+          "source_archive_sha256": "d85363c37faeca707aef026efa9f3b34d077bce547e48f770770625c6013679e",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "crossbeam-utils",
+          "version": "0.8.22",
+          "upstream_member": "crossbeam-utils-0.8.22/LICENSE-APACHE",
+          "source_archive_sha256": "61803da095bee82a81bb1a452ecc25d3b2f1416d1897eb86430c6159ef717c17",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "data-url",
+          "version": "0.3.2",
+          "upstream_member": "data-url-0.3.2/LICENSE-APACHE",
+          "source_archive_sha256": "be1e0bca6c3637f992fc1cc7cbc52a78c1ef6db076dbf1059c4323d6a2048376",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "glob",
+          "version": "0.3.4",
+          "upstream_member": "glob-0.3.4/LICENSE-APACHE",
+          "source_archive_sha256": "e4eba85ea1d0a966a983acd07deee566e67395d2d96b6fb39e62b5a833f1eb0b",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "html5ever",
+          "version": "0.38.0",
+          "upstream_member": "html5ever-0.38.0/LICENSE-APACHE",
+          "source_archive_sha256": "1054432bae2f14e0061e33d23402fbaa67a921d319d56adc6bcf887ddad1cbc2",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "idna",
+          "version": "1.1.0",
+          "upstream_member": "idna-1.1.0/LICENSE-APACHE",
+          "source_archive_sha256": "3b0875f23caa03898994f6ddc501886a45c7d3d62d04d2d90788d47be1b1e4de",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "log",
+          "version": "0.4.33",
+          "upstream_member": "log-0.4.33/LICENSE-APACHE",
+          "source_archive_sha256": "0ceec5bc11778974d1bcb055b18002eba7f4b3518b6a0081b3af5f21666da9ad",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "markup5ever",
+          "version": "0.38.0",
+          "upstream_member": "markup5ever-0.38.0/LICENSE-APACHE",
+          "source_archive_sha256": "8983d30f2915feeaaab2d6babdd6bc7e9ed1a00b66b5e6d74df19aa9c0e91862",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "mime",
+          "version": "0.3.17",
+          "upstream_member": "mime-0.3.17/LICENSE-APACHE",
+          "source_archive_sha256": "6877bb514081ee2a7ff5ef9de3281f14a4dd4bceac4c09388074a6b5df8a139a",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "muda",
+          "version": "0.19.3",
+          "upstream_member": "muda-0.19.3/LICENSE-APACHE",
+          "source_archive_sha256": "1dd04e60bc0b07438a6771710ee1698f98f6ebbc7f89b61264af1563b8aeb878",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "once_cell",
+          "version": "1.21.4",
+          "upstream_member": "once_cell-1.21.4/LICENSE-APACHE",
+          "source_archive_sha256": "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "parking_lot",
+          "version": "0.12.5",
+          "upstream_member": "parking_lot-0.12.5/LICENSE-APACHE",
+          "source_archive_sha256": "93857453250e3077bd71ff98b6a65ea6621a19bb0f559a85248955ac12c45a1a",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "parking_lot_core",
+          "version": "0.9.12",
+          "upstream_member": "parking_lot_core-0.9.12/LICENSE-APACHE",
+          "source_archive_sha256": "2621685985a2ebf1c516881c026032ac7deafcda1a2c9b7850dc81e3dfcb64c1",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "percent-encoding",
+          "version": "2.3.2",
+          "upstream_member": "percent-encoding-2.3.2/LICENSE-APACHE",
+          "source_archive_sha256": "9b4f627cb1b25917193a259e49bdad08f671f8d9708acfd5fe0a8c1455d87220",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "regex-automata",
+          "version": "0.4.16",
+          "upstream_member": "regex-automata-0.4.16/LICENSE-APACHE",
+          "source_archive_sha256": "8fcfdb36bda0c880c5931cdc7a2bcdc8ba4556847b9d912bca70bc94708711ad",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "string_cache",
+          "version": "0.9.0",
+          "upstream_member": "string_cache-0.9.0/LICENSE-APACHE",
+          "source_archive_sha256": "a18596f8c785a729f2819c0f6a7eae6ebeebdfffbfe4214ae6b087f690e31901",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "tendril",
+          "version": "0.5.1",
+          "upstream_member": "tendril-0.5.1/LICENSE-APACHE",
+          "source_archive_sha256": "5fed54709c5b3a53d09bb1c113ea4f5ceafd1e772ddcb0030a82e1d56c087b08",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "unicode-segmentation",
+          "version": "1.13.3",
+          "upstream_member": "unicode-segmentation-1.13.3/LICENSE-APACHE",
+          "source_archive_sha256": "c6f5d3c3b1bf09027a88a6bc961fc00497d651009560b5463668dc81b0fa87a8",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "url",
+          "version": "2.5.8",
+          "upstream_member": "url-2.5.8/LICENSE-APACHE",
+          "source_archive_sha256": "ff67a8a4397373c3ef660812acab3268222035010ab8680ec4215f38ba3d0eed",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "uuid",
+          "version": "1.24.0",
+          "upstream_member": "uuid-1.24.0/LICENSE-APACHE",
+          "source_archive_sha256": "bf3923a6f5c4c6382e0b653c4117f48d631ea17f38ed86e2a828e6f7412f5239",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "web_atoms",
+          "version": "0.2.5",
+          "upstream_member": "web_atoms-0.2.5/LICENSE-APACHE",
+          "source_archive_sha256": "075474b12bcb3d2e3d4546580e9de478eeeead668a1761e2a8860c836b7ef297",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "window-vibrancy",
+          "version": "0.6.0",
+          "upstream_member": "window-vibrancy-0.6.0/LICENSE-APACHE",
+          "source_archive_sha256": "d9bec5a31f3f9362f2258fd0e9c9dd61a9ca432e7306cc78c444258f0dce9a9c",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "wry",
+          "version": "0.55.1",
+          "upstream_member": "wry-0.55.1/LICENSE-APACHE",
+          "source_archive_sha256": "186f9871daa55fd9c016578b810d149de58367113db7fb72b462d2323ce19514",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+        }
+      ]
+    },
+    {
+      "sha256": "5734ed989dfca1f625b40281ee9f4530f91b2411ec01cb748223e7eb87e201ab",
+      "bytes": 1099,
+      "byte_start": 169276,
+      "byte_end_exclusive": 170375,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "crossbeam-channel",
+          "version": "0.5.16",
+          "upstream_member": "crossbeam-channel-0.5.16/LICENSE-MIT",
+          "source_archive_sha256": "d85363c37faeca707aef026efa9f3b34d077bce547e48f770770625c6013679e",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "5734ed989dfca1f625b40281ee9f4530f91b2411ec01cb748223e7eb87e201ab"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "crossbeam-utils",
+          "version": "0.8.22",
+          "upstream_member": "crossbeam-utils-0.8.22/LICENSE-MIT",
+          "source_archive_sha256": "61803da095bee82a81bb1a452ecc25d3b2f1416d1897eb86430c6159ef717c17",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "5734ed989dfca1f625b40281ee9f4530f91b2411ec01cb748223e7eb87e201ab"
+        }
+      ]
+    },
+    {
+      "sha256": "b16db96b93b1d7cf7bea533f572091ec6bca3234fbe0a83038be772ff391a44c",
+      "bytes": 33447,
+      "byte_start": 170457,
+      "byte_end_exclusive": 203904,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "crossbeam-channel",
+          "version": "0.5.16",
+          "upstream_member": "crossbeam-channel-0.5.16/LICENSE-THIRD-PARTY",
+          "source_archive_sha256": "d85363c37faeca707aef026efa9f3b34d077bce547e48f770770625c6013679e",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "b16db96b93b1d7cf7bea533f572091ec6bca3234fbe0a83038be772ff391a44c"
+        }
+      ]
+    },
+    {
+      "sha256": "b38f11f6096706e6de553dabe2a7ed142d59b6fa8c97e290c67496154745cdd5",
+      "bytes": 1072,
+      "byte_start": 203958,
+      "byte_end_exclusive": 205030,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "data-url",
+          "version": "0.3.2",
+          "upstream_member": "data-url-0.3.2/LICENSE-MIT",
+          "source_archive_sha256": "be1e0bca6c3637f992fc1cc7cbc52a78c1ef6db076dbf1059c4323d6a2048376",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "b38f11f6096706e6de553dabe2a7ed142d59b6fa8c97e290c67496154745cdd5"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "idna",
+          "version": "1.1.0",
+          "upstream_member": "idna-1.1.0/LICENSE-MIT",
+          "source_archive_sha256": "3b0875f23caa03898994f6ddc501886a45c7d3d62d04d2d90788d47be1b1e4de",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "b38f11f6096706e6de553dabe2a7ed142d59b6fa8c97e290c67496154745cdd5"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "percent-encoding",
+          "version": "2.3.2",
+          "upstream_member": "percent-encoding-2.3.2/LICENSE-MIT",
+          "source_archive_sha256": "9b4f627cb1b25917193a259e49bdad08f671f8d9708acfd5fe0a8c1455d87220",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "b38f11f6096706e6de553dabe2a7ed142d59b6fa8c97e290c67496154745cdd5"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "url",
+          "version": "2.5.8",
+          "upstream_member": "url-2.5.8/LICENSE-MIT",
+          "source_archive_sha256": "ff67a8a4397373c3ef660812acab3268222035010ab8680ec4215f38ba3d0eed",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "b38f11f6096706e6de553dabe2a7ed142d59b6fa8c97e290c67496154745cdd5"
+        }
+      ]
+    },
+    {
+      "sha256": "d3174ad63e721d4c9dccb8ad4320848992d314369bc46319720b5802c9153fe9",
+      "bytes": 9694,
+      "byte_start": 205079,
+      "byte_end_exclusive": 214773,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "dirs",
+          "version": "6.0.0",
+          "upstream_member": "dirs-6.0.0/LICENSE-APACHE",
+          "source_archive_sha256": "c3e8aa94d75141228480295a7d0e7feb620b1a5ad9f12bc40be62411e38cce4e",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "d3174ad63e721d4c9dccb8ad4320848992d314369bc46319720b5802c9153fe9"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "dirs-sys",
+          "version": "0.5.0",
+          "upstream_member": "dirs-sys-0.5.0/LICENSE-APACHE",
+          "source_archive_sha256": "e01a3366d27ee9890022452ee61b2b63a67e6f13f58900b651ff5665f0bb1fab",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "d3174ad63e721d4c9dccb8ad4320848992d314369bc46319720b5802c9153fe9"
+        }
+      ]
+    },
+    {
+      "sha256": "6a2e0ade09a7d5f816f11566fee2b151b32235a7fad52b41d49cce96f833c1a9",
+      "bytes": 1069,
+      "byte_start": 214819,
+      "byte_end_exclusive": 215888,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "dirs",
+          "version": "6.0.0",
+          "upstream_member": "dirs-6.0.0/LICENSE-MIT",
+          "source_archive_sha256": "c3e8aa94d75141228480295a7d0e7feb620b1a5ad9f12bc40be62411e38cce4e",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "6a2e0ade09a7d5f816f11566fee2b151b32235a7fad52b41d49cce96f833c1a9"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "dirs-sys",
+          "version": "0.5.0",
+          "upstream_member": "dirs-sys-0.5.0/LICENSE-MIT",
+          "source_archive_sha256": "e01a3366d27ee9890022452ee61b2b63a67e6f13f58900b651ff5665f0bb1fab",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "6a2e0ade09a7d5f816f11566fee2b151b32235a7fad52b41d49cce96f833c1a9"
+        }
+      ]
+    },
+    {
+      "sha256": "7554701d1e74fc434f68c522b1dd743c8c16d816a4b761b5213f367b898884c8",
+      "bytes": 1328,
+      "byte_start": 215942,
+      "byte_end_exclusive": 217270,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "dom_query",
+          "version": "0.27.0",
+          "upstream_member": "dom_query-0.27.0/LICENSE",
+          "source_archive_sha256": "521e380c0c8afb8d9a1e83a1822ee03556fc3e3e7dbc1fd30be14e37f9cb3f89",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "7554701d1e74fc434f68c522b1dd743c8c16d816a4b761b5213f367b898884c8"
+        }
+      ]
+    },
+    {
+      "sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499",
+      "bytes": 7048,
+      "byte_start": 217314,
+      "byte_end_exclusive": 224362,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "dunce",
+          "version": "1.0.5",
+          "upstream_member": "dunce-1.0.5/LICENSE",
+          "source_archive_sha256": "92773504d58c093f6de2459af4af33faa518c13451eb8f2b5698ed3d36e7c813",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499"
+        }
+      ]
+    },
+    {
+      "sha256": "aaff376532ea30a0cd5330b9502ad4a4c8bf769c539c87ffe78819d188a18ebf",
+      "bytes": 10849,
+      "byte_start": 224423,
+      "byte_end_exclusive": 235272,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "getrandom",
+          "version": "0.2.17",
+          "upstream_member": "getrandom-0.2.17/LICENSE-APACHE",
+          "source_archive_sha256": "ff2abc00be7fca6ebc474524697ae276ad847ad0a6b3faa4bcb027e9a4614ad0",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "aaff376532ea30a0cd5330b9502ad4a4c8bf769c539c87ffe78819d188a18ebf"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "getrandom",
+          "version": "0.3.4",
+          "upstream_member": "getrandom-0.3.4/LICENSE-APACHE",
+          "source_archive_sha256": "899def5c37c4fd7b2664648c28120ecec138e4d395b459e5ca34f9cce2dd77fd",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "aaff376532ea30a0cd5330b9502ad4a4c8bf769c539c87ffe78819d188a18ebf"
+        }
+      ]
+    },
+    {
+      "sha256": "42fa16951ce7f24b5a467a40e5b449a1d41e662f97ca779864f053f39e097737",
+      "bytes": 1130,
+      "byte_start": 235330,
+      "byte_end_exclusive": 236460,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "getrandom",
+          "version": "0.2.17",
+          "upstream_member": "getrandom-0.2.17/LICENSE-MIT",
+          "source_archive_sha256": "ff2abc00be7fca6ebc474524697ae276ad847ad0a6b3faa4bcb027e9a4614ad0",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "42fa16951ce7f24b5a467a40e5b449a1d41e662f97ca779864f053f39e097737"
+        }
+      ]
+    },
+    {
+      "sha256": "29e9fe5074bd27e0e5d5d110394fbbcd841baee2651a3c4b4560a632702cede4",
+      "bytes": 1130,
+      "byte_start": 236516,
+      "byte_end_exclusive": 237646,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "getrandom",
+          "version": "0.3.4",
+          "upstream_member": "getrandom-0.3.4/LICENSE-MIT",
+          "source_archive_sha256": "899def5c37c4fd7b2664648c28120ecec138e4d395b459e5ca34f9cce2dd77fd",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "29e9fe5074bd27e0e5d5d110394fbbcd841baee2651a3c4b4560a632702cede4"
+        }
+      ]
+    },
+    {
+      "sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb",
+      "bytes": 1071,
+      "byte_start": 237692,
+      "byte_end_exclusive": 238763,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "glob",
+          "version": "0.3.4",
+          "upstream_member": "glob-0.3.4/LICENSE-MIT",
+          "source_archive_sha256": "e4eba85ea1d0a966a983acd07deee566e67395d2d96b6fb39e62b5a833f1eb0b",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "log",
+          "version": "0.4.33",
+          "upstream_member": "log-0.4.33/LICENSE-MIT",
+          "source_archive_sha256": "0ceec5bc11778974d1bcb055b18002eba7f4b3518b6a0081b3af5f21666da9ad",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "regex-automata",
+          "version": "0.4.16",
+          "upstream_member": "regex-automata-0.4.16/LICENSE-MIT",
+          "source_archive_sha256": "8fcfdb36bda0c880c5931cdc7a2bcdc8ba4556847b9d912bca70bc94708711ad",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+        }
+      ]
+    },
+    {
+      "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08",
+      "bytes": 11358,
+      "byte_start": 238810,
+      "byte_end_exclusive": 250168,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "hex",
+          "version": "0.4.3",
+          "upstream_member": "hex-0.4.3/LICENSE-APACHE",
+          "source_archive_sha256": "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "toml",
+          "version": "1.1.3+spec-1.1.0",
+          "upstream_member": "toml-1.1.3+spec-1.1.0/LICENSE-APACHE",
+          "source_archive_sha256": "53c96ecdfa941c8fc4fcaed14f99ada8ebed502eef533015095a07e3301d4c3c",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08"
+        }
+      ]
+    },
+    {
+      "sha256": "f7bdb3426d045cd50efd4953026e3eb5a83d0199f458a075602611b9344da5b9",
+      "bytes": 1125,
+      "byte_start": 250212,
+      "byte_end_exclusive": 251337,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "hex",
+          "version": "0.4.3",
+          "upstream_member": "hex-0.4.3/LICENSE-MIT",
+          "source_archive_sha256": "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "f7bdb3426d045cd50efd4953026e3eb5a83d0199f458a075602611b9344da5b9"
+        }
+      ]
+    },
+    {
+      "sha256": "86dd7f026f916daf7511e39951ad8ea8cf55a8db67ae64060dacf829761c18f3",
+      "bytes": 1076,
+      "byte_start": 251395,
+      "byte_end_exclusive": 252471,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "html5ever",
+          "version": "0.38.0",
+          "upstream_member": "html5ever-0.38.0/LICENSE-MIT",
+          "source_archive_sha256": "1054432bae2f14e0061e33d23402fbaa67a921d319d56adc6bcf887ddad1cbc2",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "86dd7f026f916daf7511e39951ad8ea8cf55a8db67ae64060dacf829761c18f3"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "markup5ever",
+          "version": "0.38.0",
+          "upstream_member": "markup5ever-0.38.0/LICENSE-MIT",
+          "source_archive_sha256": "8983d30f2915feeaaab2d6babdd6bc7e9ed1a00b66b5e6d74df19aa9c0e91862",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "86dd7f026f916daf7511e39951ad8ea8cf55a8db67ae64060dacf829761c18f3"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "web_atoms",
+          "version": "0.2.5",
+          "upstream_member": "web_atoms-0.2.5/LICENSE-MIT",
+          "source_archive_sha256": "075474b12bcb3d2e3d4546580e9de478eeeead668a1761e2a8860c836b7ef297",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "86dd7f026f916daf7511e39951ad8ea8cf55a8db67ae64060dacf829761c18f3"
+        }
+      ]
+    },
+    {
+      "sha256": "8bb1b50b0e5c9399ae33bd35fab2769010fa6c14e8860c729a52295d84896b7a",
+      "bytes": 10835,
+      "byte_start": 252520,
+      "byte_end_exclusive": 263355,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "http",
+          "version": "1.4.2",
+          "upstream_member": "http-1.4.2/LICENSE-APACHE",
+          "source_archive_sha256": "6970f50e31d6fc17d3fa27329444bfa74e196cf62e95052a3f6fee181dba6425",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "8bb1b50b0e5c9399ae33bd35fab2769010fa6c14e8860c729a52295d84896b7a"
+        }
+      ]
+    },
+    {
+      "sha256": "dc91f8200e4b2a1f9261035d4c18c33c246911a6c0f7b543d75347e61b249cff",
+      "bytes": 1059,
+      "byte_start": 263401,
+      "byte_end_exclusive": 264460,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "http",
+          "version": "1.4.2",
+          "upstream_member": "http-1.4.2/LICENSE-MIT",
+          "source_archive_sha256": "6970f50e31d6fc17d3fa27329444bfa74e196cf62e95052a3f6fee181dba6425",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "dc91f8200e4b2a1f9261035d4c18c33c246911a6c0f7b543d75347e61b249cff"
+        }
+      ]
+    },
+    {
+      "sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2",
+      "bytes": 2195,
+      "byte_start": 264524,
+      "byte_end_exclusive": 266719,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "icu_collections",
+          "version": "2.2.0",
+          "upstream_member": "icu_collections-2.2.0/LICENSE",
+          "source_archive_sha256": "2984d1cd16c883d7935b9e07e44071dca8d917fd52ecc02c04d5fa0b5a3f191c",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "icu_normalizer",
+          "version": "2.2.0",
+          "upstream_member": "icu_normalizer-2.2.0/LICENSE",
+          "source_archive_sha256": "c56e5ee99d6e3d33bd91c5d85458b6005a22140021cc324cea84dd0e72cff3b4",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+        }
+      ]
+    },
+    {
+      "sha256": "270b0d81891aa44c7e8726cf9432dade9556a01c848bacd2f3ef839c9c1a1859",
+      "bytes": 1062,
+      "byte_start": 266765,
+      "byte_end_exclusive": 267827,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "infer",
+          "version": "0.19.0",
+          "upstream_member": "infer-0.19.0/LICENSE",
+          "source_archive_sha256": "a588916bfdfd92e71cacef98a63d9b1f0d74d6599980d11894290e7ddefffcf7",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "270b0d81891aa44c7e8726cf9432dade9556a01c848bacd2f3ef839c9c1a1859"
+        }
+      ]
+    },
+    {
+      "sha256": "df9cfd06d8a44d9a671eadd39ffd97f166481da015a30f45dfd27886209c5922",
+      "bytes": 1058,
+      "byte_start": 267875,
+      "byte_end_exclusive": 268933,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "mime",
+          "version": "0.3.17",
+          "upstream_member": "mime-0.3.17/LICENSE-MIT",
+          "source_archive_sha256": "6877bb514081ee2a7ff5ef9de3281f14a4dd4bceac4c09388074a6b5df8a139a",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "df9cfd06d8a44d9a671eadd39ffd97f166481da015a30f45dfd27886209c5922"
+        }
+      ]
+    },
+    {
+      "sha256": "07919255c7e04793d8ea760d6c2ce32d19f9ff02bdbdde3ce90b1e1880929a9b",
+      "bytes": 1082,
+      "byte_start": 268973,
+      "byte_end_exclusive": 270055,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "mio",
+          "version": "1.2.2",
+          "upstream_member": "mio-1.2.2/LICENSE",
+          "source_archive_sha256": "30d65c71f1ce40ab09135ce117d742b9f8a19ff91a41a8b57ed50bc2de59c427",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "07919255c7e04793d8ea760d6c2ce32d19f9ff02bdbdde3ce90b1e1880929a9b"
+        }
+      ]
+    },
+    {
+      "sha256": "2ab5537b8c0cb1d475e2145b6a7994b04e7c71e6e5bd836f7f9c47c221a5ad9a",
+      "bytes": 1108,
+      "byte_start": 270103,
+      "byte_end_exclusive": 271211,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "muda",
+          "version": "0.19.3",
+          "upstream_member": "muda-0.19.3/LICENSE-MIT",
+          "source_archive_sha256": "1dd04e60bc0b07438a6771710ee1698f98f6ebbc7f89b61264af1563b8aeb878",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "2ab5537b8c0cb1d475e2145b6a7994b04e7c71e6e5bd836f7f9c47c221a5ad9a"
+        }
+      ]
+    },
+    {
+      "sha256": "b99f9d43803f2ac979c50949df630bd8eeaf2fcd1b9fdb9093710d70f5dfb63d",
+      "bytes": 809,
+      "byte_start": 271260,
+      "byte_end_exclusive": 272069,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "muda",
+          "version": "0.19.3",
+          "upstream_member": "muda-0.19.3/LICENSE.spdx",
+          "source_archive_sha256": "1dd04e60bc0b07438a6771710ee1698f98f6ebbc7f89b61264af1563b8aeb878",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "b99f9d43803f2ac979c50949df630bd8eeaf2fcd1b9fdb9093710d70f5dfb63d"
+        }
+      ]
+    },
+    {
+      "sha256": "c9a75f18b9ab2927829a208fc6aa2cf4e63b8420887ba29cdb265d6619ae82d5",
+      "bytes": 1071,
+      "byte_start": 272131,
+      "byte_end_exclusive": 273202,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "parking_lot",
+          "version": "0.12.5",
+          "upstream_member": "parking_lot-0.12.5/LICENSE-MIT",
+          "source_archive_sha256": "93857453250e3077bd71ff98b6a65ea6621a19bb0f559a85248955ac12c45a1a",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "c9a75f18b9ab2927829a208fc6aa2cf4e63b8420887ba29cdb265d6619ae82d5"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "parking_lot_core",
+          "version": "0.9.12",
+          "upstream_member": "parking_lot_core-0.9.12/LICENSE-MIT",
+          "source_archive_sha256": "2621685985a2ebf1c516881c026032ac7deafcda1a2c9b7850dc81e3dfcb64c1",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "c9a75f18b9ab2927829a208fc6aa2cf4e63b8420887ba29cdb265d6619ae82d5"
+        }
+      ]
+    },
+    {
+      "sha256": "90eb64f0279b0d9432accfa6023ff803bc4965212383697eee27a0f426d5f8d5",
+      "bytes": 569,
+      "byte_start": 273256,
+      "byte_end_exclusive": 273825,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "rand_core",
+          "version": "0.6.4",
+          "upstream_member": "rand_core-0.6.4/COPYRIGHT",
+          "source_archive_sha256": "ec0be4795e2f6a28069bec0b5ff3e2ac9bafc99e6a9a7dc3547996c5c816922c",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "90eb64f0279b0d9432accfa6023ff803bc4965212383697eee27a0f426d5f8d5"
+        }
+      ]
+    },
+    {
+      "sha256": "6df43f6f4b5d4587f3d8d71e45532c688fd168afa5fe89d571cb32fa09c4ef51",
+      "bytes": 10282,
+      "byte_start": 273884,
+      "byte_end_exclusive": 284166,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "rand_core",
+          "version": "0.6.4",
+          "upstream_member": "rand_core-0.6.4/LICENSE-APACHE",
+          "source_archive_sha256": "ec0be4795e2f6a28069bec0b5ff3e2ac9bafc99e6a9a7dc3547996c5c816922c",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "6df43f6f4b5d4587f3d8d71e45532c688fd168afa5fe89d571cb32fa09c4ef51"
+        }
+      ]
+    },
+    {
+      "sha256": "209fbbe0ad52d9235e37badf9cadfe4dbdc87203179c0899e738b39ade42177b",
+      "bytes": 1117,
+      "byte_start": 284222,
+      "byte_end_exclusive": 285339,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "rand_core",
+          "version": "0.6.4",
+          "upstream_member": "rand_core-0.6.4/LICENSE-MIT",
+          "source_archive_sha256": "ec0be4795e2f6a28069bec0b5ff3e2ac9bafc99e6a9a7dc3547996c5c816922c",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "209fbbe0ad52d9235e37badf9cadfe4dbdc87203179c0899e738b39ade42177b"
+        }
+      ]
+    },
+    {
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+      "bytes": 10174,
+      "byte_start": 285417,
+      "byte_end_exclusive": 295591,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "raw-window-handle",
+          "version": "0.6.2",
+          "upstream_member": "raw-window-handle-0.6.2/LICENSE-APACHE.md",
+          "source_archive_sha256": "20675572f6f24e9e76ef639bc5552774ed45f1c30e2951e1e99c59888861c539",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "tauri",
+          "version": "2.11.5",
+          "upstream_member": "tauri-2.11.5/LICENSE_APACHE-2.0",
+          "source_archive_sha256": "667b20e2726d572dea2de7370da16e188eb06008faf9a92fab7cdc46791190b5",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "tauri-runtime",
+          "version": "2.11.3",
+          "upstream_member": "tauri-runtime-2.11.3/LICENSE_APACHE-2.0",
+          "source_archive_sha256": "b0b4bc95aed361b0019067d189a1174a603d460d0f6c72606512d59fc9c12ec8",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "tauri-runtime-wry",
+          "version": "2.11.4",
+          "upstream_member": "tauri-runtime-wry-2.11.4/LICENSE_APACHE-2.0",
+          "source_archive_sha256": "4e6fac707727b7a2f48e4ded90976324267371073edbb415ffb73bb0458d203f",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "tauri-utils",
+          "version": "2.9.3",
+          "upstream_member": "tauri-utils-2.9.3/LICENSE_APACHE-2.0",
+          "source_archive_sha256": "3e176a18e67764923c4f1ce66f25ae4abe5f688384d5eb1a0fa6c77f3d90f887",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+        }
+      ]
+    },
+    {
+      "sha256": "9c5a80639a57c1c945570e7ebbca0706305849ce3c098021325cca9db2f7acc4",
+      "bytes": 1064,
+      "byte_start": 295666,
+      "byte_end_exclusive": 296730,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "raw-window-handle",
+          "version": "0.6.2",
+          "upstream_member": "raw-window-handle-0.6.2/LICENSE-MIT.md",
+          "source_archive_sha256": "20675572f6f24e9e76ef639bc5552774ed45f1c30e2951e1e99c59888861c539",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "9c5a80639a57c1c945570e7ebbca0706305849ce3c098021325cca9db2f7acc4"
+        }
+      ]
+    },
+    {
+      "sha256": "ae895c8576e682f310fb70d93d9f99b1dd82872094c54a8f6cdfe2ca5c2d6ecb",
+      "bytes": 836,
+      "byte_start": 296806,
+      "byte_end_exclusive": 297642,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "raw-window-handle",
+          "version": "0.6.2",
+          "upstream_member": "raw-window-handle-0.6.2/LICENSE-ZLIB.md",
+          "source_archive_sha256": "20675572f6f24e9e76ef639bc5552774ed45f1c30e2951e1e99c59888861c539",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "ae895c8576e682f310fb70d93d9f99b1dd82872094c54a8f6cdfe2ca5c2d6ecb"
+        }
+      ]
+    },
+    {
+      "sha256": "65fc947f4bac882a2cd104ef73c246b1b037059df9f2b3a58b7f77f0b9e56071",
+      "bytes": 1079,
+      "byte_start": 297684,
+      "byte_end_exclusive": 298763,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "rfd",
+          "version": "0.15.4",
+          "upstream_member": "rfd-0.15.4/LICENSE",
+          "source_archive_sha256": "ef2bee61e6cffa4635c72d7d81a84294e28f0930db0ddcb0f66d10244674ebed",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "65fc947f4bac882a2cd104ef73c246b1b037059df9f2b3a58b7f77f0b9e56071"
+        }
+      ]
+    },
+    {
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "bytes": 11357,
+      "byte_start": 298850,
+      "byte_end_exclusive": 310207,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "serialize-to-javascript",
+          "version": "0.1.2",
+          "upstream_member": "serialize-to-javascript-0.1.2/LICENSE-APACHE",
+          "source_archive_sha256": "04f3666a07a197cdb77cdf306c32be9b7f598d7060d50cfd4d5aa04bfd92f6c5",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+        }
+      ]
+    },
+    {
+      "sha256": "e53a7165e8bc3ced5e5628404b3d2d28ecc14ad720f1c09ba28385d5151ecf93",
+      "bytes": 1066,
+      "byte_start": 310291,
+      "byte_end_exclusive": 311357,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "serialize-to-javascript",
+          "version": "0.1.2",
+          "upstream_member": "serialize-to-javascript-0.1.2/LICENSE-MIT",
+          "source_archive_sha256": "04f3666a07a197cdb77cdf306c32be9b7f598d7060d50cfd4d5aa04bfd92f6c5",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "e53a7165e8bc3ced5e5628404b3d2d28ecc14ad720f1c09ba28385d5151ecf93"
+        }
+      ]
+    },
+    {
+      "sha256": "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+      "bytes": 10849,
+      "byte_start": 311408,
+      "byte_end_exclusive": 322257,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "sha2",
+          "version": "0.10.9",
+          "upstream_member": "sha2-0.10.9/LICENSE-APACHE",
+          "source_archive_sha256": "a7507d819769d01a365ab707794a4084392c824f54a7a6a7862f8c3d0892b283",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5"
+        }
+      ]
+    },
+    {
+      "sha256": "b4eb00df6e2a4d22518fcaa6a2b4646f249b3a3c9814509b22bd2091f1392ff1",
+      "bytes": 1138,
+      "byte_start": 322305,
+      "byte_end_exclusive": 323443,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "sha2",
+          "version": "0.10.9",
+          "upstream_member": "sha2-0.10.9/LICENSE-MIT",
+          "source_archive_sha256": "a7507d819769d01a365ab707794a4084392c824f54a7a6a7862f8c3d0892b283",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "b4eb00df6e2a4d22518fcaa6a2b4646f249b3a3c9814509b22bd2091f1392ff1"
+        }
+      ]
+    },
+    {
+      "sha256": "a4445427440043e8ce6fadf7a43fb906cb0d7f6c573a560a9f142cf9f9bf8ff4",
+      "bytes": 11312,
+      "byte_start": 323504,
+      "byte_end_exclusive": 334816,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "softbuffer",
+          "version": "0.4.8",
+          "upstream_member": "softbuffer-0.4.8/LICENSE-APACHE",
+          "source_archive_sha256": "aac18da81ebbf05109ab275b157c22a653bb3c12cf884450179942f81bcbf6c3",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "a4445427440043e8ce6fadf7a43fb906cb0d7f6c573a560a9f142cf9f9bf8ff4"
+        }
+      ]
+    },
+    {
+      "sha256": "0463bfa47d6d763d8c824333efb0e6d6df3946c13c3b077c78ed9f23ca50d0f2",
+      "bytes": 1056,
+      "byte_start": 334874,
+      "byte_end_exclusive": 335930,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "softbuffer",
+          "version": "0.4.8",
+          "upstream_member": "softbuffer-0.4.8/LICENSE-MIT",
+          "source_archive_sha256": "aac18da81ebbf05109ab275b157c22a653bb3c12cf884450179942f81bcbf6c3",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "0463bfa47d6d763d8c824333efb0e6d6df3946c13c3b077c78ed9f23ca50d0f2"
+        }
+      ]
+    },
+    {
+      "sha256": "62065228e42caebca7e7d7db1204cbb867033de5982ca4009928915e4095f3a3",
+      "bytes": 1067,
+      "byte_start": 335992,
+      "byte_end_exclusive": 337059,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "string_cache",
+          "version": "0.9.0",
+          "upstream_member": "string_cache-0.9.0/LICENSE-MIT",
+          "source_archive_sha256": "a18596f8c785a729f2819c0f6a7eae6ebeebdfffbfe4214ae6b087f690e31901",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "62065228e42caebca7e7d7db1204cbb867033de5982ca4009928915e4095f3a3"
+        }
+      ]
+    },
+    {
+      "sha256": "6dc0e068dcf3a5bc8e054205b85b7720e1d49265bbc64bf515d2cf79197df69a",
+      "bytes": 11323,
+      "byte_start": 337101,
+      "byte_end_exclusive": 348424,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "tao",
+          "version": "0.35.3",
+          "upstream_member": "tao-0.35.3/LICENSE",
+          "source_archive_sha256": "d1c93047acf68669466a34690ac58cca7010bd1b201e1ec86f1fd0a75d3dd4a9",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "6dc0e068dcf3a5bc8e054205b85b7720e1d49265bbc64bf515d2cf79197df69a"
+        }
+      ]
+    },
+    {
+      "sha256": "02b6448337b757772d90e5f31caaa0f9e6afaad2221c01771d0a3deaa4d4196c",
+      "bytes": 793,
+      "byte_start": 348471,
+      "byte_end_exclusive": 349264,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "tao",
+          "version": "0.35.3",
+          "upstream_member": "tao-0.35.3/LICENSE.spdx",
+          "source_archive_sha256": "d1c93047acf68669466a34690ac58cca7010bd1b201e1ec86f1fd0a75d3dd4a9",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "02b6448337b757772d90e5f31caaa0f9e6afaad2221c01771d0a3deaa4d4196c"
+        }
+      ]
+    },
+    {
+      "sha256": "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d",
+      "bytes": 1090,
+      "byte_start": 349314,
+      "byte_end_exclusive": 350404,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "tauri",
+          "version": "2.11.5",
+          "upstream_member": "tauri-2.11.5/LICENSE_MIT",
+          "source_archive_sha256": "667b20e2726d572dea2de7370da16e188eb06008faf9a92fab7cdc46791190b5",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "tauri-runtime",
+          "version": "2.11.3",
+          "upstream_member": "tauri-runtime-2.11.3/LICENSE_MIT",
+          "source_archive_sha256": "b0b4bc95aed361b0019067d189a1174a603d460d0f6c72606512d59fc9c12ec8",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "tauri-runtime-wry",
+          "version": "2.11.4",
+          "upstream_member": "tauri-runtime-wry-2.11.4/LICENSE_MIT",
+          "source_archive_sha256": "4e6fac707727b7a2f48e4ded90976324267371073edbb415ffb73bb0458d203f",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "tauri-utils",
+          "version": "2.9.3",
+          "upstream_member": "tauri-utils-2.9.3/LICENSE_MIT",
+          "source_archive_sha256": "3e176a18e67764923c4f1ce66f25ae4abe5f688384d5eb1a0fa6c77f3d90f887",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d"
+        }
+      ]
+    },
+    {
+      "sha256": "eb8a6c84630461b352badcab1dbe5d0168c56d377358b2b8c86b51003272d5ef",
+      "bytes": 888,
+      "byte_start": 350499,
+      "byte_end_exclusive": 351387,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "tauri-plugin-single-instance",
+          "version": "2.4.3",
+          "upstream_member": "tauri-plugin-single-instance-2.4.3/LICENSE.spdx",
+          "source_archive_sha256": "b3214becf9ef5783c0ae99a3bb25adf5353a7a16ebf53e74b909e29205735c6c",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "eb8a6c84630461b352badcab1dbe5d0168c56d377358b2b8c86b51003272d5ef"
+        }
+      ]
+    },
+    {
+      "sha256": "0cec06e0e55fbc3dc5cee4fca9b607f66cb8f4e4dbcf3b3c013594dd156732e9",
+      "bytes": 10173,
+      "byte_start": 351488,
+      "byte_end_exclusive": 361661,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "tauri-plugin-single-instance",
+          "version": "2.4.3",
+          "upstream_member": "tauri-plugin-single-instance-2.4.3/LICENSE_APACHE-2.0",
+          "source_archive_sha256": "b3214becf9ef5783c0ae99a3bb25adf5353a7a16ebf53e74b909e29205735c6c",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "0cec06e0e55fbc3dc5cee4fca9b607f66cb8f4e4dbcf3b3c013594dd156732e9"
+        }
+      ]
+    },
+    {
+      "sha256": "b7f455413bfe5f9d7da501a4468d4c5f866a432c325947e98cc9535e8b26cd6d",
+      "bytes": 1112,
+      "byte_start": 361755,
+      "byte_end_exclusive": 362867,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "tauri-plugin-single-instance",
+          "version": "2.4.3",
+          "upstream_member": "tauri-plugin-single-instance-2.4.3/LICENSE_MIT",
+          "source_archive_sha256": "b3214becf9ef5783c0ae99a3bb25adf5353a7a16ebf53e74b909e29205735c6c",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "b7f455413bfe5f9d7da501a4468d4c5f866a432c325947e98cc9535e8b26cd6d"
+        }
+      ]
+    },
+    {
+      "sha256": "60a7062291b01ba068f300612cdbdc20382ac1d4934f07bcdd7167c15299f309",
+      "bytes": 1061,
+      "byte_start": 362919,
+      "byte_end_exclusive": 363980,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "tendril",
+          "version": "0.5.1",
+          "upstream_member": "tendril-0.5.1/LICENSE-MIT",
+          "source_archive_sha256": "5fed54709c5b3a53d09bb1c113ea4f5ceafd1e772ddcb0030a82e1d56c087b08",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "60a7062291b01ba068f300612cdbdc20382ac1d4934f07bcdd7167c15299f309"
+        }
+      ]
+    },
+    {
+      "sha256": "253cd04c6714889df2d32f3f64d669179a1c95c76ac43c40882c52eb06bc3552",
+      "bytes": 1070,
+      "byte_start": 364026,
+      "byte_end_exclusive": 365096,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "tokio",
+          "version": "1.52.3",
+          "upstream_member": "tokio-1.52.3/LICENSE",
+          "source_archive_sha256": "8fc7f01b389ac15039e4dc9531aa973a135d7a4135281b12d7c1bc79fd57fffe",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "253cd04c6714889df2d32f3f64d669179a1c95c76ac43c40882c52eb06bc3552"
+        }
+      ]
+    },
+    {
+      "sha256": "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6",
+      "bytes": 1062,
+      "byte_start": 365164,
+      "byte_end_exclusive": 366226,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "toml",
+          "version": "1.1.3+spec-1.1.0",
+          "upstream_member": "toml-1.1.3+spec-1.1.0/LICENSE-MIT",
+          "source_archive_sha256": "53c96ecdfa941c8fc4fcaed14f99ada8ebed502eef533015095a07e3301d4c3c",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6"
+        }
+      ]
+    },
+    {
+      "sha256": "23860c2a7b5d96b21569afedf033469bab9fe14a1b24a35068b8641c578ce24d",
+      "bytes": 321,
+      "byte_start": 366304,
+      "byte_end_exclusive": 366625,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "unicode-segmentation",
+          "version": "1.13.3",
+          "upstream_member": "unicode-segmentation-1.13.3/COPYRIGHT",
+          "source_archive_sha256": "c6f5d3c3b1bf09027a88a6bc961fc00497d651009560b5463668dc81b0fa87a8",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "23860c2a7b5d96b21569afedf033469bab9fe14a1b24a35068b8641c578ce24d"
+        }
+      ]
+    },
+    {
+      "sha256": "7b63ecd5f1902af1b63729947373683c32745c16a10e8e6292e2e2dcd7e90ae0",
+      "bytes": 1071,
+      "byte_start": 366705,
+      "byte_end_exclusive": 367776,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "unicode-segmentation",
+          "version": "1.13.3",
+          "upstream_member": "unicode-segmentation-1.13.3/LICENSE-MIT",
+          "source_archive_sha256": "c6f5d3c3b1bf09027a88a6bc961fc00497d651009560b5463668dc81b0fa87a8",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "7b63ecd5f1902af1b63729947373683c32745c16a10e8e6292e2e2dcd7e90ae0"
+        }
+      ]
+    },
+    {
+      "sha256": "5cf1c9dc617e4cad7fa03181ff893601ad5243aa3be527ef39034e1cd6377676",
+      "bytes": 1073,
+      "byte_start": 367830,
+      "byte_end_exclusive": 368903,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "urlpattern",
+          "version": "0.3.0",
+          "upstream_member": "urlpattern-0.3.0/LICENSE",
+          "source_archive_sha256": "70acd30e3aa1450bc2eece896ce2ad0d178e9c079493819301573dae3c37ba6d",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "5cf1c9dc617e4cad7fa03181ff893601ad5243aa3be527ef39034e1cd6377676"
+        }
+      ]
+    },
+    {
+      "sha256": "c30152c94a6d75e021adbc52b3a52470366a46edb917e17deae3259251af244c",
+      "bytes": 1742,
+      "byte_start": 368957,
+      "byte_end_exclusive": 370699,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "utf8_iter",
+          "version": "1.0.4",
+          "upstream_member": "utf8_iter-1.0.4/COPYRIGHT",
+          "source_archive_sha256": "b6c140620e7ffbb22c2dee59cafe6084a59b5ffc27a8859a5f0d494b5d52b6be",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "c30152c94a6d75e021adbc52b3a52470366a46edb917e17deae3259251af244c"
+        }
+      ]
+    },
+    {
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "bytes": 11358,
+      "byte_start": 370758,
+      "byte_end_exclusive": 382116,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "utf8_iter",
+          "version": "1.0.4",
+          "upstream_member": "utf8_iter-1.0.4/LICENSE-APACHE",
+          "source_archive_sha256": "b6c140620e7ffbb22c2dee59cafe6084a59b5ffc27a8859a5f0d494b5d52b6be",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+        }
+      ]
+    },
+    {
+      "sha256": "3fa4ca83dcc9237839b1bdeb2e6d16bdfb5ec0c5ce42b24694d8bbf0dcbef72c",
+      "bytes": 1053,
+      "byte_start": 382172,
+      "byte_end_exclusive": 383225,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "utf8_iter",
+          "version": "1.0.4",
+          "upstream_member": "utf8_iter-1.0.4/LICENSE-MIT",
+          "source_archive_sha256": "b6c140620e7ffbb22c2dee59cafe6084a59b5ffc27a8859a5f0d494b5d52b6be",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "3fa4ca83dcc9237839b1bdeb2e6d16bdfb5ec0c5ce42b24694d8bbf0dcbef72c"
+        }
+      ]
+    },
+    {
+      "sha256": "436bc5a105d8e57dcd8778730f3754f7bf39c14d2f530e4cde4bd2d17a83ec3d",
+      "bytes": 1157,
+      "byte_start": 383273,
+      "byte_end_exclusive": 384430,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "uuid",
+          "version": "1.24.0",
+          "upstream_member": "uuid-1.24.0/LICENSE-MIT",
+          "source_archive_sha256": "bf3923a6f5c4c6382e0b653c4117f48d631ea17f38ed86e2a828e6f7412f5239",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "436bc5a105d8e57dcd8778730f3754f7bf39c14d2f530e4cde4bd2d17a83ec3d"
+        }
+      ]
+    },
+    {
+      "sha256": "0dcf41516e608bbcb6cdc5229feb7b86fe4a643b85e7df251133c93408fdac73",
+      "bytes": 1067,
+      "byte_start": 384502,
+      "byte_end_exclusive": 385569,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "webview2-com",
+          "version": "0.38.2",
+          "upstream_member": "LICENSE at crate-recorded source commit",
+          "source_archive_sha256": "7130243a7a5b33c54a444e54842e6a9e133de08b5ad7b5861cd8ed9a6a5bc96a",
+          "source_commit": "b74dc5e2b394044bea5191052868ce7a106c202c",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "0dcf41516e608bbcb6cdc5229feb7b86fe4a643b85e7df251133c93408fdac73"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "webview2-com-sys",
+          "version": "0.38.2",
+          "upstream_member": "LICENSE at crate-recorded source commit",
+          "source_archive_sha256": "381336cfffd772377d291702245447a5251a2ffa5bad679c99e61bc48bacbf9c",
+          "source_commit": "b74dc5e2b394044bea5191052868ce7a106c202c",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "0dcf41516e608bbcb6cdc5229feb7b86fe4a643b85e7df251133c93408fdac73"
+        }
+      ]
+    },
+    {
+      "sha256": "cb3c929a05e6cbc9de9ab06a4c57eeb60ca8c724bef6c138c87d3a577e27aa14",
+      "bytes": 1081,
+      "byte_start": 385631,
+      "byte_end_exclusive": 386712,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "winapi-util",
+          "version": "0.1.11",
+          "upstream_member": "winapi-util-0.1.11/LICENSE-MIT",
+          "source_archive_sha256": "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "cb3c929a05e6cbc9de9ab06a4c57eeb60ca8c724bef6c138c87d3a577e27aa14"
+        }
+      ]
+    },
+    {
+      "sha256": "617b85f62a4f1b6a62d3d9f28f6d7003b7f68a70b7675a8174bbcc68401ac62d",
+      "bytes": 1108,
+      "byte_start": 386780,
+      "byte_end_exclusive": 387888,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "window-vibrancy",
+          "version": "0.6.0",
+          "upstream_member": "window-vibrancy-0.6.0/LICENSE-MIT",
+          "source_archive_sha256": "d9bec5a31f3f9362f2258fd0e9c9dd61a9ca432e7306cc78c444258f0dce9a9c",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "617b85f62a4f1b6a62d3d9f28f6d7003b7f68a70b7675a8174bbcc68401ac62d"
+        }
+      ]
+    },
+    {
+      "sha256": "7ccef0d35e8507fa02d7e904a5277d62723f9ec576d52f6a865cab7b4dbf12ad",
+      "bytes": 840,
+      "byte_start": 387957,
+      "byte_end_exclusive": 388797,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "window-vibrancy",
+          "version": "0.6.0",
+          "upstream_member": "window-vibrancy-0.6.0/LICENSE.spdx",
+          "source_archive_sha256": "d9bec5a31f3f9362f2258fd0e9c9dd61a9ca432e7306cc78c444258f0dce9a9c",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "7ccef0d35e8507fa02d7e904a5277d62723f9ec576d52f6a865cab7b4dbf12ad"
+        }
+      ]
+    },
+    {
+      "sha256": "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b",
+      "bytes": 11351,
+      "byte_start": 388858,
+      "byte_end_exclusive": 400209,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "windows",
+          "version": "0.61.3",
+          "upstream_member": "windows-0.61.3/license-apache-2.0",
+          "source_archive_sha256": "9babd3a767a4c1aef6900409f85f5d53ce2544ccdfaa86dad48c91782c6d6893",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "windows-core",
+          "version": "0.61.2",
+          "upstream_member": "windows-core-0.61.2/license-apache-2.0",
+          "source_archive_sha256": "c0fdd3ddb90610c7638aa2b3a3ab2904fb9e5cdbecc643ddb3647212781c4ae3",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "windows-result",
+          "version": "0.3.4",
+          "upstream_member": "windows-result-0.3.4/license-apache-2.0",
+          "source_archive_sha256": "56f42bd332cc6c8eac5af113fc0c1fd6a8fd2aa08a0119358686e5160d0586c6",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "windows-strings",
+          "version": "0.4.2",
+          "upstream_member": "windows-strings-0.4.2/license-apache-2.0",
+          "source_archive_sha256": "56e6c93f3a0c3b36176cb1327a4958a0353d5d166c2a35cb268ace15e91d3b57",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "windows-sys",
+          "version": "0.61.2",
+          "upstream_member": "windows-sys-0.61.2/license-apache-2.0",
+          "source_archive_sha256": "ae137229bcbd6cdf0f7b80a31df61766145077ddf49416a728b02cb3921ff3fc",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "windows-version",
+          "version": "0.1.7",
+          "upstream_member": "windows-version-0.1.7/license-apache-2.0",
+          "source_archive_sha256": "e4060a1da109b9d0326b7262c8e12c84df67cc0dbc9e33cf49e01ccc2eb63631",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "windows_x86_64_msvc",
+          "version": "0.53.1",
+          "upstream_member": "windows_x86_64_msvc-0.53.1/license-apache-2.0",
+          "source_archive_sha256": "d6bbff5f0aada427a1e5a6da5f1f98158182f26556f345ac9e04d36d0ebed650",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b"
+        }
+      ]
+    },
+    {
+      "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+      "bytes": 1141,
+      "byte_start": 400263,
+      "byte_end_exclusive": 401404,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "windows",
+          "version": "0.61.3",
+          "upstream_member": "windows-0.61.3/license-mit",
+          "source_archive_sha256": "9babd3a767a4c1aef6900409f85f5d53ce2544ccdfaa86dad48c91782c6d6893",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "windows-core",
+          "version": "0.61.2",
+          "upstream_member": "windows-core-0.61.2/license-mit",
+          "source_archive_sha256": "c0fdd3ddb90610c7638aa2b3a3ab2904fb9e5cdbecc643ddb3647212781c4ae3",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "windows-result",
+          "version": "0.3.4",
+          "upstream_member": "windows-result-0.3.4/license-mit",
+          "source_archive_sha256": "56f42bd332cc6c8eac5af113fc0c1fd6a8fd2aa08a0119358686e5160d0586c6",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "windows-strings",
+          "version": "0.4.2",
+          "upstream_member": "windows-strings-0.4.2/license-mit",
+          "source_archive_sha256": "56e6c93f3a0c3b36176cb1327a4958a0353d5d166c2a35cb268ace15e91d3b57",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "windows-sys",
+          "version": "0.61.2",
+          "upstream_member": "windows-sys-0.61.2/license-mit",
+          "source_archive_sha256": "ae137229bcbd6cdf0f7b80a31df61766145077ddf49416a728b02cb3921ff3fc",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "windows-version",
+          "version": "0.1.7",
+          "upstream_member": "windows-version-0.1.7/license-mit",
+          "source_archive_sha256": "e4060a1da109b9d0326b7262c8e12c84df67cc0dbc9e33cf49e01ccc2eb63631",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+        },
+        {
+          "row_id": "R01",
+          "distribution": "windows_x86_64_msvc",
+          "version": "0.53.1",
+          "upstream_member": "windows_x86_64_msvc-0.53.1/license-mit",
+          "source_archive_sha256": "d6bbff5f0aada427a1e5a6da5f1f98158182f26556f345ac9e04d36d0ebed650",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+        }
+      ]
+    },
+    {
+      "sha256": "ef88893533af22ffbb68ceef0724ba1389518df26165a34f3c99ad30b884df4f",
+      "bytes": 1121,
+      "byte_start": 401450,
+      "byte_end_exclusive": 402571,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "wry",
+          "version": "0.55.1",
+          "upstream_member": "wry-0.55.1/LICENSE-MIT",
+          "source_archive_sha256": "186f9871daa55fd9c016578b810d149de58367113db7fb72b462d2323ce19514",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "ef88893533af22ffbb68ceef0724ba1389518df26165a34f3c99ad30b884df4f"
+        }
+      ]
+    },
+    {
+      "sha256": "26235c41e314fb0da35b33b2bb5bcbc4dd523839f8eeca52efcd43586f441fb5",
+      "bytes": 833,
+      "byte_start": 402618,
+      "byte_end_exclusive": 403451,
+      "components": [
+        {
+          "row_id": "R01",
+          "distribution": "wry",
+          "version": "0.55.1",
+          "upstream_member": "wry-0.55.1/LICENSE.spdx",
+          "source_archive_sha256": "186f9871daa55fd9c016578b810d149de58367113db7fb72b462d2323ce19514",
+          "kind": "complete original upstream legal member; actual local modification history remains separate",
+          "original_sha256": "26235c41e314fb0da35b33b2bb5bcbc4dd523839f8eeca52efcd43586f441fb5"
+        }
+      ]
+    }
+  ],
+  "compared_owner_sha256": "6d3b7657c81e8c586bd0f3aa33dde9fcb13764a5f5204e14df7251f763838e73",
+  "compared_fragments": 186,
+  "unique_original_installation_proven": false,
+  "release_eligible": false,
+  "A01_A02_A03": "Preserved and denied; no retry or clearance.",
+  "preserved_2054_document": {
+    "bytes": 105321,
+    "sha256": "ffe1666cf11dc3b63f74159f6cc155ea8d857d5122493a74077317b4af499a71"
+  },
+  "python_component_rows": 14,
+  "native_component_rows": 3,
+  "rust_component_rows": 75,
+  "review_scope": "Python correspondence review retains its original scope. Native/Rust contribution v1 independently reviewed; this successor stages its complete original texts and four Rust standard-library companions. Installed/native delivery remains unverified.",
+  "native_rust_evidence": {
+    "desktop_sha256": "6bdd001cc9db4686bbc220af0a10c07c94e2b2d9cedd079cd70cf5660853b15d",
+    "owner_sha256": "6d3b7657c81e8c586bd0f3aa33dde9fcb13764a5f5204e14df7251f763838e73",
+    "Rust_491_dispositions": {
+      "included": 75,
+      "excluded": 239,
+      "unknown": 177
+    },
+    "original_installation_proven": false,
+    "local_Rust_modification_status": "Accepted2082 current selected capture:2820 files exact to252 pinned archives, no current source differences. Contemporaneous historical source-content hashes remain absent; current equality does not prove historical compiled inputs.",
+    "release_eligible": false,
+    "sdk_binding_scope": "Six exact whole COFF objects and 191 file-backed comparisons; nine initial virtual-zero ranges have multiple compatible source sections, not unique attribution. Earlier raw-offset hashes/mismatch claims are superseded.",
+    "current_source_capture": {
+      "version": 0,
+      "source_files": 2820,
+      "pinned_archives": 252,
+      "current_source_differences": 0,
+      "generated_outputs": 30,
+      "build_output_records": 162,
+      "current_capture_complete_within_selected_scope": true,
+      "historical_compiled_source_identity_proven": false,
+      "optimized_selectors_inclusion_proven": false,
+      "capture_provenance": "Capture counts and scope are recorded here; the covered-source map supplies available source-file hashes."
+    }
+  },
+  "recipient_notice_path": "licenses/dependency-notices.txt",
+  "recipient_companions": [
+    {
+      "path": "licenses/RUST-STDLIB-COPYRIGHT",
+      "sha256": "172020dbfd5b53a226dfde77616190a48dcff519b0bc0e6deb91a8450782c4af",
+      "size_bytes": 1571,
+      "upstream_member": "rustc-1.97.0-x86_64-pc-windows-msvc/COPYRIGHT"
+    },
+    {
+      "path": "licenses/RUST-STDLIB-COPYRIGHT-library.html",
+      "sha256": "0a65bb747c49c7bb816cbc7188319bd6e4e8d08091c1190b8a3c0971c47968ed",
+      "size_bytes": 279302,
+      "upstream_member": "rustc-1.97.0-x86_64-pc-windows-msvc/rustc/share/doc/rust/COPYRIGHT-library.html"
+    },
+    {
+      "path": "licenses/RUST-STDLIB-LICENSE-APACHE",
+      "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+      "size_bytes": 9723,
+      "upstream_member": "rustc-1.97.0-x86_64-pc-windows-msvc/LICENSE-APACHE"
+    },
+    {
+      "path": "licenses/RUST-STDLIB-LICENSE-MIT",
+      "sha256": "b71bd43a069ca0641a9ecfe585ca7b3c53b5cc1608f8b68321168698e28b5ea1",
+      "size_bytes": 1068,
+      "upstream_member": "rustc-1.97.0-x86_64-pc-windows-msvc/LICENSE-MIT"
+    },
+    {
+      "path": "licenses/COVERED-SOURCE.zip",
+      "sha256": "645490fec4ff08ddfb338dc7c5d004a6a360d8494d619860cbb7c03f7ff34939",
+      "size_bytes": 286866
+    },
+    {
+      "path": "licenses/COVERED-SOURCE-MAP.json",
+      "sha256": "364c132f23defbb0518c8ee1a341e4f1f3ae5a30b733963dba37cbcc6dfcdc6b",
+      "size_bytes": 10148
+    },
+    {
+      "path": "licenses/COVERED-SOURCE-README.md",
+      "sha256": "96c50236299a441a5a362325d5ec5df13ff78c3d52ef0a6cb703e73fdc48fe79",
+      "size_bytes": 3019
+    }
+  ],
+  "covered_source_supplement": {
+    "files": [
+      {
+        "path": "licenses/COVERED-SOURCE.zip",
+        "sha256": "338502f6af9bc463bdc2cfff88d8a4f4b70c5bf5e00ae8bcc49b36b6c5efdeff",
+        "size_bytes": 288108
+      },
+      {
+        "path": "licenses/COVERED-SOURCE-MAP.json",
+        "sha256": "402f7e1cc4bd44e9eafd98a5d9155f4fc96623573ba25e64b87a56a68623b9cd",
+        "size_bytes": 10926
+      },
+      {
+        "path": "licenses/COVERED-SOURCE-README.md",
+        "sha256": "96c50236299a441a5a362325d5ec5df13ff78c3d52ef0a6cb703e73fdc48fe79",
+        "size_bytes": 3019
+      }
+    ],
+    "preferred_certifi_source_sufficiency": "qualified; historical Mozilla/generator input provenance is not established",
+    "adoption": false,
+    "native_installed_delivery": false,
+    "input_provenance": "Supplied source paths and SHA256 identities are recorded in COVERED-SOURCE-MAP.json."
+  },
+  "contribution_provenance": "Contribution attribution and exact notice ranges are retained in this manifest.",
+  "review_provenance": "Review scope, source hashes and unresolved qualifications are recorded in this manifest."
+}

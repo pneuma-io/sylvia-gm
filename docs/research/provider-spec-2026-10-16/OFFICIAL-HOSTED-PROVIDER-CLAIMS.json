@@ -1,0 +1,2002 @@
+{
+  "schema_version": 1,
+  "checked_on": "2026-10-16",
+  "scope": "Existing hosted presets only; frozen Build2082 compared with current official public docs",
+  "baseline_root": "Build2082",
+  "authority_read": [
+    "SYLVIA-QA-CURRENT.md",
+    "provider-spec2088/CURRENT-REQUIREMENTS.md",
+    "source-snapshot2082/AGENTS.md",
+    "source-snapshot2082/docs/INDEX.md"
+  ],
+  "live_provider_testing": "not_run",
+  "inference_calls": 0,
+  "credential_access": false,
+  "implemented_hosted_count": 18,
+  "protocol_profiles": [
+    {
+      "id": "C",
+      "name": "chat_completions",
+      "statement": "Request model/messages and nested tools[].function{name,parameters}; assistant tool_calls contain IDs and JSON argument strings; role:tool results reference tool_call_id. Stream choices[].delta may contain empty content, multiple indexed tool fragments, usage-only frames and a final marker. Preserve errors and distinguish absent usage from measured zero.",
+      "source_ids": [
+        "or-api",
+        "km-stream"
+      ]
+    },
+    {
+      "id": "R",
+      "name": "responses",
+      "statement": "Use input items and flat function tool definitions. Return function_call_output linked by call_id. Parse typed output items to preserve content beyond output_text. SSE has text/argument deltas, output_item.done, completed, failed, incomplete and error. Preserve final native reasoning items; an in-progress encrypted item may be incomplete.",
+      "source_ids": [
+        "oa-tools",
+        "oa-events"
+      ]
+    },
+    {
+      "id": "A",
+      "name": "anthropic_messages",
+      "statement": "Use top-level system, user/assistant content arrays, max_tokens, native tool input_schema and linked tool_use/tool_result blocks. Reassemble indexed JSON/thinking/signature deltas and require message_stop. Preserve entire assistant blocks unchanged for continuation.",
+      "source_ids": [
+        "an-stream",
+        "an-loop",
+        "oc-api"
+      ]
+    },
+    {
+      "id": "G",
+      "name": "gemini_generate_content",
+      "statement": "Use model/method in the path and native contents/parts JSON. Tools use functionDeclarations, object args and functionResponse. Preserve Part metadata and opaque thoughtSignature values. Read native candidates, finishReason and usageMetadata; do not impose Chat delta envelopes.",
+      "source_ids": [
+        "ge-native"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "oa-auth",
+      "title": "OpenAI API overview",
+      "url": "https://developers.openai.com/api/reference/overview",
+      "sections": "Authentication; Request headers",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "oa-tools",
+      "title": "OpenAI function calling",
+      "url": "https://developers.openai.com/api/docs/guides/function-calling",
+      "sections": "Tool choice; Strict mode; Streaming",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "oa-reason",
+      "title": "OpenAI reasoning models",
+      "url": "https://developers.openai.com/api/docs/guides/reasoning",
+      "sections": "Preserve reasoning without stored responses",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "oa-events",
+      "title": "OpenAI Responses streaming events",
+      "url": "https://developers.openai.com/api/reference/resources/responses/streaming-events",
+      "sections": "response.failed; response.incomplete; response.output_item.done",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "oa-structured",
+      "title": "OpenAI structured model outputs",
+      "url": "https://developers.openai.com/api/docs/guides/structured-outputs",
+      "sections": "Structured Outputs via text.format",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "oa-errors",
+      "title": "OpenAI error codes",
+      "url": "https://developers.openai.com/api/docs/guides/error-codes",
+      "sections": "429 billing/rate errors; 503 overload; Retry-After",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "oc-api",
+      "title": "OpenCode inference API",
+      "url": "https://opencode.ai/v2/docs/console/api/inference/",
+      "sections": "Authentication; Endpoints; Gemini",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "oc-zen",
+      "title": "OpenCode Console model endpoints",
+      "url": "https://opencode.ai/v2/docs/console/models/",
+      "sections": "Endpoints; Model list",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "oc-go",
+      "title": "OpenCode Go",
+      "url": "https://opencode.ai/v2/docs/console/go/",
+      "sections": "Endpoints; Models",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "or-api",
+      "title": "OpenRouter API reference",
+      "url": "https://openrouter.ai/docs/api_reference/overview",
+      "sections": "Request headers; Responses",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "or-reason",
+      "title": "OpenRouter reasoning tokens",
+      "url": "https://openrouter.ai/docs/guides/best-practices/reasoning-tokens",
+      "sections": "Preserving Reasoning",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "or-stream",
+      "title": "OpenRouter streaming",
+      "url": "https://openrouter.ai/docs/api_reference/streaming",
+      "sections": "Final usage chunk; Handling errors during streaming",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "fe-start",
+      "title": "Featherless quickstart",
+      "url": "https://featherless.ai/docs/quickstart-guide",
+      "sections": "Prerequisites; Direct API example",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "fe-chat",
+      "title": "Featherless completions",
+      "url": "https://featherless.ai/docs/completions",
+      "sections": "Chat endpoint; Application Headers",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "fe-tools",
+      "title": "Featherless tool calling",
+      "url": "https://featherless.ai/docs/tool-calling",
+      "sections": "Supported Models; Request Structure",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "fe-errors",
+      "title": "Featherless error codes",
+      "url": "https://featherless.ai/docs/api-reference-error-codes",
+      "sections": "Client Errors; 503",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "gq-api",
+      "title": "Groq OpenAI compatibility",
+      "url": "https://console.groq.com/docs/openai",
+      "sections": "Configuring OpenAI; Unsupported Features",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "gq-tools",
+      "title": "Groq tool use",
+      "url": "https://console.groq.com/docs/tool-use/overview",
+      "sections": "Tool calling model support",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "gq-reason",
+      "title": "Groq reasoning",
+      "url": "https://console.groq.com/docs/reasoning",
+      "sections": "Reasoning Format; Reasoning Effort",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "gq-errors",
+      "title": "Groq error codes",
+      "url": "https://console.groq.com/docs/errors",
+      "sections": "Client errors; Server errors",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "to-api",
+      "title": "Together OpenAI compatibility",
+      "url": "https://docs.together.ai/docs/inference/openai-compatibility",
+      "sections": "Response shape differences; Errors",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "to-chat",
+      "title": "Together chat completions",
+      "url": "https://docs.together.ai/docs/inference/chat/overview",
+      "sections": "Stream responses",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "to-tools",
+      "title": "Together function calling",
+      "url": "https://docs.together.ai/docs/inference/function-calling/overview",
+      "sections": "Patterns; Supported models",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "to-reason",
+      "title": "Together reasoning",
+      "url": "https://docs.together.ai/docs/inference/chat/reasoning",
+      "sections": "Thinking modes; Separate reasoning field",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "ds-think",
+      "title": "DeepSeek thinking mode",
+      "url": "https://api-docs.deepseek.com/guides/thinking_mode/",
+      "sections": "Input and Output Parameters; Tool Calls",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "an-api",
+      "title": "Claude API overview",
+      "url": "https://platform.claude.com/docs/en/api/overview",
+      "sections": "Authentication; Available APIs",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "an-stream",
+      "title": "Claude streaming Messages",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/streaming",
+      "sections": "Event types; Input JSON delta; Thinking delta",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "an-think",
+      "title": "Claude extended thinking",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/extended-thinking",
+      "sections": "Budget rules; Adaptive thinking migration",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "an-loop",
+      "title": "Claude thinking in tool workflows",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/thinking-tool-workflows",
+      "sections": "Return tool result; Echo assistant turn verbatim",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "an-errors",
+      "title": "Claude API errors",
+      "url": "https://platform.claude.com/docs/en/api/errors",
+      "sections": "HTTP errors; SSE errors",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "ge-api",
+      "title": "Gemini OpenAI compatibility",
+      "url": "https://ai.google.dev/gemini-api/docs/openai",
+      "sections": "REST; Streaming; Function calling; Extra body",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "ge-native",
+      "title": "Gemini generateContent reference",
+      "url": "https://ai.google.dev/api/generate-content",
+      "sections": "GenerateContentRequest; Content; Part; FunctionCall; FunctionResponse",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "ge-functions",
+      "title": "Gemini function calling",
+      "url": "https://ai.google.dev/gemini-api/docs/function-calling",
+      "sections": "Function declarations; Function response",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "xa-start",
+      "title": "xAI API quickstart",
+      "url": "https://docs.x.ai/developers/quickstart",
+      "sections": "OpenAI Python Responses example",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "xa-compare",
+      "title": "xAI Responses comparison",
+      "url": "https://docs.x.ai/developers/model-capabilities/text/comparison",
+      "sections": "Parameter mapping; Response structure",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "xa-tools",
+      "title": "xAI function calling",
+      "url": "https://docs.x.ai/developers/tools/function-calling",
+      "sections": "Responses function_call_output example",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "xa-structured",
+      "title": "xAI structured outputs",
+      "url": "https://docs.x.ai/developers/model-capabilities/text/structured-outputs",
+      "sections": "Responses structured output example",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "xa-errors",
+      "title": "xAI debugging errors",
+      "url": "https://docs.x.ai/developers/debugging",
+      "sections": "HTTP error table",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "mi-api",
+      "title": "Mistral Chat API",
+      "url": "https://docs.mistral.ai/api/endpoint/chat",
+      "sections": "POST /v1/chat/completions; Streaming",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "mi-reason",
+      "title": "Mistral reasoning",
+      "url": "https://docs.mistral.ai/studio/conversations/reasoning",
+      "sections": "Handling thinking chunks; Streaming; Multi-turn",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "mm-api",
+      "title": "MiniMax Anthropic SDK compatibility",
+      "url": "https://platform.minimax.io/docs/api-reference/text-anthropic-api",
+      "sections": "Environment; Compatibility; Thinking control",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "mm-errors",
+      "title": "MiniMax error codes",
+      "url": "https://platform.minimax.io/docs/api-reference/errorcode",
+      "sections": "Error table",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "km-start",
+      "title": "Kimi quickstart",
+      "url": "https://platform.kimi.ai/docs/overview",
+      "sections": "Chat Completions API; First call",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "km-reason",
+      "title": "Kimi thinking models",
+      "url": "https://platform.kimi.ai/docs/guide/use-thinking-models",
+      "sections": "Preserved Thinking; Model-specific fields",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "km-stream",
+      "title": "Kimi streaming output",
+      "url": "https://platform.kimi.ai/docs/guide/utilize-the-streaming-output-feature-of-kimi-api",
+      "sections": "DONE requirement; Tool fragments; Usage",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "km-tools",
+      "title": "Kimi tool calls",
+      "url": "https://platform.kimi.ai/docs/guide/use-kimi-api-to-complete-tool-calls",
+      "sections": "Tool call/result loop",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "za-start",
+      "title": "Z.AI quickstart",
+      "url": "https://docs.z.ai/guides/overview/quick-start",
+      "sections": "Ordinary API; Coding Plan distinction",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "za-api",
+      "title": "Z.AI chat completion",
+      "url": "https://docs.z.ai/api-reference/llm/chat-completion",
+      "sections": "Authorizations; Headers; Body; Response",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "za-reason",
+      "title": "Z.AI thinking mode",
+      "url": "https://docs.z.ai/guides/capabilities/thinking-mode",
+      "sections": "Preserved Thinking",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "za-errors",
+      "title": "Z.AI errors",
+      "url": "https://docs.z.ai/api-reference/api-code",
+      "sections": "HTTP and business error codes",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "al-base",
+      "title": "Alibaba Model Studio base URLs",
+      "url": "https://www.alibabacloud.com/help/en/model-studio/base-url",
+      "sections": "Regional shared/workspace endpoints",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "al-api",
+      "title": "Alibaba OpenAI compatibility",
+      "url": "https://www.alibabacloud.com/help/en/model-studio/compatibility-of-openai-with-dashscope",
+      "sections": "HTTP endpoint; Streaming; Error response",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "al-tools",
+      "title": "Alibaba function calling",
+      "url": "https://www.alibabacloud.com/help/en/model-studio/qwen-function-calling",
+      "sections": "Streaming output; Thinking models",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "fw-api",
+      "title": "Fireworks OpenAI compatibility",
+      "url": "https://docs.fireworks.ai/tools-sdks/openai-compatibility",
+      "sections": "Endpoint; Context exceeded; Streaming usage",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "fw-chat",
+      "title": "Fireworks Chat Completion API",
+      "url": "https://docs.fireworks.ai/api-reference/post-chatcompletions",
+      "sections": "Reasoning effort; Model constraints",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "fw-tools",
+      "title": "Fireworks tool calling",
+      "url": "https://docs.fireworks.ai/guides/function-calling",
+      "sections": "Streaming tool accumulation",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "fw-errors",
+      "title": "Fireworks inference errors",
+      "url": "https://docs.fireworks.ai/guides/inference-error-codes",
+      "sections": "Error table; Serverless/dedicated 429",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "fw-retry",
+      "title": "Fireworks reliability",
+      "url": "https://docs.fireworks.ai/guides/reliability",
+      "sections": "Which errors are retryable",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "ce-api",
+      "title": "Cerebras OpenAI compatibility",
+      "url": "https://inference-docs.cerebras.ai/resources/openai",
+      "sections": "Inference target; Compatibility differences",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "ce-chat",
+      "title": "Cerebras Chat Completions",
+      "url": "https://inference-docs.cerebras.ai/api-reference/chat-completions",
+      "sections": "Authorization; Request; Response",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "ce-tools",
+      "title": "Cerebras tool calling",
+      "url": "https://inference-docs.cerebras.ai/capabilities/tool-use",
+      "sections": "Supported models; Strict schema limits",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "ce-stream",
+      "title": "Cerebras streaming",
+      "url": "https://inference-docs.cerebras.ai/capabilities/streaming",
+      "sections": "Streaming Responses",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "ce-errors",
+      "title": "Cerebras errors",
+      "url": "https://inference-docs.cerebras.ai/support/error",
+      "sections": "Error categories; Retries",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "gq-reference",
+      "title": "Groq API reference",
+      "url": "https://console.groq.com/docs/api-reference",
+      "sections": "Chat input messages; include_reasoning; reasoning_format",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    },
+    {
+      "id": "al-reason",
+      "title": "Alibaba deep thinking",
+      "url": "https://www.alibabacloud.com/help/en/model-studio/deep-thinking",
+      "sections": "Historical thinking preservation; preserve_thinking",
+      "accessed_on": "2026-10-16",
+      "source_kind": "official_primary_documentation",
+      "access_method": "public_documentation_HTTP_read",
+      "status": "read"
+    }
+  ],
+  "providers": [
+    {
+      "id": "openai",
+      "title": "OpenAI API",
+      "transport": "responses",
+      "base": "https://api.openai.com/v1",
+      "auth": "Bearer API key; application/json",
+      "unknowns": [],
+      "claim_ids": [
+        "OA01",
+        "OA02",
+        "OA03"
+      ]
+    },
+    {
+      "id": "opencode_go",
+      "title": "OpenCode Go",
+      "transport": "model-specific C/R/A/G",
+      "base": "discovery: https://opencode.ai/inference/go/v1",
+      "auth": "Bearer OpenCode service key; application/json",
+      "unknowns": [
+        "No gateway-specific strict omission, encrypted reasoning include default, cancellation guarantee, or full retry/error policy is stated in these public endpoint pages. Apply the documented family shape and keep those gateway details qualified."
+      ],
+      "claim_ids": [
+        "OC01",
+        "OC02",
+        "GE02"
+      ]
+    },
+    {
+      "id": "opencode_zen",
+      "title": "OpenCode Zen / Console",
+      "transport": "model-specific C/R/A/G",
+      "base": "discovery: https://opencode.ai/inference/v1",
+      "auth": "Bearer OpenCode service key; application/json",
+      "unknowns": [
+        "The three Sylvia-specific x-opencode metadata headers are implementation evidence. The inspected official pages do not establish whether they are required, optional, or sufficient for all models. No live claim is made."
+      ],
+      "claim_ids": [
+        "OC01",
+        "OC03",
+        "GE02"
+      ]
+    },
+    {
+      "id": "openrouter",
+      "title": "OpenRouter",
+      "transport": "chat_completions",
+      "base": "https://openrouter.ai/api/v1",
+      "auth": "Bearer API key; application/json",
+      "unknowns": [],
+      "claim_ids": [
+        "OR01",
+        "OR02",
+        "OR03"
+      ]
+    },
+    {
+      "id": "featherless",
+      "title": "Featherless",
+      "transport": "chat_completions",
+      "base": "https://api.featherless.ai/v1",
+      "auth": "Bearer API key; application/json",
+      "unknowns": [
+        "The inspected chat reference does not fully specify streaming tool-event or opaque reasoning/signature variants. Use shared Chat fixtures, with capability-dependent reasoning left unknown unless separately documented."
+      ],
+      "claim_ids": [
+        "FE01",
+        "FE02",
+        "FE03"
+      ]
+    },
+    {
+      "id": "groq",
+      "title": "Groq",
+      "transport": "chat_completions",
+      "base": "https://api.groq.com/openai/v1",
+      "auth": "Bearer API key; application/json",
+      "unknowns": [],
+      "claim_ids": [
+        "GQ01",
+        "GQ02",
+        "GQ03",
+        "GQ04"
+      ]
+    },
+    {
+      "id": "together",
+      "title": "Together AI",
+      "transport": "chat_completions",
+      "base": "https://api.together.ai/v1",
+      "auth": "Bearer API key; application/json",
+      "unknowns": [],
+      "claim_ids": [
+        "TO01",
+        "TO02",
+        "TO03"
+      ]
+    },
+    {
+      "id": "deepseek",
+      "title": "DeepSeek ordinary API",
+      "transport": "chat_completions",
+      "base": "https://api.deepseek.com",
+      "auth": "Bearer DeepSeek API key; application/json",
+      "unknowns": [
+        "Public reads of the quickstart/error-code pages timed out or were inaccessible. Their fresh error taxonomy and retry details remain a documentation gap in this note; no remembered legacy table is promoted to current evidence."
+      ],
+      "claim_ids": [
+        "DS01"
+      ]
+    },
+    {
+      "id": "anthropic",
+      "title": "Anthropic / Claude API",
+      "transport": "anthropic_messages",
+      "base": "https://api.anthropic.com/v1",
+      "auth": "Bearer or supported x-api-key fallback; anthropic-version; application/json",
+      "unknowns": [],
+      "claim_ids": [
+        "AN01",
+        "AN02",
+        "AN03"
+      ]
+    },
+    {
+      "id": "gemini",
+      "title": "Google Gemini",
+      "transport": "chat_completions; native G through OpenCode",
+      "base": "https://generativelanguage.googleapis.com/v1beta/openai",
+      "auth": "Bearer Gemini API key for compatibility; gateway Bearer for OpenCode native",
+      "unknowns": [
+        "Model-specific signature strictness and compatibility extra_content variants must follow the selected model's current documentation. The native API also documents CONTINUATION/continuationToken; Sylvia's present parser only accepts STOP/MAX_TOKENS, so it must fail clearly if that distinct finish state occurs."
+      ],
+      "claim_ids": [
+        "GE01",
+        "GE02"
+      ]
+    },
+    {
+      "id": "xai",
+      "title": "xAI",
+      "transport": "responses",
+      "base": "https://api.x.ai/v1",
+      "auth": "Bearer xAI API key; application/json",
+      "unknowns": [],
+      "claim_ids": [
+        "XA01",
+        "XA02",
+        "XA03"
+      ]
+    },
+    {
+      "id": "mistral",
+      "title": "Mistral",
+      "transport": "chat_completions",
+      "base": "https://api.mistral.ai/v1",
+      "auth": "Bearer API key; application/json",
+      "unknowns": [
+        "The attempted standalone error-handling URL was inaccessible. The Chat reference does not establish a fresh provider-specific retry policy; do not label a generic policy as an exact Mistral requirement."
+      ],
+      "claim_ids": [
+        "MI01",
+        "MI02"
+      ]
+    },
+    {
+      "id": "minimax",
+      "title": "MiniMax Anthropic compatibility",
+      "transport": "anthropic_messages",
+      "base": "https://api.minimax.io/anthropic/v1",
+      "auth": "Anthropic SDK API key; documented direct example also uses Bearer; application/json",
+      "unknowns": [
+        "The general MiniMax error table does not fully map business codes to HTTP status or Anthropic SSE error payloads. Treat that mapping as unknown. New model availability under a restricted plan is a prerequisite, not a request to obtain access."
+      ],
+      "claim_ids": [
+        "MM01",
+        "MM02"
+      ]
+    },
+    {
+      "id": "moonshot",
+      "title": "Kimi / Moonshot ordinary API",
+      "transport": "chat_completions",
+      "base": "https://api.moonshot.ai/v1",
+      "auth": "Bearer platform API key; application/json",
+      "unknowns": [],
+      "claim_ids": [
+        "KM01",
+        "KM02",
+        "KM03"
+      ]
+    },
+    {
+      "id": "zai",
+      "title": "Z.AI ordinary API",
+      "transport": "chat_completions",
+      "base": "https://api.z.ai/api/paas/v4",
+      "auth": "Bearer platform API key; application/json",
+      "unknowns": [],
+      "claim_ids": [
+        "ZA01",
+        "ZA02",
+        "ZA03"
+      ]
+    },
+    {
+      "id": "alibaba",
+      "title": "Alibaba Model Studio regional compatibility",
+      "transport": "chat_completions",
+      "base": "https://dashscope-intl.aliyuncs.com/compatible-mode/v1 (Singapore default)",
+      "auth": "Bearer regional/workspace key; application/json",
+      "unknowns": [
+        "The compatibility page's Beijing example currently repeats a Singapore workspace hostname. Prefer the dedicated base-URL table for regional authority; do not copy that contradictory example. A fresh complete retry policy was not established from these selected pages."
+      ],
+      "claim_ids": [
+        "AL01",
+        "AL02",
+        "AL03"
+      ]
+    },
+    {
+      "id": "fireworks",
+      "title": "Fireworks AI",
+      "transport": "chat_completions",
+      "base": "https://api.fireworks.ai/inference/v1",
+      "auth": "Bearer API key; application/json",
+      "unknowns": [
+        "Two official pages differ on 500 guidance: reliability treats it as transient, while the error table describes a likely engineering fault. A bounded retry followed by a clear error preserves that uncertainty."
+      ],
+      "claim_ids": [
+        "FW01",
+        "FW02",
+        "FW03",
+        "FW04"
+      ]
+    },
+    {
+      "id": "cerebras",
+      "title": "Cerebras",
+      "transport": "chat_completions",
+      "base": "https://api.cerebras.ai/v1",
+      "auth": "Bearer API key; application/json",
+      "unknowns": [
+        "Reasoning formats and clear_thinking depend on model. A customer-trial model being documented does not mean it is generally available to the user's account."
+      ],
+      "claim_ids": [
+        "CE01",
+        "CE02",
+        "CE03",
+        "CE04"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "OA01",
+      "providers": [
+        "openai"
+      ],
+      "category": "endpoint_auth",
+      "statement": "Use POST /v1/responses. Organization/project headers are conditional for multi-organization or legacy-key selection, not universal API requirements.",
+      "source_ids": [
+        "oa-auth"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "OA02",
+      "providers": [
+        "openai"
+      ],
+      "category": "reasoning_continuation",
+      "statement": "Replay native output items, or use previous_response_id. With store:false or ZDR, encrypted reasoning is returned by default; the legacy include value reasoning.encrypted_content remains accepted. Preserve opaque fields, ordering and identities.",
+      "source_ids": [
+        "oa-reason"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "OA03",
+      "providers": [
+        "openai"
+      ],
+      "category": "errors_retry",
+      "statement": "429 may mean temporary rate limiting, exhausted credits, or spend/usage limits. Inspect error.code. Rate errors and 503 overload require honoring Retry-After when present; retrying billing errors does not restore access.",
+      "source_ids": [
+        "oa-errors"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "OC01",
+      "providers": [
+        "opencode_go",
+        "opencode_zen"
+      ],
+      "category": "endpoint_auth",
+      "statement": "OpenCode inference explicitly documents Authorization: Bearer for all API families, including Anthropic and native Gemini. The inference guide does not document x-api-key or x-goog-api-key aliases. /v1/models is a discovery path, not the documented inference base.",
+      "source_ids": [
+        "oc-api"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "OC02",
+      "providers": [
+        "opencode_go"
+      ],
+      "category": "protocol_routing",
+      "statement": "Go inference uses /inference/go/openai/v1/chat/completions or /responses, /inference/go/anthropic/v1/messages, and /inference/go/google/v1beta/models/<model>:generateContent (streamGenerateContent for streaming). The current Go table includes a Gemini contributor model on the native Google family; MiniMax and Qwen use Messages.",
+      "source_ids": [
+        "oc-go"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "OC03",
+      "providers": [
+        "opencode_zen"
+      ],
+      "category": "protocol_routing",
+      "statement": "Console inference uses /inference/openai/v1/chat/completions or /responses, /inference/anthropic/v1/messages, and /inference/google/v1beta/models/<model>:generateContent. Its table routes Gemini to Google, GPT/Grok/Muse Spark to Responses, Claude and most Qwen to Messages, Qwen3.8 Max and the listed open models to Chat Completions. Use exact exceptions before prefixes.",
+      "source_ids": [
+        "oc-zen"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "OR01",
+      "providers": [
+        "openrouter"
+      ],
+      "category": "wire_headers",
+      "statement": "POST /api/v1/chat/completions normalizes message/delta choices. HTTP-Referer and X-OpenRouter-Title are optional attribution headers; their absence is not a protocol failure.",
+      "source_ids": [
+        "or-api"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "OR02",
+      "providers": [
+        "openrouter"
+      ],
+      "category": "reasoning_continuation",
+      "statement": "Preserve complete, ordered reasoning_details for encrypted/summary blocks. Plain reasoning can be replayed as reasoning; reasoning_content is a documented alias here.",
+      "source_ids": [
+        "or-reason"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "OR03",
+      "providers": [
+        "openrouter"
+      ],
+      "category": "stream_errors_usage",
+      "statement": "Ignore SSE comments. A stream may fail after HTTP 200 through a top-level error and finish_reason:error, including as its only event. The final usage frame repeats the terminal finish_reason with a content-free choice; it is not a second generation.",
+      "source_ids": [
+        "or-stream"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "FE01",
+      "providers": [
+        "featherless"
+      ],
+      "category": "endpoint_headers",
+      "statement": "The documented OpenAI client and direct HTTP route use /v1/chat/completions. HTTP-Referer and X-Title are requested application attribution and explicitly shown as optional, not authentication.",
+      "source_ids": [
+        "fe-start",
+        "fe-chat"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "FE02",
+      "providers": [
+        "featherless"
+      ],
+      "category": "model_prerequisites",
+      "statement": "Tool syntax is standard nested OpenAI function definitions, JSON argument strings and linked tool result IDs. The tool guide lists native Kimi-K2-Instruct and Qwen 3 family support; catalogue presence alone does not establish tool capability.",
+      "source_ids": [
+        "fe-tools"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "FE03",
+      "providers": [
+        "featherless"
+      ],
+      "category": "errors_retry",
+      "statement": "A 400 can mean a cold/loading model; 403 can mean gated-model access rather than a malformed key. 503 can mean model capacity exhaustion; the error guide recommends retrying the same request and reconsidering availability if it persists beyond three retries.",
+      "source_ids": [
+        "fe-errors"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "GQ01",
+      "providers": [
+        "groq"
+      ],
+      "category": "endpoint_constraints",
+      "statement": "Use the documented OpenAI-compatible base and Chat Completions. Groq rejects logprobs, logit_bias, top_logprobs and messages[].name, and only supports n=1. Newer Responses support does not change Sylvia's selected Chat route.",
+      "source_ids": [
+        "gq-api"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "GQ02",
+      "providers": [
+        "groq"
+      ],
+      "category": "reasoning_tools",
+      "statement": "Tool support is model-specific. Parsed reasoning uses message.reasoning; raw mode uses think tags and cannot be explicitly combined with tools or JSON mode. include_reasoning and reasoning_format are mutually exclusive. GPT-OSS effort supports low/medium/high; other families have their own values.",
+      "source_ids": [
+        "gq-tools",
+        "gq-reason"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "GQ03",
+      "providers": [
+        "groq"
+      ],
+      "category": "errors_retry",
+      "statement": "HTTP error bodies contain error.message/type. 429 is rate limiting; 500/502/503 can warrant delayed retry. The current error table also distinguishes 413 payload, 422 semantic/tool errors, and 498 Flex capacity.",
+      "source_ids": [
+        "gq-errors"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "TO01",
+      "providers": [
+        "together"
+      ],
+      "category": "endpoint_usage_errors",
+      "statement": "Use /v1/chat/completions and exact provider/model IDs. Errors use an OpenAI-shaped envelope with Together-owned type/code values. Cached token usage can be nested in prompt_tokens_details or flat in usage.cached_tokens.",
+      "source_ids": [
+        "to-api"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "TO02",
+      "providers": [
+        "together"
+      ],
+      "category": "stream_tools",
+      "statement": "Chat streaming returns incremental deltas; tool patterns include multiple, parallel and sequential calls. Tool eligibility comes from the selected serverless/dedicated model, not the provider name.",
+      "source_ids": [
+        "to-chat",
+        "to-tools"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "TO03",
+      "providers": [
+        "together"
+      ],
+      "category": "reasoning_continuation",
+      "statement": "Reasoning may be in reasoning or reasoning_content; replay it under the same key. Preserved-thinking blocks must retain the original sequence. Hybrid controls and allowed effort values vary; DeepSeek V3.1 tools require non-reasoning mode.",
+      "source_ids": [
+        "to-reason"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "DS01",
+      "providers": [
+        "deepseek"
+      ],
+      "category": "wire_reasoning_tools",
+      "statement": "Official SDK examples use the root base URL, Chat Completions, streaming reasoning_content/content, nested function tools and role:tool results linked by tool_call_id. Thinking defaults on in the current guide. With tools present, replay reasoning_content from every earlier assistant turn, including turns without tool calls, or the API can return 400.",
+      "source_ids": [
+        "ds-think"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "AN01",
+      "providers": [
+        "anthropic"
+      ],
+      "category": "endpoint_auth",
+      "statement": "POST /v1/messages is the native API. anthropic-version and content-type are required. Current docs prefer Bearer credentials and explicitly retain x-api-key fallback; anthropic-workspace-id is required for multi-workspace keys and optional for ordinary single-workspace keys.",
+      "source_ids": [
+        "an-api"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "AN02",
+      "providers": [
+        "anthropic"
+      ],
+      "category": "stream_continuation",
+      "statement": "The stream consists of message_start, indexed content block start/delta/stop, message_delta and message_stop, with possible ping/error events. Tool input_json_delta is partial JSON. Thinking signatures arrive as signature_delta. Echo complete assistant content unchanged before the user tool_result.",
+      "source_ids": [
+        "an-stream",
+        "an-loop"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "AN03",
+      "providers": [
+        "anthropic"
+      ],
+      "category": "model_retry_constraints",
+      "statement": "Manual thinking requires budget_tokens >=1024 and normally less than max_tokens; newer models require adaptive thinking instead. Error handling distinguishes 429 rate/spend limits, 500, 504 and 529 overload; SSE errors can follow HTTP 200.",
+      "source_ids": [
+        "an-think",
+        "an-errors"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "GE01",
+      "providers": [
+        "gemini"
+      ],
+      "category": "compatibility",
+      "statement": "The direct preset correctly selects v1beta/openai/chat/completions, Bearer authentication, standard tools and streaming deltas. Google-specific thinking configuration lives in its documented extra_body.google extension; compatibility remains beta.",
+      "source_ids": [
+        "ge-api"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "GE02",
+      "providers": [
+        "gemini",
+        "opencode_zen",
+        "opencode_go"
+      ],
+      "category": "native_wire",
+      "statement": "Native generateContent uses user/model contents[].parts, systemInstruction, functionDeclarations, functionCall object arguments and functionResponse objects. If a functionCall supplies an id, return the matching id. Part.thoughtSignature is an opaque base64 value for reuse. streamGenerateContent uses native candidate/parts responses, not Chat choices.",
+      "source_ids": [
+        "ge-native"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "XA01",
+      "providers": [
+        "xai"
+      ],
+      "category": "endpoint_state",
+      "statement": "The current quickstart uses /v1/responses. Responses uses typed output items and function_call_output with call_id; stateful tool examples use previous_response_id. store defaults true; include requests encrypted reasoning. Direct OpenAI's automatic encrypted include guarantee is not stated for xAI.",
+      "source_ids": [
+        "xa-start",
+        "xa-compare",
+        "xa-tools"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "XA02",
+      "providers": [
+        "xai"
+      ],
+      "category": "structured_output",
+      "statement": "The official Responses example sends text.format with type:json_schema, name, schema and strict:true. The Chat response_format envelope must be translated for this selected transport. Exact strict-omission fallback is not documented as identical to OpenAI.",
+      "source_ids": [
+        "xa-structured"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "XA03",
+      "providers": [
+        "xai"
+      ],
+      "category": "errors",
+      "statement": "The error guide separates authentication/permission, not-found, invalid body/media and 429 rate limiting. Do not retry invalid input as a connection failure.",
+      "source_ids": [
+        "xa-errors"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "MI01",
+      "providers": [
+        "mistral"
+      ],
+      "category": "endpoint_stream_tools",
+      "statement": "POST /v1/chat/completions accepts model/messages/tools; streaming is data-only SSE ending in [DONE]. Preserve tool-call identity across assistant/tool turns; model support still governs available features.",
+      "source_ids": [
+        "mi-api"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "MI02",
+      "providers": [
+        "mistral"
+      ],
+      "category": "reasoning_content_shape",
+      "statement": "When enabled, current reasoning returns content as ThinkChunk/TextChunk lists. Streaming can produce a thinking list, a mixed thinking/text list, then a plain string. Replay the complete assistant message including thinking chunks.",
+      "source_ids": [
+        "mi-reason"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "MM01",
+      "providers": [
+        "minimax"
+      ],
+      "category": "endpoint_continuation",
+      "statement": "Official SDK setup uses ANTHROPIC_BASE_URL=https://api.minimax.io/anthropic with ANTHROPIC_API_KEY, so removing the saved /v1 before SDK construction is correct. It requires complete response.content replay, including thinking/text/tool_use. max_tokens includes thinking; undersized caps can end before text.",
+      "source_ids": [
+        "mm-api"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "MM02",
+      "providers": [
+        "minimax"
+      ],
+      "category": "error_codes",
+      "statement": "MiniMax's general error table separates retry-later conditions such as 1000/1001/1002/1024 from invalid credentials 1004, insufficient balance 1008 and invalid parameters 2013.",
+      "source_ids": [
+        "mm-errors"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "KM01",
+      "providers": [
+        "moonshot"
+      ],
+      "category": "endpoint_tools",
+      "statement": "The ordinary platform documents /v1/chat/completions and standard tool-call/result loops. Its availability of additional API families does not require expanding this preset or switching to Kimi Code.",
+      "source_ids": [
+        "km-start",
+        "km-tools"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "KM02",
+      "providers": [
+        "moonshot"
+      ],
+      "category": "reasoning_continuation",
+      "statement": "Kimi K3 and K2.7 Code always preserve thinking; replay every historical assistant message including reasoning_content unchanged. K2.6 preservation is optional. Effort/toggle fields differ by model; K3 uses top-level reasoning_effort and no thinking parameter.",
+      "source_ids": [
+        "km-reason"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "KM03",
+      "providers": [
+        "moonshot"
+      ],
+      "category": "stream_termination",
+      "statement": "The official streaming guide explicitly requires data:[DONE]; finish_reason:stop alone is insufficient. Tool fragments accumulate by index. include_usage sends a final empty-choices accounting frame; an interrupted stream can lack final usage.",
+      "source_ids": [
+        "km-stream"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "ZA01",
+      "providers": [
+        "zai"
+      ],
+      "category": "endpoint_headers",
+      "statement": "The standard endpoint is /api/paas/v4/chat/completions. Coding Plan uses a separate endpoint. Accept-Language configures response language and has a default; it is not an additional credential.",
+      "source_ids": [
+        "za-start",
+        "za-api"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "ZA02",
+      "providers": [
+        "zai"
+      ],
+      "category": "reasoning_continuation",
+      "statement": "Preserved Thinking is enabled using thinking.clear_thinking:false in extra_body. Replay the complete unmodified reasoning_content sequence, including prior assistant tool turns.",
+      "source_ids": [
+        "za-reason"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "ZA03",
+      "providers": [
+        "zai"
+      ],
+      "category": "errors_retry",
+      "statement": "Interpret both HTTP status and business error.code. 429 includes rate overload (1302/1305) but also exhausted balance (1113) and plan/access problems; retrying every 429 as temporary throttling misstates the cause.",
+      "source_ids": [
+        "za-errors"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "AL01",
+      "providers": [
+        "alibaba"
+      ],
+      "category": "regional_endpoint",
+      "statement": "The Singapore shared base in Sylvia is documented. Beijing, Virginia, Hong Kong and workspace-specific domains have distinct bases; the key must match the selected region/workspace. Keep endpoint editability. Token/Coding Plan endpoints are separate services.",
+      "source_ids": [
+        "al-base"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "AL02",
+      "providers": [
+        "alibaba"
+      ],
+      "category": "wire_tools_stream",
+      "statement": "OpenAI-compatible HTTP requests use Chat Completions messages and standard error envelopes. SSE carries choices/delta, terminal finish_reason and [DONE]. Streaming tool arguments are fragments and the name arrives in the first tool fragment; thinking/tool constraints depend on model.",
+      "source_ids": [
+        "al-api",
+        "al-tools"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "FW01",
+      "providers": [
+        "fireworks"
+      ],
+      "category": "wire_usage",
+      "statement": "Use exact full Fireworks model/deployment identifiers. Streaming usage is included on the terminal finish_reason frame. Default context-overflow behaviour lowers max_tokens to fit; context_length_exceeded_behavior:error requests an error instead.",
+      "source_ids": [
+        "fw-api"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "FW02",
+      "providers": [
+        "fireworks"
+      ],
+      "category": "tools_reasoning",
+      "statement": "Streaming tool calls require accumulating all indexed argument fragments. Reasoning uses reasoning_content, with model-specific allowed effort values; GPT-OSS rejects none and integer effort, while MiniMax M3 has its own adaptive option.",
+      "source_ids": [
+        "fw-tools",
+        "fw-chat"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "FW03",
+      "providers": [
+        "fireworks"
+      ],
+      "category": "errors_retry",
+      "statement": "Fireworks recommends backoff for 429/500/502/503/504 and fixing 400/401/404/422. Error-code documentation additionally distinguishes 402 payment, 408 timeout and 520 unknown errors. Dedicated 429 means deployment capacity; serverless 429 means rate/TPM limits.",
+      "source_ids": [
+        "fw-retry",
+        "fw-errors"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "CE01",
+      "providers": [
+        "cerebras"
+      ],
+      "category": "endpoint_constraints",
+      "statement": "Use exact shared model IDs or a dedicated endpoint ID in model. Standard stream:true is supported; do not send tool_stream. n=1 only. Tools plus response_format is model-dependent and rejected by GPT-OSS-120B.",
+      "source_ids": [
+        "ce-api",
+        "ce-chat"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "CE02",
+      "providers": [
+        "cerebras"
+      ],
+      "category": "tools_stream",
+      "statement": "Function tools support linked results, parallel calls and strict schemas on documented models. Strictness has model-specific schema limits; Qwen rejects pattern/minLength/maxLength in strict tool schemas. Streaming emits Chat delta content.",
+      "source_ids": [
+        "ce-tools",
+        "ce-stream"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "CE03",
+      "providers": [
+        "cerebras"
+      ],
+      "category": "errors_retry",
+      "statement": "The SDK documents retrying connection failures, 408, 429 and >=500 with bounded exponential backoff. This is SDK policy, not a requirement to reproduce exactly two retries. Auth/permission/invalid-body errors remain distinct.",
+      "source_ids": [
+        "ce-errors"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "FW04",
+      "providers": [
+        "fireworks"
+      ],
+      "category": "reasoning_input_scope",
+      "statement": "reasoning_content is documented in input messages. reasoning_history controls stripping or preservation with model-specific defaults; it does not disable reasoning computation.",
+      "source_ids": [
+        "fw-chat"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "CE04",
+      "providers": [
+        "cerebras"
+      ],
+      "category": "reasoning_input_scope",
+      "statement": "For qwen-3.8-27b, clear_thinking false or omitted preserves historical assistant reasoning supplied in the conversation; true removes it. The documented output reasoning field does not justify arbitrary alternate input aliases.",
+      "source_ids": [
+        "ce-chat"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "AL03",
+      "providers": [
+        "alibaba"
+      ],
+      "category": "reasoning_input_scope",
+      "statement": "On documented preserve_thinking-capable models, historical assistant reasoning_content is accepted and used when preservation is enabled. Missing reasoning history is allowed. Model defaults differ.",
+      "source_ids": [
+        "al-reason"
+      ],
+      "qualification": "documented"
+    },
+    {
+      "id": "GQ04",
+      "providers": [
+        "groq"
+      ],
+      "category": "reasoning_input_scope",
+      "statement": "The inspected reasoning and API references establish returned reasoning, but no explicit general assistant-history scalar replay requirement or alias guarantee was found.",
+      "source_ids": [
+        "gq-reason",
+        "gq-reference"
+      ],
+      "qualification": "documentation_gap_not_unsupported_claim"
+    }
+  ],
+  "mismatches": [
+    {
+      "id": "H01",
+      "title": "OpenCode inference path mismatch",
+      "providers": [
+        "opencode_go",
+        "opencode_zen"
+      ],
+      "code": [
+        "src/sylvia_gm/config/provider_settings.py:130",
+        "src/sylvia_gm/provider/_openai_compat.py:706",
+        "src/sylvia_gm/provider/_anthropic.py:525",
+        "src/sylvia_gm/provider/_gemini.py:160"
+      ],
+      "observation": "Inference clients use discovery bases unchanged; the documented per-family path segments are missing. Existing aliases may work, but current docs do not establish them.",
+      "test": "Assert exact URL per preset and protocol while retaining discovery /models bases.",
+      "source_ids": [
+        "oc-api",
+        "oc-go",
+        "oc-zen"
+      ],
+      "status": "suspected_from_frozen_source_and_current_docs",
+      "live_reproduced": false
+    },
+    {
+      "id": "H02",
+      "title": "OpenCode gateway authentication mismatch",
+      "providers": [
+        "opencode_go",
+        "opencode_zen"
+      ],
+      "code": [
+        "src/sylvia_gm/provider/_anthropic.py:536",
+        "src/sylvia_gm/provider/_gemini.py:155"
+      ],
+      "observation": "Messages rotates SDK api_key and native Gemini sends x-goog-api-key. The gateway's explicit requirement is Bearer; alternate header acceptance is undocumented.",
+      "test": "Capture exact headers at actual HTTP boundary for all gateway families and retained session metadata.",
+      "source_ids": [
+        "oc-api"
+      ],
+      "status": "suspected_from_frozen_source_and_current_docs",
+      "live_reproduced": false
+    },
+    {
+      "id": "H03",
+      "title": "Go native Gemini routing gap",
+      "providers": [
+        "opencode_go"
+      ],
+      "code": [
+        "src/sylvia_gm/provider/_protocol_routes.py:25"
+      ],
+      "observation": "Go lacks a Gemini family rule although the official current table lists a Google-native Gemini contributor route. Discovery-supplied protocol metadata can override this, so impact depends on metadata.",
+      "test": "Check sparse/manual model setup plus explicit provider protocol metadata without guessing upstream URLs.",
+      "source_ids": [
+        "oc-go"
+      ],
+      "status": "suspected_from_frozen_source_and_current_docs",
+      "live_reproduced": false
+    },
+    {
+      "id": "H04",
+      "title": "Responses native continuation lost",
+      "providers": [
+        "openai",
+        "xai",
+        "opencode_go",
+        "opencode_zen"
+      ],
+      "code": [
+        "src/sylvia_gm/provider/_openai_compat.py:383",
+        "src/sylvia_gm/provider/_openai_compat.py:475",
+        "src/sylvia_gm/agent/_provider_session.py:5207"
+      ],
+      "observation": "The adapter rebuilds text/functions and does not retain complete output items or a previous-response chain, losing opaque reasoning and provider fields.",
+      "test": "Round-trip completed reasoning+function items, preserve ordering/identities, and reject required missing metadata.",
+      "source_ids": [
+        "oa-reason",
+        "xa-compare"
+      ],
+      "status": "suspected_from_frozen_source_and_current_docs",
+      "live_reproduced": false
+    },
+    {
+      "id": "H05",
+      "title": "Responses terminal failures normalized as length",
+      "providers": [
+        "openai",
+        "xai",
+        "opencode_go",
+        "opencode_zen"
+      ],
+      "code": [
+        "src/sylvia_gm/provider/_openai_compat.py:563",
+        "src/sylvia_gm/provider/_openai_compat.py:995"
+      ],
+      "observation": "response.failed and all incomplete reasons become length; explicit error events are ignored and EOF is accepted. Server failures are distinct from max_output_tokens.",
+      "test": "Fixture failed/server_error, incomplete/max_output_tokens, refusal/filter reason, explicit error, and missing terminal.",
+      "source_ids": [
+        "oa-events"
+      ],
+      "status": "suspected_from_frozen_source_and_current_docs",
+      "live_reproduced": false
+    },
+    {
+      "id": "H06",
+      "title": "Reasoning replay limited by model-name heuristic",
+      "providers": [
+        "together",
+        "moonshot",
+        "zai",
+        "mistral"
+      ],
+      "code": [
+        "src/sylvia_gm/agent/_native_continuation.py:6",
+        "src/sylvia_gm/agent/_provider_session.py:5195",
+        "src/sylvia_gm/provider/_openai_compat.py:162"
+      ],
+      "observation": "Only DeepSeek/Kimi names with tools trigger scalar reasoning replay, and the original field key is lost. This misses documented preserved-thinking cases, including Kimi without tools and Together reasoning-key retention.",
+      "test": "Test native reasoning key and whole-message preservation across tool and ordinary assistant turns; retain strict provider/model identity checks.",
+      "source_ids": [
+        "to-reason",
+        "km-reason",
+        "za-reason",
+        "mi-reason"
+      ],
+      "status": "suspected_from_frozen_source_and_current_docs",
+      "live_reproduced": false
+    },
+    {
+      "id": "H07",
+      "title": "Mistral typed content unsupported",
+      "providers": [
+        "mistral"
+      ],
+      "code": [
+        "src/sylvia_gm/provider/_openai_compat.py:269",
+        "src/sylvia_gm/provider/_openai_compat.py:1018",
+        "src/sylvia_gm/provider/_openai_compat.py:1092"
+      ],
+      "observation": "Current parsing assumes string delta content and passes nonstream lists through without separating thinking. Mistral documents ThinkChunk/TextChunk lists and mixed transition chunks.",
+      "test": "Feed text, thinking, mixed transition and tool parts through actual HTTP/SDK parsing and keep private reasoning out of visible narration.",
+      "source_ids": [
+        "mi-reason"
+      ],
+      "status": "suspected_from_frozen_source_and_current_docs",
+      "live_reproduced": false
+    },
+    {
+      "id": "H08",
+      "title": "Cache accounting ignores Together flat field",
+      "providers": [
+        "together"
+      ],
+      "code": [
+        "src/sylvia_gm/provider/_openai_compat.py:212",
+        "src/sylvia_gm/provider/_openai_compat.py:1138"
+      ],
+      "observation": "Only nested cached_tokens is read; Together documents usage.cached_tokens on some models.",
+      "test": "Exercise nested and flat cache usage in streamed and complete responses without inventing missing usage.",
+      "source_ids": [
+        "to-api"
+      ],
+      "status": "suspected_from_frozen_source_and_current_docs",
+      "live_reproduced": false
+    },
+    {
+      "id": "H09",
+      "title": "Streaming transport completion needs raw boundary proof",
+      "providers": [
+        "moonshot",
+        "openrouter"
+      ],
+      "code": [
+        "src/sylvia_gm/provider/_openai_compat.py:995"
+      ],
+      "observation": "The SDK iterator's EOF currently counts as completion. Kimi requires [DONE]; OpenRouter's midstream error can be the only frame. SDK event handling may hide markers or raise errors, so prove this at HTTP/SSE level.",
+      "test": "Test stop-then-EOF without DONE, full DONE, final usage repetition, and error-only HTTP200.",
+      "source_ids": [
+        "km-stream",
+        "or-stream"
+      ],
+      "status": "suspected_from_frozen_source_and_current_docs",
+      "live_reproduced": false
+    },
+    {
+      "id": "H10",
+      "title": "Retry-After and permanent 429 classification",
+      "providers": [
+        "openai",
+        "anthropic",
+        "zai"
+      ],
+      "code": [
+        "src/sylvia_gm/provider/_failover.py:40",
+        "src/sylvia_gm/provider/_openai_compat.py:339"
+      ],
+      "observation": "Server Retry-After is capped by max_delay and retained only for 429. Current OpenAI docs require respecting it for 503 too; billing/spend 429 differs from temporary rate limits.",
+      "test": "Test long numeric/HTTP-date Retry-After without real sleeping, cancellation while waiting, 503 hints and nonrecoverable billing codes.",
+      "source_ids": [
+        "oa-errors",
+        "an-errors",
+        "za-errors"
+      ],
+      "status": "suspected_from_frozen_source_and_current_docs",
+      "live_reproduced": false
+    },
+    {
+      "id": "H11",
+      "title": "Responses tool options need translation/preservation",
+      "providers": [
+        "openai",
+        "xai",
+        "opencode_go",
+        "opencode_zen"
+      ],
+      "code": [
+        "src/sylvia_gm/provider/_openai_compat.py:432",
+        "src/sylvia_gm/provider/_openai_compat.py:468"
+      ],
+      "observation": "Function conversion drops strict; kwargs passthrough does not translate nested Chat named tool_choice or response_format to Responses text.format. A deliberate strict:false can therefore change meaning.",
+      "test": "Fixture required/none/named choice, strict:false retention, and text.format translation. Gateway strict-default details remain undocumented.",
+      "source_ids": [
+        "oa-tools",
+        "oa-structured",
+        "xa-structured"
+      ],
+      "status": "suspected_from_frozen_source_and_current_docs",
+      "live_reproduced": false
+    }
+  ],
+  "documentation_gaps": [
+    {
+      "providers": [
+        "deepseek"
+      ],
+      "topic": "Fresh complete error/retry table",
+      "attempted_urls": [
+        "https://api-docs.deepseek.com/quick_start/",
+        "https://api-docs.deepseek.com/quick_start/error_codes/"
+      ],
+      "result": "Public web reads timed out/inaccessible; thinking guide was readable."
+    },
+    {
+      "providers": [
+        "mistral"
+      ],
+      "topic": "Dedicated retry documentation",
+      "attempted_urls": [
+        "https://docs.mistral.ai/guides/error-handling"
+      ],
+      "result": "Inaccessible; native Chat and reasoning references were readable."
+    },
+    {
+      "providers": [
+        "opencode_go",
+        "opencode_zen"
+      ],
+      "topic": "Auth aliases, required session/client headers, strict default and encrypted include default",
+      "result": "Not specified in inspected official endpoint pages. Bearer authentication itself is explicit."
+    },
+    {
+      "providers": [
+        "minimax"
+      ],
+      "topic": "Business-code mapping to Anthropic HTTP/SSE errors",
+      "result": "General business-code table does not establish exact compatibility mapping."
+    },
+    {
+      "providers": [
+        "alibaba"
+      ],
+      "topic": "Conflicting Beijing workspace example",
+      "result": "Compatibility guide repeats Singapore hostname under Beijing; use dedicated base-URL table."
+    },
+    {
+      "providers": [
+        "fireworks"
+      ],
+      "topic": "500 retry advice",
+      "result": "Reliability guide says transient retry; error-code table says likely server bug. Bounded retry and clear failure retain both."
+    }
+  ],
+  "continuation_scope": [
+    {
+      "providers": [
+        "deepseek"
+      ],
+      "field": "reasoning_content",
+      "scope": "All earlier assistant turns when tools present; no-tool accepted but ignored",
+      "status": "required_with_tools",
+      "source_ids": [
+        "ds-think"
+      ]
+    },
+    {
+      "providers": [
+        "moonshot"
+      ],
+      "field": "reasoning_content",
+      "scope": "K3/K2.7 Code all historical assistant turns, even without tools; K2.6 keep:'all' optional",
+      "status": "model_specific_required",
+      "source_ids": [
+        "km-reason"
+      ]
+    },
+    {
+      "providers": [
+        "openrouter"
+      ],
+      "field": "reasoning or reasoning_content alias; reasoning_details",
+      "scope": "Ordered full reasoning_details for opaque state; scalar for plain reasoning",
+      "status": "documented_allowed_and_required_for_native_state",
+      "source_ids": [
+        "or-reason"
+      ]
+    },
+    {
+      "providers": [
+        "together"
+      ],
+      "field": "Original reasoning OR reasoning_content key",
+      "scope": "Same key as output; preserve original sequence for preserved thinking/tool continuation",
+      "status": "documented_model_specific",
+      "source_ids": [
+        "to-reason"
+      ]
+    },
+    {
+      "providers": [
+        "zai"
+      ],
+      "field": "reasoning_content",
+      "scope": "Exact sequence under thinking.clear_thinking:false",
+      "status": "documented_preserved_mode",
+      "source_ids": [
+        "za-reason"
+      ]
+    },
+    {
+      "providers": [
+        "mistral"
+      ],
+      "field": "Native content list",
+      "scope": "Replay complete assistant content including ThinkChunk",
+      "status": "documented_required",
+      "source_ids": [
+        "mi-reason"
+      ]
+    },
+    {
+      "providers": [
+        "fireworks"
+      ],
+      "field": "reasoning_content",
+      "scope": "Input allowed; reasoning_history controls disabled/interleaved/preserved and model defaults",
+      "status": "documented_allowed",
+      "source_ids": [
+        "fw-chat"
+      ]
+    },
+    {
+      "providers": [
+        "cerebras"
+      ],
+      "field": "Historical reasoning (output uses reasoning)",
+      "scope": "qwen-3.8-27b clear_thinking false/omitted preserves supplied history; do not invent aliases",
+      "status": "documented_model_specific",
+      "source_ids": [
+        "ce-chat"
+      ]
+    },
+    {
+      "providers": [
+        "alibaba"
+      ],
+      "field": "reasoning_content",
+      "scope": "Only documented preserve_thinking-capable model modes; absence allowed",
+      "status": "documented_allowed",
+      "source_ids": [
+        "al-reason"
+      ]
+    },
+    {
+      "providers": [
+        "groq",
+        "featherless"
+      ],
+      "field": "Returned scalar reasoning",
+      "scope": "General input replay not established by inspected docs; retain privately for inspection without globally forwarding",
+      "status": "unspecified",
+      "source_ids": [
+        "gq-reason",
+        "gq-reference",
+        "fe-chat"
+      ]
+    },
+    {
+      "providers": [
+        "opencode_go",
+        "opencode_zen"
+      ],
+      "field": "Selected family native state",
+      "scope": "Documented protocol family; do not infer all upstream scalar aliases work on gateway",
+      "status": "gateway_specific_details_unspecified",
+      "source_ids": [
+        "oc-api"
+      ]
+    },
+    {
+      "providers": [
+        "openai",
+        "xai"
+      ],
+      "field": "Responses output items",
+      "scope": "Native output replay or previous_response_id, provider-specific encrypted include defaults",
+      "status": "documented_native",
+      "source_ids": [
+        "oa-reason",
+        "xa-compare"
+      ]
+    }
+  ],
+  "baseline_files": {
+    "src/sylvia_gm/config/provider_settings.py": "28011673b25d78784c99907c53cf4c94736043ca095fd43f2ff7ba27eaf722e1",
+    "src/sylvia_gm/provider/_protocol_routes.py": "6ff1879b66bf6991e37f18ed7b02cc91223d7806fdc217adddde34598c01aee9",
+    "src/sylvia_gm/provider/_openai_compat.py": "f9a2bcb5f96b4e5dd5917333cc051834150fe997143bece661828fbfafee1e00",
+    "src/sylvia_gm/provider/_anthropic.py": "7b8d0b0393e3fde6464d84bb94efe69c093167fedd123f0416755085d87af7d2",
+    "src/sylvia_gm/provider/_gemini.py": "a9bba44158235c8d001036a765701d632a31e38605c3fd08949e14be68050baf",
+    "src/sylvia_gm/provider/_chat_metadata.py": "e9926cd32f8d962e75d166ba8c379f04b6d549ce79d03dd5d221300cff0b049e",
+    "src/sylvia_gm/provider/_failover.py": "da89c44a0af56d5fab3909d19750000f41b5d637223f6fdb16992cf6a2c3d667",
+    "src/sylvia_gm/agent/_native_continuation.py": "a8d1c9a01170c57e4f4f87a1f9341c255bb89497cf40b25cd0be1b3b5112e8f4",
+    "src/sylvia_gm/agent/_provider_session.py": "db57c45f8cfbdd7cb9043fc2ce4e8696b0b1ca0fa456d6889d5eddce0b1a12a3"
+  }
+}

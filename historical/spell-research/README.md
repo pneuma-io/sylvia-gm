@@ -1,0 +1,1 @@
+Historical spell research is retained here as exact source snapshots. It does not define the current 117-spell SRD Lite catalogue. These files are excluded from application packages and compiled resources.

@@ -1,0 +1,6 @@
+{
+  "source_id": "sylvia-gm.conformance.missing-capability",
+  "mechanic_id": "continuous-deformable-surface",
+  "requirement": "Resolve continuous deformation and collision of an authored surface during an action.",
+  "expected_status": "missing_engine_capability"
+}

@@ -1,0 +1,46 @@
+{
+  "schema_version": 2,
+  "updated": "2026-10-16",
+  "purpose": "Machine-readable mirror of docs/INDEX.md",
+  "policy_source": "docs/INDEX.md",
+  "active_files": {
+    "repository_rules": "AGENTS.md",
+    "authority_index": "docs/INDEX.md",
+    "terminology": "CONTEXT.md",
+    "product": "docs/product/alpha-launch-contract.md",
+    "architecture": "docs/architecture/alpha-architecture-contract.md",
+    "process": "docs/operations/quality-preserving-development-process.md",
+    "plan": "docs/plans/alpha-rebuild-readiness-plan.md"
+  },
+  "evidence_only": [
+    "docs/evidence/decision-ledger-provenance.md",
+    "assistant_synthesis",
+    "implementation_evidence",
+    "tool_output",
+    "chat_history"
+  ],
+  "never_direct_authority": [
+    "docs/archive/**",
+    ".hermes/**",
+    "compaction_wrapper",
+    "compressed_summary",
+    "async_delegation_wrapper",
+    "active_task_list",
+    "goal_continuation_wrapper",
+    "generated_handover"
+  ],
+  "side_effect_authority": {
+    "source": "latest direct human instruction in the current task",
+    "not_granted_by_static_documents": [
+      "stage",
+      "commit",
+      "push",
+      "deploy",
+      "release",
+      "publish",
+      "spend",
+      "read or mutate personal campaign data",
+      "destructive git or data operation"
+    ]
+  }
+}

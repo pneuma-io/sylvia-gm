@@ -1,0 +1,36 @@
+{
+  "kind": "Sanitized retained research snapshots; excluded from application and package payloads",
+  "files": {
+    "scripts/srd_lite_catalogue.py": {
+      "archive": "historical/spell-research/srd_lite_catalogue.py",
+      "sha256": "b849e9aae013069cd828c1c568f188ee9c3a01cf4e9c020c2b39c4a438073d90",
+      "pre_sanitation_sha256": "935e12bb51fce2f3f31521f328a754d76b6001f53b14819256c4bc42b38655fe"
+    },
+    "rulesets/srd-lite-bg3/content/spell-catalogue.json": {
+      "archive": "historical/spell-research/spell-catalogue.json",
+      "sha256": "60455cfaded3f0e34869b08f1f29c38675d57659cb197bc94e7c7038fd4b7314",
+      "pre_sanitation_sha256": "759e9ccbc562c7b3648c68d8209a18796685447cf865fa072577baf49009e2f4"
+    },
+    "rulesets/srd-lite-bg3/content/launch-roster.json": {
+      "archive": "historical/spell-research/launch-roster.json",
+      "sha256": "dc5c5cd55e3118b1aa65999355998a95392b60257d367b2ad794522687767a6d",
+      "pre_sanitation_sha256": "da0f8a973d2f028e7d3ac0099474cef749b408b503ce410d18be1e088f76a6df"
+    },
+    "rulesets/srd-lite-bg3/content/roster-crosswalk.csv": {
+      "archive": "historical/spell-research/roster-crosswalk.csv",
+      "sha256": "16c2f74e2a35155ca491b922ffddc54e45f92ee9dc836fa0b1aca86523907be1"
+    },
+    "rulesets/srd-lite-bg3/content/normal-roster.txt": {
+      "archive": "historical/spell-research/normal-roster.txt",
+      "sha256": "6332f4539ed6224dc1519d01790381a0afe7aaca1146f4fc944a34fb062166c4"
+    },
+    "scripts/srd_lite_insect_zone.py": {
+      "archive": "historical/spell-research/srd_lite_insect_zone.py",
+      "sha256": "7e300cdb2fdfddbe9f164f637141f4013378bce440f8d220ce636da55b00ad8b"
+    },
+    "scripts/srd_lite_lightning_zone.py": {
+      "archive": "historical/spell-research/srd_lite_lightning_zone.py",
+      "sha256": "377f9bd5c99779a865207be3693c322e7fddc2f56db85f757118d8ce080f7934"
+    }
+  }
+}

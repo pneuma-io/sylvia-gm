@@ -1,0 +1,8 @@
+{
+  "identifier": "admin-audit",
+  "description": "Read-only event capability for the owner-private Full Audit inspector",
+  "windows": ["admin-audit"],
+  "permissions": [
+    "core:event:default"
+  ]
+}

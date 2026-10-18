@@ -1,0 +1,3107 @@
+{
+  "campaign_id": "td-panel-smoke",
+  "revision": 2,
+  "direct_actions_available": true,
+  "ruleset_id": "pneuma-io.trigger-discipline",
+  "layout": {
+    "version": 1,
+    "sidebar": {
+      "kind": "split",
+      "id": "tactical-stack",
+      "axis": "column",
+      "ratio": 0.62,
+      "first": {
+        "kind": "tabs",
+        "id": "map-and-network",
+        "panels": [
+          "operations.map",
+          "operations.network"
+        ],
+        "active": "operations.map"
+      },
+      "second": {
+        "kind": "split",
+        "id": "party-and-character",
+        "axis": "row",
+        "ratio": 0.4,
+        "first": {
+          "kind": "tabs",
+          "id": "squad",
+          "panels": [
+            "operations.party"
+          ],
+          "active": "operations.party"
+        },
+        "second": {
+          "kind": "tabs",
+          "id": "character-and-loadout",
+          "panels": [
+            "operations.character",
+            "operations.loadout"
+          ],
+          "active": "operations.character"
+        }
+      }
+    },
+    "windows": [],
+    "hidden": [
+      "operations.status"
+    ],
+    "known": [
+      "operations.character",
+      "operations.loadout",
+      "operations.map",
+      "operations.network",
+      "operations.party",
+      "operations.status"
+    ],
+    "panel_sizes": {},
+    "sidebar_width": null,
+    "views": {}
+  },
+  "player_control": {
+    "available": true,
+    "focused_actor_id": "hex",
+    "actors": [
+      {
+        "id": "vesper",
+        "name": "Vesper"
+      },
+      {
+        "id": "hex",
+        "name": "Hex"
+      },
+      {
+        "id": "autodrone_alpha",
+        "name": "Autodrone Alpha"
+      }
+    ]
+  },
+  "response_action": {
+    "action_id": "panel-823b7f04-4a21-406e-b9fa-129d267a55e3",
+    "pending_count": 2,
+    "session_id": "panel-gm",
+    "turn_id": "turn",
+    "automatic": false,
+    "available": true
+  },
+  "surfaces": [
+    {
+      "id": "operations.map",
+      "title": "Tactical map",
+      "icon": "\u25a6",
+      "renderer": "tactical_grid",
+      "source": {
+        "fields": {
+          "objectives": {
+            "key": "state.objectives",
+            "kind": "state",
+            "namespace": "pneuma-io.trigger-discipline"
+          },
+          "preview": {
+            "key": "state.preview",
+            "kind": "state",
+            "namespace": "pneuma-io.trigger-discipline"
+          },
+          "scene": {
+            "key": "state.spatial_scene",
+            "kind": "state",
+            "namespace": "pneuma-io.trigger-discipline"
+          },
+          "selection": {
+            "key": "state.selection",
+            "kind": "state",
+            "namespace": "pneuma-io.trigger-discipline"
+          }
+        },
+        "kind": "object"
+      },
+      "group": "operations",
+      "order": 0,
+      "default_size": 640,
+      "minimum_size": 320,
+      "default_placement": "docked",
+      "allowed_placements": [
+        "docked",
+        "window"
+      ],
+      "actions": [
+        {
+          "bindings": {
+            "actor": "actor"
+          },
+          "id": "stance-standing",
+          "intent": "change_stance",
+          "label": "Stand",
+          "params": {
+            "stance": "STANDING"
+          },
+          "available": true,
+          "actor_parameter": "actor",
+          "checks_required": true,
+          "map_preview_enabled": false
+        },
+        {
+          "bindings": {
+            "actor": "actor"
+          },
+          "id": "stance-crouched",
+          "intent": "change_stance",
+          "label": "Crouch",
+          "params": {
+            "stance": "CROUCHED"
+          },
+          "available": true,
+          "actor_parameter": "actor",
+          "checks_required": true,
+          "map_preview_enabled": false
+        },
+        {
+          "bindings": {
+            "actor": "actor"
+          },
+          "id": "stance-prone",
+          "intent": "change_stance",
+          "label": "Go prone",
+          "params": {
+            "stance": "PRONE"
+          },
+          "available": true,
+          "actor_parameter": "actor",
+          "checks_required": true,
+          "map_preview_enabled": false
+        },
+        {
+          "bindings": {
+            "actor": "actor",
+            "destination": "destination"
+          },
+          "id": "move",
+          "intent": "move_actor",
+          "label": "Move",
+          "params": {},
+          "available": true,
+          "actor_parameter": "actor",
+          "checks_required": true,
+          "map_preview_enabled": true
+        },
+        {
+          "bindings": {
+            "aim_point": "aim_point",
+            "attacker": "actor",
+            "target": "target"
+          },
+          "id": "aim",
+          "intent": "aim",
+          "label": "Aim",
+          "params": {
+            "ap": 1
+          },
+          "available": true,
+          "actor_parameter": "attacker",
+          "checks_required": true,
+          "map_preview_enabled": false
+        },
+        {
+          "bindings": {
+            "aim_point": "aim_point",
+            "attacker": "actor",
+            "target": "target"
+          },
+          "id": "fire",
+          "intent": "fire_single",
+          "label": "Fire",
+          "params": {
+            "critical_effect": "DEVASTATING_HIT"
+          },
+          "available": true,
+          "actor_parameter": "attacker",
+          "checks_required": true,
+          "map_preview_enabled": true
+        },
+        {
+          "bindings": {
+            "aim_point": "aim_point",
+            "attacker": "actor",
+            "target": "target"
+          },
+          "id": "burst",
+          "intent": "fire_burst",
+          "label": "Burst",
+          "params": {
+            "critical_effect": "DEVASTATING_HIT"
+          },
+          "available": true,
+          "actor_parameter": "attacker",
+          "checks_required": true,
+          "map_preview_enabled": true
+        },
+        {
+          "bindings": {
+            "aim_point": "aim_point",
+            "attacker": "actor",
+            "target": "target"
+          },
+          "id": "full-auto",
+          "intent": "fire_full_auto",
+          "label": "Full auto",
+          "params": {
+            "critical_effect": "DEVASTATING_HIT",
+            "rounds": 5
+          },
+          "available": true,
+          "actor_parameter": "attacker",
+          "checks_required": true,
+          "map_preview_enabled": true
+        },
+        {
+          "bindings": {
+            "actor": "actor",
+            "drone": "device",
+            "landing_point": "aim_point",
+            "target": "target"
+          },
+          "id": "fpv-strike",
+          "intent": "fpv_fragmentation_strike",
+          "label": "FPV fragmentation strike",
+          "params": {},
+          "available": true,
+          "actor_parameter": "actor",
+          "checks_required": true,
+          "map_preview_enabled": false
+        },
+        {
+          "bindings": {
+            "actor": "actor",
+            "aim_point": "aim_point",
+            "target": "target"
+          },
+          "id": "autodrone-fire",
+          "intent": "autodrone_fire",
+          "label": "Autodrone fire",
+          "params": {},
+          "available": true,
+          "actor_parameter": "actor",
+          "checks_required": true,
+          "map_preview_enabled": false
+        },
+        {
+          "bindings": {
+            "actor": "actor",
+            "zone_id": "zone"
+          },
+          "id": "overwatch",
+          "intent": "prepare_overwatch",
+          "label": "Prepare overwatch",
+          "params": {},
+          "available": true,
+          "actor_parameter": "actor",
+          "checks_required": true,
+          "map_preview_enabled": false
+        },
+        {
+          "bindings": {
+            "actor": "actor",
+            "zone_id": "zone"
+          },
+          "id": "suppress",
+          "intent": "establish_suppression",
+          "label": "Suppress",
+          "params": {
+            "rounds": 10
+          },
+          "available": true,
+          "actor_parameter": "actor",
+          "checks_required": true,
+          "map_preview_enabled": false
+        }
+      ],
+      "data": {
+        "format": 1,
+        "map_revision": 3,
+        "map": {
+          "id": "td-conformance-floor",
+          "revision": 3,
+          "bounds": {
+            "min": [
+              0,
+              0,
+              0
+            ],
+            "max": [
+              60,
+              60,
+              3
+            ]
+          },
+          "grid": {
+            "cell_size": 1,
+            "unit": "m",
+            "origin": [
+              0,
+              0
+            ]
+          },
+          "layers": [
+            {
+              "id": "floor",
+              "min_elevation": 0,
+              "max_elevation": 3
+            }
+          ]
+        },
+        "geometry": [
+          {
+            "id": "full-wall",
+            "map_id": "td-conformance-floor",
+            "volume": {
+              "kind": "box",
+              "min": [
+                6,
+                5,
+                0
+              ],
+              "max": [
+                6.5,
+                8,
+                3
+              ]
+            },
+            "active": true,
+            "movement": "blocking",
+            "occupies_cells": false,
+            "visibility": "opaque",
+            "destroyed": {
+              "active": true,
+              "movement": "blocking",
+              "visibility": "opaque"
+            },
+            "display": {
+              "label": "Full wall",
+              "kind": "wall",
+              "height_label": "Full"
+            }
+          },
+          {
+            "id": "partial-cover",
+            "map_id": "td-conformance-floor",
+            "volume": {
+              "kind": "box",
+              "min": [
+                6,
+                1,
+                0
+              ],
+              "max": [
+                6.5,
+                4,
+                1
+              ]
+            },
+            "active": true,
+            "movement": "blocking",
+            "occupies_cells": true,
+            "visibility": "opaque",
+            "destroyed": {
+              "active": false,
+              "movement": "passable",
+              "visibility": "clear"
+            },
+            "display": {
+              "label": "Destructible cover",
+              "kind": "cover",
+              "material_label": "Material resistance 3"
+            }
+          },
+          {
+            "id": "security-door",
+            "map_id": "td-conformance-floor",
+            "volume": {
+              "kind": "box",
+              "min": [
+                10,
+                4,
+                0
+              ],
+              "max": [
+                10.25,
+                5.5,
+                2.4
+              ]
+            },
+            "active": true,
+            "movement": "blocking",
+            "occupies_cells": false,
+            "visibility": "opaque",
+            "destroyed": {
+              "active": false,
+              "movement": "passable",
+              "visibility": "clear"
+            },
+            "display": {
+              "label": "Security door",
+              "kind": "door",
+              "state": "closed",
+              "material_label": "Material resistance 2"
+            }
+          }
+        ],
+        "entities": [
+          {
+            "id": "autodrone_alpha",
+            "map_id": "td-conformance-floor",
+            "position": [
+              27.5,
+              30.5,
+              0
+            ],
+            "footprint": {
+              "kind": "circle",
+              "radius": 0.35
+            },
+            "height": 0.7,
+            "facing": [
+              1,
+              0
+            ],
+            "active": true,
+            "movement": "blocking",
+            "visibility": "opaque",
+            "display": {
+              "label": "Autodrone Alpha",
+              "kind": "drone",
+              "state": "active",
+              "side": "allies"
+            }
+          },
+          {
+            "id": "door-controller-device",
+            "map_id": "td-conformance-floor",
+            "position": [
+              9.5,
+              5,
+              0
+            ],
+            "footprint": {
+              "kind": "box",
+              "half_extents": [
+                0.25,
+                0.25
+              ]
+            },
+            "height": 1.2,
+            "facing": [
+              -1,
+              0
+            ],
+            "active": true,
+            "movement": "passable",
+            "visibility": "opaque",
+            "display": {
+              "label": "Door controller",
+              "kind": "device"
+            }
+          },
+          {
+            "id": "drone_target",
+            "map_id": "td-conformance-floor",
+            "position": [
+              31.5,
+              30.5,
+              0
+            ],
+            "footprint": {
+              "kind": "box",
+              "half_extents": [
+                0.4,
+                0.4
+              ]
+            },
+            "height": 1.8,
+            "facing": [
+              -1,
+              0
+            ],
+            "active": true,
+            "movement": "blocking",
+            "visibility": "opaque",
+            "display": {
+              "label": "Drone qualification target",
+              "kind": "unit",
+              "stance": "standing",
+              "side": "hostiles"
+            }
+          },
+          {
+            "id": "fpv_alpha",
+            "map_id": "td-conformance-floor",
+            "position": [
+              29.5,
+              30.5,
+              0
+            ],
+            "footprint": {
+              "kind": "circle",
+              "radius": 0.2
+            },
+            "height": 0.4,
+            "facing": [
+              1,
+              0
+            ],
+            "active": true,
+            "movement": "blocking",
+            "visibility": "opaque",
+            "display": {
+              "label": "FPV Alpha",
+              "kind": "drone",
+              "state": "active",
+              "side": "allies"
+            }
+          },
+          {
+            "id": "hex",
+            "map_id": "td-conformance-floor",
+            "position": [
+              2.5,
+              3.5,
+              0
+            ],
+            "footprint": {
+              "kind": "box",
+              "half_extents": [
+                0.4,
+                0.4
+              ]
+            },
+            "height": 1.8,
+            "facing": [
+              1,
+              0
+            ],
+            "active": true,
+            "movement": "blocking",
+            "visibility": "opaque",
+            "display": {
+              "label": "Hex",
+              "kind": "unit",
+              "stance": "standing",
+              "side": "allies"
+            }
+          },
+          {
+            "id": "hostile_alpha",
+            "map_id": "td-conformance-floor",
+            "position": [
+              9.5,
+              2.5,
+              0
+            ],
+            "footprint": {
+              "kind": "box",
+              "half_extents": [
+                0.4,
+                0.4
+              ]
+            },
+            "height": 1.8,
+            "facing": [
+              -1,
+              0
+            ],
+            "active": true,
+            "movement": "blocking",
+            "visibility": "opaque",
+            "display": {
+              "label": "Hostile Alpha",
+              "kind": "unit",
+              "stance": "standing",
+              "side": "hostiles"
+            }
+          },
+          {
+            "id": "terminal-device",
+            "map_id": "td-conformance-floor",
+            "position": [
+              3.5,
+              5.5,
+              0
+            ],
+            "footprint": {
+              "kind": "box",
+              "half_extents": [
+                0.35,
+                0.35
+              ]
+            },
+            "height": 1.3,
+            "facing": [
+              0,
+              -1
+            ],
+            "active": true,
+            "movement": "passable",
+            "visibility": "opaque",
+            "display": {
+              "label": "Lobby access terminal",
+              "kind": "device"
+            },
+            "network_bindings": [
+              {
+                "surface_id": "operations.network",
+                "node_id": "lobby_terminal"
+              }
+            ]
+          },
+          {
+            "id": "vesper",
+            "map_id": "td-conformance-floor",
+            "position": [
+              2.5,
+              2.5,
+              0
+            ],
+            "footprint": {
+              "kind": "box",
+              "half_extents": [
+                0.4,
+                0.4
+              ]
+            },
+            "height": 1.8,
+            "facing": [
+              1,
+              0
+            ],
+            "active": true,
+            "movement": "blocking",
+            "visibility": "opaque",
+            "display": {
+              "label": "Vesper",
+              "kind": "unit",
+              "stance": "standing",
+              "side": "allies"
+            }
+          }
+        ],
+        "zones": [
+          {
+            "id": "objective-zone",
+            "map_id": "td-conformance-floor",
+            "shape": {
+              "kind": "box",
+              "min": [
+                10.5,
+                3.5,
+                0
+              ],
+              "max": [
+                12,
+                6,
+                2.5
+              ]
+            },
+            "display": {
+              "label": "Secure relay",
+              "kind": "objective"
+            }
+          },
+          {
+            "id": "overwatch-lane",
+            "map_id": "td-conformance-floor",
+            "shape": {
+              "kind": "box",
+              "min": [
+                5,
+                0,
+                0
+              ],
+              "max": [
+                8,
+                4,
+                2.5
+              ]
+            },
+            "display": {
+              "label": "Overwatch lane",
+              "kind": "overwatch"
+            }
+          },
+          {
+            "id": "suppression-lane",
+            "map_id": "td-conformance-floor",
+            "shape": {
+              "kind": "box",
+              "min": [
+                5,
+                0,
+                0
+              ],
+              "max": [
+                8,
+                4,
+                2.5
+              ]
+            },
+            "display": {
+              "label": "Suppression lane",
+              "kind": "suppression"
+            }
+          }
+        ],
+        "terrain": [],
+        "objectives": [
+          {
+            "id": "neutralize-hostile-alpha",
+            "label": "Neutralize Hostile Alpha",
+            "status": "active",
+            "position": [
+              9.5,
+              2.5,
+              0
+            ]
+          },
+          {
+            "id": "open-security-door",
+            "label": "Open the security door through the building network",
+            "status": "active",
+            "position": [
+              10.0,
+              4.75,
+              0
+            ]
+          }
+        ],
+        "selection": {},
+        "preview": {
+          "authoritative": false,
+          "label": "Preview only \u2014 the owner resolves the committed action",
+          "map_revision": 3,
+          "path_cost": null,
+          "los": null,
+          "exposure": null,
+          "crossed_zones": []
+        }
+      }
+    },
+    {
+      "id": "operations.network",
+      "title": "Network",
+      "icon": "\u25c7",
+      "renderer": "network_graph",
+      "source": {
+        "key": "state.network",
+        "kind": "state",
+        "namespace": "pneuma-io.trigger-discipline"
+      },
+      "group": "operations",
+      "order": 1,
+      "default_size": 520,
+      "minimum_size": 320,
+      "default_placement": "docked",
+      "allowed_placements": [
+        "docked",
+        "window"
+      ],
+      "actions": [
+        {
+          "bindings": {
+            "actor": "actor",
+            "node_id": "node"
+          },
+          "id": "connect",
+          "intent": "network_connection",
+          "label": "Connect to interface",
+          "params": {
+            "action": "CONNECT"
+          },
+          "available": true,
+          "actor_parameter": "actor",
+          "checks_required": true,
+          "map_preview_enabled": false
+        },
+        {
+          "bindings": {
+            "actor": "actor",
+            "node_id": "node"
+          },
+          "id": "disconnect",
+          "intent": "network_connection",
+          "label": "Disconnect",
+          "params": {
+            "action": "DISCONNECT"
+          },
+          "available": true,
+          "actor_parameter": "actor",
+          "checks_required": true,
+          "map_preview_enabled": false
+        },
+        {
+          "bindings": {
+            "actor": "actor",
+            "node_id": "node"
+          },
+          "id": "get-in",
+          "intent": "intrude_network",
+          "label": "Get in",
+          "params": {
+            "action": "GET_IN"
+          },
+          "available": true,
+          "actor_parameter": "actor",
+          "checks_required": true,
+          "map_preview_enabled": false
+        },
+        {
+          "bindings": {
+            "actor": "actor",
+            "node_id": "node"
+          },
+          "id": "discover",
+          "intent": "intrude_network",
+          "label": "Discover connections",
+          "params": {
+            "action": "DISCOVER"
+          },
+          "available": true,
+          "actor_parameter": "actor",
+          "checks_required": true,
+          "map_preview_enabled": false
+        },
+        {
+          "bindings": {
+            "actor": "actor",
+            "node_id": "node"
+          },
+          "id": "foothold",
+          "intent": "intrude_network",
+          "label": "Establish foothold",
+          "params": {
+            "action": "FOOTHOLD"
+          },
+          "available": true,
+          "actor_parameter": "actor",
+          "checks_required": true,
+          "map_preview_enabled": false
+        },
+        {
+          "bindings": {
+            "actor": "actor",
+            "node_id": "node"
+          },
+          "id": "reenter-local",
+          "intent": "intrude_network",
+          "label": "Use local foothold",
+          "params": {
+            "action": "GET_IN",
+            "method": "FOOTHOLD"
+          },
+          "available": true,
+          "actor_parameter": "actor",
+          "checks_required": true,
+          "map_preview_enabled": false
+        },
+        {
+          "bindings": {
+            "actor": "actor",
+            "node_id": "node",
+            "route_step": "route_step"
+          },
+          "id": "pivot",
+          "intent": "pivot_network",
+          "label": "Pivot along connection",
+          "params": {},
+          "available": true,
+          "actor_parameter": "actor",
+          "checks_required": true,
+          "map_preview_enabled": false
+        },
+        {
+          "bindings": {
+            "actor": "actor",
+            "node_id": "node",
+            "route_step": "route_step"
+          },
+          "id": "reenter-linked",
+          "intent": "pivot_network",
+          "label": "Use connected foothold",
+          "params": {
+            "method": "FOOTHOLD"
+          },
+          "available": true,
+          "actor_parameter": "actor",
+          "checks_required": true,
+          "map_preview_enabled": false
+        },
+        {
+          "bindings": {
+            "actor": "actor",
+            "node_id": "node"
+          },
+          "id": "escalate",
+          "intent": "intrude_network",
+          "label": "Escalate",
+          "params": {
+            "action": "ESCALATE"
+          },
+          "available": true,
+          "actor_parameter": "actor",
+          "checks_required": true,
+          "map_preview_enabled": false
+        },
+        {
+          "bindings": {
+            "actor": "actor",
+            "node_id": "node",
+            "remote_function": "remote_function"
+          },
+          "id": "operate",
+          "intent": "operate_remote_function",
+          "label": "Operate function",
+          "params": {},
+          "available": true,
+          "actor_parameter": "actor",
+          "checks_required": true,
+          "map_preview_enabled": false
+        }
+      ],
+      "data": {
+        "format": 1,
+        "graph_id": "td-conformance-building",
+        "graph_revision": 1,
+        "groups": [
+          {
+            "id": "office",
+            "label": "Office"
+          }
+        ],
+        "nodes": [
+          {
+            "id": "lobby_terminal",
+            "label": "Lobby terminal",
+            "kind": "access_terminal",
+            "functions": [],
+            "group_id": "office",
+            "status": "online",
+            "access": "local",
+            "control": "hostile",
+            "detection": "unknown",
+            "physical_binding": {
+              "surface_id": "operations.map",
+              "entity_id": "terminal-device"
+            }
+          }
+        ],
+        "links": [],
+        "selection": {}
+      }
+    },
+    {
+      "id": "operations.status",
+      "title": "Operation status",
+      "icon": "\u25ce",
+      "renderer": "key_value",
+      "source": {
+        "fields": {
+          "Active side": {
+            "key": "state.active_side",
+            "kind": "state",
+            "namespace": "pneuma-io.trigger-discipline"
+          },
+          "Decision owner": {
+            "key": "state.decision_owner",
+            "kind": "state",
+            "namespace": "pneuma-io.trigger-discipline"
+          },
+          "Mission status": {
+            "key": "state.mission.status",
+            "kind": "state",
+            "namespace": "pneuma-io.trigger-discipline"
+          }
+        },
+        "kind": "object"
+      },
+      "group": "operations",
+      "order": 2,
+      "default_size": 240,
+      "minimum_size": 160,
+      "default_placement": "docked",
+      "allowed_placements": [
+        "docked",
+        "floating",
+        "window"
+      ],
+      "actions": [],
+      "data": {
+        "Active side": "allies",
+        "Decision owner": "player",
+        "Mission status": "ACTIVE"
+      }
+    },
+    {
+      "id": "operations.party",
+      "title": "Squad",
+      "icon": "\u25c6",
+      "renderer": "party",
+      "source": {
+        "fields": {
+          "entities": {
+            "key": "entities",
+            "kind": "state",
+            "namespace": "pneuma-io.trigger-discipline"
+          },
+          "participants": {
+            "kind": "participants",
+            "kinds": [
+              "trigger-discipline.character"
+            ]
+          }
+        },
+        "kind": "object"
+      },
+      "group": "operations",
+      "order": 3,
+      "default_size": 300,
+      "minimum_size": 180,
+      "default_placement": "docked",
+      "allowed_placements": [
+        "docked",
+        "window"
+      ],
+      "actions": [],
+      "data": {
+        "entities": {
+          "autodrone_alpha": {
+            "active": true,
+            "ap": 2,
+            "center": [
+              27.5,
+              30.5,
+              0.5
+            ],
+            "controlled_by": null,
+            "downed": false,
+            "hp": 8,
+            "id": "autodrone_alpha",
+            "kind": "AUTONOMOUS_DRONE",
+            "max_ap": 2,
+            "muzzle": [
+              27.95,
+              30.5,
+              0.65
+            ],
+            "name": "Autodrone Alpha",
+            "payload": null,
+            "position_cell": [
+              27,
+              30
+            ],
+            "position_point": [
+              27.5,
+              30.5,
+              0.5
+            ],
+            "res": 0,
+            "sensor_confirmed_targets": [
+              "drone_target"
+            ],
+            "side": "allies",
+            "standing_order": {
+              "active": true,
+              "authorized_fire": true,
+              "collateral_limit": "NO_UNCONFIRMED_TARGETS",
+              "target": "drone_target"
+            },
+            "weapon": {
+              "current_recoil": 0,
+              "damage": 4,
+              "fire_modes": [
+                "SEMI_AUTO"
+              ],
+              "location": "MOUNTED",
+              "magazine": {
+                "id": "autodrone_alpha-light-weapon-magazine-0",
+                "rounds": 10
+              },
+              "material_pen": 1,
+              "module": "AUTONOMOUS_LIGHT_WEAPON",
+              "recoil": 2,
+              "target_pen": 1
+            }
+          },
+          "drone_target": {
+            "active": true,
+            "aim": {
+              "ap": 0,
+              "point": null,
+              "target": null
+            },
+            "ap": 6,
+            "aptitudes": {
+              "acuity": 0,
+              "force": 1,
+              "nerve": 0,
+              "precision": 2,
+              "presence": 0,
+              "reason": 1
+            },
+            "center": [
+              31.5,
+              30.5,
+              0.9
+            ],
+            "class_id": "BULWARK",
+            "control": null,
+            "downed": false,
+            "hp": 50,
+            "id": "drone_target",
+            "intrusion_ap_discount": 0,
+            "level": 10,
+            "life_threatening": {
+              "state": "NONE",
+              "within_reversible_window": false
+            },
+            "local_access": false,
+            "max_ap": 6,
+            "medical_kit_capable": false,
+            "medicine_bonus": 0,
+            "movement_m_per_ap": 1.0,
+            "muzzle": [
+              31.05,
+              30.5,
+              1.4
+            ],
+            "name": "Drone Target",
+            "position_cell": [
+              31,
+              30
+            ],
+            "recoil_recovery_per_ap": 1,
+            "res": 20,
+            "resuscitation_kit_capable": false,
+            "side": "hostiles",
+            "skills": {
+              "athletics": 0,
+              "cqc": 3,
+              "drone_operations": 0,
+              "engineering": 0,
+              "grenades": 0,
+              "influence": 0,
+              "investigation": 0,
+              "local_hacking": 0,
+              "marksmanship": 4,
+              "medicine": 2,
+              "networking": 0,
+              "recon": 0,
+              "social_read": 0,
+              "stealth": 0,
+              "tactics": 0,
+              "vehicles": 0
+            },
+            "specialties": [],
+            "stance": "STANDING",
+            "weapon": {
+              "chamber": "LIVE",
+              "controlled_by": null,
+              "current_recoil": 0,
+              "cycle_ap": 0,
+              "cyclic_rate_rpm": null,
+              "damage": 4,
+              "feed": "DETACHABLE_MAGAZINE",
+              "fire_modes": [
+                "SEMI_AUTO"
+              ],
+              "id": "pistol",
+              "location": "READY",
+              "magazine": {
+                "id": "drone_target-pistol-magazine-0",
+                "rounds": 15
+              },
+              "material_pen": 1,
+              "mechanism": "SELF_LOADING",
+              "needs_cycle": false,
+              "range_breakpoints_m": [
+                15,
+                30,
+                50
+              ],
+              "range_modifiers": [
+                0,
+                2,
+                5,
+                8
+              ],
+              "recoil": 1,
+              "reload_ap": 2,
+              "retained_magazines": [],
+              "spare_magazines": [
+                {
+                  "id": "drone_target-pistol-magazine-1",
+                  "rounds": 15
+                },
+                {
+                  "id": "drone_target-pistol-magazine-2",
+                  "rounds": 15
+                }
+              ],
+              "target_pen": 1
+            }
+          },
+          "fpv_alpha": {
+            "active": true,
+            "ap": 0,
+            "center": [
+              29.5,
+              30.5,
+              0.5
+            ],
+            "controlled_by": "hex",
+            "downed": false,
+            "hp": 4,
+            "id": "fpv_alpha",
+            "kind": "FPV_DRONE",
+            "max_ap": 0,
+            "muzzle": [
+              29.95,
+              30.5,
+              0.65
+            ],
+            "name": "Fpv Alpha",
+            "payload": "FPV_FRAGMENTATION",
+            "position_cell": [
+              29,
+              30
+            ],
+            "position_point": [
+              29.5,
+              30.5,
+              0.5
+            ],
+            "res": 0,
+            "side": "allies"
+          },
+          "hex": {
+            "active": true,
+            "aim": {
+              "ap": 0,
+              "point": null,
+              "target": null
+            },
+            "ap": 4,
+            "aptitudes": {
+              "acuity": 0,
+              "force": 1,
+              "nerve": 0,
+              "precision": 2,
+              "presence": 0,
+              "reason": 2
+            },
+            "center": [
+              2.5,
+              3.5,
+              0.9
+            ],
+            "class_id": "HACKER",
+            "control": null,
+            "downed": false,
+            "hp": 11,
+            "id": "hex",
+            "intrusion_ap_discount": 1,
+            "level": 10,
+            "life_threatening": {
+              "state": "NONE",
+              "within_reversible_window": false
+            },
+            "local_access": true,
+            "max_ap": 6,
+            "medical_kit_capable": false,
+            "medicine_bonus": 0,
+            "movement_m_per_ap": 1.0,
+            "muzzle": [
+              2.91,
+              3.5,
+              1.4000000000000001
+            ],
+            "name": "Hex",
+            "position_cell": [
+              2,
+              3
+            ],
+            "recoil_recovery_per_ap": 1,
+            "res": 10,
+            "resuscitation_kit_capable": false,
+            "side": "allies",
+            "skills": {
+              "athletics": 0,
+              "cqc": 3,
+              "drone_operations": 6,
+              "engineering": 0,
+              "grenades": 0,
+              "influence": 0,
+              "investigation": 0,
+              "local_hacking": 4,
+              "marksmanship": 4,
+              "medicine": 2,
+              "networking": 6,
+              "recon": 0,
+              "social_read": 0,
+              "stealth": 0,
+              "tactics": 0,
+              "vehicles": 0
+            },
+            "specialties": [
+              "specialty.networker.entry.map_the_links",
+              "specialty.networker.tier_1.pivot",
+              "specialty.networker.tier_1.quiet_enumeration",
+              "specialty.networker.tier_2.foothold",
+              "specialty.networker.tier_2.segment_map"
+            ],
+            "stance": "STANDING",
+            "weapon": {
+              "chamber": "LIVE",
+              "controlled_by": null,
+              "current_recoil": 0,
+              "cycle_ap": 0,
+              "cyclic_rate_rpm": 750,
+              "damage": 5,
+              "feed": "DETACHABLE_MAGAZINE",
+              "fire_modes": [
+                "SEMI_AUTO",
+                "BURST",
+                "FULL_AUTO"
+              ],
+              "id": "service_rifle",
+              "location": "READY",
+              "magazine": {
+                "id": "hex-service_rifle-magazine-0",
+                "rounds": 30
+              },
+              "material_pen": 3,
+              "mechanism": "SELF_LOADING",
+              "needs_cycle": false,
+              "range_breakpoints_m": [
+                120,
+                250,
+                400
+              ],
+              "range_modifiers": [
+                0,
+                2,
+                5,
+                8
+              ],
+              "recoil": 2,
+              "reload_ap": 2,
+              "retained_magazines": [],
+              "spare_magazines": [
+                {
+                  "id": "hex-service_rifle-magazine-1",
+                  "rounds": 30
+                },
+                {
+                  "id": "hex-service_rifle-magazine-2",
+                  "rounds": 30
+                }
+              ],
+              "target_pen": 2
+            }
+          },
+          "hostile_alpha": {
+            "active": true,
+            "aim": {
+              "ap": 0,
+              "point": null,
+              "target": null
+            },
+            "ap": 6,
+            "aptitudes": {
+              "acuity": 0,
+              "force": 1,
+              "nerve": 0,
+              "precision": 2,
+              "presence": 0,
+              "reason": 1
+            },
+            "center": [
+              9.5,
+              2.5,
+              0.9
+            ],
+            "class_id": "RIFLEMAN",
+            "control": null,
+            "downed": false,
+            "hp": 11,
+            "id": "hostile_alpha",
+            "intrusion_ap_discount": 0,
+            "level": 10,
+            "life_threatening": {
+              "state": "NONE",
+              "within_reversible_window": false
+            },
+            "local_access": false,
+            "max_ap": 6,
+            "medical_kit_capable": false,
+            "medicine_bonus": 0,
+            "movement_m_per_ap": 1.0,
+            "muzzle": [
+              8.91,
+              2.5,
+              1.4
+            ],
+            "name": "Hostile Alpha",
+            "position_cell": [
+              9,
+              2
+            ],
+            "recoil_recovery_per_ap": 2,
+            "res": 10,
+            "resuscitation_kit_capable": false,
+            "side": "hostiles",
+            "skills": {
+              "athletics": 0,
+              "cqc": 3,
+              "drone_operations": 0,
+              "engineering": 0,
+              "grenades": 0,
+              "influence": 0,
+              "investigation": 0,
+              "local_hacking": 0,
+              "marksmanship": 4,
+              "medicine": 2,
+              "networking": 0,
+              "recon": 0,
+              "social_read": 0,
+              "stealth": 0,
+              "tactics": 0,
+              "vehicles": 0
+            },
+            "specialties": [],
+            "stance": "STANDING",
+            "weapon": {
+              "chamber": "SPENT",
+              "controlled_by": null,
+              "current_recoil": 0,
+              "cycle_ap": 1,
+              "cyclic_rate_rpm": null,
+              "damage": 7,
+              "feed": "DETACHABLE_MAGAZINE",
+              "fire_modes": [
+                "SINGLE"
+              ],
+              "id": "manual_precision_rifle",
+              "location": "READY",
+              "magazine": {
+                "id": "hostile_alpha-manual_precision_rifle-magazine-0",
+                "rounds": 5
+              },
+              "material_pen": 5,
+              "mechanism": "MANUAL_ACTION",
+              "needs_cycle": true,
+              "range_breakpoints_m": [
+                300,
+                650,
+                1000
+              ],
+              "range_modifiers": [
+                0,
+                2,
+                5,
+                8
+              ],
+              "recoil": 4,
+              "reload_ap": 2,
+              "retained_magazines": [],
+              "spare_magazines": [
+                {
+                  "id": "hostile_alpha-manual_precision_rifle-magazine-1",
+                  "rounds": 5
+                },
+                {
+                  "id": "hostile_alpha-manual_precision_rifle-magazine-2",
+                  "rounds": 5
+                }
+              ],
+              "target_pen": 4
+            }
+          },
+          "vesper": {
+            "active": true,
+            "aim": {
+              "ap": 0,
+              "point": null,
+              "target": null
+            },
+            "ap": 6,
+            "aptitudes": {
+              "acuity": 0,
+              "force": 1,
+              "nerve": 0,
+              "precision": 2,
+              "presence": 0,
+              "reason": 1
+            },
+            "center": [
+              2.5,
+              2.5,
+              0.9
+            ],
+            "class_id": "RIFLEMAN",
+            "control": null,
+            "downed": false,
+            "hp": 11,
+            "id": "vesper",
+            "intrusion_ap_discount": 0,
+            "level": 10,
+            "life_threatening": {
+              "state": "NONE",
+              "within_reversible_window": false
+            },
+            "local_access": false,
+            "max_ap": 6,
+            "medical_kit_capable": false,
+            "medicine_bonus": 0,
+            "movement_m_per_ap": 1.0,
+            "muzzle": [
+              2.91,
+              2.5,
+              1.4
+            ],
+            "name": "Vesper",
+            "position_cell": [
+              2,
+              2
+            ],
+            "recoil_recovery_per_ap": 2,
+            "res": 10,
+            "resuscitation_kit_capable": false,
+            "side": "allies",
+            "skills": {
+              "athletics": 0,
+              "cqc": 3,
+              "drone_operations": 0,
+              "engineering": 0,
+              "grenades": 0,
+              "influence": 0,
+              "investigation": 0,
+              "local_hacking": 0,
+              "marksmanship": 6,
+              "medicine": 2,
+              "networking": 0,
+              "recon": 0,
+              "social_read": 0,
+              "stealth": 0,
+              "tactics": 0,
+              "vehicles": 0
+            },
+            "specialties": [],
+            "stance": "STANDING",
+            "weapon": {
+              "chamber": "LIVE",
+              "controlled_by": null,
+              "current_recoil": 0,
+              "cycle_ap": 0,
+              "cyclic_rate_rpm": 750,
+              "damage": 5,
+              "feed": "DETACHABLE_MAGAZINE",
+              "fire_modes": [
+                "SEMI_AUTO",
+                "BURST",
+                "FULL_AUTO"
+              ],
+              "id": "service_rifle",
+              "location": "READY",
+              "magazine": {
+                "id": "vesper-service_rifle-magazine-0",
+                "rounds": 30
+              },
+              "material_pen": 3,
+              "mechanism": "SELF_LOADING",
+              "needs_cycle": false,
+              "range_breakpoints_m": [
+                120,
+                250,
+                400
+              ],
+              "range_modifiers": [
+                0,
+                2,
+                5,
+                8
+              ],
+              "recoil": 2,
+              "reload_ap": 2,
+              "retained_magazines": [],
+              "spare_magazines": [
+                {
+                  "id": "vesper-service_rifle-magazine-1",
+                  "rounds": 30
+                },
+                {
+                  "id": "vesper-service_rifle-magazine-2",
+                  "rounds": 30
+                }
+              ],
+              "target_pen": 2
+            }
+          }
+        },
+        "participants": [
+          {
+            "id": "hex",
+            "kind": "trigger-discipline.character",
+            "data": {
+              "aptitudes": {
+                "acuity": 2,
+                "force": 0,
+                "nerve": 1,
+                "precision": 1,
+                "presence": 0,
+                "reason": 2
+              },
+              "class_id": "HACKER",
+              "id": "hex",
+              "level": 10,
+              "name": "Hex",
+              "side": "allies",
+              "skills": {
+                "athletics": 0,
+                "cqc": 2,
+                "drone_operations": 6,
+                "engineering": 0,
+                "grenades": 0,
+                "influence": 0,
+                "investigation": 0,
+                "local_hacking": 4,
+                "marksmanship": 4,
+                "medicine": 0,
+                "networking": 6,
+                "recon": 0,
+                "social_read": 0,
+                "stealth": 0,
+                "tactics": 0,
+                "vehicles": 0
+              },
+              "specialties": [
+                "specialty.networker.entry.map_the_links",
+                "specialty.networker.tier_1.pivot",
+                "specialty.networker.tier_1.quiet_enumeration",
+                "specialty.networker.tier_2.foothold",
+                "specialty.networker.tier_2.segment_map"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "operations.character",
+      "title": "Character",
+      "icon": "\u25c7",
+      "renderer": "unit_list",
+      "source": {
+        "fields": {
+          "entities": {
+            "key": "entities",
+            "kind": "state",
+            "namespace": "pneuma-io.trigger-discipline"
+          },
+          "participants": {
+            "kind": "participants",
+            "kinds": [
+              "trigger-discipline.character"
+            ]
+          }
+        },
+        "kind": "object"
+      },
+      "group": "operations",
+      "order": 4,
+      "default_size": 280,
+      "minimum_size": 160,
+      "default_placement": "docked",
+      "allowed_placements": [
+        "docked",
+        "window"
+      ],
+      "actions": [
+        {
+          "bindings": {
+            "actor": "actor"
+          },
+          "id": "stance-standing",
+          "intent": "change_stance",
+          "label": "Stand",
+          "params": {
+            "stance": "STANDING"
+          },
+          "available": true,
+          "actor_parameter": "actor",
+          "checks_required": true,
+          "map_preview_enabled": false
+        },
+        {
+          "bindings": {
+            "actor": "actor"
+          },
+          "id": "stance-crouched",
+          "intent": "change_stance",
+          "label": "Crouch",
+          "params": {
+            "stance": "CROUCHED"
+          },
+          "available": true,
+          "actor_parameter": "actor",
+          "checks_required": true,
+          "map_preview_enabled": false
+        },
+        {
+          "bindings": {
+            "actor": "actor"
+          },
+          "id": "stance-prone",
+          "intent": "change_stance",
+          "label": "Go prone",
+          "params": {
+            "stance": "PRONE"
+          },
+          "available": true,
+          "actor_parameter": "actor",
+          "checks_required": true,
+          "map_preview_enabled": false
+        },
+        {
+          "bindings": {
+            "actor": "actor"
+          },
+          "id": "cycle",
+          "intent": "cycle_weapon",
+          "label": "Cycle weapon",
+          "params": {},
+          "available": true,
+          "actor_parameter": "actor",
+          "checks_required": true,
+          "map_preview_enabled": false
+        },
+        {
+          "bindings": {
+            "actor": "actor"
+          },
+          "id": "reload-retain",
+          "intent": "reload_weapon",
+          "label": "Reload \u00b7 retain magazine",
+          "params": {
+            "disposition": "RETAIN"
+          },
+          "available": true,
+          "actor_parameter": "actor",
+          "checks_required": true,
+          "map_preview_enabled": false
+        },
+        {
+          "bindings": {
+            "actor": "actor"
+          },
+          "id": "recover-recoil",
+          "intent": "recover_recoil",
+          "label": "Recover recoil \u00b7 1 AP",
+          "params": {
+            "ap": 1
+          },
+          "available": true,
+          "actor_parameter": "actor",
+          "checks_required": true,
+          "map_preview_enabled": false
+        },
+        {
+          "id": "end-turn",
+          "intent": "end_allies_turn",
+          "label": "End team turn",
+          "params": {},
+          "available": true,
+          "actor_parameter": null,
+          "checks_required": true,
+          "map_preview_enabled": false
+        }
+      ],
+      "data": {
+        "entities": {
+          "autodrone_alpha": {
+            "active": true,
+            "ap": 2,
+            "center": [
+              27.5,
+              30.5,
+              0.5
+            ],
+            "controlled_by": null,
+            "downed": false,
+            "hp": 8,
+            "id": "autodrone_alpha",
+            "kind": "AUTONOMOUS_DRONE",
+            "max_ap": 2,
+            "muzzle": [
+              27.95,
+              30.5,
+              0.65
+            ],
+            "name": "Autodrone Alpha",
+            "payload": null,
+            "position_cell": [
+              27,
+              30
+            ],
+            "position_point": [
+              27.5,
+              30.5,
+              0.5
+            ],
+            "res": 0,
+            "sensor_confirmed_targets": [
+              "drone_target"
+            ],
+            "side": "allies",
+            "standing_order": {
+              "active": true,
+              "authorized_fire": true,
+              "collateral_limit": "NO_UNCONFIRMED_TARGETS",
+              "target": "drone_target"
+            },
+            "weapon": {
+              "current_recoil": 0,
+              "damage": 4,
+              "fire_modes": [
+                "SEMI_AUTO"
+              ],
+              "location": "MOUNTED",
+              "magazine": {
+                "id": "autodrone_alpha-light-weapon-magazine-0",
+                "rounds": 10
+              },
+              "material_pen": 1,
+              "module": "AUTONOMOUS_LIGHT_WEAPON",
+              "recoil": 2,
+              "target_pen": 1
+            }
+          },
+          "drone_target": {
+            "active": true,
+            "aim": {
+              "ap": 0,
+              "point": null,
+              "target": null
+            },
+            "ap": 6,
+            "aptitudes": {
+              "acuity": 0,
+              "force": 1,
+              "nerve": 0,
+              "precision": 2,
+              "presence": 0,
+              "reason": 1
+            },
+            "center": [
+              31.5,
+              30.5,
+              0.9
+            ],
+            "class_id": "BULWARK",
+            "control": null,
+            "downed": false,
+            "hp": 50,
+            "id": "drone_target",
+            "intrusion_ap_discount": 0,
+            "level": 10,
+            "life_threatening": {
+              "state": "NONE",
+              "within_reversible_window": false
+            },
+            "local_access": false,
+            "max_ap": 6,
+            "medical_kit_capable": false,
+            "medicine_bonus": 0,
+            "movement_m_per_ap": 1.0,
+            "muzzle": [
+              31.05,
+              30.5,
+              1.4
+            ],
+            "name": "Drone Target",
+            "position_cell": [
+              31,
+              30
+            ],
+            "recoil_recovery_per_ap": 1,
+            "res": 20,
+            "resuscitation_kit_capable": false,
+            "side": "hostiles",
+            "skills": {
+              "athletics": 0,
+              "cqc": 3,
+              "drone_operations": 0,
+              "engineering": 0,
+              "grenades": 0,
+              "influence": 0,
+              "investigation": 0,
+              "local_hacking": 0,
+              "marksmanship": 4,
+              "medicine": 2,
+              "networking": 0,
+              "recon": 0,
+              "social_read": 0,
+              "stealth": 0,
+              "tactics": 0,
+              "vehicles": 0
+            },
+            "specialties": [],
+            "stance": "STANDING",
+            "weapon": {
+              "chamber": "LIVE",
+              "controlled_by": null,
+              "current_recoil": 0,
+              "cycle_ap": 0,
+              "cyclic_rate_rpm": null,
+              "damage": 4,
+              "feed": "DETACHABLE_MAGAZINE",
+              "fire_modes": [
+                "SEMI_AUTO"
+              ],
+              "id": "pistol",
+              "location": "READY",
+              "magazine": {
+                "id": "drone_target-pistol-magazine-0",
+                "rounds": 15
+              },
+              "material_pen": 1,
+              "mechanism": "SELF_LOADING",
+              "needs_cycle": false,
+              "range_breakpoints_m": [
+                15,
+                30,
+                50
+              ],
+              "range_modifiers": [
+                0,
+                2,
+                5,
+                8
+              ],
+              "recoil": 1,
+              "reload_ap": 2,
+              "retained_magazines": [],
+              "spare_magazines": [
+                {
+                  "id": "drone_target-pistol-magazine-1",
+                  "rounds": 15
+                },
+                {
+                  "id": "drone_target-pistol-magazine-2",
+                  "rounds": 15
+                }
+              ],
+              "target_pen": 1
+            }
+          },
+          "fpv_alpha": {
+            "active": true,
+            "ap": 0,
+            "center": [
+              29.5,
+              30.5,
+              0.5
+            ],
+            "controlled_by": "hex",
+            "downed": false,
+            "hp": 4,
+            "id": "fpv_alpha",
+            "kind": "FPV_DRONE",
+            "max_ap": 0,
+            "muzzle": [
+              29.95,
+              30.5,
+              0.65
+            ],
+            "name": "Fpv Alpha",
+            "payload": "FPV_FRAGMENTATION",
+            "position_cell": [
+              29,
+              30
+            ],
+            "position_point": [
+              29.5,
+              30.5,
+              0.5
+            ],
+            "res": 0,
+            "side": "allies"
+          },
+          "hex": {
+            "active": true,
+            "aim": {
+              "ap": 0,
+              "point": null,
+              "target": null
+            },
+            "ap": 4,
+            "aptitudes": {
+              "acuity": 0,
+              "force": 1,
+              "nerve": 0,
+              "precision": 2,
+              "presence": 0,
+              "reason": 2
+            },
+            "center": [
+              2.5,
+              3.5,
+              0.9
+            ],
+            "class_id": "HACKER",
+            "control": null,
+            "downed": false,
+            "hp": 11,
+            "id": "hex",
+            "intrusion_ap_discount": 1,
+            "level": 10,
+            "life_threatening": {
+              "state": "NONE",
+              "within_reversible_window": false
+            },
+            "local_access": true,
+            "max_ap": 6,
+            "medical_kit_capable": false,
+            "medicine_bonus": 0,
+            "movement_m_per_ap": 1.0,
+            "muzzle": [
+              2.91,
+              3.5,
+              1.4000000000000001
+            ],
+            "name": "Hex",
+            "position_cell": [
+              2,
+              3
+            ],
+            "recoil_recovery_per_ap": 1,
+            "res": 10,
+            "resuscitation_kit_capable": false,
+            "side": "allies",
+            "skills": {
+              "athletics": 0,
+              "cqc": 3,
+              "drone_operations": 6,
+              "engineering": 0,
+              "grenades": 0,
+              "influence": 0,
+              "investigation": 0,
+              "local_hacking": 4,
+              "marksmanship": 4,
+              "medicine": 2,
+              "networking": 6,
+              "recon": 0,
+              "social_read": 0,
+              "stealth": 0,
+              "tactics": 0,
+              "vehicles": 0
+            },
+            "specialties": [
+              "specialty.networker.entry.map_the_links",
+              "specialty.networker.tier_1.pivot",
+              "specialty.networker.tier_1.quiet_enumeration",
+              "specialty.networker.tier_2.foothold",
+              "specialty.networker.tier_2.segment_map"
+            ],
+            "stance": "STANDING",
+            "weapon": {
+              "chamber": "LIVE",
+              "controlled_by": null,
+              "current_recoil": 0,
+              "cycle_ap": 0,
+              "cyclic_rate_rpm": 750,
+              "damage": 5,
+              "feed": "DETACHABLE_MAGAZINE",
+              "fire_modes": [
+                "SEMI_AUTO",
+                "BURST",
+                "FULL_AUTO"
+              ],
+              "id": "service_rifle",
+              "location": "READY",
+              "magazine": {
+                "id": "hex-service_rifle-magazine-0",
+                "rounds": 30
+              },
+              "material_pen": 3,
+              "mechanism": "SELF_LOADING",
+              "needs_cycle": false,
+              "range_breakpoints_m": [
+                120,
+                250,
+                400
+              ],
+              "range_modifiers": [
+                0,
+                2,
+                5,
+                8
+              ],
+              "recoil": 2,
+              "reload_ap": 2,
+              "retained_magazines": [],
+              "spare_magazines": [
+                {
+                  "id": "hex-service_rifle-magazine-1",
+                  "rounds": 30
+                },
+                {
+                  "id": "hex-service_rifle-magazine-2",
+                  "rounds": 30
+                }
+              ],
+              "target_pen": 2
+            }
+          },
+          "hostile_alpha": {
+            "active": true,
+            "aim": {
+              "ap": 0,
+              "point": null,
+              "target": null
+            },
+            "ap": 6,
+            "aptitudes": {
+              "acuity": 0,
+              "force": 1,
+              "nerve": 0,
+              "precision": 2,
+              "presence": 0,
+              "reason": 1
+            },
+            "center": [
+              9.5,
+              2.5,
+              0.9
+            ],
+            "class_id": "RIFLEMAN",
+            "control": null,
+            "downed": false,
+            "hp": 11,
+            "id": "hostile_alpha",
+            "intrusion_ap_discount": 0,
+            "level": 10,
+            "life_threatening": {
+              "state": "NONE",
+              "within_reversible_window": false
+            },
+            "local_access": false,
+            "max_ap": 6,
+            "medical_kit_capable": false,
+            "medicine_bonus": 0,
+            "movement_m_per_ap": 1.0,
+            "muzzle": [
+              8.91,
+              2.5,
+              1.4
+            ],
+            "name": "Hostile Alpha",
+            "position_cell": [
+              9,
+              2
+            ],
+            "recoil_recovery_per_ap": 2,
+            "res": 10,
+            "resuscitation_kit_capable": false,
+            "side": "hostiles",
+            "skills": {
+              "athletics": 0,
+              "cqc": 3,
+              "drone_operations": 0,
+              "engineering": 0,
+              "grenades": 0,
+              "influence": 0,
+              "investigation": 0,
+              "local_hacking": 0,
+              "marksmanship": 4,
+              "medicine": 2,
+              "networking": 0,
+              "recon": 0,
+              "social_read": 0,
+              "stealth": 0,
+              "tactics": 0,
+              "vehicles": 0
+            },
+            "specialties": [],
+            "stance": "STANDING",
+            "weapon": {
+              "chamber": "SPENT",
+              "controlled_by": null,
+              "current_recoil": 0,
+              "cycle_ap": 1,
+              "cyclic_rate_rpm": null,
+              "damage": 7,
+              "feed": "DETACHABLE_MAGAZINE",
+              "fire_modes": [
+                "SINGLE"
+              ],
+              "id": "manual_precision_rifle",
+              "location": "READY",
+              "magazine": {
+                "id": "hostile_alpha-manual_precision_rifle-magazine-0",
+                "rounds": 5
+              },
+              "material_pen": 5,
+              "mechanism": "MANUAL_ACTION",
+              "needs_cycle": true,
+              "range_breakpoints_m": [
+                300,
+                650,
+                1000
+              ],
+              "range_modifiers": [
+                0,
+                2,
+                5,
+                8
+              ],
+              "recoil": 4,
+              "reload_ap": 2,
+              "retained_magazines": [],
+              "spare_magazines": [
+                {
+                  "id": "hostile_alpha-manual_precision_rifle-magazine-1",
+                  "rounds": 5
+                },
+                {
+                  "id": "hostile_alpha-manual_precision_rifle-magazine-2",
+                  "rounds": 5
+                }
+              ],
+              "target_pen": 4
+            }
+          },
+          "vesper": {
+            "active": true,
+            "aim": {
+              "ap": 0,
+              "point": null,
+              "target": null
+            },
+            "ap": 6,
+            "aptitudes": {
+              "acuity": 0,
+              "force": 1,
+              "nerve": 0,
+              "precision": 2,
+              "presence": 0,
+              "reason": 1
+            },
+            "center": [
+              2.5,
+              2.5,
+              0.9
+            ],
+            "class_id": "RIFLEMAN",
+            "control": null,
+            "downed": false,
+            "hp": 11,
+            "id": "vesper",
+            "intrusion_ap_discount": 0,
+            "level": 10,
+            "life_threatening": {
+              "state": "NONE",
+              "within_reversible_window": false
+            },
+            "local_access": false,
+            "max_ap": 6,
+            "medical_kit_capable": false,
+            "medicine_bonus": 0,
+            "movement_m_per_ap": 1.0,
+            "muzzle": [
+              2.91,
+              2.5,
+              1.4
+            ],
+            "name": "Vesper",
+            "position_cell": [
+              2,
+              2
+            ],
+            "recoil_recovery_per_ap": 2,
+            "res": 10,
+            "resuscitation_kit_capable": false,
+            "side": "allies",
+            "skills": {
+              "athletics": 0,
+              "cqc": 3,
+              "drone_operations": 0,
+              "engineering": 0,
+              "grenades": 0,
+              "influence": 0,
+              "investigation": 0,
+              "local_hacking": 0,
+              "marksmanship": 6,
+              "medicine": 2,
+              "networking": 0,
+              "recon": 0,
+              "social_read": 0,
+              "stealth": 0,
+              "tactics": 0,
+              "vehicles": 0
+            },
+            "specialties": [],
+            "stance": "STANDING",
+            "weapon": {
+              "chamber": "LIVE",
+              "controlled_by": null,
+              "current_recoil": 0,
+              "cycle_ap": 0,
+              "cyclic_rate_rpm": 750,
+              "damage": 5,
+              "feed": "DETACHABLE_MAGAZINE",
+              "fire_modes": [
+                "SEMI_AUTO",
+                "BURST",
+                "FULL_AUTO"
+              ],
+              "id": "service_rifle",
+              "location": "READY",
+              "magazine": {
+                "id": "vesper-service_rifle-magazine-0",
+                "rounds": 30
+              },
+              "material_pen": 3,
+              "mechanism": "SELF_LOADING",
+              "needs_cycle": false,
+              "range_breakpoints_m": [
+                120,
+                250,
+                400
+              ],
+              "range_modifiers": [
+                0,
+                2,
+                5,
+                8
+              ],
+              "recoil": 2,
+              "reload_ap": 2,
+              "retained_magazines": [],
+              "spare_magazines": [
+                {
+                  "id": "vesper-service_rifle-magazine-1",
+                  "rounds": 30
+                },
+                {
+                  "id": "vesper-service_rifle-magazine-2",
+                  "rounds": 30
+                }
+              ],
+              "target_pen": 2
+            }
+          }
+        },
+        "participants": [
+          {
+            "id": "hex",
+            "kind": "trigger-discipline.character",
+            "data": {
+              "aptitudes": {
+                "acuity": 2,
+                "force": 0,
+                "nerve": 1,
+                "precision": 1,
+                "presence": 0,
+                "reason": 2
+              },
+              "class_id": "HACKER",
+              "id": "hex",
+              "level": 10,
+              "name": "Hex",
+              "side": "allies",
+              "skills": {
+                "athletics": 0,
+                "cqc": 2,
+                "drone_operations": 6,
+                "engineering": 0,
+                "grenades": 0,
+                "influence": 0,
+                "investigation": 0,
+                "local_hacking": 4,
+                "marksmanship": 4,
+                "medicine": 0,
+                "networking": 6,
+                "recon": 0,
+                "social_read": 0,
+                "stealth": 0,
+                "tactics": 0,
+                "vehicles": 0
+              },
+              "specialties": [
+                "specialty.networker.entry.map_the_links",
+                "specialty.networker.tier_1.pivot",
+                "specialty.networker.tier_1.quiet_enumeration",
+                "specialty.networker.tier_2.foothold",
+                "specialty.networker.tier_2.segment_map"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "operations.loadout",
+      "title": "Loadout",
+      "icon": "\u25a3",
+      "renderer": "inventory",
+      "source": {
+        "fields": {
+          "entities": {
+            "key": "entities",
+            "kind": "state",
+            "namespace": "pneuma-io.trigger-discipline"
+          },
+          "participants": {
+            "kind": "participants",
+            "kinds": [
+              "trigger-discipline.character"
+            ]
+          }
+        },
+        "kind": "object"
+      },
+      "group": "operations",
+      "order": 5,
+      "default_size": 280,
+      "minimum_size": 160,
+      "default_placement": "docked",
+      "allowed_placements": [
+        "docked",
+        "window"
+      ],
+      "actions": [],
+      "data": {
+        "entities": {
+          "autodrone_alpha": {
+            "active": true,
+            "ap": 2,
+            "center": [
+              27.5,
+              30.5,
+              0.5
+            ],
+            "controlled_by": null,
+            "downed": false,
+            "hp": 8,
+            "id": "autodrone_alpha",
+            "kind": "AUTONOMOUS_DRONE",
+            "max_ap": 2,
+            "muzzle": [
+              27.95,
+              30.5,
+              0.65
+            ],
+            "name": "Autodrone Alpha",
+            "payload": null,
+            "position_cell": [
+              27,
+              30
+            ],
+            "position_point": [
+              27.5,
+              30.5,
+              0.5
+            ],
+            "res": 0,
+            "sensor_confirmed_targets": [
+              "drone_target"
+            ],
+            "side": "allies",
+            "standing_order": {
+              "active": true,
+              "authorized_fire": true,
+              "collateral_limit": "NO_UNCONFIRMED_TARGETS",
+              "target": "drone_target"
+            },
+            "weapon": {
+              "current_recoil": 0,
+              "damage": 4,
+              "fire_modes": [
+                "SEMI_AUTO"
+              ],
+              "location": "MOUNTED",
+              "magazine": {
+                "id": "autodrone_alpha-light-weapon-magazine-0",
+                "rounds": 10
+              },
+              "material_pen": 1,
+              "module": "AUTONOMOUS_LIGHT_WEAPON",
+              "recoil": 2,
+              "target_pen": 1
+            }
+          },
+          "drone_target": {
+            "active": true,
+            "aim": {
+              "ap": 0,
+              "point": null,
+              "target": null
+            },
+            "ap": 6,
+            "aptitudes": {
+              "acuity": 0,
+              "force": 1,
+              "nerve": 0,
+              "precision": 2,
+              "presence": 0,
+              "reason": 1
+            },
+            "center": [
+              31.5,
+              30.5,
+              0.9
+            ],
+            "class_id": "BULWARK",
+            "control": null,
+            "downed": false,
+            "hp": 50,
+            "id": "drone_target",
+            "intrusion_ap_discount": 0,
+            "level": 10,
+            "life_threatening": {
+              "state": "NONE",
+              "within_reversible_window": false
+            },
+            "local_access": false,
+            "max_ap": 6,
+            "medical_kit_capable": false,
+            "medicine_bonus": 0,
+            "movement_m_per_ap": 1.0,
+            "muzzle": [
+              31.05,
+              30.5,
+              1.4
+            ],
+            "name": "Drone Target",
+            "position_cell": [
+              31,
+              30
+            ],
+            "recoil_recovery_per_ap": 1,
+            "res": 20,
+            "resuscitation_kit_capable": false,
+            "side": "hostiles",
+            "skills": {
+              "athletics": 0,
+              "cqc": 3,
+              "drone_operations": 0,
+              "engineering": 0,
+              "grenades": 0,
+              "influence": 0,
+              "investigation": 0,
+              "local_hacking": 0,
+              "marksmanship": 4,
+              "medicine": 2,
+              "networking": 0,
+              "recon": 0,
+              "social_read": 0,
+              "stealth": 0,
+              "tactics": 0,
+              "vehicles": 0
+            },
+            "specialties": [],
+            "stance": "STANDING",
+            "weapon": {
+              "chamber": "LIVE",
+              "controlled_by": null,
+              "current_recoil": 0,
+              "cycle_ap": 0,
+              "cyclic_rate_rpm": null,
+              "damage": 4,
+              "feed": "DETACHABLE_MAGAZINE",
+              "fire_modes": [
+                "SEMI_AUTO"
+              ],
+              "id": "pistol",
+              "location": "READY",
+              "magazine": {
+                "id": "drone_target-pistol-magazine-0",
+                "rounds": 15
+              },
+              "material_pen": 1,
+              "mechanism": "SELF_LOADING",
+              "needs_cycle": false,
+              "range_breakpoints_m": [
+                15,
+                30,
+                50
+              ],
+              "range_modifiers": [
+                0,
+                2,
+                5,
+                8
+              ],
+              "recoil": 1,
+              "reload_ap": 2,
+              "retained_magazines": [],
+              "spare_magazines": [
+                {
+                  "id": "drone_target-pistol-magazine-1",
+                  "rounds": 15
+                },
+                {
+                  "id": "drone_target-pistol-magazine-2",
+                  "rounds": 15
+                }
+              ],
+              "target_pen": 1
+            }
+          },
+          "fpv_alpha": {
+            "active": true,
+            "ap": 0,
+            "center": [
+              29.5,
+              30.5,
+              0.5
+            ],
+            "controlled_by": "hex",
+            "downed": false,
+            "hp": 4,
+            "id": "fpv_alpha",
+            "kind": "FPV_DRONE",
+            "max_ap": 0,
+            "muzzle": [
+              29.95,
+              30.5,
+              0.65
+            ],
+            "name": "Fpv Alpha",
+            "payload": "FPV_FRAGMENTATION",
+            "position_cell": [
+              29,
+              30
+            ],
+            "position_point": [
+              29.5,
+              30.5,
+              0.5
+            ],
+            "res": 0,
+            "side": "allies"
+          },
+          "hex": {
+            "active": true,
+            "aim": {
+              "ap": 0,
+              "point": null,
+              "target": null
+            },
+            "ap": 4,
+            "aptitudes": {
+              "acuity": 0,
+              "force": 1,
+              "nerve": 0,
+              "precision": 2,
+              "presence": 0,
+              "reason": 2
+            },
+            "center": [
+              2.5,
+              3.5,
+              0.9
+            ],
+            "class_id": "HACKER",
+            "control": null,
+            "downed": false,
+            "hp": 11,
+            "id": "hex",
+            "intrusion_ap_discount": 1,
+            "level": 10,
+            "life_threatening": {
+              "state": "NONE",
+              "within_reversible_window": false
+            },
+            "local_access": true,
+            "max_ap": 6,
+            "medical_kit_capable": false,
+            "medicine_bonus": 0,
+            "movement_m_per_ap": 1.0,
+            "muzzle": [
+              2.91,
+              3.5,
+              1.4000000000000001
+            ],
+            "name": "Hex",
+            "position_cell": [
+              2,
+              3
+            ],
+            "recoil_recovery_per_ap": 1,
+            "res": 10,
+            "resuscitation_kit_capable": false,
+            "side": "allies",
+            "skills": {
+              "athletics": 0,
+              "cqc": 3,
+              "drone_operations": 6,
+              "engineering": 0,
+              "grenades": 0,
+              "influence": 0,
+              "investigation": 0,
+              "local_hacking": 4,
+              "marksmanship": 4,
+              "medicine": 2,
+              "networking": 6,
+              "recon": 0,
+              "social_read": 0,
+              "stealth": 0,
+              "tactics": 0,
+              "vehicles": 0
+            },
+            "specialties": [
+              "specialty.networker.entry.map_the_links",
+              "specialty.networker.tier_1.pivot",
+              "specialty.networker.tier_1.quiet_enumeration",
+              "specialty.networker.tier_2.foothold",
+              "specialty.networker.tier_2.segment_map"
+            ],
+            "stance": "STANDING",
+            "weapon": {
+              "chamber": "LIVE",
+              "controlled_by": null,
+              "current_recoil": 0,
+              "cycle_ap": 0,
+              "cyclic_rate_rpm": 750,
+              "damage": 5,
+              "feed": "DETACHABLE_MAGAZINE",
+              "fire_modes": [
+                "SEMI_AUTO",
+                "BURST",
+                "FULL_AUTO"
+              ],
+              "id": "service_rifle",
+              "location": "READY",
+              "magazine": {
+                "id": "hex-service_rifle-magazine-0",
+                "rounds": 30
+              },
+              "material_pen": 3,
+              "mechanism": "SELF_LOADING",
+              "needs_cycle": false,
+              "range_breakpoints_m": [
+                120,
+                250,
+                400
+              ],
+              "range_modifiers": [
+                0,
+                2,
+                5,
+                8
+              ],
+              "recoil": 2,
+              "reload_ap": 2,
+              "retained_magazines": [],
+              "spare_magazines": [
+                {
+                  "id": "hex-service_rifle-magazine-1",
+                  "rounds": 30
+                },
+                {
+                  "id": "hex-service_rifle-magazine-2",
+                  "rounds": 30
+                }
+              ],
+              "target_pen": 2
+            }
+          },
+          "hostile_alpha": {
+            "active": true,
+            "aim": {
+              "ap": 0,
+              "point": null,
+              "target": null
+            },
+            "ap": 6,
+            "aptitudes": {
+              "acuity": 0,
+              "force": 1,
+              "nerve": 0,
+              "precision": 2,
+              "presence": 0,
+              "reason": 1
+            },
+            "center": [
+              9.5,
+              2.5,
+              0.9
+            ],
+            "class_id": "RIFLEMAN",
+            "control": null,
+            "downed": false,
+            "hp": 11,
+            "id": "hostile_alpha",
+            "intrusion_ap_discount": 0,
+            "level": 10,
+            "life_threatening": {
+              "state": "NONE",
+              "within_reversible_window": false
+            },
+            "local_access": false,
+            "max_ap": 6,
+            "medical_kit_capable": false,
+            "medicine_bonus": 0,
+            "movement_m_per_ap": 1.0,
+            "muzzle": [
+              8.91,
+              2.5,
+              1.4
+            ],
+            "name": "Hostile Alpha",
+            "position_cell": [
+              9,
+              2
+            ],
+            "recoil_recovery_per_ap": 2,
+            "res": 10,
+            "resuscitation_kit_capable": false,
+            "side": "hostiles",
+            "skills": {
+              "athletics": 0,
+              "cqc": 3,
+              "drone_operations": 0,
+              "engineering": 0,
+              "grenades": 0,
+              "influence": 0,
+              "investigation": 0,
+              "local_hacking": 0,
+              "marksmanship": 4,
+              "medicine": 2,
+              "networking": 0,
+              "recon": 0,
+              "social_read": 0,
+              "stealth": 0,
+              "tactics": 0,
+              "vehicles": 0
+            },
+            "specialties": [],
+            "stance": "STANDING",
+            "weapon": {
+              "chamber": "SPENT",
+              "controlled_by": null,
+              "current_recoil": 0,
+              "cycle_ap": 1,
+              "cyclic_rate_rpm": null,
+              "damage": 7,
+              "feed": "DETACHABLE_MAGAZINE",
+              "fire_modes": [
+                "SINGLE"
+              ],
+              "id": "manual_precision_rifle",
+              "location": "READY",
+              "magazine": {
+                "id": "hostile_alpha-manual_precision_rifle-magazine-0",
+                "rounds": 5
+              },
+              "material_pen": 5,
+              "mechanism": "MANUAL_ACTION",
+              "needs_cycle": true,
+              "range_breakpoints_m": [
+                300,
+                650,
+                1000
+              ],
+              "range_modifiers": [
+                0,
+                2,
+                5,
+                8
+              ],
+              "recoil": 4,
+              "reload_ap": 2,
+              "retained_magazines": [],
+              "spare_magazines": [
+                {
+                  "id": "hostile_alpha-manual_precision_rifle-magazine-1",
+                  "rounds": 5
+                },
+                {
+                  "id": "hostile_alpha-manual_precision_rifle-magazine-2",
+                  "rounds": 5
+                }
+              ],
+              "target_pen": 4
+            }
+          },
+          "vesper": {
+            "active": true,
+            "aim": {
+              "ap": 0,
+              "point": null,
+              "target": null
+            },
+            "ap": 6,
+            "aptitudes": {
+              "acuity": 0,
+              "force": 1,
+              "nerve": 0,
+              "precision": 2,
+              "presence": 0,
+              "reason": 1
+            },
+            "center": [
+              2.5,
+              2.5,
+              0.9
+            ],
+            "class_id": "RIFLEMAN",
+            "control": null,
+            "downed": false,
+            "hp": 11,
+            "id": "vesper",
+            "intrusion_ap_discount": 0,
+            "level": 10,
+            "life_threatening": {
+              "state": "NONE",
+              "within_reversible_window": false
+            },
+            "local_access": false,
+            "max_ap": 6,
+            "medical_kit_capable": false,
+            "medicine_bonus": 0,
+            "movement_m_per_ap": 1.0,
+            "muzzle": [
+              2.91,
+              2.5,
+              1.4
+            ],
+            "name": "Vesper",
+            "position_cell": [
+              2,
+              2
+            ],
+            "recoil_recovery_per_ap": 2,
+            "res": 10,
+            "resuscitation_kit_capable": false,
+            "side": "allies",
+            "skills": {
+              "athletics": 0,
+              "cqc": 3,
+              "drone_operations": 0,
+              "engineering": 0,
+              "grenades": 0,
+              "influence": 0,
+              "investigation": 0,
+              "local_hacking": 0,
+              "marksmanship": 6,
+              "medicine": 2,
+              "networking": 0,
+              "recon": 0,
+              "social_read": 0,
+              "stealth": 0,
+              "tactics": 0,
+              "vehicles": 0
+            },
+            "specialties": [],
+            "stance": "STANDING",
+            "weapon": {
+              "chamber": "LIVE",
+              "controlled_by": null,
+              "current_recoil": 0,
+              "cycle_ap": 0,
+              "cyclic_rate_rpm": 750,
+              "damage": 5,
+              "feed": "DETACHABLE_MAGAZINE",
+              "fire_modes": [
+                "SEMI_AUTO",
+                "BURST",
+                "FULL_AUTO"
+              ],
+              "id": "service_rifle",
+              "location": "READY",
+              "magazine": {
+                "id": "vesper-service_rifle-magazine-0",
+                "rounds": 30
+              },
+              "material_pen": 3,
+              "mechanism": "SELF_LOADING",
+              "needs_cycle": false,
+              "range_breakpoints_m": [
+                120,
+                250,
+                400
+              ],
+              "range_modifiers": [
+                0,
+                2,
+                5,
+                8
+              ],
+              "recoil": 2,
+              "reload_ap": 2,
+              "retained_magazines": [],
+              "spare_magazines": [
+                {
+                  "id": "vesper-service_rifle-magazine-1",
+                  "rounds": 30
+                },
+                {
+                  "id": "vesper-service_rifle-magazine-2",
+                  "rounds": 30
+                }
+              ],
+              "target_pen": 2
+            }
+          }
+        },
+        "participants": [
+          {
+            "id": "hex",
+            "kind": "trigger-discipline.character",
+            "data": {
+              "aptitudes": {
+                "acuity": 2,
+                "force": 0,
+                "nerve": 1,
+                "precision": 1,
+                "presence": 0,
+                "reason": 2
+              },
+              "class_id": "HACKER",
+              "id": "hex",
+              "level": 10,
+              "name": "Hex",
+              "side": "allies",
+              "skills": {
+                "athletics": 0,
+                "cqc": 2,
+                "drone_operations": 6,
+                "engineering": 0,
+                "grenades": 0,
+                "influence": 0,
+                "investigation": 0,
+                "local_hacking": 4,
+                "marksmanship": 4,
+                "medicine": 0,
+                "networking": 6,
+                "recon": 0,
+                "social_read": 0,
+                "stealth": 0,
+                "tactics": 0,
+                "vehicles": 0
+              },
+              "specialties": [
+                "specialty.networker.entry.map_the_links",
+                "specialty.networker.tier_1.pivot",
+                "specialty.networker.tier_1.quiet_enumeration",
+                "specialty.networker.tier_2.foothold",
+                "specialty.networker.tier_2.segment_map"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "shot_effects": []
+}

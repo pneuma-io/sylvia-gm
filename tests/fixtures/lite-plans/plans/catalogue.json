@@ -1,0 +1,156 @@
+[
+  {
+    "id": "rift-awakening",
+    "title": "Rift Awakening",
+    "format": "Flagship",
+    "acts": 6,
+    "character_mode": "compatible",
+    "recommended_level": "1–12 (milestones)",
+    "pitch": "Wake beside strangers beneath an unfamiliar sky. Find shelter in Thornwall, defend the people who take you in, and follow a growing crisis across the Severed Lands to the city of Nexus. Explore six substantial chapters of dangerous places, local stories and purposeful combat, building a life before deciding whether to stay or seek a way home."
+  },
+  {
+    "id": "last-cart-through",
+    "title": "Last Cart Through",
+    "format": "Combat scenario",
+    "acts": 1,
+    "character_mode": "compatible",
+    "pitch": "A broken Guild wagon blocks a forest crossing. Keep its driver safe while hungry Rifthounds close in.",
+    "prepared_combats": 1
+  },
+  {
+    "id": "the-quarry-turns",
+    "title": "The Quarry Turns",
+    "format": "Combat scenario",
+    "acts": 1,
+    "character_mode": "compatible",
+    "pitch": "A Rift-touched boar has made a supply trail impassable. Choose your ground before the hunt becomes a charge.",
+    "prepared_combats": 1
+  },
+  {
+    "id": "hold-the-rope",
+    "title": "Hold the Rope",
+    "format": "Combat scenario",
+    "acts": 1,
+    "character_mode": "compatible",
+    "pitch": "A surveyor hangs below a Cairnfields crossing. Clear the approach, then keep the rescue line intact.",
+    "prepared_combats": 2
+  },
+  {
+    "id": "dead-inventory",
+    "title": "Dead Inventory",
+    "format": "Combat scenario",
+    "acts": 1,
+    "character_mode": "compatible",
+    "pitch": "A recovered suit of Warden armour wakes during an Athenaeum stocktake. Get the porters out before the storeroom becomes wreckage.",
+    "prepared_combats": 1
+  },
+  {
+    "id": "the-sparring-debt",
+    "title": "The Sparring Debt",
+    "format": "Combat scenario",
+    "acts": 1,
+    "character_mode": "compatible",
+    "pitch": "A Lodge trainee owes the town an exhibition. Stand in for two friendly bouts and give the audience something worth remembering.",
+    "prepared_combats": 2
+  },
+  {
+    "id": "no-one-left-below",
+    "title": "No One Left Below",
+    "format": "Combat scenario",
+    "acts": 1,
+    "character_mode": "compatible",
+    "pitch": "A salvage crew is trapped in a Hollows cellar. Open a way in, then bring them out before the district shifts.",
+    "prepared_combats": 2
+  },
+  {
+    "id": "the-cartographers-wake",
+    "title": "The Cartographer’s Wake",
+    "format": "One-shot",
+    "acts": 1,
+    "character_mode": "compatible",
+    "pitch": "A stolen chart at a Nexus wake points to a sealed survey vault. Track the thieves, brave the old works and recover the mapmaker’s last expedition record.",
+    "prepared_combats": 2,
+    "recommended_level": "2"
+  },
+  {
+    "id": "a-light-on-breathing-street",
+    "title": "A Light on Breathing Street",
+    "format": "One-shot",
+    "acts": 1,
+    "character_mode": "compatible",
+    "pitch": "A lost townhouse returns to the Hollows with a lamp burning upstairs. Explore its trapped rooms, confront hostile Rift echoes and get a family keepsake out before the street shifts.",
+    "prepared_combats": 2,
+    "recommended_level": "2"
+  },
+  {
+    "id": "the-honest-thief",
+    "title": "The Honest Thief",
+    "format": "One-shot",
+    "acts": 1,
+    "character_mode": "compatible",
+    "pitch": "Recover stolen wages from a guarded Thornwall counting-house. Scout the rooms, beat its locks and traps, and get the money and a witness through a dangerous exit.",
+    "prepared_combats": 2,
+    "recommended_level": "2"
+  },
+  {
+    "id": "the-bell-below",
+    "title": "The Bell Below",
+    "format": "One-shot",
+    "acts": 1,
+    "character_mode": "compatible",
+    "pitch": "A scavengers’ warning bell has vanished into the tunnels beneath the Hollows. Descend through a flooded Warden workhouse, fight its hungry inhabitants and haul the bell back to daylight.",
+    "prepared_combats": 2,
+    "recommended_level": "2"
+  },
+  {
+    "id": "the-long-way-round",
+    "title": "The Long Way Round",
+    "format": "Two-act campaign",
+    "acts": 2,
+    "character_mode": "compatible",
+    "pitch": "Track a missing caravan into the Verdant Margin, break it out of a raider-held wayhouse and escort the survivors through a forest that has swallowed the road.",
+    "prepared_combats": 3,
+    "recommended_level": "2"
+  },
+  {
+    "id": "a-debt-in-iron",
+    "title": "A Debt in Iron",
+    "format": "Two-act campaign",
+    "acts": 2,
+    "character_mode": "fixed",
+    "pitch": "As Lodge trainee Tavin Bell, retrieve a pledged Warden relic from a dangerous salvage vault, then defend the crew carrying it out while deciding how to face your mentor’s debt.",
+    "prepared_combats": 2,
+    "recommended_level": "1",
+    "protagonist": "Tavin Bell"
+  },
+  {
+    "id": "the-scavengers-accord",
+    "title": "The Scavengers’ Accord",
+    "format": "Two-act campaign",
+    "acts": 2,
+    "character_mode": "compatible",
+    "pitch": "Two crews need the same route into a newly returned Hollows storehouse. Scout a monster-held district, open its dangerous vault and bring the salvage out before their rivalry turns violent.",
+    "prepared_combats": 2,
+    "recommended_level": "2"
+  },
+  {
+    "id": "the-company-of-the-lost",
+    "title": "The Company of the Lost",
+    "format": "Three-act campaign",
+    "acts": 3,
+    "character_mode": "compatible",
+    "pitch": "Build a salvage company through three dangerous Hollows jobs: a beast-haunted storehouse, a flooded records depot and a contested Warden vault. Your crew’s future depends on what you bring back together.",
+    "prepared_combats": 4,
+    "recommended_level": "2"
+  },
+  {
+    "id": "the-map-of-tomorrow",
+    "title": "The Map of Tomorrow",
+    "format": "Three-act campaign",
+    "acts": 3,
+    "character_mode": "compatible",
+    "pitch": "Survey a broken route across the Cairnfields. Climb ruined marker stations, survive Riftbeasts and reclaim a guarded causeway so the next caravan has a road worth trusting.",
+    "prepared_combats": 4,
+    "recommended_level": "2"
+  }
+]

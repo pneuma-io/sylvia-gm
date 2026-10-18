@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sylvia GM</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body data-theme="slate">
+
+<!-- Connecting / handshake overlay — shown until the owner handshake completes.
+     The renderer has no knowledge of ports or tokens; the host injects the
+     SylviaGMBridge only after the handshake has been verified. -->
+<div class="connecting-overlay" id="connecting-overlay">
+  <div class="connecting-dot"></div>
+  <div class="connecting-text">Connecting to Sylvia GM…</div>
+</div>
+
+<!-- ============================================================
+     UI-001 — Campaign Session Frame
+     Left: despilled portrait (transparent background, top-left)
+     Centre: chronological TALK / collapsed THINK / collapsed TOOL cards
+     Right: fixed extensible sidebar (campaign rail + context)
+     Private diagnostics are Inspector-only and never appear here.
+     ============================================================ -->
+<div class="session-frame" id="session-frame" style="display:none;">
+      <button class="sidebar-icon-button" id="home-btn" type="button" aria-label="Open Home" title="Home">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg>
+      </button>
+      <button class="sidebar-icon-button" id="toggle-left-sidebar-btn" type="button"
+              aria-label="Collapse left sidebar" aria-expanded="true" aria-controls="left-sidebar" title="Collapse left sidebar">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg>
+      </button>
+      <button class="sidebar-icon-button" id="toggle-right-sidebar-btn" type="button"
+              aria-label="Collapse right sidebar" aria-expanded="true" aria-controls="right-sidebar" title="Collapse right sidebar">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/></svg>
+      </button>
+
+
+  <!-- Left column — despilled portrait -->
+  <div class="portrait-col" id="left-sidebar">
+    <div class="portrait-frame">
+      <div class="home-brand">
+        <!-- The despilled portrait: a local asset with its greenscreen removed
+             so it composites over any session theme.  The host resolves the
+             asset path; the renderer never loads remote content. -->
+        <img class="despilled-portrait" id="despilled-portrait"
+             src="assets/sylvia-portrait.png" alt="">
+        <span class="portrait-fallback" id="portrait-fallback" hidden>◆</span>
+        <span class="portrait-label">Sylvia</span>
+        <span class="portrait-sub">Game Master</span>
+      </div>
+    </div>
+    <section class="builder-launcher" id="builder-launcher" aria-labelledby="builder-launcher-title">
+      <div class="builder-launcher-header">
+        <h2 id="builder-launcher-title">Builder Sessions</h2>
+        <button class="archive-link" id="open-archived-items-btn" type="button">Archived</button>
+      </div>
+      <button class="btn btn-primary btn-sm" id="new-builder-chat-btn" type="button">
+        + Build Something
+      </button>
+      <div class="builder-chat-rail" id="builder-chat-rail">
+        <div class="builder-chat-empty">No Builder sessions yet.</div>
+      </div>
+      <p class="list-action-status" id="builder-archive-status" role="status" hidden></p>
+    </section>
+    <div class="session-context" id="session-context">
+      <div class="ctx-label">Campaign</div>
+      <div class="ctx-value" id="ctx-campaign">—</div>
+      <div class="ctx-label">Status</div>
+      <div class="ctx-value" id="ctx-lifecycle">—</div>
+      <div class="ctx-label">Writer</div>
+      <div class="ctx-value" id="ctx-writer">—</div>
+    </div>
+  </div>
+
+  <!-- Home command centre — campaign orientation without the play sidebar. -->
+  <main class="home-view" id="home-view" hidden>
+    <header class="home-header">
+      <h1 class="home-kicker">Home</h1>
+      <div class="home-command-area">
+        <div class="home-actions">
+          <button class="btn btn-primary" id="home-new-campaign-btn" type="button">
+            New Campaign
+          </button>
+          <button class="btn btn-secondary" id="home-build-btn" type="button">
+            Build Something
+          </button>
+          <button class="btn btn-secondary" id="home-settings-btn" type="button"
+                  aria-haspopup="dialog" aria-controls="settings-overlay">
+            Settings
+          </button>
+        </div>
+        <p class="home-action-status" id="home-action-status" role="status" hidden></p>
+      </div>
+    </header>
+
+    <section class="home-recent" id="home-recent" aria-labelledby="home-recent-title">
+      <h2 class="visually-hidden" id="home-recent-title">Most recently updated campaign</h2>
+      <div class="home-empty-copy">Your most recently active campaign will appear here.</div>
+    </section>
+
+    <section class="home-collections" aria-labelledby="home-collections-title">
+      <div class="home-section-heading">
+        <h2 id="home-collections-title">Collections</h2>
+        <span id="home-campaign-count">0 ongoing campaigns</span>
+      </div>
+      <div class="campaign-shelves" id="campaign-shelves" aria-live="polite">
+        <div class="home-empty-copy">No ongoing campaigns yet.</div>
+      </div>
+    </section>
+    <details class="archived-items" id="archived-items">
+      <summary>Archived chats and campaigns <span id="archived-items-count"></span></summary>
+      <p>Restore an item to continue where you left off.</p>
+      <div id="archived-items-list"></div>
+    </details>
+    <p class="list-action-status" id="archive-action-status" role="status" hidden></p>
+  </main>
+
+  <!-- Central chronology -->
+  <div class="chronology-col">
+    <div class="session-topbar">
+      <div class="session-title" id="session-title">No campaign selected</div>
+      <details class="session-menu" id="session-menu">
+        <summary aria-label="Session menu" title="Session menu">···</summary>
+        <div class="session-menu-popover">
+          <button class="btn btn-secondary btn-sm" id="compact-context-btn" disabled
+                  title="Shorten the model's working context while keeping the saved conversation">Compact context</button>
+        </div>
+      </details>
+    </div>
+
+    <div id="campaign-loading-status" class="panel-empty" role="status" hidden></div>
+    <div class="chronology" id="chronology">
+      <div class="empty-state" id="empty-state">
+        <div class="empty-icon">◆</div>
+        <div>No campaign open. Open Home to select or create a campaign.</div>
+      </div>
+    </div>
+
+    <div class="input-bar">
+      <div class="input-composer">
+        <button id="composer-resize-handle" class="composer-resize-handle" type="button"
+                role="separator" aria-orientation="horizontal" aria-label="Resize message box"
+                aria-controls="player-input" aria-valuemin="58" aria-valuemax="200" aria-valuenow="58"
+                title="Resize message box · drag up to expand, or use Up and Down arrow keys">
+          <svg viewBox="0 0 24 12" aria-hidden="true"><path d="M5 4h14M5 8h14"/></svg>
+        </button>
+        <p id="session-status-text" class="inline-feedback" role="status" aria-live="polite"></p>
+        <textarea id="player-input" rows="2" placeholder="Type your action…"
+                  aria-label="In-character message or action" autocomplete="off" disabled></textarea>
+        <div class="composer-footer">
+          <details id="ooc-note" hidden>
+            <summary>OOC note</summary>
+            <div class="ooc-note-popover">
+              <label for="ooc-input">Out of character (to Sylvia)</label>
+              <textarea id="ooc-input" rows="3" disabled
+                        placeholder="A correction, preference or question for the GM…"></textarea>
+            </div>
+          </details>
+          <div class="builder-input-options" id="builder-input-options" hidden>
+            <button class="btn btn-secondary btn-sm" id="open-campaign-setup-btn" hidden>Configure Campaign</button>
+            <button class="btn btn-secondary btn-sm" id="attach-builder-sources-btn" disabled>Attach sources…</button>
+            <button class="btn btn-secondary btn-sm web-permission" id="allow-public-web"
+                    type="button" disabled aria-pressed="false"
+                    title="Allow the Builder to use public web research for the next message only">Web</button>
+          </div>
+          <div class="composer-actions">
+           <div class="composer-model-controls">
+        <div class="chat-model-picker" id="chat-model-picker">
+          <button class="chat-model-picker-button" id="chat-model-picker-btn" type="button"
+                  disabled aria-haspopup="dialog" aria-expanded="false">
+            No configured models
+          </button>
+          <div class="chat-model-popover" id="chat-model-popover" hidden>
+            <input id="chat-model-search" type="search" placeholder="Search configured models"
+                   aria-label="Search configured models">
+            <div class="chat-model-mode" role="group" aria-label="How to use the model">
+              <button type="button" class="active" data-chat-model-mode="current">Use here</button>
+              <button type="button" data-chat-model-mode="once">Next reply only</button>
+              <button type="button" data-chat-model-mode="global">Here + new chats</button>
+            </div>
+            <div class="chat-model-results" id="chat-model-results" role="listbox"></div>
+            <p class="chat-model-hint" id="chat-model-hint">
+              Switch this chat while preserving its history.
+            </p>
+            <div class="model-guidance-badge" id="model-guidance-badge" hidden></div>
+          </div>
+          <select id="chat-model-choice" class="visually-hidden" disabled
+                  aria-label="Model for this chat" tabindex="-1">
+            <option value="">No configured models</option>
+          </select>
+        </div>
+        <div class="chat-reasoning-picker" id="chat-reasoning-picker">
+          <button class="chat-model-picker-button" id="chat-reasoning-btn" type="button"
+                  disabled aria-haspopup="dialog" aria-controls="chat-reasoning-popover" aria-expanded="false">
+            Reasoning: Provider default
+          </button>
+          <div class="chat-model-popover chat-reasoning-popover" id="chat-reasoning-popover"
+               role="dialog" aria-label="Reasoning effort" hidden>
+            <label for="chat-reasoning-current">This chat</label>
+            <select id="chat-reasoning-current" aria-describedby="chat-reasoning-hint"></select>
+            <label for="chat-reasoning-once">Next reply only</label>
+            <select id="chat-reasoning-once" aria-describedby="chat-reasoning-hint"></select>
+            <p class="chat-model-hint" id="chat-reasoning-hint" role="status"></p>
+          </div>
+        </div>
+          </div>
+          <div class="composer-primary-action">
+            <button class="btn btn-primary btn-sm" id="send-btn" title="Send · Enter (Shift+Enter for a new line)" aria-label="Send message" disabled>↑</button>
+            <button class="btn btn-secondary btn-sm" id="stop-btn" title="Stop generation" aria-label="Stop generation" hidden disabled>■</button>
+          </div>
+          </div>
+        </div>
+        <p class="composer-steering-hint" id="composer-steering-hint" hidden>Enter to send a follow-up while the Builder works · Shift+Enter for a new line</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar resize handle — user-draggable, host-extensible -->
+  <div class="sidebar-resize-handle" id="sidebar-resize-handle" role="separator" tabindex="0"
+       aria-label="Resize game panels" aria-orientation="vertical" aria-valuemin="220" aria-valuenow="280"></div>
+
+  <!-- Right sidebar — host controls plus ruleset-declared panels -->
+  <div class="right-sidebar" id="right-sidebar">
+    <div class="sidebar-header">
+      <span>Game panels</span>
+      <button class="sidebar-settings-btn" id="open-settings-btn"
+              type="button" aria-haspopup="dialog" aria-controls="settings-overlay">
+        Settings
+      </button>
+    </div>
+    <div class="sidebar-body">
+      <p id="panel-action-status" class="inline-feedback" role="status" aria-live="polite"></p>
+      <section class="ruleset-panel-host" id="ruleset-panel-host" hidden
+               aria-label="Ruleset panels">
+        <div id="ruleset-panels"></div>
+      </section>
+        <div class="construction-panel" id="construction-panel" hidden>
+          <div class="construction-summary" id="construction-progress">Step 1 of 8</div>
+          <details class="construction-summary" id="construction-library-warnings" hidden>
+            <summary>Saved content needs repair</summary>
+            <ul id="construction-library-warning-items"></ul>
+          </details>
+          <section class="construction-summary" id="construction-party-repair" hidden>
+            <p id="construction-party-repair-message"></p>
+            <button type="button" class="btn btn-secondary btn-sm"
+                    id="construction-reselect-party-btn">Reselect party</button>
+          </section>
+          <section class="construction-fields" data-construction-step="0" data-step-id="ruleset">
+            <strong>Choose a Ruleset</strong>
+            <p class="construction-summary">This determines which game mechanics Sylvia can use.</p>
+            <label for="construction-package">Ruleset</label>
+            <select id="construction-package">
+              <option value="">No Ruleset — narrative play</option>
+            </select>
+            <button type="button" class="btn btn-secondary btn-sm"
+                    data-start-creation-subflow="ruleset">Create New Ruleset</button>
+          </section>
+          <section class="construction-fields" data-construction-step="1" data-step-id="setting" hidden>
+            <strong>Choose a Campaign Setting</strong>
+            <p class="construction-summary">Only Settings compatible with the selected Ruleset are shown.</p>
+            <select id="construction-setting">
+              <option value="">Choose a Ruleset first</option>
+            </select>
+            <button type="button" class="btn btn-secondary btn-sm"
+                    data-start-creation-subflow="setting">Create New Campaign Setting</button>
+          </section>
+          <section class="construction-fields" data-construction-step="2" data-step-id="plan" hidden>
+            <strong>Choose a Campaign Plan</strong>
+            <p class="construction-summary">The Plan gives your Game Master the prepared story and secrets.</p>
+            <select id="construction-template">
+              <option value="custom">Create a new Campaign Plan…</option>
+            </select>
+            <div id="campaign-plan-browser" hidden></div>
+            <button type="button" class="btn btn-secondary btn-sm"
+                    data-start-creation-subflow="plan">Create New Campaign Plan</button>
+            <button type="button" class="btn btn-secondary btn-sm"
+                    id="delete-reusable-plan-btn" hidden>Delete Saved Campaign Plan</button>
+            <button type="button" class="btn btn-secondary btn-sm"
+                    id="export-campaign-plan-btn" hidden>Export Campaign Plan…</button>
+          </section>
+          <section class="construction-fields" data-construction-step="3"
+                   data-step-id="ruleset_contribution" data-contribution-step hidden>
+            <strong data-contribution-title>Ruleset questions</strong>
+            <div data-contribution-questions></div>
+          </section>
+          <section class="construction-fields" data-construction-step="4"
+                   data-step-id="setting_contribution" data-contribution-step hidden>
+            <strong data-contribution-title>Campaign Setting questions</strong>
+            <div data-contribution-questions></div>
+          </section>
+          <section class="construction-fields" data-construction-step="5"
+                   data-step-id="plan_contribution" data-contribution-step hidden>
+            <strong data-contribution-title>Campaign Plan questions</strong>
+            <div data-contribution-questions></div>
+          </section>
+          <section class="construction-fields" data-construction-step="6" data-step-id="name" hidden>
+            <label for="construction-name">Campaign name</label>
+            <input id="construction-name" type="text" autocomplete="off"
+                   placeholder="Name this campaign">
+          </section>
+          <section class="construction-fields" id="rift-construction-fields"
+                   data-construction-step="7" data-step-id="participants" hidden>
+            <strong>Choose your party</strong>
+            <p class="construction-summary" id="rift-description"></p>
+            <label for="rift-archetype" id="campaign-player-label">Player Character archetype</label>
+            <select id="rift-archetype"></select>
+            <button type="button" class="btn btn-secondary btn-sm"
+                    id="rift-create-player"
+                    data-start-creation-subflow="player_character">Create New Player Character</button>
+            <button type="button" class="btn btn-secondary btn-sm"
+                    id="delete-reusable-player-btn" hidden>Delete Saved Character</button>
+            <fieldset class="companion-picker">
+              <legend>Companions <span id="rift-companion-policy"></span></legend>
+              <div id="rift-companions"></div>
+            </fieldset>
+            <button type="button" class="btn btn-secondary btn-sm"
+                    id="rift-create-companion"
+                    data-start-creation-subflow="companion">Create New Companion</button>
+            <div class="character-profile-picker" id="character-profile-picker" hidden>
+              <label for="character-profile-select">Universal character cards</label>
+              <select id="character-profile-select" aria-describedby="character-profile-summary"></select>
+              <p class="construction-summary" id="character-profile-summary" aria-live="polite"></p>
+              <button type="button" class="btn btn-secondary btn-sm"
+                      id="adapt-character-profile-btn" disabled>Adapt as Companion</button>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm"
+                    id="complete-required-characters-btn" hidden
+                    data-start-creation-subflow="plan">Complete required characters in Plan</button>
+          </section>
+          <section class="construction-fields" data-construction-step="8"
+                   data-step-id="boundaries_preferences" hidden>
+            <strong>Boundaries and preferences</strong>
+            <label for="construction-boundaries">Hard boundaries</label>
+            <textarea id="construction-boundaries" rows="2" autocomplete="off"
+                      placeholder="Anything that must not appear? (optional)"></textarea>
+            <label for="construction-preferences">Preferences</label>
+            <textarea id="construction-preferences" rows="2" autocomplete="off"
+                      placeholder="Tone, themes, pacing, romance, difficulty… (optional)"></textarea>
+          </section>
+          <section class="construction-fields" id="construction-notes-fields"
+                   data-construction-step="9" data-step-id="specific_requests" hidden>
+            <strong>Any specific requests?</strong>
+            <label class="companion-choice" for="construction-no-requests">
+              <input id="construction-no-requests" type="checkbox" checked>
+              <strong>No additional requests</strong>
+            </label>
+            <label for="construction-premise" id="construction-premise-label">Specific requests</label>
+            <textarea id="construction-premise" rows="3" autocomplete="off" disabled
+                      placeholder="What should Builder change or add before play?"></textarea>
+          </section>
+          <section class="construction-fields" data-construction-step="10" data-step-id="review" hidden>
+            <strong>Ready to begin?</strong>
+            <div class="construction-summary" id="construction-review"></div>
+            <button type="button" class="btn btn-secondary btn-sm"
+                    data-start-creation-subflow="campaign_customization">Keep Building</button>
+            <button type="button" class="btn btn-secondary btn-sm"
+                    id="save-reusable-plan-btn" hidden>Save as New Campaign Plan</button>
+          </section>
+          <div class="construction-actions">
+            <button class="btn btn-secondary btn-sm" id="construction-back-btn" hidden>Back</button>
+            <button class="btn btn-primary btn-sm" id="construction-next-btn">Continue</button>
+            <button class="btn btn-primary btn-sm" id="begin-construction-btn" hidden>Ready to Begin</button>
+            <button class="btn btn-secondary btn-sm" id="cancel-construction-btn">Cancel</button>
+          </div>
+          <p id="construction-status" class="inline-feedback" role="status" aria-live="polite"></p>
+        </div>
+      <div class="sidebar-section lifecycle-actions" id="lifecycle-actions" hidden>
+        <h4>Session</h4>
+        <button class="btn btn-secondary btn-sm" id="resume-session-btn" disabled hidden>
+          Resume Session
+        </button>
+        <button class="btn btn-primary btn-sm" id="finalize-construction-btn" disabled hidden>
+          Admit Plan &amp; Start DM
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Campaign-start guidance stays reachable when either sidebar is collapsed. -->
+<div class="model-guidance-warning" id="model-guidance-warning" role="alert" hidden>
+  <strong id="model-guidance-warning-title">Model capability warning</strong>
+  <p id="model-guidance-warning-text"></p>
+  <div class="model-guidance-actions">
+    <button class="btn btn-primary btn-sm" id="continue-model-guidance-btn">
+      Continue anyway
+    </button>
+    <button class="btn btn-secondary btn-sm" id="dismiss-model-guidance-btn">
+      Cancel
+    </button>
+  </div>
+</div>
+
+<!-- First-Home walkthrough. Sylvia and the dialogue panel are kept separate
+     from the spotlight so current temporary sprites can be swapped cleanly. -->
+<div class="tutorial-overlay" id="home-tutorial" aria-hidden="true" hidden>
+  <div class="tutorial-spotlight" id="tutorial-spotlight" aria-hidden="true"></div>
+  <div class="tutorial-guide" id="tutorial-guide" data-placement="center">
+    <img class="tutorial-sylvia" id="tutorial-sylvia"
+         src="assets/tutorial/sylvia-wave.png" alt="">
+    <section class="tutorial-card" role="dialog" aria-modal="true"
+             aria-labelledby="tutorial-title" aria-describedby="tutorial-copy">
+      <div class="tutorial-step" id="tutorial-step">1 / 4</div>
+      <h2 id="tutorial-title">Hi, I&rsquo;m Sylvia.</h2>
+      <p id="tutorial-copy">Let me show you the important stuff real quick.</p>
+      <div class="tutorial-actions">
+        <button class="btn btn-secondary" id="tutorial-skip-btn" type="button">Skip</button>
+        <button class="btn btn-primary" id="tutorial-next-btn" type="button">Next</button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- Dedicated settings surface. Configuration and infrequent/destructive
+     management controls live here rather than crowding the campaign rail. -->
+<div class="settings-overlay" id="settings-overlay" hidden>
+  <section class="settings-dialog" role="dialog" aria-modal="true"
+           aria-labelledby="settings-title">
+    <header class="settings-header">
+      <div>
+        <div class="settings-kicker">Sylvia GM</div>
+        <h1 id="settings-title">Settings</h1>
+      </div>
+      <button class="settings-close-btn" id="close-settings-btn" type="button"
+              aria-label="Close settings">Close</button>
+    </header>
+    <div class="settings-layout">
+      <nav class="settings-nav" aria-label="Settings sections" role="tablist">
+        <button class="settings-tab active" id="settings-tab-models" type="button"
+                role="tab" data-settings-tab="models" aria-selected="true"
+                aria-controls="settings-panel-models">Models</button>
+        <button class="settings-tab" id="settings-tab-accounts" type="button"
+                role="tab" data-settings-tab="accounts" aria-selected="false"
+                aria-controls="settings-panel-accounts">Account sign-in</button>
+        <button class="settings-tab" id="settings-tab-appearance" type="button"
+                role="tab" data-settings-tab="appearance" aria-selected="false"
+                aria-controls="settings-panel-appearance">Appearance</button>
+        <button class="settings-tab" id="settings-tab-packages" type="button"
+                role="tab" data-settings-tab="packages" aria-selected="false"
+                aria-controls="settings-panel-packages">Packages</button>
+        <button class="settings-tab" id="settings-tab-campaign-data" type="button"
+                role="tab" data-settings-tab="campaign-data" aria-selected="false"
+                aria-controls="settings-panel-campaign-data">Campaign Data</button>
+        <button class="settings-tab" id="settings-tab-admin" type="button"
+                role="tab" data-settings-tab="admin" aria-selected="false"
+                aria-controls="settings-panel-admin">Admin</button>
+        <button class="settings-tab" id="settings-tab-about" type="button"
+                role="tab" data-settings-tab="about" aria-selected="false"
+                aria-controls="settings-panel-about">About</button>
+      </nav>
+      <div class="settings-content">
+        <section class="settings-panel active" id="settings-panel-models" role="tabpanel"
+                 aria-labelledby="settings-tab-models" data-settings-panel="models">
+          <h2>Models</h2>
+          <p class="settings-description">
+            Choose what new chats use and manage the models available to Sylvia.
+          </p>
+          <p class="settings-description">Campaign history is saved on this computer. When you use a model,
+            Sylvia sends messages and relevant campaign or Builder content to the selected service.
+            Remote services handle that content under their own data use and retention policies.</p>
+          <div id="models-overview">
+          <div class="settings-card model-choice-panel">
+            <h3>Default for new chats</h3>
+            <label for="model-choice">Model</label>
+            <select id="model-choice" disabled>
+              <option value="">Loading configured models…</option>
+            </select>
+            <p class="provider-field-help">Existing chats keep their model. Change a chat or its next reply from the message composer.</p>
+            <div class="model-status" id="model-status" role="status">Loading model settings…</div>
+            <div class="provider-actions model-switch-actions">
+              <button class="btn btn-primary btn-sm" id="set-default-model-btn"
+                      type="button" disabled>Save default</button>
+            </div>
+          </div>
+          <div class="settings-card">
+            <div class="models-section-heading">
+              <h3>Your models</h3>
+              <button class="btn btn-primary btn-sm" id="add-model-btn" type="button">Add model</button>
+            </div>
+            <p class="provider-field-help">A connection is the account or service you use. Each connection can provide several models.</p>
+            <p id="models-action-status" class="inline-feedback" role="status"></p>
+            <button class="btn btn-secondary btn-sm" id="set-added-model-default-btn" type="button" hidden>Make the saved model my default</button>
+            <div class="configured-provider-list" id="configured-provider-list">
+              No models saved. Add a model to get started.
+            </div>
+          </div>
+          </div>
+          <div class="settings-card" id="model-add-choices" hidden>
+            <button class="btn btn-secondary btn-sm" type="button" data-models-back>Back to your models</button>
+            <h3>Add a model</h3>
+            <div id="model-existing-connection" hidden>
+              <label for="model-existing-provider">Use an existing connection</label>
+              <select id="model-existing-provider"></select>
+              <button class="btn btn-secondary btn-sm" id="use-existing-provider-btn" type="button">Choose a model on this connection</button>
+            </div>
+            <p class="provider-field-help">Or connect a service:</p>
+            <div class="model-connection-choices">
+              <button class="model-connection-choice" id="open-account-signin-btn" type="button"><strong>ChatGPT subscription</strong><span>Connect your account without an API key.</span></button>
+              <button class="model-connection-choice" type="button" data-model-route="api"><strong>API service</strong><span>Use a service such as OpenAI, OpenRouter or a custom endpoint.</span></button>
+              <button class="model-connection-choice" type="button" data-model-route="local"><strong>Local model server</strong><span>Connect to a server you already run.</span></button>
+            </div>
+          </div>
+          <div class="settings-card provider-editor" id="provider-editor" hidden>
+            <div class="models-section-heading">
+              <h3 id="provider-editor-title">Add a model</h3>
+              <button class="btn btn-secondary btn-sm" type="button" data-models-back>Cancel</button>
+            </div>
+            <p id="provider-editor-context" class="provider-field-help"></p>
+            <div id="provider-connection-step">
+            <section class="provider-step" aria-labelledby="provider-step-service">
+              <div class="provider-step-heading">
+                <span class="provider-step-number" aria-hidden="true">1</span>
+                <div>
+                  <h4 id="provider-step-service">Choose a service</h4>
+                  <p id="provider-route-help">Choose the service you want to connect.</p>
+                </div>
+              </div>
+              <label for="provider-preset">Service</label>
+              <select id="provider-preset" disabled>
+                <option value="">Loading services…</option>
+              </select>
+              <p id="provider-setup-hint" class="provider-field-help"></p>
+              <div class="provider-actions">
+                <button class="btn btn-secondary btn-sm" id="provider-setup-btn"
+                        type="button" hidden>Open service setup</button>
+                <button class="btn btn-secondary btn-sm" id="detect-local-providers-btn"
+                        type="button">Detect local services</button>
+              </div>
+              <div class="model-status" id="local-provider-detection-status"></div>
+            </section>
+            <section class="provider-step" aria-labelledby="provider-step-connect">
+              <div class="provider-step-heading">
+                <div>
+                  <h4 id="provider-step-connect">Connection details</h4>
+                  <p>Named services fill in the usual address automatically.</p>
+                </div>
+              </div>
+              <label for="provider-display-name">Connection name</label>
+              <input id="provider-display-name" type="text"
+                     autocomplete="off" placeholder="My local server">
+              <label for="provider-endpoint">Server address</label>
+              <input id="provider-endpoint" type="url" autocomplete="off" spellcheck="false">
+              <label for="provider-credential">API key <span id="provider-credential-optional"></span></label>
+              <input id="provider-credential" type="password" autocomplete="new-password"
+                     spellcheck="false" placeholder="Leave blank to keep the saved key">
+              <details class="provider-advanced-fields">
+                <summary>Advanced connection settings</summary>
+                <p class="provider-field-help">
+                  Most people can leave these unchanged. Custom services may require a different
+                  API format or request header.
+                </p>
+                <label for="provider-transport">API format</label>
+                <select id="provider-transport">
+                  <option value="chat_completions">OpenAI-compatible (recommended)</option>
+                  <option value="responses">OpenAI Responses</option>
+                  <option value="anthropic_messages">Anthropic</option>
+                  <option value="gemini_generate_content">Gemini GenerateContent</option>
+                </select>
+                <label for="provider-headers">Custom request headers (one Name: value per line)</label>
+                <textarea id="provider-headers" rows="3" autocomplete="off" spellcheck="false"
+                          placeholder="X-Provider-Header: private value"></textarea>
+              </details>
+            </section>
+            <div class="provider-actions">
+              <button class="btn btn-primary btn-sm" id="provider-continue-btn" type="button">Find models</button>
+              <button class="btn btn-secondary btn-sm" id="provider-manual-entry-btn" type="button">Enter a model manually</button>
+            </div>
+            </div>
+            <section class="provider-step" id="provider-model-step" aria-labelledby="provider-step-model" hidden>
+              <button class="btn btn-secondary btn-sm" id="provider-edit-connection-btn" type="button">Connection settings</button>
+              <div class="provider-step-heading">
+                <span class="provider-step-number" aria-hidden="true">2</span>
+                <div>
+                  <h4 id="provider-step-model">Choose a model</h4>
+                  <p>Choose a model to make available in Sylvia. Saving will not switch your chats.</p>
+                </div>
+              </div>
+              <div id="provider-discovery-tools">
+              <label for="provider-model-search">Search models <span class="label-optional">(optional)</span></label>
+              <input id="provider-model-search" type="search" maxlength="256"
+                     autocomplete="off" placeholder="Search by model name">
+              <div class="provider-actions">
+                <button class="btn btn-secondary btn-sm" id="discover-provider-models-btn"
+                        type="button">Find models</button>
+                <button class="btn btn-secondary btn-sm" id="load-more-provider-models-btn"
+                        type="button" hidden>Load more</button>
+              </div>
+              <select id="provider-discovered-models" size="5" hidden
+                      aria-label="Models found"></select>
+              </div>
+              <p id="provider-context-summary" class="provider-field-help"></p>
+              <p id="provider-output-summary" class="provider-field-help"></p>
+              <details id="provider-model-advanced" class="provider-advanced-fields">
+              <summary>Advanced model settings</summary>
+              <section class="provider-capacity-card" aria-labelledby="provider-capacity-heading">
+                <div class="provider-capacity-heading">
+                  <div>
+                    <h5 id="provider-capacity-heading">Context capacity</h5>
+                    <p>The amount of text the model can work with at once. Your server settings may lower this limit.</p>
+                  </div>
+                  <span class="provider-capacity-state" id="provider-capacity-state">Unknown</span>
+                </div>
+                <div class="provider-capacity-grid">
+                  <div class="provider-capacity-fact">
+                    <span>Model maximum</span>
+                    <strong id="provider-declared-context">Unknown</strong>
+                    <small id="provider-declared-context-source">Not reported</small>
+                  </div>
+                  <div class="provider-capacity-fact">
+                    <span>Loaded runtime</span>
+                    <strong id="provider-runtime-context">Unknown</strong>
+                    <small id="provider-runtime-context-source">Not reported</small>
+                  </div>
+                  <label class="provider-capacity-fact" for="provider-context-window">
+                    <span>Optional Sylvia cap</span>
+                    <input id="provider-context-window" type="number" min="512" max="10000000"
+                           inputmode="numeric" placeholder="Use detected capacity">
+                    <small id="provider-configured-context-source">Optional. Set a lower limit for
+                      Sylvia; increasing this value cannot raise the server&rsquo;s limit.</small>
+                  </label>
+                  <div class="provider-capacity-fact provider-capacity-effective">
+                    <span>Effective capacity</span>
+                    <strong id="provider-effective-context">Unknown</strong>
+                    <small id="provider-effective-context-source">Configure or detect a runtime limit</small>
+                  </div>
+                  <label class="provider-capacity-fact" for="provider-output-limit">
+                      <span>Optional reply cap</span>
+                    <input id="provider-output-limit" type="number" min="1" max="10000000"
+                           inputmode="numeric" placeholder="Provider-supported maximum">
+                        <small>Blank uses the known model maximum. Includes reasoning, tool arguments and narration. GM requests use
+                        this limit; Builder has a separate response budget below.</small>
+                    </label>
+                    <label class="provider-capacity-fact" for="provider-builder-output-limit">
+                      <span>Builder response budget</span>
+                      <input id="provider-builder-output-limit" type="number" min="1" max="10000000"
+                             inputmode="numeric" placeholder="Default: 32000, capped by output limit">
+                      <small>Includes thinking and file-writing tool arguments. Leave blank to keep
+                        the saved budget or use the default for a new model.</small>
+                    </label>
+                </div>
+                <p class="provider-capacity-warning" id="provider-capacity-warning" hidden></p>
+                <p id="provider-defaults-source" class="provider-field-help"></p>
+                <button id="provider-automatic-limits-btn" class="btn btn-secondary btn-sm" type="button">Use automatic limits</button>
+              </section>
+              </details>
+              <details class="provider-advanced-fields provider-manual-model" id="provider-manual-model">
+                <summary id="provider-manual-heading">Can&rsquo;t find your model?</summary>
+                <p class="provider-field-help">Enter the identifier supplied by your model service.</p>
+                <label for="provider-model-id">Model identifier</label>
+                <input id="provider-model-id" type="text"
+                       maxlength="256" autocomplete="off" spellcheck="false"
+                       placeholder="For example: organization/model-name">
+                <label for="provider-model-name">Name shown in Sylvia <span class="label-optional">(optional)</span></label>
+                <input id="provider-model-name" type="text" maxlength="128" autocomplete="off">
+              </details>
+            <div class="provider-actions">
+              <button class="btn btn-secondary btn-sm" id="validate-provider-btn"
+                      type="button">Test model</button>
+              <button class="btn btn-primary btn-sm" id="save-provider-btn"
+                      type="button">Add model</button>
+            </div>
+            <p class="provider-field-help">Test model sends a short request to check replies and tools. Finding or saving a model does not run this test.</p>
+            <div class="provider-validation-report" id="provider-validation-report" hidden></div>
+            </section>
+            <div class="model-status" id="provider-settings-status" role="status"></div>
+            <p class="settings-description provider-config-note" id="provider-data-disclosure"></p>
+            <p class="settings-description provider-config-note">
+              Sylvia saves campaign history on this computer. Messages and relevant campaign content,
+              including source material used by the Builder, are sent to your selected model service.
+              Remote services receive this data outside your computer and handle it under their
+              own privacy and retention policies. Saving locally does not prevent this transmission.
+            </p>
+            <p class="settings-description provider-config-note">
+              Sylvia connects to model services you already run or subscribe to. It does not
+              download or start models. Saved API keys and private headers use Windows protection
+              tied to your user account. They are sent to your selected service for authentication
+              and are not included in chats or campaign backups. If Windows cannot unlock them,
+              re-enter them in the connection settings.
+            </p>
+            <p class="settings-description provider-config-note">
+              This protects a copied settings file outside your Windows protection context.
+              It does not protect against software running as your Windows user or erase older
+              plaintext copies of your settings.
+            </p>
+          </div>
+        </section>
+
+        <section class="settings-panel" id="settings-panel-accounts" role="tabpanel"
+                 aria-labelledby="settings-tab-accounts" data-settings-panel="accounts" hidden>
+          <h2>Account sign-in</h2>
+          <p class="settings-description">Use your ChatGPT subscription in Sylvia. Browser sign-in lets you connect without an API key.</p>
+          <p class="settings-description">Codex manages your ChatGPT sign-in. Messages and relevant campaign or Builder content
+            are sent to OpenAI through Codex. Data use and retention depend on your ChatGPT plan and account or workspace settings;
+            API data policies do not describe every ChatGPT subscription.</p>
+          <button class="btn btn-secondary btn-sm" id="account-models-btn" type="button">Back to your models</button>
+          <div class="settings-card" id="chatgpt-connection-card">
+            <h3 id="chatgpt-signin-step">1. Connect ChatGPT</h3>
+            <p class="provider-field-help">Requires the Codex runtime. Codex manages your sign-in and generation limits.</p>
+            <div class="provider-actions">
+              <button class="btn btn-primary btn-sm" type="button" data-chatgpt-action="login">Sign in with ChatGPT</button>
+              <button class="btn btn-secondary btn-sm" type="button" data-chatgpt-action="status">Refresh status</button>
+              <button class="btn btn-secondary btn-sm" type="button" data-chatgpt-action="cancel" hidden>Cancel sign-in</button>
+              <button class="btn btn-secondary btn-sm" type="button" data-chatgpt-action="logout" hidden>Sign out</button>
+            </div>
+            <div class="model-status" id="chatgpt-connection-status" role="status" aria-live="polite">Checking connection…</div>
+          </div>
+          <div class="settings-card" id="chatgpt-model-card" hidden>
+            <h3 id="chatgpt-model-heading">2. Add a model</h3>
+            <label for="chatgpt-model-choice">Models available to your account</label>
+            <select id="chatgpt-model-choice"><option value="">Choose a model</option></select>
+            <p class="provider-field-help">Availability does not verify a model's response or tool support. Test a model before relying on it for a campaign.</p>
+            <p id="chatgpt-model-summary" class="provider-field-help"></p>
+            <details id="chatgpt-model-advanced" class="provider-advanced-fields">
+              <summary>Advanced model settings</summary>
+              <p class="provider-field-help">Leave a field empty to use its automatic value when available. A recent ChatGPT model catalog supplies the context allowance; actual limits observed during use still apply. These values guide Sylvia's context planning.</p>
+            <label for="chatgpt-model-context">Context allowance (tokens)</label>
+            <input id="chatgpt-model-context" type="number" min="1" max="10000000" step="1">
+              <label for="chatgpt-model-output">Model maximum output (reference value)</label>
+              <input id="chatgpt-model-output" type="number" min="1" max="10000000" step="1">
+              <button id="chatgpt-automatic-limits-btn" class="btn btn-secondary btn-sm" type="button">Use automatic limits</button>
+              <p class="provider-field-help">Automatic output references come from OpenAI's published model specifications. They do not establish a ChatGPT subscription reply limit.</p>
+              <p class="provider-field-help">Output budget: managed by Codex. Sylvia does not reserve this entire maximum for each response or send it as a Codex reply limit.</p>
+            </details>
+            <p id="chatgpt-model-status" class="inline-feedback" role="status"></p>
+            <div class="provider-actions">
+              <button class="btn btn-primary btn-sm" type="button" data-chatgpt-action="add_model">Save model</button>
+            </div>
+            <p class="provider-field-help">Saving returns you to Your models. You can then make it your default for new chats.</p>
+          </div>
+        </section>
+
+        <section class="settings-panel" id="settings-panel-appearance" role="tabpanel"
+                 aria-labelledby="settings-tab-appearance" data-settings-panel="appearance" hidden>
+          <h2>Appearance</h2>
+          <p class="settings-description">
+            Choose the colours used in your chats.
+          </p>
+          <div class="settings-card">
+            <div class="settings-field-label">Session theme</div>
+            <div class="theme-switch settings-theme-switch">
+              <button class="theme-btn active" data-theme="slate">Slate</button>
+              <button class="theme-btn" data-theme="sylvia">Sylvia</button>
+              <button class="theme-btn" data-theme="sylvia-dark">Dark</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="settings-panel" id="settings-panel-packages" role="tabpanel"
+                 aria-labelledby="settings-tab-packages" data-settings-panel="packages" hidden>
+          <h2>Packages</h2>
+          <p class="settings-description">
+            Install packages to make them available when setting up a campaign.
+            Existing campaigns keep the versions they already use.
+          </p>
+          <div class="settings-card settings-action-list">
+            <button class="btn btn-secondary" id="install-package-btn" type="button">
+              Install Package…
+            </button>
+            <p class="settings-help" id="package-install-status" role="status" aria-live="polite"></p>
+            <button class="btn btn-secondary" id="import-character-card-btn" type="button">Import Character Card</button>
+            <section id="character-card-preview" class="character-card-preview" aria-labelledby="character-card-preview-title" hidden>
+              <h4 id="character-card-preview-title"></h4>
+              <p id="character-card-preview-status" class="character-card-preview-status"></p>
+              <p id="character-card-preview-text"></p>
+              <p>Your original card is kept. Adapt this character to your chosen ruleset before play.</p>
+              <p id="character-card-preview-notices" class="character-card-preview-notices" hidden></p>
+              <details id="character-card-preview-details"><summary>Import details</summary>
+                <pre id="character-card-preview-detail-text"></pre>
+              </details>
+              <div class="character-card-preview-actions">
+                <button class="btn btn-secondary" id="confirm-character-card-btn" type="button">Save Universal character card</button>
+                <button class="btn btn-secondary" id="cancel-character-card-btn" type="button">Cancel</button>
+              </div>
+            </section>
+            <button class="btn btn-secondary" id="repair-import-btn" type="button" hidden>Fix with Builder</button>
+          </div>
+          <div class="settings-card ruleset-browser" aria-labelledby="ruleset-browser-title">
+            <div class="ruleset-browser-heading">
+              <div>
+                <h3 id="ruleset-browser-title">Installed rulesets</h3>
+                <p>View, compare, or export your installed ruleset files. Files cannot be edited here.</p>
+              </div>
+              <button class="btn btn-secondary btn-sm" id="ruleset-refresh-btn" type="button">
+                Refresh
+              </button>
+            </div>
+            <label for="ruleset-candidate-select">Installed ruleset</label>
+            <select id="ruleset-candidate-select" disabled>
+              <option value="">Loading installed rulesets…</option>
+            </select>
+            <div class="ruleset-browser-actions">
+              <button class="btn btn-secondary btn-sm" id="ruleset-export-btn"
+                      type="button" disabled>Export package…</button>
+              <label for="ruleset-compare-select" class="visually-hidden">
+                Compare with another installed ruleset
+              </label>
+              <select id="ruleset-compare-select" disabled>
+                <option value="">Compare with…</option>
+              </select>
+              <button class="btn btn-secondary btn-sm" id="ruleset-compare-btn"
+                      type="button" disabled>Compare</button>
+            </div>
+            <p class="model-status" id="ruleset-inspection-status" role="status">
+              Loading installed rulesets…
+            </p>
+            <div id="ruleset-identity" class="ruleset-identity" hidden></div>
+            <section class="ruleset-support-summary" aria-labelledby="ruleset-support-title" hidden>
+              <h4 id="ruleset-support-title">Gameplay resolution</h4>
+              <div id="ruleset-support-counts"></div>
+            </section>
+            <div class="ruleset-browser-grid" id="ruleset-browser-grid" hidden>
+              <section aria-labelledby="ruleset-packages-title">
+                <h4 id="ruleset-packages-title">Included packages</h4>
+                <div class="ruleset-tree" id="ruleset-package-list"></div>
+              </section>
+              <section aria-labelledby="ruleset-files-title">
+                <h4 id="ruleset-files-title">Files</h4>
+                <div class="ruleset-tree" id="ruleset-file-list"></div>
+              </section>
+            </div>
+            <section class="ruleset-preview" id="ruleset-preview" hidden
+                     aria-labelledby="ruleset-preview-title">
+              <div class="ruleset-preview-heading">
+                <h4 id="ruleset-preview-title">File preview</h4>
+                <span id="ruleset-preview-meta"></span>
+              </div>
+              <pre id="ruleset-file-preview" tabindex="0"></pre>
+            </section>
+            <div class="ruleset-comparison" id="ruleset-compare-result" hidden></div>
+          </div>
+        </section>
+
+        <section class="settings-panel" id="settings-panel-campaign-data" role="tabpanel"
+                 aria-labelledby="settings-tab-campaign-data"
+                 data-settings-panel="campaign-data" hidden>
+          <h2>Campaign Data</h2>
+          <p class="settings-description" id="settings-campaign-context">
+            Select a campaign to export, rename, archive, or delete.
+          </p>
+          <div class="settings-card settings-action-list">
+            <h3>Export and recovery</h3>
+            <label><input type="checkbox" id="export-include-thinking">
+              Include saved Thinking in this export (may contain spoilers and private content)
+            </label>
+            <button class="btn btn-secondary" id="export-campaign-btn" type="button" disabled>
+              Export selected campaign…
+            </button>
+            <button class="btn btn-secondary" id="recover-campaign-btn" type="button">
+              Recover campaign file…
+            </button>
+            <p class="settings-help" id="campaign-data-status" role="status" aria-live="polite"></p>
+          </div>
+          <div class="settings-card settings-action-list">
+            <h3>Manage campaign</h3>
+            <button class="btn btn-secondary" id="stop-session-btn" type="button" disabled hidden>
+              Stop Session
+            </button>
+            <button class="btn btn-secondary" id="rename-campaign-btn" type="button" disabled>
+              Rename Selected
+            </button>
+            <button class="btn btn-secondary" id="archive-campaign-btn" type="button" disabled>
+              Archive
+            </button>
+            <button class="btn btn-secondary" id="restore-campaign-btn" type="button" disabled>
+              Restore
+            </button>
+            <button class="btn btn-danger" id="trash-campaign-btn" type="button" disabled>
+              Move to Trash
+            </button>
+            <p id="campaign-management-status" class="inline-feedback" role="status" aria-live="polite"></p>
+          </div>
+          <div class="settings-card settings-action-list danger-zone">
+            <h3>Permanent deletion</h3>
+            <p>Permanently delete a campaign from Sylvia's local Trash. This cannot be undone.
+              Exported files and copies already held by model services are unaffected.</p>
+            <button class="btn btn-danger" id="purge-campaign-btn" type="button" disabled>
+              Delete permanently
+            </button>
+            <p id="campaign-deletion-status" class="inline-feedback" role="status" aria-live="polite"></p>
+          </div>
+        </section>
+
+        <section class="settings-panel" id="settings-panel-admin" role="tabpanel"
+                 aria-labelledby="settings-tab-admin" data-settings-panel="admin" hidden>
+          <h2>Admin Full Audit</h2>
+          <p class="settings-description">
+            Privacy-safe operation rejection diagnostics are always available here and contain
+            only correlation IDs, the tool name, rejection code, field paths, and whether state
+            changed. They contain no arguments, campaign prose, prompts, or model reasoning.
+          </p>
+          <p class="settings-description">
+            Direct connections capture the complete request sent to the model and returned response
+            chunks, including private reasoning and tool calls when available. ChatGPT subscriptions
+            capture the exchanges exposed by Codex; downstream model details may be unavailable.
+          </p>
+          <p class="settings-description">May contain spoilers.</p>
+          <div class="settings-card admin-audit-controls">
+            <button class="btn btn-secondary" id="toggle-admin-audit-btn" type="button">
+              Enable Full Audit
+            </button>
+            <button class="btn btn-secondary" id="refresh-admin-audit-btn" type="button">
+              Refresh
+            </button>
+            <button class="btn btn-secondary" id="open-admin-audit-btn" type="button" disabled>
+              Open live inspector
+            </button>
+            <span id="admin-audit-status">Full Audit disabled · 0 safe mechanics diagnostics</span>
+          </div>
+          <div class="settings-card admin-audit-output" id="admin-audit-output" hidden>
+            <h3>Developer diagnostics</h3>
+            <p>
+              Search privacy-safe mechanics diagnostics and, when explicitly enabled, exact
+              memory-only model exchange records. Credentials and authorization headers are never
+              included. Exact traces disappear when Full Audit is disabled or Sylvia restarts.
+            </p>
+            <div class="admin-audit-toolbar">
+              <input id="admin-audit-search" type="search"
+                     placeholder="Search session, model, message, tool, or response">
+              <button class="btn btn-secondary" id="copy-admin-audit-btn" type="button">
+                Copy visible entries
+              </button>
+              <button class="btn btn-secondary" id="export-admin-audit-btn" type="button">
+                Export exact Audit…
+              </button>
+            </div>
+            <div id="admin-audit-traces" class="admin-audit-traces"></div>
+          </div>
+        </section>
+
+        <section class="settings-panel" id="settings-panel-about" role="tabpanel"
+                 aria-labelledby="settings-tab-about" data-settings-panel="about" hidden>
+          <h2>About Sylvia GM</h2>
+          <p class="settings-description">
+            Version and signing information for this installation.
+          </p>
+          <p class="settings-description">For a ruleset's publisher, source attribution and licence notices,
+            open Packages and select its attribution or notice file.</p>
+          <div class="settings-card settings-action-list">
+            <h3 id="application-version">Version unavailable</h3>
+            <p id="application-channel">Release identity unavailable</p>
+            <p id="application-signing">Unsigned Alpha prerelease</p>
+          </div>
+          <div class="settings-card settings-action-list">
+            <h3>Home tutorial</h3>
+            <p>Show Sylvia&rsquo;s quick tour of the Home controls again.</p>
+            <button class="btn btn-secondary" id="replay-home-tutorial-btn" type="button">
+              Replay tutorial
+            </button>
+          </div>
+          <div class="settings-card danger-zone">
+            <h3>Windows security warning</h3>
+            <p>
+              This Alpha prerelease is unsigned. Windows may show an unfamiliar-publisher
+              warning. Verify the installer SHA-256 against the supplied release manifest
+              before running it.
+            </p>
+          </div>
+        </section>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script src="panel-workspace.js"></script>
+<script src="shot-playback.js"></script>
+<script src="panel-host.js"></script>
+<script src="campaign-plan-browser.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

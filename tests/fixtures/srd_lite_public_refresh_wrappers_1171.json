@@ -1,0 +1,1551 @@
+{
+  "source_sha256": "77ab82cc1c996d41a2e44d8cb83978055358d8427ee01d19a45e85f83209eac3",
+  "normal_package_admission": false,
+  "source_checkpoint": 1165,
+  "selected_public_wrapper_source_only": true,
+  "tools": {
+    "start_combat_encounter_entities": {
+      "description": "Roll Initiative and establish an encounter between two canonical creature states. When combat is inactive and the player declares a hostile weapon attack against a known present creature, including a companion, you MUST call this operation before any player-facing prose and before resolving the attack, then follow the freshly exposed combat lifecycle and weapon-attack operations. Do not decide in prose that the attack misses, is deflected, or is de-escalated. Do not restate the scene or ask what the player does instead. Do not substitute an Athletics or other skill check for the attack. Coordinate combat uses the saved spatial scene. Supply one combat_scenes entry when admitting a later roster or an actual new arena. Omit it to reuse the scene. For the same map ID, keep the existing bounds, grid and layers: all saved bodies, objects, blockers, zones and terrain remain authoritative; supplied rows with existing IDs do not edit or relocate them. New IDs add genuinely present scene facts. For a new map ID, explicitly place every accompanying saved body/object by its exact ID. Existing dimensions, activity and mechanic metadata are retained; only actual destination position, facing, plane and ambient lighting are admitted. Include active summons, carried/worn objects, and a live Mage Hand with its cargo and caster. Arena replacement is unavailable while an anchored object, wall panel including permanent Stone, retained coordinate area/terrain or anchored light needs its current scene. Those effects are preserved and the operation clearly rejects before initiative; do not remove them or substitute a different map ID to bypass this limit. Exploration does not require map movement.",
+      "pre_conditions": [
+        {
+          "condition": "combat.encounter_active != true",
+          "error": "A combat encounter is already active."
+        },
+        {
+          "condition": "combat.turn_active != true",
+          "error": "An encounter cannot start while a combat turn is active."
+        },
+        {
+          "condition": "_first_actor_id != _second_actor_id",
+          "error": "The two encounter creatures must be distinct."
+        },
+        {
+          "condition": "first_actor.is_alive == true and second_actor.is_alive == true",
+          "error": "Both encounter creatures must be alive."
+        },
+        {
+          "condition": "first_actor.initiative_modifier >= -10 and first_actor.initiative_modifier <= 20",
+          "error": "The first creature requires an authoritative Initiative modifier."
+        },
+        {
+          "condition": "second_actor.initiative_modifier >= -10 and second_actor.initiative_modifier <= 20",
+          "error": "The second creature requires an authoritative Initiative modifier."
+        }
+      ],
+      "effects": [
+        {
+          "set": {
+            "field": "_reentry_combatants",
+            "value": [
+              "_first_actor_id",
+              "_second_actor_id"
+            ]
+          }
+        },
+        {
+          "call": "admit_srd_lite_combat_scene",
+          "params": {
+            "scenes": "{combat_scenes}",
+            "actors": "{_reentry_combatants}",
+            "lasting_state": "{_lasting_state_id}"
+          }
+        },
+        {
+          "spatial_query": {
+            "scene": "state.spatial_scene",
+            "operation": "snapshot"
+          },
+          "store_as": "_setup_snapshot"
+        },
+        {
+          "require": {
+            "condition": "state.spatial_scene.map.grid.unit == 'ft'",
+            "error": "SRD combat positions and body dimensions must use feet."
+          }
+        },
+        {
+          "set": {
+            "field": "_setup_combatants",
+            "value": []
+          }
+        },
+        {
+          "list_push": {
+            "list": "_setup_combatants",
+            "value": "_first_actor_id"
+          }
+        },
+        {
+          "list_push": {
+            "list": "_setup_combatants",
+            "value": "_second_actor_id"
+          }
+        },
+        {
+          "for_each": {
+            "collection": "_setup_combatants",
+            "as": "_setup_actor",
+            "do": [
+              {
+                "call": "srd_information_scene_entity",
+                "params": {
+                  "subject": "{_setup_actor}",
+                  "lasting_state": "{_lasting_state_id}"
+                },
+                "export_context": {
+                  "_setup_body": "_info_scene_entity"
+                }
+              },
+              {
+                "require": {
+                  "condition": "_setup_body.metadata.participant_ref == _setup_actor and _setup_body.metadata.is_object != true and _setup_body.metadata.creature_type != null and _setup_body.metadata.plane != null and _setup_body.metadata.plane != ''",
+                  "error": "Every combatant needs one active creature body bound to its actual actor and plane."
+                }
+              }
+            ]
+          }
+        },
+        {
+          "set": {
+            "field": "_initiative_combatants",
+            "value": [
+              "_first_actor_id",
+              "_second_actor_id"
+            ]
+          }
+        },
+        {
+          "for_each": {
+            "collection": "uncanny_metabolism_users",
+            "as": "_metabolism_user",
+            "do": [
+              {
+                "require": {
+                  "condition": "_metabolism_user in _initiative_combatants",
+                  "error": "Uncanny Metabolism can only be selected for a creature rolling Initiative in this encounter."
+                }
+              }
+            ]
+          }
+        },
+        {
+          "call": "check_srd_illumination_initiative",
+          "params": {
+            "actor_state": "{_first_actor_id}"
+          },
+          "export_context": {
+            "_illumination_first_initiative_advantage": "_illumination_initiative_advantage"
+          }
+        },
+        {
+          "dice": {
+            "expression": "d20",
+            "modifier": "first_actor.initiative_modifier",
+            "advantage": "(first_actor.spell_foresight == true or _illumination_first_initiative_advantage == true) and first_surprised != true",
+            "disadvantage": "first_surprised == true and not (first_actor.spell_foresight == true or _illumination_first_initiative_advantage == true)"
+          },
+          "store_as": "_initiative_first_roll"
+        },
+        {
+          "call": "check_srd_illumination_initiative",
+          "params": {
+            "actor_state": "{_second_actor_id}"
+          },
+          "export_context": {
+            "_illumination_second_initiative_advantage": "_illumination_initiative_advantage"
+          }
+        },
+        {
+          "dice": {
+            "expression": "d20",
+            "modifier": "second_actor.initiative_modifier",
+            "advantage": "(second_actor.spell_foresight == true or _illumination_second_initiative_advantage == true) and second_surprised != true",
+            "disadvantage": "second_surprised == true and not (second_actor.spell_foresight == true or _illumination_second_initiative_advantage == true)"
+          },
+          "store_as": "_initiative_second_roll"
+        },
+        {
+          "set": {
+            "field": "_initiative_first_total",
+            "value": "_initiative_first_roll.total + _initiative_first_roll.modifier"
+          }
+        },
+        {
+          "set": {
+            "field": "_initiative_second_total",
+            "value": "_initiative_second_roll.total + _initiative_second_roll.modifier"
+          }
+        },
+        {
+          "set": {
+            "field": "_initiative_tied",
+            "value": "_initiative_first_total == _initiative_second_total"
+          }
+        },
+        {
+          "set": {
+            "field": "_tie_decision_by",
+            "value": "players"
+          }
+        },
+        {
+          "call": "qualify_srd_lite_offensive_combat_entry",
+          "params": {
+            "lasting_state": "state"
+          }
+        },
+        {
+          "set": {
+            "field": "combat.encounter_active",
+            "value": true
+          }
+        },
+        {
+          "set": {
+            "field": "combat.phase",
+            "value": "awaiting_turn_start"
+          }
+        },
+        {
+          "set": {
+            "field": "combat.round",
+            "value": 1
+          }
+        },
+        {
+          "set": {
+            "field": "combat.turn_index",
+            "value": 0
+          }
+        },
+        {
+          "set": {
+            "field": "combat.order_first",
+            "value": "_first_actor_id"
+          }
+        },
+        {
+          "set": {
+            "field": "combat.group_order",
+            "value": false
+          }
+        },
+        {
+          "set": {
+            "field": "combat.order",
+            "value": []
+          }
+        },
+        {
+          "set": {
+            "field": "combat.order_second",
+            "value": "_second_actor_id"
+          }
+        },
+        {
+          "set": {
+            "field": "combat.current_actor",
+            "value": "_first_actor_id"
+          }
+        },
+        {
+          "condition": "_initiative_second_total > _initiative_first_total",
+          "on_true": [
+            {
+              "set": {
+                "field": "combat.order_first",
+                "value": "_second_actor_id"
+              }
+            },
+            {
+              "set": {
+                "field": "combat.order_second",
+                "value": "_first_actor_id"
+              }
+            },
+            {
+              "set": {
+                "field": "combat.current_actor",
+                "value": "_second_actor_id"
+              }
+            }
+          ]
+        },
+        {
+          "condition": "_initiative_tied == true and tie_winner == 'second'",
+          "on_true": [
+            {
+              "set": {
+                "field": "combat.order_first",
+                "value": "_second_actor_id"
+              }
+            },
+            {
+              "set": {
+                "field": "combat.order_second",
+                "value": "_first_actor_id"
+              }
+            },
+            {
+              "set": {
+                "field": "combat.current_actor",
+                "value": "_second_actor_id"
+              }
+            }
+          ]
+        },
+        {
+          "set": {
+            "field": "combat.initiative_first_actor",
+            "value": "_first_actor_id"
+          }
+        },
+        {
+          "set": {
+            "field": "combat.initiative_first_total",
+            "value": "_initiative_first_total"
+          }
+        },
+        {
+          "set": {
+            "field": "combat.initiative_second_actor",
+            "value": "_second_actor_id"
+          }
+        },
+        {
+          "set": {
+            "field": "combat.initiative_second_total",
+            "value": "_initiative_second_total"
+          }
+        },
+        {
+          "set": {
+            "field": "combat.first_surprised",
+            "value": "first_surprised"
+          }
+        },
+        {
+          "set": {
+            "field": "combat.second_surprised",
+            "value": "second_surprised"
+          }
+        },
+        {
+          "set": {
+            "field": "combat.last_end_reason",
+            "value": null
+          }
+        },
+        {
+          "set": {
+            "field": "combat.active_actor",
+            "value": null
+          }
+        },
+        {
+          "set": {
+            "field": "combat.active_actor_kind",
+            "value": null
+          }
+        },
+        {
+          "set": {
+            "field": "combat.turn_active",
+            "value": false
+          }
+        },
+        {
+          "set": {
+            "field": "combat.movement_remaining",
+            "value": 0
+          }
+        },
+        {
+          "set": {
+            "field": "combat.movement_spent",
+            "value": 0
+          }
+        },
+        {
+          "set": {
+            "field": "combat.action_available",
+            "value": false
+          }
+        },
+        {
+          "narrate": {
+            "text": "When you next emit player-facing prose, explain that combat has started and Initiative was rolled before anyone may attack. State the exact established Initiative order by authoritative actor ID: {_first_actor_id}, then {_second_actor_id}. Use campaign data to state those actors' player-facing names, never the internal IDs. If this encounter began from a declared attack, explain that combat had to start and Initiative had to be rolled before an attack could be resolved. Follow the resulting Player or GM decision boundary.",
+            "style": "system",
+            "priority": "high"
+          },
+          "condition": "combat.order_first == _first_actor_id"
+        },
+        {
+          "narrate": {
+            "text": "When you next emit player-facing prose, explain that combat has started and Initiative was rolled before anyone may attack. State the exact established Initiative order by authoritative actor ID: {_second_actor_id}, then {_first_actor_id}. Use campaign data to state those actors' player-facing names, never the internal IDs. If this encounter began from a declared attack, explain that combat had to start and Initiative had to be rolled before an attack could be resolved. Follow the resulting Player or GM decision boundary.",
+            "style": "system",
+            "priority": "high"
+          },
+          "condition": "combat.order_first == _second_actor_id"
+        },
+        {
+          "log": {
+            "message": "Combat encounter Initiative order established from canonical creature states."
+          }
+        },
+        {
+          "set": {
+            "field": "_initiative_order",
+            "value": [
+              {
+                "label": "first_actor.name",
+                "roll": "_initiative_first_roll",
+                "modifier": "_initiative_first_roll.modifier",
+                "initiative_result": "_initiative_first_total"
+              },
+              {
+                "label": "second_actor.name",
+                "roll": "_initiative_second_roll",
+                "modifier": "_initiative_second_roll.modifier",
+                "initiative_result": "_initiative_second_total"
+              }
+            ]
+          }
+        },
+        {
+          "set": {
+            "field": "_initiative_order",
+            "value": [
+              {
+                "label": "second_actor.name",
+                "roll": "_initiative_second_roll",
+                "modifier": "_initiative_second_roll.modifier",
+                "initiative_result": "_initiative_second_total"
+              },
+              {
+                "label": "first_actor.name",
+                "roll": "_initiative_first_roll",
+                "modifier": "_initiative_first_roll.modifier",
+                "initiative_result": "_initiative_first_total"
+              }
+            ]
+          },
+          "condition": "combat.order_first == _second_actor_id"
+        },
+        {
+          "set": {
+            "field": "_initiative_summary",
+            "value": []
+          }
+        },
+        {
+          "set": {
+            "field": "_initiative_details",
+            "value": []
+          }
+        },
+        {
+          "for_each": {
+            "collection": "_initiative_order",
+            "as": "_entry",
+            "do": [
+              {
+                "list_push": {
+                  "list": "_initiative_summary",
+                  "value": {
+                    "label": "_entry.label",
+                    "value": "_entry.initiative_result"
+                  }
+                },
+                "store_as": "_initiative_summary"
+              },
+              {
+                "list_push": {
+                  "list": "_initiative_details",
+                  "value": {
+                    "label": "'Creature'",
+                    "value": "_entry.label"
+                  }
+                },
+                "store_as": "_initiative_details"
+              },
+              {
+                "list_push": {
+                  "list": "_initiative_details",
+                  "value": {
+                    "label": "'D20 results'",
+                    "value": "_entry.roll.results"
+                  }
+                },
+                "store_as": "_initiative_details"
+              },
+              {
+                "list_push": {
+                  "list": "_initiative_details",
+                  "value": {
+                    "label": "'Modifier'",
+                    "value": "_entry.modifier"
+                  }
+                },
+                "store_as": "_initiative_details"
+              },
+              {
+                "list_push": {
+                  "list": "_initiative_details",
+                  "value": {
+                    "label": "'Total'",
+                    "value": "_entry.initiative_result"
+                  }
+                },
+                "store_as": "_initiative_details"
+              }
+            ]
+          }
+        },
+        {
+          "call": "interrupt_srd_rest",
+          "params": {
+            "target_state": "{_first_actor_id}",
+            "reason": "initiative"
+          }
+        },
+        {
+          "call": "interrupt_srd_rest",
+          "params": {
+            "target_state": "{_second_actor_id}",
+            "reason": "initiative"
+          }
+        },
+        {
+          "for_each": {
+            "collection": "_initiative_combatants",
+            "as": "_recovery_actor",
+            "do": [
+              {
+                "set": {
+                  "field": "_use_metabolism",
+                  "value": "_recovery_actor in uncanny_metabolism_users"
+                }
+              },
+              {
+                "call": "resolve_srd_initiative_recovery",
+                "params": {
+                  "actor_state": "{_recovery_actor}",
+                  "use_uncanny_metabolism": "{_use_metabolism}"
+                },
+                "export_context": {
+                  "_monk_initiative_rows": "_monk_initiative_rows"
+                }
+              },
+              {
+                "for_each": {
+                  "collection": "_monk_initiative_rows",
+                  "as": "_recovery_row",
+                  "do": [
+                    {
+                      "list_push": {
+                        "list": "_initiative_details",
+                        "value": "_recovery_row"
+                      },
+                      "store_as": "_initiative_details"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "call": "finish_srd_shared_action_settlements",
+          "params": {
+            "lasting_state": "{_lasting_state_id}",
+            "known_spell_effect": "{known_spell_effect}"
+          },
+          "export_context": "*"
+        },
+        {
+          "set": {
+            "field": "_setup_initiative_equations",
+            "value": []
+          }
+        },
+        {
+          "for_each": {
+            "collection": "_initiative_order",
+            "as": "_setup_visual_entry",
+            "do": [
+              {
+                "list_push": {
+                  "list": "_setup_initiative_equations",
+                  "value": {
+                    "label": "_setup_visual_entry.label",
+                    "value": "'Initiative'",
+                    "equation": {
+                      "die_sides": 20,
+                      "roll": "_setup_visual_entry.roll.total",
+                      "rolls": "_setup_visual_entry.roll.results",
+                      "modifier": "_setup_visual_entry.modifier",
+                      "total": "_setup_visual_entry.initiative_result"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "call": "refresh_srd_lite_persistent_spell_map",
+          "params": {
+            "lasting_state": "{_lasting_state_id}"
+          }
+        }
+      ],
+      "metadata": {
+        "category": "combat",
+        "costs_action": false,
+        "model_behavior": "leaves_player_intent_pending",
+        "result_card": {
+          "version": 1,
+          "footprint": "compact",
+          "title": "Initiative",
+          "subtitle": "Turn order",
+          "summary": {
+            "path": "context._initiative_summary"
+          },
+          "details_label": "Calculation",
+          "details": {
+            "path": "context._initiative_details"
+          },
+          "equations": {
+            "path": "context._setup_initiative_equations"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "first_actor",
+          "resolve": "entity"
+        },
+        {
+          "name": "second_actor",
+          "resolve": "entity"
+        },
+        {
+          "name": "first_surprised",
+          "type": "boolean",
+          "default": false,
+          "description": "True only when the first creature was unaware that combat was starting. Use false for a creature that declares the attack or is already watching, threatening, or ready to act."
+        },
+        {
+          "name": "second_surprised",
+          "type": "boolean",
+          "default": false,
+          "description": "True only when the second creature was unaware that combat was starting. Use false for a creature that is already watching, threatening, or ready to act."
+        },
+        {
+          "name": "tie_winner",
+          "type": "enum",
+          "enum_values": [
+            "first",
+            "second"
+          ]
+        },
+        {
+          "name": "uncanny_metabolism_users",
+          "type": "entity_id_list",
+          "resolve": "entity_list",
+          "required": false,
+          "default": [],
+          "min_items": 0,
+          "max_items": 16,
+          "unique_items": true,
+          "description": "Monk combatants choosing Uncanny Metabolism when Initiative is rolled: regain all Focus and heal Monk level plus the Martial Arts die, once per Long Rest. Leave empty to decline; eligible level-15 Monks then receive Perfect Focus automatically."
+        },
+        {
+          "name": "lasting_state",
+          "required": false,
+          "default": "state",
+          "resolve": "entity",
+          "model_hidden": true
+        },
+        {
+          "name": "combat_scenes",
+          "type": "array",
+          "required": false,
+          "default": [],
+          "min_items": 0,
+          "max_items": 1,
+          "items": {
+            "type": "object"
+          }
+        },
+        {
+          "name": "known_spell_effect",
+          "type": "boolean",
+          "required": false,
+          "default": false
+        }
+      ]
+    },
+    "start_group_combat_encounter": {
+      "description": "Roll Initiative once for every living creature taking part in a group encounter. Supply all player characters, GM-controlled companions, and hostiles that are present when combat starts. The engine owns the resulting order; never omit a present companion merely to fit the two-creature encounter operation. Coordinate combat uses the saved spatial scene. Supply one combat_scenes entry when admitting a later roster or an actual new arena. Omit it to reuse the scene. For the same map ID, keep the existing bounds, grid and layers: all saved bodies, objects, blockers, zones and terrain remain authoritative; supplied rows with existing IDs do not edit or relocate them. New IDs add genuinely present scene facts. For a new map ID, explicitly place every accompanying saved body/object by its exact ID. Existing dimensions, activity and mechanic metadata are retained; only actual destination position, facing, plane and ambient lighting are admitted. Include active summons, carried/worn objects, and a live Mage Hand with its cargo and caster. Arena replacement is unavailable while an anchored object, wall panel including permanent Stone, retained coordinate area/terrain or anchored light needs its current scene. Those effects are preserved and the operation clearly rejects before initiative; do not remove them or substitute a different map ID to bypass this limit. Exploration does not require map movement.",
+      "pre_conditions": [
+        {
+          "condition": "combat.encounter_active != true",
+          "error": "A combat encounter is already active."
+        },
+        {
+          "condition": "combat.turn_active != true",
+          "error": "An encounter cannot start while a combat turn is active."
+        }
+      ],
+      "effects": [
+        {
+          "set": {
+            "field": "_reentry_combatants",
+            "value": "combatants"
+          }
+        },
+        {
+          "call": "admit_srd_lite_combat_scene",
+          "params": {
+            "scenes": "{combat_scenes}",
+            "actors": "{_reentry_combatants}",
+            "lasting_state": "{_lasting_state_id}"
+          }
+        },
+        {
+          "spatial_query": {
+            "scene": "state.spatial_scene",
+            "operation": "snapshot"
+          },
+          "store_as": "_setup_snapshot"
+        },
+        {
+          "require": {
+            "condition": "state.spatial_scene.map.grid.unit == 'ft'",
+            "error": "SRD combat positions and body dimensions must use feet."
+          }
+        },
+        {
+          "set": {
+            "field": "_setup_combatants",
+            "value": "combatants"
+          }
+        },
+        {
+          "for_each": {
+            "collection": "_setup_combatants",
+            "as": "_setup_actor",
+            "do": [
+              {
+                "call": "srd_information_scene_entity",
+                "params": {
+                  "subject": "{_setup_actor}",
+                  "lasting_state": "{_lasting_state_id}"
+                },
+                "export_context": {
+                  "_setup_body": "_info_scene_entity"
+                }
+              },
+              {
+                "require": {
+                  "condition": "_setup_body.metadata.participant_ref == _setup_actor and _setup_body.metadata.is_object != true and _setup_body.metadata.creature_type != null and _setup_body.metadata.plane != null and _setup_body.metadata.plane != ''",
+                  "error": "Every combatant needs one active creature body bound to its actual actor and plane."
+                }
+              }
+            ]
+          }
+        },
+        {
+          "set": {
+            "field": "_initiative_combatants",
+            "value": "combatants"
+          }
+        },
+        {
+          "set": {
+            "field": "_initiative_rollers",
+            "value": []
+          }
+        },
+        {
+          "for_each": {
+            "collection": "combatants",
+            "as": "_initiative_combatant_id",
+            "do": [
+              {
+                "call": "classify_srd_summon_initiative_entry",
+                "params": {
+                  "creature_state": "{_initiative_combatant_id}"
+                },
+                "export_context": {
+                  "_initiative_is_summon": "_initiative_is_summon",
+                  "_initiative_summon_owner": "_initiative_summon_owner"
+                }
+              },
+              {
+                "condition": "_initiative_is_summon == true",
+                "on_true": [
+                  {
+                    "require": {
+                      "condition": "_initiative_summon_owner in combatants",
+                      "error": "Include the summoner when its active creature joins Initiative."
+                    }
+                  }
+                ],
+                "on_false": [
+                  {
+                    "list_push": {
+                      "list": "_initiative_rollers",
+                      "value": "_initiative_combatant_id"
+                    },
+                    "store_as": "_initiative_rollers"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "for_each": {
+            "collection": "uncanny_metabolism_users",
+            "as": "_metabolism_user",
+            "do": [
+              {
+                "require": {
+                  "condition": "_metabolism_user in _initiative_combatants",
+                  "error": "Uncanny Metabolism can only be selected for a creature rolling Initiative in this encounter."
+                }
+              }
+            ]
+          }
+        },
+        {
+          "set": {
+            "field": "_initiative_order",
+            "value": []
+          }
+        },
+        {
+          "for_each": {
+            "collection": "_initiative_rollers",
+            "as": "_modifier_initiative_actor",
+            "do": [
+              {
+                "call": "roll_srd_actor_group_initiative",
+                "params": {
+                  "actor_state": "{_modifier_initiative_actor}"
+                },
+                "export_context": {
+                  "_actor_initiative_entry": "_actor_initiative_entry"
+                }
+              },
+              {
+                "list_push": {
+                  "list": "_initiative_order",
+                  "value": "_actor_initiative_entry"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "sort": {
+            "collection": "_initiative_order",
+            "by": "initiative_result",
+            "direction": "desc"
+          }
+        },
+        {
+          "set": {
+            "field": "combat.order",
+            "value": "_initiative_order"
+          }
+        },
+        {
+          "set": {
+            "field": "combat.turn_index",
+            "value": -1
+          }
+        },
+        {
+          "call": "organize_srd_summons_in_initiative",
+          "params": {
+            "combatants": "{combatants}"
+          }
+        },
+        {
+          "set": {
+            "field": "_initiative_order",
+            "value": "combat.order"
+          }
+        },
+        {
+          "call": "qualify_srd_lite_offensive_combat_entry",
+          "params": {
+            "lasting_state": "state"
+          }
+        },
+        {
+          "set": {
+            "field": "combat.encounter_active",
+            "value": true
+          }
+        },
+        {
+          "set": {
+            "field": "combat.group_order",
+            "value": true
+          }
+        },
+        {
+          "set": {
+            "field": "combat.phase",
+            "value": "awaiting_turn_start"
+          }
+        },
+        {
+          "set": {
+            "field": "combat.round",
+            "value": 1
+          }
+        },
+        {
+          "set": {
+            "field": "combat.order_first",
+            "value": null
+          }
+        },
+        {
+          "set": {
+            "field": "combat.order_second",
+            "value": null
+          }
+        },
+        {
+          "advance_initiative": {
+            "skip_field": "is_alive",
+            "skip_equals": false
+          },
+          "store_as": "_current_actor_after"
+        },
+        {
+          "call": "sync_srd_group_lasting_clock",
+          "params": {
+            "lasting_state": "state",
+            "initialize": true
+          }
+        },
+        {
+          "set": {
+            "field": "combat.last_end_reason",
+            "value": null
+          }
+        },
+        {
+          "set": {
+            "field": "combat.active_actor",
+            "value": null
+          }
+        },
+        {
+          "set": {
+            "field": "combat.active_actor_kind",
+            "value": null
+          }
+        },
+        {
+          "set": {
+            "field": "combat.turn_active",
+            "value": false
+          }
+        },
+        {
+          "set": {
+            "field": "combat.movement_remaining",
+            "value": 0
+          }
+        },
+        {
+          "set": {
+            "field": "combat.movement_spent",
+            "value": 0
+          }
+        },
+        {
+          "set": {
+            "field": "combat.action_available",
+            "value": false
+          }
+        },
+        {
+          "log": {
+            "message": "Group combat Initiative order established from canonical creature states."
+          }
+        },
+        {
+          "set": {
+            "field": "_initiative_summary",
+            "value": []
+          }
+        },
+        {
+          "set": {
+            "field": "_initiative_details",
+            "value": []
+          }
+        },
+        {
+          "set": {
+            "field": "_steed_initiative_equations",
+            "value": []
+          }
+        },
+        {
+          "for_each": {
+            "collection": "_initiative_order",
+            "as": "_entry",
+            "do": [
+              {
+                "list_push": {
+                  "list": "_initiative_summary",
+                  "value": {
+                    "label": "_entry.label",
+                    "value": "_entry.initiative_result"
+                  }
+                },
+                "store_as": "_initiative_summary"
+              },
+              {
+                "condition": "_entry.initiative_source_label != null",
+                "on_true": [
+                  {
+                    "list_push": {
+                      "list": "_initiative_details",
+                      "value": {
+                        "label": "'Creature'",
+                        "value": "_entry.label"
+                      }
+                    }
+                  },
+                  {
+                    "list_push": {
+                      "list": "_initiative_details",
+                      "value": {
+                        "label": "'Shares Initiative with'",
+                        "value": "_entry.initiative_source_label"
+                      }
+                    }
+                  },
+                  {
+                    "list_push": {
+                      "list": "_initiative_details",
+                      "value": {
+                        "label": "'Total'",
+                        "value": "_entry.initiative_result"
+                      }
+                    }
+                  }
+                ],
+                "on_false": [
+                  {
+                    "list_push": {
+                      "list": "_initiative_details",
+                      "value": {
+                        "label": "'Creature'",
+                        "value": "_entry.label"
+                      }
+                    },
+                    "store_as": "_initiative_details"
+                  },
+                  {
+                    "list_push": {
+                      "list": "_initiative_details",
+                      "value": {
+                        "label": "'D20 results'",
+                        "value": "_entry.roll.results"
+                      }
+                    },
+                    "store_as": "_initiative_details"
+                  },
+                  {
+                    "list_push": {
+                      "list": "_initiative_details",
+                      "value": {
+                        "label": "'Modifier'",
+                        "value": "_entry.modifier"
+                      }
+                    },
+                    "store_as": "_initiative_details"
+                  },
+                  {
+                    "list_push": {
+                      "list": "_initiative_details",
+                      "value": {
+                        "label": "'Total'",
+                        "value": "_entry.initiative_result",
+                        "equation": {
+                          "die_sides": 20,
+                          "roll": "_entry.roll.total",
+                          "modifier": "_entry.modifier",
+                          "total": "_entry.initiative_result"
+                        }
+                      }
+                    },
+                    "store_as": "_initiative_details"
+                  },
+                  {
+                    "condition": "len(_steed_initiative_equations) < 4",
+                    "on_true": [
+                      {
+                        "list_push": {
+                          "list": "_steed_initiative_equations",
+                          "value": {
+                            "label": "_entry.label",
+                            "value": "'Initiative'",
+                            "equation": {
+                              "die_sides": 20,
+                              "roll": "_entry.roll.total",
+                              "modifier": "_entry.modifier",
+                              "total": "_entry.initiative_result"
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "for_each": {
+            "collection": "combatants",
+            "as": "_rest_combatant",
+            "do": [
+              {
+                "call": "interrupt_srd_rest",
+                "params": {
+                  "target_state": "{_rest_combatant}",
+                  "reason": "initiative"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "for_each": {
+            "collection": "_initiative_combatants",
+            "as": "_recovery_actor",
+            "do": [
+              {
+                "set": {
+                  "field": "_use_metabolism",
+                  "value": "_recovery_actor in uncanny_metabolism_users"
+                }
+              },
+              {
+                "call": "resolve_srd_initiative_recovery",
+                "params": {
+                  "actor_state": "{_recovery_actor}",
+                  "use_uncanny_metabolism": "{_use_metabolism}"
+                },
+                "export_context": {
+                  "_monk_initiative_rows": "_monk_initiative_rows"
+                }
+              },
+              {
+                "for_each": {
+                  "collection": "_monk_initiative_rows",
+                  "as": "_recovery_row",
+                  "do": [
+                    {
+                      "list_push": {
+                        "list": "_initiative_details",
+                        "value": "_recovery_row"
+                      },
+                      "store_as": "_initiative_details"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "call": "finish_srd_shared_action_settlements",
+          "params": {
+            "lasting_state": "{_lasting_state_id}",
+            "known_spell_effect": "{known_spell_effect}"
+          },
+          "export_context": "*"
+        },
+        {
+          "call": "refresh_srd_lite_persistent_spell_map",
+          "params": {
+            "lasting_state": "{_lasting_state_id}"
+          }
+        }
+      ],
+      "narrative": {
+        "on_success": "Combat starts with every supplied creature in one authoritative Initiative order.",
+        "on_failure": "The group encounter cannot start."
+      },
+      "metadata": {
+        "category": "combat",
+        "costs_action": false,
+        "model_behavior": "leaves_player_intent_pending",
+        "result_card": {
+          "version": 1,
+          "footprint": "compact",
+          "title": "Initiative",
+          "subtitle": "Turn order",
+          "summary": {
+            "path": "context._initiative_summary"
+          },
+          "details_label": "Calculation",
+          "details": {
+            "path": "context._initiative_details"
+          },
+          "equations": {
+            "path": "context._steed_initiative_equations"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "combatants",
+          "type": "entity_id_list",
+          "resolve": "entity_list",
+          "min_items": 3,
+          "max_items": 16,
+          "unique_items": true
+        },
+        {
+          "name": "uncanny_metabolism_users",
+          "type": "entity_id_list",
+          "resolve": "entity_list",
+          "required": false,
+          "default": [],
+          "min_items": 0,
+          "max_items": 16,
+          "unique_items": true,
+          "description": "Monk combatants choosing Uncanny Metabolism when Initiative is rolled: regain all Focus and heal Monk level plus the Martial Arts die, once per Long Rest. Leave empty to decline; eligible level-15 Monks then receive Perfect Focus automatically."
+        },
+        {
+          "name": "lasting_state",
+          "required": false,
+          "default": "state",
+          "resolve": "entity",
+          "model_hidden": true
+        },
+        {
+          "name": "combat_scenes",
+          "type": "array",
+          "required": false,
+          "default": [],
+          "min_items": 0,
+          "max_items": 1,
+          "items": {
+            "type": "object"
+          }
+        },
+        {
+          "name": "known_spell_effect",
+          "type": "boolean",
+          "required": false,
+          "default": false
+        }
+      ]
+    },
+    "set_srd_illumination_cover": {
+      "description": "Record actual opaque covering of an admitted light-source object; covering does not quench Continual Flame. Outside combat, retained exploration objects use their local physical facts; no map setup or movement is required.",
+      "effects": [
+        {
+          "condition": "combat.encounter_active != true",
+          "on_true": [
+            {
+              "set": {
+                "field": "_lite_cover_allowed",
+                "value": false
+              }
+            },
+            {
+              "condition": "lasting_state.turn_effects != null",
+              "on_true": [
+                {
+                  "set": {
+                    "field": "_lite_cover_records",
+                    "value": "lasting_state.turn_effects"
+                  }
+                },
+                {
+                  "for_each": {
+                    "collection": "_lite_cover_records",
+                    "as": "_lite_cover_record",
+                    "do": [
+                      {
+                        "set": {
+                          "field": "_lite_cover_allowed",
+                          "value": true
+                        },
+                        "condition": "_lite_cover_record.kind == 'illumination_spell' and _lite_cover_record.source == object_id and (_lite_cover_record.spell == 'light' or _lite_cover_record.spell == 'daylight') and _lite_cover_record.spell in definitions.srd_lite_implemented and (_lite_cover_record.expires_tick == null or lasting_state.lasting_tick < _lite_cover_record.expires_tick)"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "require": {
+                "condition": "_lite_cover_allowed == true",
+                "error": "Covering requires this object's active selected Light or Daylight source."
+              }
+            },
+            {
+              "call": "require_srd_pending_window_closed"
+            },
+            {
+              "call": "lite_exploration_set_srd_illumination_cover_node",
+              "params": {
+                "object_id": "{object_id}",
+                "covered": "{covered}",
+                "lasting_state": "state"
+              },
+              "export_context": {
+                "_source_covered": "_source_covered"
+              }
+            },
+            {
+              "call": "finish_srd_shared_action_settlements",
+              "params": {
+                "lasting_state": "{_lasting_state_id}",
+                "known_spell_effect": "{known_spell_effect}"
+              },
+              "export_context": "*"
+            }
+          ],
+          "on_false": [
+            {
+              "set": {
+                "field": "_lite_cover_allowed",
+                "value": false
+              }
+            },
+            {
+              "condition": "lasting_state.turn_effects != null",
+              "on_true": [
+                {
+                  "set": {
+                    "field": "_lite_cover_records",
+                    "value": "lasting_state.turn_effects"
+                  }
+                },
+                {
+                  "for_each": {
+                    "collection": "_lite_cover_records",
+                    "as": "_lite_cover_record",
+                    "do": [
+                      {
+                        "set": {
+                          "field": "_lite_cover_allowed",
+                          "value": true
+                        },
+                        "condition": "_lite_cover_record.kind == 'illumination_spell' and _lite_cover_record.source == object_id and (_lite_cover_record.spell == 'light' or _lite_cover_record.spell == 'daylight') and _lite_cover_record.spell in definitions.srd_lite_implemented and (_lite_cover_record.expires_tick == null or lasting_state.lasting_tick < _lite_cover_record.expires_tick)"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "require": {
+                "condition": "_lite_cover_allowed == true",
+                "error": "Covering requires this object's active selected Light or Daylight source."
+              }
+            },
+            {
+              "call": "require_srd_pending_window_closed"
+            },
+            {
+              "call": "set_srd_illumination_cover_node",
+              "params": {
+                "object_id": "{object_id}",
+                "covered": "{covered}",
+                "lasting_state": "state"
+              },
+              "export_context": {
+                "_source_covered": "_source_covered"
+              }
+            },
+            {
+              "call": "finish_srd_shared_action_settlements",
+              "params": {
+                "lasting_state": "{_lasting_state_id}",
+                "known_spell_effect": "{known_spell_effect}"
+              },
+              "export_context": "*"
+            }
+          ]
+        },
+        {
+          "call": "refresh_srd_lite_persistent_spell_map",
+          "params": {
+            "lasting_state": "{_lasting_state_id}"
+          }
+        }
+      ],
+      "metadata": {
+        "category": "exploration",
+        "costs_action": false,
+        "result_card": {
+          "version": 1,
+          "footprint": "compact",
+          "title": "Light source covering",
+          "summary": [
+            {
+              "label": "Covered",
+              "value": {
+                "path": "context._source_covered",
+                "labels": {
+                  "true": "Yes",
+                  "false": "No"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "parameters": [
+        {
+          "name": "object_id"
+        },
+        {
+          "name": "covered",
+          "type": "boolean"
+        },
+        {
+          "name": "lasting_state",
+          "required": false,
+          "default": "state",
+          "resolve": "entity",
+          "model_hidden": true
+        },
+        {
+          "name": "known_spell_effect",
+          "type": "boolean",
+          "required": false,
+          "default": false
+        }
+      ]
+    },
+    "dismiss_srd_illumination_spell": {
+      "description": "Dismiss this caster's selected illumination effect, preserving every independent source.",
+      "effects": [
+        {
+          "condition": "spell in definitions.srd_lite_aliases",
+          "on_true": [
+            {
+              "set": {
+                "field": "spell",
+                "value": "definitions.srd_lite_aliases[spell]"
+              }
+            }
+          ]
+        },
+        {
+          "require": {
+            "condition": "spell in definitions.srd_lite_catalogue",
+            "error": "This spell is excluded from the SRD Lite normal-player catalogue."
+          }
+        },
+        {
+          "require": {
+            "condition": "spell in definitions.srd_lite_implemented",
+            "error": "This SRD Lite profile is pending; it cannot be selected or cast yet."
+          }
+        },
+        {
+          "call": "require_srd_pending_window_closed"
+        },
+        {
+          "call": "dismiss_srd_illumination_spell_node",
+          "params": {
+            "caster_state": "{_caster_state_id}",
+            "spell": "{spell}",
+            "lasting_state": "state"
+          },
+          "export_context": {
+            "_dismiss_light_count": "_dismiss_light_count"
+          }
+        },
+        {
+          "set": {
+            "field": "time_stop_state.time_stop_source.spell_action_active",
+            "value": false
+          },
+          "condition": "time_stop_state.time_stop_source != null"
+        },
+        {
+          "call": "finalize_srd_time_stop",
+          "condition": "time_stop_state.time_stop_source != null and time_stop_state.time_stop_source.ending == true"
+        },
+        {
+          "call": "refresh_srd_lite_persistent_spell_map",
+          "params": {
+            "lasting_state": "state"
+          }
+        }
+      ],
+      "metadata": {
+        "category": "exploration",
+        "costs_action": false,
+        "result_card": {
+          "version": 1,
+          "footprint": "compact",
+          "title": "Illumination dismissed",
+          "summary": [
+            {
+              "label": "Sources released",
+              "value": {
+                "path": "context._dismiss_light_count"
+              }
+            }
+          ]
+        }
+      },
+      "parameters": [
+        {
+          "name": "caster_state",
+          "resolve": "entity"
+        },
+        {
+          "name": "spell"
+        },
+        {
+          "name": "time_stop_state",
+          "resolve": "entity",
+          "required": false,
+          "default": "state",
+          "model_hidden": true
+        }
+      ],
+      "pre_conditions": [
+        {
+          "condition": "spell in definitions.srd_lite_catalogue or spell in definitions.srd_lite_aliases",
+          "error": "This spell is excluded from the SRD Lite normal-player catalogue."
+        },
+        {
+          "condition": "spell in definitions.srd_lite_implemented or (spell in definitions.srd_lite_aliases and definitions.srd_lite_aliases[spell] in definitions.srd_lite_implemented)",
+          "error": "This SRD Lite profile is pending; it cannot be selected or cast yet."
+        },
+        {
+          "condition": "spell in definitions.srd_lite_implemented or (spell in definitions.srd_lite_aliases and definitions.srd_lite_aliases[spell] in definitions.srd_lite_implemented)",
+          "error": "This follow-up action requires a selected SRD Lite spell."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,210 @@
+0 | Acid Splash
+0 | Blade Ward
+0 | Bone Chill
+0 | Booming Blade
+0 | Bursting Sinew
+0 | Dancing Lights
+0 | Eldritch Blast
+0 | Fire Bolt
+0 | Friends
+0 | Guidance
+0 | Light
+0 | Mage Hand
+0 | Minor Illusion
+0 | Poison Spray
+0 | Produce Flame
+0 | Ray of Frost
+0 | Resistance
+0 | Sacred Flame
+0 | Shillelagh
+0 | Shocking Grasp
+0 | Thaumaturgy
+0 | Thorn Whip
+0 | Toll the Dead
+0 | True Strike
+0 | Vicious Mockery
+1 | Animal Friendship
+1 | Armour of Agathys
+1 | Arms of Hadar
+1 | Bane
+1 | Bless
+1 | Burning Hands
+1 | Charm Person
+1 | Chromatic Orb
+1 | Colour Spray
+1 | Command
+1 | Compelled Duel
+1 | Create or Destroy Water
+1 | Cure Wounds
+1 | Disguise Self
+1 | Dissonant Whispers
+1 | Divine Favour
+1 | Enhance Leap
+1 | Ensnaring Strike
+1 | Entangle
+1 | Expeditious Retreat
+1 | Faerie Fire
+1 | False Life
+1 | Feather Fall
+1 | Find Familiar
+1 | Fog Cloud
+1 | Goodberry
+1 | Grease
+1 | Guiding Bolt
+1 | Hail of Thorns
+1 | Healing Word
+1 | Hellish Rebuke
+1 | Heroism
+1 | Hex
+1 | Hunter's Mark
+1 | Ice Knife
+1 | Inflict Wounds
+1 | Longstrider
+1 | Mage Armour
+1 | Magic Missile
+1 | Protection from Evil and Good
+1 | Ray of Sickness
+1 | Sanctuary
+1 | Searing Smite
+1 | Shield
+1 | Shield of Faith
+1 | Sleep
+1 | Speak with Animals
+1 | Tasha's Hideous Laughter
+1 | Thunderous Smite
+1 | Thunderwave
+1 | Witch Bolt
+1 | Wrathful Smite
+2 | Aid
+2 | Arcane Lock
+2 | Barkskin
+2 | Blindness
+2 | Blur
+2 | Branding Smite
+2 | Calm Emotions
+2 | Cloud of Daggers
+2 | Crown of Madness
+2 | Darkness
+2 | Darkvision
+2 | Detect Thoughts
+2 | Enhance Ability
+2 | Enlarge/Reduce
+2 | Enthrall
+2 | Flame Blade
+2 | Flaming Sphere
+2 | Gust of Wind
+2 | Heat Metal
+2 | Hold Person
+2 | Invisibility
+2 | Knock
+2 | Lesser Restoration
+2 | Magic Weapon
+2 | Melf's Acid Arrow
+2 | Mirror Image
+2 | Misty Step
+2 | Moonbeam
+2 | Pass Without Trace
+2 | Phantasmal Force
+2 | Prayer of Healing
+2 | Protection from Poison
+2 | Ray of Enfeeblement
+2 | Scorching Ray
+2 | See Invisibility
+2 | Shadow Blade
+2 | Shatter
+2 | Silence
+2 | Spike Growth
+2 | Spiritual Weapon
+2 | Warding Bond
+2 | Web
+3 | Animate Dead
+3 | Beacon of Hope
+3 | Bestow Curse
+3 | Blinding Smite
+3 | Blink
+3 | Call Lightning
+3 | Conjure Barrage
+3 | Counterspell
+3 | Crusader's Mantle
+3 | Daylight
+3 | Elemental Weapon
+3 | Fear
+3 | Feign Death
+3 | Fireball
+3 | Gaseous Form
+3 | Glyph of Warding
+3 | Grant Flight
+3 | Haste
+3 | Hunger of Hadar
+3 | Hypnotic Pattern
+3 | Lightning Arrow
+3 | Lightning Bolt
+3 | Mass Healing Word
+3 | Plant Growth
+3 | Protection from Energy
+3 | Remove Curse
+3 | Revivify
+3 | Sleet Storm
+3 | Slow
+3 | Speak with Dead
+3 | Spirit Guardians
+3 | Stinking Cloud
+3 | Vampiric Touch
+3 | Warden of Vitality
+4 | Banishment
+4 | Blight
+4 | Confusion
+4 | Conjure Minor Elemental
+4 | Conjure Woodland Being
+4 | Death Ward
+4 | Dimension Door
+4 | Dominate Beast
+4 | Evard's Black Tentacles
+4 | Fire Shield
+4 | Freedom of Movement
+4 | Grasping Vine
+4 | Greater Invisibility
+4 | Guardian of Faith
+4 | Ice Storm
+4 | Otiluke's Resilient Sphere
+4 | Phantasmal Killer
+4 | Polymorph
+4 | Staggering Smite
+4 | Stoneskin
+4 | Wall of Fire
+5 | Banishing Smite
+5 | Cloudkill
+5 | Cone of Cold
+5 | Conjure Elemental
+5 | Contagion
+5 | Destructive Wave
+5 | Dispel Evil And Good
+5 | Dominate Person
+5 | Flame Strike
+5 | Greater Restoration
+5 | Hold Monster
+5 | Insect Plague
+5 | Mass Cure Wounds
+5 | Planar Binding
+5 | Seeming
+5 | Telekinesis
+5 | Wall of Stone
+6 | Arcane Gate
+6 | Blade Barrier
+6 | Chain Lightning
+6 | Circle of Death
+6 | Create Undead
+6 | Disintegrate
+6 | Eyebite
+6 | Flesh to Stone
+6 | Globe of Invulnerability
+6 | Harm
+6 | Heal
+6 | Heroes' Feast
+6 | Otiluke's Freezing Sphere
+6 | Otto's Irresistible Dance
+6 | Planar Ally
+6 | Sunbeam
+6 | Wall of Ice
+6 | Wall of Thorns
+6 | Wind Walk

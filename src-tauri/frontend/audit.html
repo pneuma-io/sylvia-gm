@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sylvia GM — Full Audit</title>
+  <link rel="stylesheet" href="audit.css">
+</head>
+<body>
+  <header>
+    <div>
+      <p class="eyebrow">May contain spoilers</p>
+      <h1>Full Audit</h1>
+      <p id="audit-status" role="status">Connecting to Sylvia…</p>
+    </div>
+    <div class="controls">
+      <label><input id="auto-follow" type="checkbox" checked> Follow latest</label>
+      <button id="pause-btn" type="button">Pause view</button>
+    </div>
+  </header>
+  <section class="toolbar" aria-label="Audit filters">
+    <button id="older-btn" type="button">Older 50</button>
+    <button id="newer-btn" type="button">Newer 50</button>
+    <button id="latest-btn" type="button">Latest</button>
+    <input id="audit-search" type="search"
+           placeholder="Search this page">
+    <span id="record-count">0 records</span>
+  </section>
+  <main id="audit-records" aria-live="polite"></main>
+  <template id="empty-template">
+    <section class="empty">
+      <h2>No Full Audit records yet</h2>
+      <p>Leave this window open while you run the model. Exact records will appear here in order.</p>
+    </section>
+  </template>
+  <script src="audit.js"></script>
+</body>
+</html>

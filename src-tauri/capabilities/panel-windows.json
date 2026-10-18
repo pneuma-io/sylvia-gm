@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "desktop-panel-windows",
+  "description": "Local Sylvia main and registered game-panel windows",
+  "windows": ["main", "panel-*"],
+  "permissions": ["core:default"]
+}

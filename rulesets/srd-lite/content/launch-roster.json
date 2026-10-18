@@ -1,0 +1,2798 @@
+{
+  "format": "sylvia-srd-lite-launch-roster",
+  "revision": 1,
+  "authority": "Historical 96-spell launch selection with 47 additions to existing class/subclass progression. Sixteen deferred profiles remain preserved. No new class or subclass is selected by this record; the current catalogue adds exactly 21 preserved implementations for the 117-spell Lite launch.",
+  "roster_sha256": "e5855084fe1caddec8f4d5851470ce9c861b10a51a5d5dab376c46650b472ab3",
+  "retained_full_srd_runtime_sha256": "58650516cfd6cf90b52263a357bf186430366c28d1f240cbb776b029ce0c81cf",
+  "cloud_header_provenance": {
+    "identity": "cloud_of_daggers",
+    "header": {
+      "name": "Cloud of Daggers",
+      "level": 2,
+      "school": "conjuration",
+      "classes": [
+        "bard",
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "casting_time": "Action",
+      "ritual": false,
+      "range": "60 feet",
+      "components": [
+        "verbal",
+        "somatic"
+      ],
+      "material": "",
+      "material_has_cost": false,
+      "material_consumed": false,
+      "focus_substitution": false,
+      "duration": "Concentration, up to 10 turns",
+      "material_parts": []
+    },
+    "candidate_path": "retained-generation-017/srd-lite-foundation.sylvia-gm-package",
+    "candidate_sha256": "ae35846ea29e04362b31611ac854c1b6d083b30177333a4f0c8fa8e00caeb9d9",
+    "runtime_sha256": "46cec2547f176c1fc762e03b89fd0f99076367abe218ec133db07cbff3c769b4",
+    "scope": "Retained existing Lite Cloud of Daggers eligibility only; no new SRD identity, class rule or behavior acceptance inferred."
+  },
+  "count": 96,
+  "profiles": [
+    {
+      "name": "Fire Bolt",
+      "identity": "fire_bolt",
+      "aliases": [],
+      "level": 0,
+      "school": "evocation",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "cantrip",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Ray of Frost",
+      "identity": "ray_of_frost",
+      "aliases": [],
+      "level": 0,
+      "school": "evocation",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "cantrip",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Shocking Grasp",
+      "identity": "shocking_grasp",
+      "aliases": [],
+      "level": 0,
+      "school": "evocation",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "cantrip",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Acid Splash",
+      "identity": "acid_splash",
+      "aliases": [],
+      "level": 0,
+      "school": "evocation",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "damage",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Poison Spray",
+      "identity": "poison_spray",
+      "aliases": [],
+      "level": 0,
+      "school": "necromancy",
+      "classes": [
+        "druid",
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "owner": "cantrip",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Sacred Flame",
+      "identity": "sacred_flame",
+      "aliases": [],
+      "level": 0,
+      "school": "evocation",
+      "classes": [
+        "cleric"
+      ],
+      "owner": "cantrip",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Eldritch Blast",
+      "identity": "eldritch_blast",
+      "aliases": [],
+      "level": 0,
+      "school": "evocation",
+      "classes": [
+        "warlock"
+      ],
+      "owner": "cantrip",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Vicious Mockery",
+      "identity": "vicious_mockery",
+      "aliases": [],
+      "level": 0,
+      "school": "enchantment",
+      "classes": [
+        "bard"
+      ],
+      "owner": "cantrip",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Guidance",
+      "identity": "guidance",
+      "aliases": [],
+      "level": 0,
+      "school": "divination",
+      "classes": [
+        "cleric",
+        "druid"
+      ],
+      "owner": "healing",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Light",
+      "identity": "light",
+      "aliases": [],
+      "level": 0,
+      "school": "evocation",
+      "classes": [
+        "bard",
+        "cleric",
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "utility",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Shillelagh",
+      "identity": "shillelagh",
+      "aliases": [],
+      "level": 0,
+      "school": "transmutation",
+      "classes": [
+        "druid"
+      ],
+      "owner": "weapon",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Magic Missile",
+      "identity": "magic_missile",
+      "aliases": [],
+      "level": 1,
+      "school": "evocation",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "main",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Burning Hands",
+      "identity": "burning_hands",
+      "aliases": [],
+      "level": 1,
+      "school": "evocation",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "main",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Guiding Bolt",
+      "identity": "guiding_bolt",
+      "aliases": [],
+      "level": 1,
+      "school": "evocation",
+      "classes": [
+        "cleric"
+      ],
+      "owner": "main",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Cure Wounds",
+      "identity": "cure_wounds",
+      "aliases": [],
+      "level": 1,
+      "school": "abjuration",
+      "classes": [
+        "bard",
+        "cleric",
+        "druid",
+        "paladin",
+        "ranger"
+      ],
+      "owner": "main",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Healing Word",
+      "identity": "healing_word",
+      "aliases": [],
+      "level": 1,
+      "school": "abjuration",
+      "classes": [
+        "bard",
+        "cleric",
+        "druid"
+      ],
+      "owner": "main",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Bless",
+      "identity": "bless",
+      "aliases": [],
+      "level": 1,
+      "school": "enchantment",
+      "classes": [
+        "cleric",
+        "paladin"
+      ],
+      "owner": "main",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Shield",
+      "identity": "shield",
+      "aliases": [],
+      "level": 1,
+      "school": "abjuration",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "main",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Mage Armour",
+      "identity": "mage_armor",
+      "aliases": [
+        "mage_armour"
+      ],
+      "level": 1,
+      "school": "abjuration",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "main",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Longstrider",
+      "identity": "longstrider",
+      "aliases": [],
+      "level": 1,
+      "school": "transmutation",
+      "classes": [
+        "bard",
+        "druid",
+        "ranger",
+        "wizard"
+      ],
+      "owner": "utility",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Hunter’s Mark",
+      "identity": "hunters_mark",
+      "aliases": [
+        "hunter_s_mark"
+      ],
+      "level": 1,
+      "school": "divination",
+      "classes": [
+        "ranger"
+      ],
+      "owner": "weapon",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Hex",
+      "identity": "hex",
+      "aliases": [],
+      "level": 1,
+      "school": "enchantment",
+      "classes": [
+        "warlock"
+      ],
+      "owner": "weapon",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Scorching Ray",
+      "identity": "scorching_ray",
+      "aliases": [],
+      "level": 2,
+      "school": "evocation",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "main",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Cloud of Daggers",
+      "identity": "cloud_of_daggers",
+      "aliases": [],
+      "level": 2,
+      "school": "conjuration",
+      "classes": [
+        "bard",
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "owner": "main",
+      "srd_identity_present": false,
+      "source_url": "retained-admitted-lite-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Misty Step",
+      "identity": "misty_step",
+      "aliases": [],
+      "level": 2,
+      "school": "conjuration",
+      "classes": [
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "owner": "utility",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Darkvision",
+      "identity": "darkvision",
+      "aliases": [],
+      "level": 2,
+      "school": "transmutation",
+      "classes": [
+        "druid",
+        "ranger",
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "utility",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Aid",
+      "identity": "aid",
+      "aliases": [],
+      "level": 2,
+      "school": "abjuration",
+      "classes": [
+        "bard",
+        "cleric",
+        "druid",
+        "paladin",
+        "ranger"
+      ],
+      "owner": "healing",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Lesser Restoration",
+      "identity": "lesser_restoration",
+      "aliases": [],
+      "level": 2,
+      "school": "abjuration",
+      "classes": [
+        "bard",
+        "cleric",
+        "druid",
+        "paladin",
+        "ranger"
+      ],
+      "owner": "healing",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Fireball",
+      "identity": "fireball",
+      "aliases": [],
+      "level": 3,
+      "school": "evocation",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "main",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Lightning Bolt",
+      "identity": "lightning_bolt",
+      "aliases": [],
+      "level": 3,
+      "school": "evocation",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "damage",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Mass Healing Word",
+      "identity": "mass_healing_word",
+      "aliases": [],
+      "level": 3,
+      "school": "abjuration",
+      "classes": [
+        "bard",
+        "cleric"
+      ],
+      "owner": "healing",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Daylight",
+      "identity": "daylight",
+      "aliases": [],
+      "level": 3,
+      "school": "evocation",
+      "classes": [
+        "cleric",
+        "druid",
+        "paladin",
+        "ranger",
+        "sorcerer"
+      ],
+      "owner": "area",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Protection from Energy",
+      "identity": "protection_from_energy",
+      "aliases": [],
+      "level": 3,
+      "school": "abjuration",
+      "classes": [
+        "cleric",
+        "druid",
+        "ranger",
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "healing",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Counterspell",
+      "identity": "counterspell",
+      "aliases": [],
+      "level": 3,
+      "school": "abjuration",
+      "classes": [
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "owner": "weapon",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Ice Storm",
+      "identity": "ice_storm",
+      "aliases": [],
+      "level": 4,
+      "school": "evocation",
+      "classes": [
+        "druid",
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "area",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Blight",
+      "identity": "blight",
+      "aliases": [],
+      "level": 4,
+      "school": "necromancy",
+      "classes": [
+        "druid",
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "owner": "damage",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Death Ward",
+      "identity": "death_ward",
+      "aliases": [],
+      "level": 4,
+      "school": "abjuration",
+      "classes": [
+        "cleric",
+        "paladin"
+      ],
+      "owner": "healing",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Freedom of Movement",
+      "identity": "freedom_of_movement",
+      "aliases": [],
+      "level": 4,
+      "school": "abjuration",
+      "classes": [
+        "bard",
+        "cleric",
+        "druid",
+        "ranger"
+      ],
+      "owner": "healing",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Cone of Cold",
+      "identity": "cone_of_cold",
+      "aliases": [],
+      "level": 5,
+      "school": "evocation",
+      "classes": [
+        "druid",
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "damage",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Flame Strike",
+      "identity": "flame_strike",
+      "aliases": [],
+      "level": 5,
+      "school": "evocation",
+      "classes": [
+        "cleric"
+      ],
+      "owner": "damage",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Mass Cure Wounds",
+      "identity": "mass_cure_wounds",
+      "aliases": [],
+      "level": 5,
+      "school": "abjuration",
+      "classes": [
+        "bard",
+        "cleric",
+        "druid"
+      ],
+      "owner": "healing",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Greater Restoration",
+      "identity": "greater_restoration",
+      "aliases": [],
+      "level": 5,
+      "school": "abjuration",
+      "classes": [
+        "bard",
+        "cleric",
+        "druid",
+        "paladin",
+        "ranger"
+      ],
+      "owner": "healing",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Hold Monster",
+      "identity": "hold_monster",
+      "aliases": [],
+      "level": 5,
+      "school": "enchantment",
+      "classes": [
+        "bard",
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "owner": "control",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Heal",
+      "identity": "heal",
+      "aliases": [],
+      "level": 6,
+      "school": "abjuration",
+      "classes": [
+        "cleric",
+        "druid"
+      ],
+      "owner": "healing",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Fire Storm",
+      "identity": "fire_storm",
+      "aliases": [],
+      "level": 7,
+      "school": "evocation",
+      "classes": [
+        "cleric",
+        "druid",
+        "sorcerer"
+      ],
+      "owner": "highlevel",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Sunburst",
+      "identity": "sunburst",
+      "aliases": [],
+      "level": 8,
+      "school": "evocation",
+      "classes": [
+        "cleric",
+        "druid",
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "highlevel",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Power Word Stun",
+      "identity": "power_word_stun",
+      "aliases": [],
+      "level": 8,
+      "school": "enchantment",
+      "classes": [
+        "bard",
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "owner": "control",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Power Word Kill",
+      "identity": "power_word_kill",
+      "aliases": [],
+      "level": 9,
+      "school": "enchantment",
+      "classes": [
+        "bard",
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "owner": "control",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Foresight",
+      "identity": "foresight",
+      "aliases": [],
+      "level": 9,
+      "school": "divination",
+      "classes": [
+        "bard",
+        "druid",
+        "warlock",
+        "wizard"
+      ],
+      "owner": "utility",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "True Strike",
+      "identity": "true_strike",
+      "aliases": [],
+      "level": 0,
+      "school": "divination",
+      "classes": [
+        "bard",
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "owner": "cantrip",
+      "root_allocation_owner": "cantrip",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "interchangeable_capacity",
+          "justification": "Bard cantrip deficit at4 and Warlock deficits at4/10; retained working Lite source."
+        }
+      ]
+    },
+    {
+      "name": "Spare the Dying",
+      "identity": "spare_the_dying",
+      "aliases": [],
+      "level": 0,
+      "school": "necromancy",
+      "classes": [
+        "cleric",
+        "druid"
+      ],
+      "owner": "cantrip",
+      "root_allocation_owner": "cantrip",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "interchangeable_capacity",
+          "justification": "Cleric five-cantrip base capacity at10; also Druid Magician extra choice capacity."
+        }
+      ]
+    },
+    {
+      "name": "Thaumaturgy",
+      "identity": "thaumaturgy",
+      "aliases": [],
+      "level": 0,
+      "school": "transmutation",
+      "classes": [
+        "cleric"
+      ],
+      "owner": "cantrip",
+      "root_allocation_owner": "cantrip",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "interchangeable_capacity",
+          "justification": "Second additional Cleric cantrip for five base choices at10."
+        }
+      ]
+    },
+    {
+      "name": "Mending",
+      "identity": "mending",
+      "aliases": [],
+      "level": 0,
+      "school": "transmutation",
+      "classes": [
+        "bard",
+        "cleric",
+        "druid",
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "cantrip",
+      "root_allocation_owner": "cantrip",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "interchangeable_capacity",
+          "justification": "Sixth distinct Cleric cantrip preserves the existing optional Thaumaturge extra-cantrip order at10 alongside five ordinary choices."
+        }
+      ]
+    },
+    {
+      "name": "Chromatic Orb",
+      "identity": "chromatic_orb",
+      "aliases": [],
+      "level": 1,
+      "school": "evocation",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "damage",
+      "root_allocation_owner": "damage",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "sorcerer",
+          "subclass": "draconic_sorcery",
+          "source": "draconic_spells",
+          "level": 3
+        }
+      ]
+    },
+    {
+      "name": "Circle of Death",
+      "identity": "circle_of_death",
+      "aliases": [],
+      "level": 6,
+      "school": "necromancy",
+      "classes": [
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "owner": "damage",
+      "root_allocation_owner": "damage",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "interchangeable_capacity",
+          "justification": "Interchangeable rank6 Warlock Arcanum choice at11; reuse the retained generic area-damage family exercised by other current native spells."
+        }
+      ]
+    },
+    {
+      "name": "Ray of Sickness",
+      "identity": "ray_of_sickness",
+      "aliases": [],
+      "level": 1,
+      "school": "necromancy",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "damage",
+      "root_allocation_owner": "damage",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "druid",
+          "subclass": "circle_of_land",
+          "source": "land_tropical",
+          "level": 3
+        }
+      ]
+    },
+    {
+      "name": "Dragon’s Breath",
+      "identity": "dragons_breath",
+      "aliases": [],
+      "level": 2,
+      "school": "transmutation",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "damage",
+      "root_allocation_owner": "damage",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "sorcerer",
+          "subclass": "draconic_sorcery",
+          "source": "draconic_spells",
+          "level": 3
+        }
+      ]
+    },
+    {
+      "name": "Command",
+      "identity": "command",
+      "aliases": [],
+      "level": 1,
+      "school": "enchantment",
+      "classes": [
+        "bard",
+        "cleric",
+        "paladin"
+      ],
+      "owner": "control",
+      "root_allocation_owner": "control",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "sorcerer",
+          "subclass": "draconic_sorcery",
+          "source": "draconic_spells",
+          "level": 3
+        },
+        {
+          "kind": "mandatory_fixed",
+          "class": "warlock",
+          "subclass": "fiend_patron",
+          "source": "fiend_spells",
+          "level": 3
+        }
+      ]
+    },
+    {
+      "name": "Suggestion",
+      "identity": "suggestion",
+      "aliases": [],
+      "level": 2,
+      "school": "enchantment",
+      "classes": [
+        "bard",
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "owner": "control",
+      "root_allocation_owner": "control",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "warlock",
+          "subclass": "fiend_patron",
+          "source": "fiend_spells",
+          "level": 3
+        }
+      ]
+    },
+    {
+      "name": "Fear",
+      "identity": "fear",
+      "aliases": [],
+      "level": 3,
+      "school": "illusion",
+      "classes": [
+        "bard",
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "owner": "control",
+      "root_allocation_owner": "control",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "sorcerer",
+          "subclass": "draconic_sorcery",
+          "source": "draconic_spells",
+          "level": 5
+        }
+      ]
+    },
+    {
+      "name": "Geas",
+      "identity": "geas",
+      "aliases": [],
+      "level": 5,
+      "school": "enchantment",
+      "classes": [
+        "bard",
+        "cleric",
+        "druid",
+        "paladin",
+        "wizard"
+      ],
+      "owner": "control",
+      "root_allocation_owner": "control",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "warlock",
+          "subclass": "fiend_patron",
+          "source": "fiend_spells",
+          "level": 9
+        }
+      ]
+    },
+    {
+      "name": "Zone of Truth",
+      "identity": "zone_of_truth",
+      "aliases": [],
+      "level": 2,
+      "school": "enchantment",
+      "classes": [
+        "bard",
+        "cleric",
+        "paladin"
+      ],
+      "owner": "control",
+      "root_allocation_owner": "control",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "paladin",
+          "subclass": "oath_of_devotion",
+          "source": "devotion_spells",
+          "level": 5
+        }
+      ]
+    },
+    {
+      "name": "Charm Monster",
+      "identity": "charm_monster",
+      "aliases": [],
+      "level": 4,
+      "school": "enchantment",
+      "classes": [
+        "bard",
+        "druid",
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "owner": "control",
+      "root_allocation_owner": "control",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "sorcerer",
+          "subclass": "draconic_sorcery",
+          "source": "draconic_spells",
+          "level": 7
+        }
+      ]
+    },
+    {
+      "name": "Sleep",
+      "identity": "sleep",
+      "aliases": [],
+      "level": 1,
+      "school": "enchantment",
+      "classes": [
+        "bard",
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "control",
+      "root_allocation_owner": "control",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "druid",
+          "subclass": "circle_of_land",
+          "source": "land_temperate",
+          "level": 3
+        }
+      ]
+    },
+    {
+      "name": "Hold Person",
+      "identity": "hold_person",
+      "aliases": [],
+      "level": 2,
+      "school": "enchantment",
+      "classes": [
+        "bard",
+        "cleric",
+        "druid",
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "owner": "control",
+      "root_allocation_owner": "control",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "druid",
+          "subclass": "circle_of_land",
+          "source": "land_polar",
+          "level": 3
+        }
+      ]
+    },
+    {
+      "name": "Polymorph",
+      "identity": "polymorph",
+      "aliases": [],
+      "level": 4,
+      "school": "transmutation",
+      "classes": [
+        "bard",
+        "druid",
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "control",
+      "root_allocation_owner": "control",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "druid",
+          "subclass": "circle_of_land",
+          "source": "land_tropical",
+          "level": 7
+        }
+      ]
+    },
+    {
+      "name": "Aura of Life",
+      "identity": "aura_of_life",
+      "aliases": [],
+      "level": 4,
+      "school": "abjuration",
+      "classes": [
+        "cleric",
+        "paladin"
+      ],
+      "owner": "healing",
+      "root_allocation_owner": "healing",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "cleric",
+          "subclass": "life_domain",
+          "source": "life_domain",
+          "level": 7
+        }
+      ]
+    },
+    {
+      "name": "Beacon of Hope",
+      "identity": "beacon_of_hope",
+      "aliases": [],
+      "level": 3,
+      "school": "abjuration",
+      "classes": [
+        "cleric"
+      ],
+      "owner": "healing",
+      "root_allocation_owner": "healing",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "paladin",
+          "subclass": "oath_of_devotion",
+          "source": "devotion_spells",
+          "level": 9
+        }
+      ]
+    },
+    {
+      "name": "Blur",
+      "identity": "blur",
+      "aliases": [],
+      "level": 2,
+      "school": "illusion",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "healing",
+      "root_allocation_owner": "healing",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "druid",
+          "subclass": "circle_of_land",
+          "source": "land_arid",
+          "level": 3
+        }
+      ]
+    },
+    {
+      "name": "Power Word Heal",
+      "identity": "power_word_heal",
+      "aliases": [],
+      "level": 9,
+      "school": "enchantment",
+      "classes": [
+        "bard",
+        "cleric"
+      ],
+      "owner": "healing",
+      "root_allocation_owner": "healing",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "bard",
+          "subclass": null,
+          "source": "words_of_creation",
+          "level": 20
+        }
+      ]
+    },
+    {
+      "name": "Protection from Evil and Good",
+      "identity": "protection_from_evil_and_good",
+      "aliases": [],
+      "level": 1,
+      "school": "abjuration",
+      "classes": [
+        "cleric",
+        "druid",
+        "paladin",
+        "warlock",
+        "wizard"
+      ],
+      "owner": "healing",
+      "root_allocation_owner": "healing",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "paladin",
+          "subclass": "oath_of_devotion",
+          "source": "devotion_spells",
+          "level": 3
+        }
+      ]
+    },
+    {
+      "name": "Revivify",
+      "identity": "revivify",
+      "aliases": [],
+      "level": 3,
+      "school": "necromancy",
+      "classes": [
+        "cleric",
+        "druid",
+        "paladin",
+        "ranger"
+      ],
+      "owner": "healing",
+      "root_allocation_owner": "healing",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "cleric",
+          "subclass": "life_domain",
+          "source": "life_domain",
+          "level": 5
+        }
+      ]
+    },
+    {
+      "name": "Shield of Faith",
+      "identity": "shield_of_faith",
+      "aliases": [],
+      "level": 1,
+      "school": "abjuration",
+      "classes": [
+        "cleric",
+        "paladin"
+      ],
+      "owner": "healing",
+      "root_allocation_owner": "healing",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "paladin",
+          "subclass": "oath_of_devotion",
+          "source": "devotion_spells",
+          "level": 3
+        }
+      ]
+    },
+    {
+      "name": "Fog Cloud",
+      "identity": "fog_cloud",
+      "aliases": [],
+      "level": 1,
+      "school": "conjuration",
+      "classes": [
+        "druid",
+        "ranger",
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "area",
+      "root_allocation_owner": "area",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "druid",
+          "subclass": "circle_of_land",
+          "source": "land_polar",
+          "level": 3
+        }
+      ]
+    },
+    {
+      "name": "Insect Plague",
+      "identity": "insect_plague",
+      "aliases": [],
+      "level": 5,
+      "school": "conjuration",
+      "classes": [
+        "cleric",
+        "druid",
+        "sorcerer"
+      ],
+      "owner": "area",
+      "root_allocation_owner": "area",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "warlock",
+          "subclass": "fiend_patron",
+          "source": "fiend_spells",
+          "level": 9
+        },
+        {
+          "kind": "mandatory_fixed",
+          "class": "druid",
+          "subclass": "circle_of_land",
+          "source": "land_tropical",
+          "level": 9
+        }
+      ]
+    },
+    {
+      "name": "Sleet Storm",
+      "identity": "sleet_storm",
+      "aliases": [],
+      "level": 3,
+      "school": "conjuration",
+      "classes": [
+        "druid",
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "area",
+      "root_allocation_owner": "area",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "druid",
+          "subclass": "circle_of_land",
+          "source": "land_polar",
+          "level": 5
+        }
+      ]
+    },
+    {
+      "name": "Stinking Cloud",
+      "identity": "stinking_cloud",
+      "aliases": [],
+      "level": 3,
+      "school": "conjuration",
+      "classes": [
+        "bard",
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "area",
+      "root_allocation_owner": "area",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "warlock",
+          "subclass": "fiend_patron",
+          "source": "fiend_spells",
+          "level": 5
+        },
+        {
+          "kind": "mandatory_fixed",
+          "class": "druid",
+          "subclass": "circle_of_land",
+          "source": "land_tropical",
+          "level": 5
+        }
+      ]
+    },
+    {
+      "name": "Wall of Fire",
+      "identity": "wall_of_fire",
+      "aliases": [],
+      "level": 4,
+      "school": "evocation",
+      "classes": [
+        "druid",
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "area",
+      "root_allocation_owner": "area",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "warlock",
+          "subclass": "fiend_patron",
+          "source": "fiend_spells",
+          "level": 7
+        }
+      ]
+    },
+    {
+      "name": "Wall of Stone",
+      "identity": "wall_of_stone",
+      "aliases": [],
+      "level": 5,
+      "school": "evocation",
+      "classes": [
+        "druid",
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "area",
+      "root_allocation_owner": "area",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "druid",
+          "subclass": "circle_of_land",
+          "source": "land_arid",
+          "level": 9
+        }
+      ]
+    },
+    {
+      "name": "Web",
+      "identity": "web",
+      "aliases": [],
+      "level": 2,
+      "school": "conjuration",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "area",
+      "root_allocation_owner": "area",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "druid",
+          "subclass": "circle_of_land",
+          "source": "land_tropical",
+          "level": 3
+        }
+      ]
+    },
+    {
+      "name": "Divine Smite",
+      "identity": "divine_smite",
+      "aliases": [],
+      "level": 1,
+      "school": "evocation",
+      "classes": [
+        "paladin"
+      ],
+      "owner": "weapon",
+      "root_allocation_owner": "weapon",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "paladin",
+          "subclass": null,
+          "source": "paladins_smite",
+          "level": 2
+        }
+      ]
+    },
+    {
+      "name": "Fire Shield",
+      "identity": "fire_shield",
+      "aliases": [],
+      "level": 4,
+      "school": "evocation",
+      "classes": [
+        "druid",
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "weapon",
+      "root_allocation_owner": "weapon",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "warlock",
+          "subclass": "fiend_patron",
+          "source": "fiend_spells",
+          "level": 7
+        }
+      ]
+    },
+    {
+      "name": "Alter Self",
+      "identity": "alter_self",
+      "aliases": [],
+      "level": 2,
+      "school": "transmutation",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "utility",
+      "root_allocation_owner": "utility",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "sorcerer",
+          "subclass": "draconic_sorcery",
+          "source": "draconic_spells",
+          "level": 3
+        }
+      ]
+    },
+    {
+      "name": "Arcane Eye",
+      "identity": "arcane_eye",
+      "aliases": [],
+      "level": 4,
+      "school": "divination",
+      "classes": [
+        "wizard"
+      ],
+      "owner": "utility",
+      "root_allocation_owner": "utility",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "sorcerer",
+          "subclass": "draconic_sorcery",
+          "source": "draconic_spells",
+          "level": 7
+        }
+      ]
+    },
+    {
+      "name": "Commune",
+      "identity": "commune",
+      "aliases": [],
+      "level": 5,
+      "school": "divination",
+      "classes": [
+        "cleric"
+      ],
+      "owner": "utility",
+      "root_allocation_owner": "utility",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "paladin",
+          "subclass": "oath_of_devotion",
+          "source": "devotion_spells",
+          "level": 17
+        }
+      ]
+    },
+    {
+      "name": "Contact Other Plane",
+      "identity": "contact_other_plane",
+      "aliases": [],
+      "level": 5,
+      "school": "divination",
+      "classes": [
+        "warlock",
+        "wizard"
+      ],
+      "owner": "utility",
+      "root_allocation_owner": "utility",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "warlock",
+          "subclass": null,
+          "source": "contact_patron",
+          "level": 9
+        }
+      ]
+    },
+    {
+      "name": "Etherealness",
+      "identity": "etherealness",
+      "aliases": [],
+      "level": 7,
+      "school": "conjuration",
+      "classes": [
+        "bard",
+        "cleric",
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "owner": "utility",
+      "root_allocation_owner": "utility",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "interchangeable_capacity",
+          "justification": "Interchangeable rank7 Warlock Arcanum choice at13; retained SRD source and explicit source-adoption/planar-consumer tests already exist."
+        }
+      ]
+    },
+    {
+      "name": "Fly",
+      "identity": "fly",
+      "aliases": [],
+      "level": 3,
+      "school": "transmutation",
+      "classes": [
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "owner": "utility",
+      "root_allocation_owner": "utility",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "sorcerer",
+          "subclass": "draconic_sorcery",
+          "source": "draconic_spells",
+          "level": 5
+        }
+      ]
+    },
+    {
+      "name": "Legend Lore",
+      "identity": "legend_lore",
+      "aliases": [],
+      "level": 5,
+      "school": "divination",
+      "classes": [
+        "bard",
+        "cleric",
+        "wizard"
+      ],
+      "owner": "utility",
+      "root_allocation_owner": "utility",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "sorcerer",
+          "subclass": "draconic_sorcery",
+          "source": "draconic_spells",
+          "level": 9
+        }
+      ]
+    },
+    {
+      "name": "Speak with Animals",
+      "identity": "speak_with_animals",
+      "aliases": [],
+      "level": 1,
+      "school": "divination",
+      "classes": [
+        "bard",
+        "druid",
+        "ranger",
+        "warlock"
+      ],
+      "owner": "utility",
+      "root_allocation_owner": "utility",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "druid",
+          "subclass": null,
+          "source": "druidic",
+          "level": 1
+        }
+      ]
+    },
+    {
+      "name": "Tree Stride",
+      "identity": "tree_stride",
+      "aliases": [],
+      "level": 5,
+      "school": "conjuration",
+      "classes": [
+        "druid",
+        "ranger"
+      ],
+      "owner": "utility",
+      "root_allocation_owner": "utility",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "druid",
+          "subclass": "circle_of_land",
+          "source": "land_temperate",
+          "level": 9
+        }
+      ]
+    },
+    {
+      "name": "Dispel Magic",
+      "identity": "dispel_magic",
+      "aliases": [],
+      "level": 3,
+      "school": "abjuration",
+      "classes": [
+        "bard",
+        "cleric",
+        "druid",
+        "paladin",
+        "ranger",
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "owner": "utility",
+      "root_allocation_owner": "utility",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "paladin",
+          "subclass": "oath_of_devotion",
+          "source": "devotion_spells",
+          "level": 9
+        }
+      ]
+    },
+    {
+      "name": "Find Steed",
+      "identity": "find_steed",
+      "aliases": [],
+      "level": 2,
+      "school": "conjuration",
+      "classes": [
+        "paladin"
+      ],
+      "owner": "highlevel",
+      "root_allocation_owner": "summon",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "paladin",
+          "subclass": null,
+          "source": "faithful_steed",
+          "level": 5
+        }
+      ]
+    },
+    {
+      "name": "Guardian of Faith",
+      "identity": "guardian_of_faith",
+      "aliases": [],
+      "level": 4,
+      "school": "conjuration",
+      "classes": [
+        "cleric"
+      ],
+      "owner": "highlevel",
+      "root_allocation_owner": "summon",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "paladin",
+          "subclass": "oath_of_devotion",
+          "source": "devotion_spells",
+          "level": 13
+        }
+      ]
+    },
+    {
+      "name": "Mage Hand",
+      "identity": "mage_hand",
+      "aliases": [],
+      "level": 0,
+      "school": "conjuration",
+      "classes": [
+        "bard",
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "owner": "highlevel",
+      "root_allocation_owner": "summon",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "interchangeable_capacity",
+          "justification": "Second shared Bard/Warlock cantrip; four distinct Warlock cantrips are required at10."
+        }
+      ]
+    },
+    {
+      "name": "Summon Dragon",
+      "identity": "summon_dragon",
+      "aliases": [],
+      "level": 5,
+      "school": "conjuration",
+      "classes": [
+        "wizard"
+      ],
+      "owner": "highlevel",
+      "root_allocation_owner": "summon",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_class_subclass_progression",
+      "behavior_accepted": false,
+      "source_state": "pending_owner_implementation_and_integration_evidence",
+      "progression_justifications": [
+        {
+          "kind": "mandatory_fixed",
+          "class": "sorcerer",
+          "subclass": "draconic_sorcery",
+          "source": "draconic_spells",
+          "level": 9
+        }
+      ]
+    }
+  ],
+  "exclusive_spell_source_owners": {
+    "cantrip": [
+      "fire_bolt",
+      "ray_of_frost",
+      "shocking_grasp",
+      "poison_spray",
+      "sacred_flame",
+      "eldritch_blast",
+      "vicious_mockery",
+      "true_strike",
+      "spare_the_dying",
+      "thaumaturgy",
+      "mending"
+    ],
+    "damage": [
+      "acid_splash",
+      "lightning_bolt",
+      "blight",
+      "cone_of_cold",
+      "flame_strike",
+      "chromatic_orb",
+      "circle_of_death",
+      "ray_of_sickness",
+      "dragons_breath"
+    ],
+    "control": [
+      "hold_monster",
+      "power_word_stun",
+      "power_word_kill",
+      "command",
+      "suggestion",
+      "fear",
+      "geas",
+      "zone_of_truth",
+      "charm_monster",
+      "sleep",
+      "hold_person",
+      "polymorph"
+    ],
+    "healing": [
+      "guidance",
+      "aid",
+      "lesser_restoration",
+      "mass_healing_word",
+      "protection_from_energy",
+      "death_ward",
+      "freedom_of_movement",
+      "greater_restoration",
+      "mass_cure_wounds",
+      "heal",
+      "aura_of_life",
+      "beacon_of_hope",
+      "blur",
+      "power_word_heal",
+      "protection_from_evil_and_good",
+      "revivify",
+      "shield_of_faith"
+    ],
+    "area": [
+      "ice_storm",
+      "daylight",
+      "fog_cloud",
+      "insect_plague",
+      "sleet_storm",
+      "stinking_cloud",
+      "wall_of_fire",
+      "wall_of_stone",
+      "web"
+    ],
+    "weapon": [
+      "shillelagh",
+      "hex",
+      "hunters_mark",
+      "counterspell",
+      "divine_smite",
+      "fire_shield"
+    ],
+    "utility": [
+      "misty_step",
+      "darkvision",
+      "longstrider",
+      "light",
+      "foresight",
+      "alter_self",
+      "arcane_eye",
+      "commune",
+      "contact_other_plane",
+      "etherealness",
+      "fly",
+      "legend_lore",
+      "speak_with_animals",
+      "tree_stride",
+      "dispel_magic"
+    ],
+    "highlevel": [
+      "fire_storm",
+      "sunburst",
+      "find_steed",
+      "guardian_of_faith",
+      "mage_hand",
+      "summon_dragon"
+    ],
+    "main": [
+      "magic_missile",
+      "burning_hands",
+      "guiding_bolt",
+      "cure_wounds",
+      "healing_word",
+      "bless",
+      "shield",
+      "mage_armor",
+      "scorching_ray",
+      "cloud_of_daggers",
+      "fireball"
+    ]
+  },
+  "contract": "Reuse working SRD implementations, identities, grants, lists, resources and progression. Finger of Death is excluded. Preserve every non-roster source, test and evidence as deferred work; do not count it as a launch requirement. Do not silently add spells or weaken class quotas. Native imported fixtures do not establish complete acquisition. No live writes, publication or installed acceptance are implied.",
+  "original_launch_count": 65,
+  "progression_added_count": 47,
+  "source_owner_aliases": {
+    "summon": "highlevel"
+  },
+  "root_progression_allocation": {
+    "cantrip": [
+      "true_strike",
+      "spare_the_dying",
+      "thaumaturgy",
+      "mending"
+    ],
+    "damage": [
+      "chromatic_orb",
+      "circle_of_death",
+      "ray_of_sickness",
+      "dragons_breath"
+    ],
+    "control": [
+      "command",
+      "suggestion",
+      "fear",
+      "geas",
+      "zone_of_truth",
+      "charm_monster",
+      "sleep",
+      "hold_person",
+      "polymorph"
+    ],
+    "healing": [
+      "aura_of_life",
+      "beacon_of_hope",
+      "blur",
+      "power_word_heal",
+      "protection_from_evil_and_good",
+      "revivify",
+      "shield_of_faith"
+    ],
+    "area": [
+      "fog_cloud",
+      "insect_plague",
+      "sleet_storm",
+      "stinking_cloud",
+      "wall_of_fire",
+      "wall_of_stone",
+      "web"
+    ],
+    "weapon": [
+      "divine_smite",
+      "fire_shield"
+    ],
+    "utility": [
+      "alter_self",
+      "arcane_eye",
+      "commune",
+      "contact_other_plane",
+      "etherealness",
+      "fly",
+      "legend_lore",
+      "speak_with_animals",
+      "tree_stride",
+      "dispel_magic"
+    ],
+    "summon": [
+      "find_steed",
+      "guardian_of_faith",
+      "mage_hand",
+      "summon_dragon"
+    ]
+  },
+  "approved_before_cut_count": 112,
+  "retained_original_launch_count": 49,
+  "deferred_launch_profiles": [
+    {
+      "name": "Produce Flame",
+      "identity": "produce_flame",
+      "aliases": [],
+      "level": 0,
+      "school": "conjuration",
+      "classes": [
+        "druid"
+      ],
+      "owner": "highlevel",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Thunderwave",
+      "identity": "thunderwave",
+      "aliases": [],
+      "level": 1,
+      "school": "evocation",
+      "classes": [
+        "bard",
+        "druid",
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "damage",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "False Life",
+      "identity": "false_life",
+      "aliases": [],
+      "level": 1,
+      "school": "necromancy",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "main",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Expeditious Retreat",
+      "identity": "expeditious_retreat",
+      "aliases": [],
+      "level": 1,
+      "school": "transmutation",
+      "classes": [
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "owner": "utility",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Divine Favour",
+      "identity": "divine_favor",
+      "aliases": [
+        "divine_favour"
+      ],
+      "level": 1,
+      "school": "transmutation",
+      "classes": [
+        "paladin"
+      ],
+      "owner": "weapon",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Shatter",
+      "identity": "shatter",
+      "aliases": [],
+      "level": 2,
+      "school": "evocation",
+      "classes": [
+        "bard",
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "damage",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Acid Arrow",
+      "identity": "acid_arrow",
+      "aliases": [
+        "melfs_acid_arrow"
+      ],
+      "level": 2,
+      "school": "evocation",
+      "classes": [
+        "wizard"
+      ],
+      "owner": "damage",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Blindness",
+      "identity": "blindness_deafness",
+      "aliases": [
+        "blindness"
+      ],
+      "level": 2,
+      "school": "transmutation",
+      "classes": [
+        "bard",
+        "cleric",
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "control",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Chain Lightning",
+      "identity": "chain_lightning",
+      "aliases": [],
+      "level": 6,
+      "school": "evocation",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "damage",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Disintegrate",
+      "identity": "disintegrate",
+      "aliases": [],
+      "level": 6,
+      "school": "transmutation",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "damage",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Harm",
+      "identity": "harm",
+      "aliases": [],
+      "level": 6,
+      "school": "necromancy",
+      "classes": [
+        "cleric"
+      ],
+      "owner": "damage",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Sunbeam",
+      "identity": "sunbeam",
+      "aliases": [],
+      "level": 6,
+      "school": "evocation",
+      "classes": [
+        "cleric",
+        "druid",
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "area",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Otto’s Irresistible Dance",
+      "identity": "irresistible_dance",
+      "aliases": [
+        "ottos_irresistible_dance"
+      ],
+      "level": 6,
+      "school": "enchantment",
+      "classes": [
+        "bard",
+        "wizard"
+      ],
+      "owner": "control",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Regenerate",
+      "identity": "regenerate",
+      "aliases": [],
+      "level": 7,
+      "school": "transmutation",
+      "classes": [
+        "bard",
+        "cleric",
+        "druid"
+      ],
+      "owner": "healing",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Meteor Swarm",
+      "identity": "meteor_swarm",
+      "aliases": [],
+      "level": 9,
+      "school": "evocation",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "owner": "highlevel",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    },
+    {
+      "name": "Mass Heal",
+      "identity": "mass_heal",
+      "aliases": [],
+      "level": 9,
+      "school": "abjuration",
+      "classes": [
+        "cleric"
+      ],
+      "owner": "healing",
+      "srd_identity_present": true,
+      "source_url": "retained-srd-5.2.1-header",
+      "population": "approved_launch_roster",
+      "behavior_accepted": false
+    }
+  ],
+  "deferred_launch_count": 16,
+  "exclusive_retained_and_deferred_source_owners": {
+    "cantrip": [
+      "fire_bolt",
+      "ray_of_frost",
+      "shocking_grasp",
+      "poison_spray",
+      "sacred_flame",
+      "eldritch_blast",
+      "vicious_mockery",
+      "true_strike",
+      "spare_the_dying",
+      "thaumaturgy",
+      "mending"
+    ],
+    "damage": [
+      "acid_splash",
+      "thunderwave",
+      "shatter",
+      "acid_arrow",
+      "lightning_bolt",
+      "blight",
+      "cone_of_cold",
+      "flame_strike",
+      "chain_lightning",
+      "disintegrate",
+      "harm",
+      "chromatic_orb",
+      "circle_of_death",
+      "ray_of_sickness",
+      "dragons_breath"
+    ],
+    "control": [
+      "blindness_deafness",
+      "hold_monster",
+      "irresistible_dance",
+      "power_word_stun",
+      "power_word_kill",
+      "command",
+      "suggestion",
+      "fear",
+      "geas",
+      "zone_of_truth",
+      "charm_monster",
+      "sleep",
+      "hold_person",
+      "polymorph"
+    ],
+    "healing": [
+      "guidance",
+      "aid",
+      "lesser_restoration",
+      "mass_healing_word",
+      "protection_from_energy",
+      "death_ward",
+      "freedom_of_movement",
+      "greater_restoration",
+      "mass_cure_wounds",
+      "heal",
+      "regenerate",
+      "mass_heal",
+      "aura_of_life",
+      "beacon_of_hope",
+      "blur",
+      "power_word_heal",
+      "protection_from_evil_and_good",
+      "revivify",
+      "shield_of_faith"
+    ],
+    "area": [
+      "ice_storm",
+      "sunbeam",
+      "daylight",
+      "fog_cloud",
+      "insect_plague",
+      "sleet_storm",
+      "stinking_cloud",
+      "wall_of_fire",
+      "wall_of_stone",
+      "web"
+    ],
+    "weapon": [
+      "shillelagh",
+      "divine_favor",
+      "hex",
+      "hunters_mark",
+      "counterspell",
+      "divine_smite",
+      "fire_shield"
+    ],
+    "utility": [
+      "misty_step",
+      "darkvision",
+      "longstrider",
+      "expeditious_retreat",
+      "light",
+      "foresight",
+      "alter_self",
+      "arcane_eye",
+      "commune",
+      "contact_other_plane",
+      "etherealness",
+      "fly",
+      "legend_lore",
+      "speak_with_animals",
+      "tree_stride",
+      "dispel_magic"
+    ],
+    "highlevel": [
+      "produce_flame",
+      "fire_storm",
+      "sunburst",
+      "meteor_swarm",
+      "find_steed",
+      "guardian_of_faith",
+      "mage_hand",
+      "summon_dragon"
+    ],
+    "main": [
+      "magic_missile",
+      "burning_hands",
+      "guiding_bolt",
+      "cure_wounds",
+      "healing_word",
+      "bless",
+      "shield",
+      "mage_armor",
+      "false_life",
+      "scorching_ray",
+      "cloud_of_daggers",
+      "fireball"
+    ]
+  },
+  "historical_launch_cut": {
+    "target_count": 96,
+    "removed_identities": [
+      "acid_arrow",
+      "blindness_deafness",
+      "chain_lightning",
+      "disintegrate",
+      "divine_favor",
+      "expeditious_retreat",
+      "false_life",
+      "harm",
+      "irresistible_dance",
+      "mass_heal",
+      "meteor_swarm",
+      "produce_flame",
+      "regenerate",
+      "shatter",
+      "sunbeam",
+      "thunderwave"
+    ],
+    "scope": "Remove launch priority/selection only; preserve source/tests/evidence; existing classes/subclasses/level-up unchanged; all47 additions remain."
+  }
+}

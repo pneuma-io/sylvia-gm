@@ -1,0 +1,11 @@
+{
+  "source_archive_sha256": "738f1b0e1af145a55ab03bd8a8afe0cedc716902ed1e38940354779b4158c50c",
+  "source_member": "packages/pneuma.severed-lands/characters/tavin-bell.json",
+  "source_sha256": "c086f2397fe8e2a64a7f84ba2fa8d8ce251a8114ea104505346a583e5ed699ba",
+  "campaign_setting": {
+    "id": "pneuma.severed-lands",
+    "version": "1.0.0-alpha.2",
+    "content_sha256": "d15af04538504443c3a97db0672d77496bfb3e838593ee4064d834e5e933a59d"
+  },
+  "use": "Exact historical character for the existing 0.3.0 migration contract; current characters are tested separately."
+}

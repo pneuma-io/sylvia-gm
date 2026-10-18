@@ -1,0 +1,263 @@
+"""Builder continues useful work beyond one allowance, retaining bounded, recoverable stops."""
+
+from __future__ import annotations
+
+import asyncio
+import json
+import threading
+from pathlib import Path
+
+import pytest
+
+from sylvia_gm.agent._builder_session import stream_builder_turn
+from sylvia_gm.agent._mode import AgentMode
+from sylvia_gm.agent._runner import AgentLoopError, AgentRunner
+from sylvia_gm.agent._session_loop import CampaignSessionLoop, SessionRunRequest
+from sylvia_gm.application.authority import AuthorityOwner
+from sylvia_gm.domain.errors import CommandRejected
+from sylvia_gm.provider._base import FakeProvider, ProviderResponse, ProviderStreamChunk, ToolCall
+
+
+class AuthoringProvider(FakeProvider):
+    async def generate_stream(self, messages, tools=None, **_kwargs):
+        response = await self.generate(messages, tools)
+        for index, call in enumerate(response.tool_calls):
+            yield ProviderStreamChunk(
+                tool_call_delta={
+                    "index": index,
+                    "id": call.id,
+                    "function": {"name": call.name, "arguments": call.arguments},
+                }
+            )
+        yield ProviderStreamChunk(
+            content=response.content or "",
+            finish_reason="tool_calls" if response.tool_calls else "stop",
+        )
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("streaming", [False, True])
+async def test_builder_finishes_research_then_saves_without_manual_continuation(
+    tmp_path: Path, streaming: bool
+):
+    (tmp_path / "reference.md").write_text("\n".join(f"Rule {i}" for i in range(36)))
+    responses = [
+        ProviderResponse(
+            tool_calls=[
+                ToolCall(
+                    id=f"read-{i}",
+                    name="read_file",
+                    arguments=json.dumps({"path": "reference.md", "offset": i + 1, "limit": 1}),
+                )
+            ]
+        )
+        for i in range(36)
+    ]
+    responses += [
+        ProviderResponse(
+            tool_calls=[
+                ToolCall(
+                    id="save",
+                    name="write_file",
+                    arguments='{"path":"draft.md","content":"Finished draft"}',
+                )
+            ]
+        ),
+        ProviderResponse(content="Saved the draft."),
+    ]
+    provider = AuthoringProvider(responses=responses)
+    runner = AgentRunner(AgentMode.BUILDER_FREEFORM, provider, None, project_root=tmp_path)
+    if streaming:
+        events = asyncio.Queue()
+        await runner.turn_stream("Read the references and save the draft.", events)
+        observed = [events.get_nowait() for _ in range(events.qsize())]
+        assert any(event.type == "done" for event in observed)
+    else:
+        assert (
+            await runner.turn("Read the references and save the draft.")
+        ).dm_response == "Saved the draft."
+    assert (tmp_path / "draft.md").read_text() == "Finished draft"
+    assert len(provider.calls) == 38
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("streaming", [False, True])
+async def test_builder_stops_repeating_the_same_failure(tmp_path: Path, streaming: bool):
+    responses = [
+        ProviderResponse(
+            tool_calls=[
+                ToolCall(
+                    id=f"read-{i}",
+                    name="read_file",
+                    arguments='{"path":"missing.md"}',
+                )
+            ]
+        )
+        for i in range(AgentRunner.MAX_TOOL_LOOP + 1)
+    ]
+    provider = AuthoringProvider(responses=responses)
+    runner = AgentRunner(AgentMode.BUILDER_FREEFORM, provider, None, project_root=tmp_path)
+    with pytest.raises(AgentLoopError, match="repeated"):
+        if streaming:
+            await runner.turn_stream("Read the draft.", asyncio.Queue())
+        else:
+            await runner.turn("Read the draft.")
+    assert len(provider.calls) == 3
+    assert (
+        len([message for message in runner.history_snapshot() if message["role"] == "tool"])
+        == 3
+    )
+
+
+def test_saved_builder_explains_tool_limit_and_resumes_without_repeating_write(
+    tmp_path, monkeypatch,
+):
+    monkeypatch.setattr(AgentRunner, "MAX_TOOL_LOOP", 1)
+    monkeypatch.setattr(AgentRunner, "MAX_TOOL_CONTINUATIONS", 0)
+    provider = AuthoringProvider(responses=[ProviderResponse(tool_calls=[ToolCall(
+        id="save", name="write_file", arguments='{"path":"draft.md","content":"Saved once"}',
+    )])])
+    database = tmp_path / "authority.sqlite3"
+    workspace = tmp_path / "draft"
+    with AuthorityOwner.open(database, "first") as owner:
+        owner.create_builder_chat(provider_id="test", model_id="test", session_id="builder")
+        loop = CampaignSessionLoop(owner)
+
+        def run(provider_input):
+            yield from stream_builder_turn(
+                provider, context=provider_input.history, message_id="input",
+                user_text="Save the draft", workspace=workspace,
+                control=provider_input.control, complete=lambda _: None,
+            )
+
+        with pytest.raises(CommandRejected, match="tool-use limit"):
+            loop.run_builder(
+                SessionRunRequest("builder", "turn", "limited", "input", "Save the draft"),
+                run, lambda: (),
+            )
+        loop.assert_idle("builder")
+        assert (workspace / "draft.md").read_text() == "Saved once"
+    with AuthorityOwner.open(database, "reopened") as owner:
+        messages = owner.session_context("builder").messages
+        terminal = next(m.content for m in messages
+                        if m.content.get("kind") == "builder_attempt_terminal")
+        assert terminal["status"] == "interrupted"
+        assert terminal["reason_code"] == "tool_limit"
+        receipts = [m.content for m in messages if m.content.get("tool_name") == "write_file"]
+        assert len(receipts) == 1
+        provider = AuthoringProvider(responses=[
+            ProviderResponse(content="The saved draft is ready."),
+        ])
+        CampaignSessionLoop(owner).run_builder(
+            SessionRunRequest("builder", "turn-2", "continued", "follow-up", "Continue"),
+            lambda data: stream_builder_turn(
+                provider, context=data.history, message_id="follow-up", user_text="Continue",
+                workspace=workspace, control=data.control, complete=lambda _: None,
+            ), lambda: (),
+        )
+        assert (workspace / "draft.md").read_text() == "Saved once"
+        assert len([m for m in owner.session_context("builder").messages
+                    if m.content.get("tool_name") == "write_file"]) == 1
+        assert len(provider.calls) == 1
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("streaming", [False, True])
+async def test_builder_continuation_still_has_a_total_limit(tmp_path, monkeypatch, streaming):
+    monkeypatch.setattr(AgentRunner, "MAX_TOOL_LOOP", 2)
+    (tmp_path / "reference.md").write_text("A valid reference")
+    provider = AuthoringProvider(responses=[ProviderResponse(tool_calls=[ToolCall(
+        id=f"read-{index}", name="read_file", arguments='{"path":"reference.md"}',
+    )]) for index in range(7)])
+    runner = AgentRunner(AgentMode.BUILDER_FREEFORM, provider, None, project_root=tmp_path)
+    with pytest.raises(AgentLoopError):
+        if streaming:
+            await runner.turn_stream("Read the reference.", asyncio.Queue())
+        else:
+            await runner.turn("Read the reference.")
+    assert len(provider.calls) == 6
+
+
+def test_saved_builder_automatically_continues_without_repeating_write(tmp_path, monkeypatch):
+    monkeypatch.setattr(AgentRunner, "MAX_TOOL_LOOP", 1)
+    provider = AuthoringProvider(responses=[
+        ProviderResponse(tool_calls=[ToolCall(
+            id="save", name="write_file", arguments='{"path":"draft.md","content":"Saved once"}',
+        )]),
+        ProviderResponse(content="The saved draft is ready."),
+    ])
+    database = tmp_path / "authority.sqlite3"
+    workspace = tmp_path / "draft"
+    with AuthorityOwner.open(database, "first") as owner:
+        owner.create_builder_chat(provider_id="test", model_id="test", session_id="builder")
+        loop = CampaignSessionLoop(owner)
+        loop.run_builder(
+            SessionRunRequest("builder", "turn", "automatic", "input", "Save the draft"),
+            lambda data: stream_builder_turn(
+                provider, context=data.history, message_id="input", user_text="Save the draft",
+                workspace=workspace, control=data.control, complete=lambda _: None,
+            ), lambda: (),
+        )
+        loop.assert_idle("builder")
+    with AuthorityOwner.open(database, "reopened") as owner:
+        messages = owner.session_context("builder").messages
+        terminal = next(m.content for m in messages
+                        if m.content.get("kind") == "builder_attempt_terminal")
+        assert terminal["status"] == "completed"
+        assert len([m for m in messages if m.content.get("tool_name") == "write_file"]) == 1
+        assert (workspace / "draft.md").read_text() == "Saved once"
+        assert len(provider.calls) == 2
+
+
+def test_stop_during_automatic_continuation_preserves_saved_work(tmp_path, monkeypatch):
+    monkeypatch.setattr(AgentRunner, "MAX_TOOL_LOOP", 1)
+    continued = threading.Event()
+
+    class WaitingProvider(AuthoringProvider):
+        async def generate_stream(self, messages, tools=None, **kwargs):
+            if self.calls:
+                continued.set()
+                await asyncio.Event().wait()
+            async for chunk in super().generate_stream(messages, tools, **kwargs):
+                yield chunk
+
+    provider = WaitingProvider(responses=[ProviderResponse(tool_calls=[ToolCall(
+        id="save", name="write_file", arguments='{"path":"draft.md","content":"Saved before Stop"}',
+    )])])
+    database = tmp_path / "authority.sqlite3"
+    workspace = tmp_path / "draft"
+    errors = []
+    with AuthorityOwner.open(database, "first") as owner:
+        owner.create_builder_chat(provider_id="test", model_id="test", session_id="builder")
+        loop = CampaignSessionLoop(owner)
+
+        def run():
+            try:
+                loop.run_builder(
+                    SessionRunRequest("builder", "turn", "automatic", "input", "Save the draft"),
+                    lambda data: stream_builder_turn(
+                        provider, context=data.history, message_id="input",
+                        user_text="Save the draft",
+                        workspace=workspace, control=data.control, complete=lambda _: None,
+                    ), lambda: (),
+                )
+            except CommandRejected as error:
+                errors.append(error)
+
+        worker = threading.Thread(target=run)
+        worker.start()
+        try:
+            assert continued.wait(5), "Builder did not reach its automatic continuation"
+            loop.stop_agent_session("builder")
+        finally:
+            if worker.is_alive():
+                loop.stop_agent_session("builder")
+            worker.join(5)
+        assert not worker.is_alive()
+        assert len(errors) == 1 and "cancelled" in str(errors[0])
+        loop.assert_idle("builder")
+    with AuthorityOwner.open(database, "reopened") as owner:
+        assert CampaignSessionLoop(owner).builder_activity("builder")["status"] == "stopped"
+        assert (workspace / "draft.md").read_text() == "Saved before Stop"
+        assert len([m for m in owner.session_context("builder").messages
+                    if m.content.get("tool_name") == "write_file"]) == 1

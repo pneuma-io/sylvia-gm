@@ -1,0 +1,200 @@
+sylvia_gm_runtime:
+  format: 1
+  state_namespace: sylvia-gm.conformance.signal-static
+skills:
+  - name: Intrusion
+    description: Enter or reshape a hostile signal environment.
+  - name: Field Medicine
+    description: Stabilize an operator under pressure.
+model_decision_boundary:
+  active_actor: {namespace: sylvia-gm.conformance.signal-static, key: state.active_actor}
+  actor_entities: {namespace: sylvia-gm.conformance.signal-static, key: state.entities}
+  participant_control:
+    field: control_owner
+    player_values: [player]
+  default_owner: gm
+tools:
+  commit_program:
+    description: Apply one already-selected signal program family.
+    parameters:
+      - name: program
+        type: string
+        required: true
+      - name: amount
+        type: integer
+        minimum: 1
+        required: true
+      - name: charge_cost
+        type: integer
+        minimum: 0
+        required: true
+      - name: multiplier
+        type: integer
+        required: true
+      - name: family
+        type: enum
+        enum_values:
+          - add_stress
+          - clear_interference
+        required: true
+    effects:
+      - decrement:
+          field: state.resources.charge
+          amount: charge_cost
+      - set:
+          field: state.last_program.name
+          value: program
+      - set:
+          field: state.last_program.result
+          value: amount * multiplier
+      - condition: family == 'clear_interference'
+        on_true:
+          - set:
+              field: state.conditions.interference
+              value: false
+      - condition: family == 'add_stress'
+        on_true:
+          - increment:
+              field: state.stress
+              amount: 1
+    metadata:
+      category: signal_program
+      costs_action: false
+      visible_to_player: false
+  resolve_intrusion:
+    description: Resolve a noncombat Intrusion operation with two six-sided dice.
+    parameters:
+      - name: skill
+        type: enum
+        enum_values:
+          - intrusion
+          - field_medicine
+      - name: pressure
+        type: integer
+        required: true
+    effects:
+      - dice:
+          expression: 2d6
+        store_as: _operation_roll
+      - set:
+          field: state.last_check.skill
+          value: skill
+      - set:
+          field: state.last_check.total
+          value: _operation_roll.total
+      - condition: _operation_roll.total >= pressure
+        on_true:
+          - set:
+              field: state.last_check.outcome
+              value: clear
+        on_false:
+          - set:
+              field: state.last_check.outcome
+              value: compromised
+    metadata:
+      category: noncombat_resolution
+      costs_action: false
+  apply_operation_cost:
+    description: Commit package-owned Stress, Wounds, charge, condition, and advancement.
+    parameters:
+      - name: stress
+        type: integer
+        minimum: 0
+        required: true
+      - name: wounds
+        type: integer
+        minimum: 0
+        required: true
+      - name: charge_spent
+        type: integer
+        minimum: 0
+        required: true
+      - name: progress
+        type: integer
+        minimum: 0
+        required: true
+    effects:
+      - increment:
+          field: state.stress
+          amount: stress
+      - increment:
+          field: state.wounds
+          amount: wounds
+      - decrement:
+          field: state.resources.charge
+          amount: charge_spent
+      - set:
+          field: state.conditions.interference
+          value: true
+      - increment:
+          field: state.advancement.intrusion
+          amount: progress
+    metadata:
+      category: consequence
+      costs_action: false
+  run_program:
+    description: Run one package-declared signal program without core-specific mechanics.
+    parameters:
+      - name: program
+        type: enum
+        enum_values:
+          - ghost_route
+          - signal_boost
+        required: true
+      - name: amount
+        type: integer
+        minimum: 1
+        required: true
+    effects:
+      - table_lookup:
+          table: definitions.programs
+          key: program
+          required: true
+          exact_selector: true
+        store_as: _definition
+      - set:
+          field: _definition_key
+          value: program
+      - set:
+          field: _definition_table
+          value: programs
+      - call: commit_program
+        params:
+          program: "{program}"
+          amount: "{amount}"
+          charge_cost: "{_definition.charge_cost}"
+          multiplier: "{_definition.multiplier}"
+          family: "{_definition.family}"
+    metadata:
+      category: signal_program
+      costs_action: false
+procedures: {}
+definition_row_schemas:
+  definitions.programs:
+    discriminator: family
+    variants:
+      add_stress:
+        type: object
+        properties:
+          charge_cost: {type: integer, minimum: 0, maximum: 5}
+          multiplier: {type: integer, minimum: 1, maximum: 5}
+        required: [charge_cost, multiplier]
+        additionalProperties: false
+      clear_interference:
+        type: object
+        properties:
+          charge_cost: {type: integer, minimum: 0, maximum: 5}
+          multiplier: {type: integer, minimum: 1, maximum: 5}
+        required: [charge_cost, multiplier]
+        additionalProperties: false
+definitions:
+  programs:
+    ghost_route:
+      charge_cost: 3
+      family: clear_interference
+      multiplier: 1
+    signal_boost:
+      charge_cost: 2
+      family: add_stress
+      multiplier: 3
+narrative: {}

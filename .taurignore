@@ -1,0 +1,15 @@
+# Tauri must discover the application configuration, not fixture package.json files.
+tests/**
+historical/**
+.venv/**
+.owner-build/**
+node_modules/**
+target/**
+data/**
+isolated-data/**
+campaigns/**
+saves/**
+.scratch/**
+.codex/**
+marketing/**
+**/.env*

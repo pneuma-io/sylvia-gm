@@ -1,0 +1,1434 @@
+{
+  "capabilities": [
+    "pneuma.severed-lands.setting"
+  ],
+  "compatibility": {
+    "host_contract": 1,
+    "requires": [],
+    "runtime_format": 1
+  },
+  "content_declarations": "content/content-declarations.json",
+  "content_kind": "campaign_setting",
+  "content_sha256": "1215a637183819c5d0599b2b604f69c3c632f0ae75a45c1a8acbb4a6d9c4d201",
+  "dependencies": [
+    {
+      "content_sha256": "1d59eced379dbf5361401213f4811fc671a1345d4ffba0c3ed9ef094a3747fd7",
+      "id": "sylvia.srd-lite.bg3",
+      "kind": "ruleset_snapshot",
+      "namespace": "ruleset_snapshot",
+      "version": "0.3.12"
+    }
+  ],
+  "files": [
+    {
+      "bytes": 814,
+      "path": "ATTRIBUTION.md",
+      "sha256": "0c15fc664ecdd01c24bd9e7bf151f2452991c0d0f8c73cc876cf0c4a35a24410"
+    },
+    {
+      "bytes": 6605,
+      "path": "DM-SECRETS.md",
+      "sha256": "9425588e3d2d8dd008a93f83bf62f7c4c4e0a5eedf0b92a180ef745fb84f6513"
+    },
+    {
+      "bytes": 3594,
+      "path": "campaigns/the-rift-awakening/act-1.md",
+      "sha256": "ee516f0c24c1649c52939baaf1d4c8514c47f927f94a8135f06dca9d82f97290"
+    },
+    {
+      "bytes": 4233,
+      "path": "campaigns/the-rift-awakening/act-2.md",
+      "sha256": "4f2fab8a83d06c7219a2316f317370f86498c9beec85a81bc6509fe422ad7244"
+    },
+    {
+      "bytes": 3337,
+      "path": "campaigns/the-rift-awakening/act-3.md",
+      "sha256": "10bfd48733cb35837b28dad08e70514b8a5872b0641b51629c709a69edbb0bf7"
+    },
+    {
+      "bytes": 3141,
+      "path": "campaigns/the-rift-awakening/act-4.md",
+      "sha256": "beab501198382442244400d0b99d5a5051c3283c5e54835e5221a1a97c78ca6d"
+    },
+    {
+      "bytes": 3576,
+      "path": "campaigns/the-rift-awakening/act-5.md",
+      "sha256": "6b19cc0d4b2a34ab458bc96943c8f8dc33569d6cc24c938b07e54e4d24d88c39"
+    },
+    {
+      "bytes": 4506,
+      "path": "campaigns/the-rift-awakening/act-6.md",
+      "sha256": "f69cc17638d7b07212e62de7566ef9adb4d31c238cfbff509e0dc9ff02b9f0c4"
+    },
+    {
+      "bytes": 7090,
+      "path": "campaigns/the-rift-awakening/index.md",
+      "sha256": "cc69e67a99e093a2919197256be44fab26d2c625e55d22cf1a24bf54db3e77d4"
+    },
+    {
+      "bytes": 2888,
+      "path": "campaigns/the-rift-awakening/party-template.json",
+      "sha256": "59b1e50a7da411e0d9f4c26ceba2bca3b01201a727cd8644a8871056f8671ff5"
+    },
+    {
+      "bytes": 1617,
+      "path": "characters/open-adventurer.md",
+      "sha256": "ab8f14b54f4603e7eac8c4c8d65fbdb93608fb0f2c7dcfc0e78b39a0eb108251"
+    },
+    {
+      "bytes": 3285,
+      "path": "content/classes/barbarian-rift-touched.md",
+      "sha256": "4120f62082ef37f6a79fb878bce079edd3079b2ab785b2ba08a9820c4a3555f1"
+    },
+    {
+      "bytes": 3953,
+      "path": "content/classes/bard-college-of-echoes.md",
+      "sha256": "6d859035bca10816db2279ecb742e8d11d5c3a5d6492a5650051ace1cf6c74cd"
+    },
+    {
+      "bytes": 4060,
+      "path": "content/classes/cleric-anchor-domain.md",
+      "sha256": "dc617560b9df50aa9914cc4272b85452a9fd23832f47896b81c7e56aa12726fc"
+    },
+    {
+      "bytes": 4236,
+      "path": "content/classes/druid-circle-of-the-riftwild.md",
+      "sha256": "66c6a96ed9eaae26ca4760f208e36c909947339e0a24a253b9c907cd715bbec0"
+    },
+    {
+      "bytes": 6466,
+      "path": "content/classes/fighter-warden-knight.md",
+      "sha256": "2d42ea0c4e403c90988058ec5c3fe1fc6cbc85c06808f92b16b4ecdf675ec508"
+    },
+    {
+      "bytes": 4305,
+      "path": "content/classes/monk-way-of-the-veil.md",
+      "sha256": "51a84903c6397caa1b63acd3bd02d50c31fe65baf2e4f522f1e1b7044cf0f6dd"
+    },
+    {
+      "bytes": 4909,
+      "path": "content/classes/paladin-oath-of-remembrance.md",
+      "sha256": "8976472c3f6417c12ab350958d36510626ac19a4444115c731a572b2325167c3"
+    },
+    {
+      "bytes": 3239,
+      "path": "content/classes/ranger-riftstalker.md",
+      "sha256": "7e66ea8542c84560013eadf12690a9790c4a42c1525c134e2ac44f64a466b775"
+    },
+    {
+      "bytes": 3599,
+      "path": "content/classes/rogue-hollowblade.md",
+      "sha256": "07ff8e782a81c90a412d29d484621c60f66af17f41de17812f6e7eeb529dd441"
+    },
+    {
+      "bytes": 3759,
+      "path": "content/classes/sorcerer-riftblood.md",
+      "sha256": "a304fcf127b8ce224a14876132465bb7fbdb519c59be272044c2734fd1f089fc"
+    },
+    {
+      "bytes": 3796,
+      "path": "content/classes/warlock-the-deep-rift.md",
+      "sha256": "04596b81c496a1340e21987f286618beda55a3c3a9018005c3c3d748fcd9f389"
+    },
+    {
+      "bytes": 4034,
+      "path": "content/classes/wizard-school-of-warden-studies.md",
+      "sha256": "d8a5f7b80c5e6cce4fd943db26d9273b85cb69e242f4f18faf36cf0afc125c7b"
+    },
+    {
+      "bytes": 10628,
+      "path": "content/content-declarations.json",
+      "sha256": "fd3b53713e759ea089ddff01307d4f3153668d9c3792d45bf48914ef8e8314bd"
+    },
+    {
+      "bytes": 460,
+      "path": "content/items/riftbeast-slayer.md",
+      "sha256": "85d8bf14beb7cb848778c725abc9ab5f262c930fa5584e7a2d4304e640be6e15"
+    },
+    {
+      "bytes": 1302,
+      "path": "content/items/riftscale-mail.md",
+      "sha256": "ed5ccf4b5978dfd5a060ed03f3fb1773c0e409595ed46375b51fa1d6b03098b0"
+    },
+    {
+      "bytes": 142,
+      "path": "content/items/strategist-set.md",
+      "sha256": "6f19583cf611a3d05fee221fa30c903e10cdd73399eac5b53b540e3d2ef76728"
+    },
+    {
+      "bytes": 1603,
+      "path": "content/monsters/anchor-guardian-flesh.md",
+      "sha256": "a31c9e00171f83e37739fa77c369444453432c69c5f1e6778128395dacce0a7f"
+    },
+    {
+      "bytes": 1252,
+      "path": "content/monsters/anchor-sentinel.md",
+      "sha256": "1f8fd5d862b4986ce9aad8af4ce3bdfbad433aab2aef3fcb7cf401257a713a72"
+    },
+    {
+      "bytes": 1440,
+      "path": "content/monsters/anchor-trap.md",
+      "sha256": "419a73155a8dc672501e71070626e17cadb0fd7220232ee2761a54b7860c8523"
+    },
+    {
+      "bytes": 1079,
+      "path": "content/monsters/broken-one.md",
+      "sha256": "55742da711978c188ff76c87ca3d2e517b9ca4f1972681cb92c6f7c1799954bb"
+    },
+    {
+      "bytes": 1002,
+      "path": "content/monsters/cave-hollowed.md",
+      "sha256": "4d67547eb7f5e9c593bd83eaa26842573eb52a9618a67c70899412d83fd70d33"
+    },
+    {
+      "bytes": 1130,
+      "path": "content/monsters/cavern-hollowed.md",
+      "sha256": "52be95c1f5b8d501fbd1f25959c1ca063d8342ff24c2791cca27af8928dbe0e2"
+    },
+    {
+      "bytes": 1066,
+      "path": "content/monsters/chitin-riftborn.md",
+      "sha256": "8581d981422b9ca52465f4cb020f22c9e8ebbc464c9db32276f4b1f751d5429d"
+    },
+    {
+      "bytes": 1267,
+      "path": "content/monsters/deep-dwarf.md",
+      "sha256": "597702b089dc965ffa62230d042dca3b75916bcffe2970f9157096b613b4bc12"
+    },
+    {
+      "bytes": 1712,
+      "path": "content/monsters/door-guardian.md",
+      "sha256": "86d8b806d0ce1a5b2e0f38aa5cb7ce4ca466d0b4bb50ce6311e954415537394f"
+    },
+    {
+      "bytes": 1289,
+      "path": "content/monsters/field-warden.md",
+      "sha256": "f0cdf525c26f55afa31cd9f800398506317c75465e5f5f9fea6279b30a590c0f"
+    },
+    {
+      "bytes": 1307,
+      "path": "content/monsters/hollow-brute.md",
+      "sha256": "fcb3ed660f40fc50b2ca32c85acafed613be45187ea40dc1489ace5e7d0e3f9a"
+    },
+    {
+      "bytes": 1249,
+      "path": "content/monsters/hollowed-enforcer.md",
+      "sha256": "85ba788af1014c588796906ed10c8bfbab5d88530ae482a3a39b710b9743c09f"
+    },
+    {
+      "bytes": 1203,
+      "path": "content/monsters/hollowling.md",
+      "sha256": "51340f1a0a0f94319f2f539fae062df193144a318e718b3ebaedc35b5f0cc508"
+    },
+    {
+      "bytes": 1043,
+      "path": "content/monsters/pack-hollowed.md",
+      "sha256": "d5a4779df44b4cb3700cc01203fdd2b2074013e3e4de80d15f40897251e7086b"
+    },
+    {
+      "bytes": 1011,
+      "path": "content/monsters/pond-hollowed.md",
+      "sha256": "12ce35bd8d9bb01657a1677328f3397779d6970b92a173a8d61f23a7b18d3eca"
+    },
+    {
+      "bytes": 1594,
+      "path": "content/monsters/rift-air.md",
+      "sha256": "bc05ad0695c1fd8457120bd46b8aa7a12a04f7aa61e68488eb3ea4079c118c08"
+    },
+    {
+      "bytes": 971,
+      "path": "content/monsters/rift-ankheg.md",
+      "sha256": "6e755c94813e130eb1632ad9a088830b9b9998b44841a74f64a404d5acd23b88"
+    },
+    {
+      "bytes": 1626,
+      "path": "content/monsters/rift-banshee.md",
+      "sha256": "b4a3521006f0de58207aefdfba27036ef81c228a059d1dc0f0926cd40447e6b9"
+    },
+    {
+      "bytes": 941,
+      "path": "content/monsters/rift-basilisk.md",
+      "sha256": "8075badb903a1c9fee6f5af4b1786b35a4d66cf66608ab63593dc8037b2a9d07"
+    },
+    {
+      "bytes": 1356,
+      "path": "content/monsters/rift-behir.md",
+      "sha256": "95e1a8e8e040cca459d43906c277986ab6a27c149d77d1d79a857bc5c5bcb1dc"
+    },
+    {
+      "bytes": 1375,
+      "path": "content/monsters/rift-boulder.md",
+      "sha256": "1c0ef2133e56830271ade953e90071cf8a70f664015ba8c773672f9d65af4257"
+    },
+    {
+      "bytes": 1192,
+      "path": "content/monsters/rift-bulette.md",
+      "sha256": "0fc93593b6e0e6b2ddff9c6b4d6ae1a5562f8aa23326b41d89d06ce3d48bcb86"
+    },
+    {
+      "bytes": 955,
+      "path": "content/monsters/rift-centaur.md",
+      "sha256": "200930d9bf980ef8b0199cd96d69c9337a485bdea2b65d09a6f3becc48d6d28b"
+    },
+    {
+      "bytes": 1206,
+      "path": "content/monsters/rift-cinder.md",
+      "sha256": "c142da39fbdeffcaf21e1335bbdb871262c63278e2e4b90804f1dbc6692b4e37"
+    },
+    {
+      "bytes": 742,
+      "path": "content/monsters/rift-cockatrice.md",
+      "sha256": "b9f7ea16a57134121c11f2a4abf3fd681b03774fbcb6720b3e1d41caabd2055d"
+    },
+    {
+      "bytes": 1053,
+      "path": "content/monsters/rift-cube.md",
+      "sha256": "c3ede7a67bf9d961fa791804b41453c851193ba58716ca015f9ef93779d2e083"
+    },
+    {
+      "bytes": 1020,
+      "path": "content/monsters/rift-cyclops.md",
+      "sha256": "8a1f14c014d77526378c692426e4db7fe33ff2fbb97eab1ba865cd07ab0474b7"
+    },
+    {
+      "bytes": 1133,
+      "path": "content/monsters/rift-darkmantle.md",
+      "sha256": "165c99f5f6f1b75b15420a1b094f0bebae7491c1ef57a8417a18d8c922ed60f9"
+    },
+    {
+      "bytes": 1014,
+      "path": "content/monsters/rift-death-hound.md",
+      "sha256": "0c5752e116b0c17dfd2015757a64ff98926514eaa7a0c6e180df86b2f4888bdd"
+    },
+    {
+      "bytes": 1031,
+      "path": "content/monsters/rift-doppelganger.md",
+      "sha256": "210746483908da6a824cb3863d03461582719098de87252ff5445d20e77e4c5b"
+    },
+    {
+      "bytes": 1116,
+      "path": "content/monsters/rift-dust.md",
+      "sha256": "b59078f06dd9d7b2b167c144a741fa09f50c4f55bcf55f36c31595901ddeddb7"
+    },
+    {
+      "bytes": 1330,
+      "path": "content/monsters/rift-earth.md",
+      "sha256": "031ac5b73292cb5d4f7faa7999e0f344b6a16e68158e3dc9f038c92a518a4bb3"
+    },
+    {
+      "bytes": 1226,
+      "path": "content/monsters/rift-ettercap.md",
+      "sha256": "6053f49e88977f0b11dd88b78bf6f40a4a9b1102249992a877eaab37649706ae"
+    },
+    {
+      "bytes": 1301,
+      "path": "content/monsters/rift-ettin.md",
+      "sha256": "56bf92dd1a84cf96491cc7fa1dfee63dcbf91a63b2292c627c951b8a6969196a"
+    },
+    {
+      "bytes": 1842,
+      "path": "content/monsters/rift-fire.md",
+      "sha256": "426d80571d47284e7cbab398b4fa469ef98ccf8b9b58b19993a72d966571ec88"
+    },
+    {
+      "bytes": 1321,
+      "path": "content/monsters/rift-flameskull.md",
+      "sha256": "d5ca8bf66b62fe8e61b9c9f6686042a49b93cdb3ef4965f62f9f4616ef45f828"
+    },
+    {
+      "bytes": 1114,
+      "path": "content/monsters/rift-forge.md",
+      "sha256": "b13f787452172c8875fa499795a1fe81421b3d72ee7e7f70eea30b705b893485"
+    },
+    {
+      "bytes": 879,
+      "path": "content/monsters/rift-fungus-violet.md",
+      "sha256": "015355b62e02e5014c71fe434d85d6ced5ec5f94a27721d853e238d8eb9e9a11"
+    },
+    {
+      "bytes": 1202,
+      "path": "content/monsters/rift-fungus.md",
+      "sha256": "af78b565915103dc38143c322d9654397b2d0a1fe3d41418b00f25fa98cd3467"
+    },
+    {
+      "bytes": 1386,
+      "path": "content/monsters/rift-ghast.md",
+      "sha256": "78e673d82495a2ceee96db723ee9933b4fd44bb9fcd67bdf5c95fa72906c02fd"
+    },
+    {
+      "bytes": 2428,
+      "path": "content/monsters/rift-ghost.md",
+      "sha256": "7b657f09d248c7d3729731d8948f8b86648ad7d60cc453ae2c5e660c2766fd7a"
+    },
+    {
+      "bytes": 1169,
+      "path": "content/monsters/rift-ghoul.md",
+      "sha256": "c400d169e9cbbcf5c3be7100f3b58ca95730f8b377a10a83ea685c6aabf217eb"
+    },
+    {
+      "bytes": 1081,
+      "path": "content/monsters/rift-giant-cloud.md",
+      "sha256": "934414da366de1b1bb26c47152e6e20be5fa7f47de1e78a2ca535ae823a7754f"
+    },
+    {
+      "bytes": 1021,
+      "path": "content/monsters/rift-giant-fire.md",
+      "sha256": "34b88caf8f294228354a64b3a1a3c5827dd409a3f305800c413f59d992a7c33d"
+    },
+    {
+      "bytes": 1001,
+      "path": "content/monsters/rift-giant-frost.md",
+      "sha256": "cd66ac87e70e1d373e5d7f7d6ced819f58ad648897f773d67b4852440b615bff"
+    },
+    {
+      "bytes": 936,
+      "path": "content/monsters/rift-giant-hill.md",
+      "sha256": "ac46e8f7dd489fcd3b61142bf8313b1b553dc0fe92b1691eddf9b17a31b68348"
+    },
+    {
+      "bytes": 923,
+      "path": "content/monsters/rift-giant-stone.md",
+      "sha256": "bc64e9fc8bb8391e723e5ed2f89af925fced8d51f03b3a5ee5098dd8571b786e"
+    },
+    {
+      "bytes": 1354,
+      "path": "content/monsters/rift-giant-storm.md",
+      "sha256": "a82a275b40a07bd1cc3688c574baa5acfe8635845a45618b7b7f70d27a52f1f6"
+    },
+    {
+      "bytes": 1170,
+      "path": "content/monsters/rift-gorgon.md",
+      "sha256": "cad45754a8e836c357097283fa37f74173836b26e2b705b11f4dbf680f89e28f"
+    },
+    {
+      "bytes": 930,
+      "path": "content/monsters/rift-grick.md",
+      "sha256": "76044c4d90a840eb8fb0d3ac33e3a44efc8af15205a7fce84486cd7dbde259a8"
+    },
+    {
+      "bytes": 831,
+      "path": "content/monsters/rift-griffon.md",
+      "sha256": "646f2edff232a3ba986932a62d6079b3637e076062ba53bbdfa07094cc7b371a"
+    },
+    {
+      "bytes": 1143,
+      "path": "content/monsters/rift-harpy.md",
+      "sha256": "e0e502795d8f517f524b71c16b6c96826deedcd4f50b275c32d6463a8638db01"
+    },
+    {
+      "bytes": 801,
+      "path": "content/monsters/rift-hippogriff.md",
+      "sha256": "bf7bcaeec87ef9da0e6b93be809ae97299f84c395333cc54cbead93561714ae1"
+    },
+    {
+      "bytes": 1454,
+      "path": "content/monsters/rift-hydra.md",
+      "sha256": "bbeac706bf6fca33b5cf0adae5e6fd6db67851b2b8ee0ff392e53b12732f7451"
+    },
+    {
+      "bytes": 1107,
+      "path": "content/monsters/rift-ice.md",
+      "sha256": "c1e334a20a86c759eac3078a93b16b3eda86cbd2957d98d789d0709137be2849"
+    },
+    {
+      "bytes": 941,
+      "path": "content/monsters/rift-jelly.md",
+      "sha256": "1d8fb40dcf338532ef9f96d6cc8ceefaf406ad22c563776bd4a79bace414e06c"
+    },
+    {
+      "bytes": 1861,
+      "path": "content/monsters/rift-kraken.md",
+      "sha256": "ab20ab2ac4051c8e62d8c9cfadb0d3ba6a6bdb036659eaf9215aa88117c9cf26"
+    },
+    {
+      "bytes": 1154,
+      "path": "content/monsters/rift-lamia.md",
+      "sha256": "7fda16e41526beef34f2fe97620487a2e3667fb30fa0370483b617254e3daa10"
+    },
+    {
+      "bytes": 1828,
+      "path": "content/monsters/rift-lich.md",
+      "sha256": "2842c28b93b7651c0c8720107f939ef2eb1662428bb76317eecb4f232c5c5560"
+    },
+    {
+      "bytes": 1064,
+      "path": "content/monsters/rift-magma.md",
+      "sha256": "bc480dadf7d3fa973b5a71103e10c5936cfa4ae83abb10009a59f7524175dcdc"
+    },
+    {
+      "bytes": 1470,
+      "path": "content/monsters/rift-medusa.md",
+      "sha256": "519aa7bef5d8d61f059a3d2f16e5de70d9af1bc9ac9f2a0f37239e813ea42b2a"
+    },
+    {
+      "bytes": 1161,
+      "path": "content/monsters/rift-merrow.md",
+      "sha256": "0a325a28adad48e6a9dc2a56b3cf7da173d27e58a994a1df41db12e7e2510295"
+    },
+    {
+      "bytes": 1383,
+      "path": "content/monsters/rift-mimic.md",
+      "sha256": "5cd8400282e48c7c90c30f29a5fc85b939033a22d4ea0e094d6cfd7a5d2821d9"
+    },
+    {
+      "bytes": 1088,
+      "path": "content/monsters/rift-minotaur.md",
+      "sha256": "46641ad6647bafbedcd04bf6d515a21894a08574cfbf7ecfef57e1446b863e82"
+    },
+    {
+      "bytes": 1218,
+      "path": "content/monsters/rift-mud.md",
+      "sha256": "c0a81b94774dadf4fdd1d14be1fea6ebf04e6f2e158abfc756096cd3aebe77db"
+    },
+    {
+      "bytes": 1676,
+      "path": "content/monsters/rift-mummy-lord.md",
+      "sha256": "5e02ce2e6ad4416934ef2318fbede93973de91add549ae20023337634642bfe2"
+    },
+    {
+      "bytes": 1766,
+      "path": "content/monsters/rift-mummy.md",
+      "sha256": "885cef84ab6878e182d2e40d80387cf07e5aa6f990bb926a6b0cde704ebd360a"
+    },
+    {
+      "bytes": 920,
+      "path": "content/monsters/rift-ogre.md",
+      "sha256": "234406dd3c72ad4b53ff0317e49117f9a43a8a37ce4dbb9904039730fe17ab13"
+    },
+    {
+      "bytes": 1585,
+      "path": "content/monsters/rift-oni.md",
+      "sha256": "3ea100db8e13b76ab9c02de9bd3b406f5f0d2d9cc7b2b074327db296c266d45e"
+    },
+    {
+      "bytes": 1503,
+      "path": "content/monsters/rift-ooze.md",
+      "sha256": "bfee68a8fdd08c43f9867e43cd605268bd479f24a90a738d8a23b753e20bddc7"
+    },
+    {
+      "bytes": 1122,
+      "path": "content/monsters/rift-owlbear.md",
+      "sha256": "d11aaa6e278983d03f73bac43c93b907c414a9fec32c2bbe19fa381ab15c1016"
+    },
+    {
+      "bytes": 1202,
+      "path": "content/monsters/rift-peryton.md",
+      "sha256": "2247718ae598383fae7807f63896acca52b37e84b0ec17742b163b7058f04403"
+    },
+    {
+      "bytes": 1072,
+      "path": "content/monsters/rift-phase-spider.md",
+      "sha256": "3ef5e48e09445e46e5a8113084c65d53aa8ef2f8924784191c8a7d88bf1ad989"
+    },
+    {
+      "bytes": 1104,
+      "path": "content/monsters/rift-piercer.md",
+      "sha256": "8a77bcafe220f166f6a3a08fdae473790c3d8900fee0794dde90945c9dbb69df"
+    },
+    {
+      "bytes": 1250,
+      "path": "content/monsters/rift-pudding.md",
+      "sha256": "282aca07e44329e2f8211afebb3ed6b3f47b9319288882e1de6ecdf86d286ed8"
+    },
+    {
+      "bytes": 1291,
+      "path": "content/monsters/rift-purple-worm.md",
+      "sha256": "f92dd1921809329c5fab9e83fc63551df1459ab6aa202c924f11971c0b5862f8"
+    },
+    {
+      "bytes": 881,
+      "path": "content/monsters/rift-raider.md",
+      "sha256": "49a13e8deb62c5dbae5da2bf3704569a33b7cc21b1362540c0d9b9f3fd5b635d"
+    },
+    {
+      "bytes": 1426,
+      "path": "content/monsters/rift-remorhaz.md",
+      "sha256": "2fe6573608d03e6ab8fbe57388e688b1be14caa092a756b526924883b0438ab5"
+    },
+    {
+      "bytes": 1468,
+      "path": "content/monsters/rift-revenant.md",
+      "sha256": "1a6e1d59f2ed4fae9697c8d7ac26925c25987059f15e9a38799d4ccff2ca3205"
+    },
+    {
+      "bytes": 947,
+      "path": "content/monsters/rift-roc.md",
+      "sha256": "05aac2bd36f1724909060a3278a849faf54e651aa313587aea980fda92540112"
+    },
+    {
+      "bytes": 1540,
+      "path": "content/monsters/rift-roper.md",
+      "sha256": "dfdc0fc8db6d93cc907a6a19f9774fb27817d6f1627f80de24b55e983acc7e4b"
+    },
+    {
+      "bytes": 1275,
+      "path": "content/monsters/rift-rust-monster.md",
+      "sha256": "252249492a45e67172c2790b33b12f45b4e9d8d9332bb0da5702566b634f244f"
+    },
+    {
+      "bytes": 1173,
+      "path": "content/monsters/rift-salamander.md",
+      "sha256": "14ade52a5c67774a395ddd150d1c1475e13e930061ca7fe540c2c5830f3441d0"
+    },
+    {
+      "bytes": 927,
+      "path": "content/monsters/rift-seeker.md",
+      "sha256": "bec58e2db9aaee83aac10863efd31aff89271c9883b9d9c116092a1a5ec53d48"
+    },
+    {
+      "bytes": 1477,
+      "path": "content/monsters/rift-shadow.md",
+      "sha256": "73a11bcd9a54252ad19e4b4edd2816141b6dec2c14e95a888b872b1f50b4da07"
+    },
+    {
+      "bytes": 970,
+      "path": "content/monsters/rift-shrieker.md",
+      "sha256": "6f4916887bfd6c06f5f3cd80a6cf435389711d6c3c6d52eba70466470392881b"
+    },
+    {
+      "bytes": 1001,
+      "path": "content/monsters/rift-skeleton.md",
+      "sha256": "285f9e6649ea948815c4000272a24670f36f17195630aca041b01a137b3cd858"
+    },
+    {
+      "bytes": 1135,
+      "path": "content/monsters/rift-smoke.md",
+      "sha256": "6808401c6b5749ad38ed552c953a9bd62d8a48c0bbe678f1047f18169a37b1c5"
+    },
+    {
+      "bytes": 1333,
+      "path": "content/monsters/rift-specter.md",
+      "sha256": "3213ee85a841db611ed437e8074d1ced71e3c685961e2c02fe4e42ce8a6fa768"
+    },
+    {
+      "bytes": 1338,
+      "path": "content/monsters/rift-spore.md",
+      "sha256": "e71028180e4b159e12b2a98c1fd041379b759a1facf135a52550d9f429edd8e0"
+    },
+    {
+      "bytes": 1231,
+      "path": "content/monsters/rift-stalker.md",
+      "sha256": "1557df13470b037c42988d54eb3fd6d3bd6b7ddf3f74b127b3b67de4889c0f97"
+    },
+    {
+      "bytes": 909,
+      "path": "content/monsters/rift-steam.md",
+      "sha256": "61b5b2eff3c6f691890d3ee0b9ef83143d012829e02ba7d8bb16d7df426f5198"
+    },
+    {
+      "bytes": 1834,
+      "path": "content/monsters/rift-tarrasque.md",
+      "sha256": "4955c8647813d55333e05e6b599078cdc6d5c0b54b5dc1fc83e0f4d42a238fa8"
+    },
+    {
+      "bytes": 1005,
+      "path": "content/monsters/rift-treant.md",
+      "sha256": "d1048986cb76c51cf009655025bedb364e85f4783d11e9b580ad589d6cb00949"
+    },
+    {
+      "bytes": 1407,
+      "path": "content/monsters/rift-troll.md",
+      "sha256": "f906b8ba41d3b9aa3d078bfcff6bf0b08bb1054c77a745275e58eea8b1023f47"
+    },
+    {
+      "bytes": 1573,
+      "path": "content/monsters/rift-vampire-spawn.md",
+      "sha256": "69d4160d45d496d6eff762eb91d981668813811a51fdbaf98d8151437aa20d39"
+    },
+    {
+      "bytes": 1914,
+      "path": "content/monsters/rift-vampire.md",
+      "sha256": "ea28771664bce6d38406958ae9439b5e1865e0adf1a72f2278b1e62d9f7352a9"
+    },
+    {
+      "bytes": 834,
+      "path": "content/monsters/rift-warhorse.md",
+      "sha256": "cf343635b195977263ffcbfe1d3627fbb90a2d95e77893091ebfc3be56710d53"
+    },
+    {
+      "bytes": 1606,
+      "path": "content/monsters/rift-water.md",
+      "sha256": "d604f95570848135fda05b36fd0afbc0b583a25ba07d36045c73faae248368cb"
+    },
+    {
+      "bytes": 1177,
+      "path": "content/monsters/rift-weird.md",
+      "sha256": "b8dcee4999cd6cac3513882779990932536914d347abcc9c45431d3ccaf235cd"
+    },
+    {
+      "bytes": 1740,
+      "path": "content/monsters/rift-wight.md",
+      "sha256": "ca466eb2edbce7289dbb848dba6f17290426dd5ee5adbb859ad4064e3d774dcb"
+    },
+    {
+      "bytes": 1068,
+      "path": "content/monsters/rift-winter-wolf.md",
+      "sha256": "fc4fc1a31c0e5833324b735426a7895b66822b71cec5332dc35ed3bb3f8df64e"
+    },
+    {
+      "bytes": 1693,
+      "path": "content/monsters/rift-wisp.md",
+      "sha256": "9c355dd571c52a3c6edfba2d414f1d55e1c3547f23142776deb833a8cfe70edd"
+    },
+    {
+      "bytes": 820,
+      "path": "content/monsters/rift-worg.md",
+      "sha256": "8054c70b0301a0f100090f54dcb01fe13a768c4724567cf15d7bc141dc5cdca8"
+    },
+    {
+      "bytes": 1514,
+      "path": "content/monsters/rift-wraith.md",
+      "sha256": "3f1468aafb5ea288cf26201a1fead2094838cc33c0438af08d4c90c3ce1a8c54"
+    },
+    {
+      "bytes": 1230,
+      "path": "content/monsters/rift-xorn.md",
+      "sha256": "5c0879ceba002019e4607b428eec85e1b4e28c86ce1a6e94441b3c3a25ebf08a"
+    },
+    {
+      "bytes": 1306,
+      "path": "content/monsters/rift-yeti.md",
+      "sha256": "784707473891b364eab31c861bc6d6d6aac6ca0db0158d893407fd3f0dbef202"
+    },
+    {
+      "bytes": 1165,
+      "path": "content/monsters/rift-zombie.md",
+      "sha256": "2d1ef94ec857ce5df4369423575139f8d43dd34759b0e86a493fd461c174766a"
+    },
+    {
+      "bytes": 1613,
+      "path": "content/monsters/rifthollowed-bear.md",
+      "sha256": "8197fb7ef61a4781492502b99159468bef3d6b0b8b0c545bca69becde3de720e"
+    },
+    {
+      "bytes": 1541,
+      "path": "content/monsters/rifthollowed-boar.md",
+      "sha256": "3e7a1bc13c7677ff82a5ccfe1198dce99b7f13e01e7e549f54913de54131578e"
+    },
+    {
+      "bytes": 1463,
+      "path": "content/monsters/rifthollowed-rat.md",
+      "sha256": "05c097173ac56e372982cb5f76764b191c4ea4a7031b2770efa0f9033407eae1"
+    },
+    {
+      "bytes": 1790,
+      "path": "content/monsters/rifthollowed-tiger.md",
+      "sha256": "3da4835276ef6e99111b7d80a38ad8b49c7adce06fa9cbeb0cdb33e9ca27750c"
+    },
+    {
+      "bytes": 1098,
+      "path": "content/monsters/rifthollowed-wolf.md",
+      "sha256": "e6762bcd016feac36bfc79dc03ccf63315c2ecf6b0c48029c2a63ef73baf5397"
+    },
+    {
+      "bytes": 1233,
+      "path": "content/monsters/rifthound.md",
+      "sha256": "604089278dcb30a408312451c0c0e0b28a9f48ba2854529f13d91a33646dda36"
+    },
+    {
+      "bytes": 1054,
+      "path": "content/monsters/rifthunter-priestess.md",
+      "sha256": "804335028cc0f713e4f4f85ddcfe73bbbb0bad17222cbfd00a97f5bf8db5eab4"
+    },
+    {
+      "bytes": 1118,
+      "path": "content/monsters/rifthunter.md",
+      "sha256": "57dd906b813f9253380c5a73ba2592c8944af1d67da3dac4e7d47e1f205d024a"
+    },
+    {
+      "bytes": 1093,
+      "path": "content/monsters/riftpond-scavenger.md",
+      "sha256": "b2449860b9a1c4f4628b264208b93c45dfe7cb9747ab03ac59e095412f7a63bf"
+    },
+    {
+      "bytes": 1106,
+      "path": "content/monsters/serpent-hollowed.md",
+      "sha256": "e60531e1b469d20373f418913ddca66d265af1439c7459027e7182d946bc999a"
+    },
+    {
+      "bytes": 957,
+      "path": "content/monsters/tunnel-wretch.md",
+      "sha256": "6e68bbf3c209fb10b9e47569b07737ba3cbbdf5558ccaf95ad891642712fca7c"
+    },
+    {
+      "bytes": 1166,
+      "path": "content/monsters/veil-gazer.md",
+      "sha256": "3c79f1c69b0481e2275c4eed57200614e6ae1fc674812be758019038ed2f7dd2"
+    },
+    {
+      "bytes": 1492,
+      "path": "content/monsters/veil-pilgrim.md",
+      "sha256": "48f73766896a2a9fa0b7a1c86200a30cf9557aca03713fba70292964a9dc4ffb"
+    },
+    {
+      "bytes": 1094,
+      "path": "content/monsters/veil-touched-elf.md",
+      "sha256": "8eaf0293eb64b888d06f71baf16b272eda9da37752f427dcf9d3731364cd7414"
+    },
+    {
+      "bytes": 1038,
+      "path": "content/monsters/veil-touched-elite.md",
+      "sha256": "269b3eecd06e97f0d5e4ee3856e39a1a315504c41f6623250e5c103122f31b73"
+    },
+    {
+      "bytes": 839,
+      "path": "content/monsters/verdant-blight.md",
+      "sha256": "d890d1fd5148c2bc472945fba0dc90445b3097e021e418f3429fa7b7d3dd5cb1"
+    },
+    {
+      "bytes": 1464,
+      "path": "content/monsters/verdant-mound.md",
+      "sha256": "9ebad4ec6df58318295a122283b41898b25d6d7d1b34ee50fea0580a86b8c1d5"
+    },
+    {
+      "bytes": 932,
+      "path": "content/monsters/verdant-scaled.md",
+      "sha256": "a334816fb7a05f611eb1503b48281e7fb9729b7b3b45b1fe6933cf6038583d07"
+    },
+    {
+      "bytes": 745,
+      "path": "content/monsters/verdant-shrub.md",
+      "sha256": "deedd7346bb4a62a40babdb2cbb6499bbd9fba4b2e0eff6f828155d5341a9518"
+    },
+    {
+      "bytes": 837,
+      "path": "content/monsters/verdant-tree.md",
+      "sha256": "b1ae2e138b4dde0a762acde1c451ebdd260f0a19288f85dbd3f24989b6fa1b53"
+    },
+    {
+      "bytes": 874,
+      "path": "content/monsters/verdant-twig.md",
+      "sha256": "018ccb34b638c972e9c7f7b11fe1682debb0f299c5039fa193fcbbf42d5fccce"
+    },
+    {
+      "bytes": 1178,
+      "path": "content/monsters/verdant-vine.md",
+      "sha256": "83f25690053a37c94818ed240b67f322695d796255acd8c1fdbfecc966d0cb84"
+    },
+    {
+      "bytes": 1409,
+      "path": "content/monsters/warden-armor.md",
+      "sha256": "308eeef1e20394d3fe81e1c918eaddd89eff9f25c35d9ee797c97bbd568b9e10"
+    },
+    {
+      "bytes": 1450,
+      "path": "content/monsters/warden-golem-clay.md",
+      "sha256": "4e373bcc495c9d02f4b855718c703b799ff536a8f09c2cb5569472cc0d79ddb4"
+    },
+    {
+      "bytes": 1296,
+      "path": "content/monsters/warden-golem-iron.md",
+      "sha256": "96ee86843d071def35fb5b24da2222ff26ad770020b0919501d9ab9c9deebb41"
+    },
+    {
+      "bytes": 1820,
+      "path": "content/monsters/warden-golem-stone.md",
+      "sha256": "721a81f6862b5b9b86eb8e818e9e820c191b6d4ac7c89fad02157ed0d7d5e1fb"
+    },
+    {
+      "bytes": 1077,
+      "path": "content/monsters/warden-homunculus.md",
+      "sha256": "7e1c47c56b95b53a47653acfb0cc18641b0c99646056fd07ddcd62704e0ddee2"
+    },
+    {
+      "bytes": 1204,
+      "path": "content/monsters/warden-horror.md",
+      "sha256": "4a4168e326a3c3adb61d563214338109579f8834e45db416cf30e7c16493cf42"
+    },
+    {
+      "bytes": 716,
+      "path": "content/spells/anchor-summons.md",
+      "sha256": "97fe1cb534f36b86a8e0605366ce37dc73dc3f008b94e2d08fa7fb6fd3a22ca8"
+    },
+    {
+      "bytes": 740,
+      "path": "content/spells/rift-blade.md",
+      "sha256": "97ab0e0b6bd97dc6dea19baf980ee0d186b515ba727a19650e886b3369328e76"
+    },
+    {
+      "bytes": 1178,
+      "path": "content/spells/rift-hand.md",
+      "sha256": "e70f1e50a25c3feb99d0069ef8242d4ceb5eb008cb54b30ede592dff42f93a3d"
+    },
+    {
+      "bytes": 682,
+      "path": "content/spells/rift-tentacles.md",
+      "sha256": "020fbf2918341439c86c5e852d9e5b9c03007f9d75b4326713dafafb455e29d0"
+    },
+    {
+      "bytes": 621,
+      "path": "content/spells/warden-hut.md",
+      "sha256": "4e193cca4c92e77b52708b97060bcef9aeb931ceff028122745c01c7df0413ea"
+    },
+    {
+      "bytes": 7690,
+      "path": "dm-tools/encounter-tables.md",
+      "sha256": "277066ce27692d12cda340b6c9fb78f315ab021d1de3c22bbb0c3146b9f33ffe"
+    },
+    {
+      "bytes": 10156,
+      "path": "dm-tools/environmental-effects.md",
+      "sha256": "9db40e6466b896f180b245f54c02e9be43795019e9e910aad7aa340282c842e3"
+    },
+    {
+      "bytes": 11610,
+      "path": "dm-tools/premade-side-content.md",
+      "sha256": "40076cd4be913ce13156e458db7f80ff8d5788551d2f5e684077368a33e4dc74"
+    },
+    {
+      "bytes": 9355,
+      "path": "dm-tools/rumor-tables.md",
+      "sha256": "cab51db53aaddc55c205173a55a0c5ab44f359755c6fa99b927bdc8dc4411d8a"
+    },
+    {
+      "bytes": 5277,
+      "path": "factions/caravan-jackals.md",
+      "sha256": "165a2a9f240e4901b6270b6913d00ad118437ecfe2c82ba65e8d2e3601e89946"
+    },
+    {
+      "bytes": 2931,
+      "path": "factions/caravaneers-guild.md",
+      "sha256": "c915f7801bba24a3078aed0e4de5dd0a2f5b9a364f9154c833c3764629d27ae2"
+    },
+    {
+      "bytes": 6820,
+      "path": "factions/hollowed.md",
+      "sha256": "71fb10120416d545a5fa77c71504cb41ee17da0e70060cf5d97274c43a14ec9a"
+    },
+    {
+      "bytes": 5000,
+      "path": "factions/hollows-crews.md",
+      "sha256": "9ac4a4b312acfe9ddb880b0f576f3a7da1edf437e772253122f12bb6e7b06db2"
+    },
+    {
+      "bytes": 6643,
+      "path": "factions/returners.md",
+      "sha256": "2e0e4c15d0f62fd1c6f22d648aeae481e11d06d8ac2e3c140c9406d3e66c4015"
+    },
+    {
+      "bytes": 4532,
+      "path": "factions/rift-raider-warbands.md",
+      "sha256": "d840fe7b373f75ec04a0c50f7fe01cbe50b5126da37d4cf7fd7b40aac6d5129d"
+    },
+    {
+      "bytes": 2724,
+      "path": "factions/scavengers-compact.md",
+      "sha256": "29d44d1738c1884a56f4638db0e73327c6b80365477512213b445cf4f7e1c119"
+    },
+    {
+      "bytes": 6444,
+      "path": "factions/the-anchor-church.md",
+      "sha256": "2a998cbac80ad2138a865db9bfb6374d7ce00951a3c0a820e06227d4fa08aead"
+    },
+    {
+      "bytes": 3765,
+      "path": "factions/the-radicals.md",
+      "sha256": "7db576818b5a920494c8ed4b94288ca2a400ab632954cacc632b8921fbae3bef"
+    },
+    {
+      "bytes": 5671,
+      "path": "factions/the-rememberers.md",
+      "sha256": "495e88ef36962e237ceaf442f550eb3900e9b90c9faae2915f3f7ac6153e54f8"
+    },
+    {
+      "bytes": 4890,
+      "path": "factions/the-stayers.md",
+      "sha256": "99bcbdc8b75cc7ef6e218f15b81c878056761a659ee0f8cfd77305592a6f10e6"
+    },
+    {
+      "bytes": 4114,
+      "path": "factions/the-unbound.md",
+      "sha256": "47b054b72644e0bdfa27295b5ca755e212cfe20a291467f78e65de46cafc28be"
+    },
+    {
+      "bytes": 5937,
+      "path": "factions/the-veiled-path.md",
+      "sha256": "1639ff7a3c7c0b3bada4c921f0bc44a7aa331b108e857650cb5b65031c5e2ae5"
+    },
+    {
+      "bytes": 6439,
+      "path": "factions/thornwall-council.md",
+      "sha256": "b708f26dfc0df61fef2c6835c89367a018b6269b122230a4b6fbdad8e66b017c"
+    },
+    {
+      "bytes": 4874,
+      "path": "factions/verdant-scaled.md",
+      "sha256": "83b3d80df34fb6c56004800835a5211fa6c6d8382a090a4c4c9d2fcd622891ae"
+    },
+    {
+      "bytes": 6051,
+      "path": "factions/warden-lodge.md",
+      "sha256": "9ede92625fbdebe74c86773141ada3e45b7662050ef44334388e3c3c30984b11"
+    },
+    {
+      "bytes": 4657,
+      "path": "factions/warrens-court.md",
+      "sha256": "b8389642aed8bba121e0e7ddafbb329cb18e3db9f96d74318e9068fbed1845b6"
+    },
+    {
+      "bytes": 5215,
+      "path": "locations/cairnfields.md",
+      "sha256": "7121f94598ee25d78eb681ea65c6916e83722d0e0fa71781cec054f8da640b05"
+    },
+    {
+      "bytes": 6440,
+      "path": "locations/nexus.md",
+      "sha256": "7106f5e1fa99aa87e2c2f1a71ee419c6bb8394953ada9e1f28b01f92e1e600f0"
+    },
+    {
+      "bytes": 5010,
+      "path": "locations/the-hollows.md",
+      "sha256": "4a2f2e759442cd2940a9f6dca0767cb4fed2cb3a9993b8b836297f57eaaa10cd"
+    },
+    {
+      "bytes": 5641,
+      "path": "locations/thornwall.md",
+      "sha256": "d5f322a8b10dffcc95406fb5d318dd5688a73900d3f54e06b66dcd09067c4f18"
+    },
+    {
+      "bytes": 4874,
+      "path": "locations/verdant-margin.md",
+      "sha256": "7f80d5da1d49892fabb71d2eadce8d1531f7c69caf42adc432db4812c77271c0"
+    },
+    {
+      "bytes": 3964,
+      "path": "locations/waystation.md",
+      "sha256": "9d4f2f70948dd2eea9f8ac33965e4fe9eaac400b6eeaae4317e1fe27b678af16"
+    },
+    {
+      "bytes": 9302,
+      "path": "lore/history-timeline.md",
+      "sha256": "683b4671cbab787bab223e857ae47ee005dd66e7ce7f09bebfd910161bbb3202"
+    },
+    {
+      "bytes": 10338,
+      "path": "lore/world-overview.md",
+      "sha256": "579799c41ea88bfff67b86598f299f5b54dfd06ca4879640d8f835e5048eac93"
+    },
+    {
+      "bytes": 1467,
+      "path": "npcs/alchemist-fume.md",
+      "sha256": "608657b866fd9f1b6f666ed46165dc477224ae1962d9f67d2f0c8afcce547b04"
+    },
+    {
+      "bytes": 1342,
+      "path": "npcs/archivist-apprentice.md",
+      "sha256": "bf9e9a4d959f0221ffefc5d1557a1ea863a61086925ae982ce8ca917c9b73607"
+    },
+    {
+      "bytes": 1567,
+      "path": "npcs/auntie-salt.md",
+      "sha256": "e5f442cbdb2e1d04d5ae27ca9a2be6255d23e609d5ede6ed48e6da1cdd569588"
+    },
+    {
+      "bytes": 1311,
+      "path": "npcs/baker-tessa.md",
+      "sha256": "939f27479036aa63558fdd905fd5de709d2200af3721367d1faa431c590da1ac"
+    },
+    {
+      "bytes": 1584,
+      "path": "npcs/brother-ash.md",
+      "sha256": "8e186a775084ce525d0708d803576b0a64a6cb4e7c7a19a8ed40b01d23eb4a77"
+    },
+    {
+      "bytes": 1076,
+      "path": "npcs/candle-maker.md",
+      "sha256": "6957ee9d9fb8abc5c2129696c28dfaed32b2e072d592edca204cb99f857b2ebc"
+    },
+    {
+      "bytes": 1298,
+      "path": "npcs/captain-harlan.md",
+      "sha256": "177a7256e9b7adf335a201511048c6c85041e8b5ff1c537d57698381bf07a893"
+    },
+    {
+      "bytes": 2238,
+      "path": "npcs/castellan-voss.md",
+      "sha256": "603c0e8c26a75918c8986a450c9994bc110dd4e626acfadd98af52785c872af5"
+    },
+    {
+      "bytes": 1918,
+      "path": "npcs/councillor-merrow.md",
+      "sha256": "4bba8602b704d9089e438c44db944e758227690dac4e94d1b046570581594487"
+    },
+    {
+      "bytes": 1502,
+      "path": "npcs/deacon-ash.md",
+      "sha256": "f85182cf45ef8aec9c291fef87ce9dd9f37fd116bd359d9a3615667df4358cb5"
+    },
+    {
+      "bytes": 2340,
+      "path": "npcs/doctor-cipher.md",
+      "sha256": "27274ec394532ab4ac944e2424c5f2bbb1998c3582a99aa39346a884f275d869"
+    },
+    {
+      "bytes": 1838,
+      "path": "npcs/father-glass.md",
+      "sha256": "5744e21e256b57a8f71bbb3ef66804084a12fe4c0d73deb64d0a73d327ffbd48"
+    },
+    {
+      "bytes": 817,
+      "path": "npcs/fishmonger-kale.md",
+      "sha256": "c222a00ecfe556c2212c37e65557444e1c8ff66ac6a0a980c7df743811c0becd"
+    },
+    {
+      "bytes": 1471,
+      "path": "npcs/fortune-teller.md",
+      "sha256": "aca230fedb6a3a34e637689e95983b467f3d040c25189aae20b7d8e704f6f078"
+    },
+    {
+      "bytes": 1942,
+      "path": "npcs/gareth-red-banner.md",
+      "sha256": "e20ca5de6fb1658f5f8b793a0b883606d2f082ef7530f0952a590f330b291012"
+    },
+    {
+      "bytes": 1508,
+      "path": "npcs/gavin-thatch.md",
+      "sha256": "58146c3d63376d51353af2eda2cbf13bb25b29420d1f49d5175cf727397907df"
+    },
+    {
+      "bytes": 1465,
+      "path": "npcs/grim.md",
+      "sha256": "f3352df28da809b061ec2491272ab9bae9c0116d9f345529da8127c30b5a2b3b"
+    },
+    {
+      "bytes": 1331,
+      "path": "npcs/guard-davith.md",
+      "sha256": "536ed803302c4eaf40fc6a4811221f3b90e572a564891226f6b137717eb7bd43"
+    },
+    {
+      "bytes": 1254,
+      "path": "npcs/guard-miri.md",
+      "sha256": "569c460e2007ee1a2de51451903fad396ce952cec1f20808e6e3768e17b85231"
+    },
+    {
+      "bytes": 1333,
+      "path": "npcs/healer-cassian.md",
+      "sha256": "2cc5dbbb06e3e448fcd4726313fda6c4903f84da45cee8513dee05e7eb2712a3"
+    },
+    {
+      "bytes": 1114,
+      "path": "npcs/herbalist-saffron.md",
+      "sha256": "58ecfa89dd6311e13e70e8df3d08d5657ab9b57b2a1cfa0dbc64477f6408ae8a"
+    },
+    {
+      "bytes": 1538,
+      "path": "npcs/hollowed-prophet.md",
+      "sha256": "122b9577bc2515dbbf248c56d71cf26e88644205a3e9a6bf5adb20e4194b7727"
+    },
+    {
+      "bytes": 1184,
+      "path": "npcs/hunter-lorn.md",
+      "sha256": "5d2f3a35d202317e5c4ff309f7e2e8a63b06c8e2e96c732c906d08543ce3aa89"
+    },
+    {
+      "bytes": 1250,
+      "path": "npcs/innkeep-vesper.md",
+      "sha256": "8b304c214766f32c9ef94d88dfbf33fee710d1888afb1e2c37a370ec5324bafc"
+    },
+    {
+      "bytes": 1607,
+      "path": "npcs/iron-mother-hest.md",
+      "sha256": "9568e9c13c1bc7e2b1f4c49d675e37b9754c4516a821a757bed6818a4af4d9ad"
+    },
+    {
+      "bytes": 1869,
+      "path": "npcs/kell.md",
+      "sha256": "bc3db5b69f1bd1ea4e4066bad98579c914f7efa69e26aa184d7ccd8db478cab9"
+    },
+    {
+      "bytes": 1984,
+      "path": "npcs/lace-brothers.md",
+      "sha256": "fd977fb3de2137e4f49b2300cabf2a61478b64608ead10fe5ec097f740b29e7d"
+    },
+    {
+      "bytes": 3142,
+      "path": "npcs/lady-kael.md",
+      "sha256": "5b6611298c0689308b3f4673c437ceec1f186e810fd690d35f4aaa5ae9f6196f"
+    },
+    {
+      "bytes": 2209,
+      "path": "npcs/lady-trask.md",
+      "sha256": "7ef82db68fc1dd7d200e00403dc95b22ce937a57ba07a470a3fcd2e4c1c08897"
+    },
+    {
+      "bytes": 1424,
+      "path": "npcs/librarian-vesper.md",
+      "sha256": "b0a69e2a1f1cd926b258c2b1fa9075657c56c470606c652ac5e198045b982a6d"
+    },
+    {
+      "bytes": 1769,
+      "path": "npcs/lord-dorn.md",
+      "sha256": "c4fe36eebe88d61bc27f20c6cf30008f307c3095876e7b3bfd9cccbad03d015a"
+    },
+    {
+      "bytes": 2404,
+      "path": "npcs/lord-merrick.md",
+      "sha256": "1ee2be94f5e25bc29e3eeb29527dd8cf984bbdd979e398f2db1be03971c12553"
+    },
+    {
+      "bytes": 3526,
+      "path": "npcs/lord-voss.md",
+      "sha256": "357fd3fa3633c089640fcc018ff47a051f3d7aa3c6d198ed67e7f43b93dc667f"
+    },
+    {
+      "bytes": 2253,
+      "path": "npcs/madame-thistle.md",
+      "sha256": "18cbf0de043b6861a2df775669708d38dfb17abc9a858d973a643535dbefa044"
+    },
+    {
+      "bytes": 1272,
+      "path": "npcs/margin-herbalist.md",
+      "sha256": "9677ca6cf09d7aca515c7b0fb8e6bdce13e228b5d007ac07674d624a78550803"
+    },
+    {
+      "bytes": 1248,
+      "path": "npcs/market-barker-kestrel.md",
+      "sha256": "fbffa52bd5f5f5513fdbd86b2f130a1ccd78997ce8888905e429bbc1dc0a05cb"
+    },
+    {
+      "bytes": 1160,
+      "path": "npcs/marla-cook.md",
+      "sha256": "9191eda4dd50dde1f3d20401a0dda31dcec44d635ccbab716ae7aa2e0b205751"
+    },
+    {
+      "bytes": 1721,
+      "path": "npcs/maw.md",
+      "sha256": "61500009c21cb19dcd8229fe38f62ffd834b609dad56b6d08126de5ab577e053"
+    },
+    {
+      "bytes": 1181,
+      "path": "npcs/merchant-hennick.md",
+      "sha256": "d2768de209b1e9cd22d63f9f13d7fa4873d4dca23388b6a3ce7eeeeddffab41e"
+    },
+    {
+      "bytes": 1578,
+      "path": "npcs/mother-wick.md",
+      "sha256": "1d2c0b2044d0decb9111d192fcef4a5839e53ef09b208028eecd3588172d2ac3"
+    },
+    {
+      "bytes": 1339,
+      "path": "npcs/nexus-guildmaster.md",
+      "sha256": "6eab9317c46350f063ee63dedfd2527a2c83a629693333e0292c2366e4f470e6"
+    },
+    {
+      "bytes": 1233,
+      "path": "npcs/nexus-innkeep.md",
+      "sha256": "66071539fb68ef44bbd1535ceda9912aed1b5553a9845e61b8b9c014f84269ba"
+    },
+    {
+      "bytes": 2019,
+      "path": "npcs/old-crane.md",
+      "sha256": "54ca940e0ea21b6c2e35eadd1a8cb24f104feb4c61e629a1a85190d03351c3e2"
+    },
+    {
+      "bytes": 1323,
+      "path": "npcs/old-finch.md",
+      "sha256": "03d47f86e6bd4a742f11a602d42d4649f19fd19ac6bce4c6fa8a17feaa729314"
+    },
+    {
+      "bytes": 1981,
+      "path": "npcs/orin-thatch.md",
+      "sha256": "91fea1511f986fe4052c808bea9b0024c65e7d9ec8b15b1522fa48ae3c9cbf32"
+    },
+    {
+      "bytes": 1215,
+      "path": "npcs/orphanage-keeper.md",
+      "sha256": "42109ef888eec2b99d7a30f99085fa04fe13f2eba61816f8e30cb0b75a55de3f"
+    },
+    {
+      "bytes": 1180,
+      "path": "npcs/patrol-veteran-stern.md",
+      "sha256": "e47cf06f16d428fea7fe7d0a3dbd327c0bc6767a279607335998bafb3e058bbe"
+    },
+    {
+      "bytes": 1087,
+      "path": "npcs/pike-rookie.md",
+      "sha256": "62824673fb6b5d637e090d487b3a2d565d2a38b4b3800daa610ef429192e3466"
+    },
+    {
+      "bytes": 1429,
+      "path": "npcs/prospector-joss.md",
+      "sha256": "cf4199f024b98113775ae94121cb3f6a8a7e93fdc3a647203ec0cb456f8c525d"
+    },
+    {
+      "bytes": 1208,
+      "path": "npcs/quarter-merchant-rook.md",
+      "sha256": "a2fe033f213ae907af0a1dabdeb3126a2b5b55a47e7ef5e12542206abfc95b5a"
+    },
+    {
+      "bytes": 1311,
+      "path": "npcs/ratcatcher.md",
+      "sha256": "7a689c33cafe0496cf263182d45e9b34174d19189027b1d04336ade570a134b1"
+    },
+    {
+      "bytes": 1102,
+      "path": "npcs/researcher-linden.md",
+      "sha256": "55da24e1f2a5172c8bbcabe2aa17cc92d2444d6b525b0e00fc1a1e062bead54b"
+    },
+    {
+      "bytes": 1465,
+      "path": "npcs/rift-seeker-iro.md",
+      "sha256": "e3dfed946a3b33ec196e4a5d93773de2f6dc94ac2688682ca93347e5d1a4ce8a"
+    },
+    {
+      "bytes": 1784,
+      "path": "npcs/salt-ash.md",
+      "sha256": "4394ad691618e594ff1b1f6adbd0cfbd601b0799d02a27bc3905b3b20720ff10"
+    },
+    {
+      "bytes": 1411,
+      "path": "npcs/scaled-hunter.md",
+      "sha256": "e9306b5c49ec0a73b20bebb30c99c0b8fe359a031eddbe36c41d4786dead92d3"
+    },
+    {
+      "bytes": 1333,
+      "path": "npcs/scavenger-vet-rigg.md",
+      "sha256": "11a02081bed4a25408ec1f60f65cd3f70e2d68b2573104286961e6aab21fde46"
+    },
+    {
+      "bytes": 1195,
+      "path": "npcs/scribe-apprentice.md",
+      "sha256": "79999006b8007b4f69f2859f1c361728333f02e2feabe32146343f3f56612224"
+    },
+    {
+      "bytes": 1514,
+      "path": "npcs/shrike.md",
+      "sha256": "06a8821c53a33ef2e094877c722822eacb75b17774640cb9a526728bd4870bed"
+    },
+    {
+      "bytes": 1071,
+      "path": "npcs/signal-keeper.md",
+      "sha256": "9944c39675a4ba5a612d0856de2ccd6f87818950701e1f083b139d39d0a076aa"
+    },
+    {
+      "bytes": 1688,
+      "path": "npcs/sister-candle.md",
+      "sha256": "f42f689a5af35538d56ccef2a3e11dfed066a736c28dd1386b54f3c4cc895374"
+    },
+    {
+      "bytes": 2771,
+      "path": "npcs/sister-iron.md",
+      "sha256": "d8ea79351084595771df433305749312281c265c3d713544f22df360641e0d6c"
+    },
+    {
+      "bytes": 1278,
+      "path": "npcs/stablemaster-corin.md",
+      "sha256": "356f3223815bade46d96ec973f903c814f12fa6c4ef15e0d2691b0e20f424eb5"
+    },
+    {
+      "bytes": 1300,
+      "path": "npcs/streets-kit.md",
+      "sha256": "82e4782bf48ea433108fd6a758f19426b86474b465f2ff83b0265fc8d05cf827"
+    },
+    {
+      "bytes": 978,
+      "path": "npcs/tailor-lace.md",
+      "sha256": "2f12b57e10e397e472ba04c5dad3fecfb87f434e0b9103a0ebeff3cbebfc3dff"
+    },
+    {
+      "bytes": 1482,
+      "path": "npcs/tallow.md",
+      "sha256": "243203ca6d5b1fc6456e25ce08d5adbec3530f31790e396ab5f91c8ae709b9f1"
+    },
+    {
+      "bytes": 1279,
+      "path": "npcs/tavern-bard-echo.md",
+      "sha256": "7e499f51344b7269d67565f58e914d42ab8f8e0f0c216f9b9731cf1cb4e8209d"
+    },
+    {
+      "bytes": 1477,
+      "path": "npcs/the-archivist.md",
+      "sha256": "072ec09c3075f94f54686d48bb6f060add751ac69d521b4aff31fe1267424a73"
+    },
+    {
+      "bytes": 1608,
+      "path": "npcs/the-cartographer.md",
+      "sha256": "686da9452b487286b455536469e1670dfc9af182a62290a949f6616e510ff271"
+    },
+    {
+      "bytes": 1479,
+      "path": "npcs/the-glass-monk.md",
+      "sha256": "48b333840b0e9d00b80e07da125452ef245673c434e75325265c21381674158a"
+    },
+    {
+      "bytes": 1764,
+      "path": "npcs/the-inkwell.md",
+      "sha256": "548d89f77d5123c185879e42a4e43f47daa54122a1caf15ada5445b559911595"
+    },
+    {
+      "bytes": 1802,
+      "path": "npcs/the-quartermaster.md",
+      "sha256": "ec842a086ea6228eb69255803589c1f28ddd4f5a6779f78c7f9362f7fbd44a90"
+    },
+    {
+      "bytes": 1597,
+      "path": "npcs/the-silent.md",
+      "sha256": "c5e39a74289f47181b4cee530064c3a4a9fc32509057ca2dbbb0b28bcde9da4d"
+    },
+    {
+      "bytes": 2009,
+      "path": "npcs/tide-mother.md",
+      "sha256": "8eaafa6e08f0828766afd8e7158745f76ca4f7a8e249d1ebdec9557c7e506f60"
+    },
+    {
+      "bytes": 1350,
+      "path": "npcs/undercroft-guide.md",
+      "sha256": "9da9d284b6f579c5fccf1e8982f0ddabbf01c29009262a7a058b8d7f239d2813"
+    },
+    {
+      "bytes": 4055,
+      "path": "npcs/v.md",
+      "sha256": "d7443127297eb1d8da9e6f41fe8c2be5989c1c9792f18d993b569f5a1666381e"
+    },
+    {
+      "bytes": 2152,
+      "path": "npcs/war-captain-korr.md",
+      "sha256": "d9fbf97cc6b69127222c3d80b24231256528e03a44aeee0d3361739c51c975ff"
+    },
+    {
+      "bytes": 1921,
+      "path": "npcs/war-captain-vex.md",
+      "sha256": "7c45e736dd82319818199a11bd870e1b771e883c91c44c3eca7e4d9d8c0c9438"
+    },
+    {
+      "bytes": 1220,
+      "path": "npcs/warrens-fence.md",
+      "sha256": "734d7a473d361e6951dd7893745e96324478e084fa753fe4de4467c9a4fa0118"
+    },
+    {
+      "bytes": 1313,
+      "path": "npcs/waystation-healer.md",
+      "sha256": "4dbc708ab5cf7d13ee76e9b08fa85eaa5d3fe292e69386031a4e284fbbe251db"
+    },
+    {
+      "bytes": 906,
+      "path": "npcs/waystation-smith.md",
+      "sha256": "fde23eac5202a4c9d1374933a5a0176313d702d561c5be26170a6d9a870a3256"
+    },
+    {
+      "bytes": 602,
+      "path": "setting-knowledge.json",
+      "sha256": "a04d3cb98e99676cc299abbed7ee335aa53519ecf427b3242a50d2b311f4c6d9"
+    },
+    {
+      "bytes": 1056,
+      "path": "source-setting.json",
+      "sha256": "0f415f71e3beb38625715bcfe19e7e2909208939030a496de531a70fda58f46f"
+    }
+  ],
+  "id": "pneuma.severed-lands",
+  "metadata": {
+    "label": "Severed Lands Campaign Setting"
+  },
+  "minimum_model_capability_tier": "sylvia.capability.t06",
+  "participant_artifacts": [],
+  "prompt_fragments": [],
+  "provenance": {
+    "publisher": "Pneuma IO",
+    "source_sha256": "dd58198ffe6a14a4a303f522851c6a2f7e363eb42b325a9811180dad3655035a"
+  },
+  "role": "dependency",
+  "tools": [],
+  "ui_surfaces": [],
+  "version": "1.0.0-alpha.2.naming.1"
+}
