@@ -1,0 +1,197 @@
+{
+  "format_id": "sylvia-gm-source-snapshot",
+  "format_version": 1,
+  "repository": "local-siren-protocol-adapter",
+  "upstream_manifest": "upstream-source-manifest.json",
+  "source_sha256": "b402c42c1ceff681115cc0c05d8396b1b173afea687e81893bab81ab4a898954",
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "51df13994be3874ddb53615ab621f3a795495ab55c9b037af26bf4143fa31668"
+    },
+    {
+      "path": "SOURCE.md",
+      "sha256": "e24aaf83665a56a23ffb43a7d68e924e552d421936f390750c1255b1ed28ab53"
+    },
+    {
+      "path": "canon/canon.json",
+      "sha256": "17d8c5f267fb5294c986f4dd8081c712cc6aa8f8be66ff96ee28eb0b6a55443d"
+    },
+    {
+      "path": "canon/canon.yaml",
+      "sha256": "023649bc227b85d2b8c938e65983c790fc09236e718bc8677fe77831cf5e7c76"
+    },
+    {
+      "path": "characters/Blaze.md",
+      "sha256": "ee3002bc1ad43823b193226118225c05348b9946dd915ed714a3db96ab94174f"
+    },
+    {
+      "path": "characters/Hex.md",
+      "sha256": "423aa5ff74fa8e2edddc48ad908933070fb310cb6969a567bca15b4aa25eca23"
+    },
+    {
+      "path": "characters/Kora.md",
+      "sha256": "174a8fa534126bb5b1bc3ead7d29e43da9cc347fa322704b6f7fbd9b07e3444d"
+    },
+    {
+      "path": "characters/Nova.md",
+      "sha256": "7512bf9f920da7484fcc1c776ae5efa7a876f958d98babc4804b615264535ce7"
+    },
+    {
+      "path": "characters/PLAYABLE_BUILDS.md",
+      "sha256": "a3253925662fff3e2c7fe706ec0de562d7f751557f3def3e17e881b4db846fa5"
+    },
+    {
+      "path": "characters/Pixie.md",
+      "sha256": "851d7c7189c22931ef30d2cdc948c22f0aeea784bce82fa8cb9299485f85bbc5"
+    },
+    {
+      "path": "characters/README.md",
+      "sha256": "b122e621f41046a9bc57d4f5ba44fb21f80b6bd155c6c24c0ec4cb17af52c07a"
+    },
+    {
+      "path": "characters/Riot.md",
+      "sha256": "f17a9673b63311082da611cea9a8dab98a946ec0861fece9d53e8799d31b2f75"
+    },
+    {
+      "path": "characters/Sable.md",
+      "sha256": "2d9fe91473595a25755894fa3fd8ed6a888dd0a2ed966495e6eb9b25eaf4fd5a"
+    },
+    {
+      "path": "characters/Siren.md",
+      "sha256": "899b3f6b8c83d31c3423ea98c115537bb54c2fd881fcdea55f1a38917915bce1"
+    },
+    {
+      "path": "characters/Solace.md",
+      "sha256": "e152f877a8b70a1eecb6ffb1381ff1f87501030bdbe41f630a218a8946710ecd"
+    },
+    {
+      "path": "characters/Velvet.md",
+      "sha256": "9f4733ab8978c2a0dc26765c0e16e3db571df53fefbdc6e9bfb8e7c394af6233"
+    },
+    {
+      "path": "characters/Vesper.md",
+      "sha256": "fa94691554ef91f638baeb309b053ace4355359382198a4b2a42e4e045add74b"
+    },
+    {
+      "path": "docs/AGENT_AND_CANON_SPECIFICATION.md",
+      "sha256": "6c0147e821f45552745603e4bf8cb3a015fa9cce1c5c500bd0ddce789e8dbd76"
+    },
+    {
+      "path": "docs/CAMPAIGN_SETTING_GUIDE.md",
+      "sha256": "89c370f1747841702f973ff26afd12a1e7332893e31bc3f65cbb946733e7b1e4"
+    },
+    {
+      "path": "docs/PLAYABLE_IMPLEMENTATION.md",
+      "sha256": "a50db646c8071ebc8a1dbb74daa1fd6fdbfa3ceac9437c871ec8bfee2e5975f7"
+    },
+    {
+      "path": "docs/RULESET_BRIDGE.md",
+      "sha256": "94b202809488caef6a762a4501d7d84186b5d3f7b51f8ac08cc6473a0d579901"
+    },
+    {
+      "path": "docs/SETTING_CONSTITUTION.md",
+      "sha256": "68f7ba97e02042c0f7561f442f6606ede54cb0bd7b1431a5dfcd1e51f8f29b63"
+    },
+    {
+      "path": "docs/WORLD_ARCHITECTURE.md",
+      "sha256": "fbf3f85205f7fe52fed6091e3d3fd8fb087e4befe44e20eadfd01334425cdcb7"
+    },
+    {
+      "path": "implementation/README.md",
+      "sha256": "2581298a778d8c6f6d218e944102509cfec8a7c5db819dcf05a4a8e3435b144b"
+    },
+    {
+      "path": "implementation/characters.json",
+      "sha256": "5b8babfefd9cccf4826930e7dee80c94fa9fd01f34a5e5f9f2bf81b877911991"
+    },
+    {
+      "path": "implementation/equipment.json",
+      "sha256": "5ad72c7f9186e8755df682e33c56d0661a1cd1a96232037fc63f1e70eb57b61d"
+    },
+    {
+      "path": "implementation/manifest.json",
+      "sha256": "a5f141f89539222ff0106ef658bff0501421a9b1344c0e181be772c3b651224f"
+    },
+    {
+      "path": "rules/HAREMRUN_EXTENSIONS.md",
+      "sha256": "10ee27e2c2ad17817aca31609aac9089218479ec46f5bc447cbf477d5459ac0c"
+    },
+    {
+      "path": "setting-knowledge.json",
+      "sha256": "393b3846b12e3535a6bfa5f3c0edea55c704e06b0b42de0a8f859049969cc51e"
+    },
+    {
+      "path": "setting/README.md",
+      "sha256": "1fbfed85344ea45711b0d07b8ef71ab2be76cb45183d081a6938bd2ec42f0966"
+    },
+    {
+      "path": "setting/factions/AUSTRALIAN_OLIGARCHIES.md",
+      "sha256": "c53a532307b28d6daf473cef682f744ad2f78d844d901830b4903fa498be2f93"
+    },
+    {
+      "path": "setting/factions/AUSTRALIAN_SECOND_TIER_CORPORATIONS.md",
+      "sha256": "0cedbe8a3b0c9fcb260daa7e251a68c49ddea5f01298cd9015f8bceab4af9aad"
+    },
+    {
+      "path": "setting/factions/README.md",
+      "sha256": "87497cb8ed34e11a11d00a4ac0e29cffd26fb2c12c124f07ae3490302fc50515"
+    },
+    {
+      "path": "setting/factions/SYDNEY_LOCAL_POWERS.md",
+      "sha256": "8bb39beba54a8c3007c72bc3b383e2883364d1a0fc43521ebfab4cca53e1e320"
+    },
+    {
+      "path": "setting/locations/README.md",
+      "sha256": "be8d1e4970fb25a937b6e7bf152d58e713a750061ca75175abd5413ab8722ab8"
+    },
+    {
+      "path": "setting/locations/SYDNEY_COASTAL_REGION.md",
+      "sha256": "187e1e61bc409637b1e18ffe45a07c37e430641dcaadd4256612a82e8a8a88b5"
+    },
+    {
+      "path": "setting/locations/SYDNEY_DISTRICTS_PHASE1.md",
+      "sha256": "504df498590aa1e943a0a4e01f40067e7f1f3632b1270f7ab54b86b9e1b15405"
+    },
+    {
+      "path": "setting/locations/SYDNEY_DISTRICTS_PHASE2.md",
+      "sha256": "b9ef09abe1aae11f24b1a0084ffd650b8f684afde46519815a519ad137e5b1da"
+    },
+    {
+      "path": "setting/locations/SYDNEY_DISTRICTS_PHASE3.md",
+      "sha256": "60ce80b5f31e7ac78315fb141eb100083a225589cc65ca53e8e43c314ee37b26"
+    },
+    {
+      "path": "setting/locations/SYDNEY_MACRO_GEOGRAPHY.md",
+      "sha256": "de117ce97eaa3576249fc193a4eb0bc5f81d73c7a5771f536a9cb29f46165641"
+    },
+    {
+      "path": "setting/locations/SYDNEY_SHOWCASE_STATUS.md",
+      "sha256": "277984d057a26e03e02ac2e6a705c4509047d647a208aed9a3edcbc307ed4656"
+    },
+    {
+      "path": "setting/politics/AUSTRALIAN_CONCESSIONARY_OLIGARCHY.md",
+      "sha256": "52336df98efceea0f8fb6ade4fc4677a2672570496ef48f3c17be321d3e2d37b"
+    },
+    {
+      "path": "setting/technology/FIREARMS_PROTECTION_AND_EFFECTS.md",
+      "sha256": "591e521d9b7e01b4bf75c2d7c9db1c7a4c234f780194e6c9030cedf073af24fe"
+    },
+    {
+      "path": "setting/technology/MEDICAL_DRONES_AND_CYBERNETICS.md",
+      "sha256": "08d0afad22443958a8b95c5ba83d5c0fd555336b0efe6c83ea6b489c454d55f1"
+    },
+    {
+      "path": "setting/technology/README.md",
+      "sha256": "91c5b5bbc3365ad359c967624c3d976aca21c2949c11f2d646f5336fbc6f182b"
+    },
+    {
+      "path": "setting/technology/VEHICLES.md",
+      "sha256": "d113495260bd4e52cca513f8629d1d2e8a0756942bcdff6ae364e8e311516cbd"
+    },
+    {
+      "path": "upstream-source-manifest.json",
+      "sha256": "8951d1f742041f69d049498022475e71fa66befb17ce676c0da76c37c1b72201"
+    }
+  ]
+}

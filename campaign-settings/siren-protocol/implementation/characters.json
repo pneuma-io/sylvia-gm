@@ -1,0 +1,795 @@
+{
+  "format": 1,
+  "profile_id": "pneuma-io.haremrun.playable-cast.v0-1",
+  "character_schema_id": "pneuma-io.trigger-discipline.character.v0-1",
+  "default_level": 5,
+  "default_side": "allies",
+  "side_note": "The side field is an import convenience for a authored allied companion profile. It is not setting-wide allegiance canon and may be changed by a Campaign Plan.",
+  "level_note": "Level 5 is this implementation profile's authored default, not a canonical age/experience rank and not a general Trigger Discipline player-start rule.",
+  "characters": [
+    {
+      "profile_id": "hr.premade.vesper.v0-1",
+      "fiction_design_anchor": "RIFLEMAN",
+      "runtime_character": {
+        "schema_id": "pneuma-io.trigger-discipline.character.v0-1",
+        "artifact": {
+          "id": "vesper",
+          "name": "Vesper",
+          "level": 5,
+          "side": "allies",
+          "class_id": "RIFLEMAN",
+          "aptitudes": {
+            "acuity": 0,
+            "force": 0,
+            "nerve": 0,
+            "precision": 1,
+            "presence": 0,
+            "reason": 0
+          },
+          "skills": {
+            "athletics": 0,
+            "cqc": 2,
+            "drone_operations": 0,
+            "engineering": 0,
+            "grenades": 0,
+            "influence": 0,
+            "investigation": 0,
+            "local_hacking": 0,
+            "marksmanship": 5,
+            "medicine": 0,
+            "networking": 0,
+            "recon": 2,
+            "social_read": 0,
+            "stealth": 0,
+            "tactics": 3,
+            "vehicles": 0
+          },
+          "specialties": [
+            "specialty.operator.entry.weapon_manipulation",
+            "specialty.operator.tier_1.retention_reload",
+            "specialty.operator.tier_1.transition_drill",
+            "specialty.operator.tier_2.shoulder_switch",
+            "specialty.operator.tier_2.selective_load"
+          ]
+        }
+      },
+      "loadout": [
+        {
+          "equipment_id": "hr.eq.palisade.r55",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.palisade.p15",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.palisade.flexplate",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.palisade.fog8",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.cyber.palisade.taclink",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.cyber.morrow.optics",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "profile_id": "hr.premade.riot.v0-1",
+      "fiction_design_anchor": "BREACHER",
+      "runtime_character": {
+        "schema_id": "pneuma-io.trigger-discipline.character.v0-1",
+        "artifact": {
+          "id": "riot",
+          "name": "Riot",
+          "level": 5,
+          "side": "allies",
+          "class_id": "BREACHER",
+          "aptitudes": {
+            "acuity": 0,
+            "force": 1,
+            "nerve": 0,
+            "precision": 0,
+            "presence": 0,
+            "reason": 0
+          },
+          "skills": {
+            "athletics": 2,
+            "cqc": 5,
+            "drone_operations": 0,
+            "engineering": 0,
+            "grenades": 3,
+            "influence": 0,
+            "investigation": 0,
+            "local_hacking": 0,
+            "marksmanship": 2,
+            "medicine": 0,
+            "networking": 0,
+            "recon": 0,
+            "social_read": 0,
+            "stealth": 0,
+            "tactics": 0,
+            "vehicles": 0
+          },
+          "specialties": [
+            "specialty.breaker.entry.tactical_breaching",
+            "specialty.breaker.tier_1.read_the_barrier",
+            "specialty.breaker.tier_1.focused_breach",
+            "specialty.breaker.tier_2.breach_and_flow",
+            "specialty.breaker.tier_2.controlled_breach"
+          ]
+        }
+      },
+      "loadout": [
+        {
+          "equipment_id": "hr.eq.palisade.b12",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.palisade.p15",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.palisade.flexplate",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.palisade.f7",
+          "quantity": 2
+        },
+        {
+          "equipment_id": "hr.eq.palisade.flash4",
+          "quantity": 2
+        },
+        {
+          "equipment_id": "hr.eq.palisade.breach_kit",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.cyber.palisade.taclink",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "profile_id": "hr.premade.solace.v0-1",
+      "fiction_design_anchor": "CORPSMAN",
+      "runtime_character": {
+        "schema_id": "pneuma-io.trigger-discipline.character.v0-1",
+        "artifact": {
+          "id": "solace",
+          "name": "Solace",
+          "level": 5,
+          "side": "allies",
+          "class_id": "CORPSMAN",
+          "aptitudes": {
+            "acuity": 0,
+            "force": 0,
+            "nerve": 0,
+            "precision": 0,
+            "presence": 0,
+            "reason": 1
+          },
+          "skills": {
+            "athletics": 2,
+            "cqc": 0,
+            "drone_operations": 0,
+            "engineering": 0,
+            "grenades": 0,
+            "influence": 0,
+            "investigation": 3,
+            "local_hacking": 0,
+            "marksmanship": 0,
+            "medicine": 5,
+            "networking": 0,
+            "recon": 0,
+            "social_read": 2,
+            "stealth": 0,
+            "tactics": 0,
+            "vehicles": 0
+          },
+          "specialties": [
+            "specialty.field_medic.entry.combat_medicine",
+            "specialty.field_medic.tier_1.rapid_stabilization",
+            "specialty.field_medic.tier_1.kit_at_hand",
+            "specialty.field_medic.tier_2.patch_and_move",
+            "specialty.field_medic.tier_2.get_them_up"
+          ]
+        }
+      },
+      "loadout": [
+        {
+          "equipment_id": "hr.eq.palisade.p15",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.palisade.flexplate",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.calyx.fieldkit",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.sphn.trauma_kit",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.cyber.morrow.medtelemetry",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "profile_id": "hr.premade.blaze.v0-1",
+      "fiction_design_anchor": "mobility / VEHICLES",
+      "runtime_profile_note": "Blaze's fiction anchor remains VEHICLES/mobility. The v0.1 runtime profile selects GHOST/EVADER because Trigger Discipline has no dedicated driver class. GHOST mobility applies to Blaze herself, not to her vehicle; vehicle performance still uses VEHICLES and actual vehicle fiction.",
+      "runtime_character": {
+        "schema_id": "pneuma-io.trigger-discipline.character.v0-1",
+        "artifact": {
+          "id": "blaze",
+          "name": "Blaze",
+          "level": 5,
+          "side": "allies",
+          "class_id": "GHOST",
+          "aptitudes": {
+            "acuity": 0,
+            "force": 0,
+            "nerve": 0,
+            "precision": 1,
+            "presence": 0,
+            "reason": 0
+          },
+          "skills": {
+            "athletics": 0,
+            "cqc": 0,
+            "drone_operations": 0,
+            "engineering": 0,
+            "grenades": 0,
+            "influence": 0,
+            "investigation": 0,
+            "local_hacking": 0,
+            "marksmanship": 2,
+            "medicine": 0,
+            "networking": 0,
+            "recon": 2,
+            "social_read": 0,
+            "stealth": 3,
+            "tactics": 0,
+            "vehicles": 5
+          },
+          "specialties": [
+            "specialty.evader.entry.break_contact",
+            "specialty.evader.tier_1.vanishing_move",
+            "specialty.evader.tier_1.cut_the_corner",
+            "specialty.evader.tier_2.extended_reposition",
+            "specialty.evader.tier_2.hard_to_reacquire"
+          ]
+        }
+      },
+      "loadout": [
+        {
+          "equipment_id": "hr.eq.palisade.k30",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.palisade.p15",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.palisade.civicweave",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.palisade.fog8",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.cyber.vectorline.drivelink",
+          "quantity": 1
+        }
+      ],
+      "default_vehicle_id": "hr.vehicle.vectorline.cinder_r"
+    },
+    {
+      "profile_id": "hr.premade.sable.v0-1",
+      "fiction_design_anchor": "SHARPSHOOTER",
+      "runtime_character": {
+        "schema_id": "pneuma-io.trigger-discipline.character.v0-1",
+        "artifact": {
+          "id": "sable",
+          "name": "Sable",
+          "level": 5,
+          "side": "allies",
+          "class_id": "SHARPSHOOTER",
+          "aptitudes": {
+            "acuity": 1,
+            "force": 0,
+            "nerve": 0,
+            "precision": 0,
+            "presence": 0,
+            "reason": 0
+          },
+          "skills": {
+            "athletics": 0,
+            "cqc": 0,
+            "drone_operations": 0,
+            "engineering": 0,
+            "grenades": 0,
+            "influence": 0,
+            "investigation": 2,
+            "local_hacking": 0,
+            "marksmanship": 5,
+            "medicine": 0,
+            "networking": 0,
+            "recon": 3,
+            "social_read": 0,
+            "stealth": 2,
+            "tactics": 0,
+            "vehicles": 0
+          },
+          "specialties": [
+            "specialty.sentinel.entry.prepared_sightline",
+            "specialty.sentinel.tier_1.broad_sector",
+            "specialty.sentinel.tier_1.stable_nest",
+            "specialty.sentinel.tier_2.crossing_shot",
+            "specialty.sentinel.tier_2.second_trigger"
+          ]
+        }
+      },
+      "loadout": [
+        {
+          "equipment_id": "hr.eq.palisade.m7",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.palisade.p15",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.palisade.flexplate",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.palisade.fog8",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.cyber.morrow.optics",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "profile_id": "hr.premade.velvet.v0-1",
+      "fiction_design_anchor": "INFLUENCER",
+      "runtime_character": {
+        "schema_id": "pneuma-io.trigger-discipline.character.v0-1",
+        "artifact": {
+          "id": "velvet",
+          "name": "Velvet",
+          "level": 5,
+          "side": "allies",
+          "class_id": "INFLUENCER",
+          "aptitudes": {
+            "acuity": 0,
+            "force": 0,
+            "nerve": 0,
+            "precision": 0,
+            "presence": 1,
+            "reason": 0
+          },
+          "skills": {
+            "athletics": 0,
+            "cqc": 0,
+            "drone_operations": 0,
+            "engineering": 0,
+            "grenades": 0,
+            "influence": 5,
+            "investigation": 2,
+            "local_hacking": 0,
+            "marksmanship": 0,
+            "medicine": 0,
+            "networking": 0,
+            "recon": 2,
+            "social_read": 3,
+            "stealth": 0,
+            "tactics": 0,
+            "vehicles": 0
+          },
+          "specialties": [
+            "specialty.icon.entry.recognition",
+            "specialty.icon.tier_1.read_the_audience",
+            "specialty.icon.tier_1.public_introduction",
+            "specialty.icon.tier_2.make_an_entrance",
+            "specialty.icon.tier_2.crowd_momentum"
+          ]
+        }
+      },
+      "loadout": [
+        {
+          "equipment_id": "hr.eq.palisade.p15",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.palisade.civicweave",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.cyber.lattice.civiclink",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "profile_id": "hr.premade.pixie.v0-1",
+      "fiction_design_anchor": "GHOST",
+      "runtime_character": {
+        "schema_id": "pneuma-io.trigger-discipline.character.v0-1",
+        "artifact": {
+          "id": "pixie",
+          "name": "Pixie",
+          "level": 5,
+          "side": "allies",
+          "class_id": "GHOST",
+          "aptitudes": {
+            "acuity": 1,
+            "force": 0,
+            "nerve": 0,
+            "precision": 0,
+            "presence": 0,
+            "reason": 0
+          },
+          "skills": {
+            "athletics": 2,
+            "cqc": 2,
+            "drone_operations": 0,
+            "engineering": 0,
+            "grenades": 0,
+            "influence": 0,
+            "investigation": 0,
+            "local_hacking": 0,
+            "marksmanship": 0,
+            "medicine": 0,
+            "networking": 0,
+            "recon": 3,
+            "social_read": 0,
+            "stealth": 5,
+            "tactics": 0,
+            "vehicles": 0
+          },
+          "specialties": [
+            "specialty.infiltrator.entry.approach_plan",
+            "specialty.infiltrator.tier_1.timed_crossing",
+            "specialty.infiltrator.tier_1.quiet_hands",
+            "specialty.infiltrator.tier_2.clean_entry",
+            "specialty.infiltrator.tier_2.distraction_window"
+          ]
+        }
+      },
+      "loadout": [
+        {
+          "equipment_id": "hr.eq.palisade.k30",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.palisade.p15",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.palisade.civicweave",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.palisade.fog8",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.independent.infiltration_kit",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.cyber.lattice.civiclink",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "profile_id": "hr.premade.hex.v0-1",
+      "fiction_design_anchor": "HACKER",
+      "runtime_character": {
+        "schema_id": "pneuma-io.trigger-discipline.character.v0-1",
+        "artifact": {
+          "id": "hex",
+          "name": "Hex",
+          "level": 5,
+          "side": "allies",
+          "class_id": "HACKER",
+          "aptitudes": {
+            "acuity": 0,
+            "force": 0,
+            "nerve": 0,
+            "precision": 0,
+            "presence": 0,
+            "reason": 1
+          },
+          "skills": {
+            "athletics": 0,
+            "cqc": 0,
+            "drone_operations": 0,
+            "engineering": 2,
+            "grenades": 0,
+            "influence": 0,
+            "investigation": 2,
+            "local_hacking": 3,
+            "marksmanship": 0,
+            "medicine": 0,
+            "networking": 5,
+            "recon": 0,
+            "social_read": 0,
+            "stealth": 0,
+            "tactics": 0,
+            "vehicles": 0
+          },
+          "specialties": [
+            "specialty.networker.entry.map_the_links",
+            "specialty.networker.tier_1.pivot",
+            "specialty.networker.tier_1.quiet_enumeration",
+            "specialty.networker.tier_2.segment_map",
+            "specialty.networker.tier_2.token_relay"
+          ]
+        }
+      },
+      "build_note": "The authored Hex template retains its selected five nodes. The contained TD package now has a FOOTHOLD hook; that does not automatically respec this character.",
+      "loadout": [
+        {
+          "equipment_id": "hr.eq.palisade.k30",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.palisade.p15",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.palisade.civicweave",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.independent.intrusion_rig",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.cyber.lattice.civiclink",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "profile_id": "hr.premade.kora.v0-1",
+      "fiction_design_anchor": "BULWARK",
+      "runtime_character": {
+        "schema_id": "pneuma-io.trigger-discipline.character.v0-1",
+        "artifact": {
+          "id": "kora",
+          "name": "Kora",
+          "level": 5,
+          "side": "allies",
+          "class_id": "BULWARK",
+          "aptitudes": {
+            "acuity": 0,
+            "force": 0,
+            "nerve": 1,
+            "precision": 0,
+            "presence": 0,
+            "reason": 0
+          },
+          "skills": {
+            "athletics": 2,
+            "cqc": 3,
+            "drone_operations": 0,
+            "engineering": 0,
+            "grenades": 0,
+            "influence": 0,
+            "investigation": 0,
+            "local_hacking": 0,
+            "marksmanship": 2,
+            "medicine": 0,
+            "networking": 0,
+            "recon": 0,
+            "social_read": 0,
+            "stealth": 0,
+            "tactics": 5,
+            "vehicles": 0
+          },
+          "specialties": [
+            "specialty.guardian.entry.interpose",
+            "specialty.guardian.tier_1.body_cover",
+            "specialty.guardian.tier_1.pull_behind",
+            "specialty.guardian.tier_2.defensive_exchange",
+            "specialty.guardian.tier_2.protect_the_operator"
+          ]
+        }
+      },
+      "loadout": [
+        {
+          "equipment_id": "hr.eq.palisade.r55",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.palisade.p15",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.palisade.bastion",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.palisade.wall4",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.palisade.flash4",
+          "quantity": 2
+        },
+        {
+          "equipment_id": "hr.eq.palisade.fog8",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.cyber.palisade.taclink",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "profile_id": "hr.premade.siren.v0-1",
+      "fiction_design_anchor": "social / HUMINT alternate",
+      "runtime_profile_note": "Siren's fiction anchor remains social/HUMINT. The v0.1 runtime profile selects INFLUENCER/HANDLER as the closest current Trigger Discipline class expression.",
+      "runtime_character": {
+        "schema_id": "pneuma-io.trigger-discipline.character.v0-1",
+        "artifact": {
+          "id": "siren",
+          "name": "Siren",
+          "level": 5,
+          "side": "allies",
+          "class_id": "INFLUENCER",
+          "aptitudes": {
+            "acuity": 0,
+            "force": 0,
+            "nerve": 0,
+            "precision": 0,
+            "presence": 1,
+            "reason": 0
+          },
+          "skills": {
+            "athletics": 0,
+            "cqc": 0,
+            "drone_operations": 0,
+            "engineering": 0,
+            "grenades": 0,
+            "influence": 3,
+            "investigation": 2,
+            "local_hacking": 0,
+            "marksmanship": 0,
+            "medicine": 0,
+            "networking": 0,
+            "recon": 2,
+            "social_read": 5,
+            "stealth": 0,
+            "tactics": 0,
+            "vehicles": 0
+          },
+          "specialties": [
+            "specialty.handler.entry.work_a_contact",
+            "specialty.handler.tier_1.vet_the_source",
+            "specialty.handler.tier_1.discreet_channel",
+            "specialty.handler.tier_2.introduction",
+            "specialty.handler.tier_2.cutout"
+          ]
+        }
+      },
+      "loadout": [
+        {
+          "equipment_id": "hr.eq.palisade.p15",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.palisade.civicweave",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.cyber.lattice.civiclink",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "profile_id": "hr.premade.nova.v0-1",
+      "fiction_design_anchor": "TECH",
+      "runtime_character": {
+        "schema_id": "pneuma-io.trigger-discipline.character.v0-1",
+        "artifact": {
+          "id": "nova",
+          "name": "Nova",
+          "level": 5,
+          "side": "allies",
+          "class_id": "TECH",
+          "aptitudes": {
+            "acuity": 0,
+            "force": 0,
+            "nerve": 0,
+            "precision": 0,
+            "presence": 0,
+            "reason": 1
+          },
+          "skills": {
+            "athletics": 0,
+            "cqc": 0,
+            "drone_operations": 3,
+            "engineering": 5,
+            "grenades": 0,
+            "influence": 0,
+            "investigation": 0,
+            "local_hacking": 0,
+            "marksmanship": 0,
+            "medicine": 0,
+            "networking": 2,
+            "recon": 0,
+            "social_read": 0,
+            "stealth": 0,
+            "tactics": 2,
+            "vehicles": 0
+          },
+          "specialties": [
+            "specialty.autodrones.entry.tactical_autonomy",
+            "specialty.autodrones.tier_1.conditional_order",
+            "specialty.autodrones.tier_1.autonomous_reposition",
+            "specialty.autodrones.tier_2.second_element",
+            "specialty.autodrones.tier_2.sector_network"
+          ]
+        }
+      },
+      "loadout": [
+        {
+          "equipment_id": "hr.eq.palisade.k30",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.palisade.p15",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.palisade.flexplate",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.eq.emberline.oriel",
+          "quantity": 2
+        },
+        {
+          "equipment_id": "hr.eq.emberline.mesh_relay",
+          "quantity": 1
+        },
+        {
+          "equipment_id": "hr.cyber.emberline.commandmesh",
+          "quantity": 1
+        }
+      ],
+      "build_note": "The Oriel drones are unarmed in v0.1. No weapon module or free attack routine is implied."
+    }
+  ],
+  "readiness": "incomplete_starting_state",
+  "missing_decisions": [
+    "starting_and_max_hp",
+    "base_and_max_res",
+    "starting_and_max_ap",
+    "complete_starting_inventory",
+    "numerical_progression"
+  ]
+}
