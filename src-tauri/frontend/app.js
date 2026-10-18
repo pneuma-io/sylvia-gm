@@ -47,6 +47,7 @@ const SylviaGMFrontend = (() => {
     constructionRestoreInProgress: false,
     constructionPanelGeneration: 0,
     applicationInfo: null,    // host-projected release identity; never campaign truth
+    desktopUpdate: { busy: false, release: null },
     activeCampaignId: null,
     activeSessionId: null,
     activeSessionRole: null,
@@ -611,6 +612,8 @@ const SylviaGMFrontend = (() => {
     if (!invoke) return null;
     return {
       application_info: () => invoke('application_info'),
+      check_desktop_update: () => invoke('check_desktop_update'),
+      open_desktop_update: (tag) => invoke('open_desktop_update', { tag }),
       campaign_index: () => invoke('campaign_index'),
       campaign_creation_catalog: () => invoke('campaign_creation_catalog'),
       delete_reusable_library_entry: (command) => invoke('delete_reusable_library_entry', {
@@ -1082,6 +1085,9 @@ const SylviaGMFrontend = (() => {
     });
     $('open-settings-btn').addEventListener('click', () => openSettings());
     $('close-settings-btn').addEventListener('click', closeSettings);
+    $('check-desktop-update-btn').addEventListener('click', () => void checkDesktopUpdate());
+    $('open-desktop-update-btn').addEventListener('click', () => void openDesktopUpdate());
+    $('defer-desktop-update-btn').addEventListener('click', deferDesktopUpdate);
     document.querySelectorAll('[data-settings-tab]').forEach((button) => {
       button.addEventListener('click', () => {
         showSettingsTab(button.dataset.settingsTab);
@@ -1491,6 +1497,69 @@ const SylviaGMFrontend = (() => {
       channel.textContent = 'Release information unavailable';
       signing.textContent = 'Signing status unavailable';
     }
+  }
+
+  // Release metadata is untrusted text. This surface never changes session or draft state.
+  async function checkDesktopUpdate() {
+    if (state.desktopUpdate.busy) return;
+    state.desktopUpdate.busy = true;
+    state.desktopUpdate.release = null;
+    $('desktop-update-release').hidden = true;
+    $('check-desktop-update-btn').disabled = true;
+    $('desktop-update-status').textContent = 'Checking GitHub releases…';
+    try {
+      const result = await state.bridge.check_desktop_update();
+      const release = result.release;
+      if (!release) {
+        $('desktop-update-status').textContent =
+          `No newer ${result.channel} release found among recent published releases. Current version: ${result.current_version}.`;
+        return;
+      }
+      state.desktopUpdate.release = release;
+      $('desktop-update-version').textContent = `Sylvia GM ${release.version} is available`;
+      $('desktop-update-packages').textContent = `Available: ${release.packages.join(', ')}.`;
+      $('desktop-update-notes').textContent = release.notes || 'No release notes were supplied.';
+      $('desktop-update-notes-truncated').hidden = !release.notes_truncated;
+      $('desktop-update-release').hidden = false;
+      $('desktop-update-status').textContent =
+        `Current version: ${result.current_version}. Channel: ${result.channel}.`;
+    } catch (error) {
+      $('desktop-update-status').textContent = `Update check failed. ${error.message || error}`;
+    } finally {
+      state.desktopUpdate.busy = false;
+      $('check-desktop-update-btn').disabled = false;
+      $('check-desktop-update-btn').textContent = 'Check again';
+    }
+  }
+
+  async function openDesktopUpdate() {
+    const release = state.desktopUpdate.release;
+    if (!release || state.desktopUpdate.busy) return;
+    state.desktopUpdate.busy = true;
+    $('open-desktop-update-btn').disabled = true;
+    $('check-desktop-update-btn').disabled = true;
+    $('defer-desktop-update-btn').disabled = true;
+    try {
+      const result = await state.bridge.open_desktop_update(release.tag);
+      $('desktop-update-status').textContent = result.opened
+        ? 'Opened GitHub in your browser. Follow the release instructions when you are ready to update. Sylvia is still running.'
+        : `Could not open your browser. Open this official release page manually: ${result.url}`;
+    } catch (error) {
+      $('desktop-update-status').textContent = `Could not open the download page. ${error.message || error}`;
+    } finally {
+      state.desktopUpdate.busy = false;
+      $('open-desktop-update-btn').disabled = false;
+      $('check-desktop-update-btn').disabled = false;
+      $('defer-desktop-update-btn').disabled = false;
+    }
+  }
+
+  function deferDesktopUpdate() {
+    if (state.desktopUpdate.busy) return;
+    state.desktopUpdate.release = null;
+    $('desktop-update-release').hidden = true;
+    $('desktop-update-status').textContent = 'Update deferred. Check again whenever you are ready.';
+    $('check-desktop-update-btn').focus();
   }
 
   // Keep import outcomes visible in Settings, including when opened from Home.

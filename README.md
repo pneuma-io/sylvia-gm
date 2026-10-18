@@ -37,6 +37,14 @@ Custom content uses three building blocks: Rulesets define mechanics, Campaign S
 the world, and Campaign Plans define an adventure. Builder helps you create and refine that content
 for use in a compatible campaign.
 
+## Desktop updates
+
+To check for desktop updates, open **Settings → About → Check for updates**. Sylvia shows a
+newer release on your current prerelease channel, or a stable release, with its release notes
+and a button to the official GitHub download page. Checks run only when requested. Installation
+and restart are manual; finish active work, save or copy unsent drafts, and back up campaigns
+before updating. Follow the release's installed or portable instructions and verify its checksums.
+
 ## What's next
 
 The next areas of development are:

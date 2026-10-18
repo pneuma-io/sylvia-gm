@@ -944,6 +944,38 @@
             <p id="application-signing">Unsigned Alpha prerelease</p>
           </div>
           <div class="settings-card settings-action-list">
+            <h3>Desktop updates</h3>
+            <p>Check GitHub for a newer release on this installation's channel. Checks run only
+              when you choose. Downloading, installation and restart are manual.</p>
+            <button class="btn btn-secondary" id="check-desktop-update-btn" type="button">
+              Check for updates
+            </button>
+            <p id="desktop-update-status" role="status" aria-live="polite"></p>
+            <div id="desktop-update-release" hidden>
+              <h4 id="desktop-update-version"></h4>
+              <p id="desktop-update-packages"></p>
+              <h4>Release notes</h4>
+              <pre id="desktop-update-notes" class="desktop-update-notes"></pre>
+              <p id="desktop-update-notes-truncated" hidden>More notes are available on GitHub.</p>
+              <p>Finish active GM turns and Builder work, save or copy unsent drafts, and back up
+                campaigns before closing Sylvia to install. Opening the download page keeps
+                your current session running.</p>
+              <p>Verify the download against SHA256SUMS.txt on the official release page.
+                These Windows downloads are unsigned.</p>
+              <p>Installed copy: use the installer with the existing installation.
+                Portable copy: close Sylvia, preserve isolated-data, and replace only the supplied
+                application files. Keep the full portable folder and follow its included guidance.</p>
+              <div class="desktop-update-actions">
+                <button class="btn btn-primary" id="open-desktop-update-btn" type="button">
+                  Open official GitHub download
+                </button>
+                <button class="btn btn-secondary" id="defer-desktop-update-btn" type="button">
+                  Later
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="settings-card settings-action-list">
             <h3>Home tutorial</h3>
             <p>Show Sylvia&rsquo;s quick tour of the Home controls again.</p>
             <button class="btn btn-secondary" id="replay-home-tutorial-btn" type="button">

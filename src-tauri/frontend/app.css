@@ -3081,3 +3081,18 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
 @media (prefers-reduced-motion:reduce) { .sequence-step:has([data-sequence-enter]) { animation:none; } }
 
 .action-sequence > .sequence-issue { flex:0 1 auto; max-height:6rem; overflow-y:auto; }
+.desktop-update-notes {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 20rem;
+  overflow: auto;
+  font: inherit;
+  user-select: text;
+}
+.desktop-update-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+#desktop-update-release p { margin: 9px 0; }

@@ -1868,6 +1868,13 @@ def _dispatch_selected(
 ) -> Any:
     if method == "handshake_status":
         return bus.handshake_status()
+    if method in {"check_desktop_update", "open_desktop_update"}:
+        from sylvia_gm.interfaces.desktop_updates import check_for_update, open_update_release
+
+        current_version = _required_text(params, "current_version")
+        if method == "check_desktop_update":
+            return check_for_update(current_version)
+        return open_update_release(current_version, _required_text(params, "tag"))
     if method == "campaign_index":
         return bus.campaign_index()
     if method == "campaign_creation_catalog":
