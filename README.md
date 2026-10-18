@@ -2,6 +2,8 @@
 
 Sylvia GM is an AI Game Master for Tabletop RPGs.
 
+[Download the Alpha](https://github.com/pneuma-io/sylvia-gm/releases/tag/v0.3.0-alpha.1) | [Report a Bug](https://github.com/pneuma-io/sylvia-gm/issues)
+
 Play through adventures with an AI GM, create your own worlds and campaigns, and choose the model
 that runs them. Sylvia combines conversational storytelling with a game engine that handles
 supported rules and keeps track of your campaign.
