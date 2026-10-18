@@ -456,27 +456,6 @@ fn application_info(window: WebviewWindow) -> Result<Value, String> {
     Ok(application_info_projection())
 }
 
-// The host supplies its exact version; release checks never change campaign state.
-#[tauri::command]
-async fn check_desktop_update(window: WebviewWindow) -> Result<Value, String> {
-    owner_call_async(
-        window,
-        "check_desktop_update",
-        json!({"current_version": env!("CARGO_PKG_VERSION")}),
-    )
-    .await
-}
-
-#[tauri::command]
-async fn open_desktop_update(window: WebviewWindow, tag: String) -> Result<Value, String> {
-    owner_call_async(
-        window,
-        "open_desktop_update",
-        json!({"current_version": env!("CARGO_PKG_VERSION"), "tag": tag}),
-    )
-    .await
-}
-
 #[tauri::command]
 async fn campaign_index(window: WebviewWindow) -> Result<Value, String> {
     owner_call_async(window.clone(), "campaign_index", json!({})).await
@@ -2576,8 +2555,6 @@ pub fn run() {
             panel_drag::begin_panel_drag,
             panel_drag::finish_panel_drag,
             application_info,
-            check_desktop_update,
-            open_desktop_update,
             campaign_index,
             campaign_creation_catalog,
             delete_reusable_library_entry,
