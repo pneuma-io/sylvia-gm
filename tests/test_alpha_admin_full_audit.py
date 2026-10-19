@@ -1107,6 +1107,8 @@ def test_public_exact_input_examples_regenerate_with_current_tool_schemas(
     tmp_path: Path,
     public_audit_root: Path,
 ) -> None:
+    from scripts.generate_model_input_audit_examples import generate_examples
+
     generated_root = tmp_path / "model-input-audit"
     generate_examples(generated_root)
 

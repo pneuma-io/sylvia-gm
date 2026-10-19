@@ -205,12 +205,23 @@ string schema; current offers stay in the latest observation and are validated
 against the immutable host envelope. Other admitted tools retain their current
 authorization boundaries, including changing eligible secrets or operations.
 
+This ordering is a provider-wire projection after logical recovery and working
+context selection. Saved history and the event loop retain their original roles,
+chronological task boundaries and receipt ownership. A completed prior Campaign
+File disposition cannot settle a new direct-action response. Structured values
+in direct-response, GM/player-boundary, opening and interruption controls move
+to matching `*_VALUES` records; their fixed directives retain the system role.
+The prefix is stable for changes to those values within the same workflow and
+tool contract. Different GM/player or recovery workflows, corrective controls,
+Ruleset instructions, model/provider choices and authorized tool availability
+can legitimately change it. This is not universal instruction invariance.
+
 OpenRouter receives an opaque `session_id` derived from the campaign, session,
 package and configured model/provider compatibility, plus the stable actor for
 participant contexts. Revisions, turn IDs, offer IDs and display names do not
 enter that routing identity. No backend provider is pinned. ChatGPT continues to
-use application-owned history and ephemeral App Server threads; its system
-instructions contain no changing engine-state payload. Compaction notes remain
+use application-owned history and ephemeral App Server threads; supported state
+and control values follow reusable history instead of fixed instructions. Compaction notes remain
 fallible historical data and preserve the player's latest correction exactly.
 
 Cache read/write usage is nullable: missing fields are unavailable, while a
