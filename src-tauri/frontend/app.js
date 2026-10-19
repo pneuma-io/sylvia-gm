@@ -4286,18 +4286,23 @@ const SylviaGMFrontend = (() => {
   }
 
   // A delayed preview retains its captured binding only while its original context is valid.
-  function panelActionStillCurrent(command) {
+  function panelActionStillCurrent(command, projectionRevision) {
     if (command.campaign_id !== state.activeCampaignId || command.session_id !== state.activeSessionId) return false;
     const surface = state.panelProjection?.surfaces.find((item) => item.id === command.surface_id);
     const action = surface?.actions?.find((item) => item.id === command.panel_action_id);
     if (!action || action.available === false) return false;
-    if (Number.isSafeInteger(state.panelProjection.revision) &&
-        state.panelProjection.revision !== command.expected_revision) return false;
+    if (state.panelProjection.revision !== projectionRevision) return false;
     if (['tactical_grid', 'coordinate_map'].includes(surface.renderer)) {
       if (command.selection?.map_revision !== surface.data.map_revision) return false;
       if (command.selection?.target && !surface.data.entities?.some((item) => item.id === command.selection.target)) return false;
       return !actionBindsActor(action) || tacticalControlsActor(surface, command.selection?.actor) &&
         surface.data.entities?.some((item) => item.id === command.selection?.actor);
+    }
+    if (surface.renderer === 'network_graph') {
+      if (command.selection?.graph_revision !== surface.data.graph_revision) return false;
+      if (command.selection?.node && !surface.data.nodes?.some((item) => item.id === command.selection.node)) return false;
+      if (command.selection?.link && !surface.data.links?.some((item) => item.id === command.selection.link)) return false;
+      return !actionBindsActor(action) || networkControlsActor(command.selection?.actor);
     }
     if (!actionBindsActor(action)) return true;
     const actor = command.selection?.actor;
@@ -6352,6 +6357,7 @@ const SylviaGMFrontend = (() => {
         if (!action || !panelActionAvailable(surface, action, button.dataset.panelActorId)) return;
         button.disabled = true;
         const selection = JSON.parse(JSON.stringify(panelActionSelection(surface, action, button.dataset.panelActorId)));
+        const projectionRevision = projection.revision;
         const pendingIntent = { campaignId, sessionId };
         state.panelIntentPending = pendingIntent;
         try {
@@ -6376,10 +6382,10 @@ const SylviaGMFrontend = (() => {
             selection,
             session_id: sessionId,
           };
-          if (!selectedActivityMatches(activity) || !panelActionStillCurrent(command)) return;
+          if (!selectedActivityMatches(activity) || !panelActionStillCurrent(command, projectionRevision)) return;
           const proposal = await state.bridge.preview_panel_action(command);
-          if (!selectedActivityMatches(activity) || !panelActionStillCurrent(command) || !await confirmPlayerAction(proposal)) return;
-          if (!selectedActivityMatches(activity) || selectedSessionIsWorking() || !panelActionStillCurrent(command)) return;
+          if (!selectedActivityMatches(activity) || !panelActionStillCurrent(command, projectionRevision) || !await confirmPlayerAction(proposal)) return;
+          if (!selectedActivityMatches(activity) || selectedSessionIsWorking() || !panelActionStillCurrent(command, projectionRevision)) return;
           const confirmedCommand = { ...command, confirmation: proposal.confirmation };
           localStorage.setItem(panelRecoveryKey(), JSON.stringify(confirmedCommand));
           state.panelCommitPending = true;
