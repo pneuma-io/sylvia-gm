@@ -110,6 +110,122 @@ const SylviaGMFrontend = (() => {
 
   // ---- DOM helpers ----
   const $ = (id) => document.getElementById(id);
+  let dictation = null;
+  let dictationRevision = 0;
+  let dictationEngines = null;
+
+  // Discovery reads installed language metadata only; capture still needs explicit Start.
+  async function dictationEngine(bridge) {
+    if (!bridge.dictation_capabilities) throw { code: 'unavailable' };
+    if (!dictationEngines) {
+      const capabilities = await bridge.dictation_capabilities();
+      const engines = capabilities?.engines;
+      if (!Array.isArray(engines) || !engines.length) throw { code: 'unavailable' };
+      dictationEngines = engines;
+      const select = $('dictation-language');
+      select.replaceChildren(...engines.map(engine => {
+        const option = document.createElement('option');
+        option.value = engine.id; option.textContent = engine.label || engine.language;
+        return option;
+      }));
+      const preferred = engines.find(engine => engine.language === navigator.language);
+      select.value = (preferred || engines[0]).id;
+      $('dictation-options').hidden = false;
+    }
+    return $('dictation-language').value;
+  }
+
+  // Dictation edits this composer only; the normal Send path owns all submissions.
+  function initDictation() {
+    if (dictation || !window.SylviaDictation || !$('dictation-toggle')) return;
+    dictation = window.SylviaDictation.create({
+      backend: { start: async ({ signal }) => {
+        const bridge = state.bridge;
+        if (!bridge?.dictation_start || !bridge.dictation_stop || !bridge.dictation_cancel) {
+          throw { code: 'unavailable' };
+        }
+        const id = crypto.randomUUID();
+        let cancelled = false;
+        const cancel = () => {
+          if (cancelled) return;
+          cancelled = true;
+          try { void Promise.resolve(bridge.dictation_cancel(id)).catch(() => {}); } catch (_) { /* Best-effort cleanup. */ }
+        };
+        signal.addEventListener('abort', cancel, { once: true });
+        try {
+          const engine = await dictationEngine(bridge);
+          if (signal.aborted) throw { code: 'unavailable' };
+          await bridge.dictation_start(id, engine);
+          if (signal.aborted) { cancel(); throw { code: 'unavailable' }; }
+          return { stop: () => bridge.dictation_stop(id), cancel: () => {
+            signal.removeEventListener('abort', cancel); cancel();
+          } };
+        } catch (error) {
+          signal.removeEventListener('abort', cancel); cancel(); throw error;
+        }
+      } },
+      context: () => state.view === 'session' && state.activeSessionId
+        ? JSON.stringify([state.activeCampaignId, state.activeSessionId, state.activeSessionRole]) : null,
+      draft: () => ({ text: $('player-input').value, revision: dictationRevision,
+        start: $('player-input').selectionStart, end: $('player-input').selectionEnd }),
+      replace: (text, caret) => {
+        const input = $('player-input');
+        input.value = text;
+        dictationRevision += 1;
+        input.focus();
+        input.setSelectionRange(caret, caret);
+        saveSelectedSessionDraft();
+      },
+      changed: renderDictation,
+    });
+    $('dictation-toggle').addEventListener('click', toggleDictation);
+    $('dictation-cancel').addEventListener('click', () => {
+      dictation.cancel(); $('dictation-toggle').focus();
+    });
+    $('dictation-undo').addEventListener('click', () => dictation.undo());
+    $('dictation-redo').addEventListener('click', () => { void dictation.start({ redo: true }); });
+    $('dictation-insert').addEventListener('click', () => dictation.insertReview($('dictation-review').value));
+    $('player-input').addEventListener('input', () => { dictationRevision += 1; dictation.sync(); });
+    document.addEventListener('keydown', (event) => {
+      if (event.isComposing || event.repeat) return;
+      if (event.altKey && !event.ctrlKey && !event.metaKey && event.key.toLowerCase() === 'm' &&
+          !$('dictation-toggle').disabled) {
+        event.preventDefault(); toggleDictation();
+      } else if (event.key === 'Escape' && ['requesting', 'recording', 'transcribing'].includes(dictation.snapshot().phase)) {
+        event.preventDefault(); dictation.cancel(); $('dictation-toggle').focus();
+      }
+    });
+    window.addEventListener('pagehide', () => dictation.cancel());
+  }
+
+  function toggleDictation() {
+    if (!dictation || $('dictation-toggle').disabled) return;
+    if (dictation.snapshot().phase === 'recording') void dictation.stop();
+    else void dictation.start();
+  }
+
+  function renderDictation(value = dictation?.snapshot()) {
+    if (!value || !$('dictation-toggle')) return;
+    const busy = ['requesting', 'recording', 'transcribing'].includes(value.phase);
+    const recording = value.phase === 'recording';
+    const enabled = !$('player-input').disabled && state.view === 'session';
+    $('dictation-toggle').disabled = (!enabled && !recording) ||
+      ['requesting', 'transcribing'].includes(value.phase);
+    $('dictation-toggle').setAttribute('aria-pressed', String(recording));
+    $('dictation-toggle').setAttribute('aria-label', recording ? 'Stop dictation' : 'Start dictation');
+    $('dictation-toggle-text').textContent = recording ? 'Stop dictation' : 'Dictate';
+    $('dictation-status').textContent = value.message;
+    $('dictation-status').hidden = value.phase === 'idle' && !value.message;
+    $('dictation-language').disabled = busy;
+    $('dictation-cancel').hidden = !busy && !value.transcript;
+    $('dictation-undo').hidden = !value.canUndo || busy || !enabled;
+    $('dictation-redo').hidden = !value.canUndo || busy || !enabled;
+    $('dictation-review-panel').hidden = !value.transcript;
+    if ($('dictation-review').dataset.transcript !== value.transcript) {
+      $('dictation-review').value = value.transcript;
+      $('dictation-review').dataset.transcript = value.transcript;
+    }
+  }
   let panelHost = null;
   let shotFrame = null;
   let panelRenderContext = null;
@@ -611,6 +727,10 @@ const SylviaGMFrontend = (() => {
     if (!invoke) return null;
     return {
       application_info: () => invoke('application_info'),
+      dictation_capabilities: () => invoke('dictation_capabilities'),
+      dictation_start: (id, engine) => invoke('dictation_start', { id, engine }),
+      dictation_stop: (id) => invoke('dictation_stop', { id }),
+      dictation_cancel: (id) => invoke('dictation_cancel', { id }),
       campaign_index: () => invoke('campaign_index'),
       campaign_creation_catalog: () => invoke('campaign_creation_catalog'),
       delete_reusable_library_entry: (command) => invoke('delete_reusable_library_entry', {
@@ -1416,6 +1536,7 @@ const SylviaGMFrontend = (() => {
       void submitInput(event.currentTarget.value);
     });
     $('player-input').addEventListener('input', saveSelectedSessionDraft);
+    initDictation();
     $('ooc-input').addEventListener('input', () => {
       saveSelectedSessionDraft();
       $('ooc-note').classList.toggle('has-note', Boolean($('ooc-input').value.trim()));
@@ -3529,6 +3650,7 @@ const SylviaGMFrontend = (() => {
   }
 
   function showHome() {
+    dictation?.cancel();
     state.displayHistory = null;
     cancelCampaignOpening();
     gamePanels().leave();
@@ -10481,6 +10603,7 @@ const SylviaGMFrontend = (() => {
     $('composer-steering-hint').hidden = !canSubmit || !activityIsWorking(activity) ||
       state.activeSessionRole !== 'builder';
     $('ooc-note').classList.toggle('has-note', Boolean($('ooc-input').value.trim()));
+    dictation?.sync();
     return canSubmit;
   }
 
@@ -10749,6 +10872,8 @@ const SylviaGMFrontend = (() => {
   }
 
   function restoreSelectedSessionDraft() {
+    dictationRevision += 1;
+    dictation?.sync();
     const input = $('player-input');
     if (!input) return;
     const draft = state.sessionDrafts.get(state.activeSessionId) || {};
@@ -10904,6 +11029,9 @@ const SylviaGMFrontend = (() => {
     }
     if (activityIsWorking(activity) && sessionRole === 'builder') {
       if (!state.bridge.steer_session || activity.stopRequestedAttemptId || !text.trim()) return;
+      if (selectedActivityMatches(activity)) {
+        dictation?.cancel('Dictation stopped. Your message uses the ordinary Send action.');
+      }
       saveSelectedSessionDraft();
       try {
         await state.bridge.steer_session(sessionId, 'steering-' + crypto.randomUUID(), text.trim());
@@ -10945,6 +11073,9 @@ const SylviaGMFrontend = (() => {
       redirect_interruption_id: !compact && !playerAction && !campaignEndingChoice && sessionRole === 'dm'
         ? activity.retryBasis?.interruption_id || null : null,
     };
+    if (!playerAction && !builderStart && !campaignEndingChoice && !compact && state.activeSessionId === sessionId) {
+      dictation?.cancel('Dictation stopped. Your message uses the ordinary Send action.');
+    }
     if (state.activeSessionId === sessionId) {
       setWebResearchPermission(false);
       saveSelectedSessionDraft();
@@ -11361,7 +11492,7 @@ const SylviaGMFrontend = (() => {
       const feedback = $('session-status-text');
       const available = (column?.clientHeight || window.innerHeight) -
         (column?.querySelector('.session-topbar')?.offsetHeight || 48) -
-        footer.offsetHeight - feedback.offsetHeight - 160;
+        footer.offsetHeight - feedback.offsetHeight - ($('dictation-feedback')?.offsetHeight || 0) - 160;
       return Math.max(58, Math.min(200, available));
     };
     const resize = (requested) => {

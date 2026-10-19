@@ -12,6 +12,7 @@ use std::time::{Duration, Instant};
 use tauri::{Emitter, Manager, State, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
 
 mod desktop_storage;
+mod dictation;
 mod instance_policy;
 mod panel_drag;
 mod panel_windows;
@@ -454,6 +455,44 @@ fn application_info_projection() -> Value {
 fn application_info(window: WebviewWindow) -> Result<Value, String> {
     trusted_caller(&window)?;
     Ok(application_info_projection())
+}
+
+#[tauri::command]
+async fn dictation_capabilities(window: WebviewWindow) -> Result<Value, String> {
+    trusted_caller(&window)?;
+    let app = window.app_handle().clone();
+    tauri::async_runtime::spawn_blocking(move || app.state::<dictation::Dictation>().capabilities())
+        .await
+        .map_err(|_| "unavailable".to_string())?
+}
+
+#[tauri::command]
+async fn dictation_start(window: WebviewWindow, id: String, engine: String) -> Result<(), String> {
+    trusted_caller(&window)?;
+    let app = window.app_handle().clone();
+    tauri::async_runtime::spawn_blocking(move || {
+        app.state::<dictation::Dictation>().start(&id, &engine)
+    })
+    .await
+    .map_err(|_| "unavailable".to_string())?
+}
+
+#[tauri::command]
+async fn dictation_stop(window: WebviewWindow, id: String) -> Result<String, String> {
+    trusted_caller(&window)?;
+    let app = window.app_handle().clone();
+    tauri::async_runtime::spawn_blocking(move || app.state::<dictation::Dictation>().stop(&id))
+        .await
+        .map_err(|_| "provider".to_string())?
+}
+
+#[tauri::command]
+async fn dictation_cancel(window: WebviewWindow, id: String) -> Result<(), String> {
+    trusted_caller(&window)?;
+    let app = window.app_handle().clone();
+    tauri::async_runtime::spawn_blocking(move || app.state::<dictation::Dictation>().cancel(&id))
+        .await
+        .map_err(|_| "provider".to_string())
 }
 
 #[tauri::command]
@@ -2499,6 +2538,7 @@ pub fn run() {
     }
     builder
         .manage(PanelWindows::default())
+        .manage(dictation::Dictation::default())
         .manage(panel_drag::PanelDrags::default())
         .setup(move |app| {
             let database = desktop_storage::database_path(
@@ -2535,6 +2575,7 @@ pub fn run() {
                     event,
                     tauri::WindowEvent::Destroyed | tauri::WindowEvent::CloseRequested { .. }
                 ) {
+                    panel_app.state::<dictation::Dictation>().close();
                     panel_app
                         .state::<panel_drag::PanelDrags>()
                         .cancel_window("main");
@@ -2555,6 +2596,10 @@ pub fn run() {
             panel_drag::begin_panel_drag,
             panel_drag::finish_panel_drag,
             application_info,
+            dictation_capabilities,
+            dictation_start,
+            dictation_stop,
+            dictation_cancel,
             campaign_index,
             campaign_creation_catalog,
             delete_reusable_library_entry,
@@ -2663,6 +2708,7 @@ pub fn run() {
             // Tauri exits the process without dropping managed state. Wait for the owner
             // here so it cannot retain database or executable handles after desktop exit.
             if matches!(event, tauri::RunEvent::Exit) {
+                app.state::<dictation::Dictation>().close();
                 let _ = app.state::<OwnerBridge>().shutdown();
             }
         });

@@ -149,6 +149,25 @@
         <p id="session-status-text" class="inline-feedback" role="status" aria-live="polite"></p>
         <textarea id="player-input" rows="2" placeholder="Type your action…"
                   aria-label="In-character message or action" autocomplete="off" disabled></textarea>
+        <div class="dictation-feedback" id="dictation-feedback">
+          <details id="dictation-options" hidden>
+            <summary>On-device dictation settings</summary>
+            <p id="dictation-privacy">Windows dictation runs on this PC. Sylvia does not save recordings or send audio to a service.
+              Review the text before Send; your chat model receives only the message you send.</p>
+            <label id="dictation-language-field" for="dictation-language">Speech language
+              <select id="dictation-language" aria-describedby="dictation-privacy"></select>
+            </label>
+          </details>
+          <p id="dictation-status" role="status" aria-live="polite" aria-atomic="true" hidden></p>
+          <div id="dictation-review-panel" hidden>
+            <label for="dictation-review">Review transcript</label>
+            <textarea id="dictation-review" rows="2"></textarea>
+            <button id="dictation-insert" type="button" class="btn btn-secondary btn-sm">Insert transcript at cursor</button>
+          </div>
+          <button id="dictation-cancel" type="button" class="btn btn-secondary btn-sm" hidden>Cancel dictation</button>
+          <button id="dictation-undo" type="button" class="btn btn-secondary btn-sm" hidden>Undo dictation</button>
+          <button id="dictation-redo" type="button" class="btn btn-secondary btn-sm" hidden>Dictate again</button>
+        </div>
         <div class="composer-footer">
           <details id="ooc-note" hidden>
             <summary>OOC note</summary>
@@ -166,6 +185,12 @@
                     title="Allow the Builder to use public web research for the next message only">Web</button>
           </div>
           <div class="composer-actions">
+            <button id="dictation-toggle" class="btn btn-secondary btn-sm" type="button" disabled
+                    aria-label="Start dictation" aria-pressed="false" aria-keyshortcuts="Alt+M"
+                    aria-describedby="dictation-status dictation-privacy" title="On-device Windows dictation (Alt+M). Review text before Send.">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg>
+              <span id="dictation-toggle-text" class="visually-hidden">Dictate</span>
+            </button>
            <div class="composer-model-controls">
         <div class="chat-model-picker" id="chat-model-picker">
           <button class="chat-model-picker-button" id="chat-model-picker-btn" type="button"
@@ -968,6 +993,7 @@
 <script src="shot-playback.js"></script>
 <script src="panel-host.js"></script>
 <script src="campaign-plan-browser.js"></script>
+<script src="dictation.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
