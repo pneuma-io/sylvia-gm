@@ -6,7 +6,7 @@ const path = require('node:path');
 const { chromium } = require('playwright');
 const frontend = path.resolve(__dirname, '../src-tauri/frontend');
 
-for (const failStartup of [false, true]) test(`detached panel startup ${failStartup ? 'shows a recovery error' : 'renders the first owner projection'}`, { timeout: 15000 }, async () => {
+async function withPanel(failStartup, check) {
   const browser = await chromium.launch({ headless: true, channel: process.platform === 'win32' ? 'msedge' : undefined });
   try {
     const page = await browser.newPage();
@@ -24,24 +24,37 @@ for (const failStartup of [false, true]) test(`detached panel startup ${failStar
       window.__sylviaPanelContext = { context, window_id: windowId };
       const listeners = new Map();
       window.startupCalls = [];
+      window.selectionRequests = [];
+      let presentation;
+      window.presentPanel = patch => {
+        Object.assign(presentation, patch);
+        presentation.presentation_sequence += 1;
+        listeners.get('panel-workspace')({ payload: { context, window_id: windowId, payload: presentation } });
+      };
       window.__TAURI__ = {
         event: { listen: async (name, callback) => { listeners.set(name, callback); return () => listeners.delete(name); } },
         core: { invoke: async (command, args) => {
           window.startupCalls.push(command);
           if (command === 'panel_window_message' && args.payload.type === 'ready') {
             if (failStartup) throw new Error('Synthetic transport unavailable');
-            listeners.get('panel-workspace')({ payload: { context, window_id: windowId, payload: {
+            presentation = {
               presentation_sequence: 1, busy: false, theme: 'slate',
-              projection: { campaign_id: 'synthetic', revision: 1, shot_effects: [], surfaces: [
+              characterInspection: { campaignId: 'synthetic', rulesetId: 'fixture', id: 'asha', expanded: [] },
+              projection: { campaign_id: 'synthetic', ruleset_id: 'fixture', revision: 1, shot_effects: [], surfaces: [
                 { id: 'party', title: 'Party', renderer: 'party', actions: [], data: {
-                  participants: [{ id: 'asha', kind: 'character', data: { name: 'Asha' } }],
-                  entities: { asha: { hp: 8, ap: 4, res: 7, stance: 'STANDING' } },
+                  participants: [{ id: 'asha', kind: 'character', data: { name: 'Asha' } },
+                    { id: 'bram', kind: 'character', data: { name: 'Bram' } }],
+                  entities: { asha: { hp: 8, ap: 4, res: 7, stance: 'STANDING' }, bram: { hp: 6, skills: { lore: 4 } } },
                 } },
               ] },
               layout: { version: 1, sidebar: null, hidden: [], known: ['party'], views: {}, windows: [
                 { id: windowId, title: 'Party', tree: { kind: 'tabs', id: 'party-tabs', panels: ['party'], active: 'party' } },
               ] },
-            } } });
+            };
+            window.presentPanel({});
+          } else if (command === 'panel_window_message' && args.payload.method === 'selection') {
+            window.selectionRequests.push(args.payload);
+            listeners.get('panel-window-reply')({ payload: { context, request_id: args.payload.request_id, result: {} } });
           }
           return {};
         } },
@@ -51,6 +64,13 @@ for (const failStartup of [false, true]) test(`detached panel startup ${failStar
     await page.waitForFunction(() => document.getElementById('session-status-text').textContent !== 'Loading campaign panels…');
     const status = await page.locator('#session-status-text').textContent();
     const content = await page.locator('#ruleset-panels').textContent();
+    await check(page, status, content, errors);
+    assert.deepEqual(errors, []);
+  } finally { await browser.close(); }
+}
+
+for (const failStartup of [false, true]) test(`detached panel startup ${failStartup ? 'shows a recovery error' : 'renders the first owner projection'}`, { timeout: 15000 }, async () => {
+  await withPanel(failStartup, async (page, status, content, errors) => {
     if (failStartup) {
       assert.match(status, /Could not load campaign panels: .*Synthetic transport unavailable/);
       assert.match(status, /Close this window to return the panels to the sidebar/);
@@ -58,6 +78,37 @@ for (const failStartup of [false, true]) test(`detached panel startup ${failStar
       assert.ok(content.includes('Asha'), `Panel did not render: status=${status}; errors=${JSON.stringify(errors)}`);
       assert.equal(status, '');
     }
-    assert.deepEqual(errors, []);
-  } finally { await browser.close(); }
+  });
+});
+
+test('detached inspection retains keyboard focus after the asynchronous owner presentation', { timeout: 15000 }, async () => {
+  await withPanel(false, async page => {
+    await page.getByRole('button', { name: 'Inspect Bram', exact: true }).focus();
+    await page.keyboard.press('Enter');
+    assert.equal(await page.evaluate(() => document.activeElement.getAttribute('aria-label')), 'Inspect Bram');
+    assert.deepEqual(await page.evaluate(() => window.selectionRequests.map(request => request.args)),
+      [{ surfaceId: 'party', patch: { character: 'bram' } }]);
+    await page.evaluate(() => window.presentPanel({ characterInspection: {
+      campaignId: 'synthetic', rulesetId: 'fixture', id: 'bram', expanded: [],
+    } }));
+    assert.equal(await page.evaluate(() => document.activeElement.getAttribute('aria-label')), 'Inspecting Bram');
+    await page.getByLabel('Details for Bram', { exact: true }).focus();
+    await page.keyboard.press('Enter');
+    await page.evaluate(() => window.presentPanel({ characterInspection: {
+      campaignId: 'synthetic', rulesetId: 'fixture', id: 'bram', expanded: ['bram'],
+    } }));
+    assert.equal(await page.evaluate(() => document.activeElement.getAttribute('aria-label')), 'Details for Bram');
+    assert.equal(await page.locator('[data-character-expansion="bram"]').evaluate(details => details.open), true);
+    await page.getByRole('button', { name: 'Inspecting Bram', exact: true }).focus();
+    await page.evaluate(() => window.presentPanel({ characterInspection: {
+      campaignId: 'synthetic', rulesetId: 'other-rules', id: 'bram', expanded: [],
+    }, projection: { campaign_id: 'synthetic', ruleset_id: 'other-rules', revision: 2, shot_effects: [], surfaces: [
+      { id: 'party', title: 'Party', renderer: 'party', actions: [], data: {
+        participants: [{ id: 'bram', kind: 'character', data: { name: 'Bram' } }], entities: { bram: { hp: 10 } },
+      } },
+    ] } }));
+    assert.equal(await page.evaluate(() => document.activeElement.getAttribute('aria-label')), null,
+      'A new Ruleset must not inherit focus by reusing character identifiers');
+    assert.equal(await page.locator('[data-character-expansion="bram"]').evaluate(details => details.open), false);
+  });
 });

@@ -165,8 +165,24 @@ const SylviaGMFrontend = (() => {
 
   function panelRenderScope(projection) {
     return projection?.campaign_id && state.activeSessionId
-      ? { campaignId: projection.campaign_id, sessionId: state.activeSessionId }
+      ? { campaignId: projection.campaign_id, sessionId: state.activeSessionId, rulesetId: projection.ruleset_id || null }
       : null;
+  }
+
+  // Owner replies can redraw a detached inspection control after its local event has finished.
+  function captureCharacterFocus(container) {
+    const active = document.activeElement;
+    if (!active || !container.contains(active)) return null;
+    const surfaceId = active.closest('[data-panel-id]')?.dataset.panelId;
+    if (!surfaceId) return null;
+    const attribute = ['data-party-select-actor', 'data-character-actor', 'data-inventory-character',
+      'data-inspect-party'].find(name => active.hasAttribute(name));
+    if (attribute) return { surfaceId, selector: `[${attribute}="${CSS.escape(active.getAttribute(attribute))}"]` };
+    const details = active.parentElement;
+    if (active.tagName === 'SUMMARY' && details?.hasAttribute('data-character-expansion')) {
+      return { surfaceId, selector: `[data-character-expansion="${CSS.escape(details.dataset.characterExpansion)}"] > summary` };
+    }
+    return null;
   }
 
   // Keep transient Effects UI state when the same panel DOM is replaced.
@@ -6211,7 +6227,8 @@ const SylviaGMFrontend = (() => {
     const sameCharacterScope = panelRenderContext && nextPanelRenderContext &&
       panelRenderContext.campaignId === nextPanelRenderContext.campaignId &&
       panelRenderContext.sessionId === nextPanelRenderContext.sessionId &&
-      state.characterInspection?.rulesetId === (projection?.ruleset_id || null);
+      panelRenderContext.rulesetId === nextPanelRenderContext.rulesetId;
+    const savedCharacterFocus = sameCharacterScope ? captureCharacterFocus(container) : null;
     // Native disclosure toggles can still be queued when another projection redraws the DOM.
     if (sameCharacterScope && !window.__sylviaPanelContext) {
       container.querySelectorAll('[data-character-expansion]').forEach((details) => {
@@ -6255,6 +6272,10 @@ const SylviaGMFrontend = (() => {
         details.open = saved.open;
         if (saved.focused) details.querySelector('summary')?.focus({ preventScroll: true });
       }
+    }
+    if (savedCharacterFocus) {
+      container.querySelector(`[data-panel-id="${CSS.escape(savedCharacterFocus.surfaceId)}"]`)
+        ?.querySelector(savedCharacterFocus.selector)?.focus({ preventScroll: true });
     }
     container.querySelectorAll('.sequence-issue').forEach(issue => { issue.open = openQueueIssues.has(queueIssueKey(issue)); });
     const nextList = container.querySelector('.sequence-cards');
