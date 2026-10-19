@@ -288,7 +288,10 @@ def test_append_keeps_original_state_history_sources_and_new_order_on_reopen(seq
     from sylvia_gm.interfaces.owner_process import _admitted_dm_campaign_plan
 
     text, structured = _admitted_dm_campaign_plan(owner, campaign_id=campaign, session_id=session)
-    assert structured == owner.accepted_campaign_plan(campaign).content["campaign_plan"]
+    assert structured["_app_adventure_continuation"]["connection"] == REVIEW["connection"]
+    assert {
+        key: value for key, value in structured.items() if key != "_app_adventure_continuation"
+    } == (owner.accepted_campaign_plan(campaign).content["campaign_plan"])
     assert "SAME campaign" in text and "Do not apply" in text
     assert owner.session_history_page(session).campaign_ending is None
     assert owner.session_history_page(session).campaign_endings == (
@@ -604,7 +607,13 @@ def test_overlapping_act_and_objective_ids_require_author_repair():
 def test_app_transport_preserves_narrated_future_and_plays_the_new_act(sequel):
     from tests.qa_attached_request import request_attached
     from tests.test_alpha_f6e_owner_session_transport import _OwnerHarness
-    from tests.test_fc_campaign_progress import _play, _ProgressProvider, _write
+    from tests.test_fc_campaign_progress import _ProgressProvider, _write
+
+    class InspectedProgressProvider(_ProgressProvider):
+        async def generate_stream(self, messages, tools=None, **kwargs):
+            self.observed_inputs = copy.deepcopy(messages)
+            async for chunk in super().generate_stream(messages, tools=tools, **kwargs):
+                yield chunk
 
     owner, campaign, session, database, source = sequel
     before = owner.snapshot(campaign)
@@ -619,21 +628,38 @@ def test_app_transport_preserves_narrated_future_and_plays_the_new_act(sequel):
     harness = _OwnerHarness(database, provider)
     try:
         reply = request_attached(
-            harness, "finish-before-sequel", "submit_session_input",
-            {"session_id": session, "attempt_id": "after-story-attempt",
-             "message_id": "after-story-choice", "turn_id": turn,
-             "expected_revision": before.revision, "user_text": "",
-             "campaign_ending_choice": {"ending_id": "signal-settled", "choice": "finish"}},
-            campaign_id=campaign, attempt_id="after-story-attempt",
+            harness,
+            "finish-before-sequel",
+            "submit_session_input",
+            {
+                "session_id": session,
+                "attempt_id": "after-story-attempt",
+                "message_id": "after-story-choice",
+                "turn_id": turn,
+                "expected_revision": before.revision,
+                "user_text": "",
+                "campaign_ending_choice": {"ending_id": "signal-settled", "choice": "finish"},
+            },
+            campaign_id=campaign,
+            attempt_id="after-story-attempt",
         )
         assert reply["interruption"] is None, reply
-        context = harness.request("context", "campaign_sequel_context", {
-            "campaign_id": campaign, "session_id": session,
-        })
+        context = harness.request(
+            "context",
+            "campaign_sequel_context",
+            {
+                "campaign_id": campaign,
+                "session_id": session,
+            },
+        )
         assert context["ending"]["choice"] == "finish"
         assert context["ending"]["has_after_story"] is True
-        selection = {"campaign_id": campaign, "session_id": session,
-                     "source_id": source.artifact_id}
+        assert future in json.dumps(context["recent_history"])
+        selection = {
+            "campaign_id": campaign,
+            "session_id": session,
+            "source_id": source.artifact_id,
+        }
         preview = harness.request("review", "preview_campaign_sequel", selection)
         receipt = harness.request("append", "append_campaign_sequel", _request(preview))
         assert harness.request("retry", "append_campaign_sequel", _request(preview)) == receipt
@@ -643,24 +669,61 @@ def test_app_transport_preserves_narrated_future_and_plays_the_new_act(sequel):
         assert provider.failure is None, (provider.failure, provider.receipts)
     with AuthorityOwner.open(database, "after-story-retention") as reopened:
         old_messages = reopened.session_context(session).messages
-        assert future in json.dumps([dict(item.content) for item in old_messages])
+        assert future in canonical_json_bytes([item.content for item in old_messages]).decode()
         assert reopened.snapshot(campaign).state == before.state
         assert reopened.snapshot(campaign).participants == before.participants
+        turn = reopened.current_open_turn(campaign) or "next-adventure-turn"
+        revision = reopened.snapshot(campaign).revision
     next_scene = "After the five saved years, Iona follows the second signal with the same crew."
-    _play(database, campaign, session, 99, [
-        ("read_campaign_reference", {"source": "campaign_plan",
-                                     "path": f"structured/structure/{act}"}),
-        ("update_campaign_file", {
-            "state_change": "changed", "state_change_summary": next_scene,
-            "scenes": [{"act_id": act, "summary": next_scene}],
-            "revised_player_facing_response": [{"kind": "narration", "text": next_scene}],
-        }),
-    ])
+    next_provider = InspectedProgressProvider(
+        [
+            (
+                "read_campaign_reference",
+                {"source": "campaign_plan", "path": f"structured/structure/{act}"},
+            ),
+            (
+                "update_campaign_file",
+                {
+                    "state_change": "changed",
+                    "state_change_summary": next_scene,
+                    "scenes": [{"act_id": act, "summary": next_scene}],
+                    "revised_player_facing_response": [{"kind": "narration", "text": next_scene}],
+                },
+            ),
+        ]
+    )
+    harness = _OwnerHarness(database, next_provider)
+    try:
+        result = request_attached(
+            harness,
+            "play-next-adventure",
+            "submit_session_input",
+            {
+                "session_id": session,
+                "attempt_id": "next-adventure-attempt",
+                "message_id": "next-adventure-input",
+                "turn_id": turn,
+                "expected_revision": revision,
+                "user_text": "Follow the second signal.",
+            },
+            campaign_id=campaign,
+            attempt_id="next-adventure-attempt",
+        )
+        assert result["interruption"] is None, result
+    finally:
+        harness.close()
+        assert next_provider.failure is None, (next_provider.failure, next_provider.receipts)
+    model_input = json.dumps(next_provider.observed_inputs)
+    assert "adventure_continuation" in model_input
+    assert REVIEW["connection"] in model_input
+    assert "Do not apply this source's initial_state" in model_input
+    assert "Already narrated futures remain binding" in model_input
+    assert "adventures/N/structured/..." in model_input
     with AuthorityOwner.open(database, "new-adventure-reopen") as reopened:
         snapshot = reopened.snapshot(campaign)
         assert snapshot.continuity.current_scene["act_id"] == act
         assert (snapshot.state, snapshot.participants) == (before.state, before.participants)
-        assert reopened.session_context(session).messages[:len(old_messages)] == old_messages
+        assert reopened.session_context(session).messages[: len(old_messages)] == old_messages
         page = reopened.session_history_page(session)
         assert page.campaign_endings[0]["historical"] is True
         assert page.campaign_endings[0]["choice"] == "finish"

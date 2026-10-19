@@ -10772,6 +10772,10 @@ const SylviaGMFrontend = (() => {
           ? '<p><strong>This campaign already chose its after-story.</strong> Review the saved future in history. The next adventure must follow those events.</p>' : '') +
         '<h4>New sequence</h4><ol>' + preview.acts.map(item =>
           `<li>Act ${item.number}: ${escapeHtml(item.title)}</li>`).join('') + '</ol>' +
+        '<details><summary>Retained story for review</summary>' +
+        '<p>This excerpt includes up to 64 recent history entries and current facts. The complete saved history remains authoritative.</p>' +
+        `<pre>${escapeHtml(JSON.stringify({ scene: preview.current_scene,
+          facts: preview.retained_facts, recent_history: dialog.context?.recent_history }, null, 2))}</pre></details>` +
         '<details><summary>Review preparation and setup assumptions (contains story spoilers)</summary>' +
         '<p>Authored starting facts are shown for compatibility review. They are not applied to the campaign.</p>' +
         (facts.length ? '<ul>' + facts.map(item => `<li>${escapeHtml(item)}</li>`).join('') + '</ul>' : '') +
@@ -10845,7 +10849,8 @@ const SylviaGMFrontend = (() => {
       bindings: context.accepted_plan?.bindings,
       boundaries: context.accepted_plan?.boundaries, current_scene: context.current_scene,
       participants: context.participants.map(item => ({ id: item.id, name: item.data.name })),
-      recent_facts: context.facts.slice(-64), ending: context.ending,
+      recent_facts: context.facts.slice(-64), recent_history: context.recent_history,
+      ending: context.ending,
     };
     $('campaign-sequel-dialog').close();
     await startBuilderChat({ displayName: `Next adventure: ${context.campaign_name}`,
@@ -10854,7 +10859,8 @@ const SylviaGMFrontend = (() => {
         'unresolved consequences and already narrated future. This independent Builder may publish ' +
         'a reusable Plan; it cannot change the live campaign. Its starting setup will not reset ' +
         'the campaign. Ask about genuine narrative conflicts. I will review and append it separately. ' +
-        'This context includes up to 64 recent facts; my complete saved history remains authoritative.\n\n' +
+        'This context includes up to 64 recent facts and history excerpts (up to 4000 characters each); ' +
+        'my complete saved history remains authoritative.\n\n' +
         JSON.stringify(preparation, null, 2) });
   }
 

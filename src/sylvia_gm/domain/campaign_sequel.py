@@ -92,3 +92,32 @@ def sequel_markdown(content: Mapping[str, object]) -> str:
         "IDs in scenes, progress and reveals, even when the original prose uses older IDs.\n\n"
         f"Identity mapping: {dict(metadata['identity_mapping'])}\n\n" + text
     )
+
+
+def sequel_preparation(content: Mapping[str, object]) -> SafePayload | None:
+    """Project application-owned continuation instructions into the structured GM context."""
+    metadata = content.get("sequel")
+    if not isinstance(metadata, Mapping):
+        return None
+    review = metadata["request"]["review"]
+    return owned_payload(
+        {
+            "number": metadata["preview"]["number"],
+            "connection": review["connection"],
+            "timeline": review["timeline"],
+            "continuity_rule": "Continue the SAME campaign. Keep played events, characters, world "
+            "facts, boundaries, unresolved consequences and mechanical values true.",
+            "setup_rule": "Do not apply this source's initial_state, starting party, starting "
+            "location or placements as a reset. Establish any transition through play.",
+            "timeline_rule": "Already narrated futures remain binding. Follow them; do not rewind "
+            "or erase them. Read the saved history when their details are needed.",
+            "retained_preparation": {
+                "source": "campaign_plan",
+                "path": "adventures",
+                "detail_paths": ["adventures/N/structured/...", "adventures/N/markdown"],
+            },
+            "identity_rule": "Use the active structured Plan's mapped IDs for scenes, progress "
+            "and reveals even if source prose uses older IDs. World identities are unchanged.",
+            "identity_mapping": metadata["identity_mapping"],
+        }
+    )

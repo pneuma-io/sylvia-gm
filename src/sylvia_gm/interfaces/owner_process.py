@@ -899,26 +899,22 @@ def _admitted_dm_campaign_plan(
         or handoff.dm_session_id != session_id
     ):
         raise CommandRejected("DM session does not match the admitted campaign plan")
-    current = owner.accepted_campaign_plan(campaign_id)
-    cursor = current
-    seen = set()
-    while isinstance(cursor.content.get("sequel"), Mapping):
-        if cursor.plan_id in seen or len(seen) >= 32:
-            raise CommandRejected("Campaign adventure lineage is invalid")
-        seen.add(cursor.plan_id)
-        cursor = owner.campaign_plan(cursor.content["sequel"]["previous_plan_id"])
-        if cursor.campaign_id != campaign_id:
-            raise CommandRejected("Campaign adventure lineage belongs to another campaign")
-    if cursor.plan_id != plan.plan_id:
+    adventures = owner.campaign_adventures(campaign_id)
+    if not adventures or adventures[0].plan_id != plan.plan_id:
         raise CommandRejected("Current adventure is not descended from the admitted handoff")
-    plan = current
+    plan = adventures[-1]
     admitted_text = plan.content.get("campaign_plan_markdown")
     if not isinstance(admitted_text, str) or not admitted_text.strip():
         raise CommandRejected("Admitted campaign plan content is unavailable")
     if len(admitted_text.encode("utf-8")) > _MAX_CAMPAIGN_PLAN_BYTES:
         raise CommandRejected("Admitted campaign plan exceeds the usability limit")
     structured = plan.content.get("campaign_plan")
-    from sylvia_gm.domain.campaign_sequel import sequel_markdown
+    from sylvia_gm.domain.campaign_sequel import sequel_markdown, sequel_preparation
+
+    continuation = sequel_preparation(plan.content)
+    if continuation is not None and isinstance(structured, Mapping):
+        # This application projection is not a change to the authored or accepted Plan bytes.
+        structured = {**structured, "_app_adventure_continuation": continuation}
 
     return sequel_markdown(plan.content), structured if isinstance(structured, Mapping) else None
 

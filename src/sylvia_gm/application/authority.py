@@ -2756,6 +2756,14 @@ class AuthorityOwner:
                 "participants": [{"id": item.participant_id, "data": item.data}
                                  for item in snapshot.participants],
                 "ending": self.session_history_page(session_id).campaign_ending,
+                "recent_history": [
+                    {"kind": item.kind.value,
+                     "excerpt": canonical_json_bytes(item.content).decode("utf-8")[:4000]}
+                    for item in self.session_history_page(session_id, limit=64).messages
+                    if item.kind in {SessionMessageKind.USER, SessionMessageKind.TALK,
+                                     SessionMessageKind.CANONICAL_REFERENCE,
+                                     SessionMessageKind.STEERING}
+                ],
                 "source_references": [
                     {"plan_id": row.plan_id, "content_sha256": row.content_sha256,
                      "source_id": row.content.get("sequel", {}).get("source_id")}
@@ -2790,6 +2798,11 @@ class AuthorityOwner:
             if plan is None:
                 raise CommandRejected("Accepted Campaign Plan is unavailable")
             return plan
+
+    def campaign_adventures(self, campaign_id: str) -> tuple[CampaignPlan, ...]:
+        """Read the validated accepted sequence, excluding superseded Builder drafts."""
+        with self._operation():
+            return self._store.campaign_adventures(campaign_id)
 
     def handoff_builder_to_dm(
         self,
