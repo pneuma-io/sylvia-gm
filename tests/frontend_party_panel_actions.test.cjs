@@ -870,3 +870,19 @@ test('a panel moved into a child cannot duplicate its pending main-window intent
   await assert.rejects(h.api.dispatchPanelWindowRequest('preview_panel_action',command,scope),/pending panel action/);
   assert.equal(h.previews.length,0);assert.equal(h.executions.length,0);
 });
+
+test('a delayed map confirmation retains both captured actor and target while inspection changes',async()=>{
+  const surface=mapSurface();surface.actions[0].bindings={attacker:'actor',target:'target'};
+  const h=harness({available:true,actors:[{id:'alpha'},{id:'bravo'}]},surface);
+  const party=partySurface();h.projection.surfaces.push(party);h.api.renderRulesetPanelProjection(h.projection);
+  h.api.tacticalSelection(surface).target='npc';let finish;
+  h.api.state.bridge.preview_panel_action=command=>{h.previews.push(command);return new Promise(resolve=>finish=resolve);};
+  const pending=h.click();await new Promise(setImmediate);
+  h.api.applyPanelSelection('party',{character:'bravo'});
+  h.api.applyPanelSelection('map',{target:'bravo'});
+  finish({confirmation_required:true,confirmation:'alpha-npc',actor:{name:'Asha'},selection:{target:'npc'},label:'Act'});
+  await new Promise(setImmediate);assert.match(h.body.children[0].innerHTML,/npc/);
+  h.body.children[0].close('confirm');await pending;
+  assert.equal(h.executions.length,1);assert.equal(h.executions[0].selection.actor,'alpha');
+  assert.equal(h.executions[0].selection.target,'npc');assert.equal(h.api.tacticalSelection(surface).target,'bravo');
+});
