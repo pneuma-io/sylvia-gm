@@ -42,12 +42,12 @@ impl OwnerBridge {
         Self::spawn_command(Command::new(executable), database)
     }
 
-    fn spawn_default(database: &Path) -> Result<Self, String> {
+    fn spawn_default(database: &Path, portable: bool) -> Result<Self, String> {
         if let Some(executable) = std::env::var_os("SYLVIA_GM_OWNER_EXECUTABLE") {
             return Self::spawn_packaged(Path::new(&executable), database);
         }
 
-        if cfg!(debug_assertions) {
+        if cfg!(debug_assertions) && !portable {
             let python = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
                 .parent()
                 .ok_or_else(|| "Sylvia GM repository root is unavailable".to_string())?
@@ -2569,7 +2569,7 @@ pub fn run() {
             if let Some(parent) = database.parent() {
                 std::fs::create_dir_all(parent)?;
             }
-            let bridge = OwnerBridge::spawn_default(&database).map_err(|error| {
+            let bridge = OwnerBridge::spawn_default(&database, portable.is_some()).map_err(|error| {
                 rfd::MessageDialog::new()
                     .set_title("Sylvia GM - selected data unavailable")
                     .set_description("Sylvia cannot open the selected data folder. Close any other Sylvia copy using that same folder, then try again. A different installed or portable copy keeps its own data.")
