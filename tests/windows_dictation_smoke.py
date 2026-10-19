@@ -17,23 +17,41 @@ import wave
 
 @unittest.skipUnless(sys.platform == "win32", "Windows desktop speech engine required")
 class LocalDictationSmoke(unittest.TestCase):
-    def test_installed_engine_returns_editable_text_without_microphone(self):
-        script = (Path(__file__).parents[1] / "src-tauri/src/dictation.ps1").read_text(encoding="utf-8")
-        executable = str(Path(os.environ["SystemRoot"]) / "System32/WindowsPowerShell/v1.0/powershell.exe")
+    @classmethod
+    def launch(cls, code):
+        return subprocess.Popen(
+            [cls.executable, "-NoProfile", "-NonInteractive", "-Command", code],
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            text=True, encoding="utf-8", creationflags=subprocess.CREATE_NO_WINDOW,
+        )
 
-        def launch(code):
-            return subprocess.Popen(
-                [executable, "-NoProfile", "-NonInteractive", "-Command", code],
-                stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                text=True, encoding="utf-8", creationflags=subprocess.CREATE_NO_WINDOW,
-            )
-
-        capabilities = launch(script)
+    @classmethod
+    def setUpClass(cls):
+        cls.script = (Path(__file__).parents[1] / "src-tauri/src/dictation.ps1").read_text(encoding="utf-8")
+        cls.executable = str(Path(os.environ["SystemRoot"]) / "System32/WindowsPowerShell/v1.0/powershell.exe")
+        capabilities = cls.launch(cls.script)
         output, error = capabilities.communicate('{"mode":"capabilities"}\n', timeout=45)
-        self.assertFalse(error)
-        engines = json.loads(output).get("engines", [])
-        if not engines:
-            self.skipTest("No installed Microsoft desktop dictation language")
+        if error:
+            raise AssertionError("Speech metadata query emitted diagnostics")
+        cls.engines = json.loads(output).get("engines", [])
+        if not cls.engines:
+            raise unittest.SkipTest("No installed Microsoft desktop dictation language")
+
+    def test_audio_start_failures_are_redacted_without_opening_a_microphone(self):
+        for exception, expected in (("UnauthorizedAccessException", "permission"),
+                                    ("InvalidOperationException", "device")):
+            with self.subTest(error=expected):
+                self.assertEqual(self.script.count("engine.SetInputToDefaultAudioDevice();"), 1)
+                controlled = self.script.replace("engine.SetInputToDefaultAudioDevice();",
+                    'Action failInput = delegate { throw new ' + exception +
+                    '("private controlled detail"); }; failInput();')
+                capture = self.launch(controlled)
+                output, error = capture.communicate(json.dumps({"mode": "start", "engine": self.engines[0]["id"]}) + "\n", timeout=45)
+                self.assertFalse(error)
+                self.assertEqual(json.loads(output), {"error": expected})
+
+    def test_installed_engine_returns_editable_text_without_microphone(self):
+        script, launch, engines = self.script, self.launch, self.engines
 
         with tempfile.TemporaryDirectory(prefix="sylvia-dictation-smoke-") as scratch:
             wav = Path(scratch) / "controlled.wav"

@@ -41,6 +41,8 @@ Local-only Windows dictation is selected. Only explicit Start opens audio input.
 
 A metadata-only probe found an installed English (UK) recognizer. The production helper, with its microphone-input line replaced privately by file input, transcribed an offline synthesized WAV. It returned `I walk north and opened the door` for `I walk north and open the door.` This proves real local recognition with a visible correction need, without opening a microphone or speaker. It does not prove physical capture. No new engine or language was installed.
 
+Run `.venv/Scripts/python.exe tests/windows_dictation_smoke.py` for this controlled recognition check and the helper's permission/device error mapping. The latter substitutes controlled exceptions for the audio-input call and asserts safe error codes without opening a microphone. These checks do not establish actual Windows microphone permission behavior.
+
 ## Current verification
 
 - `node --test tests/frontend_dictation.test.cjs` covers selection insertion, once-only completion, undo/re-dictation, draft edits during transcription, cancellation, session switching, permission/device/provider failures, empty results and timeouts using controlled fixtures.
