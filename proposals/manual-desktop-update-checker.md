@@ -1,3 +1,5 @@
+> Superseded on 19 October 2026 by the selected [full in-app self-update scope](in-app-self-update.md). The original manual-check proposal below is retained as history; it is not the current feature boundary.
+
 # Manual desktop update checker (PL-16)
 
 Status: future work. This planning-only draft does not deliver an updater. The proposed feature
