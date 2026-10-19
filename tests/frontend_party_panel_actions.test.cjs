@@ -88,7 +88,7 @@ function harness(playerControl, surface = partySurface()) {
     refreshSelectedCampaign = async () => {};
     renderRulesetPanels = async () => {};
   ` + source.slice(insertion);
-  source = ['panel-workspace.js', 'shot-playback.js', 'panel-host.js'].map((name) =>
+  source = ['panel-workspace.js', 'shot-playback.js', 'panel-host.js', 'piece-table.js'].map((name) =>
     fs.readFileSync(path.join(__dirname, '../src-tauri/frontend', name), 'utf8')).join('\n') + '\n' + source;
   context.setTimeout ||= setTimeout;
   context.clearTimeout ||= clearTimeout;
@@ -885,4 +885,88 @@ test('a delayed map confirmation retains both captured actor and target while in
   h.body.children[0].close('confirm');await pending;
   assert.equal(h.executions.length,1);assert.equal(h.executions[0].selection.actor,'alpha');
   assert.equal(h.executions[0].selection.target,'npc');assert.equal(h.api.tacticalSelection(surface).target,'bravo');
+});
+
+// A declared, ruleset-neutral table exercises the integration without adding
+// Character/Party surfaces to the delivered Riichi ruleset.
+function pieceSurface() {
+  return { id: 'relay', title: 'Relay', renderer: 'piece_table', minimum_size: 96, default_size: 180,
+    actions: [{ id: 'act', label: 'Run program', available: true, bindings: { selected: 'piece' } }],
+    data: { format: 1, areas: [{ position: 'bottom', groups: [{ label: 'Programs', pieces: [
+      { id: 'ghost', label: 'Ghost route', action_id: 'act' },
+      { id: 'beacon', label: 'Beacon route', action_id: 'act' },
+    ] }] }] } };
+}
+
+function pieceHarness() {
+  const h = harness({ available: true, actors: [{ id: 'alpha' }, { id: 'bravo' }] }, pieceSurface());
+  delete h.button.dataset.panelActorId;
+  h.button.dataset.panelPieceId = 'ghost';
+  h.projection.surfaces.push(partySurface());
+  h.api.renderRulesetPanelProjection(h.projection);
+  return h;
+}
+
+test('delayed piece preview keeps its captured piece across inspection and blocks a second intention', async () => {
+  const h = pieceHarness();
+  let finish;
+  h.api.state.bridge.preview_panel_action = command => {
+    h.previews.push(command); return new Promise(resolve => { finish = resolve; });
+  };
+  const pending = h.click(); await new Promise(setImmediate);
+  h.api.applyPanelSelection('party', { character: 'bravo' });
+  h.button.dataset.panelPieceId = 'beacon';
+  h.api.renderRulesetPanelProjection(h.projection);
+  h.button.disabled = false;
+  await h.click();
+  assert.equal(h.previews.length, 1);
+  const scope = { campaign_id: 'campaign', session_id: 'gm', current: () => true, owns: () => true };
+  await assert.rejects(h.api.dispatchPanelWindowRequest('preview_panel_action', {
+    campaign_id: 'campaign', session_id: 'gm', surface_id: 'relay', panel_action_id: 'act',
+    selection: { piece: 'beacon' },
+  }, scope), /pending panel action/);
+  finish({ confirmation_required: true, confirmation: 'ghost-only', label: 'Run program' });
+  await new Promise(setImmediate);
+  h.body.children[0].close('confirm'); await pending;
+  assert.equal(h.executions.length, 1);
+  assert.equal(JSON.stringify(h.executions[0].selection), '{"piece":"ghost"}');
+  assert.equal(h.api.state.characterInspection.id, 'bravo');
+});
+
+for (const change of ['removed', 'concealed', 'rebound', 'revision', 'campaign']) {
+  test(`delayed piece preview rejects a ${change} binding without execution`, async () => {
+    const h = pieceHarness(); let finish;
+    h.api.state.bridge.preview_panel_action = () => new Promise(resolve => { finish = resolve; });
+    const pending = h.click(); await new Promise(setImmediate);
+    const group = h.surface.data.areas[0].groups[0];
+    if (change === 'removed') group.pieces.shift();
+    if (change === 'concealed') group.concealed = true;
+    if (change === 'rebound') group.pieces[0].action_id = 'different';
+    if (change === 'revision') h.projection.revision = 9;
+    if (change === 'campaign') h.api.state.activeCampaignId = 'other';
+    if (change !== 'campaign') h.api.renderRulesetPanelProjection(h.projection);
+    const before = JSON.stringify(h.projection);
+    finish({ confirmation_required: true, confirmation: 'obsolete', label: 'Run program' });
+    await pending;
+    assert.equal(h.body.children.length, 0);
+    assert.equal(h.executions.length, 0);
+    assert.equal(JSON.stringify(h.projection), before);
+  });
+}
+
+test('owner work beginning during piece confirmation prevents commit and inspection remains display-only', async () => {
+  const h = pieceHarness();
+  const pending = h.click(); await new Promise(setImmediate);
+  h.activity.phase = 'working'; h.activity.attemptId = 'isolated-owner-decision';
+  h.activity.actorId = 'npc';
+  const before = JSON.stringify(h.projection);
+  h.api.applyPanelSelection('party', { character: 'bravo' });
+  h.api.renderRulesetPanelProjection(h.projection);
+  h.body.children[0].close('confirm'); await pending;
+  assert.equal(h.api.state.characterInspection.id, 'bravo');
+  assert.equal(h.activity.attemptId, 'isolated-owner-decision');
+  assert.equal(h.activity.actorId, 'npc');
+  assert.equal(h.activity.phase, 'working');
+  assert.equal(h.executions.length, 0);
+  assert.equal(JSON.stringify(h.projection), before);
 });

@@ -5,7 +5,7 @@ const path = require('node:path');
 const { chromium } = require('playwright');
 const frontend = path.resolve(__dirname, '../src-tauri/frontend');
 
-test('keyboard dictation reviews text and ordinary Send submits exactly once', { timeout: 30000 }, async () => {
+async function withComposer(check) {
   const browser = await chromium.launch({ headless: true, args: ['--disable-gpu'],
     channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined) });
   try {
@@ -16,13 +16,14 @@ test('keyboard dictation reviews text and ordinary Send submits exactly once', {
     await page.route('https://dictation.test/**', async route => {
       const name = new URL(route.request().url()).pathname.slice(1) || 'app.html';
       const allowed = ['app.html', 'app.css', 'app.js', 'dictation.js', 'panel-workspace.js',
-        'panel-host.js', 'shot-playback.js', 'campaign-plan-browser.js', 'assets/sylvia-portrait.png'];
+        'panel-host.js', 'shot-playback.js', 'piece-table.js', 'campaign-plan-browser.js', 'assets/sylvia-portrait.png'];
       if (!allowed.includes(name)) return route.abort();
       let body = fs.readFileSync(path.join(frontend, name));
       if (name === 'app.js') body = body.toString().replace(
         "document.addEventListener('DOMContentLoaded', () => { void SylviaGMFrontend.init(); });", '')
         .replace('  // ---- Public API ----', `window.dictationTest = { state, wireControls,
-          refreshSessionInputAdmission, ensureSessionActivity, restoreSelectedSessionDraft };
+          refreshSessionInputAdmission, ensureSessionActivity, restoreSelectedSessionDraft,
+          renderRulesetPanelProjection, applyPanelSelection };
           // ---- Public API ----`);
       await route.fulfill({ body, contentType: name.endsWith('.js') ? 'text/javascript' :
         name.endsWith('.css') ? 'text/css' : name.endsWith('.png') ? 'image/png' : 'text/html' });
@@ -42,11 +43,21 @@ test('keyboard dictation reviews text and ordinary Send submits exactly once', {
         dictation_start: async (id, engine) => { window.captureId = id; window.selectedSpeechEngine = engine; },
         dictation_stop: () => new Promise(resolve => { window.finishDictation = resolve; }),
         dictation_cancel: async id => { window.cancelled.push(id); },
-        submit_session_input: command => { window.submissions.push(command); return new Promise(() => {}); },
+        submit_session_input: command => {
+          window.cancellationsAtSubmit = window.cancelled.length;
+          window.submissions.push(command); return new Promise(() => {});
+        },
       };
       ensureSessionActivity({ sessionId: 'fixture-gm', sessionRole: 'dm', campaignId: 'fixture' });
       wireControls(); refreshSessionInputAdmission();
     });
+    await check(page);
+    assert.deepEqual(errors, []);
+  } finally { await browser.close(); }
+}
+
+test('keyboard dictation reviews text and ordinary Send submits exactly once', { timeout: 30000 }, async () => {
+  await withComposer(async page => {
     const input = page.locator('#player-input'), mic = page.getByRole('button', { name: 'Start dictation', exact: true });
     await input.fill('I wait.');
     await input.press('Alt+m');
@@ -142,6 +153,72 @@ test('keyboard dictation reviews text and ordinary Send submits exactly once', {
     assert.equal(await input.inputValue(), '');
     assert.equal(await page.locator('#dictation-review-panel').isVisible(), false);
     assert.equal(await page.evaluate(() => window.submissions.length), 1);
-    assert.deepEqual(errors, []);
-  } finally { await browser.close(); }
+  });
+});
+
+test('dictation during piece confirmation stays in the draft and ordinary Send cancels capture before owner work',
+  { timeout: 30000 }, async () => {
+  await withComposer(async page => {
+    await page.evaluate(() => {
+      const api = window.dictationTest;
+      api.state.activeSnapshot = { revision: 4 };
+      Object.assign(api.state.bridge, {
+        snapshot: async () => ({ revision: 4 }),
+        preview_panel_action: async command => {
+          window.piecePreview = command;
+          return { confirmation_required: true, confirmation: 'ghost-only', label: 'Run program' };
+        },
+        execute_panel_action: async command => { window.pieceExecution = command; },
+      });
+      const projection = { campaign_id: 'fixture', revision: 4,
+        player_control: { available: true, actors: [{ id: 'alpha' }, { id: 'bravo' }] }, surfaces: [
+          { id: 'relay', title: 'Relay', renderer: 'piece_table', minimum_size: 96, default_size: 180,
+            actions: [{ id: 'run', label: 'Run program', available: true, bindings: { selected: 'piece' } }],
+            data: { format: 1, areas: [{ position: 'bottom', groups: [{ label: 'Programs', pieces: [
+              { id: 'ghost', label: 'Ghost route', action_id: 'run' },
+            ] }] }] } },
+          { id: 'party', title: 'Party', renderer: 'party', minimum_size: 96, default_size: 180,
+            actions: [], data: { participants: [
+              { id: 'alpha', kind: 'character', data: { name: 'Asha' } },
+              { id: 'bravo', kind: 'character', data: { name: 'Bram' } },
+            ], entities: {} } },
+        ] };
+      api.state.bridge.campaign_panels = async () => projection;
+      api.renderRulesetPanelProjection(projection);
+    });
+    const input = page.locator('#player-input');
+    await input.fill('Keep the program ready.');
+    await page.getByRole('button', { name: 'Start dictation', exact: true }).click();
+    await page.getByRole('button', { name: 'Stop dictation', exact: true }).click();
+    await page.getByRole('button', { name: 'Run program: Ghost route', exact: true }).click();
+    const dialog = page.locator('dialog.player-action-dialog');
+    await dialog.waitFor();
+    await page.evaluate(() => {
+      window.dictationTest.applyPanelSelection('party', { character: 'bravo' });
+      window.finishDictation('and inspect Bram');
+    });
+    await page.waitForFunction(() => document.getElementById('player-input').value.includes('inspect Bram'));
+    assert.equal(await page.evaluate(() => window.submissions.length), 0);
+    assert.equal(await page.evaluate(() => window.pieceExecution), undefined);
+    assert.deepEqual(await page.evaluate(() => window.piecePreview.selection), { piece: 'ghost' });
+    await dialog.getByRole('button', { name: 'Cancel', exact: true }).click();
+    assert.equal(await input.inputValue(), 'Keep the program ready. and inspect Bram');
+    assert.equal(await page.evaluate(() => window.dictationTest.state.characterInspection.id), 'bravo');
+    assert.equal(await page.evaluate(() => window.pieceExecution), undefined);
+
+    // The ordinary Send path must cancel an unfinished transcription and send
+    // only the editable draft, once, without committing the rejected piece.
+    await page.getByRole('button', { name: 'Start dictation', exact: true }).click();
+    await page.getByRole('button', { name: 'Stop dictation', exact: true }).click();
+    await page.getByRole('button', { name: 'Send message', exact: true }).click();
+    await page.evaluate(() => window.finishDictation('late words must be discarded'));
+    await input.press('Enter');
+    assert.equal(await page.evaluate(() => window.submissions.length), 1);
+    assert.equal(await page.evaluate(() => window.submissions[0].user_text),
+      'Keep the program ready. and inspect Bram');
+    assert.ok(await page.evaluate(() => window.cancellationsAtSubmit) > 0);
+    assert.equal(await page.locator('#dictation-review-panel').isVisible(), false);
+    assert.equal(await page.evaluate(() => window.pieceExecution), undefined);
+    assert.doesNotMatch(await input.inputValue(), /late words/);
+  });
 });
