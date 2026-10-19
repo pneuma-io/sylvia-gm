@@ -67,9 +67,13 @@ acts or require them to finish the sequel.
 - The unchanged pre-implementation Lite two-act Finish/Continue journey passed. The separate
   legacy Rift source-binding regression already failed at the original head and is outside this
   feature. No source content, rules package, spell roster or dependency migration is selected.
+- The desktop and frozen owner compiled from implementation head `02e408a`. Twenty-four Rust
+  unit/bridge checks passed, including the explicitly selected frozen-owner handshake/reopen test.
+  The frozen owner discovered both source-validated SRD Lite QA adventures and enabled Full Audit
+  in the disposable profile. This is engineering-candidate evidence, not installed release approval.
 
-Native compilation, ordinary desktop launch/input and the complete native disposable-campaign
-journey require the selected Windows desktop and an uncontended build slot with sufficient disk
-space. Browser and owner proofs do not close them. No merge, release or GitHub Actions run is
+Ordinary desktop launch/input and the complete native disposable-campaign journey still require
+the coordinated desktop slot. Browser and owner proofs do not close them. Formal release packaging
+also requires the existing private identity-check input. No merge, release or GitHub Actions run is
 included. The coordinator owns reconciliation of the complete PL-24, PL-01 and AR-30 Desk
 requirements and the original archive entries; this implementation note is not their replacement.
