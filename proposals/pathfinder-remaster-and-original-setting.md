@@ -29,9 +29,9 @@ Before adapting an item, record its title, edition/printing, errata/revision, au
 
 ## Rights, notices and naming boundary
 
-The [ORC licence](https://downloads.paizo.com/ORC_License_FINAL.pdf) distinguishes Licensed and Reserved Material and requires notices, upstream attribution and downstream rights in adapted rules. Keep those rules obligations separate from the application's existing licence; do not impose incompatible application restrictions on ORC rules content.
+The [final registered ORC licence](https://downloads.paizo.com/ORC_LicenseFINAL.pdf) ([drafter-hosted final copy](https://azoralaw.com/wp-content/uploads/2023/09/ORC-License.FINAL_.pdf)) distinguishes Licensed and Reserved Material and requires notices, upstream attribution and downstream rights in adapted rules. Keep those rules obligations separate from the application's existing licence; do not impose incompatible application restrictions on ORC rules content.
 
-The official [ORC AxE, digital applications section](https://downloads.paizo.com/ORC_AxE_FINAL.pdf) explains digital use and does not require release of implementation source code. This does not remove the obligations on adapted licensed mechanics.
+The [final ORC AxE, digital applications section](https://azoralaw.com/wp-content/uploads/2023/09/ORC-AxE.FINAL_.pdf), linked by the licence's drafter, explains digital use and does not require release of implementation source code. This does not remove the obligations on adapted licensed mechanics.
 
 Exclude Paizo lore, Golarion, distinctive characters, setting names, art, logos, trade dress and the action-symbol font unless separately verified permission is deliberately selected. Use original setting names, lore and art; retain any necessary licensed mechanical terms only under their verified source boundary. Do not assume a right to copy another publisher's software or assets.
 
@@ -65,9 +65,11 @@ The eventual goal is declared coverage of the selected four-book mechanical scop
 
 Confirm the first roster/slice, Setting theme/name and final compatibility wording. Resolve ambiguous licensed/reserved portions item by item, without importing them first.
 
-Verify the final registered ORC text and precise per-book notices at intake. During this review, the two Paizo hub pages returned HTTP 403; no access workaround was attempted. The supplied licence PDF's extracted text shows an INTERIM heading and registration placeholders, so its filename alone is not final-text verification. The AxE and compatibility PDF were readable. These observations are intake checks, not acceptance of a licence or a claim that source rights are cleared.
+The final-text URL distinction is resolved. Paizo's final PDF uses `ORC_LicenseFINAL.pdf`, with no underscore between `License` and `FINAL`; it and the drafter-hosted final copy identify the final licence and registration `TX 9-307-067` in Sections III.a and III.e. The earlier [underscored Paizo URL](https://downloads.paizo.com/ORC_License_FINAL.pdf) serves interim text with registration placeholders and is not this proposal's final licence reference. The final licence and AxE linked above were readable.
 
-Primary reference entry points remain [Paizo ORC](https://paizo.com/orclicense), [Paizo licences](https://paizo.com/licenses), the linked licence/AxE and compatibility PDFs, and each selected book's exact legal notices. Do not rely on a search snippet or a generic site-wide licence claim in place of those notices.
+Still verify each selected book's exact edition/printing, errata, legal notices, licensed/reserved designations and upstream attribution at intake. Identifying the final licence does not establish rights in every book item or accept a legal agreement.
+
+Primary reference entry points remain [Paizo ORC](https://paizo.com/orclicense), [Paizo licences](https://paizo.com/licenses), the [drafter's final licence/AxE/registration page](https://azoralaw.com/orclicense/), the linked final licence/AxE and compatibility PDFs, and each selected book's exact legal notices. Do not rely on a search snippet or a generic site-wide licence claim in place of those notices.
 
 ## Scheduling and limits of this PR
 
