@@ -125,6 +125,7 @@ impl Drop for Capture {
 
 #[derive(Default)]
 struct Registry {
+    closed: bool,
     active: Option<(String, Arc<Capture>)>,
     cancelled: VecDeque<String>,
 }
@@ -188,6 +189,9 @@ impl Dictation {
         let capture = Arc::new(Capture::default());
         {
             let mut registry = self.0.lock().map_err(|_| "provider")?;
+            if registry.closed {
+                return Err("unavailable".into());
+            }
             if registry
                 .active
                 .as_ref()
@@ -290,12 +294,12 @@ impl Dictation {
         }
     }
 
+    /// Permanently refuse queued starts before releasing the current capture on shutdown.
     pub(crate) fn close(&self) {
-        let capture = self
-            .0
-            .lock()
-            .ok()
-            .and_then(|mut registry| registry.active.take());
+        let capture = self.0.lock().ok().and_then(|mut registry| {
+            registry.closed = true;
+            registry.active.take()
+        });
         if let Some((_, capture)) = capture {
             capture.close();
         }
@@ -331,6 +335,20 @@ mod tests {
                 .unwrap_err(),
             "unavailable"
         );
+    }
+
+    #[test]
+    fn closing_before_a_queued_start_registers_prevents_capture() {
+        let dictation = Arc::new(Dictation::default());
+        let worker = Arc::clone(&dictation);
+        let (release, queued) = mpsc::channel();
+        let pending = std::thread::spawn(move || {
+            queued.recv().unwrap();
+            worker.start_with("late", "test", fixture(r#"$null=[Console]::ReadLine(); [Console]::WriteLine('{"status":"recording"}'); $null=[Console]::ReadLine()"#))
+        });
+        dictation.close();
+        release.send(()).unwrap();
+        assert_eq!(pending.join().unwrap().unwrap_err(), "unavailable");
     }
 
     #[test]
