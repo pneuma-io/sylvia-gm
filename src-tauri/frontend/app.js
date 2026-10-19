@@ -10852,6 +10852,11 @@ const SylviaGMFrontend = (() => {
       recent_facts: context.facts.slice(-64), recent_history: context.recent_history,
       ending: context.ending,
     };
+    const fullContext = JSON.stringify(preparation, null, 2);
+    const contextExcerpt = fullContext.length <= 60000 ? fullContext :
+      fullContext.slice(0, 60000) + '\n\n[Context excerpt truncated at 60,000 characters. ' +
+      'It may end during a field. Complete saved history and boundaries remain authoritative. ' +
+      'Ask me for missing material rather than treating it as absent.]';
     $('campaign-sequel-dialog').close();
     await startBuilderChat({ displayName: `Next adventure: ${context.campaign_name}`,
       initialPrompt: 'Help me author or adapt a compatible next Campaign Plan for this existing campaign. ' +
@@ -10861,7 +10866,7 @@ const SylviaGMFrontend = (() => {
         'the campaign. Ask about genuine narrative conflicts. I will review and append it separately. ' +
         'This context includes up to 64 recent facts and history excerpts (up to 4000 characters each); ' +
         'my complete saved history remains authoritative.\n\n' +
-        JSON.stringify(preparation, null, 2) });
+        contextExcerpt });
   }
 
   async function exportSelectedCampaign() {

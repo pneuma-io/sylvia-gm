@@ -108,6 +108,19 @@ test('review, cancellation, source conflicts and uncertain append retries use th
       assert.deepEqual(observed.opened, { campaign: 'relay', session: 'gm-relay' });
       assert.equal(observed.calls[0].review.timeline, 'after');
       assert.equal(observed.calls[0].review.reviewed, true);
+      await page.evaluate(() => {
+        const original = state.bridge.campaign_sequel_context;
+        state.bridge.campaign_sequel_context = async () => ({ ...await original(),
+          recent_history: Array.from({ length: 64 }, () => ({ kind: 'talk', excerpt: 'x'.repeat(4000) })) });
+      });
+      await page.locator('#campaign-sequel-btn').click();
+      await page.locator('#campaign-sequel-source option[value="second"]').waitFor({ state: 'attached' });
+      await page.getByRole('button', { name: 'Author with Builder', exact: true }).click();
+      const authored = await page.evaluate(() => window.authored);
+      assert.ok(authored.initialPrompt.length < 64000, 'composed draft fits ordinary Builder input');
+      assert.match(authored.initialPrompt, /Context excerpt truncated/);
+      assert.match(authored.initialPrompt, /Ask me for missing material/);
+      assert.equal(await page.evaluate(() => window.calls.length), 2, 'authoring never adopts a Plan');
       assert.deepEqual(errors, []);
     } finally { await browser.close(); }
   });
