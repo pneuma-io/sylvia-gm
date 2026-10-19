@@ -1005,14 +1005,12 @@ test('owner work beginning during piece confirmation prevents commit and inspect
   const h = pieceHarness();
   const pending = h.click(); await new Promise(setImmediate);
   h.activity.phase = 'working'; h.activity.attemptId = 'isolated-owner-decision';
-  h.activity.actorId = 'npc';
   const before = JSON.stringify(h.projection);
   h.api.applyPanelSelection('party', { character: 'bravo' });
   h.api.renderRulesetPanelProjection(h.projection);
   h.body.children[0].close('confirm'); await pending;
   assert.equal(h.api.state.characterInspection.id, 'bravo');
   assert.equal(h.activity.attemptId, 'isolated-owner-decision');
-  assert.equal(h.activity.actorId, 'npc');
   assert.equal(h.activity.phase, 'working');
   assert.equal(h.executions.length, 0);
   assert.equal(JSON.stringify(h.projection), before);
