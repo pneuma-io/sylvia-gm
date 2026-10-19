@@ -104,6 +104,107 @@ history. Foreign prompts, macros, regex and scripts remain inert; no expansion,
 fetch, execution, provider-policy change or tool authority follows from them.
 Narrative abilities do not grant mechanical powers.
 
+## Grouped piece tables
+
+A panel can select `renderer: piece_table` with the ordinary `state`, `literal`, or
+composed source declaration. Its source resolves to a closed version-1 object:
+
+```json
+{
+  "format": 1,
+  "title": "Relay console",
+  "status": [{"label": "Cycle", "value": "3"}],
+  "areas": [{
+    "id": "relay", "label": "Relay", "position": "center",
+    "groups": [{
+      "id": "route", "label": "Route", "visibility": "public",
+      "pieces": [{"id": "a", "label": "A", "detail": "Online", "emphasis": "accent"}]
+    }]
+  }]
+}
+```
+
+Use each of `top`, `left`, `center`, `right`, and `bottom` at most once. Narrow
+panels stack areas in declaration order. Each area contains ordered groups, and
+each group contains ordered pieces. Status values and all labels are plain text.
+Pieces may use `normal`, `accent`, or `muted` emphasis. There is no package HTML,
+JavaScript, remote asset loading, or renderer-owned gameplay state.
+
+An owner-only group sets `visibility: owner` and `owner` to an admitted participant
+identity. The owner resolves viewing identities through the Ruleset's existing
+`model_decision_boundary.participant_control` declaration and canonical participants,
+independently of whose turn it is. Missing control declarations reveal no private
+pieces. A concealed group exposes its label and, only with `show_count: true`, its
+piece count. Neither the hidden pieces nor the original source are sent to the UI.
+Public metadata must itself be suitable for all viewers.
+
+A piece may reference `action_id`, the identity of one of this panel's declared
+actions. This renders an ordinary action button. An action can declare
+`bindings: {selected_piece: piece}` to bind the clicked piece's opaque identity
+to its `selected_piece` tool parameter. The owner resolves the identity from the
+current permitted table and checks that the piece advertises that action. Hidden,
+missing, or differently bound pieces and extra selection fields are rejected.
+The selection cannot replace fixed parameters or bypass existing revision,
+capability, player-control, or command admission. Availability checks are specific
+to the selected piece; the Ruleset still decides whether that move is legal.
+Avoid private values in action declarations: declarations are public presentation.
+The Ruleset still computes legal actions, scoring and state transitions. Invalid
+tables show an unavailable message with no table controls.
+
+Limits are five areas, 16 status values, 64 groups total, 256 pieces per group,
+1,024 pieces total, and 256 UTF-8 bytes per label. Piece identities are unique
+within their group; area identities and positions are unique within the table.
+The synthetic `tests/fixtures/piece-table/signal-console.json` demonstrates a
+non-Mahjong composition with private programs and a public route.
+
+## Private collections and public results
+
+`state_schemas` defaults to `visibility: public`. An engine-owned root declares
+`visibility: engine` and requires `private_state.v1`. Canonical mechanics and saves
+retain it; desktop snapshots, mutation history on the desktop wire, general GM context
+and the ordinary current-state reference exclude it. A Ruleset may declare a bounded
+panel projection and the existing active-actor decision scope for permitted views.
+Fresh GM context includes that permitted decision scope, taken with public state
+from the same revision, including when a session resumes before its first action.
+Rulesets without private roots retain their existing GM context payload.
+The optional `actor_participant_field` binds a seat entity to a canonical participant;
+it does not accept a viewer identity from the client.
+
+An explicit `model_decision_boundary.isolated_participant` declaration opts into
+`isolated_participants.v1`. It declares `instructions`, actor-relative
+`observation_path`, optional `persona_path`, `actions_path`, and a
+`public_observation: {namespace, key}` state reference. Paths contain at most eight
+identifier segments. Instructions and persona are bounded to 8 KiB each; the
+serialized observation envelope is bounded to 128 KiB. The action list contains
+at most 256 closed offers `{id, label, operation, arguments}`. Operations and
+arguments must match this exact primary package's admitted catalog and schema.
+
+The configured provider receives only that actor's envelope and compatible own
+history. Its sole proposal tool selects an offered `action_id`; the host supplies
+the actor, turn, package, revision, operation and arguments. Ordinary engine
+admission still decides legality. Every public action in an opted-in Ruleset must
+explicitly `publish` its public result. GM context receives the declared public
+observation and committed published results while retaining campaign dialogue.
+Raw offer arguments, private state and participant native continuations stay out
+of GM history. Save/reopen retains valid actor-owned history; unavailable private
+history starts fresh without falling back to GM messages. Packages without this
+opt-in retain ordinary GM and side-scope behavior.
+
+Engine-private action arguments remain canonical in storage for ledger integrity.
+Desktop/player snapshots and public replay projections omit those arguments;
+this does not alter the saved action, its receipt or its idempotency identity.
+
+`collection_mechanics.v1` provides bounded pure value operations (`indices`, `portion`,
+`joined`, `replaced`, `without`, `occurrences`, `one`, `ordered`, `text`, `total`),
+exact multiset `partitions` and `completions`, and a `shuffle` effect. Searches consume
+the shared execution budget. A shuffle samples a private order independent of public
+action IDs, commits that order, and cannot precede a pending `request_choice` in the
+same action. Retry and reopen use committed state rather than sampling again.
+
+`public_results.v1` supplies `publish: {fields: {...}}`. It selects the action's public
+result context while nested mechanics may retain private calculations. Hidden shuffles
+require explicit publication; raw temporary variables must not become results.
+
 ## Plan completion
 
 The Plan definition and `BUILD CAMPAIGN PLAN` reference preserve FC-15 semantics.

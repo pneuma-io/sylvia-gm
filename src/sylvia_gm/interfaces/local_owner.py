@@ -623,7 +623,7 @@ class LocalOwnerSupervisor:
 
     def snapshot(self, campaign_id: str) -> object:
         owner = self._require_verified_owner()
-        return owner.snapshot(campaign_id)
+        return owner.desktop_snapshot(campaign_id)
 
     # ------------------------------------------------------------------
     # F6C — player-facing query + campaign command surfaces

@@ -62,6 +62,8 @@ class ToolResult:
     failure_kind: str | None = None
     logs: list[dict[str, Any]] = field(default_factory=list)
     available_tools: list[str] = field(default_factory=list)
+    public_context: dict[str, Any] | None = None
+    private_random_sampled: bool = False
 
 
 @dataclass
@@ -153,6 +155,7 @@ class ExecutionBudget:
     max_call_depth: int = 32
     operations: int = 0
     call_depth: int = 0
+    private_random_sampled: bool = False
 
     def __post_init__(self) -> None:
         if self.max_operations < 1 or self.max_call_depth < 1:

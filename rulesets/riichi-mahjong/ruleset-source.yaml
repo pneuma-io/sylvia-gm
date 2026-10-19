@@ -1,0 +1,6236 @@
+format: 1
+id: pneuma.riichi-mahjong
+version: 0.1.0
+label: Riichi Mahjong
+publisher: Pneuma IO
+mechanic_families:
+  reset_hand:
+    parameters:
+    - &id001
+      name: actor
+      type: entity_id
+      source: choice
+      resolve: entity
+    effects:
+    - set:
+        field: actor.game
+        value:
+          hand: []
+          melds: []
+          discards: []
+          riichi: false
+          double_riichi: false
+          ippatsu: false
+          temporary_furiten: false
+          riichi_furiten: false
+          draw_count: 0
+          last_draw: null
+          rinshan: false
+          forbidden_discards: []
+          choices: []
+          decision_actions: []
+          riichi_waits: []
+          pao_dragon: null
+          pao_wind: null
+          revealed: false
+    pre_conditions: []
+    narrative: {}
+  draw:
+    parameters:
+    - *id001
+    effects:
+    - require:
+        condition: len(state.live) > 0
+        error: The live wall is empty.
+    - set:
+        field: _tile
+        value: state.live[0]
+    - set:
+        field: _hand
+        value: joined(actor.game.hand, one(_tile))
+    - set:
+        field: actor.game.hand
+        value: _hand
+    - set:
+        field: actor.game.last_draw
+        value: _tile
+    - set:
+        field: actor.game.draw_count
+        value: actor.game.draw_count + 1
+    - set:
+        field: actor.game.temporary_furiten
+        value: false
+    - set:
+        field: actor.game.rinshan
+        value: false
+    - set:
+        field: state.live
+        value: portion(state.live, 1, len(state.live))
+    - set:
+        field: state.phase
+        value: '"discard"'
+    pre_conditions: []
+    narrative: {}
+  new_hand:
+    parameters: []
+    effects:
+    - shuffle:
+        collection: indices(136)
+      store_as: _wall
+    - set:
+        field: state.pending_riichi
+        value: null
+    - set:
+        field: state.pending_kan
+        value: null
+    - set:
+        field: state.ron_seats
+        value: []
+    - set:
+        field: state.kan_owners
+        value: []
+    - set:
+        field: state.abort_after_discard
+        value: false
+    - set:
+        field: state.result
+        value: null
+    - set:
+        field: state.winners
+        value: []
+    - set:
+        field: state.dead
+        value: portion(_wall, 122, 136)
+    - set:
+        field: state.live
+        value: portion(_wall, 52, 122)
+    - set:
+        field: state.kan_count
+        value: 0
+    - set:
+        field: state.kan_pending_dora
+        value: 0
+    - set:
+        field: state.any_call
+        value: false
+    - set:
+        field: state.last_discard
+        value: null
+    - set:
+        field: state.responses
+        value: []
+    - set:
+        field: state.pending_calls
+        value: []
+    - set:
+        field: _seat_ids
+        value: state.seats
+    - set:
+        field: _index
+        value: 0
+    - for_each:
+        collection: _seat_ids
+        as: _seat
+        do:
+        - call: _reset_hand
+          params:
+            actor: '{_seat}'
+        - call: _deal_seat
+          params:
+            actor: '{_seat}'
+            tiles: '{_wall}'
+            offset: '{_index}'
+        - set:
+            field: _index
+            value: _index + 1
+    - set:
+        field: state.actor
+        value: state.seats[state.dealer]
+    - call: _draw
+      params:
+        actor: '{state.actor}'
+    pre_conditions: []
+    narrative: {}
+  deal_seat:
+    parameters:
+    - *id001
+    - name: tiles
+      type: array
+      source: choice
+      items:
+        type: integer
+    - name: offset
+      type: integer
+      source: choice
+    effects:
+    - set:
+        field: actor.game.hand
+        value: portion(tiles, offset * 13, (offset + 1) * 13)
+    pre_conditions: []
+    narrative: {}
+  start_game:
+    parameters:
+    - name: player
+      type: entity_id
+      source: choice
+      resolve: participant
+    - name: match_format
+      type: enum
+      source: choice
+      enum_values:
+      - east_only
+      - east_south
+    effects:
+    - require:
+        condition: len(_player_id) <= 100
+        error: The selected player's identity is too long for table seats.
+    - condition:
+        condition: state.seats == null
+        on_true:
+        - create_entity:
+            id: _player_id + ".seat"
+            value:
+              name: player.data.name
+              seat: 0
+              participant_id: _player_id
+              control: '"player"'
+              persona: '"Play a thoughtful, friendly club match. Respect legal choices
+                and base tactics on your own hand and public play."'
+              score: 25000
+              game:
+                hand: []
+                melds: []
+                discards: []
+                riichi: false
+                double_riichi: false
+                ippatsu: false
+                temporary_furiten: false
+                riichi_furiten: false
+                draw_count: 0
+                last_draw: null
+                rinshan: false
+                forbidden_discards: []
+                choices: []
+                decision_actions: []
+                riichi_waits: []
+                pao_dragon: null
+                pao_wind: null
+                revealed: false
+        - create_entity:
+            id: _player_id + ".right"
+            value:
+              name: '"Right opponent"'
+              seat: 1
+              participant_id: null
+              control: '"gm"'
+              persona: '"Play a thoughtful, friendly club match. Respect legal choices
+                and base tactics on your own hand and public play."'
+              score: 25000
+              game:
+                hand: []
+                melds: []
+                discards: []
+                riichi: false
+                double_riichi: false
+                ippatsu: false
+                temporary_furiten: false
+                riichi_furiten: false
+                draw_count: 0
+                last_draw: null
+                rinshan: false
+                forbidden_discards: []
+                choices: []
+                decision_actions: []
+                riichi_waits: []
+                pao_dragon: null
+                pao_wind: null
+                revealed: false
+        - create_entity:
+            id: _player_id + ".across"
+            value:
+              name: '"Across opponent"'
+              seat: 2
+              participant_id: null
+              control: '"gm"'
+              persona: '"Play a thoughtful, friendly club match. Respect legal choices
+                and base tactics on your own hand and public play."'
+              score: 25000
+              game:
+                hand: []
+                melds: []
+                discards: []
+                riichi: false
+                double_riichi: false
+                ippatsu: false
+                temporary_furiten: false
+                riichi_furiten: false
+                draw_count: 0
+                last_draw: null
+                rinshan: false
+                forbidden_discards: []
+                choices: []
+                decision_actions: []
+                riichi_waits: []
+                pao_dragon: null
+                pao_wind: null
+                revealed: false
+        - create_entity:
+            id: _player_id + ".left"
+            value:
+              name: '"Left opponent"'
+              seat: 3
+              participant_id: null
+              control: '"gm"'
+              persona: '"Play a thoughtful, friendly club match. Respect legal choices
+                and base tactics on your own hand and public play."'
+              score: 25000
+              game:
+                hand: []
+                melds: []
+                discards: []
+                riichi: false
+                double_riichi: false
+                ippatsu: false
+                temporary_furiten: false
+                riichi_furiten: false
+                draw_count: 0
+                last_draw: null
+                rinshan: false
+                forbidden_discards: []
+                choices: []
+                decision_actions: []
+                riichi_waits: []
+                pao_dragon: null
+                pao_wind: null
+                revealed: false
+        on_false:
+        - require:
+            condition: state.player == _player_id
+            error: Use this campaign's existing player for another match.
+    - set:
+        field: state.player
+        value: _player_id
+    - set:
+        field: state.seats
+        value:
+        - _player_id + '.seat'
+        - _player_id + '.right'
+        - _player_id + '.across'
+        - _player_id + '.left'
+    - set:
+        field: _seat_ids
+        value: state.seats
+    - for_each:
+        collection: _seat_ids
+        as: _seat
+        do:
+        - call: _reset_score
+          params:
+            actor: '{_seat}'
+    - set:
+        field: state.match_format
+        value: match_format
+    - set:
+        field: state.round_wind
+        value: 0
+    - set:
+        field: state.dealer
+        value: 0
+    - set:
+        field: state.honba
+        value: 0
+    - set:
+        field: state.sticks
+        value: 0
+    - condition:
+        condition: state.sequence == null
+        on_true:
+        - set:
+            field: state.sequence
+            value: 0
+        on_false: []
+    - set:
+        field: state.finished
+        value: false
+    - set:
+        field: state.match_result
+        value: null
+    - set:
+        field: state.message
+        value: '"Match started."'
+    - call: _new_hand
+      params: {}
+    - call: _refresh
+      params: {}
+    - publish:
+        fields:
+          message: state.message
+          match_format: match_format
+    pre_conditions:
+    - condition: state.phase == null or state.phase == 'finished'
+      error: Finish the current match first.
+    narrative: {}
+    metadata:
+      model_behavior: resolves_player_intent
+  reset_score:
+    parameters:
+    - *id001
+    effects:
+    - set:
+        field: actor.score
+        value: 25000
+    pre_conditions: []
+    narrative: {}
+  refresh:
+    parameters: []
+    effects:
+    - call: _forced_responses
+      params: {}
+    - set:
+        field: state.sequence
+        value: state.sequence + 1
+    - call: _options
+      params:
+        actor: '{state.actor}'
+      export_context:
+        _choices: _choices
+    - require:
+        condition: len(_choices) <= 256
+        error: The current action set exceeds its bound.
+    - shuffle:
+        collection: indices(256)
+      store_as: _opaque_indices
+    - set:
+        field: _numbered
+        value: []
+    - set:
+        field: _choice_ids
+        value: []
+    - set:
+        field: _index
+        value: 0
+    - for_each:
+        collection: _choices
+        as: _choice
+        do:
+        - set:
+            field: _id
+            value: '''choice:'' + text(state.sequence) + '':'' + text(_opaque_indices[_index])'
+        - set:
+            field: _row
+            value:
+              id: _id
+        - set:
+            field: _row
+            value: merge(_choice, _row)
+        - list_push:
+            list: _numbered
+            value: _row
+        - list_push:
+            list: _choice_ids
+            value: _id
+        - set:
+            field: _index
+            value: _index + 1
+    - set:
+        field: state.choices
+        value: _numbered
+    - set:
+        field: state.choice_ids
+        value: _choice_ids
+    - call: _actor_choices
+      params:
+        actor: '{state.actor}'
+        choices: '{_numbered}'
+    - set:
+        field: _areas
+        value: []
+    - set:
+        field: _statuses
+        value: []
+    - set:
+        field: _seat_ids
+        value: state.seats
+    - for_each:
+        collection: _seat_ids
+        as: _seat
+        do:
+        - call: _seat_table
+          params:
+            actor: '{_seat}'
+          export_context:
+            _area: _area
+            _status: _status
+        - list_push:
+            list: _areas
+            value: _area
+        - list_push:
+            list: _statuses
+            value: _status
+    - call: _center_table
+      params: {}
+      export_context:
+        _center: _center
+    - list_push:
+        list: _areas
+        value: _center
+    - list_push:
+        list: _statuses
+        value:
+          label: '"Round"'
+          value: definitions.winds[min(state.round_wind, 2)] + ' ' + text(state.dealer
+            + 1)
+    - list_push:
+        list: _statuses
+        value:
+          label: '"Honba"'
+          value: text(state.honba)
+    - list_push:
+        list: _statuses
+        value:
+          label: '"Riichi sticks"'
+          value: text(state.sticks)
+    - list_push:
+        list: _statuses
+        value:
+          label: '"Live wall"'
+          value: text(len(state.live))
+    - set:
+        field: state.table
+        value:
+          format: 1
+          title: '"Riichi Mahjong"'
+          status: _statuses
+          areas: _areas
+    - set:
+        field: _records
+        value: []
+    - set:
+        field: _seats
+        value: state.seats
+    - for_each:
+        collection: _seats
+        as: _seat
+        do:
+        - call: _public_seat
+          params:
+            actor: '{_seat}'
+          export_context:
+            _public_seat: _public_seat
+        - list_push:
+            list: _records
+            value: _public_seat
+    - call: _actor_public_table
+      params:
+        actor: '{state.actor}'
+        records: '{_records}'
+    pre_conditions: []
+    narrative: {}
+  actor_choices:
+    parameters:
+    - *id001
+    - name: choices
+      type: array
+      source: choice
+      items:
+        type: object
+    effects:
+    - set:
+        field: actor.game.choices
+        value: choices
+    - set:
+        field: _decisions
+        value: []
+    - for_each:
+        collection: choices
+        as: _choice
+        do:
+        - list_push:
+            list: _decisions
+            value:
+              id: _choice.id
+              label: _choice.label
+              operation: '"take_action"'
+              arguments:
+                choice: _choice.id
+    - set:
+        field: actor.game.decision_actions
+        value: _decisions
+    pre_conditions: []
+    narrative: {}
+  seat_table:
+    parameters:
+    - *id001
+    effects:
+    - set:
+        field: _pieces
+        value: []
+    - set:
+        field: _tiles
+        value: ordered(actor.game.hand)
+    - for_each:
+        collection: _tiles
+        as: _tile
+        do:
+        - set:
+            field: _face
+            value: definitions.tiles[_tile]
+        - set:
+            field: _piece
+            value:
+              id: '''tile:'' + text(_tile)'
+              label: _face.label
+        - condition:
+            condition: _face.red
+            on_true:
+            - set:
+                field: _piece
+                value: merge(_piece, definitions.red_presentation)
+            on_false: []
+        - condition:
+            condition: actor.game.last_draw == _tile
+            on_true:
+            - set:
+                field: _drawn
+                value:
+                  detail: '"Drawn tile"'
+                  emphasis: '"accent"'
+            - set:
+                field: _piece
+                value: merge(_piece, _drawn)
+            on_false: []
+        - condition:
+            condition: _actor_id == state.actor and actor.control == 'player'
+            on_true:
+            - set:
+                field: _choices
+                value: state.choices
+            - for_each:
+                collection: _choices
+                as: _choice
+                do:
+                - condition:
+                    condition: _choice.op == 'discard' and _choice.tiles[0] == _tile
+                    on_true:
+                    - set:
+                        field: _action
+                        value:
+                          id: _choice.id
+                          action_id: '"play"'
+                    - set:
+                        field: _piece
+                        value: merge(_piece, _action)
+                    on_false: []
+            on_false: []
+        - list_push:
+            list: _pieces
+            value: _piece
+    - set:
+        field: _hand
+        value:
+          id: '"hand"'
+          label: '"Hand"'
+          visibility: '"owner"'
+          owner: _actor_id
+          show_count: true
+          pieces: _pieces
+    - condition:
+        condition: actor.control == 'player'
+        on_true:
+        - set:
+            field: _hand_owner
+            value:
+              owner: actor.participant_id
+        - set:
+            field: _hand
+            value: merge(_hand, _hand_owner)
+        on_false: []
+    - set:
+        field: _pieces
+        value: []
+    - set:
+        field: _discards
+        value: actor.game.discards
+    - for_each:
+        collection: _discards
+        as: _discard
+        do:
+        - set:
+            field: _face
+            value: definitions.tiles[_discard.tile]
+        - list_push:
+            list: _pieces
+            value:
+              id: '''discard:'' + text(_discard.tile)'
+              label: _face.label
+    - set:
+        field: _discard_group
+        value:
+          id: '"discards"'
+          label: '"Discards"'
+          visibility: '"public"'
+          pieces: _pieces
+    - set:
+        field: _area
+        value:
+          id: _actor_id
+          label: actor.name
+          position: definitions.positions[actor.seat]
+          groups:
+          - _hand
+          - _discard_group
+    - set:
+        field: _status
+        value:
+          label: actor.name
+          value: text(actor.score)
+    - condition:
+        condition: actor.game.revealed
+        on_true:
+        - set:
+            field: _visible
+            value:
+              visibility: '"public"'
+        - set:
+            field: _hand
+            value: merge(_hand, _visible)
+        on_false: []
+    - condition:
+        condition: actor.game.revealed and state.result != null and state.result.kind
+          == 'win' and actor.seat in state.winners and not state.win_tsumo
+        on_true:
+        - set:
+            field: _winning_piece
+            value:
+              id: '"winning-discard"'
+              label: definitions.tiles[state.winning_tile].label
+              detail: '"Winning discard"'
+              emphasis: '"accent"'
+        - set:
+            field: _complete_hand
+            value:
+              pieces: joined(_hand.pieces, one(_winning_piece))
+        - set:
+            field: _hand
+            value: merge(_hand, _complete_hand)
+        on_false: []
+    - set:
+        field: _pieces
+        value: []
+    - set:
+        field: _discards
+        value: actor.game.discards
+    - for_each:
+        collection: _discards
+        as: _discard
+        do:
+        - set:
+            field: _piece
+            value:
+              id: '''discard:'' + text(_discard.tile)'
+              label: definitions.tiles[_discard.tile].label
+        - condition:
+            condition: definitions.tiles[_discard.tile].red
+            on_true:
+            - set:
+                field: _piece
+                value: merge(_piece, definitions.red_presentation)
+            on_false: []
+        - condition:
+            condition: _discard.riichi
+            on_true:
+            - set:
+                field: _flag
+                value:
+                  detail: '"Riichi declaration"'
+                  emphasis: '"accent"'
+            - set:
+                field: _piece
+                value: merge(_piece, _flag)
+            on_false: []
+        - condition:
+            condition: _discard.claimed
+            on_true:
+            - set:
+                field: _flag
+                value:
+                  detail: '"Called into a meld"'
+                  emphasis: '"muted"'
+            - set:
+                field: _piece
+                value: merge(_piece, _flag)
+            on_false: []
+        - condition:
+            condition: state.last_discard != null and _discard.tile == state.last_discard.tile
+              and not _discard.claimed
+            on_true:
+            - set:
+                field: _flag
+                value:
+                  detail: '"Latest discard"'
+                  emphasis: '"accent"'
+            - set:
+                field: _piece
+                value: merge(_piece, _flag)
+            on_false: []
+        - list_push:
+            list: _pieces
+            value: _piece
+    - set:
+        field: _discard_group
+        value:
+          id: '"discards"'
+          label: '"Discards"'
+          visibility: '"public"'
+          pieces: _pieces
+    - set:
+        field: _groups
+        value:
+        - _hand
+        - _discard_group
+    - set:
+        field: _melds
+        value: actor.game.melds
+    - set:
+        field: _index
+        value: 0
+    - for_each:
+        collection: _melds
+        as: _meld
+        do:
+        - set:
+            field: _pieces
+            value: []
+        - set:
+            field: _tiles
+            value: ordered(_meld.tiles)
+        - for_each:
+            collection: _tiles
+            as: _tile
+            do:
+            - set:
+                field: _piece
+                value:
+                  id: '''meld:'' + text(_tile)'
+                  label: definitions.tiles[_tile].label
+            - condition:
+                condition: definitions.tiles[_tile].red
+                on_true:
+                - set:
+                    field: _piece
+                    value: merge(_piece, definitions.red_presentation)
+                on_false: []
+            - list_push:
+                list: _pieces
+                value: _piece
+        - set:
+            field: _label
+            value: '"Pon"'
+        - condition:
+            condition: _meld.form == 'sequence'
+            on_true:
+            - set:
+                field: _label
+                value: '"Chi"'
+            on_false: []
+        - condition:
+            condition: _meld.quad
+            on_true:
+            - set:
+                field: _label
+                value: '"Open kan"'
+            - condition:
+                condition: not _meld.opened
+                on_true:
+                - set:
+                    field: _label
+                    value: '"Concealed kan"'
+                on_false: []
+            on_false: []
+        - list_push:
+            list: _groups
+            value:
+              id: '''meld:'' + text(_index)'
+              label: _label
+              visibility: '"public"'
+              pieces: _pieces
+        - set:
+            field: _index
+            value: _index + 1
+    - set:
+        field: _seat_label
+        value: actor.name + ' / ' + definitions.seat_winds[(actor.seat - state.dealer
+          + 4) % 4]
+    - condition:
+        condition: actor.game.riichi
+        on_true:
+        - set:
+            field: _seat_label
+            value: _seat_label + ' / Riichi'
+        on_false: []
+    - condition:
+        condition: state.result != null and state.result.kind == 'draw'
+        on_true:
+        - condition:
+            condition: actor.game.revealed
+            on_true:
+            - set:
+                field: _seat_label
+                value: _seat_label + ' / Tenpai'
+            on_false:
+            - set:
+                field: _seat_label
+                value: _seat_label + ' / Noten'
+        on_false: []
+    - set:
+        field: _area
+        value:
+          id: _actor_id
+          label: _seat_label
+          position: definitions.positions[actor.seat]
+          groups: _groups
+    pre_conditions: []
+    narrative: {}
+  center_table:
+    parameters: []
+    effects:
+    - set:
+        field: _dora
+        value: []
+    - set:
+        field: _visible_indicators
+        value: 1 + state.kan_count - state.kan_pending_dora
+    - condition:
+        condition: state.phase == 'kan_response' and state.pending_kan.op == 'ankan'
+        on_true:
+        - set:
+            field: _visible_indicators
+            value: _visible_indicators + 1
+        on_false: []
+    - set:
+        field: _indexes
+        value: indices(_visible_indicators)
+    - for_each:
+        collection: _indexes
+        as: _index
+        do:
+        - list_push:
+            list: _dora
+            value:
+              id: '''dora:'' + text(_index)'
+              label: definitions.tiles[state.dead[4 + _index * 2]].label
+    - call: _choice_table
+      params:
+        actor: '{state.actor}'
+      export_context:
+        _options: _options
+        _turn: _turn
+    - set:
+        field: _info
+        value:
+        - id: '"message"'
+          label: state.message
+    - condition:
+        condition: state.finished and state.match_result != null
+        on_true:
+        - set:
+            field: _standings
+            value: state.match_result.standings
+        - for_each:
+            collection: _standings
+            as: _standing
+            do:
+            - list_push:
+                list: _info
+                value:
+                  id: '''place:'' + text(_standing.seat)'
+                  label: 'text(_standing.rank) + ''. '' + _standing.name + '': ''
+                    + text(_standing.points)'
+        on_false: []
+    - condition:
+        condition: state.pending_kan != null and state.phase == 'kan_response'
+        on_true:
+        - list_push:
+            list: _info
+            value:
+              id: '"kan"'
+              label: '''Kan declared: '' + definitions.tiles[state.last_discard.tile].label'
+        on_false: []
+    - condition:
+        condition: state.result != null and state.result.kind == 'win'
+        on_true:
+        - set:
+            field: _wins
+            value: state.result.winners
+        - for_each:
+            collection: _wins
+            as: _win
+            do:
+            - set:
+                field: _score_summary
+                value: text(_win.score.han) + ' han / ' + text(_win.score.fu) + '
+                  fu; ' + 'dora ' + text(_win.score.dora) + ', red ' + text(_win.score.red)
+                  + ', ura ' + text(_win.score.ura)
+            - condition:
+                condition: _win.score.yakuman_units > 0
+                on_true:
+                - set:
+                    field: _score_summary
+                    value: text(_win.score.yakuman_units) + ' yakuman'
+                on_false: []
+            - list_push:
+                list: _info
+                value:
+                  id: '''winner:'' + text(_win.seat)'
+                  label: _win.name + ' +' + text(_win.gain)
+                  detail: _score_summary
+                  emphasis: '"accent"'
+            - set:
+                field: _yaku
+                value: _win.score.yaku
+            - set:
+                field: _index
+                value: 0
+            - for_each:
+                collection: _yaku
+                as: _label
+                do:
+                - list_push:
+                    list: _info
+                    value:
+                      id: '''yaku:'' + text(_win.seat) + '':'' + text(_index)'
+                      label: _label
+                - set:
+                    field: _index
+                    value: _index + 1
+        on_false: []
+    - set:
+        field: _center
+        value:
+          id: '"shared"'
+          label: _turn
+          position: '"center"'
+          groups:
+          - id: '"dora"'
+            label: '"Dora indicators"'
+            visibility: '"public"'
+            pieces: _dora
+          - id: '"choices"'
+            label: '"Actions"'
+            visibility: '"public"'
+            pieces: _options
+          - id: '"result"'
+            label: '"Table"'
+            visibility: '"public"'
+            pieces: _info
+    pre_conditions: []
+    narrative: {}
+  choice_table:
+    parameters:
+    - *id001
+    effects:
+    - set:
+        field: _turn
+        value: actor.name + ' to act'
+    - condition:
+        condition: state.phase == 'hand_end'
+        on_true:
+        - set:
+            field: _turn
+            value: '"Hand complete"'
+        on_false: []
+    - condition:
+        condition: state.phase == 'finished'
+        on_true:
+        - set:
+            field: _turn
+            value: '"Match complete"'
+        on_false: []
+    - set:
+        field: _options
+        value: []
+    - condition:
+        condition: actor.control == 'player'
+        on_true:
+        - set:
+            field: _choices
+            value: state.choices
+        - for_each:
+            collection: _choices
+            as: _choice
+            do:
+            - condition:
+                condition: _choice.op != 'discard'
+                on_true:
+                - list_push:
+                    list: _options
+                    value:
+                      id: _choice.id
+                      label: _choice.label
+                      action_id: '"play"'
+                on_false: []
+        on_false: []
+    pre_conditions: []
+    narrative: {}
+  waits:
+    parameters:
+    - &id002
+      name: actor
+      type: entity_id
+      source: choice
+      resolve: entity
+    - name: tiles
+      type: array
+      source: choice
+      items:
+        type: integer
+    effects:
+    - set:
+        field: _kinds
+        value: []
+    - for_each:
+        collection: tiles
+        as: _tile
+        do:
+        - list_push:
+            list: _kinds
+            value: definitions.tiles[_tile].kind
+    - set:
+        field: _waits
+        value: completions(_kinds, definitions.patterns, definitions.group_sizes[len(actor.game.melds)],
+          indices(34))
+    - set:
+        field: _pairs
+        value: []
+    - set:
+        field: _singles
+        value: []
+    - set:
+        field: _terminals
+        value: []
+    - set:
+        field: _types
+        value: indices(34)
+    - set:
+        field: _only_terminals
+        value: true
+    - for_each:
+        collection: _types
+        as: _kind
+        do:
+        - set:
+            field: _count
+            value: occurrences(_kinds, _kind)
+        - condition:
+            condition: _count == 2
+            on_true:
+            - list_push:
+                list: _pairs
+                value: _kind
+            on_false: []
+        - condition:
+            condition: _count == 1
+            on_true:
+            - list_push:
+                list: _singles
+                value: _kind
+            on_false: []
+        - condition:
+            condition: _count > 0
+            on_true:
+            - condition:
+                condition: _kind in definitions.terminals
+                on_true:
+                - list_push:
+                    list: _terminals
+                    value: _kind
+                on_false:
+                - set:
+                    field: _only_terminals
+                    value: false
+            on_false: []
+    - condition:
+        condition: len(actor.game.melds) == 0
+        on_true:
+        - condition:
+            condition: len(_pairs) == 6 and len(_singles) == 1
+            on_true:
+            - list_push:
+                list: _waits
+                value: _singles[0]
+            on_false: []
+        - condition:
+            condition: _only_terminals and len(_terminals) == 13
+            on_true:
+            - set:
+                field: _waits
+                value: definitions.terminals
+            on_false: []
+        - condition:
+            condition: _only_terminals and len(_terminals) == 12 and len(_pairs) ==
+              1
+            on_true:
+            - set:
+                field: _missing
+                value: without(definitions.terminals, _terminals)
+            - list_push:
+                list: _waits
+                value: _missing[0]
+            on_false: []
+        on_false: []
+    - set:
+        field: _all
+        value: _kinds
+    - set:
+        field: _melds
+        value: actor.game.melds
+    - for_each:
+        collection: _melds
+        as: _meld
+        do:
+        - set:
+            field: _meld_tiles
+            value: _meld.tiles
+        - for_each:
+            collection: _meld_tiles
+            as: _tile
+            do:
+            - list_push:
+                list: _all
+                value: definitions.tiles[_tile].kind
+    - set:
+        field: _filtered
+        value: []
+    - for_each:
+        collection: _waits
+        as: _kind
+        do:
+        - condition:
+            condition: occurrences(_all, _kind) < 4 and _kind not in _filtered
+            on_true:
+            - list_push:
+                list: _filtered
+                value: _kind
+            on_false: []
+    - set:
+        field: _waits
+        value: _filtered
+    pre_conditions: []
+    narrative: {}
+  score_hand:
+    parameters:
+    - *id002
+    - &id003
+      name: winning_tile
+      type: integer
+      source: choice
+    - &id004
+      name: is_tsumo
+      type: boolean
+      source: choice
+    - &id005
+      name: win_source
+      type: string
+      source: choice
+    effects:
+    - set:
+        field: _score
+        value:
+          valid: false
+          total: 0
+          han: 0
+          fu: 0
+          basic: 0
+          yakuman_units: 0
+          yaku: []
+          dora: 0
+          red: 0
+          ura: 0
+    - set:
+        field: _closed_tiles
+        value: actor.game.hand
+    - condition:
+        condition: not is_tsumo
+        on_true:
+        - set:
+            field: _closed_tiles
+            value: joined(_closed_tiles, one(winning_tile))
+        on_false: []
+    - set:
+        field: _kinds
+        value: []
+    - for_each:
+        collection: _closed_tiles
+        as: _tile
+        do:
+        - list_push:
+            list: _kinds
+            value: definitions.tiles[_tile].kind
+    - set:
+        field: _winning_kind
+        value: definitions.tiles[winning_tile].kind
+    - set:
+        field: _patterns
+        value: partitions(_kinds, definitions.patterns, definitions.group_sizes[len(actor.game.melds)])
+    - for_each:
+        collection: _patterns
+        as: _partition
+        do:
+        - set:
+            field: _groups
+            value: []
+        - for_each:
+            collection: _partition
+            as: _pattern
+            do:
+            - condition:
+                condition: _pattern < 34
+                on_true:
+                - list_push:
+                    list: _groups
+                    value:
+                      form: '"pair"'
+                      base: _pattern
+                      opened: false
+                      quad: false
+                on_false:
+                - condition:
+                    condition: _pattern < 68
+                    on_true:
+                    - list_push:
+                        list: _groups
+                        value:
+                          form: '"triplet"'
+                          base: _pattern - 34
+                          opened: false
+                          quad: false
+                    on_false:
+                    - list_push:
+                        list: _groups
+                        value:
+                          form: '"sequence"'
+                          base: definitions.sequence_starts[_pattern - 68]
+                          opened: false
+                          quad: false
+        - set:
+            field: _closed_count
+            value: len(_groups)
+        - set:
+            field: _melds
+            value: actor.game.melds
+        - for_each:
+            collection: _melds
+            as: _meld
+            do:
+            - list_push:
+                list: _groups
+                value:
+                  form: _meld.form
+                  base: _meld.base
+                  opened: _meld.opened
+                  quad: _meld.quad
+        - set:
+            field: _placements
+            value: indices(_closed_count)
+        - for_each:
+            collection: _placements
+            as: _placement
+            do:
+            - set:
+                field: _group
+                value: _groups[_placement]
+            - condition:
+                condition: (_group.form == 'sequence' and _winning_kind >= _group.base
+                  and _winning_kind <= _group.base + 2) or (_group.form != 'sequence'
+                  and _winning_kind == _group.base)
+                on_true:
+                - call: _score_shape
+                  params:
+                    actor: '{_actor_id}'
+                    winning_tile: '{winning_tile}'
+                    is_tsumo: '{is_tsumo}'
+                    win_source: '{win_source}'
+                    groups: '{_groups}'
+                    placement: '{_placement}'
+                    shape: standard
+                  export_context:
+                    _candidate: _candidate
+                - condition:
+                    condition: (_candidate.valid and not _score.valid) or (_candidate.valid
+                      == _score.valid and (_candidate.total > _score.total or (_candidate.total
+                      == _score.total and (_candidate.yakuman_units > _score.yakuman_units
+                      or (_candidate.yakuman_units == _score.yakuman_units and _candidate.han
+                      > _score.han)))))
+                    on_true:
+                    - set:
+                        field: _score
+                        value: _candidate
+                    on_false: []
+                on_false: []
+    - condition:
+        condition: len(actor.game.melds) == 0 and len(_closed_tiles) == 14
+        on_true:
+        - set:
+            field: _pair_count
+            value: 0
+        - set:
+            field: _distinct_terminals
+            value: 0
+        - set:
+            field: _only_terminals
+            value: true
+        - set:
+            field: _types
+            value: indices(34)
+        - for_each:
+            collection: _types
+            as: _kind
+            do:
+            - set:
+                field: _count
+                value: occurrences(_kinds, _kind)
+            - condition:
+                condition: _count == 2
+                on_true:
+                - set:
+                    field: _pair_count
+                    value: _pair_count + 1
+                on_false: []
+            - condition:
+                condition: _count > 0
+                on_true:
+                - condition:
+                    condition: _kind in definitions.terminals
+                    on_true:
+                    - set:
+                        field: _distinct_terminals
+                        value: _distinct_terminals + 1
+                    on_false:
+                    - set:
+                        field: _only_terminals
+                        value: false
+                on_false: []
+        - set:
+            field: _shape
+            value: null
+        - condition:
+            condition: _pair_count == 7
+            on_true:
+            - set:
+                field: _shape
+                value: '"seven_pairs"'
+            on_false: []
+        - condition:
+            condition: _only_terminals and _distinct_terminals == 13
+            on_true:
+            - set:
+                field: _shape
+                value: '"orphans"'
+            on_false: []
+        - condition:
+            condition: _shape != null
+            on_true:
+            - call: _score_shape
+              params:
+                actor: '{_actor_id}'
+                winning_tile: '{winning_tile}'
+                is_tsumo: '{is_tsumo}'
+                win_source: '{win_source}'
+                groups: []
+                placement: -1
+                shape: '{_shape}'
+              export_context:
+                _candidate: _candidate
+            - condition:
+                condition: (_candidate.valid and not _score.valid) or (_candidate.valid
+                  == _score.valid and (_candidate.total > _score.total or (_candidate.total
+                  == _score.total and (_candidate.yakuman_units > _score.yakuman_units
+                  or (_candidate.yakuman_units == _score.yakuman_units and _candidate.han
+                  > _score.han)))))
+                on_true:
+                - set:
+                    field: _score
+                    value: _candidate
+                on_false: []
+            on_false: []
+        on_false: []
+    pre_conditions: []
+    narrative: {}
+  score_shape:
+    parameters:
+    - *id002
+    - *id003
+    - *id004
+    - *id005
+    - name: groups
+      type: array
+      source: choice
+      items:
+        type: object
+    - name: placement
+      type: integer
+      source: choice
+    - name: shape
+      type: string
+      source: choice
+    effects:
+    - set:
+        field: _closed
+        value: true
+    - set:
+        field: _tiles
+        value: actor.game.hand
+    - condition:
+        condition: not is_tsumo
+        on_true:
+        - set:
+            field: _tiles
+            value: joined(_tiles, one(winning_tile))
+        on_false: []
+    - set:
+        field: _melds
+        value: actor.game.melds
+    - for_each:
+        collection: _melds
+        as: _meld
+        do:
+        - set:
+            field: _tiles
+            value: joined(_tiles, _meld.tiles)
+        - condition:
+            condition: _meld.opened
+            on_true:
+            - set:
+                field: _closed
+                value: false
+            on_false: []
+    - set:
+        field: _kinds
+        value: []
+    - set:
+        field: _suits
+        value: []
+    - set:
+        field: _red
+        value: 0
+    - set:
+        field: _all_simple
+        value: true
+    - set:
+        field: _all_honors
+        value: true
+    - set:
+        field: _all_terminals
+        value: true
+    - set:
+        field: _all_outside
+        value: true
+    - set:
+        field: _has_honors
+        value: false
+    - set:
+        field: _all_green
+        value: true
+    - for_each:
+        collection: _tiles
+        as: _tile
+        do:
+        - set:
+            field: _face
+            value: definitions.tiles[_tile]
+        - list_push:
+            list: _kinds
+            value: _face.kind
+        - condition:
+            condition: _face.red
+            on_true:
+            - set:
+                field: _red
+                value: _red + 1
+            on_false: []
+        - condition:
+            condition: _face.kind >= 27
+            on_true:
+            - set:
+                field: _all_simple
+                value: false
+            - set:
+                field: _all_terminals
+                value: false
+            - set:
+                field: _has_honors
+                value: true
+            on_false:
+            - set:
+                field: _all_honors
+                value: false
+            - set:
+                field: _suit
+                value: _face.kind // 9
+            - condition:
+                condition: _suit not in _suits
+                on_true:
+                - list_push:
+                    list: _suits
+                    value: _suit
+                on_false: []
+            - condition:
+                condition: _face.kind % 9 == 0 or _face.kind % 9 == 8
+                on_true:
+                - set:
+                    field: _all_simple
+                    value: false
+                on_false:
+                - set:
+                    field: _all_terminals
+                    value: false
+                - set:
+                    field: _all_outside
+                    value: false
+        - condition:
+            condition: _face.kind not in definitions.green_kinds
+            on_true:
+            - set:
+                field: _all_green
+                value: false
+            on_false: []
+    - set:
+        field: _seat_wind
+        value: 27 + (actor.seat - state.dealer + 4) % 4
+    - set:
+        field: _round_wind
+        value: 27 + state.round_wind
+    - set:
+        field: _winning_kind
+        value: definitions.tiles[winning_tile].kind
+    - set:
+        field: _sequences
+        value: []
+    - set:
+        field: _triplets
+        value: []
+    - set:
+        field: _concealed_sets
+        value: 0
+    - set:
+        field: _quads
+        value: 0
+    - set:
+        field: _dragons
+        value: 0
+    - set:
+        field: _winds
+        value: 0
+    - set:
+        field: _yakuhai
+        value: 0
+    - set:
+        field: _pair
+        value: -1
+    - set:
+        field: _meld_fu
+        value: 0
+    - set:
+        field: _pair_fu
+        value: 0
+    - set:
+        field: _wait_fu
+        value: 0
+    - set:
+        field: _outside_groups
+        value: true
+    - set:
+        field: _index
+        value: 0
+    - for_each:
+        collection: groups
+        as: _group
+        do:
+        - set:
+            field: _outside
+            value: _group.base >= 27 or _group.base % 9 == 0 or _group.base % 9 ==
+              8
+        - condition:
+            condition: _group.form == 'pair'
+            on_true:
+            - set:
+                field: _pair
+                value: _group.base
+            - condition:
+                condition: _pair >= 31
+                on_true:
+                - set:
+                    field: _pair_fu
+                    value: _pair_fu + 2
+                on_false: []
+            - condition:
+                condition: _pair == _seat_wind
+                on_true:
+                - set:
+                    field: _pair_fu
+                    value: _pair_fu + 2
+                on_false: []
+            - condition:
+                condition: _pair == _round_wind
+                on_true:
+                - set:
+                    field: _pair_fu
+                    value: _pair_fu + 2
+                on_false: []
+            - condition:
+                condition: _index == placement
+                on_true:
+                - set:
+                    field: _wait_fu
+                    value: 2
+                on_false: []
+            on_false:
+            - condition:
+                condition: _group.form == 'sequence'
+                on_true:
+                - list_push:
+                    list: _sequences
+                    value: _group.base
+                - set:
+                    field: _outside
+                    value: _group.base % 9 == 0 or _group.base % 9 == 6
+                - condition:
+                    condition: _index == placement and (_winning_kind == _group.base
+                      + 1 or (_group.base % 9 == 0 and _winning_kind == _group.base
+                      + 2) or (_group.base % 9 == 6 and _winning_kind == _group.base))
+                    on_true:
+                    - set:
+                        field: _wait_fu
+                        value: 2
+                    on_false: []
+                on_false:
+                - list_push:
+                    list: _triplets
+                    value: _group.base
+                - set:
+                    field: _open
+                    value: _group.opened or (not is_tsumo and _index == placement)
+                - condition:
+                    condition: not _open
+                    on_true:
+                    - set:
+                        field: _concealed_sets
+                        value: _concealed_sets + 1
+                    on_false: []
+                - set:
+                    field: _fu
+                    value: 2
+                - condition:
+                    condition: not _open
+                    on_true:
+                    - set:
+                        field: _fu
+                        value: _fu * 2
+                    on_false: []
+                - condition:
+                    condition: _group.quad
+                    on_true:
+                    - set:
+                        field: _fu
+                        value: _fu * 4
+                    - set:
+                        field: _quads
+                        value: _quads + 1
+                    on_false: []
+                - condition:
+                    condition: _outside
+                    on_true:
+                    - set:
+                        field: _fu
+                        value: _fu * 2
+                    on_false: []
+                - set:
+                    field: _meld_fu
+                    value: _meld_fu + _fu
+                - condition:
+                    condition: _group.base >= 31
+                    on_true:
+                    - set:
+                        field: _dragons
+                        value: _dragons + 1
+                    - set:
+                        field: _yakuhai
+                        value: _yakuhai + 1
+                    on_false: []
+                - condition:
+                    condition: _group.base >= 27 and _group.base <= 30
+                    on_true:
+                    - set:
+                        field: _winds
+                        value: _winds + 1
+                    on_false: []
+                - condition:
+                    condition: _group.base == _seat_wind
+                    on_true:
+                    - set:
+                        field: _yakuhai
+                        value: _yakuhai + 1
+                    on_false: []
+                - condition:
+                    condition: _group.base == _round_wind
+                    on_true:
+                    - set:
+                        field: _yakuhai
+                        value: _yakuhai + 1
+                    on_false: []
+        - condition:
+            condition: not _outside
+            on_true:
+            - set:
+                field: _outside_groups
+                value: false
+            on_false: []
+        - set:
+            field: _index
+            value: _index + 1
+    - set:
+        field: _sequence_pairs
+        value: 0
+    - set:
+        field: _starts
+        value: indices(27)
+    - for_each:
+        collection: _starts
+        as: _start
+        do:
+        - set:
+            field: _sequence_pairs
+            value: _sequence_pairs + occurrences(_sequences, _start) // 2
+    - set:
+        field: _sanshoku_sequences
+        value: false
+    - set:
+        field: _sanshoku_triplets
+        value: false
+    - set:
+        field: _straight
+        value: false
+    - set:
+        field: _ranks
+        value: indices(9)
+    - for_each:
+        collection: _ranks
+        as: _rank
+        do:
+        - condition:
+            condition: _rank in _sequences and _rank + 9 in _sequences and _rank +
+              18 in _sequences
+            on_true:
+            - set:
+                field: _sanshoku_sequences
+                value: true
+            on_false: []
+        - condition:
+            condition: _rank in _triplets and _rank + 9 in _triplets and _rank + 18
+              in _triplets
+            on_true:
+            - set:
+                field: _sanshoku_triplets
+                value: true
+            on_false: []
+    - set:
+        field: _bases
+        value:
+        - 0
+        - 9
+        - 18
+    - for_each:
+        collection: _bases
+        as: _base
+        do:
+        - condition:
+            condition: _base in _sequences and _base + 3 in _sequences and _base +
+              6 in _sequences
+            on_true:
+            - set:
+                field: _straight
+                value: true
+            on_false: []
+    - set:
+        field: _pinfu
+        value: shape == 'standard' and _closed and len(_sequences) == 4 and _pair_fu
+          == 0 and _wait_fu == 0
+    - set:
+        field: _nine_gates
+        value: false
+    - set:
+        field: _pure_nine_gates
+        value: false
+    - condition:
+        condition: _closed and len(actor.game.melds) == 0 and len(_suits) == 1 and
+          not _has_honors
+        on_true:
+        - set:
+            field: _base
+            value: _suits[0] * 9
+        - set:
+            field: _nine_gates
+            value: true
+        - set:
+            field: _pure_nine_gates
+            value: true
+        - for_each:
+            collection: _ranks
+            as: _rank
+            do:
+            - set:
+                field: _required
+                value: 1
+            - condition:
+                condition: _rank == 0 or _rank == 8
+                on_true:
+                - set:
+                    field: _required
+                    value: 3
+                on_false: []
+            - set:
+                field: _count
+                value: occurrences(_kinds, _base + _rank)
+            - condition:
+                condition: _count < _required
+                on_true:
+                - set:
+                    field: _nine_gates
+                    value: false
+                on_false: []
+            - condition:
+                condition: _base + _rank == _winning_kind
+                on_true:
+                - set:
+                    field: _count
+                    value: _count - 1
+                on_false: []
+            - condition:
+                condition: _count != _required
+                on_true:
+                - set:
+                    field: _pure_nine_gates
+                    value: false
+                on_false: []
+        on_false: []
+    - set:
+        field: _han
+        value: 0
+    - set:
+        field: _yakuman
+        value: 0
+    - set:
+        field: _yaku
+        value: []
+    - set:
+        field: _yakuman_yaku
+        value: []
+    - set:
+        field: _heaven
+        value: is_tsumo and actor.game.draw_count == 1 and len(actor.game.discards)
+          == 0 and not state.any_call and actor.seat == state.dealer
+    - condition:
+        condition: actor.game.double_riichi
+        on_true:
+        - set:
+            field: _han
+            value: _han + 2
+        - list_push:
+            list: _yaku
+            value: '"Double riichi"'
+        on_false: []
+    - condition:
+        condition: actor.game.riichi and not actor.game.double_riichi
+        on_true:
+        - set:
+            field: _han
+            value: _han + 1
+        - list_push:
+            list: _yaku
+            value: '"Riichi"'
+        on_false: []
+    - condition:
+        condition: actor.game.riichi and actor.game.ippatsu
+        on_true:
+        - set:
+            field: _han
+            value: _han + 1
+        - list_push:
+            list: _yaku
+            value: '"Ippatsu"'
+        on_false: []
+    - condition:
+        condition: is_tsumo and _closed
+        on_true:
+        - set:
+            field: _han
+            value: _han + 1
+        - list_push:
+            list: _yaku
+            value: '"Closed self-draw"'
+        on_false: []
+    - condition:
+        condition: _all_simple
+        on_true:
+        - set:
+            field: _han
+            value: _han + 1
+        - list_push:
+            list: _yaku
+            value: '"All simples"'
+        on_false: []
+    - condition:
+        condition: _pinfu
+        on_true:
+        - set:
+            field: _han
+            value: _han + 1
+        - list_push:
+            list: _yaku
+            value: '"Pinfu"'
+        on_false: []
+    - condition:
+        condition: _closed and _sequence_pairs == 1
+        on_true:
+        - set:
+            field: _han
+            value: _han + 1
+        - list_push:
+            list: _yaku
+            value: '"Iipeikou"'
+        on_false: []
+    - condition:
+        condition: _closed and _sequence_pairs == 2
+        on_true:
+        - set:
+            field: _han
+            value: _han + 3
+        - list_push:
+            list: _yaku
+            value: '"Ryanpeikou"'
+        on_false: []
+    - condition:
+        condition: _yakuhai > 0
+        on_true:
+        - set:
+            field: _han
+            value: _han + _yakuhai
+        - list_push:
+            list: _yaku
+            value: '"Value sets"'
+        on_false: []
+    - condition:
+        condition: win_source == 'rinshan'
+        on_true:
+        - set:
+            field: _han
+            value: _han + 1
+        - list_push:
+            list: _yaku
+            value: '"Rinshan"'
+        on_false: []
+    - condition:
+        condition: win_source == 'added_kan'
+        on_true:
+        - set:
+            field: _han
+            value: _han + 1
+        - list_push:
+            list: _yaku
+            value: '"Robbing a kan"'
+        on_false: []
+    - condition:
+        condition: win_source == 'live_draw' and len(state.live) == 0
+        on_true:
+        - set:
+            field: _han
+            value: _han + 1
+        - list_push:
+            list: _yaku
+            value: '"Last-tile self-draw"'
+        on_false: []
+    - condition:
+        condition: win_source == 'discard' and len(state.live) == 0
+        on_true:
+        - set:
+            field: _han
+            value: _han + 1
+        - list_push:
+            list: _yaku
+            value: '"Last-discard win"'
+        on_false: []
+    - condition:
+        condition: shape == 'seven_pairs'
+        on_true:
+        - set:
+            field: _han
+            value: _han + 2
+        - list_push:
+            list: _yaku
+            value: '"Seven pairs"'
+        on_false: []
+    - condition:
+        condition: len(_triplets) == 4
+        on_true:
+        - set:
+            field: _han
+            value: _han + 2
+        - list_push:
+            list: _yaku
+            value: '"All triplets"'
+        on_false: []
+    - condition:
+        condition: _concealed_sets == 3
+        on_true:
+        - set:
+            field: _han
+            value: _han + 2
+        - list_push:
+            list: _yaku
+            value: '"Three concealed sets"'
+        on_false: []
+    - condition:
+        condition: _quads == 3
+        on_true:
+        - set:
+            field: _han
+            value: _han + 2
+        - list_push:
+            list: _yaku
+            value: '"Three kans"'
+        on_false: []
+    - condition:
+        condition: _sanshoku_triplets
+        on_true:
+        - set:
+            field: _han
+            value: _han + 2
+        - list_push:
+            list: _yaku
+            value: '"Three-color triplets"'
+        on_false: []
+    - condition:
+        condition: _dragons == 2 and _pair >= 31
+        on_true:
+        - set:
+            field: _han
+            value: _han + 2
+        - list_push:
+            list: _yaku
+            value: '"Little three dragons"'
+        on_false: []
+    - condition:
+        condition: _all_outside and len(_sequences) == 0
+        on_true:
+        - set:
+            field: _han
+            value: _han + 2
+        - list_push:
+            list: _yaku
+            value: '"All terminals and honors"'
+        on_false: []
+    - condition:
+        condition: _sanshoku_sequences and _closed
+        on_true:
+        - set:
+            field: _han
+            value: _han + 2
+        - list_push:
+            list: _yaku
+            value: '"Three-color sequences"'
+        on_false: []
+    - condition:
+        condition: _sanshoku_sequences and not _closed
+        on_true:
+        - set:
+            field: _han
+            value: _han + 1
+        - list_push:
+            list: _yaku
+            value: '"Three-color sequences"'
+        on_false: []
+    - condition:
+        condition: _straight and _closed
+        on_true:
+        - set:
+            field: _han
+            value: _han + 2
+        - list_push:
+            list: _yaku
+            value: '"Pure straight"'
+        on_false: []
+    - condition:
+        condition: _straight and not _closed
+        on_true:
+        - set:
+            field: _han
+            value: _han + 1
+        - list_push:
+            list: _yaku
+            value: '"Pure straight"'
+        on_false: []
+    - condition:
+        condition: _outside_groups and len(_sequences) > 0 and _has_honors and _closed
+        on_true:
+        - set:
+            field: _han
+            value: _han + 2
+        - list_push:
+            list: _yaku
+            value: '"Mixed outside hand"'
+        on_false: []
+    - condition:
+        condition: _outside_groups and len(_sequences) > 0 and _has_honors and not
+          _closed
+        on_true:
+        - set:
+            field: _han
+            value: _han + 1
+        - list_push:
+            list: _yaku
+            value: '"Mixed outside hand"'
+        on_false: []
+    - condition:
+        condition: _outside_groups and len(_sequences) > 0 and not _has_honors and
+          _closed
+        on_true:
+        - set:
+            field: _han
+            value: _han + 3
+        - list_push:
+            list: _yaku
+            value: '"Pure outside hand"'
+        on_false: []
+    - condition:
+        condition: _outside_groups and len(_sequences) > 0 and not _has_honors and
+          not _closed
+        on_true:
+        - set:
+            field: _han
+            value: _han + 2
+        - list_push:
+            list: _yaku
+            value: '"Pure outside hand"'
+        on_false: []
+    - condition:
+        condition: len(_suits) == 1 and _has_honors and _closed
+        on_true:
+        - set:
+            field: _han
+            value: _han + 3
+        - list_push:
+            list: _yaku
+            value: '"Half flush"'
+        on_false: []
+    - condition:
+        condition: len(_suits) == 1 and _has_honors and not _closed
+        on_true:
+        - set:
+            field: _han
+            value: _han + 2
+        - list_push:
+            list: _yaku
+            value: '"Half flush"'
+        on_false: []
+    - condition:
+        condition: len(_suits) == 1 and not _has_honors and _closed
+        on_true:
+        - set:
+            field: _han
+            value: _han + 6
+        - list_push:
+            list: _yaku
+            value: '"Full flush"'
+        on_false: []
+    - condition:
+        condition: len(_suits) == 1 and not _has_honors and not _closed
+        on_true:
+        - set:
+            field: _han
+            value: _han + 5
+        - list_push:
+            list: _yaku
+            value: '"Full flush"'
+        on_false: []
+    - condition:
+        condition: _dragons == 3
+        on_true:
+        - set:
+            field: _yakuman
+            value: _yakuman + 1
+        - list_push:
+            list: _yakuman_yaku
+            value: '"Big three dragons"'
+        on_false: []
+    - condition:
+        condition: _winds == 4
+        on_true:
+        - set:
+            field: _yakuman
+            value: _yakuman + 2
+        - list_push:
+            list: _yakuman_yaku
+            value: '"Big four winds"'
+        on_false: []
+    - condition:
+        condition: _winds == 3 and _pair >= 27 and _pair <= 30
+        on_true:
+        - set:
+            field: _yakuman
+            value: _yakuman + 1
+        - list_push:
+            list: _yakuman_yaku
+            value: '"Little four winds"'
+        on_false: []
+    - condition:
+        condition: _all_honors
+        on_true:
+        - set:
+            field: _yakuman
+            value: _yakuman + 1
+        - list_push:
+            list: _yakuman_yaku
+            value: '"All honors"'
+        on_false: []
+    - condition:
+        condition: _all_terminals
+        on_true:
+        - set:
+            field: _yakuman
+            value: _yakuman + 1
+        - list_push:
+            list: _yakuman_yaku
+            value: '"All terminals"'
+        on_false: []
+    - condition:
+        condition: _all_green
+        on_true:
+        - set:
+            field: _yakuman
+            value: _yakuman + 1
+        - list_push:
+            list: _yakuman_yaku
+            value: '"All green"'
+        on_false: []
+    - condition:
+        condition: _quads == 4
+        on_true:
+        - set:
+            field: _yakuman
+            value: _yakuman + 1
+        - list_push:
+            list: _yakuman_yaku
+            value: '"Four kans"'
+        on_false: []
+    - condition:
+        condition: _concealed_sets == 4 and (_wait_fu == 2 or _heaven)
+        on_true:
+        - set:
+            field: _yakuman
+            value: _yakuman + 2
+        - list_push:
+            list: _yakuman_yaku
+            value: '"Four concealed sets, single wait"'
+        on_false: []
+    - condition:
+        condition: _concealed_sets == 4 and _wait_fu != 2 and not _heaven
+        on_true:
+        - set:
+            field: _yakuman
+            value: _yakuman + 1
+        - list_push:
+            list: _yakuman_yaku
+            value: '"Four concealed sets"'
+        on_false: []
+    - condition:
+        condition: _nine_gates and (_pure_nine_gates or _heaven)
+        on_true:
+        - set:
+            field: _yakuman
+            value: _yakuman + 2
+        - list_push:
+            list: _yakuman_yaku
+            value: '"Pure nine gates"'
+        on_false: []
+    - condition:
+        condition: _nine_gates and not _pure_nine_gates and not _heaven
+        on_true:
+        - set:
+            field: _yakuman
+            value: _yakuman + 1
+        - list_push:
+            list: _yakuman_yaku
+            value: '"Nine gates"'
+        on_false: []
+    - condition:
+        condition: shape == 'orphans' and (occurrences(_kinds, _winning_kind) == 2
+          or _heaven)
+        on_true:
+        - set:
+            field: _yakuman
+            value: _yakuman + 2
+        - list_push:
+            list: _yakuman_yaku
+            value: '"Thirteen orphans, thirteen-sided wait"'
+        on_false: []
+    - condition:
+        condition: shape == 'orphans' and occurrences(_kinds, _winning_kind) != 2
+          and not _heaven
+        on_true:
+        - set:
+            field: _yakuman
+            value: _yakuman + 1
+        - list_push:
+            list: _yakuman_yaku
+            value: '"Thirteen orphans"'
+        on_false: []
+    - condition:
+        condition: _heaven
+        on_true:
+        - set:
+            field: _yakuman
+            value: _yakuman + 1
+        - list_push:
+            list: _yakuman_yaku
+            value: '"Blessing of heaven"'
+        on_false: []
+    - condition:
+        condition: is_tsumo and actor.game.draw_count == 1 and len(actor.game.discards)
+          == 0 and not state.any_call and actor.seat != state.dealer
+        on_true:
+        - set:
+            field: _yakuman
+            value: _yakuman + 1
+        - list_push:
+            list: _yakuman_yaku
+            value: '"Blessing of earth"'
+        on_false: []
+    - set:
+        field: _fu
+        value: 20
+    - condition:
+        condition: shape == 'seven_pairs'
+        on_true:
+        - set:
+            field: _fu
+            value: 25
+        on_false:
+        - condition:
+            condition: _closed and not is_tsumo
+            on_true:
+            - set:
+                field: _fu
+                value: _fu + 10
+            on_false: []
+        - condition:
+            condition: is_tsumo and not _pinfu
+            on_true:
+            - set:
+                field: _fu
+                value: _fu + 2
+            on_false: []
+        - set:
+            field: _fu
+            value: _fu + _meld_fu + _pair_fu + _wait_fu
+        - condition:
+            condition: not _closed and _fu == 20
+            on_true:
+            - set:
+                field: _fu
+                value: 30
+            on_false: []
+        - set:
+            field: _fu
+            value: ((_fu + 9) // 10) * 10
+    - set:
+        field: _valid
+        value: _han > 0 or _yakuman > 0
+    - set:
+        field: _dora
+        value: 0
+    - set:
+        field: _ura
+        value: 0
+    - set:
+        field: _visible_indicators
+        value: 1 + state.kan_count - state.kan_pending_dora
+    - condition:
+        condition: state.phase == 'kan_response' and state.pending_kan.op == 'ankan'
+        on_true:
+        - set:
+            field: _visible_indicators
+            value: _visible_indicators + 1
+        on_false: []
+    - set:
+        field: _indicators
+        value: indices(_visible_indicators)
+    - for_each:
+        collection: _indicators
+        as: _index
+        do:
+        - set:
+            field: _indicator_kind
+            value: definitions.tiles[state.dead[4 + _index * 2]].kind
+        - set:
+            field: _dora
+            value: _dora + occurrences(_kinds, definitions.dora_successors[_indicator_kind])
+        - condition:
+            condition: actor.game.riichi
+            on_true:
+            - set:
+                field: _indicator_kind
+                value: definitions.tiles[state.dead[5 + _index * 2]].kind
+            - set:
+                field: _ura
+                value: _ura + occurrences(_kinds, definitions.dora_successors[_indicator_kind])
+            on_false: []
+    - set:
+        field: _han
+        value: _han + _dora + _red + _ura
+    - set:
+        field: _basic
+        value: 0
+    - condition:
+        condition: _yakuman > 0
+        on_true:
+        - set:
+            field: _basic
+            value: 8000 * _yakuman
+        - set:
+            field: _yaku
+            value: _yakuman_yaku
+        - set:
+            field: _han
+            value: 0
+        - set:
+            field: _fu
+            value: 0
+        on_false:
+        - condition:
+            condition: _han >= 13
+            on_true:
+            - set:
+                field: _basic
+                value: 8000
+            on_false:
+            - condition:
+                condition: _han >= 11
+                on_true:
+                - set:
+                    field: _basic
+                    value: 6000
+                on_false:
+                - condition:
+                    condition: _han >= 8
+                    on_true:
+                    - set:
+                        field: _basic
+                        value: 4000
+                    on_false:
+                    - condition:
+                        condition: _han >= 6
+                        on_true:
+                        - set:
+                            field: _basic
+                            value: 3000
+                        on_false:
+                        - condition:
+                            condition: _han >= 5
+                            on_true:
+                            - set:
+                                field: _basic
+                                value: 2000
+                            on_false:
+                            - set:
+                                field: _basic
+                                value: min(2000, _fu * 2 ** (_han + 2))
+    - set:
+        field: _multiplier
+        value: 4
+    - condition:
+        condition: actor.seat == state.dealer
+        on_true:
+        - set:
+            field: _multiplier
+            value: 6
+        on_false: []
+    - set:
+        field: _payment
+        value: ((_basic * _multiplier + 99) // 100) * 100
+    - condition:
+        condition: is_tsumo
+        on_true:
+        - condition:
+            condition: actor.seat == state.dealer
+            on_true:
+            - set:
+                field: _payment
+                value: ((_basic * 2 + 99) // 100) * 300
+            on_false:
+            - set:
+                field: _payment
+                value: ((_basic * 2 + 99) // 100) * 100 + ((_basic + 99) // 100) *
+                  200
+        on_false: []
+    - set:
+        field: _candidate
+        value:
+          valid: _valid
+          total: _payment
+          han: _han
+          fu: _fu
+          basic: _basic
+          yakuman_units: _yakuman
+          yaku: _yaku
+          dora: _dora
+          red: _red
+          ura: _ura
+          big_dragons: _dragons == 3
+          big_winds: _winds == 4
+          fu_components:
+            sets: _meld_fu
+            pair: _pair_fu
+            wait: _wait_fu
+          shape: shape
+          concealed_sets: _concealed_sets
+    pre_conditions: []
+    narrative: {}
+  forced_responses:
+    parameters: []
+    effects:
+    - set:
+        field: _keep_advancing
+        value: true
+    - set:
+        field: _steps
+        value:
+        - 0
+        - 1
+        - 2
+    - for_each:
+        collection: _steps
+        as: _step
+        do:
+        - condition:
+            condition: _keep_advancing and (state.phase == 'response' or state.phase
+              == 'kan_response')
+            on_true:
+            - call: _options
+              params:
+                actor: '{state.actor}'
+              export_context:
+                _choices: _choices
+            - condition:
+                condition: len(_choices) == 1 and _choices[0].op == 'pass'
+                on_true:
+                - set:
+                    field: state.action_selection
+                    value: _choices[0]
+                - call: _respond
+                  params:
+                    actor: '{state.actor}'
+                on_false:
+                - set:
+                    field: _keep_advancing
+                    value: false
+            on_false: []
+    pre_conditions: []
+    narrative: {}
+  options:
+    parameters:
+    - *id002
+    effects:
+    - set:
+        field: _choices
+        value: []
+    - condition:
+        condition: state.phase == 'discard'
+        on_true:
+        - call: _discard_options
+          params:
+            actor: '{_actor_id}'
+          export_context:
+            _choices: _choices
+        on_false: []
+    - condition:
+        condition: state.phase == 'response' or state.phase == 'kan_response'
+        on_true:
+        - call: _response_options
+          params:
+            actor: '{_actor_id}'
+          export_context:
+            _choices: _choices
+        on_false: []
+    - condition:
+        condition: state.phase == 'hand_end'
+        on_true:
+        - list_push:
+            list: _choices
+            value:
+              op: '"continue"'
+              label: '"Continue"'
+              tiles: []
+        on_false: []
+    pre_conditions: []
+    narrative: {}
+  matching:
+    parameters:
+    - *id002
+    - name: kind
+      type: integer
+      source: choice
+    effects:
+    - set:
+        field: _matching
+        value: []
+    - set:
+        field: _hand
+        value: ordered(actor.game.hand)
+    - for_each:
+        collection: _hand
+        as: _tile
+        do:
+        - condition:
+            condition: definitions.tiles[_tile].kind == kind
+            on_true:
+            - list_push:
+                list: _matching
+                value: _tile
+            on_false: []
+    pre_conditions: []
+    narrative: {}
+  closed:
+    parameters:
+    - *id002
+    effects:
+    - set:
+        field: _closed
+        value: true
+    - set:
+        field: _melds
+        value: actor.game.melds
+    - for_each:
+        collection: _melds
+        as: _meld
+        do:
+        - condition:
+            condition: _meld.opened
+            on_true:
+            - set:
+                field: _closed
+                value: false
+            on_false: []
+    pre_conditions: []
+    narrative: {}
+  discard_options:
+    parameters:
+    - *id002
+    effects:
+    - set:
+        field: _choices
+        value: []
+    - set:
+        field: _hand
+        value: ordered(actor.game.hand)
+    - call: _closed
+      params:
+        actor: '{_actor_id}'
+      export_context:
+        _closed: _closed
+    - set:
+        field: _last_riichi_kind
+        value: -1
+    - set:
+        field: _cached_waits
+        value: []
+    - for_each:
+        collection: _hand
+        as: _tile
+        do:
+        - condition:
+            condition: (not actor.game.riichi or actor.game.last_draw == _tile) and
+              definitions.tiles[_tile].kind not in actor.game.forbidden_discards
+            on_true:
+            - list_push:
+                list: _choices
+                value:
+                  op: '"discard"'
+                  tiles:
+                  - _tile
+                  label: '''Discard '' + definitions.tiles[_tile].label'
+            - condition:
+                condition: not actor.game.riichi and _closed and actor.score >= 1000
+                  and len(state.live) >= 4
+                on_true:
+                - condition:
+                    condition: definitions.tiles[_tile].kind != _last_riichi_kind
+                    on_true:
+                    - condition:
+                        condition: 'true'
+                        on_true:
+                        - set:
+                            field: _argument_tiles
+                            value: without(actor.game.hand, one(_tile))
+                        - call: _waits
+                          params:
+                            actor: '{_actor_id}'
+                            tiles: '{_argument_tiles}'
+                          export_context:
+                            _waits: _waits
+                        on_false: []
+                    - set:
+                        field: _cached_waits
+                        value: _waits
+                    - set:
+                        field: _last_riichi_kind
+                        value: definitions.tiles[_tile].kind
+                    on_false: []
+                - condition:
+                    condition: len(_cached_waits) > 0
+                    on_true:
+                    - list_push:
+                        list: _choices
+                        value:
+                          op: '"riichi"'
+                          tiles:
+                          - _tile
+                          waits: _cached_waits
+                          label: '''Riichi: discard '' + definitions.tiles[_tile].label'
+                    on_false: []
+                on_false: []
+            on_false: []
+    - condition:
+        condition: actor.game.last_draw != null
+        on_true:
+        - set:
+            field: _source
+            value: '"live_draw"'
+        - condition:
+            condition: actor.game.rinshan
+            on_true:
+            - set:
+                field: _source
+                value: '"rinshan"'
+            on_false: []
+        - call: _score_hand
+          params:
+            actor: '{_actor_id}'
+            winning_tile: '{actor.game.last_draw}'
+            is_tsumo: true
+            win_source: '{_source}'
+          export_context:
+            _score: _score
+        - condition:
+            condition: _score.valid
+            on_true:
+            - list_push:
+                list: _choices
+                value:
+                  op: '"tsumo"'
+                  label: '"Tsumo"'
+                  tiles: []
+            on_false: []
+        - condition:
+            condition: len(state.live) > 0 and state.kan_count < 4
+            on_true:
+            - set:
+                field: _types
+                value: indices(34)
+            - for_each:
+                collection: _types
+                as: _kind
+                do:
+                - call: _matching
+                  params:
+                    actor: '{_actor_id}'
+                    kind: '{_kind}'
+                  export_context:
+                    _matching: _matching
+                - condition:
+                    condition: len(_matching) == 4
+                    on_true:
+                    - set:
+                        field: _allowed
+                        value: true
+                    - condition:
+                        condition: actor.game.riichi
+                        on_true:
+                        - call: _riichi_kan
+                          params:
+                            actor: '{_actor_id}'
+                            kind: '{_kind}'
+                            tiles: '{_matching}'
+                          export_context:
+                            _allowed: _allowed
+                        on_false: []
+                    - condition:
+                        condition: _allowed
+                        on_true:
+                        - list_push:
+                            list: _choices
+                            value:
+                              op: '"ankan"'
+                              tiles: _matching
+                              base: _kind
+                              label: '''Concealed kan: '' + definitions.tiles[_matching[0]].label'
+                        on_false: []
+                    on_false: []
+            - condition:
+                condition: not actor.game.riichi
+                on_true:
+                - set:
+                    field: _melds
+                    value: actor.game.melds
+                - set:
+                    field: _index
+                    value: 0
+                - for_each:
+                    collection: _melds
+                    as: _meld
+                    do:
+                    - condition:
+                        condition: _meld.form == 'triplet' and not _meld.quad and
+                          _meld.opened
+                        on_true:
+                        - call: _matching
+                          params:
+                            actor: '{_actor_id}'
+                            kind: '{_meld.base}'
+                          export_context:
+                            _matching: _matching
+                        - for_each:
+                            collection: _matching
+                            as: _tile
+                            do:
+                            - list_push:
+                                list: _choices
+                                value:
+                                  op: '"kakan"'
+                                  tiles:
+                                  - _tile
+                                  base: _meld.base
+                                  meld_index: _index
+                                  label: '''Added kan: '' + definitions.tiles[_tile].label'
+                        on_false: []
+                    - set:
+                        field: _index
+                        value: _index + 1
+                on_false: []
+            on_false: []
+        - condition:
+            condition: actor.game.draw_count == 1 and len(actor.game.discards) ==
+              0 and not state.any_call
+            on_true:
+            - set:
+                field: _terminals
+                value: []
+            - set:
+                field: _hand
+                value: actor.game.hand
+            - for_each:
+                collection: _hand
+                as: _tile
+                do:
+                - condition:
+                    condition: definitions.tiles[_tile].kind in definitions.terminals
+                      and definitions.tiles[_tile].kind not in _terminals
+                    on_true:
+                    - list_push:
+                        list: _terminals
+                        value: definitions.tiles[_tile].kind
+                    on_false: []
+            - condition:
+                condition: len(_terminals) >= 9
+                on_true:
+                - list_push:
+                    list: _choices
+                    value:
+                      op: '"abort_nine"'
+                      label: '"Nine terminals: abort hand"'
+                      tiles: []
+                on_false: []
+            on_false: []
+        on_false: []
+    pre_conditions: []
+    narrative: {}
+  riichi_kan:
+    parameters:
+    - *id002
+    - name: kind
+      type: integer
+      source: choice
+    - name: tiles
+      type: array
+      source: choice
+      items:
+        type: integer
+    effects:
+    - set:
+        field: _allowed
+        value: definitions.tiles[actor.game.last_draw].kind == kind
+    - set:
+        field: _wait_kinds
+        value: actor.game.riichi_waits
+    - set:
+        field: _remaining
+        value: without(actor.game.hand, tiles)
+    - set:
+        field: _remaining_kinds
+        value: []
+    - for_each:
+        collection: _remaining
+        as: _tile
+        do:
+        - list_push:
+            list: _remaining_kinds
+            value: definitions.tiles[_tile].kind
+    - set:
+        field: _after
+        value: completions(_remaining_kinds, definitions.patterns, definitions.group_sizes[len(actor.game.melds)
+          + 1], indices(34))
+    - set:
+        field: _owned_kinds
+        value: _kinds
+    - set:
+        field: _melds
+        value: actor.game.melds
+    - list_push:
+        list: _owned_kinds
+        value: definitions.tiles[actor.game.last_draw].kind
+    - for_each:
+        collection: _melds
+        as: _meld
+        do:
+        - set:
+            field: _meld_tiles
+            value: _meld.tiles
+        - for_each:
+            collection: _meld_tiles
+            as: _tile
+            do:
+            - list_push:
+                list: _owned_kinds
+                value: definitions.tiles[_tile].kind
+    - set:
+        field: _filtered_after
+        value: []
+    - for_each:
+        collection: _after
+        as: _wait_kind
+        do:
+        - condition:
+            condition: occurrences(_owned_kinds, _wait_kind) < 4
+            on_true:
+            - list_push:
+                list: _filtered_after
+                value: _wait_kind
+            on_false: []
+    - condition:
+        condition: len(_filtered_after) != len(actor.game.riichi_waits)
+        on_true:
+        - set:
+            field: _allowed
+            value: false
+        on_false: []
+    - for_each:
+        collection: _filtered_after
+        as: _wait_kind
+        do:
+        - condition:
+            condition: _wait_kind not in actor.game.riichi_waits
+            on_true:
+            - set:
+                field: _allowed
+                value: false
+            on_false: []
+    pre_conditions: []
+    narrative: {}
+  response_options:
+    parameters:
+    - *id002
+    effects:
+    - set:
+        field: _choices
+        value:
+        - op: '"pass"'
+          label: '"Pass"'
+          tiles: []
+    - set:
+        field: _tile
+        value: state.last_discard.tile
+    - set:
+        field: _kind
+        value: definitions.tiles[_tile].kind
+    - call: _waits
+      params:
+        actor: '{_actor_id}'
+        tiles: '{actor.game.hand}'
+      export_context:
+        _waits: _waits
+    - set:
+        field: _furiten
+        value: actor.game.temporary_furiten or actor.game.riichi_furiten
+    - set:
+        field: _discards
+        value: actor.game.discards
+    - for_each:
+        collection: _discards
+        as: _discard
+        do:
+        - condition:
+            condition: definitions.tiles[_discard.tile].kind in _waits
+            on_true:
+            - set:
+                field: _furiten
+                value: true
+            on_false: []
+    - condition:
+        condition: _kind in _waits and not _furiten
+        on_true:
+        - set:
+            field: _source
+            value: '"discard"'
+        - condition:
+            condition: state.last_discard.rinshan == true
+            on_true:
+            - set:
+                field: _source
+                value: '"rinshan_discard"'
+            on_false: []
+        - condition:
+            condition: state.phase == 'kan_response'
+            on_true:
+            - set:
+                field: _source
+                value: '"closed_kan"'
+            - condition:
+                condition: state.pending_kan.op == 'kakan'
+                on_true:
+                - set:
+                    field: _source
+                    value: '"added_kan"'
+                on_false: []
+            on_false: []
+        - call: _score_hand
+          params:
+            actor: '{_actor_id}'
+            winning_tile: '{_tile}'
+            is_tsumo: false
+            win_source: '{_source}'
+          export_context:
+            _score: _score
+        - condition:
+            condition: _score.valid and (_source != 'closed_kan' or _score.shape ==
+              'orphans')
+            on_true:
+            - list_push:
+                list: _choices
+                value:
+                  op: '"ron"'
+                  label: '"Ron"'
+                  tiles: []
+            on_false: []
+        on_false: []
+    - condition:
+        condition: state.phase == 'response' and not actor.game.riichi and len(state.live)
+          > 0 and not state.abort_after_discard
+        on_true:
+        - call: _matching
+          params:
+            actor: '{_actor_id}'
+            kind: '{_kind}'
+          export_context:
+            _matching: _matching
+        - set:
+            field: _copies
+            value: _matching
+        - set:
+            field: _indexes
+            value: indices(len(_copies))
+        - for_each:
+            collection: _indexes
+            as: _a
+            do:
+            - for_each:
+                collection: _indexes
+                as: _b
+                do:
+                - condition:
+                    condition: _a < _b
+                    on_true:
+                    - condition:
+                        condition: 'true'
+                        on_true:
+                        - set:
+                            field: _argument_tiles
+                            value: joined(one(_copies[_a]), one(_copies[_b]))
+                        - call: _call_option
+                          params:
+                            actor: '{_actor_id}'
+                            op: pon
+                            tiles: '{_argument_tiles}'
+                            base: '{_kind}'
+                          export_context:
+                            _option: _option
+                        on_false: []
+                    - condition:
+                        condition: _option != null
+                        on_true:
+                        - list_push:
+                            list: _choices
+                            value: _option
+                        on_false: []
+                    on_false: []
+        - condition:
+            condition: len(_copies) == 3 and state.kan_count < 4
+            on_true:
+            - list_push:
+                list: _choices
+                value:
+                  op: '"minkan"'
+                  tiles: _copies
+                  base: _kind
+                  label: '"Open kan"'
+            on_false: []
+        - condition:
+            condition: actor.seat == (state.last_discard.seat + 1) % 4 and _kind <
+              27
+            on_true:
+            - set:
+                field: _offsets
+                value:
+                - 0
+                - 1
+                - 2
+            - for_each:
+                collection: _offsets
+                as: _offset
+                do:
+                - set:
+                    field: _base
+                    value: _kind - _offset
+                - condition:
+                    condition: _base >= 0 and _base // 9 == _kind // 9 and _base %
+                      9 <= 6
+                    on_true:
+                    - set:
+                        field: _needed
+                        value: without(joined(one(_base), joined(one(_base + 1), one(_base
+                          + 2))), one(_kind))
+                    - condition:
+                        condition: 'true'
+                        on_true:
+                        - set:
+                            field: _argument_kind
+                            value: _needed[0]
+                        - call: _matching
+                          params:
+                            actor: '{_actor_id}'
+                            kind: '{_argument_kind}'
+                          export_context:
+                            _matching: _matching
+                        on_false: []
+                    - set:
+                        field: _first
+                        value: _matching
+                    - condition:
+                        condition: 'true'
+                        on_true:
+                        - set:
+                            field: _argument_kind
+                            value: _needed[1]
+                        - call: _matching
+                          params:
+                            actor: '{_actor_id}'
+                            kind: '{_argument_kind}'
+                          export_context:
+                            _matching: _matching
+                        on_false: []
+                    - set:
+                        field: _second
+                        value: _matching
+                    - for_each:
+                        collection: _first
+                        as: _a
+                        do:
+                        - for_each:
+                            collection: _second
+                            as: _b
+                            do:
+                            - condition:
+                                condition: 'true'
+                                on_true:
+                                - set:
+                                    field: _argument_tiles
+                                    value: joined(one(_a), one(_b))
+                                - call: _call_option
+                                  params:
+                                    actor: '{_actor_id}'
+                                    op: chi
+                                    tiles: '{_argument_tiles}'
+                                    base: '{_base}'
+                                  export_context:
+                                    _option: _option
+                                on_false: []
+                            - condition:
+                                condition: _option != null
+                                on_true:
+                                - list_push:
+                                    list: _choices
+                                    value: _option
+                                on_false: []
+                    on_false: []
+            on_false: []
+        on_false: []
+    pre_conditions: []
+    narrative: {}
+  call_option:
+    parameters:
+    - *id002
+    - name: op
+      type: string
+      source: choice
+    - name: tiles
+      type: array
+      source: choice
+      items:
+        type: integer
+    - name: base
+      type: integer
+      source: choice
+    effects:
+    - set:
+        field: _called
+        value: definitions.tiles[state.last_discard.tile].kind
+    - set:
+        field: _forbidden
+        value: one(_called)
+    - condition:
+        condition: op == 'chi'
+        on_true:
+        - condition:
+            condition: _called == base and base % 9 < 6
+            on_true:
+            - list_push:
+                list: _forbidden
+                value: base + 3
+            on_false: []
+        - condition:
+            condition: _called == base + 2 and base % 9 > 0
+            on_true:
+            - list_push:
+                list: _forbidden
+                value: base - 1
+            on_false: []
+        on_false: []
+    - set:
+        field: _legal_discard
+        value: false
+    - set:
+        field: _remaining
+        value: without(actor.game.hand, tiles)
+    - for_each:
+        collection: _remaining
+        as: _tile
+        do:
+        - condition:
+            condition: definitions.tiles[_tile].kind not in _forbidden
+            on_true:
+            - set:
+                field: _legal_discard
+                value: true
+            on_false: []
+    - set:
+        field: _option
+        value: null
+    - condition:
+        condition: _legal_discard
+        on_true:
+        - set:
+            field: _option
+            value:
+              op: op
+              tiles: tiles
+              base: base
+              forbidden: _forbidden
+              label: 'op + '': '' + definitions.tiles[tiles[0]].label + '' '' + definitions.tiles[tiles[1]].label'
+        on_false: []
+    pre_conditions: []
+    narrative: {}
+  take_action:
+    parameters:
+    - name: actor
+      type: entity_id
+      source: state
+      from_state: state.actor
+      resolve: entity
+    - name: choice
+      type: string
+      source: choice
+    effects:
+    - set:
+        field: _selected
+        value: null
+    - set:
+        field: _choices
+        value: state.choices
+    - for_each:
+        collection: _choices
+        as: _choice
+        do:
+        - condition:
+            condition: _choice.id == choice
+            on_true:
+            - set:
+                field: _selected
+                value: _choice
+            on_false: []
+    - require:
+        condition: _selected != null
+        error: This action is no longer legal.
+    - set:
+        field: state.action_selection
+        value: _selected
+    - condition:
+        condition: _selected.op == 'discard' or _selected.op == 'riichi'
+        on_true:
+        - call: _discard
+          params:
+            actor: '{_actor_id}'
+        on_false: []
+    - condition:
+        condition: _selected.op == 'pass' or _selected.op == 'ron' or _selected.op
+          == 'chi' or _selected.op == 'pon' or _selected.op == 'minkan'
+        on_true:
+        - call: _respond
+          params:
+            actor: '{_actor_id}'
+        on_false: []
+    - condition:
+        condition: _selected.op == 'ankan' or _selected.op == 'kakan'
+        on_true:
+        - set:
+            field: state.kan_pending_dora
+            value: 0
+        - set:
+            field: _kan_seat
+            value:
+              seat: actor.seat
+        - set:
+            field: state.pending_kan
+            value: merge(_selected, _kan_seat)
+        - set:
+            field: state.last_discard
+            value:
+              seat: actor.seat
+              tile: _selected.tiles[len(_selected.tiles) - 1]
+        - call: _begin_responses
+          params:
+            seat: '{actor.seat}'
+        - set:
+            field: state.phase
+            value: '"kan_response"'
+        - set:
+            field: state.message
+            value: actor.name + ' declared a kan.'
+        on_false: []
+    - condition:
+        condition: _selected.op == 'tsumo'
+        on_true:
+        - set:
+            field: state.winners
+            value: one(actor.seat)
+        - set:
+            field: state.win_tsumo
+            value: true
+        - set:
+            field: state.winning_tile
+            value: actor.game.last_draw
+        - set:
+            field: state.win_source
+            value: '"live_draw"'
+        - condition:
+            condition: actor.game.rinshan
+            on_true:
+            - set:
+                field: state.win_source
+                value: '"rinshan"'
+            on_false: []
+        - call: _settle_wins
+          params: {}
+        on_false: []
+    - condition:
+        condition: _selected.op == 'abort_nine'
+        on_true:
+        - call: _abort
+          params:
+            reason: Nine terminals
+        on_false: []
+    - condition:
+        condition: _selected.op == 'continue'
+        on_true:
+        - call: _advance_match
+          params: {}
+        on_false: []
+    - call: _refresh
+      params: {}
+    - publish:
+        fields:
+          message: state.message
+          result: state.result
+          match_result: state.match_result
+    pre_conditions:
+    - condition: state.phase in definitions.play_phases
+      error: The table is not waiting for a move.
+    narrative: {}
+    metadata:
+      model_behavior: resolves_player_intent
+      player_controls:
+        confirmation: none
+        response: automatic
+        checks:
+        - condition: choice in state.choice_ids
+          reason: This move is no longer available.
+  begin_responses:
+    parameters:
+    - name: seat
+      type: integer
+      source: choice
+    effects:
+    - set:
+        field: state.pending_calls
+        value: []
+    - set:
+        field: state.ron_seats
+        value: []
+    - set:
+        field: _responders
+        value: []
+    - set:
+        field: _steps
+        value:
+        - 1
+        - 2
+        - 3
+    - for_each:
+        collection: _steps
+        as: _step
+        do:
+        - list_push:
+            list: _responders
+            value: state.seats[(seat + _step) % 4]
+    - set:
+        field: state.responders
+        value: _responders
+    - set:
+        field: state.actor
+        value: _responders[0]
+    pre_conditions: []
+    narrative: {}
+  discard:
+    parameters:
+    - *id002
+    - &id006
+      name: selected
+      type: object
+      source: state
+      from_state: state.action_selection
+    effects:
+    - set:
+        field: _tile
+        value: selected.tiles[0]
+    - set:
+        field: actor.game.hand
+        value: without(actor.game.hand, one(_tile))
+    - set:
+        field: actor.game.ippatsu
+        value: false
+    - condition:
+        condition: selected.op == 'riichi'
+        on_true:
+        - set:
+            field: state.pending_riichi
+            value: actor.seat
+        - set:
+            field: actor.game.riichi_waits
+            value: selected.waits
+        - set:
+            field: actor.game.double_riichi
+            value: len(actor.game.discards) == 0 and not state.any_call
+        on_false: []
+    - set:
+        field: _discards
+        value: actor.game.discards
+    - list_push:
+        list: _discards
+        value:
+          tile: _tile
+          claimed: false
+          riichi: selected.op == 'riichi'
+    - set:
+        field: actor.game.discards
+        value: _discards
+    - set:
+        field: actor.game.forbidden_discards
+        value: []
+    - set:
+        field: actor.game.last_draw
+        value: null
+    - set:
+        field: state.last_discard
+        value:
+          tile: _tile
+          seat: actor.seat
+          rinshan: actor.game.rinshan
+    - set:
+        field: actor.game.rinshan
+        value: false
+    - set:
+        field: state.kan_pending_dora
+        value: 0
+    - set:
+        field: state.pending_kan
+        value: null
+    - call: _begin_responses
+      params:
+        seat: '{actor.seat}'
+    - set:
+        field: state.phase
+        value: '"response"'
+    - set:
+        field: state.message
+        value: actor.name + ' discarded ' + definitions.tiles[_tile].label + '.'
+    - condition:
+        condition: selected.op == 'riichi'
+        on_true:
+        - set:
+            field: state.message
+            value: actor.name + ' declared riichi and discarded ' + definitions.tiles[_tile].label
+              + '.'
+        on_false: []
+    pre_conditions: []
+    narrative: {}
+  respond:
+    parameters:
+    - *id002
+    - *id006
+    effects:
+    - condition:
+        condition: selected.op == 'ron'
+        on_true:
+        - set:
+            field: state.ron_seats
+            value: joined(state.ron_seats, one(actor.seat))
+        on_false:
+        - call: _waits
+          params:
+            actor: '{_actor_id}'
+            tiles: '{actor.game.hand}'
+          export_context:
+            _waits: _waits
+        - condition:
+            condition: definitions.tiles[state.last_discard.tile].kind in _waits
+            on_true:
+            - set:
+                field: _completes
+                value: true
+            - condition:
+                condition: state.phase == 'kan_response' and state.pending_kan.op
+                  == 'ankan'
+                on_true:
+                - call: _score_hand
+                  params:
+                    actor: '{_actor_id}'
+                    winning_tile: '{state.last_discard.tile}'
+                    is_tsumo: false
+                    win_source: closed_kan
+                  export_context:
+                    _score: _score
+                - set:
+                    field: _completes
+                    value: _score.shape == 'orphans'
+                on_false: []
+            - condition:
+                condition: _completes
+                on_true:
+                - set:
+                    field: actor.game.temporary_furiten
+                    value: true
+                - condition:
+                    condition: actor.game.riichi
+                    on_true:
+                    - set:
+                        field: actor.game.riichi_furiten
+                        value: true
+                    on_false: []
+                on_false: []
+            on_false: []
+        - condition:
+            condition: selected.op != 'pass'
+            on_true:
+            - set:
+                field: _row
+                value:
+                  seat: actor.seat
+            - set:
+                field: state.pending_calls
+                value: joined(state.pending_calls, one(merge(selected, _row)))
+            on_false: []
+    - set:
+        field: state.responders
+        value: portion(state.responders, 1, len(state.responders))
+    - condition:
+        condition: len(state.responders) > 0
+        on_true:
+        - set:
+            field: state.actor
+            value: state.responders[0]
+        on_false:
+        - call: _resolve_responses
+          params: {}
+    pre_conditions: []
+    narrative: {}
+  resolve_responses:
+    parameters: []
+    effects:
+    - condition:
+        condition: len(state.ron_seats) > 0
+        on_true:
+        - set:
+            field: state.winners
+            value: state.ron_seats
+        - set:
+            field: state.win_tsumo
+            value: false
+        - set:
+            field: state.winning_tile
+            value: state.last_discard.tile
+        - set:
+            field: state.win_source
+            value: '"discard"'
+        - condition:
+            condition: state.last_discard.rinshan == true
+            on_true:
+            - set:
+                field: state.win_source
+                value: '"rinshan_discard"'
+            on_false: []
+        - condition:
+            condition: state.phase == 'kan_response'
+            on_true:
+            - set:
+                field: state.win_source
+                value: '"closed_kan"'
+            - condition:
+                condition: state.pending_kan.op == 'kakan'
+                on_true:
+                - set:
+                    field: state.win_source
+                    value: '"added_kan"'
+                on_false: []
+            on_false: []
+        - call: _settle_wins
+          params: {}
+        on_false:
+        - condition:
+            condition: state.phase == 'kan_response'
+            on_true:
+            - call: _commit_kan
+              params: {}
+            on_false:
+            - condition:
+                condition: state.pending_riichi != null
+                on_true:
+                - condition:
+                    condition: 'true'
+                    on_true:
+                    - set:
+                        field: _argument_actor
+                        value: state.seats[state.pending_riichi]
+                    - call: _accept_riichi
+                      params:
+                        actor: '{_argument_actor}'
+                    on_false: []
+                - set:
+                    field: state.pending_riichi
+                    value: null
+                on_false: []
+            - set:
+                field: _chosen
+                value: null
+            - set:
+                field: _calls
+                value: state.pending_calls
+            - for_each:
+                collection: _calls
+                as: _call
+                do:
+                - condition:
+                    condition: _chosen == null or (_chosen.op == 'chi' and _call.op
+                      != 'chi')
+                    on_true:
+                    - set:
+                        field: _chosen
+                        value: _call
+                    on_false: []
+            - condition:
+                condition: _chosen != null
+                on_true:
+                - set:
+                    field: state.action_selection
+                    value: _chosen
+                - condition:
+                    condition: 'true'
+                    on_true:
+                    - set:
+                        field: _argument_actor
+                        value: state.seats[_chosen.seat]
+                    - call: _commit_call
+                      params:
+                        actor: '{_argument_actor}'
+                    on_false: []
+                on_false:
+                - call: _abort_checks
+                  params: {}
+                  export_context:
+                    _abort_reason: _abort_reason
+                - condition:
+                    condition: _abort_reason != null
+                    on_true:
+                    - call: _abort
+                      params:
+                        reason: '{_abort_reason}'
+                    on_false:
+                    - condition:
+                        condition: len(state.live) == 0
+                        on_true:
+                        - call: _exhaustive
+                          params: {}
+                        on_false:
+                        - set:
+                            field: state.actor
+                            value: state.seats[(state.last_discard.seat + 1) % 4]
+                        - call: _draw
+                          params:
+                            actor: '{state.actor}'
+                        - set:
+                            field: state.message
+                            value: '"Next seat drew a tile."'
+    pre_conditions: []
+    narrative: {}
+  accept_riichi:
+    parameters:
+    - *id002
+    effects:
+    - set:
+        field: actor.score
+        value: actor.score - 1000
+    - set:
+        field: state.sticks
+        value: state.sticks + 1
+    - set:
+        field: actor.game.riichi
+        value: true
+    - set:
+        field: actor.game.ippatsu
+        value: true
+    pre_conditions: []
+    narrative: {}
+  cancel_ippatsu:
+    parameters:
+    - *id002
+    effects:
+    - set:
+        field: actor.game.ippatsu
+        value: false
+    pre_conditions: []
+    narrative: {}
+  interrupt:
+    parameters: []
+    effects:
+    - set:
+        field: state.any_call
+        value: true
+    - set:
+        field: _seats
+        value: state.seats
+    - for_each:
+        collection: _seats
+        as: _seat
+        do:
+        - call: _cancel_ippatsu
+          params:
+            actor: '{_seat}'
+    pre_conditions: []
+    narrative: {}
+  claim_discard:
+    parameters:
+    - *id002
+    effects:
+    - set:
+        field: _discards
+        value: actor.game.discards
+    - set:
+        field: _index
+        value: len(_discards) - 1
+    - set:
+        field: _last
+        value: merge(_discards[_index], definitions.claimed_flag)
+    - set:
+        field: actor.game.discards
+        value: replaced(_discards, _index, _last)
+    pre_conditions: []
+    narrative: {}
+  commit_call:
+    parameters:
+    - *id002
+    - *id006
+    effects:
+    - call: _interrupt
+      params: {}
+    - condition:
+        condition: 'true'
+        on_true:
+        - set:
+            field: _argument_actor
+            value: state.seats[state.last_discard.seat]
+        - call: _claim_discard
+          params:
+            actor: '{_argument_actor}'
+        on_false: []
+    - set:
+        field: actor.game.hand
+        value: without(actor.game.hand, selected.tiles)
+    - set:
+        field: _meld
+        value:
+          form: '"triplet"'
+          base: selected.base
+          opened: true
+          quad: selected.op == 'minkan'
+          tiles: joined(selected.tiles, one(state.last_discard.tile))
+          source_seat: state.last_discard.seat
+    - condition:
+        condition: selected.op == 'chi'
+        on_true:
+        - set:
+            field: _form
+            value:
+              form: '"sequence"'
+        - set:
+            field: _meld
+            value: merge(_meld, _form)
+        on_false: []
+    - set:
+        field: actor.game.melds
+        value: joined(actor.game.melds, one(_meld))
+    - call: _pao_check
+      params:
+        actor: '{_actor_id}'
+        source_seat: '{state.last_discard.seat}'
+    - set:
+        field: state.actor
+        value: _actor_id
+    - set:
+        field: state.phase
+        value: '"discard"'
+    - set:
+        field: actor.game.last_draw
+        value: null
+    - condition:
+        condition: selected.op == 'minkan'
+        on_true:
+        - call: _finish_kan
+          params:
+            actor: '{_actor_id}'
+            concealed: false
+        on_false:
+        - set:
+            field: actor.game.forbidden_discards
+            value: selected.forbidden
+    - set:
+        field: state.message
+        value: actor.name + ' called ' + selected.op + '.'
+    pre_conditions: []
+    narrative: {}
+  pao_check:
+    parameters:
+    - *id002
+    - name: source_seat
+      type: integer
+      source: choice
+    effects:
+    - set:
+        field: _dragons
+        value: 0
+    - set:
+        field: _winds
+        value: 0
+    - set:
+        field: _melds
+        value: actor.game.melds
+    - for_each:
+        collection: _melds
+        as: _meld
+        do:
+        - condition:
+            condition: _meld.form == 'triplet' and _meld.opened
+            on_true:
+            - condition:
+                condition: _meld.base >= 31
+                on_true:
+                - set:
+                    field: _dragons
+                    value: _dragons + 1
+                on_false: []
+            - condition:
+                condition: _meld.base >= 27 and _meld.base <= 30
+                on_true:
+                - set:
+                    field: _winds
+                    value: _winds + 1
+                on_false: []
+            on_false: []
+    - condition:
+        condition: _dragons == 3 and actor.game.pao_dragon == null
+        on_true:
+        - set:
+            field: actor.game.pao_dragon
+            value: source_seat
+        on_false: []
+    - condition:
+        condition: _winds == 4 and actor.game.pao_wind == null
+        on_true:
+        - set:
+            field: actor.game.pao_wind
+            value: source_seat
+        on_false: []
+    pre_conditions: []
+    narrative: {}
+  commit_kan:
+    parameters: []
+    effects:
+    - set:
+        field: state.action_selection
+        value: state.pending_kan
+    - condition:
+        condition: 'true'
+        on_true:
+        - set:
+            field: _argument_actor
+            value: state.seats[state.pending_kan.seat]
+        - call: _complete_kan
+          params:
+            actor: '{_argument_actor}'
+        on_false: []
+    - set:
+        field: state.pending_kan
+        value: null
+    pre_conditions: []
+    narrative: {}
+  complete_kan:
+    parameters:
+    - *id002
+    - *id006
+    effects:
+    - call: _interrupt
+      params: {}
+    - set:
+        field: actor.game.hand
+        value: without(actor.game.hand, selected.tiles)
+    - set:
+        field: _melds
+        value: actor.game.melds
+    - condition:
+        condition: selected.op == 'ankan'
+        on_true:
+        - list_push:
+            list: _melds
+            value:
+              form: '"triplet"'
+              base: selected.base
+              opened: false
+              quad: true
+              tiles: selected.tiles
+              source_seat: actor.seat
+        on_false:
+        - set:
+            field: _old
+            value: _melds[selected.meld_index]
+        - set:
+            field: _update
+            value:
+              quad: true
+              tiles: joined(_old.tiles, selected.tiles)
+        - set:
+            field: _melds
+            value: replaced(_melds, selected.meld_index, merge(_old, _update))
+    - set:
+        field: actor.game.melds
+        value: _melds
+    - set:
+        field: state.actor
+        value: _actor_id
+    - condition:
+        condition: 'true'
+        on_true:
+        - set:
+            field: _argument_concealed
+            value: selected.op == 'ankan'
+        - call: _finish_kan
+          params:
+            actor: '{_actor_id}'
+            concealed: '{_argument_concealed}'
+        on_false: []
+    - set:
+        field: state.message
+        value: actor.name + ' completed a kan.'
+    pre_conditions: []
+    narrative: {}
+  finish_kan:
+    parameters:
+    - *id002
+    - name: concealed
+      type: boolean
+      source: choice
+    effects:
+    - set:
+        field: _tile
+        value: state.dead[state.kan_count]
+    - set:
+        field: state.dead
+        value: replaced(state.dead, state.kan_count, state.live[len(state.live) -
+          1])
+    - set:
+        field: state.live
+        value: portion(state.live, 0, len(state.live) - 1)
+    - set:
+        field: state.kan_count
+        value: state.kan_count + 1
+    - set:
+        field: state.kan_pending_dora
+        value: 1
+    - condition:
+        condition: concealed
+        on_true:
+        - set:
+            field: state.kan_pending_dora
+            value: 0
+        on_false: []
+    - set:
+        field: state.kan_owners
+        value: joined(state.kan_owners, one(actor.seat))
+    - set:
+        field: _owners
+        value: state.kan_owners
+    - set:
+        field: _other
+        value: false
+    - for_each:
+        collection: _owners
+        as: _owner
+        do:
+        - condition:
+            condition: _owner != actor.seat
+            on_true:
+            - set:
+                field: _other
+                value: true
+            on_false: []
+    - condition:
+        condition: state.kan_count == 4 and _other
+        on_true:
+        - set:
+            field: state.abort_after_discard
+            value: true
+        on_false: []
+    - set:
+        field: actor.game.hand
+        value: joined(actor.game.hand, one(_tile))
+    - set:
+        field: actor.game.last_draw
+        value: _tile
+    - set:
+        field: actor.game.draw_count
+        value: actor.game.draw_count + 1
+    - set:
+        field: actor.game.rinshan
+        value: true
+    - set:
+        field: actor.game.temporary_furiten
+        value: false
+    - set:
+        field: state.phase
+        value: '"discard"'
+    pre_conditions: []
+    narrative: {}
+  abort_flags:
+    parameters:
+    - *id002
+    effects:
+    - set:
+        field: _riichi
+        value: actor.game.riichi
+    - set:
+        field: _first_wind
+        value: -1
+    - condition:
+        condition: len(actor.game.discards) == 1
+        on_true:
+        - set:
+            field: _kind
+            value: definitions.tiles[actor.game.discards[0].tile].kind
+        - condition:
+            condition: _kind >= 27 and _kind <= 30
+            on_true:
+            - set:
+                field: _first_wind
+                value: _kind
+            on_false: []
+        on_false: []
+    pre_conditions: []
+    narrative: {}
+  abort_checks:
+    parameters: []
+    effects:
+    - set:
+        field: _abort_reason
+        value: null
+    - set:
+        field: _all_riichi
+        value: true
+    - set:
+        field: _same_wind
+        value: true
+    - set:
+        field: _wind
+        value: -1
+    - set:
+        field: _seats
+        value: state.seats
+    - for_each:
+        collection: _seats
+        as: _seat
+        do:
+        - call: _abort_flags
+          params:
+            actor: '{_seat}'
+          export_context:
+            _riichi: _riichi
+            _first_wind: _first_wind
+        - condition:
+            condition: not _riichi
+            on_true:
+            - set:
+                field: _all_riichi
+                value: false
+            on_false: []
+        - condition:
+            condition: _first_wind == -1 or (_wind != -1 and _wind != _first_wind)
+            on_true:
+            - set:
+                field: _same_wind
+                value: false
+            on_false: []
+        - set:
+            field: _wind
+            value: _first_wind
+    - condition:
+        condition: _same_wind and not state.any_call
+        on_true:
+        - set:
+            field: _abort_reason
+            value: '"Four winds"'
+        on_false: []
+    - condition:
+        condition: _all_riichi
+        on_true:
+        - set:
+            field: _abort_reason
+            value: '"Four riichi"'
+        on_false: []
+    - condition:
+        condition: state.abort_after_discard
+        on_true:
+        - set:
+            field: _abort_reason
+            value: '"Four kans"'
+        on_false: []
+    pre_conditions: []
+    narrative: {}
+  abort:
+    parameters:
+    - name: reason
+      type: string
+      source: choice
+    effects:
+    - set:
+        field: state.result
+        value:
+          kind: '"abort"'
+          reason: reason
+          dealer_stays: true
+    - call: _end_hand
+      params: {}
+    - set:
+        field: state.message
+        value: '''Abortive draw: '' + reason + ''.'''
+    pre_conditions: []
+    narrative: {}
+  adjust_score:
+    parameters:
+    - *id002
+    - name: amount
+      type: integer
+      source: choice
+    effects:
+    - set:
+        field: actor.score
+        value: actor.score + amount
+    pre_conditions: []
+    narrative: {}
+  settle_wins:
+    parameters: []
+    effects:
+    - set:
+        field: _winners
+        value: state.winners
+    - set:
+        field: _results
+        value: []
+    - set:
+        field: _dealer_stays
+        value: false
+    - set:
+        field: _first
+        value: true
+    - for_each:
+        collection: _winners
+        as: _winner
+        do:
+        - condition:
+            condition: 'true'
+            on_true:
+            - set:
+                field: _argument_actor
+                value: state.seats[_winner]
+            - call: _pay_winner
+              params:
+                actor: '{_argument_actor}'
+                award_sticks: '{_first}'
+              export_context:
+                _win_result: _win_result
+            on_false: []
+        - list_push:
+            list: _results
+            value: _win_result
+        - set:
+            field: _first
+            value: false
+        - condition:
+            condition: _winner == state.dealer
+            on_true:
+            - set:
+                field: _dealer_stays
+                value: true
+            on_false: []
+    - set:
+        field: state.sticks
+        value: 0
+    - set:
+        field: state.pending_riichi
+        value: null
+    - set:
+        field: state.result
+        value:
+          kind: '"win"'
+          winners: _results
+          dealer_stays: _dealer_stays
+    - call: _end_hand
+      params: {}
+    - set:
+        field: state.message
+        value: '"Hand won. Scores settled."'
+    pre_conditions: []
+    narrative: {}
+  pay_winner:
+    parameters:
+    - *id002
+    - name: award_sticks
+      type: boolean
+      source: choice
+    effects:
+    - call: _score_hand
+      params:
+        actor: '{_actor_id}'
+        winning_tile: '{state.winning_tile}'
+        is_tsumo: '{state.win_tsumo}'
+        win_source: '{state.win_source}'
+      export_context:
+        _score: _score
+    - require:
+        condition: _score.valid
+        error: The winning hand has no legal yaku.
+    - set:
+        field: _payments
+        value:
+        - 0
+        - 0
+        - 0
+        - 0
+    - set:
+        field: _ron_honba
+        value: 0
+    - condition:
+        condition: award_sticks or definitions.profile.ron_honba == 'each_winner'
+        on_true:
+        - set:
+            field: _ron_honba
+            value: state.honba * 300
+        on_false: []
+    - set:
+        field: _basic
+        value: _score.basic
+    - set:
+        field: _pao
+        value: []
+    - condition:
+        condition: _score.big_dragons and actor.game.pao_dragon != null
+        on_true:
+        - list_push:
+            list: _pao
+            value:
+              seat: actor.game.pao_dragon
+              basic: 8000
+        on_false: []
+    - condition:
+        condition: _score.big_winds and actor.game.pao_wind != null
+        on_true:
+        - list_push:
+            list: _pao
+            value:
+              seat: actor.game.pao_wind
+              basic: 16000
+        on_false: []
+    - for_each:
+        collection: _pao
+        as: _liability
+        do:
+        - set:
+            field: _component
+            value: _liability.basic * 4
+        - condition:
+            condition: actor.seat == state.dealer
+            on_true:
+            - set:
+                field: _component
+                value: _liability.basic * 6
+            on_false: []
+        - set:
+            field: _basic
+            value: _basic - _liability.basic
+        - condition:
+            condition: state.win_tsumo or state.last_discard.seat == _liability.seat
+            on_true:
+            - set:
+                field: _payments
+                value: replaced(_payments, _liability.seat, _payments[_liability.seat]
+                  + _component)
+            on_false:
+            - set:
+                field: _payments
+                value: replaced(_payments, _liability.seat, _payments[_liability.seat]
+                  + _component // 2)
+            - set:
+                field: _source
+                value: state.last_discard.seat
+            - set:
+                field: _payments
+                value: replaced(_payments, _source, _payments[_source] + _component
+                  // 2)
+    - condition:
+        condition: state.win_tsumo
+        on_true:
+        - set:
+            field: _payers
+            value: indices(4)
+        - for_each:
+            collection: _payers
+            as: _payer
+            do:
+            - condition:
+                condition: _payer != actor.seat
+                on_true:
+                - set:
+                    field: _factor
+                    value: 1
+                - condition:
+                    condition: actor.seat == state.dealer or _payer == state.dealer
+                    on_true:
+                    - set:
+                        field: _factor
+                        value: 2
+                    on_false: []
+                - set:
+                    field: _payment
+                    value: ((_basic * _factor + 99) // 100) * 100
+                - set:
+                    field: _honba
+                    value: state.honba * 100
+                - condition:
+                    condition: len(_pao) > 0
+                    on_true:
+                    - set:
+                        field: _honba
+                        value: 0
+                    - condition:
+                        condition: _payer == _pao[0].seat
+                        on_true:
+                        - set:
+                            field: _honba
+                            value: state.honba * 300
+                        on_false: []
+                    on_false: []
+                - set:
+                    field: _payments
+                    value: replaced(_payments, _payer, _payments[_payer] + _payment
+                      + _honba)
+                on_false: []
+        on_false:
+        - set:
+            field: _factor
+            value: 4
+        - condition:
+            condition: actor.seat == state.dealer
+            on_true:
+            - set:
+                field: _factor
+                value: 6
+            on_false: []
+        - set:
+            field: _source
+            value: state.last_discard.seat
+        - set:
+            field: _payments
+            value: replaced(_payments, _source, _payments[_source] + ((_basic * _factor
+              + 99) // 100) * 100)
+        - set:
+            field: _honba_source
+            value: _source
+        - condition:
+            condition: len(_pao) > 0
+            on_true:
+            - set:
+                field: _honba_source
+                value: _pao[0].seat
+            on_false: []
+        - set:
+            field: _payments
+            value: replaced(_payments, _honba_source, _payments[_honba_source] + _ron_honba)
+    - set:
+        field: _payers
+        value: indices(4)
+    - for_each:
+        collection: _payers
+        as: _payer
+        do:
+        - condition:
+            condition: _payments[_payer] > 0
+            on_true:
+            - condition:
+                condition: 'true'
+                on_true:
+                - set:
+                    field: _argument_actor
+                    value: state.seats[_payer]
+                - set:
+                    field: _argument_amount
+                    value: 0 - _payments[_payer]
+                - call: _adjust_score
+                  params:
+                    actor: '{_argument_actor}'
+                    amount: '{_argument_amount}'
+                on_false: []
+            on_false: []
+    - set:
+        field: _gain
+        value: total(_payments)
+    - condition:
+        condition: award_sticks
+        on_true:
+        - set:
+            field: _gain
+            value: _gain + state.sticks * 1000
+        on_false: []
+    - set:
+        field: actor.score
+        value: actor.score + _gain
+    - set:
+        field: actor.game.revealed
+        value: true
+    - set:
+        field: _winning_hand
+        value: actor.game.hand
+    - condition:
+        condition: not state.win_tsumo
+        on_true:
+        - set:
+            field: _winning_hand
+            value: joined(_winning_hand, one(state.winning_tile))
+        on_false: []
+    - set:
+        field: _labels
+        value: []
+    - for_each:
+        collection: _winning_hand
+        as: _tile
+        do:
+        - list_push:
+            list: _labels
+            value: definitions.tiles[_tile].label
+    - set:
+        field: _win_result
+        value:
+          seat: actor.seat
+          name: actor.name
+          score: _score
+          payments: _payments
+          gain: _gain
+          hand: _labels
+    pre_conditions: []
+    narrative: {}
+  draw_status:
+    parameters:
+    - *id002
+    effects:
+    - call: _waits
+      params:
+        actor: '{_actor_id}'
+        tiles: '{actor.game.hand}'
+      export_context:
+        _waits: _waits
+    - set:
+        field: _tenpai
+        value: len(_waits) > 0
+    - set:
+        field: _nagashi
+        value: len(actor.game.discards) > 0
+    - set:
+        field: _discards
+        value: actor.game.discards
+    - for_each:
+        collection: _discards
+        as: _discard
+        do:
+        - condition:
+            condition: _discard.claimed or definitions.tiles[_discard.tile].kind not
+              in definitions.terminals
+            on_true:
+            - set:
+                field: _nagashi
+                value: false
+            on_false: []
+    - set:
+        field: _melds
+        value: actor.game.melds
+    - for_each:
+        collection: _melds
+        as: _meld
+        do:
+        - condition:
+            condition: _meld.opened and definitions.profile.nagashi_closed_required
+            on_true:
+            - set:
+                field: _nagashi
+                value: false
+            on_false: []
+    - set:
+        field: actor.game.revealed
+        value: _tenpai
+    pre_conditions: []
+    narrative: {}
+  exhaustive:
+    parameters: []
+    effects:
+    - set:
+        field: _tenpai_seats
+        value: []
+    - set:
+        field: _nagashi_seats
+        value: []
+    - set:
+        field: _seats
+        value: indices(4)
+    - for_each:
+        collection: _seats
+        as: _seat
+        do:
+        - condition:
+            condition: 'true'
+            on_true:
+            - set:
+                field: _argument_actor
+                value: state.seats[_seat]
+            - call: _draw_status
+              params:
+                actor: '{_argument_actor}'
+              export_context:
+                _tenpai: _tenpai
+                _nagashi: _nagashi
+            on_false: []
+        - condition:
+            condition: _tenpai
+            on_true:
+            - list_push:
+                list: _tenpai_seats
+                value: _seat
+            on_false: []
+        - condition:
+            condition: _nagashi
+            on_true:
+            - list_push:
+                list: _nagashi_seats
+                value: _seat
+            on_false: []
+    - set:
+        field: _deltas
+        value:
+        - 0
+        - 0
+        - 0
+        - 0
+    - condition:
+        condition: len(_nagashi_seats) > 0
+        on_true:
+        - for_each:
+            collection: _nagashi_seats
+            as: _winner
+            do:
+            - for_each:
+                collection: _seats
+                as: _payer
+                do:
+                - condition:
+                    condition: _payer != _winner
+                    on_true:
+                    - set:
+                        field: _amount
+                        value: 2000
+                    - condition:
+                        condition: _winner == state.dealer or _payer == state.dealer
+                        on_true:
+                        - set:
+                            field: _amount
+                            value: 4000
+                        on_false: []
+                    - set:
+                        field: _deltas
+                        value: replaced(_deltas, _payer, _deltas[_payer] - _amount)
+                    - set:
+                        field: _deltas
+                        value: replaced(_deltas, _winner, _deltas[_winner] + _amount)
+                    on_false: []
+        on_false:
+        - condition:
+            condition: len(_tenpai_seats) > 0 and len(_tenpai_seats) < 4
+            on_true:
+            - for_each:
+                collection: _seats
+                as: _seat
+                do:
+                - set:
+                    field: _amount
+                    value: 0 - 3000 // (4 - len(_tenpai_seats))
+                - condition:
+                    condition: _seat in _tenpai_seats
+                    on_true:
+                    - set:
+                        field: _amount
+                        value: 3000 // len(_tenpai_seats)
+                    on_false: []
+                - set:
+                    field: _deltas
+                    value: replaced(_deltas, _seat, _amount)
+            on_false: []
+    - for_each:
+        collection: _seats
+        as: _seat
+        do:
+        - condition:
+            condition: 'true'
+            on_true:
+            - set:
+                field: _argument_actor
+                value: state.seats[_seat]
+            - set:
+                field: _argument_amount
+                value: _deltas[_seat]
+            - call: _adjust_score
+              params:
+                actor: '{_argument_actor}'
+                amount: '{_argument_amount}'
+            on_false: []
+    - set:
+        field: state.result
+        value:
+          kind: '"draw"'
+          tenpai: _tenpai_seats
+          nagashi: _nagashi_seats
+          deltas: _deltas
+          dealer_stays: state.dealer in _tenpai_seats
+    - call: _end_hand
+      params: {}
+    - set:
+        field: state.message
+        value: '"Exhaustive draw. Scores settled."'
+    pre_conditions: []
+    narrative: {}
+  end_hand:
+    parameters: []
+    effects:
+    - set:
+        field: state.phase
+        value: '"hand_end"'
+    - set:
+        field: state.actor
+        value: state.seats[0]
+    pre_conditions: []
+    narrative: {}
+  standing:
+    parameters:
+    - *id002
+    effects:
+    - set:
+        field: _score
+        value: actor.score
+    - set:
+        field: _name
+        value: actor.name
+    pre_conditions: []
+    narrative: {}
+  rank_match:
+    parameters: []
+    effects:
+    - set:
+        field: _scores
+        value: []
+    - set:
+        field: _seats
+        value: state.seats
+    - for_each:
+        collection: _seats
+        as: _seat
+        do:
+        - call: _standing
+          params:
+            actor: '{_seat}'
+          export_context:
+            _score: _score
+        - list_push:
+            list: _scores
+            value: _score
+    - set:
+        field: _picked
+        value: []
+    - set:
+        field: _standings
+        value: []
+    - set:
+        field: _ranks
+        value: indices(4)
+    - for_each:
+        collection: _ranks
+        as: _rank
+        do:
+        - set:
+            field: _best
+            value: -1
+        - set:
+            field: _candidates
+            value: indices(4)
+        - for_each:
+            collection: _candidates
+            as: _candidate
+            do:
+            - condition:
+                condition: _candidate not in _picked
+                on_true:
+                - condition:
+                    condition: _best == -1
+                    on_true:
+                    - set:
+                        field: _best
+                        value: _candidate
+                    on_false:
+                    - condition:
+                        condition: _scores[_candidate] > _scores[_best]
+                        on_true:
+                        - set:
+                            field: _best
+                            value: _candidate
+                        on_false: []
+                on_false: []
+        - condition:
+            condition: 'true'
+            on_true:
+            - set:
+                field: _argument_actor
+                value: state.seats[_best]
+            - call: _standing
+              params:
+                actor: '{_argument_actor}'
+              export_context:
+                _score: _score
+                _name: _name
+            on_false: []
+        - list_push:
+            list: _standings
+            value:
+              rank: _rank + 1
+              seat: _best
+              name: _name
+              points: _score
+        - list_push:
+            list: _picked
+            value: _best
+    - set:
+        field: state.match_result
+        value:
+          winner: _standings[0].seat
+          standings: _standings
+          match_format: state.match_format
+    pre_conditions: []
+    narrative: {}
+  advance_match:
+    parameters: []
+    effects:
+    - set:
+        field: _last_dealer
+        value: state.dealer
+    - set:
+        field: _last_round
+        value: state.round_wind
+    - set:
+        field: _last_honba
+        value: state.honba
+    - set:
+        field: _scores
+        value: []
+    - set:
+        field: _seats
+        value: state.seats
+    - for_each:
+        collection: _seats
+        as: _seat
+        do:
+        - call: _standing
+          params:
+            actor: '{_seat}'
+          export_context:
+            _score: _score
+        - list_push:
+            list: _scores
+            value: _score
+    - set:
+        field: _top
+        value: 0
+    - set:
+        field: _indexes
+        value:
+        - 1
+        - 2
+        - 3
+    - for_each:
+        collection: _indexes
+        as: _index
+        do:
+        - condition:
+            condition: _scores[_index] > _scores[_top]
+            on_true:
+            - set:
+                field: _top
+                value: _index
+            on_false: []
+    - set:
+        field: _nominal
+        value: 0
+    - condition:
+        condition: state.match_format == 'east_south'
+        on_true:
+        - set:
+            field: _nominal
+            value: 1
+        on_false: []
+    - set:
+        field: _dealer_ron_priority
+        value: state.result.kind == 'win' and state.result.dealer_stays and state.result.winners
+          != null and len(state.result.winners) > 1
+    - set:
+        field: _finished
+        value: min(_scores[0], _scores[1], _scores[2], _scores[3]) < 0
+    - condition:
+        condition: state.round_wind > _nominal and _scores[_top] >= 30000 and not
+          _dealer_ron_priority
+        on_true:
+        - set:
+            field: _finished
+            value: true
+        on_false: []
+    - condition:
+        condition: state.round_wind >= _nominal and state.dealer == 3 and _top ==
+          3 and _scores[3] >= 30000 and state.result.dealer_stays and state.result.kind
+          != 'abort'
+        on_true:
+        - set:
+            field: _finished
+            value: true
+        on_false: []
+    - condition:
+        condition: not state.result.dealer_stays
+        on_true:
+        - set:
+            field: state.dealer
+            value: state.dealer + 1
+        - condition:
+            condition: state.dealer == 4
+            on_true:
+            - set:
+                field: state.dealer
+                value: 0
+            - set:
+                field: state.round_wind
+                value: state.round_wind + 1
+            on_false: []
+        - condition:
+            condition: state.result.kind == 'win'
+            on_true:
+            - set:
+                field: state.honba
+                value: 0
+            on_false:
+            - set:
+                field: state.honba
+                value: state.honba + 1
+        on_false:
+        - set:
+            field: state.honba
+            value: state.honba + 1
+    - condition:
+        condition: state.round_wind > _nominal and _scores[_top] >= 30000 and not
+          _dealer_ron_priority
+        on_true:
+        - set:
+            field: _finished
+            value: true
+        on_false: []
+    - condition:
+        condition: state.round_wind > _nominal + 1
+        on_true:
+        - set:
+            field: _finished
+            value: true
+        on_false: []
+    - condition:
+        condition: _finished
+        on_true:
+        - set:
+            field: state.dealer
+            value: _last_dealer
+        - set:
+            field: state.round_wind
+            value: _last_round
+        - set:
+            field: state.honba
+            value: _last_honba
+        - condition:
+            condition: 'true'
+            on_true:
+            - set:
+                field: _argument_actor
+                value: state.seats[_top]
+            - set:
+                field: _argument_amount
+                value: state.sticks * 1000
+            - call: _adjust_score
+              params:
+                actor: '{_argument_actor}'
+                amount: '{_argument_amount}'
+            on_false: []
+        - set:
+            field: state.sticks
+            value: 0
+        - set:
+            field: state.finished
+            value: true
+        - set:
+            field: state.phase
+            value: '"finished"'
+        - call: _rank_match
+          params: {}
+        - set:
+            field: state.message
+            value: '"Match complete. Ties follow original seat order."'
+        on_false:
+        - call: _new_hand
+          params: {}
+        - set:
+            field: state.message
+            value: '"Next hand dealt."'
+    pre_conditions: []
+    narrative: {}
+  public_seat:
+    parameters:
+    - *id002
+    effects:
+    - set:
+        field: _public_seat
+        value:
+          name: actor.name
+          seat: actor.seat
+          score: actor.score
+          riichi: actor.game.riichi
+          discards: actor.game.discards
+          melds: actor.game.melds
+          concealed_count: len(actor.game.hand)
+    pre_conditions: []
+    narrative: {}
+  actor_public_table:
+    parameters:
+    - *id002
+    - name: records
+      type: array
+      source: choice
+      items:
+        type: object
+    effects:
+    - set:
+        field: _indicators
+        value: []
+    - set:
+        field: _visible_indicators
+        value: 1 + state.kan_count - state.kan_pending_dora
+    - condition:
+        condition: state.phase == 'kan_response' and state.pending_kan.op == 'ankan'
+        on_true:
+        - set:
+            field: _visible_indicators
+            value: _visible_indicators + 1
+        on_false: []
+    - set:
+        field: _indexes
+        value: indices(_visible_indicators)
+    - for_each:
+        collection: _indexes
+        as: _index
+        do:
+        - list_push:
+            list: _indicators
+            value: definitions.tiles[state.dead[4 + _index * 2]].kind
+    - set:
+        field: actor.game.public_table
+        value:
+          seats: records
+          dora_indicators: _indicators
+          live_count: len(state.live)
+          dealer: state.dealer
+          round_wind: state.round_wind
+          honba: state.honba
+          sticks: state.sticks
+          last_discard: state.last_discard
+          phase: state.phase
+          message: state.message
+    - set:
+        field: state.public_observation
+        value:
+          table: actor.game.public_table
+          result: state.result
+          match_result: state.match_result
+    pre_conditions: []
+    narrative: {}
+public_actions:
+- name: start_game
+  family: start_game
+  description: Start an East-only or East–South four-player match with red fives.
+  configure: {}
+  capability: pneuma.riichi-mahjong.play
+  state_predicates: []
+  turn_statuses:
+  - open
+  writers:
+  - dm
+  reference_availability: included
+  gameplay_resolution: engine_family
+  deterministic_part: null
+  gm_part: null
+- name: take_action
+  family: take_action
+  description: Choose a current action ID using the acting seat's permitted information.
+  configure: {}
+  capability: pneuma.riichi-mahjong.play
+  state_predicates: []
+  turn_statuses:
+  - open
+  writers:
+  - dm
+  reference_availability: included
+  gameplay_resolution: engine_family
+  deterministic_part: null
+  gm_part: null
+private_mechanics:
+- name: _reset_hand
+  family: reset_hand
+  description: Package-owned reset hand.
+  configure: {}
+- name: _draw
+  family: draw
+  description: Package-owned draw.
+  configure: {}
+- name: _new_hand
+  family: new_hand
+  description: Package-owned new hand.
+  configure: {}
+- name: _deal_seat
+  family: deal_seat
+  description: Package-owned deal seat.
+  configure: {}
+- name: _reset_score
+  family: reset_score
+  description: Package-owned reset score.
+  configure: {}
+- name: _refresh
+  family: refresh
+  description: Package-owned refresh.
+  configure: {}
+- name: _actor_choices
+  family: actor_choices
+  description: Package-owned actor choices.
+  configure: {}
+- name: _seat_table
+  family: seat_table
+  description: Package-owned seat table.
+  configure: {}
+- name: _center_table
+  family: center_table
+  description: Package-owned center table.
+  configure: {}
+- name: _choice_table
+  family: choice_table
+  description: Package-owned choice table.
+  configure: {}
+- name: _waits
+  family: waits
+  description: Package-owned waits.
+  configure: {}
+- name: _score_hand
+  family: score_hand
+  description: Package-owned score hand.
+  configure: {}
+- name: _score_shape
+  family: score_shape
+  description: Package-owned score shape.
+  configure: {}
+- name: _forced_responses
+  family: forced_responses
+  description: Package-owned forced responses.
+  configure: {}
+- name: _options
+  family: options
+  description: Package-owned options.
+  configure: {}
+- name: _matching
+  family: matching
+  description: Package-owned matching.
+  configure: {}
+- name: _closed
+  family: closed
+  description: Package-owned closed.
+  configure: {}
+- name: _discard_options
+  family: discard_options
+  description: Package-owned discard options.
+  configure: {}
+- name: _riichi_kan
+  family: riichi_kan
+  description: Package-owned riichi kan.
+  configure: {}
+- name: _response_options
+  family: response_options
+  description: Package-owned response options.
+  configure: {}
+- name: _call_option
+  family: call_option
+  description: Package-owned call option.
+  configure: {}
+- name: _begin_responses
+  family: begin_responses
+  description: Package-owned begin responses.
+  configure: {}
+- name: _discard
+  family: discard
+  description: Package-owned discard.
+  configure: {}
+- name: _respond
+  family: respond
+  description: Package-owned respond.
+  configure: {}
+- name: _resolve_responses
+  family: resolve_responses
+  description: Package-owned resolve responses.
+  configure: {}
+- name: _accept_riichi
+  family: accept_riichi
+  description: Package-owned accept riichi.
+  configure: {}
+- name: _cancel_ippatsu
+  family: cancel_ippatsu
+  description: Package-owned cancel ippatsu.
+  configure: {}
+- name: _interrupt
+  family: interrupt
+  description: Package-owned interrupt.
+  configure: {}
+- name: _claim_discard
+  family: claim_discard
+  description: Package-owned claim discard.
+  configure: {}
+- name: _commit_call
+  family: commit_call
+  description: Package-owned commit call.
+  configure: {}
+- name: _pao_check
+  family: pao_check
+  description: Package-owned pao check.
+  configure: {}
+- name: _commit_kan
+  family: commit_kan
+  description: Package-owned commit kan.
+  configure: {}
+- name: _complete_kan
+  family: complete_kan
+  description: Package-owned complete kan.
+  configure: {}
+- name: _finish_kan
+  family: finish_kan
+  description: Package-owned finish kan.
+  configure: {}
+- name: _abort_flags
+  family: abort_flags
+  description: Package-owned abort flags.
+  configure: {}
+- name: _abort_checks
+  family: abort_checks
+  description: Package-owned abort checks.
+  configure: {}
+- name: _abort
+  family: abort
+  description: Package-owned abort.
+  configure: {}
+- name: _adjust_score
+  family: adjust_score
+  description: Package-owned adjust score.
+  configure: {}
+- name: _settle_wins
+  family: settle_wins
+  description: Package-owned settle wins.
+  configure: {}
+- name: _pay_winner
+  family: pay_winner
+  description: Package-owned pay winner.
+  configure: {}
+- name: _draw_status
+  family: draw_status
+  description: Package-owned draw status.
+  configure: {}
+- name: _exhaustive
+  family: exhaustive
+  description: Package-owned exhaustive.
+  configure: {}
+- name: _end_hand
+  family: end_hand
+  description: Package-owned end hand.
+  configure: {}
+- name: _standing
+  family: standing
+  description: Package-owned standing.
+  configure: {}
+- name: _rank_match
+  family: rank_match
+  description: Package-owned rank match.
+  configure: {}
+- name: _advance_match
+  family: advance_match
+  description: Package-owned advance match.
+  configure: {}
+- name: _public_seat
+  family: public_seat
+  description: Package-owned public seat.
+  configure: {}
+- name: _actor_public_table
+  family: actor_public_table
+  description: Package-owned actor public table.
+  configure: {}
+definitions:
+  tiles:
+  - kind: 0
+    red: false
+    label: 1m
+  - kind: 0
+    red: false
+    label: 1m
+  - kind: 0
+    red: false
+    label: 1m
+  - kind: 0
+    red: false
+    label: 1m
+  - kind: 1
+    red: false
+    label: 2m
+  - kind: 1
+    red: false
+    label: 2m
+  - kind: 1
+    red: false
+    label: 2m
+  - kind: 1
+    red: false
+    label: 2m
+  - kind: 2
+    red: false
+    label: 3m
+  - kind: 2
+    red: false
+    label: 3m
+  - kind: 2
+    red: false
+    label: 3m
+  - kind: 2
+    red: false
+    label: 3m
+  - kind: 3
+    red: false
+    label: 4m
+  - kind: 3
+    red: false
+    label: 4m
+  - kind: 3
+    red: false
+    label: 4m
+  - kind: 3
+    red: false
+    label: 4m
+  - kind: 4
+    red: true
+    label: 5m (red)
+  - kind: 4
+    red: false
+    label: 5m
+  - kind: 4
+    red: false
+    label: 5m
+  - kind: 4
+    red: false
+    label: 5m
+  - kind: 5
+    red: false
+    label: 6m
+  - kind: 5
+    red: false
+    label: 6m
+  - kind: 5
+    red: false
+    label: 6m
+  - kind: 5
+    red: false
+    label: 6m
+  - kind: 6
+    red: false
+    label: 7m
+  - kind: 6
+    red: false
+    label: 7m
+  - kind: 6
+    red: false
+    label: 7m
+  - kind: 6
+    red: false
+    label: 7m
+  - kind: 7
+    red: false
+    label: 8m
+  - kind: 7
+    red: false
+    label: 8m
+  - kind: 7
+    red: false
+    label: 8m
+  - kind: 7
+    red: false
+    label: 8m
+  - kind: 8
+    red: false
+    label: 9m
+  - kind: 8
+    red: false
+    label: 9m
+  - kind: 8
+    red: false
+    label: 9m
+  - kind: 8
+    red: false
+    label: 9m
+  - kind: 9
+    red: false
+    label: 1p
+  - kind: 9
+    red: false
+    label: 1p
+  - kind: 9
+    red: false
+    label: 1p
+  - kind: 9
+    red: false
+    label: 1p
+  - kind: 10
+    red: false
+    label: 2p
+  - kind: 10
+    red: false
+    label: 2p
+  - kind: 10
+    red: false
+    label: 2p
+  - kind: 10
+    red: false
+    label: 2p
+  - kind: 11
+    red: false
+    label: 3p
+  - kind: 11
+    red: false
+    label: 3p
+  - kind: 11
+    red: false
+    label: 3p
+  - kind: 11
+    red: false
+    label: 3p
+  - kind: 12
+    red: false
+    label: 4p
+  - kind: 12
+    red: false
+    label: 4p
+  - kind: 12
+    red: false
+    label: 4p
+  - kind: 12
+    red: false
+    label: 4p
+  - kind: 13
+    red: true
+    label: 5p (red)
+  - kind: 13
+    red: false
+    label: 5p
+  - kind: 13
+    red: false
+    label: 5p
+  - kind: 13
+    red: false
+    label: 5p
+  - kind: 14
+    red: false
+    label: 6p
+  - kind: 14
+    red: false
+    label: 6p
+  - kind: 14
+    red: false
+    label: 6p
+  - kind: 14
+    red: false
+    label: 6p
+  - kind: 15
+    red: false
+    label: 7p
+  - kind: 15
+    red: false
+    label: 7p
+  - kind: 15
+    red: false
+    label: 7p
+  - kind: 15
+    red: false
+    label: 7p
+  - kind: 16
+    red: false
+    label: 8p
+  - kind: 16
+    red: false
+    label: 8p
+  - kind: 16
+    red: false
+    label: 8p
+  - kind: 16
+    red: false
+    label: 8p
+  - kind: 17
+    red: false
+    label: 9p
+  - kind: 17
+    red: false
+    label: 9p
+  - kind: 17
+    red: false
+    label: 9p
+  - kind: 17
+    red: false
+    label: 9p
+  - kind: 18
+    red: false
+    label: 1s
+  - kind: 18
+    red: false
+    label: 1s
+  - kind: 18
+    red: false
+    label: 1s
+  - kind: 18
+    red: false
+    label: 1s
+  - kind: 19
+    red: false
+    label: 2s
+  - kind: 19
+    red: false
+    label: 2s
+  - kind: 19
+    red: false
+    label: 2s
+  - kind: 19
+    red: false
+    label: 2s
+  - kind: 20
+    red: false
+    label: 3s
+  - kind: 20
+    red: false
+    label: 3s
+  - kind: 20
+    red: false
+    label: 3s
+  - kind: 20
+    red: false
+    label: 3s
+  - kind: 21
+    red: false
+    label: 4s
+  - kind: 21
+    red: false
+    label: 4s
+  - kind: 21
+    red: false
+    label: 4s
+  - kind: 21
+    red: false
+    label: 4s
+  - kind: 22
+    red: true
+    label: 5s (red)
+  - kind: 22
+    red: false
+    label: 5s
+  - kind: 22
+    red: false
+    label: 5s
+  - kind: 22
+    red: false
+    label: 5s
+  - kind: 23
+    red: false
+    label: 6s
+  - kind: 23
+    red: false
+    label: 6s
+  - kind: 23
+    red: false
+    label: 6s
+  - kind: 23
+    red: false
+    label: 6s
+  - kind: 24
+    red: false
+    label: 7s
+  - kind: 24
+    red: false
+    label: 7s
+  - kind: 24
+    red: false
+    label: 7s
+  - kind: 24
+    red: false
+    label: 7s
+  - kind: 25
+    red: false
+    label: 8s
+  - kind: 25
+    red: false
+    label: 8s
+  - kind: 25
+    red: false
+    label: 8s
+  - kind: 25
+    red: false
+    label: 8s
+  - kind: 26
+    red: false
+    label: 9s
+  - kind: 26
+    red: false
+    label: 9s
+  - kind: 26
+    red: false
+    label: 9s
+  - kind: 26
+    red: false
+    label: 9s
+  - kind: 27
+    red: false
+    label: East
+  - kind: 27
+    red: false
+    label: East
+  - kind: 27
+    red: false
+    label: East
+  - kind: 27
+    red: false
+    label: East
+  - kind: 28
+    red: false
+    label: South
+  - kind: 28
+    red: false
+    label: South
+  - kind: 28
+    red: false
+    label: South
+  - kind: 28
+    red: false
+    label: South
+  - kind: 29
+    red: false
+    label: West
+  - kind: 29
+    red: false
+    label: West
+  - kind: 29
+    red: false
+    label: West
+  - kind: 29
+    red: false
+    label: West
+  - kind: 30
+    red: false
+    label: North
+  - kind: 30
+    red: false
+    label: North
+  - kind: 30
+    red: false
+    label: North
+  - kind: 30
+    red: false
+    label: North
+  - kind: 31
+    red: false
+    label: White
+  - kind: 31
+    red: false
+    label: White
+  - kind: 31
+    red: false
+    label: White
+  - kind: 31
+    red: false
+    label: White
+  - kind: 32
+    red: false
+    label: Green
+  - kind: 32
+    red: false
+    label: Green
+  - kind: 32
+    red: false
+    label: Green
+  - kind: 32
+    red: false
+    label: Green
+  - kind: 33
+    red: false
+    label: Red
+  - kind: 33
+    red: false
+    label: Red
+  - kind: 33
+    red: false
+    label: Red
+  - kind: 33
+    red: false
+    label: Red
+  positions:
+  - bottom
+  - right
+  - top
+  - left
+  winds:
+  - East
+  - South
+  - West
+  seat_winds:
+  - East
+  - South
+  - West
+  - North
+  patterns:
+  - - 0
+    - 0
+  - - 1
+    - 1
+  - - 2
+    - 2
+  - - 3
+    - 3
+  - - 4
+    - 4
+  - - 5
+    - 5
+  - - 6
+    - 6
+  - - 7
+    - 7
+  - - 8
+    - 8
+  - - 9
+    - 9
+  - - 10
+    - 10
+  - - 11
+    - 11
+  - - 12
+    - 12
+  - - 13
+    - 13
+  - - 14
+    - 14
+  - - 15
+    - 15
+  - - 16
+    - 16
+  - - 17
+    - 17
+  - - 18
+    - 18
+  - - 19
+    - 19
+  - - 20
+    - 20
+  - - 21
+    - 21
+  - - 22
+    - 22
+  - - 23
+    - 23
+  - - 24
+    - 24
+  - - 25
+    - 25
+  - - 26
+    - 26
+  - - 27
+    - 27
+  - - 28
+    - 28
+  - - 29
+    - 29
+  - - 30
+    - 30
+  - - 31
+    - 31
+  - - 32
+    - 32
+  - - 33
+    - 33
+  - - 0
+    - 0
+    - 0
+  - - 1
+    - 1
+    - 1
+  - - 2
+    - 2
+    - 2
+  - - 3
+    - 3
+    - 3
+  - - 4
+    - 4
+    - 4
+  - - 5
+    - 5
+    - 5
+  - - 6
+    - 6
+    - 6
+  - - 7
+    - 7
+    - 7
+  - - 8
+    - 8
+    - 8
+  - - 9
+    - 9
+    - 9
+  - - 10
+    - 10
+    - 10
+  - - 11
+    - 11
+    - 11
+  - - 12
+    - 12
+    - 12
+  - - 13
+    - 13
+    - 13
+  - - 14
+    - 14
+    - 14
+  - - 15
+    - 15
+    - 15
+  - - 16
+    - 16
+    - 16
+  - - 17
+    - 17
+    - 17
+  - - 18
+    - 18
+    - 18
+  - - 19
+    - 19
+    - 19
+  - - 20
+    - 20
+    - 20
+  - - 21
+    - 21
+    - 21
+  - - 22
+    - 22
+    - 22
+  - - 23
+    - 23
+    - 23
+  - - 24
+    - 24
+    - 24
+  - - 25
+    - 25
+    - 25
+  - - 26
+    - 26
+    - 26
+  - - 27
+    - 27
+    - 27
+  - - 28
+    - 28
+    - 28
+  - - 29
+    - 29
+    - 29
+  - - 30
+    - 30
+    - 30
+  - - 31
+    - 31
+    - 31
+  - - 32
+    - 32
+    - 32
+  - - 33
+    - 33
+    - 33
+  - - 0
+    - 1
+    - 2
+  - - 1
+    - 2
+    - 3
+  - - 2
+    - 3
+    - 4
+  - - 3
+    - 4
+    - 5
+  - - 4
+    - 5
+    - 6
+  - - 5
+    - 6
+    - 7
+  - - 6
+    - 7
+    - 8
+  - - 9
+    - 10
+    - 11
+  - - 10
+    - 11
+    - 12
+  - - 11
+    - 12
+    - 13
+  - - 12
+    - 13
+    - 14
+  - - 13
+    - 14
+    - 15
+  - - 14
+    - 15
+    - 16
+  - - 15
+    - 16
+    - 17
+  - - 18
+    - 19
+    - 20
+  - - 19
+    - 20
+    - 21
+  - - 20
+    - 21
+    - 22
+  - - 21
+    - 22
+    - 23
+  - - 22
+    - 23
+    - 24
+  - - 23
+    - 24
+    - 25
+  - - 24
+    - 25
+    - 26
+  red_presentation:
+    detail: Red five
+    emphasis: accent
+  terminals:
+  - 0
+  - 8
+  - 9
+  - 17
+  - 18
+  - 26
+  - 27
+  - 28
+  - 29
+  - 30
+  - 31
+  - 32
+  - 33
+  green_kinds:
+  - 19
+  - 20
+  - 21
+  - 23
+  - 25
+  - 32
+  sequence_starts:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 9
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  - 18
+  - 19
+  - 20
+  - 21
+  - 22
+  - 23
+  - 24
+  group_sizes:
+  - - 2
+    - 3
+    - 3
+    - 3
+    - 3
+  - - 2
+    - 3
+    - 3
+    - 3
+  - - 2
+    - 3
+    - 3
+  - - 2
+    - 3
+  - - 2
+  dora_successors:
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 0
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  - 16
+  - 17
+  - 9
+  - 19
+  - 20
+  - 21
+  - 22
+  - 23
+  - 24
+  - 25
+  - 26
+  - 18
+  - 28
+  - 29
+  - 30
+  - 27
+  - 32
+  - 33
+  - 31
+  profile:
+    id: sylvia-four-player-aka-v1
+    label: Mahjong Soul-like four-player
+    starting_score: 25000
+    target: 30000
+    multiple_ron: all
+    ron_honba: nearest_winner
+    riichi_pot: nearest_winner
+    nagashi: draw_payments_no_honba_no_sticks
+    nagashi_closed_required: false
+    kuikae: forbidden
+  play_phases:
+  - discard
+  - response
+  - kan_response
+  - hand_end
+  claimed_flag:
+    claimed: true
+participant_artifacts:
+- kind: player
+  schema_id: pneuma.riichi-mahjong.player.v1
+  schema:
+    $id: pneuma.riichi-mahjong.player.v1
+    type: object
+    required:
+    - name
+    - control
+    properties:
+      name:
+        type: string
+        minLength: 1
+        maxLength: 32
+      control:
+        type: string
+        enum:
+        - player
+    additionalProperties: false
+  entity_state_schema:
+    type: object
+    properties: {}
+    additionalProperties: false
+  initial_state_calculations: []
+state_schemas:
+- key: state
+  schema:
+    type: object
+  references: []
+  visibility: engine
+- key: entities
+  schema:
+    type: object
+  references: []
+  visibility: engine
+model_decision_boundary:
+  active_actor:
+    namespace: pneuma.riichi-mahjong
+    key: state.actor
+  actor_entities:
+    namespace: pneuma.riichi-mahjong
+    key: entities
+  participant_control:
+    field: control
+    player_values:
+    - player
+    actor_participant_field: participant_id
+  default_owner: gm
+  isolated_participant:
+    instructions: 'Play Riichi Mahjong for only this seat. Choose one offered legal
+      action. Tile IDs 0..135 have kind ID // 4: kinds 0..8 are 1m..9m, 9..17 are
+      1p..9p, 18..26 are 1s..9s; 27..33 are East, South, West, North, White, Green,
+      Red. Physical IDs 16, 52 and 88 are red fives. Your hand and public_table are
+      the only available tile information. Do not guess wall order or another hand.
+      The engine scores, validates and resolves all moves.'
+    observation_path:
+    - game
+    persona_path:
+    - persona
+    actions_path:
+    - game
+    - decision_actions
+    public_observation:
+      namespace: pneuma.riichi-mahjong
+      key: state.public_observation
+ui_surfaces:
+- id: riichi-table
+  title: Riichi Mahjong
+  capability: pneuma.riichi-mahjong.play
+  renderer: piece_table
+  default_size: 560
+  minimum_size: 300
+  source:
+    kind: state
+    namespace: pneuma.riichi-mahjong
+    key: state.table
+  actions:
+  - id: play
+    label: Play
+    intent: take_action
+    params: {}
+    bindings:
+      choice: piece
+operating_guide: Run Riichi Mahjong through start_game and take_action. Use the named
+  player and three isolated NPC decision contexts. The host dispatches NPC choices
+  from that seat's permitted observations. Keep your continuous campaign context and
+  narrate only their committed public results. Resolve the player's currently declared
+  action through the offered IDs, then stop at the next player decision. Never inspect
+  the wall, NPC hands or NPC thinking. The table, legal actions, scores and saved
+  match state belong to the engine. Use ordinary gameplay/OOC transitions and preserve
+  the table during conversation. There is no adventuring rules layer. Tile labels
+  m, p and s mean characters, circles and bamboo; red fives are marked explicitly.

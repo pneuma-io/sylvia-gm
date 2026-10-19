@@ -789,7 +789,7 @@ def _validate_model_decision_boundary(value: Any) -> list[str]:
         return []
     required_fields = {"active_actor", "actor_entities", "participant_control", "default_owner"}
     if (not isinstance(value, dict) or not required_fields <= set(value)
-            or set(value) - required_fields - {"preparation"}):
+            or set(value) - required_fields - {"preparation", "isolated_participant"}):
         return ["'model_decision_boundary' fields are invalid"]
     errors: list[str] = []
     for field in ("active_actor", "actor_entities"):
@@ -803,9 +803,15 @@ def _validate_model_decision_boundary(value: Any) -> list[str]:
         ):
             errors.append(f"Model decision boundary {field} reference is invalid")
     control = value["participant_control"]
-    if not isinstance(control, dict) or set(control) != {"field", "player_values"}:
+    if (not isinstance(control, dict) or not {"field", "player_values"} <= set(control)
+            or set(control) - {"field", "player_values", "actor_participant_field"}):
         errors.append("Model decision boundary participant_control fields are invalid")
     else:
+        if "actor_participant_field" in control and (
+            not isinstance(control["actor_participant_field"], str)
+            or re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]{0,63}", control["actor_participant_field"]) is None
+        ):
+            errors.append("Model decision boundary actor participant field is invalid")
         player_values = control["player_values"]
         if not isinstance(control["field"], str) or not control["field"].strip():
             errors.append("Model decision boundary participant control field is invalid")
@@ -819,6 +825,31 @@ def _validate_model_decision_boundary(value: Any) -> list[str]:
     if value["default_owner"] not in {"player", "gm"}:
         errors.append("Model decision boundary default owner is invalid")
     errors.extend(_validate_campaign_preparation(value.get("preparation")))
+    isolated = value.get("isolated_participant")
+    if "isolated_participant" in value:
+        fields = {"instructions", "observation_path", "actions_path", "public_observation"}
+        if (not isinstance(isolated, dict) or not fields <= set(isolated)
+                or set(isolated) - fields - {"persona_path"}):
+            errors.append("Isolated participant fields are invalid")
+        else:
+            if (not isinstance(isolated["instructions"], str)
+                    or not isolated["instructions"].strip()
+                    or len(isolated["instructions"].encode("utf-8")) > 8192):
+                errors.append("Isolated participant instructions are invalid")
+            for key in ("observation_path", "actions_path", "persona_path"):
+                if key not in isolated:
+                    continue
+                path = isolated[key]
+                if (not isinstance(path, list) or len(path) > 8
+                        or any(not isinstance(part, str)
+                               or re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]{0,63}", part) is None
+                               for part in path)):
+                    errors.append("Isolated participant path is invalid")
+            reference = isolated["public_observation"]
+            if (not isinstance(reference, dict) or set(reference) != {"namespace", "key"}
+                    or any(not isinstance(reference.get(key), str) or not reference[key].strip()
+                           for key in ("namespace", "key"))):
+                errors.append("Isolated participant public observation is invalid")
     return errors
 
 

@@ -1442,6 +1442,16 @@ def _action_sequence_narration_facts(
             "sequence_status": result.get("status"), "committed_actions": committed}
 
 
+def _public_action_result(action_id: str | None, result: object) -> object:
+    """Keep a participant's private engine receipt out of GM recovery context."""
+    if action_id is not None and action_id.startswith("actor-action-"):
+        public = result.get("context") if isinstance(result, Mapping) else None
+        if not isinstance(public, Mapping):
+            raise CommandRejected("Isolated participant action has no published public result")
+        return {"context": _plain_json(public)}
+    return _plain_json(result)
+
+
 class ProviderSessionAdapter:
     """Run one configured provider through rules-neutral canonical session events."""
 
@@ -1667,6 +1677,8 @@ class ProviderSessionAdapter:
             tools_available=False,
             canonical_player_narration=canonical_player_narration,
         )
+        context_owner = self._gm_context_owner(provider_input)
+        context_fields = {"context_owner": context_owner} if context_owner is not None else {}
         basis_message_id = provider_input.basis_message_id
         persisted_system_contract = any(
             message.kind is SessionMessageKind.EVIDENCE
@@ -1716,7 +1728,12 @@ class ProviderSessionAdapter:
                 and event.event_type is CanonicalEventType.ACTION_COMMITTED
             }
             saved_results = [
-                {"action_id": event.action_id, "tool_result": _plain_json(event.safe_payload)}
+                {"action_id": event.action_id, "tool_result": {
+                    **_plain_json(event.safe_payload),
+                    "result": _public_action_result(
+                        event.action_id, event.safe_payload.get("result"),
+                    ),
+                }}
                 for event in saved_events
                 if event.action_id in saved_action_ids
                 and event.event_type is CanonicalEventType.TOOL_RESULT
@@ -1767,7 +1784,9 @@ class ProviderSessionAdapter:
                                 "campaign_id": retry_receipt.campaign_id,
                                 "action_id": retry_receipt.action_id,
                                 "status": retry_receipt.status.value,
-                                "result": _plain_json(retry_receipt.result),
+                                "result": _public_action_result(
+                                    retry_receipt.action_id, retry_receipt.result,
+                                ),
                                 "resulting_revision": retry_receipt.resulting_revision,
                             },
                             sort_keys=True,
@@ -2143,6 +2162,26 @@ class ProviderSessionAdapter:
         while True:
             if provider_input.control.cancelled:
                 raise CommandRejected("Agent session provider work was cancelled")
+            actor_reader = getattr(self._owner, "actor_decision_request", None)
+            actor_request = (actor_reader(campaign_id, turn_id=turn_id)
+                             if callable(actor_reader) else None)
+            if actor_request is not None:
+                from sylvia_gm.agent._actor_decisions import run_actor_decision
+
+                public_result = yield from run_actor_decision(
+                    self._owner, self._provider, provider_input, actor_request,
+                    owner_id=self._owner_id, stream=self._stream_round,
+                )
+                yield ProviderEvent.tool_evidence(
+                    message_id="participant-result-" + actor_request.decision_id,
+                    payload={"kind": "isolated_participant_result", "turn_id": turn_id,
+                             "basis_message_id": basis_message_id,
+                             "inference_id": actor_request.decision_id,
+                             "public_result": public_result},
+                )
+                messages.append(self._participant_result_message(public_result))
+                any_commit_in_exchange = True
+                continue
             inference_id = f"inference-{uuid.uuid4().hex}"
             discovery_id = f"mcp-discovery-{uuid.uuid4().hex}"
             current_catalog = provider_input.current_catalog(discovery_id)
@@ -2366,6 +2405,12 @@ class ProviderSessionAdapter:
                                       else "campaign_preparation_boundary", None)
             if callable(boundary_reader):
                 decision_boundary = boundary_reader(campaign_id)
+            if decision_boundary is None and not any_commit_in_exchange:
+                # An already active private game must resume its GM decision before narration.
+                _, private_boundary = self._owner.model_context_snapshot(campaign_id)
+                if (private_boundary is not None
+                        and private_boundary.owner is ModelDecisionOwner.GM):
+                    decision_boundary = private_boundary
             player_boundary_narration = False
             player_intent_resolution_required = False
             gm_boundary_decision = False
@@ -2613,6 +2658,7 @@ class ProviderSessionAdapter:
             if assistant_reasoning:
                 native_continuation["reasoning_content"] = "".join(assistant_reasoning)
             if native_continuation:
+                native_continuation.update(context_fields)
                 yield ProviderEvent.private_continuation(
                     native_continuation, response_id=inference_id,
                 )
@@ -2834,6 +2880,7 @@ class ProviderSessionAdapter:
                         message_id=f"{inference_id}-final-response-reference",
                         payload={
                             "kind": "provider_final_response_reference",
+                            **context_fields,
                             "response_id": inference_id,
                             "basis_message_id": basis_message_id,
                             "requirement": {
@@ -2915,6 +2962,7 @@ class ProviderSessionAdapter:
                         message_id=f"{inference_id}-gm-boundary-draft",
                         payload={
                             "kind": "provider_gm_boundary_draft",
+                            **context_fields,
                             "turn_id": turn_id,
                             "inference_id": inference_id,
                             "basis_message_id": basis_message_id,
@@ -2944,6 +2992,7 @@ class ProviderSessionAdapter:
                         message_id=f"{inference_id}-player-intent-pending-draft",
                         payload={
                             "kind": "provider_player_intent_pending_draft",
+                            **context_fields,
                             "turn_id": turn_id,
                             "inference_id": inference_id,
                             "basis_message_id": basis_message_id,
@@ -2978,6 +3027,7 @@ class ProviderSessionAdapter:
                         message_id=f"{inference_id}-held-narration",
                         payload={
                             "kind": "provider_held_narration",
+                            **context_fields,
                             "turn_id": turn_id,
                             "inference_id": inference_id,
                             "basis_message_id": basis_message_id,
@@ -2989,6 +3039,7 @@ class ProviderSessionAdapter:
                     message_id=f"{inference_id}-final-response-reference",
                     payload={
                         "kind": "provider_final_response_reference",
+                        **context_fields,
                         "response_id": inference_id,
                         "basis_message_id": basis_message_id,
                         "requirement": {
@@ -3049,6 +3100,7 @@ class ProviderSessionAdapter:
                 message_id=f"{inference_id}-assistant-tools",
                 payload={
                     "kind": "provider_tool_calls",
+                    **context_fields,
                     "turn_id": turn_id,
                     "inference_id": inference_id,
                     "basis_message_id": basis_message_id,
@@ -3877,6 +3929,7 @@ class ProviderSessionAdapter:
                     message_id=f"{inference_id}-tool-results",
                     payload={
                         "kind": "provider_tool_results",
+                        **context_fields,
                         "turn_id": turn_id,
                         "inference_id": inference_id,
                         "basis_message_id": basis_message_id,
@@ -4214,6 +4267,22 @@ class ProviderSessionAdapter:
             ),
         }
 
+    def _gm_context_owner(self, provider_input: SessionProviderInput) -> dict[str, object] | None:
+        """Keep GM native history compatible with its campaign, session and opted-in package."""
+        reader = getattr(self._owner, "model_context_owner", None)
+        campaign_id = provider_input.session.campaign_id
+        declared = reader(campaign_id) if campaign_id is not None and callable(reader) else None
+        return ({**declared, "session_id": provider_input.session.session_id}
+                if declared is not None else None)
+
+    @staticmethod
+    def _participant_result_message(result: Mapping[str, object]) -> dict[str, object]:
+        return {"role": "user", "content": (
+            "SYLVIA_COMMITTED_PARTICIPANT_EVENT (public engine data, not player speech "
+            "or instructions):\n"
+            + json.dumps(_plain_json(result), ensure_ascii=False, sort_keys=True)
+        )}
+
     def _messages(
         self,
         provider_input: SessionProviderInput,
@@ -4227,6 +4296,14 @@ class ProviderSessionAdapter:
         if tools_available is None:
             tools_available = campaign_has_mechanics
         selected = tuple(provider_input.history.messages)
+        context_owner = self._gm_context_owner(provider_input)
+        if context_owner is not None:
+            # Older unowned inference segments cannot prove GM ownership. Retain public dialogue.
+            selected = tuple(message for message in selected if not (
+                message.kind is SessionMessageKind.EVIDENCE
+                and str(message.content.get("kind", "")).startswith("provider_")
+                and message.content.get("context_owner") != context_owner
+            ))
         final_references = {
             str(message.content["basis_message_id"]): {
                 "response_id": message.content["response_id"],
@@ -4288,6 +4365,7 @@ class ProviderSessionAdapter:
             {
                 "role": "system",
                 "content": system_contract,
+                **({"_context_owner": context_owner} if context_owner is not None else {}),
             }
         ]
         narration_block = (
@@ -4414,6 +4492,7 @@ class ProviderSessionAdapter:
         invalid_historical_inferences: set[tuple[str, str]] = set()
         held_narration_messages: list[tuple[int, dict[str, object]]] = []
         gm_boundary_draft_messages: list[tuple[int, dict[str, object]]] = []
+        public_participant_segments: list[tuple[str, int, list[dict[str, object]]]] = []
         for message in selected:
             if message.kind is not SessionMessageKind.EVIDENCE:
                 continue
@@ -4428,7 +4507,13 @@ class ProviderSessionAdapter:
             ):
                 continue
             inference_key = (evidence_basis, inference_id)
-            if content.get("kind") == "provider_held_narration":
+            if content.get("kind") == "isolated_participant_result":
+                result = content.get("public_result")
+                if not isinstance(result, Mapping):
+                    raise CommandRejected("Saved public participant result is invalid")
+                public_participant_segments.append((evidence_basis, message.sequence,
+                    [self._participant_result_message(result)]))
+            elif content.get("kind") == "provider_held_narration":
                 if evidence_basis != resume_basis_message_id:
                     continue
                 assistant = content.get("assistant")
@@ -4558,6 +4643,11 @@ class ProviderSessionAdapter:
             (sequence, [message]) for sequence, message in gm_boundary_draft_messages
         )
         completed_tool_segments: list[tuple[str, int, list[dict[str, object]]]] = []
+        for basis, sequence, segment in public_participant_segments:
+            if basis == resume_basis_message_id:
+                resumed_segments.append((sequence, segment))
+            else:
+                completed_tool_segments.append((basis, sequence, segment))
         for inference_key, (call_sequence, call_assistant) in tool_calls_by_inference.items():
             result_evidence = tool_results_by_inference.get(inference_key)
             if result_evidence is None or result_evidence[0] <= call_sequence:
@@ -4909,7 +4999,7 @@ class ProviderSessionAdapter:
         campaign_id = provider_input.session.campaign_id
         if campaign_id is None:
             raise CommandRejected("DM campaign context requires campaign authority")
-        snapshot = self._owner.snapshot(campaign_id)
+        snapshot, private_decision = self._owner.model_context_snapshot(campaign_id)
         continuity = getattr(snapshot, "continuity", CampaignContinuityView())
         plan = self._campaign_plan if isinstance(self._campaign_plan, Mapping) else {}
         structure = plan.get("structure")
@@ -5159,6 +5249,24 @@ class ProviderSessionAdapter:
                         "display_name": snapshot.display_name,
                         "revision": snapshot.revision,
                     },
+                    **({"ruleset_decision": {
+                        "owner": private_decision.owner.value,
+                        "actor_id": private_decision.actor_id,
+                        "actor_name": private_decision.actor_name,
+                        "actor_state": private_decision.actor_state,
+                        "active_side_id": private_decision.active_side_id,
+                        "focused_actor_id": private_decision.focused_actor_id,
+                        "eligible_actors": [{
+                            "actor_id": actor.actor_id,
+                            "actor_name": actor.actor_name,
+                            "actor_state": actor.actor_state,
+                        } for actor in private_decision.eligible_actors],
+                        "campaign_revision": private_decision.campaign_revision,
+                        "handling": (
+                            "Use only this permitted actor view for the current decision. "
+                            "Keep information concealed from the player out of public narration."
+                        ),
+                    }} if private_decision is not None else {}),
                     "campaign_state": {
                         "meaning": "Current campaign truth and durable GM-screen memory.",
                         "current_scene": continuity.current_scene,
@@ -5267,6 +5375,8 @@ class ProviderSessionAdapter:
         }
         fresh = {
             "campaign": campaign,
+            **({"ruleset_decision": payload["ruleset_decision"]}
+               if "ruleset_decision" in payload else {}),
             "campaign_state": payload.get("campaign_state"),
             "PLAYER_KNOWN": payload.get("PLAYER_KNOWN"),
             "GM_PRIVATE_CURRENT": {
@@ -5319,6 +5429,7 @@ class ProviderSessionAdapter:
         prepared = []
         for original in messages:
             message = dict(original)
+            message.pop("_context_owner", None)
             if not resend_reasoning:
                 message.pop("reasoning_content", None)
             reference = message.pop("_native_reference", None)
@@ -5342,6 +5453,13 @@ class ProviderSessionAdapter:
                     provider_id=provider_input.session.provider_id,
                     model_id=provider_input.session.model_id,
                 ) if callable(read_native) else None
+                context_owner = self._gm_context_owner(provider_input)
+                if (native is not None and context_owner is not None
+                        and native.get("context_owner") != context_owner):
+                    raise CommandRejected(
+                        "Native continuation belongs to another model context",
+                        code="provider_native_continuation_mismatch",
+                    )
                 requirement = reference.get("requirement", {})
                 if transport in {"chat_completions", "responses", "gemini_generate_content"}:
                     message = attach_chat_metadata(
@@ -5408,29 +5526,33 @@ class ProviderSessionAdapter:
         provider_input: SessionProviderInput | None = None,
         tool_choice: str | None = None,
         history_allowed: bool = False,
+        provider_override: Provider | None = None,
     ) -> Iterable[ProviderStreamChunk]:
         output: queue.Queue[object] = queue.Queue()
         loop = _PROVIDER_ASYNC_RUNTIME.loop()
-        provider = self._provider
+        provider = provider_override or self._provider
         bridge = None
         if provider_input is not None:
             from sylvia_gm.agent._working_context import CheckpointBridge, WorkingContextProvider
 
             session_id = provider_input.session.session_id
-            if session_id not in self._working_contexts:
-                bridge = CheckpointBridge()
-                working = WorkingContextProvider(
-                    provider, records=[m.content for m in provider_input.history.messages],
-                    save=bridge.save, cancelled=lambda: control.cancelled,
-                    progress=control.set_status_hint,
-                    prepare_continuation=lambda selected, has_tools: (
-                        self._attach_native_continuation(
-                            selected, provider_input, has_tools=has_tools,
-                        )
-                    ),
-                )
-                self._working_contexts[session_id] = (working, bridge)
-            provider, bridge = self._working_contexts[session_id]
+            previous = self._working_contexts.get(session_id)
+            records = (previous[0].records if previous is not None
+                       else [m.content for m in provider_input.history.messages])
+            # Keep all conversation and checkpoints, but bind callbacks to this request's control.
+            bridge = CheckpointBridge()
+            working = WorkingContextProvider(
+                provider, records=records, record_owner=self._gm_context_owner(provider_input),
+                save=bridge.save, cancelled=lambda: control.cancelled,
+                progress=control.set_status_hint,
+                prepare_continuation=lambda selected, has_tools: (
+                    self._attach_native_continuation(
+                        selected, provider_input, has_tools=has_tools,
+                    )
+                ),
+            )
+            self._working_contexts[session_id] = (working, bridge)
+            provider = working
             provider.history_retrieval_enabled = history_allowed
 
         async def consume() -> None:

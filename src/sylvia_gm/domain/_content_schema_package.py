@@ -186,6 +186,7 @@ PACKAGE_RECORD_SCHEMA: dict[str, Any] = {
                 "type": "object", "required": ["key", "schema", "references"],
                 "properties": {
                     "key": _TEXT,
+                    "visibility": {"enum": ["public", "engine"], "default": "public"},
                     "required": {
                         "type": "boolean", "default": False,
                         "description": (

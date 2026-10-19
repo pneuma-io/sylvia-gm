@@ -4419,13 +4419,15 @@ const SylviaGMFrontend = (() => {
     }
   }
 
-  function panelActionAvailable(surface, action, partyActorId = null) {
+  function panelActionAvailable(surface, action, partyActorId = null, pieceId = null) {
     if (!state.activeSessionId || state.panelCommitPending || panelIntentPending() || pendingPanelCommand() ||
         selectedSessionIsWorking() || campaignDisplayPending() || action.available === false) return false;
-    if (!sequenceModeActive() && action.checks_required && !state.panelActionChecks.get(
-      panelActionCheckKey(surface, action, partyActorId)
+    if ((!sequenceModeActive() || surface.renderer === 'piece_table') && action.checks_required && !state.panelActionChecks.get(
+      panelActionCheckKey(surface, action, partyActorId, pieceId)
     )?.available) return false;
     const bindings = action.bindings || {};
+    if (surface.renderer === 'piece_table' && Object.values(bindings).includes('piece') &&
+        !window.SylviaPieceTable.selection(surface.data, action, pieceId)) return false;
     const actorParameter = action.actor_parameter ||
       Object.keys(bindings).find((key) => bindings[key] === 'actor');
     if (!actorParameter) return true;
@@ -4451,6 +4453,9 @@ const SylviaGMFrontend = (() => {
     const action = surface?.actions?.find((item) => item.id === command.panel_action_id);
     if (!action || action.available === false) return false;
     if (state.panelProjection.revision !== projectionRevision) return false;
+    if (surface.renderer === 'piece_table' && Object.values(action.bindings || {}).includes('piece')) {
+      return Boolean(window.SylviaPieceTable.selection(surface.data, action, command.selection?.piece));
+    }
     if (['tactical_grid', 'coordinate_map'].includes(surface.renderer)) {
       if (command.selection?.map_revision !== surface.data.map_revision) return false;
       if (command.selection?.target && !surface.data.entities?.some((item) => item.id === command.selection.target)) return false;
@@ -4469,7 +4474,8 @@ const SylviaGMFrontend = (() => {
       Boolean(surface.data?.entities?.[actor]));
   }
 
-  function panelActionSelection(surface, action, partyActorId = null) {
+  function panelActionSelection(surface, action, partyActorId = null, pieceId = null) {
+    if (surface.renderer === 'piece_table') return window.SylviaPieceTable.selection(surface.data, action, pieceId);
     if (['party', 'unit_list'].includes(surface.renderer) && partyActorId) return { actor: partyActorId };
     if (['tactical_grid', 'coordinate_map'].includes(surface.renderer)) return tacticalActionSelection(surface, action);
     if (surface.renderer === 'network_graph') return networkActionSelection(surface, action);
@@ -4477,10 +4483,10 @@ const SylviaGMFrontend = (() => {
     return null;
   }
 
-  function panelActionCheckKey(surface, action, partyActorId = null) {
+  function panelActionCheckKey(surface, action, partyActorId = null, pieceId = null) {
     return JSON.stringify([state.activeCampaignId, state.activeSessionId,
       state.panelProjection?.revision, surface.id, action.id,
-      panelActionSelection(surface, action, partyActorId)]);
+      panelActionSelection(surface, action, partyActorId, pieceId)]);
   }
 
   async function refreshPanelActionChecks(projection, container) {
@@ -4493,11 +4499,12 @@ const SylviaGMFrontend = (() => {
         const action = surface?.actions?.find((item) => item.id === button.dataset.panelActionId);
         if (!action || (!action.checks_required && !action.map_preview_enabled)) return null;
         return { button, surface, action, actor: button.dataset.panelActorId,
-          key: panelActionCheckKey(surface, action, button.dataset.panelActorId) };
+          piece: button.dataset.panelPieceId,
+          key: panelActionCheckKey(surface, action, button.dataset.panelActorId, button.dataset.panelPieceId) };
       }).filter(Boolean);
-    const apply = () => currentButtons().forEach(({ button, surface, action, actor, key }) => {
+    const apply = () => currentButtons().forEach(({ button, surface, action, actor, piece, key }) => {
       const reason = state.panelActionChecks.get(key)?.reason || '';
-      button.disabled = !panelActionAvailable(surface, action, actor);
+      button.disabled = !panelActionAvailable(surface, action, actor, piece);
       button.title = panelPlayerReason(reason);
       button.setAttribute('aria-description', reason);
       // Show only a current owner-derived price; keep native no-confirmation policy unchanged.
@@ -4530,9 +4537,9 @@ const SylviaGMFrontend = (() => {
     try {
       const response = await state.bridge.player_action_availability({
         campaign_id: projection.campaign_id, expected_revision: projection.revision,
-        requests: pending.map(({ surface, action, actor }) => ({
+        requests: pending.map(({ surface, action, actor, piece }) => ({
           source: { kind: 'panel', surface_id: surface.id, action_id: action.id },
-          selection: panelActionSelection(surface, action, actor),
+          selection: panelActionSelection(surface, action, actor, piece),
         })),
       });
       if (!projectionIsCurrent()) { releasePending(); return; }
@@ -6268,6 +6275,9 @@ const SylviaGMFrontend = (() => {
   }
 
   function panelContent(surface) {
+    if (surface.renderer === 'piece_table') {
+      return window.SylviaPieceTable.render(surface.data, surface.actions);
+    }
     if (surface.id === ACTION_QUEUE_PANEL_ID && surface.renderer === 'action_queue')
       return sequenceMarkup(state.queuePreviousCards || new Set(), surface.data);
     if (surface.renderer === 'party') return renderPartyPanel(surface.data, surface);
@@ -6328,7 +6338,8 @@ const SylviaGMFrontend = (() => {
         `${escapeHtml(surface.icon || '◆')}</span>${escapeHtml(surface.title || surface.id)}</div>`
       : '';
     const footerActions = Array.isArray(surface.actions) ? surface.actions.filter(
-      (action) => !['party', 'unit_list', 'inventory'].includes(surface.renderer) || !actionBindsActor(action)
+      (action) => (!['party', 'unit_list', 'inventory'].includes(surface.renderer) || !actionBindsActor(action)) &&
+        !(surface.renderer === 'piece_table' && Object.values(action.bindings || {}).includes('piece'))
     ) : [];
     const mapSurface = ['tactical_grid', 'coordinate_map'].includes(surface.renderer);
     const selectedAction = mapSurface ? tacticalPreviewState(surface, state.tacticalViews[surface.id] || {}).action : null;
@@ -6518,9 +6529,10 @@ const SylviaGMFrontend = (() => {
         const surface = projection.surfaces.find((entry) => entry.id === panel.dataset.panelId);
         const action = surface && Array.isArray(surface.actions)
           ? surface.actions.find((entry) => entry.id === button.dataset.panelActionId) : null;
-        if (!action || !panelActionAvailable(surface, action, button.dataset.panelActorId)) return;
+        if (!action || !panelActionAvailable(surface, action, button.dataset.panelActorId, button.dataset.panelPieceId)) return;
         button.disabled = true;
-        const selection = JSON.parse(JSON.stringify(panelActionSelection(surface, action, button.dataset.panelActorId)));
+        const selection = JSON.parse(JSON.stringify(panelActionSelection(surface, action,
+          button.dataset.panelActorId, button.dataset.panelPieceId)));
         const projectionRevision = projection.revision;
         const pendingIntent = { campaignId, sessionId };
         state.panelIntentPending = pendingIntent;
