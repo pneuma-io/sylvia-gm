@@ -1,0 +1,2589 @@
+{
+  "format": "sylvia-retained-source-snapshot",
+  "version": 1,
+  "sourceRepository": "pneuma-io/trigger-discipline",
+  "sourcePR": 49,
+  "sourceHead": "95d95c435f6cccd399a862ee44735d77ab07ed89",
+  "sourceBase": "e89a428b9d539689ff8f32e9171810105202cc41",
+  "selectedSourceFiles": 319,
+  "sourceBytes": 2470896,
+  "bytePolicy": "Exact bytes and modes retained for every source entry; only destination prefixes differ.",
+  "historyPolicy": "Source lineage is referenced, not merged. No private commit history is imported.",
+  "licencePolicy": "Retain existing source notices and LicenseRef-Proprietary metadata; source-visibility approval is not relicensing.",
+  "claim": "Unfinished development source; no generated package, gameplay or installed acceptance.",
+  "exclusions": {
+    "upstreamTreeFiles": 424,
+    "excludedFiles": 105,
+    "groups": [
+      "editor/plugin/session state",
+      "generated ruleset-draft payloads and output/qualification archives",
+      "binary assets and private installed-test captures",
+      "historical handoff material",
+      "empty unused canvas"
+    ],
+    "specific": [
+      {
+        "path": "Hacking/CREDENTIAL.md",
+        "reason": "Credential-named path excluded from the approved scoped read. Not inspected and not asserted to contain actual credentials."
+      },
+      {
+        "path": "Testing/SYLVIA RULESET IMPLEMENTATION.md",
+        "reason": "Machine-local source locator; omitted instead of publishing it."
+      }
+    ]
+  },
+  "files": [
+    {
+      "sourcePath": ".gitattributes",
+      "path": "development/trigger-discipline/source/.gitattributes",
+      "gitBlob": "f6aacb0b55c94aa81589a4b2a3abafae48a730ab",
+      "mode": "100644",
+      "bytes": 31,
+      "sha256": "5413258104f38813961c2aac2fd1720e8afe4dbe2996b59ad5e52d082e66f3a1"
+    },
+    {
+      "sourcePath": ".gitignore",
+      "path": "development/trigger-discipline/source/.gitignore",
+      "gitBlob": "f7aac1aa1d25b1806f9e7f881183070a48643985",
+      "mode": "100644",
+      "bytes": 150,
+      "sha256": "62678712324d25dd02460ccceeaaaad8d51902bcae7ad4db1e6b8d9bf90e542e"
+    },
+    {
+      "sourcePath": "AGENTS.md",
+      "path": "development/trigger-discipline/source/AGENTS.md",
+      "gitBlob": "22c1a154857cd0e1fa87f31cece752bf542320b7",
+      "mode": "100644",
+      "bytes": 3676,
+      "sha256": "6720f4a5fed6820204fe754edf5605a734481677e5c31f3d72b1194c45bcb4de"
+    },
+    {
+      "sourcePath": "CQC/CONTROL.md",
+      "path": "development/trigger-discipline/source/CQC/CONTROL.md",
+      "gitBlob": "334609ca16107e36e63f494f146f4809f51cd3e1",
+      "mode": "100644",
+      "bytes": 1909,
+      "sha256": "7ac9057007034284eb64466cd8f914555835b7ca132bf5d1bbc5383a9c77945f"
+    },
+    {
+      "sourcePath": "CQC/CQC ACTION.md",
+      "path": "development/trigger-discipline/source/CQC/CQC ACTION.md",
+      "gitBlob": "0ebfed550a8a266b7dcbd4f7b9a2d7c94bfed0e4",
+      "mode": "100644",
+      "bytes": 2058,
+      "sha256": "e8b1c4d23479c08245d7cf3b3b91955904d5ff6e6e38fbf2270baf707839190c"
+    },
+    {
+      "sourcePath": "CQC/CQC BRACE.md",
+      "path": "development/trigger-discipline/source/CQC/CQC BRACE.md",
+      "gitBlob": "d8afac4b8d137740fc548be020bfb8bdf3812e0c",
+      "mode": "100644",
+      "bytes": 951,
+      "sha256": "3bfe7ae902ac004860688097c7495bde5ffdd99141d6b160a7d30dfa4d6f7337"
+    },
+    {
+      "sourcePath": "CQC/CQC DEFENSE.md",
+      "path": "development/trigger-discipline/source/CQC/CQC DEFENSE.md",
+      "gitBlob": "bd91cc560ffc3ff5ddde11ea6c29975f69c50475",
+      "mode": "100644",
+      "bytes": 1210,
+      "sha256": "7a062501c96e526363f1edd5e1b8a32693ca99667f7d25470b5ab1b261e893cd"
+    },
+    {
+      "sourcePath": "CQC/DISARM.md",
+      "path": "development/trigger-discipline/source/CQC/DISARM.md",
+      "gitBlob": "2937f11cc81cddf713172c6ca6a46b5a85288085",
+      "mode": "100644",
+      "bytes": 1111,
+      "sha256": "ff00d6587934d12dfbc777ecad8e94efe25687a3a9249a64df35545adf74f21c"
+    },
+    {
+      "sourcePath": "CQC/ESCAPE.md",
+      "path": "development/trigger-discipline/source/CQC/ESCAPE.md",
+      "gitBlob": "c6ed0aeebb2bda0aaccf62a6a03ffa5c19aca603",
+      "mode": "100644",
+      "bytes": 835,
+      "sha256": "6f35412f72f1c1d85670be8fe603ea924d529fb06eb38582b61a228aedf01646"
+    },
+    {
+      "sourcePath": "CQC/SHOVE.md",
+      "path": "development/trigger-discipline/source/CQC/SHOVE.md",
+      "gitBlob": "221fe8910ab0c0e5b18da7b7b6616586fc5da4bf",
+      "mode": "100644",
+      "bytes": 985,
+      "sha256": "5a83a083e1e1cb47bd00da521d5148d2188567e5aefc32c683a690776d19d128"
+    },
+    {
+      "sourcePath": "CQC/THROW.md",
+      "path": "development/trigger-discipline/source/CQC/THROW.md",
+      "gitBlob": "abd83056548dc4523aa22524a86cbc51e5f642d8",
+      "mode": "100644",
+      "bytes": 1052,
+      "sha256": "d256013dec8e09de246c7c133045fd83f3b5834123a7d5df6b112a338216d877"
+    },
+    {
+      "sourcePath": "CQC/TRIP.md",
+      "path": "development/trigger-discipline/source/CQC/TRIP.md",
+      "gitBlob": "007602c2a043bbfd6906042b6ec481908a1f2c12",
+      "mode": "100644",
+      "bytes": 657,
+      "sha256": "629ae80c4263a0090c061826b50e725a6a71cc5931f6524f2e082bdf8baef436"
+    },
+    {
+      "sourcePath": "Character/ASSISTANCE.md",
+      "path": "development/trigger-discipline/source/Character/ASSISTANCE.md",
+      "gitBlob": "d622b3441d16ec1de5c0f953a54bd5cc72ca6148",
+      "mode": "100644",
+      "bytes": 411,
+      "sha256": "6541690d3e82b83c4cb34684fc2ff9b577e78fc4c17bb0059a5fb9620aab2c12"
+    },
+    {
+      "sourcePath": "Character/Aptitudes/ACUITY.md",
+      "path": "development/trigger-discipline/source/Character/Aptitudes/ACUITY.md",
+      "gitBlob": "653b7b37252fd05f38a71f20f43b627c39d07e0c",
+      "mode": "100644",
+      "bytes": 222,
+      "sha256": "33dd2d34f9afa6fc6c56a0f6fb5ebac86ec2bcadd0a735bb8152057b7a811f98"
+    },
+    {
+      "sourcePath": "Character/Aptitudes/FORCE.md",
+      "path": "development/trigger-discipline/source/Character/Aptitudes/FORCE.md",
+      "gitBlob": "900761b075fe42cea6e0b3547a28c12dbe6c73cb",
+      "mode": "100644",
+      "bytes": 344,
+      "sha256": "48eef631fc7c478f7341d37e1501d32ee42402849f68fe6da689a272c92229f2"
+    },
+    {
+      "sourcePath": "Character/Aptitudes/NERVE.md",
+      "path": "development/trigger-discipline/source/Character/Aptitudes/NERVE.md",
+      "gitBlob": "f0077e4ae526a7968b371ee305e4882129095c9a",
+      "mode": "100644",
+      "bytes": 829,
+      "sha256": "fb2affac49b92717f3002156658f003416cb91b089a7d502f3e87ab9e32c047e"
+    },
+    {
+      "sourcePath": "Character/Aptitudes/PRECISION.md",
+      "path": "development/trigger-discipline/source/Character/Aptitudes/PRECISION.md",
+      "gitBlob": "d941f72b02a60c8718a5050748de41940648ef22",
+      "mode": "100644",
+      "bytes": 206,
+      "sha256": "fa857756cd160feec99e7617d2d88d2bf92bfa30a3ee46a95ffc72455562a83b"
+    },
+    {
+      "sourcePath": "Character/Aptitudes/PRESENCE.md",
+      "path": "development/trigger-discipline/source/Character/Aptitudes/PRESENCE.md",
+      "gitBlob": "e80b6719a48c6f90595eb2135ddf1a0f9c200d2d",
+      "mode": "100644",
+      "bytes": 214,
+      "sha256": "74c3c9ef28f4e1f2935b164c6c20b82fd7b4f0b447e99099cbcb31bbfc57934d"
+    },
+    {
+      "sourcePath": "Character/Aptitudes/REASON.md",
+      "path": "development/trigger-discipline/source/Character/Aptitudes/REASON.md",
+      "gitBlob": "040c8b82b6a95281e2ebcb2a6a50725e57968242",
+      "mode": "100644",
+      "bytes": 427,
+      "sha256": "1ca12f13448adc43662b56a1c267985d84e26c1fa906d74608fda51eda2d6d18"
+    },
+    {
+      "sourcePath": "Character/CHECK.md",
+      "path": "development/trigger-discipline/source/Character/CHECK.md",
+      "gitBlob": "1d388f836589a1db1931ae2b6a4828cd969023a4",
+      "mode": "100644",
+      "bytes": 1049,
+      "sha256": "90c323f9664b9ee4a940ff3b2a89b17ed45fb123f3ec26e94a64248bf4643dc5"
+    },
+    {
+      "sourcePath": "Character/CLASS-SKILL INDEPENDENCE.md",
+      "path": "development/trigger-discipline/source/Character/CLASS-SKILL INDEPENDENCE.md",
+      "gitBlob": "c6467ec5c1954ecc9e62c84f30d5d30a543dfe45",
+      "mode": "100644",
+      "bytes": 857,
+      "sha256": "20285ce359c3ca0e9131700aee6e558123c7204d0615beea5e0bd048c28bd3b7"
+    },
+    {
+      "sourcePath": "Character/DIFFICULTY.md",
+      "path": "development/trigger-discipline/source/Character/DIFFICULTY.md",
+      "gitBlob": "d75dcccfc3169593d003fe2cbe599ce841b0b30b",
+      "mode": "100644",
+      "bytes": 533,
+      "sha256": "c8e2393c5ce35102768a06c6ef5933daf79245ca115b80b8fc302b85181deccd"
+    },
+    {
+      "sourcePath": "Character/GROUP TASK.md",
+      "path": "development/trigger-discipline/source/Character/GROUP TASK.md",
+      "gitBlob": "c6ebac061502d310db4f48c77bf7e24cfe0c8d1f",
+      "mode": "100644",
+      "bytes": 306,
+      "sha256": "9e3b4c7bc6e02a51f3228179c36e3e7b468bda6e56bcbfd55c3ed6f25d605463"
+    },
+    {
+      "sourcePath": "Character/LEVEL.md",
+      "path": "development/trigger-discipline/source/Character/LEVEL.md",
+      "gitBlob": "473da1c73b621bfdde85c66f68038bced2559920",
+      "mode": "100644",
+      "bytes": 1320,
+      "sha256": "30bc9b92d85bba196c7a25cacfda70aa64fa45251e6b06759658c28e54741554"
+    },
+    {
+      "sourcePath": "Character/NATURAL 1.md",
+      "path": "development/trigger-discipline/source/Character/NATURAL 1.md",
+      "gitBlob": "3c53920d4786788acf6abd496cf2afe50fbbbd5a",
+      "mode": "100644",
+      "bytes": 487,
+      "sha256": "d2956477a6dcc5ee8035a5ed1a63ff5fc2e35e08de2274e886527c3c65b56c14"
+    },
+    {
+      "sourcePath": "Character/NATURAL 20.md",
+      "path": "development/trigger-discipline/source/Character/NATURAL 20.md",
+      "gitBlob": "dd91bded1f5172d48be4f98373490e222624ed63",
+      "mode": "100644",
+      "bytes": 411,
+      "sha256": "9f671a7bfb540e6d12c07826e9e7f0e33d2c115a832d65778ffe87b6fbc606cd"
+    },
+    {
+      "sourcePath": "Character/SPECIALTY.md",
+      "path": "development/trigger-discipline/source/Character/SPECIALTY.md",
+      "gitBlob": "6d764638e809786809b27a63cfad68cebf1ca313",
+      "mode": "100644",
+      "bytes": 6342,
+      "sha256": "bffea09c65877148c84991563a20675ac2cffbae7fe820b61648a6b722d04edb"
+    },
+    {
+      "sourcePath": "Character/Skills/ATHLETICS.md",
+      "path": "development/trigger-discipline/source/Character/Skills/ATHLETICS.md",
+      "gitBlob": "53af57bdc9e29fd90e506fea46ce3c1dcf148a8e",
+      "mode": "100644",
+      "bytes": 195,
+      "sha256": "fa76afbd1c7297f1c8ad27e8cbc4e192059bf49cd935b98564c8b39cd762ee39"
+    },
+    {
+      "sourcePath": "Character/Skills/CQC.md",
+      "path": "development/trigger-discipline/source/Character/Skills/CQC.md",
+      "gitBlob": "9c841234dad9ba3cc115ad60a46730732a6aec90",
+      "mode": "100644",
+      "bytes": 288,
+      "sha256": "4434cea6269ba1cf1cc12bd96fcd3cab9364ff8362a77fd642f4befb9fa4bba8"
+    },
+    {
+      "sourcePath": "Character/Skills/DRONE OPERATIONS.md",
+      "path": "development/trigger-discipline/source/Character/Skills/DRONE OPERATIONS.md",
+      "gitBlob": "11e19270c2499061d38950cae4d08173e6001a65",
+      "mode": "100644",
+      "bytes": 1125,
+      "sha256": "5491bc1a320b082ba8433c5a1692f5734e9890faa7390b5137fece8dfd4a3093"
+    },
+    {
+      "sourcePath": "Character/Skills/ENGINEERING.md",
+      "path": "development/trigger-discipline/source/Character/Skills/ENGINEERING.md",
+      "gitBlob": "13c17b5c36415b4c57b4ed9ec4e8aeb93e7a25a8",
+      "mode": "100644",
+      "bytes": 305,
+      "sha256": "27cb1178a5066d364f6a670df8f771eb6050ba730af41d6490c95a193224dec2"
+    },
+    {
+      "sourcePath": "Character/Skills/GRENADES.md",
+      "path": "development/trigger-discipline/source/Character/Skills/GRENADES.md",
+      "gitBlob": "23cc7096bd847d7e3a027f12c6acaa2f93982977",
+      "mode": "100644",
+      "bytes": 265,
+      "sha256": "c3d76e7cd9c2bfc1ca2d74aa6bbfaf75f68068995be4a8d8a2a3c826d14dc247"
+    },
+    {
+      "sourcePath": "Character/Skills/INFLUENCE.md",
+      "path": "development/trigger-discipline/source/Character/Skills/INFLUENCE.md",
+      "gitBlob": "6d49abb12690e8908e20917ef5057db048a15d2d",
+      "mode": "100644",
+      "bytes": 577,
+      "sha256": "1e5f2378c9d8af6aed9cf927351522a9afd06abd9f5b27becf58b295fe0ff1b0"
+    },
+    {
+      "sourcePath": "Character/Skills/INVESTIGATION.md",
+      "path": "development/trigger-discipline/source/Character/Skills/INVESTIGATION.md",
+      "gitBlob": "6034e229f2500a6f8fba1bb892451484c65d2d07",
+      "mode": "100644",
+      "bytes": 485,
+      "sha256": "b457a0bbd1f16700619c43d43539066598a81cc6e852f49d8c6a291b80d05ddc"
+    },
+    {
+      "sourcePath": "Character/Skills/LOCAL HACKING.md",
+      "path": "development/trigger-discipline/source/Character/Skills/LOCAL HACKING.md",
+      "gitBlob": "868d742ad6573ee32ad3b7cf0876f1a4cb39151b",
+      "mode": "100644",
+      "bytes": 247,
+      "sha256": "3a37923f2ec1a8ec35ec3954df33da8e59160369941e6f4c6f8301b431096445"
+    },
+    {
+      "sourcePath": "Character/Skills/MARKSMANSHIP.md",
+      "path": "development/trigger-discipline/source/Character/Skills/MARKSMANSHIP.md",
+      "gitBlob": "f87648678856f81099bc53b5ddec6052abe6a6ca",
+      "mode": "100644",
+      "bytes": 238,
+      "sha256": "ac88cdf8c74ecd27f33a48bddd0da236eccb1660d114d1ac8551bf9fd2cde186"
+    },
+    {
+      "sourcePath": "Character/Skills/MEDICINE.md",
+      "path": "development/trigger-discipline/source/Character/Skills/MEDICINE.md",
+      "gitBlob": "81c3b33896b9da4d1b48c34928926b7d191a3666",
+      "mode": "100644",
+      "bytes": 1662,
+      "sha256": "649a0d718b09869f6cded2f1a91cfd67136602ff104c43944ef4901a198843e8"
+    },
+    {
+      "sourcePath": "Character/Skills/NETWORKING.md",
+      "path": "development/trigger-discipline/source/Character/Skills/NETWORKING.md",
+      "gitBlob": "1447218d75ebdca572b484c03f5563e7b3da26c0",
+      "mode": "100644",
+      "bytes": 273,
+      "sha256": "6a317c0d683c0b52930eca22113eb5a28de9480537a1b7e08842601c307ff8de"
+    },
+    {
+      "sourcePath": "Character/Skills/RECON.md",
+      "path": "development/trigger-discipline/source/Character/Skills/RECON.md",
+      "gitBlob": "5d79276c16774f1a8c618e003030856edfad5fce",
+      "mode": "100644",
+      "bytes": 314,
+      "sha256": "e6fccbb5ce4db21a30a61696106423afafc15d09fad8ae41f094db6ea5ea9abc"
+    },
+    {
+      "sourcePath": "Character/Skills/SOCIAL READ.md",
+      "path": "development/trigger-discipline/source/Character/Skills/SOCIAL READ.md",
+      "gitBlob": "be07ac59176f1ccc9f812da2156675431d5f7744",
+      "mode": "100644",
+      "bytes": 256,
+      "sha256": "737aa5d6c203f7acb2fdbbf7be87397faa44feeead8e1a6213aa8c01032bbbf9"
+    },
+    {
+      "sourcePath": "Character/Skills/STEALTH.md",
+      "path": "development/trigger-discipline/source/Character/Skills/STEALTH.md",
+      "gitBlob": "2f6d5e5c9e0749e0a22d8c794d850230d049c0a7",
+      "mode": "100644",
+      "bytes": 2038,
+      "sha256": "85250da112625b9f40ef7b0a4218ee2428ef331fe3a79ac19fc619a3dd06fc12"
+    },
+    {
+      "sourcePath": "Character/Skills/TACTICS.md",
+      "path": "development/trigger-discipline/source/Character/Skills/TACTICS.md",
+      "gitBlob": "281ddb7a610c767f764398a2668f1c23150aa95b",
+      "mode": "100644",
+      "bytes": 362,
+      "sha256": "655cecb055604ec17cfe3bd4bc4fb463380c6369bda6900c1683e0a8ccc30711"
+    },
+    {
+      "sourcePath": "Character/Skills/VEHICLES.md",
+      "path": "development/trigger-discipline/source/Character/Skills/VEHICLES.md",
+      "gitBlob": "f1e08461889ce5377db53bde652b3d13a83239c6",
+      "mode": "100644",
+      "bytes": 400,
+      "sha256": "8c84f3e2a9f474b8a5d13dff114a4a6eae166295673f99d2ccd27e8e76bfb359"
+    },
+    {
+      "sourcePath": "Character/TARGET KNOWLEDGE.md",
+      "path": "development/trigger-discipline/source/Character/TARGET KNOWLEDGE.md",
+      "gitBlob": "756e484d084dbfc45efc4e1ffe41a5984a71e8b4",
+      "mode": "100644",
+      "bytes": 5019,
+      "sha256": "0c8fdbbed30c335d3c20df844dce42c14ce25078abc39e44cdc700abd17dd887"
+    },
+    {
+      "sourcePath": "Classes/BREACHER.md",
+      "path": "development/trigger-discipline/source/Classes/BREACHER.md",
+      "gitBlob": "2f1ec3459aadbaa494fb307e95a85f8ef0eb27db",
+      "mode": "100644",
+      "bytes": 1864,
+      "sha256": "bad2cab1621536abb8edcb8ce6899eed8e66d69855d4b0a05ff6125dd19ccc02"
+    },
+    {
+      "sourcePath": "Classes/BULWARK.md",
+      "path": "development/trigger-discipline/source/Classes/BULWARK.md",
+      "gitBlob": "ed1fbc2434e456b3dfaeccdd26cfbaa8702b55ff",
+      "mode": "100644",
+      "bytes": 1503,
+      "sha256": "6a89a9ea69a4ea616c52aca2191a3b511b8ff6b4859163fd98731399a36519bc"
+    },
+    {
+      "sourcePath": "Classes/CORPSMAN.md",
+      "path": "development/trigger-discipline/source/Classes/CORPSMAN.md",
+      "gitBlob": "da21c5402f585f24238919d10829a16021b026e1",
+      "mode": "100644",
+      "bytes": 2434,
+      "sha256": "b0117f5c53b5a57783beec418b6c5ff6e7c8fdeb8a9e93e0300f890312d99d21"
+    },
+    {
+      "sourcePath": "Classes/GHOST.md",
+      "path": "development/trigger-discipline/source/Classes/GHOST.md",
+      "gitBlob": "fcb95d03947e913a16d7c47d5995a504003cfdb4",
+      "mode": "100644",
+      "bytes": 1724,
+      "sha256": "a0dba74117076a9779071cfc6b7e6d3bf39284d07eb7bbfd26bbeb9459d4f2ba"
+    },
+    {
+      "sourcePath": "Classes/HACKER.md",
+      "path": "development/trigger-discipline/source/Classes/HACKER.md",
+      "gitBlob": "b8d75fc6c948616677e2ee23411c625f1eb684e1",
+      "mode": "100644",
+      "bytes": 2885,
+      "sha256": "78ab1f17dab9da93f6410f0b7f842a20c04b5baed26621e0f4b3b3a4ddd08413"
+    },
+    {
+      "sourcePath": "Classes/INFLUENCER.md",
+      "path": "development/trigger-discipline/source/Classes/INFLUENCER.md",
+      "gitBlob": "4ac812675f13d7427b3e508d9b601e3dc784fd76",
+      "mode": "100644",
+      "bytes": 2441,
+      "sha256": "13289939579a402e26cdf1f6b3a89dfe43aa4037d64cb3e263c733a58bb02134"
+    },
+    {
+      "sourcePath": "Classes/RIFLEMAN.md",
+      "path": "development/trigger-discipline/source/Classes/RIFLEMAN.md",
+      "gitBlob": "cf06cdb6c224795f5ba3b3e6bac88092253f89d7",
+      "mode": "100644",
+      "bytes": 2132,
+      "sha256": "c638b950694ea1ab8d5ae69fe70c1f2546aa663408bb5c03b90b3554b0892c63"
+    },
+    {
+      "sourcePath": "Classes/SHARPSHOOTER.md",
+      "path": "development/trigger-discipline/source/Classes/SHARPSHOOTER.md",
+      "gitBlob": "fda3d0361519778c1ef24b07cecea83c485c703b",
+      "mode": "100644",
+      "bytes": 1372,
+      "sha256": "cd91c1630fd3c9dd05b4e18f392b14d11366967775c739b33c23cc2baadebb56"
+    },
+    {
+      "sourcePath": "Classes/TECH.md",
+      "path": "development/trigger-discipline/source/Classes/TECH.md",
+      "gitBlob": "f7138331e9e111f881a594b7b1e75f1e7a505f56",
+      "mode": "100644",
+      "bytes": 1816,
+      "sha256": "9b5a170cb0f9ed3ae1ae6dfa8ec0209995bbc3ac0bbcd0bc46c4081e4d625341"
+    },
+    {
+      "sourcePath": "Combat/AMBUSH.md",
+      "path": "development/trigger-discipline/source/Combat/AMBUSH.md",
+      "gitBlob": "65efb2878e8a5d85a7d0b92a52c93d187110aebe",
+      "mode": "100644",
+      "bytes": 1282,
+      "sha256": "d5a24e0b9d5286b9e6461d648bab207229eec1e4b5ecd6c78d5b358d005b485c"
+    },
+    {
+      "sourcePath": "Combat/AP.md",
+      "path": "development/trigger-discipline/source/Combat/AP.md",
+      "gitBlob": "b9b85f07171550f21c2e91d4d4734f0862297658",
+      "mode": "100644",
+      "bytes": 607,
+      "sha256": "9c335aea6b30abaca82d41e0ff6ffad02a23b8930f92134a275235038978809a"
+    },
+    {
+      "sourcePath": "Combat/ATTACK ROLL.md",
+      "path": "development/trigger-discipline/source/Combat/ATTACK ROLL.md",
+      "gitBlob": "f7a843991a3950643cb2b91cd1d8ea04f02dc714",
+      "mode": "100644",
+      "bytes": 1721,
+      "sha256": "f3c21b8f6a20b8101c539d95bc427666e28f554f4d33828b6da94639d6253f4c"
+    },
+    {
+      "sourcePath": "Combat/BREACHING.md",
+      "path": "development/trigger-discipline/source/Combat/BREACHING.md",
+      "gitBlob": "40e69ab57d47b552407cd59e89e98b47fde2bc09",
+      "mode": "100644",
+      "bytes": 2087,
+      "sha256": "bdfdc654bc1c0265c1693b8c4563b2560caee6f222c2e6702f236ec36e387b52"
+    },
+    {
+      "sourcePath": "Combat/CALLED SHOT.md",
+      "path": "development/trigger-discipline/source/Combat/CALLED SHOT.md",
+      "gitBlob": "a3764aad6b4ddea9ee89d9e2ebeae82b776b037b",
+      "mode": "100644",
+      "bytes": 585,
+      "sha256": "1a3fee03729ae0f849bbcfc1adef745a04702e40902d9720a6924cf27a8d1bda"
+    },
+    {
+      "sourcePath": "Combat/CASUALTY MOVEMENT.md",
+      "path": "development/trigger-discipline/source/Combat/CASUALTY MOVEMENT.md",
+      "gitBlob": "ccefc25cb5251e1cf609930b4a9f8e5a1e3247be",
+      "mode": "100644",
+      "bytes": 2360,
+      "sha256": "5634633b3fa666e9f27c5421ac5fedfc3c28b05c732bacfbe6092bd4616fa158"
+    },
+    {
+      "sourcePath": "Combat/CLASS MOBILITY.md",
+      "path": "development/trigger-discipline/source/Combat/CLASS MOBILITY.md",
+      "gitBlob": "0c88cdff5a56d20dc02bb6afdc3c6e66097bf8c2",
+      "mode": "100644",
+      "bytes": 728,
+      "sha256": "e25e34ff7a9fb8eaf3f5a03b6a97a69991d831a0a99e285af10e5a284e140e11"
+    },
+    {
+      "sourcePath": "Combat/COVER.md",
+      "path": "development/trigger-discipline/source/Combat/COVER.md",
+      "gitBlob": "07b73d602a70d8d792f10286a36365772e31f928",
+      "mode": "100644",
+      "bytes": 3353,
+      "sha256": "bca57a0187a74bc36ac8f25dbd27a2e3bf441bfbcb9cca596063cf456a228f99"
+    },
+    {
+      "sourcePath": "Combat/CRITICAL HIT.md",
+      "path": "development/trigger-discipline/source/Combat/CRITICAL HIT.md",
+      "gitBlob": "5dec3cef96ceab39be47ec70095c4ae9a7a90740",
+      "mode": "100644",
+      "bytes": 2512,
+      "sha256": "6732c80911c62b2dfb4d2938524ac918f4da5e9981b600979bd478250c3092c0"
+    },
+    {
+      "sourcePath": "Combat/CROUCHED.md",
+      "path": "development/trigger-discipline/source/Combat/CROUCHED.md",
+      "gitBlob": "5b7d13026eac695cd843af96b812303c5eadb97d",
+      "mode": "100644",
+      "bytes": 308,
+      "sha256": "96466e9d097af357f3359bf787524107b2034546adce49baf5781a36b9c46df5"
+    },
+    {
+      "sourcePath": "Combat/DEATH'S DOOR.md",
+      "path": "development/trigger-discipline/source/Combat/DEATH'S DOOR.md",
+      "gitBlob": "09e444c70b06827ef15dfb7504ebaceb4b2e5b56",
+      "mode": "100644",
+      "bytes": 1459,
+      "sha256": "cac3c702dacb4ff5de6d1ebb3774e13bfe7a8a588c4d69a028399cf4a353a9ca"
+    },
+    {
+      "sourcePath": "Combat/DESTRUCTIBLE COVER.md",
+      "path": "development/trigger-discipline/source/Combat/DESTRUCTIBLE COVER.md",
+      "gitBlob": "d9c80f21064b8fdecc1fd2ab1128f647df145395",
+      "mode": "100644",
+      "bytes": 2370,
+      "sha256": "c9faa1c48cac7d863d8ed03046ce2f2f94efe16bc343b7ed18205559b9fa52ee"
+    },
+    {
+      "sourcePath": "Combat/DOWNED.md",
+      "path": "development/trigger-discipline/source/Combat/DOWNED.md",
+      "gitBlob": "139adc4878240941b665dbf4d49f764a1f081b97",
+      "mode": "100644",
+      "bytes": 2295,
+      "sha256": "ffd499ebd11069892465d2dbcb95e9e7ef7884296ed0c5718e41aaff8ae97710"
+    },
+    {
+      "sourcePath": "Combat/FRIENDLY FIRE.md",
+      "path": "development/trigger-discipline/source/Combat/FRIENDLY FIRE.md",
+      "gitBlob": "772a00430be25f96dbad6a9b6033c2b73566430a",
+      "mode": "100644",
+      "bytes": 529,
+      "sha256": "292be5e27d56dae297ca375de878cf574740fb1e464fbce9a4b51526513a6f6f"
+    },
+    {
+      "sourcePath": "Combat/GRID.md",
+      "path": "development/trigger-discipline/source/Combat/GRID.md",
+      "gitBlob": "ba802a8760e6a1a715c05354e73c7d67e731032e",
+      "mode": "100644",
+      "bytes": 1649,
+      "sha256": "63410306adb09ca8ae3f49b8df3df18535a284a61cbaef5726ef492118b370c0"
+    },
+    {
+      "sourcePath": "Combat/HIT QUALITY.md",
+      "path": "development/trigger-discipline/source/Combat/HIT QUALITY.md",
+      "gitBlob": "1c0eaf4af3e829d0c5b93a33d3835adc02f2937e",
+      "mode": "100644",
+      "bytes": 3616,
+      "sha256": "62b2299cfd954199ede9146ed1a96ae493eaa36e65da14a63ddb756577ddbb83"
+    },
+    {
+      "sourcePath": "Combat/HP.md",
+      "path": "development/trigger-discipline/source/Combat/HP.md",
+      "gitBlob": "5cc26d5d53d4a28fdbc11db25b6b384c1c1523ac",
+      "mode": "100644",
+      "bytes": 719,
+      "sha256": "78c94cb8163c8d895d630578c3566e1b0bc8d54c4347dbdf457e372a40d1ffd2"
+    },
+    {
+      "sourcePath": "Combat/INJURY.md",
+      "path": "development/trigger-discipline/source/Combat/INJURY.md",
+      "gitBlob": "d927517e691c121098f4db35aaabee66ba3e1626",
+      "mode": "100644",
+      "bytes": 1110,
+      "sha256": "74ffe071a9d21ff3a65af16689906e1b12bfa310f46070c928506fd3d185e867"
+    },
+    {
+      "sourcePath": "Combat/LIFE-THREATENING CONDITION.md",
+      "path": "development/trigger-discipline/source/Combat/LIFE-THREATENING CONDITION.md",
+      "gitBlob": "5d5c6054b0d9d0fed2f3e929f0ca72acc531352a",
+      "mode": "100644",
+      "bytes": 1798,
+      "sha256": "d4c544b7b8ba1e6773be727cf5dc891ed9092aa932d4730c6891987a1d0245bc"
+    },
+    {
+      "sourcePath": "Combat/LINE OF SIGHT.md",
+      "path": "development/trigger-discipline/source/Combat/LINE OF SIGHT.md",
+      "gitBlob": "b560b80781a95145e8a670b25032a73a319dd43f",
+      "mode": "100644",
+      "bytes": 685,
+      "sha256": "38a5419825bcc00743d91fc3650279dbe4bbeff369d874a9a4806653a13856be"
+    },
+    {
+      "sourcePath": "Combat/MOVEMENT.md",
+      "path": "development/trigger-discipline/source/Combat/MOVEMENT.md",
+      "gitBlob": "ec748a393f545e6a00dfa502a75555d8e093b495",
+      "mode": "100644",
+      "bytes": 1554,
+      "sha256": "262da8904da137c5dd0d4f047907d9cc97e8003d4b620fe67edc9748ce99ae58"
+    },
+    {
+      "sourcePath": "Combat/OVERWATCH.md",
+      "path": "development/trigger-discipline/source/Combat/OVERWATCH.md",
+      "gitBlob": "004ebdb85717939f58815608c02199f446e87c59",
+      "mode": "100644",
+      "bytes": 1519,
+      "sha256": "d008e7bd35298cf60ad6dfde7988efa24e885a06fe591c8da5b1e45361b884e4"
+    },
+    {
+      "sourcePath": "Combat/OW ZONE.md",
+      "path": "development/trigger-discipline/source/Combat/OW ZONE.md",
+      "gitBlob": "08f961962cf394485609996bd150eb5d7a90e6d0",
+      "mode": "100644",
+      "bytes": 286,
+      "sha256": "fe35ca34ec8d8a3517e4e460fe4aa9691126b56c2da52b25bdd8a81708ec0f3c"
+    },
+    {
+      "sourcePath": "Combat/PENETRATION.md",
+      "path": "development/trigger-discipline/source/Combat/PENETRATION.md",
+      "gitBlob": "45247fd81e286b26616769f41adb368f22e809a3",
+      "mode": "100644",
+      "bytes": 1622,
+      "sha256": "3e92603a05afda087c5822a0418a20c73fbbd1423f9e8813d527cdafccd77fe9"
+    },
+    {
+      "sourcePath": "Combat/PREP ACTION.md",
+      "path": "development/trigger-discipline/source/Combat/PREP ACTION.md",
+      "gitBlob": "2790bd13af8b2433e0fb987a001719e56b7f4b29",
+      "mode": "100644",
+      "bytes": 1144,
+      "sha256": "892ebc337b5b326f2f8e8ede5c9b6a12b64408c5affdc9794986767e0c0309f1"
+    },
+    {
+      "sourcePath": "Combat/PRONE.md",
+      "path": "development/trigger-discipline/source/Combat/PRONE.md",
+      "gitBlob": "1d7f90c0101df812fbeb589b64c0a1cdc8d7436c",
+      "mode": "100644",
+      "bytes": 547,
+      "sha256": "e7ea537dd103a66822d7f1c1303d19500425cb3c82ed969087b49682eefccb05"
+    },
+    {
+      "sourcePath": "Combat/RES.md",
+      "path": "development/trigger-discipline/source/Combat/RES.md",
+      "gitBlob": "00ca9822f0dee1a7a5108aaa2bf7f68922d68563",
+      "mode": "100644",
+      "bytes": 803,
+      "sha256": "c234b388390332526041e5bd16bd5fdf92d5a1375d3bd54f2dfc0cf929de18f4"
+    },
+    {
+      "sourcePath": "Combat/RESUSCITATION.md",
+      "path": "development/trigger-discipline/source/Combat/RESUSCITATION.md",
+      "gitBlob": "7ccc48f6e8de9bcd095803b668002e3f6e801c6a",
+      "mode": "100644",
+      "bytes": 1817,
+      "sha256": "3828439f3b89362b0c7dffea5dc4f7b18e83bcd5a25d18276f3455f7f77f170d"
+    },
+    {
+      "sourcePath": "Combat/STABILIZE.md",
+      "path": "development/trigger-discipline/source/Combat/STABILIZE.md",
+      "gitBlob": "84822c566c45054c9e2cd25640e7c82f983c9268",
+      "mode": "100644",
+      "bytes": 1447,
+      "sha256": "daa8eced4e0788297c42069559b94f97537f36b429df7aa6cd54e91966e7966a"
+    },
+    {
+      "sourcePath": "Combat/STANCE.md",
+      "path": "development/trigger-discipline/source/Combat/STANCE.md",
+      "gitBlob": "4c65359ee836e0d1c9f02fdaecbda06883152639",
+      "mode": "100644",
+      "bytes": 1205,
+      "sha256": "5ccc2b8b284ac78b9ca389210202103bc15f20089f4c680356fe0d28e635c621"
+    },
+    {
+      "sourcePath": "Combat/STANDING.md",
+      "path": "development/trigger-discipline/source/Combat/STANDING.md",
+      "gitBlob": "12dac99dda06b9c6a32201e676ab0f615283f9f1",
+      "mode": "100644",
+      "bytes": 306,
+      "sha256": "860305843337b83f62c73b8b3aeb24c4c657ecab2bf3bc4bb763f162a00b6c9a"
+    },
+    {
+      "sourcePath": "Combat/SUPPRESSION.md",
+      "path": "development/trigger-discipline/source/Combat/SUPPRESSION.md",
+      "gitBlob": "00ecac9e37cfa44149adc595bb6d0d4922858daf",
+      "mode": "100644",
+      "bytes": 7383,
+      "sha256": "78966207e897651869ba626367c99d2b5dd6290262bae2bf8752b4d84d1c7859"
+    },
+    {
+      "sourcePath": "Combat/TEAM INITIATIVE.md",
+      "path": "development/trigger-discipline/source/Combat/TEAM INITIATIVE.md",
+      "gitBlob": "ac034253d0bb0e0298fb32756ec0e02054295600",
+      "mode": "100644",
+      "bytes": 898,
+      "sha256": "83f77431fee20496667e20b87923ff86b47e0633bf66019fcd34f61d4d855b2a"
+    },
+    {
+      "sourcePath": "Combat/TEAM TURN.md",
+      "path": "development/trigger-discipline/source/Combat/TEAM TURN.md",
+      "gitBlob": "d8e9da4cae6ba0d05991671d3cf7a9ae6041ea0d",
+      "mode": "100644",
+      "bytes": 1020,
+      "sha256": "d0cd9b305e9ebc909d0e99072d6e2eb9efda83c0ebbbea1a6a1850ee3ea07c6f"
+    },
+    {
+      "sourcePath": "Combat/TRIGGER ORDERING.md",
+      "path": "development/trigger-discipline/source/Combat/TRIGGER ORDERING.md",
+      "gitBlob": "1080fa5c4e65e65a9cf0fa25fc8a02b99f7167bf",
+      "mode": "100644",
+      "bytes": 3686,
+      "sha256": "635261149045b3af8ff04bc805284049bfc848ef2706056675070f0bec56702e"
+    },
+    {
+      "sourcePath": "Drones/AUTONOMOUS DRONE.md",
+      "path": "development/trigger-discipline/source/Drones/AUTONOMOUS DRONE.md",
+      "gitBlob": "a0840704a29be3a092dac9a04411533e7a0fe287",
+      "mode": "100644",
+      "bytes": 389,
+      "sha256": "eae143c50a6400bdd7f9059cc0cdadebd348cf7aff5b3897da3c625fe165be1b"
+    },
+    {
+      "sourcePath": "Drones/DRONE OVERWATCH.md",
+      "path": "development/trigger-discipline/source/Drones/DRONE OVERWATCH.md",
+      "gitBlob": "67a5ee356549f6d4133e7dea8fa84e0966f18502",
+      "mode": "100644",
+      "bytes": 619,
+      "sha256": "a41fd83aa91c2f2e79174fb21522d0748ea203204280eae04bf2c435c4af5547"
+    },
+    {
+      "sourcePath": "Drones/DRONE.md",
+      "path": "development/trigger-discipline/source/Drones/DRONE.md",
+      "gitBlob": "872711ef04314c34d6cd6fe267fad0c110fcf63d",
+      "mode": "100644",
+      "bytes": 674,
+      "sha256": "8d8c3f4656746f8479c0925987f2fa5500706cf543de2d5afd771087cbf096e2"
+    },
+    {
+      "sourcePath": "Drones/FPV DRONE.md",
+      "path": "development/trigger-discipline/source/Drones/FPV DRONE.md",
+      "gitBlob": "e3f51b89256b0134fdbf7a131800d87e5238da06",
+      "mode": "100644",
+      "bytes": 343,
+      "sha256": "b0bfe5316bcd003351f670df0e0592070fa6ef9d4a32c90eb5ed0c684f1a70e3"
+    },
+    {
+      "sourcePath": "Drones/LOSS OF SIGNAL.md",
+      "path": "development/trigger-discipline/source/Drones/LOSS OF SIGNAL.md",
+      "gitBlob": "3c17ed6a541b1bd0c6a182141ef4bcf961eb0a11",
+      "mode": "100644",
+      "bytes": 363,
+      "sha256": "f0ec5d268918365af57aae2d65a4b47711cedf0c73cab296c7c3596f2f4d8ea8"
+    },
+    {
+      "sourcePath": "Drones/MANUAL CONTROL.md",
+      "path": "development/trigger-discipline/source/Drones/MANUAL CONTROL.md",
+      "gitBlob": "2f9c80deddd7edb1f9ad15e5329c4fb6dbee948b",
+      "mode": "100644",
+      "bytes": 511,
+      "sha256": "7c9636ea03389fc2b3b9a03b64ed5df66c3cd56cf10e0d8bddb64cb6189ac22f"
+    },
+    {
+      "sourcePath": "Drones/SIGNAL.md",
+      "path": "development/trigger-discipline/source/Drones/SIGNAL.md",
+      "gitBlob": "fe8c8831bb37afd35f5fcc24d1b49e31de36c5ca",
+      "mode": "100644",
+      "bytes": 362,
+      "sha256": "755e4202b8299f50b2a1fe5120e0dd5bf0ffa708e54cd226ec579e71e591c93b"
+    },
+    {
+      "sourcePath": "Drones/STANDING ORDER.md",
+      "path": "development/trigger-discipline/source/Drones/STANDING ORDER.md",
+      "gitBlob": "75935af7bbd2fcc30626f73e01f031716db0133a",
+      "mode": "100644",
+      "bytes": 516,
+      "sha256": "9554a2907eab4e22cba208b3b2add7a3ed1b19d78145be331195e0a71113b83f"
+    },
+    {
+      "sourcePath": "Environment/ELECTRICITY.md",
+      "path": "development/trigger-discipline/source/Environment/ELECTRICITY.md",
+      "gitBlob": "f1693f923a9ff2f0ef950ec02e836dab7f14b363",
+      "mode": "100644",
+      "bytes": 309,
+      "sha256": "354a20ec7148334ef3e69b498744ce15d0fc29d58853bb4a7db0fe43ae221832"
+    },
+    {
+      "sourcePath": "Environment/FIRE.md",
+      "path": "development/trigger-discipline/source/Environment/FIRE.md",
+      "gitBlob": "bd080e4fca321cdb4ebf5cc10cee614cfe47d9bc",
+      "mode": "100644",
+      "bytes": 302,
+      "sha256": "42c22f7eab98ca52560e1455513713056092b04abf7ae387821962d08000ba55"
+    },
+    {
+      "sourcePath": "Environment/SMOKE.md",
+      "path": "development/trigger-discipline/source/Environment/SMOKE.md",
+      "gitBlob": "98601bb5e89c8745e604529d2865d74822ab6dbe",
+      "mode": "100644",
+      "bytes": 304,
+      "sha256": "f863655673b96e03e4961aacab34f25ff7c2a9a38789e4337210a7401db444bb"
+    },
+    {
+      "sourcePath": "Environment/TOXIC GAS.md",
+      "path": "development/trigger-discipline/source/Environment/TOXIC GAS.md",
+      "gitBlob": "8f9b9c211529228dbaa3e1218bd38d4770f99a6d",
+      "mode": "100644",
+      "bytes": 321,
+      "sha256": "fdab3a8612c57943dd9b12b3bbe38f7294ea0829ca9d755fe510aad19a4d8e37"
+    },
+    {
+      "sourcePath": "Environment/WATER.md",
+      "path": "development/trigger-discipline/source/Environment/WATER.md",
+      "gitBlob": "a91d4dbf4f6654b91bcb97c9162ff0dd0e3addb9",
+      "mode": "100644",
+      "bytes": 312,
+      "sha256": "bc236b3334a9cc8c684757059fa7b377d84216d3f2d44813ba918f4c8075a4fb"
+    },
+    {
+      "sourcePath": "Equipment/BALLISTIC SHIELD.md",
+      "path": "development/trigger-discipline/source/Equipment/BALLISTIC SHIELD.md",
+      "gitBlob": "a37a3eabc05bd6319f01b89317f4d053df6b4233",
+      "mode": "100644",
+      "bytes": 816,
+      "sha256": "6066a180c0c3671b4a14fe3210cc9223692d7b89d22f57189986781c9e6cdb7a"
+    },
+    {
+      "sourcePath": "Equipment/BARRIER.md",
+      "path": "development/trigger-discipline/source/Equipment/BARRIER.md",
+      "gitBlob": "74f3853a892989180b68aed08a96c42629022e77",
+      "mode": "100644",
+      "bytes": 607,
+      "sha256": "474655d4743b8fa096b7bc0929dbbe058670c57c00e77c8ec61be8a01beda755"
+    },
+    {
+      "sourcePath": "Equipment/BODY ARMOR.md",
+      "path": "development/trigger-discipline/source/Equipment/BODY ARMOR.md",
+      "gitBlob": "fff0321ad4c4f7df9dd5952373a6c261ffb0a929",
+      "mode": "100644",
+      "bytes": 291,
+      "sha256": "532359701a8b38f4b3a022b20ab4adc2ee242c6d11f325fa315fc9d54b78f0fd"
+    },
+    {
+      "sourcePath": "Equipment/INVENTORY.md",
+      "path": "development/trigger-discipline/source/Equipment/INVENTORY.md",
+      "gitBlob": "02dfd29f5d636c4468ddaedba389b6292613caad",
+      "mode": "100644",
+      "bytes": 684,
+      "sha256": "e6814b1243c773eda00811b78b3d3b660ff7774db6d02d585a77c522ac73f059"
+    },
+    {
+      "sourcePath": "Equipment/QUICK ACCESS.md",
+      "path": "development/trigger-discipline/source/Equipment/QUICK ACCESS.md",
+      "gitBlob": "908914fe799a88a47da566384a9fa38dd236da18",
+      "mode": "100644",
+      "bytes": 318,
+      "sha256": "28b52096db208f35c375241f360c90bbecb873115142c35e5c4c106c802c98e7"
+    },
+    {
+      "sourcePath": "Equipment/READY.md",
+      "path": "development/trigger-discipline/source/Equipment/READY.md",
+      "gitBlob": "661813b0139007ab374fdd318e607ca341299ecf",
+      "mode": "100644",
+      "bytes": 282,
+      "sha256": "2da6d9ec034339ffa42f65a5744738e1769f75ad855f698d30eb9f7c51b1bdd4"
+    },
+    {
+      "sourcePath": "Equipment/STOWED.md",
+      "path": "development/trigger-discipline/source/Equipment/STOWED.md",
+      "gitBlob": "cb4129e912e95d1fd4e8b67d0398aecb4fe59e6c",
+      "mode": "100644",
+      "bytes": 295,
+      "sha256": "0b6a0ab00109c0296c18c8916ea00e5b9cc7f7001612390db4625ff78b3d56c6"
+    },
+    {
+      "sourcePath": "Explosives/BLAST GEOMETRY.md",
+      "path": "development/trigger-discipline/source/Explosives/BLAST GEOMETRY.md",
+      "gitBlob": "fa12c559c741087fe5620afe2298f890a62cc1cb",
+      "mode": "100644",
+      "bytes": 3019,
+      "sha256": "28e52941d252e31f6d874e02604744fbf329fc85aea87391786e1a4c56d8d98a"
+    },
+    {
+      "sourcePath": "Explosives/EXPLOSIVE SAVE.md",
+      "path": "development/trigger-discipline/source/Explosives/EXPLOSIVE SAVE.md",
+      "gitBlob": "ca60548948790b2cc4e7a6ecab6e9dbc28141176",
+      "mode": "100644",
+      "bytes": 2143,
+      "sha256": "8d25cd68ad72c11418497f3ca78061ed1cb886a536453d09cc6cfd22ad6dcab4"
+    },
+    {
+      "sourcePath": "Explosives/FUSE TIMING.md",
+      "path": "development/trigger-discipline/source/Explosives/FUSE TIMING.md",
+      "gitBlob": "4cd5916f5a69c8823acb81f6a6da3178b0a07596",
+      "mode": "100644",
+      "bytes": 1534,
+      "sha256": "ffa2b990744866f7c1df3d8c58c1a294e420f2e18df5b1a35c3fe6f1e9f59b1b"
+    },
+    {
+      "sourcePath": "Explosives/GRENADE PLACEMENT.md",
+      "path": "development/trigger-discipline/source/Explosives/GRENADE PLACEMENT.md",
+      "gitBlob": "17be15a2c63e2284c64aff58bae7c670a5add5a2",
+      "mode": "100644",
+      "bytes": 1661,
+      "sha256": "21b3dbe6cff5d3596a144cfb7ef57e57ebe3df5a2ee3fafd8ebe5a575679f1b6"
+    },
+    {
+      "sourcePath": "Explosives/GRENADE.md",
+      "path": "development/trigger-discipline/source/Explosives/GRENADE.md",
+      "gitBlob": "7109d2f73ea52340b09bf39ea989a153bcc964b1",
+      "mode": "100644",
+      "bytes": 2458,
+      "sha256": "54a904c98d62d135c67b4afc30990487747227a4b5e200cd8dc8a30e19c9538c"
+    },
+    {
+      "sourcePath": "Firearms/AIM.md",
+      "path": "development/trigger-discipline/source/Firearms/AIM.md",
+      "gitBlob": "94661f191d12495168600c0515ee67e4ade029ee",
+      "mode": "100644",
+      "bytes": 655,
+      "sha256": "90e743009db5e29386f4d0396dc201f4eea8da57e50f090ced831d23e7c027d7"
+    },
+    {
+      "sourcePath": "Firearms/AMMUNITION.md",
+      "path": "development/trigger-discipline/source/Firearms/AMMUNITION.md",
+      "gitBlob": "365649530df6da3c00ffdf2820f6c40d13563dcf",
+      "mode": "100644",
+      "bytes": 948,
+      "sha256": "ccb98e92861593878717b2cabdfb3bf4df676b26bcd80f4d832e9355895b7638"
+    },
+    {
+      "sourcePath": "Firearms/ATTACHMENT.md",
+      "path": "development/trigger-discipline/source/Firearms/ATTACHMENT.md",
+      "gitBlob": "04c91b5f1912e2ac1b0713463e992775faf19dea",
+      "mode": "100644",
+      "bytes": 548,
+      "sha256": "db45b5996e88015308fc3dcd737f9811f62c504d33e85a844b636295857ee559"
+    },
+    {
+      "sourcePath": "Firearms/BURST FIRE.md",
+      "path": "development/trigger-discipline/source/Firearms/BURST FIRE.md",
+      "gitBlob": "946827f3fa11dece2095b5ba3bdb282957cf53fb",
+      "mode": "100644",
+      "bytes": 741,
+      "sha256": "a27dbb1c27d12d28768658fd662791da5ce7b9135548ede429ceac975f70940f"
+    },
+    {
+      "sourcePath": "Firearms/CHAMBER.md",
+      "path": "development/trigger-discipline/source/Firearms/CHAMBER.md",
+      "gitBlob": "033e3276750396554d76f6f1a634273e8e71d6ce",
+      "mode": "100644",
+      "bytes": 351,
+      "sha256": "7d0e1c746c1ccf79fb73c90e38b9d6a9a4efd8c8b12afce97704799cbbd1319a"
+    },
+    {
+      "sourcePath": "Firearms/CYCLING.md",
+      "path": "development/trigger-discipline/source/Firearms/CYCLING.md",
+      "gitBlob": "4d1c29bae89ea586d3e55954c22cd78a6b387eb2",
+      "mode": "100644",
+      "bytes": 531,
+      "sha256": "54304997dd0d1c8b1f3f79c2c28a0be360522029dbe738fb74e9a58902d75bca"
+    },
+    {
+      "sourcePath": "Firearms/FIREARM MANIPULATION.md",
+      "path": "development/trigger-discipline/source/Firearms/FIREARM MANIPULATION.md",
+      "gitBlob": "80df4b624147d686af8a2ac49a09fca878041a47",
+      "mode": "100644",
+      "bytes": 1261,
+      "sha256": "8d9096ec06fb8b86de539573edb2e53b737e2b869efb6e64f66c9fc1bfafe306"
+    },
+    {
+      "sourcePath": "Firearms/FULL AUTO.md",
+      "path": "development/trigger-discipline/source/Firearms/FULL AUTO.md",
+      "gitBlob": "95f350b50802648ddc293f6a12701d2a82f35df8",
+      "mode": "100644",
+      "bytes": 1874,
+      "sha256": "38a911d26ef2e128b20584bd29ddccb588d26eeb3d67ecc11f0d46a91b75516d"
+    },
+    {
+      "sourcePath": "Firearms/MAGAZINE.md",
+      "path": "development/trigger-discipline/source/Firearms/MAGAZINE.md",
+      "gitBlob": "f2ee1f96472ca8597a4d86ad74c2fc24646631f3",
+      "mode": "100644",
+      "bytes": 536,
+      "sha256": "1cc2f6c2e28d5a3be93a6182b00f1c9ba335cd3b043285b10969aa67d4896bdd"
+    },
+    {
+      "sourcePath": "Firearms/MALFUNCTION.md",
+      "path": "development/trigger-discipline/source/Firearms/MALFUNCTION.md",
+      "gitBlob": "afbec2d496f870e568248b399aa19a946bf1e2a0",
+      "mode": "100644",
+      "bytes": 590,
+      "sha256": "b78e2e384be0a7e3483eece4c2c63f6bb4132ed2e33dea95ad74b3d22eb94da4"
+    },
+    {
+      "sourcePath": "Firearms/MATERIAL PENETRATION.md",
+      "path": "development/trigger-discipline/source/Firearms/MATERIAL PENETRATION.md",
+      "gitBlob": "198c3e052ff62eb7a9bca3f4957673bf7d916a8d",
+      "mode": "100644",
+      "bytes": 2023,
+      "sha256": "7c134ff9d2039c30891a0ad181cda8006d78d6985e4995701b397176de79fe8d"
+    },
+    {
+      "sourcePath": "Firearms/PROJECTILE.md",
+      "path": "development/trigger-discipline/source/Firearms/PROJECTILE.md",
+      "gitBlob": "1f5cc988482d5cfbcc1394cdc0335b7588384a43",
+      "mode": "100644",
+      "bytes": 2077,
+      "sha256": "d9250a42025372a93921efaaf7fafdccb8495a5bff73888215dd96b453eb1170"
+    },
+    {
+      "sourcePath": "Firearms/RANGE PROFILE.md",
+      "path": "development/trigger-discipline/source/Firearms/RANGE PROFILE.md",
+      "gitBlob": "3114f37f3af3ecfbfa6073bd1b7b008822efdd50",
+      "mode": "100644",
+      "bytes": 623,
+      "sha256": "806d8998860e569f9a9d6f057c127d37b7448e8ce475b8a79c82cf01582c0a69"
+    },
+    {
+      "sourcePath": "Firearms/RECOIL.md",
+      "path": "development/trigger-discipline/source/Firearms/RECOIL.md",
+      "gitBlob": "b13c688bf5e403b21bead377dd327c459204e8a3",
+      "mode": "100644",
+      "bytes": 556,
+      "sha256": "5cb855e59b85e66194de810cde12578f21b221989ae864d4586fdf23bd2f79ed"
+    },
+    {
+      "sourcePath": "Firearms/RELOAD.md",
+      "path": "development/trigger-discipline/source/Firearms/RELOAD.md",
+      "gitBlob": "8f16cfcff5723f5aad0c13c3c8c26aa19364c3eb",
+      "mode": "100644",
+      "bytes": 783,
+      "sha256": "1eb0f0e4ac21fdd00e114684c804023b6ade90406c33373330468554f62e177a"
+    },
+    {
+      "sourcePath": "Firearms/SEMI AUTO.md",
+      "path": "development/trigger-discipline/source/Firearms/SEMI AUTO.md",
+      "gitBlob": "3353ff74092f2fdf1d9bf184deb4c6e7776b8b12",
+      "mode": "100644",
+      "bytes": 342,
+      "sha256": "b9f9e80a3f7e6f318d421899adb39efb24c908fb478362aad792aaebe1bf67f8"
+    },
+    {
+      "sourcePath": "Firearms/SHOTGUN.md",
+      "path": "development/trigger-discipline/source/Firearms/SHOTGUN.md",
+      "gitBlob": "8cc8769a551a5abb1cbc57626c72d46ab3b4e580",
+      "mode": "100644",
+      "bytes": 579,
+      "sha256": "da5be6875ad8df78fd104695319d3b7e752d5c755ecb9e356f7163be115aff48"
+    },
+    {
+      "sourcePath": "Firearms/WEAPON PROFILE.md",
+      "path": "development/trigger-discipline/source/Firearms/WEAPON PROFILE.md",
+      "gitBlob": "14dc857c5fb4255282cd60531fea10793ac2ea23",
+      "mode": "100644",
+      "bytes": 3022,
+      "sha256": "9c5b71ac4ac59def0e739d535a152d7bdf60d2ee5f498220af873f1cfe673921"
+    },
+    {
+      "sourcePath": "Hacking/AUTHENTICATION.md",
+      "path": "development/trigger-discipline/source/Hacking/AUTHENTICATION.md",
+      "gitBlob": "c58be10c142539e73114d8ac1f97605ccb5923d9",
+      "mode": "100644",
+      "bytes": 369,
+      "sha256": "6d15ec43f11d49c29996df802c989421d41dd894a5f6894ae777a60f6f6a52c6"
+    },
+    {
+      "sourcePath": "Hacking/BYPASS.md",
+      "path": "development/trigger-discipline/source/Hacking/BYPASS.md",
+      "gitBlob": "33dcdceb16e58420824a613979abea1adcd9b025",
+      "mode": "100644",
+      "bytes": 375,
+      "sha256": "9eb5f52010493f9894ac6aa637581ad96ae6cced188d5e22b2ac336bd9a8120c"
+    },
+    {
+      "sourcePath": "Hacking/DETECTION.md",
+      "path": "development/trigger-discipline/source/Hacking/DETECTION.md",
+      "gitBlob": "b77c9f822a1f2d8ad31add62b84cae7c8d892a99",
+      "mode": "100644",
+      "bytes": 1384,
+      "sha256": "c1da7d544021209d0e95b24eb9800d0f7480a59dfa36185324fcde68cdbe6e2d"
+    },
+    {
+      "sourcePath": "Hacking/DISCOVER.md",
+      "path": "development/trigger-discipline/source/Hacking/DISCOVER.md",
+      "gitBlob": "f658295564ed68dc91085e36ffcf55eb66635154",
+      "mode": "100644",
+      "bytes": 351,
+      "sha256": "b23cb10629f826b431a243a51cf8aa812d3fb71f8f35831e53ec569128c5d38b"
+    },
+    {
+      "sourcePath": "Hacking/ESCALATE.md",
+      "path": "development/trigger-discipline/source/Hacking/ESCALATE.md",
+      "gitBlob": "6ae86f29b0d3f48a9a35f4002c152e583dfc71b7",
+      "mode": "100644",
+      "bytes": 326,
+      "sha256": "f85278ff1c1134cadf1ec2fafee465bf37b10069d80cbbd03a61f5ed3992dab3"
+    },
+    {
+      "sourcePath": "Hacking/EXFILTRATE.md",
+      "path": "development/trigger-discipline/source/Hacking/EXFILTRATE.md",
+      "gitBlob": "c099f78adfa5ef5d6a994c99dd7087430d882844",
+      "mode": "100644",
+      "bytes": 349,
+      "sha256": "1463593c7e8643cbc4807e59e9ae60c90d4efa76d6be2f3e2b3d46119cbd93bb"
+    },
+    {
+      "sourcePath": "Hacking/EXTRACT.md",
+      "path": "development/trigger-discipline/source/Hacking/EXTRACT.md",
+      "gitBlob": "9337c0753b1a66b08f8fb4fcbb706368c8ac03aa",
+      "mode": "100644",
+      "bytes": 336,
+      "sha256": "4b18b99ead760de725c09c35c8e9215ab061ada8c191d9caf04d37ed74dbf8ac"
+    },
+    {
+      "sourcePath": "Hacking/FOOTHOLD.md",
+      "path": "development/trigger-discipline/source/Hacking/FOOTHOLD.md",
+      "gitBlob": "476218755d94881104da7c4d7bbb54a7a8acb454",
+      "mode": "100644",
+      "bytes": 807,
+      "sha256": "dcd30d4a08e4510d4ea74e795bf3e8d6f1e9819e3a2440a8e51174952fcd6b53"
+    },
+    {
+      "sourcePath": "Hacking/GATEWAY.md",
+      "path": "development/trigger-discipline/source/Hacking/GATEWAY.md",
+      "gitBlob": "69af7e33987cee13987ce9457f44f28d896ba9ce",
+      "mode": "100644",
+      "bytes": 566,
+      "sha256": "6f4d3a0ef4a5a3657d452a479c649a1c4121b3fdfadafbad2d775063f5c05784"
+    },
+    {
+      "sourcePath": "Hacking/HACKING VISIBILITY.md",
+      "path": "development/trigger-discipline/source/Hacking/HACKING VISIBILITY.md",
+      "gitBlob": "6a2d232d189f15a4a9dd7169f77a0a684fe47ac8",
+      "mode": "100644",
+      "bytes": 1426,
+      "sha256": "ead3cbdb3194c0aae391db415dca92747fce82d34572824376338bec34f99142"
+    },
+    {
+      "sourcePath": "Hacking/IMPLANT.md",
+      "path": "development/trigger-discipline/source/Hacking/IMPLANT.md",
+      "gitBlob": "a658876b44a1ce58928e25a0b67f1cdd0adb39c3",
+      "mode": "100644",
+      "bytes": 309,
+      "sha256": "f09da3957bcdabdd2dffd47aba22c1311e13046df950b8fbebfb77293187e368"
+    },
+    {
+      "sourcePath": "Hacking/INTRUSION.md",
+      "path": "development/trigger-discipline/source/Hacking/INTRUSION.md",
+      "gitBlob": "fba11664b2afd3c2278f30eb2ae3081a03b4fa4c",
+      "mode": "100644",
+      "bytes": 3034,
+      "sha256": "b2b58a24590788f258290df0d895ce685ced5c3712c9a167df8f53e2fc77728a"
+    },
+    {
+      "sourcePath": "Hacking/LINK.md",
+      "path": "development/trigger-discipline/source/Hacking/LINK.md",
+      "gitBlob": "e0e1721f9373a851326a2ec75bbd4652e6f8829b",
+      "mode": "100644",
+      "bytes": 368,
+      "sha256": "ad8d9ecaea08d2677ee8cb3e0766b5c830716f4ad8f3fc963d918c06c9d51adc"
+    },
+    {
+      "sourcePath": "Hacking/LOCAL ACCESS.md",
+      "path": "development/trigger-discipline/source/Hacking/LOCAL ACCESS.md",
+      "gitBlob": "90cd502aea4687f31d55ac85e02497979631b053",
+      "mode": "100644",
+      "bytes": 382,
+      "sha256": "a84abb173a96d2d875a46b4146b1912911b94bd8d12265b55577c3c5f6a9ca12"
+    },
+    {
+      "sourcePath": "Hacking/MODIFY.md",
+      "path": "development/trigger-discipline/source/Hacking/MODIFY.md",
+      "gitBlob": "4db189d7714cca25d036843313ee48c740d65878",
+      "mode": "100644",
+      "bytes": 316,
+      "sha256": "47bb742ad790e6f7e3de3e5fcbe6e8dfab24450d8bbec930744fa887c302d09e"
+    },
+    {
+      "sourcePath": "Hacking/MONITORING.md",
+      "path": "development/trigger-discipline/source/Hacking/MONITORING.md",
+      "gitBlob": "adea683caa32886b9e97a53b5e93df94beaeafae",
+      "mode": "100644",
+      "bytes": 903,
+      "sha256": "efba014d18f27d5945b24c6557918511cd06c762da5482bdfc7f56c98aea0a92"
+    },
+    {
+      "sourcePath": "Hacking/NETWORK SEGMENT.md",
+      "path": "development/trigger-discipline/source/Hacking/NETWORK SEGMENT.md",
+      "gitBlob": "825bff5a5923a3792681fe9814f4d945aaeacc8a",
+      "mode": "100644",
+      "bytes": 630,
+      "sha256": "136b8f71e318fe62c3a02ca557ee4def13f22c6ec86ab1af04aae9e17604981c"
+    },
+    {
+      "sourcePath": "Hacking/NETWORK.md",
+      "path": "development/trigger-discipline/source/Hacking/NETWORK.md",
+      "gitBlob": "e1409160bc2ea13c08901198fe8cfae6f55beb67",
+      "mode": "100644",
+      "bytes": 1204,
+      "sha256": "06063f80c7675fdce815e8623fc3e7895a2b0270c329780dd766fd21715da10a"
+    },
+    {
+      "sourcePath": "Hacking/NODE.md",
+      "path": "development/trigger-discipline/source/Hacking/NODE.md",
+      "gitBlob": "f097d90d6296baf1e8465eb779870c6ba8593f00",
+      "mode": "100644",
+      "bytes": 1000,
+      "sha256": "5387db5bfdf8812163906099068042b087b1b3cfd8df436a9d5335beeb6b2f75"
+    },
+    {
+      "sourcePath": "Hacking/OPERATE.md",
+      "path": "development/trigger-discipline/source/Hacking/OPERATE.md",
+      "gitBlob": "8b653ca8073c84d7e20dcd63f22b682021cc91c7",
+      "mode": "100644",
+      "bytes": 303,
+      "sha256": "6d668211e161edaf1e9066e9a162e48279361204d78f928773be004cc9c42bb1"
+    },
+    {
+      "sourcePath": "Hacking/OVERRIDE.md",
+      "path": "development/trigger-discipline/source/Hacking/OVERRIDE.md",
+      "gitBlob": "b77b7f8fa33e6c5e8d0d6fd2539f0f8e1bbecf12",
+      "mode": "100644",
+      "bytes": 360,
+      "sha256": "a371d1a287e8e7623620a97f209b9a5470897d63267382092c17088fa606bb99"
+    },
+    {
+      "sourcePath": "Hacking/PIVOT.md",
+      "path": "development/trigger-discipline/source/Hacking/PIVOT.md",
+      "gitBlob": "a717c0221dbbd9c474af862a53f85d06c954d414",
+      "mode": "100644",
+      "bytes": 319,
+      "sha256": "15a38112ffb79b7ce14890eb668d6d19e968047d9b296bdaf83652f6a3af42f5"
+    },
+    {
+      "sourcePath": "Hacking/PRIVILEGE.md",
+      "path": "development/trigger-discipline/source/Hacking/PRIVILEGE.md",
+      "gitBlob": "e4876666b544d72ec220164b2719c14d9b46dbca",
+      "mode": "100644",
+      "bytes": 538,
+      "sha256": "6e5bbf333fd451da57bcdeb1fb9fe306da62a5af5b35cf622fdc3f34af29037a"
+    },
+    {
+      "sourcePath": "Hacking/REMOTE FUNCTION.md",
+      "path": "development/trigger-discipline/source/Hacking/REMOTE FUNCTION.md",
+      "gitBlob": "8d0950fd63844e3d1a569f80439c7da31752489a",
+      "mode": "100644",
+      "bytes": 554,
+      "sha256": "a809524e7b79164d4a65f75cc3bce6ca7446c5bd293ea17f22f5e552c7695617"
+    },
+    {
+      "sourcePath": "Hubs/APTITUDES.md",
+      "path": "development/trigger-discipline/source/Hubs/APTITUDES.md",
+      "gitBlob": "246ec8e79c228d9386ba3e0ffa55647b17116691",
+      "mode": "100644",
+      "bytes": 238,
+      "sha256": "05f1f57a13f4dbd905207b148895221e3a1c561424474bf34985b43d62b85afd"
+    },
+    {
+      "sourcePath": "Hubs/CQC Combat.md",
+      "path": "development/trigger-discipline/source/Hubs/CQC Combat.md",
+      "gitBlob": "34f3a50a4b71456b5f590d541709bca542374798",
+      "mode": "100644",
+      "bytes": 233,
+      "sha256": "d7f4beffcd581793a1535dda6c68cba610fa0d3c1d293407aaba0a177473f41a"
+    },
+    {
+      "sourcePath": "Hubs/Character.md",
+      "path": "development/trigger-discipline/source/Hubs/Character.md",
+      "gitBlob": "1787059f4d0e9916991a76b16166a38808e0551b",
+      "mode": "100644",
+      "bytes": 261,
+      "sha256": "8322a04b887833482bba0fe9790e2db6baa5dfb9cd5a10312f2ea4ebf66d0c77"
+    },
+    {
+      "sourcePath": "Hubs/Classes.md",
+      "path": "development/trigger-discipline/source/Hubs/Classes.md",
+      "gitBlob": "1ced335e2cc2b26cab1d8312946188bc0a727e69",
+      "mode": "100644",
+      "bytes": 228,
+      "sha256": "eb28970242e830af8546f2569c62b6a08b0a26da0c4ec3d0a563f3007e9221d9"
+    },
+    {
+      "sourcePath": "Hubs/Combat.md",
+      "path": "development/trigger-discipline/source/Hubs/Combat.md",
+      "gitBlob": "6e780d5acd6ad4108afcc4a505fc552ac54dedf4",
+      "mode": "100644",
+      "bytes": 722,
+      "sha256": "ce2cd2c7d2dbafd9e6368539eac6022cd53935622f7bc55006aa389b1f167ee9"
+    },
+    {
+      "sourcePath": "Hubs/Drones.md",
+      "path": "development/trigger-discipline/source/Hubs/Drones.md",
+      "gitBlob": "8f5ba7dc5768a7ec5443a60918bb5d7dc705d5cb",
+      "mode": "100644",
+      "bytes": 282,
+      "sha256": "ce7f218f5fa8a6a04fe2f3e725ace7414c8317644e750c56468ec735f21254e3"
+    },
+    {
+      "sourcePath": "Hubs/Environment.md",
+      "path": "development/trigger-discipline/source/Hubs/Environment.md",
+      "gitBlob": "752c8cb314b8c09a32987eb3ac6e160c0daf9ed9",
+      "mode": "100644",
+      "bytes": 170,
+      "sha256": "a3f8e22343fc5547529bd1a9ebfa9dcf90e2861fb2cf70e5e40b14873e8373a5"
+    },
+    {
+      "sourcePath": "Hubs/Equipment.md",
+      "path": "development/trigger-discipline/source/Hubs/Equipment.md",
+      "gitBlob": "763869b8c8d14a660cc202cf04d6570d94e93cd9",
+      "mode": "100644",
+      "bytes": 247,
+      "sha256": "8a08fa8935cb1fd5e6ad1ea7f59abe8c4a6f1b3bb5927f14329f7c24e8109508"
+    },
+    {
+      "sourcePath": "Hubs/Explosives.md",
+      "path": "development/trigger-discipline/source/Hubs/Explosives.md",
+      "gitBlob": "7cf90406885d66754d69cecb9e7bb11ed482c05d",
+      "mode": "100644",
+      "bytes": 342,
+      "sha256": "5039d310244e40de76e44b713e34a82c9f779ebfd5adc06b28b520dd34bf47eb"
+    },
+    {
+      "sourcePath": "Hubs/Firearms.md",
+      "path": "development/trigger-discipline/source/Hubs/Firearms.md",
+      "gitBlob": "286dcf4347c562653c86f92a025c1e4e683d0ce1",
+      "mode": "100644",
+      "bytes": 452,
+      "sha256": "09ef53e8ff763002a4199ac64e84926bcc919d6bb7061dfa1f698932ea68c56f"
+    },
+    {
+      "sourcePath": "Hubs/Hacking.md",
+      "path": "development/trigger-discipline/source/Hubs/Hacking.md",
+      "gitBlob": "d6d73686c8d46d6e2bf39a4662aca3055c360ee8",
+      "mode": "100644",
+      "bytes": 398,
+      "sha256": "c229a59e492112d61ea724e10818cd5e4bf8e05a0dbe36915da28c6b0cafc1b8"
+    },
+    {
+      "sourcePath": "Hubs/Intel & Investigation.md",
+      "path": "development/trigger-discipline/source/Hubs/Intel & Investigation.md",
+      "gitBlob": "9532af909a2276d80a5fc95b577b71d3a442fe33",
+      "mode": "100644",
+      "bytes": 243,
+      "sha256": "2dd03811754dd1cd8d8c95d5de1321789d179a2dc18280ecf791a18b71e8c736"
+    },
+    {
+      "sourcePath": "Hubs/SKILLS.md",
+      "path": "development/trigger-discipline/source/Hubs/SKILLS.md",
+      "gitBlob": "b09dd705a3e816922fe38934590aa501f9fbc620",
+      "mode": "100644",
+      "bytes": 450,
+      "sha256": "135dc22ebd17f1463fd46ac0ba2062bf0b1f1cd6b7acede9bb5fd035daef7888"
+    },
+    {
+      "sourcePath": "Hubs/Social.md",
+      "path": "development/trigger-discipline/source/Hubs/Social.md",
+      "gitBlob": "d66fd8df0069b18f1ddd5dedb04412358e4adf3d",
+      "mode": "100644",
+      "bytes": 357,
+      "sha256": "603a19d37ef9b098380308e1322a2a9a9682b061d326504fc8d04fd630cc779d"
+    },
+    {
+      "sourcePath": "Hubs/Technology.md",
+      "path": "development/trigger-discipline/source/Hubs/Technology.md",
+      "gitBlob": "d806b4acd86ba2abf1d23a9e4d83b2490f81d52c",
+      "mode": "100644",
+      "bytes": 205,
+      "sha256": "4f5d7a9a5f751d3d91bfd6862f48f2cac45d5c06c69c24eba6f1e0f7a7bacfe6"
+    },
+    {
+      "sourcePath": "Hubs/Trigger Discipline.md",
+      "path": "development/trigger-discipline/source/Hubs/Trigger Discipline.md",
+      "gitBlob": "b40014337cf6c598eceb5debac7c135fc0c1f2ec",
+      "mode": "100644",
+      "bytes": 274,
+      "sha256": "1aa8c561e5413f7a132ad40eb571dede8cc873418a5ae4d7910093a99ed4e20d"
+    },
+    {
+      "sourcePath": "Investigation/EVIDENCE.md",
+      "path": "development/trigger-discipline/source/Investigation/EVIDENCE.md",
+      "gitBlob": "7af869ba6618d7cf76166d8bcd5fe6e86bd55424",
+      "mode": "100644",
+      "bytes": 707,
+      "sha256": "bb496c53a59c8a16509fc8ec57c490bb5ce0811645e2f8a53a4b930b47447c8c"
+    },
+    {
+      "sourcePath": "Investigation/LEAD.md",
+      "path": "development/trigger-discipline/source/Investigation/LEAD.md",
+      "gitBlob": "f3d2206a3ce76b48ce1371dea2c07298e9e8fc79",
+      "mode": "100644",
+      "bytes": 312,
+      "sha256": "e69a6e2dce54ad4fd566ace4cdc46700b9f35c7f3813a474096e0b43d6b8bde0"
+    },
+    {
+      "sourcePath": "Investigation/SUPPORTED.md",
+      "path": "development/trigger-discipline/source/Investigation/SUPPORTED.md",
+      "gitBlob": "3f8a3816f4f9a267c781713deb69a2573daa4769",
+      "mode": "100644",
+      "bytes": 333,
+      "sha256": "168b82abda2c06d72fa7dbe31b078d501d6de37628dd38c17ac53f47440136d9"
+    },
+    {
+      "sourcePath": "Investigation/TEAM KNOWLEDGE.md",
+      "path": "development/trigger-discipline/source/Investigation/TEAM KNOWLEDGE.md",
+      "gitBlob": "d2261ef716500890d5d277363013ea30d8eaa8ed",
+      "mode": "100644",
+      "bytes": 1149,
+      "sha256": "f60b9c3ac7c0f114af0de4c248a14de6e932120660bd8e7687b7a4834e9c695a"
+    },
+    {
+      "sourcePath": "Investigation/VERIFIED.md",
+      "path": "development/trigger-discipline/source/Investigation/VERIFIED.md",
+      "gitBlob": "7445e5acaab7ecc1289e26fc6b6426bbb19fa2de",
+      "mode": "100644",
+      "bytes": 404,
+      "sha256": "e3062892fc7bd0e85a778ff0b73d768aaed51b08d5c3bb8e3dede9ddde1d5bea"
+    },
+    {
+      "sourcePath": "Investigation/WEAK POINT.md",
+      "path": "development/trigger-discipline/source/Investigation/WEAK POINT.md",
+      "gitBlob": "896ba275dee59f188e48c31a89fbb675b350993e",
+      "mode": "100644",
+      "bytes": 637,
+      "sha256": "6a20d18f8d60eea1fea604a5727d260a79a5956bc818bb6f1f692611d35e921c"
+    },
+    {
+      "sourcePath": "Maps/Aptitudes & Skills.canvas",
+      "path": "development/trigger-discipline/source/Maps/Aptitudes & Skills.canvas",
+      "gitBlob": "7106e384dfd3387e7c6719168505f3b32fea239e",
+      "mode": "100644",
+      "bytes": 6030,
+      "sha256": "e5f6b4925254e8b043738e12d01ced2b6f8aed617afc7f94d63d51545c3ffb5a"
+    },
+    {
+      "sourcePath": "Maps/Bulwark.canvas",
+      "path": "development/trigger-discipline/source/Maps/Bulwark.canvas",
+      "gitBlob": "2305c02f69cb8ab19442e7108ec74e22d777c0ee",
+      "mode": "100644",
+      "bytes": 1943,
+      "sha256": "7e755139860faf848f40afae63543b18d8ceecfb12e5fac10aaaca13c564610b"
+    },
+    {
+      "sourcePath": "Maps/CQC.canvas",
+      "path": "development/trigger-discipline/source/Maps/CQC.canvas",
+      "gitBlob": "af953f443cd1d8eb9245393bfa43faf6d7d5d15d",
+      "mode": "100644",
+      "bytes": 3134,
+      "sha256": "c96d71259e3a32e5c77f0f2376f73ae1c5cbdd69f94feb79278277dc052a4485"
+    },
+    {
+      "sourcePath": "Maps/Character & Classes.canvas",
+      "path": "development/trigger-discipline/source/Maps/Character & Classes.canvas",
+      "gitBlob": "3882f72bc75b267af3661091c034c2a1b4a68d77",
+      "mode": "100644",
+      "bytes": 6005,
+      "sha256": "e0a423e65324b1b84f459d769d73528b8d195e8829653eca5c1f091e18bf714f"
+    },
+    {
+      "sourcePath": "Maps/Classes.canvas",
+      "path": "development/trigger-discipline/source/Maps/Classes.canvas",
+      "gitBlob": "e852a18427d9e67db5341a03308affb3d8ef6dbb",
+      "mode": "100644",
+      "bytes": 5908,
+      "sha256": "e4ea9ef0d5829e0e3104a8275d58cba06c82e6e3681cd7cd151a8424592f71d7"
+    },
+    {
+      "sourcePath": "Maps/Combat Classes.canvas",
+      "path": "development/trigger-discipline/source/Maps/Combat Classes.canvas",
+      "gitBlob": "286224651b235d984c6a7c163380d8da433af03d",
+      "mode": "100644",
+      "bytes": 3993,
+      "sha256": "a8672584971f2011e381d3f0024d9ef9b03a0d4b3af7fc2f50302c6a47a4d532"
+    },
+    {
+      "sourcePath": "Maps/Combat.canvas",
+      "path": "development/trigger-discipline/source/Maps/Combat.canvas",
+      "gitBlob": "5f257856ddcf0fba645e1cf66b31f8eb17b69c22",
+      "mode": "100644",
+      "bytes": 8645,
+      "sha256": "44713cc83a42c0ee6dfc5beb5722d8c9a3c9f971dd14f7d226e6171969520d76"
+    },
+    {
+      "sourcePath": "Maps/Corpsman.canvas",
+      "path": "development/trigger-discipline/source/Maps/Corpsman.canvas",
+      "gitBlob": "80951716332960a29e294aa318113667fe37d8de",
+      "mode": "100644",
+      "bytes": 3292,
+      "sha256": "2e76bad5fb958c519c477e3a7c96752d6b569a186145b3829b155248e4166cf8"
+    },
+    {
+      "sourcePath": "Maps/Drones.canvas",
+      "path": "development/trigger-discipline/source/Maps/Drones.canvas",
+      "gitBlob": "561382517f5950efc5c3f24576b6efe2af4fcc23",
+      "mode": "100644",
+      "bytes": 4072,
+      "sha256": "b31976b5a9cc5d9f934ef7a16a9b871155607f55960c40290344954c5cecdfd5"
+    },
+    {
+      "sourcePath": "Maps/Equipment & World.canvas",
+      "path": "development/trigger-discipline/source/Maps/Equipment & World.canvas",
+      "gitBlob": "db67f4a207ae2a2e126a01ed732588106c65ca1c",
+      "mode": "100644",
+      "bytes": 4321,
+      "sha256": "1c41be1b1a35d3a06942d3f91f1a2df279a787f9cbaec90acd8b32059eeefcb9"
+    },
+    {
+      "sourcePath": "Maps/Explosives.canvas",
+      "path": "development/trigger-discipline/source/Maps/Explosives.canvas",
+      "gitBlob": "1c8c447a35e7e2dc9789ce73ff82938e8fdffb26",
+      "mode": "100644",
+      "bytes": 3021,
+      "sha256": "aa30431990a1b595bef8a8678b86443bff01e48204cb91feb6a00612939f8a7f"
+    },
+    {
+      "sourcePath": "Maps/Firearms.canvas",
+      "path": "development/trigger-discipline/source/Maps/Firearms.canvas",
+      "gitBlob": "6622e6ad12b5a1962a0b2de60a9615442bbbbd03",
+      "mode": "100644",
+      "bytes": 5462,
+      "sha256": "072db2eec7363c519c384ef9c82cea404483b57588d5866715183c72adbe9759"
+    },
+    {
+      "sourcePath": "Maps/Hacking.canvas",
+      "path": "development/trigger-discipline/source/Maps/Hacking.canvas",
+      "gitBlob": "2b02fcea5e9c8aff606950a7c0c02f27886f22c6",
+      "mode": "100644",
+      "bytes": 7982,
+      "sha256": "3daa21ed001b34d571004e2fd12fd6885267ba0a2c41a05f7afd37792a593ecc"
+    },
+    {
+      "sourcePath": "Maps/Influencer.canvas",
+      "path": "development/trigger-discipline/source/Maps/Influencer.canvas",
+      "gitBlob": "a38948cbcf99d8895613d8cc9e28768ba375f1d3",
+      "mode": "100644",
+      "bytes": 2031,
+      "sha256": "1dbce6e2f80960957563f2f669ee3baced35e360c8db113545d8867a48e3c2ce"
+    },
+    {
+      "sourcePath": "Maps/Social & Investigation.canvas",
+      "path": "development/trigger-discipline/source/Maps/Social & Investigation.canvas",
+      "gitBlob": "2823088e86f3bfac65318dbc505dc5cb2b2e6de5",
+      "mode": "100644",
+      "bytes": 5586,
+      "sha256": "3eb550ea073a3a061b4c535756113c3fe3ad2bc0c3c4375be5e1ae7fe8734b7a"
+    },
+    {
+      "sourcePath": "Maps/Technology.canvas",
+      "path": "development/trigger-discipline/source/Maps/Technology.canvas",
+      "gitBlob": "6b060bf5af10235046a3648ef1f9da704bbeda36",
+      "mode": "100644",
+      "bytes": 4235,
+      "sha256": "07543766cab4b60f6164e125a778b833e318827688f72a46a5bf454141582b4f"
+    },
+    {
+      "sourcePath": "README.md",
+      "path": "development/trigger-discipline/source/README.md",
+      "gitBlob": "728b3884ddcd2cdef98086887c8fb5d75e807d9e",
+      "mode": "100644",
+      "bytes": 560,
+      "sha256": "243f4af8f549a7cfad16c9ea7bc39b399c47771179019dab8235271622f268ef"
+    },
+    {
+      "sourcePath": "Social/CONTACT.md",
+      "path": "development/trigger-discipline/source/Social/CONTACT.md",
+      "gitBlob": "14d6e3d1460264dc0cb3528868d64e27a7e1c8e6",
+      "mode": "100644",
+      "bytes": 315,
+      "sha256": "d6b05e41ecfa7e6c6e161211bf7b79c8762d88bd608ed6dffbffb20b5fc6991d"
+    },
+    {
+      "sourcePath": "Social/DECEPTION.md",
+      "path": "development/trigger-discipline/source/Social/DECEPTION.md",
+      "gitBlob": "fbcc5d20fded64e30f25dd1a9953a3144274ac5e",
+      "mode": "100644",
+      "bytes": 357,
+      "sha256": "0da8843acfa51e5e2d1baa829d7a865b3bea7ef1ae9611edb8bcf89eb22e1aae"
+    },
+    {
+      "sourcePath": "Social/FACTION REPUTATION.md",
+      "path": "development/trigger-discipline/source/Social/FACTION REPUTATION.md",
+      "gitBlob": "b7f20e20f04b0d3d7e1921fc5f6f7d396b095b1a",
+      "mode": "100644",
+      "bytes": 475,
+      "sha256": "e11590bcabe4b6a6929e144c0dd004dc1b9451555d5eb11f3c63b5c6adf7914e"
+    },
+    {
+      "sourcePath": "Social/INTERROGATION.md",
+      "path": "development/trigger-discipline/source/Social/INTERROGATION.md",
+      "gitBlob": "f543d76837fb1fd6d992efaba527c9cc7de4d7ad",
+      "mode": "100644",
+      "bytes": 511,
+      "sha256": "9eec182fa8e0862f50aae3b39a08447091bbba0744156225841848b3b8fcff7c"
+    },
+    {
+      "sourcePath": "Social/LEVERAGE.md",
+      "path": "development/trigger-discipline/source/Social/LEVERAGE.md",
+      "gitBlob": "c768e14ff9829fd4757cb7da1dbcf3bc4f0056ac",
+      "mode": "100644",
+      "bytes": 578,
+      "sha256": "2ea2a41f42c7421a983932b3cb0a243b3adfe5ac914dd14dafe660e51575b54f"
+    },
+    {
+      "sourcePath": "Social/NPC MORALE.md",
+      "path": "development/trigger-discipline/source/Social/NPC MORALE.md",
+      "gitBlob": "142d79d58732b16bcb36cb8fb7760d62595ab4ee",
+      "mode": "100644",
+      "bytes": 541,
+      "sha256": "a497cf540627b5a32a65e6def3a3977b7bf8737b2ee6449a04e7324f233d2064"
+    },
+    {
+      "sourcePath": "Social/SOCIAL FACT.md",
+      "path": "development/trigger-discipline/source/Social/SOCIAL FACT.md",
+      "gitBlob": "28d965e2c1784ef269af49fd3492705c34079d1e",
+      "mode": "100644",
+      "bytes": 538,
+      "sha256": "90938c0272a3cace894a6e194d79b43bfffd763fad21995ab5a31df1ec02111e"
+    },
+    {
+      "sourcePath": "Specialties/ANCHOR.md",
+      "path": "development/trigger-discipline/source/Specialties/ANCHOR.md",
+      "gitBlob": "6ad346268548c9887e0fec30c7b131c15e83589e",
+      "mode": "100644",
+      "bytes": 5597,
+      "sha256": "f36ae8834ca02984ce13cb84dae404e165173f0b7c901c7ad833ce0c5cc9e971"
+    },
+    {
+      "sourcePath": "Specialties/ARSENAL.md",
+      "path": "development/trigger-discipline/source/Specialties/ARSENAL.md",
+      "gitBlob": "875c537e7989a9d83f016b33998487fac0f987c6",
+      "mode": "100644",
+      "bytes": 5669,
+      "sha256": "dc13678bf4b5cb8d482528e23e461fd87ee56caa2522763f4eaa78f7809012c0"
+    },
+    {
+      "sourcePath": "Specialties/AUTODRONES.md",
+      "path": "development/trigger-discipline/source/Specialties/AUTODRONES.md",
+      "gitBlob": "f18a4cb3d3c3f1ddd592e40a652ff59f752baaad",
+      "mode": "100644",
+      "bytes": 4705,
+      "sha256": "bfd62932752c68d489f487bc0694446e43b41f467e72f20d86dba06a97c3fec6"
+    },
+    {
+      "sourcePath": "Specialties/BREAKER.md",
+      "path": "development/trigger-discipline/source/Specialties/BREAKER.md",
+      "gitBlob": "13ebb10354dc70080a9be9b22818ef5eb3ab3af5",
+      "mode": "100644",
+      "bytes": 4238,
+      "sha256": "10314a83478bfc0129c03f84c9d0772aaa41c56942bf4a6b64e78a19067d7009"
+    },
+    {
+      "sourcePath": "Specialties/DIPLOMAT.md",
+      "path": "development/trigger-discipline/source/Specialties/DIPLOMAT.md",
+      "gitBlob": "d163504c9a8e44ec82755d7820fbf1ed7617f616",
+      "mode": "100644",
+      "bytes": 5483,
+      "sha256": "9384cee0ce80d7f0d7823914d21399240906f5a6babd2652a48ac9db9b6af1c4"
+    },
+    {
+      "sourcePath": "Specialties/ENFORCER.md",
+      "path": "development/trigger-discipline/source/Specialties/ENFORCER.md",
+      "gitBlob": "7b23fae1c48d225f2cab0e76d7c7dbf39a20f71e",
+      "mode": "100644",
+      "bytes": 4036,
+      "sha256": "48fdca4c5138ea4128d01db1a7634766e1fa5a624a56ee4b00bb8b65fe93c759"
+    },
+    {
+      "sourcePath": "Specialties/EVADER.md",
+      "path": "development/trigger-discipline/source/Specialties/EVADER.md",
+      "gitBlob": "5e80a1fed80e42646b7a64ef21581caa0b441a75",
+      "mode": "100644",
+      "bytes": 4592,
+      "sha256": "1384061ee1732242fe747729afca0368c80aa87334b55ceca20cda0928895d1d"
+    },
+    {
+      "sourcePath": "Specialties/FIELD ENGINEER.md",
+      "path": "development/trigger-discipline/source/Specialties/FIELD ENGINEER.md",
+      "gitBlob": "db7459c62d12bb6b77b1e8703dd4177eb01074d2",
+      "mode": "100644",
+      "bytes": 6468,
+      "sha256": "a30d257a0b71d74c86b7ef3e805c9231f4953060d43910344728f65fa37cdf8f"
+    },
+    {
+      "sourcePath": "Specialties/FIELD MEDIC.md",
+      "path": "development/trigger-discipline/source/Specialties/FIELD MEDIC.md",
+      "gitBlob": "5d33ef02651ecf0cc791fd43c80a88b1b3282a5e",
+      "mode": "100644",
+      "bytes": 4799,
+      "sha256": "659da33a983a30e312f52ba6ed51d1581dd5e04c70e619e469d486f15295652c"
+    },
+    {
+      "sourcePath": "Specialties/FLANKER.md",
+      "path": "development/trigger-discipline/source/Specialties/FLANKER.md",
+      "gitBlob": "bddc945586df1420158e1dec746c18b26846761c",
+      "mode": "100644",
+      "bytes": 4059,
+      "sha256": "fdf247cdabf7de54a36a44517298c6bfc3342a519fdd771a1f0ccea37fc49709"
+    },
+    {
+      "sourcePath": "Specialties/FPV DRONES.md",
+      "path": "development/trigger-discipline/source/Specialties/FPV DRONES.md",
+      "gitBlob": "d64f5f2cf19cd446a61075bfb5c8c717f7df7f9e",
+      "mode": "100644",
+      "bytes": 4606,
+      "sha256": "8ad6e700ec2dc93103ed092bacfc74e961d37747e62aa0ad7e6e59e5b2d8be1e"
+    },
+    {
+      "sourcePath": "Specialties/GUARDIAN.md",
+      "path": "development/trigger-discipline/source/Specialties/GUARDIAN.md",
+      "gitBlob": "5d0eb99900c456655c9f9a7bf4a83ae12221a46b",
+      "mode": "100644",
+      "bytes": 5375,
+      "sha256": "77762a566c7602eee06cc2de61162cd21ce2b4e405c0803de8402e68b5470710"
+    },
+    {
+      "sourcePath": "Specialties/GUNNER.md",
+      "path": "development/trigger-discipline/source/Specialties/GUNNER.md",
+      "gitBlob": "2d8392a9bbbe3ba7d0901041680cb4d253031fab",
+      "mode": "100644",
+      "bytes": 5577,
+      "sha256": "3497d7b59775c88c558d124728a4994214e1ad5bc50ff235ad0b754191523267"
+    },
+    {
+      "sourcePath": "Specialties/HANDLER.md",
+      "path": "development/trigger-discipline/source/Specialties/HANDLER.md",
+      "gitBlob": "5ca60d7bf6a8a63eeb1f8855b8a9accf0a186dac",
+      "mode": "100644",
+      "bytes": 5452,
+      "sha256": "82d88a065ca7f2b9aa35fe34dbfb6a8c0fe54f8b4d2ef27bb1feed71ec9b8924"
+    },
+    {
+      "sourcePath": "Specialties/ICON.md",
+      "path": "development/trigger-discipline/source/Specialties/ICON.md",
+      "gitBlob": "825f7192c5b82faac930fa795eca0ce45677cade",
+      "mode": "100644",
+      "bytes": 5259,
+      "sha256": "b3368afcb9fc48451d217f8724dbf1393e0a726795305e8e4d0822dd9ea525d9"
+    },
+    {
+      "sourcePath": "Specialties/INFILTRATOR.md",
+      "path": "development/trigger-discipline/source/Specialties/INFILTRATOR.md",
+      "gitBlob": "860aba4f88709c3d5976fe37e97ffe7dfd26039e",
+      "mode": "100644",
+      "bytes": 4665,
+      "sha256": "7950ac9fce41bebff25acb8fd3fde4ed4e31e67ac2fce764e5d233fcd5f1a35e"
+    },
+    {
+      "sourcePath": "Specialties/LOCAL HACKER.md",
+      "path": "development/trigger-discipline/source/Specialties/LOCAL HACKER.md",
+      "gitBlob": "08b5b539dfb512605a3612d7893d48753f268bc3",
+      "mode": "100644",
+      "bytes": 5621,
+      "sha256": "a4e4dc9338e6ee43eb6ba371f5c756b740bcdc400eb910d9867808df1921635b"
+    },
+    {
+      "sourcePath": "Specialties/NETWORKER.md",
+      "path": "development/trigger-discipline/source/Specialties/NETWORKER.md",
+      "gitBlob": "78aee369ef03935e704c0597f18850764437729f",
+      "mode": "100644",
+      "bytes": 5723,
+      "sha256": "12fbb9432ff4da323cd8734a81e82ac2b4bceac05f69eb26e37a708543c75fed"
+    },
+    {
+      "sourcePath": "Specialties/OPERATOR.md",
+      "path": "development/trigger-discipline/source/Specialties/OPERATOR.md",
+      "gitBlob": "303cf0842fb375b59f886e51a17c8bfe621a05ce",
+      "mode": "100644",
+      "bytes": 5445,
+      "sha256": "016545c07bc38082b266a9705dc2f5e99e30d99d18dea30425ca55c311dbbeb1"
+    },
+    {
+      "sourcePath": "Specialties/RESUSCITATOR.md",
+      "path": "development/trigger-discipline/source/Specialties/RESUSCITATOR.md",
+      "gitBlob": "094d442eab1314dd4dadfce0f8a979a3b2412c06",
+      "mode": "100644",
+      "bytes": 5555,
+      "sha256": "ae4f0e47b192515edf854fb5d34dd5c75e48f2e591fa97c4d191d12b139fc9c7"
+    },
+    {
+      "sourcePath": "Specialties/SENTINEL.md",
+      "path": "development/trigger-discipline/source/Specialties/SENTINEL.md",
+      "gitBlob": "2c765bf0e5c02a76a4eea6b31a3da1fcc8d55562",
+      "mode": "100644",
+      "bytes": 4146,
+      "sha256": "266f4034c21df53b30b51244f99f9b04e33c4149710ad8e0e476dce3c3253c06"
+    },
+    {
+      "sourcePath": "Specialties/SHIELD BEARER.md",
+      "path": "development/trigger-discipline/source/Specialties/SHIELD BEARER.md",
+      "gitBlob": "fbc9e50325cac9bc38946adfd4f415a4faffc01d",
+      "mode": "100644",
+      "bytes": 6048,
+      "sha256": "7543b2e8ce7d1f11d10afb087444c5a13265a8a08766ee22dd27ca4fe644f585"
+    },
+    {
+      "sourcePath": "Specialties/SHOCK.md",
+      "path": "development/trigger-discipline/source/Specialties/SHOCK.md",
+      "gitBlob": "de50a5a398aeefb48f8871187bd5a4069a7cadb9",
+      "mode": "100644",
+      "bytes": 4675,
+      "sha256": "6c4dbf81de197517ce89364a7f5104a881ba6d523fc24721c089a3d2091dae07"
+    },
+    {
+      "sourcePath": "Specialties/SNAPSHOT.md",
+      "path": "development/trigger-discipline/source/Specialties/SNAPSHOT.md",
+      "gitBlob": "d1a5e963bb95e5eb310c2eaaf2da7a41f7fac368",
+      "mode": "100644",
+      "bytes": 4113,
+      "sha256": "ba8d6cd7f26f0c91bba7f30f73649822c6ea8d5c993639e1e197d41a57ce5da8"
+    },
+    {
+      "sourcePath": "Specialties/SNIPER.md",
+      "path": "development/trigger-discipline/source/Specialties/SNIPER.md",
+      "gitBlob": "5e5aa87bb5ade591393f700e95067c600d3b9cf7",
+      "mode": "100644",
+      "bytes": 4376,
+      "sha256": "6957b59ea36ed78bc03d719cc788360673c65674c476b5223aedc85af0918bfa"
+    },
+    {
+      "sourcePath": "Specialties/TRAUMA.md",
+      "path": "development/trigger-discipline/source/Specialties/TRAUMA.md",
+      "gitBlob": "a9714a51b420ab6cf73d3ce5fc12c6ea0c529b13",
+      "mode": "100644",
+      "bytes": 4856,
+      "sha256": "05f356037912d01ff1f8e0d2fdc0c08033d96d656c557fb67171ba4ac54e0751"
+    },
+    {
+      "sourcePath": "Systems/DOWNTIME.md",
+      "path": "development/trigger-discipline/source/Systems/DOWNTIME.md",
+      "gitBlob": "7ea258b766a7664df016dbbe5a6c9e27e6e4744b",
+      "mode": "100644",
+      "bytes": 689,
+      "sha256": "468690ef0320b0b863cb89a7b1bd956502f5946d154d8416d536d79e700abd30"
+    },
+    {
+      "sourcePath": "Systems/HP RECOVERY.md",
+      "path": "development/trigger-discipline/source/Systems/HP RECOVERY.md",
+      "gitBlob": "e30dbd0955f7821bbc7464ed7a0293f816497190",
+      "mode": "100644",
+      "bytes": 545,
+      "sha256": "fa7ff53ba11fa5af1281bca3db90e039e57252c574ab14c9f1ea7d6e3cbd8435"
+    },
+    {
+      "sourcePath": "Systems/RES RECOVERY.md",
+      "path": "development/trigger-discipline/source/Systems/RES RECOVERY.md",
+      "gitBlob": "3eb5741f6cd975873e9d28fe8a8c9e285e39e499",
+      "mode": "100644",
+      "bytes": 504,
+      "sha256": "a75804e0a6acfd5627f45db6b6a140ea3a2c1a44c4894081274c99ad9030c6d3"
+    },
+    {
+      "sourcePath": "Systems/TRAINING.md",
+      "path": "development/trigger-discipline/source/Systems/TRAINING.md",
+      "gitBlob": "654e6cf31a2172ec079523f244754433ff39927d",
+      "mode": "100644",
+      "bytes": 375,
+      "sha256": "c675986353680cea8ed34d993235ccdafbe470f9d39749a2d94f9ada2e5a6d58"
+    },
+    {
+      "sourcePath": "Testing/BALANCE CONTRACT.md",
+      "path": "development/trigger-discipline/source/Testing/BALANCE CONTRACT.md",
+      "gitBlob": "f95ce4c67594116a1f467396aa5c4771db234bba",
+      "mode": "100644",
+      "bytes": 15070,
+      "sha256": "ea9e33bed7af55b31bcaa6b1bfc124b5e40db1ef850f09786003afb8cc1bd2d6"
+    },
+    {
+      "sourcePath": "Testing/BALANCE PARAMETERS.md",
+      "path": "development/trigger-discipline/source/Testing/BALANCE PARAMETERS.md",
+      "gitBlob": "35959dbeb9a3d8d48c6e28227cea2be4bf1c72f3",
+      "mode": "100644",
+      "bytes": 57663,
+      "sha256": "0fa6ea6df14b97b09e09e5d58513c7be96e6f91d507d100f811052c4b670e579"
+    },
+    {
+      "sourcePath": "Testing/BALANCE SCENARIOS.md",
+      "path": "development/trigger-discipline/source/Testing/BALANCE SCENARIOS.md",
+      "gitBlob": "914c0668df2cbf73600e83057de282c7e68fe144",
+      "mode": "100644",
+      "bytes": 27687,
+      "sha256": "1448676b19907d93ed476e5ea559ac5988c9351dab865f24fbaaa98ac954bc66"
+    },
+    {
+      "sourcePath": "Testing/BALANCE SUITE IMPLEMENTATION.md",
+      "path": "development/trigger-discipline/source/Testing/BALANCE SUITE IMPLEMENTATION.md",
+      "gitBlob": "416afa22f38f27e10bd963a3ff059e6a5b40ce8b",
+      "mode": "100644",
+      "bytes": 19358,
+      "sha256": "5e9354158362e8aecf9dab67c390c66f6de3fc89a01f8a1e64c37ed16224863a"
+    },
+    {
+      "sourcePath": "Testing/BENCHMARK FIXTURES.md",
+      "path": "development/trigger-discipline/source/Testing/BENCHMARK FIXTURES.md",
+      "gitBlob": "bd29a13b5d6a45571a61f7dd6b16aa7c34c8cd96",
+      "mode": "100644",
+      "bytes": 7464,
+      "sha256": "2581e093f35d2b40ffd82aea8264f51a689089eaeda1175b8261943e49f9b4b0"
+    },
+    {
+      "sourcePath": "Testing/REFERENCE EQUIPMENT VALUES.md",
+      "path": "development/trigger-discipline/source/Testing/REFERENCE EQUIPMENT VALUES.md",
+      "gitBlob": "e17278e017a4bbfe64fb3352aa2d3de874f9de40",
+      "mode": "100644",
+      "bytes": 17349,
+      "sha256": "7d2dfb95bc453d2bc9f056c520740712e2fd18b9cf89fb2bd65ed42eb46fa0e9"
+    },
+    {
+      "sourcePath": "Testing/REFERENCE EQUIPMENT.md",
+      "path": "development/trigger-discipline/source/Testing/REFERENCE EQUIPMENT.md",
+      "gitBlob": "09704291a5e9860810f7f1905982267f4aedce75",
+      "mode": "100644",
+      "bytes": 3521,
+      "sha256": "302b60af1d27a67f93a5449c7fc554c7e1b1da5f209f6fbbbd207858278aa27e"
+    },
+    {
+      "sourcePath": "Testing/SPECIALTY TEST APPROVAL.md",
+      "path": "development/trigger-discipline/source/Testing/SPECIALTY TEST APPROVAL.md",
+      "gitBlob": "5102e365aaee7dcc9f32c6578b35e58e14ff39ff",
+      "mode": "100644",
+      "bytes": 3272,
+      "sha256": "b65f8734947b5bef4a0fbbd56c6bc1f23a7f32263986b294155bea807b8708ae"
+    },
+    {
+      "sourcePath": "Testing/UNFINISHED SYLVIA INTEGRATION.md",
+      "path": "development/trigger-discipline/source/Testing/UNFINISHED SYLVIA INTEGRATION.md",
+      "gitBlob": "89e04fa89475944cc35e7bb2974cb8e7500b2867",
+      "mode": "100644",
+      "bytes": 1523,
+      "sha256": "983e7a1e7e00d52b976e32b3a6236959edbd44cb8e6ccc0f9800a09db8bebf42"
+    },
+    {
+      "sourcePath": "Trigger Discipline.canvas",
+      "path": "development/trigger-discipline/source/Trigger Discipline.canvas",
+      "gitBlob": "5fdc8940de191a93ab52575c55a54e0ca8560d3f",
+      "mode": "100644",
+      "bytes": 4054,
+      "sha256": "b7851b08abdcda5e977b296a2f61785d34cffa3e8d73544098b553c76438e97e"
+    },
+    {
+      "sourcePath": "balance_suite/__init__.py",
+      "path": "development/trigger-discipline/source/balance_suite/__init__.py",
+      "gitBlob": "ac42dff06d62548f87bd96b57f15e62aff809e8b",
+      "mode": "100644",
+      "bytes": 253,
+      "sha256": "02ba284d2b08bfadcf5f608ab6856fc06c4de804325d837be5034e46e81f8b8a"
+    },
+    {
+      "sourcePath": "balance_suite/__main__.py",
+      "path": "development/trigger-discipline/source/balance_suite/__main__.py",
+      "gitBlob": "a049ad7aea97f34e4aab96cc8d30e116fa89790d",
+      "mode": "100644",
+      "bytes": 80,
+      "sha256": "3d2438ae92f4746e9ffaa1f837b1fe803f6281091d1f31f8c95643716f257d9a"
+    },
+    {
+      "sourcePath": "balance_suite/artifacts.py",
+      "path": "development/trigger-discipline/source/balance_suite/artifacts.py",
+      "gitBlob": "7a21baea5b16e1aad602f180ec2bb795af3914c6",
+      "mode": "100644",
+      "bytes": 1658,
+      "sha256": "09c6506ec0a9d61bf817cdff253403e78e0e90ff1f2d7c8f610a79fa181d8dac"
+    },
+    {
+      "sourcePath": "balance_suite/cli.py",
+      "path": "development/trigger-discipline/source/balance_suite/cli.py",
+      "gitBlob": "1267473f95ae043f7574959926ca06af0b61e558",
+      "mode": "100644",
+      "bytes": 17216,
+      "sha256": "ac891deb4b367cf60290d5c2b42df275d90e3c8805b003a5d0ef95fd91b04799"
+    },
+    {
+      "sourcePath": "balance_suite/engine.py",
+      "path": "development/trigger-discipline/source/balance_suite/engine.py",
+      "gitBlob": "72772ce0b19a2738c91864350d123c30c762cfca",
+      "mode": "100644",
+      "bytes": 5815,
+      "sha256": "b36ad9fb9a4caf7a080558a15a1b7c25d73ea579e693504a3952f3742b81d28d"
+    },
+    {
+      "sourcePath": "balance_suite/fixtures.py",
+      "path": "development/trigger-discipline/source/balance_suite/fixtures.py",
+      "gitBlob": "5a2cfec63c4f9107c4b98c50aaea6b37876dc2aa",
+      "mode": "100644",
+      "bytes": 9056,
+      "sha256": "483d5d7804329caf8599404664ce87fba9cb3bf2d81f3e81a2bb2a3c0726304e"
+    },
+    {
+      "sourcePath": "balance_suite/geometry.py",
+      "path": "development/trigger-discipline/source/balance_suite/geometry.py",
+      "gitBlob": "eda1272a1efff0893d8f9c49f72730f8f5686d91",
+      "mode": "100644",
+      "bytes": 15411,
+      "sha256": "37a8d345878a8062252165b2a76e83c511f056229172d6967e51882efe1b149c"
+    },
+    {
+      "sourcePath": "balance_suite/model.py",
+      "path": "development/trigger-discipline/source/balance_suite/model.py",
+      "gitBlob": "16feb34a2966e1783392ba17b69e44d87cfeda47",
+      "mode": "100644",
+      "bytes": 7502,
+      "sha256": "b52d715117cd853e514ceedc5ed51f6d85da1abbea98cbc2a3572e82b5a3f769"
+    },
+    {
+      "sourcePath": "balance_suite/objective_tactical.py",
+      "path": "development/trigger-discipline/source/balance_suite/objective_tactical.py",
+      "gitBlob": "92545e19ed96aeb301177fe06a0b979482a9fab8",
+      "mode": "100644",
+      "bytes": 101955,
+      "sha256": "48d08c65107c10e28bd472cf89150384d357883b4bdb6283e1da4b3edec63472"
+    },
+    {
+      "sourcePath": "balance_suite/optimizer.py",
+      "path": "development/trigger-discipline/source/balance_suite/optimizer.py",
+      "gitBlob": "20f879cf075172591f68db8873f84c1d154afa5e",
+      "mode": "100644",
+      "bytes": 19624,
+      "sha256": "81192304a788ff2c3661a0707ac061be1319b260b79c8493cf6e8ed3e817397d"
+    },
+    {
+      "sourcePath": "balance_suite/parameters.py",
+      "path": "development/trigger-discipline/source/balance_suite/parameters.py",
+      "gitBlob": "2479a0d4ea58c77c66a8ae17b29a35ff04449edb",
+      "mode": "100644",
+      "bytes": 31982,
+      "sha256": "9635647614bfeca8245dd703d019078453aad3d4075eb9f378921d4bcfd43150"
+    },
+    {
+      "sourcePath": "balance_suite/policies.py",
+      "path": "development/trigger-discipline/source/balance_suite/policies.py",
+      "gitBlob": "e899ae1b55655d5d39f8bd4785569a973742661b",
+      "mode": "100644",
+      "bytes": 8400,
+      "sha256": "bc242c1f30faf845034d9aa41740cf0a100ce8bf9a34d7b76515c0e1206f97ca"
+    },
+    {
+      "sourcePath": "balance_suite/probes.py",
+      "path": "development/trigger-discipline/source/balance_suite/probes.py",
+      "gitBlob": "10d3401b2862378c6716f76bff12a9b9783ee595",
+      "mode": "100644",
+      "bytes": 82658,
+      "sha256": "b3b8307a0515f4fc31f89db798b3b8a8aeba9353bbf49086c8cdb1faf412b404"
+    },
+    {
+      "sourcePath": "balance_suite/provenance.py",
+      "path": "development/trigger-discipline/source/balance_suite/provenance.py",
+      "gitBlob": "74605a2b5a0cd02feb73d7ec47911824ebdccd27",
+      "mode": "100644",
+      "bytes": 10110,
+      "sha256": "f7409b83c27714f3ca0daaf9bd9e43f8c297b59f8b0f873eb021422113e5f91e"
+    },
+    {
+      "sourcePath": "balance_suite/regression.py",
+      "path": "development/trigger-discipline/source/balance_suite/regression.py",
+      "gitBlob": "c95597607d6145358f6993161e3e8b7fed7ad68c",
+      "mode": "100644",
+      "bytes": 1725,
+      "sha256": "59b2af1dc091325cfdaedd8abdd53813c83e85a0c05c54b7c17317136a623927"
+    },
+    {
+      "sourcePath": "balance_suite/replay.py",
+      "path": "development/trigger-discipline/source/balance_suite/replay.py",
+      "gitBlob": "9729c7b04761f79a13e84feb55e376b10ac4bc92",
+      "mode": "100644",
+      "bytes": 4048,
+      "sha256": "8b82eb0df897fc4e41288896558c82f728c1b30f12d4ca7e0bb88fa5d0b912e8"
+    },
+    {
+      "sourcePath": "balance_suite/reports.py",
+      "path": "development/trigger-discipline/source/balance_suite/reports.py",
+      "gitBlob": "6dfaf6242f270701ad78ebda74f42d4f9d4ceba2",
+      "mode": "100644",
+      "bytes": 20903,
+      "sha256": "e6f5e6397420dc8cd58ac39f3405b87bd81607e0b795ec2c29e293f95da901c8"
+    },
+    {
+      "sourcePath": "balance_suite/rng.py",
+      "path": "development/trigger-discipline/source/balance_suite/rng.py",
+      "gitBlob": "3914fd17cef6a7d3b0c5952d38ba536001409279",
+      "mode": "100644",
+      "bytes": 2618,
+      "sha256": "67e59d033e2201d958f3d27616917a66d0cdd94e6a8268ff12b67fdc5c2325d1"
+    },
+    {
+      "sourcePath": "balance_suite/rules.py",
+      "path": "development/trigger-discipline/source/balance_suite/rules.py",
+      "gitBlob": "c2cb54d7035cfc87d3652bd18300aeff2e9691f7",
+      "mode": "100644",
+      "bytes": 21848,
+      "sha256": "bb7bd91b923dbd90740b0f350939c7834c66271bce5924de697bb57b579265a7"
+    },
+    {
+      "sourcePath": "balance_suite/runner.py",
+      "path": "development/trigger-discipline/source/balance_suite/runner.py",
+      "gitBlob": "673fe42fd29150a48131f05db7bfb224ed2aa7bf",
+      "mode": "100644",
+      "bytes": 23991,
+      "sha256": "5fd1c68934c4d4531de5f08552e0072c7bcc25a7ee8b6831e6e601d21507e8d3"
+    },
+    {
+      "sourcePath": "balance_suite/scenario_runtime.py",
+      "path": "development/trigger-discipline/source/balance_suite/scenario_runtime.py",
+      "gitBlob": "05d8782edee8820c16951d7c6ec85f1bf4703454",
+      "mode": "100644",
+      "bytes": 26297,
+      "sha256": "1e22cc35048868cab71f574d1e9cbe819177dcf17f017638160bfb5b1c7f7dc2"
+    },
+    {
+      "sourcePath": "balance_suite/scenarios.py",
+      "path": "development/trigger-discipline/source/balance_suite/scenarios.py",
+      "gitBlob": "236181a9520487c99e3f60c90c0abb916e21ec90",
+      "mode": "100644",
+      "bytes": 7451,
+      "sha256": "68000535be0b2961e775034b2b3c11c48119a7e4f10414054548334436030e4d"
+    },
+    {
+      "sourcePath": "balance_suite/simulation.py",
+      "path": "development/trigger-discipline/source/balance_suite/simulation.py",
+      "gitBlob": "055a81153a0a3fb12945e89782eec39126b3ec10",
+      "mode": "100644",
+      "bytes": 19495,
+      "sha256": "76002f8d8fa3ecc1ed00095638341ca7b82fe0af7cc15555c700bc4757eb5294"
+    },
+    {
+      "sourcePath": "balance_suite/specialties.py",
+      "path": "development/trigger-discipline/source/balance_suite/specialties.py",
+      "gitBlob": "97b6fff8b3f653ddbd16091718cc2d9042225d19",
+      "mode": "100644",
+      "bytes": 232569,
+      "sha256": "0fcb68f8e6fa99cba59038c6411850dee262fa37637bdcd45bdc7aacaeaac485"
+    },
+    {
+      "sourcePath": "balance_suite/specialty_audit.py",
+      "path": "development/trigger-discipline/source/balance_suite/specialty_audit.py",
+      "gitBlob": "46361a77962e1f8bf87b1c76b08617d17dd34f9e",
+      "mode": "100644",
+      "bytes": 1919,
+      "sha256": "7c518d2f4b39f3aaab44f57aae6f3cc5483b9158b1b2a0d39f3c10b2bb99b711"
+    },
+    {
+      "sourcePath": "balance_suite/specialty_contracts.py",
+      "path": "development/trigger-discipline/source/balance_suite/specialty_contracts.py",
+      "gitBlob": "e3e94c390a22246ae8f150edf2c8266c89bbb68a",
+      "mode": "100644",
+      "bytes": 179069,
+      "sha256": "c387d3e86b8d46b7e34c7efd66ce33532a14a8ea13df4a4d3cc50e529f82bfa1"
+    },
+    {
+      "sourcePath": "balance_suite/specialty_manifest.py",
+      "path": "development/trigger-discipline/source/balance_suite/specialty_manifest.py",
+      "gitBlob": "b84ec1344a7a741f86222ccdcf45667263dd9b26",
+      "mode": "100644",
+      "bytes": 22033,
+      "sha256": "d736e13523ee800fc1ff9abf264314d0a01afd5d2c7be697e1b46e004f7b9bce"
+    },
+    {
+      "sourcePath": "balance_suite/specialty_runtime.py",
+      "path": "development/trigger-discipline/source/balance_suite/specialty_runtime.py",
+      "gitBlob": "1e592e8d34dfa37acd5abeb80fe8be541e976120",
+      "mode": "100644",
+      "bytes": 2558,
+      "sha256": "391c27cd31ff83223289cd6b0631d1867a0e2ce9b9fa87510abdc1888a18f1ed"
+    },
+    {
+      "sourcePath": "balance_suite/statistics.py",
+      "path": "development/trigger-discipline/source/balance_suite/statistics.py",
+      "gitBlob": "ad2700bd248f77c057ceceb6b9954b1934fce3a6",
+      "mode": "100644",
+      "bytes": 1503,
+      "sha256": "1e38d71e9af43d2551f6f927f5fc05c2f33962364076dab690924372a097dfac"
+    },
+    {
+      "sourcePath": "balance_suite/support.py",
+      "path": "development/trigger-discipline/source/balance_suite/support.py",
+      "gitBlob": "b44d10cb07a75cb8a462d9034345e2fa93a06e63",
+      "mode": "100644",
+      "bytes": 19112,
+      "sha256": "8219618a414e0b3f5880e7c4b4a653c3ab42000e47d0957a10c70ef1454a262d"
+    },
+    {
+      "sourcePath": "balance_suite/tactical.py",
+      "path": "development/trigger-discipline/source/balance_suite/tactical.py",
+      "gitBlob": "1968ed8d18b4bd1e352cbf7016fab23631cf0c46",
+      "mode": "100644",
+      "bytes": 108142,
+      "sha256": "43651da82312ae11dd992a497e16f130738d626e836ff4844c8bbe818c0484f9"
+    },
+    {
+      "sourcePath": "pyproject.toml",
+      "path": "development/trigger-discipline/source/pyproject.toml",
+      "gitBlob": "ee888253dd364ad20453f6a73144cfe8bac42449",
+      "mode": "100644",
+      "bytes": 415,
+      "sha256": "f69f7ba07f316b2fb0b708702a9324629276c15829bb63b0c7a4d502abd8cb16"
+    },
+    {
+      "sourcePath": "sylvia_ruleset/__init__.py",
+      "path": "development/trigger-discipline/source/sylvia_ruleset/__init__.py",
+      "gitBlob": "1ee7c28f86f47d2ed8c0ea7deb4ee4522287644d",
+      "mode": "100644",
+      "bytes": 231,
+      "sha256": "32f620a2dedb484e40803d595fdb29c63721d6a0df5ba02ada1e959d2f842836"
+    },
+    {
+      "sourcePath": "sylvia_ruleset/__main__.py",
+      "path": "development/trigger-discipline/source/sylvia_ruleset/__main__.py",
+      "gitBlob": "f480b56e1aec7f4aaea0a9abd5ca593452c677fc",
+      "mode": "100644",
+      "bytes": 1913,
+      "sha256": "ef2c63935f4d2fd25111dc220dcaec89134fcecf1a8b9bb132c9b05da622da41"
+    },
+    {
+      "sourcePath": "sylvia_ruleset/builder.py",
+      "path": "development/trigger-discipline/source/sylvia_ruleset/builder.py",
+      "gitBlob": "07a906ee451db679616406e6845f936187bfea90",
+      "mode": "100644",
+      "bytes": 288672,
+      "sha256": "76842ee770cb1ede03cd48d18f01043e321f543a3d3ca3212e60b4016bab8a4e"
+    },
+    {
+      "sourcePath": "sylvia_ruleset/character_build.py",
+      "path": "development/trigger-discipline/source/sylvia_ruleset/character_build.py",
+      "gitBlob": "4c9d1e405155159d0998bef8a9f4235fe3a1d1e7",
+      "mode": "100644",
+      "bytes": 5018,
+      "sha256": "61065e9911d5efb228bea9eebad44fec4a6b83ffe18fc638d2cb15c096563438"
+    },
+    {
+      "sourcePath": "sylvia_ruleset/character_state_schema.json",
+      "path": "development/trigger-discipline/source/sylvia_ruleset/character_state_schema.json",
+      "gitBlob": "a53d172476621409b58f347dcb0c4114cbc16dfa",
+      "mode": "100644",
+      "bytes": 8226,
+      "sha256": "0977ccaed179a329fc12547fee5286417f59fd0795027281c4e7a64e41f2a956"
+    },
+    {
+      "sourcePath": "sylvia_ruleset/ground_weapons.py",
+      "path": "development/trigger-discipline/source/sylvia_ruleset/ground_weapons.py",
+      "gitBlob": "c8d92713e15b43726a07086d545e7431462969d7",
+      "mode": "100644",
+      "bytes": 10884,
+      "sha256": "2f4f3d209d54aa5bc325916a83174956083abe27285775a912afc5dd27cc7e3e"
+    },
+    {
+      "sourcePath": "sylvia_ruleset/medical.py",
+      "path": "development/trigger-discipline/source/sylvia_ruleset/medical.py",
+      "gitBlob": "29a84fbc70a5b1a5210929f51e38f6d744fad363",
+      "mode": "100644",
+      "bytes": 7826,
+      "sha256": "557ff63245042bee38c65dd922f4867bcbcf2dc5477bba393c4cbda6df0eeae9"
+    },
+    {
+      "sourcePath": "sylvia_ruleset/network_access.py",
+      "path": "development/trigger-discipline/source/sylvia_ruleset/network_access.py",
+      "gitBlob": "fe4a899d644b4b6a364908794775d665e3f30e96",
+      "mode": "100644",
+      "bytes": 2682,
+      "sha256": "ed1ffe1af69914931d062e5b6366dec1db9f27cf99bb307b02297ff101c8869c"
+    },
+    {
+      "sourcePath": "sylvia_ruleset/network_entry.py",
+      "path": "development/trigger-discipline/source/sylvia_ruleset/network_entry.py",
+      "gitBlob": "471c9b62bb29499d31a3b9f7ddb9ddd6f93ef591",
+      "mode": "100644",
+      "bytes": 7390,
+      "sha256": "046de6bb684532ade3dbbd411cbed348d5b3d73315f070451ca278b399fdf11e"
+    },
+    {
+      "sourcePath": "sylvia_ruleset/network_functions.py",
+      "path": "development/trigger-discipline/source/sylvia_ruleset/network_functions.py",
+      "gitBlob": "31e0eb13a06cec02e2da2ba364cce99c35740719",
+      "mode": "100644",
+      "bytes": 10470,
+      "sha256": "5bfd06cf58e6142485f66d63188ec55faaec5a3e5bd195be84bc703362826beb"
+    },
+    {
+      "sourcePath": "sylvia_ruleset/network_intrusion.py",
+      "path": "development/trigger-discipline/source/sylvia_ruleset/network_intrusion.py",
+      "gitBlob": "f323db0f4bdf63a8345b9641df057f21354ccb8b",
+      "mode": "100644",
+      "bytes": 15961,
+      "sha256": "92405b821dfbb19a943b2a16800f9bcea2abd3094dd15fc7b9a47ed7e8c50576"
+    },
+    {
+      "sourcePath": "sylvia_ruleset/network_reroute.py",
+      "path": "development/trigger-discipline/source/sylvia_ruleset/network_reroute.py",
+      "gitBlob": "930cd6d3e27f79cc41061a06ad4f95bf74b91435",
+      "mode": "100644",
+      "bytes": 4866,
+      "sha256": "feae9a27f77dbb74e65ab7e9aee245d9147cfe22680332a7fd222995b3fd32a6"
+    },
+    {
+      "sourcePath": "sylvia_ruleset/network_security.py",
+      "path": "development/trigger-discipline/source/sylvia_ruleset/network_security.py",
+      "gitBlob": "154af363e4a17011a322182dc2497c9d1bf4562b",
+      "mode": "100644",
+      "bytes": 9666,
+      "sha256": "5ee8c92456ff48065dd51e43cceefaf7e5bc1918d7ee8d5e7ee5a46fbb4d1836"
+    },
+    {
+      "sourcePath": "sylvia_ruleset/network_state_schema.py",
+      "path": "development/trigger-discipline/source/sylvia_ruleset/network_state_schema.py",
+      "gitBlob": "503204c40a0359e36efef289203d311195034649",
+      "mode": "100644",
+      "bytes": 8970,
+      "sha256": "e110f1fad3f39e38bc94e3413ef4c6e4010d1c9ed658ca6e242db26e7519887f"
+    },
+    {
+      "sourcePath": "sylvia_ruleset/qualification.py",
+      "path": "development/trigger-discipline/source/sylvia_ruleset/qualification.py",
+      "gitBlob": "4e7a51455378f555dd5194e10da370a684d790b5",
+      "mode": "100644",
+      "bytes": 72763,
+      "sha256": "02b536b979802343d6d3af25f887c1cbb040ea4d7ba264cc99dfa2b5bafba9b4"
+    },
+    {
+      "sourcePath": "sylvia_ruleset/references/campaign-authoring.md",
+      "path": "development/trigger-discipline/source/sylvia_ruleset/references/campaign-authoring.md",
+      "gitBlob": "296e6d8709ce9bcbac92782f3db3231c56436638",
+      "mode": "100644",
+      "bytes": 19903,
+      "sha256": "ad3c5104ac3c20ff1d7726c3c12004e447bad11f3d0a67c58cd076c80de800f3"
+    },
+    {
+      "sourcePath": "sylvia_ruleset/references/character-authoring.md",
+      "path": "development/trigger-discipline/source/sylvia_ruleset/references/character-authoring.md",
+      "gitBlob": "6efd82b193efa5244d8ffb165e30cd3d446391cb",
+      "mode": "100644",
+      "bytes": 10866,
+      "sha256": "a13a1e59ddc3e8ada2cd08aa864e9eeab64d5357ab12c5096c186c05912f0464"
+    },
+    {
+      "sourcePath": "sylvia_ruleset/weapon_handling.py",
+      "path": "development/trigger-discipline/source/sylvia_ruleset/weapon_handling.py",
+      "gitBlob": "1e4d1344c3157f4fca5d89f2e5fc119dc5ba685d",
+      "mode": "100644",
+      "bytes": 14496,
+      "sha256": "5e23cf8af546f33765e92132d0da1188d6dae325c54e406b0ba1f98cc5b8a88c"
+    },
+    {
+      "sourcePath": "tests/__init__.py",
+      "path": "development/trigger-discipline/source/tests/__init__.py",
+      "gitBlob": "80cf47a6bf4b33b326c9376d16822c3b40f686ff",
+      "mode": "100644",
+      "bytes": 51,
+      "sha256": "fd340aaa4bef666031293d4ef27ed78ec2db43f117c6121c6f98a98bdd3ff123"
+    },
+    {
+      "sourcePath": "tests/balance_suite/__init__.py",
+      "path": "development/trigger-discipline/source/tests/balance_suite/__init__.py",
+      "gitBlob": "c18749a819d819ebb502a4ff0dbaa66f0b56a268",
+      "mode": "100644",
+      "bytes": 52,
+      "sha256": "70b1d9fb75c8b8e8636a2674e6fdbb22443de4fb69bd6b02f52a6d4e22cc391d"
+    },
+    {
+      "sourcePath": "tests/balance_suite/test_geometry_events.py",
+      "path": "development/trigger-discipline/source/tests/balance_suite/test_geometry_events.py",
+      "gitBlob": "dc444b10f0f3d585893d6ed0655487dd6d57a398",
+      "mode": "100644",
+      "bytes": 7733,
+      "sha256": "f4719402dc94e90e9f627a4dbf86af6917c1ea02eb42ed41dc35985e98d71070"
+    },
+    {
+      "sourcePath": "tests/balance_suite/test_objective_balance.py",
+      "path": "development/trigger-discipline/source/tests/balance_suite/test_objective_balance.py",
+      "gitBlob": "60b1d209ba34d5fb0e80ffe8df0ad817bc9b7983",
+      "mode": "100644",
+      "bytes": 43371,
+      "sha256": "7991a05785b6d90d1a44ef4c9954e56b08c159e555771c4d62f77c6d1be34e4b"
+    },
+    {
+      "sourcePath": "tests/balance_suite/test_parameters.py",
+      "path": "development/trigger-discipline/source/tests/balance_suite/test_parameters.py",
+      "gitBlob": "3d16ff0c2bb6cfa128da4942fd7cccaaa46bdde4",
+      "mode": "100644",
+      "bytes": 7864,
+      "sha256": "8141b0990ce3924c8629bd2034ad39dff050bcf424e8966b52b4e071c1d1288f"
+    },
+    {
+      "sourcePath": "tests/balance_suite/test_rules.py",
+      "path": "development/trigger-discipline/source/tests/balance_suite/test_rules.py",
+      "gitBlob": "fe85384c7f686bc2563d0ebb272c1ed442eb9429",
+      "mode": "100644",
+      "bytes": 10200,
+      "sha256": "7158fbbe31e23dfc91cb68276bf6c73803b652947c37a1506489a8556b4070e0"
+    },
+    {
+      "sourcePath": "tests/balance_suite/test_simulation_reporting.py",
+      "path": "development/trigger-discipline/source/tests/balance_suite/test_simulation_reporting.py",
+      "gitBlob": "0a64fecb989d1c0d9a3836fe437a725dcbdab3f9",
+      "mode": "100644",
+      "bytes": 23184,
+      "sha256": "66d45f8abd7d2098491f51ceba575837c4600344da6a9c538b360847f16b3fec"
+    },
+    {
+      "sourcePath": "tests/balance_suite/test_support_specialties.py",
+      "path": "development/trigger-discipline/source/tests/balance_suite/test_support_specialties.py",
+      "gitBlob": "358423b6f3c1b5d021917e8a2fc5be9543f491a8",
+      "mode": "100644",
+      "bytes": 75416,
+      "sha256": "7fbf6ba577453c8f9020b73702ca2d3be15312d22e77dd3cbe054274badfc9a9"
+    },
+    {
+      "sourcePath": "tests/test_material_shot_runtime.py",
+      "path": "development/trigger-discipline/source/tests/test_material_shot_runtime.py",
+      "gitBlob": "eff6b7583f4c4254fdf786c2c1f37f759323eb65",
+      "mode": "100644",
+      "bytes": 3891,
+      "sha256": "f3346d65c132335f1e09a19ece3ae0f9aaf03a87cdf8f2c834e2dc82d26e3125"
+    },
+    {
+      "sourcePath": "tests/test_shot_reaction_runtime.py",
+      "path": "development/trigger-discipline/source/tests/test_shot_reaction_runtime.py",
+      "gitBlob": "db1a87147c5e4a0e4ca49d21e0a57006f0cdd6f6",
+      "mode": "100644",
+      "bytes": 4660,
+      "sha256": "2b12cca50ed1d7ab8146340957703eb8b8190b3542a0d64071fda1a7daaf8ca3"
+    },
+    {
+      "sourcePath": "tests/test_suppression_shot_runtime.py",
+      "path": "development/trigger-discipline/source/tests/test_suppression_shot_runtime.py",
+      "gitBlob": "0bdff5f3af0d25e3daa19574d69b57a81350bbb2",
+      "mode": "100644",
+      "bytes": 4152,
+      "sha256": "4757377ac990486e5c36dfe4e672088d818c38d557755879411ee35f650bead0"
+    },
+    {
+      "sourcePath": "tests/test_sylvia_authored_campaign.py",
+      "path": "development/trigger-discipline/source/tests/test_sylvia_authored_campaign.py",
+      "gitBlob": "3c3a4f8adce8486482775d5805427d4ac6fdb01e",
+      "mode": "100644",
+      "bytes": 17479,
+      "sha256": "de26d984e4a9834648337bc010cda69f5bc592c44d0578eaf3a385f6dac10a11"
+    },
+    {
+      "sourcePath": "tests/test_sylvia_build_eligibility.py",
+      "path": "development/trigger-discipline/source/tests/test_sylvia_build_eligibility.py",
+      "gitBlob": "74da064c92f6bd185d15457f52066ba60c073b85",
+      "mode": "100644",
+      "bytes": 3509,
+      "sha256": "056bb9e842bef8ba826d20b4605818014f3e2184c91d3390b407b8946e9780b7"
+    },
+    {
+      "sourcePath": "tests/test_sylvia_character_contract.py",
+      "path": "development/trigger-discipline/source/tests/test_sylvia_character_contract.py",
+      "gitBlob": "dc5cc89db88fd6529a4baed3d2249fb23ace211c",
+      "mode": "100644",
+      "bytes": 7526,
+      "sha256": "8527ba473a35f838ae3a604215cf61373f83d474cdee3f6df7af638fd3d91115"
+    },
+    {
+      "sourcePath": "tests/test_sylvia_ground_weapons.py",
+      "path": "development/trigger-discipline/source/tests/test_sylvia_ground_weapons.py",
+      "gitBlob": "a81364671f9ce38d8e2eb06b0d11ea58a6d5fc32",
+      "mode": "100644",
+      "bytes": 9276,
+      "sha256": "7e84e734ce367825304af418ddf84ade60cc0d77150a3a86b576e9583026591f"
+    },
+    {
+      "sourcePath": "tests/test_sylvia_medical.py",
+      "path": "development/trigger-discipline/source/tests/test_sylvia_medical.py",
+      "gitBlob": "7f1d48a30f2709615fb32558336453df4ce38511",
+      "mode": "100644",
+      "bytes": 13037,
+      "sha256": "8f35137302033b5543211ba549227bd3361199907be819210a655935e412b346"
+    },
+    {
+      "sourcePath": "tests/test_sylvia_network_access.py",
+      "path": "development/trigger-discipline/source/tests/test_sylvia_network_access.py",
+      "gitBlob": "eba0caee5f97c297da2211ea608dfd5e90e99255",
+      "mode": "100644",
+      "bytes": 10111,
+      "sha256": "5f0c1a849aeb066f21f3e97205c6a2ecacb9867ec8d3c5cb5d7502c1584d0e32"
+    },
+    {
+      "sourcePath": "tests/test_sylvia_network_functions.py",
+      "path": "development/trigger-discipline/source/tests/test_sylvia_network_functions.py",
+      "gitBlob": "a950d21039451f6829d8e0416585945c048f8a1b",
+      "mode": "100644",
+      "bytes": 25811,
+      "sha256": "6dcf19220698ff721a46aef527346626ac104268897097219c5406bf00c266b2"
+    },
+    {
+      "sourcePath": "tests/test_sylvia_network_security.py",
+      "path": "development/trigger-discipline/source/tests/test_sylvia_network_security.py",
+      "gitBlob": "d249e378874ecb0d480eb5039630c8c125f6ade9",
+      "mode": "100644",
+      "bytes": 8844,
+      "sha256": "ed4f4202a9635b45a30ab5ab960a988415f48ab379a60652895b2b9c2e69e825"
+    },
+    {
+      "sourcePath": "tests/test_sylvia_network_state_admission.py",
+      "path": "development/trigger-discipline/source/tests/test_sylvia_network_state_admission.py",
+      "gitBlob": "a2537542a8770c45d7ecfb22af4d2cf434056f5f",
+      "mode": "100644",
+      "bytes": 5393,
+      "sha256": "76318811989f01af59711a070dab0e0bfdc460f68ca86a296e5b4d42daeab4f4"
+    },
+    {
+      "sourcePath": "tests/test_sylvia_player_controls.py",
+      "path": "development/trigger-discipline/source/tests/test_sylvia_player_controls.py",
+      "gitBlob": "dfbb4f9a084a72e9a312217e562e8ae6b5efc7e2",
+      "mode": "100644",
+      "bytes": 53449,
+      "sha256": "b5129e7cf379d27ce9c9048afefe58ca5d05f732ebacbe7a54db03dead638184"
+    },
+    {
+      "sourcePath": "tests/test_sylvia_release_candidate.py",
+      "path": "development/trigger-discipline/source/tests/test_sylvia_release_candidate.py",
+      "gitBlob": "1d4dac915b236c706fefb2c4103fdd94a780096a",
+      "mode": "100644",
+      "bytes": 4839,
+      "sha256": "993632a911241d7df6928874c6159302cf1698ab4983a5fcfbb43ad2c4bf053f"
+    },
+    {
+      "sourcePath": "tests/test_sylvia_remote_entry.py",
+      "path": "development/trigger-discipline/source/tests/test_sylvia_remote_entry.py",
+      "gitBlob": "be777f322f150e6fde18ad02d8aa3998cbbbaacb",
+      "mode": "100644",
+      "bytes": 5101,
+      "sha256": "860eab15c6d5a3069c0c356446cf09c635c44e2d14cf2041fcfc616c9675a554"
+    },
+    {
+      "sourcePath": "tests/test_sylvia_ruleset_builder.py",
+      "path": "development/trigger-discipline/source/tests/test_sylvia_ruleset_builder.py",
+      "gitBlob": "acd4c005b22dcf7a395004ca262b91e9a31325cd",
+      "mode": "100644",
+      "bytes": 52545,
+      "sha256": "566e1fd3246811dffa6188ec356036bc6f66c39c8d8db67588ca5a5d30a0b93f"
+    },
+    {
+      "sourcePath": "tests/test_sylvia_snapshot_package.py",
+      "path": "development/trigger-discipline/source/tests/test_sylvia_snapshot_package.py",
+      "gitBlob": "248757eb5e7444deb5f6912c304a1abcfca82d8b",
+      "mode": "100644",
+      "bytes": 2945,
+      "sha256": "6ebae7c152866a7f3ec91aadd80fbd1924aa76465ecadfd83f4f958544271fa1"
+    },
+    {
+      "sourcePath": "tests/test_sylvia_weapon_handling.py",
+      "path": "development/trigger-discipline/source/tests/test_sylvia_weapon_handling.py",
+      "gitBlob": "57c8ef86d03549e554eef7bd98a3919295594c79",
+      "mode": "100644",
+      "bytes": 3813,
+      "sha256": "21aac703cc112fc7bbc23455a27804bc4159c36e6ae64d15b72e06d76ba95db7"
+    },
+    {
+      "sourcePath": "tests/test_sylvia_weapon_switching.py",
+      "path": "development/trigger-discipline/source/tests/test_sylvia_weapon_switching.py",
+      "gitBlob": "a747a0ade5b73d40b98e7106aad4c0b83a40eec2",
+      "mode": "100644",
+      "bytes": 4470,
+      "sha256": "598c0bc63be5333661c6054c07763ff47ceb7060199d7c0260e0816cd7fcbc46"
+    },
+    {
+      "sourcePath": "tests/test_sylvia_weapon_transfer.py",
+      "path": "development/trigger-discipline/source/tests/test_sylvia_weapon_transfer.py",
+      "gitBlob": "4f9e20055699bb09c6a45f9b4b2e70c612fcefc1",
+      "mode": "100644",
+      "bytes": 3769,
+      "sha256": "a00ef4385b5ede978c59556b117322a38e5a4e4cbaf98e61e3f74a97812fb58c"
+    }
+  ]
+}

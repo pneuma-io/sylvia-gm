@@ -1,3 +1,18 @@
+# Trigger Discipline inclusion and retained source
+
+Status: source consolidation and future inclusion planning. The owner approved public TD source visibility on 19 October 2026 and explicitly confirmed publication after the earlier approval-review block. The former blanket private/proprietary-disclosure gate below is superseded by that approval; existing licences and notices are preserved.
+
+This draft now retains 319 screened source files under `development/trigger-discipline/source/`, unchanged in bytes and modes from upstream #49 at `95d95c435f6cccd399a862ee44735d77ab07ed89`. Read the [snapshot overview](../development/trigger-discipline/README.md), [exact source manifest](../development/trigger-discipline/SOURCE-MANIFEST.json) and [licensing status](../development/trigger-discipline/LICENSING-STATUS.md).
+
+The source repository and its history remain private and unchanged. No private history, editor state, binary assets, captured journeys or generated package archives are copied. The manifest identifies the specifically excluded canonical note and machine-local guide; complete source closure is not claimed. Existing `LicenseRef-Proprietary` declarations remain unchanged, and public source visibility is not a new licence grant.
+
+The unfinished implementation, owning regressions and future host/package integration can continue in this draft from the retained sources. This commit does not generate a package, execute repository code, implement mechanics, activate TD in shipped defaults or establish gameplay/installed acceptance. The future inclusion outcome and test boundaries remain as recorded below, with the old disclosure gate treated only as superseded history. Siren #2 remains a distinct Setting composition.
+
+No merge, tag, release, purchase, new credentials or security/visibility change is selected. No GitHub Actions before November 2026.
+
+<details>
+<summary>Earlier planning proposal, preserved as superseded history where it conflicts with the selected source consolidation</summary>
+
 # Include the finished Trigger Discipline Ruleset
 
 Status: integration plan only. This public draft contains no Trigger Discipline source, generated runtime, rules text, fixtures or proprietary assets. Trigger Discipline is not yet finished or qualified by this PR.
@@ -49,3 +64,5 @@ If some material must remain proprietary/private, return a concrete alternative 
 A dedicated inclusion plan and upstream/Siren cross-references are established. Private source is not moved, merged, relicensed or exposed. Full implementation, release inclusion and gameplay acceptance remain future work after the explicit content/licensing decision.
 
 No GitHub Actions before November 2026. No merge, tag, release, purchase, security-setting change or new access is selected by this planning revision.
+
+</details>

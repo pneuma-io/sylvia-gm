@@ -1,0 +1,367 @@
+{
+  "$id": "pneuma-io.trigger-discipline.character-initial-state.v0-1",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "side",
+    "class_id",
+    "level",
+    "skills",
+    "aptitudes",
+    "specialties",
+    "active",
+    "ap",
+    "max_ap",
+    "hp",
+    "res",
+    "downed",
+    "stance",
+    "movement_m_per_ap",
+    "weapon",
+    "aim",
+    "recoil_recovery_per_ap",
+    "intrusion_ap_discount",
+    "local_access",
+    "medical_kit_capable",
+    "resuscitation_kit_capable",
+    "medicine_bonus",
+    "life_threatening"
+  ],
+  "properties": {
+    "active": {
+      "type": "boolean"
+    },
+    "ap": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "max_ap": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "hp": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "res": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "max_res": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Explicit character maximum including actual armor contribution; no default is inferred. Required for bounded between-encounter RES recovery."
+    },
+    "max_hp": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Explicit character maximum; no starting value or level scaling is inferred."
+    },
+    "downed": {
+      "type": "boolean"
+    },
+    "stance": {
+      "type": "string",
+      "enum": [
+        "STANDING",
+        "CROUCHED",
+        "PRONE"
+      ]
+    },
+    "movement_m_per_ap": {
+      "type": "number",
+      "minimum": 0
+    },
+    "weapon": {
+      "type": "object",
+      "required": [
+        "id",
+        "damage",
+        "target_pen",
+        "material_pen",
+        "recoil",
+        "range_breakpoints_m",
+        "range_modifiers",
+        "current_recoil",
+        "magazine",
+        "spare_magazines",
+        "retained_magazines",
+        "chamber",
+        "needs_cycle",
+        "mechanism",
+        "feed",
+        "reload_ap",
+        "cycle_ap",
+        "location",
+        "fire_modes"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "damage": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "target_pen": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "material_pen": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "recoil": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "range_breakpoints_m": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "minimum": 0
+          },
+          "minItems": 1
+        },
+        "range_modifiers": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "minItems": 1
+        },
+        "current_recoil": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cyclic_rate_rpm": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "magazine": {
+          "$id": "pneuma-io.trigger-discipline.magazine.v0-1",
+          "type": "object",
+          "required": [
+            "id",
+            "rounds"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "rounds": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false
+        },
+        "spare_magazines": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "rounds"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "rounds": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "retained_magazines": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "rounds"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "rounds": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "chamber": {
+          "type": "string",
+          "enum": [
+            "EMPTY",
+            "LIVE",
+            "SPENT"
+          ]
+        },
+        "needs_cycle": {
+          "type": "boolean"
+        },
+        "mechanism": {
+          "type": "string",
+          "enum": [
+            "SELF_LOADING",
+            "MANUAL_ACTION"
+          ]
+        },
+        "feed": {
+          "type": "string",
+          "enum": [
+            "DETACHABLE_MAGAZINE",
+            "TUBE"
+          ]
+        },
+        "reload_ap": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cycle_ap": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "location": {
+          "type": "string",
+          "enum": [
+            "READY",
+            "QUICK_ACCESS",
+            "STOWED"
+          ]
+        },
+        "controlled_by": {
+          "type": "string",
+          "minLength": 1,
+          "description": "ID of another actor restraining this weapon through CQC WEAPON CONTROL (see references/canon/CQC/CONTROL.md). This is not the weapon owner's ID. Omit this optional field for an unrestricted starting weapon; setting it blocks actions requiring freedom of the weapon."
+        },
+        "fire_modes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "SINGLE",
+              "SEMI_AUTO",
+              "BURST",
+              "FULL_AUTO"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "aim": {
+      "type": "object",
+      "required": [
+        "ap"
+      ],
+      "properties": {
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "point": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "ap": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "recoil_recovery_per_ap": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "intrusion_ap_discount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "local_access": {
+      "type": "boolean"
+    },
+    "medical_kit_capable": {
+      "type": "boolean"
+    },
+    "resuscitation_kit_capable": {
+      "type": "boolean"
+    },
+    "medicine_bonus": {
+      "type": "integer"
+    },
+    "battlefield_treatments": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "maxItems": 256,
+      "uniqueItems": true,
+      "description": "Stable injury/condition instance IDs already treated successfully in the field. Shared across medics; do not rename an old issue to claim another first treatment."
+    },
+    "life_threatening": {
+      "type": "object",
+      "required": [
+        "state",
+        "within_reversible_window"
+      ],
+      "properties": {
+        "state": {
+          "type": "string",
+          "enum": [
+            "NONE",
+            "ACTIVE",
+            "STABILIZED",
+            "FAILED"
+          ]
+        },
+        "within_reversible_window": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "control": {
+      "type": "object",
+      "required": [
+        "target",
+        "focus"
+      ],
+      "properties": {
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "focus": {
+          "type": "string",
+          "enum": [
+            "BODY_CONTROL",
+            "WEAPON_CONTROL"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
