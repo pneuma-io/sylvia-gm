@@ -72,8 +72,12 @@ acts or require them to finish the sequel.
   The frozen owner discovered both source-validated SRD Lite QA adventures and enabled Full Audit
   in the disposable profile. This is engineering-candidate evidence, not installed release approval.
 
-Ordinary desktop launch/input and the complete native disposable-campaign journey still require
-the coordinated desktop slot. Browser and owner proofs do not close them. Formal release packaging
+The engineering desktop launched with its packaged owner and disposable profile and rendered
+the Home/onboarding screen. Its screenshot is retained privately. Windows kept an idle Terminal
+foreground; bringing the WebView forward did not activate the window, and the app's existing
+permissions reject programmatic native focus. No campaign input was sent. The complete native
+disposable-campaign journey requires physical selection of the QA window before input can resume.
+Browser, startup and owner proofs do not close that journey. Formal release packaging
 also requires the existing private identity-check input. No merge, release or GitHub Actions run is
 included. The coordinator owns reconciliation of the complete PL-24, PL-01 and AR-30 Desk
 requirements and the original archive entries; this implementation note is not their replacement.
