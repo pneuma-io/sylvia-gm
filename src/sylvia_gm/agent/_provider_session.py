@@ -2525,7 +2525,6 @@ class ProviderSessionAdapter:
                     ):
                         messages[index] = refreshed_context
                         break
-                messages = self._request_messages(messages)
             assemblies: dict[int, _ToolCallAssembly] = {}
             mechanics_action_ids: dict[str, str] = {}
             mechanics_parameters: dict[str, dict[str, object]] = {}
@@ -2647,7 +2646,7 @@ class ProviderSessionAdapter:
                 or atomic_campaign_file_completion_required
             )
             for chunk in self._stream_round(
-                self._request_messages(inference_messages),
+                inference_messages,
                 tools,
                 control=provider_input.control,
                 provider_input=provider_input,
@@ -5040,7 +5039,7 @@ class ProviderSessionAdapter:
                 ),
             })
         messages.extend(resumed_tool_messages)
-        return self._request_messages(messages)
+        return messages
 
     def _current_campaign_context_payload(
         self,
@@ -5602,7 +5601,7 @@ class ProviderSessionAdapter:
                 progress=control.set_status_hint,
                 prepare_continuation=lambda selected, has_tools: (
                     self._attach_native_continuation(
-                        selected, provider_input, has_tools=has_tools,
+                        self._request_messages(selected), provider_input, has_tools=has_tools,
                     )
                 ),
             )

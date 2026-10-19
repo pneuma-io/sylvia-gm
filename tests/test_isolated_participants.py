@@ -766,8 +766,7 @@ def test_participant_tool_contract_stays_identical_when_current_offers_change(is
     assert second_messages[1] == first_messages[-1]
 
 
-@pytest.mark.asyncio
-async def test_fresh_gm_state_follows_history_without_entering_chatgpt_base_instructions(
+def test_fresh_gm_state_follows_history_without_entering_chatgpt_base_instructions(
     isolated_game, tmp_path,
 ):
     from sylvia_gm.provider._chatgpt import ChatGPTProvider
@@ -792,7 +791,7 @@ async def test_fresh_gm_state_follows_history_without_entering_chatgpt_base_inst
     for index in range(2):
         messages = adapter._messages(source)
         tools, _ = adapter._provider_tools(source.catalog)
-        await provider.generate(messages, tools=tools)
+        list(adapter._stream_round(messages, tools, control=source.control, provider_input=source))
         if index == 0:
             request = owner.actor_decision_request("tokens", turn_id="turn")
             owner.execute_action(owner.actor_decision_command(request, choice_id="a:0",
