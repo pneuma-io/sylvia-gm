@@ -38,7 +38,8 @@ test('keyboard dictation reviews text and ordinary Send submits exactly once', {
         sessions: [{ session_id: 'fixture-gm', role: 'dm', status: 'active', provider_id: 'test', model_id: 'fixture' }] }];
       window.submissions = []; window.cancelled = []; window.nextTranscript = 'I walk north.';
       state.bridge = {
-        dictation_start: async id => { window.captureId = id; },
+        dictation_capabilities: async () => ({ engines: [{ id: 'test', language: 'en-GB', label: 'English (United Kingdom)' }] }),
+        dictation_start: async (id, engine) => { window.captureId = id; window.selectedSpeechEngine = engine; },
         dictation_stop: () => new Promise(resolve => { window.finishDictation = resolve; }),
         dictation_cancel: async id => { window.cancelled.push(id); },
         submit_session_input: command => { window.submissions.push(command); return new Promise(() => {}); },
@@ -54,6 +55,11 @@ test('keyboard dictation reviews text and ordinary Send submits exactly once', {
     assert.match(await page.locator('#dictation-status').innerText(), /Recording/);
     assert.equal(await page.locator('#dictation-status').getAttribute('aria-live'), 'polite');
     assert.equal(await input.isEditable(), true);
+    assert.equal(await page.getByLabel('Speech language').inputValue(), 'test');
+    assert.equal(await page.evaluate(() => window.selectedSpeechEngine), 'test');
+    await page.locator('#dictation-options summary').click();
+    assert.match(await page.locator('#dictation-privacy').innerText(), /does not save recordings/);
+    await page.locator('#dictation-options summary').click();
     assert.equal(await page.evaluate(() => window.submissions.length), 0);
     await page.locator('#dictation-toggle').focus(); await page.keyboard.press('Space');
     assert.match(await page.locator('#dictation-status').innerText(), /Transcribing/);
@@ -115,6 +121,27 @@ test('keyboard dictation reviews text and ordinary Send submits exactly once', {
     assert.equal(await page.evaluate(() => window.submissions.length), 1);
     assert.equal(await page.evaluate(() => window.submissions[0].user_text), 'I wait outside and knock softly.');
     assert.equal(await page.locator('#dictation-review-panel').isVisible(), false);
+    await page.evaluate(() => {
+      const api = window.dictationTest;
+      api.state.activeCampaignId = null; api.state.activeSessionId = 'builder-fixture';
+      api.state.activeSessionRole = 'builder';
+      api.state.builderChats = [{ session: { session_id: 'builder-fixture', role: 'builder',
+        status: 'active', provider_id: 'test', model_id: 'fixture' } }];
+      const activity = api.ensureSessionActivity(); activity.phase = 'working'; activity.attemptId = 'builder-running';
+      window.steering = [];
+      api.state.bridge.steer_session = async (...args) => { window.steering.push(args); };
+      api.refreshSessionInputAdmission();
+    });
+    await input.fill('Use a desert.');
+    await mic.click();
+    await page.getByRole('button', { name: 'Stop dictation', exact: true }).click();
+    assert.equal(await page.getByRole('button', { name: 'Send message', exact: true }).isVisible(), false);
+    await input.press('Enter');
+    await page.waitForFunction(() => window.steering.length === 1 && document.getElementById('player-input').value === '');
+    await page.evaluate(() => window.finishDictation('late Builder words'));
+    assert.equal(await input.inputValue(), '');
+    assert.equal(await page.locator('#dictation-review-panel').isVisible(), false);
+    assert.equal(await page.evaluate(() => window.submissions.length), 1);
     assert.deepEqual(errors, []);
   } finally { await browser.close(); }
 });

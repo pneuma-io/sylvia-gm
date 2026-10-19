@@ -9,7 +9,7 @@
   const failures = {
     permission: 'Microphone permission was denied. Allow microphone access, then try again. Your draft is kept.',
     device: 'No microphone is available. Connect a microphone, then try again. Your draft is kept.',
-    unavailable: 'Dictation is unavailable. You can keep typing. Your draft is kept.',
+    unavailable: 'Local dictation is unavailable. Check that a Windows desktop speech language is installed, or keep typing. Your draft is kept.',
     provider: 'Transcription failed. Try dictating again. Your draft is kept.',
     empty: 'No speech was recognised. Try dictating again. Your draft is kept.',
     timeout: 'Dictation timed out and the microphone was stopped. Try again. Your draft is kept.',

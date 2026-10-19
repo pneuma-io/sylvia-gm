@@ -1,6 +1,6 @@
 # Dictation
 
-Status: PL-11 composer and lifecycle implementation in progress. Backend selection and native microphone acceptance remain open; this draft is not a working speech-recognition delivery yet.
+Status: PL-11 composer and local Windows recognition implemented. Current native-shell rebuild and physical microphone acceptance remain open.
 
 ## User outcome
 
@@ -12,15 +12,19 @@ The core journey is an ordinary player action in GM mode. Reuse the same compose
 
 The shared GM/Builder composer now has keyboard-operable microphone, cancel, undo and re-dictation controls, visible status announcements, cursor insertion and editable transcript review. An unchanged draft receives the transcript at its saved selection. Later typing keeps its text and receives a separate editable transcript with explicit insertion. Session changes, cancellation and timeouts invalidate old results. Only ordinary Send submits a message.
 
-The frontend capture contract requires explicit start, stop-to-transcript and cancellation, with abort cleanup. Existing model-provider adapters have no transcription route. The native bridge implementation is pending the owner's local-versus-hosted backend selection. Until that is selected and connected, the mic reports that dictation is unavailable and keeps typing usable.
+The frontend capture contract requires explicit start, stop-to-transcript and cancellation, with abort cleanup. Existing model-provider adapters have no transcription route. Daniel selected local-only recognition. The native host uses the installed Microsoft Windows desktop speech recognizer through System.Speech in Windows PowerShell. It lists installed languages and has no hosted fallback, credentials, downloads or paid requests. Other platforms or missing Windows speech support return an unavailable state while typing remains usable.
+
+The host retains the existing trusted-main-window checks. It owns one temporary child process, bounded replies and startup/stop/lifetime deadlines. Cancel works during startup and transcription; old cancellation IDs cannot stop a newer capture. Closing the main window or app releases capture. The production helper creates no audio files and disables acoustic adaptation for the recognizer instance without changing persisted user settings. Audio and transcripts do not enter routine diagnostics. Production code contains no fixture transcript controls.
+
+Sending active-turn Builder steering cancels dictation before waiting for acceptance, so transcription cannot repopulate a sent composer or change the draft during that wait. Rejected steering keeps the typed draft.
 
 ## Proposed flow and boundaries
 
 - Provide visible, keyboard-operable Start, Stop and Cancel controls. A sustained button hold may be optional, but a start/stop alternative is required. Give accessible names and announcements for idle, recording, transcribing, review-ready and failed states.
 - Request microphone access only from an explicit user action. Show when capture is active and stop capture on cancel, closure or relevant session change. Permission denial, missing device and provider failure must leave ordinary typing usable.
-- Preserve the existing draft. Prefer insertion at the selected cursor/selection; show a reviewable result and allow undo/re-dictation. Confirm this combine behavior against the actual composer before implementation. A delayed transcript must never land in another session or overwrite text typed meanwhile.
+- Preserve the existing draft. Insert at the selected cursor/selection; show a reviewable result and allow undo/re-dictation. A delayed transcript must never land in another session or overwrite text typed meanwhile.
 - Transcription does not send a player message. The user reviews/corrects the text and presses the normal Send control; the request is submitted exactly once through the existing path.
-- Select the actual transcription backend, supported languages/platforms, credentials and any network/cost disclosure before connecting it. No provider is forced, purchased or configured by this plan. Do not silently transmit recordings, enable continuous listening, keep audio indefinitely or upload gameplay.
+- Use the selected on-device Windows backend and its installed languages. Keep the selected language and local-audio explanation in collapsed dictation settings. Do not transmit recordings, enable continuous listening or retain audio.
 - Define temporary audio cleanup and redacted failure diagnostics. Never log raw audio, credentials or private transcripts as routine engineering output.
 
 ## Acceptance
@@ -31,21 +35,23 @@ The frontend capture contract requires explicit start, stop-to-transcript and ca
 4. Complete the journey using keyboard and assistive controls without holding a button. Check clear recording state, accessible announcements and ordinary typing throughout.
 5. Verify the selected real microphone/provider path on disposable data and the affected installed frontend. Mocked transcripts alone do not establish native capture or accessibility acceptance.
 
-## Decisions for implementation
+## Selected integration
 
-Choose the supported transcription integration and privacy/retention behavior, then settle the precise transcript/draft merge interaction against the current composer. These choices do not expand the scope to TTS, full voice play, ambient recording or automatic message submission.
+Local-only Windows dictation is selected. Only explicit Start opens audio input. This does not expand the scope to TTS, full voice play, ambient recording or automatic message submission.
 
-The proposed first backend is on-device Windows speech recognition using an installed language recognizer, without new paid API configuration or audio upload. This remains a recommendation awaiting owner selection. A metadata-only probe found an English (UK) recognizer in the selected Windows environment; no microphone was opened. Hosted transcription would require explicit provider, privacy and cost selection.
+A metadata-only probe found an installed English (UK) recognizer. The production helper, with its microphone-input line replaced privately by file input, transcribed an offline synthesized WAV. It returned `I walk north and opened the door` for `I walk north and open the door.` This proves real local recognition with a visible correction need, without opening a microphone or speaker. It does not prove physical capture. No new engine or language was installed.
 
 ## Current verification
 
 - `node --test tests/frontend_dictation.test.cjs` covers selection insertion, once-only completion, undo/re-dictation, draft edits during transcription, cancellation, session switching, permission/device/provider failures, empty results and timeouts using controlled fixtures.
-- `node --test tests/frontend_dictation.browser.cjs tests/frontend_shell.browser.cjs` passes in Edge with synthetic bridge responses: keyboard start/stop/cancel, editable review/correction, stale-result protection, no automatic send, exactly one ordinary send, model-control spacing and short-window layout.
-- `node --test tests/frontend_saved_sessions.test.cjs tests/frontend_agent_activity.test.cjs` preserves the existing draft/session and activity checks.
-- Real microphone, real transcription backend, assistive-technology operation and normal native application acceptance have not run. Browser fixtures do not establish those results.
+- `node --test tests/frontend_dictation.browser.cjs tests/frontend_shell.browser.cjs` passes in Edge with synthetic bridge responses: keyboard start/stop/cancel, language/privacy disclosure, editable review/correction, stale-result protection, no automatic send, exactly one ordinary send, active-turn Builder Enter steering, model-control spacing and short-window layout.
+- `node --test tests/frontend_saved_sessions.test.cjs tests/frontend_agent_activity.test.cjs` preserves the existing draft/session and activity checks, including accepted and rejected steering with transcription completing during or after the request.
+- The Rust module has seven process-controller tests for cancellation before/during start and transcription, one active capture, one Stop result, old cancellation IDs, bounded waits and redacted malformed/failure replies. A small private harness compiled the exact module without the full desktop dependency graph.
+- Earlier native UIA checks and screenshots cover source `f218196c2f9cd0317185cf1fd0abb90e33345ebb` with a real source owner and controlled transcript fixtures. They retain that qualification; they do not validate the later native recognition bridge.
+- Current full native build/launch, physical microphone operation, audible assistive-technology announcements and installed/packaged-owner acceptance remain unverified. Browser fixtures and isolated controller compilation do not replace these checks.
 
 ## Full specification and implementation boundary
 
 Specification reference: PL-11 - `9290fded-752a-4e8f-8da5-f7585a726c83`. Desk revision 8 and all complete original ticket versions were retrieved before implementation. The original archive matched its supplied SHA-256. The complete Desk specifications and linked original acceptance remain authoritative; these public notes are an implementation summary. Daniel's implementation selection supersedes the earlier planning-only boundary. The coordinator owns Desk reconciliation.
 
-This checkpoint changes the composer and its focused tests. Backend connection and native acceptance are still required to complete the feature. No credentials, installation, paid calls, actual user audio, merge or release are included. No GitHub Actions before November 2026.
+This change owns the generic composer and native speech capture. Ruleset content, SRD selection/expansion, schemas, campaign data, model adapters, dependency versions and packaged owner bytes are unchanged. No installed playable copy was modified. Native acceptance remains required. No credentials, installation, paid calls, actual user audio, merge or release are included. No GitHub Actions before November 2026.

@@ -112,6 +112,28 @@ const SylviaGMFrontend = (() => {
   const $ = (id) => document.getElementById(id);
   let dictation = null;
   let dictationRevision = 0;
+  let dictationEngines = null;
+
+  // Discovery reads installed language metadata only; capture still needs explicit Start.
+  async function dictationEngine(bridge) {
+    if (!bridge.dictation_capabilities) throw { code: 'unavailable' };
+    if (!dictationEngines) {
+      const capabilities = await bridge.dictation_capabilities();
+      const engines = capabilities?.engines;
+      if (!Array.isArray(engines) || !engines.length) throw { code: 'unavailable' };
+      dictationEngines = engines;
+      const select = $('dictation-language');
+      select.replaceChildren(...engines.map(engine => {
+        const option = document.createElement('option');
+        option.value = engine.id; option.textContent = engine.label || engine.language;
+        return option;
+      }));
+      const preferred = engines.find(engine => engine.language === navigator.language);
+      select.value = (preferred || engines[0]).id;
+      $('dictation-options').hidden = false;
+    }
+    return $('dictation-language').value;
+  }
 
   // Dictation edits this composer only; the normal Send path owns all submissions.
   function initDictation() {
@@ -131,7 +153,9 @@ const SylviaGMFrontend = (() => {
         };
         signal.addEventListener('abort', cancel, { once: true });
         try {
-          await bridge.dictation_start(id);
+          const engine = await dictationEngine(bridge);
+          if (signal.aborted) throw { code: 'unavailable' };
+          await bridge.dictation_start(id, engine);
           if (signal.aborted) { cancel(); throw { code: 'unavailable' }; }
           return { stop: () => bridge.dictation_stop(id), cancel: () => {
             signal.removeEventListener('abort', cancel); cancel();
@@ -192,6 +216,7 @@ const SylviaGMFrontend = (() => {
     $('dictation-toggle-text').textContent = recording ? 'Stop dictation' : 'Dictate';
     $('dictation-status').textContent = value.message;
     $('dictation-status').hidden = value.phase === 'idle' && !value.message;
+    $('dictation-language').disabled = busy;
     $('dictation-cancel').hidden = !busy && !value.transcript;
     $('dictation-undo').hidden = !value.canUndo || busy || !enabled;
     $('dictation-redo').hidden = !value.canUndo || busy || !enabled;
@@ -702,6 +727,10 @@ const SylviaGMFrontend = (() => {
     if (!invoke) return null;
     return {
       application_info: () => invoke('application_info'),
+      dictation_capabilities: () => invoke('dictation_capabilities'),
+      dictation_start: (id, engine) => invoke('dictation_start', { id, engine }),
+      dictation_stop: (id) => invoke('dictation_stop', { id }),
+      dictation_cancel: (id) => invoke('dictation_cancel', { id }),
       campaign_index: () => invoke('campaign_index'),
       campaign_creation_catalog: () => invoke('campaign_creation_catalog'),
       delete_reusable_library_entry: (command) => invoke('delete_reusable_library_entry', {
@@ -11000,6 +11029,9 @@ const SylviaGMFrontend = (() => {
     }
     if (activityIsWorking(activity) && sessionRole === 'builder') {
       if (!state.bridge.steer_session || activity.stopRequestedAttemptId || !text.trim()) return;
+      if (selectedActivityMatches(activity)) {
+        dictation?.cancel('Dictation stopped. Your message uses the ordinary Send action.');
+      }
       saveSelectedSessionDraft();
       try {
         await state.bridge.steer_session(sessionId, 'steering-' + crypto.randomUUID(), text.trim());
