@@ -1,6 +1,6 @@
 # Dictation
 
-Status: selected planning scope, PL-11. The feature is not implemented by this draft.
+Status: PL-11 composer and lifecycle implementation in progress. Backend selection and native microphone acceptance remain open; this draft is not a working speech-recognition delivery yet.
 
 ## User outcome
 
@@ -10,7 +10,9 @@ The core journey is an ordinary player action in GM mode. Reuse the same compose
 
 ## Current baseline
 
-The current desktop frontend has typed message/Builder input and a Tauri host bridge. The selected frontend file does not expose a reviewed recording/transcription journey. Ordinary message submission and session/request identity handling should be reused. This source inspection is not a fresh microphone or installed-app test, and a keyword check is not proof that every related helper is absent.
+The shared GM/Builder composer now has keyboard-operable microphone, cancel, undo and re-dictation controls, visible status announcements, cursor insertion and editable transcript review. An unchanged draft receives the transcript at its saved selection. Later typing keeps its text and receives a separate editable transcript with explicit insertion. Session changes, cancellation and timeouts invalidate old results. Only ordinary Send submits a message.
+
+The frontend capture contract requires explicit start, stop-to-transcript and cancellation, with abort cleanup. Existing model-provider adapters have no transcription route. The native bridge implementation is pending the owner's local-versus-hosted backend selection. Until that is selected and connected, the mic reports that dictation is unavailable and keeps typing usable.
 
 ## Proposed flow and boundaries
 
@@ -21,7 +23,7 @@ The current desktop frontend has typed message/Builder input and a Tauri host br
 - Select the actual transcription backend, supported languages/platforms, credentials and any network/cost disclosure before connecting it. No provider is forced, purchased or configured by this plan. Do not silently transmit recordings, enable continuous listening, keep audio indefinitely or upload gameplay.
 - Define temporary audio cleanup and redacted failure diagnostics. Never log raw audio, credentials or private transcripts as routine engineering output.
 
-## Acceptance and future tests
+## Acceptance
 
 1. With disposable speech, start/stop recording, review/edit the transcript and submit the intended action exactly once. Assert no submission before Send.
 2. Exercise cursor insertion, an existing draft, text edited while transcription is pending, re-dictation, undo, cancel and session switching. Retain the correct draft and session identity.
@@ -33,8 +35,17 @@ The current desktop frontend has typed message/Builder input and a Tauri host br
 
 Choose the supported transcription integration and privacy/retention behavior, then settle the precise transcript/draft merge interaction against the current composer. These choices do not expand the scope to TTS, full voice play, ambient recording or automatic message submission.
 
+The proposed first backend is on-device Windows speech recognition using an installed language recognizer, without new paid API configuration or audio upload. This remains a recommendation awaiting owner selection. A metadata-only probe found an English (UK) recognizer in the selected Windows environment; no microphone was opened. Hosted transcription would require explicit provider, privacy and cost selection.
+
+## Current verification
+
+- `node --test tests/frontend_dictation.test.cjs` covers selection insertion, once-only completion, undo/re-dictation, draft edits during transcription, cancellation, session switching, permission/device/provider failures, empty results and timeouts using controlled fixtures.
+- `node --test tests/frontend_dictation.browser.cjs tests/frontend_shell.browser.cjs` passes in Edge with synthetic bridge responses: keyboard start/stop/cancel, editable review/correction, stale-result protection, no automatic send, exactly one ordinary send, model-control spacing and short-window layout.
+- `node --test tests/frontend_saved_sessions.test.cjs tests/frontend_agent_activity.test.cjs` preserves the existing draft/session and activity checks.
+- Real microphone, real transcription backend, assistive-technology operation and normal native application acceptance have not run. Browser fixtures do not establish those results.
+
 ## Full specification and implementation boundary
 
-Planning references: PL-11 — `9290fded-752a-4e8f-8da5-f7585a726c83`. The complete current Desk specifications and their linked original acceptance/source material remain authoritative. Retrieve all of them through authorized access before implementation; these public notes are an index and selected scope, not a replacement handoff. Daniel's latest selection here supersedes conflicting older framing. The coordinator owns Desk reconciliation.
+Specification reference: PL-11 - `9290fded-752a-4e8f-8da5-f7585a726c83`. Desk revision 8 and all complete original ticket versions were retrieved before implementation. The original archive matched its supplied SHA-256. The complete Desk specifications and linked original acceptance remain authoritative; these public notes are an implementation summary. Daniel's implementation selection supersedes the earlier planning-only boundary. The coordinator owns Desk reconciliation.
 
-This PR changes one proposal document only. No feature implementation, external configuration, credentials, installation, paid calls, tests of the feature, merge or release is delivered. No GitHub Actions before November 2026. Future implementation and final-byte acceptance remain separate work.
+This checkpoint changes the composer and its focused tests. Backend connection and native acceptance are still required to complete the feature. No credentials, installation, paid calls, actual user audio, merge or release are included. No GitHub Actions before November 2026.

@@ -1155,6 +1155,14 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
 .input-composer { position: relative; min-width: 0; border: 1px solid var(--border-color); border-radius: 16px;
   padding: 10px; background: var(--bg-input); }
 .input-composer:focus-within { border-color: var(--accent-primary-dim); }
+.dictation-feedback { font-size: 12px; padding: 0 6px; }
+.dictation-feedback [hidden] { display: none; }
+.dictation-feedback p { margin: 4px 0 8px; }
+.dictation-feedback textarea { resize: vertical; max-height: 160px; }
+.dictation-feedback button { margin: 4px 4px 8px 0; }
+#dictation-toggle { display: inline-flex; align-items: center; gap: 5px; }
+#dictation-toggle svg { width: 16px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+#dictation-toggle[aria-pressed="true"] { color: var(--error, #fca5a5); border-color: currentColor; }
 .input-composer #player-input { border: 0; background: transparent; padding: 2px 14px 10px 4px;
   resize: none; min-height: 58px; max-height: 200px; box-shadow: none; font-family: var(--font-sans);
   transition: color var(--transition); }
