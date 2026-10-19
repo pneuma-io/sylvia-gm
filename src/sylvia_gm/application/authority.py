@@ -34,6 +34,7 @@ from sylvia_gm.application.decision_scope import (
     project_model_decision_scope,
     project_campaign_preparation_scope,
     project_player_control_scope,
+    player_viewer_ids,
 )
 from sylvia_gm.application.interview_content import resolve_interview_content
 from sylvia_gm.application.knowledge_search import (
@@ -90,6 +91,7 @@ from sylvia_gm.application.player_actions import (
     retain_player_action_origin,
     validate_player_control,
 )
+from sylvia_gm.application.piece_table import PieceTableError, project_piece_table
 from sylvia_gm.application.result_cards import project_result_card
 from sylvia_gm.application.schema_admission import (
     validate_json_value,
@@ -6222,6 +6224,26 @@ class AuthorityOwner:
                     state=snapshot.state,
                     participants=snapshot.participants,
                 )
+                if surface_spec.get("renderer") == "piece_table":
+                    viewer_ids = player_viewer_ids(
+                        snapshot, self._decision_scope_declaration(snapshot),
+                    )
+                    try:
+                        data = project_piece_table(
+                            data, viewer_ids=viewer_ids,
+                            action_ids=frozenset(action["id"] for action in surface_spec["actions"]),
+                        )
+                    except PieceTableError:
+                        projected_surfaces.append({
+                            **{key: thaw_json_value(value) for key, value in surface_spec.items()
+                               if key != "source"},
+                            "data": {"unavailable_reason": "The saved table cannot be displayed."},
+                            "actions": [],
+                        })
+                        continue
+                    surface_spec = owned_payload({
+                        key: value for key, value in surface_spec.items() if key != "source"
+                    })
                 if surface_spec.get("renderer") in {"tactical_grid", "coordinate_map"}:
                     if (surface_spec.get("renderer") == "coordinate_map" and isinstance(data, Mapping)
                             and "enabled" in data and data["enabled"] is not True):

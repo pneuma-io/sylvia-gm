@@ -6,7 +6,12 @@ const path = require('node:path');
 const { chromium } = require('playwright');
 const frontend = path.resolve(__dirname, '../src-tauri/frontend');
 
-for (const failStartup of [false, true]) test(`detached panel startup ${failStartup ? 'shows a recovery error' : 'renders the first owner projection'}`, { timeout: 15000 }, async () => {
+for (const scenario of [
+  {failStartup: false, renderer: 'party'},
+  {failStartup: true, renderer: 'party'},
+  {failStartup: false, renderer: 'piece_table'},
+]) test(`detached panel startup ${scenario.failStartup ? 'shows a recovery error' : `renders ${scenario.renderer}`}`, { timeout: 15000 }, async () => {
+  const {failStartup, renderer} = scenario;
   const browser = await chromium.launch({ headless: true, channel: process.platform === 'win32' ? 'msedge' : undefined });
   try {
     const page = await browser.newPage();
@@ -14,11 +19,11 @@ for (const failStartup of [false, true]) test(`detached panel startup ${failStar
     page.on('pageerror', error => errors.push(error.stack));
     await page.route('https://sylvia-panel.test/**', async route => {
       const name = new URL(route.request().url()).pathname.slice(1);
-      if (!['panel.html', 'app.css', 'app.js', 'panel-workspace.js', 'shot-playback.js', 'panel-host.js'].includes(name)) return route.abort();
+      if (!['panel.html', 'app.css', 'app.js', 'panel-workspace.js', 'shot-playback.js', 'panel-host.js', 'piece-table.js'].includes(name)) return route.abort();
       await route.fulfill({ body: fs.readFileSync(path.join(frontend, name)),
         contentType: name.endsWith('.js') ? 'text/javascript' : name.endsWith('.css') ? 'text/css' : 'text/html' });
     });
-    await page.addInitScript(failStartup => {
+    await page.addInitScript(({failStartup, renderer}) => {
       const context = { campaign_id: 'synthetic', session_id: 'synthetic-gm', generation: 'generation-one' };
       const windowId = 'party-window';
       window.__sylviaPanelContext = { context, window_id: windowId };
@@ -33,7 +38,16 @@ for (const failStartup of [false, true]) test(`detached panel startup ${failStar
             listeners.get('panel-workspace')({ payload: { context, window_id: windowId, payload: {
               presentation_sequence: 1, busy: false, theme: 'slate',
               projection: { campaign_id: 'synthetic', revision: 1, shot_effects: [], surfaces: [
-                { id: 'party', title: 'Party', renderer: 'party', actions: [], data: {
+                { id: 'party', title: 'Party', renderer, actions: [], data: renderer === 'piece_table' ? {
+                  format: 1, title: 'Signal console', status: [{label: 'Cycle', value: '3'}], areas: [
+                    {id: 'operator', label: 'Operator', position: 'bottom', groups: [
+                      {id: 'programs', label: 'Programs', pieces: [{id: 'ghost', label: 'Ghost route'}]},
+                    ]},
+                    {id: 'remote', label: 'Remote operator', position: 'top', groups: [
+                      {id: 'concealed', label: 'Programs', concealed: true, count: 13},
+                    ]},
+                  ],
+                } : {
                   participants: [{ id: 'asha', kind: 'character', data: { name: 'Asha' } }],
                   entities: { asha: { hp: 8, ap: 4, res: 7, stance: 'STANDING' } },
                 } },
@@ -46,7 +60,7 @@ for (const failStartup of [false, true]) test(`detached panel startup ${failStar
           return {};
         } },
       };
-    }, failStartup);
+    }, scenario);
     await page.goto('https://sylvia-panel.test/panel.html');
     await page.waitForFunction(() => document.getElementById('session-status-text').textContent !== 'Loading campaign panels…');
     const status = await page.locator('#session-status-text').textContent();
@@ -55,7 +69,13 @@ for (const failStartup of [false, true]) test(`detached panel startup ${failStar
       assert.match(status, /Could not load campaign panels: .*Synthetic transport unavailable/);
       assert.match(status, /Close this window to return the panels to the sidebar/);
     } else {
-      assert.ok(content.includes('Asha'), `Panel did not render: status=${status}; errors=${JSON.stringify(errors)}`);
+      assert.ok(content.includes(renderer === 'piece_table' ? 'Ghost route' : 'Asha'), `Panel did not render: status=${status}; errors=${JSON.stringify(errors)}`);
+      if (renderer === 'piece_table') {
+        assert.match(content, /13 concealed pieces/);
+        await page.setViewportSize({width: 400, height: 700});
+        const overflow = await page.locator('.piece-table').evaluate(element => element.scrollWidth > element.clientWidth);
+        assert.equal(overflow, false, 'Narrow table should wrap without horizontal overflow');
+      }
       assert.equal(status, '');
     }
     assert.deepEqual(errors, []);

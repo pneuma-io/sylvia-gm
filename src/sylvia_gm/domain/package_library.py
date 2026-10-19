@@ -1498,6 +1498,7 @@ _UI_RENDERERS = frozenset(
         "tactical_grid",
         "coordinate_map",
         "network_graph",
+        "piece_table",
     }
 )
 _UI_PLACEMENTS = frozenset({"docked", "floating", "window"})

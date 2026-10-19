@@ -282,9 +282,28 @@ def project_player_control_scope(
     return owned_payload({"available": False, "focused_actor_id": None, "actors": []})
 
 
+def player_viewer_ids(
+    snapshot: CampaignState, declared: Mapping[str, object] | None,
+) -> frozenset[str]:
+    """Identify the player's participants independently of whose turn is active.
+
+    Viewing a participant's private presentation does not authorize acting as them.
+    Only the admitted Ruleset role declaration and canonical participants select it.
+    """
+
+    control = declared.get("participant_control") if declared is not None else None
+    if not isinstance(control, Mapping):
+        return frozenset()
+    return frozenset(
+        participant.participant_id for participant in snapshot.participants
+        if participant.data.get(str(control["field"])) in control["player_values"]
+    )
+
+
 __all__ = (
     "DecisionScopeProjectionError",
     "project_model_decision_scope",
     "project_campaign_preparation_scope",
     "project_player_control_scope",
+    "player_viewer_ids",
 )

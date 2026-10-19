@@ -104,6 +104,53 @@ history. Foreign prompts, macros, regex and scripts remain inert; no expansion,
 fetch, execution, provider-policy change or tool authority follows from them.
 Narrative abilities do not grant mechanical powers.
 
+## Grouped piece tables
+
+A panel can select `renderer: piece_table` with the ordinary `state`, `literal`, or
+composed source declaration. Its source resolves to a closed version-1 object:
+
+```json
+{
+  "format": 1,
+  "title": "Relay console",
+  "status": [{"label": "Cycle", "value": "3"}],
+  "areas": [{
+    "id": "relay", "label": "Relay", "position": "center",
+    "groups": [{
+      "id": "route", "label": "Route", "visibility": "public",
+      "pieces": [{"id": "a", "label": "A", "detail": "Online", "emphasis": "accent"}]
+    }]
+  }]
+}
+```
+
+Use each of `top`, `left`, `center`, `right`, and `bottom` at most once. Narrow
+panels stack areas in declaration order. Each area contains ordered groups, and
+each group contains ordered pieces. Status values and all labels are plain text.
+Pieces may use `normal`, `accent`, or `muted` emphasis. There is no package HTML,
+JavaScript, remote asset loading, or renderer-owned gameplay state.
+
+An owner-only group sets `visibility: owner` and `owner` to an admitted participant
+identity. The owner resolves viewing identities through the Ruleset's existing
+`model_decision_boundary.participant_control` declaration and canonical participants,
+independently of whose turn it is. Missing control declarations reveal no private
+pieces. A concealed group exposes its label and, only with `show_count: true`, its
+piece count. Neither the hidden pieces nor the original source are sent to the UI.
+Public metadata must itself be suitable for all viewers.
+
+A piece may reference `action_id`, the identity of one of this panel's declared
+actions. This renders an ordinary action button. It cannot supply tool parameters
+or bypass existing revision, capability, player-control, or command admission.
+Avoid private values in action declarations: declarations are public presentation.
+The Ruleset still computes legal actions, scoring and state transitions. Invalid
+tables show an unavailable message with no table controls.
+
+Limits are five areas, 16 status values, 64 groups total, 256 pieces per group,
+1,024 pieces total, and 256 UTF-8 bytes per label. Piece identities are unique
+within their group; area identities and positions are unique within the table.
+The synthetic `tests/fixtures/piece-table/signal-console.json` demonstrates a
+non-Mahjong composition with private programs and a public route.
+
 ## Plan completion
 
 The Plan definition and `BUILD CAMPAIGN PLAN` reference preserve FC-15 semantics.

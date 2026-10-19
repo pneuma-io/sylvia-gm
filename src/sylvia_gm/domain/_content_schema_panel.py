@@ -16,6 +16,7 @@ RENDERERS = [
     "tactical_grid",
     "coordinate_map",
     "network_graph",
+    "piece_table",
 ]
 PLACEMENTS = ["docked", "floating", "window"]
 TACTICAL_BINDINGS = [

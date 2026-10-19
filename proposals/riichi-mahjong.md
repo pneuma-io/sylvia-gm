@@ -1,6 +1,6 @@
 # Riichi Mahjong
 
-Status: selected planning scope combining PL-13, PL-14 and the applicable PL-15 content boundary. This draft does not implement a game.
+Status: implementation selected on 19 October 2026. The shared table foundation is implemented; the Riichi rules profile, match format and opponent control still need an owner decision before game mechanics are implemented. This draft does not yet provide a playable Riichi game.
 
 ## User outcome
 
@@ -8,7 +8,13 @@ Play Riichi Mahjong in Sylvia with a readable table alongside ordinary GM narrat
 
 The feature is called **Riichi Mahjong**. A clear table and coherent game loop are the aim; a commercial Mahjong client's feature set, effects, accounts or visual assets are not requirements.
 
-## Current baseline
+## Implemented shared display
+
+The new `piece_table` renderer presents Ruleset-declared play areas, groups, pieces and status values through the existing Game Panel host. Piece controls reference ordinary admitted panel actions. The owner projects permitted pieces, retains the viewer's identity independently of whose turn it is, and removes the original source from player-facing table output. A synthetic Signal console demonstrates reuse without another game implementation.
+
+The declaration format is documented in [content formats](../docs/reference/content-formats.md#grouped-piece-tables). Focused checks cover concealed-piece isolation, malformed data, literal and state sources, save/reopen, existing layouts and actual child HTML startup in a browser fixture. Browser fixtures do not establish native desktop acceptance.
+
+## Existing baseline
 
 Sylvia has generic Ruleset/package, authoritative command, result/projection and panel-host paths. Those are foundations to inspect and reuse, not evidence that Mahjong is already implemented. Existing tactical panels do not establish a complete reusable tile/table display. The three historical tasks describe related mechanics, reusable presentation and authored content; this is one coherent feature proposal rather than three duplicate Mahjong PRs.
 
@@ -32,12 +38,14 @@ Sylvia has generic Ruleset/package, authoritative command, result/projection and
 5. Demonstrate the selected generic panel primitives with a minimal non-Mahjong synthetic declaration, without committing to another game. Reuse existing owner/package tests and representative composition.
 6. Check package/content/notice boundaries and any selected original demonstration Plan. Structural validity alone does not establish enjoyable or complete gameplay.
 
-## Decisions for implementation
+## Decisions still required
 
-Choose the exact rules profile, other-seat control and useful visual/action examples, then reconcile mechanics/display declarations and permitted demonstration content. Preserve the complete three specifications; the latest selection removes any requirement for a separate adventuring layer.
+Choose the exact rules profile, other-seat control and match format, then reconcile mechanics/display declarations and permitted demonstration content. No such choice is recorded in the retrieved specifications. The implementation owner's recommendation is four seats, one human player with the GM choosing legal actions for the remaining seats, and an East-only match with dealer repeats using a documented Tenhou-style profile. This is a recommendation, not an owner selection. No third-party code, rules prose or art has been imported.
+
+The latest selection removes any requirement for a separate adventuring layer. The three complete specifications and all retained source versions were retrieved from the authorized private archive before implementation. The archive is kept outside this public repository.
 
 ## Full specification and implementation boundary
 
 Planning references: PL-13 — `bfade435-b977-4436-aefa-732e34744dd1`; PL-14 — `be27d182-07b3-4154-b4b7-08458341a085`; PL-15 — `190951c3-1d82-41a1-bd83-13e7ebfcbc96`. The complete current Desk specifications and their linked original acceptance/source material remain authoritative. Retrieve all of them through authorized access before implementation; these public notes are an index and selected scope, not a replacement handoff. Daniel's latest selection here supersedes conflicting older framing. The coordinator owns Desk reconciliation.
 
-This PR changes one proposal document only. No feature implementation, external configuration, credentials, installation, paid calls, tests of the feature, merge or release is delivered. No GitHub Actions before November 2026. Future implementation and final-byte acceptance remain separate work.
+This PR includes the shared display foundation and its focused checks. Complete hand/match progression, scoring/legal-action proof, campaign gameplay/OOC integration, native normal-launch screenshots and Riichi save/reopen remain incomplete. No merge or release is selected. No GitHub Actions before November 2026.

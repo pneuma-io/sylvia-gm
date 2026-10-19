@@ -5995,6 +5995,9 @@ const SylviaGMFrontend = (() => {
   }
 
   function panelContent(surface) {
+    if (surface.renderer === 'piece_table') {
+      return window.SylviaPieceTable.render(surface.data, surface.actions);
+    }
     if (surface.id === ACTION_QUEUE_PANEL_ID && surface.renderer === 'action_queue')
       return sequenceMarkup(state.queuePreviousCards || new Set(), surface.data);
     if (surface.renderer === 'party') return renderPartyPanel(surface.data, surface);
