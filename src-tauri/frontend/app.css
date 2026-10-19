@@ -3054,6 +3054,13 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
 .ruleset-roster-panel .panel-actor-token { width:24px; height:24px; flex-basis:24px; }
 .ruleset-roster-panel .panel-unit-meta { font-size:.68rem; line-height:1.25; margin:2px 0; }
 .ruleset-roster-panel .roster-inspection { font-size:.63rem; line-height:1.2; }
+.ruleset-roster-panel .character-inspected { border-color:var(--accent-primary); }
+.character-picker { align-self:flex-start; margin:0 0 8px; max-width:100%; }
+.character-expanded-details { min-width:0; overflow-wrap:anywhere; }
+.character-expanded-details .character-loadout { padding:6px 0; }
+.character-expanded-details .character-resources span { min-width:0; gap:8px; }
+.roster-inspection > summary:focus-visible,
+.character-stat-group > summary:focus-visible { outline:2px solid var(--accent-primary); outline-offset:2px; }
 
 /* Compact readonly previews fit the map's bounded preview area without chronology animation. */
 .ruleset-map-panel .tactical-preview .result-card { margin:0; padding:3px 4px; border:0; background:transparent; box-shadow:none; opacity:1; animation:none; }

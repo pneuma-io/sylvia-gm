@@ -92,12 +92,14 @@ const SylviaGMFrontend = (() => {
     panelProjection: null,
     panelActionChecks: new Map(),
     panelCommitPending: false,
+    panelIntentPending: null,
     panelRecoveryAbsent: null,
     panelTabs: {},
     tacticalSelections: {},
     tacticalViews: {},
     networkSelections: {},
     crossSurfaceFocus: null,
+    characterInspection: null,
     view: 'home',
     homeTutorialStep: 0,
     homeTutorialOpen: false,
@@ -280,8 +282,24 @@ const SylviaGMFrontend = (() => {
 
   function panelRenderScope(projection) {
     return projection?.campaign_id && state.activeSessionId
-      ? { campaignId: projection.campaign_id, sessionId: state.activeSessionId }
+      ? { campaignId: projection.campaign_id, sessionId: state.activeSessionId, rulesetId: projection.ruleset_id || null }
       : null;
+  }
+
+  // Owner replies can redraw a detached inspection control after its local event has finished.
+  function captureCharacterFocus(container) {
+    const active = document.activeElement;
+    if (!active || !container.contains(active)) return null;
+    const surfaceId = active.closest('[data-panel-id]')?.dataset.panelId;
+    if (!surfaceId) return null;
+    const attribute = ['data-party-select-actor', 'data-character-actor', 'data-inventory-character',
+      'data-inspect-party'].find(name => active.hasAttribute(name));
+    if (attribute) return { surfaceId, selector: `[${attribute}="${CSS.escape(active.getAttribute(attribute))}"]` };
+    const details = active.parentElement;
+    if (active.tagName === 'SUMMARY' && details?.hasAttribute('data-character-expansion')) {
+      return { surfaceId, selector: `[data-character-expansion="${CSS.escape(details.dataset.characterExpansion)}"] > summary` };
+    }
+    return null;
   }
 
   // Keep transient Effects UI state when the same panel DOM is replaced.
@@ -424,6 +442,9 @@ const SylviaGMFrontend = (() => {
     }
     if (campaignDisplayPending()) throw new Error('Game state is still loading.');
     if (selectedSessionIsWorking()) throw new Error('Sylvia is working. Wait for her response to finish.');
+    if (['preview_panel_action', 'queue_panel_action'].includes(method) && panelIntentPending()) {
+      throw new Error('Finish the pending panel action before starting another.');
+    }
     if (method === 'queue_panel_action') {
       const action = state.panelProjection?.surfaces.find(surface => surface.id === args.surface_id)
         ?.actions?.find(action => action.id === args.panel_action_id);
@@ -448,15 +469,87 @@ const SylviaGMFrontend = (() => {
     };
   }
 
-  // Actor/target choices are presentation state shared by their panels, never an action.
+  // Inspection uses only admitted player-visible records and never grants action control.
+  function inspectableCharacters() {
+    const choices = new Map();
+    for (const surface of state.panelProjection?.surfaces || []) {
+      if (['party', 'unit_list', 'inventory'].includes(surface.renderer)) {
+        for (const member of surface.data?.participants || []) {
+          choices.set(member.id, { id: member.id, name: member.data?.name || surface.data?.entities?.[member.id]?.name || member.id });
+        }
+        for (const actor of state.panelProjection?.player_control?.actors || []) {
+          if (surface.data?.entities?.[actor.id] && !choices.has(actor.id)) {
+            choices.set(actor.id, { id: actor.id, name: surface.data.entities[actor.id].name || actor.name || actor.id });
+          }
+        }
+      } else if (surface.renderer === 'generic_inventory') {
+        for (const character of surface.data?.characters || []) choices.set(character.id, character);
+      }
+    }
+    return Array.from(choices.values());
+  }
+
+  // One campaign/Ruleset inspection context survives panel placement, never stale roster identity.
+  function characterInspection() {
+    const campaignId = state.panelProjection?.campaign_id || state.activeCampaignId;
+    const rulesetId = state.panelProjection?.ruleset_id || null;
+    const choices = inspectableCharacters();
+    let inspection = state.characterInspection;
+    if (!inspection || inspection.campaignId !== campaignId || inspection.rulesetId !== rulesetId) {
+      const prior = inspection ? null : state.panelProjection?.surfaces.filter((surface) => ['unit_list', 'inventory'].includes(surface.renderer))
+        .map((surface) => state.tacticalSelections[surface.id]?.actor).find(Boolean) ||
+        state.panelProjection?.surfaces.filter((surface) => ['tactical_grid', 'coordinate_map'].includes(surface.renderer))
+          .map((surface) => tacticalActorId(surface, state.tacticalSelections[surface.id]?.actor)).find(Boolean);
+      const focused = state.panelProjection?.player_control?.focused_actor_id;
+      inspection = state.characterInspection = { campaignId, rulesetId,
+        id: prior || (choices.some((item) => item.id === focused) ? focused : choices[0]?.id) || null,
+        unavailableId: null, expanded: [] };
+    }
+    if (inspection.id && !choices.some((item) => item.id === inspection.id)) {
+      inspection.unavailableId = inspection.id;
+      inspection.id = null;
+    }
+    inspection.expanded = (inspection.expanded || []).filter((id) => choices.some((item) => item.id === id));
+    return inspection;
+  }
+
+  function inspectCharacter(characterId) {
+    if (characterId !== null && !inspectableCharacters().some((item) => item.id === characterId)) return;
+    const inspection = characterInspection();
+    inspection.id = characterId;
+    inspection.unavailableId = null;
+  }
+
+  // Party is the shared picker; Rulesets without a roster retain an accessible common picker.
+  function characterPickerMarkup() {
+    const party = state.panelProjection?.surfaces.find((surface) => surface.renderer === 'party');
+    if (party) return `<button type="button" class="btn btn-secondary btn-sm character-picker" ` +
+      `data-inspect-party="${escapeHtml(party.id)}">Choose in Party</button>`;
+    const inspection = characterInspection();
+    return `<label class="character-picker">Inspect character <select data-character-actor>` +
+      '<option value="">Choose a character</option>' + inspectableCharacters().map((item) =>
+        `<option value="${escapeHtml(item.id)}"${item.id === inspection.id ? ' selected' : ''}>${escapeHtml(item.name)}</option>`).join('') + '</select></label>';
+  }
+
+  // Acting-character/target choices and inspection are distinct presentation requests.
   function applyPanelSelection(surfaceId, patch) {
     const surface = state.panelProjection?.surfaces.find((item) => item.id === surfaceId);
     if (!surface || !patch || typeof patch !== 'object') return;
-    if (surface.renderer === 'generic_inventory') {
-      if (surface.data.characters.some((character) => character.id === patch.character)) {
-        state.tacticalSelections[surfaceId] = { character: patch.character };
-        if (playerControlsActor(patch.character)) synchronizePanelActor(patch.character);
-      }
+    if ('character' in patch) {
+      inspectCharacter(patch.character);
+      return;
+    }
+    if (patch.expansion && surface.renderer === 'party' &&
+        (surface.data?.participants?.some((member) => member.id === patch.expansion.id) ||
+          surface.data?.entities?.[patch.expansion.id] && playerControlsActor(patch.expansion.id)) &&
+        typeof patch.expansion.open === 'boolean') {
+      const inspection = characterInspection();
+      inspection.expanded = inspection.expanded.filter((id) => id !== patch.expansion.id);
+      if (patch.expansion.open) inspection.expanded.push(patch.expansion.id);
+      return;
+    }
+    if (['party', 'unit_list', 'inventory', 'generic_inventory'].includes(surface.renderer)) {
+      if ('actor' in patch) inspectCharacter(patch.actor);
       return;
     }
     if (surface.renderer === 'network_graph') {
@@ -501,12 +594,9 @@ const SylviaGMFrontend = (() => {
 
   // Share valid actor identities across views without moving a camera or writing campaign state.
   function synchronizePanelActor(actorId) {
+    inspectCharacter(actorId);
     for (const panel of state.panelProjection?.surfaces || []) {
-      if (['unit_list', 'inventory'].includes(panel.renderer) && (actorId === null || panel.data?.entities?.[actorId] || panel.data?.participants?.some((item) => item.id === actorId))) {
-        state.tacticalSelections[panel.id] = { actor: actorId };
-      } else if (panel.renderer === 'generic_inventory' && panel.data?.characters?.some((item) => item.id === actorId)) {
-        state.tacticalSelections[panel.id] = { character: actorId };
-      } else if (panel.renderer === 'network_graph' && (actorId === null || networkControlsActor(actorId))) {
+      if (panel.renderer === 'network_graph' && (actorId === null || networkControlsActor(actorId))) {
         networkSelection(panel).actor = actorId;
       } else if (['tactical_grid', 'coordinate_map'].includes(panel.renderer)) {
         const body = panel.data?.entities?.find((item) => tacticalActorId(panel, item.id) === actorId);
@@ -4330,7 +4420,7 @@ const SylviaGMFrontend = (() => {
   }
 
   function panelActionAvailable(surface, action, partyActorId = null) {
-    if (!state.activeSessionId || state.panelCommitPending || pendingPanelCommand() ||
+    if (!state.activeSessionId || state.panelCommitPending || panelIntentPending() || pendingPanelCommand() ||
         selectedSessionIsWorking() || campaignDisplayPending() || action.available === false) return false;
     if (!sequenceModeActive() && action.checks_required && !state.panelActionChecks.get(
       panelActionCheckKey(surface, action, partyActorId)
@@ -4347,6 +4437,36 @@ const SylviaGMFrontend = (() => {
     return Boolean(actorId) && (['tactical_grid', 'coordinate_map'].includes(surface.renderer)
       && bindings[actorParameter] === 'actor' ? tacticalControlsActor(surface, actorId)
         : playerControlsActor(actorId));
+  }
+
+  function panelIntentPending() {
+    return state.panelIntentPending?.campaignId === state.activeCampaignId &&
+      state.panelIntentPending?.sessionId === state.activeSessionId;
+  }
+
+  // A delayed preview retains its captured binding only while its original context is valid.
+  function panelActionStillCurrent(command, projectionRevision) {
+    if (command.campaign_id !== state.activeCampaignId || command.session_id !== state.activeSessionId) return false;
+    const surface = state.panelProjection?.surfaces.find((item) => item.id === command.surface_id);
+    const action = surface?.actions?.find((item) => item.id === command.panel_action_id);
+    if (!action || action.available === false) return false;
+    if (state.panelProjection.revision !== projectionRevision) return false;
+    if (['tactical_grid', 'coordinate_map'].includes(surface.renderer)) {
+      if (command.selection?.map_revision !== surface.data.map_revision) return false;
+      if (command.selection?.target && !surface.data.entities?.some((item) => item.id === command.selection.target)) return false;
+      return !actionBindsActor(action) || tacticalControlsActor(surface, command.selection?.actor) &&
+        surface.data.entities?.some((item) => item.id === command.selection?.actor);
+    }
+    if (surface.renderer === 'network_graph') {
+      if (command.selection?.graph_revision !== surface.data.graph_revision) return false;
+      if (command.selection?.node && !surface.data.nodes?.some((item) => item.id === command.selection.node)) return false;
+      if (command.selection?.link && !surface.data.links?.some((item) => item.id === command.selection.link)) return false;
+      return !actionBindsActor(action) || networkControlsActor(command.selection?.actor);
+    }
+    if (!actionBindsActor(action)) return true;
+    const actor = command.selection?.actor;
+    return playerControlsActor(actor) && (surface.data?.participants?.some((item) => item.id === actor) ||
+      Boolean(surface.data?.entities?.[actor]));
   }
 
   function panelActionSelection(surface, action, partyActorId = null) {
@@ -4470,12 +4590,12 @@ const SylviaGMFrontend = (() => {
   function selectedMapActorMarkup(surface, selection) {
     const actorId = tacticalActorId(surface, selection.actor);
     const body = surface.data.entities.find((item) => item.id === selection.actor);
-    if (!body) return '<div class="map-turn-strip panel-empty">Choose your character on the map or in Party.</div>';
+    if (!body) return '<div class="map-turn-strip panel-empty">Choose an acting character on the map. Inspect characters in Party.</div>';
     const source = state.panelProjection?.surfaces.find((item) =>
       ['party', 'unit_list'].includes(item.renderer) && item.data?.entities?.[actorId]);
     const entity = source?.data.entities[actorId] || {};
     return `<div class="map-turn-strip" data-selected-actor="${escapeHtml(actorId)}">` +
-      `<strong>${escapeHtml(source?.data.participants?.find(member => member.id === actorId)?.data?.name || body.display?.label || entity.name || actorId)}</strong>` +
+      `<strong>Acting: ${escapeHtml(source?.data.participants?.find(member => member.id === actorId)?.data?.name || body.display?.label || entity.name || actorId)}</strong>` +
       personalResourceMarkup(entity) + actionReadinessMarkup(entity, actorId) + '</div>';
   }
 
@@ -4554,19 +4674,22 @@ const SylviaGMFrontend = (() => {
     ];
     return ordered.map((participant) => {
       const details = participant.data || {};
+      const detailSurface = state.panelProjection?.surfaces.find((item) => item.renderer === 'unit_list' &&
+        (item.data?.entities?.[participant.id] || item.data?.participants?.some((member) => member.id === participant.id))) || surface;
       // Namespaced content kinds identify definitions, not player-facing party roles.
       const role = details.party_role ||
         (typeof participant.kind === 'string' && !participant.kind.includes('.') ? participant.kind : '');
-      const entity = entities[participant.id] || {};
+      const entity = detailSurface?.data?.entities?.[participant.id] || entities[participant.id] || {};
       const resources = entity.resources && typeof entity.resources === 'object'
         ? Object.entries(entity.resources).map(([name, value]) =>
           `${panelIdentifierLabel(name)}: ${value}`).join(' · ')
         : '';
       const playerControlled = controlledActorIds && controlledActorIds.has(participant.id);
-      const currentActor = playerControl && playerControl.focused_actor_id === participant.id;
+      const combat = state.panelProjection?.surfaces.find((item) => item.renderer === 'encounter')?.data?.combat;
+      const currentActor = combat?.encounter_active && (combat.current_actor || combat.active_actor) === participant.id;
       const controlLabels = [
         playerControlled ? 'Player controlled' : '',
-        currentActor ? 'Focused character' : '',
+        currentActor ? 'Current turn' : '',
       ].filter(Boolean);
       const controls = actorActions.map((action) => {
         const available = panelActionAvailable(surface, action, participant.id);
@@ -4578,24 +4701,31 @@ const SylviaGMFrontend = (() => {
       const maps = state.panelProjection?.surfaces.filter((item) => ['tactical_grid', 'coordinate_map'].includes(item.renderer) &&
         Array.isArray(item.data?.entities) &&
         item.data.entities.some((member) => tacticalActorId(item, member.id) === participant.id)) || [];
-      const selectedOnMap = maps.some((map) => tacticalActorId(map, state.tacticalSelections[map.id]?.actor) === participant.id);
+      const selectedOnMap = characterInspection().id === participant.id;
       const mapBody = maps[0]?.data.entities.find((member) => tacticalActorId(maps[0], member.id) === participant.id);
       const posture = tacticalPostureText(mapBody, maps[0]?.data);
-      const selectActor = playerControlled && maps.length
+      const selectActor = inspectableCharacters().some((item) => item.id === participant.id)
         ? `<button type="button" class="btn btn-secondary btn-sm" ` +
-          `data-party-select-actor="${escapeHtml(participant.id)}" aria-pressed="${selectedOnMap}">` +
-          `${selectedOnMap ? 'Selected' : 'Select'}</button>` : '';
-      return `<div class="panel-unit" data-panel-entity="${escapeHtml(participant.id)}">` +
+          `data-party-select-actor="${escapeHtml(participant.id)}" aria-pressed="${selectedOnMap}" aria-label="${selectedOnMap ? 'Inspecting' : 'Inspect'} ${escapeHtml(details.name || participant.id)}">` +
+          `${selectedOnMap ? 'Inspecting' : 'Inspect'}</button>` : '';
+      const referencedActions = detailSurface === surface ? [] : (detailSurface.actions || [])
+        .filter((action) => actionBindsActor(action) && !actorActions.some((item) => item.id === action.id));
+      const detailActions = referencedActions.length ? `<div class="panel-unit-meta">` + referencedActions.map((action) =>
+        `${escapeHtml(action.label || action.id)}${panelActionAvailable(detailSurface, action, participant.id) ? '' : ' (unavailable)'}`).join(' · ') +
+        `</div><button type="button" class="btn btn-secondary btn-sm" data-character-action-panel="${escapeHtml(detailSurface.id)}">` +
+        `Open ${escapeHtml(detailSurface.title || 'Character')} actions</button>` : '';
+      const inspection = characterInspection();
+      return `<div class="panel-unit${selectedOnMap ? ' character-inspected' : ''}" data-panel-entity="${escapeHtml(participant.id)}">` +
         `<div class="panel-unit-heading"><span class="panel-actor-token" aria-hidden="true">${escapeHtml(actorInitials(details.name || participant.id))}</span><strong>${escapeHtml(details.name || participant.id)}</strong>` +
         (role ? `<span class="panel-unit-role">${escapeHtml(panelIdentifierLabel(role))}</span>` : '') +
         selectActor + `</div>` +
         hpPanelMarkup(entity) + personalResourceMarkup(entity) + conditionPanelMarkup(entity) +
-        `<details class="roster-inspection"><summary>Details</summary>` +
+        `<details class="roster-inspection" data-character-expansion="${escapeHtml(participant.id)}"${inspection.expanded.includes(participant.id) ? ' open' : ''}><summary aria-label="Details for ${escapeHtml(details.name || participant.id)}">Details</summary>` +
         (controlLabels.length ? `<div class="panel-unit-meta">${controlLabels.map(escapeHtml).join(' · ')}</div>` : '') +
-        weaponReadinessMarkup(entity) + actionReadinessMarkup(entity, participant.id) +
+        characterDetailMarkup(detailSurface, participant.id, true) +
         (posture ? `<div class="panel-unit-meta">${escapeHtml(posture)}</div>` : '') +
-        (resources ? `<div class="panel-unit-meta">${escapeHtml(resources)}</div>` : '') + '</details>' +
-        (controls ? `<details class="character-stat-group"><summary>Available actions</summary><div class="ruleset-panel-actions">${controls}</div></details>` : '') +
+        (resources ? `<div class="panel-unit-meta">${escapeHtml(resources)}</div>` : '') +
+        (controls || detailActions ? `<details class="character-stat-group"><summary>Available actions</summary><div class="ruleset-panel-actions">${controls}</div>${detailActions}</details>` : '') + '</details>' +
         `</div>`;
     }).join('');
   }
@@ -4622,46 +4752,49 @@ const SylviaGMFrontend = (() => {
   // This bounded renderer focuses an admitted participant and reuses the ordinary actor controls.
   function renderCharacterPanel(surface) {
     const participants = surface.data?.participants || [];
-    const selected = state.tacticalSelections[surface.id]?.actor ||
-      state.panelProjection?.surfaces.filter((item) => ['tactical_grid', 'coordinate_map'].includes(item.renderer))
-        .map((item) => tacticalActorId(item, state.tacticalSelections[item.id]?.actor)).find(Boolean) ||
-      state.panelProjection?.player_control?.focused_actor_id;
+    const inspection = characterInspection();
+    const selected = inspection.id;
     const entities = surface.data?.entities || {};
     const actors = state.panelProjection?.player_control?.actors || [];
-    const choices = [...participants.map((item) => ({ id: item.id, name: item.data?.name || entities[item.id]?.name || item.id })),
-      ...actors.filter((item) => entities[item.id] && !participants.some((participant) => participant.id === item.id))
-        .map((item) => ({ id: item.id, name: entities[item.id]?.name || item.name || item.id }))];
-    const actorId = selected || choices[0]?.id;
-    if (!actorId) return '<div class="panel-empty">No character selected.</div>';
+    const actorId = selected;
+    if (!actorId) return characterPickerMarkup() + `<div class="panel-empty" data-character-unavailable="${escapeHtml(inspection.unavailableId || '')}">` +
+      (inspection.unavailableId ? 'The previously inspected character is unavailable. ' : '') +
+      'Choose a character to inspect.</div>';
     const participant = participants.find((item) => item.id === actorId);
     const entity = entities[actorId];
     const name = participant?.data?.name || entity?.name || actors.find((item) => item.id === actorId)?.name || actorId;
-    if (!participant && !entity) return `<div class="panel-empty" data-character-unavailable="${escapeHtml(actorId)}">` +
+    if (!participant && !entity) return characterPickerMarkup() + `<div class="panel-empty" data-character-unavailable="${escapeHtml(actorId)}">` +
       `<strong>${escapeHtml(name)}</strong><p>Character details are unavailable for this character.</p></div>`;
-    const selector = `<details class="character-switcher"><summary>Change character</summary><label>Character <select data-character-actor>` + choices.map((item) =>
-      `<option value="${escapeHtml(item.id)}"${item.id === actorId ? ' selected' : ''}>` +
-      `${escapeHtml(item.name)}</option>`).join('') + '</select></label></details>';
+    const selector = characterPickerMarkup();
+    return selector + characterDetailMarkup(surface, actorId);
+  }
+
+  // Share the complete admitted detail presentation between Party and Character.
+  function characterDetailMarkup(surface, actorId, compact = false) {
+    const participant = surface.data?.participants?.find((item) => item.id === actorId);
+    const entity = surface.data?.entities?.[actorId] || {};
+    const name = participant?.data?.name || entity?.name || actorId;
     const details = participant?.data || {};
     const description = [details.class_id || details.class, Number.isFinite(details.level) ? `Level ${details.level}` : '']
       .filter(Boolean).map((value) => escapeHtml(panelIdentifierLabel(value))).join(' · ');
     const values = ['aptitudes', 'skills'].map((field) => {
       const entries = Object.entries(entity?.[field] || details[field] || {}).filter(([, value]) => Number.isFinite(value));
-      return entries.length ? `<details class="character-stat-group"><summary>${escapeHtml(panelIdentifierLabel(field))}</summary>` +
+      return entries.length ? `<details class="character-stat-group" data-character-stat="${escapeHtml(JSON.stringify([actorId, field]))}"><summary>${escapeHtml(panelIdentifierLabel(field))}</summary>` +
         entries.map(([name, value]) => `<span>${escapeHtml(panelIdentifierLabel(name))} <b>${value}</b></span>`).join('') + '</details>' : '';
     }).join('');
-    return selector + `<div class="character-hero" ${participant ? 'data-panel-entity' : 'data-character-entity'}="${escapeHtml(actorId)}">` +
-      `<div class="character-identity"><span class="panel-actor-token" aria-hidden="true">${escapeHtml(actorInitials(name))}</span>` +
-      `<div><small>Character</small><h3><strong>${escapeHtml(name)}</strong></h3>${description ? `<span class="character-description">${description}</span>` : ''}` +
-      (details.party_role ? `<span class="panel-unit-role">${escapeHtml(panelIdentifierLabel(details.party_role))}</span>` : '') + '</div></div>' +
-      `<div class="character-vitals">${hpPanelMarkup(entity)}${personalResourceMarkup(entity)}</div>` +
-      conditionPanelMarkup(entity) +
+    return `<div class="${compact ? 'character-expanded-details' : 'character-hero'}" data-character-details="${escapeHtml(actorId)}"${compact ? '' : ` ${participant ? 'data-panel-entity' : 'data-character-entity'}="${escapeHtml(actorId)}"`}>` +
+      (compact ? (description ? `<p class="character-description">${description}</p>` : '') : `<div class="character-identity"><span class="panel-actor-token" aria-hidden="true">${escapeHtml(actorInitials(name))}</span>` +
+      `<div><small>Inspecting</small><h3><strong>${escapeHtml(name)}</strong></h3>${description ? `<span class="character-description">${description}</span>` : ''}` +
+      (details.party_role ? `<span class="panel-unit-role">${escapeHtml(panelIdentifierLabel(details.party_role))}</span>` : '') + '</div></div>') +
+      (compact ? '' : `<div class="character-vitals">${hpPanelMarkup(entity)}${personalResourceMarkup(entity)}</div>` +
+      conditionPanelMarkup(entity)) +
       `<div class="character-loadout"><strong>Ready equipment</strong>${weaponReadinessMarkup(entity || {})}` +
       (entity?.weapon?.id ? `<h4>${escapeHtml(panelIdentifierLabel(entity.weapon.id))}</h4>` : '') +
       (entity?.weapon_sets ? `<div>${escapeHtml(panelIdentifierLabel(entity.weapon_sets.active_set || ''))}: ` +
         `${escapeHtml([entity.weapon_sets[entity.weapon_sets.active_set]?.main_hand, entity.weapon_sets[entity.weapon_sets.active_set]?.off_hand].filter(Boolean).map(panelIdentifierLabel).join(' / '))}</div>` : '') +
-      (entity?.resources ? `<div class="character-resources">${Object.entries(entity.resources).map(([key,value]) =>
+      (!compact && entity?.resources ? `<div class="character-resources">${Object.entries(entity.resources).map(([key,value]) =>
         `<span>${escapeHtml(panelIdentifierLabel(key))}<b>${escapeHtml(value)}</b></span>`).join('')}</div>` : '') +
-      '</div>' + characterActionMarkup(surface, actorId) + actionReadinessMarkup(entity || {}, actorId) + '</div>' + (!participant ? '<p class="panel-unit-meta">Full character details are unavailable. These are the selected character’s current combat stats.</p>' : '') + values;
+      '</div>' + (compact ? '' : characterActionMarkup(surface, actorId)) + actionReadinessMarkup(entity || {}, actorId) + '</div>' + (!participant ? '<p class="panel-unit-meta">Full character details are unavailable. These are the selected character’s current combat stats.</p>' : '') + values;
   }
 
   function renderEncounterPanel(data) {
@@ -4792,13 +4925,12 @@ const SylviaGMFrontend = (() => {
   function renderInventoryPanel(data, surface) {
     const participants = data && Array.isArray(data.participants) ? data.participants : [];
     const entities = data && data.entities && typeof data.entities === 'object' ? data.entities : {};
-    const selected = state.tacticalSelections[surface.id]?.actor ||
-      state.panelProjection?.surfaces.filter((item) => ['tactical_grid', 'coordinate_map'].includes(item.renderer))
-        .map((item) => tacticalActorId(item, state.tacticalSelections[item.id]?.actor)).find(Boolean);
+    const selected = characterInspection().id;
+    if (!selected) return characterPickerMarkup() + '<div class="panel-empty">Choose a character to inspect equipment.</div>';
     const controlled = state.panelProjection?.player_control?.actors || [];
     const participant = participants.find((item) => item.id === selected);
     const knownEntity = controlled.find((item) => item.id === selected) && entities[selected];
-    if (selected && !participant && !knownEntity) return '<div class="panel-empty">Selected character equipment is unavailable.</div>';
+    if (selected && !participant && !knownEntity) return characterPickerMarkup() + '<div class="panel-empty">Selected character equipment is unavailable.</div>';
     const displayed = selected ? [participant || { id: selected, data: { name: knownEntity.name || controlled.find((item) => item.id === selected)?.name || selected } }] : participants;
     const owners = displayed.map((participant) => {
       const entity = entities[participant.id] || {};
@@ -4836,12 +4968,10 @@ const SylviaGMFrontend = (() => {
   // Inventory is a projection of committed holdings; selection never changes campaign state.
   function renderGenericInventoryPanel(surface) {
     const characters = surface.data?.characters || [];
-    const chosen = state.tacticalSelections[surface.id]?.character;
-    const character = characters.find((item) => item.id === chosen) || characters[0];
-    if (!character) return '<div class="panel-empty">No known character inventory yet.</div>';
-    const selector = `<label>Character <select data-inventory-character>` + characters.map((item) =>
-      `<option value="${escapeHtml(item.id)}"${item.id === character.id ? ' selected' : ''}>` +
-      `${escapeHtml(item.name)}</option>`).join('') + '</select></label>';
+    const chosen = characterInspection().id;
+    const character = characters.find((item) => item.id === chosen);
+    if (!character) return characterPickerMarkup() + '<div class="panel-empty">Selected character inventory is unavailable.</div>';
+    const selector = characterPickerMarkup();
     const rows = character.items.map((item) => `<div class="panel-unit">` +
       `<div class="panel-unit-heading"><strong>${escapeHtml(item.item_id === item.name
         ? panelIdentifierLabel(item.item_id) : item.name)}</strong>` +
@@ -5045,7 +5175,7 @@ const SylviaGMFrontend = (() => {
     ));
     if (!missing.size) return null;
     const prompts = [];
-    if (missing.has('actor')) prompts.push('Choose your character');
+    if (missing.has('actor')) prompts.push('Choose an acting character');
     if (missing.has('target')) prompts.push('Select a target');
     if (missing.has('zone')) prompts.push('Select a zone');
     if (missing.has('device')) prompts.push('Select a device');
@@ -5440,10 +5570,10 @@ const SylviaGMFrontend = (() => {
         )}">Network: ${escapeHtml(entity.display && entity.display.label || entity.id)}</button>`
       ) : []
     ).join('') : '';
-    const secondaryChoices = `<label>Character <select data-tactical-actor aria-label="Choose your character" ` +
+    const secondaryChoices = `<label>Acting character <select data-tactical-actor aria-label="Choose acting character" ` +
       `${actorOptions.length ? '' : 'disabled'}><option value="">Choose character</option>` +
       actorOptions.map((entity) => `<option value="${escapeHtml(entity.id)}" ` +
-        `${entity.id === selection.actor ? 'selected' : ''}>${escapeHtml(entityLabel(entity.id))}${scope?.focused_actor_id === tacticalActorId(surface, entity.id) ? ' (current)' : ''}</option>`).join('') +
+        `${entity.id === selection.actor ? 'selected' : ''}>${escapeHtml(entityLabel(entity.id))}</option>`).join('') +
       `</select></label><label>Target <select data-tactical-target aria-label="Choose target">` +
       `<option value="">Choose target</option>` + data.entities.map((entity) =>
         `<option value="${escapeHtml(entity.id)}" ${entity.id === selection.target ? 'selected' : ''}>` +
@@ -6237,6 +6367,22 @@ const SylviaGMFrontend = (() => {
     const savedMapTools = captureMapTools(container);
     const savedPreviewHeights = captureTacticalPreviewHeights(container, projection);
     const nextPanelRenderContext = panelRenderScope(projection);
+    const sameCharacterScope = panelRenderContext && nextPanelRenderContext &&
+      panelRenderContext.campaignId === nextPanelRenderContext.campaignId &&
+      panelRenderContext.sessionId === nextPanelRenderContext.sessionId &&
+      panelRenderContext.rulesetId === nextPanelRenderContext.rulesetId;
+    const savedCharacterFocus = sameCharacterScope ? captureCharacterFocus(container) : null;
+    // Native disclosure toggles can still be queued when another projection redraws the DOM.
+    if (sameCharacterScope && !window.__sylviaPanelContext) {
+      container.querySelectorAll('[data-character-expansion]').forEach((details) => {
+        applyPanelSelection(details.closest('[data-panel-id]')?.dataset.panelId,
+          { expansion: { id: details.dataset.characterExpansion, open: details.open } });
+      });
+    }
+    const savedCharacterGroups = sameCharacterScope ? Array.from(container.querySelectorAll('[data-character-stat]'), (details) => ({
+      surfaceId: details.closest('[data-panel-id]')?.dataset.panelId, stat: details.dataset.characterStat,
+      open: details.open, focused: document.activeElement === details.querySelector('summary'),
+    })) : [];
     const nativeProjection = nativePanelProjection(projection);
     if (state.panelProjectionSource !== nativeProjection) state.panelActionChecks.clear();
     state.panelProjectionSource = nativeProjection;
@@ -6262,6 +6408,18 @@ const SylviaGMFrontend = (() => {
     const queueScroll = previousList ? {top:previousList.scrollTop,
       atEnd:previousList.scrollTop + previousList.clientHeight >= previousList.scrollHeight - 2} : null;
     container.innerHTML = recovery + markup + effectsNotice;
+    for (const saved of savedCharacterGroups) {
+      const panel = container.querySelector(`[data-panel-id="${CSS.escape(saved.surfaceId)}"]`);
+      const details = panel?.querySelector(`[data-character-stat="${CSS.escape(saved.stat)}"]`);
+      if (details) {
+        details.open = saved.open;
+        if (saved.focused) details.querySelector('summary')?.focus({ preventScroll: true });
+      }
+    }
+    if (savedCharacterFocus) {
+      container.querySelector(`[data-panel-id="${CSS.escape(savedCharacterFocus.surfaceId)}"]`)
+        ?.querySelector(savedCharacterFocus.selector)?.focus({ preventScroll: true });
+    }
     container.querySelectorAll('.sequence-issue').forEach(issue => { issue.open = openQueueIssues.has(queueIssueKey(issue)); });
     const nextList = container.querySelector('.sequence-cards');
     if (nextList && queueScroll) nextList.scrollTop = queueScroll.atEnd ? nextList.scrollHeight : queueScroll.top;
@@ -6314,15 +6472,39 @@ const SylviaGMFrontend = (() => {
     container.querySelectorAll('[data-character-actor]').forEach((select) => {
       select.addEventListener('change', () => {
         const surfaceId = select.closest('[data-panel-id]')?.dataset.panelId;
-        gamePanels().choose(surfaceId, { actor: select.value });
+        gamePanels().choose(surfaceId, { character: select.value || null });
         renderRulesetPanelProjection(projection);
+        container.querySelector('[data-character-actor]')?.focus({ preventScroll: true });
       });
     });
     container.querySelectorAll('[data-party-select-actor]').forEach((button) => {
       button.addEventListener('click', () => {
         const surfaceId = button.closest('[data-panel-id]')?.dataset.panelId;
-        gamePanels().choose(surfaceId, { actor: button.dataset.partySelectActor, target: null });
+        gamePanels().choose(surfaceId, { character: button.dataset.partySelectActor });
         renderRulesetPanelProjection(projection);
+        container.querySelector(`[data-party-select-actor="${CSS.escape(button.dataset.partySelectActor)}"]`)?.focus({ preventScroll: true });
+      });
+    });
+    container.querySelectorAll('[data-inspect-party]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const id = button.dataset.inspectParty;
+        void Promise.resolve(gamePanels().reveal(id)).then(() => {
+          const party = container.querySelector(`[data-panel-id="${CSS.escape(id)}"]`);
+          const selected = party?.querySelector('[data-party-select-actor][aria-pressed="true"]');
+          (selected || party?.querySelector('[data-party-select-actor]'))?.focus({ preventScroll: true });
+        });
+      });
+    });
+    container.querySelectorAll('[data-character-action-panel]').forEach((button) => {
+      button.addEventListener('click', () => void gamePanels().reveal(button.dataset.characterActionPanel));
+    });
+    container.querySelectorAll('[data-character-expansion]').forEach((details) => {
+      details.addEventListener('toggle', () => {
+        if (!details.isConnected) return;
+        const id = details.dataset.characterExpansion;
+        if (characterInspection().expanded.includes(id) === details.open) return;
+        gamePanels().choose(details.closest('[data-panel-id]')?.dataset.panelId,
+          { expansion: { id, open: details.open } });
       });
     });
     container.querySelectorAll('[data-panel-action-id]').forEach((button) => {
@@ -6338,7 +6520,10 @@ const SylviaGMFrontend = (() => {
           ? surface.actions.find((entry) => entry.id === button.dataset.panelActionId) : null;
         if (!action || !panelActionAvailable(surface, action, button.dataset.panelActorId)) return;
         button.disabled = true;
-        const selection = panelActionSelection(surface, action, button.dataset.panelActorId);
+        const selection = JSON.parse(JSON.stringify(panelActionSelection(surface, action, button.dataset.panelActorId)));
+        const projectionRevision = projection.revision;
+        const pendingIntent = { campaignId, sessionId };
+        state.panelIntentPending = pendingIntent;
         try {
           if (sequenceModeActive()) {
             const command = {campaign_id:campaignId,session_id:sessionId,surface_id:surface.id,
@@ -6361,9 +6546,10 @@ const SylviaGMFrontend = (() => {
             selection,
             session_id: sessionId,
           };
+          if (!selectedActivityMatches(activity) || !panelActionStillCurrent(command, projectionRevision)) return;
           const proposal = await state.bridge.preview_panel_action(command);
-          if (!selectedActivityMatches(activity) || !await confirmPlayerAction(proposal)) return;
-          if (!selectedActivityMatches(activity) || selectedSessionIsWorking()) return;
+          if (!selectedActivityMatches(activity) || !panelActionStillCurrent(command, projectionRevision) || !await confirmPlayerAction(proposal)) return;
+          if (!selectedActivityMatches(activity) || selectedSessionIsWorking() || !panelActionStillCurrent(command, projectionRevision)) return;
           const confirmedCommand = { ...command, confirmation: proposal.confirmation };
           localStorage.setItem(panelRecoveryKey(), JSON.stringify(confirmedCommand));
           state.panelCommitPending = true;
@@ -6379,6 +6565,7 @@ const SylviaGMFrontend = (() => {
         } catch (error) {
           selectedStatus(activity, friendlyCommandError('Panel action could not be completed', error), 'panels');
         } finally {
+          if (state.panelIntentPending === pendingIntent) state.panelIntentPending = null;
           state.panelCommitPending = false;
           button.disabled = false;
           if (selectedActivityMatches(activity)) await renderRulesetPanels(campaignId, true);

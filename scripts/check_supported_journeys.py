@@ -193,6 +193,7 @@ PYTHON_JOURNEYS = {
 UI_JOURNEY = [
     "tests/frontend_character_equipment.test.cjs",
     "tests/frontend_character_selection.test.cjs",
+    "tests/frontend_character_inspection.browser.cjs",
     "tests/frontend_game_controls.test.cjs",
     "tests/frontend_saved_choice_commit.test.cjs",
     "tests/frontend_map_initial_camera.test.cjs",
