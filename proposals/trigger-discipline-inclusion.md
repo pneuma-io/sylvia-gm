@@ -49,4 +49,3 @@ If some material must remain proprietary/private, return a concrete alternative 
 A dedicated inclusion plan and upstream/Siren cross-references are established. Private source is not moved, merged, relicensed or exposed. Full implementation, release inclusion and gameplay acceptance remain future work after the explicit content/licensing decision.
 
 No GitHub Actions before November 2026. No merge, tag, release, purchase, security-setting change or new access is selected by this planning revision.
-
