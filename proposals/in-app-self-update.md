@@ -72,4 +72,3 @@ PL-01/#5 owns campaign-specific package adoption. Full SRD/#3 and Siren/#2 remai
 The earlier manual-check plan and its implementation experiment remain preserved in the branch history, including the planning checkpoint `47718537d43011a9694756c29c4f2a040b133cd9`. This revision adds the selected full outcome without rebasing or removing that history. The old document is explicitly historical.
 
 This pass authorizes planning-document and PR metadata reconciliation only. No feature implementation, merge, tag, release, purchase or unrelated publication is selected. No GitHub Actions before November 2026.
-
