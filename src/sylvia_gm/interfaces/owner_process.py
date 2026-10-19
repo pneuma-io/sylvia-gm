@@ -1957,7 +1957,7 @@ def _dispatch_selected(
     if method == "snapshot":
         return bus.snapshot(_required_text(params, "campaign_id"))
     if method == "display_snapshot":
-        return application_owner.display_snapshot(_required_text(params, "campaign_id"))
+        return application_owner.desktop_snapshot(_required_text(params, "campaign_id"), display_only=True)
     if method == "player_projection":
         return bus.player_projection(_required_text(params, "campaign_id"))
     if method == "player_projection_page":

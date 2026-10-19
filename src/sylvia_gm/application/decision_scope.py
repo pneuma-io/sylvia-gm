@@ -6,6 +6,7 @@ from collections.abc import Mapping, Sequence
 from typing import cast
 
 from sylvia_gm.domain.authority import (
+    CampaignDisplaySnapshot,
     CampaignState,
     JsonValue,
     ModelDecisionActor,
@@ -15,6 +16,8 @@ from sylvia_gm.domain.authority import (
     SafePayload,
     owned_payload,
 )
+
+_ScopeSnapshot = CampaignState | CampaignDisplaySnapshot
 
 
 class DecisionScopeProjectionError(ValueError):
@@ -75,7 +78,7 @@ def _actor_projection(
 
 
 def _project_side_scope(
-    snapshot: CampaignState,
+    snapshot: _ScopeSnapshot,
     declared: Mapping[str, object],
 ) -> ModelDecisionBoundary | None:
     owner_value = _state_reference(
@@ -149,7 +152,7 @@ def _project_side_scope(
 
 
 def _project_legacy_actor_boundary(
-    snapshot: CampaignState,
+    snapshot: _ScopeSnapshot,
     declared: Mapping[str, object],
 ) -> ModelDecisionBoundary | None:
     actor_id = _state_reference(
@@ -168,11 +171,12 @@ def _project_legacy_actor_boundary(
         if isinstance(actor_value, Mapping)
         else owned_payload({})
     )
-    participant = next(
-        (item for item in snapshot.participants if item.participant_id == actor_id),
-        None,
-    )
     control = cast(Mapping[str, object], declared["participant_control"])
+    participant_id = (actor_state.get(str(control["actor_participant_field"]))
+                      if "actor_participant_field" in control else actor_id)
+    participant = next(
+        (item for item in snapshot.participants if item.participant_id == participant_id), None,
+    )
     owner = ModelDecisionOwner(str(declared["default_owner"]))
     if participant is not None and participant.data.get(str(control["field"])) in cast(
         Sequence[object], control["player_values"]
@@ -192,19 +196,20 @@ def _project_legacy_actor_boundary(
 
 
 def project_campaign_preparation_scope(
-    snapshot: CampaignState, declared: Mapping[str, object],
+    snapshot: _ScopeSnapshot, declared: Mapping[str, object],
 ) -> ModelDecisionBoundary | None:
     """Project pending package-owned character events before ordinary play decisions."""
     preparation = declared.get("preparation")
     if not isinstance(preparation, Mapping):
         return None
-    entities = _state_reference(snapshot.state, declared["actor_entities"])
+    actor_reference = cast(Mapping[str, object], declared["actor_entities"])
+    entities = _state_reference(snapshot.state, actor_reference)
     if not isinstance(entities, Mapping):
         return None
     actors = []
     events = []
     for participant in snapshot.participants:
-        if participant.package_id != declared["actor_entities"]["namespace"]:
+        if participant.package_id != actor_reference["namespace"]:
             continue
         entity = entities.get(participant.participant_id)
         if not isinstance(entity, Mapping):
@@ -229,12 +234,12 @@ def project_campaign_preparation_scope(
         actor_state=first.actor_state, campaign_revision=snapshot.revision,
         focused_actor_id=first.actor_id, eligible_actors=tuple(actors),
         preparation=owned_payload({**preparation, "events": events,
-                                   "package_id": declared["actor_entities"]["namespace"]}),
+                                   "package_id": actor_reference["namespace"]}),
     )
 
 
 def project_model_decision_scope(
-    snapshot: CampaignState,
+    snapshot: _ScopeSnapshot,
     declared: Mapping[str, object],
 ) -> ModelDecisionBoundary | None:
     """Project either the side-scope declaration or its legacy actor form."""
@@ -248,7 +253,7 @@ def project_model_decision_scope(
 
 
 def project_player_control_scope(
-    snapshot: CampaignState, declared: Mapping[str, object],
+    snapshot: _ScopeSnapshot, declared: Mapping[str, object],
 ) -> SafePayload:
     """Expose controlled actor identities, without exposing the GM's actor state."""
 
@@ -283,7 +288,7 @@ def project_player_control_scope(
 
 
 def player_viewer_ids(
-    snapshot: CampaignState, declared: Mapping[str, object] | None,
+    snapshot: _ScopeSnapshot, declared: Mapping[str, object] | None,
 ) -> frozenset[str]:
     """Identify the player's participants independently of whose turn is active.
 

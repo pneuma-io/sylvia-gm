@@ -27,7 +27,7 @@ from sylvia_gm.domain.package_library import (
 )
 from sylvia_gm.domain.panel_layout import PANEL_LAYOUT_PATH
 from sylvia_gm.domain.ruleset_tests import validate_ruleset_tests
-from sylvia_gm.domain.starting_state import STARTING_STATE_FEATURE
+from sylvia_gm.domain.starting_state import PRIVATE_STATE_FEATURE, STARTING_STATE_FEATURE
 
 COMPACT_RULESET_SOURCE = "ruleset-source.yaml"
 _SOURCE_DEPTH_LIMIT = 64
@@ -301,6 +301,19 @@ def _required_engine_features(value: object) -> tuple[str, ...]:
 
     def collect(item: object) -> None:
         if isinstance(item, Mapping):
+            if "shuffle" in item or any(
+                isinstance(value, str) and any(
+                    name + "(" in value for name in (
+                        "indices", "portion", "joined", "replaced", "without",
+                        "partitions", "completions",
+                        "occurrences", "one", "ordered", "text", "total",
+                    )
+                )
+                for value in item.values()
+            ):
+                features.add("collection_mechanics.v1")
+            if "publish" in item:
+                features.add("public_results.v1")
             if "shot_effect" in item:
                 features.update({ENGINE_FEATURE_SHOT_EFFECTS, ENGINE_FEATURE_TACTICAL_GRID})
             if "occupies_cells" in item:
@@ -345,7 +358,9 @@ def compile_ruleset_source(source_bytes: bytes) -> CompiledRulesetSource:
         ) from error
     source = _mapping(loaded, path="$")
     package_id = source.get("id") if isinstance(source.get("id"), str) else None
-    optional_keys = {"ui_surfaces", "panel_layout", "tests", "state_schemas"}
+    optional_keys = {
+        "ui_surfaces", "panel_layout", "tests", "state_schemas", "model_decision_boundary",
+    }
     _require_fields(source, _SOURCE_KEYS, optional=optional_keys, path="$", package_id=package_id)
     if type(source.get("format")) is not int or source["format"] != 1:
         raise _diagnostic(
@@ -376,7 +391,7 @@ def compile_ruleset_source(source_bytes: bytes) -> CompiledRulesetSource:
         family = _mapping(raw_family, path=family_path, package_id=package_id)
         _require_fields(
             family, {"parameters", "pre_conditions", "effects", "narrative"},
-            path=family_path, package_id=package_id,
+            optional={"metadata"}, path=family_path, package_id=package_id,
         )
     try:
         validate_content_shape("ruleset_source", source, file=COMPACT_RULESET_SOURCE)
@@ -448,13 +463,16 @@ def compile_ruleset_source(source_bytes: bytes) -> CompiledRulesetSource:
                 model_properties[parameter_name] = model_schema
                 if runtime_parameter.get("required", True) is True:
                     model_required.append(parameter_name)
-        runtime_tools[name] = {
+        runtime_tool = {
             "description": operation["description"],
             "parameters": runtime_parameters,
             "pre_conditions": expanded["pre_conditions"],
             "effects": expanded["effects"],
             "narrative": expanded["narrative"],
         }
+        if "metadata" in expanded:
+            runtime_tool["metadata"] = expanded["metadata"]
+        runtime_tools[name] = runtime_tool
         if not public:
             return
         capability = operation["capability"]
@@ -537,6 +555,8 @@ def compile_ruleset_source(source_bytes: bytes) -> CompiledRulesetSource:
         required_features.add(ENGINE_FEATURE_PANEL_WORKSPACES)
     if "state_schemas" in source:
         required_features.add(STARTING_STATE_FEATURE)
+        if any(item.get("visibility") == "engine" for item in source["state_schemas"]):
+            required_features.add(PRIVATE_STATE_FEATURE)
     required_features = tuple(sorted(required_features))
     runtime = {
         "sylvia_gm_runtime": {"format": 1, "state_namespace": package_id},
@@ -547,6 +567,8 @@ def compile_ruleset_source(source_bytes: bytes) -> CompiledRulesetSource:
         "definitions": source["definitions"],
         "narrative": {},
     }
+    if "model_decision_boundary" in source:
+        runtime["model_decision_boundary"] = source["model_decision_boundary"]
     support = {
         "format_id": "sylvia-gm-gameplay-support",
         "format_version": 1,

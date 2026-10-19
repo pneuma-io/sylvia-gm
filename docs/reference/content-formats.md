@@ -157,6 +157,30 @@ within their group; area identities and positions are unique within the table.
 The synthetic `tests/fixtures/piece-table/signal-console.json` demonstrates a
 non-Mahjong composition with private programs and a public route.
 
+## Private collections and public results
+
+`state_schemas` defaults to `visibility: public`. An engine-owned root declares
+`visibility: engine` and requires `private_state.v1`. Canonical mechanics and saves
+retain it; desktop snapshots, mutation history on the desktop wire, general GM context
+and the ordinary current-state reference exclude it. A Ruleset may declare a bounded
+panel projection and the existing active-actor decision scope for permitted views.
+Fresh GM context includes that permitted decision scope, taken with public state
+from the same revision, including when a session resumes before its first action.
+Rulesets without private roots retain their existing GM context payload.
+The optional `actor_participant_field` binds a seat entity to a canonical participant;
+it does not accept a viewer identity from the client.
+
+`collection_mechanics.v1` provides bounded pure value operations (`indices`, `portion`,
+`joined`, `replaced`, `without`, `occurrences`, `one`, `ordered`, `text`, `total`),
+exact multiset `partitions` and `completions`, and a `shuffle` effect. Searches consume
+the shared execution budget. A shuffle samples a private order independent of public
+action IDs, commits that order, and cannot precede a pending `request_choice` in the
+same action. Retry and reopen use committed state rather than sampling again.
+
+`public_results.v1` supplies `publish: {fields: {...}}`. It selects the action's public
+result context while nested mechanics may retain private calculations. Hidden shuffles
+require explicit publication; raw temporary variables must not become results.
+
 ## Plan completion
 
 The Plan definition and `BUILD CAMPAIGN PLAN` reference preserve FC-15 semantics.

@@ -5,6 +5,8 @@ from __future__ import annotations
 from sylvia_gm.runtime._effect_executor import _COMPATIBILITY_EFFECT_KEYS, _NEUTRAL_EFFECT_KEYS
 
 EFFECT_BODY_FIELDS = {
+    "publish": ["fields"],
+    "shuffle": ["collection"],
     "dice": [
         "expression",
         "modifier",

@@ -4909,7 +4909,7 @@ class ProviderSessionAdapter:
         campaign_id = provider_input.session.campaign_id
         if campaign_id is None:
             raise CommandRejected("DM campaign context requires campaign authority")
-        snapshot = self._owner.snapshot(campaign_id)
+        snapshot, private_decision = self._owner.model_context_snapshot(campaign_id)
         continuity = getattr(snapshot, "continuity", CampaignContinuityView())
         plan = self._campaign_plan if isinstance(self._campaign_plan, Mapping) else {}
         structure = plan.get("structure")
@@ -5154,6 +5154,24 @@ class ProviderSessionAdapter:
                         "display_name": snapshot.display_name,
                         "revision": snapshot.revision,
                     },
+                    **({"ruleset_decision": {
+                        "owner": private_decision.owner.value,
+                        "actor_id": private_decision.actor_id,
+                        "actor_name": private_decision.actor_name,
+                        "actor_state": private_decision.actor_state,
+                        "active_side_id": private_decision.active_side_id,
+                        "focused_actor_id": private_decision.focused_actor_id,
+                        "eligible_actors": [{
+                            "actor_id": actor.actor_id,
+                            "actor_name": actor.actor_name,
+                            "actor_state": actor.actor_state,
+                        } for actor in private_decision.eligible_actors],
+                        "campaign_revision": private_decision.campaign_revision,
+                        "handling": (
+                            "Use only this permitted actor view for the current decision. "
+                            "Keep information concealed from the player out of public narration."
+                        ),
+                    }} if private_decision is not None else {}),
                     "campaign_state": {
                         "meaning": "Current campaign truth and durable GM-screen memory.",
                         "current_scene": continuity.current_scene,
@@ -5262,6 +5280,8 @@ class ProviderSessionAdapter:
         }
         fresh = {
             "campaign": campaign,
+            **({"ruleset_decision": payload["ruleset_decision"]}
+               if "ruleset_decision" in payload else {}),
             "campaign_state": payload.get("campaign_state"),
             "PLAYER_KNOWN": payload.get("PLAYER_KNOWN"),
             "GM_PRIVATE_CURRENT": {

@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from sylvia_gm.application.launch_compatibility import require_active_ruleset
-
 import errno
 import hashlib
 import json
@@ -31,10 +29,10 @@ from sylvia_gm.application.campaign_inventory import (
 )
 from sylvia_gm.application.decision_scope import (
     DecisionScopeProjectionError,
-    project_model_decision_scope,
-    project_campaign_preparation_scope,
-    project_player_control_scope,
     player_viewer_ids,
+    project_campaign_preparation_scope,
+    project_model_decision_scope,
+    project_player_control_scope,
 )
 from sylvia_gm.application.interview_content import resolve_interview_content
 from sylvia_gm.application.knowledge_search import (
@@ -42,6 +40,8 @@ from sylvia_gm.application.knowledge_search import (
     knowledge_terms,
     rank_references,
 )
+from sylvia_gm.application.launch_compatibility import require_active_ruleset
+from sylvia_gm.application.map_segment_preview import segment_preview
 from sylvia_gm.application.network_graph import (
     NetworkGraphError,
     bind_physical_network_surfaces,
@@ -52,9 +52,9 @@ from sylvia_gm.application.network_graph import (
 from sylvia_gm.application.package_library import (
     MigrationFunction,
     declaration_admitted,
+    dependency_only_manifest_rebind,
     install_package_archive,
     project_surfaces,
-    dependency_only_manifest_rebind,
     projection_bytes,
     run_migration_outside_sqlite,
     state_predicates_match,
@@ -71,12 +71,16 @@ from sylvia_gm.application.package_runtime import (
     materialize_player_action_checker,
     materialize_player_action_previewer,
     package_model_decision_boundary,
-    package_tool_description,
     package_tool_decision_title,
+    package_tool_description,
     package_tool_model_behavior,
     package_tool_player_controls,
 )
-from sylvia_gm.application.map_segment_preview import segment_preview
+from sylvia_gm.application.piece_table import (
+    PieceTableError,
+    project_piece_table,
+    resolve_piece_action_parameters,
+)
 from sylvia_gm.application.player_actions import (
     PLAYER_ACTION_ORIGIN,
     PlayerActionChecker,
@@ -86,15 +90,10 @@ from sylvia_gm.application.player_actions import (
     player_action_records,
     player_action_request_matches,
     player_control_origin,
-    resolve_party_action_parameters,
     resolve_inventory_action_parameters,
+    resolve_party_action_parameters,
     retain_player_action_origin,
     validate_player_control,
-)
-from sylvia_gm.application.piece_table import (
-    PieceTableError,
-    project_piece_table,
-    resolve_piece_action_parameters,
 )
 from sylvia_gm.application.result_cards import project_result_card
 from sylvia_gm.application.schema_admission import (
@@ -4377,7 +4376,7 @@ class AuthorityOwner:
         )
 
     def _decision_scope_declaration(
-        self, snapshot: CampaignState,
+        self, snapshot: CampaignState | CampaignDisplaySnapshot,
     ) -> Mapping[str, object] | None:
         """Read actor-control metadata from the exact currently locked primary package."""
 
@@ -5718,7 +5717,9 @@ class AuthorityOwner:
                         "facts_and_entities": list(snapshot.continuity.facts),
                         "reveals": snapshot.continuity.reveals,
                         "plan_progress": list(snapshot.continuity.plan_progress),
-                        "ruleset_owned_values": snapshot.state,
+                        "ruleset_owned_values": self.desktop_snapshot(
+                            campaign_id, display_only=True,
+                        ).state,
                     }
                 elif path == "inventory":
                     inventory_tool = self._inventory_tool(campaign_id)
@@ -7136,6 +7137,57 @@ class AuthorityOwner:
     def snapshot(self, campaign_id: str) -> CampaignSnapshot:
         with self._operation():
             return self._store.snapshot(campaign_id)
+
+    def desktop_snapshot(
+        self, campaign_id: str, *, display_only: bool = False,
+    ) -> CampaignSnapshot | CampaignDisplaySnapshot:
+        """Keep package-declared engine state and its mutation history off the desktop wire."""
+        with self._operation():
+            snapshot = (self._store.display_snapshot(campaign_id) if display_only
+                        else self._store.snapshot(campaign_id))
+            private_keys = self._engine_private_keys(snapshot.package_lock)
+            safe_state = {
+                key: value for key, value in snapshot.state.items() if key not in private_keys
+            }
+            if isinstance(snapshot, CampaignSnapshot):
+                return replace(snapshot, state=safe_state, mutations=tuple(
+                    item for item in snapshot.mutations
+                    if f"{item.namespace}.{item.key}" not in private_keys
+                ))
+            return replace(snapshot, state=safe_state)
+
+    def _engine_private_keys(self, lock: PackageLock) -> frozenset[str]:
+        keys: set[str] = set()
+        for entry in lock.entries:
+            manifest = self._store.exact_package_manifest(
+                entry.package_id, entry.version, entry.sha256,
+            )
+            if manifest is not None:
+                keys.update(
+                    f"{entry.package_id}.{item.key}" for item in manifest.state_schemas
+                    if item.visibility == "engine"
+                )
+        return frozenset(keys)
+
+    def model_context_snapshot(
+        self, campaign_id: str,
+    ) -> tuple[CampaignDisplaySnapshot, ModelDecisionBoundary | None]:
+        """Project public state and a private game's permitted actor from one revision."""
+        with self._operation():
+            snapshot = self._store.display_snapshot(campaign_id)
+            private_keys = self._engine_private_keys(snapshot.package_lock)
+            visible = replace(snapshot, state={
+                key: value for key, value in snapshot.state.items() if key not in private_keys
+            })
+            boundary = None
+            if private_keys:
+                declared = self._decision_scope_declaration(snapshot)
+                if declared is not None:
+                    try:
+                        boundary = project_model_decision_scope(snapshot, declared)
+                    except DecisionScopeProjectionError as error:
+                        raise CommandRejected(str(error)) from error
+            return visible, boundary
 
     def campaign_index(self) -> tuple[CampaignIndexEntry, ...]:
         """Project the coherent store index through the normal owner lifecycle."""

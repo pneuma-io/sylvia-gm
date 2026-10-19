@@ -803,9 +803,15 @@ def _validate_model_decision_boundary(value: Any) -> list[str]:
         ):
             errors.append(f"Model decision boundary {field} reference is invalid")
     control = value["participant_control"]
-    if not isinstance(control, dict) or set(control) != {"field", "player_values"}:
+    if (not isinstance(control, dict) or not {"field", "player_values"} <= set(control)
+            or set(control) - {"field", "player_values", "actor_participant_field"}):
         errors.append("Model decision boundary participant_control fields are invalid")
     else:
+        if "actor_participant_field" in control and (
+            not isinstance(control["actor_participant_field"], str)
+            or re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]{0,63}", control["actor_participant_field"]) is None
+        ):
+            errors.append("Model decision boundary actor participant field is invalid")
         player_values = control["player_values"]
         if not isinstance(control["field"], str) or not control["field"].strip():
             errors.append("Model decision boundary participant control field is invalid")

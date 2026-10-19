@@ -27,6 +27,7 @@ from sylvia_gm.domain.content_validation import validate_content_shape
 from sylvia_gm.domain.inventory import inventory_holding_schema
 from sylvia_gm.domain.model_capability import validate_capability_tier_id
 from sylvia_gm.domain.starting_state import (
+    PRIVATE_STATE_FEATURE,
     REQUIRED_STARTING_STATE_FEATURE,
     STARTING_STATE_FEATURE,
     StateSchema,
@@ -288,6 +289,9 @@ ENGINE_FEATURE_PANEL_WORKSPACES = "panel_workspaces.v1"
 ENGINE_FEATURE_TACTICAL_GRID = "tactical_grid.v1"
 SUPPORTED_ENGINE_FEATURES = frozenset(
     {
+        PRIVATE_STATE_FEATURE,
+        "collection_mechanics.v1",
+        "public_results.v1",
         ENGINE_FEATURE_SPATIAL_MUTATION,
         ENGINE_FEATURE_SPATIAL_PATH_MOVING_ENTITY,
         ENGINE_FEATURE_SPATIAL_CLEARANCE,
@@ -1810,6 +1814,11 @@ def manifest_from_record(
         if role is not PackageRole.PRIMARY or STARTING_STATE_FEATURE not in required_features:
             raise ValueError("Starting-state schemas require a Ruleset and declared host support")
         state_schemas = parse_state_schemas(record["state_schemas"])
+        if (
+            any(item.visibility == "engine" for item in state_schemas)
+            and PRIVATE_STATE_FEATURE not in required_features
+        ):
+            raise ValueError("Private state needs declared host support")
         if any(item.required for item in state_schemas) and (
             REQUIRED_STARTING_STATE_FEATURE not in required_features
         ):

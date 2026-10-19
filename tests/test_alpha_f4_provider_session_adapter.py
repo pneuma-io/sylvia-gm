@@ -951,6 +951,12 @@ class _OwnerProjection:
             continuity=self.continuity,
         )
 
+    def desktop_snapshot(self, campaign_id: str, *, display_only: bool = False) -> object:
+        return self.snapshot(campaign_id)
+
+    def model_context_snapshot(self, campaign_id: str) -> tuple[object, None]:
+        return self.snapshot(campaign_id), None
+
     def canonical_replay(self, campaign_id: str, *, acknowledged_sequence: int) -> object:
         assert campaign_id == "campaign-provider"
         assert acknowledged_sequence == 0
