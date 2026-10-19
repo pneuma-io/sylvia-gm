@@ -69,6 +69,11 @@ for(const width of [1440,960])test(`shared character inspection, keyboard and re
   await page.getByRole('button',{name:'Choose in Party',exact:true}).click();
   await page.getByRole('button',{name:'Inspecting Bram',exact:true}).waitFor();
   assert.equal(await page.evaluate(()=>document.activeElement.getAttribute('aria-label')),'Inspecting Bram');
+  const revealed=await page.getByRole('button',{name:'Inspecting Bram',exact:true}).evaluate(element=>
+   new Promise(resolve=>{const observer=new IntersectionObserver(([entry])=>{
+    observer.disconnect();resolve(entry.intersectionRatio);
+   });observer.observe(element);}));
+  assert.equal(revealed,1,'Choose in Party brings its focused character into the visible viewport');
   assert.equal(await page.locator('[data-character-expansion="bram"]').evaluate(e=>e.open),true);
   await page.evaluate(()=>window.inspectionQA.gamePanels().changed({type:'hide',panelId:'character'}));
   assert.equal(await page.locator('[data-panel-id="character"]').count(),0,'Standalone Character can be hidden independently');

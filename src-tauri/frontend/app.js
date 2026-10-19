@@ -6502,7 +6502,9 @@ const SylviaGMFrontend = (() => {
         void Promise.resolve(gamePanels().reveal(id)).then(() => {
           const party = container.querySelector(`[data-panel-id="${CSS.escape(id)}"]`);
           const selected = party?.querySelector('[data-party-select-actor][aria-pressed="true"]');
-          (selected || party?.querySelector('[data-party-select-actor]'))?.focus({ preventScroll: true });
+          const target = selected || party?.querySelector('[data-party-select-actor]');
+          target?.scrollIntoView({ block: 'center', inline: 'nearest' });
+          target?.focus({ preventScroll: true });
         });
       });
     });
