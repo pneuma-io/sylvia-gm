@@ -22,7 +22,8 @@ test('Loadout uses the selected entity and the owning Character surface actions'
  const {api,loadout}=setup('vesper'),html=api.renderInventoryPanel(loadout.data,loadout);
  assert.match(html,/<strong>Vesper<\/strong>/);assert.doesNotMatch(html,/<strong>Hex<\/strong>/);
  assert.match(html,/data-panel-id="operations.character"/);assert.match(html,/data-panel-action-id="reload-retain"/);
- api.synchronizePanelActor('autodrone_alpha');assert.equal(api.state.tacticalSelections[loadout.id].actor,'autodrone_alpha');
+ api.synchronizePanelActor('autodrone_alpha');assert.equal(api.state.characterInspection.id,'autodrone_alpha');
+ assert.match(api.renderInventoryPanel(loadout.data,loadout),/<strong>Autodrone Alpha<\/strong>/);
 });
 test('Legacy Stance receipt displays Character without rewriting the native receipt',()=>{
  const {api}=setup('hex'),card={version:1,title:'Stance',summary:[{label:'Actor',value:'Hex',emphasis:false}],details:[],actions:[]};

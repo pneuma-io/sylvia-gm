@@ -122,6 +122,26 @@ function state() {
     ] } };
 }
 
+test('inspection transport follows panel lifecycle and rejects an old presentation after campaign navigation',async()=>{
+  const bus=transport(),storage=new Map(),main=renderer(bus,'main',state(),storage);
+  await main.host.init();main.render();await flush();
+  main.host.changed({type:'move',panelId:'party',destination:{windowId:'new'}});await flush();
+  const windowId=bus.windows.keys().next().value,context=bus.windows.get(windowId);
+  const child=renderer(bus,windowId,state(),storage,context);await child.host.init();
+  main.state.characterInspection={campaignId:'td',rulesetId:'td-rules',id:'bravo',unavailableId:null,expanded:['alpha','bravo']};
+  await main.host.publish();
+  assert.deepEqual(JSON.parse(JSON.stringify(child.state.characterInspection)),main.state.characterInspection);
+  const old=bus.calls.filter(c=>c.command==='publish_panel_workspace').at(-1).args;
+  main.host.changed({type:'hide',panelId:'inventory'});
+  main.host.changed({type:'show',panelId:'inventory'});await flush();
+  assert.equal(child.state.characterInspection.id,'bravo');
+  main.host.leave();main.state.activeCampaignId='different';main.state.activeSessionId='different-gm';
+  main.render({...main.state.panelProjection,campaign_id:'different'});await flush();
+  bus.emit(windowId,'panel-workspace',{context:old.context,window_id:windowId,payload:{...old.payload,presentation_sequence:0}});
+  assert.equal(main.state.characterInspection,null);
+  assert.equal(main.dispatches.length,0);assert.equal(child.dispatches.length,0);
+});
+
 function dragHarness(panelId, destination) {
   const listeners = new Map(), values = new Map();
   const classes = new Set();

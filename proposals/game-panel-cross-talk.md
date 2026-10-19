@@ -1,51 +1,45 @@
 # Game Panel cross-talk and hardening
 
-Status: selected planning scope. This draft proposes bounded SRD panel refinement, not a wholesale redesign or a runtime implementation.
+Party cards now expose the same permitted details as the standalone Character view. One inspection selection drives Character and equipment views. Inspection never chooses the acting character, clears a target, rewrites a queued intention, or executes mechanics.
 
-## User outcome
+## Interaction
 
-Expand a character card in Party to inspect the full permitted information available in the Character panel. Selecting a character in Party or another relevant panel should update a consistent shared selected character, so users do not repeatedly choose the same person in independent selectors.
+- Party offers an accessible Inspect button for every visible member, including members the player cannot control. Compact names, HP, conditions and resources remain readable. Details adds class/level, equipment, weapon-set information, readiness and declared aptitude/skill groups through the same renderer used by Character.
+- Character remains independently arrangeable. Its redundant selector becomes Choose in Party, which reveals Party. Rulesets without a Party panel retain a shared accessible inspection picker. Inventory follows that selection and explains unavailable records without displaying another person.
+- Map and Network retain explicit action-character controls. An explicit action-character choice also updates inspection; inspection cannot change the action character or target. Map labels distinguish the acting character. Encounter still displays authoritative turn ownership.
+- Existing Party actions retain their declared sources and actor bindings. Character-only action names link to their owning panel, avoiding duplicate dispatchers in detached Party windows.
 
-Keep UI selection distinct from the acting character, current combat turn and action target. Browsing another character must not grant control, change turn authority, rewrite a queued action or dispatch an action for the wrong actor.
+The existing standalone Character panel and independent expansion are preserved while Daniel's requested layout choice is pending. The recommendation is to retain Character as an optional dockable view and allow several cards expanded for comparison. No whole-shell redesign or automatic layout reset is included.
 
-## Current source baseline and actual overlap
+## State and safety
 
-At inspected main, [the frontend](../src-tauri/frontend/app.js) already has:
+Inspection and outer expansion use the existing panel host, native presentation sequence and saved campaign workspace. Ruleset defaults never copy another campaign's inspected identity. Roster removal clears inspection to an explicit unavailable state; reintroducing the same ID does not silently restore it. Campaign and Ruleset changes validate against their own admitted records. There is no additional engine authority or private campaign cache.
 
-- `renderPartyPanel` with vitals, resources, conditions, expandable Details/Available actions, and a Party Select control when a player-controlled actor has a matching map.
-- `renderCharacterPanel` with another character selector plus class/level, ready equipment, weapon-set details and aptitude/skill groups not all present in the Party card.
-- `synchronizePanelActor` and map/network selection paths sharing some actor identity across Character, inventory, network and map surfaces. Character falls back through panel/map/focused-actor state.
-- An encounter display with its own committed current-turn information, and action/queue paths that require preserved actor/target bindings.
+Docking, tabs, hide/show, detached windows and reopening use the existing host lifecycle. The renderer preserves disclosure state if a redraw races a pending browser toggle event, and restores nested stat-group focus within the same campaign/session. Children adopt the owner's current presentation and reject obsolete contexts/sequences.
 
-Therefore neither expandable Party cards nor all cross-panel sharing should be rebuilt from scratch. The actual refinement is full permitted detail parity, fewer redundant controls, and consistent selection/lifecycle semantics around the existing partial sharing. The current Party Select handler also requests a target reset; review that behavior explicitly rather than assuming every reset is a defect or retaining it silently.
+Manual requests capture actor/target inputs before awaiting. A pending intention prevents replacement DOM or a moved child panel from starting another copy. Delayed previews and confirmations recheck campaign/session, declared action, revision, actor control, visible actor/target and map revision. The authoritative owner still validates permissions, resources, revision and idempotency. Queued intentions retain their original explicit bindings.
 
-These are source observations, not a fresh installed reproduction or proof that every selection edge case is broken.
+## Verification
 
-## Proposed consolidation and boundaries
+Focused source coverage includes detail parity, noncontrolled inspection, equipment, removal/reappearance, Ruleset replacement, delayed previews/confirmation, captured queued actors, duplicate suppression, shared window transport and workspace persistence.
 
-1. Inventory the current SRD Party, Character, inventory/equipment, map and encounter information/actions. Identify exact duplicates and distinct uses before removing anything. Consolidate repeated character vitals/details and redundant selection affordances where that improves the journey; do not remove the standalone Character panel without examining inspection/detached-panel needs.
-2. Reuse a shared permitted character-detail presentation/data boundary so an expanded Party card exposes what the Character panel would show for that same visible character. Preserve complete relevant groups, truthful missing-data states, action availability and hidden-information boundaries. Do not create a competing mechanically authoritative character cache.
-3. Give the campaign/session UI one explicit selected-character identity and propagate it to relevant panels through their existing bindings. Panels opened later adopt that selection where valid. A panel that cannot display the selected entity explains its limitation rather than silently selecting someone else.
-4. Preserve separate meanings for UI inspection selection, the actor authorized to take an action, committed current turn, and each action's target. Inspecting a non-controlled character must not grant control or expose GM-only data. Actor-specific commands retain their explicit owning validation, including turn/reaction permissions. Display selection, expansion and arrangement do not execute actions, spend resources or generate narration.
-5. Define visible behavior for actor/target changes during a preview, draft or queued action. Retain an existing bound action, or visibly invalidate/reconfirm it as needed; never silently retarget or re-author it from a later panel selection.
-6. Handle panel open/close/detach, session/campaign/Ruleset changes, late projections and roster removals/additions. Clear or replace invalid selection deliberately and consistently. Do not persist a stale entity into a different campaign or create feedback loops/duplicate subscriptions between windows.
-7. Preserve layout/panel preferences and define selected-character/expanded-card persistence on reopen where useful. Add keyboard-accessible selection/expansion, clear selected/current-turn/target labels and appropriate accessible announcements.
+```powershell
+node --test tests/frontend_character_selection.test.cjs tests/frontend_character_equipment.test.cjs tests/frontend_party_panel_actions.test.cjs tests/frontend_panel_host.test.cjs tests/frontend_panel_workspace.test.cjs
+node --test tests/frontend_character_inspection.browser.cjs tests/frontend_panel_startup.browser.cjs tests/frontend_map_header.browser.cjs
+```
 
-No wholesale panel/UI framework redesign, new combat-authority model, package migration or unrelated feature work is selected. Reuse existing shared selection and owner paths; do not create duplicate selectors merely to mirror every panel.
+Real SRD Lite owner checks exercise single spending, identical receipt replay, save/reopen, and unchanged state after stale, unauthorized and out-of-range requests:
 
-## Acceptance and future tests
+```powershell
+.venv/Scripts/python.exe -m pytest -s tests/test_lite_panel_combat.py -k "actual_spell_control_spends_once_and_reopens or stale_unauthorized_and_out_of_range_controls_mutate_nothing" --basetemp <owned-fixture-root>/attempts/<fresh-run>
+```
 
-- Compare expanded Party and Character details for the same permitted SRD character, including class/level, vitals, conditions, resources, equipment and declared skill/aptitude information where available. Check unavailable data honestly.
-- Select a character in Party and each selected relevant panel. Verify consistent views without moving turn authority or changing another action's actor/target. Include inspection of a visible but non-controlled character.
-- Open/close/detach panels, change rosters and switch/reopen campaigns during projection updates. Verify late responses and stale selections cannot affect the wrong campaign.
-- Queue or preview an action, browse another character and then confirm/cancel/retry it. Assert no lost action, unauthorized actor change, silent retargeting, duplicate dispatch or wrong-character execution.
-- Complete selection and expansion using keyboard/assistive controls, preserve intended focus and announce distinct UI selection/current-turn/target states.
-- Review the actual rendered SRD panel journey after implementation at normal and narrow sizes, including detached windows, readable detail/selected/acting/target cues and screenshots. Use focused renderer/selection tests plus an affected native panel/action journey; do not claim live acceptance from this source inspection or rerun unrelated mechanics suites.
+Use the repository's current Lite fixture environment and archive rules. Native evidence is separate from component evidence. Testing uses disposable SRD campaigns, isolated WebView data and the packaged owner. Browser tests do not establish real-provider or physical-input acceptance.
 
-## Full specification and implementation boundary
+Two network-preview assertions also fail on unchanged base e618d4ff7998cd1f436e43c2a767609c9fe506e0. They remain existing failures; their assertions were not weakened.
 
-The coordinator owns Desk work item `dd228a98-0be5-406c-8057-7f4117894616` (retrieved at revision 1) and its complete specification, including the links to earlier completed panel work. Retrieve the complete current specification and mandatory references before implementation. This public proposal is not a replacement handoff.
+## Scope and integration
 
-Reuse completed shared-panel overhaul `17d55f54-ba8c-4ef3-b1df-c6f3912ad620` and TDH-04 `3e6b5811-9320-4e56-921e-0d95c9b5ee05`; do not reopen their acceptance. Preserve the separate frame simplification/Party-ordering work in PES-133 `f660f910-4d89-437e-9d40-a5cd40aa8f4a` and PES-134 `1e966982-fd4c-4d65-971f-a1c445277b69`. PL-14's generic declarations/Riichi dependency is related infrastructure, not this SRD redundancy follow-on.
+Desk work item dd228a98-0be5-406c-8057-7f4117894616 was read at revision 4. The complete specification and relevant unabridged original tickets were retrieved before implementation. Today's explicit implementation selection supersedes historical planning-only status.
 
-This PR changes one proposal document only. No runtime implementation, third-party assets, configuration, installation, security change, merge or release is delivered. No GitHub Actions before November 2026.
+This reuses the completed panel overhaul, TDH-04 lifecycle, PES-133 compact frames and PES-134 player-first ordering. Riichi's piece_table extension is independent: preserve its panelContent case and CSS block during integration. This branch adds no display renderer, package mechanics, credentials, security change, installer, merge or release. GitHub Actions remain deferred until November 2026.
