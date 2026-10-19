@@ -907,6 +907,53 @@ function pieceHarness() {
   return h;
 }
 
+test('late availability for one piece cannot enable a different piece using the same action', async () => {
+  const h = pieceHarness(), checks = [];
+  h.surface.actions[0].checks_required = true;
+  h.projection.revision = 4;
+  h.api.state.bridge.player_action_availability = command => new Promise(resolve => {
+    checks.push({ command, resolve });
+  });
+  h.api.renderRulesetPanelProjection(h.projection);
+  assert.equal(h.button.disabled, true);
+  h.button.dataset.panelPieceId = 'beacon';
+  h.api.renderRulesetPanelProjection(h.projection);
+  assert.equal(checks.length, 2);
+  assert.equal(checks[0].command.requests[0].selection.piece, 'ghost');
+  assert.equal(checks[1].command.requests[0].selection.piece, 'beacon');
+  checks[0].resolve({ campaign_id: 'campaign', revision: 4, results: [{ available: true }] });
+  await new Promise(setImmediate);
+  assert.equal(h.button.disabled, true);
+  checks[1].resolve({ campaign_id: 'campaign', revision: 4,
+    results: [{ available: false, reason: 'Program has no charges' }] });
+  await new Promise(setImmediate);
+  assert.equal(h.button.disabled, true);
+  await h.click();
+  assert.equal(h.previews.length, 0);
+  assert.equal(h.executions.length, 0);
+});
+
+test('queued piece retains its identity while another character is inspected', async () => {
+  const h = pieceHarness(), composed = []; let finish;
+  Object.assign(h.api.state.bridge, { action_sequence: async () => null,
+    snapshot: () => new Promise(resolve => { finish = resolve; }),
+    compose_action_sequence: async command => {
+      composed.push(command); return { ...command, version: 1, status: 'ready', steps: command.steps };
+    } });
+  const pending = h.click(); await new Promise(setImmediate);
+  h.button.dataset.panelPieceId = 'beacon';
+  h.api.applyPanelSelection('party', { character: 'bravo' });
+  h.api.renderRulesetPanelProjection(h.projection);
+  h.button.disabled = false; await h.click();
+  finish({ revision: 4 }); await pending;
+  assert.equal(composed.length, 1);
+  assert.equal(composed[0].steps.length, 1);
+  assert.equal(composed[0].steps[0].selection.piece, 'ghost');
+  assert.equal(h.api.state.characterInspection.id, 'bravo');
+  assert.equal(h.previews.length, 0);
+  assert.equal(h.executions.length, 0);
+});
+
 test('delayed piece preview keeps its captured piece across inspection and blocks a second intention', async () => {
   const h = pieceHarness();
   let finish;
