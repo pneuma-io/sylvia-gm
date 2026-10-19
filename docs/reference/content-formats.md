@@ -197,6 +197,30 @@ and Campaign File work remain available, while automatic gameplay and participan
 decisions wait for a gameplay input. Stop/redirection uses the ordinary session
 interruption path and retains any already committed results.
 
+On the ChatGPT-account and OpenRouter routes, fixed authority instructions precede
+reusable owned history; labelled fresh application data follows it, with current
+engine state last. The final participant observation similarly follows that
+participant's own history. `select_actor_action.action_id` has a stable bounded
+string schema; current offers stay in the latest observation and are validated
+against the immutable host envelope. Other admitted tools retain their current
+authorization boundaries, including changing eligible secrets or operations.
+
+OpenRouter receives an opaque `session_id` derived from the campaign, session,
+package and configured model/provider compatibility, plus the stable actor for
+participant contexts. Revisions, turn IDs, offer IDs and display names do not
+enter that routing identity. No backend provider is pinned. ChatGPT continues to
+use application-owned history and ephemeral App Server threads; its system
+instructions contain no changing engine-state payload. Compaction notes remain
+fallible historical data and preserve the player's latest correction exactly.
+
+Cache read/write usage is nullable: missing fields are unavailable, while a
+reported zero remains zero. ChatGPT uses the matching thread/turn's latest
+`tokenUsage.last`, never additive `total` notifications. OpenRouter usage reads
+`cached_tokens` and `cache_write_tokens` from returned token details. Session and
+model totals include counts of requests that reported each cache field. These
+are observed token counts, not a guarantee of cache hits, billing discounts or
+ChatGPT allowance savings.
+
 Engine-private action arguments remain canonical in storage for ledger integrity.
 Desktop/player snapshots and public replay projections omit those arguments;
 this does not alter the saved action, its receipt or its idempotency identity.

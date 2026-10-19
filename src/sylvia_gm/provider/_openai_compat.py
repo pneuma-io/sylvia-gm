@@ -190,6 +190,24 @@ def _chat_reasoning(message: object) -> str:
     return ""
 
 
+def _reported_cache_usage(raw_usage: object, prompt_tokens: int) -> CacheUsage:
+    """Keep optional provider cache fields distinct from reported zero counts."""
+    def field(value: object, key: str) -> object:
+        return value.get(key) if isinstance(value, Mapping) else getattr(value, key, None)
+
+    details = field(raw_usage, "prompt_tokens_details") or field(raw_usage, "input_tokens_details")
+
+    def observed(*values: object) -> int | None:
+        return next((value for value in values if type(value) is int and value >= 0), None)
+
+    read = observed(field(details, "cached_tokens"), field(raw_usage, "cached_tokens"),
+                    field(raw_usage, "prompt_cache_hit_tokens"))
+    write = observed(field(details, "cache_write_tokens"), field(raw_usage, "cache_write_tokens"))
+    return CacheUsage(cache_read_tokens=read, cache_write_tokens=write,
+                      cache_miss_tokens=None if read is None else max(0, prompt_tokens - read),
+                      total_prompt_tokens=prompt_tokens)
+
+
 def _stream_usage(raw_usage: object) -> tuple[TokenUsage, CacheUsage]:
     """Normalize usage from delta-bearing or usage-only streaming chunks."""
 
@@ -219,22 +237,7 @@ def _stream_usage(raw_usage: object) -> tuple[TokenUsage, CacheUsage]:
             else None
         ),
     )
-    prompt_details = getattr(raw_usage, "prompt_tokens_details", None) or getattr(
-        raw_usage, "input_tokens_details", None
-    )
-    cached_tokens = (
-        int(getattr(prompt_details, "cached_tokens", 0) or 0)
-        if prompt_details is not None
-        else int(
-            getattr(raw_usage, "cached_tokens", getattr(raw_usage, "prompt_cache_hit_tokens", 0))
-            or 0
-        )
-    )
-    return usage, CacheUsage(
-        cache_read_tokens=cached_tokens,
-        cache_miss_tokens=max(0, prompt_tokens - cached_tokens),
-        total_prompt_tokens=prompt_tokens,
-    )
+    return usage, _reported_cache_usage(raw_usage, prompt_tokens)
 
 
 class ChatCompletionsTransport(ProviderTransport):
@@ -540,10 +543,6 @@ class ResponsesTransport(ChatCompletionsTransport):
         prompt_tokens = int(getattr(usage, "input_tokens", 0) or 0)
         completion_tokens = int(getattr(usage, "output_tokens", 0) or 0)
         output_details = getattr(usage, "output_tokens_details", None)
-        input_details = getattr(usage, "input_tokens_details", None)
-        cached_tokens = (
-            int(getattr(input_details, "cached_tokens", 0) or 0) if input_details is not None else 0
-        )
         finish = responses_finish(raw_response)
         retained = native_output(output)
         return ProviderResponse(
@@ -564,11 +563,7 @@ class ResponsesTransport(ChatCompletionsTransport):
             model=model_id,
             finish_reason=finish,
             usage_reported=usage is not None,
-            cache_usage=CacheUsage(
-                cache_read_tokens=cached_tokens,
-                cache_miss_tokens=max(0, prompt_tokens - cached_tokens),
-                total_prompt_tokens=prompt_tokens,
-            ),
+            cache_usage=_reported_cache_usage(usage, prompt_tokens),
         )
 
     def parse_stream_chunk(self, raw_chunk: Any) -> ProviderStreamChunk | None:
@@ -854,6 +849,14 @@ class OpenAICompatProvider(Provider):
         """Request documented stateless native reasoning only on direct supported APIs."""
         from urllib.parse import urlsplit
 
+        context_id = options.pop("_request_context_id", None)
+        if (urlsplit(self._base_url).hostname == "openrouter.ai"
+                and isinstance(context_id, str) and context_id.startswith("sylvia-")
+                and len(context_id) <= 256):
+            extra = options.get("extra_body")
+            options["extra_body"] = {
+                **(extra if isinstance(extra, dict) else {}), "session_id": context_id,
+            }
         if self._model_info.transport != "responses" or urlsplit(self._base_url).hostname not in {
             "api.openai.com",
             "api.x.ai",

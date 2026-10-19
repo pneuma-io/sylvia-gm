@@ -95,7 +95,8 @@ def run_actor_decision(
                     "properties": {
                         "action_id": {
                             "type": "string",
-                            "enum": [action.identity for action in request.actions],
+                            "minLength": 1,
+                            "maxLength": 256,
                         }
                     },
                     "required": ["action_id"],
@@ -122,6 +123,7 @@ def run_actor_decision(
         records=checkpoints,
         save=keep_checkpoint,
         record_owner={"kind": "participant", "context_id": context_id},
+        request_context_id="sylvia-" + context_id,
         cancelled=lambda: provider_input.control.cancelled,
         progress=provider_input.control.set_status_hint,
         prepare_continuation=prepare_native,

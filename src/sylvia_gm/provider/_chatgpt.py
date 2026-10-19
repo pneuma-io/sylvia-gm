@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any
 
 from sylvia_gm.provider._base import (
+    CacheUsage,
     ModelInfo,
     Provider,
     ProviderResponse,
@@ -104,6 +105,40 @@ class ChatGPTProvider(Provider):
                     "downstream_model_request": "not_exposed_by_runtime",
                 },
             )
+        )
+
+    def _capture_usage(
+        self, response: ProviderResponse, params: dict[str, Any],
+        thread_id: str | None, turn_id: str | None,
+    ) -> None:
+        """Use the latest owned last-request report; cumulative thread totals are not additive."""
+        if (not thread_id or not turn_id or params.get("threadId") != thread_id
+                or params.get("turnId") != turn_id):
+            return
+        token_usage = params.get("tokenUsage")
+        if not isinstance(token_usage, dict):
+            return
+        self._observe_context_window(token_usage.get("modelContextWindow"))
+        last = token_usage.get("last")
+        if not isinstance(last, dict):
+            return
+
+        def count(key: str) -> int | None:
+            value = last.get(key)
+            return value if type(value) is int and value >= 0 else None
+
+        prompt, output, total = (
+            count(key) for key in ("inputTokens", "outputTokens", "totalTokens")
+        )
+        if prompt is None or output is None or total is None:
+            return
+        response.usage = TokenUsage(prompt, output, total, count("reasoningOutputTokens"))
+        response.usage_reported = True
+        read, write = count("cachedInputTokens"), count("cacheWriteInputTokens")
+        response.cache_usage = CacheUsage(
+            cache_read_tokens=read, cache_write_tokens=write,
+            cache_miss_tokens=None if read is None else max(0, prompt - read),
+            total_prompt_tokens=prompt,
         )
 
     async def generate(
@@ -311,21 +346,7 @@ class ChatGPTProvider(Provider):
                         )
                         break
                     elif method == "thread/tokenUsage/updated":
-                        token_usage = params.get("tokenUsage")
-                        if not isinstance(token_usage, dict):
-                            continue
-                        if params.get("threadId") == thread_id and params.get("turnId") == turn_id:
-                            self._observe_context_window(token_usage.get("modelContextWindow"))
-                        usage = token_usage.get("last", {})
-                        if isinstance(usage, dict):
-                            counts = [
-                                usage.get(key)
-                                for key in ("inputTokens", "outputTokens", "totalTokens")
-                            ]
-                            valid_counts = [n for n in counts if type(n) is int and n >= 0]
-                            if len(valid_counts) == 3:
-                                response.usage = TokenUsage(*valid_counts)
-                                response.usage_reported = True
+                        self._capture_usage(response, params, thread_id, turn_id)
                     elif method == "turn/completed":
                         completed = params.get("turn", {})
                         if completed.get("status") != "completed":
@@ -350,6 +371,15 @@ class ChatGPTProvider(Provider):
                                 "ChatGPT did not complete this response. Saved work is retained."
                             )
                         break
+                # Tool admission has already stopped this owned child. Preserve any usage
+                # notification received around shutdown without starting another model call.
+                await asyncio.to_thread(connection.close)
+                drain = getattr(connection, "notifications", None)
+                if callable(drain):
+                    for pending in drain():
+                        if (pending.get("method") == "thread/tokenUsage/updated"
+                                and isinstance(pending.get("params"), dict)):
+                            self._capture_usage(response, pending["params"], thread_id, turn_id)
                 response.content = "".join(text_parts) or None
                 self._last_response = response
                 await self.hooks.fire_on_response(

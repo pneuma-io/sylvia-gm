@@ -20,6 +20,16 @@ The new `piece_table` renderer presents Ruleset-declared play areas, groups, pie
 
 The declaration format is documented in [content formats](../docs/reference/content-formats.md#grouped-piece-tables). Focused checks cover concealed-piece isolation, malformed data, literal and state sources, save/reopen, existing layouts and actual child HTML startup in a browser fixture. Browser fixtures do not establish native desktop acceptance.
 
+## ChatGPT and OpenRouter cache support
+
+These two routes place fixed instructions and tool contracts before reusable owned history, followed by fresh labelled engine state or the participant's current observation. ChatGPT's App Server `baseInstructions` excludes changing state. The participant selector schema stays fixed while the host validates the selected ID against the latest legal offers. Authorization-sensitive GM tool availability and eligible-secret restrictions remain current even when they cause a cold request.
+
+OpenRouter receives its documented opaque `session_id`, stable for one compatible campaign/session/package/model/actor context. It contains no revision, turn, offer ID or display name, and does not pin a paid backend. ChatGPT retains ephemeral runtime threads and application-owned continuation; the installed runtime exposes no standard thread/turn cache-key parameter. No persistent-thread redesign or new credentials are required.
+
+Returned cache reads and writes retain missing-versus-zero distinctions. Request audit correlation and model totals remain scoped; ChatGPT uses the latest matching `tokenUsage.last`, without summing cumulative thread totals. OpenRouter records returned `cached_tokens` and `cache_write_tokens`. Counts do not establish billing or subscription-quota savings. Routing and prefix stability follow the [OpenRouter cache documentation](https://openrouter.ai/docs/guides/best-practices/prompt-caching); the [App Server documentation](https://learn.chatgpt.com/docs/app-server) and installed protocol schema define the ChatGPT boundary.
+
+Offline production-serializer fixtures cover GM → A → B → C → GM → A, current-state changes, stable tools, permitted observations and save/reopen. They establish request contents and isolation, not actual remote cache hits. A live warm probe still needs an approved disposable Sylvia profile with an already configured ChatGPT or OpenRouter model; none has been verified in this isolated workspace. Native table interaction and screenshots remain a separate pending desktop acceptance item.
+
 ## Existing baseline
 
 Sylvia has generic Ruleset/package, authoritative command, result/projection and panel-host paths. Those are foundations to inspect and reuse, not evidence that Mahjong is already implemented. Existing tactical panels do not establish a complete reusable tile/table display. The three historical tasks describe related mechanics, reusable presentation and authored content; this is one coherent feature proposal rather than three duplicate Mahjong PRs.
