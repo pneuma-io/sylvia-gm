@@ -33,6 +33,18 @@ def each(collection, variable, effects):
     return {"for_each": {"collection": collection, "as": variable, "do": effects}}
 
 
+def dora_indexes(destination):
+    """Reveal a declared concealed kan before robbery while delayed indicators stay pending."""
+    return [
+        set_("_visible_indicators", "1 + state.kan_count - state.kan_pending_dora"),
+        branch(
+            "state.phase == 'kan_response' and state.pending_kan.op == 'ankan'",
+            [set_("_visible_indicators", "_visible_indicators + 1")],
+        ),
+        set_(destination, "indices(_visible_indicators)"),
+    ]
+
+
 def call(name, params=None, exports=None):
     resolved, prelude = {}, []
     for key, value in (params or {}).items():

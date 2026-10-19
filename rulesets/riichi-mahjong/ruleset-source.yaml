@@ -867,8 +867,18 @@ mechanic_families:
         field: _dora
         value: []
     - set:
+        field: _visible_indicators
+        value: 1 + state.kan_count - state.kan_pending_dora
+    - condition:
+        condition: state.phase == 'kan_response' and state.pending_kan.op == 'ankan'
+        on_true:
+        - set:
+            field: _visible_indicators
+            value: _visible_indicators + 1
+        on_false: []
+    - set:
         field: _indexes
-        value: indices(1 + state.kan_count - state.kan_pending_dora)
+        value: indices(_visible_indicators)
     - for_each:
         collection: _indexes
         as: _index
@@ -2411,8 +2421,18 @@ mechanic_families:
         field: _ura
         value: 0
     - set:
+        field: _visible_indicators
+        value: 1 + state.kan_count - state.kan_pending_dora
+    - condition:
+        condition: state.phase == 'kan_response' and state.pending_kan.op == 'ankan'
+        on_true:
+        - set:
+            field: _visible_indicators
+            value: _visible_indicators + 1
+        on_false: []
+    - set:
         field: _indicators
-        value: indices(1 + state.kan_count - state.kan_pending_dora)
+        value: indices(_visible_indicators)
     - for_each:
         collection: _indicators
         as: _index
@@ -2918,47 +2938,8 @@ mechanic_families:
         field: _allowed
         value: definitions.tiles[actor.game.last_draw].kind == kind
     - set:
-        field: _before
-        value: without(actor.game.hand, one(actor.game.last_draw))
-    - set:
-        field: _kinds
-        value: []
-    - for_each:
-        collection: _before
-        as: _tile
-        do:
-        - list_push:
-            list: _kinds
-            value: definitions.tiles[_tile].kind
-    - set:
         field: _wait_kinds
         value: actor.game.riichi_waits
-    - for_each:
-        collection: _wait_kinds
-        as: _wait_kind
-        do:
-        - set:
-            field: _partitions
-            value: partitions(joined(_kinds, one(_wait_kind)), definitions.patterns,
-              definitions.group_sizes[len(actor.game.melds)])
-        - condition:
-            condition: len(_partitions) == 0
-            on_true:
-            - set:
-                field: _allowed
-                value: false
-            on_false: []
-        - for_each:
-            collection: _partitions
-            as: _partition
-            do:
-            - condition:
-                condition: kind + 34 not in _partition
-                on_true:
-                - set:
-                    field: _allowed
-                    value: false
-                on_false: []
     - set:
         field: _remaining
         value: without(actor.game.hand, tiles)
@@ -3397,6 +3378,9 @@ mechanic_families:
     - condition:
         condition: _selected.op == 'ankan' or _selected.op == 'kakan'
         on_true:
+        - set:
+            field: state.kan_pending_dora
+            value: 0
         - set:
             field: _kan_seat
             value:
@@ -4498,7 +4482,20 @@ mechanic_families:
         - set:
             field: _payments
             value: replaced(_payments, _source, _payments[_source] + ((_basic * _factor
-              + 99) // 100) * 100 + _ron_honba)
+              + 99) // 100) * 100)
+        - set:
+            field: _honba_source
+            value: _source
+        - condition:
+            condition: len(_pao) > 0
+            on_true:
+            - set:
+                field: _honba_source
+                value: _pao[0].seat
+            on_false: []
+        - set:
+            field: _payments
+            value: replaced(_payments, _honba_source, _payments[_honba_source] + _ron_honba)
     - set:
         field: _payers
         value: indices(4)
@@ -4934,10 +4931,15 @@ mechanic_families:
             value: 1
         on_false: []
     - set:
+        field: _dealer_ron_priority
+        value: state.result.kind == 'win' and state.result.dealer_stays and state.result.winners
+          != null and len(state.result.winners) > 1
+    - set:
         field: _finished
         value: min(_scores[0], _scores[1], _scores[2], _scores[3]) < 0
     - condition:
-        condition: state.round_wind > _nominal and _scores[_top] >= 30000
+        condition: state.round_wind > _nominal and _scores[_top] >= 30000 and not
+          _dealer_ron_priority
         on_true:
         - set:
             field: _finished
@@ -4983,7 +4985,8 @@ mechanic_families:
             field: state.honba
             value: state.honba + 1
     - condition:
-        condition: state.round_wind > _nominal and _scores[_top] >= 30000
+        condition: state.round_wind > _nominal and _scores[_top] >= 30000 and not
+          _dealer_ron_priority
         on_true:
         - set:
             field: _finished
@@ -5073,8 +5076,18 @@ mechanic_families:
         field: _indicators
         value: []
     - set:
+        field: _visible_indicators
+        value: 1 + state.kan_count - state.kan_pending_dora
+    - condition:
+        condition: state.phase == 'kan_response' and state.pending_kan.op == 'ankan'
+        on_true:
+        - set:
+            field: _visible_indicators
+            value: _visible_indicators + 1
+        on_false: []
+    - set:
         field: _indexes
-        value: indices(1 + state.kan_count - state.kan_pending_dora)
+        value: indices(_visible_indicators)
     - for_each:
         collection: _indexes
         as: _index
@@ -6080,10 +6093,10 @@ definitions:
     starting_score: 25000
     target: 30000
     multiple_ron: all
-    ron_honba: each_winner
+    ron_honba: nearest_winner
     riichi_pot: nearest_winner
     nagashi: draw_payments_no_honba_no_sticks
-    nagashi_closed_required: true
+    nagashi_closed_required: false
     kuikae: forbidden
   play_phases:
   - discard

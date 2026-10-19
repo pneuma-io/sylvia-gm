@@ -8,7 +8,11 @@ Play Riichi Mahjong in Sylvia with a readable table alongside ordinary GM narrat
 
 The feature is called **Riichi Mahjong**. A clear table and coherent game loop are the aim; a commercial Mahjong client's feature set, effects, accounts or visual assets are not requirements.
 
-Each match has one player and three GM-controlled opponents. The ordinary `start_game` tool selects East-only or East-South for that match. One Game Panel contains the entire table, including all four seats and shared match state.
+Each match has one player and three NPC opponents, each making game decisions in a separate actor context. The GM keeps its continuous narration/campaign context. The ordinary `start_game` tool selects East-only or East–South for that match. One Game Panel contains the entire table, including all four seats and shared match state.
+
+The Ruleset declares each actor's permitted observations, legal actions and relevant play/character instructions through a reusable mechanism. NPC contexts use the configured provider/model and remain isolated from other NPCs and GM narration, including native thinking, tool history and saved continuation. The engine alone validates and commits proposals. Same-actor context can continue when valid; state revisions, seat identity and package identity constrain resume and stale proposals. Validated public results return to the GM without replacing its campaign context. No additional credentials, parallel decisions, management UI or general autonomous-agent platform are selected.
+
+Acceptance includes private sentinel checks across three NPCs and the GM, successive same-actor decisions, retained GM history, save/reopen/interruption/stale rejection, illegal proposal rejection and a small non-Mahjong synthetic fixture. The earlier candidate's shared-GM decision loop does not satisfy this updated architecture and is under repair.
 
 ## Implemented shared display
 
@@ -44,9 +48,11 @@ Sylvia has generic Ruleset/package, authoritative command, result/projection and
 
 The selected profile uses open tanyao and atozuke, forbids kuikae, requires one yaku, uses no kiriage mangan, double-wind pair 4 fu, chiitoitsu 25 fu, kazoe yakuman and the selected double yakuman variants. Triple ron pays every winner; kokushi can rob a concealed kan. Pao applies only to the liable yakuman component.
 
-Matches start at 25,000 with a 30,000 target, end below zero, allow one extension wind, repeat the dealer on a win or tenpai, and end when the final dealer leads at target. Ties follow original seat order. These owner selections supersede the historical open questions. This is not a claim of Tenhou identity or Mahjong Soul feature parity. Exact current in-game honba, multi-ron and nagashi details remain acceptance checks; the public tournament PDF has different target, bust and head-bump settings and cannot supply those ranked defaults.
+Matches start at 25,000 with a 30,000 target, end below zero, allow one extension wind, repeat the dealer on a win or tenpai, and end when the final dealer leads at target. Ties follow original seat order. This follows the selected familiar ranked profile, without a claim of Tenhou identity or Mahjong Soul feature parity. The tournament PDF describes different competition settings and does not determine these defaults.
 
-The current package provisionally pays honba to each ron winner and requires a closed hand for nagashi mangan. Profile data and tests also support honba only for the nearest winner and nagashi with open groups; the owner must confirm the selected current-client behavior. Nagashi is treated as an exhaustive draw: honba advances, riichi sticks carry, and dealer continuation follows tenpai. Concealed-kan dora reveals immediately; open/added-kan dora currently reveals after the following discard, including a pending rinshan-before-discard case to verify. These explicit profile checks remain open before acceptance.
+The [official ranked rules](https://mahjongsoul.com/news/46) establish nearest-winner honba/deposit priority, dealer continuation in multi-ron, pao honba responsibility, unchanged-wait riichi kans, concealed-kan robbery by kokushi, and indicator timing. A previous delayed indicator reveals before the next kan declaration/robbery window; a robbed added kan creates no new indicator. Concealed-kan indicators appear before kokushi responses. These are rule-derived sequences; the rare consecutive-kan/chankan case has not been observed in the actual client during this work.
+
+Nagashi replaces tenpai payments, keeps deposits and uses dealer tenpai for continuation. The player's own calls remain eligible, supported by the secondary [Mahjong Soul guide](https://nekomimi.ws/~nikukyu/jantama/jt_yakumain.html) and [Game8 conditions](https://game8.jp/jantama/661221); all discards must remain unclaimed terminals/honors. This secondary basis is distinct from the official settlement rule. Prior concealed dragon/wind kan counting for pao is still being investigated; no unsupported change is selected.
 
 The latest selection removes any requirement for a separate adventuring layer. The three complete specifications and all retained source versions were retrieved from the authorized private archive before implementation. The archive is kept outside this public repository.
 

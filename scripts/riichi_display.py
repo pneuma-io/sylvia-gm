@@ -4,6 +4,7 @@ from scripts.build_riichi_ruleset import (
     PRIVATE_ACTOR,
     branch,
     call,
+    dora_indexes,
     each,
     family,
     literal,
@@ -176,7 +177,7 @@ def add_display(families):
     ]
     families["center_table"]["effects"] = [
         set_("_dora", []),
-        set_("_indexes", "indices(1 + state.kan_count - state.kan_pending_dora)"),
+        *dora_indexes("_indexes"),
         each(
             "_indexes",
             "_index",
@@ -337,7 +338,7 @@ def add_display(families):
         ],
         [
             set_("_indicators", []),
-            set_("_indexes", "indices(1 + state.kan_count - state.kan_pending_dora)"),
+            *dora_indexes("_indexes"),
             each(
                 "_indexes",
                 "_index",

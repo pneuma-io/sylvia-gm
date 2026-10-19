@@ -4,6 +4,7 @@ from scripts.build_riichi_ruleset import (
     PRIVATE_ACTOR,
     branch,
     call,
+    dora_indexes,
     each,
     family,
     literal,
@@ -667,7 +668,7 @@ def add_scoring(families, definitions):
         set_("_valid", "_han > 0 or _yakuman > 0"),
         set_("_dora", 0),
         set_("_ura", 0),
-        set_("_indicators", "indices(1 + state.kan_count - state.kan_pending_dora)"),
+        *dora_indexes("_indicators"),
         each(
             "_indicators",
             "_index",

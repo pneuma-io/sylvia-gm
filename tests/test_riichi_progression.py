@@ -17,10 +17,12 @@ from tests.test_riichi_scoring import tiles
 
 
 @lru_cache(maxsize=4)
-def scenario_archive(ron_honba="each_winner", nagashi_closed=True):
+def scenario_archive(ron_honba=None, nagashi_closed=None):
     declaration = source()
-    declaration["definitions"]["profile"]["ron_honba"] = ron_honba
-    declaration["definitions"]["profile"]["nagashi_closed_required"] = nagashi_closed
+    if ron_honba is not None:
+        declaration["definitions"]["profile"]["ron_honba"] = ron_honba
+    if nagashi_closed is not None:
+        declaration["definitions"]["profile"]["nagashi_closed_required"] = nagashi_closed
     declaration["mechanic_families"]["fixture_refresh"] = family(
         [],
         [
@@ -67,9 +69,10 @@ def scenario(
     discards=None,
     scores=None,
     exposed=None,
-    ron_honba="each_winner",
-    nagashi_closed=True,
+    ron_honba=None,
+    nagashi_closed=None,
     exhausted=False,
+    dead_wall=None,
 ):
     pool = list(range(136))
 
@@ -83,6 +86,7 @@ def scenario(
         return result
 
     physical_hands = [allocate(hand) if hand else None for hand in hands]
+    reserved_dead = allocate(dead_wall) if dead_wall is not None else None
     discards = [allocate(text) for text in (discards or ["", "", "", ""])]
     melds = {}
     for seat, declarations in (exposed or {}).items():
@@ -103,7 +107,8 @@ def scenario(
         if hand is None:
             length = 14 if seat == 0 else 13
             physical_hands[seat], pool = pool[:length], pool[length:]
-    dead, live = pool[:14], pool[14:]
+    dead, live = (reserved_dead, pool) if reserved_dead is not None else (pool[:14], pool[14:])
+    assert len(dead) == 14
     if exhausted:
         for index, tile in enumerate(live):
             discards[(0, 2, 3)[index % 3]].append(tile)
@@ -220,6 +225,30 @@ def test_three_ron_pays_every_winner_and_nearest_takes_sticks(tmp_path, ron_honb
         assert sorted(physical_tiles(table)) == list(range(136))
 
 
+@pytest.mark.parametrize("discarder", [0, 2])
+def test_ranked_multi_ron_awards_honba_and_deposits_in_discarder_turn_order(tmp_path, discarder):
+    hands = ["666m19m19p19s12345z", "12345m23455p678s", "34578m111p222s11z", "45789m333p789s22z"]
+    seats = ["you.seat", "you.right", "you.across", "you.left"]
+    winners = [(discarder + offset) % 4 for offset in (1, 2, 3)]
+    with scenario(
+        tmp_path, [hands[(seat - discarder) % 4] for seat in range(4)],
+        overrides={"actor": seats[discarder], "honba": 2, "sticks": 3},
+        games={seat: {"riichi": True} for seat in winners},
+        scores=[25000 if seat == discarder else 24000 for seat in range(4)],
+    ) as table:
+        choose(table, "discard", 5)
+        for _ in winners:
+            choose(table, "ron")
+        result = table.state()["result"]
+        assert [winner["seat"] for winner in result["winners"]] == winners
+        assert [row["payments"][discarder] - row["score"]["total"]
+                for row in result["winners"]] == [600, 0, 0]
+        assert [row["gain"] - sum(row["payments"]) for row in result["winners"]] == [3000, 0, 0]
+        assert result["dealer_stays"] is (0 in winners)
+        assert sum(seat["score"] for seat in table.entities().values()) == 100000
+        assert sorted(physical_tiles(table)) == list(range(136))
+
+
 def test_pon_beats_chi_and_called_tile_cannot_be_swapped(tmp_path):
     with scenario(
         tmp_path, ["3m123456789p1122s", "12456m789s11122z", "33m456789s12344z", None]
@@ -279,6 +308,31 @@ def test_final_dealer_leading_at_target_ends_match_and_ties_follow_start_order(
         assert table.state()["phase"] == "finished" and table.state()["finished"]
 
 
+@pytest.mark.parametrize("match_format,wind", [("east_only", 1), ("east_south", 2)])
+def test_extension_target_does_not_override_a_dealer_among_multiple_ron_winners(
+    tmp_path, match_format, wind,
+):
+    hands = ["666m19m19p19s12345z", "12345m23455p678s", "34578m111p222s11z", "45789m333p789s22z"]
+    with scenario(
+        tmp_path, [hands[2], hands[3], hands[0], hands[1]],
+        overrides={"actor": "you.across", "round_wind": wind, "match_format": match_format},
+        games={seat: {"riichi": True} for seat in (0, 1, 3)},
+        scores=[10000, 18000, 42100, 29900],
+    ) as table:
+        choose(table, "discard", 5)
+        for _ in range(3):
+            choose(table, "ron")
+        assert table.state()["result"]["dealer_stays"]
+        scores = [seat["score"] for seat in table.entities().values()]
+        assert table.entities()["you.left"]["score"] > 30000
+        assert table.entities()["you.seat"]["score"] < max(scores)
+        choose(table, "continue")
+        assert not table.state()["finished"] and table.state()["phase"] == "discard"
+        assert table.state()["round_wind"] == wind and table.state()["dealer"] == 0
+        assert table.state()["honba"] == 1
+        assert sorted(physical_tiles(table)) == list(range(136))
+
+
 def test_exhaustive_draw_and_continue_preserve_match_state(tmp_path):
     with scenario(tmp_path, [None] * 4, discards=["2m", "2p", "2s", "3p"]) as table:
         # Follow the full live wall through ordinary discard/pass commands, without wins or calls.
@@ -335,6 +389,10 @@ def test_only_kokushi_can_rob_a_concealed_kan(tmp_path, orphans):
         choose(table, "ankan")
         if orphans:
             assert any(row["op"] == "ron" for row in table.state()["choices"])
+            center = next(
+                area for area in table.state()["table"]["areas"] if area["id"] == "shared"
+            )
+            assert len(center["groups"][0]["pieces"]) == 2
             choose(table, "ron")
             passes(table)
             assert table.state()["result"]["kind"] == "win"
@@ -347,7 +405,8 @@ def test_only_kokushi_can_rob_a_concealed_kan(tmp_path, orphans):
 
 
 @pytest.mark.parametrize("stacked,payer,liable", [(False, 16000, 16000), (True, 48000, 16000)])
-def test_pao_splits_only_the_liable_yakuman_component(tmp_path, stacked, payer, liable):
+@pytest.mark.parametrize("honba", [0, 2])
+def test_pao_splits_only_the_liable_yakuman_component(tmp_path, stacked, payer, liable, honba):
     # A terminal meld avoids all-honors; East adds the non-liable stacked yakuman.
     fourth = "111z" if stacked else "111m"
     hand = "2z" if stacked else "1z"
@@ -356,13 +415,15 @@ def test_pao_splits_only_the_liable_yakuman_component(tmp_path, stacked, payer, 
         tmp_path,
         [discard_hand, hand, None, None],
         games={1: {"pao_dragon": 2}},
+        overrides={"honba": honba},
         exposed={1: [(text, True, False) for text in ("555z", "666z", "777z", fourth)]},
     ) as table:
         choose(table, "discard", 28 if stacked else 27)
         choose(table, "ron")
         passes(table)
         winner = table.state()["result"]["winners"][0]
-        assert winner["payments"][0] == payer and winner["payments"][2] == liable
+        assert winner["payments"][0] == payer
+        assert winner["payments"][2] == liable + honba * 300
         assert winner["payments"][3] == 0
         assert sum(seat["score"] for seat in table.entities().values()) == 100000
         assert sorted(physical_tiles(table)) == list(range(136))
@@ -373,9 +434,12 @@ def test_pao_splits_only_the_liable_yakuman_component(tmp_path, stacked, payer, 
     [
         ("1111m234p567s2255z", [28, 31], True),
         ("11112345678999m", list(range(9)), False),
+        ("1111222333m45p55s", [11, 14], True),
     ],
 )
-def test_riichi_kan_preserves_waits_and_all_hand_readings(tmp_path, hand, waits, allowed):
+def test_riichi_kan_requires_the_drawn_fourth_tile_and_unchanged_wait_types(
+    tmp_path, hand, waits, allowed,
+):
     with scenario(
         tmp_path,
         [hand, None, None, None],
@@ -384,6 +448,11 @@ def test_riichi_kan_preserves_waits_and_all_hand_readings(tmp_path, hand, waits,
         assert any(row["op"] == "ankan" for row in table.state()["choices"]) is allowed
         discards = [row["tiles"][0] for row in table.state()["choices"] if row["op"] == "discard"]
         assert discards == [3]
+        if allowed:
+            choose(table, "ankan")
+            passes(table)
+            assert table.state()["kan_count"] == 1
+            assert sorted(physical_tiles(table)) == list(range(136))
 
 
 @pytest.mark.parametrize("op", ["minkan", "kakan"])
@@ -406,6 +475,28 @@ def test_open_and_added_kan_replace_a_tile_and_delay_indicator_until_discard(tmp
         assert table.state()["kan_pending_dora"] == 0
         center = next(area for area in table.state()["table"]["areas"] if area["id"] == "shared")
         assert len(center["groups"][0]["pieces"]) == 2
+
+
+def test_pending_indicator_reveals_before_a_second_added_kan_is_robbed(tmp_path):
+    with scenario(
+        tmp_path,
+        ["5m789p112s7z", "12346m23455p678s", None, None],
+        exposed={0: [("777z", True, False), ("555m", True, False)]},
+        dead_wall="1111z5z6z4m6z8s2z9s3z1p4z",
+    ) as table:
+        choose(table, "kakan", 33)
+        passes(table)
+        assert table.state()["kan_count"] == 1 and table.state()["kan_pending_dora"] == 1
+        choose(table, "kakan", 4)
+        choose(table, "ron")
+        passes(table)
+        winner = table.state()["result"]["winners"][0]
+        assert "Robbing a kan" in winner["score"]["yaku"]
+        assert winner["score"]["dora"] == 1
+        assert table.state()["kan_count"] == 1 and table.state()["kan_pending_dora"] == 0
+        center = next(area for area in table.state()["table"]["areas"] if area["id"] == "shared")
+        assert len(center["groups"][0]["pieces"]) == 2
+        assert sorted(physical_tiles(table)) == list(range(136))
 
 
 def test_robbed_added_kan_does_not_commit_and_supplies_chankan_yaku(tmp_path):
@@ -485,7 +576,7 @@ def test_fourth_kan_by_another_player_aborts_after_its_discard(tmp_path):
         assert sorted(physical_tiles(table)) == list(range(136))
 
 
-@pytest.mark.parametrize("closed_required", [True, False])
+@pytest.mark.parametrize("closed_required", [True, False, None])
 def test_nagashi_profile_payment_and_draw_progression_are_explicit(tmp_path, closed_required):
     with scenario(
         tmp_path,

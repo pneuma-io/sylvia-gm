@@ -25,10 +25,10 @@ This preserves a future four-human seam without adding networking.
 
 The selected profile is Mahjong Soul-like four-player Riichi with three red fives.
 It is not a claim of exact client parity. See the [implementation scope](../../proposals/riichi-mahjong.md)
-for selected scoring and match rules and the remaining acceptance checks. The
-[official tournament manual](https://mahjongsoul.yo-star.com/tournament/rules.pdf)
-documents a different competition configuration; its 25,000 target, no-bust and
-head-bump settings are not this package's ranked-like defaults.
+for selected scoring, source confidence and remaining acceptance checks. The
+[official ranked rules](https://mahjongsoul.com/news/46) determine multi-ron,
+kan timing and settlement; open-hand nagashi eligibility has a documented secondary
+source basis. The tournament manual describes a different competition configuration.
 
 Tile labels and presentation are original text/CSS. No third-party game art, code,
 characters or rules prose is included. The repository's licence and scope apply.

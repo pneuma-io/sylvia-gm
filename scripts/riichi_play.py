@@ -33,10 +33,10 @@ def add_gameplay(families, definitions):
         "starting_score": 25000,
         "target": 30000,
         "multiple_ron": "all",
-        "ron_honba": "each_winner",
+        "ron_honba": "nearest_winner",
         "riichi_pot": "nearest_winner",
         "nagashi": "draw_payments_no_honba_no_sticks",
-        "nagashi_closed_required": True,
+        "nagashi_closed_required": False,
         "kuikae": "forbidden",
     }
     # A hand resets these fields before drawing. Persistent round counters live outside it.
@@ -356,7 +356,7 @@ def add_gameplay(families, definitions):
             ),
         ],
     )
-    # Riichi permits only drawing the fourth tile of an indispensable concealed triplet.
+    # Ranked riichi permits a drawn fourth tile when the waiting tile types stay unchanged.
     # Compare waits against a hypothetical meld without publishing or committing it.
     families["riichi_kan"] = family(
         [
@@ -366,30 +366,7 @@ def add_gameplay(families, definitions):
         ],
         [
             set_("_allowed", "definitions.tiles[actor.game.last_draw].kind == kind"),
-            set_("_before", "without(actor.game.hand, one(actor.game.last_draw))"),
-            set_("_kinds", []),
-            each("_before", "_tile", [push("_kinds", "definitions.tiles[_tile].kind")]),
             set_("_wait_kinds", "actor.game.riichi_waits"),
-            each(
-                "_wait_kinds",
-                "_wait_kind",
-                [
-                    set_(
-                        "_partitions",
-                        (
-                            "partitions(joined(_kinds, one(_wait_kind)), "
-                            "definitions.patterns, definitions.group_sizes[len(actor.game.meld"
-                            "s)])"
-                        ),
-                    ),
-                    branch("len(_partitions) == 0", [set_("_allowed", False)]),
-                    each(
-                        "_partitions",
-                        "_partition",
-                        [branch("kind + 34 not in _partition", [set_("_allowed", False)])],
-                    ),
-                ],
-            ),
             set_("_remaining", "without(actor.game.hand, tiles)"),
             set_("_remaining_kinds", []),
             each(
@@ -708,6 +685,7 @@ def add_gameplay(families, definitions):
             branch(
                 "_selected.op == 'ankan' or _selected.op == 'kakan'",
                 [
+                    set_("state.kan_pending_dora", 0),
                     set_("_kan_seat", {"seat": "actor.seat"}),
                     set_("state.pending_kan", "merge(_selected, _kan_seat)"),
                     set_(
@@ -1363,8 +1341,15 @@ def add_settlement(families):
                         "_payments",
                         (
                             "replaced(_payments, _source, _payments[_source] + ((_basic * "
-                            "_factor + 99) // 100) * 100 + _ron_honba)"
+                            "_factor + 99) // 100) * 100)"
                         ),
+                    ),
+                    set_("_honba_source", "_source"),
+                    branch("len(_pao) > 0", [set_("_honba_source", "_pao[0].seat")]),
+                    set_(
+                        "_payments",
+                        "replaced(_payments, _honba_source, "
+                        "_payments[_honba_source] + _ron_honba)",
                     ),
                 ],
             ),
@@ -1641,9 +1626,16 @@ def add_settlement(families):
             ),
             set_("_nominal", 0),
             branch("state.match_format == 'east_south'", [set_("_nominal", 1)]),
+            set_(
+                "_dealer_ron_priority",
+                "state.result.kind == 'win' and state.result.dealer_stays and "
+                "state.result.winners != null and len(state.result.winners) > 1",
+            ),
             set_("_finished", "min(_scores[0], _scores[1], _scores[2], _scores[3]) < 0"),
             branch(
-                "state.round_wind > _nominal and _scores[_top] >= 30000", [set_("_finished", True)]
+                "state.round_wind > _nominal and _scores[_top] >= 30000 "
+                "and not _dealer_ron_priority",
+                [set_("_finished", True)],
             ),
             branch(
                 (
@@ -1670,7 +1662,9 @@ def add_settlement(families):
                 [set_("state.honba", "state.honba + 1")],
             ),
             branch(
-                "state.round_wind > _nominal and _scores[_top] >= 30000", [set_("_finished", True)]
+                "state.round_wind > _nominal and _scores[_top] >= 30000 "
+                "and not _dealer_ron_priority",
+                [set_("_finished", True)],
             ),
             branch("state.round_wind > _nominal + 1", [set_("_finished", True)]),
             branch(
