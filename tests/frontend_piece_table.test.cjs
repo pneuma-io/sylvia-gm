@@ -21,6 +21,8 @@ test('table renders closed owner projection with accessible action references', 
   assert.match(markup, /<dt>Cycle<\/dt><dd>3<\/dd>/);
   assert.doesNotMatch(markup, /disabled/);
   assert.match(render(data, [{id: 'run', label: 'Run program', available: false}]), /disabled/);
+  data.areas[1].groups[0].count = 1;
+  assert.match(render(data), /1 concealed piece<\/p>/);
 });
 
 test('all authored text is escaped, positions are bounded, unknown controls stay inert', () => {

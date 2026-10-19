@@ -19,7 +19,7 @@
         let pieces;
         if (group.concealed) {
           pieces = `<p class="piece-table-concealed">${Number.isInteger(group.count)
-            ? `${group.count} concealed pieces` : 'Concealed pieces'}</p>`;
+            ? `${group.count} concealed ${group.count === 1 ? 'piece' : 'pieces'}` : 'Concealed pieces'}</p>`;
         } else {
           pieces = `<ol class="piece-table-pieces">${(group.pieces || []).map((piece) => {
             const action = controls.get(piece.action_id);
