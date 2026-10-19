@@ -204,7 +204,6 @@ def test_action_tokens_do_not_encode_sorted_hand_position_or_private_option_coun
 def test_opponent_context_and_ordinary_reference_expose_only_permitted_information(table):
     from sylvia_gm.agent._provider_session import (
         ProviderSessionAdapter,
-        _gm_decision_control_message,
     )
     from tests.test_alpha_f4_provider_session_adapter import _provider_input, _ScriptedProvider
 
@@ -212,18 +211,13 @@ def test_opponent_context_and_ordinary_reference_expose_only_permitted_informati
     table.act("take_action", {"choice": table.state()["choices"][0]["id"]})
     boundary = table.owner.model_decision_boundary("riichi")
     assert boundary.owner.value == "gm" and boundary.actor_id != "you.seat"
-    payload = json.loads(
-        _gm_decision_control_message(boundary)["content"].split("\n", 1)[1].split("\n", 1)[0]
-    )
-    assert payload["actor_state"]["game"]["hand"] == list(
+    request = table.owner.actor_decision_request("riichi", turn_id="turn")
+    assert list(request.observation["hand"]) == list(
         table.entities()[boundary.actor_id]["game"]["hand"]
     )
-    assert "hand" not in json.dumps(payload["actor_state"]["game"]["public_table"])
-    assert len(payload["actor_state"]["game"]["public_table"]["seats"]) == 4
-    assert (
-        "live" not in payload["actor_state"]["game"]
-        and "dead" not in payload["actor_state"]["game"]
-    )
+    assert "hand" not in json.dumps(thaw_json_value(request.observation["public_table"]))
+    assert len(request.observation["public_table"]["seats"]) == 4
+    assert "live" not in request.observation and "dead" not in request.observation
     provider_input = _provider_input()
     provider_input = replace(
         provider_input, session=replace(provider_input.session, campaign_id="riichi")
@@ -232,7 +226,9 @@ def test_opponent_context_and_ordinary_reference_expose_only_permitted_informati
     context = adapter._current_campaign_context_payload(provider_input)
     assert context["campaign_state"]["ruleset_owned_values"] == {}
     assert context["ruleset_decision"]["actor_id"] == boundary.actor_id
-    assert context["ruleset_decision"]["actor_state"] == payload["actor_state"]
+    assert "hand" not in json.dumps(context["ruleset_decision"]["actor_state"])
+    public_table = context["ruleset_decision"]["actor_state"]["table"]
+    assert public_table["live_count"] == len(table.state()["live"])
     fresh = json.loads(adapter._campaign_context_messages(provider_input)[1]["content"].split(
         "\n", 1,
     )[1])
@@ -280,7 +276,7 @@ def test_resumed_gm_seat_requires_real_action_before_campaign_narration(table):
     )
     provider = _ScriptedProvider([[ProviderStreamChunk(
         tool_call_delta={"index": 0, "id": "riichi-controlled-seat", "function": {
-            "name": "take_action", "arguments": json.dumps({"choice": choice}),
+            "name": "select_actor_action", "arguments": json.dumps({"action_id": choice}),
         }}, finish_reason="tool_calls",
     )]])
     events = iter(ProviderSessionAdapter(
@@ -292,7 +288,8 @@ def test_resumed_gm_seat_requires_real_action_before_campaign_narration(table):
         assert provider.request_kwargs[0]["tool_choice"] == "required"
         messages, tools = provider.calls[0]
         assert "update_campaign_file" not in _tool_operations(tools)
-        assert "SYLVIA_GM_DECISION_REQUEST" in str(messages)
+        assert [tool["function"]["name"] for tool in tools] == ["select_actor_action"]
+        assert json.loads(messages[-1]["content"])["actor"]["id"] == boundary.actor_id
         before = table.snapshot().revision
         receipt = table.owner.execute_action(action.action_command)
         assert receipt.status.value == "committed"

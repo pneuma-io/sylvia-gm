@@ -1,8 +1,10 @@
 # Riichi Mahjong
 
-Four seats: one player and three GM-controlled opponents. Start an `east_only` or
+Four seats: one player and three NPC opponents. Start an `east_only` or
 `east_south` match through the ordinary `start_game` tool. The engine supplies current
-opaque action IDs; the player uses the table and the GM chooses for its active seat.
+opaque action IDs; the player uses the table and each NPC chooses in its own private
+context using the configured model. The GM retains campaign context and narrates
+committed public results.
 Forced passes advance automatically. Ordinary gameplay and OOC conversation preserve
 the saved table.
 
@@ -19,7 +21,8 @@ participant artifact with a name and
 
 The package declares all Mahjong mechanics. Shared core additions are bounded value
 operations, explicit public results, hidden random collections, private state roots,
-and the reusable `piece_table` surface. No Mahjong dispatch exists in the core engine.
+the reusable `piece_table` surface and opt-in actor-owned decisions. No Mahjong
+dispatch exists in the core engine.
 The canonical participant binds the human seat; clients cannot request another viewer.
 This preserves a future four-human seam without adding networking.
 

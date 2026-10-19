@@ -301,6 +301,8 @@ def _required_engine_features(value: object) -> tuple[str, ...]:
 
     def collect(item: object) -> None:
         if isinstance(item, Mapping):
+            if "isolated_participant" in item:
+                features.add("isolated_participants.v1")
             if "shuffle" in item or any(
                 isinstance(value, str) and any(
                     name + "(" in value for name in (

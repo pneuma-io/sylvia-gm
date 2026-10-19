@@ -170,6 +170,30 @@ Rulesets without private roots retain their existing GM context payload.
 The optional `actor_participant_field` binds a seat entity to a canonical participant;
 it does not accept a viewer identity from the client.
 
+An explicit `model_decision_boundary.isolated_participant` declaration opts into
+`isolated_participants.v1`. It declares `instructions`, actor-relative
+`observation_path`, optional `persona_path`, `actions_path`, and a
+`public_observation: {namespace, key}` state reference. Paths contain at most eight
+identifier segments. Instructions and persona are bounded to 8 KiB each; the
+serialized observation envelope is bounded to 128 KiB. The action list contains
+at most 256 closed offers `{id, label, operation, arguments}`. Operations and
+arguments must match this exact primary package's admitted catalog and schema.
+
+The configured provider receives only that actor's envelope and compatible own
+history. Its sole proposal tool selects an offered `action_id`; the host supplies
+the actor, turn, package, revision, operation and arguments. Ordinary engine
+admission still decides legality. Every public action in an opted-in Ruleset must
+explicitly `publish` its public result. GM context receives the declared public
+observation and committed published results while retaining campaign dialogue.
+Raw offer arguments, private state and participant native continuations stay out
+of GM history. Save/reopen retains valid actor-owned history; unavailable private
+history starts fresh without falling back to GM messages. Packages without this
+opt-in retain ordinary GM and side-scope behavior.
+
+Engine-private action arguments remain canonical in storage for ledger integrity.
+Desktop/player snapshots and public replay projections omit those arguments;
+this does not alter the saved action, its receipt or its idempotency identity.
+
 `collection_mechanics.v1` provides bounded pure value operations (`indices`, `portion`,
 `joined`, `replaced`, `without`, `occurrences`, `one`, `ordered`, `text`, `total`),
 exact multiset `partitions` and `completions`, and a `shuffle` effect. Searches consume

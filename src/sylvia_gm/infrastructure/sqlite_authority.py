@@ -6378,6 +6378,20 @@ class SQLiteAuthorityStore:
         finally:
             connection.close()
 
+    def actor_context(
+        self, session_id: str, context_id: str, *, provider_id: str, model_id: str,
+    ) -> Mapping[str, object] | None:
+        """Read one actor-owned private history without reading the GM conversation."""
+        connection = self._connect_read_only()
+        try:
+            if int(connection.execute("PRAGMA user_version").fetchone()[0]) < 11:
+                return None
+            return sqlite_reasoning.read_actor_context(
+                connection, session_id, context_id, provider_id=provider_id, model_id=model_id,
+            )
+        finally:
+            connection.close()
+
     def session_history_page(
         self, session_id: str, *, before_sequence: int | None = None, limit: int = 50,
     ) -> SessionHistoryPage:

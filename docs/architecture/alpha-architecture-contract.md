@@ -401,6 +401,15 @@ The owner classifies provider output at ingress:
   exclude them. Clearing or disabling Full Audit clears its own trace store, not saved Thinking.
   Partial reasoning retained after interruption is labelled as such and is never promoted to a
   completed narrative or an authoritative game fact;
+- **isolated Ruleset participants:** an explicit package opt-in creates separate actor-owned
+  inference histories. The GM retains its campaign and narration history. Participant requests
+  start from the declared observation/persona/action envelope, never a filtered GM transcript.
+  Native fields and private compaction notes remain with the campaign, session, stable actor,
+  exact package and compatible provider/model context. Revisions fence proposals, not history
+  lifetime. Missing private continuation starts a fresh actor-only context. Readable participant
+  reasoning uses the same private inspection sink; signatures and opaque data are not previews
+  or summary prose. Only the engine's committed published result enters GM history. Cancellation
+  before commit discards a proposal; recovery after commit reads its receipt without replay;
 - **TALK:** provisionally streamed, canonically stored only on completion;
 - **Admin Full Audit trace:** off by default during ordinary use and required during testing; it
   mirrors each complete provider request, source-event/role provenance, exact tool surface and

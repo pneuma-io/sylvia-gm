@@ -1399,6 +1399,10 @@ def materialize_package_mechanic(
             raise PackageRuntimeError("Package mechanic did not consume the authorized choice")
         if result.private_random_sampled and result.public_context is None:
             raise PackageRuntimeError("Hidden random results require explicit publication")
+        if (runtime.model_decision_boundary
+                and runtime.model_decision_boundary.get("isolated_participant")
+                and result.public_context is None):
+            raise PackageRuntimeError("Isolated participant actions require explicit publication")
         published_context = result.context if result.public_context is None else result.public_context
         visible_context = {
             key: value

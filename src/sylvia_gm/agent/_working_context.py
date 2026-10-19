@@ -193,11 +193,14 @@ class WorkingContextProvider(Provider):
         cancelled: Callable[[], bool] = lambda: False,
         progress: Callable[[str | None], None] = lambda _text: None,
         prepare_continuation: Callable | None = None,
+        record_owner: Mapping[str, object] | None = None,
     ) -> None:
         super().__init__()
         self._provider = provider
         self.model_info = getattr(provider, "model_info", None)
-        self.records = [dict(r) for r in records if _valid_checkpoint(r)]
+        self.records = [dict(r) for r in records if _valid_checkpoint(r)
+                        and (record_owner is None or r.get("context_owner") == record_owner)]
+        self._record_owner = dict(record_owner) if record_owner is not None else None
         self._save = save
         self._cancelled = cancelled
         self._progress = progress
@@ -399,6 +402,7 @@ class WorkingContextProvider(Provider):
                 )
             payload = {
                 "kind": CHECKPOINT_KIND,
+                **({"context_owner": self._record_owner} if self._record_owner is not None else {}),
                 "version": 1,
                 "checkpoint_id": uuid4().hex,
                 "previous_checkpoint_id": previous["checkpoint_id"] if previous else None,
@@ -551,6 +555,7 @@ def compact_saved_messages(provider, context, messages, control):
     working = WorkingContextProvider(
         provider,
         records=[m.content for m in context.messages],
+        record_owner=messages[0].get("_context_owner") if messages else None,
         save=bridge.save,
         cancelled=lambda: control.cancelled,
         progress=control.set_status_hint,

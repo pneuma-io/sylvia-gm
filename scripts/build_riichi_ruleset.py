@@ -107,6 +107,7 @@ def hand_defaults():
         "rinshan": False,
         "forbidden_discards": [],
         "choices": [],
+        "decision_actions": [],
         "riichi_waits": [],
         "pao_dragon": None,
         "pao_wind": None,
@@ -207,6 +208,10 @@ def source():
                         "seat": seat,
                         "participant_id": "_player_id" if seat == 0 else None,
                         "control": literal("player" if seat == 0 else "gm"),
+                        "persona": literal(
+                            "Play a thoughtful, friendly club match. Respect legal "
+                            "choices and base tactics on your own hand and public play."
+                        ),
                         "score": 25000,
                         "game": hand_defaults(),
                     },
@@ -336,7 +341,15 @@ def source():
             PRIVATE_ACTOR,
             parameter("choices", "array", items={"type": "object"}),
         ],
-        [set_("actor.game.choices", "choices")],
+        [
+            set_("actor.game.choices", "choices"),
+            set_("_decisions", []),
+            each("choices", "_choice", [push("_decisions", {
+                "id": "_choice.id", "label": "_choice.label", "operation": literal("take_action"),
+                "arguments": {"choice": "_choice.id"},
+            })]),
+            set_("actor.game.decision_actions", "_decisions"),
+        ],
     )
 
     families["seat_table"] = family(
@@ -593,6 +606,19 @@ def source():
                 "actor_participant_field": "participant_id",
             },
             "default_owner": "gm",
+            "isolated_participant": {
+                "instructions": (
+                    "Play Riichi Mahjong for only this seat. Choose one offered legal action. "
+                    "Tile IDs 0..135 have kind ID // 4: kinds 0..8 are 1m..9m, 9..17 are "
+                    "1p..9p, 18..26 are 1s..9s; 27..33 are East, South, West, North, White, "
+                    "Green, Red. Physical IDs 16, 52 and 88 are red fives. Your hand and "
+                    "public_table are the only available tile information. Do not guess wall "
+                    "order or another hand. The engine scores, validates and resolves all moves."
+                ),
+                "observation_path": ["game"], "persona_path": ["persona"],
+                "actions_path": ["game", "decision_actions"],
+                "public_observation": {"namespace": NS, "key": "state.public_observation"},
+            },
         },
         "ui_surfaces": [
             {
@@ -616,11 +642,11 @@ def source():
         ],
         "operating_guide": (
             "Run Riichi Mahjong through start_game and take_action. Use the "
-            "named player and three GM-controlled opponents. Choose only "
-            "currently offered action IDs and stop at the player's decision. "
-            "Base opponent choices on that seat's hand and public "
-            "information; never inspect the hidden wall or other hands. Keep "
-            "opponents' concealed tiles out of public narration. The "
+            "named player and three isolated NPC decision contexts. The host dispatches NPC "
+            "choices from that seat's permitted observations. Keep your continuous campaign "
+            "context and narrate only their committed public results. Resolve the player's "
+            "currently declared action through the offered IDs, then stop at the next player "
+            "decision. Never inspect the wall, NPC hands or NPC thinking. The "
             "table, legal actions, scores and saved match state belong to the "
             "engine. Use ordinary gameplay/OOC transitions and preserve the "
             "table during conversation. There is no adventuring rules layer. "

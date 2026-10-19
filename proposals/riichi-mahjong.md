@@ -12,7 +12,7 @@ Each match has one player and three NPC opponents, each making game decisions in
 
 The Ruleset declares each actor's permitted observations, legal actions and relevant play/character instructions through a reusable mechanism. NPC contexts use the configured provider/model and remain isolated from other NPCs and GM narration, including native thinking, tool history and saved continuation. The engine alone validates and commits proposals. Same-actor context can continue when valid; state revisions, seat identity and package identity constrain resume and stale proposals. Validated public results return to the GM without replacing its campaign context. No additional credentials, parallel decisions, management UI or general autonomous-agent platform are selected.
 
-Acceptance includes private sentinel checks across three NPCs and the GM, successive same-actor decisions, retained GM history, save/reopen/interruption/stale rejection, illegal proposal rejection and a small non-Mahjong synthetic fixture. The earlier candidate's shared-GM decision loop does not satisfy this updated architecture and is under repair.
+The implementation now uses the explicit `isolated_participants.v1` contract. A synthetic hidden-token Ruleset exercises three NPCs, successive same-actor decisions, a human turn and return to the same NPC through production Anthropic, chat, Responses and Gemini request formatters. Focused checks also cover retained GM history, private inspection, public-result reconstruction, save/reopen, interruption, stale and illegal proposals, model changes and owned compaction notes. Native desktop acceptance remains separate.
 
 ## Implemented shared display
 

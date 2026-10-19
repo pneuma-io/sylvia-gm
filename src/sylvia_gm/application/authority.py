@@ -18,10 +18,15 @@ from contextlib import contextmanager, suppress
 from dataclasses import dataclass, replace
 from pathlib import Path
 from types import MappingProxyType
-from typing import BinaryIO, cast
+from typing import BinaryIO, TypeVar, cast
 
 import yaml
 
+from sylvia_gm.application.actor_decisions import (
+    ActorDecisionRequest,
+    project_actor_decision,
+    public_actor_observation,
+)
 from sylvia_gm.application.campaign_inventory import (
     generic_inventory_surface,
     inventory_holdings,
@@ -149,6 +154,7 @@ from sylvia_gm.domain.authority import (
     MechanicsChoiceRequest,
     MechanicsChoiceResolution,
     ModelDecisionBoundary,
+    ModelDecisionOwner,
     ModelToolBehavior,
     NarrationInterruption,
     NarrationStream,
@@ -267,6 +273,8 @@ from sylvia_gm.infrastructure.sqlite_authority import (
 )
 
 __all__ = ("mechanic_outcome_is_safe",)
+
+_Snapshot = TypeVar("_Snapshot", CampaignSnapshot, CampaignDisplaySnapshot)
 
 _RULESET_GM_OPERATING_GUIDE_PATH = "prompts/gm-operating-guide.md"
 _RULESET_GM_OPERATING_GUIDE_BYTE_LIMIT = 64 * 1024
@@ -1115,6 +1123,15 @@ class AuthorityOwner:
         with self._operation():
             return self._store.provider_continuation(
                 session_id, response_id, provider_id=provider_id, model_id=model_id,
+            )
+
+    def actor_context(
+        self, session_id: str, context_id: str, *, provider_id: str, model_id: str,
+    ) -> Mapping[str, object] | None:
+        """Load only the selected participant's private provider-compatible history."""
+        with self._operation():
+            return self._store.actor_context(
+                session_id, context_id, provider_id=provider_id, model_id=model_id,
             )
 
     def session_history_page(
@@ -7145,6 +7162,7 @@ class AuthorityOwner:
         with self._operation():
             snapshot = (self._store.display_snapshot(campaign_id) if display_only
                         else self._store.snapshot(campaign_id))
+            snapshot = self._project_private_tool_inputs(snapshot)
             private_keys = self._engine_private_keys(snapshot.package_lock)
             safe_state = {
                 key: value for key, value in snapshot.state.items() if key not in private_keys
@@ -7155,6 +7173,24 @@ class AuthorityOwner:
                     if f"{item.namespace}.{item.key}" not in private_keys
                 ))
             return replace(snapshot, state=safe_state)
+
+    def _project_private_tool_inputs(
+        self, snapshot: _Snapshot,
+    ) -> _Snapshot:
+        """Keep canonical input bytes in storage and omit hidden-game arguments from readers."""
+        private_keys = self._engine_private_keys(snapshot.package_lock)
+        private_packages = {entry.package_id for entry in snapshot.package_lock.entries
+                            if any(key.startswith(entry.package_id + ".") for key in private_keys)}
+        actions = tuple(replace(action, parameters=owned_payload({}))
+                        if action.package_id in private_packages else action
+                        for action in snapshot.actions)
+        events = tuple(replace(event, safe_payload=owned_payload({
+                           **event.safe_payload, "parameters": {},
+                       }))
+                       if event.event_type is CanonicalEventType.TOOL_CALL
+                       and event.safe_payload.get("package_id") in private_packages else event
+                       for event in snapshot.events)
+        return replace(snapshot, actions=actions, events=events)
 
     def _engine_private_keys(self, lock: PackageLock) -> frozenset[str]:
         keys: set[str] = set()
@@ -7185,9 +7221,84 @@ class AuthorityOwner:
                 if declared is not None:
                     try:
                         boundary = project_model_decision_scope(snapshot, declared)
+                        isolated = declared.get("isolated_participant")
+                        if (isinstance(isolated, Mapping) and boundary is not None
+                                and boundary.owner is ModelDecisionOwner.GM):
+                            boundary = replace(
+                                boundary,
+                                actor_state=public_actor_observation(snapshot, isolated),
+                                eligible_actors=(),
+                            )
                     except DecisionScopeProjectionError as error:
                         raise CommandRejected(str(error)) from error
             return visible, boundary
+
+    def model_context_owner(self, campaign_id: str) -> SafePayload | None:
+        """Identify the GM's native history owner when a package opts into isolated participants."""
+        with self._operation():
+            snapshot = self._store.display_snapshot(campaign_id)
+            declared = self._decision_scope_declaration(snapshot)
+            if declared is None or "isolated_participant" not in declared:
+                return None
+            primary = next(entry for entry in snapshot.package_lock.entries
+                           if entry.role is PackageRole.PRIMARY)
+            return owned_payload({"kind": "gm", "campaign_id": campaign_id,
+                                  "package_id": primary.package_id,
+                                  "package_version": primary.version,
+                                  "package_sha256": primary.sha256})
+
+    def actor_decision_request(
+        self, campaign_id: str, *, turn_id: str,
+    ) -> ActorDecisionRequest | None:
+        """Read one opted-in actor's observation and legal offers from an authority revision."""
+        with self._operation():
+            snapshot = self._store.display_snapshot(campaign_id)
+            declared = self._decision_scope_declaration(snapshot)
+            if declared is None or "isolated_participant" not in declared:
+                return None
+            if (snapshot.lifecycle is not LifecycleState.ACTIVE
+                    or snapshot.writer is not WriterRole.DM
+                    or snapshot.turns.get(turn_id) is not TurnStatus.OPEN):
+                raise CommandRejected("Isolated participant turn is unavailable")
+            boundary = project_model_decision_scope(snapshot, declared)
+            primary = next(entry for entry in snapshot.package_lock.entries
+                           if entry.role is PackageRole.PRIMARY)
+            schemas = {tool.name: tool.input_schema for tool in self._catalog(campaign_id)
+                       if tool.package_id == primary.package_id
+                       and tool.package_sha256 == primary.sha256}
+            return project_actor_decision(
+                snapshot, boundary, declared["isolated_participant"], turn_id=turn_id,
+                tool_schemas=schemas,
+            )
+
+    def actor_decision_command(
+        self, request: ActorDecisionRequest, *, choice_id: str, session_id: str, owner_id: str,
+        provider_id: str | None = None, model_id: str | None = None,
+    ) -> ActionCommand:
+        """Bind an offered identity to the current actor; never accept model-supplied arguments."""
+        with self._operation():
+            current = self.actor_decision_request(request.campaign_id, turn_id=request.turn_id)
+            if current is None or current != request:
+                raise StaleRevision("Isolated participant decision is stale")
+            session = self._store.session_activity_basis(session_id).session
+            if (session.campaign_id != request.campaign_id or session.role is not WriterRole.DM
+                    or session.status.value != "active"
+                    or (provider_id is not None and session.provider_id != provider_id)
+                    or (model_id is not None and session.model_id != model_id)):
+                raise CommandRejected("Isolated participant session changed")
+            choice = next(
+                (action for action in request.actions if action.identity == choice_id), None,
+            )
+            if choice is None:
+                raise CommandRejected("Isolated participant choice is not offered")
+            identity = "actor-action-" + request.decision_id
+            return ActionCommand(
+                campaign_id=request.campaign_id, action_id=identity, idempotency_key=identity,
+                turn_id=request.turn_id, owner_id=owner_id, writer=WriterRole.DM,
+                expected_revision=request.revision, package_id=request.package_id,
+                tool_name=choice.operation, parameters=choice.arguments,
+                initiating_session_id=session_id,
+            )
 
     def campaign_index(self) -> tuple[CampaignIndexEntry, ...]:
         """Project the coherent store index through the normal owner lifecycle."""
@@ -8055,6 +8166,7 @@ class AuthorityOwner:
         if acknowledged_sequence < 0:
             raise ValueError("Acknowledged canonical sequence cannot be negative")
         snapshot = self._store.snapshot(campaign_id)
+        snapshot = self._project_private_tool_inputs(snapshot)
         high_water = snapshot.events[-1].sequence if snapshot.events else 0
         return CanonicalReplay(
             canonical=tuple(
@@ -8179,6 +8291,7 @@ class AuthorityOwner:
     def _project_player_snapshot(
         self, snapshot: CampaignSnapshot | CampaignDisplaySnapshot,
     ) -> tuple[PlayerProjection, ...]:
+        snapshot = self._project_private_tool_inputs(snapshot)
         campaign_id = snapshot.campaign_id
         with self._work_condition:
             controls_idle = not self._campaign_work_counts.get(campaign_id, 0)

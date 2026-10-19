@@ -292,6 +292,7 @@ SUPPORTED_ENGINE_FEATURES = frozenset(
         PRIVATE_STATE_FEATURE,
         "collection_mechanics.v1",
         "public_results.v1",
+        "isolated_participants.v1",
         ENGINE_FEATURE_SPATIAL_MUTATION,
         ENGINE_FEATURE_SPATIAL_PATH_MOVING_ENTITY,
         ENGINE_FEATURE_SPATIAL_CLEARANCE,

@@ -359,6 +359,10 @@ def add_display(families):
                     "message": "state.message",
                 },
             ),
+            set_("state.public_observation", {
+                "table": "actor.game.public_table", "result": "state.result",
+                "match_result": "state.match_result",
+            }),
         ],
     )
     families["refresh"]["effects"] += [
