@@ -958,6 +958,23 @@ retained Setting and Ruleset copies. The editable Plan keeps its original source
 derives effective hashes after package admission and validates references against the edited copy.
 Runtime validation precedes saving a selectable Plan. Publication never rewrites source packages.
 
+An explicit adventure append admits another immutable Campaign Plan revision under the existing GM
+writer. It retains its predecessor, exact selected source identity and hashes, original structured
+and readable preparation, reviewed story-identity mapping and the player's continuity review.
+Application evidence records adoption without manufacturing player dialogue. The original handoff
+continues to certify its original Plan; the GM loads the current accepted adventure only through
+that retained lineage. Earlier preparation, unresolved secrets and progress remain addressable.
+History projects chapter ordinals and previous completion markers across the ordered adventures,
+while the active adventure keeps its own ending gates.
+
+Append requires an idle active campaign and an unchanged exact package lock. The owner revalidates
+the source, campaign revision, accepted predecessor and latest saved message sequence immediately
+before one short transaction writes the Plan, adoption evidence and revision receipt. The message
+fence catches newly narrated futures even when no game-state value changed. Stable request identity
+recovers a committed result without loading the authoring library again; a changed request rejects.
+No starting state, participants, package activation or layout is written by this transaction.
+Existing campaign export and backup retain all accepted revisions and the same exact source closure.
+
 Optional Plan party placements apply at Start in player-first selection order. Each slot supplies
 Ruleset-authored character-state fields and additions to existing Ruleset state lists, such as map
 tokens or actor rosters. Exact participant-reference values bind only the assigned ID or display

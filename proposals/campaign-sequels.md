@@ -1,41 +1,75 @@
 # Campaign sequels
 
-Status: selected planning scope, PL-24. The feature is not implemented by this draft.
+Status: PL-24 implementation in PR #8. Native desktop acceptance remains open.
 
-## User outcome
+## Player outcome
 
-Explicitly append more authored acts or a subsequent adventure to the same campaign. Continue with its characters, world and history rather than starting an unrelated campaign or replacing what has already happened. Preserve participants, unresolved consequences and the exact sources of both the played material and the appended adventure.
+The campaign GM menu offers **Add another adventure** after the current authored adventure
+has earned its ending. Choose a saved or bundled Campaign Plan, inspect its preparation,
+source bindings and identity mapping, describe its connection to the retained story, and
+explicitly confirm the review before appending. **Author with Builder** opens an independent
+draft containing selected campaign context for the player to review before sending.
 
-## Current baseline and actual missing outcome
+The existing **Continue adventuring in this world** remains the freeform option. Publishing
+a Plan in Builder still does not change a live campaign. Appending is an application-owned
+operation with its own review receipt.
 
-At current main, [the campaign-ending handler](../src/sylvia_gm/application/authority.py) offers "Continue adventuring in this world" only when the ending permits open-world continuation. [Existing progress tests](../tests/test_fc_campaign_progress.py) describe retention of the ending choice and progress on reopen. They were inspected, not rerun here.
+## Preserved campaign and sources
 
-That freeform continuation is already supported; it does not append a new authored Plan. [Plan admission](../src/sylvia_gm/infrastructure/sqlite_authority.py) requires Builder authority, while [the GM loader](../src/sylvia_gm/interfaces/owner_process.py) loads the originally admitted Plan/handoff. Standalone Builder can publish a revised reusable library Plan without changing an existing live campaign. The missing outcome is an app-supported append/admission operation for that campaign, not another freeform Continue button or a republish command.
+The append changes accepted preparation and the campaign revision. It does not initialize
+characters, locations, resources, inventory, mechanics, knowledge or world facts from the new
+source. The old Plan and its played progress, history, ending choice and unresolved preparation
+remain available. The GM reads the new active Plan and can inspect earlier preparation through
+`campaign_plan/adventures` and `adventures/N/structured/...` or `adventures/N/markdown`.
 
-## Proposed behavior and boundaries
+The existing and new Plans must use the same exact Setting, Ruleset and dependency closure.
+Missing snapshots, incompatible fixed characters or new required companions fail preflight.
+New story IDs receive a deterministic, visible mapping; world and participant identities stay
+unchanged. Ambiguous overlapping act/objective identities and redeclared private facts require
+author repair. The original reusable Plan and other campaigns are never rewritten.
 
-- Select the target campaign and a compatible authored addition, then preview new acts, source identities, dependencies and conflicts before explicit adoption. Cancellation or a failed preflight changes nothing.
-- Preserve played acts and their order/receipts, history, participant identities, world state, inventory/resources and unresolved consequences. Retain exact original and new source bindings. Do not rewrite the original reusable library Plan or another campaign.
-- Detect duplicate act/object identifiers, conflicting cast/world assumptions, missing dependencies and incompatible versions. Reject with a useful explanation or require an explicitly reviewed mapping; do not silently renumber or overwrite authoritative past facts.
-- Account for any epilogue, narrated after-story or future already established by the first ending. Present conflicts for a deliberate choice instead of treating a sequel as permission to erase that future or undo played events.
-- Add the new authored sequence through the owning application transaction with stale-revision and once-only/retry protection. Preserve save/reopen, backup/export and recovery of the expanded sequence and its source closure.
-- Reuse [PL-01/#5](https://github.com/pneuma-io/sylvia-gm/pull/5) content-preview/adoption boundaries where applicable. Appending an adventure must not silently update a Ruleset, change mechanical state, replace the Setting or migrate unrelated packages.
-- Keep the existing open-world continuation option and ordinary GM/OOC behavior. This scope does not authorize broad story rewriting, automatic new-adventure generation or arbitrary edits to past acts.
+Source starting assumptions and prose are shown for narrative review. The player must adapt
+contradictory preparation in Builder before adoption. This does not attempt to determine prose
+compatibility automatically. The supported connection follows all established events and any
+already narrated future; it cannot rewind or erase them. Broader timeline placement remains a
+product decision. The current eligibility guard requires a continuable ending; allowing a
+reviewed authored sequel after an ending that disables freeform continuation is also pending
+the owner's product decision.
 
-## Acceptance and future tests
+## Transaction and recovery
 
-1. Complete a short disposable campaign, append a compatible second authored adventure through the app, enter its first act and continue play. Verify all original played state/history and the new ordered sequence.
-2. Reopen and export/recover into a clean disposable profile. Assert exact original/new source bindings, participants, unresolved consequences and appended progress survive.
-3. Cancel the preview and reject stale revisions, duplicate IDs, incompatible packages, missing closure and contradictory epilogues atomically. Repeated application/retry must not duplicate acts or spend/change mechanics.
-4. Compare the original library Plan and an independent campaign before/after; their bytes/state remain unchanged.
-5. Check the existing freeform Continue/Finish behavior still works without claiming it delivers sequel append. Use the owning progress/Plan/adoption tests and an affected installed journey; no whole-Ruleset recertification is implied.
+Review captures the current Plan, exact source, campaign revision and latest GM message
+sequence. Adoption revalidates them under the existing campaign work gate and commits source,
+review evidence and revision together in one SQLite transaction. Active work, interrupted
+replies and pending mechanics choices block adoption. Stale or changed reviews fail without
+partial writes. Replaying an identical request returns its saved receipt, including after
+reopen or recovery without the original library. Reusing the request ID with changed content
+fails. Two competing append requests cannot both commit from one review basis.
 
-## Decisions for implementation
+The accepted Plan lineage and its source closures travel through existing save, backup and
+campaign export/recovery. Earlier ending cards remain quiet history while the new adventure
+has its own progress and completion gates. An early old ending does not complete unplayed
+acts or require them to finish the sequel.
 
-Settle the append entry point, compatible identity/conflict rules and how already narrated futures are presented. Use the complete PL-24 requirements and PL-01 boundaries before choosing storage or migration changes. The baseline findings are source evidence, not fresh installed acceptance.
+## Verification and limits
 
-## Full specification and implementation boundary
+- `tests/test_campaign_sequels.py` exercises real saved Plan and package snapshots, retained
+  state/history, unchanged library and other campaign, unresolved preparation, identity conflicts,
+  stale narration, rollback, concurrent admission, interrupted work, export/recovery and backup.
+- The app-owner transport journey uses controlled provider responses and the real GM read/write
+  tools to preserve a narrated after-story, append through the new commands, enter the new act and
+  reopen. This is source/transport evidence, not native UI acceptance.
+- `tests/frontend_campaign_sequel.browser.cjs` exercises actual dialog code and wiring with an
+  explicitly substituted desktop bridge: review, cancellation, conflicts and exact retry after
+  uncertain acknowledgement. Component screenshots are kept privately.
+- `tests/frontend_campaign_endings.test.cjs` covers old quiet ending cards beside the active
+  adventure. Existing ending and early-ending regressions remain applicable.
+- The unchanged pre-implementation Lite two-act Finish/Continue journey passed. The separate
+  legacy Rift source-binding regression already failed at the original head and is outside this
+  feature. No source content, rules package, spell roster or dependency migration is selected.
 
-Planning references: PL-24 — `cf2cb4f9-1e13-4faf-aaba-2907302c288d`. The complete current Desk specifications and their linked original acceptance/source material remain authoritative. Retrieve all of them through authorized access before implementation; these public notes are an index and selected scope, not a replacement handoff. Daniel's latest selection here supersedes conflicting older framing. The coordinator owns Desk reconciliation.
-
-This PR changes one proposal document only. No feature implementation, external configuration, credentials, installation, paid calls, tests of the feature, merge or release is delivered. No GitHub Actions before November 2026. Future implementation and final-byte acceptance remain separate work.
+Native compilation, ordinary desktop launch/input and the complete native disposable-campaign
+journey require the selected Windows desktop and an uncontended build slot with sufficient disk
+space. Browser and owner proofs do not close them. No merge, release or GitHub Actions run is
+included. The coordinator owns reconciliation of the complete PL-24, PL-01 and AR-30 Desk
+requirements and the original archive entries; this implementation note is not their replacement.

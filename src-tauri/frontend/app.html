@@ -126,10 +126,37 @@
         <div class="session-menu-popover">
           <button class="btn btn-secondary btn-sm" id="compact-context-btn" disabled
                   title="Shorten the model's working context while keeping the saved conversation">Compact context</button>
+          <button class="btn btn-secondary btn-sm" id="campaign-sequel-btn" hidden>
+            Add another adventure…</button>
         </div>
       </details>
     </div>
 
+    <dialog id="campaign-sequel-dialog" aria-labelledby="campaign-sequel-title">
+      <h2 id="campaign-sequel-title">Add another adventure</h2>
+      <p>Continue this campaign with authored preparation. Your characters, world, history and game state stay with you.</p>
+      <label for="campaign-sequel-source">Choose an adventure</label>
+      <select id="campaign-sequel-source"><option value="">Choose an adventure…</option></select>
+      <p>Reviewing or authoring preparation can reveal story spoilers. Builder opens a draft for you to review before sending.</p>
+      <div class="sequel-actions">
+        <button type="button" class="btn btn-secondary" id="campaign-sequel-preview">Review adventure</button>
+        <button type="button" class="btn btn-secondary" id="campaign-sequel-author">Author with Builder</button>
+      </div>
+      <p id="campaign-sequel-status" role="status"></p>
+      <div id="campaign-sequel-review" hidden></div>
+      <div id="campaign-sequel-confirmation" hidden>
+        <label for="campaign-sequel-connection">How does this adventure follow what happened?</label>
+        <textarea id="campaign-sequel-connection" rows="3" maxlength="4000"
+          placeholder="Describe the connection and any established future it must preserve."></textarea>
+        <p>The adventure begins after established events. Already narrated futures remain true.</p>
+        <label class="sequel-consent"><input type="checkbox" id="campaign-sequel-reviewed">
+          I reviewed the preparation, setup assumptions and identity mapping against this campaign’s history. They fit without undoing events or resetting anyone.</label>
+      </div>
+      <div class="sequel-actions">
+        <button type="button" class="btn btn-primary" id="campaign-sequel-append" disabled>Append adventure</button>
+        <button type="button" class="btn btn-secondary" id="campaign-sequel-cancel">Cancel</button>
+      </div>
+    </dialog>
     <div id="campaign-loading-status" class="panel-empty" role="status" hidden></div>
     <div class="chronology" id="chronology">
       <div class="empty-state" id="empty-state">

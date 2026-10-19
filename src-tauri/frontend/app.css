@@ -3081,3 +3081,14 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
 @media (prefers-reduced-motion:reduce) { .sequence-step:has([data-sequence-enter]) { animation:none; } }
 
 .action-sequence > .sequence-issue { flex:0 1 auto; max-height:6rem; overflow-y:auto; }
+
+#campaign-sequel-dialog { margin:auto; width:min(48rem, 90vw); max-height:88vh; overflow:auto; padding:1.5rem;
+  background:var(--bg-primary); color:var(--text-bright); border:1px solid var(--border-color, #555); border-radius:12px; }
+#campaign-sequel-dialog::backdrop { background:rgba(0,0,0,.7); }
+#campaign-sequel-dialog select, #campaign-sequel-dialog textarea { display:block; width:100%; margin:.5rem 0 1rem; }
+#campaign-sequel-dialog pre { white-space:pre-wrap; overflow-wrap:anywhere; max-height:24rem; overflow:auto; font-size:.8rem; }
+#campaign-sequel-dialog details { margin:1rem 0; }
+#campaign-sequel-dialog table { width:100%; font-size:.75rem; overflow-wrap:anywhere; table-layout:fixed; }
+#campaign-sequel-dialog td, #campaign-sequel-dialog th { text-align:left; padding:.3rem; }
+.sequel-actions { display:flex; flex-wrap:wrap; gap:.5rem; margin:1rem 0; }
+.sequel-consent { display:flex; align-items:flex-start; gap:.5rem; line-height:1.5; }

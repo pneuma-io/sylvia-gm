@@ -467,6 +467,21 @@ async fn campaign_creation_catalog(window: WebviewWindow) -> Result<Value, Strin
 }
 
 #[tauri::command]
+async fn campaign_sequel_context(window: WebviewWindow, request: Value) -> Result<Value, String> {
+    owner_call_async(window, "campaign_sequel_context", request).await
+}
+
+#[tauri::command]
+async fn preview_campaign_sequel(window: WebviewWindow, request: Value) -> Result<Value, String> {
+    owner_call_async(window, "preview_campaign_sequel", request).await
+}
+
+#[tauri::command]
+async fn append_campaign_sequel(window: WebviewWindow, request: Value) -> Result<Value, String> {
+    owner_call_async(window, "append_campaign_sequel", request).await
+}
+
+#[tauri::command]
 async fn delete_reusable_library_entry(
     window: WebviewWindow,
     kind: String,
@@ -2557,6 +2572,9 @@ pub fn run() {
             application_info,
             campaign_index,
             campaign_creation_catalog,
+            campaign_sequel_context,
+            preview_campaign_sequel,
+            append_campaign_sequel,
             delete_reusable_library_entry,
             builder_chat_index,
             create_builder_chat,
