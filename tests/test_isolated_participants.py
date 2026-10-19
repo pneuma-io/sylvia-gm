@@ -9,7 +9,7 @@ import yaml
 
 from sylvia_gm.agent._actor_decisions import run_actor_decision
 from sylvia_gm.agent._provider_session import ProviderSessionAdapter
-from sylvia_gm.agent._session_loop import ProviderEventKind
+from sylvia_gm.agent._session_loop import CampaignSessionLoop, ProviderEventKind, SessionRunRequest
 from sylvia_gm.agent._stateless_mcp import ModelMechanicsTool
 from sylvia_gm.application.authority import ActionCommand, AuthorityOwner, CampaignCreate
 from sylvia_gm.application.package_materialization import materialize_package_archive
@@ -180,9 +180,34 @@ def token_ruleset():
 
 @pytest.fixture
 def isolated_game(tmp_path, request):
-    compiled = compile_ruleset_source(yaml.safe_dump(token_ruleset()).encode())
+    declaration = token_ruleset()
+    options = getattr(request, "param", None)
+    pending = isinstance(options, dict) and options.get("housekeeping", False)
+    if pending:
+        declaration["mechanic_families"]["housekeeping"] = {
+            "parameters": [],
+            "pre_conditions": [],
+            "narrative": {},
+            "metadata": {"model_behavior": "required_engine_transition"},
+            "effects": [
+                {"set": {"field": "state.pending", "value": False}},
+                {"set": {"field": "state.counter", "value": 1}},
+                {"set": {"field": "state.public.counter", "value": 1}},
+                {"call": "_refresh", "params": {"actor": "{state.actor}"}},
+                {"publish": {"fields": {"message": "'HOUSEKEEPING_PUBLIC_RESULT'", "counter": 1}}},
+            ],
+        }
+        declaration["public_actions"].append(
+            {
+                **declaration["public_actions"][0],
+                "name": "housekeeping",
+                "family": "housekeeping",
+                "state_predicates": [{"namespace": NS, "key": "state.pending", "equals": True}],
+            }
+        )
+    compiled = compile_ruleset_source(yaml.safe_dump(declaration).encode())
     database = tmp_path / "tokens.sqlite3"
-    with AuthorityOwner.open(database, "isolated-test") as owner:
+    with AuthorityOwner.open(database, "isolated-test", disconnect_grace_seconds=1.0) as owner:
         with materialize_package_archive((compiled.draft,)) as artifact:
             manifest = artifact.manifest
             declaration = manifest.participant_artifacts[0]
@@ -232,7 +257,8 @@ def isolated_game(tmp_path, request):
                         {
                             "actor": "a",
                             "counter": 0,
-                            "blocked": bool(getattr(request, "param", False)),
+                            "blocked": options is True,
+                            "pending": pending,
                             "public": {"counter": 0},
                         },
                     ),
@@ -298,6 +324,7 @@ class IsolatedFlowProvider(_ScriptedProvider):
         self.before_proposal = None
         self.proposal = None
         self.require_second_gm_history = False
+        self.ooc_only = False
         self.transport = {
             "anthropic_messages": AnthropicMessagesTransport,
             "chat_completions": ChatCompletionsTransport,
@@ -325,7 +352,20 @@ class IsolatedFlowProvider(_ScriptedProvider):
             )
         self.wire.append(wire)
         names = [tool["function"]["name"] for tool in tools or []]
-        if "select_actor_action" in names:
+        if self.ooc_only:
+            assert "select_actor_action" not in names
+            assert not any(
+                name.endswith("_advance") or name.endswith("_housekeeping") for name in names
+            )
+            assert "HAND_SENTINEL" not in json.dumps(wire)
+            operation = next(name for name in names if name.endswith("_update_campaign_file"))
+            arguments = {
+                "revised_player_facing_response": [
+                    {"kind": "ooc", "text": "The table stays paused while we discuss."}
+                ]
+            }
+            call_id, marker = "ooc-gm-call", "GM"
+        elif "select_actor_action" in names:
             assert names == ["select_actor_action"]
             envelope = json.loads(messages[-1]["content"])
             seat = envelope["actor"]["id"]
@@ -446,19 +486,25 @@ class IsolatedFlowProvider(_ScriptedProvider):
 
 def gm_input(owner, session):
     base = _provider_input(user_text="PLAYER_CONVERSATION_SENTINEL: watch the token moves.")
-    catalog = tuple(
-        ModelMechanicsTool(
-            package_id=tool.package_id,
-            package_version=tool.package_version,
-            package_sha256=tool.package_sha256,
-            name=tool.name,
-            capability=tool.capability,
-            input_schema=tool.input_schema,
-            description=tool.description,
-            model_behavior=tool.model_behavior,
+
+    def current_catalog():
+        return (
+            *tuple(
+                ModelMechanicsTool(
+                    package_id=tool.package_id,
+                    package_version=tool.package_version,
+                    package_sha256=tool.package_sha256,
+                    name=tool.name,
+                    capability=tool.capability,
+                    input_schema=tool.input_schema,
+                    description=tool.description,
+                    model_behavior=tool.model_behavior,
+                )
+                for tool in owner.catalog("tokens")
+            ),
+            _campaign_file_tool(allow_unchanged=True),
         )
-        for tool in owner.catalog("tokens")
-    )
+
     return replace(
         base,
         session=session,
@@ -466,7 +512,8 @@ def gm_input(owner, session):
             session=session,
             messages=(replace(base.history.messages[0], session_id=session.session_id),),
         ),
-        catalog=(*catalog, _campaign_file_tool(allow_unchanged=True)),
+        catalog=current_catalog(),
+        catalog_supplier=lambda _discovery: current_catalog(),
         narrative_writer=lambda _parameters: {
             "status": "campaign_file_unchanged",
             "campaign_revision": owner.snapshot("tokens").revision,
@@ -699,6 +746,50 @@ def actor_events(owner, session, provider):
     ), source
 
 
+@pytest.mark.parametrize("isolated_game", [{"housekeeping": True}], indirect=True)
+def test_required_transition_refreshes_the_actor_before_any_npc_request(isolated_game):
+    owner, session, _ = isolated_game
+    old = owner.actor_decision_request("tokens", turn_id="turn")
+    provider = IsolatedFlowProvider("anthropic_messages", "minimax-m3")
+    adapter = ProviderSessionAdapter(
+        owner,
+        provider,
+        owner_id="isolated-test",
+        gm_system_prompt="GM_PRIVATE_INSTRUCTIONS_SENTINEL",
+        campaign_plan={"structure": [{"id": "one", "title": "GM_PLAN_SENTINEL"}], "objectives": []},
+    )
+    events = iter(adapter.for_turn("turn")(gm_input(owner, session)))
+    try:
+        event = next(event for event in events if event.kind is ProviderEventKind.ACTION)
+        assert provider.calls == []
+        assert event.action_command.tool_name == "housekeeping"
+        receipt = owner.execute_action(event.action_command)
+        assert receipt.status.value == "committed", receipt.result
+        assert receipt.result["context"]["message"] == "HOUSEKEEPING_PUBLIC_RESULT"
+        current = owner.actor_decision_request("tokens", turn_id="turn")
+        assert current.actor_id == "a" and current.observation["public_counter"] == 1
+        assert current.actions[0].identity == "a:1"
+        for request in (old, current):
+            with pytest.raises(AuthorityError):
+                owner.actor_decision_command(
+                    request,
+                    choice_id="a:0",
+                    session_id=session.session_id,
+                    owner_id="isolated-test",
+                )
+        for event in events:
+            if event.kind is ProviderEventKind.ACTION:
+                owner.execute_action(event.action_command)
+        first = json.loads(provider.calls[0][0][-1]["content"])
+        assert first["observation"]["public_counter"] == 1
+        assert first["actions"][0]["id"] == "a:1"
+        assert provider.actor_calls == ["a", "b", "c"]
+        assert "HOUSEKEEPING_PUBLIC_RESULT" in json.dumps(provider.wire[-1])
+        assert owner.snapshot("tokens").revision == 4
+    finally:
+        events.close()
+
+
 @pytest.mark.parametrize("committed", [False, True])
 def test_interrupted_actor_reopens_from_its_own_complete_receipts(isolated_game, committed):
     owner, session, database = isolated_game
@@ -727,6 +818,108 @@ def test_interrupted_actor_reopens_from_its_own_complete_receipts(isolated_game,
             assert reopened.snapshot("tokens").revision == 1 + int(committed)
         finally:
             events.close()
+
+
+@pytest.mark.parametrize("stop_pending", [False, True])
+def test_ooc_and_stop_redirect_leave_pending_npcs_until_gameplay_resumes(
+    isolated_game, stop_pending
+):
+    owner, session, _ = isolated_game
+    loop = CampaignSessionLoop(owner)
+
+    def session_provider(provider):
+        adapter = ProviderSessionAdapter(
+            owner,
+            provider,
+            owner_id="isolated-test",
+            gm_system_prompt="GM_PRIVATE_INSTRUCTIONS_SENTINEL",
+            campaign_plan={
+                "structure": [{"id": "one", "title": "GM_PLAN_SENTINEL"}],
+                "objectives": [],
+            },
+        )
+
+        def run(source):
+            # Keep the real session/Stop/catalog path, with a synthetic Campaign File writer.
+            supplier = source.current_catalog
+            return adapter.for_turn("turn")(
+                replace(
+                    source,
+                    catalog_supplier=lambda discovery: (
+                        *(
+                            tool
+                            for tool in supplier(discovery)
+                            if tool.category != "narrative_state"
+                        ),
+                        _campaign_file_tool(allow_unchanged=True),
+                    ),
+                    narrative_writer=lambda _parameters: {
+                        "status": "campaign_file_unchanged",
+                        "campaign_revision": owner.snapshot("tokens").revision,
+                    },
+                )
+            )
+
+        return run
+
+    interruption_id = None
+    if stop_pending:
+        pending = IsolatedFlowProvider("anthropic_messages", "minimax-m3")
+        stopped = []
+        pending.before_proposal = lambda: stopped.append(loop.stop(session.session_id))
+        result = loop.run(
+            SessionRunRequest(
+                session.session_id,
+                "turn",
+                "pending",
+                "start-input",
+                "PLAYER_CONVERSATION_SENTINEL: Continue the token game.",
+            ),
+            session_provider(pending),
+        )
+        assert result.interruption == stopped[0].interruption
+        assert pending.actor_calls == ["a"]
+        assert owner.snapshot("tokens").revision == 0
+        assert owner.session_context(session.session_id).session.status.value == "stopped"
+        interruption_id = result.interruption.interruption_id
+        owner.resume_agent_session(session.session_id)
+
+    ooc = IsolatedFlowProvider("anthropic_messages", "minimax-m3")
+    ooc.ooc_only = True
+    loop.run(
+        SessionRunRequest(
+            session.session_id,
+            "turn",
+            "ooc",
+            "ooc-input",
+            "",
+            "Pause the game. I want to discuss the table before anyone acts.",
+            redirect_interruption_id=interruption_id,
+        ),
+        session_provider(ooc),
+    )
+    assert ooc.actor_calls == [] and len(ooc.wire) == 1
+    assert owner.snapshot("tokens").revision == 0
+    request = owner.actor_decision_request("tokens", turn_id="turn")
+    assert request.actor_id == "a" and request.actions[0].identity == "a:0"
+    assert any(
+        item.kind.value == "talk" and "paused" in str(item.safe_payload)
+        for item in owner.player_projection("tokens")
+    )
+
+    resumed = IsolatedFlowProvider("anthropic_messages", "minimax-m3")
+    loop.run(
+        SessionRunRequest(
+            session.session_id,
+            "turn",
+            "resume",
+            "resume-input",
+            "PLAYER_CONVERSATION_SENTINEL: Continue the token game now.",
+        ),
+        session_provider(resumed),
+    )
+    assert resumed.actor_calls == ["a", "a", "b", "c"]
+    assert owner.snapshot("tokens").revision == 4
 
 
 @pytest.mark.parametrize(

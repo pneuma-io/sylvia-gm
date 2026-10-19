@@ -231,7 +231,8 @@ def test_ranked_multi_ron_awards_honba_and_deposits_in_discarder_turn_order(tmp_
     seats = ["you.seat", "you.right", "you.across", "you.left"]
     winners = [(discarder + offset) % 4 for offset in (1, 2, 3)]
     with scenario(
-        tmp_path, [hands[(seat - discarder) % 4] for seat in range(4)],
+        tmp_path,
+        [hands[(seat - discarder) % 4] for seat in range(4)],
         overrides={"actor": seats[discarder], "honba": 2, "sticks": 3},
         games={seat: {"riichi": True} for seat in winners},
         scores=[25000 if seat == discarder else 24000 for seat in range(4)],
@@ -241,8 +242,9 @@ def test_ranked_multi_ron_awards_honba_and_deposits_in_discarder_turn_order(tmp_
             choose(table, "ron")
         result = table.state()["result"]
         assert [winner["seat"] for winner in result["winners"]] == winners
-        assert [row["payments"][discarder] - row["score"]["total"]
-                for row in result["winners"]] == [600, 0, 0]
+        assert [
+            row["payments"][discarder] - row["score"]["total"] for row in result["winners"]
+        ] == [600, 0, 0]
         assert [row["gain"] - sum(row["payments"]) for row in result["winners"]] == [3000, 0, 0]
         assert result["dealer_stays"] is (0 in winners)
         assert sum(seat["score"] for seat in table.entities().values()) == 100000
@@ -310,11 +312,14 @@ def test_final_dealer_leading_at_target_ends_match_and_ties_follow_start_order(
 
 @pytest.mark.parametrize("match_format,wind", [("east_only", 1), ("east_south", 2)])
 def test_extension_target_does_not_override_a_dealer_among_multiple_ron_winners(
-    tmp_path, match_format, wind,
+    tmp_path,
+    match_format,
+    wind,
 ):
     hands = ["666m19m19p19s12345z", "12345m23455p678s", "34578m111p222s11z", "45789m333p789s22z"]
     with scenario(
-        tmp_path, [hands[2], hands[3], hands[0], hands[1]],
+        tmp_path,
+        [hands[2], hands[3], hands[0], hands[1]],
         overrides={"actor": "you.across", "round_wind": wind, "match_format": match_format},
         games={seat: {"riichi": True} for seat in (0, 1, 3)},
         scores=[10000, 18000, 42100, 29900],
@@ -429,6 +434,28 @@ def test_pao_splits_only_the_liable_yakuman_component(tmp_path, stacked, payer, 
         assert sorted(physical_tiles(table)) == list(range(136))
 
 
+@pytest.mark.parametrize("prior_concealed_kan", [False, True])
+def test_pao_trigger_counts_open_dragon_groups_in_the_selected_profile(
+    tmp_path, prior_concealed_kan
+):
+    # Preserve this profile's open-group interpretation; exact Mahjong Soul treatment
+    # of a prior concealed kan remains unconfirmed by the available ranked rules.
+    first = ("5555z", False, True) if prior_concealed_kan else ("555z", True, False)
+    with scenario(
+        tmp_path,
+        ["7z123456m234p5678s", "77z123m44p", None, None],
+        exposed={1: [first, ("666z", True, False)]},
+        overrides={"kan_count": int(prior_concealed_kan)},
+    ) as table:
+        choose(table, "discard", 33)
+        choose(table, "pon", 33)
+        passes(table)
+        assert table.entities()["you.right"]["game"]["pao_dragon"] == (
+            None if prior_concealed_kan else 0
+        )
+        assert sorted(physical_tiles(table)) == list(range(136))
+
+
 @pytest.mark.parametrize(
     "hand,waits,allowed",
     [
@@ -438,7 +465,10 @@ def test_pao_splits_only_the_liable_yakuman_component(tmp_path, stacked, payer, 
     ],
 )
 def test_riichi_kan_requires_the_drawn_fourth_tile_and_unchanged_wait_types(
-    tmp_path, hand, waits, allowed,
+    tmp_path,
+    hand,
+    waits,
+    allowed,
 ):
     with scenario(
         tmp_path,
@@ -453,6 +483,30 @@ def test_riichi_kan_requires_the_drawn_fourth_tile_and_unchanged_wait_types(
             passes(table)
             assert table.state()["kan_count"] == 1
             assert sorted(physical_tiles(table)) == list(range(136))
+
+
+def test_riichi_kan_filters_impossible_waits_using_all_owned_tiles(tmp_path):
+    # Riichi 3333555666888m waits only on 4m: all four copies of 3m are already owned.
+    # Drawing 6m permits a concealed kan of 6m without changing that wait.
+    with scenario(
+        tmp_path,
+        ["3333555666888m6m", None, None, None],
+        games={0: {"riichi": True, "riichi_waits": [3]}},
+    ) as table:
+        game = table.entities()["you.seat"]["game"]
+        assert game["last_draw"] // 4 == 5
+        kans = [row for row in table.state()["choices"] if row["op"] == "ankan"]
+        assert [row["base"] for row in kans] == [5]
+        assert [row["tiles"][0] for row in table.state()["choices"] if row["op"] == "discard"] == [
+            game["last_draw"]
+        ]
+        choose(table, "ankan", 5)
+        passes(table)
+        game = table.entities()["you.seat"]["game"]
+        assert table.state()["kan_count"] == 1
+        assert game["melds"][0]["quad"] and game["melds"][0]["base"] == 5
+        assert game["riichi_waits"] == [3]
+        assert sorted(physical_tiles(table)) == list(range(136))
 
 
 @pytest.mark.parametrize("op", ["minkan", "kakan"])

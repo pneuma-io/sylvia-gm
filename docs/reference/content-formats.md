@@ -190,6 +190,13 @@ of GM history. Save/reopen retains valid actor-owned history; unavailable privat
 history starts fresh without falling back to GM messages. Packages without this
 opt-in retain ordinary GM and side-scope behavior.
 
+Required non-choice engine transitions run before participant dispatch. After each
+commit, the host refreshes the catalog and state before constructing an actor
+envelope. An OOC-only player message leaves opted-in gameplay pending: GM reference
+and Campaign File work remain available, while automatic gameplay and participant
+decisions wait for a gameplay input. Stop/redirection uses the ordinary session
+interruption path and retains any already committed results.
+
 Engine-private action arguments remain canonical in storage for ledger integrity.
 Desktop/player snapshots and public replay projections omit those arguments;
 this does not alter the saved action, its receipt or its idempotency identity.

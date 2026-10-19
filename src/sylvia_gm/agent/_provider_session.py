@@ -1894,6 +1894,11 @@ class ProviderSessionAdapter:
             and isinstance(current_player_message.content.get("ooc_text"), str)
             and str(current_player_message.content.get("ooc_text", "")).strip()
         )
+        # An OOC-only correction does not resume an opted-in participant's pending game turn.
+        participant_ooc_only = (
+            context_owner is not None and ooc_ack_required
+            and not str(current_player_action or "").strip()
+        )
         buffered_narration_needs_disposition = False
         any_commit_in_exchange = post_mechanics_recovery or direct_response
         campaign_file_commit_in_exchange = False
@@ -2162,26 +2167,6 @@ class ProviderSessionAdapter:
         while True:
             if provider_input.control.cancelled:
                 raise CommandRejected("Agent session provider work was cancelled")
-            actor_reader = getattr(self._owner, "actor_decision_request", None)
-            actor_request = (actor_reader(campaign_id, turn_id=turn_id)
-                             if callable(actor_reader) else None)
-            if actor_request is not None:
-                from sylvia_gm.agent._actor_decisions import run_actor_decision
-
-                public_result = yield from run_actor_decision(
-                    self._owner, self._provider, provider_input, actor_request,
-                    owner_id=self._owner_id, stream=self._stream_round,
-                )
-                yield ProviderEvent.tool_evidence(
-                    message_id="participant-result-" + actor_request.decision_id,
-                    payload={"kind": "isolated_participant_result", "turn_id": turn_id,
-                             "basis_message_id": basis_message_id,
-                             "inference_id": actor_request.decision_id,
-                             "public_result": public_result},
-                )
-                messages.append(self._participant_result_message(public_result))
-                any_commit_in_exchange = True
-                continue
             inference_id = f"inference-{uuid.uuid4().hex}"
             discovery_id = f"mcp-discovery-{uuid.uuid4().hex}"
             current_catalog = provider_input.current_catalog(discovery_id)
@@ -2193,6 +2178,11 @@ class ProviderSessionAdapter:
                         *(tool for tool in queue_tools
                           if not sequence_execution_stopped or tool.category == "reference"),
                     )
+            if participant_ooc_only:
+                current_catalog = tuple(
+                    tool for tool in current_catalog
+                    if tool.category in {"reference", "narrative_state"}
+                )
             if provider_input.control.cancelled:
                 raise CommandRejected("Agent session provider work was cancelled")
             required_transitions = tuple(
@@ -2360,6 +2350,29 @@ class ProviderSessionAdapter:
                     )
                 continue
 
+            if not engine_transition_review_pending and not participant_ooc_only:
+                # Build the envelope only after required bookkeeping has drained and refreshed.
+                actor_reader = getattr(self._owner, "actor_decision_request", None)
+                actor_request = (actor_reader(campaign_id, turn_id=turn_id)
+                                 if callable(actor_reader) else None)
+                if actor_request is not None:
+                    from sylvia_gm.agent._actor_decisions import run_actor_decision
+
+                    public_result = yield from run_actor_decision(
+                        self._owner, self._provider, provider_input, actor_request,
+                        owner_id=self._owner_id, stream=self._stream_round,
+                    )
+                    yield ProviderEvent.tool_evidence(
+                        message_id="participant-result-" + actor_request.decision_id,
+                        payload={"kind": "isolated_participant_result", "turn_id": turn_id,
+                                 "basis_message_id": basis_message_id,
+                                 "inference_id": actor_request.decision_id,
+                                 "public_result": public_result},
+                    )
+                    messages.append(self._participant_result_message(public_result))
+                    any_commit_in_exchange = True
+                    continue
+
             model_catalog = current_catalog
             opening_update_required = opening_request and not campaign_file_commit_in_exchange
             campaign_file_disposition_supported = any(
@@ -2403,9 +2416,10 @@ class ProviderSessionAdapter:
             decision_boundary: ModelDecisionBoundary | None = None
             boundary_reader = getattr(self._owner, "model_decision_boundary" if any_commit_in_exchange
                                       else "campaign_preparation_boundary", None)
-            if callable(boundary_reader):
+            if callable(boundary_reader) and not participant_ooc_only:
                 decision_boundary = boundary_reader(campaign_id)
-            if decision_boundary is None and not any_commit_in_exchange:
+            if (decision_boundary is None and not any_commit_in_exchange
+                    and not participant_ooc_only):
                 # An already active private game must resume its GM decision before narration.
                 _, private_boundary = self._owner.model_context_snapshot(campaign_id)
                 if (private_boundary is not None

@@ -379,9 +379,10 @@ def add_gameplay(families, definitions):
                     "definitions.group_sizes[len(actor.game.melds) + 1], indices(34))"
                 ),
             ),
-            set_("_owned_kinds", "_kinds"),
+            set_("_owned_kinds", []),
+            set_("_owned_tiles", "actor.game.hand"),
+            each("_owned_tiles", "_tile", [push("_owned_kinds", "definitions.tiles[_tile].kind")]),
             set_("_melds", "actor.game.melds"),
-            push("_owned_kinds", "definitions.tiles[actor.game.last_draw].kind"),
             each(
                 "_melds",
                 "_meld",
@@ -733,7 +734,7 @@ def add_gameplay(families, definitions):
                         "reason": "This move is no longer available.",
                     }
                 ],
-            }
+            },
         },
     )
     definitions["play_phases"] = ["discard", "response", "kan_response", "hand_end"]
@@ -1348,8 +1349,7 @@ def add_settlement(families):
                     branch("len(_pao) > 0", [set_("_honba_source", "_pao[0].seat")]),
                     set_(
                         "_payments",
-                        "replaced(_payments, _honba_source, "
-                        "_payments[_honba_source] + _ron_honba)",
+                        "replaced(_payments, _honba_source, _payments[_honba_source] + _ron_honba)",
                     ),
                 ],
             ),

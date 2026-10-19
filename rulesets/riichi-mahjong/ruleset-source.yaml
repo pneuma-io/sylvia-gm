@@ -2990,13 +2990,20 @@ mechanic_families:
           + 1], indices(34))
     - set:
         field: _owned_kinds
-        value: _kinds
+        value: []
+    - set:
+        field: _owned_tiles
+        value: actor.game.hand
+    - for_each:
+        collection: _owned_tiles
+        as: _tile
+        do:
+        - list_push:
+            list: _owned_kinds
+            value: definitions.tiles[_tile].kind
     - set:
         field: _melds
         value: actor.game.melds
-    - list_push:
-        list: _owned_kinds
-        value: definitions.tiles[actor.game.last_draw].kind
     - for_each:
         collection: _melds
         as: _meld
