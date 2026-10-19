@@ -16,6 +16,7 @@ from sylvia_gm.domain.authority import (
     thaw_json_value,
 )
 from sylvia_gm.domain.errors import SchemaIdentityError
+from sylvia_gm.infrastructure.sqlite_sequel import adventure_rows
 
 MIGRATION_9_NAME = "campaign_state_continuity"
 MIGRATION_9_SQL = """
@@ -419,14 +420,8 @@ def read_act_markers(
     a future lead's introduced progress is insufficient. Existing records provide durability and
     replay identity, so displaying a chapter never writes state or advances the story.
     """
-    plan_row = connection.execute(
-        "SELECT json_extract(content_json, '$.campaign_plan.structure') FROM campaign_plans "
-        "WHERE campaign_id = ? AND acceptance_status = 'accepted' "
-        "ORDER BY plan_revision DESC LIMIT 1", (campaign_id,),
-    ).fetchone()
-    if plan_row is None or plan_row[0] is None:
-        return ()
-    structure = json.loads(plan_row[0])
+    structure = [act for row in adventure_rows(connection, campaign_id)
+                 for act in json.loads(row['content_json']).get('campaign_plan', {}).get('structure', ())]
     if not isinstance(structure, list):
         return ()
     ordinals = {
@@ -477,6 +472,7 @@ def read_act_markers(
 
 def read_campaign_ending(
     connection: sqlite3.Connection, session_id: str, campaign_id: str,
+    *, plan_row: sqlite3.Row | None = None, act_offset: int = 0,
 ) -> SafePayload | None:
     """Project one earned ending and its user choice without leaking private ending prose."""
     from sylvia_gm.domain.campaign_ending import (
@@ -487,14 +483,16 @@ def read_campaign_ending(
         resolved_progress,
     )
 
-    row = connection.execute(
-        "SELECT json_extract(content_json, '$.campaign_plan') FROM campaign_plans "
-        "WHERE campaign_id = ? AND acceptance_status = 'accepted' "
-        "ORDER BY plan_revision DESC LIMIT 1", (campaign_id,),
-    ).fetchone()
-    if row is None or row[0] is None:
+    if plan_row is None:
+        adventures = adventure_rows(connection, campaign_id)
+        if not adventures:
+            return None
+        plan_row = adventures[-1]
+        act_offset = sum(len(json.loads(row['content_json']).get('campaign_plan', {}).get('structure', ()))
+                         for row in adventures[:-1])
+    plan = json.loads(plan_row['content_json']).get('campaign_plan')
+    if not isinstance(plan, dict):
         return None
-    plan = json.loads(row[0])
     endings = {ending_progress_id(item): item for item in intended_endings(plan)}
     if not endings:
         return None
@@ -525,11 +523,28 @@ def read_campaign_ending(
     ).fetchone()
     return owned_payload({
         "ending_id": ending["id"], "after_message_id": anchor,
-        "act_number": len(plan["structure"]) if required_story_items(plan) <= resolved else None,
+        "act_number": act_offset + len(plan["structure"]) if required_story_items(plan) <= resolved else None,
         "plan_title": plan["title"],
         "open_world": ending["open_world"], "has_after_story": ending["after_story"] is not None,
         "choice": choice_row[0] if choice_row is not None else None,
     })
+
+
+def read_campaign_endings(
+    connection: sqlite3.Connection, session_id: str, campaign_id: str,
+) -> tuple[SafePayload, ...]:
+    """Retain previous completion cards and choices while the next adventure is active."""
+    adventures = adventure_rows(connection, campaign_id)
+    result = []
+    offset = 0
+    for index, row in enumerate(adventures):
+        ending = read_campaign_ending(connection, session_id, campaign_id,
+                                      plan_row=row, act_offset=offset)
+        if ending is not None:
+            result.append(owned_payload({**ending, **({'historical': True}
+                          if index < len(adventures) - 1 else {})}))
+        offset += len(json.loads(row['content_json']).get('campaign_plan', {}).get('structure', ()))
+    return tuple(result)
 
 
 def verify_authority(connection: sqlite3.Connection) -> None:

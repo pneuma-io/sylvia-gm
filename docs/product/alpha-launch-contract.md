@@ -456,9 +456,21 @@ only for a viable ending and Finish the story, with concise descriptions of each
 selected, retain a quiet completion marker and the chosen continuation or after-story in history;
 do not keep presenting active choice buttons. Preserve the choice through reopen. Home remains
 navigation, not a finish action, and OOC chat remains available. Illustrative mockup prose does
-not establish campaign canon. Appending further acts or a subsequent adventure to the same
-campaign is a post-launch request; the inspected current production paths do not support it.
-It is not an Alpha-ending prerequisite.
+not establish campaign canon.
+
+After a continuable authored ending, the player may choose Add another adventure from the session
+menu. They select a saved compatible Plan or open an independent Builder to author one, review its
+preparation and setup assumptions, then explicitly append it. The review includes the exact source,
+new act sequence and separate story identities. The player explains how it follows the retained
+campaign; already narrated events and futures remain true. A contradictory premise must be adapted
+before adoption. The app checks structural and exact-source compatibility, not narrative judgment.
+
+The new adventure retains the current exact Setting and Ruleset snapshots. Its starting party,
+location, facts and mechanical setup do not reinitialize the campaign. Played acts, characters,
+history, state, unresolved consequences and previous source revisions remain available. Earlier
+completion cards stay in history; the next adventure has its own completion gates. Publishing a
+library revision alone still leaves live campaigns unchanged. Rules updates remain separate PL-01
+work, and sequel append does not authorize mechanical migration or replacing the Setting.
 
 The Campaign Plan is the GM's private story preparation: the direction the GM hopes to lead the
 players toward through natural intrigue, leads, character motives, pressures, and consequences. It

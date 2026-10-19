@@ -37,7 +37,9 @@ from sylvia_gm.domain.session import (
     agent_session_payload_sha256,
     builder_chat_payload_sha256,
 )
-from sylvia_gm.infrastructure.sqlite_continuity import read_act_markers, read_campaign_ending
+from sylvia_gm.infrastructure.sqlite_continuity import (
+    read_act_markers, read_campaign_ending, read_campaign_endings,
+)
 
 
 def _with_mechanics_activity(
@@ -450,6 +452,8 @@ def read_history_page(
         if session.role is WriterRole.DM and session.campaign_id is not None else (),
         campaign_ending=read_campaign_ending(connection, session_id, session.campaign_id)
         if session.role is WriterRole.DM and session.campaign_id is not None else None,
+        campaign_endings=read_campaign_endings(connection, session_id, session.campaign_id)
+        if session.role is WriterRole.DM and session.campaign_id is not None else (),
     )
 
 

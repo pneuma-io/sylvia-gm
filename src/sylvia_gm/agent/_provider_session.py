@@ -4983,6 +4983,11 @@ class ProviderSessionAdapter:
                 "path": "structured",
             },
             **(
+                {"adventure_continuation": plan["_app_adventure_continuation"]}
+                if isinstance(plan.get("_app_adventure_continuation"), Mapping)
+                else {}
+            ),
+            **(
                 {
                     "opening_direction": plan.get("opening_direction"),
                     "opening_direction_meaning": (

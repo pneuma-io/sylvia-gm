@@ -459,6 +459,7 @@ class SessionHistoryPage:
     latest_canonical_sequence: int | None = None
     act_markers: tuple[SafePayload, ...] = ()
     campaign_ending: SafePayload | None = None
+    campaign_endings: tuple[SafePayload, ...] = ()
 
 
 @dataclass(frozen=True)

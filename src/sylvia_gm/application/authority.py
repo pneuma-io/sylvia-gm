@@ -1206,7 +1206,9 @@ class AuthorityOwner:
                         "Campaign scene field 'act_id' is invalid",
                         code="campaign_scene_invalid",
                     ) from error
-                structure = plan.get("structure")
+                structure = self._retained_preparation(
+                    context.session.campaign_id, plan
+                ).get("structure")
                 scene_act_ids = {
                     str(item["id"])
                     for item in (
@@ -1731,8 +1733,9 @@ class AuthorityOwner:
             }
             plan_items: set[str] = set()
             plan_items.update(ending_progress_id(item) for item in intended_endings(plan))
+            retained_preparation = self._retained_preparation(campaign_id, plan)
             for collection_name in ("objectives", "structure"):
-                raw_collection = plan.get(collection_name, ())
+                raw_collection = retained_preparation.get(collection_name, ())
                 if not isinstance(raw_collection, Sequence) or isinstance(
                     raw_collection, (str, bytes, bytearray)
                 ):
@@ -1742,7 +1745,7 @@ class AuthorityOwner:
                     for item in raw_collection
                     if isinstance(item, Mapping) and isinstance(item.get("id"), str)
                 )
-            structure = plan.get("structure")
+            structure = retained_preparation.get("structure")
             scene_act_ids = {
                 str(item["id"])
                 for item in (
@@ -2188,6 +2191,30 @@ class AuthorityOwner:
             raise CommandRejected("Campaign narrative state requires a structured plan")
         return context, cast(Mapping[str, object], plan)
 
+    def _retained_preparation(
+        self, campaign_id: str, plan: Mapping[str, object],
+    ) -> Mapping[str, object]:
+        """Keep earlier opportunities usable while the active adventure owns its ending gates."""
+        current = self._store.accepted_campaign_plan(campaign_id)
+        if (current is None or not isinstance(current.content.get("sequel"), Mapping)
+                or canonical_json_bytes(plan) != canonical_json_bytes(current.content["campaign_plan"])):
+            return plan
+        result = dict(plan)
+        adventures = self._store.campaign_adventures(campaign_id)
+        for field in ("structure", "objectives", "secrets"):
+            values: list[object] = []
+            setting_fact_ids: set[object] = set()
+            for adventure in adventures:
+                story = cast(Mapping[str, object], adventure.content["campaign_plan"])
+                for item in cast(Sequence[object], story.get(field, ())):
+                    if isinstance(item, Mapping) and "setting_fact_id" in item:
+                        if item["setting_fact_id"] in setting_fact_ids:
+                            continue
+                        setting_fact_ids.add(item["setting_fact_id"])
+                    values.append(item)
+            result[field] = values
+        return owned_payload(result)
+
     def _dm_structured_plan(self, session_id: str) -> tuple[SessionContext, Mapping[str, object]]:
         """Return one active DM context and its required exact accepted structured Plan."""
 
@@ -2283,6 +2310,7 @@ class AuthorityOwner:
 
         if campaign_id is None:
             raise CommandRejected("Campaign secret catalog requires campaign authority")
+        plan = self._retained_preparation(campaign_id, plan)
         setting_facts, _private_references = self._campaign_setting_knowledge(campaign_id, plan)
         remaining = {str(item["id"]): item for item in setting_facts}
         merged: list[SafePayload] = []
@@ -2423,7 +2451,10 @@ class AuthorityOwner:
 
         with self._operation():
             context, plan = self._optional_dm_structured_plan(session_id)
-            structure = plan.get("structure")
+            campaign_id = context.session.campaign_id
+            assert campaign_id is not None
+            preparation = self._retained_preparation(campaign_id, plan)
+            structure = preparation.get("structure")
             acts = (
                 [
                     item
@@ -2438,7 +2469,7 @@ class AuthorityOwner:
             assert campaign_id is not None
             snapshot = self._store.snapshot(campaign_id)
             scene_act_ids = [str(item["id"]) for item in acts]
-            objectives = plan.get("objectives")
+            objectives = preparation.get("objectives")
             objective_ids = [
                 str(item["id"])
                 for item in (
@@ -2626,6 +2657,8 @@ class AuthorityOwner:
         """Admit one exact accepted plan through the existing campaign revision authority."""
 
         with self._operation(), self._lane(campaign_id):
+            if "sequel" in content:
+                raise CommandRejected("Live adventure additions require explicit sequel review")
             try:
                 captured_content = owned_payload(content)
                 validation = PlanValidationOutcome(validation_outcome)
@@ -2695,6 +2728,63 @@ class AuthorityOwner:
                 payload_sha256=payload_sha256,
             )
 
+    def preview_campaign_sequel(
+        self, *, campaign_id: str, session_id: str, source_id: str,
+    ) -> SafePayload:
+        """Read a candidate and its continuity review without adopting content."""
+        from sylvia_gm.application.campaign_sequels import preview
+
+        with self._operation(), self._lane(campaign_id):
+            return owned_payload(preview(self, campaign_id, session_id, source_id))
+
+    def campaign_sequel_context(self, *, campaign_id: str, session_id: str) -> SafePayload:
+        """Capture selected-campaign facts for an independent, read-only authoring prompt."""
+        with self._operation(), self._lane(campaign_id):
+            context = self._active_dm_context(session_id)
+            if context.session.campaign_id != campaign_id:
+                raise CommandRejected("The selected GM does not belong to this campaign")
+            snapshot = self._store.snapshot(campaign_id)
+            accepted = self.accepted_campaign_plan(campaign_id)
+            if accepted is None:
+                raise CommandRejected("This campaign has no accepted authored adventure")
+            return owned_payload({
+                "campaign_name": snapshot.display_name,
+                "accepted_plan": accepted.content.get("campaign_plan"),
+                "current_scene": snapshot.continuity.current_scene,
+                "facts": list(snapshot.continuity.facts),
+                "plan_progress": list(snapshot.continuity.plan_progress),
+                "participants": [{"id": item.participant_id, "data": item.data}
+                                 for item in snapshot.participants],
+                "ending": self.session_history_page(session_id).campaign_ending,
+                "recent_history": [
+                    {"kind": item.kind.value,
+                     "excerpt": canonical_json_bytes(item.content).decode("utf-8")[:4000]}
+                    for item in self.session_history_page(session_id, limit=64).messages
+                    if item.kind in {SessionMessageKind.USER, SessionMessageKind.TALK,
+                                     SessionMessageKind.CANONICAL_REFERENCE,
+                                     SessionMessageKind.STEERING}
+                ],
+                "source_references": [
+                    {"plan_id": row.plan_id, "content_sha256": row.content_sha256,
+                     "source_id": row.content.get("sequel", {}).get("source_id")}
+                    for row in self._store.campaign_adventures(campaign_id)
+                ],
+            })
+
+    def append_campaign_sequel(
+        self, *, campaign_id: str, session_id: str, operation_id: str, source_id: str,
+        expected_revision: int, preview_sha256: str, review: object,
+    ) -> SafePayload:
+        """Append reviewed story preparation through the current GM owner, once."""
+        from sylvia_gm.application.campaign_sequels import append
+
+        with self._operation():
+            return owned_payload(append(
+                self, campaign_id=campaign_id, session_id=session_id, operation_id=operation_id,
+                source_id=source_id, expected_revision=expected_revision,
+                preview_sha256=preview_sha256, review=review,
+            ))
+
     def campaign_plan(self, plan_id: str) -> CampaignPlan:
         with self._operation():
             plan = self._store.campaign_plan_hit(plan_id)
@@ -2708,6 +2798,11 @@ class AuthorityOwner:
             if plan is None:
                 raise CommandRejected("Accepted Campaign Plan is unavailable")
             return plan
+
+    def campaign_adventures(self, campaign_id: str) -> tuple[CampaignPlan, ...]:
+        """Read the validated accepted sequence, excluding superseded Builder drafts."""
+        with self._operation():
+            return self._store.campaign_adventures(campaign_id)
 
     def handoff_builder_to_dm(
         self,
@@ -5897,6 +5992,28 @@ class AuthorityOwner:
             accepted = self._store.accepted_campaign_plan(campaign_id)
             if accepted is None:
                 raise CommandRejected("Campaign reference source requires an accepted plan")
+            if source == "campaign_plan" and path == "adventures":
+                adventures = self._store.campaign_adventures(campaign_id)
+                content = canonical_json_bytes([
+                    {"number": index + 1, "plan_id": item.plan_id,
+                     "content_sha256": item.content_sha256,
+                     "title": item.content["campaign_plan"]["title"],
+                     "source_id": item.content.get("sequel", {}).get("source_id"),
+                     "structure": item.content["campaign_plan"]["structure"]}
+                    for index, item in enumerate(adventures)
+                ]).decode("utf-8")
+                if len(content.encode("utf-8")) > maximum_bytes:
+                    raise CommandRejected("Adventure sequence exceeds the read bound")
+                return owned_payload({"source": source, "path": path, "content": content,
+                                      "campaign_id": campaign_id,
+                                      "visibility": "gm_private_preparation"})
+            if source == "campaign_plan" and path.startswith("adventures/"):
+                match = re.fullmatch(r"adventures/([1-9][0-9]*)/(structured(?:/.*)?|markdown)", path)
+                adventures = self._store.campaign_adventures(campaign_id)
+                if match is None or int(match[1]) > len(adventures):
+                    raise CommandRejected("Retained adventure reference is unavailable")
+                accepted = adventures[int(match[1]) - 1]
+                path = "readable" if match[2] == "markdown" else match[2]
             structured = accepted.content.get("campaign_plan")
             if source == "campaign_plan":
                 if path.startswith("structured") and not isinstance(structured, Mapping):

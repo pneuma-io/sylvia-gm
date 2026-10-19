@@ -106,6 +106,7 @@ const SylviaGMFrontend = (() => {
     navigationRefreshBusy: false,
     campaignConfirmationPending: false,
     campaignHandoffPending: false,
+    sequelDialog: null,
   };
 
   // ---- DOM helpers ----
@@ -733,6 +734,9 @@ const SylviaGMFrontend = (() => {
       dictation_cancel: (id) => invoke('dictation_cancel', { id }),
       campaign_index: () => invoke('campaign_index'),
       campaign_creation_catalog: () => invoke('campaign_creation_catalog'),
+      campaign_sequel_context: (request) => invoke('campaign_sequel_context', { request }),
+      preview_campaign_sequel: (request) => invoke('preview_campaign_sequel', { request }),
+      append_campaign_sequel: (request) => invoke('append_campaign_sequel', { request }),
       delete_reusable_library_entry: (command) => invoke('delete_reusable_library_entry', {
         kind: command.kind,
         artifactId: command.artifact_id,
@@ -1357,6 +1361,23 @@ const SylviaGMFrontend = (() => {
       void startCampaignBuilder();
     });
     $('home-build-btn').addEventListener('click', () => { void startBuilderChat(); });
+    $('campaign-sequel-btn').addEventListener('click', () => { void openCampaignSequel(); });
+    $('campaign-sequel-preview').addEventListener('click', () => { void previewCampaignSequel(); });
+    $('campaign-sequel-append').addEventListener('click', () => { void appendCampaignSequel(); });
+    $('campaign-sequel-author').addEventListener('click', () => { void authorCampaignSequel(); });
+    $('campaign-sequel-cancel').addEventListener('click', () => {
+      if (!state.sequelDialog?.busy) $('campaign-sequel-dialog').close();
+    });
+    $('campaign-sequel-dialog').addEventListener('cancel', (event) => {
+      if (state.sequelDialog?.busy) event.preventDefault();
+    });
+    $('campaign-sequel-dialog').addEventListener('close', () => { state.sequelDialog = null; });
+    $('campaign-sequel-source').addEventListener('change', () => {
+      if (!state.sequelDialog?.request) resetSequelReview();
+    });
+    for (const id of ['campaign-sequel-connection', 'campaign-sequel-reviewed']) {
+      $(id).addEventListener('input', refreshSequelConfirmation);
+    }
     $('home-settings-btn').addEventListener('click', () => openSettings());
     $('tutorial-skip-btn').addEventListener('click', () => closeHomeTutorial('skipped'));
     $('tutorial-next-btn').addEventListener('click', advanceHomeTutorial);
@@ -8444,7 +8465,8 @@ const SylviaGMFrontend = (() => {
         groupedAgentActivity(messages, committed, context, 'dm', activity),
         (context?.act_markers || []).filter(marker => !context?.campaign_ending ||
           marker.status !== 'complete' || marker.act_number !== context.campaign_ending.act_number)),
-        context?.campaign_ending, activityIsWorking(activity) || Boolean(activity.retryBasis)),
+        context?.campaign_endings?.length ? context.campaign_endings : context?.campaign_ending,
+        activityIsWorking(activity) || Boolean(activity.retryBasis)),
       ...live].filter(Boolean);
     if (!cards.length) {
       const openingPending = activityIsWorking(activity) &&
@@ -8488,15 +8510,17 @@ const SylviaGMFrontend = (() => {
 
   // The saved ending offers one real user choice after its closing narration, never private prose.
   function withCampaignEnding(messages, cards, ending, busy = false) {
+    if (Array.isArray(ending)) return ending.reduce(
+      (result, item) => withCampaignEnding(messages, result, item, busy), cards);
     const result = [...cards];
     if (!ending || (ending.act_number !== null &&
         (!Number.isInteger(ending.act_number) || ending.act_number < 1)) ||
         typeof ending.ending_id !== 'string') return result;
     const position = messages.findIndex(message => message.message_id === ending.after_message_id);
     if (position < 0) return result;
-    const key = chronologyKeyAttribute('campaign-ending');
+    const key = chronologyKeyAttribute(`campaign-ending-${ending.after_message_id}`);
     let markup;
-    if (ending.choice) {
+    if (ending.choice || ending.historical) {
       markup = `<div class="campaign-ending-marker"${key} aria-label="Campaign complete">` +
         `<span>✓ ${escapeHtml(ending.plan_title || 'Campaign')} · Complete</span></div>`;
     } else {
@@ -10268,6 +10292,10 @@ const SylviaGMFrontend = (() => {
       });
       await refreshBuilderChats();
       await openBuilderChat(chat.session.session_id);
+      if (options.initialPrompt) {
+        $('player-input').value = options.initialPrompt;
+        saveSelectedSessionDraft();
+      }
       setInlineStatus('');
       $('player-input').focus();
     } catch (e) {
@@ -10591,6 +10619,7 @@ const SylviaGMFrontend = (() => {
       activityIsWorking(activity) || (state.activeSessionRole === 'builder' &&
         state.activeCampaignId && state.constructionDraftId === state.activeCampaignId &&
         !state.activeCreationSubflow);
+    $('campaign-sequel-btn').disabled = !configured || activityIsWorking(activity) || Boolean(activity?.retryBasis);
     $('player-input').disabled = !canSubmit;
     $('player-input').setAttribute('aria-label', state.activeSessionRole === 'dm'
       ? 'In-character message or action' : 'Message to Builder');
@@ -10790,6 +10819,177 @@ const SylviaGMFrontend = (() => {
   function setCampaignDataStatus(message) {
     $('campaign-data-status').textContent = message;
 
+  }
+
+  function sequelSelectionIsCurrent(dialog = state.sequelDialog) {
+    return dialog && state.sequelDialog === dialog && state.view === 'session' &&
+      state.activeCampaignId === dialog.campaign_id && state.activeSessionId === dialog.session_id;
+  }
+
+  function refreshSequelConfirmation() {
+    const dialog = state.sequelDialog;
+    $('campaign-sequel-append').disabled = !dialog?.preview || dialog.busy ||
+      (!dialog.request && (!$('campaign-sequel-reviewed').checked ||
+        !$('campaign-sequel-connection').value.trim()));
+  }
+
+  function resetSequelReview() {
+    if (state.sequelDialog) state.sequelDialog.preview = null;
+    $('campaign-sequel-review').hidden = true;
+    $('campaign-sequel-confirmation').hidden = true;
+    $('campaign-sequel-reviewed').checked = false;
+    refreshSequelConfirmation();
+  }
+
+  async function openCampaignSequel() {
+    if (selectedSessionIsWorking() || selectedActivity()?.retryBasis || state.activeSessionRole !== 'dm') return;
+    const dialog = { campaign_id: state.activeCampaignId, session_id: state.activeSessionId,
+      operation_id: `append-adventure-${crypto.randomUUID()}`, preview: null, request: null,
+      busy: false, context: null };
+    state.sequelDialog = dialog;
+    resetSequelReview();
+    $('campaign-sequel-connection').value = '';
+    for (const id of ['campaign-sequel-source', 'campaign-sequel-connection', 'campaign-sequel-reviewed'])
+      $(id).disabled = false;
+    $('campaign-sequel-append').textContent = 'Append adventure';
+    $('campaign-sequel-status').textContent = 'Loading your adventure library…';
+    $('campaign-sequel-dialog').showModal();
+    try {
+      const [catalog, context] = await Promise.all([
+        state.bridge.campaign_creation_catalog(),
+        state.bridge.campaign_sequel_context({ campaign_id: dialog.campaign_id,
+          session_id: dialog.session_id }),
+      ]);
+      if (!sequelSelectionIsCurrent(dialog)) return;
+      dialog.context = context;
+      $('campaign-sequel-source').innerHTML = '<option value="">Choose an adventure…</option>' +
+        catalog.filter(item => item.kind === 'campaign_plan').map(item =>
+          `<option value="${escapeHtml(item.id)}">${escapeHtml(item.title)}</option>`).join('');
+      $('campaign-sequel-status').textContent =
+        'Choose an adventure to check its exact world and rules. You can also author a compatible next adventure in Builder.';
+    } catch (error) {
+      if (sequelSelectionIsCurrent(dialog)) $('campaign-sequel-status').textContent =
+        friendlyCommandError('Adventure library could not load', error);
+    }
+  }
+
+  async function previewCampaignSequel() {
+    const dialog = state.sequelDialog;
+    const sourceId = $('campaign-sequel-source').value;
+    if (!sequelSelectionIsCurrent(dialog) || !sourceId || dialog.busy || dialog.request) return;
+    resetSequelReview();
+    dialog.busy = true;
+    $('campaign-sequel-status').textContent = 'Checking this adventure against the campaign…';
+    try {
+      const preview = await state.bridge.preview_campaign_sequel({ campaign_id: dialog.campaign_id,
+        session_id: dialog.session_id, source_id: sourceId });
+      if (!sequelSelectionIsCurrent(dialog) || sourceId !== $('campaign-sequel-source').value) return;
+      dialog.preview = preview;
+      const initial = preview.source_initial_state || {};
+      const facts = (initial.facts || []).map(item => typeof item === 'string' ? item : item.fact);
+      $('campaign-sequel-review').innerHTML =
+        `<h3>${escapeHtml(preview.title)}</h3><p>${escapeHtml(preview.summary)}</p>` +
+        `<p>${escapeHtml(preview.warning)}</p>` +
+        `<p><strong>Retained characters:</strong> ${preview.participants.map(item => escapeHtml(item.name)).join(', ') || 'Current campaign party'}</p>` +
+        (preview.ending.choice === 'finish' && preview.ending.has_after_story
+          ? '<p><strong>This campaign already chose its after-story.</strong> Review the saved future in history. The next adventure must follow those events.</p>' : '') +
+        '<h4>New sequence</h4><ol>' + preview.acts.map(item =>
+          `<li>Act ${item.number}: ${escapeHtml(item.title)}</li>`).join('') + '</ol>' +
+        '<details><summary>Retained story for review</summary>' +
+        '<p>This excerpt includes up to 64 recent history entries and current facts. The complete saved history remains authoritative.</p>' +
+        `<pre>${escapeHtml(JSON.stringify({ scene: preview.current_scene,
+          facts: preview.retained_facts, recent_history: dialog.context?.recent_history }, null, 2))}</pre></details>` +
+        '<details><summary>Review preparation and setup assumptions (contains story spoilers)</summary>' +
+        '<p>Authored starting facts are shown for compatibility review. They are not applied to the campaign.</p>' +
+        (facts.length ? '<ul>' + facts.map(item => `<li>${escapeHtml(item)}</li>`).join('') + '</ul>' : '') +
+        `<pre>${escapeHtml(preview.source_markdown)}</pre>` +
+        '<details><summary>Exact authored setup</summary>' +
+        `<pre>${escapeHtml(JSON.stringify({ initial_state: initial,
+          starting_location: preview.source_plan?.starting_location,
+          starting_party: preview.source_plan?.starting_party }, null, 2))}</pre></details></details>` +
+        '<details><summary>Review separate story identities</summary>' +
+        '<p>These mappings keep new progress separate from earlier acts and objectives. World identities are retained.</p>' +
+        '<table><thead><tr><th>Authored reference</th><th>Campaign reference</th></tr></thead><tbody>' +
+        Object.entries(preview.identity_mapping).map(([from, to]) =>
+          `<tr><td>${escapeHtml(from)}</td><td>${escapeHtml(to)}</td></tr>`).join('') +
+        '</tbody></table></details>' +
+        `<details><summary>Exact source</summary><pre>${escapeHtml(JSON.stringify({
+          id: preview.basis.source_id, sha256: preview.basis.source_sha256,
+          bindings: preview.source_bindings }, null, 2))}</pre></details>`;
+      $('campaign-sequel-review').hidden = false;
+      $('campaign-sequel-confirmation').hidden = false;
+      $('campaign-sequel-status').textContent =
+        'Review the adventure against your history. Resolve incompatible assumptions in Builder before appending.';
+    } catch (error) {
+      if (sequelSelectionIsCurrent(dialog)) $('campaign-sequel-status').textContent =
+        friendlyCommandError('This adventure cannot be appended', error);
+    } finally {
+      dialog.busy = false;
+      if (sequelSelectionIsCurrent(dialog)) refreshSequelConfirmation();
+    }
+  }
+
+  async function appendCampaignSequel() {
+    const dialog = state.sequelDialog;
+    if (!sequelSelectionIsCurrent(dialog) || !dialog.preview || dialog.busy ||
+        $('campaign-sequel-append').disabled) return;
+    if (!dialog.request) dialog.request = {
+      campaign_id: dialog.campaign_id, session_id: dialog.session_id,
+      operation_id: dialog.operation_id, source_id: dialog.preview.basis.source_id,
+      expected_revision: dialog.preview.basis.expected_revision,
+      preview_sha256: dialog.preview.preview_sha256,
+      review: { connection: $('campaign-sequel-connection').value.trim(), timeline: 'after', reviewed: true },
+    };
+    dialog.busy = true;
+    for (const id of ['campaign-sequel-source', 'campaign-sequel-connection', 'campaign-sequel-reviewed'])
+      $(id).disabled = true;
+    refreshSequelConfirmation();
+    $('campaign-sequel-status').textContent = 'Appending the reviewed adventure…';
+    try {
+      await state.bridge.append_campaign_sequel(dialog.request);
+      if (!sequelSelectionIsCurrent(dialog)) return;
+      $('campaign-sequel-dialog').close();
+      await openCampaign(dialog.campaign_id, dialog.session_id);
+      setInlineStatus('Adventure added. Continue with your Game Master when you are ready.');
+    } catch (error) {
+      if (sequelSelectionIsCurrent(dialog)) {
+        $('campaign-sequel-status').textContent = friendlyCommandError(
+          'Append was not confirmed. Retry this exact request to recover its result; if the review is stale, cancel and review again', error);
+        $('campaign-sequel-append').textContent = 'Retry append';
+      }
+    } finally {
+      dialog.busy = false;
+      if (sequelSelectionIsCurrent(dialog)) refreshSequelConfirmation();
+    }
+  }
+
+  async function authorCampaignSequel() {
+    const dialog = state.sequelDialog;
+    if (!sequelSelectionIsCurrent(dialog) || dialog.busy || dialog.request || !dialog.context) return;
+    const context = dialog.context;
+    const preparation = {
+      source_plan_id: context.accepted_plan?.id, source_references: context.source_references,
+      bindings: context.accepted_plan?.bindings,
+      boundaries: context.accepted_plan?.boundaries, current_scene: context.current_scene,
+      participants: context.participants.map(item => ({ id: item.id, name: item.data.name })),
+      recent_facts: context.facts.slice(-64), recent_history: context.recent_history,
+      ending: context.ending,
+    };
+    const fullContext = JSON.stringify(preparation, null, 2);
+    const contextExcerpt = fullContext.length <= 60000 ? fullContext :
+      fullContext.slice(0, 60000) + '\n\n[Context excerpt truncated at 60,000 characters. ' +
+      'It may end during a field. Complete saved history and boundaries remain authoritative. ' +
+      'Ask me for missing material rather than treating it as absent.]';
+    $('campaign-sequel-dialog').close();
+    await startBuilderChat({ displayName: `Next adventure: ${context.campaign_name}`,
+      initialPrompt: 'Help me author or adapt a compatible next Campaign Plan for this existing campaign. ' +
+        'Keep its exact Setting and Ruleset snapshots, characters, boundaries, played events, ' +
+        'unresolved consequences and already narrated future. This independent Builder may publish ' +
+        'a reusable Plan; it cannot change the live campaign. Its starting setup will not reset ' +
+        'the campaign. Ask about genuine narrative conflicts. I will review and append it separately. ' +
+        'This context includes up to 64 recent facts and history excerpts (up to 4000 characters each); ' +
+        'my complete saved history remains authoritative.\n\n' +
+        contextExcerpt });
   }
 
   async function exportSelectedCampaign() {
@@ -11435,6 +11635,7 @@ const SylviaGMFrontend = (() => {
   // Navigation controls are host presentation; hiding them must not change any saved session.
   function renderSidebarState() {
     const campaign = state.view === 'session' && Boolean(state.activeCampaignId);
+    $('campaign-sequel-btn').hidden = !campaign || state.activeSessionRole !== 'dm';
     $('builder-launcher').hidden = campaign && state.activeSessionRole === 'dm';
     $('session-context').hidden = !campaign;
     for (const side of ['left', 'right']) {
