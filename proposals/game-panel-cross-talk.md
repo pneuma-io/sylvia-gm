@@ -15,6 +15,8 @@ Daniel approved the layout on 19 October 2026: retain Character as an optional d
 
 Inspection and outer expansion use the existing panel host, native presentation sequence and saved campaign workspace. Ruleset defaults never copy another campaign's inspected identity. Roster removal clears inspection to an explicit unavailable state; reintroducing the same ID does not silently restore it. Campaign and Ruleset changes validate against their own admitted records. There is no additional engine authority or private campaign cache.
 
+Inspection and layout belong to the current viewer's local profile. Sharing inspection across that viewer's panels and detached windows does not publish a campaign mutation or select a character for another viewer. A future multiplayer client must retain its own inspection and layout even when players see the same authoritative map, acting character, turn or target. This change adds no multiplayer transport.
+
 Docking, tabs, hide/show, detached windows and reopening use the existing host lifecycle. The renderer preserves disclosure state if a redraw races a pending browser toggle event, and restores nested stat-group focus within the same campaign/session. Children adopt the owner's current presentation and reject obsolete contexts/sequences.
 
 Manual requests capture actor/target inputs before awaiting. A pending intention prevents replacement DOM or a moved child panel from starting another copy. Delayed previews and confirmations recheck campaign/session, declared action, revision, actor control, visible actor/target and map revision. The authoritative owner still validates permissions, resources, revision and idempotency. Queued intentions retain their original explicit bindings.

@@ -122,6 +122,43 @@ function state() {
     ] } };
 }
 
+test('independent viewer profiles retain their own inspection and layout while synchronizing their own child', async () => {
+  const projection = state().panelProjection;
+  const originalProjection = JSON.stringify(projection);
+  const viewers = [];
+  for (const inspected of ['alpha', 'bravo']) {
+    const bus = transport(), storage = new Map(), viewerState = state();
+    viewerState.panelProjection = projection;
+    const main = renderer(bus, 'main', viewerState, storage);
+    await main.host.init(); main.render(); await flush();
+    main.host.changed({ type: 'move', panelId: 'party', destination: { windowId: 'new' } });
+    await flush();
+    const windowId = bus.windows.keys().next().value;
+    const child = renderer(bus, windowId, state(), storage, bus.windows.get(windowId));
+    await child.host.init();
+    main.state.characterInspection = { campaignId: 'td', rulesetId: 'td-rules', id: inspected,
+      unavailableId: null, expanded: [inspected] };
+    await main.host.publish();
+    viewers.push({ main, child, storage, inspected });
+  }
+  viewers[0].main.host.changed({ type: 'hide', panelId: 'inventory' });
+  await viewers[0].main.host.publish();
+  for (const [index, viewer] of viewers.entries()) {
+    assert.equal(viewer.main.state.characterInspection.id, viewer.inspected);
+    assert.equal(viewer.child.state.characterInspection.id, viewer.inspected);
+    assert.equal(viewer.child.host.snapshot().hidden.includes('inventory'), index === 0);
+    assert.equal(JSON.stringify(viewer.main.state.panelProjection), originalProjection);
+    assert.equal(viewer.main.dispatches.length, 0);
+    assert.equal(viewer.child.dispatches.length, 0);
+    const reopened = renderer(transport(), 'main', state(), viewer.storage);
+    reopened.render();
+    assert.equal(reopened.state.characterInspection.id, viewer.inspected);
+    assert.equal(reopened.host.snapshot().hidden.includes('inventory'), index === 0);
+    reopened.host.leave(); viewer.child.host.leave(); viewer.main.host.leave();
+  }
+  assert.equal(JSON.stringify(projection), originalProjection, 'Presentation never mutates the shared projection');
+});
+
 test('inspection transport follows panel lifecycle and rejects an old presentation after campaign navigation',async()=>{
   const bus=transport(),storage=new Map(),main=renderer(bus,'main',state(),storage);
   await main.host.init();main.render();await flush();
