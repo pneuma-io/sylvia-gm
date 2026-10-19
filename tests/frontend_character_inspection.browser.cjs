@@ -45,6 +45,9 @@ for(const width of [1440,960])test(`shared character inspection, keyboard and re
   assert.equal(await page.locator('[data-character-actor]').count(),0,'Character has no independent selector when Party exists');
   const details=page.getByLabel('Details for Bram',{exact:true});await details.focus();await page.keyboard.press('Enter');
   assert.equal(await page.locator('[data-character-expansion="bram"]').evaluate(e=>e.open),true);
+  await page.getByLabel('Details for Asha',{exact:true}).focus();await page.keyboard.press('Enter');
+  for(const member of ['asha','bram'])assert.equal(await page.locator(`[data-character-expansion="${member}"]`).evaluate(e=>e.open),true);
+  assert.equal(await page.evaluate(()=>window.inspectionQA.state.characterInspection.id),'bram','Expanding another card does not inspect it');
   for(const owner of [page.locator('[data-character-expansion="bram"]'),page.locator('[data-panel-id="character"]')]){
    for(const group of ['skills','aptitudes']){
     await owner.locator('summary').filter({hasText:new RegExp(`^${group}$`)}).focus();
@@ -58,7 +61,7 @@ for(const width of [1440,960])test(`shared character inspection, keyboard and re
   const selection=await page.evaluate(()=>window.inspectionQA.state.tacticalSelections.map);
   assert.equal(selection.actor,'asha');assert.equal(selection.target,'bram');
   await page.evaluate(()=>window.inspectionQA.renderRulesetPanelProjection(window.testProjection));
-  assert.equal(await page.locator('[data-character-expansion="bram"]').evaluate(e=>e.open),true);
+  for(const member of ['asha','bram'])assert.equal(await page.locator(`[data-character-expansion="${member}"]`).evaluate(e=>e.open),true);
   await page.getByRole('button',{name:'Inventory',exact:true}).click();
   assert.match(await page.locator('[data-panel-id="inventory"]').innerText(),/Bram.*Silver Dagger/s);
   await page.getByRole('button',{name:'Character',exact:true}).click();
@@ -67,6 +70,17 @@ for(const width of [1440,960])test(`shared character inspection, keyboard and re
   await page.getByRole('button',{name:'Inspecting Bram',exact:true}).waitFor();
   assert.equal(await page.evaluate(()=>document.activeElement.getAttribute('aria-label')),'Inspecting Bram');
   assert.equal(await page.locator('[data-character-expansion="bram"]').evaluate(e=>e.open),true);
+  await page.evaluate(()=>window.inspectionQA.gamePanels().changed({type:'hide',panelId:'character'}));
+  assert.equal(await page.locator('[data-panel-id="character"]').count(),0,'Standalone Character can be hidden independently');
+  assert.equal(await page.locator('[data-character-expansion="bram"]').evaluate(e=>e.open),true);
+  await page.evaluate(()=>window.inspectionQA.gamePanels().changed({type:'show',panelId:'character'}));
+  await page.getByRole('button',{name:'Character',exact:true}).click();
+  assert.match(await page.locator('[data-panel-id="character"]').innerText(),/Bram.*Silver Dagger/s);
+  await page.getByLabel('Details for Asha',{exact:true}).focus();await page.keyboard.press('Enter');
+  assert.equal(await page.locator('[data-character-expansion="asha"]').evaluate(e=>e.open),false);
+  assert.equal(await page.locator('[data-character-expansion="bram"]').evaluate(e=>e.open),true,'Collapsing Asha leaves Bram expanded');
+  const retained=await page.evaluate(()=>window.inspectionQA.state.tacticalSelections.map);
+  assert.equal(retained.actor,'asha');assert.equal(retained.target,'bram');
   const overflow=await page.locator('.ruleset-roster-panel .ruleset-panel-content').evaluate(e=>e.scrollWidth>e.clientWidth+1);
   assert.equal(overflow,false);assert.deepEqual(errors,[]);
  }finally{await browser.close();}

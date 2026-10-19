@@ -9,7 +9,7 @@ Party cards now expose the same permitted details as the standalone Character vi
 - Map and Network retain explicit action-character controls. An explicit action-character choice also updates inspection; inspection cannot change the action character or target. Map labels distinguish the acting character. Encounter still displays authoritative turn ownership.
 - Existing Party actions retain their declared sources and actor bindings. Character-only action names link to their owning panel, avoiding duplicate dispatchers in detached Party windows.
 
-The existing standalone Character panel and independent expansion are preserved while Daniel's requested layout choice is pending. The recommendation is to retain Character as an optional dockable view and allow several cards expanded for comparison. No whole-shell redesign or automatic layout reset is included.
+Daniel approved the layout on 19 October 2026: retain Character as an optional dockable view and allow several Party cards expanded at once. Details expands a card without changing inspection; Inspect selects the character shown by Character and equipment views. No whole-shell redesign or automatic layout reset is included.
 
 ## State and safety
 
