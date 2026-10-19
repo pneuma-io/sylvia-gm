@@ -2366,6 +2366,12 @@ class ProviderSessionAdapter:
                                       else "campaign_preparation_boundary", None)
             if callable(boundary_reader):
                 decision_boundary = boundary_reader(campaign_id)
+            if decision_boundary is None and not any_commit_in_exchange:
+                # An already active private game must resume its GM decision before narration.
+                _, private_boundary = self._owner.model_context_snapshot(campaign_id)
+                if (private_boundary is not None
+                        and private_boundary.owner is ModelDecisionOwner.GM):
+                    decision_boundary = private_boundary
             player_boundary_narration = False
             player_intent_resolution_required = False
             gm_boundary_decision = False

@@ -1,6 +1,6 @@
 # Riichi Mahjong
 
-Status: implementation selected on 19 October 2026. The shared table foundation is implemented. Four seats, GM-controlled opponents, per-match East-only/East–South selection and one complete table panel are confirmed. The exact Riichi rules/scoring profile still needs an owner decision before game mechanics are implemented. This draft does not yet provide a playable Riichi game.
+Status: implementation selected on 19 October 2026. Four seats, GM-controlled opponents, per-match East-only/East–South selection and one complete table panel are confirmed. The declared engine now implements legal actions, scoring and complete hand/match progression. Native UI acceptance and the remaining profile checks below keep this PR in draft.
 
 ## User outcome
 
@@ -8,7 +8,7 @@ Play Riichi Mahjong in Sylvia with a readable table alongside ordinary GM narrat
 
 The feature is called **Riichi Mahjong**. A clear table and coherent game loop are the aim; a commercial Mahjong client's feature set, effects, accounts or visual assets are not requirements.
 
-Each match has one player and three GM-controlled opponents. The ordinary `start_game` tool must let the caller choose East-only or East–South for that match. One Game Panel contains the entire table, including all four seats and shared match state. These are confirmed product requirements; the shared display checkpoint does not yet implement the match-start tool or opponents.
+Each match has one player and three GM-controlled opponents. The ordinary `start_game` tool selects East-only or East-South for that match. One Game Panel contains the entire table, including all four seats and shared match state.
 
 ## Implemented shared display
 
@@ -22,7 +22,7 @@ Sylvia has generic Ruleset/package, authoritative command, result/projection and
 
 ## Proposed scope and boundaries
 
-- Select the exact Riichi rules/scoring profile, optional rules and authoritative reference before implementing mechanics. Preserve the confirmed four-seat control, match-format choice and complete-table panel requirements above. Record licences for any adapted text, code or assets; do not import proprietary game material.
+- Use the selected Mahjong Soul-like four-player profile, including one red five per suit. Document variant boundaries and verify subtle payments and progression before acceptance. No third-party code, rules prose or art is imported.
 - Cover setup, turn and response actions, hand resolution, scoring and match progression for that selected profile. Ruleset/owner paths enforce legal actions and outcomes. Narration and UI do not maintain a competing score or authoritative game state.
 - Declare one readable panel containing the entire table: the player's hand, permitted opponent information, discards, exposed groups, seat/turn/round, scores and available actions. Keep concealed information out of unauthorized projections and public result cards.
 - Use the existing panel host for placement, resizing, docking/detaching where supported, theme/layout persistence and accessible controls. Choose direct table controls for usefulness; not every game action must operate exclusively by clicking tiles.
@@ -40,11 +40,13 @@ Sylvia has generic Ruleset/package, authoritative command, result/projection and
 5. Demonstrate the selected generic panel primitives with a minimal non-Mahjong synthetic declaration, without committing to another game. Reuse existing owner/package tests and representative composition.
 6. Check package/content/notice boundaries and any selected original demonstration Plan. Structural validity alone does not establish enjoyable or complete gameplay.
 
-## Decisions still required
+## Selected profile and remaining verification
 
-The remaining product dependency is the exact rules/scoring profile and its optional rules, including any profile-specific match-end conditions. The earlier Tenhou-style profile suggestion remains unapproved. It is not an implementation default or an owner selection. No third-party code, rules prose or art has been imported.
+The selected profile uses open tanyao and atozuke, forbids kuikae, requires one yaku, uses no kiriage mangan, double-wind pair 4 fu, chiitoitsu 25 fu, kazoe yakuman and the selected double yakuman variants. Triple ron pays every winner; kokushi can rob a concealed kan. Pao applies only to the liable yakuman component.
 
-Daniel has confirmed four seats with one player and three GM-controlled opponents, East-only or East–South chosen per match through the ordinary `start_game` tool, and one panel containing the entire table. These choices supersede the corresponding open questions in the historical specifications. They do not select a scoring profile.
+Matches start at 25,000 with a 30,000 target, end below zero, allow one extension wind, repeat the dealer on a win or tenpai, and end when the final dealer leads at target. Ties follow original seat order. These owner selections supersede the historical open questions. This is not a claim of Tenhou identity or Mahjong Soul feature parity. Exact current in-game honba, multi-ron and nagashi details remain acceptance checks; the public tournament PDF has different target, bust and head-bump settings and cannot supply those ranked defaults.
+
+The current package provisionally pays honba to each ron winner and requires a closed hand for nagashi mangan. Profile data and tests also support honba only for the nearest winner and nagashi with open groups; the owner must confirm the selected current-client behavior. Nagashi is treated as an exhaustive draw: honba advances, riichi sticks carry, and dealer continuation follows tenpai. Concealed-kan dora reveals immediately; open/added-kan dora currently reveals after the following discard, including a pending rinshan-before-discard case to verify. These explicit profile checks remain open before acceptance.
 
 The latest selection removes any requirement for a separate adventuring layer. The three complete specifications and all retained source versions were retrieved from the authorized private archive before implementation. The archive is kept outside this public repository.
 
@@ -52,4 +54,4 @@ The latest selection removes any requirement for a separate adventuring layer. T
 
 Planning references: PL-13 — `bfade435-b977-4436-aefa-732e34744dd1`; PL-14 — `be27d182-07b3-4154-b4b7-08458341a085`; PL-15 — `190951c3-1d82-41a1-bd83-13e7ebfcbc96`. The complete current Desk specifications and their linked original acceptance/source material remain authoritative. Retrieve all of them through authorized access before implementation; these public notes are an index and selected scope, not a replacement handoff. Daniel's latest selection here supersedes conflicting older framing. The coordinator owns Desk reconciliation.
 
-This PR includes the shared display foundation and its focused checks. Complete hand/match progression, scoring/legal-action proof, campaign gameplay/OOC integration, native normal-launch screenshots and Riichi save/reopen remain incomplete. No merge or release is selected. No GitHub Actions before November 2026.
+This PR now includes a bounded declarative package, scoring and hand/match progression, private-state publication, current-generation legal actions, per-seat views and save/reopen checks. Normal-start fixtures complete both match formats through one extension. Native acceptance and current-game rule verification are still in progress. No merge or release is selected. No GitHub Actions before November 2026.
