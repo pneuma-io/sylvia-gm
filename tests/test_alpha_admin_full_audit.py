@@ -9,7 +9,6 @@ from collections.abc import Mapping
 from pathlib import Path
 
 import pytest
-from scripts.generate_model_input_audit_examples import generate_examples
 
 from sylvia_gm.agent._provider_session import _dm_system_prompt
 from sylvia_gm.application.authority import AuthorityOwner
@@ -34,6 +33,8 @@ from sylvia_gm.provider._hooks import HookContext
 @pytest.fixture(scope="module")
 def public_audit_root(tmp_path_factory: pytest.TempPathFactory) -> Path:
     """Generate current synthetic examples without relying on ignored local captures."""
+    from scripts.generate_model_input_audit_examples import generate_examples
+
     output = tmp_path_factory.mktemp("public-model-input-audit")
     generate_examples(output)
     return output
@@ -367,6 +368,7 @@ def test_admin_audited_provider_includes_provider_returned_stream_usage() -> Non
         "output_tokens": 12,
         "total_tokens": 113,
         "cached_tokens": 40,
+        "cache_write_tokens": None,
         "reasoning_tokens": 3,
     }
     assert response["retry_count"] == 1
@@ -1093,6 +1095,7 @@ def test_public_exact_input_examples_are_complete_and_correlated(public_audit_ro
             "output_tokens": None,
             "total_tokens": None,
             "cached_tokens": None,
+            "cache_write_tokens": None,
             "reasoning_tokens": None,
         }
         for response in srd["traces"]

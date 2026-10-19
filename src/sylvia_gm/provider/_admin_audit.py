@@ -69,8 +69,9 @@ def _usage_projection(response: ProviderResponse | None) -> dict[str, object]:
         "output_tokens": usage.completion_tokens if reported and usage is not None else None,
         "total_tokens": usage.total_tokens if reported and usage is not None else None,
         "cached_tokens": (
-            cache_usage.cache_read_tokens if reported and cache_usage is not None else None
+            cache_usage.cache_read_tokens if cache_usage is not None else None
         ),
+        "cache_write_tokens": cache_usage.cache_write_tokens if cache_usage is not None else None,
         "reasoning_tokens": usage.reasoning_tokens if reported and usage is not None else None,
     }
 

@@ -9,7 +9,7 @@ import yaml
 
 from sylvia_gm.agent._actor_decisions import run_actor_decision
 from sylvia_gm.agent._provider_session import ProviderSessionAdapter
-from sylvia_gm.agent._session_loop import ProviderEventKind
+from sylvia_gm.agent._session_loop import CampaignSessionLoop, ProviderEventKind, SessionRunRequest
 from sylvia_gm.agent._stateless_mcp import ModelMechanicsTool
 from sylvia_gm.application.authority import ActionCommand, AuthorityOwner, CampaignCreate
 from sylvia_gm.application.package_materialization import materialize_package_archive
@@ -180,9 +180,34 @@ def token_ruleset():
 
 @pytest.fixture
 def isolated_game(tmp_path, request):
-    compiled = compile_ruleset_source(yaml.safe_dump(token_ruleset()).encode())
+    declaration = token_ruleset()
+    options = getattr(request, "param", None)
+    pending = isinstance(options, dict) and options.get("housekeeping", False)
+    if pending:
+        declaration["mechanic_families"]["housekeeping"] = {
+            "parameters": [],
+            "pre_conditions": [],
+            "narrative": {},
+            "metadata": {"model_behavior": "required_engine_transition"},
+            "effects": [
+                {"set": {"field": "state.pending", "value": False}},
+                {"set": {"field": "state.counter", "value": 1}},
+                {"set": {"field": "state.public.counter", "value": 1}},
+                {"call": "_refresh", "params": {"actor": "{state.actor}"}},
+                {"publish": {"fields": {"message": "'HOUSEKEEPING_PUBLIC_RESULT'", "counter": 1}}},
+            ],
+        }
+        declaration["public_actions"].append(
+            {
+                **declaration["public_actions"][0],
+                "name": "housekeeping",
+                "family": "housekeeping",
+                "state_predicates": [{"namespace": NS, "key": "state.pending", "equals": True}],
+            }
+        )
+    compiled = compile_ruleset_source(yaml.safe_dump(declaration).encode())
     database = tmp_path / "tokens.sqlite3"
-    with AuthorityOwner.open(database, "isolated-test") as owner:
+    with AuthorityOwner.open(database, "isolated-test", disconnect_grace_seconds=1.0) as owner:
         with materialize_package_archive((compiled.draft,)) as artifact:
             manifest = artifact.manifest
             declaration = manifest.participant_artifacts[0]
@@ -232,7 +257,8 @@ def isolated_game(tmp_path, request):
                         {
                             "actor": "a",
                             "counter": 0,
-                            "blocked": bool(getattr(request, "param", False)),
+                            "blocked": options is True,
+                            "pending": pending,
                             "public": {"counter": 0},
                         },
                     ),
@@ -298,6 +324,7 @@ class IsolatedFlowProvider(_ScriptedProvider):
         self.before_proposal = None
         self.proposal = None
         self.require_second_gm_history = False
+        self.ooc_only = False
         self.transport = {
             "anthropic_messages": AnthropicMessagesTransport,
             "chat_completions": ChatCompletionsTransport,
@@ -325,7 +352,20 @@ class IsolatedFlowProvider(_ScriptedProvider):
             )
         self.wire.append(wire)
         names = [tool["function"]["name"] for tool in tools or []]
-        if "select_actor_action" in names:
+        if self.ooc_only:
+            assert "select_actor_action" not in names
+            assert not any(
+                name.endswith("_advance") or name.endswith("_housekeeping") for name in names
+            )
+            assert "HAND_SENTINEL" not in json.dumps(wire)
+            operation = next(name for name in names if name.endswith("_update_campaign_file"))
+            arguments = {
+                "revised_player_facing_response": [
+                    {"kind": "ooc", "text": "The table stays paused while we discuss."}
+                ]
+            }
+            call_id, marker = "ooc-gm-call", "GM"
+        elif "select_actor_action" in names:
             assert names == ["select_actor_action"]
             envelope = json.loads(messages[-1]["content"])
             seat = envelope["actor"]["id"]
@@ -446,19 +486,25 @@ class IsolatedFlowProvider(_ScriptedProvider):
 
 def gm_input(owner, session):
     base = _provider_input(user_text="PLAYER_CONVERSATION_SENTINEL: watch the token moves.")
-    catalog = tuple(
-        ModelMechanicsTool(
-            package_id=tool.package_id,
-            package_version=tool.package_version,
-            package_sha256=tool.package_sha256,
-            name=tool.name,
-            capability=tool.capability,
-            input_schema=tool.input_schema,
-            description=tool.description,
-            model_behavior=tool.model_behavior,
+
+    def current_catalog():
+        return (
+            *tuple(
+                ModelMechanicsTool(
+                    package_id=tool.package_id,
+                    package_version=tool.package_version,
+                    package_sha256=tool.package_sha256,
+                    name=tool.name,
+                    capability=tool.capability,
+                    input_schema=tool.input_schema,
+                    description=tool.description,
+                    model_behavior=tool.model_behavior,
+                )
+                for tool in owner.catalog("tokens")
+            ),
+            _campaign_file_tool(allow_unchanged=True),
         )
-        for tool in owner.catalog("tokens")
-    )
+
     return replace(
         base,
         session=session,
@@ -466,7 +512,8 @@ def gm_input(owner, session):
             session=session,
             messages=(replace(base.history.messages[0], session_id=session.session_id),),
         ),
-        catalog=(*catalog, _campaign_file_tool(allow_unchanged=True)),
+        catalog=current_catalog(),
+        catalog_supplier=lambda _discovery: current_catalog(),
         narrative_writer=lambda _parameters: {
             "status": "campaign_file_unchanged",
             "campaign_revision": owner.snapshot("tokens").revision,
@@ -699,6 +746,257 @@ def actor_events(owner, session, provider):
     ), source
 
 
+def test_participant_tool_contract_stays_identical_when_current_offers_change(isolated_game):
+    owner, session, _ = isolated_game
+    provider = IsolatedFlowProvider("chat_completions", "deepseek-v3.2")
+    for _ in range(2):
+        events, _ = actor_events(owner, session, provider)
+        try:
+            event = next(events)
+            owner.execute_action(event.action_command)
+            list(events)
+        finally:
+            events.close()
+    first_messages, first_tools = provider.calls[0]
+    second_messages, second_tools = provider.calls[1]
+    assert json.dumps(first_tools, sort_keys=True) == json.dumps(second_tools, sort_keys=True)
+    assert json.loads(first_messages[-1]["content"])["actions"][0]["id"] == "a:0"
+    assert json.loads(second_messages[-1]["content"])["actions"][0]["id"] == "a:1"
+    assert first_messages[0] == second_messages[0]
+    assert second_messages[1] == first_messages[-1]
+
+
+@pytest.mark.asyncio
+async def test_fresh_gm_state_follows_history_without_entering_chatgpt_base_instructions(
+    isolated_game, tmp_path,
+):
+    from sylvia_gm.provider._chatgpt import ChatGPTProvider
+    from tests.test_pes82_chatgpt_failures import SyntheticRuntime, provider_for
+
+    owner, session, _ = isolated_game
+    captured = []
+
+    class Runtime(SyntheticRuntime):
+        def call(self, method, params):
+            captured.append((method, json.loads(json.dumps(params))))
+            return super().call(method, params)
+
+    def connect(*_args, **_kwargs):
+        return Runtime([{"method": "turn/completed", "params": {"turn": {"status": "completed"}}}])
+
+    model = provider_for(SyntheticRuntime([]), tmp_path).model_info
+    provider = ChatGPTProvider(tmp_path, model, connection_factory=connect)
+    adapter = ProviderSessionAdapter(owner, provider, owner_id="isolated-test",
+        gm_system_prompt="FIXED_GM_INSTRUCTIONS")
+    source = gm_input(owner, session)
+    for index in range(2):
+        messages = adapter._messages(source)
+        tools, _ = adapter._provider_tools(source.catalog)
+        await provider.generate(messages, tools=tools)
+        if index == 0:
+            request = owner.actor_decision_request("tokens", turn_id="turn")
+            owner.execute_action(owner.actor_decision_command(request, choice_id="a:0",
+                session_id=session.session_id, owner_id="isolated-test"))
+    starts = [params for method, params in captured if method == "thread/start"]
+    injected = [params["items"] for method, params in captured if method == "thread/inject_items"]
+    assert json.dumps(starts[0]["dynamicTools"], sort_keys=True) == json.dumps(
+        starts[1]["dynamicTools"], sort_keys=True)
+    assert starts[0]["baseInstructions"] == starts[1]["baseInstructions"]
+    assert "SYLVIA_GM_FRESH_CAMPAIGN_STATE" not in starts[0]["baseInstructions"]
+    for items in injected:
+        assert items[-1]["content"][0]["text"].startswith("SYLVIA_GM_FRESH_CAMPAIGN_STATE")
+        assert "PLAYER_CONVERSATION_SENTINEL" in json.dumps(items[:-1])
+        assert "HAND_SENTINEL" not in json.dumps(items)
+    assert injected[0][-1] != injected[1][-1]
+
+
+@pytest.mark.parametrize("route", ["chatgpt", "openrouter"])
+def test_real_serializers_interleave_owned_contexts_and_reopen(isolated_game, tmp_path, route):
+    """Capture actual App Server RPC or SDK HTTP JSON, with no external inference."""
+    import httpx
+
+    from sylvia_gm.provider._chatgpt import ChatGPTProvider
+    from sylvia_gm.provider._openai_compat import OpenAICompatProvider
+    from tests.test_pes82_chatgpt_failures import SyntheticRuntime, provider_for
+
+    owner, session, database = isolated_game
+    frames = []
+
+    def proposed(messages, tools):
+        if any(tool["function"]["name"] == "select_actor_action" for tool in tools):
+            return json.loads(messages[-1]["content"])["actions"][0]["id"]
+        return None
+
+    if route == "openrouter":
+        def handle(request):
+            body = json.loads(request.content)
+            frames.append(body)
+            action = proposed(body["messages"], body.get("tools", []))
+            delta = {"content": "GM_PUBLIC_TALK_SENTINEL"} if action is None else {
+                "tool_calls": [{"index": 0, "id": "choice-" + str(len(frames)),
+                    "type": "function", "function": {"name": "select_actor_action",
+                        "arguments": json.dumps({"action_id": action})}}]}
+            event = {"id": "synthetic", "created": 1, "object": "chat.completion.chunk",
+                "model": "synthetic", "choices": [{"index": 0, "delta": delta,
+                    "finish_reason": "stop" if action is None else "tool_calls"}]}
+            return httpx.Response(200, headers={"content-type": "text/event-stream"},
+                text="data: " + json.dumps(event) + "\n\ndata: [DONE]\n\n")
+
+        provider = OpenAICompatProvider(
+            base_url="https://openrouter.ai/api/v1", api_key="synthetic",
+            model_info=ModelInfo("synthetic", "Test", "OpenRouter", "openrouter", "byok"),
+            http_client=httpx.AsyncClient(transport=httpx.MockTransport(handle)))
+    else:
+        class Runtime(SyntheticRuntime):
+            def call(self, method, params):
+                if method == "thread/start":
+                    self.frame = {"baseInstructions": params["baseInstructions"],
+                                  "tools": params["dynamicTools"]}
+                if method == "thread/inject_items":
+                    self.frame["messages"] = params["items"]
+                if method == "turn/start":
+                    frames.append(json.loads(json.dumps(self.frame)))
+                    names = [tool["name"] for namespace in self.frame["tools"]
+                             for tool in namespace["tools"]]
+                    if "select_actor_action" in names:
+                        envelope = json.loads(self.frame["messages"][-1]["content"][0]["text"])
+                        self.events = [{"method": "item/tool/call", "params": {
+                            "namespace": "sylvia", "tool": "select_actor_action",
+                            "callId": "choice-" + str(len(frames)),
+                            "arguments": {"action_id": envelope["actions"][0]["id"]}}}]
+                    else:
+                        self.events = [{"method": "item/agentMessage/delta", "params": {
+                            "delta": "GM_PUBLIC_TALK_SENTINEL"}}, {"method": "turn/completed",
+                            "params": {"turn": {"status": "completed"}}}]
+                return super().call(method, params)
+
+        model = provider_for(SyntheticRuntime([]), tmp_path).model_info
+        provider = ChatGPTProvider(tmp_path, model,
+            connection_factory=lambda *_args, **_kwargs: Runtime([]))
+
+    adapter = ProviderSessionAdapter(owner, provider, owner_id="isolated-test",
+        gm_system_prompt="GM_PRIVATE_INSTRUCTIONS_SENTINEL")
+    source = gm_input(owner, session)
+    # Advance the fixture's first repeated A decision so the captured order is GM,A,B,C,GM,A.
+    request = owner.actor_decision_request("tokens", turn_id="turn")
+    owner.execute_action(owner.actor_decision_command(request, choice_id="a:0",
+        session_id=session.session_id, owner_id="isolated-test"))
+
+    def gm():
+        tools, _ = adapter._provider_tools(source.catalog)
+        list(adapter._stream_round(adapter._messages(source), tools, control=source.control,
+                                   provider_input=source))
+
+    def actor():
+        request = owner.actor_decision_request("tokens", turn_id="turn")
+        events = iter(run_actor_decision(owner, provider, source, request,
+            owner_id="isolated-test", stream=adapter._stream_round))
+        try:
+            event = next(events)
+            owner.execute_action(event.action_command)
+            list(events)
+        finally:
+            events.close()
+
+    gm()
+    owner.append_agent_message(session_id=session.session_id, message_id="saved-gm-talk",
+        kind=SessionMessageKind.TALK, content={"text": "GM_PUBLIC_TALK_SENTINEL"})
+    for _ in range(3):
+        actor()
+    saved_talk = owner.session_context(session.session_id).messages
+    source = replace(source, history=SessionContext(session=session,
+        messages=(*source.history.messages, *saved_talk)))
+    gm_id = adapter._gm_request_context_id(source)
+    gm()
+    owner.execute_action(ActionCommand(campaign_id="tokens", action_id="human-selection",
+        idempotency_key="human-selection", turn_id="turn", owner_id="isolated-test",
+        writer=WriterRole.DM, expected_revision=4, package_id=NS, tool_name="advance",
+        parameters={"choice": "human:4"}))
+    owner.close()
+    with AuthorityOwner.open(database, "isolated-test") as reopened:
+        owner = reopened
+        session = owner.session_activity_basis("gm-tokens").session
+        source = replace(source, session=session)
+        adapter = ProviderSessionAdapter(owner, provider, owner_id="isolated-test",
+            gm_system_prompt="GM_PRIVATE_INSTRUCTIONS_SENTINEL")
+        assert adapter._gm_request_context_id(source) == gm_id
+        actor()
+    assert len(frames) == 6
+    for index, seat in ((1, "a"), (2, "b"), (3, "c"), (5, "a")):
+        rendered = json.dumps(frames[index])
+        assert seat.upper() + "_HAND_SENTINEL" in rendered
+        assert "GM_PRIVATE_INSTRUCTIONS_SENTINEL" not in rendered
+        assert "PLAYER_CONVERSATION_SENTINEL" not in rendered
+        for other in "abc":
+            if other != seat:
+                assert other.upper() + "_HAND_SENTINEL" not in rendered
+    for index in (0, 4):
+        for seat in "abc":
+            assert seat.upper() + "_HAND_SENTINEL" not in json.dumps(frames[index])
+        assert "PLAYER_CONVERSATION_SENTINEL" in json.dumps(frames[index])
+    assert "GM_PUBLIC_TALK_SENTINEL" in json.dumps(frames[4])
+    assert frames[1]["tools"] == frames[5]["tools"]
+    if route == "openrouter":
+        assert frames[0]["session_id"] == frames[4]["session_id"] == gm_id
+        assert frames[1]["session_id"] == frames[5]["session_id"]
+        assert len({frames[i]["session_id"] for i in range(4)}) == 4
+        assert all("provider" not in frame and "_request_context_id" not in frame
+                   for frame in frames)
+        assert frames[5]["messages"][1] == frames[1]["messages"][-1]
+        prior_call, prior_receipt = frames[5]["messages"][2:4]
+        assert prior_call["tool_calls"][0]["id"] == prior_receipt["tool_call_id"]
+        assert json.loads(prior_receipt["content"])["status"] == "committed"
+    else:
+        assert frames[0]["baseInstructions"] == frames[4]["baseInstructions"]
+        assert frames[1]["baseInstructions"] == frames[5]["baseInstructions"]
+        assert "SYLVIA_GM_FRESH_CAMPAIGN_STATE" not in frames[4]["baseInstructions"]
+    assert "a:1" in json.dumps(frames[5]) and "a:5" in json.dumps(frames[5])
+
+
+@pytest.mark.parametrize("isolated_game", [{"housekeeping": True}], indirect=True)
+def test_required_transition_refreshes_the_actor_before_any_npc_request(isolated_game):
+    owner, session, _ = isolated_game
+    old = owner.actor_decision_request("tokens", turn_id="turn")
+    provider = IsolatedFlowProvider("anthropic_messages", "minimax-m3")
+    adapter = ProviderSessionAdapter(
+        owner,
+        provider,
+        owner_id="isolated-test",
+        gm_system_prompt="GM_PRIVATE_INSTRUCTIONS_SENTINEL",
+        campaign_plan={"structure": [{"id": "one", "title": "GM_PLAN_SENTINEL"}], "objectives": []},
+    )
+    events = iter(adapter.for_turn("turn")(gm_input(owner, session)))
+    try:
+        event = next(event for event in events if event.kind is ProviderEventKind.ACTION)
+        assert provider.calls == []
+        assert event.action_command.tool_name == "housekeeping"
+        receipt = owner.execute_action(event.action_command)
+        assert receipt.status.value == "committed", receipt.result
+        assert receipt.result["context"]["message"] == "HOUSEKEEPING_PUBLIC_RESULT"
+        current = owner.actor_decision_request("tokens", turn_id="turn")
+        assert current.actor_id == "a" and current.observation["public_counter"] == 1
+        assert current.actions[0].identity == "a:1"
+        for request in (old, current):
+            with pytest.raises(AuthorityError):
+                owner.actor_decision_command(
+                    request,
+                    choice_id="a:0",
+                    session_id=session.session_id,
+                    owner_id="isolated-test",
+                )
+        for event in events:
+            if event.kind is ProviderEventKind.ACTION:
+                owner.execute_action(event.action_command)
+        first = json.loads(provider.calls[0][0][-1]["content"])
+        assert first["observation"]["public_counter"] == 1
+        assert first["actions"][0]["id"] == "a:1"
+        assert provider.actor_calls == ["a", "b", "c"]
+        assert "HOUSEKEEPING_PUBLIC_RESULT" in json.dumps(provider.wire[-1])
+        assert owner.snapshot("tokens").revision == 4
+    finally:
+        events.close()
+
+
 @pytest.mark.parametrize("committed", [False, True])
 def test_interrupted_actor_reopens_from_its_own_complete_receipts(isolated_game, committed):
     owner, session, database = isolated_game
@@ -727,6 +1025,108 @@ def test_interrupted_actor_reopens_from_its_own_complete_receipts(isolated_game,
             assert reopened.snapshot("tokens").revision == 1 + int(committed)
         finally:
             events.close()
+
+
+@pytest.mark.parametrize("stop_pending", [False, True])
+def test_ooc_and_stop_redirect_leave_pending_npcs_until_gameplay_resumes(
+    isolated_game, stop_pending
+):
+    owner, session, _ = isolated_game
+    loop = CampaignSessionLoop(owner)
+
+    def session_provider(provider):
+        adapter = ProviderSessionAdapter(
+            owner,
+            provider,
+            owner_id="isolated-test",
+            gm_system_prompt="GM_PRIVATE_INSTRUCTIONS_SENTINEL",
+            campaign_plan={
+                "structure": [{"id": "one", "title": "GM_PLAN_SENTINEL"}],
+                "objectives": [],
+            },
+        )
+
+        def run(source):
+            # Keep the real session/Stop/catalog path, with a synthetic Campaign File writer.
+            supplier = source.current_catalog
+            return adapter.for_turn("turn")(
+                replace(
+                    source,
+                    catalog_supplier=lambda discovery: (
+                        *(
+                            tool
+                            for tool in supplier(discovery)
+                            if tool.category != "narrative_state"
+                        ),
+                        _campaign_file_tool(allow_unchanged=True),
+                    ),
+                    narrative_writer=lambda _parameters: {
+                        "status": "campaign_file_unchanged",
+                        "campaign_revision": owner.snapshot("tokens").revision,
+                    },
+                )
+            )
+
+        return run
+
+    interruption_id = None
+    if stop_pending:
+        pending = IsolatedFlowProvider("anthropic_messages", "minimax-m3")
+        stopped = []
+        pending.before_proposal = lambda: stopped.append(loop.stop(session.session_id))
+        result = loop.run(
+            SessionRunRequest(
+                session.session_id,
+                "turn",
+                "pending",
+                "start-input",
+                "PLAYER_CONVERSATION_SENTINEL: Continue the token game.",
+            ),
+            session_provider(pending),
+        )
+        assert result.interruption == stopped[0].interruption
+        assert pending.actor_calls == ["a"]
+        assert owner.snapshot("tokens").revision == 0
+        assert owner.session_context(session.session_id).session.status.value == "stopped"
+        interruption_id = result.interruption.interruption_id
+        owner.resume_agent_session(session.session_id)
+
+    ooc = IsolatedFlowProvider("anthropic_messages", "minimax-m3")
+    ooc.ooc_only = True
+    loop.run(
+        SessionRunRequest(
+            session.session_id,
+            "turn",
+            "ooc",
+            "ooc-input",
+            "",
+            "Pause the game. I want to discuss the table before anyone acts.",
+            redirect_interruption_id=interruption_id,
+        ),
+        session_provider(ooc),
+    )
+    assert ooc.actor_calls == [] and len(ooc.wire) == 1
+    assert owner.snapshot("tokens").revision == 0
+    request = owner.actor_decision_request("tokens", turn_id="turn")
+    assert request.actor_id == "a" and request.actions[0].identity == "a:0"
+    assert any(
+        item.kind.value == "talk" and "paused" in str(item.safe_payload)
+        for item in owner.player_projection("tokens")
+    )
+
+    resumed = IsolatedFlowProvider("anthropic_messages", "minimax-m3")
+    loop.run(
+        SessionRunRequest(
+            session.session_id,
+            "turn",
+            "resume",
+            "resume-input",
+            "PLAYER_CONVERSATION_SENTINEL: Continue the token game now.",
+        ),
+        session_provider(resumed),
+    )
+    assert resumed.actor_calls == ["a", "a", "b", "c"]
+    assert owner.snapshot("tokens").revision == 4
 
 
 @pytest.mark.parametrize(

@@ -13203,6 +13203,7 @@ def test_local_qwen_35_requests_do_not_add_synthetic_assistant_prefill() -> None
         "output_tokens": None,
         "total_tokens": None,
         "cached_tokens": None,
+        "cache_write_tokens": None,
         "reasoning_tokens": None,
     }
 
@@ -13401,6 +13402,7 @@ def test_openai_stream_captures_usage_from_final_chunk_without_choices() -> None
         "output_tokens": 17,
         "total_tokens": 338,
         "cached_tokens": 40,
+        "cache_write_tokens": None,
         "reasoning_tokens": 0,
     }
 
