@@ -1521,6 +1521,7 @@ NETWORK_UI_DYNAMIC_SELECTIONS = frozenset(
 )
 UI_DYNAMIC_SELECTIONS = TACTICAL_UI_DYNAMIC_SELECTIONS | NETWORK_UI_DYNAMIC_SELECTIONS
 _UI_RENDERER_SELECTIONS = {
+    "piece_table": frozenset({"piece"}),
     "party": frozenset({"actor"}),
     "inventory": frozenset({"actor", "declared_action"}),
     "unit_list": frozenset({"actor"}),

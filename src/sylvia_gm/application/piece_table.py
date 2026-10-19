@@ -7,6 +7,7 @@ from the admitted player-control scope, never from a renderer request or table d
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence, Set
+from typing import Any, cast
 
 from sylvia_gm.domain.authority import SafePayload, owned_payload
 
@@ -145,3 +146,29 @@ def project_piece_table(
         })
     result["areas"] = areas
     return owned_payload(result)
+
+
+def resolve_piece_action_parameters(
+    action: Mapping[str, object], selection: object, projected_table: SafePayload,
+) -> SafePayload:
+    """Bind an advertised piece identity only from the viewer's current safe table."""
+
+    bindings = action.get("bindings")
+    fixed = action.get("params")
+    if (
+        not isinstance(bindings, Mapping) or len(bindings) != 1
+        or tuple(bindings.values()) != ("piece",)
+        or not isinstance(fixed, Mapping) or set(bindings) & set(fixed)
+        or not isinstance(selection, Mapping) or set(selection) != {"piece"}
+    ):
+        raise PieceTableError("Invalid piece selection")
+    piece_id = _label(selection["piece"])
+    permitted = any(
+        piece["id"] == piece_id and piece.get("action_id") == action.get("id")
+        for area in cast(Sequence[Mapping[str, Any]], projected_table["areas"])
+        for group in area["groups"]
+        for piece in group.get("pieces", ())
+    )
+    if not permitted:
+        raise PieceTableError("Invalid piece selection")
+    return owned_payload({**fixed, next(iter(bindings)): piece_id})

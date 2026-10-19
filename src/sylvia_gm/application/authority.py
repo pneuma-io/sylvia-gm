@@ -91,7 +91,11 @@ from sylvia_gm.application.player_actions import (
     retain_player_action_origin,
     validate_player_control,
 )
-from sylvia_gm.application.piece_table import PieceTableError, project_piece_table
+from sylvia_gm.application.piece_table import (
+    PieceTableError,
+    project_piece_table,
+    resolve_piece_action_parameters,
+)
 from sylvia_gm.application.result_cards import project_result_card
 from sylvia_gm.application.schema_admission import (
     validate_json_value,
@@ -6524,6 +6528,21 @@ class AuthorityOwner:
         elif surface.get("renderer") == "inventory":
             source_data = resolve_surface_source(surface.get("source"), state=snapshot.state, participants=snapshot.participants)
             parameters = resolve_inventory_action_parameters(action, selection, source_data)
+        elif surface.get("renderer") == "piece_table":
+            source_data = resolve_surface_source(
+                surface.get("source"), state=snapshot.state, participants=snapshot.participants,
+            )
+            try:
+                table = project_piece_table(
+                    source_data,
+                    viewer_ids=player_viewer_ids(snapshot, self._decision_scope_declaration(snapshot)),
+                    action_ids=frozenset(item["id"] for item in surface["actions"]),
+                )
+                parameters = resolve_piece_action_parameters(action, selection, table)
+            except PieceTableError as error:
+                raise CommandRejected(
+                    "Panel action selection is invalid", code="panel_action_invalid",
+                ) from error
         elif surface.get("renderer") in {"party", "unit_list"}:
             source_data = resolve_surface_source(
                 surface.get("source"), state=snapshot.state, participants=snapshot.participants,

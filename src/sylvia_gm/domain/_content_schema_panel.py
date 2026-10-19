@@ -152,7 +152,7 @@ PANEL_DECLARATION_SCHEMA: dict[str, Any] = {
                     "maxProperties": 16,
                     "propertyNames": IDENTITY,
                     "additionalProperties": {
-                        "enum": sorted(set(["actor"] + TACTICAL_BINDINGS + NETWORK_BINDINGS))
+                        "enum": sorted(set(["actor", "piece"] + TACTICAL_BINDINGS + NETWORK_BINDINGS))
                     },
                 },
                 "spatial_preview": {"enum": ["segment"]},
@@ -170,6 +170,12 @@ PANEL_DECLARATION_SCHEMA: dict[str, Any] = {
         },
     },
     "allOf": [
+        {
+            "if": {"properties": {"renderer": {"const": "piece_table"}}},
+            "then": {"properties": {"actions": {"items": {"properties": {
+                "bindings": {"additionalProperties": {"enum": ["piece"]}}
+            }}}}},
+        },
         {
             "if": {"properties": {"renderer": {"const": "coordinate_map"}}},
             "then": {
@@ -231,7 +237,7 @@ PANEL_DECLARATION_SCHEMA: dict[str, Any] = {
         {
             "if": {
                 "properties": {
-                    "renderer": {"not": {"enum": ["party", "unit_list", "inventory", "tactical_grid", "coordinate_map", "network_graph"]}}
+                    "renderer": {"not": {"enum": ["party", "unit_list", "inventory", "tactical_grid", "coordinate_map", "network_graph", "piece_table"]}}
                 }
             },
             "then": {"properties": {"actions": {"items": {"not": {"required": ["bindings"]}}}}},

@@ -6,6 +6,21 @@ const path = require('node:path');
 const context = {};
 vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../src-tauri/frontend/piece-table.js'), 'utf8'), context);
 const render = context.SylviaPieceTable.render;
+const selection = context.SylviaPieceTable.selection;
+
+test('piece binding identifies only a currently exposed piece advertising that action', () => {
+  const action = {id: 'run', label: 'Run program', available: true, bindings: {selected: 'piece'}};
+  const data = {format: 1, title: 'Relay', areas: [{position: 'bottom', label: 'Operator', groups: [
+    {label: 'Programs', pieces: [{id: 'ghost', label: 'Ghost route', action_id: 'run'},
+      {id: 'spent', label: 'Spent route'}]},
+    {label: 'Remote programs', concealed: true, pieces: [{id: 'secret', action_id: 'run'}]},
+  ]}]};
+  assert.match(render(data, [action]), /data-panel-piece-id="ghost"/);
+  assert.equal(JSON.stringify(selection(data, action, 'ghost')), '{"piece":"ghost"}');
+  for (const id of ['secret', 'spent', 'unknown', '', null]) assert.equal(selection(data, action, id), null);
+  assert.equal(selection(data, {...action, bindings: undefined}, 'ghost'), null);
+  assert.equal(selection(data, {...action, bindings: {actor: 'actor'}}, 'ghost'), null);
+});
 
 test('table renders closed owner projection with accessible action references', () => {
   const data = {format: 1, title: 'Relay', status: [{label: 'Cycle', value: '3'}], areas: [

@@ -139,8 +139,14 @@ piece count. Neither the hidden pieces nor the original source are sent to the U
 Public metadata must itself be suitable for all viewers.
 
 A piece may reference `action_id`, the identity of one of this panel's declared
-actions. This renders an ordinary action button. It cannot supply tool parameters
-or bypass existing revision, capability, player-control, or command admission.
+actions. This renders an ordinary action button. An action can declare
+`bindings: {selected_piece: piece}` to bind the clicked piece's opaque identity
+to its `selected_piece` tool parameter. The owner resolves the identity from the
+current permitted table and checks that the piece advertises that action. Hidden,
+missing, or differently bound pieces and extra selection fields are rejected.
+The selection cannot replace fixed parameters or bypass existing revision,
+capability, player-control, or command admission. Availability checks are specific
+to the selected piece; the Ruleset still decides whether that move is legal.
 Avoid private values in action declarations: declarations are public presentation.
 The Ruleset still computes legal actions, scoring and state transitions. Invalid
 tables show an unavailable message with no table controls.

@@ -84,8 +84,9 @@ def test_viewing_identity_is_stable_during_other_actor_turns():
 
 
 @pytest.mark.parametrize("source_kind", ["state", "literal"])
+@pytest.mark.parametrize("bind_piece", [False, True])
 def test_declared_table_reaches_ordinary_owner_and_reopens_without_hidden_pieces(
-    tmp_path, source_kind,
+    tmp_path, source_kind, bind_piece,
 ):
     raw = table()
     raw["areas"][0]["groups"][0]["pieces"][0]["action_id"] = "run"
@@ -114,6 +115,14 @@ def test_declared_table_reaches_ordinary_owner_and_reopens_without_hidden_pieces
             } if source_kind == "state" else {"kind": "literal", "value": raw},
         }],
     }
+    if bind_piece:
+        source["mechanic_families"]["activate"]["parameters"] = [{
+            "name": "selected_piece", "type": "string", "source": "choice", "required": True,
+        }]
+        source["mechanic_families"]["activate"]["effects"].append({
+            "set": {"field": "state.selected_piece", "value": "selected_piece"},
+        })
+        source["ui_surfaces"][0]["actions"][0]["bindings"] = {"selected_piece": "piece"}
     compiled = compile_ruleset_source(yaml.safe_dump(source).encode("utf-8"))
     database = tmp_path / "table.db"
     with AuthorityOwner.open(database, "seed") as owner:
@@ -129,6 +138,16 @@ def test_declared_table_reaches_ordinary_owner_and_reopens_without_hidden_pieces
         request = {"campaign_id": "table-campaign", "surface_id": "console",
                    "panel_action_id": "run", "operation_id": "activate-once",
                    "expected_revision": before["revision"]}
+        if bind_piece:
+            for index, selection in enumerate((
+                None, {"piece": "hidden-intercept"}, {"piece": "relay-b"},
+                {"piece": "unknown"}, {"piece": "relay-a", "replacement": "extra"},
+            )):
+                with pytest.raises(CommandRejected, match="selection is invalid"):
+                    owner.execute_panel_action(**{
+                        **request, "operation_id": f"invalid-{index}", "selection": selection,
+                    })
+            request["selection"] = {"piece": "relay-a"}
         receipt = owner.execute_panel_action(**request)
         assert receipt.status.value == "committed"
         assert owner.execute_panel_action(**request) == receipt

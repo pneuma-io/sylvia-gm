@@ -6,6 +6,16 @@
       ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
   }
 
+  function selection(data, action, pieceId) {
+    if (typeof pieceId !== 'string' || !pieceId ||
+        Object.values(action.bindings || {}).length !== 1 ||
+        Object.values(action.bindings || {})[0] !== 'piece') return null;
+    const permitted = (data?.areas || []).some(area => (area.groups || []).some(group =>
+      !group.concealed && (group.pieces || []).some(piece =>
+        piece.id === pieceId && piece.action_id === action.id)));
+    return permitted ? {piece: pieceId} : null;
+  }
+
   function render(data, actions = []) {
     if (!data || data.format !== 1 || !Array.isArray(data.areas))
       return '<p class="panel-empty" role="status">Table unavailable.</p>';
@@ -29,6 +39,8 @@
             const content = action
               ? `<button type="button" class="piece-table-piece ruleset-panel-action" ` +
                 `data-panel-action-id="${escape(action.id)}" ` +
+                (Object.values(action.bindings || {}).includes('piece')
+                  ? `data-panel-piece-id="${escape(piece.id)}" ` : '') +
                 `aria-label="${escape(action.label)}: ${escape(piece.label)}" ` +
                 `${action.available === true ? '' : 'disabled'}>${text}</button>`
               : `<span class="piece-table-piece">${text}</span>`;
@@ -44,5 +56,5 @@
       `<dl class="piece-table-status">${statuses}</dl></header>` +
       `<div class="piece-table-areas">${areas}</div></div>`;
   }
-  root.SylviaPieceTable = { render };
+  root.SylviaPieceTable = { render, selection };
 })(typeof window === 'undefined' ? globalThis : window);
