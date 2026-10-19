@@ -1066,12 +1066,16 @@ def _runtime_parameters(
     tool: ToolDef,
     parameters: SafePayload,
     bridge: AuthorityMemoryStateBridge,
+    *,
+    preserve_explicit: bool = False,
 ) -> dict[str, Any]:
-    """Use the same defaults and authority-bound values for checks and execution."""
+    """Bind public inputs to authority; retain explicit arguments in internal Ruleset calls."""
 
     bound = cast(dict[str, Any], _mutable_json(parameters))
     for parameter in tool.parameters:
-        if parameter.from_state is not None:
+        if parameter.from_state is not None and not (
+            preserve_explicit and parameter.name in bound
+        ):
             bound[parameter.name] = _bound_runtime_parameter(bridge, parameter.from_state)
         elif parameter.name not in bound and parameter.default is not None:
             bound[parameter.name] = deepcopy(parameter.default)
@@ -1321,7 +1325,9 @@ def materialize_package_mechanic(
             _parent: ExecutionContext,
         ) -> ToolResult:
             if tool_name in tools:
-                nested_parameters = _runtime_parameters(tools[tool_name], nested_parameters, bridge)
+                nested_parameters = _runtime_parameters(
+                    tools[tool_name], nested_parameters, bridge, preserve_explicit=True,
+                )
             return execute_tool(
                 tool_name,
                 nested_parameters,
