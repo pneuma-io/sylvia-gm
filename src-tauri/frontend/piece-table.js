@@ -19,6 +19,8 @@
   function render(data, actions = []) {
     if (!data || data.format !== 1 || !Array.isArray(data.areas))
       return '<p class="panel-empty" role="status">Table unavailable.</p>';
+    if (data.layout === 'four_sided' && root.SylviaTileTable && root.SylviaTileFaces)
+      return root.SylviaTileTable.render(data, actions);
     const controls = new Map(actions.map((action) => [action.id, action]));
     const statuses = (data.status || []).map((row) =>
       `<div><dt>${escape(row.label)}</dt><dd>${escape(row.value)}</dd></div>`).join('');

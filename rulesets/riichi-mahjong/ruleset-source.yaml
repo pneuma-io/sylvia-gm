@@ -1,6 +1,6 @@
 format: 1
 id: pneuma.riichi-mahjong
-version: 0.1.0
+version: 0.1.1
 label: Riichi Mahjong
 publisher: Pneuma IO
 mechanic_families:
@@ -499,6 +499,7 @@ mechanic_families:
         field: state.table
         value:
           format: 1
+          layout: '"four_sided"'
           title: '"Riichi Mahjong"'
           status: _statuses
           areas: _areas
@@ -580,6 +581,8 @@ mechanic_families:
             value:
               id: '''tile:'' + text(_tile)'
               label: _face.label
+              face: _face.face
+              flags: []
         - condition:
             condition: _face.red
             on_true:
@@ -595,6 +598,8 @@ mechanic_families:
                 value:
                   detail: '"Drawn tile"'
                   emphasis: '"accent"'
+                  flags:
+                  - '"drawn"'
             - set:
                 field: _piece
                 value: merge(_piece, _drawn)
@@ -630,6 +635,7 @@ mechanic_families:
         value:
           id: '"hand"'
           label: '"Hand"'
+          role: '"rack"'
           visibility: '"owner"'
           owner: _actor_id
           show_count: true
@@ -704,6 +710,8 @@ mechanic_families:
             value:
               id: '"winning-discard"'
               label: definitions.tiles[state.winning_tile].label
+              face: definitions.tiles[state.winning_tile].face
+              flags: []
               detail: '"Winning discard"'
               emphasis: '"accent"'
         - set:
@@ -718,6 +726,9 @@ mechanic_families:
         field: _pieces
         value: []
     - set:
+        field: _riichi_marker
+        value: false
+    - set:
         field: _discards
         value: actor.game.discards
     - for_each:
@@ -729,6 +740,8 @@ mechanic_families:
             value:
               id: '''discard:'' + text(_discard.tile)'
               label: definitions.tiles[_discard.tile].label
+              face: definitions.tiles[_discard.tile].face
+              flags: []
         - condition:
             condition: definitions.tiles[_discard.tile].red
             on_true:
@@ -739,6 +752,9 @@ mechanic_families:
         - condition:
             condition: _discard.riichi
             on_true:
+            - set:
+                field: _riichi_marker
+                value: true
             - set:
                 field: _flag
                 value:
@@ -756,9 +772,26 @@ mechanic_families:
                 value:
                   detail: '"Called into a meld"'
                   emphasis: '"muted"'
+                  flags:
+                  - '"claimed"'
             - set:
                 field: _piece
                 value: merge(_piece, _flag)
+            on_false: []
+        - condition:
+            condition: _riichi_marker and not _discard.claimed
+            on_true:
+            - set:
+                field: _flag
+                value:
+                  flags:
+                  - '"sideways"'
+            - set:
+                field: _piece
+                value: merge(_piece, _flag)
+            - set:
+                field: _riichi_marker
+                value: false
             on_false: []
         - condition:
             condition: state.last_discard != null and _discard.tile == state.last_discard.tile
@@ -767,8 +800,8 @@ mechanic_families:
             - set:
                 field: _flag
                 value:
-                  detail: '"Latest discard"'
                   emphasis: '"accent"'
+                  flags: joined(_piece.flags, one('latest'))
             - set:
                 field: _piece
                 value: merge(_piece, _flag)
@@ -781,8 +814,39 @@ mechanic_families:
         value:
           id: '"discards"'
           label: '"Discards"'
+          role: '"pond"'
           visibility: '"public"'
           pieces: _pieces
+    - set:
+        field: _regular
+        value: []
+    - set:
+        field: _drawn_pieces
+        value: []
+    - set:
+        field: _rack_pieces
+        value: _hand.pieces
+    - for_each:
+        collection: _rack_pieces
+        as: _rack_piece
+        do:
+        - condition:
+            condition: '''drawn'' in _rack_piece.flags'
+            on_true:
+            - list_push:
+                list: _drawn_pieces
+                value: _rack_piece
+            on_false:
+            - list_push:
+                list: _regular
+                value: _rack_piece
+    - set:
+        field: _complete_hand
+        value:
+          pieces: joined(_regular, _drawn_pieces)
+    - set:
+        field: _hand
+        value: merge(_hand, _complete_hand)
     - set:
         field: _groups
         value:
@@ -804,8 +868,105 @@ mechanic_families:
         - set:
             field: _tiles
             value: ordered(_meld.tiles)
+        - set:
+            field: _called
+            value: -1
+        - set:
+            field: _added
+            value: -1
+        - set:
+            field: _offset
+            value: (_meld.source_seat - actor.seat + 4) % 4
+        - condition:
+            condition: _meld.opened
+            on_true:
+            - condition:
+                condition: 'true'
+                on_true:
+                - set:
+                    field: _argument_actor
+                    value: state.seats[_meld.source_seat]
+                - call: _discard_history
+                  params:
+                    actor: '{_argument_actor}'
+                  export_context:
+                    _source_discards: _source_discards
+                on_false: []
+            - for_each:
+                collection: _source_discards
+                as: _source_discard
+                do:
+                - condition:
+                    condition: _source_discard.claimed and _source_discard.tile in
+                      _meld.tiles
+                    on_true:
+                    - set:
+                        field: _called
+                        value: _source_discard.tile
+                    on_false: []
+            - condition:
+                condition: _meld.quad and _called != _meld.tiles[3]
+                on_true:
+                - set:
+                    field: _added
+                    value: _meld.tiles[3]
+                on_false: []
+            on_false: []
+        - set:
+            field: _normal
+            value: []
         - for_each:
             collection: _tiles
+            as: _normal_tile
+            do:
+            - condition:
+                condition: _normal_tile != _called and _normal_tile != _added
+                on_true:
+                - list_push:
+                    list: _normal
+                    value: _normal_tile
+                on_false: []
+        - set:
+            field: _ordered
+            value: _tiles
+        - condition:
+            condition: not _meld.opened and definitions.tiles[_tiles[0]].red
+            on_true:
+            - set:
+                field: _ordered
+                value:
+                - _tiles[1]
+                - _tiles[0]
+                - _tiles[2]
+                - _tiles[3]
+            on_false: []
+        - condition:
+            condition: _called >= 0
+            on_true:
+            - set:
+                field: _slot
+                value: 0
+            - condition:
+                condition: _offset == 1
+                on_true:
+                - set:
+                    field: _slot
+                    value: len(_normal)
+                on_false: []
+            - condition:
+                condition: _offset == 2
+                on_true:
+                - set:
+                    field: _slot
+                    value: 1
+                on_false: []
+            - set:
+                field: _ordered
+                value: joined(joined(portion(_normal, 0, _slot), one(_called)), portion(_normal,
+                  _slot, len(_normal)))
+            on_false: []
+        - for_each:
+            collection: _ordered
             as: _tile
             do:
             - set:
@@ -813,6 +974,33 @@ mechanic_families:
                 value:
                   id: '''meld:'' + text(_tile)'
                   label: definitions.tiles[_tile].label
+                  face: definitions.tiles[_tile].face
+                  flags: []
+            - condition:
+                condition: _tile == _called
+                on_true:
+                - set:
+                    field: _flag
+                    value:
+                      flags:
+                      - '"sideways"'
+                - set:
+                    field: _piece
+                    value: merge(_piece, _flag)
+                on_false: []
+            - condition:
+                condition: not _meld.opened and (_tile == _ordered[0] or _tile ==
+                  _ordered[3])
+                on_true:
+                - set:
+                    field: _flag
+                    value:
+                      flags:
+                      - '"back"'
+                - set:
+                    field: _piece
+                    value: merge(_piece, _flag)
+                on_false: []
             - condition:
                 condition: definitions.tiles[_tile].red
                 on_true:
@@ -823,6 +1011,18 @@ mechanic_families:
             - list_push:
                 list: _pieces
                 value: _piece
+            - condition:
+                condition: _tile == _called and _added >= 0
+                on_true:
+                - list_push:
+                    list: _pieces
+                    value:
+                      id: '''meld:'' + text(_added)'
+                      label: definitions.tiles[_added].label
+                      face: definitions.tiles[_added].face
+                      flags:
+                      - '"stacked"'
+                on_false: []
         - set:
             field: _label
             value: '"Pon"'
@@ -852,6 +1052,8 @@ mechanic_families:
             value:
               id: '''meld:'' + text(_index)'
               label: _label
+              role: '"meld"'
+              source: definitions.call_sources[_offset]
               visibility: '"public"'
               pieces: _pieces
         - set:
@@ -888,6 +1090,9 @@ mechanic_families:
           id: _actor_id
           label: _seat_label
           position: definitions.positions[actor.seat]
+          badge: definitions.wind_glyphs[(actor.seat - state.dealer + 4) % 4]
+          score: text(actor.score)
+          active: _actor_id == state.actor and not state.finished
           groups: _groups
     pre_conditions: []
     narrative: {}
@@ -919,6 +1124,7 @@ mechanic_families:
             value:
               id: '''dora:'' + text(_index)'
               label: definitions.tiles[state.dead[4 + _index * 2]].label
+              face: definitions.tiles[state.dead[4 + _index * 2]].face
     - call: _choice_table
       params:
         actor: '{state.actor}'
@@ -1013,14 +1219,17 @@ mechanic_families:
           groups:
           - id: '"dora"'
             label: '"Dora indicators"'
+            role: '"indicators"'
             visibility: '"public"'
             pieces: _dora
           - id: '"choices"'
             label: '"Actions"'
+            role: '"actions"'
             visibility: '"public"'
             pieces: _options
           - id: '"result"'
             label: '"Table"'
+            role: '"message"'
             visibility: '"public"'
             pieces: _info
     pre_conditions: []
@@ -1062,11 +1271,34 @@ mechanic_families:
             - condition:
                 condition: _choice.op != 'discard'
                 on_true:
+                - set:
+                    field: _faces
+                    value: []
+                - set:
+                    field: _choice_tiles
+                    value: _choice.tiles
+                - for_each:
+                    collection: _choice_tiles
+                    as: _choice_tile
+                    do:
+                    - list_push:
+                        list: _faces
+                        value: definitions.tiles[_choice_tile].face
+                - condition:
+                    condition: _choice.op == 'chi' or _choice.op == 'pon' or _choice.op
+                      == 'minkan'
+                    on_true:
+                    - list_push:
+                        list: _faces
+                        value: definitions.tiles[state.last_discard.tile].face
+                    on_false: []
                 - list_push:
                     list: _options
                     value:
                       id: _choice.id
-                      label: _choice.label
+                      label: definitions.action_labels[_choice.op]
+                      detail: _choice.label
+                      faces: _faces
                       action_id: '"play"'
                 on_false: []
         on_false: []
@@ -5085,6 +5317,15 @@ mechanic_families:
             value: '"Next hand dealt."'
     pre_conditions: []
     narrative: {}
+  discard_history:
+    parameters:
+    - *id002
+    effects:
+    - set:
+        field: _source_discards
+        value: actor.game.discards
+    pre_conditions: []
+    narrative: {}
   public_seat:
     parameters:
     - *id002
@@ -5368,6 +5609,10 @@ private_mechanics:
   family: advance_match
   description: Package-owned advance match.
   configure: {}
+- name: _discard_history
+  family: discard_history
+  description: Package-owned discard history.
+  configure: {}
 - name: _public_seat
   family: public_seat
   description: Package-owned public seat.
@@ -5381,411 +5626,955 @@ definitions:
   - kind: 0
     red: false
     label: 1m
+    face:
+      family: mahjong
+      kind: 0
+      red: false
   - kind: 0
     red: false
     label: 1m
+    face:
+      family: mahjong
+      kind: 0
+      red: false
   - kind: 0
     red: false
     label: 1m
+    face:
+      family: mahjong
+      kind: 0
+      red: false
   - kind: 0
     red: false
     label: 1m
+    face:
+      family: mahjong
+      kind: 0
+      red: false
   - kind: 1
     red: false
     label: 2m
+    face:
+      family: mahjong
+      kind: 1
+      red: false
   - kind: 1
     red: false
     label: 2m
+    face:
+      family: mahjong
+      kind: 1
+      red: false
   - kind: 1
     red: false
     label: 2m
+    face:
+      family: mahjong
+      kind: 1
+      red: false
   - kind: 1
     red: false
     label: 2m
+    face:
+      family: mahjong
+      kind: 1
+      red: false
   - kind: 2
     red: false
     label: 3m
+    face:
+      family: mahjong
+      kind: 2
+      red: false
   - kind: 2
     red: false
     label: 3m
+    face:
+      family: mahjong
+      kind: 2
+      red: false
   - kind: 2
     red: false
     label: 3m
+    face:
+      family: mahjong
+      kind: 2
+      red: false
   - kind: 2
     red: false
     label: 3m
+    face:
+      family: mahjong
+      kind: 2
+      red: false
   - kind: 3
     red: false
     label: 4m
+    face:
+      family: mahjong
+      kind: 3
+      red: false
   - kind: 3
     red: false
     label: 4m
+    face:
+      family: mahjong
+      kind: 3
+      red: false
   - kind: 3
     red: false
     label: 4m
+    face:
+      family: mahjong
+      kind: 3
+      red: false
   - kind: 3
     red: false
     label: 4m
+    face:
+      family: mahjong
+      kind: 3
+      red: false
   - kind: 4
     red: true
     label: 5m (red)
+    face:
+      family: mahjong
+      kind: 4
+      red: true
   - kind: 4
     red: false
     label: 5m
+    face:
+      family: mahjong
+      kind: 4
+      red: false
   - kind: 4
     red: false
     label: 5m
+    face:
+      family: mahjong
+      kind: 4
+      red: false
   - kind: 4
     red: false
     label: 5m
+    face:
+      family: mahjong
+      kind: 4
+      red: false
   - kind: 5
     red: false
     label: 6m
+    face:
+      family: mahjong
+      kind: 5
+      red: false
   - kind: 5
     red: false
     label: 6m
+    face:
+      family: mahjong
+      kind: 5
+      red: false
   - kind: 5
     red: false
     label: 6m
+    face:
+      family: mahjong
+      kind: 5
+      red: false
   - kind: 5
     red: false
     label: 6m
+    face:
+      family: mahjong
+      kind: 5
+      red: false
   - kind: 6
     red: false
     label: 7m
+    face:
+      family: mahjong
+      kind: 6
+      red: false
   - kind: 6
     red: false
     label: 7m
+    face:
+      family: mahjong
+      kind: 6
+      red: false
   - kind: 6
     red: false
     label: 7m
+    face:
+      family: mahjong
+      kind: 6
+      red: false
   - kind: 6
     red: false
     label: 7m
+    face:
+      family: mahjong
+      kind: 6
+      red: false
   - kind: 7
     red: false
     label: 8m
+    face:
+      family: mahjong
+      kind: 7
+      red: false
   - kind: 7
     red: false
     label: 8m
+    face:
+      family: mahjong
+      kind: 7
+      red: false
   - kind: 7
     red: false
     label: 8m
+    face:
+      family: mahjong
+      kind: 7
+      red: false
   - kind: 7
     red: false
     label: 8m
+    face:
+      family: mahjong
+      kind: 7
+      red: false
   - kind: 8
     red: false
     label: 9m
+    face:
+      family: mahjong
+      kind: 8
+      red: false
   - kind: 8
     red: false
     label: 9m
+    face:
+      family: mahjong
+      kind: 8
+      red: false
   - kind: 8
     red: false
     label: 9m
+    face:
+      family: mahjong
+      kind: 8
+      red: false
   - kind: 8
     red: false
     label: 9m
+    face:
+      family: mahjong
+      kind: 8
+      red: false
   - kind: 9
     red: false
     label: 1p
+    face:
+      family: mahjong
+      kind: 9
+      red: false
   - kind: 9
     red: false
     label: 1p
+    face:
+      family: mahjong
+      kind: 9
+      red: false
   - kind: 9
     red: false
     label: 1p
+    face:
+      family: mahjong
+      kind: 9
+      red: false
   - kind: 9
     red: false
     label: 1p
+    face:
+      family: mahjong
+      kind: 9
+      red: false
   - kind: 10
     red: false
     label: 2p
+    face:
+      family: mahjong
+      kind: 10
+      red: false
   - kind: 10
     red: false
     label: 2p
+    face:
+      family: mahjong
+      kind: 10
+      red: false
   - kind: 10
     red: false
     label: 2p
+    face:
+      family: mahjong
+      kind: 10
+      red: false
   - kind: 10
     red: false
     label: 2p
+    face:
+      family: mahjong
+      kind: 10
+      red: false
   - kind: 11
     red: false
     label: 3p
+    face:
+      family: mahjong
+      kind: 11
+      red: false
   - kind: 11
     red: false
     label: 3p
+    face:
+      family: mahjong
+      kind: 11
+      red: false
   - kind: 11
     red: false
     label: 3p
+    face:
+      family: mahjong
+      kind: 11
+      red: false
   - kind: 11
     red: false
     label: 3p
+    face:
+      family: mahjong
+      kind: 11
+      red: false
   - kind: 12
     red: false
     label: 4p
+    face:
+      family: mahjong
+      kind: 12
+      red: false
   - kind: 12
     red: false
     label: 4p
+    face:
+      family: mahjong
+      kind: 12
+      red: false
   - kind: 12
     red: false
     label: 4p
+    face:
+      family: mahjong
+      kind: 12
+      red: false
   - kind: 12
     red: false
     label: 4p
+    face:
+      family: mahjong
+      kind: 12
+      red: false
   - kind: 13
     red: true
     label: 5p (red)
+    face:
+      family: mahjong
+      kind: 13
+      red: true
   - kind: 13
     red: false
     label: 5p
+    face:
+      family: mahjong
+      kind: 13
+      red: false
   - kind: 13
     red: false
     label: 5p
+    face:
+      family: mahjong
+      kind: 13
+      red: false
   - kind: 13
     red: false
     label: 5p
+    face:
+      family: mahjong
+      kind: 13
+      red: false
   - kind: 14
     red: false
     label: 6p
+    face:
+      family: mahjong
+      kind: 14
+      red: false
   - kind: 14
     red: false
     label: 6p
+    face:
+      family: mahjong
+      kind: 14
+      red: false
   - kind: 14
     red: false
     label: 6p
+    face:
+      family: mahjong
+      kind: 14
+      red: false
   - kind: 14
     red: false
     label: 6p
+    face:
+      family: mahjong
+      kind: 14
+      red: false
   - kind: 15
     red: false
     label: 7p
+    face:
+      family: mahjong
+      kind: 15
+      red: false
   - kind: 15
     red: false
     label: 7p
+    face:
+      family: mahjong
+      kind: 15
+      red: false
   - kind: 15
     red: false
     label: 7p
+    face:
+      family: mahjong
+      kind: 15
+      red: false
   - kind: 15
     red: false
     label: 7p
+    face:
+      family: mahjong
+      kind: 15
+      red: false
   - kind: 16
     red: false
     label: 8p
+    face:
+      family: mahjong
+      kind: 16
+      red: false
   - kind: 16
     red: false
     label: 8p
+    face:
+      family: mahjong
+      kind: 16
+      red: false
   - kind: 16
     red: false
     label: 8p
+    face:
+      family: mahjong
+      kind: 16
+      red: false
   - kind: 16
     red: false
     label: 8p
+    face:
+      family: mahjong
+      kind: 16
+      red: false
   - kind: 17
     red: false
     label: 9p
+    face:
+      family: mahjong
+      kind: 17
+      red: false
   - kind: 17
     red: false
     label: 9p
+    face:
+      family: mahjong
+      kind: 17
+      red: false
   - kind: 17
     red: false
     label: 9p
+    face:
+      family: mahjong
+      kind: 17
+      red: false
   - kind: 17
     red: false
     label: 9p
+    face:
+      family: mahjong
+      kind: 17
+      red: false
   - kind: 18
     red: false
     label: 1s
+    face:
+      family: mahjong
+      kind: 18
+      red: false
   - kind: 18
     red: false
     label: 1s
+    face:
+      family: mahjong
+      kind: 18
+      red: false
   - kind: 18
     red: false
     label: 1s
+    face:
+      family: mahjong
+      kind: 18
+      red: false
   - kind: 18
     red: false
     label: 1s
+    face:
+      family: mahjong
+      kind: 18
+      red: false
   - kind: 19
     red: false
     label: 2s
+    face:
+      family: mahjong
+      kind: 19
+      red: false
   - kind: 19
     red: false
     label: 2s
+    face:
+      family: mahjong
+      kind: 19
+      red: false
   - kind: 19
     red: false
     label: 2s
+    face:
+      family: mahjong
+      kind: 19
+      red: false
   - kind: 19
     red: false
     label: 2s
+    face:
+      family: mahjong
+      kind: 19
+      red: false
   - kind: 20
     red: false
     label: 3s
+    face:
+      family: mahjong
+      kind: 20
+      red: false
   - kind: 20
     red: false
     label: 3s
+    face:
+      family: mahjong
+      kind: 20
+      red: false
   - kind: 20
     red: false
     label: 3s
+    face:
+      family: mahjong
+      kind: 20
+      red: false
   - kind: 20
     red: false
     label: 3s
+    face:
+      family: mahjong
+      kind: 20
+      red: false
   - kind: 21
     red: false
     label: 4s
+    face:
+      family: mahjong
+      kind: 21
+      red: false
   - kind: 21
     red: false
     label: 4s
+    face:
+      family: mahjong
+      kind: 21
+      red: false
   - kind: 21
     red: false
     label: 4s
+    face:
+      family: mahjong
+      kind: 21
+      red: false
   - kind: 21
     red: false
     label: 4s
+    face:
+      family: mahjong
+      kind: 21
+      red: false
   - kind: 22
     red: true
     label: 5s (red)
+    face:
+      family: mahjong
+      kind: 22
+      red: true
   - kind: 22
     red: false
     label: 5s
+    face:
+      family: mahjong
+      kind: 22
+      red: false
   - kind: 22
     red: false
     label: 5s
+    face:
+      family: mahjong
+      kind: 22
+      red: false
   - kind: 22
     red: false
     label: 5s
+    face:
+      family: mahjong
+      kind: 22
+      red: false
   - kind: 23
     red: false
     label: 6s
+    face:
+      family: mahjong
+      kind: 23
+      red: false
   - kind: 23
     red: false
     label: 6s
+    face:
+      family: mahjong
+      kind: 23
+      red: false
   - kind: 23
     red: false
     label: 6s
+    face:
+      family: mahjong
+      kind: 23
+      red: false
   - kind: 23
     red: false
     label: 6s
+    face:
+      family: mahjong
+      kind: 23
+      red: false
   - kind: 24
     red: false
     label: 7s
+    face:
+      family: mahjong
+      kind: 24
+      red: false
   - kind: 24
     red: false
     label: 7s
+    face:
+      family: mahjong
+      kind: 24
+      red: false
   - kind: 24
     red: false
     label: 7s
+    face:
+      family: mahjong
+      kind: 24
+      red: false
   - kind: 24
     red: false
     label: 7s
+    face:
+      family: mahjong
+      kind: 24
+      red: false
   - kind: 25
     red: false
     label: 8s
+    face:
+      family: mahjong
+      kind: 25
+      red: false
   - kind: 25
     red: false
     label: 8s
+    face:
+      family: mahjong
+      kind: 25
+      red: false
   - kind: 25
     red: false
     label: 8s
+    face:
+      family: mahjong
+      kind: 25
+      red: false
   - kind: 25
     red: false
     label: 8s
+    face:
+      family: mahjong
+      kind: 25
+      red: false
   - kind: 26
     red: false
     label: 9s
+    face:
+      family: mahjong
+      kind: 26
+      red: false
   - kind: 26
     red: false
     label: 9s
+    face:
+      family: mahjong
+      kind: 26
+      red: false
   - kind: 26
     red: false
     label: 9s
+    face:
+      family: mahjong
+      kind: 26
+      red: false
   - kind: 26
     red: false
     label: 9s
+    face:
+      family: mahjong
+      kind: 26
+      red: false
   - kind: 27
     red: false
     label: East
+    face:
+      family: mahjong
+      kind: 27
+      red: false
   - kind: 27
     red: false
     label: East
+    face:
+      family: mahjong
+      kind: 27
+      red: false
   - kind: 27
     red: false
     label: East
+    face:
+      family: mahjong
+      kind: 27
+      red: false
   - kind: 27
     red: false
     label: East
+    face:
+      family: mahjong
+      kind: 27
+      red: false
   - kind: 28
     red: false
     label: South
+    face:
+      family: mahjong
+      kind: 28
+      red: false
   - kind: 28
     red: false
     label: South
+    face:
+      family: mahjong
+      kind: 28
+      red: false
   - kind: 28
     red: false
     label: South
+    face:
+      family: mahjong
+      kind: 28
+      red: false
   - kind: 28
     red: false
     label: South
+    face:
+      family: mahjong
+      kind: 28
+      red: false
   - kind: 29
     red: false
     label: West
+    face:
+      family: mahjong
+      kind: 29
+      red: false
   - kind: 29
     red: false
     label: West
+    face:
+      family: mahjong
+      kind: 29
+      red: false
   - kind: 29
     red: false
     label: West
+    face:
+      family: mahjong
+      kind: 29
+      red: false
   - kind: 29
     red: false
     label: West
+    face:
+      family: mahjong
+      kind: 29
+      red: false
   - kind: 30
     red: false
     label: North
+    face:
+      family: mahjong
+      kind: 30
+      red: false
   - kind: 30
     red: false
     label: North
+    face:
+      family: mahjong
+      kind: 30
+      red: false
   - kind: 30
     red: false
     label: North
+    face:
+      family: mahjong
+      kind: 30
+      red: false
   - kind: 30
     red: false
     label: North
+    face:
+      family: mahjong
+      kind: 30
+      red: false
   - kind: 31
     red: false
     label: White
+    face:
+      family: mahjong
+      kind: 31
+      red: false
   - kind: 31
     red: false
     label: White
+    face:
+      family: mahjong
+      kind: 31
+      red: false
   - kind: 31
     red: false
     label: White
+    face:
+      family: mahjong
+      kind: 31
+      red: false
   - kind: 31
     red: false
     label: White
+    face:
+      family: mahjong
+      kind: 31
+      red: false
   - kind: 32
     red: false
     label: Green
+    face:
+      family: mahjong
+      kind: 32
+      red: false
   - kind: 32
     red: false
     label: Green
+    face:
+      family: mahjong
+      kind: 32
+      red: false
   - kind: 32
     red: false
     label: Green
+    face:
+      family: mahjong
+      kind: 32
+      red: false
   - kind: 32
     red: false
     label: Green
+    face:
+      family: mahjong
+      kind: 32
+      red: false
   - kind: 33
     red: false
     label: Red
+    face:
+      family: mahjong
+      kind: 33
+      red: false
   - kind: 33
     red: false
     label: Red
+    face:
+      family: mahjong
+      kind: 33
+      red: false
   - kind: 33
     red: false
     label: Red
+    face:
+      family: mahjong
+      kind: 33
+      red: false
   - kind: 33
     red: false
     label: Red
+    face:
+      family: mahjong
+      kind: 33
+      red: false
   positions:
   - bottom
   - right
@@ -5800,6 +6589,28 @@ definitions:
   - South
   - West
   - North
+  wind_glyphs:
+  - 東
+  - 南
+  - 西
+  - 北
+  call_sources:
+  - self
+  - right
+  - across
+  - left
+  action_labels:
+    riichi: Riichi
+    tsumo: Tsumo
+    ron: Ron
+    pass: Pass
+    chi: Chi
+    pon: Pon
+    minkan: Open kan
+    ankan: Concealed kan
+    kakan: Added kan
+    continue: Next hand
+    abort_nine: Nine terminals draw
   patterns:
   - - 0
     - 0
@@ -6219,7 +7030,7 @@ ui_surfaces:
   title: Riichi Mahjong
   capability: pneuma.riichi-mahjong.play
   renderer: piece_table
-  default_size: 560
+  default_size: 760
   minimum_size: 300
   source:
     kind: state

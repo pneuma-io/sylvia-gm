@@ -23,10 +23,10 @@ from sylvia_gm.infrastructure.package_archive import admit_package_archive
 from tests.test_alpha_f6e_owner_session_transport import _OwnerHarness
 
 
-def test_bundled_riichi_is_the_validated_original_package() -> None:
+def test_bundled_riichi_is_the_validated_tile_presentation_package() -> None:
     archive = bundled_riichi_archive()
     assert hashlib.sha256(archive).hexdigest() == (
-        "c090627edfcc91346fad1e55769ddb5423076fada077d43951fd535e09313a2f"
+        "c50d43a0c09abdf6745af7adb5dfa4246daf56282d93df0d20c3697e7e721d6b"
     )
     with admit_package_archive(io.BytesIO(archive)) as admitted:
         validate_admitted_package_runtimes(admitted)
@@ -122,3 +122,47 @@ def test_startup_preserves_edited_content_and_supplies_a_missing_setting(
             owner.export_package_candidate(changed.candidate_id, exported)
             assert exported.getvalue() == expected
     assert authored.read_bytes() == b"# My unfinished campaign\nDo not replace this draft.\n"
+
+
+def test_new_presentation_preserves_an_existing_playing_010_campaign(tmp_path: Path) -> None:
+    from sylvia_gm.application.authority import CampaignCreate
+    from sylvia_gm.domain.authority import Participant, ParticipantValidationStatus, WriterRole
+    from tests.test_riichi_mahjong import Table
+
+    legacy = Path(__file__).resolve().parents[1] / (
+        "rulesets/riichi-mahjong/riichi-mahjong-0.1.0.sylvia-gm-package"
+    )
+    raw = legacy.read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == (
+        "c090627edfcc91346fad1e55769ddb5423076fada077d43951fd535e09313a2f"
+    )
+    with admit_package_archive(io.BytesIO(raw)) as admitted:
+        rules = next(item for item in admitted.manifests
+                     if item.package_id == "pneuma.riichi-mahjong")
+        schema = rules.participant_artifacts[0]
+    database = tmp_path / "legacy.db"
+    with AuthorityOwner.open(database, "riichi-test") as owner:
+        original = owner.install_package_archive(io.BytesIO(raw), install_id="saved-010")
+        owner.create_campaign(CampaignCreate(
+            campaign_id="riichi", display_name="Retained 0.1.0 match", writer=WriterRole.DM,
+            package_lock=original.package_lock, turn_id="turn", participants=(Participant(
+                participant_id="you", kind="player", package_id=rules.package_id,
+                package_version=rules.version, package_sha256=rules.content_sha256,
+                schema_id=schema.schema_id, schema_sha256=schema.schema_sha256,
+                validation_status=ParticipantValidationStatus.VALIDATED,
+                data={"name": "You", "control": "player"},
+            ),),
+        ))
+        table = Table(owner)
+        table.act("start_game", {"player": "you", "match_format": "east_only"})
+        saved = table.snapshot()
+    harness = _OwnerHarness(database, None)
+    try:
+        catalog = harness.request("catalog", "campaign_creation_catalog")
+        plan = next(item for item in catalog if item.get("id") == "riichi-quick-test")
+        assert plan["ruleset"]["version"] == "0.1.1"
+    finally:
+        harness.close()
+    with AuthorityOwner.open(database, "riichi-test") as owner:
+        assert owner.snapshot("riichi") == saved
+        assert owner.package_candidate(original.candidate_id) == original

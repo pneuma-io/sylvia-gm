@@ -129,6 +129,7 @@ def source():
         for index in range(136)
     ]
     for tile in tiles:
+        tile["face"] = {"family": "mahjong", "kind": tile["kind"], "red": tile["red"]}
         if tile["red"]:
             tile["label"] += " (red)"
     patterns = [[kind, kind] for kind in range(34)] + [[kind] * 3 for kind in range(34)]
@@ -329,6 +330,7 @@ def source():
                 "state.table",
                 {
                     "format": 1,
+                    "layout": literal("four_sided"),
                     "title": literal("Riichi Mahjong"),
                     "status": "_statuses",
                     "areas": "_areas",
@@ -344,10 +346,21 @@ def source():
         [
             set_("actor.game.choices", "choices"),
             set_("_decisions", []),
-            each("choices", "_choice", [push("_decisions", {
-                "id": "_choice.id", "label": "_choice.label", "operation": literal("take_action"),
-                "arguments": {"choice": "_choice.id"},
-            })]),
+            each(
+                "choices",
+                "_choice",
+                [
+                    push(
+                        "_decisions",
+                        {
+                            "id": "_choice.id",
+                            "label": "_choice.label",
+                            "operation": literal("take_action"),
+                            "arguments": {"choice": "_choice.id"},
+                        },
+                    )
+                ],
+            ),
             set_("actor.game.decision_actions", "_decisions"),
         ],
     )
@@ -362,7 +375,15 @@ def source():
                 "_tile",
                 [
                     set_("_face", "definitions.tiles[_tile]"),
-                    set_("_piece", {"id": "'tile:' + text(_tile)", "label": "_face.label"}),
+                    set_(
+                        "_piece",
+                        {
+                            "id": "'tile:' + text(_tile)",
+                            "label": "_face.label",
+                            "face": "_face.face",
+                            "flags": [],
+                        },
+                    ),
                     branch(
                         "_face.red", [set_("_piece", "merge(_piece, definitions.red_presentation)")]
                     ),
@@ -371,7 +392,11 @@ def source():
                         [
                             set_(
                                 "_drawn",
-                                {"detail": literal("Drawn tile"), "emphasis": literal("accent")},
+                                {
+                                    "detail": literal("Drawn tile"),
+                                    "emphasis": literal("accent"),
+                                    "flags": [literal("drawn")],
+                                },
                             ),
                             set_("_piece", "merge(_piece, _drawn)"),
                         ],
@@ -406,6 +431,7 @@ def source():
                 {
                     "id": literal("hand"),
                     "label": literal("Hand"),
+                    "role": literal("rack"),
                     "visibility": literal("owner"),
                     "owner": "_actor_id",
                     "show_count": True,
@@ -503,11 +529,32 @@ def source():
                             branch(
                                 "_choice.op != 'discard'",
                                 [
+                                    set_("_faces", []),
+                                    set_("_choice_tiles", "_choice.tiles"),
+                                    each(
+                                        "_choice_tiles",
+                                        "_choice_tile",
+                                        [
+                                            push("_faces", "definitions.tiles[_choice_tile].face"),
+                                        ],
+                                    ),
+                                    branch(
+                                        "_choice.op == 'chi' or _choice.op == 'pon' "
+                                        "or _choice.op == 'minkan'",
+                                        [
+                                            push(
+                                                "_faces",
+                                                "definitions.tiles[state.last_discard.tile].face",
+                                            ),
+                                        ],
+                                    ),
                                     push(
                                         "_options",
                                         {
                                             "id": "_choice.id",
-                                            "label": "_choice.label",
+                                            "label": "definitions.action_labels[_choice.op]",
+                                            "detail": "_choice.label",
+                                            "faces": "_faces",
                                             "action_id": literal("play"),
                                         },
                                     ),
@@ -557,7 +604,7 @@ def source():
     result = {
         "format": 1,
         "id": NS,
-        "version": "0.1.0",
+        "version": "0.1.1",
         "label": "Riichi Mahjong",
         "publisher": "Pneuma IO",
         "mechanic_families": families,
@@ -577,6 +624,21 @@ def source():
             "positions": ["bottom", "right", "top", "left"],
             "winds": ["East", "South", "West"],
             "seat_winds": ["East", "South", "West", "North"],
+            "wind_glyphs": ["東", "南", "西", "北"],
+            "call_sources": ["self", "right", "across", "left"],
+            "action_labels": {
+                "riichi": "Riichi",
+                "tsumo": "Tsumo",
+                "ron": "Ron",
+                "pass": "Pass",
+                "chi": "Chi",
+                "pon": "Pon",
+                "minkan": "Open kan",
+                "ankan": "Concealed kan",
+                "kakan": "Added kan",
+                "continue": "Next hand",
+                "abort_nine": "Nine terminals draw",
+            },
             "patterns": patterns,
             "red_presentation": {"detail": "Red five", "emphasis": "accent"},
         },
@@ -615,7 +677,8 @@ def source():
                     "public_table are the only available tile information. Do not guess wall "
                     "order or another hand. The engine scores, validates and resolves all moves."
                 ),
-                "observation_path": ["game"], "persona_path": ["persona"],
+                "observation_path": ["game"],
+                "persona_path": ["persona"],
                 "actions_path": ["game", "decision_actions"],
                 "public_observation": {"namespace": NS, "key": "state.public_observation"},
             },
@@ -626,7 +689,7 @@ def source():
                 "title": "Riichi Mahjong",
                 "capability": NS + ".play",
                 "renderer": "piece_table",
-                "default_size": 560,
+                "default_size": 760,
                 "minimum_size": 300,
                 "source": {"kind": "state", "namespace": NS, "key": "state.table"},
                 "actions": [
@@ -695,7 +758,7 @@ def main():
         compiled = compile_ruleset_source(content.encode())
         world = _world_draft(
             package_id="pneuma.riichi-club",
-            version="0.1.0",
+            version="0.1.1",
             title="The Lantern Table",
             payloads={"world.md": (ROOT / "setting" / "world.md").read_bytes()},
             ruleset=compiled.draft,

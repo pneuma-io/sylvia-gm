@@ -50,6 +50,29 @@ def test_concealed_replacement_cannot_leak_piece_ids_labels_or_actions():
     assert "count" not in concealed["areas"][2]["groups"][0]
 
 
+def test_tile_presentation_remains_hidden_and_strictly_bounded():
+    raw = table()
+    raw["layout"] = "four_sided"
+    public = raw["areas"][0]["groups"][0]["pieces"][0]
+    public.update(face={"family": "mahjong", "kind": 13, "red": True}, flags=["drawn"])
+    raw["areas"][0].update(score="25000", badge="東", active=True)
+    projected = project_piece_table(raw, viewer_ids={"operator"}, action_ids={"run"})
+    assert projected["areas"][0]["groups"][0]["pieces"][0]["face"]["red"] is True
+    assert projected["areas"][0]["active"] is True
+    remote = raw["areas"][2]["groups"][0]
+    remote["pieces"] = [{"face": {"secret": "do not validate or expose hidden faces"},
+                          "flags": ["private"], "faces": [{"kind": 33}]}]
+    remote["source"] = "private source must remain hidden"
+    assert project_piece_table(raw, viewer_ids={"operator"}, action_ids={"run"}) == projected
+    for bad_face in ({"family": "mahjong", "kind": 34},
+                     {"family": "mahjong", "kind": True},
+                     {"family": "mahjong", "kind": 0, "red": True},
+                     {"family": "mahjong", "kind": 0, "private": "secret"}):
+        public["face"] = bad_face
+        with pytest.raises(PieceTableError):
+            project_piece_table(raw, viewer_ids={"operator"}, action_ids={"run"})
+
+
 @pytest.mark.parametrize("problem", [
     "format", "visibility", "action", "fields", "size", "position-type", "unicode",
 ])

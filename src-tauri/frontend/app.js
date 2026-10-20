@@ -3342,7 +3342,8 @@ const SylviaGMFrontend = (() => {
         item.id === button.closest('[data-panel-id]')?.dataset.panelId);
       const action = surface?.actions?.find((item) => item.id === button.dataset.panelActionId);
       button.disabled = !hasIdleSession || !state.activeCampaignId || !state.activeSnapshot ||
-        !surface || !action || !panelActionAvailable(surface, action, button.dataset.panelActorId);
+        !surface || !action || !panelActionAvailable(surface, action,
+          button.dataset.panelActorId, button.dataset.panelPieceId);
     });
   }
 
@@ -6520,7 +6521,11 @@ const SylviaGMFrontend = (() => {
           { expansion: { id, open: details.open } });
       });
     });
-    container.querySelectorAll('[data-panel-action-id]').forEach((button) => {
+    window.SylviaTileTable?.attach(container, () => void refreshPanelActionChecks(projection, container),
+      () => !state.panelCommitPending && !panelIntentPending() && !pendingPanelCommand() &&
+        !selectedSessionIsWorking() && !campaignDisplayPending());
+    new Set([...container.querySelectorAll('[data-panel-action-id]'),
+      ...container.querySelectorAll('[data-table-discard]')]).forEach((button) => {
       button.addEventListener('click', async () => {
         if (button.disabled || !state.activeCampaignId || !state.activeSnapshot || selectedSessionIsWorking() ||
             (!sequenceModeActive() && (!state.bridge.execute_panel_action || !state.bridge.preview_panel_action))) return;

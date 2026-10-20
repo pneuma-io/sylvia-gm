@@ -14,6 +14,10 @@ from scripts.build_riichi_ruleset import (
 
 
 def add_display(families):
+    families["discard_history"] = family(
+        [PRIVATE_ACTOR],
+        [set_("_source_discards", "actor.game.discards")],
+    )
     families["seat_table"]["effects"] += [
         branch(
             "actor.game.revealed",
@@ -31,6 +35,8 @@ def add_display(families):
                     {
                         "id": literal("winning-discard"),
                         "label": "definitions.tiles[state.winning_tile].label",
+                        "face": "definitions.tiles[state.winning_tile].face",
+                        "flags": [],
                         "detail": literal("Winning discard"),
                         "emphasis": literal("accent"),
                     },
@@ -40,6 +46,7 @@ def add_display(families):
             ],
         ),
         set_("_pieces", []),
+        set_("_riichi_marker", False),
         set_("_discards", "actor.game.discards"),
         each(
             "_discards",
@@ -50,6 +57,8 @@ def add_display(families):
                     {
                         "id": "'discard:' + text(_discard.tile)",
                         "label": "definitions.tiles[_discard.tile].label",
+                        "face": "definitions.tiles[_discard.tile].face",
+                        "flags": [],
                     },
                 ),
                 branch(
@@ -59,6 +68,7 @@ def add_display(families):
                 branch(
                     "_discard.riichi",
                     [
+                        set_("_riichi_marker", True),
                         set_(
                             "_flag",
                             {
@@ -74,9 +84,21 @@ def add_display(families):
                     [
                         set_(
                             "_flag",
-                            {"detail": literal("Called into a meld"), "emphasis": literal("muted")},
+                            {
+                                "detail": literal("Called into a meld"),
+                                "emphasis": literal("muted"),
+                                "flags": [literal("claimed")],
+                            },
                         ),
                         set_("_piece", "merge(_piece, _flag)"),
+                    ],
+                ),
+                branch(
+                    "_riichi_marker and not _discard.claimed",
+                    [
+                        set_("_flag", {"flags": [literal("sideways")]}),
+                        set_("_piece", "merge(_piece, _flag)"),
+                        set_("_riichi_marker", False),
                     ],
                 ),
                 branch(
@@ -85,7 +107,10 @@ def add_display(families):
                     [
                         set_(
                             "_flag",
-                            {"detail": literal("Latest discard"), "emphasis": literal("accent")},
+                            {
+                                "emphasis": literal("accent"),
+                                "flags": "joined(_piece.flags, one('latest'))",
+                            },
                         ),
                         set_("_piece", "merge(_piece, _flag)"),
                     ],
@@ -98,10 +123,27 @@ def add_display(families):
             {
                 "id": literal("discards"),
                 "label": literal("Discards"),
+                "role": literal("pond"),
                 "visibility": literal("public"),
                 "pieces": "_pieces",
             },
         ),
+        set_("_regular", []),
+        set_("_drawn_pieces", []),
+        set_("_rack_pieces", "_hand.pieces"),
+        each(
+            "_rack_pieces",
+            "_rack_piece",
+            [
+                branch(
+                    "'drawn' in _rack_piece.flags",
+                    [push("_drawn_pieces", "_rack_piece")],
+                    [push("_regular", "_rack_piece")],
+                )
+            ],
+        ),
+        set_("_complete_hand", {"pieces": "joined(_regular, _drawn_pieces)"}),
+        set_("_hand", "merge(_hand, _complete_hand)"),
         set_("_groups", ["_hand", "_discard_group"]),
         set_("_melds", "actor.game.melds"),
         set_("_index", 0),
@@ -111,8 +153,67 @@ def add_display(families):
             [
                 set_("_pieces", []),
                 set_("_tiles", "ordered(_meld.tiles)"),
+                set_("_called", -1),
+                set_("_added", -1),
+                set_("_offset", "(_meld.source_seat - actor.seat + 4) % 4"),
+                branch(
+                    "_meld.opened",
+                    [
+                        call(
+                            "_discard_history",
+                            {"actor": "{state.seats[_meld.source_seat]}"},
+                            ["_source_discards"],
+                        ),
+                        each(
+                            "_source_discards",
+                            "_source_discard",
+                            [
+                                branch(
+                                    "_source_discard.claimed and "
+                                    "_source_discard.tile in _meld.tiles",
+                                    [set_("_called", "_source_discard.tile")],
+                                )
+                            ],
+                        ),
+                        branch(
+                            "_meld.quad and _called != _meld.tiles[3]",
+                            [set_("_added", "_meld.tiles[3]")],
+                        ),
+                    ],
+                ),
+                set_("_normal", []),
                 each(
                     "_tiles",
+                    "_normal_tile",
+                    [
+                        branch(
+                            "_normal_tile != _called and _normal_tile != _added",
+                            [push("_normal", "_normal_tile")],
+                        )
+                    ],
+                ),
+                set_("_ordered", "_tiles"),
+                branch(
+                    "not _meld.opened and definitions.tiles[_tiles[0]].red",
+                    [
+                        set_("_ordered", ["_tiles[1]", "_tiles[0]", "_tiles[2]", "_tiles[3]"]),
+                    ],
+                ),
+                branch(
+                    "_called >= 0",
+                    [
+                        set_("_slot", 0),
+                        branch("_offset == 1", [set_("_slot", "len(_normal)")]),
+                        branch("_offset == 2", [set_("_slot", 1)]),
+                        set_(
+                            "_ordered",
+                            "joined(joined(portion(_normal, 0, _slot), one(_called)), "
+                            "portion(_normal, _slot, len(_normal)))",
+                        ),
+                    ],
+                ),
+                each(
+                    "_ordered",
                     "_tile",
                     [
                         set_(
@@ -120,13 +221,43 @@ def add_display(families):
                             {
                                 "id": "'meld:' + text(_tile)",
                                 "label": "definitions.tiles[_tile].label",
+                                "face": "definitions.tiles[_tile].face",
+                                "flags": [],
                             },
+                        ),
+                        branch(
+                            "_tile == _called",
+                            [
+                                set_("_flag", {"flags": [literal("sideways")]}),
+                                set_("_piece", "merge(_piece, _flag)"),
+                            ],
+                        ),
+                        branch(
+                            "not _meld.opened and (_tile == _ordered[0] or _tile == _ordered[3])",
+                            [
+                                set_("_flag", {"flags": [literal("back")]}),
+                                set_("_piece", "merge(_piece, _flag)"),
+                            ],
                         ),
                         branch(
                             "definitions.tiles[_tile].red",
                             [set_("_piece", "merge(_piece, definitions.red_presentation)")],
                         ),
                         push("_pieces", "_piece"),
+                        branch(
+                            "_tile == _called and _added >= 0",
+                            [
+                                push(
+                                    "_pieces",
+                                    {
+                                        "id": "'meld:' + text(_added)",
+                                        "label": "definitions.tiles[_added].label",
+                                        "face": "definitions.tiles[_added].face",
+                                        "flags": [literal("stacked")],
+                                    },
+                                )
+                            ],
+                        ),
                     ],
                 ),
                 set_("_label", literal("Pon")),
@@ -143,6 +274,8 @@ def add_display(families):
                     {
                         "id": "'meld:' + text(_index)",
                         "label": "_label",
+                        "role": literal("meld"),
+                        "source": "definitions.call_sources[_offset]",
                         "visibility": literal("public"),
                         "pieces": "_pieces",
                     },
@@ -171,6 +304,9 @@ def add_display(families):
                 "id": "_actor_id",
                 "label": "_seat_label",
                 "position": "definitions.positions[actor.seat]",
+                "badge": "definitions.wind_glyphs[(actor.seat - state.dealer + 4) % 4]",
+                "score": "text(actor.score)",
+                "active": "_actor_id == state.actor and not state.finished",
                 "groups": "_groups",
             },
         ),
@@ -187,6 +323,7 @@ def add_display(families):
                     {
                         "id": "'dora:' + text(_index)",
                         "label": "definitions.tiles[state.dead[4 + _index * 2]].label",
+                        "face": "definitions.tiles[state.dead[4 + _index * 2]].face",
                     },
                 )
             ],
@@ -294,18 +431,21 @@ def add_display(families):
                     {
                         "id": literal("dora"),
                         "label": literal("Dora indicators"),
+                        "role": literal("indicators"),
                         "visibility": literal("public"),
                         "pieces": "_dora",
                     },
                     {
                         "id": literal("choices"),
                         "label": literal("Actions"),
+                        "role": literal("actions"),
                         "visibility": literal("public"),
                         "pieces": "_options",
                     },
                     {
                         "id": literal("result"),
                         "label": literal("Table"),
+                        "role": literal("message"),
                         "visibility": literal("public"),
                         "pieces": "_info",
                     },
@@ -359,10 +499,14 @@ def add_display(families):
                     "message": "state.message",
                 },
             ),
-            set_("state.public_observation", {
-                "table": "actor.game.public_table", "result": "state.result",
-                "match_result": "state.match_result",
-            }),
+            set_(
+                "state.public_observation",
+                {
+                    "table": "actor.game.public_table",
+                    "result": "state.result",
+                    "match_result": "state.match_result",
+                },
+            ),
         ],
     )
     families["refresh"]["effects"] += [
