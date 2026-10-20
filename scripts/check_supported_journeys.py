@@ -44,6 +44,9 @@ PYTHON_JOURNEYS = {
         "tests/test_qa_lite_physical_range.py",
     ],
     "campaign-play": [
+        "tests/test_campaign_rules_update.py",
+        "tests/test_campaign_rules_update_bindings.py",
+        "tests/test_campaign_rules_update_knowledge.py",
         "tests/test_action_sequences.py",
         "tests/test_action_sequence_provider.py",
         "tests/test_td_native_panel_repairs.py",
@@ -191,6 +194,7 @@ PYTHON_JOURNEYS = {
     ],
 }
 UI_JOURNEY = [
+    "tests/frontend_campaign_rules_update.browser.cjs",
     "tests/frontend_character_equipment.test.cjs",
     "tests/frontend_character_selection.test.cjs",
     "tests/frontend_character_inspection.browser.cjs",

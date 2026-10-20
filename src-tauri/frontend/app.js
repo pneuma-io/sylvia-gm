@@ -48,6 +48,7 @@ const SylviaGMFrontend = (() => {
     constructionPanelGeneration: 0,
     applicationInfo: null,    // host-projected release identity; never campaign truth
     activeCampaignId: null,
+    rulesUpdateController: null,
     activeSessionId: null,
     activeSessionRole: null,
     activeSnapshot: null,
@@ -991,6 +992,14 @@ const SylviaGMFrontend = (() => {
         text,
       }),
       package_candidates: () => invoke('package_candidates'),
+      campaign_rules_update_options: (campaignId) => invoke('campaign_rules_update_options', { campaignId }),
+      preview_campaign_rules_update: (campaignId, candidateId) =>
+        invoke('preview_campaign_rules_update', { campaignId, candidateId }),
+      adopt_campaign_rules_update: (command) => invoke('adopt_campaign_rules_update', {
+        campaignId: command.campaign_id, candidateId: command.candidate_id,
+        activationId: command.activation_id, expectedRevision: command.expected_revision,
+        expectedLockId: command.expected_lock_id, confirmation: command.confirmation,
+      }),
       inspect_package_candidate: (candidateId) => invoke('inspect_package_candidate', {
         candidateId,
       }),
@@ -1603,6 +1612,13 @@ const SylviaGMFrontend = (() => {
     });
     $('cancel-construction-btn').addEventListener('click', showHome);
     $('rename-campaign-btn').addEventListener('click', () => { void renameSelectedCampaign(); });
+    state.rulesUpdateController = window.SylviaCampaignRulesUpdate?.mount({
+      root: $('campaign-rules-update'), bridge: () => state.bridge,
+      campaign: () => state.activeSessionRole === 'dm' ? state.activeCampaignId : null,
+      adopted: async (campaignId) => {
+        if (state.activeCampaignId === campaignId) await refreshSelectedCampaign();
+      },
+    });
     $('stop-session-btn').addEventListener('click', () => { void stopSelectedSession(); });
     $('resume-session-btn').addEventListener('click', () => { void resumeSelectedSession(); });
     $('finalize-construction-btn').addEventListener('click', () => {
@@ -7197,6 +7213,13 @@ const SylviaGMFrontend = (() => {
   function updateLifecycleControls(indexEntry, snapshot) {
     const lifecycle = snapshot && ((snapshot.lifecycle && snapshot.lifecycle.value) || snapshot.lifecycle);
     const selected = Boolean(snapshot);
+    const updateRules = $('campaign-rules-update');
+    if (updateRules) {
+      const id = `${snapshot?.campaign_id || ''}:${state.activeSessionRole || ''}`;
+      if (updateRules.dataset.campaignId !== id) state.rulesUpdateController?.reset();
+      updateRules.dataset.campaignId = id;
+      updateRules.hidden = !selected || lifecycle !== 'active' || state.activeSessionRole !== 'dm';
+    }
     const session = selectedSessionEntry(indexEntry);
     const canRename = selected && lifecycle === 'active';
     const canStop = selected && Boolean(session) && session.status === 'active';

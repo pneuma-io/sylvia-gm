@@ -2086,6 +2086,21 @@ def _dispatch_selected(
         )
     if method == "package_candidates":
         return bus.package_candidates()
+    if method == "campaign_rules_update_options":
+        return application_owner.campaign_rules_update_options(_required_text(params, "campaign_id"))
+    if method == "preview_campaign_rules_update":
+        return application_owner.preview_campaign_rules_update(
+            _required_text(params, "campaign_id"), _required_text(params, "candidate_id"),
+        )
+    if method == "adopt_campaign_rules_update":
+        return application_owner.adopt_campaign_rules_update(
+            campaign_id=_required_text(params, "campaign_id"),
+            candidate_id=_required_text(params, "candidate_id"),
+            activation_id=_required_text(params, "activation_id"),
+            expected_revision=_required_nonnegative_int(params, "expected_revision"),
+            expected_lock_id=_required_text(params, "expected_lock_id"),
+            confirmation=_required_text(params, "confirmation"),
+        )
     if method == "inspect_package_candidate":
         return bus.inspect_package_candidate(_required_text(params, "candidate_id"))
     if method == "package_candidate_text":

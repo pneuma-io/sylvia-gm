@@ -296,7 +296,7 @@ def _handoff_candidate_matches_lock(
         return candidate is None
     return (
         candidate is not None
-        and candidate.status.value == "validated"
+        and candidate.status.value in {"validated", "activated"}
         and candidate.package_lock == lock.package_lock
         and candidate.closure_sha256 == lock.closure_sha256
     )
@@ -11092,10 +11092,17 @@ class SQLiteAuthorityStore:
                 "WHERE p.campaign_id = ? AND p.participant_id = ?",
                 (campaign_id, mutation.participant_id),
             ).fetchone()
-            if row is None or (
-                row["package_id"], row["package_version"], row["package_sha256"],
-                row["validation_status"],
-            ) != (package_id, package_version, package_sha256, "validated"):
+            if (
+                row is None or row["validation_status"] != "validated"
+                or not sqlite_packages.participant_owner_is_current(
+                    connection, campaign_id=campaign_id,
+                    source_identity=(str(row["package_id"]), str(row["package_version"]),
+                                     str(row["package_sha256"])),
+                    actor_identity=(package_id, package_version, package_sha256),
+                    kind=str(row["kind"]), schema_id=str(row["schema_id"]),
+                    schema_sha256=str(row["schema_sha256"]),
+                )
+            ):
                 raise CommandRejected(
                     "Live character updates require the owning exact Ruleset and schema",
                     code="participant_mutation_unowned",
@@ -12748,6 +12755,20 @@ class SQLiteAuthorityStore:
         finally:
             connection.close()
 
+    def compatible_package_binding(
+        self, campaign_id: str, identity: tuple[str, str, str],
+    ) -> PackageLockEntry | None:
+        """Resolve a retained binding only through this campaign's compatible lineage."""
+        connection = self._connect_read_only()
+        try:
+            connection.execute("BEGIN")
+            entries = sqlite_packages.compatible_binding_entries(connection, campaign_id, identity)
+            return entries[0] if entries else None
+        finally:
+            if connection.in_transaction:
+                connection.rollback()
+            connection.close()
+
     def primary_package_manifest(self, lock_id: str) -> PackageManifest | None:
         connection = self._connect()
         try:
@@ -13190,8 +13211,11 @@ class SQLiteAuthorityStore:
             state = self._read_state(connection, campaign_id)
             completed = (
                 connection.execute(
-                    "SELECT 1 FROM turns WHERE campaign_id = ? AND status = 'completed' LIMIT 1",
-                    (campaign_id,),
+                    "SELECT 1 FROM turns WHERE campaign_id = ? AND status = 'completed' "
+                    "AND NOT EXISTS (SELECT 1 FROM turns WHERE campaign_id = ? "
+                    "AND status = 'open') "
+                    "LIMIT 1",
+                    (campaign_id, campaign_id),
                 ).fetchone()
                 is not None
             )
@@ -13250,6 +13274,7 @@ class SQLiteAuthorityStore:
         expected_lock_id: str,
         migration_id: str,
         migrated_state: Mapping[str, JsonValue],
+        compatible_update: bool = False,
     ) -> ActivationResult:
         connection = self._connect()
         commit_started = False
@@ -13279,6 +13304,7 @@ class SQLiteAuthorityStore:
                 expected_lock_id=expected_lock_id,
                 migration_id=migration_id,
                 migrated_state=migrated_state,
+                compatible_update=compatible_update,
             )
             self._before_activation_commit()
             commit_started = True
