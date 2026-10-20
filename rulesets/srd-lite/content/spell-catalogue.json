@@ -2,7 +2,7 @@
   "format": "sylvia-srd-lite-catalogue",
   "revision": 5,
   "variant_id": "sylvia.srd-lite.bg3",
-  "variant_version": "0.3.12",
+  "variant_version": "0.3.13",
   "source_checked": "2026-10-09",
   "authority": "Historical 96-spell launch selection with 47 additions to existing class/subclass progression. Sixteen deferred profiles remain preserved. No new class or subclass is selected by this record; the current catalogue adds exactly 21 preserved implementations for the 117-spell Lite launch.",
   "final_roster_authority": "117 launch spells: the original 96 Lite profiles and exactly 21 preserved implementations.",

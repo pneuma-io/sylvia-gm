@@ -198,7 +198,7 @@ class level 3 include the selected subclass with feature ID `subclass`. Supply c
 proficiency lists, saving throw proficiencies, spellcasting abilities and prepared spells,
 preserving existing grants. Supply the resulting AC and speed, plus any feature HP gain (zero
 when none), with `mechanical_sources` explaining the retained rules used. Include retroactive
-feature grants where applicable. The engine calculates class Hit Points and Constitution changes.
+feature grants where applicable. The engine calculates class Hit Points and Constitution changes. The saved participant Speed is its base species Speed; class and equipment movement modifiers are derived once. Do not replace that base with the resulting Speed. The confirmation reports the computed AC and walking Speed.
 List changed class resource maxima with their source; existing resources require their previous
 maxima so spent uses can be preserved. Summarize all gains and choices within 1,000 characters
 for the player's confirmation. Apply one level at a time until the earned target is reached.

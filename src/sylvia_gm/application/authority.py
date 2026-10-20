@@ -100,6 +100,12 @@ from sylvia_gm.application.player_actions import (
     retain_player_action_origin,
     validate_player_control,
 )
+from sylvia_gm.application.reference_text import (
+    REFERENCE_CONTENT_BYTE_LIMIT,
+    REFERENCE_REPLY_BYTE_LIMIT,
+    matching_text_excerpts,
+    text_excerpt,
+)
 from sylvia_gm.application.result_cards import project_result_card
 from sylvia_gm.application.schema_admission import (
     validate_json_value,
@@ -266,6 +272,10 @@ from sylvia_gm.domain.session import (
     campaign_plan_payload_sha256,
 )
 from sylvia_gm.infrastructure import campaign_archive
+from sylvia_gm.infrastructure.package_archive import (
+    PACKAGE_MEMBER_BYTE_LIMIT,
+    PACKAGE_MEMBER_COUNT_LIMIT,
+)
 from sylvia_gm.infrastructure.sqlite_authority import (
     CampaignIndexRecord,
     SQLiteAuthorityStore,
@@ -296,12 +306,13 @@ def _markdown_sections(value: str) -> tuple[tuple[str, str, str], ...]:
         if match is not None:
             headings.append((index, len(match.group(1)), match.group(2).strip()))
     sections: list[tuple[str, str, str]] = []
-    for heading_index, (start, level, heading) in enumerate(headings):
-        end = len(lines)
-        for next_start, next_level, _next_heading in headings[heading_index + 1 :]:
-            if next_level <= level:
-                end = next_start
-                break
+    ends = [len(lines)] * len(headings)
+    parents: list[int] = []
+    for index, (start, level, _heading) in enumerate(headings):
+        while parents and headings[parents[-1]][1] >= level:
+            ends[parents.pop()] = start
+        parents.append(index)
+    for (start, _level, heading), end in zip(headings, ends, strict=True):
         slug = re.sub(r"[^a-z0-9]+", "-", heading.casefold()).strip("-")
         sections.append((heading, slug, "\n".join(lines[start:end]).strip()))
     return tuple(sections)
@@ -326,26 +337,31 @@ def _markdown_section_references(
     *,
     path: str,
     document_private: bool,
-) -> tuple[dict[str, str], ...]:
-    """List exact section references without returning their authored content."""
+) -> tuple[tuple[dict[str, str], ...], int]:
+    """Bound heading metadata independently of the admitted source and return its total count."""
 
     sections = _markdown_sections(value)
     references: list[dict[str, str]] = []
+    counts = Counter(slug for _, slug, _ in sections)
+    total = 0
     for heading, slug, content in sections:
         if len(sections) > 1 and content == value.strip():
+            continue
+        total += 1
+        if len(references) >= 100 or len(slug) > 200 or counts[slug] != 1:
             continue
         heading_key = heading.casefold().rstrip("s")
         private = document_private or heading_key in {
             item.rstrip("s") for item in _PRIVATE_PREPARATION_HEADINGS
         }
-        references.append(
-            {
-                "heading": heading,
-                "path": f"{path}#{slug}",
-                "visibility": ("gm_private_preparation" if private else "campaign_reference"),
-            }
-        )
-    return tuple(references)
+        reference = {
+            "heading": heading[:200],
+            "path": f"{path}#{slug}",
+            "visibility": ("gm_private_preparation" if private else "campaign_reference"),
+        }
+        if len(canonical_json_bytes([*references, reference])) <= 8 * 1024:
+            references.append(reference)
+    return tuple(references), total
 
 
 def _read_structured_campaign_plan(root: Mapping[str, object], path: str) -> object:
@@ -5515,6 +5531,8 @@ class AuthorityOwner:
         with self._operation():
             snapshot = self._store.snapshot(campaign_id)
             candidates: list[KnowledgeReference] = []
+            unavailable_references: list[dict[str, str]] = []
+            unavailable_count = 0
 
             def add_match(
                 *,
@@ -5527,13 +5545,20 @@ class AuthorityOwner:
                 provenance: Mapping[str, object],
                 identity: str | None = None,
             ) -> None:
-                candidates.append(KnowledgeReference(
-                    result={
-                        "source": source, "path": path, "kind": kind, "label": label,
-                        "visibility": visibility, "provenance": dict(provenance),
-                    },
-                    identity=identity or path, body=body,
-                ))
+                candidates.append(
+                    KnowledgeReference(
+                        result={
+                            "source": source,
+                            "path": path,
+                            "kind": kind,
+                            "label": label,
+                            "visibility": visibility,
+                            "provenance": dict(provenance),
+                        },
+                        identity=identity or path,
+                        body=body,
+                    )
+                )
 
             if "campaign_state" in requested_sources:
                 for item in snapshot.continuity.facts:
@@ -5692,7 +5717,7 @@ class AuthorityOwner:
                         entry.package_id,
                         entry.version,
                         entry.sha256,
-                        maximum_files=2_048,
+                        maximum_files=PACKAGE_MEMBER_COUNT_LIMIT,
                     )
                     for path in paths:
                         if Path(path).suffix.casefold() not in {
@@ -5709,15 +5734,33 @@ class AuthorityOwner:
                                 entry.version,
                                 entry.sha256,
                                 path,
-                                maximum_bytes=64 * 1024,
+                                maximum_bytes=PACKAGE_MEMBER_BYTE_LIMIT,
                             )
-                        except CommandRejected:
+                        except CommandRejected as error:
+                            unavailable_count += 1
+                            if len(unavailable_references) < 8:
+                                unavailable_references.append(
+                                    {
+                                        "source": source,
+                                        "path": path,
+                                        "code": error.code or "campaign_reference_unavailable",
+                                    }
+                                )
                             continue
                         if value is None:
                             continue
                         try:
                             text = value.decode("utf-8")
                         except UnicodeDecodeError:
+                            unavailable_count += 1
+                            if len(unavailable_references) < 8:
+                                unavailable_references.append(
+                                    {
+                                        "source": source,
+                                        "path": path,
+                                        "code": "campaign_reference_not_utf8",
+                                    }
+                                )
                             continue
                         package_provenance = {
                             "campaign_id": campaign_id,
@@ -5726,6 +5769,23 @@ class AuthorityOwner:
                             "package_sha256": entry.sha256,
                             "source_path": path,
                         }
+                        if len(value) > REFERENCE_CONTENT_BYTE_LIMIT:
+                            for offset, excerpt in matching_text_excerpts(text, query, limit):
+                                add_match(
+                                    source=source,
+                                    path=f"{path}#text/{offset}",
+                                    kind="package_excerpt",
+                                    label=Path(path).stem.replace("-", " ").title(),
+                                    visibility=(
+                                        "gm_private_preparation"
+                                        if source == "campaign_setting"
+                                        else "campaign_reference"
+                                    ),
+                                    body=excerpt,
+                                    provenance={**package_provenance, "text_offset": offset},
+                                    identity=path,
+                                )
+                            continue
                         sections = _markdown_sections(text) if path.endswith(".md") else ()
                         if not sections:
                             add_match(
@@ -5742,9 +5802,7 @@ class AuthorityOwner:
                                 provenance=package_provenance,
                             )
                             continue
-                        path_terms = set(
-                            knowledge_terms(Path(path).stem.replace("-", " "))
-                        )
+                        path_terms = set(knowledge_terms(Path(path).stem.replace("-", " ")))
                         slug_counts = Counter(slug for _, slug, _ in sections)
                         for heading, slug, content in sections:
                             if slug_counts[slug] != 1:
@@ -5781,6 +5839,8 @@ class AuthorityOwner:
                     "limit": limit,
                     "matches": selected,
                     "truncated": len(matches) > limit,
+                    "unavailable_count": unavailable_count,
+                    "unavailable_references": unavailable_references,
                     "authority": (
                         "Discovery returns references only. Read the selected exact reference; "
                         "Campaign State remains current truth."
@@ -5798,6 +5858,15 @@ class AuthorityOwner:
     ) -> SafePayload:
         """Read one bounded reference from the campaign's exact admitted authority."""
 
+        if (
+            not isinstance(maximum_bytes, int)
+            or isinstance(maximum_bytes, bool)
+            or not 1 <= maximum_bytes <= REFERENCE_REPLY_BYTE_LIMIT
+        ):
+            raise CommandRejected(
+                "Reference reply limit must be from 1 to 65536 bytes",
+                code="campaign_reference_limit_invalid",
+            )
         with self._operation():
             snapshot = self._store.snapshot(campaign_id)
             if source == "engine_format":
@@ -6138,7 +6207,7 @@ class AuthorityOwner:
                 selected_entry.version,
                 selected_entry.sha256,
                 portable_path,
-                maximum_bytes=maximum_bytes,
+                maximum_bytes=PACKAGE_MEMBER_BYTE_LIMIT,
             )
             if value is None and source == "ruleset":
                 reference_dependencies = tuple(
@@ -6168,7 +6237,7 @@ class AuthorityOwner:
                             selected_entry.version,
                             selected_entry.sha256,
                             portable_path,
-                            maximum_bytes=maximum_bytes,
+                            maximum_bytes=PACKAGE_MEMBER_BYTE_LIMIT,
                         )
             if value is None:
                 raise CommandRejected("Campaign package reference path is unavailable")
@@ -6187,7 +6256,25 @@ class AuthorityOwner:
             selection = None
             selected_heading: str | None = None
             available_sections: tuple[dict[str, str], ...] = ()
-            if separator:
+            available_section_count = 0
+            excerpt_metadata: dict[str, object] = {}
+            if separator and fragment.startswith("text/"):
+                if re.fullmatch(r"text/(0|[1-9][0-9]{0,9})", fragment) is None:
+                    raise CommandRejected(
+                        "Reference text offset is unavailable",
+                        code="campaign_reference_offset_invalid",
+                    )
+                excerpt = text_excerpt(content, int(fragment[5:]), maximum_bytes=maximum_bytes)
+                content = excerpt["content"]
+                following = excerpt["next_offset"]
+                excerpt_metadata = {
+                    "selection": excerpt["selection"],
+                    "truncated": excerpt["truncated"],
+                    "next_path": f"{portable_path}#text/{following}"
+                    if following is not None
+                    else None,
+                }
+            elif separator:
                 selected_heading, content = _select_markdown_section(content, fragment)
                 selection = {"kind": "markdown_section", "heading": selected_heading}
             elif source == "campaign_setting" and portable_path.startswith("locations/"):
@@ -6206,26 +6293,43 @@ class AuthorityOwner:
                         "heading": selected_heading,
                         "default": True,
                     }
-                    available_sections = _markdown_section_references(
+                    available_sections, available_section_count = _markdown_section_references(
                         value.decode("utf-8"),
                         path=portable_path,
                         document_private=portable_path in private_references,
                     )
+            content_budget = min(maximum_bytes, REFERENCE_CONTENT_BYTE_LIMIT)
+            if not excerpt_metadata and len(content.encode("utf-8")) > content_budget:
+                if selection is not None:
+                    raise CommandRejected(
+                        "Reference section exceeds the reply bound; "
+                        f"read {portable_path}#text/0 or search for a bounded excerpt",
+                        code="campaign_reference_too_large",
+                    )
+                excerpt = text_excerpt(content, maximum_bytes=content_budget)
+                content = excerpt["content"]
+                following = excerpt["next_offset"]
+                excerpt_metadata = {
+                    "selection": excerpt["selection"],
+                    "truncated": excerpt["truncated"],
+                    "next_path": f"{portable_path}#text/{following}"
+                    if following is not None
+                    else None,
+                }
             heading_key = (
-                selected_heading.casefold().rstrip("s")
-                if selected_heading is not None
-                else ""
+                selected_heading.casefold().rstrip("s") if selected_heading is not None else ""
             )
             visibility = (
                 "gm_private_preparation"
                 if source == "campaign_setting"
                 and (
                     portable_path in private_references
+                    or bool(excerpt_metadata)
                     or heading_key in {item.rstrip("s") for item in _PRIVATE_PREPARATION_HEADINGS}
                 )
                 else "campaign_reference"
             )
-            return owned_payload(
+            payload = owned_payload(
                 {
                     "source": source,
                     "path": path,
@@ -6236,10 +6340,16 @@ class AuthorityOwner:
                         "content_sha256": selected_entry.sha256,
                     },
                     "content": content,
+                    **excerpt_metadata,
                     **({"selection": selection} if selection is not None else {}),
                     **(
-                        {"available_sections": list(available_sections)}
-                        if available_sections
+                        {
+                            "available_sections": list(available_sections),
+                            "available_section_count": available_section_count,
+                            "available_sections_truncated": available_section_count
+                            > len(available_sections),
+                        }
+                        if available_section_count
                         else {}
                     ),
                     "visibility": visibility,
@@ -6261,6 +6371,13 @@ class AuthorityOwner:
                     ),
                 }
             )
+            if len(canonical_json_bytes(payload)) > REFERENCE_REPLY_BYTE_LIMIT:
+                raise CommandRejected(
+                    "Reference reply metadata exceeds its byte bound; "
+                    "use an exact bounded text excerpt",
+                    code="campaign_reference_too_large",
+                )
+            return payload
 
     def consume_package_blob(
         self, blob_sha256: str, consumer: Callable[[bytes], None]

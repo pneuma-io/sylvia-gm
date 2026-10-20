@@ -619,6 +619,8 @@ def compose(runtime, root, output, progress):
         bind_reaction_decisions(runtime, record)
         from .srd_lite_starting_events import bind_starting_events
         bind_starting_events(runtime, record)
+        from .srd_lite_advancement_contract import bind_advancement_speed
+        bind_advancement_speed(runtime, record)
         runtime.pop("parameter_declarations", None)
         rendered = yaml.dump(
             runtime, Dumper=_RuntimeDumper, sort_keys=False, allow_unicode=True, width=100

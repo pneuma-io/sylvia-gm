@@ -3819,7 +3819,9 @@ class ProviderSessionAdapter:
                 "or 'readable'; "
                 "participant the exact participant ID; campaign_setting or ruleset an exact "
                 "admitted package path; engine_format 'spatial_scene' for the installed scene "
-                "schema and example. Retry with a valid source and path only if the fact is "
+                "schema and example. Large package text uses the returned '#text/<offset>' "
+                "reference and next_path; search returns relevant bounded excerpt paths. "
+                "Retry with a valid source and path only if the fact is "
                 "still needed; otherwise continue from supplied authoritative context."
             )
             optional_reference_failures: set[str] = set()

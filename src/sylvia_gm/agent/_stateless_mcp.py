@@ -1462,7 +1462,10 @@ def build_stateless_mcp_server(owner: AuthorityOwner) -> Server[Any]:
                                         "that Character File. For "
                                         "campaign_setting or ruleset use an exact admitted package "
                                         "path. Append '#heading-slug' to read one Markdown section "
-                                        "without reading the rest of its file. For engine_format "
+                                        "without reading the rest of its file. Large UTF-8 files "
+                                        "return bounded '#text/<character-offset>' excerpts. "
+                                        "Follow next_path or search_campaign_knowledge for a "
+                                        "relevant excerpt. For engine_format "
                                         "use spatial_scene (the installed scene schema "
                                         "and example)."
                                     ),
