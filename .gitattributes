@@ -1,2 +1,4 @@
 # Hash-pinned package payloads retain their original bytes, including line endings.
 * -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# Preserve the upstream PortAudio licence verbatim, including its trailing spaces.
+licenses/dictation/PORTAUDIO-MIT.txt whitespace=-blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

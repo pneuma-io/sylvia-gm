@@ -52,6 +52,7 @@ from sylvia_gm.application.campaign_library_selection import (
     resolve_campaign_library_selection,
 )
 from sylvia_gm.application.campaign_plan_sources import campaign_plan_sources
+from sylvia_gm.application.knowledge_search import bounded_search_page
 from sylvia_gm.application.reusable_plans import save_reusable_campaign_plan
 from sylvia_gm.domain.authority import (
     ActionReceipt,
@@ -950,6 +951,12 @@ class _OwnerProjection:
             events=self.events,
             continuity=self.continuity,
         )
+
+    def desktop_snapshot(self, campaign_id: str, *, display_only: bool = False) -> object:
+        return self.snapshot(campaign_id)
+
+    def model_context_snapshot(self, campaign_id: str) -> tuple[object, None]:
+        return self.snapshot(campaign_id), None
 
     def canonical_replay(self, campaign_id: str, *, acknowledged_sequence: int) -> object:
         assert campaign_id == "campaign-provider"
@@ -6772,7 +6779,7 @@ def test_same_gm_searches_reads_updates_and_narrates_in_one_tool_loop() -> None:
         ]
     )
     source = _provider_input(user_text="I ask where Alrya is now.")
-    searches: list[tuple[str, tuple[str, ...] | None, int]] = []
+    searches: list[tuple[str, tuple[str, ...] | None, int, int]] = []
     reads: list[tuple[str, str]] = []
     writes: list[dict[str, object]] = []
     provider_input = SessionProviderInput(
@@ -6780,8 +6787,8 @@ def test_same_gm_searches_reads_updates_and_narrates_in_one_tool_loop() -> None:
         history=source.history,
         catalog=(search_tool, reference_tool, _campaign_file_tool(allow_unchanged=True)),
         control=source.control,
-        knowledge_searcher=lambda query, sources, limit: (
-            searches.append((query, tuple(sources) if sources is not None else None, limit))
+        knowledge_searcher=lambda query, sources, limit, offset: (
+            searches.append((query, tuple(sources) if sources is not None else None, limit, offset))
             or {
                 "results": [
                     {
@@ -6811,7 +6818,7 @@ def test_same_gm_searches_reads_updates_and_narrates_in_one_tool_loop() -> None:
         ).for_turn("turn-provider")(provider_input)
     )
 
-    assert searches == [("Where is Alrya now?", ("campaign_state",), 3)]
+    assert searches == [("Where is Alrya now?", ("campaign_state",), 3, 0)]
     assert reads == [("campaign_state", "entities.alrya")]
     assert writes == [update]
     assert [event.text for event in events if event.kind is ProviderEventKind.TALK] == [
@@ -6832,6 +6839,135 @@ def test_same_gm_searches_reads_updates_and_narrates_in_one_tool_loop() -> None:
         for event in events
     )
     assert "reconciliation" not in str(provider.calls).casefold()
+
+
+@pytest.mark.parametrize("continuation_offset", [2, -1, True, "2"])
+def test_provider_bridge_follows_search_continuation_instead_of_replaying_page_zero(
+    continuation_offset: object,
+) -> None:
+    search_tool = ModelMechanicsTool(
+        package_id="sylvia.application",
+        package_version="1",
+        package_sha256="0" * 64,
+        name="search_campaign_knowledge",
+        capability="context.search",
+        category="reference",
+        description="Discover exact references and follow next_offset.",
+        input_schema={
+            "type": "object",
+            "properties": {
+                "query": {"type": "string"},
+                "sources": {"type": "array", "items": {"type": "string"}},
+                "limit": {"type": "integer"},
+                "offset": {"type": "integer", "minimum": 0},
+            },
+            "required": ["query"],
+            "additionalProperties": False,
+        },
+    )
+
+    def call(
+        identity: str, name: str, arguments: Mapping[str, object]
+    ) -> list[ProviderStreamChunk]:
+        return [
+            ProviderStreamChunk(
+                tool_call_delta={
+                    "index": 0,
+                    "id": identity,
+                    "function": {"name": name, "arguments": json.dumps(arguments)},
+                },
+                finish_reason="tool_calls",
+            )
+        ]
+
+    provider = _ScriptedProvider(
+        [
+            call(
+                "page-zero",
+                "search_campaign_knowledge",
+                {
+                    "query": "temple",
+                    "sources": ["ruleset"],
+                    "limit": 2,
+                    "offset": 0,
+                },
+            ),
+            call(
+                "page-next",
+                "search_campaign_knowledge",
+                {
+                    "query": "temple",
+                    "sources": ["ruleset"],
+                    "limit": 2,
+                    "offset": continuation_offset,
+                },
+            ),
+            call(
+                "finish-search",
+                "update_campaign_file",
+                {
+                    "state_change": "unchanged",
+                    "state_change_summary": "Read-only reference discovery.",
+                    "revised_player_facing_response": [
+                        {
+                            "kind": "narration",
+                            "text": "The next two temple references are available.",
+                        }
+                    ],
+                },
+            ),
+        ]
+    )
+    searches: list[int] = []
+    references: list[dict[str, object]] = [
+        {"source": "ruleset", "path": f"lore/temple-{index}.md", "label": f"Temple {index}"}
+        for index in range(4)
+    ]
+
+    def search(query: str, sources: object, limit: int, offset: int = 0) -> Mapping[str, object]:
+        assert query == "temple" and sources == ("ruleset",) and limit == 2
+        searches.append(offset)
+        return bounded_search_page(
+            {"query": query, "campaign_revision": 4},
+            references,
+            offset=offset,
+            limit=limit,
+            maximum_bytes=65536,
+        )
+
+    source = _provider_input(user_text="List the next temple references.")
+    provider_input = replace(
+        source,
+        catalog=(search_tool, _campaign_file_tool(allow_unchanged=True)),
+        knowledge_searcher=search,
+        narrative_writer=lambda _: {"status": "campaign_file_unchanged", "state_changed": False},
+    )
+    events = tuple(
+        ProviderSessionAdapter(
+            cast(AuthorityOwner, _OwnerProjection(participants=())),
+            provider,
+            owner_id="owner-provider",
+        ).for_turn("turn-provider")(provider_input)
+    )
+    replies = {
+        message["tool_call_id"]: json.loads(message["content"])
+        for message in provider.calls[2][0]
+        if message["role"] == "tool"
+    }
+    assert replies["page-zero"]["result"]["next_offset"] == 2
+    if type(continuation_offset) is int and continuation_offset == 2:
+        assert searches == [0, 2]
+        assert replies["page-next"]["result"]["offset"] == 2
+        assert replies["page-next"]["result"]["matches"] == references[2:]
+        assert replies["page-next"]["result"]["next_offset"] is None
+    else:
+        assert searches == [0]
+        assert replies["page-next"]["status"] == "rejected"
+        assert replies["page-next"]["code"] == "campaign_knowledge_search_unavailable"
+    assert len(provider.calls) == 3
+    assert [event.text for event in events if event.kind is ProviderEventKind.TALK] == [
+        "The next two temple references are available."
+    ]
 
 
 def test_rejected_optional_reference_may_be_abandoned_before_narration_checkpoint() -> None:
@@ -13197,6 +13333,7 @@ def test_local_qwen_35_requests_do_not_add_synthetic_assistant_prefill() -> None
         "output_tokens": None,
         "total_tokens": None,
         "cached_tokens": None,
+        "cache_write_tokens": None,
         "reasoning_tokens": None,
     }
 
@@ -13395,6 +13532,7 @@ def test_openai_stream_captures_usage_from_final_chunk_without_choices() -> None
         "output_tokens": 17,
         "total_tokens": 338,
         "cached_tokens": 40,
+        "cache_write_tokens": None,
         "reasoning_tokens": 0,
     }
 

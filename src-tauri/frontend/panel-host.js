@@ -59,15 +59,19 @@
     function presentationKey(value) {
       const preferences = value.effects?.preferences || effects.preferences();
       return JSON.stringify([value.layout, value.busy, value.projection?.presentation_key, value.theme, value.tacticalSelections,
-        value.networkSelections, value.crossSurfaceFocus, preferences]);
+        value.networkSelections, value.crossSurfaceFocus, value.characterInspection, preferences]);
     }
 
     function workspacePayload() {
+      if (!child && layout && state.characterInspection && !state.panelProjection?.loading) {
+        layout = store.change({ type: 'inspection', value: state.characterInspection });
+      }
       return {
         projection: { ...state.panelProjection, shot_effects: [] }, layout,
         effects: effects.snapshot(), busy: busy(), theme: state.selectedTheme,
         tacticalSelections: state.tacticalSelections, networkSelections: state.networkSelections,
         crossSurfaceFocus: state.crossSurfaceFocus,
+        characterInspection: state.characterInspection,
       };
     }
 
@@ -176,6 +180,7 @@
       state.tacticalViewScenes = {};
       state.panelTabs = {};
       state.crossSurfaceFocus = null;
+      state.characterInspection = null;
       sync();
     }
 
@@ -217,6 +222,7 @@
       layout = store.select({ campaignId: projection.campaign_id,
         rulesetId: projection.ruleset_id || 'no-rules', surfaces: projection.surfaces,
         original: projection.layout || null });
+      state.characterInspection ||= layout.inspection;
       state.tacticalViewScenes ||= {};
       projection.surfaces.filter((surface) =>
         ['tactical_grid', 'coordinate_map'].includes(surface.renderer) && surface.data?.map
@@ -499,6 +505,7 @@
           state.tacticalSelections = value.tacticalSelections || {};
           state.networkSelections = value.networkSelections || {};
           state.crossSurfaceFocus = value.crossSurfaceFocus;
+          state.characterInspection = value.characterInspection || null;
           state.selectedTheme = value.theme;
           document.body.setAttribute('data-theme', value.theme);
           status(value.busy ? 'Sylvia is working…' : '');

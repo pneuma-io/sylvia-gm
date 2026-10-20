@@ -42,7 +42,15 @@ def builder_reference_copy_tool(source_reader: ReferenceSource, workspace: Path)
             return {"success": False, "code": "reference_copy_path_denied"}
         except _workspace_files.StaleWorkspaceFileError as error:
             return {"success": False, "error_code": "stale_file", "error": str(error)}
-        except (AuthorityError, OSError, UnicodeError, ValueError):
+        except AuthorityError as error:
+            reason = getattr(error, "code", "")
+            return {"success": False, "code": "reference_copy_unavailable", **(
+                {"reason": reason} if reason in {
+                    "package_file_oversized", "package_unavailable", "package_file_unavailable",
+                    "package_corrupt",
+                } else {}
+            )}
+        except (OSError, UnicodeError, ValueError):
             return {"success": False, "code": "reference_copy_unavailable"}
         return {
             "success": True,

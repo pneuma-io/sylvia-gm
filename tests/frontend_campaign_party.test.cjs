@@ -1468,7 +1468,7 @@ test('legacy construction without a saved Campaign Plan remains available', () =
   assert.equal(h.node('construction-next-btn').disabled, false);
 });
 
-test('New No-Rules creates an isolated usable interview without stale Ruleset choices', async () => {
+test('New Campaign selecting No Rules creates an isolated usable interview without stale Ruleset choices', async () => {
   const h = harness([
     'ruleset', 'setting', 'plan',
     'ruleset_contribution', 'setting_contribution', 'plan_contribution',
@@ -1564,15 +1564,21 @@ test('New No-Rules creates an isolated usable interview without stale Ruleset ch
   };
   h.wireControls();
 
-  h.node('new-no-rules-btn').dispatchEvent({ type: 'click' });
+  h.node('home-new-campaign-btn').dispatchEvent({ type: 'click' });
   await h.flush();
+
+  assert.ok(h.node('construction-package').options.some((option) =>
+    option.value === '' && /No Ruleset/.test(option.textContent)));
+  h.node('construction-package').value = '';
+  h.node('construction-package').dispatchEvent({ type: 'change' });
 
   assert.equal(created.length, 1);
   assert.equal(h.state.activeCampaignId, draft.campaign_id);
   assert.equal(h.state.activeSessionId, draft.builder_session_id);
   assert.equal(h.node('chat-model-choice').value, '0');
   assert.equal(h.state.constructionDraftId, draft.campaign_id);
-  assert.equal(h.node('construction-status').textContent, 'Campaign Draft · narrative play');
+  assert.equal(h.node('construction-status').textContent,
+    'Create New opens a saved Builder chat. Return to this interview whenever you are ready.');
   assert.equal(h.node('construction-package').value, '');
   const noRulesName = h.node('construction-name').value;
   h.updateConstructionPlans();
@@ -1956,7 +1962,7 @@ test('late Back navigation cannot repaint a newly selected Interview', async () 
   assert.equal(h.node('session-status-text').textContent, 'Other Interview');
 });
 
-test('New No-Rules never exposes the previous Interview Ruleset while owner projections load', async () => {
+test('New Campaign selecting No Rules never exposes the previous Interview Ruleset while owner projections load', async () => {
   const h = harness([
     'ruleset', 'setting', 'plan',
     'ruleset_contribution', 'setting_contribution', 'plan_contribution',
@@ -2028,7 +2034,7 @@ test('New No-Rules never exposes the previous Interview Ruleset while owner proj
   };
   h.wireControls();
 
-  h.node('new-no-rules-btn').dispatchEvent({ type: 'click' });
+  h.node('home-new-campaign-btn').dispatchEvent({ type: 'click' });
   await h.flush();
   assert.equal(creationCommands.length, 1);
   assertPreviousRulesetIsUnavailable('the campaign list loaded');
@@ -2054,6 +2060,12 @@ test('New No-Rules never exposes the previous Interview Ruleset while owner proj
   }]);
   await h.flush();
 
+  assert.ok(h.node('construction-package').options.some((option) =>
+    option.value === '' && /No Ruleset/.test(option.textContent)));
+  h.node('construction-package').value = '';
+  h.node('construction-package').dispatchEvent({ type: 'change' });
+  assertPreviousRulesetIsUnavailable('No Rules was selected');
+
   assert.equal(h.state.activeCampaignId, draft.campaign_id);
   assert.equal(h.state.activeSessionId, draft.builder_session_id);
   assert.equal(h.state.constructionDraftId, draft.campaign_id);
@@ -2062,7 +2074,8 @@ test('New No-Rules never exposes the previous Interview Ruleset while owner proj
     'ruleset', 'name', 'boundaries_preferences', 'specific_requests', 'review',
   ]);
   assert.equal(h.currentConstructionStepId(), 'ruleset');
-  assert.equal(h.node('construction-status').textContent, 'Campaign Draft · narrative play');
+  assert.equal(h.node('construction-status').textContent,
+    'Create New opens a saved Builder chat. Return to this interview whenever you are ready.');
   assert.equal(h.node('construction-panel').hidden, false);
 });
 

@@ -33,6 +33,10 @@ from sylvia_gm.domain.package_library import (
 _SRD_PACKAGE_ID = "sylvia.srd-lite.bg3"
 _SRD_REFERENCE_PACKAGE_ID = "pneuma.srd.5.2.1.reference"
 _SEVERED_LANDS_PACKAGE_ID = "pneuma.severed-lands"
+BUNDLED_RIICHI_PACKAGES = (
+    ("pneuma.riichi-mahjong", "0.1.1"),
+    ("pneuma.riichi-club", "0.1.1"),
+)
 _SRD_SHARED_NOTICE_FILES = (
     "ATTRIBUTION.md",
     "LICENSE",
@@ -291,6 +295,19 @@ def bundled_rift_archive() -> bytes:
     """Return Severed Lands with its exact contained D&D SRD snapshot."""
 
     return _archive(_rift_drafts())
+
+
+def bundled_riichi_archive() -> bytes:
+    """Read the validated Riichi/Setting archive unchanged in source and frozen builds."""
+
+    relative = Path("rulesets/riichi-mahjong/riichi-mahjong-0.1.1.sylvia-gm-package")
+    frozen_root = getattr(sys, "_MEIPASS", None)
+    root = (
+        Path(frozen_root)
+        if isinstance(frozen_root, str)
+        else Path(__file__).resolve().parents[3]
+    )
+    return (root / relative).read_bytes()
 
 
 @lru_cache(maxsize=1)

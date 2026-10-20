@@ -449,7 +449,15 @@ def _builder_reference_tool(source_reader: ReferenceSource) -> ToolSpec:
             return {"success": False, "code": "reference_query_invalid"}
         try:
             content = references.read(params["path"])
-        except (AuthorityError, OSError, UnicodeError, ValueError):
+        except AuthorityError as error:
+            reason = getattr(error, "code", "")
+            return {"success": False, "code": "reference_unavailable", **(
+                {"reason": reason} if reason in {
+                    "package_file_oversized", "package_unavailable", "package_file_unavailable",
+                    "package_corrupt",
+                } else {}
+            )}
+        except (OSError, UnicodeError, ValueError):
             return {"success": False, "code": "reference_unavailable"}
         if action == "find":
             # Literal matches retain the same character offsets used by paged reads.
@@ -592,6 +600,9 @@ def _builder_prompt(context: SessionContext) -> str:
         "For this character-building chat, first retrieve get_content_definition with name "
         "character_creation for the complete authored inputs and calculated outputs. "
         "Distinguish actual Ruleset, Setting and Plan requirements from suggestions. "
+        "When the player explicitly delegates unspecified character details, choose legal "
+        "compatible starting options from those references and briefly summarize your choices; "
+        "do not ask the player to decide every delegated detail. "
         "Where the Ruleset declares queued campaign starting events, create or adapt a reusable "
         "character at its ordinary base level. A Plan's higher starting level is reached on the "
         "campaign copy through normal confirmed level-up events; do not create a special "
@@ -1987,17 +1998,13 @@ def _run_cancellable_turn(
             except FutureTimeoutError:
                 continue
             except AgentLoopError as error:
-                raise CommandRejected(
-                    "Builder reached its tool-use limit; completed workspace files were kept"
-                ) from error
+                raise CommandRejected(error.user_message) from error
         if control.cancelled or task.cancelled():
             raise CommandRejected("Agent session provider work was cancelled")
         try:
             return task.result()
         except AgentLoopError as error:
-            raise CommandRejected(
-                "Builder reached its tool-use limit; completed workspace files were kept"
-            ) from error
+            raise CommandRejected(error.user_message) from error
 
 
 def _run_cancellable_stream(

@@ -5530,13 +5530,35 @@ class SQLiteAuthorityStore:
                             "FROM canonical_events WHERE campaign_id = ? AND sequence = ?",
                             (session.campaign_id, message.canonical_sequence),
                         ).fetchone()
-                        if event is None or message.content != owned_payload(
-                            {
-                                "event_type": str(event["event_type"]),
-                                "visibility": str(event["visibility"]),
-                                "safe_payload": _load_payload(str(event["safe_payload_json"])),
-                            }
+                        if event is None:
+                            raise ValueError("Stored canonical session reference is invalid")
+                        payload = _load_payload(str(event["safe_payload_json"]))
+                        expected_reference = owned_payload({
+                            "event_type": str(event["event_type"]),
+                            "visibility": str(event["visibility"]),
+                            "safe_payload": payload,
+                        })
+                        if (
+                            message.content != expected_reference
+                            and str(event["event_type"]) == CanonicalEventType.TOOL_CALL.value
                         ):
+                            identity = tuple(payload.get(key) for key in (
+                                "package_id", "package_version", "package_sha256",
+                            ))
+                            if all(isinstance(value, str) for value in identity):
+                                manifest = sqlite_packages.exact_manifest(
+                                    connection, cast(tuple[str, str, str], identity),
+                                )
+                                # Canonical replay omits private engine inputs. Validate that
+                                # exact projection against the retained package declaration.
+                                if manifest is not None and any(
+                                    item.visibility == "engine" for item in manifest.state_schemas
+                                ):
+                                    expected_reference = owned_payload({
+                                        **expected_reference,
+                                        "safe_payload": {**payload, "parameters": {}},
+                                    })
+                        if message.content != expected_reference:
                             raise ValueError("Stored canonical session reference is invalid")
                 if session.status is SessionStatus.REVIEW_REQUIRED and not any(
                     message.kind is SessionMessageKind.HUMAN_REVIEW for message in messages
@@ -5646,12 +5668,19 @@ class SQLiteAuthorityStore:
                                         lifecycle_state["tombstone_prior_session_id"]
                                         == designated_source
                                     )
+                    sequel = plan.content.get("sequel")
+                    source_role_valid = source is not None and (
+                        (source.role is WriterRole.BUILDER
+                         and source.selected_skill == "BUILD CAMPAIGN PLAN" and sequel is None)
+                        or (source.role is WriterRole.DM and isinstance(sequel, Mapping)
+                            and handoff is not None
+                            and handoff["dm_session_id"] == source.session_id)
+                    )
                     if (
                         source is None
                         or source.campaign_id != plan.campaign_id
                         or source.parent_session_id is not None
-                        or source.role is not WriterRole.BUILDER
-                        or source.selected_skill != "BUILD CAMPAIGN PLAN"
+                        or not source_role_valid
                         or (
                             source.status
                             not in {SessionStatus.ACTIVE, SessionStatus.HANDOFF_CLOSED}
@@ -5673,6 +5702,20 @@ class SQLiteAuthorityStore:
                         plan.content_sha256
                     ):
                         raise ValueError("Stored Campaign Plan content identity is invalid")
+                    if isinstance(sequel, Mapping):
+                        from sylvia_gm.domain.campaign_sequel import digest
+                        from sylvia_gm.infrastructure.sqlite_sequel import verify_sequel
+
+                        previous = plans.get(str(sequel.get("previous_plan_id")))
+                        if previous is None:
+                            raise ValueError("Stored sequel predecessor is unavailable")
+                        verify_sequel(plan, previous)
+                        evidence = source_messages[plan.provenance_evidence_ids[0]]
+                        if (evidence.content != {
+                            "kind": "campaign_sequel_adoption", "plan_id": plan.plan_id,
+                            "request_sha256": digest(sequel["request"]),
+                        } or evidence.sequence != sequel["preview"]["latest_message_sequence"] + 1):
+                            raise ValueError("Stored sequel adoption evidence is invalid")
                     expected_plan_payload = campaign_plan_payload_sha256(
                         plan_id=plan.plan_id,
                         campaign_id=plan.campaign_id,
@@ -6378,6 +6421,20 @@ class SQLiteAuthorityStore:
         finally:
             connection.close()
 
+    def actor_context(
+        self, session_id: str, context_id: str, *, provider_id: str, model_id: str,
+    ) -> Mapping[str, object] | None:
+        """Read one actor-owned private history without reading the GM conversation."""
+        connection = self._connect_read_only()
+        try:
+            if int(connection.execute("PRAGMA user_version").fetchone()[0]) < 11:
+                return None
+            return sqlite_reasoning.read_actor_context(
+                connection, session_id, context_id, provider_id=provider_id, model_id=model_id,
+            )
+        finally:
+            connection.close()
+
     def session_history_page(
         self, session_id: str, *, before_sequence: int | None = None, limit: int = 50,
     ) -> SessionHistoryPage:
@@ -6538,6 +6595,27 @@ class SQLiteAuthorityStore:
         connection = self._connect()
         try:
             return sqlite_session.read_handoff(connection, handoff_id)
+        finally:
+            connection.close()
+
+    def campaign_adventures(self, campaign_id: str) -> tuple[CampaignPlan, ...]:
+        """Read the ordered accepted adventure lineage, excluding abandoned Builder revisions."""
+        from sylvia_gm.infrastructure.sqlite_sequel import adventure_rows
+
+        connection = self._connect_read_only()
+        try:
+            return tuple(sqlite_session.plan_from_row(row)
+                         for row in adventure_rows(connection, campaign_id))
+        finally:
+            connection.close()
+
+    def commit_campaign_sequel(self, plan: CampaignPlan) -> CampaignPlan:
+        """Use the same durability domain for the reviewed source and its admission receipt."""
+        from sylvia_gm.infrastructure.sqlite_sequel import commit_sequel
+
+        connection = self._connect()
+        try:
+            return commit_sequel(connection, plan)
         finally:
             connection.close()
 

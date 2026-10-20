@@ -49,7 +49,7 @@ def test_collection_is_public_complete_and_does_not_create_library_copies(tmp_pa
     with AuthorityOwner.open(tmp_path / "campaigns.db", "collection") as owner:
         rows = _campaign_creation_catalog(tmp_path, owner)
         plans = [row for row in rows if row["kind"] == "campaign_plan"]
-        assert len(plans) == len(public) == 16
+        assert len(plans) == len(public) == 17
         assert {row["id"] for row in plans} == {row["id"] for row in public}
         for row in plans:
             source = next(item for item in public if item["id"] == row["id"])
@@ -65,7 +65,7 @@ def test_collection_is_public_complete_and_does_not_create_library_copies(tmp_pa
         assert bundled_campaign_content_catalog()[2]["starting_party"]
     with AuthorityOwner.open(tmp_path / "campaigns.db", "collection-reopened") as owner:
         assert len([row for row in _campaign_creation_catalog(tmp_path, owner)
-                    if row["kind"] == "campaign_plan"]) == 16
+                    if row["kind"] == "campaign_plan"]) == 17
 
 
 @pytest.mark.parametrize("slug", [
@@ -119,7 +119,7 @@ def test_build_inventory_excludes_unselected_files_and_includes_fixed_character(
         assert "packages/pneuma.severed-lands/setting-knowledge.json" in archive.namelist()
     assert root / "the-rift-awakening/plan.json" in files
     assert root / "the-rift-awakening/setting.sylvia-gm-package" in files
-    assert len([path for path in files if path.name == "plan.json"]) == 17
+    assert len([path for path in files if path.name == "plan.json"]) == 18
     invalid = [{"id": "../private", "title": "Invalid", "pitch": "Invalid", "format": "Test"}]
     (tmp_path / "catalogue.json").write_text(json.dumps(invalid), encoding="utf-8")
     with pytest.raises(ValueError, match="identity"):
@@ -140,7 +140,7 @@ def test_fixed_builtin_exports_without_setup_and_coexists_with_its_imported_copy
         })
         assert imported["id"] != original.artifact_id
         catalog = harness.request("catalog-after-import", "campaign_creation_catalog")
-        assert len([row for row in catalog if row["kind"] == "campaign_plan"]) == 17
+        assert len([row for row in catalog if row["kind"] == "campaign_plan"]) == 18
         options = harness.request("fixed-party", "campaign_party_options", {
             "ruleset_selection": original.plan.payload["bindings"]["ruleset"]["id"], "setting_id": "pneuma.severed-lands",
             "plan_id": imported["id"],

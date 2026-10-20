@@ -12,6 +12,7 @@ use std::time::{Duration, Instant};
 use tauri::{Emitter, Manager, State, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
 
 mod desktop_storage;
+mod dictation;
 mod instance_policy;
 mod panel_drag;
 mod panel_windows;
@@ -41,12 +42,12 @@ impl OwnerBridge {
         Self::spawn_command(Command::new(executable), database)
     }
 
-    fn spawn_default(database: &Path) -> Result<Self, String> {
+    fn spawn_default(database: &Path, portable: bool) -> Result<Self, String> {
         if let Some(executable) = std::env::var_os("SYLVIA_GM_OWNER_EXECUTABLE") {
             return Self::spawn_packaged(Path::new(&executable), database);
         }
 
-        if cfg!(debug_assertions) {
+        if cfg!(debug_assertions) && !portable {
             let python = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
                 .parent()
                 .ok_or_else(|| "Sylvia GM repository root is unavailable".to_string())?
@@ -457,6 +458,52 @@ fn application_info(window: WebviewWindow) -> Result<Value, String> {
 }
 
 #[tauri::command]
+async fn dictation_capabilities(window: WebviewWindow, id: Option<String>) -> Result<Value, String> {
+    trusted_caller(&window)?;
+    let app = window.app_handle().clone();
+    tauri::async_runtime::spawn_blocking(move || app.state::<dictation::Dictation>().capabilities_for(id.as_deref()))
+        .await
+        .map_err(|_| "unavailable".to_string())?
+}
+
+#[tauri::command]
+async fn dictation_start(window: WebviewWindow, id: String, engine: String, device: Option<String>) -> Result<(), String> {
+    trusted_caller(&window)?;
+    let app = window.app_handle().clone();
+    tauri::async_runtime::spawn_blocking(move || {
+        app.state::<dictation::Dictation>().start(&id, &engine, device.as_deref().unwrap_or("default"))
+    })
+    .await
+    .map_err(|_| "unavailable".to_string())?
+}
+
+#[tauri::command]
+async fn dictation_prepare(window: WebviewWindow, id: String) -> Result<Value, String> {
+    trusted_caller(&window)?;
+    let app = window.app_handle().clone();
+    tauri::async_runtime::spawn_blocking(move || app.state::<dictation::Dictation>().prepare(&id))
+        .await.map_err(|_| "download".to_string())?
+}
+
+#[tauri::command]
+async fn dictation_stop(window: WebviewWindow, id: String) -> Result<String, String> {
+    trusted_caller(&window)?;
+    let app = window.app_handle().clone();
+    tauri::async_runtime::spawn_blocking(move || app.state::<dictation::Dictation>().stop(&id))
+        .await
+        .map_err(|_| "provider".to_string())?
+}
+
+#[tauri::command]
+async fn dictation_cancel(window: WebviewWindow, id: String) -> Result<(), String> {
+    trusted_caller(&window)?;
+    let app = window.app_handle().clone();
+    tauri::async_runtime::spawn_blocking(move || app.state::<dictation::Dictation>().cancel(&id))
+        .await
+        .map_err(|_| "provider".to_string())
+}
+
+#[tauri::command]
 async fn campaign_index(window: WebviewWindow) -> Result<Value, String> {
     owner_call_async(window.clone(), "campaign_index", json!({})).await
 }
@@ -464,6 +511,21 @@ async fn campaign_index(window: WebviewWindow) -> Result<Value, String> {
 #[tauri::command]
 async fn campaign_creation_catalog(window: WebviewWindow) -> Result<Value, String> {
     owner_call_async(window.clone(), "campaign_creation_catalog", json!({})).await
+}
+
+#[tauri::command]
+async fn campaign_sequel_context(window: WebviewWindow, request: Value) -> Result<Value, String> {
+    owner_call_async(window, "campaign_sequel_context", request).await
+}
+
+#[tauri::command]
+async fn preview_campaign_sequel(window: WebviewWindow, request: Value) -> Result<Value, String> {
+    owner_call_async(window, "preview_campaign_sequel", request).await
+}
+
+#[tauri::command]
+async fn append_campaign_sequel(window: WebviewWindow, request: Value) -> Result<Value, String> {
+    owner_call_async(window, "append_campaign_sequel", request).await
 }
 
 #[tauri::command]
@@ -2513,8 +2575,9 @@ pub fn run() {
             .map_err(std::io::Error::other)?;
             if let Some(parent) = database.parent() {
                 std::fs::create_dir_all(parent)?;
+                app.manage(dictation::Dictation::new(parent.join("dictation-models/base-ebe41f70")));
             }
-            let bridge = OwnerBridge::spawn_default(&database).map_err(|error| {
+            let bridge = OwnerBridge::spawn_default(&database, portable.is_some()).map_err(|error| {
                 rfd::MessageDialog::new()
                     .set_title("Sylvia GM - selected data unavailable")
                     .set_description("Sylvia cannot open the selected data folder. Close any other Sylvia copy using that same folder, then try again. A different installed or portable copy keeps its own data.")
@@ -2535,6 +2598,7 @@ pub fn run() {
                     event,
                     tauri::WindowEvent::Destroyed | tauri::WindowEvent::CloseRequested { .. }
                 ) {
+                    panel_app.state::<dictation::Dictation>().close();
                     panel_app
                         .state::<panel_drag::PanelDrags>()
                         .cancel_window("main");
@@ -2555,8 +2619,16 @@ pub fn run() {
             panel_drag::begin_panel_drag,
             panel_drag::finish_panel_drag,
             application_info,
+            dictation_capabilities,
+            dictation_prepare,
+            dictation_start,
+            dictation_stop,
+            dictation_cancel,
             campaign_index,
             campaign_creation_catalog,
+            campaign_sequel_context,
+            preview_campaign_sequel,
+            append_campaign_sequel,
             delete_reusable_library_entry,
             builder_chat_index,
             create_builder_chat,
@@ -2663,6 +2735,7 @@ pub fn run() {
             // Tauri exits the process without dropping managed state. Wait for the owner
             // here so it cannot retain database or executable handles after desktop exit.
             if matches!(event, tauri::RunEvent::Exit) {
+                app.state::<dictation::Dictation>().close();
                 let _ = app.state::<OwnerBridge>().shutdown();
             }
         });

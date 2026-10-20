@@ -1066,12 +1066,16 @@ def _runtime_parameters(
     tool: ToolDef,
     parameters: SafePayload,
     bridge: AuthorityMemoryStateBridge,
+    *,
+    preserve_explicit: bool = False,
 ) -> dict[str, Any]:
-    """Use the same defaults and authority-bound values for checks and execution."""
+    """Bind public inputs to authority; retain explicit arguments in internal Ruleset calls."""
 
     bound = cast(dict[str, Any], _mutable_json(parameters))
     for parameter in tool.parameters:
-        if parameter.from_state is not None:
+        if parameter.from_state is not None and not (
+            preserve_explicit and parameter.name in bound
+        ):
             bound[parameter.name] = _bound_runtime_parameter(bridge, parameter.from_state)
         elif parameter.name not in bound and parameter.default is not None:
             bound[parameter.name] = deepcopy(parameter.default)
@@ -1320,6 +1324,10 @@ def materialize_package_mechanic(
             nested_parameters: dict[str, Any],
             _parent: ExecutionContext,
         ) -> ToolResult:
+            if tool_name in tools:
+                nested_parameters = _runtime_parameters(
+                    tools[tool_name], nested_parameters, bridge, preserve_explicit=True,
+                )
             return execute_tool(
                 tool_name,
                 nested_parameters,
@@ -1395,9 +1403,16 @@ def materialize_package_mechanic(
             raise PackageRuntimeError("Package mechanic execution failed")
         if choice_control is not None and not choice_control.consumed:
             raise PackageRuntimeError("Package mechanic did not consume the authorized choice")
+        if result.private_random_sampled and result.public_context is None:
+            raise PackageRuntimeError("Hidden random results require explicit publication")
+        if (runtime.model_decision_boundary
+                and runtime.model_decision_boundary.get("isolated_participant")
+                and result.public_context is None):
+            raise PackageRuntimeError("Isolated participant actions require explicit publication")
+        published_context = result.context if result.public_context is None else result.public_context
         visible_context = {
             key: value
-            for key, value in result.context.items()
+            for key, value in published_context.items()
             if key not in bridge.spatial_private_variables
         }
         result_payload: dict[str, object] = {

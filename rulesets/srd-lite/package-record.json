@@ -31,7 +31,7 @@
   },
   "content_declarations": "content/content-declarations.json",
   "content_kind": "ruleset",
-  "content_sha256": "d93c0d4f6eff9b24e475f4f9b178ce11cfcad889cb3dc331db87562d78c92efe",
+  "content_sha256": "645f83094691903002f318cd106695b8cdb6a412b50b9516e60c62acd93b63dd",
   "dependencies": [
     {
       "content_sha256": "ad3da5b65b26ed1fb5076ef30ffd764713bc52deadfe5d5ae6e83b8078651461",
@@ -155,7 +155,7 @@
     {
       "bytes": 93734,
       "path": "content/spell-catalogue.json",
-      "sha256": "e3470675d330bc61e9a9215698427dc2312a4c292cf56d45d4673502d6e010fc"
+      "sha256": "1028f7006135dcbba6fa1c04b0227d1cca25a05d98dd9070d83f1899df130bd8"
     },
     {
       "bytes": 5865,
@@ -185,12 +185,12 @@
     {
       "bytes": 1640,
       "path": "package-identity.json",
-      "sha256": "b4c20479f6d3a66fda999196b20227e6920f888c35210d18ad40e9ccfc180c26"
+      "sha256": "94e91c77280da2547a6b264f2428c484e249fe3baeec9a7e0cf7121b6baac14d"
     },
     {
-      "bytes": 26703,
+      "bytes": 26926,
       "path": "prompts/gm-operating-guide.md",
-      "sha256": "174a0795f7798910b1b2468c56d1807bdc3bc2aadee0a12ec7487f07844d943a"
+      "sha256": "b0223bf248de2d7e5757201ae89e0c09f5739b5fdfec672b3813b77834a83837"
     },
     {
       "bytes": 753326,
@@ -208,9 +208,9 @@
       "sha256": "e99cb13cdf36dca41c67b9041bf91a536c8b49c730bb27a8909eb4385a8908e3"
     },
     {
-      "bytes": 14561427,
+      "bytes": 14562341,
       "path": "runtime/ruleset.yaml",
-      "sha256": "ce2617540501490e51cd48eb219509a5e19d695430a206e9c5e09f74ec5b762e"
+      "sha256": "54acf5501d474fef48e1767e43c73de708a79e9e9d673367feed4697ceba2d03"
     },
     {
       "bytes": 59661,
@@ -42256,6 +42256,7 @@
         "additionalProperties": false,
         "properties": {
           "build": {
+            "description": "Complete resulting build. Resulting walking Speed after the new class features and worn equipment. The engine derives it from the retained base species Speed; do not change that base.",
             "items": {
               "additionalProperties": false,
               "properties": {
@@ -56271,16 +56272,7 @@
       "title": "Party"
     },
     {
-      "actions": [
-        {
-          "id": "end-combat",
-          "intent": "end_combat_encounter",
-          "label": "End combat",
-          "params": {
-            "end_reason": "fighting_stopped"
-          }
-        }
-      ],
+      "actions": [],
       "allowed_placements": [
         "docked",
         "floating",
@@ -57138,5 +57130,5 @@
       "title": "Character"
     }
   ],
-  "version": "0.3.12"
+  "version": "0.3.15"
 }

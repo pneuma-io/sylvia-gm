@@ -1,32 +1,87 @@
 """Campaign discovery ranks retained SQLite sources without changing their authority."""
 
+import io
+
 import pytest
 
+from sylvia_gm.application.authority import AuthorityOwner
+from sylvia_gm.application.bundled_packages import bundled_rift_archive
+from sylvia_gm.domain.authority import PackageRole, StateValue
+from sylvia_gm.domain.campaign_plan import CAMPAIGN_PLAN_FORMAT_VERSION
 from sylvia_gm.domain.session import SessionMessageKind
-from sylvia_gm.infrastructure.launch_handshake import derive_owner_response
-from sylvia_gm.interfaces.local_api import LocalCommandBus
-from sylvia_gm.interfaces.local_owner import LocalOwnerSupervisor
-from tests.test_alpha_05_rift_journey import _construct_rift
 
 
 @pytest.fixture(scope="module")
 def campaign(tmp_path_factory):
     root = tmp_path_factory.mktemp("knowledge-search")
-    supervisor = LocalOwnerSupervisor()
-    issued = supervisor.acquire_owner(root / "campaign.db", "search-owner")
-    supervisor.complete_handshake(derive_owner_response(issued.secret_hex))
-    owner = supervisor.application_owner()
-    try:
-        campaign_id, session_id = _construct_rift(
-            LocalCommandBus(supervisor),
-            owner,
-            root,
-            lane="quick_start",
-            companion_ids=(),
+    with AuthorityOwner.open(root / "campaign.db", "search-owner") as owner:
+        candidate = owner.install_package_archive(
+            io.BytesIO(bundled_rift_archive()), install_id="search"
         )
-        yield owner, campaign_id, session_id
-    finally:
-        supervisor.shutdown()
+        primary = next(p for p in candidate.package_lock.entries if p.role is PackageRole.PRIMARY)
+        setting = next(
+            p for p in candidate.package_lock.entries if p.package_id == "pneuma.severed-lands"
+        )
+        state = {
+            "advancement": {
+                "method": "fixed",
+                "starting_level": 1,
+                "maximum_level": 1,
+                "recipients": "whole_party",
+                "timing": "Reference QA only.",
+                "allocation": "No awards.",
+            }
+        }
+        confirmation = owner.confirm_new_campaign(
+            operation_id="search-confirm",
+            display_name="Search QA",
+            package_lock=candidate.package_lock,
+            turn_id="construction",
+            package_candidate_id=candidate.candidate_id,
+            builder_session_id="search-builder",
+            builder_provider_id="fixture",
+            builder_model_id="fixture",
+            participants=(),
+            initial_state=(StateValue(primary.package_id, "state", state),),
+        )
+        campaign_id = confirmation.campaign_id
+        owner.begin_campaign_construction(
+            operation_id="search-begin",
+            campaign_id=campaign_id,
+            lane="quick_start",
+            expected_revision=0,
+            canonical_input={"premise": "Search QA"},
+        )
+        lock = owner.current_package_lock(campaign_id)
+        _, _, handoff = owner.finalize_campaign_construction(
+            campaign_id=campaign_id,
+            dm_provider_id="fixture",
+            dm_model_id="fixture",
+            plan_artifact_text="# Search QA",
+            model_guidance_override=True,
+            structured_plan={
+                "format_id": "sylvia-gm-campaign-plan",
+                "format_version": CAMPAIGN_PLAN_FORMAT_VERSION,
+                "bindings": {
+                    "ruleset": {
+                        "id": primary.package_id,
+                        "version": primary.version,
+                        "content_sha256": primary.sha256,
+                    },
+                    "campaign_setting": {
+                        "id": setting.package_id,
+                        "version": setting.version,
+                        "content_sha256": setting.sha256,
+                    },
+                    "package_closure_sha256": lock.closure_sha256,
+                },
+                "initial_state": {
+                    "mechanics": [{"namespace": primary.package_id, "key": "state", "value": state}]
+                },
+            },
+        )
+        owner.open_turn(campaign_id, "search-turn")
+        yield owner, campaign_id, handoff.dm_session_id
 
 
 @pytest.mark.parametrize(

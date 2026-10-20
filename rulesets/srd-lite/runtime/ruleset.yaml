@@ -33050,12 +33050,14 @@ tools:
   level_up_srd_character:
     description: 'Apply one earned or queued starting SRD level. Read the retained class level, subclass,
       feat and spell rules; resolve every player choice before proposing the build. Provide complete proficiency
-      lists preserving existing grants and all new features. The player confirms the proposal. Feature records
-      are not automatic feature execution.
-  
+      lists preserving existing grants and all new features. The player confirms the proposal. Feature
+      records are not automatic feature execution.
+
       Selected spell headers restrict eligible choices. Full complete-grant and earned-level requirements
       remain unchanged; initial character validation describes available choices and reports current repertoire
-      shortfalls. Pending profiles cannot fill missing choices. Gameplay verification remains pending.'
+      shortfalls. Pending profiles cannot fill missing choices. Gameplay verification remains pending.
+      Supply resulting AC and walking Speed; the engine validates both against new class features and
+      worn equipment while retaining base species Speed.'
     pre_conditions:
     - condition: _character_id == _character_state_id
       error: Character profile and mechanical state must identify the same character.
@@ -33085,8 +33087,8 @@ tools:
         > 0
       on_true:
       - require:
-          condition: character_state.initial_advancement_queue[0].from_level == _prior_character.level and
-            character_state.initial_advancement_queue[0].target_level == _new_level and character_state.initial_advancement_queue[0].intent
+          condition: character_state.initial_advancement_queue[0].from_level == _prior_character.level
+            and character_state.initial_advancement_queue[0].target_level == _new_level and character_state.initial_advancement_queue[0].intent
             == 'level_up_srd_character'
           error: Resolve the next queued starting level in order; levels cannot be skipped or repeated.
     - require:
@@ -33201,9 +33203,9 @@ tools:
     - set:
         field: _ability_budget
         value: 2
-      condition: _class_level == 4 or _class_level == 8 or _class_level == 12 or _class_level == 16 or (class_id
-        == 'fighter' and (_class_level == 6 or _class_level == 14)) or (class_id == 'rogue' and _class_level
-        == 10)
+      condition: _class_level == 4 or _class_level == 8 or _class_level == 12 or _class_level == 16 or
+        (class_id == 'fighter' and (_class_level == 6 or _class_level == 14)) or (class_id == 'rogue'
+        and _class_level == 10)
     - set:
         field: _ability_budget
         value: 1
@@ -33231,8 +33233,8 @@ tools:
         error: A level-up cannot remove existing ability-score gains.
     - require:
         condition: _build.abilities.dexterity <= max(20, _prior_character.abilities.dexterity) or (_class_level
-          == 19 and _build.abilities.dexterity <= 30) or (class_id == 'barbarian' and _class_level == 20
-          and _build.abilities.dexterity <= 25)
+          == 19 and _build.abilities.dexterity <= 30) or (class_id == 'barbarian' and _class_level ==
+          20 and _build.abilities.dexterity <= 25)
         error: An ability increase exceeds the selected level's score limit.
     - set:
         field: _ability_total
@@ -33242,8 +33244,8 @@ tools:
         error: A level-up cannot remove existing ability-score gains.
     - require:
         condition: _build.abilities.constitution <= max(20, _prior_character.abilities.constitution) or
-          (_class_level == 19 and _build.abilities.constitution <= 30) or (class_id == 'barbarian' and _class_level
-          == 20 and _build.abilities.constitution <= 25)
+          (_class_level == 19 and _build.abilities.constitution <= 30) or (class_id == 'barbarian' and
+          _class_level == 20 and _build.abilities.constitution <= 25)
         error: An ability increase exceeds the selected level's score limit.
     - set:
         field: _ability_total
@@ -33253,8 +33255,8 @@ tools:
         error: A level-up cannot remove existing ability-score gains.
     - require:
         condition: _build.abilities.intelligence <= max(20, _prior_character.abilities.intelligence) or
-          (_class_level == 19 and _build.abilities.intelligence <= 30) or (class_id == 'barbarian' and _class_level
-          == 20 and _build.abilities.intelligence <= 25)
+          (_class_level == 19 and _build.abilities.intelligence <= 30) or (class_id == 'barbarian' and
+          _class_level == 20 and _build.abilities.intelligence <= 25)
         error: An ability increase exceeds the selected level's score limit.
     - set:
         field: _ability_total
@@ -33264,8 +33266,8 @@ tools:
         error: A level-up cannot remove existing ability-score gains.
     - require:
         condition: _build.abilities.wisdom <= max(20, _prior_character.abilities.wisdom) or (_class_level
-          == 19 and _build.abilities.wisdom <= 30) or (class_id == 'barbarian' and _class_level == 20 and
-          _build.abilities.wisdom <= 25)
+          == 19 and _build.abilities.wisdom <= 30) or (class_id == 'barbarian' and _class_level == 20
+          and _build.abilities.wisdom <= 25)
         error: An ability increase exceeds the selected level's score limit.
     - set:
         field: _ability_total
@@ -33290,8 +33292,8 @@ tools:
           condition: _build.abilities.strength == min(25, _prior_character.abilities.strength + 4)
           error: Primal Champion raises Strength and Constitution by 4 (maximum 25).
       - require:
-          condition: _build.abilities.constitution == min(25, _prior_character.abilities.constitution +
-            4)
+          condition: _build.abilities.constitution == min(25, _prior_character.abilities.constitution
+            + 4)
           error: Primal Champion raises Strength and Constitution by 4 (maximum 25).
       - require:
           condition: _build.abilities.dexterity == _prior_character.abilities.dexterity
@@ -33503,7 +33505,6 @@ tools:
           classes: _classes
           abilities: _build.abilities
           subclasses: _next_subclasses
-          speed: _build.speed
           spellcasting_grants: _build.spellcasting
     - set:
         field: _next_equipment_profile
@@ -33556,8 +33557,8 @@ tools:
         - set:
             field: _style_feature
             value: true
-          condition: _style_class.id == 'fighter' or ((_style_class.id == 'paladin' or _style_class.id ==
-            'ranger') and _style_class.level >= 2)
+          condition: _style_class.id == 'fighter' or ((_style_class.id == 'paladin' or _style_class.id
+            == 'ranger') and _style_class.level >= 2)
     - set:
         field: _style_records
         value: _next_equipment_profile.fighting_styles
@@ -33596,8 +33597,8 @@ tools:
             condition: _style_class_level >= _style_policy.level
             error: The Fighting Style grant has not been earned at this class level.
         - require:
-            condition: _style_policy.subclass == '' or (_next_equipment_profile.subclasses != null and _next_equipment_profile.subclasses[_style_policy.class_id]
-              == _style_policy.subclass)
+            condition: _style_policy.subclass == '' or (_next_equipment_profile.subclasses != null and
+              _next_equipment_profile.subclasses[_style_policy.class_id] == _style_policy.subclass)
             error: The additional Fighting Style requires the Champion subclass.
         - list_push:
             list: _style_sources
@@ -33893,8 +33894,8 @@ tools:
             condition: _old_style_choice.source in definitions.srd_fighting_style_grants
             error: A Fighting Style needs its actual class feature or feat slot.
         - require:
-            condition: _old_style_choice.source not in _old_style_sources and _old_style_choice.style not
-              in _old_style_selected
+            condition: _old_style_choice.source not in _old_style_sources and _old_style_choice.style
+              not in _old_style_selected
             error: Each Fighting Style and its granting feature may be selected only once.
         - set:
             field: _old_style_policy
@@ -34006,6 +34007,10 @@ tools:
     - require:
         condition: _build.armor_class == _equipment_ac
         error: Proposed Armor Class must match the new abilities, class grants and worn equipment.
+    - require:
+        condition: _build.speed == _equipment_speed
+        error: Proposed walking Speed must match the new class features and worn equipment. Keep the character's
+          base species Speed unchanged.
     - set:
         field: _next_focus_maximum
         value: 0
@@ -34097,8 +34102,8 @@ tools:
           as: _wholeness_proposal
           do:
           - require:
-              condition: _wholeness_proposal.id != 'wholeness_of_body' or _wholeness_proposal.maximum ==
-                _next_wholeness_maximum
+              condition: _wholeness_proposal.id != 'wholeness_of_body' or _wholeness_proposal.maximum
+                == _next_wholeness_maximum
               error: Wholeness of Body capacity is determined by the Open Hand feature and Wisdom.
       on_false: []
     - set:
@@ -34109,8 +34114,8 @@ tools:
         value: character_state.resources.focus_point
       condition: character_state.resources.focus_point != null
     - require:
-        condition: _prior_focus_remaining >= 0 and _prior_focus_remaining <= _prior_focus_maximum and (_prior_focus_maximum
-          == 0 or character_state.resource_maxima.focus_point == _prior_focus_maximum)
+        condition: _prior_focus_remaining >= 0 and _prior_focus_remaining <= _prior_focus_maximum and
+          (_prior_focus_maximum == 0 or character_state.resource_maxima.focus_point == _prior_focus_maximum)
         error: Saved Focus must match the previous Monk class capacity.
     - condition: 'true'
       on_true:
@@ -34223,10 +34228,14 @@ tools:
           maximum: 1
       store_as: _pools
       condition: _found == false
+    - set:
+        field: _proposed_max_hp
+        value: character_state.max_hp + _hp_gain
     - request_choice:
         choice_id: srd-level-up
-        prompt: Advance {_prior_character.name} to level {_new_level} ({class_id} {_class_level}) using
-          {hp_method} Hit Points? {choices_summary}
+        prompt: 'Advance {_prior_character.name} to level {_new_level} ({class_id} {_class_level}) using
+          {hp_method} Hit Points? Computed maximum HP: {_proposed_max_hp}; Armor Class: {_equipment_ac};
+          Walking Speed: {_equipment_speed}. {choices_summary}'
         options:
         - id: apply
           label: Apply level-up
@@ -34327,10 +34336,6 @@ tools:
           participant: _character_id
           field: advancements
           value: _advancements
-      - set_participant:
-          participant: _character_id
-          field: speed
-          value: _build.speed
       - set:
           field: '{_character_state_id}.speed'
           value: _equipment_speed
@@ -34365,8 +34370,8 @@ tools:
         on_true:
         - set:
             field: _save
-            value: character_state.saving_throw_modifiers.strength + (_build.abilities.strength - 10) //
-              2 - (_prior_character.abilities.strength - 10) // 2
+            value: character_state.saving_throw_modifiers.strength + (_build.abilities.strength - 10)
+              // 2 - (_prior_character.abilities.strength - 10) // 2
         - set:
             field: _save
             value: _save - 2 - (_prior_character.level - 1) // 4
@@ -34437,8 +34442,8 @@ tools:
         on_true:
         - set:
             field: _save
-            value: character_state.saving_throw_modifiers.wisdom + (_build.abilities.wisdom - 10) // 2 -
-              (_prior_character.abilities.wisdom - 10) // 2
+            value: character_state.saving_throw_modifiers.wisdom + (_build.abilities.wisdom - 10) // 2
+              - (_prior_character.abilities.wisdom - 10) // 2
         - set:
             field: _save
             value: _save - 2 - (_prior_character.level - 1) // 4
@@ -34455,8 +34460,8 @@ tools:
         on_true:
         - set:
             field: _save
-            value: character_state.saving_throw_modifiers.charisma + (_build.abilities.charisma - 10) //
-              2 - (_prior_character.abilities.charisma - 10) // 2
+            value: character_state.saving_throw_modifiers.charisma + (_build.abilities.charisma - 10)
+              // 2 - (_prior_character.abilities.charisma - 10) // 2
         - set:
             field: _save
             value: _save - 2 - (_prior_character.level - 1) // 4
@@ -34476,10 +34481,10 @@ tools:
         condition: character_state.initiative_modifier != null
       - set:
           field: '{_character_state_id}.initiative_modifier'
-          value: character_state.initiative_modifier + (_new_level - 1) // 4 - (_prior_character.level -
-            1) // 4
-        condition: '''alert'' in _prior_character.origin_feats and character_state.initiative_modifier !=
-          null'
+          value: character_state.initiative_modifier + (_new_level - 1) // 4 - (_prior_character.level
+            - 1) // 4
+        condition: '''alert'' in _prior_character.origin_feats and character_state.initiative_modifier
+          != null'
       - condition: 'true'
         on_true:
         - set:
@@ -34666,6 +34671,10 @@ tools:
           value:
             path: context._applied_hp_gain
           optional: true
+        - label: Walking Speed
+          value:
+            path: context.character_state.speed
+          optional: true
         details:
         - label: Proposed choices
           value:
@@ -34677,9 +34686,14 @@ tools:
               fixed: Fixed increase
               roll: Rolled increase
     parameters:
-    - param_character_46d8a27d7576c33c
-    - param_character_state_809d60742dbb9d5c
-    - param_policy_ba7ffd01a64e74dc
+    - name: character
+      resolve: participant
+    - name: character_state
+      resolve: entity
+      description: The same character ID, selecting its live mechanical state.
+    - name: policy
+      type: object
+      from_state: state.advancement
     - name: class_id
       type: enum
       enum_values:
@@ -35575,6 +35589,9 @@ tools:
         - prepared_spells
         - features
         additionalProperties: false
+      description: Complete resulting build. Resulting walking Speed after the new class features and
+        worn equipment. The engine derives it from the retained base species Speed; do not change that
+        base.
   take_srd_short_rest_hit_die:
     description: Immediately after a tracked Short Rest completes, spend one Hit Die and apply its healing.
       Choose further dice after each result, before advancing time or resuming other activity. For mixed

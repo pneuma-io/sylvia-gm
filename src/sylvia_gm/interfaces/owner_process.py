@@ -78,11 +78,13 @@ from sylvia_gm.application.bundled_campaign_plans import (
     selected_campaign_plan,
 )
 from sylvia_gm.application.bundled_packages import (
+    BUNDLED_RIICHI_PACKAGES,
     bundled_campaign_content_catalog,
     bundled_rift_archive,
     bundled_rift_authority,
     bundled_rift_campaign_plan,
     bundled_rift_participant_declaration,
+    bundled_riichi_archive,
     bundled_srd_archive,
     bundled_srd_version,
 )
@@ -572,6 +574,15 @@ def _campaign_creation_catalog(
         choice = next((item for item in items if item.get("kind") == "ruleset" and item.get("id") == rule["id"]), None)
         if choice is None:
             choice = {"kind": "ruleset", **dict(rule), "title": rule["id"], "selection_id": rule["id"], "compatible_settings": ()}
+            installed = next((entry for candidate in candidates
+                              for entry in candidate.package_lock.entries
+                              if (entry.package_id, entry.version, entry.sha256) == (
+                                  rule["id"], rule["version"], rule["content_sha256"],
+                              )), None)
+            if installed is not None:
+                choice["title"] = application_owner.package_label(
+                    installed.package_id, installed.version, installed.sha256,
+                )
             items.append(choice)
         settings = tuple(choice.get("compatible_settings", ()))
         if not any(binding["id"] == world["id"] for binding in settings):
@@ -899,13 +910,24 @@ def _admitted_dm_campaign_plan(
         or handoff.dm_session_id != session_id
     ):
         raise CommandRejected("DM session does not match the admitted campaign plan")
+    adventures = owner.campaign_adventures(campaign_id)
+    if not adventures or adventures[0].plan_id != plan.plan_id:
+        raise CommandRejected("Current adventure is not descended from the admitted handoff")
+    plan = adventures[-1]
     admitted_text = plan.content.get("campaign_plan_markdown")
     if not isinstance(admitted_text, str) or not admitted_text.strip():
         raise CommandRejected("Admitted campaign plan content is unavailable")
     if len(admitted_text.encode("utf-8")) > _MAX_CAMPAIGN_PLAN_BYTES:
         raise CommandRejected("Admitted campaign plan exceeds the usability limit")
     structured = plan.content.get("campaign_plan")
-    return admitted_text, structured if isinstance(structured, Mapping) else None
+    from sylvia_gm.domain.campaign_sequel import sequel_markdown, sequel_preparation
+
+    continuation = sequel_preparation(plan.content)
+    if continuation is not None and isinstance(structured, Mapping):
+        # This application projection is not a change to the authored or accepted Plan bytes.
+        structured = {**structured, "_app_adventure_continuation": continuation}
+
+    return sequel_markdown(plan.content), structured if isinstance(structured, Mapping) else None
 
 
 def _read_message(stream: TextIO) -> dict[str, Any] | None:
@@ -1494,6 +1516,24 @@ def _preinstall_bundled_srd(bus: LocalCommandBus) -> None:
     )
 
 
+def _preinstall_bundled_riichi(bus: LocalCommandBus) -> None:
+    """Add the shipped closure once, retaining installed content and same-version edits."""
+
+    raw_candidates = bus.package_candidates()
+    if not isinstance(raw_candidates, Sequence):
+        raise RuntimeError("Package candidate projection is invalid")
+    required = set(BUNDLED_RIICHI_PACKAGES)
+    for candidate in cast(Sequence[PackageCandidate], raw_candidates):
+        installed = {(entry.package_id, entry.version) for entry in candidate.package_lock.entries}
+        if required <= installed:
+            return
+    archive = bundled_riichi_archive()
+    bus.install_package(
+        io.BytesIO(archive),
+        install_id=f"install-bundled-riichi-{hashlib.sha256(archive).hexdigest()[:24]}",
+    )
+
+
 def _selection_from_reference(
     choices: Sequence[Mapping[str, object]], reference: str
 ) -> dict[str, str]:
@@ -1957,7 +1997,7 @@ def _dispatch_selected(
     if method == "snapshot":
         return bus.snapshot(_required_text(params, "campaign_id"))
     if method == "display_snapshot":
-        return application_owner.display_snapshot(_required_text(params, "campaign_id"))
+        return application_owner.desktop_snapshot(_required_text(params, "campaign_id"), display_only=True)
     if method == "player_projection":
         return bus.player_projection(_required_text(params, "campaign_id"))
     if method == "player_projection_page":
@@ -2028,6 +2068,21 @@ def _dispatch_selected(
             return application_owner.preview_panel_action(**action_arguments)
         return application_owner.execute_panel_action(
             **action_arguments, confirmation=_optional_text(params, "confirmation"),
+        )
+    if method in {"campaign_sequel_context", "preview_campaign_sequel", "append_campaign_sequel"}:
+        arguments = {
+            "campaign_id": _required_text(params, "campaign_id"),
+            "session_id": _required_text(params, "session_id"),
+        }
+        if method == "campaign_sequel_context":
+            return application_owner.campaign_sequel_context(**arguments)
+        arguments["source_id"] = _required_text(params, "source_id")
+        if method == "preview_campaign_sequel":
+            return application_owner.preview_campaign_sequel(**arguments)
+        return application_owner.append_campaign_sequel(
+            **arguments, operation_id=_required_text(params, "operation_id"),
+            expected_revision=_required_nonnegative_int(params, "expected_revision"),
+            preview_sha256=_required_text(params, "preview_sha256"), review=params.get("review"),
         )
     if method == "package_candidates":
         return bus.package_candidates()
@@ -2260,6 +2315,7 @@ def _dispatch_selected(
                 "latest_canonical_sequence": history_page.latest_canonical_sequence,
                 "act_markers": history_page.act_markers,
                 "campaign_ending": history_page.campaign_ending,
+                "campaign_endings": history_page.campaign_endings,
             }
             display_session = history_page.session
             display_messages = history_page.messages
@@ -4486,6 +4542,7 @@ def run(
         owner_config_path = storage_root / "config.yaml"
         application_owner = supervisor.application_owner()
         _preinstall_bundled_srd(bus)
+        _preinstall_bundled_riichi(bus)
         if application_owner.legacy_builder_contexts():
             migrate_legacy_builder_chats(
                 application_owner, storage_root,

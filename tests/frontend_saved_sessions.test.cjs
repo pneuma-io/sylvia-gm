@@ -42,7 +42,9 @@ function element() {
     setCustomValidity(message) { this.validationMessage = message; },
     reportValidity() { this.validityReports = (this.validityReports || 0) + 1; return !this.validationMessage; },
     focus() { this.focused = true; }, contains: () => false,
+    setSelectionRange(start, end) { this.selectionStart = start; this.selectionEnd = end; },
     appendChild(child) { this.children.push(child); child.parentElement = this; },
+    replaceChildren(...children) { this.children = children; },
     replaceWith(next) {
       const parent = this.parentElement;
       parent.children[parent.children.indexOf(this)] = next;
@@ -102,7 +104,7 @@ function harness(savedStorage = new Map(), { shippedDom = false } = {}) {
     window: { addEventListener() {}, confirm: () => true, requestAnimationFrame() {} },
     navigator: { clipboard: { writeText: async (text) => { clipboard.push(text); } } },
     document, sessionStorage: storage, localStorage: storage,
-    crypto: webcrypto, console,
+    crypto: webcrypto, console, AbortController,
     setInterval: (fn, ms) => { const id = ++timerId; timers.set(id, { fn, ms }); return id; },
     clearInterval: (id) => timers.delete(id),
     setTimeout: (fn, ms) => { const id = ++timerId; timers.set(id, { fn, ms }); return id; },
@@ -114,6 +116,7 @@ function harness(savedStorage = new Map(), { shippedDom = false } = {}) {
   const insertion = source.lastIndexOf('  return {');
   source = source.slice(0, insertion) + `  window.sessionTest = {
     state, openBuilderChat, openCampaign, showHome, refreshSelectedCampaign, submitInput, stop, retry, reconnect,
+    initDictation, getDictation: () => dictation, createHostBridge,
     signalActiveStreamDisconnect, restoreDisconnectedStream, renderBuilderSession,
     renderDMSession, ensureSessionActivity, finalizeSelectedConstruction, renameBuilderChat,
     deleteBuilderChat, setBuilderArchived, setCampaignArchived, renderHome, renderBuilderChatRail,
@@ -127,7 +130,7 @@ function harness(savedStorage = new Map(), { shippedDom = false } = {}) {
     wireBuilderQuestionForms: typeof wireBuilderQuestionForms === 'function'
       ? wireBuilderQuestionForms : null,
   };\n` + source.slice(insertion);
-  source = ['panel-workspace.js', 'shot-playback.js', 'panel-host.js'].map((name) =>
+  source = ['dictation.js', 'panel-workspace.js', 'shot-playback.js', 'panel-host.js'].map((name) =>
     fs.readFileSync(path.join(__dirname, '../src-tauri/frontend', name), 'utf8')).join('\n') + '\n' + source;
   context.setTimeout ||= setTimeout;
   context.clearTimeout ||= clearTimeout;
@@ -1165,6 +1168,221 @@ test('two Builder chats keep their requests, drafts, steering and Stop separate'
   assert.equal(h.node('player-input').value, 'A new unsent draft');
 });
 
+test('host dictation bridge passes identity and language without audio or submission fields', async () => {
+  const h = harness();
+  const calls = [];
+  h.window.__TAURI__ = { core: { invoke: async (...args) => { calls.push(args); } } };
+  const bridge = h.createHostBridge();
+  await bridge.dictation_capabilities();
+  await bridge.dictation_capabilities('capture');
+  await bridge.dictation_start('capture', 'installed-language');
+  await bridge.dictation_stop('capture');
+  await bridge.dictation_cancel('capture');
+  assert.deepEqual(JSON.parse(JSON.stringify(calls)), [
+    ['dictation_capabilities'], ['dictation_capabilities', { id: 'capture' }],
+    ['dictation_start', { id: 'capture', engine: 'installed-language' }],
+    ['dictation_stop', { id: 'capture' }], ['dictation_cancel', { id: 'capture' }],
+  ]);
+});
+
+test('cancel during language discovery prevents native capture and keeps the draft', async () => {
+  const h = harness();
+  await h.openBuilderChat('a');
+  const capabilities = deferred();
+  let starts = 0, loadingId;
+  const cancellations = [];
+  h.state.bridge.dictation_capabilities = id => { loadingId = id; return capabilities.promise; };
+  h.state.bridge.dictation_start = async () => { starts += 1; };
+  h.state.bridge.dictation_stop = async () => 'words';
+  h.state.bridge.dictation_cancel = async id => { cancellations.push(id); };
+  h.initDictation(); h.node('player-input').value = 'Keep this draft';
+  const pending = h.getDictation().start();
+  h.getDictation().cancel();
+  capabilities.resolve({ engines: [{ id: 'test', language: 'en-GB' }] });
+  await pending;
+  assert.equal(starts, 0);
+  assert.equal(typeof loadingId, 'string');
+  assert.deepEqual(cancellations, [loadingId]);
+  assert.equal(h.node('player-input').value, 'Keep this draft');
+  assert.equal(h.calls.submissions.length, 0);
+});
+
+test('unavailable local speech leaves typing and explicit retry available', async () => {
+  const h = harness();
+  await h.openBuilderChat('a');
+  let starts = 0;
+  h.state.bridge.dictation_capabilities = async () => ({ engines: [] });
+  h.state.bridge.dictation_start = async () => { starts += 1; };
+  h.state.bridge.dictation_stop = async () => '';
+  h.state.bridge.dictation_cancel = async () => {};
+  h.initDictation(); h.node('player-input').value = 'Keep this draft';
+  await h.getDictation().start();
+  assert.equal(h.getDictation().snapshot().phase, 'error');
+  assert.match(h.getDictation().snapshot().message, /Local dictation is unavailable/);
+  assert.equal(starts, 0);
+  assert.equal(h.node('player-input').disabled, false);
+  assert.equal(h.node('player-input').value, 'Keep this draft');
+});
+
+test('missing local model offers explicit setup without capturing or sending the draft', async () => {
+  const h = harness(); await h.openBuilderChat('a');
+  let ready = false, starts = 0;
+  const preparation = deferred();
+  h.state.bridge.dictation_capabilities = async () => ({ ready, engines: [{ id: 'en', language: 'en' }],
+    devices: [{ id: 'default', label: 'System default: Test microphone' }] });
+  h.state.bridge.dictation_start = async () => { starts++; };
+  h.state.bridge.dictation_stop = async () => 'words';
+  h.state.bridge.dictation_cancel = async () => {};
+  h.state.bridge.dictation_prepare = () => preparation.promise;
+  h.initDictation(); h.node('player-input').value = 'Keep my typed action';
+  await h.getDictation().start();
+  assert.match(h.getDictation().snapshot().message, /Download the local speech model/);
+  assert.equal(h.node('settings-overlay').hidden, false);
+  assert.equal(h.node('settings-panel-dictation').hidden, false);
+  assert.equal(h.node('dictation-download').hidden, false);
+  h.node('dictation-download').dispatchEvent({ type: 'click' }); await h.flush();
+  assert.match(h.node('dictation-model-status').textContent, /Downloading/);
+  assert.equal(h.node('dictation-toggle').disabled, true);
+  assert.equal(h.node('player-input').disabled, false);
+  ready = true; preparation.resolve({ status: 'ready' }); await h.flush();
+  assert.match(h.node('dictation-model-status').textContent, /ready/);
+  assert.equal(starts, 0);
+  assert.equal(h.calls.submissions.length, 0);
+  assert.equal(h.node('player-input').value, 'Keep my typed action');
+  await h.getDictation().start(); assert.equal(starts, 1);
+  h.getDictation().cancel();
+});
+
+test('cancelling setup ignores late completion and keeps typing available', async () => {
+  const h = harness(); await h.openBuilderChat('a');
+  const preparation = deferred(), cancellations = [];
+  h.state.bridge.dictation_capabilities = async () => ({ ready: false, engines: [{ id: 'en', language: 'en' }] });
+  h.state.bridge.dictation_start = async () => { throw new Error('must not capture during setup'); };
+  h.state.bridge.dictation_stop = async () => '';
+  h.state.bridge.dictation_cancel = async id => cancellations.push(id);
+  h.state.bridge.dictation_prepare = () => preparation.promise;
+  h.initDictation(); h.node('player-input').value = 'My preserved draft';
+  await h.getDictation().start();
+  h.node('dictation-download').dispatchEvent({ type: 'click' }); await h.flush();
+  h.node('dictation-download').dispatchEvent({ type: 'click' }); await h.flush();
+  const before = h.node('dictation-model-status').textContent;
+  assert.match(before, /cancelled/);
+  preparation.resolve({ status: 'ready' }); await h.flush();
+  assert.equal(h.node('dictation-model-status').textContent, before);
+  assert.ok(cancellations.length >= 1);
+  assert.equal(h.node('player-input').disabled, false);
+  assert.equal(h.node('player-input').value, 'My preserved draft');
+  assert.equal(h.calls.submissions.length, 0);
+});
+
+test('explicit language and microphone selections reach the capture contract unchanged', async () => {
+  const h = harness(); await h.openBuilderChat('a'); const starts = [];
+  h.state.bridge.dictation_capabilities = async () => ({ ready: true,
+    engines: [{ id: 'auto', language: 'auto' }, { id: 'es', language: 'es' }],
+    devices: [{ id: 'default', label: 'System default' }, { id: 'd-2-test', label: 'Selected input' }] });
+  h.state.bridge.dictation_start = async (...args) => starts.push(args);
+  h.state.bridge.dictation_stop = async () => '';
+  h.state.bridge.dictation_cancel = async () => {};
+  h.initDictation();
+  h.node('dictation-language').value = 'es'; h.node('dictation-device').value = 'd-2-test';
+  await h.getDictation().start();
+  assert.equal(starts.length, 1);
+  assert.equal(starts[0][1], 'es'); assert.equal(starts[0][2], 'd-2-test');
+  h.getDictation().cancel();
+});
+
+test('a disappeared selected microphone is retained for explicit correction, never replaced by default', async () => {
+  const h = harness(); await h.openBuilderChat('a'); const starts = [];
+  h.state.bridge.dictation_capabilities = async () => ({ ready: true,
+    engines: [{ id: 'en', language: 'en' }], devices: [{ id: 'default', label: 'System default' }] });
+  h.state.bridge.dictation_start = async (...args) => { starts.push(args); throw 'device'; };
+  h.state.bridge.dictation_stop = async () => '';
+  h.state.bridge.dictation_cancel = async () => {};
+  h.initDictation(); h.node('player-input').value = 'Keep my correction';
+  h.node('dictation-device').value = 'd-2-unplugged';
+  await h.getDictation().start();
+  assert.equal(starts[0][2], 'd-2-unplugged');
+  assert.equal(h.node('dictation-device').value, 'd-2-unplugged');
+  assert.match(h.getDictation().snapshot().message, /selected microphone/);
+  assert.equal(h.node('player-input').value, 'Keep my correction');
+  assert.equal(h.calls.submissions.length, 0);
+});
+
+test('model download failure is redacted, preserves the draft and allows explicit retry', async () => {
+  const h = harness(); await h.openBuilderChat('a'); let attempts = 0, ready = false;
+  h.state.bridge.dictation_capabilities = async () => ({ ready, engines: [{ id: 'en', language: 'en' }] });
+  h.state.bridge.dictation_start = async () => { throw new Error('setup must not capture'); };
+  h.state.bridge.dictation_stop = async () => '';
+  h.state.bridge.dictation_cancel = async () => {};
+  h.state.bridge.dictation_prepare = async () => {
+    attempts++; if (attempts === 1) throw 'private network details'; ready = true; return { status: 'ready' };
+  };
+  h.initDictation(); h.node('player-input').value = 'Keep this action';
+  await h.getDictation().start();
+  h.node('dictation-download').dispatchEvent({ type: 'click' }); await h.flush();
+  assert.match(h.node('dictation-model-status').textContent, /download failed/);
+  assert.doesNotMatch(h.node('dictation-model-status').textContent, /private/);
+  assert.equal(h.node('player-input').value, 'Keep this action');
+  h.node('dictation-download').dispatchEvent({ type: 'click' }); await h.flush();
+  assert.equal(attempts, 2);
+  assert.match(h.node('dictation-model-status').textContent, /ready/);
+  assert.equal(h.calls.submissions.length, 0);
+});
+
+test('late readiness metadata cannot overwrite a cancelled setup state', async () => {
+  const h = harness(); await h.openBuilderChat('a'); const metadata = deferred(); let reads = 0;
+  h.state.bridge.dictation_capabilities = () => ++reads <= 2
+    ? Promise.resolve({ ready: false, engines: [{ id: 'en', language: 'en' }] }) : metadata.promise;
+  h.state.bridge.dictation_start = async () => {};
+  h.state.bridge.dictation_stop = async () => '';
+  h.state.bridge.dictation_cancel = async () => {};
+  h.state.bridge.dictation_prepare = async () => ({ status: 'ready' });
+  h.initDictation(); h.node('player-input').value = 'Keep my draft';
+  await h.getDictation().start();
+  h.node('dictation-download').dispatchEvent({ type: 'click' }); await h.flush();
+  assert.equal(reads, 3); // initial attempt, actual Settings opening, then completed-download refresh
+  h.node('dictation-download').dispatchEvent({ type: 'click' }); await h.flush();
+  const cancelled = h.node('dictation-model-status').textContent;
+  metadata.resolve({ ready: true, engines: [{ id: 'en', language: 'en' }] }); await h.flush();
+  assert.match(cancelled, /cancelled/);
+  assert.equal(h.node('dictation-model-status').textContent, cancelled);
+  assert.equal(h.node('player-input').value, 'Keep my draft');
+  assert.equal(h.calls.submissions.length, 0);
+});
+
+for (const accepted of [true, false]) for (const early of [true, false]) test(`Builder ${accepted ? 'accepted' : 'rejected'} steering preserves dictation ownership (${early ? 'during' : 'after'} request)`, async () => {
+  const h = harness();
+  await h.openBuilderChat('a');
+  const running = h.submitInput('Make a scout');
+  await h.flush();
+  const transcript = deferred();
+  const steering = deferred();
+  let cancelled = 0;
+  h.state.bridge.dictation_capabilities = async () => ({ engines: [{ id: 'test', language: 'en-GB', label: 'English' }] });
+  h.state.bridge.dictation_start = async () => {};
+  h.state.bridge.dictation_stop = () => transcript.promise;
+  h.state.bridge.dictation_cancel = async () => { cancelled += 1; };
+  h.state.bridge.steer_session = () => steering.promise;
+  h.initDictation();
+  const input = h.node('player-input');
+  input.value = 'Use a desert'; input.setSelectionRange(input.value.length, input.value.length);
+  const dictation = h.getDictation();
+  await dictation.start();
+  const stopping = dictation.stop();
+  const sending = h.submitInput(input.value);
+  if (early) { transcript.resolve('late captured words'); await stopping; }
+  if (accepted) steering.resolve({}); else steering.reject(new Error('rejected'));
+  await sending;
+  if (!early) transcript.resolve('late captured words');
+  await stopping;
+  assert.equal(input.value, accepted ? '' : 'Use a desert');
+  assert.equal(dictation.snapshot().transcript, '');
+  assert.equal(cancelled, 1);
+  assert.equal(h.calls.submissions.length, 1);
+  h.pending.get(h.calls.submissions[0].attempt_id).resolve({ status: 'completed' });
+  await running;
+});
+
 test('Stop waits for owner cancellation to settle before starting another request', async () => {
   const h = harness();
   await h.openBuilderChat('a');
@@ -1897,6 +2115,27 @@ test('repeated Builder failures explain the interruption and keep input usable',
   assert.equal(h.node('send-btn').disabled, false);
   assert.equal(h.calls.submissions.length, 0);
 });
+
+for(const reason_code of ['required_reference_unavailable','repeated_reference_failure']){
+  test(`${reason_code} stops with source-specific recovery and never auto-submits`,async()=>{
+    const h=harness();
+    h.state.bridge.session_context=async()=>({
+      activity:{attempt_id:'source-failed',status:'interrupted'},
+      messages:[{message_id:'terminal',kind:'evidence',content:{
+        kind:'builder_attempt_terminal',status:'interrupted',attempt_id:'source-failed',reason_code,
+        error:'PRIVATE SOURCE DETAIL',
+      }}],
+    });
+    await h.openBuilderChat('a');
+    const html=h.node('chronology').dataset.chronologyHtml;
+    assert.match(html,/selected source|same source/i);
+    assert.match(html,/Saved work is retained/);
+    assert.match(html,/before continuing/);
+    assert.doesNotMatch(html,/PRIVATE SOURCE DETAIL|Send a message when you are ready/);
+    assert.equal(h.node('send-btn').disabled,false);
+    assert.equal(h.calls.submissions.length,0);
+  });
+}
 
 test('a migrated independent Builder chat does not render Campaign return actions', async () => {
   const h = harness();

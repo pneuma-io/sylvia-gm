@@ -100,6 +100,8 @@ def execute_tool(
         tool_name=tool_name,
         success=True,
         context=ctx.vars,
+        public_context=ctx.extras.get("published_result"),
+        private_random_sampled=bool(ctx.budget and ctx.budget.private_random_sampled),
         narrative_hooks=_collect_narrative(ctx),
         narrative_directives=_collect_narrative_directives(ctx),
         logs=ctx.vars.get("_logs", []),
@@ -249,6 +251,8 @@ def _build_context(
         current_tool=tool_name,
         budget=budget or ExecutionBudget(),
     )
+    if state_bridge is not None and state_bridge.entity_exists("state"):
+        ctx.entities["state"] = state_bridge.get_entity("state")
 
     # LOCK-3: Inject runtime managers from extras if provided via execute_tool
     # (extras dict is set by the caller, e.g. RulesetRuntime)
@@ -409,6 +413,10 @@ def _validate_params(
                     for eid in value:
                         if isinstance(eid, str) and not state_bridge.entity_exists(eid):
                             errors.append(f"Entity '{eid}' not found in parameter '{name}'")
+
+        elif ptype == "object":
+            if not isinstance(value, dict):
+                errors.append(f"Parameter '{name}' must be an object")
 
         elif ptype == "array":
             if not isinstance(value, list):

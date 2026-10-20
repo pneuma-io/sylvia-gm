@@ -92,12 +92,14 @@ const SylviaGMFrontend = (() => {
     panelProjection: null,
     panelActionChecks: new Map(),
     panelCommitPending: false,
+    panelIntentPending: null,
     panelRecoveryAbsent: null,
     panelTabs: {},
     tacticalSelections: {},
     tacticalViews: {},
     networkSelections: {},
     crossSurfaceFocus: null,
+    characterInspection: null,
     view: 'home',
     homeTutorialStep: 0,
     homeTutorialOpen: false,
@@ -106,10 +108,196 @@ const SylviaGMFrontend = (() => {
     navigationRefreshBusy: false,
     campaignConfirmationPending: false,
     campaignHandoffPending: false,
+    sequelDialog: null,
   };
 
   // ---- DOM helpers ----
   const $ = (id) => document.getElementById(id);
+  let dictation = null;
+  let dictationRevision = 0;
+  let dictationModelJob = null;
+  let dictationOptionsEpoch = 0;
+  function savedDictationChoice(name) {
+    try { return localStorage.getItem(`sylvia-dictation-${name}`) || ''; } catch (_) { return ''; }
+  }
+
+  // Metadata/readiness never starts audio or downloads a model.
+  async function refreshDictationOptions(bridge, attemptId = null) {
+    if (!bridge.dictation_capabilities) throw { code: 'unavailable' };
+      const epoch = dictationOptionsEpoch;
+      const capabilities = await bridge.dictation_capabilities(attemptId);
+      if (epoch !== dictationOptionsEpoch) return capabilities;
+      const engines = capabilities?.engines;
+      if (!Array.isArray(engines) || !engines.length) throw { code: 'unavailable' };
+      const select = $('dictation-language');
+      const saved = select.value || savedDictationChoice('language');
+      select.replaceChildren(...engines.map(engine => {
+        const option = document.createElement('option');
+        option.value = engine.id; option.textContent = engine.label || engine.language;
+        return option;
+      }));
+      const preferred = engines.find(engine => engine.id === saved) || engines.find(engine =>
+        engine.language === navigator.language || engine.language === (navigator.language || '').split('-')[0]);
+      select.value = (preferred || engines[0]).id;
+      const device = $('dictation-device'), selectedDevice = device.value || savedDictationChoice('device');
+      const devices = capabilities.devices || [{ id: 'default', label: 'System default input' }];
+      if (selectedDevice && selectedDevice !== 'default' && !devices.some(item => item.id === selectedDevice)) {
+        devices.push({ id: selectedDevice, label: 'Selected microphone unavailable — choose an input' });
+      }
+      device.replaceChildren(...devices.map(item => {
+        const option = document.createElement('option'); option.value = item.id; option.textContent = item.label; return option;
+      }));
+      device.value = devices.some(item => item.id === selectedDevice) ? selectedDevice : 'default';
+      $('dictation-download').hidden = capabilities.ready !== false;
+      $('dictation-model-status').textContent = capabilities.ready === false
+        ? 'The local speech model is not downloaded. Download it once before dictating; no audio is sent.'
+        : 'Local speech model ready. Recognition runs on CPU on this PC.';
+      $('dictation-options').hidden = false;
+      return capabilities;
+  }
+
+  async function dictationEngine(bridge, attemptId) {
+    const capabilities = await refreshDictationOptions(bridge, attemptId);
+    if (capabilities.ready === false) { openSettings('dictation'); throw { code: 'model' }; }
+    return $('dictation-language').value;
+  }
+
+  function cancelDictationDownload() {
+    if (!dictationModelJob) return;
+    const { id, bridge } = dictationModelJob; dictationModelJob = null;
+    dictationOptionsEpoch += 1;
+    void Promise.resolve(bridge.dictation_cancel(id)).catch(() => {});
+    $('dictation-model-status').textContent = 'Model download cancelled. Your draft is kept. You can retry.';
+    $('dictation-download').textContent = 'Download local speech model';
+    renderDictation();
+  }
+
+  async function prepareDictationModel() {
+    if (dictationModelJob) { cancelDictationDownload(); return; }
+    const bridge = state.bridge;
+    if (!bridge?.dictation_prepare || !bridge.dictation_cancel) return;
+    const job = { id: crypto.randomUUID(), bridge }; dictationModelJob = job;
+    dictationOptionsEpoch += 1;
+    $('dictation-model-status').textContent = 'Downloading the local speech model (about 148 MB). No audio is sent. You can cancel or keep typing.';
+    $('dictation-download').textContent = 'Cancel model download';
+    renderDictation();
+    try {
+      await bridge.dictation_prepare(job.id);
+      if (dictationModelJob !== job) return;
+      await refreshDictationOptions(bridge);
+      if (dictationModelJob === job) dictation.clearError();
+    } catch (error) {
+      if (dictationModelJob !== job) return;
+      $('dictation-model-status').textContent = (typeof error === 'string' ? error : error?.code) === 'storage'
+        ? 'Not enough space for the speech model. Free some space and retry. Your draft is kept.'
+        : 'Speech model download failed. Check your connection and retry. Your draft is kept.';
+    } finally {
+      if (dictationModelJob === job) {
+        dictationModelJob = null;
+        $('dictation-download').textContent = 'Download local speech model'; renderDictation();
+      }
+    }
+  }
+
+  // Dictation edits this composer only; the normal Send path owns all submissions.
+  function initDictation() {
+    if (dictation || !window.SylviaDictation || !$('dictation-toggle')) return;
+    dictation = window.SylviaDictation.create({
+      backend: { start: async ({ signal }) => {
+        const bridge = state.bridge;
+        if (!bridge?.dictation_start || !bridge.dictation_stop || !bridge.dictation_cancel) {
+          throw { code: 'unavailable' };
+        }
+        const id = crypto.randomUUID();
+        let cancelled = false;
+        const cancel = () => {
+          if (cancelled) return;
+          cancelled = true;
+          try { void Promise.resolve(bridge.dictation_cancel(id)).catch(() => {}); } catch (_) { /* Best-effort cleanup. */ }
+        };
+        signal.addEventListener('abort', cancel, { once: true });
+        try {
+          const engine = await dictationEngine(bridge, id);
+          if (signal.aborted) throw { code: 'unavailable' };
+          await bridge.dictation_start(id, engine, $('dictation-device').value || 'default');
+          if (signal.aborted) { cancel(); throw { code: 'unavailable' }; }
+          return { stop: () => bridge.dictation_stop(id), cancel: () => {
+            signal.removeEventListener('abort', cancel); cancel();
+          } };
+        } catch (error) {
+          signal.removeEventListener('abort', cancel); cancel(); throw error;
+        }
+      } },
+      context: () => state.view === 'session' && state.activeSessionId
+        ? JSON.stringify([state.activeCampaignId, state.activeSessionId, state.activeSessionRole]) : null,
+      draft: () => ({ text: $('player-input').value, revision: dictationRevision,
+        start: $('player-input').selectionStart, end: $('player-input').selectionEnd }),
+      replace: (text, caret) => {
+        const input = $('player-input');
+        input.value = text;
+        dictationRevision += 1;
+        input.focus();
+        input.setSelectionRange(caret, caret);
+        saveSelectedSessionDraft();
+      },
+      changed: renderDictation,
+    });
+    $('dictation-toggle').addEventListener('click', toggleDictation);
+    $('dictation-download').addEventListener('click', () => { void prepareDictationModel(); });
+    for (const name of ['language', 'device']) $('dictation-' + name).addEventListener('change', () => {
+      try { localStorage.setItem(`sylvia-dictation-${name}`, $('dictation-' + name).value); } catch (_) { /* Input works without storage. */ }
+    });
+    $('dictation-cancel').addEventListener('click', () => {
+      dictation.cancel(); $('dictation-toggle').focus();
+    });
+    $('dictation-undo').addEventListener('click', () => dictation.undo());
+    $('dictation-redo').addEventListener('click', () => { void dictation.start({ redo: true }); });
+    $('dictation-insert').addEventListener('click', () => dictation.insertReview($('dictation-review').value));
+    $('player-input').addEventListener('input', () => { dictationRevision += 1; dictation.sync(); });
+    document.addEventListener('keydown', (event) => {
+      if (event.isComposing || event.repeat) return;
+      if (event.altKey && !event.ctrlKey && !event.metaKey && event.key.toLowerCase() === 'm' &&
+          !$('dictation-toggle').disabled) {
+        event.preventDefault(); toggleDictation();
+      } else if (event.key === 'Escape' && dictationModelJob) {
+        event.preventDefault(); cancelDictationDownload();
+      } else if (event.key === 'Escape' && ['requesting', 'recording', 'transcribing'].includes(dictation.snapshot().phase)) {
+        event.preventDefault(); dictation.cancel(); $('dictation-toggle').focus();
+      }
+    });
+    window.addEventListener('pagehide', () => { dictation.cancel('', { announce: false }); cancelDictationDownload(); });
+  }
+
+  function toggleDictation() {
+    if (!dictation || $('dictation-toggle').disabled) return;
+    if (dictation.snapshot().phase === 'recording') void dictation.stop();
+    else void dictation.start();
+  }
+
+  function renderDictation(value = dictation?.snapshot()) {
+    if (!value || !$('dictation-toggle')) return;
+    const busy = ['requesting', 'recording', 'transcribing'].includes(value.phase);
+    const recording = value.phase === 'recording';
+    const enabled = !$('player-input').disabled && state.view === 'session';
+    $('dictation-toggle').disabled = (!enabled && !recording) ||
+      ['requesting', 'transcribing'].includes(value.phase) || Boolean(dictationModelJob);
+    $('dictation-toggle').setAttribute('aria-pressed', String(recording));
+    $('dictation-toggle').setAttribute('aria-label', recording ? 'Stop dictation' : 'Start dictation');
+    $('dictation-toggle-text').textContent = recording ? 'Stop dictation' : 'Dictate';
+    if ($('dictation-status').textContent !== value.message) $('dictation-status').textContent = value.message;
+    $('dictation-status').hidden = value.phase === 'idle' && !value.message;
+    $('dictation-language').disabled = busy;
+    $('dictation-device').disabled = busy || Boolean(dictationModelJob);
+    $('dictation-download').disabled = busy;
+    $('dictation-cancel').hidden = !busy && !value.transcript;
+    $('dictation-undo').hidden = !value.canUndo || busy || !enabled;
+    $('dictation-redo').hidden = !value.canUndo || busy || !enabled;
+    $('dictation-review-panel').hidden = !value.transcript;
+    if ($('dictation-review').dataset.transcript !== value.transcript) {
+      $('dictation-review').value = value.transcript;
+      $('dictation-review').dataset.transcript = value.transcript;
+    }
+  }
   let panelHost = null;
   let shotFrame = null;
   let panelRenderContext = null;
@@ -163,8 +351,24 @@ const SylviaGMFrontend = (() => {
 
   function panelRenderScope(projection) {
     return projection?.campaign_id && state.activeSessionId
-      ? { campaignId: projection.campaign_id, sessionId: state.activeSessionId }
+      ? { campaignId: projection.campaign_id, sessionId: state.activeSessionId, rulesetId: projection.ruleset_id || null }
       : null;
+  }
+
+  // Owner replies can redraw a detached inspection control after its local event has finished.
+  function captureCharacterFocus(container) {
+    const active = document.activeElement;
+    if (!active || !container.contains(active)) return null;
+    const surfaceId = active.closest('[data-panel-id]')?.dataset.panelId;
+    if (!surfaceId) return null;
+    const attribute = ['data-party-select-actor', 'data-character-actor', 'data-inventory-character']
+      .find(name => active.hasAttribute(name));
+    if (attribute) return { surfaceId, selector: `[${attribute}="${CSS.escape(active.getAttribute(attribute))}"]` };
+    const details = active.parentElement;
+    if (active.tagName === 'SUMMARY' && details?.hasAttribute('data-character-expansion')) {
+      return { surfaceId, selector: `[data-character-expansion="${CSS.escape(details.dataset.characterExpansion)}"] > summary` };
+    }
+    return null;
   }
 
   // Keep transient Effects UI state when the same panel DOM is replaced.
@@ -307,6 +511,9 @@ const SylviaGMFrontend = (() => {
     }
     if (campaignDisplayPending()) throw new Error('Game state is still loading.');
     if (selectedSessionIsWorking()) throw new Error('Sylvia is working. Wait for her response to finish.');
+    if (['preview_panel_action', 'queue_panel_action'].includes(method) && panelIntentPending()) {
+      throw new Error('Finish the pending panel action before starting another.');
+    }
     if (method === 'queue_panel_action') {
       const action = state.panelProjection?.surfaces.find(surface => surface.id === args.surface_id)
         ?.actions?.find(action => action.id === args.panel_action_id);
@@ -331,15 +538,86 @@ const SylviaGMFrontend = (() => {
     };
   }
 
-  // Actor/target choices are presentation state shared by their panels, never an action.
+  // Inspection uses only admitted player-visible records and never grants action control.
+  function inspectableCharacters() {
+    const choices = new Map();
+    for (const surface of state.panelProjection?.surfaces || []) {
+      if (['party', 'unit_list', 'inventory'].includes(surface.renderer)) {
+        for (const member of surface.data?.participants || []) {
+          choices.set(member.id, { id: member.id, name: member.data?.name || surface.data?.entities?.[member.id]?.name || member.id });
+        }
+        for (const actor of state.panelProjection?.player_control?.actors || []) {
+          if (surface.data?.entities?.[actor.id] && !choices.has(actor.id)) {
+            choices.set(actor.id, { id: actor.id, name: surface.data.entities[actor.id].name || actor.name || actor.id });
+          }
+        }
+      } else if (surface.renderer === 'generic_inventory') {
+        for (const character of surface.data?.characters || []) choices.set(character.id, character);
+      }
+    }
+    return Array.from(choices.values());
+  }
+
+  // One campaign/Ruleset inspection context survives panel placement, never stale roster identity.
+  function characterInspection() {
+    const campaignId = state.panelProjection?.campaign_id || state.activeCampaignId;
+    const rulesetId = state.panelProjection?.ruleset_id || null;
+    const choices = inspectableCharacters();
+    let inspection = state.characterInspection;
+    if (!inspection || inspection.campaignId !== campaignId || inspection.rulesetId !== rulesetId) {
+      const prior = inspection ? null : state.panelProjection?.surfaces.filter((surface) => ['unit_list', 'inventory'].includes(surface.renderer))
+        .map((surface) => state.tacticalSelections[surface.id]?.actor).find(Boolean) ||
+        state.panelProjection?.surfaces.filter((surface) => ['tactical_grid', 'coordinate_map'].includes(surface.renderer))
+          .map((surface) => tacticalActorId(surface, state.tacticalSelections[surface.id]?.actor)).find(Boolean);
+      const focused = state.panelProjection?.player_control?.focused_actor_id;
+      inspection = state.characterInspection = { campaignId, rulesetId,
+        id: prior || (choices.some((item) => item.id === focused) ? focused : choices[0]?.id) || null,
+        unavailableId: null, expanded: [] };
+    }
+    if (inspection.id && !choices.some((item) => item.id === inspection.id)) {
+      inspection.unavailableId = inspection.id;
+      inspection.id = null;
+    }
+    inspection.expanded = (inspection.expanded || []).filter((id) => choices.some((item) => item.id === id));
+    return inspection;
+  }
+
+  function inspectCharacter(characterId) {
+    if (characterId !== null && !inspectableCharacters().some((item) => item.id === characterId)) return;
+    const inspection = characterInspection();
+    inspection.id = characterId;
+    inspection.unavailableId = null;
+  }
+
+  // Party is the shared picker; Rulesets without a roster retain an accessible common picker.
+  function characterPickerMarkup() {
+    const party = state.panelProjection?.surfaces.find((surface) => surface.renderer === 'party');
+    if (party) return '';
+    const inspection = characterInspection();
+    return `<label class="character-picker">Inspect character <select data-character-actor>` +
+      '<option value="">Choose a character</option>' + inspectableCharacters().map((item) =>
+        `<option value="${escapeHtml(item.id)}"${item.id === inspection.id ? ' selected' : ''}>${escapeHtml(item.name)}</option>`).join('') + '</select></label>';
+  }
+
+  // Acting-character/target choices and inspection are distinct presentation requests.
   function applyPanelSelection(surfaceId, patch) {
     const surface = state.panelProjection?.surfaces.find((item) => item.id === surfaceId);
     if (!surface || !patch || typeof patch !== 'object') return;
-    if (surface.renderer === 'generic_inventory') {
-      if (surface.data.characters.some((character) => character.id === patch.character)) {
-        state.tacticalSelections[surfaceId] = { character: patch.character };
-        if (playerControlsActor(patch.character)) synchronizePanelActor(patch.character);
-      }
+    if ('character' in patch) {
+      inspectCharacter(patch.character);
+      return;
+    }
+    if (patch.expansion && surface.renderer === 'party' &&
+        (surface.data?.participants?.some((member) => member.id === patch.expansion.id) ||
+          surface.data?.entities?.[patch.expansion.id] && playerControlsActor(patch.expansion.id)) &&
+        typeof patch.expansion.open === 'boolean') {
+      const inspection = characterInspection();
+      inspection.expanded = inspection.expanded.filter((id) => id !== patch.expansion.id);
+      if (patch.expansion.open) inspection.expanded.push(patch.expansion.id);
+      return;
+    }
+    if (['party', 'unit_list', 'inventory', 'generic_inventory'].includes(surface.renderer)) {
+      if ('actor' in patch) inspectCharacter(patch.actor);
       return;
     }
     if (surface.renderer === 'network_graph') {
@@ -384,12 +662,9 @@ const SylviaGMFrontend = (() => {
 
   // Share valid actor identities across views without moving a camera or writing campaign state.
   function synchronizePanelActor(actorId) {
+    inspectCharacter(actorId);
     for (const panel of state.panelProjection?.surfaces || []) {
-      if (['unit_list', 'inventory'].includes(panel.renderer) && (actorId === null || panel.data?.entities?.[actorId] || panel.data?.participants?.some((item) => item.id === actorId))) {
-        state.tacticalSelections[panel.id] = { actor: actorId };
-      } else if (panel.renderer === 'generic_inventory' && panel.data?.characters?.some((item) => item.id === actorId)) {
-        state.tacticalSelections[panel.id] = { character: actorId };
-      } else if (panel.renderer === 'network_graph' && (actorId === null || networkControlsActor(actorId))) {
+      if (panel.renderer === 'network_graph' && (actorId === null || networkControlsActor(actorId))) {
         networkSelection(panel).actor = actorId;
       } else if (['tactical_grid', 'coordinate_map'].includes(panel.renderer)) {
         const body = panel.data?.entities?.find((item) => tacticalActorId(panel, item.id) === actorId);
@@ -400,7 +675,7 @@ const SylviaGMFrontend = (() => {
 
   const VALID_THEMES = new Set(['slate', 'sylvia', 'sylvia-dark']);
   const VALID_SETTINGS_TABS = new Set([
-    'models', 'accounts', 'appearance', 'packages', 'campaign-data', 'admin', 'about'
+    'models', 'accounts', 'appearance', 'dictation', 'packages', 'campaign-data', 'admin', 'about'
   ]);
   const DISCONNECTED_STREAM_KEY = 'sylvia-gm-disconnected-stream';
   const PANEL_LAYOUT_KEY = 'sylvia-gm-panel-layout-v1';
@@ -611,8 +886,16 @@ const SylviaGMFrontend = (() => {
     if (!invoke) return null;
     return {
       application_info: () => invoke('application_info'),
+      dictation_capabilities: (id = null) => id ? invoke('dictation_capabilities', { id }) : invoke('dictation_capabilities'),
+      dictation_start: (id, engine, device) => invoke('dictation_start', { id, engine, device }),
+      dictation_prepare: id => invoke('dictation_prepare', { id }),
+      dictation_stop: (id) => invoke('dictation_stop', { id }),
+      dictation_cancel: (id) => invoke('dictation_cancel', { id }),
       campaign_index: () => invoke('campaign_index'),
       campaign_creation_catalog: () => invoke('campaign_creation_catalog'),
+      campaign_sequel_context: (request) => invoke('campaign_sequel_context', { request }),
+      preview_campaign_sequel: (request) => invoke('preview_campaign_sequel', { request }),
+      append_campaign_sequel: (request) => invoke('append_campaign_sequel', { request }),
       delete_reusable_library_entry: (command) => invoke('delete_reusable_library_entry', {
         kind: command.kind,
         artifactId: command.artifact_id,
@@ -1237,6 +1520,23 @@ const SylviaGMFrontend = (() => {
       void startCampaignBuilder();
     });
     $('home-build-btn').addEventListener('click', () => { void startBuilderChat(); });
+    $('campaign-sequel-btn').addEventListener('click', () => { void openCampaignSequel(); });
+    $('campaign-sequel-preview').addEventListener('click', () => { void previewCampaignSequel(); });
+    $('campaign-sequel-append').addEventListener('click', () => { void appendCampaignSequel(); });
+    $('campaign-sequel-author').addEventListener('click', () => { void authorCampaignSequel(); });
+    $('campaign-sequel-cancel').addEventListener('click', () => {
+      if (!state.sequelDialog?.busy) $('campaign-sequel-dialog').close();
+    });
+    $('campaign-sequel-dialog').addEventListener('cancel', (event) => {
+      if (state.sequelDialog?.busy) event.preventDefault();
+    });
+    $('campaign-sequel-dialog').addEventListener('close', () => { state.sequelDialog = null; });
+    $('campaign-sequel-source').addEventListener('change', () => {
+      if (!state.sequelDialog?.request) resetSequelReview();
+    });
+    for (const id of ['campaign-sequel-connection', 'campaign-sequel-reviewed']) {
+      $(id).addEventListener('input', refreshSequelConfirmation);
+    }
     $('home-settings-btn').addEventListener('click', () => openSettings());
     $('tutorial-skip-btn').addEventListener('click', () => closeHomeTutorial('skipped'));
     $('tutorial-next-btn').addEventListener('click', advanceHomeTutorial);
@@ -1416,6 +1716,7 @@ const SylviaGMFrontend = (() => {
       void submitInput(event.currentTarget.value);
     });
     $('player-input').addEventListener('input', saveSelectedSessionDraft);
+    initDictation();
     $('ooc-input').addEventListener('input', () => {
       saveSelectedSessionDraft();
       $('ooc-note').classList.toggle('has-note', Boolean($('ooc-input').value.trim()));
@@ -1445,6 +1746,11 @@ const SylviaGMFrontend = (() => {
       panel.hidden = !selected;
     });
     if (chatgptPageVisible) void updateChatGPTConnection('status');
+    if (tab === 'dictation' && !dictationModelJob) {
+      void refreshDictationOptions(state.bridge).catch(() => {
+        $('dictation-model-status').textContent = 'Local speech is unavailable. Reinstall the updated Sylvia application, or keep typing.';
+      });
+    }
   }
 
   function openSettings(tab = 'models') {
@@ -3110,7 +3416,8 @@ const SylviaGMFrontend = (() => {
         item.id === button.closest('[data-panel-id]')?.dataset.panelId);
       const action = surface?.actions?.find((item) => item.id === button.dataset.panelActionId);
       button.disabled = !hasIdleSession || !state.activeCampaignId || !state.activeSnapshot ||
-        !surface || !action || !panelActionAvailable(surface, action, button.dataset.panelActorId);
+        !surface || !action || !panelActionAvailable(surface, action,
+          button.dataset.panelActorId, button.dataset.panelPieceId);
     });
   }
 
@@ -3529,6 +3836,7 @@ const SylviaGMFrontend = (() => {
   }
 
   function showHome() {
+    dictation?.cancel('', { announce: false });
     state.displayHistory = null;
     cancelCampaignOpening();
     gamePanels().leave();
@@ -4186,13 +4494,15 @@ const SylviaGMFrontend = (() => {
     }
   }
 
-  function panelActionAvailable(surface, action, partyActorId = null) {
-    if (!state.activeSessionId || state.panelCommitPending || pendingPanelCommand() ||
+  function panelActionAvailable(surface, action, partyActorId = null, pieceId = null) {
+    if (!state.activeSessionId || state.panelCommitPending || panelIntentPending() || pendingPanelCommand() ||
         selectedSessionIsWorking() || campaignDisplayPending() || action.available === false) return false;
-    if (!sequenceModeActive() && action.checks_required && !state.panelActionChecks.get(
-      panelActionCheckKey(surface, action, partyActorId)
+    if ((!sequenceModeActive() || surface.renderer === 'piece_table') && action.checks_required && !state.panelActionChecks.get(
+      panelActionCheckKey(surface, action, partyActorId, pieceId)
     )?.available) return false;
     const bindings = action.bindings || {};
+    if (surface.renderer === 'piece_table' && Object.values(bindings).includes('piece') &&
+        !window.SylviaPieceTable.selection(surface.data, action, pieceId)) return false;
     const actorParameter = action.actor_parameter ||
       Object.keys(bindings).find((key) => bindings[key] === 'actor');
     if (!actorParameter) return true;
@@ -4206,7 +4516,41 @@ const SylviaGMFrontend = (() => {
         : playerControlsActor(actorId));
   }
 
-  function panelActionSelection(surface, action, partyActorId = null) {
+  function panelIntentPending() {
+    return state.panelIntentPending?.campaignId === state.activeCampaignId &&
+      state.panelIntentPending?.sessionId === state.activeSessionId;
+  }
+
+  // A delayed preview retains its captured binding only while its original context is valid.
+  function panelActionStillCurrent(command, projectionRevision) {
+    if (command.campaign_id !== state.activeCampaignId || command.session_id !== state.activeSessionId) return false;
+    const surface = state.panelProjection?.surfaces.find((item) => item.id === command.surface_id);
+    const action = surface?.actions?.find((item) => item.id === command.panel_action_id);
+    if (!action || action.available === false) return false;
+    if (state.panelProjection.revision !== projectionRevision) return false;
+    if (surface.renderer === 'piece_table' && Object.values(action.bindings || {}).includes('piece')) {
+      return Boolean(window.SylviaPieceTable.selection(surface.data, action, command.selection?.piece));
+    }
+    if (['tactical_grid', 'coordinate_map'].includes(surface.renderer)) {
+      if (command.selection?.map_revision !== surface.data.map_revision) return false;
+      if (command.selection?.target && !surface.data.entities?.some((item) => item.id === command.selection.target)) return false;
+      return !actionBindsActor(action) || tacticalControlsActor(surface, command.selection?.actor) &&
+        surface.data.entities?.some((item) => item.id === command.selection?.actor);
+    }
+    if (surface.renderer === 'network_graph') {
+      if (command.selection?.graph_revision !== surface.data.graph_revision) return false;
+      if (command.selection?.node && !surface.data.nodes?.some((item) => item.id === command.selection.node)) return false;
+      if (command.selection?.link && !surface.data.links?.some((item) => item.id === command.selection.link)) return false;
+      return !actionBindsActor(action) || networkControlsActor(command.selection?.actor);
+    }
+    if (!actionBindsActor(action)) return true;
+    const actor = command.selection?.actor;
+    return playerControlsActor(actor) && (surface.data?.participants?.some((item) => item.id === actor) ||
+      Boolean(surface.data?.entities?.[actor]));
+  }
+
+  function panelActionSelection(surface, action, partyActorId = null, pieceId = null) {
+    if (surface.renderer === 'piece_table') return window.SylviaPieceTable.selection(surface.data, action, pieceId);
     if (['party', 'unit_list'].includes(surface.renderer) && partyActorId) return { actor: partyActorId };
     if (['tactical_grid', 'coordinate_map'].includes(surface.renderer)) return tacticalActionSelection(surface, action);
     if (surface.renderer === 'network_graph') return networkActionSelection(surface, action);
@@ -4214,10 +4558,10 @@ const SylviaGMFrontend = (() => {
     return null;
   }
 
-  function panelActionCheckKey(surface, action, partyActorId = null) {
+  function panelActionCheckKey(surface, action, partyActorId = null, pieceId = null) {
     return JSON.stringify([state.activeCampaignId, state.activeSessionId,
       state.panelProjection?.revision, surface.id, action.id,
-      panelActionSelection(surface, action, partyActorId)]);
+      panelActionSelection(surface, action, partyActorId, pieceId)]);
   }
 
   async function refreshPanelActionChecks(projection, container) {
@@ -4230,11 +4574,12 @@ const SylviaGMFrontend = (() => {
         const action = surface?.actions?.find((item) => item.id === button.dataset.panelActionId);
         if (!action || (!action.checks_required && !action.map_preview_enabled)) return null;
         return { button, surface, action, actor: button.dataset.panelActorId,
-          key: panelActionCheckKey(surface, action, button.dataset.panelActorId) };
+          piece: button.dataset.panelPieceId,
+          key: panelActionCheckKey(surface, action, button.dataset.panelActorId, button.dataset.panelPieceId) };
       }).filter(Boolean);
-    const apply = () => currentButtons().forEach(({ button, surface, action, actor, key }) => {
+    const apply = () => currentButtons().forEach(({ button, surface, action, actor, piece, key }) => {
       const reason = state.panelActionChecks.get(key)?.reason || '';
-      button.disabled = !panelActionAvailable(surface, action, actor);
+      button.disabled = !panelActionAvailable(surface, action, actor, piece);
       button.title = panelPlayerReason(reason);
       button.setAttribute('aria-description', reason);
       // Show only a current owner-derived price; keep native no-confirmation policy unchanged.
@@ -4267,9 +4612,9 @@ const SylviaGMFrontend = (() => {
     try {
       const response = await state.bridge.player_action_availability({
         campaign_id: projection.campaign_id, expected_revision: projection.revision,
-        requests: pending.map(({ surface, action, actor }) => ({
+        requests: pending.map(({ surface, action, actor, piece }) => ({
           source: { kind: 'panel', surface_id: surface.id, action_id: action.id },
-          selection: panelActionSelection(surface, action, actor),
+          selection: panelActionSelection(surface, action, actor, piece),
         })),
       });
       if (!projectionIsCurrent()) { releasePending(); return; }
@@ -4327,12 +4672,12 @@ const SylviaGMFrontend = (() => {
   function selectedMapActorMarkup(surface, selection) {
     const actorId = tacticalActorId(surface, selection.actor);
     const body = surface.data.entities.find((item) => item.id === selection.actor);
-    if (!body) return '<div class="map-turn-strip panel-empty">Choose your character on the map or in Party.</div>';
+    if (!body) return '<div class="map-turn-strip panel-empty">Choose an acting character on the map. Inspect characters in Party.</div>';
     const source = state.panelProjection?.surfaces.find((item) =>
       ['party', 'unit_list'].includes(item.renderer) && item.data?.entities?.[actorId]);
     const entity = source?.data.entities[actorId] || {};
     return `<div class="map-turn-strip" data-selected-actor="${escapeHtml(actorId)}">` +
-      `<strong>${escapeHtml(source?.data.participants?.find(member => member.id === actorId)?.data?.name || body.display?.label || entity.name || actorId)}</strong>` +
+      `<strong>Acting: ${escapeHtml(source?.data.participants?.find(member => member.id === actorId)?.data?.name || body.display?.label || entity.name || actorId)}</strong>` +
       personalResourceMarkup(entity) + actionReadinessMarkup(entity, actorId) + '</div>';
   }
 
@@ -4411,19 +4756,22 @@ const SylviaGMFrontend = (() => {
     ];
     return ordered.map((participant) => {
       const details = participant.data || {};
+      const detailSurface = state.panelProjection?.surfaces.find((item) => item.renderer === 'unit_list' &&
+        (item.data?.entities?.[participant.id] || item.data?.participants?.some((member) => member.id === participant.id))) || surface;
       // Namespaced content kinds identify definitions, not player-facing party roles.
       const role = details.party_role ||
         (typeof participant.kind === 'string' && !participant.kind.includes('.') ? participant.kind : '');
-      const entity = entities[participant.id] || {};
+      const entity = detailSurface?.data?.entities?.[participant.id] || entities[participant.id] || {};
       const resources = entity.resources && typeof entity.resources === 'object'
         ? Object.entries(entity.resources).map(([name, value]) =>
           `${panelIdentifierLabel(name)}: ${value}`).join(' · ')
         : '';
       const playerControlled = controlledActorIds && controlledActorIds.has(participant.id);
-      const currentActor = playerControl && playerControl.focused_actor_id === participant.id;
+      const combat = state.panelProjection?.surfaces.find((item) => item.renderer === 'encounter')?.data?.combat;
+      const currentActor = combat?.encounter_active && (combat.current_actor || combat.active_actor) === participant.id;
       const controlLabels = [
         playerControlled ? 'Player controlled' : '',
-        currentActor ? 'Focused character' : '',
+        currentActor ? 'Current turn' : '',
       ].filter(Boolean);
       const controls = actorActions.map((action) => {
         const available = panelActionAvailable(surface, action, participant.id);
@@ -4435,24 +4783,31 @@ const SylviaGMFrontend = (() => {
       const maps = state.panelProjection?.surfaces.filter((item) => ['tactical_grid', 'coordinate_map'].includes(item.renderer) &&
         Array.isArray(item.data?.entities) &&
         item.data.entities.some((member) => tacticalActorId(item, member.id) === participant.id)) || [];
-      const selectedOnMap = maps.some((map) => tacticalActorId(map, state.tacticalSelections[map.id]?.actor) === participant.id);
+      const selectedOnMap = characterInspection().id === participant.id;
       const mapBody = maps[0]?.data.entities.find((member) => tacticalActorId(maps[0], member.id) === participant.id);
       const posture = tacticalPostureText(mapBody, maps[0]?.data);
-      const selectActor = playerControlled && maps.length
+      const selectActor = inspectableCharacters().some((item) => item.id === participant.id)
         ? `<button type="button" class="btn btn-secondary btn-sm" ` +
-          `data-party-select-actor="${escapeHtml(participant.id)}" aria-pressed="${selectedOnMap}">` +
-          `${selectedOnMap ? 'Selected' : 'Select'}</button>` : '';
-      return `<div class="panel-unit" data-panel-entity="${escapeHtml(participant.id)}">` +
+          `data-party-select-actor="${escapeHtml(participant.id)}" aria-pressed="${selectedOnMap}" aria-label="${selectedOnMap ? 'Inspecting' : 'Inspect'} ${escapeHtml(details.name || participant.id)}">` +
+          `${selectedOnMap ? 'Inspecting' : 'Inspect'}</button>` : '';
+      const referencedActions = detailSurface === surface ? [] : (detailSurface.actions || [])
+        .filter((action) => actionBindsActor(action) && !actorActions.some((item) => item.id === action.id));
+      const detailActions = referencedActions.length ? `<div class="panel-unit-meta">` + referencedActions.map((action) =>
+        `${escapeHtml(action.label || action.id)}${panelActionAvailable(detailSurface, action, participant.id) ? '' : ' (unavailable)'}`).join(' · ') +
+        `</div><button type="button" class="btn btn-secondary btn-sm" data-character-action-panel="${escapeHtml(detailSurface.id)}">` +
+        `Open ${escapeHtml(detailSurface.title || 'Character')} actions</button>` : '';
+      const inspection = characterInspection();
+      return `<div class="panel-unit${selectedOnMap ? ' character-inspected' : ''}" data-panel-entity="${escapeHtml(participant.id)}">` +
         `<div class="panel-unit-heading"><span class="panel-actor-token" aria-hidden="true">${escapeHtml(actorInitials(details.name || participant.id))}</span><strong>${escapeHtml(details.name || participant.id)}</strong>` +
         (role ? `<span class="panel-unit-role">${escapeHtml(panelIdentifierLabel(role))}</span>` : '') +
         selectActor + `</div>` +
         hpPanelMarkup(entity) + personalResourceMarkup(entity) + conditionPanelMarkup(entity) +
-        `<details class="roster-inspection"><summary>Details</summary>` +
+        `<details class="roster-inspection" data-character-expansion="${escapeHtml(participant.id)}"${inspection.expanded.includes(participant.id) ? ' open' : ''}><summary aria-label="Details for ${escapeHtml(details.name || participant.id)}">Details</summary>` +
         (controlLabels.length ? `<div class="panel-unit-meta">${controlLabels.map(escapeHtml).join(' · ')}</div>` : '') +
-        weaponReadinessMarkup(entity) + actionReadinessMarkup(entity, participant.id) +
+        characterDetailMarkup(detailSurface, participant.id, true) +
         (posture ? `<div class="panel-unit-meta">${escapeHtml(posture)}</div>` : '') +
-        (resources ? `<div class="panel-unit-meta">${escapeHtml(resources)}</div>` : '') + '</details>' +
-        (controls ? `<details class="character-stat-group"><summary>Available actions</summary><div class="ruleset-panel-actions">${controls}</div></details>` : '') +
+        (resources ? `<div class="panel-unit-meta">${escapeHtml(resources)}</div>` : '') +
+        (controls || detailActions ? `<details class="character-stat-group"><summary>Available actions</summary><div class="ruleset-panel-actions">${controls}</div>${detailActions}</details>` : '') + '</details>' +
         `</div>`;
     }).join('');
   }
@@ -4479,46 +4834,49 @@ const SylviaGMFrontend = (() => {
   // This bounded renderer focuses an admitted participant and reuses the ordinary actor controls.
   function renderCharacterPanel(surface) {
     const participants = surface.data?.participants || [];
-    const selected = state.tacticalSelections[surface.id]?.actor ||
-      state.panelProjection?.surfaces.filter((item) => ['tactical_grid', 'coordinate_map'].includes(item.renderer))
-        .map((item) => tacticalActorId(item, state.tacticalSelections[item.id]?.actor)).find(Boolean) ||
-      state.panelProjection?.player_control?.focused_actor_id;
+    const inspection = characterInspection();
+    const selected = inspection.id;
     const entities = surface.data?.entities || {};
     const actors = state.panelProjection?.player_control?.actors || [];
-    const choices = [...participants.map((item) => ({ id: item.id, name: item.data?.name || entities[item.id]?.name || item.id })),
-      ...actors.filter((item) => entities[item.id] && !participants.some((participant) => participant.id === item.id))
-        .map((item) => ({ id: item.id, name: entities[item.id]?.name || item.name || item.id }))];
-    const actorId = selected || choices[0]?.id;
-    if (!actorId) return '<div class="panel-empty">No character selected.</div>';
+    const actorId = selected;
+    if (!actorId) return characterPickerMarkup() + `<div class="panel-empty" data-character-unavailable="${escapeHtml(inspection.unavailableId || '')}">` +
+      (inspection.unavailableId ? 'The previously inspected character is unavailable. ' : '') +
+      'Choose a character to inspect.</div>';
     const participant = participants.find((item) => item.id === actorId);
     const entity = entities[actorId];
     const name = participant?.data?.name || entity?.name || actors.find((item) => item.id === actorId)?.name || actorId;
-    if (!participant && !entity) return `<div class="panel-empty" data-character-unavailable="${escapeHtml(actorId)}">` +
+    if (!participant && !entity) return characterPickerMarkup() + `<div class="panel-empty" data-character-unavailable="${escapeHtml(actorId)}">` +
       `<strong>${escapeHtml(name)}</strong><p>Character details are unavailable for this character.</p></div>`;
-    const selector = `<details class="character-switcher"><summary>Change character</summary><label>Character <select data-character-actor>` + choices.map((item) =>
-      `<option value="${escapeHtml(item.id)}"${item.id === actorId ? ' selected' : ''}>` +
-      `${escapeHtml(item.name)}</option>`).join('') + '</select></label></details>';
+    const selector = characterPickerMarkup();
+    return selector + characterDetailMarkup(surface, actorId);
+  }
+
+  // Share the complete admitted detail presentation between Party and Character.
+  function characterDetailMarkup(surface, actorId, compact = false) {
+    const participant = surface.data?.participants?.find((item) => item.id === actorId);
+    const entity = surface.data?.entities?.[actorId] || {};
+    const name = participant?.data?.name || entity?.name || actorId;
     const details = participant?.data || {};
     const description = [details.class_id || details.class, Number.isFinite(details.level) ? `Level ${details.level}` : '']
       .filter(Boolean).map((value) => escapeHtml(panelIdentifierLabel(value))).join(' · ');
     const values = ['aptitudes', 'skills'].map((field) => {
       const entries = Object.entries(entity?.[field] || details[field] || {}).filter(([, value]) => Number.isFinite(value));
-      return entries.length ? `<details class="character-stat-group"><summary>${escapeHtml(panelIdentifierLabel(field))}</summary>` +
+      return entries.length ? `<details class="character-stat-group" data-character-stat="${escapeHtml(JSON.stringify([actorId, field]))}"><summary>${escapeHtml(panelIdentifierLabel(field))}</summary>` +
         entries.map(([name, value]) => `<span>${escapeHtml(panelIdentifierLabel(name))} <b>${value}</b></span>`).join('') + '</details>' : '';
     }).join('');
-    return selector + `<div class="character-hero" ${participant ? 'data-panel-entity' : 'data-character-entity'}="${escapeHtml(actorId)}">` +
-      `<div class="character-identity"><span class="panel-actor-token" aria-hidden="true">${escapeHtml(actorInitials(name))}</span>` +
-      `<div><small>Character</small><h3><strong>${escapeHtml(name)}</strong></h3>${description ? `<span class="character-description">${description}</span>` : ''}` +
-      (details.party_role ? `<span class="panel-unit-role">${escapeHtml(panelIdentifierLabel(details.party_role))}</span>` : '') + '</div></div>' +
-      `<div class="character-vitals">${hpPanelMarkup(entity)}${personalResourceMarkup(entity)}</div>` +
-      conditionPanelMarkup(entity) +
+    return `<div class="${compact ? 'character-expanded-details' : 'character-hero'}" data-character-details="${escapeHtml(actorId)}"${compact ? '' : ` ${participant ? 'data-panel-entity' : 'data-character-entity'}="${escapeHtml(actorId)}"`}>` +
+      (compact ? (description ? `<p class="character-description">${description}</p>` : '') : `<div class="character-identity"><span class="panel-actor-token" aria-hidden="true">${escapeHtml(actorInitials(name))}</span>` +
+      `<div><small>Inspecting</small><h3><strong>${escapeHtml(name)}</strong></h3>${description ? `<span class="character-description">${description}</span>` : ''}` +
+      (details.party_role ? `<span class="panel-unit-role">${escapeHtml(panelIdentifierLabel(details.party_role))}</span>` : '') + '</div></div>') +
+      (compact ? '' : `<div class="character-vitals">${hpPanelMarkup(entity)}${personalResourceMarkup(entity)}</div>` +
+      conditionPanelMarkup(entity)) +
       `<div class="character-loadout"><strong>Ready equipment</strong>${weaponReadinessMarkup(entity || {})}` +
       (entity?.weapon?.id ? `<h4>${escapeHtml(panelIdentifierLabel(entity.weapon.id))}</h4>` : '') +
       (entity?.weapon_sets ? `<div>${escapeHtml(panelIdentifierLabel(entity.weapon_sets.active_set || ''))}: ` +
         `${escapeHtml([entity.weapon_sets[entity.weapon_sets.active_set]?.main_hand, entity.weapon_sets[entity.weapon_sets.active_set]?.off_hand].filter(Boolean).map(panelIdentifierLabel).join(' / '))}</div>` : '') +
-      (entity?.resources ? `<div class="character-resources">${Object.entries(entity.resources).map(([key,value]) =>
+      (!compact && entity?.resources ? `<div class="character-resources">${Object.entries(entity.resources).map(([key,value]) =>
         `<span>${escapeHtml(panelIdentifierLabel(key))}<b>${escapeHtml(value)}</b></span>`).join('')}</div>` : '') +
-      '</div>' + characterActionMarkup(surface, actorId) + actionReadinessMarkup(entity || {}, actorId) + '</div>' + (!participant ? '<p class="panel-unit-meta">Full character details are unavailable. These are the selected character’s current combat stats.</p>' : '') + values;
+      '</div>' + (compact ? '' : characterActionMarkup(surface, actorId)) + actionReadinessMarkup(entity || {}, actorId) + '</div>' + (!participant ? '<p class="panel-unit-meta">Full character details are unavailable. These are the selected character’s current combat stats.</p>' : '') + values;
   }
 
   function renderEncounterPanel(data) {
@@ -4649,13 +5007,12 @@ const SylviaGMFrontend = (() => {
   function renderInventoryPanel(data, surface) {
     const participants = data && Array.isArray(data.participants) ? data.participants : [];
     const entities = data && data.entities && typeof data.entities === 'object' ? data.entities : {};
-    const selected = state.tacticalSelections[surface.id]?.actor ||
-      state.panelProjection?.surfaces.filter((item) => ['tactical_grid', 'coordinate_map'].includes(item.renderer))
-        .map((item) => tacticalActorId(item, state.tacticalSelections[item.id]?.actor)).find(Boolean);
+    const selected = characterInspection().id;
+    if (!selected) return characterPickerMarkup() + '<div class="panel-empty">Choose a character to inspect equipment.</div>';
     const controlled = state.panelProjection?.player_control?.actors || [];
     const participant = participants.find((item) => item.id === selected);
     const knownEntity = controlled.find((item) => item.id === selected) && entities[selected];
-    if (selected && !participant && !knownEntity) return '<div class="panel-empty">Selected character equipment is unavailable.</div>';
+    if (selected && !participant && !knownEntity) return characterPickerMarkup() + '<div class="panel-empty">Selected character equipment is unavailable.</div>';
     const displayed = selected ? [participant || { id: selected, data: { name: knownEntity.name || controlled.find((item) => item.id === selected)?.name || selected } }] : participants;
     const owners = displayed.map((participant) => {
       const entity = entities[participant.id] || {};
@@ -4693,12 +5050,10 @@ const SylviaGMFrontend = (() => {
   // Inventory is a projection of committed holdings; selection never changes campaign state.
   function renderGenericInventoryPanel(surface) {
     const characters = surface.data?.characters || [];
-    const chosen = state.tacticalSelections[surface.id]?.character;
-    const character = characters.find((item) => item.id === chosen) || characters[0];
-    if (!character) return '<div class="panel-empty">No known character inventory yet.</div>';
-    const selector = `<label>Character <select data-inventory-character>` + characters.map((item) =>
-      `<option value="${escapeHtml(item.id)}"${item.id === character.id ? ' selected' : ''}>` +
-      `${escapeHtml(item.name)}</option>`).join('') + '</select></label>';
+    const chosen = characterInspection().id;
+    const character = characters.find((item) => item.id === chosen);
+    if (!character) return characterPickerMarkup() + '<div class="panel-empty">Selected character inventory is unavailable.</div>';
+    const selector = characterPickerMarkup();
     const rows = character.items.map((item) => `<div class="panel-unit">` +
       `<div class="panel-unit-heading"><strong>${escapeHtml(item.item_id === item.name
         ? panelIdentifierLabel(item.item_id) : item.name)}</strong>` +
@@ -4902,7 +5257,7 @@ const SylviaGMFrontend = (() => {
     ));
     if (!missing.size) return null;
     const prompts = [];
-    if (missing.has('actor')) prompts.push('Choose your character');
+    if (missing.has('actor')) prompts.push('Choose an acting character');
     if (missing.has('target')) prompts.push('Select a target');
     if (missing.has('zone')) prompts.push('Select a zone');
     if (missing.has('device')) prompts.push('Select a device');
@@ -5297,10 +5652,10 @@ const SylviaGMFrontend = (() => {
         )}">Network: ${escapeHtml(entity.display && entity.display.label || entity.id)}</button>`
       ) : []
     ).join('') : '';
-    const secondaryChoices = `<label>Character <select data-tactical-actor aria-label="Choose your character" ` +
+    const secondaryChoices = `<label>Acting character <select data-tactical-actor aria-label="Choose acting character" ` +
       `${actorOptions.length ? '' : 'disabled'}><option value="">Choose character</option>` +
       actorOptions.map((entity) => `<option value="${escapeHtml(entity.id)}" ` +
-        `${entity.id === selection.actor ? 'selected' : ''}>${escapeHtml(entityLabel(entity.id))}${scope?.focused_actor_id === tacticalActorId(surface, entity.id) ? ' (current)' : ''}</option>`).join('') +
+        `${entity.id === selection.actor ? 'selected' : ''}>${escapeHtml(entityLabel(entity.id))}</option>`).join('') +
       `</select></label><label>Target <select data-tactical-target aria-label="Choose target">` +
       `<option value="">Choose target</option>` + data.entities.map((entity) =>
         `<option value="${escapeHtml(entity.id)}" ${entity.id === selection.target ? 'selected' : ''}>` +
@@ -5995,6 +6350,9 @@ const SylviaGMFrontend = (() => {
   }
 
   function panelContent(surface) {
+    if (surface.renderer === 'piece_table') {
+      return window.SylviaPieceTable.render(surface.data, surface.actions);
+    }
     if (surface.id === ACTION_QUEUE_PANEL_ID && surface.renderer === 'action_queue')
       return sequenceMarkup(state.queuePreviousCards || new Set(), surface.data);
     if (surface.renderer === 'party') return renderPartyPanel(surface.data, surface);
@@ -6055,7 +6413,8 @@ const SylviaGMFrontend = (() => {
         `${escapeHtml(surface.icon || '◆')}</span>${escapeHtml(surface.title || surface.id)}</div>`
       : '';
     const footerActions = Array.isArray(surface.actions) ? surface.actions.filter(
-      (action) => !['party', 'unit_list', 'inventory'].includes(surface.renderer) || !actionBindsActor(action)
+      (action) => (!['party', 'unit_list', 'inventory'].includes(surface.renderer) || !actionBindsActor(action)) &&
+        !(surface.renderer === 'piece_table' && Object.values(action.bindings || {}).includes('piece'))
     ) : [];
     const mapSurface = ['tactical_grid', 'coordinate_map'].includes(surface.renderer);
     const selectedAction = mapSurface ? tacticalPreviewState(surface, state.tacticalViews[surface.id] || {}).action : null;
@@ -6094,6 +6453,22 @@ const SylviaGMFrontend = (() => {
     const savedMapTools = captureMapTools(container);
     const savedPreviewHeights = captureTacticalPreviewHeights(container, projection);
     const nextPanelRenderContext = panelRenderScope(projection);
+    const sameCharacterScope = panelRenderContext && nextPanelRenderContext &&
+      panelRenderContext.campaignId === nextPanelRenderContext.campaignId &&
+      panelRenderContext.sessionId === nextPanelRenderContext.sessionId &&
+      panelRenderContext.rulesetId === nextPanelRenderContext.rulesetId;
+    const savedCharacterFocus = sameCharacterScope ? captureCharacterFocus(container) : null;
+    // Native disclosure toggles can still be queued when another projection redraws the DOM.
+    if (sameCharacterScope && !window.__sylviaPanelContext) {
+      container.querySelectorAll('[data-character-expansion]').forEach((details) => {
+        applyPanelSelection(details.closest('[data-panel-id]')?.dataset.panelId,
+          { expansion: { id: details.dataset.characterExpansion, open: details.open } });
+      });
+    }
+    const savedCharacterGroups = sameCharacterScope ? Array.from(container.querySelectorAll('[data-character-stat]'), (details) => ({
+      surfaceId: details.closest('[data-panel-id]')?.dataset.panelId, stat: details.dataset.characterStat,
+      open: details.open, focused: document.activeElement === details.querySelector('summary'),
+    })) : [];
     const nativeProjection = nativePanelProjection(projection);
     if (state.panelProjectionSource !== nativeProjection) state.panelActionChecks.clear();
     state.panelProjectionSource = nativeProjection;
@@ -6119,6 +6494,18 @@ const SylviaGMFrontend = (() => {
     const queueScroll = previousList ? {top:previousList.scrollTop,
       atEnd:previousList.scrollTop + previousList.clientHeight >= previousList.scrollHeight - 2} : null;
     container.innerHTML = recovery + markup + effectsNotice;
+    for (const saved of savedCharacterGroups) {
+      const panel = container.querySelector(`[data-panel-id="${CSS.escape(saved.surfaceId)}"]`);
+      const details = panel?.querySelector(`[data-character-stat="${CSS.escape(saved.stat)}"]`);
+      if (details) {
+        details.open = saved.open;
+        if (saved.focused) details.querySelector('summary')?.focus({ preventScroll: true });
+      }
+    }
+    if (savedCharacterFocus) {
+      container.querySelector(`[data-panel-id="${CSS.escape(savedCharacterFocus.surfaceId)}"]`)
+        ?.querySelector(savedCharacterFocus.selector)?.focus({ preventScroll: true });
+    }
     container.querySelectorAll('.sequence-issue').forEach(issue => { issue.open = openQueueIssues.has(queueIssueKey(issue)); });
     const nextList = container.querySelector('.sequence-cards');
     if (nextList && queueScroll) nextList.scrollTop = queueScroll.atEnd ? nextList.scrollHeight : queueScroll.top;
@@ -6171,18 +6558,36 @@ const SylviaGMFrontend = (() => {
     container.querySelectorAll('[data-character-actor]').forEach((select) => {
       select.addEventListener('change', () => {
         const surfaceId = select.closest('[data-panel-id]')?.dataset.panelId;
-        gamePanels().choose(surfaceId, { actor: select.value });
+        gamePanels().choose(surfaceId, { character: select.value || null });
         renderRulesetPanelProjection(projection);
+        container.querySelector('[data-character-actor]')?.focus({ preventScroll: true });
       });
     });
     container.querySelectorAll('[data-party-select-actor]').forEach((button) => {
       button.addEventListener('click', () => {
         const surfaceId = button.closest('[data-panel-id]')?.dataset.panelId;
-        gamePanels().choose(surfaceId, { actor: button.dataset.partySelectActor, target: null });
+        gamePanels().choose(surfaceId, { character: button.dataset.partySelectActor });
         renderRulesetPanelProjection(projection);
+        container.querySelector(`[data-party-select-actor="${CSS.escape(button.dataset.partySelectActor)}"]`)?.focus({ preventScroll: true });
       });
     });
-    container.querySelectorAll('[data-panel-action-id]').forEach((button) => {
+    container.querySelectorAll('[data-character-action-panel]').forEach((button) => {
+      button.addEventListener('click', () => void gamePanels().reveal(button.dataset.characterActionPanel));
+    });
+    container.querySelectorAll('[data-character-expansion]').forEach((details) => {
+      details.addEventListener('toggle', () => {
+        if (!details.isConnected) return;
+        const id = details.dataset.characterExpansion;
+        if (characterInspection().expanded.includes(id) === details.open) return;
+        gamePanels().choose(details.closest('[data-panel-id]')?.dataset.panelId,
+          { expansion: { id, open: details.open } });
+      });
+    });
+    window.SylviaTileTable?.attach(container, () => void refreshPanelActionChecks(projection, container),
+      () => !state.panelCommitPending && !panelIntentPending() && !pendingPanelCommand() &&
+        !selectedSessionIsWorking() && !campaignDisplayPending());
+    new Set([...container.querySelectorAll('[data-panel-action-id]'),
+      ...container.querySelectorAll('[data-table-discard]')]).forEach((button) => {
       button.addEventListener('click', async () => {
         if (button.disabled || !state.activeCampaignId || !state.activeSnapshot || selectedSessionIsWorking() ||
             (!sequenceModeActive() && (!state.bridge.execute_panel_action || !state.bridge.preview_panel_action))) return;
@@ -6193,9 +6598,13 @@ const SylviaGMFrontend = (() => {
         const surface = projection.surfaces.find((entry) => entry.id === panel.dataset.panelId);
         const action = surface && Array.isArray(surface.actions)
           ? surface.actions.find((entry) => entry.id === button.dataset.panelActionId) : null;
-        if (!action || !panelActionAvailable(surface, action, button.dataset.panelActorId)) return;
+        if (!action || !panelActionAvailable(surface, action, button.dataset.panelActorId, button.dataset.panelPieceId)) return;
         button.disabled = true;
-        const selection = panelActionSelection(surface, action, button.dataset.panelActorId);
+        const selection = JSON.parse(JSON.stringify(panelActionSelection(surface, action,
+          button.dataset.panelActorId, button.dataset.panelPieceId)));
+        const projectionRevision = projection.revision;
+        const pendingIntent = { campaignId, sessionId };
+        state.panelIntentPending = pendingIntent;
         try {
           if (sequenceModeActive()) {
             const command = {campaign_id:campaignId,session_id:sessionId,surface_id:surface.id,
@@ -6218,9 +6627,10 @@ const SylviaGMFrontend = (() => {
             selection,
             session_id: sessionId,
           };
+          if (!selectedActivityMatches(activity) || !panelActionStillCurrent(command, projectionRevision)) return;
           const proposal = await state.bridge.preview_panel_action(command);
-          if (!selectedActivityMatches(activity) || !await confirmPlayerAction(proposal)) return;
-          if (!selectedActivityMatches(activity) || selectedSessionIsWorking()) return;
+          if (!selectedActivityMatches(activity) || !panelActionStillCurrent(command, projectionRevision) || !await confirmPlayerAction(proposal)) return;
+          if (!selectedActivityMatches(activity) || selectedSessionIsWorking() || !panelActionStillCurrent(command, projectionRevision)) return;
           const confirmedCommand = { ...command, confirmation: proposal.confirmation };
           localStorage.setItem(panelRecoveryKey(), JSON.stringify(confirmedCommand));
           state.panelCommitPending = true;
@@ -6236,6 +6646,7 @@ const SylviaGMFrontend = (() => {
         } catch (error) {
           selectedStatus(activity, friendlyCommandError('Panel action could not be completed', error), 'panels');
         } finally {
+          if (state.panelIntentPending === pendingIntent) state.panelIntentPending = null;
           state.panelCommitPending = false;
           button.disabled = false;
           if (selectedActivityMatches(activity)) await renderRulesetPanels(campaignId, true);
@@ -7386,9 +7797,19 @@ const SylviaGMFrontend = (() => {
     const status = String(result.status || content && content.status || '');
     const failed = ['failed', 'error'].includes(status);
     const rejected = status === 'rejected' || (!failed && result.success === false);
+    if (result.success === false && result.code === 'not_executed' &&
+        ['required_reference_unavailable', 'repeated_reference_failure'].includes(result.reason)) {
+      return { feedback: true, summary: 'This action did not run because a selected source could not be read. Saved work is kept.' };
+    }
     if (rejected && ['check_participant_draft', 'publish_participant_artifact',
       'check_character_profile_draft', 'publish_character_profile'].includes(toolName)) {
       return { feedback: true, summary: participantRejectionDetail(result) };
+    }
+    if (result.success === false && ['inspect_builder_references', 'copy_builder_reference'].includes(toolName) &&
+        ['reference_unavailable', 'reference_copy_unavailable'].includes(result.code)) {
+      return { feedback: true, summary: result.reason === 'package_file_oversized'
+        ? 'The selected source file exceeds Builder’s supported size. Saved work is kept. Check the selected content before continuing.'
+        : `Builder could not ${toolName === 'copy_builder_reference' ? 'copy' : 'read'} a selected reference. Saved work is kept. Check the selected source${toolName === 'copy_builder_reference' ? ' and draft workspace' : ''} before continuing.` };
     }
     if (failed || rejected) {
       return { feedback: true, summary: failed
@@ -7889,6 +8310,14 @@ const SylviaGMFrontend = (() => {
     return null;
   }
 
+  function builderProgressStage(name) {
+    if (['get_content_definition', 'inspect_builder_references', 'read_file'].includes(name)) return 'Reviewed references';
+    if (['write_file', 'edit_file', 'copy_builder_reference'].includes(name)) return 'Updated draft';
+    if (['check_participant_draft', 'check_character_profile_draft'].includes(name)) return 'Checked character';
+    if (['publish_participant_artifact', 'publish_character_profile'].includes(name)) return 'Saved character';
+    return null;
+  }
+
   // Correlation comes from saved ingress metadata, never arrival timing or narration text.
   function groupedAgentActivity(messages, cards, context, role, liveActivity = null) {
     const groups = new Map();
@@ -7939,6 +8368,10 @@ const SylviaGMFrontend = (() => {
         const result = content.result || {};
         const failed = result.success === false || ['rejected', 'error', 'failed'].includes(result.status) ||
           ['rejected', 'error', 'failed', 'pending'].includes(content.status);
+        if (role === 'builder' && !failed && content.tool_name) {
+          const stage = builderProgressStage(content.tool_name);
+          if (stage) group.lastStage = stage;
+        }
         if (label && !failed && result.result_card == null) {
           group.entries.push({ label, order: correlation?.source_order ?? index });
           hidden.add(index);
@@ -7955,7 +8388,7 @@ const SylviaGMFrontend = (() => {
     const additions = new Map();
     for (const group of groups.values()) {
       const live = liveActivity?.attemptId === group.attempt && activityIsWorking(liveActivity);
-      const status = live ? 'Working' : group.status === 'interrupted' ? 'Interrupted' :
+      const status = live ? (role === 'builder' && group.lastStage ? `Working · Last: ${group.lastStage}` : 'Working') : group.status === 'interrupted' ? 'Interrupted' :
         group.status === 'completed' ? 'Done' : 'Recorded';
       const entries = group.entries.map((entry) => ({ order: entry.order,
         html: `<div class="agent-operation"><span>${escapeHtml(entry.label)}</span><span>Done</span></div>` }));
@@ -7973,7 +8406,7 @@ const SylviaGMFrontend = (() => {
       const label = role === 'builder' ? 'Builder activity' : 'GM activity';
       const html = `<details class="agent-activity" data-chronology-key="activity-${escapeHtml(group.attempt)}" ` +
         `data-disclosure-key="activity-${escapeHtml(group.attempt)}">` +
-        `<summary>${label}<span class="agent-activity-status">${status}</span></summary>` +
+        `<summary>${label}<span class="agent-activity-status">${escapeHtml(status)}</span></summary>` +
         `<div class="agent-activity-trail">${entries.sort((a, b) => a.order - b.order)
           .map((entry) => entry.html).join('')}</div></details>`;
       additions.set(group.position, (additions.get(group.position) || '') + html);
@@ -8105,6 +8538,10 @@ const SylviaGMFrontend = (() => {
             ? 'Builder reached its work limit after automatic continuation. Saved work is retained. Send a message to continue.'
             : content.status === 'interrupted' && content.reason_code === 'repeated_tool_failure'
             ? 'Builder stopped after repeated identical tool failures. Saved work is retained. Review the last tool error before continuing.'
+            : content.status === 'interrupted' && content.reason_code === 'required_reference_unavailable'
+            ? 'Builder stopped because a selected source could not be read. Saved work is retained. Check the selected source content before continuing.'
+            : content.status === 'interrupted' && content.reason_code === 'repeated_reference_failure'
+            ? 'Builder stopped after repeated attempts to read the same source. Saved work is retained. Review the source error before continuing.'
             : 'Saved work is retained. Send a message when you are ready to continue.';
           return `<div class="story-card builder-interruption"${key}>` +
             `<div class="story-header">${content.status === 'stopped' ? 'Stopped' : 'Interrupted'}</div>` +
@@ -8322,7 +8759,8 @@ const SylviaGMFrontend = (() => {
         groupedAgentActivity(messages, committed, context, 'dm', activity),
         (context?.act_markers || []).filter(marker => !context?.campaign_ending ||
           marker.status !== 'complete' || marker.act_number !== context.campaign_ending.act_number)),
-        context?.campaign_ending, activityIsWorking(activity) || Boolean(activity.retryBasis)),
+        context?.campaign_endings?.length ? context.campaign_endings : context?.campaign_ending,
+        activityIsWorking(activity) || Boolean(activity.retryBasis)),
       ...live].filter(Boolean);
     if (!cards.length) {
       const openingPending = activityIsWorking(activity) &&
@@ -8366,15 +8804,17 @@ const SylviaGMFrontend = (() => {
 
   // The saved ending offers one real user choice after its closing narration, never private prose.
   function withCampaignEnding(messages, cards, ending, busy = false) {
+    if (Array.isArray(ending)) return ending.reduce(
+      (result, item) => withCampaignEnding(messages, result, item, busy), cards);
     const result = [...cards];
     if (!ending || (ending.act_number !== null &&
         (!Number.isInteger(ending.act_number) || ending.act_number < 1)) ||
         typeof ending.ending_id !== 'string') return result;
     const position = messages.findIndex(message => message.message_id === ending.after_message_id);
     if (position < 0) return result;
-    const key = chronologyKeyAttribute('campaign-ending');
+    const key = chronologyKeyAttribute(`campaign-ending-${ending.after_message_id}`);
     let markup;
-    if (ending.choice) {
+    if (ending.choice || ending.historical) {
       markup = `<div class="campaign-ending-marker"${key} aria-label="Campaign complete">` +
         `<span>✓ ${escapeHtml(ending.plan_title || 'Campaign')} · Complete</span></div>`;
     } else {
@@ -10146,6 +10586,10 @@ const SylviaGMFrontend = (() => {
       });
       await refreshBuilderChats();
       await openBuilderChat(chat.session.session_id);
+      if (options.initialPrompt) {
+        $('player-input').value = options.initialPrompt;
+        saveSelectedSessionDraft();
+      }
       setInlineStatus('');
       $('player-input').focus();
     } catch (e) {
@@ -10469,6 +10913,7 @@ const SylviaGMFrontend = (() => {
       activityIsWorking(activity) || (state.activeSessionRole === 'builder' &&
         state.activeCampaignId && state.constructionDraftId === state.activeCampaignId &&
         !state.activeCreationSubflow);
+    $('campaign-sequel-btn').disabled = !configured || activityIsWorking(activity) || Boolean(activity?.retryBasis);
     $('player-input').disabled = !canSubmit;
     $('player-input').setAttribute('aria-label', state.activeSessionRole === 'dm'
       ? 'In-character message or action' : 'Message to Builder');
@@ -10481,6 +10926,7 @@ const SylviaGMFrontend = (() => {
     $('composer-steering-hint').hidden = !canSubmit || !activityIsWorking(activity) ||
       state.activeSessionRole !== 'builder';
     $('ooc-note').classList.toggle('has-note', Boolean($('ooc-input').value.trim()));
+    dictation?.sync();
     return canSubmit;
   }
 
@@ -10669,6 +11115,177 @@ const SylviaGMFrontend = (() => {
 
   }
 
+  function sequelSelectionIsCurrent(dialog = state.sequelDialog) {
+    return dialog && state.sequelDialog === dialog && state.view === 'session' &&
+      state.activeCampaignId === dialog.campaign_id && state.activeSessionId === dialog.session_id;
+  }
+
+  function refreshSequelConfirmation() {
+    const dialog = state.sequelDialog;
+    $('campaign-sequel-append').disabled = !dialog?.preview || dialog.busy ||
+      (!dialog.request && (!$('campaign-sequel-reviewed').checked ||
+        !$('campaign-sequel-connection').value.trim()));
+  }
+
+  function resetSequelReview() {
+    if (state.sequelDialog) state.sequelDialog.preview = null;
+    $('campaign-sequel-review').hidden = true;
+    $('campaign-sequel-confirmation').hidden = true;
+    $('campaign-sequel-reviewed').checked = false;
+    refreshSequelConfirmation();
+  }
+
+  async function openCampaignSequel() {
+    if (selectedSessionIsWorking() || selectedActivity()?.retryBasis || state.activeSessionRole !== 'dm') return;
+    const dialog = { campaign_id: state.activeCampaignId, session_id: state.activeSessionId,
+      operation_id: `append-adventure-${crypto.randomUUID()}`, preview: null, request: null,
+      busy: false, context: null };
+    state.sequelDialog = dialog;
+    resetSequelReview();
+    $('campaign-sequel-connection').value = '';
+    for (const id of ['campaign-sequel-source', 'campaign-sequel-connection', 'campaign-sequel-reviewed'])
+      $(id).disabled = false;
+    $('campaign-sequel-append').textContent = 'Append adventure';
+    $('campaign-sequel-status').textContent = 'Loading your adventure library…';
+    $('campaign-sequel-dialog').showModal();
+    try {
+      const [catalog, context] = await Promise.all([
+        state.bridge.campaign_creation_catalog(),
+        state.bridge.campaign_sequel_context({ campaign_id: dialog.campaign_id,
+          session_id: dialog.session_id }),
+      ]);
+      if (!sequelSelectionIsCurrent(dialog)) return;
+      dialog.context = context;
+      $('campaign-sequel-source').innerHTML = '<option value="">Choose an adventure…</option>' +
+        catalog.filter(item => item.kind === 'campaign_plan').map(item =>
+          `<option value="${escapeHtml(item.id)}">${escapeHtml(item.title)}</option>`).join('');
+      $('campaign-sequel-status').textContent =
+        'Choose an adventure to check its exact world and rules. You can also author a compatible next adventure in Builder.';
+    } catch (error) {
+      if (sequelSelectionIsCurrent(dialog)) $('campaign-sequel-status').textContent =
+        friendlyCommandError('Adventure library could not load', error);
+    }
+  }
+
+  async function previewCampaignSequel() {
+    const dialog = state.sequelDialog;
+    const sourceId = $('campaign-sequel-source').value;
+    if (!sequelSelectionIsCurrent(dialog) || !sourceId || dialog.busy || dialog.request) return;
+    resetSequelReview();
+    dialog.busy = true;
+    $('campaign-sequel-status').textContent = 'Checking this adventure against the campaign…';
+    try {
+      const preview = await state.bridge.preview_campaign_sequel({ campaign_id: dialog.campaign_id,
+        session_id: dialog.session_id, source_id: sourceId });
+      if (!sequelSelectionIsCurrent(dialog) || sourceId !== $('campaign-sequel-source').value) return;
+      dialog.preview = preview;
+      const initial = preview.source_initial_state || {};
+      const facts = (initial.facts || []).map(item => typeof item === 'string' ? item : item.fact);
+      $('campaign-sequel-review').innerHTML =
+        `<h3>${escapeHtml(preview.title)}</h3><p>${escapeHtml(preview.summary)}</p>` +
+        `<p>${escapeHtml(preview.warning)}</p>` +
+        `<p><strong>Retained characters:</strong> ${preview.participants.map(item => escapeHtml(item.name)).join(', ') || 'Current campaign party'}</p>` +
+        (preview.ending.choice === 'finish' && preview.ending.has_after_story
+          ? '<p><strong>This campaign already chose its after-story.</strong> Review the saved future in history. The next adventure must follow those events.</p>' : '') +
+        '<h4>New sequence</h4><ol>' + preview.acts.map(item =>
+          `<li>Act ${item.number}: ${escapeHtml(item.title)}</li>`).join('') + '</ol>' +
+        '<details><summary>Retained story for review</summary>' +
+        '<p>This excerpt includes up to 64 recent history entries and current facts. The complete saved history remains authoritative.</p>' +
+        `<pre>${escapeHtml(JSON.stringify({ scene: preview.current_scene,
+          facts: preview.retained_facts, recent_history: dialog.context?.recent_history }, null, 2))}</pre></details>` +
+        '<details><summary>Review preparation and setup assumptions (contains story spoilers)</summary>' +
+        '<p>Authored starting facts are shown for compatibility review. They are not applied to the campaign.</p>' +
+        (facts.length ? '<ul>' + facts.map(item => `<li>${escapeHtml(item)}</li>`).join('') + '</ul>' : '') +
+        `<pre>${escapeHtml(preview.source_markdown)}</pre>` +
+        '<details><summary>Exact authored setup</summary>' +
+        `<pre>${escapeHtml(JSON.stringify({ initial_state: initial,
+          starting_location: preview.source_plan?.starting_location,
+          starting_party: preview.source_plan?.starting_party }, null, 2))}</pre></details></details>` +
+        '<details><summary>Review separate story identities</summary>' +
+        '<p>These mappings keep new progress separate from earlier acts and objectives. World identities are retained.</p>' +
+        '<table><thead><tr><th>Authored reference</th><th>Campaign reference</th></tr></thead><tbody>' +
+        Object.entries(preview.identity_mapping).map(([from, to]) =>
+          `<tr><td>${escapeHtml(from)}</td><td>${escapeHtml(to)}</td></tr>`).join('') +
+        '</tbody></table></details>' +
+        `<details><summary>Exact source</summary><pre>${escapeHtml(JSON.stringify({
+          id: preview.basis.source_id, sha256: preview.basis.source_sha256,
+          bindings: preview.source_bindings }, null, 2))}</pre></details>`;
+      $('campaign-sequel-review').hidden = false;
+      $('campaign-sequel-confirmation').hidden = false;
+      $('campaign-sequel-status').textContent =
+        'Review the adventure against your history. Resolve incompatible assumptions in Builder before appending.';
+    } catch (error) {
+      if (sequelSelectionIsCurrent(dialog)) $('campaign-sequel-status').textContent =
+        friendlyCommandError('This adventure cannot be appended', error);
+    } finally {
+      dialog.busy = false;
+      if (sequelSelectionIsCurrent(dialog)) refreshSequelConfirmation();
+    }
+  }
+
+  async function appendCampaignSequel() {
+    const dialog = state.sequelDialog;
+    if (!sequelSelectionIsCurrent(dialog) || !dialog.preview || dialog.busy ||
+        $('campaign-sequel-append').disabled) return;
+    if (!dialog.request) dialog.request = {
+      campaign_id: dialog.campaign_id, session_id: dialog.session_id,
+      operation_id: dialog.operation_id, source_id: dialog.preview.basis.source_id,
+      expected_revision: dialog.preview.basis.expected_revision,
+      preview_sha256: dialog.preview.preview_sha256,
+      review: { connection: $('campaign-sequel-connection').value.trim(), timeline: 'after', reviewed: true },
+    };
+    dialog.busy = true;
+    for (const id of ['campaign-sequel-source', 'campaign-sequel-connection', 'campaign-sequel-reviewed'])
+      $(id).disabled = true;
+    refreshSequelConfirmation();
+    $('campaign-sequel-status').textContent = 'Appending the reviewed adventure…';
+    try {
+      await state.bridge.append_campaign_sequel(dialog.request);
+      if (!sequelSelectionIsCurrent(dialog)) return;
+      $('campaign-sequel-dialog').close();
+      await openCampaign(dialog.campaign_id, dialog.session_id);
+      setInlineStatus('Adventure added. Continue with your Game Master when you are ready.');
+    } catch (error) {
+      if (sequelSelectionIsCurrent(dialog)) {
+        $('campaign-sequel-status').textContent = friendlyCommandError(
+          'Append was not confirmed. Retry this exact request to recover its result; if the review is stale, cancel and review again', error);
+        $('campaign-sequel-append').textContent = 'Retry append';
+      }
+    } finally {
+      dialog.busy = false;
+      if (sequelSelectionIsCurrent(dialog)) refreshSequelConfirmation();
+    }
+  }
+
+  async function authorCampaignSequel() {
+    const dialog = state.sequelDialog;
+    if (!sequelSelectionIsCurrent(dialog) || dialog.busy || dialog.request || !dialog.context) return;
+    const context = dialog.context;
+    const preparation = {
+      source_plan_id: context.accepted_plan?.id, source_references: context.source_references,
+      bindings: context.accepted_plan?.bindings,
+      boundaries: context.accepted_plan?.boundaries, current_scene: context.current_scene,
+      participants: context.participants.map(item => ({ id: item.id, name: item.data.name })),
+      recent_facts: context.facts.slice(-64), recent_history: context.recent_history,
+      ending: context.ending,
+    };
+    const fullContext = JSON.stringify(preparation, null, 2);
+    const contextExcerpt = fullContext.length <= 60000 ? fullContext :
+      fullContext.slice(0, 60000) + '\n\n[Context excerpt truncated at 60,000 characters. ' +
+      'It may end during a field. Complete saved history and boundaries remain authoritative. ' +
+      'Ask me for missing material rather than treating it as absent.]';
+    $('campaign-sequel-dialog').close();
+    await startBuilderChat({ displayName: `Next adventure: ${context.campaign_name}`,
+      initialPrompt: 'Help me author or adapt a compatible next Campaign Plan for this existing campaign. ' +
+        'Keep its exact Setting and Ruleset snapshots, characters, boundaries, played events, ' +
+        'unresolved consequences and already narrated future. This independent Builder may publish ' +
+        'a reusable Plan; it cannot change the live campaign. Its starting setup will not reset ' +
+        'the campaign. Ask about genuine narrative conflicts. I will review and append it separately. ' +
+        'This context includes up to 64 recent facts and history excerpts (up to 4000 characters each); ' +
+        'my complete saved history remains authoritative.\n\n' +
+        contextExcerpt });
+  }
+
   async function exportSelectedCampaign() {
     if (!state.activeCampaignId || !state.bridge || !state.bridge.export_campaign_file) return;
     const includeThinking = $('export-include-thinking')?.checked === true;
@@ -10749,6 +11366,8 @@ const SylviaGMFrontend = (() => {
   }
 
   function restoreSelectedSessionDraft() {
+    dictationRevision += 1;
+    dictation?.sync();
     const input = $('player-input');
     if (!input) return;
     const draft = state.sessionDrafts.get(state.activeSessionId) || {};
@@ -10904,6 +11523,9 @@ const SylviaGMFrontend = (() => {
     }
     if (activityIsWorking(activity) && sessionRole === 'builder') {
       if (!state.bridge.steer_session || activity.stopRequestedAttemptId || !text.trim()) return;
+      if (selectedActivityMatches(activity)) {
+        dictation?.cancel('', { announce: false });
+      }
       saveSelectedSessionDraft();
       try {
         await state.bridge.steer_session(sessionId, 'steering-' + crypto.randomUUID(), text.trim());
@@ -10945,6 +11567,9 @@ const SylviaGMFrontend = (() => {
       redirect_interruption_id: !compact && !playerAction && !campaignEndingChoice && sessionRole === 'dm'
         ? activity.retryBasis?.interruption_id || null : null,
     };
+    if (!playerAction && !builderStart && !campaignEndingChoice && !compact && state.activeSessionId === sessionId) {
+      dictation?.cancel('', { announce: false });
+    }
     if (state.activeSessionId === sessionId) {
       setWebResearchPermission(false);
       saveSelectedSessionDraft();
@@ -11304,6 +11929,7 @@ const SylviaGMFrontend = (() => {
   // Navigation controls are host presentation; hiding them must not change any saved session.
   function renderSidebarState() {
     const campaign = state.view === 'session' && Boolean(state.activeCampaignId);
+    $('campaign-sequel-btn').hidden = !campaign || state.activeSessionRole !== 'dm';
     $('builder-launcher').hidden = campaign && state.activeSessionRole === 'dm';
     $('session-context').hidden = !campaign;
     for (const side of ['left', 'right']) {
@@ -11361,7 +11987,7 @@ const SylviaGMFrontend = (() => {
       const feedback = $('session-status-text');
       const available = (column?.clientHeight || window.innerHeight) -
         (column?.querySelector('.session-topbar')?.offsetHeight || 48) -
-        footer.offsetHeight - feedback.offsetHeight - 160;
+        footer.offsetHeight - feedback.offsetHeight - ($('dictation-feedback')?.offsetHeight || 0) - 160;
       return Math.max(58, Math.min(200, available));
     };
     const resize = (requested) => {

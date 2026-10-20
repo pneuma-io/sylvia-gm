@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from sylvia_gm.application.launch_compatibility import require_active_ruleset
-
 import errno
 import hashlib
 import json
@@ -20,10 +18,15 @@ from contextlib import contextmanager, suppress
 from dataclasses import dataclass, replace
 from pathlib import Path
 from types import MappingProxyType
-from typing import BinaryIO, cast
+from typing import BinaryIO, TypeVar, cast
 
 import yaml
 
+from sylvia_gm.application.actor_decisions import (
+    ActorDecisionRequest,
+    project_actor_decision,
+    public_actor_observation,
+)
 from sylvia_gm.application.campaign_inventory import (
     generic_inventory_surface,
     inventory_holdings,
@@ -31,16 +34,20 @@ from sylvia_gm.application.campaign_inventory import (
 )
 from sylvia_gm.application.decision_scope import (
     DecisionScopeProjectionError,
-    project_model_decision_scope,
+    player_viewer_ids,
     project_campaign_preparation_scope,
+    project_model_decision_scope,
     project_player_control_scope,
 )
 from sylvia_gm.application.interview_content import resolve_interview_content
 from sylvia_gm.application.knowledge_search import (
     KnowledgeReference,
+    bounded_search_page,
     knowledge_terms,
     rank_references,
 )
+from sylvia_gm.application.launch_compatibility import player_ui_surfaces, require_active_ruleset
+from sylvia_gm.application.map_segment_preview import segment_preview
 from sylvia_gm.application.network_graph import (
     NetworkGraphError,
     bind_physical_network_surfaces,
@@ -51,9 +58,9 @@ from sylvia_gm.application.network_graph import (
 from sylvia_gm.application.package_library import (
     MigrationFunction,
     declaration_admitted,
+    dependency_only_manifest_rebind,
     install_package_archive,
     project_surfaces,
-    dependency_only_manifest_rebind,
     projection_bytes,
     run_migration_outside_sqlite,
     state_predicates_match,
@@ -70,12 +77,16 @@ from sylvia_gm.application.package_runtime import (
     materialize_player_action_checker,
     materialize_player_action_previewer,
     package_model_decision_boundary,
-    package_tool_description,
     package_tool_decision_title,
+    package_tool_description,
     package_tool_model_behavior,
     package_tool_player_controls,
 )
-from sylvia_gm.application.map_segment_preview import segment_preview
+from sylvia_gm.application.piece_table import (
+    PieceTableError,
+    project_piece_table,
+    resolve_piece_action_parameters,
+)
 from sylvia_gm.application.player_actions import (
     PLAYER_ACTION_ORIGIN,
     PlayerActionChecker,
@@ -85,10 +96,16 @@ from sylvia_gm.application.player_actions import (
     player_action_records,
     player_action_request_matches,
     player_control_origin,
-    resolve_party_action_parameters,
     resolve_inventory_action_parameters,
+    resolve_party_action_parameters,
     retain_player_action_origin,
     validate_player_control,
+)
+from sylvia_gm.application.reference_text import (
+    REFERENCE_CONTENT_BYTE_LIMIT,
+    REFERENCE_REPLY_BYTE_LIMIT,
+    matching_text_excerpts,
+    text_excerpt,
 )
 from sylvia_gm.application.result_cards import project_result_card
 from sylvia_gm.application.schema_admission import (
@@ -144,6 +161,7 @@ from sylvia_gm.domain.authority import (
     MechanicsChoiceRequest,
     MechanicsChoiceResolution,
     ModelDecisionBoundary,
+    ModelDecisionOwner,
     ModelToolBehavior,
     NarrationInterruption,
     NarrationStream,
@@ -255,6 +273,10 @@ from sylvia_gm.domain.session import (
     campaign_plan_payload_sha256,
 )
 from sylvia_gm.infrastructure import campaign_archive
+from sylvia_gm.infrastructure.package_archive import (
+    PACKAGE_MEMBER_BYTE_LIMIT,
+    PACKAGE_MEMBER_COUNT_LIMIT,
+)
 from sylvia_gm.infrastructure.sqlite_authority import (
     CampaignIndexRecord,
     SQLiteAuthorityStore,
@@ -262,6 +284,8 @@ from sylvia_gm.infrastructure.sqlite_authority import (
 )
 
 __all__ = ("mechanic_outcome_is_safe",)
+
+_Snapshot = TypeVar("_Snapshot", CampaignSnapshot, CampaignDisplaySnapshot)
 
 _RULESET_GM_OPERATING_GUIDE_PATH = "prompts/gm-operating-guide.md"
 _RULESET_GM_OPERATING_GUIDE_BYTE_LIMIT = 64 * 1024
@@ -283,12 +307,13 @@ def _markdown_sections(value: str) -> tuple[tuple[str, str, str], ...]:
         if match is not None:
             headings.append((index, len(match.group(1)), match.group(2).strip()))
     sections: list[tuple[str, str, str]] = []
-    for heading_index, (start, level, heading) in enumerate(headings):
-        end = len(lines)
-        for next_start, next_level, _next_heading in headings[heading_index + 1 :]:
-            if next_level <= level:
-                end = next_start
-                break
+    ends = [len(lines)] * len(headings)
+    parents: list[int] = []
+    for index, (start, level, _heading) in enumerate(headings):
+        while parents and headings[parents[-1]][1] >= level:
+            ends[parents.pop()] = start
+        parents.append(index)
+    for (start, _level, heading), end in zip(headings, ends, strict=True):
         slug = re.sub(r"[^a-z0-9]+", "-", heading.casefold()).strip("-")
         sections.append((heading, slug, "\n".join(lines[start:end]).strip()))
     return tuple(sections)
@@ -313,26 +338,31 @@ def _markdown_section_references(
     *,
     path: str,
     document_private: bool,
-) -> tuple[dict[str, str], ...]:
-    """List exact section references without returning their authored content."""
+) -> tuple[tuple[dict[str, str], ...], int]:
+    """Bound heading metadata independently of the admitted source and return its total count."""
 
     sections = _markdown_sections(value)
     references: list[dict[str, str]] = []
+    counts = Counter(slug for _, slug, _ in sections)
+    total = 0
     for heading, slug, content in sections:
         if len(sections) > 1 and content == value.strip():
+            continue
+        total += 1
+        if len(references) >= 100 or len(slug) > 200 or counts[slug] != 1:
             continue
         heading_key = heading.casefold().rstrip("s")
         private = document_private or heading_key in {
             item.rstrip("s") for item in _PRIVATE_PREPARATION_HEADINGS
         }
-        references.append(
-            {
-                "heading": heading,
-                "path": f"{path}#{slug}",
-                "visibility": ("gm_private_preparation" if private else "campaign_reference"),
-            }
-        )
-    return tuple(references)
+        reference = {
+            "heading": heading[:200],
+            "path": f"{path}#{slug}",
+            "visibility": ("gm_private_preparation" if private else "campaign_reference"),
+        }
+        if len(canonical_json_bytes([*references, reference])) <= 8 * 1024:
+            references.append(reference)
+    return tuple(references), total
 
 
 def _read_structured_campaign_plan(root: Mapping[str, object], path: str) -> object:
@@ -1112,6 +1142,15 @@ class AuthorityOwner:
                 session_id, response_id, provider_id=provider_id, model_id=model_id,
             )
 
+    def actor_context(
+        self, session_id: str, context_id: str, *, provider_id: str, model_id: str,
+    ) -> Mapping[str, object] | None:
+        """Load only the selected participant's private provider-compatible history."""
+        with self._operation():
+            return self._store.actor_context(
+                session_id, context_id, provider_id=provider_id, model_id=model_id,
+            )
+
     def session_history_page(
         self, session_id: str, *, before_sequence: int | None = None, limit: int = 50,
     ) -> SessionHistoryPage:
@@ -1206,7 +1245,9 @@ class AuthorityOwner:
                         "Campaign scene field 'act_id' is invalid",
                         code="campaign_scene_invalid",
                     ) from error
-                structure = plan.get("structure")
+                structure = self._retained_preparation(
+                    context.session.campaign_id, plan
+                ).get("structure")
                 scene_act_ids = {
                     str(item["id"])
                     for item in (
@@ -1731,8 +1772,9 @@ class AuthorityOwner:
             }
             plan_items: set[str] = set()
             plan_items.update(ending_progress_id(item) for item in intended_endings(plan))
+            retained_preparation = self._retained_preparation(campaign_id, plan)
             for collection_name in ("objectives", "structure"):
-                raw_collection = plan.get(collection_name, ())
+                raw_collection = retained_preparation.get(collection_name, ())
                 if not isinstance(raw_collection, Sequence) or isinstance(
                     raw_collection, (str, bytes, bytearray)
                 ):
@@ -1742,7 +1784,7 @@ class AuthorityOwner:
                     for item in raw_collection
                     if isinstance(item, Mapping) and isinstance(item.get("id"), str)
                 )
-            structure = plan.get("structure")
+            structure = retained_preparation.get("structure")
             scene_act_ids = {
                 str(item["id"])
                 for item in (
@@ -2188,6 +2230,30 @@ class AuthorityOwner:
             raise CommandRejected("Campaign narrative state requires a structured plan")
         return context, cast(Mapping[str, object], plan)
 
+    def _retained_preparation(
+        self, campaign_id: str, plan: Mapping[str, object],
+    ) -> Mapping[str, object]:
+        """Keep earlier opportunities usable while the active adventure owns its ending gates."""
+        current = self._store.accepted_campaign_plan(campaign_id)
+        if (current is None or not isinstance(current.content.get("sequel"), Mapping)
+                or canonical_json_bytes(plan) != canonical_json_bytes(current.content["campaign_plan"])):
+            return plan
+        result = dict(plan)
+        adventures = self._store.campaign_adventures(campaign_id)
+        for field in ("structure", "objectives", "secrets"):
+            values: list[object] = []
+            setting_fact_ids: set[object] = set()
+            for adventure in adventures:
+                story = cast(Mapping[str, object], adventure.content["campaign_plan"])
+                for item in cast(Sequence[object], story.get(field, ())):
+                    if isinstance(item, Mapping) and "setting_fact_id" in item:
+                        if item["setting_fact_id"] in setting_fact_ids:
+                            continue
+                        setting_fact_ids.add(item["setting_fact_id"])
+                    values.append(item)
+            result[field] = values
+        return owned_payload(result)
+
     def _dm_structured_plan(self, session_id: str) -> tuple[SessionContext, Mapping[str, object]]:
         """Return one active DM context and its required exact accepted structured Plan."""
 
@@ -2283,6 +2349,7 @@ class AuthorityOwner:
 
         if campaign_id is None:
             raise CommandRejected("Campaign secret catalog requires campaign authority")
+        plan = self._retained_preparation(campaign_id, plan)
         setting_facts, _private_references = self._campaign_setting_knowledge(campaign_id, plan)
         remaining = {str(item["id"]): item for item in setting_facts}
         merged: list[SafePayload] = []
@@ -2423,7 +2490,10 @@ class AuthorityOwner:
 
         with self._operation():
             context, plan = self._optional_dm_structured_plan(session_id)
-            structure = plan.get("structure")
+            campaign_id = context.session.campaign_id
+            assert campaign_id is not None
+            preparation = self._retained_preparation(campaign_id, plan)
+            structure = preparation.get("structure")
             acts = (
                 [
                     item
@@ -2438,7 +2508,7 @@ class AuthorityOwner:
             assert campaign_id is not None
             snapshot = self._store.snapshot(campaign_id)
             scene_act_ids = [str(item["id"]) for item in acts]
-            objectives = plan.get("objectives")
+            objectives = preparation.get("objectives")
             objective_ids = [
                 str(item["id"])
                 for item in (
@@ -2626,6 +2696,8 @@ class AuthorityOwner:
         """Admit one exact accepted plan through the existing campaign revision authority."""
 
         with self._operation(), self._lane(campaign_id):
+            if "sequel" in content:
+                raise CommandRejected("Live adventure additions require explicit sequel review")
             try:
                 captured_content = owned_payload(content)
                 validation = PlanValidationOutcome(validation_outcome)
@@ -2695,6 +2767,63 @@ class AuthorityOwner:
                 payload_sha256=payload_sha256,
             )
 
+    def preview_campaign_sequel(
+        self, *, campaign_id: str, session_id: str, source_id: str,
+    ) -> SafePayload:
+        """Read a candidate and its continuity review without adopting content."""
+        from sylvia_gm.application.campaign_sequels import preview
+
+        with self._operation(), self._lane(campaign_id):
+            return owned_payload(preview(self, campaign_id, session_id, source_id))
+
+    def campaign_sequel_context(self, *, campaign_id: str, session_id: str) -> SafePayload:
+        """Capture selected-campaign facts for an independent, read-only authoring prompt."""
+        with self._operation(), self._lane(campaign_id):
+            context = self._active_dm_context(session_id)
+            if context.session.campaign_id != campaign_id:
+                raise CommandRejected("The selected GM does not belong to this campaign")
+            snapshot = self._store.snapshot(campaign_id)
+            accepted = self.accepted_campaign_plan(campaign_id)
+            if accepted is None:
+                raise CommandRejected("This campaign has no accepted authored adventure")
+            return owned_payload({
+                "campaign_name": snapshot.display_name,
+                "accepted_plan": accepted.content.get("campaign_plan"),
+                "current_scene": snapshot.continuity.current_scene,
+                "facts": list(snapshot.continuity.facts),
+                "plan_progress": list(snapshot.continuity.plan_progress),
+                "participants": [{"id": item.participant_id, "data": item.data}
+                                 for item in snapshot.participants],
+                "ending": self.session_history_page(session_id).campaign_ending,
+                "recent_history": [
+                    {"kind": item.kind.value,
+                     "excerpt": canonical_json_bytes(item.content).decode("utf-8")[:4000]}
+                    for item in self.session_history_page(session_id, limit=64).messages
+                    if item.kind in {SessionMessageKind.USER, SessionMessageKind.TALK,
+                                     SessionMessageKind.CANONICAL_REFERENCE,
+                                     SessionMessageKind.STEERING}
+                ],
+                "source_references": [
+                    {"plan_id": row.plan_id, "content_sha256": row.content_sha256,
+                     "source_id": row.content.get("sequel", {}).get("source_id")}
+                    for row in self._store.campaign_adventures(campaign_id)
+                ],
+            })
+
+    def append_campaign_sequel(
+        self, *, campaign_id: str, session_id: str, operation_id: str, source_id: str,
+        expected_revision: int, preview_sha256: str, review: object,
+    ) -> SafePayload:
+        """Append reviewed story preparation through the current GM owner, once."""
+        from sylvia_gm.application.campaign_sequels import append
+
+        with self._operation():
+            return owned_payload(append(
+                self, campaign_id=campaign_id, session_id=session_id, operation_id=operation_id,
+                source_id=source_id, expected_revision=expected_revision,
+                preview_sha256=preview_sha256, review=review,
+            ))
+
     def campaign_plan(self, plan_id: str) -> CampaignPlan:
         with self._operation():
             plan = self._store.campaign_plan_hit(plan_id)
@@ -2708,6 +2837,11 @@ class AuthorityOwner:
             if plan is None:
                 raise CommandRejected("Accepted Campaign Plan is unavailable")
             return plan
+
+    def campaign_adventures(self, campaign_id: str) -> tuple[CampaignPlan, ...]:
+        """Read the validated accepted sequence, excluding superseded Builder drafts."""
+        with self._operation():
+            return self._store.campaign_adventures(campaign_id)
 
     def handoff_builder_to_dm(
         self,
@@ -4371,7 +4505,7 @@ class AuthorityOwner:
         )
 
     def _decision_scope_declaration(
-        self, snapshot: CampaignState,
+        self, snapshot: CampaignState | CampaignDisplaySnapshot,
     ) -> Mapping[str, object] | None:
         """Read actor-control metadata from the exact currently locked primary package."""
 
@@ -5369,6 +5503,7 @@ class AuthorityOwner:
         query: str,
         sources: Sequence[str] | None = None,
         limit: int = 5,
+        offset: int = 0,
     ) -> SafePayload:
         """Discover bounded exact references without creating another source of truth."""
 
@@ -5398,6 +5533,8 @@ class AuthorityOwner:
         with self._operation():
             snapshot = self._store.snapshot(campaign_id)
             candidates: list[KnowledgeReference] = []
+            unavailable_references: list[dict[str, str]] = []
+            unavailable_count = 0
 
             def add_match(
                 *,
@@ -5410,13 +5547,28 @@ class AuthorityOwner:
                 provenance: Mapping[str, object],
                 identity: str | None = None,
             ) -> None:
-                candidates.append(KnowledgeReference(
-                    result={
-                        "source": source, "path": path, "kind": kind, "label": label,
-                        "visibility": visibility, "provenance": dict(provenance),
-                    },
-                    identity=identity or path, body=body,
-                ))
+                public_provenance = dict(provenance)
+                heading = public_provenance.get("heading")
+                if isinstance(heading, str) and len(heading) > 200:
+                    public_provenance["heading"] = heading[:200]
+                    public_provenance["heading_truncated"] = True
+                candidates.append(
+                    KnowledgeReference(
+                        result={
+                            "source": source,
+                            "path": path,
+                            "kind": kind,
+                            "label": label[:200],
+                            **({"label_truncated": True} if len(label) > 200 else {}),
+                            "visibility": visibility,
+                            "provenance": public_provenance,
+                        },
+                        identity=f"{identity or path} {label}"
+                        if len(label) > 200
+                        else identity or path,
+                        body=body,
+                    )
+                )
 
             if "campaign_state" in requested_sources:
                 for item in snapshot.continuity.facts:
@@ -5575,7 +5727,7 @@ class AuthorityOwner:
                         entry.package_id,
                         entry.version,
                         entry.sha256,
-                        maximum_files=2_048,
+                        maximum_files=PACKAGE_MEMBER_COUNT_LIMIT,
                     )
                     for path in paths:
                         if Path(path).suffix.casefold() not in {
@@ -5592,15 +5744,33 @@ class AuthorityOwner:
                                 entry.version,
                                 entry.sha256,
                                 path,
-                                maximum_bytes=64 * 1024,
+                                maximum_bytes=PACKAGE_MEMBER_BYTE_LIMIT,
                             )
-                        except CommandRejected:
+                        except CommandRejected as error:
+                            unavailable_count += 1
+                            if len(unavailable_references) < 8:
+                                unavailable_references.append(
+                                    {
+                                        "source": source,
+                                        "path": path,
+                                        "code": error.code or "campaign_reference_unavailable",
+                                    }
+                                )
                             continue
                         if value is None:
                             continue
                         try:
                             text = value.decode("utf-8")
                         except UnicodeDecodeError:
+                            unavailable_count += 1
+                            if len(unavailable_references) < 8:
+                                unavailable_references.append(
+                                    {
+                                        "source": source,
+                                        "path": path,
+                                        "code": "campaign_reference_not_utf8",
+                                    }
+                                )
                             continue
                         package_provenance = {
                             "campaign_id": campaign_id,
@@ -5609,7 +5779,30 @@ class AuthorityOwner:
                             "package_sha256": entry.sha256,
                             "source_path": path,
                         }
-                        sections = _markdown_sections(text) if path.endswith(".md") else ()
+                        sections = (
+                            _markdown_sections(text)
+                            if len(value) <= REFERENCE_CONTENT_BYTE_LIMIT and path.endswith(".md")
+                            else ()
+                        )
+                        if len(value) > REFERENCE_CONTENT_BYTE_LIMIT or any(
+                            len(heading) > 200 or len(slug) > 200 for heading, slug, _ in sections
+                        ):
+                            for text_offset, excerpt in matching_text_excerpts(text, query, limit):
+                                add_match(
+                                    source=source,
+                                    path=f"{path}#text/{text_offset}",
+                                    kind="package_excerpt",
+                                    label=Path(path).stem.replace("-", " ").title(),
+                                    visibility=(
+                                        "gm_private_preparation"
+                                        if source == "campaign_setting"
+                                        else "campaign_reference"
+                                    ),
+                                    body=excerpt,
+                                    provenance={**package_provenance, "text_offset": text_offset},
+                                    identity=path,
+                                )
+                            continue
                         if not sections:
                             add_match(
                                 source=source,
@@ -5625,9 +5818,7 @@ class AuthorityOwner:
                                 provenance=package_provenance,
                             )
                             continue
-                        path_terms = set(
-                            knowledge_terms(Path(path).stem.replace("-", " "))
-                        )
+                        path_terms = set(knowledge_terms(Path(path).stem.replace("-", " ")))
                         slug_counts = Counter(slug for _, slug, _ in sections)
                         for heading, slug, content in sections:
                             if slug_counts[slug] != 1:
@@ -5656,19 +5847,24 @@ class AuthorityOwner:
                             )
 
             matches = rank_references(query, candidates)
-            selected = matches[:limit]
             return owned_payload(
-                {
-                    "query": query,
-                    "sources": list(requested_sources),
-                    "limit": limit,
-                    "matches": selected,
-                    "truncated": len(matches) > limit,
-                    "authority": (
-                        "Discovery returns references only. Read the selected exact reference; "
-                        "Campaign State remains current truth."
-                    ),
-                }
+                bounded_search_page(
+                    {
+                        "query": query,
+                        "sources": list(requested_sources),
+                        "campaign_revision": snapshot.revision,
+                        "unavailable_count": unavailable_count,
+                        "unavailable_references": unavailable_references,
+                        "authority": (
+                            "Discovery returns references only. Read the selected exact reference; "
+                            "Campaign State remains current truth."
+                        ),
+                    },
+                    matches,
+                    offset=offset,
+                    limit=limit,
+                    maximum_bytes=REFERENCE_REPLY_BYTE_LIMIT,
+                )
             )
 
     def read_campaign_reference(
@@ -5681,6 +5877,15 @@ class AuthorityOwner:
     ) -> SafePayload:
         """Read one bounded reference from the campaign's exact admitted authority."""
 
+        if (
+            not isinstance(maximum_bytes, int)
+            or isinstance(maximum_bytes, bool)
+            or not 1 <= maximum_bytes <= REFERENCE_REPLY_BYTE_LIMIT
+        ):
+            raise CommandRejected(
+                "Reference reply limit must be from 1 to 65536 bytes",
+                code="campaign_reference_limit_invalid",
+            )
         with self._operation():
             snapshot = self._store.snapshot(campaign_id)
             if source == "engine_format":
@@ -5712,7 +5917,9 @@ class AuthorityOwner:
                         "facts_and_entities": list(snapshot.continuity.facts),
                         "reveals": snapshot.continuity.reveals,
                         "plan_progress": list(snapshot.continuity.plan_progress),
-                        "ruleset_owned_values": snapshot.state,
+                        "ruleset_owned_values": self.desktop_snapshot(
+                            campaign_id, display_only=True,
+                        ).state,
                     }
                 elif path == "inventory":
                     inventory_tool = self._inventory_tool(campaign_id)
@@ -5897,6 +6104,28 @@ class AuthorityOwner:
             accepted = self._store.accepted_campaign_plan(campaign_id)
             if accepted is None:
                 raise CommandRejected("Campaign reference source requires an accepted plan")
+            if source == "campaign_plan" and path == "adventures":
+                adventures = self._store.campaign_adventures(campaign_id)
+                content = canonical_json_bytes([
+                    {"number": index + 1, "plan_id": item.plan_id,
+                     "content_sha256": item.content_sha256,
+                     "title": item.content["campaign_plan"]["title"],
+                     "source_id": item.content.get("sequel", {}).get("source_id"),
+                     "structure": item.content["campaign_plan"]["structure"]}
+                    for index, item in enumerate(adventures)
+                ]).decode("utf-8")
+                if len(content.encode("utf-8")) > maximum_bytes:
+                    raise CommandRejected("Adventure sequence exceeds the read bound")
+                return owned_payload({"source": source, "path": path, "content": content,
+                                      "campaign_id": campaign_id,
+                                      "visibility": "gm_private_preparation"})
+            if source == "campaign_plan" and path.startswith("adventures/"):
+                match = re.fullmatch(r"adventures/([1-9][0-9]*)/(structured(?:/.*)?|markdown)", path)
+                adventures = self._store.campaign_adventures(campaign_id)
+                if match is None or int(match[1]) > len(adventures):
+                    raise CommandRejected("Retained adventure reference is unavailable")
+                accepted = adventures[int(match[1]) - 1]
+                path = "readable" if match[2] == "markdown" else match[2]
             structured = accepted.content.get("campaign_plan")
             if source == "campaign_plan":
                 if path.startswith("structured") and not isinstance(structured, Mapping):
@@ -5997,7 +6226,7 @@ class AuthorityOwner:
                 selected_entry.version,
                 selected_entry.sha256,
                 portable_path,
-                maximum_bytes=maximum_bytes,
+                maximum_bytes=PACKAGE_MEMBER_BYTE_LIMIT,
             )
             if value is None and source == "ruleset":
                 reference_dependencies = tuple(
@@ -6027,7 +6256,7 @@ class AuthorityOwner:
                             selected_entry.version,
                             selected_entry.sha256,
                             portable_path,
-                            maximum_bytes=maximum_bytes,
+                            maximum_bytes=PACKAGE_MEMBER_BYTE_LIMIT,
                         )
             if value is None:
                 raise CommandRejected("Campaign package reference path is unavailable")
@@ -6046,7 +6275,25 @@ class AuthorityOwner:
             selection = None
             selected_heading: str | None = None
             available_sections: tuple[dict[str, str], ...] = ()
-            if separator:
+            available_section_count = 0
+            excerpt_metadata: dict[str, object] = {}
+            if separator and fragment.startswith("text/"):
+                if re.fullmatch(r"text/(0|[1-9][0-9]{0,9})", fragment) is None:
+                    raise CommandRejected(
+                        "Reference text offset is unavailable",
+                        code="campaign_reference_offset_invalid",
+                    )
+                excerpt = text_excerpt(content, int(fragment[5:]), maximum_bytes=maximum_bytes)
+                content = excerpt["content"]
+                following = excerpt["next_offset"]
+                excerpt_metadata = {
+                    "selection": excerpt["selection"],
+                    "truncated": excerpt["truncated"],
+                    "next_path": f"{portable_path}#text/{following}"
+                    if following is not None
+                    else None,
+                }
+            elif separator:
                 selected_heading, content = _select_markdown_section(content, fragment)
                 selection = {"kind": "markdown_section", "heading": selected_heading}
             elif source == "campaign_setting" and portable_path.startswith("locations/"):
@@ -6065,26 +6312,43 @@ class AuthorityOwner:
                         "heading": selected_heading,
                         "default": True,
                     }
-                    available_sections = _markdown_section_references(
+                    available_sections, available_section_count = _markdown_section_references(
                         value.decode("utf-8"),
                         path=portable_path,
                         document_private=portable_path in private_references,
                     )
+            content_budget = min(maximum_bytes, REFERENCE_CONTENT_BYTE_LIMIT)
+            if not excerpt_metadata and len(content.encode("utf-8")) > content_budget:
+                if selection is not None:
+                    raise CommandRejected(
+                        "Reference section exceeds the reply bound; "
+                        f"read {portable_path}#text/0 or search for a bounded excerpt",
+                        code="campaign_reference_too_large",
+                    )
+                excerpt = text_excerpt(content, maximum_bytes=content_budget)
+                content = excerpt["content"]
+                following = excerpt["next_offset"]
+                excerpt_metadata = {
+                    "selection": excerpt["selection"],
+                    "truncated": excerpt["truncated"],
+                    "next_path": f"{portable_path}#text/{following}"
+                    if following is not None
+                    else None,
+                }
             heading_key = (
-                selected_heading.casefold().rstrip("s")
-                if selected_heading is not None
-                else ""
+                selected_heading.casefold().rstrip("s") if selected_heading is not None else ""
             )
             visibility = (
                 "gm_private_preparation"
                 if source == "campaign_setting"
                 and (
                     portable_path in private_references
+                    or bool(excerpt_metadata)
                     or heading_key in {item.rstrip("s") for item in _PRIVATE_PREPARATION_HEADINGS}
                 )
                 else "campaign_reference"
             )
-            return owned_payload(
+            payload = owned_payload(
                 {
                     "source": source,
                     "path": path,
@@ -6095,10 +6359,16 @@ class AuthorityOwner:
                         "content_sha256": selected_entry.sha256,
                     },
                     "content": content,
+                    **excerpt_metadata,
                     **({"selection": selection} if selection is not None else {}),
                     **(
-                        {"available_sections": list(available_sections)}
-                        if available_sections
+                        {
+                            "available_sections": list(available_sections),
+                            "available_section_count": available_section_count,
+                            "available_sections_truncated": available_section_count
+                            > len(available_sections),
+                        }
+                        if available_section_count
                         else {}
                     ),
                     "visibility": visibility,
@@ -6120,6 +6390,13 @@ class AuthorityOwner:
                     ),
                 }
             )
+            if len(canonical_json_bytes(payload)) > REFERENCE_REPLY_BYTE_LIMIT:
+                raise CommandRejected(
+                    "Reference reply metadata exceeds its byte bound; "
+                    "use an exact bounded text excerpt",
+                    code="campaign_reference_too_large",
+                )
+            return payload
 
     def consume_package_blob(
         self, blob_sha256: str, consumer: Callable[[bytes], None]
@@ -6197,6 +6474,8 @@ class AuthorityOwner:
                 active_capabilities=active_capabilities,
             ).ui_surfaces
 
+            surfaces = player_ui_surfaces(surfaces, lock)
+
             def player_safe_source(source: object) -> bool:
                 """Keep legacy installed packages from projecting private Plan data to players."""
 
@@ -6222,6 +6501,26 @@ class AuthorityOwner:
                     state=snapshot.state,
                     participants=snapshot.participants,
                 )
+                if surface_spec.get("renderer") == "piece_table":
+                    viewer_ids = player_viewer_ids(
+                        snapshot, self._decision_scope_declaration(snapshot),
+                    )
+                    try:
+                        data = project_piece_table(
+                            data, viewer_ids=viewer_ids,
+                            action_ids=frozenset(action["id"] for action in surface_spec["actions"]),
+                        )
+                    except PieceTableError:
+                        projected_surfaces.append({
+                            **{key: thaw_json_value(value) for key, value in surface_spec.items()
+                               if key != "source"},
+                            "data": {"unavailable_reason": "The saved table cannot be displayed."},
+                            "actions": [],
+                        })
+                        continue
+                    surface_spec = owned_payload({
+                        key: value for key, value in surface_spec.items() if key != "source"
+                    })
                 if surface_spec.get("renderer") in {"tactical_grid", "coordinate_map"}:
                     if (surface_spec.get("renderer") == "coordinate_map" and isinstance(data, Mapping)
                             and "enabled" in data and data["enabled"] is not True):
@@ -6462,6 +6761,7 @@ class AuthorityOwner:
             ui_raw,
             active_capabilities=active_capabilities,
         ).ui_surfaces
+        surfaces = player_ui_surfaces(surfaces, lock)
         surface = next((item for item in surfaces if item.get("id") == surface_id), None)
         if surface is None:
             raise CommandRejected(
@@ -6502,6 +6802,21 @@ class AuthorityOwner:
         elif surface.get("renderer") == "inventory":
             source_data = resolve_surface_source(surface.get("source"), state=snapshot.state, participants=snapshot.participants)
             parameters = resolve_inventory_action_parameters(action, selection, source_data)
+        elif surface.get("renderer") == "piece_table":
+            source_data = resolve_surface_source(
+                surface.get("source"), state=snapshot.state, participants=snapshot.participants,
+            )
+            try:
+                table = project_piece_table(
+                    source_data,
+                    viewer_ids=player_viewer_ids(snapshot, self._decision_scope_declaration(snapshot)),
+                    action_ids=frozenset(item["id"] for item in surface["actions"]),
+                )
+                parameters = resolve_piece_action_parameters(action, selection, table)
+            except PieceTableError as error:
+                raise CommandRejected(
+                    "Panel action selection is invalid", code="panel_action_invalid",
+                ) from error
         elif surface.get("renderer") in {"party", "unit_list"}:
             source_data = resolve_surface_source(
                 surface.get("source"), state=snapshot.state, participants=snapshot.participants,
@@ -7095,6 +7410,151 @@ class AuthorityOwner:
     def snapshot(self, campaign_id: str) -> CampaignSnapshot:
         with self._operation():
             return self._store.snapshot(campaign_id)
+
+    def desktop_snapshot(
+        self, campaign_id: str, *, display_only: bool = False,
+    ) -> CampaignSnapshot | CampaignDisplaySnapshot:
+        """Keep package-declared engine state and its mutation history off the desktop wire."""
+        with self._operation():
+            snapshot = (self._store.display_snapshot(campaign_id) if display_only
+                        else self._store.snapshot(campaign_id))
+            snapshot = self._project_private_tool_inputs(snapshot)
+            private_keys = self._engine_private_keys(snapshot.package_lock)
+            safe_state = {
+                key: value for key, value in snapshot.state.items() if key not in private_keys
+            }
+            if isinstance(snapshot, CampaignSnapshot):
+                return replace(snapshot, state=safe_state, mutations=tuple(
+                    item for item in snapshot.mutations
+                    if f"{item.namespace}.{item.key}" not in private_keys
+                ))
+            return replace(snapshot, state=safe_state)
+
+    def _project_private_tool_inputs(
+        self, snapshot: _Snapshot,
+    ) -> _Snapshot:
+        """Keep canonical input bytes in storage and omit hidden-game arguments from readers."""
+        private_keys = self._engine_private_keys(snapshot.package_lock)
+        private_packages = {entry.package_id for entry in snapshot.package_lock.entries
+                            if any(key.startswith(entry.package_id + ".") for key in private_keys)}
+        actions = tuple(replace(action, parameters=owned_payload({}))
+                        if action.package_id in private_packages else action
+                        for action in snapshot.actions)
+        events = tuple(replace(event, safe_payload=owned_payload({
+                           **event.safe_payload, "parameters": {},
+                       }))
+                       if event.event_type is CanonicalEventType.TOOL_CALL
+                       and event.safe_payload.get("package_id") in private_packages else event
+                       for event in snapshot.events)
+        return replace(snapshot, actions=actions, events=events)
+
+    def _engine_private_keys(self, lock: PackageLock) -> frozenset[str]:
+        keys: set[str] = set()
+        for entry in lock.entries:
+            manifest = self._store.exact_package_manifest(
+                entry.package_id, entry.version, entry.sha256,
+            )
+            if manifest is not None:
+                keys.update(
+                    f"{entry.package_id}.{item.key}" for item in manifest.state_schemas
+                    if item.visibility == "engine"
+                )
+        return frozenset(keys)
+
+    def model_context_snapshot(
+        self, campaign_id: str,
+    ) -> tuple[CampaignDisplaySnapshot, ModelDecisionBoundary | None]:
+        """Project public state and a private game's permitted actor from one revision."""
+        with self._operation():
+            snapshot = self._store.display_snapshot(campaign_id)
+            private_keys = self._engine_private_keys(snapshot.package_lock)
+            visible = replace(snapshot, state={
+                key: value for key, value in snapshot.state.items() if key not in private_keys
+            })
+            boundary = None
+            if private_keys:
+                declared = self._decision_scope_declaration(snapshot)
+                if declared is not None:
+                    try:
+                        boundary = project_model_decision_scope(snapshot, declared)
+                        isolated = declared.get("isolated_participant")
+                        if (isinstance(isolated, Mapping) and boundary is not None
+                                and boundary.owner is ModelDecisionOwner.GM):
+                            boundary = replace(
+                                boundary,
+                                actor_state=public_actor_observation(snapshot, isolated),
+                                eligible_actors=(),
+                            )
+                    except DecisionScopeProjectionError as error:
+                        raise CommandRejected(str(error)) from error
+            return visible, boundary
+
+    def model_context_owner(self, campaign_id: str) -> SafePayload | None:
+        """Identify the GM's native history owner when a package opts into isolated participants."""
+        with self._operation():
+            snapshot = self._store.display_snapshot(campaign_id)
+            declared = self._decision_scope_declaration(snapshot)
+            if declared is None or "isolated_participant" not in declared:
+                return None
+            primary = next(entry for entry in snapshot.package_lock.entries
+                           if entry.role is PackageRole.PRIMARY)
+            return owned_payload({"kind": "gm", "campaign_id": campaign_id,
+                                  "package_id": primary.package_id,
+                                  "package_version": primary.version,
+                                  "package_sha256": primary.sha256})
+
+    def actor_decision_request(
+        self, campaign_id: str, *, turn_id: str,
+    ) -> ActorDecisionRequest | None:
+        """Read one opted-in actor's observation and legal offers from an authority revision."""
+        with self._operation():
+            snapshot = self._store.display_snapshot(campaign_id)
+            declared = self._decision_scope_declaration(snapshot)
+            if declared is None or "isolated_participant" not in declared:
+                return None
+            if (snapshot.lifecycle is not LifecycleState.ACTIVE
+                    or snapshot.writer is not WriterRole.DM
+                    or snapshot.turns.get(turn_id) is not TurnStatus.OPEN):
+                raise CommandRejected("Isolated participant turn is unavailable")
+            boundary = project_model_decision_scope(snapshot, declared)
+            primary = next(entry for entry in snapshot.package_lock.entries
+                           if entry.role is PackageRole.PRIMARY)
+            schemas = {tool.name: tool.input_schema for tool in self._catalog(campaign_id)
+                       if tool.package_id == primary.package_id
+                       and tool.package_sha256 == primary.sha256}
+            return project_actor_decision(
+                snapshot, boundary, declared["isolated_participant"], turn_id=turn_id,
+                tool_schemas=schemas,
+            )
+
+    def actor_decision_command(
+        self, request: ActorDecisionRequest, *, choice_id: str, session_id: str, owner_id: str,
+        provider_id: str | None = None, model_id: str | None = None,
+    ) -> ActionCommand:
+        """Bind an offered identity to the current actor; never accept model-supplied arguments."""
+        with self._operation():
+            current = self.actor_decision_request(request.campaign_id, turn_id=request.turn_id)
+            if current is None or current != request:
+                raise StaleRevision("Isolated participant decision is stale")
+            session = self._store.session_activity_basis(session_id).session
+            if (session.campaign_id != request.campaign_id or session.role is not WriterRole.DM
+                    or session.status.value != "active"
+                    or (provider_id is not None and session.provider_id != provider_id)
+                    or (model_id is not None and session.model_id != model_id)):
+                raise CommandRejected("Isolated participant session changed")
+            choice = next(
+                (action for action in request.actions if action.identity == choice_id), None,
+            )
+            if choice is None:
+                raise CommandRejected("Isolated participant choice is not offered")
+            identity = "actor-action-" + request.decision_id
+            return ActionCommand(
+                campaign_id=request.campaign_id, action_id=identity, idempotency_key=identity,
+                turn_id=request.turn_id, owner_id=owner_id, writer=WriterRole.DM,
+                expected_revision=request.revision, package_id=request.package_id,
+                tool_name=choice.operation, parameters=choice.arguments,
+                initiating_session_id=session_id,
+            )
 
     def campaign_index(self) -> tuple[CampaignIndexEntry, ...]:
         """Project the coherent store index through the normal owner lifecycle."""
@@ -7962,6 +8422,7 @@ class AuthorityOwner:
         if acknowledged_sequence < 0:
             raise ValueError("Acknowledged canonical sequence cannot be negative")
         snapshot = self._store.snapshot(campaign_id)
+        snapshot = self._project_private_tool_inputs(snapshot)
         high_water = snapshot.events[-1].sequence if snapshot.events else 0
         return CanonicalReplay(
             canonical=tuple(
@@ -8086,6 +8547,7 @@ class AuthorityOwner:
     def _project_player_snapshot(
         self, snapshot: CampaignSnapshot | CampaignDisplaySnapshot,
     ) -> tuple[PlayerProjection, ...]:
+        snapshot = self._project_private_tool_inputs(snapshot)
         campaign_id = snapshot.campaign_id
         with self._work_condition:
             controls_idle = not self._campaign_work_counts.get(campaign_id, 0)

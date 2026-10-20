@@ -88,7 +88,7 @@ function harness(playerControl, surface = partySurface()) {
     refreshSelectedCampaign = async () => {};
     renderRulesetPanels = async () => {};
   ` + source.slice(insertion);
-  source = ['panel-workspace.js', 'shot-playback.js', 'panel-host.js'].map((name) =>
+  source = ['panel-workspace.js', 'shot-playback.js', 'panel-host.js', 'piece-table.js'].map((name) =>
     fs.readFileSync(path.join(__dirname, '../src-tauri/frontend', name), 'utf8')).join('\n') + '\n' + source;
   context.setTimeout ||= setTimeout;
   context.clearTimeout ||= clearTimeout;
@@ -155,12 +155,13 @@ test('squad scope renders controls for two controlled members and disables the n
   ] });
   const markup = h.markup();
   assert.match(markup, /Asha[\s\S]*Player controlled/);
-  assert.match(markup, /Bram[\s\S]*Player controlled · Focused character/);
+  assert.match(markup, /data-party-select-actor="bravo" aria-pressed="true"/);
   assert.equal((markup.match(/data-panel-actor-id="alpha"/g) || []).length, 1);
   assert.equal((markup.match(/data-panel-actor-id="bravo"/g) || []).length, 1);
   assert.match(markup, /data-panel-actor-id="npc" disabled>Act<\/button>/);
   assert.equal((markup.match(/>Rest<\/button>/g) || []).length, 1);
-  assert.doesNotMatch(markup, /data-party-select-actor/);
+  assert.equal((markup.match(/data-party-select-actor=/g) || []).length, 3);
+  assert.match(markup, /data-party-select-actor="npc" aria-pressed="false"/);
 });
 
 test('party posture comes from the public map projection and is escaped', () => {
@@ -191,7 +192,7 @@ test('Party puts the canonical Player Character first without mutating roster or
   assert(html.indexOf('>Asha</strong>') < html.indexOf('>Bram</strong>'));
   assert(html.indexOf('>Bram</strong>') < html.indexOf('>Nell</strong>'));
   assert.equal(JSON.stringify(surface.data.participants), roster);
-  assert.match(html, /Bram[\s\S]*Focused character/);
+  assert.match(html, /data-party-select-actor="bravo" aria-pressed="true"/);
   delete surface.data.participants[1].data.party_role;
   assert(h.markup().indexOf('>Bram</strong>') < h.markup().indexOf('>Asha</strong>'));
   assert.equal(h.executions.length, 0);
@@ -266,7 +267,7 @@ test('status panels name missing values without exposing null or raw identifiers
   assert.match(h.markup(), /No current status yet/);
 });
 
-test('Character selection shares one actor with Map and Loadout without a command', () => {
+test('Character inspection shares Loadout while Map retains its acting character without a command', () => {
   const character = { ...partySurface(), id: 'character', renderer: 'unit_list' };
   character.data.entities.alpha = { hp: 9, res: 4, ap: 2, max_ap: 6, skills: { local_hacking: 2 } };
   character.data.entities.bravo = { hp: 7, res: 3, ap: 1, weapon: {
@@ -277,7 +278,7 @@ test('Character selection shares one actor with Map and Loadout without a comman
   h.projection.surfaces.push(map, { id: 'loadout', renderer: 'inventory', data: character.data });
   h.api.renderRulesetPanelProjection(h.projection);
   h.api.applyPanelSelection('character', { actor: 'bravo' });
-  assert.equal(h.api.state.tacticalSelections.map.actor, 'bravo');
+  assert.equal(h.api.tacticalSelection(map).actor, 'alpha');
   assert.match(h.markup(), /HP 7/);
   assert.match(h.markup(), /RES 3 · AP 1/);
   assert.doesNotMatch(h.markup(), /HP 9/);
@@ -290,7 +291,8 @@ test('Character selection shares one actor with Map and Loadout without a comman
   assert.match(h.markup(), /Local Hacking/);
   assert.match(h.markup(), /HP 9/);
   h.api.applyPanelSelection('character', { actor: 'npc' });
-  assert.equal(h.api.state.tacticalSelections.character.actor, 'alpha');
+  assert.equal(h.api.state.characterInspection.id, 'npc');
+  assert.equal(h.api.tacticalSelection(map).actor, 'alpha');
 });
 
 test('generic inventory selects committed character holdings and escapes all labels', () => {
@@ -340,8 +342,8 @@ test('map actor selection offers controlled members, while targets include the w
     { id: 'alpha', name: 'Asha' }, { id: 'bravo', name: 'Bram' },
   ] }, mapSurface());
   const markup = h.markup();
-  const actorOptions = markup.split('aria-label="Choose your character"')[1].split('</select>')[0];
-  assert.match(actorOptions, />Asha \(current\)<\/option>/);
+  const actorOptions = markup.split('aria-label="Choose acting character"')[1].split('</select>')[0];
+  assert.match(actorOptions, />Asha<\/option>/);
   assert.match(actorOptions, />Bram<\/option>/);
   assert.doesNotMatch(actorOptions, /Nell/);
   assert.match(markup.split('aria-label="Choose target"')[1], />Nell<\/option>/);
@@ -515,7 +517,7 @@ test('control changes clear an obsolete map actor even when the map revision has
   h.api.state.panelProjection.player_control = { available: false, focused_actor_id: null, actors: [] };
   const markup = h.markup();
   assert.equal(h.api.tacticalSelection(h.surface).actor, null);
-  assert.match(markup, /aria-label="Choose your character" disabled/);
+  assert.match(markup, /aria-label="Choose acting character" disabled/);
   assert.match(markup, /data-panel-action-id="act" disabled/);
 });
 
@@ -523,7 +525,7 @@ test('single-character scope enables only its named actor and busy state disable
   const h = harness({ available: true, focused_actor_id: 'alpha', actors: [
     { id: 'alpha', name: 'Asha' },
   ] });
-  assert.match(h.markup(), /Asha[\s\S]*Player controlled · Focused character/);
+  assert.match(h.markup(), /data-party-select-actor="alpha" aria-pressed="true"/);
   assert.match(h.markup(), /data-panel-actor-id="bravo" disabled>Act<\/button>/);
   h.activity.phase = 'working';
   const busy = h.markup();
@@ -675,13 +677,16 @@ test('the actual Party action listener queues by default and still rejects an un
   await h.click();assert.equal(composed.length,1,'Displayed actors do not grant control in default queue mode');
 });
 
-test('Party selection updates the map actor without changing its camera or executing an action', () => {
+test('Party inspection preserves the acting character, target, aim and camera without an action', () => {
   const h = harness({ available: true, actors: [{ id: 'alpha' }, { id: 'bravo' }] });
   h.projection.surfaces.push(mapSurface());
   h.api.renderRulesetPanelProjection(h.projection);
   h.api.state.tacticalViews.map = { zoom: 1.5, scrollLeft: 72, scrollTop: 32 };
-  h.api.applyPanelSelection('party', { actor: 'bravo', target: null });
-  assert.equal(h.api.tacticalSelection(h.projection.surfaces[1]).actor, 'bravo');
+  const selection = h.api.tacticalSelection(h.projection.surfaces[1]);
+  selection.target = 'npc'; selection.aim_point = [2.5, .5, 1];
+  const before = JSON.stringify(selection);
+  h.api.applyPanelSelection('party', { character: 'bravo' });
+  assert.equal(JSON.stringify(h.api.tacticalSelection(h.projection.surfaces[1])), before);
   assert.equal(h.api.state.tacticalViews.map.scrollLeft, 72);
   assert.equal(h.api.state.tacticalViews.map.zoom, 1.5);
   assert.match(h.markup(), /data-party-select-actor="bravo" aria-pressed="true"/);
@@ -730,8 +735,285 @@ for (const actor of ['vesper', 'autodrone_alpha']) test(`Delivered Map selection
   h.api.renderRulesetPanelProjection(h.projection);
   h.api.applyPanelSelection(fixture.character.id, { actor: 'hex' });
   h.api.applyPanelSelection(fixture.map.id, { actor });
-  assert.equal(h.api.state.tacticalSelections[fixture.character.id].actor, actor);
+  assert.equal(h.api.state.characterInspection.id, actor);
   assert.match(h.markup(), new RegExp('data-character-entity="' + actor + '"'));
   assert.doesNotMatch(h.markup(), /<strong>Hex<\/strong>|value="hex" selected/);
   assert.deepEqual(h.executions, []);
+});
+
+test('one inspected noncontrolled member reaches Character and Inventory without granting control', () => {
+  const h = harness({ available:true, focused_actor_id:'alpha', actors:[{id:'alpha'}] });
+  const character = {...partySurface(), id:'character', renderer:'unit_list'};
+  character.data.entities.npc = {hp:17, inventory:['silver_charm'], skills:{lore:4}};
+  h.projection.surfaces.push(character, {...character,id:'inventory',renderer:'inventory'},mapSurface());
+  h.api.renderRulesetPanelProjection(h.projection);
+  const map = h.api.tacticalSelection(h.projection.surfaces.at(-1));
+  map.target='bravo'; const before=JSON.stringify(map);
+  h.api.applyPanelSelection('party',{character:'npc'});
+  const details=h.api.panelMarkup(character),inventory=h.api.panelMarkup(h.projection.surfaces[2]);
+  assert.match(details,/Nell/);assert.match(details,/HP 17/);assert.match(details,/lore <b>4/);
+  assert.doesNotMatch(details,/data-character-actor/);
+  assert.doesNotMatch(details,/Choose in Party|data-inspect-party/);
+  assert.doesNotMatch(inventory,/Choose in Party|data-inspect-party/);
+  assert.match(inventory,/Silver Charm/);
+  assert.match(details,/data-panel-actor-id="npc" disabled/);
+  assert.equal(JSON.stringify(map),before);assert.equal(h.executions.length,0);
+});
+
+test('Party details include Character-only class, loadout, resources and every declared stat group', () => {
+  const h=harness({available:true,actors:[{id:'alpha'}]});
+  const character={...partySurface(),id:'character',renderer:'unit_list'};
+  character.data.participants[0].data={name:'Asha',class_id:'ranger',level:6};
+  character.data.entities.alpha={hp:19,max_hp:23,ap:4,conditions:['Poisoned'],
+    weapon_sets:{active_set:'ranged',ranged:{main_hand:'long_bow',off_hand:'silver_dagger'}},
+    resources:{focus:7},aptitudes:{resolve:3},skills:{tracking:5}};
+  h.projection.surfaces.push(character);h.api.renderRulesetPanelProjection(h.projection);
+  // Party's compact values remain its own projection; detail groups use the Character owner.
+  const party=h.markup(),single=h.api.panelMarkup(character);
+  for(const expected of [/ranger · Level 6/,/Long Bow \/ Silver Dagger/,/focus/i,/resolve <b>3/,/tracking <b>5/]){
+    assert.match(party,expected);assert.match(single,expected);
+  }
+  assert.equal((party.match(/data-panel-action-id="act" data-panel-actor-id="alpha"/g)||[]).length,1);
+  assert.equal(h.executions.length,0);
+});
+
+test('Character-only actions remain on their owning panel instead of creating a cross-window dispatcher',()=>{
+  const h=harness({available:true,actors:[{id:'alpha'}]});
+  const character={...partySurface(),id:'character',title:'Character',renderer:'unit_list',
+    actions:[{id:'crouch',label:'Crouch',available:true,bindings:{actor:'actor'}}]};
+  h.projection.surfaces.push(character);h.api.renderRulesetPanelProjection(h.projection);
+  assert.match(h.markup(),/Crouch/);
+  assert.match(h.markup(),/data-character-action-panel="character"/);
+  assert.doesNotMatch(h.markup(),/data-panel-action-id="crouch"/);
+  assert.match(h.api.panelMarkup(character),/data-panel-action-id="crouch"/);
+  assert.equal(h.executions.length,0);
+});
+
+test('removed inspection clears across views and does not return when the same id reappears', () => {
+  const h=harness({available:true,actors:[{id:'alpha'},{id:'bravo'}]});
+  const character={...partySurface(),id:'character',renderer:'unit_list'};
+  h.projection.surfaces.push(character);h.api.renderRulesetPanelProjection(h.projection);
+  h.api.applyPanelSelection('party',{character:'bravo'});
+  h.api.applyPanelSelection('party',{expansion:{id:'bravo',open:true}});
+  for(const surface of h.projection.surfaces)surface.data.participants=surface.data.participants.filter(p=>p.id!=='bravo');
+  h.projection.player_control.actors=[{id:'alpha'}];h.api.renderRulesetPanelProjection(h.projection);
+  assert.equal(h.api.state.characterInspection.id,null);
+  assert.deepEqual(Array.from(h.api.state.characterInspection.expanded),[]);
+  assert.match(h.api.panelMarkup(character),/previously inspected character is unavailable/);
+  for(const surface of h.projection.surfaces)surface.data.participants.push({id:'bravo',data:{name:'New Bram'}});
+  h.api.renderRulesetPanelProjection(h.projection);
+  assert.equal(h.api.state.characterInspection.id,null);
+  assert.doesNotMatch(h.api.panelMarkup(character),/New Bram/);
+  h.api.applyPanelSelection('party',{character:'alpha'});
+  assert.match(h.api.panelMarkup(character),/Asha/);
+});
+
+test('Ruleset replacement chooses current permitted focus rather than an old per-panel selection', () => {
+  const h=harness({available:true,focused_actor_id:'alpha',actors:[{id:'alpha'},{id:'bravo'}]});
+  h.api.applyPanelSelection('party',{character:'bravo'});
+  h.projection.ruleset_id='replacement';h.api.renderRulesetPanelProjection(h.projection);
+  assert.equal(h.api.state.characterInspection.id,'alpha');
+  assert.equal(h.api.state.characterInspection.rulesetId,'replacement');
+  assert.deepEqual(Array.from(h.api.state.characterInspection.expanded),[]);
+});
+
+test('delayed preview retains its captured character while inspection changes, with no duplicate send', async () => {
+  const h=harness({available:true,actors:[{id:'alpha'},{id:'bravo'}]});
+  let finish;h.api.state.bridge.preview_panel_action=command=>{
+    h.previews.push(command);return new Promise(resolve=>finish=resolve);
+  };
+  const pending=h.click();await new Promise(setImmediate);
+  h.api.applyPanelSelection('party',{character:'alpha'});
+  h.api.renderRulesetPanelProjection(h.projection);h.button.disabled=false;
+  await h.click();assert.equal(h.previews.length,1);
+  finish({confirmation_required:true,confirmation:'bound-bravo',actor:{name:'Bram'},label:'Act'});
+  await new Promise(setImmediate);assert.match(h.body.children[0].innerHTML,/Bram/);
+  h.body.children[0].close('confirm');await pending;
+  assert.equal(h.executions.length,1);assert.equal(h.executions[0].selection.actor,'bravo');
+  assert.equal(h.api.state.characterInspection.id,'alpha');
+});
+
+for(const obsolete of ['removed','revision','navigation'])test(`obsolete ${obsolete} preview cannot reach confirmation or execution`,async()=>{
+  const h=harness({available:true,actors:[{id:'bravo'}]});let finish;
+  h.api.state.bridge.preview_panel_action=()=>new Promise(resolve=>finish=resolve);
+  const pending=h.click();await new Promise(setImmediate);
+  if(obsolete==='removed')h.projection.player_control.actors=[];
+  if(obsolete==='revision'){h.projection.revision=9;h.api.renderRulesetPanelProjection(h.projection);}
+  if(obsolete==='navigation')h.api.state.activeCampaignId='other';
+  finish({confirmation_required:true,confirmation:'obsolete',label:'Act'});await pending;
+  assert.equal(h.body.children.length,0);assert.equal(h.executions.length,0);
+});
+
+test('revision change during confirmation cancels the original command',async()=>{
+  const h=harness({available:true,actors:[{id:'bravo'}]});
+  const pending=h.click();await new Promise(setImmediate);
+  h.projection.revision=9;h.api.renderRulesetPanelProjection(h.projection);h.body.children[0].close('confirm');await pending;
+  assert.equal(h.executions.length,0);
+});
+
+test('a delayed queued action keeps its member after another character is inspected',async()=>{
+  const h=harness({available:true,actors:[{id:'alpha'},{id:'bravo'}]});let finish;const composed=[];
+  Object.assign(h.api.state.bridge,{action_sequence:async()=>null,
+    snapshot:()=>new Promise(resolve=>finish=resolve),
+    compose_action_sequence:async command=>{composed.push(command);return {...command,version:1,status:'ready',steps:command.steps};}});
+  const pending=h.click();await new Promise(setImmediate);
+  h.api.applyPanelSelection('party',{character:'alpha'});h.api.renderRulesetPanelProjection(h.projection);
+  h.button.disabled=false;await h.click();finish({revision:8});await pending;
+  assert.equal(composed.length,1);assert.equal(composed[0].steps.length,1);
+  assert.equal(composed[0].steps[0].selection.actor,'bravo');assert.equal(h.executions.length,0);
+});
+
+test('a panel moved into a child cannot duplicate its pending main-window intention',async()=>{
+  const h=harness({available:true,actors:[{id:'bravo'}]});
+  h.api.state.panelIntentPending={campaignId:'campaign',sessionId:'gm'};
+  const scope={campaign_id:'campaign',session_id:'gm',current:()=>true,owns:()=>true};
+  const command={campaign_id:'campaign',session_id:'gm',surface_id:'party',panel_action_id:'act',selection:{actor:'bravo'}};
+  await assert.rejects(h.api.dispatchPanelWindowRequest('queue_panel_action',command,scope),/pending panel action/);
+  await assert.rejects(h.api.dispatchPanelWindowRequest('preview_panel_action',command,scope),/pending panel action/);
+  assert.equal(h.previews.length,0);assert.equal(h.executions.length,0);
+});
+
+test('a delayed map confirmation retains both captured actor and target while inspection changes',async()=>{
+  const surface=mapSurface();surface.actions[0].bindings={attacker:'actor',target:'target'};
+  const h=harness({available:true,actors:[{id:'alpha'},{id:'bravo'}]},surface);
+  const party=partySurface();h.projection.surfaces.push(party);h.api.renderRulesetPanelProjection(h.projection);
+  h.api.tacticalSelection(surface).target='npc';let finish;
+  h.api.state.bridge.preview_panel_action=command=>{h.previews.push(command);return new Promise(resolve=>finish=resolve);};
+  const pending=h.click();await new Promise(setImmediate);
+  h.api.applyPanelSelection('party',{character:'bravo'});
+  h.api.applyPanelSelection('map',{target:'bravo'});
+  finish({confirmation_required:true,confirmation:'alpha-npc',actor:{name:'Asha'},selection:{target:'npc'},label:'Act'});
+  await new Promise(setImmediate);assert.match(h.body.children[0].innerHTML,/npc/);
+  h.body.children[0].close('confirm');await pending;
+  assert.equal(h.executions.length,1);assert.equal(h.executions[0].selection.actor,'alpha');
+  assert.equal(h.executions[0].selection.target,'npc');assert.equal(h.api.tacticalSelection(surface).target,'bravo');
+});
+
+// A declared, ruleset-neutral table exercises the integration without adding
+// Character/Party surfaces to the delivered Riichi ruleset.
+function pieceSurface() {
+  return { id: 'relay', title: 'Relay', renderer: 'piece_table', minimum_size: 96, default_size: 180,
+    actions: [{ id: 'act', label: 'Run program', available: true, bindings: { selected: 'piece' } }],
+    data: { format: 1, areas: [{ position: 'bottom', groups: [{ label: 'Programs', pieces: [
+      { id: 'ghost', label: 'Ghost route', action_id: 'act' },
+      { id: 'beacon', label: 'Beacon route', action_id: 'act' },
+    ] }] }] } };
+}
+
+function pieceHarness() {
+  const h = harness({ available: true, actors: [{ id: 'alpha' }, { id: 'bravo' }] }, pieceSurface());
+  delete h.button.dataset.panelActorId;
+  h.button.dataset.panelPieceId = 'ghost';
+  h.projection.surfaces.push(partySurface());
+  h.api.renderRulesetPanelProjection(h.projection);
+  return h;
+}
+
+test('late availability for one piece cannot enable a different piece using the same action', async () => {
+  const h = pieceHarness(), checks = [];
+  h.surface.actions[0].checks_required = true;
+  h.projection.revision = 4;
+  h.api.state.bridge.player_action_availability = command => new Promise(resolve => {
+    checks.push({ command, resolve });
+  });
+  h.api.renderRulesetPanelProjection(h.projection);
+  assert.equal(h.button.disabled, true);
+  h.button.dataset.panelPieceId = 'beacon';
+  h.api.renderRulesetPanelProjection(h.projection);
+  assert.equal(checks.length, 2);
+  assert.equal(checks[0].command.requests[0].selection.piece, 'ghost');
+  assert.equal(checks[1].command.requests[0].selection.piece, 'beacon');
+  checks[0].resolve({ campaign_id: 'campaign', revision: 4, results: [{ available: true }] });
+  await new Promise(setImmediate);
+  assert.equal(h.button.disabled, true);
+  checks[1].resolve({ campaign_id: 'campaign', revision: 4,
+    results: [{ available: false, reason: 'Program has no charges' }] });
+  await new Promise(setImmediate);
+  assert.equal(h.button.disabled, true);
+  await h.click();
+  assert.equal(h.previews.length, 0);
+  assert.equal(h.executions.length, 0);
+});
+
+test('queued piece retains its identity while another character is inspected', async () => {
+  const h = pieceHarness(), composed = []; let finish;
+  Object.assign(h.api.state.bridge, { action_sequence: async () => null,
+    snapshot: () => new Promise(resolve => { finish = resolve; }),
+    compose_action_sequence: async command => {
+      composed.push(command); return { ...command, version: 1, status: 'ready', steps: command.steps };
+    } });
+  const pending = h.click(); await new Promise(setImmediate);
+  h.button.dataset.panelPieceId = 'beacon';
+  h.api.applyPanelSelection('party', { character: 'bravo' });
+  h.api.renderRulesetPanelProjection(h.projection);
+  h.button.disabled = false; await h.click();
+  finish({ revision: 4 }); await pending;
+  assert.equal(composed.length, 1);
+  assert.equal(composed[0].steps.length, 1);
+  assert.equal(composed[0].steps[0].selection.piece, 'ghost');
+  assert.equal(h.api.state.characterInspection.id, 'bravo');
+  assert.equal(h.previews.length, 0);
+  assert.equal(h.executions.length, 0);
+});
+
+test('delayed piece preview keeps its captured piece across inspection and blocks a second intention', async () => {
+  const h = pieceHarness();
+  let finish;
+  h.api.state.bridge.preview_panel_action = command => {
+    h.previews.push(command); return new Promise(resolve => { finish = resolve; });
+  };
+  const pending = h.click(); await new Promise(setImmediate);
+  h.api.applyPanelSelection('party', { character: 'bravo' });
+  h.button.dataset.panelPieceId = 'beacon';
+  h.api.renderRulesetPanelProjection(h.projection);
+  h.button.disabled = false;
+  await h.click();
+  assert.equal(h.previews.length, 1);
+  const scope = { campaign_id: 'campaign', session_id: 'gm', current: () => true, owns: () => true };
+  await assert.rejects(h.api.dispatchPanelWindowRequest('preview_panel_action', {
+    campaign_id: 'campaign', session_id: 'gm', surface_id: 'relay', panel_action_id: 'act',
+    selection: { piece: 'beacon' },
+  }, scope), /pending panel action/);
+  finish({ confirmation_required: true, confirmation: 'ghost-only', label: 'Run program' });
+  await new Promise(setImmediate);
+  h.body.children[0].close('confirm'); await pending;
+  assert.equal(h.executions.length, 1);
+  assert.equal(JSON.stringify(h.executions[0].selection), '{"piece":"ghost"}');
+  assert.equal(h.api.state.characterInspection.id, 'bravo');
+});
+
+for (const change of ['removed', 'concealed', 'rebound', 'revision', 'campaign']) {
+  test(`delayed piece preview rejects a ${change} binding without execution`, async () => {
+    const h = pieceHarness(); let finish;
+    h.api.state.bridge.preview_panel_action = () => new Promise(resolve => { finish = resolve; });
+    const pending = h.click(); await new Promise(setImmediate);
+    const group = h.surface.data.areas[0].groups[0];
+    if (change === 'removed') group.pieces.shift();
+    if (change === 'concealed') group.concealed = true;
+    if (change === 'rebound') group.pieces[0].action_id = 'different';
+    if (change === 'revision') h.projection.revision = 9;
+    if (change === 'campaign') h.api.state.activeCampaignId = 'other';
+    if (change !== 'campaign') h.api.renderRulesetPanelProjection(h.projection);
+    const before = JSON.stringify(h.projection);
+    finish({ confirmation_required: true, confirmation: 'obsolete', label: 'Run program' });
+    await pending;
+    assert.equal(h.body.children.length, 0);
+    assert.equal(h.executions.length, 0);
+    assert.equal(JSON.stringify(h.projection), before);
+  });
+}
+
+test('owner work beginning during piece confirmation prevents commit and inspection remains display-only', async () => {
+  const h = pieceHarness();
+  const pending = h.click(); await new Promise(setImmediate);
+  h.activity.phase = 'working'; h.activity.attemptId = 'isolated-owner-decision';
+  const before = JSON.stringify(h.projection);
+  h.api.applyPanelSelection('party', { character: 'bravo' });
+  h.api.renderRulesetPanelProjection(h.projection);
+  h.body.children[0].close('confirm'); await pending;
+  assert.equal(h.api.state.characterInspection.id, 'bravo');
+  assert.equal(h.activity.attemptId, 'isolated-owner-decision');
+  assert.equal(h.activity.phase, 'working');
+  assert.equal(h.executions.length, 0);
+  assert.equal(JSON.stringify(h.projection), before);
 });

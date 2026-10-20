@@ -201,6 +201,7 @@ RUNTIME_PROCEDURAL_DEFINITION = {
     "required_descriptor_fields": ["format", "state_namespace"],
     "parameter_types": [
         "array",
+        "object",
         "boolean",
         "entity_id",
         "entity_id_list",

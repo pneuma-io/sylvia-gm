@@ -79,3 +79,12 @@ def bind_queue_response_controls(runtime, record):
     assert controls["response"] in {"on_request", "automatic"}
     controls["response"] = "automatic"
     record["version"] = "0.3.5"
+
+
+def bind_gm_encounter_boundary(runtime, record):
+    """Keep ending an encounter with the GM while preserving its existing engine operation."""
+    assert "end_combat_encounter" in runtime["tools"]
+    for surface in record["ui_surfaces"]:
+        surface["actions"] = [action for action in surface["actions"]
+                              if action["intent"] != "end_combat_encounter"]
+    record["version"] = "0.3.15"

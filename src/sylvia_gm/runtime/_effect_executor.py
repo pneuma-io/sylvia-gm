@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import contextlib
 import re
+import secrets
 from collections.abc import Callable, Mapping, Sequence
 from copy import deepcopy
 from typing import Any
@@ -55,6 +56,36 @@ from sylvia_gm.runtime._types import ExecutionContext, RuntimeChoiceOption, Runt
 
 # Callback type: (tool_name, params, context) -> ToolResult
 NestedToolExecutor = Callable[[str, dict[str, Any], ExecutionContext], Any]
+
+
+def _handle_publish(body: Any, effect: dict[str, Any], ctx: ExecutionContext,
+                    tool_executor: NestedToolExecutor | None) -> None:
+    """Select the sole public result fields while retaining private calculation context."""
+    if (
+        not isinstance(body, dict) or set(body) != {"fields"}
+        or not isinstance(body["fields"], dict)
+    ):
+        raise EffectExecutionError("publish", "Published fields must be an object")
+    if len(body["fields"]) > 32:
+        raise EffectExecutionError("publish", "Too many published fields")
+    ctx.extras["published_result"] = _resolve_value(body["fields"], ctx)
+
+
+def _handle_shuffle(body: Any, effect: dict[str, Any], ctx: ExecutionContext,
+                    tool_executor: NestedToolExecutor | None) -> None:
+    """Sample an unguessable permutation and retain its committed order as ordinary state."""
+    from sylvia_gm.runtime._collections import collection
+
+    if not isinstance(body, dict) or set(body) != {"collection"}:
+        raise EffectExecutionError("shuffle", "A collection is required")
+    destination = effect.get("store_as")
+    if not isinstance(destination, str) or re.fullmatch(r"_[A-Za-z0-9_]+", destination) is None:
+        raise EffectExecutionError("shuffle", "A context destination is required")
+    values = deepcopy(collection(_resolve_value(body["collection"], ctx)))
+    secrets.SystemRandom().shuffle(values)
+    ctx.vars[destination] = values
+    if ctx.budget is not None:
+        ctx.budget.private_random_sampled = True
 
 
 def execute_effects(
@@ -330,6 +361,11 @@ def _handle_request_choice(
     tool_executor: NestedToolExecutor | None,
 ) -> None:
     """Suspend one deterministic mechanic until the trusted owner selects an option."""
+
+    if ctx.budget is not None and ctx.budget.private_random_sampled:
+        raise EffectExecutionError(
+            "request_choice", "Commit a hidden shuffle before requesting a later choice",
+        )
 
     if not isinstance(body, dict):
         raise EffectExecutionError("request_choice", "request body must be an object")
@@ -2207,6 +2243,8 @@ _EFFECT_HANDLERS: dict[
     str,
     Callable[[Any, dict[str, Any], ExecutionContext, NestedToolExecutor | None], None],
 ] = {
+    "publish": _handle_publish,
+    "shuffle": _handle_shuffle,
     "dice": _handle_dice,
     "set": _handle_set,
     "set_participant": _handle_set_participant,
@@ -2261,6 +2299,8 @@ _EFFECT_HANDLERS: dict[
 # contract.
 _NEUTRAL_EFFECT_KEYS: frozenset[str] = frozenset(
     {
+        "publish",
+        "shuffle",
         "dice",
         "set",
         "set_participant",

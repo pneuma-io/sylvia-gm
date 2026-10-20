@@ -19,10 +19,15 @@ PARAM_TYPES = [
     "number",
     "boolean",
     "array",
+    "object",
     "enum",
     "entity_id_list",
 ]
 EFFECT_FIELDS = [
+    "call", "params", "export_context", "trigger", "context",
+    "require", "create_entity", "set_participant",
+    "publish",
+    "shuffle",
     "condition",
     "on_true",
     "on_false",
@@ -94,6 +99,7 @@ RULESET_SOURCE_SCHEMA: dict[str, Any] = {
         "operating_guide",
     ],
     "properties": {
+        "model_decision_boundary": {"type": "object", "additionalProperties": True},
         "format": {"type": "integer", "const": 1},
         "id": {"$ref": "#/$defs/nonempty"},
         "version": {"$ref": "#/$defs/nonempty"},
@@ -138,6 +144,7 @@ RULESET_SOURCE_SCHEMA: dict[str, Any] = {
             "additionalProperties": False,
             "required": ["parameters", "pre_conditions", "effects", "narrative"],
             "properties": {
+                "metadata": {"type": "object", "additionalProperties": True},
                 "parameters": tokenized(
                     {"type": "array", "items": tokenized({"$ref": "#/$defs/parameter"})}
                 ),

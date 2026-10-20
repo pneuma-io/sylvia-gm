@@ -16,6 +16,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from sylvia_gm.runtime._collections import FUNCTIONS as COLLECTION_FUNCTIONS
 from sylvia_gm.runtime._exceptions import ExpressionError, FieldNotFoundError
 from sylvia_gm.runtime._expression_parser import (
     _SANDBOXED_FUNCTIONS,
@@ -228,6 +229,10 @@ def _eval_binary(node: BinaryOpNode, ctx: ExecutionContext) -> Any:
 
     # Arithmetic
     if op == "+":
+        if isinstance(left, str) and isinstance(right, str):
+            if len(left) + len(right) > 4096:
+                raise ExpressionError("Combined text exceeds its bound")
+            return left + right
         _check_numeric_op(op, left, right)
         return left + right
 
@@ -371,7 +376,8 @@ def _eval_function(node: FunctionCallNode, ctx: ExecutionContext) -> Any:
     args = [evaluate(arg, ctx) for arg in node.args]
 
     # Validate arg types
-    for i, arg in enumerate(args if node.name not in {"len", "merge"} else ()):
+    numeric_args = args if node.name not in {"len", "merge", *COLLECTION_FUNCTIONS} else ()
+    for i, arg in enumerate(numeric_args):
         if arg is None:
             raise ExpressionError(f"Argument {i + 1} to {node.name}() is null")
         if isinstance(arg, str):
@@ -382,7 +388,11 @@ def _eval_function(node: FunctionCallNode, ctx: ExecutionContext) -> Any:
             )
 
     try:
+        if node.name in {"partitions", "completions"}:
+            return func(*args, consume=ctx.budget.consume_operation if ctx.budget else None)
         return func(*args)
+    except RuntimeError:
+        raise
     except Exception as e:
         raise ExpressionError(  # noqa: B904
             f"Error calling {node.name}(): {e}"

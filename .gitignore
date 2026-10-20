@@ -49,6 +49,8 @@ outputs/
 private/
 test-profiles/
 *.sylvia-gm-package
+!rulesets/riichi-mahjong/riichi-mahjong-0.1.0.sylvia-gm-package
+!rulesets/riichi-mahjong/riichi-mahjong-0.1.1.sylvia-gm-package
 !campaign-settings/**/setting.sylvia-gm-package
 !campaign-plans/**/setting.sylvia-gm-package
 !tests/fixtures/**/*.sylvia-gm-package

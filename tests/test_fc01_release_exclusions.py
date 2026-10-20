@@ -342,11 +342,13 @@ def test_actual_sidecar_arguments_cover_all_synthetic_directory_sentinels(tmp_pa
     make_plan(tmp_path / "campaign-plans")
     roots = [
         "rulesets/srd-lite",
+        "rulesets/riichi-mahjong",
         "campaign-settings/severed-lands",
         "src/sylvia_gm/agent/skills",
     ]
     legitimate = [
         "rulesets/srd-lite/content/fixture.json",
+        "rulesets/riichi-mahjong/riichi-mahjong-0.1.0.sylvia-gm-package",
         "rulesets/srd-lite/content/roster-crosswalk.csv",
         "campaign-settings/severed-lands/campaigns/story.md",
         "src/sylvia_gm/agent/skills/build_fixture/SKILL.md",
@@ -374,6 +376,10 @@ def test_actual_sidecar_arguments_cover_all_synthetic_directory_sentinels(tmp_pa
     put(tmp_path, "config/unselected-private.yaml")
     put(tmp_path, "src/sylvia_gm/campaign/the-rift-awakening.json", "{}")
     put(tmp_path, "private/not-in-any-source.jsonl")
+    for name in module._DICTATION_NOTICES:
+        put(tmp_path, "licenses/dictation/" + name, "Synthetic selected speech notice")
+    put(tmp_path, "src-tauri/scripts/hooks/hook-sounddevice.py", "# synthetic hook")
+    put(tmp_path, "licenses/dictation/private-note.txt", "Must not ship")
     calls = []
 
     def fake_run(command, *, cwd, env, check):
@@ -391,6 +397,7 @@ def test_actual_sidecar_arguments_cover_all_synthetic_directory_sentinels(tmp_pa
             "SYLVIA_KEEP_OWNER_BUILD": "1",  # This test inspects staged payloads after return.
         }),
         patch.object(module.subprocess, "run", fake_run),
+        patch.object(module, "version", module._DICTATION_VERSIONS.__getitem__),
         contextlib.redirect_stdout(io.StringIO()),
     ):
         assert module.main() == 0
@@ -427,8 +434,10 @@ def test_actual_sidecar_arguments_cover_all_synthetic_directory_sentinels(tmp_pa
     assert legitimate_destinations.issubset(included)
     assert "config/unselected-private.yaml" not in included
     assert "private/not-in-any-source.jsonl" not in included
+    assert "licenses/dictation/private-note.txt" not in included
+    assert {"licenses/dictation/" + name for name in module._DICTATION_NOTICES}.issubset(included)
     staged_directories = [x["source"] for x in selectors if x["kind"] == "directory"]
-    assert len(staged_directories) == 3
+    assert len(staged_directories) == 4
     assert all(path.startswith(".owner-build/") for path in staged_directories)
     assert all(path not in roots for path in staged_directories)
     (EVIDENCE / "sidecar-directory-handoff.json").write_text(
@@ -519,6 +528,7 @@ def load_sidecar():
 def inventory_fixture(root):
     names = [
         "rulesets/srd-lite/content/fixture.json",
+        "rulesets/riichi-mahjong/riichi-mahjong-0.1.0.sylvia-gm-package",
         "campaign-settings/severed-lands/campaigns/story.md",
         "src/sylvia_gm/agent/skills/build_fixture/SKILL.md",
     ]
@@ -617,7 +627,7 @@ def test_unlisted_private_siblings_are_neither_walked_nor_staged(tmp_path, monke
 
     monkeypatch.setattr(Path, "iterdir", iterdir)
     data = load_sidecar().sidecar_data_arguments(tmp_path, staging)
-    assert len(data) == 6
+    assert len(data) == 8
     expected = {name.removeprefix("src/") for name in names}
     actual = {p.relative_to(staging).as_posix() for p in staging.rglob("*") if p.is_file()}
     assert actual == expected
