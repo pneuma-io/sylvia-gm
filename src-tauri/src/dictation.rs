@@ -13,6 +13,7 @@ const STOP_TIMEOUT: Duration = Duration::from_secs(130);
 const PREPARE_TIMEOUT: Duration = Duration::from_secs(600);
 const MAX_LIFETIME: Duration = Duration::from_secs(300);
 const EXIT_TIMEOUT: Duration = Duration::from_secs(5);
+const IDLE_TIMEOUT: Duration = Duration::from_secs(300);
 
 type Reply = Result<Value, String>;
 
@@ -159,6 +160,8 @@ impl Drop for ProcessJob {
 struct Capture {
     cancelled: AtomicBool,
     stopping: AtomicBool,
+    session: AtomicBool,
+    deadline: Mutex<Option<Instant>>,
     child: Mutex<Option<Child>>,
     input: Mutex<Option<ChildStdin>>,
     replies: Mutex<Option<mpsc::Receiver<Reply>>>,
@@ -249,12 +252,16 @@ impl Capture {
             *self.input.lock().map_err(|_| "provider")? = Some(input);
             *self.temporary.lock().map_err(|_| "provider")? = temporary;
         }
-        let (send, receive) = mpsc::channel();
+        let session = request["mode"] == "session";
+        self.session.store(session, Ordering::Release);
+        self.extend_deadline(START_TIMEOUT);
+        let (send, receive) = mpsc::sync_channel(2);
         *self.replies.lock().map_err(|_| "provider")? = Some(receive);
         std::thread::spawn(move || {
             let mut output = BufReader::new(output);
-            // Two bounded JSON replies; neither diagnostics nor arbitrary process output is exposed.
-            for _ in 0..2 {
+            // Bound both each reply and the queued replies, including while a runtime is idle.
+            let mut replies = 0;
+            loop {
                 let mut line = String::new();
                 let result = (&mut output).take(131_072).read_line(&mut line);
                 let reply = match result {
@@ -265,6 +272,10 @@ impl Capture {
                 };
                 let failed = reply.is_err();
                 if send.send(reply).is_err() || failed {
+                    break;
+                }
+                replies += 1;
+                if !session && replies == 2 {
                     break;
                 }
             }
@@ -278,7 +289,29 @@ impl Capture {
             MAX_LIFETIME
         };
         std::thread::spawn(move || {
-            if watch.recv_timeout(lifetime).is_err() {
+            if session {
+                loop {
+                    match watch.recv_timeout(Duration::from_millis(100)) {
+                        Ok(()) | Err(mpsc::RecvTimeoutError::Disconnected) => return,
+                        Err(mpsc::RecvTimeoutError::Timeout) => {}
+                    }
+                    let Some(capture) = weak.upgrade() else {
+                        return;
+                    };
+                    let expired = capture.deadline.lock().ok().is_some_and(|deadline| {
+                        if deadline.is_some_and(|limit| Instant::now() >= limit) {
+                            capture.cancelled.store(true, Ordering::Release);
+                            true
+                        } else {
+                            false
+                        }
+                    });
+                    if expired {
+                        capture.close();
+                        return;
+                    }
+                }
+            } else if watch.recv_timeout(lifetime).is_err() {
                 if let Some(capture) = weak.upgrade() {
                     capture.close();
                 }
@@ -294,6 +327,41 @@ impl Capture {
             .write_all(text.as_bytes())
             .and_then(|_| input.flush())
             .map_err(|_| "provider".into())
+    }
+
+    fn extend_deadline(&self, duration: Duration) -> bool {
+        if let Ok(mut deadline) = self.deadline.lock() {
+            if self.cancelled.load(Ordering::Acquire) {
+                return false;
+            }
+            *deadline = Some(Instant::now() + duration);
+            return true;
+        }
+        false
+    }
+
+    fn running(&self) -> bool {
+        !self.cancelled.load(Ordering::Acquire)
+            && self
+                .child
+                .lock()
+                .ok()
+                .and_then(|mut child| child.as_mut().map(|c| matches!(c.try_wait(), Ok(None))))
+                .unwrap_or(false)
+    }
+
+    fn exchange(&self, id: &str, request: Value, timeout: Duration) -> Reply {
+        if !self.extend_deadline(timeout + Duration::from_secs(5)) {
+            return Err("unavailable".into());
+        }
+        let mut request = request;
+        request["id"] = json!(id);
+        self.write(&format!("{request}\n"))?;
+        let reply = self.receive(timeout)?;
+        if reply["id"] != id {
+            return Err("provider".into());
+        }
+        Ok(reply)
     }
 
     fn receive(&self, timeout: Duration) -> Reply {
@@ -389,6 +457,7 @@ impl Drop for Capture {
 struct Registry {
     closed: bool,
     active: Option<(String, Arc<Capture>)>,
+    warm: Option<Arc<Capture>>,
     cancelled: VecDeque<String>,
 }
 
@@ -466,6 +535,16 @@ fn checked(reply: Value) -> Reply {
     Ok(reply)
 }
 
+fn idle_reply(reply: &Reply) -> bool {
+    reply.as_ref().is_ok_and(|value| {
+        value["idle"] == true
+            && match value.get("error").and_then(Value::as_str) {
+                None | Some("empty" | "device" | "permission" | "model" | "language") => true,
+                _ => false,
+            }
+    })
+}
+
 impl Dictation {
     pub(crate) fn new(cache: PathBuf) -> Self {
         Self(Mutex::new(Registry::default()), cache)
@@ -482,15 +561,23 @@ impl Dictation {
     }
 
     pub(crate) fn capabilities(&self) -> Reply {
-        let capture = self.capture();
-        let reply = capture
-            .launch(command(&self.1)?, json!({"mode":"capabilities"}))
-            .and_then(|_| capture.receive(START_TIMEOUT));
-        if reply.is_ok() {
-            capture.finish();
-        } else {
-            capture.close();
-        }
+        self.capabilities_for(None)
+    }
+
+    pub(crate) fn capabilities_for(&self, attempt: Option<&str>) -> Reply {
+        self.capabilities_with(attempt, command(&self.1)?)
+    }
+
+    fn capabilities_with(&self, attempt: Option<&str>, command: Command) -> Reply {
+        let id = attempt
+            .map(str::to_owned)
+            .unwrap_or_else(|| format!("metadata-{:032x}", rand::random::<u128>()));
+        let capture = self.register_runtime(&id)?;
+        let reply = self
+            .launch_runtime(&capture, command)
+            .and_then(|_| capture.exchange(&id, json!({"mode":"capabilities"}), START_TIMEOUT));
+        let reusable = idle_reply(&reply);
+        self.retire(&id, &capture, reusable);
         reply.and_then(checked)
     }
 
@@ -523,12 +610,96 @@ impl Dictation {
         Ok(capture)
     }
 
+    fn register_runtime(&self, id: &str) -> Result<Arc<Capture>, String> {
+        if !valid_id(id) {
+            return Err("unavailable".into());
+        }
+        let mut registry = self.0.lock().map_err(|_| "provider")?;
+        if registry
+            .active
+            .as_ref()
+            .is_some_and(|(_, c)| c.cancelled.load(Ordering::Acquire))
+        {
+            registry.active = None;
+        }
+        if registry.closed
+            || registry.active.is_some()
+            || registry.cancelled.iter().any(|s| s == id)
+        {
+            return Err("unavailable".into());
+        }
+        let mut capture = registry
+            .warm
+            .take()
+            .filter(|c| c.running())
+            .unwrap_or_else(|| self.capture());
+        capture.stopping.store(false, Ordering::Release);
+        if !capture.extend_deadline(START_TIMEOUT + Duration::from_secs(5)) {
+            capture = self.capture();
+            capture.extend_deadline(START_TIMEOUT + Duration::from_secs(5));
+        }
+        registry.active = Some((id.to_owned(), Arc::clone(&capture)));
+        Ok(capture)
+    }
+
+    fn launch_runtime(&self, capture: &Arc<Capture>, command: Command) -> Result<(), String> {
+        if capture.cancelled.load(Ordering::Acquire) {
+            return Err("unavailable".into());
+        }
+        if capture.session.load(Ordering::Acquire) {
+            return Ok(());
+        }
+        capture.launch(command, json!({"mode":"session"}))?;
+        let ready = capture.receive(START_TIMEOUT)?;
+        if ready["status"] != "ready" || ready["protocol"] != 1 {
+            return Err("provider".into());
+        }
+        Ok(())
+    }
+
     #[cfg(test)]
     fn start_with(&self, id: &str, engine: &str, command: Command) -> Result<(), String> {
-        self.start_selected_with(id, engine, "default", command)
+        self.start_one_shot_with(id, engine, "default", command)
     }
 
     fn start_selected_with(
+        &self,
+        id: &str,
+        engine: &str,
+        device: &str,
+        command: Command,
+    ) -> Result<(), String> {
+        if engine.len() > 128 || device.len() > 128 {
+            return Err("unavailable".into());
+        }
+        let capture = self.register_runtime(id)?;
+        let reply = self.launch_runtime(&capture, command).and_then(|_| {
+            capture.exchange(
+                id,
+                json!({"mode":"start", "engine":engine, "device":device}),
+                START_TIMEOUT,
+            )
+        });
+        let reusable = idle_reply(&reply);
+        let result = reply.and_then(checked).and_then(|reply| {
+            if reply["status"] == "recording"
+                && reply["idle"] == false
+                && !capture.cancelled.load(Ordering::Acquire)
+            {
+                capture.extend_deadline(Duration::from_secs(130));
+                Ok(())
+            } else {
+                Err("unavailable".into())
+            }
+        });
+        if result.is_err() {
+            self.retire(id, &capture, reusable);
+        }
+        result
+    }
+
+    #[cfg(test)]
+    fn start_one_shot_with(
         &self,
         id: &str,
         engine: &str,
@@ -599,11 +770,23 @@ impl Dictation {
         if capture.stopping.swap(true, Ordering::AcqRel) {
             return Err("unavailable".into());
         }
-        let reply = capture
-            .write("stop\n")
-            .and_then(|_| capture.receive(STOP_TIMEOUT));
-        let completed = reply.is_ok();
+        let session = capture.session.load(Ordering::Acquire);
+        let reply = if session {
+            capture.exchange(id, json!({"mode":"stop"}), STOP_TIMEOUT)
+        } else {
+            capture
+                .write("stop\n")
+                .and_then(|_| capture.receive(STOP_TIMEOUT))
+        };
+        let completed = if session {
+            idle_reply(&reply)
+        } else {
+            reply.is_ok()
+        };
         let result = reply.and_then(checked).and_then(|reply| {
+            if session && reply["idle"] != true {
+                return Err("provider".into());
+            }
             reply
                 .get("text")
                 .and_then(Value::as_str)
@@ -621,6 +804,24 @@ impl Dictation {
     }
 
     fn retire(&self, id: &str, capture: &Arc<Capture>, completed: bool) {
+        if capture.session.load(Ordering::Acquire) {
+            if let Ok(mut registry) = self.0.lock() {
+                if registry
+                    .active
+                    .as_ref()
+                    .is_some_and(|(active, current)| active == id && Arc::ptr_eq(current, capture))
+                {
+                    registry.active = None;
+                    if completed && !registry.closed && !capture.cancelled.load(Ordering::Acquire) {
+                        capture.extend_deadline(IDLE_TIMEOUT);
+                        registry.warm = Some(Arc::clone(capture));
+                        return;
+                    }
+                }
+            }
+            capture.close();
+            return;
+        }
         if completed {
             capture.finish();
         } else {
@@ -665,12 +866,17 @@ impl Dictation {
 
     /// Permanently refuse queued starts before releasing the current capture on shutdown.
     pub(crate) fn close(&self) {
-        let capture = self.0.lock().ok().and_then(|mut registry| {
+        let captures = self.0.lock().ok().map(|mut registry| {
             registry.closed = true;
-            registry.active.take()
+            (registry.active.take(), registry.warm.take())
         });
-        if let Some((_, capture)) = capture {
-            capture.close();
+        if let Some((active, warm)) = captures {
+            if let Some((_, capture)) = active {
+                capture.close();
+            }
+            if let Some(capture) = warm {
+                capture.finish();
+            }
         }
     }
 }
@@ -684,6 +890,224 @@ mod tests {
         command.creation_flags(0x0800_0000);
         command.args(["-NoProfile", "-NonInteractive", "-Command", body]);
         command
+    }
+
+    fn session_fixture() -> Command {
+        fixture(
+            r#"$hello=[Console]::ReadLine()|ConvertFrom-Json; if($hello.mode -ne 'session'){[Console]::WriteLine('{"error":"unavailable"}');exit}; [Console]::WriteLine('{"status":"ready","protocol":1}'); while($line=[Console]::ReadLine()){ $q=$line|ConvertFrom-Json; $r=@{id=$q.id;idle=$true}; if($q.mode -eq 'start'){$r.status='recording';$r.idle=$false}else{$r.text='controlled words'}; [Console]::WriteLine(($r|ConvertTo-Json -Compress)) }"#,
+        )
+    }
+
+    #[test]
+    fn successful_attempt_cleanup_keeps_one_warm_runtime_for_repeat_start() {
+        let dictation = Dictation::default();
+        dictation
+            .start_selected_with("one", "en", "default", session_fixture())
+            .unwrap();
+        let first = dictation
+            .0
+            .lock()
+            .unwrap()
+            .active
+            .as_ref()
+            .unwrap()
+            .1
+            .clone();
+        let pid = first.child.lock().unwrap().as_ref().unwrap().id();
+        assert_eq!(dictation.stop("one").unwrap(), "controlled words");
+        dictation.cancel("one"); // frontend release() runs even after a successful Stop
+        dictation
+            .start_selected_with("two", "en", "default", session_fixture())
+            .unwrap();
+        assert_eq!(
+            dictation
+                .0
+                .lock()
+                .unwrap()
+                .active
+                .as_ref()
+                .unwrap()
+                .1
+                .child
+                .lock()
+                .unwrap()
+                .as_ref()
+                .unwrap()
+                .id(),
+            pid
+        );
+        assert_eq!(dictation.stop("two").unwrap(), "controlled words");
+        dictation.close();
+        assert!(first.child.lock().unwrap().is_none());
+    }
+
+    fn blocked_session(stage: &str) -> Command {
+        fixture(&r#"$null=[Console]::ReadLine();[Console]::WriteLine('{"status":"ready","protocol":1}');while($line=[Console]::ReadLine()){$q=$line|ConvertFrom-Json;if($q.mode -eq 'STAGE'){$null=[Console]::ReadLine();exit};$r=@{id=$q.id;status='recording';idle=$false};[Console]::WriteLine(($r|ConvertTo-Json -Compress))}"#.replace("STAGE", stage))
+    }
+
+    #[test]
+    fn loading_preflight_is_cancelled_by_its_actual_attempt_id() {
+        let dictation = Arc::new(Dictation::default());
+        let worker = Arc::clone(&dictation);
+        let pending = std::thread::spawn(move || {
+            worker.capabilities_with(Some("loading"), blocked_session("capabilities"))
+        });
+        let deadline = Instant::now() + Duration::from_secs(5);
+        loop {
+            let active = dictation
+                .0
+                .lock()
+                .unwrap()
+                .active
+                .as_ref()
+                .map(|(id, c)| (id.clone(), c.clone()));
+            if let Some((id, capture)) = active {
+                assert_eq!(id, "loading");
+                if capture.running() {
+                    break;
+                }
+            }
+            assert!(Instant::now() < deadline);
+            std::thread::sleep(Duration::from_millis(10));
+        }
+        dictation.cancel("loading");
+        assert!(pending.join().unwrap().is_err());
+        assert!(dictation.0.lock().unwrap().warm.is_none());
+        dictation
+            .start_selected_with("fresh", "en", "default", session_fixture())
+            .unwrap();
+        dictation.close();
+    }
+
+    #[test]
+    fn session_cancel_while_loading_or_decoding_closes_job_and_allows_restart() {
+        for stage in ["start", "stop"] {
+            let dictation = Arc::new(Dictation::default());
+            if stage == "stop" {
+                dictation
+                    .start_selected_with("blocked", "en", "default", blocked_session(stage))
+                    .unwrap();
+            }
+            let worker = Arc::clone(&dictation);
+            let pending = std::thread::spawn(move || {
+                if stage == "start" {
+                    worker
+                        .start_selected_with("blocked", "en", "default", blocked_session(stage))
+                        .map(|_| String::new())
+                } else {
+                    worker.stop("blocked")
+                }
+            });
+            let deadline = Instant::now() + Duration::from_secs(5);
+            let capture = loop {
+                let active = dictation
+                    .0
+                    .lock()
+                    .unwrap()
+                    .active
+                    .as_ref()
+                    .map(|(_, c)| c.clone());
+                if let Some(c) = active {
+                    if c.running() && (stage == "start" || c.stopping.load(Ordering::Acquire)) {
+                        break c;
+                    }
+                }
+                assert!(Instant::now() < deadline);
+                std::thread::sleep(Duration::from_millis(10));
+            };
+            dictation.cancel("blocked");
+            assert!(pending.join().unwrap().is_err());
+            assert!(capture.child.lock().unwrap().is_none());
+            assert!(capture.job.lock().unwrap().is_none());
+            dictation
+                .start_selected_with("retry", "en", "default", session_fixture())
+                .unwrap();
+            dictation.close();
+        }
+    }
+
+    #[test]
+    fn session_recording_cancel_and_idle_expiry_do_not_leave_a_warm_capture() {
+        let dictation = Dictation::default();
+        dictation
+            .start_selected_with("cancel", "en", "default", session_fixture())
+            .unwrap();
+        let cancelled = dictation
+            .0
+            .lock()
+            .unwrap()
+            .active
+            .as_ref()
+            .unwrap()
+            .1
+            .clone();
+        dictation.cancel("cancel");
+        assert!(!cancelled.running());
+        dictation
+            .start_selected_with("again", "en", "default", session_fixture())
+            .unwrap();
+        assert_eq!(dictation.stop("again").unwrap(), "controlled words");
+        let warm = dictation.0.lock().unwrap().warm.as_ref().unwrap().clone();
+        warm.extend_deadline(Duration::from_millis(10));
+        let deadline = Instant::now() + Duration::from_secs(3);
+        while warm.running() {
+            assert!(Instant::now() < deadline);
+            std::thread::sleep(Duration::from_millis(10));
+        }
+        dictation
+            .start_selected_with("after-expiry", "en", "default", session_fixture())
+            .unwrap();
+        dictation.close();
+    }
+
+    #[test]
+    fn dead_idle_runtime_is_replaced_and_stale_reply_ids_are_refused() {
+        let dictation = Dictation::default();
+        dictation
+            .start_selected_with("first", "en", "default", session_fixture())
+            .unwrap();
+        assert_eq!(dictation.stop("first").unwrap(), "controlled words");
+        let warm = dictation.0.lock().unwrap().warm.as_ref().unwrap().clone();
+        let pid = warm.child.lock().unwrap().as_ref().unwrap().id();
+        warm.job.lock().unwrap().as_ref().unwrap().terminate();
+        let deadline = Instant::now() + Duration::from_secs(3);
+        while warm.running() {
+            assert!(Instant::now() < deadline);
+            std::thread::sleep(Duration::from_millis(10));
+        }
+        dictation
+            .start_selected_with("replacement", "en", "default", session_fixture())
+            .unwrap();
+        assert_ne!(
+            dictation
+                .0
+                .lock()
+                .unwrap()
+                .active
+                .as_ref()
+                .unwrap()
+                .1
+                .child
+                .lock()
+                .unwrap()
+                .as_ref()
+                .unwrap()
+                .id(),
+            pid
+        );
+        dictation.close();
+        let dictation = Dictation::default();
+        let wrong = fixture(
+            r#"$null=[Console]::ReadLine();[Console]::WriteLine('{"status":"ready","protocol":1}');$null=[Console]::ReadLine();[Console]::WriteLine('{"id":"old","status":"recording","idle":false}')"#,
+        );
+        assert_eq!(
+            dictation
+                .start_selected_with("new", "en", "default", wrong)
+                .unwrap_err(),
+            "provider"
+        );
+        assert!(dictation.0.lock().unwrap().active.is_none());
+        assert!(dictation.0.lock().unwrap().warm.is_none());
     }
 
     #[test]
@@ -995,6 +1419,69 @@ mod tests {
         );
     }
 
+    #[test]
+    #[ignore = "requires the adjacent built owner and an existing controlled model; no download or capture"]
+    fn packaged_warm_runtime_repeats_without_capture_and_closes_owned_processes() {
+        let root = PathBuf::from(std::env::var_os("SYLVIA_DICTATION_PROOF_ROOT").unwrap());
+        let source = PathBuf::from(std::env::var_os("SYLVIA_DICTATION_PROOF_MODEL").unwrap());
+        assert!(!root.exists());
+        let cache = root.join("model-cache/base");
+        std::fs::create_dir_all(&cache).unwrap();
+        for name in [
+            "config.json",
+            "model.bin",
+            "tokenizer.json",
+            "vocabulary.txt",
+        ] {
+            std::fs::copy(source.join(name), cache.join(name)).unwrap();
+        }
+        let dictation = Arc::new(Dictation::new(cache.clone()));
+        let mut records = Vec::new();
+        let mut first_pid = None;
+        for i in 0..5 {
+            let id = format!("fixture-{i}");
+            let started = Instant::now();
+            assert_eq!(
+                dictation.capabilities_for(Some(&id)).unwrap()["ready"],
+                true
+            );
+            let preflight = started.elapsed().as_secs_f64();
+            assert_eq!(
+                dictation
+                    .start(&id, "en", "controlled-no-input")
+                    .unwrap_err(),
+                "device"
+            );
+            let elapsed = started.elapsed().as_secs_f64();
+            dictation.cancel(&id);
+            let warm = dictation.0.lock().unwrap().warm.as_ref().unwrap().clone();
+            let pid = warm.child.lock().unwrap().as_ref().unwrap().id();
+            if let Some(expected) = first_pid {
+                assert_eq!(pid, expected);
+            } else {
+                first_pid = Some(pid);
+            }
+            assert!(warm.running());
+            records.push(json!({"iteration":i,"capabilities_seconds":preflight,"preflight_plus_start_seconds":elapsed,"worker_pid":pid}));
+            if i > 0 {
+                assert!(elapsed < 1.5, "repeat startup rebuilt its runtime");
+            }
+        }
+        let warm = dictation.0.lock().unwrap().warm.as_ref().unwrap().clone();
+        dictation.close();
+        assert!(warm.child.lock().unwrap().is_none());
+        assert!(warm.job.lock().unwrap().is_none());
+        assert!(
+            !warm.cancelled.load(Ordering::Acquire),
+            "idle exit needed forced termination"
+        );
+        assert!(std::fs::read_dir(root.join("model-cache/worker-temp"))
+            .unwrap()
+            .next()
+            .is_none());
+        std::fs::write(root.join("packaged-warm-timings.json"), serde_json::to_vec_pretty(&json!({"records":records,"capture":false,"download":false,"idle_exit_graceful":true,"retained_processes":0,"retained_extraction_files":0})).unwrap()).unwrap();
+    }
+
     // Run from a disposable directory containing the exact packaged owner beside this test EXE.
     #[test]
     #[ignore = "requires the built owner and explicit pinned-model preparation; never records audio"]
@@ -1046,8 +1533,11 @@ mod tests {
                 .unwrap_err(),
             "model"
         );
+        assert!(dictation.0.lock().unwrap().warm.is_some());
+        dictation.close();
         check_empty();
         records.push(json!({"case":"missing-model error before capture","temporary_files":0,"temporary_bytes":0}));
+        let dictation = Arc::new(Dictation::new(cache.clone()));
         assert_eq!(
             std::env::var("SYLVIA_DICTATION_PROOF_PREPARE").unwrap(),
             "1"

@@ -15,6 +15,129 @@ def segment(text, probability, confidence):
     return SimpleNamespace(text=text, no_speech_prob=probability, avg_logprob=confidence)
 
 
+def test_warm_recognizer_reuses_one_model_without_retaining_prior_audio(tmp_path, monkeypatch):
+    monkeypatch.setattr(local, "model_ready", lambda _: True)
+    loads, inputs = [], []
+
+    class Model:
+        supported_languages = ["en"]
+
+        def __init__(self, *args, **kwargs):
+            loads.append(1)
+
+        def transcribe(self, audio, **options):
+            inputs.append(audio)
+            return iter([segment(audio, 0, 0)]), None
+
+    recognizer = local.Recognizer(tmp_path, model_factory=Model)
+    assert recognizer.transcribe("first", "en") == "first"
+    assert recognizer.transcribe("second", "en") == "second"
+    assert loads == [1] and inputs == ["first", "second"]
+    monkeypatch.setattr(local, "model_ready", lambda _: False)
+    with pytest.raises(SpeechError, match="model"):
+        recognizer.transcribe("modified cache", "en")
+
+
+def test_warm_recognizer_discards_failed_model_and_never_returns_partial_text(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(local, "model_ready", lambda _: True)
+    loads = []
+
+    class Model:
+        supported_languages = ["en"]
+
+        def __init__(self, *args, **kwargs):
+            loads.append(1)
+
+        def transcribe(self, audio, **options):
+            def segments():
+                if audio == "fail":
+                    yield segment("partial", 0, 0)
+                    raise RuntimeError("private decoder failure")
+                yield segment("fresh utterance", 0, 0)
+            return segments(), None
+
+    recognizer = local.Recognizer(tmp_path, model_factory=Model)
+    with pytest.raises(SpeechError, match="provider"):
+        recognizer.transcribe("fail", "en")
+    assert recognizer.model is None
+    assert recognizer.transcribe("next", "en") == "fresh utterance"
+    assert loads == [1, 1]
+
+
+def test_session_eof_releases_recording_without_loading_model_or_decoding(tmp_path, monkeypatch):
+    calls = []
+    monkeypatch.setattr(worker, "model_ready", lambda _: True)
+
+    class Capture:
+        def __init__(self, device):
+            pass
+
+        def start(self):
+            calls.append("open")
+
+        def cancel(self):
+            calls.append("close")
+
+        def stop(self):
+            pytest.fail("EOF must not decode")
+
+    monkeypatch.setattr(worker, "Recording", Capture)
+    source = io.StringIO('{"mode":"session"}\n{"id":"one","mode":"start","engine":"en"}\n')
+    assert worker.serve(source, io.StringIO(), tmp_path) == 0
+    assert calls == ["open", "close"]
+
+
+def test_session_protocol_repeats_capture_closes_audio_before_reply_and_rejects_stale_id(
+    tmp_path, monkeypatch
+):
+    calls = []
+    monkeypatch.setattr(worker, "model_ready", lambda _: True)
+    monkeypatch.setattr(worker, "capabilities", lambda _: {"ready": True})
+
+    class Capture:
+        def __init__(self, device):
+            calls.append("create")
+
+        def start(self):
+            calls.append("open")
+
+        def stop(self):
+            calls.append("close")
+            return io.BytesIO(b"controlled")
+
+        def cancel(self):
+            calls.append("cancel")
+
+    class Recognizer:
+        def __init__(self, directory):
+            calls.append("recognizer")
+
+        def transcribe(self, audio, language):
+            assert calls[-1] == "close"
+            return "controlled words"
+
+    monkeypatch.setattr(worker, "Recording", Capture)
+    monkeypatch.setattr(worker, "Recognizer", Recognizer, raising=False)
+    commands = [{"mode": "session"}, {"id": "metadata", "mode": "capabilities"},
+                {"id": "one", "mode": "start", "engine": "en"},
+                {"id": "old", "mode": "stop"}, {"id": "one", "mode": "stop"},
+                {"id": "two", "mode": "start", "engine": "en"},
+                {"id": "two", "mode": "stop"}]
+    output = io.StringIO()
+    source = io.StringIO("".join(json.dumps(c) + "\n" for c in commands))
+    assert worker.serve(source, output, tmp_path) == 0
+    replies = [json.loads(line) for line in output.getvalue().splitlines()]
+    assert replies[0] == {"status": "ready", "protocol": 1}
+    assert replies[1] == {"id": "metadata", "ready": True, "idle": True}
+    assert replies[3] == {"id": "old", "error": "unavailable", "idle": False}
+    assert replies[4] == {"id": "one", "text": "controlled words", "idle": True}
+    assert replies[6] == {"id": "two", "text": "controlled words", "idle": True}
+    assert calls.count("open") == calls.count("close") == 2
+    assert calls.count("recognizer") == 1
+
+
 def test_local_decode_uses_selected_cpu_model_and_conservative_silence_gate(tmp_path, monkeypatch):
     monkeypatch.setattr("sylvia_gm.local_dictation.model_ready", lambda _: True)
     observed = {}

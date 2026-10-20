@@ -458,10 +458,10 @@ fn application_info(window: WebviewWindow) -> Result<Value, String> {
 }
 
 #[tauri::command]
-async fn dictation_capabilities(window: WebviewWindow) -> Result<Value, String> {
+async fn dictation_capabilities(window: WebviewWindow, id: Option<String>) -> Result<Value, String> {
     trusted_caller(&window)?;
     let app = window.app_handle().clone();
-    tauri::async_runtime::spawn_blocking(move || app.state::<dictation::Dictation>().capabilities())
+    tauri::async_runtime::spawn_blocking(move || app.state::<dictation::Dictation>().capabilities_for(id.as_deref()))
         .await
         .map_err(|_| "unavailable".to_string())?
 }

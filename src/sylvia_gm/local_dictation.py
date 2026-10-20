@@ -178,6 +178,34 @@ def transcribe(
         raise SpeechError("provider") from None
 
 
+class Recognizer:
+    """Keep one verified CPU model, never an utterance, inside one profile's worker."""
+
+    def __init__(self, directory: Path, *, model_factory: Callable[..., Any] | None = None):
+        self.directory = directory
+        self.factory = model_factory
+        self.model: Any = None
+
+    def transcribe(self, audio: Any, language: str) -> str:
+        def load(*args: Any, **options: Any) -> Any:
+            if self.model is None:
+                factory = self.factory
+                if factory is None:
+                    from faster_whisper import WhisperModel
+
+                    factory = WhisperModel
+                self.model = factory(*args, **options)
+            return self.model
+
+        try:
+            # Retain the complete byte verification and conservative decoding guards per use.
+            return transcribe(audio, self.directory, language, model_factory=load)
+        except SpeechError as error:
+            if str(error) in {"model", "provider"}:
+                self.model = None
+            raise
+
+
 def _device_id(index: int, row: Any, host: str) -> str:
     identity = hashlib.sha256(
         f"{host}\n{row['name']}\n{row['default_samplerate']}".encode()

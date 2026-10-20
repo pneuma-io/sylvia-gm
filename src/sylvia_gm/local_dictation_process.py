@@ -15,6 +15,7 @@ from sylvia_gm.local_dictation import (
     MODEL_FILES,
     MODEL_ID,
     MODEL_REVISION,
+    Recognizer,
     Recording,
     SpeechError,
     input_devices,
@@ -63,6 +64,8 @@ def serve(source: TextIO, output: TextIO, directory: Path) -> int:
             raise SpeechError("unavailable")
         request = json.loads(line)
         mode = request.get("mode")
+        if mode == "session":
+            return serve_session(source, reply, directory)
         if mode == "capabilities":
             reply(capabilities(directory))
         elif mode == "prepare":
@@ -100,6 +103,75 @@ def serve(source: TextIO, output: TextIO, directory: Path) -> int:
             with suppress(Exception):
                 recording.cancel()
     return 1
+
+
+def serve_session(source: TextIO, reply: Any, directory: Path) -> int:
+    """Serialize bounded, identified attempts; keep only the model while the microphone is idle."""
+    recognizer = Recognizer(directory)
+    recording = None
+    active_id = None
+    language = "auto"
+    reply({"status": "ready", "protocol": 1})
+    try:
+        while line := source.readline(8193):
+            if not line.endswith("\n") or len(line.encode("utf-8")) > 8192:
+                return 1
+            request = json.loads(line)
+            identity = request.get("id")
+            if not isinstance(identity, str) or not 0 < len(identity) <= 64 or not all(
+                c.isascii() and (c.isalnum() or c == "-") for c in identity
+            ):
+                return 1
+            result: dict[str, Any]
+            try:
+                mode = request.get("mode")
+                if mode == "capabilities" and recording is None:
+                    result = capabilities(directory)
+                elif mode == "start" and recording is None:
+                    if not model_ready(directory):
+                        raise SpeechError("model")
+                    selected_language = request.get("engine")
+                    device = request.get("device", "default")
+                    from faster_whisper.tokenizer import _LANGUAGE_CODES
+
+                    if not isinstance(selected_language, str) or (
+                        selected_language != "auto"
+                        and selected_language not in _LANGUAGE_CODES[:99]
+                    ):
+                        raise SpeechError("language")
+                    if not isinstance(device, str):
+                        raise SpeechError("device")
+                    candidate = Recording(device)
+                    try:
+                        candidate.start()
+                    except Exception:
+                        candidate.cancel()
+                        raise
+                    recording, active_id, language = candidate, identity, selected_language
+                    result = {"status": "recording"}
+                elif mode == "stop" and recording is not None and identity == active_id:
+                    capture, recording, active_id = recording, None, None
+                    audio = None
+                    try:
+                        audio = capture.stop()  # close the stream before model loading or decode
+                        result = {"text": recognizer.transcribe(audio, language)}
+                    finally:
+                        capture.cancel()
+                        if audio is not None:
+                            audio.close()
+                else:
+                    raise SpeechError("unavailable")
+            except SpeechError as error:
+                result = {"error": str(error)}
+            except Exception:
+                result = {"error": "provider"}
+            reply({"id": identity, **result, "idle": recording is None})
+            result.clear()  # the model may stay warm; the previous transcript must not
+        return 0
+    finally:
+        if recording is not None:
+            with suppress(Exception):
+                recording.cancel()
 
 
 def main(args: list[str] | None = None) -> int:

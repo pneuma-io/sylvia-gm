@@ -122,10 +122,10 @@ const SylviaGMFrontend = (() => {
   }
 
   // Metadata/readiness never starts audio or downloads a model.
-  async function refreshDictationOptions(bridge) {
+  async function refreshDictationOptions(bridge, attemptId = null) {
     if (!bridge.dictation_capabilities) throw { code: 'unavailable' };
       const epoch = dictationOptionsEpoch;
-      const capabilities = await bridge.dictation_capabilities();
+      const capabilities = await bridge.dictation_capabilities(attemptId);
       if (epoch !== dictationOptionsEpoch) return capabilities;
       const engines = capabilities?.engines;
       if (!Array.isArray(engines) || !engines.length) throw { code: 'unavailable' };
@@ -156,8 +156,8 @@ const SylviaGMFrontend = (() => {
       return capabilities;
   }
 
-  async function dictationEngine(bridge) {
-    const capabilities = await refreshDictationOptions(bridge);
+  async function dictationEngine(bridge, attemptId) {
+    const capabilities = await refreshDictationOptions(bridge, attemptId);
     if (capabilities.ready === false) { openSettings('dictation'); throw { code: 'model' }; }
     return $('dictation-language').value;
   }
@@ -217,7 +217,7 @@ const SylviaGMFrontend = (() => {
         };
         signal.addEventListener('abort', cancel, { once: true });
         try {
-          const engine = await dictationEngine(bridge);
+          const engine = await dictationEngine(bridge, id);
           if (signal.aborted) throw { code: 'unavailable' };
           await bridge.dictation_start(id, engine, $('dictation-device').value || 'default');
           if (signal.aborted) { cancel(); throw { code: 'unavailable' }; }
@@ -886,7 +886,7 @@ const SylviaGMFrontend = (() => {
     if (!invoke) return null;
     return {
       application_info: () => invoke('application_info'),
-      dictation_capabilities: () => invoke('dictation_capabilities'),
+      dictation_capabilities: (id = null) => id ? invoke('dictation_capabilities', { id }) : invoke('dictation_capabilities'),
       dictation_start: (id, engine, device) => invoke('dictation_start', { id, engine, device }),
       dictation_prepare: id => invoke('dictation_prepare', { id }),
       dictation_stop: (id) => invoke('dictation_stop', { id }),
