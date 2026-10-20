@@ -1055,6 +1055,8 @@ const SylviaGMFrontend = (() => {
         triggerMessageId: command.trigger_message_id || null,
         characterProfileId: command.character_profile_id || null,
         characterProfileSha256: command.character_profile_sha256 || null,
+        characterArtifactId: command.character_artifact_id || null,
+        characterArtifactSha256: command.character_artifact_sha256 || null,
       }),
       return_guided_creation_subflow: (command) => invoke('return_guided_creation_subflow', {
         operationId: command.operation_id,

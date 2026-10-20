@@ -33,13 +33,13 @@ for (const width of [1280, 640]) test(`Starter chooser, preview and editable cop
       if (name === 'app.js') body = body.toString().replace(
         "document.addEventListener('DOMContentLoaded', () => { void SylviaGMFrontend.init(); });", '')
         .replace('  // ---- Public API ----',
-          'window.starterQA = { state, renderCampaignPartyOptions, initStarterCharacterControls };\n  // ---- Public API ----');
+          'window.starterQA = { state, renderCampaignPartyOptions, initStarterCharacterControls, createHostBridge };\n  // ---- Public API ----');
       await route.fulfill({ body, contentType: name.endsWith('.js') ? 'text/javascript' :
         name.endsWith('.css') ? 'text/css' : name.endsWith('.png') ? 'image/png' : 'text/html' });
     });
     await page.goto('https://sylvia-starter.test/');
     await page.evaluate((options) => {
-      const { state, renderCampaignPartyOptions, initStarterCharacterControls } = window.starterQA;
+      const { state, renderCampaignPartyOptions, initStarterCharacterControls, createHostBridge } = window.starterQA;
       document.getElementById('connecting-overlay').style.display = 'none';
       document.getElementById('session-frame').style.display = 'flex';
       document.getElementById('home-view').hidden = true;
@@ -56,10 +56,11 @@ for (const width of [1280, 640]) test(`Starter chooser, preview and editable cop
       state.view = 'session'; state.activeSessionRole = 'builder';
       state.constructionDraftId = 'starter-campaign'; state.constructionRevision = 4;
       window.launches = [];
-      state.bridge = { start_guided_creation_subflow: request => {
-        window.launches.push(request);
+      window.__TAURI__ = { core: { invoke: (method, request) => {
+        if (method === 'start_guided_creation_subflow') window.launches.push(request);
         return new Promise(() => {}); // The real owner/Builder route has separate Python proof.
-      } };
+      } } };
+      state.bridge = createHostBridge();
       renderCampaignPartyOptions(options);
       initStarterCharacterControls();
     }, options);
@@ -89,9 +90,9 @@ for (const width of [1280, 640]) test(`Starter chooser, preview and editable cop
     const launches = await page.evaluate(() => window.launches);
     assert.equal(launches.length, 1);
     assert.equal(launches[0].purpose, 'player_character');
-    assert.equal(launches[0].character_artifact_id, rows[0].id);
-    assert.equal(launches[0].character_artifact_sha256, rows[0].content_sha256);
-    assert.equal(launches[0].visible_answer, `Edit a copy of ${rows[0].name}`);
+    assert.equal(launches[0].characterArtifactId, rows[0].id);
+    assert.equal(launches[0].characterArtifactSha256, rows[0].content_sha256);
+    assert.equal(launches[0].visibleAnswer, `Edit a copy of ${rows[0].name}`);
     await page.evaluate((options) => {
       const fixed = { id: 'required-protagonist', name: 'Required protagonist', summary: 'Fixed by Plan',
         campaign_ready: true, source_ref: { id: 'required-protagonist', path: 'characters/fixed.json' } };

@@ -1928,6 +1928,8 @@ async fn start_guided_creation_subflow(
     trigger_message_id: Option<String>,
     character_profile_id: Option<String>,
     character_profile_sha256: Option<String>,
+    character_artifact_id: Option<String>,
+    character_artifact_sha256: Option<String>,
 ) -> Result<Value, String> {
     owner_call_async(
         window.clone(),
@@ -1942,6 +1944,8 @@ async fn start_guided_creation_subflow(
             "trigger_message_id": trigger_message_id,
             "character_profile_id": character_profile_id,
             "character_profile_sha256": character_profile_sha256,
+            "character_artifact_id": character_artifact_id,
+            "character_artifact_sha256": character_artifact_sha256,
         }),
     )
     .await
