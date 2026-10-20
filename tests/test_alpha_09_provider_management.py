@@ -152,7 +152,7 @@ def test_default_config_path_uses_pyinstaller_bundle_root(
     assert loader_module._default_config_path() == tmp_path / "config" / "config.yaml"
 
 
-def test_owner_sidecar_bundles_general_builder_skill_documents(tmp_path: Path) -> None:
+def test_owner_sidecar_bundles_general_builder_skill_documents(tmp_path: Path, monkeypatch) -> None:
     import importlib.util
     import os
     import shutil
@@ -205,6 +205,23 @@ def test_owner_sidecar_bundles_general_builder_skill_documents(tmp_path: Path) -
         source = ROOT / "src/sylvia_gm/agent/skills" / relative
         assert source.is_file()
         assert (staged_skills / relative).read_bytes() == source.read_bytes()
+
+    from sylvia_gm.agent import _skills
+    from sylvia_gm.agent._builder_session import _builder_skill_loader_tool
+
+    monkeypatch.setattr(_skills, "__file__", str(staged_skills.parent / "_skills.py"))
+    tool = _builder_skill_loader_tool()
+    catalog = tool.handler({"name": "BUILD CAMPAIGN PLAN"}, None)
+    assert catalog["success"] is True
+    for reference in catalog["references"]:
+        loaded = tool.handler({"name": "BUILD CAMPAIGN PLAN", "reference": reference}, None)
+        assert loaded["success"] is True
+        assert loaded["instructions"] == (
+            staged_skills / "build_campaign_plan" / reference
+        ).read_text(encoding="utf-8")
+    assert "definition.procedural_definition.executable" in tool.handler(
+        {"name": "BUILD RULESET"}, None
+    )["instructions"]
 
 
 def _install_httpx_mock(monkeypatch: object, handler: object) -> None:

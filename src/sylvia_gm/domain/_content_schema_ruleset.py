@@ -8,7 +8,10 @@ from typing import Any
 from sylvia_gm.domain._content_schema_package import PACKAGE_RECORD_SCHEMA
 from sylvia_gm.domain._content_schema_panel import PANEL_DECLARATION_SCHEMA
 from sylvia_gm.domain._content_schema_ruleset_tests import RULESET_TESTS_SCHEMA
+from sylvia_gm.domain._content_schema_runtime import PACKAGE_RUNTIME_SCHEMA
 from sylvia_gm.domain._content_schema_ui import PANEL_LAYOUT_SCHEMA
+from sylvia_gm.domain._runtime_executable_reference import EFFECT_ENVELOPE
+from sylvia_gm.runtime._authoring_declarations import EFFECT_BODY_FIELDS
 
 TEMPLATE = {"type": "string", "pattern": r"^\{[^{}]+\}$(?![\s\S])"}
 IDENTIFIER = {"type": "string", "minLength": 1}
@@ -23,55 +26,16 @@ PARAM_TYPES = [
     "enum",
     "entity_id_list",
 ]
-EFFECT_FIELDS = [
-    "call", "params", "export_context", "trigger", "context",
-    "require", "create_entity", "set_participant",
-    "publish",
-    "shuffle",
-    "condition",
-    "on_true",
-    "on_false",
-    "store_as",
-    "dice",
-    "set",
-    "request_choice",
-    "apply_damage",
-    "apply_condition",
-    "remove_condition",
-    "heal",
-    "decrement",
-    "increment",
-    "modify_field",
-    "conditional",
-    "nested_call",
-    "trigger_procedure",
-    "save_throw",
-    "log",
-    "table_lookup",
-    "spatial_query",
-    "shot_effect",
-    "spatial_mutation",
-    "for_each",
-    "sort",
-    "apply_ability_damage",
-    "count_successes",
-    "reroll",
-    "hunger_dice",
-    "set_flag",
-    "advance_time",
-    "list_push",
-    "list_pop",
-    "initiative",
-    "advance_initiative",
-    "random_table",
-    "transition_scene",
-    "aoe",
-    "defer",
-    "narrate",
-    "register_initiative_trigger",
-    "clock_create",
-    "clock_tick",
-]
+# Compact source preserves runtime handler names and their legal sibling fields.
+EFFECT_FIELDS = sorted(
+    set(EFFECT_BODY_FIELDS)
+    | set(EFFECT_ENVELOPE["optional_fields"])
+    | {
+        field
+        for fields in EFFECT_ENVELOPE["handler_specific_siblings"].values()
+        for field in fields
+    }
+)
 
 
 def tokenized(schema: dict[str, Any]) -> dict[str, Any]:
@@ -112,6 +76,7 @@ RULESET_SOURCE_SCHEMA: dict[str, Any] = {
         },
         "public_actions": {"type": "array", "items": {"$ref": "#/$defs/public_action"}},
         "private_mechanics": {"type": "array", "items": {"$ref": "#/$defs/private_action"}},
+        "procedures": deepcopy(PACKAGE_RUNTIME_SCHEMA["properties"]["procedures"]),
         "definitions": {
             "type": "object",
             "description": "Open Ruleset-owned runtime data.",
@@ -455,6 +420,11 @@ FORMAT_NOTES = (
     (
         "After family expansion, the shared runtime validator owns parameters, "
         "preconditions, effects, expressions, references, and execution bounds."
+    ),
+    (
+        "Mechanic families expand into tools. Optional procedures use literal package_runtime "
+        "procedure declarations, including steps and narrative, copied unchanged without "
+        "family/configure token substitution. Omission emits an empty procedures map."
     ),
     "Family objects have exactly four fields, even when no operation references the family.",
     "Family references and operation-name uniqueness require procedural checks.",
