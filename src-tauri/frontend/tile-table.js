@@ -36,7 +36,7 @@
     const center = data.areas.find(area => area.position === 'center');
     const groups = center?.groups || [];
     const indicators = groups.filter(group => group.role === 'indicators').map(group =>
-      `<div class="table-indicators"><span>${escape(group.label)}</span>${tiles(group.pieces || [], controls)}</div>`).join('');
+      `<div class="table-indicators" role="group" aria-label="${escape(group.label)}"><span>${escape(group.label)}</span>${tiles(group.pieces || [], controls)}</div>`).join('');
     const status = new Map((data.status || []).map(row => [row.label, row.value]));
     const seats = data.areas.filter(area => area.position !== 'center').map(area => {
       const rack = area.groups.find(group => group.role === 'rack');
@@ -47,9 +47,9 @@
       const rackContent = concealed ? `<span class="table-sr-only">${count} concealed tiles</span><ol class="table-tiles" aria-hidden="true">${Array.from({length:count}, () => `<li class="table-tile-slot">${root.SylviaTileFaces.render(null, true)}</li>`).join('')}</ol>` : tiles(rack?.pieces || [], controls, true);
       return `<section class="table-seat table-seat-${escape(area.position)}${concealed ? ' table-seat-concealed' : ''}${area.active ? ' table-seat-active' : ''}" aria-label="${escape(area.label)}">` +
         `<div class="table-seat-badge"><span class="table-wind">${escape(area.badge)}</span><span><small>${escape(area.label)}</small><strong>${escape(area.score)}</strong></span>${area.active ? '<i title="Acting seat" aria-label="Acting seat"></i>' : ''}</div>` +
-        `<div class="table-rack" aria-label="${escape(rack?.label || 'Hand')}">${rackContent}</div>` +
-        `<div class="table-pond" aria-label="${escape(area.label)} discards">${tiles(pond?.pieces || [], controls, false, true)}</div>` +
-        `<div class="table-melds">${melds.map(group => `<div class="table-meld" aria-label="${escape(group.label)}${group.source ? ', called from ' + escape(group.source) : ''}">${tiles(group.pieces || [], controls)}</div>`).join('')}</div></section>`;
+        `<div class="table-rack" role="group" aria-label="${escape(rack?.label || 'Hand')}">${rackContent}</div>` +
+        `<div class="table-pond" role="group" aria-label="${escape(area.label)} discards">${tiles(pond?.pieces || [], controls, false, true)}</div>` +
+        `<div class="table-melds">${melds.map(group => `<div class="table-meld" role="group" aria-label="${escape(group.label)}${group.source ? ', called from ' + escape(group.source) : ''}">${tiles(group.pieces || [], controls)}</div>`).join('')}</div></section>`;
     }).join('');
     const choices = groups.filter(group => group.role === 'actions' && !group.concealed).flatMap(group => group.pieces || []).filter(piece => controls.get(piece.action_id)?.available === true).map(piece =>
       `<button type="button" class="table-choice ruleset-panel-action" data-panel-action-id="${escape(piece.action_id)}" data-panel-piece-id="${escape(piece.id)}" aria-label="${escape(piece.detail || piece.label)}" title="${escape(piece.detail || piece.label)}"><span>${escape(piece.label)}</span>${(piece.faces || []).map(face => root.SylviaTileFaces.render(face)).join('')}</button>`).join('');

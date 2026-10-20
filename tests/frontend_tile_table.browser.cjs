@@ -22,6 +22,11 @@ for (const width of [750,280]) test(`tile artwork, ponds and local keyboard sele
     assert.equal(await page.locator('.table-pond .tile-sideways').count(),4);
     assert.equal(await page.locator('.table-pond .table-tile-slot').count(),28,'Called discards have no second visible tile');
     assert.equal(await page.locator('.table-meld .tile-sideways').count(),1);
+    assert.equal(await page.getByRole('group',{name:'Added kan, called from across',exact:true}).count(),1);
+    const called=await page.locator('.table-meld .tile-sideways .table-tile').boundingBox();
+    const added=await page.locator('.table-meld .tile-stacked .table-tile').boundingBox();
+    assert.ok(Math.abs(called.y+called.height/2-added.y-added.height/2)<1,'Added kan aligns with its called tile in the rotated rack');
+    assert.ok(Math.abs(called.x-added.x)>called.width*.8 && Math.abs(called.x-added.x)<called.width*1.2,'Added kan stacks one tile above its called tile');
     assert.equal(await page.getByRole('button',{name:'Win with your drawn tile',exact:true}).count(),1);
     const first=page.locator('[data-table-select]').first();await first.focus();await page.keyboard.press('Enter');
     assert.equal(await first.getAttribute('aria-pressed'),'true');

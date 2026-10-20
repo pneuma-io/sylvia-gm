@@ -7,8 +7,12 @@ function fixture() {
         ({id:`discard-${index}`,label:'Diagnostic label',face:face(kind,kind===4),action_id:'play',flags:index===13?['drawn']:[]}))})},
       {id:'discards',role:'pond',label:'Discards',pieces:[0,8,10,28,33,14,19,27].map((kind,index)=>
         ({id:`pond-${seat}-${index}`,label:'Tile',face:face(kind),flags:index===4?['sideways']:index===7?['latest']:index===2?['claimed']:[]}))},
-      ...(seat===1 ? [{id:'pon',role:'meld',source:'across',label:'Pon',pieces:[0,1,2].map((v,index)=>
-        ({id:`meld-${v}`,label:'3 of circles',face:face(11),flags:index===1?['sideways']:[]}))}] : []),
+      ...(seat===1 ? [{id:'kan',role:'meld',source:'across',label:'Added kan',pieces:[
+        {id:'meld-0',label:'3 of circles',face:face(11),flags:[]},
+        {id:'meld-1',label:'3 of circles',face:face(11),flags:['sideways']},
+        {id:'meld-added',label:'3 of circles',face:face(11),flags:['stacked']},
+        {id:'meld-2',label:'3 of circles',face:face(11),flags:[]},
+      ]}] : []),
     ]}));
   areas.push({id:'shared',position:'center',label:'Your turn',groups:[
     {role:'indicators',label:'Dora indicators',pieces:[{id:'dora-0',label:'Dora',face:face(11)}]},

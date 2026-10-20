@@ -8,7 +8,7 @@
 .table-seat-top { --rotation: 180deg; }
 .table-seat-left { --rotation: 90deg; }
 .table-seat > * { pointer-events: auto; }
-.table-tiles { display: flex; align-items: flex-end; flex-wrap: nowrap; gap: max(1px, .2cqw); padding: 0; margin: 0; list-style: none; }
+.table-tiles { --tile-gap: max(1px, .2cqw); display: flex; align-items: flex-end; flex-wrap: nowrap; gap: var(--tile-gap); padding: 0; margin: 0; list-style: none; }
 .table-tile-slot { position: relative; flex: none; width: var(--tile-width); height: calc(var(--tile-width) * 1.47); }
 .table-tile { display: inline-block; box-sizing: border-box; width: var(--tile-width); height: calc(var(--tile-width) * 1.4); vertical-align: middle; border: 1px solid #b9b59a; border-radius: max(2px, .55cqw); background: linear-gradient(105deg, #fffef0, #edead6); box-shadow: 0 max(1px, .5cqw) 0 #aaa58e, 0 max(2px, .65cqw) max(2px, .65cqw) #08201d66; }
 .table-tile svg { display: block; width: 100%; height: 100%; overflow: visible; }
@@ -33,8 +33,8 @@
 .tile-latest::after { content: ''; position: absolute; top: -4px; left: 40%; width: 5px; height: 5px; background: #ffe7a0; border-radius: 50%; box-shadow: 0 0 0 2px #173b35; pointer-events: none; }
 .table-melds { position: absolute; bottom: 14.7%; right: 5%; display: flex; align-items: flex-end; gap: 1.5cqw; --tile-width: 3.15cqw; }
 .table-meld { position: relative; }
-.table-meld .tile-stacked { width: 0; }
-.table-meld .tile-stacked > .table-static-tile { position: absolute; right: calc(var(--tile-width) * .8); top: calc(var(--tile-width) * -.95); width: var(--tile-width); transform: rotate(-90deg); }
+.table-meld .tile-stacked { width: 0; margin-right: calc(-1 * var(--tile-gap)); }
+.table-meld .tile-stacked > .table-static-tile { position: absolute; right: calc(var(--tile-width) * .2 + var(--tile-gap)); top: calc(-1 * var(--tile-width)); width: var(--tile-width); transform: rotate(-90deg); }
 .table-seat-badge { position: absolute; bottom: 14%; left: 38%; display: flex; align-items: center; gap: 1cqw; max-width: 24%; padding: .8cqw 1.2cqw; border: 1px solid #618375; border-radius: 5px; background: #17322fee; font-size: clamp(7px, 1.6cqw, 13px); transform: rotate(calc(-1 * var(--rotation))); }
 .table-seat-bottom .table-seat-badge { left: 5%; bottom: 15%; }
 .table-seat-badge small { display: block; color: #bed0c5; max-width: 21cqw; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: .9em; }
