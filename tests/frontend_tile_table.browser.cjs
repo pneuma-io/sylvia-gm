@@ -8,7 +8,7 @@ for (const width of [750,280]) test(`tile artwork, ponds and local keyboard sele
   const browser=await chromium.launch({headless:true,channel:process.platform==='win32'?'msedge':undefined});
   try {
     const page=await browser.newPage({viewport:{width:Math.max(820,width+40),height:1000}});
-    await page.setContent(`<html><head><style>body{margin:20px;background:#10211e}main{width:${width}px}</style><style>${fs.readFileSync(path.join(frontend,'tile-table.css'),'utf8')}</style></head><body><main></main></body></html>`);
+    await page.setContent(`<html><head><style>${fs.readFileSync(path.join(frontend,'app.css'),'utf8')}</style><style>body{margin:20px}main{width:${width}px}</style><style>${fs.readFileSync(path.join(frontend,'tile-table.css'),'utf8')}</style></head><body><main></main></body></html>`);
     for (const name of ['tile-faces.js','tile-table.js','piece-table.js']) await page.addScriptTag({content:fs.readFileSync(path.join(frontend,name),'utf8')});
     await page.evaluate(data=>{
       window.changed=0;window.busy=false;
@@ -36,6 +36,14 @@ for (const width of [750,280]) test(`tile artwork, ponds and local keyboard sele
     await page.evaluate(()=>window.busy=true);await page.locator('[data-table-select]').nth(2).click();
     assert.equal(await page.locator('[data-table-discard]').getAttribute('data-panel-piece-id'),'discard-1','Busy commit locks local selection');
     const box=await page.locator('.table-board').boundingBox();
+    const occupied=await page.locator('.table-rack, .table-pond').evaluateAll(nodes=>nodes.map(node=>{
+      const b=node.getBoundingClientRect();return {left:b.left,right:b.right,top:b.top,bottom:b.bottom};
+    }));
+    for(const badge of await page.locator('.table-seat-badge').all()){
+      const b=await badge.boundingBox();
+      assert.ok(occupied.every(r=>Math.min(b.x+b.width,r.right)-Math.max(b.x,r.left)<=.5 ||
+        Math.min(b.y+b.height,r.bottom)-Math.max(b.y,r.top)<=.5),'Seat score badges stay clear of racks and ponds');
+    }
     for(const control of await page.locator('[data-table-select]').all()) {
       const tile=await control.boundingBox();assert.ok(tile.x>=box.x && tile.x+tile.width<=box.x+box.width+1,'Player tiles remain in board');
     }
@@ -51,6 +59,46 @@ for (const width of [750,280]) test(`tile artwork, ponds and local keyboard sele
     assert.ok(Math.abs(fit.board.width-fit.board.height)<1,'Tiles stay on a square table when height is constrained');
     assert.ok(fit.deck.bottom<=fit.host.bottom+1,'The action deck stays visible in a short panel');
     if(process.env.SYLVIA_TILE_EVIDENCE)await page.locator('main').screenshot({path:path.join(process.env.SYLVIA_TILE_EVIDENCE,`component-short-${width}.png`)});
+  } finally {await browser.close();}
+});
+
+test('table follows existing theme tokens live in docked and pop-out documents, preserving tile faces and intent', {timeout:30000}, async()=>{
+  const browser=await chromium.launch({headless:true,channel:process.platform==='win32'?'msedge':undefined});
+  try {
+    const pages=[];
+    for(const host of ['docked','popout']){
+      const page=await browser.newPage({viewport:{width:850,height:1000}});pages.push(page);
+      await page.setContent(`<html><head><style>${fs.readFileSync(path.join(frontend,'app.css'),'utf8')}</style><style>main{width:750px}</style><style>${fs.readFileSync(path.join(frontend,'tile-table.css'),'utf8')}</style></head><body class="${host==='popout'?'panel-window-body':''}"><main></main></body></html>`);
+      for(const name of ['tile-faces.js','tile-table.js','piece-table.js'])await page.addScriptTag({content:fs.readFileSync(path.join(frontend,name),'utf8')});
+      await page.evaluate(data=>{
+        document.querySelector('main').innerHTML=window.SylviaPieceTable.render(data,[{id:'play',label:'Play',available:true,bindings:{choice:'piece'}}]);
+        window.SylviaTileTable.attach(document.querySelector('main'),()=>{},()=>true);
+      },fixture());
+      await page.locator('[data-table-select]').first().click();
+    }
+    const read=page=>page.evaluate(()=>{
+      const style=s=>getComputedStyle(document.querySelector(s));
+      return {board:style('.table-board').backgroundImage,back:style('.table-tile-back').backgroundColor,
+        face:style('.table-rack .table-select-tile .table-tile').backgroundImage,
+        selected:document.querySelector('[data-table-select]').getAttribute('aria-pressed'),
+        action:style('[data-table-discard]').backgroundColor,selection:style('[data-table-select]').outlineStyle,
+        faces:document.querySelectorAll('.table-tile svg').length,backs:document.querySelectorAll('.table-tile-back').length};
+    });
+    const baseline=await read(pages[0]);
+    const colours=[];
+    for(const theme of ['sylvia','sylvia-dark','slate']){
+      for(const page of pages)await page.evaluate(theme=>document.body.setAttribute('data-theme',theme),theme);
+      const docked=await read(pages[0]),popout=await read(pages[1]);
+      assert.deepEqual(docked,popout,'Both documents inherit the same live tokens');
+      assert.equal(docked.face,baseline.face,'Traditional ivory tile artwork stays legible');
+      assert.equal(docked.selected,'true','Changing theme retains local intent');
+      assert.equal(docked.selection,'solid');
+      assert.equal(docked.faces,baseline.faces);assert.equal(docked.backs,39);
+      colours.push(docked.board);
+      if(process.env.SYLVIA_TILE_EVIDENCE)await pages[0].locator('main').screenshot({path:path.join(process.env.SYLVIA_TILE_EVIDENCE,`theme-${theme}.png`)});
+    }
+    assert.equal(new Set(colours).size,3,'Each existing theme changes the felt');
+    assert.equal(colours[2],baseline.board,'The default restores Slate');
   } finally {await browser.close();}
 });
 

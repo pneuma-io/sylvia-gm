@@ -38,7 +38,9 @@
     const indicators = groups.filter(group => group.role === 'indicators').map(group =>
       `<div class="table-indicators" role="group" aria-label="${escape(group.label)}"><span>${escape(group.label)}</span>${tiles(group.pieces || [], controls)}</div>`).join('');
     const status = new Map((data.status || []).map(row => [row.label, row.value]));
-    const seats = data.areas.filter(area => area.position !== 'center').map(area => {
+    const seated = data.areas.filter(area => area.position !== 'center');
+    const scores = seated.map(area => `<div class="table-seat-badge${area.active ? ' table-score-active' : ''}" role="group" tabindex="0" aria-label="${escape(area.label)}, ${escape(area.score)} points" title="${escape(area.label)}, ${escape(area.score)} points"><span class="table-wind">${escape(area.badge)}</span><span><small>${escape(area.label)}</small><strong>${escape(area.score)}</strong></span>${area.active ? '<i title="Acting seat" aria-label="Acting seat"></i>' : ''}</div>`).join('');
+    const seats = seated.map(area => {
       const rack = area.groups.find(group => group.role === 'rack');
       const pond = area.groups.find(group => group.role === 'pond');
       const melds = area.groups.filter(group => group.role === 'meld');
@@ -46,7 +48,6 @@
       const count = concealed && Number.isInteger(rack.count) ? Math.min(18, Math.max(0, rack.count)) : 0;
       const rackContent = concealed ? `<span class="table-sr-only">${count} concealed tiles</span><ol class="table-tiles" aria-hidden="true">${Array.from({length:count}, () => `<li class="table-tile-slot">${root.SylviaTileFaces.render(null, true)}</li>`).join('')}</ol>` : tiles(rack?.pieces || [], controls, true);
       return `<section class="table-seat table-seat-${escape(area.position)}${concealed ? ' table-seat-concealed' : ''}${area.active ? ' table-seat-active' : ''}" aria-label="${escape(area.label)}">` +
-        `<div class="table-seat-badge"><span class="table-wind">${escape(area.badge)}</span><span><small>${escape(area.label)}</small><strong>${escape(area.score)}</strong></span>${area.active ? '<i title="Acting seat" aria-label="Acting seat"></i>' : ''}</div>` +
         `<div class="table-rack" role="group" aria-label="${escape(rack?.label || 'Hand')}">${rackContent}</div>` +
         `<div class="table-pond" role="group" aria-label="${escape(area.label)} discards">${tiles(pond?.pieces || [], controls, false, true)}</div>` +
         `<div class="table-melds">${melds.map(group => `<div class="table-meld" role="group" aria-label="${escape(group.label)}${group.source ? ', called from ' + escape(group.source) : ''}">${tiles(group.pieces || [], controls)}</div>`).join('')}</div></section>`;
@@ -54,7 +55,7 @@
     const choices = groups.filter(group => group.role === 'actions' && !group.concealed).flatMap(group => group.pieces || []).filter(piece => controls.get(piece.action_id)?.available === true).map(piece =>
       `<button type="button" class="table-choice ruleset-panel-action" data-panel-action-id="${escape(piece.action_id)}" data-panel-piece-id="${escape(piece.id)}" aria-label="${escape(piece.detail || piece.label)}" title="${escape(piece.detail || piece.label)}"><span>${escape(piece.label)}</span>${(piece.faces || []).map(face => root.SylviaTileFaces.render(face)).join('')}</button>`).join('');
     const messages = groups.filter(group => group.role === 'message').flatMap(group => group.pieces || []);
-    return `<div class="tile-table"><div class="table-fit"><div class="table-board" role="group" aria-label="${escape(data.title)} table">${seats}${indicators}` +
+    return `<div class="tile-table"><div class="table-scores" role="group" aria-label="Seats and scores">${scores}</div><div class="table-fit"><div class="table-board" role="group" aria-label="${escape(data.title)} table">${seats}${indicators}` +
       `<div class="table-round"><strong>${escape(status.get('Round') || '')}</strong><span>${escape(status.get('Live wall') || '0')} tiles left</span><small>Honba ${escape(status.get('Honba') || '0')} · Sticks ${escape(status.get('Riichi sticks') || '0')}</small></div></div></div>` +
       `<div class="table-command-deck"><div class="table-turn" role="status">${escape(center?.label || '')}</div>` +
       `${messages.length ? `<p class="table-message">${escape(messages[0].label)}</p>` : ''}` +

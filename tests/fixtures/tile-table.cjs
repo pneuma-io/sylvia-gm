@@ -1,7 +1,7 @@
 const face = (kind, red=false) => ({family:'mahjong', kind, red});
 function fixture() {
   const positions = ['bottom','right','top','left'];
-  const areas = positions.map((position, seat) => ({id:`seat-${seat}`, position, label:seat ? `Opponent ${seat}` : 'You',
+  const areas = positions.map((position, seat) => ({id:`seat-${seat}`, position, label:['You / East','Right opponent / South','Across opponent / West','Left opponent / North'][seat],
     badge:['東','南','西','北'][seat], score:'25000', active:seat===0, groups:[
       {id:'hand',role:'rack',label:'Hand',...(seat ? {concealed:true,count:13} : {pieces:[0,1,2,3,4,5,9,10,12,18,19,22,27,28].map((kind,index) =>
         ({id:`discard-${index}`,label:'Diagnostic label',face:face(kind,kind===4),action_id:'play',flags:index===13?['drawn']:[]}))})},
