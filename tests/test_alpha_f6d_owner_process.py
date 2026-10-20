@@ -349,7 +349,8 @@ def test_owner_process_writes_content_free_runtime_diagnostics(tmp_path: Path) -
     assert command["outcome"] == "ok"
     assert isinstance(command["duration_ms"], float)
     rejected_command = next(
-        record for record in records if record.get("operation") == "unsupported_operation"
+        record for record in records
+        if record["event"] == "command_completed" and record["operation"] == "other_operation"
     )
     assert rejected_command["outcome"] == "error"
     assert rejected_command["error_code"] == "command_rejected"

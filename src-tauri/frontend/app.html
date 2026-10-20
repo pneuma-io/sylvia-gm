@@ -1008,6 +1008,34 @@
             <p id="application-signing">Unsigned Alpha prerelease</p>
           </div>
           <div class="settings-card settings-action-list">
+            <h3>Local problem report</h3>
+            <p>Sylvia keeps small app diagnostics on this PC for up to seven days, within 1 MiB.
+              They contain action categories, error codes, counts and timing, without chat,
+              prompts, model replies, tool arguments, names or personal paths.</p>
+            <p>You can describe an app problem or give individual model feedback without enabling
+              Full Audit. Add only details you want in the file. Preview and save a local copy;
+              nothing is uploaded. Campaigns and Full Audit records are not included.</p>
+            <label for="local-report-kind">Report type</label>
+            <select id="local-report-kind">
+              <option value="app_problem">App problem</option>
+              <option value="model_feedback">Model feedback</option>
+            </select>
+            <label for="local-report-reproduction">Steps to reproduce <span class="label-optional">(optional)</span></label>
+            <textarea id="local-report-reproduction" rows="3" maxlength="4000"></textarea>
+            <label for="local-report-feedback">Your feedback <span class="label-optional">(optional)</span></label>
+            <textarea id="local-report-feedback" rows="3" maxlength="4000"></textarea>
+            <button class="btn btn-secondary" id="preview-local-report-btn" type="button">Preview local report</button>
+            <p id="local-report-status" class="inline-feedback" role="status" aria-live="polite"></p>
+            <div id="local-report-preview" hidden>
+              <h4>Exact file contents</h4>
+              <p>Save opens the file chooser. After confirming a file, wait for the result here.
+                Settings stays open until saving finishes.</p>
+              <button class="btn btn-primary" id="save-local-report-btn" type="button">Save report…</button>
+              <button class="btn btn-secondary" id="cancel-local-report-btn" type="button">Cancel</button>
+              <pre id="local-report-content" tabindex="0" aria-label="Exact local report contents"></pre>
+            </div>
+          </div>
+          <div class="settings-card settings-action-list">
             <h3>Home tutorial</h3>
             <p>Show Sylvia&rsquo;s quick tour of the Home controls again.</p>
             <button class="btn btn-secondary" id="replay-home-tutorial-btn" type="button">
@@ -1036,6 +1064,8 @@
 <script src="piece-table.js"></script>
 <script src="campaign-plan-browser.js"></script>
 <script src="dictation.js"></script>
+<script src="support-report.js"></script>
+<script src="local-diagnostics.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

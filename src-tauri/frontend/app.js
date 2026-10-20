@@ -886,6 +886,10 @@ const SylviaGMFrontend = (() => {
     if (!invoke) return null;
     return {
       application_info: () => invoke('application_info'),
+      record_local_fault: (category, delta) => invoke('record_local_fault', { category, delta }),
+      preview_local_report: (report) => invoke('preview_local_report', report),
+      cancel_local_report: (previewId) => invoke('cancel_local_report', { previewId }),
+      save_local_report: (previewId) => invoke('save_local_report', { previewId }),
       dictation_capabilities: (id = null) => id ? invoke('dictation_capabilities', { id }) : invoke('dictation_capabilities'),
       dictation_start: (id, engine, device) => invoke('dictation_start', { id, engine, device }),
       dictation_prepare: id => invoke('dictation_prepare', { id }),
@@ -1331,6 +1335,8 @@ const SylviaGMFrontend = (() => {
     $('connecting-overlay').classList.add('hidden');
     $('session-frame').style.display = 'flex';
     wireControls();
+    window.SylviaLocalDiagnostics?.init(state.bridge);
+    localSupportReport = window.SylviaSupportReport?.init(state.bridge);
     initTheme();
     initSidebarResize();
     await gamePanels().init();
@@ -1762,8 +1768,10 @@ const SylviaGMFrontend = (() => {
     if (selectedTab === 'packages') void refreshRulesetBrowser();
   }
 
+  let localSupportReport = null;
   function closeSettings() {
     if ($('settings-overlay').hidden) return;
+    if (localSupportReport?.close() === false) return;
     $('settings-overlay').hidden = true;
     chatgptPageVisible = false;
     clearTimeout(chatgptStatusTimer);
