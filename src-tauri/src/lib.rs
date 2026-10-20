@@ -2501,6 +2501,78 @@ async fn recover_campaign_file(
 }
 
 #[tauri::command]
+async fn record_local_fault(
+    window: WebviewWindow,
+    category: String,
+    delta: u32,
+) -> Result<Value, String> {
+    trusted_caller(&window)?;
+    owner_call_async(
+        window,
+        "record_local_fault",
+        json!({"category": category, "delta": delta}),
+    )
+    .await
+}
+
+#[tauri::command]
+async fn preview_local_report(
+    window: WebviewWindow,
+    kind: String,
+    reproduction: String,
+    feedback: String,
+) -> Result<Value, String> {
+    trusted_caller(&window)?;
+    owner_call_async(
+        window,
+        "preview_local_report",
+        json!({
+            "kind": kind, "reproduction": reproduction, "feedback": feedback,
+        }),
+    )
+    .await
+}
+
+#[tauri::command]
+async fn cancel_local_report(window: WebviewWindow, preview_id: String) -> Result<Value, String> {
+    trusted_caller(&window)?;
+    owner_call_async(
+        window,
+        "cancel_local_report",
+        json!({"preview_id": preview_id}),
+    )
+    .await
+}
+
+#[tauri::command]
+async fn save_local_report(window: WebviewWindow, preview_id: String) -> Result<Value, String> {
+    trusted_caller(&window)?;
+    let Some(destination) = rfd::AsyncFileDialog::new()
+        .set_parent(&window)
+        .add_filter("Sylvia local report JSON", &["json"])
+        .set_file_name("sylvia-local-report.json")
+        .save_file()
+        .await
+    else {
+        owner_call_async(
+            window,
+            "cancel_local_report",
+            json!({"preview_id": preview_id}),
+        )
+        .await?;
+        return Ok(json!({"status": "cancelled"}));
+    };
+    owner_call_async(
+        window,
+        "save_local_report",
+        json!({
+            "preview_id": preview_id, "destination_path": destination.path().to_string_lossy(),
+        }),
+    )
+    .await
+}
+
+#[tauri::command]
 async fn export_admin_audit_file(window: WebviewWindow) -> Result<Value, String> {
     trusted_caller(&window)?;
     // Audit has a passive spoilers notice; only the ordinary save chooser is needed here.
@@ -2730,6 +2802,10 @@ pub fn run() {
             recover_campaign,
             recover_campaign_file,
             export_admin_audit_file,
+            preview_local_report,
+            record_local_fault,
+            cancel_local_report,
+            save_local_report,
         ])
         .build(tauri::generate_context!())
         .expect("error while building Sylvia GM")

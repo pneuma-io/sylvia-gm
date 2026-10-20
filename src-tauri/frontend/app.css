@@ -3139,3 +3139,16 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
 #campaign-sequel-dialog td, #campaign-sequel-dialog th { text-align:left; padding:.3rem; }
 .sequel-actions { display:flex; flex-wrap:wrap; gap:.5rem; margin:1rem 0; }
 .sequel-consent { display:flex; align-items:flex-start; gap:.5rem; line-height:1.5; }
+#local-report-content {
+  max-height: 20rem;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 0.75rem;
+}
+
+#local-report-reproduction,
+#local-report-feedback {
+  width: 100%;
+  resize: vertical;
+}

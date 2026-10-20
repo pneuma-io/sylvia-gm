@@ -33,7 +33,6 @@ import time
 import zipfile
 from collections.abc import Callable, Iterator, Mapping, Sequence, Set
 from contextlib import ExitStack, nullcontext
-from datetime import UTC, datetime
 from enum import Enum
 from pathlib import Path
 from types import MappingProxyType
@@ -221,6 +220,7 @@ from sylvia_gm.interfaces._session_reasoning import (
 )
 from sylvia_gm.interfaces.local_api import LocalCommandBus
 from sylvia_gm.interfaces.local_owner import LocalOwnerSupervisor
+from sylvia_gm.interfaces._local_diagnostics import LocalDiagnostics
 from sylvia_gm.provider._admin_audit import AdminAuditedProvider
 from sylvia_gm.provider._context_fit import (
     GM_MODE_MINIMUM_CONTEXT_TOKENS,
@@ -252,76 +252,12 @@ _MAX_MESSAGE_BYTES = 67_108_864
 _MAX_PACKAGE_BYTES = 48 * 1024 * 1024
 _MAX_USER_TEXT_CHARS = 131_072
 _MAX_CAMPAIGN_PLAN_BYTES = 1024 * 1024
-_MAX_RUNTIME_DIAGNOSTIC_BYTES = 5 * 1024 * 1024
 _MAX_ADMIN_AUDIT_VIEW_BYTES = 256 * 1024
 _TEST_FULL_AUDIT_ENV = "SYLVIA_GM_TEST_FULL_AUDIT"
 
 
 class OwnerProtocolError(ValueError):
     """A malformed or unsupported private owner-process message."""
-
-
-def _runtime_diagnostic_path(storage_root: Path) -> Path:
-    """Return the private, machine-local runtime journal path."""
-
-    return storage_root / "diagnostics" / "runtime.jsonl"
-
-
-def _prepare_runtime_diagnostic(path: Path) -> None:
-    """Create the journal directory and rotate one bounded previous journal."""
-
-    try:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        if path.is_file() and path.stat().st_size >= _MAX_RUNTIME_DIAGNOSTIC_BYTES:
-            previous = path.with_name("runtime.previous.jsonl")
-            path.replace(previous)
-    except OSError:
-        # Diagnostics must never prevent Sylvia from launching or serving a request.
-        return
-
-
-def _write_runtime_diagnostic(
-    path: Path,
-    *,
-    event: str,
-    operation: str | None = None,
-    outcome: str | None = None,
-    error_code: str | None = None,
-    error_type: str | None = None,
-    duration_ms: float | None = None,
-) -> None:
-    """Append one metadata-only diagnostic without campaign or provider content."""
-
-    record: dict[str, object] = {
-        "timestamp": datetime.now(UTC).isoformat(),
-        "event": event,
-    }
-    if operation is not None:
-        record["operation"] = (
-            operation if re.fullmatch(r"[a-z][a-z0-9_]{0,79}", operation) else "invalid_operation"
-        )
-    if outcome is not None:
-        record["outcome"] = outcome
-    if error_code is not None:
-        record["error_code"] = (
-            error_code
-            if re.fullmatch(r"[A-Za-z][A-Za-z0-9_.-]{0,79}", error_code)
-            else "unknown_error"
-        )
-    if error_type is not None:
-        record["error_type"] = (
-            error_type
-            if re.fullmatch(r"[A-Za-z][A-Za-z0-9_.-]{0,79}", error_type)
-            else "UnknownError"
-        )
-    if duration_ms is not None:
-        record["duration_ms"] = round(duration_ms, 1)
-    try:
-        with path.open("a", encoding="utf-8", newline="\n") as stream:
-            stream.write(json.dumps(record, ensure_ascii=True, separators=(",", ":")) + "\n")
-    except OSError:
-        # Diagnostics are best effort and are never part of campaign authority.
-        return
 
 
 def _guided_start_selection_input(payload: Mapping[str, object]) -> dict[str, object]:
@@ -4513,10 +4449,9 @@ def run(
     write_lock = threading.Lock()
     closing = threading.Event()
     resolver_lock = threading.Lock()
-    diagnostic_lock = threading.Lock()
     configured_resolver = provider_resolver
     owner_config_path: Path | None = None
-    diagnostic_path: Path | None = None
+    diagnostics: LocalDiagnostics | None = None
     display_reads: DisplayReads | None = None
 
     def resolve_provider(session: Any) -> Any:
@@ -4554,9 +4489,7 @@ def run(
         if launch is None:
             raise OwnerProtocolError("Owner launch envelope is missing")
         supervisor, bus, external_response, owner_id, storage_root = _launch(launch)
-        diagnostic_path = _runtime_diagnostic_path(storage_root)
-        _prepare_runtime_diagnostic(diagnostic_path)
-        _write_runtime_diagnostic(diagnostic_path, event="owner_started")
+        diagnostics = LocalDiagnostics(storage_root)
         owner_config_path = storage_root / "config.yaml"
         application_owner = supervisor.application_owner()
         _preinstall_bundled_srd(bus)
@@ -4602,20 +4535,36 @@ def run(
             error_code: str | None = None
             error_type: str | None = None
             try:
-                result = _dispatch(
-                    bus,
-                    method,
-                    params,
-                    application_owner=application_owner,
-                    owner_id=owner_id,
-                    provider_resolver=resolve_provider,
-                    model_choices=list_model_choices,
-                    session_loop=session_loop,
-                    storage_root=storage_root,
-                    reload_provider_resolver=reload_configured_provider,
-                    gm_system_prompt=gm_system_prompt,
-                    provider_work_reserved=preparation is not None,
-                )
+                if method == "record_local_fault":
+                    result = diagnostics.client_fault(params.get("category"), params.get("delta"))
+                elif method == "preview_local_report":
+                    result = diagnostics.preview(
+                        kind=params.get("kind"), reproduction=params.get("reproduction", ""),
+                        feedback=params.get("feedback", ""),
+                    )
+                elif method == "cancel_local_report":
+                    diagnostics.cancel(_required_text(params, "preview_id"))
+                    result = {"status": "cancelled"}
+                elif method == "save_local_report":
+                    destination = Path(_required_text(params, "destination_path"))
+                    if not destination.is_absolute() or not destination.name:
+                        raise OwnerProtocolError("Choose a local report file.")
+                    result = diagnostics.save(_required_text(params, "preview_id"), destination)
+                else:
+                    result = _dispatch(
+                        bus,
+                        method,
+                        params,
+                        application_owner=application_owner,
+                        owner_id=owner_id,
+                        provider_resolver=resolve_provider,
+                        model_choices=list_model_choices,
+                        session_loop=session_loop,
+                        storage_root=storage_root,
+                        reload_provider_resolver=reload_configured_provider,
+                        gm_system_prompt=gm_system_prompt,
+                        provider_work_reserved=preparation is not None,
+                    )
                 reply = {"id": request_id, "ok": True, "result": _json_value(result)}
             except (
                 AuthorityError,
@@ -4742,7 +4691,7 @@ def run(
                 error_code = "internal_error"
                 error_type = type(error).__name__
                 print(
-                    f"Sylvia GM owner command failed: {type(error).__name__}",
+                    "Sylvia GM owner command failed: internal_error",
                     file=sys.stderr,
                 )
                 reply = {
@@ -4760,17 +4709,14 @@ def run(
             finally:
                 if preparation is not None:
                     preparation.close()
-            if diagnostic_path is not None:
-                with diagnostic_lock:
-                    _write_runtime_diagnostic(
-                        diagnostic_path,
-                        event="command_completed",
-                        operation=method,
-                        outcome="error" if error_code is not None else "ok",
-                        error_code=error_code,
-                        error_type=error_type,
-                        duration_ms=(time.monotonic() - started) * 1000,
-                    )
+            diagnostic_id = diagnostics.record(
+                "command_completed", operation=method,
+                outcome="error" if error_code is not None else "ok",
+                error_code=error_code, error_type=error_type,
+                duration_ms=(time.monotonic() - started) * 1000,
+            )
+            if error_code is not None:
+                reply["error"]["diagnostic_id"] = diagnostic_id
             write_reply(reply)
 
         def execute_worker(
@@ -4838,6 +4784,10 @@ def run(
                         preparation.enter_context(session_loop.provider_request_work(session_id))
                 except (AuthorityError, OwnerProtocolError, ValueError) as error:
                     preparation.close()
+                    diagnostics.record(
+                        "request_rejected", operation=method, outcome="error",
+                        error_code="command_rejected", error_type=type(error).__name__,
+                    )
                     write_reply({"id": request_id, "ok": False, "error": {
                         "code": getattr(error, "code", "command_rejected"), "message": str(error),
                     }})
@@ -4859,13 +4809,14 @@ def run(
                     raise
                 continue
             execute_request(request_id, method, params)
+    except BaseException:
+        if diagnostics is not None:
+            diagnostics.record("owner_failed", outcome="error", error_code="internal_error")
+        raise
     finally:
         closing.set()
         if display_reads is not None:
             display_reads.close()
-        if diagnostic_path is not None:
-            with diagnostic_lock:
-                _write_runtime_diagnostic(diagnostic_path, event="owner_stopped")
         if supervisor is not None:
             supervisor.shutdown()
         with workers_lock:
@@ -4874,6 +4825,8 @@ def run(
             worker.join(timeout=5.0)
         if bus is not None:
             bus.close()
+        if diagnostics is not None:
+            diagnostics.close()
 
 
 def main() -> int:
@@ -4885,10 +4838,10 @@ def main() -> int:
         sys.stdin.reconfigure(encoding="utf-8", errors="strict")
         sys.stdout.reconfigure(encoding="utf-8", errors="strict")
         return run(sys.stdin, sys.stdout)
-    except (AuthorityError, OwnerProtocolError, ValueError) as error:
+    except Exception:
         # Startup errors go to stderr because no request id exists yet. Never
         # include the launch envelope, credential, or authority path.
-        print(f"Sylvia GM owner startup failed: {type(error).__name__}", file=sys.stderr)
+        print("Sylvia GM owner startup failed", file=sys.stderr)
         return 2
 
 
