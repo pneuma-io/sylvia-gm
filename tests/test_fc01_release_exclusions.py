@@ -345,6 +345,7 @@ def test_actual_sidecar_arguments_cover_all_synthetic_directory_sentinels(tmp_pa
         "rulesets/riichi-mahjong",
         "campaign-settings/severed-lands",
         "src/sylvia_gm/agent/skills",
+        "src/sylvia_gm/campaign",
     ]
     legitimate = [
         "rulesets/srd-lite/content/fixture.json",
@@ -353,6 +354,8 @@ def test_actual_sidecar_arguments_cover_all_synthetic_directory_sentinels(tmp_pa
         "campaign-settings/severed-lands/campaigns/story.md",
         "src/sylvia_gm/agent/skills/build_fixture/SKILL.md",
         "src/sylvia_gm/agent/skills/build_fixture/references/example.json",
+        "src/sylvia_gm/campaign/the-rift-awakening.json",
+        "src/sylvia_gm/campaign/srd-starters.json",
     ]
     for name in legitimate:
         put(tmp_path, name)
@@ -437,7 +440,7 @@ def test_actual_sidecar_arguments_cover_all_synthetic_directory_sentinels(tmp_pa
     assert "licenses/dictation/private-note.txt" not in included
     assert {"licenses/dictation/" + name for name in module._DICTATION_NOTICES}.issubset(included)
     staged_directories = [x["source"] for x in selectors if x["kind"] == "directory"]
-    assert len(staged_directories) == 4
+    assert len(staged_directories) == 5
     assert all(path.startswith(".owner-build/") for path in staged_directories)
     assert all(path not in roots for path in staged_directories)
     (EVIDENCE / "sidecar-directory-handoff.json").write_text(
@@ -531,6 +534,7 @@ def inventory_fixture(root):
         "rulesets/riichi-mahjong/riichi-mahjong-0.1.0.sylvia-gm-package",
         "campaign-settings/severed-lands/campaigns/story.md",
         "src/sylvia_gm/agent/skills/build_fixture/SKILL.md",
+        "src/sylvia_gm/campaign/srd-starters.json",
     ]
     for name in names:
         put(root, name)
@@ -627,7 +631,7 @@ def test_unlisted_private_siblings_are_neither_walked_nor_staged(tmp_path, monke
 
     monkeypatch.setattr(Path, "iterdir", iterdir)
     data = load_sidecar().sidecar_data_arguments(tmp_path, staging)
-    assert len(data) == 8
+    assert len(data) == 10
     expected = {name.removeprefix("src/") for name in names}
     actual = {p.relative_to(staging).as_posix() for p in staging.rglob("*") if p.is_file()}
     assert actual == expected

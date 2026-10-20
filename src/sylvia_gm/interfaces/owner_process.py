@@ -91,6 +91,7 @@ from sylvia_gm.application.bundled_packages import (
     bundled_srd_archive,
     bundled_srd_version,
 )
+from sylvia_gm.application.bundled_starter_characters import available_reusable_participants
 from sylvia_gm.application.campaign_library_selection import (
     materialize_library_party,
     participant_catalog_payload,
@@ -127,7 +128,6 @@ from sylvia_gm.application.plan_bundle import (
 from sylvia_gm.application.plan_snapshot import retained_plan_snapshot, validate_plan_snapshot
 from sylvia_gm.application.reusable_participants import (
     ReusableParticipant,
-    compatible_reusable_participants,
     delete_reusable_participant,
     save_reusable_participant,
 )
@@ -764,11 +764,9 @@ def _rift_reusable_participants(
 ) -> tuple[ReusableParticipant, ...]:
     """Load participants compatible with the bundled Severed Lands/Rift binding."""
 
-    if not (storage_root / "participants").exists():
-        return ()
     package, declaration = _rift_participant_authority()
     campaign_setting = bundled_rift_authority().setting
-    return compatible_reusable_participants(
+    return available_reusable_participants(
         storage_root,
         package=package,
         declaration=declaration,
@@ -785,8 +783,6 @@ def _reusable_participant_catalog(
     on_invalid: Callable[[str, Exception], None] | None = None,
 ) -> tuple[ReusableParticipant, ...]:
     """Discover library characters using the exact schemas of installed Rulesets and Settings."""
-    if not (storage_root / "participants").exists():
-        return ()
     found = {
         item.artifact_id: item for item in _rift_reusable_participants(
             storage_root, on_invalid=on_invalid,
@@ -817,7 +813,7 @@ def _reusable_participant_catalog(
                 )
                 if sources is None:
                     continue
-                for item in compatible_reusable_participants(
+                for item in available_reusable_participants(
                     storage_root,
                     package=primary,
                     declaration=declaration,
@@ -1226,7 +1222,7 @@ def _start_rift_campaign(
         template=party_template,
         selected_plan=selected_plan,
         setting_character_schema=rift_authority.setting_character_schema,
-        reusable_participants=compatible_reusable_participants(
+        reusable_participants=available_reusable_participants(
             storage_root,
             package=primary,
             declaration=declaration,
@@ -2086,7 +2082,7 @@ def _dispatch_selected(
                 ) if item.kind == "player_character"
             )
             return rift_public_template(
-                reusable_participants=compatible_reusable_participants(
+                reusable_participants=available_reusable_participants(
                     storage_root, package=primary, declaration=declaration,
                     campaign_setting=sources.setting,
                     legacy_campaign_setting=bundled_rift_authority().setting,
@@ -3841,6 +3837,15 @@ def _dispatch_selected(
         purpose = _required_text(params, "purpose")
         profile_id = _optional_text(params, "character_profile_id")
         profile_hash = _optional_text(params, "character_profile_sha256")
+        character_id = _optional_text(params, "character_artifact_id")
+        character_hash = _optional_text(params, "character_artifact_sha256")
+        if (character_id is None) != (character_hash is None) or (
+            character_id is not None
+            and (purpose not in {"player_character", "companion"} or profile_id is not None)
+        ):
+            raise CommandRejected(
+                "Choose one exact Character File to edit a copy", code="character_copy_invalid",
+            )
         if (profile_id is None) != (profile_hash is None) or (
             profile_id is not None and purpose != "companion"
         ):
@@ -3965,6 +3970,36 @@ def _dispatch_selected(
                 reference_options["references"] = {
                     **retained,
                     "character_profile": profile.snapshot(),
+                }
+            pinned_character = retained.get("character_copy")
+            if existing is not None:
+                if (pinned_character is None and character_id is not None) or (
+                    pinned_character is not None and (
+                        pinned_character.get("artifact_id") != character_id
+                        or pinned_character.get("content_sha256") != character_hash
+                    )
+                ):
+                    raise CommandRejected(
+                        "This launch already selected a different Character File",
+                        code="stale_character",
+                    )
+            elif character_id is not None:
+                source = next((
+                    item for item in _reusable_participant_catalog(storage_root, application_owner)
+                    if item.artifact_id == character_id and item.role == purpose
+                ), None)
+                if source is None or source.content_sha256 != character_hash:
+                    raise CommandRejected(
+                        "Refresh the selected Character File before editing a copy",
+                        code="stale_character",
+                    )
+                reference_options["references"] = {
+                    **retained,
+                    "character_copy": {
+                        "artifact_id": source.artifact_id,
+                        "content_sha256": source.content_sha256,
+                        "name": source.name,
+                    },
                 }
         subflow = launch(
             operation_id=operation_id,

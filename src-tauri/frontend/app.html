@@ -351,6 +351,20 @@
             <p class="construction-summary" id="rift-description"></p>
             <label for="rift-archetype" id="campaign-player-label">Player Character archetype</label>
             <select id="rift-archetype"></select>
+            <section id="starter-character-preview" hidden aria-live="polite">
+              <strong id="starter-character-heading"></strong>
+              <p class="construction-summary" id="starter-character-guidance"></p>
+              <p id="starter-character-stats"></p>
+              <details><summary>Character preview</summary>
+                <pre id="starter-character-profile" class="starter-character-profile"></pre>
+                <details><summary>Abilities, equipment and spells</summary>
+                  <pre id="starter-character-data"></pre>
+                </details>
+              </details>
+              <button type="button" class="btn btn-secondary btn-sm"
+                      id="starter-edit-copy">Edit a copy in Builder</button>
+              <p class="construction-summary">This built-in stays unchanged. Builder saves your edits as a separate character.</p>
+            </section>
             <button type="button" class="btn btn-secondary btn-sm"
                     id="rift-create-player"
                     data-start-creation-subflow="player_character">Create New Player Character</button>

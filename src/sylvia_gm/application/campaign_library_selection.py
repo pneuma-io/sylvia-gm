@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
 from sylvia_gm.application.bundled_campaign_plans import selected_campaign_plan
+from sylvia_gm.application.bundled_starter_characters import available_reusable_participants
 from sylvia_gm.application.campaign_plan_sources import (
     CampaignPlanToolAuthority,
     campaign_plan_sources,
@@ -30,7 +31,6 @@ from sylvia_gm.application.package_runtime import (
 )
 from sylvia_gm.application.reusable_participants import (
     ReusableParticipant,
-    compatible_reusable_participants,
     parse_setting_character,
 )
 from sylvia_gm.application.reusable_plans import ReusableCampaignPlan
@@ -115,6 +115,12 @@ class CampaignLibrarySelection:
         def row_for(item: ReusableParticipant) -> dict[str, object]:
             row = dict(_participant_choice(item, self.entity_reference))
             row["label"] = item.name
+            if item.builtin_starter:
+                row["starter_preview"] = {
+                    "authored_profile": item.authored_profile,
+                    "participant": json.loads(canonical_json_bytes(item.participant)),
+                    "entity_state": json.loads(canonical_json_bytes(item.entity_state)),
+                }
             return row
 
         for item in self.participants:
@@ -297,7 +303,7 @@ def resolve_campaign_library_selection(
         participants = tuple(
             item
             for declaration in declarations
-            for item in compatible_reusable_participants(
+            for item in available_reusable_participants(
                 storage_root,
                 package=primary,
                 declaration=declaration,
