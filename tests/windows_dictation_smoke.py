@@ -1,100 +1,79 @@
-"""Explicit Windows smoke: real local recognition of synthesized WAV, never a microphone.
+"""Explicit offline recognition proof using an existing controlled WAV; never a microphone.
 
-Run with .venv/Scripts/python.exe tests/windows_dictation_smoke.py.
-Only the production helper's input-device line is substituted in memory.
+Run with the dictation extra installed:
+  python tests/windows_dictation_smoke.py --model-dir LOCAL_CACHE --audio CONTROLLED.wav \
+      --audio-sha256 EXPECTED_SHA256 --expected "I walk north and open the door."
+
+No model download, audio synthesis, playback, device stream or provider call occurs.
+Physical microphone quality remains a separate, explicitly authorised user trial.
 """
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import io
 import json
-import os
-from pathlib import Path
-import subprocess
-import sys
-import tempfile
-import threading
+import re
 import time
-import unittest
 import wave
+from pathlib import Path
+
+from sylvia_gm.local_dictation import MODEL_ID, MODEL_REVISION, SpeechError, transcribe
 
 
-@unittest.skipUnless(sys.platform == "win32", "Windows desktop speech engine required")
-class LocalDictationSmoke(unittest.TestCase):
-    @classmethod
-    def launch(cls, code):
-        return subprocess.Popen(
-            [cls.executable, "-NoProfile", "-NonInteractive", "-Command", code],
-            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-            text=True, encoding="utf-8", creationflags=subprocess.CREATE_NO_WINDOW,
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--model-dir", type=Path, required=True)
+    parser.add_argument("--audio", type=Path, required=True)
+    parser.add_argument("--audio-sha256", required=True)
+    parser.add_argument("--expected", required=True)
+    args = parser.parse_args()
+    payload = args.audio.read_bytes()
+    if hashlib.sha256(payload).hexdigest() != args.audio_sha256:
+        parser.error("Controlled audio SHA256 mismatch")
+    with wave.open(io.BytesIO(payload), "rb") as audio:
+        if not 0 < audio.getnframes() / audio.getframerate() <= 120:
+            parser.error("Controlled WAV must contain between zero and 120 seconds")
+    started = time.monotonic()
+    text = transcribe(io.BytesIO(payload), args.model_dir, "en")
+
+    def words(value: str) -> list[str]:
+        return re.findall(r"\w+", value.casefold())
+
+    if words(text) != words(args.expected):
+        raise AssertionError("Controlled recognition differed from the selected expected words")
+    silence = io.BytesIO()
+    with wave.open(silence, "wb") as audio:
+        audio.setnchannels(1)
+        audio.setsampwidth(2)
+        audio.setframerate(16000)
+        audio.writeframes(bytes(16000 * 2 * 3))
+    silence.seek(0)
+    try:
+        transcribe(silence, args.model_dir, "auto")
+    except SpeechError as error:
+        if str(error) != "empty":
+            raise
+    else:
+        raise AssertionError("Silence produced a transcript")
+    print(
+        json.dumps(
+            {
+                "model": MODEL_ID,
+                "revision": MODEL_REVISION,
+                "device": "cpu",
+                "compute_type": "int8",
+                "cpu_threads": 2,
+                "controlled_fixture": "passed",
+                "silence": "empty",
+                "seconds": round(time.monotonic() - started, 3),
+                "physical_quality": "not tested",
+            }
         )
-
-    @classmethod
-    def setUpClass(cls):
-        cls.script = (Path(__file__).parents[1] / "src-tauri/src/dictation.ps1").read_text(encoding="utf-8")
-        cls.executable = str(Path(os.environ["SystemRoot"]) / "System32/WindowsPowerShell/v1.0/powershell.exe")
-        capabilities = cls.launch(cls.script)
-        output, error = capabilities.communicate('{"mode":"capabilities"}\n', timeout=45)
-        if error:
-            raise AssertionError("Speech metadata query emitted diagnostics")
-        cls.engines = json.loads(output).get("engines", [])
-        if not cls.engines:
-            raise unittest.SkipTest("No installed Microsoft desktop dictation language")
-
-    def test_audio_start_failures_are_redacted_without_opening_a_microphone(self):
-        for exception, expected in (("UnauthorizedAccessException", "permission"),
-                                    ("InvalidOperationException", "device")):
-            with self.subTest(error=expected):
-                self.assertEqual(self.script.count("engine.SetInputToDefaultAudioDevice();"), 1)
-                controlled = self.script.replace("engine.SetInputToDefaultAudioDevice();",
-                    'Action failInput = delegate { throw new ' + exception +
-                    '("private controlled detail"); }; failInput();')
-                capture = self.launch(controlled)
-                output, error = capture.communicate(json.dumps({"mode": "start", "engine": self.engines[0]["id"]}) + "\n", timeout=45)
-                self.assertFalse(error)
-                self.assertEqual(json.loads(output), {"error": expected})
-
-    def test_installed_engine_returns_editable_text_without_microphone(self):
-        script, launch, engines = self.script, self.launch, self.engines
-
-        with tempfile.TemporaryDirectory(prefix="sylvia-dictation-smoke-") as scratch:
-            wav = Path(scratch) / "controlled.wav"
-            synthesis = launch("""
-                $ErrorActionPreference='Stop'; Add-Type -AssemblyName System.Speech
-                $synth = New-Object System.Speech.Synthesis.SpeechSynthesizer
-                try {
-                    $synth.SetOutputToWaveFile([Console]::ReadLine())
-                    $synth.Speak('I walk north and open the door.')
-                } finally { $synth.Dispose() }
-            """)
-            _, error = synthesis.communicate(str(wav) + "\n", timeout=30)
-            self.assertEqual(synthesis.returncode, 0)
-            self.assertFalse(error)
-            with wave.open(str(wav)) as audio:
-                duration = audio.getnframes() / audio.getframerate()
-            self.assertEqual(script.count("engine.SetInputToDefaultAudioDevice();"), 1)
-            controlled = script.replace("engine.SetInputToDefaultAudioDevice();",
-                'engine.SetInputToWaveFile(@"' + str(wav).replace('"', '""') + '");')
-            capture = launch(controlled)
-            deadline = threading.Timer(45, capture.kill)
-            deadline.start()
-            try:
-                capture.stdin.write(json.dumps({"mode": "start", "engine": engines[0]["id"]}) + "\n")
-                capture.stdin.flush()
-                self.assertEqual(json.loads(capture.stdout.readline()), {"status": "recording"})
-                time.sleep(min(duration + 1, 10))
-                capture.stdin.write("stop\n")
-                capture.stdin.flush()
-                result = json.loads(capture.stdout.readline())
-                capture.wait(timeout=35)
-                self.assertFalse(capture.stderr.read())
-                self.assertIsInstance(result.get("text"), str)
-                self.assertRegex(result["text"].lower(), r"\b(walk|door|north)\b")
-                print("Controlled local recognition:", result["text"])
-            finally:
-                deadline.cancel()
-                if capture.poll() is None:
-                    capture.kill()
-                    capture.wait()
-                for pipe in (capture.stdin, capture.stdout, capture.stderr):
-                    pipe.close()
+    )
+    return 0
 
 
 if __name__ == "__main__":
-    unittest.main()
+    raise SystemExit(main())

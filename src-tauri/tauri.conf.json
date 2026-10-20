@@ -33,7 +33,15 @@
       "../licenses/RUST-STDLIB-LICENSE-MIT": "licenses/RUST-STDLIB-LICENSE-MIT",
       "../licenses/COVERED-SOURCE.zip": "licenses/COVERED-SOURCE.zip",
       "../licenses/COVERED-SOURCE-MAP.json": "licenses/COVERED-SOURCE-MAP.json",
-      "../licenses/COVERED-SOURCE-README.md": "licenses/COVERED-SOURCE-README.md"
+      "../licenses/COVERED-SOURCE-README.md": "licenses/COVERED-SOURCE-README.md",
+      "../licenses/dictation/README.md": "licenses/dictation/README.md",
+      "../licenses/dictation/HERMES-MIT.txt": "licenses/dictation/HERMES-MIT.txt",
+      "../licenses/dictation/FASTER-WHISPER-MIT.txt": "licenses/dictation/FASTER-WHISPER-MIT.txt",
+      "../licenses/dictation/WHISPER-MIT.txt": "licenses/dictation/WHISPER-MIT.txt",
+      "../licenses/dictation/CTRANSLATE2-MIT.txt": "licenses/dictation/CTRANSLATE2-MIT.txt",
+      "../licenses/dictation/FFMPEG-LGPLv3.txt": "licenses/dictation/FFMPEG-LGPLv3.txt",
+      "../licenses/dictation/GPLv3.txt": "licenses/dictation/GPLv3.txt",
+      "../licenses/dictation/PORTAUDIO-MIT.txt": "licenses/dictation/PORTAUDIO-MIT.txt"
     },
     "externalBin": [
       "binaries/sylvia-gm-owner"

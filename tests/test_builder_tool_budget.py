@@ -18,6 +18,8 @@ from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.application.builder_references import BuilderReferences
 from sylvia_gm.domain.errors import CommandRejected
 from sylvia_gm.provider._base import FakeProvider, ProviderResponse, ProviderStreamChunk, ToolCall
+from sylvia_gm.tools._spec import ToolSpec
+from sylvia_gm.tools._toolsets import ToolsetName
 
 
 class AuthoringProvider(FakeProvider):
@@ -175,6 +177,157 @@ async def test_builder_stops_one_unreadable_source_across_varied_calls_and_succe
     assert len([m for m in runner.history_snapshot() if m["role"] == "tool"]) == 5
     assert (tmp_path / "profile.md").read_text() == "Preserved authored character profile"
     assert not (tmp_path / "references/runtime.yaml").exists()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("streaming", [False, True])
+async def test_listing_an_unreadable_reference_does_not_count_as_recovery(tmp_path, streaming):
+    path = "ruleset/runtime/ruleset.yaml"
+
+    def unreadable(_path):
+        raise CommandRejected("Missing", code="package_file_unavailable")
+
+    references = BuilderReferences((path,), unreadable)
+    provider = AuthoringProvider(
+        responses=[
+            ProviderResponse(
+                tool_calls=[
+                    ToolCall(
+                        id=f"call-{i}",
+                        name="inspect_builder_references",
+                        arguments=json.dumps(
+                            {"action": "read" if i % 2 == 0 else "list", "path": path}
+                        ),
+                    )
+                ]
+            )
+            for i in range(12)
+        ]
+        + [ProviderResponse(content="Must not finish")]
+    )
+    runner = AgentRunner(
+        AgentMode.BUILDER_FREEFORM,
+        provider,
+        None,
+        project_root=tmp_path,
+        builder_application_tools=(_builder_reference_tool(references),),
+    )
+    with pytest.raises(AgentLoopError) as stopped:
+        if streaming:
+            await runner.turn_stream("Read the source", asyncio.Queue())
+        else:
+            await runner.turn("Read the source")
+    assert stopped.value.reason == "repeated_reference_failure"
+    assert len(provider.calls) == 5
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("streaming", [False, True])
+@pytest.mark.parametrize("later", ["ask_question", "publish_participant"])
+async def test_structural_reference_failure_blocks_later_batch_tools(tmp_path, streaming, later):
+    path = "ruleset/runtime/ruleset.yaml"
+
+    def corrupted(_path):
+        raise CommandRejected("Damaged", code="package_corrupt")
+
+    published = []
+
+    def publish(_params, _context):
+        published.append(True)
+        return {"success": True}
+
+    references = BuilderReferences((path,), corrupted)
+    tools = (
+        _builder_reference_tool(references),
+        ToolSpec(
+            name="publish_participant",
+            description="Save the character",
+            parameters=[],
+            handler=publish,
+            toolsets=frozenset({ToolsetName.BUILDER_TOOLS}),
+        ),
+    )
+    provider = AuthoringProvider(
+        responses=[
+            ProviderResponse(
+                tool_calls=[
+                    ToolCall(
+                        id="bad-source",
+                        name="inspect_builder_references",
+                        arguments=json.dumps({"action": "read", "path": path}),
+                    ),
+                    ToolCall(
+                        id="later",
+                        name=later,
+                        arguments=json.dumps(
+                            {"type": "text", "id": "question", "question": "Choose?"}
+                        ),
+                    ),
+                ]
+            ),
+            ProviderResponse(content="Must not finish"),
+        ]
+    )
+    runner = AgentRunner(
+        AgentMode.BUILDER_FREEFORM,
+        provider,
+        None,
+        project_root=tmp_path,
+        builder_application_tools=tools,
+    )
+    events = asyncio.Queue()
+    with pytest.raises(AgentLoopError) as stopped:
+        if streaming:
+            await runner.turn_stream("Create the character", events)
+        else:
+            await runner.turn("Create the character")
+    assert stopped.value.reason == "required_reference_unavailable"
+    assert len(provider.calls) == 1
+    assert published == []
+    assert not runner._pending_widget
+    observed = [events.get_nowait() for _ in range(events.qsize())]
+    assert not any((event.meta or {}).get("widget") for event in observed)
+    history = runner.history_snapshot()
+    requested = {call["id"] for message in history if message["role"] == "assistant"
+                 for call in message.get("tool_calls", [])}
+    returned = {message["tool_call_id"] for message in history if message["role"] == "tool"}
+    assert requested == returned
+    if streaming:
+        skipped = next(json.loads(m["content"]) for m in history
+                       if m.get("tool_call_id") == "later")
+        assert skipped == {"success": False, "code": "not_executed",
+                           "reason": "required_reference_unavailable"}
+    assert any(
+        json.loads(m["content"]).get("reason") == "package_corrupt"
+        for m in history
+        if m["role"] == "tool"
+    )
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("streaming", [False, True])
+async def test_a_real_successful_reference_read_allows_recovery(tmp_path, streaming):
+    path = "ruleset/runtime/ruleset.yaml"
+    reads = []
+
+    def recover(_path):
+        reads.append(_path)
+        if len(reads) != 3:
+            raise CommandRejected("Missing", code="package_file_unavailable")
+        return "Recovered legal starting choices"
+
+    provider = AuthoringProvider(responses=[ProviderResponse(tool_calls=[ToolCall(
+        id=f"read-{i}", name="inspect_builder_references",
+        arguments=json.dumps({"action": "read", "path": path}),
+    )]) for i in range(5)] + [ProviderResponse(content="Recovered")])
+    runner = AgentRunner(AgentMode.BUILDER_FREEFORM, provider, None, project_root=tmp_path,
+        builder_application_tools=(_builder_reference_tool(BuilderReferences((path,), recover)),))
+    if streaming:
+        await runner.turn_stream("Read the source", asyncio.Queue())
+    else:
+        assert (await runner.turn("Read the source")).dm_response == "Recovered"
+    assert len(provider.calls) == 6
+    assert len(reads) == 5
 
 
 def test_saved_builder_stops_oversized_reference_without_another_model_request(tmp_path):

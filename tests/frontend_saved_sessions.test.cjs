@@ -1202,7 +1202,7 @@ test('cancel during language discovery prevents native capture and keeps the dra
   assert.equal(h.calls.submissions.length, 0);
 });
 
-test('missing installed speech support leaves typing and explicit retry available', async () => {
+test('unavailable local speech leaves typing and explicit retry available', async () => {
   const h = harness();
   await h.openBuilderChat('a');
   let starts = 0;
@@ -1213,10 +1213,135 @@ test('missing installed speech support leaves typing and explicit retry availabl
   h.initDictation(); h.node('player-input').value = 'Keep this draft';
   await h.getDictation().start();
   assert.equal(h.getDictation().snapshot().phase, 'error');
-  assert.match(h.getDictation().snapshot().message, /Windows desktop speech language/);
+  assert.match(h.getDictation().snapshot().message, /Local dictation is unavailable/);
   assert.equal(starts, 0);
   assert.equal(h.node('player-input').disabled, false);
   assert.equal(h.node('player-input').value, 'Keep this draft');
+});
+
+test('missing local model offers explicit setup without capturing or sending the draft', async () => {
+  const h = harness(); await h.openBuilderChat('a');
+  let ready = false, starts = 0;
+  const preparation = deferred();
+  h.state.bridge.dictation_capabilities = async () => ({ ready, engines: [{ id: 'en', language: 'en' }],
+    devices: [{ id: 'default', label: 'System default: Test microphone' }] });
+  h.state.bridge.dictation_start = async () => { starts++; };
+  h.state.bridge.dictation_stop = async () => 'words';
+  h.state.bridge.dictation_cancel = async () => {};
+  h.state.bridge.dictation_prepare = () => preparation.promise;
+  h.initDictation(); h.node('player-input').value = 'Keep my typed action';
+  await h.getDictation().start();
+  assert.match(h.getDictation().snapshot().message, /Download the local speech model/);
+  assert.equal(h.node('dictation-options').open, true);
+  assert.equal(h.node('dictation-download').hidden, false);
+  h.node('dictation-download').dispatchEvent({ type: 'click' }); await h.flush();
+  assert.match(h.node('dictation-model-status').textContent, /Downloading/);
+  assert.equal(h.node('dictation-toggle').disabled, true);
+  assert.equal(h.node('player-input').disabled, false);
+  ready = true; preparation.resolve({ status: 'ready' }); await h.flush();
+  assert.match(h.node('dictation-model-status').textContent, /ready/);
+  assert.equal(starts, 0);
+  assert.equal(h.calls.submissions.length, 0);
+  assert.equal(h.node('player-input').value, 'Keep my typed action');
+  await h.getDictation().start(); assert.equal(starts, 1);
+  h.getDictation().cancel();
+});
+
+test('cancelling setup ignores late completion and keeps typing available', async () => {
+  const h = harness(); await h.openBuilderChat('a');
+  const preparation = deferred(), cancellations = [];
+  h.state.bridge.dictation_capabilities = async () => ({ ready: false, engines: [{ id: 'en', language: 'en' }] });
+  h.state.bridge.dictation_start = async () => { throw new Error('must not capture during setup'); };
+  h.state.bridge.dictation_stop = async () => '';
+  h.state.bridge.dictation_cancel = async id => cancellations.push(id);
+  h.state.bridge.dictation_prepare = () => preparation.promise;
+  h.initDictation(); h.node('player-input').value = 'My preserved draft';
+  await h.getDictation().start();
+  h.node('dictation-download').dispatchEvent({ type: 'click' }); await h.flush();
+  h.node('dictation-download').dispatchEvent({ type: 'click' }); await h.flush();
+  const before = h.node('dictation-model-status').textContent;
+  assert.match(before, /cancelled/);
+  preparation.resolve({ status: 'ready' }); await h.flush();
+  assert.equal(h.node('dictation-model-status').textContent, before);
+  assert.ok(cancellations.length >= 1);
+  assert.equal(h.node('player-input').disabled, false);
+  assert.equal(h.node('player-input').value, 'My preserved draft');
+  assert.equal(h.calls.submissions.length, 0);
+});
+
+test('explicit language and microphone selections reach the capture contract unchanged', async () => {
+  const h = harness(); await h.openBuilderChat('a'); const starts = [];
+  h.state.bridge.dictation_capabilities = async () => ({ ready: true,
+    engines: [{ id: 'auto', language: 'auto' }, { id: 'es', language: 'es' }],
+    devices: [{ id: 'default', label: 'System default' }, { id: 'd-2-test', label: 'Selected input' }] });
+  h.state.bridge.dictation_start = async (...args) => starts.push(args);
+  h.state.bridge.dictation_stop = async () => '';
+  h.state.bridge.dictation_cancel = async () => {};
+  h.initDictation();
+  h.node('dictation-language').value = 'es'; h.node('dictation-device').value = 'd-2-test';
+  await h.getDictation().start();
+  assert.equal(starts.length, 1);
+  assert.equal(starts[0][1], 'es'); assert.equal(starts[0][2], 'd-2-test');
+  h.getDictation().cancel();
+});
+
+test('a disappeared selected microphone is retained for explicit correction, never replaced by default', async () => {
+  const h = harness(); await h.openBuilderChat('a'); const starts = [];
+  h.state.bridge.dictation_capabilities = async () => ({ ready: true,
+    engines: [{ id: 'en', language: 'en' }], devices: [{ id: 'default', label: 'System default' }] });
+  h.state.bridge.dictation_start = async (...args) => { starts.push(args); throw 'device'; };
+  h.state.bridge.dictation_stop = async () => '';
+  h.state.bridge.dictation_cancel = async () => {};
+  h.initDictation(); h.node('player-input').value = 'Keep my correction';
+  h.node('dictation-device').value = 'd-2-unplugged';
+  await h.getDictation().start();
+  assert.equal(starts[0][2], 'd-2-unplugged');
+  assert.equal(h.node('dictation-device').value, 'd-2-unplugged');
+  assert.match(h.getDictation().snapshot().message, /selected microphone/);
+  assert.equal(h.node('player-input').value, 'Keep my correction');
+  assert.equal(h.calls.submissions.length, 0);
+});
+
+test('model download failure is redacted, preserves the draft and allows explicit retry', async () => {
+  const h = harness(); await h.openBuilderChat('a'); let attempts = 0, ready = false;
+  h.state.bridge.dictation_capabilities = async () => ({ ready, engines: [{ id: 'en', language: 'en' }] });
+  h.state.bridge.dictation_start = async () => { throw new Error('setup must not capture'); };
+  h.state.bridge.dictation_stop = async () => '';
+  h.state.bridge.dictation_cancel = async () => {};
+  h.state.bridge.dictation_prepare = async () => {
+    attempts++; if (attempts === 1) throw 'private network details'; ready = true; return { status: 'ready' };
+  };
+  h.initDictation(); h.node('player-input').value = 'Keep this action';
+  await h.getDictation().start();
+  h.node('dictation-download').dispatchEvent({ type: 'click' }); await h.flush();
+  assert.match(h.node('dictation-model-status').textContent, /download failed/);
+  assert.doesNotMatch(h.node('dictation-model-status').textContent, /private/);
+  assert.equal(h.node('player-input').value, 'Keep this action');
+  h.node('dictation-download').dispatchEvent({ type: 'click' }); await h.flush();
+  assert.equal(attempts, 2);
+  assert.match(h.node('dictation-model-status').textContent, /ready/);
+  assert.equal(h.calls.submissions.length, 0);
+});
+
+test('late readiness metadata cannot overwrite a cancelled setup state', async () => {
+  const h = harness(); await h.openBuilderChat('a'); const metadata = deferred(); let reads = 0;
+  h.state.bridge.dictation_capabilities = () => ++reads === 1
+    ? Promise.resolve({ ready: false, engines: [{ id: 'en', language: 'en' }] }) : metadata.promise;
+  h.state.bridge.dictation_start = async () => {};
+  h.state.bridge.dictation_stop = async () => '';
+  h.state.bridge.dictation_cancel = async () => {};
+  h.state.bridge.dictation_prepare = async () => ({ status: 'ready' });
+  h.initDictation(); h.node('player-input').value = 'Keep my draft';
+  await h.getDictation().start();
+  h.node('dictation-download').dispatchEvent({ type: 'click' }); await h.flush();
+  assert.equal(reads, 2);
+  h.node('dictation-download').dispatchEvent({ type: 'click' }); await h.flush();
+  const cancelled = h.node('dictation-model-status').textContent;
+  metadata.resolve({ ready: true, engines: [{ id: 'en', language: 'en' }] }); await h.flush();
+  assert.match(cancelled, /cancelled/);
+  assert.equal(h.node('dictation-model-status').textContent, cancelled);
+  assert.equal(h.node('player-input').value, 'Keep my draft');
+  assert.equal(h.calls.submissions.length, 0);
 });
 
 for (const accepted of [true, false]) for (const early of [true, false]) test(`Builder ${accepted ? 'accepted' : 'rejected'} steering preserves dictation ownership (${early ? 'during' : 'after'} request)`, async () => {

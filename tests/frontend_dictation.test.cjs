@@ -32,6 +32,42 @@ function fixture(text = 'I open the door.') {
   };
 }
 
+test('idle startup and repeated no-op cancellation stay silent without touching the draft', () => {
+  const f = fixture('Keep this typed draft');
+  assert.equal(f.api.snapshot().message, '');
+  f.api.cancel(); f.api.cancel(); f.api.sync();
+  assert.equal(f.api.snapshot().message, '');
+  assert.equal(f.value, 'Keep this typed draft');
+  assert.equal(f.requests, 0); assert.equal(f.cancels, 0);
+});
+
+test('real cancellation is announced once, then typing and a new capture replace the notice', async () => {
+  const f = fixture(); await f.record(); f.api.cancel();
+  assert.match(f.api.snapshot().message, /Dictation cancelled/);
+  const notices = f.states.length;
+  f.api.cancel(); f.api.cancel();
+  assert.equal(f.states.length, notices);
+  f.type('A normal typed correction.');
+  assert.equal(f.api.snapshot().message, '');
+  assert.equal(f.value, 'A normal typed correction.');
+  await f.api.start();
+  assert.equal(f.api.snapshot().phase, 'recording');
+  assert.match(f.api.snapshot().message, /^Recording/);
+  f.api.cancel('', { announce: false });
+  assert.equal(f.api.snapshot().message, '');
+});
+
+test('session transitions release real capture and clear old notices without claiming user cancellation', async () => {
+  const f = fixture(); await f.record(); f.switch();
+  assert.equal(f.cancels, 1);
+  assert.equal(f.api.snapshot().phase, 'idle');
+  assert.equal(f.api.snapshot().message, '');
+  assert.equal(f.value, 'Other draft');
+  const second = fixture(); await second.record(); second.api.cancel(); second.switch();
+  assert.equal(second.api.snapshot().message, '');
+  assert.equal(second.value, 'Other draft');
+});
+
 test('explicit start/stop inserts at selection once and offers undo without submitting', async () => {
   const f = fixture('I open the door.'); f.select(7, 16);
   const first = f.api.start();

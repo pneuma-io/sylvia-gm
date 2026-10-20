@@ -84,6 +84,18 @@ test('Builder reference failures explain source access instead of rejecting char
   }
 });
 
+test('a skipped publication explains that it did not run after the blocked source', () => {
+  const content={tool_name:'publish_participant_artifact',result:{success:false,
+    code:'not_executed',reason:'required_reference_unavailable',error:'PRIVATE DETAIL'}};
+  const before=JSON.stringify(content);
+  const html=app().toolResultMarkup(content,'');
+  assert.match(html,/action did not run/);
+  assert.match(html,/source could not be read/);
+  assert.match(html,/Saved work is kept/);
+  assert.doesNotMatch(html,/PRIVATE DETAIL|unavailable with these choices/);
+  assert.equal(JSON.stringify(content),before);
+});
+
 test('old saved checks retain recorded values in the shared card, without a legacy renderer or arithmetic', () => {
   const content = { tool_name: 'd20_test', parameters: { skill: 'survival', target_number: 14 },
     result: { context: { _outcome: 'failure', _adjusted_total: 99,

@@ -15,7 +15,7 @@ async function withComposer(check) {
     page.on('pageerror', error => errors.push(error.message));
     await page.route('https://dictation.test/**', async route => {
       const name = new URL(route.request().url()).pathname.slice(1) || 'app.html';
-      const allowed = ['app.html', 'app.css', 'app.js', 'dictation.js', 'panel-workspace.js',
+      const allowed = ['app.html', 'app.css', 'app.js', 'dictation.js', 'tile-table.css', 'tile-faces.js', 'tile-table.js', 'panel-workspace.js',
         'panel-host.js', 'shot-playback.js', 'piece-table.js', 'campaign-plan-browser.js', 'assets/sylvia-portrait.png'];
       if (!allowed.includes(name)) return route.abort();
       let body = fs.readFileSync(path.join(frontend, name));
@@ -38,9 +38,13 @@ async function withComposer(check) {
       state.campaigns = [{ campaign_id: 'fixture', lifecycle: 'active', turn_id: 'turn-fixture',
         sessions: [{ session_id: 'fixture-gm', role: 'dm', status: 'active', provider_id: 'test', model_id: 'fixture' }] }];
       window.submissions = []; window.cancelled = []; window.nextTranscript = 'I walk north.';
+      window.modelReady = false; window.captureStarts = 0;
       state.bridge = {
-        dictation_capabilities: async () => ({ engines: [{ id: 'test', language: 'en-GB', label: 'English (United Kingdom)' }] }),
-        dictation_start: async (id, engine) => { window.captureId = id; window.selectedSpeechEngine = engine; },
+        dictation_capabilities: async () => ({ ready: window.modelReady,
+          engines: [{ id: 'test', language: 'en-GB', label: 'English (United Kingdom)' }],
+          devices: [{ id: 'default', label: 'System default: Controlled input' }] }),
+        dictation_prepare: () => new Promise(resolve => { window.finishModelDownload = () => { window.modelReady = true; resolve({ status: 'ready' }); }; }),
+        dictation_start: async (id, engine) => { window.captureStarts++; window.captureId = id; window.selectedSpeechEngine = engine; },
         dictation_stop: () => new Promise(resolve => { window.finishDictation = resolve; }),
         dictation_cancel: async id => { window.cancelled.push(id); },
         submit_session_input: command => {
@@ -59,6 +63,31 @@ async function withComposer(check) {
 test('keyboard dictation reviews text and ordinary Send submits exactly once', { timeout: 30000 }, async () => {
   await withComposer(async page => {
     const input = page.locator('#player-input'), mic = page.getByRole('button', { name: 'Start dictation', exact: true });
+    assert.equal(await page.locator('#dictation-status').isVisible(), false);
+    assert.equal(await page.locator('#dictation-status').textContent(), '');
+    await input.fill('I wait.');
+    await mic.press('Enter');
+    await page.waitForFunction(() => document.getElementById('dictation-status').textContent.includes('Download the local speech model'));
+    assert.equal(await page.evaluate(() => window.captureStarts), 0);
+    const download = page.getByRole('button', { name: 'Download local speech model', exact: true });
+    await download.press('Enter');
+    await page.getByRole('button', { name: 'Cancel model download', exact: true }).waitFor();
+    await input.fill('Typed during setup.');
+    assert.equal(await mic.isDisabled(), true);
+    await page.keyboard.press('Escape');
+    assert.equal(await input.inputValue(), 'Typed during setup.');
+    await download.press('Enter');
+    await page.evaluate(() => window.finishModelDownload());
+    await page.waitForFunction(() => document.getElementById('dictation-model-status').textContent.includes('ready'));
+    assert.equal(await page.evaluate(() => window.captureStarts), 0);
+    assert.equal(await page.evaluate(() => window.submissions.length), 0);
+    assert.equal(await input.inputValue(), 'Typed during setup.');
+    assert.equal(await page.locator('#dictation-status').isVisible(), false);
+    await page.setViewportSize({ width: 1000, height: 640 });
+    await page.getByLabel('Microphone', { exact: true }).scrollIntoViewIfNeeded();
+    assert.equal(await page.getByLabel('Microphone', { exact: true }).isVisible(), true);
+    await page.setViewportSize({ width: 1400, height: 900 });
+    await page.locator('#dictation-options summary').click();
     await input.fill('I wait.');
     await input.press('Alt+m');
     await page.getByRole('button', { name: 'Stop dictation', exact: true }).waitFor();
@@ -88,9 +117,22 @@ test('keyboard dictation reviews text and ordinary Send submits exactly once', {
 
     await mic.focus(); await page.keyboard.press('Enter');
     await page.getByRole('button', { name: 'Stop dictation', exact: true }).waitFor();
+    await page.evaluate(() => {
+      window.statusMutations = 0;
+      window.statusObserver = new MutationObserver(records => { window.statusMutations += records.length; });
+      window.statusObserver.observe(document.getElementById('dictation-status'), { childList: true });
+    });
     await page.keyboard.press('Escape');
     assert.equal(await input.inputValue(), 'I wait outside.');
     assert.equal(await mic.getAttribute('aria-pressed'), 'false');
+    assert.match(await page.locator('#dictation-status').innerText(), /Dictation cancelled/);
+    const announcements = await page.evaluate(async () => {
+      window.dictationTest.refreshSessionInputAdmission(); window.dictationTest.refreshSessionInputAdmission();
+      await Promise.resolve(); window.statusObserver.disconnect(); return window.statusMutations;
+    });
+    assert.equal(announcements, 1, 'ordinary redraws must not repeat an accessible cancellation announcement');
+    await input.fill('I wait outside.');
+    assert.equal(await page.locator('#dictation-status').isVisible(), false);
 
     await page.evaluate(() => {
       const bridge = window.dictationTest.state.bridge;
@@ -113,6 +155,7 @@ test('keyboard dictation reviews text and ordinary Send submits exactly once', {
     });
     assert.equal(await input.inputValue(), 'The other campaign draft.');
     assert.equal(await page.locator('#dictation-review-panel').isVisible(), false);
+    assert.equal(await page.locator('#dictation-status').isVisible(), false);
     await page.evaluate(() => {
       const api = window.dictationTest;
       api.state.activeCampaignId = 'fixture'; api.state.activeSessionId = 'fixture-gm';
@@ -161,6 +204,8 @@ test('dictation during piece confirmation stays in the draft and ordinary Send c
   await withComposer(async page => {
     await page.evaluate(() => {
       const api = window.dictationTest;
+      // Model preparation is covered by the preceding test; this journey starts ready.
+      window.modelReady = true;
       api.state.activeSnapshot = { revision: 4 };
       Object.assign(api.state.bridge, {
         snapshot: async () => ({ revision: 4 }),

@@ -115,27 +115,88 @@ const SylviaGMFrontend = (() => {
   const $ = (id) => document.getElementById(id);
   let dictation = null;
   let dictationRevision = 0;
-  let dictationEngines = null;
+  let dictationModelJob = null;
+  let dictationOptionsEpoch = 0;
+  function savedDictationChoice(name) {
+    try { return localStorage.getItem(`sylvia-dictation-${name}`) || ''; } catch (_) { return ''; }
+  }
 
-  // Discovery reads installed language metadata only; capture still needs explicit Start.
-  async function dictationEngine(bridge) {
+  // Metadata/readiness never starts audio or downloads a model.
+  async function refreshDictationOptions(bridge) {
     if (!bridge.dictation_capabilities) throw { code: 'unavailable' };
-    if (!dictationEngines) {
+      const epoch = dictationOptionsEpoch;
       const capabilities = await bridge.dictation_capabilities();
+      if (epoch !== dictationOptionsEpoch) return capabilities;
       const engines = capabilities?.engines;
       if (!Array.isArray(engines) || !engines.length) throw { code: 'unavailable' };
-      dictationEngines = engines;
       const select = $('dictation-language');
+      const saved = select.value || savedDictationChoice('language');
       select.replaceChildren(...engines.map(engine => {
         const option = document.createElement('option');
         option.value = engine.id; option.textContent = engine.label || engine.language;
         return option;
       }));
-      const preferred = engines.find(engine => engine.language === navigator.language);
+      const preferred = engines.find(engine => engine.id === saved) || engines.find(engine =>
+        engine.language === navigator.language || engine.language === (navigator.language || '').split('-')[0]);
       select.value = (preferred || engines[0]).id;
+      const device = $('dictation-device'), selectedDevice = device.value || savedDictationChoice('device');
+      const devices = capabilities.devices || [{ id: 'default', label: 'System default input' }];
+      if (selectedDevice && selectedDevice !== 'default' && !devices.some(item => item.id === selectedDevice)) {
+        devices.push({ id: selectedDevice, label: 'Selected microphone unavailable — choose an input' });
+      }
+      device.replaceChildren(...devices.map(item => {
+        const option = document.createElement('option'); option.value = item.id; option.textContent = item.label; return option;
+      }));
+      device.value = devices.some(item => item.id === selectedDevice) ? selectedDevice : 'default';
+      $('dictation-download').hidden = capabilities.ready !== false;
+      $('dictation-model-status').textContent = capabilities.ready === false
+        ? 'The local speech model is not downloaded. Download it once before dictating; no audio is sent.'
+        : 'Local speech model ready. Recognition runs on CPU on this PC.';
       $('dictation-options').hidden = false;
-    }
+      return capabilities;
+  }
+
+  async function dictationEngine(bridge) {
+    const capabilities = await refreshDictationOptions(bridge);
+    if (capabilities.ready === false) { $('dictation-options').open = true; throw { code: 'model' }; }
     return $('dictation-language').value;
+  }
+
+  function cancelDictationDownload() {
+    if (!dictationModelJob) return;
+    const { id, bridge } = dictationModelJob; dictationModelJob = null;
+    dictationOptionsEpoch += 1;
+    void Promise.resolve(bridge.dictation_cancel(id)).catch(() => {});
+    $('dictation-model-status').textContent = 'Model download cancelled. Your draft is kept. You can retry.';
+    $('dictation-download').textContent = 'Download local speech model';
+    renderDictation();
+  }
+
+  async function prepareDictationModel() {
+    if (dictationModelJob) { cancelDictationDownload(); return; }
+    const bridge = state.bridge;
+    if (!bridge?.dictation_prepare || !bridge.dictation_cancel) return;
+    const job = { id: crypto.randomUUID(), bridge }; dictationModelJob = job;
+    dictationOptionsEpoch += 1;
+    $('dictation-model-status').textContent = 'Downloading the local speech model (about 148 MB). No audio is sent. You can cancel or keep typing.';
+    $('dictation-download').textContent = 'Cancel model download';
+    renderDictation();
+    try {
+      await bridge.dictation_prepare(job.id);
+      if (dictationModelJob !== job) return;
+      await refreshDictationOptions(bridge);
+      if (dictationModelJob === job) dictation.clearError();
+    } catch (error) {
+      if (dictationModelJob !== job) return;
+      $('dictation-model-status').textContent = (typeof error === 'string' ? error : error?.code) === 'storage'
+        ? 'Not enough space for the speech model. Free some space and retry. Your draft is kept.'
+        : 'Speech model download failed. Check your connection and retry. Your draft is kept.';
+    } finally {
+      if (dictationModelJob === job) {
+        dictationModelJob = null;
+        $('dictation-download').textContent = 'Download local speech model'; renderDictation();
+      }
+    }
   }
 
   // Dictation edits this composer only; the normal Send path owns all submissions.
@@ -158,7 +219,7 @@ const SylviaGMFrontend = (() => {
         try {
           const engine = await dictationEngine(bridge);
           if (signal.aborted) throw { code: 'unavailable' };
-          await bridge.dictation_start(id, engine);
+          await bridge.dictation_start(id, engine, $('dictation-device').value || 'default');
           if (signal.aborted) { cancel(); throw { code: 'unavailable' }; }
           return { stop: () => bridge.dictation_stop(id), cancel: () => {
             signal.removeEventListener('abort', cancel); cancel();
@@ -182,6 +243,17 @@ const SylviaGMFrontend = (() => {
       changed: renderDictation,
     });
     $('dictation-toggle').addEventListener('click', toggleDictation);
+    $('dictation-options').addEventListener('toggle', () => {
+      if ($('dictation-options').open && !dictationModelJob) {
+        void refreshDictationOptions(state.bridge).catch(() => {
+          $('dictation-model-status').textContent = 'Local speech is unavailable. Reinstall the updated Sylvia application, or keep typing.';
+        });
+      }
+    });
+    $('dictation-download').addEventListener('click', () => { void prepareDictationModel(); });
+    for (const name of ['language', 'device']) $('dictation-' + name).addEventListener('change', () => {
+      try { localStorage.setItem(`sylvia-dictation-${name}`, $('dictation-' + name).value); } catch (_) { /* Input works without storage. */ }
+    });
     $('dictation-cancel').addEventListener('click', () => {
       dictation.cancel(); $('dictation-toggle').focus();
     });
@@ -194,11 +266,13 @@ const SylviaGMFrontend = (() => {
       if (event.altKey && !event.ctrlKey && !event.metaKey && event.key.toLowerCase() === 'm' &&
           !$('dictation-toggle').disabled) {
         event.preventDefault(); toggleDictation();
+      } else if (event.key === 'Escape' && dictationModelJob) {
+        event.preventDefault(); cancelDictationDownload();
       } else if (event.key === 'Escape' && ['requesting', 'recording', 'transcribing'].includes(dictation.snapshot().phase)) {
         event.preventDefault(); dictation.cancel(); $('dictation-toggle').focus();
       }
     });
-    window.addEventListener('pagehide', () => dictation.cancel());
+    window.addEventListener('pagehide', () => { dictation.cancel('', { announce: false }); cancelDictationDownload(); });
   }
 
   function toggleDictation() {
@@ -213,13 +287,15 @@ const SylviaGMFrontend = (() => {
     const recording = value.phase === 'recording';
     const enabled = !$('player-input').disabled && state.view === 'session';
     $('dictation-toggle').disabled = (!enabled && !recording) ||
-      ['requesting', 'transcribing'].includes(value.phase);
+      ['requesting', 'transcribing'].includes(value.phase) || Boolean(dictationModelJob);
     $('dictation-toggle').setAttribute('aria-pressed', String(recording));
     $('dictation-toggle').setAttribute('aria-label', recording ? 'Stop dictation' : 'Start dictation');
     $('dictation-toggle-text').textContent = recording ? 'Stop dictation' : 'Dictate';
-    $('dictation-status').textContent = value.message;
+    if ($('dictation-status').textContent !== value.message) $('dictation-status').textContent = value.message;
     $('dictation-status').hidden = value.phase === 'idle' && !value.message;
     $('dictation-language').disabled = busy;
+    $('dictation-device').disabled = busy || Boolean(dictationModelJob);
+    $('dictation-download').disabled = busy;
     $('dictation-cancel').hidden = !busy && !value.transcript;
     $('dictation-undo').hidden = !value.canUndo || busy || !enabled;
     $('dictation-redo').hidden = !value.canUndo || busy || !enabled;
@@ -819,7 +895,8 @@ const SylviaGMFrontend = (() => {
     return {
       application_info: () => invoke('application_info'),
       dictation_capabilities: () => invoke('dictation_capabilities'),
-      dictation_start: (id, engine) => invoke('dictation_start', { id, engine }),
+      dictation_start: (id, engine, device) => invoke('dictation_start', { id, engine, device }),
+      dictation_prepare: id => invoke('dictation_prepare', { id }),
       dictation_stop: (id) => invoke('dictation_stop', { id }),
       dictation_cancel: (id) => invoke('dictation_cancel', { id }),
       campaign_index: () => invoke('campaign_index'),
@@ -3762,7 +3839,7 @@ const SylviaGMFrontend = (() => {
   }
 
   function showHome() {
-    dictation?.cancel();
+    dictation?.cancel('', { announce: false });
     state.displayHistory = null;
     cancelCampaignOpening();
     gamePanels().leave();
@@ -7735,6 +7812,10 @@ const SylviaGMFrontend = (() => {
     const status = String(result.status || content && content.status || '');
     const failed = ['failed', 'error'].includes(status);
     const rejected = status === 'rejected' || (!failed && result.success === false);
+    if (result.success === false && result.code === 'not_executed' &&
+        ['required_reference_unavailable', 'repeated_reference_failure'].includes(result.reason)) {
+      return { feedback: true, summary: 'This action did not run because a selected source could not be read. Saved work is kept.' };
+    }
     if (rejected && ['check_participant_draft', 'publish_participant_artifact',
       'check_character_profile_draft', 'publish_character_profile'].includes(toolName)) {
       return { feedback: true, summary: participantRejectionDetail(result) };
@@ -11458,7 +11539,7 @@ const SylviaGMFrontend = (() => {
     if (activityIsWorking(activity) && sessionRole === 'builder') {
       if (!state.bridge.steer_session || activity.stopRequestedAttemptId || !text.trim()) return;
       if (selectedActivityMatches(activity)) {
-        dictation?.cancel('Dictation stopped. Your message uses the ordinary Send action.');
+        dictation?.cancel('', { announce: false });
       }
       saveSelectedSessionDraft();
       try {
@@ -11502,7 +11583,7 @@ const SylviaGMFrontend = (() => {
         ? activity.retryBasis?.interruption_id || null : null,
     };
     if (!playerAction && !builderStart && !campaignEndingChoice && !compact && state.activeSessionId === sessionId) {
-      dictation?.cancel('Dictation stopped. Your message uses the ordinary Send action.');
+      dictation?.cancel('', { announce: false });
     }
     if (state.activeSessionId === sessionId) {
       setWebResearchPermission(false);

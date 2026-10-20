@@ -8,8 +8,14 @@
 
   const failures = {
     permission: 'Microphone permission was denied. Allow microphone access, then try again. Your draft is kept.',
-    device: 'No microphone is available. Connect a microphone, then try again. Your draft is kept.',
-    unavailable: 'Local dictation is unavailable. Check that a Windows desktop speech language is installed, or keep typing. Your draft is kept.',
+    device: 'The selected microphone could not be opened. Check the device and Windows microphone access in Settings, then try again. Your draft is kept.',
+    unavailable: 'Local dictation is unavailable. Check dictation settings, or keep typing. Your draft is kept.',
+    runtime: 'The local speech runtime is unavailable. Reinstall the updated Sylvia application, or keep typing. Your draft is kept.',
+    model: 'Download the local speech model in dictation settings, then try again. Your draft is kept.',
+    download: 'The local speech model could not be downloaded. Check your connection and retry in dictation settings. Your draft is kept.',
+    storage: 'There is not enough space for the local speech model. Free some space and retry. Your draft is kept.',
+    language: 'The selected speech language is unavailable. Choose a supported language or automatic detection. Your draft is kept.',
+    busy: 'Local speech setup is already in progress. Wait or cancel it before dictating. Your draft is kept.',
     provider: 'Transcription failed. Try dictating again. Your draft is kept.',
     empty: 'No speech was recognised. Try dictating again. Your draft is kept.',
     timeout: 'Dictation timed out and the microphone was stopped. Try again. Your draft is kept.',
@@ -21,12 +27,19 @@
     let active = null;
     let review = null;
     let undo = null;
-    let status = { phase: 'idle', message: 'Dictate a message, then review it before Send.' };
+    let status = { phase: 'idle', message: '' };
+    let statusContext = context();
+    let noticeRevision = null;
 
     const snapshot = () => ({ ...status, transcript: review?.text || '',
       canUndo: Boolean(undo && undo.context === context() && undo.after === draft().text &&
         undo.revision === draft().revision) });
-    const publish = (phase, message) => { status = { phase, message }; changed(snapshot()); };
+    const publish = (phase, message) => {
+      status = { phase, message };
+      statusContext = context();
+      noticeRevision = phase === 'idle' && message ? draft().revision : null;
+      changed(snapshot());
+    };
     const current = (attempt) => active === attempt && attempt.context === context();
     const release = (attempt) => {
       clear(attempt.timer);
@@ -44,19 +57,26 @@
       attempt.timer = timer(() => fail(attempt, 'timeout'), duration);
     };
 
-    function cancel(message = 'Dictation cancelled. Your draft is kept.') {
+    function cancel(message = 'Dictation cancelled. Your draft is kept.', { announce = true } = {}) {
       const attempt = active;
+      const hadWork = Boolean(active || review);
       active = null;
       review = null;
       if (attempt) release(attempt);
-      publish('idle', message);
+      // Cleanup runs on ordinary navigation and Send too; only a real user cancel needs feedback.
+      if (announce && !hadWork) return;
+      if (hadWork || status.phase !== 'idle' || status.message || statusContext !== context()) {
+        publish('idle', announce ? message : '');
+      }
     }
 
     function sync() {
       if ((active && active.context !== context()) || (review && review.context !== context()) ||
-          (undo && undo.context !== context())) {
+          (undo && undo.context !== context()) || statusContext !== context()) {
         undo = null;
-        cancel('Dictation stopped after leaving the message. Your draft is kept.');
+        cancel('', { announce: false });
+      } else if (noticeRevision !== null && noticeRevision !== draft().revision) {
+        publish('idle', '');
       } else changed(snapshot());
     }
 
@@ -101,7 +121,7 @@
       const attempt = active;
       if (!attempt?.capture || status.phase !== 'recording') return;
       publish('transcribing', 'Transcribing. The microphone is stopping. You can cancel or keep typing.');
-      deadline(attempt, 60000);
+      deadline(attempt, 120000);
       try {
         const result = await attempt.capture.stop();
         if (!current(attempt)) { release(attempt); return; }
@@ -133,7 +153,11 @@
       publish('idle', 'Dictation undone. Your previous draft is restored.');
     }
 
-    return { start, stop, cancel, sync, snapshot, insertReview, undo: undoInsertion };
+    function clearError(message = '') {
+      if (!active && status.phase === 'error') publish('idle', message);
+    }
+
+    return { start, stop, cancel, sync, snapshot, insertReview, undo: undoInsertion, clearError };
   }
 
   return { create };

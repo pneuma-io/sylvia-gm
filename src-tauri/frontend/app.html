@@ -178,13 +178,17 @@
         <textarea id="player-input" rows="2" placeholder="Type your action…"
                   aria-label="In-character message or action" autocomplete="off" disabled></textarea>
         <div class="dictation-feedback" id="dictation-feedback">
-          <details id="dictation-options" hidden>
+          <details id="dictation-options">
             <summary>On-device dictation settings</summary>
-            <p id="dictation-privacy">Windows dictation runs on this PC. Sylvia does not save recordings or send audio to a service.
+            <p id="dictation-privacy">Whisper base transcribes speech on this PC. Download the local model once (about 148 MB).
+              Sylvia does not save recordings or send audio to a service.
               Review the text before Send; your chat model receives only the message you send.</p>
-            <label id="dictation-language-field" for="dictation-language">Speech language
-              <select id="dictation-language" aria-describedby="dictation-privacy"></select>
-            </label>
+            <p id="dictation-model-status" role="status" aria-live="polite">Open these settings to check the local speech model.</p>
+            <button id="dictation-download" type="button" class="btn btn-secondary btn-sm" hidden>Download local speech model</button>
+            <label id="dictation-language-field" for="dictation-language">Speech language</label>
+            <select id="dictation-language" aria-describedby="dictation-privacy"></select>
+            <label for="dictation-device">Microphone</label>
+            <select id="dictation-device" aria-describedby="dictation-privacy"></select>
           </details>
           <p id="dictation-status" role="status" aria-live="polite" aria-atomic="true" hidden></p>
           <div id="dictation-review-panel" hidden>
@@ -215,7 +219,7 @@
           <div class="composer-actions">
             <button id="dictation-toggle" class="btn btn-secondary btn-sm" type="button" disabled
                     aria-label="Start dictation" aria-pressed="false" aria-keyshortcuts="Alt+M"
-                    aria-describedby="dictation-status dictation-privacy" title="On-device Windows dictation (Alt+M). Review text before Send.">
+                    aria-describedby="dictation-status dictation-privacy" title="Local dictation (Alt+M). Review text before Send.">
               <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg>
               <span id="dictation-toggle-text" class="visually-hidden">Dictate</span>
             </button>

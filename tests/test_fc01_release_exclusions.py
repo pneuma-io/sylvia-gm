@@ -376,6 +376,10 @@ def test_actual_sidecar_arguments_cover_all_synthetic_directory_sentinels(tmp_pa
     put(tmp_path, "config/unselected-private.yaml")
     put(tmp_path, "src/sylvia_gm/campaign/the-rift-awakening.json", "{}")
     put(tmp_path, "private/not-in-any-source.jsonl")
+    for name in module._DICTATION_NOTICES:
+        put(tmp_path, "licenses/dictation/" + name, "Synthetic selected speech notice")
+    put(tmp_path, "src-tauri/scripts/hooks/hook-sounddevice.py", "# synthetic hook")
+    put(tmp_path, "licenses/dictation/private-note.txt", "Must not ship")
     calls = []
 
     def fake_run(command, *, cwd, env, check):
@@ -393,6 +397,7 @@ def test_actual_sidecar_arguments_cover_all_synthetic_directory_sentinels(tmp_pa
             "SYLVIA_KEEP_OWNER_BUILD": "1",  # This test inspects staged payloads after return.
         }),
         patch.object(module.subprocess, "run", fake_run),
+        patch.object(module, "version", module._DICTATION_VERSIONS.__getitem__),
         contextlib.redirect_stdout(io.StringIO()),
     ):
         assert module.main() == 0
@@ -429,6 +434,8 @@ def test_actual_sidecar_arguments_cover_all_synthetic_directory_sentinels(tmp_pa
     assert legitimate_destinations.issubset(included)
     assert "config/unselected-private.yaml" not in included
     assert "private/not-in-any-source.jsonl" not in included
+    assert "licenses/dictation/private-note.txt" not in included
+    assert {"licenses/dictation/" + name for name in module._DICTATION_NOTICES}.issubset(included)
     staged_directories = [x["source"] for x in selectors if x["kind"] == "directory"]
     assert len(staged_directories) == 4
     assert all(path.startswith(".owner-build/") for path in staged_directories)

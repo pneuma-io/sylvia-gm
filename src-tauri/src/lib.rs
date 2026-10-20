@@ -467,14 +467,22 @@ async fn dictation_capabilities(window: WebviewWindow) -> Result<Value, String> 
 }
 
 #[tauri::command]
-async fn dictation_start(window: WebviewWindow, id: String, engine: String) -> Result<(), String> {
+async fn dictation_start(window: WebviewWindow, id: String, engine: String, device: Option<String>) -> Result<(), String> {
     trusted_caller(&window)?;
     let app = window.app_handle().clone();
     tauri::async_runtime::spawn_blocking(move || {
-        app.state::<dictation::Dictation>().start(&id, &engine)
+        app.state::<dictation::Dictation>().start(&id, &engine, device.as_deref().unwrap_or("default"))
     })
     .await
     .map_err(|_| "unavailable".to_string())?
+}
+
+#[tauri::command]
+async fn dictation_prepare(window: WebviewWindow, id: String) -> Result<Value, String> {
+    trusted_caller(&window)?;
+    let app = window.app_handle().clone();
+    tauri::async_runtime::spawn_blocking(move || app.state::<dictation::Dictation>().prepare(&id))
+        .await.map_err(|_| "download".to_string())?
 }
 
 #[tauri::command]
@@ -2553,7 +2561,6 @@ pub fn run() {
     }
     builder
         .manage(PanelWindows::default())
-        .manage(dictation::Dictation::default())
         .manage(panel_drag::PanelDrags::default())
         .setup(move |app| {
             let database = desktop_storage::database_path(
@@ -2568,6 +2575,7 @@ pub fn run() {
             .map_err(std::io::Error::other)?;
             if let Some(parent) = database.parent() {
                 std::fs::create_dir_all(parent)?;
+                app.manage(dictation::Dictation::new(parent.join("dictation-models/base-ebe41f70")));
             }
             let bridge = OwnerBridge::spawn_default(&database, portable.is_some()).map_err(|error| {
                 rfd::MessageDialog::new()
@@ -2612,6 +2620,7 @@ pub fn run() {
             panel_drag::finish_panel_drag,
             application_info,
             dictation_capabilities,
+            dictation_prepare,
             dictation_start,
             dictation_stop,
             dictation_cancel,

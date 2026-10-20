@@ -98,44 +98,52 @@ class _BuilderLoopBudget:
 
     def before_round(self, messages: list[dict[str, Any]], iteration: int) -> None:
         if iteration and iteration % self.rounds_per_segment == 0:
-            messages.append({
-                "role": "system",
-                "content": (
-                    "Sylvia Builder automatic continuation of the current user request. "
-                    f"{self.total_rounds - iteration} model/tool rounds remain. "
-                    "Reuse references and completed tool results already in this conversation. "
-                    "Do not repeat committed writes or publication. Prioritize the remaining "
-                    "authoring, validation and requested save. Ask only for missing user choices; "
-                    "if blocked, explain the specific unresolved problem."
-                ),
-            })
+            messages.append(
+                {
+                    "role": "system",
+                    "content": (
+                        "Sylvia Builder automatic continuation of the current user request. "
+                        f"{self.total_rounds - iteration} model/tool rounds remain. "
+                        "Reuse references and completed tool results already in this conversation. "
+                        "Do not repeat committed writes or publication. Prioritize the remaining "
+                        "authoring, validation and requested save. "
+                        "Ask only for missing user choices; "
+                        "if blocked, explain the specific unresolved problem."
+                    ),
+                }
+            )
+
+    def finish_tool(self, call: dict[str, Any], result: Any) -> None:
+        """Stop blocked source work before another tool can act on it."""
+        name = call["function"]["name"]
+        if name not in {"inspect_builder_references", "copy_builder_reference"}:
+            return
+        arguments = call["function"]["arguments"]
+        if isinstance(arguments, str):
+            try:
+                arguments = json.loads(arguments or "{}")
+            except json.JSONDecodeError:
+                return
+        if not isinstance(arguments, dict) or not isinstance(result, dict):
+            return
+        if name == "inspect_builder_references" and arguments.get("action") not in {"read", "find"}:
+            return
+        path = arguments.get("source_path" if name == "copy_builder_reference" else "path")
+        if not isinstance(path, str):
+            return
+        if result.get("success") is False and result.get("reason") in {
+            "package_file_oversized",
+            "package_corrupt",
+        }:
+            raise AgentLoopError(self.total_rounds, reason="required_reference_unavailable")
+        if result.get("success") is True:
+            self.unreadable_references.pop(path, None)
+        elif result.get("code") in {"reference_unavailable", "reference_copy_unavailable"}:
+            self.unreadable_references[path] = self.unreadable_references.get(path, 0) + 1
+            if self.unreadable_references[path] >= 3:
+                raise AgentLoopError(self.total_rounds, reason="repeated_reference_failure")
 
     def finish_round(self, calls: list[dict[str, Any]], results: list[Any]) -> None:
-        for call, result in zip(calls, results, strict=True):
-            name = call["function"]["name"]
-            if name not in {"inspect_builder_references", "copy_builder_reference"}:
-                continue
-            arguments = call["function"]["arguments"]
-            if isinstance(arguments, str):
-                try:
-                    arguments = json.loads(arguments or "{}")
-                except json.JSONDecodeError:
-                    continue
-            if not isinstance(arguments, dict) or not isinstance(result, dict):
-                continue
-            path = arguments.get("source_path" if name == "copy_builder_reference" else "path")
-            if not isinstance(path, str):
-                continue
-            if result.get("success") is False and result.get("reason") in {
-                "package_file_oversized", "package_corrupt",
-            }:
-                raise AgentLoopError(self.total_rounds, reason="required_reference_unavailable")
-            if result.get("success") is True:
-                self.unreadable_references.pop(path, None)
-            elif result.get("code") in {"reference_unavailable", "reference_copy_unavailable"}:
-                self.unreadable_references[path] = self.unreadable_references.get(path, 0) + 1
-                if self.unreadable_references[path] >= 3:
-                    raise AgentLoopError(self.total_rounds, reason="repeated_reference_failure")
         if not results or not all(
             isinstance(result, dict) and result.get("success") is False for result in results
         ):
@@ -687,6 +695,7 @@ class AgentRunner:
                 if response.reasoning_content:
                     assistant_msg["reasoning_content"] = response.reasoning_content
                 messages.append(assistant_msg)
+                self._history.append(assistant_msg)
 
                 # Cache tool results for both messages and history (avoid double execution)
                 tool_outcomes: list[tuple[str, str, str, Any]] = []
@@ -738,6 +747,8 @@ class AgentRunner:
                             "content": result_content,
                         }
                     )
+                    self._history.append(messages[-1])
+                    budget.finish_tool(assistant_msg["tool_calls"][-1], tool_result)
 
                     # ── Widget tracking: ask_question tool carries widget payload ──
                     if tc.name == "ask_question" and isinstance(tool_result, dict):
@@ -746,17 +757,6 @@ class AgentRunner:
                             widget_id = widget.get("data", {}).get("id", "")
                             if widget_id:
                                 self._pending_widget[widget_id] = tc.id
-
-                # Append assistant + tool results to history
-                self._history.append(assistant_msg)
-                for _name, tcid, rcontent, _tresult in tool_outcomes:
-                    self._history.append(
-                        {
-                            "role": "tool",
-                            "tool_call_id": tcid,
-                            "content": rcontent,
-                        }
-                    )
 
                 # Check for awaiting_answer — break the tool-call loop so
                 # the UI can present the widget and wait for user input.
@@ -769,7 +769,8 @@ class AgentRunner:
                             messages=self._build_visible_messages(),
                         )
                 budget.finish_round(
-                    assistant_msg["tool_calls"], [outcome[3] for outcome in tool_outcomes],
+                    assistant_msg["tool_calls"],
+                    [outcome[3] for outcome in tool_outcomes],
                 )
                 continue
 
@@ -1210,6 +1211,22 @@ class AgentRunner:
                         meta=meta,
                     )
                 )
+
+                try:
+                    budget.finish_tool(tc, tool_result)
+                except AgentLoopError as error:
+                    # Complete the provider protocol without executing the rest of this batch.
+                    for pending in accumulated_tool_calls[len(round_results) :]:
+                        skipped = {
+                            "role": "tool",
+                            "tool_call_id": pending["id"],
+                            "content": json.dumps(
+                                {"success": False, "code": "not_executed", "reason": error.reason}
+                            ),
+                        }
+                        self._history.append(skipped)
+                        messages.append(skipped)
+                    raise
 
             budget.finish_round(accumulated_tool_calls, round_results)
 
