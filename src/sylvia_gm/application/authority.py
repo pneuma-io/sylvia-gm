@@ -42,6 +42,7 @@ from sylvia_gm.application.decision_scope import (
 from sylvia_gm.application.interview_content import resolve_interview_content
 from sylvia_gm.application.knowledge_search import (
     KnowledgeReference,
+    bounded_search_page,
     knowledge_terms,
     rank_references,
 )
@@ -5502,6 +5503,7 @@ class AuthorityOwner:
         query: str,
         sources: Sequence[str] | None = None,
         limit: int = 5,
+        offset: int = 0,
     ) -> SafePayload:
         """Discover bounded exact references without creating another source of truth."""
 
@@ -5545,17 +5547,25 @@ class AuthorityOwner:
                 provenance: Mapping[str, object],
                 identity: str | None = None,
             ) -> None:
+                public_provenance = dict(provenance)
+                heading = public_provenance.get("heading")
+                if isinstance(heading, str) and len(heading) > 200:
+                    public_provenance["heading"] = heading[:200]
+                    public_provenance["heading_truncated"] = True
                 candidates.append(
                     KnowledgeReference(
                         result={
                             "source": source,
                             "path": path,
                             "kind": kind,
-                            "label": label,
+                            "label": label[:200],
+                            **({"label_truncated": True} if len(label) > 200 else {}),
                             "visibility": visibility,
-                            "provenance": dict(provenance),
+                            "provenance": public_provenance,
                         },
-                        identity=identity or path,
+                        identity=f"{identity or path} {label}"
+                        if len(label) > 200
+                        else identity or path,
                         body=body,
                     )
                 )
@@ -5769,11 +5779,18 @@ class AuthorityOwner:
                             "package_sha256": entry.sha256,
                             "source_path": path,
                         }
-                        if len(value) > REFERENCE_CONTENT_BYTE_LIMIT:
-                            for offset, excerpt in matching_text_excerpts(text, query, limit):
+                        sections = (
+                            _markdown_sections(text)
+                            if len(value) <= REFERENCE_CONTENT_BYTE_LIMIT and path.endswith(".md")
+                            else ()
+                        )
+                        if len(value) > REFERENCE_CONTENT_BYTE_LIMIT or any(
+                            len(heading) > 200 or len(slug) > 200 for heading, slug, _ in sections
+                        ):
+                            for text_offset, excerpt in matching_text_excerpts(text, query, limit):
                                 add_match(
                                     source=source,
-                                    path=f"{path}#text/{offset}",
+                                    path=f"{path}#text/{text_offset}",
                                     kind="package_excerpt",
                                     label=Path(path).stem.replace("-", " ").title(),
                                     visibility=(
@@ -5782,11 +5799,10 @@ class AuthorityOwner:
                                         else "campaign_reference"
                                     ),
                                     body=excerpt,
-                                    provenance={**package_provenance, "text_offset": offset},
+                                    provenance={**package_provenance, "text_offset": text_offset},
                                     identity=path,
                                 )
                             continue
-                        sections = _markdown_sections(text) if path.endswith(".md") else ()
                         if not sections:
                             add_match(
                                 source=source,
@@ -5831,21 +5847,24 @@ class AuthorityOwner:
                             )
 
             matches = rank_references(query, candidates)
-            selected = matches[:limit]
             return owned_payload(
-                {
-                    "query": query,
-                    "sources": list(requested_sources),
-                    "limit": limit,
-                    "matches": selected,
-                    "truncated": len(matches) > limit,
-                    "unavailable_count": unavailable_count,
-                    "unavailable_references": unavailable_references,
-                    "authority": (
-                        "Discovery returns references only. Read the selected exact reference; "
-                        "Campaign State remains current truth."
-                    ),
-                }
+                bounded_search_page(
+                    {
+                        "query": query,
+                        "sources": list(requested_sources),
+                        "campaign_revision": snapshot.revision,
+                        "unavailable_count": unavailable_count,
+                        "unavailable_references": unavailable_references,
+                        "authority": (
+                            "Discovery returns references only. Read the selected exact reference; "
+                            "Campaign State remains current truth."
+                        ),
+                    },
+                    matches,
+                    offset=offset,
+                    limit=limit,
+                    maximum_bytes=REFERENCE_REPLY_BYTE_LIMIT,
+                )
             )
 
     def read_campaign_reference(

@@ -1185,6 +1185,17 @@ def _safe_error(error: AuthorityError) -> types.CallToolResult:
         "campaign_knowledge_limit_invalid": (
             "Search parameter 'limit' must be an integer from 1 to 8. Retry with limit=5."
         ),
+        "campaign_knowledge_offset_invalid": (
+            "Search parameter 'offset' must be a nonnegative integer within the current "
+            "results. Begin at offset=0, then follow next_offset using the same query and limit."
+        ),
+        "campaign_knowledge_metadata_too_large": (
+            "Search metadata exceeds the reply byte bound. Refine the query and sources."
+        ),
+        "campaign_knowledge_result_too_large": (
+            "An exact reference exceeds the reply byte bound. Refine the query and sources; "
+            "this error does not mean that the source is absent."
+        ),
         "campaign_knowledge_search_invalid": (
             "Use a nonempty query of at most 500 characters and distinct sources "
             "from the tool schema."
@@ -1400,6 +1411,16 @@ def build_stateless_mcp_server(owner: AuthorityOwner) -> Server[Any]:
                                     "minimum": 1,
                                     "maximum": 8,
                                     "default": 5,
+                                },
+                                "offset": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "default": 0,
+                                    "description": (
+                                        "Follow next_offset with the same query, sources, and "
+                                        "limit to continue a byte-bounded page. Restart at 0 "
+                                        "if campaign_revision changes."
+                                    ),
                                 },
                             },
                             "required": ["query"],
@@ -1764,11 +1785,13 @@ def build_stateless_mcp_server(owner: AuthorityOwner) -> Server[Any]:
                     "query",
                     "sources",
                     "limit",
+                    "offset",
                 }:
                     raise CommandRejected("MCP knowledge search parameters are invalid")
                 query = arguments.get("query")
                 sources = arguments.get("sources")
                 limit = arguments.get("limit", 5)
+                offset = arguments.get("offset", 0)
                 if (
                     not isinstance(query, str)
                     or (sources is not None and not isinstance(sources, list))
@@ -1778,6 +1801,8 @@ def build_stateless_mcp_server(owner: AuthorityOwner) -> Server[Any]:
                     )
                     or not isinstance(limit, int)
                     or isinstance(limit, bool)
+                    or not isinstance(offset, int)
+                    or isinstance(offset, bool)
                 ):
                     raise CommandRejected("MCP knowledge search parameters are invalid")
                 payload = owner.search_campaign_knowledge(
@@ -1785,6 +1810,7 @@ def build_stateless_mcp_server(owner: AuthorityOwner) -> Server[Any]:
                     query=query,
                     sources=cast(list[str] | None, sources),
                     limit=limit,
+                    offset=offset,
                 )
                 return types.CallToolResult(
                     content=[
@@ -2371,11 +2397,12 @@ class StatelessMcpMechanics:
         query: str,
         sources: Sequence[str] | None = None,
         limit: int = 5,
+        offset: int = 0,
     ) -> Mapping[str, object]:
         """Search exact campaign authority through a fresh private MCP request."""
 
         server = build_stateless_mcp_server(self._owner)
-        arguments: dict[str, object] = {"query": query, "limit": limit}
+        arguments: dict[str, object] = {"query": query, "limit": limit, "offset": offset}
         if sources is not None:
             arguments["sources"] = list(sources)
         async with Client(server, raise_exceptions=True) as client:
@@ -2406,6 +2433,7 @@ class StatelessMcpMechanics:
                 "query": query,
                 "sources": list(sources) if sources is not None else None,
                 "limit": limit,
+                "offset": offset,
                 "result": _plain_json(payload),
                 "is_error": result.is_error,
             }
@@ -2429,6 +2457,7 @@ class StatelessMcpMechanics:
         query: str,
         sources: Sequence[str] | None = None,
         limit: int = 5,
+        offset: int = 0,
     ) -> Mapping[str, object]:
         """Discover bounded campaign references through a fresh MCP request."""
 
@@ -2438,6 +2467,7 @@ class StatelessMcpMechanics:
                 query=query,
                 sources=sources,
                 limit=limit,
+                offset=offset,
             )
         )
 

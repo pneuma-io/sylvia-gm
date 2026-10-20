@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+from sylvia_gm.agent._stateless_mcp import StatelessMcpMechanics
 from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.application.bundled_packages import bundled_srd_archive
 from sylvia_gm.application.package_materialization import (
@@ -183,6 +184,68 @@ def test_admitted_index_over_2048_files_is_searchable_with_explicit_unavailable_
             ]
             == "Lateindexneedle"
         )
+        assert owner.snapshot(cid) == before
+
+
+def test_eight_valid_long_markdown_headings_do_not_expand_search_replies(tmp_path):
+    source = Path(__file__).parent / "fixtures/rulesets/signal-and-static"
+    record = json.loads((source / "package-record.json").read_text())
+    payloads = {
+        p.relative_to(source).as_posix(): p.read_bytes()
+        for p in source.rglob("*")
+        if p.is_file() and p.name != "package-record.json"
+    }
+    heading = "Longheadingneedle " + "h" * 19_982
+    paths = [f"lore/long-heading-{i}.md" for i in range(8)]
+    for index, path in enumerate(paths):
+        payloads[path] = f"# {heading}{index}\nBody.\n".encode()
+    declaration_path = record["content_declarations"]
+    declarations = json.loads(payloads[declaration_path])
+    inclusion = deepcopy(declarations["inclusions"][0])
+    inclusion["id"] = "long-heading-references"
+    inclusion["links"] = {key: [] for key in inclusion["links"]}
+    inclusion["links"]["artifacts"] = paths
+    declarations["inclusions"].append(inclusion)
+    declarations["inclusions"].sort(key=lambda item: item["id"])
+    payloads[declaration_path] = canonical_json_bytes(declarations)
+    with (
+        materialize_package_archive((NormalizedPackageDraft(record, payloads),)) as archive,
+        AuthorityOwner.open(tmp_path / "headings.db", "heading-references") as owner,
+    ):
+        candidate = owner.install_package_archive(archive.archive, install_id="headings")
+        cid = _start_reference_campaign(owner, candidate, {}, record["id"])
+        before = owner.snapshot(cid)
+        found = owner.search_campaign_knowledge(
+            cid, query="Longheadingneedle", sources=("ruleset",), limit=8
+        )
+        assert len(canonical_json_bytes(found)) <= 65536
+        assert len(found["matches"]) == 8
+        assert {m["path"].split("#")[0] for m in found["matches"]} == set(paths)
+        for match in found["matches"]:
+            assert "#text/" in match["path"] and len(match["label"]) <= 200
+            page = owner.read_campaign_reference(cid, source="ruleset", path=match["path"])
+            assert page["package"]["content_sha256"] == match["provenance"]["package_sha256"]
+            assert (
+                page["content"]
+                == payloads[match["path"].split("#")[0]].decode()[: len(page["content"])]
+            )
+        mcp = StatelessMcpMechanics(owner)
+        offset = 0
+        recovered = []
+        while offset is not None:
+            page = mcp.search_knowledge(
+                cid,
+                query="Longheadingneedle",
+                sources=("ruleset",),
+                limit=3,
+                offset=offset,
+            )
+            assert len(canonical_json_bytes(page)) <= 65536
+            assert page["campaign_revision"] == before.revision
+            assert page["offset"] == len(recovered)
+            recovered.extend(page["matches"])
+            offset = page["next_offset"]
+        assert recovered == found["matches"]
         assert owner.snapshot(cid) == before
 
 
