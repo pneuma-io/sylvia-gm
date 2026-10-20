@@ -239,15 +239,16 @@ def test_builder_launch_preserves_interview_and_survives_campaign_purge(tmp_path
             builder_provider_id="test.provider",
             builder_model_id="test.model",
         )
-        owner.advance_guided_campaign_draft(
+        selected = owner.advance_guided_campaign_draft(
             operation_id="choose-original-ruleset",
             campaign_id=draft.campaign_id,
             builder_session_id=draft.builder_session_id,
             expected_construction_revision=0,
             current_step="ruleset",
-            visible_answer="No Ruleset",
-            answer={"candidate_id": None},
+            visible_answer="SRD Lite",
+            answer={"candidate_id": "sylvia.srd-lite.bg3"},
         )
+        assert selected.current_step == "setting"
         original_interview = owner.session_context(draft.builder_session_id)
         request = {
             "operation_id": "launch-setting",
@@ -265,9 +266,9 @@ def test_builder_launch_preserves_interview_and_survives_campaign_purge(tmp_path
         child = owner.session_context(launched.child_session_id)
         assert child.session.campaign_id is None
         assert child.session.parent_session_id is None
-        assert child.messages[0].content["selections"]["ruleset"]["text"] == "No Ruleset"
+        assert child.messages[0].content["selections"]["ruleset"]["text"] == "SRD Lite"
         assert all(message.kind is not SessionMessageKind.USER for message in child.messages)
-        assert owner.builder_chat_index()[0].display_name == "New setting · No Ruleset"
+        assert owner.builder_chat_index()[0].display_name == "New setting · SRD Lite"
 
         owner.advance_guided_campaign_draft(
             operation_id="change-ruleset-while-builder-is-open",
@@ -275,8 +276,8 @@ def test_builder_launch_preserves_interview_and_survives_campaign_purge(tmp_path
             builder_session_id=draft.builder_session_id,
             expected_construction_revision=1,
             current_step="ruleset",
-            visible_answer="A different Ruleset",
-            answer={"candidate_id": "different-ruleset"},
+            visible_answer="No Ruleset",
+            answer={"candidate_id": None},
         )
         assert owner.session_context(launched.child_session_id) == child
         assert owner.start_interview_builder_chat(**request) == launched
@@ -291,11 +292,7 @@ def test_builder_launch_preserves_interview_and_survives_campaign_purge(tmp_path
 
         # Complete the originating interview through the existing campaign binding path.
         remaining = (
-            ("ruleset", "No Ruleset", {"candidate_id": None}),
-            ("setting", "A quiet town", {"setting_id": "quiet-town"}),
-            ("plan", "A town mystery", {"plan_id": "town-mystery"}),
             ("name", "Original campaign", {"display_name": "Original campaign"}),
-            ("participants", "One investigator", {"player_name": "Investigator"}),
             ("boundaries_preferences", "No additions", {"boundaries": "", "preferences": ""}),
             ("specific_requests", "No additional requests", {"no_additional_requests": True}),
         )
@@ -354,10 +351,34 @@ def test_builder_launch_preserves_interview_and_survives_campaign_purge(tmp_path
         assert restored.session.status.value == "active"
         history = _provider_history(restored)
         assert history[0]["role"] == "system"
-        assert "No Ruleset" in history[0]["content"]
+        assert "SRD Lite" in history[0]["content"]
         assert [item["content"] for item in history if item["role"] == "user"] == [
             "Continue building this setting."
         ]
+
+
+def test_no_rules_interview_cannot_launch_a_setting_from_the_skipped_step(tmp_path):
+    with AuthorityOwner.open(tmp_path / "no-rules-builder.sqlite3", "no-rules-builder") as owner:
+        draft = owner.create_guided_campaign_draft(
+            operation_id="no-rules-draft", display_name="Narrative campaign",
+            builder_session_id="narrative-interview", builder_provider_id="test.provider",
+            builder_model_id="test.model",
+        )
+        selected = owner.advance_guided_campaign_draft(
+            operation_id="choose-no-rules", campaign_id=draft.campaign_id,
+            builder_session_id=draft.builder_session_id, expected_construction_revision=0,
+            current_step="ruleset", visible_answer="No Ruleset", answer={"candidate_id": None},
+        )
+        assert selected.current_step == "name"
+        before = owner.session_context(draft.builder_session_id)
+        with pytest.raises(StaleRevision):
+            owner.start_interview_builder_chat(
+                operation_id="invalid-setting-launch", campaign_id=draft.campaign_id,
+                parent_session_id=draft.builder_session_id, expected_construction_revision=1,
+                purpose="setting", visible_answer="Create New Setting", child_session_id="invalid",
+            )
+        assert owner.session_context(draft.builder_session_id) == before
+        assert owner.builder_chat_index() == ()
 
 
 @pytest.mark.parametrize(
