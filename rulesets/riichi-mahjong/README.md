@@ -8,6 +8,13 @@ committed public results.
 Forced passes advance automatically. Ordinary gameplay and OOC conversation preserve
 the saved table.
 
+The default library also ships `riichi-mahjong-0.1.0.sylvia-gm-package`, the exact
+validated Ruleset and The Lantern Table Setting archive (SHA-256
+`c090627edfcc91346fad1e55769ddb5423076fada077d43951fd535e09313a2f`).
+Startup installs this closure through normal package admission when absent;
+existing same-version closures and user edits remain intact. No Campaign Plan
+is included: use the ordinary campaign setup to create a compatible Plan.
+
 Build an importable package from the repository root:
 
 ```powershell

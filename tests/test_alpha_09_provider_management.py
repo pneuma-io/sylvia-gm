@@ -175,10 +175,11 @@ def test_owner_sidecar_bundles_general_builder_skill_documents(tmp_path: Path) -
     owned_root.mkdir()
     staging_root = owned_root / "skills-proof"
     arguments = builder.sidecar_data_arguments(repository, staging_root)
-    assert arguments[::2] == ["--add-data"] * 3
+    assert arguments[::2] == ["--add-data"] * 4
     destinations = dict(value.rsplit(os.pathsep, 1)[::-1] for value in arguments[1::2])
     assert set(destinations) == {
         "rulesets/srd-lite",
+        "rulesets/riichi-mahjong",
         "campaign-settings/severed-lands",
         "sylvia_gm/agent/skills",
     }

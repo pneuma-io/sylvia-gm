@@ -78,11 +78,13 @@ from sylvia_gm.application.bundled_campaign_plans import (
     selected_campaign_plan,
 )
 from sylvia_gm.application.bundled_packages import (
+    BUNDLED_RIICHI_PACKAGES,
     bundled_campaign_content_catalog,
     bundled_rift_archive,
     bundled_rift_authority,
     bundled_rift_campaign_plan,
     bundled_rift_participant_declaration,
+    bundled_riichi_archive,
     bundled_srd_archive,
     bundled_srd_version,
 )
@@ -1502,6 +1504,24 @@ def _preinstall_bundled_srd(bus: LocalCommandBus) -> None:
     bus.install_package(
         io.BytesIO(archive),
         install_id=f"install-bundled-srd-{install_seed[:24]}",
+    )
+
+
+def _preinstall_bundled_riichi(bus: LocalCommandBus) -> None:
+    """Add the shipped closure once, retaining installed content and same-version edits."""
+
+    raw_candidates = bus.package_candidates()
+    if not isinstance(raw_candidates, Sequence):
+        raise RuntimeError("Package candidate projection is invalid")
+    required = set(BUNDLED_RIICHI_PACKAGES)
+    for candidate in cast(Sequence[PackageCandidate], raw_candidates):
+        installed = {(entry.package_id, entry.version) for entry in candidate.package_lock.entries}
+        if required <= installed:
+            return
+    archive = bundled_riichi_archive()
+    bus.install_package(
+        io.BytesIO(archive),
+        install_id=f"install-bundled-riichi-{hashlib.sha256(archive).hexdigest()[:24]}",
     )
 
 
@@ -4513,6 +4533,7 @@ def run(
         owner_config_path = storage_root / "config.yaml"
         application_owner = supervisor.application_owner()
         _preinstall_bundled_srd(bus)
+        _preinstall_bundled_riichi(bus)
         if application_owner.legacy_builder_contexts():
             migrate_legacy_builder_chats(
                 application_owner, storage_root,
