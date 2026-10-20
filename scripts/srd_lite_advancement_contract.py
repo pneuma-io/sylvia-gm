@@ -52,6 +52,12 @@ def bind_advancement_speed(runtime, record):
         "against new class features and worn equipment while retaining base species Speed."
     )
     summary = tool["metadata"]["result_card"]["summary"]
-    summary.append({"label": "Walking Speed", "value": {"path": "context.character_state.speed"}})
+    summary.append(
+        {
+            "label": "Walking Speed",
+            "value": {"path": "context.character_state.speed"},
+            "optional": True,
+        }
+    )
     declaration = next(t for t in record["tools"] if t["name"] == "level_up_srd_character")
     declaration["input_schema"]["properties"]["build"]["description"] = build["description"]

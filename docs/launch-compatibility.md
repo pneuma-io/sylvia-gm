@@ -14,10 +14,11 @@ Native Windows and live-provider acceptance remain separate evidence layers. Bro
 
 The reviewed combined code/content import is private Git commit
 `cebc66f2245af071f6b2f4cfdeeefbeb980a70de`, followed by the README correction
-`56b0164885834ccac2a1c6f1f98607da2b0202a1`. Current SRD Lite is 0.3.13, primary content
-identity `68b5a9d43e99244f4874daa83a59e31b6f8aec0210b06e4a94a2118b2b83d347`.
+`56b0164885834ccac2a1c6f1f98607da2b0202a1`. Current SRD Lite is 0.3.14, primary content
+identity `e07292d409287b5f7a31062d369f12fb8243736b5c286a8d9ced683d10b596e0`.
 This successor retains base species Speed during advancement, validates resulting walking Speed,
-and displays the computed result before confirmation. Its 16 SRD Plan closures were admitted;
+and displays the computed result before confirmation. The optional Speed result row preserves
+cancellation cards for older state without that field. Its 16 SRD Plan closures were admitted;
 the independent Riichi Plan is unchanged. The preceding 0.3.12 qualification admitted all 17
 Plan closures and installed the package without changing an existing synthetic 0.3.11 pin. Subsequent scoped source
 repairs are recorded in Git history and their delivery receipt. Existing user saves stay intact.
