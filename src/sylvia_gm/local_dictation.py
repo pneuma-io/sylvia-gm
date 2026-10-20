@@ -214,8 +214,14 @@ def _device_id(index: int, row: Any, host: str) -> str:
 
 
 def input_devices(sound: Any) -> list[dict[str, Any]]:
-    """Enumerate input metadata; never opens a stream or changes OS/default device settings."""
+    """Refresh idle PortAudio metadata; callers must own no open recording stream."""
     try:
+        # The pinned runtime freezes devices/defaults at initialization. This worker owns
+        # PortAudio exclusively; serialized idle discovery can refresh it without
+        # discarding the Whisper model or changing the user's system defaults.
+        if sound._initialized:
+            sound._terminate()
+        sound._initialize()
         rows, hosts = sound.query_devices(), sound.query_hostapis()
         default = int(sound.default.device[0])
         devices = []

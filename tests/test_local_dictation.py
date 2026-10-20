@@ -287,7 +287,147 @@ def sound_fixture():
             calls.append(("close",))
 
     sound.InputStream = Stream
+    sound._initialized = 1
+    sound._terminate = lambda: setattr(sound, "_initialized", 0)
+    sound._initialize = lambda: setattr(sound, "_initialized", 1)
     return sound, calls
+
+
+def cached_sound_fixture():
+    """PortAudio-style inventory changes become visible only after reinitialization."""
+    sound, calls = sound_fixture()
+    state = {"rows": sound.query_devices(), "default": 0, "active": False,
+             "fail_initialize": False, "permission": False, "refreshes": 0}
+    cached = {"rows": list(state["rows"]), "default": 0}
+    sound._initialized = 1
+
+    def terminate():
+        assert not state["active"], "must never terminate PortAudio with an open stream"
+        sound._initialized -= 1
+
+    def initialize():
+        assert not state["active"], "must never initialize PortAudio with an open stream"
+        state["refreshes"] += 1
+        if state["fail_initialize"]:
+            raise RuntimeError("controlled initialization failure")
+        sound._initialized += 1
+        cached.update(rows=list(state["rows"]), default=state["default"])
+
+    class Defaults:
+        @property
+        def device(self):
+            return [cached["default"], -1]
+
+    original_stream = sound.InputStream
+
+    def stream(**options):
+        if state["permission"]:
+            raise PermissionError("controlled permission failure")
+        result = original_stream(**options)
+        close = result.close
+        state["active"] = True
+
+        def closed():
+            state["active"] = False
+            close()
+
+        result.close = closed
+        return result
+
+    sound._terminate, sound._initialize = terminate, initialize
+    sound.query_devices = lambda: cached["rows"]
+    sound.default = Defaults()
+    sound.InputStream = stream
+    return sound, calls, state
+
+
+def test_warm_device_inventory_refreshes_add_remove_and_default_changes_without_capture():
+    sound, calls, state = cached_sound_fixture()
+    original = local.input_devices(sound)[1]["id"]
+    added = dict(state["rows"][0], name="Newly connected input", default_samplerate=44100)
+    state.update(rows=[*state["rows"], added], default=1)
+    options = local.input_devices(sound)
+    assert len(options) == 3
+    assert "Newly connected input" in options[0]["label"]
+    recording = local.Recording("default", sound=sound)
+    assert recording.device == 1 and recording.rate == 44100
+    state.update(rows=[added], default=0)
+    with pytest.raises(SpeechError, match="device"):
+        local.Recording(original, sound=sound)
+    assert calls == [] and not state["active"]
+
+
+def test_warm_device_initialization_failure_and_permission_recover_on_next_attempt():
+    sound, calls, state = cached_sound_fixture()
+    state["fail_initialize"] = True
+    with pytest.raises(SpeechError, match="device"):
+        local.input_devices(sound)
+    assert sound._initialized == 0 and calls == []
+    state.update(fail_initialize=False, permission=True)
+    with pytest.raises(SpeechError, match="permission"):
+        local.Recording("default", sound=sound).start()
+    state["permission"] = False
+    recording = local.Recording("default", sound=sound)
+    recording.start()
+    recording.cancel()
+    assert sound._initialized == 1 and not state["active"]
+    assert calls[-2:] == [("abort",), ("close",)]
+
+
+def test_session_refreshes_only_idle_devices_and_preserves_the_loaded_model(tmp_path, monkeypatch):
+    import sys
+
+    sound, calls, state = cached_sound_fixture()
+    monkeypatch.setitem(sys.modules, "sounddevice", sound)
+    monkeypatch.setattr(local, "model_ready", lambda _: True)
+    monkeypatch.setattr(worker, "model_ready", lambda _: True)
+    loads = []
+
+    class Model:
+        supported_languages = ["en"]
+
+        def __init__(self, *args, **kwargs):
+            assert not state["active"]
+            loads.append(1)
+
+        def transcribe(self, *args, **kwargs):
+            assert not state["active"]
+            return iter([segment("controlled words", 0, 0)]), None
+
+    monkeypatch.setattr(
+        worker, "Recognizer", lambda path: local.Recognizer(path, model_factory=Model)
+    )
+    commands = iter([
+        {"mode": "session"},
+        {"id": "initial", "mode": "capabilities"},
+        {"id": "one", "mode": "start", "engine": "en"},
+        {"id": "during", "mode": "capabilities"},
+        {"id": "overlap", "mode": "start", "engine": "en"},
+        {"id": "one", "mode": "stop"},
+        {"id": "changed", "mode": "capabilities"},
+        {"id": "two", "mode": "start", "engine": "en"},
+        {"id": "two", "mode": "stop"},
+    ])
+
+    class Source:
+        def readline(self, limit):
+            command = next(commands, None)
+            if command is None:
+                return ""
+            if command.get("id") == "changed":
+                state.update(rows=[dict(state["rows"][0], name="Replacement input")], default=0)
+            return json.dumps(command) + "\n"
+
+    output = io.StringIO()
+    assert worker.serve(Source(), output, tmp_path) == 0
+    replies = [json.loads(line) for line in output.getvalue().splitlines()]
+    assert replies[3] == {"id": "during", "error": "unavailable", "idle": False}
+    assert replies[4] == {"id": "overlap", "error": "unavailable", "idle": False}
+    assert "Replacement input" in replies[6]["devices"][0]["label"]
+    assert [row["text"] for row in replies if "text" in row] == ["controlled words"] * 2
+    assert state["refreshes"] == 4 and loads == [1]
+    assert len([call for call in calls if call[0] == "open"]) == 2
+    assert not state["active"]
 
 
 def test_input_selection_is_metadata_only_and_recording_keeps_native_rate_in_memory():
