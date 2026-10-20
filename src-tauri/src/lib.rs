@@ -1025,6 +1025,7 @@ async fn submit_session_input(
     automatic_response: Option<bool>,
     redirect_interruption_id: Option<String>,
     campaign_ending_choice: Option<Value>,
+    builder_question_answers: Option<Value>,
 ) -> Result<Value, String> {
     owner_call_async(
         window,
@@ -1042,6 +1043,7 @@ async fn submit_session_input(
             "automatic_response": automatic_response.unwrap_or(false),
             "redirect_interruption_id": redirect_interruption_id,
             "campaign_ending_choice": campaign_ending_choice,
+            "builder_question_answers": builder_question_answers,
         }),
     )
     .await

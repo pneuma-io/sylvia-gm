@@ -39,6 +39,7 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Any, BinaryIO, TextIO, cast
 
+from sylvia_gm.agent._builder_question_answers import builder_question_answer_content
 from sylvia_gm.agent._builder_session import (
     BuilderTurnResult,
     CampaignContentToolAuthority,
@@ -2439,6 +2440,13 @@ def _dispatch_selected(
         if ooc_text is not None and len(ooc_text) > _MAX_USER_TEXT_CHARS:
             raise OwnerProtocolError("ooc_text exceeds the session input limit")
         session_id = _required_text(params, "session_id")
+        question_answers = params.get("builder_question_answers")
+        context = application_owner.session_context(session_id)
+        if question_answers is not None:
+            if (builder_start or player_action_id or ending_choice is not None or ooc_text
+                    or params.get("redirect_interruption_id")):
+                raise OwnerProtocolError("Question answers cannot be combined with other input")
+            builder_question_answer_content(context, question_answers, user_text)
         model_command = _model_slash_command(user_text) if ooc_text is None else None
         if model_command is not None:
             reference, mode = model_command
@@ -2456,7 +2464,6 @@ def _dispatch_selected(
                 mode=mode,
                 choices=model_choices(),
             )
-        context = application_owner.session_context(session_id)
         if ending_choice is not None and (
             context.session.role is not WriterRole.DM or builder_start or player_action_id
             or user_text or ooc_text or params.get("redirect_interruption_id")
@@ -2565,7 +2572,8 @@ def _dispatch_selected(
                     ),
                     None,
                 )
-                if current_chat is not None and current_chat.display_name == "New chat":
+                if (current_chat is not None and current_chat.display_name == "New chat"
+                        and question_answers is None):
                     title = opening_title(user_text)
                     if title:
                         application_owner.rename_builder_chat(session_id, title, automatic=True)
@@ -2584,6 +2592,9 @@ def _dispatch_selected(
                 user_text=user_text,
                 input_kind=(
                     SessionInputKind.BUILDER_START if builder_start else SessionInputKind.USER
+                ),
+                builder_question_answers=(
+                    tuple(question_answers) if question_answers is not None else None
                 ),
             )
             campaign_plan_authority = None

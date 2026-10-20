@@ -10,6 +10,7 @@ from dataclasses import dataclass, field, replace
 from enum import StrEnum
 from typing import TypeVar, cast
 
+from sylvia_gm.agent._builder_question_answers import builder_question_answer_content
 from sylvia_gm.agent._runner import AgentLoopError
 from sylvia_gm.agent._stateless_mcp import ModelMechanicsTool, StatelessMcpMechanics
 from sylvia_gm.application.authority import (
@@ -278,6 +279,7 @@ class SessionRunRequest:
     automatic_response: bool = False
     redirect_interruption_id: str | None = None
     campaign_ending_choice: SafePayload | None = None
+    builder_question_answers: tuple[SafePayload, ...] | None = None
 
 
 class ProviderControl:
@@ -633,6 +635,13 @@ class CampaignSessionLoop:
         elif request.input_kind is SessionInputKind.USER:
             input_kind = SessionMessageKind.USER
             input_content = {"text": request.user_text, "attempt_id": request.attempt_id}
+            if request.builder_question_answers is not None:
+                input_content = {
+                    **builder_question_answer_content(
+                        context, request.builder_question_answers, request.user_text,
+                    ),
+                    "attempt_id": request.attempt_id,
+                }
         else:
             raise CommandRejected("Builder input kind is unsupported")
         self._owner.append_agent_message(

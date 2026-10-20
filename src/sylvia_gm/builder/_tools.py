@@ -230,7 +230,7 @@ INTERVIEW_TOOL_DEFINITIONS: list[dict[str, Any]] = [
                 "Use this INSTEAD of outputting [WIDGET:...] text. "
                 "The UI will render an interactive widget card. "
                 "Returns immediately with 'awaiting_answer' status. "
-                "The player's answers arrive as an ordinary saved user reply."
+                "The player's answers arrive as saved user input linked to the question evidence."
             ),
             "parameters": {
                 "type": "object",

@@ -1137,6 +1137,7 @@ const SylviaGMFrontend = (() => {
         automaticResponse: Boolean(command.automatic_response),
         redirectInterruptionId: command.redirect_interruption_id || null,
         campaignEndingChoice: command.campaign_ending_choice || null,
+        ...(command.builder_question_answers ? { builderQuestionAnswers: command.builder_question_answers } : {}),
       }),
       start_dm_session: (campaignId, sessionId, turnId) => invoke('start_dm_session', {
         campaignId,
@@ -7397,6 +7398,7 @@ const SylviaGMFrontend = (() => {
       options,
       awaiting: result.status === 'awaiting_answer',
       key: String(messageKey || content.tool_call_id || `${messageIndex}-${data.id}`),
+      toolCallId: content.tool_call_id,
       index: messageIndex,
     };
   }
@@ -7408,6 +7410,14 @@ const SylviaGMFrontend = (() => {
   function builderQuestionCardMarkup(question, key, {
     sessionId, groupId, active, busy,
   }) {
+    if (question.answer) {
+      return `<fieldset class="story-card builder-question-card"${key}>` +
+        `<legend class="story-header">Builder question</legend>` +
+        `<div class="builder-question-text">${escapeHtml(question.question)}</div>` +
+        `<div class="story-text builder-question-answer" aria-label="Answer">` +
+        `${escapeHtml(question.answer.label)}</div>` +
+        `<div class="builder-question-note">Answered</div></fieldset>`;
+    }
     const disabled = !active || busy;
     const controlId = `builder-question-${question.index}`;
     const labelId = `${controlId}-label`;
@@ -7484,17 +7494,17 @@ const SylviaGMFrontend = (() => {
   }
 
   function selectedBuilderQuestionAnswer(control) {
-    const value = String(control.value || '').trim();
+    const value = String(control.value || '');
     if (!value) return '';
     const selected = Array.from(control.selectedOptions || [])[0];
-    const label = String(selected?.textContent || '').trim() || value;
+    const label = String(selected?.textContent || '') || value;
     const duplicateLabels = Array.from(control.options || []).filter((option) =>
-      String(option.value || '').length && String(option.textContent || '').trim() === label
+      String(option.value || '').length && String(option.textContent || '') === label
     ).length;
     return duplicateLabels > 1 && value && value !== label ? `${label} (${value})` : label;
   }
 
-  // Submit visible question fields as one ordinary saved User reply to this exact Builder session.
+  // Keep genuine form input linked to the saved questions in this exact Builder session.
   function wireBuilderQuestionForms(container) {
     const controls = Array.from(container.querySelectorAll('[data-builder-question-control]'));
     container.querySelectorAll('[data-builder-question-form]').forEach((form) => {
@@ -7530,11 +7540,13 @@ const SylviaGMFrontend = (() => {
             candidate.dataset.builderQuestionKey === control.dataset.builderQuestionKey &&
             candidate.dataset.builderQuestionType === 'custom'
           );
-          const customAnswer = String(custom?.value || '').trim();
-          const answer = customAnswer || (control.dataset.builderQuestionType === 'text'
-            ? String(control.value || '').trim()
+          const customAnswer = String(custom?.value || '');
+          const isCustom = Boolean(customAnswer.trim());
+          const value = isCustom ? customAnswer : String(control.value || '');
+          const answer = isCustom ? customAnswer : (control.dataset.builderQuestionType === 'text'
+            ? value
             : selectedBuilderQuestionAnswer(control));
-          if (!answer) {
+          if (!answer.trim()) {
             control.focus();
             selectedStatus(activity, 'Answer each question before submitting');
             return;
@@ -7542,12 +7554,18 @@ const SylviaGMFrontend = (() => {
           answers.push({
             question: control.dataset.builderQuestionText || 'Builder question',
             answer,
+            question_message_id: control.dataset.builderQuestionKey,
+            value,
+            custom: isCustom,
           });
         }
         if (!answers.length) return;
         if (submitButton) submitButton.disabled = true;
         formControls.forEach((control) => { control.disabled = true; });
-        void submitInput(builderQuestionAnswerMessage(answers));
+        void submitInput(builderQuestionAnswerMessage(answers), {
+          builderQuestionAnswers: answers.map(({ question_message_id, value, custom }) =>
+            ({ question_message_id, value, custom })),
+        });
       };
       if (form.sylviaQuestionSubmitHandler) {
         form.removeEventListener('submit', form.sylviaQuestionSubmitHandler);
@@ -8496,8 +8514,33 @@ const SylviaGMFrontend = (() => {
         ? builderQuestionFromEvidence(message.content || {}, message.message_id, index)
         : null
     );
+    // Only explicit durable answer events complete a widget or replace its chat bubble.
+    const savedAnswers = new Map();
+    messages.forEach((message, messageIndex) => {
+      const content = message.content || {};
+      if (message.kind !== 'user' || content.kind !== 'builder_question_answer' ||
+          !Array.isArray(content.answers) || !content.answers.length) return;
+      const seen = new Set();
+      const valid = content.answers.every((answer) => {
+        if (!answer || ['question_message_id', 'tool_call_id', 'widget_id', 'question', 'value', 'label']
+          .some((field) => typeof answer[field] !== 'string' || !answer[field].length) ||
+          !['text', 'select', 'cascade', 'confirm'].includes(answer.type) ||
+          typeof answer.custom !== 'boolean' || seen.has(answer.question_message_id)) return false;
+        seen.add(answer.question_message_id);
+        const question = builderQuestions.find((item) => item?.key === answer.question_message_id);
+        return !question || (question.toolCallId === answer.tool_call_id &&
+          question.id === answer.widget_id && question.type === answer.type &&
+          question.question === answer.question && question.index < messageIndex);
+      });
+      if (!valid) return;
+      savedAnswers.set(message, content.answers);
+      content.answers.forEach((answer) => {
+        const question = builderQuestions.find((item) => item?.key === answer.question_message_id);
+        if (question && !question.answer) question.answer = answer;
+      });
+    });
     const activeQuestions = builderQuestions.filter((question) =>
-      question && question.awaiting && (context.latest_user_sequence != null
+      question && !question.answer && question.awaiting && (context.latest_user_sequence != null
         ? messages[question.index].sequence > context.latest_user_sequence
         : question.index > lastUserIndex)
     );
@@ -8511,6 +8554,14 @@ const SylviaGMFrontend = (() => {
       const key = chronologyKeyAttribute(message.message_id ||
         `${message.kind}-${message.canonical_sequence ?? ''}-${content.text || ''}`);
       if (message.kind === 'user') {
+        if (savedAnswers.has(message)) {
+          const detached = savedAnswers.get(message).filter((answer) =>
+            !builderQuestions.some((question) => question?.key === answer.question_message_id));
+          return detached.length ? `<div class="builder-answered-questions"${key}>` +
+            detached.map((answer) => builderQuestionCardMarkup({
+              question: answer.question, answer,
+            }, '', {})).join('') + `</div>` : '';
+        }
         return `<div class="story-card talk"${key}><div class="story-header">You</div>` +
           `<div class="story-text">${escapeHtml(content.text || '')}</div></div>`;
       }
@@ -11490,6 +11541,7 @@ const SylviaGMFrontend = (() => {
 
   async function submitInput(text, {
     builderStart = false, builderSessionId = null, playerAction = null, campaignEndingChoice = null,
+    builderQuestionAnswers = null,
   } = {}) {
     if (builderSessionId && !builderStart) return;
     const sessionId = playerAction?.sessionId || builderSessionId || state.activeSessionId;
@@ -11522,6 +11574,7 @@ const SylviaGMFrontend = (() => {
       return;
     }
     if (activityIsWorking(activity) && sessionRole === 'builder') {
+      if (builderQuestionAnswers) return;
       if (!state.bridge.steer_session || activity.stopRequestedAttemptId || !text.trim()) return;
       if (selectedActivityMatches(activity)) {
         dictation?.cancel('', { announce: false });
@@ -11564,6 +11617,7 @@ const SylviaGMFrontend = (() => {
       player_action_id: playerAction?.actionId || null,
       automatic_response: Boolean(playerAction?.automatic),
       campaign_ending_choice: campaignEndingChoice,
+      ...(builderQuestionAnswers ? { builder_question_answers: builderQuestionAnswers } : {}),
       redirect_interruption_id: !compact && !playerAction && !campaignEndingChoice && sessionRole === 'dm'
         ? activity.retryBasis?.interruption_id || null : null,
     };
@@ -11577,7 +11631,8 @@ const SylviaGMFrontend = (() => {
     activity = beginSessionActivity(activity, command.attempt_id);
     activity.contextCompaction = compact;
     activity.ownerId = compact || sessionRole === 'builder' ? sessionId : campaignId;
-    activity.pendingInput = playerAction || compact || campaignEndingChoice ? null : { sessionId, messageId: command.message_id, text, oocText };
+    activity.pendingInput = playerAction || compact || campaignEndingChoice || builderQuestionAnswers
+      ? null : { sessionId, messageId: command.message_id, text, oocText };
     refreshActivityControls(activity);
     selectedStatus(activity, compact ? 'Compacting context · saved conversation is kept' : 'Streaming…');
     renderActivityIndexes();

@@ -835,6 +835,143 @@ test('Builder question answers use the original saved session and remain readabl
   assert.doesNotMatch(html, /Submit answers/);
 });
 
+test('freeform character interview answers stay in the original widget after reopen', async () => {
+  const h = harness();
+  const question = {
+    message_id: 'play-question', sequence: 2, kind: 'evidence', content: {
+      kind: 'builder_tool_result', tool_name: 'ask_question', tool_call_id: 'play-call',
+      arguments: '{"type":"text","id":"player_concept","question":"Who would you like to play?"}',
+      result: { success: true, status: 'awaiting_answer', widget: { type: 'text', data: {
+        id: 'player_concept', question: 'Who would you like to play?',
+      } } },
+    },
+  };
+  let savedAnswer = null;
+  h.state.bridge.session_context = async () => ({ messages: [question, ...(savedAnswer ? [{
+    message_id: 'saved-play-answer', sequence: 3, kind: 'user', content: savedAnswer,
+  }] : [])] });
+  await h.openBuilderChat('a');
+  const control = h.makeElement();
+  control.dataset = { builderQuestionKey: 'play-question', builderQuestionType: 'text',
+    builderQuestionText: 'Who would you like to play?', builderQuestionOrder: '0' };
+  control.value = '  A calm courier called Rowan <watcher>.\nKeep this exact line.  ';
+  control.setAttribute('form', 'builder-question-form-a');
+  const button = h.makeElement();
+  const form = h.makeElement();
+  form.id = 'builder-question-form-a';
+  form.dataset = { builderQuestionSession: 'a' };
+  form.querySelector = () => button;
+  const container = h.makeElement();
+  container.querySelectorAll = selector => selector === '[data-builder-question-form]'
+    ? [form] : [control];
+  h.wireBuilderQuestionForms(container);
+  control.dispatchEvent({ type: 'input' });
+  form.dispatchEvent({ type: 'submit', preventDefault() {} });
+  await h.flush();
+  assert.equal(h.calls.submissions.length, 1);
+  const command = h.calls.submissions[0];
+  // The owner contract preserves the answer and derives provenance from saved evidence.
+  savedAnswer = { text: command.user_text, ...(command.builder_question_answers ? {
+    kind: 'builder_question_answer', answers: command.builder_question_answers.map(answer => ({
+      ...answer, tool_call_id: 'play-call', widget_id: 'player_concept', type: 'text',
+      question: 'Who would you like to play?', label: answer.value,
+    })),
+  } : {}) };
+  h.pending.get(command.attempt_id).resolve({ status: 'completed' });
+  await h.flush();
+  await h.openBuilderChat('b');
+  await h.openBuilderChat('a');
+  const html = h.node('chronology').dataset.chronologyHtml;
+  const card = html.match(/<fieldset[^>]*builder-question-card[\s\S]*?<\/fieldset>/)?.[0] || '';
+  assert.match(card, /Who would you like to play\?/);
+  assert.match(card, /A calm courier called Rowan &lt;watcher&gt;\./);
+  assert.match(card, /Answered/);
+  assert.doesNotMatch(html, /Here are my answers:/);
+  assert.doesNotMatch(html, /<div class="story-header">You<\/div>/);
+  assert.doesNotMatch(html, /Submit answers/);
+  assert.equal(command.builder_question_answers[0].question_message_id, 'play-question');
+  assert.equal(command.builder_question_answers[0].value, control.value);
+});
+
+test('typed answers survive paging and repeated widget ids while literal chat remains visible', async () => {
+  const h = harness();
+  const question = (id, sequence) => ({ message_id: id, sequence, kind: 'evidence', content: {
+    kind: 'builder_tool_result', tool_name: 'ask_question', tool_call_id: `${id}-call`, result: {
+      success: true, status: 'awaiting_answer', widget: { type: 'text', data: {
+        id: 'player_concept', question: 'Who would you like to play?',
+      } },
+    },
+  } });
+  const snapshot = { question_message_id: 'first-question', tool_call_id: 'first-question-call',
+    widget_id: 'player_concept', question: 'Who would you like to play?', type: 'text',
+    value: 'Rowan <courier>', label: 'Rowan <courier>', custom: false };
+  const answer = { message_id: 'answer', sequence: 3, kind: 'user', content: {
+    kind: 'builder_question_answer', text: 'Here are my answers: hidden transport text',
+    answers: [snapshot],
+  } };
+  let messages = [answer, question('new-question', 4)];
+  h.state.bridge.session_context = async () => ({ messages, latest_user_sequence: 3 });
+  await h.openBuilderChat('a');
+  let html = h.node('chronology').dataset.chronologyHtml;
+  assert.match(html, /Rowan &lt;courier&gt;/);
+  assert.equal((html.match(/Answered/g) || []).length, 1);
+  assert.match(html, /Submit answers/);
+  assert.doesNotMatch(html, /hidden transport text/);
+  messages = [question('first-question', 2), ...messages];
+  await h.openBuilderChat('a');
+  html = h.node('chronology').dataset.chronologyHtml;
+  assert.equal((html.match(/Rowan &lt;courier&gt;/g) || []).length, 1);
+  assert.equal((html.match(/Answered/g) || []).length, 1);
+  assert.match(html, /Submit answers/);
+  messages.push({ message_id: 'plain', sequence: 5, kind: 'user', content: {
+    text: 'Here are my answers: this is my actual typed chat.',
+  } });
+  await h.openBuilderChat('a');
+  html = h.node('chronology').dataset.chronologyHtml;
+  assert.match(html, /Here are my answers: this is my actual typed chat\./);
+  assert.match(html, /<div class="story-header">You<\/div>/);
+  // A corrupt or mismatched link must remain visible rather than erase player input.
+  answer.content.answers = [{ ...snapshot, tool_call_id: 'wrong-call' }];
+  await h.openBuilderChat('a');
+  assert.match(h.node('chronology').dataset.chronologyHtml, /hidden transport text/);
+});
+
+test('rejected question submission keeps its session draft and ordinary composer text', async () => {
+  const h = harness();
+  h.state.bridge.session_context = async () => ({ messages: [{ message_id: 'question',
+    kind: 'evidence', content: { kind: 'builder_tool_result', tool_name: 'ask_question', result: {
+      success: true, status: 'awaiting_answer', widget: { type: 'text', data: {
+        id: 'concept', question: 'Who would you like to play?',
+      } },
+    } },
+  }] });
+  await h.openBuilderChat('a');
+  h.node('player-input').value = 'Separate composer draft';
+  const control = h.makeElement();
+  control.dataset = { builderQuestionKey: 'question', builderQuestionType: 'text',
+    builderQuestionText: 'Who would you like to play?', builderQuestionOrder: '0' };
+  control.value = 'Keep Rowan';
+  control.setAttribute('form', 'builder-question-form-a');
+  const form = h.makeElement();
+  form.id = 'builder-question-form-a';
+  form.dataset = { builderQuestionSession: 'a' };
+  form.querySelector = () => h.makeElement();
+  const container = h.makeElement();
+  container.querySelectorAll = selector => selector === '[data-builder-question-form]'
+    ? [form] : [control];
+  h.wireBuilderQuestionForms(container);
+  control.dispatchEvent({ type: 'input' });
+  form.dispatchEvent({ type: 'submit', preventDefault() {} });
+  await h.flush();
+  const command = h.calls.submissions[0];
+  assert.equal(h.state.sessionActivities.get('a').pendingInput, null);
+  h.pending.get(command.attempt_id).reject(new Error('Question is stale'));
+  await h.flush();
+  assert.equal(h.state.builderQuestionDrafts.get('a').get('question').text, 'Keep Rowan');
+  assert.equal(h.node('player-input').value, 'Separate composer draft');
+  assert.equal(h.calls.submissions.length, 1);
+});
+
 test('paged Builder history loads on scroll, preserves position and ignores a departed page', async () => {
   const h = harness();
   const older = deferred();
@@ -1183,6 +1320,20 @@ test('host dictation bridge passes identity and language without audio or submis
     ['dictation_start', { id: 'capture', engine: 'installed-language' }],
     ['dictation_stop', { id: 'capture' }], ['dictation_cancel', { id: 'capture' }],
   ]);
+});
+
+test('host bridge carries structured question refs and exact answer values to the native command', async () => {
+  const h = harness();
+  const calls = [];
+  h.window.__TAURI__ = { core: { invoke: async (...args) => { calls.push(args); } } };
+  const bridge = h.createHostBridge();
+  const answers = [{ question_message_id: 'question', value: '  Rowan\n<watcher>  ', custom: false }];
+  await bridge.submit_session_input({ session_id: 'a', attempt_id: 'attempt', message_id: 'answer',
+    user_text: 'genuine input', builder_question_answers: answers });
+  assert.equal(calls[0][0], 'submit_session_input');
+  assert.deepEqual(calls[0][1].builderQuestionAnswers, answers);
+  await bridge.submit_session_input({ session_id: 'a', user_text: 'Plain chat' });
+  assert.equal('builderQuestionAnswers' in calls[1][1], false);
 });
 
 test('cancel during language discovery prevents native capture and keeps the draft', async () => {
