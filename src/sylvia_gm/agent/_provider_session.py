@@ -3400,6 +3400,7 @@ class ProviderSessionAdapter:
                         query = parameters.get("query")
                         raw_sources = parameters.get("sources")
                         limit = parameters.get("limit", 5)
+                        offset = parameters.get("offset", 0)
                         sources = (
                             tuple(str(item) for item in raw_sources)
                             if isinstance(raw_sources, Sequence)
@@ -3414,6 +3415,9 @@ class ProviderSessionAdapter:
                             or (raw_sources is not None and sources is None)
                             or not isinstance(limit, int)
                             or isinstance(limit, bool)
+                            or not isinstance(offset, int)
+                            or isinstance(offset, bool)
+                            or offset < 0
                         ):
                             local_tool_results[assembly.call_id] = {
                                 "status": "rejected",
@@ -3422,7 +3426,7 @@ class ProviderSessionAdapter:
                             local_tool_failures.add(assembly.call_id)
                             continue
                         try:
-                            matches = searcher(query, sources, limit)
+                            matches = searcher(query, sources, limit, offset)
                         except CommandRejected as error:
                             local_tool_results[assembly.call_id] = {
                                 "status": "rejected",

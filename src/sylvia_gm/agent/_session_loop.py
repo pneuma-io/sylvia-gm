@@ -375,7 +375,7 @@ class SessionProviderInput:
     control: ProviderControl
     catalog_supplier: Callable[[str], tuple[ModelMechanicsTool, ...]] | None = None
     knowledge_searcher: (
-        Callable[[str, Sequence[str] | None, int], Mapping[str, object]] | None
+        Callable[[str, Sequence[str] | None, int, int], Mapping[str, object]] | None
     ) = None
     reference_reader: Callable[[str, str], Mapping[str, object]] | None = None
     narrative_writer: Callable[[Mapping[str, object]], Mapping[str, object]] | None = None
@@ -973,11 +973,15 @@ class CampaignSessionLoop:
                 discovery_id=catalog_request_id,
                 session_id=request.session_id,
             ),
-            knowledge_searcher=lambda query, sources, limit: self._mechanics.search_knowledge(
-                campaign_id,
-                query=query,
-                sources=sources,
-                limit=limit,
+            knowledge_searcher=lambda query, sources, limit, offset: (
+                self._mechanics.search_knowledge(
+                    campaign_id,
+                    query=query,
+                    sources=sources,
+                    limit=limit,
+                    offset=offset,
+                    session_id=request.session_id,
+                )
             ),
             reference_reader=lambda source, path: self._mechanics.read_reference(
                 campaign_id,
@@ -1457,12 +1461,14 @@ class CampaignSessionLoop:
                             discovery_id=catalog_request_id,
                             session_id=session_id,
                         ),
-                        knowledge_searcher=lambda query, sources, limit: (
+                        knowledge_searcher=lambda query, sources, limit, offset: (
                             self._mechanics.search_knowledge(
                                 campaign_id,
                                 query=query,
                                 sources=sources,
                                 limit=limit,
+                                offset=offset,
+                                session_id=session_id,
                             )
                         ),
                         reference_reader=lambda source, path: self._mechanics.read_reference(

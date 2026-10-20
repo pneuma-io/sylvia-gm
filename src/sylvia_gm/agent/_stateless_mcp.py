@@ -2398,6 +2398,7 @@ class StatelessMcpMechanics:
         sources: Sequence[str] | None = None,
         limit: int = 5,
         offset: int = 0,
+        session_id: str | None = None,
     ) -> Mapping[str, object]:
         """Search exact campaign authority through a fresh private MCP request."""
 
@@ -2411,10 +2412,11 @@ class StatelessMcpMechanics:
                     "MCP client negotiated an unsupported protocol version",
                     code="unsupported_mcp_protocol_version",
                 )
-            await client.list_tools(
-                meta=_meta({"campaign_id": campaign_id}),
-                cache_mode="bypass",
-            )
+            # Retain the same authorized discovery context used for a reference read.
+            identity = {"campaign_id": campaign_id}
+            if session_id is not None:
+                identity["session_id"] = session_id
+            await client.list_tools(meta=_meta(identity), cache_mode="bypass")
             result = await client.call_tool(
                 _KNOWLEDGE_SEARCH_TOOL_NAME,
                 arguments,
@@ -2458,6 +2460,7 @@ class StatelessMcpMechanics:
         sources: Sequence[str] | None = None,
         limit: int = 5,
         offset: int = 0,
+        session_id: str | None = None,
     ) -> Mapping[str, object]:
         """Discover bounded campaign references through a fresh MCP request."""
 
@@ -2468,6 +2471,7 @@ class StatelessMcpMechanics:
                 sources=sources,
                 limit=limit,
                 offset=offset,
+                session_id=session_id,
             )
         )
 
