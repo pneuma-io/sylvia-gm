@@ -962,6 +962,53 @@ async fn package_candidates(window: WebviewWindow) -> Result<Value, String> {
 }
 
 #[tauri::command]
+async fn campaign_rules_update_options(
+    window: WebviewWindow,
+    campaign_id: String,
+) -> Result<Value, String> {
+    owner_call_async(
+        window,
+        "campaign_rules_update_options",
+        json!({"campaign_id": campaign_id}),
+    )
+    .await
+}
+
+#[tauri::command]
+async fn preview_campaign_rules_update(
+    window: WebviewWindow,
+    campaign_id: String,
+    candidate_id: String,
+) -> Result<Value, String> {
+    owner_call_async(
+        window,
+        "preview_campaign_rules_update",
+        json!({"campaign_id": campaign_id, "candidate_id": candidate_id}),
+    )
+    .await
+}
+
+#[tauri::command]
+async fn adopt_campaign_rules_update(
+    window: WebviewWindow,
+    campaign_id: String,
+    candidate_id: String,
+    activation_id: String,
+    expected_revision: u64,
+    expected_lock_id: String,
+    confirmation: String,
+) -> Result<Value, String> {
+    owner_call_async(
+        window,
+        "adopt_campaign_rules_update",
+        json!({"campaign_id": campaign_id, "candidate_id": candidate_id,
+            "activation_id": activation_id, "expected_revision": expected_revision,
+            "expected_lock_id": expected_lock_id, "confirmation": confirmation}),
+    )
+    .await
+}
+
+#[tauri::command]
 async fn inspect_package_candidate(
     window: WebviewWindow,
     candidate_id: String,
@@ -2731,6 +2778,9 @@ pub fn run() {
             inspect_provider_thinking,
             steer_session,
             package_candidates,
+            campaign_rules_update_options,
+            preview_campaign_rules_update,
+            adopt_campaign_rules_update,
             inspect_package_candidate,
             package_candidate_text,
             compare_package_candidates,
