@@ -4,8 +4,8 @@
   const escape = value => String(value ?? '').replace(/[&<>"']/g, char =>
     ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'})[char]);
   const flags = piece => new Set(piece.flags || []);
-  const description = piece => [piece.face ? root.SylviaTileFaces.describe(piece.face) : piece.label,
-    ...(piece.flags || []).filter(flag => flag === 'drawn').map(() => 'Drawn tile'), piece.detail].filter(Boolean).join('. ');
+  const description = piece => [...new Set([piece.face ? root.SylviaTileFaces.describe(piece.face) : piece.label,
+    ...(piece.flags || []).filter(flag => flag === 'drawn').map(() => 'Drawn tile'), piece.detail].filter(Boolean))].join('. ');
   function tiles(pieces, controls, rack = false, pond = false) {
     if (pond) {
       const visible = pieces.filter(piece => !flags(piece).has('claimed'));
@@ -54,8 +54,8 @@
     const choices = groups.filter(group => group.role === 'actions' && !group.concealed).flatMap(group => group.pieces || []).filter(piece => controls.get(piece.action_id)?.available === true).map(piece =>
       `<button type="button" class="table-choice ruleset-panel-action" data-panel-action-id="${escape(piece.action_id)}" data-panel-piece-id="${escape(piece.id)}" aria-label="${escape(piece.detail || piece.label)}" title="${escape(piece.detail || piece.label)}"><span>${escape(piece.label)}</span>${(piece.faces || []).map(face => root.SylviaTileFaces.render(face)).join('')}</button>`).join('');
     const messages = groups.filter(group => group.role === 'message').flatMap(group => group.pieces || []);
-    return `<div class="tile-table"><div class="table-board" role="group" aria-label="${escape(data.title)} table">${seats}${indicators}` +
-      `<div class="table-round"><strong>${escape(status.get('Round') || '')}</strong><span>${escape(status.get('Live wall') || '0')} tiles left</span><small>Honba ${escape(status.get('Honba') || '0')} · Sticks ${escape(status.get('Riichi sticks') || '0')}</small></div></div>` +
+    return `<div class="tile-table"><div class="table-fit"><div class="table-board" role="group" aria-label="${escape(data.title)} table">${seats}${indicators}` +
+      `<div class="table-round"><strong>${escape(status.get('Round') || '')}</strong><span>${escape(status.get('Live wall') || '0')} tiles left</span><small>Honba ${escape(status.get('Honba') || '0')} · Sticks ${escape(status.get('Riichi sticks') || '0')}</small></div></div></div>` +
       `<div class="table-command-deck"><div class="table-turn" role="status">${escape(center?.label || '')}</div>` +
       `${messages.length ? `<p class="table-message">${escape(messages[0].label)}</p>` : ''}` +
       `<p class="table-selection-help">${canDiscard ? 'Select a tile, then Discard. Arrow keys move through your hand.' : choices ? 'Choose an available action.' : 'Waiting for the acting seat.'}</p>` +

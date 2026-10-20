@@ -18,6 +18,7 @@ for (const width of [750,280]) test(`tile artwork, ponds and local keyboard sele
     assert.equal(await page.locator('.table-seat').count(),4);
     assert.equal(await page.locator('.table-tile-back').count(),39);
     assert.equal(await page.locator('.table-rack .tile-drawn').count(),1);
+    assert.equal((await page.locator('.tile-drawn button').getAttribute('aria-label')).match(/Drawn tile/g).length,1);
     assert.equal(await page.locator('.table-pond .tile-sideways').count(),4);
     assert.equal(await page.locator('.table-pond .table-tile-slot').count(),28,'Called discards have no second visible tile');
     assert.equal(await page.locator('.table-meld .tile-sideways').count(),1);
@@ -37,6 +38,14 @@ for (const width of [750,280]) test(`tile artwork, ponds and local keyboard sele
     assert.equal(main.scroll,main.width,'Narrow panel has no horizontal overflow');
     assert.doesNotMatch(await page.locator('.table-board').innerText(),/Diagnostic label/,'Codes are not primary tile display');
     if(process.env.SYLVIA_TILE_EVIDENCE){fs.mkdirSync(process.env.SYLVIA_TILE_EVIDENCE,{recursive:true});await page.locator('main').screenshot({path:path.join(process.env.SYLVIA_TILE_EVIDENCE,`component-${width}.png`)});}
+    await page.locator('main').evaluate(el=>el.style.height='460px');
+    const fit=await page.evaluate(()=>{
+      const box=selector=>{const b=document.querySelector(selector).getBoundingClientRect();return {width:b.width,height:b.height,bottom:b.bottom}};
+      return {host:box('main'),board:box('.table-board'),deck:box('.table-command-deck')};
+    });
+    assert.ok(Math.abs(fit.board.width-fit.board.height)<1,'Tiles stay on a square table when height is constrained');
+    assert.ok(fit.deck.bottom<=fit.host.bottom+1,'The action deck stays visible in a short panel');
+    if(process.env.SYLVIA_TILE_EVIDENCE)await page.locator('main').screenshot({path:path.join(process.env.SYLVIA_TILE_EVIDENCE,`component-short-${width}.png`)});
   } finally {await browser.close();}
 });
 
