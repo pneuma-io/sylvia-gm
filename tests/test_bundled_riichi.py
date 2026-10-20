@@ -55,11 +55,10 @@ def test_fresh_owner_offers_srd_and_riichi_and_reopens_without_duplicates(tmp_pa
                 item["id"] == "pneuma.riichi-club"
                 for item in riichi["compatible_settings"]
             )
-            assert not any(
-                item["kind"] == "campaign_plan"
-                and item.get("ruleset", {}).get("id") == "pneuma.riichi-mahjong"
-                for item in catalog
-            )
+            assert [item["id"] for item in catalog if item["kind"] == "campaign_plan"
+                    and item.get("ruleset", {}).get("id") == "pneuma.riichi-mahjong"] == [
+                "riichi-quick-test"
+            ]
         finally:
             harness.close()
     assert snapshots[0] == snapshots[1]

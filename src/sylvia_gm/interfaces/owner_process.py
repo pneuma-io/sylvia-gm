@@ -574,6 +574,15 @@ def _campaign_creation_catalog(
         choice = next((item for item in items if item.get("kind") == "ruleset" and item.get("id") == rule["id"]), None)
         if choice is None:
             choice = {"kind": "ruleset", **dict(rule), "title": rule["id"], "selection_id": rule["id"], "compatible_settings": ()}
+            installed = next((entry for candidate in candidates
+                              for entry in candidate.package_lock.entries
+                              if (entry.package_id, entry.version, entry.sha256) == (
+                                  rule["id"], rule["version"], rule["content_sha256"],
+                              )), None)
+            if installed is not None:
+                choice["title"] = application_owner.package_label(
+                    installed.package_id, installed.version, installed.sha256,
+                )
             items.append(choice)
         settings = tuple(choice.get("compatible_settings", ()))
         if not any(binding["id"] == world["id"] for binding in settings):
