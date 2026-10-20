@@ -8202,7 +8202,7 @@ const SylviaGMFrontend = (() => {
     if (history.refresh) return history.refresh;
     const current = () => state.displayHistory === history && state.activeSessionId === sessionId;
     const loadPage = async () => {
-      const page = await state.bridge.session_history_page(sessionId);
+      let page = await state.bridge.session_history_page(sessionId);
       if (!current()) return null;
       let incoming = page.messages || [];
       let cursor = page.next_before_sequence;
@@ -8212,6 +8212,11 @@ const SylviaGMFrontend = (() => {
           incoming.length && incoming[0].sequence > previousLatest + 1) {
         const gap = await state.bridge.session_history_page(sessionId, cursor);
         if (!current()) return null;
+        // A gap read can observe a newer reply that closed the projected form.
+        if ((gap.latest_sequence ?? 0) > (page.latest_sequence ?? 0)) {
+          page = { ...page, ...gap, messages: page.messages,
+            next_before_sequence: page.next_before_sequence };
+        }
         incoming = [...(gap.messages || []), ...incoming];
         cursor = gap.next_before_sequence;
       }
@@ -8469,7 +8474,21 @@ const SylviaGMFrontend = (() => {
     const constructionPanel = $('construction-panel');
     // The attached Interview owns this area while loading as well as when its form is visible.
     if (constructionPanel.parentElement === container) return;
-    const messages = context && Array.isArray(context.messages) ? context.messages : [];
+    const messages = context && Array.isArray(context.messages) ? [...context.messages] : [];
+    // Current form evidence stays available without expanding the loaded history pages.
+    const currentQuestions = Array.isArray(context?.builder_question_messages)
+      ? context.builder_question_messages.filter((message) =>
+        !message.session_id || message.session_id === sessionId) : null;
+    if (currentQuestions) {
+      const loaded = new Set(messages.map((message) => message.message_id));
+      currentQuestions.forEach((message) => {
+        if (!loaded.has(message.message_id)) {
+          messages.push(message);
+          loaded.add(message.message_id);
+        }
+      });
+      messages.sort((left, right) => left.sequence - right.sequence);
+    }
     if (activity.pendingInput &&
         messages.some((message) => message.message_id === activity.pendingInput.messageId)) {
       clearAcceptedInput(activity);
@@ -8540,7 +8559,9 @@ const SylviaGMFrontend = (() => {
       });
     });
     const activeQuestions = builderQuestions.filter((question) =>
-      question && !question.answer && question.awaiting && (context.latest_user_sequence != null
+      question && !question.answer && question.awaiting &&
+      (!currentQuestions || currentQuestions.some((message) => message.message_id === question.key)) &&
+      (context.latest_user_sequence != null
         ? messages[question.index].sequence > context.latest_user_sequence
         : question.index > lastUserIndex)
     );

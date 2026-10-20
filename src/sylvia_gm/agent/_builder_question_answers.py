@@ -7,7 +7,8 @@ from sylvia_gm.domain.errors import CommandRejected
 from sylvia_gm.domain.session import SessionContext, SessionMessageKind
 
 
-def _question(content: SafePayload) -> dict | None:
+def builder_question_details(content: SafePayload) -> dict | None:
+    """Recognize the same answerable widget in display projections and submission checks."""
     if content.get("kind") != "builder_tool_result" or content.get("tool_name") != "ask_question":
         return None
     result = content.get("result")
@@ -72,7 +73,7 @@ def builder_question_answer_content(
     questions = {}
     for row in context.messages:
         if row.kind is SessionMessageKind.EVIDENCE and row.sequence > latest_user:
-            question = _question(row.content)
+            question = builder_question_details(row.content)
             if question:
                 questions[row.message_id] = question
     snapshots = []

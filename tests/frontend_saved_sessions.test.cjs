@@ -1080,6 +1080,148 @@ test('a paged question stays closed when the later user answer is outside its pa
   assert.doesNotMatch(h.node('chronology').dataset.chronologyHtml, /Submit answers/);
 });
 
+for (const straddling of [true, false]) test(`paged reopen includes the complete ${straddling ? 'straddling' : 'offpage'} question group`, async () => {
+  const h = harness();
+  const question = (id, sequence, text) => ({ message_id: id, sequence, kind: 'evidence', content: {
+    kind: 'builder_tool_result', tool_name: 'ask_question', tool_call_id: `${id}-call`, result: {
+      success: true, status: 'awaiting_answer', widget: { type: 'text', data: { id, question: text } },
+    },
+  } });
+  const questions = [question('early', 2, 'Who would you like to play?'),
+    question('background', straddling ? 103 : 3, 'What is their background?')];
+  const page = { latest_sequence: 103, latest_user_sequence: 1, next_before_sequence: 54,
+    messages: Array.from({ length: 50 }, (_, index) => ({ sequence: 54 + index,
+      message_id: `progress-${index}`, kind: 'talk', content: { text: 'Builder progress' } })),
+    builder_question_messages: questions };
+  if (straddling) page.messages[49] = questions[1];
+  const reads = [];
+  h.state.bridge.session_context = async () => { throw new Error('Do not read full history'); };
+  h.state.bridge.session_history_page = async (sessionId, before) => {
+    reads.push([sessionId, before]); return page;
+  };
+  h.state.builderQuestionDrafts.set('a', new Map([['early', { text: 'Keep Rowan' }]]));
+  await h.openBuilderChat('a');
+  let html = h.node('chronology').dataset.chronologyHtml;
+  assert.match(html, /Who would you like to play\?/);
+  assert.match(html, /What is their background\?/);
+  assert.equal((html.match(/data-builder-question-type="text"/g) || []).length, 2);
+  assert.match(html, /Submit answers/);
+  assert.equal(reads.length, 1, 'question projection must not load unrelated history pages');
+  await h.openBuilderChat('b');
+  await h.openBuilderChat('a');
+  html = h.node('chronology').dataset.chronologyHtml;
+  assert.equal((html.match(/data-builder-question-type="text"/g) || []).length, 2);
+  assert.equal(h.state.builderQuestionDrafts.get('a').get('early').text, 'Keep Rowan');
+  assert.equal(h.calls.submissions.length, 0);
+  const makeForm = () => {
+    const controls = questions.map((question, index) => {
+      const control = h.makeElement();
+      control.dataset = { builderQuestionKey: question.message_id, builderQuestionType: 'text',
+        builderQuestionText: question.content.result.widget.data.question, builderQuestionOrder: `${index}` };
+      control.setAttribute('form', 'builder-question-form-a');
+      return control;
+    });
+    const button = h.makeElement(), form = h.makeElement(), container = h.makeElement();
+    form.id = 'builder-question-form-a'; form.dataset = { builderQuestionSession: 'a' };
+    form.querySelector = () => button;
+    container.querySelectorAll = selector => selector === '[data-builder-question-form]' ? [form] : controls;
+    h.wireBuilderQuestionForms(container);
+    return { controls, form };
+  };
+  let form = makeForm();
+  assert.equal(form.controls[0].value, 'Keep Rowan');
+  form.controls[1].value = 'Courier';
+  form.controls[1].dispatchEvent({ type: 'input' });
+  await h.openBuilderChat('b');
+  form.form.dispatchEvent({ type: 'submit', preventDefault() {} });
+  assert.equal(h.calls.submissions.length, 0);
+  await h.openBuilderChat('a');
+  form = makeForm();
+  assert.equal(form.controls[1].value, 'Courier');
+  form.form.dispatchEvent({ type: 'submit', preventDefault() {} });
+  form.form.dispatchEvent({ type: 'submit', preventDefault() {} });
+  await h.flush();
+  const command = h.calls.submissions[0];
+  assert.equal(h.calls.submissions.length, 1);
+  assert.equal(command.session_id, 'a');
+  assert.deepEqual(Array.from(command.builder_question_answers, answer => answer.question_message_id),
+    ['early', 'background']);
+  assert.equal(command.builder_question_answers[0].value, 'Keep Rowan');
+  h.pending.get(command.attempt_id).reject(new Error('Controlled rejection retains drafts'));
+  await h.flush();
+  assert.equal(h.state.builderQuestionDrafts.get('a').get('early').text, 'Keep Rowan');
+});
+
+test('a closure refresh wins over an older question page still loading', async () => {
+  const h = harness();
+  const older = deferred();
+  const question = { message_id: 'question', sequence: 2, kind: 'evidence', content: {
+    kind: 'builder_tool_result', tool_name: 'ask_question', tool_call_id: 'question-call', result: {
+      success: true, status: 'awaiting_answer', widget: { type: 'text', data: {
+        id: 'concept', question: 'Who would you like to play?',
+      } },
+    },
+  } };
+  let closed = false;
+  const newest = () => ({ latest_sequence: closed ? 104 : 103, latest_user_sequence: closed ? 104 : 1,
+    next_before_sequence: 54, builder_question_messages: closed ? [] : [question],
+    messages: closed ? [{ message_id: 'closure', sequence: 104, kind: 'user',
+      content: { text: 'I changed my mind' } }] : [{ message_id: 'progress', sequence: 103,
+      kind: 'talk', content: { text: 'Builder progress' } }],
+  });
+  h.state.bridge.session_history_page = async (_id, before) => before == null ? newest() : older.promise;
+  h.state.builderQuestionDrafts.set('a', new Map([['question', { text: 'Keep Rowan' }]]));
+  await h.openBuilderChat('a');
+  h.node('chronology').dispatchEvent({ type: 'scroll' });
+  assert.equal(h.state.displayHistory.loadingOlder, true);
+  assert.equal(h.state.builderQuestionDrafts.get('a').get('question').text, 'Keep Rowan');
+  closed = true;
+  await h.renderBuilderSession('a');
+  older.resolve({ messages: [question], latest_sequence: 103, latest_user_sequence: 1,
+    builder_question_messages: [question], next_before_sequence: null });
+  await h.flush();
+  const html = h.node('chronology').dataset.chronologyHtml;
+  assert.match(html, /I changed my mind/);
+  assert.match(html, /A later reply closed these controls/);
+  assert.doesNotMatch(html, /Submit answers/);
+  assert.equal(h.state.displayHistory.context.latest_user_sequence, 104);
+  assert.equal(h.calls.submissions.length, 0);
+});
+
+test('a closure observed while filling a refresh gap closes its projected form', async () => {
+  const h = harness();
+  const gap = deferred();
+  let advanced = false;
+  const question = { message_id: 'question', sequence: 2, kind: 'evidence', content: {
+    kind: 'builder_tool_result', tool_name: 'ask_question', tool_call_id: 'question-call', result: {
+      success: true, status: 'awaiting_answer', widget: { type: 'text', data: {
+        id: 'concept', question: 'Who would you like to play?',
+      } },
+    },
+  } };
+  h.state.bridge.session_history_page = async (_id, before) => {
+    if (before != null) return gap.promise;
+    if (!advanced) return { messages: [{ message_id: 'user', sequence: 1, kind: 'user',
+      content: { text: 'Create a character' } }], latest_sequence: 1, latest_user_sequence: 1,
+      builder_question_messages: [], next_before_sequence: null };
+    return { messages: [{ message_id: 'progress', sequence: 104, kind: 'talk',
+      content: { text: 'Builder progress' } }], latest_sequence: 104, latest_user_sequence: 1,
+      builder_question_messages: [question], next_before_sequence: 100 };
+  };
+  await h.openBuilderChat('a');
+  h.state.builderQuestionDrafts.set('a', new Map([['question', { text: 'Keep Rowan' }]]));
+  advanced = true;
+  const refresh = h.renderBuilderSession('a');
+  await h.flush();
+  assert.equal(h.state.builderQuestionDrafts.get('a').get('question').text, 'Keep Rowan');
+  gap.resolve({ messages: [question], latest_sequence: 105, latest_user_sequence: 105,
+    builder_question_messages: [], next_before_sequence: null });
+  await refresh;
+  assert.doesNotMatch(h.node('chronology').dataset.chronologyHtml, /Submit answers/);
+  assert.equal(h.state.displayHistory.context.latest_user_sequence, 105);
+  assert.equal(h.calls.submissions.length, 0);
+});
+
 test('paged DM history keeps its canonical acknowledgement outside the visible page', async () => {
   const h = harness();
   configureGM(h);

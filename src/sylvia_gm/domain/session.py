@@ -448,7 +448,7 @@ class SessionActivityBasis:
 
 @dataclass(frozen=True)
 class SessionHistoryPage:
-    """A bounded display page, distinct from the agent's complete saved context."""
+    """A bounded display page with current form evidence, distinct from model context."""
 
     session: SessionRecord
     messages: tuple[SessionMessage, ...]
@@ -460,6 +460,7 @@ class SessionHistoryPage:
     act_markers: tuple[SafePayload, ...] = ()
     campaign_ending: SafePayload | None = None
     campaign_endings: tuple[SafePayload, ...] = ()
+    builder_question_messages: tuple[SessionMessage, ...] = ()
 
 
 @dataclass(frozen=True)

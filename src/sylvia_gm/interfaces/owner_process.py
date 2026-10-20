@@ -39,7 +39,10 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Any, BinaryIO, TextIO, cast
 
-from sylvia_gm.agent._builder_question_answers import builder_question_answer_content
+from sylvia_gm.agent._builder_question_answers import (
+    builder_question_answer_content,
+    builder_question_details,
+)
 from sylvia_gm.agent._builder_session import (
     BuilderTurnResult,
     CampaignContentToolAuthority,
@@ -2317,6 +2320,10 @@ def _dispatch_selected(
                 "act_markers": history_page.act_markers,
                 "campaign_ending": history_page.campaign_ending,
                 "campaign_endings": history_page.campaign_endings,
+                "builder_question_messages": tuple(
+                    message for message in history_page.builder_question_messages
+                    if builder_question_details(message.content) is not None
+                ),
             }
             display_session = history_page.session
             display_messages = history_page.messages
