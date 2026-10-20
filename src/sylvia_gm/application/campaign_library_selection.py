@@ -123,9 +123,11 @@ class CampaignLibrarySelection:
                 }
             return row
 
-        for item in self.participants:
-            rows[item.role].append(row_for(item))
         policy = parse_starting_party_policy(self.plan.plan.payload["starting_party"])
+        for item in self.participants:
+            if item.role == "player_character" and policy.fixed_player_character is not None:
+                continue
+            rows[item.role].append(row_for(item))
         available = {item.artifact_id: item for item in self.required_participants}
         for role, reference in _required_character_references(policy):
             item = available.get(reference.character_id)

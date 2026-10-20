@@ -229,6 +229,9 @@ def test_all_bundled_plan_policies_and_exact_setting_snapshots(tmp_path):
             companions = (*required, *custom)
             player = starters[0].artifact_id
             if policy["player_character"]["mode"] == "fixed":
+                assert [row["id"] for row in options["player_archetypes"]] == [
+                    policy["player_character"]["character"]["id"]
+                ]
                 with pytest.raises(CommandRejected):
                     materialize_library_party(
                         owner,
