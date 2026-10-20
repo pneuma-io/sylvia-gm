@@ -17,6 +17,7 @@ from sylvia_gm.application.bundled_packages import (
 )
 from sylvia_gm.application.campaign_plan_sources import validate_retained_campaign_plan
 from sylvia_gm.application.character_profiles import profile_from_snapshot
+from sylvia_gm.application.package_runtime import PACKAGE_RUNTIME_BYTE_LIMIT
 from sylvia_gm.domain.authority import PackageRole, SafePayload, owned_payload
 from sylvia_gm.domain.errors import CommandRejected
 from sylvia_gm.domain.package_library import (
@@ -368,7 +369,7 @@ def reader_for_references(
             package["version"],
             package["content_sha256"],
             package["path"],
-            maximum_bytes=8 * 1024 * 1024,
+            maximum_bytes=PACKAGE_RUNTIME_BYTE_LIMIT,
         )
 
     return BuilderReferences(tuple(sorted((*files, *plan_files))), read)

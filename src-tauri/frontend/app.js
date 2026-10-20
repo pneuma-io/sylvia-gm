@@ -7739,6 +7739,12 @@ const SylviaGMFrontend = (() => {
       'check_character_profile_draft', 'publish_character_profile'].includes(toolName)) {
       return { feedback: true, summary: participantRejectionDetail(result) };
     }
+    if (result.success === false && ['inspect_builder_references', 'copy_builder_reference'].includes(toolName) &&
+        ['reference_unavailable', 'reference_copy_unavailable'].includes(result.code)) {
+      return { feedback: true, summary: result.reason === 'package_file_oversized'
+        ? 'The selected source file exceeds Builder’s supported size. Saved work is kept. Check the selected content before continuing.'
+        : `Builder could not ${toolName === 'copy_builder_reference' ? 'copy' : 'read'} a selected reference. Saved work is kept. Check the selected source${toolName === 'copy_builder_reference' ? ' and draft workspace' : ''} before continuing.` };
+    }
     if (failed || rejected) {
       return { feedback: true, summary: failed
         ? 'Sylvia could not complete this action. Try again.'
@@ -8238,6 +8244,14 @@ const SylviaGMFrontend = (() => {
     return null;
   }
 
+  function builderProgressStage(name) {
+    if (['get_content_definition', 'inspect_builder_references', 'read_file'].includes(name)) return 'Reviewed references';
+    if (['write_file', 'edit_file', 'copy_builder_reference'].includes(name)) return 'Updated draft';
+    if (['check_participant_draft', 'check_character_profile_draft'].includes(name)) return 'Checked character';
+    if (['publish_participant_artifact', 'publish_character_profile'].includes(name)) return 'Saved character';
+    return null;
+  }
+
   // Correlation comes from saved ingress metadata, never arrival timing or narration text.
   function groupedAgentActivity(messages, cards, context, role, liveActivity = null) {
     const groups = new Map();
@@ -8288,6 +8302,10 @@ const SylviaGMFrontend = (() => {
         const result = content.result || {};
         const failed = result.success === false || ['rejected', 'error', 'failed'].includes(result.status) ||
           ['rejected', 'error', 'failed', 'pending'].includes(content.status);
+        if (role === 'builder' && !failed && content.tool_name) {
+          const stage = builderProgressStage(content.tool_name);
+          if (stage) group.lastStage = stage;
+        }
         if (label && !failed && result.result_card == null) {
           group.entries.push({ label, order: correlation?.source_order ?? index });
           hidden.add(index);
@@ -8304,7 +8322,7 @@ const SylviaGMFrontend = (() => {
     const additions = new Map();
     for (const group of groups.values()) {
       const live = liveActivity?.attemptId === group.attempt && activityIsWorking(liveActivity);
-      const status = live ? 'Working' : group.status === 'interrupted' ? 'Interrupted' :
+      const status = live ? (role === 'builder' && group.lastStage ? `Working · Last: ${group.lastStage}` : 'Working') : group.status === 'interrupted' ? 'Interrupted' :
         group.status === 'completed' ? 'Done' : 'Recorded';
       const entries = group.entries.map((entry) => ({ order: entry.order,
         html: `<div class="agent-operation"><span>${escapeHtml(entry.label)}</span><span>Done</span></div>` }));
@@ -8322,7 +8340,7 @@ const SylviaGMFrontend = (() => {
       const label = role === 'builder' ? 'Builder activity' : 'GM activity';
       const html = `<details class="agent-activity" data-chronology-key="activity-${escapeHtml(group.attempt)}" ` +
         `data-disclosure-key="activity-${escapeHtml(group.attempt)}">` +
-        `<summary>${label}<span class="agent-activity-status">${status}</span></summary>` +
+        `<summary>${label}<span class="agent-activity-status">${escapeHtml(status)}</span></summary>` +
         `<div class="agent-activity-trail">${entries.sort((a, b) => a.order - b.order)
           .map((entry) => entry.html).join('')}</div></details>`;
       additions.set(group.position, (additions.get(group.position) || '') + html);

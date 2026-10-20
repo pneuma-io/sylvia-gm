@@ -70,6 +70,20 @@ test('application guidance is readable without a generic Details disclosure', ()
   assert.doesNotMatch(html, /<details|Operation /);
 });
 
+test('Builder reference failures explain source access instead of rejecting character choices', () => {
+  const render = app().toolResultMarkup;
+  for(const tool_name of ['inspect_builder_references','copy_builder_reference']){
+    const content={tool_name,result:{success:false,code:tool_name==='inspect_builder_references'?'reference_unavailable':'reference_copy_unavailable',
+      reason:'package_file_oversized',error:'PRIVATE PATH AND SOURCE'}};
+    const before=JSON.stringify(content);
+    const html=render(content,'');
+    assert.match(html,/selected (reference|source)|source file/i);
+    assert.match(html,/saved (work|draft)|draft.*kept/i);
+    assert.doesNotMatch(html,/unavailable with these choices|PRIVATE PATH AND SOURCE/);
+    assert.equal(JSON.stringify(content),before);
+  }
+});
+
 test('old saved checks retain recorded values in the shared card, without a legacy renderer or arithmetic', () => {
   const content = { tool_name: 'd20_test', parameters: { skill: 'survival', target_number: 14 },
     result: { context: { _outcome: 'failure', _adjusted_total: 99,

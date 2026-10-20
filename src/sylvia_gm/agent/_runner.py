@@ -90,6 +90,7 @@ class _BuilderLoopBudget:
     continuations: int
     previous_failure: str | None = None
     repeated_failures: int = 0
+    unreadable_references: dict[str, int] = field(default_factory=dict)
 
     @property
     def total_rounds(self) -> int:
@@ -110,6 +111,31 @@ class _BuilderLoopBudget:
             })
 
     def finish_round(self, calls: list[dict[str, Any]], results: list[Any]) -> None:
+        for call, result in zip(calls, results, strict=True):
+            name = call["function"]["name"]
+            if name not in {"inspect_builder_references", "copy_builder_reference"}:
+                continue
+            arguments = call["function"]["arguments"]
+            if isinstance(arguments, str):
+                try:
+                    arguments = json.loads(arguments or "{}")
+                except json.JSONDecodeError:
+                    continue
+            if not isinstance(arguments, dict) or not isinstance(result, dict):
+                continue
+            path = arguments.get("source_path" if name == "copy_builder_reference" else "path")
+            if not isinstance(path, str):
+                continue
+            if result.get("success") is False and result.get("reason") in {
+                "package_file_oversized", "package_corrupt",
+            }:
+                raise AgentLoopError(self.total_rounds, reason="required_reference_unavailable")
+            if result.get("success") is True:
+                self.unreadable_references.pop(path, None)
+            elif result.get("code") in {"reference_unavailable", "reference_copy_unavailable"}:
+                self.unreadable_references[path] = self.unreadable_references.get(path, 0) + 1
+                if self.unreadable_references[path] >= 3:
+                    raise AgentLoopError(self.total_rounds, reason="repeated_reference_failure")
         if not results or not all(
             isinstance(result, dict) and result.get("success") is False for result in results
         ):
@@ -144,6 +170,12 @@ class AgentLoopError(RuntimeError):
     def __init__(self, max_iterations: int, *, reason: str = "tool_limit") -> None:
         self.reason = reason
         self.user_message = (
+            "Builder stopped because a selected source file is too large or damaged. "
+            "Saved work was kept. Check the selected source content before continuing."
+            if reason == "required_reference_unavailable" else
+            "Builder stopped because the same source could not be read after several attempts. "
+            "Saved work was kept. Review the source error before continuing."
+            if reason == "repeated_reference_failure" else
             "Builder stopped after repeated identical tool failures; saved work was kept. "
             "Review the last tool error before continuing."
             if reason == "repeated_tool_failure"

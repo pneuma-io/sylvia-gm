@@ -9,11 +9,13 @@ from pathlib import Path
 
 import pytest
 
-from sylvia_gm.agent._builder_session import stream_builder_turn
+from sylvia_gm.agent._builder_reference_copy_tool import builder_reference_copy_tool
+from sylvia_gm.agent._builder_session import _builder_reference_tool, stream_builder_turn
 from sylvia_gm.agent._mode import AgentMode
 from sylvia_gm.agent._runner import AgentLoopError, AgentRunner
 from sylvia_gm.agent._session_loop import CampaignSessionLoop, SessionRunRequest
 from sylvia_gm.application.authority import AuthorityOwner
+from sylvia_gm.application.builder_references import BuilderReferences
 from sylvia_gm.domain.errors import CommandRejected
 from sylvia_gm.provider._base import FakeProvider, ProviderResponse, ProviderStreamChunk, ToolCall
 
@@ -109,14 +111,160 @@ async def test_builder_stops_repeating_the_same_failure(tmp_path: Path, streamin
     )
 
 
+@pytest.mark.asyncio
+@pytest.mark.parametrize("streaming", [False, True])
+async def test_builder_stops_one_unreadable_source_across_varied_calls_and_successful_reads(
+    tmp_path: Path,
+    streaming: bool,
+):
+    unavailable = "ruleset/runtime/ruleset.yaml"
+
+    def read(path):
+        if path == unavailable:
+            raise CommandRejected(
+                "Selected source cannot be read", code="package_file_unavailable"
+            )
+        return "A successfully read creation reference"
+
+    references = BuilderReferences((unavailable, "ruleset/creation.md"), read)
+    operations = [
+        (
+            "inspect_builder_references",
+            {"action": "find", "path": unavailable, "query": "starting_level_queue"},
+        ),
+        ("inspect_builder_references", {"action": "read", "path": "ruleset/creation.md"}),
+        ("inspect_builder_references", {"action": "read", "path": unavailable, "limit": 1200}),
+        ("write_file", {"path": "profile.md", "content": "Preserved authored character profile"}),
+        (
+            "copy_builder_reference",
+            {"source_path": unavailable, "destination_path": "references/runtime.yaml"},
+        ),
+    ]
+    provider = AuthoringProvider(
+        responses=[
+            ProviderResponse(
+                tool_calls=[
+                    ToolCall(
+                        id=f"call-{i}",
+                        name=name,
+                        arguments=json.dumps(arguments),
+                    )
+                ]
+            )
+            for i, (name, arguments) in enumerate(operations)
+        ]
+        + [ProviderResponse(content="Incorrectly completed")]
+    )
+    runner = AgentRunner(
+        AgentMode.BUILDER_FREEFORM,
+        provider,
+        None,
+        project_root=tmp_path,
+        builder_application_tools=(
+            _builder_reference_tool(references),
+            builder_reference_copy_tool(references, tmp_path),
+        ),
+    )
+    with pytest.raises(AgentLoopError) as stopped:
+        if streaming:
+            await runner.turn_stream("Create the character", asyncio.Queue())
+        else:
+            await runner.turn("Create the character")
+    assert stopped.value.reason == "repeated_reference_failure"
+    assert len(provider.calls) == 5
+    assert len([m for m in runner.history_snapshot() if m["role"] == "tool"]) == 5
+    assert (tmp_path / "profile.md").read_text() == "Preserved authored character profile"
+    assert not (tmp_path / "references/runtime.yaml").exists()
+
+
+def test_saved_builder_stops_oversized_reference_without_another_model_request(tmp_path):
+    path = "ruleset/runtime/ruleset.yaml"
+
+    def unavailable(_path):
+        raise CommandRejected(
+            "Package file exceeds its consumer byte limit", code="package_file_oversized"
+        )
+
+    references = BuilderReferences((path,), unavailable)
+    provider = AuthoringProvider(
+        responses=[
+            ProviderResponse(
+                tool_calls=[
+                    ToolCall(
+                        id="runtime",
+                        name="inspect_builder_references",
+                        arguments=json.dumps(
+                            {
+                                "action": "find",
+                                "path": path,
+                                "query": "starting_level_queue",
+                            }
+                        ),
+                    )
+                ]
+            ),
+            ProviderResponse(content="Should never be requested"),
+        ]
+    )
+    workspace = tmp_path / "draft"
+    workspace.mkdir()
+    (workspace / "profile.md").write_text("Existing character work")
+    with AuthorityOwner.open(tmp_path / "owner.db", "builder") as owner:
+        owner.create_builder_chat(provider_id="fixture", model_id="fixture", session_id="builder")
+        loop = CampaignSessionLoop(owner)
+        with pytest.raises(CommandRejected, match="source file is too large or damaged"):
+            loop.run_builder(
+                SessionRunRequest(
+                    "builder", "turn", "source-error", "input", "Create my character"
+                ),
+                lambda data: stream_builder_turn(
+                    provider,
+                    context=data.history,
+                    message_id="input",
+                    user_text="Create my character",
+                    workspace=workspace,
+                    control=data.control,
+                    complete=lambda _: None,
+                    references=references,
+                ),
+                lambda: (),
+            )
+        loop.assert_idle("builder")
+        messages = owner.session_context("builder").messages
+        terminal = next(
+            m.content for m in messages if m.content.get("kind") == "builder_attempt_terminal"
+        )
+        assert terminal["status"] == "interrupted"
+        assert terminal["reason_code"] == "required_reference_unavailable"
+        receipt = next(
+            m.content
+            for m in messages
+            if m.content.get("tool_name") == "inspect_builder_references"
+        )
+        assert receipt["result"]["reason"] == "package_file_oversized"
+    assert len(provider.calls) == 1
+    assert (workspace / "profile.md").read_text() == "Existing character work"
+
+
 def test_saved_builder_explains_tool_limit_and_resumes_without_repeating_write(
-    tmp_path, monkeypatch,
+    tmp_path,
+    monkeypatch,
 ):
     monkeypatch.setattr(AgentRunner, "MAX_TOOL_LOOP", 1)
     monkeypatch.setattr(AgentRunner, "MAX_TOOL_CONTINUATIONS", 0)
-    provider = AuthoringProvider(responses=[ProviderResponse(tool_calls=[ToolCall(
-        id="save", name="write_file", arguments='{"path":"draft.md","content":"Saved once"}',
-    )])])
+    provider = AuthoringProvider(
+        responses=[
+            ProviderResponse(
+                tool_calls=[
+                    ToolCall(
+                        id="save",
+                        name="write_file",
+                        arguments='{"path":"draft.md","content":"Saved once"}',
+                    )
+                ]
+            )
+        ]
+    )
     database = tmp_path / "authority.sqlite3"
     workspace = tmp_path / "draft"
     with AuthorityOwner.open(database, "first") as owner:
