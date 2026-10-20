@@ -105,7 +105,12 @@ Results must match the target's declared JSON type. Parent and child targets can
 An empty calculation array is valid when the Ruleset deliberately makes every starting field
 authored. Missing required inputs are errors, never defaults. A Setting owns its characters and
 uses this declaration from its contained Ruleset. Retrieve `get_content_definition` with name
-`ruleset_source` for the exact declaration shape, and use `check_ruleset_draft` before publication.
+`ruleset_source` for the compact authoring container. Before authoring executable effects,
+expressions, procedures or calls, retrieve `get_content_definition` with `name: package_runtime`
+and inspect `definition.procedural_definition.executable` for the accepted runtime language and
+its validation owners. Use `section: /procedural_definition/executable` for a focused reread.
+Load these definitions on demand, and use `check_ruleset_draft` and normal package/runtime
+admission to validate the result. Reading a reference alone does not establish validity or play.
 For each parameter, declare whether its authority is `choice`, `gm_judgment`, or `state`. Use
 `from_state` for state-owned facts so they are resolved from fresh authority and omitted from the
 model interface. Put spatial queries inside family effects; Builder derives the corresponding engine

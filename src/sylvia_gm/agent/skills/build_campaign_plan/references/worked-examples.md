@@ -2,8 +2,9 @@
 
 Read a complete pair through `load_builder_skill` with `name: BUILD CAMPAIGN PLAN` and the
 listed `reference`. Each JSON file is a whole Campaign Plan v2, not an excerpt. Each Markdown
-file renders the same preparation. The examples are maintained from repository campaign sources
-by `scripts/build_severed_lands_campaigns.py --write` and checked against those sources.
+file renders the same preparation. The pairs mirror the repository's canonical
+`campaign-plans/last-cart-through` and `campaign-plans/the-map-of-tomorrow` sources and are checked
+against their retained Setting snapshots through ordinary Plan and package admission.
 
 | Request | Read |
 | --- | --- |

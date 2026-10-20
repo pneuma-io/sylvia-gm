@@ -362,6 +362,7 @@ def compile_ruleset_source(source_bytes: bytes) -> CompiledRulesetSource:
     package_id = source.get("id") if isinstance(source.get("id"), str) else None
     optional_keys = {
         "ui_surfaces", "panel_layout", "tests", "state_schemas", "model_decision_boundary",
+        "procedures",
     }
     _require_fields(source, _SOURCE_KEYS, optional=optional_keys, path="$", package_id=package_id)
     if type(source.get("format")) is not int or source["format"] != 1:
@@ -550,7 +551,10 @@ def compile_ruleset_source(source_bytes: bytes) -> CompiledRulesetSource:
             "actions": [],
             **surface,
         })
-    required_features = set(_required_engine_features(runtime_tools))
+    procedures = _mapping(source.get("procedures", {}), path="$.procedures", package_id=package_id)
+    required_features = set(_required_engine_features({
+        "tools": runtime_tools, "procedures": procedures,
+    }))
     if any(surface.get("renderer") == "tactical_grid" for surface in surfaces):
         required_features.add(ENGINE_FEATURE_TACTICAL_GRID)
     if "panel_layout" in source:
@@ -565,7 +569,7 @@ def compile_ruleset_source(source_bytes: bytes) -> CompiledRulesetSource:
         "features": {},
         "abilities": {},
         "tools": runtime_tools,
-        "procedures": {},
+        "procedures": procedures,
         "definitions": source["definitions"],
         "narrative": {},
     }
@@ -633,7 +637,7 @@ def compile_ruleset_source(source_bytes: bytes) -> CompiledRulesetSource:
                     "artifacts": artifacts,
                     "capabilities": sorted(capabilities),
                     "mechanics": [],
-                    "procedures": [],
+                    "procedures": sorted(procedures),
                     "prompt_fragments": [item["id"] for item in prompt_fragments],
                     "schemas": [
                         item["schema_id"]
