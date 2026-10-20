@@ -10403,8 +10403,22 @@ const SylviaGMFrontend = (() => {
     $('starter-character-stats').textContent =
       `HP ${actor.max_hp} · AC ${actor.armor_class} · Speed ${actor.speed} ft`;
     $('starter-character-profile').textContent = preview.authored_profile;
-    $('starter-character-data').textContent = JSON.stringify({ participant: character,
-      entity_state: actor }, null, 2);
+    const label = (value) => String(value).replaceAll('_', ' ');
+    const equipment = actor.inventory.map((item) => {
+      const quantity = actor.inventory_quantities?.[item] || 1;
+      return `${label(item)}${quantity > 1 ? ` ×${quantity}` : ''}`;
+    });
+    const resources = Object.entries(actor.resource_maxima || {})
+      .filter(([, maximum]) => maximum > 0)
+      .map(([name, maximum]) => `${label(name)} ${maximum}`);
+    $('starter-character-data').textContent = [
+      `Ability scores: ${Object.entries(character.abilities).map(([name, score]) => `${label(name)} ${score}`).join(', ')}`,
+      `Saving throws: ${character.saving_throw_proficiencies.map(label).join(', ')}`,
+      `Skills: ${(character.skill_proficiencies || []).map(label).join(', ')}`,
+      `Equipment: ${equipment.join(', ')}`,
+      `Spells: ${actor.prepared_spells.map(label).join(', ') || 'None'}`,
+      `Resources: ${resources.join(', ')}`,
+    ].join('\n\n');
     $('starter-edit-copy').hidden = selectedStartingPartyPolicy().player_character?.mode === 'fixed';
   }
 

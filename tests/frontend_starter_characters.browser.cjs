@@ -75,6 +75,11 @@ for (const width of [1280, 640]) test(`Starter chooser, preview and editable cop
       assert.match(await page.locator('#starter-character-heading').textContent(), /Level 1/);
       assert.match(await page.locator('#starter-character-heading').textContent(), new RegExp(row.name));
       assert.equal(await page.locator('#starter-character-profile').textContent(), row.starter_preview.authored_profile);
+      const details = await page.locator('#starter-character-data').textContent();
+      assert.match(details, /Ability scores:/);
+      assert.match(details, /Equipment:/);
+      assert.match(details, /Spells:/);
+      assert.doesNotMatch(details, /entity_state|weapon_sets|resource_maxima/);
       assert.equal(await page.locator('#delete-reusable-player-btn').isVisible(), false);
     }
     await chooser.selectOption(rows[0].id);
