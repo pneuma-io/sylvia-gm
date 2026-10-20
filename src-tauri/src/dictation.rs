@@ -560,6 +560,7 @@ impl Dictation {
         Arc::new(capture)
     }
 
+    #[cfg(test)]
     pub(crate) fn capabilities(&self) -> Reply {
         self.capabilities_for(None)
     }
