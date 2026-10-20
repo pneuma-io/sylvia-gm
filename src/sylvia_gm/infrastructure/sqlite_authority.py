@@ -5530,13 +5530,35 @@ class SQLiteAuthorityStore:
                             "FROM canonical_events WHERE campaign_id = ? AND sequence = ?",
                             (session.campaign_id, message.canonical_sequence),
                         ).fetchone()
-                        if event is None or message.content != owned_payload(
-                            {
-                                "event_type": str(event["event_type"]),
-                                "visibility": str(event["visibility"]),
-                                "safe_payload": _load_payload(str(event["safe_payload_json"])),
-                            }
+                        if event is None:
+                            raise ValueError("Stored canonical session reference is invalid")
+                        payload = _load_payload(str(event["safe_payload_json"]))
+                        expected_reference = owned_payload({
+                            "event_type": str(event["event_type"]),
+                            "visibility": str(event["visibility"]),
+                            "safe_payload": payload,
+                        })
+                        if (
+                            message.content != expected_reference
+                            and str(event["event_type"]) == CanonicalEventType.TOOL_CALL.value
                         ):
+                            identity = tuple(payload.get(key) for key in (
+                                "package_id", "package_version", "package_sha256",
+                            ))
+                            if all(isinstance(value, str) for value in identity):
+                                manifest = sqlite_packages.exact_manifest(
+                                    connection, cast(tuple[str, str, str], identity),
+                                )
+                                # Canonical replay omits private engine inputs. Validate that
+                                # exact projection against the retained package declaration.
+                                if manifest is not None and any(
+                                    item.visibility == "engine" for item in manifest.state_schemas
+                                ):
+                                    expected_reference = owned_payload({
+                                        **expected_reference,
+                                        "safe_payload": {**payload, "parameters": {}},
+                                    })
+                        if message.content != expected_reference:
                             raise ValueError("Stored canonical session reference is invalid")
                 if session.status is SessionStatus.REVIEW_REQUIRED and not any(
                     message.kind is SessionMessageKind.HUMAN_REVIEW for message in messages
