@@ -46,7 +46,7 @@ from sylvia_gm.application.knowledge_search import (
     knowledge_terms,
     rank_references,
 )
-from sylvia_gm.application.launch_compatibility import require_active_ruleset
+from sylvia_gm.application.launch_compatibility import player_ui_surfaces, require_active_ruleset
 from sylvia_gm.application.map_segment_preview import segment_preview
 from sylvia_gm.application.network_graph import (
     NetworkGraphError,
@@ -6474,6 +6474,8 @@ class AuthorityOwner:
                 active_capabilities=active_capabilities,
             ).ui_surfaces
 
+            surfaces = player_ui_surfaces(surfaces, lock)
+
             def player_safe_source(source: object) -> bool:
                 """Keep legacy installed packages from projecting private Plan data to players."""
 
@@ -6759,6 +6761,7 @@ class AuthorityOwner:
             ui_raw,
             active_capabilities=active_capabilities,
         ).ui_surfaces
+        surfaces = player_ui_surfaces(surfaces, lock)
         surface = next((item for item in surfaces if item.get("id") == surface_id), None)
         if surface is None:
             raise CommandRejected(

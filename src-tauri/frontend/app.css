@@ -1188,9 +1188,9 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
 .dictation-feedback p { margin: 4px 0 8px; }
 .dictation-feedback textarea { resize: vertical; max-height: 160px; }
 .dictation-feedback button { margin: 4px 4px 8px 0; }
-#dictation-options[open] { max-height: min(250px, 32vh); overflow-y: auto; }
+#dictation-options [hidden] { display: none; }
 #dictation-options label { display: block; margin: 6px 0; }
-#dictation-options select { max-width: 100%; }
+#dictation-options select { width: 100%; max-width: 100%; }
 #dictation-toggle { display: inline-flex; align-items: center; gap: 5px; }
 #dictation-toggle svg { width: 16px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; }
 #dictation-toggle[aria-pressed="true"] { color: var(--error, #fca5a5); border-color: currentColor; }

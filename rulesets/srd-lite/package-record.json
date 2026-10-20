@@ -31,7 +31,7 @@
   },
   "content_declarations": "content/content-declarations.json",
   "content_kind": "ruleset",
-  "content_sha256": "e07292d409287b5f7a31062d369f12fb8243736b5c286a8d9ced683d10b596e0",
+  "content_sha256": "645f83094691903002f318cd106695b8cdb6a412b50b9516e60c62acd93b63dd",
   "dependencies": [
     {
       "content_sha256": "ad3da5b65b26ed1fb5076ef30ffd764713bc52deadfe5d5ae6e83b8078651461",
@@ -155,7 +155,7 @@
     {
       "bytes": 93734,
       "path": "content/spell-catalogue.json",
-      "sha256": "3506f71fd4ae9949826ee4afcbdcddc3d13351523bfb53f9a6bbee2873e8589b"
+      "sha256": "1028f7006135dcbba6fa1c04b0227d1cca25a05d98dd9070d83f1899df130bd8"
     },
     {
       "bytes": 5865,
@@ -185,7 +185,7 @@
     {
       "bytes": 1640,
       "path": "package-identity.json",
-      "sha256": "2bea2594bdbbe6bbb9621f0acf051218041e8d27871259a7cc7e5238adca7d8e"
+      "sha256": "94e91c77280da2547a6b264f2428c484e249fe3baeec9a7e0cf7121b6baac14d"
     },
     {
       "bytes": 26926,
@@ -56272,16 +56272,7 @@
       "title": "Party"
     },
     {
-      "actions": [
-        {
-          "id": "end-combat",
-          "intent": "end_combat_encounter",
-          "label": "End combat",
-          "params": {
-            "end_reason": "fighting_stopped"
-          }
-        }
-      ],
+      "actions": [],
       "allowed_placements": [
         "docked",
         "floating",
@@ -57139,5 +57130,5 @@
       "title": "Character"
     }
   ],
-  "version": "0.3.14"
+  "version": "0.3.15"
 }

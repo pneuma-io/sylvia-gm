@@ -60,6 +60,53 @@ async function withComposer(check) {
   } finally { await browser.close(); }
 }
 
+async function openDictationSettings(page) {
+  await page.locator('#open-settings-btn').click();
+  await page.getByRole('tab', { name: 'Dictation', exact: true }).click();
+  await page.locator('#settings-panel-dictation').waitFor();
+}
+
+test('dictation preferences live in Settings and opening them preserves saved choices without capture or download',
+  { timeout: 30000 }, async () => {
+  await withComposer(async page => {
+    assert.equal(await page.locator('#settings-overlay #dictation-options').count(), 1);
+    assert.equal(await page.locator('.input-composer #dictation-options').count(), 0);
+    assert.equal(await page.locator('.input-composer #dictation-toggle').count(), 1);
+    assert.equal(await page.locator('.input-composer #dictation-status').count(), 1);
+    await page.evaluate(() => {
+      localStorage.setItem('sylvia-dictation-language', 'saved-language');
+      localStorage.setItem('sylvia-dictation-device', 'saved-microphone');
+      window.prepareCalls = 0;
+      const bridge = window.dictationTest.state.bridge;
+      bridge.dictation_capabilities = async () => ({ ready: false,
+        engines: [{ id: 'other-language', label: 'Another language' },
+          { id: 'saved-language', label: 'Saved language' }],
+        devices: [{ id: 'default', label: 'System default input' },
+          { id: 'saved-microphone', label: 'Saved microphone' }] });
+      bridge.dictation_prepare = async () => { window.prepareCalls++; };
+    });
+    for (const width of [1400, 1000]) {
+      await page.setViewportSize({ width, height: 900 });
+      await openDictationSettings(page);
+      await page.waitForFunction(() => document.getElementById('dictation-language').value === 'saved-language');
+      assert.equal(await page.getByLabel('Speech language').inputValue(), 'saved-language');
+      assert.equal(await page.getByLabel('Microphone', { exact: true }).inputValue(), 'saved-microphone');
+      assert.equal(await page.getByRole('button', { name: 'Download local speech model', exact: true }).isVisible(), true);
+      assert.match(await page.locator('#dictation-privacy').innerText(), /does not save recordings or send audio/);
+      assert.deepEqual(await page.evaluate(() => ({
+        language: localStorage.getItem('sylvia-dictation-language'),
+        device: localStorage.getItem('sylvia-dictation-device'),
+        downloads: window.prepareCalls, captures: window.captureStarts,
+        sends: window.submissions.length,
+      })), { language: 'saved-language', device: 'saved-microphone', downloads: 0, captures: 0, sends: 0 });
+      assert.equal(await page.locator('#settings-panel-dictation').evaluate(panel =>
+        panel.scrollWidth > panel.clientWidth + 1), false);
+      await page.getByRole('button', { name: 'Close settings', exact: true }).click();
+      assert.equal(await page.locator('#dictation-toggle').isVisible(), true);
+    }
+  });
+});
+
 test('keyboard dictation reviews text and ordinary Send submits exactly once', { timeout: 30000 }, async () => {
   await withComposer(async page => {
     const input = page.locator('#player-input'), mic = page.getByRole('button', { name: 'Start dictation', exact: true });
@@ -72,10 +119,12 @@ test('keyboard dictation reviews text and ordinary Send submits exactly once', {
     const download = page.getByRole('button', { name: 'Download local speech model', exact: true });
     await download.press('Enter');
     await page.getByRole('button', { name: 'Cancel model download', exact: true }).waitFor();
+    await page.getByRole('button', { name: 'Close settings', exact: true }).click();
     await input.fill('Typed during setup.');
     assert.equal(await mic.isDisabled(), true);
     await page.keyboard.press('Escape');
     assert.equal(await input.inputValue(), 'Typed during setup.');
+    await openDictationSettings(page);
     await download.press('Enter');
     await page.evaluate(() => window.finishModelDownload());
     await page.waitForFunction(() => document.getElementById('dictation-model-status').textContent.includes('ready'));
@@ -83,11 +132,13 @@ test('keyboard dictation reviews text and ordinary Send submits exactly once', {
     assert.equal(await page.evaluate(() => window.submissions.length), 0);
     assert.equal(await input.inputValue(), 'Typed during setup.');
     assert.equal(await page.locator('#dictation-status').isVisible(), false);
+    await page.getByRole('button', { name: 'Close settings', exact: true }).click();
     await page.setViewportSize({ width: 1000, height: 640 });
+    await openDictationSettings(page);
     await page.getByLabel('Microphone', { exact: true }).scrollIntoViewIfNeeded();
     assert.equal(await page.getByLabel('Microphone', { exact: true }).isVisible(), true);
+    await page.getByRole('button', { name: 'Close settings', exact: true }).click();
     await page.setViewportSize({ width: 1400, height: 900 });
-    await page.locator('#dictation-options summary').click();
     await input.fill('I wait.');
     await input.press('Alt+m');
     await page.getByRole('button', { name: 'Stop dictation', exact: true }).waitFor();
@@ -97,9 +148,11 @@ test('keyboard dictation reviews text and ordinary Send submits exactly once', {
     assert.equal(await input.isEditable(), true);
     assert.equal(await page.getByLabel('Speech language').inputValue(), 'test');
     assert.equal(await page.evaluate(() => window.selectedSpeechEngine), 'test');
-    await page.locator('#dictation-options summary').click();
+    await openDictationSettings(page);
     assert.match(await page.locator('#dictation-privacy').innerText(), /does not save recordings/);
-    await page.locator('#dictation-options summary').click();
+    assert.equal(await page.getByLabel('Speech language').isDisabled(), true);
+    assert.equal(await page.getByLabel('Microphone', { exact: true }).isDisabled(), true);
+    await page.getByRole('button', { name: 'Close settings', exact: true }).click();
     assert.equal(await page.evaluate(() => window.submissions.length), 0);
     await page.locator('#dictation-toggle').focus(); await page.keyboard.press('Space');
     assert.match(await page.locator('#dictation-status').innerText(), /Transcribing/);

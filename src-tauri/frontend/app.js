@@ -158,7 +158,7 @@ const SylviaGMFrontend = (() => {
 
   async function dictationEngine(bridge) {
     const capabilities = await refreshDictationOptions(bridge);
-    if (capabilities.ready === false) { $('dictation-options').open = true; throw { code: 'model' }; }
+    if (capabilities.ready === false) { openSettings('dictation'); throw { code: 'model' }; }
     return $('dictation-language').value;
   }
 
@@ -243,13 +243,6 @@ const SylviaGMFrontend = (() => {
       changed: renderDictation,
     });
     $('dictation-toggle').addEventListener('click', toggleDictation);
-    $('dictation-options').addEventListener('toggle', () => {
-      if ($('dictation-options').open && !dictationModelJob) {
-        void refreshDictationOptions(state.bridge).catch(() => {
-          $('dictation-model-status').textContent = 'Local speech is unavailable. Reinstall the updated Sylvia application, or keep typing.';
-        });
-      }
-    });
     $('dictation-download').addEventListener('click', () => { void prepareDictationModel(); });
     for (const name of ['language', 'device']) $('dictation-' + name).addEventListener('change', () => {
       try { localStorage.setItem(`sylvia-dictation-${name}`, $('dictation-' + name).value); } catch (_) { /* Input works without storage. */ }
@@ -368,8 +361,8 @@ const SylviaGMFrontend = (() => {
     if (!active || !container.contains(active)) return null;
     const surfaceId = active.closest('[data-panel-id]')?.dataset.panelId;
     if (!surfaceId) return null;
-    const attribute = ['data-party-select-actor', 'data-character-actor', 'data-inventory-character',
-      'data-inspect-party'].find(name => active.hasAttribute(name));
+    const attribute = ['data-party-select-actor', 'data-character-actor', 'data-inventory-character']
+      .find(name => active.hasAttribute(name));
     if (attribute) return { surfaceId, selector: `[${attribute}="${CSS.escape(active.getAttribute(attribute))}"]` };
     const details = active.parentElement;
     if (active.tagName === 'SUMMARY' && details?.hasAttribute('data-character-expansion')) {
@@ -599,8 +592,7 @@ const SylviaGMFrontend = (() => {
   // Party is the shared picker; Rulesets without a roster retain an accessible common picker.
   function characterPickerMarkup() {
     const party = state.panelProjection?.surfaces.find((surface) => surface.renderer === 'party');
-    if (party) return `<button type="button" class="btn btn-secondary btn-sm character-picker" ` +
-      `data-inspect-party="${escapeHtml(party.id)}">Choose in Party</button>`;
+    if (party) return '';
     const inspection = characterInspection();
     return `<label class="character-picker">Inspect character <select data-character-actor>` +
       '<option value="">Choose a character</option>' + inspectableCharacters().map((item) =>
@@ -683,7 +675,7 @@ const SylviaGMFrontend = (() => {
 
   const VALID_THEMES = new Set(['slate', 'sylvia', 'sylvia-dark']);
   const VALID_SETTINGS_TABS = new Set([
-    'models', 'accounts', 'appearance', 'packages', 'campaign-data', 'admin', 'about'
+    'models', 'accounts', 'appearance', 'dictation', 'packages', 'campaign-data', 'admin', 'about'
   ]);
   const DISCONNECTED_STREAM_KEY = 'sylvia-gm-disconnected-stream';
   const PANEL_LAYOUT_KEY = 'sylvia-gm-panel-layout-v1';
@@ -1754,6 +1746,11 @@ const SylviaGMFrontend = (() => {
       panel.hidden = !selected;
     });
     if (chatgptPageVisible) void updateChatGPTConnection('status');
+    if (tab === 'dictation' && !dictationModelJob) {
+      void refreshDictationOptions(state.bridge).catch(() => {
+        $('dictation-model-status').textContent = 'Local speech is unavailable. Reinstall the updated Sylvia application, or keep typing.';
+      });
+    }
   }
 
   function openSettings(tab = 'models') {
@@ -6572,18 +6569,6 @@ const SylviaGMFrontend = (() => {
         gamePanels().choose(surfaceId, { character: button.dataset.partySelectActor });
         renderRulesetPanelProjection(projection);
         container.querySelector(`[data-party-select-actor="${CSS.escape(button.dataset.partySelectActor)}"]`)?.focus({ preventScroll: true });
-      });
-    });
-    container.querySelectorAll('[data-inspect-party]').forEach((button) => {
-      button.addEventListener('click', () => {
-        const id = button.dataset.inspectParty;
-        void Promise.resolve(gamePanels().reveal(id)).then(() => {
-          const party = container.querySelector(`[data-panel-id="${CSS.escape(id)}"]`);
-          const selected = party?.querySelector('[data-party-select-actor][aria-pressed="true"]');
-          const target = selected || party?.querySelector('[data-party-select-actor]');
-          target?.scrollIntoView({ block: 'center', inline: 'nearest' });
-          target?.focus({ preventScroll: true });
-        });
       });
     });
     container.querySelectorAll('[data-character-action-panel]').forEach((button) => {

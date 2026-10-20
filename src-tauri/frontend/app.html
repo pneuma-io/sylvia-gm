@@ -178,18 +178,6 @@
         <textarea id="player-input" rows="2" placeholder="Type your action…"
                   aria-label="In-character message or action" autocomplete="off" disabled></textarea>
         <div class="dictation-feedback" id="dictation-feedback">
-          <details id="dictation-options">
-            <summary>On-device dictation settings</summary>
-            <p id="dictation-privacy">Whisper base transcribes speech on this PC. Download the local model once (about 148 MB).
-              Sylvia does not save recordings or send audio to a service.
-              Review the text before Send; your chat model receives only the message you send.</p>
-            <p id="dictation-model-status" role="status" aria-live="polite">Open these settings to check the local speech model.</p>
-            <button id="dictation-download" type="button" class="btn btn-secondary btn-sm" hidden>Download local speech model</button>
-            <label id="dictation-language-field" for="dictation-language">Speech language</label>
-            <select id="dictation-language" aria-describedby="dictation-privacy"></select>
-            <label for="dictation-device">Microphone</label>
-            <select id="dictation-device" aria-describedby="dictation-privacy"></select>
-          </details>
           <p id="dictation-status" role="status" aria-live="polite" aria-atomic="true" hidden></p>
           <div id="dictation-review-panel" hidden>
             <label for="dictation-review">Review transcript</label>
@@ -495,6 +483,9 @@
         <button class="settings-tab" id="settings-tab-appearance" type="button"
                 role="tab" data-settings-tab="appearance" aria-selected="false"
                 aria-controls="settings-panel-appearance">Appearance</button>
+        <button class="settings-tab" id="settings-tab-dictation" type="button"
+                role="tab" data-settings-tab="dictation" aria-selected="false"
+                aria-controls="settings-panel-dictation">Dictation</button>
         <button class="settings-tab" id="settings-tab-packages" type="button"
                 role="tab" data-settings-tab="packages" aria-selected="false"
                 aria-controls="settings-panel-packages">Packages</button>
@@ -802,6 +793,22 @@
               <button class="theme-btn" data-theme="sylvia">Sylvia</button>
               <button class="theme-btn" data-theme="sylvia-dark">Dark</button>
             </div>
+          </div>
+        </section>
+
+        <section class="settings-panel" id="settings-panel-dictation" role="tabpanel"
+                 aria-labelledby="settings-tab-dictation" data-settings-panel="dictation" hidden>
+          <h2>On-device dictation</h2>
+          <div class="settings-card" id="dictation-options">
+            <p id="dictation-privacy">Whisper base transcribes speech on this PC. Download the local model once (about 148 MB).
+              Sylvia does not save recordings or send audio to a service.
+              Review the text before Send; your chat model receives only the message you send.</p>
+            <p id="dictation-model-status" role="status" aria-live="polite">Open these settings to check the local speech model.</p>
+            <button id="dictation-download" type="button" class="btn btn-secondary btn-sm" hidden>Download local speech model</button>
+            <label id="dictation-language-field" for="dictation-language">Speech language</label>
+            <select id="dictation-language" aria-describedby="dictation-privacy"></select>
+            <label for="dictation-device">Microphone</label>
+            <select id="dictation-device" aria-describedby="dictation-privacy"></select>
           </div>
         </section>
 

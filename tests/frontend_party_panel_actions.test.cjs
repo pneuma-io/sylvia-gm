@@ -753,7 +753,9 @@ test('one inspected noncontrolled member reaches Character and Inventory without
   const details=h.api.panelMarkup(character),inventory=h.api.panelMarkup(h.projection.surfaces[2]);
   assert.match(details,/Nell/);assert.match(details,/HP 17/);assert.match(details,/lore <b>4/);
   assert.doesNotMatch(details,/data-character-actor/);
-  assert.match(details,/Choose in Party/);assert.match(inventory,/Silver Charm/);
+  assert.doesNotMatch(details,/Choose in Party|data-inspect-party/);
+  assert.doesNotMatch(inventory,/Choose in Party|data-inspect-party/);
+  assert.match(inventory,/Silver Charm/);
   assert.match(details,/data-panel-actor-id="npc" disabled/);
   assert.equal(JSON.stringify(map),before);assert.equal(h.executions.length,0);
 });

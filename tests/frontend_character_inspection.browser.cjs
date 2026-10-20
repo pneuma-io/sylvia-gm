@@ -43,6 +43,7 @@ for(const width of [1440,960])test(`shared character inspection, keyboard and re
   await page.getByRole('button',{name:'Inspecting Bram',exact:true}).waitFor();
   assert.equal(await page.evaluate(()=>document.activeElement.getAttribute('aria-label')),'Inspecting Bram');
   assert.equal(await page.locator('[data-character-actor]').count(),0,'Character has no independent selector when Party exists');
+  assert.equal(await page.getByRole('button',{name:'Choose in Party',exact:true}).count(),0);
   const details=page.getByLabel('Details for Bram',{exact:true});await details.focus();await page.keyboard.press('Enter');
   assert.equal(await page.locator('[data-character-expansion="bram"]').evaluate(e=>e.open),true);
   await page.getByLabel('Details for Asha',{exact:true}).focus();await page.keyboard.press('Enter');
@@ -66,14 +67,19 @@ for(const width of [1440,960])test(`shared character inspection, keyboard and re
   assert.match(await page.locator('[data-panel-id="inventory"]').innerText(),/Bram.*Silver Dagger/s);
   await page.getByRole('button',{name:'Character',exact:true}).click();
   await page.evaluate(()=>window.inspectionQA.gamePanels().changed({type:'hide',panelId:'party'}));
-  await page.getByRole('button',{name:'Choose in Party',exact:true}).click();
+  assert.equal(await page.getByRole('button',{name:'Choose in Party',exact:true}).count(),0);
+  await page.getByText('Arrange panels',{exact:true}).focus();await page.keyboard.press('Enter');
+  await page.getByRole('button',{name:'Show Party',exact:true}).focus();await page.keyboard.press('Enter');
   await page.getByRole('button',{name:'Inspecting Bram',exact:true}).waitFor();
+  await page.getByRole('button',{name:'Inspecting Bram',exact:true}).focus();
   assert.equal(await page.evaluate(()=>document.activeElement.getAttribute('aria-label')),'Inspecting Bram');
+  await page.getByRole('button',{name:'Inspecting Bram',exact:true}).evaluate(element=>
+   element.scrollIntoView({block:'center',inline:'nearest'}));
   const revealed=await page.getByRole('button',{name:'Inspecting Bram',exact:true}).evaluate(element=>
    new Promise(resolve=>{const observer=new IntersectionObserver(([entry])=>{
     observer.disconnect();resolve(entry.intersectionRatio);
    });observer.observe(element);}));
-  assert.equal(revealed,1,'Choose in Party brings its focused character into the visible viewport');
+  assert.equal(revealed,1,'Party remains recoverable through the existing keyboard-accessible panel controls');
   assert.equal(await page.locator('[data-character-expansion="bram"]').evaluate(e=>e.open),true);
   await page.evaluate(()=>window.inspectionQA.gamePanels().changed({type:'hide',panelId:'character'}));
   assert.equal(await page.locator('[data-panel-id="character"]').count(),0,'Standalone Character can be hidden independently');
