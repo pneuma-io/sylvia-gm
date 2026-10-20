@@ -1985,6 +1985,27 @@ test('repeated Builder failures explain the interruption and keep input usable',
   assert.equal(h.calls.submissions.length, 0);
 });
 
+for(const reason_code of ['required_reference_unavailable','repeated_reference_failure']){
+  test(`${reason_code} stops with source-specific recovery and never auto-submits`,async()=>{
+    const h=harness();
+    h.state.bridge.session_context=async()=>({
+      activity:{attempt_id:'source-failed',status:'interrupted'},
+      messages:[{message_id:'terminal',kind:'evidence',content:{
+        kind:'builder_attempt_terminal',status:'interrupted',attempt_id:'source-failed',reason_code,
+        error:'PRIVATE SOURCE DETAIL',
+      }}],
+    });
+    await h.openBuilderChat('a');
+    const html=h.node('chronology').dataset.chronologyHtml;
+    assert.match(html,/selected source|same source/i);
+    assert.match(html,/Saved work is retained/);
+    assert.match(html,/before continuing/);
+    assert.doesNotMatch(html,/PRIVATE SOURCE DETAIL|Send a message when you are ready/);
+    assert.equal(h.node('send-btn').disabled,false);
+    assert.equal(h.calls.submissions.length,0);
+  });
+}
+
 test('a migrated independent Builder chat does not render Campaign return actions', async () => {
   const h = harness();
   h.state.bridge.session_context = async () => ({

@@ -17,7 +17,6 @@ from sylvia_gm.application.bundled_packages import (
 )
 from sylvia_gm.application.campaign_plan_sources import validate_retained_campaign_plan
 from sylvia_gm.application.character_profiles import profile_from_snapshot
-from sylvia_gm.application.package_runtime import PACKAGE_RUNTIME_BYTE_LIMIT
 from sylvia_gm.domain.authority import PackageRole, SafePayload, owned_payload
 from sylvia_gm.domain.errors import CommandRejected
 from sylvia_gm.domain.package_library import (
@@ -26,6 +25,10 @@ from sylvia_gm.domain.package_library import (
     canonical_json_bytes,
 )
 from sylvia_gm.domain.session import SessionContext, SessionMessageKind
+from sylvia_gm.infrastructure.package_archive import (
+    PACKAGE_MEMBER_BYTE_LIMIT,
+    PACKAGE_MEMBER_COUNT_LIMIT,
+)
 
 if TYPE_CHECKING:
     from sylvia_gm.application.authority import AuthorityOwner
@@ -339,7 +342,8 @@ def reader_for_references(
     files: dict[str, Mapping] = {}
     for package in references.get("packages", []):
         for path in owner.package_file_paths(
-            package["id"], package["version"], package["content_sha256"], maximum_files=512
+            package["id"], package["version"], package["content_sha256"],
+            maximum_files=PACKAGE_MEMBER_COUNT_LIMIT,
         ):
             files[f"{package['prefix']}/{path}"] = {**package, "path": path}
     plan = references.get("plan")
@@ -369,7 +373,7 @@ def reader_for_references(
             package["version"],
             package["content_sha256"],
             package["path"],
-            maximum_bytes=PACKAGE_RUNTIME_BYTE_LIMIT,
+            maximum_bytes=PACKAGE_MEMBER_BYTE_LIMIT,
         )
 
     return BuilderReferences(tuple(sorted((*files, *plan_files))), read)

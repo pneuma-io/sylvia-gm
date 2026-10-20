@@ -8472,6 +8472,10 @@ const SylviaGMFrontend = (() => {
             ? 'Builder reached its work limit after automatic continuation. Saved work is retained. Send a message to continue.'
             : content.status === 'interrupted' && content.reason_code === 'repeated_tool_failure'
             ? 'Builder stopped after repeated identical tool failures. Saved work is retained. Review the last tool error before continuing.'
+            : content.status === 'interrupted' && content.reason_code === 'required_reference_unavailable'
+            ? 'Builder stopped because a selected source could not be read. Saved work is retained. Check the selected source content before continuing.'
+            : content.status === 'interrupted' && content.reason_code === 'repeated_reference_failure'
+            ? 'Builder stopped after repeated attempts to read the same source. Saved work is retained. Review the source error before continuing.'
             : 'Saved work is retained. Send a message when you are ready to continue.';
           return `<div class="story-card builder-interruption"${key}>` +
             `<div class="story-header">${content.status === 'stopped' ? 'Stopped' : 'Interrupted'}</div>` +

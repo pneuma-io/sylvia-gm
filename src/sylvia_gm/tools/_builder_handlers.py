@@ -21,6 +21,7 @@ from urllib.parse import parse_qs, urlparse
 import httpx
 
 from sylvia_gm.builder import _workspace_files
+from sylvia_gm.infrastructure.package_archive import PACKAGE_MEMBER_BYTE_LIMIT
 
 
 def _search_result_url(raw_url: str) -> str:
@@ -166,9 +167,7 @@ def tool_write_file(params: dict[str, Any], _context: Any) -> dict[str, Any]:
         return {"success": False, "error": f"Cannot write to a directory: {file_path}"}
 
     try:
-        version = _workspace_files.write_text(
-            file_path, content, params.get("expected_version")
-        )
+        version = _workspace_files.write_text(file_path, content, params.get("expected_version"))
         bytes_written = len(content.encode("utf-8"))
         return {
             "success": True,
@@ -277,13 +276,21 @@ def tool_search_files(params: dict[str, Any], _context: Any) -> dict[str, Any]:
                 return {"success": False, "error": f"Invalid regex pattern: {e}"}
 
             results: list[dict[str, Any]] = []
+            skipped_oversized_files = 0
             single_file = search_path.is_file()
             candidates = (search_path,) if single_file else search_path.rglob("*")
             result_root = project_root if single_file else search_path
             for file_path in candidates:
                 if not file_path.is_file() or owner_internal(file_path):
                     continue
-                if file_path.stat().st_size > 1_000_000:
+                if file_path.stat().st_size > PACKAGE_MEMBER_BYTE_LIMIT:
+                    if single_file:
+                        return {
+                            "success": False,
+                            "error_code": "file_oversized",
+                            "error": "The selected file exceeds the supported package file size.",
+                        }
+                    skipped_oversized_files += 1
                     continue
                 try:
                     file_content = file_path.read_text(encoding="utf-8")
@@ -297,6 +304,7 @@ def tool_search_files(params: dict[str, Any], _context: Any) -> dict[str, Any]:
                                 "file": str(file_path.relative_to(result_root)),
                                 "line": i,
                                 "content": line[:200],
+                                "content_complete": len(line) <= 200,
                             }
                         )
                         if len(results) >= 100:
@@ -308,6 +316,7 @@ def tool_search_files(params: dict[str, Any], _context: Any) -> dict[str, Any]:
                 "success": True,
                 "matches": results,
                 "count": len(results),
+                "skipped_oversized_files": skipped_oversized_files,
             }
     except Exception as e:
         return {"success": False, "error": f"Error searching files: {e}"}
