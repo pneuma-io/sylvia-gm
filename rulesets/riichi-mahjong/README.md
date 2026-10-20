@@ -8,12 +8,19 @@ committed public results.
 Forced passes advance automatically. Ordinary gameplay and OOC conversation preserve
 the saved table.
 
-The default library also ships `riichi-mahjong-0.1.0.sylvia-gm-package`, the exact
-validated Ruleset and The Lantern Table Setting archive (SHA-256
-`c090627edfcc91346fad1e55769ddb5423076fada077d43951fd535e09313a2f`).
-Startup installs this closure through normal package admission when absent;
-existing same-version closures and user edits remain intact. No Campaign Plan
-is included: use the ordinary campaign setup to create a compatible Plan.
+The default library ships `riichi-mahjong-0.1.1.sylvia-gm-package` and The Lantern
+Table Setting. The bundled **Riichi Quick Test** Plan includes the player **You**
+and asks only for East-only or East-South. Select it during ordinary New Campaign
+setup to reach a real dealt hand without Builder or character authoring.
+
+The package declares tile faces, four discard ponds, called melds, concealed racks,
+scores and round counters. Select a hand tile, then Discard; arrow keys move the
+selection. Calls and wins appear when legal. Hover or focus provides descriptions.
+The shared panel framework supports docking, resizing and pop-out windows.
+
+Startup admits the new closure normally and preserves existing versions and user
+edits. The original 0.1.0 archive remains retained in source. Existing campaigns
+keep their exact package pins and original presentation; they are not rewritten.
 
 Build an importable package from the repository root:
 
@@ -40,5 +47,5 @@ for selected scoring, source confidence and remaining acceptance checks. The
 kan timing and settlement; open-hand nagashi eligibility has a documented secondary
 source basis. The tournament manual describes a different competition configuration.
 
-Tile labels and presentation are original text/CSS. No third-party game art, code,
+Tile faces use original SVG/CSS artwork and system-font characters. No third-party game art, code,
 characters or rules prose is included. The repository's licence and scope apply.
