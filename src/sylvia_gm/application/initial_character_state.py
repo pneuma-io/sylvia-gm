@@ -8,7 +8,11 @@ from collections.abc import Mapping, Sequence
 from copy import deepcopy
 from typing import Any, cast
 
-from sylvia_gm.application.character_rules import validate_character_rules, verify_character_rules
+from sylvia_gm.application.character_rules import (
+    prepare_character_rules,
+    validate_character_rules,
+    verify_character_rules,
+)
 from sylvia_gm.application.schema_admission import validate_json_schema, validate_parameters
 from sylvia_gm.domain.authority import SafePayload
 from sylvia_gm.domain.errors import CommandRejected, MechanicsRejected, RulesetDiagnostic
@@ -339,6 +343,9 @@ def _calculate(
     setting_inputs = _required_inputs(json.loads(canonical_json_bytes(
         {} if setting_data is None else setting_data
     )))
+    check_rules = prepare_character_rules(
+        participant, initial_state_validation, setting_data, campaign_state=campaign_state,
+    )
     for index, (field, expression, condition) in enumerate(calculations):
         base = f"initial_state_calculations[{index}]"
         expression_path = f"{base}.condition" if condition is not None else f"{base}.set.value"
@@ -347,26 +354,22 @@ def _calculate(
                 "participant": participant_inputs, "state": _required_inputs(state),
                 "setting_data": setting_inputs,
                 "rules": _RequiredInputs(),
-                "campaign_state": _required_inputs(json.loads(canonical_json_bytes(campaign_state or {}))),
+                "campaign_state": _required_inputs(json.loads(
+                    canonical_json_bytes(campaign_state or {})
+                )),
             }
         )
         try:
             if condition is not None:
                 condition_node = _guard_expression(condition, path=expression_path)
                 if _reads_root(condition_node, "rules"):
-                    context.params["rules"] = _required_inputs(verify_character_rules(
-                        participant, state, initial_state_validation, setting_data,
-                        campaign_state=campaign_state,
-                    ))
+                    context.params["rules"] = _required_inputs(check_rules(state))
                 if not bool(evaluate(condition_node, context)):
                     continue
             expression_path = f"{base}.set.value"
             expression_node = _guard_expression(expression, path=expression_path)
             if _reads_root(expression_node, "rules") and not context.params["rules"]:
-                context.params["rules"] = _required_inputs(verify_character_rules(
-                    participant, state, initial_state_validation, setting_data,
-                    campaign_state=campaign_state,
-                ))
+                context.params["rules"] = _required_inputs(check_rules(state))
             value = evaluate(expression_node, context)
         except CommandRejected:
             raise

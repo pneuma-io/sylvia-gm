@@ -7,6 +7,7 @@ import pytest
 from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.application.builder_references import launch_references, reference_reader
 from sylvia_gm.application.builder_source_selection import BuilderSourceSelection
+from sylvia_gm.application.bundled_campaign_plans import bundled_plan
 from sylvia_gm.application.bundled_packages import bundled_rift_authority
 from sylvia_gm.domain.errors import CommandRejected
 from sylvia_gm.interfaces.owner_process import _campaign_creation_catalog
@@ -134,6 +135,13 @@ def test_plain_builder_continues_from_saved_setting_to_plan_in_same_turn(tmp_pat
         ("check", "check_campaign_plan_draft", {}),
         ("plan", "publish_campaign_plan", {}),
     ]
+    if source_kind == "bundled":
+        check_index = next(i for i, step in enumerate(steps) if step[0] == "check")
+        steps[check_index:check_index] = [
+            ("incomplete", "check_campaign_plan_draft", {}),
+            ("read-plan", "read_file", {"path": "campaign-plan-draft/plan.json"}),
+            ("state", "edit_file", {}),
+        ]
 
     class TransitionProvider(LibraryProvider):
         async def generate(self, messages, tools=None, **kwargs):
@@ -143,6 +151,28 @@ def test_plain_builder_continues_from_saved_setting_to_plan_in_same_turn(tmp_pat
                 self._responses[5] = ProviderResponse(tool_calls=[ToolCall(
                     id="source", name="select_builder_setting", arguments=json.dumps({
                         "candidate_id": saved["candidate_id"], "setting_id": saved["id"],
+                    }),
+                )])
+            if self._index < len(steps) and steps[self._index][0] == "state":
+                read = next(json.loads(message["content"]) for message in messages
+                            if message.get("tool_call_id") == "read-plan")
+                assert read["lines"] == read["total_lines"]
+                content = "".join(
+                    line.split("|", 1)[1] for line in read["content"].splitlines(keepends=True)
+                )
+                plan = json.loads(content)
+                plan["initial_state"]["mechanics"] = [{
+                    "namespace": ruleset_id, "key": "state", "value": {"advancement": {
+                        "method": "fixed", "starting_level": 1, "maximum_level": 1,
+                        "recipients": "whole_party", "timing": "Remain at level one.",
+                        "allocation": "The whole party stays at the starting level.",
+                    }},
+                }]
+                self._responses[self._index] = ProviderResponse(tool_calls=[ToolCall(
+                    id="state", name="edit_file", arguments=json.dumps({
+                        "path": read["path"], "old_text": content,
+                        "new_text": json.dumps(plan, sort_keys=True, separators=(",", ":")),
+                        "expected_version": read["version"],
                     }),
                 )])
             return await super().generate(messages, tools, **kwargs)
@@ -169,6 +199,13 @@ def test_plain_builder_continues_from_saved_setting_to_plan_in_same_turn(tmp_pat
         results = {message["tool_call_id"]: json.loads(message["content"])
                    for message in provider.calls[-1]["messages"] if message.get("role") == "tool"}
         for identity, _name, _args in steps:
+            if identity == "incomplete":
+                assert results[identity]["success"] is False
+                assert results[identity]["state_changed"] is False
+                assert results[identity]["validation_errors"][0]["code"] == (
+                    "plan_starting_state_invalid"
+                )
+                continue
             assert results[identity]["success"] is True, (identity, results[identity])
         references = results["source"]["references"]
         assert results["plan"]["campaign_setting"]["id"] == setting["package_id"]
@@ -276,12 +313,10 @@ def test_plain_builder_selects_reads_checks_and_publishes_in_one_turn_then_reope
 
 def test_contextual_builder_cannot_replace_its_original_sources(tmp_path):
     bindings = bundled_rift_authority()
-    from sylvia_gm.application.bundled_packages import bundled_rift_campaign_plan
-
     with AuthorityOwner.open(tmp_path / "contextual.db", "contextual-builder") as owner:
         draft = open_character_interview(
             owner, bindings.ruleset.package_id, bindings.setting.package_id,
-            bundled_rift_campaign_plan().payload["id"],
+            bundled_plan("rift-awakening").plan.payload["id"],
         )
         context = launch_character(owner, tmp_path, draft)
         selection = BuilderSourceSelection(
