@@ -792,8 +792,10 @@ def _reusable_participant_catalog(
     include_starters: bool = True,
 ) -> tuple[ReusableParticipant, ...]:
     """Validate saved characters even when setup defers built-in roster construction."""
-    if not include_starters and not (storage_root / "participants").exists():
-        return ()
+    if not include_starters:
+        library_root = storage_root / "participants"
+        if not library_root.exists() or next(library_root.iterdir(), None) is None:
+            return ()
     discover = (
         available_reusable_participants if include_starters else compatible_reusable_participants
     )

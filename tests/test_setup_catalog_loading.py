@@ -133,7 +133,13 @@ def test_metadata_only_setup_keeps_actual_saved_character_repair_warnings(
         assert path.read_bytes() == damaged_bytes
 
 
-def test_empty_metadata_discovery_never_loads_the_roster_or_its_authority(monkeypatch, tmp_path):
+@pytest.mark.parametrize("library_state", ["absent", "empty"])
+def test_empty_metadata_discovery_never_loads_the_roster_or_its_authority(
+    monkeypatch, tmp_path, library_state
+):
+    if library_state == "empty":
+        (tmp_path / "participants").mkdir()
+
     def unexpected(*_args, **_kwargs):
         pytest.fail("An empty saved library must not discover or construct the built-in roster")
 
@@ -141,3 +147,49 @@ def test_empty_metadata_discovery_never_loads_the_roster_or_its_authority(monkey
     assert owner._reusable_participant_catalog(
         tmp_path, SimpleNamespace(), include_starters=False
     ) == ()
+
+
+@pytest.mark.parametrize("entry_kind", ["file", "directory"])
+def test_nonempty_saved_library_still_reaches_validation(monkeypatch, tmp_path, entry_kind):
+    root = tmp_path / "participants"
+    root.mkdir()
+    entry = root / "malformed-entry"
+    if entry_kind == "file":
+        entry.write_bytes(b"malformed character data")
+    else:
+        entry.mkdir()
+
+    class ValidationReachedError(Exception):
+        pass
+
+    def validate(*_args, **kwargs):
+        assert kwargs["include_starters"] is False
+        raise ValidationReachedError
+
+    monkeypatch.setattr(owner, "_rift_reusable_participants", validate)
+    with pytest.raises(ValidationReachedError):
+        owner._reusable_participant_catalog(tmp_path, SimpleNamespace(), include_starters=False)
+    assert entry.exists()
+
+
+def test_complete_discovery_keeps_starters_with_an_empty_saved_library(monkeypatch, tmp_path):
+    (tmp_path / "participants").mkdir()
+    calls = []
+
+    def discover(*_args, **kwargs):
+        calls.append(kwargs["include_starters"])
+        return ()
+
+    monkeypatch.setattr(owner, "_rift_reusable_participants", discover)
+    assert owner._reusable_participant_catalog(
+        tmp_path, SimpleNamespace(package_candidates=lambda: ())
+    ) == ()
+    assert calls == [True]
+
+
+def test_a_file_at_the_saved_library_root_is_not_treated_as_an_empty_roster(tmp_path):
+    path = tmp_path / "participants"
+    path.write_bytes(b"not a participant directory")
+    with pytest.raises(NotADirectoryError):
+        owner._reusable_participant_catalog(tmp_path, SimpleNamespace(), include_starters=False)
+    assert path.read_bytes() == b"not a participant directory"
