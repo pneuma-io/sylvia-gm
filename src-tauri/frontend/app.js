@@ -1055,6 +1055,8 @@ const SylviaGMFrontend = (() => {
         triggerMessageId: command.trigger_message_id || null,
         characterProfileId: command.character_profile_id || null,
         characterProfileSha256: command.character_profile_sha256 || null,
+        characterArtifactId: command.character_artifact_id || null,
+        characterArtifactSha256: command.character_artifact_sha256 || null,
       }),
       return_guided_creation_subflow: (command) => invoke('return_guided_creation_subflow', {
         operationId: command.operation_id,
@@ -1579,6 +1581,7 @@ const SylviaGMFrontend = (() => {
       updateCampaignPartyActionAvailability();
       updateReusableLibraryDeleteControls();
     });
+    initStarterCharacterControls();
     $('delete-reusable-player-btn').addEventListener('click', () => {
       const item = (state.campaignPartyOptions?.player_archetypes || []).find(
         (candidate) => candidate.id === $('rift-archetype').value
@@ -9158,7 +9161,7 @@ const SylviaGMFrontend = (() => {
     const player = (state.campaignPartyOptions?.player_archetypes || []).find(
       (item) => item.id === $('rift-archetype').value
     );
-    $('delete-reusable-player-btn').hidden = !(player?.reusable && player.content_sha256);
+    $('delete-reusable-player-btn').hidden = !(player?.reusable && player.content_sha256 && !player.builtin_starter);
   }
 
   async function deleteReusableLibraryEntry(item) {
@@ -10150,7 +10153,7 @@ const SylviaGMFrontend = (() => {
     }
   }
 
-  async function startCreationSubflow(purpose, visibleAnswer, triggerMessageId = null, profile = null) {
+  async function startCreationSubflow(purpose, visibleAnswer, triggerMessageId = null, profile = null, character = null) {
     if (!state.bridge || !state.bridge.start_guided_creation_subflow ||
         !state.constructionDraftId || !state.activeSessionId) return;
     const parentSessionId = state.activeSessionId;
@@ -10169,6 +10172,8 @@ const SylviaGMFrontend = (() => {
         trigger_message_id: triggerMessageId,
         ...(profile ? { character_profile_id: profile.id,
           character_profile_sha256: profile.content_sha256 } : {}),
+        ...(character ? { character_artifact_id: character.id,
+          character_artifact_sha256: character.content_sha256 } : {}),
       });
       if (state.activeSessionId === parentSessionId) state.constructionRevision = result.construction_revision;
       if (result.status === 'independent') {
@@ -10377,6 +10382,55 @@ const SylviaGMFrontend = (() => {
     });
     applyStartingPartyPolicy();
     updateReusableLibraryDeleteControls();
+    renderSelectedStarterCharacter();
+  }
+
+  function renderSelectedStarterCharacter() {
+    const panel = $('starter-character-preview');
+    if (!panel) return;
+    const item = (state.campaignPartyOptions?.player_archetypes || []).find(
+      (candidate) => candidate.id === $('rift-archetype').value && candidate.builtin_starter
+    );
+    const preview = item?.starter_preview;
+    panel.hidden = !preview;
+    if (!preview) return;
+    const character = preview.participant;
+    const actor = preview.entity_state;
+    const className = character.classes[0].id;
+    $('starter-character-heading').textContent =
+      `${item.name} · ${className[0].toUpperCase() + className.slice(1)} · Level ${character.level}`;
+    $('starter-character-guidance').textContent = item.summary;
+    $('starter-character-stats').textContent =
+      `HP ${actor.max_hp} · AC ${actor.armor_class} · Speed ${actor.speed} ft`;
+    $('starter-character-profile').textContent = preview.authored_profile;
+    const label = (value) => String(value).replaceAll('_', ' ');
+    const equipment = actor.inventory.map((item) => {
+      const quantity = actor.inventory_quantities?.[item] || 1;
+      return `${label(item)}${quantity > 1 ? ` ×${quantity}` : ''}`;
+    });
+    const resources = Object.entries(actor.resource_maxima || {})
+      .filter(([, maximum]) => maximum > 0)
+      .map(([name, maximum]) => `${label(name)} ${maximum}`);
+    $('starter-character-data').textContent = [
+      `Ability scores: ${Object.entries(character.abilities).map(([name, score]) => `${label(name)} ${score}`).join(', ')}`,
+      `Saving throws: ${character.saving_throw_proficiencies.map(label).join(', ')}`,
+      `Skills: ${(character.skill_proficiencies || []).map(label).join(', ')}`,
+      `Equipment: ${equipment.join(', ')}`,
+      `Spells: ${actor.prepared_spells.map(label).join(', ') || 'None'}`,
+      `Resources: ${resources.join(', ')}`,
+    ].join('\n\n');
+    $('starter-edit-copy').hidden = selectedStartingPartyPolicy().player_character?.mode === 'fixed';
+  }
+
+  function initStarterCharacterControls() {
+    $('rift-archetype').addEventListener('change', renderSelectedStarterCharacter);
+    $('starter-edit-copy')?.addEventListener('click', () => {
+      const item = (state.campaignPartyOptions?.player_archetypes || []).find(
+        (candidate) => candidate.id === $('rift-archetype').value && candidate.builtin_starter
+      );
+      if (item) void startCreationSubflow('player_character',
+        `Edit a copy of ${item.name}`, null, null, item);
+    });
   }
 
   function selectedRiftPlayerName() {

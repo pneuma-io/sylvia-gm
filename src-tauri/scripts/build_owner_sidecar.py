@@ -47,6 +47,7 @@ _DATA_ROOTS = {
     "rulesets/riichi-mahjong": "rulesets/riichi-mahjong",
     "campaign-settings/severed-lands": "campaign-settings/severed-lands",
     "src/sylvia_gm/agent/skills": "sylvia_gm/agent/skills",
+    "src/sylvia_gm/campaign": "sylvia_gm/campaign",
 }
 
 _DICTATION_VERSIONS = {
@@ -268,9 +269,6 @@ def main() -> int:
         *sidecar_data_arguments(repository_root, work_root / "data"),
         *campaign_plan_data_arguments(repository_root),
         *dictation_build_arguments(repository_root),
-        "--add-data",
-        f"{repository_root / 'src' / 'sylvia_gm' / 'campaign' / 'the-rift-awakening.json'}"
-        f"{os.pathsep}sylvia_gm/campaign",
         "--workpath",
         str(build_dir),
         "--distpath",

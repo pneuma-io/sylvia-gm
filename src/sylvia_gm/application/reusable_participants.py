@@ -80,6 +80,7 @@ class ReusableParticipant:
     setting_data: SafePayload = field(default_factory=dict)
     source_profile: SafePayload | None = None
     source_migration: SafePayload | None = None
+    builtin_starter: bool = False
 
     @property
     def profile_status(self) -> str:
@@ -100,6 +101,7 @@ class ReusableParticipant:
             "campaign_ready": self.profile_status == "authored",
             "content_sha256": self.content_sha256,
             "reusable": True,
+            **({"builtin_starter": True} if self.builtin_starter else {}),
             "source_profile": self.source_profile,
             "ruleset": {
                 "id": self.package_id,

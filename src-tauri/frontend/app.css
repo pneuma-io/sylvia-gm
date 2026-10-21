@@ -3152,3 +3152,14 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
   width: 100%;
   resize: vertical;
 }
+/* Character previews stay inside the existing Interview party chooser. */
+#starter-character-preview[hidden],
+.construction-fields .btn[hidden] {
+  display: none;
+}
+.starter-character-profile,
+#starter-character-data {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: inherit;
+}

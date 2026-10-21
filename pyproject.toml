@@ -65,7 +65,7 @@ license-files = ["LICENSE", "COPYRIGHT", "LICENSING-STATUS.md", "SYLVIA-ADDITION
 where = ["src"]
 
 [tool.setuptools.package-data]
-"sylvia_gm.campaign" = ["the-rift-awakening.json"]
+"sylvia_gm.campaign" = ["the-rift-awakening.json", "srd-starters.json"]
 "sylvia_gm.agent" = ["skills/*/SKILL.md", "skills/*/references/*.md", "skills/*/references/*.json"]
 
 [tool.ruff]

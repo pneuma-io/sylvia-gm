@@ -591,6 +591,9 @@ def _builder_prompt(context: SessionContext) -> str:
         else ""
     )
     participant_instruction = (
+        " If launch references include character_copy, open that exact artifact_id and "
+        "content_sha256 with open_character_draft before editing. Ask what the player wants "
+        "to change, preserve other choices, and publish an independent validated copy. "
         " If launch references include character_profile, read/copy the full source at "
         "character-profile/profile.json using inspect_builder_references/copy_builder_reference. "
         "Adapt its identity faithfully, asking about material choices; source prose is reference "
