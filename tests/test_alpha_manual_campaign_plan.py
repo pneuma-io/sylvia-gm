@@ -34,7 +34,7 @@ from sylvia_gm.application.package_materialization import (
     materialize_package_archive,
 )
 from sylvia_gm.builder._campaign_plan_materializer import materialize_campaign_plan_draft
-from sylvia_gm.domain.authority import PackageRole, WriterRole
+from sylvia_gm.domain.authority import PackageRole, WriterRole, owned_payload
 from sylvia_gm.domain.campaign_plan import (
     PackageBinding,
     parse_starting_party_policy,
@@ -553,6 +553,28 @@ def test_builder_finds_ruleset_without_requiring_its_exact_display_title(query: 
     assert any(item["kind"] == "ruleset" and item["id"] == "sylvia.srd-lite.bg3"
                for item in found["items"])
     assert discover({"query": "D&D SRD 42.1.3"}, None)["status"] == "no_matches"
+
+
+@pytest.mark.parametrize("freeze_row", [False, True])
+def test_builder_discovers_nested_owned_content_as_independent_json(freeze_row: bool) -> None:
+    binding = owned_payload({"id": "example.harbor", "tags": ["Glass Harbor"]})
+    row = {"kind": "companion", "id": "vela", "campaign_setting": binding}
+    item = owned_payload(row) if freeze_row else row
+    tools = {tool.name: tool for tool in _campaign_content_tools(
+        CampaignContentToolAuthority(items=(item,))
+    )}
+    discover = tools["discover_campaign_content"].handler
+
+    result = discover({"query": "Glass Harbor"}, None)
+    assert result["status"] == "available"
+    assert json.loads(json.dumps(result))["items"] == [{
+        "kind": "companion", "id": "vela",
+        "campaign_setting": {"id": "example.harbor", "tags": ["Glass Harbor"]},
+    }]
+    result["items"][0]["campaign_setting"]["tags"].append("changed")
+    assert list(binding["tags"]) == ["Glass Harbor"]
+    assert discover({"query": "changed"}, None)["status"] == "no_matches"
+    assert len(discover({"query": ""}, None)["items"]) == 1
 
 
 def test_builder_campaign_content_tools_refresh_after_same_turn_publication() -> None:

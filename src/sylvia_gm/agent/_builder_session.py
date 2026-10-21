@@ -65,7 +65,7 @@ from sylvia_gm.builder._tools import (
     PREPARE_CAMPAIGN_SETUP_TOOL_DEFINITION,
     RULESET_CANDIDATE_TOOL_DEFINITION,
 )
-from sylvia_gm.domain.authority import SafePayload
+from sylvia_gm.domain.authority import SafePayload, thaw_json_value
 from sylvia_gm.domain.errors import AuthorityError, CommandRejected, RulesetDiagnostic
 from sylvia_gm.domain.package_library import ParticipantArtifactDeclaration, canonical_json_bytes
 from sylvia_gm.domain.session import (
@@ -766,7 +766,8 @@ def _campaign_content_tools(authority: CampaignContentToolAuthority) -> tuple[To
             }
         terms = query.casefold().split()
         matches = []
-        for item in authority.current_items():
+        for source in authority.current_items():
+            item = cast(dict[str, Any], thaw_json_value(source))
             searchable = json.dumps(item, sort_keys=True, ensure_ascii=False).casefold()
             if all(term in searchable for term in terms):
                 matches.append(item)
