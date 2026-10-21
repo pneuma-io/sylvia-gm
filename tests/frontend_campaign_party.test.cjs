@@ -1333,6 +1333,48 @@ test('unavailable saved content keeps healthy Rulesets selectable with persisten
   assert.doesNotMatch(details, /<test>/);
 });
 
+test('metadata-only saved character repair details survive a failed party refresh', async () => {
+  const h = harness();
+  const badId = 'participant-reusable-000000000000000000000000-1234567890123456';
+  let includeParticipants;
+  let partyCalls = 0;
+  h.state.bridge = {
+    campaign_creation_catalog: async (include) => {
+      includeParticipants = include;
+      return [
+        { kind: 'ruleset', id: 'rules', selection_id: 'rules', title: 'Healthy Ruleset',
+          version: '1', content_sha256: 'rules-hash', compatible_settings: [] },
+        { kind: 'unavailable_content', content_kind: 'participant', id: badId,
+          title: 'Saved character unavailable',
+          summary: 'The saved files do not meet their content requirements. Repair a copy in Builder.',
+          validation_errors: [{ path: 'stress',
+            message: 'The value at stress does not match the declared state schema.' }] },
+      ];
+    },
+    campaign_party_options: async () => {
+      partyCalls += 1;
+      throw new Error('Saved participant rejected');
+    },
+  };
+  await h.showConstructionPanel();
+  assert.equal(includeParticipants, false);
+  const details = h.node('construction-library-warning-items').innerHTML;
+  assert.equal(h.node('construction-library-warnings').hidden, false);
+  assert.match(details, /Saved character unavailable/);
+  assert.match(details, /567890123456/);
+  assert.match(details, /Repair a copy in Builder/);
+  assert.match(details, /stress.*declared state schema/);
+  const callsBeforeRefresh = partyCalls;
+  h.node('construction-package').value = 'rules';
+  h.node('construction-setting').innerHTML = '<option value="setting">Setting</option>';
+  h.node('construction-template').innerHTML = '<option value="plan-a">Plan</option>';
+  await h.refreshCampaignPartyOptions();
+  assert.equal(h.state.campaignPartyOptionsStatus, 'error');
+  assert.equal(partyCalls, callsBeforeRefresh + 1);
+  assert.equal(h.node('construction-library-warnings').hidden, false);
+  assert.equal(h.node('construction-library-warning-items').innerHTML, details);
+});
+
 test('a failed catalog request keeps its explanation visible after status updates', async () => {
   const h = harness();
   h.state.bridge = { campaign_creation_catalog: async () => { throw new Error('Unavailable'); } };

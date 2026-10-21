@@ -128,6 +128,7 @@ from sylvia_gm.application.plan_bundle import (
 from sylvia_gm.application.plan_snapshot import retained_plan_snapshot, validate_plan_snapshot
 from sylvia_gm.application.reusable_participants import (
     ReusableParticipant,
+    compatible_reusable_participants,
     delete_reusable_participant,
     save_reusable_participant,
 )
@@ -491,22 +492,24 @@ def _campaign_creation_catalog(
             "Reusable Campaign Plan library contains an invalid artifact",
             code="reusable_campaign_plan_invalid",
         ) from error
-    if include_participants:
-        try:
+    try:
+        participants = _reusable_participant_catalog(
+            storage_root, application_owner, candidates=candidates,
+            include_starters=include_participants,
+            on_invalid=lambda artifact_id, error: record_invalid(
+                "participant", artifact_id, error,
+            ),
+        )
+        if include_participants:
             items.extend(
                 dict(participant_catalog_payload(application_owner, participant))
-                for participant in _reusable_participant_catalog(
-                    storage_root, application_owner, candidates=candidates,
-                    on_invalid=lambda artifact_id, error: record_invalid(
-                        "participant", artifact_id, error,
-                    ),
-                )
+                for participant in participants
             )
-        except (OSError, UnicodeError, ValueError, json.JSONDecodeError) as error:
-            raise CommandRejected(
-                "Reusable participant library contains an invalid artifact",
-                code="reusable_participant_invalid",
-            ) from error
+    except (OSError, UnicodeError, ValueError, json.JSONDecodeError) as error:
+        raise CommandRejected(
+            "Reusable participant library contains an invalid artifact",
+            code="reusable_participant_invalid",
+        ) from error
     # Portable built-in Plans own exact world snapshots. Offer those worlds before
     # installation; the Interview admits the selected snapshot through normal checks.
     public_plans = [item for item in items if item.get("kind") == "campaign_plan" and item.get("ruleset") and item.get("campaign_setting")]
@@ -762,12 +765,16 @@ def _rift_reusable_participants(
     storage_root: Path,
     *,
     on_invalid: Callable[[str, Exception], None] | None = None,
+    include_starters: bool = True,
 ) -> tuple[ReusableParticipant, ...]:
     """Load participants compatible with the bundled Severed Lands/Rift binding."""
 
     package, declaration = _rift_participant_authority()
     campaign_setting = bundled_rift_authority().setting
-    return available_reusable_participants(
+    discover = (
+        available_reusable_participants if include_starters else compatible_reusable_participants
+    )
+    return discover(
         storage_root,
         package=package,
         declaration=declaration,
@@ -782,11 +789,17 @@ def _reusable_participant_catalog(
     *,
     candidates: Sequence[PackageCandidate] | None = None,
     on_invalid: Callable[[str, Exception], None] | None = None,
+    include_starters: bool = True,
 ) -> tuple[ReusableParticipant, ...]:
-    """Discover library characters using the exact schemas of installed Rulesets and Settings."""
+    """Validate saved characters even when setup defers built-in roster construction."""
+    if not include_starters and not (storage_root / "participants").exists():
+        return ()
+    discover = (
+        available_reusable_participants if include_starters else compatible_reusable_participants
+    )
     found = {
         item.artifact_id: item for item in _rift_reusable_participants(
-            storage_root, on_invalid=on_invalid,
+            storage_root, on_invalid=on_invalid, include_starters=include_starters,
         )
     }
     inspected: set[tuple[str, str, str, str, str]] = set()
@@ -814,7 +827,7 @@ def _reusable_participant_catalog(
                 )
                 if sources is None:
                     continue
-                for item in available_reusable_participants(
+                for item in discover(
                     storage_root,
                     package=primary,
                     declaration=declaration,
