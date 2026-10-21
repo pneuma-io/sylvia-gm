@@ -447,9 +447,9 @@ def _unavailable_library_content(
 
 
 def _campaign_creation_catalog(
-    storage_root: Path, application_owner: AuthorityOwner
+    storage_root: Path, application_owner: AuthorityOwner, *, include_participants: bool = True,
 ) -> tuple[SafePayload, ...]:
-    """Project logical campaign choices with exact compatible content bindings."""
+    """Project exact content; setup can defer character construction until party selection."""
 
     items: list[dict[str, Any]] = [dict(item) for item in bundled_campaign_content_catalog()]
     candidates = tuple(
@@ -491,21 +491,22 @@ def _campaign_creation_catalog(
             "Reusable Campaign Plan library contains an invalid artifact",
             code="reusable_campaign_plan_invalid",
         ) from error
-    try:
-        items.extend(
-            dict(participant_catalog_payload(application_owner, participant))
-            for participant in _reusable_participant_catalog(
-                storage_root, application_owner, candidates=candidates,
-                on_invalid=lambda artifact_id, error: record_invalid(
-                    "participant", artifact_id, error,
-                ),
+    if include_participants:
+        try:
+            items.extend(
+                dict(participant_catalog_payload(application_owner, participant))
+                for participant in _reusable_participant_catalog(
+                    storage_root, application_owner, candidates=candidates,
+                    on_invalid=lambda artifact_id, error: record_invalid(
+                        "participant", artifact_id, error,
+                    ),
+                )
             )
-        )
-    except (OSError, UnicodeError, ValueError, json.JSONDecodeError) as error:
-        raise CommandRejected(
-            "Reusable participant library contains an invalid artifact",
-            code="reusable_participant_invalid",
-        ) from error
+        except (OSError, UnicodeError, ValueError, json.JSONDecodeError) as error:
+            raise CommandRejected(
+                "Reusable participant library contains an invalid artifact",
+                code="reusable_participant_invalid",
+            ) from error
     # Portable built-in Plans own exact world snapshots. Offer those worlds before
     # installation; the Interview admits the selected snapshot through normal checks.
     public_plans = [item for item in items if item.get("kind") == "campaign_plan" and item.get("ruleset") and item.get("campaign_setting")]
@@ -1847,7 +1848,10 @@ def _dispatch_selected(
     if method == "campaign_index":
         return bus.campaign_index()
     if method == "campaign_creation_catalog":
-        return _campaign_creation_catalog(storage_root, application_owner)
+        return _campaign_creation_catalog(
+            storage_root, application_owner,
+            include_participants=_optional_bool(params, "include_participants", default=True),
+        )
     if method == "delete_reusable_library_entry":
         kind = _required_text(params, "kind")
         artifact_id = _required_text(params, "artifact_id")
@@ -2064,7 +2068,9 @@ def _dispatch_selected(
         setting_id = _required_text(params, "setting_id")
         plan_id = _required_text(params, "plan_id")
         catalog_plan = next((
-            item for item in _campaign_creation_catalog(storage_root, application_owner)
+            item for item in _campaign_creation_catalog(
+                storage_root, application_owner, include_participants=False,
+            )
             if item.get("kind") == "campaign_plan" and item.get("id") == plan_id
         ), None)
         if catalog_plan is not None and catalog_plan.get("setup_id") == "the-rift-awakening":

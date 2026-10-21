@@ -509,8 +509,16 @@ async fn campaign_index(window: WebviewWindow) -> Result<Value, String> {
 }
 
 #[tauri::command]
-async fn campaign_creation_catalog(window: WebviewWindow) -> Result<Value, String> {
-    owner_call_async(window.clone(), "campaign_creation_catalog", json!({})).await
+async fn campaign_creation_catalog(
+    window: WebviewWindow,
+    include_participants: Option<bool>,
+) -> Result<Value, String> {
+    owner_call_async(
+        window.clone(),
+        "campaign_creation_catalog",
+        json!({ "include_participants": include_participants.unwrap_or(true) }),
+    )
+    .await
 }
 
 #[tauri::command]

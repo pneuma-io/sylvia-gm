@@ -897,7 +897,9 @@ const SylviaGMFrontend = (() => {
       dictation_stop: (id) => invoke('dictation_stop', { id }),
       dictation_cancel: (id) => invoke('dictation_cancel', { id }),
       campaign_index: () => invoke('campaign_index'),
-      campaign_creation_catalog: () => invoke('campaign_creation_catalog'),
+      campaign_creation_catalog: (includeParticipants = true) => invoke(
+        'campaign_creation_catalog', { includeParticipants }
+      ),
       campaign_sequel_context: (request) => invoke('campaign_sequel_context', { request }),
       preview_campaign_sequel: (request) => invoke('preview_campaign_sequel', { request }),
       append_campaign_sequel: (request) => invoke('append_campaign_sequel', { request }),
@@ -10468,7 +10470,7 @@ const SylviaGMFrontend = (() => {
     if (!state.bridge) return;
     if (state.bridge.campaign_creation_catalog) {
       try {
-        const catalog = await state.bridge.campaign_creation_catalog() || [];
+        const catalog = await state.bridge.campaign_creation_catalog(false) || [];
         if (!stillSelected()) return;
         state.campaignCreationCatalog = catalog;
         renderCharacterProfiles();
@@ -10493,7 +10495,9 @@ const SylviaGMFrontend = (() => {
         );
       }
     }
-    if (state.bridge.rift_template) {
+    if (state.bridge.rift_template && state.campaignCreationCatalog.some(
+      (item) => item.kind === 'campaign_plan' && item.setup_id
+    )) {
       try {
         const template = await state.bridge.rift_template();
         if (!stillSelected()) return;

@@ -538,6 +538,54 @@ test('host bridge forwards exact party selections for lookup and generic Start',
   }]);
 });
 
+test('host catalog defaults to complete discovery and forwards explicit setup deferral', async () => {
+  const h = harness();
+  const calls = [];
+  h.window.__TAURI__ = { core: { invoke: async (...args) => { calls.push(args); return []; } } };
+  const bridge = h.createHostBridge();
+  await bridge.campaign_creation_catalog();
+  await bridge.campaign_creation_catalog(false);
+  assert.deepEqual(JSON.parse(JSON.stringify(calls)), [
+    ['campaign_creation_catalog', { includeParticipants: true }],
+    ['campaign_creation_catalog', { includeParticipants: false }],
+  ]);
+});
+
+test('Ruleset browsing requests metadata without constructing an unselected Rift party', async () => {
+  const h = harness();
+  const calls = [];
+  let riftCalls = 0;
+  h.state.bridge = {
+    campaign_creation_catalog: async (includeParticipants) => {
+      calls.push(includeParticipants);
+      return [{ kind: 'ruleset', id: 'rules', selection_id: 'rules', title: 'Rules', compatible_settings: [] }];
+    },
+    rift_template: async () => { riftCalls++; throw new Error('Party construction must wait for selection'); },
+  };
+  await h.showConstructionPanel();
+  assert.deepEqual(calls, [false]);
+  assert.equal(riftCalls, 0);
+  assert.equal(h.node('construction-panel').hidden, false);
+  assert.match(h.node('construction-package').innerHTML, /Rules/);
+});
+
+test('an inventoried legacy setup still loads its retained Rift metadata', async () => {
+  const h = harness();
+  let riftCalls = 0;
+  h.state.bridge = {
+    campaign_creation_catalog: async () => [{
+      kind: 'campaign_plan', id: 'legacy-plan', setup_id: 'the-rift-awakening',
+    }],
+    rift_template: async () => {
+      riftCalls++;
+      return { template_id: 'the-rift-awakening' };
+    },
+  };
+  await h.showConstructionPanel();
+  assert.equal(riftCalls, 1);
+  assert.equal(h.state.riftTemplate.template_id, 'the-rift-awakening');
+});
+
 test('host bridge forwards exact guided Interview navigation fields', async () => {
   const h = harness();
   const calls = [];
