@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "trigger-discipline-balance-suite"
+version = "0.1.0"
+description = "Deterministic, replayable balance instrumentation for Trigger Discipline"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+trigger-balance = "balance_suite.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["balance_suite*"]
+
