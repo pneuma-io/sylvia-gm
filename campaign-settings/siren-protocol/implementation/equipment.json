@@ -1,0 +1,591 @@
+{
+  "format": 1,
+  "catalog_id": "pneuma-io.haremrun.equipment.v0-1",
+  "status": "authored_equipment_templates",
+  "authority_note": "Named Siren Protocol models below select and reskin current Trigger Discipline reference-equipment behavior for the v0.1 authored profile. They are not immutable setting-wide balance canon and may be retuned without retconning the fiction.",
+  "ruleset_provenance": {
+    "repository": "pneuma-io/trigger-discipline",
+    "main_inspected_commit": "6d7ac6bba9284b0db66d422875b93cedf3724303",
+    "reference_equipment_source": "Testing/REFERENCE EQUIPMENT.md",
+    "reference_values_source": "Testing/REFERENCE EQUIPMENT VALUES.md",
+    "reference_values_status": "test/tuning inputs upstream; explicitly selected here as Siren Protocol v0.1 implementation defaults"
+  },
+  "firearms": [
+    {
+      "id": "hr.eq.palisade.p15",
+      "name": "PALISADE P15 Compact Sidearm",
+      "family": "PISTOL",
+      "damage": 4,
+      "target_penetration": 1,
+      "material_penetration": 1,
+      "range_profile_m": [
+        {
+          "max": 15,
+          "difficulty": 0
+        },
+        {
+          "max": 30,
+          "difficulty": 2
+        },
+        {
+          "max": 50,
+          "difficulty": 5
+        },
+        {
+          "beyond": true,
+          "difficulty": 8
+        }
+      ],
+      "recoil": 1,
+      "capacity": "15-round detachable magazine + chamber",
+      "fire_modes": [
+        "SEMI AUTO"
+      ],
+      "mechanism": "short-recoil self-loader",
+      "reload_ap": 2,
+      "handling": 0
+    },
+    {
+      "id": "hr.eq.palisade.k30",
+      "name": "PALISADE K30 PDW",
+      "family": "SMG",
+      "damage": 4,
+      "target_penetration": 1,
+      "material_penetration": 1,
+      "range_profile_m": [
+        {
+          "max": 30,
+          "difficulty": 0
+        },
+        {
+          "max": 60,
+          "difficulty": 2
+        },
+        {
+          "max": 100,
+          "difficulty": 5
+        },
+        {
+          "beyond": true,
+          "difficulty": 8
+        }
+      ],
+      "recoil": 1,
+      "cyclic_rate": "~800 rpm reference behavior",
+      "capacity": "30-round detachable magazine + chamber",
+      "fire_modes": [
+        "SEMI AUTO",
+        "FULL AUTO"
+      ],
+      "mechanism": "compact self-loader",
+      "reload_ap": 2,
+      "handling": 1,
+      "implementation_note": "FULL AUTO exists physically; BURST/FULL AUTO resolve through the contained TD package when its actual weapon and ammunition prerequisites hold."
+    },
+    {
+      "id": "hr.eq.palisade.r55",
+      "name": "PALISADE R55 Service Rifle",
+      "family": "SERVICE RIFLE",
+      "damage": 5,
+      "target_penetration": 2,
+      "material_penetration": 3,
+      "range_profile_m": [
+        {
+          "max": 120,
+          "difficulty": 0
+        },
+        {
+          "max": 250,
+          "difficulty": 2
+        },
+        {
+          "max": 400,
+          "difficulty": 5
+        },
+        {
+          "beyond": true,
+          "difficulty": 8
+        }
+      ],
+      "recoil": 2,
+      "cyclic_rate": "~750 rpm reference behavior",
+      "capacity": "30-round detachable magazine + chamber",
+      "fire_modes": [
+        "SEMI AUTO",
+        "3-round BURST",
+        "FULL AUTO"
+      ],
+      "mechanism": "gas-operated self-loader",
+      "reload_ap": 2,
+      "handling": 2,
+      "implementation_note": "BURST/FULL AUTO exist physically; BURST/FULL AUTO resolve through the contained TD package when its actual weapon and ammunition prerequisites hold."
+    },
+    {
+      "id": "hr.eq.palisade.l65",
+      "name": "PALISADE L65 Support Weapon",
+      "family": "LMG",
+      "damage": 5,
+      "target_penetration": 2,
+      "material_penetration": 3,
+      "range_profile_m": [
+        {
+          "max": 150,
+          "difficulty": 0
+        },
+        {
+          "max": 350,
+          "difficulty": 2
+        },
+        {
+          "max": 600,
+          "difficulty": 5
+        },
+        {
+          "beyond": true,
+          "difficulty": 8
+        }
+      ],
+      "recoil": 2,
+      "recoil_when_properly_braced": 1,
+      "cyclic_rate": "~650 rpm reference behavior",
+      "capacity": "100-round belt box + chamber",
+      "fire_modes": [
+        "FULL AUTO"
+      ],
+      "mechanism": "belt-fed gas-operated",
+      "reload_ap": 4,
+      "handling": 4,
+      "implementation_note": "Use the contained TD firing operations only with a supported complete weapon, feed and ammunition profile. This reference entry does not supply a complete starting weapon state."
+    },
+    {
+      "id": "hr.eq.palisade.b12",
+      "name": "PALISADE B12 Entry Shotgun",
+      "family": "SHOTGUN",
+      "damage_by_range_m": [
+        {
+          "max": 10,
+          "damage": 7,
+          "difficulty": 0
+        },
+        {
+          "max": 20,
+          "damage": 5,
+          "difficulty": 2
+        },
+        {
+          "max": 35,
+          "damage": 3,
+          "difficulty": 5
+        },
+        {
+          "beyond": true,
+          "difficulty": 8
+        }
+      ],
+      "target_penetration": 1,
+      "material_penetration": 1,
+      "recoil": 4,
+      "capacity": "8-shell tube + chamber",
+      "fire_modes": [
+        "single shot"
+      ],
+      "mechanism": "pump action",
+      "shell_load_ap": 1,
+      "cycle_ap": 1,
+      "handling": 2,
+      "implementation_note": "Physical shell/chamber/cycle state remains authoritative. Use the contained TD supported loading/cycling operations and explicitly adjudicate any unsupported handling."
+    },
+    {
+      "id": "hr.eq.palisade.m6",
+      "name": "PALISADE M6 Precision Rifle",
+      "family": "PRECISION RIFLE",
+      "damage": 6,
+      "target_penetration": 3,
+      "material_penetration": 4,
+      "range_profile_m": [
+        {
+          "max": 250,
+          "difficulty": 0
+        },
+        {
+          "max": 500,
+          "difficulty": 2
+        },
+        {
+          "max": 800,
+          "difficulty": 5
+        },
+        {
+          "beyond": true,
+          "difficulty": 8
+        }
+      ],
+      "recoil": 3,
+      "capacity": "10-round detachable magazine + chamber",
+      "fire_modes": [
+        "SEMI AUTO"
+      ],
+      "mechanism": "precision gas-operated self-loader",
+      "reload_ap": 2,
+      "handling": 3
+    },
+    {
+      "id": "hr.eq.palisade.m7",
+      "name": "PALISADE M7 Manual Precision Rifle",
+      "family": "MANUAL-ACTION PRECISION RIFLE",
+      "damage": 7,
+      "target_penetration": 4,
+      "material_penetration": 5,
+      "range_profile_m": [
+        {
+          "max": 300,
+          "difficulty": 0
+        },
+        {
+          "max": 650,
+          "difficulty": 2
+        },
+        {
+          "max": 1000,
+          "difficulty": 5
+        },
+        {
+          "beyond": true,
+          "difficulty": 8
+        }
+      ],
+      "recoil": 4,
+      "capacity": "5-round detachable magazine + chamber",
+      "fire_modes": [
+        "single shot"
+      ],
+      "mechanism": "bolt action",
+      "reload_ap": 2,
+      "cycle_ap": 1,
+      "handling": 4
+    }
+  ],
+  "protection": [
+    {
+      "id": "hr.eq.palisade.civicweave",
+      "name": "PALISADE Civicweave Concealable Armour",
+      "family": "STANDARD BODY ARMOR",
+      "res": 4,
+      "burden": 1,
+      "note": "Civilian/executive cut. Personal RES only; does not create COVER."
+    },
+    {
+      "id": "hr.eq.palisade.flexplate",
+      "name": "PALISADE FlexPlate Tactical Armour",
+      "family": "STANDARD BODY ARMOR",
+      "res": 4,
+      "burden": 1,
+      "note": "Tactical cut of the same v0.1 reference protection family; does not create COVER."
+    },
+    {
+      "id": "hr.eq.palisade.bastion",
+      "name": "PALISADE Bastion Heavy Armour",
+      "family": "HEAVY BODY ARMOR",
+      "res": 7,
+      "burden": 3
+    },
+    {
+      "id": "hr.eq.palisade.wall4",
+      "name": "PALISADE Wall-4 Ballistic Shield",
+      "family": "BALLISTIC SHIELD",
+      "cover_hp": 16,
+      "material_resistance": 4,
+      "burden": 4,
+      "handling": 4,
+      "note": "Directional physical COVER; occupies hands and can be flanked, destroyed, or penetrated."
+    },
+    {
+      "id": "hr.eq.palisade.aegis_screen",
+      "name": "PALISADE Aegis Projected Screen",
+      "family": "PROJECTED BARRIER",
+      "rules_basis": "BARRIER/COVER",
+      "numeric_status": "open_not_standardized_v0-1",
+      "default_loadout_eligible": false,
+      "note": "A projected directional barrier exists in Siren Protocol. v0.1 does not invent universal barrier HP/material-resistance numbers or personal all-around shield HP."
+    }
+  ],
+  "effects": [
+    {
+      "id": "hr.eq.palisade.f7",
+      "name": "PALISADE F7 Fragmentation Grenade",
+      "family": "FRAGMENTATION GRENADE",
+      "fuse_seconds": 4,
+      "bands": [
+        {
+          "max_m": 4,
+          "damage": 7,
+          "target_penetration": 3,
+          "material_penetration": 2
+        },
+        {
+          "max_m": 8,
+          "damage": 5,
+          "target_penetration": 2,
+          "material_penetration": 1
+        },
+        {
+          "max_m": 14,
+          "damage": 3,
+          "target_penetration": 1,
+          "material_penetration": 0
+        },
+        {
+          "max_m": 20,
+          "damage": 1,
+          "target_penetration": 0,
+          "material_penetration": 0
+        }
+      ]
+    },
+    {
+      "id": "hr.eq.palisade.flash4",
+      "name": "PALISADE Flash-4 Concussion Grenade",
+      "family": "FLASH / CONCUSSION GRENADE",
+      "fuse_seconds": 4,
+      "bands": [
+        {
+          "max_m": 4,
+          "difficulty": 4
+        },
+        {
+          "max_m": 8,
+          "difficulty": 3
+        },
+        {
+          "max_m": 12,
+          "difficulty": 2
+        }
+      ],
+      "duration": "through the end of the affected target's next TEAM TURN when geometry leaves the target exposed",
+      "damage": 0
+    },
+    {
+      "id": "hr.eq.palisade.fog8",
+      "name": "PALISADE Fog-8 Smoke Grenade",
+      "family": "SMOKE GRENADE",
+      "fuse_seconds": 2,
+      "radius_m": {
+        "initial": 2,
+        "after_2_seconds": 6,
+        "after_4_seconds": 8
+      },
+      "dense_seconds": 18,
+      "dissipation_seconds": 6,
+      "visual_rule": ">=4m dense smoke blocks visual LOS; shorter dense traces add +3 DIFFICULTY to sight-dependent targeting/observation; other sensors use actual capability"
+    }
+  ],
+  "medical": [
+    {
+      "id": "hr.eq.calyx.fieldkit",
+      "name": "CALYX Field Medical Kit",
+      "family": "MEDKIT",
+      "burden": 1,
+      "supplies": 6,
+      "quick_access_setup_ap": 1,
+      "stowed_setup_ap": 2,
+      "substantial_treatment_supply": 1,
+      "supports": [
+        "hemorrhage control",
+        "basic airway management",
+        "dressing",
+        "splinting",
+        "injectors",
+        "STABILIZE when physically supported"
+      ],
+      "does_not_support": [
+        "baseline RESUSCITATION after vital failure without additional equipment"
+      ]
+    },
+    {
+      "id": "hr.eq.sphn.trauma_kit",
+      "name": "SPHN Trauma / Resuscitation Kit",
+      "family": "TRAUMA / RESUSCITATION KIT",
+      "burden": 3,
+      "supplies": 12,
+      "advanced_setup_ap": 2,
+      "ordinary_treatment_supply": 1,
+      "major_trauma_or_resus_supply": 2,
+      "supports": [
+        "advanced airway",
+        "hemorrhage control",
+        "fluids/blood-equivalent",
+        "monitoring/defibrillation",
+        "serious wound care",
+        "STABILIZE",
+        "serious TRAUMA care",
+        "RESUSCITATION when physically reversible"
+      ]
+    }
+  ],
+  "technical": [
+    {
+      "id": "hr.eq.aster.kite_fpv",
+      "name": "ASTER Kite FPV Drone",
+      "family": "FPV DRONE",
+      "durability": 4,
+      "manual_move_m_per_operator_ap": 12,
+      "operator_ap_per_ap_equivalent_action": 1,
+      "battery_seconds": 300,
+      "signal_m": {
+        "urban": 300,
+        "open": 800
+      },
+      "sensors": "ordinary visual camera; clear-condition reference ~60m CONFIRMED / ~150m APPROXIMATE when resolvable",
+      "payload_kg": 1,
+      "default_weapon": null
+    },
+    {
+      "id": "hr.eq.emberline.oriel",
+      "name": "EMBERLINE Oriel Autonomous Drone",
+      "family": "AUTONOMOUS DRONE",
+      "durability": 8,
+      "autonomous_move_m_per_ap_equivalent": 8,
+      "standing_order_change_operator_ap": 1,
+      "simple_autonomous_actions_per_team_turn": 2,
+      "battery_seconds": 900,
+      "signal_m": {
+        "urban": 500,
+        "open": 1500
+      },
+      "sensors": "visual + low-light/thermal; clear-condition reference ~80m CONFIRMED / ~250m APPROXIMATE when resolvable",
+      "payload_kg": 3,
+      "default_weapon": null,
+      "note": "No free attack routine. Armed behavior requires a separately defined real module and compatible Trigger Discipline rules."
+    },
+    {
+      "id": "hr.eq.emberline.mesh_relay",
+      "name": "EMBERLINE Mesh Relay / Field Sensor Node",
+      "family": "ENGINEERING DEPLOYABLE",
+      "burden": 2,
+      "durability": 6,
+      "setup_ap": 3,
+      "tech_systems_handling_setup_ap": 2,
+      "battery_seconds": 1200,
+      "local_detection_radius_m": 25,
+      "direct_visual_confirmation_m": 40,
+      "signal_relay_m": 150,
+      "hackable_physical_node": true,
+      "default_weapon": null
+    },
+    {
+      "id": "hr.eq.palisade.breach_kit",
+      "name": "PALISADE Breach Kit",
+      "family": "BREACHING TOOLS",
+      "note": "Physical entry tools and consumables. Ownership grants no generic bonus; BREAKER/ENGINEERING rules and the actual barrier determine performance."
+    },
+    {
+      "id": "hr.eq.independent.infiltration_kit",
+      "name": "Infiltration Tool Kit",
+      "family": "INFILTRATION TOOLS",
+      "note": "Lock/access tools, compact camera, line, cutters, and ordinary physical aids. It supplies real capabilities rather than a generic STEALTH bonus."
+    },
+    {
+      "id": "hr.eq.independent.intrusion_rig",
+      "name": "Portable Intrusion Rig",
+      "family": "HACKING INTERFACE",
+      "note": "Cables, local interfaces, radios, compute, and protocol tools that can provide plausible access routes. It never invents a LINK, credential, privilege, or remote function that does not exist."
+    }
+  ],
+  "cybernetics": [
+    {
+      "id": "hr.cyber.lattice.civiclink",
+      "name": "LATTICE CivicLink",
+      "capability": "identity/payment/credential/comms interface",
+      "mechanical_boundary": "No automatic HACKING, INFLUENCE, access, or CHECK bonus. It is an interface to real systems the user is permitted or able to reach."
+    },
+    {
+      "id": "hr.cyber.palisade.taclink",
+      "name": "PALISADE TacLink",
+      "capability": "weapon/armour HUD and squad-data interface",
+      "mechanical_boundary": "Does not AIM for the wearer, erase RECOIL/COVER, or grant extra AP."
+    },
+    {
+      "id": "hr.cyber.morrow.optics",
+      "name": "MORROW Multispectrum Optics",
+      "capability": "low-light, thermal, rangefinding, and visual sensor modes",
+      "mechanical_boundary": "Changes what can physically be sensed; does not automatically negate RANGE, COVER, AIM requirements, or uncertainty outside sensor capability."
+    },
+    {
+      "id": "hr.cyber.morrow.medtelemetry",
+      "name": "MORROW Medical Telemetry Suite",
+      "capability": "vitals and compatible-implant telemetry",
+      "mechanical_boundary": "Does not automatically reveal hidden pathology or make treatment succeed."
+    },
+    {
+      "id": "hr.cyber.vectorline.drivelink",
+      "name": "VECTORLINE DriveLink",
+      "capability": "direct control interface for compatible vehicles",
+      "mechanical_boundary": "Provides a real control route; no generic VEHICLES bonus or extra action economy is implied."
+    },
+    {
+      "id": "hr.cyber.emberline.commandmesh",
+      "name": "EMBERLINE CommandMesh",
+      "capability": "drone standing-order, command, and sensor-fusion interface",
+      "mechanical_boundary": "Does not create free drone actions, weapons, sensors, links, or autonomy beyond actual equipment and TECH rules."
+    },
+    {
+      "id": "hr.cyber.ironlace.reinforced_limb",
+      "name": "IRONLACE Reinforced Prosthetic Limb",
+      "capability": "advanced durable biological-compatible replacement limb",
+      "mechanical_boundary": "Does not automatically increase FORCE, CQC damage, movement, carry capacity, or AP. Any such advantage requires an explicit later mechanic."
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "hr.vehicle.vectorline.cinder_r",
+      "name": "VECTORLINE Cinder R",
+      "type": "high-performance electric motorcycle",
+      "occupancy": 2,
+      "control": [
+        "manual",
+        "DriveLink-compatible"
+      ],
+      "combat_profile": null
+    },
+    {
+      "id": "hr.vehicle.vectorline.v9_courier",
+      "name": "VECTORLINE V9 Courier",
+      "type": "compact high-performance road vehicle",
+      "occupancy": 4,
+      "control": [
+        "manual",
+        "assisted",
+        "autonomous"
+      ],
+      "combat_profile": null
+    },
+    {
+      "id": "hr.vehicle.palisade.bastion_carrier",
+      "name": "PALISADE Bastion Carrier",
+      "type": "armoured emergency/security utility vehicle",
+      "occupancy": 8,
+      "control": [
+        "manual",
+        "assisted"
+      ],
+      "mounted_weapon_profile": null,
+      "combat_profile": null
+    },
+    {
+      "id": "hr.vehicle.tideglass.skimmer",
+      "name": "TIDEGLASS Skimmer",
+      "type": "fast coastal response craft",
+      "occupancy": 6,
+      "control": [
+        "manual",
+        "assisted marine operation"
+      ],
+      "combat_profile": null
+    }
+  ],
+  "ammunition_policy": {
+    "ordinary_ammunition_baseline": true,
+    "special_ammunition_catalog_v0-1": false,
+    "note": "Trigger Discipline permits Campaign Settings to define ammunition that changes target and/or material penetration. Siren Protocol v0.1 deliberately does not add a special-ammunition tuning catalog yet."
+  }
+}

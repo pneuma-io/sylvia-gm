@@ -1,0 +1,28 @@
+{
+  "id": "pneuma-io.siren-protocol",
+  "version": "0.2.0",
+  "role": "dependency",
+  "metadata": {
+    "label": "Siren Protocol"
+  },
+  "provenance": {
+    "publisher": "Pneuma IO",
+    "source_sha256": "fabfcd15ce9bbd361812050fb29bbb460cd756b3270ec369ef7ada27ceac65e5"
+  },
+  "compatibility": {
+    "host_contract": 1,
+    "runtime_format": 1,
+    "requires": []
+  },
+  "minimum_model_capability_tier": "sylvia.capability.t02",
+  "dependencies": [],
+  "capabilities": [
+    "pneuma-io.siren-protocol.setting"
+  ],
+  "tools": [],
+  "prompt_fragments": [],
+  "ui_surfaces": [],
+  "participant_artifacts": [],
+  "content_declarations": "content/content-declarations.json",
+  "content_kind": "campaign_setting"
+}
