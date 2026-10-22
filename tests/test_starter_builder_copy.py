@@ -2,8 +2,11 @@
 
 import json
 
+import pytest
+
 from sylvia_gm.application.authority import AuthorityOwner, CampaignCreate
 from sylvia_gm.application.compatible_character_copy import authored_character_state
+from sylvia_gm.builder._workspace_files import content_version
 from sylvia_gm.domain.authority import WriterRole
 from sylvia_gm.domain.package_library import canonical_json_bytes
 from sylvia_gm.domain.session import SessionMessageKind
@@ -14,7 +17,10 @@ from tests.test_builder_references import open_character_interview
 from tests.test_bundled_starter_characters import authority, selection
 
 
-def test_builtin_starter_opens_in_builder_and_publishes_an_independent_copy(tmp_path):
+@pytest.mark.parametrize("file_commands", [False, True])
+def test_builtin_starter_opens_in_builder_and_publishes_an_independent_copy(
+    tmp_path, file_commands,
+):
     database = tmp_path / "builder.db"
     with AuthorityOwner.open(database, "seed") as owner:
         selected = selection(owner, tmp_path)
@@ -133,6 +139,13 @@ def test_builtin_starter_opens_in_builder_and_publishes_an_independent_copy(tmp_
             "entity_state": json.dumps(draft["entity_state"]),
             "setting_data": json.dumps(draft["setting_data"]),
         }
+        command_fields = revised
+        check_name, save_name = "check_participant_draft", "publish_participant_artifact"
+        if file_commands:
+            changed = draft_path.read_bytes().replace(b'"Mara Flint"', b'"Mara Rain"', 1)
+            command_fields = {"path": opened["path"], "expected_version": content_version(changed)}
+            check_name = "check_participant_draft_file"
+            save_name = "publish_participant_artifact_file"
         responses.extend(
             [
                 call(
@@ -145,8 +158,8 @@ def test_builtin_starter_opens_in_builder_and_publishes_an_independent_copy(tmp_
                     },
                     "edit",
                 ),
-                call("check_participant_draft", revised, "check"),
-                call("publish_participant_artifact", revised, "save"),
+                call(check_name, command_fields, "check"),
+                call(save_name, command_fields, "save"),
                 ProviderResponse(content="Mara Rain is saved as a separate character."),
             ]
         )
@@ -179,7 +192,9 @@ def test_builtin_starter_opens_in_builder_and_publishes_an_independent_copy(tmp_
         assert canonical_json_bytes(refreshed.participants[0].rift_source()) == original
         copy = next(item for item in refreshed.participants if item.artifact_id == saved["id"])
         assert copy.participant["name"] == "Mara Rain"
-        assert copy.authored_profile == revised["authored_profile"]
+        assert copy.authored_profile == (
+            draft["authored_profile"] if file_commands else revised["authored_profile"]
+        )
 
 
 def test_campaign_inventory_edit_cannot_change_starter_or_another_campaign(tmp_path):

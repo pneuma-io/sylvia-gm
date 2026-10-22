@@ -74,6 +74,7 @@ from sylvia_gm.application.builder_references import (
     launch_candidate,
     launch_references,
     reference_reader,
+    with_character_examples,
 )
 from sylvia_gm.application.builder_session_migration import migrate_legacy_builder_chats
 from sylvia_gm.application.bundled_campaign_plans import (
@@ -3905,6 +3906,11 @@ def _dispatch_selected(
                 )
             )
             retained = cast(dict[str, Any], reference_options["references"] or {})
+            if existing is None and purpose in {"player_character", "companion"}:
+                retained = with_character_examples(
+                    application_owner, storage_root, retained, purpose=purpose,
+                )
+                reference_options["references"] = retained
             pinned = retained.get("character_profile")
             if existing is not None:
                 actual = profile_from_snapshot(pinned) if pinned is not None else None

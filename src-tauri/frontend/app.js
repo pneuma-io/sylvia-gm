@@ -7783,12 +7783,12 @@ const SylviaGMFrontend = (() => {
           .map((category) => `${category.replaceAll('_', ' ')}: ${result.conversion_preview[category].length}`)
           .join(' · ') + '. Review the conversion before importing.',
       };
-      if (toolName === 'check_participant_draft' && result.status === 'valid_draft' &&
+      if (['check_participant_draft', 'check_participant_draft_file'].includes(toolName) && result.status === 'valid_draft' &&
           result.published === false) return {
         title: 'Character draft checked', summary: 'Draft is valid for the selected Ruleset',
         detail: 'The computed starting values are ready for publication.',
       };
-      if (toolName === 'publish_participant_artifact' && result.status === 'published' &&
+      if (['publish_participant_artifact', 'publish_participant_artifact_file'].includes(toolName) && result.status === 'published' &&
           ['companion', 'player_character'].includes(result.kind)) return {
         title: result.kind === 'companion' ? 'Companion saved' : 'Player Character saved',
         summary: result.title || result.name || 'Reusable character saved',
@@ -7856,6 +7856,7 @@ const SylviaGMFrontend = (() => {
       return { feedback: true, summary: 'This action did not run because a selected source could not be read. Saved work is kept.' };
     }
     if (rejected && ['check_participant_draft', 'publish_participant_artifact',
+      'check_participant_draft_file', 'publish_participant_artifact_file',
       'check_character_profile_draft', 'publish_character_profile'].includes(toolName)) {
       return { feedback: true, summary: participantRejectionDetail(result) };
     }
@@ -8372,8 +8373,8 @@ const SylviaGMFrontend = (() => {
   function builderProgressStage(name) {
     if (['get_content_definition', 'inspect_builder_references', 'read_file'].includes(name)) return 'Reviewed references';
     if (['write_file', 'edit_file', 'copy_builder_reference'].includes(name)) return 'Updated draft';
-    if (['check_participant_draft', 'check_character_profile_draft'].includes(name)) return 'Checked character';
-    if (['publish_participant_artifact', 'publish_character_profile'].includes(name)) return 'Saved character';
+    if (['check_participant_draft', 'check_participant_draft_file', 'check_character_profile_draft'].includes(name)) return 'Checked character';
+    if (['publish_participant_artifact', 'publish_participant_artifact_file', 'publish_character_profile'].includes(name)) return 'Saved character';
     return null;
   }
 

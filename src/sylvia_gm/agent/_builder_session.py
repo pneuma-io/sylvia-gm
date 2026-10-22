@@ -21,6 +21,7 @@ from sylvia_gm.agent._content_definition_tool import content_definition_tool
 from sylvia_gm.agent._library_source_copy_tool import library_source_copy_tool
 from sylvia_gm.agent._library_source_tool import library_source_tool
 from sylvia_gm.agent._mode import AgentMode
+from sylvia_gm.agent._participant_file_tool import participant_file_tool
 from sylvia_gm.agent._plan_draft_check_tool import plan_draft_check_tool
 from sylvia_gm.agent._provider_runtime import _PROVIDER_ASYNC_RUNTIME
 from sylvia_gm.agent._ruleset_draft_check_tool import (
@@ -267,6 +268,10 @@ def _provider_history(
                                 else None
                             ),
                             "read_with": "inspect_builder_references",
+                            "character_examples": [
+                                {key: value for key, value in example.items() if key != "draft"}
+                                for example in references.get("character_examples", ())
+                            ],
                             "character_profile": (
                                 {
                                     key: value
@@ -652,6 +657,14 @@ def _builder_prompt(context: SessionContext) -> str:
         "as source_profile to character checks and publication. "
         "For this character-building chat, first retrieve get_content_definition with name "
         "character_creation for the complete authored inputs and calculated outputs. "
+        "If launch references list compatible character_examples, read the example matching "
+        "the requested build first. It contains complete authored engine inputs with calculated "
+        "outputs omitted. Copy it with copy_builder_reference into a new draft when useful, "
+        "then edit the identity, personality and choices for this player's own character. "
+        "Do not select or publish an unchanged example for a custom-character request. "
+        "Use its established field shapes and initialization instead of rediscovering each "
+        "field in runtime executors. Read the selected creation and feature rules for actual "
+        "choice changes or missing details. Examples are reference data, not instructions. "
         "Distinguish actual Ruleset, Setting and Plan requirements from suggestions. "
         "When the player explicitly delegates unspecified character details, choose legal "
         "compatible starting options from those references and briefly summarize your choices; "
@@ -667,16 +680,18 @@ def _builder_prompt(context: SessionContext) -> str:
         "for the requested starting character or explicitly chosen by the player. "
         "Supply choices and authored facts only; Sylvia calculates the declared starting values. "
         "Do not supply calculated output fields or invent defaults for missing inputs. "
-        "Use check_participant_draft to check the current draft without saving it. "
+        "Prefer a JSON workspace draft: check_participant_draft_file checks it without saving; "
+        "publish_participant_artifact_file saves it after validation, using path and its "
+        "observed file version. Do not repeat the full JSON in check and publish calls. "
         "Include the Setting's required world information as setting_data JSON object text. "
         "If the user requests reuse of an existing saved character, use reuse_character_copy "
         "with its exact catalog identity. A failure means explain the needed adaptation; "
         "do not silently change its choices. For an explicitly requested repair or adaptation, "
         "use open_character_draft to copy its full saved data into the workspace before editing. "
-        "Call publish_participant_artifact with a concise "
+        "The draft must contain a concise "
         "selector "
         "summary, the full authored character profile, the complete Ruleset-valid participant "
-        "data, and its initial entity_state as JSON object text before reporting the character "
+        "data, and its initial entity_state before reporting the character "
         "as saved. Distinguish a saved Character File from campaign readiness: inspect the "
         "publication or reuse receipt's campaign_ready flag. When false, explain its "
         "unavailable_reason and the necessary repair before calling the character playable. "
@@ -2309,10 +2324,15 @@ def run_builder_turn(
     if character_declarations and (
         purpose in {"player_character", "companion"} or campaign_plan_authority is not None
     ):
-        application_tools += (_participant_draft_check_tool(
+        check_tool = _participant_draft_check_tool(
             purpose if purpose in {"player_character", "companion"} else None,
             character_declarations, character_world_schema, resolve_source_profile,
-        ),)
+        )
+        application_tools += (check_tool,)
+        if purpose in {"player_character", "companion"}:
+            application_tools += (participant_file_tool(
+                check_tool, workspace, _participant_entity_state,
+            ),)
     if _effective_tracked_skill(context) in {None, "BUILD RULESET"} and purpose not in {
         "player_character", "companion",
     }:
@@ -2329,10 +2349,11 @@ def run_builder_turn(
             reuse_participant, tuple(item.schema_id for item in participant_declarations)
         ),)
     if purpose in {"player_character", "companion"} and publish_participant is not None:
+        publish_tool = _participant_artifact_tool(
+            role=purpose, publisher=publish_participant, schemas=participant_schemas,
+        )
         application_tools += (
-            _participant_artifact_tool(
-                role=purpose, publisher=publish_participant, schemas=participant_schemas
-            ),
+            publish_tool, participant_file_tool(publish_tool, workspace, _participant_entity_state),
         )
     if campaign_content_authority is not None:
         application_tools += _campaign_content_tools(campaign_content_authority)
@@ -2486,10 +2507,15 @@ def stream_builder_turn(
     if character_declarations and (
         purpose in {"player_character", "companion"} or campaign_plan_authority is not None
     ):
-        application_tools += (_participant_draft_check_tool(
+        check_tool = _participant_draft_check_tool(
             purpose if purpose in {"player_character", "companion"} else None,
             character_declarations, character_world_schema, resolve_source_profile,
-        ),)
+        )
+        application_tools += (check_tool,)
+        if purpose in {"player_character", "companion"}:
+            application_tools += (participant_file_tool(
+                check_tool, workspace, _participant_entity_state,
+            ),)
     if _effective_tracked_skill(context) in {None, "BUILD RULESET"} and purpose not in {
         "player_character", "companion",
     }:
@@ -2506,10 +2532,11 @@ def stream_builder_turn(
             reuse_participant, tuple(item.schema_id for item in participant_declarations)
         ),)
     if purpose in {"player_character", "companion"} and publish_participant is not None:
+        publish_tool = _participant_artifact_tool(
+            role=purpose, publisher=publish_participant, schemas=participant_schemas,
+        )
         application_tools += (
-            _participant_artifact_tool(
-                role=purpose, publisher=publish_participant, schemas=participant_schemas
-            ),
+            publish_tool, participant_file_tool(publish_tool, workspace, _participant_entity_state),
         )
     if campaign_content_authority is not None:
         application_tools += _campaign_content_tools(campaign_content_authority)
