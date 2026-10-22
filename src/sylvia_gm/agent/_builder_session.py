@@ -39,7 +39,7 @@ from sylvia_gm.agent._working_context import (
     durable_tool_result,
 )
 from sylvia_gm.application.authority import AuthorityOwner
-from sylvia_gm.application.builder_references import ReferenceSource
+from sylvia_gm.application.builder_references import BuilderReferences, ReferenceSource
 from sylvia_gm.application.campaign_plan_sources import CampaignPlanToolAuthority
 from sylvia_gm.application.library_sources import LibrarySourceReader
 from sylvia_gm.application.package_library import validate_admitted_package_runtimes
@@ -412,10 +412,7 @@ def _creation_subflow_purpose(context: SessionContext) -> str | None:
 def _builder_reference_tool(source_reader: ReferenceSource) -> ToolSpec:
     """Page through selected snapshots without exposing machine paths or live parent state."""
 
-    def inspect(params: dict[str, Any], _context: Any) -> dict[str, Any]:
-        references = source_reader() if callable(source_reader) else source_reader
-        if references is None:
-            return {"success": False, "code": "builder_ruleset_selection_required"}
+    def inspect_page(params: dict[str, Any], references: BuilderReferences) -> dict[str, Any]:
         action = params.get("action")
         offset = params.get("offset", 0)
         limit = params.get("limit", 100 if action == "list" else 20 if action == "find" else 8000)
@@ -490,21 +487,74 @@ def _builder_reference_tool(source_reader: ReferenceSource) -> ToolSpec:
             "next_offset": end if end < len(content) else None,
         }
 
+    def inspect(params: dict[str, Any], _context: Any) -> dict[str, Any]:
+        references = source_reader() if callable(source_reader) else source_reader
+        if references is None:
+            return {"success": False, "code": "builder_ruleset_selection_required"}
+        if params.get("action") != "read_many":
+            return inspect_page(params, references)
+        pages = params.get("pages")
+        if not isinstance(pages, list) or not 1 <= len(pages) <= 4:
+            return {"success": False, "code": "reference_batch_invalid"}
+        budget = 0
+        for page in pages:
+            if not isinstance(page, dict) or set(page) - {"path", "offset", "limit"}:
+                return {"success": False, "code": "reference_batch_invalid"}
+            offset, limit = page.get("offset", 0), page.get("limit", 8000)
+            if (
+                page.get("path") not in references.paths
+                or not isinstance(offset, int) or isinstance(offset, bool) or offset < 0
+                or not isinstance(limit, int) or isinstance(limit, bool) or not 1 <= limit <= 32000
+            ):
+                return {"success": False, "code": "reference_batch_invalid"}
+            budget += limit
+        if budget > 32000:
+            return {"success": False, "code": "reference_batch_invalid"}
+        results = []
+        for page in pages:
+            result = inspect_page({**page, "action": "read"}, references)
+            results.append(result)
+            if not result["success"]:
+                return {**result, "pages": results}
+        return {"success": True, "pages": results}
+
     return ToolSpec.from_openai_schema(
         {
             "type": "function",
             "function": {
                 "name": "inspect_builder_references",
                 "description": (
-                    "List, read, or find text in the exact Ruleset, dependencies, Setting, "
+                    "List, read, find, or read_many explicit pages in the exact Ruleset, "
+                    "dependencies, Setting, "
                     "and Plan selected when this Builder chat opened. "
+                    "Use read_many for independently needed pages instead of serial reads: "
+                    "1-4 explicit pages, at most 32000 requested characters in total. "
                     "Load relevant sources before drafting. "
                     "These references keep their original identity when the Interview changes."
                 ),
                 "parameters": {
                     "type": "object",
                     "properties": {
-                        "action": {"type": "string", "enum": ["list", "read", "find"]},
+                        "action": {
+                            "type": "string", "enum": ["list", "read", "find", "read_many"],
+                        },
+                        "pages": {
+                            "type": "array", "minItems": 1, "maxItems": 4,
+                            "description": (
+                                "For read_many only: explicit pages in request order. "
+                                "Each limit defaults to 8000; their sum must be <=32000. "
+                                "Stops at the first unreadable source; later pages are not read."
+                            ),
+                            "items": {
+                                "type": "object", "additionalProperties": False,
+                                "properties": {
+                                    "path": {"type": "string"},
+                                    "offset": {"type": "integer", "minimum": 0},
+                                    "limit": {"type": "integer", "minimum": 1, "maximum": 32000},
+                                },
+                                "required": ["path"],
+                            },
+                        },
                         "path": {"type": "string", "description": "Exact path from list."},
                         "query": {
                             "type": "string",
@@ -631,9 +681,12 @@ def _builder_prompt(context: SessionContext) -> str:
         "publication or reuse receipt's campaign_ready flag. When false, explain its "
         "unavailable_reason and the necessary repair before calling the character playable. "
         "Keep numbers, booleans, arrays and objects in that JSON; do not turn them into quoted "
-        "values or item wrappers. Before constructing entity_state, use inspect_builder_references "
-        "to inspect the selected Ruleset's runtime field formats and any authored actor-state "
-        "examples. Use find to locate how its mechanics consume the fields you supply. "
+        "values or item wrappers. Use the character_creation definition's authored input schema "
+        "and the selected Ruleset's creation guidance and authored actor-state examples first. "
+        "Batch independently needed reference pages with inspect_builder_references read_many. "
+        "Reuse sources already read in this conversation. Inspect runtime mechanics with focused "
+        "find/read only when those sources leave a required field or feature's initialization "
+        "unclear, or a validation diagnostic requires it; do not audit every executor. "
         "Once the player's character choices are known, read the creation rules for those "
         "choices before publishing. Apply their required adjustments to authored values; "
         "do not treat valid field shapes as proof that all creation rules were followed. "
@@ -642,7 +695,8 @@ def _builder_prompt(context: SessionContext) -> str:
         "references do not establish an effect, leave that description unspecified and explain "
         "what is missing instead of supplying it from memory. "
         "Identify their granted starting features and equipment, "
-        "then check which runtime fields each supported feature needs, including current uses, "
+        "then establish which authored inputs each supported feature needs, "
+        "including current uses, "
         "recovery limits and available actions. Initialize those fields from the selected "
         "Ruleset. A generic actor example can show field formats while omitting this character's "
         "features; do not copy its empty collections as proof that no starting resources exist. "

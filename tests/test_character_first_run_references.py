@@ -65,6 +65,15 @@ def test_actual_lite_runtime_is_available_to_character_builder_find_read_and_cop
         )
         assert page["success"] is True and page["content"] == match["excerpt"]
         assert len(page["content"]) <= 32000
+        pages = [
+            {"path": path, "offset": match["excerpt_offset"], "limit": len(match["excerpt"])},
+            {"path": "ruleset/SAVED-EQUIPMENT-POLICY.md", "limit": 4000},
+        ]
+        batch = tool.handler({"action": "read_many", "pages": pages}, None)
+        assert batch["success"] is True, batch
+        assert batch["pages"] == [
+            tool.handler({"action": "read", **request}, None) for request in pages
+        ]
         workspace = tmp_path / "workspace"
         workspace.mkdir()
         copied = builder_reference_copy_tool(reader, workspace).handler(
