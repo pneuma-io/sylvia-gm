@@ -132,8 +132,10 @@ def test_character_creation_subflow_stays_general_builder_work() -> None:
     assert "only when those sources leave a required field" in prompt
     assert "do not audit every executor" in prompt
     assert "Before describing a feature's effect" in prompt
-    assert "Use check_participant_draft" in prompt
-    assert "Call publish_participant_artifact" in prompt
+    assert "check_participant_draft_file checks it without saving" in prompt
+    assert "publish_participant_artifact_file saves it after validation" in prompt
+    assert "Do not repeat the full JSON" in prompt
+    assert "Do not select or publish an unchanged example" in prompt
     assert (
         "Work that does not match one of those three remains ordinary Builder artifact work"
         in prompt
