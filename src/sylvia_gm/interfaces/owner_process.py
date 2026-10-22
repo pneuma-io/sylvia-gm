@@ -214,6 +214,7 @@ from sylvia_gm.infrastructure.builder_source_ingestion import (
 )
 from sylvia_gm.infrastructure.launch_handshake import derive_owner_response
 from sylvia_gm.interfaces._display_reads import DisplayReads
+from sylvia_gm.interfaces._local_diagnostics import LocalDiagnostics
 from sylvia_gm.interfaces._session_reasoning import (
     reasoning_state,
     selected_model_info,
@@ -221,7 +222,6 @@ from sylvia_gm.interfaces._session_reasoning import (
 )
 from sylvia_gm.interfaces.local_api import LocalCommandBus
 from sylvia_gm.interfaces.local_owner import LocalOwnerSupervisor
-from sylvia_gm.interfaces._local_diagnostics import LocalDiagnostics
 from sylvia_gm.provider._admin_audit import AdminAuditedProvider
 from sylvia_gm.provider._context_fit import (
     GM_MODE_MINIMUM_CONTEXT_TOKENS,
@@ -2042,7 +2042,9 @@ def _dispatch_selected(
     if method == "package_candidates":
         return bus.package_candidates()
     if method == "campaign_rules_update_options":
-        return application_owner.campaign_rules_update_options(_required_text(params, "campaign_id"))
+        return application_owner.campaign_rules_update_options(
+            _required_text(params, "campaign_id")
+        )
     if method == "preview_campaign_rules_update":
         return application_owner.preview_campaign_rules_update(
             _required_text(params, "campaign_id"), _required_text(params, "candidate_id"),
