@@ -1,3 +1,4 @@
+import hashlib
 import json
 from pathlib import Path
 
@@ -18,6 +19,151 @@ from sylvia_gm.domain.errors import CommandRejected, IdempotencyConflict, StaleR
 from sylvia_gm.domain.session import SessionMessageKind
 from sylvia_gm.provider._anthropic import AnthropicMessagesTransport
 from sylvia_gm.provider._base import FakeProvider, ProviderResponse, ProviderStreamChunk, ToolCall
+
+
+class _SkillReferenceProvider(FakeProvider):
+    async def generate_stream(self, messages, tools=None, **kwargs):
+        response = await self.generate(messages, tools, **kwargs)
+        for index, call in enumerate(response.tool_calls):
+            yield ProviderStreamChunk(
+                tool_call_delta={
+                    "index": index,
+                    "id": call.id,
+                    "function": {"name": call.name, "arguments": call.arguments},
+                }
+            )
+        yield ProviderStreamChunk(
+            content=response.content or "",
+            finish_reason="tool_calls" if response.tool_calls else "stop",
+        )
+
+
+@pytest.mark.parametrize("streaming", [False, True])
+@pytest.mark.parametrize("selected_skill", [None, "BUILD CAMPAIGN PLAN"])
+def test_saved_builder_loads_real_skill_references_without_changing_selection(
+    tmp_path,
+    streaming,
+    selected_skill,
+):
+    database = tmp_path / "skill-references.db"
+    with AuthorityOwner.open(database, "create-reference-session") as owner:
+        if selected_skill:
+            draft = owner.create_guided_campaign_draft(
+                operation_id="reference-campaign", display_name="Reference campaign",
+                builder_session_id="selected", builder_provider_id="test.provider",
+                builder_model_id="test.model",
+            )
+            session_id = draft.builder_session_id
+        else:
+            owner.create_builder_chat(
+                provider_id="test.provider", model_id="test.model", session_id="general"
+            )
+            session_id = "general"
+
+    requests = {
+        "catalog": {"name": "BUILD CAMPAIGN PLAN"},
+        "worked": {"name": "BUILD CAMPAIGN PLAN", "reference": "references/worked-examples.md"},
+        "combat": {"name": "BUILD CAMPAIGN PLAN", "reference": "references/combat-plan.json"},
+        "traversal": {"name": "BUILD CAMPAIGN PLAN", "reference": "references/../../_skills.py"},
+        "missing": {"name": "BUILD CAMPAIGN PLAN", "reference": "references/missing.md"},
+        "non_catalog": {"name": "BUILD CAMPAIGN PLAN", "reference": "SKILL.md"},
+        "unknown_skill": {"name": "BUILD CHARACTER"},
+        "other_skill": {"name": "BUILD RULESET", "reference": "references/combat-plan.json"},
+    }
+    provider = _SkillReferenceProvider(
+        responses=[
+            ProviderResponse(
+                tool_calls=[
+                    ToolCall(id=name, name="load_builder_skill", arguments=json.dumps(params))
+                ]
+            )
+            for name, params in requests.items()
+        ]
+        + [ProviderResponse(content="References read; the selected workflow is unchanged.")]
+    )
+
+    with AuthorityOwner.open(database, "resumed-reference-session") as owner:
+        context = owner.session_context(session_id)
+        assert context.session.selected_skill == selected_skill
+        assert "reading them never selects a workflow" in _builder_prompt(context)
+        assert "From an idea to complete campaign preparation" not in _builder_prompt(context)
+        owner.append_agent_message(
+            session_id=session_id,
+            message_id="read-references",
+            kind=SessionMessageKind.USER,
+            content={"text": "Read the Plan's worked references."},
+        )
+        kwargs = {
+            "context": owner.session_context(session_id),
+            "message_id": "read-references",
+            "user_text": "Read the Plan's worked references.",
+            "workspace": tmp_path / "workspace",
+            "control": ProviderControl(),
+        }
+        if streaming:
+            completed = []
+            events = list(stream_builder_turn(provider, **kwargs, complete=completed.append))
+            prepared = tuple(
+                BuilderMessage(event.message_id, SessionMessageKind.EVIDENCE, event.evidence)
+                for event in events
+                if event.kind is ProviderEventKind.EVIDENCE
+            )
+            assert completed[0].tool_calls_made == ("load_builder_skill",) * len(requests)
+        else:
+            turn = run_builder_turn(provider, **kwargs)
+            prepared = turn.messages
+            assert turn.tool_calls_made == ("load_builder_skill",) * len(requests)
+        for message in prepared:
+            owner.append_agent_message(
+                session_id=session_id,
+                message_id=message.message_id,
+                kind=message.kind,
+                content=message.content,
+            )
+        assert owner.session_context(session_id).session.selected_skill == selected_skill
+
+    for call in provider.calls:
+        assert "load_builder_skill" in {tool["function"]["name"] for tool in call["tools"]}
+    results = {
+        message["tool_call_id"]: json.loads(message["content"])
+        for message in provider.calls[-1]["messages"]
+        if message["role"] == "tool"
+    }
+    assert results["catalog"]["success"] is True
+    assert set(results["catalog"]["references"]) == {
+        "references/worked-examples.md",
+        "references/variations.md",
+        "references/combat-plan.json",
+        "references/combat-plan.md",
+        "references/multi-act-plan.json",
+        "references/multi-act-plan.md",
+    }
+    assert "From an idea to complete campaign preparation" in results["worked"]["instructions"]
+    assert "Last Cart Through" in results["worked"]["instructions"]
+    combat = json.loads(results["combat"]["instructions"])
+    assert combat["format_version"] == 2
+    assert combat["title"] == "Last Cart Through"
+    for name in ("worked", "combat"):
+        result = results[name]
+        assert result["success"] is True
+        assert result["sha256"] == hashlib.sha256(result["instructions"].encode()).hexdigest()
+    for name in ("traversal", "missing", "non_catalog", "other_skill"):
+        assert results[name] == {
+            "success": False,
+            "status": "rejected",
+            "code": "skill_reference_unavailable",
+        }
+    assert results["unknown_skill"] == {
+        "success": False,
+        "status": "rejected",
+        "code": "skill_unavailable",
+    }
+    with AuthorityOwner.open(database, "check-reference-session") as owner:
+        restored = owner.session_context(session_id)
+        assert restored.session.selected_skill == selected_skill
+        assert restored.session.scope == context.session.scope
+        history = _provider_history(restored)
+        assert {message.get("tool_call_id") for message in history} >= set(requests)
 
 
 def test_delete_builder_chat_is_exact_independent_and_durable(tmp_path: Path) -> None:
@@ -93,15 +239,16 @@ def test_builder_launch_preserves_interview_and_survives_campaign_purge(tmp_path
             builder_provider_id="test.provider",
             builder_model_id="test.model",
         )
-        owner.advance_guided_campaign_draft(
+        selected = owner.advance_guided_campaign_draft(
             operation_id="choose-original-ruleset",
             campaign_id=draft.campaign_id,
             builder_session_id=draft.builder_session_id,
             expected_construction_revision=0,
             current_step="ruleset",
-            visible_answer="No Ruleset",
-            answer={"candidate_id": None},
+            visible_answer="SRD Lite",
+            answer={"candidate_id": "sylvia.srd-lite.bg3"},
         )
+        assert selected.current_step == "setting"
         original_interview = owner.session_context(draft.builder_session_id)
         request = {
             "operation_id": "launch-setting",
@@ -119,9 +266,9 @@ def test_builder_launch_preserves_interview_and_survives_campaign_purge(tmp_path
         child = owner.session_context(launched.child_session_id)
         assert child.session.campaign_id is None
         assert child.session.parent_session_id is None
-        assert child.messages[0].content["selections"]["ruleset"]["text"] == "No Ruleset"
+        assert child.messages[0].content["selections"]["ruleset"]["text"] == "SRD Lite"
         assert all(message.kind is not SessionMessageKind.USER for message in child.messages)
-        assert owner.builder_chat_index()[0].display_name == "New setting · No Ruleset"
+        assert owner.builder_chat_index()[0].display_name == "New setting · SRD Lite"
 
         owner.advance_guided_campaign_draft(
             operation_id="change-ruleset-while-builder-is-open",
@@ -129,8 +276,8 @@ def test_builder_launch_preserves_interview_and_survives_campaign_purge(tmp_path
             builder_session_id=draft.builder_session_id,
             expected_construction_revision=1,
             current_step="ruleset",
-            visible_answer="A different Ruleset",
-            answer={"candidate_id": "different-ruleset"},
+            visible_answer="No Ruleset",
+            answer={"candidate_id": None},
         )
         assert owner.session_context(launched.child_session_id) == child
         assert owner.start_interview_builder_chat(**request) == launched
@@ -145,11 +292,7 @@ def test_builder_launch_preserves_interview_and_survives_campaign_purge(tmp_path
 
         # Complete the originating interview through the existing campaign binding path.
         remaining = (
-            ("ruleset", "No Ruleset", {"candidate_id": None}),
-            ("setting", "A quiet town", {"setting_id": "quiet-town"}),
-            ("plan", "A town mystery", {"plan_id": "town-mystery"}),
             ("name", "Original campaign", {"display_name": "Original campaign"}),
-            ("participants", "One investigator", {"player_name": "Investigator"}),
             ("boundaries_preferences", "No additions", {"boundaries": "", "preferences": ""}),
             ("specific_requests", "No additional requests", {"no_additional_requests": True}),
         )
@@ -208,10 +351,34 @@ def test_builder_launch_preserves_interview_and_survives_campaign_purge(tmp_path
         assert restored.session.status.value == "active"
         history = _provider_history(restored)
         assert history[0]["role"] == "system"
-        assert "No Ruleset" in history[0]["content"]
+        assert "SRD Lite" in history[0]["content"]
         assert [item["content"] for item in history if item["role"] == "user"] == [
             "Continue building this setting."
         ]
+
+
+def test_no_rules_interview_cannot_launch_a_setting_from_the_skipped_step(tmp_path):
+    with AuthorityOwner.open(tmp_path / "no-rules-builder.sqlite3", "no-rules-builder") as owner:
+        draft = owner.create_guided_campaign_draft(
+            operation_id="no-rules-draft", display_name="Narrative campaign",
+            builder_session_id="narrative-interview", builder_provider_id="test.provider",
+            builder_model_id="test.model",
+        )
+        selected = owner.advance_guided_campaign_draft(
+            operation_id="choose-no-rules", campaign_id=draft.campaign_id,
+            builder_session_id=draft.builder_session_id, expected_construction_revision=0,
+            current_step="ruleset", visible_answer="No Ruleset", answer={"candidate_id": None},
+        )
+        assert selected.current_step == "name"
+        before = owner.session_context(draft.builder_session_id)
+        with pytest.raises(StaleRevision):
+            owner.start_interview_builder_chat(
+                operation_id="invalid-setting-launch", campaign_id=draft.campaign_id,
+                parent_session_id=draft.builder_session_id, expected_construction_revision=1,
+                purpose="setting", visible_answer="Create New Setting", child_session_id="invalid",
+            )
+        assert owner.session_context(draft.builder_session_id) == before
+        assert owner.builder_chat_index() == ()
 
 
 @pytest.mark.parametrize(

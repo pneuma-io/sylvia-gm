@@ -509,8 +509,16 @@ async fn campaign_index(window: WebviewWindow) -> Result<Value, String> {
 }
 
 #[tauri::command]
-async fn campaign_creation_catalog(window: WebviewWindow) -> Result<Value, String> {
-    owner_call_async(window.clone(), "campaign_creation_catalog", json!({})).await
+async fn campaign_creation_catalog(
+    window: WebviewWindow,
+    include_participants: Option<bool>,
+) -> Result<Value, String> {
+    owner_call_async(
+        window.clone(),
+        "campaign_creation_catalog",
+        json!({ "include_participants": include_participants.unwrap_or(true) }),
+    )
+    .await
 }
 
 #[tauri::command]
@@ -962,6 +970,53 @@ async fn package_candidates(window: WebviewWindow) -> Result<Value, String> {
 }
 
 #[tauri::command]
+async fn campaign_rules_update_options(
+    window: WebviewWindow,
+    campaign_id: String,
+) -> Result<Value, String> {
+    owner_call_async(
+        window,
+        "campaign_rules_update_options",
+        json!({"campaign_id": campaign_id}),
+    )
+    .await
+}
+
+#[tauri::command]
+async fn preview_campaign_rules_update(
+    window: WebviewWindow,
+    campaign_id: String,
+    candidate_id: String,
+) -> Result<Value, String> {
+    owner_call_async(
+        window,
+        "preview_campaign_rules_update",
+        json!({"campaign_id": campaign_id, "candidate_id": candidate_id}),
+    )
+    .await
+}
+
+#[tauri::command]
+async fn adopt_campaign_rules_update(
+    window: WebviewWindow,
+    campaign_id: String,
+    candidate_id: String,
+    activation_id: String,
+    expected_revision: u64,
+    expected_lock_id: String,
+    confirmation: String,
+) -> Result<Value, String> {
+    owner_call_async(
+        window,
+        "adopt_campaign_rules_update",
+        json!({"campaign_id": campaign_id, "candidate_id": candidate_id,
+            "activation_id": activation_id, "expected_revision": expected_revision,
+            "expected_lock_id": expected_lock_id, "confirmation": confirmation}),
+    )
+    .await
+}
+
+#[tauri::command]
 async fn inspect_package_candidate(
     window: WebviewWindow,
     candidate_id: String,
@@ -1025,6 +1080,7 @@ async fn submit_session_input(
     automatic_response: Option<bool>,
     redirect_interruption_id: Option<String>,
     campaign_ending_choice: Option<Value>,
+    builder_question_answers: Option<Value>,
 ) -> Result<Value, String> {
     owner_call_async(
         window,
@@ -1042,6 +1098,7 @@ async fn submit_session_input(
             "automatic_response": automatic_response.unwrap_or(false),
             "redirect_interruption_id": redirect_interruption_id,
             "campaign_ending_choice": campaign_ending_choice,
+            "builder_question_answers": builder_question_answers,
         }),
     )
     .await
@@ -1879,6 +1936,8 @@ async fn start_guided_creation_subflow(
     trigger_message_id: Option<String>,
     character_profile_id: Option<String>,
     character_profile_sha256: Option<String>,
+    character_artifact_id: Option<String>,
+    character_artifact_sha256: Option<String>,
 ) -> Result<Value, String> {
     owner_call_async(
         window.clone(),
@@ -1893,6 +1952,8 @@ async fn start_guided_creation_subflow(
             "trigger_message_id": trigger_message_id,
             "character_profile_id": character_profile_id,
             "character_profile_sha256": character_profile_sha256,
+            "character_artifact_id": character_artifact_id,
+            "character_artifact_sha256": character_artifact_sha256,
         }),
     )
     .await
@@ -2499,6 +2560,78 @@ async fn recover_campaign_file(
 }
 
 #[tauri::command]
+async fn record_local_fault(
+    window: WebviewWindow,
+    category: String,
+    delta: u32,
+) -> Result<Value, String> {
+    trusted_caller(&window)?;
+    owner_call_async(
+        window,
+        "record_local_fault",
+        json!({"category": category, "delta": delta}),
+    )
+    .await
+}
+
+#[tauri::command]
+async fn preview_local_report(
+    window: WebviewWindow,
+    kind: String,
+    reproduction: String,
+    feedback: String,
+) -> Result<Value, String> {
+    trusted_caller(&window)?;
+    owner_call_async(
+        window,
+        "preview_local_report",
+        json!({
+            "kind": kind, "reproduction": reproduction, "feedback": feedback,
+        }),
+    )
+    .await
+}
+
+#[tauri::command]
+async fn cancel_local_report(window: WebviewWindow, preview_id: String) -> Result<Value, String> {
+    trusted_caller(&window)?;
+    owner_call_async(
+        window,
+        "cancel_local_report",
+        json!({"preview_id": preview_id}),
+    )
+    .await
+}
+
+#[tauri::command]
+async fn save_local_report(window: WebviewWindow, preview_id: String) -> Result<Value, String> {
+    trusted_caller(&window)?;
+    let Some(destination) = rfd::AsyncFileDialog::new()
+        .set_parent(&window)
+        .add_filter("Sylvia local report JSON", &["json"])
+        .set_file_name("sylvia-local-report.json")
+        .save_file()
+        .await
+    else {
+        owner_call_async(
+            window,
+            "cancel_local_report",
+            json!({"preview_id": preview_id}),
+        )
+        .await?;
+        return Ok(json!({"status": "cancelled"}));
+    };
+    owner_call_async(
+        window,
+        "save_local_report",
+        json!({
+            "preview_id": preview_id, "destination_path": destination.path().to_string_lossy(),
+        }),
+    )
+    .await
+}
+
+#[tauri::command]
 async fn export_admin_audit_file(window: WebviewWindow) -> Result<Value, String> {
     trusted_caller(&window)?;
     // Audit has a passive spoilers notice; only the ordinary save chooser is needed here.
@@ -2657,6 +2790,9 @@ pub fn run() {
             inspect_provider_thinking,
             steer_session,
             package_candidates,
+            campaign_rules_update_options,
+            preview_campaign_rules_update,
+            adopt_campaign_rules_update,
             inspect_package_candidate,
             package_candidate_text,
             compare_package_candidates,
@@ -2728,6 +2864,10 @@ pub fn run() {
             recover_campaign,
             recover_campaign_file,
             export_admin_audit_file,
+            preview_local_report,
+            record_local_fault,
+            cancel_local_report,
+            save_local_report,
         ])
         .build(tauri::generate_context!())
         .expect("error while building Sylvia GM")

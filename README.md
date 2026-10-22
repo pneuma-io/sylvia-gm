@@ -39,6 +39,45 @@ Custom content uses three building blocks: Rulesets define mechanics, Campaign S
 the world, and Campaign Plans define an adventure. Builder helps you create and refine that content
 for use in a compatible campaign.
 
+## Local problem reports
+
+Settings → About lets you describe an app problem or give model feedback, preview the exact JSON
+and save it using the normal file chooser. Cancel discards the preview before saving. While Save
+is pending, Settings stays open; Close, Escape, backdrop dismissal and Settings tabs cannot hide
+the result. The completion message remains when Settings is reopened. If saving cannot be
+confirmed, check the chosen file before retrying; discarding a preview does not undo a saved file.
+The report stays on your PC;
+Sylvia does not upload it. Only the reproduction steps and feedback you enter can contain prose.
+Campaigns, saved chats and Full Audit records are excluded. Full Audit remains a separate,
+off-by-default developer control in Settings → Admin.
+
+Automatic diagnostics contain fixed action/error categories, generated correlation IDs, version
+and numeric platform metadata, counts and timing. They omit messages, stacks, input, prompts,
+replies, tool arguments, credentials, personal paths and custom names. The owner keeps at most
+512 aggregated records for seven days in `diagnostics/runtime.jsonl`. A snapshot is limited to
+512 KiB; its temporary atomic replacement has the same limit, for at most 1 MiB total. The
+previous journal format is retired during the first successful write. These limits apply only to
+the owned diagnostic files, never campaigns or deliberate exports.
+
+Matching events aggregate by minute with counts, first/last occurrence and maximum duration.
+One background writer flushes and atomically replaces the snapshot at most once per second;
+an interruption can lose the newest unflushed second. The next start labels a previously
+unfinished owner run as interrupted, without claiming its cause. Failed writes retry after
+30 seconds, retain only the bounded memory buffer and never print a fallback log. An unwritable
+disk cannot be pruned; the report marks local diagnostic storage unavailable. App upgrades discard
+incompatible journal versions. Export previews are held only in memory and include their storage
+status; explicitly saved report files are yours to keep or delete.
+
+Renderer failures use two fixed counters, each capped at 65,535, with one timer and at most one
+unresolved local IPC request. They drain no faster than once per second, alternating categories.
+The owner validates each delta as an integer from 1 to 65,535, rejecting booleans and malformed
+values. While a request is stalled, only the counters change; no event objects or further requests
+are queued. Once it settles, pending counts can drain. Counter overflow is discarded. A rejected
+or synchronously failed batch has uncertain delivery and is discarded without retry; any new
+pending batch waits 30 seconds. A permanently unresolved request holds the lane until it settles
+or Sylvia restarts. Pending counts are lost on restart. Renderer timestamps describe owner receipt,
+not individual event occurrence. These are best-effort diagnostics, not an exhaustive event log.
+
 ## What's next
 
 The next areas of development are:

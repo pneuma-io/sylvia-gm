@@ -127,6 +127,15 @@ def test_character_creation_subflow_stays_general_builder_work() -> None:
 
     prompt = _builder_prompt(context)
     assert "BEGIN TRACKED BUILDER SKILL" not in prompt
+    assert "Batch independently needed reference pages" in prompt
+    assert "Reuse sources already read in this conversation" in prompt
+    assert "only when those sources leave a required field" in prompt
+    assert "do not audit every executor" in prompt
+    assert "Before describing a feature's effect" in prompt
+    assert "check_participant_draft_file checks it without saving" in prompt
+    assert "publish_participant_artifact_file saves it after validation" in prompt
+    assert "Do not repeat the full JSON" in prompt
+    assert "Do not select or publish an unchanged example" in prompt
     assert (
         "Work that does not match one of those three remains ordinary Builder artifact work"
         in prompt

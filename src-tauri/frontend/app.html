@@ -351,6 +351,20 @@
             <p class="construction-summary" id="rift-description"></p>
             <label for="rift-archetype" id="campaign-player-label">Player Character archetype</label>
             <select id="rift-archetype"></select>
+            <section id="starter-character-preview" hidden aria-live="polite">
+              <strong id="starter-character-heading"></strong>
+              <p class="construction-summary" id="starter-character-guidance"></p>
+              <p id="starter-character-stats"></p>
+              <details><summary>Character preview</summary>
+                <pre id="starter-character-profile" class="starter-character-profile"></pre>
+                <details><summary>Abilities, equipment and spells</summary>
+                  <pre id="starter-character-data"></pre>
+                </details>
+              </details>
+              <button type="button" class="btn btn-secondary btn-sm"
+                      id="starter-edit-copy">Edit a copy in Builder</button>
+              <p class="construction-summary">This built-in stays unchanged. Builder saves your edits as a separate character.</p>
+            </section>
             <button type="button" class="btn btn-secondary btn-sm"
                     id="rift-create-player"
                     data-start-creation-subflow="player_character">Create New Player Character</button>
@@ -901,6 +915,7 @@
                  aria-labelledby="settings-tab-campaign-data"
                  data-settings-panel="campaign-data" hidden>
           <h2>Campaign Data</h2>
+          <div class="settings-card settings-action-list" id="campaign-rules-update"></div>
           <p class="settings-description" id="settings-campaign-context">
             Select a campaign to export, rename, archive, or delete.
           </p>
@@ -1008,6 +1023,34 @@
             <p id="application-signing">Unsigned Alpha prerelease</p>
           </div>
           <div class="settings-card settings-action-list">
+            <h3>Local problem report</h3>
+            <p>Sylvia keeps small app diagnostics on this PC for up to seven days, within 1 MiB.
+              They contain action categories, error codes, counts and timing, without chat,
+              prompts, model replies, tool arguments, names or personal paths.</p>
+            <p>You can describe an app problem or give individual model feedback without enabling
+              Full Audit. Add only details you want in the file. Preview and save a local copy;
+              nothing is uploaded. Campaigns and Full Audit records are not included.</p>
+            <label for="local-report-kind">Report type</label>
+            <select id="local-report-kind">
+              <option value="app_problem">App problem</option>
+              <option value="model_feedback">Model feedback</option>
+            </select>
+            <label for="local-report-reproduction">Steps to reproduce <span class="label-optional">(optional)</span></label>
+            <textarea id="local-report-reproduction" rows="3" maxlength="4000"></textarea>
+            <label for="local-report-feedback">Your feedback <span class="label-optional">(optional)</span></label>
+            <textarea id="local-report-feedback" rows="3" maxlength="4000"></textarea>
+            <button class="btn btn-secondary" id="preview-local-report-btn" type="button">Preview local report</button>
+            <p id="local-report-status" class="inline-feedback" role="status" aria-live="polite"></p>
+            <div id="local-report-preview" hidden>
+              <h4>Exact file contents</h4>
+              <p>Save opens the file chooser. After confirming a file, wait for the result here.
+                Settings stays open until saving finishes.</p>
+              <button class="btn btn-primary" id="save-local-report-btn" type="button">Save report…</button>
+              <button class="btn btn-secondary" id="cancel-local-report-btn" type="button">Cancel</button>
+              <pre id="local-report-content" tabindex="0" aria-label="Exact local report contents"></pre>
+            </div>
+          </div>
+          <div class="settings-card settings-action-list">
             <h3>Home tutorial</h3>
             <p>Show Sylvia&rsquo;s quick tour of the Home controls again.</p>
             <button class="btn btn-secondary" id="replay-home-tutorial-btn" type="button">
@@ -1035,7 +1078,10 @@
 <script src="tile-table.js"></script>
 <script src="piece-table.js"></script>
 <script src="campaign-plan-browser.js"></script>
+<script src="campaign-rules-update.js"></script>
 <script src="dictation.js"></script>
+<script src="support-report.js"></script>
+<script src="local-diagnostics.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

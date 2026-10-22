@@ -15,6 +15,8 @@ const receipts = [
   ['publish_character_profile', {success:true,published:true,name:'Vela',campaign_ready:false}, 'Character Profile saved', 'Vela'],
   ['open_character_profile', {success:true,published:false,path:'vela-copy.json'}, 'Character Profile draft opened', 'vela-copy.json'],
   ['check_participant_draft', {success:true,status:'valid_draft',published:false,complete_entity_state:{private:'SECRET'}}, 'Character draft checked', 'selected Ruleset'],
+  ['check_participant_draft_file', {success:true,status:'valid_draft',published:false,complete_entity_state:{private:'SECRET'},draft_path:'PRIVATE DRAFT'}, 'Character draft checked', 'selected Ruleset'],
+  ['publish_participant_artifact_file', {success:true,status:'published',kind:'player_character',title:'New hero',draft_version:'PRIVATE HASH'}, 'Player Character saved', 'New hero'],
   ['publish_participant_artifact', {success:true,status:'published',kind:'companion',title:'Vela'}, 'Companion saved', 'Vela'],
   ['publish_participant_artifact', {success:true,status:'published',kind:'player_character',title:'Hero'}, 'Player Character saved', 'Hero'],
   ['check_campaign_setting_draft', {success:true,status:'valid_draft'}, 'Setting draft checked', 'Draft is valid'],

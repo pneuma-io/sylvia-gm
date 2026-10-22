@@ -312,8 +312,8 @@ def test_first_click_creates_unbound_draft_without_turn_or_user_message(tmp_path
             builder_session_id=draft.builder_session_id,
             expected_construction_revision=0,
             current_step="ruleset",
-            visible_answer="No Ruleset — narrative play",
-            answer={"candidate_id": None},
+            visible_answer="SRD Lite",
+            answer={"candidate_id": "sylvia.srd-lite.bg3"},
         )
         assert advanced.current_step == "setting"
         assert advanced.construction_revision == 1
@@ -325,7 +325,7 @@ def test_first_click_creates_unbound_draft_without_turn_or_user_message(tmp_path
             SessionMessageKind.TALK,
             SessionMessageKind.EVIDENCE,
         ]
-        assert context.messages[2].content["text"] == "No Ruleset — narrative play"
+        assert context.messages[2].content["text"] == "SRD Lite"
         assert context.messages[3].content["interview_step"] == "setting"
         assert context.messages[4].content["answers"] == {
             "ruleset": context.messages[2].message_id
@@ -349,7 +349,7 @@ def test_first_click_creates_unbound_draft_without_turn_or_user_message(tmp_path
             visible_answer="No Ruleset — narrative play",
             answer={"candidate_id": None},
         )
-        assert revised.current_step == "setting"
+        assert revised.current_step == "name"
         latest_state = owner.session_context(draft.builder_session_id).messages[-1]
         assert latest_state.content["answers"] == {
             "ruleset": owner.session_context(draft.builder_session_id).messages[-3].message_id
@@ -358,14 +358,7 @@ def test_first_click_creates_unbound_draft_without_turn_or_user_message(tmp_path
         revision = revised.construction_revision
         for ordinal, (step, visible, answer) in enumerate(
             (
-                ("setting", "The Rift", {"setting_id": "the-rift"}),
-                ("plan", "The Rift Awakening", {"plan_id": "the-rift-awakening"}),
                 ("name", "The Rift Awakening", {"display_name": "The Rift Awakening"}),
-                (
-                    "participants",
-                    "Wanderer; 0 companions",
-                    {"archetype_id": "wanderer", "companion_ids": []},
-                ),
                 (
                     "boundaries_preferences",
                     "Boundaries: None; Preferences: None",

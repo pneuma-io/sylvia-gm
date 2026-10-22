@@ -564,9 +564,10 @@ class ActivationResult:
 def canonical_json_bytes(value: object) -> bytes:
     """Encode finite owned JSON with the exact F3 canonical byte representation."""
 
-    captured = owned_json_value(thaw_json_value(value))
+    # Thawing validates every leaf and captures fresh containers. Freezing that
+    # private tree only to thaw it again adds copies without changing ownership.
     return json.dumps(
-        thaw_json_value(captured),
+        thaw_json_value(value),
         sort_keys=True,
         separators=(",", ":"),
         ensure_ascii=False,

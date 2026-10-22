@@ -538,6 +538,54 @@ test('host bridge forwards exact party selections for lookup and generic Start',
   }]);
 });
 
+test('host catalog defaults to complete discovery and forwards explicit setup deferral', async () => {
+  const h = harness();
+  const calls = [];
+  h.window.__TAURI__ = { core: { invoke: async (...args) => { calls.push(args); return []; } } };
+  const bridge = h.createHostBridge();
+  await bridge.campaign_creation_catalog();
+  await bridge.campaign_creation_catalog(false);
+  assert.deepEqual(JSON.parse(JSON.stringify(calls)), [
+    ['campaign_creation_catalog', { includeParticipants: true }],
+    ['campaign_creation_catalog', { includeParticipants: false }],
+  ]);
+});
+
+test('Ruleset browsing requests metadata without constructing an unselected Rift party', async () => {
+  const h = harness();
+  const calls = [];
+  let riftCalls = 0;
+  h.state.bridge = {
+    campaign_creation_catalog: async (includeParticipants) => {
+      calls.push(includeParticipants);
+      return [{ kind: 'ruleset', id: 'rules', selection_id: 'rules', title: 'Rules', compatible_settings: [] }];
+    },
+    rift_template: async () => { riftCalls++; throw new Error('Party construction must wait for selection'); },
+  };
+  await h.showConstructionPanel();
+  assert.deepEqual(calls, [false]);
+  assert.equal(riftCalls, 0);
+  assert.equal(h.node('construction-panel').hidden, false);
+  assert.match(h.node('construction-package').innerHTML, /Rules/);
+});
+
+test('an inventoried legacy setup still loads its retained Rift metadata', async () => {
+  const h = harness();
+  let riftCalls = 0;
+  h.state.bridge = {
+    campaign_creation_catalog: async () => [{
+      kind: 'campaign_plan', id: 'legacy-plan', setup_id: 'the-rift-awakening',
+    }],
+    rift_template: async () => {
+      riftCalls++;
+      return { template_id: 'the-rift-awakening' };
+    },
+  };
+  await h.showConstructionPanel();
+  assert.equal(riftCalls, 1);
+  assert.equal(h.state.riftTemplate.template_id, 'the-rift-awakening');
+});
+
 test('host bridge forwards exact guided Interview navigation fields', async () => {
   const h = harness();
   const calls = [];
@@ -1283,6 +1331,48 @@ test('unavailable saved content keeps healthy Rulesets selectable with persisten
   assert.match(details, /plan\.json/);
   assert.match(details, /Invalid scene &lt;test&gt;/);
   assert.doesNotMatch(details, /<test>/);
+});
+
+test('metadata-only saved character repair details survive a failed party refresh', async () => {
+  const h = harness();
+  const badId = 'participant-reusable-000000000000000000000000-1234567890123456';
+  let includeParticipants;
+  let partyCalls = 0;
+  h.state.bridge = {
+    campaign_creation_catalog: async (include) => {
+      includeParticipants = include;
+      return [
+        { kind: 'ruleset', id: 'rules', selection_id: 'rules', title: 'Healthy Ruleset',
+          version: '1', content_sha256: 'rules-hash', compatible_settings: [] },
+        { kind: 'unavailable_content', content_kind: 'participant', id: badId,
+          title: 'Saved character unavailable',
+          summary: 'The saved files do not meet their content requirements. Repair a copy in Builder.',
+          validation_errors: [{ path: 'stress',
+            message: 'The value at stress does not match the declared state schema.' }] },
+      ];
+    },
+    campaign_party_options: async () => {
+      partyCalls += 1;
+      throw new Error('Saved participant rejected');
+    },
+  };
+  await h.showConstructionPanel();
+  assert.equal(includeParticipants, false);
+  const details = h.node('construction-library-warning-items').innerHTML;
+  assert.equal(h.node('construction-library-warnings').hidden, false);
+  assert.match(details, /Saved character unavailable/);
+  assert.match(details, /567890123456/);
+  assert.match(details, /Repair a copy in Builder/);
+  assert.match(details, /stress.*declared state schema/);
+  const callsBeforeRefresh = partyCalls;
+  h.node('construction-package').value = 'rules';
+  h.node('construction-setting').innerHTML = '<option value="setting">Setting</option>';
+  h.node('construction-template').innerHTML = '<option value="plan-a">Plan</option>';
+  await h.refreshCampaignPartyOptions();
+  assert.equal(h.state.campaignPartyOptionsStatus, 'error');
+  assert.equal(partyCalls, callsBeforeRefresh + 1);
+  assert.equal(h.node('construction-library-warnings').hidden, false);
+  assert.equal(h.node('construction-library-warning-items').innerHTML, details);
 });
 
 test('a failed catalog request keeps its explanation visible after status updates', async () => {

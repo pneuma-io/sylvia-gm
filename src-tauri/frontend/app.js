@@ -48,6 +48,7 @@ const SylviaGMFrontend = (() => {
     constructionPanelGeneration: 0,
     applicationInfo: null,    // host-projected release identity; never campaign truth
     activeCampaignId: null,
+    rulesUpdateController: null,
     activeSessionId: null,
     activeSessionRole: null,
     activeSnapshot: null,
@@ -886,13 +887,19 @@ const SylviaGMFrontend = (() => {
     if (!invoke) return null;
     return {
       application_info: () => invoke('application_info'),
+      record_local_fault: (category, delta) => invoke('record_local_fault', { category, delta }),
+      preview_local_report: (report) => invoke('preview_local_report', report),
+      cancel_local_report: (previewId) => invoke('cancel_local_report', { previewId }),
+      save_local_report: (previewId) => invoke('save_local_report', { previewId }),
       dictation_capabilities: (id = null) => id ? invoke('dictation_capabilities', { id }) : invoke('dictation_capabilities'),
       dictation_start: (id, engine, device) => invoke('dictation_start', { id, engine, device }),
       dictation_prepare: id => invoke('dictation_prepare', { id }),
       dictation_stop: (id) => invoke('dictation_stop', { id }),
       dictation_cancel: (id) => invoke('dictation_cancel', { id }),
       campaign_index: () => invoke('campaign_index'),
-      campaign_creation_catalog: () => invoke('campaign_creation_catalog'),
+      campaign_creation_catalog: (includeParticipants = true) => invoke(
+        'campaign_creation_catalog', { includeParticipants }
+      ),
       campaign_sequel_context: (request) => invoke('campaign_sequel_context', { request }),
       preview_campaign_sequel: (request) => invoke('preview_campaign_sequel', { request }),
       append_campaign_sequel: (request) => invoke('append_campaign_sequel', { request }),
@@ -991,6 +998,14 @@ const SylviaGMFrontend = (() => {
         text,
       }),
       package_candidates: () => invoke('package_candidates'),
+      campaign_rules_update_options: (campaignId) => invoke('campaign_rules_update_options', { campaignId }),
+      preview_campaign_rules_update: (campaignId, candidateId) =>
+        invoke('preview_campaign_rules_update', { campaignId, candidateId }),
+      adopt_campaign_rules_update: (command) => invoke('adopt_campaign_rules_update', {
+        campaignId: command.campaign_id, candidateId: command.candidate_id,
+        activationId: command.activation_id, expectedRevision: command.expected_revision,
+        expectedLockId: command.expected_lock_id, confirmation: command.confirmation,
+      }),
       inspect_package_candidate: (candidateId) => invoke('inspect_package_candidate', {
         candidateId,
       }),
@@ -1042,6 +1057,8 @@ const SylviaGMFrontend = (() => {
         triggerMessageId: command.trigger_message_id || null,
         characterProfileId: command.character_profile_id || null,
         characterProfileSha256: command.character_profile_sha256 || null,
+        characterArtifactId: command.character_artifact_id || null,
+        characterArtifactSha256: command.character_artifact_sha256 || null,
       }),
       return_guided_creation_subflow: (command) => invoke('return_guided_creation_subflow', {
         operationId: command.operation_id,
@@ -1137,6 +1154,7 @@ const SylviaGMFrontend = (() => {
         automaticResponse: Boolean(command.automatic_response),
         redirectInterruptionId: command.redirect_interruption_id || null,
         campaignEndingChoice: command.campaign_ending_choice || null,
+        ...(command.builder_question_answers ? { builderQuestionAnswers: command.builder_question_answers } : {}),
       }),
       start_dm_session: (campaignId, sessionId, turnId) => invoke('start_dm_session', {
         campaignId,
@@ -1331,6 +1349,8 @@ const SylviaGMFrontend = (() => {
     $('connecting-overlay').classList.add('hidden');
     $('session-frame').style.display = 'flex';
     wireControls();
+    window.SylviaLocalDiagnostics?.init(state.bridge);
+    localSupportReport = window.SylviaSupportReport?.init(state.bridge);
     initTheme();
     initSidebarResize();
     await gamePanels().init();
@@ -1563,6 +1583,7 @@ const SylviaGMFrontend = (() => {
       updateCampaignPartyActionAvailability();
       updateReusableLibraryDeleteControls();
     });
+    initStarterCharacterControls();
     $('delete-reusable-player-btn').addEventListener('click', () => {
       const item = (state.campaignPartyOptions?.player_archetypes || []).find(
         (candidate) => candidate.id === $('rift-archetype').value
@@ -1603,6 +1624,13 @@ const SylviaGMFrontend = (() => {
     });
     $('cancel-construction-btn').addEventListener('click', showHome);
     $('rename-campaign-btn').addEventListener('click', () => { void renameSelectedCampaign(); });
+    state.rulesUpdateController = window.SylviaCampaignRulesUpdate?.mount({
+      root: $('campaign-rules-update'), bridge: () => state.bridge,
+      campaign: () => state.activeSessionRole === 'dm' ? state.activeCampaignId : null,
+      adopted: async (campaignId) => {
+        if (state.activeCampaignId === campaignId) await refreshSelectedCampaign();
+      },
+    });
     $('stop-session-btn').addEventListener('click', () => { void stopSelectedSession(); });
     $('resume-session-btn').addEventListener('click', () => { void resumeSelectedSession(); });
     $('finalize-construction-btn').addEventListener('click', () => {
@@ -1762,8 +1790,10 @@ const SylviaGMFrontend = (() => {
     if (selectedTab === 'packages') void refreshRulesetBrowser();
   }
 
+  let localSupportReport = null;
   function closeSettings() {
     if ($('settings-overlay').hidden) return;
+    if (localSupportReport?.close() === false) return;
     $('settings-overlay').hidden = true;
     chatgptPageVisible = false;
     clearTimeout(chatgptStatusTimer);
@@ -7197,6 +7227,13 @@ const SylviaGMFrontend = (() => {
   function updateLifecycleControls(indexEntry, snapshot) {
     const lifecycle = snapshot && ((snapshot.lifecycle && snapshot.lifecycle.value) || snapshot.lifecycle);
     const selected = Boolean(snapshot);
+    const updateRules = $('campaign-rules-update');
+    if (updateRules) {
+      const id = `${snapshot?.campaign_id || ''}:${state.activeSessionRole || ''}`;
+      if (updateRules.dataset.campaignId !== id) state.rulesUpdateController?.reset();
+      updateRules.dataset.campaignId = id;
+      updateRules.hidden = !selected || lifecycle !== 'active' || state.activeSessionRole !== 'dm';
+    }
     const session = selectedSessionEntry(indexEntry);
     const canRename = selected && lifecycle === 'active';
     const canStop = selected && Boolean(session) && session.status === 'active';
@@ -7397,6 +7434,7 @@ const SylviaGMFrontend = (() => {
       options,
       awaiting: result.status === 'awaiting_answer',
       key: String(messageKey || content.tool_call_id || `${messageIndex}-${data.id}`),
+      toolCallId: content.tool_call_id,
       index: messageIndex,
     };
   }
@@ -7408,6 +7446,14 @@ const SylviaGMFrontend = (() => {
   function builderQuestionCardMarkup(question, key, {
     sessionId, groupId, active, busy,
   }) {
+    if (question.answer) {
+      return `<fieldset class="story-card builder-question-card"${key}>` +
+        `<legend class="story-header">Builder question</legend>` +
+        `<div class="builder-question-text">${escapeHtml(question.question)}</div>` +
+        `<div class="story-text builder-question-answer" aria-label="Answer">` +
+        `${escapeHtml(question.answer.label)}</div>` +
+        `<div class="builder-question-note">Answered</div></fieldset>`;
+    }
     const disabled = !active || busy;
     const controlId = `builder-question-${question.index}`;
     const labelId = `${controlId}-label`;
@@ -7484,17 +7530,17 @@ const SylviaGMFrontend = (() => {
   }
 
   function selectedBuilderQuestionAnswer(control) {
-    const value = String(control.value || '').trim();
+    const value = String(control.value || '');
     if (!value) return '';
     const selected = Array.from(control.selectedOptions || [])[0];
-    const label = String(selected?.textContent || '').trim() || value;
+    const label = String(selected?.textContent || '') || value;
     const duplicateLabels = Array.from(control.options || []).filter((option) =>
-      String(option.value || '').length && String(option.textContent || '').trim() === label
+      String(option.value || '').length && String(option.textContent || '') === label
     ).length;
     return duplicateLabels > 1 && value && value !== label ? `${label} (${value})` : label;
   }
 
-  // Submit visible question fields as one ordinary saved User reply to this exact Builder session.
+  // Keep genuine form input linked to the saved questions in this exact Builder session.
   function wireBuilderQuestionForms(container) {
     const controls = Array.from(container.querySelectorAll('[data-builder-question-control]'));
     container.querySelectorAll('[data-builder-question-form]').forEach((form) => {
@@ -7530,11 +7576,13 @@ const SylviaGMFrontend = (() => {
             candidate.dataset.builderQuestionKey === control.dataset.builderQuestionKey &&
             candidate.dataset.builderQuestionType === 'custom'
           );
-          const customAnswer = String(custom?.value || '').trim();
-          const answer = customAnswer || (control.dataset.builderQuestionType === 'text'
-            ? String(control.value || '').trim()
+          const customAnswer = String(custom?.value || '');
+          const isCustom = Boolean(customAnswer.trim());
+          const value = isCustom ? customAnswer : String(control.value || '');
+          const answer = isCustom ? customAnswer : (control.dataset.builderQuestionType === 'text'
+            ? value
             : selectedBuilderQuestionAnswer(control));
-          if (!answer) {
+          if (!answer.trim()) {
             control.focus();
             selectedStatus(activity, 'Answer each question before submitting');
             return;
@@ -7542,12 +7590,18 @@ const SylviaGMFrontend = (() => {
           answers.push({
             question: control.dataset.builderQuestionText || 'Builder question',
             answer,
+            question_message_id: control.dataset.builderQuestionKey,
+            value,
+            custom: isCustom,
           });
         }
         if (!answers.length) return;
         if (submitButton) submitButton.disabled = true;
         formControls.forEach((control) => { control.disabled = true; });
-        void submitInput(builderQuestionAnswerMessage(answers));
+        void submitInput(builderQuestionAnswerMessage(answers), {
+          builderQuestionAnswers: answers.map(({ question_message_id, value, custom }) =>
+            ({ question_message_id, value, custom })),
+        });
       };
       if (form.sylviaQuestionSubmitHandler) {
         form.removeEventListener('submit', form.sylviaQuestionSubmitHandler);
@@ -7729,12 +7783,12 @@ const SylviaGMFrontend = (() => {
           .map((category) => `${category.replaceAll('_', ' ')}: ${result.conversion_preview[category].length}`)
           .join(' · ') + '. Review the conversion before importing.',
       };
-      if (toolName === 'check_participant_draft' && result.status === 'valid_draft' &&
+      if (['check_participant_draft', 'check_participant_draft_file'].includes(toolName) && result.status === 'valid_draft' &&
           result.published === false) return {
         title: 'Character draft checked', summary: 'Draft is valid for the selected Ruleset',
         detail: 'The computed starting values are ready for publication.',
       };
-      if (toolName === 'publish_participant_artifact' && result.status === 'published' &&
+      if (['publish_participant_artifact', 'publish_participant_artifact_file'].includes(toolName) && result.status === 'published' &&
           ['companion', 'player_character'].includes(result.kind)) return {
         title: result.kind === 'companion' ? 'Companion saved' : 'Player Character saved',
         summary: result.title || result.name || 'Reusable character saved',
@@ -7802,6 +7856,7 @@ const SylviaGMFrontend = (() => {
       return { feedback: true, summary: 'This action did not run because a selected source could not be read. Saved work is kept.' };
     }
     if (rejected && ['check_participant_draft', 'publish_participant_artifact',
+      'check_participant_draft_file', 'publish_participant_artifact_file',
       'check_character_profile_draft', 'publish_character_profile'].includes(toolName)) {
       return { feedback: true, summary: participantRejectionDetail(result) };
     }
@@ -8184,7 +8239,7 @@ const SylviaGMFrontend = (() => {
     if (history.refresh) return history.refresh;
     const current = () => state.displayHistory === history && state.activeSessionId === sessionId;
     const loadPage = async () => {
-      const page = await state.bridge.session_history_page(sessionId);
+      let page = await state.bridge.session_history_page(sessionId);
       if (!current()) return null;
       let incoming = page.messages || [];
       let cursor = page.next_before_sequence;
@@ -8194,6 +8249,11 @@ const SylviaGMFrontend = (() => {
           incoming.length && incoming[0].sequence > previousLatest + 1) {
         const gap = await state.bridge.session_history_page(sessionId, cursor);
         if (!current()) return null;
+        // A gap read can observe a newer reply that closed the projected form.
+        if ((gap.latest_sequence ?? 0) > (page.latest_sequence ?? 0)) {
+          page = { ...page, ...gap, messages: page.messages,
+            next_before_sequence: page.next_before_sequence };
+        }
         incoming = [...(gap.messages || []), ...incoming];
         cursor = gap.next_before_sequence;
       }
@@ -8313,8 +8373,8 @@ const SylviaGMFrontend = (() => {
   function builderProgressStage(name) {
     if (['get_content_definition', 'inspect_builder_references', 'read_file'].includes(name)) return 'Reviewed references';
     if (['write_file', 'edit_file', 'copy_builder_reference'].includes(name)) return 'Updated draft';
-    if (['check_participant_draft', 'check_character_profile_draft'].includes(name)) return 'Checked character';
-    if (['publish_participant_artifact', 'publish_character_profile'].includes(name)) return 'Saved character';
+    if (['check_participant_draft', 'check_participant_draft_file', 'check_character_profile_draft'].includes(name)) return 'Checked character';
+    if (['publish_participant_artifact', 'publish_participant_artifact_file', 'publish_character_profile'].includes(name)) return 'Saved character';
     return null;
   }
 
@@ -8451,7 +8511,21 @@ const SylviaGMFrontend = (() => {
     const constructionPanel = $('construction-panel');
     // The attached Interview owns this area while loading as well as when its form is visible.
     if (constructionPanel.parentElement === container) return;
-    const messages = context && Array.isArray(context.messages) ? context.messages : [];
+    const messages = context && Array.isArray(context.messages) ? [...context.messages] : [];
+    // Current form evidence stays available without expanding the loaded history pages.
+    const currentQuestions = Array.isArray(context?.builder_question_messages)
+      ? context.builder_question_messages.filter((message) =>
+        !message.session_id || message.session_id === sessionId) : null;
+    if (currentQuestions) {
+      const loaded = new Set(messages.map((message) => message.message_id));
+      currentQuestions.forEach((message) => {
+        if (!loaded.has(message.message_id)) {
+          messages.push(message);
+          loaded.add(message.message_id);
+        }
+      });
+      messages.sort((left, right) => left.sequence - right.sequence);
+    }
     if (activity.pendingInput &&
         messages.some((message) => message.message_id === activity.pendingInput.messageId)) {
       clearAcceptedInput(activity);
@@ -8496,8 +8570,35 @@ const SylviaGMFrontend = (() => {
         ? builderQuestionFromEvidence(message.content || {}, message.message_id, index)
         : null
     );
+    // Only explicit durable answer events complete a widget or replace its chat bubble.
+    const savedAnswers = new Map();
+    messages.forEach((message, messageIndex) => {
+      const content = message.content || {};
+      if (message.kind !== 'user' || content.kind !== 'builder_question_answer' ||
+          !Array.isArray(content.answers) || !content.answers.length) return;
+      const seen = new Set();
+      const valid = content.answers.every((answer) => {
+        if (!answer || ['question_message_id', 'tool_call_id', 'widget_id', 'question', 'value', 'label']
+          .some((field) => typeof answer[field] !== 'string' || !answer[field].length) ||
+          !['text', 'select', 'cascade', 'confirm'].includes(answer.type) ||
+          typeof answer.custom !== 'boolean' || seen.has(answer.question_message_id)) return false;
+        seen.add(answer.question_message_id);
+        const question = builderQuestions.find((item) => item?.key === answer.question_message_id);
+        return !question || (question.toolCallId === answer.tool_call_id &&
+          question.id === answer.widget_id && question.type === answer.type &&
+          question.question === answer.question && question.index < messageIndex);
+      });
+      if (!valid) return;
+      savedAnswers.set(message, content.answers);
+      content.answers.forEach((answer) => {
+        const question = builderQuestions.find((item) => item?.key === answer.question_message_id);
+        if (question && !question.answer) question.answer = answer;
+      });
+    });
     const activeQuestions = builderQuestions.filter((question) =>
-      question && question.awaiting && (context.latest_user_sequence != null
+      question && !question.answer && question.awaiting &&
+      (!currentQuestions || currentQuestions.some((message) => message.message_id === question.key)) &&
+      (context.latest_user_sequence != null
         ? messages[question.index].sequence > context.latest_user_sequence
         : question.index > lastUserIndex)
     );
@@ -8511,6 +8612,14 @@ const SylviaGMFrontend = (() => {
       const key = chronologyKeyAttribute(message.message_id ||
         `${message.kind}-${message.canonical_sequence ?? ''}-${content.text || ''}`);
       if (message.kind === 'user') {
+        if (savedAnswers.has(message)) {
+          const detached = savedAnswers.get(message).filter((answer) =>
+            !builderQuestions.some((question) => question?.key === answer.question_message_id));
+          return detached.length ? `<div class="builder-answered-questions"${key}>` +
+            detached.map((answer) => builderQuestionCardMarkup({
+              question: answer.question, answer,
+            }, '', {})).join('') + `</div>` : '';
+        }
         return `<div class="story-card talk"${key}><div class="story-header">You</div>` +
           `<div class="story-text">${escapeHtml(content.text || '')}</div></div>`;
       }
@@ -9055,7 +9164,7 @@ const SylviaGMFrontend = (() => {
     const player = (state.campaignPartyOptions?.player_archetypes || []).find(
       (item) => item.id === $('rift-archetype').value
     );
-    $('delete-reusable-player-btn').hidden = !(player?.reusable && player.content_sha256);
+    $('delete-reusable-player-btn').hidden = !(player?.reusable && player.content_sha256 && !player.builtin_starter);
   }
 
   async function deleteReusableLibraryEntry(item) {
@@ -10047,7 +10156,7 @@ const SylviaGMFrontend = (() => {
     }
   }
 
-  async function startCreationSubflow(purpose, visibleAnswer, triggerMessageId = null, profile = null) {
+  async function startCreationSubflow(purpose, visibleAnswer, triggerMessageId = null, profile = null, character = null) {
     if (!state.bridge || !state.bridge.start_guided_creation_subflow ||
         !state.constructionDraftId || !state.activeSessionId) return;
     const parentSessionId = state.activeSessionId;
@@ -10066,6 +10175,8 @@ const SylviaGMFrontend = (() => {
         trigger_message_id: triggerMessageId,
         ...(profile ? { character_profile_id: profile.id,
           character_profile_sha256: profile.content_sha256 } : {}),
+        ...(character ? { character_artifact_id: character.id,
+          character_artifact_sha256: character.content_sha256 } : {}),
       });
       if (state.activeSessionId === parentSessionId) state.constructionRevision = result.construction_revision;
       if (result.status === 'independent') {
@@ -10274,6 +10385,55 @@ const SylviaGMFrontend = (() => {
     });
     applyStartingPartyPolicy();
     updateReusableLibraryDeleteControls();
+    renderSelectedStarterCharacter();
+  }
+
+  function renderSelectedStarterCharacter() {
+    const panel = $('starter-character-preview');
+    if (!panel) return;
+    const item = (state.campaignPartyOptions?.player_archetypes || []).find(
+      (candidate) => candidate.id === $('rift-archetype').value && candidate.builtin_starter
+    );
+    const preview = item?.starter_preview;
+    panel.hidden = !preview;
+    if (!preview) return;
+    const character = preview.participant;
+    const actor = preview.entity_state;
+    const className = character.classes[0].id;
+    $('starter-character-heading').textContent =
+      `${item.name} · ${className[0].toUpperCase() + className.slice(1)} · Level ${character.level}`;
+    $('starter-character-guidance').textContent = item.summary;
+    $('starter-character-stats').textContent =
+      `HP ${actor.max_hp} · AC ${actor.armor_class} · Speed ${actor.speed} ft`;
+    $('starter-character-profile').textContent = preview.authored_profile;
+    const label = (value) => String(value).replaceAll('_', ' ');
+    const equipment = actor.inventory.map((item) => {
+      const quantity = actor.inventory_quantities?.[item] || 1;
+      return `${label(item)}${quantity > 1 ? ` ×${quantity}` : ''}`;
+    });
+    const resources = Object.entries(actor.resource_maxima || {})
+      .filter(([, maximum]) => maximum > 0)
+      .map(([name, maximum]) => `${label(name)} ${maximum}`);
+    $('starter-character-data').textContent = [
+      `Ability scores: ${Object.entries(character.abilities).map(([name, score]) => `${label(name)} ${score}`).join(', ')}`,
+      `Saving throws: ${character.saving_throw_proficiencies.map(label).join(', ')}`,
+      `Skills: ${(character.skill_proficiencies || []).map(label).join(', ')}`,
+      `Equipment: ${equipment.join(', ')}`,
+      `Spells: ${actor.prepared_spells.map(label).join(', ') || 'None'}`,
+      `Resources: ${resources.join(', ')}`,
+    ].join('\n\n');
+    $('starter-edit-copy').hidden = selectedStartingPartyPolicy().player_character?.mode === 'fixed';
+  }
+
+  function initStarterCharacterControls() {
+    $('rift-archetype').addEventListener('change', renderSelectedStarterCharacter);
+    $('starter-edit-copy')?.addEventListener('click', () => {
+      const item = (state.campaignPartyOptions?.player_archetypes || []).find(
+        (candidate) => candidate.id === $('rift-archetype').value && candidate.builtin_starter
+      );
+      if (item) void startCreationSubflow('player_character',
+        `Edit a copy of ${item.name}`, null, null, item);
+    });
   }
 
   function selectedRiftPlayerName() {
@@ -10311,7 +10471,7 @@ const SylviaGMFrontend = (() => {
     if (!state.bridge) return;
     if (state.bridge.campaign_creation_catalog) {
       try {
-        const catalog = await state.bridge.campaign_creation_catalog() || [];
+        const catalog = await state.bridge.campaign_creation_catalog(false) || [];
         if (!stillSelected()) return;
         state.campaignCreationCatalog = catalog;
         renderCharacterProfiles();
@@ -10336,7 +10496,9 @@ const SylviaGMFrontend = (() => {
         );
       }
     }
-    if (state.bridge.rift_template) {
+    if (state.bridge.rift_template && state.campaignCreationCatalog.some(
+      (item) => item.kind === 'campaign_plan' && item.setup_id
+    )) {
       try {
         const template = await state.bridge.rift_template();
         if (!stillSelected()) return;
@@ -11490,6 +11652,7 @@ const SylviaGMFrontend = (() => {
 
   async function submitInput(text, {
     builderStart = false, builderSessionId = null, playerAction = null, campaignEndingChoice = null,
+    builderQuestionAnswers = null,
   } = {}) {
     if (builderSessionId && !builderStart) return;
     const sessionId = playerAction?.sessionId || builderSessionId || state.activeSessionId;
@@ -11522,6 +11685,7 @@ const SylviaGMFrontend = (() => {
       return;
     }
     if (activityIsWorking(activity) && sessionRole === 'builder') {
+      if (builderQuestionAnswers) return;
       if (!state.bridge.steer_session || activity.stopRequestedAttemptId || !text.trim()) return;
       if (selectedActivityMatches(activity)) {
         dictation?.cancel('', { announce: false });
@@ -11564,6 +11728,7 @@ const SylviaGMFrontend = (() => {
       player_action_id: playerAction?.actionId || null,
       automatic_response: Boolean(playerAction?.automatic),
       campaign_ending_choice: campaignEndingChoice,
+      ...(builderQuestionAnswers ? { builder_question_answers: builderQuestionAnswers } : {}),
       redirect_interruption_id: !compact && !playerAction && !campaignEndingChoice && sessionRole === 'dm'
         ? activity.retryBasis?.interruption_id || null : null,
     };
@@ -11577,7 +11742,8 @@ const SylviaGMFrontend = (() => {
     activity = beginSessionActivity(activity, command.attempt_id);
     activity.contextCompaction = compact;
     activity.ownerId = compact || sessionRole === 'builder' ? sessionId : campaignId;
-    activity.pendingInput = playerAction || compact || campaignEndingChoice ? null : { sessionId, messageId: command.message_id, text, oocText };
+    activity.pendingInput = playerAction || compact || campaignEndingChoice || builderQuestionAnswers
+      ? null : { sessionId, messageId: command.message_id, text, oocText };
     refreshActivityControls(activity);
     selectedStatus(activity, compact ? 'Compacting context · saved conversation is kept' : 'Streaming…');
     renderActivityIndexes();

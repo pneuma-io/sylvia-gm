@@ -126,6 +126,15 @@ class _BuilderLoopBudget:
                 return
         if not isinstance(arguments, dict) or not isinstance(result, dict):
             return
+        if name == "inspect_builder_references" and arguments.get("action") == "read_many":
+            pages, results = arguments.get("pages"), result.get("pages")
+            if isinstance(pages, list) and isinstance(results, list):
+                for page, page_result in zip(pages, results, strict=False):
+                    if isinstance(page, dict):
+                        self.finish_tool({"function": {
+                            "name": name, "arguments": {**page, "action": "read"},
+                        }}, page_result)
+            return
         if name == "inspect_builder_references" and arguments.get("action") not in {"read", "find"}:
             return
         path = arguments.get("source_path" if name == "copy_builder_reference" else "path")

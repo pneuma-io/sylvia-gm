@@ -874,6 +874,22 @@ Bundled and third-party rulesets use the same public package format. External pa
 activate or repin a campaign. Campaigns retain exact pins; activation is explicit, occurs only at
 an idle completed-TURN checkpoint, and leaves the old pin authoritative on failure.
 
+Existing campaigns can explicitly preview and adopt a compatible installed snapshot with the
+same Ruleset and Campaign Setting ownership. Campaign Data shows content changes and conflicts
+before confirmation. Compatible adoption keeps saved values and character records unchanged,
+preserves the player's layout and adds new panels once in the sidebar. Removed or renamed panels,
+changed existing state/character contracts and unsafe saved values block this path. It performs
+no automatic repair. Stop Session reaches the checkpoint; stale previews and active work cannot
+apply. Previous exact versions remain retained. Returning to one requires another compatibility
+review against current progress; it never rewinds intervening play.
+Character provenance and accepted Plans retain their original exact source. Active character
+bookkeeping and Ruleset/Setting reference reads follow this campaign's committed compatible
+update lineage. Existing fact identities, audiences, source bindings and declared content
+references must remain coherent; removal or reassignment blocks adoption.
+Candidate Setting knowledge must also fit the campaign's accepted Plan and retained adventures.
+Conflicting fact identities or missing references are explained before adoption; this workflow
+does not rename secrets or rewrite the Plan to resolve them.
+
 Every ruleset declares one minimum recommended model-capability tier. The selected model may be
 below it after a clear warning. Sylvia GM provides at least ten ordered capability tiers.
 Engineering is authorized to define tier identifiers, names, empirical rubrics, benchmarks, and
@@ -1001,8 +1017,8 @@ qualified artifacts through GitHub Releases after direct approval.
 
 ## 9. Explicitly post-Alpha
 
-- adopting updated rules inside an existing campaign, including saved-state conflict handling and
-  layout preservation when an update adds panels; tracked in post-launch PL-01 (formerly PES-119);
+- incompatible rules-update migrations and player-resolved conflict handling beyond the
+  compatible-only adoption path;
 - Trigger Discipline and Siren Protocol implementation and acceptance; they are not Alpha blockers;
 - Cairn 2e as an advertised supported ruleset;
 - multiplayer, mobile, native macOS/Linux, or hosted cloud play;

@@ -1020,6 +1020,7 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
   width: 100%;
 }
 .builder-question-controls textarea { resize: vertical; }
+.builder-question-answer { white-space: pre-wrap; overflow-wrap: anywhere; }
 .builder-question-custom-label,
 .builder-question-note {
   color: var(--text-muted);
@@ -3138,3 +3139,27 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
 #campaign-sequel-dialog td, #campaign-sequel-dialog th { text-align:left; padding:.3rem; }
 .sequel-actions { display:flex; flex-wrap:wrap; gap:.5rem; margin:1rem 0; }
 .sequel-consent { display:flex; align-items:flex-start; gap:.5rem; line-height:1.5; }
+#local-report-content {
+  max-height: 20rem;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 0.75rem;
+}
+
+#local-report-reproduction,
+#local-report-feedback {
+  width: 100%;
+  resize: vertical;
+}
+/* Character previews stay inside the existing Interview party chooser. */
+#starter-character-preview[hidden],
+.construction-fields .btn[hidden] {
+  display: none;
+}
+.starter-character-profile,
+#starter-character-data {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: inherit;
+}

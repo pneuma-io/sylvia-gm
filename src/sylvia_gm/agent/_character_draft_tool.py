@@ -88,8 +88,8 @@ def character_draft_tool(
                 "Use read_file and edit_file to preserve other choices. Calculated state is "
                 "omitted for recalculation. This does not validate or save a library character: "
                 "check the draft against this chat's selected Setting and Ruleset, then use "
-                "check_participant_draft and publish_participant_artifact with the draft fields "
-                "(encode entity_state and setting_data as JSON strings for those tools). "
+                "check_participant_draft_file and publish_participant_artifact_file with the "
+                "draft path and observed version. Inline character tools remain available. "
                 "A different Setting may require explicit adaptation; never invent missing choices."
             ),
             "parameters": {"type": "object", "properties": properties,

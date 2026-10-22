@@ -480,7 +480,7 @@ def test_admin_audit_records_rejected_preflight_without_provider_request() -> No
     assert base.calls == []
 
 
-def test_unknown_capacity_is_audited_as_unknown_and_blocked_before_send() -> None:
+def test_unknown_capacity_is_audited_as_unknown_and_deferred_to_runtime() -> None:
     traces: list[object] = []
     base = FakeProvider(stream_chunks=[ProviderStreamChunk(content="must not send")])
     base.model_info = ModelInfo(  # type: ignore[attr-defined]
@@ -501,13 +501,18 @@ def test_unknown_capacity_is_audited_as_unknown_and_blocked_before_send() -> Non
         )
     )
 
-    with pytest.raises(TokenLimitError, match="no trustworthy effective context capacity"):
-        provider.admit_request([{"role": "user", "content": "hello"}], max_tokens=128)
+    measurement = provider.admit_request([{"role": "user", "content": "hello"}], max_tokens=128)
+    assert measurement.admission_decision == "runtime_deferred"
+    assert len(traces) == 1
+    assert traces[0]["kind"] == "provider_context_fit"
     report = traces[0]["correlation"]["context_fit"]
     assert report["precision"] == "conservative_bound"
     assert report["effective_context_capacity"] is None
     assert report["capacity_source"] in {"unknown", "legacy_unverified"}
-    assert report["admission_decision"] == "rejected"
+    assert report["admission_decision"] == "runtime_deferred"
+    assert report["input_tokens"] is None
+    assert report["input_token_bound"] > 0
+    assert report["output_token_reserve"] == 128
     assert base.calls == []
 
 

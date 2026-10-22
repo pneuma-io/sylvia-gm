@@ -343,7 +343,7 @@ def tool_ask_question(params: dict[str, Any], _context: Any) -> dict[str, Any]:
 
     Returns a serializable question with 'status': 'awaiting_answer'.
     The Builder adapter retains it as tool evidence; the desktop renders
-    answer controls and submits the player's ordinary saved reply.
+    answer controls and saves the player's input linked to this question evidence.
 
     Question payload:
         {

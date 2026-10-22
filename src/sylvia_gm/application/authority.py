@@ -2283,6 +2283,15 @@ class AuthorityOwner:
             (entry.package_id, entry.version, entry.sha256) == (package_id, version, content_sha256)
             for entry in snapshot.package_lock.entries
         ):
+            compatible = self._store.compatible_package_binding(
+                campaign_id, (str(package_id), str(version), str(content_sha256)),
+            )
+            if compatible is not None and compatible in snapshot.package_lock.entries:
+                version, content_sha256 = compatible.version, compatible.sha256
+        if not any(
+            (entry.package_id, entry.version, entry.sha256) == (package_id, version, content_sha256)
+            for entry in snapshot.package_lock.entries
+        ):
             replacements = tuple(
                 entry
                 for entry in snapshot.package_lock.entries
@@ -2309,10 +2318,14 @@ class AuthorityOwner:
             # Read the equivalent current artifact without rewriting the accepted
             # Plan, historical lock, Builder handoff or previously pinned package.
             content_sha256 = replacements[0].sha256
+        return self._exact_setting_knowledge((str(package_id), str(version), str(content_sha256)))
+
+    def _exact_setting_knowledge(
+        self, identity: tuple[str, str, str],
+    ) -> tuple[tuple[SafePayload, ...], tuple[str, ...]]:
+        """Read one exact bounded Setting artifact for active use or a read-only preview."""
         value = self._store.package_file_bytes(
-            str(package_id),
-            str(version),
-            str(content_sha256),
+            *identity,
             CAMPAIGN_SETTING_KNOWLEDGE_PATH,
             maximum_bytes=CAMPAIGN_SETTING_KNOWLEDGE_BYTE_LIMIT,
         )
@@ -2344,13 +2357,16 @@ class AuthorityOwner:
         self,
         campaign_id: str | None,
         plan: Mapping[str, object],
+        *,
+        setting_facts: tuple[SafePayload, ...] | None = None,
     ) -> tuple[SafePayload, ...]:
         """Merge inline Plan secrets with exact fact references from the Setting."""
 
         if campaign_id is None:
             raise CommandRejected("Campaign secret catalog requires campaign authority")
         plan = self._retained_preparation(campaign_id, plan)
-        setting_facts, _private_references = self._campaign_setting_knowledge(campaign_id, plan)
+        if setting_facts is None:
+            setting_facts, _private_references = self._campaign_setting_knowledge(campaign_id, plan)
         remaining = {str(item["id"]): item for item in setting_facts}
         merged: list[SafePayload] = []
         raw_secrets = plan.get("secrets")
@@ -5709,6 +5725,12 @@ class AuthorityOwner:
                     for entry in snapshot.package_lock.entries
                     if (entry.package_id, entry.version, entry.sha256) == identity
                 ]
+                if not package_entries:
+                    compatible = self._store.compatible_package_binding(
+                        campaign_id, cast(tuple[str, str, str], identity),
+                    )
+                    if compatible is not None and compatible in snapshot.package_lock.entries:
+                        package_entries = [compatible]
                 if source == "ruleset" and package_entries:
                     ruleset_entry = package_entries[0]
                     dependency_identities = {
@@ -6218,7 +6240,11 @@ class AuthorityOwner:
                 None,
             )
             if exact_entry is None:
-                raise CommandRejected("Campaign package reference binding is stale")
+                exact_entry = self._store.compatible_package_binding(
+                    campaign_id, (str(package_id), str(version), str(content_sha256)),
+                )
+                if exact_entry is None or exact_entry not in snapshot.package_lock.entries:
+                    raise CommandRejected("Campaign package reference binding is stale")
             selected_entry = exact_entry
             portable_path, separator, fragment = path.partition("#")
             value = self._store.package_file_bytes(
@@ -7367,9 +7393,43 @@ class AuthorityOwner:
     def package_surface_bytes(self, campaign_id: str) -> bytes:
         return projection_bytes(self.package_surfaces(campaign_id))
 
+    def campaign_rules_update_options(self, campaign_id: str) -> SafePayload:
+        """List exact installed snapshots eligible for this campaign's ownership chain."""
+        from sylvia_gm.application.campaign_rules_update import options
+
+        return options(self, campaign_id)
+
+    def preview_campaign_rules_update(self, campaign_id: str, candidate_id: str) -> SafePayload:
+        """Explain compatible changes and conflicts without mutating campaign truth."""
+        from sylvia_gm.application.campaign_rules_update import preview
+
+        return preview(self, campaign_id, candidate_id)
+
+    def adopt_campaign_rules_update(
+        self, *, campaign_id: str, candidate_id: str, activation_id: str,
+        expected_revision: int, expected_lock_id: str, confirmation: str,
+    ) -> ActivationResult:
+        """Adopt the explicitly reviewed snapshot through normal package activation."""
+        from sylvia_gm.application.campaign_rules_update import adopt
+
+        return adopt(self, campaign_id=campaign_id, candidate_id=candidate_id,
+                     activation_id=activation_id, expected_revision=expected_revision,
+                     expected_lock_id=expected_lock_id, confirmation=confirmation)
+
     def activate_package(
         self, command: ActivationCommand, migrate: MigrationFunction
     ) -> ActivationResult:
+        return self._activate_package(command, migrate, compatible_update=False)
+
+    def _activate_package(
+        self, command: ActivationCommand, migrate: MigrationFunction, *, compatible_update: bool,
+    ) -> ActivationResult:
+        """Keep compatible authority reserved for the validated adoption seam."""
+        if command.migration_id.startswith("compatible-update-") != compatible_update:
+            raise CommandRejected(
+                "Compatible update migration identities are reserved for reviewed adoption",
+                code="reserved_migration_identity",
+            )
         with self._operation():
             self._reject_pending_mechanics_choice(command.campaign_id)
             payload_sha256 = activation_payload_sha256(command)
@@ -7403,6 +7463,7 @@ class AuthorityOwner:
                         expected_lock_id=command.expected_lock_id,
                         migration_id=command.migration_id,
                         migrated_state=migrated_state,
+                        compatible_update=compatible_update,
                     )
             finally:
                 self._release_campaign_transition(command.campaign_id)

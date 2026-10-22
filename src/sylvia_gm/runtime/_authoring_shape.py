@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 
 from sylvia_gm.runtime._authoring_declarations import EFFECT_BODY_FIELDS, SCALAR_EFFECT_BODIES
+from sylvia_gm.runtime._schema_validator import _validate_effects
 
 _ENVELOPE_COMMON = frozenset({"condition", "store_as"})
 _ENVELOPE_BY_HANDLER = {
@@ -87,7 +88,13 @@ def runtime_authoring_shape_errors(raw: object) -> list[tuple[str, str]]:
     if isinstance(procedures, Mapping):
         for name, procedure in procedures.items():
             if isinstance(name, str) and isinstance(procedure, Mapping):
-                effects(procedure.get("steps", []), f"$.procedures.{name}.steps")
+                steps = procedure.get("steps", [])
+                path = f"$.procedures.{name}.steps"
+                if isinstance(steps, list) and _validate_effects(f"procedure {name}", steps):
+                    errors.append((
+                        path, "Procedure steps must use registered effects and valid declarations."
+                    ))
+                effects(steps, path)
     return errors[:16]
 
 

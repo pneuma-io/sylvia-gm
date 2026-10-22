@@ -135,7 +135,8 @@ def rift_public_template(
 
     value = _template() if template is None else validate_rift_template(template)
     local_players = [
-        participant.catalog_payload()
+        {**participant.catalog_payload(), **({"starter_preview": participant.rift_source()}
+         if participant.builtin_starter else {})}
         for participant in reusable_participants
         if participant.role == "player_character"
     ]
@@ -167,6 +168,9 @@ def rift_public_template(
                 "reusable": True,
                 "profile_status": item["profile_status"],
                 "campaign_ready": item["profile_status"] == "authored",
+                **({"builtin_starter": True, "starter_preview": item["starter_preview"],
+                    "content_sha256": item["content_sha256"]}
+                   if item.get("builtin_starter") else {}),
                 **(
                     {"source_profile": item["source_profile"]} if item.get("source_profile") else {}
                 ),
