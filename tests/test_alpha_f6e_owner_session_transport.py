@@ -3581,6 +3581,8 @@ def test_owner_shutdown_cancels_live_builder_provider_and_fences_output(
     session_id = ""
     try:
         _campaign_id, session_id = _create_builder_session(harness, "shutdown-live")
+        # Qualify shutdown after provider admission, independently of first catalog materialization.
+        harness.request("prepare-shutdown-catalog", "campaign_creation_catalog")
         harness.send(
             "submit-builder-shutdown-live",
             {

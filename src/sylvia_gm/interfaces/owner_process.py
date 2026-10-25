@@ -127,6 +127,11 @@ from sylvia_gm.application.plan_bundle import (
     import_plan_bundle,
 )
 from sylvia_gm.application.plan_snapshot import retained_plan_snapshot, validate_plan_snapshot
+from sylvia_gm.application.ready_campaigns import (
+    customize_ready_campaign,
+    ready_campaign_catalog,
+    start_ready_campaign,
+)
 from sylvia_gm.application.reusable_participants import (
     ReusableParticipant,
     compatible_reusable_participants,
@@ -1423,6 +1428,7 @@ def _publish_builder_ruleset_candidate(
 
 def _launch(
     envelope: Mapping[str, Any],
+    *, before_migration: Callable[[], None] | None = None,
 ) -> tuple[LocalOwnerSupervisor, LocalCommandBus, str, str, Path]:
     if envelope.get("type") != "launch":
         raise OwnerProtocolError("The first owner message must be a launch envelope")
@@ -1434,7 +1440,9 @@ def _launch(
     external_response = derive_owner_response(secret_hex)
     supervisor = LocalOwnerSupervisor()
     try:
-        internal = supervisor.acquire_owner(database_path, owner_id)
+        internal = supervisor.acquire_owner(
+            database_path, owner_id, before_migration=before_migration,
+        )
         supervisor.complete_handshake(derive_owner_response(internal.secret_hex))
     except BaseException:
         supervisor.shutdown()
@@ -1867,6 +1875,27 @@ def _dispatch_selected(
         return _campaign_creation_catalog(
             storage_root, application_owner,
             include_participants=_optional_bool(params, "include_participants", default=True),
+        )
+    if method == "ready_campaign_catalog":
+        try:
+            return ready_campaign_catalog()
+        except (OSError, ValueError, KeyError, TypeError) as error:
+            raise CommandRejected("Prepared campaigns are unavailable or incompatible",
+                                  code="ready_campaign_invalid") from error
+    if method in {"start_ready_campaign", "customize_ready_campaign"}:
+        ready_arguments = {
+            "operation_id": _required_text(params, "operation_id"),
+            "template_id": _required_text(params, "template_id"),
+            "expected_content_sha256": _required_text(params, "expected_content_sha256"),
+        }
+        if method == "customize_ready_campaign":
+            return customize_ready_campaign(application_owner, storage_root, **ready_arguments)
+        return start_ready_campaign(
+            application_owner, storage_root, **ready_arguments,
+            display_name=_required_text(params, "display_name"),
+            provider_id=_required_text(params, "provider_id"),
+            model_id=_required_text(params, "model_id"),
+            model_guidance_override=_optional_bool(params, "model_guidance_override"),
         )
     if method == "delete_reusable_library_entry":
         kind = _required_text(params, "kind")
@@ -2313,6 +2342,7 @@ def _dispatch_selected(
             **page_fields,
             "provisional": session_loop.provisional_session_projection(session_id),
             "activity": activity,
+            "activity_progress": session_loop.activity_progress(session_id),
             "context_status_hint": session_loop.context_status_hint(session_id),
             "reasoning_state": reasoning_state(display_session, model_choices(), pending_model),
             "model_state": {
@@ -3484,11 +3514,13 @@ def _dispatch_selected(
         activity = session_loop.builder_activity(session_id, attempt_id=attempt_id)
         if activity is not None and activity["status"] != "active":
             return activity
+        status = bus.provider_stream_status(session_id, attempt_id)
+        # A live admitted run can precede lease registration or outlive its release.
+        # Only saved terminal evidence can complete that run.
+        if activity is not None and status == "completed":
+            status = "active"
         return {
-            "status": bus.provider_stream_status(
-                session_id,
-                attempt_id,
-            )
+            "status": status,
         }
     if method == "reconnect_stream":
         return bus.reconnect_stream(
@@ -4532,6 +4564,11 @@ def run(
     owner_config_path: Path | None = None
     diagnostics: LocalDiagnostics | None = None
     display_reads: DisplayReads | None = None
+    desktop_updates: Any = None
+    desktop_drafts: Any = None
+    update_installation: Any = None
+    update_startup: Any = None
+    update_start_confirmed = False
 
     def resolve_provider(session: Any) -> Any:
         nonlocal configured_resolver
@@ -4567,10 +4604,37 @@ def run(
         launch = _read_message(input_stream)
         if launch is None:
             raise OwnerProtocolError("Owner launch envelope is missing")
-        supervisor, bus, external_response, owner_id, storage_root = _launch(launch)
+        from sylvia_gm.application.desktop_update.manifest import UpdateError
+        from sylvia_gm.application.desktop_update.startup import owner_startup_context
+
+        def validate_update_startup() -> None:
+            nonlocal update_installation, update_startup
+            update_installation, update_startup = owner_startup_context(launch)
+
+        try:
+            validate_update_startup()
+            supervisor, bus, external_response, owner_id, storage_root = _launch(
+                launch, before_migration=validate_update_startup,
+            )
+        except UpdateError as startup_error:
+            if (
+                startup_error.code == "update_recovery_required"
+                and launch.get("desktop_update_context") is not None
+            ):
+                from sylvia_gm.application.desktop_update.recovery_service import run_recovery
+
+                return run_recovery(launch, input_stream, output_stream)
+            _write_message(output_stream, {
+                "ok": False, "type": "update_recovery_required",
+                "error": {"code": "update_recovery_required", "message": (
+                    "The interrupted update must be reconciled before opening saved data."
+                )},
+            })
+            return 2  # No authority acquisition, schema migration or provider work occurred.
         diagnostics = LocalDiagnostics(storage_root)
         owner_config_path = storage_root / "config.yaml"
         application_owner = supervisor.application_owner()
+        application_owner.prepare_new_campaign_storage()
         _preinstall_bundled_srd(bus)
         _preinstall_bundled_riichi(bus)
         if application_owner.legacy_builder_contexts():
@@ -4610,11 +4674,63 @@ def run(
             params: Mapping[str, Any],
             preparation: ExitStack | None = None,
         ) -> None:
+            nonlocal desktop_updates, desktop_drafts, update_start_confirmed
             started = time.monotonic()
             error_code: str | None = None
             error_type: str | None = None
             try:
-                if method == "record_local_fault":
+                if method == "desktop_update_confirm_startup":
+                    if set(params) != {"host"} or update_startup is None:
+                        raise OwnerProtocolError("No update startup is awaiting confirmation")
+                    expected = {
+                        "version": update_startup.version,
+                        "target": update_startup.installation.target,
+                        "distribution": update_startup.installation.distribution,
+                    }
+                    if params["host"] != expected:
+                        raise OwnerProtocolError("The native startup context changed")
+                    already_confirmed = update_start_confirmed
+                    update_start_confirmed = update_startup.confirm()
+                    if (
+                        update_start_confirmed and not already_confirmed
+                        and desktop_updates is not None
+                    ):
+                        desktop_updates.startup_completed()
+                    result = {
+                        "status": "confirmed" if update_start_confirmed else "waiting_for_helper",
+                    }
+                elif method in {"load_desktop_drafts", "save_desktop_drafts"}:
+                    if desktop_drafts is None:
+                        from sylvia_gm.application.desktop_update.drafts import DraftStore
+
+                        desktop_drafts = DraftStore(storage_root)
+                    if method == "load_desktop_drafts" and not params:
+                        result = desktop_drafts.load()
+                    elif method == "save_desktop_drafts" and set(params) == {"drafts"}:
+                        result = desktop_drafts.save(params["drafts"])
+                    else:
+                        raise OwnerProtocolError("Unsupported draft storage request")
+                elif method in {
+                    "desktop_update_state", "desktop_update_check", "desktop_update_download",
+                    "desktop_update_cancel", "desktop_update_defer",
+                    "desktop_update_prepare", "desktop_update_handoff",
+                }:
+                    if desktop_updates is None:
+                        from sylvia_gm.application.desktop_update.service import (
+                            DesktopUpdateService,
+                        )
+
+                        desktop_updates = DesktopUpdateService(
+                            storage_root, installation=update_installation,
+                            backup_database=bus.backup_database,
+                            reserved=lambda identity: (
+                                not closing.is_set()
+                                and supervisor.desktop_update_operation() == identity
+                            ),
+                            release=supervisor.abort_desktop_update,
+                        )
+                    result = desktop_updates.handle(method.removeprefix("desktop_update_"), params)
+                elif method == "record_local_fault":
                     result = diagnostics.client_fault(params.get("category"), params.get("delta"))
                 elif method == "preview_local_report":
                     result = diagnostics.preview(
@@ -4831,6 +4947,77 @@ def run(
             params = request.get("params", {})
             if not isinstance(params, dict):
                 raise OwnerProtocolError("Owner request params must be an object")
+            if update_startup is not None and not update_start_confirmed and method not in {
+                "desktop_update_confirm_startup", "desktop_update_state", "shutdown",
+                "load_desktop_drafts", "save_desktop_drafts", "campaign_index",
+                "builder_chat_index", "provider_settings", "model_choices",
+                "display_snapshot", "player_projection", "player_projection_page",
+                "campaign_panels", "cancel_display_load", "record_local_fault",
+            }:
+                write_reply({"id": request_id, "ok": False, "error": {
+                    "code": "update_startup_unconfirmed",
+                    "message": "Wait for the updated application to confirm startup.",
+                }})
+                continue
+            if supervisor.desktop_update_operation() is not None and method not in {
+                "shutdown", "desktop_update_state", "desktop_update_abort",
+                "desktop_update_reserve", "desktop_update_shutdown",
+                "desktop_update_prepare", "desktop_update_defer", "desktop_update_handoff",
+                "load_desktop_drafts", "save_desktop_drafts",
+                "cancel_display_load", "campaign_index", "builder_chat_index",
+            }:
+                write_reply({"id": request_id, "ok": False, "error": {
+                    "code": "update_in_progress",
+                    "message": (
+                        "Update preparation has reserved this app. "
+                        "Finish or cancel it before changing saved work."
+                    ),
+                }})
+                continue
+            if method in {
+                "desktop_update_reserve", "desktop_update_abort", "desktop_update_shutdown",
+            }:
+                try:
+                    from sylvia_gm.application.desktop_update.storage import operation_id
+
+                    if set(params) != {"operation_id"}:
+                        raise OwnerProtocolError("Unsupported update lifecycle request")
+                    identity = operation_id(params["operation_id"])
+                    if method == "desktop_update_abort":
+                        if desktop_updates is not None:
+                            desktop_updates.abort_preparation(identity)
+                        supervisor.abort_desktop_update(identity)
+                        result = {"status": "aborted"}
+                    else:
+                        with workers_lock:
+                            if (
+                                workers or not display_reads.idle()
+                                or (desktop_updates is not None and desktop_updates.preparing())
+                            ):
+                                raise CommandRejected(
+                                    "Finish admitted work and loading before updating",
+                                    code="update_busy",
+                                )
+                            if method == "desktop_update_reserve":
+                                supervisor.begin_desktop_update(identity)
+                                result = {"status": "reserved"}
+                            elif supervisor.desktop_update_operation() == identity:
+                                if desktop_updates is not None:
+                                    desktop_updates.arm_shutdown(identity)
+                                result = {"status": "closed"}
+                            else:
+                                raise CommandRejected(
+                                    "This update reservation is stale",
+                                    code="stale_update_operation",
+                                )
+                    write_reply({"id": request_id, "ok": True, "result": result})
+                    if result["status"] == "closed":
+                        return 0  # finally closes an idle owner; no provider cancellation/replay.
+                except (AuthorityError, OwnerProtocolError, ValueError) as error:
+                    write_reply({"id": request_id, "ok": False, "error": {
+                        "code": getattr(error, "code", "command_rejected"), "message": str(error),
+                    }})
+                continue
             if method == "shutdown":
                 write_reply({"id": request_id, "ok": True, "result": {"status": "closed"}})
                 return 0
@@ -4855,6 +5042,9 @@ def run(
                 "start_dm_session",
                 "submit_session_input",
                 "manual_retry_session",
+                "ready_campaign_catalog",
+                "start_ready_campaign",
+                "customize_ready_campaign",
             }:
                 preparation = ExitStack()
                 try:
@@ -4894,6 +5084,8 @@ def run(
         raise
     finally:
         closing.set()
+        if desktop_updates is not None:
+            desktop_updates.close()
         if display_reads is not None:
             display_reads.close()
         if supervisor is not None:

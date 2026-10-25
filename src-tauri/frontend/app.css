@@ -1049,11 +1049,49 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
 
 
 
-.agent-activity { color: var(--text-dim); font: 13px/22px var(--font-sans); margin: 0 0 14px; }
+.agent-activity { color: var(--text-narration); font: 13px/22px var(--font-sans); margin: 0 0 14px; }
 .agent-activity > summary { cursor: pointer; width: fit-content; padding: 0; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.agent-activity-status { margin-left: 12px; font-size: 11px; }
+.agent-activity-status { margin-left: 12px; font-size: 12px; }
 .agent-activity-trail { border-left: 1px solid var(--border-color); margin: 8px 0 0 5px; padding-left: 15px; max-width: 390px; }
 .agent-operation { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; }
+.agent-activity > summary {
+  display: grid;
+  grid-template-columns: 106px 18px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 22px;
+  list-style: none;
+}
+.agent-activity > summary::before { content: none; }
+.agent-activity > summary::-webkit-details-marker { display: none; }
+.agent-activity > summary:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 3px; }
+.agent-activity-status { margin: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.activity-time { font-size: 12px; font-variant-numeric: tabular-nums; }
+.activity-motion { display: flex; align-items: center; justify-content: center; gap: 3px; height: 16px; }
+.activity-motion i { width: 3px; height: 8px; border-radius: 3px; background: currentColor; opacity: .7; }
+.agent-activity:is([data-activity-phase="queued"], [data-activity-phase="working"],
+  [data-activity-phase="provider"], [data-activity-phase="tool"], [data-activity-phase="retrying"],
+  [data-activity-phase="compacting"], [data-activity-phase="stopping"]) .activity-motion i {
+  animation: activity-wave 1.5s ease-in-out infinite;
+}
+.activity-motion i:nth-child(2) { animation-delay: .15s; }
+.activity-motion i:nth-child(3) { animation-delay: .3s; }
+@keyframes activity-wave {
+  0%, 100% { transform: translateY(2px) scaleY(.65); opacity: .4; }
+  45% { transform: translateY(-2px) scaleY(1.25); opacity: 1; }
+}
+.activity-actor { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.activity-observation { margin: 0 0 7px; font-size: 12px; white-space: normal; overflow-wrap: anywhere; }
+.activity-observation:empty { display: none; }
+.agent-operation > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.agent-operation > span:last-child { flex-shrink: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .agent-activity .activity-motion i { animation: none !important; transform: none; opacity: .8; }
+}
+@media (max-width: 400px) {
+  .agent-activity > summary { grid-template-columns: 92px 14px minmax(0, 1fr) auto; gap: 5px; font-size: 12px; }
+}
 .agent-thinking { margin: 5px 0; }
 .agent-thinking > summary { cursor: pointer; }
 .thinking-warning { font-size: 11px; margin-left: 6px; }
@@ -3152,6 +3190,34 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
   width: 100%;
   resize: vertical;
 }
+/* Prepared adventures use the same modal surface as Settings. */
+#ready-campaign-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(44rem, 90vw);
+  height: fit-content;
+  max-height: 85vh;
+  overflow: auto;
+  padding: 20px;
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-lg);
+  background: var(--bg-secondary);
+  color: var(--text-narration);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.55);
+  font: inherit;
+}
+#ready-campaign-dialog::backdrop { background: rgba(5, 8, 12, 0.78); backdrop-filter: blur(5px); }
+#ready-campaign-dialog h2 { margin-bottom: .6rem; color: var(--text-bright); font: 600 1.45rem/1.2 var(--font-serif); }
+#ready-campaign-dialog h3 { margin-top: 1rem; color: var(--text-bright); font-size: 1rem; }
+#ready-campaign-dialog p { margin: .6rem 0; }
+#ready-campaign-dialog label { display: block; margin-top: .8rem; }
+#ready-campaign-dialog select, #ready-campaign-name { width: 100%; }
+#ready-campaign-party { padding-left: 1.2rem; }
+#ready-campaign-party li { margin: .8rem 0; }
+.ready-character-profile { white-space: pre-wrap; overflow-wrap: anywhere; }
+.ready-campaign-actions { display: flex; gap: .6rem; flex-wrap: wrap; justify-content: flex-end; margin-top: 1rem; }
+
 /* Character previews stay inside the existing Interview party chooser. */
 #starter-character-preview[hidden],
 .construction-fields .btn[hidden] {
@@ -3163,3 +3229,8 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
   overflow-wrap: anywhere;
   font: inherit;
 }
+
+.desktop-updates [hidden] { display: none; }
+.desktop-updates pre { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; }
+.desktop-updates progress { width: 100%; }
+.desktop-update-actions { display: flex; gap: .6rem; flex-wrap: wrap; }

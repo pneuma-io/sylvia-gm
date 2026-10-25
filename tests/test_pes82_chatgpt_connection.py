@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import subprocess
 import sys
+import threading
 from pathlib import Path
 from typing import Any
 
@@ -86,6 +88,65 @@ def test_rpc_errors_do_not_expose_server_text(rpc_child: CodexConnection) -> Non
     with pytest.raises(CodexConnectionError) as error:
         rpc_child.call("synthetic/error", {})
     assert "private-sentinel" not in str(error.value)
+
+
+def test_rpc_observes_boot_and_initialize_without_protocol_content(
+    rpc_child: CodexConnection,
+) -> None:
+    spans: list[tuple[str, int, int, str]] = []
+    rpc_child.set_lifecycle_observer(lambda *span: spans.append(span))
+    rpc_child.start()
+    assert [span[0] for span in spans] == ["process_boot", "initialize"]
+    assert all(start <= end and status == "completed" for _, start, end, status in spans)
+    assert spans[0][2] <= spans[1][1]
+    rpc_child.start()
+    assert len(spans) == 2
+
+
+def test_rpc_observer_failure_does_not_change_connection(rpc_child: CodexConnection) -> None:
+    def fail(*args: object) -> None:
+        raise ValueError("private-sentinel")
+
+    rpc_child.set_lifecycle_observer(fail)
+    rpc_child.start()
+    assert rpc_child.call("account/read", {}) == {"denied": True}
+
+
+@pytest.mark.asyncio
+async def test_cancel_pending_rpc_collects_the_actual_synthetic_child(
+    rpc_child: CodexConnection, tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from tests.test_chatgpt_cancel_boundaries import provider_for
+
+    entered = threading.Event()
+    original_call, original_write = rpc_child.call, rpc_child._write
+
+    def call(method: str, params: dict[str, Any], **kwargs: Any) -> dict[str, Any]:
+        if method == "account/read":
+            return original_call("synthetic/hang", {}, timeout=10)
+        return original_call(method, params, **kwargs)
+
+    def write(message: dict[str, Any]) -> None:
+        original_write(message)
+        if message.get("method") == "synthetic/hang":
+            entered.set()
+
+    monkeypatch.setattr(rpc_child, "call", call)
+    monkeypatch.setattr(rpc_child, "_write", write)
+    provider = provider_for(rpc_child, tmp_path)
+    task = asyncio.create_task(provider.generate([]))
+    try:
+        assert await asyncio.to_thread(entered.wait, 3)
+        child = rpc_child._process
+        assert child is not None and child.poll() is None
+        task.cancel()
+        with pytest.raises(asyncio.CancelledError):
+            await asyncio.wait_for(task, 3)
+        assert child.poll() is not None
+        assert rpc_child._process is None and provider._active is None
+    finally:
+        rpc_child.request_stop()
+        rpc_child.close()
 
 
 def test_timed_out_connection_can_restart_without_stale_responses(

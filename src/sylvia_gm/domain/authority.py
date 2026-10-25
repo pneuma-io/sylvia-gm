@@ -180,6 +180,11 @@ def validate_authority_identity(
 def owned_json_value(value: object) -> FrozenJsonValue:
     """Capture one recursively owned, immutable, JSON-compatible semantic value."""
 
+    # Exact scalar leaves need no container probes; subclasses retain Mapping precedence.
+    if value is None or type(value) is str or type(value) is bool or type(value) is int:
+        return value
+    if type(value) is float and math.isfinite(value):
+        return value
     if isinstance(value, Mapping):
         captured: list[tuple[str, FrozenJsonValue]] = []
         for key, item in value.items():
@@ -208,6 +213,10 @@ def owned_payload(value: object) -> SafePayload:
 def thaw_json_value(value: object) -> JsonValue:
     """Materialize immutable owned JSON as plain dict/list values for serialization."""
 
+    if value is None or type(value) is str or type(value) is bool or type(value) is int:
+        return value
+    if type(value) is float and math.isfinite(value):
+        return value
     if isinstance(value, Mapping):
         return {str(key): thaw_json_value(item) for key, item in value.items()}
     if isinstance(value, Sequence) and not isinstance(value, (str, bytes, bytearray)):

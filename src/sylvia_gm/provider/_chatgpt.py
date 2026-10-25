@@ -24,7 +24,11 @@ from sylvia_gm.provider._base import (
     TokenUsage,
     ToolCall,
 )
-from sylvia_gm.provider._codex_rpc import CodexConnection, CodexConnectionError
+from sylvia_gm.provider._codex_rpc import (
+    CodexCancelledError,
+    CodexConnection,
+    CodexConnectionError,
+)
 from sylvia_gm.provider._context_capacity import resolve_context_capacity
 from sylvia_gm.provider._exceptions import (
     AuthenticationError,
@@ -39,6 +43,7 @@ from sylvia_gm.provider._exceptions import (
     TokenLimitError,
 )
 from sylvia_gm.provider._hooks import HookContext
+from sylvia_gm.provider._lifecycle import LifecycleTiming
 from sylvia_gm.provider._openai_compat import ResponsesTransport
 
 
@@ -61,6 +66,30 @@ class ChatGPTProvider(Provider):
         self._lock = asyncio.Lock()
         self._active: CodexConnection | None = None
         self._last_response = ProviderResponse()
+
+    def _request_stop(self, connection: CodexConnection) -> None:
+        cancel = getattr(connection, "request_stop", None)
+        if callable(cancel):
+            cancel()
+
+    def _check_stopped(self, connection: CodexConnection) -> None:
+        check = getattr(connection, "_check_stopped", None)
+        if callable(check):
+            check()
+
+    async def _close_owned(self, connection: CodexConnection) -> None:
+        """Collect the retained child before propagating repeated caller cancellation."""
+        closing = asyncio.create_task(asyncio.to_thread(connection.close))
+        interrupted: asyncio.CancelledError | None = None
+        while not closing.done():
+            try:
+                await asyncio.shield(closing)
+            except asyncio.CancelledError as error:
+                interrupted = error
+                self._request_stop(connection)
+        closing.result()
+        if interrupted is not None:
+            raise interrupted
 
     @property
     def model_info(self) -> ModelInfo:
@@ -161,6 +190,7 @@ class ChatGPTProvider(Provider):
         **kwargs: object,
     ) -> AsyncIterator[ProviderStreamChunk]:
         async with self._lock:
+            timing = LifecycleTiming()
             converted = ResponsesTransport().format_request(
                 self.model_info.wire_model_id,
                 messages,
@@ -203,12 +233,31 @@ class ChatGPTProvider(Provider):
                 dynamic_tools=allowed,
             )
             self._active = connection
+            observe = getattr(connection, "set_lifecycle_observer", None)
+            if callable(observe):
+                observe(lambda name, start, end, status: timing.record(
+                    name, start, end, status, parent="runtime_start",
+                ))
             response = ProviderResponse(model=self.model_info.wire_model_id, usage_reported=False)
             text_parts: list[str] = []
             thread_id: str | None = None
             turn_id: str | None = None
+            status = "error"
+            stream_start: int | None = None
+
+            def end_stream(outcome: str) -> None:
+                nonlocal stream_start
+                if stream_start is not None:
+                    timing.record("turn_stream", stream_start, time.perf_counter_ns(), outcome)
+                    stream_start = None
+
+            async def stop() -> None:
+                with timing.measure("shutdown"):
+                    await self._close_owned(connection)
+
             try:
-                await asyncio.to_thread(connection.start)
+                with timing.measure("runtime_start"):
+                    await asyncio.to_thread(connection.start)
                 await self._audit(
                     "sylvia/runtime_controls",
                     {
@@ -220,9 +269,10 @@ class ChatGPTProvider(Provider):
                         },
                     },
                 )
-                account = await asyncio.to_thread(
-                    connection.call, "account/read", {"refreshToken": True}
-                )
+                with timing.measure("account_read"):
+                    account = await asyncio.to_thread(
+                        connection.call, "account/read", {"refreshToken": False}
+                    )
                 if (
                     not isinstance(account.get("account"), dict)
                     or account["account"].get("type") != "chatgpt"
@@ -251,7 +301,8 @@ class ChatGPTProvider(Provider):
                     else [],
                 }
                 await self._audit("thread/start", start)
-                thread = await asyncio.to_thread(connection.call, "thread/start", start)
+                with timing.measure("thread_start"):
+                    thread = await asyncio.to_thread(connection.call, "thread/start", start)
                 await self._audit("thread/start/result", thread, received=True)
                 actual_model = thread.get("model")
                 if isinstance(actual_model, str) and actual_model != self.model_info.wire_model_id:
@@ -259,7 +310,10 @@ class ChatGPTProvider(Provider):
                 thread_id = thread["thread"]["id"]
                 inject = {"threadId": thread_id, "items": items}
                 await self._audit("thread/inject_items", inject)
-                injected = await asyncio.to_thread(connection.call, "thread/inject_items", inject)
+                with timing.measure("history_injection"):
+                    injected = await asyncio.to_thread(
+                        connection.call, "thread/inject_items", inject,
+                    )
                 await self._audit("thread/inject_items/result", injected, received=True)
                 turn: dict[str, Any] = {
                     "threadId": thread_id,
@@ -270,10 +324,12 @@ class ChatGPTProvider(Provider):
                 if kwargs.get("reasoning_effort") is not None:
                     turn["effort"] = kwargs["reasoning_effort"]
                 await self._audit("turn/start", turn)
-                started = await asyncio.to_thread(connection.call, "turn/start", turn)
+                with timing.measure("turn_start"):
+                    started = await asyncio.to_thread(connection.call, "turn/start", turn)
                 await self._audit("turn/start/result", started, received=True)
                 turn_id = started["turn"]["id"]
                 last_event = time.monotonic()
+                stream_start = time.perf_counter_ns()
                 while True:
                     event = await asyncio.to_thread(connection.next_event)
                     if event is None:
@@ -296,6 +352,7 @@ class ChatGPTProvider(Provider):
                         ("account/", "remoteControl/")
                     ):
                         await self._audit(method, params, received=True)
+                    self._check_stopped(connection)
                     if method == "model/rerouted":
                         raise ModelNotFoundError(
                             "ChatGPT routed to a different model; Sylvia stopped the response."
@@ -335,7 +392,9 @@ class ChatGPTProvider(Provider):
                         response.tool_calls = [ToolCall(id=call_id, name=name, arguments=arguments)]
                         response.finish_reason = "tool_calls"
                         # Stop the runtime before the owner can execute this returned call.
-                        await asyncio.to_thread(connection.close)
+                        end_stream("completed")
+                        await stop()
+                        self._check_stopped(connection)
                         yield ProviderStreamChunk(
                             tool_call_delta={
                                 "index": 0,
@@ -373,7 +432,8 @@ class ChatGPTProvider(Provider):
                         break
                 # Tool admission has already stopped this owned child. Preserve any usage
                 # notification received around shutdown without starting another model call.
-                await asyncio.to_thread(connection.close)
+                end_stream("completed")
+                await stop()
                 drain = getattr(connection, "notifications", None)
                 if callable(drain):
                     for pending in drain():
@@ -381,7 +441,6 @@ class ChatGPTProvider(Provider):
                                 and isinstance(pending.get("params"), dict)):
                             self._capture_usage(response, pending["params"], thread_id, turn_id)
                 response.content = "".join(text_parts) or None
-                self._last_response = response
                 await self.hooks.fire_on_response(
                     HookContext(
                         provider_key="chatgpt_subscription",
@@ -390,14 +449,32 @@ class ChatGPTProvider(Provider):
                         stream=True,
                     )
                 )
+                self._check_stopped(connection)
+                self._last_response = response
+                status = "completed"
                 yield ProviderStreamChunk(finish_reason=response.finish_reason)
+            except (asyncio.CancelledError, GeneratorExit):
+                if status != "completed":
+                    status = "cancelled"
+                    self._request_stop(connection)
+                raise
+            except CodexCancelledError:
+                if status != "completed":
+                    status = "cancelled"
+                raise asyncio.CancelledError("The ChatGPT response was cancelled.") from None
             except CodexConnectionError as error:
                 raise ProviderConnectionError(str(error)) from None
             finally:
                 # Closing the owned child cancels unresolved runtime calls and ephemeral history.
-                await asyncio.to_thread(connection.close)
-                self._active = None
+                end_stream(status)
+                try:
+                    await stop()
+                finally:
+                    self._active = None
+                    await self._audit("sylvia/provider_lifecycle", timing.snapshot(status))
 
     async def close(self) -> None:
-        if self._active is not None:
-            await asyncio.to_thread(self._active.close)
+        connection = self._active
+        if connection is not None:
+            self._request_stop(connection)
+            await self._close_owned(connection)

@@ -1,6 +1,7 @@
 {
   "format": 1,
   "files": [
+    "src/sylvia_gm/campaign/ready-campaigns.json",
     "src/sylvia_gm/campaign/srd-starters.json",
     "src/sylvia_gm/campaign/the-rift-awakening.json",
     "campaign-settings/severed-lands/ATTRIBUTION.md",

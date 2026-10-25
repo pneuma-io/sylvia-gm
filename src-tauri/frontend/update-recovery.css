@@ -1,0 +1,28 @@
+.update-recovery {
+  max-width: 44rem;
+  margin: 3rem auto;
+  padding: 1.5rem;
+  color: var(--text-narration);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+}
+.update-recovery h1, .update-recovery h2 { color: var(--text-bright); }
+.update-recovery [hidden] { display: none !important; }
+.update-recovery fieldset { margin: 1.5rem 0; border: 1px solid var(--border-color); }
+.update-recovery label { display: block; margin: 1rem 0; }
+.update-recovery input { margin-right: .5rem; }
+.update-recovery button {
+  padding: .65rem 1rem;
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text-bright);
+  font: inherit;
+  cursor: pointer;
+}
+.update-recovery button:disabled { opacity: .5; cursor: default; }
+.update-recovery :focus-visible { outline: 2px solid var(--accent-primary-bright); outline-offset: 3px; }
+.recovery-actions { display: flex; flex-wrap: wrap; gap: .75rem; }
+#recovery-confirm { margin-top: 2rem; padding: 1rem; border: 1px solid var(--border-accent); }
+#recovery-cancel { margin-left: .75rem; }
+@media (max-width: 42rem) { .update-recovery { margin: 0; padding: 1rem; } }

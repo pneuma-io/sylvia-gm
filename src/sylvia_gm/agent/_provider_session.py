@@ -3142,6 +3142,7 @@ class ProviderSessionAdapter:
             )
             state_changing_call_submitted = False
             for position, assembly in enumerate(ordered):
+                provider_input.control.progress.update("tool", assembly.name)
                 if assembly.name == "read_session_history":
                     try:
                         history_parameters = json.loads(assembly.arguments or "{}")
@@ -3971,6 +3972,7 @@ class ProviderSessionAdapter:
                         ),
                     },
                 )
+            provider_input.control.progress.update("working")
             if round_has_any_commit:
                 any_commit_in_exchange = True
                 if round_leaves_player_intent_pending:
@@ -3986,6 +3988,7 @@ class ProviderSessionAdapter:
             if round_has_any_commit:
                 pending_narration_facts.extend(round_narration_facts)
             if round_failed:
+                provider_input.control.progress.expect_correction()
                 if round_has_non_narrative_call:
                     buffered_narration = None
                     buffered_response_blocks = None
@@ -5648,6 +5651,7 @@ class ProviderSessionAdapter:
                         output_budget["temperature"] = 0
                 if getattr(model_info, "transport", None) == "codex_app_server":
                     output_budget.pop("max_tokens", None)
+                control.progress.update("provider")
                 stream_or_awaitable: object = provider.generate_stream(
                     messages,
                     tools=tools or None,
@@ -5702,6 +5706,7 @@ class ProviderSessionAdapter:
                     raise item.error
                 if not isinstance(item, ProviderStreamChunk):
                     raise TypeError("Provider stream returned an invalid chunk")
+                control.progress.observe()
                 yield item
         finally:
             if not future.done():

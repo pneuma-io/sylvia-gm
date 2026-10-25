@@ -129,6 +129,7 @@ def campaign_plan_sources(
             path,
         )
 
+    primary_record = owner.package_record(primary.package_id, primary.version, primary.sha256)
     return CampaignPlanToolAuthority(
         ruleset=PackageBinding(primary.package_id, primary.version, primary.sha256),
         setting=PackageBinding(setting.package_id, setting.version, setting.sha256),
@@ -136,16 +137,8 @@ def campaign_plan_sources(
         setting_paths=setting_paths,
         read_setting=read_setting,
         setting_knowledge_ids=setting_knowledge_ids,
-        participant_schemas=tuple(
-            owner.package_record(primary.package_id, primary.version, primary.sha256).get(
-                "participant_artifacts", ()
-            )
-        ),
-        state_schemas=tuple(
-            owner.package_record(primary.package_id, primary.version, primary.sha256).get(
-                "state_schemas", (),
-            )
-        ),
+        participant_schemas=tuple(primary_record.get("participant_artifacts", ())),
+        state_schemas=tuple(primary_record.get("state_schemas", ())),
         setting_character_schema=(
             parse_setting_character_requirements(read_setting(CHARACTER_REQUIREMENTS_PATH))
             if CHARACTER_REQUIREMENTS_PATH in setting_paths else None

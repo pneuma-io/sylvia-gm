@@ -6,7 +6,7 @@ import pytest
 
 from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.domain.authority import PackageLock
-from sylvia_gm.domain.errors import CommandRejected, StaleRevision
+from sylvia_gm.domain.errors import CommandRejected, IdempotencyConflict, StaleRevision
 from sylvia_gm.domain.session import SessionMessageKind
 
 
@@ -15,6 +15,32 @@ def new_draft(owner):
         operation_id="new-interview", display_name="Unfinished campaign",
         builder_session_id="interview", builder_provider_id="test", builder_model_id="test",
     )
+
+
+def test_ready_customization_draft_retry_preserves_one_interview_and_its_model(tmp_path):
+    database = tmp_path / "customization-retry.db"
+    request = {
+        "operation_id": "ready-custom-one-draft",
+        "display_name": "New campaign interview",
+        "builder_session_id": "session-guided-custom-one",
+        "builder_provider_id": "original-provider",
+        "builder_model_id": "original-model",
+    }
+    with AuthorityOwner.open(database, "customization") as owner:
+        draft = owner.create_guided_campaign_draft(**request)
+        before = owner.session_context(draft.builder_session_id)
+        assert owner.create_guided_campaign_draft(**request).campaign_id == draft.campaign_id
+        assert owner.session_context(draft.builder_session_id) == before
+        assert len(owner.campaign_index()) == 1
+    with AuthorityOwner.open(database, "customization-reopened") as owner:
+        assert owner.create_guided_campaign_draft(**request).campaign_id == draft.campaign_id
+        assert owner.session_context(draft.builder_session_id) == before
+        with pytest.raises(IdempotencyConflict):
+            owner.create_guided_campaign_draft(
+                **{**request, "builder_provider_id": "changed-provider"}
+            )
+        assert owner.session_context(draft.builder_session_id) == before
+        assert len(owner.campaign_index()) == 1
 
 
 @pytest.mark.parametrize("manual_title", ["My campaign planning", "New campaign interview"])

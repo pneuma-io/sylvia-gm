@@ -35,6 +35,12 @@ SRD Lite is based on the D&D SRD 5.2.1, with 117 supported spells and a delibera
 scope. Consumables are outside this Lite release. Severed Lands supplies the included setting and
 adventures.
 
+Home's **Ready campaigns** previews four existing adventures with complete prepared parties:
+A Debt in Iron, Last Cart Through, The Cartographer's Wake and The Rift Awakening.
+Start creates an independent campaign without character creation or starting level-ups.
+Choose **Customize** to save editable party copies and use the ordinary Campaign Interview.
+Provider setup and the Game Master's first response remain separate from local preparation.
+
 Custom content uses three building blocks: Rulesets define mechanics, Campaign Settings define
 the world, and Campaign Plans define an adventure. Builder helps you create and refine that content
 for use in a compatible campaign.

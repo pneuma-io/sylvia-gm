@@ -262,6 +262,10 @@ class StreamEvent:
 # ═══════════════════════════════════════════════════════════════
 
 
+def _ignore_activity(_phase: str, _tool: str | None = None) -> None:
+    """Keep activity optional for callers that do not display response progress."""
+
+
 class AgentRunner:
     """Run Builder turns with injected tools, prompt, and session history.
 
@@ -272,6 +276,23 @@ class AgentRunner:
     # Reference lookup, authoring, and validation need room within one bounded Builder turn.
     MAX_TOOL_LOOP = 32
     MAX_TOOL_CONTINUATIONS = 2
+    _activity_progress: Callable[[str, str | None], None]
+    _activity_retry: bool
+
+    def _activity_provider_started(self) -> None:
+        """A correction becomes Retrying only when the following request starts."""
+        self._activity_progress("retrying" if self._activity_retry else "provider", None)
+        self._activity_retry = False
+
+    def _activity_tool_finished(self, result: Any) -> None:
+        if isinstance(result, dict):
+            failed = result.get("success") is False or result.get("status") in {
+                "rejected", "failed", "error",
+            }
+        else:
+            failed = getattr(result, "success", None) is False
+        self._activity_retry = self._activity_retry or failed
+        self._activity_progress("working", None)
 
     def _builder_stream_options(self) -> dict[str, Any]:
         """Apply the visible Builder budget and selected-model reasoning options."""
@@ -319,12 +340,15 @@ class AgentRunner:
         available_companions: dict | None = None,  # T145
         builder_application_tools: Sequence[ToolSpec] = (),
         allow_public_web: bool = False,
+        activity_progress: Callable[[str, str | None], None] | None = None,
     ) -> None:
         if mode == AgentMode.DM_SESSION:
             raise ValueError(
                 "Legacy AgentRunner DM_SESSION is retired; use the canonical "
                 "CampaignSessionLoop stateless MCP path"
             )
+        self._activity_progress = activity_progress or _ignore_activity
+        self._activity_retry = False
         self._mode = mode
         self._provider = provider
         self._history_path = history_path
@@ -630,6 +654,7 @@ class AgentRunner:
         budget = _BuilderLoopBudget(self.MAX_TOOL_LOOP, self.MAX_TOOL_CONTINUATIONS)
         for _iteration in range(budget.total_rounds):
             budget.before_round(messages, _iteration)
+            self._activity_provider_started()
             # DM mode: use overflow-aware generate on first iteration
             if self._mode == AgentMode.DM_SESSION and _iteration == 0:
                 response, was_truncated_retry = await self._turn_with_overflow_recovery(
@@ -643,6 +668,7 @@ class AgentRunner:
                     messages=messages, tools=tools, **self._builder_stream_options(),
                 )
 
+            self._activity_progress("working", None)
             if response.content and not response.tool_calls:
                 # Store assistant response
                 assistant_entry = {"role": "assistant", "content": response.content}
@@ -722,7 +748,9 @@ class AgentRunner:
                     logger.debug("tool_call name=%s args=%s", tc.name, args_preview)
 
                     # Execute tool (mode-dispatched)
+                    self._activity_progress("tool", tc.name)
                     tool_result = await self._execute_tool(tc.name, params)
+                    self._activity_tool_finished(tool_result)
                     tool_calls_made.append(tc.name)
 
                     assistant_msg["tool_calls"].append(
@@ -933,11 +961,13 @@ class AgentRunner:
                 user_msgs = [m.get("content", "")[:80] for m in messages if m.get("role") == "user"]
                 logger.debug(f"turn_stream: builder user messages ({len(user_msgs)}): {user_msgs}")
 
+            self._activity_provider_started()
             async for chunk in self._provider.generate_stream(
                 messages=messages,
                 tools=tools,
                 **self._builder_stream_options(),
             ):
+                self._activity_progress("working", None)
                 if chunk.chat_completion_metadata is not None:
                     native_chat_metadata = chunk.chat_completion_metadata
                 if chunk.anthropic_content is not None:
@@ -1129,7 +1159,9 @@ class AgentRunner:
                 except json.JSONDecodeError:
                     tool_args = {}
 
+                self._activity_progress("tool", tool_name)
                 tool_result = await self._execute_tool(tool_name, tool_args)
+                self._activity_tool_finished(tool_result)
                 round_results.append(tool_result)
                 tool_calls_made.append(tool_name)
 
@@ -2321,6 +2353,7 @@ class AgentRunner:
             # Re-stream with compressed messages
             full_reasoning = ""
             private_response_id = f"provider-response-{uuid4().hex}"
+            self._activity_provider_started()
             async for chunk in self._provider.generate_stream(
                 messages=compressed_messages,
                 tools=tools,

@@ -9,7 +9,7 @@ const { webcrypto } = require('node:crypto');
 for (const homeVisible of [true, false]) {
   test(`Campaign creation failure is visible with Home ${homeVisible ? 'open' : 'closed'}`, async () => {
     const source = fs.readFileSync(path.join(__dirname, '../src-tauri/frontend/app.js'), 'utf8');
-    const start = source.indexOf('  async function startCampaignBuilder() {');
+    const start = source.indexOf('  async function startCampaignBuilder(');
     const end = source.indexOf('  async function beginConstruction()', start);
     assert.ok(start >= 0 && end > start);
     const nodes = {

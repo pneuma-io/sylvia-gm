@@ -14,6 +14,7 @@ Supports:
 
 from __future__ import annotations
 
+from functools import lru_cache
 from typing import Any
 
 from sylvia_gm.runtime._collections import FUNCTIONS as COLLECTION_FUNCTIONS
@@ -433,6 +434,14 @@ def _check_numeric_op(op: str, left: Any, right: Any) -> None:
         raise ExpressionError(f"Cannot use '{op}' with null")
 
 
+@lru_cache(maxsize=1024)
+def _evaluation_expression(expression: str) -> ASTNode:
+    """Retain successful syntax only; public parsing still returns independent mutable ASTs."""
+    from sylvia_gm.runtime._expression_parser import parse_expression
+
+    return parse_expression(expression)
+
+
 def evaluate_expression(expr_str: str, context: ExecutionContext) -> Any:
     """Parse and evaluate an expression string against a context.
 
@@ -448,9 +457,7 @@ def evaluate_expression(expr_str: str, context: ExecutionContext) -> Any:
     Raises:
         ExpressionError: On parse or evaluation failures.
     """
-    from sylvia_gm.runtime._expression_parser import parse_expression
-
-    node = parse_expression(expr_str)
+    node = _evaluation_expression(expr_str)
     return evaluate(node, context)
 
 

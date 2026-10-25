@@ -187,6 +187,7 @@ class LocalOwnerSupervisor:
         self._handshake_verified = False
         self._owner_lock_held = False
         self._shutdown = False
+        self._desktop_update_operation: str | None = None
         self._lifecycle_lock = threading.RLock()
 
     # ------------------------------------------------------------------
@@ -243,6 +244,7 @@ class LocalOwnerSupervisor:
         self,
         database_path: Path,
         owner_id: str,
+        *, before_migration: Callable[[], None] | None = None,
     ) -> OwnerCredential:
         """Open the authority owner and arm the launch handshake.
 
@@ -261,6 +263,7 @@ class LocalOwnerSupervisor:
                 database_path,
                 owner_id,
                 disconnect_grace_seconds=self._disconnect_grace_seconds,
+                before_migration=before_migration,
             )
             # The store acquired the OS lock — remember to release on failure.
             self._owner_lock_held = True
@@ -886,7 +889,8 @@ class LocalOwnerSupervisor:
             timer=None,
         )
         with self._lifecycle_lock:
-            if self._shutdown:
+            blocked_for_update = self._desktop_update_operation is not None
+            if self._shutdown or blocked_for_update:
                 shutdown_rejected = True
             else:
                 shutdown_rejected = False
@@ -906,6 +910,11 @@ class LocalOwnerSupervisor:
                 logger.warning(
                     "Narration cancellation raised during rejected lease publication",
                     exc_info=True,
+                )
+            if blocked_for_update:
+                raise CommandRejected(
+                    "Update preparation blocks narration-work admission",
+                    code="update_in_progress",
                 )
             raise CommandRejected("Owner shutdown blocks narration-work admission")
 
@@ -935,6 +944,11 @@ class LocalOwnerSupervisor:
         with self._lifecycle_lock:
             if self._shutdown:
                 raise CommandRejected("Owner shutdown blocks provider-work admission")
+            if self._desktop_update_operation is not None:
+                raise CommandRejected(
+                    "Update preparation blocks provider-work admission",
+                    code="update_in_progress",
+                )
             with self._provider_work_lock:
                 self._provider_work[(campaign_id, attempt_id)] = lease
                 self._arm_provider_attachment_timer(lease)
@@ -1287,6 +1301,42 @@ class LocalOwnerSupervisor:
     # ------------------------------------------------------------------
     # Shutdown
     # ------------------------------------------------------------------
+
+    def begin_desktop_update(self, operation_id: str) -> None:
+        """Reserve an idle owner without stopping work or changing committed game state."""
+        if (
+            not isinstance(operation_id, str)
+            or len(operation_id) != 32
+            or any(char not in "0123456789abcdef" for char in operation_id)
+        ):
+            raise CommandRejected("Update identity is invalid", code="invalid_update_operation")
+        with self._lifecycle_lock:
+            self._require_verified_owner()
+            if self._desktop_update_operation is not None:
+                if self._desktop_update_operation == operation_id:
+                    return
+                raise CommandRejected("Another update is preparing", code="update_in_progress")
+            with self._leases_lock, self._provider_work_lock:
+                if self._leases or self._provider_work:
+                    raise CommandRejected(
+                        "Finish or explicitly stop active GM and Builder work before updating",
+                        code="update_busy",
+                    )
+                self._desktop_update_operation = operation_id
+
+    def desktop_update_operation(self) -> str | None:
+        with self._lifecycle_lock:
+            return self._desktop_update_operation
+
+    def abort_desktop_update(self, operation_id: str) -> None:
+        """Release only the selected reservation; no model input is replayed or retried."""
+        with self._lifecycle_lock:
+            self._require_verified_owner()
+            if self._desktop_update_operation != operation_id:
+                raise CommandRejected(
+                    "This update reservation is stale", code="stale_update_operation"
+                )
+            self._desktop_update_operation = None
 
     def shutdown(self) -> None:
         """Cancel all narration leases and close the owner process."""

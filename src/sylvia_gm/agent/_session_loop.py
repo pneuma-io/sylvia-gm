@@ -10,6 +10,7 @@ from dataclasses import dataclass, field, replace
 from enum import StrEnum
 from typing import TypeVar, cast
 
+from sylvia_gm.agent._activity import AttemptProgress
 from sylvia_gm.agent._builder_question_answers import builder_question_answer_content
 from sylvia_gm.agent._runner import AgentLoopError
 from sylvia_gm.agent._stateless_mcp import ModelMechanicsTool, StatelessMcpMechanics
@@ -286,6 +287,7 @@ class ProviderControl:
     """Injected cancellation/steering control containing no persistence handle."""
 
     def __init__(self) -> None:
+        self.progress = AttemptProgress()
         self._cancelled = threading.Event()
         self._cancel_lock = threading.Lock()
         self._cancel_count = 0
@@ -298,6 +300,7 @@ class ProviderControl:
     def set_status_hint(self, text: str | None) -> None:
         """Expose application progress only; callers never pass model-generated text here."""
         self._status_hint = text
+        self.progress.update("compacting" if text else "working")
 
     @property
     def status_hint(self) -> str | None:
@@ -326,6 +329,7 @@ class ProviderControl:
                 return
             self._cancelled.set()
             self._cancel_count += 1
+            self.progress.update("stopping")
 
     def wait_cancelled(self, timeout: float | None = None) -> bool:
         return self._cancelled.wait(timeout)
@@ -420,6 +424,7 @@ class _ActiveRun:
     campaign_id: str
     attempt_id: str
     control: ProviderControl = field(default_factory=ProviderControl)
+    basis_message_id: str | None = None
     _projection_lock: threading.Lock = field(default_factory=threading.Lock)
     _provisional: list[dict[str, object]] = field(default_factory=list)
     _segment_ordinal: int = 0
@@ -663,6 +668,7 @@ class CampaignSessionLoop:
             campaign_id=context.session.session_id,
             attempt_id=request.attempt_id,
             control=provider_input.control,
+            basis_message_id=request.message_id,
         )
         with self._active_lock:
             if request.session_id in self._stop_requested:
@@ -702,6 +708,10 @@ class CampaignSessionLoop:
                     "kind": "builder_attempt_terminal",
                     "attempt_id": request.attempt_id,
                     "status": status,
+                    "activity_timing": self._finish_activity(
+                        request.session_id, request.attempt_id,
+                        "failed" if status == "interrupted" else status,
+                    ),
                     **({"reason_code": reason_code} if reason_code else {}),
                 },
             )
@@ -713,6 +723,7 @@ class CampaignSessionLoop:
             provider_work_started = True
             stream = active.control.admit(lambda: provider(provider_input))
             for source_order, event in enumerate(stream):
+                active.control.progress.observe()
                 if active.control.cancelled and event.kind not in {
                     ProviderEventKind.EVIDENCE,
                     ProviderEventKind.PRIVATE_REASONING,
@@ -866,6 +877,26 @@ class CampaignSessionLoop:
             "attempt_id": attempt_id,
             "status": "active" if pending else "interrupted",
         }
+
+    def activity_progress(self, session_id: str) -> SafePayload | None:
+        """Read live owner observations without fetching chat or private provider content."""
+        with self._active_lock:
+            active = self._active.get(session_id)
+        if active is None:
+            return None
+        return cast(SafePayload, {
+            "attempt_id": active.attempt_id,
+            "basis_message_id": active.basis_message_id,
+            **active.control.progress.snapshot(),
+        })
+
+    def _finish_activity(self, session_id: str, attempt_id: str, status: str) -> SafePayload:
+        """Freeze timing once, including when Stop and provider unwind share a terminal."""
+        with self._active_lock:
+            active = self._active.get(session_id)
+        if active is None or active.attempt_id != attempt_id:
+            return {}
+        return cast(SafePayload, active.control.progress.finish(status))
 
     def set_builder_chat_archived(self, session_id: str, *, archived: bool) -> BuilderChatRecord:
         """Exclude admitted and queued provider work while changing the saved chat lifecycle."""
@@ -1068,6 +1099,7 @@ class CampaignSessionLoop:
             campaign_id=campaign_id,
             attempt_id=request.attempt_id,
             control=provider_input.control,
+            basis_message_id=request.message_id,
         )
         with self._active_lock:
             if request.session_id in self._stop_requested:
@@ -1095,6 +1127,7 @@ class CampaignSessionLoop:
                 raise CommandRejected("Agent session was stopped before provider admission")
             stream = active.control.admit(lambda: provider(provider_input))
             for source_order, event in enumerate(stream):
+                active.control.progress.observe()
                 if active.control.cancelled:
                     raise CommandRejected("Agent session provider work was cancelled")
                 if event.kind in {
@@ -1145,6 +1178,13 @@ class CampaignSessionLoop:
                     if isinstance(receipt, AwaitingChoiceReceipt):
                         self._owner.complete_narration_attempt(
                             active.campaign_id, active.attempt_id
+                        )
+                        self._record_gm_turn_activity(
+                            session_id=request.session_id,
+                            attempt_id=request.attempt_id,
+                            basis_message_id=request.message_id,
+                            turn_id=request.turn_id,
+                            opening=request.input_kind is SessionInputKind.CAMPAIGN_START,
                         )
                         canonical = self._owner.canonical_replay(
                             active.campaign_id, acknowledged_sequence=initial_high_water
@@ -1296,6 +1336,10 @@ class CampaignSessionLoop:
                 "turn_id": interruption.turn_id,
                 "status": "interrupted",
                 "failure_category": failure_category,
+                "activity_timing": self._finish_activity(
+                    session_id, interruption.failed_attempt_id,
+                    "stopped" if failure_category == "user_cancelled" else "failed",
+                ),
                 "recovery_kind": recovery_kind,
                 "committed_action_id": interruption.last_action_id,
                 "retryable": interruption.retryable,
@@ -1368,6 +1412,7 @@ class CampaignSessionLoop:
                     campaign_id=campaign_id,
                     attempt_id=retry_id,
                     control=active_control,
+                    basis_message_id=basis_message.message_id,
                 )
 
                 def admit_attempt() -> None:
@@ -1497,6 +1542,7 @@ class CampaignSessionLoop:
                     provider = provider_factory(retry_input.turn_id)
                     provider_events = active_control.admit(lambda: provider(provider_input))
                     for source_order, event in enumerate(provider_events):
+                        active_control.progress.observe()
                         if active_control.cancelled:
                             raise CommandRejected("Agent session provider work was cancelled")
                         if event.kind in {
@@ -1595,13 +1641,14 @@ class CampaignSessionLoop:
                     on_attempt_started=admit_attempt,
                 )
                 assert basis_message is not None
-                self._record_gm_turn_activity(
-                    session_id=session_id,
-                    attempt_id=retry_id,
-                    basis_message_id=basis_message.message_id,
-                    turn_id=interruption.turn_id,
-                    opening=basis_message.content.get("kind") == "campaign_start",
-                )
+                if not result.replayed:
+                    self._record_gm_turn_activity(
+                        session_id=session_id,
+                        attempt_id=retry_id,
+                        basis_message_id=basis_message.message_id,
+                        turn_id=interruption.turn_id,
+                        opening=basis_message.content.get("kind") == "campaign_start",
+                    )
                 # Retry can commit a first mechanic as well as narration. Retain the
                 # whole new canonical interval, as the failed-retry path already does.
                 canonical = (
@@ -1612,6 +1659,18 @@ class CampaignSessionLoop:
                 self._owner.append_session_canonical_references(session_id, canonical)
                 return result
         except BaseException as error:
+            with self._active_lock:
+                stop_was_requested = session_id in self._stop_requested
+            was_cancelled = (
+                retry_failure_cancelled
+                if retry_failure_cancelled is not None else stop_was_requested
+            )
+            failure_category = self._failure_category(error, cancelled=was_cancelled)
+            terminal_status = "stopped" if failure_category == "user_cancelled" else "failed"
+            timing = self._finish_activity(session_id, retry_id, terminal_status)
+            if not timing:
+                # Stop can win before this Retry is registered as the active run.
+                timing = cast(SafePayload, active_control.progress.finish(terminal_status))
             if campaign_id is not None:
                 with suppress(Exception):
                     self._owner.finish_private_provider_attempt(
@@ -1621,8 +1680,6 @@ class CampaignSessionLoop:
                     campaign_id, failed_attempt_id=retry_id
                 )
                 if interruption is not None:
-                    with self._active_lock:
-                        stop_was_requested = session_id in self._stop_requested
                     with self._active_lock:
                         self._last_interruption[session_id] = interruption
                     if basis_message is not None:
@@ -1637,14 +1694,8 @@ class CampaignSessionLoop:
                                 "message_id": basis_message.message_id,
                                 "turn_id": interruption.turn_id,
                                 "status": "interrupted",
-                                "failure_category": self._failure_category(
-                                    error,
-                                    cancelled=(
-                                        retry_failure_cancelled
-                                        if retry_failure_cancelled is not None
-                                        else stop_was_requested
-                                    ),
-                                ),
+                                "failure_category": failure_category,
+                                "activity_timing": timing,
                                 "recovery_kind": _recovery_kind(
                                     self._owner.session_context(session_id),
                                     basis_message,
@@ -1803,6 +1854,7 @@ class CampaignSessionLoop:
             content={
                 "kind": "gm_turn_activity",
                 "activity": "campaign_opened" if opening else "turn_completed",
+                "activity_timing": self._finish_activity(session_id, attempt_id, "completed"),
                 "attempt_id": attempt_id,
                 "basis_message_id": basis_message_id,
                 "turn_id": turn_id,

@@ -285,6 +285,69 @@ test('saved extra windows restore during loading without old state, then receive
   assert.equal(bus.windows.size, 0);
 });
 
+test('a fresh app restores two saved frames without replaying old effects or accepting pre-restart messages', async () => {
+  const storage = new Map(), oldBus = transport({ enforceRegisteredContext: true });
+  const previous = renderer(oldBus, 'main', state(), storage);
+  await previous.host.init(); previous.render(); await flush();
+  const placement = { x: -1200, y: 100, width: 650, height: 700 };
+  previous.host.changed({ type: 'move', panelId: 'map', destination: { windowId: 'new', placement } });
+  previous.host.changed({ type: 'move', panelId: 'party', destination: { windowId: 'new' } });
+  await flush();
+  previous.state.characterInspection = {
+    campaignId: 'td', rulesetId: 'td-rules', id: 'bravo', unavailableId: null, expanded: ['alpha', 'bravo'],
+  };
+  previous.host.saveView(previous.state.panelProjection.surfaces[0], {
+    zoom: 1.5, scrollLeft: 80, scrollTop: 40,
+  });
+  await previous.host.publish();
+  const saved = JSON.parse(JSON.stringify(previous.host.snapshot()));
+  const oldContext = oldBus.windows.get(saved.windows[0].id);
+  const oldPacket = oldBus.calls.filter(call => call.command === 'publish_panel_workspace').at(-1).args;
+  previous.host.leave(); await flush();
+  assert.equal(oldBus.windows.size, 0);
+
+  // A new renderer and native transport model process replacement, using only durable storage.
+  const bus = transport({ enforceRegisteredContext: true });
+  const current = renderer(bus, 'main', state(), storage);
+  await current.host.init();
+  current.render(current.host.loading('td', 'gm')); await flush();
+  const loading = bus.calls.filter(call => call.command === 'publish_panel_workspace').at(-1).args;
+  assert.equal(bus.windows.size, 2);
+  assert.notEqual(loading.context.generation, oldContext.generation);
+  assert.equal(loading.payload.projection.surfaces.some(surface => surface.data || surface.actions.length), false);
+  assert.equal(loading.payload.effects.active.length, 0);
+  const windowId = saved.windows[0].id;
+  const child = renderer(bus, windowId, state(), storage, bus.windows.get(windowId));
+  await child.host.init(); await flush();
+  assert.equal(child.state.activeSnapshot, null);
+  current.render({ ...state().panelProjection, revision: 9, shot_effects: [burstRecord(8)] });
+  await flush();
+  assert.deepEqual(JSON.parse(JSON.stringify(current.host.snapshot())), saved);
+  assert.equal(child.state.activeSnapshot.revision, 9);
+  assert.equal(child.state.characterInspection.id, 'bravo');
+  assert.equal(child.state.tacticalViews.map.zoom, 1.5);
+  assert.equal(current.host.effects.snapshot().active.length, 0, 'historical effects must not replay');
+
+  const before = JSON.stringify(current.host.snapshot()), renders = child.renderCount();
+  bus.emit('main', 'panel-window-closed', { context: oldContext, window_id: windowId });
+  bus.emit('main', 'panel-window-message', { context: oldContext, window_id: windowId, payload: {
+    type: 'rpc', request_id: 'before-restart', method: 'layout',
+    args: { type: 'close-window', windowId },
+  } });
+  bus.emit(windowId, 'panel-workspace', { ...oldPacket, window_id: windowId });
+  await flush();
+  assert.equal(JSON.stringify(current.host.snapshot()), before);
+  assert.equal(child.renderCount(), renders);
+  assert.equal(current.dispatches.length, 0);
+  assert.equal(current.selections.length, 0);
+  assert.equal((await child.host.request('snapshot', {})).revision, 9);
+  assert.equal(current.dispatches.length, 1, 'one new request receives one current reply');
+  assert.deepEqual(current.errors, []);
+  assert.deepEqual(child.errors.filter(Boolean), []);
+  current.host.leave(); await flush();
+  assert.equal(bus.windows.size, 0);
+});
+
 test('applying a saved Ruleset layout restores native window placement only on explicit reset', async () => {
   const bus = transport(), storage = new Map();
   const main = renderer(bus, 'main', state(), storage);

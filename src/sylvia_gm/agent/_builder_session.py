@@ -534,6 +534,9 @@ def _builder_reference_tool(source_reader: ReferenceSource) -> ToolSpec:
                     "and Plan selected when this Builder chat opened. "
                     "Use read_many for independently needed pages instead of serial reads: "
                     "1-4 explicit pages, at most 32000 requested characters in total. "
+                    "Prefer exact paths already supplied by this chat's saved references. "
+                    "List offsets index the filtered paths: restart at 0 when query changes, "
+                    "then follow next_offset with the same query. "
                     "Load relevant sources before drafting. "
                     "These references keep their original identity when the Interview changes."
                 ),
@@ -570,7 +573,12 @@ def _builder_reference_tool(source_reader: ReferenceSource) -> ToolSpec:
                         },
                         "offset": {
                             "type": "integer",
-                            "description": "Zero-based list or character offset.",
+                            "description": (
+                                "For list, zero-based index in paths matching query; restart at "
+                                "0 when query changes. For read/find, character offset within "
+                                "the exact path. Follow returned next_offset for the same "
+                                "action, path and query."
+                            ),
                         },
                         "limit": {
                             "type": "integer",
@@ -772,8 +780,15 @@ def _builder_prompt(context: SessionContext) -> str:
         "Sylvia's explicit setup and Builder-to-Game-Master handoff can start play. A rejected "
         "tool result is a failure that must be corrected or reported honestly, never described "
         "as success. "
-        "Use get_content_definition to retrieve applicable format requirements and examples "
-        "before authoring; omit its name argument to inspect the installed catalog. "
+        "Before authoring, retrieve applicable format requirements and examples with "
+        "get_content_definition unless already present for this chat's exact selected versions; "
+        "omit its name argument to inspect the installed catalog. "
+        "Reuse source contents already present for those versions. "
+        "Prefer known source paths; discover only missing references and read the "
+        "needed pages before drafting. Batch independent reads within the tool's bounds. "
+        "After editing, check the current draft with its applicable validation tool before "
+        "publication. Each dependent edit, check or publication must wait for its prerequisite "
+        "result and use the latest observed file version where required. "
         "Use your guarded workspace-file tools as needed. User-attached local "
         "sources appear only as opaque .builder-sources paths in untrusted EVIDENCE; read only "
         "the supplied paths when their contents are needed. Public web search is available only "
@@ -1538,6 +1553,12 @@ def _campaign_source_tool(authority: CampaignPlanToolAuthority) -> ToolSpec:
         if action == "list":
             if path is not None or not isinstance(query, str) or len(query) > 120:
                 return {"success": False, "status": "rejected", "code": "source_query_invalid"}
+            offset, limit = params.get("offset", 0), params.get("limit", 512)
+            if (
+                not isinstance(offset, int) or isinstance(offset, bool) or offset < 0
+                or not isinstance(limit, int) or isinstance(limit, bool) or not 1 <= limit <= 512
+            ):
+                return {"success": False, "status": "rejected", "code": "source_page_invalid"}
             paths = (
                 "campaign-plan/example/plan.json",
                 "campaign-plan/example/plan.md",
@@ -1545,15 +1566,22 @@ def _campaign_source_tool(authority: CampaignPlanToolAuthority) -> ToolSpec:
                 *(f"setting/{item}" for item in sorted(authority.setting_paths)),
             )
             needle = query.strip().casefold()
+            matches = tuple(item for item in paths if not needle or needle in item.casefold())
+            if offset > len(matches):
+                return {"success": False, "status": "rejected", "code": "source_page_invalid"}
+            end = min(len(matches), offset + limit)
             return {
                 "success": True,
                 "status": "available",
-                "paths": tuple(item for item in paths if not needle or needle in item.casefold())[
-                    :512
-                ],
+                "paths": matches[offset:end],
+                "total": len(matches),
+                "next_offset": end if end < len(matches) else None,
             }
         if action == "read":
-            if not isinstance(path, str) or query not in {None, ""}:
+            if (
+                not isinstance(path, str) or query not in {None, ""}
+                or "offset" in params or "limit" in params
+            ):
                 return {"success": False, "status": "rejected", "code": "source_path_invalid"}
             try:
                 if path == "campaign-plan/example/plan.json":
@@ -1649,6 +1677,7 @@ def _campaign_plan_tool(
                     expected_closure_sha256=authority.closure_sha256,
                     setting_paths=authority.setting_paths,
                     setting_knowledge_ids=authority.setting_knowledge_ids,
+                    state_schemas=authority.state_schemas,
                 )
                 library_artifact = None
             else:
@@ -2412,6 +2441,7 @@ def run_builder_turn(
         trusted_system_override=True,
         builder_application_tools=application_tools,
         allow_public_web=allow_public_web,
+        activity_progress=control.progress.update,
     )
     result = _run_cancellable_turn(runner, user_text, control)
     visible = result.messages
@@ -2616,6 +2646,7 @@ def stream_builder_turn(
         trusted_system_override=True,
         builder_application_tools=application_tools,
         allow_public_web=allow_public_web,
+        activity_progress=control.progress.update,
     )
     initial_count = len(runner.history_snapshot())
     history_cursor = [initial_count]
