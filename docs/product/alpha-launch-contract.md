@@ -186,6 +186,19 @@ as the fixed protagonist of A Debt in Iron. The Interview supports
 browsing this collection alongside compatible imported or locally authored Plans using public
 premises, scope and character requirements; private GM preparation is never browsing copy.
 
+Home also offers **Ready campaigns** for four existing adventures with complete prepared parties:
+A Debt in Iron uses Tavin Bell (Fighter 1) and Oren Reed (Cleric 1); Last Cart Through uses
+Bram Alder (Fighter 2) and Oren Reed (Cleric 2); The Cartographer's Wake uses Pip Venn
+(Rogue 2), Bram Alder (Fighter 2) and Oren Reed (Cleric 2); The Rift Awakening uses Neri Vale
+(Bard 1), Bram Alder (Fighter 1) and Oren Reed (Cleric 1). The first named character is the
+Player Character. Preview explains the scenario and party. Start admits an independent editable
+copy through the exact retained content contracts, without model-driven character creation,
+advancement, party assembly or a campaign-authoring interview. Bundled templates, individual
+starters, existing saves and progress remain unchanged. Customize saves independent party files
+for the ordinary Campaign Interview and Builder; the Plan's fixed-character policy still applies.
+Provider configuration and the first live narrative response are separate from loading the local
+prepared state. No campaign is persisted merely by browsing its preview.
+
 Optional Ruleset, Setting and Plan questions follow the three content selections. They come from
 the exact inherited copies the selected Plan will use, or from the selected Setting and its Ruleset
 when no Plan is chosen yet. Reselecting content removes downstream answers from the active path;

@@ -7,7 +7,9 @@ import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
+from sylvia_gm.application.plan_state_admission import validate_starting_declarations
 from sylvia_gm.builder._package_materializer import _reject_reparse_chain
+from sylvia_gm.domain.authority import SafePayload
 from sylvia_gm.domain.campaign_plan import (
     CAMPAIGN_PLAN_BYTE_LIMIT,
     PackageBinding,
@@ -15,6 +17,7 @@ from sylvia_gm.domain.campaign_plan import (
     validate_campaign_plan,
 )
 from sylvia_gm.domain.package_library import canonical_json_bytes
+from sylvia_gm.domain.starting_state import parse_state_schemas
 
 _DRAFT_DIRECTORY = "campaign-plan-draft"
 _PLAN_FILE = "plan.json"
@@ -98,6 +101,7 @@ def publish_campaign_plan_draft(
     expected_closure_sha256: str,
     setting_paths: frozenset[str],
     setting_knowledge_ids: frozenset[str] = frozenset(),
+    state_schemas: tuple[SafePayload, ...] = (),
 ) -> CampaignPlanDraft:
     """Validate a draft, then publish the exact canonical files used by DM handoff."""
 
@@ -109,6 +113,11 @@ def publish_campaign_plan_draft(
         setting_paths=setting_paths,
         setting_knowledge_ids=setting_knowledge_ids,
     )
+    if state_schemas:
+        validate_starting_declarations(
+            draft.plan.payload, expected_ruleset.package_id, expected_ruleset.version,
+            parse_state_schemas(state_schemas),
+        )
     return publish_campaign_plan_files(workspace, draft.plan)
 
 

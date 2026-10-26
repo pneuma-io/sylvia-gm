@@ -75,7 +75,29 @@
     </div>
   </div>
 
-  <!-- Home command centre — campaign orientation without the play sidebar. -->
+  <dialog id="ready-campaign-dialog" aria-labelledby="ready-campaign-title">
+    <h2 id="ready-campaign-title">Ready campaigns</h2>
+    <p>Choose an existing adventure with its complete premade party. No character creation or starting level-ups are needed.</p>
+    <label for="ready-campaign-choice">Adventure</label>
+    <select id="ready-campaign-choice"></select>
+    <p id="ready-campaign-summary"></p>
+    <h3>Your party</h3>
+    <ul id="ready-campaign-party"></ul>
+    <label for="ready-campaign-name">Campaign name</label>
+    <input id="ready-campaign-name" type="text" maxlength="160">
+    <p>Customize saves editable party copies and opens the ordinary campaign interview.
+      You can change your party or edit a copy in Builder. A fixed protagonist remains required
+      unless you revise that adventure's Plan.</p>
+    <p>Provider setup and the Game Master's first response take place separately from loading the prepared state.</p>
+    <p id="ready-campaign-status" role="status" aria-live="polite"></p>
+    <div class="ready-campaign-actions">
+      <button class="btn btn-primary" id="ready-campaign-start" type="button">Start this campaign</button>
+      <button class="btn btn-secondary" id="ready-campaign-customize" type="button">Customize</button>
+      <button class="btn btn-secondary" id="ready-campaign-close" type="button">Close</button>
+    </div>
+  </dialog>
+
+  <!-- Home command centre - campaign orientation without the play sidebar. -->
   <main class="home-view" id="home-view" hidden>
     <header class="home-header">
       <h1 class="home-kicker">Home</h1>
@@ -83,6 +105,9 @@
         <div class="home-actions">
           <button class="btn btn-primary" id="home-new-campaign-btn" type="button">
             New Campaign
+          </button>
+          <button class="btn btn-secondary" id="home-ready-campaign-btn" type="button">
+            Ready campaigns
           </button>
           <button class="btn btn-secondary" id="home-build-btn" type="button">
             Build Something
@@ -175,6 +200,7 @@
           <svg viewBox="0 0 24 12" aria-hidden="true"><path d="M5 4h14M5 8h14"/></svg>
         </button>
         <p id="session-status-text" class="inline-feedback" role="status" aria-live="polite"></p>
+        <p id="desktop-draft-status" class="inline-feedback" role="status" hidden></p>
         <textarea id="player-input" rows="2" placeholder="Type your action…"
                   aria-label="In-character message or action" autocomplete="off" disabled></textarea>
         <div class="dictation-feedback" id="dictation-feedback">
@@ -1022,6 +1048,32 @@
             <p id="application-channel">Release identity unavailable</p>
             <p id="application-signing">Unsigned Alpha prerelease</p>
           </div>
+          <section class="settings-card settings-action-list desktop-updates" id="desktop-updates"
+                   aria-labelledby="desktop-updates-heading" aria-busy="false">
+            <h3 id="desktop-updates-heading">Application updates</h3>
+            <p data-update-role="identity"></p>
+            <p data-update-role="source">Official Sylvia GM releases</p>
+            <p data-update-role="version"></p>
+            <p data-update-role="status" role="status" aria-live="polite">Check when you are ready.</p>
+            <pre data-update-role="notes" aria-label="Release notes" hidden></pre>
+            <progress data-update-role="progress" aria-label="Update download progress" hidden></progress>
+            <p data-update-role="bytes" hidden></p>
+            <div class="desktop-update-actions">
+              <button class="btn btn-secondary" type="button" data-update-role="check">Check for updates</button>
+              <button class="btn btn-primary" type="button" data-update-role="download" hidden>Download update</button>
+              <button class="btn btn-secondary" type="button" data-update-role="cancel" hidden>Cancel download</button>
+              <button class="btn btn-secondary" type="button" data-update-role="defer" hidden>Defer</button>
+              <button class="btn btn-primary" type="button" data-update-role="install" hidden>Update and restart…</button>
+            </div>
+            <div data-update-role="confirm" role="group" aria-label="Confirm update and restart" hidden>
+              <p>Finish or stop active model work before updating. Sylvia must save your drafts,
+                checkpoint your data and close every app window before replacing this copy.</p>
+              <div class="desktop-update-actions">
+                <button class="btn btn-primary" type="button" data-update-role="confirm-install">Update and restart</button>
+                <button class="btn btn-secondary" type="button" data-update-role="not-now">Not now</button>
+              </div>
+            </div>
+          </section>
           <div class="settings-card settings-action-list">
             <h3>Local problem report</h3>
             <p>Sylvia keeps small app diagnostics on this PC for up to seven days, within 1 MiB.
@@ -1082,6 +1134,9 @@
 <script src="dictation.js"></script>
 <script src="support-report.js"></script>
 <script src="local-diagnostics.js"></script>
+<script src="ready-campaigns.js"></script>
+<script src="desktop-updates.js"></script>
+<script src="desktop-drafts.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

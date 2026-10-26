@@ -315,6 +315,10 @@ CAMPAIGN_SOURCE_TOOL_DEFINITION: dict[str, Any] = {
         "description": (
             "List or read the selected Ruleset and Campaign Setting source material before "
             "drafting a Campaign Plan. Paths are package-relative and never machine paths. "
+            "Prefer exact source paths already supplied. List returns at most 512 paths, "
+            "the total matching count and next_offset; null means no later page. "
+            "Continue with the same query and returned next_offset when more paths are needed. "
+            "Restart at offset 0 when query changes. "
             "Use the returned setting/... paths directly with create_campaign_plan_draft."
         ),
         "parameters": {
@@ -322,7 +326,23 @@ CAMPAIGN_SOURCE_TOOL_DEFINITION: dict[str, Any] = {
             "properties": {
                 "action": {"type": "string", "enum": ["list", "read"]},
                 "path": {"type": "string"},
-                "query": {"type": "string"},
+                "query": {
+                    "type": "string", "maxLength": 120,
+                    "description": (
+                        "List only: case-insensitive path filter, at most 120 characters."
+                    ),
+                },
+                "offset": {
+                    "type": "integer", "minimum": 0,
+                    "description": (
+                        "List only: zero-based index in matching paths, default 0. "
+                        "Follow next_offset for the same query; restart at 0 for a new filter."
+                    ),
+                },
+                "limit": {
+                    "type": "integer", "minimum": 1, "maximum": 512,
+                    "description": "List only: maximum returned path count, default 512.",
+                },
             },
             "required": ["action"],
             "additionalProperties": False,

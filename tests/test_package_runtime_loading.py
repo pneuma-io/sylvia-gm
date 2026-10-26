@@ -14,6 +14,57 @@ from tests.test_alpha_f3_package_execution import _runtime_yaml
 
 
 @pytest.mark.parametrize('authoring', [False, True])
+def test_runtime_checks_source_and_expanded_parameter_shape_without_a_duplicate_scan(
+    monkeypatch, authoring,
+):
+    data = yaml.safe_load(_runtime_yaml())
+    data['parameter_declarations'] = {'steps': data['tools']['advance']['parameters'][0]}
+    data['tools']['advance']['parameters'][0] = 'steps'
+    checked = []
+    validate = package_runtime._validate_shape
+
+    def observed(value):
+        checked.append(deepcopy(value))
+        validate(value)
+
+    monkeypatch.setattr(package_runtime, '_validate_shape', observed)
+    package_runtime._clear_runtime_cache()
+    runtime = _parse_runtime(
+        package_id='synthetic.clockwork',
+        runtime_bytes=yaml.safe_dump(data, sort_keys=False).encode(), authoring=authoring,
+    )
+    assert runtime.tools['advance'].parameters[0].name == 'steps'
+    assert len(checked) == 2
+    assert checked[0]['tools']['advance']['parameters'][0] == 'steps'
+    assert checked[1]['tools']['advance']['parameters'][0]['name'] == 'steps'
+
+
+@pytest.mark.parametrize('authoring', [False, True])
+def test_expanded_parameter_references_still_spend_the_full_shape_budget(monkeypatch, authoring):
+    data = yaml.safe_load(_runtime_yaml())
+    data['parameter_declarations'] = {'steps': data['tools']['advance']['parameters'][0]}
+    data['tools']['advance']['parameters'][0] = 'steps'
+    for index in range(12):
+        data['tools'][f'sibling_{index}'] = deepcopy(data['tools']['advance'])
+
+    def nodes(value):
+        children = (
+            value.values() if isinstance(value, dict)
+            else value if isinstance(value, list) else ()
+        )
+        return 1 + sum(nodes(child) for child in children)
+
+    monkeypatch.setattr(package_runtime, '_MAX_RUNTIME_NODES', nodes(data) + 3)
+    package_runtime._clear_runtime_cache()
+    with pytest.raises(PackageRuntimeError, match='too many nodes'):
+        _parse_runtime(
+            package_id='synthetic.clockwork',
+            runtime_bytes=yaml.safe_dump(data, sort_keys=False).encode(), authoring=authoring,
+        )
+    assert not package_runtime._PARSED_RUNTIMES
+
+
+@pytest.mark.parametrize('authoring', [False, True])
 def test_runtime_validates_one_parsed_document_and_reuses_exact_bytes(monkeypatch, authoring):
     """Executable validation must not parse the complete ruleset a second time."""
     source = _runtime_yaml()
@@ -24,7 +75,7 @@ def test_runtime_validates_one_parsed_document_and_reuses_exact_bytes(monkeypatc
         parses.append(stream)
         return original_load(stream, **kwargs)
 
-    _parse_runtime.cache_clear()
+    package_runtime._clear_runtime_cache()
     monkeypatch.setattr(yaml, 'load', counted_load)
     first = _parse_runtime(
         package_id='synthetic.clockwork', runtime_bytes=source, authoring=authoring,
@@ -35,6 +86,35 @@ def test_runtime_validates_one_parsed_document_and_reuses_exact_bytes(monkeypatc
     assert 'advance' in first.tools
     assert second is first
     assert len(parses) == 1
+
+
+def test_execution_reuses_stricter_parse_but_authored_content_is_always_checked(monkeypatch):
+    source = _runtime_yaml()
+    original_load = yaml.load
+    parses = []
+
+    def counted_load(stream, **kwargs):
+        parses.append(stream)
+        return original_load(stream, **kwargs)
+
+    package_runtime._clear_runtime_cache()
+    monkeypatch.setattr(yaml, 'load', counted_load)
+    authored = _parse_runtime(
+        package_id='synthetic.clockwork', runtime_bytes=source, authoring=True,
+    )
+    executed = _parse_runtime(package_id='synthetic.clockwork', runtime_bytes=source)
+    assert executed is authored
+    assert len(parses) == 1
+    # A permissive legacy execution parse must never attest strict authoring validation.
+    duplicate = source + b'tools: {}\n'
+    _parse_runtime(package_id='synthetic.clockwork', runtime_bytes=duplicate)
+    with pytest.raises(PackageRuntimeError, match='YAML is invalid'):
+        _parse_runtime(package_id='synthetic.clockwork', runtime_bytes=duplicate, authoring=True)
+    # Even a one-byte change needs fresh admission; package identity is also part of the key.
+    _parse_runtime(package_id='synthetic.clockwork', runtime_bytes=source + b'\n')
+    with pytest.raises(PackageRuntimeError, match='does not match'):
+        _parse_runtime(package_id='another.ruleset', runtime_bytes=source)
+    assert len(parses) == 5
 
 
 @pytest.mark.parametrize('invalid', [False, True])
@@ -81,7 +161,7 @@ def test_runtime_bounds_yaml_merge_expansion_before_mapping_construction(monkeyp
     )
     source = _runtime_yaml().replace(b'definitions: {}', '\n'.join(definitions).encode())
     monkeypatch.setattr(package_runtime, '_MAX_RUNTIME_NODES', 1024)
-    _parse_runtime.cache_clear()
+    package_runtime._clear_runtime_cache()
 
     def forbidden_expansion(*args, **kwargs):
         pytest.fail('YAML merges expanded before the parser budget was checked')

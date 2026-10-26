@@ -9,6 +9,7 @@ from __future__ import annotations
 import math
 import re
 from collections.abc import Iterator, Mapping, Sequence, Set
+from functools import lru_cache
 from typing import Any, cast
 
 import yaml
@@ -144,6 +145,12 @@ VALID_TRIGGER_PATTERN: re.Pattern[str] = re.compile(r"^on_[a-z][a-z0-9_]*$")
 
 
 # ── Top-level validation ──────────────────────────────────────────────────
+
+
+@lru_cache(maxsize=1024)
+def _validate_expression(expression: str) -> None:
+    """Reuse successful bounded syntax checks, retaining neither ASTs nor caller diagnostics."""
+    parse_expression(expression)
 
 
 def validate_ruleset(yaml_content: str) -> list[str]:
@@ -1017,7 +1024,7 @@ def _validate_pre_conditions(tool_name: str, pre_conds: list[Any]) -> list[str]:
             errors.append(f"Tool '{tool_name}': pre_condition {i} missing 'condition'")
         elif isinstance(condition, str):
             try:
-                parse_expression(condition)
+                _validate_expression(condition)
             except ExpressionError as e:
                 errors.append(
                     f"Tool '{tool_name}': pre_condition {i} invalid expression '{condition}': {e}"
@@ -1072,7 +1079,7 @@ def _validate_single_effect(tool_name: str, effect: dict[str, Any], path: str) -
 
     if isinstance(condition, str):
         try:
-            parse_expression(condition)
+            _validate_expression(condition)
         except ExpressionError as error:
             errors.append(f"Tool '{tool_name}': {path} condition invalid expression: {error}")
 
@@ -1621,7 +1628,7 @@ def _validate_procedures(procedures: dict[str, Any], all_tool_names: set[str]) -
         condition = proc_def.get("condition")
         if isinstance(condition, str):
             try:
-                parse_expression(condition)
+                _validate_expression(condition)
             except ExpressionError as e:
                 errors.append(
                     f"Procedure '{proc_name}': invalid condition expression '{condition}': {e}"

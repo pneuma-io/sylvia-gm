@@ -70,7 +70,10 @@ def builder_reference_copy_tool(source_reader: ReferenceSource, workspace: Path)
                     "Use this before editing an existing Plan or inherited file; a paged read "
                     "is not a complete copy. Source bytes remain unchanged. Existing destination "
                     "files require their observed version from read_file; reconcile local edits "
-                    "before replacing them. Then use read_file and edit_file for focused changes."
+                    "before replacing them. If the complete source content is already in context, "
+                    "use edit_file with the successful copy's returned version for focused changes "
+                    "without rereading. Read content you have not seen. After a stale-file error, "
+                    "read and reconcile the current destination before retrying."
                 ),
                 "parameters": {
                     "type": "object",

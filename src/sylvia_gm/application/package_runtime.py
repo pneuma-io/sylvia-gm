@@ -12,10 +12,10 @@ import hashlib
 import math
 import re
 import threading
+from collections import OrderedDict
 from collections.abc import Iterator, Mapping, Sequence
 from copy import deepcopy
 from enum import Enum
-from functools import lru_cache
 from typing import Any, cast
 
 import yaml
@@ -145,6 +145,8 @@ def _validate_shape(value: object) -> None:
         nodes += 1
         if nodes > _MAX_RUNTIME_NODES:
             raise PackageRuntimeError("Package runtime has too many nodes")
+        if item is None or type(item) in (str, bool, int):
+            return
         if isinstance(item, Mapping):
             if len(item) > _MAX_OBJECT_MEMBERS:
                 raise PackageRuntimeError("Package runtime object is too large")
@@ -848,14 +850,43 @@ class _UniqueRuntimeLoader(_BoundedRuntimeLoader):
         super().flatten_mapping(node)
 
 
-@lru_cache(maxsize=16)
+_PARSED_RUNTIMES: OrderedDict[tuple[str, bytes, bool], RulesetRuntime] = OrderedDict()
+_PARSED_RUNTIMES_LOCK = threading.Lock()
+
+
+def _clear_runtime_cache() -> None:
+    with _PARSED_RUNTIMES_LOCK:
+        _PARSED_RUNTIMES.clear()
+
+
 def _parse_runtime(
     *,
     package_id: str,
     runtime_bytes: bytes,
     authoring: bool = False,
 ) -> RulesetRuntime:
-    """Parse and validate exact immutable package bytes once per owner process."""
+    """Reuse exact parsed bytes, including stricter authoring results during execution."""
+    key = (package_id, runtime_bytes, authoring)
+    with _PARSED_RUNTIMES_LOCK:
+        # Execution accepts legacy files; it cannot attest the stricter authoring checks.
+        admitted_key = (package_id, runtime_bytes, True)
+        if not authoring and admitted_key in _PARSED_RUNTIMES:
+            key = admitted_key
+        cached = _PARSED_RUNTIMES.get(key)
+        if cached is not None:
+            _PARSED_RUNTIMES.move_to_end(key)
+            return cached
+    runtime = _load_runtime(package_id=package_id, runtime_bytes=runtime_bytes, authoring=authoring)
+    with _PARSED_RUNTIMES_LOCK:
+        _PARSED_RUNTIMES[key] = runtime
+        _PARSED_RUNTIMES.move_to_end(key)
+        while len(_PARSED_RUNTIMES) > 16:
+            _PARSED_RUNTIMES.popitem(last=False)
+    return runtime
+
+
+def _load_runtime(*, package_id: str, runtime_bytes: bytes, authoring: bool) -> RulesetRuntime:
+    """Run all parser and executable guards before an immutable result can be reused."""
 
     if len(runtime_bytes) > PACKAGE_RUNTIME_BYTE_LIMIT:
         raise PackageRuntimeError("Package runtime exceeds the byte limit")
@@ -899,7 +930,7 @@ def _parse_runtime(
         raw = resolve_parameter_declarations(raw, validate_shape=_validate_shape)
     except ParameterDeclarationError as error:
         raise PackageRuntimeError(str(error)) from error
-    _validate_shape(raw)
+    # The resolver checks expanded data before copying; unchanged data was checked above.
     descriptor = raw.get("sylvia_gm_runtime")
     if not isinstance(descriptor, dict) or set(descriptor) != {"format", "state_namespace"}:
         raise PackageRuntimeError("Package runtime descriptor is invalid")

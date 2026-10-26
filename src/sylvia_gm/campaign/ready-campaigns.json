@@ -1,0 +1,1902 @@
+{
+  "format_version": 1,
+  "provenance": {
+    "adventures": "Existing bundled Severed Lands Campaign Plans; story preparation unchanged.",
+    "characters": "Existing SRD starters and Tavin Bell; independent prepared role/level editions.",
+    "starter_source_sha256": "fbf9da650afe2fd8e3044496e78d35f74184a5cd0340c355ebe4119ab594f803",
+    "rules": "Contained SRD Lite 0.3.15; retained SRD 5.2.1 class and creation references.",
+    "notices": [
+      "LICENSING-STATUS.md",
+      "campaign-settings/severed-lands/ATTRIBUTION.md",
+      "rulesets/srd-lite/ATTRIBUTION.md"
+    ]
+  },
+  "campaigns": [
+    {
+      "id": "a-debt-in-iron",
+      "plan_content_sha256": "a7b5deefff2760f5c1c732d934144e716dd53e481c75d99caea83d2cf7705098",
+      "bindings": {
+        "campaign_setting": {
+          "content_sha256": "8682e744d96468ca00a07833c984b204cf1d2a4f1d6ee5b0d8e813e4a11d7cd7",
+          "id": "pneuma.severed-lands",
+          "version": "1.0.0-alpha.2.naming.1"
+        },
+        "package_closure_sha256": "42d59f02d5caa38ac7a3baa280718582528bf92ab73eee3abd159a4aefe936f4",
+        "ruleset": {
+          "content_sha256": "645f83094691903002f318cd106695b8cdb6a412b50b9516e60c62acd93b63dd",
+          "id": "sylvia.srd-lite.bg3",
+          "version": "0.3.15"
+        }
+      },
+      "party": [
+        {
+          "role": "player_character",
+          "required_character_id": "tavin-bell"
+        },
+        {
+          "role": "companion",
+          "character": {
+            "format_id": "sylvia-gm-character-file",
+            "format_version": 2,
+            "id": "ready-cleric-1",
+            "schema": {
+              "id": "sylvia.srd-lite.bg3.player-character",
+              "content_sha256": "f18aefccc825474cba9d8326636207cc38789fc2526b48bc652c46c5ebf07f91"
+            },
+            "summary": "Cleric · Level 1. Protect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies.",
+            "authored_profile": "# Oren Reed\n\nHuman Cleric, level 1. Pronouns: they/them.\n\nPatient and practical; asks what would help before offering advice. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Oren\n\nProtect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies. Divine Order: Protector.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: history survival athletics. Class skill choices: medicine persuasion. Starting equipment uses class option A and background option A, with 15 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
+            "participant": {
+              "abilities": {
+                "charisma": 8,
+                "constitution": 13,
+                "dexterity": 14,
+                "intelligence": 11,
+                "strength": 12,
+                "wisdom": 17
+              },
+              "background": "Acolyte",
+              "classes": [
+                {
+                  "id": "cleric",
+                  "level": 1
+                }
+              ],
+              "cleric_order": "protector",
+              "level": 1,
+              "name": "Oren Reed",
+              "origin_feats": [
+                "magic_initiate",
+                "skilled"
+              ],
+              "saving_throw_proficiencies": [
+                "wisdom",
+                "charisma"
+              ],
+              "size_rank": 1,
+              "skill_proficiencies": [
+                "insight",
+                "religion",
+                "medicine",
+                "persuasion",
+                "perception",
+                "history",
+                "survival",
+                "athletics"
+              ],
+              "species": "Human",
+              "speed": 30,
+              "spellcasting_grants": [
+                {
+                  "ability": "wisdom",
+                  "source": "cleric",
+                  "spells": [
+                    "guidance",
+                    "sacred_flame",
+                    "light",
+                    "bless",
+                    "cure_wounds",
+                    "guiding_bolt",
+                    "healing_word"
+                  ]
+                },
+                {
+                  "ability": "wisdom",
+                  "source": "magic_initiate_cleric",
+                  "spells": [
+                    "spare_the_dying",
+                    "mending",
+                    "command"
+                  ]
+                }
+              ],
+              "tool_proficiencies": [
+                "calligraphers_supplies"
+              ],
+              "weapon_proficiencies": [
+                "simple_weapons",
+                "martial_weapons"
+              ],
+              "party_role": "companion"
+            },
+            "entity_state": {
+              "available_bonus_actions": [],
+              "conditions": [],
+              "damage_immunities": [],
+              "damage_resistances": [],
+              "damage_vulnerabilities": [],
+              "hit_die_size": 8,
+              "inventory": [
+                "chain_shirt",
+                "shield",
+                "mace",
+                "holy_symbol",
+                "priests_pack",
+                "gp",
+                "calligraphers_supplies",
+                "book_prayers",
+                "parchment",
+                "robe"
+              ],
+              "inventory_quantities": {
+                "book_prayers": 1,
+                "calligraphers_supplies": 1,
+                "chain_shirt": 1,
+                "gp": 15,
+                "holy_symbol": 2,
+                "mace": 1,
+                "parchment": 10,
+                "priests_pack": 1,
+                "robe": 1,
+                "shield": 1
+              },
+              "max_hp": 9,
+              "prepared_spells": [
+                "guidance",
+                "sacred_flame",
+                "light",
+                "bless",
+                "cure_wounds",
+                "guiding_bolt",
+                "healing_word",
+                "spare_the_dying",
+                "mending",
+                "command"
+              ],
+              "resource_maxima": {
+                "hit_die": 1,
+                "spell_slot_1": 2,
+                "second_wind": 0
+              },
+              "resources": {
+                "hit_die": 1,
+                "spell_slot_1": 2,
+                "second_wind": 0
+              },
+              "weapon_sets": {
+                "active_set": "melee",
+                "format": 1,
+                "melee": {
+                  "main_hand": "mace",
+                  "off_hand": "shield"
+                },
+                "ranged": {
+                  "main_hand": null,
+                  "off_hand": null
+                }
+              },
+              "worn_armor": {
+                "armor_type": "chain_shirt",
+                "inventory_item": "chain_shirt",
+                "magic_bonus": 0
+              },
+              "worn_shield": {
+                "armor_type": "shield",
+                "inventory_item": "shield",
+                "magic_bonus": 0
+              },
+              "name": "Oren Reed",
+              "size_rank": 1,
+              "creature_kind": "character",
+              "hp": 9,
+              "temp_hp": 0,
+              "bloodied": false,
+              "is_alive": true,
+              "initiative_modifier": 2,
+              "melee_reach": 5,
+              "constitution_modifier": 1,
+              "death_failures": 0,
+              "death_successes": 0,
+              "stable": false,
+              "stable_recovery_hours_remaining": 0,
+              "exhaustion_level": 0,
+              "saving_throw_modifiers": {
+                "strength": 1,
+                "dexterity": 2,
+                "constitution": 1,
+                "intelligence": 0,
+                "wisdom": 5,
+                "charisma": 1
+              },
+              "fighter_level": 0,
+              "armor_class": 17,
+              "armor_speed_penalty": 0,
+              "armor_untrained": false,
+              "armor_stealth_disadvantage": false,
+              "speed": 30,
+              "climb_speed": 0,
+              "swim_speed": 0
+            },
+            "setting_data": {}
+          },
+          "content_sha256": "8b0554e6d8e7145f50a91d10fe710d5c4f184a18822e4fc3001df9a84ec9c0a5"
+        }
+      ]
+    },
+    {
+      "id": "last-cart-through",
+      "plan_content_sha256": "7befca762386f6c1d12d670466be510f1059ecc0b7bbdc15b20b78b31c05a47f",
+      "bindings": {
+        "campaign_setting": {
+          "content_sha256": "e4fbca80424e27ee0871f958dfe3b7c05034a845456860a4240a208d8a9bf4e7",
+          "id": "pneuma.severed-lands",
+          "version": "1.0.0-alpha.2.naming.1"
+        },
+        "package_closure_sha256": "79c1d5cffb7047e0ecc0366f6383a2ce49cb476deb8460f81edbb15045cd1b28",
+        "ruleset": {
+          "content_sha256": "645f83094691903002f318cd106695b8cdb6a412b50b9516e60c62acd93b63dd",
+          "id": "sylvia.srd-lite.bg3",
+          "version": "0.3.15"
+        }
+      },
+      "party": [
+        {
+          "role": "player_character",
+          "character": {
+            "format_id": "sylvia-gm-character-file",
+            "format_version": 2,
+            "id": "ready-fighter-2",
+            "schema": {
+              "id": "sylvia.srd-lite.bg3.player-character",
+              "content_sha256": "f18aefccc825474cba9d8326636207cc38789fc2526b48bc652c46c5ebf07f91"
+            },
+            "summary": "Fighter · Level 2. A direct greatsword fighter in chain mail. Attack on your turn and use Second Wind when hurt; you begin with two uses.",
+            "authored_profile": "# Bram Alder\n\nHuman Fighter, level 2. Pronouns: they/them.\n\nSteady and dry-witted; likes a clear plan and a hot meal. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Bram\n\nA direct greatsword fighter in chain mail. Attack on your turn and use Second Wind when hurt; you begin with two uses.\n\n## Creation choices\n\nStandard array, then the Soldier background increases, is reflected in the final ability scores. Soldier supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies nature. Skilled choices: survival acrobatics stealth. Class skill choices: perception insight. Starting equipment uses class option A and background option A, with 18 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.\n\n## Prepared level-two choices\n\nAction Surge, one use per Short or Long Rest. Tactical Mind uses Second Wind; retain Defense. Fixed HP increase, including Constitution: 8.",
+            "participant": {
+              "abilities": {
+                "charisma": 8,
+                "constitution": 14,
+                "dexterity": 14,
+                "intelligence": 10,
+                "strength": 17,
+                "wisdom": 12
+              },
+              "advancements": [
+                {
+                  "class_id": "fighter",
+                  "features": [
+                    {
+                      "choice": "Action Surge, one use per Short or Long Rest.",
+                      "id": "action_surge",
+                      "source": "SRD 5.2.1 Fighter level 2"
+                    },
+                    {
+                      "choice": "Tactical Mind uses Second Wind; retain Defense.",
+                      "id": "tactical_mind",
+                      "source": "SRD 5.2.1 Fighter level 2"
+                    }
+                  ],
+                  "level": 2,
+                  "summary": "Prepared level-two edition; fixed HP increase and retained starting choices."
+                }
+              ],
+              "background": "Soldier",
+              "classes": [
+                {
+                  "id": "fighter",
+                  "level": 2
+                }
+              ],
+              "fighting_styles": [
+                {
+                  "source": "fighter",
+                  "style": "defense"
+                }
+              ],
+              "level": 2,
+              "name": "Bram Alder",
+              "origin_feats": [
+                "savage_attacker",
+                "skilled"
+              ],
+              "saving_throw_proficiencies": [
+                "strength",
+                "constitution"
+              ],
+              "size_rank": 1,
+              "skill_proficiencies": [
+                "athletics",
+                "intimidation",
+                "perception",
+                "insight",
+                "nature",
+                "survival",
+                "acrobatics",
+                "stealth"
+              ],
+              "species": "Human",
+              "speed": 30,
+              "spellcasting_grants": [],
+              "tool_proficiencies": [
+                "gaming_set_dice"
+              ],
+              "weapon_masteries": [
+                "greatsword",
+                "flail",
+                "spear"
+              ],
+              "weapon_proficiencies": [
+                "simple_weapons",
+                "martial_weapons"
+              ],
+              "party_role": "player_character"
+            },
+            "entity_state": {
+              "ammunition": {
+                "arrow": 20
+              },
+              "ammunition_expended": {
+                "arrow": 0
+              },
+              "available_bonus_actions": [
+                "second_wind"
+              ],
+              "conditions": [],
+              "damage_immunities": [],
+              "damage_resistances": [],
+              "damage_vulnerabilities": [],
+              "hit_die_size": 10,
+              "inventory": [
+                "chain_mail",
+                "greatsword",
+                "flail",
+                "javelin",
+                "dungeoneers_pack",
+                "gp",
+                "spear",
+                "shortbow",
+                "arrow",
+                "gaming_set_dice",
+                "healers_kit",
+                "quiver",
+                "travelers_clothes"
+              ],
+              "inventory_quantities": {
+                "arrow": 20,
+                "chain_mail": 1,
+                "dungeoneers_pack": 1,
+                "flail": 1,
+                "gaming_set_dice": 1,
+                "gp": 18,
+                "greatsword": 1,
+                "healers_kit": 1,
+                "javelin": 8,
+                "quiver": 1,
+                "shortbow": 1,
+                "spear": 1,
+                "travelers_clothes": 1
+              },
+              "max_hp": 20,
+              "prepared_spells": [],
+              "resource_maxima": {
+                "hit_die": 2,
+                "second_wind": 2,
+                "action_surge": 1
+              },
+              "resources": {
+                "hit_die": 2,
+                "second_wind": 2,
+                "action_surge": 1
+              },
+              "weapon_sets": {
+                "active_set": "melee",
+                "format": 1,
+                "melee": {
+                  "main_hand": "greatsword",
+                  "off_hand": "greatsword"
+                },
+                "ranged": {
+                  "main_hand": null,
+                  "off_hand": null
+                }
+              },
+              "worn_armor": {
+                "armor_type": "chain_mail",
+                "inventory_item": "chain_mail",
+                "magic_bonus": 0
+              },
+              "worn_shield": null,
+              "name": "Bram Alder",
+              "size_rank": 1,
+              "creature_kind": "character",
+              "hp": 20,
+              "temp_hp": 0,
+              "bloodied": false,
+              "is_alive": true,
+              "initiative_modifier": 2,
+              "melee_reach": 5,
+              "constitution_modifier": 2,
+              "death_failures": 0,
+              "death_successes": 0,
+              "stable": false,
+              "stable_recovery_hours_remaining": 0,
+              "exhaustion_level": 0,
+              "saving_throw_modifiers": {
+                "strength": 5,
+                "dexterity": 2,
+                "constitution": 4,
+                "intelligence": 0,
+                "wisdom": 1,
+                "charisma": -1
+              },
+              "fighter_level": 2,
+              "armor_class": 17,
+              "armor_speed_penalty": 0,
+              "armor_untrained": false,
+              "armor_stealth_disadvantage": true,
+              "speed": 30,
+              "climb_speed": 0,
+              "swim_speed": 0
+            },
+            "setting_data": {}
+          },
+          "content_sha256": "12d4ce7cb5a2312dd3fc5672610ec84e818d7cbca7b6667a13c96f15dd048118"
+        },
+        {
+          "role": "companion",
+          "character": {
+            "format_id": "sylvia-gm-character-file",
+            "format_version": 2,
+            "id": "ready-cleric-2",
+            "schema": {
+              "id": "sylvia.srd-lite.bg3.player-character",
+              "content_sha256": "f18aefccc825474cba9d8326636207cc38789fc2526b48bc652c46c5ebf07f91"
+            },
+            "summary": "Cleric · Level 2. Protect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies.",
+            "authored_profile": "# Oren Reed\n\nHuman Cleric, level 2. Pronouns: they/them.\n\nPatient and practical; asks what would help before offering advice. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Oren\n\nProtect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies. Divine Order: Protector.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: history survival athletics. Class skill choices: medicine persuasion. Starting equipment uses class option A and background option A, with 15 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.\n\n## Prepared level-two choices\n\nTwo uses; Divine Spark and Turn Undead. Five Cleric spells prepared; add Shield of Faith. Fixed HP increase, including Constitution: 6.",
+            "participant": {
+              "abilities": {
+                "charisma": 8,
+                "constitution": 13,
+                "dexterity": 14,
+                "intelligence": 11,
+                "strength": 12,
+                "wisdom": 17
+              },
+              "advancements": [
+                {
+                  "class_id": "cleric",
+                  "features": [
+                    {
+                      "choice": "Two uses; Divine Spark and Turn Undead.",
+                      "id": "channel_divinity",
+                      "source": "SRD 5.2.1 Cleric level 2"
+                    },
+                    {
+                      "choice": "Five Cleric spells prepared; add Shield of Faith.",
+                      "id": "spellcasting",
+                      "source": "SRD 5.2.1 Cleric level 2"
+                    }
+                  ],
+                  "level": 2,
+                  "summary": "Prepared level-two edition; fixed HP increase and retained starting choices."
+                }
+              ],
+              "background": "Acolyte",
+              "classes": [
+                {
+                  "id": "cleric",
+                  "level": 2
+                }
+              ],
+              "cleric_order": "protector",
+              "level": 2,
+              "name": "Oren Reed",
+              "origin_feats": [
+                "magic_initiate",
+                "skilled"
+              ],
+              "saving_throw_proficiencies": [
+                "wisdom",
+                "charisma"
+              ],
+              "size_rank": 1,
+              "skill_proficiencies": [
+                "insight",
+                "religion",
+                "medicine",
+                "persuasion",
+                "perception",
+                "history",
+                "survival",
+                "athletics"
+              ],
+              "species": "Human",
+              "speed": 30,
+              "spellcasting_grants": [
+                {
+                  "ability": "wisdom",
+                  "source": "cleric",
+                  "spells": [
+                    "guidance",
+                    "sacred_flame",
+                    "light",
+                    "bless",
+                    "cure_wounds",
+                    "guiding_bolt",
+                    "healing_word",
+                    "shield_of_faith"
+                  ]
+                },
+                {
+                  "ability": "wisdom",
+                  "source": "magic_initiate_cleric",
+                  "spells": [
+                    "spare_the_dying",
+                    "mending",
+                    "command"
+                  ]
+                }
+              ],
+              "tool_proficiencies": [
+                "calligraphers_supplies"
+              ],
+              "weapon_proficiencies": [
+                "simple_weapons",
+                "martial_weapons"
+              ],
+              "party_role": "companion"
+            },
+            "entity_state": {
+              "available_bonus_actions": [],
+              "conditions": [],
+              "damage_immunities": [],
+              "damage_resistances": [],
+              "damage_vulnerabilities": [],
+              "hit_die_size": 8,
+              "inventory": [
+                "chain_shirt",
+                "shield",
+                "mace",
+                "holy_symbol",
+                "priests_pack",
+                "gp",
+                "calligraphers_supplies",
+                "book_prayers",
+                "parchment",
+                "robe"
+              ],
+              "inventory_quantities": {
+                "book_prayers": 1,
+                "calligraphers_supplies": 1,
+                "chain_shirt": 1,
+                "gp": 15,
+                "holy_symbol": 2,
+                "mace": 1,
+                "parchment": 10,
+                "priests_pack": 1,
+                "robe": 1,
+                "shield": 1
+              },
+              "max_hp": 15,
+              "prepared_spells": [
+                "guidance",
+                "sacred_flame",
+                "light",
+                "bless",
+                "cure_wounds",
+                "guiding_bolt",
+                "healing_word",
+                "spare_the_dying",
+                "mending",
+                "command",
+                "shield_of_faith"
+              ],
+              "resource_maxima": {
+                "channel_divinity": 2,
+                "hit_die": 2,
+                "spell_slot_1": 3,
+                "second_wind": 0
+              },
+              "resources": {
+                "channel_divinity": 2,
+                "hit_die": 2,
+                "spell_slot_1": 3,
+                "second_wind": 0
+              },
+              "weapon_sets": {
+                "active_set": "melee",
+                "format": 1,
+                "melee": {
+                  "main_hand": "mace",
+                  "off_hand": "shield"
+                },
+                "ranged": {
+                  "main_hand": null,
+                  "off_hand": null
+                }
+              },
+              "worn_armor": {
+                "armor_type": "chain_shirt",
+                "inventory_item": "chain_shirt",
+                "magic_bonus": 0
+              },
+              "worn_shield": {
+                "armor_type": "shield",
+                "inventory_item": "shield",
+                "magic_bonus": 0
+              },
+              "name": "Oren Reed",
+              "size_rank": 1,
+              "creature_kind": "character",
+              "hp": 15,
+              "temp_hp": 0,
+              "bloodied": false,
+              "is_alive": true,
+              "initiative_modifier": 2,
+              "melee_reach": 5,
+              "constitution_modifier": 1,
+              "death_failures": 0,
+              "death_successes": 0,
+              "stable": false,
+              "stable_recovery_hours_remaining": 0,
+              "exhaustion_level": 0,
+              "saving_throw_modifiers": {
+                "strength": 1,
+                "dexterity": 2,
+                "constitution": 1,
+                "intelligence": 0,
+                "wisdom": 5,
+                "charisma": 1
+              },
+              "fighter_level": 0,
+              "armor_class": 17,
+              "armor_speed_penalty": 0,
+              "armor_untrained": false,
+              "armor_stealth_disadvantage": false,
+              "speed": 30,
+              "climb_speed": 0,
+              "swim_speed": 0
+            },
+            "setting_data": {}
+          },
+          "content_sha256": "9fe73145567c27f752e5e81f71d99c69a5c6bcca5cddbd36163ece64a7be32c2"
+        }
+      ]
+    },
+    {
+      "id": "the-cartographers-wake",
+      "plan_content_sha256": "b9fc284969edd1e8bc10d1112eddba276d9a7c58d78e30bcd992dc67c5e12115",
+      "bindings": {
+        "campaign_setting": {
+          "content_sha256": "e4fbca80424e27ee0871f958dfe3b7c05034a845456860a4240a208d8a9bf4e7",
+          "id": "pneuma.severed-lands",
+          "version": "1.0.0-alpha.2.naming.1"
+        },
+        "package_closure_sha256": "79c1d5cffb7047e0ecc0366f6383a2ce49cb476deb8460f81edbb15045cd1b28",
+        "ruleset": {
+          "content_sha256": "645f83094691903002f318cd106695b8cdb6a412b50b9516e60c62acd93b63dd",
+          "id": "sylvia.srd-lite.bg3",
+          "version": "0.3.15"
+        }
+      },
+      "party": [
+        {
+          "role": "player_character",
+          "character": {
+            "format_id": "sylvia-gm-character-file",
+            "format_version": 2,
+            "id": "ready-rogue-2",
+            "schema": {
+              "id": "sylvia.srd-lite.bg3.player-character",
+              "content_sha256": "f18aefccc825474cba9d8326636207cc38789fc2526b48bc652c46c5ebf07f91"
+            },
+            "summary": "Rogue · Level 2. Use a shortsword or shortbow and seek a Sneak Attack opening. You have two Expertise choices; Cunning Action arrives at level two.",
+            "authored_profile": "# Pip Venn\n\nHuman Rogue, level 2. Pronouns: they/them.\n\nQuick with a grin; checks that everyone has an exit. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Pip\n\nUse a shortsword or shortbow and seek a Sneak Attack opening. You have two Expertise choices; Cunning Action arrives at level two. Expertise: Stealth and Perception. Thieves' Cant is known.\n\n## Creation choices\n\nStandard array, then the Criminal background increases, is reflected in the final ability scores. Criminal supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies history. Skilled choices: insight survival deception. Class skill choices: acrobatics investigation perception persuasion. Starting equipment uses class option A and background option A, with 24 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.\n\n## Prepared level-two choices\n\nDash, Disengage or Hide as a Bonus Action. Fixed HP increase, including Constitution: 7.",
+            "participant": {
+              "abilities": {
+                "charisma": 10,
+                "constitution": 14,
+                "dexterity": 17,
+                "intelligence": 14,
+                "strength": 8,
+                "wisdom": 12
+              },
+              "advancements": [
+                {
+                  "class_id": "rogue",
+                  "features": [
+                    {
+                      "choice": "Dash, Disengage or Hide as a Bonus Action.",
+                      "id": "cunning_action",
+                      "source": "SRD 5.2.1 Rogue level 2"
+                    }
+                  ],
+                  "level": 2,
+                  "summary": "Prepared level-two edition; fixed HP increase and retained starting choices."
+                }
+              ],
+              "background": "Criminal",
+              "classes": [
+                {
+                  "id": "rogue",
+                  "level": 2
+                }
+              ],
+              "level": 2,
+              "name": "Pip Venn",
+              "origin_feats": [
+                "alert",
+                "skilled"
+              ],
+              "saving_throw_proficiencies": [
+                "dexterity",
+                "intelligence"
+              ],
+              "size_rank": 1,
+              "skill_proficiencies": [
+                "sleight_of_hand",
+                "stealth",
+                "acrobatics",
+                "investigation",
+                "perception",
+                "persuasion",
+                "history",
+                "insight",
+                "survival",
+                "deception"
+              ],
+              "species": "Human",
+              "speed": 30,
+              "spellcasting_grants": [],
+              "tool_proficiencies": [
+                "thieves_tools"
+              ],
+              "weapon_masteries": [
+                "shortsword",
+                "dagger"
+              ],
+              "weapon_proficiencies": [
+                "simple_weapons",
+                "hand_crossbow",
+                "rapier",
+                "scimitar",
+                "shortsword",
+                "whip"
+              ],
+              "party_role": "player_character"
+            },
+            "entity_state": {
+              "ammunition": {
+                "arrow": 20
+              },
+              "ammunition_expended": {
+                "arrow": 0
+              },
+              "available_bonus_actions": [
+                "cunning_action"
+              ],
+              "conditions": [],
+              "damage_immunities": [],
+              "damage_resistances": [],
+              "damage_vulnerabilities": [],
+              "hit_die_size": 8,
+              "inventory": [
+                "leather",
+                "dagger",
+                "shortsword",
+                "shortbow",
+                "arrow",
+                "quiver",
+                "thieves_tools",
+                "burglars_pack",
+                "gp",
+                "crowbar",
+                "pouch",
+                "travelers_clothes"
+              ],
+              "inventory_quantities": {
+                "arrow": 20,
+                "burglars_pack": 1,
+                "crowbar": 1,
+                "dagger": 4,
+                "gp": 24,
+                "leather": 1,
+                "pouch": 2,
+                "quiver": 1,
+                "shortbow": 1,
+                "shortsword": 1,
+                "thieves_tools": 2,
+                "travelers_clothes": 1
+              },
+              "max_hp": 17,
+              "prepared_spells": [],
+              "resource_maxima": {
+                "hit_die": 2,
+                "second_wind": 0
+              },
+              "resources": {
+                "hit_die": 2,
+                "second_wind": 0
+              },
+              "weapon_sets": {
+                "active_set": "ranged",
+                "format": 1,
+                "melee": {
+                  "main_hand": "shortsword",
+                  "off_hand": null
+                },
+                "ranged": {
+                  "main_hand": "shortbow",
+                  "off_hand": "shortbow"
+                }
+              },
+              "worn_armor": {
+                "armor_type": "leather_armor",
+                "inventory_item": "leather",
+                "magic_bonus": 0
+              },
+              "worn_shield": null,
+              "name": "Pip Venn",
+              "size_rank": 1,
+              "creature_kind": "character",
+              "hp": 17,
+              "temp_hp": 0,
+              "bloodied": false,
+              "is_alive": true,
+              "initiative_modifier": 5,
+              "melee_reach": 5,
+              "constitution_modifier": 2,
+              "death_failures": 0,
+              "death_successes": 0,
+              "stable": false,
+              "stable_recovery_hours_remaining": 0,
+              "exhaustion_level": 0,
+              "saving_throw_modifiers": {
+                "strength": -1,
+                "dexterity": 5,
+                "constitution": 2,
+                "intelligence": 4,
+                "wisdom": 1,
+                "charisma": 0
+              },
+              "fighter_level": 0,
+              "armor_class": 14,
+              "armor_speed_penalty": 0,
+              "armor_untrained": false,
+              "armor_stealth_disadvantage": false,
+              "speed": 30,
+              "climb_speed": 0,
+              "swim_speed": 0
+            },
+            "setting_data": {}
+          },
+          "content_sha256": "1f95454629494f037a1d0fda82a9703323e3c82c5dede890a55cfa8b992319f6"
+        },
+        {
+          "role": "companion",
+          "character": {
+            "format_id": "sylvia-gm-character-file",
+            "format_version": 2,
+            "id": "ready-fighter-2",
+            "schema": {
+              "id": "sylvia.srd-lite.bg3.player-character",
+              "content_sha256": "f18aefccc825474cba9d8326636207cc38789fc2526b48bc652c46c5ebf07f91"
+            },
+            "summary": "Fighter · Level 2. A direct greatsword fighter in chain mail. Attack on your turn and use Second Wind when hurt; you begin with two uses.",
+            "authored_profile": "# Bram Alder\n\nHuman Fighter, level 2. Pronouns: they/them.\n\nSteady and dry-witted; likes a clear plan and a hot meal. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Bram\n\nA direct greatsword fighter in chain mail. Attack on your turn and use Second Wind when hurt; you begin with two uses.\n\n## Creation choices\n\nStandard array, then the Soldier background increases, is reflected in the final ability scores. Soldier supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies nature. Skilled choices: survival acrobatics stealth. Class skill choices: perception insight. Starting equipment uses class option A and background option A, with 18 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.\n\n## Prepared level-two choices\n\nAction Surge, one use per Short or Long Rest. Tactical Mind uses Second Wind; retain Defense. Fixed HP increase, including Constitution: 8.",
+            "participant": {
+              "abilities": {
+                "charisma": 8,
+                "constitution": 14,
+                "dexterity": 14,
+                "intelligence": 10,
+                "strength": 17,
+                "wisdom": 12
+              },
+              "advancements": [
+                {
+                  "class_id": "fighter",
+                  "features": [
+                    {
+                      "choice": "Action Surge, one use per Short or Long Rest.",
+                      "id": "action_surge",
+                      "source": "SRD 5.2.1 Fighter level 2"
+                    },
+                    {
+                      "choice": "Tactical Mind uses Second Wind; retain Defense.",
+                      "id": "tactical_mind",
+                      "source": "SRD 5.2.1 Fighter level 2"
+                    }
+                  ],
+                  "level": 2,
+                  "summary": "Prepared level-two edition; fixed HP increase and retained starting choices."
+                }
+              ],
+              "background": "Soldier",
+              "classes": [
+                {
+                  "id": "fighter",
+                  "level": 2
+                }
+              ],
+              "fighting_styles": [
+                {
+                  "source": "fighter",
+                  "style": "defense"
+                }
+              ],
+              "level": 2,
+              "name": "Bram Alder",
+              "origin_feats": [
+                "savage_attacker",
+                "skilled"
+              ],
+              "saving_throw_proficiencies": [
+                "strength",
+                "constitution"
+              ],
+              "size_rank": 1,
+              "skill_proficiencies": [
+                "athletics",
+                "intimidation",
+                "perception",
+                "insight",
+                "nature",
+                "survival",
+                "acrobatics",
+                "stealth"
+              ],
+              "species": "Human",
+              "speed": 30,
+              "spellcasting_grants": [],
+              "tool_proficiencies": [
+                "gaming_set_dice"
+              ],
+              "weapon_masteries": [
+                "greatsword",
+                "flail",
+                "spear"
+              ],
+              "weapon_proficiencies": [
+                "simple_weapons",
+                "martial_weapons"
+              ],
+              "party_role": "companion"
+            },
+            "entity_state": {
+              "ammunition": {
+                "arrow": 20
+              },
+              "ammunition_expended": {
+                "arrow": 0
+              },
+              "available_bonus_actions": [
+                "second_wind"
+              ],
+              "conditions": [],
+              "damage_immunities": [],
+              "damage_resistances": [],
+              "damage_vulnerabilities": [],
+              "hit_die_size": 10,
+              "inventory": [
+                "chain_mail",
+                "greatsword",
+                "flail",
+                "javelin",
+                "dungeoneers_pack",
+                "gp",
+                "spear",
+                "shortbow",
+                "arrow",
+                "gaming_set_dice",
+                "healers_kit",
+                "quiver",
+                "travelers_clothes"
+              ],
+              "inventory_quantities": {
+                "arrow": 20,
+                "chain_mail": 1,
+                "dungeoneers_pack": 1,
+                "flail": 1,
+                "gaming_set_dice": 1,
+                "gp": 18,
+                "greatsword": 1,
+                "healers_kit": 1,
+                "javelin": 8,
+                "quiver": 1,
+                "shortbow": 1,
+                "spear": 1,
+                "travelers_clothes": 1
+              },
+              "max_hp": 20,
+              "prepared_spells": [],
+              "resource_maxima": {
+                "hit_die": 2,
+                "second_wind": 2,
+                "action_surge": 1
+              },
+              "resources": {
+                "hit_die": 2,
+                "second_wind": 2,
+                "action_surge": 1
+              },
+              "weapon_sets": {
+                "active_set": "melee",
+                "format": 1,
+                "melee": {
+                  "main_hand": "greatsword",
+                  "off_hand": "greatsword"
+                },
+                "ranged": {
+                  "main_hand": null,
+                  "off_hand": null
+                }
+              },
+              "worn_armor": {
+                "armor_type": "chain_mail",
+                "inventory_item": "chain_mail",
+                "magic_bonus": 0
+              },
+              "worn_shield": null,
+              "name": "Bram Alder",
+              "size_rank": 1,
+              "creature_kind": "character",
+              "hp": 20,
+              "temp_hp": 0,
+              "bloodied": false,
+              "is_alive": true,
+              "initiative_modifier": 2,
+              "melee_reach": 5,
+              "constitution_modifier": 2,
+              "death_failures": 0,
+              "death_successes": 0,
+              "stable": false,
+              "stable_recovery_hours_remaining": 0,
+              "exhaustion_level": 0,
+              "saving_throw_modifiers": {
+                "strength": 5,
+                "dexterity": 2,
+                "constitution": 4,
+                "intelligence": 0,
+                "wisdom": 1,
+                "charisma": -1
+              },
+              "fighter_level": 2,
+              "armor_class": 17,
+              "armor_speed_penalty": 0,
+              "armor_untrained": false,
+              "armor_stealth_disadvantage": true,
+              "speed": 30,
+              "climb_speed": 0,
+              "swim_speed": 0
+            },
+            "setting_data": {}
+          },
+          "content_sha256": "1fdba2d792f0b9e63f18a925056f90ab2ffe48a3232d387173992de5f7e2e618"
+        },
+        {
+          "role": "companion",
+          "character": {
+            "format_id": "sylvia-gm-character-file",
+            "format_version": 2,
+            "id": "ready-cleric-2",
+            "schema": {
+              "id": "sylvia.srd-lite.bg3.player-character",
+              "content_sha256": "f18aefccc825474cba9d8326636207cc38789fc2526b48bc652c46c5ebf07f91"
+            },
+            "summary": "Cleric · Level 2. Protect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies.",
+            "authored_profile": "# Oren Reed\n\nHuman Cleric, level 2. Pronouns: they/them.\n\nPatient and practical; asks what would help before offering advice. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Oren\n\nProtect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies. Divine Order: Protector.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: history survival athletics. Class skill choices: medicine persuasion. Starting equipment uses class option A and background option A, with 15 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.\n\n## Prepared level-two choices\n\nTwo uses; Divine Spark and Turn Undead. Five Cleric spells prepared; add Shield of Faith. Fixed HP increase, including Constitution: 6.",
+            "participant": {
+              "abilities": {
+                "charisma": 8,
+                "constitution": 13,
+                "dexterity": 14,
+                "intelligence": 11,
+                "strength": 12,
+                "wisdom": 17
+              },
+              "advancements": [
+                {
+                  "class_id": "cleric",
+                  "features": [
+                    {
+                      "choice": "Two uses; Divine Spark and Turn Undead.",
+                      "id": "channel_divinity",
+                      "source": "SRD 5.2.1 Cleric level 2"
+                    },
+                    {
+                      "choice": "Five Cleric spells prepared; add Shield of Faith.",
+                      "id": "spellcasting",
+                      "source": "SRD 5.2.1 Cleric level 2"
+                    }
+                  ],
+                  "level": 2,
+                  "summary": "Prepared level-two edition; fixed HP increase and retained starting choices."
+                }
+              ],
+              "background": "Acolyte",
+              "classes": [
+                {
+                  "id": "cleric",
+                  "level": 2
+                }
+              ],
+              "cleric_order": "protector",
+              "level": 2,
+              "name": "Oren Reed",
+              "origin_feats": [
+                "magic_initiate",
+                "skilled"
+              ],
+              "saving_throw_proficiencies": [
+                "wisdom",
+                "charisma"
+              ],
+              "size_rank": 1,
+              "skill_proficiencies": [
+                "insight",
+                "religion",
+                "medicine",
+                "persuasion",
+                "perception",
+                "history",
+                "survival",
+                "athletics"
+              ],
+              "species": "Human",
+              "speed": 30,
+              "spellcasting_grants": [
+                {
+                  "ability": "wisdom",
+                  "source": "cleric",
+                  "spells": [
+                    "guidance",
+                    "sacred_flame",
+                    "light",
+                    "bless",
+                    "cure_wounds",
+                    "guiding_bolt",
+                    "healing_word",
+                    "shield_of_faith"
+                  ]
+                },
+                {
+                  "ability": "wisdom",
+                  "source": "magic_initiate_cleric",
+                  "spells": [
+                    "spare_the_dying",
+                    "mending",
+                    "command"
+                  ]
+                }
+              ],
+              "tool_proficiencies": [
+                "calligraphers_supplies"
+              ],
+              "weapon_proficiencies": [
+                "simple_weapons",
+                "martial_weapons"
+              ],
+              "party_role": "companion"
+            },
+            "entity_state": {
+              "available_bonus_actions": [],
+              "conditions": [],
+              "damage_immunities": [],
+              "damage_resistances": [],
+              "damage_vulnerabilities": [],
+              "hit_die_size": 8,
+              "inventory": [
+                "chain_shirt",
+                "shield",
+                "mace",
+                "holy_symbol",
+                "priests_pack",
+                "gp",
+                "calligraphers_supplies",
+                "book_prayers",
+                "parchment",
+                "robe"
+              ],
+              "inventory_quantities": {
+                "book_prayers": 1,
+                "calligraphers_supplies": 1,
+                "chain_shirt": 1,
+                "gp": 15,
+                "holy_symbol": 2,
+                "mace": 1,
+                "parchment": 10,
+                "priests_pack": 1,
+                "robe": 1,
+                "shield": 1
+              },
+              "max_hp": 15,
+              "prepared_spells": [
+                "guidance",
+                "sacred_flame",
+                "light",
+                "bless",
+                "cure_wounds",
+                "guiding_bolt",
+                "healing_word",
+                "spare_the_dying",
+                "mending",
+                "command",
+                "shield_of_faith"
+              ],
+              "resource_maxima": {
+                "channel_divinity": 2,
+                "hit_die": 2,
+                "spell_slot_1": 3,
+                "second_wind": 0
+              },
+              "resources": {
+                "channel_divinity": 2,
+                "hit_die": 2,
+                "spell_slot_1": 3,
+                "second_wind": 0
+              },
+              "weapon_sets": {
+                "active_set": "melee",
+                "format": 1,
+                "melee": {
+                  "main_hand": "mace",
+                  "off_hand": "shield"
+                },
+                "ranged": {
+                  "main_hand": null,
+                  "off_hand": null
+                }
+              },
+              "worn_armor": {
+                "armor_type": "chain_shirt",
+                "inventory_item": "chain_shirt",
+                "magic_bonus": 0
+              },
+              "worn_shield": {
+                "armor_type": "shield",
+                "inventory_item": "shield",
+                "magic_bonus": 0
+              },
+              "name": "Oren Reed",
+              "size_rank": 1,
+              "creature_kind": "character",
+              "hp": 15,
+              "temp_hp": 0,
+              "bloodied": false,
+              "is_alive": true,
+              "initiative_modifier": 2,
+              "melee_reach": 5,
+              "constitution_modifier": 1,
+              "death_failures": 0,
+              "death_successes": 0,
+              "stable": false,
+              "stable_recovery_hours_remaining": 0,
+              "exhaustion_level": 0,
+              "saving_throw_modifiers": {
+                "strength": 1,
+                "dexterity": 2,
+                "constitution": 1,
+                "intelligence": 0,
+                "wisdom": 5,
+                "charisma": 1
+              },
+              "fighter_level": 0,
+              "armor_class": 17,
+              "armor_speed_penalty": 0,
+              "armor_untrained": false,
+              "armor_stealth_disadvantage": false,
+              "speed": 30,
+              "climb_speed": 0,
+              "swim_speed": 0
+            },
+            "setting_data": {}
+          },
+          "content_sha256": "9fe73145567c27f752e5e81f71d99c69a5c6bcca5cddbd36163ece64a7be32c2"
+        }
+      ]
+    },
+    {
+      "id": "rift-awakening",
+      "plan_content_sha256": "1f8a8fa6100a0da42a0c5bb8d5d4910dfa63ee4068fc406c616ad2796f505d9f",
+      "bindings": {
+        "campaign_setting": {
+          "content_sha256": "be78d115db76920e1c902c24c2ef69f2b1b42ed13e524b3ef286a9b37ca4c1a0",
+          "id": "pneuma.severed-lands",
+          "version": "1.0.0-alpha.2.naming.1"
+        },
+        "package_closure_sha256": "9fe8743f31093557779bdadad8b744448a351002dc8b44894ac0bbc0c07be9f1",
+        "ruleset": {
+          "content_sha256": "645f83094691903002f318cd106695b8cdb6a412b50b9516e60c62acd93b63dd",
+          "id": "sylvia.srd-lite.bg3",
+          "version": "0.3.15"
+        }
+      },
+      "party": [
+        {
+          "role": "player_character",
+          "character": {
+            "format_id": "sylvia-gm-character-file",
+            "format_version": 2,
+            "id": "ready-bard-1",
+            "schema": {
+              "id": "sylvia.srd-lite.bg3.player-character",
+              "content_sha256": "f18aefccc825474cba9d8326636207cc38789fc2526b48bc652c46c5ebf07f91"
+            },
+            "summary": "Bard · Level 1. Help allies and talk your way through trouble. Vicious Mockery is your repeatable attack; save Healing Word for an ally who needs help.",
+            "authored_profile": "# Neri Vale\n\nHuman Bard, level 1. Pronouns: they/them.\n\nCurious and playful; collects odd turns of phrase. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Neri\n\nHelp allies and talk your way through trouble. Vicious Mockery is your repeatable attack; save Healing Word for an ally who needs help.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: acrobatics investigation stealth. Class skill choices: persuasion deception performance. Starting equipment uses class option A and background option A, with 27 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
+            "participant": {
+              "abilities": {
+                "charisma": 17,
+                "constitution": 13,
+                "dexterity": 14,
+                "intelligence": 11,
+                "strength": 8,
+                "wisdom": 12
+              },
+              "background": "Acolyte",
+              "classes": [
+                {
+                  "id": "bard",
+                  "level": 1
+                }
+              ],
+              "level": 1,
+              "name": "Neri Vale",
+              "origin_feats": [
+                "magic_initiate",
+                "skilled"
+              ],
+              "saving_throw_proficiencies": [
+                "dexterity",
+                "charisma"
+              ],
+              "size_rank": 1,
+              "skill_proficiencies": [
+                "insight",
+                "religion",
+                "persuasion",
+                "deception",
+                "performance",
+                "perception",
+                "acrobatics",
+                "investigation",
+                "stealth"
+              ],
+              "species": "Human",
+              "speed": 30,
+              "spellcasting_grants": [
+                {
+                  "ability": "charisma",
+                  "source": "bard",
+                  "spells": [
+                    "vicious_mockery",
+                    "mage_hand",
+                    "cure_wounds",
+                    "dissonant_whispers",
+                    "sleep",
+                    "thunderwave"
+                  ]
+                },
+                {
+                  "ability": "charisma",
+                  "source": "magic_initiate_cleric",
+                  "spells": [
+                    "guidance",
+                    "light",
+                    "healing_word"
+                  ]
+                }
+              ],
+              "tool_proficiencies": [
+                "calligraphers_supplies",
+                "musical_instrument_lute",
+                "musical_instrument_flute",
+                "musical_instrument_drum"
+              ],
+              "weapon_proficiencies": [
+                "simple_weapons"
+              ],
+              "party_role": "player_character"
+            },
+            "entity_state": {
+              "available_bonus_actions": [],
+              "conditions": [],
+              "damage_immunities": [],
+              "damage_resistances": [],
+              "damage_vulnerabilities": [],
+              "hit_die_size": 8,
+              "inventory": [
+                "leather",
+                "dagger",
+                "lute",
+                "entertainers_pack",
+                "gp",
+                "calligraphers_supplies",
+                "book_prayers",
+                "parchment",
+                "robe",
+                "holy_symbol"
+              ],
+              "inventory_quantities": {
+                "book_prayers": 1,
+                "calligraphers_supplies": 1,
+                "dagger": 2,
+                "entertainers_pack": 1,
+                "gp": 27,
+                "holy_symbol": 1,
+                "leather": 1,
+                "lute": 1,
+                "parchment": 10,
+                "robe": 1
+              },
+              "max_hp": 9,
+              "prepared_spells": [
+                "vicious_mockery",
+                "mage_hand",
+                "cure_wounds",
+                "dissonant_whispers",
+                "sleep",
+                "thunderwave",
+                "guidance",
+                "light",
+                "healing_word"
+              ],
+              "resource_maxima": {
+                "bardic_inspiration": 3,
+                "hit_die": 1,
+                "spell_slot_1": 2,
+                "second_wind": 0
+              },
+              "resources": {
+                "bardic_inspiration": 3,
+                "hit_die": 1,
+                "spell_slot_1": 2,
+                "second_wind": 0
+              },
+              "weapon_sets": {
+                "active_set": "melee",
+                "format": 1,
+                "melee": {
+                  "main_hand": "dagger",
+                  "off_hand": null
+                },
+                "ranged": {
+                  "main_hand": null,
+                  "off_hand": null
+                }
+              },
+              "worn_armor": {
+                "armor_type": "leather_armor",
+                "inventory_item": "leather",
+                "magic_bonus": 0
+              },
+              "worn_shield": null,
+              "name": "Neri Vale",
+              "size_rank": 1,
+              "creature_kind": "character",
+              "hp": 9,
+              "temp_hp": 0,
+              "bloodied": false,
+              "is_alive": true,
+              "initiative_modifier": 2,
+              "melee_reach": 5,
+              "constitution_modifier": 1,
+              "death_failures": 0,
+              "death_successes": 0,
+              "stable": false,
+              "stable_recovery_hours_remaining": 0,
+              "exhaustion_level": 0,
+              "saving_throw_modifiers": {
+                "strength": -1,
+                "dexterity": 4,
+                "constitution": 1,
+                "intelligence": 0,
+                "wisdom": 1,
+                "charisma": 5
+              },
+              "fighter_level": 0,
+              "armor_class": 13,
+              "armor_speed_penalty": 0,
+              "armor_untrained": false,
+              "armor_stealth_disadvantage": false,
+              "speed": 30,
+              "climb_speed": 0,
+              "swim_speed": 0
+            },
+            "setting_data": {}
+          },
+          "content_sha256": "2e7af37fe3a43d6c4f058ddccbae9b09a4c71a5a28b46ea53a2dd025ac708093"
+        },
+        {
+          "role": "companion",
+          "character": {
+            "format_id": "sylvia-gm-character-file",
+            "format_version": 2,
+            "id": "ready-fighter-1",
+            "schema": {
+              "id": "sylvia.srd-lite.bg3.player-character",
+              "content_sha256": "f18aefccc825474cba9d8326636207cc38789fc2526b48bc652c46c5ebf07f91"
+            },
+            "summary": "Fighter · Level 1. A direct greatsword fighter in chain mail. Attack on your turn and use Second Wind when hurt; you begin with two uses.",
+            "authored_profile": "# Bram Alder\n\nHuman Fighter, level 1. Pronouns: they/them.\n\nSteady and dry-witted; likes a clear plan and a hot meal. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Bram\n\nA direct greatsword fighter in chain mail. Attack on your turn and use Second Wind when hurt; you begin with two uses.\n\n## Creation choices\n\nStandard array, then the Soldier background increases, is reflected in the final ability scores. Soldier supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies nature. Skilled choices: survival acrobatics stealth. Class skill choices: perception insight. Starting equipment uses class option A and background option A, with 18 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
+            "participant": {
+              "abilities": {
+                "charisma": 8,
+                "constitution": 14,
+                "dexterity": 14,
+                "intelligence": 10,
+                "strength": 17,
+                "wisdom": 12
+              },
+              "background": "Soldier",
+              "classes": [
+                {
+                  "id": "fighter",
+                  "level": 1
+                }
+              ],
+              "fighting_styles": [
+                {
+                  "source": "fighter",
+                  "style": "defense"
+                }
+              ],
+              "level": 1,
+              "name": "Bram Alder",
+              "origin_feats": [
+                "savage_attacker",
+                "skilled"
+              ],
+              "saving_throw_proficiencies": [
+                "strength",
+                "constitution"
+              ],
+              "size_rank": 1,
+              "skill_proficiencies": [
+                "athletics",
+                "intimidation",
+                "perception",
+                "insight",
+                "nature",
+                "survival",
+                "acrobatics",
+                "stealth"
+              ],
+              "species": "Human",
+              "speed": 30,
+              "spellcasting_grants": [],
+              "tool_proficiencies": [
+                "gaming_set_dice"
+              ],
+              "weapon_masteries": [
+                "greatsword",
+                "flail",
+                "spear"
+              ],
+              "weapon_proficiencies": [
+                "simple_weapons",
+                "martial_weapons"
+              ],
+              "party_role": "companion"
+            },
+            "entity_state": {
+              "ammunition": {
+                "arrow": 20
+              },
+              "ammunition_expended": {
+                "arrow": 0
+              },
+              "available_bonus_actions": [
+                "second_wind"
+              ],
+              "conditions": [],
+              "damage_immunities": [],
+              "damage_resistances": [],
+              "damage_vulnerabilities": [],
+              "hit_die_size": 10,
+              "inventory": [
+                "chain_mail",
+                "greatsword",
+                "flail",
+                "javelin",
+                "dungeoneers_pack",
+                "gp",
+                "spear",
+                "shortbow",
+                "arrow",
+                "gaming_set_dice",
+                "healers_kit",
+                "quiver",
+                "travelers_clothes"
+              ],
+              "inventory_quantities": {
+                "arrow": 20,
+                "chain_mail": 1,
+                "dungeoneers_pack": 1,
+                "flail": 1,
+                "gaming_set_dice": 1,
+                "gp": 18,
+                "greatsword": 1,
+                "healers_kit": 1,
+                "javelin": 8,
+                "quiver": 1,
+                "shortbow": 1,
+                "spear": 1,
+                "travelers_clothes": 1
+              },
+              "max_hp": 12,
+              "prepared_spells": [],
+              "resource_maxima": {
+                "hit_die": 1,
+                "second_wind": 2
+              },
+              "resources": {
+                "hit_die": 1,
+                "second_wind": 2
+              },
+              "weapon_sets": {
+                "active_set": "melee",
+                "format": 1,
+                "melee": {
+                  "main_hand": "greatsword",
+                  "off_hand": "greatsword"
+                },
+                "ranged": {
+                  "main_hand": null,
+                  "off_hand": null
+                }
+              },
+              "worn_armor": {
+                "armor_type": "chain_mail",
+                "inventory_item": "chain_mail",
+                "magic_bonus": 0
+              },
+              "worn_shield": null,
+              "name": "Bram Alder",
+              "size_rank": 1,
+              "creature_kind": "character",
+              "hp": 12,
+              "temp_hp": 0,
+              "bloodied": false,
+              "is_alive": true,
+              "initiative_modifier": 2,
+              "melee_reach": 5,
+              "constitution_modifier": 2,
+              "death_failures": 0,
+              "death_successes": 0,
+              "stable": false,
+              "stable_recovery_hours_remaining": 0,
+              "exhaustion_level": 0,
+              "saving_throw_modifiers": {
+                "strength": 5,
+                "dexterity": 2,
+                "constitution": 4,
+                "intelligence": 0,
+                "wisdom": 1,
+                "charisma": -1
+              },
+              "fighter_level": 1,
+              "armor_class": 17,
+              "armor_speed_penalty": 0,
+              "armor_untrained": false,
+              "armor_stealth_disadvantage": true,
+              "speed": 30,
+              "climb_speed": 0,
+              "swim_speed": 0
+            },
+            "setting_data": {}
+          },
+          "content_sha256": "30eea6478cc30917f3a2ccb6a7f57a9adc69bc99909972955cfe1382a5b732b2"
+        },
+        {
+          "role": "companion",
+          "character": {
+            "format_id": "sylvia-gm-character-file",
+            "format_version": 2,
+            "id": "ready-cleric-1",
+            "schema": {
+              "id": "sylvia.srd-lite.bg3.player-character",
+              "content_sha256": "f18aefccc825474cba9d8326636207cc38789fc2526b48bc652c46c5ebf07f91"
+            },
+            "summary": "Cleric · Level 1. Protect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies.",
+            "authored_profile": "# Oren Reed\n\nHuman Cleric, level 1. Pronouns: they/them.\n\nPatient and practical; asks what would help before offering advice. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Oren\n\nProtect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies. Divine Order: Protector.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: history survival athletics. Class skill choices: medicine persuasion. Starting equipment uses class option A and background option A, with 15 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
+            "participant": {
+              "abilities": {
+                "charisma": 8,
+                "constitution": 13,
+                "dexterity": 14,
+                "intelligence": 11,
+                "strength": 12,
+                "wisdom": 17
+              },
+              "background": "Acolyte",
+              "classes": [
+                {
+                  "id": "cleric",
+                  "level": 1
+                }
+              ],
+              "cleric_order": "protector",
+              "level": 1,
+              "name": "Oren Reed",
+              "origin_feats": [
+                "magic_initiate",
+                "skilled"
+              ],
+              "saving_throw_proficiencies": [
+                "wisdom",
+                "charisma"
+              ],
+              "size_rank": 1,
+              "skill_proficiencies": [
+                "insight",
+                "religion",
+                "medicine",
+                "persuasion",
+                "perception",
+                "history",
+                "survival",
+                "athletics"
+              ],
+              "species": "Human",
+              "speed": 30,
+              "spellcasting_grants": [
+                {
+                  "ability": "wisdom",
+                  "source": "cleric",
+                  "spells": [
+                    "guidance",
+                    "sacred_flame",
+                    "light",
+                    "bless",
+                    "cure_wounds",
+                    "guiding_bolt",
+                    "healing_word"
+                  ]
+                },
+                {
+                  "ability": "wisdom",
+                  "source": "magic_initiate_cleric",
+                  "spells": [
+                    "spare_the_dying",
+                    "mending",
+                    "command"
+                  ]
+                }
+              ],
+              "tool_proficiencies": [
+                "calligraphers_supplies"
+              ],
+              "weapon_proficiencies": [
+                "simple_weapons",
+                "martial_weapons"
+              ],
+              "party_role": "companion"
+            },
+            "entity_state": {
+              "available_bonus_actions": [],
+              "conditions": [],
+              "damage_immunities": [],
+              "damage_resistances": [],
+              "damage_vulnerabilities": [],
+              "hit_die_size": 8,
+              "inventory": [
+                "chain_shirt",
+                "shield",
+                "mace",
+                "holy_symbol",
+                "priests_pack",
+                "gp",
+                "calligraphers_supplies",
+                "book_prayers",
+                "parchment",
+                "robe"
+              ],
+              "inventory_quantities": {
+                "book_prayers": 1,
+                "calligraphers_supplies": 1,
+                "chain_shirt": 1,
+                "gp": 15,
+                "holy_symbol": 2,
+                "mace": 1,
+                "parchment": 10,
+                "priests_pack": 1,
+                "robe": 1,
+                "shield": 1
+              },
+              "max_hp": 9,
+              "prepared_spells": [
+                "guidance",
+                "sacred_flame",
+                "light",
+                "bless",
+                "cure_wounds",
+                "guiding_bolt",
+                "healing_word",
+                "spare_the_dying",
+                "mending",
+                "command"
+              ],
+              "resource_maxima": {
+                "hit_die": 1,
+                "spell_slot_1": 2,
+                "second_wind": 0
+              },
+              "resources": {
+                "hit_die": 1,
+                "spell_slot_1": 2,
+                "second_wind": 0
+              },
+              "weapon_sets": {
+                "active_set": "melee",
+                "format": 1,
+                "melee": {
+                  "main_hand": "mace",
+                  "off_hand": "shield"
+                },
+                "ranged": {
+                  "main_hand": null,
+                  "off_hand": null
+                }
+              },
+              "worn_armor": {
+                "armor_type": "chain_shirt",
+                "inventory_item": "chain_shirt",
+                "magic_bonus": 0
+              },
+              "worn_shield": {
+                "armor_type": "shield",
+                "inventory_item": "shield",
+                "magic_bonus": 0
+              },
+              "name": "Oren Reed",
+              "size_rank": 1,
+              "creature_kind": "character",
+              "hp": 9,
+              "temp_hp": 0,
+              "bloodied": false,
+              "is_alive": true,
+              "initiative_modifier": 2,
+              "melee_reach": 5,
+              "constitution_modifier": 1,
+              "death_failures": 0,
+              "death_successes": 0,
+              "stable": false,
+              "stable_recovery_hours_remaining": 0,
+              "exhaustion_level": 0,
+              "saving_throw_modifiers": {
+                "strength": 1,
+                "dexterity": 2,
+                "constitution": 1,
+                "intelligence": 0,
+                "wisdom": 5,
+                "charisma": 1
+              },
+              "fighter_level": 0,
+              "armor_class": 17,
+              "armor_speed_penalty": 0,
+              "armor_untrained": false,
+              "armor_stealth_disadvantage": false,
+              "speed": 30,
+              "climb_speed": 0,
+              "swim_speed": 0
+            },
+            "setting_data": {}
+          },
+          "content_sha256": "8b0554e6d8e7145f50a91d10fe710d5c4f184a18822e4fc3001df9a84ec9c0a5"
+        }
+      ]
+    }
+  ]
+}

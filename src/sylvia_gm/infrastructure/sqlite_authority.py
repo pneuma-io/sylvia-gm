@@ -148,7 +148,7 @@ from sylvia_gm.infrastructure import (
     sqlite_session,
     sqlite_state_ownership,
 )
-from sylvia_gm.infrastructure.owner_lock import DatabaseOwnerLock
+from sylvia_gm.infrastructure.owner_lock import DatabaseOwnerLock, authority_lock_identity
 from sylvia_gm.infrastructure.package_archive import (
     PACKAGE_CHUNK_LIMIT,
     AdmittedPackageArchive,
@@ -1037,6 +1037,7 @@ class SQLiteAuthorityStore:
         database_path: Path,
         *,
         _application_owner_gate: object | None = None,
+        before_migration: Callable[[], None] | None = None,
     ) -> None:
         if _application_owner_gate is not _APPLICATION_OWNER_GATE:
             raise CommandRejected(
@@ -1044,14 +1045,34 @@ class SQLiteAuthorityStore:
                 code="application_owner_required",
             )
         self._database_path = database_path.resolve()
-        lock_identity = self._database_path.with_name(f"{self._database_path.name}.authority-owner")
-        self._owner_lock = DatabaseOwnerLock(lock_identity)
+        self._owner_lock = DatabaseOwnerLock(authority_lock_identity(self._database_path))
+        self._created_new_database = False
         try:
+            # Startup admission must stay under this ownership lock through migrations.
+            if before_migration is not None:
+                before_migration()
             self._migrate()
         except BaseException:
             self._owner_lock.close()
             raise
         self._closed = False
+
+    def prepare_new_campaign_storage(self) -> None:
+        """Finish fresh-profile migrations before bundles make verified backups expensive."""
+        if not self._created_new_database:
+            return
+        connection = self._connect()
+        try:
+            connection.execute("BEGIN IMMEDIATE")
+            self._ensure_campaign_schema(connection)
+            connection.commit()
+            self._created_new_database = False
+        except BaseException:
+            if connection.in_transaction:
+                connection.rollback()
+            raise
+        finally:
+            connection.close()
 
     def _connect(self) -> sqlite3.Connection:
         if self._closed:
@@ -3651,6 +3672,7 @@ class SQLiteAuthorityStore:
         return version
 
     def _migrate(self) -> None:
+        new_database = not self._database_path.exists()
         if self._database_path.exists() and self._database_path.stat().st_size == 0:
             raise SchemaIdentityError("Authority schema identity is incomplete")
         self._database_path.parent.mkdir(parents=True, exist_ok=True)
@@ -3717,6 +3739,7 @@ class SQLiteAuthorityStore:
                 )
                 connection.execute("PRAGMA user_version = 1")
                 connection.commit()
+                self._created_new_database = new_database
                 version = 1
             if version == 1:
                 connection.executescript("BEGIN IMMEDIATE;\n" + _MIGRATION_2)
@@ -7311,6 +7334,25 @@ class SQLiteAuthorityStore:
         ):
             raise IdempotencyConflict("Campaign operation identity payload does not match")
         return self._campaign_operation_result(row)
+
+    def campaign_confirmation(self, operation_id: str) -> CampaignConfirmation | None:
+        """Project the saved confirmation; absence never requires schema mutation."""
+        connection = self._connect_read_only()
+        try:
+            version = self._verify_exact_schema_identity(connection)
+            if version in (_SCHEMA_VERSION, _SESSION_SCHEMA_VERSION):
+                return None
+            row = connection.execute(
+                "SELECT * FROM campaign_operations WHERE operation_id = ?", (operation_id,)
+            ).fetchone()
+            if row is None:
+                return None
+            result = self._campaign_operation_result(row)
+            if not isinstance(result, CampaignConfirmation):
+                raise IdempotencyConflict("Campaign operation is not a confirmation")
+            return result
+        finally:
+            connection.close()
 
     def campaign_operation_hit(
         self,
@@ -12427,16 +12469,9 @@ class SQLiteAuthorityStore:
             connection.execute("BEGIN IMMEDIATE")
             sqlite_packages.begin_staging(connection, install_id, manifest_json)
             connection.commit()
-        except BaseException:
-            if connection.in_transaction:
-                connection.rollback()
-            raise
-        finally:
-            connection.close()
-        for file_order, archive_file in enumerate(admitted.files):
-            for chunk_order, chunk in enumerate(admitted.iter_file_chunks(archive_file)):
-                connection = self._connect()
-                try:
+            # Retain each committed retry prefix without reopening SQLite for every chunk.
+            for file_order, archive_file in enumerate(admitted.files):
+                for chunk_order, chunk in enumerate(admitted.iter_file_chunks(archive_file)):
                     connection.execute("BEGIN IMMEDIATE")
                     sqlite_packages.append_staging_chunk(
                         connection,
@@ -12450,12 +12485,12 @@ class SQLiteAuthorityStore:
                         chunk=chunk,
                     )
                     connection.commit()
-                except BaseException:
-                    if connection.in_transaction:
-                        connection.rollback()
-                    raise
-                finally:
-                    connection.close()
+        except BaseException:
+            if connection.in_transaction:
+                connection.rollback()
+            raise
+        finally:
+            connection.close()
 
     def publish_package_archive(
         self, admitted: AdmittedPackageArchive, install_id: str
@@ -13428,10 +13463,13 @@ class SQLiteAuthorityStore:
 
 
 
-def _open_for_application_owner(database_path: Path) -> SQLiteAuthorityStore:
-    """Package-private construction gate used only by application authority."""
+def _open_for_application_owner(
+    database_path: Path, *, before_migration: Callable[[], None] | None = None,
+) -> SQLiteAuthorityStore:
+    """Application-only construction; validate startup under ownership before opening SQLite."""
 
     return SQLiteAuthorityStore(
         database_path,
         _application_owner_gate=_APPLICATION_OWNER_GATE,
+        before_migration=before_migration,
     )

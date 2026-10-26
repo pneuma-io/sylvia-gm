@@ -12,13 +12,19 @@ import queue
 import shutil
 import subprocess
 import threading
-from contextlib import suppress
+import time
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager, suppress
 from pathlib import Path
 from typing import Any
 
 
 class CodexConnectionError(RuntimeError):
     """A privacy-safe connection failure suitable for the settings surface."""
+
+
+class CodexCancelledError(CodexConnectionError):
+    """This inference was intentionally stopped rather than losing its connection."""
 
 
 def isolated_environment(home: Path) -> dict[str, str]:
@@ -91,106 +97,144 @@ class CodexConnection:
         self._responses: queue.Queue[dict[str, Any] | None] = queue.Queue()
         self._notifications: queue.Queue[dict[str, Any]] = queue.Queue(maxsize=8192)
         self._next_id = 0
+        self._stop_requested = threading.Event()
+        self._lifecycle_observer: Callable[[str, int, int, str], None] | None = None
+
+    def set_lifecycle_observer(
+        self, observer: Callable[[str, int, int, str], None],
+    ) -> None:
+        """Report local boundary metadata without exposing protocol or process content."""
+        self._lifecycle_observer = observer
+
+    def request_stop(self) -> None:
+        """Fence this inference connection and wake its pending RPC without reading credentials."""
+        if not self._stop_requested.is_set():
+            self._stop_requested.set()
+            self._responses.put(None)
+
+    def _check_stopped(self) -> None:
+        if self._stop_requested.is_set():
+            raise CodexCancelledError("The ChatGPT response was cancelled.")
+
+    @contextmanager
+    def _measure(self, name: str) -> Iterator[None]:
+        start, status = time.perf_counter_ns(), "completed"
+        try:
+            yield
+        except BaseException as error:
+            status = "cancelled" if isinstance(error, CodexCancelledError) else "error"
+            raise
+        finally:
+            if self._lifecycle_observer is not None:
+                with suppress(Exception):
+                    self._lifecycle_observer(name, start, time.perf_counter_ns(), status)
 
     def start(self) -> None:
         """Start a dedicated stdio child with its own profile and no environment access."""
         with self._call_lock:
+            self._check_stopped()
             if self._process is not None and self._process.poll() is None:
                 return
-            resolved = str(self.executable) if self.executable else find_codex_runtime()
-            if not resolved or (os.name == "nt" and Path(resolved).suffix.lower() != ".exe"):
-                raise CodexConnectionError("Install the Codex runtime before connecting ChatGPT.")
-            self.workspace.mkdir(parents=True, exist_ok=True)
-            self._responses = queue.Queue()
-            self._notifications = queue.Queue(maxsize=8192)
-            self._overflow = False
-            command = [
-                resolved,
-                "app-server",
-                "--stdio",
-                "-c",
-                'cli_auth_credentials_store="file"',
-                "-c",
-                'forced_login_method="chatgpt"',
-                "-c",
-                "analytics.enabled=false",
-                "-c",
-                'history.persistence="none"',
-                "-c",
-                "features.shell_tool=false",
-                "-c",
-                "features.code_mode_host=true",
-                "-c",
-                'features.code_mode.direct_only_tool_namespaces=["sylvia"]',
-                "-c",
-                "features.multi_agent=false",
-                "-c",
-                "features.multi_agent_v2=false",
-                "-c",
-                "agents.enabled=false",
-                "-c",
-                "tools.experimental_request_user_input.enabled=false",
-                "-c",
-                "tools.update_plan.enabled=false",
-                "-c",
-                "skills.include_instructions=false",
-                "-c",
-                "features.apps=false",
-                "-c",
-                "features.goals=false",
-                "-c",
-                "features.hooks=false",
-                "-c",
-                "features.memories=false",
-                "-c",
-                "features.skip_host_skill_discovery=true",
-                "-c",
-                "features.skill_search=false",
-                "-c",
-                "features.tool_suggest=false",
-                "-c",
-                "features.sleep_tool=false",
-                "-c",
-                'web_search="disabled"',
-            ]
+            with self._measure("process_boot"):
+                self._start_process()
             try:
-                process = subprocess.Popen(
-                    command,
-                    cwd=self.workspace,
-                    env=isolated_environment(self.home),
-                    stdin=subprocess.PIPE,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.DEVNULL,
-                    text=True,
-                    encoding="utf-8",
-                    bufsize=1,
-                    creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
-                )
-            except OSError:
-                raise CodexConnectionError("The Codex runtime could not be started.") from None
-            self._process = process
-            threading.Thread(
-                target=self._read,
-                args=(process, self._responses, self._notifications),
-                daemon=True,
-                name="sylvia-chatgpt-rpc",
-            ).start()
-            try:
-                self.call(
-                    "initialize",
-                    {
-                        "clientInfo": {
-                            "name": "sylvia_gm",
-                            "title": "Sylvia GM",
-                            "version": "0.3.0",
+                with self._measure("initialize"):
+                    self.call(
+                        "initialize",
+                        {
+                            "clientInfo": {
+                                "name": "sylvia_gm",
+                                "title": "Sylvia GM",
+                                "version": "0.3.0",
+                            },
+                            "capabilities": {"experimentalApi": True},
                         },
-                        "capabilities": {"experimentalApi": True},
-                    },
-                )
-                self._write({"method": "initialized"})
+                    )
+                    self._write({"method": "initialized"})
             except BaseException:
                 self.close()
                 raise
+
+    def _start_process(self) -> None:
+        """Create and retain only this connection's isolated runtime instance."""
+        resolved = str(self.executable) if self.executable else find_codex_runtime()
+        if not resolved or (os.name == "nt" and Path(resolved).suffix.lower() != ".exe"):
+            raise CodexConnectionError("Install the Codex runtime before connecting ChatGPT.")
+        self.workspace.mkdir(parents=True, exist_ok=True)
+        self._responses = queue.Queue()
+        self._notifications = queue.Queue(maxsize=8192)
+        self._overflow = False
+        command = [
+            resolved,
+            "app-server",
+            "--stdio",
+            "-c",
+            'cli_auth_credentials_store="file"',
+            "-c",
+            'forced_login_method="chatgpt"',
+            "-c",
+            "analytics.enabled=false",
+            "-c",
+            'history.persistence="none"',
+            "-c",
+            "features.shell_tool=false",
+            "-c",
+            "features.code_mode_host=true",
+            "-c",
+            'features.code_mode.direct_only_tool_namespaces=["sylvia"]',
+            "-c",
+            "features.multi_agent=false",
+            "-c",
+            "features.multi_agent_v2=false",
+            "-c",
+            "agents.enabled=false",
+            "-c",
+            "tools.experimental_request_user_input.enabled=false",
+            "-c",
+            "tools.update_plan.enabled=false",
+            "-c",
+            "skills.include_instructions=false",
+            "-c",
+            "features.apps=false",
+            "-c",
+            "features.goals=false",
+            "-c",
+            "features.hooks=false",
+            "-c",
+            "features.memories=false",
+            "-c",
+            "features.skip_host_skill_discovery=true",
+            "-c",
+            "features.skill_search=false",
+            "-c",
+            "features.tool_suggest=false",
+            "-c",
+            "features.sleep_tool=false",
+            "-c",
+            'web_search="disabled"',
+        ]
+        try:
+            process = subprocess.Popen(
+                command,
+                cwd=self.workspace,
+                env=isolated_environment(self.home),
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+                text=True,
+                encoding="utf-8",
+                bufsize=1,
+                creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
+            )
+        except OSError:
+            raise CodexConnectionError("The Codex runtime could not be started.") from None
+        self._process = process
+        threading.Thread(
+            target=self._read,
+            args=(process, self._responses, self._notifications),
+            daemon=True,
+            name="sylvia-chatgpt-rpc",
+        ).start()
 
     def _write(self, message: dict[str, Any]) -> None:
         """Write one indivisible protocol record; never include it in an exception."""
@@ -259,6 +303,7 @@ class CodexConnection:
     def call(self, method: str, params: dict[str, Any], *, timeout: float = 30) -> dict[str, Any]:
         """Wait for a correlated reply and close on timeout to prevent stale work reuse."""
         with self._call_lock:
+            self._check_stopped()
             self._next_id += 1
             request_id = self._next_id
             self._write({"id": request_id, "method": method, "params": params})
@@ -269,6 +314,7 @@ class CodexConnection:
                 raise CodexConnectionError(
                     "The ChatGPT connection timed out. Reconnect to retry."
                 ) from None
+            self._check_stopped()
             if response is None or response.get("id") != request_id:
                 self.close()
                 raise CodexConnectionError("The ChatGPT connection ended before replying.")
@@ -295,10 +341,13 @@ class CodexConnection:
 
     def next_event(self, timeout: float = 0.25) -> dict[str, Any] | None:
         """Read one event with a short bounded wait so async cancellation stays responsive."""
+        self._check_stopped()
         if self._overflow:
             raise CodexConnectionError("The ChatGPT event stream exceeded its safe buffer.")
         try:
-            return self._notifications.get(timeout=timeout)
+            event = self._notifications.get(timeout=timeout)
+            self._check_stopped()
+            return event
         except queue.Empty:
             if self._process is None or self._process.poll() is not None:
                 raise CodexConnectionError(

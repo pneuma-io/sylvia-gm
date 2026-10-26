@@ -701,6 +701,8 @@ class AuthorityOwner:
         self._lanes: dict[str, threading.RLock] = {}
         self._lanes_lock = threading.Lock()
         self._narration_lock = threading.RLock()
+        self._ready_campaign_lock = threading.RLock()
+        self._rejected_ready_campaign_operations: set[str] = set()
         self._attempts: dict[tuple[str, str], _NarrationAttempt] = {}
         self._pending_tools: dict[tuple[str, str], PlayerProjection] = {}
         self._inspector_trace: list[object] = []
@@ -723,15 +725,21 @@ class AuthorityOwner:
         *,
         disconnect_grace_seconds: float | None = None,
         model_capability_registry: ModelCapabilityRegistry | None = None,
+        before_migration: Callable[[], None] | None = None,
     ) -> AuthorityOwner:
         validate_authority_identity(owner_id, "Application owner identity")
         return cls(
-            _open_for_application_owner(database_path),
+            _open_for_application_owner(database_path, before_migration=before_migration),
             owner_id,
             disconnect_grace_seconds=disconnect_grace_seconds,
             model_capability_registry=model_capability_registry,
             content_storage_root=database_path.resolve().parent,
         )
+
+    def prepare_new_campaign_storage(self) -> None:
+        """Initialize a newly created desktop profile without migrating existing profiles early."""
+        with self._operation():
+            self._store.prepare_new_campaign_storage()
 
     def model_guidance(
         self,
@@ -3074,6 +3082,39 @@ class AuthorityOwner:
         with self._operation(), self._session_campaign_work(session_id):
             return self._sessions.append_canonical_references(session_id, events)
 
+    @contextmanager
+    def ready_campaign_start_work(self, operation_id: str) -> Iterator[None]:
+        """Reject fenced attempts even when they arrive after a later request overtook them."""
+        with self._operation(), self._ready_campaign_lock:
+            self._assert_campaign_creation_not_rejected(operation_id)
+            yield
+
+    def _assert_campaign_creation_not_rejected(self, operation_id: str) -> None:
+        if (
+            isinstance(operation_id, str)
+            and operation_id in self._rejected_ready_campaign_operations
+        ):
+            raise CommandRejected(
+                "This prepared start was rejected without creating a campaign. "
+                "Review the current choices and start again.",
+                code="ready_campaign_not_created",
+            )
+
+    def reject_uncreated_ready_campaign(self, operation_id: str) -> bool:
+        """Fence a rejected identity before reporting absence to its caller."""
+        with self._operation(), self._ready_campaign_lock:
+            if self.campaign_confirmation(operation_id) is not None:
+                return False
+            # Do not evict while this owner lives: a pre-lane worker may still hold the identity.
+            self._rejected_ready_campaign_operations.add(operation_id)
+            return True
+
+    def campaign_confirmation(self, operation_id: str) -> CampaignConfirmation | None:
+        """Read a durable confirmation without recreating its original mutable inputs."""
+        with self._operation():
+            validate_authority_identity(operation_id, "Campaign operation identity")
+            return self._store.campaign_confirmation(operation_id)
+
     def confirm_new_campaign(
         self,
         *,
@@ -3091,7 +3132,8 @@ class AuthorityOwner:
     ) -> CampaignConfirmation:
         """Create the stable campaign aggregate before either Builder lane begins."""
 
-        with self._operation():
+        with self._operation(), self._ready_campaign_lock:
+            self._assert_campaign_creation_not_rejected(operation_id)
             builder_session: SessionRecord | None = None
             try:
                 for value, label in (
@@ -4187,6 +4229,11 @@ class AuthorityOwner:
         dm_session_id = f"session-dm-{suffix}"
 
         builder_context = self._sessions.context(basis.builder_session_id)
+        prepared_selection = any(
+            message.kind is SessionMessageKind.USER
+            and message.content.get("ready_campaign_id") is not None
+            for message in builder_context.messages
+        )
         guided_construction = any(
             message.kind is SessionMessageKind.EVIDENCE
             and message.content.get("kind") == "campaign_interview_state"
@@ -4333,9 +4380,13 @@ class AuthorityOwner:
             content_sha256=content_sha256,
             source_locator=None,
             safe_excerpt=(
-                "Builder-authored campaign plan file."
-                if plan_artifact_text is not None
-                else "Owner-materialized campaign construction plan."
+                "Selected bundled prepared Campaign Plan."
+                if prepared_selection
+                else (
+                    "Builder-authored campaign plan file."
+                    if plan_artifact_text is not None
+                    else "Owner-materialized campaign construction plan."
+                )
             ),
             claims=("construction-input", "package-lock", "participant-artifacts"),
         )

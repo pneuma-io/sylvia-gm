@@ -33,8 +33,9 @@ const SylviaGMFrontend = (() => {
     sidebarCollapsed: { left: false, right: false }, // presentation only, independent of campaign layout
     deletingBuilderChats: new Set(),
     archivingItems: new Set(),
-    sessionDrafts: new Map(), // ephemeral compose text isolated by exact session identity
+    sessionDrafts: new Map(), // unsent compose text isolated by exact session identity
     builderQuestionDrafts: new Map(), // pending question fields isolated by Builder session
+    desktopDrafts: null,
     sessionActivities: new Map(), // one stream/retry lifecycle record per exact session identity
     modelChoices: [],         // safe owner-projected model metadata
     providerSettings: null,   // safe provider metadata; credentials are never projected back
@@ -47,6 +48,7 @@ const SylviaGMFrontend = (() => {
     constructionRestoreInProgress: false,
     constructionPanelGeneration: 0,
     applicationInfo: null,    // host-projected release identity; never campaign truth
+    desktopUpdater: null,
     activeCampaignId: null,
     rulesUpdateController: null,
     activeSessionId: null,
@@ -772,7 +774,7 @@ const SylviaGMFrontend = (() => {
     stopStreamHeartbeat(previous);
     stopProjectionPolling(previous);
     const activity = {
-      ...previous, attemptId, phase: 'working', attachmentGeneration: null,
+      ...previous, attemptId, phase: 'working', activityPhase: 'queued', attachmentGeneration: null,
       terminalLabel: null,
       restored: false, stopRequestedAttemptId: null, pendingInput: null,
       projectionTimer: null, projectionPollBusy: false,
@@ -887,6 +889,16 @@ const SylviaGMFrontend = (() => {
     if (!invoke) return null;
     return {
       application_info: () => invoke('application_info'),
+      desktop_update_state: () => invoke('desktop_update_state'),
+      desktop_update_check: () => invoke('desktop_update_check'),
+      desktop_update_download: operationId => invoke('desktop_update_download', { operationId }),
+      desktop_update_cancel: operationId => invoke('desktop_update_cancel', { operationId }),
+      desktop_update_defer: operationId => invoke('desktop_update_defer', { operationId }),
+      desktop_update_startup_state: () => invoke('desktop_update_startup_state'),
+      desktop_update_confirm_startup: () => invoke('desktop_update_confirm_startup'),
+      desktop_update_install: operationId => invoke('desktop_update_install', { operationId }),
+      load_desktop_drafts: () => invoke('load_desktop_drafts'),
+      save_desktop_drafts: drafts => invoke('save_desktop_drafts', { drafts }),
       record_local_fault: (category, delta) => invoke('record_local_fault', { category, delta }),
       preview_local_report: (report) => invoke('preview_local_report', report),
       cancel_local_report: (previewId) => invoke('cancel_local_report', { previewId }),
@@ -897,6 +909,9 @@ const SylviaGMFrontend = (() => {
       dictation_stop: (id) => invoke('dictation_stop', { id }),
       dictation_cancel: (id) => invoke('dictation_cancel', { id }),
       campaign_index: () => invoke('campaign_index'),
+      ready_campaign_catalog: () => invoke('ready_campaign_catalog'),
+      start_ready_campaign: command => invoke('start_ready_campaign', { command }),
+      customize_ready_campaign: command => invoke('customize_ready_campaign', { command }),
       campaign_creation_catalog: (includeParticipants = true) => invoke(
         'campaign_creation_catalog', { includeParticipants }
       ),
@@ -1345,21 +1360,109 @@ const SylviaGMFrontend = (() => {
       setTimeout(() => { void init(); }, 500);
       return;
     }
-    // Handshake already verified by the host before injection.
-    $('connecting-overlay').classList.add('hidden');
-    $('session-frame').style.display = 'flex';
-    wireControls();
-    window.SylviaLocalDiagnostics?.init(state.bridge);
-    localSupportReport = window.SylviaSupportReport?.init(state.bridge);
-    initTheme();
-    initSidebarResize();
-    await gamePanels().init();
-    await refreshApplicationInfo();
-    await refreshProviderSettings();
-    await refreshModelChoices();
-    await refreshNavigationIndexes();
-    await restoreDisconnectedStream();
-    showHome();
+    let updateStartup = { pending: false };
+    try {
+      if (state.bridge.desktop_update_startup_state) {
+        updateStartup = await state.bridge.desktop_update_startup_state();
+        if (!updateStartup || typeof updateStartup.pending !== 'boolean' ||
+            (updateStartup.pending && !/^[0-9a-f]{32}$/.test(updateStartup.operation_id || '')))
+          throw new Error('Invalid startup state');
+      }
+    } catch (_error) {
+      $('connecting-overlay').classList.remove('hidden');
+      $('connecting-overlay').querySelector('.connecting-text').textContent =
+        'Update startup status is unavailable. Close Sylvia and use update recovery.';
+      return;
+    }
+    const startupFrameWasInert = $('session-frame').inert;
+    if (updateStartup.pending) $('session-frame').inert = true;
+    try {
+      // Load local text before wiring compose controls; restoration never submits it.
+      state.desktopDrafts = window.SylviaDesktopDrafts?.mount(state.bridge, {
+        sessionDrafts: state.sessionDrafts, builderQuestionDrafts: state.builderQuestionDrafts,
+        failed: () => {
+          $('desktop-draft-status').textContent = 'Unsent drafts could not be saved. Keep this window open until saving succeeds.';
+          $('desktop-draft-status').hidden = false;
+        },
+        saved: () => { $('desktop-draft-status').hidden = true; },
+      });
+      const draftsLoaded = await state.desktopDrafts?.load();
+      if (updateStartup.pending && draftsLoaded !== true) throw new Error('Draft restoration unavailable');
+      // Handshake already verified by the host before injection.
+      if (!updateStartup.pending) $('connecting-overlay').classList.add('hidden');
+      $('session-frame').style.display = 'flex';
+      wireControls();
+      window.SylviaLocalDiagnostics?.init(state.bridge);
+      state.desktopUpdater = window.SylviaDesktopUpdates?.mount($('desktop-updates'), state.bridge,
+        async operationId => {
+          const frame = $('session-frame'), wasInert = frame.inert;
+          let closing = false;
+          frame.inert = true;
+          try {
+            if (typeof state.desktopDrafts?.rememberUpdate !== 'function') throw new Error('Draft saving unavailable');
+            saveSelectedSessionDraft();
+            await state.desktopDrafts.rememberUpdate(operationId, {
+              kind: state.view === 'session' && state.activeSessionId ? 'session' : 'home',
+              campaign_id: state.view === 'session' ? state.activeCampaignId || null : null,
+              session_id: state.view === 'session' ? state.activeSessionId || null : null,
+            });
+            const result = await state.bridge.desktop_update_install(operationId);
+            closing = ['closing', 'owner_closed', 'owner_unavailable'].includes(result?.status);
+            if (closing && result?.status !== 'closing') {
+              $('connecting-overlay').classList.remove('hidden');
+              $('connecting-overlay').querySelector('.connecting-text').textContent =
+                'Sylvia cannot continue using its data owner, and the update could not finish. Saved work and recovery files are retained. Close this window and use update recovery.';
+            }
+            return result;
+          } finally { if (!closing) frame.inert = wasInert; }
+        });
+      localSupportReport = window.SylviaSupportReport?.init(state.bridge);
+      initTheme();
+      initSidebarResize();
+      await gamePanels().init();
+      await refreshApplicationInfo();
+      await refreshProviderSettings();
+      await refreshModelChoices();
+      await refreshNavigationIndexes();
+    } catch (error) {
+      if (!updateStartup.pending) throw error;
+      $('connecting-overlay').classList.remove('hidden');
+      $('connecting-overlay').querySelector('.connecting-text').textContent =
+        'The updated app could not finish opening your saved state. Close Sylvia and use update recovery.';
+      return;
+    }
+    if (updateStartup.pending) {
+      // A restart restores saved presentation, never a provider submission or action queue.
+      showHome();
+      try {
+        for (;;) {
+          const confirmed = await state.bridge.desktop_update_confirm_startup();
+          if (confirmed?.status === 'confirmed') break;
+          if (confirmed?.status !== 'waiting_for_helper') throw new Error('Startup unconfirmed');
+          $('connecting-overlay').querySelector('.connecting-text').textContent =
+            'Finishing the application update.';
+          await new Promise(resolve => setTimeout(resolve, 250));
+        }
+        try { await restoreUpdateView(updateStartup.operation_id); }
+        catch (_error) {
+          showHome();
+          setInlineStatus('The application updated, but the previous view could not load. Open it from Home; saved history is retained.');
+        }
+      } catch (error) {
+        const rejection = typeof error === 'string' ? error : error?.message;
+        const code = typeof rejection === 'string' ? /^([a-z_]{1,64}):/.exec(rejection)?.[1] : null;
+        $('connecting-overlay').classList.remove('hidden');
+        $('connecting-overlay').querySelector('.connecting-text').textContent =
+          'Update startup could not be confirmed. Close Sylvia and use update recovery.' +
+          (code ? ` Error code: ${code}.` : '');
+        return;
+      }
+      $('session-frame').inert = startupFrameWasInert;
+      $('connecting-overlay').classList.add('hidden');
+    } else {
+      await restoreDisconnectedStream();
+      showHome();
+    }
     // Wire the despilled portrait asset — the host resolves the local
     // path; the renderer never loads remote content.
     if (state.bridge.resolvePortraitAsset) {
@@ -1373,6 +1476,20 @@ const SylviaGMFrontend = (() => {
       if (anySessionIsWorking()) return;
       void refreshNavigationIndexes();
     }, 15000);
+  }
+
+  // Restore presentation through read-only opens; no guided draft continuation or stream replay.
+  async function restoreUpdateView(operationId) {
+    const saved = state.desktopDrafts?.updateView?.(operationId);
+    if (saved?.kind !== 'session') return;
+    if (saved.campaign_id) {
+      const campaign = state.campaigns.find(item => item.campaign_id === saved.campaign_id &&
+        item.lifecycle === 'active' && item.sessions?.some(session => session.session_id === saved.session_id));
+      if (campaign) await openCampaign(saved.campaign_id, saved.session_id, { restoreOnly: true });
+    } else if (state.builderChats.some(chat => chat.session?.session_id === saved.session_id &&
+        chat.session.status !== 'stopped')) {
+      await openBuilderChat(saved.session_id);
+    }
   }
 
   function wireControls() {
@@ -1539,6 +1656,24 @@ const SylviaGMFrontend = (() => {
     $('home-new-campaign-btn').addEventListener('click', () => {
       void startCampaignBuilder();
     });
+    const readyCampaigns = window.SylviaReadyCampaigns?.create({
+      document, storage: window.localStorage, uuid: () => crypto.randomUUID(),
+      catalog: () => state.bridge.ready_campaign_catalog(),
+      start: command => state.bridge.start_ready_campaign(command),
+      customize: command => state.bridge.customize_ready_campaign(command),
+      model: () => selectedModelChoice() || defaultModelChoice(),
+      customizationModel: () => defaultModelChoice(),
+      error: friendlyCommandError, guidance: guidanceWarningText,
+      onStarted: openReadyCampaign,
+      onCustomize: async (row, result, draftRequest) => {
+        const draft = await startCampaignBuilder(draftRequest);
+        if (!draft) throw new Error('Party files are saved, but campaign setup did not open. Retry to resume it.');
+        setInlineStatus(`Choose ${row.title} and your saved party: ` +
+          result.characters.map(character => character.name).join(', ') +
+          '. Each character is an independent editable copy.', 'construction');
+      },
+    });
+    $('home-ready-campaign-btn').addEventListener('click', () => { void readyCampaigns?.open(); });
     $('home-build-btn').addEventListener('click', () => { void startBuilderChat(); });
     $('campaign-sequel-btn').addEventListener('click', () => { void openCampaignSequel(); });
     $('campaign-sequel-preview').addEventListener('click', () => { void previewCampaignSequel(); });
@@ -1774,6 +1909,7 @@ const SylviaGMFrontend = (() => {
       panel.hidden = !selected;
     });
     if (chatgptPageVisible) void updateChatGPTConnection('status');
+    state.desktopUpdater?.setVisible(tab === 'about');
     if (tab === 'dictation' && !dictationModelJob) {
       void refreshDictationOptions(state.bridge).catch(() => {
         $('dictation-model-status').textContent = 'Local speech is unavailable. Reinstall the updated Sylvia application, or keep typing.';
@@ -1795,6 +1931,7 @@ const SylviaGMFrontend = (() => {
     if ($('settings-overlay').hidden) return;
     if (localSupportReport?.close() === false) return;
     $('settings-overlay').hidden = true;
+    state.desktopUpdater?.setVisible(false);
     chatgptPageVisible = false;
     clearTimeout(chatgptStatusTimer);
     if (settingsReturnFocus && typeof settingsReturnFocus.focus === 'function') {
@@ -1817,9 +1954,12 @@ const SylviaGMFrontend = (() => {
       }
       state.applicationInfo = info;
       version.textContent = `Version ${info.version}`;
-      channel.textContent = info.release_channel === 'alpha' ? 'Alpha prerelease' : 'Prerelease';
+      const releaseChannel = typeof info.release_channel === 'string' ? info.release_channel : '';
+      channel.textContent = releaseChannel === 'stable' ? 'Stable release'
+        : releaseChannel ? `${releaseChannel.charAt(0).toUpperCase()}${releaseChannel.slice(1)} prerelease`
+        : 'Release channel unavailable';
       signing.textContent = info.signing_status === 'unsigned'
-        ? 'This version is not digitally signed'
+        ? 'Windows publisher signature: unsigned'
         : 'Signing status supplied by the host';
     } catch (error) {
       state.applicationInfo = null;
@@ -4242,6 +4382,7 @@ const SylviaGMFrontend = (() => {
       state.builderChats = state.builderChats.filter((item) => item.session?.session_id !== sessionId);
       state.sessionDrafts.delete(sessionId);
       state.builderQuestionDrafts.delete(sessionId);
+      state.desktopDrafts?.changed();
       if (state.activeSessionId === sessionId) {
         state.activeSessionId = null;
         $('player-input').value = '';
@@ -7098,7 +7239,7 @@ const SylviaGMFrontend = (() => {
   }
 
   // ---- Open a campaign session and render its authoritative projection ----
-  async function openCampaign(campaignId, sessionId = null) {
+  async function openCampaign(campaignId, sessionId = null, { restoreOnly = false } = {}) {
     state.displayHistory = null;
     const retryDisplay = campaignDisplayPending();
     cancelCampaignOpening();
@@ -7213,7 +7354,7 @@ const SylviaGMFrontend = (() => {
           ? activity.terminalLabel || 'Generation was interrupted' : '');
       if (state.panelProjection) renderRulesetPanelProjection(state.panelProjection);
     }
-    if (indexEntry && indexEntry.availability === 'draft' &&
+    if (!restoreOnly && indexEntry && indexEntry.availability === 'draft' &&
         state.activeSessionRole === 'builder' && !state.activeCreationSubflow) {
       try {
         await resumeGuidedCampaignDraft(campaignId, state.activeSessionId);
@@ -7302,6 +7443,50 @@ const SylviaGMFrontend = (() => {
     updateModelSwitchButtons();
   }
 
+  // Keep the focused summary, animation and opted-in Thinking nodes across timer updates.
+  function syncActivityRow(current, next) {
+    const summary = current.querySelector('summary');
+    const nextSummary = next.querySelector('summary');
+    if (!summary?.firstChild || !nextSummary?.firstChild) return false;
+    summary.firstChild.nodeValue = nextSummary.firstChild.nodeValue;
+    current.dataset.activityPhase = next.dataset.activityPhase;
+    for (const selector of ['[data-activity-status]', '[data-activity-time]']) {
+      const oldText = summary.querySelector(selector);
+      const newText = nextSummary.querySelector(selector);
+      if (selector === '[data-activity-status]' && oldText && newText &&
+          oldText.getAttribute('aria-live') !== newText.getAttribute('aria-live')) {
+        oldText.setAttribute('aria-live', newText.getAttribute('aria-live'));
+      }
+      if (oldText && newText && oldText.textContent !== newText.textContent) {
+        oldText.textContent = newText.textContent;
+        if (selector === '[data-activity-status]' && !window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches) {
+          oldText.animate?.([{ opacity: .35, transform: 'translateY(2px)' },
+            { opacity: 1, transform: 'translateY(0)' }], { duration: 160, easing: 'ease-out' });
+        }
+      }
+    }
+    const trail = current.querySelector('.agent-activity-trail');
+    const nextTrail = next.querySelector('.agent-activity-trail');
+    if (!trail || !nextTrail) return true;
+    const retained = new Map(Array.from(trail.children).map(child => [child.dataset.activityEntry, child]));
+    const desired = Array.from(nextTrail.children);
+    desired.forEach((child, index) => {
+      let existing = child.dataset.activityEntry ? retained.get(child.dataset.activityEntry) :
+        trail.querySelector('[data-activity-observation]');
+      if (existing && existing.dataset.thinkingResponse &&
+          existing.dataset.thinkingVersion === child.dataset.thinkingVersion) {
+        // Private inspection text is owned by its open Thinking control.
+      } else if (existing && existing.outerHTML !== child.outerHTML) {
+        existing.innerHTML = child.innerHTML;
+        if (child.dataset.thinkingVersion) existing.dataset.thinkingVersion = child.dataset.thinkingVersion;
+      }
+      existing ||= child;
+      if (trail.children[index] !== existing) trail.insertBefore(existing, trail.children[index] || null);
+    });
+    while (trail.children.length > desired.length) trail.lastElementChild.remove();
+    return true;
+  }
+
   // Update only chronology cards whose authoritative projection changed.
   // Keeping stable card elements prevents streaming polls from replaying every
   // entrance animation or resetting the player's expanded cards and scroll.
@@ -7334,6 +7519,7 @@ const SylviaGMFrontend = (() => {
       const currentKey = currentCard.dataset.chronologyKey || '';
       const nextKey = nextCard.dataset.chronologyKey || '';
       if (currentKey && currentKey === nextKey) {
+        if (currentCard.classList.contains('agent-activity') && syncActivityRow(currentCard, nextCard)) return;
         if (currentCard.innerHTML !== nextCard.innerHTML) {
           currentCard.className = nextCard.className;
           currentCard.innerHTML = nextCard.innerHTML;
@@ -7514,6 +7700,7 @@ const SylviaGMFrontend = (() => {
     else if (control.dataset.builderQuestionType === 'text') draft.text = control.value;
     else draft.selection = control.value;
     sessionDraft.set(key, draft);
+    state.desktopDrafts?.changed();
   }
 
   function restoreBuilderQuestionControl(sessionId, control) {
@@ -8378,6 +8565,36 @@ const SylviaGMFrontend = (() => {
     return null;
   }
 
+  function activityTerminal(content) {
+    if (content.kind === 'gm_turn_activity') return 'completed';
+    if (!['builder_attempt_terminal', 'session_attempt_terminal'].includes(content.kind)) return null;
+    if (content.status === 'completed') return 'completed';
+    if (content.status === 'stopped' || content.failure_category === 'user_cancelled') return 'stopped';
+    return content.activity_timing?.phase === 'failed' || content.failure_category || content.reason_code
+      ? 'failed' : 'interrupted';
+  }
+
+  function activityResultStatus(result, outer = {}) {
+    const status = outer.status || result.status;
+    if (status === 'pending') return 'Waiting';
+    if (status === 'rejected') return 'Rejected';
+    const error = result.error ?? outer.error;
+    const hasError = typeof error === 'string' ? Boolean(error.trim()) : Boolean(error);
+    if (['failed', 'error', 'action_failed'].includes(status) || result.success === false || hasError)
+      return 'Failed';
+    if (['skipped', 'cancelled', 'stopped'].includes(status)) return 'Stopped';
+    if (status === 'awaiting_choice') return 'Needs input';
+    if (status === 'action_committed') return 'Committed';
+    return result.success === true || ['completed', 'committed', 'success', 'ok', 'ingested'].includes(status)
+      ? 'Done' : 'Returned';
+  }
+
+  function activityDuration(milliseconds) {
+    if (!Number.isFinite(milliseconds) || milliseconds < 0) return '';
+    const seconds = Math.floor(milliseconds / 1000);
+    return seconds < 60 ? `${seconds}s` : `${Math.floor(seconds / 60)}m ${String(seconds % 60).padStart(2, '0')}s`;
+  }
+
   // Correlation comes from saved ingress metadata, never arrival timing or narration text.
   function groupedAgentActivity(messages, cards, context, role, liveActivity = null) {
     const groups = new Map();
@@ -8389,86 +8606,130 @@ const SylviaGMFrontend = (() => {
       `${message.content.activity.attempt_id}:${message.content.action_id}`));
     const groupFor = (attempt, basis, position) => {
       if (typeof attempt !== 'string' || !attempt) return null;
-      if (!groups.has(attempt)) {
-        const basisIndex = messages.findIndex((message) => message.message_id === basis);
-        groups.set(attempt, { attempt, position: basisIndex >= 0 ? basisIndex + 1 : position,
-          entries: [], thinking: [], status: null });
-      } else {
-        const basisIndex = messages.findIndex((message) => message.message_id === basis);
-        if (basisIndex >= 0) groups.get(attempt).position = basisIndex + 1;
-      }
+      const basisIndex = messages.findIndex((message) => message.message_id === basis);
+      if (!groups.has(attempt)) groups.set(attempt, { attempt,
+        position: basisIndex >= 0 ? basisIndex + 1 : position, entries: [], thinking: [], status: null });
+      else if (basisIndex >= 0) groups.get(attempt).position = basisIndex + 1;
       return groups.get(attempt);
     };
     messages.forEach((message, index) => {
       const content = message.content || {};
       const correlation = typeof content.activity === 'object' ? content.activity : null;
-      const attempt = correlation?.attempt_id ||
-        (['gm_turn_activity', 'builder_attempt_terminal', 'session_attempt_terminal'].includes(content.kind)
-          ? content.attempt_id : null);
-      const group = groupFor(attempt, correlation?.basis_message_id || content.basis_message_id, index);
-      if (content.kind === 'provider_tool_calls') {
-        for (const call of content.assistant?.tool_calls || []) calls.set(call.id, call.function?.name);
-      }
+      const attempt = correlation?.attempt_id || content.attempt_id;
+      const terminalBasis = content.kind === 'session_attempt_terminal' ? content.message_id : null;
+      const group = groupFor(attempt, correlation?.basis_message_id || content.basis_message_id || terminalBasis,
+        message.kind === 'user' ? index + 1 : index);
       if (!group) return;
-      if (content.kind === 'gm_turn_activity') {
-        group.status = 'completed'; hidden.add(index);
-      } else if (['builder_attempt_terminal', 'session_attempt_terminal'].includes(content.kind)) {
-        group.status = content.status === 'completed' ? 'completed' : 'interrupted';
+      if (content.kind === 'provider_tool_calls') {
+        for (const call of content.assistant?.tool_calls || []) {
+          const key = `${attempt}:${content.inference_id || ''}:${call.id}`;
+          const entry = { key, label: routineActivityLabel(call.function?.name) || 'Resolve game action',
+            status: 'Waiting', order: correlation?.source_order ?? index };
+          calls.set(key, entry);
+          group.entries.push(entry);
+        }
+      } else if (activityTerminal(content)) {
+        group.status = activityTerminal(content);
+        group.timing = content.activity_timing;
+        if (content.kind === 'gm_turn_activity') hidden.add(index);
       } else if (content.kind === 'provider_tool_results') {
         for (const result of content.results || []) {
           let recorded = {};
           try { recorded = JSON.parse(result.content || '{}') || {}; } catch (_error) { /* Older opaque receipt. */ }
-          if (routineActions.has(`${attempt}:${recorded.action_id}`)) continue;
-          const label = packageActivityLabel(recorded) ||
-            routineActivityLabel(result.name || calls.get(result.tool_call_id)) || 'Resolve game action';
-          group.entries.push({ label, order: correlation?.source_order ?? index });
+          const key = `${attempt}:${content.inference_id || ''}:${result.tool_call_id}`;
+          const entry = calls.get(key);
+          if (routineActions.has(`${attempt}:${recorded.action_id}`)) {
+            if (entry) entry.hidden = true;
+            continue;
+          }
+          const label = packageActivityLabel(recorded) || routineActivityLabel(result.name) ||
+            entry?.label || 'Resolve game action';
+          if (entry) Object.assign(entry, { label, status: activityResultStatus(recorded) });
+          else group.entries.push({ key, label, status: activityResultStatus(recorded),
+            order: correlation?.source_order ?? index });
         }
       } else {
-        const label = packageActivityLabel(content) || routineActivityLabel(content.tool_name);
+        const routine = packageActivityLabel(content) || routineActivityLabel(content.tool_name);
+        const stage = role === 'builder' ? builderProgressStage(content.tool_name) : null;
+        const label = routine || { 'Checked character': 'Check character',
+          'Saved character': 'Save character' }[stage];
         const result = content.result || {};
-        const failed = result.success === false || ['rejected', 'error', 'failed'].includes(result.status) ||
-          ['rejected', 'error', 'failed', 'pending'].includes(content.status);
-        if (role === 'builder' && !failed && content.tool_name) {
-          const stage = builderProgressStage(content.tool_name);
-          if (stage) group.lastStage = stage;
-        }
-        if (label && !failed && result.result_card == null) {
-          group.entries.push({ label, order: correlation?.source_order ?? index });
-          hidden.add(index);
+        const status = activityResultStatus(result, content);
+        const failed = ['Failed', 'Rejected', 'Stopped', 'Waiting'].includes(status);
+        if (stage && status === 'Done') group.lastStage = stage;
+        if (label) {
+          group.entries.push({ key: message.message_id, label, status,
+            order: correlation?.source_order ?? index });
+          if (routine && !failed && result.result_card == null) hidden.add(index);
         }
       }
     });
+    const observed = context?.activity_progress;
+    if (liveActivity?.attemptId && activityIsWorking(liveActivity)) {
+      const basis = observed?.attempt_id === liveActivity.attemptId ? observed.basis_message_id :
+        liveActivity.pendingInput?.messageId;
+      groupFor(liveActivity.attemptId, basis, messages.length);
+    }
+    const saved = context?.activity;
+    if (saved && groups.has(saved.attempt_id) && !groups.get(saved.attempt_id).status &&
+        ['completed', 'stopped', 'interrupted'].includes(saved.status)) {
+      groups.get(saved.attempt_id).status = saved.status;
+    }
     for (const thinking of context?.thinking || []) {
       const basisIndex = messages.findIndex((message) => message.message_id === thinking.basis_message_id);
       if (basisIndex < 0 && !groups.has(thinking.attempt_id)) continue;
       const group = groupFor(thinking.attempt_id, thinking.basis_message_id, basisIndex + 1);
       group.thinking.push(thinking);
-      if (!group.status && thinking.status !== 'partial') group.status = thinking.status;
     }
     const additions = new Map();
+    const operations = { read: 'Reading campaign data', write: 'Writing a file', validate: 'Checking content',
+      save: 'Saving content', question: 'Preparing a question', action: 'Running a tool' };
+    const phases = { queued: 'Starting', working: 'Working', provider: 'Waiting for model',
+      tool: 'Waiting for tool', retrying: 'Retrying', compacting: 'Compacting context', stopping: 'Stopping' };
     for (const group of groups.values()) {
-      const live = liveActivity?.attemptId === group.attempt && activityIsWorking(liveActivity);
-      const status = live ? (role === 'builder' && group.lastStage ? `Working · Last: ${group.lastStage}` : 'Working') : group.status === 'interrupted' ? 'Interrupted' :
-        group.status === 'completed' ? 'Done' : 'Recorded';
-      const entries = group.entries.map((entry) => ({ order: entry.order,
-        html: `<div class="agent-operation"><span>${escapeHtml(entry.label)}</span><span>Done</span></div>` }));
+      const live = liveActivity?.attemptId === group.attempt && activityIsWorking(liveActivity) && !group.status;
+      const progress = live && observed?.attempt_id === group.attempt ? observed : null;
+      const livePhase = phases[progress?.phase] ? progress.phase : liveActivity?.activityPhase || 'working';
+      const phase = live ? livePhase : group.status || 'recorded';
+      const terminal = ['completed', 'stopped', 'interrupted', 'failed'].includes(phase);
+      let status = phases[phase] || { completed: 'Response complete', stopped: 'Stopped', failed: 'Failed',
+        interrupted: 'Interrupted', recorded: 'Recorded' }[phase] || 'Working';
+      if (live && phase === 'tool') status = operations[progress?.operation] || phases.tool;
+      if (live && role === 'builder' && group.lastStage) status += ` · Last: ${group.lastStage}`;
+      const timing = progress || group.timing;
+      const elapsed = activityDuration(timing?.elapsed_ms);
+      const quiet = live && timing?.quiet_ms >= 1000 ? activityDuration(timing.quiet_ms) : '';
+      const entries = group.entries.filter(entry => !entry.hidden).map((entry) => ({ order: entry.order,
+        html: `<div class="agent-operation" data-activity-entry="${escapeHtml(entry.key || '')}">` +
+          `<span>${escapeHtml(entry.label)}</span><span>${escapeHtml(
+            terminal && entry.status === 'Waiting' ? 'Incomplete' : entry.status)}</span></div>` }));
       for (const thinking of group.thinking) {
         const identity = `thinking-${group.attempt}-${thinking.response_id}`;
         entries.push({ order: thinking.source_order, html:
           `<details class="agent-thinking" data-disclosure-key="${escapeHtml(identity)}" ` +
-          `data-thinking-attempt="${escapeHtml(group.attempt)}" ` +
+          `data-activity-entry="${escapeHtml(identity)}" data-thinking-attempt="${escapeHtml(group.attempt)}" ` +
           `data-thinking-version="${Number(thinking.chunk_count) || 0}" ` +
           `data-thinking-response="${escapeHtml(thinking.response_id)}">` +
           '<summary>Thinking <span class="thinking-warning">May contain spoilers</span></summary>' +
           '<div class="thinking-body"></div></details>' });
       }
-      if (!entries.length && !group.status) continue;
-      const label = role === 'builder' ? 'Builder activity' : 'GM activity';
-      const html = `<details class="agent-activity" data-chronology-key="activity-${escapeHtml(group.attempt)}" ` +
+      if (!entries.length && !group.status && !live) continue;
+      const actor = role === 'builder' ? 'Builder activity' : 'GM activity';
+      const html = `<details class="agent-activity" data-activity-phase="${escapeHtml(phase)}" ` +
+        `data-chronology-key="activity-${escapeHtml(group.attempt)}" ` +
         `data-disclosure-key="activity-${escapeHtml(group.attempt)}">` +
-        `<summary>${label}<span class="agent-activity-status">${escapeHtml(status)}</span></summary>` +
-        `<div class="agent-activity-trail">${entries.sort((a, b) => a.order - b.order)
-          .map((entry) => entry.html).join('')}</div></details>`;
+        `<summary>${terminal ? 'View activity' : actor}` +
+        `<span class="activity-motion" aria-hidden="true"><i></i><i></i><i></i></span>` +
+        `<span data-activity-status role="status" aria-live="${live ? 'polite' : 'off'}" aria-atomic="true" ` +
+        `class="agent-activity-status">${escapeHtml(status)}</span>` +
+        `<span class="activity-time" data-activity-time>${elapsed ? escapeHtml(elapsed) : ''}</span></summary>` +
+        `<span class="activity-actor">${actor}</span>` +
+        `<div class="agent-activity-trail">` +
+        `<p class="activity-observation" data-activity-observation>${quiet
+          ? `No new activity for ${escapeHtml(quiet)}. Last observed: ${escapeHtml(
+            operations[progress?.last_operation] || phases[phase] || 'Working')}.` : ''}</p>` +
+        `${entries.sort((a, b) => a.order - b.order).map((entry) => entry.html).join('')}` +
+        '</div></details>';
       additions.set(group.position, (additions.get(group.position) || '') + html);
     }
     return [...cards.map((card, index) => (additions.get(index) || '') +
@@ -8603,7 +8864,7 @@ const SylviaGMFrontend = (() => {
         : question.index > lastUserIndex)
     );
     if (context !== null && !activeQuestions.length && lastUserIndex >= 0) {
-      state.builderQuestionDrafts.delete(sessionId);
+      if (state.builderQuestionDrafts.delete(sessionId)) state.desktopDrafts?.changed();
     }
     const questionGroupId = `builder-question-form-${sessionId}`;
     const questionBusy = selectedSessionIsWorking() || state.deletingBuilderChats.has(sessionId);
@@ -10759,11 +11020,55 @@ const SylviaGMFrontend = (() => {
     }
   }
 
-  async function startCampaignBuilder() {
+  async function openReadyCampaign(result) {
+    let activity = null;
+    const previousSelection = [state.view, state.activeCampaignId, state.activeSessionId];
+    const atPreviousSelection = () => previousSelection[0] === state.view &&
+      previousSelection[1] === state.activeCampaignId && previousSelection[2] === state.activeSessionId;
+    const atReadySelection = () => state.view === 'session' &&
+      state.activeCampaignId === result.campaign_id && state.activeSessionId === result.dm_session_id;
+    try {
+      await refreshCampaignIndex();
+      if (atPreviousSelection()) await openCampaign(result.campaign_id, result.dm_session_id);
+      if (atReadySelection()) setInlineStatus('Campaign ready. The Game Master is preparing the opening.');
+      if (!state.bridge.start_dm_session) return;
+      activity = beginSessionActivity(ensureSessionActivity({
+        sessionId: result.dm_session_id, sessionRole: 'dm', campaignId: result.campaign_id,
+      }), result.dm_attempt_id);
+      selectedStatus(activity, 'Campaign ready. Game Master is opening the adventure.');
+      refreshActivityControls(activity);
+      renderActivityIndexes();
+      startProjectionPolling(activity);
+      const opening = state.bridge.start_dm_session(
+        result.campaign_id, result.dm_session_id, result.dm_turn_id,
+      );
+      startStreamHeartbeat(activity, true);
+      const opened = await opening;
+      if (opened?.interruption) throw new Error('The opening response was interrupted.');
+      finishSessionActivity(activity, 'completed', 'Completed');
+      if (selectedActivityMatches(activity)) await refreshSelectedCampaign();
+    } catch (error) {
+      if (activity) finishSessionActivity(activity, 'interrupted', 'Opening interrupted');
+      if (activity ? selectedActivityMatches(activity) : atPreviousSelection()) {
+        setInlineStatus(friendlyCommandError(
+          'Your prepared campaign is saved. The opening was interrupted; reopen it to continue', error,
+        ));
+      }
+    } finally {
+      if (activity) {
+        stopStreamHeartbeat(activity);
+        stopProjectionPolling(activity);
+        refreshActivityControls(activity);
+      }
+    }
+  }
+
+  // Ready-party retries retain their draft identity/model; New Campaign creates a fresh interview.
+  async function startCampaignBuilder(draftRequest = null) {
     if (!state.bridge || !state.bridge.create_guided_campaign_draft) return;
     hideConstructionPanel(false);
-    const selected = defaultModelChoice();
-    const operationId = `guided-draft-${crypto.randomUUID()}`;
+    const selected = draftRequest || defaultModelChoice();
+    const operationId = draftRequest?.operation_id || `guided-draft-${crypto.randomUUID()}`;
     setInlineStatus('Creating campaign Draft…');
     try {
       const draft = await state.bridge.create_guided_campaign_draft({
@@ -11525,6 +11830,7 @@ const SylviaGMFrontend = (() => {
       });
     }
     else state.sessionDrafts.delete(state.activeSessionId);
+    state.desktopDrafts?.changed();
   }
 
   function restoreSelectedSessionDraft() {
@@ -11545,6 +11851,7 @@ const SylviaGMFrontend = (() => {
     const saved = state.sessionDrafts.get(submitted.sessionId);
     if (saved && saved.text === submitted.text && saved.oocText === submitted.oocText) {
       state.sessionDrafts.delete(submitted.sessionId);
+      state.desktopDrafts?.changed();
     }
     if (state.activeSessionId === submitted.sessionId &&
         $('player-input').value === submitted.text && $('ooc-input').value === submitted.oocText) {
@@ -11695,7 +12002,10 @@ const SylviaGMFrontend = (() => {
         await state.bridge.steer_session(sessionId, 'steering-' + crypto.randomUUID(), text.trim());
         if (!currentActivity(activity)) return;
         const saved = state.sessionDrafts.get(sessionId);
-        if (saved && saved.text === text) state.sessionDrafts.delete(sessionId);
+        if (saved && saved.text === text) {
+          state.sessionDrafts.delete(sessionId);
+          state.desktopDrafts?.changed();
+        }
         if (selectedActivityMatches(activity) && $('player-input').value === text) {
           $('player-input').value = '';
         }
@@ -11964,6 +12274,7 @@ const SylviaGMFrontend = (() => {
     }
     const retryId = interruption.resolving_retry_id || ('retry-' + crypto.randomUUID());
     activity = beginSessionActivity(activity, retryId);
+    activity.activityPhase = 'retrying';
     refreshActivityControls(activity);
     selectedStatus(activity, 'Retry streaming…');
     renderActivityIndexes();

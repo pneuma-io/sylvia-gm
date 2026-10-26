@@ -2,6 +2,7 @@
 
 import json
 import random
+from collections.abc import Mapping
 
 import pytest
 
@@ -67,3 +68,25 @@ def test_canonical_encoding_matches_previous_capture_for_nested_values():
 def test_canonical_encoding_preserves_sequence_and_key_normalization():
     value = {2: ("second", {False: -0.0}), "2": ["last key wins"], "a": (1, 2)}
     assert package_library.canonical_json_bytes(value) == b'{"2":["last key wins"],"a":[1,2]}'
+
+
+@pytest.mark.parametrize('base', [str, float])
+def test_scalar_subclasses_keep_mapping_precedence_and_container_ownership(base):
+    class ScalarMapping(base, Mapping):
+        def __iter__(self):
+            return iter(('items',))
+
+        def __getitem__(self, key):
+            if key != 'items':
+                raise KeyError(key)
+            return [1, 2]
+
+        def __len__(self):
+            return 1
+
+    source = ScalarMapping('3')
+    captured = thaw_json_value(source)
+    assert captured == {'items': [1, 2]}
+    assert package_library.canonical_json_bytes(source) == b'{"items":[1,2]}'
+    captured['items'].append(3)
+    assert thaw_json_value(source) == {'items': [1, 2]}

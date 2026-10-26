@@ -2424,6 +2424,7 @@ source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
     { name = "anthropic" },
+    { name = "cryptography" },
     { name = "httpx" },
     { name = "jsonschema" },
     { name = "mcp" },
@@ -2462,6 +2463,7 @@ requires-dist = [
     { name = "aiohttp", specifier = ">=3.14.1" },
     { name = "anthropic", specifier = ">=0.49,<1.0" },
     { name = "av", marker = "extra == 'dictation'", specifier = "==18.0.0" },
+    { name = "cryptography", specifier = ">=50,<51" },
     { name = "ctranslate2", marker = "extra == 'dictation'", specifier = "==4.8.3" },
     { name = "faster-whisper", marker = "extra == 'dictation'", specifier = "==1.2.1" },
     { name = "httpx", specifier = ">=0.25" },

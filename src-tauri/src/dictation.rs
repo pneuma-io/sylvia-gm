@@ -22,6 +22,20 @@ struct ProcessJob(usize);
 
 #[cfg(windows)]
 impl ProcessJob {
+    fn wait_empty(&self) -> Result<(), String> {
+        use windows_sys::Win32::System::JobObjects::*;
+        loop {
+            let mut info = JOBOBJECT_BASIC_ACCOUNTING_INFORMATION::default();
+            let read = unsafe { QueryInformationJobObject(
+                self.0 as _, JobObjectBasicAccountingInformation, &mut info as *mut _ as _,
+                std::mem::size_of_val(&info) as u32, std::ptr::null_mut(),
+            ) };
+            if read == 0 { return Err("The owned dictation job could not be drained".into()); }
+            if info.ActiveProcesses == 0 { return Ok(()); }
+            std::thread::sleep(Duration::from_millis(20));
+        }
+    }
+
     fn terminate(&self) {
         use windows_sys::Win32::System::JobObjects::*;
         unsafe {
@@ -445,6 +459,37 @@ impl Capture {
             std::thread::sleep(Duration::from_millis(20));
         }
     }
+
+    // Updating drains an idle worker by EOF; it never uses capture cancellation or kill timers.
+    fn finish_for_update(&self) -> Result<(), String> {
+        {
+            let mut deadline = self.deadline.lock().map_err(|_| "Dictation state is unavailable")?;
+            if self.cancelled.load(Ordering::Acquire) {
+                return Err("The idle dictation worker is already closing".into());
+            }
+            *deadline = None;
+        }
+        if let Some(done) = self.finished.lock().map_err(|_| "Dictation state is unavailable")?.take() {
+            let _ = done.send(());
+        }
+        self.input.lock().map_err(|_| "Dictation input is unavailable")?.take();
+        let mut owned = self.child.lock().map_err(|_| "The owned dictation handle is unavailable")?;
+        if let Some(child) = owned.as_mut() {
+            let status = child.wait().map_err(|_| "Dictation exit could not be verified")?;
+            if !status.success() {
+                return Err("The idle dictation worker did not close normally".into());
+            }
+        }
+        #[cfg(windows)]
+        {
+            let mut job = self.job.lock().map_err(|_| "The owned dictation job is unavailable")?;
+            if let Some(job) = job.as_ref() { job.wait_empty()?; }
+            job.take();
+        }
+        owned.take();
+        self.temporary.lock().map_err(|_| "Dictation storage is unavailable")?.take();
+        Ok(())
+    }
 }
 
 impl Drop for Capture {
@@ -456,6 +501,7 @@ impl Drop for Capture {
 #[derive(Default)]
 struct Registry {
     closed: bool,
+    updating: bool,
     active: Option<(String, Arc<Capture>)>,
     warm: Option<Arc<Capture>>,
     cancelled: VecDeque<String>,
@@ -593,7 +639,7 @@ impl Dictation {
         let capture = self.capture();
         {
             let mut registry = self.0.lock().map_err(|_| "provider")?;
-            if registry.closed {
+            if registry.closed || registry.updating {
                 return Err("unavailable".into());
             }
             if registry
@@ -623,7 +669,7 @@ impl Dictation {
         {
             registry.active = None;
         }
-        if registry.closed
+        if registry.closed || registry.updating
             || registry.active.is_some()
             || registry.cancelled.iter().any(|s| s == id)
         {
@@ -813,7 +859,7 @@ impl Dictation {
                     .is_some_and(|(active, current)| active == id && Arc::ptr_eq(current, capture))
                 {
                     registry.active = None;
-                    if completed && !registry.closed && !capture.cancelled.load(Ordering::Acquire) {
+                    if completed && !registry.closed && !registry.updating && !capture.cancelled.load(Ordering::Acquire) {
                         capture.extend_deadline(IDLE_TIMEOUT);
                         registry.warm = Some(Arc::clone(capture));
                         return;
@@ -863,6 +909,30 @@ impl Dictation {
         if let Some(capture) = capture {
             capture.close();
         }
+    }
+
+    pub(crate) fn park_for_update(&self) -> Result<(), String> {
+        let warm = {
+            let mut registry = self.0.lock().map_err(|_| "Dictation state is unavailable")?;
+            if registry.closed || registry.updating || registry.active.is_some() {
+                return Err("Finish dictation before updating Sylvia".into());
+            }
+            registry.updating = true;
+            registry.warm.take()
+        };
+        if let Some(warm) = warm {
+            if let Err(error) = warm.finish_for_update() {
+                let mut registry = self.0.lock().unwrap_or_else(|error| error.into_inner());
+                if !registry.closed { registry.warm = Some(warm); }
+                registry.updating = false;
+                return Err(error);
+            }
+        }
+        Ok(())
+    }
+
+    pub(crate) fn resume_after_update_abort(&self) {
+        if let Ok(mut registry) = self.0.lock() { registry.updating = false; }
     }
 
     /// Permanently refuse queued starts before releasing the current capture on shutdown.

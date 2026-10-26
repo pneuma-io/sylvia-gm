@@ -54,3 +54,8 @@ class DisplayReads:
 
     def close(self) -> None:
         self._executor.shutdown(wait=True, cancel_futures=True)
+
+    def idle(self) -> bool:
+        """Preparation must wait for admitted projections rather than close their authority."""
+        with self._lock:
+            return not self._pending
