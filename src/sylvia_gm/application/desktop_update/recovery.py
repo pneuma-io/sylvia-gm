@@ -78,16 +78,36 @@ class RecoveryOperation:
                     restart_nonce = self.handshake._load()["nonce"]
                     # Retry opens restored data; it never restores again.
                     started = self.compatibility
-                compatible = True
-                try:
-                    self.checkpoint.require_compatible(
-                        started,
+                if self.checkpoint.restore_pending():
+                    checkpoint = self.checkpoint._load(
                         expected_storage_compatibility=self.compatibility,
                     )
-                except UpdateError as error:
-                    if error.code != "restore_choice_required":
-                        raise
+                    expected = {
+                        "format_version": 1, "operation_id": self.prepared.identity,
+                        "attempt": self.prepared.attempt, "choice": RESTORE_CONFIRMATION,
+                        "checkpoint_version": checkpoint["app_version"],
+                        "started_storage_compatibility": started,
+                    }
+                    if phase != "rolling_back" or bounded_json(
+                        checked_file(self.choice, maximum=4096)
+                    ) != expected:
+                        raise UpdateError(
+                            "invalid_checkpoint", "The interrupted restore choice changed."
+                        )
+                    # Retention can leave the live DB absent, or DB/config partly restored.
+                    # Only the original explicit restore can resume; keeping this mixture is unsafe.
                     compatible = False
+                else:
+                    compatible = True
+                    try:
+                        self.checkpoint.require_compatible(
+                            started,
+                            expected_storage_compatibility=self.compatibility,
+                        )
+                    except UpdateError as error:
+                        if error.code != "restore_choice_required":
+                            raise
+                        compatible = False
                 return {
                     "operation_id": self.prepared.identity, "phase": phase,
                     "previous_version": self.prepared.current.text,

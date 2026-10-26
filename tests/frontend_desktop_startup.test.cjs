@@ -35,7 +35,7 @@ function fixture(startup, confirmation = { status: 'confirmed' }) {
       ? { operation_id: 'a'.repeat(32), ...startup } : startup; },
     desktop_update_confirm_startup: async () => {
       calls.push('confirm');
-      if (confirmation instanceof Error) throw confirmation;
+      if (confirmation instanceof Error || typeof confirmation === 'string') throw confirmation;
       return confirmation;
     },
     desktop_update_install: async () => { calls.push('native-install'); return { status: 'closing' }; },
@@ -104,6 +104,29 @@ test('failed update confirmation keeps the overlay and never retries or reconnec
   assert.equal(f.calls.filter(call => call === 'confirm').length, 1);
   assert.equal(f.calls.includes('reconnect'), false);
   assert.equal(f.calls.includes('timer'), false);
+  assert.equal(f.node('session-frame').inert, true);
+});
+
+test('startup rejection shows only its bounded error code, without the raw native message', async () => {
+  for (const rejection of ['journal_failed: private native details must stay hidden',
+    new Error('checkpoint_unavailable: private native details must stay hidden')]) {
+    const f = fixture({ pending: true }, rejection);
+    await f.run();
+    const text = f.node('connecting-overlay').text.textContent;
+    const expected = typeof rejection === 'string' ? 'journal_failed' : 'checkpoint_unavailable';
+    assert.match(text, new RegExp(`Error code: ${expected}\\.`));
+    assert.doesNotMatch(text, /private native details/);
+    assert.equal(f.node('session-frame').inert, true);
+    assert.equal(f.calls.filter(call => call === 'confirm').length, 1);
+    assert.equal(f.calls.includes('reconnect'), false);
+  }
+});
+
+test('unstructured startup rejection remains generic and does not expose arbitrary content', async () => {
+  const f = fixture({ pending: true }, new Error('<private-fixture-text>'));
+  await f.run();
+  const text = f.node('connecting-overlay').text.textContent;
+  assert.doesNotMatch(text, /private-fixture-text|Error code:/);
   assert.equal(f.node('session-frame').inert, true);
 });
 

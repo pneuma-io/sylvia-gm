@@ -1448,10 +1448,13 @@ const SylviaGMFrontend = (() => {
           showHome();
           setInlineStatus('The application updated, but the previous view could not load. Open it from Home; saved history is retained.');
         }
-      } catch (_error) {
+      } catch (error) {
+        const rejection = typeof error === 'string' ? error : error?.message;
+        const code = typeof rejection === 'string' ? /^([a-z_]{1,64}):/.exec(rejection)?.[1] : null;
         $('connecting-overlay').classList.remove('hidden');
         $('connecting-overlay').querySelector('.connecting-text').textContent =
-          'Update startup could not be confirmed. Close Sylvia and use update recovery.';
+          'Update startup could not be confirmed. Close Sylvia and use update recovery.' +
+          (code ? ` Error code: ${code}.` : '');
         return;
       }
       $('session-frame').inert = startupFrameWasInert;

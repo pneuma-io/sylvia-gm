@@ -172,6 +172,99 @@ def test_restore_then_binary_failure_retries_same_choice_without_discarding_reta
     }
 
 
+@pytest.mark.parametrize("boundary", ["database", "config", "database-published"])
+def test_recovery_inspection_can_resume_after_retaining_current_database(
+    tmp_path, monkeypatch, boundary,
+):
+    from sylvia_gm.application.desktop_update import checkpoint
+
+    update, _, installation, _, database = prepared(tmp_path, compatibility=1)
+    with closing(sqlite3.connect(database)) as connection, connection:
+        connection.execute("ALTER TABLE fictional_progress ADD COLUMN newer_semantics TEXT")
+    progress(database, "newer progress retained before interrupted restore")
+    changed = database.read_bytes()
+    config = update.root / "config.yaml"
+    config.write_bytes(b"newer fictional settings")
+    new_config = config.read_bytes()
+    recovery = RecoveryOperation(update)
+    replace = checkpoint.os.replace
+
+    def stop_after_retention(source, destination):
+        replace(source, destination)
+        retained = source == {"database": database, "config": config}.get(boundary)
+        published = boundary == "database-published" and destination == database
+        if retained or published:
+            raise OSError("controlled exit boundary after retaining current data")
+
+    with monkeypatch.context() as fault:
+        fault.setattr(checkpoint.os, "replace", stop_after_retention)
+        with pytest.raises(OSError, match="controlled exit boundary"):
+            recovery.rollback(RESTORE_CONFIRMATION, lambda: True)
+    current_database = database.read_bytes() if database.exists() else None
+    if boundary == "database-published":
+        assert values(database) == ["keep saved progress"]
+    else:
+        assert current_database is None
+    if boundary == "database":
+        assert config.read_bytes() == new_config
+    else:
+        assert not config.exists()
+    assert update.store.load()["phase"] == "rolling_back"
+    saved = list((update.stage / "data-checkpoint/post-checkpoint").glob("*/authority.sqlite3"))
+    assert len(saved) == 1 and saved[0].read_bytes() == changed
+    receipt = (recovery.checkpoint.root / "restore.json").read_bytes()
+
+    resumed = RecoveryOperation(update)
+    assert resumed.inspect()["can_keep_data"] is False
+    assert (database.read_bytes() if database.exists() else None) == current_database
+    assert (resumed.checkpoint.root / "restore.json").read_bytes() == receipt
+    from sylvia_gm.application.desktop_update import recovery_service
+
+    service = recovery_service.RecoveryService(
+        installation, current=update.current, verify=accept_stub,
+    )
+    host = {"version": update.current.text, "target": update.target,
+            "distribution": update.distribution}
+    assert recovery_service._RECOVERY_QUALIFIED is False
+    assert service.handle("state", {"host": host})["can_recover"] is False
+    # A qualified test context exercises the actual consumer without enabling shipped recovery.
+    with monkeypatch.context() as qualified:
+        qualified.setattr(recovery_service, "_RECOVERY_QUALIFIED", True)
+        state = service.handle("state", {"host": host})
+        assert state["can_recover"] and not state["can_keep_data"]
+        request = {"host": host, "operation_id": update.identity, "restart_nonce": None}
+        with pytest.raises(UpdateError) as keep:
+            service.handle("handoff", {**request, "choice": "keep"})
+        assert keep.value.code == "restore_choice_required"
+        handoff = service.handle("handoff", {**request, "choice": "restore"})
+        assert handoff["operation_id"] == update.identity and handoff["attempt"] == update.attempt
+    choice = resumed.choice.read_bytes()
+    changed_choice = json.loads(choice)
+    changed_choice["choice"] = KEEP_DATA
+    resumed.choice.write_text(json.dumps(changed_choice))
+    with pytest.raises(UpdateError) as invalid_choice:
+        resumed.inspect()
+    assert invalid_choice.value.code == "invalid_checkpoint"
+    resumed.choice.write_bytes(choice)
+    damaged = json.loads(receipt)
+    del damaged["before"]["config"]
+    (resumed.checkpoint.root / "restore.json").write_text(json.dumps(damaged))
+    with pytest.raises(UpdateError) as invalid_receipt:
+        resumed.inspect()
+    assert invalid_receipt.value.code == "invalid_checkpoint"
+    (resumed.checkpoint.root / "restore.json").write_bytes(receipt)
+    assert (database.read_bytes() if database.exists() else None) == current_database
+    assert saved[0].read_bytes() == changed
+    with pytest.raises(UpdateError) as different_choice:
+        resumed.rollback(KEEP_DATA, lambda: True)
+    assert different_choice.value.code == "changed_recovery_choice"
+    resumed.rollback(RESTORE_CONFIRMATION, lambda: True)
+    assert update.store.load()["phase"] == "rollback_ready"
+    assert values(database) == ["keep saved progress"]
+    assert saved[0].read_bytes() == changed
+    assert (saved[0].parent / "config.yaml").read_bytes() == new_config
+
+
 def test_pre_apply_recovery_and_busy_owner_never_discard_data(tmp_path):
     update, _, backup, old, _, database = fixture(tmp_path)
     update.prepare(backup, lambda: True)

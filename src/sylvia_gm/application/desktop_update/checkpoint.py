@@ -284,24 +284,42 @@ class DataCheckpoint:
         finally:
             lock.close()
 
+    def _restore_receipt(self) -> dict[str, object] | None:
+        """Validate retained restore intent before treating a missing live file as resumable."""
+        self._check()
+        receipt = self.root / "restore.json"
+        if not receipt.exists() and not receipt.is_symlink():
+            return None
+        row = bounded_json(checked_file(receipt, maximum=16 * 1024))
+        if (
+            not isinstance(row, dict)
+            or set(row) != {"format_version", "phase", "generation", "before"}
+            or type(row["format_version"]) is not int
+            or row["format_version"] != 1
+            or row["phase"] not in ("restoring", "restored")
+            or not isinstance(row["before"], dict)
+            or set(row["before"]) != self._paths().keys()
+        ):
+            raise UpdateError(
+                "invalid_checkpoint", "The interrupted restore needs manual reconciliation."
+            )
+        operation_id(row["generation"])
+        for key, path in self._paths().items():
+            if row["before"][key] is not None:
+                _parse_record(row["before"][key], path.name)
+        return row
+
+    def restore_pending(self) -> bool:
+        """Inspection may resume a recorded restore without opening a temporarily retained DB."""
+        row = self._restore_receipt()
+        return row is not None and row["phase"] == "restoring"
+
     def _restore_locked(self, processes_exited: Callable[[], bool]) -> None:
         checkpoint = self._load()
         receipt = self.root / "restore.json"
         paths = self._paths()
-        if receipt.exists() or receipt.is_symlink():
-            row = bounded_json(checked_file(receipt, maximum=16 * 1024))
-            if (
-                not isinstance(row, dict)
-                or set(row) != {"format_version", "phase", "generation", "before"}
-                or type(row["format_version"]) is not int
-                or row["format_version"] != 1
-                or row["phase"] not in ("restoring", "restored")
-                or not isinstance(row["before"], dict)
-                or set(row["before"]) != paths.keys()
-            ):
-                raise UpdateError(
-                    "invalid_checkpoint", "The interrupted restore needs manual reconciliation."
-                )
+        row = self._restore_receipt()
+        if row is not None:
             generation = operation_id(row["generation"])
             if row["phase"] == "restored":
                 return  # A duplicate request must never discard subsequent player progress.

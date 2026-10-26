@@ -113,7 +113,9 @@ def atomic_receipt(path: Path, value: object) -> None:
     raw = canonical_bytes(value)
     if len(raw) > MANIFEST_LIMIT:
         raise UpdateError("metadata_limit", "Stored update information is too large.")
-    temporary = path.with_name(f".{path.name}.{uuid.uuid4().hex}.tmp")
+    # A long recovery receipt name must not push an otherwise valid Windows
+    # generation path beyond the legacy limit. UUIDs keep concurrent writes distinct.
+    temporary = path.with_name(f".receipt-{uuid.uuid4().hex}.tmp")
     try:
         with temporary.open("xb") as stream:
             if stream.write(raw) != len(raw):
@@ -126,7 +128,8 @@ def atomic_receipt(path: Path, value: object) -> None:
         os.replace(temporary, path)
     except OSError as error:
         raise UpdateError(
-            "journal_failed", "The update receipt could not be saved. No apply was started."
+            "journal_failed",
+            "The update receipt could not be saved. Recovery information is retained.",
         ) from error
 
 
