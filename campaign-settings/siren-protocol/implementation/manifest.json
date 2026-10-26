@@ -1,0 +1,57 @@
+{
+  "format": 1,
+  "profile_id": "pneuma-io.haremrun.playable-cast.v0-1",
+  "display_name": "Siren Protocol Playable Cast v0.1",
+  "status": "incomplete_starting_state",
+  "authority": "implementation_profile",
+  "setting_canon_version": "0.8.0",
+  "setting_commit": "b2da23f05acec8cf9d79c04789b28510ab6489d7",
+  "ruleset": {
+    "repository": "pneuma-io/trigger-discipline",
+    "main_inspected_commit": "6d7ac6bba9284b0db66d422875b93cedf3724303",
+    "packaged_source_checkpoint": "a7cfce431af1ebb7812ef9d29e53855f3f5ee2cc",
+    "character_schema_id": "pneuma-io.trigger-discipline.character.v0-1",
+    "sylvia_compatibility_baseline": "0eccde944309f25560dcf7d2dd182084642787e5"
+  },
+  "defaults": {
+    "profile_level": 5,
+    "side": "allies",
+    "side_is_import_convenience_only": true,
+    "campaign_plan_may_change_side": true,
+    "campaign_plan_may_rebuild_characters": true,
+    "profile_level_is_not_setting_canon": true,
+    "benchmark_scale_used_as_tested_ruler_not_player_progression_canon": true
+  },
+  "files": {
+    "characters": "implementation/characters.json",
+    "equipment": "implementation/equipment.json",
+    "human_build_guide": "characters/PLAYABLE_BUILDS.md",
+    "implementation_guide": "docs/PLAYABLE_IMPLEMENTATION.md"
+  },
+  "ruleset_boundary": {
+    "haremrun_specific_extension_required": false,
+    "operations_used": [
+      "select",
+      "reskin",
+      "interpret",
+      "constrain"
+    ],
+    "specialty_package_execution": "Most specialty nodes remain GM-judgment in the current Trigger Discipline package even when their canonical rules text is locked/tertiary.",
+    "networker_foothold_selected": false,
+    "networker_foothold_reason": "The contained TD package has a FOOTHOLD hook. Hex retains her authored five-node selection; the new hook does not respec her.",
+    "armed_drone_attacks": "The Setting Oriel profile has no weapon/module or attack profile. Armed drones require the contained Ruleset operation and an explicitly supplied compatible weapon; this profile supplies neither.",
+    "vehicle_combat": "not added; VEHICLES handles uncertain/demanding operation and vehicles remain scene objects/transport until an explicit subsystem exists",
+    "projected_barrier_numbers": "not standardized in v0.1; projected barriers use BARRIER/COVER logic but their Siren Protocol material numbers remain open",
+    "burst_full_auto": "Use the contained TD implementation when its actual weapon and ammunition prerequisites hold; no separate Setting formula.",
+    "tube_fed_loading": "Retain actual feed, shell, chamber and cycling state; inspect the contained Ruleset operations for supported loading paths and explicitly adjudicate any unsupported handling.",
+    "general_ready_stow": "Use the contained Ruleset handling operations with explicitly justified costs; no new default costs or starting allowances are selected."
+  },
+  "canon_effect": {
+    "changes_setting_canon": false,
+    "changes_character_biography": false,
+    "changes_romance_or_harem_canon": false,
+    "changes_trigger_discipline": false,
+    "note": "These are authored defaults. Rebalancing or rebuilding this profile does not retcon Siren Protocol setting fiction."
+  },
+  "current_adapter": "See SOURCE.md for the current exact format-4 containment and source provenance; earlier commit fields are historical."
+}

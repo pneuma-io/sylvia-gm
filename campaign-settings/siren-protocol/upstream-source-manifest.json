@@ -1,0 +1,185 @@
+{
+  "format_id": "sylvia-gm-source-snapshot",
+  "format_version": 1,
+  "repository": "pneuma-io/haremrun",
+  "commit": "c7a9587b94f8e5125ea5818a9f708ec32d0bab01",
+  "source_sha256": "fabfcd15ce9bbd361812050fb29bbb460cd756b3270ec369ef7ada27ceac65e5",
+  "files": [
+    {
+      "path": "canon/canon.json",
+      "sha256": "50b3cd117262cbbe196c5b89918789d1a3bf0f82072459420b63819e9510906f"
+    },
+    {
+      "path": "canon/canon.yaml",
+      "sha256": "f8697a79f9da74b5de9a3d8e6428b29ca102aa4f78a76b293cc8c2446c953c2a"
+    },
+    {
+      "path": "characters/Blaze.md",
+      "sha256": "41edb7619f582222d10559cec8ab48376d97a77a1b0059b94c2d3b99940264a1"
+    },
+    {
+      "path": "characters/Hex.md",
+      "sha256": "78cab9cfc4aa021937d52b7cb635118872f5d35ed11bb092b485acfd1cffac20"
+    },
+    {
+      "path": "characters/Kora.md",
+      "sha256": "457b40dc15bcbb042c689e82fc5f48f0ed311e51102f7e9eee410cc7ab2e043b"
+    },
+    {
+      "path": "characters/Nova.md",
+      "sha256": "7512bf9f920da7484fcc1c776ae5efa7a876f958d98babc4804b615264535ce7"
+    },
+    {
+      "path": "characters/Pixie.md",
+      "sha256": "851d7c7189c22931ef30d2cdc948c22f0aeea784bce82fa8cb9299485f85bbc5"
+    },
+    {
+      "path": "characters/PLAYABLE_BUILDS.md",
+      "sha256": "e7e03cc8e96518d7364ad866d7e95fa12ecd2058160431f554d520b4531f144b"
+    },
+    {
+      "path": "characters/README.md",
+      "sha256": "94a23747d013cf041737388295fa8b7f249433c7813ce67c0102423c4a94ced0"
+    },
+    {
+      "path": "characters/Riot.md",
+      "sha256": "fac7381971193bdbf542ac230c9bf061d3853dde7cd5af89b0efbe51f09348d3"
+    },
+    {
+      "path": "characters/Sable.md",
+      "sha256": "bd0ffc9210fce031171009521b6fcc1cf6345021fed926998129da098cabf8c2"
+    },
+    {
+      "path": "characters/Siren.md",
+      "sha256": "899b3f6b8c83d31c3423ea98c115537bb54c2fd881fcdea55f1a38917915bce1"
+    },
+    {
+      "path": "characters/Solace.md",
+      "sha256": "7b240d1875127cf84eb687aee793fd2ab1038201c70332fb20159ab1f4b80fca"
+    },
+    {
+      "path": "characters/Velvet.md",
+      "sha256": "9f4733ab8978c2a0dc26765c0e16e3db571df53fefbdc6e9bfb8e7c394af6233"
+    },
+    {
+      "path": "characters/Vesper.md",
+      "sha256": "004b3c70385dfa61235dad36b683fde9ad925c11132310bb9294c135248c8547"
+    },
+    {
+      "path": "docs/AGENT_AND_CANON_SPECIFICATION.md",
+      "sha256": "66429c501216348dc3bc33a08f26d47ba8f3d09366ab0dd77e2cb7af4d6289f3"
+    },
+    {
+      "path": "docs/CAMPAIGN_SETTING_GUIDE.md",
+      "sha256": "1b0d70bc8d7cc379269d7d3804a3a21ef35ae5956cb413d879983fdd0dbcb50f"
+    },
+    {
+      "path": "docs/PLAYABLE_IMPLEMENTATION.md",
+      "sha256": "ec3057df3cea8da75b6803f7955f0dae8f08ab67c2a0a04a9634fe55453a4164"
+    },
+    {
+      "path": "docs/RULESET_BRIDGE.md",
+      "sha256": "5beabc82d135c3af7fb5fe407a1588e0fd9c73ea3abcbe722154c7a1ad6327ca"
+    },
+    {
+      "path": "docs/SETTING_CONSTITUTION.md",
+      "sha256": "b7293239e95b2817f7b15fad3c4eb7fc3e68fea70003ca2c0492c5e673ea83f1"
+    },
+    {
+      "path": "docs/WORLD_ARCHITECTURE.md",
+      "sha256": "21d08b372b7fa3928ecef57f0c7f4e854db09b6225a49bbd891203ba6ebd4866"
+    },
+    {
+      "path": "implementation/characters.json",
+      "sha256": "a9e86e78f46d412d61fdf0d4f6771f1b6f762390885430ccf49ef8b99e78bc46"
+    },
+    {
+      "path": "implementation/equipment.json",
+      "sha256": "14515500880147318c066a277df4ad9282e73fd4d93f695df2553d28a94db989"
+    },
+    {
+      "path": "implementation/manifest.json",
+      "sha256": "bccfac8d98da181258c0be63e16848620124a39a7aefe93d93ddaba76678d90c"
+    },
+    {
+      "path": "implementation/README.md",
+      "sha256": "de19ba1705bf9106eefa6cf3b05844f047cfae45600df3279c574b82245cf516"
+    },
+    {
+      "path": "README.md",
+      "sha256": "aad89664ce7d3d7176e04c2bc2677605a1264e66619f160a2c2755c8e786855d"
+    },
+    {
+      "path": "rules/HAREMRUN_EXTENSIONS.md",
+      "sha256": "2b37db8b8fb0de1d09de55163e3f5ccf5323d0ceb2934f29fe0de22dfe2f02e8"
+    },
+    {
+      "path": "setting/factions/AUSTRALIAN_OLIGARCHIES.md",
+      "sha256": "b2c410231f80c816c74453775c5f4bdd673796b875d6815187cc6d139258aaf0"
+    },
+    {
+      "path": "setting/factions/AUSTRALIAN_SECOND_TIER_CORPORATIONS.md",
+      "sha256": "ba96039669997e8e3151f2e511d5edd2c50bc6356c6874b7cc5e906ba2603bba"
+    },
+    {
+      "path": "setting/factions/README.md",
+      "sha256": "4eea94fa5c656e40efab6e5f5a3f1f735ab1531cdfb1741842d161c89e5f6ac3"
+    },
+    {
+      "path": "setting/factions/SYDNEY_LOCAL_POWERS.md",
+      "sha256": "8bb39beba54a8c3007c72bc3b383e2883364d1a0fc43521ebfab4cca53e1e320"
+    },
+    {
+      "path": "setting/locations/README.md",
+      "sha256": "6d169fd9efaed3598452452709bf5db7cac4c405152320b4103ef7037488c568"
+    },
+    {
+      "path": "setting/locations/SYDNEY_COASTAL_REGION.md",
+      "sha256": "f00cd61bff8eca6c4552697d721c7f8f5ae188b740ed69c429631262e74bb2c8"
+    },
+    {
+      "path": "setting/locations/SYDNEY_DISTRICTS_PHASE1.md",
+      "sha256": "f43421d9b20037f41c7055c0bb513e86ee80dfea9dfd1682a4a1767cab907118"
+    },
+    {
+      "path": "setting/locations/SYDNEY_DISTRICTS_PHASE2.md",
+      "sha256": "e75e3475df8c3553574d2e20dc7b58e461f72106ccedd8154de3ed78ea7ecf7b"
+    },
+    {
+      "path": "setting/locations/SYDNEY_DISTRICTS_PHASE3.md",
+      "sha256": "60ce80b5f31e7ac78315fb141eb100083a225589cc65ca53e8e43c314ee37b26"
+    },
+    {
+      "path": "setting/locations/SYDNEY_MACRO_GEOGRAPHY.md",
+      "sha256": "77568177101f7780ef7155294f82d5f8c803c05fb1d6a1cf0eb624b5f3021f6a"
+    },
+    {
+      "path": "setting/locations/SYDNEY_SHOWCASE_STATUS.md",
+      "sha256": "277984d057a26e03e02ac2e6a705c4509047d647a208aed9a3edcbc307ed4656"
+    },
+    {
+      "path": "setting/politics/AUSTRALIAN_CONCESSIONARY_OLIGARCHY.md",
+      "sha256": "52336df98efceea0f8fb6ade4fc4677a2672570496ef48f3c17be321d3e2d37b"
+    },
+    {
+      "path": "setting/README.md",
+      "sha256": "ef81928f5ef13c44504a7c258eb6c22534cbde9e2002bec15f4ff44e7e5c2af6"
+    },
+    {
+      "path": "setting/technology/FIREARMS_PROTECTION_AND_EFFECTS.md",
+      "sha256": "9bf9c82460c8569fc77c6147df3e8f797e6e7413ce8785929a1e298497c979fb"
+    },
+    {
+      "path": "setting/technology/MEDICAL_DRONES_AND_CYBERNETICS.md",
+      "sha256": "82f38e29fa73cf7675a9e61770a02dc46364bf90179646d15947fefd4c30826b"
+    },
+    {
+      "path": "setting/technology/README.md",
+      "sha256": "008638a0bb63ce386be214307fb8f3411f2cf170df931111606609c9cd07138e"
+    },
+    {
+      "path": "setting/technology/VEHICLES.md",
+      "sha256": "9089735d6359b80972176c6e6260f458d0213823099a378a3aa3a01207379c99"
+    }
+  ]
+}
