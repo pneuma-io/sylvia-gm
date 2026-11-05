@@ -139,17 +139,32 @@ Install these prerequisites:
 - Rust with the MSVC toolchain, Microsoft C++ Build Tools with the **Desktop development with C++** workload, and a Windows SDK. Follow the [Tauri Windows prerequisites](https://v2.tauri.app/start/prerequisites/#windows) and [Windows SDK guidance](https://learn.microsoft.com/en-us/windows/apps/windows-sdk/).
 - Microsoft Edge WebView2, described in the [Tauri WebView2 setup](https://v2.tauri.app/start/prerequisites/#webview2).
 - The Tauri 2 CLI. Its [official installation command](https://v2.tauri.app/reference/cli/) is `cargo install tauri-cli --version "^2.0.0" --locked`.
+- The seven x64 LGPL FFmpeg 8.1.2 DLLs identified by the [codec input manifest](licenses/dictation/PYAV-LGPL-BUILD.json).
+  Obtain the matching `DICTATION-CODEC-SOURCE.zip` supplement and follow the
+  [Windows codec build and recombination instructions](licenses/dictation/REBUILD-CODECS.md).
+  Keep its DLL output in a separate directory. `uv sync` supplies Python dependencies;
+  the codec DLL directory is a required external build input. The frozen recipe was
+  verified with x64 Python 3.12.11 and the locked PyAV 18.0.0 bindings.
 
-Clone the repository, then run the development commands in PowerShell:
+Open an x64 Visual Studio Developer PowerShell with the existing MSVC build tools
+available. Clone the repository, then set the codec directory and run the development
+commands in that same terminal. Replace the example codec path with your DLL output directory:
 
 ```powershell
 git clone https://github.com/pneuma-io/sylvia-gm.git
 cd sylvia-gm
 uv sync --locked --all-extras
+$env:SYLVIA_FFMPEG_LGPL_DIR = 'C:\Sylvia-codecs\ffmpeg-lgpl\bin'
 uv run --locked --all-extras python src-tauri/scripts/build_owner_sidecar.py
 cd src-tauri
 cargo tauri dev
 ```
+
+Keep `SYLVIA_FFMPEG_LGPL_DIR` set for the Tauri command too: its build hook invokes
+the owner builder again. The builder checks the selected DLL identities against the
+manifest and stages the LGPL libraries with the PyAV bindings in invocation-owned work.
+The recombination instructions explain how to identify ABI-compatible modified libraries
+in a separate personal source copy.
 
 Keep the checked-in lockfiles. The `--locked` Python commands reject an outdated lockfile instead
 of rewriting it. The `sylvia-gm` Python command provides `--help` and `--version`; launch the desktop

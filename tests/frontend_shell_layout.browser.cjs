@@ -8,7 +8,7 @@ const { chromium } = require('playwright');
 const frontend = path.resolve(__dirname, '../src-tauri/frontend');
 const fixture = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/td-delivered-map-controls.json'), 'utf8'));
 
-async function open(browser, viewport) {
+async function open(browser, viewport, { previewAvailable = false } = {}) {
   const page = await browser.newPage({ viewport });
   page.setDefaultTimeout(4000);
   const errors = [];
@@ -22,14 +22,15 @@ async function open(browser, viewport) {
       .replace("document.addEventListener('DOMContentLoaded', () => { void SylviaGMFrontend.init(); });", '')
       .replace('  // ---- Public API ----', `window.layoutTest = { state, wireControls, initSidebarResize,
         renderRulesetPanelProjection, renderSidebarState, showSessionView, gamePanels, renderBuilderChatRail,
-        updateTacticalSelection, tacticalTargetSelection, setSidebarCollapsed };
+        updateTacticalSelection, tacticalTargetSelection, setSidebarCollapsed, ensureSessionActivity };
         // ---- Public API ----`);
     await route.fulfill({ body, contentType: name.endsWith('.js') ? 'text/javascript' : name.endsWith('.css')
       ? 'text/css' : name.endsWith('.png') ? 'image/png' : 'text/html' });
   });
   await page.goto('https://sylvia-layout.test/app.html');
-  await page.evaluate((projection) => {
+  await page.evaluate(({ projection, previewAvailable }) => {
     const api = window.layoutTest;
+    const calls = window.layoutCalls = { compose: [], execute: 0 };
     document.getElementById('connecting-overlay').classList.add('hidden');
     document.getElementById('session-frame').style.display = 'flex';
     const queue = { campaign_id: projection.campaign_id, session_id: 'layout-gm', sequence_id: 'layout-queue',
@@ -41,15 +42,24 @@ async function open(browser, viewport) {
       campaigns: [{ campaign_id: projection.campaign_id, display_name: 'Layout check', lifecycle: 'active',
         ruleset_label: 'Trigger Discipline 0.1.24', campaign_setting_label: 'Siren Protocol 0.2.0',
         sessions: [{ session_id: 'layout-gm', role: 'dm', status: 'active' }] }],
-      bridge: { compose_action_sequence: async () => queue, action_sequence: async () => queue,
+      bridge: { compose_action_sequence: async command => { calls.compose.push(command); return queue; },
+        action_sequence: async () => queue,
+        snapshot: async () => ({ campaign_id: projection.campaign_id, revision: projection.revision }),
+        campaign_panels: async () => projection,
+        execute_action_sequence: async () => { calls.execute += 1; throw new Error('Unexpected execution'); },
+        execute_panel_action: async () => { calls.execute += 1; throw new Error('Unexpected execution'); },
         player_action_availability: async (command) => ({ campaign_id: command.campaign_id,
-          revision: command.expected_revision, results: command.requests.map(() => ({ available: false, reason: 'Not checked' })) }) } });
+          revision: command.expected_revision, results: command.requests.map(request => ({
+            available: previewAvailable && request.source.action_id === 'aim',
+            reason: previewAvailable && request.source.action_id === 'aim' ? '' : 'Synthetic preview refusal',
+          })) }) } });
     document.getElementById('session-title').textContent = 'Layout check';
+    api.ensureSessionActivity({ sessionId: 'layout-gm', sessionRole: 'dm', campaignId: projection.campaign_id });
     document.getElementById('chronology').innerHTML = '<div class="story-card talk"><p>Synthetic narration.</p></div>';
     api.wireControls(); api.initSidebarResize(); api.showSessionView();
     api.renderRulesetPanelProjection(projection);
     api.renderSidebarState();
-  }, fixture);
+  }, { projection: fixture, previewAvailable });
   return { page, errors };
 }
 
@@ -259,14 +269,15 @@ async function shortMapWithPreview(page, ratio) {
 }
 
 // True when the element's centre is inside the map content's visible box and not covered by another layer.
-const reachable = (page, selector) => page.evaluate((selector) => {
-  const content = document.querySelector('[data-panel-id="operations.map"] .ruleset-panel-content');
-  const node = content.querySelector(selector);
+const reachable = (page, selector, bounds = '.ruleset-panel-content') => page.evaluate(({ selector, bounds }) => {
+  const panel = document.querySelector('[data-panel-id="operations.map"]');
+  const content = panel.querySelector(bounds);
+  const node = panel.querySelector(selector);
   const view = content.getBoundingClientRect(), rect = node.getBoundingClientRect();
   const x = rect.left + Math.min(rect.width / 2, 20), y = rect.top + Math.min(rect.height / 2, 8);
   const hit = document.elementFromPoint(x, y);
   return rect.height > 0 && y > view.top && y < view.bottom && Boolean(hit && (node === hit || node.contains(hit)));
-}, selector);
+}, { selector, bounds });
 
 for (const [label, viewport, ratio] of [['ordinary 1600x1000', { width: 1600, height: 1000 }, 0.5],
   ['short split 1600x1000', { width: 1600, height: 1000 }, 0.32], ['200% zoom 800x500', { width: 800, height: 500 }, 0.5]]) {
@@ -274,7 +285,8 @@ for (const [label, viewport, ratio] of [['ordinary 1600x1000', { width: 1600, he
     const browser = await chromium.launch({ headless: true, args: ['--disable-gpu'],
       channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined) });
     try {
-      const { page, errors } = await open(browser, viewport);
+      // This layout cell needs a selectable preview. Refusal is covered separately below.
+      const { page, errors } = await open(browser, viewport, { previewAvailable: true });
       await shortMapWithPreview(page, ratio);
       const map = page.locator('[data-panel-id="operations.map"]');
       const content = map.locator('.ruleset-panel-content');
@@ -284,14 +296,28 @@ for (const [label, viewport, ratio] of [['ordinary 1600x1000', { width: 1600, he
       assert.ok(box.y + box.height <= deck.y + 1, 'the command deck never sits over map content');
 
       // Keyboard: Tab order reaches Map tools and the preview's queue control, each brought into view.
-      for (const selector of ['.map-detail-controls > summary', '.map-intent-card .ruleset-panel-action']) {
+      for (const [selector, bounds] of [['.map-detail-controls > summary', '.ruleset-panel-content'],
+        ['.map-commit-strip .ruleset-panel-action', '.map-command-deck']]) {
         await map.locator(selector).focus();
-        assert.equal(await reachable(page, selector), true, selector + ' is visible when focused');
+        assert.equal(await reachable(page, selector, bounds), true, selector + ' is visible when focused');
       }
-      // Mouse wheel over the panel's own scrollbar edge (the map viewport pans the map) reaches the preview.
-      await content.evaluate((node) => { node.scrollTop = 0; });
-      await page.mouse.move(box.x + box.width - 3, box.y + box.height / 2);
-      for (let step = 0; step < 12 && !(await reachable(page, '.preview-only-note')); step += 1) await page.mouse.wheel(0, 120);
+      // Wheel through the actual nested regions: panel stack, map content and compact preview.
+      // Reset the starting position only; no scrollIntoView substitutes for the user's wheel.
+      const regions = [page.locator('#right-sidebar .sidebar-body'), content,
+        map.locator('[data-tactical-preview]'), map.locator('.preview-only-note')];
+      for (const region of regions.slice(0, -1)) await region.evaluate(node => { node.scrollTop = 0; });
+      for (let index = 0; index < regions.length - 1; index += 1) {
+        const owner = regions[index], child = regions[index + 1];
+        const steps = await owner.evaluate(node => Math.ceil(node.scrollHeight / 120) + 1);
+        for (let step = 0; step < steps; step += 1) {
+          const area = await owner.boundingBox(), target = await child.boundingBox();
+          const top = Math.max(0, area.y), bottom = Math.min(viewport.height, area.y + area.height);
+          if (target.y >= top && target.y + Math.min(target.height, bottom - top) <= bottom) break;
+          await page.mouse.move(Math.min(area.x + area.width - 3, viewport.width - 3), (top + bottom) / 2);
+          await page.mouse.wheel(0, target.y < top ? -120 : 120);
+          await page.evaluate(() => new Promise(requestAnimationFrame));
+        }
+      }
       assert.equal(await reachable(page, '.preview-only-note'), true, 'wheel scrolling reaches the preview text');
       const queue = await page.locator('.ruleset-queue-panel').boundingBox();
       assert.ok(queue.height < viewport.height * 0.75, 'the lower queue does not take the whole window');
@@ -300,6 +326,28 @@ for (const [label, viewport, ratio] of [['ordinary 1600x1000', { width: 1600, he
     } finally { await browser.close(); }
   });
 }
+
+test('an unavailable preview keeps its refusal while Queue remains unvalidated and never executes', async () => {
+  const browser = await chromium.launch({ headless: true,
+    channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined) });
+  try {
+    const { page, errors } = await open(browser, { width: 1600, height: 1000 });
+    await shortMapWithPreview(page, .5);
+    const card = page.locator('[data-panel-id="operations.map"] [data-tactical-preview]');
+    await card.getByText('Synthetic preview refusal', { exact: true }).waitFor();
+    assert.match(await card.innerText(), /queuing adds an unvalidated intent/);
+    const before = await page.evaluate(() => JSON.stringify(window.layoutTest.state.panelProjection.surfaces
+      .filter(surface => surface.id !== 'sylvia.action-queue')));
+    await page.locator('[data-panel-id="operations.map"] .map-commit-strip .ruleset-panel-action').click();
+    await page.waitForFunction(() => window.layoutCalls.compose.length === 1);
+    const after = await page.evaluate(() => ({ revision: window.layoutTest.state.panelProjection.revision,
+      projection: JSON.stringify(window.layoutTest.state.panelProjection.surfaces.filter(surface => surface.id !== 'sylvia.action-queue')),
+      mutations: window.layoutCalls.execute }));
+    assert.equal(after.projection, before); assert.equal(after.revision, fixture.revision);
+    assert.equal(after.mutations, 0);
+    assert.deepEqual(errors, []);
+  } finally { await browser.close(); }
+});
 
 test('map resize observers are replaced, not accumulated, across renders and leaving', { timeout: 60000 }, async () => {
   const browser = await chromium.launch({ headless: true, args: ['--disable-gpu'],

@@ -184,13 +184,20 @@
       sync();
     }
 
-    // Loading windows carry only saved layout identifiers, never stale game data or old effects.
+    // Phase one returns legacy window panels inline before any loading publication.
+    function returnWindowsInline() {
+      for (const item of [...(layout?.windows || [])])
+        layout = store.change({ type: 'close-window', windowId: item.id });
+    }
+
+    // Loading carries saved layout identifiers, never stale game data or old effects.
     function loading(campaignId, sessionId, phase = 'loading') {
       if (child) return null;
       if (context?.campaign_id !== campaignId || context?.session_id !== sessionId) {
         leave();
         context = { campaign_id: campaignId, session_id: sessionId, generation: crypto.randomUUID() };
         layout = store.restore(campaignId);
+        returnWindowsInline();
         effects.enter(context.generation, 0);
       }
       loadingLayout = true;
@@ -222,10 +229,7 @@
       layout = store.select({ campaignId: projection.campaign_id,
         rulesetId: projection.ruleset_id || 'no-rules', surfaces: projection.surfaces,
         original: projection.layout || null });
-      if (layout.windows.length) {
-        for (const item of [...layout.windows])
-          layout = store.change({ type: 'close-window', windowId: item.id });
-      }
+      returnWindowsInline();
       state.characterInspection ||= layout.inspection;
       state.tacticalViewScenes ||= {};
       projection.surfaces.filter((surface) =>

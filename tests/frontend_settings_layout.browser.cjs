@@ -20,7 +20,7 @@ async function openShell(browser, viewport, { browserInvoke = false } = {}) {
     let body = fs.readFileSync(file);
     if (name === 'app.js') body = body.toString().replace(
       "document.addEventListener('DOMContentLoaded', () => { void SylviaGMFrontend.init(); });", '')
-      .replace('  // ---- Public API ----', 'window.layoutTest = { state, wireControls, openSettings, closeSettings, beginModelConnection, startBuilderChat };\n  // ---- Public API ----');
+      .replace('  // ---- Public API ----', 'window.layoutTest = { state, wireControls, openSettings, closeSettings, beginModelConnection, startBuilderChat, refreshProviderSettings };\n  // ---- Public API ----');
     await route.fulfill({ body, contentType: name.endsWith('.js') ? 'text/javascript' :
       name.endsWith('.css') ? 'text/css' : name.endsWith('.png') ? 'image/png' : 'text/html' });
   });
@@ -127,8 +127,11 @@ function installSaveBridge(page) {
       provider_settings: async () => { calls.list += 1; return { configured, presets: [{ provider_id: 'custom', name: 'Custom', mode: 'byok' }], default_model: null }; },
       model_choices: async () => configured.flatMap(p => p.models.map(m => ({ provider_id: p.provider_id, model_id: m.canonical_id, label: m.name }))),
       save_provider_settings: (command) => { calls.save += 1; return new Promise((resolve, reject) => {
-        window.finishSave = (ok) => { if (ok !== true) return reject(ok === false ? new Error('synthetic save failure') : ok);
-          configured = [{ provider_id: 'custom', name: 'Synthetic service', models: [{ id: command.model_id, canonical_id: command.model_id, name: 'Synthetic saved model' }] }];
+        window.finishSave = (ok) => {
+          if (ok === true || ok?.committed) configured = [{ provider_id: 'custom', name: 'Synthetic service', models: [{ id: command.model_id, canonical_id: command.model_id, name: 'Synthetic saved model' }] }];
+          if (ok !== true) return reject(typeof ok === 'object'
+            ? Object.assign(new Error(ok.message), { code: ok.code })
+            : ok === false ? new Error('synthetic save failure') : ok);
           resolve({ provider_id: 'custom', canonical_model_id: command.model_id, name: 'Synthetic saved model' }); };
       }); },
       set_default_model: async () => { calls.default += 1; },
@@ -280,15 +283,34 @@ test('reopening Settings after a failed save starts Models at its top with the f
   }
 });
 
-test('a save cut off by Sylvia stopping is reported as unconfirmed, not as saved or unchanged', async () => {
+for (const [name, failure, recovery] of [
+  ['current native EOF', { message: 'Sylvia GM authority reply pipe closed' }, /Restart Sylvia/],
+  ['committed save with native EOF', { message: 'Sylvia GM authority reply pipe closed', committed: true }, /Restart Sylvia/],
+  ['unreadable native response', { message: 'Sylvia GM authority response could not be read' }, /Restart Sylvia/],
+  ['old native exit', { message: 'Sylvia GM authority process exited' }, /Restart Sylvia/],
+  ['browser outcome_unknown', { message: 'Unconfirmed response', code: 'outcome_unknown' }, /Reload \/ reconnect/],
+  ['committed browser outcome_unknown', { message: 'Unconfirmed response', code: 'outcome_unknown', committed: true }, /Reload \/ reconnect/],
+]) test(`a save cut off by ${name} stays unconfirmed without replay`, async () => {
   const browser = await chromium.launch();
   try {
-    const { page, errors } = await openShell(browser, { width: 1600, height: 1000 });
-    const result = await saveThenClose(page, 'Sylvia GM authority process exited');
+    const { page, errors } = await openShell(browser, failure.committed
+      ? { width: 390, height: 844 } : { width: 1600, height: 1000 });
+    const result = await saveThenClose(page, failure);
     assert.match(result.visibleText, /before confirming the save/);
-    assert.match(result.visibleText, /Restart Sylvia/);
+    assert.match(result.visibleText, recovery);
+    assert.match(result.visibleText, /check Your models to see whether it was saved/);
+    assert.match(result.visibleText, /Check before saving again/);
     assert.doesNotMatch(result.visibleText, /unchanged|saved\. Your chats/);
     assert.equal(result.defaultOffer, false);
+    if (process.env.SYLVIA_WEBUI_QA_OUTPUT) await page.screenshot({ path: path.join(
+      process.env.SYLVIA_WEBUI_QA_OUTPUT, `save-unknown-${name.replaceAll(' ', '-')}.png`) });
+    // Restart/reconnect reloads owner settings through this read-only production path.
+    await page.evaluate(() => window.layoutTest.refreshProviderSettings());
+    const inspected = await modelsView(page);
+    assert.equal(inspected.list.includes('Synthetic saved model'), Boolean(failure.committed),
+      'read-only recovery discovers the actual saved state without resending the save');
+    assert.deepEqual({ save: inspected.calls.save, default: inspected.calls.default, switch: inspected.calls.switch },
+      { save: 1, default: 0, switch: 0 });
     assert.deepEqual({ save: result.calls.save, default: result.calls.default, switch: result.calls.switch }, { save: 1, default: 0, switch: 0 });
     assert.deepEqual(errors, []);
   } finally {

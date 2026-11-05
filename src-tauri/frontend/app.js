@@ -3094,11 +3094,16 @@ const SylviaGMFrontend = (() => {
   // Show an actionable category without echoing raw network responses or private headers.
   function providerSetupError(error, action) {
     const detail = String(error?.message || error || '');
-    // The owner stopped mid-request, so whether a save landed is unknown until Sylvia restarts.
-    if (/authority (process exited|process is closed|response channel closed|request pipe closed|worker could not complete)/.test(detail)) {
+    // A lost response cannot establish whether the owner committed a save. Never replay it.
+    if (error?.code === 'outcome_unknown') {
       return action === 'save the model'
-        ? 'Sylvia stopped before confirming the save. Restart Sylvia, then check Your models to see whether it was saved.'
-        : `Sylvia stopped, so it could not ${action}. Restart Sylvia, then try again.`;
+        ? 'Sylvia lost the response before confirming the save. Reload / reconnect, then check Your models to see whether it was saved. Check before saving again.'
+        : `Sylvia lost the response and could not confirm ${action}. Reload / reconnect, then inspect the current state before trying again.`;
+    }
+    if (/authority (process exited|process is closed|response channel closed|request pipe closed|reply pipe closed|response could not be read|response was invalid|response identity did not match|response exceeded its bounded protocol|worker could not complete)/.test(detail)) {
+      return action === 'save the model'
+        ? 'Sylvia lost its owner connection before confirming the save. Restart Sylvia, then check Your models to see whether it was saved. Check before saving again.'
+        : `Sylvia lost its owner connection and could not confirm ${action}. Restart Sylvia, then inspect the current state before trying again.`;
     }
     if (/previous file is unchanged|settings file could not be read|settings-file access/.test(detail)) {
       return 'Could not write Sylvia’s settings file. Your saved models are unchanged. ' +
