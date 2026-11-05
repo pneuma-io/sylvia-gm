@@ -1331,18 +1331,77 @@ def _resolve_body_proximity(
     return result
 
 
-def _resolve_sweep(scene: _CompiledScene, query: Mapping[str, object]) -> dict[str, object]:
+def _resolve_circle_overlap(
+    scene: _CompiledScene, query: Mapping[str, object], *,
+    entities: Mapping[str, Mapping[str, object]] | None = None,
+) -> dict[str, object]:
+    """Intersect declared horizontal circles during translation, using actual vertical body spans.
+
+    This queries controlled space independently of physical wall-clearance footprints.
+    Exact tangency and vertical face contact do not occupy space. The shared engine's
+    1e-12 tolerance removes numerical contact, without sampling or physics simulation.
+    """
+    if entities is None:
+        entities = {row['id']: row for row in scene.admitted.as_payload()['entities']}
+    moving = entities[query["moving_entity_id"]]
+    fixed = entities[query["fixed_entity_id"]]
+    start, end, center = _vec3(query.get("origin", moving["position"])), _vec3(query["destination"]), _vec3(fixed["position"])
+    delta = tuple(end[i] - start[i] for i in range(3))
+    radius = float(cast(float, query["moving_radius"])) + float(cast(float, query["fixed_radius"]))
+    lower = center[2] - float(cast(float, moving["height"]))
+    upper = center[2] + float(cast(float, fixed["height"]))
+    result: dict[str, object] = {
+        **_provenance(scene, "circle_overlap"), "hit": False, "entry": None, "exit": None,
+        "starts_inside": False, "ends_inside": False,
+    }
+    offset = (start[0] - center[0], start[1] - center[1])
+    a = delta[0] ** 2 + delta[1] ** 2
+    b = offset[0] * delta[0] + offset[1] * delta[1]
+    c = offset[0] ** 2 + offset[1] ** 2 - radius ** 2
+    entry, exit = 0.0, 1.0
+    if a <= _EPSILON ** 2:
+        if c >= -_EPSILON:
+            return result
+    else:
+        closest = -b / a
+        gap = math.hypot(offset[0] + delta[0] * closest, offset[1] + delta[1] * closest)
+        if gap >= radius - _EPSILON:
+            return result
+        span = math.sqrt((radius - gap) * (radius + gap) / a)
+        entry, exit = max(entry, closest - span), min(exit, closest + span)
+    if abs(delta[2]) <= _EPSILON:
+        if start[2] <= lower + _EPSILON or start[2] >= upper - _EPSILON:
+            return result
+    else:
+        z1, z2 = (lower - start[2]) / delta[2], (upper - start[2]) / delta[2]
+        entry, exit = max(entry, min(z1, z2)), min(exit, max(z1, z2))
+    if exit - entry <= _EPSILON:
+        return result
+
+    def inside(point: Vec3) -> bool:
+        return (math.hypot(point[0] - center[0], point[1] - center[1]) < radius - _EPSILON
+                and lower + _EPSILON < point[2] < upper - _EPSILON)
+
+    return {**result, "hit": True, "entry": _clean(entry), "exit": _clean(exit),
+            "starts_inside": inside(start), "ends_inside": inside(end)}
+
+
+def _resolve_sweep(
+    scene: _CompiledScene, query: Mapping[str, object], *, start: Vec3 | None = None,
+    mover_value: Mapping[str, object] | None = None,
+) -> dict[str, object]:
     """Sweep the actual box or circular mover continuously through selected solids."""
     moving_id = query["moving_entity_id"]
     mover = next(
         item for item in scene.objects if item.kind == "entity" and item.item_id == moving_id
     )
-    mover_value = next(
-        item
-        for item in cast(Sequence[Mapping[str, object]], scene.admitted.as_payload()["entities"])
-        if item["id"] == moving_id
-    )
-    origin = _vec3(mover_value["position"])
+    if mover_value is None:
+        mover_value = next(
+            item
+            for item in cast(Sequence[Mapping[str, object]], scene.admitted.as_payload()["entities"])
+            if item["id"] == moving_id
+        )
+    origin = _vec3(mover_value["position"]) if start is None else start
     destination = _vec3(query["destination"])
     result: dict[str, object] = {
         **_provenance(scene, "sweep"),
@@ -1389,6 +1448,115 @@ def _resolve_sweep(scene: _CompiledScene, query: Mapping[str, object]) -> dict[s
         "blockers": blockers,
         "reason": "blocked" if blockers else "clear",
     }
+
+
+def _resolve_circle_route(scene: _CompiledScene, query: Mapping[str, object]) -> dict[str, object]:
+    """Find a bounded detour; packages declare which occupied circles block passage.
+
+    Circumscribed polygons gain facing support lines at disjoint circle pairs so a
+    positive passage is not closed by the base angular sampling. Lazy A* validates
+    edges in lower-bound order instead of spending the cap on every outgoing edge.
+    Supports at the endpoint elevations allow existing sloped movement without
+    inventing intermediate heights. Blockers spanning that elevation range participate.
+    Exact circle and physical-footprint clearance remain authoritative for every leg.
+    """
+    entities = {row['id']: row for row in scene.admitted.as_payload()['entities']}
+    moving_id = query['moving_entity_id']
+    origin = _vec3(entities[moving_id]['position'])
+    destination = _vec3(query['destination'])
+    circles = query['circles']
+    result = {**_provenance(scene, 'circle_route'), 'found': False, 'points': [],
+              'distance': None, 'truncated': False, 'tests': 0}
+    maximum = query['max_tests']
+    # Packages may lazily price directed edges through their own mechanics. Unknown
+    # edges retain Euclidean lower bounds; geometry never interprets terrain policy.
+    edge_costs = {(tuple(row['start']), tuple(row['end'])): row['cost']
+                  for row in query['edge_costs']}
+
+    def clear(first, second):
+        result['tests'] += 1
+        sweep = _resolve_sweep(scene, {'moving_entity_id': moving_id, 'destination': second,
+            'include_entities': False, 'exclude_entity_ids': [],
+            'metadata_filter': query['metadata_filter']}, start=first, mover_value=entities[moving_id])
+        if not sweep['supported'] or not sweep['clear']:
+            return False
+        for circle in circles:
+            overlap = _resolve_circle_overlap(scene, {'moving_entity_id': moving_id,
+                'fixed_entity_id': circle['entity_id'], 'destination': second, 'origin': first,
+                'moving_radius': query['moving_radius'], 'fixed_radius': circle['radius']}, entities=entities)
+            if overlap['ends_inside'] or (circle['blocking'] and overlap['hit']
+                    and not (first == origin and overlap['starts_inside'])):
+                return False
+        return True
+
+    if clear(origin, destination):
+        return {**result, 'found': True, 'points': [list(origin), list(destination)],
+                'distance': _clean(math.dist(origin, destination))}
+    blocking = [circle for circle in circles if circle['blocking']]
+    if len(blocking) > 16:
+        return {**result, 'truncated': True}
+    points = [origin, destination]
+    elevations = [origin[2]]
+    if abs(origin[2] - destination[2]) > _EPSILON:
+        elevations.append(destination[2])
+    for circle in blocking:
+        fixed = entities[circle['entity_id']]
+        center = _vec3(fixed['position'])
+        if (min(origin[2], destination[2]) >= center[2] + fixed['height'] - _EPSILON
+                or max(origin[2], destination[2]) + entities[moving_id]['height'] <= center[2] + _EPSILON):
+            continue
+        occupied_radius = query['moving_radius'] + circle['radius']
+        normals = [index * math.tau / 16 for index in range(16)]
+        for other in blocking:
+            other_center = _vec3(entities[other['entity_id']]['position'])
+            dx, dy = other_center[0] - center[0], other_center[1] - center[1]
+            # Facing supports use the overlap owner's existing contact tolerance.
+            if math.hypot(dx, dy) < occupied_radius + query['moving_radius'] + other['radius'] - _EPSILON:
+                continue
+            angle = math.atan2(dy, dx) % math.tau
+            if all(abs(math.remainder(angle - existing, math.tau)) > _EPSILON for existing in normals):
+                normals.append(angle)
+        if len(normals) == 16:
+            # Keep existing candidate coordinates, including caller-priced edge identities.
+            vertices = [((index * 2 + 1) * math.pi / 16,
+                         occupied_radius / math.cos(math.pi / 16)) for index in range(16)]
+        else:
+            normals.sort()
+            vertices = []
+            for first, second in zip(normals, [*normals[1:], normals[0] + math.tau]):
+                vertices.append(((first + second) / 2, occupied_radius / math.cos((second - first) / 2)))
+        for angle, radius in vertices:
+            for elevation in elevations:
+                points.append((center[0] + radius * math.cos(angle),
+                               center[1] + radius * math.sin(angle), elevation))
+    costs, parents = {}, {}
+    frontier = [(math.dist(origin, destination), 0.0, 0, -1)]
+    while frontier:
+        _, cost, current, parent = heapq.heappop(frontier)
+        if current in costs:
+            continue
+        if parent != -1:
+            if result['tests'] >= maximum:
+                return {**result, 'truncated': True}
+            if not clear(points[parent], points[current]):
+                continue
+            parents[current] = parent
+        costs[current] = cost
+        if current == 1:
+            retained = [1]
+            while retained[-1] != 0:
+                retained.append(parents[retained[-1]])
+            path = [list(points[i]) for i in reversed(retained)]
+            return {**result, 'found': True, 'points': path,
+                    'distance': _clean(sum(math.dist(a, b) for a, b in zip(path, path[1:])))}
+        for neighbor in range(1, len(points)):
+            if neighbor in costs:
+                continue
+            candidate = cost + edge_costs.get((points[current], points[neighbor]),
+                                             math.dist(points[current], points[neighbor]))
+            heapq.heappush(frontier, (candidate + math.dist(points[neighbor], destination),
+                                     candidate, neighbor, current))
+    return result
 
 
 def _placement_box(value: Mapping[str, object], kind: str) -> tuple[PlacementPoint, PlacementPoint]:
@@ -1685,6 +1853,8 @@ class SpatialEngine:
             "placement": _resolve_placement,
             "sweep": _resolve_sweep,
             "body_proximity": _resolve_body_proximity,
+            "circle_overlap": _resolve_circle_overlap,
+            "circle_route": _resolve_circle_route,
             "crossed_zones": _resolve_zones,
             "area": _resolve_area,
         }[query.kind]

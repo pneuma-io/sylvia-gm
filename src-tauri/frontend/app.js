@@ -5000,6 +5000,11 @@ const SylviaGMFrontend = (() => {
       actions.map(button).join('') + '</div></div>').join('') + '</div>';
   }
 
+  // Hide near-integer calculation residue in presentation; authoritative values stay untouched.
+  function presentNumber(value) {
+    return Number.isFinite(value) && Math.abs(value - Math.round(value)) < 1e-9 ? Math.round(value) : value;
+  }
+
   function actionReadinessMarkup(entity, actorId) {
     const combat = state.panelProjection?.surfaces.find((item) => item.renderer === 'encounter')?.data?.combat;
     if (!combat?.encounter_active) return '';
@@ -5007,7 +5012,7 @@ const SylviaGMFrontend = (() => {
     const fields = [active ? `Action ${combat.action_available ? 'ready' : 'spent'}` : 'Waiting for turn',
       typeof entity.bonus_action_available === 'boolean' ? `Bonus ${entity.bonus_action_available ? 'ready' : 'spent'}` : '',
       typeof entity.reaction_available === 'boolean' ? `Reaction ${entity.reaction_available ? 'ready' : 'spent'}` : '',
-      active && Number.isFinite(combat.movement_remaining) ? `Move remaining ${combat.movement_remaining}` : ''].filter(Boolean);
+      active && Number.isFinite(combat.movement_remaining) ? `Move remaining ${presentNumber(combat.movement_remaining)}` : ''].filter(Boolean);
     return `<span class="panel-unit-meta" data-action-readiness="${escapeHtml(actorId)}">${fields.map((field) =>
       `<span class="panel-tag" data-tone="${/ready|remaining/i.test(field) ? 'good' : 'neutral'}">${escapeHtml(field)}</span>`).join(' ')}</span>`;
   }
@@ -5558,7 +5563,8 @@ const SylviaGMFrontend = (() => {
   function tacticalPositionStyle(position, dimensions, size = 0.72) {
     const x = (position[0] - dimensions.lower[0]) / dimensions.cellSize;
     const y = (position[1] - dimensions.lower[1]) / dimensions.cellSize;
-    return `left:${x * 32}px;top:${y * 32}px;width:${size * 32}px;height:${size * 32}px`;
+    const point = `left:${x * 32}px;top:${y * 32}px`;
+    return size === null ? point : `${point};width:${size * 32}px;height:${size * 32}px`;
   }
 
   function tacticalBoxStyle(volume, dimensions) {
@@ -6032,18 +6038,24 @@ const SylviaGMFrontend = (() => {
         state.crossSurfaceFocus.surfaceId === surfaceId &&
         state.crossSurfaceFocus.entityId === item.id;
       const label = item.display && item.display.label || item.id;
+      const space = item.occupied_space;
       const posture = [tacticalPostureText(item, data), continuous
-        ? `at ${item.position.join(', ')} ${data.map.grid.unit}` : ''].filter(Boolean).join('; ');
+        ? `at ${item.position.join(', ')} ${data.map.grid.unit}` : '', continuous && space
+        ? space.status === 'declared' ? `Occupied space ${space.diameter} ${data.map.grid.unit} diameter`
+          : space.reason : ''].filter(Boolean).join('; ');
       return `<button type="button" class="tactical-entity${actor ? ' actor' : ''}` +
         `${target ? ' target' : ''}${crossFocused ? ' cross-focused' : ''}" ` +
         `data-tactical-entity="${escapeHtml(item.id)}" data-tone="${entityTone(item.id, item.display)}" ` +
         `data-token-kind="${escapeHtml(item.display?.kind || 'unit')}" ` +
+        (continuous ? `data-space-state="${space?.status || 'physical'}" ` : '') +
         `aria-label="${escapeHtml(label)}${posture ? `, ${escapeHtml(posture)}` : ''}" ` +
         `title="${escapeHtml(label)}${posture ? `, ${escapeHtml(posture)}` : ''}" ` +
         `aria-pressed="${actor || target}" style="${tacticalPositionStyle(
-          item.position, dimensions
-        )}${continuous ? coordinateBodyStyle(item, dimensions) : ''}"><span class="map-token-label" aria-hidden="true">${escapeHtml(actorInitials(label))}</span>` +
+          item.position, dimensions, continuous ? null : undefined
+        )}${continuous ? coordinateBodyStyle(item, dimensions, view.zoom) : ''}"><span class="map-token-label" aria-hidden="true">${escapeHtml(actorInitials(label))}</span>` +
         `<span class="map-name-label" aria-hidden="true">${escapeHtml(label)}</span>` +
+        (continuous && space?.status === 'unavailable' ?
+          '<span class="coordinate-space-warning" aria-hidden="true">Space unknown</span>' : '') +
         (continuous && item.position[2] !== 0 ? `<span class="coordinate-height-label" aria-hidden="true">` +
           `${escapeHtml(item.position[2])} ${escapeHtml(data.map.grid.unit)}</span>` : '') + '</button>';
     }).join('') : '';
@@ -6140,14 +6152,20 @@ const SylviaGMFrontend = (() => {
         `</div>`);
   }
 
-  // Render the body's actual footprint around its authoritative position.
-  function coordinateBodyStyle(entity, dimensions) {
+  // Occupied space uses the owner's declared diameter; physical clearance remains separate.
+  function coordinateBodyStyle(entity, dimensions, zoom = 1) {
+    const space = entity.occupied_space;
+    const interaction = `;--coordinate-hit-size:${28 / zoom}px`;
+    if (space) {
+      const size = space.status === 'declared' ? space.diameter * 32 / dimensions.cellSize : 18;
+      return `;width:${size}px;height:${size}px;border-radius:50%;transform:translate(-50%, -50%)${interaction}`;
+    }
     const footprint = entity.footprint;
     const scale = 32 / dimensions.cellSize;
     const width = footprint.kind === 'circle' ? footprint.radius * 2 : footprint.half_extents[0] * 2;
     const depth = footprint.kind === 'circle' ? footprint.radius * 2 : footprint.half_extents[1] * 2;
     return `;width:${width * scale}px;height:${depth * scale}px;` +
-      `border-radius:${footprint.kind === 'circle' ? '50%' : '3px'};transform:translate(-50%, -50%)`;
+      `border-radius:${footprint.kind === 'circle' ? '50%' : '3px'};transform:translate(-50%, -50%)${interaction}`;
   }
 
   // Coordinate fields provide precise and keyboard-accessible 3D intent without grid snapping.
@@ -8687,7 +8705,7 @@ const SylviaGMFrontend = (() => {
         !card.actions.every((action) => action && typeof action.label === 'string' &&
           typeof action.tool === 'string' && action.parameters &&
           typeof action.parameters === 'object' && !Array.isArray(action.parameters))) return null;
-    const valueText = (value) => value === null ? '—' : String(value);
+    const valueText = (value) => value === null ? '—' : String(typeof value === 'number' ? presentNumber(value) : value);
     const equationRowKey = (row) => JSON.stringify([row.label, row.value,
       row.equation.die_sides, row.equation.roll, row.equation.modifier,
       row.equation.total, row.equation.rolls || null]);

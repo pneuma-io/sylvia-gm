@@ -34,8 +34,8 @@ from sylvia_gm.application.result_card_admission import (
 )
 from sylvia_gm.application.result_cards import project_activity_label, project_result_card
 from sylvia_gm.application.shot_effects import project_shot_effect
-from sylvia_gm.application.spatial_preview import project_spatial_preview
-from sylvia_gm.application.tactical_grid import player_known_spatial_scene
+from sylvia_gm.application.spatial_preview import project_preflight_path, project_spatial_preview
+from sylvia_gm.application.tactical_grid import player_known_spatial_scene, player_known_spatial_value
 from sylvia_gm.domain.authority import (
     JsonValue,
     Mechanic,
@@ -72,6 +72,7 @@ from sylvia_gm.runtime._tool_executor import execute_tool, prepare_tool_context
 from sylvia_gm.runtime._types import (
     ChoiceResolutionControl,
     ExecutionContext,
+    ExecutionBudget,
     RuntimeChoiceOption,
     RuntimeChoiceRequest,
     ToolDef,
@@ -90,7 +91,7 @@ PACKAGE_RUNTIME_BYTE_LIMIT = 16 * 1024 * 1024
 _RUNTIME_FORMAT = 1
 _MAX_RUNTIME_DEPTH = 64
 # Complete rulesets can exceed 250,000 structural nodes without exceeding their work budget.
-_MAX_RUNTIME_NODES = 500_000
+_MAX_RUNTIME_NODES = 501_000
 _MAX_OBJECT_MEMBERS = 25_000
 _MAX_SPATIAL_EVIDENCE = 128
 _MAX_SPATIAL_RESULT_BYTES = 2 * 1024 * 1024
@@ -204,6 +205,11 @@ def _nested_set(value: dict[str, Any], path: str, replacement: Any) -> None:
     current[parts[-1]] = replacement
 
 
+def _spatial_proof_number(value: int | float) -> float:
+    """Match admitted geometry's float arithmetic in proof keys, including signed zero."""
+    return 0.0 if value == 0 else float(value)
+
+
 class AuthorityMemoryStateBridge:
     """Mutable package-local view used only during one mechanic execution."""
 
@@ -250,14 +256,14 @@ class AuthorityMemoryStateBridge:
 
     @property
     def combat_state(self) -> dict[str, Any]:
+        if self._player_spatial_view:
+            return cast(dict[str, Any], player_known_spatial_value(self._combat))
         return self._combat
 
     def get_entity(self, entity_id: str) -> dict[str, Any]:
-        if entity_id == "state":
-            return deepcopy(self._state)
-        value = self._entities.get(entity_id)
-        if not isinstance(value, dict):
-            raise KeyError(entity_id)
+        value = self._entity(entity_id)
+        if self._player_spatial_view:
+            return cast(dict[str, Any], player_known_spatial_value(value))
         return deepcopy(value)
 
     def get_entity_raw(self, entity_id: str) -> dict[str, Any]:
@@ -288,6 +294,8 @@ class AuthorityMemoryStateBridge:
         value = self._participants.get(participant_id)
         if not isinstance(value, dict):
             raise KeyError(participant_id)
+        if self._player_spatial_view:
+            return cast(dict[str, Any], player_known_spatial_value(value))
         return deepcopy(value)
 
     def participant_exists(self, participant_id: str) -> bool:
@@ -326,6 +334,8 @@ class AuthorityMemoryStateBridge:
         return entity
 
     def read_field(self, entity_id: str, field_path: str) -> Any:
+        if self._player_spatial_view:
+            return deepcopy(_nested_get(self.get_entity(entity_id), field_path))
         return deepcopy(_nested_get(self._entity(entity_id), field_path))
 
     def write_field(self, entity_id: str, field_path: str, value: Any) -> None:
@@ -390,7 +400,7 @@ class AuthorityMemoryStateBridge:
         if not isinstance(scene_value, Mapping):
             raise PackageRuntimeError("Package-owned spatial scene is unavailable")
         if self._player_spatial_view:
-            scene_value = player_known_spatial_scene(scene_value)
+            scene_value = player_known_spatial_scene(scene_value, retain_metadata=True)
         admitted = admit_spatial_scene(scene_value)
         engine = self._spatial_engines.get(scene_path)
         if engine is None:
@@ -472,10 +482,27 @@ class AuthorityMemoryStateBridge:
             admitted_scene,
             {"kind": operation, **dict(query)},
         ).as_payload()
-        # Repeated reads of one immutable snapshot share the same evidence.
-        # DSL effects still consume the shared operation budget; distinct queries
-        # and changed snapshots retain the existing evidence and byte limits.
-        key = (scene_path, admitted_scene.snapshot_id, selected is not None, canonical_json_bytes(canonical_query))
+        # An explicit-origin circle overlap depends only on the two body heights
+        # and fixed position. Reuse its original snapshot evidence when those
+        # facts survive a move; the returned provenance still names that snapshot.
+        # Snapshot selection and every other query retain exact snapshot identity.
+        identity = admitted_scene.snapshot_id
+        proof_query = canonical_query
+        if operation == 'circle_overlap':
+            proof_query = dict(canonical_query)
+            for field in ('origin', 'destination'):
+                if field in proof_query:
+                    proof_query[field] = [_spatial_proof_number(value) for value in proof_query[field]]
+            for field in ('moving_radius', 'fixed_radius'):
+                proof_query[field] = _spatial_proof_number(proof_query[field])
+        if operation == 'circle_overlap' and selected is None and 'origin' in canonical_query:
+            bodies = {row['id']: row for row in admitted_scene.as_payload()['entities']}
+            moving = bodies[canonical_query['moving_entity_id']]
+            fixed = bodies[canonical_query['fixed_entity_id']]
+            facts = [_spatial_proof_number(moving['height']), _spatial_proof_number(fixed['height']),
+                     [_spatial_proof_number(value) for value in fixed['position']]]
+            identity = 'circle_overlap:' + hashlib.sha256(canonical_json_bytes(facts)).hexdigest()
+        key = (scene_path, identity, selected is not None, canonical_json_bytes(proof_query))
         cached = self._spatial_query_results.get(key)
         if cached is not None:
             return deepcopy(cached)
@@ -979,6 +1006,9 @@ def validate_package_runtime(
     for declaration in declarations:
         _validate_runtime_declaration(runtime, declaration)
         metadata = runtime.tools[declaration.name].metadata
+        policy = parse_player_controls(metadata.get("player_controls"))
+        if any(name not in runtime.tools for name in policy.preflight):
+            raise PackageRuntimeError("Player preflight names an unavailable runtime tool")
         if "activity_label" in metadata:
             try:
                 validate_activity_label(
@@ -1145,12 +1175,52 @@ def materialize_player_action_checker(
             for item in policy.checks:
                 if not evaluate_condition(item["condition"], prepared):
                     return item["reason"]
+            _player_preflight(runtime, policy, _runtime_parameters(tool, parameters, bridge), bridge)
         except Exception:
             # An invalid expression or missing state cannot enable a control or expose its inputs.
             return "This action's availability could not be determined"
         return None
 
     return check
+
+
+def _player_preflight(
+    runtime: RulesetRuntime, policy: PlayerControls, parameters: dict[str, Any],
+    bridge: AuthorityMemoryStateBridge,
+) -> tuple[dict[str, object], SafePayload | None]:
+    """Reuse deterministic owners on copied state without rolls, relocation, commit or choices.
+
+    Derived state may refresh in this disposable bridge. Nested calls share the
+    ordinary budget; the effect dispatcher blocks random effects and spatial mutation.
+    """
+    budget = ExecutionBudget(preflight_only=True)
+
+    def nested(name: str, values: dict[str, Any], parent: ExecutionContext) -> ToolResult:
+        return execute_tool(name, values, runtime.tools, bridge, runtime.ruleset_config,
+                            runtime.definitions, combat_state=parent.combat_state,
+                            tool_executor=nested, budget=parent.budget)
+
+    scalars: dict[str, object] = {}
+    selected_route = None
+    for name in policy.preflight:
+        target = runtime.tools[name]
+        names = {parameter.name for parameter in target.parameters}
+        result = execute_tool(name, {key: value for key, value in parameters.items() if key in names},
+            runtime.tools, bridge, runtime.ruleset_config, runtime.definitions,
+            combat_state=bridge.combat_state, tool_executor=nested, budget=budget)
+        if not result.success:
+            raise PackageRuntimeError('This path or destination is unavailable; check the visible map and creature-space declarations.')
+        scalars.update({key: value for key, value in result.context.items()
+                        if value is None or isinstance(value, (str, bool, int, float))})
+        if policy.preflight_path is not None and policy.preflight_path["route"] in result.context:
+            selected_route = result.context[policy.preflight_path["route"]]
+    path_preview = None
+    if policy.preflight_path is not None and bridge._player_spatial_view:
+        path_preview = project_preflight_path(
+            selected_route, scalars.get(policy.preflight_path["cost"]),
+            bridge._spatial_engine(policy.preflight_path["scene"]).snapshot.as_payload(),
+        )
+    return scalars, path_preview
 
 
 def _prepare_player_control_values(
@@ -1213,7 +1283,9 @@ def materialize_player_action_previewer(
         state: SafePayload,
         participants: SafePayload,
     ) -> SafePayload | None:
-        if not policy.available or (policy.map_preview is None and policy.preview is None):
+        if not policy.available or (
+            policy.map_preview is None and policy.preview is None and policy.preflight_path is None
+        ):
             return None
         try:
             bridge = AuthorityMemoryStateBridge(
@@ -1234,7 +1306,9 @@ def materialize_player_action_previewer(
             if isinstance(prepared, ToolResult):
                 return None
             queries = _prepare_player_control_values(policy, prepared, bridge)
-            map_preview = None
+            preflight, map_preview = _player_preflight(
+                runtime, policy, _runtime_parameters(tool, parameters, bridge), bridge,
+            )
             if policy.map_preview is not None:
                 scenes = {
                     item["store_as"]: bridge._spatial_engine(
@@ -1253,10 +1327,10 @@ def materialize_player_action_previewer(
                     "preview": project_result_card(
                         policy.preview,
                         parameters=parameters,
-                        public_context={
+                        public_context={**preflight, **{
                             item["set"]["field"]: prepared.vars[item["set"]["field"]]
                             for item in policy.calculations
-                        },
+                        }},
                     ),
                     "map_preview": map_preview,
                 }

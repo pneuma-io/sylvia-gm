@@ -10,6 +10,122 @@ Read the relevant section instead of truncating a large definition.
 
 ## Current inventory
 
+Coordinate-map occupied space can be declared independently of physical body clearance. A
+`coordinate_map` source may supply `occupied_space` with an `actors` state source and a
+`declaration` literal object containing `convention`, `category_field` and `widths`. The
+category is an explicit integer index into positive diameters in map units. Actor binding
+uses the surface's declared `actor_reference`; the projection exposes only the resolved
+diameter and convention, never the underlying actor records. Missing or invalid categories
+produce an unavailable-space diagnostic. They do not acquire a default diameter.
+
+SRD Lite selects `srd.5.2.1.control-circle.v1`: Tiny, Small, Medium, Large, Huge and
+Gargantuan use diameters 2.5, 5, 5, 10, 15 and 20 feet, from saved `size_rank` 0 through 5.
+This is the owner-selected gridless adaptation of the square combat spaces in
+[SRD 5.2.1, page 14](https://media.dndbeyond.com/compendium-images/srd/5.2/SRD_CC_v5.2.1.pdf#page=14).
+It does not describe physical body width or claim that circles equal tabletop squares.
+The centre is authoritative XY; elevation remains the saved base Z with a separate height label.
+Physical boxes, radii, facing and heights remain unchanged for walls, range and spell geometry.
+
+The neutral `circle_overlap` query accepts two active scene identities, their explicit
+positive radii and a destination. It returns the open overlap interval, source occupancy
+and endpoint occupancy, with ordinary spatial provenance. Horizontal tangency and vertical
+body-face contact are clear. Vertical relevance uses the existing physical base Z and body
+height. It uses the shared engine's 1e-12 numerical tolerance, not a sampled physics loop.
+Packages require `spatial_circle_overlap.v1` to consume it.
+An optional `origin` prices or checks a later segment without relocating the mover.
+Within an action, an identical explicit-origin overlap can reuse its first proof when
+the fixed position and both body heights are unchanged. Current body admission runs
+before reuse, and the result retains the original snapshot identity. Default-origin
+queries and explicitly selected snapshots keep their exact snapshot identity. The
+128-record evidence cap and shared operation budget remain in force.
+Equivalent finite numeric encodings, including signed zero, share overlap proof keys
+after admission. Admitted inputs, recorded queries and returned provenance remain intact.
+
+`spatial_circle_route.v1` adds the neutral `circle_route` query. Packages supply the
+moving entity and radius, destination, metadata selector, and up to 64 active entity
+circles with explicit radii and passage-blocking flags. The engine selects a deterministic
+polyline around blocking circles using circumscribed polygons. Their base 16
+support lines gain facing tangents for disjoint circle pairs, preserving narrow passages
+between their declared circles. Lazy A* tests candidate edges in Euclidean lower-bound
+order rather than checking every outgoing edge before advancing. Every selected leg checks
+continuous circle overlap, physical footprint clearance and map bounds. Intermediate
+endpoints also avoid passable creatures. Search is bounded to 16 blocking circles and
+16,384 edge tests; exhaustion is reported, and no continuous-space shortest-path claim is made.
+For elevation changes, polygon supports use both endpoint elevations and include blockers
+whose body heights overlap the intervening elevation range. Every sloped leg uses the
+same continuous three-dimensional clearance checks and Euclidean distance as direct moves.
+No intermediate elevations are generated; the existing search bounds still apply.
+Optional `edge_costs` supplies up to 16,384 directed `{start, end, cost}` records, each
+priced at least at its geometric distance. Unknown edges retain Euclidean lower bounds;
+the engine interprets only numeric prices. Returned `distance` remains physical length.
+SRD admits the requested endpoint separately and prices candidate legs through its existing
+Difficult Terrain union and movement modifiers. If a candidate is unaffordable, it feeds those
+prices back into the graph and tries again, for at most eight candidates sharing the original
+16,384 edge-test allowance and the existing action-operation budget. Exhaustion refuses
+without spending; this bounded search does not guarantee terrain-optimal continuous routing.
+Detour preparation retains native eligibility and movement-mode budget refresh without
+requiring the initial geometric leg to be affordable. The selected route's total still
+passes the original affordability guard and clamp before any leg is committed.
+It checks the full selected budget and executes each leg through the existing
+movement and Reaction owners. A saved Reaction retains the final destination for replanning.
+Only a forbidden direct creature crossing selects detour search. Other moves retain the
+original clearance, cost and special-form qualifiers.
+The preview draws the selected visible-scene route and quotes its qualified movement cost.
+Its first and last points retain the actor position and requested destination, including
+elevation. Full-scene execution can take a different route without exposing hidden creatures
+in advance.
+
+The runtime admission and Lite builder limits are 501,000 structural nodes. The additional
+1,000 nodes accommodate route declarations above the retained 499,980-node package; depth,
+member, byte and per-action execution limits are unchanged.
+
+`player_controls.preflight` may name up to four deterministic private tools, in order,
+under `player_action_preflight.v1`. They receive the action's matching parameters and
+run on disposable owner memory with the existing shared operation/depth budget. Context
+and derived state projections may refresh there; dice, spatial mutation, participant
+mutation, publication and choice effects are rejected before execution. No preflight
+mutations reach campaign persistence. Availability and preview cards use player-known
+spatial facts and selected scalar results. SRD reuses its actual
+endpoint and route/budget qualifiers, then requires confirmation before commitment.
+`player_controls.preflight_path`, under `player_action_preflight_path.v1`, explicitly names
+the `scene`, local `route` result and scalar `cost` from those qualifiers. Only successful,
+untruncated paths of 2 to 1,024 finite three-dimensional points within map bounds are drawn.
+The player-spatial bridge computes this drawing; full-scene preflight context is never exported.
+Only map identity/revision, points, cost and found/truncated flags reach the renderer. Snapshot
+hashes, evidence, query inputs, metadata and hidden geometry remain private. This declaration
+is separate from query-based `map_preview` and cannot be combined with it.
+Nested state and participant scene reads use the same visible membership as spatial
+queries, including deterministic preflights. Mechanical metadata on visible rows stays
+inside Ruleset evaluation so actor references and visible terrain costs remain usable;
+renderer projections still expose only the closed public display record. Preview and
+button-readiness checks use this view. Admission and execution recheck the full scene,
+so an undisclosed obstacle or terrain cost can still change the committed outcome.
+Required panel confirmation binds the known-scene parameters, selected intent, revision,
+operation and package. Execution validates that same confirmation while retaining its
+independently resolved full-scene route and costs. An undisclosed detour does not require
+revealing the route or obtaining a different confirmation; changed intent and stale requests
+remain refused.
+For preflight-backed actions, the declared result card accompanies the existing safe
+map drawing; a generic segment-distance card cannot replace the declared action cost.
+
+SRD owns passage permission, using explicit `ally_state_ids`, Incapacitated (including
+conditions that impose it), Tiny, and the two-category size difference. Friendly attitude
+alone is insufficient. Declared Halfling Nimbleness also permits passage through a
+larger creature; it grants neither an occupied endpoint nor relief from Difficult Terrain.
+Creature-space intervals join the existing Difficult Terrain cost
+union once; ally and Tiny spaces add no surcharge. The SRD budget qualifier allows
+1e-9 foot of comparison tolerance and clamps the final charge to the remaining
+budget within that tolerance. This prevents interval arithmetic residue from
+denying the final movement or producing a negative budget. Route costs, positions,
+physical dimensions and spatial-query geometry retain their original precision.
+The ordinary action qualifies the requested endpoint before opportunity/environment subdivision. A subdivision may stop
+temporarily within permitted space; the requested willing endpoint may not. Existing
+source overlap can be left. Turn end applies Prone unless the mover is Tiny, larger than
+the overlapping creature, immune to Prone, or has the existing source-owned space-sharing
+exception. Mounted bodies retain their authenticated seat heights and receiver; teleport
+and forced-relocation owners retain their existing semantics. Saved campaigns are not
+converted. Declare or repair missing categories explicitly through the existing authoring path.
+
 | Definition | Authored content and owning admission boundary |
 | --- | --- |
 | `ruleset_source` | Compact `ruleset-source.yaml`; Ruleset compiler and draft checker. |

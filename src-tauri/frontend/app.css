@@ -3532,9 +3532,15 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
 
 .ruleset-map-panel .ruleset-panel-content { height:min(520px, calc(100dvh - 210px))!important; }
 
-.coordinate-world .map-token-label { position:absolute; bottom:calc(100% + 4px); left:50%; transform:translateX(-50%); display:inline-grid; place-items:center; width:28px; height:26px; border-radius:50%; background:var(--bg-card); border:1px solid var(--text-muted); font:700 .65rem var(--font-sans); color:var(--text-bright); box-shadow:0 2px 6px #0005; }
-.coordinate-world .tactical-entity.actor .map-token-label { border-color:var(--accent-primary-bright); }
-.coordinate-world .tactical-entity.target .map-token-label { border-color:#df996c; }
+.coordinate-world .map-token-label { position:absolute; inset:0; display:grid; place-items:center; font:700 .65rem var(--font-sans); color:var(--text-bright); pointer-events:none; }
+.coordinate-world .tactical-entity { box-sizing:border-box; min-width:0; min-height:0; padding:0; }
+/* The invisible interaction area may be larger than the declared visible footprint. */
+.coordinate-world .tactical-entity::before { content:""; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:max(100%,var(--coordinate-hit-size,28px)); height:max(100%,var(--coordinate-hit-size,28px)); border-radius:50%; }
+.coordinate-world .tactical-entity[data-space-state="unavailable"] { border-style:dashed; background:transparent; box-shadow:none; }
+.coordinate-world .tactical-entity[data-space-state="unavailable"] .map-token-label { opacity:.7; }
+.coordinate-space-warning { position:absolute; bottom:calc(100% + 3px); left:50%; transform:translateX(-50%); white-space:nowrap; font-size:10px; color:var(--text-muted); }
+.coordinate-world .coordinate-height-label { top:auto; right:auto; bottom:calc(100% + 3px); left:50%; transform:translateX(-50%); white-space:nowrap; pointer-events:none; }
+.coordinate-world .tactical-entity[data-space-state="unavailable"] .coordinate-height-label { bottom:calc(100% + 17px); }
 
 /* Game controls remain inside distinct, independently arranged surfaces. */
 .map-turn-strip { display:flex; flex:0 0 auto; align-items:center; gap:12px; min-height:30px; flex-wrap:wrap; padding:3px 6px; }
@@ -4036,7 +4042,7 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
 .ruleset-map-panel .tactical-entity[data-tone][data-token-kind="drone"] { border-radius: 30%; }
 .ruleset-map-panel .tactical-entity.actor { box-shadow: 0 0 0 3px color-mix(in srgb, var(--tone, var(--ally)) 40%, transparent); }
 .ruleset-map-panel .tactical-entity.target { outline: 2px dashed var(--hostile); outline-offset: 3px; }
-.coordinate-world .tactical-entity[data-tone] .map-token-label { border-color: var(--tone); color: var(--tone); }
+.coordinate-world .tactical-entity[data-tone] .map-token-label { color: var(--tone); }
 /* Names stay on screen for units; drones and devices show theirs when chosen, hovered or focused. */
 .ruleset-map-panel .tactical-entity:is([data-token-kind="drone"], [data-token-kind="device"]):not(.actor, .target, :hover, :focus-visible) .map-name-label { display: none; }
 .map-name-label {

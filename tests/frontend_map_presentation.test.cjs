@@ -53,6 +53,11 @@ function harness(options = {}) {
         hasPointerCapture: () => false, releasePointerCapture() {}, setPointerCapture() {} };
       const panel = { ...element(), dataset: { panelId } };
       details.closest = () => panel;
+      Object.values(controls).forEach(item => {
+        item.closest = selector => selector === '[data-panel-id]' ? panel : null;
+      });
+      panels.contains = candidate => candidate === panels || candidate === panel ||
+        candidate === details || candidate === scroll || Object.values(controls).includes(candidate);
       panel.querySelector = (selector) => ({
         '.shot-controls': details,
         '.tactical-scroll': scroll,
@@ -111,7 +116,7 @@ function harness(options = {}) {
   let source = fs.readFileSync(path.join(__dirname, '../src-tauri/frontend/app.js'), 'utf8');
   const insertion = source.lastIndexOf('  return {');
   source = source.slice(0, insertion) + `
-    window.mapPresentationTest = { state, renderTacticalGridPanel, renderRulesetPanels,
+    window.mapPresentationTest = { state, renderTacticalGridPanel, renderRulesetPanels, actionReadinessMarkup, rulesetCardMarkup,
       renderRulesetPanelProjection, gamePanels };
   ` + source.slice(insertion);
   source = ['panel-workspace.js', 'shot-playback.js', 'panel-host.js'].map((name) =>
@@ -127,6 +132,48 @@ function harness(options = {}) {
     advance(milliseconds) { time += milliseconds; frames.splice(0).forEach((callback) => callback()); },
     paint() { this.advance(16); this.advance(16); } };
 }
+
+test('coordinate identity and declared occupied circle share the exact world centre', () => {
+  const api = harness();
+  const map = surface();
+  map.renderer = 'coordinate_map';
+  map.data.map.grid = {cell_size: 5, unit: 'ft'};
+  map.data.entities = [{id: 'hero', position: [-1.25, 2.125, 3.5], height: 6,
+    footprint: {kind: 'box', half_extents: [.4, .4]},
+    occupied_space: {status: 'declared', kind: 'circle', diameter: 5},
+    display: {label: 'Mira', kind: 'unit'}}];
+  api.state.panelProjection = {surfaces: [map]};
+  const html = api.renderTacticalGridPanel(map.data, map.id);
+  assert.match(html, /left:-8px;top:13.6px;[^"<>]*width:32px;height:32px/);
+  assert.match(html, /Occupied space 5 ft diameter/);
+  assert.match(html, /data-space-state="declared"/);
+  assert.match(html, /coordinate-height-label/);
+  assert.doesNotMatch(html, /width:5.12px/);
+  api.state.tacticalViews.map = {zoom:0.5};
+  const zoomed = api.renderTacticalGridPanel(map.data, map.id);
+  assert.match(zoomed, /width:32px;height:32px/);
+  assert.match(zoomed, /--coordinate-hit-size:56px/);
+});
+
+test('movement cards and remaining resources hide roundoff without changing fractional values or state', () => {
+  const api = harness();
+  api.state.panelProjection = {surfaces: [{renderer: 'encounter', data: {combat: {
+    encounter_active: true, turn_active: true, active_actor: 'hero', action_available: true,
+    movement_remaining: 4.999999999994998,
+  }}}]};
+  const before = JSON.stringify(api.state.panelProjection);
+  assert.match(api.actionReadinessMarkup({}, 'hero'), /Move remaining 5</);
+  const card = {version:1, summary:[
+    {label:'Movement spent', value:25.000000000005, emphasis:false},
+    {label:'Fraction', value:2.125, emphasis:false},
+  ], details:[], actions:[]};
+  const original = JSON.stringify(card);
+  const html = api.rulesetCardMarkup(card, '');
+  assert.match(html, />25</);
+  assert.match(html, />2\.125</);
+  assert.equal(JSON.stringify(card), original);
+  assert.equal(JSON.stringify(api.state.panelProjection), before);
+});
 
 function surface(id = 'map') {
   return {
@@ -174,11 +221,15 @@ test('Effects disclosure and focused controls survive same-session replacement r
 
   let current = api.effectDom();
   current.details.open = true;
+  const originalGeneration = current.generation;
+  assert.equal(api.node('ruleset-panels').contains(current.controls.volume), true);
+  assert.equal(api.node('ruleset-panels').contains(element()), false);
   current.controls.volume.value = '65';
   current.controls.volume.focus();
   current.controls.volume.change();
 
   current = api.effectDom();
+  assert.ok(current.generation > originalGeneration, 'The controls must actually be replaced');
   assert.equal(current.details.open, true);
   assert.equal(api.activeElement(), current.controls.volume);
   assert.equal(current.controls.volume.focusOptions.preventScroll, true);
@@ -238,7 +289,8 @@ test('selected actors show public posture and height beside their names', () => 
   api.state.panelProjection = { player_control: null, surfaces: [map] };
   api.state.tacticalSelections.map = { map_revision: map.data.map_revision, actor: 'alpha' };
   const html = api.renderTacticalGridPanel(map.data, map.id);
-  assert.match(html, /Actor: Asha \(crouched, 1\.15 m high\)/);
+  assert.match(html, /data-selected-actor="alpha"[^>]*>.*<strong>Acting: Asha<\/strong>/);
+  assert.match(html, /aria-label="Asha, crouched, 1\.15 m high"/);
   assert.match(html, /title="Asha, crouched, 1\.15 m high"/);
   assert.doesNotMatch(html, /hidden body detail|private_note/);
 });
