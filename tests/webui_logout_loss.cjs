@@ -65,6 +65,9 @@ test('lost logout responses lock private drafts with honest revocation uncertain
         })).session.session_id, mode);
         await page.reload();
         await page.locator('#connecting-overlay').waitFor({ state: 'hidden' });
+        // The overlay can close before the independent Builder index arrives.
+        // Exercise logout from the saved chat, after that chat is actually navigable.
+        await page.locator(`[data-builder-session-id="${sessionId}"]`).first().waitFor({ state: 'attached' });
         if (!delivered) await page.getByRole('button', { name: 'Sessions', exact: true }).click();
         await page.locator('#rail-builder-btn').click();
         await page.locator('#home-view').waitFor({ state: 'hidden' });
