@@ -1,0 +1,74 @@
+/* The browser keeps the desktop composition until a narrow viewport needs one pane. */
+.webui-narrow-navigation { display: none; }
+/* Authentication recovery keeps private drafts in memory behind an opaque, modal screen. */
+body.webui-auth-locked > :not(.webui-auth-recovery),
+body.webui-auth-locked > :not(.webui-auth-recovery) * {
+  transition: none !important; animation: none !important; visibility: hidden !important;
+}
+.webui-auth-recovery {
+  position: fixed; inset: 0; width: 100vw; height: 100dvh;
+  max-width: none; max-height: none; margin: 0; border: 0; padding: 24px;
+  background: #151923; color: #edf0f6; font: 16px/1.5 system-ui, sans-serif;
+}
+.webui-auth-recovery::backdrop { background: #151923; }
+.webui-auth-recovery form { max-width: 440px; margin: 8vh auto; }
+.webui-auth-recovery h1 { font-size: 26px; }
+.webui-auth-recovery label, .webui-auth-recovery input, .webui-auth-recovery button {
+  display: block; width: 100%; box-sizing: border-box;
+}
+.webui-auth-recovery input, .webui-auth-recovery button {
+  font: inherit; min-height: 48px; padding: 10px; margin-top: 8px;
+  border: 1px solid #8592aa; border-radius: 6px;
+}
+.webui-auth-recovery input { color: #edf0f6; background: #202736; }
+.webui-auth-recovery button { margin-top: 20px; background: #d3ddfa; color: #151923; }
+.webui-auth-recovery :focus-visible { outline: 3px solid #a4c8ff; outline-offset: 3px; }
+.webui-auth-recovery output { display: block; margin-top: 16px; overflow-wrap: anywhere; }
+/* Full-window Settings must leave the deliberate transport controls above it reachable. */
+body.webui .settings-overlay {
+  top: calc(var(--webui-bar-height, 34px) + var(--webui-viewport-top, 0px));
+  height: calc(var(--webui-viewport-height, 100dvh) - var(--webui-bar-height, 34px));
+  bottom: auto;
+}
+@media (max-width: 720px) {
+  body.webui .webui-session-bar { flex-wrap: wrap; gap: 4px 8px; padding: 4px 8px; }
+  body.webui .webui-session-bar output { flex-basis: 100%; white-space: normal; overflow-wrap: anywhere; font-size: 11px; }
+  body.webui .webui-session-bar > button { min-height: 44px; flex: 1; }
+  .webui-narrow-navigation { display: flex; width: 100%; gap: 5px; }
+  .webui-narrow-navigation button { flex: 1; min-height: 44px; }
+  .webui-narrow-navigation [aria-pressed="true"] { border-color: var(--accent-primary-bright); color: var(--text-bright); }
+  body.webui .session-frame { min-height: 0; overflow: hidden; }
+  body.webui .session-frame .portrait-col,
+  body.webui .session-frame .right-sidebar,
+  body.webui .session-frame .sidebar-resize-handle,
+  body.webui #toggle-left-sidebar-btn,
+  body.webui #toggle-right-sidebar-btn { display: none; }
+  body.webui .session-frame .chronology-col { flex: 1; min-width: 0; width: 100%; }
+  body.webui .session-frame[data-browser-pane="panels"] .chronology-col,
+  body.webui .session-frame[data-browser-pane="sessions"] .chronology-col,
+  body.webui .session-frame[data-browser-pane="panels"] .home-view { display: none; }
+  body.webui .session-frame[data-browser-pane="panels"] .right-sidebar,
+  body.webui .session-frame[data-browser-pane="sessions"] .portrait-col {
+    display: flex; width: 100% !important; flex: 1; min-height: 0;
+  }
+  body.webui .session-frame[data-browser-pane="sessions"] { flex-direction: column; }
+  body.webui .session-frame[data-browser-pane="sessions"] #home-btn { display: none; }
+  body.webui .session-frame[data-browser-pane="sessions"] .portrait-col { flex: 0 0 auto; max-height: 40%; overflow-y: auto; }
+  body.webui .session-frame[data-browser-pane="sessions"] .home-view { display: block; padding-top: 16px; }
+  body.webui .portrait-frame { display: none; }
+  body.webui .session-topbar { padding-left: 44px; }
+  body.webui .sidebar-header { padding-left: 44px; }
+  body.webui .input-bar { padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+  body.webui textarea, body.webui input, body.webui select { font-size: 16px; max-width: 100%; }
+  body.webui .input-bar button,
+  body.webui .builder-launcher button,
+  body.webui .home-view button,
+  body.webui .sidebar-header button,
+  body.webui .ruleset-panel button,
+  body.webui .ruleset-panel-tab { min-height: 44px; min-width: 44px; }
+  /* Spatial buttons keep the engine's dimensions; use map zoom for larger cells. */
+  body.webui .tactical-world button { min-height: 0; min-width: 0; }
+  body.webui .tactical-scroll { touch-action: none; }
+  body.webui .webui-narrow-navigation { flex-shrink: 0; }
+  body.webui .session-frame.home-active[data-browser-pane="panels"] .right-sidebar { display: flex; }
+}

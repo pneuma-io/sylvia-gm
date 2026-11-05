@@ -222,6 +222,10 @@
       layout = store.select({ campaignId: projection.campaign_id,
         rulesetId: projection.ruleset_id || 'no-rules', surfaces: projection.surfaces,
         original: projection.layout || null });
+      if (layout.windows.length) {
+        for (const item of [...layout.windows])
+          layout = store.change({ type: 'close-window', windowId: item.id });
+      }
       state.characterInspection ||= layout.inspection;
       state.tacticalViewScenes ||= {};
       projection.surfaces.filter((surface) =>
@@ -322,6 +326,11 @@
     function changed(command) {
       if (child) return request('layout', command);
       if (!context) return;
+      if (command?.type === 'move' &&
+          command.destination?.windowId !== 'sidebar') {
+        status('This candidate keeps panels in the main workspace. Arrange panels here instead.');
+        return;
+      }
       if (loadingLayout && !['placement', 'close-window'].includes(command?.type)) return;
       layout = store.change(command);
       render();
@@ -584,14 +593,39 @@
       if (!available.length) return '';
       const selected = available.find((item) => item.id === tree.active) || available[0];
       const tabs = available.map((surface) => `<button type="button" class="ruleset-panel-tab" ` +
+        `role="tab" aria-controls="panel-${escape(surface.id)}" tabindex="${surface.id === selected.id ? '0' : '-1'}" ` +
         `draggable="true" data-workspace-panel="${escape(surface.id)}" data-workspace-tab="${escape(tree.id)}" ` +
         `title="Drag ${escape(surface.title || surface.id)} to move it" ` +
         `aria-selected="${surface.id === selected.id}">${escape(surface.title || surface.id)}</button>`).join('');
-      return `<section class="panel-tab-group" data-panel-drop="${escape(selected.id)}">` +
-        `<div class="ruleset-panel-tabs">${tabs}<button type="button" class="panel-menu-button" ` +
+      return `<section class="panel-tab-group" data-renderer="${escape(selected.renderer)}" data-panel-drop="${escape(selected.id)}">` +
+        `<div class="ruleset-panel-tabs" role="tablist" aria-label="Panel tabs">${tabs}<button type="button" class="panel-menu-button" ` +
         `data-panel-menu="${escape(selected.id)}" title="Arrange ${escape(selected.title || selected.id)}" ` +
         `aria-label="Arrange ${escape(selected.title || selected.id)}">⋯</button>` +
         `</div>${renderPanel(selected, false)}</section>`;
+    }
+
+    // One chip per declared panel with its real placement; choosing a chip reveals that panel.
+    function stripMarkup(current, surfaces) {
+      const shown = new Set();
+      (function collect(tree) {
+        if (!tree) return;
+        if (tree.kind === 'split') { collect(tree.first); collect(tree.second); return; }
+        const available = tree.panels.map((id) => surfaces.find((item) => item.id === id))
+          .filter((surface) => surface && visible(surface));
+        const selected = available.find((item) => item.id === tree.active) || available[0];
+        if (selected) shown.add(selected.id);
+      })(ownerTree('sidebar'));
+      const labels = { shown: 'showing', tab: 'behind a tab', window: 'in its own window', hidden: 'hidden' };
+      return '<div class="panel-strip-chips">' + surfaces.filter((surface) =>
+        current.known.includes(surface.id) && (visible(surface) || current.hidden.includes(surface.id))).map((surface) => {
+        const placement = current.hidden.includes(surface.id) ? 'hidden'
+          : current.windows.some((item) => owns(item.id, surface.id)) ? 'window'
+            : shown.has(surface.id) ? 'shown' : 'tab';
+        const title = surface.title || surface.id;
+        return `<button type="button" class="panel-chip" data-panel-chip="${escape(surface.id)}" ` +
+          `data-panel-placement="${placement}" aria-label="${escape(title)} · ${labels[placement]}" ` +
+          `title="${escape(title)} · ${labels[placement]}">${escape(title)}</button>`;
+      }).join('') + '</div>';
     }
 
     function markup(projection) {
@@ -605,7 +639,9 @@
       if (!current) return '';
       if (!current.known.length) return '';
       const tree = ownerTree(child?.window_id || 'sidebar');
-      const controls = child ? '' : `<details class="panel-layout-controls"><summary>Arrange panels</summary>` +
+      const controls = child ? '' : `<div class="panel-strip" role="group" aria-label="Game panels">` +
+        `<span class="panel-strip-label" aria-hidden="true">Panels</span>${stripMarkup(current, projection.surfaces)}` +
+        `<details class="panel-layout-controls"><summary>Arrange panels</summary>` +
         `<div class="panel-layout-options"><button type="button" data-panel-preference="save">Save as my Ruleset default</button>` +
         `<button type="button" data-panel-preference="mine">Use my Ruleset layout</button>` +
         `<button type="button" data-panel-preference="original">Use Ruleset's original layout</button>` +
@@ -614,11 +650,11 @@
         current.hidden.map((id) => {
           const surface = projection.surfaces.find((item) => item.id === id);
           return surface ? `<button type="button" data-panel-show="${escape(id)}">Show ${escape(surface.title || id)}</button>` : '';
-        }).join('') + '</div></details>';
+        }).join('') + '</div></details></div>';
       const contents = treeMarkup(tree, projection.surfaces);
       const dropDestinations = `<div class="panel-workspace-drop-destinations" aria-label="Panel drop destinations">` +
         `<div class="panel-workspace-drop-destination" data-panel-workspace-destination="sidebar">Return to sidebar</div>` +
-        `<div class="panel-workspace-drop-destination" data-panel-workspace-destination="new">Move to a new window</div></div>`;
+          `</div>`;
       return controls + dropDestinations + `<div class="panel-workspace-tree">${contents || (child
         ? '<p class="panel-empty">No panels are available in the current game state.</p>' : '')}</div>`;
     }
@@ -630,8 +666,8 @@
       const menuContext = { ...context };
       const destinations = [
         ['Return to sidebar', { windowId: 'sidebar' }],
-        ['Move to a new window', { windowId: 'new' }],
-        ...layout.windows.map((item) => [`Move to ${item.title}`, { windowId: item.id }]),
+
+
       ];
       for (const item of surfaces) {
         if (item.id === panelId || layout.hidden.includes(item.id)) continue;
@@ -644,6 +680,7 @@
       const dialog = document.createElement('dialog');
       dialog.className = 'player-action-dialog';
       dialog.innerHTML = `<h2>Arrange ${escape(surface.title || panelId)}</h2>` +
+        '<p>This candidate keeps panels in the main workspace.</p>' +
         `<label>Move panel<select data-panel-destination>${destinations.map(([label], i) =>
           `<option value="${i}">${escape(label)}</option>`).join('')}</select></label>` +
         `<form method="dialog"><button class="btn btn-secondary" value="cancel">Cancel</button>` +
@@ -731,8 +768,7 @@
         left: 'Split left', right: 'Split right', tab: 'Group as tabs' }[position];
     }
 
-    // Native observation supplies release/cancel and physical coordinates; dropEffect only
-    // tells us when the existing HTML docking path already handled the gesture.
+    // Finish an in-workspace panel drag without starting a native window operation.
     async function finishDrag(drag, cancelled) {
       if (drag.ended) return;
       drag.ended = true;
@@ -740,22 +776,6 @@
       clearDropPreview();
       drag.container.classList.remove('panel-workspace-dragging');
       drag.preview?.remove();
-      try {
-        if (!await drag.ready) {
-          if (!cancelled && sameContext(drag.context))
-            status('This drag could not detach a panel. Try again or use Arrange panels.');
-          return;
-        }
-        const placement = await native('finish_panel_drag', {
-          context: drag.context, dragId: drag.id, cancelled,
-        });
-        if (!placement || cancelled || activeDrag || !sameContext(drag.context) ||
-            !owns(child?.window_id || 'sidebar', drag.panelId)) return;
-        await changed({ type: 'move', panelId: drag.panelId, destination: { windowId: 'new', placement } });
-      } catch (_) {
-        if (!cancelled && sameContext(drag.context))
-          status('The panel could not be detached. Use Arrange panels or try dragging again.');
-      }
     }
 
     function wire(container) {
@@ -772,6 +792,21 @@
       container.querySelectorAll('[data-workspace-tab]').forEach((button) => {
         button.addEventListener('click', () => { void changed({ type: 'tab',
           groupId: button.dataset.workspaceTab, panelId: button.dataset.workspacePanel }); });
+        button.addEventListener('keydown', (event) => {
+          if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+          const tabs = Array.from(button.parentElement.querySelectorAll('[data-workspace-tab]'));
+          const index = tabs.indexOf(button);
+          const next = event.key === 'Home' ? tabs[0] : event.key === 'End' ? tabs.at(-1)
+            : tabs[(index + (event.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
+          if (!next || !context) return;
+          event.preventDefault();
+          const captured = { ...context };
+          const groupId = next.dataset.workspaceTab, panelId = next.dataset.workspacePanel;
+          void Promise.resolve(changed({type:'tab',groupId,panelId})).then(() => {
+            if (sameContext(captured)) container.querySelector(
+              `[data-workspace-tab="${CSS.escape(groupId)}"][data-workspace-panel="${CSS.escape(panelId)}"]`)?.focus();
+          }).catch(error => status(`Panel tab could not be selected: ${error}`));
+        });
         button.addEventListener('dragstart', (event) => {
           const surface = state.panelProjection.surfaces.find((item) => item.id === button.dataset.workspacePanel);
           if (!context || !surface) { event.preventDefault(); return; }
@@ -784,12 +819,6 @@
           event.dataTransfer.setData('application/x-sylvia-panel', JSON.stringify({
             context, panelId: drag.panelId }));
           event.dataTransfer.effectAllowed = 'move';
-          drag.ready = (child ? Promise.resolve() : nativeQueue).then(async () => {
-            if (!sameContext(drag.context)) return false;
-            await native('begin_panel_drag', { context: drag.context, dragId: drag.id,
-              width: preview.width, height: preview.height });
-            return true;
-          }).catch(() => false);
         });
         button.addEventListener('dragend', (event) => {
           if (activeDrag?.panelId === button.dataset.workspacePanel)
@@ -852,6 +881,8 @@
           render();
         });
       });
+      container.querySelectorAll('[data-panel-chip]').forEach((button) =>
+        button.addEventListener('click', () => reveal(button.dataset.panelChip)));
       container.querySelectorAll('[data-panel-show]').forEach((button) =>
         button.addEventListener('click', () => changed({ type: 'show', panelId: button.dataset.panelShow })));
       container.querySelectorAll('[data-panel-close-window]').forEach((button) =>

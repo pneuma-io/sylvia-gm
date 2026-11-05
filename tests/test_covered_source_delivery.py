@@ -91,7 +91,9 @@ def test_real_source_archive_is_readable_self_contained_and_qualified() -> None:
 
 def test_current_resources_and_assembler_preserve_exact_source_bytes(tmp_path: Path) -> None:
     resources = json.loads((ROOT / "src-tauri/tauri.conf.json").read_bytes())["bundle"]["resources"]
-    assert len(resources) == 16
+    # The original 16 resources gained eight dictation notices on merged main,
+    # then three codec source/rebuild notices in the release packaging repair.
+    assert len(resources) == 27
     for name in COVERED_SOURCE_DELIVERY_SHA256:
         assert resources["../" + name] == name
         assert list(resources.values()).count(name) == 1

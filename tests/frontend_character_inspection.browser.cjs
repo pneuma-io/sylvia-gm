@@ -63,9 +63,9 @@ for(const width of [1440,960])test(`shared character inspection, keyboard and re
   assert.equal(selection.actor,'asha');assert.equal(selection.target,'bram');
   await page.evaluate(()=>window.inspectionQA.renderRulesetPanelProjection(window.testProjection));
   for(const member of ['asha','bram'])assert.equal(await page.locator(`[data-character-expansion="${member}"]`).evaluate(e=>e.open),true);
-  await page.getByRole('button',{name:'Inventory',exact:true}).click();
+  await page.getByRole('tab',{name:'Inventory',exact:true}).click();
   assert.match(await page.locator('[data-panel-id="inventory"]').innerText(),/Bram.*Silver Dagger/s);
-  await page.getByRole('button',{name:'Character',exact:true}).click();
+  await page.getByRole('tab',{name:'Character',exact:true}).click();
   await page.evaluate(()=>window.inspectionQA.gamePanels().changed({type:'hide',panelId:'party'}));
   assert.equal(await page.getByRole('button',{name:'Choose in Party',exact:true}).count(),0);
   await page.getByText('Arrange panels',{exact:true}).focus();await page.keyboard.press('Enter');
@@ -85,7 +85,7 @@ for(const width of [1440,960])test(`shared character inspection, keyboard and re
   assert.equal(await page.locator('[data-panel-id="character"]').count(),0,'Standalone Character can be hidden independently');
   assert.equal(await page.locator('[data-character-expansion="bram"]').evaluate(e=>e.open),true);
   await page.evaluate(()=>window.inspectionQA.gamePanels().changed({type:'show',panelId:'character'}));
-  await page.getByRole('button',{name:'Character',exact:true}).click();
+  await page.getByRole('tab',{name:'Character',exact:true}).click();
   assert.match(await page.locator('[data-panel-id="character"]').innerText(),/Bram.*Silver Dagger/s);
   await page.getByLabel('Details for Asha',{exact:true}).focus();await page.keyboard.press('Enter');
   assert.equal(await page.locator('[data-character-expansion="asha"]').evaluate(e=>e.open),false);

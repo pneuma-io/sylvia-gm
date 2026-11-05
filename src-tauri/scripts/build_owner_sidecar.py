@@ -65,6 +65,9 @@ _DICTATION_NOTICES = (
     "WHISPER-MIT.txt",
     "CTRANSLATE2-MIT.txt",
     "FFMPEG-LGPLv3.txt",
+    "FFMPEG-LGPLv2.1.txt",
+    "PYAV-LGPL-BUILD.json",
+    "REBUILD-CODECS.md",
     "GPLv3.txt",
     "PORTAUDIO-MIT.txt",
 )
@@ -252,6 +255,23 @@ def main() -> int:
     for directory in (build_dir, dist_dir, spec_dir):
         directory.mkdir()
 
+    # Stock PyAV wheels bundle GPL-linked codecs. Release builds use the pinned
+    # LGPL-only libraries and a private binding stage, leaving the venv unchanged.
+    ffmpeg_directory = os.environ.get("SYLVIA_FFMPEG_LGPL_DIR")
+    if not ffmpeg_directory:
+        raise RuntimeError("Set SYLVIA_FFMPEG_LGPL_DIR to the manifest-bound LGPL FFmpeg DLLs")
+    pyav_stage = work_root / "pyav-lgpl"
+    subprocess.run(
+        [
+            sys.executable,
+            str(tauri_root / "scripts" / "stage_pyav_lgpl.py"),
+            "--ffmpeg", ffmpeg_directory,
+            "--output", str(pyav_stage),
+            "--manifest", str(repository_root / "licenses/dictation/PYAV-LGPL-BUILD.json"),
+        ],
+        check=True,
+    )
+
     command = [
         sys.executable,
         "-m",
@@ -262,6 +282,8 @@ def main() -> int:
         "--noupx",
         "--name",
         "sylvia-gm-owner",
+        "--paths",
+        str(pyav_stage),
         "--paths",
         str(repository_root / "src"),
         "--add-data",
@@ -283,6 +305,7 @@ def main() -> int:
     build_environment.pop("PYTHONHOME", None)
 
     build_environment.pop("PYTHONPATH", None)
+    build_environment["PYTHONPATH"] = str(pyav_stage)
     build_environment["HF_HOME"] = str(work_root / "hf-cache")
     build_environment["HF_XET_CACHE"] = str(work_root / "hf-cache/xet")
     build_environment["HF_HUB_OFFLINE"] = "1"

@@ -72,7 +72,7 @@ function renderer(bus, id, state, storage, context, options = {}) {
         remove() { this.removed = true; } }) },
     localStorage: { getItem: (key) => storage.get(key) || null,
       setItem: (key, value) => storage.set(key, value) },
-    crypto: webcrypto, Date: { now: () => clock.now },
+    crypto: webcrypto, CSS: {escape: value => String(value)}, Date: { now: () => clock.now },
     setTimeout: options.setTimeout || setTimeout, clearTimeout: options.clearTimeout || clearTimeout,
   };
   for (const name of ['panel-workspace.js', 'shot-playback.js', 'panel-host.js']) {
@@ -121,6 +121,27 @@ function state() {
       { id: 'inventory', title: 'Inventory', renderer: 'inventory' },
     ] } };
 }
+
+test('keyboard tabs restore focus after synchronous main layout changes and cancel late focus after leaving', async () => {
+  const bus=transport(),s=state();
+  s.panelProjection.surfaces=[{id:'map',title:'Map',renderer:'tactical_grid',group:'scene'},
+    {id:'network',title:'Network',renderer:'network_graph',group:'scene'}];
+  const original=JSON.stringify(s.panelProjection),main=renderer(bus,'main',s,new Map());
+  await main.host.init();main.render();await flush();
+  const group=main.host.snapshot().sidebar.id,handlers=new Map();let focused=null;
+  const tabs=['map','network'].map(id=>({dataset:{workspacePanel:id,workspaceTab:group},
+    addEventListener:(name,handler)=>handlers.set(id+':'+name,handler),focus:()=>{focused=id;}}));
+  const parent={querySelectorAll:()=>tabs};tabs.forEach(tab=>{tab.parentElement=parent;});
+  const container={classList:{add(){},remove(){}},querySelectorAll:selector=>selector==='[data-workspace-tab]'?tabs:[],
+    querySelector:selector=>tabs.find(tab=>selector.includes(`data-workspace-panel="${tab.dataset.workspacePanel}"`))};
+  main.host.wire(container);
+  let prevented=false;handlers.get('map:keydown')({key:'ArrowRight',preventDefault:()=>{prevented=true;}});
+  await flush();assert.equal(prevented,true);assert.equal(focused,'network');
+  assert.equal(main.host.snapshot().sidebar.active,'network');
+  assert.equal(JSON.stringify(s.panelProjection),original);assert.deepEqual(main.dispatches,[]);assert.deepEqual(main.errors,[]);
+  focused=null;handlers.get('network:keydown')({key:'Home',preventDefault(){}});main.host.leave();await flush();
+  assert.equal(focused,null);assert.deepEqual(main.errors,[]);
+});
 
 test('independent viewer profiles retain their own inspection and layout while synchronizing their own child', async () => {
   const projection = state().panelProjection;
@@ -410,6 +431,39 @@ test('returning to a campaign waits for native context registration before publi
   releaseReturn();
   assert.equal(await outcome, null,
     'publish must wait until sync_panel_windows registers the returned campaign context');
+  assert.deepEqual(main.errors, []);
+});
+
+test('reveal restores a hidden panel, selects a background tab and focuses a detached window in place', async () => {
+  const bus = transport(), storage = new Map();
+  const main = renderer(bus, 'main', state(), storage);
+  await main.host.init();
+  main.render();
+  const panels = (tree) => !tree ? [] : tree.kind === 'tabs' ? tree.panels : [...panels(tree.first), ...panels(tree.second)];
+  const groupOf = (tree, id) => !tree ? null : tree.kind === 'tabs' ? (tree.panels.includes(id) ? tree : null)
+    : groupOf(tree.first, id) || groupOf(tree.second, id);
+  main.host.changed({ type: 'hide', panelId: 'inventory' });
+  assert.ok(main.host.snapshot().hidden.includes('inventory'));
+  main.host.reveal('inventory');
+  assert.equal(main.host.snapshot().hidden.includes('inventory'), false);
+  assert.equal(groupOf(main.host.snapshot().sidebar, 'inventory').active, 'inventory');
+
+  main.host.changed({ type: 'move', panelId: 'inventory', destination: { windowId: 'sidebar', targetPanelId: 'party', position: 'tab' } });
+  const group = groupOf(main.host.snapshot().sidebar, 'party');
+  main.host.changed({ type: 'tab', groupId: group.id, panelId: 'party' });
+  assert.equal(groupOf(main.host.snapshot().sidebar, 'inventory').active, 'party');
+  main.host.reveal('inventory');
+  assert.equal(groupOf(main.host.snapshot().sidebar, 'inventory').active, 'inventory');
+
+  main.host.changed({ type: 'move', panelId: 'inventory', destination: { windowId: 'new' } });
+  await flush();
+  const detached = main.host.snapshot().windows.find((item) => panels(item.tree).includes('inventory'));
+  assert.ok(detached);
+  main.host.reveal('inventory');
+  await flush();
+  assert.ok(panels(main.host.snapshot().windows.find((item) => item.id === detached.id).tree).includes('inventory'),
+    'revealing a detached panel keeps it in its window');
+  assert.ok(bus.calls.some((call) => call.command === 'focus_panel_window' && call.args.windowId === detached.id));
   assert.deepEqual(main.errors, []);
 });
 
@@ -996,4 +1050,21 @@ test('queue-only presentation keys update an open child at the same mechanical r
   main.state.panelProjection={...main.state.panelProjection,presentation_key:key};await main.host.publish();assert.equal(child.renderCount(),++count);assert.equal(child.state.panelProjection.revision,revision);
  }
  main.host.leave();await flush();
+});
+
+test('phase one keeps default window panels inline and refuses new floating windows without game actions', async () => {
+  const bus = transport(), current = state();
+  current.panelProjection.surfaces[2].default_placement = 'window';
+  const main = renderer(bus, 'main', current, new Map());
+  await main.host.init(); main.render(); await flush();
+  assert.equal(main.host.snapshot().windows.length, 0, 'a window default is returned to the main workspace');
+  assert.equal(bus.windows.size, 0);
+  const before = JSON.stringify(main.host.snapshot());
+  await main.host.changed({ type: 'move', panelId: 'party', destination: { windowId: 'new' } });
+  await flush();
+  assert.equal(JSON.stringify(main.host.snapshot()), before);
+  assert.equal(bus.windows.size, 0);
+  assert.match(main.errors.at(-1), /keeps panels in the main workspace/);
+  assert.deepEqual(main.dispatches, []);
+  assert.equal(main.html().includes('data-panel-workspace-destination="new"'), false);
 });

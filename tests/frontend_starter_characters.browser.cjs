@@ -43,7 +43,6 @@ for (const width of [1280, 640]) test(`Starter chooser, preview and editable cop
       document.getElementById('connecting-overlay').style.display = 'none';
       document.getElementById('session-frame').style.display = 'flex';
       document.getElementById('home-view').hidden = true;
-      document.getElementById('ctx-campaign').textContent = 'Starter character test';
       document.getElementById('chronology').innerHTML = '';
       const panel = document.getElementById('construction-panel');
       panel.hidden = false;

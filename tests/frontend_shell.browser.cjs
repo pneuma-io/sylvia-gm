@@ -75,16 +75,18 @@ test('composer and sidebar controls remain usable in the shipped shell', { timeo
     assert.equal(await page.locator('#construction-package option[value=""]').count(), 1,
       'Home campaign setup retains its existing narrative-play choice');
     const box = selector => page.locator(selector).boundingBox();
-    assert.equal((await box('.session-topbar')).height, 48);
+    assert.equal((await box('.session-topbar')).height, 56);
     const chat = await box('.chronology-col'), right = await box('#right-sidebar');
-    assert.equal(chat.x + chat.width, right.x, 'no gap before the game panels');
-    assert.ok((await box('#toggle-left-sidebar-btn')).x >= (await box('#left-sidebar')).width);
-    assert.ok((await box('#toggle-right-sidebar-btn')).x < right.x);
+    const divider = await box('#sidebar-resize-handle'), rail = await box('#app-rail');
+    assert.equal(right.x + right.width, divider.x, 'game panels meet the divider without a gap');
+    assert.equal(divider.x + divider.width, chat.x, 'Story starts at the divider without a gap');
+    assert.ok((await box('#toggle-left-sidebar-btn')).x < rail.x + rail.width, 'sessions toggle lives in the rail');
+    const header = await box('.session-topbar'), panelsToggle = await box('#toggle-right-sidebar-btn');
+    assert.ok(panelsToggle.y >= header.y && panelsToggle.y + panelsToggle.height <= header.y + header.height);
     assert.equal(await page.locator('#stop-btn').isVisible(), false);
     const modelGroup = await box('.composer-model-controls'), send = await box('#send-btn');
     assert.ok(Math.abs(send.x - modelGroup.x - modelGroup.width - 6) <= 1,
       'model and effort remain immediately beside Send');
-    const divider = await box('#sidebar-resize-handle');
     assert.equal(divider.y, right.y, 'resize highlight starts alongside the sidebar header');
     assert.equal(await page.evaluate(({ x, y }) => document.elementFromPoint(x, y).id,
       { x: divider.x + 4, y: divider.y + 8 }), 'sidebar-resize-handle');
@@ -126,9 +128,11 @@ test('composer and sidebar controls remain usable in the shipped shell', { timeo
     await page.locator('#session-menu summary').click();
     assert.equal(await page.locator('#compact-context-btn').isVisible(), true);
     await page.keyboard.press('Escape');
-    await page.locator('#toggle-left-sidebar-btn').click();
+    // The one left rail starts thin, so only the game panels need collapsing here.
+    assert.equal(await page.locator('#toggle-left-sidebar-btn').getAttribute('aria-expanded'), 'false');
     await page.locator('#toggle-right-sidebar-btn').click();
-    assert.equal((await box('.chronology-col')).width, 1280, 'collapsed sidebars leave no rails');
+    assert.equal((await box('.chronology-col')).width, 1280 - (await box('#app-rail')).width,
+      'collapsed sidebars leave only the navigation rail');
     assert.equal(await page.locator('#home-btn').isVisible(), true);
     await page.evaluate(() => window.shellTest.showModelGuidanceWarning(
       { status: 'unrated', minimum_tier_id: 'synthetic-minimum' },
@@ -210,6 +214,7 @@ test('composer and sidebar controls remain usable in the shipped shell', { timeo
     });
     for (const width of [1280, 420]) {
       await page.setViewportSize({ width, height: 850 });
+      if (!await page.locator('#builder-launcher').isVisible()) await page.locator('#toggle-left-sidebar-btn').click();
       const rows = await page.locator('.builder-chat-row').evaluateAll(rows => rows.map(row => {
         const name = row.querySelector('.builder-chat-name');
         return { height: row.getBoundingClientRect().height, nameHeight: name.getBoundingClientRect().height };

@@ -18,6 +18,8 @@ mod dictation;
 mod instance_policy;
 mod panel_drag;
 mod panel_windows;
+#[cfg(all(test, windows))]
+mod owner_shutdown_tests;
 use panel_windows::PanelWindows;
 
 const HANDSHAKE_TRANSCRIPT: &[u8] = b"sylvia-gm-f6-local-owner-handshake-v1";
@@ -33,13 +35,34 @@ struct DesktopUpdateLaunch {
     applying: AtomicBool,
 }
 
+const OWNER_CLOSE_PENDING: &str = "Sylvia GM owner is still running; close has not completed";
+const OWNER_CLOSE_PIPE_CLOSED: &str = "Sylvia GM owner reply pipe closed while its process is still running; close has not completed";
+const OWNER_CLOSE_NO_ACK: &str = "Sylvia GM owner has not acknowledged shutdown; its process and saved data remain owned";
+// This bounds admission of a close request, not the owner's cleanup lifetime.
+const OWNER_SHUTDOWN_REPLY_TIMEOUT: Duration = Duration::from_secs(3);
+
+struct OwnerShutdownRequest {
+    request_id: String,
+    receiver: mpsc::Receiver<Result<Value, String>>,
+    started: Instant,
+    reply: Option<Result<(), String>>,
+    rejected: bool,
+}
+
 pub struct OwnerBridge {
     recovery_only: bool,
-    child: Mutex<Child>,
-    input: Mutex<ChildStdin>,
+    child: Arc<Mutex<Child>>,
+    input: Arc<Mutex<ChildStdin>>,
     pending: Arc<Mutex<HashMap<String, mpsc::Sender<Result<Value, String>>>>>,
     next_request_id: AtomicU64,
     closed: Arc<AtomicBool>,
+    closing: AtomicBool,
+    shutdown_request: Mutex<Option<OwnerShutdownRequest>>,
+    exit_code: Arc<Mutex<Option<i32>>>,
+    exit_notice: Mutex<Option<mpsc::Receiver<Result<i32, String>>>>,
+    close_requested: Arc<AtomicBool>,
+    #[cfg(windows)]
+    job: Arc<dictation::ProcessJob>,
 }
 
 impl OwnerBridge {
@@ -102,7 +125,8 @@ impl OwnerBridge {
         #[cfg(windows)]
         {
             use std::os::windows::process::CommandExt;
-            command.creation_flags(0x0800_0000);
+            use windows_sys::Win32::System::Threading::{CREATE_NO_WINDOW, CREATE_SUSPENDED};
+            command.creation_flags(CREATE_NO_WINDOW | CREATE_SUSPENDED);
         }
         command
             .stdin(Stdio::piped())
@@ -111,6 +135,22 @@ impl OwnerBridge {
         let mut child = command
             .spawn()
             .map_err(|_| "Sylvia GM authority process could not be launched".to_string())?;
+        #[cfg(windows)]
+        let job = match dictation::ProcessJob::own(&child) {
+            Ok(job) => Arc::new(job),
+            Err(error) => {
+                let _ = child.kill();
+                let _ = child.wait();
+                return Err(error);
+            }
+        };
+        #[cfg(windows)]
+        if let Err(error) = dictation::ProcessJob::resume(&child) {
+            drop(job);
+            let _ = child.kill();
+            let _ = child.wait();
+            return Err(error);
+        }
         let mut input = child
             .stdin
             .take()
@@ -170,9 +210,17 @@ impl OwnerBridge {
         let reader_pending = Arc::clone(&pending);
         let closed = Arc::new(AtomicBool::new(false));
         let reader_closed = Arc::clone(&closed);
+        let child = Arc::new(Mutex::new(child));
+        let reader_child = Arc::clone(&child);
+        #[cfg(windows)]
+        let reader_job = Arc::clone(&job);
+        let exit_code = Arc::new(Mutex::new(None));
+        let reader_exit_code = Arc::clone(&exit_code);
+        let (exit_sender, exit_receiver) = mpsc::channel();
         std::thread::Builder::new()
             .name("sylvia-gm-owner-replies".to_string())
-            .spawn(move || loop {
+            .spawn(move || {
+              loop {
                 let reply = Self::read_from(&mut output);
                 let request_id = reply
                     .as_ref()
@@ -197,20 +245,46 @@ impl OwnerBridge {
                                 let _ = sender.send(Err(error.clone()));
                             }
                         }
-                        return;
+                        break;
                     }
                     _ => {}
                 }
+              }
+              // The existing reply reader retains the exact child/job after bridge Drop.
+              // EOF is transport failure; collection is a separate actual process observation.
+              #[cfg(windows)]
+              let drained = reader_job.wait_empty();
+              #[cfg(not(windows))]
+              let drained: Result<(), String> = Ok(());
+              let result = drained.and_then(|_| loop {
+                  let status = reader_child.lock()
+                      .map_err(|_| "The owned authority handle is unavailable".to_string())?
+                      .try_wait()
+                      .map_err(|_| "The owned authority exit could not be checked".to_string())?;
+                  if let Some(status) = status { break Ok(status.code().unwrap_or(-1)); }
+                  std::thread::sleep(Duration::from_millis(20));
+              });
+              if let Ok(code) = result {
+                  if let Ok(mut saved) = reader_exit_code.lock() { *saved = Some(code); }
+              }
+              let _ = exit_sender.send(result);
             })
             .map_err(|_| "Sylvia GM authority response reader could not start".to_string())?;
 
         Ok(Self {
             recovery_only: ready.get("recovery_only") == Some(&Value::Bool(true)),
-            child: Mutex::new(child),
-            input: Mutex::new(input),
+            child,
+            input: Arc::new(Mutex::new(input)),
             pending,
             next_request_id: AtomicU64::new(1),
             closed,
+            closing: AtomicBool::new(false),
+            shutdown_request: Mutex::new(None),
+            exit_code,
+            exit_notice: Mutex::new(Some(exit_receiver)),
+            close_requested: Arc::new(AtomicBool::new(false)),
+            #[cfg(windows)]
+            job,
         })
     }
 
@@ -233,7 +307,7 @@ impl OwnerBridge {
             .read_line(&mut line)
             .map_err(|_| "Sylvia GM authority response could not be read".to_string())?;
         if read == 0 {
-            return Err("Sylvia GM authority process exited".to_string());
+            return Err("Sylvia GM authority reply pipe closed".to_string());
         }
         if line.len() > MAX_MESSAGE_BYTES || !line.ends_with('\n') {
             return Err("Sylvia GM authority response exceeded its bounded protocol".to_string());
@@ -243,6 +317,9 @@ impl OwnerBridge {
     }
 
     pub fn request(&self, method: &str, params: Value) -> Result<Value, String> {
+        if self.closing.load(Ordering::Acquire) {
+            return Err("Sylvia GM authority is closing; editing is suspended".into());
+        }
         if self.closed.load(Ordering::Acquire) {
             return Err("Sylvia GM authority process is closed".to_string());
         }
@@ -323,38 +400,100 @@ impl OwnerBridge {
         }
     }
 
+    // Never hold a child lock across a wait. A live job is retained, not called clean.
+    fn poll_owner_exit(&self) -> Result<Option<i32>, String> {
+        let status = self.child.try_lock()
+            .map_err(|error| match error {
+                std::sync::TryLockError::WouldBlock => OWNER_CLOSE_PENDING.to_string(),
+                std::sync::TryLockError::Poisoned(_) => "The owned authority handle is unavailable".to_string(),
+            })?
+            .try_wait().map_err(|_| "The owned authority exit could not be checked".to_string())?;
+        let Some(status) = status else { return Ok(None); };
+        #[cfg(windows)]
+        if !self.job.is_empty()? { return Ok(None); }
+        let code = status.code().unwrap_or(-1);
+        if let Ok(mut saved) = self.exit_code.try_lock() { *saved = Some(code); }
+        Ok(Some(code))
+    }
+
+    // Bound only the reply wait. Acknowledgement and EOF never substitute for exit.
+    // Repeated observations use one request, including a reply arriving after its deadline.
     pub fn shutdown(&self) -> Result<(), String> {
-        if self.closed.load(Ordering::Acquire) {
-            return Ok(());
+        if let Some(code) = self.poll_owner_exit()? {
+            return if code == 0 { Ok(()) } else {
+                Err(format!("Sylvia GM authority did not close cleanly (exit {code})"))
+            };
         }
-        let request_result = self.request("shutdown", json!({}));
-        let deadline = Instant::now() + Duration::from_secs(3);
-        loop {
-            let status = self
-                .child
-                .lock()
-                .map_err(|_| "Sylvia GM authority process handle is unavailable".to_string())?
-                .try_wait();
-            match status {
-                Ok(Some(status)) => {
-                    self.closed.store(true, Ordering::Release);
-                    if status.success() && request_result.is_ok() {
-                        return Ok(());
+        self.closing.store(true, Ordering::Release);
+        let mut shutdown_request = self.shutdown_request.try_lock()
+            .map_err(|_| OWNER_CLOSE_PENDING.to_string())?;
+        if shutdown_request.is_none() {
+            if self.closed.load(Ordering::Acquire) { return Err(OWNER_CLOSE_PIPE_CLOSED.into()); }
+            let request_id = format!("desktop-{}", self.next_request_id.fetch_add(1, Ordering::Relaxed));
+            let (sender, receiver) = mpsc::channel();
+            self.pending.try_lock()
+                .map_err(|_| {
+                    self.closing.store(false, Ordering::Release);
+                    "The authority reply registry is busy".to_string()
+                })?
+                .insert(request_id.clone(), sender);
+            let input = Arc::clone(&self.input);
+            let pending = Arc::clone(&self.pending);
+            let write_id = request_id.clone();
+            let spawn = std::thread::Builder::new().name("sylvia-gm-owner-close".into()).spawn(move || {
+                let result = input.lock()
+                    .map_err(|_| "The authority input pipe is unavailable".to_string())
+                    .and_then(|mut input| Self::write_to(&mut input, &json!({
+                        "id": write_id, "method": "shutdown", "params": {}
+                    })));
+                if let Err(error) = result {
+                    if let Ok(mut registry) = pending.lock() {
+                        if let Some(sender) = registry.remove(&write_id) { let _ = sender.send(Err(error)); }
                     }
-                    return Err("Sylvia GM authority process did not close cleanly".to_string());
                 }
-                Ok(None) if Instant::now() < deadline => {
-                    std::thread::sleep(Duration::from_millis(20));
-                }
-                _ => {
-                    if let Ok(mut child) = self.child.lock() {
-                        let _ = child.kill();
-                        let _ = child.wait();
-                    }
-                    self.closed.store(true, Ordering::Release);
-                    return Err("Sylvia GM authority process required forced shutdown".to_string());
-                }
+            });
+            if spawn.is_err() {
+                if let Ok(mut pending) = self.pending.try_lock() { pending.remove(&request_id); }
+                self.closing.store(false, Ordering::Release);
+                return Err("The owned shutdown request could not be started".into());
             }
+            *shutdown_request = Some(OwnerShutdownRequest { request_id, receiver, started: Instant::now(), reply: None, rejected: false });
+        }
+        let request = shutdown_request.as_mut().unwrap();
+        if request.reply.is_none() {
+            let remaining = OWNER_SHUTDOWN_REPLY_TIMEOUT.saturating_sub(request.started.elapsed());
+            match request.receiver.recv_timeout(remaining) {
+                Ok(Ok(reply)) => {
+                    request.rejected = reply.get("id").and_then(Value::as_str) == Some(request.request_id.as_str())
+                        && reply.get("ok") == Some(&Value::Bool(false));
+                    request.reply = Some(if reply.get("id").and_then(Value::as_str) != Some(request.request_id.as_str()) {
+                        Err("The shutdown reply identity did not match".into())
+                    } else if reply.get("ok") != Some(&Value::Bool(true)) {
+                        Err("The authority rejected shutdown; its process and saved data remain owned".into())
+                    } else if reply.pointer("/result/status").and_then(Value::as_str) != Some("closed") {
+                        Err("The authority did not acknowledge shutdown; its process remains owned".into())
+                    } else { Ok(()) });
+                }
+                Ok(Err(error)) => request.reply = Some(Err(if self.closed.load(Ordering::Acquire) {
+                    OWNER_CLOSE_PIPE_CLOSED.into()
+                } else { error })),
+                Err(mpsc::RecvTimeoutError::Timeout) => return Err(OWNER_CLOSE_NO_ACK.into()),
+                Err(mpsc::RecvTimeoutError::Disconnected) => return Err(OWNER_CLOSE_PIPE_CLOSED.into()),
+            }
+        }
+        if let Some(Err(error)) = &request.reply {
+            let error = error.clone();
+            if request.rejected {
+                self.closing.store(false, Ordering::Release);
+                // Only a definite refusal permits a later new close request.
+                *shutdown_request = None;
+            }
+            return Err(error);
+        }
+        match self.poll_owner_exit()? {
+            Some(0) => Ok(()),
+            Some(code) => Err(format!("Sylvia GM authority did not close cleanly (exit {code})")),
+            None => Err(OWNER_CLOSE_PENDING.into()),
         }
     }
 
@@ -434,13 +573,9 @@ fn desktop_update_launch_context(
     }))
 }
 
-impl Drop for OwnerBridge {
-    fn drop(&mut self) {
-        if !self.closed.load(Ordering::Acquire) {
-            let _ = if self.recovery_only { self.shutdown_for_recovery() } else { self.shutdown() };
-        }
-    }
-}
+// Drop performs no blocking protocol call. Closing the last input drops its pipe;
+// the reply reader retains the exact child and Windows job through real collection.
+// Abnormal desktop termination closes that kill-on-close job, containing its tree.
 
 fn trusted_asset_url(url: &tauri::Url) -> bool {
     let host = url.host_str().unwrap_or_default();
@@ -3204,6 +3339,28 @@ pub fn run() {
                 .min_inner_size(960.0, 640.0)
                 .disable_drag_drop_handler()
                 .build()?;
+            let exit_notice = app.state::<OwnerBridge>().exit_notice.lock()
+                .map_err(|_| std::io::Error::other("Owner collection notice unavailable"))?
+                .take().ok_or_else(|| std::io::Error::other("Owner collection notice already taken"))?;
+            let close_requested = Arc::clone(&app.state::<OwnerBridge>().close_requested);
+            let exit_app = app.handle().clone();
+            std::thread::Builder::new().name("sylvia-gm-owner-close-observer".into())
+                .spawn(move || {
+                    if let Ok(result) = exit_notice.recv() {
+                        if close_requested.swap(false, Ordering::AcqRel) {
+                            if result == Ok(0) {
+                                if let Some(window) = exit_app.get_webview_window("main") { let _ = window.close(); }
+                            } else {
+                                rfd::MessageDialog::new().set_title("Sylvia GM - owner close failed")
+                                    .set_description("The owner did not close cleanly. Keep saved campaign data and application files intact; this was not a clean shutdown.")
+                                    .set_level(rfd::MessageLevel::Error).show();
+                                if exit_app.state::<OwnerBridge>().poll_owner_exit().ok().flatten().is_some() {
+                                    exit_app.exit(1);
+                                }
+                            }
+                        }
+                    }
+                })?;
             let panel_app = app.handle().clone();
             main.on_window_event(move |event| {
                 if let tauri::WindowEvent::CloseRequested { api, .. } = event {
@@ -3211,6 +3368,37 @@ pub fn run() {
                         api.prevent_close();
                         let _ = panel_app.emit("desktop_update_close_blocked", json!({}));
                         return;
+                    }
+                    panel_app.state::<dictation::Dictation>().close();
+                    let owner = panel_app.state::<OwnerBridge>();
+                    owner.close_requested.store(true, Ordering::Release);
+                    if let Err(error) = owner.shutdown() {
+                        match owner.poll_owner_exit() {
+                            Ok(Some(0)) => {}
+                            Ok(Some(_)) => {
+                                api.prevent_close();
+                                if owner.close_requested.swap(false, Ordering::AcqRel) {
+                                    rfd::MessageDialog::new().set_title("Sylvia GM - owner close failed")
+                                        .set_description(&error).set_level(rfd::MessageLevel::Error).show();
+                                    panel_app.exit(1);
+                                }
+                                return;
+                            }
+                            _ => {
+                                api.prevent_close();
+                                if error == OWNER_CLOSE_PENDING || error == OWNER_CLOSE_PIPE_CLOSED {
+                                    if let Some(window) = panel_app.get_webview_window("main") {
+                                        let _ = window.set_title("Sylvia GM - waiting for owner cleanup");
+                                    }
+                                } else {
+                                    if error != OWNER_CLOSE_NO_ACK { owner.close_requested.store(false, Ordering::Release); }
+                                    rfd::MessageDialog::new().set_title("Sylvia GM - close not completed")
+                                        .set_description(format!("{error}. Sylvia is staying open because the owner has not been collected. Keep saved campaign data and application files in place."))
+                                        .set_level(rfd::MessageLevel::Error).show();
+                                }
+                                return;
+                            }
+                        }
                     }
                 }
                 if matches!(
@@ -3373,12 +3561,39 @@ pub fn run() {
         .build(tauri::generate_context!())
         .expect("error while building Sylvia GM")
         .run(|app, event| {
-            // Tauri exits the process without dropping managed state. Wait for the owner
-            // here so it cannot retain database or executable handles after desktop exit.
+            // A failed or pending close retains the desktop and its positively owned job.
+            if let tauri::RunEvent::ExitRequested { api, code, .. } = &event {
+                let owner = app.state::<OwnerBridge>();
+                owner.close_requested.store(true, Ordering::Release);
+                let result = owner.shutdown();
+                let collected = owner.poll_owner_exit().ok().flatten();
+                if matches!(collected, Some(status) if status != 0) && *code != Some(1) {
+                    api.prevent_exit();
+                    owner.close_requested.store(false, Ordering::Release);
+                    rfd::MessageDialog::new().set_title("Sylvia GM - owner close failed")
+                        .set_description("The owner exited unsuccessfully. Saved campaign data and application files have been retained; this was not a clean shutdown.")
+                        .set_level(rfd::MessageLevel::Error).show();
+                    app.exit(1);
+                } else if collected.is_none() {
+                    api.prevent_exit();
+                    if let Err(error) = result {
+                        if error == OWNER_CLOSE_PENDING || error == OWNER_CLOSE_PIPE_CLOSED {
+                            if let Some(window) = app.get_webview_window("main") {
+                                let _ = window.set_title("Sylvia GM - waiting for owner cleanup");
+                            }
+                        } else {
+                            if error != OWNER_CLOSE_NO_ACK { owner.close_requested.store(false, Ordering::Release); }
+                            rfd::MessageDialog::new().set_title("Sylvia GM - exit not completed")
+                                .set_description(format!("{error}. Sylvia retains the owner and saved data; exit has been stopped."))
+                                .set_level(rfd::MessageLevel::Error).show();
+                        }
+                    }
+                }
+            }
             if matches!(event, tauri::RunEvent::Exit) {
                 app.state::<dictation::Dictation>().close();
                 let owner = app.state::<OwnerBridge>();
-                let _ = if owner.recovery_only { owner.shutdown_for_recovery() } else { owner.shutdown() };
+                let _ = owner.poll_owner_exit();
             }
         });
 }
