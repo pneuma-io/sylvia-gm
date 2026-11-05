@@ -45,6 +45,37 @@ Custom content uses three building blocks: Rulesets define mechanics, Campaign S
 the world, and Campaign Plans define an adventure. Builder helps you create and refine that content
 for use in a compatible campaign.
 
+## Browser access
+
+The Windows package includes `sylvia-gm-owner.exe` beside the desktop application. To host
+Sylvia in a browser, open PowerShell in that folder and choose a data directory explicitly:
+
+```powershell
+.\sylvia-gm-owner.exe --webui --data-root "D:\Sylvia-browser-data"
+```
+
+Open the loopback address printed after the owner is ready. No Python or source checkout is
+needed. The host binds to `127.0.0.1` only. Closing a browser tab keeps the host running;
+use **Stop local WebUI** in the browser or Ctrl+C in the host terminal to stop it. Wait for the
+process to exit before reopening the same data directory. A desktop or another host already
+using that directory is rejected by the owner's writer lock.
+
+Source users can use `python -m sylvia_gm --webui --data-root "D:\Sylvia-browser-data"`
+with the existing project environment. Both paths use the same host and owner contracts.
+
+For a private user-managed Tailscale HTTPS proxy, choose a fixed loopback port and supply
+the exact lowercase HTTPS origin and your access-key file:
+
+```powershell
+.\sylvia-gm-owner.exe --webui --data-root "D:\Sylvia-browser-data" --port 8765 --webui-remote-origin https://node.tailnet.ts.net --webui-access-key-file "D:\Private\sylvia-webui-key.txt"
+```
+
+The file must contain 43–128 random URL-safe characters. Keep it private. Configure your
+private proxy to forward to the printed loopback target while retaining the exact Host and
+Origin. This mode requires sign-in, rejects other hosts/origins and disables direct localhost
+bootstrap. Sylvia does not configure Tailscale, certificates, access policies or hosting.
+Browser dictation and detached panel windows are unavailable in this version.
+
 ## Local problem reports
 
 Settings → About lets you describe an app problem or give model feedback, preview the exact JSON

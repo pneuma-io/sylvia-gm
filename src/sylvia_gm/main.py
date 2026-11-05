@@ -14,7 +14,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         prog="sylvia-gm",
         description=(
-            "Use the installed Windows desktop or launch the source WebUI "
+            "Use the installed Windows desktop or launch the WebUI "
             "with an explicit data root. "
             "Campaign and provider authority remains in its supervised owner process."
         ),

@@ -215,7 +215,7 @@ def test_informational_cli_cannot_launch_a_competing_application() -> None:
     # The installed desktop stays the named product; the only other launch is the explicit-root WebUI.
     help_text = " ".join(help_result.stdout.split())
     assert "Use the installed Windows desktop" in help_text
-    assert "source WebUI with an explicit data root" in help_text
+    assert "launch the WebUI with an explicit data root" in help_text
     assert "{serve,desktop}" not in help_result.stdout
     assert "Start the HTTP server" not in help_result.stdout
 

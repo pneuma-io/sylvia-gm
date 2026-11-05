@@ -218,11 +218,13 @@ class OwnerProcess:
     async def start(self) -> None:
         handshake = LaunchHandshake()
         credential = handshake.issue()
+        # A frozen executable dispatches its default mode to the owner; Python
+        # interpreter flags would be application arguments and cannot import it.
+        command = [sys.executable] if getattr(sys, "frozen", False) else [
+            sys.executable, "-B", "-m", "sylvia_gm.interfaces.owner_process",
+        ]
         self.process = await asyncio.create_subprocess_exec(
-            sys.executable,
-            "-B",
-            "-m",
-            "sylvia_gm.interfaces.owner_process",
+            *command,
             stdin=asyncio.subprocess.PIPE,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.DEVNULL,
@@ -863,11 +865,15 @@ class LocalWebUI:
 
 async def serve(data_root: Path, port: int = 0, *, remote: RemoteAccess | None = None) -> None:
     """Start explicitly, show the real address, and stop on UI Stop or Ctrl+C."""
-    frontend = Path(__file__).resolve().parents[3] / "src-tauri" / "frontend"
+    bundle = getattr(sys, "_MEIPASS", None)
+    frontend = (
+        Path(bundle) / "webui" if bundle is not None
+        else Path(__file__).resolve().parents[3] / "src-tauri" / "frontend"
+    )
     if remote is not None and port == 0:
         raise WebUIError("Private HTTPS mode requires an explicit nonzero --port for the proxy.")
     if not (frontend / "app.html").is_file():
-        raise WebUIError("The source WebUI assets are unavailable beside this checkout.")
+        raise WebUIError("The WebUI assets are unavailable in this application or source checkout.")
     owner = OwnerProcess(data_root)
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listener:
         listener.bind(("127.0.0.1", port))

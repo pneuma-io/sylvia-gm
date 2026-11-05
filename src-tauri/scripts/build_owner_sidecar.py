@@ -223,6 +223,39 @@ def campaign_plan_data_arguments(repository_root: Path) -> list[str]:
     return arguments
 
 
+def webui_data_arguments(repository_root: Path) -> list[str]:
+    """Bundle only the declared browser assets, with containment checked before reads."""
+    inventory = _contained_data_file(
+        repository_root, repository_root / "src-tauri/webui-data-files.json"
+    )
+    document = json.loads(inventory.read_text(encoding="utf-8"))
+    if (
+        not isinstance(document, dict)
+        or set(document) != {"format", "files"}
+        or type(document["format"]) is not int
+        or document["format"] != 1
+        or not isinstance(document["files"], list)
+        or not document["files"]
+    ):
+        raise ValueError("WebUI data inventory is invalid")
+    frontend = repository_root / "src-tauri/frontend"
+    _contained_data_file(repository_root, frontend / "app.html")
+    arguments, seen = [], set()
+    for name in document["files"]:
+        if not isinstance(name, str):
+            raise ValueError("WebUI data path is invalid")
+        validate_portable_path(name)
+        if name.casefold() in seen:
+            raise ValueError("WebUI data path is duplicated")
+        seen.add(name.casefold())
+        source = _contained_data_file(frontend, frontend / name)
+        destination = (Path("webui") / Path(name).parent).as_posix()
+        arguments.extend(["--add-data", f"{source}{os.pathsep}{destination}"])
+    if "app.html" not in seen:
+        raise ValueError("WebUI data inventory must include app.html")
+    return arguments
+
+
 def main() -> int:
 
     tauri_root = Path(__file__).resolve().parents[1]
@@ -290,6 +323,7 @@ def main() -> int:
         f"{repository_root / 'config' / 'config.yaml'}{os.pathsep}config",
         *sidecar_data_arguments(repository_root, work_root / "data"),
         *campaign_plan_data_arguments(repository_root),
+        *webui_data_arguments(repository_root),
         *dictation_build_arguments(repository_root),
         "--workpath",
         str(build_dir),
