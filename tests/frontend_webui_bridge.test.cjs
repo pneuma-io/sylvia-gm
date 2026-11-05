@@ -91,3 +91,14 @@ test('expired authentication requests sign-in without retrying a command', async
     error.code === 'authentication_required' && /request was not repeated/.test(error.message));
   assert.equal(h.calls.length, 1);
 });
+
+for (const code of ['outcome_unknown', 'webui_unavailable', 'command_rejected']) {
+  test(`HTTP bridge retains ${code} without retrying`, async () => {
+    const h = harness({ reply: { ok: false, status: 400, async json() {
+      return { ok: false, error: { code, message: 'Actual host category' } };
+    } } });
+    await assert.rejects(h.invoke('save_provider_settings'), error =>
+      error.code === code && error.message === 'Actual host category');
+    assert.equal(h.calls.length, 1);
+  });
+}

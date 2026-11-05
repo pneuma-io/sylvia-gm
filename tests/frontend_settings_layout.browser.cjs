@@ -4,9 +4,23 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
+const { execFileSync } = require('node:child_process');
 const { chromium } = require('playwright');
 const frontend = process.env.SYLVIA_SETTINGS_FRONTEND || path.resolve(__dirname, '../src-tauri/frontend');
 const TABS = ['models', 'accounts', 'appearance', 'dictation', 'packages', 'campaign-data', 'about', 'admin'];
+
+let hostReceipts;
+function actualHostReceipts() {
+  if (!hostReceipts) {
+    const root = path.resolve(__dirname, '..');
+    const python = process.env.SYLVIA_TEST_PYTHON || path.join(root, '.venv',
+      process.platform === 'win32' ? 'Scripts/python.exe' : 'bin/python');
+    hostReceipts = JSON.parse(execFileSync(python, ['-m', 'tests.webui_owner_outcome_fixture'],
+      { cwd: root, encoding: 'utf8', env: { ...process.env,
+        PYTHONPATH: [path.join(root, 'src'), root, process.env.PYTHONPATH].filter(Boolean).join(path.delimiter) } }));
+  }
+  return hostReceipts;
+}
 
 async function openShell(browser, viewport, { browserInvoke = false } = {}) {
   const page = await browser.newPage({ viewport });
@@ -140,6 +154,53 @@ function installSaveBridge(page) {
     api.state.providerSettings = { configured: [], presets: [{ provider_id: 'custom', name: 'Custom', mode: 'byok' }] };
   });
 }
+
+for (const committed of [false, true]) test(`real host EOF envelope keeps Settings uncertain (${committed ? 'committed' : 'uncommitted'})`, async () => {
+  const receipt = actualHostReceipts()[String(committed)];
+  const browser = await chromium.launch();
+  try {
+    const { page, errors } = await openShell(browser, committed
+      ? { width: 390, height: 844 } : { width: 1600, height: 1000 });
+    await installSaveBridge(page);
+    await page.addScriptTag({ path: path.join(frontend, 'webui-bridge.js') });
+    let sends = 0;
+    await page.route('**/api/command', async route => {
+      assert.equal(route.request().postDataJSON().method, 'save_provider_settings');
+      sends += 1;
+      await route.fulfill({ status: receipt.status, json: receipt.envelope });
+    });
+    await page.evaluate(committed => {
+      const bridge = window.layoutTest.state.bridge;
+      const original = bridge.save_provider_settings;
+      bridge.save_provider_settings = async command => {
+        const pending = original(command);
+        try { await window.__sylviaBrowserInvoke('save_provider_settings', command); }
+        catch (error) { window.finishSave({ message: error.message, code: error.code, committed }); }
+        return pending;
+      };
+    }, receipt.committed);
+    await page.evaluate(() => { window.layoutTest.openSettings('models'); window.layoutTest.beginModelConnection('api'); });
+    await page.locator('#provider-manual-entry-btn').click();
+    await page.locator('#provider-model-id').fill('synthetic/model');
+    await page.locator('#save-provider-btn').click();
+    await page.waitForFunction(() => !['', 'Saving model.'].includes(document.getElementById('provider-settings-status').textContent));
+    const result = await modelsView(page);
+    assert.match(result.editorStatus, /before confirming the save/);
+    assert.match(result.editorStatus, /Restart Sylvia/);
+    assert.match(result.editorStatus, /Reload \/ reconnect/);
+    assert.match(result.editorStatus, /check Your models to see whether it was saved/);
+    assert.match(result.editorStatus, /Check before saving again/);
+    assert.doesNotMatch(result.editorStatus, /unchanged|Model saved/);
+    assert.equal(result.defaultOffer, false);
+    await page.evaluate(() => window.layoutTest.refreshProviderSettings());
+    const inspected = await modelsView(page);
+    assert.equal(inspected.list.includes('Synthetic saved model'), receipt.committed);
+    assert.deepEqual({ save: inspected.calls.save, default: inspected.calls.default, switch: inspected.calls.switch },
+      { save: 1, default: 0, switch: 0 });
+    assert.equal(sends, 1);
+    assert.deepEqual(errors, []);
+  } finally { await browser.close(); }
+});
 
 async function startSave(page, modelId = 'synthetic/model') {
   await page.evaluate(() => { window.layoutTest.openSettings('models'); window.layoutTest.beginModelConnection('api'); });

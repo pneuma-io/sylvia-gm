@@ -3097,7 +3097,7 @@ const SylviaGMFrontend = (() => {
     // A lost response cannot establish whether the owner committed a save. Never replay it.
     if (error?.code === 'outcome_unknown') {
       return action === 'save the model'
-        ? 'Sylvia lost the response before confirming the save. Reload / reconnect, then check Your models to see whether it was saved. Check before saving again.'
+        ? 'Sylvia lost the response before confirming the save. Restart Sylvia if its owner stopped. Reload / reconnect, then check Your models to see whether it was saved. Check before saving again.'
         : `Sylvia lost the response and could not confirm ${action}. Reload / reconnect, then inspect the current state before trying again.`;
     }
     if (/authority (process exited|process is closed|response channel closed|request pipe closed|reply pipe closed|response could not be read|response was invalid|response identity did not match|response exceeded its bounded protocol|worker could not complete)/.test(detail)) {

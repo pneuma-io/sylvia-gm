@@ -16,7 +16,9 @@
     let envelope;
     try { envelope = await response.json(); }
     catch (_) { throw unconfirmed('The local WebUI response could not be read. Reload to reconnect and check saved work; this request was not repeated.'); }
-    if (!response.ok || !envelope.ok) throw new Error(envelope.error?.message || 'The command was rejected.');
+    if (!response.ok || !envelope.ok) throw Object.assign(
+      new Error(envelope.error?.message || 'The command was rejected.'),
+      { code: envelope.error?.code || 'command_rejected' });
     return envelope.result;
   }
 

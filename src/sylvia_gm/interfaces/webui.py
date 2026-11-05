@@ -260,13 +260,19 @@ class OwnerProcess:
             ) from None
         self.reader = asyncio.create_task(self._receive())
 
-    async def _write(self, payload: dict) -> None:
+    async def _write(self, payload: dict, future: asyncio.Future | None = None) -> None:
         raw = json.dumps(payload, ensure_ascii=True, allow_nan=False).encode() + b"\n"
         if len(raw) > MAX_BYTES:
             raise WebUIError("The request is too large.", "request_too_large")
         async with self.write_lock:
             if self.process is None or self.process.stdin is None:
                 raise WebUIError("The Sylvia owner is stopped.")
+            if future is not None:
+                if self.reader is None or self.reader.done():
+                    raise WebUIError("The Sylvia owner is stopped. Launch it again to continue.")
+                # Only requests reaching the pipe can have an uncertain outcome.
+                # Register before write: drain may fail after the owner committed.
+                self.pending[payload["id"]] = future
             self.process.stdin.write(raw)
             await self.process.stdin.drain()
 
@@ -290,7 +296,9 @@ class OwnerProcess:
                     future.set_exception(
                         WebUIError(
                             "The Sylvia owner disconnected. Reload to inspect saved work; "
-                            "actions were not automatically repeated."
+                            "restart Sylvia before reconnecting if its owner stopped. "
+                            "This request's outcome is unknown; it was not repeated.",
+                            "outcome_unknown",
                         )
                     )
 
@@ -299,9 +307,8 @@ class OwnerProcess:
             raise WebUIError("The Sylvia owner is stopped. Launch it again to continue.")
         identity = secrets.token_hex(16)
         future = asyncio.get_running_loop().create_future()
-        self.pending[identity] = future
         try:
-            await self._write({"id": identity, "method": method, "params": params or {}})
+            await self._write({"id": identity, "method": method, "params": params or {}}, future)
             reply = await asyncio.shield(future)
             if not reply.get("ok"):
                 error = reply.get("error", {})
@@ -311,9 +318,18 @@ class OwnerProcess:
                 )
             return reply.get("result")
         except (BrokenPipeError, ConnectionError):
-            raise WebUIError("The Sylvia owner disconnected. Saved work is retained.") from None
+            raise WebUIError(
+                "The Sylvia owner connection failed before confirming the result. "
+                "Restart Sylvia, then reconnect and inspect saved work before trying again; "
+                "this request was not repeated.",
+                "outcome_unknown",
+            ) from None
         finally:
             self.pending.pop(identity, None)
+            if not future.done():
+                future.cancel()
+            elif not future.cancelled():
+                future.exception()  # A failed drain may race the reader's disconnect error.
 
     async def close(self) -> None:
         """Collect the child, reporting nonzero exit or forced cleanup as failed shutdown."""
