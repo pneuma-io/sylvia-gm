@@ -118,6 +118,7 @@ from sylvia_gm.application.tactical_grid import (
     TacticalGridError,
     coordinate_actor_reference,
     player_known_spatial_scene,
+    player_known_spatial_value,
     project_coordinate_map,
     project_tactical_grid,
     resolve_surface_source,
@@ -7025,7 +7026,7 @@ class AuthorityOwner:
                 validate_player_control(
                     control_scope, parameters, tool.player_controls.actor_parameter,
                 )
-                self._check_player_action(tool, parameters, snapshot)
+                self._check_player_action(tool, parameters, snapshot, player_view=True)
             except CommandRejected as error:
                 available.append({"available": False, "reason": str(error)})
             else:
@@ -7034,15 +7035,21 @@ class AuthorityOwner:
 
     def _check_player_action(
         self, tool: CatalogTool, parameters: SafePayload, snapshot: CampaignState,
+        *, player_view: bool = False,
     ) -> None:
         """Apply package checks at projection and immediately before execution."""
 
         if tool.check_player_action is None:
             return
-        reason = tool.check_player_action(parameters, snapshot.state, {
+        state = snapshot.state
+        participants = {
             participant.participant_id: _participant_context_payload(participant)
             for participant in snapshot.participants
-        })
+        }
+        if player_view:
+            state = owned_payload(player_known_spatial_value(state))
+            participants = owned_payload(player_known_spatial_value(participants))
+        reason = tool.check_player_action(parameters, state, participants)
         if reason is not None:
             raise CommandRejected(reason, code="player_action_unavailable")
 
@@ -7089,7 +7096,7 @@ class AuthorityOwner:
                             selection=selection, session_id=None,
                         )
                         tool, parameters, _, actor_parameter = (
-                            self._resolve_panel_control(snapshot, source, selection)
+                            self._resolve_panel_control(snapshot, source, selection, known_map=True)
                             if source["kind"] == "panel"
                             else self._resolve_card_control(snapshot, source, selection)
                         )
@@ -7101,7 +7108,7 @@ class AuthorityOwner:
                             participant_ids={item.participant_id for item in snapshot.participants},
                         )
                         validate_player_control(scope, parameters, actor_parameter)
-                        self._check_player_action(tool, parameters, snapshot)
+                        self._check_player_action(tool, parameters, snapshot, player_view=True)
                         presentation = self._player_action_preview(
                             tool, parameters, snapshot, source, selection,
                         ) or {}
@@ -7124,6 +7131,7 @@ class AuthorityOwner:
     ) -> SafePayload | None:
         """Bind display-only paths to known geometry; commitment keeps the full-scene parameters."""
 
+        segment_presentation = None
         if source["kind"] == "panel" and selection:
             lock = self._store.current_package_lock(snapshot.campaign_id).package_lock
             prompts, ui = self._store.package_surfaces_for_current_lock(snapshot.campaign_id)
@@ -7134,7 +7142,9 @@ class AuthorityOwner:
             if action and action.get('spatial_preview'):
                 data = resolve_surface_source(surface['source'], state=snapshot.state, participants=snapshot.participants)
                 data = {**data, 'scene': player_known_spatial_scene(data['scene'])}
-                return segment_preview({**surface, 'action': action}, data, selection)
+                segment_presentation = segment_preview({**surface, 'action': action}, data, selection)
+                if not tool.player_controls.preflight:
+                    return segment_presentation
         if tool.preview_player_action is None:
             return None
         try:
@@ -7142,10 +7152,14 @@ class AuthorityOwner:
                 _, parameters, _, _ = self._resolve_panel_control(
                     snapshot, source, selection, known_map=True,
                 )
-            return tool.preview_player_action(parameters, snapshot.state, {
+            presentation = tool.preview_player_action(parameters, snapshot.state, {
                 participant.participant_id: _participant_context_payload(participant)
                 for participant in snapshot.participants
             })
+            if presentation is not None and segment_presentation is not None:
+                return owned_payload({**segment_presentation, **presentation,
+                    'map_preview': presentation.get('map_preview') or segment_presentation.get('map_preview')})
+            return presentation
         except (CommandRejected, TypeError, ValueError, KeyError):
             return None
 
@@ -7235,7 +7249,7 @@ class AuthorityOwner:
         if pending is not None:
             raise CommandRejected("Resolve the pending mechanics choice first")
         tool, parameters, label, actor_parameter = (
-            self._resolve_panel_control(snapshot, source, selection)
+            self._resolve_panel_control(snapshot, source, selection, known_map=preview_only)
             if source["kind"] == "panel"
             else self._resolve_card_control(snapshot, source, selection)
         )
@@ -7255,10 +7269,16 @@ class AuthorityOwner:
         )
         control_scope = self._player_control_scope(snapshot)
         validate_player_control(control_scope, parameters, actor_parameter)
-        self._check_player_action(tool, parameters, snapshot)
+        self._check_player_action(tool, parameters, snapshot, player_view=preview_only)
         policy_values = {"confirmation": policy.confirmation, "response": policy.response}
+        confirmation_parameters = parameters
+        if not preview_only and policy.confirmation == "required" and source["kind"] == "panel":
+            # Confirm the same visible intent; execution retains the independently bound full-scene route.
+            _, confirmation_parameters, _, _ = self._resolve_panel_control(
+                snapshot, source, selection, known_map=True,
+            )
         confirmation_token = hashlib.sha256(canonical_json_bytes({
-            "operation_id": operation_id, "origin": origin, "parameters": parameters,
+            "operation_id": operation_id, "origin": origin, "parameters": confirmation_parameters,
             "package_sha256": tool.package_sha256, "tool": tool.name, "policy": policy_values,
         })).hexdigest()
         if preview_only:

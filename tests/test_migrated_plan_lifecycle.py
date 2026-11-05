@@ -3,21 +3,55 @@
 Only character-provider replies are scripted. No gameplay state or story is injected.
 Native Windows input and genuine providers are separate evidence layers.
 """
-from pathlib import Path
+import json
 import pytest
 from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.application.bundled_campaign_plans import bundled_plan
 from sylvia_gm.domain.authority import thaw_json_value
-from tests.test_fc_campaign_journey import ROOT, _start_campaign
+from tests.test_fc_campaign_journey import ROOT, SRD, _start_campaign
 from tests.test_alpha_f6e_owner_session_transport import _OwnerHarness
+from tests.test_riichi_quick_test_plan import RIICHI_PLANS
 
-PLANS = sorted(path.parent.name for path in (ROOT / "campaign-plans").glob("*/plan.json"))
-assert len(PLANS) == 17
+MIGRATED_SRD_PLANS = (
+    "a-debt-in-iron",
+    "a-light-on-breathing-street",
+    "dead-inventory",
+    "hold-the-rope",
+    "last-cart-through",
+    "no-one-left-below",
+    "rift-awakening",
+    "the-bell-below",
+    "the-cartographers-wake",
+    "the-company-of-the-lost",
+    "the-honest-thief",
+    "the-long-way-round",
+    "the-map-of-tomorrow",
+    "the-quarry-turns",
+    "the-rift-awakening",  # Retained legacy alias has its own exact closure.
+    "the-scavengers-accord",
+    "the-sparring-debt",
+)
 
-@pytest.mark.parametrize("slug", PLANS)
+
+def test_every_bundled_plan_has_ruleset_specific_lifecycle_coverage():
+    plans = {
+        path.parent.name: json.loads(path.read_text(encoding="utf-8"))
+        for path in (ROOT / "campaign-plans").glob("*/plan.json")
+    }
+    assert set(MIGRATED_SRD_PLANS).isdisjoint(RIICHI_PLANS)
+    assert set(plans) == set(MIGRATED_SRD_PLANS) | set(RIICHI_PLANS)
+    for slugs, ruleset_id in (
+        (MIGRATED_SRD_PLANS, SRD), (RIICHI_PLANS, "pneuma.riichi-mahjong"),
+    ):
+        for slug in slugs:
+            assert plans[slug]["bindings"]["ruleset"]["id"] == ruleset_id, slug
+
+
+@pytest.mark.parametrize("slug", MIGRATED_SRD_PLANS)
 def test_migrated_plan_start_save_reopen_export_recover_and_story_equivalence(tmp_path, slug):
     original = bundled_plan(slug)
     assert original is not None
+    assert original.plan.payload["bindings"]["ruleset"]["id"] == SRD
     selected = slug
     database = tmp_path / "campaign.sqlite3"
     # The retained legacy alias remains accessible to saved references. Import its
@@ -53,6 +87,7 @@ def test_migrated_plan_start_save_reopen_export_recover_and_story_equivalence(tm
             if field in original.plan.payload:
                 assert plan[field] == original.plan.payload[field], (slug, field)
         assert saved.participants
+        assert any(entry.package_id == SRD for entry in saved.package_lock.entries)
         assert all(entry.package_id != "wotc.srd.5.2.1" for entry in saved.package_lock.entries)
         assert next(row for row in owner.campaign_index() if row.campaign_id == campaign).playable
         archive = tmp_path / "started-campaign.sylvia-gm-campaign"

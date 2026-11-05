@@ -93,7 +93,7 @@ class ImportedCase(Case):
         entities["hero"]["spell_materials"] = materials
         entities["hero"]["inventory"] += [item["inventory_item"] for item in materials]
         for identity, changes in (entity_changes or {}).items():
-            entities[identity].update(changes)
+            entities.setdefault(identity, deepcopy(entities['guard'])).update(changes)
         state[FULL + ".combat"].update(
             encounter_active=False,
             turn_active=False,

@@ -3,6 +3,11 @@
 import sys
 
 if __name__ == "__main__":
+    if "--webui" in sys.argv[1:]:
+        from sylvia_gm.main import main
+
+        main()
+        raise SystemExit(0)
     if len(sys.argv) > 1 and sys.argv[1] == "--desktop-update-helper":
         if len(sys.argv) != 2:
             raise SystemExit(2)

@@ -25,7 +25,11 @@
       "runtime_immutable_collections.v1",
       "runtime_require.v1",
       "starting_state_validation.v1",
-      "tactical_grid.v1"
+      "tactical_grid.v1",
+      "spatial_circle_overlap.v1",
+      "player_action_preflight.v1",
+      "spatial_circle_route.v1",
+      "player_action_preflight_path.v1"
     ],
     "runtime_format": 1
   },
@@ -57089,6 +57093,31 @@
             "key": "state.spatial_scene",
             "kind": "state",
             "namespace": "sylvia.srd-lite.bg3"
+          },
+          "occupied_space": {
+            "kind": "object",
+            "fields": {
+              "declaration": {
+                "kind": "literal",
+                "value": {
+                  "convention": "srd.5.2.1.control-circle.v1",
+                  "widths": [
+                    2.5,
+                    5,
+                    5,
+                    10,
+                    15,
+                    20
+                  ],
+                  "category_field": "size_rank"
+                }
+              },
+              "actors": {
+                "kind": "state",
+                "namespace": "sylvia.srd-lite.bg3",
+                "key": "entities"
+              }
+            }
           }
         },
         "kind": "object"

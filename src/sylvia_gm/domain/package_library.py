@@ -289,6 +289,10 @@ ENGINE_FEATURE_PANEL_WORKSPACES = "panel_workspaces.v1"
 ENGINE_FEATURE_TACTICAL_GRID = "tactical_grid.v1"
 SUPPORTED_ENGINE_FEATURES = frozenset(
     {
+        "spatial_circle_overlap.v1",
+        "spatial_circle_route.v1",
+        "player_action_preflight.v1",
+        "player_action_preflight_path.v1",
         PRIVATE_STATE_FEATURE,
         "collection_mechanics.v1",
         "public_results.v1",

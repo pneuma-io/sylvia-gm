@@ -144,6 +144,13 @@ jobs:
           version: '0.12.19'
       - name: Install locked build dependencies
         run: uv sync --locked --all-extras --dev
+      - name: Provision verified LGPL codec inputs from the pinned public release
+        shell: pwsh
+        run: |
+          $codecWork = "$env:RUNNER_TEMP/sylvia-codec-inputs"
+          uv run --locked --all-extras python src-tauri/scripts/provision_ffmpeg_lgpl.py --work-dir $codecWork
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          "SYLVIA_FFMPEG_LGPL_DIR=$codecWork/ffmpeg-lgpl" >> $env:GITHUB_ENV
       - name: Build declared owner sidecar for compile-time resources
         run: uv run --locked --all-extras python src-tauri/scripts/build_owner_sidecar.py
       - name: Compile all Rust targets and run their tests

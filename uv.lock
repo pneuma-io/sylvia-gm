@@ -2419,7 +2419,7 @@ wheels = [
 
 [[package]]
 name = "sylvia-gm"
-version = "0.3.0a1"
+version = "0.3.0a3"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },

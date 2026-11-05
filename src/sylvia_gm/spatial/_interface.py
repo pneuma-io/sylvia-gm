@@ -90,6 +90,14 @@ _MUTABLE_FIELDS = {
 }
 
 _QUERY_KEYS = {
+    "circle_route": frozenset(
+        {"kind", "map_id", "moving_entity_id", "destination", "moving_radius",
+         "circles", "metadata_filter", "max_tests", "edge_costs"}
+    ),
+    "circle_overlap": frozenset(
+        {"kind", "map_id", "moving_entity_id", "fixed_entity_id", "destination",
+         "moving_radius", "fixed_radius", "origin"}
+    ),
     "body_proximity": frozenset(
         {
             "kind",
@@ -147,6 +155,14 @@ _QUERY_KEYS = {
 }
 
 _RESULT_KEYS = {
+    "circle_route": frozenset(
+        {"kind", "map_id", "snapshot_id", "geometry_revision", "algorithm_version",
+         "found", "points", "distance", "truncated", "tests"}
+    ),
+    "circle_overlap": frozenset(
+        {"kind", "map_id", "snapshot_id", "geometry_revision", "algorithm_version",
+         "hit", "entry", "exit", "starts_inside", "ends_inside"}
+    ),
     "body_proximity": frozenset(
         {
             "kind",
@@ -1035,6 +1051,10 @@ def admit_spatial_query(scene: AdmittedSpatialScene, value: object) -> AdmittedS
     if not isinstance(kind, str) or kind not in _QUERY_KEYS:
         _reject("Spatial query kind is invalid", code=code, path="$.kind")
     expected_keys = _QUERY_KEYS[kind]
+    if kind == "circle_overlap" and "origin" not in payload:
+        expected_keys = expected_keys - {"origin"}
+    if kind == "circle_route" and "edge_costs" not in payload:
+        expected_keys = expected_keys - {"edge_costs"}
     if kind == "path" and "moving_entity_id" not in payload:
         expected_keys = expected_keys - {"moving_entity_id"}
     if kind in {"path", "exposure"} and "metadata_filter" not in payload:
@@ -1119,7 +1139,48 @@ def admit_spatial_query(scene: AdmittedSpatialScene, value: object) -> AdmittedS
             normalized["metadata_filter"] = _metadata_selector(
                 item["metadata_filter"], code=code, path="$.metadata_filter"
             )
-    elif kind == "body_proximity":
+    elif kind == "circle_route":
+        entities = {entry['id']: entry for entry in admitted['entities'] if entry['active']}
+        moving_id = _identity(item['moving_entity_id'], code=code, path='$.moving_entity_id')
+        if moving_id not in entities:
+            _reject('Moving entity is unavailable', code=code, path='$.moving_entity_id')
+        destination = _coordinate(item['destination'], 3, code=code, path='$.destination')
+        if not _inside(destination, bounds):
+            _reject('Destination is outside map bounds', code=code, path='$.destination')
+        radius = _number(item['moving_radius'], minimum=0, code=code, path='$.moving_radius')
+        if not 0 < radius <= _MAX_ABSOLUTE_COORDINATE:
+            _reject('Occupied radius must be positive and bounded', code=code, path='$.moving_radius')
+        circles = []
+        seen = {moving_id}
+        for index, raw in enumerate(_array(item['circles'], minimum=0, maximum=64, code=code, path='$.circles')):
+            path = f'$.circles[{index}]'
+            circle = _object(raw, frozenset({'entity_id', 'radius', 'blocking'}), code=code, path=path)
+            identity = _identity(circle['entity_id'], code=code, path=path + '.entity_id')
+            if identity not in entities or identity in seen:
+                _reject('Route circles must name distinct active entities', code=code, path=path)
+            seen.add(identity)
+            fixed_radius = _number(circle['radius'], minimum=0, code=code, path=path + '.radius')
+            if not 0 < fixed_radius <= _MAX_ABSOLUTE_COORDINATE:
+                _reject('Occupied radius must be positive and bounded', code=code, path=path + '.radius')
+            circles.append({'entity_id': identity, 'radius': fixed_radius,
+                            'blocking': _boolean(circle['blocking'], code=code, path=path + '.blocking')})
+        normalized.update(moving_entity_id=moving_id, destination=destination, moving_radius=radius,
+                          circles=sorted(circles, key=lambda row: row['entity_id']),
+                          metadata_filter=_metadata_selector(item['metadata_filter'], code=code, path='$.metadata_filter'),
+                          max_tests=_integer(item['max_tests'], minimum=1, maximum=16384, code=code, path='$.max_tests'))
+        edge_costs = []
+        for index, raw in enumerate(_array(item.get('edge_costs', []), minimum=0, maximum=16384,
+                                         code=code, path='$.edge_costs')):
+            path = f'$.edge_costs[{index}]'
+            edge = _object(raw, frozenset({'start', 'end', 'cost'}), code=code, path=path)
+            start = _coordinate(edge['start'], 3, code=code, path=path + '.start')
+            end = _coordinate(edge['end'], 3, code=code, path=path + '.end')
+            cost = _number(edge['cost'], minimum=0, code=code, path=path + '.cost')
+            if cost + 1e-9 < math.dist(start, end):
+                _reject('Route edge cost must cover its geometric distance', code=code, path=path)
+            edge_costs.append({'start': start, 'end': end, 'cost': cost})
+        normalized['edge_costs'] = edge_costs
+    elif kind in {"body_proximity", "circle_overlap"}:
         entities = cast(list[dict[str, object]], admitted["entities"])
         active_ids = {entry["id"] for entry in entities if entry["active"]}
         for name in ("moving_entity_id", "fixed_entity_id"):
@@ -1134,12 +1195,22 @@ def admit_spatial_query(scene: AdmittedSpatialScene, value: object) -> AdmittedS
                 code="spatial_out_of_bounds",
                 path="$.destination",
             )
-        normalized.update(
-            {
-                "destination": destination,
-                "radius": _number(item["radius"], minimum=0, code=code, path="$.radius"),
-            }
-        )
+        normalized["destination"] = destination
+        if kind == 'circle_overlap' and 'origin' in item:
+            origin = _coordinate(item['origin'], 3, code=code, path='$.origin')
+            if not _inside(origin, bounds):
+                _reject('Origin is outside map bounds', code=code, path='$.origin')
+            normalized['origin'] = origin
+        if kind == "body_proximity":
+            normalized["radius"] = _number(item["radius"], minimum=0, code=code, path="$.radius")
+        else:
+            if normalized["moving_entity_id"] == normalized["fixed_entity_id"]:
+                _reject("Overlap requires two distinct entities", code=code, path="$")
+            for name in ("moving_radius", "fixed_radius"):
+                radius = _number(item[name], minimum=0, code=code, path="$." + name)
+                if radius <= 0 or radius > _MAX_ABSOLUTE_COORDINATE:
+                    _reject("Occupied radius must be positive and bounded", code=code, path="$." + name)
+                normalized[name] = radius
     elif kind == "sweep":
         moving_id = _identity(item["moving_entity_id"], code=code, path="$.moving_entity_id")
         entities = cast(list[dict[str, object]], admitted["entities"])
@@ -1598,7 +1669,22 @@ def admit_spatial_result(scene: AdmittedSpatialScene, value: object) -> Admitted
                 "occluders": occluders,
             }
         )
-    elif kind == "body_proximity":
+    elif kind == 'circle_route':
+        found = _boolean(item['found'], code=code, path='$.found')
+        points = [_coordinate(point, 3, code=code, path='$.points')
+                  for point in _array(item['points'], minimum=2 if found else 0,
+                                      maximum=258 if found else 0, code=code, path='$.points')]
+        distance = item['distance']
+        if found:
+            distance = _number(distance, minimum=0, code=code, path='$.distance')
+        elif distance is not None:
+            _reject('Missing route distance must be null', code=code, path='$.distance')
+        truncated = _boolean(item['truncated'], code=code, path='$.truncated')
+        if found and truncated:
+            _reject('A retained route cannot be truncated', code=code, path='$.truncated')
+        normalized.update(found=found, points=points, distance=distance, truncated=truncated,
+                          tests=_integer(item['tests'], minimum=0, maximum=16384, code=code, path='$.tests'))
+    elif kind in {"body_proximity", "circle_overlap"}:
         hit = _boolean(item["hit"], code=code, path="$.hit")
         interval: dict[str, object] = {}
         for name in ("entry", "exit"):
@@ -1612,15 +1698,16 @@ def admit_spatial_result(scene: AdmittedSpatialScene, value: object) -> Admitted
             interval[name] = value
         if hit and cast(float, interval["entry"]) > cast(float, interval["exit"]):
             _reject("Proximity interval is reversed", code=code, path="$")
-        normalized.update(
-            {
-                "hit": hit,
-                **interval,
-                "minimum_distance": _number(
-                    item["minimum_distance"], minimum=0, code=code, path="$.minimum_distance"
-                ),
-            }
-        )
+        normalized.update({"hit": hit, **interval})
+        if kind == "body_proximity":
+            normalized["minimum_distance"] = _number(
+                item["minimum_distance"], minimum=0, code=code, path="$.minimum_distance"
+            )
+        else:
+            for name in ("starts_inside", "ends_inside"):
+                normalized[name] = _boolean(item[name], code=code, path="$." + name)
+                if normalized[name] and not hit:
+                    _reject("Occupied endpoint requires an overlap", code=code, path="$." + name)
     elif kind == "sweep":
         supported = _boolean(item["supported"], code=code, path="$.supported")
         clear = _boolean(item["clear"], code=code, path="$.clear")

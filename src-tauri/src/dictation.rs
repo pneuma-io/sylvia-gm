@@ -18,11 +18,11 @@ const IDLE_TIMEOUT: Duration = Duration::from_secs(300);
 type Reply = Result<Value, String>;
 
 #[cfg(windows)]
-struct ProcessJob(usize);
+pub(crate) struct ProcessJob(usize);
 
 #[cfg(windows)]
 impl ProcessJob {
-    fn wait_empty(&self) -> Result<(), String> {
+    pub(crate) fn wait_empty(&self) -> Result<(), String> {
         use windows_sys::Win32::System::JobObjects::*;
         loop {
             let mut info = JOBOBJECT_BASIC_ACCOUNTING_INFORMATION::default();
@@ -63,7 +63,7 @@ impl ProcessJob {
     }
 
     // The primary thread is still suspended, so no descendant can escape assignment.
-    fn resume(child: &Child) -> Result<(), String> {
+    pub(crate) fn resume(child: &Child) -> Result<(), String> {
         use windows_sys::Win32::Foundation::{CloseHandle, INVALID_HANDLE_VALUE};
         use windows_sys::Win32::System::Diagnostics::ToolHelp::*;
         use windows_sys::Win32::System::Threading::{
@@ -102,7 +102,7 @@ impl ProcessJob {
     }
 
     // Kill the one-file Python bootloader and its worker together when capture is cancelled.
-    fn own(child: &Child) -> Result<Self, String> {
+    pub(crate) fn own(child: &Child) -> Result<Self, String> {
         use std::os::windows::io::AsRawHandle;
         use windows_sys::Win32::System::JobObjects::*;
         unsafe {
@@ -125,6 +125,17 @@ impl ProcessJob {
             }
             Ok(job)
         }
+    }
+
+    pub(crate) fn is_empty(&self) -> Result<bool, String> {
+        use windows_sys::Win32::System::JobObjects::*;
+        let mut info = JOBOBJECT_BASIC_ACCOUNTING_INFORMATION::default();
+        let read = unsafe { QueryInformationJobObject(
+            self.0 as _, JobObjectBasicAccountingInformation, &mut info as *mut _ as _,
+            std::mem::size_of_val(&info) as u32, std::ptr::null_mut(),
+        ) };
+        if read == 0 { return Err("The owned process job could not be checked".into()); }
+        Ok(info.ActiveProcesses == 0)
     }
 }
 

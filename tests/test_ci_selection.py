@@ -50,6 +50,12 @@ def test_edited_campaign_test_helper_selects_all_plan_lifecycle_variants():
     assert "tests/test_fc_campaign_progress.py" in selectors
 
 
+def test_authored_plan_checks_keep_srd_and_dedicated_riichi_coverage():
+    plan = choose(["campaign-plans/riichi-quick-test/plan.json"])
+    assert "tests/test_migrated_plan_lifecycle.py" in plan["python"]["campaign-play"]
+    assert "tests/test_riichi_quick_test_plan.py" in plan["python"]["campaign-play"]
+
+
 @pytest.mark.parametrize("module", ["bundled_packages", "bundled_campaign_plans"])
 def test_package_materializers_keep_exact_closure_and_release_consumers(module):
     plan = choose([f"src/sylvia_gm/application/{module}.py"])

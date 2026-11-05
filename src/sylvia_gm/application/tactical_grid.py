@@ -373,15 +373,15 @@ def project_tactical_grid(value: object) -> SafePayload:
     )
 
 
-def player_known_spatial_scene(value: object) -> SafePayload:
-    """Use the renderer's exact visibility boundary for a physical preview's scene inputs."""
+def player_known_spatial_scene(value: object, *, retain_metadata: bool = False) -> SafePayload:
+    """Filter scene membership; internal Ruleset previews retain visible rows' mechanical metadata."""
 
     admitted_scene = admit_spatial_scene(value)
     scene = admitted_scene.as_payload()
     visible_anchors = _visible_anchor_ids(scene)
     for category in ("geometry", "entities", "zones"):
         scene[category] = [
-            {**item, "metadata": {"player": display}}
+            {**item, "metadata": item["metadata"] if retain_metadata else {"player": display}}
             for item in scene[category]
             if (
                 display := _public_display(
@@ -392,6 +392,17 @@ def player_known_spatial_scene(value: object) -> SafePayload:
             is not None
         ]
     return owned_payload(scene)
+
+
+def player_known_spatial_value(value: object) -> object:
+    """Apply the same scene membership boundary to nested reads before Ruleset preview evaluation."""
+    if isinstance(value, Mapping):
+        if value.get('format') == 1 and all(key in value for key in ('map', 'entities', 'geometry', 'zones', 'terrain')):
+            return thaw_json_value(player_known_spatial_scene(value, retain_metadata=True))
+        return {key: player_known_spatial_value(child) for key, child in value.items()}
+    if _sequence(value) is not None:
+        return [player_known_spatial_value(child) for child in value]
+    return value
 
 
 def coordinate_actor_reference(actions: object) -> str | None:
@@ -430,7 +441,35 @@ def project_coordinate_map(value: object, *, actor_reference: str | None = None)
             reference = bodies[item['id']]['metadata'].get(actor_reference)
             item['actor_ref'] = (reference if isinstance(reference, str)
                                  and references.get(reference) == [item['id']] else None)
+    if isinstance(value, Mapping) and 'occupied_space' in value:
+        declaration = value['occupied_space']
+        for item in projected['entities']:
+            item['occupied_space'] = _project_occupied_space(declaration, item.get('actor_ref'))
     return owned_payload(projected)
+
+
+def _project_occupied_space(value: object, actor_ref: object) -> dict[str, object]:
+    """Resolve a package-declared category/diameter table without inferring a body or category."""
+    unavailable: dict[str, object] = {
+        'status': 'unavailable',
+        'reason': 'Occupied space needs an explicit supported size category.',
+    }
+    if not isinstance(value, Mapping) or set(value) != {'declaration', 'actors'}:
+        return unavailable
+    declaration, actors = value['declaration'], value['actors']
+    if not isinstance(declaration, Mapping) or set(declaration) != {'convention', 'widths', 'category_field'}:
+        return unavailable
+    widths, field, convention = (declaration[key] for key in ('widths', 'category_field', 'convention'))
+    if (not isinstance(widths, (list, tuple)) or not 1 <= len(widths) <= 32
+            or any(not _finite(width) or not 0 < width <= 1_000_000 for width in widths)
+            or not isinstance(field, str) or not field or not isinstance(actors, Mapping)
+            or not isinstance(convention, str) or not 1 <= len(convention) <= 128):
+        return unavailable
+    actor = actors.get(actor_ref) if isinstance(actor_ref, str) else None
+    rank = actor.get(field) if isinstance(actor, Mapping) else None
+    if isinstance(rank, bool) or not isinstance(rank, int) or not 0 <= rank < len(widths):
+        return unavailable
+    return {'status': 'declared', 'kind': 'circle', 'diameter': widths[rank], 'convention': convention}
 
 
 def _map_bounds(projection: Mapping[str, object]) -> tuple[list[float], list[float], float]:
