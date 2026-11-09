@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import argparse
+import json
+import subprocess
 from pathlib import Path
 
-from .builder import build_draft, publish_candidate
+from .builder import build_draft, compile_inputs, publish_candidate
 
 
 def main() -> int:
@@ -11,19 +13,38 @@ def main() -> int:
         prog="python -m sylvia_ruleset",
         description="Build and publish the Trigger Discipline Sylvia GM Ruleset candidate.",
     )
-    parser.add_argument("command", choices=("build", "publish", "verify"))
+    parser.add_argument("command", choices=("build", "publish", "verify", "compile-inputs"))
     parser.add_argument("--workspace", type=Path, default=Path.cwd())
     parser.add_argument("--sylvia-root", type=Path)
     parser.add_argument("--source-commit")
+    parser.add_argument("--notes-directory", type=Path)
+    parser.add_argument("--draft-path", type=Path)
+    parser.add_argument("--private", action="store_true", help="Local build including private vault notes")
     parser.add_argument("--include-test-tools", action="store_true")
     parser.add_argument("--allow-worktree-sources", action="store_true",
                         help="Build an explicitly marked worktree candidate with per-file source hashes.")
     args = parser.parse_args()
+    if args.command == "compile-inputs":
+        if args.notes_directory is None:
+            parser.error("compile-inputs requires --notes-directory")
+        revision = args.source_commit or subprocess.check_output(
+            ["git", "-C", str(args.workspace), "rev-parse", "HEAD"], text=True,
+        ).strip()
+        inputs = compile_inputs(args.notes_directory, source_commit=revision)
+        destination = args.workspace / "sylvia_ruleset/compiled-inputs.json"
+        destination.write_text(json.dumps(inputs, sort_keys=True, separators=(",", ":")) + "\n",
+                               encoding="utf-8")
+        print(f"Updated {destination}; commit these compiled inputs before a public package build.")
+        return 0
+    if args.private and args.command != "build":
+        parser.error("private packages are build-only; import them locally")
 
     result = build_draft(
         args.workspace, source_commit=args.source_commit,
         include_test_tools=args.include_test_tools or args.command == "verify",
         allow_worktree_sources=args.allow_worktree_sources,
+        notes_directory=args.notes_directory, include_private_notes=args.private,
+        draft_path=args.draft_path,
     )
     if args.command == "build":
         print(result["draft"])

@@ -76,7 +76,7 @@ def _canonical_hashes() -> dict[str, str]:
 
 
 class SylviaCanonicalReferenceBuildTests(unittest.TestCase):
-    def test_build_packages_indexed_character_references_without_mutating_canon(self) -> None:
+    def test_public_build_keeps_note_identities_without_packaging_private_notes(self) -> None:
         source_hashes_before = {
             path.relative_to(ROOT).as_posix(): _sha(path)
             for directory in INDEXED_REFERENCE_ROOTS
@@ -105,18 +105,12 @@ class SylviaCanonicalReferenceBuildTests(unittest.TestCase):
                 path.relative_to(files_root).as_posix()
                 for path in (files_root / "references" / "canon").rglob("*.md")
             }
-            self.assertEqual(
-                {f"references/canon/{path}" for path in canonical_paths},
-                packaged_paths,
-            )
+            self.assertEqual(set(), packaged_paths)
+            self.assertGreater(len(canonical_paths), 200)
+            self.assertEqual("omitted", source_index["notes_distribution"])
             self.assertFalse(
                 any(path.startswith("references/canon/Testing/") for path in packaged_paths)
             )
-            for source_path in canonical_paths:
-                self.assertEqual(
-                    (ROOT / source_path).read_bytes(),
-                    (files_root / "references" / "canon" / source_path).read_bytes(),
-                )
 
             guide_path = "references/character-authoring.md"
             guide = (files_root / guide_path).read_text(encoding="utf-8")
@@ -135,12 +129,12 @@ class SylviaCanonicalReferenceBuildTests(unittest.TestCase):
                 "references/canon/Equipment/QUICK ACCESS.md",
                 "references/canon/Equipment/STOWED.md",
             }
-            self.assertTrue(required_targets <= packaged_paths)
+            self.assertTrue(required_targets.isdisjoint(packaged_paths))
             guide_targets = set(
                 re.findall(r"`(references/canon/[^`]+\.md)`", guide)
             )
             self.assertTrue(required_targets <= guide_targets)
-            self.assertTrue(guide_targets <= packaged_paths)
+            self.assertIn("not readable files in this package", guide)
 
             runtime = json.loads(
                 (files_root / "runtime" / "ruleset.yaml").read_text()

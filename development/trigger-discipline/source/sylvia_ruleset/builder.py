@@ -43,6 +43,7 @@ from sylvia_ruleset import (
     snapshot as quick_solution,
 )
 from sylvia_ruleset.character_build import eligibility_catalog, eligibility_constraints
+from sylvia_ruleset.compiler_inputs import public_compiler_inputs, retained_inputs
 
 PACKAGE_ID = "pneuma-io.trigger-discipline"
 PACKAGE_VERSION = "0.1.29"
@@ -104,6 +105,9 @@ TESTING_SOURCES = (
     "Testing/REFERENCE EQUIPMENT.md",
     "Testing/REFERENCE EQUIPMENT VALUES.md",
 )
+EXCLUDED_SOURCE_PATHS = frozenset({
+    "Hacking/CREDENTIAL.md", "Testing/SYLVIA RULESET IMPLEMENTATION.md",
+})
 
 
 def _canonical_json(value: object, *, pretty: bool = False) -> bytes:
@@ -130,7 +134,11 @@ def _authority_paths(root: Path) -> list[Path]:
     for directory in INDEXED_REFERENCE_ROOTS:
         paths.extend(sorted((root / directory).rglob("*.md")))
     paths.extend(root / value for value in TESTING_SOURCES)
-    return sorted(set(paths), key=lambda value: value.relative_to(root).as_posix())
+    return sorted(
+        (path for path in set(paths)
+         if path.relative_to(root).as_posix() not in EXCLUDED_SOURCE_PATHS),
+        key=lambda value: value.relative_to(root).as_posix(),
+    )
 
 
 def _verify_source_commit(root: Path, source_commit: str, *, allow_worktree_sources: bool = False) -> str:
@@ -139,7 +147,8 @@ def _verify_source_commit(root: Path, source_commit: str, *, allow_worktree_sour
     except subprocess.CalledProcessError as error:
         raise ValueError(f"source commit does not resolve: {source_commit}") from error
 
-    scoped_roots = [*INDEXED_REFERENCE_ROOTS, *TESTING_SOURCES]
+    scoped_roots = [*INDEXED_REFERENCE_ROOTS, *TESTING_SOURCES,
+                    "sylvia_ruleset", "balance_suite", "pyproject.toml"]
     status = subprocess.run(
         [
             "git",
@@ -5960,6 +5969,27 @@ def _content_declarations(
     }
 
 
+def compile_inputs(notes_directory: Path, *, source_commit: str) -> dict[str, Any]:
+    """Compile public mechanics/identities from a separately supplied private vault."""
+    notes = notes_directory.resolve()
+    if not (notes / "Specialties").is_dir() or not (notes / "Classes").is_dir():
+        raise ValueError("notes directory must contain the private Classes and Specialties folders")
+    parameters = default_manifest().seed_set()
+    balance = specialty_coverage(parameters, notes, include_objective_scenarios=False)
+    index = _source_index(notes, source_commit)
+    index.pop("source_commit")
+    coverage = _coverage(notes, parameters, source_commit, balance=balance)
+    coverage.pop("source_commit")
+    return public_compiler_inputs({
+        "format": 1, "compiled_from": source_commit,
+        "notes_repository": "pneuma-io/trigger-discipline",
+        "notes_revision": None, "parameter_set_sha256": parameters.hash,
+        "source_index": index, "coverage": coverage,
+        "specialty_records": _specialty_execution_records(balance),
+        "eligibility": eligibility_catalog(notes),
+    })
+
+
 def build_draft(
     workspace: Path,
     *,
@@ -5967,9 +5997,20 @@ def build_draft(
     draft_path: Path | None = None,
     include_test_tools: bool = False,
     allow_worktree_sources: bool = False,
+    notes_directory: Path | None = None,
+    include_private_notes: bool = False,
 ) -> dict[str, str]:
     """Build package bytes; test-only counterfactual discovery requires explicit selection."""
     root = workspace.resolve()
+    draft = (draft_path or (root / "ruleset-draft")).resolve()
+    if include_private_notes:
+        if notes_directory is None:
+            raise ValueError("private builds require an explicit notes directory")
+        repository = Path(_git(root, "rev-parse", "--show-toplevel")).resolve()
+        if draft.is_relative_to(repository):
+            raise ValueError("private drafts must be outside the public repository")
+    elif (draft / "files/references/canon").exists():
+        raise ValueError("public build refuses a draft containing private notes; use a fresh destination")
     source_commit = _verify_source_commit(
         root,
         source_commit or _git(root, "rev-parse", "HEAD"),
@@ -5979,15 +6020,25 @@ def build_draft(
     parameter_document = {"format": 1, "manifest": parameters.manifest.to_dict(), "values": parameters.values, "parameter_set_sha256": parameters.hash}
     parameter_bytes = _canonical_json(parameter_document, pretty=True)
     parameter_hash = _sha(parameter_bytes)
-    source_document = _source_index(root, source_commit)
+    inputs = (compile_inputs(notes_directory, source_commit=source_commit)
+              if notes_directory is not None else retained_inputs())
+    if inputs["parameter_set_sha256"] != parameters.hash:
+        raise ValueError("compiled inputs do not match parameters; regenerate them from the private notes")
+    source_document = deepcopy(inputs["source_index"])
+    source_document.update(
+        source_commit=source_commit,
+        source_commit_role="compiler revision; note entry hashes identify the private source bytes",
+        notes_repository=inputs["notes_repository"],
+        notes_distribution="private-local" if include_private_notes else "omitted",
+    )
     if allow_worktree_sources:
         source_document["source_state"] = "worktree"
         source_document["source_commit_role"] = "base revision; entry hashes identify the actual reviewed bytes"
     source_bytes = _canonical_json(source_document, pretty=True)
     source_hash = _sha(source_bytes)
-    specialty_balance = specialty_coverage(parameters, root, include_objective_scenarios=False)
-    specialty_records = _specialty_execution_records(specialty_balance)
-    coverage = _coverage(root, parameters, source_commit, balance=specialty_balance)
+    specialty_records = inputs["specialty_records"]
+    coverage = deepcopy(inputs["coverage"])
+    coverage["source_commit"] = source_commit
     # The coverage artifact accounts for every tertiary node, including formal
     # spec gaps.  Only nodes with an executable same-character counterfactual
     # may be admitted to the runtime tool's closed enum/table.
@@ -6000,7 +6051,7 @@ def build_draft(
             for fixture in record["branch_fixture_table"]
         }
     )
-    catalog = eligibility_catalog(root)
+    catalog = inputs["eligibility"]
     manifest = _manifest(
         source_hash,
         specialty_node_ids,
@@ -6062,7 +6113,22 @@ def build_draft(
         "provenance/source-index.json": source_bytes,
         "provenance/parameter-manifest.json": parameter_bytes,
     }
-    files.update(_indexed_reference_files(root, source_document))
+    if include_private_notes:
+        files.update(_indexed_reference_files(notes_directory.resolve(), source_document))
+    else:
+        notice = (
+            "## Public build: rules-text limits\n\n"
+            "The private Obsidian vault is not bundled. Any references/canon/ paths below "
+            "identify private sources, not readable files in this package. Use the compiled "
+            "contracts and references shipped here; do not invent missing rules or resource "
+            "allocations. Supported deterministic actions remain available with authored state. "
+            "Complete GM/Builder session coverage is not established by this public build; "
+            "the future public TTRPG Rulebook remains separate.\n\n"
+        ).encode()
+        for name in ("references/character-authoring.md", "references/campaign-authoring.md"):
+            files[name] = notice + files[name]
+    if include_private_notes:
+        manifest["metadata"]["label"] += " (private local notes)"
     specialty_exclusions = sorted(
         [
             {
@@ -6097,7 +6163,6 @@ def build_draft(
     setting_manifest, setting_files = _conformance_setting_package(
         str(ruleset_record["content_sha256"])
     )
-    draft = (draft_path or (root / "ruleset-draft")).resolve()
     for path, value in files.items():
         target = draft / "files" / Path(path)
         target.parent.mkdir(parents=True, exist_ok=True)

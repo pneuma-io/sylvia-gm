@@ -5,10 +5,13 @@ from pathlib import Path
 from typing import Any
 
 from balance_suite.specialties import parse_all_specialties
+from sylvia_ruleset.compiler_inputs import retained_inputs
 
 
 def eligibility_catalog(root: Path) -> dict[str, Any]:
     """Retain source identities without importing counterfactual outcomes or balance defaults."""
+    if not (root / "Specialties").is_dir():
+        return retained_inputs()["eligibility"]
     nodes = parse_all_specialties(root)
     for node in nodes:
         class_text = (root / 'Classes' / f'{node.class_id}.md').read_text(encoding='utf-8-sig')

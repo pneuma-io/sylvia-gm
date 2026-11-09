@@ -1,10 +1,10 @@
 # Trigger Discipline character authoring
 
-Use this page to find the packaged Trigger Discipline notes needed for a Character File. The files under `references/canon/` are build-time copies of indexed source files. Canonical notes remain the rules authority; Hubs files only navigate them.
+Use this page with the compiled Character File schema and specialty eligibility catalog. Private builds can also include indexed source notes under `references/canon/`; public builds omit those files. The paths below identify private authority, not files a public GM or Builder can open. Canonical notes remain private rules authority; Hubs files only navigate them. Do not invent missing resource allocations or claim complete session coverage from the compiled subset.
 
 ## Reading path
 
-Start with `references/canon/Character/LEVEL.md`, `references/canon/Character/SPECIALTY.md`, `references/canon/Character/CLASS-SKILL INDEPENDENCE.md`, and `references/canon/Character/CHECK.md`.
+When the private notes are included, start with `references/canon/Character/LEVEL.md`, `references/canon/Character/SPECIALTY.md`, `references/canon/Character/CLASS-SKILL INDEPENDENCE.md`, and `references/canon/Character/CHECK.md`.
 
 Read `references/canon/Hubs/Classes.md`, then open the selected class file under `references/canon/Classes/`. Open the specialty files named by that class under `references/canon/Specialties/`.
 

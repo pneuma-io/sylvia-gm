@@ -21,18 +21,24 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "development/trigger-discipline/source"
 
 
-def build_package(output: Path, *, source_commit: str, allow_worktree: bool = False) -> dict:
+def build_package(
+    output: Path, *, source_commit: str, allow_worktree: bool = False,
+    notes_directory: Path | None = None, include_private_notes: bool = False,
+) -> dict:
     """Compile and admit the standalone Ruleset without selecting a Setting or tuning it."""
     sys.path.insert(0, str(SOURCE))
     from sylvia_ruleset import builder
 
     output = output.resolve()
+    if include_private_notes and output.is_relative_to(ROOT):
+        raise ValueError("private packages must be written outside the public repository")
     output.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="td-build-", dir=output.parent) as temporary:
         draft = Path(temporary) / "draft"
         builder.build_draft(
             SOURCE, source_commit=source_commit, draft_path=draft,
             allow_worktree_sources=allow_worktree,
+            notes_directory=notes_directory, include_private_notes=include_private_notes,
         )
         record = json.loads((draft / "package.json").read_bytes())
         files = {
@@ -63,6 +69,8 @@ def build_package(output: Path, *, source_commit: str, allow_worktree: bool = Fa
             "parameter_set_sha256": parameters["parameter_set_sha256"],
             "bytes": len(archive),
             "balance_status": "retained values; balance qualification pending",
+            "distribution": "private-local" if include_private_notes else "public",
+            "private_notes_included": include_private_notes,
         }
         output.with_suffix(".identity.json").write_text(
             json.dumps(identity, indent=2) + "\n", encoding="utf8",
@@ -74,7 +82,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--allow-worktree", action="store_true", help="Label a development build")
+    parser.add_argument("--notes-directory", type=Path, help="Separate private TD vault input")
+    parser.add_argument("--private", action="store_true",
+                        help="Include private notes for local play only")
     args = parser.parse_args()
+    if args.private and args.notes_directory is None:
+        parser.error("--private requires --notes-directory")
     revision = subprocess.check_output(
         ["git", "-C", str(ROOT), "rev-parse", "HEAD"], text=True,
     ).strip()
@@ -90,6 +103,7 @@ def main() -> None:
             )
     print(json.dumps(build_package(
         args.output, source_commit=revision, allow_worktree=args.allow_worktree,
+        notes_directory=args.notes_directory, include_private_notes=args.private,
     ), indent=2))
 
 

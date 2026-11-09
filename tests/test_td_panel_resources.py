@@ -1,12 +1,17 @@
 """Authored panel maxima and physical magazine metadata survive normal reload and reopen."""
 
 import json
+import os
+import subprocess
 import zipfile
 from pathlib import Path
+
+import pytest
 
 from sylvia_gm.application.authority import AuthorityOwner, CampaignCreate
 from sylvia_gm.domain.authority import StateValue, WriterRole
 from tests.admitted_library_fixture import admitted_fixture_owner
+from tests.td_source_fixture import SOURCE, builder
 from tests.td_source_fixture import candidate as candidate
 
 NS = "pneuma-io.trigger-discipline"
@@ -66,3 +71,69 @@ def test_resource_projection_and_reload_keep_authored_maxima_and_capacity(candid
         assert owner.snapshot("resources") == after
     with AuthorityOwner.open(database, "reopened") as owner:
         assert owner.snapshot("resources") == after
+
+
+PACKAGE_PREFIX = "packages/pneuma-io.trigger-discipline/"
+
+
+def test_public_checkout_and_package_omit_vault_text(candidate):
+    assert not (SOURCE / "AGENTS.md").exists()
+    assert not (SOURCE / "README.md").exists()
+    assert not list(SOURCE.rglob("*.canvas"))
+    assert not any((SOURCE / name).exists() for name in builder.INDEXED_REFERENCE_ROOTS)
+    with zipfile.ZipFile(candidate) as archive:
+        assert not any("/references/canon/" in name for name in archive.namelist())
+        index = json.loads(archive.read(PACKAGE_PREFIX + "provenance/source-index.json"))
+        assert index["notes_distribution"] == "omitted"
+        assert len(index["entries"]) > 200
+        guide = archive.read(PACKAGE_PREFIX + "references/character-authoring.md").decode()
+        assert "Complete GM/Builder session coverage is not established" in guide
+        compiled = archive.read(PACKAGE_PREFIX + "conformance/specialty-counterfactuals.json")
+        assert b'"source_excerpt"' not in compiled
+        assert b'"canonical_span"' not in compiled
+
+
+def test_private_input_keeps_existing_source_exclusions(tmp_path):
+    (tmp_path / "Hacking").mkdir()
+    (tmp_path / "Hacking/CREDENTIAL.md").write_text("Synthetic excluded note")
+    (tmp_path / "Hacking/ACCESS.md").write_text("Synthetic permitted note")
+    paths = {path.relative_to(tmp_path).as_posix() for path in builder._authority_paths(tmp_path)}
+    assert "Hacking/CREDENTIAL.md" not in paths
+    assert "Hacking/ACCESS.md" in paths
+
+
+def test_private_input_and_output_must_be_explicit(tmp_path):
+    with pytest.raises(ValueError, match="explicit notes directory"):
+        builder.build_draft(SOURCE, draft_path=tmp_path / "draft", include_private_notes=True)
+    with pytest.raises(ValueError, match="outside the public repository"):
+        builder.build_draft(SOURCE, draft_path=SOURCE / "private-draft",
+                            notes_directory=tmp_path, include_private_notes=True)
+    contaminated = tmp_path / "contaminated"
+    (contaminated / "files/references/canon").mkdir(parents=True)
+    with pytest.raises(ValueError, match="containing private notes"):
+        builder.build_draft(SOURCE, draft_path=contaminated)
+
+
+def test_private_notes_compile_to_the_same_public_mechanics(candidate, tmp_path):
+    supplied = os.environ.get("TD_PRIVATE_NOTES_DIRECTORY")
+    if not supplied:
+        pytest.skip("Private vault is an optional local input, never a public test fixture")
+    from scripts.build_trigger_discipline_package import build_package
+
+    revision = subprocess.check_output(["git", "-C", str(SOURCE), "rev-parse", "HEAD"],
+                                       text=True).strip()
+    output = tmp_path / "private.sylvia-gm-package"
+    identity = build_package(output, source_commit=revision, allow_worktree=True,
+                             notes_directory=Path(supplied), include_private_notes=True)
+    assert identity["distribution"] == "private-local"
+    with zipfile.ZipFile(candidate) as public, zipfile.ZipFile(output) as private:
+        index = json.loads(private.read(PACKAGE_PREFIX + "provenance/source-index.json"))
+        assert index["notes_distribution"] == "private-local"
+        notes = {name for name in private.namelist() if "/references/canon/" in name}
+        assert len(notes) > 200
+        for name in notes:
+            source_note = Path(supplied) / name.split("/references/canon/", 1)[1]
+            assert private.read(name) == source_note.read_bytes()
+        for name in ("runtime/ruleset.yaml", "references/specialty-eligibility.json",
+                     "provenance/parameter-manifest.json", "conformance/scenario.json"):
+            assert public.read(PACKAGE_PREFIX + name) == private.read(PACKAGE_PREFIX + name), name

@@ -15,9 +15,9 @@ from sylvia_gm.domain.content_validation import ContentShapeError
 from sylvia_gm.domain.errors import CommandRejected, IdempotencyConflict, StaleRevision
 from sylvia_gm.domain.package_library import manifest_from_record
 from tests.admitted_library_fixture import admitted_fixture_owner
+from tests.td_source_fixture import candidate as candidate_fixture
 from tests.test_td_ordinary_movement import SESSION
 from tests.test_td_rifleman_entry_boundaries import scene_for, start, step
-from tests.td_source_fixture import candidate as candidate_fixture
 
 candidate = candidate_fixture
 NS = "pneuma-io.trigger-discipline"
@@ -457,11 +457,15 @@ def test_typed_equipment_admission_rejects_bad_fields(candidate, tmp_path):
             validate_plan_state(payload, manifest)
 
 
-def test_package_keeps_exact_canon_and_other_cost_contracts(candidate):
+def test_public_package_keeps_source_identity_and_other_cost_contracts(candidate):
     with zipfile.ZipFile(candidate) as package:
-        assert hashlib.sha256(
-            package.read(f"packages/{NS}/references/canon/Specialties/FIELD ENGINEER.md")
-        ).hexdigest() == ("a30d257a0b71d74c86b7ef3e805c9231f4953060d43910344728f65fa37cdf8f")
+        assert not any("/references/canon/" in name for name in package.namelist())
+        index = json.loads(package.read(f"packages/{NS}/provenance/source-index.json"))
+        source = next(row for row in index["entries"]
+                      if row["path"] == "Specialties/FIELD ENGINEER.md")
+        assert source["sha256"] == (
+            "a30d257a0b71d74c86b7ef3e805c9231f4953060d43910344728f65fa37cdf8f"
+        )
         runtime = json.loads(package.read(f"packages/{NS}/runtime/ruleset.yaml"))
         tool = runtime["tools"]["reorient_field_node"]
         assert "ap_cost" not in {p["name"] for p in tool["parameters"]}
