@@ -5,7 +5,7 @@ const root=process.env.SYLVIA_QA_SOURCE||path.join(__dirname,'..');
 function harness(queue){
   const context={window:{},document:{addEventListener(){}}};
   const source=fs.readFileSync(path.join(root,'src-tauri/frontend/app.js'),'utf8')
-    .replace('  // ---- Public API ----','window.compactQueueQA={state,sequenceMarkup};\n  // ---- Public API ----');
+    .replace('  // ---- Public API ----','window.compactQueueQA={state,sequenceMarkup,queueView};\n  // ---- Public API ----');
   vm.runInNewContext(source,context);
   const api=context.window.compactQueueQA;
   Object.assign(api.state,{activeSessionId:'gm',activeSessionRole:'dm',view:'session',
@@ -42,6 +42,34 @@ test('target and cost share one short secondary row; target label comes from cur
   assert.match(html,/Target: Guardian · Action cost: 1 action/);
   assert.equal((html.match(/class="sequence-detail"/g)||[]).length,1);
   assert.doesNotMatch(html,/Unrelated detail|not needed/);
+});
+
+test('committed cards show public spent resources instead of an earlier preview price',()=>{
+  const value=queue([step('move','Move',{status:'committed',
+    selection:{destination:[3,2]},preview:{summary:[{label:'AP cost',value:1}]},
+    receipt:{status:'committed',resulting_revision:2,result:{
+      context:{private_runtime_value:'never project this'},
+      result_card:{summary:[{label:'AP spent',value:2}],details:[{label:'Movement cost',value:1}]},
+    }},
+  })]);
+  const api=harness(value),before=JSON.stringify(value),html=api.sequenceMarkup();
+  assert.match(html,/AP spent: 2/);
+  assert.doesNotMatch(html,/AP cost: 1|private_runtime_value|never project this/);
+  const projected=api.queueView();
+  const detached=api.sequenceMarkup(new Set(),{queue:projected});
+  assert.match(detached,/AP spent: 2/);
+  assert.doesNotMatch(detached,/AP cost: 1/);
+  assert.doesNotMatch(JSON.stringify(projected),/private_runtime_value|never project this|receipt|confirmation/);
+  assert.equal(JSON.stringify(value),before);
+});
+
+test('a legacy committed card without public result details does not claim its old estimate was spent',()=>{
+  const api=harness(queue([step('done','Guard',{status:'committed',
+    preview:{summary:[{label:'Energy cost',value:'3 charges'}]},
+  })]));
+  const html=api.sequenceMarkup();
+  assert.match(html,/Committed/);
+  assert.doesNotMatch(html,/Energy cost: 3 charges/);
 });
 test('failed suffix keeps an accessible compact explanation and existing review control',()=>{
   const value=queue([step('done','Move',{status:'committed'}),step('later','Strike',{error:'The action is already spent.'})]);

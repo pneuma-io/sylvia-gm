@@ -53,6 +53,10 @@ The 9 November owner selection authorizes completing and checking this integrati
 balancing, with merge held. Retained Overwatch and runtime changes are reconciled with the
 current host. Source and browser checks do not establish installed-app or genuine-provider
 acceptance; current results and remaining qualification belong in the active completion plan.
+The 10 November goal additionally selects native Windows qualification with isolated synthetic
+data; the PR records the exact tested candidate and remaining limits. Numerical balancing stays
+separate. The newer Opus production port is tracked in [Sylvia #28](https://github.com/pneuma-io/sylvia-gm/pull/28);
+the final combined frontend must match the approved mock-up and receive the later Opus pass.
 
 ## Limits and notices
 

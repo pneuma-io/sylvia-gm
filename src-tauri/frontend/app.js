@@ -7697,6 +7697,16 @@ const SylviaGMFrontend = (() => {
 
   // App-owned presentation participates in the same workspace as package panels.
   // Child windows receive this view, never the native confirmation or full receipts.
+  function sequenceDisplaySummary(step) {
+    const card = step.status === 'committed' && step.receipt?.status === 'committed'
+      ? step.receipt.result?.result_card : null;
+    const rows = Array.isArray(step.display_summary) ? step.display_summary
+      : step.status === 'committed' ? [...(card?.summary || []), ...(card?.details || [])]
+      : step.preview?.summary || [];
+    return rows.filter(row => /cost|distance|spent/i.test(row.label || ''))
+      .map(row => ({label:row.label,value:row.value}));
+  }
+
   function queueView(queue = state.actionSequence) {
     if (!queue || queue.session_id !== state.activeSessionId) return null;
     return {
@@ -7713,7 +7723,9 @@ const SylviaGMFrontend = (() => {
           ? step.receipt.resulting_revision : null,
         selection:step.selection ? Object.fromEntries(['target','destination','aim_point']
           .filter(key => Object.hasOwn(step.selection,key)).map(key => [key,step.selection[key]])) : null,
-        preview:step.preview ? {summary:(step.preview.summary || []).filter(row => /cost|distance/i.test(row.label || ''))} : null,
+        display_summary:sequenceDisplaySummary(step),
+        preview:step.status !== 'committed' && step.preview
+          ? {summary:(step.preview.summary || []).filter(row => /cost|distance/i.test(row.label || ''))} : null,
         error:step.status === 'committed' ? null : panelPlayerReason(step.error),
         warning:step.status === 'committed' ? null : panelPlayerReason(step.warning),
       })),
@@ -7805,8 +7817,8 @@ const SylviaGMFrontend = (() => {
     };
     const rows = steps.map((step, index) => {
       const status = step.status === 'committed' ? 'Committed' : step.status === 'awaiting_choice' ? 'Awaiting choice' : step.status === 'executing' ? 'Sending' : 'Pending';
-      // A saved preview can contain a price even when current prerequisites refuse the action.
-      const previewDetails = (step.preview?.summary || []).filter(row => /cost|distance/i.test(row.label || '')).map(row => {
+      // Pending prices are estimates; settled details come from the public result card.
+      const resourceDetails = sequenceDisplaySummary(step).map(row => {
         let value = row.value;
         if (/cost/i.test(row.label || '')) {
           if (stepReason(step)) value = step.error ? 'unconfirmed' : 'unavailable';
@@ -7819,13 +7831,13 @@ const SylviaGMFrontend = (() => {
         step.selection?.target ? `Target: ${targetLabel(step.selection.target)}` : '',
         step.selection?.destination ? `Destination: ${JSON.stringify(step.selection.destination)}` : '',
         step.selection?.aim_point ? `Map point: ${JSON.stringify(step.selection.aim_point)}` : '',
-        ...previewDetails,
+        ...resourceDetails,
       ].filter(Boolean).join(' · ');
       const compactDetail = [multipleActors ? step.actor_name : '',
         step.selection?.target ? targetLabel(step.selection.target)
           : step.selection?.destination ? JSON.stringify(step.selection.destination)
           : step.selection?.aim_point ? JSON.stringify(step.selection.aim_point) : '',
-        ...previewDetails,
+        ...resourceDetails,
       ].filter(Boolean).join(' · ');
       return `<li class="sequence-step sequence-${step.status}">
         <span class="sequence-number" aria-label="Step ${index + 1}: ${status}" data-sequence-step="${escapeHtml(step.step_id)}" ${previousSteps.has(step.step_id) ? '' : 'data-sequence-enter'}>${index + 1}</span>

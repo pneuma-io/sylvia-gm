@@ -17,6 +17,20 @@ handoffs and checkout-specific records do not activate work.
 
 ## 1. Current work
 
+**10 November 2026: native TD qualification, with merge held.** The owner selected completing
+PR #6 through a separate Windows candidate and isolated synthetic data, including ordinary
+package import, supported controls, preview/queue/execute, resource accounting, cancellation,
+rejection, save/reopen and duplicate-action safety. Exact candidate results belong in the PR's
+qualification section. The native queue journey exposed a committed-card price that retained
+its earlier preview after a stance change; completed summaries now use the declared public
+result card. Engine accounting and retained balance parameters are unchanged.
+
+The newer Opus frontend production port remains separate in [PR #28](https://github.com/pneuma-io/sylvia-gm/pull/28).
+The final combined product must match the current approved mock-up and receive the later Opus
+pass. TD mechanics qualification does not close that visual acceptance. Siren composition and
+balance-suite refactoring remain separate. The following 9 November entry records the earlier
+source-integration selection; it does not supersede this native qualification requirement.
+
 **9 November 2026: Trigger Discipline integration before balancing.** The owner selected an
 integrated, ready, unmerged TD baseline in existing PR #6. The retained runtime, shooter-origin
 Overwatch and grid-edge controls are being reconciled with current main. TD 0.1.29 keeps the
