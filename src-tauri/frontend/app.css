@@ -4663,6 +4663,10 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
         .session-frame.has-panels .panel-tab-group:has(> .ruleset-map-panel) :is(.ruleset-panel, .ruleset-panel > div) { flex: 1 0 auto; }
     .session-frame.has-panels .ruleset-map-panel .ruleset-panel-content { flex: 1 0 auto; min-height: auto !important; overflow-x: hidden; overflow-y: auto; }
     .session-frame.has-panels .ruleset-map-panel .map-stage { min-height: 160px; }
+    /* Only the map lends its natural height to a column split; every other panel body is size-contained and
+       scrolls inside its share, so a long sheet never grows its row and squeezes the roster strip. */
+    .session-frame.has-panels .ruleset-panel:not(.ruleset-map-panel) .ruleset-panel-content { contain: size; overflow-y: auto; }
+    .session-frame.has-panels .ruleset-roster-panel .ruleset-panel-content { min-height: 100px !important; }
   }
 }
 @container (max-height: 420px) { .ruleset-map-panel .map-stage > .map-legend { display: none; } }

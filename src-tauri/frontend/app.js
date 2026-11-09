@@ -5176,17 +5176,18 @@ const SylviaGMFrontend = (() => {
       retained: Array.isArray(weapon.retained_magazines) ? weapon.retained_magazines.length : null };
   }
   // What changed between two committed states of the same weapon, in the order it happens.
-  function rigManipulations(before, after) {
+  function rigManipulations(before, after, { gap = 1 } = {}) {
     if (!before || !after || before.id !== after.id) return [];
     const kinds = [];
+    const sameMagazine = before.magazine === after.magazine;
     if (after.feed !== 'TUBE' && before.magazine !== null && after.magazine !== null && before.magazine !== after.magazine) {
       kinds.push({ kind: 'reload', retained: after.retained !== null && before.retained !== null && after.retained > before.retained,
         needsCycle: after.needs_cycle, chamberAfter: after.chamber });
     } else if (after.feed === 'TUBE' && before.rounds !== null && after.rounds !== null && after.rounds > before.rounds &&
         before.chamber === after.chamber) {
       kinds.push({ kind: 'load-shell' });
-    } else if (before.rounds !== null && after.rounds !== null && after.rounds < before.rounds &&
-        (after.chamber === 'SPENT' || after.mechanism === 'SELF_LOADING' || after.needs_cycle)) {
+    } else if (gap === 1 && sameMagazine && ((before.chamber === 'LIVE' && after.chamber === 'SPENT') ||
+        (before.rounds !== null && after.rounds !== null && after.rounds < before.rounds && after.mechanism === 'SELF_LOADING'))) {
       kinds.push({ kind: 'fire' });
     }
     if ((before.needs_cycle && !after.needs_cycle) || (after.mechanism !== 'SELF_LOADING' && before.chamber !== 'LIVE' && after.chamber === 'LIVE' &&
@@ -5254,59 +5255,97 @@ const SylviaGMFrontend = (() => {
     }
     return [];
   }
-  // One live run per actor survives panel redraws: a redraw re-attaches the moving drawing and caption.
+  // A run belongs to one campaign/session/Ruleset context, one panel and one actor's weapon. It writes only into
+  // that panel's own caption while the context is still selected, survives same-revision redraws by re-attaching its
+  // drawing, and is cancelled (drawing and caption back to the committed rest state) on Off/Static/Skip, reduced
+  // motion, a context change, the actor or panel going away, or a different weapon. Leaving a context forgets what it
+  // saw, so reopening never replays commits made while away.
   const rigRuns = new Map();
+  function rigContextKey() {
+    return JSON.stringify([state.panelProjection?.campaign_id || null, state.activeSessionId || null, state.panelProjection?.ruleset_id || null]);
+  }
+  function rigMotionAllowed() {
+    return gamePanels().effects?.preferences?.().visual === 'motion' && !window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+  }
+  function rigCaption(run) {
+    return document.querySelector(`[data-panel-id="${CSS.escape(run.surfaceId)}"] [data-rig-phase="${CSS.escape(run.actorId)}"]`);
+  }
+  function cancelRigRuns(filter = () => true) {
+    for (const [key, run] of rigRuns) if (filter(run)) { run.finish(); rigRuns.delete(key); }
+  }
+  let rigMotionWatch = null;
   function playCommittedRigMotion(projection, container) {
+    if (!rigMotionWatch && window.matchMedia) {
+      rigMotionWatch = window.matchMedia('(prefers-reduced-motion: reduce)');
+      rigMotionWatch.addEventListener?.('change', (event) => { if (event.matches) cancelRigRuns(); });
+    }
+    const context = rigContextKey();
+    if (state.rigContext !== context) {
+      cancelRigRuns();
+      state.rigMemory = new Map();
+      state.rigContext = context;
+    }
     const memory = state.rigMemory ||= new Map();
-    const motion = gamePanels().effects?.preferences?.().visual === 'motion' &&
-      !window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+    const motion = rigMotionAllowed();
+    if (!motion) cancelRigRuns();
+    const seen = new Set();
     container.querySelectorAll('[data-rig-stage]').forEach((stage) => {
       const actorId = stage.dataset.rigStage;
-      const key = JSON.stringify([projection?.campaign_id, actorId]);
+      const surfaceId = stage.closest('[data-panel-id]')?.dataset.panelId || '';
+      const key = JSON.stringify([surfaceId, actorId]);
+      seen.add(key);
       const weapon = rigWeaponSnapshot(projectedActorEntity(actorId).weapon);
       const run = rigRuns.get(key);
       if (run && !run.done) {
-        const fresh = stage.querySelector('svg.weapon-rig');
-        if (fresh && run.svg !== fresh && run.revision === projection?.revision) fresh.replaceWith(run.svg);
-        const caption = container.querySelector(`[data-rig-phase="${CSS.escape(actorId)}"]`);
-        if (caption && run.label) caption.innerHTML = `<span class="pulse"></span>${escapeHtml(run.label)}`;
-        if (run.revision === projection?.revision) return;
+        if (run.revision === projection?.revision && run.weaponId === weapon?.id) {
+          const fresh = stage.querySelector('svg.weapon-rig');
+          if (fresh && run.svg !== fresh) fresh.replaceWith(run.svg);
+          const caption = rigCaption(run);
+          if (caption && run.label) caption.innerHTML = `<span class="pulse"></span>${escapeHtml(run.label)}`;
+          return;
+        }
         run.finish();
+        rigRuns.delete(key);
       }
       const previous = memory.get(key);
       memory.set(key, { revision: projection?.revision, weapon });
-      if (!previous || !Number.isFinite(projection?.revision) || !(projection.revision > previous.revision) || !motion) return;
+      if (!motion || !previous || !Number.isFinite(projection?.revision) || !(projection.revision > previous.revision)) return;
       const svg = stage.querySelector('svg.weapon-rig');
-      const steps = rigManipulations(previous.weapon, weapon);
+      const steps = rigManipulations(previous.weapon, weapon, { gap: projection.revision - previous.revision });
       if (!svg || !steps.length) return;
       const phases = steps.flatMap((step) => rigPhasePlan(step, svg.dataset.rig));
       const timers = [], animations = [];
-      const live = { svg, revision: projection.revision, done: false, label: '' };
+      const live = { svg, actorId, surfaceId, context, weaponId: weapon?.id, revision: projection.revision, done: false, label: '',
+        rest: stage.parentElement?.querySelector('[data-rig-phase]')?.innerHTML || 'Ready' };
+      const current = () => !live.done && rigContextKey() === live.context;
       live.finish = () => {
         if (live.done) return;
+        const owned = rigContextKey() === live.context;
         live.done = true;
         timers.forEach(clearTimeout);
         animations.forEach((animation) => { try { animation.cancel(); } catch (_) { /* detached */ } });
         svg.querySelector('[data-rig-part="fx"]')?.replaceChildren();
-        const caption = document.querySelector(`[data-rig-phase="${CSS.escape(actorId)}"]`);
-        if (caption) caption.textContent = caption.dataset.rigRest || 'Ready';
+        // Restore the rest caption only where this run's own phase is still shown; a newer render keeps its caption.
+        const caption = owned ? rigCaption(live) : null;
+        if (caption && live.label && caption.textContent === live.label) caption.innerHTML = live.rest;
       };
       rigRuns.set(key, live);
-      const caption = stage.parentElement?.querySelector(`[data-rig-phase="${CSS.escape(actorId)}"]`);
-      if (caption) caption.dataset.rigRest = caption.textContent;
       let at = 0;
       phases.forEach((phase) => {
         timers.push(setTimeout(() => {
-          if (live.done) return;
+          if (!current() || !rigMotionAllowed()) { live.finish(); rigRuns.delete(key); return; }
           live.label = phase.label;
-          const current = document.querySelector(`[data-rig-phase="${CSS.escape(actorId)}"]`);
-          if (current) current.innerHTML = `<span class="pulse"></span>${escapeHtml(phase.label)}`;
+          const caption = rigCaption(live);
+          if (caption) caption.innerHTML = `<span class="pulse"></span>${escapeHtml(phase.label)}`;
           (phase.run(live.svg) || []).filter(Boolean).forEach((animation) => animations.push(animation));
         }, at));
         at += phase.ms;
       });
-      timers.push(setTimeout(() => live.finish(), at + 120));
+      timers.push(setTimeout(() => { live.finish(); if (rigRuns.get(key) === live) rigRuns.delete(key); }, at + 120));
     });
+    // A run whose panel was redrawn without its actor (actor switch, hidden panel) stops here.
+    const surfaces = new Set(Array.from(container.querySelectorAll('[data-panel-id]'), (node) => node.dataset.panelId));
+    cancelRigRuns((run) => surfaces.has(run.surfaceId) && !seen.has(JSON.stringify([run.surfaceId, run.actorId])));
   }
 
   // Which declared steps a single Reload should queue for this weapon, in order. The owner still prices and
@@ -5583,52 +5622,72 @@ const SylviaGMFrontend = (() => {
   // Operator (accepted suite): a portrait plate with vitals and posture beside it, then the ready weapon with its
   // rig, readouts, one Reload and the granular handling steps. Only projected values and declared actions appear;
   // no portrait is projected, so the plate shows the initials fallback the suite specifies.
-  function grimoireMarkup(surface, actorId, { participant, entity, name, details, values }) {
+  // The first map surface and its declared, actor-bound cast actions.
+  function mapCastActions() {
     const map = (state.panelProjection?.surfaces || []).find((item) => ['tactical_grid', 'coordinate_map'].includes(item.renderer));
-    const casts = (map?.actions || []).filter((action) => action.intent === 'cast_spell' && actionBindsActor(action));
+    return { map, casts: (map?.actions || []).filter((action) => action.intent === 'cast_spell' && actionBindsActor(action)) };
+  }
+
+  // Caster sheet for an actor without a carried firearm when the map declares cast actions. Every number shown is a
+  // projected value and every label is the projected label or one derived from its projected key; no ruleset
+  // arithmetic, unit, attribute list or level naming is assumed here.
+  function grimoireMarkup(surface, actorId, { participant, entity, name, details, values }) {
+    const { map, casts } = mapCastActions();
     const word = (value) => String(panelIdentifierLabel(value || '')).replace(/\b\w/g, (letter) => letter.toUpperCase());
+    const initials = (key) => word(key).split(/\s+/).map((part) => part.charAt(0)).join('');
     const classes = Array.isArray(details.classes) ? details.classes.map((item) => `${word(item.id)}${Number.isFinite(item.level) ? ` ${item.level}` : ''}`).join(' / ') : '';
-    const lineage = [details.species, details.background].filter(Boolean).map(word).join(' ');
+    const lineage = [details.species, details.background].filter((item) => typeof item === 'string' && item).map(word).join(' ');
     const fraction = Number.isFinite(entity.hp) && Number.isFinite(entity.max_hp) && entity.max_hp > 0 ? Math.max(0, Math.min(1, entity.hp / entity.max_hp)) : null;
-    const flask = Number.isFinite(entity.hp) ? `<span class="grim-flask" title="HP"><svg viewBox="0 0 30 40" aria-hidden="true"><defs><clipPath id="flask-${escapeHtml(actorId)}">` +
+    const flask = Number.isFinite(entity.hp) ? `<span class="grim-flask" title="${escapeHtml(word('hp'))}"><svg viewBox="0 0 30 40" aria-hidden="true"><defs><clipPath id="flask-${escapeHtml(actorId)}">` +
       `<path d="M11 2h8v9c6 3 9 8 9 14a13 13 0 0 1-26 0c0-6 3-11 9-14z"/></clipPath></defs><path class="fl-glass" d="M11 2h8v9c6 3 9 8 9 14a13 13 0 0 1-26 0c0-6 3-11 9-14z"/>` +
       (fraction === null ? '' : `<rect class="fl-liquid" clip-path="url(#flask-${escapeHtml(actorId)})" x="0" y="${(39 - 28 * fraction).toFixed(1)}" width="30" height="40"/>`) +
       `</svg><b>${escapeHtml(entity.hp)}${Number.isFinite(entity.max_hp) ? `<small>/${escapeHtml(entity.max_hp)}</small>` : ''}</b><small>HP</small></span>` : '';
-    const shield = Number.isFinite(entity.armor_class) ? `<span class="grim-shield" title="AC"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v6c0 5-3 8-7 9-4-1-7-4-7-9V6z"/></svg>` +
-      `<b>${escapeHtml(entity.armor_class)}</b><small>AC</small></span>` : '';
-    const speed = Number.isFinite(entity.speed ?? details.speed) ? `<span class="grim-speed"><b>${escapeHtml(entity.speed ?? details.speed)}</b><small>ft walk</small></span>` : '';
-    const roman = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX'];
-    const slots = Object.entries(entity.resources || {}).map(([key, value]) => [Number(/^spell_slot_(\d)$/.exec(key)?.[1]), value])
-      .filter(([tier, value]) => tier >= 1 && tier <= 9 && Number.isInteger(value)).sort((a, b) => a[0] - b[0]);
-    const icon = (action) => suiteIcon(suiteActionIcon(action) || 'burstarea');
+    const shield = Number.isFinite(entity.armor_class) ? `<span class="grim-shield" title="${escapeHtml(word('armor_class'))}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v6c0 5-3 8-7 9-4-1-7-4-7-9V6z"/></svg>` +
+      `<b>${escapeHtml(entity.armor_class)}</b><small>${escapeHtml(initials('armor_class'))}</small></span>` : '';
+    // The distance unit is the map's own projected grid unit; without one the value stands alone.
+    const unit = map?.data?.map?.grid?.unit;
+    const speedValue = entity.speed ?? details.speed;
+    const speed = Number.isFinite(speedValue) ? `<span class="grim-speed"><b>${escapeHtml(speedValue)}</b><small>${escapeHtml([unit, word('speed')].filter(Boolean).join(' · '))}</small></span>` : '';
+    // Numbered resource families (key_1 … key_n) read as one ribbon labelled from their shared projected key.
+    const families = new Map();
+    for (const [key, value] of Object.entries(entity.resources || {})) {
+      const match = /^(.+?)_(\d+)$/.exec(key);
+      if (!match || !Number.isInteger(value)) continue;
+      if (!families.has(match[1])) families.set(match[1], []);
+      families.get(match[1]).push([Number(match[2]), value, key]);
+    }
+    families.forEach((items) => items.sort((a, b) => a[0] - b[0]));
+    const familyKeys = new Set(Array.from(families.values()).flat().map((item) => item[2]));
+    const resourceCost = (resource) => {
+      const count = entity.resources?.[resource];
+      if (!resource) return '';
+      return Number.isInteger(count) ? `<span class="grim-crystals">${'<i class="on"></i>'.repeat(Math.max(0, Math.min(count, 6)))}</span><small>${escapeHtml(count)} left</small>` : '';
+    };
     const spellCard = (action) => {
       const resource = action.params?.slot_resource;
-      const tier = Number(/^spell_slot_(\d)$/.exec(resource || '')?.[1]) || 0;
-      const count = tier ? entity.resources?.[resource] : null;
       const available = panelActionAvailable(map, action, actorId);
-      const label = String(action.label || action.id).replace(/\s*\(\d\)$/, '');
+      const label = action.label || panelIdentifierLabel(action.id);
       return `<button type="button" class="grim-spell${available ? '' : ' is-off'}" data-grimoire-cast="${escapeHtml(action.id)}" data-grimoire-map="${escapeHtml(map.id)}" ` +
-        `aria-label="Ready ${escapeHtml(label)}: choose a target on ${escapeHtml(map.title || 'the map')}" ${available ? '' : 'aria-disabled="true"'}>${icon(action)}` +
-        `<span class="grim-spell-main"><b>${escapeHtml(label)}</b><small>${tier ? `Level ${tier}` : 'Cantrip'}</small></span>` +
-        `<span class="grim-spell-cost">${tier ? `<span class="grim-crystals">${'<i class="on"></i>'.repeat(Math.max(0, Math.min(Number(count) || 0, 6)))}</span>` +
-          `<small>${escapeHtml(count ?? 0)} slot${count === 1 ? '' : 's'} · L${tier}</small>` : '<small>at will</small>'}</span></button>`;
+        `aria-label="Ready ${escapeHtml(label)}: choose a target on ${escapeHtml(map.title || 'the map')}" ${available ? '' : 'aria-disabled="true"'}>${suiteIcon(suiteActionIcon(action) || 'burstarea')}` +
+        `<span class="grim-spell-main"><b>${escapeHtml(label)}</b>${resource ? `<small>${escapeHtml(word(resource))}</small>` : ''}</span>` +
+        `<span class="grim-spell-cost">${resourceCost(resource)}</span></button>`;
     };
-    const mod = (score) => { const value = Math.floor((score - 10) / 2); return value >= 0 ? `+${value}` : `${value}`; };
+    // Projected scores as projected, in projected order; membership in a projected proficiency list is highlighted.
     const abilities = details.abilities && typeof details.abilities === 'object' ? Object.entries(details.abilities).filter(([, score]) => Number.isFinite(score)) : [];
-    const saves = Array.isArray(details.saving_throw_proficiencies) ? details.saving_throw_proficiencies : [];
-    const order = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
-    abilities.sort((a, b) => order.indexOf(a[0]) - order.indexOf(b[0]));
-    const otherResources = Object.entries(entity.resources || {}).filter(([key]) => !/^spell_slot_\d$/.test(key));
+    const savesKey = 'saving_throw_proficiencies';
+    const saves = Array.isArray(details[savesKey]) ? details[savesKey] : [];
+    const otherResources = Object.entries(entity.resources || {}).filter(([key]) => !familyKeys.has(key));
     return `<div class="character-hero grimoire" data-character-details="${escapeHtml(actorId)}" ${participant ? 'data-panel-entity' : 'data-character-entity'}="${escapeHtml(actorId)}">` +
       `<header class="grim-head"><div class="grim-plinth" role="img" aria-label="${escapeHtml(name)}: initials (no portrait projected)"><b>${escapeHtml(actorInitials(name))}</b><small>no portrait · initials</small></div>` +
       `<div class="grim-id"><small class="op-kicker">Inspecting</small><h3><strong>${escapeHtml(name)}</strong></h3><p>${escapeHtml([lineage, classes].filter(Boolean).join(' · '))}</p>` +
       `<div class="grim-vitals">${flask}${shield}${speed}</div></div></header>` + conditionPanelMarkup(entity) +
-      (casts.length ? `<section class="grim-book"><span class="grim-sec">Prepared · choose, then target on the ${escapeHtml(map.title || 'map')}</span>${casts.map(spellCard).join('')}</section>` : '') +
-      (slots.length ? `<section class="grim-slots" aria-label="Slots by level"><span class="grim-sec">Slots</span><div class="grim-ribbon">${slots.map(([tier, value]) =>
-        `<span class="grim-tier" title="Level ${tier}: ${value} remaining"><small>${roman[tier - 1]}</small>${'<i class="on"></i>'.repeat(Math.min(value, 6))}${value === 0 ? '<em>0</em>' : ''}</span>`).join('')}</div></section>` : '') +
-      (abilities.length ? `<div class="grim-runes" role="list" aria-label="Ability scores">${abilities.map(([key, score]) =>
-        `<span role="listitem" class="grim-rune${saves.includes(key) ? ' save' : ''}" title="${escapeHtml(panelIdentifierLabel(key))} ${score}${saves.includes(key) ? ' · proficient save' : ''}">` +
-        `<small>${escapeHtml(key.slice(0, 3).toUpperCase())}</small><b>${mod(score)}</b></span>`).join('')}</div>` : '') +
+      `<section class="grim-book"><span class="grim-sec">Prepared · choose, then target on the ${escapeHtml(map.title || 'map')}</span>${casts.map(spellCard).join('')}</section>` +
+      Array.from(families, ([prefix, items]) => `<section class="grim-slots" aria-label="${escapeHtml(word(prefix))}"><span class="grim-sec">${escapeHtml(word(prefix))}</span>` +
+        `<div class="grim-ribbon">${items.map(([number, value, key]) => `<span class="grim-tier" title="${escapeHtml(word(key))}: ${escapeHtml(value)}"><small>${escapeHtml(number)}</small>` +
+        `${'<i class="on"></i>'.repeat(Math.min(value, 6))}${value === 0 ? '<em>0</em>' : ''}</span>`).join('')}</div></section>`).join('') +
+      (abilities.length ? `<div class="grim-runes" role="list" aria-label="${escapeHtml(word('abilities'))}">${abilities.map(([key, score]) =>
+        `<span role="listitem" class="grim-rune${saves.includes(key) ? ' save' : ''}" title="${escapeHtml(word(key))} ${escapeHtml(score)}${saves.includes(key) ? ` · ${escapeHtml(word(savesKey))}` : ''}">` +
+        `<small>${escapeHtml(String(key).slice(0, 3).toUpperCase())}</small><b>${escapeHtml(score)}</b></span>`).join('')}</div>` : '') +
       `<div class="character-loadout grim-gear">${weaponSetMarkup(entity?.weapon_sets)}</div>` +
       (otherResources.length ? `<div class="character-resources">${otherResources.map(([key, value]) => `<span>${escapeHtml(panelIdentifierLabel(key))}<b>${escapeHtml(value)}</b></span>`).join('')}</div>` : '') +
       characterActionMarkup(surface, actorId) + actionReadinessMarkup(entity || {}, actorId) +
@@ -5636,7 +5695,8 @@ const SylviaGMFrontend = (() => {
   }
 
   function operatorMarkup(surface, actorId, { participant, entity, name, details, level, values }) {
-    if (!(entity.weapon && typeof entity.weapon === 'object') && (Array.isArray(details.classes) || Number.isFinite(entity.armor_class)))
+    // The caster sheet is chosen only from declared map actions, never from which stat fields an entity happens to carry.
+    if (!(entity.weapon && typeof entity.weapon === 'object') && mapCastActions().casts.length)
       return grimoireMarkup(surface, actorId, { participant, entity, name, details, values });
     const classId = details.class_id || details.class || entity.class_id;
     const actions = (surface.actions || []).filter(actionBindsActor);
@@ -7590,12 +7650,14 @@ const SylviaGMFrontend = (() => {
         const patch = control.hasAttribute('data-shot-visual') ? { visual: control.value }
           : control.hasAttribute('data-shot-volume') ? { volume: Number(control.value) / 100 }
             : { muted: control.checked };
+        if (patch.visual && patch.visual !== 'motion') cancelRigRuns();
         void Promise.resolve(gamePanels().configureEffects(patch)).catch((error) => {
           setInlineStatus(friendlyCommandError('Effects settings could not be updated', error), 'panels');
         });
       }));
     container.querySelectorAll('[data-shot-skip]').forEach((button) => {
       button.addEventListener('click', () => {
+        cancelRigRuns();
         void Promise.resolve(gamePanels().skipEffects()).then(animateShots);
       });
     });

@@ -105,6 +105,15 @@ test('rig motion is derived only from two committed states of the same weapon, i
   const live = weapon('vesper');
   assert.deepEqual(kinds(live, { ...live, magazine: { ...live.magazine, rounds: 29 } }), ['fire']);
   assert.deepEqual(kinds(live, live), [], 'no change, no motion');
+  // A manual action fires the chambered round: the magazine is unchanged until the cycle.
+  const ready = weapon('hostile_alpha', { chamber: 'LIVE', needs_cycle: false, magazine: { id: 'm1', rounds: 5 } });
+  const fired = { ...ready, chamber: 'SPENT', needs_cycle: true };
+  assert.deepEqual(kinds(ready, fired), ['fire']);
+  assert.deepEqual(kinds(fired, { ...ready, magazine: { id: 'm1', rounds: 4 } }), ['cycle']);
+  // Across a revision gap the number and order of shots are unknown: no shot is drawn; a magazine change still is.
+  assert.deepEqual(Array.from(diff(snap(ready), snap(fired), { gap: 3 }), (step) => step.kind), []);
+  assert.deepEqual(Array.from(diff(snap(live), snap({ ...live, magazine: { ...live.magazine, rounds: 25 } }), { gap: 2 }), (step) => step.kind), []);
+  assert.deepEqual(Array.from(diff(snap(spent), snap(changed), { gap: 2 }), (step) => step.kind), ['reload']);
   assert.deepEqual(kinds(live, weapon('hostile_alpha')), [], 'a different weapon is not animated as a manipulation');
   assert.deepEqual(Array.from(diff(null, snap(live))), [], 'first sight (open or reopen) never plays');
   assert.deepEqual(Array.from(plan({ kind: 'cycle', ejected: 'SPENT' }, 'bolt'), (phase) => phase.label),
