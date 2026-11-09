@@ -136,6 +136,13 @@ def select_checks(paths, *, source, base, diff_complete=True, full=False, root=N
             }:
                 groups["ci-harness"] = list(HARNESS)
                 reason = "Selection, fail-closed runner, diagnostics and fixture isolation"
+            elif (
+                path.startswith("branding/sprites/")
+                or path == "scripts/extract_tutorial_sprites.py"
+            ):
+                ui.update(UI_JOURNEY)
+                groups.setdefault("tutorial-assets", []).append("tests/test_tutorial_assets.py")
+                reason = "Tutorial artwork: provenance, packaged crops and rendered lessons"
             elif path.startswith("src-tauri/frontend/"):
                 ui.update(UI_JOURNEY)
                 reason = "Shipped frontend: JavaScript invariants and rendered browser journeys"

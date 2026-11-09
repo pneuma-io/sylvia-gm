@@ -339,8 +339,9 @@ for (const navigated of [false, true]) test(`an interrupted opening preserves it
   const source = fs.readFileSync(path.join(__dirname, '../src-tauri/frontend/app.js'), 'utf8');
   const start = source.indexOf('  async function openReadyCampaign(result) {');
   const end = source.indexOf('  async function startCampaignBuilder(', start);
-  const finishes = [], statuses = [];
+  const finishes = [], statuses = [], tutorialEvents = [];
   const context = {
+    tutorials: { notify: (...args) => tutorialEvents.push(args) },
     state: { view: 'home', activeCampaignId: null, activeSessionId: null,
       bridge: { start_dm_session: async () => ({ interruption: { code: 'scripted' } }) } },
     refreshCampaignIndex: async () => {
@@ -362,6 +363,7 @@ for (const navigated of [false, true]) test(`an interrupted opening preserves it
   await context.openReadyCampaign({ campaign_id: 'saved', dm_session_id: 'dm',
     dm_turn_id: 'turn', dm_attempt_id: 'opening' });
   assert.deepEqual(finishes, ['interrupted']);
+  assert.deepEqual(tutorialEvents, navigated ? [] : [['ready-started', 'dm']]);
   if (navigated) {
     assert.equal(context.state.activeSessionId, 'other-chat');
     assert.deepEqual(statuses, []);

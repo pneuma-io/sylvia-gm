@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sylvia GM</title>
 <link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="tutorials.css">
 <link rel="stylesheet" href="tile-table.css">
 </head>
 <body data-theme="slate">
@@ -91,6 +92,7 @@
 
   <dialog id="ready-campaign-dialog" aria-labelledby="ready-campaign-title">
     <h2 id="ready-campaign-title">Ready campaigns</h2>
+    <div class="tutorial-entry"><button type="button" class="btn btn-secondary btn-sm" data-tutorial-offer="ready">Guide: start a ready campaign</button></div>
     <p>Choose an existing adventure with its complete premade party. No character creation or starting level-ups are needed.</p>
     <label for="ready-campaign-choice">Adventure</label>
     <select id="ready-campaign-choice"></select>
@@ -130,11 +132,19 @@
                   aria-haspopup="dialog" aria-controls="settings-overlay">
             Settings
           </button>
+          <button class="btn btn-secondary" id="home-tutorials-btn" type="button">Tutorials</button>
         </div>
         <p class="home-action-status" id="home-action-status" role="status" hidden></p>
       </div>
     </header>
 
+    <section class="tutorial-entry home-learning" aria-label="Getting started">
+      <div><strong>Ready for an adventure together?</strong><p>I can help you connect AI, meet a prepared party, or find your way around.</p></div>
+      <div class="tutorial-entry-actions">
+        <button type="button" class="btn btn-primary" id="home-get-started-btn">Help me start playing</button>
+        <button type="button" class="btn btn-secondary" id="tutorial-resume-btn" hidden>Resume tutorial</button>
+      </div>
+    </section>
     <section class="home-recent" id="home-recent" aria-labelledby="home-recent-title">
       <h2 class="visually-hidden" id="home-recent-title">Most recently updated campaign</h2>
       <div class="home-empty-copy">Your most recently active campaign will appear here.</div>
@@ -173,6 +183,7 @@
         </div>
       </details>
       <span class="play-header-spacer" aria-hidden="true"></span>
+      <button type="button" class="btn btn-secondary btn-sm" id="session-tutorials-btn">Tutorials</button>
       <button class="queue-badge" id="queue-badge" type="button" hidden aria-controls="ruleset-panels"></button>
       <div class="view-switch" id="view-switch" role="group" aria-label="Game panels and Story width" hidden>
         <button type="button" data-view-mode="board" aria-pressed="false" title="Board: game panels fill the window; Story folds to a rail">
@@ -210,6 +221,7 @@
           <div id="ruleset-panels"></div>
         </section>
           <div class="construction-panel" id="construction-panel" hidden>
+            <div class="tutorial-entry"><button type="button" class="btn btn-secondary btn-sm" data-tutorial-offer="customize">Guide: customize a campaign</button></div>
             <div class="construction-summary" id="construction-progress">Step 1 of 8</div>
             <details class="construction-summary" id="construction-library-warnings" hidden>
               <summary>Saved content needs repair</summary>
@@ -413,6 +425,12 @@
       </div>
 
       <div class="input-bar">
+        <div class="tutorial-entry tutorial-context-offers" aria-label="Relevant tutorials">
+          <button type="button" class="btn btn-secondary btn-sm" data-tutorial-offer="play" data-tutorial-require="campaign" data-tutorial-suggest="true" hidden>Guide: playing with your GM</button>
+          <button type="button" class="btn btn-secondary btn-sm" data-tutorial-offer="combat" data-tutorial-require="combatGuide" data-tutorial-suggest="true" hidden>Guide: combat controls</button>
+          <button type="button" class="btn btn-secondary btn-sm" data-tutorial-offer="builder" data-tutorial-require="builder" data-tutorial-suggest="true" hidden>Guide: create with Builder</button>
+          <button type="button" class="btn btn-secondary btn-sm" data-tutorial-offer="layout" data-tutorial-require="campaign" data-tutorial-suggest="true" hidden>Guide: arrange panels</button>
+        </div>
         <div class="input-composer">
           <button id="composer-resize-handle" class="composer-resize-handle" type="button"
                   role="separator" aria-orientation="horizontal" aria-label="Resize message box"
@@ -538,19 +556,56 @@
   <div class="tutorial-spotlight" id="tutorial-spotlight" aria-hidden="true"></div>
   <div class="tutorial-guide" id="tutorial-guide" data-placement="center">
     <img class="tutorial-sylvia" id="tutorial-sylvia"
-         src="assets/tutorial/sylvia-wave.png" alt="">
-    <section class="tutorial-card" role="dialog" aria-modal="true"
+         src="assets/tutorial/sylvia-welcome.png" alt="">
+    <section class="tutorial-card" role="region"
              aria-labelledby="tutorial-title" aria-describedby="tutorial-copy">
       <div class="tutorial-step" id="tutorial-step">1 / 4</div>
-      <h2 id="tutorial-title">Hi, I&rsquo;m Sylvia.</h2>
+      <h2 id="tutorial-title" tabindex="-1">Hi, I&rsquo;m Sylvia.</h2>
       <p id="tutorial-copy">Let me show you the important stuff real quick.</p>
+      <p id="tutorial-waiting" role="status" aria-live="polite"></p>
+      <div id="tutorial-routes" class="tutorial-routes"></div>
+      <button type="button" class="btn btn-secondary" id="tutorial-action-btn" hidden>Open page</button>
       <div class="tutorial-actions">
-        <button class="btn btn-secondary" id="tutorial-skip-btn" type="button">Skip</button>
+        <button class="btn btn-secondary" id="tutorial-back-btn" type="button">Back</button>
+        <button class="btn btn-secondary" id="tutorial-pause-btn" type="button">Pause</button>
+        <button class="btn btn-secondary" id="tutorial-skip-btn" type="button">Skip lesson</button>
+        <button class="btn btn-secondary" id="tutorial-skip-step-btn" type="button" hidden>Skip step</button>
         <button class="btn btn-primary" id="tutorial-next-btn" type="button">Next</button>
       </div>
     </section>
   </div>
 </div>
+<dialog class="tutorial-dialog" id="tutorial-welcome" aria-labelledby="tutorial-welcome-title">
+  <div class="tutorial-welcome-heading">
+    <img src="assets/tutorial/sylvia-welcome.png" width="116" height="144" alt="">
+    <div><p class="settings-eyebrow">Welcome to Sylvia GM</p><h2 id="tutorial-welcome-title">Oh, there you are!</h2></div>
+  </div>
+  <p>I’m Sylvia, your Game Master and guide around here. You make the choices; an AI model helps me bring our adventure to life, while the game engine keeps track of the rules and results. I can’t wait to see what you try.</p>
+  <p>If this is your first AI adventure, I’ll help you connect a model and meet a prepared party. Or you can explore at your own pace. Every guide is optional, and I’m always here in Tutorials if you need me.</p>
+  <div class="tutorial-welcome-choices">
+    <button type="button" class="btn btn-primary" id="tutorial-welcome-play">Help me start playing</button>
+    <button type="button" class="btn btn-secondary" id="tutorial-welcome-connect">Just help me connect AI</button>
+    <button type="button" class="btn btn-secondary" id="tutorial-welcome-explore">Explore on my own</button>
+  </div>
+</dialog>
+<dialog class="tutorial-dialog" id="tutorial-hub" aria-labelledby="tutorial-hub-title">
+  <div class="tutorial-dialog-heading"><h2 id="tutorial-hub-title">Tutorials</h2><button type="button" class="btn btn-secondary" id="tutorial-hub-close">Close</button></div>
+  <p>Pick whatever you’re curious about, and I’ll show you. Every lesson works on its own; pause whenever you like. Times are approximate.</p>
+  <ul class="tutorial-lesson-list" id="tutorial-lesson-list"></ul>
+</dialog>
+<dialog class="tutorial-dialog" id="tutorial-finished" aria-labelledby="tutorial-finished-title">
+  <div class="tutorial-welcome-heading">
+    <img src="assets/tutorial/sylvia-celebrating.png" width="116" height="144" alt="">
+    <div><p class="settings-eyebrow">That’s this lesson!</p><h2 id="tutorial-finished-title"></h2></div>
+  </div>
+  <p id="tutorial-finished-copy"></p>
+  <div class="tutorial-entry-actions">
+    <button type="button" class="btn btn-primary" id="tutorial-continue-btn" hidden>Continue</button>
+    <button type="button" class="btn btn-secondary" id="tutorial-finished-hub">All tutorials</button>
+    <button type="button" class="btn btn-secondary" id="tutorial-replay-btn">Replay lesson</button>
+    <button type="button" class="btn btn-secondary" id="tutorial-finished-close">Close</button>
+  </div>
+</dialog>
 
 <!-- Dedicated settings surface: a full-height dialog grouped by what people come here to do. Every control keeps
      its id, so callers (rail, Home, Library, Builder refusal, import repair) open the same place. -->
@@ -633,6 +688,7 @@
             <h2>Models</h2>
             <p class="settings-lead">Choose what new chats use, and manage the services Sylvia can talk to.</p>
           </header>
+          <div class="tutorial-entry"><button type="button" class="btn btn-secondary btn-sm" data-tutorial-offer="connect">Need help connecting AI?</button></div>
           <p class="settings-note">Campaigns are saved on this computer. When you use a model, messages and relevant
             campaign or Builder content go to its service, which handles them under its own data use and retention terms.</p>
           <div id="models-overview">
@@ -669,6 +725,7 @@
           <div class="settings-card settings-flow" id="model-add-choices" hidden>
             <button class="settings-back" type="button" data-models-back>Back to your models</button>
             <h3>Add a model</h3>
+            <div class="tutorial-entry"><button type="button" class="btn btn-secondary btn-sm" data-tutorial-offer="connect">Explain connection choices</button></div>
             <div id="model-existing-connection" hidden>
               <label for="model-existing-provider">Use an existing connection</label>
               <div class="settings-inline-field">
@@ -687,6 +744,10 @@
             <div class="models-section-heading">
               <button class="settings-back" type="button" data-models-back>Cancel</button>
               <h3 id="provider-editor-title">Add a model</h3>
+            </div>
+            <div class="tutorial-entry">
+              <button type="button" class="btn btn-secondary btn-sm" data-tutorial-offer="api" data-tutorial-require="apiRoute" id="api-tutorial-offer">Guide: connect an API service</button>
+              <button type="button" class="btn btn-secondary btn-sm" data-tutorial-offer="local" data-tutorial-require="localRoute" id="local-tutorial-offer">Guide: connect a local server</button>
             </div>
             <p id="provider-editor-context" class="provider-field-help"></p>
             <div id="provider-connection-step">
@@ -867,6 +928,7 @@
             <h2>ChatGPT account</h2>
             <p class="settings-lead">Use your ChatGPT subscription in Sylvia. You sign in through your browser; no API key is needed.</p>
           </header>
+          <div class="tutorial-entry"><button type="button" class="btn btn-secondary btn-sm" data-tutorial-offer="subscription">Need help connecting your ChatGPT subscription?</button></div>
           <p class="settings-note">Codex manages the sign-in. Messages and relevant campaign or Builder content go to OpenAI
             through Codex. Data use and retention depend on your ChatGPT plan and account or workspace settings; API data
             policies don&rsquo;t describe every subscription.</p>
@@ -1068,6 +1130,7 @@
             <h2>Campaign data</h2>
             <p class="settings-lead">Export, recover and manage the campaign that is open now.</p>
           </header>
+          <div class="tutorial-entry"><button type="button" class="btn btn-secondary btn-sm" data-tutorial-offer="manage">Guide: resume, recover and export</button></div>
           <p class="settings-context" id="settings-campaign-context">
             Select a campaign to export, rename, archive, or delete.
           </p>
@@ -1282,9 +1345,10 @@
             </div>
           </section>
           <section class="settings-section" aria-labelledby="home-tour-heading">
-            <h3 class="settings-eyebrow" id="home-tour-heading">Home tutorial</h3>
+            <h3 class="settings-eyebrow" id="home-tour-heading">Tutorials</h3>
             <div class="settings-card settings-row">
-              <div><p>Show Sylvia&rsquo;s quick tour of the Home controls again.</p></div>
+              <div><p>Learn a control, resume a lesson, or replay the Home tour.</p></div>
+              <button type="button" class="btn btn-secondary" id="settings-tutorials-btn">All tutorials</button>
               <button class="btn btn-secondary" id="replay-home-tutorial-btn" type="button">
                 Replay tutorial
               </button>
@@ -1308,6 +1372,7 @@
 <script src="support-report.js"></script>
 <script src="local-diagnostics.js"></script>
 <script src="ready-campaigns.js"></script>
+<script src="tutorials.js"></script>
 <script src="desktop-updates.js"></script>
 <script src="desktop-drafts.js"></script>
 <script src="app.js"></script>

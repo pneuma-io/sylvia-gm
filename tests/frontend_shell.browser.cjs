@@ -16,7 +16,7 @@ test('composer and sidebar controls remain usable in the shipped shell', { timeo
     page.on('pageerror', error => errors.push(error.message));
     await page.route('https://sylvia-shell.test/**', async route => {
       const name = new URL(route.request().url()).pathname.slice(1) || 'app.html';
-      if (!['app.html', 'app.css', 'app.js', 'panel-workspace.js', 'shot-playback.js',
+      if (!['app.html', 'app.css', 'app.js', 'tutorials.js', 'tutorials.css', 'panel-workspace.js', 'shot-playback.js',
         'panel-host.js', 'assets/sylvia-portrait.png'].includes(name)) return route.abort();
       let body = fs.readFileSync(path.join(frontend, name));
       if (name === 'app.js') body = body.toString().replace(
@@ -191,8 +191,8 @@ test('composer and sidebar controls remain usable in the shipped shell', { timeo
         session: { ...state.builderChats[0].session, status: 'active' } });
     });
     await page.locator('#home-btn').click();
-    await page.locator('#home-tutorial').waitFor({ state: 'visible' });
-    await page.keyboard.press('Escape'); // Dismiss the normal first-visit tutorial in this fresh profile.
+    assert.equal(await page.locator('#tutorial-welcome').isVisible(), false,
+      'an existing campaign or Builder session does not trigger new-player onboarding');
     if (!await page.locator('#builder-launcher').isVisible()) await page.locator('#toggle-left-sidebar-btn').click();
     await page.locator('.builder-chat-controls summary').click();
     await page.locator('[data-archive-builder="builder-one"]').click();

@@ -105,9 +105,6 @@ const SylviaGMFrontend = (() => {
     crossSurfaceFocus: null,
     characterInspection: null,
     view: 'home',
-    homeTutorialStep: 0,
-    homeTutorialOpen: false,
-    homeTutorialQueued: false,
     controlsWired: false,
     navigationRefreshBusy: false,
     campaignConfirmationPending: false,
@@ -684,42 +681,10 @@ const SylviaGMFrontend = (() => {
   ]);
   const DISCONNECTED_STREAM_KEY = 'sylvia-gm-disconnected-stream';
   const PANEL_LAYOUT_KEY = 'sylvia-gm-panel-layout-v1';
-  const HOME_TUTORIAL_KEY = 'sylvia-gm-home-tutorial-v1';
   const PENDING_PARTY_SELECTION_KEY = 'sylvia-gm-pending-party-selection-v1';
-  const HOME_TUTORIAL_STEPS = [
-    {
-      title: 'Hi, I\u2019m Sylvia.',
-      copy: 'Let me show you the important stuff real quick.',
-      sprite: 'wave',
-    },
-    {
-      targetId: 'home-new-campaign-btn',
-      title: 'New Campaign',
-      copy: 'Start a new personalized campaign using all the goodies you currently have installed.',
-      preferredPlacements: ['right', 'below', 'left', 'above'],
-    },
-    {
-      targetId: 'home-build-btn',
-      title: 'Build Something',
-      copy: 'Open Builder when you want to create or change campaign plans, settings, characters, or Rulesets.',
-      preferredPlacements: ['left', 'below', 'right', 'above'],
-    },
-    {
-      targetId: 'home-settings-btn',
-      title: 'Settings',
-      copy: 'Connect models and manage appearance, packages, campaign data, and app details here.',
-      preferredPlacements: ['below', 'left', 'right', 'above'],
-    },
-  ];
-  const TUTORIAL_SPRITES = {
-    wave: 'assets/tutorial/sylvia-wave.png',
-    left: 'assets/tutorial/sylvia-point-left.png',
-    right: 'assets/tutorial/sylvia-point-right.png',
-    up: 'assets/tutorial/sylvia-point-up.png',
-    down: 'assets/tutorial/sylvia-point-down.png',
-  };
   let settingsReturnFocus = null;
-  let tutorialReturnFocus = null;
+  let tutorials = null;
+  let readyCampaigns = null;
 
   // Keep every provider turn's renderer-owned lifecycle under its session identity.
   function ensureSessionActivity({
@@ -1683,7 +1648,7 @@ const SylviaGMFrontend = (() => {
     $('home-new-campaign-btn').addEventListener('click', () => {
       void startCampaignBuilder();
     });
-    const readyCampaigns = window.SylviaReadyCampaigns?.create({
+    readyCampaigns = window.SylviaReadyCampaigns?.create({
       document, storage: window.localStorage, uuid: () => crypto.randomUUID(),
       catalog: () => state.bridge.ready_campaign_catalog(),
       start: command => state.bridge.start_ready_campaign(command),
@@ -1720,11 +1685,7 @@ const SylviaGMFrontend = (() => {
       $(id).addEventListener('input', refreshSequelConfirmation);
     }
     $('home-settings-btn').addEventListener('click', () => openSettings());
-    $('tutorial-skip-btn').addEventListener('click', () => closeHomeTutorial('skipped'));
-    $('tutorial-next-btn').addEventListener('click', advanceHomeTutorial);
-    $('replay-home-tutorial-btn').addEventListener('click', replayHomeTutorial);
-    window.addEventListener('resize', positionHomeTutorial);
-    document.addEventListener('keydown', handleHomeTutorialKeydown);
+    initTutorials();
     $('new-builder-chat-btn').addEventListener('click', () => { void startBuilderChat(); });
     $('open-campaign-setup-btn').addEventListener('click', () => {
       void showConstructionPanel();
@@ -1944,6 +1905,7 @@ const SylviaGMFrontend = (() => {
     });
     if (chatgptPageVisible) void updateChatGPTConnection('status');
     state.desktopUpdater?.setVisible(tab === 'about');
+    tutorials?.refresh();
     if (tab === 'dictation' && !dictationModelJob) {
       void refreshDictationOptions(state.bridge).catch(() => {
         // The browser never offers recording; only the desktop app can lack its speech runtime.
@@ -3877,199 +3839,50 @@ const SylviaGMFrontend = (() => {
     badge.hidden = false;
   }
 
-  function readHomeTutorialProgress() {
-    try {
-      const saved = JSON.parse(localStorage.getItem(HOME_TUTORIAL_KEY) || 'null');
-      if (!saved || !['in_progress', 'completed', 'skipped'].includes(saved.status)) return null;
-      return {
-        status: saved.status,
-        step: Number.isInteger(saved.step) ? saved.step : 0,
-      };
-    } catch (e) {
-      return null;
-    }
-  }
-
-  // Tutorial progress is a local UI preference, never campaign or session truth.
-  function writeHomeTutorialProgress(status, step) {
-    try {
-      localStorage.setItem(HOME_TUTORIAL_KEY, JSON.stringify({ status, step }));
-    } catch (e) { /* best-effort local preference */ }
-  }
-
-  function maybeStartHomeTutorial() {
-    if (state.view !== 'home' || state.homeTutorialOpen || state.homeTutorialQueued) return;
-    const progress = readHomeTutorialProgress();
-    if (progress && ['completed', 'skipped'].includes(progress.status)) return;
-    state.homeTutorialQueued = true;
-    requestAnimationFrame(() => {
-      state.homeTutorialQueued = false;
-      if (state.view !== 'home' || state.homeTutorialOpen) return;
-      startHomeTutorial(progress ? progress.step : 0);
+  // Tutorials observe safe projections and navigate existing pages; they own no application commands.
+  function initTutorials() {
+    if (tutorials || !window.SylviaTutorials) return;
+    tutorials = window.SylviaTutorials.create({
+      document,
+      context: () => {
+        const campaign = state.view === 'session' && state.activeSessionRole === 'dm';
+        const ruleset = state.panelProjection?.ruleset_id || selectedIndexEntry()?.ruleset_id;
+        return {
+          view: state.view, loaded: state.campaignIndexStatus === 'ready',
+          hasContent: Boolean(state.campaigns.length || state.builderChats.length),
+          sessionId: state.activeSessionId,
+          campaign,
+          combatGuide: campaign && window.SylviaTutorials.supportsCombat(ruleset),
+          interview: state.view === 'session' && Boolean(state.activeCampaignId) &&
+            state.activeCampaignId === state.constructionDraftId && state.activeSessionRole === 'builder',
+          builder: state.view === 'session' && state.activeSessionRole === 'builder' && !state.activeCampaignId,
+          modelReady: Boolean(defaultModelChoice()),
+          hasModels: state.modelChoices.length > 0,
+          signedIn: chatgptAccountStatus.signed_in === true,
+          subscriptionModel: state.modelChoices.some(choice =>
+            state.providerSettings?.configured?.some(provider =>
+              provider.provider_id === choice.provider_id && provider.preset_id === 'chatgpt_subscription')),
+          modelEditorReady: state.modelEditor.step === 'model',
+          interviewStep: state.activeCampaignId && state.activeCampaignId === state.constructionDraftId ? currentConstructionStepId() : null,
+          apiRoute: state.modelEditor.route !== 'local', localRoute: state.modelEditor.route === 'local',
+        };
+      },
+      navigate: async route => {
+        if ($('ready-campaign-dialog').open) $('ready-campaign-dialog').close();
+        if (route === 'home') { closeSettings(); showHome(); }
+        else if (route === 'session') closeSettings();
+        else if (route === 'interview') {
+          closeSettings();
+          if (!state.activeCampaignId || state.activeCampaignId !== state.constructionDraftId ||
+              state.activeSessionRole !== 'builder') showHome();
+        } else if (route === 'ready') { closeSettings(); await readyCampaigns?.open(); }
+        else if (route === 'api' || route === 'local') {
+          openSettings('models');
+          // Retain an already-open editor and anything the player has entered.
+          if ($('provider-editor').hidden || state.modelEditor.route !== route) beginModelConnection(route);
+        } else openSettings(route);
+      },
     });
-  }
-
-  function startHomeTutorial(step = 0, restart = false) {
-    const progress = restart ? null : readHomeTutorialProgress();
-    if (!restart && progress && ['completed', 'skipped'].includes(progress.status)) return;
-    state.homeTutorialStep = Math.max(0, Math.min(
-      Number.isInteger(step) ? step : 0,
-      HOME_TUTORIAL_STEPS.length - 1
-    ));
-    state.homeTutorialOpen = true;
-    tutorialReturnFocus = $('home-btn');
-    writeHomeTutorialProgress('in_progress', state.homeTutorialStep);
-    $('home-tutorial').hidden = false;
-    $('home-tutorial').setAttribute('aria-hidden', 'false');
-    renderHomeTutorialStep();
-  }
-
-  function renderHomeTutorialStep() {
-    if (!state.homeTutorialOpen) return;
-    const step = HOME_TUTORIAL_STEPS[state.homeTutorialStep];
-    const target = step.targetId ? $(step.targetId) : null;
-    $('tutorial-step').textContent =
-      `${state.homeTutorialStep + 1} / ${HOME_TUTORIAL_STEPS.length}`;
-    $('tutorial-title').textContent = step.title;
-    $('tutorial-copy').textContent = step.copy;
-    $('tutorial-next-btn').textContent =
-      state.homeTutorialStep === HOME_TUTORIAL_STEPS.length - 1 ? 'Done' : 'Next';
-    $('home-tutorial').dataset.mode = target ? 'target' : 'intro';
-    $('tutorial-spotlight').hidden = !target;
-    $('tutorial-sylvia').src = TUTORIAL_SPRITES[step.sprite || 'up'];
-    requestAnimationFrame(() => {
-      positionHomeTutorial();
-      $('tutorial-next-btn').focus();
-    });
-  }
-
-  function positionHomeTutorial() {
-    if (!state.homeTutorialOpen) return;
-    const step = HOME_TUTORIAL_STEPS[state.homeTutorialStep];
-    const target = step.targetId ? $(step.targetId) : null;
-    const guide = $('tutorial-guide');
-    const sprite = $('tutorial-sylvia');
-    const margin = 14;
-    const gap = 18;
-
-    if (!target) {
-      guide.dataset.placement = 'center';
-      sprite.src = TUTORIAL_SPRITES.wave;
-      const guideRect = guide.getBoundingClientRect();
-      guide.style.left = `${Math.max(margin, (window.innerWidth - guideRect.width) / 2)}px`;
-      guide.style.top = `${Math.max(margin, (window.innerHeight - guideRect.height) / 2)}px`;
-      return;
-    }
-
-    const targetRect = target.getBoundingClientRect();
-    const spotlightPadding = 7;
-    const spotlight = $('tutorial-spotlight');
-    spotlight.style.left = `${targetRect.left - spotlightPadding}px`;
-    spotlight.style.top = `${targetRect.top - spotlightPadding}px`;
-    spotlight.style.width = `${targetRect.width + spotlightPadding * 2}px`;
-    spotlight.style.height = `${targetRect.height + spotlightPadding * 2}px`;
-
-    let guideRect = guide.getBoundingClientRect();
-    const sideGuideWidth = Math.min(420, window.innerWidth - margin * 2);
-    const roomLeft = targetRect.left - margin;
-    const roomRight = window.innerWidth - targetRect.right - margin;
-    const roomAbove = targetRect.top - margin;
-    const roomBelow = window.innerHeight - targetRect.bottom - margin;
-    const roomByPlacement = {
-      left: roomLeft,
-      right: roomRight,
-      above: roomAbove,
-      below: roomBelow,
-    };
-    const requiredRoom = {
-      left: sideGuideWidth + gap,
-      right: sideGuideWidth + gap,
-      above: guideRect.height + gap,
-      below: guideRect.height + gap,
-    };
-    const preferredPlacements = step.preferredPlacements || [
-      'left', 'right', 'below', 'above'
-    ];
-    const placement = preferredPlacements.find(
-      (candidate) => roomByPlacement[candidate] >= requiredRoom[candidate]
-    ) || preferredPlacements.reduce((roomiest, candidate) => (
-      roomByPlacement[candidate] > roomByPlacement[roomiest] ? candidate : roomiest
-    ));
-
-    guide.dataset.placement = placement;
-    guideRect = guide.getBoundingClientRect();
-    const spriteForPlacement = {
-      left: 'right',
-      right: 'left',
-      below: 'up',
-      above: 'down',
-    }[placement];
-    sprite.src = TUTORIAL_SPRITES[spriteForPlacement];
-
-    let left;
-    let top;
-    if (placement === 'left') {
-      left = targetRect.left - guideRect.width - gap;
-      top = targetRect.top + (targetRect.height - guideRect.height) / 2;
-    } else if (placement === 'right') {
-      left = targetRect.right + gap;
-      top = targetRect.top + (targetRect.height - guideRect.height) / 2;
-    } else if (placement === 'below') {
-      left = targetRect.left + (targetRect.width - guideRect.width) / 2;
-      top = targetRect.bottom + gap;
-    } else {
-      left = targetRect.left + (targetRect.width - guideRect.width) / 2;
-      top = targetRect.top - guideRect.height - gap;
-    }
-    guide.style.left = `${Math.max(margin, Math.min(left, window.innerWidth - guideRect.width - margin))}px`;
-    guide.style.top = `${Math.max(margin, Math.min(top, window.innerHeight - guideRect.height - margin))}px`;
-  }
-
-  function advanceHomeTutorial() {
-    if (!state.homeTutorialOpen) return;
-    if (state.homeTutorialStep === HOME_TUTORIAL_STEPS.length - 1) {
-      closeHomeTutorial('completed');
-      return;
-    }
-    state.homeTutorialStep += 1;
-    writeHomeTutorialProgress('in_progress', state.homeTutorialStep);
-    renderHomeTutorialStep();
-  }
-
-  function closeHomeTutorial(status) {
-    if (!state.homeTutorialOpen) return;
-    state.homeTutorialOpen = false;
-    state.homeTutorialQueued = false;
-    $('home-tutorial').hidden = true;
-    $('home-tutorial').setAttribute('aria-hidden', 'true');
-    if (status) writeHomeTutorialProgress(status, state.homeTutorialStep);
-    if (tutorialReturnFocus && typeof tutorialReturnFocus.focus === 'function') {
-      tutorialReturnFocus.focus();
-    }
-    tutorialReturnFocus = null;
-  }
-
-  function handleHomeTutorialKeydown(event) {
-    if (!state.homeTutorialOpen) return;
-    if (event.key === 'Escape') {
-      event.preventDefault();
-      closeHomeTutorial('skipped');
-      return;
-    }
-    if (event.key !== 'Tab') return;
-    const focusable = [$('tutorial-skip-btn'), $('tutorial-next-btn')];
-    const current = focusable.indexOf(document.activeElement);
-    const next = event.shiftKey
-      ? (current <= 0 ? focusable.length - 1 : current - 1)
-      : (current === focusable.length - 1 ? 0 : current + 1);
-    event.preventDefault();
-    focusable[next].focus();
-  }
-
-  function replayHomeTutorial() {
-    closeSettings();
-    showHome();
-    startHomeTutorial(0, true);
   }
 
   function showSessionView() {
@@ -4104,7 +3917,7 @@ const SylviaGMFrontend = (() => {
     renderBuilderChatRail();
     renderSidebarState();
     renderHome();
-    maybeStartHomeTutorial();
+    tutorials?.maybeWelcome();
   }
 
   function recentCampaign(campaigns) {
@@ -7225,6 +7038,7 @@ const SylviaGMFrontend = (() => {
           localStorage.setItem(panelRecoveryKey(), JSON.stringify(confirmedCommand));
           state.panelCommitPending = true;
           const receipt = await state.bridge.execute_panel_action(confirmedCommand);
+          if (receipt.status === 'committed') tutorials?.notify('action-committed', sessionId);
           if (selectedActivityMatches(activity)) clearPanelRecovery();
           if (receipt.status !== 'failed' && surface.renderer === 'inventory') state.equipmentDrafts?.clear();
           selectedStatus(activity, receipt.status === 'failed' ? 'Panel action failed' : 'Panel action completed', 'panels');
@@ -7495,6 +7309,7 @@ const SylviaGMFrontend = (() => {
     });
     context.check();
     state.actionSequence = result;
+    if (result.committed_action_ids?.length) tutorials?.notify('action-committed', context.sessionId);
     refreshQueuePresentation();
     await refreshSelectedCampaign();
     context.check();
@@ -11543,7 +11358,10 @@ const SylviaGMFrontend = (() => {
     try {
       await refreshCampaignIndex();
       if (atPreviousSelection()) await openCampaign(result.campaign_id, result.dm_session_id);
-      if (atReadySelection()) setInlineStatus('Campaign ready. The Game Master is preparing the opening.');
+      if (atReadySelection()) {
+        setInlineStatus('Campaign ready. The Game Master is preparing the opening.');
+        tutorials?.notify('ready-started', result.dm_session_id);
+      }
       if (!state.bridge.start_dm_session) return;
       activity = beginSessionActivity(ensureSessionActivity({
         sessionId: result.dm_session_id, sessionRole: 'dm', campaignId: result.campaign_id,
@@ -11911,6 +11729,7 @@ const SylviaGMFrontend = (() => {
     $('composer-steering-hint').hidden = !canSubmit || !activityIsWorking(activity) ||
       state.activeSessionRole !== 'builder';
     $('ooc-note').classList.toggle('has-note', Boolean($('ooc-input').value.trim()));
+    tutorials?.refresh();
     dictation?.sync();
     return canSubmit;
   }
@@ -12583,6 +12402,9 @@ const SylviaGMFrontend = (() => {
       const result = await submission;
       if (!currentActivity(activity)) return;
       clearAcceptedInput(activity);
+      if (!playerAction && !compact && !campaignEndingChoice && !builderQuestionAnswers) {
+        tutorials?.notify(activity.sessionRole === 'dm' ? 'player-message' : 'builder-message', sessionId);
+      }
       const stopped = activity.stopRequestedAttemptId === command.attempt_id;
       const interrupted = result && (result.interruption || result.status === 'interrupted');
       finishSessionActivity(activity, stopped ? 'stopped' : interrupted ? 'interrupted' : 'completed',

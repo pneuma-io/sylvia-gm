@@ -160,6 +160,37 @@ and redundant internal labels such as `Resolution: Rolled` are omitted. Dice ani
 enhancement, not part of this presentation correction. These D&D choices do not impose dice or
 fixed fields on other Rulesets.
 
+### 2.0 Optional onboarding and tutorials
+
+First-run onboarding offers **Help me start playing**, **Just help me connect AI**, and
+**Explore on my own**. The guided play path explains AI inference and the existing supported
+connection choices in plain language, helps connect a model when needed, opens Ready campaigns,
+and offers guidance through the first scene. An existing configured default skips connection setup.
+Each transition into another lesson remains a player choice.
+
+The complete suite covers Home orientation, AI connection, Ready campaigns, play with the GM,
+SRD Lite combat controls, campaign customization, Builder content creation, workspace arrangement,
+and campaign resume/recovery/export/archive. ChatGPT subscription, API service and local model
+server connections have independently accessible setup guides. Tutorials are available from
+Home, the session header and Settings, with relevant contextual invitations. Visiting a connection
+page never requires the welcome journey or a showcase battle.
+
+Lessons retain Sylvia's replaceable sprites and spotlight style while leaving real controls
+interactive. Sylvia speaks as the player's warm, playful guide, visibly excited to share an
+adventure. Contextual expressions use the existing four approved transparent sheets; the full
+originals are preserved and extraction retains irregular hair and each pose's own effects.
+Instructions and action labels remain clear about actual consequences.
+Each lesson supports Back, Pause, Skip, Resume and Replay. Action steps observe
+application results or actual control interactions without requiring a particular roll or model
+response; a player can explicitly skip a step. Tutorials never submit messages, authenticate,
+create campaigns, commit game actions or change resources themselves. The player uses the ordinary
+controls for those actions. Lesson progress is a local UI preference, separate from campaign truth.
+Existing completed/skipped Home tour preferences remain respected, and existing players are not
+forced through the new welcome. Storage failure must not prevent use of the app.
+
+The future attract-mode showcase and no-AI battle feature are deferred. They may reuse independent
+lessons later, but are not prerequisites for this onboarding or advertised as available here.
+
 ### 2.1 Guided New Campaign construction
 
 Choosing **NEW CAMPAIGN** immediately creates one visible, resumable Draft Campaign and opens its

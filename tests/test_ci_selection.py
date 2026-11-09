@@ -21,6 +21,20 @@ def test_readme_does_not_replay_campaigns_or_compile_owner():
     assert plan["reasons"][0]["path"] == "README.md"
 
 
+@pytest.mark.parametrize("path", [
+    "branding/sprites/tutorial-poses.png",
+    "branding/sprites/provenance.json",
+    "scripts/extract_tutorial_sprites.py",
+])
+def test_tutorial_artwork_selects_its_packaging_and_ui_consumers(path):
+    plan = choose([path])
+    assert not plan["broad_fallback"]
+    assert not plan["native"]
+    assert plan["python"]["tutorial-assets"] == ["tests/test_tutorial_assets.py"]
+    assert "tests/frontend_tutorials.browser.cjs" in plan["ui"]
+    assert "campaign-play" not in plan["python"]
+
+
 @pytest.mark.parametrize(
     "path", ["rulesets/srd-lite/ATTRIBUTION.md", "campaign-settings/severed-lands/ATTRIBUTION.md"]
 )

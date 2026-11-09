@@ -1,0 +1,455 @@
+{
+  "format": 1,
+  "method": "Original RGBA pixels, component masks, six-pixel padding",
+  "sheets": [
+    {
+      "file": "branding/sprites/tutorial-poses.png",
+      "original_filename": "ChatGPT Image Sep 10, 2026, 08_50_47 PM.png",
+      "sha256": "a00bc026b213a2b652030d75b78018a1a8091a8251d9abfff71f2fe254ea5331",
+      "size": [
+        1448,
+        1086
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "file": "branding/sprites/general-emotes.png",
+      "original_filename": "ChatGPT Image Sep 10, 2026, 08_58_57 PM.png",
+      "sha256": "549c02ff75bc6a6d1979518b3abebb847d555941541921b1f5a42d0796f630aa",
+      "size": [
+        1448,
+        1086
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "file": "branding/sprites/warm-expressions.png",
+      "original_filename": "ChatGPT Image Sep 10, 2026, 08_24_01 PM.png",
+      "sha256": "60eceaed75053a5d5ad6a0206764a4186ee88eb2c915952f0d0d56058f446b52",
+      "size": [
+        1448,
+        1086
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "file": "branding/sprites/playful-expressions.png",
+      "original_filename": "ChatGPT Image Sep 10, 2026, 08_20_18 PM.png",
+      "sha256": "45e156829b6868aa9c23152b8dc8165303d4fd6bcb2e86622ca478f95a9f9b35",
+      "size": [
+        1448,
+        1086
+      ],
+      "mode": "RGBA"
+    }
+  ],
+  "sprites": [
+    {
+      "file": "src-tauri/frontend/assets/tutorial/sylvia-speaking.png",
+      "sheet": "tutorial-poses",
+      "source_sha256": "a00bc026b213a2b652030d75b78018a1a8091a8251d9abfff71f2fe254ea5331",
+      "source_bounds": [
+        0,
+        13,
+        311,
+        372
+      ],
+      "body_region": [
+        0,
+        0,
+        310,
+        368
+      ],
+      "effect_regions": [],
+      "size": [
+        323,
+        371
+      ],
+      "sha256": "da179fa99c19fe208df5deecc0987904c35845b5c98c160211576e76fd54478a"
+    },
+    {
+      "file": "src-tauri/frontend/assets/tutorial/sylvia-point-left-full.png",
+      "sheet": "tutorial-poses",
+      "source_sha256": "a00bc026b213a2b652030d75b78018a1a8091a8251d9abfff71f2fe254ea5331",
+      "source_bounds": [
+        0,
+        360,
+        312,
+        719
+      ],
+      "body_region": [
+        0,
+        360,
+        310,
+        718
+      ],
+      "effect_regions": [],
+      "size": [
+        324,
+        371
+      ],
+      "sha256": "1b7ac9d3b2428228ed9a3feda21445383aa0a8350b3bb5544b4fe92472e0d67b"
+    },
+    {
+      "file": "src-tauri/frontend/assets/tutorial/sylvia-point-right-full.png",
+      "sheet": "tutorial-poses",
+      "source_sha256": "a00bc026b213a2b652030d75b78018a1a8091a8251d9abfff71f2fe254ea5331",
+      "source_bounds": [
+        304,
+        362,
+        621,
+        718
+      ],
+      "body_region": [
+        300,
+        360,
+        624,
+        718
+      ],
+      "effect_regions": [],
+      "size": [
+        329,
+        368
+      ],
+      "sha256": "042f558eddd0f632f86add6b1d57bb7788cbac23ab9bff47a47047ba53212e8b"
+    },
+    {
+      "file": "src-tauri/frontend/assets/tutorial/sylvia-welcome.png",
+      "sheet": "tutorial-poses",
+      "source_sha256": "a00bc026b213a2b652030d75b78018a1a8091a8251d9abfff71f2fe254ea5331",
+      "source_bounds": [
+        18,
+        708,
+        336,
+        1069
+      ],
+      "body_region": [
+        0,
+        705,
+        330,
+        1086
+      ],
+      "effect_regions": [
+        [
+          45,
+          720,
+          125,
+          812
+        ]
+      ],
+      "size": [
+        330,
+        373
+      ],
+      "sha256": "ec6d2eddbd03d7c3f10f37bf3783c5fbff6f9308275735ec53c15a7c79b5cc92"
+    },
+    {
+      "file": "src-tauri/frontend/assets/tutorial/sylvia-thumbs-up.png",
+      "sheet": "tutorial-poses",
+      "source_sha256": "a00bc026b213a2b652030d75b78018a1a8091a8251d9abfff71f2fe254ea5331",
+      "source_bounds": [
+        324,
+        709,
+        632,
+        1070
+      ],
+      "body_region": [
+        320,
+        708,
+        635,
+        1086
+      ],
+      "effect_regions": [
+        [
+          330,
+          815,
+          385,
+          883
+        ]
+      ],
+      "size": [
+        320,
+        373
+      ],
+      "sha256": "807ff3c62a3d1fe0199b2a36dcc943d6f61b04675d460ddcc2b8b850d579b3e8"
+    },
+    {
+      "file": "src-tauri/frontend/assets/tutorial/sylvia-listening.png",
+      "sheet": "tutorial-poses",
+      "source_sha256": "a00bc026b213a2b652030d75b78018a1a8091a8251d9abfff71f2fe254ea5331",
+      "source_bounds": [
+        931,
+        713,
+        1197,
+        1070
+      ],
+      "body_region": [
+        925,
+        710,
+        1199,
+        1086
+      ],
+      "effect_regions": [
+        [
+          935,
+          716,
+          1000,
+          783
+        ]
+      ],
+      "size": [
+        278,
+        369
+      ],
+      "sha256": "bab8c46c93b9b380d3c57e24e9b85633002cecf6a7896e360746a384f6aec80e"
+    },
+    {
+      "file": "src-tauri/frontend/assets/tutorial/sylvia-reading.png",
+      "sheet": "general-emotes",
+      "source_sha256": "549c02ff75bc6a6d1979518b3abebb847d555941541921b1f5a42d0796f630aa",
+      "source_bounds": [
+        335,
+        25,
+        617,
+        373
+      ],
+      "body_region": [
+        330,
+        15,
+        625,
+        385
+      ],
+      "effect_regions": [],
+      "size": [
+        294,
+        360
+      ],
+      "sha256": "09b440b2c751dbdc05dc1805e274f0b3253e6af7d0ef42a481e07e147c4f89de"
+    },
+    {
+      "file": "src-tauri/frontend/assets/tutorial/sylvia-thinking.png",
+      "sheet": "general-emotes",
+      "source_sha256": "549c02ff75bc6a6d1979518b3abebb847d555941541921b1f5a42d0796f630aa",
+      "source_bounds": [
+        604,
+        380,
+        895,
+        746
+      ],
+      "body_region": [
+        602,
+        386,
+        890,
+        750
+      ],
+      "effect_regions": [
+        [
+          846,
+          440,
+          890,
+          505
+        ]
+      ],
+      "size": [
+        303,
+        378
+      ],
+      "sha256": "66b3ed81ed300fbb1ae653beb68fc992868ba5cb7c254f86d5e8e99cd957981d"
+    },
+    {
+      "file": "src-tauri/frontend/assets/tutorial/sylvia-celebrating.png",
+      "sheet": "general-emotes",
+      "source_sha256": "549c02ff75bc6a6d1979518b3abebb847d555941541921b1f5a42d0796f630aa",
+      "source_bounds": [
+        851,
+        737,
+        1150,
+        1072
+      ],
+      "body_region": [
+        840,
+        735,
+        1150,
+        1086
+      ],
+      "effect_regions": [
+        [
+          840,
+          740,
+          935,
+          855
+        ],
+        [
+          1100,
+          750,
+          1148,
+          825
+        ]
+      ],
+      "size": [
+        311,
+        347
+      ],
+      "sha256": "603ff3a7cdf82dec2aca38627aa3ed131f2230773c359425ff57651a7aeeb2a7"
+    },
+    {
+      "file": "src-tauri/frontend/assets/tutorial/sylvia-reassuring.png",
+      "sheet": "warm-expressions",
+      "source_sha256": "60eceaed75053a5d5ad6a0206764a4186ee88eb2c915952f0d0d56058f446b52",
+      "source_bounds": [
+        622,
+        367,
+        889,
+        719
+      ],
+      "body_region": [
+        620,
+        366,
+        887,
+        723
+      ],
+      "effect_regions": [],
+      "size": [
+        279,
+        364
+      ],
+      "sha256": "633e2a2ce4cbefc8ce7897722936e01109c4c244dc4321c019147fda9a920b11"
+    },
+    {
+      "file": "src-tauri/frontend/assets/tutorial/sylvia-sparkle.png",
+      "sheet": "warm-expressions",
+      "source_sha256": "60eceaed75053a5d5ad6a0206764a4186ee88eb2c915952f0d0d56058f446b52",
+      "source_bounds": [
+        868,
+        14,
+        1164,
+        378
+      ],
+      "body_region": [
+        875,
+        10,
+        1168,
+        378
+      ],
+      "effect_regions": [
+        [
+          875,
+          120,
+          929,
+          195
+        ]
+      ],
+      "size": [
+        308,
+        376
+      ],
+      "sha256": "288182231615425ba9dfdc9f1a3ed566585f7829d64e95daf00af419373c45c0"
+    },
+    {
+      "file": "src-tauri/frontend/assets/tutorial/sylvia-warm-smile.png",
+      "sheet": "warm-expressions",
+      "source_sha256": "60eceaed75053a5d5ad6a0206764a4186ee88eb2c915952f0d0d56058f446b52",
+      "source_bounds": [
+        895,
+        705,
+        1156,
+        1070
+      ],
+      "body_region": [
+        890,
+        710,
+        1160,
+        1086
+      ],
+      "effect_regions": [
+        [
+          920,
+          716,
+          985,
+          780
+        ]
+      ],
+      "size": [
+        273,
+        377
+      ],
+      "sha256": "13cfd3a52c2d501912ac089c07439594dd5f949340aa5af487411e1e6976b273"
+    },
+    {
+      "file": "src-tauri/frontend/assets/tutorial/sylvia-presenting.png",
+      "sheet": "playful-expressions",
+      "source_sha256": "45e156829b6868aa9c23152b8dc8165303d4fd6bcb2e86622ca478f95a9f9b35",
+      "source_bounds": [
+        613,
+        368,
+        923,
+        740
+      ],
+      "body_region": [
+        605,
+        370,
+        918,
+        738
+      ],
+      "effect_regions": [],
+      "size": [
+        322,
+        384
+      ],
+      "sha256": "3d2dc7bdd2c728deb06fe4674686151c8c6454968a82cf6809307dfe909b06aa"
+    },
+    {
+      "file": "src-tauri/frontend/assets/tutorial/sylvia-shush.png",
+      "sheet": "playful-expressions",
+      "source_sha256": "45e156829b6868aa9c23152b8dc8165303d4fd6bcb2e86622ca478f95a9f9b35",
+      "source_bounds": [
+        11,
+        11,
+        340,
+        374
+      ],
+      "body_region": [
+        0,
+        0,
+        342,
+        375
+      ],
+      "effect_regions": [
+        [
+          8,
+          95,
+          68,
+          163
+        ]
+      ],
+      "size": [
+        341,
+        375
+      ],
+      "sha256": "92b844e5e4394aa734c8df1a8027b9dfdb2926cc35a06f48b5d04587d81f5049"
+    },
+    {
+      "file": "src-tauri/frontend/assets/tutorial/sylvia-confident.png",
+      "sheet": "playful-expressions",
+      "source_sha256": "45e156829b6868aa9c23152b8dc8165303d4fd6bcb2e86622ca478f95a9f9b35",
+      "source_bounds": [
+        0,
+        730,
+        292,
+        1086
+      ],
+      "body_region": [
+        0,
+        730,
+        304,
+        1086
+      ],
+      "effect_regions": [],
+      "size": [
+        304,
+        368
+      ],
+      "sha256": "be29764ef6e272be08797b372fe47195ce212145f0d6829936205c2348578ba4"
+    }
+  ]
+}
