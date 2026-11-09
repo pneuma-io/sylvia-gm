@@ -1867,22 +1867,17 @@ class TestUI001Frame:
             "replay-home-tutorial-btn",
         ):
             assert f'id="{control_id}"' in html
-        assert "const HOME_TUTORIAL_KEY = 'sylvia-gm-home-tutorial-v1';" in js
-        assert "targetId: 'home-new-campaign-btn'" in js
-        assert "targetId: 'home-build-btn'" in js
-        assert "targetId: 'home-settings-btn'" in js
-        assert "preferredPlacements: ['right', 'below', 'left', 'above']" in js
-        assert "preferredPlacements: ['left', 'below', 'right', 'above']" in js
-        assert "preferredPlacements: ['below', 'left', 'right', 'above']" in js
-        assert "roomByPlacement[candidate] >= requiredRoom[candidate]" in js
-        assert "const sideGuideWidth = Math.min(420" in js
+        tutorials = _renderer_runtime_text(FRONTEND_DIR / "tutorials.js")
+        assert "sylvia-gm-home-tutorial-v1" in tutorials
+        for target in ("home-ready-campaign-btn", "home-new-campaign-btn",
+                       "home-build-btn", "home-settings-btn"):
+            assert target in tutorials
+        assert 'src="tutorials.js"' in html
+        assert 'href="tutorials.css"' in html
         assert '.tutorial-guide[data-placement="right"]' in css
         assert '.tutorial-guide[data-placement="above"]' in css
         assert '.tutorial-guide[data-placement="below"]' in css
-        assert "all the goodies you currently have installed" in js
-        assert "maybeStartHomeTutorial();" in js
-        assert "closeHomeTutorial('skipped')" in js
-        assert "closeHomeTutorial('completed')" in js
+        assert "tutorials?.maybeWelcome();" in js
         assert "box-shadow: 0 0 0 9999px" in css
         assert "@media (prefers-reduced-motion: reduce)" in css
 

@@ -13,7 +13,7 @@ async function openShell(browser) {
   page.on('pageerror', error => errors.push(error.message));
   await page.route('https://sylvia-settings.test/**', async route => {
     const name = new URL(route.request().url()).pathname.slice(1) || 'app.html';
-    if (!['app.html', 'app.css', 'app.js', 'panel-workspace.js', 'shot-playback.js',
+    if (!['app.html', 'app.css', 'app.js', 'tutorials.js', 'tutorials.css', 'panel-workspace.js', 'shot-playback.js',
       'panel-host.js', 'assets/sylvia-portrait.png'].includes(name)) return route.abort();
     let body = fs.readFileSync(path.join(frontend, name));
     if (name === 'app.js') body = body.toString().replace(

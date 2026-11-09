@@ -219,6 +219,7 @@ UI_JOURNEY = [
     "tests/frontend_party_panel_actions.test.cjs",
     "tests/frontend_result_migration.browser.cjs",
     "tests/frontend_shell.browser.cjs",
+    "tests/frontend_tutorials.browser.cjs",
     "tests/frontend_saved_equipment.browser.cjs",
 ]
 
