@@ -46,7 +46,10 @@ A temporary, unpushed qualification composition preserves both PR branches. Nati
 found the retained TD layout could clip the battlefield behind its wrapped command deck;
 the map content now keeps a usable minimum height. The shipped-shell regression reproduces
 the collapse without the repair and passes on initial render and redraw with it. Native
-replay of that layout repair and the combined Reload journey remain required. The TD acceptance includes
+replay passed for that layout repair and the combined Reload sequence, AP stop and stale
+revision recovery. A later map edit also exposed a warning that demanded review of an
+already completed queue; warnings now depend on unfinished steps. Stale pending actions,
+uncertain execution and current receipt markers retain their distinct indications. The TD acceptance includes
 the single Reload control's magazine-change/cycle order, AP exhaustion, refusal/stale-state
 recovery, and committed animation occurring once without replay on reopen. Qualification must
 name the exact frontend composition; PR6-only native evidence cannot close that combined check.

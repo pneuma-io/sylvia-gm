@@ -5739,6 +5739,7 @@ const SylviaGMFrontend = (() => {
         queue.session_id !== state.activeSessionId) return empty;
     if (busy) return { ...empty, notice: 'Updating intentions; waiting for the owner.' };
     const current = queue.expected_revision === revision;
+    const unfinished = (queue.steps || []).some(step => step.status !== 'committed');
     const ready = current && queue.status === 'ready';
     const entities = surface.data.entities || [];
     const entity = id => id != null && entities.find(item => item.id === id || item.actor_ref === id || item.participant_ref === id);
@@ -5789,7 +5790,7 @@ const SylviaGMFrontend = (() => {
       rows.push(label + (step.warning ? ' · Needs review' : ''));
       if (moving) positions.set(actor.id, endpoint);
     }
-    return { svg: drawings.join(''), rows, notice: !current ? 'Queue is out of date; review remaining intentions.' :
+    return { svg: drawings.join(''), rows, notice: !current && unfinished ? 'Queue is out of date; review remaining intentions.' :
       queue.status === 'running' ? 'Action outcome is not yet confirmed; waiting for the owner receipt.' :
       !['ready', 'completed'].includes(queue.status) && !resolvedChoicePause(queue)
         ? 'Queue stopped; inspect its saved decision before continuing.' : '' };
