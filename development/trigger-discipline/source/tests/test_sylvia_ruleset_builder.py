@@ -6,6 +6,7 @@ import re
 import subprocess
 import tempfile
 import unittest
+from collections import Counter
 from pathlib import Path
 
 from balance_suite.parameters import default_manifest
@@ -236,7 +237,10 @@ class SylviaRulesetBuilderTests(unittest.TestCase):
         self.assertNotIn("meta", self.runtime)
         tools = {item["name"]: item for item in self.manifest["tools"]}
         self.assertEqual(47, len(tools))
-        self.assertEqual(set(tools), set(self.runtime["tools"]))
+        self.assertLessEqual(set(tools), set(self.runtime["tools"]))
+        private_tools = set(self.runtime["tools"]) - set(tools)
+        self.assertTrue(private_tools)
+        self.assertTrue(all(name.startswith("td_") for name in private_tools))
         self.assertEqual(HOST_COMPATIBILITY, self.manifest["compatibility"])
         self.assertEqual(HOST_COMPATIBILITY, self.setting_manifest["compatibility"])
         for tool in tools.values():
@@ -311,19 +315,40 @@ class SylviaRulesetBuilderTests(unittest.TestCase):
         )
 
     def test_runtime_guards_actor_side_and_uses_only_host_spatial_queries(self) -> None:
+        def descendants(value):
+            if isinstance(value, dict):
+                yield value
+                for child in value.values():
+                    yield from descendants(child)
+            elif isinstance(value, list):
+                for child in value:
+                    yield from descendants(child)
+
         runtime_tools = self.runtime["tools"]
+        advertised = {item["name"] for item in self.manifest["tools"]}
         for name, tool in runtime_tools.items():
+            if name not in advertised:
+                continue
             self.assertTrue(tool["metadata"]["source_provenance"])
-            if name not in {"end_allies_turn", "end_hostiles_turn"}:
+            if (tool["metadata"].get("costs_action")
+                    and name not in {"end_allies_turn", "end_hostiles_turn"}):
                 hidden = next(
                     item for item in tool["parameters"] if item["name"] == "active_side"
                 )
                 self.assertEqual("state.active_side", hidden["from_state"])
-                effects = iter(tool["effects"])
-                first = next(effects)
-                while "set" in first and first["set"]["field"].startswith("_card_"):
-                    first = next(effects)
-                self.assertIn(".side == active_side", first["condition"])
+                effects = list(descendants(tool["effects"]))
+                guards = [effect for effect in effects
+                          if "on_true" in effect and
+                          ".side == active_side" in effect.get("condition", "")]
+                requirements = [effect["require"] for effect in effects
+                                if ".side == active_side" in
+                                effect.get("require", {}).get("condition", "")]
+                self.assertGreaterEqual(len(guards) + len(requirements), 1, name)
+                if guards:
+                    self.assertTrue(guards[0]["on_true"], name)
+                    self.assertIn("INACTIVE_SIDE", json.dumps(guards[0]["on_false"]))
+                else:
+                    self.assertTrue(requirements[0]["error"], name)
         encoded_fire = json.dumps(runtime_tools["fire_single"], sort_keys=True)
         self.assertIn('"operation": "ray"', encoded_fire)
         self.assertIn('"operation": "exposure"', encoded_fire)
@@ -367,7 +392,9 @@ class SylviaRulesetBuilderTests(unittest.TestCase):
         )
         self.assertIn("actor.skills.drone_operations + actor.aptitudes.precision", encoded_fpv)
         self.assertIn('"operation": "snapshot"', encoded_fpv)
-        self.assertIn('"operation": "area"', encoded_fpv)
+        self.assertIn('"operation": "ray"', encoded_fpv)
+        self.assertIn('"snapshot": "{_fpv_blast_snapshot}"', encoded_fpv)
+        self.assertIn('"origin": "{_actual_detonation}"', encoded_fpv)
         self.assertIn('"spatial_mutation"', encoded_fpv)
         self.assertIn('"id": "{_drone_id}", "kind": "entity"', encoded_fpv)
         self.assertIn("definitions.parameters.equipment.frag_grenade.damage", encoded_fpv)
@@ -387,14 +414,15 @@ class SylviaRulesetBuilderTests(unittest.TestCase):
         )
         self.assertIn('"spatial_mutation"', encoded_door)
         self.assertIn(
-            '"target": {"id": "security-door", "kind": "geometry"}',
+            '"target": {"id": "{_function.geometry_id}", "kind": "geometry"}',
             encoded_door,
         )
         self.assertIn(
-            '"expected_revision": "{_door_snapshot.geometry_revision}"',
+            '"expected_revision": "{_device_snapshot.geometry_revision}"',
             encoded_door,
         )
-        self.assertIn('"state": "open"', encoded_door)
+        self.assertIn('"movement": "{_function.patch.movement}"', encoded_door)
+        self.assertNotIn('"security-door"', encoded_door)
 
     def test_character_schema_requires_closed_runtime_stats(self) -> None:
         schema = self.manifest["participant_artifacts"][0]["schema"]
@@ -657,15 +685,14 @@ class SylviaRulesetBuilderTests(unittest.TestCase):
             self.assertIn("material_resistance", encoded)
             self.assertIn("spatial_mutation", encoded)
 
-    def test_conformance_objective_requires_both_tactical_and_network_state(self) -> None:
+    def test_conformance_objectives_do_not_leak_into_generic_actions(self) -> None:
         firing = json.dumps(self.runtime["tools"]["fire_single"], sort_keys=True)
         operating = json.dumps(
             self.runtime["tools"]["operate_remote_function"], sort_keys=True
         )
-        self.assertIn("state.mission.hostile_neutralized", firing)
-        self.assertIn("security_door_open == true", firing)
-        self.assertIn("hostile_alpha.downed == true", operating)
-        self.assertIn("state.mission.status", operating)
+        for encoded in (firing, operating):
+            self.assertNotIn("state.mission", encoded)
+            self.assertNotIn("hostile_alpha", encoded)
 
         scenario = json.loads(
             (self.draft / "files" / "conformance" / "scenario.json").read_text()
@@ -676,6 +703,12 @@ class SylviaRulesetBuilderTests(unittest.TestCase):
             {"neutralize-hostile-alpha", "open-security-door"},
             {item["id"] for item in state["objectives"]},
         )
+        coverage = json.loads(
+            (self.draft / "files" / "conformance" / "coverage.json").read_text()
+        )
+        mixed = next(item for item in coverage["mechanics"] if item["id"] == "mixed-objective")
+        self.assertEqual("validation_only", mixed["status"])
+        self.assertIn("authored Plan and GM own it", mixed["conformance"])
 
     def test_each_fire_mode_replaces_stale_attack_telemetry(self) -> None:
         single = json.dumps(self.runtime["tools"]["fire_single"]["effects"])
@@ -856,70 +889,29 @@ class SylviaRulesetBuilderTests(unittest.TestCase):
         self.assertIn('{_actor_id}.ap', hacking)
         self.assertIn('{_attacker_id}.ap', firing)
         self.assertNotIn("network_ap_pool", hacking)
-        self.assertEqual(
-            "state.network.nodes.lobby_terminal.control",
-            next(
-                item
-                for item in self.runtime["tools"]["intrude_network"]["parameters"]
-                if item["name"] == "lobby_control"
-            )["from_state"],
-        )
-        self.assertIn("_prerequisites_valid == true", hacking)
+        self.assertIn("_intrusion_allowed == true", hacking)
         self.assertIn(
             "'specialty.networker.entry.map_the_links' in actor.specialties",
             hacking,
         )
-        self.assertIn(
-            "'specialty.networker.tier_1.pivot' in actor.specialties",
-            hacking,
-        )
-        self.assertIn(
-            "definitions.parameters.specialty.networker.pivot.ap_discount",
-            hacking,
-        )
-        self.assertIn(
-            "'specialty.networker.tier_2.foothold' in actor.specialties",
-            hacking,
-        )
-        self.assertIn(
-            "definitions.parameters.specialty.networker.foothold.ap_discount",
-            hacking,
-        )
-        self.assertIn(
-            "action == 'FOOTHOLD' and node_id != 'lobby_terminal' and _node_control == 'compromised'",
-            hacking,
-        )
+        self.assertIn('"amount": "_rule.ap"', hacking)
+        self.assertIn("ni[node_id].actions[action]", hacking)
+        self.assertIn("ni[node_id].actions.FOOTHOLD.persistence.generation", hacking)
+        self.assertIn("ns[_actor_id].nodes[node_id].privilege", hacking)
+        self.assertNotIn("lobby_terminal", hacking)
         hidden = {
             item["name"]: item["from_state"]
             for item in self.runtime["tools"]["intrude_network"]["parameters"]
             if "from_state" in item
         }
         self.assertEqual(
-            "state.network_access.security_controller.privilege",
-            hidden["security_privilege"],
+            "state.network_sessions", hidden["ns"],
         )
         self.assertEqual(
-            "state.network_access.security_controller.foothold",
-            hidden["security_foothold"],
+            "state.network_footholds", hidden["nh"],
         )
 
     def test_network_actions_replace_stale_result_telemetry(self) -> None:
-        encoded = json.dumps(self.runtime["tools"]["intrude_network"]["effects"])
-        self.assertIn('"field": "state.last_network", "value": {}', encoded)
-
-        operate = json.dumps(
-            self.runtime["tools"]["operate_remote_function"]["effects"]
-        )
-        self.assertIn('"field": "state.last_network", "value": {}', operate)
-        self.assertIn('"field": "state.last_network.action", "value": "\'OPERATE\'"', operate)
-        self.assertIn('"field": "state.last_network.node", "value": "node_id"', operate)
-        self.assertIn(
-            '"field": "state.last_network.remote_function", "value": "remote_function"',
-            operate,
-        )
-        self.assertIn('"field": "state.last_network.success", "value": "false"', operate)
-        self.assertIn('"field": "state.last_network.success", "value": "true"', operate)
-
         def walk(effects: list[dict[str, object]]) -> list[dict[str, object]]:
             found: list[dict[str, object]] = []
             for effect in effects:
@@ -930,15 +922,31 @@ class SylviaRulesetBuilderTests(unittest.TestCase):
                         found.extend(walk(nested))
             return found
 
-        revision_effects = [
-            effect
-            for effect in walk(self.runtime["tools"]["intrude_network"]["effects"])
-            if "increment" in effect
-            and isinstance(effect["increment"], dict)
-            and effect["increment"].get("field") == "state.network.revision"
-        ]
-        self.assertEqual(1, len(revision_effects))
-        self.assertEqual("_intrusion_total >= _network_difficulty", revision_effects[0]["condition"])
+        for name, action, rejected in (
+            ("intrude_network", "action", "'MISSING_ROUTE_OR_AP'"),
+            ("operate_remote_function", "'OPERATE'", "'OPERATE_REJECTED'"),
+        ):
+            effects = walk(self.runtime["tools"][name]["effects"])
+            replacements = [effect["set"]["value"] for effect in effects
+                            if effect.get("set", {}).get("field") == "state.last_network"]
+            self.assertEqual(1, len(replacements), name)
+            result = replacements[0]
+            self.assertEqual(action, result["action"])
+            self.assertEqual("node_id", result["node"])
+            self.assertIs(False, result["success"])
+            self.assertEqual(rejected, result["status"])
+            if name == "operate_remote_function":
+                self.assertEqual("remote_function", result["remote_function"])
+            self.assertIn(
+                {"set": {"field": "state.last_network.success", "value": True}},
+                effects,
+            )
+        intrusion = walk(self.runtime["tools"]["intrude_network"]["effects"])
+        success = next(effect for effect in intrusion
+                       if effect.get("condition") == "_access_succeeded == true")
+        revision = {"increment": {"field": "state.network.revision", "amount": 1}}
+        self.assertIn(revision, success["on_true"])
+        self.assertEqual(1, intrusion.count(revision))
 
     def test_source_commit_must_exist_and_match_canonical_sources(self) -> None:
         with self.assertRaises((RuntimeError, ValueError)):
@@ -1015,10 +1023,8 @@ class SylviaRulesetBuilderTests(unittest.TestCase):
         self.assertEqual(364, coverage["specialty_summary"]["nodes"])
         self.assertEqual(364, len(coverage["specialty_nodes"]))
         self.assertEqual(
-            360,
-            coverage["specialty_summary"]["package_status_counts"][
-                "test_subject_implemented"
-            ],
+            dict(Counter(item["package_status"] for item in coverage["specialty_nodes"])),
+            coverage["specialty_summary"]["package_status_counts"],
         )
         self.assertNotIn(
             "gm_judgment",
@@ -1068,7 +1074,7 @@ class SylviaRulesetBuilderTests(unittest.TestCase):
             for item in coverage["findings"]
             if item["code"] == "SYLVIA_RAY_GRID_INTERSECTION_NONTERMINATION"
         )
-        self.assertEqual("open_host_follow_up", host_gap["status"])
+        self.assertEqual("historical_resolved_in_host_v2", host_gap["status"])
         self.assertIn("one micrometre", host_gap["package_mitigation"])
         foothold = next(
             item
@@ -1188,7 +1194,9 @@ class SylviaRulesetBuilderTests(unittest.TestCase):
         }
         for node in state["network"]["nodes"].values():
             self.assertLessEqual(set(node), public_node_fields)
-        self.assertEqual(0, state["network_access"]["lobby_terminal"]["privilege"])
+        self.assertEqual({}, state["network_sessions"])
+        self.assertEqual({}, state["network_footholds"])
+        self.assertNotIn("network_access", state)
 
     def test_content_declaration_excludes_only_formal_specialty_gaps(self) -> None:
         declarations = json.loads(
