@@ -64,9 +64,9 @@ test('Reload queues the planned declared steps once and keeps the granular actio
     assert.equal(await page.locator('svg.weapon-rig[data-rig="bolt"] [data-rig-chamber="spent"]').count(), 1);
     await page.waitForFunction(() => !document.querySelector('[data-weapon-reload="vesper"]')?.disabled);
     await reload.click();
-    await page.waitForFunction(() => window.composed.length >= 2);
+    await page.waitForFunction(() => window.composed.length >= 1);
     const composed = await page.evaluate(() => window.composed);
-    assert.deepEqual(composed.at(-1), ['reload-retain', 'cycle'], 'both planned steps are queued in order');
+    assert.deepEqual(composed, [['reload-retain', 'cycle']], 'both planned steps are queued in order in one owner composition');
     // A second press at the same revision does not queue the steps again.
     await page.waitForFunction(() => !document.querySelector('[data-weapon-reload="vesper"]')?.disabled);
     await page.locator('[data-weapon-reload="vesper"]').click();

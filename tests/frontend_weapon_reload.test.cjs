@@ -11,7 +11,7 @@ function load({ sequence = true } = {}) {
   const context = { window: {}, document: { addEventListener() {} } };
   let source = fs.readFileSync(path.join(__dirname, '../src-tauri/frontend/app.js'), 'utf8');
   source = source.replace('  // ---- Public API ----',
-    'window.weaponQA={state,renderCharacterPanel,weaponReloadPlan,weaponRigMarkup};\n  // ---- Public API ----');
+    'window.weaponQA={state,renderCharacterPanel,weaponReloadPlan,weaponRigMarkup,rigWeaponSnapshot,rigManipulations,rigPhasePlan};\n  // ---- Public API ----');
   vm.runInNewContext(source, context);
   const api = context.window.weaponQA;
   api.state.activeSessionRole = 'dm';
@@ -68,7 +68,7 @@ test('the rig draws only projected state and the Reload control heads the granul
   assert.match(spent, /<svg class="weapon-rig"[^>]*data-rig="bolt"/);
   assert.match(spent, /data-rig-chamber="spent"/);
   assert.match(spent, /aria-label="Weapon: chamber spent, 5 in magazine"/);
-  assert.match(spent, /data-weapon-reload="vesper" >Reload/);
+  assert.match(spent, /data-weapon-reload="vesper" ><span class="suite-ico"[^]*?<span>Reload<\/span>/);
   assert.match(spent, /Queues Cycle weapon/);
   assert.ok(spent.indexOf('data-weapon-reload') < spent.indexOf('data-panel-action-id="cycle"'), 'granular Cycle stays available');
 
@@ -77,7 +77,7 @@ test('the rig draws only projected state and the Reload control heads the granul
   const loaded = api.renderCharacterPanel(full);
   assert.match(loaded, /data-rig="rifle"/);
   assert.match(loaded, /data-rig-chamber="live"/);
-  assert.match(loaded, /data-weapon-reload="vesper" disabled>Reload/);
+  assert.match(loaded, /data-weapon-reload="vesper" disabled><span class="suite-ico"[^]*?<span>Reload<\/span>/);
   assert.match(loaded, /Loaded · nothing to queue/);
 });
 
@@ -90,4 +90,25 @@ test('without the owner action queue there is no Reload shortcut; the declared a
   const markup = api.renderCharacterPanel(surface);
   assert.doesNotMatch(markup, /data-weapon-reload/);
   assert.match(markup, /data-panel-action-id="cycle"/);
+});
+
+test('rig motion is derived only from two committed states of the same weapon, in the order it happens', () => {
+  const { rigWeaponSnapshot: snap, rigManipulations: diff, rigPhasePlan: plan } = load();
+  const kinds = (a, b) => Array.from(diff(snap(a), snap(b)), (step) => step.kind);
+  const spent = weapon('hostile_alpha', { magazine: { id: 'm0', rounds: 1 } });
+  const changed = weapon('hostile_alpha', { magazine: { id: 'm1', rounds: 5 }, retained_magazines: [{ id: 'm0', rounds: 1 }] });
+  const cycled = { ...changed, magazine: { id: 'm1', rounds: 4 }, chamber: 'LIVE', needs_cycle: false };
+  assert.deepEqual(kinds(spent, changed), ['reload']);
+  assert.equal(diff(snap(spent), snap(changed))[0].retained, true);
+  assert.deepEqual(kinds(changed, cycled), ['cycle']);
+  assert.deepEqual(kinds(spent, cycled), ['reload', 'cycle'], 'a batched commit plays both, reload first');
+  const live = weapon('vesper');
+  assert.deepEqual(kinds(live, { ...live, magazine: { ...live.magazine, rounds: 29 } }), ['fire']);
+  assert.deepEqual(kinds(live, live), [], 'no change, no motion');
+  assert.deepEqual(kinds(live, weapon('hostile_alpha')), [], 'a different weapon is not animated as a manipulation');
+  assert.deepEqual(Array.from(diff(null, snap(live))), [], 'first sight (open or reopen) never plays');
+  assert.deepEqual(Array.from(plan({ kind: 'cycle', ejected: 'SPENT' }, 'bolt'), (phase) => phase.label),
+    ['Lift bolt', 'Draw back · eject case', 'Push forward · feed round', 'Lock down']);
+  assert.deepEqual(Array.from(plan({ kind: 'cycle', ejected: 'SPENT' }, 'pump'), (phase) => phase.label),
+    ['Pump back · eject shell', 'Pump forward · chamber shell']);
 });

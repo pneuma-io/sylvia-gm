@@ -8,7 +8,7 @@ function setup(){const context={window:{SylviaPanelHost:{create:()=>({snapshot:(
 test('Map shows declared action choices and one commit; character detail stays separate',()=>{const {api,surface}=setup();const before=JSON.stringify(surface.data),html=api.panelMarkup(surface);
  assert.match(html,/data-tactical-action="move"/);assert.match(html,/data-tactical-action="fire"/);assert.match(html,/Commit Move/);assert.match(html,/End team turn/);
  assert.doesNotMatch(html,/data-tactical-preview-action|Center actor|Actor:|map-actor-card|HACKER|Local Hacking/);
- assert.doesNotMatch(html,/data-tactical-zone|data-tactical-device/);assert.match(html,/aria-label="Map zoom">100%/);assert.match(html,/<summary>Map tools<\/summary><span class="map-revision">/);assert.equal(JSON.stringify(surface.data),before);
+ assert.doesNotMatch(html,/data-tactical-zone|data-tactical-device/);assert.match(html,/aria-label="Map zoom">100%/);assert.match(html,/<summary>Map tools<\/summary><div class="map-detail-body"><span class="map-revision">/);assert.equal(JSON.stringify(surface.data),before);
  const declared=new Set(surface.actions.map(a=>a.id));for(const match of html.matchAll(/data-tactical-action="([^"]+)"/g))assert.ok(declared.has(match[1]));
 });
 test('Required zone and device choices appear only for the selected declared action',()=>{const {api,surface}=setup();
@@ -29,8 +29,8 @@ test('Horizontal, centred and free-standing edge geometry preserve position and 
  assert.equal(api.tacticalBoxStyle({min:[2,4,0],max:[2.04,6,1]},d),'left:64px;top:128px;width:1.2800000000000011px;height:64px');
 });
 test('Fresh game default exposes distinct primary panels and keeps saved user layouts',()=>{const {projection}=setup(),workspace=require('../src-tauri/frontend/panel-workspace.js');
- const values=new Map();const storage={getItem:key=>values.get(key)||null,setItem:(key,value)=>values.set(key,value)};const store=workspace.createStore(storage);const layout=store.select({campaignId:'layout-proof',rulesetId:'td',surfaces:projection.surfaces});assert.equal(layout.sidebar.kind,'split');assert.equal(layout.sidebar.axis,'row');
- const changed=store.change({type:'hide',panelId:'operations.party'});const restored=store.select({campaignId:'layout-proof',rulesetId:'td',surfaces:projection.surfaces});assert.deepEqual(restored.hidden,['operations.party']);
+ const values=new Map();const storage={getItem:key=>values.get(key)||null,setItem:(key,value)=>values.set(key,value)};const store=workspace.createStore(storage);const layout=store.select({campaignId:'layout-proof',rulesetId:'td',surfaces:projection.surfaces});assert.equal(layout.sidebar.kind,'split');assert.equal(layout.sidebar.axis,'column');/* Suite default: roster strip above, then the map beside the character column. */assert.deepEqual(layout.sidebar.first.panels.slice(0,1),['operations.party']);assert.equal(layout.sidebar.second.axis,'row');assert.deepEqual(layout.sidebar.second.first.panels,['operations.map']);assert.equal(layout.sidebar.second.second.panels[0],'operations.character');
+ const changed=store.change({type:'hide',panelId:'operations.party'});const restored=store.select({campaignId:'layout-proof',rulesetId:'td',surfaces:projection.surfaces});/* Key-value status starts hidden (the map bar shows it) and stays restorable. */assert.deepEqual([...restored.hidden].sort(),['operations.party','operations.status']);
 });
 
 test('Player-facing disabled reasons preserve the native reason while replacing technical actor terminology',()=>{const {api}=setup();assert.equal(api.panelPlayerReason('This actor is already in that stance.'),'This character is already in that stance.');});
