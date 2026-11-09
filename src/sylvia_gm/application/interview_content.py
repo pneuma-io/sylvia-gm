@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING
 from sylvia_gm.application.bundled_campaign_plans import bundled_plan, bundled_setting_snapshot
 from sylvia_gm.application.bundled_packages import (
     bundled_rift_archive,
+    bundled_rift_archive_for_closure,
     bundled_rift_authority,
 )
 from sylvia_gm.application.campaign_plan_sources import validate_retained_campaign_plan
@@ -92,6 +93,8 @@ def resolve_interview_content(
         candidate = next(
             (item for item in owner.package_candidates() if item.closure_sha256 == expected), None,
         )
+        if candidate is None and snapshot is None:
+            snapshot = bundled_rift_archive_for_closure(expected)
         if candidate is None and snapshot is not None:
             candidate = owner.install_package_archive(
                 io.BytesIO(snapshot),

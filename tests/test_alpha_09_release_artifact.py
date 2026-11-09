@@ -751,7 +751,7 @@ def test_alpha_09_nsis_qualification_cleans_a_rejected_partial_install(
                     display_name="Sylvia GM",
                     display_version=WINDOWS_INSTALLER_VERSION,
                     install_location=str(install_directory),
-                    uninstall_string=str(install_directory / "uninstall.exe"),
+                    uninstall_string=f'"{install_directory / "uninstall.exe"}"',
                 )
             )
         else:
@@ -832,7 +832,7 @@ def test_alpha_09_nsis_qualification_rejects_uninstaller_residue(
                 display_name="Sylvia GM",
                 display_version=WINDOWS_INSTALLER_VERSION,
                 install_location=str(install_directory),
-                uninstall_string=str(install_directory / "uninstall.exe"),
+                uninstall_string=f'"{install_directory / "uninstall.exe"}"',
             )
         )
 
@@ -1293,7 +1293,7 @@ def test_alpha_09_nsis_notice_qualification_requires_persistence_after_owner_exi
                     display_name="Sylvia GM",
                     display_version=WINDOWS_INSTALLER_VERSION,
                     install_location=str(target),
-                    uninstall_string=str(target / "uninstall.exe"),
+                    uninstall_string=f'"{target / "uninstall.exe"}"',
                 )
             )
         else:

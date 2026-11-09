@@ -7108,10 +7108,11 @@ class AuthorityOwner:
                             participant_ids={item.participant_id for item in snapshot.participants},
                         )
                         validate_player_control(scope, parameters, actor_parameter)
+                        if tool.player_controls.map_preview is not None:
+                            presentation = self._player_action_preview(
+                                tool, parameters, snapshot, source, selection,
+                            ) or {}
                         self._check_player_action(tool, parameters, snapshot, player_view=True)
-                        presentation = self._player_action_preview(
-                            tool, parameters, snapshot, source, selection,
-                        ) or {}
                         if tool.player_controls.map_preview is None:
                             presentation = self._player_action_preview(
                                 tool, parameters, snapshot, source, selection,

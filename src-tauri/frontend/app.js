@@ -4150,6 +4150,19 @@ const SylviaGMFrontend = (() => {
 
   function renderHome() {
     renderArchivedItems();
+    if (state.campaignIndexStatus !== 'ready') {
+      const failed = state.campaignIndexStatus === 'error';
+      const message = failed ? 'Campaign list could not be loaded' : 'Loading campaigns…';
+      $('home-campaign-count').textContent = message;
+      $('home-recent').innerHTML = '<div class="home-empty-copy">' + message + '</div>';
+      $('campaign-shelves').innerHTML = '<div class="home-empty-copy" role="status">' +
+        message + (failed ? ' <button class="btn btn-secondary" type="button" ' +
+          'id="campaign-index-retry-btn">Retry</button>' : '') + '</div>';
+      if (failed) $('campaign-index-retry-btn').addEventListener('click', () => {
+        void refreshCampaignIndex();
+      });
+      return;
+    }
     const campaigns = state.campaigns.filter((campaign) => campaign.lifecycle === 'active');
     const count = campaigns.length;
     $('home-campaign-count').textContent =
@@ -4603,6 +4616,7 @@ const SylviaGMFrontend = (() => {
     state.campaignIndexStatus = 'loading';
     state.campaignIndexError = null;
     renderSidebarState();
+    renderHome();
     let pending = state.campaignIndexRefresh = (async () => {
       try {
         const projection = await state.bridge.campaign_index();
@@ -6595,7 +6609,12 @@ const SylviaGMFrontend = (() => {
         button.addEventListener('click', () => {
           retainScroll();
           const delta = button.dataset.tacticalZoom === 'in' ? 0.25 : -0.25;
-          view.zoom = Math.max(0.5, Math.min(2, view.zoom + delta));
+          const nextZoom = Math.max(0.5, Math.min(2, view.zoom + delta));
+          const ratio = nextZoom / view.zoom;
+          // Keep the world point at the viewport centre fixed while scaling the map.
+          view.scrollLeft = Math.max(0, (scroll.scrollLeft + scroll.clientWidth / 2) * ratio - scroll.clientWidth / 2);
+          view.scrollTop = Math.max(0, (scroll.scrollTop + scroll.clientHeight / 2) * ratio - scroll.clientHeight / 2);
+          view.zoom = nextZoom;
           state.tacticalViews[surface.id] = view;
           gamePanels().saveView(surface, view);
           renderRulesetPanelProjection(projection);
@@ -11543,6 +11562,11 @@ const SylviaGMFrontend = (() => {
       if (selectedActivityMatches(activity)) await refreshSelectedCampaign();
     } catch (error) {
       if (activity) finishSessionActivity(activity, 'interrupted', 'Opening interrupted');
+      if (activity && selectedActivityMatches(activity)) {
+        try {
+          await renderPlayerProjection(activity.campaignId, activity.sessionId, { loadPanels: false });
+        } catch (_) { /* The saved opening failure still reports if history is unavailable. */ }
+      }
       if (activity ? selectedActivityMatches(activity) : atPreviousSelection()) {
         setInlineStatus(friendlyCommandError(
           'Your prepared campaign is saved. The opening was interrupted; reopen it to continue', error,

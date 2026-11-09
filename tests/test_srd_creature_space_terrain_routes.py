@@ -9,7 +9,9 @@ from tests.lite_imported_fixture import ImportedCase
 from tests.test_srd_creature_space_owner import MAP, NS, request
 
 
-def terrain_case(path, *, side=-1, hidden=False, budget=30, all_difficult=False):
+def terrain_case(
+    path, *, side=-1, hidden=False, budget=30, all_difficult=False, archive_bytes=None,
+):
     lower, upper = ([-100, -100, -1], [100, -.0001, 7]) if side < 0 else (
         [-100, .0001, -1], [100, 100, 7])
     if all_difficult:
@@ -17,7 +19,7 @@ def terrain_case(path, *, side=-1, hidden=False, budget=30, all_difficult=False)
     metadata = {'difficult': True, 'plane': 'material'}
     if not hidden:
         metadata['player'] = {'label': 'Rubble', 'kind': 'terrain'}
-    value = ImportedCase(path, 'fire_bolt',
+    value = ImportedCase(path, 'fire_bolt', archive_bytes=archive_bytes,
         positions={'hero': [budget - 30, 0, 0], 'guard': [7.5, 0, 0]},
         scene_zones=[{'id': 'rubble', 'map_id': 'lite',
                       'shape': {'kind': 'box', 'min': lower, 'max': upper}, 'metadata': metadata}],

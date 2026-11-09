@@ -345349,7 +345349,7 @@ tools:
     - set:
         field: _end_turn_display_conditions
         value: _space_end_conditions
-      condition: _space_end_conditions != null
+      condition: _space_end_conditions != null and len(_space_end_conditions) > 0
     - condition: _end_turn_conditions != null and len(_end_turn_conditions) > 0
       on_true:
       - set:

@@ -49,6 +49,7 @@ class ImportedCase(Case):
         entities = state[FULL + ".entities"]
         entities["hero"].update(
             name="Lite caster",
+            size_rank=data["size_rank"],
             prepared_spells=[spell],
             spell_slot_cast_this_turn=False,
             resources={f"spell_slot_{level}": 3 for level in range(1, 10)},

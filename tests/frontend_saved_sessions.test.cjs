@@ -116,7 +116,7 @@ function harness(savedStorage = new Map(), { shippedDom = false } = {}) {
   // Expose existing private entry points for the test, without changing their implementation.
   const insertion = source.lastIndexOf('  return {');
   source = source.slice(0, insertion) + `  window.sessionTest = {
-    state, openBuilderChat, openCampaign, showHome, refreshSelectedCampaign, submitInput, stop, retry, reconnect,
+    state, openBuilderChat, openCampaign, openReadyCampaign, showHome, refreshSelectedCampaign, submitInput, stop, retry, reconnect,
     initDictation, getDictation: () => dictation, createHostBridge,
     signalActiveStreamDisconnect, restoreDisconnectedStream, renderBuilderSession,
     renderDMSession, ensureSessionActivity, finalizeSelectedConstruction, renameBuilderChat,
@@ -138,6 +138,7 @@ function harness(savedStorage = new Map(), { shippedDom = false } = {}) {
   context.window.innerWidth = 1400;
   vm.runInNewContext(source, context, { filename: 'app.js' });
   const api = context.window.sessionTest;
+  api.state.campaignIndexStatus = 'ready';
   api.state.builderChats = ['a', 'b'].map((id) => ({
     display_name: `Builder ${id}`, session: {
       session_id: id, role: 'builder', status: 'active', provider_id: 'test', model_id: 'test',
@@ -2773,3 +2774,70 @@ test('an unconfirmed queued send is shown as unconfirmed, not success or failure
   assert.doesNotMatch(html, /Action saved|Not done|could not complete|Try again/);
   assert.equal(h.calls.submissions.length, 0);
 });
+
+
+for (const navigateAway of [false, true]) {
+  test(`prepared campaign opening failure repaints terminal activity without changing navigation (${navigateAway})`, async () => {
+    const h = harness();
+    configureGM(h);
+    let ended = false;
+    const input = { sequence: 1, message_id: 'opening-input', kind: 'user',
+      content: { text: 'Begin this prepared adventure.', attempt_id: 'ready-opening' } };
+    h.state.bridge.session_context = async (id) => id !== 'gm'
+      ? ({ messages: [{ message_id: 'answer-a', kind: 'talk', content: { text: 'Answer a' } }] })
+      : ({ messages: [input], activity_progress: {
+      attempt_id: 'ready-opening', basis_message_id: 'opening-input', phase: 'working', elapsed_ms: 2000,
+    } });
+    h.state.bridge.session_history_page = async (id) => id !== 'gm'
+      ? ({ latest_sequence: 1, messages: [{ sequence: 1, message_id: 'answer-a', kind: 'talk', content: { text: 'Answer a' } }] })
+      : ({ latest_sequence: ended ? 2 : 1,
+      messages: [input, ...(ended ? [{ sequence: 2, message_id: 'opening-ended', kind: 'evidence',
+        content: { kind: 'session_attempt_terminal', attempt_id: 'ready-opening',
+          status: 'interrupted', failure_category: 'provider_error' } }] : [])] });
+    h.state.bridge.player_projection_page = async () => [];
+    const response = deferred();
+    h.state.bridge.start_dm_session = () => response.promise;
+    const opening = h.openReadyCampaign({ campaign_id: 'campaign', dm_session_id: 'gm',
+      dm_attempt_id: 'ready-opening', dm_turn_id: 'turn' });
+    await h.flush();
+    // The opening has a live activity row before its provider request fails.
+    await h.window.SylviaGMFrontend.renderPlayerProjection('campaign', 'gm');
+    assert.match(h.node('chronology').dataset.chronologyHtml, /data-activity-phase="queued"/);
+    if (navigateAway) await h.openBuilderChat('a');
+    ended = true;
+    response.reject(Error('Synthetic context capacity failure'));
+    await opening;
+    assert.equal(h.state.sessionActivities.get('gm').phase, 'interrupted');
+    const html = h.node('chronology').dataset.chronologyHtml;
+    if (navigateAway) {
+      assert.equal(h.state.activeSessionId, 'a');
+      assert.match(html, /Answer a/);
+      assert.doesNotMatch(html, /Begin this prepared adventure/);
+    } else {
+      assert.match(html, /data-activity-phase="failed"/);
+      assert.doesNotMatch(html, /data-activity-phase="working"/);
+      assert.match(h.node('session-status-text').textContent, /opening was interrupted/i);
+    }
+  });
+}
+
+for (const indexStatus of ['loading', 'error']) {
+  test(`campaign index ${indexStatus} is distinct from an empty library and can recover`, async () => {
+    const h = harness();
+    h.state.campaignIndexStatus = indexStatus;
+    const retained = [{campaign_id: 'retained', lifecycle: 'active', display_name: 'Retained'}];
+    h.state.campaigns = retained;
+    h.renderHome();
+    assert.doesNotMatch(h.node('campaign-shelves').innerHTML, /No ongoing campaigns yet/);
+    assert.match(h.node('campaign-shelves').innerHTML,
+      indexStatus === 'loading' ? /Loading campaigns/ : /Campaign list could not be loaded/);
+    assert.equal(h.state.campaigns, retained);
+    if (indexStatus === 'error') {
+      h.state.bridge = {campaign_index: async () => []};
+      h.node('campaign-index-retry-btn').dispatchEvent({type: 'click'});
+      await new Promise(resolve => setImmediate(resolve));
+      assert.equal(h.state.campaignIndexStatus, 'ready');
+      assert.match(h.node('campaign-shelves').innerHTML, /No ongoing campaigns yet/);
+    }
+  });
+}

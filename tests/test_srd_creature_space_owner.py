@@ -12,8 +12,13 @@ NS = 'sylvia.srd-lite.bg3'
 MAP = 'srd-coordinate-map'
 
 
-def make_case(path, *, ally=False, incapacitated=False, guard_position=(7.5, 0, 0), mover_position=(0, 0, 0), start=True):
-    value = ImportedCase(path, 'fire_bolt', positions={'hero': list(mover_position), 'guard': list(guard_position)},
+def make_case(
+    path, *, ally=False, incapacitated=False, guard_position=(7.5, 0, 0),
+    mover_position=(0, 0, 0), start=True, archive_bytes=None,
+):
+    value = ImportedCase(
+        path, 'fire_bolt', archive_bytes=archive_bytes,
+        positions={'hero': list(mover_position), 'guard': list(guard_position)},
         participant_changes={'party_role': 'player_character', 'size_rank': 2},
         entity_changes={'hero': {'size_rank': 2, 'ally_state_ids': ['guard'] if ally else []},
                         'guard': {'size_rank': 2, 'conditions': ['incapacitated'] if incapacitated else []}},

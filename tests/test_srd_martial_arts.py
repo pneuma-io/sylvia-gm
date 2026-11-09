@@ -223,6 +223,8 @@ def test_focus_level_up_preserves_spent_points_and_reopens(tmp_path):
         award(owner)
         proposal = build(owner)
         proposal["class_id"] = "monk"
+        # Monk 3 retains base Speed 30 and gains 10 feet while unarmored.
+        proposal["build"][0]["speed"] = 40
         proposal["build"][0]["subclasses"] = {"monk": "warrior_of_the_open_hand"}
         proposal["build"][0]["features"] = [{
             "id": "subclass", "source": "SRD Monk", "choice": "Warrior of the Open Hand",
@@ -231,19 +233,41 @@ def test_focus_level_up_preserves_spent_points_and_reopens(tmp_path):
             {"id": "focus_point", "maximum": 99, "source": "Monk level"},
         ]
         before = owner.snapshot("advancement")
+        prior = before.state[f"{SRD}.entities"]["hero"]
+        assert before.participants[0].data["speed"] == 30
+        assert prior["resource_maxima"]["focus_point"] == 2
+        assert prior["resources"]["focus_point"] == 0
         with pytest.raises(CommandRejected, match="Focus capacity"):
             owner.execute_action(command(owner, "level_up_srd_character", proposal, "invented"))
-        assert owner.snapshot("advancement").state == before.state
+        assert owner.snapshot("advancement") == before
         proposal["build"][0]["resources"] = []
-        waiting = owner.execute_action(command(owner, "level_up_srd_character", proposal, "level"))
-        assert resolve(owner, waiting).status is ActionStatus.COMMITTED
+        request = command(owner, "level_up_srd_character", proposal, "level")
+        waiting = owner.execute_action(request)
+        assert owner.snapshot("advancement") == before
+        assert owner.execute_action(request) == waiting
+        receipt = resolve(owner, waiting)
+        assert receipt.status is ActionStatus.COMMITTED
         saved = owner.snapshot("advancement")
         hero = saved.state[f"{SRD}.entities"]["hero"]
+        assert saved.revision == before.revision + 1
+        assert saved.participants[0].data["speed"] == 30
+        assert saved.participants[0].data["classes"] == [{"id": "monk", "level": 3}]
+        assert saved.participants[0].data["subclasses"] == {"monk": "warrior_of_the_open_hand"}
+        assert hero["speed"] == 40
         assert hero["resource_maxima"]["focus_point"] == 3
         assert hero["resources"]["focus_point"] == 1
+        assert hero["resources"]["hit_die"] == 1
         assert hero["hp"] == 5
+        assert owner.execute_action(request) == receipt
+        assert resolve(owner, waiting) == receipt
+        assert owner.snapshot("advancement") == saved
     with AuthorityOwner.open(database, "test") as owner:
         assert owner.snapshot("advancement").state == saved.state
+        assert owner.snapshot("advancement") == saved
+        assert owner.saved_action_receipt("advancement", "level") == receipt
+        assert owner.execute_action(request) == receipt
+        assert resolve(owner, waiting) == receipt
+        assert owner.snapshot("advancement") == saved
 
 
 

@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use std::io::{BufRead, BufReader, Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Child, ChildStdin, ChildStdout, Command, Stdio};
-use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicI64, AtomicU64, Ordering};
 use std::sync::{mpsc, Arc, Mutex};
 use std::time::{Duration, Instant};
 use tauri::{Emitter, Manager, State, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
@@ -40,6 +40,9 @@ const OWNER_CLOSE_PIPE_CLOSED: &str = "Sylvia GM owner reply pipe closed while i
 const OWNER_CLOSE_NO_ACK: &str = "Sylvia GM owner has not acknowledged shutdown; its process and saved data remain owned";
 // This bounds admission of a close request, not the owner's cleanup lifetime.
 const OWNER_SHUTDOWN_REPLY_TIMEOUT: Duration = Duration::from_secs(3);
+// Every i32 exit status fits below this unknown sentinel. Store only after
+// observing actual process exit and, on Windows, an empty owned process job.
+const OWNER_EXIT_UNKNOWN: i64 = i64::MAX;
 
 struct OwnerShutdownRequest {
     request_id: String,
@@ -58,7 +61,7 @@ pub struct OwnerBridge {
     closed: Arc<AtomicBool>,
     closing: AtomicBool,
     shutdown_request: Mutex<Option<OwnerShutdownRequest>>,
-    exit_code: Arc<Mutex<Option<i32>>>,
+    exit_code: Arc<AtomicI64>,
     exit_notice: Mutex<Option<mpsc::Receiver<Result<i32, String>>>>,
     close_requested: Arc<AtomicBool>,
     #[cfg(windows)]
@@ -214,7 +217,7 @@ impl OwnerBridge {
         let reader_child = Arc::clone(&child);
         #[cfg(windows)]
         let reader_job = Arc::clone(&job);
-        let exit_code = Arc::new(Mutex::new(None));
+        let exit_code = Arc::new(AtomicI64::new(OWNER_EXIT_UNKNOWN));
         let reader_exit_code = Arc::clone(&exit_code);
         let (exit_sender, exit_receiver) = mpsc::channel();
         std::thread::Builder::new()
@@ -265,7 +268,7 @@ impl OwnerBridge {
                   std::thread::sleep(Duration::from_millis(20));
               });
               if let Ok(code) = result {
-                  if let Ok(mut saved) = reader_exit_code.lock() { *saved = Some(code); }
+                  reader_exit_code.store(i64::from(code), Ordering::Release);
               }
               let _ = exit_sender.send(result);
             })
@@ -402,6 +405,10 @@ impl OwnerBridge {
 
     // Never hold a child lock across a wait. A live job is retained, not called clean.
     fn poll_owner_exit(&self) -> Result<Option<i32>, String> {
+        let verified = self.exit_code.load(Ordering::Acquire);
+        if verified != OWNER_EXIT_UNKNOWN {
+            return Ok(Some(verified as i32));
+        }
         let status = self.child.try_lock()
             .map_err(|error| match error {
                 std::sync::TryLockError::WouldBlock => OWNER_CLOSE_PENDING.to_string(),
@@ -412,7 +419,7 @@ impl OwnerBridge {
         #[cfg(windows)]
         if !self.job.is_empty()? { return Ok(None); }
         let code = status.code().unwrap_or(-1);
-        if let Ok(mut saved) = self.exit_code.try_lock() { *saved = Some(code); }
+        self.exit_code.store(i64::from(code), Ordering::Release);
         Ok(Some(code))
     }
 

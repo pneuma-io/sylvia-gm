@@ -19,7 +19,8 @@ FORBIDDEN={
 
 def test_actual_bundled_chooser_projection_uses_public_opening_preview():
  rows=read_plan_catalogue(ROOT)
- assert len(rows)==16
+ assert len(rows)==17
+ assert len({row['id'] for row in rows})==17
  for row in rows:
   plan=bundled_plan(row['id'])
   assert plan.summary==row['pitch']

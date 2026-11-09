@@ -12,8 +12,9 @@ test('rendered review/cancel/conflict/adopt controls preserve real saved campaig
   async () => {
     const evidence = path.join(repo, '.scratch', `rules-update-ui-${Date.now()}`);
     fs.mkdirSync(evidence, { recursive: true });
-    const python = process.platform === 'win32' ? '.venv/Scripts/python.exe' : '.venv/bin/python';
-    const server = spawn(path.join(repo, python), ['-m', 'tests.rules_update_ui_owner', evidence], {
+    const python = process.env.SYLVIA_TEST_PYTHON || path.join(repo,
+      process.platform === 'win32' ? '.venv/Scripts/python.exe' : '.venv/bin/python');
+    const server = spawn(python, ['-m', 'tests.rules_update_ui_owner', evidence], {
       cwd: repo, env: { ...process.env, PYTHONUTF8: '1', TEMP: evidence, TMP: evidence,
         SYLVIA_GM_TEST_FULL_AUDIT: '1' }, stdio: ['ignore', 'pipe', 'pipe'],
     });

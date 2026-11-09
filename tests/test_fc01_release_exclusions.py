@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import contextlib
+import hashlib
 import importlib.util
 import io
 import json
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -383,12 +385,47 @@ def test_actual_sidecar_arguments_cover_all_synthetic_directory_sentinels(tmp_pa
         put(tmp_path, "licenses/dictation/" + name, "Synthetic selected speech notice")
     put(tmp_path, "src-tauri/scripts/hooks/hook-sounddevice.py", "# synthetic hook")
     put(tmp_path, "licenses/dictation/private-note.txt", "Must not ship")
+    put(tmp_path, "src-tauri/frontend/app.html", "<title>Synthetic Sylvia fixture</title>")
+    put(tmp_path, "src-tauri/frontend/private-note.txt", "Must not ship")
+    put(tmp_path, "src-tauri/webui-data-files.json", json.dumps({"format": 1, "files": ["app.html"]}))
+    codec_manifest = "licenses/dictation/PYAV-LGPL-BUILD.json"
+    put(tmp_path, codec_manifest, (FROZEN / codec_manifest).read_bytes())
+    manifest = json.loads((tmp_path / codec_manifest).read_text(encoding="utf-8"))
+    reused_stage = Path(os.environ["SYLVIA_TEST_PYAV_LGPL_STAGE"])
+    ffmpeg = Path(os.environ["SYLVIA_FFMPEG_LGPL_DIR"])
+    for library in manifest["libraries"]:
+        for root in (ffmpeg, reused_stage / "av.libs"):
+            payload = (root / library["path"]).read_bytes()
+            assert len(payload) == library["bytes"]
+            assert hashlib.sha256(payload).hexdigest() == library["sha256"]
+    for binding in manifest["bindings"]:
+        assert hashlib.sha256((reused_stage / binding["path"]).read_bytes()).hexdigest() == binding["after_sha256"]
     calls = []
+    staging_calls = []
 
-    def fake_run(command, *, cwd, env, check):
+    def fake_run(command, *, cwd=None, env=None, check):
+        if len(command) > 1 and command[1].endswith("stage_pyav_lgpl.py"):
+            stage = Path(command[command.index("--output") + 1])
+            assert command == [
+                sys.executable, str(tmp_path / "src-tauri/scripts/stage_pyav_lgpl.py"),
+                "--ffmpeg", str(ffmpeg), "--output", str(stage),
+                "--manifest", str(tmp_path / codec_manifest),
+            ]
+            assert cwd is None and env is None and check is True
+            assert stage.parent.parent == tmp_path / ".owner-build"
+            assert stage.name == "pyav-lgpl" and not stage.exists()
+            # Reuse verified release input at the existing subprocess boundary.
+            shutil.copytree(reused_stage, stage)
+            staging_calls.append(command)
+            return subprocess.CompletedProcess(command, 0)
         assert command[:3] == [sys.executable, "-m", "PyInstaller"]
         assert cwd == tmp_path and check is True
-        assert "PYTHONHOME" not in env and "PYTHONPATH" not in env
+        assert "PYTHONHOME" not in env
+        assert len(staging_calls) == 1
+        assert env["PYTHONPATH"] == staging_calls[0][5]
+        assert [command[i + 1] for i, arg in enumerate(command[:-1]) if arg == "--paths"] == [
+            staging_calls[0][5], str(tmp_path / "src"),
+        ]
         calls.append(command)
         dist = Path(command[command.index("--distpath") + 1])
         put(dist, "sylvia-gm-owner.exe", b"SYNTHETIC EXECUTABLE PLACEHOLDER")
@@ -405,6 +442,7 @@ def test_actual_sidecar_arguments_cover_all_synthetic_directory_sentinels(tmp_pa
     ):
         assert module.main() == 0
     assert len(calls) == 1
+    assert len(staging_calls) == 1
     command = calls[0]
     data = [command[i + 1] for i, arg in enumerate(command[:-1]) if arg == "--add-data"]
     selectors = []
@@ -438,6 +476,8 @@ def test_actual_sidecar_arguments_cover_all_synthetic_directory_sentinels(tmp_pa
     assert "config/unselected-private.yaml" not in included
     assert "private/not-in-any-source.jsonl" not in included
     assert "licenses/dictation/private-note.txt" not in included
+    assert "webui/app.html" in included
+    assert "webui/private-note.txt" not in included
     assert {"licenses/dictation/" + name for name in module._DICTATION_NOTICES}.issubset(included)
     staged_directories = [x["source"] for x in selectors if x["kind"] == "directory"]
     assert len(staged_directories) == 5
@@ -449,7 +489,11 @@ def test_actual_sidecar_arguments_cover_all_synthetic_directory_sentinels(tmp_pa
                 "actual_command_constructor": "src-tauri/scripts/build_owner_sidecar.py:main",
                 "subprocess_intercepted": True,
                 "pyinstaller_ran": False,
-                "fixture_contents": "dummy synthetic sentinels only",
+                "fixture_contents": "Synthetic data sentinels; pinned codec manifest and verified retained LGPL stage",
+                "codec_staging_intercepted": True,
+                "codec_stage_reused": True,
+                "ffmpeg_libraries_verified": len(manifest["libraries"]),
+                "pyav_bindings_verified": len(manifest["bindings"]),
                 "add_data_selectors": selectors,
                 "whole_directory_sentinels_covered": observed,
                 "covered_count": len(observed),

@@ -20,11 +20,13 @@ from sylvia_gm.agent._builder_session import (
 from sylvia_gm.agent._stateless_mcp import StatelessMcpMechanics
 from sylvia_gm.application.authority import AuthorityOwner, CampaignCreate
 from sylvia_gm.application.bundled_campaign_plans import bundled_plan
+from sylvia_gm.application.plan_snapshot import _admitted_snapshot_facts
 from sylvia_gm.application.bundled_packages import (
     _package_payload,
     _rift_drafts,
     bundled_campaign_content_catalog,
     bundled_rift_archive,
+    BundledRiftAuthority,
     bundled_rift_authority,
     bundled_srd_archive,
     read_bundled_rift_source,
@@ -91,14 +93,36 @@ def _payload() -> dict[str, object]:
     return json.loads((PLAN_ROOT / "plan.json").read_text(encoding="utf-8"))
 
 
+def _retained_setting_text(path: str) -> str:
+    with admit_package_archive(io.BytesIO((PLAN_ROOT / "setting.sylvia-gm-package").read_bytes())) as admitted:
+        setting_id = _payload()["bindings"]["campaign_setting"]["id"]
+        entry = next(item for item in admitted.files
+                     if item.manifest.package_id == setting_id and item.file.path == path)
+        return b"".join(admitted.iter_file_chunks(entry)).decode("utf-8")
+
+
+def _retained_plan_authority() -> BundledRiftAuthority:
+    """Read the retained Plan's own closure, independently of the current generic world."""
+    primary, settings, closure = _admitted_snapshot_facts(
+        (PLAN_ROOT / "setting.sylvia-gm-package").read_bytes()
+    )
+    setting, paths, knowledge = next(item for item in settings
+        if item[0].package_id == _payload()["bindings"]["campaign_setting"]["id"])
+    return BundledRiftAuthority(
+        PackageBinding(*primary.identity),
+        PackageBinding(setting.package_id, setting.version, setting.sha256),
+        closure, paths, knowledge,
+    )
+
+
 def _tool_authority() -> CampaignPlanToolAuthority:
-    authority = bundled_rift_authority()
+    authority = _retained_plan_authority()
     return CampaignPlanToolAuthority(
         ruleset=authority.ruleset,
         setting=authority.setting,
         closure_sha256=authority.closure_sha256,
         setting_paths=authority.setting_paths,
-        read_setting=lambda path: read_bundled_rift_source(f"setting/{path}"),
+        read_setting=_retained_setting_text,
         setting_knowledge_ids=authority.setting_knowledge_ids,
     )
 
@@ -146,10 +170,10 @@ def _stale_same_version_rift_archive() -> bytes:
 
 
 def test_genuine_rift_plan_binds_ruleset_and_severed_lands() -> None:
-    authority = bundled_rift_authority()
-    assert authority.ruleset.version == "0.2.0"
-    assert authority.setting.version == "1.0.0-alpha.2"
-    admitted = admit_package_archive(io.BytesIO(bundled_rift_archive()))
+    authority = _retained_plan_authority()
+    assert authority.ruleset.version == "0.3.15"
+    assert authority.setting.version == "1.0.0-alpha.2.naming.1"
+    admitted = admit_package_archive(io.BytesIO((PLAN_ROOT / "setting.sylvia-gm-package").read_bytes()))
     assert [entry.package_id for entry in admitted.package_lock.entries] == [
         "sylvia.srd-lite.bg3",
         "pneuma.severed-lands",
@@ -279,7 +303,7 @@ def test_creation_catalog_groups_raw_candidates_into_compatible_logical_choices(
     assert srd[0]["compatible_settings"] == (
         {
             "id": "pneuma.severed-lands",
-            "version": "1.0.0-alpha.2",
+            "version": bundled_rift_authority().setting.version,
             "content_sha256": bundled_rift_authority().setting.content_sha256,
             "candidate_id": "candidate-catalog-rift-closure",
             "ruleset": bundled_rift_authority().ruleset.as_payload(),
@@ -683,7 +707,7 @@ def test_campaign_setting_knowledge_rejects_ambiguous_or_missing_sources() -> No
 
 
 def test_campaign_plan_rejects_wrong_binding_missing_reference_and_private_path() -> None:
-    authority = bundled_rift_authority()
+    authority = _retained_plan_authority()
     base = _payload()
 
     wrong_binding = copy.deepcopy(base)
@@ -741,7 +765,7 @@ def test_campaign_plan_rejects_wrong_binding_missing_reference_and_private_path(
 
 
 def test_campaign_plan_opening_direction_is_optional_private_creative_guidance() -> None:
-    authority = bundled_rift_authority()
+    authority = _retained_plan_authority()
     base = copy.deepcopy(_payload())
     base.pop("opening_direction")
     without_direction = validate_campaign_plan(
@@ -793,7 +817,7 @@ def test_general_builder_can_inspect_and_publish_campaign_plan(tmp_path: Path) -
     draft.mkdir()
     shutil.copy2(PLAN_ROOT / "plan.json", draft / "plan.json")
     shutil.copy2(PLAN_ROOT / "plan.md", draft / "plan.md")
-    authority = bundled_rift_authority()
+    authority = _retained_plan_authority()
 
     materialized = materialize_campaign_plan_draft(
         tmp_path,

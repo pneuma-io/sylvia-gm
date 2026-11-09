@@ -17,6 +17,11 @@ from sylvia_gm.domain.content_definitions import get_content_definition
 from sylvia_gm.domain.content_validation import ContentShapeError, validate_content_shape
 from sylvia_gm.domain.errors import CommandRejected
 from sylvia_gm.domain.package_library import canonical_json_bytes
+from sylvia_gm.domain.starting_state import (
+    PRIVATE_STATE_FEATURE,
+    REQUIRED_STARTING_STATE_FEATURE,
+    STARTING_STATE_FEATURE,
+)
 from sylvia_gm.runtime._authoring_declarations import EFFECT_BODY_FIELDS
 from sylvia_gm.runtime._effect_executor import _EFFECT_HANDLERS
 
@@ -419,4 +424,81 @@ def test_no_procedure_source_retains_its_previous_runtime_bytes():
             "runtime/ruleset.yaml"
         ]
         == runtime
+    )
+
+
+@pytest.mark.parametrize(
+    "flags,expected_state_features",
+    [
+        pytest.param(None, (), id="no-state"),
+        pytest.param([{}], (STARTING_STATE_FEATURE,), id="absent-required"),
+        pytest.param([{"required": False}], (STARTING_STATE_FEATURE,), id="optional"),
+        pytest.param(
+            [{"required": True}],
+            (STARTING_STATE_FEATURE, REQUIRED_STARTING_STATE_FEATURE),
+            id="required",
+        ),
+        pytest.param(
+            [{"required": False}, {"required": True}, {}, {"required": True}],
+            (STARTING_STATE_FEATURE, REQUIRED_STARTING_STATE_FEATURE),
+            id="mixed-multiple-required",
+        ),
+        pytest.param(
+            [{"visibility": "engine"}],
+            (STARTING_STATE_FEATURE, PRIVATE_STATE_FEATURE),
+            id="optional-private",
+        ),
+        pytest.param(
+            [{"required": True, "visibility": "engine"}] * 2,
+            (STARTING_STATE_FEATURE, REQUIRED_STARTING_STATE_FEATURE, PRIVATE_STATE_FEATURE),
+            id="multiple-required-private",
+        ),
+    ],
+)
+def test_compact_state_declarations_derive_exact_host_features(flags, expected_state_features):
+    source = _source(EFFECT_EXAMPLES["publish"])
+    if flags is not None:
+        source["state_schemas"] = [
+            {
+                "key": f"counter_{index}",
+                "schema": {"type": "integer", "minimum": 0},
+                "references": [],
+                **flag,
+            }
+            for index, flag in enumerate(flags)
+        ]
+    declarations = deepcopy(source.get("state_schemas"))
+    expected = tuple(sorted((*expected_state_features, "public_results.v1")))
+    for _ in range(2):
+        compiled = compile_ruleset_source(yaml.safe_dump(source).encode())
+        assert compiled.required_engine_features == expected
+        assert compiled.draft.record["compatibility"] == {
+            "host_contract": 1,
+            "runtime_format": 1,
+            "requires": list(expected),
+        }
+        assert compiled.draft.record.get("state_schemas") == declarations
+        assert ("state_schemas" in compiled.draft.record) is (flags is not None)
+        with materialize_package_archive((compiled.draft,)) as package:
+            assert tuple(package.manifest.compatibility["requires"]) == expected
+            assert [item.required for item in package.manifest.state_schemas] == [
+                item.get("required", False) for item in declarations or []
+            ]
+        if declarations:
+            source["state_schemas"].reverse()
+            declarations.reverse()
+
+
+@pytest.mark.parametrize("required", [None, 0, 1, "true", "false", [], {}])
+def test_compact_state_required_flag_rejects_non_booleans(required):
+    source = _source(EFFECT_EXAMPLES["publish"])
+    source["state_schemas"] = [
+        {"key": "counter", "schema": {"type": "integer"}, "references": [], "required": required}
+    ]
+    with pytest.raises(CommandRejected) as failure:
+        compile_ruleset_source(yaml.safe_dump(source).encode())
+    assert failure.value.code == "builder_ruleset_source_invalid"
+    assert any(
+        item.file == "ruleset-source.yaml" and item.path == "$.state_schemas[0].required"
+        for item in failure.value.diagnostics
     )

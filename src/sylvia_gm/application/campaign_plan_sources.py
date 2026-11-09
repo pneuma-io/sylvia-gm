@@ -6,7 +6,10 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from sylvia_gm.application.bundled_packages import bundled_rift_authority
+from sylvia_gm.application.bundled_packages import (
+    bundled_rift_archive_for_closure,
+    bundled_rift_authority,
+)
 from sylvia_gm.application.plan_state_admission import validate_starting_declarations
 from sylvia_gm.domain.starting_state import parse_state_schemas
 from sylvia_gm.application.setting_character_requirements import (
@@ -172,7 +175,12 @@ def validate_retained_campaign_plan(
     else:
         sources = bundled_rift_authority()
         if closure != sources.closure_sha256:
-            raise ValueError("Reusable Campaign Plan exact packages are unavailable")
+            snapshot = bundled_rift_archive_for_closure(closure)
+            if snapshot is None:
+                raise ValueError("Reusable Campaign Plan exact packages are unavailable")
+            from sylvia_gm.application.plan_snapshot import validate_plan_snapshot
+
+            return validate_plan_snapshot(snapshot, payload, readable_markdown)
     return validate_campaign_plan(
         payload,
         readable_markdown=readable_markdown,

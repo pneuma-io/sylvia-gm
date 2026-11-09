@@ -191,7 +191,7 @@ def bind_creature_space(runtime, record):
     last_display = max(i for i, row in enumerate(end)
                        if row.get('set', {}).get('field') == '_end_turn_display_conditions')
     end.insert(last_display + 1, _set('_end_turn_display_conditions', '_space_end_conditions') |
-               {'condition': '_space_end_conditions != null'})
+               {'condition': '_space_end_conditions != null and len(_space_end_conditions) > 0'})
     record['compatibility']['requires'].append('spatial_circle_overlap.v1')
     record['compatibility']['requires'].append('player_action_preflight.v1')
     tools['move_srd_scene_creature']['metadata']['player_controls'] = {

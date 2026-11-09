@@ -1176,6 +1176,8 @@ def materialize_player_action_checker(
                 if not evaluate_condition(item["condition"], prepared):
                     return item["reason"]
             _player_preflight(runtime, policy, _runtime_parameters(tool, parameters, bridge), bridge)
+        except RulesetPreconditionRejected as error:
+            return error.safe_reason
         except Exception:
             # An invalid expression or missing state cannot enable a control or expose its inputs.
             return "This action's availability could not be determined"
@@ -1209,6 +1211,9 @@ def _player_preflight(
             runtime.tools, bridge, runtime.ruleset_config, runtime.definitions,
             combat_state=bridge.combat_state, tool_executor=nested, budget=budget)
         if not result.success:
+            # Preserve authored refusals; unexpected runtime failures stay private.
+            if result.failure_kind == "precondition" and result.error is not None:
+                raise RulesetPreconditionRejected(result.error)
             raise PackageRuntimeError('This path or destination is unavailable; check the visible map and creature-space declarations.')
         scalars.update({key: value for key, value in result.context.items()
                         if value is None or isinstance(value, (str, bool, int, float))})

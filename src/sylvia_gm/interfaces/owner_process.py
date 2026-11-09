@@ -78,15 +78,15 @@ from sylvia_gm.application.builder_references import (
 )
 from sylvia_gm.application.builder_session_migration import migrate_legacy_builder_chats
 from sylvia_gm.application.bundled_campaign_plans import (
+    bundled_plan,
     known_builtin_public_summary,
     selected_campaign_plan,
 )
 from sylvia_gm.application.bundled_packages import (
     BUNDLED_RIICHI_PACKAGES,
     bundled_campaign_content_catalog,
-    bundled_rift_archive,
+    bundled_rift_archive_for_closure,
     bundled_rift_authority,
-    bundled_rift_campaign_plan,
     bundled_rift_participant_declaration,
     bundled_riichi_archive,
     bundled_srd_archive,
@@ -1094,7 +1094,11 @@ def _resolve_rift_library_selection(
 ) -> tuple[PackageCandidate, CampaignPlanToolAuthority, ValidatedCampaignPlan, dict | None]:
     """Use a Rift Plan's retained sources, including its authored party template when present."""
     if plan_id == "the-rift-awakening":
-        plan = bundled_rift_campaign_plan()
+        retained = bundled_plan(plan_id)
+        if retained is None:
+            raise CommandRejected("The selected Rift Plan is unavailable")
+        plan = retained.plan
+        archive = retained.package_snapshot
     else:
         saved = load_reusable_campaign_plan(
             storage_root, plan_id,
@@ -1105,6 +1109,7 @@ def _resolve_rift_library_selection(
         if saved.setup_id != "the-rift-awakening":
             raise CommandRejected("The selected Plan does not use Rift campaign setup")
         plan = saved.plan
+        archive = saved.package_snapshot
     bindings = plan.payload["bindings"]
     if setting_id != bindings["campaign_setting"]["id"]:
         raise CommandRejected("The selected Plan belongs to another Campaign Setting")
@@ -1121,9 +1126,10 @@ def _resolve_rift_library_selection(
         None,
     )
     if candidate is None:
-        if bindings["package_closure_sha256"] != bundled_rift_authority().closure_sha256:
-            raise CommandRejected("The selected Plan's saved packages are unavailable")
-        archive = bundled_rift_archive()
+        if archive is None:
+            archive = bundled_rift_archive_for_closure(bindings["package_closure_sha256"])
+            if archive is None:
+                raise CommandRejected("The selected Plan's saved packages are unavailable")
         candidate = owner.install_package_archive(
             io.BytesIO(archive),
             install_id=f"install-bundled-rift-{hashlib.sha256(archive).hexdigest()[:24]}",
@@ -2696,16 +2702,21 @@ def _dispatch_selected(
                     )
                     if isinstance(setting_value, Mapping):
                         participant_setting_selection = setting_value.get("setting_id")
-            rift_authority = bundled_rift_authority()
+            rift_authority = (
+                bundled_rift_authority()
+                if participant_purpose is not None
+                and participant_ruleset_selection == RIFT_RULESET_ID
+                else None
+            )
             participant_authority = (
                 None
-                if participant_purpose is None
-                or participant_ruleset_selection != RIFT_RULESET_ID
+                if rift_authority is None
                 or participant_setting_selection != rift_authority.setting.package_id
                 else _rift_participant_authority()
             )
             participant_campaign_setting = (
-                rift_authority.setting if participant_authority is not None else None
+                rift_authority.setting
+                if participant_authority is not None and rift_authority is not None else None
             )
             participant_package = (
                 None if participant_authority is None else participant_authority[0]
@@ -3257,9 +3268,8 @@ def _dispatch_selected(
                     profile_tools=profile_tools,
                     resolve_source_profile=resolve_source_profile,
                     campaign_content_authority=CampaignContentToolAuthority(
-                        items=_campaign_content_tool_authority(
-                            application_owner, storage_root
-                        ).items,
+                        # Discovery refreshes the catalog only when its tool is called.
+                        items=(),
                         refresh=lambda: _campaign_content_tool_authority(
                             application_owner, storage_root
                         ).items,

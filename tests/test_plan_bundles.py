@@ -115,9 +115,9 @@ def test_import_into_empty_library_retains_sources_and_supports_later_builder(tm
         ]
         assert len(imported_candidates) == 1
         candidate = imported_candidates[0]
-        # A fresh desktop also installs its bundled SRD; it supplies none of this Plan's sources.
+        # Fresh desktops also install Lite and Riichi; neither supplies this Plan's sources.
         assert all(
-            item == candidate or item.package_lock.entries[0].package_id == "sylvia.srd-lite.bg3"
+            item == candidate or item.package_lock.entries[0].package_id in {"sylvia.srd-lite.bg3", "pneuma.riichi-mahjong"}
             for item in candidates
         )
         assert candidate.package_lock == source.package_lock

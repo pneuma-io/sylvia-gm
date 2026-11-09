@@ -693,7 +693,10 @@ def _handle_nested_call(
             ctx.budget.leave_call()
 
     if not getattr(result, "success", False):
-        if getattr(result, "failure_kind", None) == "precondition" and result.error:
+        if (
+            getattr(result, "failure_kind", None) in {"precondition", "parameter_validation"}
+            and result.error
+        ):
             raise PreConditionError(tool_name, result.error)
         raise EffectExecutionError(
             "call",

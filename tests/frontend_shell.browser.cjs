@@ -273,6 +273,7 @@ test('composer and sidebar controls remain usable in the shipped shell', { timeo
       state.campaigns = Array.from({ length: 60 }, (_, index) => ({
         campaign_id: `campaign-${index}`, display_name: `Synthetic campaign ${index}`,
         lifecycle: 'active', revision: 0, sessions: [] }));
+      state.campaignIndexStatus = 'ready';
       state.bridge.archive_campaign = async () => { throw new Error('Synthetic archive rejection'); };
     });
     await page.locator('#home-btn').click();

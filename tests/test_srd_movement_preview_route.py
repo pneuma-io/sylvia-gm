@@ -5,6 +5,7 @@ from math import dist
 import pytest
 
 from sylvia_gm import dice
+from sylvia_gm.application.bundled_packages import bundled_srd_archive
 from sylvia_gm.application.player_actions import parse_player_controls
 from sylvia_gm.application.spatial_preview import project_preflight_path
 from sylvia_gm.domain.authority import ActionStatus, thaw_json_value
@@ -13,6 +14,12 @@ from sylvia_gm.spatial import SpatialEngine
 from tests.lite_imported_fixture import ImportedCase
 from tests.test_srd_creature_space_owner import MAP, NS, make_case, request
 from tests.test_srd_creature_space_terrain_routes import preview_cost, terrain_case
+
+
+@pytest.fixture(scope="module")
+def current_lite_archive():
+    """Exercise current route declarations without changing the retained legacy fixture."""
+    return bundled_srd_archive()
 
 
 def assert_public_route(value, preview, destination):
@@ -39,8 +46,10 @@ def assert_public_route(value, preview, destination):
 
 
 @pytest.mark.parametrize('elevation', [0, 1])
-def test_public_preview_draws_selected_route_and_preserves_confirmation_lifecycle(tmp_path, elevation):
-    value = make_case(tmp_path / 'route.sqlite3')
+def test_public_preview_draws_selected_route_and_preserves_confirmation_lifecycle(
+    tmp_path, elevation, current_lite_archive,
+):
+    value = make_case(tmp_path / 'route.sqlite3', archive_bytes=current_lite_archive)
     try:
         destination = [15, 0, elevation]
         proposed = request(value, destination)
@@ -85,8 +94,8 @@ def test_public_preview_draws_selected_route_and_preserves_confirmation_lifecycl
         value.close()
 
 
-def test_preview_draws_final_terrain_priced_selection(tmp_path):
-    value = terrain_case(tmp_path / 'terrain.sqlite3')
+def test_preview_draws_final_terrain_priced_selection(tmp_path, current_lite_archive):
+    value = terrain_case(tmp_path / 'terrain.sqlite3', archive_bytes=current_lite_archive)
     try:
         proposed = request(value, [15, 0, 0])
         preview = value.owner.preview_panel_action(**proposed)
@@ -98,7 +107,7 @@ def test_preview_draws_final_terrain_priced_selection(tmp_path):
         value.close()
 
 
-def hidden_case(path, variant):
+def hidden_case(path, variant, *, archive_bytes=None):
     positions = {'hero': [0, 0, 0], 'guard': [7.5, 0, 0]}
     zones = []
     if variant in ('creature', 'elevation'):
@@ -107,7 +116,8 @@ def hidden_case(path, variant):
         zones = [{'id': 'concealed-rubble', 'map_id': 'lite',
             'shape': {'kind': 'box', 'min': [-100, -100, -1], 'max': [100, 100, 7]},
             'metadata': {'difficult': True, 'plane': 'material'}}]
-    value = ImportedCase(path, 'fire_bolt', positions=positions, scene_zones=zones,
+    value = ImportedCase(
+        path, 'fire_bolt', archive_bytes=archive_bytes, positions=positions, scene_zones=zones,
         participant_changes={'party_role': 'player_character', 'size_rank': 2},
         entity_changes={key: {'size_rank': 2, 'conditions': [], 'ally_state_ids': []} for key in positions},
         scene_metadata_changes={key: {'player': {'label': key.title(), 'kind': 'unit'}}
@@ -117,10 +127,14 @@ def hidden_case(path, variant):
     return value
 
 
-def test_hidden_creature_terrain_and_elevation_changes_have_identical_public_previews(tmp_path):
+def test_hidden_creature_terrain_and_elevation_changes_have_identical_public_previews(
+    tmp_path, current_lite_archive,
+):
     expected = None
     for variant in ('plain', 'creature', 'terrain', 'elevation'):
-        value = hidden_case(tmp_path / (variant + '.sqlite3'), variant)
+        value = hidden_case(
+            tmp_path / (variant + '.sqlite3'), variant, archive_bytes=current_lite_archive,
+        )
         try:
             before = value.snapshot()
             proposed = request(value, [15, 0, 1])

@@ -2,6 +2,7 @@ use super::{OwnerBridge, OWNER_CLOSE_NO_ACK, OWNER_CLOSE_PENDING, OWNER_CLOSE_PI
 use std::os::windows::io::{AsHandle, AsRawHandle, OwnedHandle};
 use std::path::PathBuf;
 use std::process::Command;
+use std::sync::atomic::{AtomicI64, Ordering};
 use std::sync::{mpsc, Arc, Mutex, Weak};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
@@ -70,7 +71,7 @@ struct Fixture {
     preserved: PathBuf,
     job: Weak<super::dictation::ProcessJob>,
     child: Weak<Mutex<std::process::Child>>,
-    code: Arc<Mutex<Option<i32>>>,
+    code: Arc<AtomicI64>,
     notice: mpsc::Receiver<Result<i32, String>>,
 }
 impl Fixture {
@@ -188,7 +189,7 @@ impl Fixture {
                 .unwrap(),
             expected
         );
-        assert_eq!(*self.code.lock().unwrap(), Some(expected));
+        assert_eq!(self.code.load(Ordering::Acquire), i64::from(expected));
         if let Some(job) = self.job.upgrade() {
             assert!(job.is_empty().unwrap());
         }
@@ -236,6 +237,16 @@ fn acknowledged_shutdown_waits_for_process_cleanup() {
         .bridge()
         .shutdown()
         .expect("already-collected owner");
+    fixture.finish(0);
+}
+
+#[test]
+fn collected_shutdown_stays_clean_while_the_child_mutex_is_busy() {
+    let fixture = Fixture::new("shutdown", "0", "0");
+    await_clean(fixture.bridge());
+    let child = fixture.bridge().child.lock().unwrap();
+    assert_eq!(fixture.bridge().shutdown(), Ok(()));
+    drop(child);
     fixture.finish(0);
 }
 

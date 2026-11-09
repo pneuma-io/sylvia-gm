@@ -143,17 +143,31 @@ def test_minute_expiry_does_not_remove_independent_resistances(tick, expected):
     assert state[f"{SRD}.entities"]["hero"]["hp"] == expected - 10
 
 
-def test_composite_damage_checks_each_type_and_does_not_stack_resistance():
+@pytest.mark.parametrize(
+    "immunities,resistances,vulnerabilities,expected",
+    [
+        ([], ["fire"], [], 69),
+        (["fire"], ["fire"], ["fire"], 79),
+        ([], ["fire"], ["fire"], 59),
+        ([], ["fire", "force"], [], 80),
+    ],
+)
+def test_composite_damage_checks_each_type_and_does_not_stack_resistance(
+    immunities, resistances, vulnerabilities, expected
+):
     state, data = _monk(18)
     state[f"{SRD}.entities"]["hero"].update(
         hp=100,
         max_hp=100,
         temp_hp=0,
         superior_defense_expires_tick=20,
-        damage_resistances=["fire"],
+        damage_immunities=immunities,
+        damage_resistances=resistances,
+        damage_vulnerabilities=vulnerabilities,
     )
+    # Native spell/attack callers use this private packet owner in the pruned Lite runtime.
     _run(
-        "apply_srd_composite_damage",
+        "apply_srd_qualifying_composite_damage",
         state,
         participant_data=data,
         target="hero",
@@ -161,9 +175,75 @@ def test_composite_damage_checks_each_type_and_does_not_stack_resistance():
         component_1_damage_type="fire",
         component_2_amount=21,
         component_2_damage_type="force",
-        adjustment=0,
+        source_state_id="",
     )
-    assert state[f"{SRD}.entities"]["hero"]["hp"] == 69
+    assert state[f"{SRD}.entities"]["hero"]["hp"] == expected
+
+
+@pytest.mark.parametrize("hp", [0, 1])
+@pytest.mark.parametrize("critical", [False, True])
+def test_composite_packet_applies_zero_hp_transition_once(hp, critical):
+    state, data = _monk(18)
+    hero = state[f"{SRD}.entities"]["hero"]
+    hero.update(
+        hp=hp,
+        max_hp=100,
+        temp_hp=0,
+        death_failures=0,
+        death_successes=0,
+        stable=hp == 0,
+        stable_recovery_hours_remaining=2 if hp == 0 else 0,
+        conditions=["unconscious"] if hp == 0 else [],
+    )
+    _run(
+        "apply_srd_qualifying_composite_damage",
+        state,
+        participant_data=data,
+        target="hero",
+        component_1_amount=1,
+        component_1_damage_type="fire",
+        component_2_amount=1,
+        component_2_damage_type="force",
+        source_state_id="",
+        critical_hit=critical,
+    )
+    hero = state[f"{SRD}.entities"]["hero"]
+    assert hero["hp"] == 0 and hero["is_alive"] is True
+    assert hero["death_failures"] == ((2 if critical else 1) if hp == 0 else 0)
+    assert hero["stable"] is False and hero["stable_recovery_hours_remaining"] == 0
+    assert hero["conditions"].count("unconscious") == 1
+
+
+@pytest.mark.parametrize(
+    "parameters",
+    [
+        {"component_1_amount": -1},
+        {"component_1_amount": True},
+        {"component_2_damage_type": "fire"},
+        {"component_2_damage_type": "unknown"},
+    ],
+)
+def test_composite_packet_refuses_invalid_components_without_mutation(parameters):
+    state, data = _monk(18)
+    before = deepcopy(state)
+    with pytest.raises((RulesetPreconditionRejected, PackageRuntimeError)):
+        _run(
+            "apply_srd_qualifying_composite_damage",
+            state,
+            participant_data=data,
+            **(
+                {
+                    "target": "hero",
+                    "component_1_amount": 21,
+                    "component_1_damage_type": "fire",
+                    "component_2_amount": 21,
+                    "component_2_damage_type": "force",
+                    "source_state_id": "",
+                }
+                | parameters
+            ),
+        )
+    assert state == before
 
 
 @pytest.mark.parametrize(
@@ -199,10 +279,11 @@ def _defense_archive():
             Loader=yaml.CSafeLoader,
         )
     )
+    # Select only the entry points used by the saved-choice scenarios below.
+    # Composite damage is exercised through its actual private owner above.
     public = [
         "begin_combat_turn",
         "apply_srd_damage",
-        "apply_srd_composite_damage",
         "apply_srd_condition",
         "remove_srd_condition",
         "advance_srd_lasting_time",
@@ -456,7 +537,7 @@ def test_independent_resistances_and_temporary_hp_share_one_damage_packet(
         )
     else:
         _run(
-            "apply_srd_composite_damage",
+            "apply_srd_qualifying_composite_damage",
             state,
             participant_data=data,
             target="hero",
@@ -464,6 +545,7 @@ def test_independent_resistances_and_temporary_hp_share_one_damage_packet(
             component_1_damage_type="fire",
             component_2_amount=21,
             component_2_damage_type="force",
+            source_state_id="",
         )
     hero = state[f"{SRD}.entities"]["hero"]
     assert hero["hp"] == expected and hero["temp_hp"] == 0
@@ -493,13 +575,14 @@ def test_native_condition_application_retires_defense_before_any_later_consumer(
     elif path == "composite":
         hero["hp"] = 1
         _run(
-            "apply_srd_composite_damage",
+            "apply_srd_qualifying_composite_damage",
             state,
             target="hero",
             component_1_amount=10,
             component_1_damage_type="fire",
             component_2_amount=1,
             component_2_damage_type="force",
+            source_state_id="",
         )
     elif path == "explicit":
         _run("apply_srd_condition", state, target="hero", condition="incapacitated")

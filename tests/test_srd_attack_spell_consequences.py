@@ -7,6 +7,7 @@ import pytest
 from sylvia_gm import dice
 from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.domain.authority import ActionStatus
+from tests.srd_fixture_scene import fixture_scene
 from tests.test_srd_action_budget import _run
 from tests.test_srd_attack_budget import _combat_case, _npc_attack
 from tests.test_srd_npc_spell_casting import _act
@@ -18,6 +19,10 @@ def _cast(monkeypatch, spell, *, bard_spells=(), **choices):
     monkeypatch.setattr(dice, "_rng", Random(0))
     monkeypatch.setattr(dice, "set_seed", lambda _seed: None)
     state, data, parameters = _spell_case(spell)
+    # Separate Medium control spaces while keeping both attackers within 5 ft of Guard.
+    state[f"{SRD}.state"]["spatial_scene"] = fixture_scene(
+        state[f"{SRD}.entities"], {"other": [5, 5, 0]},
+    )
     if bard_spells:
         data["classes"] = [{"id": "bard", "level": 17}]
         data["abilities"]["charisma"] = 18
@@ -73,21 +78,27 @@ def test_next_attack_advantage_is_consumed_even_if_cancelled_or_attack_misses(
     )
     roll = first.result["context"]["_attack_roll"]
     assert len(roll["results"]) == (1 if disadvantage else 2)
+    assert first.result["context"]["_attack_outcome"] == "miss"
+    assert state[f"{SRD}.state"]["turn_effects"] == []
     if not disadvantage:
         assert roll["total"] == max(roll["results"])
     _next(state, "other")
+    assert state[f"{SRD}.entities"]["other"]["conditions"] == []
     second = _npc_attack(state, "Spear", actor="other", target="guard", use_multiattack=False)
     assert len(second.result["context"]["_attack_roll"]["results"]) == 1
 
 
 def test_delayed_damage_occurs_once_at_targets_next_end_and_uses_upcast_dice(monkeypatch):
     state, _, _ = _cast(monkeypatch, "acid_arrow", slot_resource="spell_slot_4")
+    effect = state[f"{SRD}.state"]["turn_effects"][0]
+    assert (effect["dice_count"], effect["damage_die"], effect["damage_type"]) == (4, "d4", "acid")
     hp = state[f"{SRD}.entities"]["guard"]["hp"]
     _next(state, "guard")
     assert state[f"{SRD}.entities"]["guard"]["hp"] == hp
     ended = _run("end_combat_turn", state)
     after = state[f"{SRD}.entities"]["guard"]["hp"]
     assert hp - 16 <= after <= hp - 4
+    assert state[f"{SRD}.state"]["turn_effects"] == []
     detail = ended.result["result_card"]["details"][0]
     assert detail["label"] == "Acid Arrow"
     assert "4d4" in detail["value"] and "HP lost" in detail["value"]
@@ -103,12 +114,38 @@ def test_delayed_damage_occurs_once_at_targets_next_end_and_uses_upcast_dice(mon
     assert state[f"{SRD}.entities"]["guard"]["hp"] == after
 
 
+@pytest.mark.parametrize("overlap", [False, True])
+def test_delayed_damage_card_keeps_final_conditions_and_acid_resistance(monkeypatch, overlap):
+    state, _, _ = _cast(monkeypatch, "acid_arrow", slot_resource="spell_slot_4")
+    state[f"{SRD}.entities"]["guard"].update(
+        conditions=["poisoned"], damage_resistances=["acid"],
+    )
+    if overlap:
+        state[f"{SRD}.state"]["spatial_scene"] = fixture_scene(
+            state[f"{SRD}.entities"], {"other": [5, 2, 0]},
+        )
+    _next(state, "guard")
+    hp = state[f"{SRD}.entities"]["guard"]["hp"]
+    monkeypatch.setattr(dice, "_rng", Random(0))
+    ended = _run("end_combat_turn", state)
+    # The saved 4d4 rolls 4 + 4 + 1 + 3; Acid resistance halves the 12 damage.
+    assert state[f"{SRD}.entities"]["guard"]["hp"] == hp - 6
+    expected = ["poisoned", "prone"] if overlap else ["poisoned"]
+    assert state[f"{SRD}.entities"]["guard"]["conditions"] == expected
+    summary = {row["label"]: row["value"] for row in ended.result["result_card"]["summary"]}
+    assert summary["Conditions after"] == expected
+    assert summary["Damage applied"] == 6
+    assert state[f"{SRD}.state"]["turn_effects"] == []
+
+
 def test_unused_next_attack_effect_expires_at_casters_next_end_not_start(monkeypatch):
     state, _, _ = _cast(monkeypatch, "guiding_bolt")
     _next(state, "guard")
     _next(state, "hero")
     assert state[f"{SRD}.state"]["turn_effects"]
     _next(state, "other")
+    assert state[f"{SRD}.state"]["turn_effects"] == []
+    assert state[f"{SRD}.entities"]["guard"]["conditions"] == []
     attack = _npc_attack(state, "Spear", actor="other", target="guard", use_multiattack=False)
     assert len(attack.result["context"]["_attack_roll"]["results"]) == 1
 
@@ -153,6 +190,7 @@ def test_multiple_spell_attacks_consume_advantage_on_only_the_first_roll(monkeyp
     )
     rolls = cast.result["context"]["_spell_multi_attacks"]
     assert [len(roll["results"]) for roll in rolls] == [2, 1, 1]
+    assert state[f"{SRD}.state"]["turn_effects"] == []
 
 
 def test_delayed_effect_survives_reopen_and_free_time_retry_cannot_repeat_damage(
@@ -163,11 +201,18 @@ def test_delayed_effect_survives_reopen_and_free_time_retry_cannot_repeat_damage
     database = tmp_path / "delayed.db"
     with AuthorityOwner.open(database, "casting-owner") as owner:
         _, _, parameters = _create_spell_campaign(owner, "acid_arrow")
-        receipt, _ = _act(owner, "cast_spell_outside_combat", **(parameters | {"target": "other"}))
+        receipt, cast_command = _act(
+            owner, "cast_spell_outside_combat", **(parameters | {"target": "other"}),
+        )
         assert receipt.status is ActionStatus.COMMITTED
         saved = owner.snapshot("casting").state
         assert saved[f"{SRD}.state"]["turn_effects"]
+        assert saved[f"{SRD}.entities"]["hero"]["resources"]["spell_slot_2"] == 2
+        assert owner.execute_action(cast_command) == receipt
+        assert owner.snapshot("casting").state == saved
     with AuthorityOwner.open(database, "casting-owner") as owner:
+        assert owner.snapshot("casting").state == saved
+        assert owner.execute_action(cast_command) == receipt
         assert owner.snapshot("casting").state == saved
         receipt, command = _act(owner, "advance_srd_lasting_time", elapsed_rounds=1)
         assert receipt.status is ActionStatus.COMMITTED
