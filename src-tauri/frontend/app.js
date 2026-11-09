@@ -4867,6 +4867,15 @@ const SylviaGMFrontend = (() => {
       `<span class="panel-tag" data-tone="${/ready|remaining/i.test(field) ? 'good' : 'neutral'}">${escapeHtml(field)}</span>`).join(' ')}</span>`;
   }
 
+  // The active weapon set as "Set: main / off", or a plain note when no set or no held item is selected.
+  function weaponSetMarkup(sets) {
+    if (!sets || typeof sets !== 'object') return '';
+    const active = sets.active_set;
+    const held = active ? [sets[active]?.main_hand, sets[active]?.off_hand].filter(Boolean).map(panelIdentifierLabel) : [];
+    if (!active || !held.length) return '<div class="weapon-set-line panel-unit-meta">No weapon set in hand</div>';
+    return `<div class="weapon-set-line"><span>${escapeHtml(panelIdentifierLabel(active))}</span> ${escapeHtml(held.join(' / '))}</div>`;
+  }
+
   function weaponReadinessMarkup(entity) {
     const weapon = entity.weapon;
     if (!weapon || typeof weapon !== 'object') return '';
@@ -4922,6 +4931,76 @@ const SylviaGMFrontend = (() => {
   }
 
   // Ready-weapon card from the projected carried weapon; absent fields are omitted, never estimated.
+  // A side-profile drawing of the ready weapon, built only from projected fields: the feed and mechanism pick the
+  // silhouette, and the chamber and magazine/tube count draw the state. It shows authority; it never animates
+  // manipulations the owner did not commit.
+  function weaponRigMarkup(weapon) {
+    if (!weapon || typeof weapon !== 'object' || !weapon.feed) return '';
+    const kind = weapon.feed === 'TUBE' ? 'pump' : weapon.mechanism === 'SELF_LOADING' ? 'rifle' : 'bolt';
+    const rounds = Number.isInteger(weapon.magazine?.rounds) ? weapon.magazine.rounds : null;
+    const spares = Array.isArray(weapon.spare_magazines) ? weapon.spare_magazines.map((item) => item?.rounds).filter(Number.isInteger) : [];
+    const capacityValue = weapon.feed === 'TUBE' ? weapon.tube_capacity : weapon.magazine?.capacity;
+    const capacity = Number.isInteger(capacityValue) && capacityValue > 0 ? capacityValue : Math.max(rounds || 0, ...spares, 1);
+    const slots = Math.min(capacity, 30);
+    const filled = rounds === null ? 0 : Math.round(Math.min(rounds, capacity) / capacity * slots);
+    const strip = (x, y, w, h, vertical) => Array.from({ length: slots }, (_, index) => {
+      const on = index < filled;
+      if (vertical) { const step = (h - 2) / slots; return `<rect x="${x + 1}" y="${(y + h - 1 - (index + 1) * step + 0.4).toFixed(2)}" width="${w - 2}" height="${Math.max(0.6, step - 0.8).toFixed(2)}" rx="0.6" class="${on ? 'rig-brass' : 'rig-slot'}"/>`; }
+      const step = (w - 2) / slots;
+      return `<rect x="${(x + 1 + index * step + 0.4).toFixed(2)}" y="${y + 1}" width="${Math.max(0.6, step - 0.8).toFixed(2)}" height="${h - 2}" rx="0.6" class="${on ? 'rig-brass' : 'rig-slot'}"/>`;
+    }).join('');
+    const chamber = (x, y) => weapon.chamber === 'LIVE'
+      ? `<g data-rig-chamber="live"><rect x="${x}" y="${y}" width="16" height="6" rx="2" class="rig-brass"/><rect x="${x + 13}" y="${y + 0.5}" width="5" height="5" rx="2.4" class="rig-tip"/></g>`
+      : weapon.chamber === 'SPENT'
+        ? `<g data-rig-chamber="spent"><rect x="${x}" y="${y}" width="15" height="6" rx="1.4" class="rig-spent"/><circle cx="${x + 1.5}" cy="${y + 3}" r="1.2" class="rig-hole"/></g>`
+        : '<g data-rig-chamber="empty"></g>';
+    const body = {
+      bolt: '<path class="rig-poly" d="M8 70 L58 63 L132 60 L136 88 L116 92 L98 98 L66 114 L20 118 L8 110 Z"/>' +
+        '<rect class="rig-metal" x="134" y="56" width="114" height="26" rx="4"/><rect class="rig-metal" x="246" y="63" width="142" height="8" rx="2"/>' +
+        '<rect class="rig-metal" x="384" y="59" width="26" height="16" rx="3"/><rect class="rig-optic" x="150" y="32" width="102" height="14" rx="7"/>' +
+        '<path class="rig-optic" d="M252 30 h26 a4 4 0 0 1 4 4 v12 a4 4 0 0 1 -4 4 h-26 z"/><circle class="rig-lens" cx="279" cy="40" r="5"/>' +
+        '<path class="rig-hi" d="M154 35 h94 M138 58 h106 M250 64.5 h132"/><rect class="rig-port" x="194" y="58" width="30" height="11" rx="2"/>' +
+        chamber(201, 60.5) + '<rect class="rig-steel" x="176" y="60" width="20" height="7" rx="2"/><path class="rig-steel" d="M168 64 L176 64 L188 86 L182 89 Z"/>' +
+        '<circle class="rig-knob" cx="186" cy="90" r="6"/><path class="rig-metal" d="M150 82 h28 v4 c0 10 -26 12 -28 0 z"/><path class="rig-trigger" d="M162 84 q4 6 0 10"/>' +
+        `<g data-rig-feed><rect class="rig-mag" x="204" y="81" width="34" height="27" rx="3"/>${strip(208, 86, 26, 6)}</g>`,
+      rifle: '<path class="rig-poly" d="M10 60 h70 l14 4 v26 l-14 6 h-58 l-12 -8 z"/><rect class="rig-metal" x="92" y="64" width="50" height="11" rx="3"/>' +
+        '<rect class="rig-metal" x="140" y="50" width="132" height="27" rx="3"/><path class="rig-metal" d="M150 76 h104 l-6 15 h-90 z"/>' +
+        '<rect class="rig-poly" x="270" y="53" width="92" height="22" rx="3"/><rect class="rig-metal" x="360" y="60" width="44" height="7" rx="2"/>' +
+        '<rect class="rig-metal" x="400" y="57" width="16" height="13" rx="2"/><rect class="rig-optic" x="184" y="34" width="40" height="17" rx="3"/>' +
+        '<circle class="rig-lens" cx="220" cy="42" r="4"/><path class="rig-hi" d="M142 52 h126 M362 61 h40"/><rect class="rig-port" x="210" y="57" width="30" height="11" rx="2"/>' +
+        chamber(217, 59.5) + '<path class="rig-poly" d="M168 88 l20 0 l6 34 l-16 2 z"/><path class="rig-metal" d="M156 88 h26 v3 c0 10 -24 10 -26 0 z"/><path class="rig-trigger" d="M168 90 q4 6 0 10"/>' +
+        `<g data-rig-feed><path class="rig-mag" d="M222 88 h30 l10 46 l-28 6 z"/><g transform="rotate(-12 240 110)">${strip(234, 92, 7, 40, true)}</g></g>`,
+      pump: '<path class="rig-poly" d="M8 66 L64 62 L120 60 L124 86 L104 92 L60 112 L18 116 L8 108 Z"/><rect class="rig-metal" x="120" y="56" width="100" height="30" rx="4"/>' +
+        '<rect class="rig-metal" x="218" y="57" width="192" height="9" rx="2"/><rect class="rig-metal" x="218" y="68" width="160" height="9" rx="3"/>' +
+        `<g data-rig-feed>${strip(222, 69, 152, 7)}</g><path class="rig-hi" d="M124 59 h92 M222 58.5 h184"/><rect class="rig-port" x="156" y="59" width="30" height="11" rx="2"/>` +
+        chamber(163, 61.5) + '<rect class="rig-poly" x="256" y="64" width="78" height="19" rx="5"/><path class="rig-metal" d="M136 86 h28 v3 c0 10 -26 12 -28 0 z"/><path class="rig-trigger" d="M148 88 q4 6 0 10"/>',
+    }[kind];
+    const feedName = weapon.feed === 'TUBE' ? 'tube' : 'magazine';
+    const chamberName = typeof weapon.chamber === 'string' ? weapon.chamber.toLowerCase() : 'unknown';
+    return `<svg class="weapon-rig" viewBox="0 22 424 124" role="img" data-rig="${kind}" aria-label="Weapon: chamber ${escapeHtml(chamberName)}` +
+      `${rounds === null ? '' : `, ${rounds} in ${feedName}`}">${body}</svg>`;
+  }
+
+  // Which declared steps a single Reload should queue for this weapon, in order. The owner still prices and
+  // checks every step when the queue is composed and run; this only chooses among actions the surface declares.
+  function weaponReloadPlan(weapon, actions) {
+    const declared = (intent) => (actions || []).find((action) => action.intent === intent && actionBindsActor(action));
+    const reload = declared('reload_weapon');
+    const cycle = declared('cycle_weapon');
+    if (!weapon || typeof weapon !== 'object' || (!reload && !cycle)) return { steps: [], summary: '' };
+    const rounds = Number.isInteger(weapon.magazine?.rounds) ? weapon.magazine.rounds : null;
+    const spares = Array.isArray(weapon.spare_magazines) ? weapon.spare_magazines.map((item) => item?.rounds).filter(Number.isInteger) : [];
+    const steps = [];
+    // A magazine change only helps when a carried spare holds more rounds than the inserted magazine.
+    if (reload && weapon.feed === 'DETACHABLE_MAGAZINE' && rounds !== null && spares.some((count) => count > rounds)) steps.push(reload);
+    const chamberNeedsCycle = weapon.needs_cycle === true ||
+      (steps.length && weapon.mechanism !== 'SELF_LOADING' && weapon.chamber !== 'LIVE');
+    if (cycle && chamberNeedsCycle && Number(weapon.cycle_ap) > 0) steps.push(cycle);
+    const summary = steps.length ? steps.map((action) => action.label || action.id).join(' → ')
+      : weapon.feed === 'TUBE' && !weapon.needs_cycle ? 'Tube top-up has no declared action' : 'Loaded · nothing to queue';
+    return { steps, summary };
+  }
+
   function weaponCardMarkup(entity) {
     const weapon = entity?.weapon;
     if (!weapon || typeof weapon !== 'object') return '';
@@ -4945,6 +5024,7 @@ const SylviaGMFrontend = (() => {
         ? `${weapon.range_breakpoints_m.join(' / ')} m` : null]].filter(([, value]) => value != null && value !== '');
     return `<div class="weapon-card"><div class="weapon-card-top"><strong>${escapeHtml(panelIdentifierLabel(weapon.label || weapon.id || 'Weapon'))}</strong>` +
       tags.map(([text, tone]) => `<span class="panel-tag"${tone ? ` data-tone="${tone}"` : ''}>${escapeHtml(text)}</span>`).join('') + '</div>' +
+      weaponRigMarkup(weapon) +
       (Array.isArray(weapon.fire_modes) && weapon.fire_modes.length ? `<div class="weapon-modes">${weapon.fire_modes.map((mode) =>
         `<span class="panel-tag">${escapeHtml(displayIdentifier(String(mode)))}</span>`).join('')}</div>` : '') +
       (Number.isFinite(rounds) ? `<div class="weapon-ammo">${strip}<span class="weapon-ammo-count">${feed} <b>${rounds}</b>` +
@@ -5085,7 +5165,13 @@ const SylviaGMFrontend = (() => {
       state.panelActionChecks.get(panelActionCheckKey(surface, action, actorId))?.available === false);
     const ready = handling.filter((action) => !refused(action));
     const unavailable = handling.filter(refused);
-    return `<div class="character-action-groups" data-panel-id="${escapeHtml(surface.id)}">` +
+    const plan = weaponReloadPlan(surface.data?.entities?.[actorId]?.weapon, surface.actions);
+    // One Reload queues the declared steps this weapon needs; the individual actions stay available below.
+    const reload = sequenceModeActive() && (plan.steps.length || plan.summary) ? `<div class="weapon-reload">` +
+      `<button type="button" class="btn btn-primary btn-sm" data-weapon-reload="${escapeHtml(actorId)}" ` +
+      `${plan.steps.length && !state.panelCommitPending ? '' : 'disabled'}>Reload</button>` +
+      `<span class="weapon-reload-plan">${escapeHtml(plan.steps.length ? `Queues ${plan.summary}` : plan.summary)}</span></div>` : '';
+    return `<div class="character-action-groups" data-panel-id="${escapeHtml(surface.id)}">` + reload +
       (posture.length ? `<div class="character-posture"><span>Posture</span><div class="ruleset-panel-actions posture-switch" role="group" aria-label="Posture">${buttons(posture)}</div></div>` : '') +
       (ready.length ? `<div class="character-ready-actions"><span>${equipmentOnly ? 'Equipment actions' : 'Actions'}</span><div class="ruleset-panel-actions">${buttons(ready)}</div></div>` : '') +
       (unavailable.length ? `<details class="character-handling" data-character-stat="${escapeHtml(JSON.stringify([actorId, 'handling']))}"><summary>${unavailable.length} unavailable now</summary><div class="ruleset-panel-actions">${buttons(unavailable)}</div></details>` : '') + '</div>';
@@ -5134,8 +5220,7 @@ const SylviaGMFrontend = (() => {
       (!compact && weaponCardMarkup(entity) ? `<div class="character-loadout"><strong>Ready weapon</strong>${weaponCardMarkup(entity)}`
         : `<div class="character-loadout"><strong>Ready equipment</strong>${weaponReadinessMarkup(entity || {})}` +
           (entity?.weapon?.id ? `<h4>${escapeHtml(panelIdentifierLabel(entity.weapon.id))}</h4>` : '')) +
-      (entity?.weapon_sets ? `<div>${escapeHtml(panelIdentifierLabel(entity.weapon_sets.active_set || ''))}: ` +
-        `${escapeHtml([entity.weapon_sets[entity.weapon_sets.active_set]?.main_hand, entity.weapon_sets[entity.weapon_sets.active_set]?.off_hand].filter(Boolean).map(panelIdentifierLabel).join(' / '))}</div>` : '') +
+      weaponSetMarkup(entity?.weapon_sets) +
       (!compact && entity?.resources ? `<div class="character-resources">${Object.entries(entity.resources).map(([key,value]) =>
         `<span>${escapeHtml(panelIdentifierLabel(key))}<b>${escapeHtml(value)}</b></span>`).join('')}</div>` : '') +
       '</div>' + (compact ? '' : characterActionMarkup(surface, actorId)) + actionReadinessMarkup(entity || {}, actorId) + '</div>' + (!participant ? '<p class="panel-unit-meta">Full character details are unavailable. These are the selected character’s current combat stats.</p>' : '') + values;
@@ -7080,6 +7165,9 @@ const SylviaGMFrontend = (() => {
         }
       });
     });
+    container.querySelectorAll('[data-weapon-reload]').forEach((button) => {
+      button.addEventListener('click', () => { void queueWeaponReload(button, projection); });
+    });
     wireTacticalGrid(container, projection, savedPreviewHeights);
     wireNetworkGraph(container, projection);
     void refreshPanelActionChecks(projection, container);
@@ -7160,6 +7248,49 @@ const SylviaGMFrontend = (() => {
   function refreshQueuePresentation() {
     if (panelHost && state.panelProjection && !state.panelProjection.loading && !window.__sylviaPanelContext)
       renderRulesetPanelProjection(state.panelProjection);
+  }
+
+  // Append the planned declared reload steps to the owner's action queue exactly as clicking each action would.
+  // One Reload per actor and revision: repeated clicks never queue the steps twice.
+  async function queueWeaponReload(button, projection) {
+    if (button.disabled || !sequenceModeActive() || !state.activeCampaignId || selectedSessionIsWorking()) return;
+    const panel = button.closest('[data-panel-id]');
+    const surface = projection.surfaces.find((entry) => entry.id === panel?.dataset.panelId);
+    const actorId = button.dataset.weaponReload;
+    const plan = weaponReloadPlan(surface?.data?.entities?.[actorId]?.weapon, surface?.actions);
+    const activity = selectedActivity();
+    const key = `${state.activeCampaignId}:${projection.revision}:${surface?.id}:${actorId}`;
+    if (!surface || !plan.steps.length) return;
+    if (state.weaponReloadQueued === key) {
+      selectedStatus(activity, 'Reload is already queued for this character. Run or edit the queue.', 'panels');
+      return;
+    }
+    const campaignId = state.activeCampaignId, sessionId = state.activeSessionId;
+    button.disabled = true;
+    state.weaponReloadQueued = key;
+    let queued = 0;
+    try {
+      for (const action of plan.steps) {
+        if (!selectedActivityMatches(activity) || state.activeCampaignId !== campaignId) break;
+        if (!panelActionAvailable(surface, action, actorId)) {
+          selectedStatus(activity, `Reload stopped before ${action.label || action.id}: it is unavailable now.`, 'panels');
+          break;
+        }
+        const selection = JSON.parse(JSON.stringify(panelActionSelection(surface, action, actorId)));
+        const operationId = `panel-${crypto.randomUUID()}`;
+        if (window.__sylviaPanelContext) await state.bridge.queue_panel_action({ campaign_id: campaignId, session_id: sessionId,
+          surface_id: surface.id, panel_action_id: action.id, operation_id: operationId, selection });
+        else await appendQueuedAction({ operation_id: operationId, source: { kind: 'panel', surface_id: surface.id, action_id: action.id }, selection },
+          { flush: action === plan.steps.at(-1) && action.response_policy === 'automatic' });
+        queued += 1;
+      }
+      if (queued === plan.steps.length) selectedStatus(activity, `Reload queued: ${plan.summary}. Review and run the queue.`, 'panels');
+    } catch (error) {
+      selectedStatus(activity, friendlyCommandError('Reload could not be queued', error), 'panels');
+    } finally {
+      if (!queued) state.weaponReloadQueued = null;
+      if (selectedActivityMatches(activity)) await renderRulesetPanels(campaignId, true);
+    }
   }
 
   function sequenceModeActive() {
