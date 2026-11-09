@@ -19,7 +19,8 @@ def main() -> int:
     parser.add_argument("--source-commit")
     parser.add_argument("--notes-directory", type=Path)
     parser.add_argument("--draft-path", type=Path)
-    parser.add_argument("--private", action="store_true", help="Local build including private vault notes")
+    parser.add_argument("--private", action="store_true",
+                        help="Local build including private vault notes")
     parser.add_argument("--include-test-tools", action="store_true")
     parser.add_argument("--allow-worktree-sources", action="store_true",
                         help="Build an explicitly marked worktree candidate with per-file source hashes.")

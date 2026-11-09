@@ -6010,7 +6010,9 @@ def build_draft(
         if draft.is_relative_to(repository):
             raise ValueError("private drafts must be outside the public repository")
     elif (draft / "files/references/canon").exists():
-        raise ValueError("public build refuses a draft containing private notes; use a fresh destination")
+        raise ValueError(
+            "public build refuses a draft containing private notes; use a fresh destination"
+        )
     source_commit = _verify_source_commit(
         root,
         source_commit or _git(root, "rev-parse", "HEAD"),
@@ -6023,7 +6025,9 @@ def build_draft(
     inputs = (compile_inputs(notes_directory, source_commit=source_commit)
               if notes_directory is not None else retained_inputs())
     if inputs["parameter_set_sha256"] != parameters.hash:
-        raise ValueError("compiled inputs do not match parameters; regenerate them from the private notes")
+        raise ValueError(
+            "compiled inputs do not match parameters; regenerate them from the private notes"
+        )
     source_document = deepcopy(inputs["source_index"])
     source_document.update(
         source_commit=source_commit,
@@ -6117,14 +6121,14 @@ def build_draft(
         files.update(_indexed_reference_files(notes_directory.resolve(), source_document))
     else:
         notice = (
-            "## Public build: rules-text limits\n\n"
-            "The private Obsidian vault is not bundled. Any references/canon/ paths below "
-            "identify private sources, not readable files in this package. Use the compiled "
-            "contracts and references shipped here; do not invent missing rules or resource "
-            "allocations. Supported deterministic actions remain available with authored state. "
-            "Complete GM/Builder session coverage is not established by this public build; "
-            "the future public TTRPG Rulebook remains separate.\n\n"
-        ).encode()
+            b"## Public build: rules-text limits\n\n"
+            b"The private Obsidian vault is not bundled. Any references/canon/ paths below "
+            b"identify private sources, not readable files in this package. Use the compiled "
+            b"contracts and references shipped here; do not invent missing rules or resource "
+            b"allocations. Supported deterministic actions remain available with authored state. "
+            b"Complete GM/Builder session coverage is not established by this public build; "
+            b"the future public TTRPG Rulebook remains separate.\n\n"
+        )
         for name in ("references/character-authoring.md", "references/campaign-authoring.md"):
             files[name] = notice + files[name]
     if include_private_notes:
