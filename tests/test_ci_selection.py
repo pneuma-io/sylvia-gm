@@ -214,15 +214,14 @@ def test_changed_doc_links_reject_missing_local_targets(tmp_path):
     assert check_links(tmp_path, ["README.md"]) == ["README.md: missing local link lost.md"]
 
 
-def test_workflow_separates_full_qualification_and_prevents_branch_push_duplication():
+def test_workflow_is_manual_only_and_retains_full_qualification():
     import yaml
 
     root = Path(__file__).resolve().parents[1]
     workflow = yaml.load(
         (root / ".github/workflows/supported-journeys.yml").read_text(), Loader=yaml.BaseLoader
     )
-    assert workflow["on"]["push"]["branches"] == ["main"]
-    assert "pull_request" in workflow["on"]
+    assert set(workflow["on"]) == {"workflow_dispatch"}
     assert workflow["on"]["workflow_dispatch"]["inputs"]["qualification"]["options"] == [
         "affected",
         "full",
