@@ -1,5 +1,5 @@
 // Render the shipped shell over the declared TD layout, including its command deck and appended queue.
-// Scripted bridge: regression coverage for native map collapse, not native acceptance.
+// Scripted bridge: regression coverage for retained layout clipping, not native acceptance.
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -7,6 +7,9 @@ const path = require('node:path');
 const { chromium } = require('playwright');
 const frontend = path.resolve(__dirname, '../src-tauri/frontend');
 const fixture = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/td-delivered-map-controls.json'), 'utf8'));
+// Current public package declarations: older map fixtures omit several shipped controls.
+fixture.surfaces.find(surface => surface.id === 'operations.map').actions =
+  JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/td-current-map-actions.json'), 'utf8'));
 
 async function open(browser, viewport) {
   const page = await browser.newPage({ viewport });
@@ -32,7 +35,10 @@ async function open(browser, viewport) {
     document.getElementById('connecting-overlay').classList.add('hidden');
     document.getElementById('session-frame').style.display = 'flex';
     const queue = { campaign_id: projection.campaign_id, session_id: 'strip-gm', sequence_id: 'q', version: 1, status: 'ready',
-      expected_revision: projection.revision, committed_action_ids: [], steps: [] };
+      expected_revision: projection.revision, committed_action_ids: [], steps: [{ step_id: 'pending-crouch',
+        actor: 'vesper', actor_name: 'Vesper', label: 'Crouch', status: 'pending',
+        source: { kind: 'panel', surface_id: 'operations.character', action_id: 'stance-crouched' },
+        selection: { actor: 'vesper' } }] };
     Object.assign(api.state, { view: 'session', activeCampaignId: projection.campaign_id, activeSessionId: 'strip-gm', activeSessionRole: 'dm',
       activeSnapshot: { revision: projection.revision }, actionSequence: queue,
       campaigns: [{ campaign_id: projection.campaign_id, display_name: 'Strip', lifecycle: 'active', sessions: [{ session_id: 'strip-gm', role: 'dm', status: 'active' }] }],
@@ -69,6 +75,30 @@ for (const viewport of [{ width: 1402, height: 932 }, { width: 1366, height: 768
         assert.ok(measures.mapHeight >= 100 && measures.contentHeight >= 100 && measures.visible >= 100,
           `${pass}: battlefield clipped by retained split: ${JSON.stringify(measures)}`);
       }
+      assert.deepEqual(errors, []);
+    } finally { await browser.close(); }
+  });
+}
+
+
+for (const viewport of [{ width: 1402, height: 900 }, { width: 1366, height: 736 }]) {
+  test(`queue badge reveals Execute with all declared TD controls at ${viewport.width}x${viewport.height}`, async () => {
+    const browser = await chromium.launch({ headless: true, args: ['--disable-gpu'],
+      channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined) });
+    try {
+      const { page, errors } = await open(browser, viewport);
+      await page.locator('#queue-badge').click();
+      const execute = page.locator('[data-panel-id="sylvia.action-queue"] [data-sequence-execute]');
+      const geometry = await execute.evaluate(async node => {
+        const visibility = await new Promise(resolve => {
+          const observer = new IntersectionObserver(([entry]) => {
+            observer.disconnect(); resolve(entry.intersectionRatio);
+          }); observer.observe(node);
+        });
+        const rect = node.getBoundingClientRect();
+        return { visibility, top: rect.top, bottom: rect.bottom, viewport: innerHeight };
+      });
+      assert.ok(geometry.visibility > 0.99, `Execute remains clipped after Show queue: ${JSON.stringify(geometry)}`);
       assert.deepEqual(errors, []);
     } finally { await browser.close(); }
   });

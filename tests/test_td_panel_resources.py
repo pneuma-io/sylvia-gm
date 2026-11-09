@@ -2,6 +2,7 @@
 
 import json
 import zipfile
+from pathlib import Path
 
 from sylvia_gm.application.authority import AuthorityOwner, CampaignCreate
 from sylvia_gm.domain.authority import StateValue, WriterRole
@@ -14,6 +15,13 @@ NS = "pneuma-io.trigger-discipline"
 def test_resource_projection_and_reload_keep_authored_maxima_and_capacity(candidate, tmp_path):
     database = tmp_path / "resources.sqlite3"
     with zipfile.ZipFile(candidate) as archive:
+        package = json.loads(archive.read("manifest.json"))["packages"][0]
+        map_surface = next(surface for surface in package["ui_surfaces"]
+                           if surface["id"] == "operations.map")
+        declared_actions = json.loads(
+            (Path(__file__).parent / "fixtures/td-current-map-actions.json").read_bytes()
+        )
+        assert map_surface["actions"] == declared_actions
         state = json.loads(archive.read(f"packages/{NS}/conformance/scenario.json"))[
             "initial_state"
         ]

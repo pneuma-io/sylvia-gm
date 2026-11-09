@@ -49,7 +49,11 @@ the collapse without the repair and passes on initial render and redraw with it.
 replay passed for that layout repair and the combined Reload sequence, AP stop and stale
 revision recovery. A later map edit also exposed a warning that demanded review of an
 already completed queue; warnings now depend on unfinished steps. Stale pending actions,
-uncertain execution and current receipt markers retain their distinct indications. The TD acceptance includes
+uncertain execution and current receipt markers retain their distinct indications. The full
+20-control TD toolbar also exposed a clipped Execute button; the queue now retains its declared
+minimum body height. The browser fixture is checked against the current package declarations,
+with Show queue coverage at both native viewport sizes. Native replay of this queue repair and
+the warning repair remains required. The TD acceptance includes
 the single Reload control's magazine-change/cycle order, AP exhaustion, refusal/stale-state
 recovery, and committed animation occurring once without replay on reopen. Qualification must
 name the exact frontend composition; PR6-only native evidence cannot close that combined check.
