@@ -114,7 +114,10 @@ def test_private_input_and_output_must_be_explicit(tmp_path):
         builder.build_draft(SOURCE, draft_path=contaminated)
 
 
-def test_private_notes_compile_to_the_same_public_mechanics(candidate, tmp_path):
+@pytest.mark.parametrize("include_private_notes", [False, True])
+def test_explicit_notes_input_preserves_mechanics_in_both_modes(
+    candidate, tmp_path, include_private_notes,
+):
     supplied = os.environ.get("TD_PRIVATE_NOTES_DIRECTORY")
     if not supplied:
         pytest.skip("Private vault is an optional local input, never a public test fixture")
@@ -122,15 +125,21 @@ def test_private_notes_compile_to_the_same_public_mechanics(candidate, tmp_path)
 
     revision = subprocess.check_output(["git", "-C", str(SOURCE), "rev-parse", "HEAD"],
                                        text=True).strip()
-    output = tmp_path / "private.sylvia-gm-package"
+    output = tmp_path / "provided-notes.sylvia-gm-package"
     identity = build_package(output, source_commit=revision, allow_worktree=True,
-                             notes_directory=Path(supplied), include_private_notes=True)
-    assert identity["distribution"] == "private-local"
+                             notes_directory=Path(supplied),
+                             include_private_notes=include_private_notes)
+    assert identity["distribution"] == ("private-local" if include_private_notes else "public")
     with zipfile.ZipFile(candidate) as public, zipfile.ZipFile(output) as private:
         index = json.loads(private.read(PACKAGE_PREFIX + "provenance/source-index.json"))
-        assert index["notes_distribution"] == "private-local"
+        assert index["notes_distribution"] == (
+            "private-local" if include_private_notes else "omitted"
+        )
         notes = {name for name in private.namelist() if "/references/canon/" in name}
-        assert len(notes) > 200
+        if include_private_notes:
+            assert len(notes) > 200
+        else:
+            assert not notes
         for name in notes:
             source_note = Path(supplied) / name.split("/references/canon/", 1)[1]
             assert private.read(name) == source_note.read_bytes()
