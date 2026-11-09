@@ -5333,7 +5333,8 @@ const SylviaGMFrontend = (() => {
       let at = 0;
       phases.forEach((phase) => {
         timers.push(setTimeout(() => {
-          if (!current() || !rigMotionAllowed()) { live.finish(); rigRuns.delete(key); return; }
+          // A drawing that is no longer in the document (panel hidden or behind another tab) has stopped.
+          if (!current() || !rigMotionAllowed() || !live.svg.isConnected) { live.finish(); rigRuns.delete(key); memory.delete(key); return; }
           live.label = phase.label;
           const caption = rigCaption(live);
           if (caption) caption.innerHTML = `<span class="pulse"></span>${escapeHtml(phase.label)}`;
@@ -5343,9 +5344,13 @@ const SylviaGMFrontend = (() => {
       });
       timers.push(setTimeout(() => { live.finish(); if (rigRuns.get(key) === live) rigRuns.delete(key); }, at + 120));
     });
-    // A run whose panel was redrawn without its actor (actor switch, hidden panel) stops here.
-    const surfaces = new Set(Array.from(container.querySelectorAll('[data-panel-id]'), (node) => node.dataset.panelId));
-    cancelRigRuns((run) => surfaces.has(run.surfaceId) && !seen.has(JSON.stringify([run.surfaceId, run.actorId])));
+    // A rig whose stage is no longer drawn anywhere in this document (actor switch, panel hidden or behind another
+    // tab) stops, and what was observed for it is forgotten: when it returns, its first sight is the current committed
+    // state, never a replay of commits made while it was absent. A drawing still live elsewhere keeps its owner.
+    const shown = (key) => { const [surfaceId, actorId] = JSON.parse(key);
+      return Boolean(document.querySelector(`[data-panel-id="${CSS.escape(surfaceId)}"] [data-rig-stage="${CSS.escape(actorId)}"]`)); };
+    cancelRigRuns((run) => { const key = JSON.stringify([run.surfaceId, run.actorId]); return !seen.has(key) && !run.svg.isConnected; });
+    for (const key of Array.from(memory.keys())) if (!seen.has(key) && !shown(key)) memory.delete(key);
   }
 
   // Which declared steps a single Reload should queue for this weapon, in order. The owner still prices and

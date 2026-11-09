@@ -1,7 +1,8 @@
 // Rig motion in the shipped shell over committed revisions of the delivered TD character data: a run plays the
 // committed manipulation once in its own panel, survives a same-revision redraw, and stops (caption back to the
 // committed rest state, no later phase writes) on Off, Static, Skip, reduced motion, a campaign switch, an actor
-// switch, a changed weapon, and reopen. Synthetic projection sequence; not native or provider acceptance.
+// switch, a changed weapon, reopen, and the panel being hidden or put behind a sibling tab (with no replay of
+// commits made while it was absent). Synthetic projection sequence; not native or provider acceptance.
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -35,7 +36,7 @@ async function open(browser) {
     if (name === 'app.js') body = body.toString()
       .replace("document.addEventListener('DOMContentLoaded', () => { void SylviaGMFrontend.init(); });", '')
       .replace('  // ---- Public API ----', `window.rigQA = { state, wireControls, initSidebarResize, renderRulesetPanelProjection,
-        renderSidebarState, showSessionView, ensureSessionActivity }; // ---- Public API ----`);
+        renderSidebarState, showSessionView, ensureSessionActivity, gamePanels }; // ---- Public API ----`);
     await route.fulfill({ body, contentType: name.endsWith('.js') ? 'text/javascript' : name.endsWith('.css') ? 'text/css'
       : name.endsWith('.png') ? 'image/png' : 'text/html' });
   });
@@ -164,4 +165,55 @@ test('a different weapon at the next revision ends the run without animating a s
   await page.waitForTimeout(2200);
   assert.deepEqual(await phaseWritesSince(page, since), []);
   assert.match(await caption(page), /Ready/);
+}));
+
+// The Character panel leaves the document behind a sibling tab or when hidden; the host only draws the selected tab.
+// Queued actions is used as the sibling (Loadout embeds Character's own action group, which would mask the gap).
+const toSibling = (page) => page.locator('[data-workspace-panel="sylvia.action-queue"]').click();
+const backFromSibling = (page) => page.locator('[data-workspace-panel="operations.character"]').click();
+const hide = (page) => page.evaluate(() => {
+  window.rigQA.gamePanels().changed({ type: 'hide', panelId: 'operations.loadout' });
+  window.rigQA.gamePanels().changed({ type: 'hide', panelId: 'operations.character' });
+});
+const reveal = (page) => page.locator('[data-panel-chip="operations.character"]').click();
+
+// With the map hidden too, no other panel carries a Character marker (the map's End turn control does otherwise).
+const hideWithMap = (page) => page.evaluate(() => {
+  for (const panelId of ['operations.map', 'operations.loadout', 'operations.character']) window.rigQA.gamePanels().changed({ type: 'hide', panelId });
+});
+for (const [label, away, back] of [['behind a sibling tab', toSibling, backFromSibling], ['hidden', hide, reveal],
+  ['hidden with the map hidden too', hideWithMap, reveal]]) {
+  test(`a running rig stops when its panel is ${label}; a quick return shows the rest state`, { timeout: 60000 }, () => withPage(async (page) => {
+    await startReload(page);
+    await away(page);
+    assert.equal(await page.locator('[data-rig-stage="vesper"]').count(), 0, 'the panel is out of the document');
+    assert.equal(await page.locator('section.ruleset-panel[data-panel-id="operations.character"]').count(), 0, 'the Character panel is not drawn');
+    await back(page);
+    const since = await mark(page);
+    await page.waitForTimeout(2200);
+    assert.deepEqual(await phaseWritesSince(page, since), [], 'the old moving drawing is not re-attached');
+    assert.match(await caption(page), /Spent case chambered/);
+    assert.equal(await page.locator('[data-rig-part="fx"] > *').count(), 0);
+  }));
+
+  test(`a commit received while the panel is ${label} is not replayed on return`, { timeout: 60000 }, () => withPage(async (page) => {
+    await show(page, revision(2, spent));
+    await show(page, revision(3, reloaded));
+    await page.waitForTimeout(2600); // the r3 magazine change finishes in view
+    await away(page);
+    await show(page, revision(4, cycled)); // the cycle commits while Character is absent
+    await back(page);
+    const since = await mark(page);
+    await page.waitForTimeout(1800);
+    assert.deepEqual(await phaseWritesSince(page, since), [], 'first sight of the current state, no hidden cycle');
+    assert.match(await caption(page), /Ready/);
+  }));
+}
+
+test('a commit seen in view after a return still plays once', { timeout: 60000 }, () => withPage(async (page) => {
+  await show(page, revision(2, spent));
+  await toSibling(page);
+  await backFromSibling(page);
+  await show(page, revision(3, reloaded));
+  await page.waitForFunction(() => /Magazine release/.test(document.querySelector('[data-rig-phase="vesper"]')?.textContent || ''));
 }));
