@@ -1,3 +1,3 @@
 """Sylvia GM — standalone TTRPG DM harness."""
 
-__version__ = "0.3.0-alpha.3"
+__version__ = "0.3.0-alpha.4"

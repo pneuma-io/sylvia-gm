@@ -24,6 +24,7 @@ marketing/
 *.log
 *.sylvia-gm-campaign
 # Generated build and development state
+*.egg-info/
 __pycache__/
 *.py[cod]
 .pytest_cache/
