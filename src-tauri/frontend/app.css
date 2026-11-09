@@ -513,15 +513,6 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
 .builder-chat-controls button { padding: 6px 8px; background: transparent; color: var(--text-dim); border: 0; text-align: left; }
 .builder-chat-controls button:hover { background: var(--bg-card); color: var(--text-bright); }
 .list-action-status { font-size: 0.8rem; color: var(--text-dim); padding: 8px 4px; overflow-wrap: anywhere; }
-.archived-items { margin-top: 28px; color: var(--text-dim); }
-.archived-items summary { cursor: pointer; font-size: 0.85rem; }
-.archived-items > p { font-size: 0.8rem; margin: 12px 0; }
-.archived-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border-color); }
-.archived-item > div { min-width: 0; overflow-wrap: anywhere; }
-.archived-item small { display: block; margin-top: 4px; color: var(--text-muted); }
-.campaign-shelf-entry { position: relative; }
-.campaign-shelf-entry .campaign-shelf-item { width: 100%; height: 100%; padding-right: 66px; }
-.campaign-archive-link { position: absolute; right: 8px; top: 8px; }
 .builder-chat-rename, .builder-chat-delete {
   border: 0;
   background: transparent;
@@ -559,193 +550,197 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
 }
 
 /* ============================================================
-   Home command centre — latest campaign first, then collection shelves.
+   Home — continue the latest campaign, then campaigns grouped by Ruleset and Setting.
+   Uses the Settings anatomy: sans headings, uppercase eyebrows, 12px cards and the brand accent.
    ============================================================ */
 .home-view {
-  --home-violet: #8d7dfa;
-  --home-violet-soft: #b9afff;
   flex: 1;
   min-width: 0;
   overflow-y: auto;
-  padding: clamp(24px, 4vw, 56px);
+  padding: 32px clamp(20px, 4vw, 48px) 48px;
   background: var(--bg-primary);
+  color: var(--text-narration);
+  font-size: 13px;
 }
+.home-view > * { width: min(100%, 1080px); margin-inline: auto; }
 .home-view[hidden] { display: none; }
 .session-frame.home-active .play-area {
   display: none;
 }
 .home-header {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 24px;
-  padding-bottom: 24px;
+  gap: 16px 24px;
+  padding-bottom: 20px;
   border-bottom: 1px solid var(--border-color);
 }
-.home-kicker,
-.home-recent-kicker {
-  color: var(--home-violet);
-  font: 0.68rem var(--font-mono);
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-}
-.home-header h1:not(.home-kicker) {
-  margin-top: 6px;
-  color: var(--text-bright);
-  font-family: var(--font-serif);
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 400;
-  line-height: 1.05;
-}
-.home-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 9px;
-}
-.home-command-area {
-  display: grid;
-  justify-items: end;
-  gap: 8px;
-}
-.home-action-status {
-  max-width: 520px;
-  color: var(--text-dim);
-  font-size: 0.72rem;
-  text-align: right;
-}
+.home-heading { min-width: 0; color: var(--text-bright); font-family: var(--font-sans); font-size: 24px; font-weight: 600; line-height: 1.25; }
+.home-command-area { display: grid; justify-items: end; gap: 8px; }
+.home-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.home-action-status { max-width: 520px; color: var(--text-dim); font-size: 12.5px; text-align: right; }
 .home-action-status[hidden] { display: none; }
-.home-view .btn-primary {
-  border-color: var(--home-violet);
-  background: var(--home-violet);
-  color: #0d0d13;
-}
-.home-view .btn-primary:hover { background: var(--home-violet-soft); }
-.home-view .btn-secondary {
-  border-color: var(--border-accent);
-  color: var(--text-bright);
-}
+
+/* Controls match the Settings buttons. */
+.home-view .btn { min-height: 36px; padding: 6px 14px; border-radius: 8px; font-size: 13px; justify-content: center; }
+.home-view .btn-sm { min-height: 32px; padding: 5px 12px; font-size: 12.5px; }
+.home-view .btn svg { flex: 0 0 16px; width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }
+.home-view .btn-primary { background: var(--brand); border-color: var(--brand); color: #15121f; font-weight: 600; }
+.home-view .btn-primary:not(:disabled):hover { background: color-mix(in srgb, var(--brand) 82%, white); }
+.home-view .btn-secondary { background: var(--bg-secondary); border-color: var(--border-color); color: var(--text-bright); }
+.home-view .btn-secondary:not(:disabled):hover { background: var(--bg-card-hover); border-color: var(--border-accent); }
+.home-view .btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.home-view .btn:disabled { opacity: .45; }
+
+/* Continue card: the most recently played campaign. */
 .home-recent {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 24px;
-  align-items: end;
-  padding: 30px 0;
-  border-bottom: 1px solid var(--border-color);
-}
-.home-recent h2 {
-  margin-top: 8px;
-  color: var(--text-bright);
-  font-family: var(--font-serif);
-  font-size: clamp(1.6rem, 3vw, 2.25rem);
-  font-weight: 400;
-  line-height: 1.15;
-}
-.home-recent-path {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-  margin-top: 9px;
-  color: var(--text-dim);
-  font-size: 0.78rem;
-}
-.home-recent-path span { color: var(--home-violet); }
-.home-recent-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 16px;
-  margin-top: 15px;
-  color: var(--text-muted);
-  font: 0.68rem var(--font-mono);
-}
-.home-working,
-.campaign-shelf-working {
-  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  color: var(--home-violet-soft);
+  gap: 16px 24px;
+  margin-top: 24px;
+  padding: 20px 22px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--brand) 7%, transparent), transparent 120px), var(--bg-secondary);
+  box-shadow: inset 3px 0 0 var(--brand);
 }
-.home-continue {
-  min-width: 92px;
-  justify-content: center;
-  border-color: var(--home-violet) !important;
-  color: var(--home-violet-soft) !important;
-}
-.home-collections { padding-top: 25px; }
-.home-section-heading,
-.ruleset-shelf-heading {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 16px;
-}
-.home-section-heading { margin-bottom: 18px; }
+.home-recent[hidden] { display: none; }
+.home-recent-kicker,
 .home-section-heading h2,
-.ruleset-shelf-heading h2 {
-  color: var(--text-bright);
-  font-size: 0.88rem;
-  font-weight: 600;
-}
-.home-section-heading span,
-.ruleset-shelf-heading span {
+.setting-shelf h4 {
   color: var(--text-muted);
-  font: 0.66rem var(--font-mono);
-}
-.campaign-shelves { display: grid; gap: 24px; }
-.ruleset-shelf { border-top: 1px solid var(--border-accent); }
-.ruleset-shelf-heading {
-  padding: 11px 0;
-  border-bottom: 1px solid var(--border-color);
-}
-.setting-shelf { padding-top: 14px; }
-.setting-shelf h3 {
-  margin-bottom: 8px;
-  color: var(--text-dim);
-  font: 0.66rem var(--font-mono);
-  letter-spacing: 0.09em;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .09em;
   text-transform: uppercase;
 }
+.home-recent-kicker { color: var(--brand); }
+.home-recent h2 { margin-top: 6px; color: var(--text-bright); font-family: var(--font-sans); font-size: 22px; font-weight: 600; line-height: 1.25; overflow-wrap: anywhere; }
+.home-recent-path { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; color: var(--text-dim); font-size: 13px; }
+.home-recent-path span { color: var(--text-muted); }
+.home-recent-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin-top: 12px; color: var(--text-dim); font-size: 12px; }
+.home-recent .settings-note { margin: 12px 0 0; }
+.home-working { display: inline-flex; align-items: center; gap: 6px; color: var(--brand); font-weight: 500; }
+.home-view .home-missing-session { color: var(--intent); }
+.home-continue { min-width: 128px; }
+
+/* Campaigns grouped by Ruleset, then Setting. */
+.home-collections { margin-top: 28px; }
+.home-section-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.home-section-heading span { color: var(--text-muted); font-size: 12px; }
+.campaign-shelves { display: grid; gap: 14px; }
+.campaign-shelves > .settings-note { margin: 0; }
+.ruleset-shelf {
+  min-width: 0;
+  padding: 16px 18px 18px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,.018), transparent 60px), var(--bg-secondary);
+}
+.ruleset-shelf-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.ruleset-shelf-heading h3 { min-width: 0; color: var(--text-bright); font-size: 15px; font-weight: 600; overflow-wrap: anywhere; }
+.ruleset-shelf-heading span { flex-shrink: 0; color: var(--text-muted); font-size: 12px; }
+.setting-shelf { margin-top: 14px; }
+.setting-shelf h4 { margin-bottom: 8px; overflow-wrap: anywhere; }
 .campaign-shelf-items {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 240px));
-  justify-content: start;
-  gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: 10px;
 }
+.campaign-shelf-entry { position: relative; min-width: 0; }
 .campaign-shelf-item {
   display: grid;
-  min-width: 0;
-  gap: 5px;
-  padding: 12px;
+  align-content: start;
+  gap: 4px;
+  width: 100%;
+  height: 100%;
+  min-height: 76px;
+  padding: 12px 76px 12px 14px;
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  background: var(--bg-secondary);
+  border-radius: 10px;
+  background: var(--bg-primary);
   color: var(--text-narration);
+  font: inherit;
   text-align: left;
+  transition: background var(--transition), border-color var(--transition);
 }
-.campaign-shelf-item:hover,
-.campaign-shelf-item:focus-visible {
-  border-color: var(--home-violet);
-  outline: none;
-}
+.campaign-shelf-item:hover { border-color: var(--border-accent); background: var(--bg-card-hover); }
+.campaign-shelf-item:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 .campaign-shelf-name {
+  display: -webkit-box;
   overflow: hidden;
   color: var(--text-bright);
-  font-family: var(--font-serif);
-  font-size: 0.96rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
-.campaign-shelf-meta {
-  overflow: hidden;
+.campaign-shelf-meta { color: var(--text-dim); font-size: 12px; }
+.campaign-archive-link {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  min-height: 28px;
+  padding: 4px 10px;
+  border: 1px solid transparent;
+  border-radius: 7px;
   color: var(--text-muted);
-  font: 0.65rem var(--font-mono);
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-size: 12px;
 }
-.home-empty-copy {
+.campaign-archive-link:hover { border-color: var(--border-color); background: var(--bg-card); color: var(--text-bright); }
+.campaign-archive-link:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; color: var(--text-bright); }
+.campaign-archive-link:disabled { opacity: .45; cursor: default; }
+.home-empty-copy { color: var(--text-dim); font-size: 13px; }
+.home-empty-card { padding: 18px; border: 1px dashed var(--border-accent); border-radius: 12px; text-align: center; }
+
+/* Archived chats and campaigns: a disclosure card with Restore rows. */
+.archived-items {
+  margin-top: 28px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--bg-secondary);
   color: var(--text-dim);
-  font-size: 0.82rem;
 }
+.archived-items summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  color: var(--text-narration);
+  font-size: 13px;
+  font-weight: 500;
+  list-style: none;
+  cursor: pointer;
+}
+.archived-items summary::-webkit-details-marker { display: none; }
+.archived-items summary::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-right: 1.6px solid currentColor;
+  border-bottom: 1.6px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform var(--transition);
+}
+.archived-items[open] summary::before { transform: rotate(45deg); }
+.archived-items summary:hover { color: var(--text-bright); }
+.archived-items summary:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+#archived-items-count { color: var(--text-muted); font-weight: 400; }
+.archived-items > p { margin: 0 0 4px; padding: 0 16px; font-size: 12.5px; }
+#archived-items-list { padding: 0 16px 4px; }
+#archived-items-list > .home-empty-copy { padding: 8px 0 12px; }
+.archived-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-top: 1px solid var(--border-color); }
+.archived-item > div { min-width: 0; overflow-wrap: anywhere; }
+.archived-item strong { color: var(--text-bright); font-size: 13px; font-weight: 600; }
+.archived-item small { display: block; margin-top: 2px; color: var(--text-dim); font-size: 12px; }
+.home-view .list-action-status { margin-top: 10px; padding: 0; font-size: 12.5px; }
+.home-view .builder-stream-spinner { border-top-color: var(--brand); }
+
 .builder-chat-title {
   display: flex;
   min-width: 0;
@@ -3427,17 +3422,14 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
 
 /* ---- Responsive ---- */
 @media (max-width: 768px) {
-  .home-view { padding: 24px 14px 32px; }
-  .home-header {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 17px;
-  }
-  .home-command-area { justify-items: start; }
-  .home-actions { justify-content: flex-start; }
+  .home-view { padding: 20px 14px 28px; }
+  .home-header { flex-direction: column; align-items: stretch; }
+  .home-command-area { justify-items: stretch; }
+  .home-actions { display: grid; grid-template-columns: 1fr 1fr; }
   .home-action-status { text-align: left; }
-  .home-recent { grid-template-columns: 1fr; gap: 18px; }
-  .campaign-shelf-items { grid-template-columns: 1fr; }
+  .home-recent { grid-template-columns: 1fr; padding: 16px; }
+  .home-continue { width: 100%; }
+  .ruleset-shelf { padding: 14px; }
   .input-bar { padding: 8px 10px 12px; }
   .chat-model-picker-button { max-width: 135px; }
   .ruleset-browser-grid { grid-template-columns: 1fr; }

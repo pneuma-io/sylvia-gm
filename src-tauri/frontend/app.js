@@ -3477,16 +3477,16 @@ const SylviaGMFrontend = (() => {
     const chatSelection = state.sessionReasoning?.modelState?.current ||
       (chatSelect.value === '' ? null : state.modelChoices[Number(chatSelect.value)]);
     const status = $('model-status');
-    const deterministicCampaignButtons = [
-      $('home-new-campaign-btn')
+    const homeCreationButtons = [
+      $('home-new-campaign-btn'), $('home-build-btn')
     ];
     const modelRequiredCreationButtons = [
-      $('new-builder-chat-btn'), $('home-build-btn')
+      $('new-builder-chat-btn')
     ];
     select.disabled = true;
     chatSelect.disabled = true;
     $('set-default-model-btn').disabled = true;
-    [...deterministicCampaignButtons, ...modelRequiredCreationButtons]
+    [...homeCreationButtons, ...modelRequiredCreationButtons]
       .forEach((button) => { button.disabled = true; });
     state.modelChoices = [];
     if (!state.bridge || !state.bridge.model_choices) {
@@ -3504,7 +3504,7 @@ const SylviaGMFrontend = (() => {
     } catch (e) {
       state.modelChoices = [];
     }
-    deterministicCampaignButtons.forEach((button) => { button.disabled = false; });
+    homeCreationButtons.forEach((button) => { button.disabled = false; });
     if (!state.modelChoices.length) {
       select.innerHTML = '<option value="">No configured models</option>';
       chatSelect.innerHTML = select.innerHTML;
@@ -3945,12 +3945,18 @@ const SylviaGMFrontend = (() => {
       sessions.find((session) => session.role === 'dm') || sessions[0] || null;
   }
 
+  // Plain session wording for Home; a non-active status stays visible.
   function sessionSummary(session) {
-    if (!session) return 'No session';
-    return `${session.role === 'builder' ? 'Builder' : 'DM'} session · ${session.status}`;
+    if (!session) return 'No saved session';
+    const label = `${session.role === 'builder' ? 'Builder' : 'Game Master'} session`;
+    return session.status === 'active' ? label : `${label} · ${session.status}`;
   }
 
+  const HOME_WORKING_MARKUP = '<span class="home-working"><span class="builder-stream-spinner" ' +
+    'aria-hidden="true"></span>Working…</span>';
+
   function wireHomeCampaignLinks() {
+    $('campaign-index-retry-btn')?.addEventListener('click', () => { void refreshCampaignIndex(); });
     document.querySelectorAll('[data-home-campaign-id]').forEach((button) => {
       button.addEventListener('click', () => {
         void openCampaign(button.dataset.homeCampaignId, button.dataset.homeSessionId || null);
@@ -3961,31 +3967,42 @@ const SylviaGMFrontend = (() => {
     });
   }
 
+  // Keep keyboard navigation on the same Home control when the live index replaces its markup.
   function renderHome() {
+    const focused = document.activeElement;
+    const controlClass = ['home-continue', 'campaign-shelf-item', 'campaign-archive-link']
+      .find((name) => focused?.classList?.contains(name));
+    const campaignId = focused?.dataset?.homeCampaignId || focused?.dataset?.archiveCampaign;
+    const sessionId = focused?.dataset?.homeSessionId;
+    renderHomeContents();
+    if (!controlClass || !campaignId || focused.isConnected ||
+        document.activeElement !== document.body || state.view !== 'home') return;
+    [...$('home-view').querySelectorAll(`.${controlClass}`)].find((button) =>
+      (button.dataset.homeCampaignId || button.dataset.archiveCampaign) === campaignId &&
+      button.dataset.homeSessionId === sessionId)?.focus({ preventScroll: true });
+  }
+
+  function renderHomeContents() {
     renderArchivedItems();
-    if (state.campaignIndexStatus !== 'ready') {
-      const failed = state.campaignIndexStatus === 'error';
-      const message = failed ? 'Campaign list could not be loaded' : 'Loading campaigns…';
-      $('home-campaign-count').textContent = message;
-      $('home-recent').innerHTML = '<div class="home-empty-copy">' + message + '</div>';
-      $('campaign-shelves').innerHTML = '<div class="home-empty-copy" role="status">' +
-        message + (failed ? ' <button class="btn btn-secondary" type="button" ' +
-          'id="campaign-index-retry-btn">Retry</button>' : '') + '</div>';
-      if (failed) $('campaign-index-retry-btn').addEventListener('click', () => {
-        void refreshCampaignIndex();
-      });
-      return;
-    }
     const campaigns = state.campaigns.filter((campaign) => campaign.lifecycle === 'active');
     const count = campaigns.length;
     $('home-campaign-count').textContent =
       `${count} ongoing campaign${count === 1 ? '' : 's'}`;
 
+    // The index can still be loading or have failed; an empty list then does not mean no campaigns.
+    const indexNote = state.campaignIndexStatus === 'error'
+      ? '<p class="settings-note settings-note-warn" role="status">Sylvia couldn’t load your campaign list just now. ' +
+        'It will try again shortly. <button class="btn btn-secondary btn-sm" type="button" ' +
+        'id="campaign-index-retry-btn">Retry</button></p>'
+      : state.campaignIndexStatus === 'loading' && !campaigns.length
+        ? '<p class="settings-note">Loading your campaigns…</p>' : '';
+
     const recent = recentCampaign(campaigns);
+    // With nothing to continue, the campaign list below explains the empty or loading state.
+    $('home-recent').hidden = !recent;
     if (!recent) {
       $('home-recent').innerHTML =
-        '<h2 class="visually-hidden" id="home-recent-title">Most recently updated campaign</h2>' +
-        '<div class="home-empty-copy">Your most recently updated campaign will appear here.</div>';
+        '<h2 class="visually-hidden" id="home-recent-title">Most recently updated campaign</h2>';
     } else {
       const session = preferredCampaignSession(recent);
       const isDraft = recent.availability === 'draft';
@@ -3997,24 +4014,28 @@ const SylviaGMFrontend = (() => {
         : concisePackageLabel(recent.campaign_setting_label, 'setting');
       const streaming = Boolean(session && activityIsWorking(activityForSession(session.session_id)));
       $('home-recent').innerHTML =
-        '<div class="home-recent-copy"><div class="home-recent-kicker">Most recently updated</div>' +
+        '<div class="home-recent-copy"><div class="home-recent-kicker">Continue where you left off</div>' +
         `<h2 id="home-recent-title">${escapeHtml(recent.display_name)}</h2>` +
         `<div class="home-recent-path">${escapeHtml(ruleset)}` +
-        '<span aria-hidden="true">→</span>' + `${escapeHtml(setting)}</div>` +
+        '<span aria-hidden="true">·</span>' + `${escapeHtml(setting)}</div>` +
         '<div class="home-recent-meta">' +
-        `<span>${escapeHtml(sessionSummary(session))}</span>` +
+        `<span${session ? '' : ' class="home-missing-session"'}>${escapeHtml(sessionSummary(session))}</span>` +
         `<span>Revision ${escapeHtml(recent.revision)}</span>` +
-        `${streaming ? '<span class="home-working"><span class="builder-stream-spinner" aria-hidden="true"></span>Working…</span>' : ''}` +
-        '</div></div>' +
-        `<button class="btn btn-secondary home-continue" type="button" ` +
+        `${streaming ? HOME_WORKING_MARKUP : ''}` +
+        '</div>' +
+        `${session ? '' : '<p class="settings-note settings-note-warn">This campaign has no saved session to continue.</p>'}` +
+        '</div>' +
+        `<button class="btn btn-primary home-continue" type="button" ` +
         `data-home-campaign-id="${escapeHtml(recent.campaign_id)}" ` +
         `data-home-session-id="${escapeHtml(session && session.session_id)}" ` +
-        `${session ? '' : 'disabled'}>Continue</button>`;
+        `${session ? '' : 'disabled'}><svg viewBox="0 0 24 24" aria-hidden="true">` +
+        '<path d="M7 4.5v15l12-7.5z"/></svg>Continue</button>';
     }
 
     if (!campaigns.length) {
-      $('campaign-shelves').innerHTML =
-        '<div class="home-empty-copy">No ongoing campaigns yet.</div>';
+      $('campaign-shelves').innerHTML = indexNote + (!indexNote
+        ? '<div class="home-empty-copy home-empty-card">No ongoing campaigns yet. ' +
+          'Start a New Campaign, or choose a Ready campaign to play with a premade party.</div>' : '');
       wireHomeCampaignLinks();
       return;
     }
@@ -4040,7 +4061,7 @@ const SylviaGMFrontend = (() => {
       ruleset.settings.get(settingKey).campaigns.push(campaign);
     });
 
-    $('campaign-shelves').innerHTML = [...rulesets.values()].map((ruleset) => {
+    $('campaign-shelves').innerHTML = indexNote + [...rulesets.values()].map((ruleset) => {
       const rulesetCount = [...ruleset.settings.values()].reduce(
         (total, setting) => total + setting.campaigns.length, 0
       );
@@ -4054,21 +4075,22 @@ const SylviaGMFrontend = (() => {
             );
             return `<div class="campaign-shelf-entry"><button class="campaign-shelf-item" type="button" ` +
               `data-home-campaign-id="${escapeHtml(campaign.campaign_id)}" ` +
-              `data-home-session-id="${escapeHtml(session && session.session_id)}">` +
+              `data-home-session-id="${escapeHtml(session && session.session_id)}" ` +
+              `title="${escapeHtml(campaign.display_name)}">` +
               `<span class="campaign-shelf-name">${escapeHtml(campaign.display_name)}</span>` +
-              `<span class="campaign-shelf-meta">${escapeHtml(sessionSummary(session))} · ` +
-              `Revision ${escapeHtml(campaign.revision)}</span>` +
-              `${streaming ? '<span class="campaign-shelf-working"><span class="builder-stream-spinner" aria-hidden="true"></span>Working…</span>' : ''}` +
+              `<span class="campaign-shelf-meta${session ? '' : ' home-missing-session'}">` +
+              `${escapeHtml(sessionSummary(session))}</span>` +
+              `${streaming ? HOME_WORKING_MARKUP : ''}` +
               '</button>' + `<button class="archive-link campaign-archive-link" type="button" ` +
               `data-archive-campaign="${escapeHtml(campaign.campaign_id)}" ` +
               `aria-label="Archive campaign ${escapeHtml(campaign.display_name)}" ` +
               `${state.archivingItems.has(campaign.campaign_id) ? 'disabled' : ''}>Archive</button></div>`;
           }).join('');
-        return `<section class="setting-shelf"><h3>${escapeHtml(setting.label)}</h3>` +
+        return `<section class="setting-shelf"><h4>${escapeHtml(setting.label)}</h4>` +
           `<div class="campaign-shelf-items">${tiles}</div></section>`;
       }).join('');
       return '<section class="ruleset-shelf">' +
-        `<div class="ruleset-shelf-heading"><h2>${escapeHtml(ruleset.label)}</h2>` +
+        `<div class="ruleset-shelf-heading"><h3>${escapeHtml(ruleset.label)}</h3>` +
         `<span>${rulesetCount} campaign${rulesetCount === 1 ? '' : 's'}</span></div>` +
         settings + '</section>';
     }).join('');
@@ -4206,7 +4228,8 @@ const SylviaGMFrontend = (() => {
       ...campaigns.map((campaign) => ({ id: campaign.campaign_id, name: campaign.display_name,
         type: campaign.availability === 'draft' ? 'Campaign draft · includes Interview' : 'Campaign · includes saved sessions', action: 'campaign' })),
     ].map((item) => `<div class="archived-item"><div><strong>${escapeHtml(item.name)}</strong>` +
-      `<small>${escapeHtml(item.type)}</small></div><button class="btn btn-secondary btn-sm" ` +
+      `<small>${escapeHtml(item.type)}</small></div><button class="btn btn-secondary btn-sm" type="button" ` +
+      `aria-label="Restore ${escapeHtml(item.name)}" ` +
       `data-restore-${item.action}="${escapeHtml(item.id)}" ` +
       `${state.archivingItems.has(item.id) ? 'disabled' : ''}>Restore</button></div>`).join('') ||
       '<p class="home-empty-copy">No archived items.</p>';
