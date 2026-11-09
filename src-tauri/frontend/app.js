@@ -3956,7 +3956,9 @@ const SylviaGMFrontend = (() => {
     'aria-hidden="true"></span>Working…</span>';
 
   function wireHomeCampaignLinks() {
-    $('campaign-index-retry-btn')?.addEventListener('click', () => { void refreshCampaignIndex(); });
+    if (state.campaignIndexStatus === 'error') {
+      $('campaign-index-retry-btn')?.addEventListener('click', () => { void refreshCampaignIndex(); }, { once: true });
+    }
     document.querySelectorAll('[data-home-campaign-id]').forEach((button) => {
       button.addEventListener('click', () => {
         void openCampaign(button.dataset.homeCampaignId, button.dataset.homeSessionId || null);
@@ -3989,13 +3991,14 @@ const SylviaGMFrontend = (() => {
     $('home-campaign-count').textContent =
       `${count} ongoing campaign${count === 1 ? '' : 's'}`;
 
-    // The index can still be loading or have failed; an empty list then does not mean no campaigns.
+    // The index can still be loading or have failed; campaigns already shown stay listed, and an empty
+    // list then does not mean no campaigns.
     const indexNote = state.campaignIndexStatus === 'error'
-      ? '<p class="settings-note settings-note-warn" role="status">Sylvia couldn’t load your campaign list just now. ' +
-        'It will try again shortly. <button class="btn btn-secondary btn-sm" type="button" ' +
-        'id="campaign-index-retry-btn">Retry</button></p>'
-      : state.campaignIndexStatus === 'loading' && !campaigns.length
-        ? '<p class="settings-note">Loading your campaigns…</p>' : '';
+      ? '<p class="settings-note settings-note-warn" role="status"><strong>Campaign list could not be loaded.</strong> ' +
+        'Sylvia couldn’t load your campaign list just now and will try again shortly. ' +
+        '<button class="btn btn-secondary btn-sm" type="button" id="campaign-index-retry-btn">Retry</button></p>'
+      : state.campaignIndexStatus === 'loading'
+        ? '<p class="settings-note" role="status">Loading campaigns…</p>' : '';
 
     const recent = recentCampaign(campaigns);
     // With nothing to continue, the campaign list below explains the empty or loading state.
