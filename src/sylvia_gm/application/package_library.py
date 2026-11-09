@@ -202,6 +202,14 @@ def project_surfaces(
         if not isinstance(source, Mapping):
             return False
         kind = source.get("kind")
+        if kind == "keyed_values":
+            entries = source.get("entries")
+            return isinstance(entries, Sequence) and all(
+                isinstance(entry, Mapping)
+                and player_safe_source(entry.get("key"))
+                and player_safe_source(entry.get("value"))
+                for entry in entries
+            )
         if kind == "object":
             fields = source.get("fields")
             return isinstance(fields, Mapping) and all(
