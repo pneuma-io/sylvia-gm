@@ -85,6 +85,7 @@ PANEL_DECLARATION_SCHEMA: dict[str, Any] = {
                 {"$ref": "#/$defs/participant_source"},
                 {"$ref": "#/$defs/campaign_plan_source"},
                 {"$ref": "#/$defs/object_source"},
+                {"$ref": "#/$defs/keyed_values_source"},
             ]
         },
         "literal_source": {"type":"object","additionalProperties":False,"required":["kind","value"],"properties":{"kind":{"const":"literal"},"value":{"type":"object"}}},
@@ -116,6 +117,29 @@ PANEL_DECLARATION_SCHEMA: dict[str, Any] = {
             "properties": {
                 "kind": {"const": "campaign_plan"},
                 "path": {"type": "array", "minItems": 1, "maxItems": 16, "items": IDENTITY},
+            },
+        },
+        "keyed_values_source": {
+            "type": "object",
+            "additionalProperties": False,
+            "required": ["kind", "entries"],
+            "description": "Map resolved string keys to values; omit empty keys and null values.",
+            "properties": {
+                "kind": {"const": "keyed_values"},
+                "entries": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 16,
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": False,
+                        "required": ["key", "value"],
+                        "properties": {
+                            "key": {"$ref": "#/$defs/source"},
+                            "value": {"$ref": "#/$defs/source"},
+                        },
+                    },
+                },
             },
         },
         "object_source": {

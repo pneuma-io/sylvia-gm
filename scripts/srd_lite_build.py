@@ -612,6 +612,8 @@ def compose(runtime, root, output, progress):
         bind_gm_encounter_boundary(runtime, record)
         from .srd_lite_creature_space import bind_creature_space
         bind_creature_space(runtime, record)
+        from .srd_lite_frontend_projections import bind_frontend_projections
+        bind_frontend_projections(record, catalogue)
         # Final wrappers can retire private helpers; use the existing reachability check
         # after all movement bindings, preserving the unchanged runtime admission limit.
         omit_unreachable_private_tools(runtime, record)
