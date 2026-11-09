@@ -50,6 +50,7 @@ PYTHON_JOURNEYS = {
         "tests/test_action_sequences.py",
         "tests/test_action_sequence_provider.py",
         "tests/test_td_native_panel_repairs.py",
+        "tests/test_td_panel_resources.py",
         "tests/test_fc_campaign_journey.py",
         "tests/test_fc_party_combat.py",
         "tests/test_fc_campaign_progress.py",
@@ -135,6 +136,7 @@ PYTHON_JOURNEYS = {
         "tests/test_result_cards.py",
     ],
     "interruption-and-recovery": [
+        "tests/test_private_session_reopen.py",
         "tests/test_fc_recovery_composition.py",
         "tests/test_session_history_pages.py",
         "tests/test_alpha_f6e_owner_session_transport.py::"

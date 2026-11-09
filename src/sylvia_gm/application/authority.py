@@ -95,6 +95,7 @@ from sylvia_gm.application.player_actions import (
     player_action_origins,
     player_action_records,
     player_action_request_matches,
+    player_canonical_payload,
     player_control_origin,
     player_tool_result,
     resolve_inventory_action_parameters,
@@ -7348,6 +7349,7 @@ class AuthorityOwner:
         if session_id is None:
             return
         snapshot = self._store.snapshot(receipt.campaign_id)
+        snapshot = self._project_private_tool_inputs(snapshot)
         events = tuple(
             event for event in snapshot.events
             if event.action_id == receipt.action_id
@@ -7590,21 +7592,10 @@ class AuthorityOwner:
         ) for action in snapshot.actions)
 
         def public_event(event: CanonicalEvent) -> CanonicalEvent:
-            if (event.event_type is CanonicalEventType.TOOL_CALL
-                    and event.safe_payload.get("package_id") in private_packages):
-                return replace(event, safe_payload=owned_payload({
-                    **event.safe_payload, "parameters": {},
-                }))
-            if event.event_type is CanonicalEventType.TOOL_RESULT:
-                result = event.safe_payload.get("result")
-                if isinstance(result, Mapping):
-                    return replace(event, safe_payload=owned_payload({
-                        **event.safe_payload, "result": player_tool_result(result),
-                    }))
-            if (event.event_type is CanonicalEventType.CONSEQUENCE
-                    and event.safe_payload.get("kind") == "spatial_query"):
-                return replace(event, safe_payload=owned_payload({"kind": "spatial_query"}))
-            return event
+            return replace(event, safe_payload=player_canonical_payload(
+                event.event_type, event.safe_payload,
+                private_inputs=event.safe_payload.get("package_id") in private_packages,
+            ))
 
         events = tuple(public_event(event) for event in snapshot.events)
         return replace(snapshot, actions=actions, events=events)

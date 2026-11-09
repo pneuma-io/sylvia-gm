@@ -25,7 +25,24 @@ qualification section. The native queue journey exposed a committed-card price t
 its earlier preview after a stance change; completed summaries now use the declared public
 result card. Engine accounting and retained balance parameters are unchanged.
 
+Resumed after the owner's DBD pause. Hosted qualification on `0954bed` failed despite the
+separate Windows Rust pass: public event references differed between panel commits, narration
+replay and reopen validation. The repair uses one public projection, normalizes only exact
+legacy references, and retains canonical events and tamper rejection. Focused checks pass;
+hosted qualification and the rebuilt native candidate still need fresh results. The exclusion
+test's undeclared local codec-stage dependency is replaced by a labelled synthetic subprocess
+fixture; actual codec verification remains with staging and final build checks.
+
+The TD character format accepts authored magazine capacities and firearm labels. Existing
+HP/RES maxima and tube capacity project without frontend changes; unknown values stay absent.
+Conformance characters explicitly declare their synthetic maxima and capacities. These values
+are not new-character defaults or a balance selection.
+
 The newer Opus frontend production port remains separate in [PR #28](https://github.com/pneuma-io/sylvia-gm/pull/28).
+Its current `8b0371f` correction is under Fluff's independent review. The TD acceptance includes
+the single Reload control's magazine-change/cycle order, AP exhaustion, refusal/stale-state
+recovery, and committed animation occurring once without replay on reopen. Qualification must
+name the exact frontend composition; PR6-only native evidence cannot close that combined check.
 The final combined product must match the current approved mock-up and receive the later Opus
 pass. TD mechanics qualification does not close that visual acceptance. Siren composition and
 balance-suite refactoring remain separate. The following 9 November entry records the earlier

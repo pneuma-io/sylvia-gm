@@ -48,6 +48,13 @@ that maximum, after the GM establishes genuine safety, time and support. Without
 or in the unsafe/insufficient-time case, it changes no character resource. It never restores
 HP/AP, reloads weapons or removes injuries; those require their actual rules and decisions.
 
+The panels display these authored maxima beside current resources. Optional `weapon.label`
+supplies the firearm's display name. A detachable magazine may carry its explicit `capacity`
+alongside `id` and `rounds`, including spare and retained magazines; it travels with that physical
+magazine through reloads and transfers. Tube feeds use the existing `weapon.tube_capacity`.
+Omit unknown maxima, capacities and labels rather than deriving them from remaining resources.
+These presentation fields do not grant resources, equipment or a starting profile.
+
 For the currently represented `life_threatening` record, use `NONE` when absent and the
 canonical `ACTIVE`, `STABILIZED` or `FAILED` states otherwise. The obsolete labels `STABLE`
 and `LIFE_THREATENING` do not match treatment. `treat_casualty` requires an active, non-downed

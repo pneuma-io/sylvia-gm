@@ -96,6 +96,11 @@
           "type": "string",
           "minLength": 1
         },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Authored display name for this firearm; omission retains the ID fallback."
+        },
         "damage": {
           "type": "integer",
           "minimum": 0
@@ -158,6 +163,11 @@
             "rounds": {
               "type": "integer",
               "minimum": 0
+            },
+            "capacity": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Authored capacity of this physical magazine, excluding the chamber."
             }
           },
           "additionalProperties": false
@@ -178,6 +188,10 @@
               "rounds": {
                 "type": "integer",
                 "minimum": 0
+              },
+              "capacity": {
+                "type": "integer",
+                "minimum": 1
               }
             },
             "additionalProperties": false
@@ -199,6 +213,10 @@
               "rounds": {
                 "type": "integer",
                 "minimum": 0
+              },
+              "capacity": {
+                "type": "integer",
+                "minimum": 1
               }
             },
             "additionalProperties": false

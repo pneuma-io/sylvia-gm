@@ -63,6 +63,11 @@ def test_declared_operative_state_copies_choices_without_scene_or_duplicate_list
         assert complete[field] is not participant[field]
     assert complete["downed"] is False
     assert complete["reserve_weapons"] == [reserve]
+    assert (complete["max_hp"], complete["max_res"]) == (11, 10)
+    assert complete["weapon"]["label"] == "Pistol"
+    assert complete["weapon"]["magazine"]["capacity"] == (
+        default_manifest().seed_set().values["equipment.pistol.capacity"]
+    )
     assert not {"position_cell", "center", "muzzle"} & set(complete)
     assert verify_initial_character_state(
         participant, complete,
@@ -72,6 +77,24 @@ def test_declared_operative_state_copies_choices_without_scene_or_duplicate_list
     context = ExecutionContext(params={"attacker": complete})
     assert evaluate(parse_expression("attacker.aim.target == null"), context) is True
     assert evaluate(parse_expression("attacker.weapon.controlled_by == null"), context) is True
+
+
+def test_unknown_presentation_values_are_not_inferred_from_current_resources():
+    participant = builder._conformance_character()["artifact"]
+    declaration = builder._character_declaration(builder._character_schema(participant["specialties"]))
+    authored = _authored_state(declaration)
+    for field in ("max_hp", "max_res"):
+        authored.pop(field)
+    authored["weapon"].pop("label")
+    for magazine in [authored["weapon"]["magazine"], *authored["weapon"]["spare_magazines"]]:
+        magazine.pop("capacity")
+    complete = materialize_initial_character_state(
+        participant, authored, entity_state_schema=declaration["entity_state_schema"],
+        initial_state_calculations=declaration["initial_state_calculations"],
+    )
+    assert "max_hp" not in complete and "max_res" not in complete
+    assert "label" not in complete["weapon"]
+    assert "capacity" not in complete["weapon"]["magazine"]
 
 
 def test_generated_creation_identity_matches_sylvia_complete_contract_hash():

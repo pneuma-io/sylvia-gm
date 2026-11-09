@@ -5232,6 +5232,7 @@ def _entity(
     cyclic_rates_rpm = {"smg": 900, "service_rifle": 750, "lmg": 600}
     selected_weapon = {
         "id": weapon,
+        "label": weapon.replace("_", " ").capitalize(),
         "damage": parameter_values[f"{prefix}.damage"],
         "target_pen": parameter_values[f"{prefix}.target_pen"],
         "material_pen": parameter_values[f"{prefix}.material_pen"],
@@ -5240,23 +5241,27 @@ def _entity(
         "range_modifiers": deepcopy(parameter_values[f"{prefix}.range_modifiers"]),
         "current_recoil": 0,
         "cyclic_rate_rpm": cyclic_rates_rpm.get(weapon),
-        "magazine": {"id": f"{identity}-{weapon}-magazine-0", "rounds": capacity},
+        "magazine": {"id": f"{identity}-{weapon}-magazine-0", "rounds": capacity,
+                     **({"capacity": capacity} if weapon != "shotgun" else {})},
         "spare_magazines": [
-            {"id": f"{identity}-{weapon}-magazine-1", "rounds": capacity},
-            {"id": f"{identity}-{weapon}-magazine-2", "rounds": capacity},
+            {"id": f"{identity}-{weapon}-magazine-1", "rounds": capacity, "capacity": capacity},
+            {"id": f"{identity}-{weapon}-magazine-2", "rounds": capacity, "capacity": capacity},
         ],
         "retained_magazines": [],
         "chamber": "SPENT" if needs_cycle else "LIVE",
         "needs_cycle": needs_cycle,
         "mechanism": mechanisms[weapon],
         "feed": "TUBE" if weapon == "shotgun" else "DETACHABLE_MAGAZINE",
+        **({"tube_capacity": capacity} if weapon == "shotgun" else {}),
         "reload_ap": parameter_values[f"{prefix}.reload_ap"],
         "cycle_ap": parameter_values.get(f"{prefix}.cycle_ap", 0),
         "location": "READY",
         "controlled_by": None,
         "fire_modes": fire_modes[weapon],
     }
+    # These maxima describe this full-health synthetic fixture, never a new-character default.
     return {
+        "max_hp": 11, "max_res": 10,
         "id": identity, "name": identity.replace("_", " ").title(), "side": side, "class_id": class_id, "level": 10, "active": True, "ap": 6, "max_ap": 6, "hp": 11, "res": 10, "downed": False, "stance": "STANDING", "position_cell": position, "center": [position[0] + 0.5, position[1] + 0.5, 0.9], "movement_m_per_ap": parameter_values["move.upright_m_per_ap"], "muzzle": [position[0] + (0.91 if side == "allies" else -0.09), position[1] + 0.5, 1.4], "skills": {"athletics": 0, "cqc": 3, "drone_operations": 6 if identity == "hex" else 0, "engineering": 0, "grenades": 0, "influence": 0, "investigation": 0, "local_hacking": 4 if identity == "hex" else 0, "marksmanship": 6 if identity == "vesper" else 4, "medicine": 2, "networking": networking, "recon": 0, "social_read": 0, "stealth": 0, "tactics": 0, "vehicles": 0}, "aptitudes": {"acuity": 0, "force": 1, "nerve": 0, "precision": 2, "presence": 0, "reason": 2 if identity == "hex" else 1}, "specialties": ["specialty.networker.entry.map_the_links", "specialty.networker.tier_1.pivot", "specialty.networker.tier_1.quiet_enumeration", "specialty.networker.tier_2.foothold", "specialty.networker.tier_2.segment_map"] if identity == "hex" else [], "weapon": selected_weapon, "aim": {"target": None, "point": None, "ap": 0}, "recoil_recovery_per_ap": 2 if class_id == "RIFLEMAN" else 1, "intrusion_ap_discount": 1 if class_id == "HACKER" else 0, "local_access": identity == "hex", "medical_kit_capable": False, "resuscitation_kit_capable": False, "medicine_bonus": 0, "life_threatening": {"state": "NONE", "within_reversible_window": False}, "control": None,
     }
 
