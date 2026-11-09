@@ -74,6 +74,7 @@ Use a slow, welcoming, character-orienting D&D introduction rather than beginnin
         "max_hp": 9,
         "prepared_spells": [],
         "resources": {},
+        "size_rank": 2,
         "speed": 40,
         "stable": false,
         "stable_recovery_hours_remaining": 0,

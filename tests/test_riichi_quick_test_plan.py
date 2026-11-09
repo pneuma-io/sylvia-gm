@@ -27,11 +27,17 @@ from sylvia_gm.domain.package_library import canonical_json_bytes
 from sylvia_gm.infrastructure.package_archive import admit_package_archive
 from tests.test_alpha_f6e_owner_session_transport import _OwnerHarness
 
+RIICHI_PLANS = ("riichi-quick-test",)
 
+
+@pytest.mark.parametrize("slug", RIICHI_PLANS)
 @pytest.mark.parametrize("match_format", ["east_only", "east_south"])
-def test_included_player_and_format_reach_a_real_engine_deal(tmp_path: Path, match_format: str):
-    selected = bundled_plan("riichi-quick-test")
+def test_included_player_and_format_reach_a_real_engine_deal(
+    tmp_path: Path, match_format: str, slug: str,
+):
+    selected = bundled_plan(slug)
     assert selected is not None
+    assert selected.plan.payload["bindings"]["ruleset"]["id"] == "pneuma.riichi-mahjong"
     files = bundled_plan_files(Path(__file__).resolve().parents[1] / "campaign-plans")
     assert any(path.as_posix().endswith("riichi-quick-test/setting-files/characters/you.json")
                for path in files)
@@ -55,7 +61,7 @@ def test_included_player_and_format_reach_a_real_engine_deal(tmp_path: Path, mat
     with AuthorityOwner.open(tmp_path / "deal.db", "quick-test") as owner:
         selection = resolve_campaign_library_selection(
             owner, tmp_path, candidate_id="pneuma.riichi-mahjong",
-            setting_id="pneuma.riichi-club", plan_id="riichi-quick-test",
+            setting_id="pneuma.riichi-club", plan_id=slug,
         )
         options = selection.party_options()
         assert len(options["player_archetypes"]) == 1

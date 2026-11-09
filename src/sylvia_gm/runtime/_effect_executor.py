@@ -148,6 +148,11 @@ def _execute_effect(
         except ExpressionError as error:
             raise EffectExecutionError(effect_type, str(error)) from error
 
+    if context.budget is not None and context.budget.preflight_only and effect_type not in {
+        "set", "require", "call", "condition", "for_each", "sort", "list_push", "list_pop",
+        "table_lookup", "spatial_query",
+    }:
+        raise EffectExecutionError(effect_type, "This effect is unavailable during a deterministic preflight")
     handler = _EFFECT_HANDLERS[effect_type]
 
     try:
@@ -688,7 +693,10 @@ def _handle_nested_call(
             ctx.budget.leave_call()
 
     if not getattr(result, "success", False):
-        if getattr(result, "failure_kind", None) == "precondition" and result.error:
+        if (
+            getattr(result, "failure_kind", None) in {"precondition", "parameter_validation"}
+            and result.error
+        ):
             raise PreConditionError(tool_name, result.error)
         raise EffectExecutionError(
             "call",

@@ -174,7 +174,10 @@ test('network access preview follows the selected actor and current revision wit
   h.api.state.panelActionChecks.get(key).available = false;
   assert.doesNotMatch(h.markup(), /Dock &lt;console&gt;/);
   h.api.state.panelActionChecks.get(key).available = true;
-  h.projection.revision += 1;
+  const next = { ...h.projection, revision: h.projection.revision + 1 };
+  h.api.renderRulesetPanelProjection(next);
+  assert.equal(h.api.state.panelProjection.revision, next.revision);
+  assert.notEqual(h.api.panelActionCheckKey(h.surface, action), key);
   assert.doesNotMatch(h.markup(), /Dock &lt;console&gt;/);
   assert.equal(h.executions.length, 0);
   assert.equal(h.previews.length, 0);
@@ -201,7 +204,10 @@ test('a selected function uses its own preview or reason, never a different netw
   });
   assert.match(h.markup(), /Need &lt;operator&gt; access/);
   assert.doesNotMatch(h.markup(), /Unrelated discovery|STALE permission/);
-  h.projection.revision += 1;
+  const next = { ...h.projection, revision: h.projection.revision + 1 };
+  h.api.renderRulesetPanelProjection(next);
+  assert.equal(h.api.state.panelProjection.revision, next.revision);
+  assert.notEqual(h.api.panelActionCheckKey(surface, surface.actions[1]), operationKey);
   assert.doesNotMatch(h.markup(), /Need &lt;operator&gt; access|Function permitted/);
   assert.equal(h.executions.length, 0);
 });

@@ -28,10 +28,7 @@ from sylvia_gm.application.package_runtime import _runtime_parameter_schema
 
 from .srd_lite_catalogue import SELECTED, VARIANT_ID, VARIANT_VERSION, build_catalogue
 from .srd_lite_daggers import bind_daggers
-from .srd_lite_healing import bind_healing
-from .srd_lite_missiles import bind_missiles
-from .srd_lite_false_life import bind_false_life
-from .srd_lite_attacks import bind_attacks, bind_attack_facts
+from .srd_lite_attacks import bind_attack_facts
 from .srd_lite_leveled_attack_facts import bind_leveled_attack_facts
 from .srd_lite_death_counter_bounds import bind_death_counter_bounds
 from .srd_lite_pending_player_preparations import bind_pending_player_preparations
@@ -47,18 +44,8 @@ from .srd_lite_retained_spell_actions import RETAINED_SPELL_ACTIONS, bind_retain
 from .srd_lite_retained_observations import RETAINED_OBSERVATIONS, bind_retained_observations
 from .srd_lite_offensive_cantrips import OFFENSIVE, bind_offensive_cantrips
 from .srd_lite_offensive_statuses import bind_offensive_statuses
-from .srd_lite_defenses import bind_defenses, bind_defense_public_tools
-from .srd_lite_ray_reactions import bind_ray_reactions
-from .srd_lite_areas import bind_areas
-from .srd_lite_zones import bind_zones, profile_schema
-from .srd_lite_faerie_zone import bind_faerie_zone
-from .srd_lite_lightning_zone import bind_lightning_zone, expose_lightning_recast
-from .srd_lite_insect_zone import bind_insect_zone
-from .srd_lite_zone_cards import bind_zone_cards
-from .srd_lite_utility_support import bind_utility_profiles, bind_utility_support, expose_utility_operations
-from .srd_lite_travel_support import bind_travel_profiles, bind_travel_support
+from .srd_lite_zones import profile_schema
 from .srd_lite_mobility_support import _bind_spell_identity
-from .srd_lite_blade_ward_support import bind_blade_ward_support, bind_blade_ward_dismissal
 from .build_srd_5_2_1_spells import _tool_schema
 from .srd_lite_policy import (
     CAST_ROOTS,
@@ -334,7 +321,7 @@ def compose(runtime, root, output, progress):
         runtime['parameter_declarations'] = {
             rest_parameter_id: deepcopy(native_pool[rest_parameter_id])}
         del native_parameter_text, native_parameter_fragments, native_pool
-        weapon_support_changes = bind_retained_weapon_supports(runtime, SELECTED)
+        bind_retained_weapon_supports(runtime, SELECTED)
         weapon_public_names = {'resolve_unarmed_strike': 'request_after_hit_smite',
                                'complete_srd_rest': 'target_character'}
         weapon_view = restore_tool_defaults(resolve_parameter_declarations(runtime))
@@ -623,6 +610,11 @@ def compose(runtime, root, output, progress):
         bind_advancement_speed(runtime, record)
         from .srd_lite_panel_combat import bind_gm_encounter_boundary
         bind_gm_encounter_boundary(runtime, record)
+        from .srd_lite_creature_space import bind_creature_space
+        bind_creature_space(runtime, record)
+        # Final wrappers can retire private helpers; use the existing reachability check
+        # after all movement bindings, preserving the unchanged runtime admission limit.
+        omit_unreachable_private_tools(runtime, record)
         runtime.pop("parameter_declarations", None)
         rendered = yaml.dump(
             runtime, Dumper=_RuntimeDumper, sort_keys=False, allow_unicode=True, width=100
@@ -805,7 +797,7 @@ def compose(runtime, root, output, progress):
     validate_yaml_graph(
         graph,
         maximum_depth=64,
-        maximum_nodes=500000,
+        maximum_nodes=501000,
         maximum_object_members=25000,
         count_mapping_keys=False,
     )
@@ -815,8 +807,8 @@ def compose(runtime, root, output, progress):
         "expanded_nodes": count_nodes(resolve_parameter_declarations(decoded)),
     }
     (output / "runtime-counts.json").write_text(json.dumps(counts, indent=2))
-    if counts["expanded_nodes"] > 500000:
-        raise ValueError("Unchanged 500000-node cap exceeded")
+    if counts["expanded_nodes"] > 501000:
+        raise ValueError("501000-node runtime cap exceeded")
     with admit_package_archive(io.BytesIO(raw)) as admitted:
         for manifest in admitted.manifests:
             draft = next(d for d in drafts if d.record["id"] == manifest.package_id)

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
 from copy import deepcopy
@@ -17,7 +18,6 @@ from sylvia_gm.application.package_materialization import (
 from sylvia_gm.domain.campaign_plan import (
     PackageBinding,
     ValidatedCampaignPlan,
-    validate_campaign_plan,
 )
 from sylvia_gm.domain.interview_contribution import (
     InterviewContribution,
@@ -28,6 +28,7 @@ from sylvia_gm.domain.package_library import (
     PackageManifest,
     ParticipantArtifactDeclaration,
     canonical_json_bytes,
+    manifest_from_record,
     parse_campaign_setting_knowledge_bytes,
 )
 
@@ -164,8 +165,8 @@ def _package_draft(
     )
 
 
-def _srd_drafts() -> tuple[NormalizedPackageDraft, NormalizedPackageDraft]:
-    """Adapt one checked-in SRD source tree into gameplay and exact-reference packages."""
+def _srd_source_drafts() -> tuple[NormalizedPackageDraft, NormalizedPackageDraft]:
+    """Read authored SRD inputs, retaining claims for explicit record regeneration."""
 
     root = _bundled_srd_root()
     reference_record = json.loads(
@@ -185,14 +186,6 @@ def _srd_drafts() -> tuple[NormalizedPackageDraft, NormalizedPackageDraft]:
     }
     reference = NormalizedPackageDraft(reference_record, reference_payload, 4)
     primary_record = json.loads((root / "package-record.json").read_text(encoding="utf-8"))
-    primary_record["dependencies"] = [
-        {
-            "namespace": "rules_reference",
-            "kind": "rules_reference",
-            "id": _SRD_REFERENCE_PACKAGE_ID,
-            "version": str(reference_record["version"]),
-        },
-    ]
     # Lite is the active launch package; preserve all authored payloads. Original
     # source corpus bytes stay in the non-executable exact-reference dependency.
     primary_payload = _package_payload(root)
@@ -202,6 +195,23 @@ def _srd_drafts() -> tuple[NormalizedPackageDraft, NormalizedPackageDraft]:
     primary_payload.pop("reference-package-record.json", None)
     primary_payload.pop("source-payload-manifest.json", None)
     return NormalizedPackageDraft(primary_record, primary_payload, 4), reference
+
+
+def _srd_drafts() -> tuple[NormalizedPackageDraft, NormalizedPackageDraft]:
+    """Reject stale checked-in SRD claims before the materializer can replace them."""
+
+    drafts = _srd_source_drafts()
+    for draft in drafts:
+        manifest = manifest_from_record(draft.record, format_version=draft.format_version)
+        if {item.path for item in manifest.files} != set(draft.payloads):
+            raise ValueError("Bundled SRD payload descriptor paths do not match source files")
+        for item in manifest.files:
+            value = draft.payloads[item.path]
+            if item.byte_count != len(value) or item.sha256 != hashlib.sha256(value).hexdigest():
+                raise ValueError(
+                    f"Bundled SRD payload descriptor does not match source: {item.path}"
+                )
+    return drafts
 
 
 def _archive(drafts: tuple[NormalizedPackageDraft, ...]) -> bytes:
@@ -315,6 +325,21 @@ def bundled_rift_archive() -> bytes:
     return _archive(_rift_drafts())
 
 
+def bundled_rift_archive_for_closure(expected: object) -> bytes | None:
+    """Resolve only an exact available Rift closure; never replace an unknown saved pin."""
+    if not isinstance(expected, str):
+        return None
+    if expected == bundled_rift_authority().closure_sha256:
+        return bundled_rift_archive()
+    from sylvia_gm.application.plan_snapshot import _admitted_snapshot_facts
+
+    try:
+        retained = (_bundled_rift_plan_root() / "setting.sylvia-gm-package").read_bytes()
+    except FileNotFoundError:
+        return None
+    return retained if _admitted_snapshot_facts(retained)[2] == expected else None
+
+
 def bundled_riichi_archive() -> bytes:
     """Read the validated Riichi/Setting archive unchanged in source and frozen builds."""
 
@@ -369,18 +394,14 @@ def bundled_rift_participant_declaration() -> ParticipantArtifactDeclaration:
 
 
 def bundled_rift_campaign_plan() -> ValidatedCampaignPlan:
-    """Load and validate the checked-in structured Rift plan against bundled packages."""
+    """Validate retained Rift against its owned snapshot, independent of the base world."""
+    from sylvia_gm.application.plan_snapshot import validate_plan_snapshot
 
-    authority = bundled_rift_authority()
     root = _bundled_rift_plan_root()
-    return validate_campaign_plan(
+    return validate_plan_snapshot(
+        (root / "setting.sylvia-gm-package").read_bytes(),
         json.loads((root / "plan.json").read_text(encoding="utf-8")),
-        readable_markdown=(root / "plan.md").read_text(encoding="utf-8"),
-        expected_ruleset=authority.ruleset,
-        expected_setting=authority.setting,
-        expected_closure_sha256=authority.closure_sha256,
-        setting_paths=authority.setting_paths,
-        setting_knowledge_ids=authority.setting_knowledge_ids,
+        (root / "plan.md").read_text(encoding="utf-8"),
     )
 
 

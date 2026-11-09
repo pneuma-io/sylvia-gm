@@ -45,6 +45,37 @@ Custom content uses three building blocks: Rulesets define mechanics, Campaign S
 the world, and Campaign Plans define an adventure. Builder helps you create and refine that content
 for use in a compatible campaign.
 
+## Browser access
+
+The Windows package includes `sylvia-gm-owner.exe` beside the desktop application. To host
+Sylvia in a browser, open PowerShell in that folder and choose a data directory explicitly:
+
+```powershell
+.\sylvia-gm-owner.exe --webui --data-root "D:\Sylvia-browser-data"
+```
+
+Open the loopback address printed after the owner is ready. No Python or source checkout is
+needed. The host binds to `127.0.0.1` only. Closing a browser tab keeps the host running;
+use **Stop local WebUI** in the browser or Ctrl+C in the host terminal to stop it. Wait for the
+process to exit before reopening the same data directory. A desktop or another host already
+using that directory is rejected by the owner's writer lock.
+
+Source users can use `python -m sylvia_gm --webui --data-root "D:\Sylvia-browser-data"`
+with the existing project environment. Both paths use the same host and owner contracts.
+
+For a private user-managed Tailscale HTTPS proxy, choose a fixed loopback port and supply
+the exact lowercase HTTPS origin and your access-key file:
+
+```powershell
+.\sylvia-gm-owner.exe --webui --data-root "D:\Sylvia-browser-data" --port 8765 --webui-remote-origin https://node.tailnet.ts.net --webui-access-key-file "D:\Private\sylvia-webui-key.txt"
+```
+
+The file must contain 43–128 random URL-safe characters. Keep it private. Configure your
+private proxy to forward to the printed loopback target while retaining the exact Host and
+Origin. This mode requires sign-in, rejects other hosts/origins and disables direct localhost
+bootstrap. Sylvia does not configure Tailscale, certificates, access policies or hosting.
+Browser dictation and detached panel windows are unavailable in this version.
+
 ## Local problem reports
 
 Settings → About lets you describe an app problem or give model feedback, preview the exact JSON
@@ -108,17 +139,32 @@ Install these prerequisites:
 - Rust with the MSVC toolchain, Microsoft C++ Build Tools with the **Desktop development with C++** workload, and a Windows SDK. Follow the [Tauri Windows prerequisites](https://v2.tauri.app/start/prerequisites/#windows) and [Windows SDK guidance](https://learn.microsoft.com/en-us/windows/apps/windows-sdk/).
 - Microsoft Edge WebView2, described in the [Tauri WebView2 setup](https://v2.tauri.app/start/prerequisites/#webview2).
 - The Tauri 2 CLI. Its [official installation command](https://v2.tauri.app/reference/cli/) is `cargo install tauri-cli --version "^2.0.0" --locked`.
+- The seven x64 LGPL FFmpeg 8.1.2 DLLs identified by the [codec input manifest](licenses/dictation/PYAV-LGPL-BUILD.json).
+  Obtain the matching `DICTATION-CODEC-SOURCE.zip` supplement and follow the
+  [Windows codec build and recombination instructions](licenses/dictation/REBUILD-CODECS.md).
+  Keep its DLL output in a separate directory. `uv sync` supplies Python dependencies;
+  the codec DLL directory is a required external build input. The frozen recipe was
+  verified with x64 Python 3.12.11 and the locked PyAV 18.0.0 bindings.
 
-Clone the repository, then run the development commands in PowerShell:
+Open an x64 Visual Studio Developer PowerShell with the existing MSVC build tools
+available. Clone the repository, then set the codec directory and run the development
+commands in that same terminal. Replace the example codec path with your DLL output directory:
 
 ```powershell
 git clone https://github.com/pneuma-io/sylvia-gm.git
 cd sylvia-gm
 uv sync --locked --all-extras
+$env:SYLVIA_FFMPEG_LGPL_DIR = 'C:\Sylvia-codecs\ffmpeg-lgpl\bin'
 uv run --locked --all-extras python src-tauri/scripts/build_owner_sidecar.py
 cd src-tauri
 cargo tauri dev
 ```
+
+Keep `SYLVIA_FFMPEG_LGPL_DIR` set for the Tauri command too: its build hook invokes
+the owner builder again. The builder checks the selected DLL identities against the
+manifest and stages the LGPL libraries with the PyAV bindings in invocation-owned work.
+The recombination instructions explain how to identify ABI-compatible modified libraries
+in a separate personal source copy.
 
 Keep the checked-in lockfiles. The `--locked` Python commands reject an outdated lockfile instead
 of rewriting it. The `sylvia-gm` Python command provides `--help` and `--version`; launch the desktop

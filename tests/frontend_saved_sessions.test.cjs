@@ -85,7 +85,8 @@ function harness(savedStorage = new Map(), { shippedDom = false } = {}) {
   };
   const document = {
     getElementById: node, querySelectorAll: () => [],
-    querySelector: selector => selector === '[data-chatgpt-action="add_model"]' ? element() : null,
+    querySelector: selector => selector === '[data-chatgpt-action="add_model"]' ? element()
+      : selector === '.settings-content' ? node('settings-content-test') : null,
     addEventListener() {}, body: element(), activeElement: null,
     createElement(tag) {
       const result = element();
@@ -115,12 +116,12 @@ function harness(savedStorage = new Map(), { shippedDom = false } = {}) {
   // Expose existing private entry points for the test, without changing their implementation.
   const insertion = source.lastIndexOf('  return {');
   source = source.slice(0, insertion) + `  window.sessionTest = {
-    state, openBuilderChat, openCampaign, showHome, refreshSelectedCampaign, submitInput, stop, retry, reconnect,
+    state, openBuilderChat, openCampaign, openReadyCampaign, showHome, refreshSelectedCampaign, submitInput, stop, retry, reconnect,
     initDictation, getDictation: () => dictation, createHostBridge,
     signalActiveStreamDisconnect, restoreDisconnectedStream, renderBuilderSession,
     renderDMSession, ensureSessionActivity, finalizeSelectedConstruction, renameBuilderChat,
     deleteBuilderChat, setBuilderArchived, setCampaignArchived, renderHome, renderBuilderChatRail,
-    deleteReusableLibraryEntry, respondToPlayerAction,
+    deleteReusableLibraryEntry, respondToPlayerAction, openBuilderMode,
     showSettingsTab, closeSettings, updateChatGPTConnection, selectChatGPTModel,
     refreshAdminAudit, exportAdminAudit, selectDiscoveredProviderModel, exportSelectedCampaign,
     toggleAdminAudit, copyVisibleAdminAudit,
@@ -137,6 +138,7 @@ function harness(savedStorage = new Map(), { shippedDom = false } = {}) {
   context.window.innerWidth = 1400;
   vm.runInNewContext(source, context, { filename: 'app.js' });
   const api = context.window.sessionTest;
+  api.state.campaignIndexStatus = 'ready';
   api.state.builderChats = ['a', 'b'].map((id) => ({
     display_name: `Builder ${id}`, session: {
       session_id: id, role: 'builder', status: 'active', provider_id: 'test', model_id: 'test',
@@ -455,21 +457,21 @@ test('Thinking export requires a fresh explicit opt-in for each export', async (
   assert(calls.every((args) => args[2] === 'selected'));
 });
 
-test('Home, campaign and Builder navigation show the appropriate left sidebar without stopping work', async () => {
-  const h = harness();
+test('Home, campaign and Builder navigation keep Builder sessions in the one rail without stopping work', async () => {
+  // The expandable rail replaced the old left sidebar; its campaign/status/writer block is gone.
+  const h = harness(new Map(), { shippedDom: true });
   configureGM(h);
+  assert.equal(h.node('session-context'), null);
+  assert.equal(h.node('ctx-writer'), null);
   h.showHome();
-  assert.equal(h.node('session-context').hidden, true);
   assert.equal(h.node('builder-launcher').hidden, false);
   await h.openCampaign('campaign', 'gm');
-  assert.equal(h.node('session-context').hidden, false);
-  assert.equal(h.node('builder-launcher').hidden, true);
+  assert.equal(h.node('builder-launcher').hidden, false, 'Builder sessions stay reachable during play');
   assert.equal(h.node('lifecycle-actions').hidden, true, 'active GM needs no right-side session controls');
   await h.openBuilderChat('a');
   assert.equal(h.node('builder-launcher').hidden, false);
-  assert.equal(h.node('session-context').hidden, true);
   h.showHome();
-  assert.equal(h.node('session-context').hidden, true);
+  assert.equal(h.node('builder-launcher').hidden, false);
   assert.equal(h.calls.stop.length, 0);
   assert.equal(h.calls.submissions.length, 0);
 });
@@ -478,8 +480,9 @@ test('sidebar toggles are independent and persist through navigation and app rel
   const h = harness();
   configureGM(h);
   h.wireControls();
+  assert.equal(h.state.sidebarCollapsed.left, true, 'the left rail starts thin');
   h.node('toggle-left-sidebar-btn').dispatchEvent({ type: 'click' });
-  assert.equal(h.node('toggle-left-sidebar-btn').getAttribute('aria-expanded'), 'false');
+  assert.equal(h.node('toggle-left-sidebar-btn').getAttribute('aria-expanded'), 'true');
   assert.equal(h.node('toggle-right-sidebar-btn').getAttribute('aria-expanded'), 'true');
   await h.openCampaign('campaign', 'gm');
   h.savePanelLayout({ sidebar_width: 350 });
@@ -488,16 +491,16 @@ test('sidebar toggles are independent and persist through navigation and app rel
   h.node('home-btn').dispatchEvent({ type: 'click' });
   assert.equal(h.state.view, 'home');
   await h.openCampaign('campaign', 'gm');
-  assert.equal(h.node('session-frame').classList.contains('left-sidebar-collapsed'), true);
+  assert.equal(h.node('session-frame').classList.contains('left-sidebar-collapsed'), false);
   assert.equal(h.node('session-frame').classList.contains('right-sidebar-collapsed'), true);
   assert.equal(h.node('right-sidebar').style.width, '350px');
   const reopened = harness(h.storage);
   reopened.initSidebarResize();
-  assert.equal(reopened.node('toggle-left-sidebar-btn').getAttribute('aria-label'), 'Expand left sidebar');
+  assert.equal(reopened.node('toggle-left-sidebar-btn').getAttribute('aria-label'), 'Hide sessions sidebar');
   assert.equal(reopened.node('toggle-right-sidebar-btn').getAttribute('aria-expanded'), 'false');
   h.node('toggle-right-sidebar-btn').dispatchEvent({ type: 'click' });
   assert.equal(h.node('right-sidebar').style.width, '350px');
-  assert.equal(h.node('session-frame').classList.contains('left-sidebar-collapsed'), true);
+  assert.equal(h.node('session-frame').classList.contains('left-sidebar-collapsed'), false);
   assert.equal(h.node('session-frame').classList.contains('right-sidebar-collapsed'), false);
 });
 
@@ -2002,7 +2005,6 @@ test('reopening a session uses the saved campaign name even when its snapshot ti
   h.state.campaigns[0].display_name = 'PES Companion Return · Interview';
   await h.openCampaign('campaign', 'gm');
   assert.equal(h.node('session-title').textContent, 'PES Companion Return · Interview');
-  assert.equal(h.node('ctx-campaign').textContent, 'PES Companion Return · Interview');
 });
 
 test('opening a saved campaign names the pending campaign before projections load', async () => {
@@ -2635,3 +2637,207 @@ test('a claimed Builder heartbeat reconnects during owner disconnect grace', asy
   h.pending.get(h.calls.submissions[0].attempt_id).resolve({ status: 'completed' });
   await pending;
 });
+
+// Saved queue snapshots exactly as the owner records them, for the Story outcome regressions.
+function queueSnapshot(status, steps, extra = {}) {
+  return { kind: 'action_sequence', sequence_id: 'queue-1', session_id: 'gm', campaign_id: 'campaign',
+    status, error: null, steps, ...extra };
+}
+function queueStep(label, status, extra = {}) {
+  return { step_id: `step-${label}`, operation_id: `op-${label}`, actor: 'vesper', actor_name: 'Vesper',
+    label, status, error: null, receipt: status === 'committed' ? { action_id: `op-${label}`, status: 'committed' } : null,
+    ...extra };
+}
+function storyHistory(h, snapshots) {
+  const messages = snapshots.map((content, index) => ({ sequence: index + 1,
+    message_id: `queue-1-${index + 1}`, kind: 'evidence', content }));
+  h.state.bridge.session_history_page = async () => ({ messages, latest_sequence: messages.length });
+}
+
+// The desktop invoke rejects with the owner's "code: message" string rather than an Error object.
+for (const [uncertain, nativeString] of [[false, false], [true, false], [false, true]]) {
+  test(`committed queue action stays saved when its narration request ${uncertain ? 'is unconfirmed'
+    : nativeString ? 'is refused through the desktop bridge' : 'is refused'}`, async () => {
+    const h = harness();
+    configureGM(h);
+    storyHistory(h, [
+      queueSnapshot('ready', [queueStep('Aim', 'pending')]),
+      queueSnapshot('running', [queueStep('Aim', 'executing')]),
+      queueSnapshot('running', [queueStep('Aim', 'committed')]),
+      queueSnapshot('completed', [queueStep('Aim', 'committed')], { committed_action_ids: ['op-Aim'] }),
+    ]);
+    await h.openCampaign('campaign', 'gm');
+    const narration = h.submitInput('', { playerAction: { campaignId: 'campaign', sessionId: 'gm',
+      actionId: 'op-Aim', automatic: false } });
+    const command = h.calls.submissions[0];
+    assert.equal(command.player_action_id, 'op-Aim');
+    h.pending.get(command.attempt_id).reject(uncertain
+      ? Object.assign(new Error('The local connection was interrupted.'), { code: 'outcome_unknown' })
+      : nativeString ? 'command_rejected: Agent session provider is not configured'
+        : new Error('Agent session provider is not configured'));
+    await narration;
+    await h.flush();
+    const html = h.node('chronology').dataset.chronologyHtml;
+    assert.equal((html.match(/Action saved/g) || []).length, 1);
+    assert.match(html, /Vesper · Aim/);
+    assert.match(html, uncertain ? /Narration request unconfirmed/ : /Narration unavailable · Agent session provider is not configured/);
+    assert.doesNotMatch(html, /command_rejected/);
+    assert.match(html, /was not repeated/);
+    assert.doesNotMatch(html, /could not complete|Try again|manual-retry|Awaiting confirmation|Not done/);
+    assert.doesNotMatch(h.node('session-status-text').textContent, /Session request rejected/);
+    assert.equal(h.calls.submissions.length, 1, 'narration is never retried silently');
+  });
+}
+
+test('Builder without a configured model explains itself in Models, not in the open campaign chat', async () => {
+  const h = harness();
+  configureGM(h);
+  h.state.builderChats = [];
+  let creates = 0;
+  h.state.bridge.create_builder_chat = async () => { creates += 1; };
+  await h.openCampaign('campaign', 'gm');
+  h.node('player-input').value = 'Keep this unsent action';
+  const scrolled = [];
+  h.node('models-action-status').scrollIntoView = (options) => scrolled.push(options);
+  h.openBuilderMode();
+  await h.flush();
+  assert.equal(h.node('settings-overlay').hidden, false);
+  assert.equal(h.node('settings-panel-models').hidden, false);
+  assert.match(h.node('models-action-status').textContent, /Configure a provider before starting Builder/);
+  // Narrow Settings is one tall scroll; the refusal sits below the fold unless it is brought into view.
+  assert.equal(JSON.stringify(scrolled), '[{"block":"nearest"}]');
+  // That scroll must not carry into the next Settings tab, which starts at its own top.
+  h.node('settings-content-test').scrollTop = 70;
+  h.showSettingsTab('dictation');
+  assert.equal(h.node('settings-content-test').scrollTop, 0);
+  assert.equal(creates, 0, 'no Builder session is created without a model');
+  h.closeSettings();
+  assert.doesNotMatch(h.node('session-status-text').textContent, /Configure a provider/,
+    'the refusal does not stay in the campaign status line after Settings closes');
+  assert.equal(h.state.activeSessionId, 'gm');
+  assert.equal(h.node('player-input').value, 'Keep this unsent action');
+  assert.equal(h.calls.submissions.length, 0);
+});
+
+test('a rules refusal shows the owner reason, saves nothing and invites no blind retry', async () => {
+  const h = harness();
+  configureGM(h);
+  const reason = 'This actor is already in that stance.';
+  storyHistory(h, [
+    queueSnapshot('ready', [queueStep('Stand', 'pending')]),
+    queueSnapshot('failed', [queueStep('Stand', 'pending', { error: reason })], { error: reason }),
+    queueSnapshot('ready', []),
+  ]);
+  await h.openCampaign('campaign', 'gm');
+  const html = h.node('chronology').dataset.chronologyHtml;
+  assert.match(html, /Not done/);
+  assert.match(html, /Vesper · Stand/);
+  assert.match(html, /This actor is already in that stance\./);
+  assert.match(html, /This step was not saved/);
+  assert.doesNotMatch(html, /Action saved|could not complete|Try again|Awaiting confirmation/);
+});
+
+test('a committed prefix and a later refusal are reported once each, in owner words', async () => {
+  const h = harness();
+  configureGM(h);
+  // Mirrors the real SRD-Lite queue: the second melee attack is refused once the Action is spent.
+  const reason = 'Panel mechanic is unavailable';
+  storyHistory(h, [
+    queueSnapshot('ready', [queueStep('Melee', 'pending'), queueStep('Again', 'pending')]),
+    queueSnapshot('running', [queueStep('Melee', 'executing'), queueStep('Again', 'pending')]),
+    queueSnapshot('running', [queueStep('Melee', 'committed'), queueStep('Again', 'pending')]),
+    queueSnapshot('failed', [queueStep('Melee', 'committed'), queueStep('Again', 'pending', { error: reason })],
+      { error: reason }),
+  ]);
+  await h.openCampaign('campaign', 'gm');
+  const html = h.node('chronology').dataset.chronologyHtml;
+  assert.equal((html.match(/Action saved/g) || []).length, 1);
+  assert.match(html, /Vesper · Melee/);
+  assert.equal((html.match(/Not done/g) || []).length, 1);
+  assert.match(html, /Vesper · Again/);
+  assert.match(html, /Panel mechanic is unavailable\. This step was not saved\./);
+  assert.doesNotMatch(html, /Awaiting confirmation|could not complete|Try again/);
+});
+
+test('an unconfirmed queued send is shown as unconfirmed, not success or failure', async () => {
+  const h = harness();
+  configureGM(h);
+  storyHistory(h, [
+    queueSnapshot('ready', [queueStep('Aim', 'pending')]),
+    queueSnapshot('running', [queueStep('Aim', 'executing')]),
+  ]);
+  await h.openCampaign('campaign', 'gm');
+  const html = h.node('chronology').dataset.chronologyHtml;
+  assert.match(html, /Awaiting confirmation/);
+  assert.match(html, /Vesper · Aim/);
+  assert.match(html, /has not been sent again/);
+  assert.doesNotMatch(html, /Action saved|Not done|could not complete|Try again/);
+  assert.equal(h.calls.submissions.length, 0);
+});
+
+
+for (const navigateAway of [false, true]) {
+  test(`prepared campaign opening failure repaints terminal activity without changing navigation (${navigateAway})`, async () => {
+    const h = harness();
+    configureGM(h);
+    let ended = false;
+    const input = { sequence: 1, message_id: 'opening-input', kind: 'user',
+      content: { text: 'Begin this prepared adventure.', attempt_id: 'ready-opening' } };
+    h.state.bridge.session_context = async (id) => id !== 'gm'
+      ? ({ messages: [{ message_id: 'answer-a', kind: 'talk', content: { text: 'Answer a' } }] })
+      : ({ messages: [input], activity_progress: {
+      attempt_id: 'ready-opening', basis_message_id: 'opening-input', phase: 'working', elapsed_ms: 2000,
+    } });
+    h.state.bridge.session_history_page = async (id) => id !== 'gm'
+      ? ({ latest_sequence: 1, messages: [{ sequence: 1, message_id: 'answer-a', kind: 'talk', content: { text: 'Answer a' } }] })
+      : ({ latest_sequence: ended ? 2 : 1,
+      messages: [input, ...(ended ? [{ sequence: 2, message_id: 'opening-ended', kind: 'evidence',
+        content: { kind: 'session_attempt_terminal', attempt_id: 'ready-opening',
+          status: 'interrupted', failure_category: 'provider_error' } }] : [])] });
+    h.state.bridge.player_projection_page = async () => [];
+    const response = deferred();
+    h.state.bridge.start_dm_session = () => response.promise;
+    const opening = h.openReadyCampaign({ campaign_id: 'campaign', dm_session_id: 'gm',
+      dm_attempt_id: 'ready-opening', dm_turn_id: 'turn' });
+    await h.flush();
+    // The opening has a live activity row before its provider request fails.
+    await h.window.SylviaGMFrontend.renderPlayerProjection('campaign', 'gm');
+    assert.match(h.node('chronology').dataset.chronologyHtml, /data-activity-phase="queued"/);
+    if (navigateAway) await h.openBuilderChat('a');
+    ended = true;
+    response.reject(Error('Synthetic context capacity failure'));
+    await opening;
+    assert.equal(h.state.sessionActivities.get('gm').phase, 'interrupted');
+    const html = h.node('chronology').dataset.chronologyHtml;
+    if (navigateAway) {
+      assert.equal(h.state.activeSessionId, 'a');
+      assert.match(html, /Answer a/);
+      assert.doesNotMatch(html, /Begin this prepared adventure/);
+    } else {
+      assert.match(html, /data-activity-phase="failed"/);
+      assert.doesNotMatch(html, /data-activity-phase="working"/);
+      assert.match(h.node('session-status-text').textContent, /opening was interrupted/i);
+    }
+  });
+}
+
+for (const indexStatus of ['loading', 'error']) {
+  test(`campaign index ${indexStatus} is distinct from an empty library and can recover`, async () => {
+    const h = harness();
+    h.state.campaignIndexStatus = indexStatus;
+    const retained = [{campaign_id: 'retained', lifecycle: 'active', display_name: 'Retained'}];
+    h.state.campaigns = retained;
+    h.renderHome();
+    assert.doesNotMatch(h.node('campaign-shelves').innerHTML, /No ongoing campaigns yet/);
+    assert.match(h.node('campaign-shelves').innerHTML,
+      indexStatus === 'loading' ? /Loading campaigns/ : /Campaign list could not be loaded/);
+    assert.equal(h.state.campaigns, retained);
+    if (indexStatus === 'error') {
+      h.state.bridge = {campaign_index: async () => []};
+      h.node('campaign-index-retry-btn').dispatchEvent({type: 'click'});
+      await new Promise(resolve => setImmediate(resolve));
+      assert.equal(h.state.campaignIndexStatus, 'ready');
+      assert.match(h.node('campaign-shelves').innerHTML, /No ongoing campaigns yet/);
+    }
+  });
+}

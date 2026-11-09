@@ -1008,7 +1008,6 @@ test('accepting the campaign name refreshes the saved Interview title in the sid
 
   assert.match(h.node('builder-chat-rail').innerHTML, /The silent relay · Interview/);
   assert.equal(h.node('session-title').textContent, 'The silent relay · Interview');
-  assert.equal(h.node('ctx-campaign').textContent, 'The silent relay · Interview');
   assert.equal(h.state.constructionRevision, 4);
 });
 

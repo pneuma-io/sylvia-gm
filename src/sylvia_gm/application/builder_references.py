@@ -10,9 +10,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from sylvia_gm.application.bundled_campaign_plans import selected_campaign_plan
+from sylvia_gm.application.bundled_campaign_plans import bundled_plan, selected_campaign_plan
 from sylvia_gm.application.bundled_packages import (
     bundled_rift_archive,
+    bundled_rift_archive_for_closure,
     bundled_rift_authority,
 )
 from sylvia_gm.application.bundled_starter_characters import bundled_starter_participants
@@ -189,6 +190,12 @@ def capture_content_references(
         ),
         None,
     )
+    if selected_plan is None and plan_id == "the-rift-awakening":
+        # Older Interviews may retain this hidden selection. Resolve its owned
+        # snapshot without adding it to the current discovery catalogue.
+        retained = bundled_plan(plan_id)
+        if retained is not None:
+            selected_plan = {**retained.catalog_payload(), "bundled": True}
     if selected_plan is not None:
         if selected_plan.get("reusable") or selected_plan.get("bundled"):
             reusable = selected_campaign_plan(
@@ -227,9 +234,9 @@ def capture_content_references(
         if candidate is None:
             archive = reusable.package_snapshot
             if archive is None:
-                if bindings["package_closure_sha256"] != bundled_rift_authority().closure_sha256:
+                archive = bundled_rift_archive_for_closure(bindings["package_closure_sha256"])
+                if archive is None:
                     raise CommandRejected("Selected Builder Campaign Plan snapshot is unavailable")
-                archive = bundled_rift_archive()
             suffix = hashlib.sha256(archive).hexdigest()[:24]
             candidate = owner.install_package_archive(
                 io.BytesIO(archive), install_id=f"install-bundled-rift-{suffix}"

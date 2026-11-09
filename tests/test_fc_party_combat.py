@@ -17,7 +17,7 @@ from tests.test_fc_campaign_journey import SRD, _start_campaign, _practice_scene
 
 
 class _PartyCombatProvider(LibraryProvider):
-    """Choose one action per actor using the same trusted decision context as a real model."""
+    """Use real turn context, circling below the companion and following into melee if needed."""
 
     def __init__(self, player: str, companion: str, *, surge_before_attack: bool) -> None:
         super().__init__()
@@ -33,6 +33,8 @@ class _PartyCombatProvider(LibraryProvider):
         self.player_attacks = 0
         self.npc_attacks = 0
         self.npc_moved = False
+        self.npc_destination = [5, 0, 0]
+        self.companion_moved = False
         self.attacked: set[str] = set()
         self.sent = 0
         self.failure: str | None = None
@@ -84,14 +86,21 @@ class _PartyCombatProvider(LibraryProvider):
             }
         elif actor in self.attacked:
             suffix, args = "end_combat_turn", {}
+        elif actor == self.companion and self.npc_moved and not self.companion_moved:
+            self.companion_moved = True
+            destination = [self.npc_destination[0], self.npc_destination[1] - 5, 0]
+            suffix, args = "move_srd_scene_creature", {
+                "actor_state": self.companion, "destination": destination, "mode": "walk",
+            }
         elif actor == self.player and not self.moved:
             self.moved = True
             suffix = "move_srd_scene_creature"
-            destination = [5, 0, 0] if self.npc_moved else [2.5, 4.330127018922193, 0]
+            destination = [5, -5, 0]
             args = {"actor_state": self.player, "destination": destination, "mode": "walk"}
         elif actor == "training-guard" and self.npc_attacks == 1 and not self.npc_moved:
             self.npc_moved = True
-            destination = [7.5, 4.330127018922193, 0] if self.moved else [2.5, 4.330127018922193, 0]
+            destination = [10, -5, 0] if self.moved else [0, -5, 0]
+            self.npc_destination = destination
             suffix, args = "move_srd_scene_creature", {"actor_state": "training-guard", "destination": destination, "mode": "walk"}
         elif actor == "training-guard":
             self.npc_attacks += 1
@@ -170,10 +179,10 @@ def test_normal_party_combat_retains_all_actors_attacks_recovery_and_ending(
                "the guard chooses its Strength +2 save. " if surge_before_attack else
                "My companion makes one spear attack. ")
             + "The guard uses its two-attack Multiattack. "
-            "Between its attacks the guard moves five feet around me, remaining within reach. "
+            "Between its attacks the guard moves around me, remaining within reach. "
             "I use Action Surge for two attacks in my turn, then we stop. "
-            "I start in spear reach, move five feet around the guard while staying in reach, attack and end my turn; "
-            "my companion starts in reach and acts independently. "
+            "I start in spear reach, move around the guard while staying in reach, attack and end my turn; "
+            "my companion starts in reach, follows the guard into reach if needed and acts independently. "
             "Afterward I use Second Wind.",
         }, campaign_id=campaign, attempt_id="party-practice")
         assert reply["interruption"] is None, reply
@@ -188,7 +197,8 @@ def test_normal_party_combat_retains_all_actors_attacks_recovery_and_ending(
         expected = {"start_group_combat_encounter": 1,
                     "resolve_combat_attack": 2 if surge_before_attack else 3,
                     "resolve_adjudicated_creature_attack": 2, "end_combat_encounter": 1,
-                    "use_srd_second_wind": 1, "move_srd_scene_creature": 2,
+                    "use_srd_second_wind": 1,
+                    "move_srd_scene_creature": 2 + int(provider.companion_moved),
                     "use_srd_action_surge": 1}
         if surge_before_attack:
             expected["resolve_unarmed_strike"] = 1
@@ -196,6 +206,14 @@ def test_normal_party_combat_retains_all_actors_attacks_recovery_and_ending(
             actions = [a for a in saved.actions if a.tool_name == name]
             assert len(actions) == count, (name, actions)
             assert all(a.status is ActionStatus.COMMITTED for a in actions), actions
+        movements = [a for a in saved.actions if a.tool_name == "move_srd_scene_creature"]
+        expected_movers = {player, "training-guard"}
+        if provider.companion_moved:
+            expected_movers.add(companion)
+        assert {a.parameters["actor_state"] for a in movements} == expected_movers
+        assert all(a.result["context"]["_scene_movement_distance"] > 0 for a in movements)
+        assert all(a.result["context"]["_scene_actor_position"] == a.parameters["destination"]
+                   for a in movements)
         movement = next(a for a in saved.actions if a.tool_name == "move_srd_scene_creature"
                         and a.parameters["actor_state"] == player)
         attack = next(a for a in saved.actions if a.tool_name == "resolve_combat_attack"

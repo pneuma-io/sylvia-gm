@@ -111,6 +111,8 @@ class PlayerControls:
     calculations: tuple[SafePayload, ...] = ()
     map_preview: SafePayload | None = None
     available: bool = True
+    preflight: tuple[str, ...] = ()
+    preflight_path: SafePayload | None = None
 
 
 def parse_player_controls(value: object) -> PlayerControls:
@@ -120,7 +122,7 @@ def parse_player_controls(value: object) -> PlayerControls:
         return PlayerControls()
     if not isinstance(value, Mapping) or set(value) - {
         "confirmation", "response", "preview", "actor_parameter", "checks", "queries",
-        "calculations", "map_preview",
+        "calculations", "map_preview", "preflight", "preflight_path",
     }:
         return PlayerControls(available=False)
     confirmation = value.get("confirmation", "none")
@@ -132,6 +134,22 @@ def parse_player_controls(value: object) -> PlayerControls:
     if not _valid_control_queries(queries, calculations):
         return PlayerControls(available=False)
     map_preview = value.get("map_preview")
+    preflight = value.get("preflight", ())
+    preflight_path = value.get("preflight_path")
+    if (not isinstance(preflight, (list, tuple)) or len(preflight) > 4
+            or any(not isinstance(name, str) or re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]{0,127}', name) is None
+                   for name in preflight)):
+        return PlayerControls(available=False)
+    if preflight_path is not None and (
+        not preflight or not isinstance(preflight_path, Mapping)
+        or set(preflight_path) != {"scene", "route", "cost"}
+        or not isinstance(preflight_path["scene"], str)
+        or re.fullmatch(r'state\.[A-Za-z_][A-Za-z0-9_.]{0,127}', preflight_path["scene"]) is None
+        or any(not isinstance(preflight_path[key], str)
+               or not _LOCAL_NAME.fullmatch(preflight_path[key]) for key in ("route", "cost"))
+        or map_preview is not None
+    ):
+        return PlayerControls(available=False)
     if map_preview is not None:
         query_kinds = {item["store_as"]: item["spatial_query"]["operation"] for item in queries}
         if (not isinstance(map_preview, Mapping) or not map_preview
@@ -160,6 +178,8 @@ def parse_player_controls(value: object) -> PlayerControls:
         return PlayerControls(available=False)
     try:
         return PlayerControls(
+            preflight=tuple(preflight),
+            preflight_path=None if preflight_path is None else owned_payload(preflight_path),
             confirmation=confirmation, response=response,
             preview=None if preview is None else owned_payload(preview),
             actor_parameter=actor_parameter,

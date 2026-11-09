@@ -8,12 +8,13 @@ import os
 import re
 import tempfile
 import threading
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import cast
 
 from sylvia_gm.application.bundled_packages import (
+    bundled_rift_archive_for_closure,
     bundled_rift_authority,
     bundled_rift_interview_contribution,
 )
@@ -160,6 +161,12 @@ def _validate_rift_plan(payload: object, readable_markdown: str) -> ValidatedCam
     """Validate a reusable Plan against the bundled Rift package closure."""
 
     authority = bundled_rift_authority()
+    bindings = payload.get("bindings") if isinstance(payload, Mapping) else None
+    closure = bindings.get("package_closure_sha256") if isinstance(bindings, Mapping) else None
+    if closure != authority.closure_sha256:
+        snapshot = bundled_rift_archive_for_closure(closure)
+        if snapshot is not None:
+            return validate_plan_snapshot(snapshot, payload, readable_markdown)
     return validate_campaign_plan(
         payload,
         readable_markdown=readable_markdown,

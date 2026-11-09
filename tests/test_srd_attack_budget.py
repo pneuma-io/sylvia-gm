@@ -9,6 +9,7 @@ from tests.test_srd_action_budget import SRD, _run, _state
 
 
 def _combat_case(classes=None, *, positions=None):
+    """Declare a Medium hero and Medium sparring guard before creating their physical scene."""
     classes = classes or [{"id": "fighter", "level": 5}]
     state = _state()
     state[f"{SRD}.state"] = {}
@@ -22,7 +23,7 @@ def _combat_case(classes=None, *, positions=None):
     hero["fighter_level"] = sum(c["level"] for c in classes if c["id"] == "fighter")
     state[f"{SRD}.entities"]["guard"] = {
         "name": "Guard", "creature_kind": "monster", "hp": 1000, "max_hp": 1000,
-        "armor_class": 13, "is_alive": True, "conditions": [], "exhaustion_level": 0,
+        "armor_class": 13, "size_rank": 2, "is_alive": True, "conditions": [], "exhaustion_level": 0,
         "temp_hp": 0, "damage_immunities": [], "damage_resistances": [],
         "damage_vulnerabilities": [], "resources": {}, "resource_maxima": {},
     }
@@ -31,7 +32,7 @@ def _combat_case(classes=None, *, positions=None):
         "abilities": {"strength": 16, "dexterity": 14, "constitution": 14,
                       "intelligence": 10, "wisdom": 10, "charisma": 10},
         "weapon_proficiencies": ["simple_weapons", "martial_weapons"],
-        "weapon_masteries": ["dagger", "scimitar"], "speed": 30,
+        "weapon_masteries": ["dagger", "scimitar"], "speed": 30, "size_rank": 2,
     }
     from tests.srd_fixture_scene import fixture_scene
     state[f"{SRD}.state"]["spatial_scene"] = fixture_scene(state[f"{SRD}.entities"], positions)

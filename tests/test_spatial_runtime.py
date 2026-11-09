@@ -1017,3 +1017,59 @@ def test_repeated_snapshot_references_share_evidence_but_changed_scenes_do_not()
     historical = bridge.spatial_query("state.scene", operation="ray", query=_query("ray"), snapshot=original)
     assert historical["snapshot_id"] == original["snapshot_id"]
     assert historical["intersections"][0]["id"] == "near-surface"
+
+
+def test_explicit_circle_overlap_reuses_proven_facts_and_invalidates_changed_bodies():
+    from sylvia_gm.application.package_runtime import AuthorityMemoryStateBridge
+    from tests.test_srd_creature_space import NS, state
+
+    values = state(position=(7.5, 0, 0))
+    bridge = AuthorityMemoryStateBridge(NS, values)
+    query = {'map_id': 'space', 'moving_entity_id': 'hero', 'fixed_entity_id': 'guard',
+             'origin': [0, 0, 0], 'destination': [15, 0, 0], 'moving_radius': 2.5, 'fixed_radius': 2.5}
+    first = bridge.spatial_query('state.spatial_scene', operation='circle_overlap', query=query, snapshot=None)
+    scene = values[NS + '.state']['spatial_scene']
+    scene['map']['revision'] += 1
+    scene['entities'][0]['position'] = [2, 1, 0]
+    bridge.write_field('state', 'spatial_scene', scene)
+    reused = bridge.spatial_query('state.spatial_scene', operation='circle_overlap', query=query, snapshot=None)
+    assert reused == first and len(bridge.spatial_evidence) == 1
+    reused['hit'] = False
+    assert bridge.spatial_query('state.spatial_scene', operation='circle_overlap', query=query, snapshot=None)['hit']
+    changes = [('hero', 'height', 5), ('guard', 'height', 5), ('guard', 'position', [50, 0, 0])]
+    for count, (identity, field, value) in enumerate(changes, 2):
+        scene['map']['revision'] += 1
+        next(row for row in scene['entities'] if row['id'] == identity)[field] = value
+        bridge.write_field('state', 'spatial_scene', scene)
+        fresh = bridge.spatial_query('state.spatial_scene', operation='circle_overlap', query=query, snapshot=None)
+        assert fresh['snapshot_id'] != first['snapshot_id']
+        assert len(bridge.spatial_evidence) == count
+    assert not fresh['hit']
+
+
+def test_circle_overlap_reuse_keeps_default_origins_and_snapshot_requests_exact():
+    from sylvia_gm.application.package_runtime import AuthorityMemoryStateBridge
+    from sylvia_gm.spatial import SpatialValidationError
+    from tests.test_srd_creature_space import NS, state
+
+    values = state(position=(7.5, 0, 0))
+    bridge = AuthorityMemoryStateBridge(NS, values)
+    query = {'map_id': 'space', 'moving_entity_id': 'hero', 'fixed_entity_id': 'guard',
+             'destination': [15, 0, 0], 'moving_radius': 2.5, 'fixed_radius': 2.5}
+    before = bridge.spatial_snapshot('state.spatial_scene')
+    first = bridge.spatial_query('state.spatial_scene', operation='circle_overlap', query=query, snapshot=None)
+    scene = values[NS + '.state']['spatial_scene']
+    scene['map']['revision'] += 1
+    scene['entities'][0]['position'] = [0, 20, 0]
+    bridge.write_field('state', 'spatial_scene', scene)
+    current = bridge.spatial_query('state.spatial_scene', operation='circle_overlap', query=query, snapshot=None)
+    assert current['snapshot_id'] != first['snapshot_id']
+    explicit = query | {'origin': [0, 0, 0]}
+    live = bridge.spatial_query('state.spatial_scene', operation='circle_overlap', query=explicit, snapshot=None)
+    historical = bridge.spatial_query('state.spatial_scene', operation='circle_overlap', query=explicit, snapshot=before)
+    assert historical['snapshot_id'] == before['snapshot_id'] != live['snapshot_id']
+    scene['map']['revision'] += 1
+    scene['entities'][1]['active'] = False
+    bridge.write_field('state', 'spatial_scene', scene)
+    with pytest.raises(SpatialValidationError):
+        bridge.spatial_query('state.spatial_scene', operation='circle_overlap', query=explicit, snapshot=None)

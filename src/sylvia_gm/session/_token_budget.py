@@ -32,7 +32,7 @@ try:
     import tiktoken
 
     _TIKTOKEN_AVAILABLE = True
-    _DEFAULT_ENCODING = tiktoken.get_encoding("cl100k_base")
+    _DEFAULT_ENCODING = None
 except ImportError:
     _TIKTOKEN_AVAILABLE = False
     _DEFAULT_ENCODING = None
@@ -124,7 +124,9 @@ class TokenEstimator:
     @staticmethod
     def _tiktoken_estimate(text: str) -> int:
         """Count tokens using cl100k_base encoding."""
-        assert _DEFAULT_ENCODING is not None
+        global _DEFAULT_ENCODING
+        if _DEFAULT_ENCODING is None:
+            _DEFAULT_ENCODING = tiktoken.get_encoding("cl100k_base")
         return len(_DEFAULT_ENCODING.encode(text))
 
     @staticmethod

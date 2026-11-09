@@ -40,13 +40,13 @@ def retained_plan_snapshot(owner: AuthorityOwner, payload: object) -> bytes:
     )
     if candidate is None:
         from sylvia_gm.application.bundled_packages import (
-            bundled_rift_archive,
-            bundled_rift_authority,
+            bundled_rift_archive_for_closure,
         )
 
-        if expected != bundled_rift_authority().closure_sha256:
+        snapshot = bundled_rift_archive_for_closure(expected)
+        if snapshot is None:
             raise ValueError("Campaign Plan retained packages are unavailable")
-        return bundled_rift_archive()
+        return snapshot
     with io.BytesIO() as exported:
         owner.export_package_candidate(candidate.candidate_id, exported)
         return exported.getvalue()

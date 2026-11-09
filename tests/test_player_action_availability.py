@@ -188,6 +188,56 @@ def test_path_bound_control_uses_the_complete_owner_scene(tmp_path: Path):
         assert receipt.resulting_revision == 1
 
 
+@pytest.mark.parametrize('confirmation', ['none', 'required'])
+def test_path_binding_cannot_disclose_a_hidden_occupant_before_admission(tmp_path: Path, confirmation):
+    with AuthorityOwner.open(tmp_path / 'hidden-path-binding.sqlite3', 'owner') as owner:
+        _create(owner, path_binding=True, controls={'confirmation': confirmation})
+        before = owner.snapshot('campaign')
+        selected = {'actor': 'operator', 'destination': [6, 2], 'map_revision': 7}
+        preview = owner.preview_panel_action(**_request(selection=selected))
+        assert _checks(owner, destination=[6, 2])['available'] is True
+        with pytest.raises(CommandRejected) as rejected:
+            _move(owner, selection=selected, confirmation=preview['confirmation'])
+        assert rejected.value.code == 'panel_action_invalid'
+        assert owner.snapshot('campaign') == before
+
+
+def test_confirmation_binds_the_known_intent_when_the_full_route_differs(tmp_path: Path):
+    from sylvia_gm import dice
+    database = tmp_path / 'confirmed-hidden-route.sqlite3'
+    with AuthorityOwner.open(database, 'owner') as owner:
+        _create(owner, path_binding=True, controls={'confirmation': 'required'})
+        selected = {'actor': 'operator', 'destination': [7, 2], 'map_revision': 7}
+        request = _request(selection=selected)
+        before, rng = owner.snapshot('campaign'), dice._rng.getstate()
+        preview = owner.preview_panel_action(**request)
+        assert owner.preview_panel_action(**request) == preview
+        for change in (
+            {'confirmation': None},
+            {'confirmation': 'invalid'},
+            {'operation_id': 'another-move', 'confirmation': preview['confirmation']},
+            {'selection': {**selected, 'destination': [7, 3]}, 'confirmation': preview['confirmation']},
+        ):
+            with pytest.raises(CommandRejected) as rejected:
+                owner.execute_panel_action(**{**request, **change})
+            assert rejected.value.code == 'action_confirmation_required'
+            assert owner.snapshot('campaign') == before
+        with pytest.raises(StaleRevision):
+            owner.execute_panel_action(**{**request, 'expected_revision': 1}, confirmation=preview['confirmation'])
+        assert owner.snapshot('campaign') == before and dice._rng.getstate() == rng
+        receipt = owner.execute_panel_action(**request, confirmation=preview['confirmation'])
+        path = owner.snapshot('campaign').actions[0].parameters['path']
+        assert path[-1] == [7, 2] and [6, 2] not in path
+        after = owner.snapshot('campaign')
+        assert owner.execute_panel_action(**request) == receipt
+        assert owner.snapshot('campaign') == after
+        assert after.revision == 1 and len(after.actions) == 1
+    with AuthorityOwner.open(database, 'owner') as owner:
+        assert owner.execute_panel_action(**request) == receipt
+        assert owner.snapshot('campaign').state == after.state
+        assert owner.snapshot('campaign').revision == 1
+
+
 def _route_controls():
     return {
         "queries": [{
@@ -211,7 +261,7 @@ def _route_controls():
     }
 
 
-def test_spatial_readiness_uses_real_route_cost_without_effects_or_private_output(
+def test_spatial_readiness_uses_known_route_cost_without_effects_or_private_output(
     tmp_path: Path, monkeypatch,
 ):
     with AuthorityOwner.open(tmp_path / "route-check.sqlite3", "owner") as owner:
@@ -230,8 +280,10 @@ def test_spatial_readiness_uses_real_route_cost_without_effects_or_private_outpu
                 "available": False, "reason": "No route is currently available",
             }
             assert _checks(owner, destination=[6, 2]) == {
-                "available": False, "reason": "No route is currently available",
+                "available": False, "reason": "This route costs too many action points",
             }
+            with pytest.raises(CommandRejected, match="No route is currently available"):
+                _move(owner, selection={'actor': 'operator', 'destination': [6, 2], 'map_revision': 7})
             with pytest.raises(CommandRejected, match="too many action points"):
                 _move(owner)
         assert owner.snapshot("campaign") == before

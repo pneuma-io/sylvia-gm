@@ -50,3 +50,28 @@ def test_mutable_defaults_are_fresh_per_invocation_and_validated():
     result = execute_tool("collect", {}, {"collect": tool}, bridge, {}, {})
     assert not result.success
     assert result.failure_kind == "parameter_validation"
+
+
+@pytest.mark.parametrize("nested_call", [False, True])
+@pytest.mark.parametrize(
+    "value,valid", [(True, False), (False, False), (0, True), (2, True), (2.0, True)]
+)
+def test_integer_parameters_reject_booleans_before_effects_in_public_and_nested_calls(
+    nested_call, value, valid
+):
+    leaf = ToolDef(name="leaf", parameters=[ToolParameter("rank", "integer")],
+                   effects=[{"set": {"field": "state.received", "value": "rank"}}])
+    outer = ToolDef(name="outer", effects=[{"call": "leaf", "params": {"rank": value}}])
+    tools = {"leaf": leaf, "outer": outer}
+    bridge = AuthorityMemoryStateBridge("example.test", {})
+
+    def nested(name, parameters, _context):
+        return execute_tool(name, parameters, tools, bridge, {}, {}, tool_executor=nested)
+
+    result = nested("outer", {}, None) if nested_call else nested("leaf", {"rank": value}, None)
+    assert result.success is valid, result.error
+    if valid:
+        assert bridge.read_field("state", "received") == value
+    else:
+        assert "integer" in result.error
+        assert not bridge.mutations()

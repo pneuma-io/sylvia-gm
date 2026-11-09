@@ -1,0 +1,1075 @@
+{
+  "format": 1,
+  "pyav_version": "18.0.0",
+  "original_wheel_sha256": "aaf4d354d2beaa6651e4f92e54409a578bde64f79c0beef9a30b388d06f7c629",
+  "ffmpeg_version": "8.1.2",
+  "ffmpeg_source_url": "https://ffmpeg.org/releases/ffmpeg-8.1.2.tar.xz",
+  "ffmpeg_source_sha256": "464beb5e7bf0c311e68b45ae2f04e9cc2af88851abb4082231742a74d97b524c",
+  "ffmpeg_licence": "LGPL-2.1-or-later",
+  "compiler": "Microsoft C/C++ 19.50.35725 x64 (MSVC tools 14.50.35717)",
+  "configuration": "--toolchain=msvc --arch=x86_64 --target-os=win64 --enable-shared --disable-static --disable-programs --disable-doc --disable-debug --disable-autodetect --disable-x86asm --disable-network --disable-gpl --disable-nonfree --disable-version3 --prefix=../ffmpeg-lgpl",
+  "generated_build_repairs": [
+    "Skip dependency scans only during the fresh complete build",
+    "MSVC response-file export generation; same compiled object set"
+  ],
+  "source_wrapper_init_sha256": "2d8401d2d31f097fbb10fcf6d96223860c5755a96ee9c80649f7dcab27b8ecaa",
+  "libraries": [
+    {
+      "path": "avcodec-62.dll",
+      "bytes": 12246016,
+      "sha256": "e3202ccd192332b17921ca460e7ff4e5298190df4733b56e47fb1c7f34a6bc1c"
+    },
+    {
+      "path": "avdevice-62.dll",
+      "bytes": 197632,
+      "sha256": "3b2aee0245a2f867ad33dcbf0e85ba126f4893497c69fb581f914e6ad97973fa"
+    },
+    {
+      "path": "avfilter-11.dll",
+      "bytes": 3848704,
+      "sha256": "b038e81dfb2b20c1ede9fea82f5c7f033b7c6493ecda14077b9b9448c82f43c0"
+    },
+    {
+      "path": "avformat-62.dll",
+      "bytes": 2415616,
+      "sha256": "28dd8405ea3161f90f9f96a9b1b1cd29d45f1c8d80bdc4f7c03bbe5852f5c30e"
+    },
+    {
+      "path": "avutil-60.dll",
+      "bytes": 974336,
+      "sha256": "4afe3a74c43b9860d64ebdbdaef30b8758d907a1d3128ff8fc0e28d3b7227008"
+    },
+    {
+      "path": "swresample-6.dll",
+      "bytes": 202240,
+      "sha256": "3d950dfb94a55fc3b25fdd55ea4c49aa0361506d0c304d2615d3fa49a21634ad"
+    },
+    {
+      "path": "swscale-9.dll",
+      "bytes": 946688,
+      "sha256": "3065d713b7217396268258c2af1892aa4418416a9d9b778ccdfc6075f4063898"
+    }
+  ],
+  "bindings": [
+    {
+      "path": "av/_core.pyd",
+      "before_sha256": "fddabbe4bd31288baa6cd90dcddf69dd13bd14fdeee95cb0f7b2aedf97b82ce5",
+      "after_sha256": "a5c0e2ac8aaa8fdd06c13b1e3a09ebd256e7b6cbb05e17ff78988790aaefb191",
+      "imports": [
+        {
+          "old": "avformat-62-b6d6bb16ff0b7753371e2d0b285c9dc0.dll",
+          "new": "avformat-62.dll",
+          "symbols": [
+            "avformat_configuration",
+            "avformat_license",
+            "avformat_version"
+          ]
+        },
+        {
+          "old": "avcodec-62-984de33114b7fa384296817dec999c9d.dll",
+          "new": "avcodec-62.dll",
+          "symbols": [
+            "avcodec_configuration",
+            "avcodec_license",
+            "avcodec_version"
+          ]
+        },
+        {
+          "old": "avdevice-62-bf7a3ffbb6a4b577f24a39ea98a958d5.dll",
+          "new": "avdevice-62.dll",
+          "symbols": [
+            "avdevice_configuration",
+            "avdevice_license",
+            "avdevice_register_all",
+            "avdevice_version"
+          ]
+        },
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_version_info",
+            "avutil_configuration",
+            "avutil_license",
+            "avutil_version"
+          ]
+        },
+        {
+          "old": "avfilter-11-aef80fc767dc77e0319469b5bdcdf998.dll",
+          "new": "avfilter-11.dll",
+          "symbols": [
+            "avfilter_configuration",
+            "avfilter_license",
+            "avfilter_version"
+          ]
+        },
+        {
+          "old": "swscale-9-0c9886c118598c54e159ef2267ff99f3.dll",
+          "new": "swscale-9.dll",
+          "symbols": [
+            "swscale_configuration",
+            "swscale_license",
+            "swscale_version"
+          ]
+        },
+        {
+          "old": "swresample-6-0158536d5c4197d7d623445553ce9472.dll",
+          "new": "swresample-6.dll",
+          "symbols": [
+            "swresample_configuration",
+            "swresample_license",
+            "swresample_version"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/audio/codeccontext.pyd",
+      "before_sha256": "01fcaec1567af1900e2817cfb14054330cc267869e4d20d50651b04dd0af658b",
+      "after_sha256": "162a621fa6bb907767e6a935833cefe323d990d372fef90b5c3c31e795902e0d",
+      "imports": []
+    },
+    {
+      "path": "av/audio/fifo.pyd",
+      "before_sha256": "8e8eaa23febef6056cec152087cf81bfc16e988235cd52ba9b85eb881b342971",
+      "after_sha256": "f613919142ceb5da381b64cb3166455e92b87658107550dabac8e70d77c9fc0c",
+      "imports": [
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_audio_fifo_alloc",
+            "av_audio_fifo_free",
+            "av_audio_fifo_read",
+            "av_audio_fifo_size",
+            "av_audio_fifo_write"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/audio/format.pyd",
+      "before_sha256": "4e778d20e8cf185b16b6f88d6af7f66e06d47f8c90db6bacca09fbc8da2277b4",
+      "after_sha256": "f47c88a304113d67c082e249033823d19f841feaae53fc1d6b241a2fe96c4415",
+      "imports": [
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_get_bytes_per_sample",
+            "av_get_packed_sample_fmt",
+            "av_get_planar_sample_fmt",
+            "av_get_sample_fmt",
+            "av_get_sample_fmt_name",
+            "av_sample_fmt_is_planar"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/audio/frame.pyd",
+      "before_sha256": "30023b536d0df01e95feb3b11a6f3aee4bde4bbbd43ef3fa0859107d6c1ca80d",
+      "after_sha256": "0f6dacc8a203814a9af291a19cb9e72229a15f847e28bd5aa538f6118bfcb3cb",
+      "imports": [
+        {
+          "old": "avcodec-62-984de33114b7fa384296817dec999c9d.dll",
+          "new": "avcodec-62.dll",
+          "symbols": [
+            "avcodec_fill_audio_frame"
+          ]
+        },
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_freep",
+            "av_malloc",
+            "av_samples_get_buffer_size"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/audio/layout.pyd",
+      "before_sha256": "6090bac01acf6c49e7fe2312fe3452ac8b5827c98c449aef9b8c24d3c920dea1",
+      "after_sha256": "8451752862b4fc467210e47c70fdf8eb8569ff86aaa812c5274c5c2f703d0987",
+      "imports": [
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_channel_description",
+            "av_channel_layout_channel_from_index",
+            "av_channel_layout_compare",
+            "av_channel_layout_describe",
+            "av_channel_layout_from_string",
+            "av_channel_layout_uninit",
+            "av_channel_name"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/audio/plane.pyd",
+      "before_sha256": "7902e90813131fd23c5b63f76023a527c9df44d41bbdaf7b279e268edcab0107",
+      "after_sha256": "233ffc7ed98d098b65d7d4ba105f9f6adf562c48b9cd2e558ca8e7b818e78e96",
+      "imports": []
+    },
+    {
+      "path": "av/audio/resampler.pyd",
+      "before_sha256": "f2cff16841e39efc189dc56879617818bb852ad307d4bbfc267f67f59daef9f4",
+      "after_sha256": "d7f5ade2c3a64a587873533ea1fdb1a432f74d6ca41793c737baf4699fd9baaa",
+      "imports": []
+    },
+    {
+      "path": "av/audio/stream.pyd",
+      "before_sha256": "0800aee648efd4ad13f4ebe6a1c8bb83bd96520d08c2b44852f15b91ab0cff49",
+      "after_sha256": "a621ba6936f576f6bf381a6db4d53354d229de3a0ff14f9efed0065f18e14971",
+      "imports": []
+    },
+    {
+      "path": "av/bitstream.pyd",
+      "before_sha256": "057f99825b25c738c937cf18ed33d3307a040248401938b49e9ea5098118ea46",
+      "after_sha256": "08fd92c1f56c054cf26ca9b258a73c61a7a66088db8bc917f99455b023af905f",
+      "imports": [
+        {
+          "old": "avcodec-62-984de33114b7fa384296817dec999c9d.dll",
+          "new": "avcodec-62.dll",
+          "symbols": [
+            "av_bsf_flush",
+            "av_bsf_free",
+            "av_bsf_init",
+            "av_bsf_iterate",
+            "av_bsf_list_parse_str",
+            "av_bsf_receive_packet",
+            "av_bsf_send_packet",
+            "avcodec_parameters_copy",
+            "avcodec_parameters_to_context"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/buffer.pyd",
+      "before_sha256": "ed76dd9379bf7086d7e13ef452b11ee7b6ef6ec39eace8cfebdb00612195183a",
+      "after_sha256": "1ac56fa6003ecdbd8ba1acffd26cae9c68a2cc306f98104becbc6ee8c9190134",
+      "imports": []
+    },
+    {
+      "path": "av/codec/codec.pyd",
+      "before_sha256": "2d72b3db49860fc630189ae5c683962132ed23dad5c06db4f5c08734824f064f",
+      "after_sha256": "491f6c56b16f7a9a0c5985904987f305eec89c92c4c2f5ec59be5dfab6716c2c",
+      "imports": [
+        {
+          "old": "avcodec-62-984de33114b7fa384296817dec999c9d.dll",
+          "new": "avcodec-62.dll",
+          "symbols": [
+            "av_codec_is_decoder",
+            "av_codec_is_encoder",
+            "av_codec_iterate",
+            "avcodec_descriptor_get",
+            "avcodec_descriptor_get_by_name",
+            "avcodec_find_best_pix_fmt_of_list",
+            "avcodec_find_decoder",
+            "avcodec_find_decoder_by_name",
+            "avcodec_find_encoder",
+            "avcodec_find_encoder_by_name",
+            "avcodec_get_hw_config",
+            "avcodec_get_name",
+            "avcodec_get_supported_config"
+          ]
+        },
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_get_media_type_string"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/codec/context.pyd",
+      "before_sha256": "1e65f6f3e35e1930aff0577fa7a8424a13b2f9134e6626e95ae8be18bc087d52",
+      "after_sha256": "e5ae4f3f15b3a27de051c6b543c5f695eedb8538d2d206f67f6c06d39c3417b9",
+      "imports": [
+        {
+          "old": "avcodec-62-984de33114b7fa384296817dec999c9d.dll",
+          "new": "avcodec-62.dll",
+          "symbols": [
+            "av_codec_is_decoder",
+            "av_codec_is_encoder",
+            "av_parser_close",
+            "av_parser_init",
+            "av_parser_parse2",
+            "avcodec_alloc_context3",
+            "avcodec_flush_buffers",
+            "avcodec_free_context",
+            "avcodec_open2",
+            "avcodec_receive_frame",
+            "avcodec_receive_packet",
+            "avcodec_send_frame",
+            "avcodec_send_packet"
+          ]
+        },
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_buffer_ref",
+            "av_buffer_unref",
+            "av_freep",
+            "av_get_pix_fmt",
+            "av_hwframe_ctx_alloc",
+            "av_hwframe_ctx_init",
+            "av_realloc"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/codec/hwaccel.pyd",
+      "before_sha256": "7d4c70ce4db46c1e11e88108992043476ce78d84ee1b93251b0c586507f2a291",
+      "after_sha256": "adb1076898f520ee0bf2c58f178c1f51572d648064beb6d342166ffc46f21f5d",
+      "imports": [
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_buffer_unref",
+            "av_hwdevice_ctx_create",
+            "av_hwdevice_find_type_by_name",
+            "av_hwdevice_get_type_name",
+            "av_hwdevice_iterate_types"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/container/core.pyd",
+      "before_sha256": "bc3cdcba0b08e3de70983fb959cae1a9a49c212e443c7d43502a4e76f7ffa4c9",
+      "after_sha256": "9191d88f9307e1c858f00bbedb1ce6a602bc9e3bd97d8ac67220a856d5bff359",
+      "imports": [
+        {
+          "old": "avformat-62-b6d6bb16ff0b7753371e2d0b285c9dc0.dll",
+          "new": "avformat-62.dll",
+          "symbols": [
+            "av_dump_format",
+            "av_guess_format",
+            "avformat_alloc_context",
+            "avformat_alloc_output_context2",
+            "avformat_free_context",
+            "avformat_open_input"
+          ]
+        },
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_dict_free",
+            "av_freep",
+            "av_malloc"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/container/input.pyd",
+      "before_sha256": "898a51d35128c9e98bdeb633131bd085cf6f4dfb65a4e69df7d6ea16bb7fbb4d",
+      "after_sha256": "14f3ae747bb9c3bf945ac87c950bee69f4197d44b77a97009889a77b4a39605e",
+      "imports": [
+        {
+          "old": "avformat-62-b6d6bb16ff0b7753371e2d0b285c9dc0.dll",
+          "new": "avformat-62.dll",
+          "symbols": [
+            "av_read_frame",
+            "av_seek_frame",
+            "avformat_close_input",
+            "avformat_find_stream_info",
+            "avio_size"
+          ]
+        },
+        {
+          "old": "avcodec-62-984de33114b7fa384296817dec999c9d.dll",
+          "new": "avcodec-62.dll",
+          "symbols": [
+            "av_packet_alloc",
+            "av_packet_free",
+            "av_packet_move_ref",
+            "av_packet_unref",
+            "avcodec_alloc_context3",
+            "avcodec_find_decoder",
+            "avcodec_parameters_to_context"
+          ]
+        },
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_dict_copy",
+            "av_dict_free"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/container/output.pyd",
+      "before_sha256": "49e00e5ed841da36864918fb099d8de48296eeb5a44519ea9a306e544cd77e71",
+      "after_sha256": "c556e254d7f90ad24aa0d8e1983a68d8200f9088a3676a439c81a1c6287fd441",
+      "imports": [
+        {
+          "old": "avformat-62-b6d6bb16ff0b7753371e2d0b285c9dc0.dll",
+          "new": "avformat-62.dll",
+          "symbols": [
+            "av_interleaved_write_frame",
+            "av_write_trailer",
+            "avformat_new_stream",
+            "avformat_query_codec",
+            "avformat_write_header",
+            "avio_closep",
+            "avio_open"
+          ]
+        },
+        {
+          "old": "avcodec-62-984de33114b7fa384296817dec999c9d.dll",
+          "new": "avcodec-62.dll",
+          "symbols": [
+            "av_bsf_receive_packet",
+            "av_bsf_send_packet",
+            "av_codec_iterate",
+            "av_packet_alloc",
+            "av_packet_free",
+            "av_packet_get_side_data",
+            "av_packet_ref",
+            "av_packet_unref",
+            "avcodec_alloc_context3",
+            "avcodec_descriptor_get_by_name",
+            "avcodec_find_decoder_by_name",
+            "avcodec_find_encoder_by_name",
+            "avcodec_get_name",
+            "avcodec_get_supported_config",
+            "avcodec_parameters_copy",
+            "avcodec_parameters_from_context",
+            "avcodec_parameters_to_context"
+          ]
+        },
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_channel_layout_default",
+            "av_dict_set",
+            "av_freep",
+            "av_malloc"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/container/pyio.pyd",
+      "before_sha256": "95fbe920969470551b40c64b76a4276d7272a94ae7fe4b0fafcd8f49c7bc5762",
+      "after_sha256": "908d2ab5ee06000a24bdd1807150374239d6931be27d5b98e43b1e62e36eaf4d",
+      "imports": [
+        {
+          "old": "avformat-62-b6d6bb16ff0b7753371e2d0b285c9dc0.dll",
+          "new": "avformat-62.dll",
+          "symbols": [
+            "avio_alloc_context",
+            "avio_close",
+            "avio_flush"
+          ]
+        },
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_freep",
+            "av_malloc"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/container/streams.pyd",
+      "before_sha256": "a9eb6d474b1eb7d76ff9a39b3a20a8b8e5fd7794da981172e66824de78e55f62",
+      "after_sha256": "7ea5ceeaa17feeb991c340079c5115013fa2fbd382ddbd358bda3dd0c1b0c710",
+      "imports": [
+        {
+          "old": "avformat-62-b6d6bb16ff0b7753371e2d0b285c9dc0.dll",
+          "new": "avformat-62.dll",
+          "symbols": [
+            "av_find_best_stream"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/device.pyd",
+      "before_sha256": "515680239b83f6a5911346c1d0b54d6949dfdd11450c2464773521e55193cf61",
+      "after_sha256": "aeed174240d1996bfc0137f8af92278289542cb0596385d699ade2c9464f838c",
+      "imports": [
+        {
+          "old": "avformat-62-b6d6bb16ff0b7753371e2d0b285c9dc0.dll",
+          "new": "avformat-62.dll",
+          "symbols": [
+            "av_find_input_format",
+            "av_guess_format",
+            "avformat_close_input",
+            "avformat_open_input"
+          ]
+        },
+        {
+          "old": "avdevice-62-bf7a3ffbb6a4b577f24a39ea98a958d5.dll",
+          "new": "avdevice-62.dll",
+          "symbols": [
+            "avdevice_free_list_devices",
+            "avdevice_list_input_sources",
+            "avdevice_list_output_sinks"
+          ]
+        },
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_dict_free",
+            "av_dict_set",
+            "av_get_media_type_string"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/dictionary.pyd",
+      "before_sha256": "430ad821a98ed9186dfea9ca54e9bf113db8c729dc60cb9cfa5e775049fcf4aa",
+      "after_sha256": "311d87b09d6f2275e9b817be8a4e2f3f4ed297500c825193286286046d5809f7",
+      "imports": [
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_dict_copy",
+            "av_dict_count",
+            "av_dict_free",
+            "av_dict_get",
+            "av_dict_set"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/error.pyd",
+      "before_sha256": "a8e472068f49fe5d60bca9a0f5aa9242007dea89088a95cf396c345940c4a38c",
+      "after_sha256": "ee4d5186594a7af363659a939f02e02cb6c1a4f4a95ef64a0aa539524909790b",
+      "imports": [
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_strerror"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/filter/context.pyd",
+      "before_sha256": "f4151f7eb52b347dd63764f872754aa2a3efe8c4f630fdc39c35423aa63c3fe1",
+      "after_sha256": "1bcffd6b8f43bb05e1ca40cf0d6e1ddd05d58b815d948ec7b7b0758657d89515",
+      "imports": [
+        {
+          "old": "avfilter-11-aef80fc767dc77e0319469b5bdcdf998.dll",
+          "new": "avfilter-11.dll",
+          "symbols": [
+            "av_buffersink_get_frame",
+            "av_buffersrc_write_frame",
+            "avfilter_init_dict",
+            "avfilter_init_str",
+            "avfilter_link",
+            "avfilter_process_command"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/filter/filter.pyd",
+      "before_sha256": "2677cd7978f9e71f3c3a1d2275f58d495c3887693c39d20dd230a4b2676e1c6b",
+      "after_sha256": "dd054421c567ec6f44a67cb194cd36d5ea78e988041d4dbba192f558b4d37d24",
+      "imports": [
+        {
+          "old": "avfilter-11-aef80fc767dc77e0319469b5bdcdf998.dll",
+          "new": "avfilter-11.dll",
+          "symbols": [
+            "av_filter_iterate",
+            "avfilter_get_by_name"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/filter/graph.pyd",
+      "before_sha256": "b8d18c9d8f08030b10616564fc4cb394fc068157dfe8853bd23b7835dff7ae8b",
+      "after_sha256": "afcbc5f6edc65276a8cef68776018ff4051585262cbbcf0106c39cc39f3c5e90",
+      "imports": [
+        {
+          "old": "avfilter-11-aef80fc767dc77e0319469b5bdcdf998.dll",
+          "new": "avfilter-11.dll",
+          "symbols": [
+            "av_buffersink_set_frame_size",
+            "avfilter_graph_alloc",
+            "avfilter_graph_alloc_filter",
+            "avfilter_graph_config",
+            "avfilter_graph_free"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/filter/link.pyd",
+      "before_sha256": "8ca6145b08ad30533dca5da66b001005d2efe1e43be9d328ee637881173c454f",
+      "after_sha256": "3ea0341f89e26a477db8dd927461fc5b1a3853852eed155f4b598f61bebb7477",
+      "imports": [
+        {
+          "old": "avfilter-11-aef80fc767dc77e0319469b5bdcdf998.dll",
+          "new": "avfilter-11.dll",
+          "symbols": [
+            "avfilter_filter_pad_count",
+            "avfilter_pad_get_name"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/filter/loudnorm.pyd",
+      "before_sha256": "ac3f14eff48420f0d84f524aa16c5e94b5dd4243d37dd84b69fc8d1b7c1604fe",
+      "after_sha256": "fd83afc9b8d20a3baffbd8a4f4722188b6b8116b1d537489f97deeab1576edb7",
+      "imports": [
+        {
+          "old": "avformat-62-b6d6bb16ff0b7753371e2d0b285c9dc0.dll",
+          "new": "avformat-62.dll",
+          "symbols": [
+            "av_read_frame",
+            "avformat_close_input"
+          ]
+        },
+        {
+          "old": "avcodec-62-984de33114b7fa384296817dec999c9d.dll",
+          "new": "avcodec-62.dll",
+          "symbols": [
+            "av_packet_alloc",
+            "av_packet_free",
+            "av_packet_unref",
+            "avcodec_alloc_context3",
+            "avcodec_find_decoder",
+            "avcodec_free_context",
+            "avcodec_open2",
+            "avcodec_parameters_to_context",
+            "avcodec_receive_frame",
+            "avcodec_send_packet"
+          ]
+        },
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_channel_layout_describe",
+            "av_frame_alloc",
+            "av_frame_free",
+            "av_frame_unref",
+            "av_get_sample_fmt_name",
+            "av_log",
+            "av_log_default_callback",
+            "av_log_set_callback"
+          ]
+        },
+        {
+          "old": "avfilter-11-aef80fc767dc77e0319469b5bdcdf998.dll",
+          "new": "avfilter-11.dll",
+          "symbols": [
+            "av_buffersink_get_frame",
+            "av_buffersrc_add_frame",
+            "av_buffersrc_add_frame_flags",
+            "avfilter_get_by_name",
+            "avfilter_graph_alloc",
+            "avfilter_graph_config",
+            "avfilter_graph_create_filter",
+            "avfilter_graph_free",
+            "avfilter_link"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/format.pyd",
+      "before_sha256": "dc955b63ec7a8564516bbf23901c404b0ca78b3c723a31ce599ac7276231510c",
+      "after_sha256": "e59aaa11cae365034cde4a5fb27c07e4f0f5a9ab4fd7658bf55fcdf5eb72b014",
+      "imports": [
+        {
+          "old": "avformat-62-b6d6bb16ff0b7753371e2d0b285c9dc0.dll",
+          "new": "avformat-62.dll",
+          "symbols": [
+            "av_demuxer_iterate",
+            "av_find_input_format",
+            "av_guess_format",
+            "av_muxer_iterate"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/frame.pyd",
+      "before_sha256": "3ea5daabbbf9f2f476c90f21a75dbb42c19211f8c170c000c153cf6f89f156de",
+      "after_sha256": "f0b946860b233d136e0199525f6f92639c24ef64e23102af6f7e39a120bab7eb",
+      "imports": [
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_buffer_unref",
+            "av_frame_alloc",
+            "av_frame_copy_props",
+            "av_frame_free",
+            "av_frame_make_writable",
+            "av_rescale_q"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/index.pyd",
+      "before_sha256": "a6e55441c103d1af0e52680cef6a31e1a5197d122d465e7cab79f37cbedf245a",
+      "after_sha256": "cb20d3ef7e02e49301d99574ab3667e0cb82400ee2ab37ef5c7e3209c2302860",
+      "imports": [
+        {
+          "old": "avformat-62-b6d6bb16ff0b7753371e2d0b285c9dc0.dll",
+          "new": "avformat-62.dll",
+          "symbols": [
+            "av_index_search_timestamp",
+            "avformat_index_get_entries_count",
+            "avformat_index_get_entry"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/logging.pyd",
+      "before_sha256": "6f49dcd07425fcfa32b4e9cf2d5a349ec9c77b7b43c53628c0fc5dd7f2fef29c",
+      "after_sha256": "99533ebac1b12b1d1151fdd7f85f895be0aab3a70f7eb5378e3bca4869744771",
+      "imports": [
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_log",
+            "av_log_default_callback",
+            "av_log_set_callback",
+            "av_log_set_level"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/opaque.pyd",
+      "before_sha256": "8afce6591573baa3cce62578468ec0993a1d36110437ed74bf3c2fdaa77a4688",
+      "after_sha256": "3658d391403f618f3624cb4605f489a55a8911461acf5b12ff79ec160e7c73e9",
+      "imports": [
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_buffer_create",
+            "av_free",
+            "av_malloc"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/packet.pyd",
+      "before_sha256": "3a7f4a06b593e3597e99da97a9d5dc0529fb6ef6311f8449087a1cbbf02eff26",
+      "after_sha256": "af6b0b06e5a9ecdf3c95490db6f52e6a2fedf842689812bfc2e0a0ee24a2c87e",
+      "imports": [
+        {
+          "old": "avcodec-62-984de33114b7fa384296817dec999c9d.dll",
+          "new": "avcodec-62.dll",
+          "symbols": [
+            "av_new_packet",
+            "av_packet_add_side_data",
+            "av_packet_alloc",
+            "av_packet_free",
+            "av_packet_rescale_ts",
+            "av_packet_side_data_get",
+            "av_packet_side_data_name"
+          ]
+        },
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_buffer_create",
+            "av_buffer_unref",
+            "av_freep",
+            "av_malloc"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/plane.pyd",
+      "before_sha256": "835756ca51ce96e39216e63e492904fbff2a4d14b6d473a9647acd0ddf58624a",
+      "after_sha256": "81a7b4a3065fb61e1166cff0c954ea6c1f865d9ec534029b9d1f1ca50d0d979e",
+      "imports": []
+    },
+    {
+      "path": "av/sidedata/encparams.pyd",
+      "before_sha256": "18b7e342d68ef7294d75deb6ef350758e321bb632e0c0b1fe9a1d23e5f4f64ce",
+      "after_sha256": "df4b737dd4a714896bbcf8592b47b06128f1da32033cfe97a9dec5ea1c4a146c",
+      "imports": []
+    },
+    {
+      "path": "av/sidedata/motionvectors.pyd",
+      "before_sha256": "6ddb0692f81792dd02ac487f1b47e02c1d2eb47e1f2a5d8c3dcba7d952f9d42e",
+      "after_sha256": "c92d2a0581c9070c4673d9276b85adbebe3312b0d8c4e9d2a0ce701678c3a945",
+      "imports": []
+    },
+    {
+      "path": "av/sidedata/sidedata.pyd",
+      "before_sha256": "da6b302b55ddc775473b7e464d320c004410dc79e23eeba83cd65e423a0d41ba",
+      "after_sha256": "e1607f9836f26777cc7714a964954d9f4a07f629147a0378914812ab9568cd70",
+      "imports": [
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_display_rotation_get"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/stream.pyd",
+      "before_sha256": "ee17656782f69aaa5d474f0efe311609f4f654a67f02d7fb7b471f84fe4bd424",
+      "after_sha256": "ccc1369b4f2c0c7fb5dca08db84bde238c647315a693d2328585aa402533cb57",
+      "imports": [
+        {
+          "old": "avcodec-62-984de33114b7fa384296817dec999c9d.dll",
+          "new": "avcodec-62.dll",
+          "symbols": [
+            "avcodec_descriptor_get",
+            "avcodec_parameters_from_context"
+          ]
+        },
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_get_media_type_string"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/subtitles/codeccontext.pyd",
+      "before_sha256": "5b77c108cd578d75615af4e12285575862357047ce27ee22d7ff4a10891b0b9d",
+      "after_sha256": "cad14b13115e66358bdc9180ba5bb9f9c79f91f7f1fd2d5c42c4c428b9a356c9",
+      "imports": [
+        {
+          "old": "avcodec-62-984de33114b7fa384296817dec999c9d.dll",
+          "new": "avcodec-62.dll",
+          "symbols": [
+            "avcodec_decode_subtitle2",
+            "avcodec_encode_subtitle"
+          ]
+        },
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_free",
+            "av_freep",
+            "av_malloc",
+            "av_realloc"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/subtitles/stream.pyd",
+      "before_sha256": "c70768591b46c999c277469812c224393cacd97796de79730a0b42ed6368f69b",
+      "after_sha256": "8a7408578b8c0cf142eb5f38035b25870c249c610d10cb8f6c5f3837b5ea5cb4",
+      "imports": []
+    },
+    {
+      "path": "av/subtitles/subtitle.pyd",
+      "before_sha256": "67ba15b3cac54a3521cd5cf17746e145025fb037634a24d063d2f805215acf6d",
+      "after_sha256": "0e8f5a57e6d989d407bd9da8783346e5e9276497fdc0bab2582d96e1b1c94da1",
+      "imports": [
+        {
+          "old": "avcodec-62-984de33114b7fa384296817dec999c9d.dll",
+          "new": "avcodec-62.dll",
+          "symbols": [
+            "avsubtitle_free"
+          ]
+        },
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_free",
+            "av_malloc",
+            "av_mallocz"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/utils.pyd",
+      "before_sha256": "5d9e0a84aebaca6ef0617b46b5a3012603ce84c8ca2fc3774eb391779fb06965",
+      "after_sha256": "97015dc739aaa8a6c273573fe0232a2285317aee6f2356652476ebd399788733",
+      "imports": [
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_dict_free",
+            "av_dict_get",
+            "av_dict_set"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/video/codeccontext.pyd",
+      "before_sha256": "642475d02d22cad4189f89591b71fc31cb306fd59149c8e38f24e3a9f3e461b4",
+      "after_sha256": "35ae58311465d76f4819fd24581e11527ab9a71880457ba5375194b1d4145783",
+      "imports": [
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_buffer_ref",
+            "av_hwframe_get_buffer",
+            "av_hwframe_transfer_data",
+            "av_pix_fmt_desc_get",
+            "av_reduce"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/video/format.pyd",
+      "before_sha256": "97dff084bf8404580055b6abd1282726f7701f52adc2096abd44cbb459b18cda",
+      "after_sha256": "9b2b7c7036709f48b5e00997ebaa21d6492bb89a895315d0c59325901086db99",
+      "imports": [
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_get_bits_per_pixel",
+            "av_get_padded_bits_per_pixel",
+            "av_get_pix_fmt",
+            "av_pix_fmt_desc_get",
+            "av_pix_fmt_desc_next"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/video/frame.pyd",
+      "before_sha256": "b6ddfdfd60672c6cea4bc5ebdd5d45fc6200c4804f28f934d92f5075ed8564bf",
+      "after_sha256": "87532b4dd39f3950a215b47039e898a41e49757769679aa736b602f038057605",
+      "imports": [
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_buffer_create",
+            "av_buffer_ref",
+            "av_buffer_unref",
+            "av_frame_get_buffer",
+            "av_frame_unref",
+            "av_hwdevice_ctx_create",
+            "av_hwframe_ctx_alloc",
+            "av_hwframe_ctx_init",
+            "av_image_fill_pointers",
+            "av_pix_fmt_desc_get"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/video/plane.pyd",
+      "before_sha256": "851949b8e447c6a59d97185853afe84d232a082d1af993952255ec51eae8ee49",
+      "after_sha256": "cf01249a997361fd51a1196ad0b6669da7a45a427d80f0cc326ad32b10af0fa3",
+      "imports": [
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_frame_alloc",
+            "av_frame_free",
+            "av_frame_ref",
+            "av_pix_fmt_desc_get"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/video/reformatter.pyd",
+      "before_sha256": "fa22be785af17e5a1b53ffcc583a5c210d4f70b617bc6b6149a90015bf2e3412",
+      "after_sha256": "8a17eba628c31eccec2c0c0fbcd43197d3a448d9df35c1a20950556686fb47e7",
+      "imports": [
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_hwframe_transfer_data"
+          ]
+        },
+        {
+          "old": "swscale-9-0c9886c118598c54e159ef2267ff99f3.dll",
+          "new": "swscale-9.dll",
+          "symbols": [
+            "sws_alloc_context",
+            "sws_free_context",
+            "sws_is_noop",
+            "sws_scale_frame"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "av/video/stream.pyd",
+      "before_sha256": "f41f6ecdbaaa7f4a80e0428ddb6d902bc1f344f506c957f833942f51142237eb",
+      "after_sha256": "ee96ec0e5f7f8e8fb3f244863ba9e4d2d612d8c508a25acb4cda111827d35579",
+      "imports": [
+        {
+          "old": "avformat-62-b6d6bb16ff0b7753371e2d0b285c9dc0.dll",
+          "new": "avformat-62.dll",
+          "symbols": [
+            "av_guess_frame_rate",
+            "av_guess_sample_aspect_ratio"
+          ]
+        },
+        {
+          "old": "avcodec-62-984de33114b7fa384296817dec999c9d.dll",
+          "new": "avcodec-62.dll",
+          "symbols": [
+            "av_packet_side_data_new"
+          ]
+        },
+        {
+          "old": "avutil-60-cc1777f859dcfd98b8019bdf459e774e.dll",
+          "new": "avutil-60.dll",
+          "symbols": [
+            "av_display_matrix_flip",
+            "av_display_rotation_set",
+            "av_reduce"
+          ]
+        }
+      ]
+    }
+  ],
+  "required_symbol_references_verified": 293,
+  "source_delivery": "DICTATION-CODEC-SOURCE.zip and matching application source supplied beside the release binaries",
+  "replacement_route": "Rebuild FFmpeg, stage its seven ABI-compatible DLLs with the supplied BSD PyAV binding objects, then rebuild the Python owner; see REBUILD-CODECS.md",
+  "stock_vendor_codec_dlls_shipped": false
+}

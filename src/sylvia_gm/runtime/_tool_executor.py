@@ -369,7 +369,7 @@ def _validate_params(
                 errors.append(f"Parameter '{name}' must be a string")
 
         elif ptype == "integer":
-            if not isinstance(value, (int, float)):
+            if isinstance(value, bool) or not isinstance(value, (int, float)):
                 errors.append(f"Parameter '{name}' must be an integer")
             elif isinstance(value, float) and value != int(value):
                 errors.append(f"Parameter '{name}' must be an integer, got float")

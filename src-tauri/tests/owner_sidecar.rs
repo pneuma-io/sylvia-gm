@@ -1,7 +1,10 @@
 use serde_json::json;
 use std::path::PathBuf;
 use std::time::{SystemTime, UNIX_EPOCH};
+use support::await_clean_shutdown;
 use sylvia_gm::OwnerBridge;
+
+mod support;
 
 fn test_directory() -> PathBuf {
     let nonce = SystemTime::now()
@@ -82,6 +85,7 @@ fn rust_host_handshakes_and_reopens_authority_child() {
             )
             .expect("finalize canonical campaign construction");
         assert_eq!(finalized["handoff"]["campaign_id"], campaign_id);
+        await_clean_shutdown(&bridge);
         bridge.shutdown().expect("clean owner shutdown");
     }
 
@@ -95,8 +99,14 @@ fn rust_host_handshakes_and_reopens_authority_child() {
         assert_eq!(index[0]["playable"], true);
         assert_eq!(index[0]["provider_id"], "test.rust-sidecar");
         assert_eq!(index[0]["model_id"], "test.rust-sidecar/model0");
+        await_clean_shutdown(&reopened);
         reopened.shutdown().expect("clean reopened owner shutdown");
     }
 
+    assert_eq!(
+        root.canonicalize().unwrap().parent(),
+        Some(std::env::temp_dir().canonicalize().unwrap().as_path()),
+        "remove only this run's contained synthetic directory"
+    );
     std::fs::remove_dir_all(&root).expect("remove test directory");
 }

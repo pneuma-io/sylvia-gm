@@ -10,6 +10,7 @@ from typing import Any, cast
 import pytest
 
 from sylvia_gm.agent._provider_session import _GM_MODEL_NARRATION_BLOCK, ProviderSessionAdapter
+from sylvia_gm.agent._request_data import APPLICATION_DATA_GUIDANCE, PLAYER_MESSAGE_GUIDANCE
 from sylvia_gm.agent._working_context import WorkingContextProvider
 from sylvia_gm.application.authority import AuthorityOwner, CampaignCreate
 from sylvia_gm.domain.authority import PackageLock, WriterRole
@@ -227,8 +228,18 @@ def test_builder_role_does_not_receive_gm_style_block() -> None:
     )
 
 
+@pytest.mark.parametrize("wire", ["gpt-6.1-sol", "gpt-6-luna"])
+@pytest.mark.parametrize(
+    "malformed",
+    [
+        [{"kind": "npc_dialogue", "speaker_id": "anonymous", "text": 'Rowan nods. "Proceed."'}],
+        'Rowan nods. "Proceed."',
+    ],
+)
 def test_response_correction_retry_keeps_block_once_and_old_contract(
     monkeypatch: pytest.MonkeyPatch,
+    wire: str,
+    malformed: object,
 ) -> None:
     from tests import test_alpha_f4_provider_session_adapter as existing
 
@@ -237,19 +248,26 @@ def test_response_correction_retry_keeps_block_once_and_old_contract(
 
     def configured(rounds):
         provider = original(rounds)
-        provider.model_info = model("chatgpt-subscription/gpt-6.1-sol", "gpt-6.1-sol")
+        provider.model_info = model(f"chatgpt-subscription/{wire}", wire)
         captured.append(provider)
         return provider
 
     monkeypatch.setattr(existing, "_ScriptedProvider", configured)
-    existing.test_old_dialogue_shape_is_rejected_before_write_then_same_gm_corrects_it(
-        [{"kind": "npc_dialogue", "speaker_id": "anonymous", "text": 'Rowan nods. "Proceed."'}]
-    )
+    existing.test_old_dialogue_shape_is_rejected_before_write_then_same_gm_corrects_it(malformed)
     assert len(captured[0].calls) == 2
     for messages, _ in captured[0].calls:
-        assert messages[0] == {"role": "system", "content": "UNCHANGED OLD GM"}
-        assert messages[1] == {"role": "system", "content": _GM_MODEL_NARRATION_BLOCK}
-        assert sum(item.get("content") == _GM_MODEL_NARRATION_BLOCK for item in messages) == 1
+        # The provider projection inserts fixed host guidance before the model's style block.
+        prefix = ["UNCHANGED OLD GM", APPLICATION_DATA_GUIDANCE, PLAYER_MESSAGE_GUIDANCE]
+        if wire == "gpt-6.1-sol":
+            prefix.append(_GM_MODEL_NARRATION_BLOCK)
+        assert messages[: len(prefix)] == [
+            {"role": "system", "content": content} for content in prefix
+        ]
+        for content in (APPLICATION_DATA_GUIDANCE, PLAYER_MESSAGE_GUIDANCE):
+            assert sum(item.get("content") == content for item in messages) == 1
+        assert sum(item.get("content") == _GM_MODEL_NARRATION_BLOCK for item in messages) == (
+            wire == "gpt-6.1-sol"
+        )
 
 
 def test_mismatched_provider_key_does_not_infer_sol_identity() -> None:

@@ -24,7 +24,8 @@ test(`${pageName}: tactical camera survives pending and settled action previews`
         name.endsWith('.css') ? 'text/css' : name.endsWith('.png') ? 'image/png' : 'text/html' });
     });
     await page.goto(`https://sylvia-camera.test/${pageName}`);
-    await page.evaluate(() => {
+    // The camera must be scrollable: the main window's map fills its panel, so it needs a larger zoom.
+    await page.evaluate((zoom) => {
       document.getElementById('connecting-overlay')?.classList.add('hidden');
       const frame = document.getElementById('session-frame');
       if (frame) frame.style.display = 'flex';
@@ -56,10 +57,10 @@ test(`${pageName}: tactical camera survives pending and settled action previews`
       }) };
       api.renderRulesetPanelProjection(projection);
       api.updateTacticalSelection(map, { actor: 'hero', ...api.tacticalTargetSelection(map, 'target') });
-      api.state.tacticalViews.map.zoom = .75;
+      api.state.tacticalViews.map.zoom = zoom;
       api.renderRulesetPanelProjection(projection);
       window.previewReplies.splice(0).forEach(reply => reply());
-    });
+    }, pageName === 'app.html' ? 1.5 : .75);
     await page.getByText('Exposed silhouette: 100%', { exact: false }).waitFor();
     const mapScroll = page.locator('.tactical-scroll');
     await mapScroll.evaluate(node => { node.scrollTop = node.scrollHeight; });

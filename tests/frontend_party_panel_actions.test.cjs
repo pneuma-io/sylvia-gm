@@ -244,7 +244,8 @@ test('Squad and Character omit definition IDs but retain authored roles and char
     const h = harness({ available: true, actors: [{ id: 'alpha' }] }, surface);
     assert.match(h.markup(), /<strong>Asha<\/strong>/);
     assert.match(h.markup(), /HP 9/);
-    assert.match(h.markup(), /RES 4 · AP 2/);
+    assert.match(h.markup(), /data-resource="res">RES 4<\/span>/);
+    assert.match(h.markup(), /data-resource="ap">AP 2<\/span>/);
     assert.doesNotMatch(h.markup(), /trigger-discipline\.character|panel-unit-role/);
     if (renderer === 'unit_list') assert.match(h.markup(), /RIFLEMAN · Level 5/);
     assert.equal(JSON.stringify(surface.data), before);
@@ -280,7 +281,8 @@ test('Character inspection shares Loadout while Map retains its acting character
   h.api.applyPanelSelection('character', { actor: 'bravo' });
   assert.equal(h.api.tacticalSelection(map).actor, 'alpha');
   assert.match(h.markup(), /HP 7/);
-  assert.match(h.markup(), /RES 3 · AP 1/);
+  assert.match(h.markup(), /data-resource="res">RES 3<\/span>/);
+  assert.match(h.markup(), /data-resource="ap">AP 1<\/span>/);
   assert.doesNotMatch(h.markup(), /HP 9/);
   const loadout = h.api.panelMarkup(h.projection.surfaces.at(-1));
   assert.match(loadout, /&lt;Custom rifle&gt;/);

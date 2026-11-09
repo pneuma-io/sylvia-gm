@@ -27,7 +27,11 @@ from sylvia_gm.domain.package_library import (
 )
 from sylvia_gm.domain.panel_layout import PANEL_LAYOUT_PATH
 from sylvia_gm.domain.ruleset_tests import validate_ruleset_tests
-from sylvia_gm.domain.starting_state import PRIVATE_STATE_FEATURE, STARTING_STATE_FEATURE
+from sylvia_gm.domain.starting_state import (
+    PRIVATE_STATE_FEATURE,
+    REQUIRED_STARTING_STATE_FEATURE,
+    STARTING_STATE_FEATURE,
+)
 
 COMPACT_RULESET_SOURCE = "ruleset-source.yaml"
 _SOURCE_DEPTH_LIMIT = 64
@@ -561,6 +565,8 @@ def compile_ruleset_source(source_bytes: bytes) -> CompiledRulesetSource:
         required_features.add(ENGINE_FEATURE_PANEL_WORKSPACES)
     if "state_schemas" in source:
         required_features.add(STARTING_STATE_FEATURE)
+        if any(item.get("required") is True for item in source["state_schemas"]):
+            required_features.add(REQUIRED_STARTING_STATE_FEATURE)
         if any(item.get("visibility") == "engine" for item in source["state_schemas"]):
             required_features.add(PRIVATE_STATE_FEATURE)
     required_features = tuple(sorted(required_features))

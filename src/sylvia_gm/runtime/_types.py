@@ -156,6 +156,7 @@ class ExecutionBudget:
     operations: int = 0
     call_depth: int = 0
     private_random_sampled: bool = False
+    preflight_only: bool = False
 
     def __post_init__(self) -> None:
         if self.max_operations < 1 or self.max_call_depth < 1:

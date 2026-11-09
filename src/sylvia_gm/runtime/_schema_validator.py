@@ -43,6 +43,12 @@ VALID_PARAM_TYPES: frozenset[str] = frozenset(
 VALID_EFFECT_KEYS: frozenset[str] = frozenset(_EFFECT_HANDLERS)
 
 _SPATIAL_QUERY_FIELDS: dict[str, frozenset[str]] = {
+    "circle_route": frozenset(
+        {"map_id", "moving_entity_id", "destination", "moving_radius", "circles", "metadata_filter", "max_tests", "edge_costs"}
+    ),
+    "circle_overlap": frozenset(
+        {"map_id", "moving_entity_id", "fixed_entity_id", "destination", "moving_radius", "fixed_radius", "origin"}
+    ),
     "body_proximity": frozenset(
         {
             "map_id",
@@ -1274,6 +1280,10 @@ def _validate_spatial_query_effect(
         errors.append(f"{label} query must be an object")
         return errors
     expected_query = _SPATIAL_QUERY_FIELDS[cast(str, operation)]
+    if operation == 'circle_overlap' and 'origin' not in query:
+        expected_query = expected_query - {'origin'}
+    if operation == 'circle_route' and 'edge_costs' not in query:
+        expected_query = expected_query - {'edge_costs'}
     if operation == "path" and "moving_entity_id" not in query:
         expected_query = expected_query - {"moving_entity_id"}
     if operation in {"path", "exposure"} and "metadata_filter" not in query:
@@ -1330,20 +1340,47 @@ def _validate_spatial_query_effect(
             or not _spatial_literal_or_template(selector.get("missing_matches"), bool)
         ):
             errors.append(f"{label} metadata filter is invalid")
-    elif operation == "body_proximity":
+    elif operation == 'circle_route':
+        if not _spatial_coordinate(query.get('destination'), 3):
+            errors.append(f'{label} destination must contain three coordinates')
+        if not isinstance(query.get('moving_entity_id'), str) or not query['moving_entity_id']:
+            errors.append(f'{label} moving_entity_id must be text or a template')
+        radius = query.get('moving_radius')
+        if not (isinstance(radius, str) and _SPATIAL_TEMPLATE.fullmatch(radius)) and not (
+            isinstance(radius, (int, float)) and not isinstance(radius, bool) and math.isfinite(radius) and radius > 0
+        ):
+            errors.append(f'{label} moving_radius must be positive or a template')
+        circles = query.get('circles')
+        if not (isinstance(circles, str) and _SPATIAL_TEMPLATE.fullmatch(circles)) and not (
+            isinstance(circles, list) and len(circles) <= 64
+            and all(isinstance(row, Mapping) and set(row) == {'entity_id', 'radius', 'blocking'} for row in circles)
+        ):
+            errors.append(f'{label} circles must be a bounded list or a template')
+        selector = query.get('metadata_filter')
+        if not isinstance(selector, Mapping) or set(selector) != {'key', 'value', 'missing_matches'}:
+            errors.append(f'{label} metadata filter is invalid')
+        edge_costs = query.get('edge_costs', [])
+        if not (isinstance(edge_costs, str) and _SPATIAL_TEMPLATE.fullmatch(edge_costs)) and not (
+            isinstance(edge_costs, list) and len(edge_costs) <= 16384
+            and all(isinstance(row, Mapping) and set(row) == {'start', 'end', 'cost'} for row in edge_costs)
+        ):
+            errors.append(f'{label} edge_costs must be a bounded list or a template')
+        _validate_spatial_limit(errors, label, query.get('max_tests'), 'max_tests', 1, 16384)
+    elif operation in {"body_proximity", "circle_overlap"}:
+        if 'origin' in query and not _spatial_coordinate(query['origin'], 3):
+            errors.append(f'{label} origin must contain three coordinates')
         if not _spatial_coordinate(query.get("destination"), 3):
             errors.append(f"{label} destination must contain three coordinates")
         for name in ("moving_entity_id", "fixed_entity_id"):
             if not isinstance(query.get(name), str) or not query.get(name):
                 errors.append(f"{label} {name} must be text or a template")
-        radius = query.get("radius")
-        if not (isinstance(radius, str) and _SPATIAL_TEMPLATE.fullmatch(radius)) and not (
-            isinstance(radius, (int, float))
-            and not isinstance(radius, bool)
-            and math.isfinite(radius)
-            and radius >= 0
-        ):
-            errors.append(f"{label} radius must be a finite nonnegative number or a template")
+        for name in (("radius",) if operation == "body_proximity" else ("moving_radius", "fixed_radius")):
+            radius = query.get(name)
+            if not (isinstance(radius, str) and _SPATIAL_TEMPLATE.fullmatch(radius)) and not (
+                isinstance(radius, (int, float)) and not isinstance(radius, bool)
+                and math.isfinite(radius) and (radius >= 0 if name == "radius" else radius > 0)
+            ):
+                errors.append(f"{label} {name} must be a finite valid radius or a template")
     elif operation == "sweep":
         if not _spatial_coordinate(query.get("destination"), 3):
             errors.append(f"{label} destination must contain three coordinates")

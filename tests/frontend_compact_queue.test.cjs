@@ -62,6 +62,28 @@ test('a reaction blocks Execute and keeps its exact saved decision available',()
   assert.match(html,/Movement Reaction decision: choose whether to react\./);
   assert.doesNotMatch(html,/data-sequence-run/);
 });
+test('a settled choice pause is not presented as a decision still to make',()=>{
+  // Real TD owner read-back after a movement-trigger-order choice resolved from another window,
+  // then the pre-resolution reason the owner stores while the choice is awaited.
+  for(const reason of ['Saved commitment recovered; inspect the remaining intentions','Resolve the saved mechanics choice']){
+    const resolved=queue([step('a','Move',{status:'committed'})]);
+    Object.assign(resolved,{status:'paused',pause_reason:reason});
+    const html=harness(resolved).sequenceMarkup();
+    assert.doesNotMatch(html,/Resolve the decision to continue/);
+    assert.doesNotMatch(html,new RegExp(reason));
+    const waiting=queue([step('a','Move',{status:'awaiting_choice'})]);
+    Object.assign(waiting,{status:'paused',pause_reason:reason});
+    assert.match(harness(waiting).sequenceMarkup(),/Resolve the decision to continue/);
+    const later=queue([step('a','Move',{status:'committed'}),step('b','Aim')]);
+    Object.assign(later,{status:'paused',pause_reason:reason});
+    assert.match(harness(later).sequenceMarkup(),/Resolve the decision to continue/);
+  }
+  // A turn boundary is not a settled choice; it keeps its explanation.
+  const boundary=queue([step('a','End turn',{status:'committed'})]);
+  Object.assign(boundary,{status:'paused',pause_reason:'Native action reached a control or turn boundary'});
+  assert.match(harness(boundary).sequenceMarkup(),/Resolve the decision to continue/);
+});
+
 test('only newly queued cards request entrance motion on a panel refresh',()=>{
   const api=harness(queue([step('a','Move'),step('b','Strike')]));
   assert.equal((api.sequenceMarkup(new Set(['a'])).match(/data-sequence-enter/g)||[]).length,1);

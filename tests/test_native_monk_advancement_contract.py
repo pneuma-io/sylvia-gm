@@ -109,3 +109,6 @@ def test_monk_proposal_rejects_wrong_resulting_speed_without_changes(tmp_path):
             owner.execute_action(command(owner, "level_up_srd_character", proposal, "wrong"))
         after = owner.snapshot("advancement")
         assert after.state == before.state and after.participants == before.participants
+        assert after == before
+        with pytest.raises(CommandRejected, match="Stored action result is unavailable"):
+            owner.saved_action_receipt("advancement", "wrong")
