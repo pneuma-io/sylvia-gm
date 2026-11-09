@@ -24,6 +24,7 @@ marketing/
 *.log
 *.sylvia-gm-campaign
 # Generated build and development state
+*.egg-info/
 __pycache__/
 *.py[cod]
 .pytest_cache/
@@ -49,6 +50,8 @@ outputs/
 private/
 test-profiles/
 *.sylvia-gm-package
+!rulesets/riichi-mahjong/riichi-mahjong-0.1.0.sylvia-gm-package
+!rulesets/riichi-mahjong/riichi-mahjong-0.1.1.sylvia-gm-package
 !campaign-settings/**/setting.sylvia-gm-package
 !campaign-plans/**/setting.sylvia-gm-package
 !tests/fixtures/**/*.sylvia-gm-package

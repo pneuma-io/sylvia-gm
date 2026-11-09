@@ -10,6 +10,7 @@ from sylvia_gm.domain.authority import SafePayload, owned_payload, validate_auth
 
 STARTING_STATE_FEATURE = "starting_state_validation.v1"
 REQUIRED_STARTING_STATE_FEATURE = "required_starting_state.v1"
+PRIVATE_STATE_FEATURE = "private_state.v1"
 _BINDING = re.compile(r"\$[a-zA-Z_][a-zA-Z0-9_]{0,63}\Z")
 
 
@@ -26,6 +27,7 @@ class StateSchema:
     schema: SafePayload
     references: tuple[StateReference, ...]
     required: bool = False
+    visibility: str = "public"
 
 
 def _path(value: object) -> tuple[str, ...]:
@@ -50,10 +52,12 @@ def parse_state_schemas(value: object) -> tuple[StateSchema, ...]:
         raise ValueError("Starting-state schemas require 1 to 32 declarations")
     declarations = []
     for item in value:
-        if not isinstance(item, Mapping) or set(item) not in (
-            {"key", "schema", "references"}, {"key", "schema", "references", "required"},
-        ):
+        if (not isinstance(item, Mapping) or not {"key", "schema", "references"} <= set(item)
+                or set(item) - {"key", "schema", "references", "required", "visibility"}):
             raise ValueError("Starting-state schema fields are invalid")
+        visibility = item.get("visibility", "public")
+        if visibility not in ("public", "engine"):
+            raise ValueError("Starting-state visibility is invalid")
         if type(item.get("required", False)) is not bool:
             raise ValueError("Starting-state required flag must be a boolean")
         key = validate_authority_identity(item["key"], "Starting-state key")
@@ -77,7 +81,8 @@ def parse_state_schemas(value: object) -> tuple[StateSchema, ...]:
                 reference["target_key"], "Starting-state target key",
             ), target))
         declarations.append(StateSchema(
-            key, owned_payload(item["schema"]), tuple(parsed), item.get("required", False),
+            key, owned_payload(item["schema"]), tuple(parsed),
+            item.get("required", False), visibility,
         ))
     if len({item.key for item in declarations}) != len(declarations):
         raise ValueError("Starting-state schema keys must be unique")

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sylvia GM — Update recovery</title>
+<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="update-recovery.css">
+</head>
+<body data-theme="slate">
+<main class="update-recovery" id="update-recovery" aria-busy="true">
+  <h1>Recover an interrupted update</h1>
+  <p>Saved campaigns remain closed while Sylvia checks the retained recovery files.</p>
+  <p id="recovery-status" role="status" aria-live="polite">Reading update recovery status.</p>
+  <p id="recovery-version"></p>
+  <p id="recovery-warning"></p>
+  <fieldset id="recovery-choices" disabled hidden>
+    <legend>Choose what to do with your saved data</legend>
+    <label><input id="recovery-keep" type="radio" name="recovery-choice" value="keep">
+      <span id="recovery-keep-text">Restore the previous application and keep current data</span></label>
+    <label id="recovery-restore-option"><input id="recovery-restore" type="radio" name="recovery-choice" value="restore">
+      Restore the previous application and its pre-update data checkpoint</label>
+  </fieldset>
+  <div class="recovery-actions">
+    <button id="recovery-refresh" type="button">Check recovery status</button>
+    <button id="recovery-review" type="button" disabled hidden>Review recovery and restart</button>
+  </div>
+  <section id="recovery-confirm" role="region" aria-labelledby="recovery-confirm-title" hidden>
+    <h2 id="recovery-confirm-title">Confirm recovery</h2>
+    <p id="recovery-confirm-text"></p>
+    <button id="recovery-commit" type="button">Recover and restart</button>
+    <button id="recovery-cancel" type="button">Go back</button>
+  </section>
+</main>
+<script src="update-recovery.js"></script>
+</body>
+</html>

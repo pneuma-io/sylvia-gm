@@ -4,7 +4,7 @@ import pytest
 
 from sylvia_gm.application.package_runtime import AuthorityMemoryStateBridge
 from sylvia_gm.runtime._tool_executor import execute_tool
-from sylvia_gm.runtime._types import ToolDef
+from sylvia_gm.runtime._types import ToolDef, ToolParameter
 
 
 @pytest.mark.parametrize("rule_check", [True, False])
@@ -26,4 +26,25 @@ def test_nested_failure_preserves_its_kind_across_two_calls(rule_check):
     assert result.failure_kind == ("precondition" if rule_check else "effect_execution")
     if rule_check:
         assert result.error == message
+    assert bridge.mutations() == ()
+
+
+@pytest.mark.parametrize("rank", [True, 6, "Medium"])
+def test_nested_parameter_rejection_remains_a_refusal_across_two_calls(rank):
+    tools = {
+        "outer": ToolDef(name="outer", effects=[{"call": "middle"}]),
+        "middle": ToolDef(name="middle", effects=[{"call": "leaf", "params": {"rank": rank}}]),
+        "leaf": ToolDef(name="leaf", parameters=[
+            ToolParameter("rank", "integer", minimum=0, maximum=5),
+        ], effects=[{"set": {"field": "state.received", "value": "rank"}}]),
+    }
+    bridge = AuthorityMemoryStateBridge("example.test", {})
+
+    def nested(name, parameters, _context):
+        return execute_tool(name, parameters, tools, bridge, {}, {}, tool_executor=nested)
+
+    result = nested("outer", {}, None)
+    assert not result.success
+    assert result.failure_kind == "precondition"
+    assert "rank" in result.error
     assert bridge.mutations() == ()

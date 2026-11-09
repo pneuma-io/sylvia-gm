@@ -63,16 +63,18 @@ def _mechanic(name):
 
 
 def _state():
+    """Start with an explicitly Medium synthetic hero, independent of class and body geometry."""
     return {
         f"{SRD}.combat": {
             "encounter_active": True, "turn_active": True, "phase": "turn_active",
             "active_actor": "hero", "current_actor": "hero", "action_available": True,
-            "normal_action_spent": False, "movement_remaining": 30,
+            "normal_action_spent": False, "movement_remaining": 30, "movement_spent": 0,
         },
         f"{SRD}.entities": {
             "hero": {
                 "hp": 20, "max_hp": 20, "is_alive": True, "fighter_level": 17,
-                "speed": 30, "melee_reach": 5, "exhaustion_level": 0, "conditions": [],
+                "speed": 30, "size_rank": 2, "melee_reach": 5,
+                "exhaustion_level": 0, "conditions": [],
                 "bonus_action_available": True, "reaction_available": True,
                 "resources": {"action_surge": 2},
             },
@@ -190,8 +192,10 @@ def test_committed_surge_exact_retry_after_owner_reopen_does_not_spend_again(tmp
         )
         fighter = _installed_fighter(candidate.package_lock, fighter=True)
         fighter = replace(fighter, data={**fighter.data, "level": 17,
+                                        "size_rank": 2,
                                         "classes": [{"id": "fighter", "level": 17}]})
         initial = _state()
+        assert fighter.data["size_rank"] == initial[f"{SRD}.entities"]["hero"]["size_rank"]
         initial[f"{SRD}.combat"].update(active_actor_kind="character", active_actor_can_act=True)
         owner.create_campaign(CampaignCreate(
             campaign_id="budget", display_name="Synthetic surge retry", writer=WriterRole.DM,

@@ -91,9 +91,8 @@ test('migrated results, historical checks and Builder controls fit normal and na
     for (const width of [1400, 962, 390]) {
       await page.setViewportSize({ width, height: 1100 });
       if (width === 390) {
-        // Use existing ordinary controls to give the narrow chat its full width.
-        await page.locator('#toggle-left-sidebar-btn').click();
-        await page.locator('#toggle-right-sidebar-btn').click();
+        // Narrow windows show one pane: chat without game panels takes the full width.
+        assert.equal(await page.locator('#toggle-right-sidebar-btn').isVisible(), false);
         assert.equal(await page.locator('.portrait-col').isVisible(), false);
         assert.equal(await page.locator('.right-sidebar').isVisible(), false);
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);

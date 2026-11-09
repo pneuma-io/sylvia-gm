@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import json
 import re
-from collections.abc import Mapping
-from typing import Any
+from collections.abc import Callable, Mapping
+from copy import deepcopy
+from typing import Any, cast
 
 from sylvia_gm.domain.errors import CommandRejected, RulesetDiagnostic
 from sylvia_gm.domain.package_library import canonical_json_bytes
@@ -106,20 +107,39 @@ def verify_character_rules(
     *, campaign_state: Mapping[str, object] | None = None,
 ) -> dict[str, Any]:
     """Check private copies and return local results without mutation or external access."""
+    return prepare_character_rules(
+        participant, program, setting_data, campaign_state=campaign_state,
+    )(state)
+
+
+def prepare_character_rules(
+    participant: Mapping[str, object], program: Mapping[str, object] | None,
+    setting_data: Mapping[str, object] | None = None,
+    *, campaign_state: Mapping[str, object] | None = None,
+) -> Callable[[Mapping[str, object]], dict[str, Any]]:
+    """Admit a program once; check each changing state with fresh private runtime data."""
     checked = validate_character_rules(program)
-    if checked is None:
-        return {}
-    inputs = json.loads(canonical_json_bytes({
-        "participant": participant, "state": state, "setting_data": setting_data or {},
-        "campaign_state": campaign_state or {},
-    }))
-    context = ExecutionContext(params=inputs, definitions=checked["definitions"],
-                               budget=ExecutionBudget())
-    try:
-        execute_effects(checked["effects"], context)
-    except PreConditionError as error:
-        raise _reject("character_initial_state_rule_rejected", str(error)) from error
-    except EffectExecutionError as error:
-        raise _reject("character_initial_state_validation_failed",
-                      "The Ruleset could not validate the character's declared choices.") from error
-    return json.loads(canonical_json_bytes(context.vars))
+
+    def check(state: Mapping[str, object]) -> dict[str, Any]:
+        if checked is None:
+            return {}
+        inputs = json.loads(canonical_json_bytes({
+            "participant": participant, "state": state, "setting_data": setting_data or {},
+            "campaign_state": campaign_state or {},
+        }))
+        # Local lists can alias table values or literal effects. Keep every execution owned.
+        private = deepcopy(checked)
+        context = ExecutionContext(params=inputs, definitions=private["definitions"],
+                                   budget=ExecutionBudget())
+        try:
+            execute_effects(private["effects"], context)
+        except PreConditionError as error:
+            raise _reject("character_initial_state_rule_rejected", str(error)) from error
+        except EffectExecutionError as error:
+            raise _reject(
+                "character_initial_state_validation_failed",
+                "The Ruleset could not validate the character's declared choices.",
+            ) from error
+        return cast(dict[str, Any], json.loads(canonical_json_bytes(context.vars)))
+
+    return check

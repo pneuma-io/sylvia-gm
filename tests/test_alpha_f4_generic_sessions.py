@@ -2156,6 +2156,8 @@ def test_probe_09b_stop_fences_pending_retry_provider_admission(
             if message.content.get("attempt_id") == "retry-pending-stop"
         )
         assert retry_terminal.content["failure_category"] == "user_cancelled"
+        assert retry_terminal.content["activity_timing"]["phase"] == "stopped"
+        assert retry_terminal.content["activity_timing"]["elapsed_ms"] >= 0
         print(
             "F4 PROBE 09B pending Retry fenced",
             "provider_calls",
@@ -2231,7 +2233,10 @@ def test_player_input_identity_and_provider_failure_basis_are_durable(
             "turn_id": request.turn_id,
             "input_kind": "user",
         }
+        assert terminal.content["activity_timing"]["phase"] == "failed"
+        assert terminal.content["activity_timing"]["elapsed_ms"] >= 0
         assert terminal.content == {
+            "activity_timing": terminal.content["activity_timing"],
             "kind": "session_attempt_terminal",
             "input_id": request.attempt_id,
             "attempt_id": request.attempt_id,
@@ -3724,7 +3729,12 @@ def test_probe_21_existing_campaign_handoff_is_one_exact_atomic_revision(
             for message in owner.session_context(dm_id).messages
             if message.content.get("kind") == "gm_turn_activity"
         )
+        timing = activity.content["activity_timing"]
+        assert timing["phase"] == "completed"
+        assert timing["operation"] is None
+        assert 0 <= timing["quiet_ms"] <= timing["elapsed_ms"]
         assert activity.content == {
+            "activity_timing": timing,
             "kind": "gm_turn_activity",
             "activity": "turn_completed",
             "attempt_id": "attempt-dm-after-handoff",

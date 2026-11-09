@@ -10,13 +10,19 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from sylvia_gm.application.bundled_campaign_plans import selected_campaign_plan
+from sylvia_gm.application.bundled_campaign_plans import bundled_plan, selected_campaign_plan
 from sylvia_gm.application.bundled_packages import (
     bundled_rift_archive,
+    bundled_rift_archive_for_closure,
     bundled_rift_authority,
 )
-from sylvia_gm.application.campaign_plan_sources import validate_retained_campaign_plan
+from sylvia_gm.application.bundled_starter_characters import bundled_starter_participants
+from sylvia_gm.application.campaign_plan_sources import (
+    campaign_plan_sources,
+    validate_retained_campaign_plan,
+)
 from sylvia_gm.application.character_profiles import profile_from_snapshot
+from sylvia_gm.application.compatible_character_copy import authored_character_state
 from sylvia_gm.domain.authority import PackageRole, SafePayload, owned_payload
 from sylvia_gm.domain.errors import CommandRejected
 from sylvia_gm.domain.package_library import (
@@ -25,6 +31,10 @@ from sylvia_gm.domain.package_library import (
     canonical_json_bytes,
 )
 from sylvia_gm.domain.session import SessionContext, SessionMessageKind
+from sylvia_gm.infrastructure.package_archive import (
+    PACKAGE_MEMBER_BYTE_LIMIT,
+    PACKAGE_MEMBER_COUNT_LIMIT,
+)
 
 if TYPE_CHECKING:
     from sylvia_gm.application.authority import AuthorityOwner
@@ -180,6 +190,12 @@ def capture_content_references(
         ),
         None,
     )
+    if selected_plan is None and plan_id == "the-rift-awakening":
+        # Older Interviews may retain this hidden selection. Resolve its owned
+        # snapshot without adding it to the current discovery catalogue.
+        retained = bundled_plan(plan_id)
+        if retained is not None:
+            selected_plan = {**retained.catalog_payload(), "bundled": True}
     if selected_plan is not None:
         if selected_plan.get("reusable") or selected_plan.get("bundled"):
             reusable = selected_campaign_plan(
@@ -218,9 +234,9 @@ def capture_content_references(
         if candidate is None:
             archive = reusable.package_snapshot
             if archive is None:
-                if bindings["package_closure_sha256"] != bundled_rift_authority().closure_sha256:
+                archive = bundled_rift_archive_for_closure(bindings["package_closure_sha256"])
+                if archive is None:
                     raise CommandRejected("Selected Builder Campaign Plan snapshot is unavailable")
-                archive = bundled_rift_archive()
             suffix = hashlib.sha256(archive).hexdigest()[:24]
             candidate = owner.install_package_archive(
                 io.BytesIO(archive), install_id=f"install-bundled-rift-{suffix}"
@@ -300,6 +316,45 @@ def launch_references(context: SessionContext) -> SafePayload | None:
     return None
 
 
+def with_character_examples(
+    owner: AuthorityOwner, storage_root: Path, references: SafePayload, *, purpose: str,
+) -> SafePayload:
+    """Snapshot compatible built-in authored examples, never the player's saved library."""
+    candidate = candidate_for_references(owner, references)
+    setting = next(
+        (item for item in references.get("packages", ()) if item["prefix"] == "setting"), None,
+    )
+    if candidate is None or setting is None:
+        return references
+    sources = campaign_plan_sources(owner, candidate.package_lock, setting_id=setting["id"])
+    if sources is None:
+        return references
+    primary = next(entry for entry in candidate.package_lock.entries
+                   if entry.role is PackageRole.PRIMARY)
+    examples = []
+    for declaration in sources.character_declarations:
+        if declaration.kind != purpose:
+            continue
+        for starter in bundled_starter_participants(
+            storage_root, package=primary, declaration=declaration,
+            campaign_setting=sources.setting,
+            setting_character_schema=sources.setting_character_schema,
+        ):
+            draft = {
+                "schema_id": declaration.schema_id, "summary": starter.summary,
+                "authored_profile": starter.authored_profile, "participant": starter.participant,
+                "entity_state": authored_character_state(starter.entity_state, declaration),
+                "setting_data": starter.setting_data,
+            }
+            examples.append({
+                "path": f"character-examples/{starter.artifact_id}.json", "name": starter.name,
+                "summary": starter.summary, "schema_id": declaration.schema_id,
+                "content_sha256": hashlib.sha256(canonical_json_bytes(draft)).hexdigest(),
+                "draft": draft,
+            })
+    return owned_payload({**references, "character_examples": examples})
+
+
 def launch_candidate(owner: AuthorityOwner, context: SessionContext) -> PackageCandidate | None:
     """Resolve the retained closure, checking its bytes against the original launch snapshot."""
     return candidate_for_references(owner, launch_references(context))
@@ -338,11 +393,16 @@ def reader_for_references(
     files: dict[str, Mapping] = {}
     for package in references.get("packages", []):
         for path in owner.package_file_paths(
-            package["id"], package["version"], package["content_sha256"], maximum_files=512
+            package["id"], package["version"], package["content_sha256"],
+            maximum_files=PACKAGE_MEMBER_COUNT_LIMIT,
         ):
             files[f"{package['prefix']}/{path}"] = {**package, "path": path}
     plan = references.get("plan")
     plan_files = {}
+    for example in references.get("character_examples", ()):
+        plan_files[example["path"]] = json.dumps(
+            json.loads(canonical_json_bytes(example["draft"])), indent=2, ensure_ascii=False,
+        ) + "\n"
     profile_snapshot = references.get("character_profile")
     if profile_snapshot is not None:
         profile = profile_from_snapshot(profile_snapshot)
@@ -368,7 +428,7 @@ def reader_for_references(
             package["version"],
             package["content_sha256"],
             package["path"],
-            maximum_bytes=8 * 1024 * 1024,
+            maximum_bytes=PACKAGE_MEMBER_BYTE_LIMIT,
         )
 
     return BuilderReferences(tuple(sorted((*files, *plan_files))), read)

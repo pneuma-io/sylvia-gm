@@ -49,6 +49,7 @@ class ImportedCase(Case):
         entities = state[FULL + ".entities"]
         entities["hero"].update(
             name="Lite caster",
+            size_rank=data["size_rank"],
             prepared_spells=[spell],
             spell_slot_cast_this_turn=False,
             resources={f"spell_slot_{level}": 3 for level in range(1, 10)},
@@ -93,7 +94,7 @@ class ImportedCase(Case):
         entities["hero"]["spell_materials"] = materials
         entities["hero"]["inventory"] += [item["inventory_item"] for item in materials]
         for identity, changes in (entity_changes or {}).items():
-            entities[identity].update(changes)
+            entities.setdefault(identity, deepcopy(entities['guard'])).update(changes)
         state[FULL + ".combat"].update(
             encounter_active=False,
             turn_active=False,

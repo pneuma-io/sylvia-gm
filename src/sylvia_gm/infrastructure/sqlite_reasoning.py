@@ -157,3 +157,30 @@ def read_continuation(
         raise CommandRejected("Native continuation identity is ambiguous")
     value: dict[str, object] = json.loads(str(rows[0][0]))
     return value
+
+
+def read_actor_context(
+    connection: sqlite3.Connection, session_id: str, context_id: str,
+    *, provider_id: str, model_id: str,
+) -> Mapping[str, object] | None:
+    """Assemble once-stored complete exchanges from one private participant namespace."""
+    if len(context_id) != 64 or any(char not in "0123456789abcdef" for char in context_id):
+        raise CommandRejected("Invalid actor context identity")
+    rows = connection.execute(
+        "SELECT payload FROM provider_private_records WHERE session_id = ? "
+        "AND response_id LIKE ? AND provider_id = ? AND model_id = ? AND kind = 'continuation' "
+        "ORDER BY rowid",
+        (session_id, "actor-context-" + context_id + "-%", provider_id, model_id),
+    ).fetchall()
+    if not rows:
+        return None
+    messages = []
+    for row in rows:
+        payload = json.loads(str(row[0]))
+        context = payload.get("actor_context")
+        if (not isinstance(context, dict) or context.get("format") != 1
+                or context.get("context_id") != context_id
+                or not isinstance(context.get("messages"), list)):
+            raise CommandRejected("Actor context ownership is invalid")
+        messages.extend(context["messages"])
+    return {**context, "messages": messages}

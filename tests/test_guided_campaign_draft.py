@@ -1,17 +1,20 @@
 from __future__ import annotations
 
 import hashlib
+import io
 import json
 from pathlib import Path
 
 import pytest
 
 from sylvia_gm.agent._provider_session import ProviderSessionAdapter
+from sylvia_gm.application.bundled_campaign_plans import bundled_plan
 from sylvia_gm.agent._session_loop import ProviderControl, SessionProviderInput
 from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.application.bundled_packages import (
     bundled_campaign_content_catalog,
     bundled_rift_campaign_plan,
+    bundled_rift_archive,
     bundled_rift_interview_contribution,
 )
 from sylvia_gm.application.reusable_plans import (
@@ -19,7 +22,7 @@ from sylvia_gm.application.reusable_plans import (
     reusable_campaign_plan_catalog,
     save_reusable_rift_plan,
 )
-from sylvia_gm.domain.authority import LifecycleState, PackageLock, TurnStatus, WriterRole
+from sylvia_gm.domain.authority import LifecycleState, PackageLock, TurnStatus, WriterRole, owned_payload, thaw_json_value
 from sylvia_gm.domain.errors import StaleRevision
 from sylvia_gm.domain.interview_contribution import (
     parse_interview_contribution_bytes,
@@ -92,7 +95,7 @@ def test_rift_campaign_plan_has_no_test_authored_interview_question() -> None:
     plan = next(
         item
         for item in bundled_campaign_content_catalog()
-        if item["kind"] == "campaign_plan" and item["id"] == "the-rift-awakening"
+        if item["kind"] == "campaign_plan" and item["id"] == "rift-awakening"
     )
 
     assert bundled_rift_interview_contribution() is None
@@ -312,8 +315,8 @@ def test_first_click_creates_unbound_draft_without_turn_or_user_message(tmp_path
             builder_session_id=draft.builder_session_id,
             expected_construction_revision=0,
             current_step="ruleset",
-            visible_answer="No Ruleset — narrative play",
-            answer={"candidate_id": None},
+            visible_answer="SRD Lite",
+            answer={"candidate_id": "sylvia.srd-lite.bg3"},
         )
         assert advanced.current_step == "setting"
         assert advanced.construction_revision == 1
@@ -325,7 +328,7 @@ def test_first_click_creates_unbound_draft_without_turn_or_user_message(tmp_path
             SessionMessageKind.TALK,
             SessionMessageKind.EVIDENCE,
         ]
-        assert context.messages[2].content["text"] == "No Ruleset — narrative play"
+        assert context.messages[2].content["text"] == "SRD Lite"
         assert context.messages[3].content["interview_step"] == "setting"
         assert context.messages[4].content["answers"] == {
             "ruleset": context.messages[2].message_id
@@ -349,7 +352,7 @@ def test_first_click_creates_unbound_draft_without_turn_or_user_message(tmp_path
             visible_answer="No Ruleset — narrative play",
             answer={"candidate_id": None},
         )
-        assert revised.current_step == "setting"
+        assert revised.current_step == "name"
         latest_state = owner.session_context(draft.builder_session_id).messages[-1]
         assert latest_state.content["answers"] == {
             "ruleset": owner.session_context(draft.builder_session_id).messages[-3].message_id
@@ -358,14 +361,7 @@ def test_first_click_creates_unbound_draft_without_turn_or_user_message(tmp_path
         revision = revised.construction_revision
         for ordinal, (step, visible, answer) in enumerate(
             (
-                ("setting", "The Rift", {"setting_id": "the-rift"}),
-                ("plan", "The Rift Awakening", {"plan_id": "the-rift-awakening"}),
                 ("name", "The Rift Awakening", {"display_name": "The Rift Awakening"}),
-                (
-                    "participants",
-                    "Wanderer; 0 companions",
-                    {"archetype_id": "wanderer", "companion_ids": []},
-                ),
                 (
                     "boundaries_preferences",
                     "Boundaries: None; Preferences: None",
@@ -618,7 +614,7 @@ def test_linked_creation_subflow_suspends_and_returns_to_exact_question(
             expected_construction_revision=0,
             current_step="ruleset",
             visible_answer="No Ruleset — narrative play",
-            answer={"candidate_id": None},
+            answer={"candidate_id": "example.interview-questions"},
         )
         subflow = owner.start_guided_creation_subflow(
             operation_id="open-guided-setting-subflow",
@@ -743,6 +739,10 @@ def test_campaign_local_derived_plan_stays_on_same_draft_and_is_admitted(
 ) -> None:
     database = tmp_path / "guided-derived-plan.sqlite3"
     with AuthorityOwner.open(database, "owner-guided-derived") as owner:
+        source_plan = bundled_plan("rift-awakening")
+        admitted = owner.install_package_archive(
+            io.BytesIO(source_plan.package_snapshot), install_id="current-interview-source"
+        )
         draft = owner.create_guided_campaign_draft(
             operation_id="create-guided-derived",
             display_name="Derived Plan Draft",
@@ -752,8 +752,8 @@ def test_campaign_local_derived_plan_stays_on_same_draft_and_is_admitted(
         )
         revision = 0
         for step, visible, answer in (
-            ("ruleset", "No Ruleset — narrative play", {"candidate_id": None}),
-            ("setting", "A setting made for narrative play", {"setting_id": "setting-local"}),
+            ("ruleset", "Current Lite", {"candidate_id": admitted.candidate_id}),
+            ("setting", "A setting made for narrative play", {"setting_id": "pneuma.severed-lands"}),
         ):
             result = owner.advance_guided_campaign_draft(
                 operation_id=f"derived-answer-{step}",
@@ -848,7 +848,8 @@ def test_campaign_local_derived_plan_stays_on_same_draft_and_is_admitted(
             operation_id="bind-derived-plan",
             campaign_id=draft.campaign_id,
             display_name="The Lantern Road",
-            package_lock=PackageLock(entries=()),
+            package_lock=admitted.package_lock,
+            package_candidate_id=admitted.candidate_id,
             turn_id="turn-derived-construction",
             builder_session_id=draft.builder_session_id,
         )
@@ -859,11 +860,17 @@ def test_campaign_local_derived_plan_stays_on_same_draft_and_is_admitted(
             expected_revision=0,
             canonical_input={"derived_plan_session_id": subflow.child_session_id},
         )
+        derived_plan = thaw_json_value(source_plan.plan.payload)
+        derived_plan["title"] = "The Lantern Road"
+        derived_plan["premise"] = "A campaign-local derived Plan."
+        derived_plan["revision"] += 1
         _completed, plan, handoff = owner.finalize_campaign_construction(
             campaign_id=draft.campaign_id,
             dm_provider_id="test.provider",
             dm_model_id="test.model",
             plan_artifact_text="# The Lantern Road\nA campaign-local derived Plan.\n",
+            structured_plan=owned_payload(derived_plan),
+            model_guidance_override=True,
         )
         assert plan.campaign_id == draft.campaign_id
         assert plan.source_session_id == draft.builder_session_id
@@ -876,6 +883,10 @@ def test_keep_building_from_review_returns_to_review_without_new_answer(
 ) -> None:
     database = tmp_path / "guided-keep-building.sqlite3"
     with AuthorityOwner.open(database, "owner-guided-keep-building") as owner:
+        source_plan = bundled_plan("rift-awakening")
+        admitted = owner.install_package_archive(
+            io.BytesIO(source_plan.package_snapshot), install_id="current-interview-source"
+        )
         draft = owner.create_guided_campaign_draft(
             operation_id="create-guided-keep-building",
             display_name="Keep Building Draft",
@@ -885,9 +896,9 @@ def test_keep_building_from_review_returns_to_review_without_new_answer(
         )
         revision = 0
         answers = (
-            ("ruleset", "No Ruleset — narrative play", {"candidate_id": None}),
-            ("setting", "A narrative Setting", {"setting_id": "setting-local"}),
-            ("plan", "A local Campaign Plan", {"plan_id": "plan-local"}),
+            ("ruleset", "Current Lite", {"candidate_id": admitted.candidate_id}),
+            ("setting", "A narrative Setting", {"setting_id": "pneuma.severed-lands"}),
+            ("plan", "A local Campaign Plan", {"plan_id": "rift-awakening"}),
             ("name", "Keep Building", {"display_name": "Keep Building"}),
             ("participants", "Mara; 0 companions", {"player_name": "Mara"}),
             (

@@ -32820,6 +32820,1342 @@ definitions:
   - suggestion
 narrative: {}
 tools:
+  prepare_srd_creature_space_route:
+    pre_conditions:
+    - condition: actor_state.meld_stone_source_id == null
+      error: Leave the actual merged stone before ordinary movement.
+    effects:
+    - set:
+        field: _srd_factored_context
+        value:
+        - key: '''_actor_state_id'''
+          missing: _actor_state_id == null
+          value: _actor_state_id
+        - key: '''_lasting_state_id'''
+          missing: _lasting_state_id == null
+          value: _lasting_state_id
+        - key: '''_srd_factored_choice_destination'''
+          missing: destination == null
+          value: destination
+        - key: '''_srd_factored_choice_difficult_terrain'''
+          missing: difficult_terrain == null
+          value: difficult_terrain
+        - key: '''_srd_factored_choice_levitate_source_id'''
+          missing: levitate_source_id == null
+          value: levitate_source_id
+        - key: '''_srd_factored_choice_mode'''
+          missing: mode == null
+          value: mode
+    - call: qualify_srd_lite_shared_movement_body
+      params:
+        actor_state: '{_actor_state_id}'
+        lasting_state: '{_lasting_state_id}'
+        _srd_factored_context: '{_srd_factored_context}'
+      export_context: '*'
+    - condition: combat.encounter_active == true
+      on_true:
+      - require:
+          condition: combat.turn_active == true and combat.active_actor == _actor_state_id
+          error: Move the active creature on its turn.
+      - call: qualify_srd_tsunami_swim_segment
+        params:
+          actor_state: '{_actor_state_id}'
+          destination: '{destination}'
+          mode: '{mode}'
+        export_context:
+          _tsunami_ordinary_swim: _tsunami_ordinary_swim
+      - set:
+          field: _tsunami_segment_budget_mode
+          value: _levitate_grip_budget_mode
+      - set:
+          field: _tsunami_segment_budget_mode
+          value: '''walk'''
+        condition: _tsunami_ordinary_swim == true
+      - set:
+          field: _ordinary_swim_budget_mode
+          value: _tsunami_segment_budget_mode
+      - condition: mode == 'swim' and (_ordinary_water_swim == true or _tsunami_ordinary_swim == true) and
+          (actor_state.swim_speed == null or actor_state.swim_speed <= 0) and actor_state.spell_freedom_of_movement
+          != true
+        on_true:
+        - set:
+            field: _ordinary_swim_budget_mode
+            value: '''walk'''
+        - set:
+            field: _route_cost
+            value: _route_cost + _route_distance
+      - condition: lasting_state.pending_srd_movement != null and lasting_state.pending_srd_movement.full_intent_validated
+          == true and lasting_state.pending_srd_movement.stage == 'resuming' and lasting_state.pending_srd_movement.actor
+          == _actor_state_id and lasting_state.pending_srd_movement.turn_sequence == combat.turn_sequence
+        on_true:
+        - call: prepare_srd_creature_space_departure
+          params:
+            actor: '{_actor_state_id}'
+            actor_state: '{_actor_state_id}'
+            distance: '{_route_cost}'
+            difficult_terrain: false
+            movement_kind: '{_ordinary_swim_budget_mode}'
+        on_false:
+        - call: prepare_srd_creature_space_departure
+          params:
+            actor: '{_actor_state_id}'
+            actor_state: '{_actor_state_id}'
+            distance: '{_route_cost}'
+            difficult_terrain: false
+            movement_kind: '{_ordinary_swim_budget_mode}'
+      on_false:
+      - call: qualify_srd_tsunami_swim_segment
+        params:
+          actor_state: '{_actor_state_id}'
+          destination: '{destination}'
+          mode: '{mode}'
+        export_context:
+          _tsunami_ordinary_swim: _tsunami_ordinary_swim
+      - set:
+          field: _tsunami_segment_budget_mode
+          value: _levitate_grip_budget_mode
+      - set:
+          field: _tsunami_segment_budget_mode
+          value: '''walk'''
+        condition: _tsunami_ordinary_swim == true
+      - set:
+          field: _ordinary_swim_budget_mode
+          value: _tsunami_segment_budget_mode
+      - condition: mode == 'swim' and (_ordinary_water_swim == true or _tsunami_ordinary_swim == true) and
+          (actor_state.swim_speed == null or actor_state.swim_speed <= 0) and actor_state.spell_freedom_of_movement
+          != true
+        on_true:
+        - set:
+            field: _ordinary_swim_budget_mode
+            value: '''walk'''
+        - set:
+            field: _route_cost
+            value: _route_cost + _route_distance
+      - call: derive_srd_scene_movement_budget
+        params:
+          actor_state: '{_actor_state_id}'
+          mode: '{_ordinary_swim_budget_mode}'
+        export_context:
+          _scene_exploration_remaining: _scene_exploration_remaining
+      - require:
+          condition: _route_cost <= _scene_exploration_remaining
+          error: Advance the actual exploration round before spending more movement.
+    - condition: lasting_state.has_active_symbol_auras == true
+      on_true:
+      - set:
+          field: _symbol_walk_previous_position
+          value: _move_scene_entity.position
+      - set:
+          field: _symbol_walk_previous_plane
+          value: _move_scene_entity.metadata.plane
+    - set:
+        field: _move_patch
+        value:
+          previous_position: _move_origin
+          moving: true
+          motion_tick: lasting_state.lasting_tick
+    - set:
+        field: _move_metadata
+        value: merge(_move_scene_entity.metadata, _move_patch)
+    - call: check_srd_demiplane_body_bounds
+      params:
+        subject: '{_actor_state_id}'
+        destination: '{destination}'
+        plane: '{_travel_movement_plane}'
+    - call: check_srd_dwelling_room_bounds
+      params:
+        subject: '{_actor_state_id}'
+        destination: '{destination}'
+        plane: '{_travel_movement_plane}'
+    - call: check_srd_levitate_movement
+      params:
+        subject: '{_actor_state_id}'
+        destination: '{destination}'
+        plane: '{_travel_movement_plane}'
+        teleport: false
+        levitate_source_id: '{levitate_source_id}'
+      condition: lasting_state.has_levitate_sources == true or lasting_state.has_levitate_pending_returns
+        == true
+    - call: check_srd_telekinesis_movement
+      params:
+        subject: '{_actor_state_id}'
+        destination: '{destination}'
+        plane: '{_travel_movement_plane}'
+        teleport: false
+      condition: lasting_state.has_telekinesis_sources == true
+    - call: qualify_srd_wall_of_ice_movement
+      params:
+        actor_subject: '{_actor_state_id}'
+        destination: '{destination}'
+      condition: lasting_state.has_wall_of_ice == true
+    - call: check_srd_solid_wall_movement
+      params:
+        subject: '{_actor_state_id}'
+        destination: '{destination}'
+        plane: '{_move_scene_entity.metadata.plane}'
+        teleport: false
+      condition: lasting_state.has_solid_spell_walls == true
+    metadata:
+      category: internal
+      visible_to_player: false
+    parameters:
+    - name: actor_state
+      resolve: entity
+      required: true
+      type: string
+    - name: destination
+      type: array
+      items:
+        type: number
+      min_items: 3
+      max_items: 3
+      required: true
+    - name: mode
+      type: enum
+      required: false
+      enum_values:
+      - walk
+      - fly
+      - climb
+      - swim
+      default: walk
+    - name: difficult_terrain
+      type: boolean
+      required: false
+      default: false
+    - name: lasting_state
+      required: false
+      default: state
+      resolve: entity
+      model_hidden: true
+      type: string
+    - name: witness_state_ids
+      type: array
+      items:
+        type: string
+      required: false
+    - name: levitate_source_id
+      required: false
+      default: ''
+      model_hidden: true
+      type: string
+    description: Prepare a physical candidate without requiring its initial leg to be affordable.
+  prepare_srd_creature_space_departure:
+    description: Prepare native movement eligibility and mode before candidate affordability.
+    pre_conditions:
+    - condition: combat.turn_active == true
+      error: No package combat turn is active.
+    - condition: combat.active_actor == _actor_id
+      error: Only the active creature can spend movement.
+    - condition: distance >= 0
+      error: Movement distance cannot be negative.
+    - condition: (actor_state.timed_control_speed_zero != true or actor_state.spell_freedom_of_movement
+        == true) and not ('grappled' in actor_state.conditions or 'paralyzed' in actor_state.conditions
+        or 'petrified' in actor_state.conditions or 'restrained' in actor_state.conditions or 'stunned'
+        in actor_state.conditions or 'unconscious' in actor_state.conditions)
+      error: The creature's Speed is 0 while this condition persists.
+    - condition: movement_kind != 'long_jump' and movement_kind != 'high_jump' and movement_kind != 'vertical_surface'
+        or actor.creature_kind == 'character'
+      error: Calculated jumping and Acrobatic Movement require a saved character; other creatures need their
+        own stat-block movement rule.
+    - condition: (movement_kind != 'long_jump' and movement_kind != 'high_jump') or running_start == false
+        or combat.movement_spent >= 10
+      error: Record the actual 10-foot run-up before a running jump.
+    - condition: (actor_state.timed_control_speed_zero != true or actor_state.spell_freedom_of_movement
+        == true)
+      error: Hypnotic Pattern sets every movement Speed to zero.
+    - condition: actor_state.control_order_moving == true or (actor_state.control_dancing != true and actor_state.control_fear_active
+        != true and (actor_state.control_confusion_active != true or actor_state.control_confusion_mode
+        == 'free'))
+      error: Resolve the spell's required movement instead of voluntary movement.
+    - condition: actor_state.has_control_order_sources != true or actor_state.control_order_moving == true
+        or actor_state.control_order_movement_pending != true
+      error: Perform prescribed movement through the source-owned order resolver.
+    - condition: actor_state.affliction_movement_pending != true or actor_state.control_order_moving ==
+        true
+      error: Perform compulsory movement through its saved source owner.
+    - condition: actor_state.binding_waiting_at_origin != true
+      error: This exact Binding source requires the creature to remain at its binding place.
+    - condition: actor_state.magic_jar_role == null or actor_state.magic_jar_role == 'possessed'
+      error: This actual soul or catatonic body cannot move, react or take a Bonus Action.
+    - condition: actor_state.meld_stone_source_id == null
+      error: Leave the actual merged stone before ordinary movement.
+    effects:
+    - condition: actor_state.earthquake_buried == true
+      on_true:
+      - call: resolve_srd_earthquake_burial
+        params:
+          target_state: '{_actor_state_id}'
+      - require:
+          condition: actor_state.earthquake_buried != true
+          error: Escape the actual rubble before moving this body.
+    - require:
+        condition: actor_state.dream_trance_speed_zero != true
+        error: A Dream messenger has Speed 0.
+    - require:
+        condition: actor_state.form_cloud != true or movement_kind == 'fly'
+        error: The cloud form's only movement method is its actual Fly Speed.
+    - set:
+        field: _acrobatic_movement
+        value: null
+    - condition: movement_kind == 'vertical_surface' or (movement_kind == 'liquid_surface' and actor_state.spell_water_walk
+        != true)
+      on_true:
+      - require:
+          condition: actor_state.worn_armor == null and actor_state.worn_shield == null
+          error: Acrobatic Movement requires no worn armor or wielded Shield.
+      - call: derive_srd_martial_arts
+        params:
+          actor: '{_actor_id}'
+          actor_state: '{_actor_state_id}'
+        export_context:
+          _martial_arts_level: _martial_arts_level
+      - require:
+          condition: _martial_arts_level >= 9
+          error: Acrobatic Movement requires Monk level 9.
+      - set:
+          field: _acrobatic_movement
+          value: '''Acrobatic Movement: vertical surface, during movement only'''
+      - set:
+          field: _acrobatic_movement
+          value: '''Acrobatic Movement: liquid surface, during movement only'''
+        condition: movement_kind == 'liquid_surface'
+    - call: initialize_srd_lite_constants_4639a3dc00cb
+      export_context: '*'
+    - condition: (movement_kind == 'long_jump' or movement_kind == 'high_jump')
+      on_true:
+      - call: derive_srd_jump_distance
+        params:
+          actor: '{_actor_id}'
+          actor_state: '{_actor_state_id}'
+          movement_kind: '{movement_kind}'
+          running_start: '{running_start}'
+        export_context:
+          _jump_maximum: _jump_maximum
+      - require:
+          condition: distance <= _jump_maximum
+          error: The declared jump exceeds the character’s current jump distance.
+    - call: project_srd_timed_actor_mobility
+      params:
+        target_state: '{_actor_state_id}'
+        lasting_state: state
+    - require:
+        condition: actor_state.spell_flight_fall_pending != true
+        error: Resolve the fall caused by lost flight before voluntary movement.
+    - condition: movement_kind == 'fly'
+      on_true:
+      - require:
+          condition: actor_state.spell_flying_speed > 0 or (actor_state.flying_speed != null and actor_state.flying_speed
+            > 0)
+          error: The creature has no Fly Speed.
+      - set:
+          field: actor_state.flying_aloft
+          value: end_in_air
+    - require:
+        condition: actor_state.spell_spider_climb == true
+        error: Ceiling movement requires Spider Climb.
+      condition: movement_kind == 'ceiling'
+    - require:
+        condition: actor_state.spell_spider_climb == true or (actor_state.climb_speed != null and actor_state.climb_speed
+          > 0)
+        error: This mode requires a Climb Speed; ordinary climbing requires separately accounting for its
+          extra movement cost.
+      condition: movement_kind == 'climb'
+    - condition: movement_kind == 'liquid_surface' and actor_state.spell_water_walk == true
+      on_true:
+      - require:
+          condition: actor_state.water_walk_in_liquid != true
+          error: Take the Water Walk transition Bonus Action before moving on the surface.
+      - set:
+          field: _acrobatic_movement
+          value: '''Water Walk: liquid treated as harmless solid ground; heat remains hazardous'''
+    - condition: movement_kind == 'spell_jump'
+      on_true:
+      - require:
+          condition: actor_state.spell_jump_distance > 0
+          error: The creature has no active Jump spell.
+      - require:
+          condition: actor_state.spell_jump_used != true
+          error: Jump can be used only once on each of the creature's turns.
+      - require:
+          condition: distance <= actor_state.spell_jump_distance
+          error: The declared jump exceeds the spell's jump distance.
+      - set:
+          field: actor_state.spell_jump_used
+          value: true
+      - set:
+          field: _jump_maximum
+          value: actor_state.spell_jump_distance
+    - require:
+        condition: actor_state.spell_freedom_of_movement == true or (actor_state.swim_speed != null and
+          actor_state.swim_speed > 0)
+        error: Swimming in this mode needs a Swim Speed.
+      condition: movement_kind == 'swim'
+    - set:
+        field: _mobility_refresh_speed
+        value: movement_kind == 'fly' or movement_kind == 'climb' or movement_kind == 'ceiling' or combat.movement_mode
+          == 'fly' or combat.movement_mode == 'climb' or combat.movement_mode == 'ceiling' or movement_kind
+          == 'swim' or combat.movement_mode == 'swim'
+    - set:
+        field: combat.movement_mode
+        value: movement_kind
+    - call: refresh_srd_movement_budget
+      params:
+        actor_state: '{_actor_state_id}'
+      condition: _mobility_refresh_speed == true
+    - set:
+        field: _movement_cost
+        value: distance
+    - set:
+        field: _movement_cost
+        value: distance * 2
+      condition: difficult_terrain == true and (movement_kind != 'long_jump' and movement_kind != 'high_jump')
+        and actor_state.spell_freedom_of_movement != true
+    - set:
+        field: _movement_cost
+        value: actor_state.spell_jump_cost
+      condition: movement_kind == 'spell_jump'
+    metadata:
+      category: internal
+      visible_to_player: false
+    parameters:
+    - name: actor
+      resolve: entity
+      from_state: combat.active_actor
+      required: true
+      type: string
+    - name: actor_state
+      resolve: entity
+      from_state: combat.active_actor
+      required: true
+      type: string
+    - name: distance
+      type: number
+      minimum: 0
+      required: true
+    - name: difficult_terrain
+      type: boolean
+      required: true
+    - name: movement_kind
+      type: enum
+      enum_values:
+      - walk
+      - long_jump
+      - high_jump
+      - vertical_surface
+      - liquid_surface
+      - fly
+      - climb
+      - ceiling
+      - spell_jump
+      - swim
+      required: false
+      default: walk
+    - name: end_in_air
+      type: boolean
+      required: false
+      default: true
+      description: For flight, true if the creature remains aloft after this movement; false if it lands.
+    - name: running_start
+      type: boolean
+      required: false
+      default: false
+      description: For a jump, true only after moving at least 10 feet on foot immediately before this jump.
+        Record that run-up as movement first.
+    - name: fear_source_in_sight
+      type: boolean
+      required: false
+      default: false
+      description: Actual visible fear source, used for a Difficult Terrain landing check.
+    - name: lasting_state
+      required: false
+      resolve: entity
+      default: state
+      type: string
+    - name: time_stop_state
+      resolve: entity
+      required: false
+      default: state
+      model_hidden: true
+      type: string
+    - name: known_spell_effect
+      type: boolean
+      required: false
+      default: false
+  move_srd_creature_space_segment:
+    description: Combat only. Move an admitted scene creature along a clear segment and consume actual route
+      terrain cost.
+    effects:
+    - require:
+        condition: combat.opportunity_attack_pending != true
+        error: Resolve the pending native Reaction before moving.
+    - require:
+        condition: lasting_state.pending_srd_movement == null or lasting_state.pending_srd_movement.stage
+          == 'resuming'
+        error: Complete or cancel the saved coordinate movement first.
+    - call: qualify_srd_creature_space_endpoint
+      params:
+        actor_state: '{_actor_state_id}'
+        destination: '{destination}'
+    - set:
+        field: _coordinate_original_destination
+        value: destination
+    - set:
+        field: _coordinate_split_resume
+        value: lasting_state.pending_srd_movement != null
+    - call: qualify_srd_coordinate_opportunity_move
+      params:
+        actor_state: '{_actor_state_id}'
+        destination: '{destination}'
+      export_context:
+        _coordinate_candidates: _coordinate_candidates
+        _coordinate_move_destination: _coordinate_move_destination
+        _coordinate_ignored: _coordinate_ignored
+        _coordinate_first_exit: _coordinate_first_exit
+        _coordinate_move_origin: _coordinate_move_origin
+        _coordinate_requested_distance: _coordinate_requested_distance
+    - condition: len(_coordinate_candidates) > 0 or _coordinate_split_resume
+      on_true:
+      - call: qualify_srd_celestial_scene_route
+        params:
+          actor_state: '{_actor_state_id}'
+          destination: '{_coordinate_original_destination}'
+          mode: '{mode}'
+          difficult_terrain: '{difficult_terrain}'
+          lasting_state: '{_lasting_state_id}'
+          witness_state_ids: '{witness_state_ids}'
+          levitate_source_id: '{levitate_source_id}'
+    - set:
+        field: _coordinate_movement_budget_total
+        value: combat.movement_remaining + combat.movement_spent
+    - set:
+        field: lasting_state.coordinate_fractional_prefix_actor
+        value: null
+    - condition: (len(_coordinate_candidates) > 0 or _coordinate_split_resume) and _coordinate_first_exit
+        > 0 and _coordinate_requested_distance * _coordinate_first_exit < 0.5
+      on_true:
+      - set:
+          field: lasting_state.coordinate_fractional_prefix_actor
+          value: _actor_state_id
+    - condition: _coordinate_first_exit > 0
+      on_true:
+      - call: move_srd_scene_creature_before_opportunity
+        params:
+          actor_state: '{_actor_state_id}'
+          destination: '{_coordinate_move_destination}'
+          mode: '{mode}'
+          difficult_terrain: '{difficult_terrain}'
+          lasting_state: '{_lasting_state_id}'
+          levitate_source_id: '{levitate_source_id}'
+          witness_state_ids: '{witness_state_ids}'
+          time_stop_state: '{_time_stop_state_id}'
+          celestial_entry_choices: '{celestial_entry_choices}'
+          known_spell_effect: '{known_spell_effect}'
+        export_context: '*'
+    - condition: _coordinate_first_exit == 0
+      on_true:
+      - call: srd_information_scene_entity
+        params:
+          subject: '{_actor_state_id}'
+        export_context:
+          _info_scene_entity: _info_scene_entity
+          _info_position: _info_position
+      - call: srd_information_movement_cost
+        params:
+          start: '{_coordinate_move_origin}'
+          end: '{_coordinate_original_destination}'
+          base_difficult: '{difficult_terrain}'
+          plane: '{_info_scene_entity.metadata.plane}'
+          actor_subject: '{_actor_state_id}'
+          movement_mode: '{mode}'
+        export_context:
+          _route_cost: _route_cost
+          _route_distance: _route_distance
+      - condition: actor_state.spell_freedom_of_movement == true
+        on_true:
+        - set:
+            field: _route_cost
+            value: _route_distance
+      - call: qualify_srd_coordinate_departure_budget
+        params:
+          actor: '{_actor_state_id}'
+          actor_state: '{_actor_state_id}'
+          distance: '{_route_cost}'
+          difficult_terrain: false
+          movement_kind: '{mode}'
+          known_spell_effect: '{known_spell_effect}'
+        export_context:
+          _movement_cost: _movement_cost
+      - set:
+          field: _scene_movement_actor_name
+          value: actor_state.name
+      - set:
+          field: _scene_movement_distance
+          value: 0
+      - set:
+          field: _scene_movement_cost
+          value: 0
+      - set:
+          field: _scene_actor_position
+          value: _coordinate_move_origin
+    - set:
+        field: lasting_state.coordinate_fractional_prefix_actor
+        value: null
+    - condition: (len(_coordinate_candidates) > 0 or _coordinate_split_resume) and combat.movement_remaining
+        + combat.movement_spent == _coordinate_movement_budget_total
+      on_true:
+      - set:
+          field: combat.movement_remaining
+          value: _coordinate_movement_budget_total - combat.movement_spent
+    - set:
+        field: _movement_remaining_after
+        value: combat.movement_remaining
+    - condition: len(_coordinate_candidates) > 0
+      on_true:
+      - set:
+          field: lasting_state.pending_srd_movement
+          value:
+            actor: _actor_state_id
+            destination: _coordinate_original_destination
+            parameters:
+              actor_state: _actor_state_id
+              destination: _coordinate_original_destination
+              mode: mode
+              difficult_terrain: difficult_terrain
+              lasting_state: _lasting_state_id
+              levitate_source_id: levitate_source_id
+              witness_state_ids: witness_state_ids
+              time_stop_state: _time_stop_state_id
+              celestial_entry_choices: celestial_entry_choices
+              known_spell_effect: known_spell_effect
+            candidates: _coordinate_candidates
+            ignored: _coordinate_ignored
+            turn_sequence: combat.turn_sequence
+            movement_budget_total: combat.movement_remaining + combat.movement_spent
+            full_intent_validated: true
+            stage: '''selection'''
+            selected_reactor: null
+      - set:
+          field: combat.opportunity_attack_pending
+          value: true
+      - set:
+          field: combat.pending_reaction
+          value:
+            kind: '''movement_opportunity_selection'''
+            provoking_entity: _actor_state_id
+    - condition: len(_coordinate_candidates) == 0
+      on_true:
+      - set:
+          field: lasting_state.pending_srd_movement
+          value: null
+    metadata:
+      category: internal
+      visible_to_player: false
+      costs_action: false
+    pre_conditions:
+    - condition: combat.encounter_active == true
+      error: Coordinate movement is available during combat. Outside combat, use the established fictional
+        travel without a map movement budget.
+    parameters:
+    - name: actor_state
+      resolve: entity
+    - name: destination
+      type: array
+      items:
+        type: number
+      min_items: 3
+      max_items: 3
+    - name: mode
+      type: enum
+      required: false
+      enum_values:
+      - walk
+      - fly
+      - climb
+      - swim
+      default: walk
+    - name: difficult_terrain
+      type: boolean
+      required: false
+      default: false
+    - name: lasting_state
+      required: false
+      default: state
+      resolve: entity
+      model_hidden: true
+    - name: levitate_source_id
+      required: false
+      default: ''
+      model_hidden: true
+    - name: witness_state_ids
+      type: array
+      items:
+        type: string
+      required: false
+    - name: time_stop_state
+      resolve: entity
+      required: false
+      default: state
+      model_hidden: true
+    - name: celestial_entry_choices
+      type: array
+      required: false
+      default: []
+      max_items: 8
+      items:
+        type: object
+        required:
+        - source_id
+        - light
+        additionalProperties: false
+        properties:
+          source_id:
+            type: string
+          light:
+            type: string
+            enum:
+            - healing
+            - searing
+    - name: known_spell_effect
+      type: boolean
+      required: false
+      default: false
+  qualify_srd_creature_space_route:
+    description: Select an affordable route using actual movement prices without spending or revealing hidden
+      facts.
+    parameters:
+    - name: actor_state
+      resolve: entity
+      required: true
+      type: string
+    - name: destination
+      type: array
+      items:
+        type: number
+      min_items: 3
+      max_items: 3
+      required: true
+    - name: mode
+      type: enum
+      required: false
+      enum_values:
+      - walk
+      - fly
+      - climb
+      - swim
+      default: walk
+    - name: difficult_terrain
+      type: boolean
+      required: false
+      default: false
+    - name: lasting_state
+      required: false
+      default: state
+      resolve: entity
+      model_hidden: true
+      type: string
+    - name: levitate_source_id
+      required: false
+      default: ''
+      model_hidden: true
+      type: string
+    - name: witness_state_ids
+      type: array
+      items:
+        type: string
+      required: false
+    - name: known_spell_effect
+      type: boolean
+      required: false
+      default: false
+    pre_conditions: []
+    effects:
+    - call: plan_srd_creature_space_route
+      params:
+        actor_state: '{_actor_state_id}'
+        destination: '{destination}'
+      export_context: '*'
+    - set:
+        field: _detour_first
+        value: _detour_route.points[1]
+    - call: prepare_srd_creature_space_route
+      params:
+        actor_state: '{_actor_state_id}'
+        destination: '{_detour_first}'
+        mode: '{mode}'
+        difficult_terrain: '{difficult_terrain}'
+        lasting_state: '{_lasting_state_id}'
+        levitate_source_id: '{levitate_source_id}'
+        witness_state_ids: '{witness_state_ids}'
+      export_context: '*'
+      condition: len(_detour_route.points) > 2
+    - call: qualify_srd_celestial_scene_route
+      params:
+        actor_state: '{_actor_state_id}'
+        destination: '{_detour_first}'
+        mode: '{mode}'
+        difficult_terrain: '{difficult_terrain}'
+        lasting_state: '{_lasting_state_id}'
+        levitate_source_id: '{levitate_source_id}'
+        witness_state_ids: '{witness_state_ids}'
+      export_context: '*'
+      condition: len(_detour_route.points) <= 2
+    - condition: len(_detour_route.points) > 2
+      on_true:
+      - set:
+          field: _detour_tests_left
+          value: 16384 - _detour_route.tests
+      - set:
+          field: _detour_edge_costs
+          value: []
+      - set:
+          field: _detour_affordable
+          value: false
+      - set:
+          field: _detour_attempts
+          value:
+          - 0
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+          - 6
+          - 7
+      - for_each:
+          collection: _detour_attempts
+          as: _detour_attempt
+          do:
+          - condition: _detour_affordable != true
+            on_true:
+            - set:
+                field: _detour_total_cost
+                value: 0
+            - set:
+                field: _detour_total_distance
+                value: 0
+            - set:
+                field: _detour_previous
+                value: _detour_route.points[0]
+            - set:
+                field: _detour_pricing_points
+                value: _detour_route.points
+            - for_each:
+                collection: _detour_pricing_points
+                as: _detour_point
+                do:
+                - condition: _detour_point[0] != _detour_previous[0] or _detour_point[1] != _detour_previous[1]
+                    or _detour_point[2] != _detour_previous[2]
+                  on_true:
+                  - call: srd_information_movement_cost
+                    params:
+                      start: '{_detour_previous}'
+                      end: '{_detour_point}'
+                      actor_subject: '{_actor_state_id}'
+                      movement_mode: '{mode}'
+                      base_difficult: '{difficult_terrain}'
+                      plane: '{_detour_plane}'
+                      ignore_ground_environments: '{_move_ignore_ground_environments}'
+                    export_context:
+                      _route_cost: _route_cost
+                      _route_distance: _route_distance
+                  - set:
+                      field: _route_cost
+                      value: _route_distance
+                    condition: actor_state.spell_freedom_of_movement == true
+                  - set:
+                      field: _route_cost
+                      value: _route_cost + _route_distance
+                    condition: '''prone'' in actor_state.conditions'
+                  - set:
+                      field: _route_cost
+                      value: _route_cost + _route_distance
+                    condition: _levitate_grip_walk_budget == true
+                  - set:
+                      field: _route_cost
+                      value: _route_cost + _route_distance
+                    condition: mode == 'swim' and (_ordinary_water_swim == true or _tsunami_ordinary_swim
+                      == true) and (actor_state.swim_speed == null or actor_state.swim_speed <= 0) and actor_state.spell_freedom_of_movement
+                      != true
+                  - list_push:
+                      list: _detour_edge_costs
+                      value:
+                        start: _detour_previous
+                        end: _detour_point
+                        cost: _route_cost
+                  - set:
+                      field: _detour_total_cost
+                      value: _detour_total_cost + _route_cost
+                  - set:
+                      field: _detour_total_distance
+                      value: _detour_total_distance + _route_distance
+                  - set:
+                      field: _detour_previous
+                      value: _detour_point
+            - set:
+                field: _detour_affordable
+                value: _detour_total_cost <= combat.movement_remaining + 0.000000001
+            - condition: _detour_affordable != true and _detour_attempt < 7
+              on_true:
+              - require:
+                  condition: _detour_tests_left > 0
+                  error: Creature-space route search exceeded its bounded search.
+              - spatial_query:
+                  scene: state.spatial_scene
+                  operation: circle_route
+                  query:
+                    map_id: '{lasting_state.spatial_scene.map.id}'
+                    moving_entity_id: '{_detour_mover.id}'
+                    destination: '{destination}'
+                    moving_radius: '{_space_route_radius}'
+                    circles: '{_space_route_circles}'
+                    metadata_filter:
+                      key: plane
+                      value: '{_detour_plane}'
+                      missing_matches: '{_detour_missing_plane}'
+                    max_tests: '{_detour_tests_left}'
+                    edge_costs: '{_detour_edge_costs}'
+                store_as: _detour_route
+              - set:
+                  field: _detour_tests_left
+                  value: _detour_tests_left - _detour_route.tests
+              - require:
+                  condition: _detour_route.truncated != true
+                  error: Creature-space route search exceeded its bounded search.
+              - require:
+                  condition: _detour_route.found == true
+                  error: No legal creature-space route was found for this destination.
+      - require:
+          condition: _detour_affordable == true
+          error: Not enough movement for a route within the bounded priced search.
+      - call: qualify_srd_coordinate_departure_budget
+        params:
+          actor: '{_actor_state_id}'
+          actor_state: '{_actor_state_id}'
+          distance: '{_detour_total_cost}'
+          difficult_terrain: false
+          movement_kind: '{_ordinary_swim_budget_mode}'
+          known_spell_effect: '{known_spell_effect}'
+        export_context:
+          _movement_cost: _movement_cost
+      - set:
+          field: _route_cost
+          value: _movement_cost
+      - set:
+          field: _route_distance
+          value: _detour_total_distance
+    metadata:
+      category: internal
+      visible_to_player: false
+      costs_action: false
+  plan_srd_creature_space_route:
+    description: Select a bounded physical route around forbidden creature spaces.
+    parameters:
+    - name: actor_state
+      resolve: entity
+    - name: destination
+      type: array
+      items:
+        type: number
+      min_items: 3
+      max_items: 3
+    - name: lasting_state
+      resolve: entity
+      required: false
+      default: state
+    effects:
+    - call: qualify_srd_creature_space_endpoint
+      params:
+        actor_state: '{_actor_state_id}'
+        destination: '{destination}'
+      export_context:
+        _space_route_circles: _space_route_circles
+        _space_route_radius: _space_route_radius
+        _space_route_blocked: _space_route_blocked
+        _space_mover: _space_mover
+    - set:
+        field: _detour_mover
+        value: _space_mover
+    - set:
+        field: _detour_plane
+        value: _detour_mover.metadata.plane
+    - set:
+        field: _detour_plane
+        value: '''material'''
+      condition: _detour_plane == null
+    - set:
+        field: _detour_missing_plane
+        value: _detour_plane == 'material'
+    - set:
+        field: _detour_route
+        value:
+          points:
+          - _detour_mover.position
+          - destination
+          found: true
+          truncated: false
+    - spatial_query:
+        scene: state.spatial_scene
+        operation: circle_route
+        query:
+          map_id: '{lasting_state.spatial_scene.map.id}'
+          moving_entity_id: '{_detour_mover.id}'
+          destination: '{destination}'
+          moving_radius: '{_space_route_radius}'
+          circles: '{_space_route_circles}'
+          metadata_filter:
+            key: plane
+            value: '{_detour_plane}'
+            missing_matches: '{_detour_missing_plane}'
+          max_tests: 16384
+      store_as: _detour_route
+      condition: _space_route_blocked == true
+    - require:
+        condition: _detour_route.truncated != true
+        error: Creature-space route search exceeded its bounded search.
+    - require:
+        condition: _detour_route.found == true
+        error: No legal creature-space route was found for this destination.
+    metadata:
+      category: internal
+      visible_to_player: false
+      costs_action: false
+  resolve_srd_occupied_space_turn_end:
+    description: Apply the SRD turn-end Prone consequence to actual unresolved overlap.
+    parameters:
+    - name: actor_state
+      resolve: entity
+    effects:
+    - call: srd_information_scene_entity
+      params:
+        subject: '{_actor_state_id}'
+      export_context:
+        _info_position: _info_position
+    - call: collect_srd_creature_space_intervals
+      params:
+        actor_state: '{_actor_state_id}'
+        destination: '{_info_position}'
+        passage: false
+      export_context:
+        _space_turn_prone: _space_turn_prone
+    - set:
+        field: _space_end_conditions
+        value: actor_state.conditions
+    - set:
+        field: _space_prone_applied
+        value: false
+    - condition: _space_turn_prone == true and 'prone' not in actor_state.conditions and (actor_state.condition_immunities
+        == null or 'prone' not in actor_state.condition_immunities)
+      on_true:
+      - list_push:
+          list: _space_end_conditions
+          value: '''prone'''
+      - set:
+          field: actor_state.conditions
+          value: _space_end_conditions
+      - set:
+          field: _space_prone_applied
+          value: true
+    metadata:
+      category: internal
+      visible_to_player: false
+      costs_action: false
+  qualify_srd_creature_space_endpoint:
+    description: Qualify the requested endpoint before opportunity or environment splitting.
+    effects:
+    - call: collect_srd_creature_space_intervals
+      params:
+        actor_state: '{_actor_state_id}'
+        destination: '{destination}'
+        endpoint: true
+        passage: false
+      export_context:
+        _space_route_circles: _space_route_circles
+        _space_route_radius: _space_route_radius
+        _space_route_blocked: _space_route_blocked
+        _space_mover: _space_mover
+    metadata:
+      category: internal
+      visible_to_player: false
+      costs_action: false
+    parameters:
+    - name: actor_state
+      resolve: entity
+    - name: destination
+      type: array
+      items:
+        type: number
+      min_items: 3
+      max_items: 3
+  collect_srd_creature_space_intervals:
+    description: Collect continuous creature-space intervals from actual scene and relationship records.
+    parameters:
+    - name: actor_state
+      type: string
+      required: true
+      resolve: entity
+    - name: destination
+      type: array
+      required: true
+      items:
+        type: number
+      min_items: 3
+      max_items: 3
+    - name: endpoint
+      type: boolean
+      required: false
+      default: false
+    - name: start
+      type: array
+      required: false
+      items:
+        type: number
+      default: []
+      max_items: 3
+    - name: passage
+      type: boolean
+      required: false
+      default: true
+    - name: lasting_state
+      type: string
+      resolve: entity
+      required: false
+      default: state
+    pre_conditions: []
+    effects:
+    - require:
+        condition: actor_state.size_rank != null
+        error: Creature space needs an explicit supported SRD size_rank.
+    - call: read_srd_creature_space_width
+      params:
+        rank: '{actor_state.size_rank}'
+      export_context:
+        _space_width: _space_width
+    - set:
+        field: _space_route_radius
+        value: _space_width * 0.5
+    - call: check_srd_form_movement_permissions
+      params:
+        actor_state: '{_actor_state_id}'
+      export_context:
+        _form_share_creature_space: _form_share_creature_space
+    - call: srd_information_scene_entity
+      params:
+        subject: '{_actor_state_id}'
+      export_context:
+        _info_scene_entity: _info_scene_entity
+    - set:
+        field: _space_mover
+        value: _info_scene_entity
+    - set:
+        field: _space_intervals
+        value: []
+    - set:
+        field: _space_turn_prone
+        value: false
+    - set:
+        field: _space_route_circles
+        value: []
+    - set:
+        field: _space_route_blocked
+        value: false
+    - set:
+        field: _space_scene_entities
+        value: lasting_state.spatial_scene.entities
+    - for_each:
+        collection: _space_scene_entities
+        as: _space_body
+        do:
+        - condition: _space_body.active == true and _space_body.id != _space_mover.id and _space_body.metadata.participant_ref
+            != null and (_space_body.metadata.plane == _space_mover.metadata.plane or ((_space_body.metadata.plane
+            == null or _space_body.metadata.plane == 'material') and (_space_mover.metadata.plane == null
+            or _space_mover.metadata.plane == 'material')))
+          on_true:
+          - call: query_srd_creature_space_pair
+            params:
+              actor_state: '{_actor_state_id}'
+              other_state: '{_space_body.metadata.participant_ref}'
+              destination: '{destination}'
+              moving_entity: '{_space_mover.id}'
+              moving_position: '{_space_mover.position}'
+              moving_radius: '{_space_route_radius}'
+              start: '{start}'
+            export_context:
+              _space_overlap: _space_overlap
+              _space_allowed: _space_allowed
+              _space_difficult: _space_difficult
+              _space_other_rank: _space_other_rank
+              _space_fixed_radius: _space_fixed_radius
+          - condition: _form_share_creature_space != true
+            on_true:
+            - set:
+                field: _space_route_blocked
+                value: true
+              condition: _space_overlap.hit == true and _space_allowed != true and _space_overlap.starts_inside
+                != true
+            - list_push:
+                list: _space_route_circles
+                value:
+                  entity_id: _space_body.id
+                  radius: _space_fixed_radius
+                  blocking: _space_allowed != true
+            - require:
+                condition: endpoint != true or _space_overlap.ends_inside != true
+                error: A willing move cannot end in another creature's occupied space.
+            - require:
+                condition: passage != true or _space_overlap.hit != true or _space_allowed == true or _space_overlap.starts_inside
+                  == true
+                error: This creature does not permit passage through its occupied space.
+          - condition: _space_overlap.hit == true and _space_difficult == true
+            on_true:
+            - list_push:
+                list: _space_intervals
+                value:
+                  entry: _space_overlap.entry
+                  exit: _space_overlap.exit
+          - condition: _space_overlap.ends_inside == true and actor_state.size_rank != 0 and actor_state.size_rank
+              <= _space_other_rank and _form_share_creature_space != true
+            on_true:
+            - set:
+                field: _space_turn_prone
+                value: true
+    metadata:
+      category: internal
+      visible_to_player: false
+      costs_action: false
+  query_srd_creature_space_pair:
+    description: Query one actual creature pair; attitude alone does not establish an ally.
+    parameters:
+    - name: actor_state
+      type: string
+      required: true
+      resolve: entity
+    - name: other_state
+      type: string
+      required: true
+      resolve: entity
+    - name: moving_entity
+      type: string
+      required: true
+    - name: moving_position
+      type: array
+      required: true
+      items:
+        type: number
+      min_items: 3
+      max_items: 3
+    - name: moving_radius
+      type: number
+      required: true
+    - name: destination
+      type: array
+      required: true
+      items:
+        type: number
+      min_items: 3
+      max_items: 3
+    - name: start
+      type: array
+      required: false
+      items:
+        type: number
+      default: []
+      max_items: 3
+    - name: lasting_state
+      type: string
+      resolve: entity
+      required: false
+      default: state
+    pre_conditions: []
+    effects:
+    - require:
+        condition: actor_state.size_rank != null and other_state.size_rank != null
+        error: Creature space needs an explicit supported SRD size_rank for both creatures.
+    - call: read_srd_creature_space_width
+      params:
+        rank: '{other_state.size_rank}'
+      export_context:
+        _space_width: _space_width
+    - call: srd_information_scene_entity
+      params:
+        subject: '{_other_state_id}'
+      export_context:
+        _info_scene_entity: _info_scene_entity
+    - set:
+        field: _space_fixed_body
+        value: _info_scene_entity
+    - set:
+        field: _space_moving_radius
+        value: moving_radius
+    - set:
+        field: _space_fixed_radius
+        value: _space_width * 0.5
+    - set:
+        field: _space_origin
+        value: moving_position
+    - set:
+        field: _space_origin
+        value: start
+      condition: len(start) > 0
+    - spatial_query:
+        scene: state.spatial_scene
+        operation: circle_overlap
+        query:
+          map_id: '{lasting_state.spatial_scene.map.id}'
+          moving_entity_id: '{moving_entity}'
+          fixed_entity_id: '{_space_fixed_body.id}'
+          destination: '{destination}'
+          origin: '{_space_origin}'
+          moving_radius: '{_space_moving_radius}'
+          fixed_radius: '{_space_fixed_radius}'
+      store_as: _space_overlap
+    - set:
+        field: _space_ally
+        value: (actor_state.ally_state_ids != null and _other_state_id in actor_state.ally_state_ids)
+    - set:
+        field: _space_incapacitated
+        value: '''incapacitated'' in other_state.conditions or ''paralyzed'' in other_state.conditions or
+          ''petrified'' in other_state.conditions or ''stunned'' in other_state.conditions or ''unconscious''
+          in other_state.conditions'
+    - set:
+        field: _space_allowed
+        value: _space_ally or _space_incapacitated or other_state.size_rank == 0 or abs(actor_state.size_rank
+          - other_state.size_rank) >= 2 or (actor_state.species == 'halfling' and other_state.size_rank
+          > actor_state.size_rank)
+    - set:
+        field: _space_difficult
+        value: _space_ally != true and other_state.size_rank != 0
+    - set:
+        field: _space_other_rank
+        value: other_state.size_rank
+    metadata:
+      category: internal
+      visible_to_player: false
+      costs_action: false
+  read_srd_creature_space_width:
+    description: Map an actual SRD size category to its declared control-space diameter in feet.
+    parameters:
+    - name: rank
+      type: integer
+      minimum: 0
+      maximum: 5
+    effects:
+    - set:
+        field: _space_widths
+        value:
+        - 2.5
+        - 5
+        - 5
+        - 10
+        - 15
+        - 20
+    - set:
+        field: _space_width
+        value: _space_widths[rank]
+    metadata:
+      category: internal
+      visible_to_player: false
+      costs_action: false
   award_srd_advancement:
     description: Record a Plan milestone or allocated XP award once for this character. Read the policy
       and verify its trigger, timing and recipients first. Repeat for every eligible party member when
@@ -33050,12 +34386,14 @@ tools:
   level_up_srd_character:
     description: 'Apply one earned or queued starting SRD level. Read the retained class level, subclass,
       feat and spell rules; resolve every player choice before proposing the build. Provide complete proficiency
-      lists preserving existing grants and all new features. The player confirms the proposal. Feature records
-      are not automatic feature execution.
-  
+      lists preserving existing grants and all new features. The player confirms the proposal. Feature
+      records are not automatic feature execution.
+
       Selected spell headers restrict eligible choices. Full complete-grant and earned-level requirements
       remain unchanged; initial character validation describes available choices and reports current repertoire
-      shortfalls. Pending profiles cannot fill missing choices. Gameplay verification remains pending.'
+      shortfalls. Pending profiles cannot fill missing choices. Gameplay verification remains pending.
+      Supply resulting AC and walking Speed; the engine validates both against new class features and
+      worn equipment while retaining base species Speed.'
     pre_conditions:
     - condition: _character_id == _character_state_id
       error: Character profile and mechanical state must identify the same character.
@@ -33085,8 +34423,8 @@ tools:
         > 0
       on_true:
       - require:
-          condition: character_state.initial_advancement_queue[0].from_level == _prior_character.level and
-            character_state.initial_advancement_queue[0].target_level == _new_level and character_state.initial_advancement_queue[0].intent
+          condition: character_state.initial_advancement_queue[0].from_level == _prior_character.level
+            and character_state.initial_advancement_queue[0].target_level == _new_level and character_state.initial_advancement_queue[0].intent
             == 'level_up_srd_character'
           error: Resolve the next queued starting level in order; levels cannot be skipped or repeated.
     - require:
@@ -33201,9 +34539,9 @@ tools:
     - set:
         field: _ability_budget
         value: 2
-      condition: _class_level == 4 or _class_level == 8 or _class_level == 12 or _class_level == 16 or (class_id
-        == 'fighter' and (_class_level == 6 or _class_level == 14)) or (class_id == 'rogue' and _class_level
-        == 10)
+      condition: _class_level == 4 or _class_level == 8 or _class_level == 12 or _class_level == 16 or
+        (class_id == 'fighter' and (_class_level == 6 or _class_level == 14)) or (class_id == 'rogue'
+        and _class_level == 10)
     - set:
         field: _ability_budget
         value: 1
@@ -33231,8 +34569,8 @@ tools:
         error: A level-up cannot remove existing ability-score gains.
     - require:
         condition: _build.abilities.dexterity <= max(20, _prior_character.abilities.dexterity) or (_class_level
-          == 19 and _build.abilities.dexterity <= 30) or (class_id == 'barbarian' and _class_level == 20
-          and _build.abilities.dexterity <= 25)
+          == 19 and _build.abilities.dexterity <= 30) or (class_id == 'barbarian' and _class_level ==
+          20 and _build.abilities.dexterity <= 25)
         error: An ability increase exceeds the selected level's score limit.
     - set:
         field: _ability_total
@@ -33242,8 +34580,8 @@ tools:
         error: A level-up cannot remove existing ability-score gains.
     - require:
         condition: _build.abilities.constitution <= max(20, _prior_character.abilities.constitution) or
-          (_class_level == 19 and _build.abilities.constitution <= 30) or (class_id == 'barbarian' and _class_level
-          == 20 and _build.abilities.constitution <= 25)
+          (_class_level == 19 and _build.abilities.constitution <= 30) or (class_id == 'barbarian' and
+          _class_level == 20 and _build.abilities.constitution <= 25)
         error: An ability increase exceeds the selected level's score limit.
     - set:
         field: _ability_total
@@ -33253,8 +34591,8 @@ tools:
         error: A level-up cannot remove existing ability-score gains.
     - require:
         condition: _build.abilities.intelligence <= max(20, _prior_character.abilities.intelligence) or
-          (_class_level == 19 and _build.abilities.intelligence <= 30) or (class_id == 'barbarian' and _class_level
-          == 20 and _build.abilities.intelligence <= 25)
+          (_class_level == 19 and _build.abilities.intelligence <= 30) or (class_id == 'barbarian' and
+          _class_level == 20 and _build.abilities.intelligence <= 25)
         error: An ability increase exceeds the selected level's score limit.
     - set:
         field: _ability_total
@@ -33264,8 +34602,8 @@ tools:
         error: A level-up cannot remove existing ability-score gains.
     - require:
         condition: _build.abilities.wisdom <= max(20, _prior_character.abilities.wisdom) or (_class_level
-          == 19 and _build.abilities.wisdom <= 30) or (class_id == 'barbarian' and _class_level == 20 and
-          _build.abilities.wisdom <= 25)
+          == 19 and _build.abilities.wisdom <= 30) or (class_id == 'barbarian' and _class_level == 20
+          and _build.abilities.wisdom <= 25)
         error: An ability increase exceeds the selected level's score limit.
     - set:
         field: _ability_total
@@ -33290,8 +34628,8 @@ tools:
           condition: _build.abilities.strength == min(25, _prior_character.abilities.strength + 4)
           error: Primal Champion raises Strength and Constitution by 4 (maximum 25).
       - require:
-          condition: _build.abilities.constitution == min(25, _prior_character.abilities.constitution +
-            4)
+          condition: _build.abilities.constitution == min(25, _prior_character.abilities.constitution
+            + 4)
           error: Primal Champion raises Strength and Constitution by 4 (maximum 25).
       - require:
           condition: _build.abilities.dexterity == _prior_character.abilities.dexterity
@@ -33503,7 +34841,6 @@ tools:
           classes: _classes
           abilities: _build.abilities
           subclasses: _next_subclasses
-          speed: _build.speed
           spellcasting_grants: _build.spellcasting
     - set:
         field: _next_equipment_profile
@@ -33556,8 +34893,8 @@ tools:
         - set:
             field: _style_feature
             value: true
-          condition: _style_class.id == 'fighter' or ((_style_class.id == 'paladin' or _style_class.id ==
-            'ranger') and _style_class.level >= 2)
+          condition: _style_class.id == 'fighter' or ((_style_class.id == 'paladin' or _style_class.id
+            == 'ranger') and _style_class.level >= 2)
     - set:
         field: _style_records
         value: _next_equipment_profile.fighting_styles
@@ -33596,8 +34933,8 @@ tools:
             condition: _style_class_level >= _style_policy.level
             error: The Fighting Style grant has not been earned at this class level.
         - require:
-            condition: _style_policy.subclass == '' or (_next_equipment_profile.subclasses != null and _next_equipment_profile.subclasses[_style_policy.class_id]
-              == _style_policy.subclass)
+            condition: _style_policy.subclass == '' or (_next_equipment_profile.subclasses != null and
+              _next_equipment_profile.subclasses[_style_policy.class_id] == _style_policy.subclass)
             error: The additional Fighting Style requires the Champion subclass.
         - list_push:
             list: _style_sources
@@ -33893,8 +35230,8 @@ tools:
             condition: _old_style_choice.source in definitions.srd_fighting_style_grants
             error: A Fighting Style needs its actual class feature or feat slot.
         - require:
-            condition: _old_style_choice.source not in _old_style_sources and _old_style_choice.style not
-              in _old_style_selected
+            condition: _old_style_choice.source not in _old_style_sources and _old_style_choice.style
+              not in _old_style_selected
             error: Each Fighting Style and its granting feature may be selected only once.
         - set:
             field: _old_style_policy
@@ -34006,6 +35343,10 @@ tools:
     - require:
         condition: _build.armor_class == _equipment_ac
         error: Proposed Armor Class must match the new abilities, class grants and worn equipment.
+    - require:
+        condition: _build.speed == _equipment_speed
+        error: Proposed walking Speed must match the new class features and worn equipment. Keep the character's
+          base species Speed unchanged.
     - set:
         field: _next_focus_maximum
         value: 0
@@ -34097,8 +35438,8 @@ tools:
           as: _wholeness_proposal
           do:
           - require:
-              condition: _wholeness_proposal.id != 'wholeness_of_body' or _wholeness_proposal.maximum ==
-                _next_wholeness_maximum
+              condition: _wholeness_proposal.id != 'wholeness_of_body' or _wholeness_proposal.maximum
+                == _next_wholeness_maximum
               error: Wholeness of Body capacity is determined by the Open Hand feature and Wisdom.
       on_false: []
     - set:
@@ -34109,8 +35450,8 @@ tools:
         value: character_state.resources.focus_point
       condition: character_state.resources.focus_point != null
     - require:
-        condition: _prior_focus_remaining >= 0 and _prior_focus_remaining <= _prior_focus_maximum and (_prior_focus_maximum
-          == 0 or character_state.resource_maxima.focus_point == _prior_focus_maximum)
+        condition: _prior_focus_remaining >= 0 and _prior_focus_remaining <= _prior_focus_maximum and
+          (_prior_focus_maximum == 0 or character_state.resource_maxima.focus_point == _prior_focus_maximum)
         error: Saved Focus must match the previous Monk class capacity.
     - condition: 'true'
       on_true:
@@ -34223,10 +35564,14 @@ tools:
           maximum: 1
       store_as: _pools
       condition: _found == false
+    - set:
+        field: _proposed_max_hp
+        value: character_state.max_hp + _hp_gain
     - request_choice:
         choice_id: srd-level-up
-        prompt: Advance {_prior_character.name} to level {_new_level} ({class_id} {_class_level}) using
-          {hp_method} Hit Points? {choices_summary}
+        prompt: 'Advance {_prior_character.name} to level {_new_level} ({class_id} {_class_level}) using
+          {hp_method} Hit Points? Computed maximum HP: {_proposed_max_hp}; Armor Class: {_equipment_ac};
+          Walking Speed: {_equipment_speed}. {choices_summary}'
         options:
         - id: apply
           label: Apply level-up
@@ -34327,10 +35672,6 @@ tools:
           participant: _character_id
           field: advancements
           value: _advancements
-      - set_participant:
-          participant: _character_id
-          field: speed
-          value: _build.speed
       - set:
           field: '{_character_state_id}.speed'
           value: _equipment_speed
@@ -34365,8 +35706,8 @@ tools:
         on_true:
         - set:
             field: _save
-            value: character_state.saving_throw_modifiers.strength + (_build.abilities.strength - 10) //
-              2 - (_prior_character.abilities.strength - 10) // 2
+            value: character_state.saving_throw_modifiers.strength + (_build.abilities.strength - 10)
+              // 2 - (_prior_character.abilities.strength - 10) // 2
         - set:
             field: _save
             value: _save - 2 - (_prior_character.level - 1) // 4
@@ -34437,8 +35778,8 @@ tools:
         on_true:
         - set:
             field: _save
-            value: character_state.saving_throw_modifiers.wisdom + (_build.abilities.wisdom - 10) // 2 -
-              (_prior_character.abilities.wisdom - 10) // 2
+            value: character_state.saving_throw_modifiers.wisdom + (_build.abilities.wisdom - 10) // 2
+              - (_prior_character.abilities.wisdom - 10) // 2
         - set:
             field: _save
             value: _save - 2 - (_prior_character.level - 1) // 4
@@ -34455,8 +35796,8 @@ tools:
         on_true:
         - set:
             field: _save
-            value: character_state.saving_throw_modifiers.charisma + (_build.abilities.charisma - 10) //
-              2 - (_prior_character.abilities.charisma - 10) // 2
+            value: character_state.saving_throw_modifiers.charisma + (_build.abilities.charisma - 10)
+              // 2 - (_prior_character.abilities.charisma - 10) // 2
         - set:
             field: _save
             value: _save - 2 - (_prior_character.level - 1) // 4
@@ -34476,10 +35817,10 @@ tools:
         condition: character_state.initiative_modifier != null
       - set:
           field: '{_character_state_id}.initiative_modifier'
-          value: character_state.initiative_modifier + (_new_level - 1) // 4 - (_prior_character.level -
-            1) // 4
-        condition: '''alert'' in _prior_character.origin_feats and character_state.initiative_modifier !=
-          null'
+          value: character_state.initiative_modifier + (_new_level - 1) // 4 - (_prior_character.level
+            - 1) // 4
+        condition: '''alert'' in _prior_character.origin_feats and character_state.initiative_modifier
+          != null'
       - condition: 'true'
         on_true:
         - set:
@@ -34666,6 +36007,10 @@ tools:
           value:
             path: context._applied_hp_gain
           optional: true
+        - label: Walking Speed
+          value:
+            path: context.character_state.speed
+          optional: true
         details:
         - label: Proposed choices
           value:
@@ -34677,9 +36022,14 @@ tools:
               fixed: Fixed increase
               roll: Rolled increase
     parameters:
-    - param_character_46d8a27d7576c33c
-    - param_character_state_809d60742dbb9d5c
-    - param_policy_ba7ffd01a64e74dc
+    - name: character
+      resolve: participant
+    - name: character_state
+      resolve: entity
+      description: The same character ID, selecting its live mechanical state.
+    - name: policy
+      type: object
+      from_state: state.advancement
     - name: class_id
       type: enum
       enum_values:
@@ -35575,6 +36925,9 @@ tools:
         - prepared_spells
         - features
         additionalProperties: false
+      description: Complete resulting build. Resulting walking Speed after the new class features and
+        worn equipment. The engine derives it from the retained base species Speed; do not change that
+        base.
   take_srd_short_rest_hit_die:
     description: Immediately after a tracked Short Rest completes, spend one Hit Die and apply its healing.
       Choose further dice after each result, before advancing time or resuming other activity. For mixed
@@ -42153,8 +43506,6 @@ tools:
     - name: target
       resolve: entity
       from_state: combat.active_actor
-      required: true
-      type: string
     - name: witness_state_ids
       type: array
       items:
@@ -42164,7 +43515,6 @@ tools:
       required: false
       resolve: entity
       default: state
-      type: string
     - name: known_spell_effect
       type: boolean
       required: false
@@ -63377,18 +64727,13 @@ tools:
     parameters:
     - name: target_state
       resolve: entity
-      required: true
-      type: string
     - name: lasting_state
       resolve: entity
-      required: true
-      type: string
     - name: witness_state_ids
       type: array
       items:
         type: string
       required: false
-    pre_conditions: []
   remove_srd_timed_condition_effect:
     effects:
     - set:
@@ -108230,8 +109575,7 @@ tools:
         collection: _route_zones
         as: _route_zone
         do:
-        - condition: _route_zone.metadata.ground_environment != true or ignore_ground_environments !=
-            true
+        - condition: _route_zone.metadata.ground_environment != true or ignore_ground_environments != true
           on_true:
           - call: srd_information_segment_interval
             params:
@@ -108471,6 +109815,33 @@ tools:
                     value:
                       t: _segment_exit
       condition: lasting_state.has_plant_growth_terrain == true
+    - set:
+        field: _space_cost_intervals
+        value: []
+    - condition: len(actor_subject) > 0
+      on_true:
+      - call: collect_srd_creature_space_intervals
+        params:
+          actor_state: '{actor_subject}'
+          destination: '{end}'
+          start: '{start}'
+        export_context:
+          _space_intervals: _space_intervals
+      - set:
+          field: _space_cost_intervals
+          value: _space_intervals
+      - for_each:
+          collection: _space_cost_intervals
+          as: _space_cost_interval
+          do:
+          - list_push:
+              list: _route_cuts
+              value:
+                t: _space_cost_interval.entry
+          - list_push:
+              list: _route_cuts
+              value:
+                t: _space_cost_interval.exit
     - sort:
         collection: _route_cuts
         by: t
@@ -108519,9 +109890,8 @@ tools:
               do:
               - set:
                   field: _growth_route_inside
-                  value: (_route_point[0] - _growth_route_record.origin[0]) ** 2 + (_route_point[1] -
-                    _growth_route_record.origin[1]) ** 2 + (_route_point[2] - _growth_route_record.origin[2])
-                    ** 2 <= 10000
+                  value: (_route_point[0] - _growth_route_record.origin[0]) ** 2 + (_route_point[1] - _growth_route_record.origin[1])
+                    ** 2 + (_route_point[2] - _growth_route_record.origin[2]) ** 2 <= 10000
               - set:
                   field: _growth_route_exclusions
                   value: _growth_route_record.exclusions
@@ -108633,8 +110003,8 @@ tools:
                 - set:
                     field: _route_piece_difficult
                     value: false
-                  condition: _route_plant.terrain == 'ordinary_terrain' and _route_growth_difficult ==
-                    true and _route_nonplant_difficult != true and base_difficult != true
+                  condition: _route_plant.terrain == 'ordinary_terrain' and _route_growth_difficult == true
+                    and _route_nonplant_difficult != true and base_difficult != true
                 - set:
                     field: _route_piece_difficult
                     value: true
@@ -108660,6 +110030,14 @@ tools:
                 on_true:
                 - call: initialize_srd_lite_constants_28ef1cf4aa3f
                   export_context: '*'
+          - for_each:
+              collection: _space_cost_intervals
+              as: _space_cost_interval
+              do:
+              - set:
+                  field: _route_piece_difficult
+                  value: true
+                condition: _route_mid > _space_cost_interval.entry and _route_mid < _space_cost_interval.exit
           - set:
               field: _route_piece_cost
               value: (_route_cut.t - _route_previous) * _route_distance
@@ -108743,14 +110121,39 @@ tools:
       category: internal
       visible_to_player: false
     parameters:
-    - param_start_d98e3be2ca5dca70
-    - param_end_2ff639971e9448b4
-    - param_base_difficult_a5608f5f49a78950
-    - param_plane_1f147b6f378b0935
-    - param_lasting_state_f791c68f01bb49c8
-    - param_ignore_ground_environments_4734932a4b45d48a
-    - param_actor_subject_01a055a914c07f60
-    - param_movement_mode_1ba895a414924e9a
+    - name: start
+      type: array
+      items:
+        type: number
+      min_items: 3
+      max_items: 3
+    - name: end
+      type: array
+      items:
+        type: number
+      min_items: 3
+      max_items: 3
+    - name: base_difficult
+      type: boolean
+    - name: plane
+    - name: lasting_state
+      required: false
+      default: state
+      resolve: entity
+      model_hidden: true
+    - name: ignore_ground_environments
+      type: boolean
+      required: false
+      default: false
+      model_hidden: true
+    - name: actor_subject
+      required: false
+      default: ''
+      model_hidden: true
+    - name: movement_mode
+      required: false
+      default: walk
+      model_hidden: true
   update_srd_information_record:
     effects:
     - set:
@@ -108806,165 +110209,82 @@ tools:
     - param_instance_id_423087afbc55012d
     - param_lasting_state_7bff8d20c3cf7d0f
   move_srd_scene_creature:
-    description: Combat only. Move an admitted scene creature along a clear segment and consume actual
-      route terrain cost.
+    description: Combat only. Follow a legal creature-space route and consume its actual movement cost.
     effects:
-    - require:
-        condition: combat.opportunity_attack_pending != true
-        error: Resolve the pending native Reaction before moving.
-    - require:
-        condition: lasting_state.pending_srd_movement == null or lasting_state.pending_srd_movement.stage
-          == 'resuming'
-        error: Complete or cancel the saved coordinate movement first.
-    - set:
-        field: _coordinate_original_destination
-        value: destination
-    - set:
-        field: _coordinate_split_resume
-        value: lasting_state.pending_srd_movement != null
-    - call: qualify_srd_coordinate_opportunity_move
+    - call: qualify_srd_creature_space_route
       params:
         actor_state: '{_actor_state_id}'
         destination: '{destination}'
-      export_context:
-        _coordinate_candidates: _coordinate_candidates
-        _coordinate_move_destination: _coordinate_move_destination
-        _coordinate_ignored: _coordinate_ignored
-        _coordinate_first_exit: _coordinate_first_exit
-        _coordinate_move_origin: _coordinate_move_origin
-        _coordinate_requested_distance: _coordinate_requested_distance
-    - condition: len(_coordinate_candidates) > 0 or _coordinate_split_resume
-      on_true:
-      - call: qualify_srd_celestial_scene_route
-        params:
-          actor_state: '{_actor_state_id}'
-          destination: '{_coordinate_original_destination}'
-          mode: '{mode}'
-          difficult_terrain: '{difficult_terrain}'
-          lasting_state: '{_lasting_state_id}'
-          witness_state_ids: '{witness_state_ids}'
-          levitate_source_id: '{levitate_source_id}'
+        mode: '{mode}'
+        difficult_terrain: '{difficult_terrain}'
+        lasting_state: '{_lasting_state_id}'
+        levitate_source_id: '{levitate_source_id}'
+        witness_state_ids: '{witness_state_ids}'
+        known_spell_effect: '{known_spell_effect}'
+      export_context: '*'
     - set:
-        field: _coordinate_movement_budget_total
-        value: combat.movement_remaining + combat.movement_spent
+        field: _detour_walk_points
+        value: _detour_route.points
     - set:
-        field: lasting_state.coordinate_fractional_prefix_actor
-        value: null
-    - condition: (len(_coordinate_candidates) > 0 or _coordinate_split_resume) and _coordinate_first_exit
-        > 0 and _coordinate_requested_distance * _coordinate_first_exit < 0.5
-      on_true:
-      - set:
-          field: lasting_state.coordinate_fractional_prefix_actor
-          value: _actor_state_id
-    - condition: _coordinate_first_exit > 0
-      on_true:
-      - call: move_srd_scene_creature_before_opportunity
-        params:
-          actor_state: '{_actor_state_id}'
-          destination: '{_coordinate_move_destination}'
-          mode: '{mode}'
-          difficult_terrain: '{difficult_terrain}'
-          lasting_state: '{_lasting_state_id}'
-          levitate_source_id: '{levitate_source_id}'
-          witness_state_ids: '{witness_state_ids}'
-          time_stop_state: '{_time_stop_state_id}'
-          celestial_entry_choices: '{celestial_entry_choices}'
-          known_spell_effect: '{known_spell_effect}'
-        export_context: '*'
-    - condition: _coordinate_first_exit == 0
-      on_true:
-      - call: srd_information_scene_entity
-        params:
-          subject: '{_actor_state_id}'
-        export_context:
-          _info_scene_entity: _info_scene_entity
-          _info_position: _info_position
-      - call: srd_information_movement_cost
-        params:
-          start: '{_coordinate_move_origin}'
-          end: '{_coordinate_original_destination}'
-          base_difficult: '{difficult_terrain}'
-          plane: '{_info_scene_entity.metadata.plane}'
-        export_context:
-          _route_cost: _route_cost
-          _route_distance: _route_distance
-      - condition: actor_state.spell_freedom_of_movement == true
-        on_true:
-        - set:
-            field: _route_cost
-            value: _route_distance
-      - call: qualify_srd_coordinate_departure_budget
-        params:
-          actor: '{_actor_state_id}'
-          actor_state: '{_actor_state_id}'
-          distance: '{_route_cost}'
-          difficult_terrain: false
-          movement_kind: '{mode}'
-          known_spell_effect: '{known_spell_effect}'
-        export_context:
-          _movement_cost: _movement_cost
-      - set:
-          field: _scene_movement_actor_name
-          value: actor_state.name
-      - set:
-          field: _scene_movement_distance
-          value: 0
-      - set:
-          field: _scene_movement_cost
-          value: 0
-      - set:
-          field: _scene_actor_position
-          value: _coordinate_move_origin
+        field: _detour_final_destination
+        value: destination
     - set:
-        field: lasting_state.coordinate_fractional_prefix_actor
-        value: null
-    - condition: (len(_coordinate_candidates) > 0 or _coordinate_split_resume) and combat.movement_remaining
-        + combat.movement_spent == _coordinate_movement_budget_total
-      on_true:
-      - set:
-          field: combat.movement_remaining
-          value: _coordinate_movement_budget_total - combat.movement_spent
+        field: _detour_walk_origin
+        value: _detour_route.points[0]
     - set:
-        field: _movement_remaining_after
-        value: combat.movement_remaining
-    - condition: len(_coordinate_candidates) > 0
-      on_true:
-      - set:
-          field: lasting_state.pending_srd_movement
-          value:
-            actor: _actor_state_id
-            destination: _coordinate_original_destination
-            parameters:
-              actor_state: _actor_state_id
-              destination: _coordinate_original_destination
-              mode: mode
-              difficult_terrain: difficult_terrain
-              lasting_state: _lasting_state_id
-              levitate_source_id: levitate_source_id
-              witness_state_ids: witness_state_ids
-              time_stop_state: _time_stop_state_id
-              celestial_entry_choices: celestial_entry_choices
-              known_spell_effect: known_spell_effect
-            candidates: _coordinate_candidates
-            ignored: _coordinate_ignored
-            turn_sequence: combat.turn_sequence
-            movement_budget_total: combat.movement_remaining + combat.movement_spent
-            full_intent_validated: true
-            stage: '''selection'''
-            selected_reactor: null
-      - set:
-          field: combat.opportunity_attack_pending
-          value: true
-      - set:
-          field: combat.pending_reaction
-          value:
-            kind: '''movement_opportunity_selection'''
-            provoking_entity: _actor_state_id
-    - condition: len(_coordinate_candidates) == 0
-      on_true:
-      - set:
-          field: lasting_state.pending_srd_movement
-          value: null
+        field: _detour_spent
+        value: 0
+    - set:
+        field: _detour_distance
+        value: 0
+    - set:
+        field: _detour_continue
+        value: true
+    - for_each:
+        collection: _detour_walk_points
+        as: _detour_waypoint
+        do:
+        - condition: _detour_continue == true and (_detour_waypoint[0] != _detour_walk_origin[0] or _detour_waypoint[1]
+            != _detour_walk_origin[1] or _detour_waypoint[2] != _detour_walk_origin[2])
+          on_true:
+          - call: move_srd_creature_space_segment
+            params:
+              actor_state: '{_actor_state_id}'
+              destination: '{_detour_waypoint}'
+              mode: '{mode}'
+              difficult_terrain: '{difficult_terrain}'
+              lasting_state: '{_lasting_state_id}'
+              levitate_source_id: '{levitate_source_id}'
+              witness_state_ids: '{witness_state_ids}'
+              time_stop_state: '{_time_stop_state_id}'
+              celestial_entry_choices: '{celestial_entry_choices}'
+              known_spell_effect: '{known_spell_effect}'
+            export_context: '*'
+          - set:
+              field: _detour_spent
+              value: _detour_spent + _scene_movement_cost
+          - set:
+              field: _detour_distance
+              value: _detour_distance + _scene_movement_distance
+          - set:
+              field: _detour_continue
+              value: lasting_state.pending_srd_movement == null and abs(_scene_actor_position[0] - _detour_waypoint[0])
+                <= 0.000000001 and abs(_scene_actor_position[1] - _detour_waypoint[1]) <= 0.000000001 and
+                abs(_scene_actor_position[2] - _detour_waypoint[2]) <= 0.000000001
+          - condition: lasting_state.pending_srd_movement != null
+            on_true:
+            - set:
+                field: lasting_state.pending_srd_movement.destination
+                value: _detour_final_destination
+            - set:
+                field: lasting_state.pending_srd_movement.parameters.destination
+                value: _detour_final_destination
+    - set:
+        field: _scene_movement_cost
+        value: _detour_spent
+    - set:
+        field: _scene_movement_distance
+        value: _detour_distance
     metadata:
       category: movement
       result_card:
@@ -109035,6 +110355,22 @@ tools:
         equations:
           path: context._spell_featured_equations
       model_behavior: supports_player_intent
+      player_controls:
+        confirmation: required
+        preflight:
+        - qualify_srd_creature_space_route
+        preview:
+          version: 1
+          footprint: compact
+          title: Movement
+          summary:
+          - label: Movement spent
+            value:
+              path: context._route_cost
+        preflight_path:
+          scene: state.spatial_scene
+          route: _detour_route
+          cost: _route_cost
     pre_conditions:
     - condition: combat.encounter_active == true
       error: Coordinate movement is available during combat. Outside combat, use the established fictional
@@ -343923,8 +345259,8 @@ tools:
           target_state: '{_actor_id}'
           lasting_state: state
     - call: prepare_srd_telekinesis_releases
-    - condition: time_stop_state.time_stop_source != null and time_stop_state.time_stop_source.active
-        == true and time_stop_state.time_stop_source.turn_running == true and _actor_id == time_stop_state.time_stop_source.caster
+    - condition: time_stop_state.time_stop_source != null and time_stop_state.time_stop_source.active ==
+        true and time_stop_state.time_stop_source.turn_running == true and _actor_id == time_stop_state.time_stop_source.caster
       on_true:
       - set:
           field: time_stop_state.time_stop_source.turn_running
@@ -343952,8 +345288,8 @@ tools:
         value: false
       condition: time_stop_state.time_stop_source != null
     - call: finalize_srd_time_stop
-      condition: time_stop_state.time_stop_source != null and time_stop_state.time_stop_source.ending
-        == true
+      condition: time_stop_state.time_stop_source != null and time_stop_state.time_stop_source.ending ==
+        true
     - call: expire_srd_created_ghoul_claw_sources
       params:
         target_state: '{_actor_id}'
@@ -343987,8 +345323,33 @@ tools:
               list: _spell_featured_equations
               value: _visual_equation_row
     - set:
+        field: _space_end_conditions
+        value: null
+    - condition: state.spatial_scene != null
+      on_true:
+      - call: resolve_srd_occupied_space_turn_end
+        params:
+          actor_state: '{_actor_id}'
+        export_context:
+          _space_end_conditions: _space_end_conditions
+          _space_prone_applied: _space_prone_applied
+      - condition: _space_prone_applied == true
+        on_true:
+        - list_push:
+            list: _end_turn_rows
+            value:
+              label: '''Occupied space'''
+              value: '''Prone'''
+        - set:
+            field: _end_turn_card_title
+            value: '''End of turn'''
+    - set:
         field: _end_turn_display_conditions
         value: '''None'''
+    - set:
+        field: _end_turn_display_conditions
+        value: _space_end_conditions
+      condition: _space_end_conditions != null and len(_space_end_conditions) > 0
     - condition: _end_turn_conditions != null and len(_end_turn_conditions) > 0
       on_true:
       - set:
@@ -344001,12 +345362,56 @@ tools:
       category: internal
       visible_to_player: false
     parameters:
-    - param_actor_851b9e15e6de61bc
-    - param_self_restoration_47483454e222f59c
-    - param_lasting_state_f791c68f01bb49c8
-    - param_witness_state_ids_1dc147c145211b0d
-    - param_time_stop_state_ffde41c75687f2dd
-    - param_celestial_light_choices_c1d11cfaa85d0c5a
+    - name: actor
+      resolve: entity
+    - name: self_restoration
+      type: enum
+      enum_values:
+      - none
+      - charmed
+      - frightened
+      - poisoned
+      required: false
+      default: none
+      description: For a Monk of level 10 or higher, choose one condition to remove at the end of this turn.
+        This is optional and does not spend an action.
+    - name: lasting_state
+      required: false
+      default: state
+      resolve: entity
+      model_hidden: true
+    - name: witness_state_ids
+      type: array
+      items:
+        type: string
+      required: false
+    - name: time_stop_state
+      resolve: entity
+      required: false
+      default: state
+      model_hidden: true
+    - name: celestial_light_choices
+      type: array
+      required: false
+      default: []
+      max_items: 8
+      items:
+        type: object
+        required:
+        - source_id
+        - light
+        additionalProperties: false
+        properties:
+          source_id:
+            type: string
+            minLength: 1
+          light:
+            type: string
+            enum:
+            - healing
+            - searing
+      description: Optional source caster choices for this actual creature ending its turn; membership,
+        visibility and once-per-turn eligibility are derived.
     - name: controlled_steed_end_rows
       type: array
       required: false
@@ -344015,7 +345420,10 @@ tools:
         type: object
       model_hidden: true
       max_items: 256
-    - param_known_spell_effect_c456f907323fe8b9
+    - name: known_spell_effect
+      type: boolean
+      required: false
+      default: false
   qualify_srd_otherworldly_rider_segment:
     effects:
     - require:
@@ -360028,268 +361436,6 @@ tools:
     - param_temporary_hit_points_per_slot_level_b05c9c5faa74a561
     - param_range_kind_eece0feee34036f7
     - param_range_feet_f7650612d19da920
-  apply_srd_composite_damage:
-    pre_conditions:
-    - condition: component_1_amount >= 0 and component_2_amount >= 0
-      error: Composite damage components cannot be negative.
-    - condition: component_1_damage_type != component_2_damage_type
-      error: Composite damage components must have distinct damage types.
-    - condition: target.is_alive == true
-      error: This traced composite-damage vertical cannot damage a dead creature.
-    effects:
-    - call: resolve_srd_superior_defense
-      params:
-        target_state: '{target}'
-      export_context:
-        _superior_defense_active: _superior_defense_active
-    - call: initialize_srd_lite_constants_cfbcbbd00817
-      export_context: '*'
-    - set:
-        field: _component_1_effective_damage
-        value: component_1_amount
-    - condition: component_1_damage_type in target.damage_immunities
-      on_true:
-      - set:
-          field: _component_1_effective_damage
-          value: 0
-    - set:
-        field: _component_1_lasting_damage_resistance
-        value: false
-    - condition: _component_1_effective_damage > 0 and target.concentration_resistance_source_ids != null
-      on_true:
-      - call: resolve_srd_concentration_damage_resistance
-        params:
-          target_state: '{target}'
-          lasting_state: state
-          damage_type: '{component_1_damage_type}'
-        export_context:
-          _component_1_lasting_damage_resistance: _lasting_damage_resistance
-    - condition: _component_1_effective_damage > 0 and (component_1_damage_type in target.damage_resistances
-        or (_superior_defense_active == true and component_1_damage_type != 'force') or _component_1_lasting_damage_resistance
-        == true or 'petrified' in target.conditions)
-      on_true:
-      - set:
-          field: _component_1_effective_damage
-          value: _component_1_effective_damage // 2
-    - condition: _component_1_effective_damage > 0 and component_1_damage_type in target.damage_vulnerabilities
-      on_true:
-      - set:
-          field: _component_1_effective_damage
-          value: _component_1_effective_damage * 2
-    - set:
-        field: _component_2_effective_damage
-        value: component_2_amount
-    - condition: component_2_damage_type in target.damage_immunities
-      on_true:
-      - set:
-          field: _component_2_effective_damage
-          value: 0
-    - set:
-        field: _component_2_lasting_damage_resistance
-        value: false
-    - condition: _component_2_effective_damage > 0 and target.concentration_resistance_source_ids != null
-      on_true:
-      - call: resolve_srd_concentration_damage_resistance
-        params:
-          target_state: '{target}'
-          lasting_state: state
-          damage_type: '{component_2_damage_type}'
-        export_context:
-          _component_2_lasting_damage_resistance: _lasting_damage_resistance
-    - condition: _component_2_effective_damage > 0 and (component_2_damage_type in target.damage_resistances
-        or (_superior_defense_active == true and component_2_damage_type != 'force') or _component_2_lasting_damage_resistance
-        == true or 'petrified' in target.conditions)
-      on_true:
-      - set:
-          field: _component_2_effective_damage
-          value: _component_2_effective_damage // 2
-    - condition: _component_2_effective_damage > 0 and component_2_damage_type in target.damage_vulnerabilities
-      on_true:
-      - set:
-          field: _component_2_effective_damage
-          value: _component_2_effective_damage * 2
-    - set:
-        field: _incoming_damage
-        value: component_1_amount + component_2_amount
-    - set:
-        field: _effective_damage
-        value: _component_1_effective_damage + _component_2_effective_damage
-    - set:
-        field: _hp_before
-        value: target.hp
-    - set:
-        field: _temp_hp_absorbed
-        value: min(target.temp_hp, _effective_damage)
-    - decrement:
-        field: target.temp_hp
-        amount: _temp_hp_absorbed
-    - set:
-        field: _hp_damage
-        value: _effective_damage - _temp_hp_absorbed
-    - apply_damage:
-        target: target
-        amount: _hp_damage
-    - set:
-        field: _remaining_damage
-        value: max(0, _hp_damage - _hp_before)
-    - set:
-        field: target.bloodied
-        value: target.hp <= target.max_hp // 2
-    - condition: target.hp == 0 and target.creature_kind == 'monster'
-      on_true:
-      - set:
-          field: target.is_alive
-          value: 'false'
-      - apply_condition:
-          target: target
-          condition: dead
-    - condition: target.hp == 0 and target.creature_kind == 'character' and _remaining_damage >= target.max_hp
-      on_true:
-      - set:
-          field: target.is_alive
-          value: 'false'
-      - apply_condition:
-          target: target
-          condition: dead
-    - condition: _hp_before == 0 and _effective_damage >= target.max_hp and target.creature_kind == 'character'
-        and target.is_alive == true
-      on_true:
-      - set:
-          field: target.is_alive
-          value: 'false'
-      - apply_condition:
-          target: target
-          condition: dead
-    - condition: target.hp == 0 and target.creature_kind == 'character' and target.is_alive == true
-      on_true:
-      - apply_condition:
-          target: target
-          condition: unconscious
-      - condition: target.superior_defense_expires_tick != null
-        on_true:
-        - set:
-            field: target.superior_defense_expires_tick
-            value: null
-    - condition: _hp_before == 0 and _effective_damage > 0 and target.creature_kind == 'character' and
-        target.is_alive == true
-      on_true:
-      - set:
-          field: target.stable
-          value: 'false'
-      - set:
-          field: target.stable_recovery_hours_remaining
-          value: 0
-      - increment:
-          field: target.death_failures
-          amount: 1
-      - condition: target.death_failures >= 3
-        on_true:
-        - set:
-            field: target.is_alive
-            value: 'false'
-        - apply_condition:
-            target: target
-            condition: dead
-    - condition: target.concentration_spell_id != null
-      on_true:
-      - call: resolve_srd_concentration_after_damage
-        params:
-          caster_state: '{target}'
-          lasting_state: state
-          damage_taken: '{_effective_damage}'
-        export_context:
-          _concentration_save_dc: _concentration_save_dc
-          _concentration_save_outcome: _concentration_save_outcome
-          _concentration_save_roll: _concentration_save_roll
-    - set:
-        field: _hp_after
-        value: target.hp
-    - set:
-        field: _temp_hp_after
-        value: target.temp_hp
-    - set:
-        field: _is_alive_after
-        value: target.is_alive
-    - set:
-        field: _conditions_after
-        value: target.conditions
-    - set:
-        field: _death_failures_after
-        value: target.death_failures
-    - set:
-        field: _stable_after
-        value: target.stable
-    - set:
-        field: _stable_recovery_hours_remaining_after
-        value: target.stable_recovery_hours_remaining
-    narrative:
-      on_success: The independently typed components are applied as one damage instance.
-      on_failure: The composite damage action is rejected.
-    metadata:
-      category: internal
-      visible_to_player: false
-    parameters:
-    - param_target_be55e922774f9bfc
-    - param_component_1_amount_c32846d85c3e0de7
-    - param_component_1_damage_type_3938305262becd86
-    - param_component_2_amount_82d17d022166ee7f
-    - param_component_2_damage_type_350f41c75a970e12
-  refresh_srd_superior_defense_targets:
-    effects:
-    - condition: lasting_state.superior_defense_target_ids != null
-      on_true:
-      - set:
-          field: _superior_tracked
-          value: lasting_state.superior_defense_target_ids
-      - set:
-          field: _superior_remaining
-          value: []
-      - for_each:
-          collection: _superior_tracked
-          as: _superior_target
-          do:
-          - call: resolve_srd_superior_defense
-            params:
-              target_state: '{_superior_target}'
-            export_context:
-              _superior_defense_active: _superior_defense_active
-          - condition: _superior_defense_active == true
-            on_true:
-            - list_push:
-                list: _superior_remaining
-                value: _superior_target
-      - set:
-          field: lasting_state.superior_defense_target_ids
-          value: _superior_remaining
-    metadata:
-      category: internal
-      visible_to_player: false
-    parameters:
-    - param_lasting_state_7bff8d20c3cf7d0f
-  register_srd_superior_defense_target:
-    effects:
-    - condition: lasting_state.superior_defense_target_ids == null
-      on_true:
-      - set:
-          field: lasting_state.superior_defense_target_ids
-          value: []
-    - set:
-        field: _superior_registered
-        value: lasting_state.superior_defense_target_ids
-    - condition: _target_state_id not in _superior_registered
-      on_true:
-      - list_push:
-          list: _superior_registered
-          value: _target_state_id
-    - set:
-        field: lasting_state.superior_defense_target_ids
-        value: _superior_registered
-    metadata:
-      category: internal
-      visible_to_player: false
-    parameters:
-    - param_target_state_cb03a83d0b3e524f
-    - param_lasting_state_7bff8d20c3cf7d0f
   settle_srd_concentration_endings:
     effects:
     - call: prepare_srd_telekinesis_releases
@@ -365942,20 +367088,20 @@ tools:
       error: The creature's Speed is 0 while this condition persists.
     - condition: movement_kind != 'long_jump' and movement_kind != 'high_jump' and movement_kind != 'vertical_surface'
         or actor.creature_kind == 'character'
-      error: Calculated jumping and Acrobatic Movement require a saved character; other creatures need
-        their own stat-block movement rule.
+      error: Calculated jumping and Acrobatic Movement require a saved character; other creatures need their
+        own stat-block movement rule.
     - condition: (movement_kind != 'long_jump' and movement_kind != 'high_jump') or running_start == false
         or combat.movement_spent >= 10
       error: Record the actual 10-foot run-up before a running jump.
     - condition: (actor_state.timed_control_speed_zero != true or actor_state.spell_freedom_of_movement
         == true)
       error: Hypnotic Pattern sets every movement Speed to zero.
-    - condition: actor_state.control_order_moving == true or (actor_state.control_dancing != true and
-        actor_state.control_fear_active != true and (actor_state.control_confusion_active != true or actor_state.control_confusion_mode
+    - condition: actor_state.control_order_moving == true or (actor_state.control_dancing != true and actor_state.control_fear_active
+        != true and (actor_state.control_confusion_active != true or actor_state.control_confusion_mode
         == 'free'))
       error: Resolve the spell's required movement instead of voluntary movement.
-    - condition: actor_state.has_control_order_sources != true or actor_state.control_order_moving ==
-        true or actor_state.control_order_movement_pending != true
+    - condition: actor_state.has_control_order_sources != true or actor_state.control_order_moving == true
+        or actor_state.control_order_movement_pending != true
       error: Perform prescribed movement through the source-owned order resolver.
     - condition: actor_state.affliction_movement_pending != true or actor_state.control_order_moving ==
         true
@@ -365967,143 +367113,26 @@ tools:
     - condition: actor_state.meld_stone_source_id == null
       error: Leave the actual merged stone before ordinary movement.
     effects:
-    - condition: actor_state.earthquake_buried == true
-      on_true:
-      - call: resolve_srd_earthquake_burial
-        params:
-          target_state: '{_actor_state_id}'
-      - require:
-          condition: actor_state.earthquake_buried != true
-          error: Escape the actual rubble before moving this body.
-    - require:
-        condition: actor_state.dream_trance_speed_zero != true
-        error: A Dream messenger has Speed 0.
-    - require:
-        condition: actor_state.form_cloud != true or movement_kind == 'fly'
-        error: The cloud form's only movement method is its actual Fly Speed.
-    - set:
-        field: _acrobatic_movement
-        value: null
-    - condition: movement_kind == 'vertical_surface' or (movement_kind == 'liquid_surface' and actor_state.spell_water_walk
-        != true)
-      on_true:
-      - require:
-          condition: actor_state.worn_armor == null and actor_state.worn_shield == null
-          error: Acrobatic Movement requires no worn armor or wielded Shield.
-      - call: derive_srd_martial_arts
-        params:
-          actor: '{_actor_id}'
-          actor_state: '{_actor_state_id}'
-        export_context:
-          _martial_arts_level: _martial_arts_level
-      - require:
-          condition: _martial_arts_level >= 9
-          error: Acrobatic Movement requires Monk level 9.
-      - set:
-          field: _acrobatic_movement
-          value: '''Acrobatic Movement: vertical surface, during movement only'''
-      - set:
-          field: _acrobatic_movement
-          value: '''Acrobatic Movement: liquid surface, during movement only'''
-        condition: movement_kind == 'liquid_surface'
-    - call: initialize_srd_lite_constants_4639a3dc00cb
-      export_context: '*'
-    - condition: (movement_kind == 'long_jump' or movement_kind == 'high_jump')
-      on_true:
-      - call: derive_srd_jump_distance
-        params:
-          actor: '{_actor_id}'
-          actor_state: '{_actor_state_id}'
-          movement_kind: '{movement_kind}'
-          running_start: '{running_start}'
-        export_context:
-          _jump_maximum: _jump_maximum
-      - require:
-          condition: distance <= _jump_maximum
-          error: The declared jump exceeds the character’s current jump distance.
-    - call: project_srd_timed_actor_mobility
+    - call: prepare_srd_creature_space_departure
       params:
-        target_state: '{_actor_state_id}'
-        lasting_state: state
-    - require:
-        condition: actor_state.spell_flight_fall_pending != true
-        error: Resolve the fall caused by lost flight before voluntary movement.
-    - condition: movement_kind == 'fly'
-      on_true:
-      - require:
-          condition: actor_state.spell_flying_speed > 0 or (actor_state.flying_speed != null and actor_state.flying_speed
-            > 0)
-          error: The creature has no Fly Speed.
-      - set:
-          field: actor_state.flying_aloft
-          value: end_in_air
-    - require:
-        condition: actor_state.spell_spider_climb == true
-        error: Ceiling movement requires Spider Climb.
-      condition: movement_kind == 'ceiling'
-    - require:
-        condition: actor_state.spell_spider_climb == true or (actor_state.climb_speed != null and actor_state.climb_speed
-          > 0)
-        error: This mode requires a Climb Speed; ordinary climbing requires separately accounting for
-          its extra movement cost.
-      condition: movement_kind == 'climb'
-    - condition: movement_kind == 'liquid_surface' and actor_state.spell_water_walk == true
-      on_true:
-      - require:
-          condition: actor_state.water_walk_in_liquid != true
-          error: Take the Water Walk transition Bonus Action before moving on the surface.
-      - set:
-          field: _acrobatic_movement
-          value: '''Water Walk: liquid treated as harmless solid ground; heat remains hazardous'''
-    - condition: movement_kind == 'spell_jump'
-      on_true:
-      - require:
-          condition: actor_state.spell_jump_distance > 0
-          error: The creature has no active Jump spell.
-      - require:
-          condition: actor_state.spell_jump_used != true
-          error: Jump can be used only once on each of the creature's turns.
-      - require:
-          condition: distance <= actor_state.spell_jump_distance
-          error: The declared jump exceeds the spell's jump distance.
-      - set:
-          field: actor_state.spell_jump_used
-          value: true
-      - set:
-          field: _jump_maximum
-          value: actor_state.spell_jump_distance
-    - require:
-        condition: actor_state.spell_freedom_of_movement == true or (actor_state.swim_speed != null and
-          actor_state.swim_speed > 0)
-        error: Swimming in this mode needs a Swim Speed.
-      condition: movement_kind == 'swim'
-    - set:
-        field: _mobility_refresh_speed
-        value: movement_kind == 'fly' or movement_kind == 'climb' or movement_kind == 'ceiling' or combat.movement_mode
-          == 'fly' or combat.movement_mode == 'climb' or combat.movement_mode == 'ceiling' or movement_kind
-          == 'swim' or combat.movement_mode == 'swim'
-    - set:
-        field: combat.movement_mode
-        value: movement_kind
-    - call: refresh_srd_movement_budget
-      params:
+        actor: '{_actor_id}'
         actor_state: '{_actor_state_id}'
-      condition: _mobility_refresh_speed == true
-    - set:
-        field: _movement_cost
-        value: distance
-    - set:
-        field: _movement_cost
-        value: distance * 2
-      condition: difficult_terrain == true and (movement_kind != 'long_jump' and movement_kind != 'high_jump')
-        and actor_state.spell_freedom_of_movement != true
-    - set:
-        field: _movement_cost
-        value: actor_state.spell_jump_cost
-      condition: movement_kind == 'spell_jump'
+        distance: '{distance}'
+        difficult_terrain: '{difficult_terrain}'
+        movement_kind: '{movement_kind}'
+        end_in_air: '{end_in_air}'
+        running_start: '{running_start}'
+        fear_source_in_sight: '{fear_source_in_sight}'
+        lasting_state: '{_lasting_state_id}'
+        time_stop_state: '{_time_stop_state_id}'
+        known_spell_effect: '{known_spell_effect}'
+      export_context: '*'
     - require:
-        condition: _movement_cost <= combat.movement_remaining
+        condition: _movement_cost <= combat.movement_remaining + 0.000000001
         error: The creature does not have enough movement remaining.
+    - set:
+        field: _movement_cost
+        value: max(0, min(_movement_cost, combat.movement_remaining))
     narrative:
       on_success: Movement is deducted from the creature's remaining Speed.
       on_failure: The movement is rejected.
@@ -366114,14 +367143,20 @@ tools:
     - name: actor
       resolve: entity
       from_state: combat.active_actor
+      required: true
+      type: string
     - name: actor_state
       resolve: entity
       from_state: combat.active_actor
+      required: true
+      type: string
     - name: distance
       type: number
       minimum: 0
+      required: true
     - name: difficult_terrain
       type: boolean
+      required: true
     - name: movement_kind
       type: enum
       enum_values:
@@ -366146,8 +367181,8 @@ tools:
       type: boolean
       required: false
       default: false
-      description: For a jump, true only after moving at least 10 feet on foot immediately before this
-        jump. Record that run-up as movement first.
+      description: For a jump, true only after moving at least 10 feet on foot immediately before this jump.
+        Record that run-up as movement first.
     - name: fear_source_in_sight
       type: boolean
       required: false
@@ -366157,11 +367192,13 @@ tools:
       required: false
       resolve: entity
       default: state
+      type: string
     - name: time_stop_state
       resolve: entity
       required: false
       default: state
       model_hidden: true
+      type: string
     - name: known_spell_effect
       type: boolean
       required: false

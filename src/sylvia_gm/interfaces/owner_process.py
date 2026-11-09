@@ -33,12 +33,15 @@ import time
 import zipfile
 from collections.abc import Callable, Iterator, Mapping, Sequence, Set
 from contextlib import ExitStack, nullcontext
-from datetime import UTC, datetime
 from enum import Enum
 from pathlib import Path
 from types import MappingProxyType
 from typing import Any, BinaryIO, TextIO, cast
 
+from sylvia_gm.agent._builder_question_answers import (
+    builder_question_answer_content,
+    builder_question_details,
+)
 from sylvia_gm.agent._builder_session import (
     BuilderTurnResult,
     CampaignContentToolAuthority,
@@ -71,21 +74,25 @@ from sylvia_gm.application.builder_references import (
     launch_candidate,
     launch_references,
     reference_reader,
+    with_character_examples,
 )
 from sylvia_gm.application.builder_session_migration import migrate_legacy_builder_chats
 from sylvia_gm.application.bundled_campaign_plans import (
+    bundled_plan,
     known_builtin_public_summary,
     selected_campaign_plan,
 )
 from sylvia_gm.application.bundled_packages import (
+    BUNDLED_RIICHI_PACKAGES,
     bundled_campaign_content_catalog,
-    bundled_rift_archive,
+    bundled_rift_archive_for_closure,
     bundled_rift_authority,
-    bundled_rift_campaign_plan,
     bundled_rift_participant_declaration,
+    bundled_riichi_archive,
     bundled_srd_archive,
     bundled_srd_version,
 )
+from sylvia_gm.application.bundled_starter_characters import available_reusable_participants
 from sylvia_gm.application.campaign_library_selection import (
     materialize_library_party,
     participant_catalog_payload,
@@ -120,6 +127,11 @@ from sylvia_gm.application.plan_bundle import (
     import_plan_bundle,
 )
 from sylvia_gm.application.plan_snapshot import retained_plan_snapshot, validate_plan_snapshot
+from sylvia_gm.application.ready_campaigns import (
+    customize_ready_campaign,
+    ready_campaign_catalog,
+    start_ready_campaign,
+)
 from sylvia_gm.application.reusable_participants import (
     ReusableParticipant,
     compatible_reusable_participants,
@@ -208,6 +220,7 @@ from sylvia_gm.infrastructure.builder_source_ingestion import (
 )
 from sylvia_gm.infrastructure.launch_handshake import derive_owner_response
 from sylvia_gm.interfaces._display_reads import DisplayReads
+from sylvia_gm.interfaces._local_diagnostics import LocalDiagnostics
 from sylvia_gm.interfaces._session_reasoning import (
     reasoning_state,
     selected_model_info,
@@ -246,76 +259,12 @@ _MAX_MESSAGE_BYTES = 67_108_864
 _MAX_PACKAGE_BYTES = 48 * 1024 * 1024
 _MAX_USER_TEXT_CHARS = 131_072
 _MAX_CAMPAIGN_PLAN_BYTES = 1024 * 1024
-_MAX_RUNTIME_DIAGNOSTIC_BYTES = 5 * 1024 * 1024
 _MAX_ADMIN_AUDIT_VIEW_BYTES = 256 * 1024
 _TEST_FULL_AUDIT_ENV = "SYLVIA_GM_TEST_FULL_AUDIT"
 
 
 class OwnerProtocolError(ValueError):
     """A malformed or unsupported private owner-process message."""
-
-
-def _runtime_diagnostic_path(storage_root: Path) -> Path:
-    """Return the private, machine-local runtime journal path."""
-
-    return storage_root / "diagnostics" / "runtime.jsonl"
-
-
-def _prepare_runtime_diagnostic(path: Path) -> None:
-    """Create the journal directory and rotate one bounded previous journal."""
-
-    try:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        if path.is_file() and path.stat().st_size >= _MAX_RUNTIME_DIAGNOSTIC_BYTES:
-            previous = path.with_name("runtime.previous.jsonl")
-            path.replace(previous)
-    except OSError:
-        # Diagnostics must never prevent Sylvia from launching or serving a request.
-        return
-
-
-def _write_runtime_diagnostic(
-    path: Path,
-    *,
-    event: str,
-    operation: str | None = None,
-    outcome: str | None = None,
-    error_code: str | None = None,
-    error_type: str | None = None,
-    duration_ms: float | None = None,
-) -> None:
-    """Append one metadata-only diagnostic without campaign or provider content."""
-
-    record: dict[str, object] = {
-        "timestamp": datetime.now(UTC).isoformat(),
-        "event": event,
-    }
-    if operation is not None:
-        record["operation"] = (
-            operation if re.fullmatch(r"[a-z][a-z0-9_]{0,79}", operation) else "invalid_operation"
-        )
-    if outcome is not None:
-        record["outcome"] = outcome
-    if error_code is not None:
-        record["error_code"] = (
-            error_code
-            if re.fullmatch(r"[A-Za-z][A-Za-z0-9_.-]{0,79}", error_code)
-            else "unknown_error"
-        )
-    if error_type is not None:
-        record["error_type"] = (
-            error_type
-            if re.fullmatch(r"[A-Za-z][A-Za-z0-9_.-]{0,79}", error_type)
-            else "UnknownError"
-        )
-    if duration_ms is not None:
-        record["duration_ms"] = round(duration_ms, 1)
-    try:
-        with path.open("a", encoding="utf-8", newline="\n") as stream:
-            stream.write(json.dumps(record, ensure_ascii=True, separators=(",", ":")) + "\n")
-    except OSError:
-        # Diagnostics are best effort and are never part of campaign authority.
-        return
 
 
 def _guided_start_selection_input(payload: Mapping[str, object]) -> dict[str, object]:
@@ -505,9 +454,9 @@ def _unavailable_library_content(
 
 
 def _campaign_creation_catalog(
-    storage_root: Path, application_owner: AuthorityOwner
+    storage_root: Path, application_owner: AuthorityOwner, *, include_participants: bool = True,
 ) -> tuple[SafePayload, ...]:
-    """Project logical campaign choices with exact compatible content bindings."""
+    """Project exact content; setup can defer character construction until party selection."""
 
     items: list[dict[str, Any]] = [dict(item) for item in bundled_campaign_content_catalog()]
     candidates = tuple(
@@ -550,15 +499,18 @@ def _campaign_creation_catalog(
             code="reusable_campaign_plan_invalid",
         ) from error
     try:
-        items.extend(
-            dict(participant_catalog_payload(application_owner, participant))
-            for participant in _reusable_participant_catalog(
-                storage_root, application_owner, candidates=candidates,
-                on_invalid=lambda artifact_id, error: record_invalid(
-                    "participant", artifact_id, error,
-                ),
-            )
+        participants = _reusable_participant_catalog(
+            storage_root, application_owner, candidates=candidates,
+            include_starters=include_participants,
+            on_invalid=lambda artifact_id, error: record_invalid(
+                "participant", artifact_id, error,
+            ),
         )
+        if include_participants:
+            items.extend(
+                dict(participant_catalog_payload(application_owner, participant))
+                for participant in participants
+            )
     except (OSError, UnicodeError, ValueError, json.JSONDecodeError) as error:
         raise CommandRejected(
             "Reusable participant library contains an invalid artifact",
@@ -572,6 +524,15 @@ def _campaign_creation_catalog(
         choice = next((item for item in items if item.get("kind") == "ruleset" and item.get("id") == rule["id"]), None)
         if choice is None:
             choice = {"kind": "ruleset", **dict(rule), "title": rule["id"], "selection_id": rule["id"], "compatible_settings": ()}
+            installed = next((entry for candidate in candidates
+                              for entry in candidate.package_lock.entries
+                              if (entry.package_id, entry.version, entry.sha256) == (
+                                  rule["id"], rule["version"], rule["content_sha256"],
+                              )), None)
+            if installed is not None:
+                choice["title"] = application_owner.package_label(
+                    installed.package_id, installed.version, installed.sha256,
+                )
             items.append(choice)
         settings = tuple(choice.get("compatible_settings", ()))
         if not any(binding["id"] == world["id"] for binding in settings):
@@ -810,14 +771,16 @@ def _rift_reusable_participants(
     storage_root: Path,
     *,
     on_invalid: Callable[[str, Exception], None] | None = None,
+    include_starters: bool = True,
 ) -> tuple[ReusableParticipant, ...]:
     """Load participants compatible with the bundled Severed Lands/Rift binding."""
 
-    if not (storage_root / "participants").exists():
-        return ()
     package, declaration = _rift_participant_authority()
     campaign_setting = bundled_rift_authority().setting
-    return compatible_reusable_participants(
+    discover = (
+        available_reusable_participants if include_starters else compatible_reusable_participants
+    )
+    return discover(
         storage_root,
         package=package,
         declaration=declaration,
@@ -832,13 +795,19 @@ def _reusable_participant_catalog(
     *,
     candidates: Sequence[PackageCandidate] | None = None,
     on_invalid: Callable[[str, Exception], None] | None = None,
+    include_starters: bool = True,
 ) -> tuple[ReusableParticipant, ...]:
-    """Discover library characters using the exact schemas of installed Rulesets and Settings."""
-    if not (storage_root / "participants").exists():
-        return ()
+    """Validate saved characters even when setup defers built-in roster construction."""
+    if not include_starters:
+        library_root = storage_root / "participants"
+        if not library_root.exists() or next(library_root.iterdir(), None) is None:
+            return ()
+    discover = (
+        available_reusable_participants if include_starters else compatible_reusable_participants
+    )
     found = {
         item.artifact_id: item for item in _rift_reusable_participants(
-            storage_root, on_invalid=on_invalid,
+            storage_root, on_invalid=on_invalid, include_starters=include_starters,
         )
     }
     inspected: set[tuple[str, str, str, str, str]] = set()
@@ -866,7 +835,7 @@ def _reusable_participant_catalog(
                 )
                 if sources is None:
                     continue
-                for item in compatible_reusable_participants(
+                for item in discover(
                     storage_root,
                     package=primary,
                     declaration=declaration,
@@ -899,13 +868,24 @@ def _admitted_dm_campaign_plan(
         or handoff.dm_session_id != session_id
     ):
         raise CommandRejected("DM session does not match the admitted campaign plan")
+    adventures = owner.campaign_adventures(campaign_id)
+    if not adventures or adventures[0].plan_id != plan.plan_id:
+        raise CommandRejected("Current adventure is not descended from the admitted handoff")
+    plan = adventures[-1]
     admitted_text = plan.content.get("campaign_plan_markdown")
     if not isinstance(admitted_text, str) or not admitted_text.strip():
         raise CommandRejected("Admitted campaign plan content is unavailable")
     if len(admitted_text.encode("utf-8")) > _MAX_CAMPAIGN_PLAN_BYTES:
         raise CommandRejected("Admitted campaign plan exceeds the usability limit")
     structured = plan.content.get("campaign_plan")
-    return admitted_text, structured if isinstance(structured, Mapping) else None
+    from sylvia_gm.domain.campaign_sequel import sequel_markdown, sequel_preparation
+
+    continuation = sequel_preparation(plan.content)
+    if continuation is not None and isinstance(structured, Mapping):
+        # This application projection is not a change to the authored or accepted Plan bytes.
+        structured = {**structured, "_app_adventure_continuation": continuation}
+
+    return sequel_markdown(plan.content), structured if isinstance(structured, Mapping) else None
 
 
 def _read_message(stream: TextIO) -> dict[str, Any] | None:
@@ -1114,7 +1094,11 @@ def _resolve_rift_library_selection(
 ) -> tuple[PackageCandidate, CampaignPlanToolAuthority, ValidatedCampaignPlan, dict | None]:
     """Use a Rift Plan's retained sources, including its authored party template when present."""
     if plan_id == "the-rift-awakening":
-        plan = bundled_rift_campaign_plan()
+        retained = bundled_plan(plan_id)
+        if retained is None:
+            raise CommandRejected("The selected Rift Plan is unavailable")
+        plan = retained.plan
+        archive = retained.package_snapshot
     else:
         saved = load_reusable_campaign_plan(
             storage_root, plan_id,
@@ -1125,6 +1109,7 @@ def _resolve_rift_library_selection(
         if saved.setup_id != "the-rift-awakening":
             raise CommandRejected("The selected Plan does not use Rift campaign setup")
         plan = saved.plan
+        archive = saved.package_snapshot
     bindings = plan.payload["bindings"]
     if setting_id != bindings["campaign_setting"]["id"]:
         raise CommandRejected("The selected Plan belongs to another Campaign Setting")
@@ -1141,9 +1126,10 @@ def _resolve_rift_library_selection(
         None,
     )
     if candidate is None:
-        if bindings["package_closure_sha256"] != bundled_rift_authority().closure_sha256:
-            raise CommandRejected("The selected Plan's saved packages are unavailable")
-        archive = bundled_rift_archive()
+        if archive is None:
+            archive = bundled_rift_archive_for_closure(bindings["package_closure_sha256"])
+            if archive is None:
+                raise CommandRejected("The selected Plan's saved packages are unavailable")
         candidate = owner.install_package_archive(
             io.BytesIO(archive),
             install_id=f"install-bundled-rift-{hashlib.sha256(archive).hexdigest()[:24]}",
@@ -1264,7 +1250,7 @@ def _start_rift_campaign(
         template=party_template,
         selected_plan=selected_plan,
         setting_character_schema=rift_authority.setting_character_schema,
-        reusable_participants=compatible_reusable_participants(
+        reusable_participants=available_reusable_participants(
             storage_root,
             package=primary,
             declaration=declaration,
@@ -1448,6 +1434,7 @@ def _publish_builder_ruleset_candidate(
 
 def _launch(
     envelope: Mapping[str, Any],
+    *, before_migration: Callable[[], None] | None = None,
 ) -> tuple[LocalOwnerSupervisor, LocalCommandBus, str, str, Path]:
     if envelope.get("type") != "launch":
         raise OwnerProtocolError("The first owner message must be a launch envelope")
@@ -1459,7 +1446,9 @@ def _launch(
     external_response = derive_owner_response(secret_hex)
     supervisor = LocalOwnerSupervisor()
     try:
-        internal = supervisor.acquire_owner(database_path, owner_id)
+        internal = supervisor.acquire_owner(
+            database_path, owner_id, before_migration=before_migration,
+        )
         supervisor.complete_handshake(derive_owner_response(internal.secret_hex))
     except BaseException:
         supervisor.shutdown()
@@ -1491,6 +1480,24 @@ def _preinstall_bundled_srd(bus: LocalCommandBus) -> None:
     bus.install_package(
         io.BytesIO(archive),
         install_id=f"install-bundled-srd-{install_seed[:24]}",
+    )
+
+
+def _preinstall_bundled_riichi(bus: LocalCommandBus) -> None:
+    """Add the shipped closure once, retaining installed content and same-version edits."""
+
+    raw_candidates = bus.package_candidates()
+    if not isinstance(raw_candidates, Sequence):
+        raise RuntimeError("Package candidate projection is invalid")
+    required = set(BUNDLED_RIICHI_PACKAGES)
+    for candidate in cast(Sequence[PackageCandidate], raw_candidates):
+        installed = {(entry.package_id, entry.version) for entry in candidate.package_lock.entries}
+        if required <= installed:
+            return
+    archive = bundled_riichi_archive()
+    bus.install_package(
+        io.BytesIO(archive),
+        install_id=f"install-bundled-riichi-{hashlib.sha256(archive).hexdigest()[:24]}",
     )
 
 
@@ -1871,7 +1878,31 @@ def _dispatch_selected(
     if method == "campaign_index":
         return bus.campaign_index()
     if method == "campaign_creation_catalog":
-        return _campaign_creation_catalog(storage_root, application_owner)
+        return _campaign_creation_catalog(
+            storage_root, application_owner,
+            include_participants=_optional_bool(params, "include_participants", default=True),
+        )
+    if method == "ready_campaign_catalog":
+        try:
+            return ready_campaign_catalog()
+        except (OSError, ValueError, KeyError, TypeError) as error:
+            raise CommandRejected("Prepared campaigns are unavailable or incompatible",
+                                  code="ready_campaign_invalid") from error
+    if method in {"start_ready_campaign", "customize_ready_campaign"}:
+        ready_arguments = {
+            "operation_id": _required_text(params, "operation_id"),
+            "template_id": _required_text(params, "template_id"),
+            "expected_content_sha256": _required_text(params, "expected_content_sha256"),
+        }
+        if method == "customize_ready_campaign":
+            return customize_ready_campaign(application_owner, storage_root, **ready_arguments)
+        return start_ready_campaign(
+            application_owner, storage_root, **ready_arguments,
+            display_name=_required_text(params, "display_name"),
+            provider_id=_required_text(params, "provider_id"),
+            model_id=_required_text(params, "model_id"),
+            model_guidance_override=_optional_bool(params, "model_guidance_override"),
+        )
     if method == "delete_reusable_library_entry":
         kind = _required_text(params, "kind")
         artifact_id = _required_text(params, "artifact_id")
@@ -1957,7 +1988,7 @@ def _dispatch_selected(
     if method == "snapshot":
         return bus.snapshot(_required_text(params, "campaign_id"))
     if method == "display_snapshot":
-        return application_owner.display_snapshot(_required_text(params, "campaign_id"))
+        return application_owner.desktop_snapshot(_required_text(params, "campaign_id"), display_only=True)
     if method == "player_projection":
         return bus.player_projection(_required_text(params, "campaign_id"))
     if method == "player_projection_page":
@@ -2029,8 +2060,40 @@ def _dispatch_selected(
         return application_owner.execute_panel_action(
             **action_arguments, confirmation=_optional_text(params, "confirmation"),
         )
+    if method in {"campaign_sequel_context", "preview_campaign_sequel", "append_campaign_sequel"}:
+        arguments = {
+            "campaign_id": _required_text(params, "campaign_id"),
+            "session_id": _required_text(params, "session_id"),
+        }
+        if method == "campaign_sequel_context":
+            return application_owner.campaign_sequel_context(**arguments)
+        arguments["source_id"] = _required_text(params, "source_id")
+        if method == "preview_campaign_sequel":
+            return application_owner.preview_campaign_sequel(**arguments)
+        return application_owner.append_campaign_sequel(
+            **arguments, operation_id=_required_text(params, "operation_id"),
+            expected_revision=_required_nonnegative_int(params, "expected_revision"),
+            preview_sha256=_required_text(params, "preview_sha256"), review=params.get("review"),
+        )
     if method == "package_candidates":
         return bus.package_candidates()
+    if method == "campaign_rules_update_options":
+        return application_owner.campaign_rules_update_options(
+            _required_text(params, "campaign_id")
+        )
+    if method == "preview_campaign_rules_update":
+        return application_owner.preview_campaign_rules_update(
+            _required_text(params, "campaign_id"), _required_text(params, "candidate_id"),
+        )
+    if method == "adopt_campaign_rules_update":
+        return application_owner.adopt_campaign_rules_update(
+            campaign_id=_required_text(params, "campaign_id"),
+            candidate_id=_required_text(params, "candidate_id"),
+            activation_id=_required_text(params, "activation_id"),
+            expected_revision=_required_nonnegative_int(params, "expected_revision"),
+            expected_lock_id=_required_text(params, "expected_lock_id"),
+            confirmation=_required_text(params, "confirmation"),
+        )
     if method == "inspect_package_candidate":
         return bus.inspect_package_candidate(_required_text(params, "candidate_id"))
     if method == "package_candidate_text":
@@ -2058,7 +2121,9 @@ def _dispatch_selected(
         setting_id = _required_text(params, "setting_id")
         plan_id = _required_text(params, "plan_id")
         catalog_plan = next((
-            item for item in _campaign_creation_catalog(storage_root, application_owner)
+            item for item in _campaign_creation_catalog(
+                storage_root, application_owner, include_participants=False,
+            )
             if item.get("kind") == "campaign_plan" and item.get("id") == plan_id
         ), None)
         if catalog_plan is not None and catalog_plan.get("setup_id") == "the-rift-awakening":
@@ -2076,7 +2141,7 @@ def _dispatch_selected(
                 ) if item.kind == "player_character"
             )
             return rift_public_template(
-                reusable_participants=compatible_reusable_participants(
+                reusable_participants=available_reusable_participants(
                     storage_root, package=primary, declaration=declaration,
                     campaign_setting=sources.setting,
                     legacy_campaign_setting=bundled_rift_authority().setting,
@@ -2260,6 +2325,11 @@ def _dispatch_selected(
                 "latest_canonical_sequence": history_page.latest_canonical_sequence,
                 "act_markers": history_page.act_markers,
                 "campaign_ending": history_page.campaign_ending,
+                "campaign_endings": history_page.campaign_endings,
+                "builder_question_messages": tuple(
+                    message for message in history_page.builder_question_messages
+                    if builder_question_details(message.content) is not None
+                ),
             }
             display_session = history_page.session
             display_messages = history_page.messages
@@ -2278,6 +2348,7 @@ def _dispatch_selected(
             **page_fields,
             "provisional": session_loop.provisional_session_projection(session_id),
             "activity": activity,
+            "activity_progress": session_loop.activity_progress(session_id),
             "context_status_hint": session_loop.context_status_hint(session_id),
             "reasoning_state": reasoning_state(display_session, model_choices(), pending_model),
             "model_state": {
@@ -2383,6 +2454,13 @@ def _dispatch_selected(
         if ooc_text is not None and len(ooc_text) > _MAX_USER_TEXT_CHARS:
             raise OwnerProtocolError("ooc_text exceeds the session input limit")
         session_id = _required_text(params, "session_id")
+        question_answers = params.get("builder_question_answers")
+        context = application_owner.session_context(session_id)
+        if question_answers is not None:
+            if (builder_start or player_action_id or ending_choice is not None or ooc_text
+                    or params.get("redirect_interruption_id")):
+                raise OwnerProtocolError("Question answers cannot be combined with other input")
+            builder_question_answer_content(context, question_answers, user_text)
         model_command = _model_slash_command(user_text) if ooc_text is None else None
         if model_command is not None:
             reference, mode = model_command
@@ -2400,7 +2478,6 @@ def _dispatch_selected(
                 mode=mode,
                 choices=model_choices(),
             )
-        context = application_owner.session_context(session_id)
         if ending_choice is not None and (
             context.session.role is not WriterRole.DM or builder_start or player_action_id
             or user_text or ooc_text or params.get("redirect_interruption_id")
@@ -2509,7 +2586,8 @@ def _dispatch_selected(
                     ),
                     None,
                 )
-                if current_chat is not None and current_chat.display_name == "New chat":
+                if (current_chat is not None and current_chat.display_name == "New chat"
+                        and question_answers is None):
                     title = opening_title(user_text)
                     if title:
                         application_owner.rename_builder_chat(session_id, title, automatic=True)
@@ -2528,6 +2606,9 @@ def _dispatch_selected(
                 user_text=user_text,
                 input_kind=(
                     SessionInputKind.BUILDER_START if builder_start else SessionInputKind.USER
+                ),
+                builder_question_answers=(
+                    tuple(question_answers) if question_answers is not None else None
                 ),
             )
             campaign_plan_authority = None
@@ -2621,16 +2702,21 @@ def _dispatch_selected(
                     )
                     if isinstance(setting_value, Mapping):
                         participant_setting_selection = setting_value.get("setting_id")
-            rift_authority = bundled_rift_authority()
+            rift_authority = (
+                bundled_rift_authority()
+                if participant_purpose is not None
+                and participant_ruleset_selection == RIFT_RULESET_ID
+                else None
+            )
             participant_authority = (
                 None
-                if participant_purpose is None
-                or participant_ruleset_selection != RIFT_RULESET_ID
+                if rift_authority is None
                 or participant_setting_selection != rift_authority.setting.package_id
                 else _rift_participant_authority()
             )
             participant_campaign_setting = (
-                rift_authority.setting if participant_authority is not None else None
+                rift_authority.setting
+                if participant_authority is not None and rift_authority is not None else None
             )
             participant_package = (
                 None if participant_authority is None else participant_authority[0]
@@ -3182,9 +3268,8 @@ def _dispatch_selected(
                     profile_tools=profile_tools,
                     resolve_source_profile=resolve_source_profile,
                     campaign_content_authority=CampaignContentToolAuthority(
-                        items=_campaign_content_tool_authority(
-                            application_owner, storage_root
-                        ).items,
+                        # Discovery refreshes the catalog only when its tool is called.
+                        items=(),
                         refresh=lambda: _campaign_content_tool_authority(
                             application_owner, storage_root
                         ).items,
@@ -3439,11 +3524,13 @@ def _dispatch_selected(
         activity = session_loop.builder_activity(session_id, attempt_id=attempt_id)
         if activity is not None and activity["status"] != "active":
             return activity
+        status = bus.provider_stream_status(session_id, attempt_id)
+        # A live admitted run can precede lease registration or outlive its release.
+        # Only saved terminal evidence can complete that run.
+        if activity is not None and status == "completed":
+            status = "active"
         return {
-            "status": bus.provider_stream_status(
-                session_id,
-                attempt_id,
-            )
+            "status": status,
         }
     if method == "reconnect_stream":
         return bus.reconnect_stream(
@@ -3816,6 +3903,15 @@ def _dispatch_selected(
         purpose = _required_text(params, "purpose")
         profile_id = _optional_text(params, "character_profile_id")
         profile_hash = _optional_text(params, "character_profile_sha256")
+        character_id = _optional_text(params, "character_artifact_id")
+        character_hash = _optional_text(params, "character_artifact_sha256")
+        if (character_id is None) != (character_hash is None) or (
+            character_id is not None
+            and (purpose not in {"player_character", "companion"} or profile_id is not None)
+        ):
+            raise CommandRejected(
+                "Choose one exact Character File to edit a copy", code="character_copy_invalid",
+            )
         if (profile_id is None) != (profile_hash is None) or (
             profile_id is not None and purpose != "companion"
         ):
@@ -3852,6 +3948,11 @@ def _dispatch_selected(
                 )
             )
             retained = cast(dict[str, Any], reference_options["references"] or {})
+            if existing is None and purpose in {"player_character", "companion"}:
+                retained = with_character_examples(
+                    application_owner, storage_root, retained, purpose=purpose,
+                )
+                reference_options["references"] = retained
             pinned = retained.get("character_profile")
             if existing is not None:
                 actual = profile_from_snapshot(pinned) if pinned is not None else None
@@ -3940,6 +4041,36 @@ def _dispatch_selected(
                 reference_options["references"] = {
                     **retained,
                     "character_profile": profile.snapshot(),
+                }
+            pinned_character = retained.get("character_copy")
+            if existing is not None:
+                if (pinned_character is None and character_id is not None) or (
+                    pinned_character is not None and (
+                        pinned_character.get("artifact_id") != character_id
+                        or pinned_character.get("content_sha256") != character_hash
+                    )
+                ):
+                    raise CommandRejected(
+                        "This launch already selected a different Character File",
+                        code="stale_character",
+                    )
+            elif character_id is not None:
+                source = next((
+                    item for item in _reusable_participant_catalog(storage_root, application_owner)
+                    if item.artifact_id == character_id and item.role == purpose
+                ), None)
+                if source is None or source.content_sha256 != character_hash:
+                    raise CommandRejected(
+                        "Refresh the selected Character File before editing a copy",
+                        code="stale_character",
+                    )
+                reference_options["references"] = {
+                    **retained,
+                    "character_copy": {
+                        "artifact_id": source.artifact_id,
+                        "content_sha256": source.content_sha256,
+                        "name": source.name,
+                    },
                 }
         subflow = launch(
             operation_id=operation_id,
@@ -4439,11 +4570,15 @@ def run(
     write_lock = threading.Lock()
     closing = threading.Event()
     resolver_lock = threading.Lock()
-    diagnostic_lock = threading.Lock()
     configured_resolver = provider_resolver
     owner_config_path: Path | None = None
-    diagnostic_path: Path | None = None
+    diagnostics: LocalDiagnostics | None = None
     display_reads: DisplayReads | None = None
+    desktop_updates: Any = None
+    desktop_drafts: Any = None
+    update_installation: Any = None
+    update_startup: Any = None
+    update_start_confirmed = False
 
     def resolve_provider(session: Any) -> Any:
         nonlocal configured_resolver
@@ -4479,13 +4614,39 @@ def run(
         launch = _read_message(input_stream)
         if launch is None:
             raise OwnerProtocolError("Owner launch envelope is missing")
-        supervisor, bus, external_response, owner_id, storage_root = _launch(launch)
-        diagnostic_path = _runtime_diagnostic_path(storage_root)
-        _prepare_runtime_diagnostic(diagnostic_path)
-        _write_runtime_diagnostic(diagnostic_path, event="owner_started")
+        from sylvia_gm.application.desktop_update.manifest import UpdateError
+        from sylvia_gm.application.desktop_update.startup import owner_startup_context
+
+        def validate_update_startup() -> None:
+            nonlocal update_installation, update_startup
+            update_installation, update_startup = owner_startup_context(launch)
+
+        try:
+            validate_update_startup()
+            supervisor, bus, external_response, owner_id, storage_root = _launch(
+                launch, before_migration=validate_update_startup,
+            )
+        except UpdateError as startup_error:
+            if (
+                startup_error.code == "update_recovery_required"
+                and launch.get("desktop_update_context") is not None
+            ):
+                from sylvia_gm.application.desktop_update.recovery_service import run_recovery
+
+                return run_recovery(launch, input_stream, output_stream)
+            _write_message(output_stream, {
+                "ok": False, "type": "update_recovery_required",
+                "error": {"code": "update_recovery_required", "message": (
+                    "The interrupted update must be reconciled before opening saved data."
+                )},
+            })
+            return 2  # No authority acquisition, schema migration or provider work occurred.
+        diagnostics = LocalDiagnostics(storage_root)
         owner_config_path = storage_root / "config.yaml"
         application_owner = supervisor.application_owner()
+        application_owner.prepare_new_campaign_storage()
         _preinstall_bundled_srd(bus)
+        _preinstall_bundled_riichi(bus)
         if application_owner.legacy_builder_contexts():
             migrate_legacy_builder_chats(
                 application_owner, storage_root,
@@ -4523,24 +4684,92 @@ def run(
             params: Mapping[str, Any],
             preparation: ExitStack | None = None,
         ) -> None:
+            nonlocal desktop_updates, desktop_drafts, update_start_confirmed
             started = time.monotonic()
             error_code: str | None = None
             error_type: str | None = None
             try:
-                result = _dispatch(
-                    bus,
-                    method,
-                    params,
-                    application_owner=application_owner,
-                    owner_id=owner_id,
-                    provider_resolver=resolve_provider,
-                    model_choices=list_model_choices,
-                    session_loop=session_loop,
-                    storage_root=storage_root,
-                    reload_provider_resolver=reload_configured_provider,
-                    gm_system_prompt=gm_system_prompt,
-                    provider_work_reserved=preparation is not None,
-                )
+                if method == "desktop_update_confirm_startup":
+                    if set(params) != {"host"} or update_startup is None:
+                        raise OwnerProtocolError("No update startup is awaiting confirmation")
+                    expected = {
+                        "version": update_startup.version,
+                        "target": update_startup.installation.target,
+                        "distribution": update_startup.installation.distribution,
+                    }
+                    if params["host"] != expected:
+                        raise OwnerProtocolError("The native startup context changed")
+                    already_confirmed = update_start_confirmed
+                    update_start_confirmed = update_startup.confirm()
+                    if (
+                        update_start_confirmed and not already_confirmed
+                        and desktop_updates is not None
+                    ):
+                        desktop_updates.startup_completed()
+                    result = {
+                        "status": "confirmed" if update_start_confirmed else "waiting_for_helper",
+                    }
+                elif method in {"load_desktop_drafts", "save_desktop_drafts"}:
+                    if desktop_drafts is None:
+                        from sylvia_gm.application.desktop_update.drafts import DraftStore
+
+                        desktop_drafts = DraftStore(storage_root)
+                    if method == "load_desktop_drafts" and not params:
+                        result = desktop_drafts.load()
+                    elif method == "save_desktop_drafts" and set(params) == {"drafts"}:
+                        result = desktop_drafts.save(params["drafts"])
+                    else:
+                        raise OwnerProtocolError("Unsupported draft storage request")
+                elif method in {
+                    "desktop_update_state", "desktop_update_check", "desktop_update_download",
+                    "desktop_update_cancel", "desktop_update_defer",
+                    "desktop_update_prepare", "desktop_update_handoff",
+                }:
+                    if desktop_updates is None:
+                        from sylvia_gm.application.desktop_update.service import (
+                            DesktopUpdateService,
+                        )
+
+                        desktop_updates = DesktopUpdateService(
+                            storage_root, installation=update_installation,
+                            backup_database=bus.backup_database,
+                            reserved=lambda identity: (
+                                not closing.is_set()
+                                and supervisor.desktop_update_operation() == identity
+                            ),
+                            release=supervisor.abort_desktop_update,
+                        )
+                    result = desktop_updates.handle(method.removeprefix("desktop_update_"), params)
+                elif method == "record_local_fault":
+                    result = diagnostics.client_fault(params.get("category"), params.get("delta"))
+                elif method == "preview_local_report":
+                    result = diagnostics.preview(
+                        kind=params.get("kind"), reproduction=params.get("reproduction", ""),
+                        feedback=params.get("feedback", ""),
+                    )
+                elif method == "cancel_local_report":
+                    diagnostics.cancel(_required_text(params, "preview_id"))
+                    result = {"status": "cancelled"}
+                elif method == "save_local_report":
+                    destination = Path(_required_text(params, "destination_path"))
+                    if not destination.is_absolute() or not destination.name:
+                        raise OwnerProtocolError("Choose a local report file.")
+                    result = diagnostics.save(_required_text(params, "preview_id"), destination)
+                else:
+                    result = _dispatch(
+                        bus,
+                        method,
+                        params,
+                        application_owner=application_owner,
+                        owner_id=owner_id,
+                        provider_resolver=resolve_provider,
+                        model_choices=list_model_choices,
+                        session_loop=session_loop,
+                        storage_root=storage_root,
+                        reload_provider_resolver=reload_configured_provider,
+                        gm_system_prompt=gm_system_prompt,
+                        provider_work_reserved=preparation is not None,
+                    )
                 reply = {"id": request_id, "ok": True, "result": _json_value(result)}
             except (
                 AuthorityError,
@@ -4667,7 +4896,7 @@ def run(
                 error_code = "internal_error"
                 error_type = type(error).__name__
                 print(
-                    f"Sylvia GM owner command failed: {type(error).__name__}",
+                    "Sylvia GM owner command failed: internal_error",
                     file=sys.stderr,
                 )
                 reply = {
@@ -4685,17 +4914,14 @@ def run(
             finally:
                 if preparation is not None:
                     preparation.close()
-            if diagnostic_path is not None:
-                with diagnostic_lock:
-                    _write_runtime_diagnostic(
-                        diagnostic_path,
-                        event="command_completed",
-                        operation=method,
-                        outcome="error" if error_code is not None else "ok",
-                        error_code=error_code,
-                        error_type=error_type,
-                        duration_ms=(time.monotonic() - started) * 1000,
-                    )
+            diagnostic_id = diagnostics.record(
+                "command_completed", operation=method,
+                outcome="error" if error_code is not None else "ok",
+                error_code=error_code, error_type=error_type,
+                duration_ms=(time.monotonic() - started) * 1000,
+            )
+            if error_code is not None:
+                reply["error"]["diagnostic_id"] = diagnostic_id
             write_reply(reply)
 
         def execute_worker(
@@ -4731,6 +4957,77 @@ def run(
             params = request.get("params", {})
             if not isinstance(params, dict):
                 raise OwnerProtocolError("Owner request params must be an object")
+            if update_startup is not None and not update_start_confirmed and method not in {
+                "desktop_update_confirm_startup", "desktop_update_state", "shutdown",
+                "load_desktop_drafts", "save_desktop_drafts", "campaign_index",
+                "builder_chat_index", "provider_settings", "model_choices",
+                "display_snapshot", "player_projection", "player_projection_page",
+                "campaign_panels", "cancel_display_load", "record_local_fault",
+            }:
+                write_reply({"id": request_id, "ok": False, "error": {
+                    "code": "update_startup_unconfirmed",
+                    "message": "Wait for the updated application to confirm startup.",
+                }})
+                continue
+            if supervisor.desktop_update_operation() is not None and method not in {
+                "shutdown", "desktop_update_state", "desktop_update_abort",
+                "desktop_update_reserve", "desktop_update_shutdown",
+                "desktop_update_prepare", "desktop_update_defer", "desktop_update_handoff",
+                "load_desktop_drafts", "save_desktop_drafts",
+                "cancel_display_load", "campaign_index", "builder_chat_index",
+            }:
+                write_reply({"id": request_id, "ok": False, "error": {
+                    "code": "update_in_progress",
+                    "message": (
+                        "Update preparation has reserved this app. "
+                        "Finish or cancel it before changing saved work."
+                    ),
+                }})
+                continue
+            if method in {
+                "desktop_update_reserve", "desktop_update_abort", "desktop_update_shutdown",
+            }:
+                try:
+                    from sylvia_gm.application.desktop_update.storage import operation_id
+
+                    if set(params) != {"operation_id"}:
+                        raise OwnerProtocolError("Unsupported update lifecycle request")
+                    identity = operation_id(params["operation_id"])
+                    if method == "desktop_update_abort":
+                        if desktop_updates is not None:
+                            desktop_updates.abort_preparation(identity)
+                        supervisor.abort_desktop_update(identity)
+                        result = {"status": "aborted"}
+                    else:
+                        with workers_lock:
+                            if (
+                                workers or not display_reads.idle()
+                                or (desktop_updates is not None and desktop_updates.preparing())
+                            ):
+                                raise CommandRejected(
+                                    "Finish admitted work and loading before updating",
+                                    code="update_busy",
+                                )
+                            if method == "desktop_update_reserve":
+                                supervisor.begin_desktop_update(identity)
+                                result = {"status": "reserved"}
+                            elif supervisor.desktop_update_operation() == identity:
+                                if desktop_updates is not None:
+                                    desktop_updates.arm_shutdown(identity)
+                                result = {"status": "closed"}
+                            else:
+                                raise CommandRejected(
+                                    "This update reservation is stale",
+                                    code="stale_update_operation",
+                                )
+                    write_reply({"id": request_id, "ok": True, "result": result})
+                    if result["status"] == "closed":
+                        return 0  # finally closes an idle owner; no provider cancellation/replay.
+                except (AuthorityError, OwnerProtocolError, ValueError) as error:
+                    write_reply({"id": request_id, "ok": False, "error": {
+                        "code": getattr(error, "code", "command_rejected"), "message": str(error),
+                    }})
+                continue
             if method == "shutdown":
                 write_reply({"id": request_id, "ok": True, "result": {"status": "closed"}})
                 return 0
@@ -4755,6 +5052,9 @@ def run(
                 "start_dm_session",
                 "submit_session_input",
                 "manual_retry_session",
+                "ready_campaign_catalog",
+                "start_ready_campaign",
+                "customize_ready_campaign",
             }:
                 preparation = ExitStack()
                 try:
@@ -4763,6 +5063,10 @@ def run(
                         preparation.enter_context(session_loop.provider_request_work(session_id))
                 except (AuthorityError, OwnerProtocolError, ValueError) as error:
                     preparation.close()
+                    diagnostics.record(
+                        "request_rejected", operation=method, outcome="error",
+                        error_code="command_rejected", error_type=type(error).__name__,
+                    )
                     write_reply({"id": request_id, "ok": False, "error": {
                         "code": getattr(error, "code", "command_rejected"), "message": str(error),
                     }})
@@ -4784,13 +5088,16 @@ def run(
                     raise
                 continue
             execute_request(request_id, method, params)
+    except BaseException:
+        if diagnostics is not None:
+            diagnostics.record("owner_failed", outcome="error", error_code="internal_error")
+        raise
     finally:
         closing.set()
+        if desktop_updates is not None:
+            desktop_updates.close()
         if display_reads is not None:
             display_reads.close()
-        if diagnostic_path is not None:
-            with diagnostic_lock:
-                _write_runtime_diagnostic(diagnostic_path, event="owner_stopped")
         if supervisor is not None:
             supervisor.shutdown()
         with workers_lock:
@@ -4799,6 +5106,8 @@ def run(
             worker.join(timeout=5.0)
         if bus is not None:
             bus.close()
+        if diagnostics is not None:
+            diagnostics.close()
 
 
 def main() -> int:
@@ -4810,10 +5119,10 @@ def main() -> int:
         sys.stdin.reconfigure(encoding="utf-8", errors="strict")
         sys.stdout.reconfigure(encoding="utf-8", errors="strict")
         return run(sys.stdin, sys.stdout)
-    except (AuthorityError, OwnerProtocolError, ValueError) as error:
+    except Exception:
         # Startup errors go to stderr because no request id exists yet. Never
         # include the launch envelope, credential, or authority path.
-        print(f"Sylvia GM owner startup failed: {type(error).__name__}", file=sys.stderr)
+        print("Sylvia GM owner startup failed", file=sys.stderr)
         return 2
 
 

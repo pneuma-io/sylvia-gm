@@ -10,6 +10,122 @@ Read the relevant section instead of truncating a large definition.
 
 ## Current inventory
 
+Coordinate-map occupied space can be declared independently of physical body clearance. A
+`coordinate_map` source may supply `occupied_space` with an `actors` state source and a
+`declaration` literal object containing `convention`, `category_field` and `widths`. The
+category is an explicit integer index into positive diameters in map units. Actor binding
+uses the surface's declared `actor_reference`; the projection exposes only the resolved
+diameter and convention, never the underlying actor records. Missing or invalid categories
+produce an unavailable-space diagnostic. They do not acquire a default diameter.
+
+SRD Lite selects `srd.5.2.1.control-circle.v1`: Tiny, Small, Medium, Large, Huge and
+Gargantuan use diameters 2.5, 5, 5, 10, 15 and 20 feet, from saved `size_rank` 0 through 5.
+This is the owner-selected gridless adaptation of the square combat spaces in
+[SRD 5.2.1, page 14](https://media.dndbeyond.com/compendium-images/srd/5.2/SRD_CC_v5.2.1.pdf#page=14).
+It does not describe physical body width or claim that circles equal tabletop squares.
+The centre is authoritative XY; elevation remains the saved base Z with a separate height label.
+Physical boxes, radii, facing and heights remain unchanged for walls, range and spell geometry.
+
+The neutral `circle_overlap` query accepts two active scene identities, their explicit
+positive radii and a destination. It returns the open overlap interval, source occupancy
+and endpoint occupancy, with ordinary spatial provenance. Horizontal tangency and vertical
+body-face contact are clear. Vertical relevance uses the existing physical base Z and body
+height. It uses the shared engine's 1e-12 numerical tolerance, not a sampled physics loop.
+Packages require `spatial_circle_overlap.v1` to consume it.
+An optional `origin` prices or checks a later segment without relocating the mover.
+Within an action, an identical explicit-origin overlap can reuse its first proof when
+the fixed position and both body heights are unchanged. Current body admission runs
+before reuse, and the result retains the original snapshot identity. Default-origin
+queries and explicitly selected snapshots keep their exact snapshot identity. The
+128-record evidence cap and shared operation budget remain in force.
+Equivalent finite numeric encodings, including signed zero, share overlap proof keys
+after admission. Admitted inputs, recorded queries and returned provenance remain intact.
+
+`spatial_circle_route.v1` adds the neutral `circle_route` query. Packages supply the
+moving entity and radius, destination, metadata selector, and up to 64 active entity
+circles with explicit radii and passage-blocking flags. The engine selects a deterministic
+polyline around blocking circles using circumscribed polygons. Their base 16
+support lines gain facing tangents for disjoint circle pairs, preserving narrow passages
+between their declared circles. Lazy A* tests candidate edges in Euclidean lower-bound
+order rather than checking every outgoing edge before advancing. Every selected leg checks
+continuous circle overlap, physical footprint clearance and map bounds. Intermediate
+endpoints also avoid passable creatures. Search is bounded to 16 blocking circles and
+16,384 edge tests; exhaustion is reported, and no continuous-space shortest-path claim is made.
+For elevation changes, polygon supports use both endpoint elevations and include blockers
+whose body heights overlap the intervening elevation range. Every sloped leg uses the
+same continuous three-dimensional clearance checks and Euclidean distance as direct moves.
+No intermediate elevations are generated; the existing search bounds still apply.
+Optional `edge_costs` supplies up to 16,384 directed `{start, end, cost}` records, each
+priced at least at its geometric distance. Unknown edges retain Euclidean lower bounds;
+the engine interprets only numeric prices. Returned `distance` remains physical length.
+SRD admits the requested endpoint separately and prices candidate legs through its existing
+Difficult Terrain union and movement modifiers. If a candidate is unaffordable, it feeds those
+prices back into the graph and tries again, for at most eight candidates sharing the original
+16,384 edge-test allowance and the existing action-operation budget. Exhaustion refuses
+without spending; this bounded search does not guarantee terrain-optimal continuous routing.
+Detour preparation retains native eligibility and movement-mode budget refresh without
+requiring the initial geometric leg to be affordable. The selected route's total still
+passes the original affordability guard and clamp before any leg is committed.
+It checks the full selected budget and executes each leg through the existing
+movement and Reaction owners. A saved Reaction retains the final destination for replanning.
+Only a forbidden direct creature crossing selects detour search. Other moves retain the
+original clearance, cost and special-form qualifiers.
+The preview draws the selected visible-scene route and quotes its qualified movement cost.
+Its first and last points retain the actor position and requested destination, including
+elevation. Full-scene execution can take a different route without exposing hidden creatures
+in advance.
+
+The runtime admission and Lite builder limits are 501,000 structural nodes. The additional
+1,000 nodes accommodate route declarations above the retained 499,980-node package; depth,
+member, byte and per-action execution limits are unchanged.
+
+`player_controls.preflight` may name up to four deterministic private tools, in order,
+under `player_action_preflight.v1`. They receive the action's matching parameters and
+run on disposable owner memory with the existing shared operation/depth budget. Context
+and derived state projections may refresh there; dice, spatial mutation, participant
+mutation, publication and choice effects are rejected before execution. No preflight
+mutations reach campaign persistence. Availability and preview cards use player-known
+spatial facts and selected scalar results. SRD reuses its actual
+endpoint and route/budget qualifiers, then requires confirmation before commitment.
+`player_controls.preflight_path`, under `player_action_preflight_path.v1`, explicitly names
+the `scene`, local `route` result and scalar `cost` from those qualifiers. Only successful,
+untruncated paths of 2 to 1,024 finite three-dimensional points within map bounds are drawn.
+The player-spatial bridge computes this drawing; full-scene preflight context is never exported.
+Only map identity/revision, points, cost and found/truncated flags reach the renderer. Snapshot
+hashes, evidence, query inputs, metadata and hidden geometry remain private. This declaration
+is separate from query-based `map_preview` and cannot be combined with it.
+Nested state and participant scene reads use the same visible membership as spatial
+queries, including deterministic preflights. Mechanical metadata on visible rows stays
+inside Ruleset evaluation so actor references and visible terrain costs remain usable;
+renderer projections still expose only the closed public display record. Preview and
+button-readiness checks use this view. Admission and execution recheck the full scene,
+so an undisclosed obstacle or terrain cost can still change the committed outcome.
+Required panel confirmation binds the known-scene parameters, selected intent, revision,
+operation and package. Execution validates that same confirmation while retaining its
+independently resolved full-scene route and costs. An undisclosed detour does not require
+revealing the route or obtaining a different confirmation; changed intent and stale requests
+remain refused.
+For preflight-backed actions, the declared result card accompanies the existing safe
+map drawing; a generic segment-distance card cannot replace the declared action cost.
+
+SRD owns passage permission, using explicit `ally_state_ids`, Incapacitated (including
+conditions that impose it), Tiny, and the two-category size difference. Friendly attitude
+alone is insufficient. Declared Halfling Nimbleness also permits passage through a
+larger creature; it grants neither an occupied endpoint nor relief from Difficult Terrain.
+Creature-space intervals join the existing Difficult Terrain cost
+union once; ally and Tiny spaces add no surcharge. The SRD budget qualifier allows
+1e-9 foot of comparison tolerance and clamps the final charge to the remaining
+budget within that tolerance. This prevents interval arithmetic residue from
+denying the final movement or producing a negative budget. Route costs, positions,
+physical dimensions and spatial-query geometry retain their original precision.
+The ordinary action qualifies the requested endpoint before opportunity/environment subdivision. A subdivision may stop
+temporarily within permitted space; the requested willing endpoint may not. Existing
+source overlap can be left. Turn end applies Prone unless the mover is Tiny, larger than
+the overlapping creature, immune to Prone, or has the existing source-owned space-sharing
+exception. Mounted bodies retain their authenticated seat heights and receiver; teleport
+and forced-relocation owners retain their existing semantics. Saved campaigns are not
+converted. Declare or repair missing categories explicitly through the existing authoring path.
+
 | Definition | Authored content and owning admission boundary |
 | --- | --- |
 | `ruleset_source` | Compact `ruleset-source.yaml`; Ruleset compiler and draft checker. |
@@ -103,6 +219,149 @@ Greetings, scenarios and examples are reference material. They are not played
 history. Foreign prompts, macros, regex and scripts remain inert; no expansion,
 fetch, execution, provider-policy change or tool authority follows from them.
 Narrative abilities do not grant mechanical powers.
+
+## Grouped piece tables
+
+A panel can select `renderer: piece_table` with the ordinary `state`, `literal`, or
+composed source declaration. Its source resolves to a closed version-1 object:
+
+```json
+{
+  "format": 1,
+  "title": "Relay console",
+  "status": [{"label": "Cycle", "value": "3"}],
+  "areas": [{
+    "id": "relay", "label": "Relay", "position": "center",
+    "groups": [{
+      "id": "route", "label": "Route", "visibility": "public",
+      "pieces": [{"id": "a", "label": "A", "detail": "Online", "emphasis": "accent"}]
+    }]
+  }]
+}
+```
+
+Use each of `top`, `left`, `center`, `right`, and `bottom` at most once. Narrow
+panels stack areas in declaration order. Each area contains ordered groups, and
+each group contains ordered pieces. Status values and all labels are plain text.
+Pieces may use `normal`, `accent`, or `muted` emphasis. There is no package HTML,
+JavaScript, remote asset loading, or renderer-owned gameplay state.
+
+An owner-only group sets `visibility: owner` and `owner` to an admitted participant
+identity. The owner resolves viewing identities through the Ruleset's existing
+`model_decision_boundary.participant_control` declaration and canonical participants,
+independently of whose turn it is. Missing control declarations reveal no private
+pieces. A concealed group exposes its label and, only with `show_count: true`, its
+piece count. Neither the hidden pieces nor the original source are sent to the UI.
+Public metadata must itself be suitable for all viewers.
+
+A piece may reference `action_id`, the identity of one of this panel's declared
+actions. This renders an ordinary action button. An action can declare
+`bindings: {selected_piece: piece}` to bind the clicked piece's opaque identity
+to its `selected_piece` tool parameter. The owner resolves the identity from the
+current permitted table and checks that the piece advertises that action. Hidden,
+missing, or differently bound pieces and extra selection fields are rejected.
+The selection cannot replace fixed parameters or bypass existing revision,
+capability, player-control, or command admission. Availability checks are specific
+to the selected piece; the Ruleset still decides whether that move is legal.
+Avoid private values in action declarations: declarations are public presentation.
+The Ruleset still computes legal actions, scoring and state transitions. Invalid
+tables show an unavailable message with no table controls.
+
+Limits are five areas, 16 status values, 64 groups total, 256 pieces per group,
+1,024 pieces total, and 256 UTF-8 bytes per label. Piece identities are unique
+within their group; area identities and positions are unique within the table.
+The synthetic `tests/fixtures/piece-table/signal-console.json` demonstrates a
+non-Mahjong composition with private programs and a public route.
+
+## Private collections and public results
+
+`state_schemas` defaults to `visibility: public`. An engine-owned root declares
+`visibility: engine` and requires `private_state.v1`. Canonical mechanics and saves
+retain it; desktop snapshots, mutation history on the desktop wire, general GM context
+and the ordinary current-state reference exclude it. A Ruleset may declare a bounded
+panel projection and the existing active-actor decision scope for permitted views.
+Fresh GM context includes that permitted decision scope, taken with public state
+from the same revision, including when a session resumes before its first action.
+Rulesets without private roots retain their existing GM context payload.
+The optional `actor_participant_field` binds a seat entity to a canonical participant;
+it does not accept a viewer identity from the client.
+
+An explicit `model_decision_boundary.isolated_participant` declaration opts into
+`isolated_participants.v1`. It declares `instructions`, actor-relative
+`observation_path`, optional `persona_path`, `actions_path`, and a
+`public_observation: {namespace, key}` state reference. Paths contain at most eight
+identifier segments. Instructions and persona are bounded to 8 KiB each; the
+serialized observation envelope is bounded to 128 KiB. The action list contains
+at most 256 closed offers `{id, label, operation, arguments}`. Operations and
+arguments must match this exact primary package's admitted catalog and schema.
+
+The configured provider receives only that actor's envelope and compatible own
+history. Its sole proposal tool selects an offered `action_id`; the host supplies
+the actor, turn, package, revision, operation and arguments. Ordinary engine
+admission still decides legality. Every public action in an opted-in Ruleset must
+explicitly `publish` its public result. GM context receives the declared public
+observation and committed published results while retaining campaign dialogue.
+Raw offer arguments, private state and participant native continuations stay out
+of GM history. Save/reopen retains valid actor-owned history; unavailable private
+history starts fresh without falling back to GM messages. Packages without this
+opt-in retain ordinary GM and side-scope behavior.
+
+Required non-choice engine transitions run before participant dispatch. After each
+commit, the host refreshes the catalog and state before constructing an actor
+envelope. An OOC-only player message leaves opted-in gameplay pending: GM reference
+and Campaign File work remain available, while automatic gameplay and participant
+decisions wait for a gameplay input. Stop/redirection uses the ordinary session
+interruption path and retains any already committed results.
+
+On the ChatGPT-account and OpenRouter routes, fixed authority instructions precede
+reusable owned history; labelled fresh application data follows it, with current
+engine state last. The final participant observation similarly follows that
+participant's own history. `select_actor_action.action_id` has a stable bounded
+string schema; current offers stay in the latest observation and are validated
+against the immutable host envelope. Other admitted tools retain their current
+authorization boundaries, including changing eligible secrets or operations.
+
+This ordering is a provider-wire projection after logical recovery and working
+context selection. Saved history and the event loop retain their original roles,
+chronological task boundaries and receipt ownership. A completed prior Campaign
+File disposition cannot settle a new direct-action response. Structured values
+in direct-response, GM/player-boundary, opening and interruption controls move
+to matching `*_VALUES` records; their fixed directives retain the system role.
+The prefix is stable for changes to those values within the same workflow and
+tool contract. Different GM/player or recovery workflows, corrective controls,
+Ruleset instructions, model/provider choices and authorized tool availability
+can legitimately change it. This is not universal instruction invariance.
+
+OpenRouter receives an opaque `session_id` derived from the campaign, session,
+package and configured model/provider compatibility, plus the stable actor for
+participant contexts. Revisions, turn IDs, offer IDs and display names do not
+enter that routing identity. No backend provider is pinned. ChatGPT continues to
+use application-owned history and ephemeral App Server threads; supported state
+and control values follow reusable history instead of fixed instructions. Compaction notes remain
+fallible historical data and preserve the player's latest correction exactly.
+
+Cache read/write usage is nullable: missing fields are unavailable, while a
+reported zero remains zero. ChatGPT uses the matching thread/turn's latest
+`tokenUsage.last`, never additive `total` notifications. OpenRouter usage reads
+`cached_tokens` and `cache_write_tokens` from returned token details. Session and
+model totals include counts of requests that reported each cache field. These
+are observed token counts, not a guarantee of cache hits, billing discounts or
+ChatGPT allowance savings.
+
+Engine-private action arguments remain canonical in storage for ledger integrity.
+Desktop/player snapshots and public replay projections omit those arguments;
+this does not alter the saved action, its receipt or its idempotency identity.
+
+`collection_mechanics.v1` provides bounded pure value operations (`indices`, `portion`,
+`joined`, `replaced`, `without`, `occurrences`, `one`, `ordered`, `text`, `total`),
+exact multiset `partitions` and `completions`, and a `shuffle` effect. Searches consume
+the shared execution budget. A shuffle samples a private order independent of public
+action IDs, commits that order, and cannot precede a pending `request_choice` in the
+same action. Retry and reopen use committed state rather than sampling again.
+
+`public_results.v1` supplies `publish: {fields: {...}}`. It selects the action's public
+result context while nested mechanics may retain private calculations. Hidden shuffles
+require explicit publication; raw temporary variables must not become results.
 
 ## Plan completion
 

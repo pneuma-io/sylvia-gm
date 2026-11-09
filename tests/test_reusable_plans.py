@@ -29,6 +29,7 @@ def _signal_plan() -> tuple[dict[str, object], str]:
     payload["id"] = "signal-echoes"
     payload["title"] = "Echoes Across Static"
     payload["premise"] = "Trace a missing signal through an unfamiliar system."
+    payload["initial_state"] = {"facts": [], "mechanics": [], "entities": []}
     payload["bindings"] = {
         "ruleset": {
             "id": "example.signal-rules",

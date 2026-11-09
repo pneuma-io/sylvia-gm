@@ -8,11 +8,12 @@ import hashlib
 import io
 import json
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
 from sylvia_gm.application.bundled_campaign_plans import selected_campaign_plan
+from sylvia_gm.application.bundled_starter_characters import available_reusable_participants
 from sylvia_gm.application.campaign_plan_sources import (
     CampaignPlanToolAuthority,
     campaign_plan_sources,
@@ -30,7 +31,6 @@ from sylvia_gm.application.package_runtime import (
 )
 from sylvia_gm.application.reusable_participants import (
     ReusableParticipant,
-    compatible_reusable_participants,
     parse_setting_character,
 )
 from sylvia_gm.application.reusable_plans import ReusableCampaignPlan
@@ -115,11 +115,19 @@ class CampaignLibrarySelection:
         def row_for(item: ReusableParticipant) -> dict[str, object]:
             row = dict(_participant_choice(item, self.entity_reference))
             row["label"] = item.name
+            if item.builtin_starter:
+                row["starter_preview"] = {
+                    "authored_profile": item.authored_profile,
+                    "participant": json.loads(canonical_json_bytes(item.participant)),
+                    "entity_state": json.loads(canonical_json_bytes(item.entity_state)),
+                }
             return row
 
-        for item in self.participants:
-            rows[item.role].append(row_for(item))
         policy = parse_starting_party_policy(self.plan.plan.payload["starting_party"])
+        for item in self.participants:
+            if item.role == "player_character" and policy.fixed_player_character is not None:
+                continue
+            rows[item.role].append(row_for(item))
         available = {item.artifact_id: item for item in self.required_participants}
         for role, reference in _required_character_references(policy):
             item = available.get(reference.character_id)
@@ -236,7 +244,7 @@ def require_completed_plan_characters(
     )
 
 
-def resolve_campaign_library_selection(
+def resolve_campaign_plan_selection(
     owner: AuthorityOwner,
     storage_root: Path,
     *,
@@ -244,7 +252,7 @@ def resolve_campaign_library_selection(
     setting_id: str,
     plan_id: str,
 ) -> CampaignLibrarySelection:
-    """Revalidate saved Plan and participant identities; picker metadata grants no authority."""
+    """Resolve exact Plan sources and required files without discovering the character library."""
     retained = selected_campaign_plan(
         storage_root,
         plan_id,
@@ -294,27 +302,12 @@ def resolve_campaign_library_selection(
         declarations = owner.exact_participant_declarations(
             primary.package_id, primary.version, primary.sha256
         )
-        participants = tuple(
-            item
-            for declaration in declarations
-            for item in compatible_reusable_participants(
-                storage_root,
-                package=primary,
-                declaration=declaration,
-                campaign_setting=sources.setting,
-                setting_character_schema=sources.setting_character_schema,
-            )
-        )
         required_participants = read_required_plan_characters(
             sources,
             parse_starting_party_policy(plan.plan.payload["starting_party"]),
             primary,
             declarations,
         )
-        if {item.artifact_id for item in participants} & {
-            item.artifact_id for item in required_participants
-        }:
-            raise ValueError("Setting and local Character File identities conflict")
         reference = _character_state_reference(
             owner, primary.package_id, primary.version, primary.sha256,
         )
@@ -327,10 +320,48 @@ def resolve_campaign_library_selection(
         candidate,
         sources,
         plan,
-        participants,
+        (),
         reference,
         required_participants,
     )
+
+
+def resolve_campaign_library_selection(
+    owner: AuthorityOwner,
+    storage_root: Path,
+    *,
+    candidate_id: str,
+    setting_id: str,
+    plan_id: str,
+) -> CampaignLibrarySelection:
+    """Revalidate ordinary picker choices, including compatible saved files and starters."""
+    selection = resolve_campaign_plan_selection(
+        owner, storage_root, candidate_id=candidate_id, setting_id=setting_id, plan_id=plan_id,
+    )
+    primary = next(entry for entry in selection.candidate.package_lock.entries
+                   if entry.role is PackageRole.PRIMARY)
+    try:
+        participants = tuple(
+            item
+            for declaration in owner.exact_participant_declarations(
+                primary.package_id, primary.version, primary.sha256,
+            )
+            for item in available_reusable_participants(
+                storage_root, package=primary, declaration=declaration,
+                campaign_setting=selection.sources.setting,
+                setting_character_schema=selection.sources.setting_character_schema,
+            )
+        )
+        if {item.artifact_id for item in participants} & {
+            item.artifact_id for item in selection.required_participants
+        }:
+            raise ValueError("Setting and local Character File identities conflict")
+    except (OSError, UnicodeError, ValueError) as error:
+        raise CommandRejected(
+            "The selected campaign content is unavailable or incompatible; refresh its choices",
+            code="campaign_library_selection_invalid",
+        ) from error
+    return replace(selection, participants=participants)
 
 
 def materialize_library_party(

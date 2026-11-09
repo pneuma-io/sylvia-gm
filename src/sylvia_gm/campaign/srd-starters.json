@@ -1,0 +1,1710 @@
+[
+  {
+    "id": "barbarian",
+    "summary": "Barbarian · Level 1. Close melee with a greataxe. Rage has two uses; regain one on a Short Rest and all on a Long Rest.",
+    "authored_profile": "# Mara Flint\n\nHuman Barbarian, level 1. Pronouns: they/them.\n\nWarm and blunt; always offers to carry the awkward bag. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Mara\n\nClose melee with a greataxe. Rage has two uses; regain one on a Short Rest and all on a Long Rest.\n\n## Creation choices\n\nStandard array, then the Soldier background increases, is reflected in the final ability scores. Soldier supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies nature. Skilled choices: insight stealth acrobatics. Class skill choices: perception survival. Starting equipment uses class option A and background option A, with 29 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
+    "participant": {
+      "name": "Mara Flint",
+      "level": 1,
+      "species": "Human",
+      "background": "Soldier",
+      "classes": [
+        {
+          "id": "barbarian",
+          "level": 1
+        }
+      ],
+      "abilities": {
+        "strength": 17,
+        "dexterity": 14,
+        "constitution": 14,
+        "intelligence": 10,
+        "wisdom": 12,
+        "charisma": 8
+      },
+      "speed": 30,
+      "size_rank": 1,
+      "saving_throw_proficiencies": [
+        "strength",
+        "constitution"
+      ],
+      "origin_feats": [
+        "savage_attacker",
+        "skilled"
+      ],
+      "skill_proficiencies": [
+        "athletics",
+        "intimidation",
+        "perception",
+        "survival",
+        "nature",
+        "insight",
+        "stealth",
+        "acrobatics"
+      ],
+      "tool_proficiencies": [
+        "gaming_set_dice"
+      ],
+      "weapon_proficiencies": [
+        "simple_weapons",
+        "martial_weapons"
+      ],
+      "spellcasting_grants": [],
+      "weapon_masteries": [
+        "greataxe",
+        "handaxe"
+      ]
+    },
+    "entity_state": {
+      "max_hp": 14,
+      "hit_die_size": 12,
+      "inventory": [
+        "greataxe",
+        "handaxe",
+        "explorers_pack",
+        "gp",
+        "spear",
+        "shortbow",
+        "arrow",
+        "gaming_set_dice",
+        "healers_kit",
+        "quiver",
+        "travelers_clothes"
+      ],
+      "inventory_quantities": {
+        "greataxe": 1,
+        "handaxe": 4,
+        "explorers_pack": 1,
+        "gp": 29,
+        "spear": 1,
+        "shortbow": 1,
+        "arrow": 20,
+        "gaming_set_dice": 1,
+        "healers_kit": 1,
+        "quiver": 1,
+        "travelers_clothes": 1
+      },
+      "available_bonus_actions": [],
+      "prepared_spells": [],
+      "resources": {
+        "hit_die": 1,
+        "rage": 2
+      },
+      "resource_maxima": {
+        "hit_die": 1,
+        "rage": 2
+      },
+      "conditions": [],
+      "damage_immunities": [],
+      "damage_resistances": [],
+      "damage_vulnerabilities": [],
+      "worn_armor": null,
+      "worn_shield": null,
+      "weapon_sets": {
+        "format": 1,
+        "active_set": "melee",
+        "melee": {
+          "main_hand": "greataxe",
+          "off_hand": "greataxe"
+        },
+        "ranged": {
+          "main_hand": null,
+          "off_hand": null
+        }
+      },
+      "ammunition": {
+        "arrow": 20
+      },
+      "ammunition_expended": {
+        "arrow": 0
+      }
+    }
+  },
+  {
+    "id": "bard",
+    "summary": "Bard · Level 1. Help allies and talk your way through trouble. Vicious Mockery is your repeatable attack; save Healing Word for an ally who needs help.",
+    "authored_profile": "# Neri Vale\n\nHuman Bard, level 1. Pronouns: they/them.\n\nCurious and playful; collects odd turns of phrase. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Neri\n\nHelp allies and talk your way through trouble. Vicious Mockery is your repeatable attack; save Healing Word for an ally who needs help.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: acrobatics investigation stealth. Class skill choices: persuasion deception performance. Starting equipment uses class option A and background option A, with 27 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
+    "participant": {
+      "name": "Neri Vale",
+      "level": 1,
+      "species": "Human",
+      "background": "Acolyte",
+      "classes": [
+        {
+          "id": "bard",
+          "level": 1
+        }
+      ],
+      "abilities": {
+        "strength": 8,
+        "dexterity": 14,
+        "constitution": 13,
+        "intelligence": 11,
+        "wisdom": 12,
+        "charisma": 17
+      },
+      "speed": 30,
+      "size_rank": 1,
+      "saving_throw_proficiencies": [
+        "dexterity",
+        "charisma"
+      ],
+      "origin_feats": [
+        "magic_initiate",
+        "skilled"
+      ],
+      "skill_proficiencies": [
+        "insight",
+        "religion",
+        "persuasion",
+        "deception",
+        "performance",
+        "perception",
+        "acrobatics",
+        "investigation",
+        "stealth"
+      ],
+      "tool_proficiencies": [
+        "calligraphers_supplies",
+        "musical_instrument_lute",
+        "musical_instrument_flute",
+        "musical_instrument_drum"
+      ],
+      "weapon_proficiencies": [
+        "simple_weapons"
+      ],
+      "spellcasting_grants": [
+        {
+          "source": "bard",
+          "ability": "charisma",
+          "spells": [
+            "vicious_mockery",
+            "mage_hand",
+            "cure_wounds",
+            "dissonant_whispers",
+            "sleep",
+            "thunderwave"
+          ]
+        },
+        {
+          "source": "magic_initiate_cleric",
+          "ability": "charisma",
+          "spells": [
+            "guidance",
+            "light",
+            "healing_word"
+          ]
+        }
+      ]
+    },
+    "entity_state": {
+      "max_hp": 9,
+      "hit_die_size": 8,
+      "inventory": [
+        "leather",
+        "dagger",
+        "lute",
+        "entertainers_pack",
+        "gp",
+        "calligraphers_supplies",
+        "book_prayers",
+        "parchment",
+        "robe",
+        "holy_symbol"
+      ],
+      "inventory_quantities": {
+        "leather": 1,
+        "dagger": 2,
+        "lute": 1,
+        "entertainers_pack": 1,
+        "gp": 27,
+        "calligraphers_supplies": 1,
+        "book_prayers": 1,
+        "parchment": 10,
+        "robe": 1,
+        "holy_symbol": 1
+      },
+      "available_bonus_actions": [],
+      "prepared_spells": [
+        "vicious_mockery",
+        "mage_hand",
+        "cure_wounds",
+        "dissonant_whispers",
+        "sleep",
+        "thunderwave",
+        "guidance",
+        "light",
+        "healing_word"
+      ],
+      "resources": {
+        "hit_die": 1,
+        "spell_slot_1": 2,
+        "bardic_inspiration": 3
+      },
+      "resource_maxima": {
+        "hit_die": 1,
+        "spell_slot_1": 2,
+        "bardic_inspiration": 3
+      },
+      "conditions": [],
+      "damage_immunities": [],
+      "damage_resistances": [],
+      "damage_vulnerabilities": [],
+      "worn_armor": {
+        "armor_type": "leather_armor",
+        "inventory_item": "leather",
+        "magic_bonus": 0
+      },
+      "worn_shield": null,
+      "weapon_sets": {
+        "format": 1,
+        "active_set": "melee",
+        "melee": {
+          "main_hand": "dagger",
+          "off_hand": null
+        },
+        "ranged": {
+          "main_hand": null,
+          "off_hand": null
+        }
+      }
+    }
+  },
+  {
+    "id": "cleric",
+    "summary": "Cleric · Level 1. Protect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies.",
+    "authored_profile": "# Oren Reed\n\nHuman Cleric, level 1. Pronouns: they/them.\n\nPatient and practical; asks what would help before offering advice. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Oren\n\nProtect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies. Divine Order: Protector.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: history survival athletics. Class skill choices: medicine persuasion. Starting equipment uses class option A and background option A, with 15 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
+    "participant": {
+      "name": "Oren Reed",
+      "level": 1,
+      "species": "Human",
+      "background": "Acolyte",
+      "classes": [
+        {
+          "id": "cleric",
+          "level": 1
+        }
+      ],
+      "abilities": {
+        "strength": 12,
+        "dexterity": 14,
+        "constitution": 13,
+        "intelligence": 11,
+        "wisdom": 17,
+        "charisma": 8
+      },
+      "speed": 30,
+      "size_rank": 1,
+      "saving_throw_proficiencies": [
+        "wisdom",
+        "charisma"
+      ],
+      "origin_feats": [
+        "magic_initiate",
+        "skilled"
+      ],
+      "skill_proficiencies": [
+        "insight",
+        "religion",
+        "medicine",
+        "persuasion",
+        "perception",
+        "history",
+        "survival",
+        "athletics"
+      ],
+      "tool_proficiencies": [
+        "calligraphers_supplies"
+      ],
+      "weapon_proficiencies": [
+        "simple_weapons",
+        "martial_weapons"
+      ],
+      "spellcasting_grants": [
+        {
+          "source": "cleric",
+          "ability": "wisdom",
+          "spells": [
+            "guidance",
+            "sacred_flame",
+            "light",
+            "bless",
+            "cure_wounds",
+            "guiding_bolt",
+            "healing_word"
+          ]
+        },
+        {
+          "source": "magic_initiate_cleric",
+          "ability": "wisdom",
+          "spells": [
+            "spare_the_dying",
+            "mending",
+            "command"
+          ]
+        }
+      ],
+      "cleric_order": "protector"
+    },
+    "entity_state": {
+      "max_hp": 9,
+      "hit_die_size": 8,
+      "inventory": [
+        "chain_shirt",
+        "shield",
+        "mace",
+        "holy_symbol",
+        "priests_pack",
+        "gp",
+        "calligraphers_supplies",
+        "book_prayers",
+        "parchment",
+        "robe"
+      ],
+      "inventory_quantities": {
+        "chain_shirt": 1,
+        "shield": 1,
+        "mace": 1,
+        "holy_symbol": 2,
+        "priests_pack": 1,
+        "gp": 15,
+        "calligraphers_supplies": 1,
+        "book_prayers": 1,
+        "parchment": 10,
+        "robe": 1
+      },
+      "available_bonus_actions": [],
+      "prepared_spells": [
+        "guidance",
+        "sacred_flame",
+        "light",
+        "bless",
+        "cure_wounds",
+        "guiding_bolt",
+        "healing_word",
+        "spare_the_dying",
+        "mending",
+        "command"
+      ],
+      "resources": {
+        "hit_die": 1,
+        "spell_slot_1": 2
+      },
+      "resource_maxima": {
+        "hit_die": 1,
+        "spell_slot_1": 2
+      },
+      "conditions": [],
+      "damage_immunities": [],
+      "damage_resistances": [],
+      "damage_vulnerabilities": [],
+      "worn_armor": {
+        "armor_type": "chain_shirt",
+        "inventory_item": "chain_shirt",
+        "magic_bonus": 0
+      },
+      "worn_shield": {
+        "armor_type": "shield",
+        "inventory_item": "shield",
+        "magic_bonus": 0
+      },
+      "weapon_sets": {
+        "format": 1,
+        "active_set": "melee",
+        "melee": {
+          "main_hand": "mace",
+          "off_hand": "shield"
+        },
+        "ranged": {
+          "main_hand": null,
+          "off_hand": null
+        }
+      }
+    }
+  },
+  {
+    "id": "druid",
+    "summary": "Druid · Level 1. Control space with Fog Cloud and attack with Starry Wisp. Cure Wounds helps an injured ally; Wild Shape arrives at level two.",
+    "authored_profile": "# Sela Moss\n\nHuman Druid, level 1. Pronouns: they/them.\n\nQuietly amused; notices small changes in weather and mood. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Sela\n\nControl space with Fog Cloud and attack with Starry Wisp. Cure Wounds helps an injured ally; Wild Shape arrives at level two. Primal Order: Warden. Druidic is known. The quarterstaff is the Druidic Focus.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: animal handling medicine stealth. Class skill choices: nature survival. Starting equipment uses class option A and background option A, with 17 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
+    "participant": {
+      "name": "Sela Moss",
+      "level": 1,
+      "species": "Human",
+      "background": "Acolyte",
+      "classes": [
+        {
+          "id": "druid",
+          "level": 1
+        }
+      ],
+      "abilities": {
+        "strength": 12,
+        "dexterity": 14,
+        "constitution": 13,
+        "intelligence": 11,
+        "wisdom": 17,
+        "charisma": 8
+      },
+      "speed": 30,
+      "size_rank": 1,
+      "saving_throw_proficiencies": [
+        "intelligence",
+        "wisdom"
+      ],
+      "origin_feats": [
+        "magic_initiate",
+        "skilled"
+      ],
+      "skill_proficiencies": [
+        "insight",
+        "religion",
+        "nature",
+        "survival",
+        "perception",
+        "animal_handling",
+        "medicine",
+        "stealth"
+      ],
+      "tool_proficiencies": [
+        "calligraphers_supplies",
+        "herbalism_kit"
+      ],
+      "weapon_proficiencies": [
+        "simple_weapons",
+        "martial_weapons"
+      ],
+      "spellcasting_grants": [
+        {
+          "source": "druid",
+          "ability": "wisdom",
+          "spells": [
+            "guidance",
+            "starry_wisp",
+            "cure_wounds",
+            "fog_cloud",
+            "ice_knife",
+            "longstrider"
+          ]
+        },
+        {
+          "source": "druidic",
+          "ability": "wisdom",
+          "spells": [
+            "speak_with_animals"
+          ]
+        },
+        {
+          "source": "magic_initiate_cleric",
+          "ability": "wisdom",
+          "spells": [
+            "light",
+            "mending",
+            "healing_word"
+          ]
+        }
+      ],
+      "druid_order": "warden"
+    },
+    "entity_state": {
+      "max_hp": 9,
+      "hit_die_size": 8,
+      "inventory": [
+        "leather",
+        "shield",
+        "sickle",
+        "quarterstaff",
+        "explorers_pack",
+        "herbalism_kit",
+        "gp",
+        "calligraphers_supplies",
+        "book_prayers",
+        "parchment",
+        "robe",
+        "holy_symbol"
+      ],
+      "inventory_quantities": {
+        "leather": 1,
+        "shield": 1,
+        "sickle": 1,
+        "quarterstaff": 1,
+        "explorers_pack": 1,
+        "herbalism_kit": 1,
+        "gp": 17,
+        "calligraphers_supplies": 1,
+        "book_prayers": 1,
+        "parchment": 10,
+        "robe": 1,
+        "holy_symbol": 1
+      },
+      "available_bonus_actions": [],
+      "prepared_spells": [
+        "guidance",
+        "starry_wisp",
+        "cure_wounds",
+        "fog_cloud",
+        "ice_knife",
+        "longstrider",
+        "speak_with_animals",
+        "light",
+        "mending",
+        "healing_word"
+      ],
+      "resources": {
+        "hit_die": 1,
+        "spell_slot_1": 2
+      },
+      "resource_maxima": {
+        "hit_die": 1,
+        "spell_slot_1": 2
+      },
+      "conditions": [],
+      "damage_immunities": [],
+      "damage_resistances": [],
+      "damage_vulnerabilities": [],
+      "worn_armor": {
+        "armor_type": "leather_armor",
+        "inventory_item": "leather",
+        "magic_bonus": 0
+      },
+      "worn_shield": {
+        "armor_type": "shield",
+        "inventory_item": "shield",
+        "magic_bonus": 0
+      },
+      "weapon_sets": {
+        "format": 1,
+        "active_set": "melee",
+        "melee": {
+          "main_hand": "quarterstaff",
+          "off_hand": "shield"
+        },
+        "ranged": {
+          "main_hand": null,
+          "off_hand": null
+        }
+      }
+    }
+  },
+  {
+    "id": "fighter",
+    "summary": "Fighter · Level 1. A direct greatsword fighter in chain mail. Attack on your turn and use Second Wind when hurt; you begin with two uses.",
+    "authored_profile": "# Bram Alder\n\nHuman Fighter, level 1. Pronouns: they/them.\n\nSteady and dry-witted; likes a clear plan and a hot meal. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Bram\n\nA direct greatsword fighter in chain mail. Attack on your turn and use Second Wind when hurt; you begin with two uses.\n\n## Creation choices\n\nStandard array, then the Soldier background increases, is reflected in the final ability scores. Soldier supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies nature. Skilled choices: survival acrobatics stealth. Class skill choices: perception insight. Starting equipment uses class option A and background option A, with 18 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
+    "participant": {
+      "name": "Bram Alder",
+      "level": 1,
+      "species": "Human",
+      "background": "Soldier",
+      "classes": [
+        {
+          "id": "fighter",
+          "level": 1
+        }
+      ],
+      "abilities": {
+        "strength": 17,
+        "dexterity": 14,
+        "constitution": 14,
+        "intelligence": 10,
+        "wisdom": 12,
+        "charisma": 8
+      },
+      "speed": 30,
+      "size_rank": 1,
+      "saving_throw_proficiencies": [
+        "strength",
+        "constitution"
+      ],
+      "origin_feats": [
+        "savage_attacker",
+        "skilled"
+      ],
+      "skill_proficiencies": [
+        "athletics",
+        "intimidation",
+        "perception",
+        "insight",
+        "nature",
+        "survival",
+        "acrobatics",
+        "stealth"
+      ],
+      "tool_proficiencies": [
+        "gaming_set_dice"
+      ],
+      "weapon_proficiencies": [
+        "simple_weapons",
+        "martial_weapons"
+      ],
+      "spellcasting_grants": [],
+      "weapon_masteries": [
+        "greatsword",
+        "flail",
+        "spear"
+      ],
+      "fighting_styles": [
+        {
+          "source": "fighter",
+          "style": "defense"
+        }
+      ]
+    },
+    "entity_state": {
+      "max_hp": 12,
+      "hit_die_size": 10,
+      "inventory": [
+        "chain_mail",
+        "greatsword",
+        "flail",
+        "javelin",
+        "dungeoneers_pack",
+        "gp",
+        "spear",
+        "shortbow",
+        "arrow",
+        "gaming_set_dice",
+        "healers_kit",
+        "quiver",
+        "travelers_clothes"
+      ],
+      "inventory_quantities": {
+        "chain_mail": 1,
+        "greatsword": 1,
+        "flail": 1,
+        "javelin": 8,
+        "dungeoneers_pack": 1,
+        "gp": 18,
+        "spear": 1,
+        "shortbow": 1,
+        "arrow": 20,
+        "gaming_set_dice": 1,
+        "healers_kit": 1,
+        "quiver": 1,
+        "travelers_clothes": 1
+      },
+      "available_bonus_actions": [
+        "second_wind"
+      ],
+      "prepared_spells": [],
+      "resources": {
+        "hit_die": 1
+      },
+      "resource_maxima": {
+        "hit_die": 1
+      },
+      "conditions": [],
+      "damage_immunities": [],
+      "damage_resistances": [],
+      "damage_vulnerabilities": [],
+      "worn_armor": {
+        "armor_type": "chain_mail",
+        "inventory_item": "chain_mail",
+        "magic_bonus": 0
+      },
+      "worn_shield": null,
+      "weapon_sets": {
+        "format": 1,
+        "active_set": "melee",
+        "melee": {
+          "main_hand": "greatsword",
+          "off_hand": "greatsword"
+        },
+        "ranged": {
+          "main_hand": null,
+          "off_hand": null
+        }
+      },
+      "ammunition": {
+        "arrow": 20
+      },
+      "ammunition_expended": {
+        "arrow": 0
+      }
+    }
+  },
+  {
+    "id": "monk",
+    "summary": "Monk · Level 1. Fight with a spear or unarmed strikes. Martial Arts allows a Bonus Action unarmed strike; Focus Points arrive at level two.",
+    "authored_profile": "# Iri Swift\n\nHuman Monk, level 1. Pronouns: they/them.\n\nRestless and kind; turns waiting into a balance exercise. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Iri\n\nFight with a spear or unarmed strikes. Martial Arts allows a Bonus Action unarmed strike; Focus Points arrive at level two.\n\n## Creation choices\n\nStandard array, then the Soldier background increases, is reflected in the final ability scores. Soldier supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies nature. Skilled choices: perception stealth survival. Class skill choices: acrobatics insight. Starting equipment uses class option A and background option A, with 25 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
+    "participant": {
+      "name": "Iri Swift",
+      "level": 1,
+      "species": "Human",
+      "background": "Soldier",
+      "classes": [
+        {
+          "id": "monk",
+          "level": 1
+        }
+      ],
+      "abilities": {
+        "strength": 12,
+        "dexterity": 17,
+        "constitution": 14,
+        "intelligence": 10,
+        "wisdom": 14,
+        "charisma": 8
+      },
+      "speed": 30,
+      "size_rank": 1,
+      "saving_throw_proficiencies": [
+        "strength",
+        "dexterity"
+      ],
+      "origin_feats": [
+        "savage_attacker",
+        "skilled"
+      ],
+      "skill_proficiencies": [
+        "athletics",
+        "intimidation",
+        "acrobatics",
+        "insight",
+        "nature",
+        "perception",
+        "stealth",
+        "survival"
+      ],
+      "tool_proficiencies": [
+        "gaming_set_dice",
+        "musical_instrument_flute"
+      ],
+      "weapon_proficiencies": [
+        "simple_weapons",
+        "hand_crossbow",
+        "scimitar",
+        "shortsword"
+      ],
+      "spellcasting_grants": []
+    },
+    "entity_state": {
+      "max_hp": 10,
+      "hit_die_size": 8,
+      "inventory": [
+        "spear",
+        "dagger",
+        "flute",
+        "explorers_pack",
+        "gp",
+        "shortbow",
+        "arrow",
+        "gaming_set_dice",
+        "healers_kit",
+        "quiver",
+        "travelers_clothes"
+      ],
+      "inventory_quantities": {
+        "spear": 2,
+        "dagger": 5,
+        "flute": 1,
+        "explorers_pack": 1,
+        "gp": 25,
+        "shortbow": 1,
+        "arrow": 20,
+        "gaming_set_dice": 1,
+        "healers_kit": 1,
+        "quiver": 1,
+        "travelers_clothes": 1
+      },
+      "available_bonus_actions": [],
+      "prepared_spells": [],
+      "resources": {
+        "hit_die": 1
+      },
+      "resource_maxima": {
+        "hit_die": 1
+      },
+      "conditions": [],
+      "damage_immunities": [],
+      "damage_resistances": [],
+      "damage_vulnerabilities": [],
+      "worn_armor": null,
+      "worn_shield": null,
+      "weapon_sets": {
+        "format": 1,
+        "active_set": "melee",
+        "melee": {
+          "main_hand": "spear",
+          "off_hand": null
+        },
+        "ranged": {
+          "main_hand": null,
+          "off_hand": null
+        }
+      },
+      "ammunition": {
+        "arrow": 20
+      },
+      "ammunition_expended": {
+        "arrow": 0
+      }
+    }
+  },
+  {
+    "id": "paladin",
+    "summary": "Paladin · Level 1. Hold the front with longsword and shield. Bless supports allies, Cure Wounds heals, and Lay on Hands starts with five points.",
+    "authored_profile": "# Tess Rowan\n\nHuman Paladin, level 1. Pronouns: they/them.\n\nEarnest and stubborn; takes small promises seriously. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Tess\n\nHold the front with longsword and shield. Bless supports allies, Cure Wounds heals, and Lay on Hands starts with five points.\n\n## Creation choices\n\nStandard array, then the Soldier background increases, is reflected in the final ability scores. Soldier supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies religion. Skilled choices: perception survival insight. Class skill choices: persuasion medicine. Starting equipment uses class option A and background option A, with 23 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
+    "participant": {
+      "name": "Tess Rowan",
+      "level": 1,
+      "species": "Human",
+      "background": "Soldier",
+      "classes": [
+        {
+          "id": "paladin",
+          "level": 1
+        }
+      ],
+      "abilities": {
+        "strength": 17,
+        "dexterity": 10,
+        "constitution": 14,
+        "intelligence": 8,
+        "wisdom": 12,
+        "charisma": 14
+      },
+      "speed": 30,
+      "size_rank": 1,
+      "saving_throw_proficiencies": [
+        "wisdom",
+        "charisma"
+      ],
+      "origin_feats": [
+        "savage_attacker",
+        "skilled"
+      ],
+      "skill_proficiencies": [
+        "athletics",
+        "intimidation",
+        "persuasion",
+        "medicine",
+        "religion",
+        "perception",
+        "survival",
+        "insight"
+      ],
+      "tool_proficiencies": [
+        "gaming_set_dice"
+      ],
+      "weapon_proficiencies": [
+        "simple_weapons",
+        "martial_weapons"
+      ],
+      "spellcasting_grants": [
+        {
+          "source": "paladin",
+          "ability": "charisma",
+          "spells": [
+            "bless",
+            "cure_wounds"
+          ]
+        }
+      ],
+      "weapon_masteries": [
+        "longsword",
+        "javelin"
+      ]
+    },
+    "entity_state": {
+      "max_hp": 12,
+      "hit_die_size": 10,
+      "inventory": [
+        "chain_mail",
+        "shield",
+        "longsword",
+        "javelin",
+        "holy_symbol",
+        "priests_pack",
+        "gp",
+        "spear",
+        "shortbow",
+        "arrow",
+        "gaming_set_dice",
+        "healers_kit",
+        "quiver",
+        "travelers_clothes"
+      ],
+      "inventory_quantities": {
+        "chain_mail": 1,
+        "shield": 1,
+        "longsword": 1,
+        "javelin": 6,
+        "holy_symbol": 1,
+        "priests_pack": 1,
+        "gp": 23,
+        "spear": 1,
+        "shortbow": 1,
+        "arrow": 20,
+        "gaming_set_dice": 1,
+        "healers_kit": 1,
+        "quiver": 1,
+        "travelers_clothes": 1
+      },
+      "available_bonus_actions": [],
+      "prepared_spells": [
+        "bless",
+        "cure_wounds"
+      ],
+      "resources": {
+        "hit_die": 1,
+        "spell_slot_1": 2,
+        "lay_on_hands": 5
+      },
+      "resource_maxima": {
+        "hit_die": 1,
+        "spell_slot_1": 2,
+        "lay_on_hands": 5
+      },
+      "conditions": [],
+      "damage_immunities": [],
+      "damage_resistances": [],
+      "damage_vulnerabilities": [],
+      "worn_armor": {
+        "armor_type": "chain_mail",
+        "inventory_item": "chain_mail",
+        "magic_bonus": 0
+      },
+      "worn_shield": {
+        "armor_type": "shield",
+        "inventory_item": "shield",
+        "magic_bonus": 0
+      },
+      "weapon_sets": {
+        "format": 1,
+        "active_set": "melee",
+        "melee": {
+          "main_hand": "longsword",
+          "off_hand": "shield"
+        },
+        "ranged": {
+          "main_hand": null,
+          "off_hand": null
+        }
+      },
+      "ammunition": {
+        "arrow": 20
+      },
+      "ammunition_expended": {
+        "arrow": 0
+      }
+    }
+  },
+  {
+    "id": "ranger",
+    "summary": "Ranger · Level 1. Fight at range with a longbow. Hunter's Mark has two free uses per Long Rest; keep Concentration on the marked target.",
+    "authored_profile": "# Kest Wren\n\nHuman Ranger, level 1. Pronouns: they/them.\n\nObservant and cheerful; prefers a useful question to a speech. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Kest\n\nFight at range with a longbow. Hunter's Mark has two free uses per Long Rest; keep Concentration on the marked target.\n\n## Creation choices\n\nStandard array, then the Soldier background increases, is reflected in the final ability scores. Soldier supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies animal handling. Skilled choices: insight stealth acrobatics. Class skill choices: perception survival nature. Starting equipment uses class option A and background option A, with 21 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
+    "participant": {
+      "name": "Kest Wren",
+      "level": 1,
+      "species": "Human",
+      "background": "Soldier",
+      "classes": [
+        {
+          "id": "ranger",
+          "level": 1
+        }
+      ],
+      "abilities": {
+        "strength": 12,
+        "dexterity": 17,
+        "constitution": 14,
+        "intelligence": 10,
+        "wisdom": 14,
+        "charisma": 8
+      },
+      "speed": 30,
+      "size_rank": 1,
+      "saving_throw_proficiencies": [
+        "strength",
+        "dexterity"
+      ],
+      "origin_feats": [
+        "savage_attacker",
+        "skilled"
+      ],
+      "skill_proficiencies": [
+        "athletics",
+        "intimidation",
+        "perception",
+        "survival",
+        "nature",
+        "animal_handling",
+        "insight",
+        "stealth",
+        "acrobatics"
+      ],
+      "tool_proficiencies": [
+        "gaming_set_dice"
+      ],
+      "weapon_proficiencies": [
+        "simple_weapons",
+        "martial_weapons"
+      ],
+      "spellcasting_grants": [
+        {
+          "source": "ranger",
+          "ability": "wisdom",
+          "spells": [
+            "cure_wounds",
+            "longstrider"
+          ]
+        },
+        {
+          "source": "favored_enemy",
+          "ability": "wisdom",
+          "spells": [
+            "hunters_mark"
+          ]
+        }
+      ],
+      "weapon_masteries": [
+        "longbow",
+        "shortsword"
+      ]
+    },
+    "entity_state": {
+      "max_hp": 12,
+      "hit_die_size": 10,
+      "inventory": [
+        "studded_leather",
+        "scimitar",
+        "shortsword",
+        "longbow",
+        "arrow",
+        "quiver",
+        "druidic_focus",
+        "explorers_pack",
+        "gp",
+        "spear",
+        "shortbow",
+        "gaming_set_dice",
+        "healers_kit",
+        "travelers_clothes"
+      ],
+      "inventory_quantities": {
+        "studded_leather": 1,
+        "scimitar": 1,
+        "shortsword": 1,
+        "longbow": 1,
+        "arrow": 40,
+        "quiver": 2,
+        "druidic_focus": 1,
+        "explorers_pack": 1,
+        "gp": 21,
+        "spear": 1,
+        "shortbow": 1,
+        "gaming_set_dice": 1,
+        "healers_kit": 1,
+        "travelers_clothes": 1
+      },
+      "available_bonus_actions": [],
+      "prepared_spells": [
+        "cure_wounds",
+        "longstrider",
+        "hunters_mark"
+      ],
+      "resources": {
+        "hit_die": 1,
+        "spell_slot_1": 2
+      },
+      "resource_maxima": {
+        "hit_die": 1,
+        "spell_slot_1": 2
+      },
+      "conditions": [],
+      "damage_immunities": [],
+      "damage_resistances": [],
+      "damage_vulnerabilities": [],
+      "worn_armor": {
+        "armor_type": "studded_leather_armor",
+        "inventory_item": "studded_leather",
+        "magic_bonus": 0
+      },
+      "worn_shield": null,
+      "weapon_sets": {
+        "format": 1,
+        "active_set": "ranged",
+        "melee": {
+          "main_hand": "shortsword",
+          "off_hand": null
+        },
+        "ranged": {
+          "main_hand": "longbow",
+          "off_hand": "longbow"
+        }
+      },
+      "ammunition": {
+        "arrow": 40
+      },
+      "ammunition_expended": {
+        "arrow": 0
+      }
+    }
+  },
+  {
+    "id": "rogue",
+    "summary": "Rogue · Level 1. Use a shortsword or shortbow and seek a Sneak Attack opening. You have two Expertise choices; Cunning Action arrives at level two.",
+    "authored_profile": "# Pip Venn\n\nHuman Rogue, level 1. Pronouns: they/them.\n\nQuick with a grin; checks that everyone has an exit. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Pip\n\nUse a shortsword or shortbow and seek a Sneak Attack opening. You have two Expertise choices; Cunning Action arrives at level two. Expertise: Stealth and Perception. Thieves' Cant is known.\n\n## Creation choices\n\nStandard array, then the Criminal background increases, is reflected in the final ability scores. Criminal supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies history. Skilled choices: insight survival deception. Class skill choices: acrobatics investigation perception persuasion. Starting equipment uses class option A and background option A, with 24 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
+    "participant": {
+      "name": "Pip Venn",
+      "level": 1,
+      "species": "Human",
+      "background": "Criminal",
+      "classes": [
+        {
+          "id": "rogue",
+          "level": 1
+        }
+      ],
+      "abilities": {
+        "strength": 8,
+        "dexterity": 17,
+        "constitution": 14,
+        "intelligence": 14,
+        "wisdom": 12,
+        "charisma": 10
+      },
+      "speed": 30,
+      "size_rank": 1,
+      "saving_throw_proficiencies": [
+        "dexterity",
+        "intelligence"
+      ],
+      "origin_feats": [
+        "alert",
+        "skilled"
+      ],
+      "skill_proficiencies": [
+        "sleight_of_hand",
+        "stealth",
+        "acrobatics",
+        "investigation",
+        "perception",
+        "persuasion",
+        "history",
+        "insight",
+        "survival",
+        "deception"
+      ],
+      "tool_proficiencies": [
+        "thieves_tools"
+      ],
+      "weapon_proficiencies": [
+        "simple_weapons",
+        "hand_crossbow",
+        "rapier",
+        "scimitar",
+        "shortsword",
+        "whip"
+      ],
+      "spellcasting_grants": [],
+      "weapon_masteries": [
+        "shortsword",
+        "dagger"
+      ]
+    },
+    "entity_state": {
+      "max_hp": 10,
+      "hit_die_size": 8,
+      "inventory": [
+        "leather",
+        "dagger",
+        "shortsword",
+        "shortbow",
+        "arrow",
+        "quiver",
+        "thieves_tools",
+        "burglars_pack",
+        "gp",
+        "crowbar",
+        "pouch",
+        "travelers_clothes"
+      ],
+      "inventory_quantities": {
+        "leather": 1,
+        "dagger": 4,
+        "shortsword": 1,
+        "shortbow": 1,
+        "arrow": 20,
+        "quiver": 1,
+        "thieves_tools": 2,
+        "burglars_pack": 1,
+        "gp": 24,
+        "crowbar": 1,
+        "pouch": 2,
+        "travelers_clothes": 1
+      },
+      "available_bonus_actions": [],
+      "prepared_spells": [],
+      "resources": {
+        "hit_die": 1
+      },
+      "resource_maxima": {
+        "hit_die": 1
+      },
+      "conditions": [],
+      "damage_immunities": [],
+      "damage_resistances": [],
+      "damage_vulnerabilities": [],
+      "worn_armor": {
+        "armor_type": "leather_armor",
+        "inventory_item": "leather",
+        "magic_bonus": 0
+      },
+      "worn_shield": null,
+      "weapon_sets": {
+        "format": 1,
+        "active_set": "ranged",
+        "melee": {
+          "main_hand": "shortsword",
+          "off_hand": null
+        },
+        "ranged": {
+          "main_hand": "shortbow",
+          "off_hand": "shortbow"
+        }
+      },
+      "ammunition": {
+        "arrow": 20
+      },
+      "ammunition_expended": {
+        "arrow": 0
+      }
+    }
+  },
+  {
+    "id": "sorcerer",
+    "summary": "Sorcerer · Level 1. Use Fire Bolt freely and save your two spell slots for Magic Missile or Shield. Innate Sorcery has two uses per Long Rest.",
+    "authored_profile": "# Luma Ash\n\nHuman Sorcerer, level 1. Pronouns: they/them.\n\nExpressive and hopeful; laughs when a small experiment surprises them. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Luma\n\nUse Fire Bolt freely and save your two spell slots for Magic Missile or Shield. Innate Sorcery has two uses per Long Rest.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: stealth investigation performance. Class skill choices: arcana persuasion. Starting equipment uses class option A and background option A, with 36 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
+    "participant": {
+      "name": "Luma Ash",
+      "level": 1,
+      "species": "Human",
+      "background": "Acolyte",
+      "classes": [
+        {
+          "id": "sorcerer",
+          "level": 1
+        }
+      ],
+      "abilities": {
+        "strength": 8,
+        "dexterity": 14,
+        "constitution": 13,
+        "intelligence": 11,
+        "wisdom": 12,
+        "charisma": 17
+      },
+      "speed": 30,
+      "size_rank": 1,
+      "saving_throw_proficiencies": [
+        "constitution",
+        "charisma"
+      ],
+      "origin_feats": [
+        "magic_initiate",
+        "skilled"
+      ],
+      "skill_proficiencies": [
+        "insight",
+        "religion",
+        "arcana",
+        "persuasion",
+        "perception",
+        "stealth",
+        "investigation",
+        "performance"
+      ],
+      "tool_proficiencies": [
+        "calligraphers_supplies"
+      ],
+      "weapon_proficiencies": [
+        "simple_weapons"
+      ],
+      "spellcasting_grants": [
+        {
+          "source": "sorcerer",
+          "ability": "charisma",
+          "spells": [
+            "fire_bolt",
+            "ray_of_frost",
+            "mage_hand",
+            "light",
+            "magic_missile",
+            "shield"
+          ]
+        },
+        {
+          "source": "magic_initiate_cleric",
+          "ability": "charisma",
+          "spells": [
+            "guidance",
+            "spare_the_dying",
+            "healing_word"
+          ]
+        }
+      ]
+    },
+    "entity_state": {
+      "max_hp": 7,
+      "hit_die_size": 6,
+      "inventory": [
+        "spear",
+        "dagger",
+        "arcane_focus",
+        "dungeoneers_pack",
+        "gp",
+        "calligraphers_supplies",
+        "book_prayers",
+        "parchment",
+        "robe",
+        "holy_symbol"
+      ],
+      "inventory_quantities": {
+        "spear": 1,
+        "dagger": 2,
+        "arcane_focus": 1,
+        "dungeoneers_pack": 1,
+        "gp": 36,
+        "calligraphers_supplies": 1,
+        "book_prayers": 1,
+        "parchment": 10,
+        "robe": 1,
+        "holy_symbol": 1
+      },
+      "available_bonus_actions": [],
+      "prepared_spells": [
+        "fire_bolt",
+        "ray_of_frost",
+        "mage_hand",
+        "light",
+        "magic_missile",
+        "shield",
+        "guidance",
+        "spare_the_dying",
+        "healing_word"
+      ],
+      "resources": {
+        "hit_die": 1,
+        "spell_slot_1": 2,
+        "innate_sorcery": 2
+      },
+      "resource_maxima": {
+        "hit_die": 1,
+        "spell_slot_1": 2,
+        "innate_sorcery": 2
+      },
+      "conditions": [],
+      "damage_immunities": [],
+      "damage_resistances": [],
+      "damage_vulnerabilities": [],
+      "worn_armor": null,
+      "worn_shield": null,
+      "weapon_sets": {
+        "format": 1,
+        "active_set": "melee",
+        "melee": {
+          "main_hand": "spear",
+          "off_hand": null
+        },
+        "ranged": {
+          "main_hand": null,
+          "off_hand": null
+        }
+      }
+    }
+  },
+  {
+    "id": "warlock",
+    "summary": "Warlock · Level 1. Use Eldritch Blast at range and Hex for a sustained fight. Your one Pact Magic slot returns on a Short or Long Rest.",
+    "authored_profile": "# Veya Quill\n\nHuman Warlock, level 1. Pronouns: they/them.\n\nCourteous and inquisitive; keeps questions in the margins of a notebook. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Veya\n\nUse Eldritch Blast at range and Hex for a sustained fight. Your one Pact Magic slot returns on a Short or Long Rest. Eldritch Invocation: Eldritch Mind (no level prerequisite). The patron and pact story are left for the player.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: stealth persuasion performance. Class skill choices: arcana investigation. Starting equipment uses class option A and background option A, with 23 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
+    "participant": {
+      "name": "Veya Quill",
+      "level": 1,
+      "species": "Human",
+      "background": "Acolyte",
+      "classes": [
+        {
+          "id": "warlock",
+          "level": 1
+        }
+      ],
+      "abilities": {
+        "strength": 8,
+        "dexterity": 14,
+        "constitution": 13,
+        "intelligence": 11,
+        "wisdom": 12,
+        "charisma": 17
+      },
+      "speed": 30,
+      "size_rank": 1,
+      "saving_throw_proficiencies": [
+        "wisdom",
+        "charisma"
+      ],
+      "origin_feats": [
+        "magic_initiate",
+        "skilled"
+      ],
+      "skill_proficiencies": [
+        "insight",
+        "religion",
+        "arcana",
+        "investigation",
+        "perception",
+        "stealth",
+        "persuasion",
+        "performance"
+      ],
+      "tool_proficiencies": [
+        "calligraphers_supplies"
+      ],
+      "weapon_proficiencies": [
+        "simple_weapons"
+      ],
+      "spellcasting_grants": [
+        {
+          "source": "warlock",
+          "ability": "charisma",
+          "spells": [
+            "eldritch_blast",
+            "mage_hand",
+            "hex",
+            "protection_from_evil_and_good"
+          ]
+        },
+        {
+          "source": "magic_initiate_cleric",
+          "ability": "charisma",
+          "spells": [
+            "guidance",
+            "spare_the_dying",
+            "healing_word"
+          ]
+        }
+      ]
+    },
+    "entity_state": {
+      "max_hp": 9,
+      "hit_die_size": 8,
+      "inventory": [
+        "leather",
+        "sickle",
+        "dagger",
+        "arcane_focus",
+        "book_occult_lore",
+        "scholars_pack",
+        "gp",
+        "calligraphers_supplies",
+        "book_prayers",
+        "parchment",
+        "robe",
+        "holy_symbol"
+      ],
+      "inventory_quantities": {
+        "leather": 1,
+        "sickle": 1,
+        "dagger": 2,
+        "arcane_focus": 1,
+        "book_occult_lore": 1,
+        "scholars_pack": 1,
+        "gp": 23,
+        "calligraphers_supplies": 1,
+        "book_prayers": 1,
+        "parchment": 10,
+        "robe": 1,
+        "holy_symbol": 1
+      },
+      "available_bonus_actions": [],
+      "prepared_spells": [
+        "eldritch_blast",
+        "mage_hand",
+        "hex",
+        "protection_from_evil_and_good",
+        "guidance",
+        "spare_the_dying",
+        "healing_word"
+      ],
+      "resources": {
+        "hit_die": 1,
+        "spell_slot_1": 1
+      },
+      "resource_maxima": {
+        "hit_die": 1,
+        "spell_slot_1": 1
+      },
+      "conditions": [],
+      "damage_immunities": [],
+      "damage_resistances": [],
+      "damage_vulnerabilities": [],
+      "worn_armor": {
+        "armor_type": "leather_armor",
+        "inventory_item": "leather",
+        "magic_bonus": 0
+      },
+      "worn_shield": null,
+      "weapon_sets": {
+        "format": 1,
+        "active_set": "melee",
+        "melee": {
+          "main_hand": "dagger",
+          "off_hand": null
+        },
+        "ranged": {
+          "main_hand": null,
+          "off_hand": null
+        }
+      }
+    }
+  },
+  {
+    "id": "wizard",
+    "summary": "Wizard · Level 1. Use Fire Bolt freely. Four prepared spells cover damage, defense and control; your spellbook has six first-level spells.",
+    "authored_profile": "# Eli Penn\n\nHuman Wizard, level 1. Pronouns: they/them.\n\nMethodical and generous; enjoys explaining a discovery without showing off. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Eli\n\nUse Fire Bolt freely. Four prepared spells cover damage, defense and control; your spellbook has six first-level spells. The quarterstaff is the Arcane Focus. Arcane Recovery restores one level-one slot once per Long Rest after a Short Rest.\n\n## Creation choices\n\nStandard array, then the Sage background increases, is reflected in the final ability scores. Sage supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies nature. Skilled choices: perception stealth insight. Class skill choices: investigation medicine. Starting equipment uses class option A and background option A, with 13 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
+    "participant": {
+      "name": "Eli Penn",
+      "level": 1,
+      "species": "Human",
+      "background": "Sage",
+      "classes": [
+        {
+          "id": "wizard",
+          "level": 1
+        }
+      ],
+      "abilities": {
+        "strength": 10,
+        "dexterity": 14,
+        "constitution": 14,
+        "intelligence": 17,
+        "wisdom": 12,
+        "charisma": 8
+      },
+      "speed": 30,
+      "size_rank": 1,
+      "saving_throw_proficiencies": [
+        "intelligence",
+        "wisdom"
+      ],
+      "origin_feats": [
+        "magic_initiate",
+        "skilled"
+      ],
+      "skill_proficiencies": [
+        "arcana",
+        "history",
+        "investigation",
+        "medicine",
+        "nature",
+        "perception",
+        "stealth",
+        "insight"
+      ],
+      "tool_proficiencies": [
+        "calligraphers_supplies"
+      ],
+      "weapon_proficiencies": [
+        "simple_weapons"
+      ],
+      "spellcasting_grants": [
+        {
+          "source": "wizard",
+          "ability": "intelligence",
+          "spells": [
+            "fire_bolt",
+            "mage_hand",
+            "light",
+            "magic_missile",
+            "shield",
+            "sleep",
+            "mage_armor"
+          ]
+        },
+        {
+          "source": "magic_initiate_wizard",
+          "ability": "intelligence",
+          "spells": [
+            "mending",
+            "shocking_grasp",
+            "longstrider"
+          ]
+        }
+      ],
+      "wizard_spellbook": [
+        "magic_missile",
+        "shield",
+        "sleep",
+        "mage_armor",
+        "burning_hands",
+        "fog_cloud"
+      ]
+    },
+    "entity_state": {
+      "max_hp": 8,
+      "hit_die_size": 6,
+      "inventory": [
+        "dagger",
+        "quarterstaff",
+        "robe",
+        "spellbook",
+        "scholars_pack",
+        "gp",
+        "calligraphers_supplies",
+        "book_history",
+        "parchment"
+      ],
+      "inventory_quantities": {
+        "dagger": 2,
+        "quarterstaff": 2,
+        "robe": 2,
+        "spellbook": 1,
+        "scholars_pack": 1,
+        "gp": 13,
+        "calligraphers_supplies": 1,
+        "book_history": 1,
+        "parchment": 8
+      },
+      "available_bonus_actions": [],
+      "prepared_spells": [
+        "fire_bolt",
+        "mage_hand",
+        "light",
+        "magic_missile",
+        "shield",
+        "sleep",
+        "mage_armor",
+        "mending",
+        "shocking_grasp",
+        "longstrider"
+      ],
+      "resources": {
+        "hit_die": 1,
+        "spell_slot_1": 2,
+        "arcane_recovery": 1
+      },
+      "resource_maxima": {
+        "hit_die": 1,
+        "spell_slot_1": 2,
+        "arcane_recovery": 1
+      },
+      "conditions": [],
+      "damage_immunities": [],
+      "damage_resistances": [],
+      "damage_vulnerabilities": [],
+      "worn_armor": null,
+      "worn_shield": null,
+      "weapon_sets": {
+        "format": 1,
+        "active_set": "melee",
+        "melee": {
+          "main_hand": "quarterstaff",
+          "off_hand": null
+        },
+        "ranged": {
+          "main_hand": null,
+          "off_hand": null
+        }
+      }
+    }
+  }
+]

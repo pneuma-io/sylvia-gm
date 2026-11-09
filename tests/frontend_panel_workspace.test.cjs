@@ -21,6 +21,22 @@ const surfaces = [
   { id: 'encounter', title: 'Encounter', order: 40 },
 ];
 
+test('inspection and expansion persist through arrangement and reopen without entering another campaign default', () => {
+  const storage=memoryStorage(),store=createStore(storage);
+  store.select({campaignId:'a',rulesetId:'r',surfaces});
+  const inspection={campaignId:'a',rulesetId:'r',id:'companion',unavailableId:null,expanded:['hero','companion']};
+  store.change({type:'inspection',value:inspection});
+  store.change({type:'hide',panelId:'party'});
+  store.change({type:'show',panelId:'party'});
+  const moved=store.change({type:'move',panelId:'party',destination:{windowId:'new'}});
+  store.change({type:'close-window',windowId:moved.windows[0].id});
+  assert.deepEqual(store.snapshot().inspection,inspection);
+  store.preference('save');
+  const reopened=createStore(storage);
+  assert.deepEqual(reopened.select({campaignId:'a',rulesetId:'r',surfaces}).inspection,inspection);
+  assert.equal(reopened.select({campaignId:'b',rulesetId:'r',surfaces}).inspection,null);
+});
+
 function locations(layout) {
   const result = [];
   function collect(tree) {

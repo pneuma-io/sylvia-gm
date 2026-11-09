@@ -14,8 +14,10 @@ Supports:
 
 from __future__ import annotations
 
+from functools import lru_cache
 from typing import Any
 
+from sylvia_gm.runtime._collections import FUNCTIONS as COLLECTION_FUNCTIONS
 from sylvia_gm.runtime._exceptions import ExpressionError, FieldNotFoundError
 from sylvia_gm.runtime._expression_parser import (
     _SANDBOXED_FUNCTIONS,
@@ -228,6 +230,10 @@ def _eval_binary(node: BinaryOpNode, ctx: ExecutionContext) -> Any:
 
     # Arithmetic
     if op == "+":
+        if isinstance(left, str) and isinstance(right, str):
+            if len(left) + len(right) > 4096:
+                raise ExpressionError("Combined text exceeds its bound")
+            return left + right
         _check_numeric_op(op, left, right)
         return left + right
 
@@ -371,7 +377,8 @@ def _eval_function(node: FunctionCallNode, ctx: ExecutionContext) -> Any:
     args = [evaluate(arg, ctx) for arg in node.args]
 
     # Validate arg types
-    for i, arg in enumerate(args if node.name not in {"len", "merge"} else ()):
+    numeric_args = args if node.name not in {"len", "merge", *COLLECTION_FUNCTIONS} else ()
+    for i, arg in enumerate(numeric_args):
         if arg is None:
             raise ExpressionError(f"Argument {i + 1} to {node.name}() is null")
         if isinstance(arg, str):
@@ -382,7 +389,11 @@ def _eval_function(node: FunctionCallNode, ctx: ExecutionContext) -> Any:
             )
 
     try:
+        if node.name in {"partitions", "completions"}:
+            return func(*args, consume=ctx.budget.consume_operation if ctx.budget else None)
         return func(*args)
+    except RuntimeError:
+        raise
     except Exception as e:
         raise ExpressionError(  # noqa: B904
             f"Error calling {node.name}(): {e}"
@@ -423,6 +434,14 @@ def _check_numeric_op(op: str, left: Any, right: Any) -> None:
         raise ExpressionError(f"Cannot use '{op}' with null")
 
 
+@lru_cache(maxsize=1024)
+def _evaluation_expression(expression: str) -> ASTNode:
+    """Retain successful syntax only; public parsing still returns independent mutable ASTs."""
+    from sylvia_gm.runtime._expression_parser import parse_expression
+
+    return parse_expression(expression)
+
+
 def evaluate_expression(expr_str: str, context: ExecutionContext) -> Any:
     """Parse and evaluate an expression string against a context.
 
@@ -438,9 +457,7 @@ def evaluate_expression(expr_str: str, context: ExecutionContext) -> Any:
     Raises:
         ExpressionError: On parse or evaluation failures.
     """
-    from sylvia_gm.runtime._expression_parser import parse_expression
-
-    node = parse_expression(expr_str)
+    node = _evaluation_expression(expr_str)
     return evaluate(node, context)
 
 

@@ -144,8 +144,25 @@ jobs:
           version: '0.12.19'
       - name: Install locked build dependencies
         run: uv sync --locked --all-extras --dev
+      - name: Provision verified LGPL codec inputs from the pinned public release
+        shell: pwsh
+        run: |
+          $codecWork = "$env:RUNNER_TEMP/sylvia-codec-inputs"
+          uv run --locked --all-extras python src-tauri/scripts/provision_ffmpeg_lgpl.py --work-dir $codecWork
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          "SYLVIA_FFMPEG_LGPL_DIR=$codecWork/ffmpeg-lgpl" >> $env:GITHUB_ENV
       - name: Build declared owner sidecar for compile-time resources
         run: uv run --locked --all-extras python src-tauri/scripts/build_owner_sidecar.py
+      - name: Select base Python for Rust owner fixtures
+        shell: pwsh
+        run: |
+          $basePython = uv run --no-sync --no-python-downloads python -c "import sys; print(sys._base_executable)"
+          if ($LASTEXITCODE -ne 0) { throw 'Could not resolve the project Python base interpreter' }
+          if ([string]::IsNullOrWhiteSpace($basePython)) { throw 'Python base interpreter path is empty' }
+          if (-not (Test-Path -LiteralPath $basePython -PathType Leaf)) { throw "Python base interpreter does not exist: $basePython" }
+          & $basePython -c "import os, sys; sys.exit(0 if sys.version_info[:2] == (3, 11) and sys.prefix == sys.base_prefix and os.path.samefile(sys.executable, sys._base_executable) else 1)"
+          if ($LASTEXITCODE -ne 0) { throw 'Rust owner fixtures require an executable Python 3.11 base interpreter, not a venv redirector' }
+          "SYLVIA_GM_TEST_PYTHON=$basePython" >> $env:GITHUB_ENV
       - name: Compile all Rust targets and run their tests
         run: cargo test --locked --all-targets --manifest-path src-tauri/Cargo.toml
 

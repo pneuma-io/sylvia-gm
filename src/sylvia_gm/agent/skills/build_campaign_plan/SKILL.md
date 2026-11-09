@@ -204,9 +204,12 @@ after saving a Setting in the same chat and turn. An already selected Ruleset mu
 selected Setting cannot be replaced. Interview-launched chats keep their original sources and do
 not need this selection tool.
 
-Before drafting, call `inspect_campaign_sources` with `action: list`. Read
-`ruleset/identity.json`, then read the Setting entries relevant to the campaign. Search the catalog
-with `query` rather than reading hundreds of files. For a new plan, prefer
+Before drafting, read `ruleset/identity.json`, then the Setting entries relevant to the campaign.
+Reuse exact source contents already read for this chat's saved selection. To discover missing
+paths, call `inspect_campaign_sources` with `action: list` and a focused `query`. Its `total` is
+the matching count; follow `next_offset` with the same query when more paths are needed. A null
+`next_offset` ends that filtered listing. Start at offset 0 whenever the filter changes.
+Read the needed sources before dependent draft changes. For a new plan, prefer
 `create_campaign_plan_draft`: give it a concise campaign concept plus the exact `setting/...` player
 and starting-location paths returned by source inspection. Sylvia creates the complete closed
 artifact and readable draft. Package sources are not workspace files; never use `read_file` or

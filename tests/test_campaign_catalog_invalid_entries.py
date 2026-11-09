@@ -28,7 +28,7 @@ def _assert_healthy_choices_survive(catalog: Sequence[SafePayload]) -> None:
         item.get("kind") == "ruleset" and item.get("id") == "sylvia.srd-lite.bg3" for item in catalog
     )
     assert any(
-        item.get("kind") == "campaign_plan" and item.get("id") == "the-rift-awakening"
+        item.get("kind") == "campaign_plan" and item.get("id") == "last-cart-through"
         for item in catalog
     )
     assert any(

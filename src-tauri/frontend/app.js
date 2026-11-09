@@ -30,11 +30,12 @@ const SylviaGMFrontend = (() => {
     campaignIndexRequestId: 0,
     campaignIndexRefresh: null,
     builderChats: [],        // durable campaign-independent Builder conversations
-    sidebarCollapsed: { left: false, right: false }, // presentation only, independent of campaign layout
+    sidebarCollapsed: { left: true, right: false }, // presentation only; the left rail starts thin
     deletingBuilderChats: new Set(),
     archivingItems: new Set(),
-    sessionDrafts: new Map(), // ephemeral compose text isolated by exact session identity
+    sessionDrafts: new Map(), // unsent compose text isolated by exact session identity
     builderQuestionDrafts: new Map(), // pending question fields isolated by Builder session
+    desktopDrafts: null,
     sessionActivities: new Map(), // one stream/retry lifecycle record per exact session identity
     modelChoices: [],         // safe owner-projected model metadata
     providerSettings: null,   // safe provider metadata; credentials are never projected back
@@ -47,7 +48,9 @@ const SylviaGMFrontend = (() => {
     constructionRestoreInProgress: false,
     constructionPanelGeneration: 0,
     applicationInfo: null,    // host-projected release identity; never campaign truth
+    desktopUpdater: null,
     activeCampaignId: null,
+    rulesUpdateController: null,
     activeSessionId: null,
     activeSessionRole: null,
     activeSnapshot: null,
@@ -92,24 +95,211 @@ const SylviaGMFrontend = (() => {
     panelProjection: null,
     panelActionChecks: new Map(),
     panelCommitPending: false,
+    panelIntentPending: null,
     panelRecoveryAbsent: null,
     panelTabs: {},
     tacticalSelections: {},
     tacticalViews: {},
+    tacticalFocusCells: {}, // last keyboard cell per campaign/session/map; outlives panel resets
     networkSelections: {},
     crossSurfaceFocus: null,
+    characterInspection: null,
     view: 'home',
-    homeTutorialStep: 0,
-    homeTutorialOpen: false,
-    homeTutorialQueued: false,
     controlsWired: false,
     navigationRefreshBusy: false,
     campaignConfirmationPending: false,
     campaignHandoffPending: false,
+    sequelDialog: null,
   };
 
   // ---- DOM helpers ----
   const $ = (id) => document.getElementById(id);
+  let dictation = null;
+  let dictationRevision = 0;
+  let dictationModelJob = null;
+  let dictationOptionsEpoch = 0;
+  function savedDictationChoice(name) {
+    try { return localStorage.getItem(`sylvia-dictation-${name}`) || ''; } catch (_) { return ''; }
+  }
+
+  // Metadata/readiness never starts audio or downloads a model.
+  async function refreshDictationOptions(bridge, attemptId = null) {
+    if (!bridge.dictation_capabilities) throw { code: 'unavailable' };
+      const epoch = dictationOptionsEpoch;
+      const capabilities = await bridge.dictation_capabilities(attemptId);
+      if (epoch !== dictationOptionsEpoch) return capabilities;
+      const engines = capabilities?.engines;
+      if (!Array.isArray(engines) || !engines.length) throw { code: 'unavailable' };
+      const select = $('dictation-language');
+      const saved = select.value || savedDictationChoice('language');
+      select.replaceChildren(...engines.map(engine => {
+        const option = document.createElement('option');
+        option.value = engine.id; option.textContent = engine.label || engine.language;
+        return option;
+      }));
+      const preferred = engines.find(engine => engine.id === saved) || engines.find(engine =>
+        engine.language === navigator.language || engine.language === (navigator.language || '').split('-')[0]);
+      select.value = (preferred || engines[0]).id;
+      const device = $('dictation-device'), selectedDevice = device.value || savedDictationChoice('device');
+      const devices = capabilities.devices || [{ id: 'default', label: 'System default input' }];
+      if (selectedDevice && selectedDevice !== 'default' && !devices.some(item => item.id === selectedDevice)) {
+        devices.push({ id: selectedDevice, label: 'Selected microphone unavailable — choose an input' });
+      }
+      device.replaceChildren(...devices.map(item => {
+        const option = document.createElement('option'); option.value = item.id; option.textContent = item.label; return option;
+      }));
+      device.value = devices.some(item => item.id === selectedDevice) ? selectedDevice : 'default';
+      $('dictation-download').hidden = capabilities.ready !== false;
+      $('dictation-model-status').textContent = capabilities.ready === false
+        ? 'The local speech model is not downloaded. Download it once before dictating; no audio is sent.'
+        : 'Local speech model ready. Recognition runs on CPU on this PC.';
+      $('dictation-options').hidden = false;
+      return capabilities;
+  }
+
+  async function dictationEngine(bridge, attemptId) {
+    const capabilities = await refreshDictationOptions(bridge, attemptId);
+    if (capabilities.ready === false) { openSettings('dictation'); throw { code: 'model' }; }
+    return $('dictation-language').value;
+  }
+
+  function cancelDictationDownload() {
+    if (!dictationModelJob) return;
+    const { id, bridge } = dictationModelJob; dictationModelJob = null;
+    dictationOptionsEpoch += 1;
+    void Promise.resolve(bridge.dictation_cancel(id)).catch(() => {});
+    $('dictation-model-status').textContent = 'Model download cancelled. Your draft is kept. You can retry.';
+    $('dictation-download').textContent = 'Download local speech model';
+    renderDictation();
+  }
+
+  async function prepareDictationModel() {
+    if (dictationModelJob) { cancelDictationDownload(); return; }
+    const bridge = state.bridge;
+    if (!bridge?.dictation_prepare || !bridge.dictation_cancel) return;
+    const job = { id: crypto.randomUUID(), bridge }; dictationModelJob = job;
+    dictationOptionsEpoch += 1;
+    $('dictation-model-status').textContent = 'Downloading the local speech model (about 148 MB). No audio is sent. You can cancel or keep typing.';
+    $('dictation-download').textContent = 'Cancel model download';
+    renderDictation();
+    try {
+      await bridge.dictation_prepare(job.id);
+      if (dictationModelJob !== job) return;
+      await refreshDictationOptions(bridge);
+      if (dictationModelJob === job) dictation.clearError();
+    } catch (error) {
+      if (dictationModelJob !== job) return;
+      $('dictation-model-status').textContent = (typeof error === 'string' ? error : error?.code) === 'storage'
+        ? 'Not enough space for the speech model. Free some space and retry. Your draft is kept.'
+        : 'Speech model download failed. Check your connection and retry. Your draft is kept.';
+    } finally {
+      if (dictationModelJob === job) {
+        dictationModelJob = null;
+        $('dictation-download').textContent = 'Download local speech model'; renderDictation();
+      }
+    }
+  }
+
+  // Dictation edits this composer only; the normal Send path owns all submissions.
+  function initDictation() {
+    if (dictation || !window.SylviaDictation || !$('dictation-toggle')) return;
+    dictation = window.SylviaDictation.create({
+      backend: { start: async ({ signal }) => {
+        const bridge = state.bridge;
+        if (!bridge?.dictation_start || !bridge.dictation_stop || !bridge.dictation_cancel) {
+          throw { code: 'unavailable' };
+        }
+        const id = crypto.randomUUID();
+        let cancelled = false;
+        const cancel = () => {
+          if (cancelled) return;
+          cancelled = true;
+          try { void Promise.resolve(bridge.dictation_cancel(id)).catch(() => {}); } catch (_) { /* Best-effort cleanup. */ }
+        };
+        signal.addEventListener('abort', cancel, { once: true });
+        try {
+          const engine = await dictationEngine(bridge, id);
+          if (signal.aborted) throw { code: 'unavailable' };
+          await bridge.dictation_start(id, engine, $('dictation-device').value || 'default');
+          if (signal.aborted) { cancel(); throw { code: 'unavailable' }; }
+          return { stop: () => bridge.dictation_stop(id), cancel: () => {
+            signal.removeEventListener('abort', cancel); cancel();
+          } };
+        } catch (error) {
+          signal.removeEventListener('abort', cancel); cancel(); throw error;
+        }
+      } },
+      context: () => state.view === 'session' && state.activeSessionId
+        ? JSON.stringify([state.activeCampaignId, state.activeSessionId, state.activeSessionRole]) : null,
+      draft: () => ({ text: $('player-input').value, revision: dictationRevision,
+        start: $('player-input').selectionStart, end: $('player-input').selectionEnd }),
+      replace: (text, caret) => {
+        const input = $('player-input');
+        input.value = text;
+        dictationRevision += 1;
+        input.focus();
+        input.setSelectionRange(caret, caret);
+        saveSelectedSessionDraft();
+      },
+      changed: renderDictation,
+    });
+    $('dictation-toggle').addEventListener('click', toggleDictation);
+    $('dictation-download').addEventListener('click', () => { void prepareDictationModel(); });
+    for (const name of ['language', 'device']) $('dictation-' + name).addEventListener('change', () => {
+      try { localStorage.setItem(`sylvia-dictation-${name}`, $('dictation-' + name).value); } catch (_) { /* Input works without storage. */ }
+    });
+    $('dictation-cancel').addEventListener('click', () => {
+      dictation.cancel(); $('dictation-toggle').focus();
+    });
+    $('dictation-undo').addEventListener('click', () => dictation.undo());
+    $('dictation-redo').addEventListener('click', () => { void dictation.start({ redo: true }); });
+    $('dictation-insert').addEventListener('click', () => dictation.insertReview($('dictation-review').value));
+    $('player-input').addEventListener('input', () => { dictationRevision += 1; dictation.sync(); });
+    document.addEventListener('keydown', (event) => {
+      if (event.isComposing || event.repeat) return;
+      if (event.altKey && !event.ctrlKey && !event.metaKey && event.key.toLowerCase() === 'm' &&
+          !$('dictation-toggle').disabled) {
+        event.preventDefault(); toggleDictation();
+      } else if (event.key === 'Escape' && dictationModelJob) {
+        event.preventDefault(); cancelDictationDownload();
+      } else if (event.key === 'Escape' && ['requesting', 'recording', 'transcribing'].includes(dictation.snapshot().phase)) {
+        event.preventDefault(); dictation.cancel(); $('dictation-toggle').focus();
+      }
+    });
+    window.addEventListener('pagehide', () => { dictation.cancel('', { announce: false }); cancelDictationDownload(); });
+  }
+
+  function toggleDictation() {
+    if (!dictation || $('dictation-toggle').disabled) return;
+    if (dictation.snapshot().phase === 'recording') void dictation.stop();
+    else void dictation.start();
+  }
+
+  function renderDictation(value = dictation?.snapshot()) {
+    if (!value || !$('dictation-toggle')) return;
+    const busy = ['requesting', 'recording', 'transcribing'].includes(value.phase);
+    const recording = value.phase === 'recording';
+    const enabled = !$('player-input').disabled && state.view === 'session' && !window.__sylviaBrowserInvoke;
+    $('dictation-toggle').disabled = (!enabled && !recording) ||
+      ['requesting', 'transcribing'].includes(value.phase) || Boolean(dictationModelJob);
+    $('dictation-toggle').setAttribute('aria-pressed', String(recording));
+    $('dictation-toggle').setAttribute('aria-label', window.__sylviaBrowserInvoke
+      ? 'Dictation requires the desktop application' : recording ? 'Stop dictation' : 'Start dictation');
+    $('dictation-toggle-text').textContent = recording ? 'Stop dictation' : 'Dictate';
+    if ($('dictation-status').textContent !== value.message) $('dictation-status').textContent = value.message;
+    $('dictation-status').hidden = value.phase === 'idle' && !value.message;
+    $('dictation-language').disabled = busy;
+    $('dictation-device').disabled = busy || Boolean(dictationModelJob);
+    $('dictation-download').disabled = busy;
+    $('dictation-cancel').hidden = !busy && !value.transcript;
+    $('dictation-undo').hidden = !value.canUndo || busy || !enabled;
+    $('dictation-redo').hidden = !value.canUndo || busy || !enabled;
+    $('dictation-review-panel').hidden = !value.transcript;
+    if ($('dictation-review').dataset.transcript !== value.transcript) {
+      $('dictation-review').value = value.transcript;
+      $('dictation-review').dataset.transcript = value.transcript;
+    }
+  }
   let panelHost = null;
   let shotFrame = null;
   let panelRenderContext = null;
@@ -163,8 +353,24 @@ const SylviaGMFrontend = (() => {
 
   function panelRenderScope(projection) {
     return projection?.campaign_id && state.activeSessionId
-      ? { campaignId: projection.campaign_id, sessionId: state.activeSessionId }
+      ? { campaignId: projection.campaign_id, sessionId: state.activeSessionId, rulesetId: projection.ruleset_id || null }
       : null;
+  }
+
+  // Owner replies can redraw a detached inspection control after its local event has finished.
+  function captureCharacterFocus(container) {
+    const active = document.activeElement;
+    if (!active || !container.contains(active)) return null;
+    const surfaceId = active.closest('[data-panel-id]')?.dataset.panelId;
+    if (!surfaceId) return null;
+    const attribute = ['data-party-select-actor', 'data-character-actor', 'data-inventory-character', 'data-tactical-cell']
+      .find(name => active.hasAttribute(name));
+    if (attribute) return { surfaceId, selector: `[${attribute}="${CSS.escape(active.getAttribute(attribute))}"]` };
+    const details = active.parentElement;
+    if (active.tagName === 'SUMMARY' && details?.hasAttribute('data-character-expansion')) {
+      return { surfaceId, selector: `[data-character-expansion="${CSS.escape(details.dataset.characterExpansion)}"] > summary` };
+    }
+    return null;
   }
 
   // Keep transient Effects UI state when the same panel DOM is replaced.
@@ -307,6 +513,9 @@ const SylviaGMFrontend = (() => {
     }
     if (campaignDisplayPending()) throw new Error('Game state is still loading.');
     if (selectedSessionIsWorking()) throw new Error('Sylvia is working. Wait for her response to finish.');
+    if (['preview_panel_action', 'queue_panel_action'].includes(method) && panelIntentPending()) {
+      throw new Error('Finish the pending panel action before starting another.');
+    }
     if (method === 'queue_panel_action') {
       const action = state.panelProjection?.surfaces.find(surface => surface.id === args.surface_id)
         ?.actions?.find(action => action.id === args.panel_action_id);
@@ -331,15 +540,86 @@ const SylviaGMFrontend = (() => {
     };
   }
 
-  // Actor/target choices are presentation state shared by their panels, never an action.
+  // Inspection uses only admitted player-visible records and never grants action control.
+  function inspectableCharacters() {
+    const choices = new Map();
+    for (const surface of state.panelProjection?.surfaces || []) {
+      if (['party', 'unit_list', 'inventory'].includes(surface.renderer)) {
+        for (const member of surface.data?.participants || []) {
+          choices.set(member.id, { id: member.id, name: member.data?.name || surface.data?.entities?.[member.id]?.name || member.id });
+        }
+        for (const actor of state.panelProjection?.player_control?.actors || []) {
+          if (surface.data?.entities?.[actor.id] && !choices.has(actor.id)) {
+            choices.set(actor.id, { id: actor.id, name: surface.data.entities[actor.id].name || actor.name || actor.id });
+          }
+        }
+      } else if (surface.renderer === 'generic_inventory') {
+        for (const character of surface.data?.characters || []) choices.set(character.id, character);
+      }
+    }
+    return Array.from(choices.values());
+  }
+
+  // One campaign/Ruleset inspection context survives panel placement, never stale roster identity.
+  function characterInspection() {
+    const campaignId = state.panelProjection?.campaign_id || state.activeCampaignId;
+    const rulesetId = state.panelProjection?.ruleset_id || null;
+    const choices = inspectableCharacters();
+    let inspection = state.characterInspection;
+    if (!inspection || inspection.campaignId !== campaignId || inspection.rulesetId !== rulesetId) {
+      const prior = inspection ? null : state.panelProjection?.surfaces.filter((surface) => ['unit_list', 'inventory'].includes(surface.renderer))
+        .map((surface) => state.tacticalSelections[surface.id]?.actor).find(Boolean) ||
+        state.panelProjection?.surfaces.filter((surface) => ['tactical_grid', 'coordinate_map'].includes(surface.renderer))
+          .map((surface) => tacticalActorId(surface, state.tacticalSelections[surface.id]?.actor)).find(Boolean);
+      const focused = state.panelProjection?.player_control?.focused_actor_id;
+      inspection = state.characterInspection = { campaignId, rulesetId,
+        id: prior || (choices.some((item) => item.id === focused) ? focused : choices[0]?.id) || null,
+        unavailableId: null, expanded: [] };
+    }
+    if (inspection.id && !choices.some((item) => item.id === inspection.id)) {
+      inspection.unavailableId = inspection.id;
+      inspection.id = null;
+    }
+    inspection.expanded = (inspection.expanded || []).filter((id) => choices.some((item) => item.id === id));
+    return inspection;
+  }
+
+  function inspectCharacter(characterId) {
+    if (characterId !== null && !inspectableCharacters().some((item) => item.id === characterId)) return;
+    const inspection = characterInspection();
+    inspection.id = characterId;
+    inspection.unavailableId = null;
+  }
+
+  // Party is the shared picker; Rulesets without a roster retain an accessible common picker.
+  function characterPickerMarkup() {
+    const party = state.panelProjection?.surfaces.find((surface) => surface.renderer === 'party');
+    if (party) return '';
+    const inspection = characterInspection();
+    return `<label class="character-picker">Inspect character <select data-character-actor>` +
+      '<option value="">Choose a character</option>' + inspectableCharacters().map((item) =>
+        `<option value="${escapeHtml(item.id)}"${item.id === inspection.id ? ' selected' : ''}>${escapeHtml(item.name)}</option>`).join('') + '</select></label>';
+  }
+
+  // Acting-character/target choices and inspection are distinct presentation requests.
   function applyPanelSelection(surfaceId, patch) {
     const surface = state.panelProjection?.surfaces.find((item) => item.id === surfaceId);
     if (!surface || !patch || typeof patch !== 'object') return;
-    if (surface.renderer === 'generic_inventory') {
-      if (surface.data.characters.some((character) => character.id === patch.character)) {
-        state.tacticalSelections[surfaceId] = { character: patch.character };
-        if (playerControlsActor(patch.character)) synchronizePanelActor(patch.character);
-      }
+    if ('character' in patch) {
+      inspectCharacter(patch.character);
+      return;
+    }
+    if (patch.expansion && surface.renderer === 'party' &&
+        (surface.data?.participants?.some((member) => member.id === patch.expansion.id) ||
+          surface.data?.entities?.[patch.expansion.id] && playerControlsActor(patch.expansion.id)) &&
+        typeof patch.expansion.open === 'boolean') {
+      const inspection = characterInspection();
+      inspection.expanded = inspection.expanded.filter((id) => id !== patch.expansion.id);
+      if (patch.expansion.open) inspection.expanded.push(patch.expansion.id);
+      return;
+    }
+    if (['party', 'unit_list', 'inventory', 'generic_inventory'].includes(surface.renderer)) {
+      if ('actor' in patch) inspectCharacter(patch.actor);
       return;
     }
     if (surface.renderer === 'network_graph') {
@@ -384,12 +664,9 @@ const SylviaGMFrontend = (() => {
 
   // Share valid actor identities across views without moving a camera or writing campaign state.
   function synchronizePanelActor(actorId) {
+    inspectCharacter(actorId);
     for (const panel of state.panelProjection?.surfaces || []) {
-      if (['unit_list', 'inventory'].includes(panel.renderer) && (actorId === null || panel.data?.entities?.[actorId] || panel.data?.participants?.some((item) => item.id === actorId))) {
-        state.tacticalSelections[panel.id] = { actor: actorId };
-      } else if (panel.renderer === 'generic_inventory' && panel.data?.characters?.some((item) => item.id === actorId)) {
-        state.tacticalSelections[panel.id] = { character: actorId };
-      } else if (panel.renderer === 'network_graph' && (actorId === null || networkControlsActor(actorId))) {
+      if (panel.renderer === 'network_graph' && (actorId === null || networkControlsActor(actorId))) {
         networkSelection(panel).actor = actorId;
       } else if (['tactical_grid', 'coordinate_map'].includes(panel.renderer)) {
         const body = panel.data?.entities?.find((item) => tacticalActorId(panel, item.id) === actorId);
@@ -400,46 +677,14 @@ const SylviaGMFrontend = (() => {
 
   const VALID_THEMES = new Set(['slate', 'sylvia', 'sylvia-dark']);
   const VALID_SETTINGS_TABS = new Set([
-    'models', 'accounts', 'appearance', 'packages', 'campaign-data', 'admin', 'about'
+    'models', 'accounts', 'appearance', 'dictation', 'packages', 'campaign-data', 'admin', 'about'
   ]);
   const DISCONNECTED_STREAM_KEY = 'sylvia-gm-disconnected-stream';
   const PANEL_LAYOUT_KEY = 'sylvia-gm-panel-layout-v1';
-  const HOME_TUTORIAL_KEY = 'sylvia-gm-home-tutorial-v1';
   const PENDING_PARTY_SELECTION_KEY = 'sylvia-gm-pending-party-selection-v1';
-  const HOME_TUTORIAL_STEPS = [
-    {
-      title: 'Hi, I\u2019m Sylvia.',
-      copy: 'Let me show you the important stuff real quick.',
-      sprite: 'wave',
-    },
-    {
-      targetId: 'home-new-campaign-btn',
-      title: 'New Campaign',
-      copy: 'Start a new personalized campaign using all the goodies you currently have installed.',
-      preferredPlacements: ['right', 'below', 'left', 'above'],
-    },
-    {
-      targetId: 'home-build-btn',
-      title: 'Build Something',
-      copy: 'Open Builder when you want to create or change campaign plans, settings, characters, or Rulesets.',
-      preferredPlacements: ['left', 'below', 'right', 'above'],
-    },
-    {
-      targetId: 'home-settings-btn',
-      title: 'Settings',
-      copy: 'Connect models and manage appearance, packages, campaign data, and app details here.',
-      preferredPlacements: ['below', 'left', 'right', 'above'],
-    },
-  ];
-  const TUTORIAL_SPRITES = {
-    wave: 'assets/tutorial/sylvia-wave.png',
-    left: 'assets/tutorial/sylvia-point-left.png',
-    right: 'assets/tutorial/sylvia-point-right.png',
-    up: 'assets/tutorial/sylvia-point-up.png',
-    down: 'assets/tutorial/sylvia-point-down.png',
-  };
   let settingsReturnFocus = null;
-  let tutorialReturnFocus = null;
+  let tutorials = null;
+  let readyCampaigns = null;
 
   // Keep every provider turn's renderer-owned lifecycle under its session identity.
   function ensureSessionActivity({
@@ -496,7 +741,7 @@ const SylviaGMFrontend = (() => {
     stopStreamHeartbeat(previous);
     stopProjectionPolling(previous);
     const activity = {
-      ...previous, attemptId, phase: 'working', attachmentGeneration: null,
+      ...previous, attemptId, phase: 'working', activityPhase: 'queued', attachmentGeneration: null,
       terminalLabel: null,
       restored: false, stopRequestedAttemptId: null, pendingInput: null,
       projectionTimer: null, projectionPollBusy: false,
@@ -607,12 +852,39 @@ const SylviaGMFrontend = (() => {
   }
 
   function createHostBridge() {
-    const invoke = window.__TAURI__ && window.__TAURI__.core && window.__TAURI__.core.invoke;
+    const invoke = window.__TAURI__?.core?.invoke || window.__sylviaBrowserInvoke;
     if (!invoke) return null;
-    return {
+    const bridge = {
       application_info: () => invoke('application_info'),
+      desktop_update_state: () => invoke('desktop_update_state'),
+      desktop_update_check: () => invoke('desktop_update_check'),
+      desktop_update_download: operationId => invoke('desktop_update_download', { operationId }),
+      desktop_update_cancel: operationId => invoke('desktop_update_cancel', { operationId }),
+      desktop_update_defer: operationId => invoke('desktop_update_defer', { operationId }),
+      desktop_update_startup_state: () => invoke('desktop_update_startup_state'),
+      desktop_update_confirm_startup: () => invoke('desktop_update_confirm_startup'),
+      desktop_update_install: operationId => invoke('desktop_update_install', { operationId }),
+      load_desktop_drafts: () => invoke('load_desktop_drafts'),
+      save_desktop_drafts: drafts => invoke('save_desktop_drafts', { drafts }),
+      record_local_fault: (category, delta) => invoke('record_local_fault', { category, delta }),
+      preview_local_report: (report) => invoke('preview_local_report', report),
+      cancel_local_report: (previewId) => invoke('cancel_local_report', { previewId }),
+      save_local_report: (previewId) => invoke('save_local_report', { previewId }),
+      dictation_capabilities: (id = null) => id ? invoke('dictation_capabilities', { id }) : invoke('dictation_capabilities'),
+      dictation_start: (id, engine, device) => invoke('dictation_start', { id, engine, device }),
+      dictation_prepare: id => invoke('dictation_prepare', { id }),
+      dictation_stop: (id) => invoke('dictation_stop', { id }),
+      dictation_cancel: (id) => invoke('dictation_cancel', { id }),
       campaign_index: () => invoke('campaign_index'),
-      campaign_creation_catalog: () => invoke('campaign_creation_catalog'),
+      ready_campaign_catalog: () => invoke('ready_campaign_catalog'),
+      start_ready_campaign: command => invoke('start_ready_campaign', { command }),
+      customize_ready_campaign: command => invoke('customize_ready_campaign', { command }),
+      campaign_creation_catalog: (includeParticipants = true) => invoke(
+        'campaign_creation_catalog', { includeParticipants }
+      ),
+      campaign_sequel_context: (request) => invoke('campaign_sequel_context', { request }),
+      preview_campaign_sequel: (request) => invoke('preview_campaign_sequel', { request }),
+      append_campaign_sequel: (request) => invoke('append_campaign_sequel', { request }),
       delete_reusable_library_entry: (command) => invoke('delete_reusable_library_entry', {
         kind: command.kind,
         artifactId: command.artifact_id,
@@ -708,6 +980,14 @@ const SylviaGMFrontend = (() => {
         text,
       }),
       package_candidates: () => invoke('package_candidates'),
+      campaign_rules_update_options: (campaignId) => invoke('campaign_rules_update_options', { campaignId }),
+      preview_campaign_rules_update: (campaignId, candidateId) =>
+        invoke('preview_campaign_rules_update', { campaignId, candidateId }),
+      adopt_campaign_rules_update: (command) => invoke('adopt_campaign_rules_update', {
+        campaignId: command.campaign_id, candidateId: command.candidate_id,
+        activationId: command.activation_id, expectedRevision: command.expected_revision,
+        expectedLockId: command.expected_lock_id, confirmation: command.confirmation,
+      }),
       inspect_package_candidate: (candidateId) => invoke('inspect_package_candidate', {
         candidateId,
       }),
@@ -759,6 +1039,8 @@ const SylviaGMFrontend = (() => {
         triggerMessageId: command.trigger_message_id || null,
         characterProfileId: command.character_profile_id || null,
         characterProfileSha256: command.character_profile_sha256 || null,
+        characterArtifactId: command.character_artifact_id || null,
+        characterArtifactSha256: command.character_artifact_sha256 || null,
       }),
       return_guided_creation_subflow: (command) => invoke('return_guided_creation_subflow', {
         operationId: command.operation_id,
@@ -854,6 +1136,7 @@ const SylviaGMFrontend = (() => {
         automaticResponse: Boolean(command.automatic_response),
         redirectInterruptionId: command.redirect_interruption_id || null,
         campaignEndingChoice: command.campaign_ending_choice || null,
+        ...(command.builder_question_answers ? { builderQuestionAnswers: command.builder_question_answers } : {}),
       }),
       start_dm_session: (campaignId, sessionId, turnId) => invoke('start_dm_session', {
         campaignId,
@@ -1018,6 +1301,7 @@ const SylviaGMFrontend = (() => {
       }),
       recover_campaign_file: (recoveryId) => invoke('recover_campaign_file', { recoveryId }),
     };
+    return window.__sylviaBrowserInvoke ? window.SylviaWebUI.decorateBridge(bridge) : bridge;
   }
 
   // ---- Init ----
@@ -1044,19 +1328,109 @@ const SylviaGMFrontend = (() => {
       setTimeout(() => { void init(); }, 500);
       return;
     }
-    // Handshake already verified by the host before injection.
-    $('connecting-overlay').classList.add('hidden');
-    $('session-frame').style.display = 'flex';
-    wireControls();
-    initTheme();
-    initSidebarResize();
-    await gamePanels().init();
-    await refreshApplicationInfo();
-    await refreshProviderSettings();
-    await refreshModelChoices();
-    await refreshNavigationIndexes();
-    await restoreDisconnectedStream();
-    showHome();
+    let updateStartup = { pending: false };
+    try {
+      if (state.bridge.desktop_update_startup_state) {
+        updateStartup = await state.bridge.desktop_update_startup_state();
+        if (!updateStartup || typeof updateStartup.pending !== 'boolean' ||
+            (updateStartup.pending && !/^[0-9a-f]{32}$/.test(updateStartup.operation_id || '')))
+          throw new Error('Invalid startup state');
+      }
+    } catch (_error) {
+      $('connecting-overlay').classList.remove('hidden');
+      $('connecting-overlay').querySelector('.connecting-text').textContent =
+        'Update startup status is unavailable. Close Sylvia and use update recovery.';
+      return;
+    }
+    const startupFrameWasInert = $('session-frame').inert;
+    if (updateStartup.pending) $('session-frame').inert = true;
+    try {
+      // Load local text before wiring compose controls; restoration never submits it.
+      state.desktopDrafts = window.SylviaDesktopDrafts?.mount(state.bridge, {
+        sessionDrafts: state.sessionDrafts, builderQuestionDrafts: state.builderQuestionDrafts,
+        failed: () => {
+          $('desktop-draft-status').textContent = 'Unsent drafts could not be saved. Keep this window open until saving succeeds.';
+          $('desktop-draft-status').hidden = false;
+        },
+        saved: () => { $('desktop-draft-status').hidden = true; },
+      });
+      const draftsLoaded = await state.desktopDrafts?.load();
+      if (updateStartup.pending && draftsLoaded !== true) throw new Error('Draft restoration unavailable');
+      // Handshake already verified by the host before injection.
+      if (!updateStartup.pending) $('connecting-overlay').classList.add('hidden');
+      $('session-frame').style.display = 'flex';
+      wireControls();
+      window.SylviaLocalDiagnostics?.init(state.bridge);
+      state.desktopUpdater = window.SylviaDesktopUpdates?.mount($('desktop-updates'), state.bridge,
+        async operationId => {
+          const frame = $('session-frame'), wasInert = frame.inert;
+          let closing = false;
+          frame.inert = true;
+          try {
+            if (typeof state.desktopDrafts?.rememberUpdate !== 'function') throw new Error('Draft saving unavailable');
+            saveSelectedSessionDraft();
+            await state.desktopDrafts.rememberUpdate(operationId, {
+              kind: state.view === 'session' && state.activeSessionId ? 'session' : 'home',
+              campaign_id: state.view === 'session' ? state.activeCampaignId || null : null,
+              session_id: state.view === 'session' ? state.activeSessionId || null : null,
+            });
+            const result = await state.bridge.desktop_update_install(operationId);
+            closing = ['closing', 'owner_closed', 'owner_unavailable'].includes(result?.status);
+            if (closing && result?.status !== 'closing') {
+              $('connecting-overlay').classList.remove('hidden');
+              $('connecting-overlay').querySelector('.connecting-text').textContent =
+                'Sylvia cannot continue using its data owner, and the update could not finish. Saved work and recovery files are retained. Close this window and use update recovery.';
+            }
+            return result;
+          } finally { if (!closing) frame.inert = wasInert; }
+        });
+      localSupportReport = window.SylviaSupportReport?.init(state.bridge);
+      initTheme();
+      initSidebarResize();
+      await gamePanels().init();
+      await refreshApplicationInfo();
+      await refreshProviderSettings();
+      await refreshModelChoices();
+      await refreshNavigationIndexes();
+    } catch (error) {
+      if (!updateStartup.pending) throw error;
+      $('connecting-overlay').classList.remove('hidden');
+      $('connecting-overlay').querySelector('.connecting-text').textContent =
+        'The updated app could not finish opening your saved state. Close Sylvia and use update recovery.';
+      return;
+    }
+    if (updateStartup.pending) {
+      // A restart restores saved presentation, never a provider submission or action queue.
+      showHome();
+      try {
+        for (;;) {
+          const confirmed = await state.bridge.desktop_update_confirm_startup();
+          if (confirmed?.status === 'confirmed') break;
+          if (confirmed?.status !== 'waiting_for_helper') throw new Error('Startup unconfirmed');
+          $('connecting-overlay').querySelector('.connecting-text').textContent =
+            'Finishing the application update.';
+          await new Promise(resolve => setTimeout(resolve, 250));
+        }
+        try { await restoreUpdateView(updateStartup.operation_id); }
+        catch (_error) {
+          showHome();
+          setInlineStatus('The application updated, but the previous view could not load. Open it from Home; saved history is retained.');
+        }
+      } catch (error) {
+        const rejection = typeof error === 'string' ? error : error?.message;
+        const code = typeof rejection === 'string' ? /^([a-z_]{1,64}):/.exec(rejection)?.[1] : null;
+        $('connecting-overlay').classList.remove('hidden');
+        $('connecting-overlay').querySelector('.connecting-text').textContent =
+          'Update startup could not be confirmed. Close Sylvia and use update recovery.' +
+          (code ? ` Error code: ${code}.` : '');
+        return;
+      }
+      $('session-frame').inert = startupFrameWasInert;
+      $('connecting-overlay').classList.add('hidden');
+    } else {
+      await restoreDisconnectedStream();
+      showHome();
+    }
     // Wire the despilled portrait asset — the host resolves the local
     // path; the renderer never loads remote content.
     if (state.bridge.resolvePortraitAsset) {
@@ -1070,6 +1444,20 @@ const SylviaGMFrontend = (() => {
       if (anySessionIsWorking()) return;
       void refreshNavigationIndexes();
     }, 15000);
+  }
+
+  // Restore presentation through read-only opens; no guided draft continuation or stream replay.
+  async function restoreUpdateView(operationId) {
+    const saved = state.desktopDrafts?.updateView?.(operationId);
+    if (saved?.kind !== 'session') return;
+    if (saved.campaign_id) {
+      const campaign = state.campaigns.find(item => item.campaign_id === saved.campaign_id &&
+        item.lifecycle === 'active' && item.sessions?.some(session => session.session_id === saved.session_id));
+      if (campaign) await openCampaign(saved.campaign_id, saved.session_id, { restoreOnly: true });
+    } else if (state.builderChats.some(chat => chat.session?.session_id === saved.session_id &&
+        chat.session.status !== 'stopped')) {
+      await openBuilderChat(saved.session_id);
+    }
   }
 
   function wireControls() {
@@ -1092,6 +1480,19 @@ const SylviaGMFrontend = (() => {
     $('settings-overlay').addEventListener('click', (event) => {
       if (event.target === $('settings-overlay')) closeSettings();
     });
+    // Arrow keys move between sections while focus is in the section list (vertical or narrow strip).
+    document.querySelector('.settings-nav')?.addEventListener('keydown', (event) => {
+      const keys = ['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft', 'Home', 'End'];
+      if (!keys.includes(event.key) || event.altKey || event.ctrlKey || event.metaKey) return;
+      const tabs = [...document.querySelectorAll('[data-settings-tab]')].filter(tab => !tab.disabled);
+      const current = tabs.indexOf(document.activeElement);
+      if (current < 0) return;
+      const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1
+        : (current + (['ArrowDown', 'ArrowRight'].includes(event.key) ? 1 : -1) + tabs.length) % tabs.length;
+      event.preventDefault();
+      tabs[next].focus();
+      tabs[next].click();
+    });
     document.addEventListener('keydown', (event) => {
       if ($('settings-overlay').hidden) return;
       if (event.key === 'Escape') {
@@ -1099,10 +1500,12 @@ const SylviaGMFrontend = (() => {
         return;
       }
       if (event.key !== 'Tab') return;
+      // Disclosure summaries are stops; controls inside a closed disclosure are not.
       const focusable = [...$('settings-overlay').querySelectorAll(
         'button:not(:disabled), select:not(:disabled), input:not(:disabled), ' +
-        'textarea:not(:disabled), [tabindex]:not([tabindex="-1"])'
-      )].filter((element) => element.offsetParent !== null);
+        'textarea:not(:disabled), summary, [tabindex]:not([tabindex="-1"])'
+      )].filter((element) => element.offsetParent !== null &&
+        !element.closest('details:not([open]) > :not(summary)'));
       if (focusable.length === 0) return;
       const current = focusable.indexOf(document.activeElement);
       const next = event.shiftKey
@@ -1228,21 +1631,61 @@ const SylviaGMFrontend = (() => {
       if (button) void removeConfiguredProvider(button.dataset.removeProvider);
     });
     $('home-btn').addEventListener('click', showHome);
+    $('rail-play-btn')?.addEventListener('click', playLatestCampaign);
+    $('rail-builder-btn')?.addEventListener('click', openBuilderMode);
+    $('rail-library-btn')?.addEventListener('click', () => openSettings('packages'));
+    $('rail-settings-btn')?.addEventListener('click', () => openSettings());
+    $('story-rail-btn')?.addEventListener('click', () => setSidebarCollapsed('story', false));
+    $('queue-badge')?.addEventListener('click', revealQueuedActions);
+    document.querySelectorAll('[data-view-mode]').forEach((button) =>
+      button.addEventListener('click', () => selectViewMode(button.dataset.viewMode)));
     for (const side of ['left', 'right']) {
       $(`toggle-${side}-sidebar-btn`).addEventListener('click', () => {
-        setSidebarCollapsed(side, !state.sidebarCollapsed[side]);
+        if (side === 'left' && narrowShell()) toggleNarrowDrawer();
+        else setSidebarCollapsed(side, !state.sidebarCollapsed[side]);
       });
     }
     $('home-new-campaign-btn').addEventListener('click', () => {
       void startCampaignBuilder();
     });
+    readyCampaigns = window.SylviaReadyCampaigns?.create({
+      document, storage: window.localStorage, uuid: () => crypto.randomUUID(),
+      catalog: () => state.bridge.ready_campaign_catalog(),
+      start: command => state.bridge.start_ready_campaign(command),
+      customize: command => state.bridge.customize_ready_campaign(command),
+      model: () => selectedModelChoice() || defaultModelChoice(),
+      customizationModel: () => defaultModelChoice(),
+      error: friendlyCommandError, guidance: guidanceWarningText,
+      onStarted: openReadyCampaign,
+      onCustomize: async (row, result, draftRequest) => {
+        const draft = await startCampaignBuilder(draftRequest);
+        if (!draft) throw new Error('Party files are saved, but campaign setup did not open. Retry to resume it.');
+        setInlineStatus(`Choose ${row.title} and your saved party: ` +
+          result.characters.map(character => character.name).join(', ') +
+          '. Each character is an independent editable copy.', 'construction');
+      },
+    });
+    $('home-ready-campaign-btn').addEventListener('click', () => { void readyCampaigns?.open(); });
     $('home-build-btn').addEventListener('click', () => { void startBuilderChat(); });
+    $('campaign-sequel-btn').addEventListener('click', () => { void openCampaignSequel(); });
+    $('campaign-sequel-preview').addEventListener('click', () => { void previewCampaignSequel(); });
+    $('campaign-sequel-append').addEventListener('click', () => { void appendCampaignSequel(); });
+    $('campaign-sequel-author').addEventListener('click', () => { void authorCampaignSequel(); });
+    $('campaign-sequel-cancel').addEventListener('click', () => {
+      if (!state.sequelDialog?.busy) $('campaign-sequel-dialog').close();
+    });
+    $('campaign-sequel-dialog').addEventListener('cancel', (event) => {
+      if (state.sequelDialog?.busy) event.preventDefault();
+    });
+    $('campaign-sequel-dialog').addEventListener('close', () => { state.sequelDialog = null; });
+    $('campaign-sequel-source').addEventListener('change', () => {
+      if (!state.sequelDialog?.request) resetSequelReview();
+    });
+    for (const id of ['campaign-sequel-connection', 'campaign-sequel-reviewed']) {
+      $(id).addEventListener('input', refreshSequelConfirmation);
+    }
     $('home-settings-btn').addEventListener('click', () => openSettings());
-    $('tutorial-skip-btn').addEventListener('click', () => closeHomeTutorial('skipped'));
-    $('tutorial-next-btn').addEventListener('click', advanceHomeTutorial);
-    $('replay-home-tutorial-btn').addEventListener('click', replayHomeTutorial);
-    window.addEventListener('resize', positionHomeTutorial);
-    document.addEventListener('keydown', handleHomeTutorialKeydown);
+    initTutorials();
     $('new-builder-chat-btn').addEventListener('click', () => { void startBuilderChat(); });
     $('open-campaign-setup-btn').addEventListener('click', () => {
       void showConstructionPanel();
@@ -1263,6 +1706,7 @@ const SylviaGMFrontend = (() => {
       updateCampaignPartyActionAvailability();
       updateReusableLibraryDeleteControls();
     });
+    initStarterCharacterControls();
     $('delete-reusable-player-btn').addEventListener('click', () => {
       const item = (state.campaignPartyOptions?.player_archetypes || []).find(
         (candidate) => candidate.id === $('rift-archetype').value
@@ -1303,6 +1747,13 @@ const SylviaGMFrontend = (() => {
     });
     $('cancel-construction-btn').addEventListener('click', showHome);
     $('rename-campaign-btn').addEventListener('click', () => { void renameSelectedCampaign(); });
+    state.rulesUpdateController = window.SylviaCampaignRulesUpdate?.mount({
+      root: $('campaign-rules-update'), bridge: () => state.bridge,
+      campaign: () => state.activeSessionRole === 'dm' ? state.activeCampaignId : null,
+      adopted: async (campaignId) => {
+        if (state.activeCampaignId === campaignId) await refreshSelectedCampaign();
+      },
+    });
     $('stop-session-btn').addEventListener('click', () => { void stopSelectedSession(); });
     $('resume-session-btn').addEventListener('click', () => { void resumeSelectedSession(); });
     $('finalize-construction-btn').addEventListener('click', () => {
@@ -1399,7 +1850,8 @@ const SylviaGMFrontend = (() => {
     });
     document.addEventListener('click', (event) => {
       if (!$('session-menu').contains(event.target)) $('session-menu').open = false;
-      if (!$('ooc-note').contains(event.target)) $('ooc-note').open = false;
+      // Dismiss the OOC note for clicks elsewhere in the session only; navigating away keeps its saved state.
+      if (!$('ooc-note').contains(event.target) && $('play-area')?.contains(event.target)) $('ooc-note').open = false;
     });
     document.addEventListener('keydown', (event) => {
       if (event.key !== 'Escape') return;
@@ -1412,10 +1864,12 @@ const SylviaGMFrontend = (() => {
     });
     $('player-input').addEventListener('keydown', (event) => {
       if (event.key !== 'Enter' || event.shiftKey || event.isComposing) return;
+      if (window.__sylviaBrowserInvoke && window.matchMedia?.('(pointer: coarse)').matches) return;
       event.preventDefault();
       void submitInput(event.currentTarget.value);
     });
     $('player-input').addEventListener('input', saveSelectedSessionDraft);
+    initDictation();
     $('ooc-input').addEventListener('input', () => {
       saveSelectedSessionDraft();
       $('ooc-note').classList.toggle('has-note', Boolean($('ooc-input').value.trim()));
@@ -1432,12 +1886,17 @@ const SylviaGMFrontend = (() => {
 
   function showSettingsTab(tab) {
     if (!VALID_SETTINGS_TABS.has(tab)) return;
+    // Each tab starts at its own top; another panel's scroll offset never applies.
+    const content = document.querySelector('.settings-content');
+    if (content) content.scrollTop = 0;
     chatgptPageVisible = tab === 'accounts';
     clearTimeout(chatgptStatusTimer);
     document.querySelectorAll('[data-settings-tab]').forEach((button) => {
       const selected = button.dataset.settingsTab === tab;
       button.classList.toggle('active', selected);
       button.setAttribute('aria-selected', selected ? 'true' : 'false');
+      // The narrow section strip scrolls sideways; keep the chosen section in view.
+      if (selected) button.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
     });
     document.querySelectorAll('[data-settings-panel]').forEach((panel) => {
       const selected = panel.dataset.settingsPanel === tab;
@@ -1445,20 +1904,37 @@ const SylviaGMFrontend = (() => {
       panel.hidden = !selected;
     });
     if (chatgptPageVisible) void updateChatGPTConnection('status');
+    state.desktopUpdater?.setVisible(tab === 'about');
+    tutorials?.refresh();
+    if (tab === 'dictation' && !dictationModelJob) {
+      void refreshDictationOptions(state.bridge).catch(() => {
+        // The browser never offers recording; only the desktop app can lack its speech runtime.
+        $('dictation-model-status').textContent = window.__sylviaBrowserInvoke
+          ? 'Dictation is only available in the Sylvia desktop app. You can keep typing here.'
+          : 'Local speech isn’t available in this copy of Sylvia. You can keep typing.';
+      });
+    }
   }
 
   function openSettings(tab = 'models') {
     settingsReturnFocus = document.activeElement;
     const selectedTab = VALID_SETTINGS_TABS.has(tab) ? tab : 'models';
-    showSettingsTab(selectedTab);
+    // Shown first: a hidden pane ignores the tab's scroll reset, so a reopen would keep the old offset.
     $('settings-overlay').hidden = false;
+    showSettingsTab(selectedTab);
+    document.querySelector('.settings-tab.active')?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
     $('close-settings-btn').focus();
     if (selectedTab === 'packages') void refreshRulesetBrowser();
   }
 
+  let localSupportReport = null;
   function closeSettings() {
     if ($('settings-overlay').hidden) return;
+    if (localSupportReport?.close() === false) return;
     $('settings-overlay').hidden = true;
+    // An unsaved model setup ends with Settings, so Models (and any Builder refusal) reopens on its overview.
+    resetModelsPage();
+    state.desktopUpdater?.setVisible(false);
     chatgptPageVisible = false;
     clearTimeout(chatgptStatusTimer);
     if (settingsReturnFocus && typeof settingsReturnFocus.focus === 'function') {
@@ -1481,9 +1957,12 @@ const SylviaGMFrontend = (() => {
       }
       state.applicationInfo = info;
       version.textContent = `Version ${info.version}`;
-      channel.textContent = info.release_channel === 'alpha' ? 'Alpha prerelease' : 'Prerelease';
+      const releaseChannel = typeof info.release_channel === 'string' ? info.release_channel : '';
+      channel.textContent = releaseChannel === 'stable' ? 'Stable release'
+        : releaseChannel ? `${releaseChannel.charAt(0).toUpperCase()}${releaseChannel.slice(1)} prerelease`
+        : 'Release channel unavailable';
       signing.textContent = info.signing_status === 'unsigned'
-        ? 'This version is not digitally signed'
+        ? 'Windows publisher signature: unsigned'
         : 'Signing status supplied by the host';
     } catch (error) {
       state.applicationInfo = null;
@@ -1592,7 +2071,7 @@ const SylviaGMFrontend = (() => {
       );
       void refreshRulesetBrowser(candidateId || null);
     } catch (e) {
-      setPackageInstallStatus(friendlyCommandError('Package installation failed', e));
+      setPackageInstallStatus(uploadCommandError('Package installation', e));
     }
   }
 
@@ -1858,6 +2337,7 @@ const SylviaGMFrontend = (() => {
     try { localStorage.setItem('sylvia-gm-theme', theme); } catch (e) { /* ignore */ }
     document.querySelectorAll('.theme-btn').forEach((btn) => {
       btn.classList.toggle('active', btn.dataset.theme === theme);
+      btn.setAttribute('aria-pressed', String(btn.dataset.theme === theme));
     });
     if (panelHost && !panelHost.isChild) void panelHost.publish().catch(() => {});
   }
@@ -1870,18 +2350,24 @@ const SylviaGMFrontend = (() => {
 
   // ---- Owner-controlled provider settings; saved credentials are never projected back ----
   // Leaving setup discards only unsaved form values, never saved connections or chat selections.
-  function showModelsOverview(saved = null) {
+  function resetModelsPage() {
     state.modelEditor = { route: 'api', providerId: null, modelId: null, step: 'connection' };
     $('models-overview').hidden = false;
     $('model-add-choices').hidden = true;
     $('provider-editor').hidden = true;
     $('provider-credential').value = '';
     $('provider-headers').value = '';
-    if (saved) {
-      state.savedModelNotice = saved;
-      $('models-action-status').textContent = `${saved.name || 'Model'} saved. Your chats keep their current models.`;
-      $('set-added-model-default-btn').hidden = !saved.provider_id || !saved.canonical_model_id;
-    }
+  }
+
+  function noteSavedModel(saved) {
+    state.savedModelNotice = saved;
+    $('models-action-status').textContent = `${saved.name || 'Model'} saved. Your chats keep their current models.`;
+    $('set-added-model-default-btn').hidden = !saved.provider_id || !saved.canonical_model_id;
+  }
+
+  function showModelsOverview(saved = null) {
+    resetModelsPage();
+    if (saved) noteSavedModel(saved);
     showSettingsTab('models');
     $('add-model-btn').focus();
   }
@@ -1990,7 +2476,7 @@ const SylviaGMFrontend = (() => {
         `<button class="btn btn-secondary btn-sm" type="button" data-edit-provider="${escapeHtml(provider.provider_id)}">Connection settings</button>` +
         `<button class="btn btn-danger btn-sm" type="button" data-remove-provider="${escapeHtml(provider.provider_id)}">Remove connection and its models</button>` +
         `</div></details></div>` +
-        (provider.credential_error ? `<p class="settings-description" role="status">${escapeHtml(provider.credential_error)}</p>` : '') +
+        (provider.credential_error ? `<p class="settings-note settings-note-warn" role="status">${escapeHtml(provider.credential_error)}</p>` : '') +
         `${models || '<p>No saved models on this connection.</p>'}</section>`;
     }).join('');
   }
@@ -2570,6 +3056,21 @@ const SylviaGMFrontend = (() => {
   // Show an actionable category without echoing raw network responses or private headers.
   function providerSetupError(error, action) {
     const detail = String(error?.message || error || '');
+    // A lost response cannot establish whether the owner committed a save. Never replay it.
+    if (error?.code === 'outcome_unknown') {
+      return action === 'save the model'
+        ? 'Sylvia lost the response before confirming the save. Restart Sylvia if its owner stopped. Reload / reconnect, then check Your models to see whether it was saved. Check before saving again.'
+        : `Sylvia lost the response and could not confirm ${action}. Reload / reconnect, then inspect the current state before trying again.`;
+    }
+    if (/authority (process exited|process is closed|response channel closed|request pipe closed|reply pipe closed|response could not be read|response was invalid|response identity did not match|response exceeded its bounded protocol|worker could not complete)/.test(detail)) {
+      return action === 'save the model'
+        ? 'Sylvia lost its owner connection before confirming the save. Restart Sylvia, then check Your models to see whether it was saved. Check before saving again.'
+        : `Sylvia lost its owner connection and could not confirm ${action}. Restart Sylvia, then inspect the current state before trying again.`;
+    }
+    if (/previous file is unchanged|settings file could not be read|settings-file access/.test(detail)) {
+      return 'Could not write Sylvia’s settings file. Your saved models are unchanged. ' +
+        'Check that Sylvia’s data folder can be written to, then try again.';
+    }
     if (/rejected the API credential|requires an API key/.test(detail)) {
       return 'Check or replace this service’s API key, then try again. Your saved models are unchanged.';
     }
@@ -2660,17 +3161,31 @@ const SylviaGMFrontend = (() => {
     const editor = state.modelEditor;
     let command;
     status.textContent = 'Saving model.';
+    // The editor is taller than the Settings pane; keep the save outcome on screen.
+    status.scrollIntoView?.({ block: 'nearest' });
     try {
       command = providerEditorCommand();
       const saved = await state.bridge.save_provider_settings(command);
-      if (editor !== state.modelEditor) return;
-      $('provider-credential').value = '';
+      // The owner has saved it even if setup ended meanwhile (Close, Escape, Cancel), so lists always refresh.
       await refreshProviderSettings();
       await refreshModelChoices();
+      if (editor !== state.modelEditor) {
+        noteSavedModel({ ...saved, name: command.model_name });
+        return;
+      }
+      $('provider-credential').value = '';
       showModelsOverview({ ...saved, name: command.model_name });
     } catch (e) {
-      if (editor !== state.modelEditor) return;
-      status.textContent = providerSetupError(e, 'save the model');
+      const message = providerSetupError(e, 'save the model');
+      if (editor !== state.modelEditor) {
+        // The failure replaces any earlier saved notice, so its default offer goes with it.
+        state.savedModelNotice = null;
+        $('set-added-model-default-btn').hidden = true;
+        $('models-action-status').textContent = message;
+        return;
+      }
+      status.textContent = message;
+      status.scrollIntoView?.({ block: 'nearest' });
     }
   }
 
@@ -3110,7 +3625,8 @@ const SylviaGMFrontend = (() => {
         item.id === button.closest('[data-panel-id]')?.dataset.panelId);
       const action = surface?.actions?.find((item) => item.id === button.dataset.panelActionId);
       button.disabled = !hasIdleSession || !state.activeCampaignId || !state.activeSnapshot ||
-        !surface || !action || !panelActionAvailable(surface, action, button.dataset.panelActorId);
+        !surface || !action || !panelActionAvailable(surface, action,
+          button.dataset.panelActorId, button.dataset.panelPieceId);
     });
   }
 
@@ -3323,199 +3839,50 @@ const SylviaGMFrontend = (() => {
     badge.hidden = false;
   }
 
-  function readHomeTutorialProgress() {
-    try {
-      const saved = JSON.parse(localStorage.getItem(HOME_TUTORIAL_KEY) || 'null');
-      if (!saved || !['in_progress', 'completed', 'skipped'].includes(saved.status)) return null;
-      return {
-        status: saved.status,
-        step: Number.isInteger(saved.step) ? saved.step : 0,
-      };
-    } catch (e) {
-      return null;
-    }
-  }
-
-  // Tutorial progress is a local UI preference, never campaign or session truth.
-  function writeHomeTutorialProgress(status, step) {
-    try {
-      localStorage.setItem(HOME_TUTORIAL_KEY, JSON.stringify({ status, step }));
-    } catch (e) { /* best-effort local preference */ }
-  }
-
-  function maybeStartHomeTutorial() {
-    if (state.view !== 'home' || state.homeTutorialOpen || state.homeTutorialQueued) return;
-    const progress = readHomeTutorialProgress();
-    if (progress && ['completed', 'skipped'].includes(progress.status)) return;
-    state.homeTutorialQueued = true;
-    requestAnimationFrame(() => {
-      state.homeTutorialQueued = false;
-      if (state.view !== 'home' || state.homeTutorialOpen) return;
-      startHomeTutorial(progress ? progress.step : 0);
+  // Tutorials observe safe projections and navigate existing pages; they own no application commands.
+  function initTutorials() {
+    if (tutorials || !window.SylviaTutorials) return;
+    tutorials = window.SylviaTutorials.create({
+      document,
+      context: () => {
+        const campaign = state.view === 'session' && state.activeSessionRole === 'dm';
+        const ruleset = state.panelProjection?.ruleset_id || selectedIndexEntry()?.ruleset_id;
+        return {
+          view: state.view, loaded: state.campaignIndexStatus === 'ready',
+          hasContent: Boolean(state.campaigns.length || state.builderChats.length),
+          sessionId: state.activeSessionId,
+          campaign,
+          combatGuide: campaign && window.SylviaTutorials.supportsCombat(ruleset),
+          interview: state.view === 'session' && Boolean(state.activeCampaignId) &&
+            state.activeCampaignId === state.constructionDraftId && state.activeSessionRole === 'builder',
+          builder: state.view === 'session' && state.activeSessionRole === 'builder' && !state.activeCampaignId,
+          modelReady: Boolean(defaultModelChoice()),
+          hasModels: state.modelChoices.length > 0,
+          signedIn: chatgptAccountStatus.signed_in === true,
+          subscriptionModel: state.modelChoices.some(choice =>
+            state.providerSettings?.configured?.some(provider =>
+              provider.provider_id === choice.provider_id && provider.preset_id === 'chatgpt_subscription')),
+          modelEditorReady: state.modelEditor.step === 'model',
+          interviewStep: state.activeCampaignId && state.activeCampaignId === state.constructionDraftId ? currentConstructionStepId() : null,
+          apiRoute: state.modelEditor.route !== 'local', localRoute: state.modelEditor.route === 'local',
+        };
+      },
+      navigate: async route => {
+        if ($('ready-campaign-dialog').open) $('ready-campaign-dialog').close();
+        if (route === 'home') { closeSettings(); showHome(); }
+        else if (route === 'session') closeSettings();
+        else if (route === 'interview') {
+          closeSettings();
+          if (!state.activeCampaignId || state.activeCampaignId !== state.constructionDraftId ||
+              state.activeSessionRole !== 'builder') showHome();
+        } else if (route === 'ready') { closeSettings(); await readyCampaigns?.open(); }
+        else if (route === 'api' || route === 'local') {
+          openSettings('models');
+          // Retain an already-open editor and anything the player has entered.
+          if ($('provider-editor').hidden || state.modelEditor.route !== route) beginModelConnection(route);
+        } else openSettings(route);
+      },
     });
-  }
-
-  function startHomeTutorial(step = 0, restart = false) {
-    const progress = restart ? null : readHomeTutorialProgress();
-    if (!restart && progress && ['completed', 'skipped'].includes(progress.status)) return;
-    state.homeTutorialStep = Math.max(0, Math.min(
-      Number.isInteger(step) ? step : 0,
-      HOME_TUTORIAL_STEPS.length - 1
-    ));
-    state.homeTutorialOpen = true;
-    tutorialReturnFocus = $('home-btn');
-    writeHomeTutorialProgress('in_progress', state.homeTutorialStep);
-    $('home-tutorial').hidden = false;
-    $('home-tutorial').setAttribute('aria-hidden', 'false');
-    renderHomeTutorialStep();
-  }
-
-  function renderHomeTutorialStep() {
-    if (!state.homeTutorialOpen) return;
-    const step = HOME_TUTORIAL_STEPS[state.homeTutorialStep];
-    const target = step.targetId ? $(step.targetId) : null;
-    $('tutorial-step').textContent =
-      `${state.homeTutorialStep + 1} / ${HOME_TUTORIAL_STEPS.length}`;
-    $('tutorial-title').textContent = step.title;
-    $('tutorial-copy').textContent = step.copy;
-    $('tutorial-next-btn').textContent =
-      state.homeTutorialStep === HOME_TUTORIAL_STEPS.length - 1 ? 'Done' : 'Next';
-    $('home-tutorial').dataset.mode = target ? 'target' : 'intro';
-    $('tutorial-spotlight').hidden = !target;
-    $('tutorial-sylvia').src = TUTORIAL_SPRITES[step.sprite || 'up'];
-    requestAnimationFrame(() => {
-      positionHomeTutorial();
-      $('tutorial-next-btn').focus();
-    });
-  }
-
-  function positionHomeTutorial() {
-    if (!state.homeTutorialOpen) return;
-    const step = HOME_TUTORIAL_STEPS[state.homeTutorialStep];
-    const target = step.targetId ? $(step.targetId) : null;
-    const guide = $('tutorial-guide');
-    const sprite = $('tutorial-sylvia');
-    const margin = 14;
-    const gap = 18;
-
-    if (!target) {
-      guide.dataset.placement = 'center';
-      sprite.src = TUTORIAL_SPRITES.wave;
-      const guideRect = guide.getBoundingClientRect();
-      guide.style.left = `${Math.max(margin, (window.innerWidth - guideRect.width) / 2)}px`;
-      guide.style.top = `${Math.max(margin, (window.innerHeight - guideRect.height) / 2)}px`;
-      return;
-    }
-
-    const targetRect = target.getBoundingClientRect();
-    const spotlightPadding = 7;
-    const spotlight = $('tutorial-spotlight');
-    spotlight.style.left = `${targetRect.left - spotlightPadding}px`;
-    spotlight.style.top = `${targetRect.top - spotlightPadding}px`;
-    spotlight.style.width = `${targetRect.width + spotlightPadding * 2}px`;
-    spotlight.style.height = `${targetRect.height + spotlightPadding * 2}px`;
-
-    let guideRect = guide.getBoundingClientRect();
-    const sideGuideWidth = Math.min(420, window.innerWidth - margin * 2);
-    const roomLeft = targetRect.left - margin;
-    const roomRight = window.innerWidth - targetRect.right - margin;
-    const roomAbove = targetRect.top - margin;
-    const roomBelow = window.innerHeight - targetRect.bottom - margin;
-    const roomByPlacement = {
-      left: roomLeft,
-      right: roomRight,
-      above: roomAbove,
-      below: roomBelow,
-    };
-    const requiredRoom = {
-      left: sideGuideWidth + gap,
-      right: sideGuideWidth + gap,
-      above: guideRect.height + gap,
-      below: guideRect.height + gap,
-    };
-    const preferredPlacements = step.preferredPlacements || [
-      'left', 'right', 'below', 'above'
-    ];
-    const placement = preferredPlacements.find(
-      (candidate) => roomByPlacement[candidate] >= requiredRoom[candidate]
-    ) || preferredPlacements.reduce((roomiest, candidate) => (
-      roomByPlacement[candidate] > roomByPlacement[roomiest] ? candidate : roomiest
-    ));
-
-    guide.dataset.placement = placement;
-    guideRect = guide.getBoundingClientRect();
-    const spriteForPlacement = {
-      left: 'right',
-      right: 'left',
-      below: 'up',
-      above: 'down',
-    }[placement];
-    sprite.src = TUTORIAL_SPRITES[spriteForPlacement];
-
-    let left;
-    let top;
-    if (placement === 'left') {
-      left = targetRect.left - guideRect.width - gap;
-      top = targetRect.top + (targetRect.height - guideRect.height) / 2;
-    } else if (placement === 'right') {
-      left = targetRect.right + gap;
-      top = targetRect.top + (targetRect.height - guideRect.height) / 2;
-    } else if (placement === 'below') {
-      left = targetRect.left + (targetRect.width - guideRect.width) / 2;
-      top = targetRect.bottom + gap;
-    } else {
-      left = targetRect.left + (targetRect.width - guideRect.width) / 2;
-      top = targetRect.top - guideRect.height - gap;
-    }
-    guide.style.left = `${Math.max(margin, Math.min(left, window.innerWidth - guideRect.width - margin))}px`;
-    guide.style.top = `${Math.max(margin, Math.min(top, window.innerHeight - guideRect.height - margin))}px`;
-  }
-
-  function advanceHomeTutorial() {
-    if (!state.homeTutorialOpen) return;
-    if (state.homeTutorialStep === HOME_TUTORIAL_STEPS.length - 1) {
-      closeHomeTutorial('completed');
-      return;
-    }
-    state.homeTutorialStep += 1;
-    writeHomeTutorialProgress('in_progress', state.homeTutorialStep);
-    renderHomeTutorialStep();
-  }
-
-  function closeHomeTutorial(status) {
-    if (!state.homeTutorialOpen) return;
-    state.homeTutorialOpen = false;
-    state.homeTutorialQueued = false;
-    $('home-tutorial').hidden = true;
-    $('home-tutorial').setAttribute('aria-hidden', 'true');
-    if (status) writeHomeTutorialProgress(status, state.homeTutorialStep);
-    if (tutorialReturnFocus && typeof tutorialReturnFocus.focus === 'function') {
-      tutorialReturnFocus.focus();
-    }
-    tutorialReturnFocus = null;
-  }
-
-  function handleHomeTutorialKeydown(event) {
-    if (!state.homeTutorialOpen) return;
-    if (event.key === 'Escape') {
-      event.preventDefault();
-      closeHomeTutorial('skipped');
-      return;
-    }
-    if (event.key !== 'Tab') return;
-    const focusable = [$('tutorial-skip-btn'), $('tutorial-next-btn')];
-    const current = focusable.indexOf(document.activeElement);
-    const next = event.shiftKey
-      ? (current <= 0 ? focusable.length - 1 : current - 1)
-      : (current === focusable.length - 1 ? 0 : current + 1);
-    event.preventDefault();
-    focusable[next].focus();
-  }
-
-  function replayHomeTutorial() {
-    closeSettings();
-    showHome();
-    startHomeTutorial(0, true);
   }
 
   function showSessionView() {
@@ -3529,6 +3896,7 @@ const SylviaGMFrontend = (() => {
   }
 
   function showHome() {
+    dictation?.cancel('', { announce: false });
     state.displayHistory = null;
     cancelCampaignOpening();
     gamePanels().leave();
@@ -3549,7 +3917,7 @@ const SylviaGMFrontend = (() => {
     renderBuilderChatRail();
     renderSidebarState();
     renderHome();
-    maybeStartHomeTutorial();
+    tutorials?.maybeWelcome();
   }
 
   function recentCampaign(campaigns) {
@@ -3595,6 +3963,19 @@ const SylviaGMFrontend = (() => {
 
   function renderHome() {
     renderArchivedItems();
+    if (state.campaignIndexStatus !== 'ready') {
+      const failed = state.campaignIndexStatus === 'error';
+      const message = failed ? 'Campaign list could not be loaded' : 'Loading campaigns…';
+      $('home-campaign-count').textContent = message;
+      $('home-recent').innerHTML = '<div class="home-empty-copy">' + message + '</div>';
+      $('campaign-shelves').innerHTML = '<div class="home-empty-copy" role="status">' +
+        message + (failed ? ' <button class="btn btn-secondary" type="button" ' +
+          'id="campaign-index-retry-btn">Retry</button>' : '') + '</div>';
+      if (failed) $('campaign-index-retry-btn').addEventListener('click', () => {
+        void refreshCampaignIndex();
+      });
+      return;
+    }
     const campaigns = state.campaigns.filter((campaign) => campaign.lifecycle === 'active');
     const count = campaigns.length;
     $('home-campaign-count').textContent =
@@ -3777,8 +4158,18 @@ const SylviaGMFrontend = (() => {
           `Delete</button></div></details>`) + '</div>';
     }).join('');
     if (rail.dataset.markup === markup) return;
+    // Replacing the rows would drop keyboard focus to the page; return it to the same session's control.
+    const focused = document.activeElement && rail.contains(document.activeElement) ? document.activeElement : null;
+    const focusedId = focused?.closest('.builder-chat-row')?.querySelector('[data-builder-session-id]')?.dataset.builderSessionId;
+    const focusedSummary = focused?.tagName === 'SUMMARY';
     rail.dataset.markup = markup;
     rail.innerHTML = markup;
+    if (focusedId) {
+      const row = [...rail.querySelectorAll('[data-builder-session-id]')]
+        .find((button) => button.dataset.builderSessionId === focusedId)?.closest('.builder-chat-row');
+      (focusedSummary ? row?.querySelector('summary') : row?.querySelector('[data-builder-session-id]'))
+        ?.focus({ preventScroll: true });
+    }
     rail.querySelectorAll('[data-builder-session-id]').forEach((button) => {
       button.addEventListener('click', () => {
         if (button.dataset.builderCampaignId) {
@@ -3904,6 +4295,7 @@ const SylviaGMFrontend = (() => {
       state.builderChats = state.builderChats.filter((item) => item.session?.session_id !== sessionId);
       state.sessionDrafts.delete(sessionId);
       state.builderQuestionDrafts.delete(sessionId);
+      state.desktopDrafts?.changed();
       if (state.activeSessionId === sessionId) {
         state.activeSessionId = null;
         $('player-input').value = '';
@@ -3995,9 +4387,6 @@ const SylviaGMFrontend = (() => {
           : isCampaignSetup
             ? 'Choose content with Builder, then Configure Campaign'
             : '');
-    $('ctx-campaign').textContent = isCampaignSetup ? 'Not created yet' : 'None';
-    $('ctx-lifecycle').textContent = isCampaignSetup ? 'Campaign setup' : 'Independent chat';
-    $('ctx-writer').textContent = 'Builder';
     $('export-campaign-btn').disabled = true;
     updateLifecycleControls(null, null);
     const canSubmit = refreshSessionInputAdmission();
@@ -4040,6 +4429,7 @@ const SylviaGMFrontend = (() => {
     state.campaignIndexStatus = 'loading';
     state.campaignIndexError = null;
     renderSidebarState();
+    renderHome();
     let pending = state.campaignIndexRefresh = (async () => {
       try {
         const projection = await state.bridge.campaign_index();
@@ -4103,11 +4493,11 @@ const SylviaGMFrontend = (() => {
     const hp = Number.isFinite(entity && entity.hp) ? entity.hp : null;
     const maxHp = Number.isFinite(entity && entity.max_hp) ? entity.max_hp : null;
     if (hp == null) return '';
-    if (maxHp == null || maxHp <= 0) return `<div class="panel-unit-meta">HP ${hp}</div>`;
+    if (maxHp == null || maxHp <= 0) return `<div class="hp-meter"><div class="panel-unit-meta">HP ${hp}</div></div>`;
     const percent = Math.max(0, Math.min(100, (hp / maxHp) * 100));
-    return `<div class="panel-unit-meta">HP ${hp} / ${maxHp}</div>` +
-      `<div class="panel-hp-bar"><div class="panel-hp-fill" ` +
-      `style="width:${percent.toFixed(1)}%"></div></div>`;
+    return `<div class="hp-meter"><div class="panel-unit-meta">HP ${hp} / ${maxHp}</div>` +
+      `<div class="panel-hp-bar"><div class="panel-hp-fill"${percent <= 35 ? ' data-level="low"' : ''} ` +
+      `style="width:${percent.toFixed(1)}%"></div></div></div>`;
   }
 
   function conditionPanelMarkup(entity) {
@@ -4186,13 +4576,15 @@ const SylviaGMFrontend = (() => {
     }
   }
 
-  function panelActionAvailable(surface, action, partyActorId = null) {
-    if (!state.activeSessionId || state.panelCommitPending || pendingPanelCommand() ||
+  function panelActionAvailable(surface, action, partyActorId = null, pieceId = null) {
+    if (!state.activeSessionId || state.panelCommitPending || panelIntentPending() || pendingPanelCommand() ||
         selectedSessionIsWorking() || campaignDisplayPending() || action.available === false) return false;
-    if (!sequenceModeActive() && action.checks_required && !state.panelActionChecks.get(
-      panelActionCheckKey(surface, action, partyActorId)
+    if ((!sequenceModeActive() || surface.renderer === 'piece_table') && action.checks_required && !state.panelActionChecks.get(
+      panelActionCheckKey(surface, action, partyActorId, pieceId)
     )?.available) return false;
     const bindings = action.bindings || {};
+    if (surface.renderer === 'piece_table' && Object.values(bindings).includes('piece') &&
+        !window.SylviaPieceTable.selection(surface.data, action, pieceId)) return false;
     const actorParameter = action.actor_parameter ||
       Object.keys(bindings).find((key) => bindings[key] === 'actor');
     if (!actorParameter) return true;
@@ -4206,7 +4598,41 @@ const SylviaGMFrontend = (() => {
         : playerControlsActor(actorId));
   }
 
-  function panelActionSelection(surface, action, partyActorId = null) {
+  function panelIntentPending() {
+    return state.panelIntentPending?.campaignId === state.activeCampaignId &&
+      state.panelIntentPending?.sessionId === state.activeSessionId;
+  }
+
+  // A delayed preview retains its captured binding only while its original context is valid.
+  function panelActionStillCurrent(command, projectionRevision) {
+    if (command.campaign_id !== state.activeCampaignId || command.session_id !== state.activeSessionId) return false;
+    const surface = state.panelProjection?.surfaces.find((item) => item.id === command.surface_id);
+    const action = surface?.actions?.find((item) => item.id === command.panel_action_id);
+    if (!action || action.available === false) return false;
+    if (state.panelProjection.revision !== projectionRevision) return false;
+    if (surface.renderer === 'piece_table' && Object.values(action.bindings || {}).includes('piece')) {
+      return Boolean(window.SylviaPieceTable.selection(surface.data, action, command.selection?.piece));
+    }
+    if (['tactical_grid', 'coordinate_map'].includes(surface.renderer)) {
+      if (command.selection?.map_revision !== surface.data.map_revision) return false;
+      if (command.selection?.target && !surface.data.entities?.some((item) => item.id === command.selection.target)) return false;
+      return !actionBindsActor(action) || tacticalControlsActor(surface, command.selection?.actor) &&
+        surface.data.entities?.some((item) => item.id === command.selection?.actor);
+    }
+    if (surface.renderer === 'network_graph') {
+      if (command.selection?.graph_revision !== surface.data.graph_revision) return false;
+      if (command.selection?.node && !surface.data.nodes?.some((item) => item.id === command.selection.node)) return false;
+      if (command.selection?.link && !surface.data.links?.some((item) => item.id === command.selection.link)) return false;
+      return !actionBindsActor(action) || networkControlsActor(command.selection?.actor);
+    }
+    if (!actionBindsActor(action)) return true;
+    const actor = command.selection?.actor;
+    return playerControlsActor(actor) && (surface.data?.participants?.some((item) => item.id === actor) ||
+      Boolean(surface.data?.entities?.[actor]));
+  }
+
+  function panelActionSelection(surface, action, partyActorId = null, pieceId = null) {
+    if (surface.renderer === 'piece_table') return window.SylviaPieceTable.selection(surface.data, action, pieceId);
     if (['party', 'unit_list'].includes(surface.renderer) && partyActorId) return { actor: partyActorId };
     if (['tactical_grid', 'coordinate_map'].includes(surface.renderer)) return tacticalActionSelection(surface, action);
     if (surface.renderer === 'network_graph') return networkActionSelection(surface, action);
@@ -4214,10 +4640,10 @@ const SylviaGMFrontend = (() => {
     return null;
   }
 
-  function panelActionCheckKey(surface, action, partyActorId = null) {
+  function panelActionCheckKey(surface, action, partyActorId = null, pieceId = null) {
     return JSON.stringify([state.activeCampaignId, state.activeSessionId,
       state.panelProjection?.revision, surface.id, action.id,
-      panelActionSelection(surface, action, partyActorId)]);
+      panelActionSelection(surface, action, partyActorId, pieceId)]);
   }
 
   async function refreshPanelActionChecks(projection, container) {
@@ -4230,11 +4656,12 @@ const SylviaGMFrontend = (() => {
         const action = surface?.actions?.find((item) => item.id === button.dataset.panelActionId);
         if (!action || (!action.checks_required && !action.map_preview_enabled)) return null;
         return { button, surface, action, actor: button.dataset.panelActorId,
-          key: panelActionCheckKey(surface, action, button.dataset.panelActorId) };
+          piece: button.dataset.panelPieceId,
+          key: panelActionCheckKey(surface, action, button.dataset.panelActorId, button.dataset.panelPieceId) };
       }).filter(Boolean);
-    const apply = () => currentButtons().forEach(({ button, surface, action, actor, key }) => {
+    const apply = () => currentButtons().forEach(({ button, surface, action, actor, piece, key }) => {
       const reason = state.panelActionChecks.get(key)?.reason || '';
-      button.disabled = !panelActionAvailable(surface, action, actor);
+      button.disabled = !panelActionAvailable(surface, action, actor, piece);
       button.title = panelPlayerReason(reason);
       button.setAttribute('aria-description', reason);
       // Show only a current owner-derived price; keep native no-confirmation policy unchanged.
@@ -4267,9 +4694,9 @@ const SylviaGMFrontend = (() => {
     try {
       const response = await state.bridge.player_action_availability({
         campaign_id: projection.campaign_id, expected_revision: projection.revision,
-        requests: pending.map(({ surface, action, actor }) => ({
+        requests: pending.map(({ surface, action, actor, piece }) => ({
           source: { kind: 'panel', surface_id: surface.id, action_id: action.id },
-          selection: panelActionSelection(surface, action, actor),
+          selection: panelActionSelection(surface, action, actor, piece),
         })),
       });
       if (!projectionIsCurrent()) { releasePending(); return; }
@@ -4316,6 +4743,14 @@ const SylviaGMFrontend = (() => {
     return reason.replace(/\bactor\b/gi, word => word[0] === 'A' ? 'Character' : 'character');
   }
 
+  // Display an upper-case engine value such as SEMI_AUTO as words; authored names keep their text.
+  function displayIdentifier(value) {
+    const text = String(value ?? '');
+    return /^[A-Z0-9]+(?:[_-][A-Z0-9]+)*$/.test(text)
+      ? text.toLowerCase().replace(/[_-]/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase())
+      : panelIdentifierLabel(text);
+  }
+
   function panelIdentifierLabel(value) {
     const text = String(value ?? '');
     return /^[a-z0-9]+(?:[_-][a-z0-9]+)+$/.test(text)
@@ -4327,12 +4762,13 @@ const SylviaGMFrontend = (() => {
   function selectedMapActorMarkup(surface, selection) {
     const actorId = tacticalActorId(surface, selection.actor);
     const body = surface.data.entities.find((item) => item.id === selection.actor);
-    if (!body) return '<div class="map-turn-strip panel-empty">Choose your character on the map or in Party.</div>';
+    if (!body) return '<div class="map-turn-strip panel-empty">Choose an acting character on the map. Inspect characters in Party.</div>';
     const source = state.panelProjection?.surfaces.find((item) =>
       ['party', 'unit_list'].includes(item.renderer) && item.data?.entities?.[actorId]);
     const entity = source?.data.entities[actorId] || {};
-    return `<div class="map-turn-strip" data-selected-actor="${escapeHtml(actorId)}">` +
-      `<strong>${escapeHtml(source?.data.participants?.find(member => member.id === actorId)?.data?.name || body.display?.label || entity.name || actorId)}</strong>` +
+    const actingName = source?.data.participants?.find(member => member.id === actorId)?.data?.name || body.display?.label || entity.name || actorId;
+    return `<div class="map-turn-strip" data-selected-actor="${escapeHtml(actorId)}">${actorTokenMarkup(actorId, actingName)}` +
+      `<strong>Acting: ${escapeHtml(actingName)}</strong>` +
       personalResourceMarkup(entity) + actionReadinessMarkup(entity, actorId) + '</div>';
   }
 
@@ -4354,17 +4790,46 @@ const SylviaGMFrontend = (() => {
     return action.id === 'end-turn' ? 'End turn' : action.label || action.id;
   }
 
+  // A key-value status surface the layout hides stays readable as compact map-bar chips.
+  function mapStatusMarkup() {
+    const hidden = gamePanels().snapshot?.()?.hidden || [];
+    const rows = (state.panelProjection?.surfaces || []).filter((surface) => surface.renderer === 'key_value' &&
+      hidden.includes(surface.id) && surface.data && typeof surface.data === 'object' && !Array.isArray(surface.data))
+      .flatMap((surface) => Object.entries(surface.data))
+      .filter(([, value]) => ['string', 'number', 'boolean'].includes(typeof value)).slice(0, 6);
+    return rows.length ? `<div class="map-status-chips" role="group" aria-label="Status">${rows.map(([label, value]) =>
+      `<span class="panel-tag"><small>${escapeHtml(label)}</small> ${escapeHtml(panelIdentifierLabel(String(value).toLowerCase()))}</span>`
+    ).join('')}</div>` : '';
+  }
+
+  // Group a declared map action by what it binds; this is ruleset-neutral presentation only.
+  function mapActionGroup(action) {
+    const bindings = action.bindings || {};
+    const keys = Object.keys(bindings), values = Object.values(bindings);
+    if (values.includes('device')) return 'devices';
+    if (values.includes('zone')) return 'area';
+    if (keys.includes('destination') || values.includes('destination')) return 'move';
+    if (values.includes('target') || values.includes('aim_point')) return 'target';
+    return 'self';
+  }
+
   function mapActionPalette(surface) {
     const selected = tacticalPreviewState(surface, state.tacticalViews[surface.id] || {});
-    const primary = new Set(['move', 'move-walk', 'fire', 'aim', 'burst', 'attack-melee-strength',
-      'attack-ranged-dexterity', 'cast-fire_bolt', 'cast-magic_missile', 'dash']);
     const button = action => `<button type="button" class="map-action-choice${action.id === selected.action?.id ? ' active' : ''}" ` +
       `data-tactical-action="${escapeHtml(action.id)}" aria-pressed="${action.id === selected.action?.id}">` +
       `${escapeHtml(mapActionLabel(surface, action))}</button>`;
-    const main = selected.actions.filter(action => primary.has(action.id)).map(button).join('');
-    const more = selected.actions.filter(action => !primary.has(action.id)).map(button).join('');
-    return `<div class="map-action-palette" aria-label="Choose an action">${main}` +
-      (more ? `<details class="map-more-actions"><summary>More actions</summary><div>${more}</div></details>` : '') + '</div>';
+    const groups = [['self', 'Self'], ['move', 'Move'], ['target', 'Target'], ['area', 'Area'], ['devices', 'Devices']]
+      .map(([id, label]) => [id, label, selected.actions.filter((action) => mapActionGroup(action) === id)])
+      .filter(([, , actions]) => actions.length);
+    return `<div class="map-action-palette" aria-label="Choose an action">` + groups.map(([id, label, actions]) =>
+      `<div class="map-action-group" role="group" aria-label="${label} actions" data-action-group="${id}">` +
+      `<span class="map-action-group-label" aria-hidden="true">${label}</span><div class="map-action-group-buttons">` +
+      actions.map(button).join('') + '</div></div>').join('') + '</div>';
+  }
+
+  // Hide near-integer calculation residue in presentation; authoritative values stay untouched.
+  function presentNumber(value) {
+    return Number.isFinite(value) && Math.abs(value - Math.round(value)) < 1e-9 ? Math.round(value) : value;
   }
 
   function actionReadinessMarkup(entity, actorId) {
@@ -4374,8 +4839,9 @@ const SylviaGMFrontend = (() => {
     const fields = [active ? `Action ${combat.action_available ? 'ready' : 'spent'}` : 'Waiting for turn',
       typeof entity.bonus_action_available === 'boolean' ? `Bonus ${entity.bonus_action_available ? 'ready' : 'spent'}` : '',
       typeof entity.reaction_available === 'boolean' ? `Reaction ${entity.reaction_available ? 'ready' : 'spent'}` : '',
-      active && Number.isFinite(combat.movement_remaining) ? `Move remaining ${combat.movement_remaining}` : ''].filter(Boolean);
-    return `<span class="panel-unit-meta" data-action-readiness="${escapeHtml(actorId)}">${fields.map(escapeHtml).join(' · ')}</span>`;
+      active && Number.isFinite(combat.movement_remaining) ? `Move remaining ${presentNumber(combat.movement_remaining)}` : ''].filter(Boolean);
+    return `<span class="panel-unit-meta" data-action-readiness="${escapeHtml(actorId)}">${fields.map((field) =>
+      `<span class="panel-tag" data-tone="${/ready|remaining/i.test(field) ? 'good' : 'neutral'}">${escapeHtml(field)}</span>`).join(' ')}</span>`;
   }
 
   function weaponReadinessMarkup(entity) {
@@ -4390,6 +4856,81 @@ const SylviaGMFrontend = (() => {
 
   function actorInitials(name) {
     return String(name || '?').trim().split(/\s+/).slice(0, 2).map((word) => Array.from(word)[0]).join('').toUpperCase();
+  }
+
+  function mapBodyForActor(actorId) {
+    for (const surface of state.panelProjection?.surfaces || []) {
+      if (!['tactical_grid', 'coordinate_map'].includes(surface.renderer) || !Array.isArray(surface.data?.entities)) continue;
+      const body = surface.data.entities.find((item) => tacticalActorId(surface, item.id) === actorId);
+      if (body) return body;
+    }
+    return null;
+  }
+
+  // Presentation tone from the projected side/kind or player control only; unknown stays neutral.
+  function entityTone(id, display = mapBodyForActor(id)?.display) {
+    const kind = String(display?.kind || '').toLowerCase();
+    const side = String(display?.side || '').toLowerCase();
+    if (kind === 'device') return 'device';
+    if (/hostile|enem|oppos/.test(side)) return 'hostile';
+    if (/^all|party|friend|player/.test(side) ||
+        state.panelProjection?.player_control?.actors?.some((actor) => actor.id === id)) return 'ally';
+    return 'neutral';
+  }
+
+  function actorTokenMarkup(id, name) {
+    const display = mapBodyForActor(id)?.display;
+    return `<span class="panel-actor-token" data-tone="${entityTone(id, display)}"` +
+      `${display?.kind === 'drone' ? ' data-token-kind="drone"' : ''} aria-hidden="true">${escapeHtml(actorInitials(name || id))}</span>`;
+  }
+
+  // Pips only when the projection supplies a current value and a small declared maximum.
+  function resourcePipsMarkup(value, maximum) {
+    if (!Number.isInteger(value) || !Number.isInteger(maximum) || maximum < 1 || maximum > 12) return '';
+    return `<span class="resource-pips" aria-hidden="true">${Array.from({ length: maximum }, (_, index) =>
+      `<i${index < value ? '' : ' class="off"'}></i>`).join('')}</span>`;
+  }
+
+  // The acting character chosen on the first map; a local presentation choice, not game state.
+  function mapActingActorId() {
+    const surface = state.panelProjection?.surfaces?.find((item) => ['tactical_grid', 'coordinate_map'].includes(item.renderer));
+    const actor = surface ? state.tacticalSelections?.[surface.id]?.actor : null;
+    return actor ? tacticalActorId(surface, actor) : null;
+  }
+
+  // Ready-weapon card from the projected carried weapon; absent fields are omitted, never estimated.
+  function weaponCardMarkup(entity) {
+    const weapon = entity?.weapon;
+    if (!weapon || typeof weapon !== 'object') return '';
+    const rounds = weapon.magazine?.rounds;
+    const capacity = weapon.feed === 'TUBE' ? weapon.tube_capacity : weapon.magazine?.capacity;
+    const feed = weapon.feed === 'TUBE' ? 'Tube' : weapon.feed === 'BELT' ? 'Belt' : 'Magazine';
+    const slots = Number.isInteger(capacity) && capacity >= rounds && capacity <= 120 ? capacity : rounds;
+    const strip = Number.isInteger(rounds) && rounds >= 0 && slots <= 120 ? `<span class="round-strip" aria-hidden="true">` +
+      Array.from({ length: slots }, (_, index) => `<i${index < rounds ? '' : ' class="spent"'}></i>`).join('') + '</span>' : '';
+    const spares = Array.isArray(weapon.spare_magazines)
+      ? weapon.spare_magazines.filter((magazine) => Number.isFinite(magazine?.rounds)) : [];
+    const tags = [
+      typeof weapon.chamber === 'string' ? [`Chamber ${panelIdentifierLabel(weapon.chamber.toLowerCase())}`, weapon.chamber === 'LIVE' ? 'good' : ''] : null,
+      weapon.needs_cycle === true ? ['Cycle required', 'intent'] : null,
+      typeof weapon.location === 'string' ? [displayIdentifier(weapon.location), ''] : null,
+    ].filter(Boolean);
+    const facts = [['Damage', weapon.damage], ['Penetration', weapon.material_pen], ['Recoil', weapon.current_recoil],
+      // The carried base; the owner's reload preview prices the actual action (classes may change it).
+      ['Base reload', Number.isFinite(weapon.reload_ap) ? `${weapon.reload_ap} AP` : null],
+      ['Range', Array.isArray(weapon.range_breakpoints_m) && weapon.range_breakpoints_m.length
+        ? `${weapon.range_breakpoints_m.join(' / ')} m` : null]].filter(([, value]) => value != null && value !== '');
+    return `<div class="weapon-card"><div class="weapon-card-top"><strong>${escapeHtml(panelIdentifierLabel(weapon.label || weapon.id || 'Weapon'))}</strong>` +
+      tags.map(([text, tone]) => `<span class="panel-tag"${tone ? ` data-tone="${tone}"` : ''}>${escapeHtml(text)}</span>`).join('') + '</div>' +
+      (Array.isArray(weapon.fire_modes) && weapon.fire_modes.length ? `<div class="weapon-modes">${weapon.fire_modes.map((mode) =>
+        `<span class="panel-tag">${escapeHtml(displayIdentifier(String(mode)))}</span>`).join('')}</div>` : '') +
+      (Number.isFinite(rounds) ? `<div class="weapon-ammo">${strip}<span class="weapon-ammo-count">${feed} <b>${rounds}</b>` +
+        `${Number.isFinite(capacity) ? `<small> / ${capacity}</small>` : ''}</span></div>` : '') +
+      (spares.length || Number.isFinite(weapon.spare_shells) ? `<div class="weapon-spares"><span>Spares</span>` +
+        spares.map((magazine) => `<span class="spare-chip">${escapeHtml(magazine.rounds)}</span>`).join('') +
+        (Number.isFinite(weapon.spare_shells) ? `<span class="spare-chip">Spare shells ${weapon.spare_shells}</span>` : '') + '</div>' : '') +
+      (facts.length ? `<dl class="weapon-facts">${facts.map(([label, value]) =>
+        `<div><dt>${label}</dt><dd>${escapeHtml(value)}</dd></div>`).join('')}</dl>` : '') + '</div>';
   }
 
   function renderPartyPanel(data, surface) {
@@ -4409,21 +4950,25 @@ const SylviaGMFrontend = (() => {
       ...participants.filter((participant) => (participant.data?.party_role || participant.kind) === 'player_character'),
       ...participants.filter((participant) => (participant.data?.party_role || participant.kind) !== 'player_character'),
     ];
-    return ordered.map((participant) => {
+    const acting = mapActingActorId();
+    const cards = ordered.map((participant) => {
       const details = participant.data || {};
+      const detailSurface = state.panelProjection?.surfaces.find((item) => item.renderer === 'unit_list' &&
+        (item.data?.entities?.[participant.id] || item.data?.participants?.some((member) => member.id === participant.id))) || surface;
       // Namespaced content kinds identify definitions, not player-facing party roles.
       const role = details.party_role ||
         (typeof participant.kind === 'string' && !participant.kind.includes('.') ? participant.kind : '');
-      const entity = entities[participant.id] || {};
+      const entity = detailSurface?.data?.entities?.[participant.id] || entities[participant.id] || {};
       const resources = entity.resources && typeof entity.resources === 'object'
         ? Object.entries(entity.resources).map(([name, value]) =>
           `${panelIdentifierLabel(name)}: ${value}`).join(' · ')
         : '';
       const playerControlled = controlledActorIds && controlledActorIds.has(participant.id);
-      const currentActor = playerControl && playerControl.focused_actor_id === participant.id;
+      const combat = state.panelProjection?.surfaces.find((item) => item.renderer === 'encounter')?.data?.combat;
+      const currentActor = combat?.encounter_active && (combat.current_actor || combat.active_actor) === participant.id;
       const controlLabels = [
         playerControlled ? 'Player controlled' : '',
-        currentActor ? 'Focused character' : '',
+        currentActor ? 'Current turn' : '',
       ].filter(Boolean);
       const controls = actorActions.map((action) => {
         const available = panelActionAvailable(surface, action, participant.id);
@@ -4435,34 +4980,68 @@ const SylviaGMFrontend = (() => {
       const maps = state.panelProjection?.surfaces.filter((item) => ['tactical_grid', 'coordinate_map'].includes(item.renderer) &&
         Array.isArray(item.data?.entities) &&
         item.data.entities.some((member) => tacticalActorId(item, member.id) === participant.id)) || [];
-      const selectedOnMap = maps.some((map) => tacticalActorId(map, state.tacticalSelections[map.id]?.actor) === participant.id);
+      const selectedOnMap = characterInspection().id === participant.id;
       const mapBody = maps[0]?.data.entities.find((member) => tacticalActorId(maps[0], member.id) === participant.id);
       const posture = tacticalPostureText(mapBody, maps[0]?.data);
-      const selectActor = playerControlled && maps.length
+      const selectActor = inspectableCharacters().some((item) => item.id === participant.id)
         ? `<button type="button" class="btn btn-secondary btn-sm" ` +
-          `data-party-select-actor="${escapeHtml(participant.id)}" aria-pressed="${selectedOnMap}">` +
-          `${selectedOnMap ? 'Selected' : 'Select'}</button>` : '';
-      return `<div class="panel-unit" data-panel-entity="${escapeHtml(participant.id)}">` +
-        `<div class="panel-unit-heading"><span class="panel-actor-token" aria-hidden="true">${escapeHtml(actorInitials(details.name || participant.id))}</span><strong>${escapeHtml(details.name || participant.id)}</strong>` +
-        (role ? `<span class="panel-unit-role">${escapeHtml(panelIdentifierLabel(role))}</span>` : '') +
+          `data-party-select-actor="${escapeHtml(participant.id)}" aria-pressed="${selectedOnMap}" aria-label="${selectedOnMap ? 'Inspecting' : 'Inspect'} ${escapeHtml(details.name || participant.id)}">` +
+          `${selectedOnMap ? 'Inspecting' : 'Inspect'}</button>` : '';
+      const referencedActions = detailSurface === surface ? [] : (detailSurface.actions || [])
+        .filter((action) => actionBindsActor(action) && !actorActions.some((item) => item.id === action.id));
+      const detailActions = referencedActions.length ? `<div class="panel-unit-meta">` + referencedActions.map((action) =>
+        `${escapeHtml(action.label || action.id)}${panelActionAvailable(detailSurface, action, participant.id) ? '' : ' (unavailable)'}`).join(' · ') +
+        `</div><button type="button" class="btn btn-secondary btn-sm" data-character-action-panel="${escapeHtml(detailSurface.id)}">` +
+        `Open ${escapeHtml(detailSurface.title || 'Character')} actions</button>` : '';
+      const inspection = characterInspection();
+      const classLevel = [details.class_id || details.class || entity.class_id,
+        Number.isFinite(details.level ?? entity.level) ? `Level ${details.level ?? entity.level}` : '']
+        .filter(Boolean).map((value) => panelIdentifierLabel(value)).join(' · ');
+      const markup = `<div class="panel-unit${selectedOnMap ? ' character-inspected' : ''}${acting === participant.id ? ' roster-acting' : ''}" data-panel-entity="${escapeHtml(participant.id)}">` +
+        `<div class="panel-unit-heading">${actorTokenMarkup(participant.id, details.name)}<span class="panel-unit-name"><strong>${escapeHtml(details.name || participant.id)}</strong>` +
+        (classLevel ? `<small>${escapeHtml(classLevel)}</small>` : '') +
+        (role ? `<span class="panel-unit-role">${escapeHtml(panelIdentifierLabel(role))}</span>` : '') + '</span>' +
+        (acting === participant.id ? '<span class="panel-tag" data-tone="ally">Acting</span>' : '') +
         selectActor + `</div>` +
-        hpPanelMarkup(entity) + personalResourceMarkup(entity) + conditionPanelMarkup(entity) +
-        `<details class="roster-inspection"><summary>Details</summary>` +
+        `<div class="roster-vitals">${hpPanelMarkup(entity)}${personalResourceMarkup(entity)}</div>` +
+        droneStatusMarkup(entity, (id) => participants.find((member) => member.id === id)?.data?.name ||
+          entities[id]?.name || mapBodyForActor(id)?.display?.label || displayIdentifier(id)) + conditionPanelMarkup(entity) +
+        `<details class="roster-inspection" data-character-expansion="${escapeHtml(participant.id)}"${inspection.expanded.includes(participant.id) ? ' open' : ''}><summary aria-label="Details for ${escapeHtml(details.name || participant.id)}">Details</summary>` +
         (controlLabels.length ? `<div class="panel-unit-meta">${controlLabels.map(escapeHtml).join(' · ')}</div>` : '') +
-        weaponReadinessMarkup(entity) + actionReadinessMarkup(entity, participant.id) +
+        characterDetailMarkup(detailSurface, participant.id, true) +
         (posture ? `<div class="panel-unit-meta">${escapeHtml(posture)}</div>` : '') +
-        (resources ? `<div class="panel-unit-meta">${escapeHtml(resources)}</div>` : '') + '</details>' +
-        (controls ? `<details class="character-stat-group"><summary>Available actions</summary><div class="ruleset-panel-actions">${controls}</div></details>` : '') +
+        (resources ? `<div class="panel-unit-meta">${escapeHtml(resources)}</div>` : '') +
+        (controls || detailActions ? `<details class="character-stat-group"><summary>Available actions</summary><div class="ruleset-panel-actions">${controls}</div>${detailActions}</details>` : '') + '</details>' +
         `</div>`;
-    }).join('');
+      return { markup, drone: mapBodyForActor(participant.id)?.display?.kind === 'drone' };
+    });
+    const drones = cards.filter((card) => card.drone);
+    return cards.filter((card) => !card.drone).map((card) => card.markup).join('') +
+      (drones.length ? `<div class="roster-group-label">Drones</div>${drones.map((card) => card.markup).join('')}` : '');
   }
 
   // Resource values come from committed state; an absent maximum never becomes a guessed bar.
+  function droneStatusMarkup(entity, names) {
+    const rows = [];
+    if (typeof entity.controlled_by === 'string' && entity.controlled_by)
+      rows.push(`Controlled by ${names(entity.controlled_by)}`);
+    const order = entity.standing_order;
+    if (order && typeof order === 'object' && order.active === true) {
+      rows.push(['Standing order', typeof order.target === 'string' ? names(order.target) : '',
+        typeof order.authorized_fire === 'boolean' ? (order.authorized_fire ? 'fire authorised' : 'fire not authorised') : '',
+        typeof order.collateral_limit === 'string' ? displayIdentifier(order.collateral_limit) : ''].filter(Boolean).join(' · '));
+    }
+    return rows.length ? `<div class="panel-unit-meta drone-status">${rows.map(escapeHtml).join('<br>')}</div>` : '';
+  }
+
   function personalResourceMarkup(entity) {
     const values = [['RES', 'res'], ['AP', 'ap']].filter(([, field]) => Number.isFinite(entity[field]));
-    return values.length ? `<div class="panel-unit-meta">${values.map(([label, field]) =>
-      `${label} ${entity[field]}${Number.isFinite(entity[`max_${field}`]) ? ` / ${entity[`max_${field}`]}` : ''}`
-    ).join(' · ')}</div>` : '';
+    return values.length ? `<div class="panel-unit-meta personal-resources">${values.map(([label, field]) => {
+      const maximum = entity[`max_${field}`];
+      return `<span class="resource-stat" data-resource-stat="${field}"><span class="resource-chip" data-resource="${field}">` +
+        `${label} ${entity[field]}${Number.isFinite(maximum) ? ` / ${maximum}` : ''}</span>` +
+        `${field === 'ap' ? resourcePipsMarkup(entity[field], maximum) : ''}</span>`;
+    }).join('')}</div>` : '';
   }
 
   // Use the owning admitted surface so inventory shortcuts retain native bindings and checks.
@@ -4470,55 +5049,73 @@ const SylviaGMFrontend = (() => {
     const actions = (surface.actions || []).filter((action) => actionBindsActor(action) &&
       (!equipmentOnly || ['cycle_weapon', 'reload_weapon', 'recover_recoil'].includes(action.intent)));
     if (!actions.length) return '';
-    return `<div class="ruleset-panel-actions" data-panel-id="${escapeHtml(surface.id)}">` + actions.map((action) =>
+    const stance = surface.data?.entities?.[actorId]?.stance;
+    const buttons = choices => choices.map((action) =>
       `<button type="button" class="btn btn-secondary btn-sm ruleset-panel-action" ` +
       `data-panel-action-id="${escapeHtml(action.id)}" data-panel-actor-id="${escapeHtml(actorId)}" ` +
-      `${panelActionAvailable(surface, action, actorId) ? '' : 'disabled'}>${escapeHtml(action.label || action.id)}</button>`).join('') + '</div>';
+      `${action.params?.stance != null && action.params.stance === stance ? 'aria-current="true" ' : ''}` +
+      `${panelActionAvailable(surface, action, actorId) ? '' : 'disabled'}>${escapeHtml(action.label || action.id)}</button>`).join('');
+    const posture = actions.filter(action => action.intent === 'set_stance' || action.id.startsWith('stance-'));
+    const handling = actions.filter(action => !posture.includes(action));
+    // Only a declared or checked refusal folds an action away; transient busy states stay visible.
+    const refused = (action) => action.available === false || (action.checks_required &&
+      state.panelActionChecks.get(panelActionCheckKey(surface, action, actorId))?.available === false);
+    const ready = handling.filter((action) => !refused(action));
+    const unavailable = handling.filter(refused);
+    return `<div class="character-action-groups" data-panel-id="${escapeHtml(surface.id)}">` +
+      (posture.length ? `<div class="character-posture"><span>Posture</span><div class="ruleset-panel-actions posture-switch" role="group" aria-label="Posture">${buttons(posture)}</div></div>` : '') +
+      (ready.length ? `<div class="character-ready-actions"><span>${equipmentOnly ? 'Equipment actions' : 'Actions'}</span><div class="ruleset-panel-actions">${buttons(ready)}</div></div>` : '') +
+      (unavailable.length ? `<details class="character-handling" data-character-stat="${escapeHtml(JSON.stringify([actorId, 'handling']))}"><summary>${unavailable.length} unavailable now</summary><div class="ruleset-panel-actions">${buttons(unavailable)}</div></details>` : '') + '</div>';
   }
 
   // This bounded renderer focuses an admitted participant and reuses the ordinary actor controls.
   function renderCharacterPanel(surface) {
     const participants = surface.data?.participants || [];
-    const selected = state.tacticalSelections[surface.id]?.actor ||
-      state.panelProjection?.surfaces.filter((item) => ['tactical_grid', 'coordinate_map'].includes(item.renderer))
-        .map((item) => tacticalActorId(item, state.tacticalSelections[item.id]?.actor)).find(Boolean) ||
-      state.panelProjection?.player_control?.focused_actor_id;
+    const inspection = characterInspection();
+    const selected = inspection.id;
     const entities = surface.data?.entities || {};
     const actors = state.panelProjection?.player_control?.actors || [];
-    const choices = [...participants.map((item) => ({ id: item.id, name: item.data?.name || entities[item.id]?.name || item.id })),
-      ...actors.filter((item) => entities[item.id] && !participants.some((participant) => participant.id === item.id))
-        .map((item) => ({ id: item.id, name: entities[item.id]?.name || item.name || item.id }))];
-    const actorId = selected || choices[0]?.id;
-    if (!actorId) return '<div class="panel-empty">No character selected.</div>';
+    const actorId = selected;
+    if (!actorId) return characterPickerMarkup() + `<div class="panel-empty" data-character-unavailable="${escapeHtml(inspection.unavailableId || '')}">` +
+      (inspection.unavailableId ? 'The previously inspected character is unavailable. ' : '') +
+      'Choose a character to inspect.</div>';
     const participant = participants.find((item) => item.id === actorId);
     const entity = entities[actorId];
     const name = participant?.data?.name || entity?.name || actors.find((item) => item.id === actorId)?.name || actorId;
-    if (!participant && !entity) return `<div class="panel-empty" data-character-unavailable="${escapeHtml(actorId)}">` +
+    if (!participant && !entity) return characterPickerMarkup() + `<div class="panel-empty" data-character-unavailable="${escapeHtml(actorId)}">` +
       `<strong>${escapeHtml(name)}</strong><p>Character details are unavailable for this character.</p></div>`;
-    const selector = `<details class="character-switcher"><summary>Change character</summary><label>Character <select data-character-actor>` + choices.map((item) =>
-      `<option value="${escapeHtml(item.id)}"${item.id === actorId ? ' selected' : ''}>` +
-      `${escapeHtml(item.name)}</option>`).join('') + '</select></label></details>';
+    const selector = characterPickerMarkup();
+    return selector + characterDetailMarkup(surface, actorId);
+  }
+
+  // Share the complete admitted detail presentation between Party and Character.
+  function characterDetailMarkup(surface, actorId, compact = false) {
+    const participant = surface.data?.participants?.find((item) => item.id === actorId);
+    const entity = surface.data?.entities?.[actorId] || {};
+    const name = participant?.data?.name || entity?.name || actorId;
     const details = participant?.data || {};
-    const description = [details.class_id || details.class, Number.isFinite(details.level) ? `Level ${details.level}` : '']
+    const level = details.level ?? entity.level;
+    const description = [details.class_id || details.class || entity.class_id, Number.isFinite(level) ? `Level ${level}` : '']
       .filter(Boolean).map((value) => escapeHtml(panelIdentifierLabel(value))).join(' · ');
     const values = ['aptitudes', 'skills'].map((field) => {
       const entries = Object.entries(entity?.[field] || details[field] || {}).filter(([, value]) => Number.isFinite(value));
-      return entries.length ? `<details class="character-stat-group"><summary>${escapeHtml(panelIdentifierLabel(field))}</summary>` +
+      return entries.length ? `<details class="character-stat-group" data-character-stat="${escapeHtml(JSON.stringify([actorId, field]))}"><summary>${escapeHtml(panelIdentifierLabel(field))}</summary>` +
         entries.map(([name, value]) => `<span>${escapeHtml(panelIdentifierLabel(name))} <b>${value}</b></span>`).join('') + '</details>' : '';
     }).join('');
-    return selector + `<div class="character-hero" ${participant ? 'data-panel-entity' : 'data-character-entity'}="${escapeHtml(actorId)}">` +
-      `<div class="character-identity"><span class="panel-actor-token" aria-hidden="true">${escapeHtml(actorInitials(name))}</span>` +
-      `<div><small>Character</small><h3><strong>${escapeHtml(name)}</strong></h3>${description ? `<span class="character-description">${description}</span>` : ''}` +
-      (details.party_role ? `<span class="panel-unit-role">${escapeHtml(panelIdentifierLabel(details.party_role))}</span>` : '') + '</div></div>' +
-      `<div class="character-vitals">${hpPanelMarkup(entity)}${personalResourceMarkup(entity)}</div>` +
-      conditionPanelMarkup(entity) +
-      `<div class="character-loadout"><strong>Ready equipment</strong>${weaponReadinessMarkup(entity || {})}` +
-      (entity?.weapon?.id ? `<h4>${escapeHtml(panelIdentifierLabel(entity.weapon.id))}</h4>` : '') +
+    return `<div class="${compact ? 'character-expanded-details' : 'character-hero'}" data-character-details="${escapeHtml(actorId)}"${compact ? '' : ` ${participant ? 'data-panel-entity' : 'data-character-entity'}="${escapeHtml(actorId)}"`}>` +
+      (compact ? (description ? `<p class="character-description">${description}</p>` : '') : `<div class="character-identity">${actorTokenMarkup(actorId, name)}` +
+      `<div><small>Inspecting</small><h3><strong>${escapeHtml(name)}</strong></h3>${description ? `<span class="character-description">${description}</span>` : ''}` +
+      (details.party_role ? `<span class="panel-unit-role">${escapeHtml(panelIdentifierLabel(details.party_role))}</span>` : '') + '</div></div>') +
+      (compact ? '' : `<div class="character-vitals">${hpPanelMarkup(entity)}${personalResourceMarkup(entity)}</div>` +
+      conditionPanelMarkup(entity)) +
+      (!compact && weaponCardMarkup(entity) ? `<div class="character-loadout"><strong>Ready weapon</strong>${weaponCardMarkup(entity)}`
+        : `<div class="character-loadout"><strong>Ready equipment</strong>${weaponReadinessMarkup(entity || {})}` +
+          (entity?.weapon?.id ? `<h4>${escapeHtml(panelIdentifierLabel(entity.weapon.id))}</h4>` : '')) +
       (entity?.weapon_sets ? `<div>${escapeHtml(panelIdentifierLabel(entity.weapon_sets.active_set || ''))}: ` +
         `${escapeHtml([entity.weapon_sets[entity.weapon_sets.active_set]?.main_hand, entity.weapon_sets[entity.weapon_sets.active_set]?.off_hand].filter(Boolean).map(panelIdentifierLabel).join(' / '))}</div>` : '') +
-      (entity?.resources ? `<div class="character-resources">${Object.entries(entity.resources).map(([key,value]) =>
+      (!compact && entity?.resources ? `<div class="character-resources">${Object.entries(entity.resources).map(([key,value]) =>
         `<span>${escapeHtml(panelIdentifierLabel(key))}<b>${escapeHtml(value)}</b></span>`).join('')}</div>` : '') +
-      '</div>' + characterActionMarkup(surface, actorId) + actionReadinessMarkup(entity || {}, actorId) + '</div>' + (!participant ? '<p class="panel-unit-meta">Full character details are unavailable. These are the selected character’s current combat stats.</p>' : '') + values;
+      '</div>' + (compact ? '' : characterActionMarkup(surface, actorId)) + actionReadinessMarkup(entity || {}, actorId) + '</div>' + (!participant ? '<p class="panel-unit-meta">Full character details are unavailable. These are the selected character’s current combat stats.</p>' : '') + values;
   }
 
   function renderEncounterPanel(data) {
@@ -4538,11 +5135,12 @@ const SylviaGMFrontend = (() => {
     ]).filter(Boolean))];
     const header = `<div class="panel-unit-meta">Round ${escapeHtml(combat.round || 1)} · ` +
       `Current: ${escapeHtml(names[combat.current_actor] || combat.current_actor || '—')}</div>`;
-    const units = orderedIds.map((id) => {
+    const units = orderedIds.map((id, index) => {
       const entity = entities[id] || {};
       const active = id === combat.current_actor ? ' · Current turn' : '';
-      return `<div class="panel-unit" data-panel-entity="${escapeHtml(id)}">` +
-        `<div class="panel-unit-heading"><strong>${escapeHtml(names[id] || id)}</strong>` +
+      return `<div class="panel-unit${active ? ' turn-current' : ''}" data-panel-entity="${escapeHtml(id)}">` +
+        `<div class="panel-unit-heading"><span class="turn-order" aria-hidden="true">${index + 1}</span>` +
+        `${actorTokenMarkup(id, names[id])}<strong>${escapeHtml(names[id] || id)}</strong>` +
         `<span class="panel-unit-role">${escapeHtml(entity.creature_kind || 'creature')}${active}</span></div>` +
         hpPanelMarkup(entity) + personalResourceMarkup(entity) + conditionPanelMarkup(entity) + `</div>`;
     }).join('');
@@ -4649,13 +5247,12 @@ const SylviaGMFrontend = (() => {
   function renderInventoryPanel(data, surface) {
     const participants = data && Array.isArray(data.participants) ? data.participants : [];
     const entities = data && data.entities && typeof data.entities === 'object' ? data.entities : {};
-    const selected = state.tacticalSelections[surface.id]?.actor ||
-      state.panelProjection?.surfaces.filter((item) => ['tactical_grid', 'coordinate_map'].includes(item.renderer))
-        .map((item) => tacticalActorId(item, state.tacticalSelections[item.id]?.actor)).find(Boolean);
+    const selected = characterInspection().id;
+    if (!selected) return characterPickerMarkup() + '<div class="panel-empty">Choose a character to inspect equipment.</div>';
     const controlled = state.panelProjection?.player_control?.actors || [];
     const participant = participants.find((item) => item.id === selected);
     const knownEntity = controlled.find((item) => item.id === selected) && entities[selected];
-    if (selected && !participant && !knownEntity) return '<div class="panel-empty">Selected character equipment is unavailable.</div>';
+    if (selected && !participant && !knownEntity) return characterPickerMarkup() + '<div class="panel-empty">Selected character equipment is unavailable.</div>';
     const displayed = selected ? [participant || { id: selected, data: { name: knownEntity.name || controlled.find((item) => item.id === selected)?.name || selected } }] : participants;
     const owners = displayed.map((participant) => {
       const entity = entities[participant.id] || {};
@@ -4674,8 +5271,12 @@ const SylviaGMFrontend = (() => {
           typeof carried.location === 'string' ? panelIdentifierLabel(carried.location.toLowerCase()) : '',
           typeof carried.owner_id === 'string' ? `Owner: ${participants.find((item) => item.id === carried.owner_id)?.data?.name || panelIdentifierLabel(carried.owner_id)}` : '',
         ].filter(Boolean).map(escapeHtml).join(' · ');
-        return `<div class="panel-unit-meta"><strong>${escapeHtml(panelIdentifierLabel(weaponName))}</strong></div>` +
-          `<div class="panel-unit-meta">${ammunition}</div>`;
+        const spares = Array.isArray(carried.spare_magazines)
+          ? carried.spare_magazines.filter((magazine) => Number.isFinite(magazine?.rounds)) : [];
+        return `<div class="loadout-weapon"><div class="panel-unit-meta"><strong>${escapeHtml(panelIdentifierLabel(weaponName))}</strong></div>` +
+          `<div class="panel-unit-meta">${ammunition}</div>` +
+          (spares.length ? `<div class="weapon-spares"><span>Spare magazines</span>${spares.map((magazine) =>
+            `<span class="spare-chip">${escapeHtml(magazine.rounds)}</span>`).join('')}</div>` : '') + '</div>';
       }).join('');
       return `<div class="panel-unit"><div class="panel-unit-heading"><strong>${escapeHtml(name)}</strong></div>` +
         renderPreparedEquipment(participant, entity, surface) + weapons +
@@ -4693,12 +5294,10 @@ const SylviaGMFrontend = (() => {
   // Inventory is a projection of committed holdings; selection never changes campaign state.
   function renderGenericInventoryPanel(surface) {
     const characters = surface.data?.characters || [];
-    const chosen = state.tacticalSelections[surface.id]?.character;
-    const character = characters.find((item) => item.id === chosen) || characters[0];
-    if (!character) return '<div class="panel-empty">No known character inventory yet.</div>';
-    const selector = `<label>Character <select data-inventory-character>` + characters.map((item) =>
-      `<option value="${escapeHtml(item.id)}"${item.id === character.id ? ' selected' : ''}>` +
-      `${escapeHtml(item.name)}</option>`).join('') + '</select></label>';
+    const chosen = characterInspection().id;
+    const character = characters.find((item) => item.id === chosen);
+    if (!character) return characterPickerMarkup() + '<div class="panel-empty">Selected character inventory is unavailable.</div>';
+    const selector = characterPickerMarkup();
     const rows = character.items.map((item) => `<div class="panel-unit">` +
       `<div class="panel-unit-heading"><strong>${escapeHtml(item.item_id === item.name
         ? panelIdentifierLabel(item.item_id) : item.name)}</strong>` +
@@ -4791,7 +5390,8 @@ const SylviaGMFrontend = (() => {
   function tacticalPositionStyle(position, dimensions, size = 0.72) {
     const x = (position[0] - dimensions.lower[0]) / dimensions.cellSize;
     const y = (position[1] - dimensions.lower[1]) / dimensions.cellSize;
-    return `left:${x * 32}px;top:${y * 32}px;width:${size * 32}px;height:${size * 32}px`;
+    const point = `left:${x * 32}px;top:${y * 32}px`;
+    return size === null ? point : `${point};width:${size * 32}px;height:${size * 32}px`;
   }
 
   function tacticalBoxStyle(volume, dimensions) {
@@ -4902,7 +5502,7 @@ const SylviaGMFrontend = (() => {
     ));
     if (!missing.size) return null;
     const prompts = [];
-    if (missing.has('actor')) prompts.push('Choose your character');
+    if (missing.has('actor')) prompts.push('Choose an acting character');
     if (missing.has('target')) prompts.push('Select a target');
     if (missing.has('zone')) prompts.push('Select a zone');
     if (missing.has('device')) prompts.push('Select a device');
@@ -4989,12 +5589,16 @@ const SylviaGMFrontend = (() => {
       return `Checking ${escapeHtml(selected.action.label || selected.action.id)} preview…`;
     }
     const preview = selected.check.map_preview;
+    // A preview never changes state; the owner rechecks the action when it actually runs.
+    const previewOnly = `<div class="preview-only-note">${sequenceModeActive()
+      ? 'Preview only · queuing adds an unvalidated intent; Sylvia’s rules recheck it on Execute.'
+      : 'Preview only · Sylvia’s rules recheck it when you commit.'}</div>`;
     const unavailable = !selected.check.available
       ? `<div class="tactical-preview-unavailable">${escapeHtml(
         panelPlayerReason(selected.check.reason) || 'This action is unavailable.'
       )}</div>` : '';
-    if (!preview) return unavailable || rulesetCardMarkup(selected.check.preview, '') ||
-      'Cost preview unavailable. Committing spends the action’s normal resources.';
+    if (!preview) return (unavailable || rulesetCardMarkup(selected.check.preview, '') ||
+      'Cost preview unavailable. Committing spends the action’s normal resources.') + previewOnly;
     if (preview.map_revision !== surface.data.map_revision ||
         (surface.data.map.id && preview.map_id !== surface.data.map.id)) {
       return 'This map preview is out of date. Change the selection to check again.';
@@ -5014,7 +5618,7 @@ const SylviaGMFrontend = (() => {
     return unavailable + (card || '') +
       `<div>${parts.map(escapeHtml).join(' · ') || 'Map preview available.'}</div>` +
       tacticalFiringExplanation(preview, surface.data) +
-      `<div>${escapeHtml(preview.notice || '')}</div>`;
+      `<div>${escapeHtml(preview.notice || '')}</div>` + previewOnly;
   }
 
   // Read only the map's public posture and physical height; rulesets own their meaning.
@@ -5146,6 +5750,26 @@ const SylviaGMFrontend = (() => {
       '<span>Map effects</span><ul>' + Array.from(entries.values()).join('') + '</ul></div>' : '';
   }
 
+  function tacticalFocusKey(surface) {
+    return surface ? JSON.stringify([state.activeCampaignId, state.activeSessionId, surface.id,
+      surface.data?.map?.id || surface.id]) : null;
+  }
+
+  function tacticalEntryCell(view, selection, surface, dimensions) {
+    const inside = (cell) => Array.isArray(cell) && Number.isInteger(cell[0]) && Number.isInteger(cell[1]) &&
+      cell[0] >= 0 && cell[1] >= 0 && cell[0] < dimensions.width && cell[1] < dimensions.height;
+    if (inside(view.focusCell)) return view.focusCell;
+    // Leaving a campaign resets map views; the remembered cell returns with the same campaign and session.
+    const remembered = state.tacticalFocusCells[tacticalFocusKey(surface)];
+    if (inside(remembered)) return remembered;
+    if (inside(selection.destination)) return selection.destination;
+    const actor = surface?.data?.entities?.find((item) => item.id === selection.actor);
+    const cell = Array.isArray(actor?.position) ? [
+      Math.floor((actor.position[0] - dimensions.lower[0]) / dimensions.cellSize),
+      Math.floor((actor.position[1] - dimensions.lower[1]) / dimensions.cellSize)] : null;
+    return inside(cell) ? cell : [0, 0];
+  }
+
   function renderTacticalGridPanel(data, surfaceId) {
     if (typeof data?.unavailable_reason === 'string') {
       return `<div class="panel-empty" role="status">${escapeHtml(data.unavailable_reason)}</div>`;
@@ -5168,11 +5792,13 @@ const SylviaGMFrontend = (() => {
     const currentMapPreview = surface ? tacticalCurrentMapPreview(surface, previewState.check) : null;
     const previewDetails = tacticalMapPreviewDetails(currentMapPreview, dimensions);
     const cells = [];
+    const entry = continuous ? null : tacticalEntryCell(view, selection, surface, dimensions);
     for (let y = 0; !continuous && y < dimensions.height; y += 1) {
       for (let x = 0; x < dimensions.width; x += 1) {
         const selected = Array.isArray(selection.destination) &&
           selection.destination[0] === x && selection.destination[1] === y;
         cells.push(`<button type="button" class="tactical-cell${selected ? ' selected' : ''}" ` +
+          `tabindex="${entry[0] === x && entry[1] === y ? 0 : -1}" ` +
           `data-tactical-cell="${x},${y}" data-cell-x="${x}" data-cell-y="${y}" ` +
           `aria-label="Cell ${x + 1}, ${y + 1}" aria-pressed="${selected}"></button>`);
       }
@@ -5239,16 +5865,24 @@ const SylviaGMFrontend = (() => {
         state.crossSurfaceFocus.surfaceId === surfaceId &&
         state.crossSurfaceFocus.entityId === item.id;
       const label = item.display && item.display.label || item.id;
+      const space = item.occupied_space;
       const posture = [tacticalPostureText(item, data), continuous
-        ? `at ${item.position.join(', ')} ${data.map.grid.unit}` : ''].filter(Boolean).join('; ');
+        ? `at ${item.position.join(', ')} ${data.map.grid.unit}` : '', continuous && space
+        ? space.status === 'declared' ? `Occupied space ${space.diameter} ${data.map.grid.unit} diameter`
+          : space.reason : ''].filter(Boolean).join('; ');
       return `<button type="button" class="tactical-entity${actor ? ' actor' : ''}` +
         `${target ? ' target' : ''}${crossFocused ? ' cross-focused' : ''}" ` +
-        `data-tactical-entity="${escapeHtml(item.id)}" ` +
+        `data-tactical-entity="${escapeHtml(item.id)}" data-tone="${entityTone(item.id, item.display)}" ` +
+        `data-token-kind="${escapeHtml(item.display?.kind || 'unit')}" ` +
+        (continuous ? `data-space-state="${space?.status || 'physical'}" ` : '') +
         `aria-label="${escapeHtml(label)}${posture ? `, ${escapeHtml(posture)}` : ''}" ` +
         `title="${escapeHtml(label)}${posture ? `, ${escapeHtml(posture)}` : ''}" ` +
         `aria-pressed="${actor || target}" style="${tacticalPositionStyle(
-          item.position, dimensions
-        )}${continuous ? coordinateBodyStyle(item, dimensions) : ''}"><span class="map-token-label" aria-hidden="true">${escapeHtml(actorInitials(label))}</span>` +
+          item.position, dimensions, continuous ? null : undefined
+        )}${continuous ? coordinateBodyStyle(item, dimensions, view.zoom) : ''}"><span class="map-token-label" aria-hidden="true">${escapeHtml(actorInitials(label))}</span>` +
+        `<span class="map-name-label" aria-hidden="true">${escapeHtml(label)}</span>` +
+        (continuous && space?.status === 'unavailable' ?
+          '<span class="coordinate-space-warning" aria-hidden="true">Space unknown</span>' : '') +
         (continuous && item.position[2] !== 0 ? `<span class="coordinate-height-label" aria-hidden="true">` +
           `${escapeHtml(item.position[2])} ${escapeHtml(data.map.grid.unit)}</span>` : '') + '</button>';
     }).join('') : '';
@@ -5297,16 +5931,16 @@ const SylviaGMFrontend = (() => {
         )}">Network: ${escapeHtml(entity.display && entity.display.label || entity.id)}</button>`
       ) : []
     ).join('') : '';
-    const secondaryChoices = `<label>Character <select data-tactical-actor aria-label="Choose your character" ` +
+    const secondaryChoices = `<label>Acting character <select data-tactical-actor aria-label="Choose acting character" ` +
       `${actorOptions.length ? '' : 'disabled'}><option value="">Choose character</option>` +
       actorOptions.map((entity) => `<option value="${escapeHtml(entity.id)}" ` +
-        `${entity.id === selection.actor ? 'selected' : ''}>${escapeHtml(entityLabel(entity.id))}${scope?.focused_actor_id === tacticalActorId(surface, entity.id) ? ' (current)' : ''}</option>`).join('') +
+        `${entity.id === selection.actor ? 'selected' : ''}>${escapeHtml(entityLabel(entity.id))}</option>`).join('') +
       `</select></label><label>Target <select data-tactical-target aria-label="Choose target">` +
       `<option value="">Choose target</option>` + data.entities.map((entity) =>
         `<option value="${escapeHtml(entity.id)}" ${entity.id === selection.target ? 'selected' : ''}>` +
         `${escapeHtml(entityLabel(entity.id))}</option>`).join('') + '</select></label>';
 
-    return (surface ? selectedMapActorMarkup(surface, selection) : '') +
+    return (surface ? selectedMapActorMarkup(surface, selection) : '') + mapStatusMarkup() +
       `<div class="tactical-toolbar" role="toolbar" aria-label="Tactical map controls">` +
       `<button type="button" class="btn btn-secondary btn-sm" data-tactical-zoom="out" ` +
       `aria-label="Zoom out">−</button><span class="map-zoom-level" aria-label="Map zoom">${Math.round(view.zoom * 100)}%</span>` +
@@ -5316,12 +5950,14 @@ const SylviaGMFrontend = (() => {
         `${selection.actor ? '' : 'disabled'} aria-label="Focus on ${escapeHtml(selection.actor ? entityLabel(selection.actor) : 'selected character')}">Focus</button>` +
       `<button type="button" class="btn btn-secondary btn-sm" data-tactical-cover-info ` +
       `aria-pressed="${Boolean(view.coverInfo)}">Cover info</button>` +
+      `<button type="button" class="btn btn-secondary btn-sm map-offview" data-map-offview aria-expanded="${Boolean(view.overview)}" hidden></button>` +
       (continuous ? '' : shotControlsMarkup()) +
       '</div>' +
       (usesZone || usesDevice ? `<div class="map-action-inputs">${zonePicker}${devicePicker}</div>` : '') +
       (selectedText ? `<div class="tactical-selection-summary" aria-live="polite">${escapeHtml('Target: ' + entityLabel(selection.target))}</div>` : '') +
       `<div class="tactical-scroll" tabindex="0" ` +
        `aria-label="${continuous ? 'Coordinate map; click to select a point, drag to pan' : 'Tactical grid; drag to pan, arrow keys move cell focus'}">` +
+       tacticalOverviewMarkup(data, dimensions) +
        `<div class="tactical-world${continuous ? ' coordinate-world' : ''}${view.coverInfo ? ' show-cover-info' : ''}" ` +
       `style="width:${dimensions.width * 32}px;` +
       `height:${dimensions.height * 32}px;--tactical-zoom:${view.zoom}">` +
@@ -5343,14 +5979,20 @@ const SylviaGMFrontend = (() => {
         `</div>`);
   }
 
-  // Render the body's actual footprint around its authoritative position.
-  function coordinateBodyStyle(entity, dimensions) {
+  // Occupied space uses the owner's declared diameter; physical clearance remains separate.
+  function coordinateBodyStyle(entity, dimensions, zoom = 1) {
+    const space = entity.occupied_space;
+    const interaction = `;--coordinate-hit-size:${28 / zoom}px`;
+    if (space) {
+      const size = space.status === 'declared' ? space.diameter * 32 / dimensions.cellSize : 18;
+      return `;width:${size}px;height:${size}px;border-radius:50%;transform:translate(-50%, -50%)${interaction}`;
+    }
     const footprint = entity.footprint;
     const scale = 32 / dimensions.cellSize;
     const width = footprint.kind === 'circle' ? footprint.radius * 2 : footprint.half_extents[0] * 2;
     const depth = footprint.kind === 'circle' ? footprint.radius * 2 : footprint.half_extents[1] * 2;
     return `;width:${width * scale}px;height:${depth * scale}px;` +
-      `border-radius:${footprint.kind === 'circle' ? '50%' : '3px'};transform:translate(-50%, -50%)`;
+      `border-radius:${footprint.kind === 'circle' ? '50%' : '3px'};transform:translate(-50%, -50%)${interaction}`;
   }
 
   // Coordinate fields provide precise and keyboard-accessible 3D intent without grid snapping.
@@ -5429,7 +6071,9 @@ const SylviaGMFrontend = (() => {
 
   // A new map opens on public bodies instead of an empty corner of large bounds.
   // Restored views and subsequent refreshes retain the player's chosen camera.
-  function tacticalInitialScroll(data, dimensions, view, viewport) {
+  // Without a saved camera, frame every body when they fit; otherwise frame the projected or preferred
+  // actor (ids in priority order) together with any other preferred bodies that fit beside it.
+  function tacticalInitialScroll(data, dimensions, view, viewport, preferred = []) {
     const positions = (Array.isArray(data.entities) ? data.entities : []).filter((entity) =>
       Array.isArray(entity.position) && entity.position.length >= 2 &&
       entity.position.slice(0, 2).every((value, axis) => Number.isFinite(value) &&
@@ -5441,10 +6085,86 @@ const SylviaGMFrontend = (() => {
     const upper = [0, 1].map((axis) => Math.max(...points.map((point) => point[axis])));
     const nearby = (upper[0] - lower[0]) * scale + 32 <= viewport.width &&
       (upper[1] - lower[1]) * scale + 32 <= viewport.height;
+    const ranked = [data.selection?.actor, ...preferred].map((id) => positions.find((entity) => entity.id === id)).filter(Boolean);
+    const anchor = ranked[0] || positions[0];
+    const group = [anchor.position];
+    for (const entity of ranked.slice(1)) {
+      const next = [...group, entity.position];
+      const fits = [0, 1].every((axis) => (Math.max(...next.map((point) => point[axis])) -
+        Math.min(...next.map((point) => point[axis]))) * scale + 32 <= (axis ? viewport.height : viewport.width));
+      if (fits) group.push(entity.position);
+    }
     const focus = nearby ? lower.map((value, axis) => (value + upper[axis]) / 2) :
-      (positions.find((entity) => entity.id === data.selection?.actor) || positions[0]).position;
+      [0, 1].map((axis) => (Math.min(...group.map((point) => point[axis])) + Math.max(...group.map((point) => point[axis]))) / 2);
     return { left: (focus[0] - dimensions.lower[0]) * scale - viewport.width / 2,
       top: (focus[1] - dimensions.lower[1]) * scale - viewport.height / 2 };
+  }
+
+  // A small overview of the projected bounds and bodies; the viewport box follows the camera.
+  function tacticalOverviewMarkup(data, dimensions) {
+    const span = [0, 1].map((axis) => dimensions.upper[axis] - dimensions.lower[axis]);
+    if (!(span[0] > 0 && span[1] > 0)) return '';
+    const width = 112, height = Math.round(Math.max(40, Math.min(112, width * span[1] / span[0])));
+    const dots = (Array.isArray(data.entities) ? data.entities : []).filter((entity) => Array.isArray(entity.position) &&
+      [0, 1].every((axis) => Number.isFinite(entity.position[axis]) && entity.position[axis] >= dimensions.lower[axis] &&
+        entity.position[axis] <= dimensions.upper[axis])).map((entity) =>
+      `<i data-tone="${entityTone(entity.id, entity.display)}" style="left:${((entity.position[0] - dimensions.lower[0]) / span[0] * 100).toFixed(2)}%;` +
+      `top:${((entity.position[1] - dimensions.lower[1]) / span[1] * 100).toFixed(2)}%"></i>`).join('');
+    return `<span class="map-overview-anchor" aria-hidden="true"><span class="map-overview" data-map-overview hidden ` +
+      `data-aspect="${(span[1] / span[0]).toFixed(4)}" style="width:${width}px;height:${height}px">${dots}<b data-map-overview-view></b></span></span>`;
+  }
+
+  // Count bodies whose tokens sit outside the visible map, and move the overview's viewport box.
+  function updateTacticalOverview(panel, scroll) {
+    const overview = panel.querySelector('[data-map-overview]');
+    const offview = panel.querySelector('[data-map-offview]');
+    if (scroll.isConnected === false || !scroll.clientWidth || !scroll.clientHeight) return;
+    const larger = scroll.scrollWidth > scroll.clientWidth + 1 || scroll.scrollHeight > scroll.clientHeight + 1;
+    if (overview) {
+      overview.hidden = !larger || offview?.getAttribute('aria-expanded') !== 'true';
+      const box = overview.querySelector('[data-map-overview-view]');
+      box.style.left = `${scroll.scrollLeft / scroll.scrollWidth * 100}%`;
+      box.style.top = `${scroll.scrollTop / scroll.scrollHeight * 100}%`;
+      box.style.width = `${Math.min(100, scroll.clientWidth / scroll.scrollWidth * 100)}%`;
+      box.style.height = `${Math.min(100, scroll.clientHeight / scroll.scrollHeight * 100)}%`;
+      // Never more than 40% of the visible map's height, so a short map keeps most of its view.
+      const aspect = Number(overview.dataset.aspect) || 1;
+      const height = Math.round(Math.max(36, Math.min(112, scroll.clientHeight * 0.4)));
+      overview.style.height = `${height}px`;
+      overview.style.width = `${Math.round(Math.max(36, Math.min(112, height / aspect)))}px`;
+      // Sit at the bottom-left of the visible map, away from the usual top-left framing of the action.
+      overview.style.setProperty('--overview-top', `${Math.max(8, scroll.clientHeight - overview.offsetHeight - 8)}px`);
+    }
+    if (offview) {
+      const view = scroll.getBoundingClientRect();
+      const outside = Array.from(scroll.querySelectorAll('[data-tactical-entity]')).filter((node) => {
+        const token = node.getBoundingClientRect();
+        const x = (token.left + token.right) / 2, y = (token.top + token.bottom) / 2;
+        return x < view.left || x > view.right || y < view.top || y > view.bottom;
+      });
+      offview.hidden = !larger;
+      offview.textContent = outside.length ? `${outside.length} off view` : 'Overview';
+      offview.title = [outside.length ? `Off view: ${outside.map((node) => node.getAttribute('aria-label')).join(' · ')}` : '',
+        `${offview.getAttribute('aria-expanded') === 'true' ? 'Hide' : 'Show'} the map overview`].filter(Boolean).join('. ');
+    }
+  }
+
+  // Map body ids for the acting selection, the player's focused actor, then controlled units before drones.
+  function tacticalCameraPreference(surface, projection) {
+    const bodyFor = (actorId) => surface.data.entities?.find((entity) => tacticalActorId(surface, entity.id) === actorId)?.id;
+    const control = projection?.player_control;
+    const actors = control?.available === true && Array.isArray(control.actors) ? control.actors.map((actor) => actor.id) : [];
+    const kind = (id) => surface.data.entities?.find((entity) => entity.id === id)?.display?.kind;
+    const controlled = actors.map(bodyFor).filter(Boolean);
+    return [tacticalSelection(surface).actor, bodyFor(control?.focused_actor_id),
+      ...controlled.filter((id) => !['drone', 'device'].includes(kind(id))), ...controlled].filter(Boolean);
+  }
+
+  // Map resize observers live only as long as the map DOM they measure; each panel render replaces it.
+  const tacticalResizeObservers = new Set();
+  function disconnectTacticalObservers() {
+    tacticalResizeObservers.forEach((observer) => observer.disconnect());
+    tacticalResizeObservers.clear();
   }
 
   function wireTacticalGrid(container, projection, previewHeights = new Map()) {
@@ -5473,7 +6193,7 @@ const SylviaGMFrontend = (() => {
         gamePanels().saveView(surface, view);
       };
       const initial = view.initialFocus ? tacticalInitialScroll(surface.data, dimensions, view,
-        { width: scroll.clientWidth, height: scroll.clientHeight }) : null;
+        { width: scroll.clientWidth, height: scroll.clientHeight }, tacticalCameraPreference(surface, projection)) : null;
       scroll.scrollLeft = Math.max(0, Math.min(maximumScrollLeft(), initial?.left ?? view.scrollLeft ?? 0));
       scroll.scrollTop = Math.max(0, Math.min(maximumScrollTop(), initial?.top ?? view.scrollTop ?? 0));
       if (view.initialFocus && initial) {
@@ -5481,6 +6201,28 @@ const SylviaGMFrontend = (() => {
         retainScroll();
       }
       scroll.addEventListener('scroll', retainScroll, { passive: true });
+      let overviewQueued = false;
+      const refreshOverview = () => {
+        if (overviewQueued) return;
+        overviewQueued = true;
+        window.requestAnimationFrame(() => setTimeout(() => {
+          overviewQueued = false;
+          updateTacticalOverview(panel, scroll);
+        }, 0));
+      };
+      // Measure after the next paint, never during render or a playback frame: layout reads would delay shots.
+      refreshOverview();
+      scroll.addEventListener('scroll', refreshOverview, { passive: true });
+      if (typeof ResizeObserver === 'function') {
+        const observer = new ResizeObserver(() => { if (scroll.isConnected) refreshOverview(); });
+        observer.observe(scroll);
+        tacticalResizeObservers.add(observer);
+      }
+      panel.querySelector('[data-map-offview]')?.addEventListener('click', (event) => {
+        view.overview = event.currentTarget.getAttribute('aria-expanded') !== 'true';
+        event.currentTarget.setAttribute('aria-expanded', String(view.overview));
+        updateTacticalOverview(panel, scroll);
+      });
       panel.querySelector('[data-tactical-center]')?.addEventListener('click', () => {
         const actor = surface.data.entities.find((item) => item.id === tacticalSelection(surface).actor);
         if (!actor) return;
@@ -5656,6 +6398,13 @@ const SylviaGMFrontend = (() => {
           });
           renderRulesetPanelProjection(projection);
         });
+        button.addEventListener('focus', () => {
+          // Focus is presentation only: it moves the grid's single Tab stop, never the selection.
+          panel.querySelectorAll('[data-tactical-cell][tabindex="0"]').forEach((cell) => { cell.tabIndex = -1; });
+          button.tabIndex = 0;
+          view.focusCell = [Number(button.dataset.cellX), Number(button.dataset.cellY)];
+          state.tacticalFocusCells[tacticalFocusKey(surface)] = view.focusCell;
+        });
         button.addEventListener('keydown', (event) => {
           const delta = { ArrowLeft: [-1, 0], ArrowRight: [1, 0],
             ArrowUp: [0, -1], ArrowDown: [0, 1] }[event.key];
@@ -5663,14 +6412,22 @@ const SylviaGMFrontend = (() => {
           event.preventDefault();
           const x = Number(button.dataset.cellX) + delta[0];
           const y = Number(button.dataset.cellY) + delta[1];
-          panel.querySelector(`[data-tactical-cell="${x},${y}"]`)?.focus();
+          const next = panel.querySelector(`[data-tactical-cell="${x},${y}"]`);
+          // The implicit focus scroll can leave the new cell partly outside the map; show all of it.
+          next?.focus({ preventScroll: true });
+          next?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
         });
       });
       panel.querySelectorAll('[data-tactical-zoom]').forEach((button) => {
         button.addEventListener('click', () => {
           retainScroll();
           const delta = button.dataset.tacticalZoom === 'in' ? 0.25 : -0.25;
-          view.zoom = Math.max(0.5, Math.min(2, view.zoom + delta));
+          const nextZoom = Math.max(0.5, Math.min(2, view.zoom + delta));
+          const ratio = nextZoom / view.zoom;
+          // Keep the world point at the viewport centre fixed while scaling the map.
+          view.scrollLeft = Math.max(0, (scroll.scrollLeft + scroll.clientWidth / 2) * ratio - scroll.clientWidth / 2);
+          view.scrollTop = Math.max(0, (scroll.scrollTop + scroll.clientHeight / 2) * ratio - scroll.clientHeight / 2);
+          view.zoom = nextZoom;
           state.tacticalViews[surface.id] = view;
           gamePanels().saveView(surface, view);
           renderRulesetPanelProjection(projection);
@@ -5821,15 +6578,15 @@ const SylviaGMFrontend = (() => {
           : '';
         const states = ['status', 'access', 'control', 'detection']
           .filter((field) => node[field])
-          .map((field) => `<span><strong>${escapeHtml(field)}</strong> ` +
-            `${escapeHtml(node[field])}</span>`).join('');
+          .map((field) => `<div><dt>${escapeHtml(panelIdentifierLabel(field))}</dt>` +
+            `<dd data-network-state="${escapeHtml(String(node[field]).toLowerCase())}">${escapeHtml(panelIdentifierLabel(String(node[field])))}</dd></div>`).join('');
         const heading = diagram ? `<div class="network-device-heading"><strong>${escapeHtml(node.label)}</strong></div>`
           : `<button type="button" class="network-node-select" data-network-node="${escapeHtml(node.id)}" aria-pressed="${selected}">` +
             `<strong>${escapeHtml(node.label)}</strong><small>${escapeHtml(panelIdentifierLabel(node.kind))}</small></button>`;
         return `<article class="network-node${selected ? ' selected' : ''}" ` +
           `data-network-node-card="${escapeHtml(node.id)}">` +
           heading +
-          (states ? `<div class="network-node-state">${states}</div>` : '') +
+          (states ? `<dl class="network-node-state">${states}</dl>` : '') +
           (functions ? `<div class="network-functions" aria-label="Available functions">` +
             `${functions}</div>` : '') + physical + `</article>`;
       }).join('');
@@ -5995,6 +6752,9 @@ const SylviaGMFrontend = (() => {
   }
 
   function panelContent(surface) {
+    if (surface.renderer === 'piece_table') {
+      return window.SylviaPieceTable.render(surface.data, surface.actions);
+    }
     if (surface.id === ACTION_QUEUE_PANEL_ID && surface.renderer === 'action_queue')
       return sequenceMarkup(state.queuePreviousCards || new Set(), surface.data);
     if (surface.renderer === 'party') return renderPartyPanel(surface.data, surface);
@@ -6055,7 +6815,8 @@ const SylviaGMFrontend = (() => {
         `${escapeHtml(surface.icon || '◆')}</span>${escapeHtml(surface.title || surface.id)}</div>`
       : '';
     const footerActions = Array.isArray(surface.actions) ? surface.actions.filter(
-      (action) => !['party', 'unit_list', 'inventory'].includes(surface.renderer) || !actionBindsActor(action)
+      (action) => (!['party', 'unit_list', 'inventory'].includes(surface.renderer) || !actionBindsActor(action)) &&
+        !(surface.renderer === 'piece_table' && Object.values(action.bindings || {}).includes('piece'))
     ) : [];
     const mapSurface = ['tactical_grid', 'coordinate_map'].includes(surface.renderer);
     const selectedAction = mapSurface ? tacticalPreviewState(surface, state.tacticalViews[surface.id] || {}).action : null;
@@ -6094,6 +6855,22 @@ const SylviaGMFrontend = (() => {
     const savedMapTools = captureMapTools(container);
     const savedPreviewHeights = captureTacticalPreviewHeights(container, projection);
     const nextPanelRenderContext = panelRenderScope(projection);
+    const sameCharacterScope = panelRenderContext && nextPanelRenderContext &&
+      panelRenderContext.campaignId === nextPanelRenderContext.campaignId &&
+      panelRenderContext.sessionId === nextPanelRenderContext.sessionId &&
+      panelRenderContext.rulesetId === nextPanelRenderContext.rulesetId;
+    const savedCharacterFocus = sameCharacterScope ? captureCharacterFocus(container) : null;
+    // Native disclosure toggles can still be queued when another projection redraws the DOM.
+    if (sameCharacterScope && !window.__sylviaPanelContext) {
+      container.querySelectorAll('[data-character-expansion]').forEach((details) => {
+        applyPanelSelection(details.closest('[data-panel-id]')?.dataset.panelId,
+          { expansion: { id: details.dataset.characterExpansion, open: details.open } });
+      });
+    }
+    const savedCharacterGroups = sameCharacterScope ? Array.from(container.querySelectorAll('[data-character-stat]'), (details) => ({
+      surfaceId: details.closest('[data-panel-id]')?.dataset.panelId, stat: details.dataset.characterStat,
+      open: details.open, focused: document.activeElement === details.querySelector('summary'),
+    })) : [];
     const nativeProjection = nativePanelProjection(projection);
     if (state.panelProjectionSource !== nativeProjection) state.panelActionChecks.clear();
     state.panelProjectionSource = nativeProjection;
@@ -6118,7 +6895,20 @@ const SylviaGMFrontend = (() => {
     const previousList = container.querySelector('.sequence-cards');
     const queueScroll = previousList ? {top:previousList.scrollTop,
       atEnd:previousList.scrollTop + previousList.clientHeight >= previousList.scrollHeight - 2} : null;
+    disconnectTacticalObservers();
     container.innerHTML = recovery + markup + effectsNotice;
+    for (const saved of savedCharacterGroups) {
+      const panel = container.querySelector(`[data-panel-id="${CSS.escape(saved.surfaceId)}"]`);
+      const details = panel?.querySelector(`[data-character-stat="${CSS.escape(saved.stat)}"]`);
+      if (details) {
+        details.open = saved.open;
+        if (saved.focused) details.querySelector('summary')?.focus({ preventScroll: true });
+      }
+    }
+    if (savedCharacterFocus) {
+      container.querySelector(`[data-panel-id="${CSS.escape(savedCharacterFocus.surfaceId)}"]`)
+        ?.querySelector(savedCharacterFocus.selector)?.focus({ preventScroll: true });
+    }
     container.querySelectorAll('.sequence-issue').forEach(issue => { issue.open = openQueueIssues.has(queueIssueKey(issue)); });
     const nextList = container.querySelector('.sequence-cards');
     if (nextList && queueScroll) nextList.scrollTop = queueScroll.atEnd ? nextList.scrollHeight : queueScroll.top;
@@ -6171,18 +6961,36 @@ const SylviaGMFrontend = (() => {
     container.querySelectorAll('[data-character-actor]').forEach((select) => {
       select.addEventListener('change', () => {
         const surfaceId = select.closest('[data-panel-id]')?.dataset.panelId;
-        gamePanels().choose(surfaceId, { actor: select.value });
+        gamePanels().choose(surfaceId, { character: select.value || null });
         renderRulesetPanelProjection(projection);
+        container.querySelector('[data-character-actor]')?.focus({ preventScroll: true });
       });
     });
     container.querySelectorAll('[data-party-select-actor]').forEach((button) => {
       button.addEventListener('click', () => {
         const surfaceId = button.closest('[data-panel-id]')?.dataset.panelId;
-        gamePanels().choose(surfaceId, { actor: button.dataset.partySelectActor, target: null });
+        gamePanels().choose(surfaceId, { character: button.dataset.partySelectActor });
         renderRulesetPanelProjection(projection);
+        container.querySelector(`[data-party-select-actor="${CSS.escape(button.dataset.partySelectActor)}"]`)?.focus({ preventScroll: true });
       });
     });
-    container.querySelectorAll('[data-panel-action-id]').forEach((button) => {
+    container.querySelectorAll('[data-character-action-panel]').forEach((button) => {
+      button.addEventListener('click', () => void gamePanels().reveal(button.dataset.characterActionPanel));
+    });
+    container.querySelectorAll('[data-character-expansion]').forEach((details) => {
+      details.addEventListener('toggle', () => {
+        if (!details.isConnected) return;
+        const id = details.dataset.characterExpansion;
+        if (characterInspection().expanded.includes(id) === details.open) return;
+        gamePanels().choose(details.closest('[data-panel-id]')?.dataset.panelId,
+          { expansion: { id, open: details.open } });
+      });
+    });
+    window.SylviaTileTable?.attach(container, () => void refreshPanelActionChecks(projection, container),
+      () => !state.panelCommitPending && !panelIntentPending() && !pendingPanelCommand() &&
+        !selectedSessionIsWorking() && !campaignDisplayPending());
+    new Set([...container.querySelectorAll('[data-panel-action-id]'),
+      ...container.querySelectorAll('[data-table-discard]')]).forEach((button) => {
       button.addEventListener('click', async () => {
         if (button.disabled || !state.activeCampaignId || !state.activeSnapshot || selectedSessionIsWorking() ||
             (!sequenceModeActive() && (!state.bridge.execute_panel_action || !state.bridge.preview_panel_action))) return;
@@ -6193,9 +7001,13 @@ const SylviaGMFrontend = (() => {
         const surface = projection.surfaces.find((entry) => entry.id === panel.dataset.panelId);
         const action = surface && Array.isArray(surface.actions)
           ? surface.actions.find((entry) => entry.id === button.dataset.panelActionId) : null;
-        if (!action || !panelActionAvailable(surface, action, button.dataset.panelActorId)) return;
+        if (!action || !panelActionAvailable(surface, action, button.dataset.panelActorId, button.dataset.panelPieceId)) return;
         button.disabled = true;
-        const selection = panelActionSelection(surface, action, button.dataset.panelActorId);
+        const selection = JSON.parse(JSON.stringify(panelActionSelection(surface, action,
+          button.dataset.panelActorId, button.dataset.panelPieceId)));
+        const projectionRevision = projection.revision;
+        const pendingIntent = { campaignId, sessionId };
+        state.panelIntentPending = pendingIntent;
         try {
           if (sequenceModeActive()) {
             const command = {campaign_id:campaignId,session_id:sessionId,surface_id:surface.id,
@@ -6218,13 +7030,15 @@ const SylviaGMFrontend = (() => {
             selection,
             session_id: sessionId,
           };
+          if (!selectedActivityMatches(activity) || !panelActionStillCurrent(command, projectionRevision)) return;
           const proposal = await state.bridge.preview_panel_action(command);
-          if (!selectedActivityMatches(activity) || !await confirmPlayerAction(proposal)) return;
-          if (!selectedActivityMatches(activity) || selectedSessionIsWorking()) return;
+          if (!selectedActivityMatches(activity) || !panelActionStillCurrent(command, projectionRevision) || !await confirmPlayerAction(proposal)) return;
+          if (!selectedActivityMatches(activity) || selectedSessionIsWorking() || !panelActionStillCurrent(command, projectionRevision)) return;
           const confirmedCommand = { ...command, confirmation: proposal.confirmation };
           localStorage.setItem(panelRecoveryKey(), JSON.stringify(confirmedCommand));
           state.panelCommitPending = true;
           const receipt = await state.bridge.execute_panel_action(confirmedCommand);
+          if (receipt.status === 'committed') tutorials?.notify('action-committed', sessionId);
           if (selectedActivityMatches(activity)) clearPanelRecovery();
           if (receipt.status !== 'failed' && surface.renderer === 'inventory') state.equipmentDrafts?.clear();
           selectedStatus(activity, receipt.status === 'failed' ? 'Panel action failed' : 'Panel action completed', 'panels');
@@ -6236,6 +7050,7 @@ const SylviaGMFrontend = (() => {
         } catch (error) {
           selectedStatus(activity, friendlyCommandError('Panel action could not be completed', error), 'panels');
         } finally {
+          if (state.panelIntentPending === pendingIntent) state.panelIntentPending = null;
           state.panelCommitPending = false;
           button.disabled = false;
           if (selectedActivityMatches(activity)) await renderRulesetPanels(campaignId, true);
@@ -6335,6 +7150,16 @@ const SylviaGMFrontend = (() => {
       queue.steps.at(-1)?.response_policy === 'automatic');
   }
 
+  // The owner keeps a choice or recovered-commitment pause after it settles (a resolved choice is
+  // read back as "Saved commitment recovered"); once every step is committed, that pause is
+  // history, not a decision still to make. Turn-boundary and Ruleset-decision pauses still show.
+  const SETTLED_PAUSE_REASONS = new Set(['Resolve the saved mechanics choice',
+    'Saved commitment recovered; inspect the remaining intentions']);
+  function resolvedChoicePause(queue) {
+    return queue?.status === 'paused' && SETTLED_PAUSE_REASONS.has(queue.pause_reason) &&
+      Boolean(queue.steps.length) && queue.steps.every(step => step.status === 'committed');
+  }
+
   function queueResponseAction(projection = state.panelProjection) {
     const offer = projection?.response_action;
     return state.activeSessionRole === 'dm' && !projection?.loading &&
@@ -6354,7 +7179,8 @@ const SylviaGMFrontend = (() => {
     const multipleActors = new Set(steps.map(step => step.actor).filter(Boolean)).size > 1;
     const stepReason = (step) => step.status === 'committed' ? '' : panelPlayerReason(step.error || step.warning);
     const queueReason = panelPlayerReason(queue?.error || queue?.pause_summary || queue?.pause_reason);
-    const showQueueReason = queueReason && !automaticQueueCommitted(queue) && !steps.some(step => stepReason(step) === queueReason);
+    const showQueueReason = queueReason && !automaticQueueCommitted(queue) && !resolvedChoicePause(queue) &&
+      !steps.some(step => stepReason(step) === queueReason);
     const explanation = (reason, label) => reason ? `<details class="sequence-issue"><summary>${escapeHtml(label)}</summary><p role="status">${escapeHtml(reason)}</p></details>` : '';
     const targetLabel = (id) => {
       const entities = (state.panelProjection?.surfaces || []).flatMap(surface => Array.isArray(surface.data?.entities) ? surface.data.entities : []);
@@ -6380,8 +7206,11 @@ const SylviaGMFrontend = (() => {
     }).join('');
     const canRun = (steps.some(step => ['pending','executing'].includes(step.status)) &&
       ['ready','running'].includes(queue?.status)) || Boolean(queueResponseAction());
-    return `<section class="action-sequence" aria-label="Queued actions" data-sequence-id="${escapeHtml(queue?.sequence_id || '')}">
-      <div class="sequence-heading"><span class="sequence-count" aria-label="${pending} queued actions">${pending}</span><span>queued</span></div>
+    return `<section class="action-sequence" aria-label="Queued actions" tabindex="-1" data-sequence-id="${escapeHtml(queue?.sequence_id || '')}">
+      <div class="sequence-heading"><span class="sequence-count" aria-label="${pending} queued actions">${pending}</span><span>queued</span>${steps.some(step => step.status === 'executing')
+        ? '<small class="sequence-note">Sending · waiting for Sylvia’s confirmation</small>'
+        : steps.some(step => step.status === 'pending') && queue?.status === 'ready'
+          ? '<small class="sequence-note">Not yet run · each pending intent is rechecked on Execute</small>' : ''}</div>
       <ol class="sequence-cards" aria-label="Actions in execution order" ${rows ? 'tabindex="0"' : ''}>${rows}</ol>
       ${explanation(showQueueReason ? queueReason : '', queue?.status === 'paused' ? 'Resolve the decision to continue' : 'Review the stopped queue')}
       ${steps.some(step => step.status === 'pending') && ['failed','paused','stale'].includes(queue?.status)
@@ -6480,6 +7309,7 @@ const SylviaGMFrontend = (() => {
     });
     context.check();
     state.actionSequence = result;
+    if (result.committed_action_ids?.length) tutorials?.notify('action-committed', context.sessionId);
     refreshQueuePresentation();
     await refreshSelectedCampaign();
     context.check();
@@ -6657,7 +7487,7 @@ const SylviaGMFrontend = (() => {
   }
 
   // ---- Open a campaign session and render its authoritative projection ----
-  async function openCampaign(campaignId, sessionId = null) {
+  async function openCampaign(campaignId, sessionId = null, { restoreOnly = false } = {}) {
     state.displayHistory = null;
     const retryDisplay = campaignDisplayPending();
     cancelCampaignOpening();
@@ -6692,7 +7522,6 @@ const SylviaGMFrontend = (() => {
     if (openingSelection) {
       const openingName = indexEntry?.display_name || 'Campaign';
       $('session-title').textContent = openingName;
-      $('ctx-campaign').textContent = openingName;
       updateChronology(
         $('chronology'),
         '<div class="empty-state" data-chronology-key="opening-campaign">' +
@@ -6732,9 +7561,6 @@ const SylviaGMFrontend = (() => {
         if (!snap) throw new Error('Snapshot unavailable');
         state.activeSnapshot = snap;
         const displayName = selectedIndexEntry()?.display_name || snap.display_name;
-        $('ctx-campaign').textContent = displayName || '—';
-        $('ctx-lifecycle').textContent = (snap.lifecycle && snap.lifecycle.value) || snap.lifecycle || '—';
-        $('ctx-writer').textContent = (snap.writer && snap.writer.value) || snap.writer || '—';
         $('session-title').textContent = displayName || 'Campaign';
         updateLifecycleControls(indexEntry, snap);
         updateCampaignOpening(opening, 'snapshot', 'ready');
@@ -6772,7 +7598,7 @@ const SylviaGMFrontend = (() => {
           ? activity.terminalLabel || 'Generation was interrupted' : '');
       if (state.panelProjection) renderRulesetPanelProjection(state.panelProjection);
     }
-    if (indexEntry && indexEntry.availability === 'draft' &&
+    if (!restoreOnly && indexEntry && indexEntry.availability === 'draft' &&
         state.activeSessionRole === 'builder' && !state.activeCreationSubflow) {
       try {
         await resumeGuidedCampaignDraft(campaignId, state.activeSessionId);
@@ -6786,6 +7612,13 @@ const SylviaGMFrontend = (() => {
   function updateLifecycleControls(indexEntry, snapshot) {
     const lifecycle = snapshot && ((snapshot.lifecycle && snapshot.lifecycle.value) || snapshot.lifecycle);
     const selected = Boolean(snapshot);
+    const updateRules = $('campaign-rules-update');
+    if (updateRules) {
+      const id = `${snapshot?.campaign_id || ''}:${state.activeSessionRole || ''}`;
+      if (updateRules.dataset.campaignId !== id) state.rulesUpdateController?.reset();
+      updateRules.dataset.campaignId = id;
+      updateRules.hidden = !selected || lifecycle !== 'active' || state.activeSessionRole !== 'dm';
+    }
     const session = selectedSessionEntry(indexEntry);
     const canRename = selected && lifecycle === 'active';
     const canStop = selected && Boolean(session) && session.status === 'active';
@@ -6819,9 +7652,6 @@ const SylviaGMFrontend = (() => {
     if ($('compact-context-btn')) $('compact-context-btn').disabled = true;
     clearModelGuidanceWarning();
     renderPersistedModelGuidance(null);
-    $('ctx-campaign').textContent = '—';
-    $('ctx-lifecycle').textContent = '—';
-    $('ctx-writer').textContent = '—';
     $('session-title').textContent = 'No campaign selected';
     $('player-input').disabled = true;
     $('send-btn').disabled = true;
@@ -6852,6 +7682,50 @@ const SylviaGMFrontend = (() => {
     $('chat-model-choice').value = index >= 0 ? String(index) : '';
     renderChatModelPicker();
     updateModelSwitchButtons();
+  }
+
+  // Keep the focused summary, animation and opted-in Thinking nodes across timer updates.
+  function syncActivityRow(current, next) {
+    const summary = current.querySelector('summary');
+    const nextSummary = next.querySelector('summary');
+    if (!summary?.firstChild || !nextSummary?.firstChild) return false;
+    summary.firstChild.nodeValue = nextSummary.firstChild.nodeValue;
+    current.dataset.activityPhase = next.dataset.activityPhase;
+    for (const selector of ['[data-activity-status]', '[data-activity-time]']) {
+      const oldText = summary.querySelector(selector);
+      const newText = nextSummary.querySelector(selector);
+      if (selector === '[data-activity-status]' && oldText && newText &&
+          oldText.getAttribute('aria-live') !== newText.getAttribute('aria-live')) {
+        oldText.setAttribute('aria-live', newText.getAttribute('aria-live'));
+      }
+      if (oldText && newText && oldText.textContent !== newText.textContent) {
+        oldText.textContent = newText.textContent;
+        if (selector === '[data-activity-status]' && !window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches) {
+          oldText.animate?.([{ opacity: .35, transform: 'translateY(2px)' },
+            { opacity: 1, transform: 'translateY(0)' }], { duration: 160, easing: 'ease-out' });
+        }
+      }
+    }
+    const trail = current.querySelector('.agent-activity-trail');
+    const nextTrail = next.querySelector('.agent-activity-trail');
+    if (!trail || !nextTrail) return true;
+    const retained = new Map(Array.from(trail.children).map(child => [child.dataset.activityEntry, child]));
+    const desired = Array.from(nextTrail.children);
+    desired.forEach((child, index) => {
+      let existing = child.dataset.activityEntry ? retained.get(child.dataset.activityEntry) :
+        trail.querySelector('[data-activity-observation]');
+      if (existing && existing.dataset.thinkingResponse &&
+          existing.dataset.thinkingVersion === child.dataset.thinkingVersion) {
+        // Private inspection text is owned by its open Thinking control.
+      } else if (existing && existing.outerHTML !== child.outerHTML) {
+        existing.innerHTML = child.innerHTML;
+        if (child.dataset.thinkingVersion) existing.dataset.thinkingVersion = child.dataset.thinkingVersion;
+      }
+      existing ||= child;
+      if (trail.children[index] !== existing) trail.insertBefore(existing, trail.children[index] || null);
+    });
+    while (trail.children.length > desired.length) trail.lastElementChild.remove();
+    return true;
   }
 
   // Update only chronology cards whose authoritative projection changed.
@@ -6886,6 +7760,7 @@ const SylviaGMFrontend = (() => {
       const currentKey = currentCard.dataset.chronologyKey || '';
       const nextKey = nextCard.dataset.chronologyKey || '';
       if (currentKey && currentKey === nextKey) {
+        if (currentCard.classList.contains('agent-activity') && syncActivityRow(currentCard, nextCard)) return;
         if (currentCard.innerHTML !== nextCard.innerHTML) {
           currentCard.className = nextCard.className;
           currentCard.innerHTML = nextCard.innerHTML;
@@ -6986,6 +7861,7 @@ const SylviaGMFrontend = (() => {
       options,
       awaiting: result.status === 'awaiting_answer',
       key: String(messageKey || content.tool_call_id || `${messageIndex}-${data.id}`),
+      toolCallId: content.tool_call_id,
       index: messageIndex,
     };
   }
@@ -6997,6 +7873,14 @@ const SylviaGMFrontend = (() => {
   function builderQuestionCardMarkup(question, key, {
     sessionId, groupId, active, busy,
   }) {
+    if (question.answer) {
+      return `<fieldset class="story-card builder-question-card"${key}>` +
+        `<legend class="story-header">Builder question</legend>` +
+        `<div class="builder-question-text">${escapeHtml(question.question)}</div>` +
+        `<div class="story-text builder-question-answer" aria-label="Answer">` +
+        `${escapeHtml(question.answer.label)}</div>` +
+        `<div class="builder-question-note">Answered</div></fieldset>`;
+    }
     const disabled = !active || busy;
     const controlId = `builder-question-${question.index}`;
     const labelId = `${controlId}-label`;
@@ -7057,6 +7941,7 @@ const SylviaGMFrontend = (() => {
     else if (control.dataset.builderQuestionType === 'text') draft.text = control.value;
     else draft.selection = control.value;
     sessionDraft.set(key, draft);
+    state.desktopDrafts?.changed();
   }
 
   function restoreBuilderQuestionControl(sessionId, control) {
@@ -7073,17 +7958,17 @@ const SylviaGMFrontend = (() => {
   }
 
   function selectedBuilderQuestionAnswer(control) {
-    const value = String(control.value || '').trim();
+    const value = String(control.value || '');
     if (!value) return '';
     const selected = Array.from(control.selectedOptions || [])[0];
-    const label = String(selected?.textContent || '').trim() || value;
+    const label = String(selected?.textContent || '') || value;
     const duplicateLabels = Array.from(control.options || []).filter((option) =>
-      String(option.value || '').length && String(option.textContent || '').trim() === label
+      String(option.value || '').length && String(option.textContent || '') === label
     ).length;
     return duplicateLabels > 1 && value && value !== label ? `${label} (${value})` : label;
   }
 
-  // Submit visible question fields as one ordinary saved User reply to this exact Builder session.
+  // Keep genuine form input linked to the saved questions in this exact Builder session.
   function wireBuilderQuestionForms(container) {
     const controls = Array.from(container.querySelectorAll('[data-builder-question-control]'));
     container.querySelectorAll('[data-builder-question-form]').forEach((form) => {
@@ -7119,11 +8004,13 @@ const SylviaGMFrontend = (() => {
             candidate.dataset.builderQuestionKey === control.dataset.builderQuestionKey &&
             candidate.dataset.builderQuestionType === 'custom'
           );
-          const customAnswer = String(custom?.value || '').trim();
-          const answer = customAnswer || (control.dataset.builderQuestionType === 'text'
-            ? String(control.value || '').trim()
+          const customAnswer = String(custom?.value || '');
+          const isCustom = Boolean(customAnswer.trim());
+          const value = isCustom ? customAnswer : String(control.value || '');
+          const answer = isCustom ? customAnswer : (control.dataset.builderQuestionType === 'text'
+            ? value
             : selectedBuilderQuestionAnswer(control));
-          if (!answer) {
+          if (!answer.trim()) {
             control.focus();
             selectedStatus(activity, 'Answer each question before submitting');
             return;
@@ -7131,12 +8018,18 @@ const SylviaGMFrontend = (() => {
           answers.push({
             question: control.dataset.builderQuestionText || 'Builder question',
             answer,
+            question_message_id: control.dataset.builderQuestionKey,
+            value,
+            custom: isCustom,
           });
         }
         if (!answers.length) return;
         if (submitButton) submitButton.disabled = true;
         formControls.forEach((control) => { control.disabled = true; });
-        void submitInput(builderQuestionAnswerMessage(answers));
+        void submitInput(builderQuestionAnswerMessage(answers), {
+          builderQuestionAnswers: answers.map(({ question_message_id, value, custom }) =>
+            ({ question_message_id, value, custom })),
+        });
       };
       if (form.sylviaQuestionSubmitHandler) {
         form.removeEventListener('submit', form.sylviaQuestionSubmitHandler);
@@ -7318,12 +8211,12 @@ const SylviaGMFrontend = (() => {
           .map((category) => `${category.replaceAll('_', ' ')}: ${result.conversion_preview[category].length}`)
           .join(' · ') + '. Review the conversion before importing.',
       };
-      if (toolName === 'check_participant_draft' && result.status === 'valid_draft' &&
+      if (['check_participant_draft', 'check_participant_draft_file'].includes(toolName) && result.status === 'valid_draft' &&
           result.published === false) return {
         title: 'Character draft checked', summary: 'Draft is valid for the selected Ruleset',
         detail: 'The computed starting values are ready for publication.',
       };
-      if (toolName === 'publish_participant_artifact' && result.status === 'published' &&
+      if (['publish_participant_artifact', 'publish_participant_artifact_file'].includes(toolName) && result.status === 'published' &&
           ['companion', 'player_character'].includes(result.kind)) return {
         title: result.kind === 'companion' ? 'Companion saved' : 'Player Character saved',
         summary: result.title || result.name || 'Reusable character saved',
@@ -7386,9 +8279,20 @@ const SylviaGMFrontend = (() => {
     const status = String(result.status || content && content.status || '');
     const failed = ['failed', 'error'].includes(status);
     const rejected = status === 'rejected' || (!failed && result.success === false);
+    if (result.success === false && result.code === 'not_executed' &&
+        ['required_reference_unavailable', 'repeated_reference_failure'].includes(result.reason)) {
+      return { feedback: true, summary: 'This action did not run because a selected source could not be read. Saved work is kept.' };
+    }
     if (rejected && ['check_participant_draft', 'publish_participant_artifact',
+      'check_participant_draft_file', 'publish_participant_artifact_file',
       'check_character_profile_draft', 'publish_character_profile'].includes(toolName)) {
       return { feedback: true, summary: participantRejectionDetail(result) };
+    }
+    if (result.success === false && ['inspect_builder_references', 'copy_builder_reference'].includes(toolName) &&
+        ['reference_unavailable', 'reference_copy_unavailable'].includes(result.code)) {
+      return { feedback: true, summary: result.reason === 'package_file_oversized'
+        ? 'The selected source file exceeds Builder’s supported size. Saved work is kept. Check the selected content before continuing.'
+        : `Builder could not ${toolName === 'copy_builder_reference' ? 'copy' : 'read'} a selected reference. Saved work is kept. Check the selected source${toolName === 'copy_builder_reference' ? ' and draft workspace' : ''} before continuing.` };
     }
     if (failed || rejected) {
       return { feedback: true, summary: failed
@@ -7635,7 +8539,7 @@ const SylviaGMFrontend = (() => {
         !card.actions.every((action) => action && typeof action.label === 'string' &&
           typeof action.tool === 'string' && action.parameters &&
           typeof action.parameters === 'object' && !Array.isArray(action.parameters))) return null;
-    const valueText = (value) => value === null ? '—' : String(value);
+    const valueText = (value) => value === null ? '—' : String(typeof value === 'number' ? presentNumber(value) : value);
     const equationRowKey = (row) => JSON.stringify([row.label, row.value,
       row.equation.die_sides, row.equation.roll, row.equation.modifier,
       row.equation.total, row.equation.rolls || null]);
@@ -7763,7 +8667,7 @@ const SylviaGMFrontend = (() => {
     if (history.refresh) return history.refresh;
     const current = () => state.displayHistory === history && state.activeSessionId === sessionId;
     const loadPage = async () => {
-      const page = await state.bridge.session_history_page(sessionId);
+      let page = await state.bridge.session_history_page(sessionId);
       if (!current()) return null;
       let incoming = page.messages || [];
       let cursor = page.next_before_sequence;
@@ -7773,6 +8677,11 @@ const SylviaGMFrontend = (() => {
           incoming.length && incoming[0].sequence > previousLatest + 1) {
         const gap = await state.bridge.session_history_page(sessionId, cursor);
         if (!current()) return null;
+        // A gap read can observe a newer reply that closed the projected form.
+        if ((gap.latest_sequence ?? 0) > (page.latest_sequence ?? 0)) {
+          page = { ...page, ...gap, messages: page.messages,
+            next_before_sequence: page.next_before_sequence };
+        }
         incoming = [...(gap.messages || []), ...incoming];
         cursor = gap.next_before_sequence;
       }
@@ -7889,6 +8798,44 @@ const SylviaGMFrontend = (() => {
     return null;
   }
 
+  function builderProgressStage(name) {
+    if (['get_content_definition', 'inspect_builder_references', 'read_file'].includes(name)) return 'Reviewed references';
+    if (['write_file', 'edit_file', 'copy_builder_reference'].includes(name)) return 'Updated draft';
+    if (['check_participant_draft', 'check_participant_draft_file', 'check_character_profile_draft'].includes(name)) return 'Checked character';
+    if (['publish_participant_artifact', 'publish_participant_artifact_file', 'publish_character_profile'].includes(name)) return 'Saved character';
+    return null;
+  }
+
+  function activityTerminal(content) {
+    if (content.kind === 'gm_turn_activity') return 'completed';
+    if (!['builder_attempt_terminal', 'session_attempt_terminal'].includes(content.kind)) return null;
+    if (content.status === 'completed') return 'completed';
+    if (content.status === 'stopped' || content.failure_category === 'user_cancelled') return 'stopped';
+    return content.activity_timing?.phase === 'failed' || content.failure_category || content.reason_code
+      ? 'failed' : 'interrupted';
+  }
+
+  function activityResultStatus(result, outer = {}) {
+    const status = outer.status || result.status;
+    if (status === 'pending') return 'Waiting';
+    if (status === 'rejected') return 'Rejected';
+    const error = result.error ?? outer.error;
+    const hasError = typeof error === 'string' ? Boolean(error.trim()) : Boolean(error);
+    if (['failed', 'error', 'action_failed'].includes(status) || result.success === false || hasError)
+      return 'Failed';
+    if (['skipped', 'cancelled', 'stopped'].includes(status)) return 'Stopped';
+    if (status === 'awaiting_choice') return 'Needs input';
+    if (status === 'action_committed') return 'Committed';
+    return result.success === true || ['completed', 'committed', 'success', 'ok', 'ingested'].includes(status)
+      ? 'Done' : 'Returned';
+  }
+
+  function activityDuration(milliseconds) {
+    if (!Number.isFinite(milliseconds) || milliseconds < 0) return '';
+    const seconds = Math.floor(milliseconds / 1000);
+    return seconds < 60 ? `${seconds}s` : `${Math.floor(seconds / 60)}m ${String(seconds % 60).padStart(2, '0')}s`;
+  }
+
   // Correlation comes from saved ingress metadata, never arrival timing or narration text.
   function groupedAgentActivity(messages, cards, context, role, liveActivity = null) {
     const groups = new Map();
@@ -7900,82 +8847,130 @@ const SylviaGMFrontend = (() => {
       `${message.content.activity.attempt_id}:${message.content.action_id}`));
     const groupFor = (attempt, basis, position) => {
       if (typeof attempt !== 'string' || !attempt) return null;
-      if (!groups.has(attempt)) {
-        const basisIndex = messages.findIndex((message) => message.message_id === basis);
-        groups.set(attempt, { attempt, position: basisIndex >= 0 ? basisIndex + 1 : position,
-          entries: [], thinking: [], status: null });
-      } else {
-        const basisIndex = messages.findIndex((message) => message.message_id === basis);
-        if (basisIndex >= 0) groups.get(attempt).position = basisIndex + 1;
-      }
+      const basisIndex = messages.findIndex((message) => message.message_id === basis);
+      if (!groups.has(attempt)) groups.set(attempt, { attempt,
+        position: basisIndex >= 0 ? basisIndex + 1 : position, entries: [], thinking: [], status: null });
+      else if (basisIndex >= 0) groups.get(attempt).position = basisIndex + 1;
       return groups.get(attempt);
     };
     messages.forEach((message, index) => {
       const content = message.content || {};
       const correlation = typeof content.activity === 'object' ? content.activity : null;
-      const attempt = correlation?.attempt_id ||
-        (['gm_turn_activity', 'builder_attempt_terminal', 'session_attempt_terminal'].includes(content.kind)
-          ? content.attempt_id : null);
-      const group = groupFor(attempt, correlation?.basis_message_id || content.basis_message_id, index);
-      if (content.kind === 'provider_tool_calls') {
-        for (const call of content.assistant?.tool_calls || []) calls.set(call.id, call.function?.name);
-      }
+      const attempt = correlation?.attempt_id || content.attempt_id;
+      const terminalBasis = content.kind === 'session_attempt_terminal' ? content.message_id : null;
+      const group = groupFor(attempt, correlation?.basis_message_id || content.basis_message_id || terminalBasis,
+        message.kind === 'user' ? index + 1 : index);
       if (!group) return;
-      if (content.kind === 'gm_turn_activity') {
-        group.status = 'completed'; hidden.add(index);
-      } else if (['builder_attempt_terminal', 'session_attempt_terminal'].includes(content.kind)) {
-        group.status = content.status === 'completed' ? 'completed' : 'interrupted';
+      if (content.kind === 'provider_tool_calls') {
+        for (const call of content.assistant?.tool_calls || []) {
+          const key = `${attempt}:${content.inference_id || ''}:${call.id}`;
+          const entry = { key, label: routineActivityLabel(call.function?.name) || 'Resolve game action',
+            status: 'Waiting', order: correlation?.source_order ?? index };
+          calls.set(key, entry);
+          group.entries.push(entry);
+        }
+      } else if (activityTerminal(content)) {
+        group.status = activityTerminal(content);
+        group.timing = content.activity_timing;
+        if (content.kind === 'gm_turn_activity') hidden.add(index);
       } else if (content.kind === 'provider_tool_results') {
         for (const result of content.results || []) {
           let recorded = {};
           try { recorded = JSON.parse(result.content || '{}') || {}; } catch (_error) { /* Older opaque receipt. */ }
-          if (routineActions.has(`${attempt}:${recorded.action_id}`)) continue;
-          const label = packageActivityLabel(recorded) ||
-            routineActivityLabel(result.name || calls.get(result.tool_call_id)) || 'Resolve game action';
-          group.entries.push({ label, order: correlation?.source_order ?? index });
+          const key = `${attempt}:${content.inference_id || ''}:${result.tool_call_id}`;
+          const entry = calls.get(key);
+          if (routineActions.has(`${attempt}:${recorded.action_id}`)) {
+            if (entry) entry.hidden = true;
+            continue;
+          }
+          const label = packageActivityLabel(recorded) || routineActivityLabel(result.name) ||
+            entry?.label || 'Resolve game action';
+          if (entry) Object.assign(entry, { label, status: activityResultStatus(recorded) });
+          else group.entries.push({ key, label, status: activityResultStatus(recorded),
+            order: correlation?.source_order ?? index });
         }
       } else {
-        const label = packageActivityLabel(content) || routineActivityLabel(content.tool_name);
+        const routine = packageActivityLabel(content) || routineActivityLabel(content.tool_name);
+        const stage = role === 'builder' ? builderProgressStage(content.tool_name) : null;
+        const label = routine || { 'Checked character': 'Check character',
+          'Saved character': 'Save character' }[stage];
         const result = content.result || {};
-        const failed = result.success === false || ['rejected', 'error', 'failed'].includes(result.status) ||
-          ['rejected', 'error', 'failed', 'pending'].includes(content.status);
-        if (label && !failed && result.result_card == null) {
-          group.entries.push({ label, order: correlation?.source_order ?? index });
-          hidden.add(index);
+        const status = activityResultStatus(result, content);
+        const failed = ['Failed', 'Rejected', 'Stopped', 'Waiting'].includes(status);
+        if (stage && status === 'Done') group.lastStage = stage;
+        if (label) {
+          group.entries.push({ key: message.message_id, label, status,
+            order: correlation?.source_order ?? index });
+          if (routine && !failed && result.result_card == null) hidden.add(index);
         }
       }
     });
+    const observed = context?.activity_progress;
+    if (liveActivity?.attemptId && activityIsWorking(liveActivity)) {
+      const basis = observed?.attempt_id === liveActivity.attemptId ? observed.basis_message_id :
+        liveActivity.pendingInput?.messageId;
+      groupFor(liveActivity.attemptId, basis, messages.length);
+    }
+    const saved = context?.activity;
+    if (saved && groups.has(saved.attempt_id) && !groups.get(saved.attempt_id).status &&
+        ['completed', 'stopped', 'interrupted'].includes(saved.status)) {
+      groups.get(saved.attempt_id).status = saved.status;
+    }
     for (const thinking of context?.thinking || []) {
       const basisIndex = messages.findIndex((message) => message.message_id === thinking.basis_message_id);
       if (basisIndex < 0 && !groups.has(thinking.attempt_id)) continue;
       const group = groupFor(thinking.attempt_id, thinking.basis_message_id, basisIndex + 1);
       group.thinking.push(thinking);
-      if (!group.status && thinking.status !== 'partial') group.status = thinking.status;
     }
     const additions = new Map();
+    const operations = { read: 'Reading campaign data', write: 'Writing a file', validate: 'Checking content',
+      save: 'Saving content', question: 'Preparing a question', action: 'Running a tool' };
+    const phases = { queued: 'Starting', working: 'Working', provider: 'Waiting for model',
+      tool: 'Waiting for tool', retrying: 'Retrying', compacting: 'Compacting context', stopping: 'Stopping' };
     for (const group of groups.values()) {
-      const live = liveActivity?.attemptId === group.attempt && activityIsWorking(liveActivity);
-      const status = live ? 'Working' : group.status === 'interrupted' ? 'Interrupted' :
-        group.status === 'completed' ? 'Done' : 'Recorded';
-      const entries = group.entries.map((entry) => ({ order: entry.order,
-        html: `<div class="agent-operation"><span>${escapeHtml(entry.label)}</span><span>Done</span></div>` }));
+      const live = liveActivity?.attemptId === group.attempt && activityIsWorking(liveActivity) && !group.status;
+      const progress = live && observed?.attempt_id === group.attempt ? observed : null;
+      const livePhase = phases[progress?.phase] ? progress.phase : liveActivity?.activityPhase || 'working';
+      const phase = live ? livePhase : group.status || 'recorded';
+      const terminal = ['completed', 'stopped', 'interrupted', 'failed'].includes(phase);
+      let status = phases[phase] || { completed: 'Response complete', stopped: 'Stopped', failed: 'Failed',
+        interrupted: 'Interrupted', recorded: 'Recorded' }[phase] || 'Working';
+      if (live && phase === 'tool') status = operations[progress?.operation] || phases.tool;
+      if (live && role === 'builder' && group.lastStage) status += ` · Last: ${group.lastStage}`;
+      const timing = progress || group.timing;
+      const elapsed = activityDuration(timing?.elapsed_ms);
+      const quiet = live && timing?.quiet_ms >= 1000 ? activityDuration(timing.quiet_ms) : '';
+      const entries = group.entries.filter(entry => !entry.hidden).map((entry) => ({ order: entry.order,
+        html: `<div class="agent-operation" data-activity-entry="${escapeHtml(entry.key || '')}">` +
+          `<span>${escapeHtml(entry.label)}</span><span>${escapeHtml(
+            terminal && entry.status === 'Waiting' ? 'Incomplete' : entry.status)}</span></div>` }));
       for (const thinking of group.thinking) {
         const identity = `thinking-${group.attempt}-${thinking.response_id}`;
         entries.push({ order: thinking.source_order, html:
           `<details class="agent-thinking" data-disclosure-key="${escapeHtml(identity)}" ` +
-          `data-thinking-attempt="${escapeHtml(group.attempt)}" ` +
+          `data-activity-entry="${escapeHtml(identity)}" data-thinking-attempt="${escapeHtml(group.attempt)}" ` +
           `data-thinking-version="${Number(thinking.chunk_count) || 0}" ` +
           `data-thinking-response="${escapeHtml(thinking.response_id)}">` +
           '<summary>Thinking <span class="thinking-warning">May contain spoilers</span></summary>' +
           '<div class="thinking-body"></div></details>' });
       }
-      if (!entries.length && !group.status) continue;
-      const label = role === 'builder' ? 'Builder activity' : 'GM activity';
-      const html = `<details class="agent-activity" data-chronology-key="activity-${escapeHtml(group.attempt)}" ` +
+      if (!entries.length && !group.status && !live) continue;
+      const actor = role === 'builder' ? 'Builder activity' : 'GM activity';
+      const html = `<details class="agent-activity" data-activity-phase="${escapeHtml(phase)}" ` +
+        `data-chronology-key="activity-${escapeHtml(group.attempt)}" ` +
         `data-disclosure-key="activity-${escapeHtml(group.attempt)}">` +
-        `<summary>${label}<span class="agent-activity-status">${status}</span></summary>` +
-        `<div class="agent-activity-trail">${entries.sort((a, b) => a.order - b.order)
-          .map((entry) => entry.html).join('')}</div></details>`;
+        `<summary>${terminal ? 'View activity' : actor}` +
+        `<span class="activity-motion" aria-hidden="true"><i></i><i></i><i></i></span>` +
+        `<span data-activity-status role="status" aria-live="${live ? 'polite' : 'off'}" aria-atomic="true" ` +
+        `class="agent-activity-status">${escapeHtml(status)}</span>` +
+        `<span class="activity-time" data-activity-time>${elapsed ? escapeHtml(elapsed) : ''}</span></summary>` +
+        `<span class="activity-actor">${actor}</span>` +
+        `<div class="agent-activity-trail">` +
+        `<p class="activity-observation" data-activity-observation>${quiet
+          ? `No new activity for ${escapeHtml(quiet)}. Last observed: ${escapeHtml(
+            operations[progress?.last_operation] || phases[phase] || 'Working')}.` : ''}</p>` +
+        `${entries.sort((a, b) => a.order - b.order).map((entry) => entry.html).join('')}` +
+        '</div></details>';
       additions.set(group.position, (additions.get(group.position) || '') + html);
     }
     return [...cards.map((card, index) => (additions.get(index) || '') +
@@ -8018,7 +9013,21 @@ const SylviaGMFrontend = (() => {
     const constructionPanel = $('construction-panel');
     // The attached Interview owns this area while loading as well as when its form is visible.
     if (constructionPanel.parentElement === container) return;
-    const messages = context && Array.isArray(context.messages) ? context.messages : [];
+    const messages = context && Array.isArray(context.messages) ? [...context.messages] : [];
+    // Current form evidence stays available without expanding the loaded history pages.
+    const currentQuestions = Array.isArray(context?.builder_question_messages)
+      ? context.builder_question_messages.filter((message) =>
+        !message.session_id || message.session_id === sessionId) : null;
+    if (currentQuestions) {
+      const loaded = new Set(messages.map((message) => message.message_id));
+      currentQuestions.forEach((message) => {
+        if (!loaded.has(message.message_id)) {
+          messages.push(message);
+          loaded.add(message.message_id);
+        }
+      });
+      messages.sort((left, right) => left.sequence - right.sequence);
+    }
     if (activity.pendingInput &&
         messages.some((message) => message.message_id === activity.pendingInput.messageId)) {
       clearAcceptedInput(activity);
@@ -8063,13 +9072,40 @@ const SylviaGMFrontend = (() => {
         ? builderQuestionFromEvidence(message.content || {}, message.message_id, index)
         : null
     );
+    // Only explicit durable answer events complete a widget or replace its chat bubble.
+    const savedAnswers = new Map();
+    messages.forEach((message, messageIndex) => {
+      const content = message.content || {};
+      if (message.kind !== 'user' || content.kind !== 'builder_question_answer' ||
+          !Array.isArray(content.answers) || !content.answers.length) return;
+      const seen = new Set();
+      const valid = content.answers.every((answer) => {
+        if (!answer || ['question_message_id', 'tool_call_id', 'widget_id', 'question', 'value', 'label']
+          .some((field) => typeof answer[field] !== 'string' || !answer[field].length) ||
+          !['text', 'select', 'cascade', 'confirm'].includes(answer.type) ||
+          typeof answer.custom !== 'boolean' || seen.has(answer.question_message_id)) return false;
+        seen.add(answer.question_message_id);
+        const question = builderQuestions.find((item) => item?.key === answer.question_message_id);
+        return !question || (question.toolCallId === answer.tool_call_id &&
+          question.id === answer.widget_id && question.type === answer.type &&
+          question.question === answer.question && question.index < messageIndex);
+      });
+      if (!valid) return;
+      savedAnswers.set(message, content.answers);
+      content.answers.forEach((answer) => {
+        const question = builderQuestions.find((item) => item?.key === answer.question_message_id);
+        if (question && !question.answer) question.answer = answer;
+      });
+    });
     const activeQuestions = builderQuestions.filter((question) =>
-      question && question.awaiting && (context.latest_user_sequence != null
+      question && !question.answer && question.awaiting &&
+      (!currentQuestions || currentQuestions.some((message) => message.message_id === question.key)) &&
+      (context.latest_user_sequence != null
         ? messages[question.index].sequence > context.latest_user_sequence
         : question.index > lastUserIndex)
     );
     if (context !== null && !activeQuestions.length && lastUserIndex >= 0) {
-      state.builderQuestionDrafts.delete(sessionId);
+      if (state.builderQuestionDrafts.delete(sessionId)) state.desktopDrafts?.changed();
     }
     const questionGroupId = `builder-question-form-${sessionId}`;
     const questionBusy = selectedSessionIsWorking() || state.deletingBuilderChats.has(sessionId);
@@ -8078,6 +9114,14 @@ const SylviaGMFrontend = (() => {
       const key = chronologyKeyAttribute(message.message_id ||
         `${message.kind}-${message.canonical_sequence ?? ''}-${content.text || ''}`);
       if (message.kind === 'user') {
+        if (savedAnswers.has(message)) {
+          const detached = savedAnswers.get(message).filter((answer) =>
+            !builderQuestions.some((question) => question?.key === answer.question_message_id));
+          return detached.length ? `<div class="builder-answered-questions"${key}>` +
+            detached.map((answer) => builderQuestionCardMarkup({
+              question: answer.question, answer,
+            }, '', {})).join('') + `</div>` : '';
+        }
         return `<div class="story-card talk"${key}><div class="story-header">You</div>` +
           `<div class="story-text">${escapeHtml(content.text || '')}</div></div>`;
       }
@@ -8105,6 +9149,10 @@ const SylviaGMFrontend = (() => {
             ? 'Builder reached its work limit after automatic continuation. Saved work is retained. Send a message to continue.'
             : content.status === 'interrupted' && content.reason_code === 'repeated_tool_failure'
             ? 'Builder stopped after repeated identical tool failures. Saved work is retained. Review the last tool error before continuing.'
+            : content.status === 'interrupted' && content.reason_code === 'required_reference_unavailable'
+            ? 'Builder stopped because a selected source could not be read. Saved work is retained. Check the selected source content before continuing.'
+            : content.status === 'interrupted' && content.reason_code === 'repeated_reference_failure'
+            ? 'Builder stopped after repeated attempts to read the same source. Saved work is retained. Review the source error before continuing.'
             : 'Saved work is retained. Send a message when you are ready to continue.';
           return `<div class="story-card builder-interruption"${key}>` +
             `<div class="story-header">${content.status === 'stopped' ? 'Stopped' : 'Interrupted'}</div>` +
@@ -8206,6 +9254,69 @@ const SylviaGMFrontend = (() => {
     renderDMHistory(activity, currentContext(), loadedProjection.value || [], failed ? 'error' : null);
   }
 
+  // Narration requests for already-committed queue actions that the owner refused or left
+  // unconfirmed, keyed by session and action. Display only: nothing here is ever resent.
+  const narrationNotices = new Map();
+  const narrationNoticeKey = (sessionId, actionId) => JSON.stringify([sessionId, actionId]);
+
+  // Turn saved queue snapshots into durable Story outcomes. Commits accumulate through a run and
+  // are reported once when it stops; a failed/stale run reports the owner's reason; a step still
+  // `executing` in the newest snapshot is unconfirmed. Nothing here sends or repeats an action.
+  function actionSequenceOutcomes(messages) {
+    const queueAt = (message) => message.kind === 'evidence' &&
+      message.content?.kind === 'action_sequence' && message.content.sequence_id ? message.content : null;
+    const latest = new Map();
+    messages.forEach((message, index) => { const queue = queueAt(message); if (queue) latest.set(queue.sequence_id, index); });
+    const runs = new Map();
+    const outcomes = new Map();
+    messages.forEach((message, index) => {
+      const queue = queueAt(message);
+      if (!queue) return;
+      const steps = Array.isArray(queue.steps) ? queue.steps : [];
+      const run = runs.get(queue.sequence_id) || { status: null, statuses: new Map(), committed: [] };
+      run.committed.push(...steps.filter((step) => step.status === 'committed' &&
+        run.statuses.get(step.step_id) !== 'committed'));
+      const newest = latest.get(queue.sequence_id) === index;
+      const refused = ['failed', 'stale'].includes(queue.status) && run.status !== queue.status;
+      if (queue.status !== 'running' || newest) {
+        outcomes.set(index, { status: queue.status, committed: run.committed,
+          refused: refused ? { reason: String(queue.error || ''), steps: steps.filter((step) => step.error) } : null,
+          unconfirmed: newest ? steps.filter((step) => step.status === 'executing') : [] });
+        run.committed = [];
+      }
+      run.status = queue.status;
+      run.statuses = new Map(steps.map((step) => [step.step_id, step.status]));
+      runs.set(queue.sequence_id, run);
+    });
+    return outcomes;
+  }
+
+  function actionOutcomeMarkup(outcome, key, sessionId) {
+    if (!outcome) return '';
+    const card = (tone, title, steps, detail) => `<div class="story-card action-outcome" ` +
+      `data-action-outcome="${tone}" role="status"><div class="action-outcome-title">${escapeHtml(title)}</div>` +
+      (steps.length ? '<ul class="action-outcome-steps">' + steps.map((step) => `<li>${escapeHtml(
+        [step.actor_name || step.actor, step.label || step.tool].filter(Boolean).join(' · '))}</li>`).join('') + '</ul>' : '') +
+      (detail ? `<div class="action-outcome-detail">${escapeHtml(detail)}</div>` : '') + '</div>';
+    const cards = [];
+    if (outcome.committed.length) {
+      cards.push(card('committed', outcome.committed.length === 1 ? 'Action saved' : 'Actions saved', outcome.committed, ''));
+      const notice = outcome.committed.map((step) => narrationNotices.get(
+        narrationNoticeKey(sessionId, step.receipt?.action_id || step.operation_id))).find(Boolean);
+      if (notice) cards.push(card('narration', notice.uncertain ? 'Narration request unconfirmed' :
+        `Narration unavailable · ${notice.reason || 'Sylvia could not narrate this result'}`, [],
+        notice.uncertain
+          ? 'The saved action stands and was not repeated. Reload to see any narration Sylvia saved.'
+          : 'The saved action stands and was not repeated. No narration was written for it.'));
+    }
+    if (outcome.refused) cards.push(card('refused', 'Not done', outcome.refused.steps,
+      `${(outcome.refused.reason || 'Sylvia’s rules did not accept this queued action').replace(/([^.!?])$/, '$1.')} ` +
+      (outcome.status === 'stale' ? 'The queued actions were not run.' : 'This step was not saved.')));
+    if (outcome.unconfirmed.length) cards.push(card('unconfirmed', 'Awaiting confirmation', outcome.unconfirmed,
+      'Sylvia has not confirmed whether this was saved. It has not been sent again.'));
+    return cards.length ? `<div class="action-outcomes"${key}>${cards.join('')}</div>` : '';
+  }
+
   function renderDMHistory(activity, context, projections, displayStatus = null) {
     const campaignId = activity.campaignId;
     const container = $('chronology');
@@ -8264,7 +9375,8 @@ const SylviaGMFrontend = (() => {
       activity.interruptedAttemptId = null;
     }
 
-    const committed = messages.map((message) => {
+    const sequenceOutcomes = actionSequenceOutcomes(messages);
+    const committed = messages.map((message, messageIndex) => {
       const content = message.content || {};
       const key = chronologyKeyAttribute(message.message_id ||
         `${message.kind}-${message.canonical_sequence ?? ''}-${content.text || ''}`);
@@ -8283,6 +9395,9 @@ const SylviaGMFrontend = (() => {
             String(content.kind || '').startsWith('provider_')) return '';
         // The authoritative retry projection owns this notice; evidence only enriches it.
         if (content.kind === 'session_attempt_terminal') return '';
+        if (content.kind === 'action_sequence') {
+          return actionOutcomeMarkup(sequenceOutcomes.get(messageIndex), key, activity.sessionId);
+        }
         return toolResultMarkup(content, key);
       }
       if (message.kind === 'canonical_reference') {
@@ -8322,7 +9437,8 @@ const SylviaGMFrontend = (() => {
         groupedAgentActivity(messages, committed, context, 'dm', activity),
         (context?.act_markers || []).filter(marker => !context?.campaign_ending ||
           marker.status !== 'complete' || marker.act_number !== context.campaign_ending.act_number)),
-        context?.campaign_ending, activityIsWorking(activity) || Boolean(activity.retryBasis)),
+        context?.campaign_endings?.length ? context.campaign_endings : context?.campaign_ending,
+        activityIsWorking(activity) || Boolean(activity.retryBasis)),
       ...live].filter(Boolean);
     if (!cards.length) {
       const openingPending = activityIsWorking(activity) &&
@@ -8366,15 +9482,17 @@ const SylviaGMFrontend = (() => {
 
   // The saved ending offers one real user choice after its closing narration, never private prose.
   function withCampaignEnding(messages, cards, ending, busy = false) {
+    if (Array.isArray(ending)) return ending.reduce(
+      (result, item) => withCampaignEnding(messages, result, item, busy), cards);
     const result = [...cards];
     if (!ending || (ending.act_number !== null &&
         (!Number.isInteger(ending.act_number) || ending.act_number < 1)) ||
         typeof ending.ending_id !== 'string') return result;
     const position = messages.findIndex(message => message.message_id === ending.after_message_id);
     if (position < 0) return result;
-    const key = chronologyKeyAttribute('campaign-ending');
+    const key = chronologyKeyAttribute(`campaign-ending-${ending.after_message_id}`);
     let markup;
-    if (ending.choice) {
+    if (ending.choice || ending.historical) {
       markup = `<div class="campaign-ending-marker"${key} aria-label="Campaign complete">` +
         `<span>✓ ${escapeHtml(ending.plan_title || 'Campaign')} · Complete</span></div>`;
     } else {
@@ -8508,21 +9626,39 @@ const SylviaGMFrontend = (() => {
         };
         container.querySelectorAll('[data-action="resolve-mechanics-choice"]')
           .forEach((item) => { item.disabled = true; });
+        const selected = () => state.activeCampaignId === command.campaignId &&
+          state.activeSessionId === command.sessionId;
         try {
           const resolved = await state.bridge.resolve_mechanics_choice(command);
-          if (state.activeSessionId === command.sessionId) {
-            await renderPlayerProjection(command.campaignId, command.sessionId);
+          if (selected()) {
+            await readSavedQueue(command.sessionId);
+            if (selected()) await renderPlayerProjection(command.campaignId, command.sessionId);
           }
           if (resolved?.status !== 'awaiting_choice') {
             await respondToPlayerAction(command.campaignId, command.sessionId, command.actionId);
           }
         } catch (error) {
-          if (state.activeSessionId === command.sessionId) {
-            await renderPlayerProjection(command.campaignId, command.sessionId);
-          }
+          if (!selected()) return;
+          // The repaint shows the saved result: possibly this choice, possibly another window's.
+          await readSavedQueue(command.sessionId);
+          if (!selected()) return;
+          await renderPlayerProjection(command.campaignId, command.sessionId);
+          if (!selected()) return;
+          // A lost reply does not prove the choice failed; only an owner rejection does. Nothing is resent.
+          setInlineStatus(error?.code === 'outcome_unknown'
+            ? 'Sylvia did not confirm your choice before the connection was lost. It was not sent again; the saved result is shown.'
+            : `${friendlyCommandError('Your choice was not applied', error)}. The saved result is shown.`);
         }
       });
     });
+  }
+
+  // The owner records a queued step's resolved choice in the session history when it reads that
+  // queue; read it before repainting Story. A read never commits, resolves or resends anything.
+  async function readSavedQueue(sessionId) {
+    if (!state.bridge?.action_sequence) return;
+    try { await state.bridge.action_sequence({ session_id: sessionId }); }
+    catch (_) { /* Story still repaints saved history; the panels read the queue on their next refresh. */ }
   }
 
   function renderProjection(p, activity = selectedActivity()) {
@@ -8615,7 +9751,7 @@ const SylviaGMFrontend = (() => {
     const player = (state.campaignPartyOptions?.player_archetypes || []).find(
       (item) => item.id === $('rift-archetype').value
     );
-    $('delete-reusable-player-btn').hidden = !(player?.reusable && player.content_sha256);
+    $('delete-reusable-player-btn').hidden = !(player?.reusable && player.content_sha256 && !player.builtin_starter);
   }
 
   async function deleteReusableLibraryEntry(item) {
@@ -9592,7 +10728,6 @@ const SylviaGMFrontend = (() => {
         const renamed = selectedIndexEntry();
         if (renamed) {
           $('session-title').textContent = renamed.display_name || 'Campaign';
-          $('ctx-campaign').textContent = renamed.display_name || '—';
         }
       }
     } catch (e) {
@@ -9607,7 +10742,7 @@ const SylviaGMFrontend = (() => {
     }
   }
 
-  async function startCreationSubflow(purpose, visibleAnswer, triggerMessageId = null, profile = null) {
+  async function startCreationSubflow(purpose, visibleAnswer, triggerMessageId = null, profile = null, character = null) {
     if (!state.bridge || !state.bridge.start_guided_creation_subflow ||
         !state.constructionDraftId || !state.activeSessionId) return;
     const parentSessionId = state.activeSessionId;
@@ -9626,6 +10761,8 @@ const SylviaGMFrontend = (() => {
         trigger_message_id: triggerMessageId,
         ...(profile ? { character_profile_id: profile.id,
           character_profile_sha256: profile.content_sha256 } : {}),
+        ...(character ? { character_artifact_id: character.id,
+          character_artifact_sha256: character.content_sha256 } : {}),
       });
       if (state.activeSessionId === parentSessionId) state.constructionRevision = result.construction_revision;
       if (result.status === 'independent') {
@@ -9834,6 +10971,55 @@ const SylviaGMFrontend = (() => {
     });
     applyStartingPartyPolicy();
     updateReusableLibraryDeleteControls();
+    renderSelectedStarterCharacter();
+  }
+
+  function renderSelectedStarterCharacter() {
+    const panel = $('starter-character-preview');
+    if (!panel) return;
+    const item = (state.campaignPartyOptions?.player_archetypes || []).find(
+      (candidate) => candidate.id === $('rift-archetype').value && candidate.builtin_starter
+    );
+    const preview = item?.starter_preview;
+    panel.hidden = !preview;
+    if (!preview) return;
+    const character = preview.participant;
+    const actor = preview.entity_state;
+    const className = character.classes[0].id;
+    $('starter-character-heading').textContent =
+      `${item.name} · ${className[0].toUpperCase() + className.slice(1)} · Level ${character.level}`;
+    $('starter-character-guidance').textContent = item.summary;
+    $('starter-character-stats').textContent =
+      `HP ${actor.max_hp} · AC ${actor.armor_class} · Speed ${actor.speed} ft`;
+    $('starter-character-profile').textContent = preview.authored_profile;
+    const label = (value) => String(value).replaceAll('_', ' ');
+    const equipment = actor.inventory.map((item) => {
+      const quantity = actor.inventory_quantities?.[item] || 1;
+      return `${label(item)}${quantity > 1 ? ` ×${quantity}` : ''}`;
+    });
+    const resources = Object.entries(actor.resource_maxima || {})
+      .filter(([, maximum]) => maximum > 0)
+      .map(([name, maximum]) => `${label(name)} ${maximum}`);
+    $('starter-character-data').textContent = [
+      `Ability scores: ${Object.entries(character.abilities).map(([name, score]) => `${label(name)} ${score}`).join(', ')}`,
+      `Saving throws: ${character.saving_throw_proficiencies.map(label).join(', ')}`,
+      `Skills: ${(character.skill_proficiencies || []).map(label).join(', ')}`,
+      `Equipment: ${equipment.join(', ')}`,
+      `Spells: ${actor.prepared_spells.map(label).join(', ') || 'None'}`,
+      `Resources: ${resources.join(', ')}`,
+    ].join('\n\n');
+    $('starter-edit-copy').hidden = selectedStartingPartyPolicy().player_character?.mode === 'fixed';
+  }
+
+  function initStarterCharacterControls() {
+    $('rift-archetype').addEventListener('change', renderSelectedStarterCharacter);
+    $('starter-edit-copy')?.addEventListener('click', () => {
+      const item = (state.campaignPartyOptions?.player_archetypes || []).find(
+        (candidate) => candidate.id === $('rift-archetype').value && candidate.builtin_starter
+      );
+      if (item) void startCreationSubflow('player_character',
+        `Edit a copy of ${item.name}`, null, null, item);
+    });
   }
 
   function selectedRiftPlayerName() {
@@ -9871,7 +11057,7 @@ const SylviaGMFrontend = (() => {
     if (!state.bridge) return;
     if (state.bridge.campaign_creation_catalog) {
       try {
-        const catalog = await state.bridge.campaign_creation_catalog() || [];
+        const catalog = await state.bridge.campaign_creation_catalog(false) || [];
         if (!stillSelected()) return;
         state.campaignCreationCatalog = catalog;
         renderCharacterProfiles();
@@ -9896,7 +11082,9 @@ const SylviaGMFrontend = (() => {
         );
       }
     }
-    if (state.bridge.rift_template) {
+    if (state.bridge.rift_template && state.campaignCreationCatalog.some(
+      (item) => item.kind === 'campaign_plan' && item.setup_id
+    )) {
       try {
         const template = await state.bridge.rift_template();
         if (!stillSelected()) return;
@@ -10131,8 +11319,11 @@ const SylviaGMFrontend = (() => {
     if (!state.bridge || !state.bridge.create_builder_chat) return;
     const selected = defaultModelChoice();
     if (!selected) {
-      setInlineStatus('Configure a provider before starting Builder');
+      // Explain where the user is sent; the open campaign's chat status is not about Builder.
+      $('models-action-status').textContent = 'Configure a provider before starting Builder';
       openSettings('models');
+      // Narrow Settings scrolls as one column; keep the reason on screen without moving focus from Close.
+      $('models-action-status').scrollIntoView?.({ block: 'nearest' });
       return;
     }
     const nonce = Date.now();
@@ -10146,6 +11337,10 @@ const SylviaGMFrontend = (() => {
       });
       await refreshBuilderChats();
       await openBuilderChat(chat.session.session_id);
+      if (options.initialPrompt) {
+        $('player-input').value = options.initialPrompt;
+        saveSelectedSessionDraft();
+      }
       setInlineStatus('');
       $('player-input').focus();
     } catch (e) {
@@ -10153,11 +11348,63 @@ const SylviaGMFrontend = (() => {
     }
   }
 
-  async function startCampaignBuilder() {
+  async function openReadyCampaign(result) {
+    let activity = null;
+    const previousSelection = [state.view, state.activeCampaignId, state.activeSessionId];
+    const atPreviousSelection = () => previousSelection[0] === state.view &&
+      previousSelection[1] === state.activeCampaignId && previousSelection[2] === state.activeSessionId;
+    const atReadySelection = () => state.view === 'session' &&
+      state.activeCampaignId === result.campaign_id && state.activeSessionId === result.dm_session_id;
+    try {
+      await refreshCampaignIndex();
+      if (atPreviousSelection()) await openCampaign(result.campaign_id, result.dm_session_id);
+      if (atReadySelection()) {
+        setInlineStatus('Campaign ready. The Game Master is preparing the opening.');
+        tutorials?.notify('ready-started', result.dm_session_id);
+      }
+      if (!state.bridge.start_dm_session) return;
+      activity = beginSessionActivity(ensureSessionActivity({
+        sessionId: result.dm_session_id, sessionRole: 'dm', campaignId: result.campaign_id,
+      }), result.dm_attempt_id);
+      selectedStatus(activity, 'Campaign ready. Game Master is opening the adventure.');
+      refreshActivityControls(activity);
+      renderActivityIndexes();
+      startProjectionPolling(activity);
+      const opening = state.bridge.start_dm_session(
+        result.campaign_id, result.dm_session_id, result.dm_turn_id,
+      );
+      startStreamHeartbeat(activity, true);
+      const opened = await opening;
+      if (opened?.interruption) throw new Error('The opening response was interrupted.');
+      finishSessionActivity(activity, 'completed', 'Completed');
+      if (selectedActivityMatches(activity)) await refreshSelectedCampaign();
+    } catch (error) {
+      if (activity) finishSessionActivity(activity, 'interrupted', 'Opening interrupted');
+      if (activity && selectedActivityMatches(activity)) {
+        try {
+          await renderPlayerProjection(activity.campaignId, activity.sessionId, { loadPanels: false });
+        } catch (_) { /* The saved opening failure still reports if history is unavailable. */ }
+      }
+      if (activity ? selectedActivityMatches(activity) : atPreviousSelection()) {
+        setInlineStatus(friendlyCommandError(
+          'Your prepared campaign is saved. The opening was interrupted; reopen it to continue', error,
+        ));
+      }
+    } finally {
+      if (activity) {
+        stopStreamHeartbeat(activity);
+        stopProjectionPolling(activity);
+        refreshActivityControls(activity);
+      }
+    }
+  }
+
+  // Ready-party retries retain their draft identity/model; New Campaign creates a fresh interview.
+  async function startCampaignBuilder(draftRequest = null) {
     if (!state.bridge || !state.bridge.create_guided_campaign_draft) return;
     hideConstructionPanel(false);
-    const selected = defaultModelChoice();
-    const operationId = `guided-draft-${crypto.randomUUID()}`;
+    const selected = draftRequest || defaultModelChoice();
+    const operationId = draftRequest?.operation_id || `guided-draft-${crypto.randomUUID()}`;
     setInlineStatus('Creating campaign Draft…');
     try {
       const draft = await state.bridge.create_guided_campaign_draft({
@@ -10469,6 +11716,7 @@ const SylviaGMFrontend = (() => {
       activityIsWorking(activity) || (state.activeSessionRole === 'builder' &&
         state.activeCampaignId && state.constructionDraftId === state.activeCampaignId &&
         !state.activeCreationSubflow);
+    $('campaign-sequel-btn').disabled = !configured || activityIsWorking(activity) || Boolean(activity?.retryBasis);
     $('player-input').disabled = !canSubmit;
     $('player-input').setAttribute('aria-label', state.activeSessionRole === 'dm'
       ? 'In-character message or action' : 'Message to Builder');
@@ -10481,6 +11729,8 @@ const SylviaGMFrontend = (() => {
     $('composer-steering-hint').hidden = !canSubmit || !activityIsWorking(activity) ||
       state.activeSessionRole !== 'builder';
     $('ooc-note').classList.toggle('has-note', Boolean($('ooc-input').value.trim()));
+    tutorials?.refresh();
+    dictation?.sync();
     return canSubmit;
   }
 
@@ -10669,6 +11919,177 @@ const SylviaGMFrontend = (() => {
 
   }
 
+  function sequelSelectionIsCurrent(dialog = state.sequelDialog) {
+    return dialog && state.sequelDialog === dialog && state.view === 'session' &&
+      state.activeCampaignId === dialog.campaign_id && state.activeSessionId === dialog.session_id;
+  }
+
+  function refreshSequelConfirmation() {
+    const dialog = state.sequelDialog;
+    $('campaign-sequel-append').disabled = !dialog?.preview || dialog.busy ||
+      (!dialog.request && (!$('campaign-sequel-reviewed').checked ||
+        !$('campaign-sequel-connection').value.trim()));
+  }
+
+  function resetSequelReview() {
+    if (state.sequelDialog) state.sequelDialog.preview = null;
+    $('campaign-sequel-review').hidden = true;
+    $('campaign-sequel-confirmation').hidden = true;
+    $('campaign-sequel-reviewed').checked = false;
+    refreshSequelConfirmation();
+  }
+
+  async function openCampaignSequel() {
+    if (selectedSessionIsWorking() || selectedActivity()?.retryBasis || state.activeSessionRole !== 'dm') return;
+    const dialog = { campaign_id: state.activeCampaignId, session_id: state.activeSessionId,
+      operation_id: `append-adventure-${crypto.randomUUID()}`, preview: null, request: null,
+      busy: false, context: null };
+    state.sequelDialog = dialog;
+    resetSequelReview();
+    $('campaign-sequel-connection').value = '';
+    for (const id of ['campaign-sequel-source', 'campaign-sequel-connection', 'campaign-sequel-reviewed'])
+      $(id).disabled = false;
+    $('campaign-sequel-append').textContent = 'Append adventure';
+    $('campaign-sequel-status').textContent = 'Loading your adventure library…';
+    $('campaign-sequel-dialog').showModal();
+    try {
+      const [catalog, context] = await Promise.all([
+        state.bridge.campaign_creation_catalog(),
+        state.bridge.campaign_sequel_context({ campaign_id: dialog.campaign_id,
+          session_id: dialog.session_id }),
+      ]);
+      if (!sequelSelectionIsCurrent(dialog)) return;
+      dialog.context = context;
+      $('campaign-sequel-source').innerHTML = '<option value="">Choose an adventure…</option>' +
+        catalog.filter(item => item.kind === 'campaign_plan').map(item =>
+          `<option value="${escapeHtml(item.id)}">${escapeHtml(item.title)}</option>`).join('');
+      $('campaign-sequel-status').textContent =
+        'Choose an adventure to check its exact world and rules. You can also author a compatible next adventure in Builder.';
+    } catch (error) {
+      if (sequelSelectionIsCurrent(dialog)) $('campaign-sequel-status').textContent =
+        friendlyCommandError('Adventure library could not load', error);
+    }
+  }
+
+  async function previewCampaignSequel() {
+    const dialog = state.sequelDialog;
+    const sourceId = $('campaign-sequel-source').value;
+    if (!sequelSelectionIsCurrent(dialog) || !sourceId || dialog.busy || dialog.request) return;
+    resetSequelReview();
+    dialog.busy = true;
+    $('campaign-sequel-status').textContent = 'Checking this adventure against the campaign…';
+    try {
+      const preview = await state.bridge.preview_campaign_sequel({ campaign_id: dialog.campaign_id,
+        session_id: dialog.session_id, source_id: sourceId });
+      if (!sequelSelectionIsCurrent(dialog) || sourceId !== $('campaign-sequel-source').value) return;
+      dialog.preview = preview;
+      const initial = preview.source_initial_state || {};
+      const facts = (initial.facts || []).map(item => typeof item === 'string' ? item : item.fact);
+      $('campaign-sequel-review').innerHTML =
+        `<h3>${escapeHtml(preview.title)}</h3><p>${escapeHtml(preview.summary)}</p>` +
+        `<p>${escapeHtml(preview.warning)}</p>` +
+        `<p><strong>Retained characters:</strong> ${preview.participants.map(item => escapeHtml(item.name)).join(', ') || 'Current campaign party'}</p>` +
+        (preview.ending.choice === 'finish' && preview.ending.has_after_story
+          ? '<p><strong>This campaign already chose its after-story.</strong> Review the saved future in history. The next adventure must follow those events.</p>' : '') +
+        '<h4>New sequence</h4><ol>' + preview.acts.map(item =>
+          `<li>Act ${item.number}: ${escapeHtml(item.title)}</li>`).join('') + '</ol>' +
+        '<details><summary>Retained story for review</summary>' +
+        '<p>This excerpt includes up to 64 recent history entries and current facts. The complete saved history remains authoritative.</p>' +
+        `<pre>${escapeHtml(JSON.stringify({ scene: preview.current_scene,
+          facts: preview.retained_facts, recent_history: dialog.context?.recent_history }, null, 2))}</pre></details>` +
+        '<details><summary>Review preparation and setup assumptions (contains story spoilers)</summary>' +
+        '<p>Authored starting facts are shown for compatibility review. They are not applied to the campaign.</p>' +
+        (facts.length ? '<ul>' + facts.map(item => `<li>${escapeHtml(item)}</li>`).join('') + '</ul>' : '') +
+        `<pre>${escapeHtml(preview.source_markdown)}</pre>` +
+        '<details><summary>Exact authored setup</summary>' +
+        `<pre>${escapeHtml(JSON.stringify({ initial_state: initial,
+          starting_location: preview.source_plan?.starting_location,
+          starting_party: preview.source_plan?.starting_party }, null, 2))}</pre></details></details>` +
+        '<details><summary>Review separate story identities</summary>' +
+        '<p>These mappings keep new progress separate from earlier acts and objectives. World identities are retained.</p>' +
+        '<table><thead><tr><th>Authored reference</th><th>Campaign reference</th></tr></thead><tbody>' +
+        Object.entries(preview.identity_mapping).map(([from, to]) =>
+          `<tr><td>${escapeHtml(from)}</td><td>${escapeHtml(to)}</td></tr>`).join('') +
+        '</tbody></table></details>' +
+        `<details><summary>Exact source</summary><pre>${escapeHtml(JSON.stringify({
+          id: preview.basis.source_id, sha256: preview.basis.source_sha256,
+          bindings: preview.source_bindings }, null, 2))}</pre></details>`;
+      $('campaign-sequel-review').hidden = false;
+      $('campaign-sequel-confirmation').hidden = false;
+      $('campaign-sequel-status').textContent =
+        'Review the adventure against your history. Resolve incompatible assumptions in Builder before appending.';
+    } catch (error) {
+      if (sequelSelectionIsCurrent(dialog)) $('campaign-sequel-status').textContent =
+        friendlyCommandError('This adventure cannot be appended', error);
+    } finally {
+      dialog.busy = false;
+      if (sequelSelectionIsCurrent(dialog)) refreshSequelConfirmation();
+    }
+  }
+
+  async function appendCampaignSequel() {
+    const dialog = state.sequelDialog;
+    if (!sequelSelectionIsCurrent(dialog) || !dialog.preview || dialog.busy ||
+        $('campaign-sequel-append').disabled) return;
+    if (!dialog.request) dialog.request = {
+      campaign_id: dialog.campaign_id, session_id: dialog.session_id,
+      operation_id: dialog.operation_id, source_id: dialog.preview.basis.source_id,
+      expected_revision: dialog.preview.basis.expected_revision,
+      preview_sha256: dialog.preview.preview_sha256,
+      review: { connection: $('campaign-sequel-connection').value.trim(), timeline: 'after', reviewed: true },
+    };
+    dialog.busy = true;
+    for (const id of ['campaign-sequel-source', 'campaign-sequel-connection', 'campaign-sequel-reviewed'])
+      $(id).disabled = true;
+    refreshSequelConfirmation();
+    $('campaign-sequel-status').textContent = 'Appending the reviewed adventure…';
+    try {
+      await state.bridge.append_campaign_sequel(dialog.request);
+      if (!sequelSelectionIsCurrent(dialog)) return;
+      $('campaign-sequel-dialog').close();
+      await openCampaign(dialog.campaign_id, dialog.session_id);
+      setInlineStatus('Adventure added. Continue with your Game Master when you are ready.');
+    } catch (error) {
+      if (sequelSelectionIsCurrent(dialog)) {
+        $('campaign-sequel-status').textContent = friendlyCommandError(
+          'Append was not confirmed. Retry this exact request to recover its result; if the review is stale, cancel and review again', error);
+        $('campaign-sequel-append').textContent = 'Retry append';
+      }
+    } finally {
+      dialog.busy = false;
+      if (sequelSelectionIsCurrent(dialog)) refreshSequelConfirmation();
+    }
+  }
+
+  async function authorCampaignSequel() {
+    const dialog = state.sequelDialog;
+    if (!sequelSelectionIsCurrent(dialog) || dialog.busy || dialog.request || !dialog.context) return;
+    const context = dialog.context;
+    const preparation = {
+      source_plan_id: context.accepted_plan?.id, source_references: context.source_references,
+      bindings: context.accepted_plan?.bindings,
+      boundaries: context.accepted_plan?.boundaries, current_scene: context.current_scene,
+      participants: context.participants.map(item => ({ id: item.id, name: item.data.name })),
+      recent_facts: context.facts.slice(-64), recent_history: context.recent_history,
+      ending: context.ending,
+    };
+    const fullContext = JSON.stringify(preparation, null, 2);
+    const contextExcerpt = fullContext.length <= 60000 ? fullContext :
+      fullContext.slice(0, 60000) + '\n\n[Context excerpt truncated at 60,000 characters. ' +
+      'It may end during a field. Complete saved history and boundaries remain authoritative. ' +
+      'Ask me for missing material rather than treating it as absent.]';
+    $('campaign-sequel-dialog').close();
+    await startBuilderChat({ displayName: `Next adventure: ${context.campaign_name}`,
+      initialPrompt: 'Help me author or adapt a compatible next Campaign Plan for this existing campaign. ' +
+        'Keep its exact Setting and Ruleset snapshots, characters, boundaries, played events, ' +
+        'unresolved consequences and already narrated future. This independent Builder may publish ' +
+        'a reusable Plan; it cannot change the live campaign. Its starting setup will not reset ' +
+        'the campaign. Ask about genuine narrative conflicts. I will review and append it separately. ' +
+        'This context includes up to 64 recent facts and history excerpts (up to 4000 characters each); ' +
+        'my complete saved history remains authoritative.\n\n' +
+        contextExcerpt });
+  }
+
   async function exportSelectedCampaign() {
     if (!state.activeCampaignId || !state.bridge || !state.bridge.export_campaign_file) return;
     const includeThinking = $('export-include-thinking')?.checked === true;
@@ -10704,7 +12125,7 @@ const SylviaGMFrontend = (() => {
       if (campaignId) await openCampaign(campaignId);
       setCampaignDataStatus(`Recovered ${result.file_name || 'campaign archive'}`);
     } catch (e) {
-      const detail = friendlyCommandError('Recovery failed', e);
+      const detail = uploadCommandError('Recovery', e);
       setCampaignDataStatus(detail.includes('portable_recovery_campaign_collision')
         ? 'This campaign already exists here. Your current campaign is unchanged.'
         : detail);
@@ -10731,7 +12152,7 @@ const SylviaGMFrontend = (() => {
       setInlineStatus(`Attached ${result.source_count} local source${result.source_count === 1 ? '' : 's'}`);
       await renderBuilderSession(sessionId);
     } catch (e) {
-      selectedStatus(activity, friendlyCommandError('Source attachment failed', e));
+      selectedStatus(activity, uploadCommandError('Source attachment', e));
     }
   }
 
@@ -10746,9 +12167,12 @@ const SylviaGMFrontend = (() => {
       });
     }
     else state.sessionDrafts.delete(state.activeSessionId);
+    state.desktopDrafts?.changed();
   }
 
   function restoreSelectedSessionDraft() {
+    dictationRevision += 1;
+    dictation?.sync();
     const input = $('player-input');
     if (!input) return;
     const draft = state.sessionDrafts.get(state.activeSessionId) || {};
@@ -10764,6 +12188,7 @@ const SylviaGMFrontend = (() => {
     const saved = state.sessionDrafts.get(submitted.sessionId);
     if (saved && saved.text === submitted.text && saved.oocText === submitted.oocText) {
       state.sessionDrafts.delete(submitted.sessionId);
+      state.desktopDrafts?.changed();
     }
     if (state.activeSessionId === submitted.sessionId &&
         $('player-input').value === submitted.text && $('ooc-input').value === submitted.oocText) {
@@ -10871,6 +12296,7 @@ const SylviaGMFrontend = (() => {
 
   async function submitInput(text, {
     builderStart = false, builderSessionId = null, playerAction = null, campaignEndingChoice = null,
+    builderQuestionAnswers = null,
   } = {}) {
     if (builderSessionId && !builderStart) return;
     const sessionId = playerAction?.sessionId || builderSessionId || state.activeSessionId;
@@ -10903,13 +12329,20 @@ const SylviaGMFrontend = (() => {
       return;
     }
     if (activityIsWorking(activity) && sessionRole === 'builder') {
+      if (builderQuestionAnswers) return;
       if (!state.bridge.steer_session || activity.stopRequestedAttemptId || !text.trim()) return;
+      if (selectedActivityMatches(activity)) {
+        dictation?.cancel('', { announce: false });
+      }
       saveSelectedSessionDraft();
       try {
         await state.bridge.steer_session(sessionId, 'steering-' + crypto.randomUUID(), text.trim());
         if (!currentActivity(activity)) return;
         const saved = state.sessionDrafts.get(sessionId);
-        if (saved && saved.text === text) state.sessionDrafts.delete(sessionId);
+        if (saved && saved.text === text) {
+          state.sessionDrafts.delete(sessionId);
+          state.desktopDrafts?.changed();
+        }
         if (selectedActivityMatches(activity) && $('player-input').value === text) {
           $('player-input').value = '';
         }
@@ -10942,9 +12375,13 @@ const SylviaGMFrontend = (() => {
       player_action_id: playerAction?.actionId || null,
       automatic_response: Boolean(playerAction?.automatic),
       campaign_ending_choice: campaignEndingChoice,
+      ...(builderQuestionAnswers ? { builder_question_answers: builderQuestionAnswers } : {}),
       redirect_interruption_id: !compact && !playerAction && !campaignEndingChoice && sessionRole === 'dm'
         ? activity.retryBasis?.interruption_id || null : null,
     };
+    if (!playerAction && !builderStart && !campaignEndingChoice && !compact && state.activeSessionId === sessionId) {
+      dictation?.cancel('', { announce: false });
+    }
     if (state.activeSessionId === sessionId) {
       setWebResearchPermission(false);
       saveSelectedSessionDraft();
@@ -10952,7 +12389,8 @@ const SylviaGMFrontend = (() => {
     activity = beginSessionActivity(activity, command.attempt_id);
     activity.contextCompaction = compact;
     activity.ownerId = compact || sessionRole === 'builder' ? sessionId : campaignId;
-    activity.pendingInput = playerAction || compact || campaignEndingChoice ? null : { sessionId, messageId: command.message_id, text, oocText };
+    activity.pendingInput = playerAction || compact || campaignEndingChoice || builderQuestionAnswers
+      ? null : { sessionId, messageId: command.message_id, text, oocText };
     refreshActivityControls(activity);
     selectedStatus(activity, compact ? 'Compacting context · saved conversation is kept' : 'Streaming…');
     renderActivityIndexes();
@@ -10964,16 +12402,28 @@ const SylviaGMFrontend = (() => {
       const result = await submission;
       if (!currentActivity(activity)) return;
       clearAcceptedInput(activity);
+      if (!playerAction && !compact && !campaignEndingChoice && !builderQuestionAnswers) {
+        tutorials?.notify(activity.sessionRole === 'dm' ? 'player-message' : 'builder-message', sessionId);
+      }
       const stopped = activity.stopRequestedAttemptId === command.attempt_id;
       const interrupted = result && (result.interruption || result.status === 'interrupted');
       finishSessionActivity(activity, stopped ? 'stopped' : interrupted ? 'interrupted' : 'completed',
         stopped ? 'Stopped' : interrupted ? 'Generation was interrupted' :
           compact ? 'Context compacted · saved conversation is kept' : 'Completed');
     } catch (e) {
+      const stopped = activity.stopRequestedAttemptId === command.attempt_id;
+      // The action was already committed; only its narration request failed or went unconfirmed.
+      const uncertain = e?.code === 'outcome_unknown';
+      if (playerAction && !stopped) narrationNotices.set(narrationNoticeKey(sessionId, playerAction.actionId),
+        // The desktop bridge rejects with "owner_code: message"; show only the owner's words.
+        { uncertain, reason: String(e?.message || e || '').replace(/^Error:\s*/, '')
+          .replace(/^[a-z]+(?:_[a-z]+)+:\s+/, '').trim() });
       if (currentActivity(activity)) {
-        const stopped = activity.stopRequestedAttemptId === command.attempt_id;
         finishSessionActivity(activity, stopped ? 'stopped' : 'interrupted',
-          stopped ? 'Stopped' : friendlyCommandError('Session request rejected', e));
+          stopped ? 'Stopped' : playerAction
+            ? (uncertain ? 'Narration request unconfirmed · the saved action was not repeated'
+              : 'Narration unavailable · the saved action was not repeated')
+            : friendlyCommandError('Session request rejected', e));
       }
     } finally {
       stopStreamHeartbeat(activity);
@@ -11173,6 +12623,7 @@ const SylviaGMFrontend = (() => {
     }
     const retryId = interruption.resolving_retry_id || ('retry-' + crypto.randomUUID());
     activity = beginSessionActivity(activity, retryId);
+    activity.activityPhase = 'retrying';
     refreshActivityControls(activity);
     selectedStatus(activity, 'Retry streaming…');
     renderActivityIndexes();
@@ -11241,6 +12692,33 @@ const SylviaGMFrontend = (() => {
     }
   }
 
+  let browserVisibilityGeneration = 0;
+  async function setBrowserVisibility(visible) {
+    if (!window.__sylviaBrowserInvoke || window.SylviaWebUI?.isStopped()) return;
+    const generation = ++browserVisibilityGeneration;
+    if (!visible) {
+      saveSelectedSessionDraft();
+      signalActiveStreamDisconnect();
+      await state.desktopDrafts?.flush();
+      return;
+    }
+    const working = [...state.sessionActivities.values()].filter(activityIsWorking);
+    await Promise.all(working.map(async (activity) => {
+      await reconnect(activity.attemptId, activity.acknowledgedSequence,
+        activity.attachmentGeneration, activity);
+      if (document.hidden) {
+        // A reconnect can finish after the background notification. Release its
+        // newly attached lease too, using the owner's updated generation.
+        signalActiveStreamDisconnect();
+        return;
+      }
+      if (generation !== browserVisibilityGeneration || document.hidden ||
+          !currentActivity(activity) || !activityIsWorking(activity)) return;
+      startStreamHeartbeat(activity, true);
+      startProjectionPolling(activity);
+    }));
+  }
+
   async function restoreDisconnectedStream() {
     let saved;
     try { saved = JSON.parse(sessionStorage.getItem(DISCONNECTED_STREAM_KEY) || 'null'); }
@@ -11300,53 +12778,228 @@ const SylviaGMFrontend = (() => {
     }
   }
 
-  // ---- Sidebar resize (host-extensible, user-draggable) ----
-  // Navigation controls are host presentation; hiding them must not change any saved session.
+  // ---- Shell navigation and the game panels / Story split ----
+  // Navigation and widths are host presentation; hiding or resizing never changes a saved session.
+  const SHELL_LAYOUT_KEY = 'sylvia-gm-sidebar-visibility';
+  const STORY_MINIMUM_WIDTH = 320;
+  const PANELS_MINIMUM_WIDTH = 220;
+  const RESIZE_HANDLE_WIDTH = 14;
+  const narrowShell = () => Boolean(window.matchMedia?.('(max-width: 760px)').matches);
+
+  function shellWidth(id) {
+    const width = $(id)?.getBoundingClientRect?.()?.width;
+    return Number.isFinite(width) ? width : 0;
+  }
+
+  // The width shared by game panels, divider and Story; unmeasured layouts fall back to the window.
+  function playColumnsWidth() {
+    const measured = shellWidth('play-columns');
+    if (measured > 0) return measured;
+    const viewport = Number(window.innerWidth) || 1280;
+    return Math.max(480, viewport - (shellWidth('app-sidebar') || shellWidth('app-rail')));
+  }
+
+  function hasGamePanels() {
+    return state.view === 'session' && Boolean(state.panelProjection?.surfaces?.length);
+  }
+
+  // Board folds Story to a rail; Balanced and Story are width presets that the divider can refine.
+  function presetSidebarWidth(mode) {
+    const available = playColumnsWidth() - RESIZE_HANDLE_WIDTH;
+    const story = mode === 'story' ? Math.round(available * 0.58)
+      : Math.max(STORY_MINIMUM_WIDTH + 20, Math.min(560, Math.round(available * 0.3)));
+    return Math.max(PANELS_MINIMUM_WIDTH, available - story);
+  }
+
+  function currentViewMode() {
+    if (narrowShell()) return $('session-frame').dataset.browserPane === 'chat' ? 'story' : 'board';
+    if (state.sidebarCollapsed.right) return null;
+    if (state.sidebarCollapsed.story) return 'board';
+    const width = shellWidth('right-sidebar') || Number.parseFloat($('right-sidebar')?.style.width);
+    return ['balanced', 'story'].find((mode) => Math.abs(width - presetSidebarWidth(mode)) <= 24) || null;
+  }
+
+  function persistShellLayout() {
+    try { localStorage.setItem(SHELL_LAYOUT_KEY, JSON.stringify(state.sidebarCollapsed)); }
+    catch (_) { /* Keep the controls usable when local preferences cannot be saved. */ }
+  }
+
+  function renderShellNavigation() {
+    const frame = $('session-frame');
+    const panels = hasGamePanels();
+    const storyFolded = panels && state.sidebarCollapsed.story && !state.sidebarCollapsed.right && !narrowShell();
+    for (const [name, active] of [['has-panels', panels], ['story-collapsed', storyFolded]]) {
+      if (active) frame.classList.add(name);
+      else frame.classList.remove(name);
+    }
+    if (state.storySessionId !== state.activeSessionId || !storyFolded) {
+      state.storySessionId = state.activeSessionId;
+      state.storyUnread = false;
+    }
+    const storyRail = $('story-rail-btn');
+    if (storyRail) {
+      storyRail.hidden = !storyFolded;
+      storyRail.setAttribute('aria-label', state.storyUnread ? 'Show Story · new messages' : 'Show Story');
+    }
+    if ($('story-rail-unread')) $('story-rail-unread').hidden = !state.storyUnread;
+    if ($('view-switch')) $('view-switch').hidden = !panels;
+    renderQueueBadge(panels ? state.panelProjection : null);
+    const mode = currentViewMode();
+    for (const button of Array.from(document.querySelectorAll?.('[data-view-mode]') || []))
+      button.setAttribute('aria-pressed', String(button.dataset.viewMode === mode));
+    const campaign = state.view === 'session' && state.activeCampaignId
+      ? state.campaigns.find((item) => item.campaign_id === state.activeCampaignId) : null;
+    const subtitle = campaign ? [concisePackageLabel(campaign.ruleset_label, 'ruleset'),
+      concisePackageLabel(campaign.campaign_setting_label, 'setting')].join(' · ')
+      : state.view === 'session' && state.activeSessionRole === 'builder' ? 'Builder session' : '';
+    if ($('session-subtitle')) {
+      $('session-subtitle').textContent = subtitle;
+      $('session-subtitle').hidden = !subtitle;
+    }
+    const current = state.view === 'home' ? 'home-btn'
+      : state.activeSessionRole === 'builder' ? 'rail-builder-btn'
+        : state.view === 'session' && state.activeCampaignId ? 'rail-play-btn' : null;
+    for (const id of ['home-btn', 'rail-play-btn', 'rail-builder-btn'])
+      $(id)?.setAttribute?.('aria-current', id === current ? 'page' : 'false');
+  }
+
   function renderSidebarState() {
     const campaign = state.view === 'session' && Boolean(state.activeCampaignId);
-    $('builder-launcher').hidden = campaign && state.activeSessionRole === 'dm';
-    $('session-context').hidden = !campaign;
+    $('campaign-sequel-btn').hidden = !campaign || state.activeSessionRole !== 'dm';
+    const names = { left: 'sessions sidebar', right: 'game panels' };
     for (const side of ['left', 'right']) {
       const collapsed = state.sidebarCollapsed[side];
       const frame = $('session-frame');
       if (collapsed) frame.classList.add(`${side}-sidebar-collapsed`);
       else frame.classList.remove(`${side}-sidebar-collapsed`);
       const button = $(`toggle-${side}-sidebar-btn`);
-      const label = `${collapsed ? 'Expand' : 'Collapse'} ${side} sidebar`;
+      const label = `${collapsed ? 'Show' : 'Hide'} ${names[side]}`;
       button.setAttribute('aria-expanded', String(!collapsed));
       button.setAttribute('aria-label', label);
       button.title = label;
     }
+    if (narrowShell()) toggleNarrowDrawer(false);
+    renderShellNavigation();
+  }
+
+  // Narrow windows show the sessions drawer as a temporary overlay without changing desktop preferences.
+  function toggleNarrowDrawer(open = !$('session-frame').classList.contains('narrow-drawer-open')) {
+    const frame = $('session-frame');
+    if (open) frame.classList.add('narrow-drawer-open');
+    else frame.classList.remove('narrow-drawer-open');
+    $('toggle-left-sidebar-btn').setAttribute('aria-expanded', String(open));
   }
 
   function setSidebarCollapsed(side, collapsed) {
-    if (!['left', 'right'].includes(side)) return;
+    if (!['left', 'right', 'story'].includes(side)) return;
     state.sidebarCollapsed[side] = collapsed === true;
-    try { localStorage.setItem('sylvia-gm-sidebar-visibility', JSON.stringify(state.sidebarCollapsed)); }
-    catch (_) { /* Keep the controls usable when local preferences cannot be saved. */ }
+    persistShellLayout();
     renderSidebarState();
+    applySidebarWidth();
+  }
+
+  // Apply a named view. Narrow windows show one pane at a time through the shared browser-pane state.
+  function selectViewMode(mode) {
+    if (narrowShell()) {
+      $('session-frame').dataset.browserPane = mode === 'board' ? 'panels' : 'chat';
+      renderShellNavigation();
+      return;
+    }
+    state.sidebarCollapsed.right = false;
+    state.sidebarCollapsed.story = mode === 'board';
+    persistShellLayout();
+    renderSidebarState();
+    if (mode === 'board') return;
+    const width = presetSidebarWidth(mode);
+    setSidebarWidth(width);
+    savePanelLayout({ sidebar_width: Math.round(width) });
+    renderShellNavigation();
+  }
+
+  // Open the most recently active campaign, or Home when there is nothing to continue.
+  function playLatestCampaign() {
+    if (state.view === 'session' && state.activeCampaignId && state.activeSessionRole === 'dm') return;
+    const campaign = recentCampaign(state.campaigns.filter((item) => item.lifecycle === 'active'));
+    if (!campaign) {
+      showHome();
+      $('home-new-campaign-btn')?.focus();
+      return;
+    }
+    void openCampaign(campaign.campaign_id, preferredCampaignSession(campaign)?.session_id || null);
+  }
+
+  // Open the first listed Builder session, or start one. Inside Builder it reveals the session list.
+  function openBuilderMode() {
+    if (state.view === 'session' && state.activeSessionRole === 'builder') {
+      setSidebarCollapsed('left', false);
+      $('builder-chat-rail')?.querySelector('[data-builder-session-id]')?.focus();
+      return;
+    }
+    renderBuilderChatRail();
+    const first = $('builder-chat-rail')?.querySelector('[data-builder-session-id]');
+    if (first) first.click();
+    else void startBuilderChat();
+  }
+
+  // Bring the queued-actions panel forward, whether it is a background tab or already visible.
+  // Bring the queue forward wherever it is: shown panels, a hidden panel, a background tab or its own window.
+  function revealQueuedActions() {
+    if (narrowShell()) selectViewMode('board');
+    else if (state.sidebarCollapsed.right) setSidebarCollapsed('right', false);
+    gamePanels().reveal(ACTION_QUEUE_PANEL_ID);
+    setTimeout(() => {
+      const queue = $('ruleset-panels')?.querySelector('.action-sequence');
+      queue?.scrollIntoView({ block: 'nearest' });
+      queue?.focus({ preventScroll: true });
+    }, 0);
+  }
+
+  function renderQueueBadge(projection) {
+    const badge = $('queue-badge');
+    if (!badge) return;
+    const queue = projection?.surfaces?.find((surface) => surface.id === ACTION_QUEUE_PANEL_ID)?.data?.queue;
+    const steps = queue?.session_id === state.activeSessionId ? queue.steps || [] : [];
+    const count = (status) => steps.filter((step) => step.status === status).length;
+    const queued = count('pending'), sending = count('executing'), choosing = count('awaiting_choice');
+    const review = queued && ['failed', 'paused', 'stale'].includes(queue?.status);
+    const parts = [queued ? [queued, review ? 'queued · needs review' : 'queued'] : null,
+      sending ? [sending, 'sending · unconfirmed'] : null, choosing ? [choosing, 'awaiting choice'] : null].filter(Boolean);
+    badge.hidden = !parts.length;
+    badge.dataset.queueState = sending ? 'sending' : choosing || review ? 'attention' : 'queued';
+    badge.innerHTML = `<span>≡ ${parts.map(([value, label]) =>
+      `<b>${value}</b><span class="queue-badge-label"> ${label}</span>`).join(' ')}</span>`;
+    badge.setAttribute('aria-label', parts.map(([value, label]) => `${value} ${label}`).join(', ') + ' · show queue');
   }
 
   function sidebarMaximumWidth() {
-    return Math.max(260, Math.min(Math.floor(window.innerWidth * 0.65), window.innerWidth - 560));
+    return Math.max(260, playColumnsWidth() - RESIZE_HANDLE_WIDTH - STORY_MINIMUM_WIDTH);
   }
 
-  // The separator and chat-side toggle track the actual sidebar without occupying layout space.
+  function renderResizeReadout(pixels) {
+    const available = playColumnsWidth() - RESIZE_HANDLE_WIDTH;
+    const share = Math.round(Math.max(0, Math.min(1, (available - pixels) / available)) * 100);
+    if ($('resize-readout')) $('resize-readout').textContent = `Story ${share}%`;
+    $('sidebar-resize-handle').setAttribute('aria-valuetext', `Game panels ${Math.round(pixels)} pixels · Story ${share}%`);
+  }
+
+  // The game panels own an explicit width; Story takes the remainder beside the divider.
   function setSidebarWidth(width) {
-    const pixels = Math.max(220, Math.min(sidebarMaximumWidth(), width));
+    const pixels = Math.max(PANELS_MINIMUM_WIDTH, Math.min(sidebarMaximumWidth(), width));
     $('right-sidebar').style.width = `${pixels}px`;
     $('session-frame').style.setProperty('--sidebar-width', `${pixels}px`);
     $('sidebar-resize-handle').setAttribute('aria-valuenow', String(Math.round(pixels)));
     $('sidebar-resize-handle').setAttribute('aria-valuemax', String(sidebarMaximumWidth()));
+    renderResizeReadout(pixels);
   }
 
   function applySidebarWidth() {
     const sidebar = $('right-sidebar');
     if (!sidebar) return;
     const saved = panelLayout().sidebar_width;
-    const defaultWidth = state.panelProjection?.surfaces.some((surface) => ['tactical_grid', 'coordinate_map'].includes(surface.renderer)) ? Math.max(480, Math.round(window.innerWidth * 0.5)) : 280;
+    const defaultWidth = state.panelProjection?.surfaces.some((surface) => ['tactical_grid', 'coordinate_map'].includes(surface.renderer)) ? presetSidebarWidth('balanced') : 280;
     const width = saved == null ? defaultWidth : Number(saved);
     setSidebarWidth(Number.isFinite(width) ? width : defaultWidth);
+    renderShellNavigation();
   }
 
   // Keep the footer anchored while the message box grows upward, without touching its draft.
@@ -11360,8 +13013,8 @@ const SylviaGMFrontend = (() => {
       const footer = input.closest('.input-composer').querySelector('.composer-footer');
       const feedback = $('session-status-text');
       const available = (column?.clientHeight || window.innerHeight) -
-        (column?.querySelector('.session-topbar')?.offsetHeight || 48) -
-        footer.offsetHeight - feedback.offsetHeight - 160;
+        (column?.querySelector('.story-column-header')?.offsetHeight || 0) -
+        footer.offsetHeight - feedback.offsetHeight - ($('dictation-feedback')?.offsetHeight || 0) - 160;
       return Math.max(58, Math.min(200, available));
     };
     const resize = (requested) => {
@@ -11407,11 +13060,13 @@ const SylviaGMFrontend = (() => {
     resize(input.getBoundingClientRect().height || 58);
   }
 
+  // Restore shell preferences and wire the divider. Story is to the right of the game panels.
   function initSidebarResize() {
     try {
-      const saved = JSON.parse(localStorage.getItem('sylvia-gm-sidebar-visibility') || '{}');
-      state.sidebarCollapsed = { left: saved?.left === true, right: saved?.right === true };
-    } catch (_) { state.sidebarCollapsed = { left: false, right: false }; }
+      const saved = JSON.parse(localStorage.getItem(SHELL_LAYOUT_KEY) || '{}');
+      // The left rail is thin until expanded; only an explicit saved choice keeps it open.
+      state.sidebarCollapsed = { left: saved?.left !== false, right: saved?.right === true, story: saved?.story === true };
+    } catch (_) { state.sidebarCollapsed = { left: true, right: false, story: false }; }
     renderSidebarState();
     let dragInfo = null;
     const handle = $('sidebar-resize-handle');
@@ -11420,13 +13075,16 @@ const SylviaGMFrontend = (() => {
     applySidebarWidth();
     window.addEventListener('resize', applySidebarWidth);
     handle.addEventListener('keydown', (event) => {
-      if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+      if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
       event.preventDefault();
-      setSidebarWidth(sidebar.getBoundingClientRect().width + (event.key === 'ArrowLeft' ? 16 : -16));
+      const width = sidebar.getBoundingClientRect().width;
+      setSidebarWidth(event.key === 'Home' ? PANELS_MINIMUM_WIDTH : event.key === 'End' ? sidebarMaximumWidth()
+        : width + (event.key === 'ArrowRight' ? 16 : -16));
       savePanelLayout({ sidebar_width: Math.round(sidebar.getBoundingClientRect().width) });
+      renderShellNavigation();
     });
     document.addEventListener('mousedown', (e) => {
-      if (e.target !== handle || state.sidebarCollapsed.right) return;
+      if (e.button !== 0 || e.target?.closest?.('#sidebar-resize-handle') !== handle || state.sidebarCollapsed.right) return;
       e.preventDefault();
       document.body.style.userSelect = 'none';
       handle.classList.add('active');
@@ -11434,9 +13092,7 @@ const SylviaGMFrontend = (() => {
     });
     document.addEventListener('mousemove', (e) => {
       if (!dragInfo) return;
-      const delta = e.clientX - dragInfo.startX;
-      const newW = Math.max(220, Math.min(sidebarMaximumWidth(), dragInfo.startW - delta));
-      setSidebarWidth(newW);
+      setSidebarWidth(dragInfo.startW + e.clientX - dragInfo.startX);
     });
     document.addEventListener('mouseup', () => {
       if (!dragInfo) return;
@@ -11444,7 +13100,18 @@ const SylviaGMFrontend = (() => {
       handle.classList.remove('active');
       document.body.style.userSelect = '';
       dragInfo = null;
+      renderShellNavigation();
     });
+    // Story cards that arrive while Story is folded mark its rail; expanding Story clears the mark.
+    const chronology = $('chronology');
+    if (chronology && typeof MutationObserver === 'function') {
+      new MutationObserver((records) => {
+        if (!$('session-frame').classList.contains('story-collapsed') || state.storyUnread) return;
+        state.storyUnread = records.some((record) => Array.from(record.addedNodes).some((node) =>
+          node.nodeType === 1 && node.classList.contains('story-card')));
+        if (state.storyUnread) renderShellNavigation();
+      }).observe(chronology, { childList: true });
+    }
   }
 
   // ---- HTML escape (prevent injection from projection text) ----
@@ -11681,9 +13348,20 @@ const SylviaGMFrontend = (() => {
     return `${fallback}: ${detail}`;
   }
 
+  // A lost upload receipt leaves the saved outcome unknown until reconnect/reconciliation.
+  function uploadCommandError(operation, error) {
+    return friendlyCommandError(`${operation} ${error?.code === 'outcome_unknown'
+      ? 'status unconfirmed' : 'failed'}`, error);
+  }
+
   // ---- Public API ----
   return {
     init,
+    setBrowserVisibility,
+    flushBrowserDrafts: async () => {
+      saveSelectedSessionDraft();
+      await state.desktopDrafts?.flush();
+    },
     setTheme,
     openCampaign,
     createNoRulesCampaign,

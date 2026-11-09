@@ -149,7 +149,7 @@ def test_library_party_handoff_uses_declared_state_and_retains_profiles(
                 "plan_id": plan.artifact_id,
             },
         )
-        assert options["player_archetypes"][0]["id"] == characters[0].artifact_id
+        assert options["player_archetypes"][0]["id"] == player_id
         assert options["companions"][0]["campaign_ready"] is True
         if required_party:
             required_row = options["companions"][-1]

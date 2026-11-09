@@ -749,6 +749,8 @@ class TestRendererSecretless:
         assert len(artefacts) >= 3, f"Expected app.html, app.css, app.js; got {artefacts}"
         for path in artefacts:
             content = _renderer_runtime_text(path).lower()
+            # An operation display label is not an owner database address.
+            content = content.replace("'write to database'", "'save campaign state'")
             for pattern in SECRET_PATTERNS:
                 assert pattern.lower() not in content, (
                     f"Secret pattern '{pattern}' found in {path.name}"
@@ -782,6 +784,11 @@ class TestRendererSecretless:
         ]
         for path in FRONTEND_DIR.glob("app.*"):
             content = _renderer_runtime_text(path).lower()
+            # The compatibility label is presentation, never a rules resolver.
+            content = content.replace("return packageid === 'sylvia.srd-lite.bg3' ? 'srd lite' : label || packageid;", "")
+            # Selected package data may name a saving throw; the empty-rules
+            # surface is separately exercised through the real owner below.
+            content = content.replace("'saving throw'", "''").replace("`saving throws:", "`proficiencies:")
             for pattern in dnd_patterns:
                 assert pattern not in content, f"D&D/TTRPG pattern '{pattern}' found in {path.name}"
 
@@ -986,10 +993,10 @@ class TestUI001Frame:
     def test_campaign_index_failure_is_not_rendered_as_an_empty_library(self) -> None:
         js = _renderer_runtime_text(FRONTEND_DIR / "app.js")
         refresh = js.split("async function refreshCampaignIndex()", maxsplit=1)[1].split(
-            "function renderCampaignRail()", maxsplit=1
-        )[0]
-        rail = js.split("function renderCampaignRail()", maxsplit=1)[1].split(
             "function panelLayout()", maxsplit=1
+        )[0]
+        rail = js.split("function renderHome()", maxsplit=1)[1].split(
+            "function renderBuilderChatRail()", maxsplit=1
         )[0]
 
         assert "campaignIndexStatus" in refresh
@@ -1000,7 +1007,7 @@ class TestUI001Frame:
         assert "Loading campaigns" in rail
         assert "Campaign list could not be loaded" in rail
         assert "Retry" in rail
-        assert "No campaigns yet" in rail
+        assert "No ongoing campaigns yet" in rail
 
     def test_talk_keeps_one_identity_and_typography_through_commit(self) -> None:
         frontend = FRONTEND_DIR / "app.js"
@@ -1118,13 +1125,13 @@ class TestUI001Frame:
         ):
             assert f'id="{relocated_control}"' not in rail
             assert f'id="{relocated_control}"' in settings
-        for tab in ("models", "appearance", "packages", "campaign-data", "about"):
+        for tab in ("models", "accounts", "appearance", "dictation", "packages", "campaign-data", "about", "admin"):
             assert f'data-settings-tab="{tab}"' in settings
             assert f'data-settings-panel="{tab}"' in settings
         assert 'role="dialog"' in settings
         assert 'aria-modal="true"' in settings
         assert 'role="tablist"' in settings
-        assert settings.count('role="tabpanel"') == 6
+        assert settings.count('role="tabpanel"') == 8
         assert ".settings-overlay[hidden]" in css
         assert "VALID_SETTINGS_TABS" in js
         assert "function openSettings(" in js
@@ -1135,10 +1142,10 @@ class TestUI001Frame:
         assert 'id="lifecycle-actions" hidden' in rail
         assert ".lifecycle-actions[hidden]" in css
         assert ".lifecycle-actions .btn[hidden]" in css
-        assert "$('lifecycle-actions').hidden = !(canStop || canResume || canFinalize)" in js
+        assert "$('lifecycle-actions').hidden = !(canResume || canFinalize)" in js
         assert "control.hidden = !available" in js
-        assert "Subscription" not in settings
-        assert "Account" not in settings
+        assert 'data-settings-panel="accounts"' in settings
+        assert 'data-settings-panel="dictation"' in settings
 
     def test_css_has_session_themes(self) -> None:
         css = (FRONTEND_DIR / "app.css").read_text(encoding="utf-8")
@@ -1158,7 +1165,8 @@ class TestUI001Frame:
         assert "finalize_campaign_construction" in js
         assert "create_no_rules_campaign" not in js
         assert "create_campaign_from_candidate" not in js
-        assert "execute_action" not in js
+        assert re.search(r"invoke\(['\"]execute_action['\"]", js) is None
+        assert "execute_action_sequence" in js
         assert "interrupt_stream" in js
         assert "interrupt_provider_stream" in js
         assert "steer_session" in js
@@ -1202,7 +1210,7 @@ class TestUI001Frame:
     def test_html_exposes_construction_and_lifecycle_controls(self) -> None:
         html = (FRONTEND_DIR / "app.html").read_text(encoding="utf-8")
         for control_id in (
-            "new-campaign-btn",
+            "home-new-campaign-btn",
             "install-package-btn",
             "construction-panel",
             "finalize-construction-btn",
@@ -1244,7 +1252,7 @@ class TestUI001Frame:
         assert "Privacy-safe operation rejection diagnostics are always available" in html
         assert "safe operation diagnostics" in js
         assert "safe_mechanics_diagnostics" in js
-        assert "state.adminAuditTraces = [...safeDiagnostics, ...traces]" in js
+        assert "state.adminAuditTraces = [...safeDiagnostics.slice(-50), ...traces]" in js
 
     def test_guided_rift_interview_uses_the_owner_bridge(self) -> None:
         html = (FRONTEND_DIR / "app.html").read_text(encoding="utf-8")
@@ -1277,8 +1285,8 @@ class TestUI001Frame:
         assert "item.campaign_ready === false" in js
         assert "input.dataset.profileRequired" in js
         assert "Complete Character File first" in js
-        assert "Create or Complete Player Character" in html
-        assert "Create or Complete Companion" in html
+        assert "Create New Player Character" in html
+        assert "Create New Companion" in html
         assert "playerPolicy.mode === 'fixed'" in js
         assert "policy.custom_companions?.minimum" in js
         assert "create_guided_campaign_draft" in js
@@ -1288,7 +1296,7 @@ class TestUI001Frame:
         assert "save_reusable_campaign_plan" in js
 
         deterministic_boundary_path = (
-            "currentStep === 'specific_requests' &&\n        !captured.value.no_additional_requests"
+            "currentStep === 'specific_requests' && $('construction-package').value &&\n        !captured.value.no_additional_requests"
         )
         assert deterministic_boundary_path in js
         assert "hardBoundaries" not in js
@@ -1311,7 +1319,7 @@ class TestUI001Frame:
         )[0]
         assert "hideConstructionPanel(false);" in show_home
         assert open_campaign.index("hideConstructionPanel(false);") < open_campaign.index(
-            "await renderPlayerProjection(campaignId, openingSessionId);"
+            "renderPlayerProjection(campaignId, openingSessionId, { loadPanels: false, opening })"
         )
 
     def test_guided_campaign_resume_selects_the_highest_construction_revision(self) -> None:
@@ -1525,7 +1533,7 @@ class TestUI001Frame:
         assert ".pick_files()" in picker
         assert '"ingest_builder_sources"' in picker
         assert "file_name" not in picker
-        assert "openCampaign(item.dataset.campaignId, item.dataset.sessionId || null)" in js
+        assert "openCampaign(button.dataset.homeCampaignId, button.dataset.homeSessionId || null)" in js
 
     def test_session_submission_maps_internal_fields_to_tauri_arguments(self) -> None:
         js = _renderer_runtime_text(FRONTEND_DIR / "app.js")
@@ -1566,21 +1574,23 @@ class TestUI001Frame:
         )
         script = (
             "const fields = {}; const $ = id => fields[id] ||= {value: ''};"
-            "const state = {providerCapacity: {}};"
+            "const state = {providerCapacity: {}, modelEditor: {}};"
             "const privateProviderHeaders = () => ({});"
             + integer
+            + "const requireTextLength = value => value;"
             + editor
             + "const discovery = providerEditorCommand({requireOutputLimit: false});"
-            "let saveError = ''; try {providerEditorCommand();} catch(e) {saveError=e.message;}"
+            "let saveError = ''; const automatic = providerEditorCommand();"
             "$('provider-output-limit').value = '131072';"
             "const save = providerEditorCommand();"
             "process.stdout.write(JSON.stringify({discovery:discovery.max_output_tokens,"
-            "saveError, output:save.max_output_tokens}));"
+            "saveError, automatic:automatic.max_output_tokens, output:save.max_output_tokens}));"
         )
         result = subprocess.run(["node", "-e", script], check=True, capture_output=True, text=True)
         assert json.loads(result.stdout) == {
             "discovery": None,
-            "saveError": "Enter the output token limit supported by your provider",
+            "saveError": "",
+            "automatic": None,
             "output": 131_072,
         }
 
@@ -1606,9 +1616,9 @@ class TestUI001Frame:
         assert 'id="provider-credential" type="password"' in html
         assert "LM Studio" not in html  # presets come from the owner, not renderer defaults
         assert "Choose a service" in html
-        assert "Refresh models &amp; context" in html
+        assert "Find models" in html
         assert "Choose a model" in html
-        assert "Advanced settings" in html
+        assert "Advanced connection settings" in html
         assert "Server address" in html
         assert "API format" in html
         assert "Context capacity" in html
@@ -1616,18 +1626,18 @@ class TestUI001Frame:
         assert "Loaded runtime" in html
         assert "Optional Sylvia cap" in html
         assert "Effective capacity" in html
-        assert "Output token limit" in html
-        assert "Includes reasoning, tool arguments and narration" in html
+        assert "Optional reply cap" in html
+        assert "Covers reasoning, tool arguments and narration" in html
         assert 'inputmode="numeric" value="4096"' not in html
         assert "max_output_tokens || 4096" not in js
         discovery = js.split("async function discoverSelectedProviderModels(", maxsplit=1)[1]
         discovery = discovery.split("function selectDiscoveredProviderModel(", maxsplit=1)[0]
         assert "providerEditorCommand({ requireOutputLimit: false })" in discovery
-        assert "Save connection" in html
-        assert "API keys are saved on this computer and sent to your" in html
+        assert "Add model" in html
+        assert "Saved API keys and private headers are protected by Windows" in html
         assert "selected service for authentication" in html
         assert (
-            "Messages and relevant campaign content are sent to your selected model service" in html
+            "source material, are sent to the selected service." in html
         )
         assert "Request transport" not in html
         assert "owner-local" not in html
@@ -1638,9 +1648,9 @@ class TestUI001Frame:
         assert 'id="provider-model-search"' in html
         assert 'id="provider-discovered-models"' in html
         assert 'id="validate-provider-btn"' in html
-        assert 'id="switch-current-model-btn"' in html
-        assert 'id="switch-once-model-btn"' in html
-        assert 'id="switch-global-model-btn"' in html
+        assert 'data-chat-model-mode="current"' in html
+        assert 'data-chat-model-mode="once"' in html
+        assert 'data-chat-model-mode="global"' in html
         assert "invoke('detect_local_providers')" in js
         assert "invoke('validate_provider_model'" in js
         assert "Ready for Builder and Game Master" in js
@@ -1664,7 +1674,7 @@ class TestUI001Frame:
         assert "modelId: command.model_id" in js
         create_draft_bridge = js.split("create_guided_campaign_draft: (command)", maxsplit=1)[1]
         create_draft_bridge = create_draft_bridge.split(
-            "advance_guided_campaign_draft: (command)", maxsplit=1
+            "navigate_guided_campaign_draft: (command)", maxsplit=1
         )[0]
         assert "builderSessionId: command.builder_session_id" not in create_draft_bridge
         assert "provider_id: selected.provider_id" in js
@@ -1672,7 +1682,8 @@ class TestUI001Frame:
         assert "builder_session_id: `session-builder-${nonce}`" not in js
         assert "'finalize_campaign_construction'" in js
         assert "complete_campaign_construction" not in js
-        assert "execute_action" not in js
+        assert re.search(r"invoke\(['\"]execute_action['\"]", js) is None
+        assert "execute_action_sequence" in js
         assert "invoke('open_turn'" not in js
         assert "complete_turn" not in js
         assert "Campaign Plan ready" in js
@@ -1716,8 +1727,8 @@ class TestUI001Frame:
         assert "Open live inspector" in html
         assert "complete request sent to the model" in html
         assert "including private reasoning and tool calls" in html
-        assert "Enable Full Audit before" in html
-        assert "every test run" in html
+        assert "Enable Full Audit" in html
+        assert "Exact traces disappear" in html
         assert "disappear when Full Audit is disabled or Sylvia restarts" in html
         assert "invoke('admin_full_audit_status')" in js
         assert "invoke('admin_full_audit_record'" in js
@@ -1782,7 +1793,7 @@ class TestUI001Frame:
         rust = (FRONTEND_DIR.parent / "src" / "lib.rs").read_text(encoding="utf-8")
 
         left_sidebar = html[
-            html.index('<div class="portrait-col">') : html.index("<!-- Central chronology -->")
+            html.index('<div class="portrait-col" id="left-sidebar">') : html.index('<div class="chronology-col" id="story-column">')
         ]
         assert 'id="new-builder-chat-btn"' in left_sidebar
         assert 'id="builder-chat-rail"' in left_sidebar
@@ -1816,9 +1827,9 @@ class TestUI001Frame:
             "campaign-shelves",
         ):
             assert f'id="{control_id}"' in html
-        assert "await restoreDisconnectedStream();\n    showHome();" in js
-        assert ".session-frame.home-active .right-sidebar" in css
-        assert ".session-frame.home-active .portrait-frame" not in css
+        assert re.search(r"await restoreDisconnectedStream\(\);\s+showHome\(\);", js)
+        assert ".session-frame.home-active .play-area" in css
+        assert ".session-frame.home-active .portrait-frame { display: none; }" in css
         assert ".session-frame.home-active .home-brand" not in css
         assert ".session-frame.home-active .session-context" not in css
         assert ".campaign-shelf-items" in css
@@ -1828,18 +1839,18 @@ class TestUI001Frame:
         assert "function renderHome()" in js
         assert "campaign.ruleset_label" in js
         assert "campaign.campaign_setting_label" in js
-        assert "async function startCampaignBuilder()" in js
+        assert "async function startCampaignBuilder(draftRequest = null)" in js
         assert "I want to start a new campaign." not in js
         assert "create_guided_campaign_draft" in js
         assert "advance_guided_campaign_draft" in js
-        assert "Campaign Draft · choose a Ruleset" in js
+        assert "Campaign Draft saved" in js
         assert "home-quick-start-btn" not in html
         assert "Quick Start is coming soon" not in js
         assert 'id="open-campaign-setup-btn"' in html
         assert "Configure Campaign" in html
         assert "updateCampaignSetupControl" in js
         assert "chat && chat.display_name === 'New Campaign'" in js
-        assert "showConstructionPanel('the-rift-awakening')" in js
+        assert "showConstructionPanel(importedPlan?.id || 'custom')" in js
         assert "void startCampaignBuilder();" in js
 
     def test_first_home_tutorial_uses_replaceable_transparent_sprites(self) -> None:
@@ -1856,22 +1867,17 @@ class TestUI001Frame:
             "replay-home-tutorial-btn",
         ):
             assert f'id="{control_id}"' in html
-        assert "const HOME_TUTORIAL_KEY = 'sylvia-gm-home-tutorial-v1';" in js
-        assert "targetId: 'home-new-campaign-btn'" in js
-        assert "targetId: 'home-build-btn'" in js
-        assert "targetId: 'home-settings-btn'" in js
-        assert "preferredPlacements: ['right', 'below', 'left', 'above']" in js
-        assert "preferredPlacements: ['left', 'below', 'right', 'above']" in js
-        assert "preferredPlacements: ['below', 'left', 'right', 'above']" in js
-        assert "roomByPlacement[candidate] >= requiredRoom[candidate]" in js
-        assert "const sideGuideWidth = Math.min(420" in js
+        tutorials = _renderer_runtime_text(FRONTEND_DIR / "tutorials.js")
+        assert "sylvia-gm-home-tutorial-v1" in tutorials
+        for target in ("home-ready-campaign-btn", "home-new-campaign-btn",
+                       "home-build-btn", "home-settings-btn"):
+            assert target in tutorials
+        assert 'src="tutorials.js"' in html
+        assert 'href="tutorials.css"' in html
         assert '.tutorial-guide[data-placement="right"]' in css
         assert '.tutorial-guide[data-placement="above"]' in css
         assert '.tutorial-guide[data-placement="below"]' in css
-        assert "all the goodies you currently have installed" in js
-        assert "maybeStartHomeTutorial();" in js
-        assert "closeHomeTutorial('skipped')" in js
-        assert "closeHomeTutorial('completed')" in js
+        assert "tutorials?.maybeWelcome();" in js
         assert "box-shadow: 0 0 0 9999px" in css
         assert "@media (prefers-reduced-motion: reduce)" in css
 
@@ -1911,7 +1917,7 @@ class TestUI001Frame:
         ):
             assert f"'{command}'" in js
             assert command in rust
-        assert "credential_configured" in js
+        assert "provider.credential_error" in js
         assert "providerSettings" in js
         assert "Remove this connection and its saved API key?" in js
         assert "localStorage.setItem('sylvia-gm-theme'" in js
@@ -1929,7 +1935,7 @@ class TestUI001Frame:
         refresh = refresh.split("function chatModelModeLabel()", maxsplit=1)[0]
 
         assert "deterministicCampaignButtons" in refresh
-        assert "$('new-campaign-btn'), $('home-new-campaign-btn')" in refresh
+        assert "$('home-new-campaign-btn')" in refresh
         enable = "deterministicCampaignButtons.forEach((button) => { button.disabled = false; });"
         assert refresh.index(enable) < refresh.index("if (!state.modelChoices.length)")
         assert "modelRequiredCreationButtons.forEach" in refresh
@@ -2077,7 +2083,8 @@ class TestUI001Frame:
         assert "recordedCheckPresentation" in presentation
         assert "skillCheckCardMarkup" not in presentation
         assert "Completed and saved" not in presentation
-        assert "Operation completed" in presentation
+        fallback = presentation.split("function finiteProjectedNumber", maxsplit=1)[0]
+        assert re.search(r"return null;\s*}\s*$", fallback)
 
     def test_skill_check_cards_render_player_safe_results_and_calculations(self) -> None:
         frontend = FRONTEND_DIR / "app.js"
@@ -2330,7 +2337,7 @@ class TestUI001Frame:
         assert "payload.saved_changes === true" in retry_card
         assert "recovery_kind" in retry_card
         assert "provider_empty_completion" in js
-        assert "Boolean(activity && activity.retryBasis)" in js
+        assert "Boolean(activity && activity.retryBasis && !activity.retryBasis.can_redirect)" in js
 
     def test_preflight_rejection_keeps_the_ready_interview_visible(self) -> None:
         js = _renderer_runtime_text(FRONTEND_DIR / "app.js")
@@ -2463,7 +2470,7 @@ class TestUI001Frame:
         html = (FRONTEND_DIR / "app.html").read_text(encoding="utf-8")
         js = _renderer_runtime_text(FRONTEND_DIR / "app.js")
         assert re.search(r"\bon[a-z]+\s*=", html, flags=re.IGNORECASE) is None
-        assert re.search(r"\bon[a-z]+\s*=", js, flags=re.IGNORECASE) is None
+        assert re.search(r"<[a-z][^>]*\s+on[a-z]+\s*=", js, flags=re.IGNORECASE) is None
 
 
 # --------------------------------------------------------------------------

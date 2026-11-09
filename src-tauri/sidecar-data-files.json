@@ -1,6 +1,9 @@
 {
   "format": 1,
   "files": [
+    "src/sylvia_gm/campaign/ready-campaigns.json",
+    "src/sylvia_gm/campaign/srd-starters.json",
+    "src/sylvia_gm/campaign/the-rift-awakening.json",
     "campaign-settings/severed-lands/ATTRIBUTION.md",
     "campaign-settings/severed-lands/DM-SECRETS.md",
     "campaign-settings/severed-lands/campaigns/the-rift-awakening/act-1.md",
@@ -280,6 +283,7 @@
     "campaign-settings/severed-lands/package-record.json",
     "campaign-settings/severed-lands/setting-knowledge.json",
     "campaign-settings/severed-lands/source-setting.json",
+    "rulesets/riichi-mahjong/riichi-mahjong-0.1.1.sylvia-gm-package",
     "rulesets/srd-lite/ATTRIBUTION.md",
     "rulesets/srd-lite/COPYRIGHT",
     "rulesets/srd-lite/LICENSE",

@@ -160,6 +160,37 @@ and redundant internal labels such as `Resolution: Rolled` are omitted. Dice ani
 enhancement, not part of this presentation correction. These D&D choices do not impose dice or
 fixed fields on other Rulesets.
 
+### 2.0 Optional onboarding and tutorials
+
+First-run onboarding offers **Help me start playing**, **Just help me connect AI**, and
+**Explore on my own**. The guided play path explains AI inference and the existing supported
+connection choices in plain language, helps connect a model when needed, opens Ready campaigns,
+and offers guidance through the first scene. An existing configured default skips connection setup.
+Each transition into another lesson remains a player choice.
+
+The complete suite covers Home orientation, AI connection, Ready campaigns, play with the GM,
+SRD Lite combat controls, campaign customization, Builder content creation, workspace arrangement,
+and campaign resume/recovery/export/archive. ChatGPT subscription, API service and local model
+server connections have independently accessible setup guides. Tutorials are available from
+Home, the session header and Settings, with relevant contextual invitations. Visiting a connection
+page never requires the welcome journey or a showcase battle.
+
+Lessons retain Sylvia's replaceable sprites and spotlight style while leaving real controls
+interactive. Sylvia speaks as the player's warm, playful guide, visibly excited to share an
+adventure. Contextual expressions use the existing four approved transparent sheets; the full
+originals are preserved and extraction retains irregular hair and each pose's own effects.
+Instructions and action labels remain clear about actual consequences.
+Each lesson supports Back, Pause, Skip, Resume and Replay. Action steps observe
+application results or actual control interactions without requiring a particular roll or model
+response; a player can explicitly skip a step. Tutorials never submit messages, authenticate,
+create campaigns, commit game actions or change resources themselves. The player uses the ordinary
+controls for those actions. Lesson progress is a local UI preference, separate from campaign truth.
+Existing completed/skipped Home tour preferences remain respected, and existing players are not
+forced through the new welcome. Storage failure must not prevent use of the app.
+
+The future attract-mode showcase and no-AI battle feature are deferred. They may reuse independent
+lessons later, but are not prerequisites for this onboarding or advertised as available here.
+
 ### 2.1 Guided New Campaign construction
 
 Choosing **NEW CAMPAIGN** immediately creates one visible, resumable Draft Campaign and opens its
@@ -185,6 +216,19 @@ isekai scope. Their authored Starting Party Policies remain authoritative, inclu
 as the fixed protagonist of A Debt in Iron. The Interview supports
 browsing this collection alongside compatible imported or locally authored Plans using public
 premises, scope and character requirements; private GM preparation is never browsing copy.
+
+Home also offers **Ready campaigns** for four existing adventures with complete prepared parties:
+A Debt in Iron uses Tavin Bell (Fighter 1) and Oren Reed (Cleric 1); Last Cart Through uses
+Bram Alder (Fighter 2) and Oren Reed (Cleric 2); The Cartographer's Wake uses Pip Venn
+(Rogue 2), Bram Alder (Fighter 2) and Oren Reed (Cleric 2); The Rift Awakening uses Neri Vale
+(Bard 1), Bram Alder (Fighter 1) and Oren Reed (Cleric 1). The first named character is the
+Player Character. Preview explains the scenario and party. Start admits an independent editable
+copy through the exact retained content contracts, without model-driven character creation,
+advancement, party assembly or a campaign-authoring interview. Bundled templates, individual
+starters, existing saves and progress remain unchanged. Customize saves independent party files
+for the ordinary Campaign Interview and Builder; the Plan's fixed-character policy still applies.
+Provider configuration and the first live narrative response are separate from loading the local
+prepared state. No campaign is persisted merely by browsing its preview.
 
 Optional Ruleset, Setting and Plan questions follow the three content selections. They come from
 the exact inherited copies the selected Plan will use, or from the selected Setting and its Ruleset
@@ -456,9 +500,21 @@ only for a viable ending and Finish the story, with concise descriptions of each
 selected, retain a quiet completion marker and the chosen continuation or after-story in history;
 do not keep presenting active choice buttons. Preserve the choice through reopen. Home remains
 navigation, not a finish action, and OOC chat remains available. Illustrative mockup prose does
-not establish campaign canon. Appending further acts or a subsequent adventure to the same
-campaign is a post-launch request; the inspected current production paths do not support it.
-It is not an Alpha-ending prerequisite.
+not establish campaign canon.
+
+After a continuable authored ending, the player may choose Add another adventure from the session
+menu. They select a saved compatible Plan or open an independent Builder to author one, review its
+preparation and setup assumptions, then explicitly append it. The review includes the exact source,
+new act sequence and separate story identities. The player explains how it follows the retained
+campaign; already narrated events and futures remain true. A contradictory premise must be adapted
+before adoption. The app checks structural and exact-source compatibility, not narrative judgment.
+
+The new adventure retains the current exact Setting and Ruleset snapshots. Its starting party,
+location, facts and mechanical setup do not reinitialize the campaign. Played acts, characters,
+history, state, unresolved consequences and previous source revisions remain available. Earlier
+completion cards stay in history; the next adventure has its own completion gates. Publishing a
+library revision alone still leaves live campaigns unchanged. Rules updates remain separate PL-01
+work, and sequel append does not authorize mechanical migration or replacing the Setting.
 
 The Campaign Plan is the GM's private story preparation: the direction the GM hopes to lead the
 players toward through natural intrigue, leads, character motives, pressures, and consequences. It
@@ -862,6 +918,22 @@ Bundled and third-party rulesets use the same public package format. External pa
 activate or repin a campaign. Campaigns retain exact pins; activation is explicit, occurs only at
 an idle completed-TURN checkpoint, and leaves the old pin authoritative on failure.
 
+Existing campaigns can explicitly preview and adopt a compatible installed snapshot with the
+same Ruleset and Campaign Setting ownership. Campaign Data shows content changes and conflicts
+before confirmation. Compatible adoption keeps saved values and character records unchanged,
+preserves the player's layout and adds new panels once in the sidebar. Removed or renamed panels,
+changed existing state/character contracts and unsafe saved values block this path. It performs
+no automatic repair. Stop Session reaches the checkpoint; stale previews and active work cannot
+apply. Previous exact versions remain retained. Returning to one requires another compatibility
+review against current progress; it never rewinds intervening play.
+Character provenance and accepted Plans retain their original exact source. Active character
+bookkeeping and Ruleset/Setting reference reads follow this campaign's committed compatible
+update lineage. Existing fact identities, audiences, source bindings and declared content
+references must remain coherent; removal or reassignment blocks adoption.
+Candidate Setting knowledge must also fit the campaign's accepted Plan and retained adventures.
+Conflicting fact identities or missing references are explained before adoption; this workflow
+does not rename secrets or rewrite the Plan to resolve them.
+
 Every ruleset declares one minimum recommended model-capability tier. The selected model may be
 below it after a clear warning. Sylvia GM provides at least ten ordered capability tiers.
 Engineering is authorized to define tier identifiers, names, empirical rubrics, benchmarks, and
@@ -989,8 +1061,8 @@ qualified artifacts through GitHub Releases after direct approval.
 
 ## 9. Explicitly post-Alpha
 
-- adopting updated rules inside an existing campaign, including saved-state conflict handling and
-  layout preservation when an update adds panels; tracked in post-launch PL-01 (formerly PES-119);
+- incompatible rules-update migrations and player-resolved conflict handling beyond the
+  compatible-only adoption path;
 - Trigger Discipline and Siren Protocol implementation and acceptance; they are not Alpha blockers;
 - Cairn 2e as an advertised supported ruleset;
 - multiplayer, mobile, native macOS/Linux, or hosted cloud play;

@@ -37,7 +37,9 @@ from sylvia_gm.domain.session import (
     agent_session_payload_sha256,
     builder_chat_payload_sha256,
 )
-from sylvia_gm.infrastructure.sqlite_continuity import read_act_markers, read_campaign_ending
+from sylvia_gm.infrastructure.sqlite_continuity import (
+    read_act_markers, read_campaign_ending, read_campaign_endings,
+)
 
 
 def _with_mechanics_activity(
@@ -429,6 +431,18 @@ def read_history_page(
         f"SELECT MAX(sequence) FROM {table} WHERE session_id = ? AND kind = ?",
         (session_id, SessionMessageKind.USER.value),
     ).fetchone()[0]
+    # A display cursor must not truncate the current form. Decode only its tool
+    # evidence, in the same snapshot as the latest User sequence and page rows.
+    builder_questions = tuple(
+        message_from_row(row)
+        for row in connection.execute(
+            f"SELECT * FROM {table} WHERE session_id = ? AND sequence > ? "
+            "AND kind = 'evidence' "
+            "AND json_extract(content_json, '$.kind') = 'builder_tool_result' "
+            "AND json_extract(content_json, '$.tool_name') = 'ask_question' ORDER BY sequence",
+            (session_id, latest_user or 0),
+        )
+    ) if session.role is WriterRole.BUILDER else ()
     launch_messages = tuple(
         message_from_row(row)
         for row in connection.execute(
@@ -450,6 +464,9 @@ def read_history_page(
         if session.role is WriterRole.DM and session.campaign_id is not None else (),
         campaign_ending=read_campaign_ending(connection, session_id, session.campaign_id)
         if session.role is WriterRole.DM and session.campaign_id is not None else None,
+        campaign_endings=read_campaign_endings(connection, session_id, session.campaign_id)
+        if session.role is WriterRole.DM and session.campaign_id is not None else (),
+        builder_question_messages=builder_questions,
     )
 
 

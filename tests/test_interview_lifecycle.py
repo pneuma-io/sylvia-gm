@@ -6,7 +6,7 @@ import pytest
 
 from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.domain.authority import PackageLock
-from sylvia_gm.domain.errors import CommandRejected, StaleRevision
+from sylvia_gm.domain.errors import CommandRejected, IdempotencyConflict, StaleRevision
 from sylvia_gm.domain.session import SessionMessageKind
 
 
@@ -15,6 +15,32 @@ def new_draft(owner):
         operation_id="new-interview", display_name="Unfinished campaign",
         builder_session_id="interview", builder_provider_id="test", builder_model_id="test",
     )
+
+
+def test_ready_customization_draft_retry_preserves_one_interview_and_its_model(tmp_path):
+    database = tmp_path / "customization-retry.db"
+    request = {
+        "operation_id": "ready-custom-one-draft",
+        "display_name": "New campaign interview",
+        "builder_session_id": "session-guided-custom-one",
+        "builder_provider_id": "original-provider",
+        "builder_model_id": "original-model",
+    }
+    with AuthorityOwner.open(database, "customization") as owner:
+        draft = owner.create_guided_campaign_draft(**request)
+        before = owner.session_context(draft.builder_session_id)
+        assert owner.create_guided_campaign_draft(**request).campaign_id == draft.campaign_id
+        assert owner.session_context(draft.builder_session_id) == before
+        assert len(owner.campaign_index()) == 1
+    with AuthorityOwner.open(database, "customization-reopened") as owner:
+        assert owner.create_guided_campaign_draft(**request).campaign_id == draft.campaign_id
+        assert owner.session_context(draft.builder_session_id) == before
+        with pytest.raises(IdempotencyConflict):
+            owner.create_guided_campaign_draft(
+                **{**request, "builder_provider_id": "changed-provider"}
+            )
+        assert owner.session_context(draft.builder_session_id) == before
+        assert len(owner.campaign_index()) == 1
 
 
 @pytest.mark.parametrize("manual_title", ["My campaign planning", "New campaign interview"])
@@ -44,7 +70,7 @@ def test_default_interview_title_follows_saved_name_and_respects_manual_rename(
         )
         owner.advance_guided_campaign_draft(
             operation_id="revised-name", campaign_id=draft.campaign_id,
-            builder_session_id=draft.builder_session_id, expected_construction_revision=7,
+            builder_session_id=draft.builder_session_id, expected_construction_revision=4,
             current_step="name", visible_answer="The silent relay",
             answer={"display_name": "The silent relay"},
         )
@@ -59,21 +85,22 @@ def test_default_interview_title_follows_saved_name_and_respects_manual_rename(
 
 
 def finish_interview(owner, draft):
+    # Narrative-only play skips Setting, Plan and party selection before review.
+    next_steps = ("name", "boundaries_preferences", "specific_requests", "review")
     for revision, (step, answer) in enumerate((
         ("ruleset", {"candidate_id": None}),
-        ("setting", {"setting_id": None}),
-        ("plan", {"plan_id": None}),
         ("name", {"display_name": "The restored campaign"}),
-        ("participants", {"player_name": "Investigator"}),
         ("boundaries_preferences", {"boundaries": "", "preferences": ""}),
         ("specific_requests", {"no_additional_requests": True}),
     )):
-        owner.advance_guided_campaign_draft(
+        advanced = owner.advance_guided_campaign_draft(
             operation_id=f"choose-{step}", campaign_id=draft.campaign_id,
             builder_session_id=draft.builder_session_id,
             expected_construction_revision=revision, current_step=step,
             visible_answer=step, answer=answer,
         )
+        assert advanced.current_step == next_steps[revision]
+        assert advanced.construction_revision == revision + 1
     owner.append_agent_message(
         session_id=draft.builder_session_id, message_id="ready",
         kind=SessionMessageKind.USER,

@@ -42,27 +42,31 @@ class CacheUsage:
 
     - ``cache_read_tokens``: tokens served from cache (cached_tokens in OpenAI,
       cache_read_input_tokens in Anthropic)
-    - ``cache_write_tokens``: tokens written to cache (Anthropic only)
+    Missing fields remain ``None``; a reported zero is a measured value.
+    - ``cache_write_tokens``: tokens written to cache where the provider reports them
     - ``cache_miss_tokens``: calculated as total - read; tokens NOT in cache
     - ``total_prompt_tokens``: total prompt tokens for the request
     """
 
-    cache_read_tokens: int = 0
-    cache_write_tokens: int = 0
-    cache_miss_tokens: int = 0
+    cache_read_tokens: int | None = None
+    cache_write_tokens: int | None = None
+    cache_miss_tokens: int | None = None
     total_prompt_tokens: int = 0
 
     @property
-    def hit_ratio(self) -> float:
-        """cache_read / total_prompt, or 0.0 if no prompt tokens."""
+    def hit_ratio(self) -> float | None:
+        """Observed read fraction; unavailable when cache reads were not reported."""
+        if self.cache_read_tokens is None:
+            return None
         if self.total_prompt_tokens == 0:
-            return 0.0
+            return 0.0 if self.cache_read_tokens == 0 else None
         return self.cache_read_tokens / self.total_prompt_tokens
 
     @property
-    def savings_pct(self) -> float:
-        """Percentage of prompt tokens served from cache."""
-        return self.hit_ratio * 100
+    def savings_pct(self) -> float | None:
+        """Cached-token percentage, not an estimate of billing or subscription quota savings."""
+        ratio = self.hit_ratio
+        return None if ratio is None else ratio * 100
 
 
 @dataclass
@@ -151,7 +155,8 @@ class ModelInfo:
     """Builder response allowance, capped by max_output_tokens for supported transports."""
     cost_per_1k_tokens: float = 0.0
     transport: Literal[
-        "chat_completions", "responses", "anthropic_messages", "codex_app_server", "gemini_generate_content"
+        "chat_completions", "responses", "anthropic_messages", "codex_app_server",
+        "gemini_generate_content"
     ] = "chat_completions"
     """Wire protocol needed to reach this model.
 

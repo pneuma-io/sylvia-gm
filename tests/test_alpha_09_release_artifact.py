@@ -102,7 +102,7 @@ def _synthetic_release_notice_record(release: Path) -> dict[str, object]:
 def test_alpha_09_prerelease_version_is_exact_host_displayed_and_unsigned() -> None:
     from sylvia_gm.config.loader import load_config
 
-    assert PRERELEASE_VERSION == "0.3.0-alpha.1"
+    assert PRERELEASE_VERSION == "0.3.0-alpha.4"
     assert validate_version_sources(ROOT) == PRERELEASE_VERSION
     default_config = load_config(load_dotenv_file=False)
     assert default_config.app.version == PRERELEASE_VERSION
@@ -293,10 +293,10 @@ def test_alpha_09_windows_builder_is_locked_unsigned_and_selects_exact_bundles(
         "--bundles",
         "nsis",
         "--config",
-        '{"version":"0.3.0-1"}',
+        '{"version":"0.3.0-4"}',
     )
-    assert WINDOWS_INSTALLER_VERSION == "0.3.0-1"
-    assert TAURI_WINDOWS_VERSION_OVERRIDE == '{"version":"0.3.0-1"}'
+    assert WINDOWS_INSTALLER_VERSION == "0.3.0-4"
+    assert TAURI_WINDOWS_VERSION_OVERRIDE == '{"version":"0.3.0-4"}'
     assert ("uv", "lock", "--check") in LOCK_CHECK_COMMANDS
     assert any("--locked" in command for command in LOCK_CHECK_COMMANDS)
 
@@ -751,7 +751,7 @@ def test_alpha_09_nsis_qualification_cleans_a_rejected_partial_install(
                     display_name="Sylvia GM",
                     display_version=WINDOWS_INSTALLER_VERSION,
                     install_location=str(install_directory),
-                    uninstall_string=str(install_directory / "uninstall.exe"),
+                    uninstall_string=f'"{install_directory / "uninstall.exe"}"',
                 )
             )
         else:
@@ -832,7 +832,7 @@ def test_alpha_09_nsis_qualification_rejects_uninstaller_residue(
                 display_name="Sylvia GM",
                 display_version=WINDOWS_INSTALLER_VERSION,
                 install_location=str(install_directory),
-                uninstall_string=str(install_directory / "uninstall.exe"),
+                uninstall_string=f'"{install_directory / "uninstall.exe"}"',
             )
         )
 
@@ -906,7 +906,7 @@ def test_alpha_09_msi_qualification_is_elevated_manifest_bound_and_removes_insta
                     hive="HKLM",
                     key=r"Software\Microsoft\Windows\CurrentVersion\Uninstall\{product}",
                     display_name="Sylvia GM",
-                    display_version="0.3.0.1",
+                    display_version=WINDOWS_INSTALLER_VERSION.replace("-", "."),
                     install_location=str(install_directory),
                     uninstall_string="MsiExec.exe /I{product}",
                 )
@@ -968,7 +968,7 @@ def test_alpha_09_msi_qualification_is_elevated_manifest_bound_and_removes_insta
         "product": "Sylvia GM",
         "registration_hive": "HKLM",
         "registration_removed": True,
-        "registration_version": "0.3.0.1",
+        "registration_version": WINDOWS_INSTALLER_VERSION.replace("-", "."),
         "source_commit": "a" * 40,
         "source_tree": "b" * 40,
         "version": PRERELEASE_VERSION,
@@ -1293,7 +1293,7 @@ def test_alpha_09_nsis_notice_qualification_requires_persistence_after_owner_exi
                     display_name="Sylvia GM",
                     display_version=WINDOWS_INSTALLER_VERSION,
                     install_location=str(target),
-                    uninstall_string=str(target / "uninstall.exe"),
+                    uninstall_string=f'"{target / "uninstall.exe"}"',
                 )
             )
         else:

@@ -10,6 +10,29 @@ from sylvia_gm.runtime._schema_validator import validate_ruleset
 
 
 @pytest.mark.parametrize(
+    "step",
+    [
+        {"nested_call": "helper"},
+        {"condition": "eval('x')", "on_true": []},
+    ],
+)
+def test_procedure_effect_checks_apply_only_to_new_authoring_admission(step):
+    from sylvia_gm.application.package_runtime import _parse_runtime
+
+    raw = {
+        "sylvia_gm_runtime": {"format": 1, "state_namespace": "example.rules"},
+        "tools": {},
+        "procedures": {"ready": {"trigger": "on_ready", "steps": [step]}},
+    }
+    data = yaml.safe_dump(raw).encode()
+    with pytest.raises(PackageRuntimeError) as rejected:
+        _parse_runtime(package_id="example.rules", runtime_bytes=data, authoring=True)
+    assert "$.procedures.ready.steps" in {item.path for item in rejected.value.diagnostics}
+    installed = _parse_runtime(package_id="example.rules", runtime_bytes=data, authoring=False)
+    assert installed.procedures["ready"].steps == [step]
+
+
+@pytest.mark.parametrize(
     ("effect", "suffix"),
     [
         ({"set": {"field": "state.x", "value": 1, "guess": True}}, ".set.guess"),

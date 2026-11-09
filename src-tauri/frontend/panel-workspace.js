@@ -190,6 +190,7 @@
       sidebar_width: layout.sidebar_width != null && Number.isFinite(Number(layout.sidebar_width))
         ? Number(layout.sidebar_width) : null,
       views: cleanViews(layout.views),
+      inspection: cleanInspection(layout.inspection),
     };
   }
 
@@ -210,6 +211,16 @@
         ? view.selectedGeometry.slice(0, 512) : null;
     }
     return safe;
+  }
+
+  // Saved inspection is presentation only and remains isolated to its campaign/Ruleset.
+  function cleanInspection(value) {
+    const validId = (id) => typeof id === 'string' && id.length > 0 && id.length <= 512;
+    if (!value || !validId(value.campaignId) || !(value.rulesetId === null || validId(value.rulesetId))) return null;
+    return { campaignId: value.campaignId, rulesetId: value.rulesetId,
+      id: validId(value.id) ? value.id : null,
+      unavailableId: validId(value.unavailableId) ? value.unavailableId : null,
+      expanded: Array.isArray(value.expanded) ? [...new Set(value.expanded.filter(validId))].slice(0, 512) : [] };
   }
 
   function cleanViews(views) {
@@ -408,6 +419,8 @@
         current.panel_sizes[command.panelId] = Math.max(48, Math.round(Number(command.height)));
       } else if (command.type === 'sidebar-width' && Number.isFinite(Number(command.width))) {
         current.sidebar_width = Math.max(180, Math.round(Number(command.width)));
+      } else if (command.type === 'inspection') {
+        current.inspection = cleanInspection(command.value);
       } else if (command.type === 'placement') {
         const window = current.windows.find((item) => item.id === command.windowId);
         if (window && command.placement && typeof command.placement === 'object') window.placement = copy(command.placement);
@@ -422,14 +435,17 @@
       if (action === 'save') {
         const preferred = copy(current);
         preferred.views = {};
+        preferred.inspection = null;
         write(storage, rulesetKey(), preferred);
         return copy(current);
       }
       if (action === 'mine' || action === 'original') {
         const views = copy(current.views);
+        const inspection = copy(current.inspection);
         const source = action === 'mine' ? read(storage, rulesetKey()) : originalLayout;
         current = reconcile(validLayout(source) ? source : originalLayout, context.surfaces);
         current.views = views;
+        current.inspection = inspection;
         persist();
       }
       return copy(current);

@@ -20,6 +20,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
+from sylvia_gm.runtime._collections import FUNCTIONS as COLLECTION_FUNCTIONS
 from sylvia_gm.runtime._exceptions import ExpressionError
 
 # ---------------------------------------------------------------------------
@@ -303,7 +304,7 @@ class FunctionCallNode(ASTNode):
 
 
 _FUNCTION_WHITELIST: frozenset[str] = frozenset(
-    {"max", "min", "abs", "floor", "ceil", "len", "merge"}
+    {"max", "min", "abs", "floor", "ceil", "len", "merge", *COLLECTION_FUNCTIONS}
 )
 
 
@@ -583,6 +584,7 @@ def _merge_objects(original: Any, changes: Any) -> dict[str, Any]:
 
 
 _SANDBOXED_FUNCTIONS: dict[str, Callable[..., Any]] = {
+    **COLLECTION_FUNCTIONS,
     "max": max,
     "min": min,
     "abs": abs,

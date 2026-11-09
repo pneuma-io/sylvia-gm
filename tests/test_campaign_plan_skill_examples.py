@@ -3,19 +3,25 @@
 import hashlib
 import io
 import json
+from pathlib import Path
 
 import pytest
-from scripts.build_severed_lands_campaigns import EXAMPLES, PLANS, render_plan, sources_for
 
 from sylvia_gm.agent._builder_session import _builder_skill_loader_tool
 from sylvia_gm.application.authority import AuthorityOwner
+from sylvia_gm.application.bundled_campaign_plans import sources_for
 from sylvia_gm.application.campaign_library_selection import resolve_campaign_library_selection
 from sylvia_gm.application.plan_bundle import export_plan_bundle, import_plan_bundle
 from sylvia_gm.application.plan_snapshot import validate_plan_snapshot
 from sylvia_gm.application.reusable_plans import save_reusable_campaign_plan
+from sylvia_gm.domain.authority import PackageRole
+from sylvia_gm.infrastructure.package_archive import admit_package_archive
+
+PLANS = Path(__file__).parents[1] / "campaign-plans"
+EXAMPLES = {"last-cart-through": "combat", "the-map-of-tomorrow": "multi-act"}
 
 
-def test_builder_retrieves_a_complete_valid_example_from_its_advertised_references():
+def test_builder_retrieves_a_complete_valid_example_from_its_advertised_references(tmp_path):
     tool = _builder_skill_loader_tool()
     main = tool.handler({"name": "BUILD CAMPAIGN PLAN"}, None)
     assert main["success"] is True
@@ -31,8 +37,42 @@ def test_builder_retrieves_a_complete_valid_example_from_its_advertised_referenc
             assert loaded["sha256"] == hashlib.sha256(texts[suffix].encode("utf-8")).hexdigest()
             assert texts[suffix] == (PLANS / slug / f"plan.{suffix}").read_text(encoding="utf-8")
         plan = json.loads(texts["json"])
-        validate_plan_snapshot(sources_for(PLANS / slug).snapshot, plan, texts["md"])
-        assert texts["md"] == render_plan(plan)
+        sources = sources_for(PLANS / slug)
+        validated = validate_plan_snapshot(sources.snapshot, plan, texts["md"])
+        assert plan["bindings"] == sources.bindings
+        with AuthorityOwner.open(tmp_path / f"{slug}.db", "worked-reference") as owner:
+            candidate = owner.install_package_archive(io.BytesIO(sources.snapshot), install_id=slug)
+            assert candidate.closure_sha256 == plan["bindings"]["package_closure_sha256"]
+        with admit_package_archive(io.BytesIO(sources.snapshot)) as admitted:
+            primary = next(row for row in admitted.manifests if row.role is PackageRole.PRIMARY)
+            assert primary.identity == (
+                plan["bindings"]["ruleset"]["id"],
+                plan["bindings"]["ruleset"]["version"],
+                plan["bindings"]["ruleset"]["content_sha256"],
+            )
+            files = {
+                row.file.path: row
+                for row in admitted.files
+                if row.manifest.package_id == plan["bindings"]["campaign_setting"]["id"]
+            }
+            assert validated.referenced_setting_paths
+            for path in validated.referenced_setting_paths:
+                assert b"".join(admitted.iter_file_chunks(files[path])).strip()
+
+
+@pytest.mark.parametrize("change", ["binding", "reference"])
+def test_worked_example_rejects_a_stale_binding_or_missing_source_reference(change):
+    root = PLANS / "last-cart-through"
+    sources = sources_for(root)
+    plan = json.loads((root / "plan.json").read_text(encoding="utf-8"))
+    if change == "binding":
+        plan["bindings"]["ruleset"]["content_sha256"] = "0" * 64
+    else:
+        plan["starting_location"]["path"] = "locations/missing.md"
+    with pytest.raises(ValueError):
+        validate_plan_snapshot(
+            sources.snapshot, plan, (root / "plan.md").read_text(encoding="utf-8")
+        )
 
 
 @pytest.mark.parametrize(

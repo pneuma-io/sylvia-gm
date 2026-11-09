@@ -31,3 +31,13 @@ test('saved choices become quiet markers; non-continuable and no-after-story end
   assert.match(html,/Finish the story/);
   assert.match(html,/Leave your adventure here/);
 });
+
+test('earlier adventure completions stay quiet beside an active sequel completion',()=>{
+  const next={...ending,ending_id:'adventure-2:safe-return',act_number:7,after_message_id:'later'};
+  const html=withCampaignEnding(messages,['OLD','NEW'],[{...ending,historical:true},next]).join('');
+  assert.equal((html.match(/campaign-ending-marker/g)||[]).length,1);
+  assert.equal((html.match(/data-campaign-ending-choice="continue"/g)||[]).length,1);
+  assert.match(html,/Act 7 complete/);
+  assert.match(html,/campaign-ending-reply/);
+  assert.match(html,/campaign-ending-later/);
+});

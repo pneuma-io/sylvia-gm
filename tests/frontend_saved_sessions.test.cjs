@@ -42,7 +42,9 @@ function element() {
     setCustomValidity(message) { this.validationMessage = message; },
     reportValidity() { this.validityReports = (this.validityReports || 0) + 1; return !this.validationMessage; },
     focus() { this.focused = true; }, contains: () => false,
+    setSelectionRange(start, end) { this.selectionStart = start; this.selectionEnd = end; },
     appendChild(child) { this.children.push(child); child.parentElement = this; },
+    replaceChildren(...children) { this.children = children; },
     replaceWith(next) {
       const parent = this.parentElement;
       parent.children[parent.children.indexOf(this)] = next;
@@ -83,7 +85,8 @@ function harness(savedStorage = new Map(), { shippedDom = false } = {}) {
   };
   const document = {
     getElementById: node, querySelectorAll: () => [],
-    querySelector: selector => selector === '[data-chatgpt-action="add_model"]' ? element() : null,
+    querySelector: selector => selector === '[data-chatgpt-action="add_model"]' ? element()
+      : selector === '.settings-content' ? node('settings-content-test') : null,
     addEventListener() {}, body: element(), activeElement: null,
     createElement(tag) {
       const result = element();
@@ -102,7 +105,7 @@ function harness(savedStorage = new Map(), { shippedDom = false } = {}) {
     window: { addEventListener() {}, confirm: () => true, requestAnimationFrame() {} },
     navigator: { clipboard: { writeText: async (text) => { clipboard.push(text); } } },
     document, sessionStorage: storage, localStorage: storage,
-    crypto: webcrypto, console,
+    crypto: webcrypto, console, AbortController,
     setInterval: (fn, ms) => { const id = ++timerId; timers.set(id, { fn, ms }); return id; },
     clearInterval: (id) => timers.delete(id),
     setTimeout: (fn, ms) => { const id = ++timerId; timers.set(id, { fn, ms }); return id; },
@@ -113,11 +116,12 @@ function harness(savedStorage = new Map(), { shippedDom = false } = {}) {
   // Expose existing private entry points for the test, without changing their implementation.
   const insertion = source.lastIndexOf('  return {');
   source = source.slice(0, insertion) + `  window.sessionTest = {
-    state, openBuilderChat, openCampaign, showHome, refreshSelectedCampaign, submitInput, stop, retry, reconnect,
+    state, openBuilderChat, openCampaign, openReadyCampaign, showHome, refreshSelectedCampaign, submitInput, stop, retry, reconnect,
+    initDictation, getDictation: () => dictation, createHostBridge,
     signalActiveStreamDisconnect, restoreDisconnectedStream, renderBuilderSession,
     renderDMSession, ensureSessionActivity, finalizeSelectedConstruction, renameBuilderChat,
     deleteBuilderChat, setBuilderArchived, setCampaignArchived, renderHome, renderBuilderChatRail,
-    deleteReusableLibraryEntry, respondToPlayerAction,
+    deleteReusableLibraryEntry, respondToPlayerAction, openBuilderMode,
     showSettingsTab, closeSettings, updateChatGPTConnection, selectChatGPTModel,
     refreshAdminAudit, exportAdminAudit, selectDiscoveredProviderModel, exportSelectedCampaign,
     toggleAdminAudit, copyVisibleAdminAudit,
@@ -127,13 +131,14 @@ function harness(savedStorage = new Map(), { shippedDom = false } = {}) {
     wireBuilderQuestionForms: typeof wireBuilderQuestionForms === 'function'
       ? wireBuilderQuestionForms : null,
   };\n` + source.slice(insertion);
-  source = ['panel-workspace.js', 'shot-playback.js', 'panel-host.js'].map((name) =>
+  source = ['dictation.js', 'panel-workspace.js', 'shot-playback.js', 'panel-host.js'].map((name) =>
     fs.readFileSync(path.join(__dirname, '../src-tauri/frontend', name), 'utf8')).join('\n') + '\n' + source;
   context.setTimeout ||= setTimeout;
   context.clearTimeout ||= clearTimeout;
   context.window.innerWidth = 1400;
   vm.runInNewContext(source, context, { filename: 'app.js' });
   const api = context.window.sessionTest;
+  api.state.campaignIndexStatus = 'ready';
   api.state.builderChats = ['a', 'b'].map((id) => ({
     display_name: `Builder ${id}`, session: {
       session_id: id, role: 'builder', status: 'active', provider_id: 'test', model_id: 'test',
@@ -452,21 +457,21 @@ test('Thinking export requires a fresh explicit opt-in for each export', async (
   assert(calls.every((args) => args[2] === 'selected'));
 });
 
-test('Home, campaign and Builder navigation show the appropriate left sidebar without stopping work', async () => {
-  const h = harness();
+test('Home, campaign and Builder navigation keep Builder sessions in the one rail without stopping work', async () => {
+  // The expandable rail replaced the old left sidebar; its campaign/status/writer block is gone.
+  const h = harness(new Map(), { shippedDom: true });
   configureGM(h);
+  assert.equal(h.node('session-context'), null);
+  assert.equal(h.node('ctx-writer'), null);
   h.showHome();
-  assert.equal(h.node('session-context').hidden, true);
   assert.equal(h.node('builder-launcher').hidden, false);
   await h.openCampaign('campaign', 'gm');
-  assert.equal(h.node('session-context').hidden, false);
-  assert.equal(h.node('builder-launcher').hidden, true);
+  assert.equal(h.node('builder-launcher').hidden, false, 'Builder sessions stay reachable during play');
   assert.equal(h.node('lifecycle-actions').hidden, true, 'active GM needs no right-side session controls');
   await h.openBuilderChat('a');
   assert.equal(h.node('builder-launcher').hidden, false);
-  assert.equal(h.node('session-context').hidden, true);
   h.showHome();
-  assert.equal(h.node('session-context').hidden, true);
+  assert.equal(h.node('builder-launcher').hidden, false);
   assert.equal(h.calls.stop.length, 0);
   assert.equal(h.calls.submissions.length, 0);
 });
@@ -475,8 +480,9 @@ test('sidebar toggles are independent and persist through navigation and app rel
   const h = harness();
   configureGM(h);
   h.wireControls();
+  assert.equal(h.state.sidebarCollapsed.left, true, 'the left rail starts thin');
   h.node('toggle-left-sidebar-btn').dispatchEvent({ type: 'click' });
-  assert.equal(h.node('toggle-left-sidebar-btn').getAttribute('aria-expanded'), 'false');
+  assert.equal(h.node('toggle-left-sidebar-btn').getAttribute('aria-expanded'), 'true');
   assert.equal(h.node('toggle-right-sidebar-btn').getAttribute('aria-expanded'), 'true');
   await h.openCampaign('campaign', 'gm');
   h.savePanelLayout({ sidebar_width: 350 });
@@ -485,16 +491,16 @@ test('sidebar toggles are independent and persist through navigation and app rel
   h.node('home-btn').dispatchEvent({ type: 'click' });
   assert.equal(h.state.view, 'home');
   await h.openCampaign('campaign', 'gm');
-  assert.equal(h.node('session-frame').classList.contains('left-sidebar-collapsed'), true);
+  assert.equal(h.node('session-frame').classList.contains('left-sidebar-collapsed'), false);
   assert.equal(h.node('session-frame').classList.contains('right-sidebar-collapsed'), true);
   assert.equal(h.node('right-sidebar').style.width, '350px');
   const reopened = harness(h.storage);
   reopened.initSidebarResize();
-  assert.equal(reopened.node('toggle-left-sidebar-btn').getAttribute('aria-label'), 'Expand left sidebar');
+  assert.equal(reopened.node('toggle-left-sidebar-btn').getAttribute('aria-label'), 'Hide sessions sidebar');
   assert.equal(reopened.node('toggle-right-sidebar-btn').getAttribute('aria-expanded'), 'false');
   h.node('toggle-right-sidebar-btn').dispatchEvent({ type: 'click' });
   assert.equal(h.node('right-sidebar').style.width, '350px');
-  assert.equal(h.node('session-frame').classList.contains('left-sidebar-collapsed'), true);
+  assert.equal(h.node('session-frame').classList.contains('left-sidebar-collapsed'), false);
   assert.equal(h.node('session-frame').classList.contains('right-sidebar-collapsed'), false);
 });
 
@@ -832,6 +838,143 @@ test('Builder question answers use the original saved session and remain readabl
   assert.doesNotMatch(html, /Submit answers/);
 });
 
+test('freeform character interview answers stay in the original widget after reopen', async () => {
+  const h = harness();
+  const question = {
+    message_id: 'play-question', sequence: 2, kind: 'evidence', content: {
+      kind: 'builder_tool_result', tool_name: 'ask_question', tool_call_id: 'play-call',
+      arguments: '{"type":"text","id":"player_concept","question":"Who would you like to play?"}',
+      result: { success: true, status: 'awaiting_answer', widget: { type: 'text', data: {
+        id: 'player_concept', question: 'Who would you like to play?',
+      } } },
+    },
+  };
+  let savedAnswer = null;
+  h.state.bridge.session_context = async () => ({ messages: [question, ...(savedAnswer ? [{
+    message_id: 'saved-play-answer', sequence: 3, kind: 'user', content: savedAnswer,
+  }] : [])] });
+  await h.openBuilderChat('a');
+  const control = h.makeElement();
+  control.dataset = { builderQuestionKey: 'play-question', builderQuestionType: 'text',
+    builderQuestionText: 'Who would you like to play?', builderQuestionOrder: '0' };
+  control.value = '  A calm courier called Rowan <watcher>.\nKeep this exact line.  ';
+  control.setAttribute('form', 'builder-question-form-a');
+  const button = h.makeElement();
+  const form = h.makeElement();
+  form.id = 'builder-question-form-a';
+  form.dataset = { builderQuestionSession: 'a' };
+  form.querySelector = () => button;
+  const container = h.makeElement();
+  container.querySelectorAll = selector => selector === '[data-builder-question-form]'
+    ? [form] : [control];
+  h.wireBuilderQuestionForms(container);
+  control.dispatchEvent({ type: 'input' });
+  form.dispatchEvent({ type: 'submit', preventDefault() {} });
+  await h.flush();
+  assert.equal(h.calls.submissions.length, 1);
+  const command = h.calls.submissions[0];
+  // The owner contract preserves the answer and derives provenance from saved evidence.
+  savedAnswer = { text: command.user_text, ...(command.builder_question_answers ? {
+    kind: 'builder_question_answer', answers: command.builder_question_answers.map(answer => ({
+      ...answer, tool_call_id: 'play-call', widget_id: 'player_concept', type: 'text',
+      question: 'Who would you like to play?', label: answer.value,
+    })),
+  } : {}) };
+  h.pending.get(command.attempt_id).resolve({ status: 'completed' });
+  await h.flush();
+  await h.openBuilderChat('b');
+  await h.openBuilderChat('a');
+  const html = h.node('chronology').dataset.chronologyHtml;
+  const card = html.match(/<fieldset[^>]*builder-question-card[\s\S]*?<\/fieldset>/)?.[0] || '';
+  assert.match(card, /Who would you like to play\?/);
+  assert.match(card, /A calm courier called Rowan &lt;watcher&gt;\./);
+  assert.match(card, /Answered/);
+  assert.doesNotMatch(html, /Here are my answers:/);
+  assert.doesNotMatch(html, /<div class="story-header">You<\/div>/);
+  assert.doesNotMatch(html, /Submit answers/);
+  assert.equal(command.builder_question_answers[0].question_message_id, 'play-question');
+  assert.equal(command.builder_question_answers[0].value, control.value);
+});
+
+test('typed answers survive paging and repeated widget ids while literal chat remains visible', async () => {
+  const h = harness();
+  const question = (id, sequence) => ({ message_id: id, sequence, kind: 'evidence', content: {
+    kind: 'builder_tool_result', tool_name: 'ask_question', tool_call_id: `${id}-call`, result: {
+      success: true, status: 'awaiting_answer', widget: { type: 'text', data: {
+        id: 'player_concept', question: 'Who would you like to play?',
+      } },
+    },
+  } });
+  const snapshot = { question_message_id: 'first-question', tool_call_id: 'first-question-call',
+    widget_id: 'player_concept', question: 'Who would you like to play?', type: 'text',
+    value: 'Rowan <courier>', label: 'Rowan <courier>', custom: false };
+  const answer = { message_id: 'answer', sequence: 3, kind: 'user', content: {
+    kind: 'builder_question_answer', text: 'Here are my answers: hidden transport text',
+    answers: [snapshot],
+  } };
+  let messages = [answer, question('new-question', 4)];
+  h.state.bridge.session_context = async () => ({ messages, latest_user_sequence: 3 });
+  await h.openBuilderChat('a');
+  let html = h.node('chronology').dataset.chronologyHtml;
+  assert.match(html, /Rowan &lt;courier&gt;/);
+  assert.equal((html.match(/Answered/g) || []).length, 1);
+  assert.match(html, /Submit answers/);
+  assert.doesNotMatch(html, /hidden transport text/);
+  messages = [question('first-question', 2), ...messages];
+  await h.openBuilderChat('a');
+  html = h.node('chronology').dataset.chronologyHtml;
+  assert.equal((html.match(/Rowan &lt;courier&gt;/g) || []).length, 1);
+  assert.equal((html.match(/Answered/g) || []).length, 1);
+  assert.match(html, /Submit answers/);
+  messages.push({ message_id: 'plain', sequence: 5, kind: 'user', content: {
+    text: 'Here are my answers: this is my actual typed chat.',
+  } });
+  await h.openBuilderChat('a');
+  html = h.node('chronology').dataset.chronologyHtml;
+  assert.match(html, /Here are my answers: this is my actual typed chat\./);
+  assert.match(html, /<div class="story-header">You<\/div>/);
+  // A corrupt or mismatched link must remain visible rather than erase player input.
+  answer.content.answers = [{ ...snapshot, tool_call_id: 'wrong-call' }];
+  await h.openBuilderChat('a');
+  assert.match(h.node('chronology').dataset.chronologyHtml, /hidden transport text/);
+});
+
+test('rejected question submission keeps its session draft and ordinary composer text', async () => {
+  const h = harness();
+  h.state.bridge.session_context = async () => ({ messages: [{ message_id: 'question',
+    kind: 'evidence', content: { kind: 'builder_tool_result', tool_name: 'ask_question', result: {
+      success: true, status: 'awaiting_answer', widget: { type: 'text', data: {
+        id: 'concept', question: 'Who would you like to play?',
+      } },
+    } },
+  }] });
+  await h.openBuilderChat('a');
+  h.node('player-input').value = 'Separate composer draft';
+  const control = h.makeElement();
+  control.dataset = { builderQuestionKey: 'question', builderQuestionType: 'text',
+    builderQuestionText: 'Who would you like to play?', builderQuestionOrder: '0' };
+  control.value = 'Keep Rowan';
+  control.setAttribute('form', 'builder-question-form-a');
+  const form = h.makeElement();
+  form.id = 'builder-question-form-a';
+  form.dataset = { builderQuestionSession: 'a' };
+  form.querySelector = () => h.makeElement();
+  const container = h.makeElement();
+  container.querySelectorAll = selector => selector === '[data-builder-question-form]'
+    ? [form] : [control];
+  h.wireBuilderQuestionForms(container);
+  control.dispatchEvent({ type: 'input' });
+  form.dispatchEvent({ type: 'submit', preventDefault() {} });
+  await h.flush();
+  const command = h.calls.submissions[0];
+  assert.equal(h.state.sessionActivities.get('a').pendingInput, null);
+  h.pending.get(command.attempt_id).reject(new Error('Question is stale'));
+  await h.flush();
+  assert.equal(h.state.builderQuestionDrafts.get('a').get('question').text, 'Keep Rowan');
+  assert.equal(h.node('player-input').value, 'Separate composer draft');
+  assert.equal(h.calls.submissions.length, 1);
+});
+
 test('paged Builder history loads on scroll, preserves position and ignores a departed page', async () => {
   const h = harness();
   const older = deferred();
@@ -938,6 +1081,148 @@ test('a paged question stays closed when the later user answer is outside its pa
   await h.openBuilderChat('a');
   assert.match(h.node('chronology').dataset.chronologyHtml, /A later reply closed these controls/);
   assert.doesNotMatch(h.node('chronology').dataset.chronologyHtml, /Submit answers/);
+});
+
+for (const straddling of [true, false]) test(`paged reopen includes the complete ${straddling ? 'straddling' : 'offpage'} question group`, async () => {
+  const h = harness();
+  const question = (id, sequence, text) => ({ message_id: id, sequence, kind: 'evidence', content: {
+    kind: 'builder_tool_result', tool_name: 'ask_question', tool_call_id: `${id}-call`, result: {
+      success: true, status: 'awaiting_answer', widget: { type: 'text', data: { id, question: text } },
+    },
+  } });
+  const questions = [question('early', 2, 'Who would you like to play?'),
+    question('background', straddling ? 103 : 3, 'What is their background?')];
+  const page = { latest_sequence: 103, latest_user_sequence: 1, next_before_sequence: 54,
+    messages: Array.from({ length: 50 }, (_, index) => ({ sequence: 54 + index,
+      message_id: `progress-${index}`, kind: 'talk', content: { text: 'Builder progress' } })),
+    builder_question_messages: questions };
+  if (straddling) page.messages[49] = questions[1];
+  const reads = [];
+  h.state.bridge.session_context = async () => { throw new Error('Do not read full history'); };
+  h.state.bridge.session_history_page = async (sessionId, before) => {
+    reads.push([sessionId, before]); return page;
+  };
+  h.state.builderQuestionDrafts.set('a', new Map([['early', { text: 'Keep Rowan' }]]));
+  await h.openBuilderChat('a');
+  let html = h.node('chronology').dataset.chronologyHtml;
+  assert.match(html, /Who would you like to play\?/);
+  assert.match(html, /What is their background\?/);
+  assert.equal((html.match(/data-builder-question-type="text"/g) || []).length, 2);
+  assert.match(html, /Submit answers/);
+  assert.equal(reads.length, 1, 'question projection must not load unrelated history pages');
+  await h.openBuilderChat('b');
+  await h.openBuilderChat('a');
+  html = h.node('chronology').dataset.chronologyHtml;
+  assert.equal((html.match(/data-builder-question-type="text"/g) || []).length, 2);
+  assert.equal(h.state.builderQuestionDrafts.get('a').get('early').text, 'Keep Rowan');
+  assert.equal(h.calls.submissions.length, 0);
+  const makeForm = () => {
+    const controls = questions.map((question, index) => {
+      const control = h.makeElement();
+      control.dataset = { builderQuestionKey: question.message_id, builderQuestionType: 'text',
+        builderQuestionText: question.content.result.widget.data.question, builderQuestionOrder: `${index}` };
+      control.setAttribute('form', 'builder-question-form-a');
+      return control;
+    });
+    const button = h.makeElement(), form = h.makeElement(), container = h.makeElement();
+    form.id = 'builder-question-form-a'; form.dataset = { builderQuestionSession: 'a' };
+    form.querySelector = () => button;
+    container.querySelectorAll = selector => selector === '[data-builder-question-form]' ? [form] : controls;
+    h.wireBuilderQuestionForms(container);
+    return { controls, form };
+  };
+  let form = makeForm();
+  assert.equal(form.controls[0].value, 'Keep Rowan');
+  form.controls[1].value = 'Courier';
+  form.controls[1].dispatchEvent({ type: 'input' });
+  await h.openBuilderChat('b');
+  form.form.dispatchEvent({ type: 'submit', preventDefault() {} });
+  assert.equal(h.calls.submissions.length, 0);
+  await h.openBuilderChat('a');
+  form = makeForm();
+  assert.equal(form.controls[1].value, 'Courier');
+  form.form.dispatchEvent({ type: 'submit', preventDefault() {} });
+  form.form.dispatchEvent({ type: 'submit', preventDefault() {} });
+  await h.flush();
+  const command = h.calls.submissions[0];
+  assert.equal(h.calls.submissions.length, 1);
+  assert.equal(command.session_id, 'a');
+  assert.deepEqual(Array.from(command.builder_question_answers, answer => answer.question_message_id),
+    ['early', 'background']);
+  assert.equal(command.builder_question_answers[0].value, 'Keep Rowan');
+  h.pending.get(command.attempt_id).reject(new Error('Controlled rejection retains drafts'));
+  await h.flush();
+  assert.equal(h.state.builderQuestionDrafts.get('a').get('early').text, 'Keep Rowan');
+});
+
+test('a closure refresh wins over an older question page still loading', async () => {
+  const h = harness();
+  const older = deferred();
+  const question = { message_id: 'question', sequence: 2, kind: 'evidence', content: {
+    kind: 'builder_tool_result', tool_name: 'ask_question', tool_call_id: 'question-call', result: {
+      success: true, status: 'awaiting_answer', widget: { type: 'text', data: {
+        id: 'concept', question: 'Who would you like to play?',
+      } },
+    },
+  } };
+  let closed = false;
+  const newest = () => ({ latest_sequence: closed ? 104 : 103, latest_user_sequence: closed ? 104 : 1,
+    next_before_sequence: 54, builder_question_messages: closed ? [] : [question],
+    messages: closed ? [{ message_id: 'closure', sequence: 104, kind: 'user',
+      content: { text: 'I changed my mind' } }] : [{ message_id: 'progress', sequence: 103,
+      kind: 'talk', content: { text: 'Builder progress' } }],
+  });
+  h.state.bridge.session_history_page = async (_id, before) => before == null ? newest() : older.promise;
+  h.state.builderQuestionDrafts.set('a', new Map([['question', { text: 'Keep Rowan' }]]));
+  await h.openBuilderChat('a');
+  h.node('chronology').dispatchEvent({ type: 'scroll' });
+  assert.equal(h.state.displayHistory.loadingOlder, true);
+  assert.equal(h.state.builderQuestionDrafts.get('a').get('question').text, 'Keep Rowan');
+  closed = true;
+  await h.renderBuilderSession('a');
+  older.resolve({ messages: [question], latest_sequence: 103, latest_user_sequence: 1,
+    builder_question_messages: [question], next_before_sequence: null });
+  await h.flush();
+  const html = h.node('chronology').dataset.chronologyHtml;
+  assert.match(html, /I changed my mind/);
+  assert.match(html, /A later reply closed these controls/);
+  assert.doesNotMatch(html, /Submit answers/);
+  assert.equal(h.state.displayHistory.context.latest_user_sequence, 104);
+  assert.equal(h.calls.submissions.length, 0);
+});
+
+test('a closure observed while filling a refresh gap closes its projected form', async () => {
+  const h = harness();
+  const gap = deferred();
+  let advanced = false;
+  const question = { message_id: 'question', sequence: 2, kind: 'evidence', content: {
+    kind: 'builder_tool_result', tool_name: 'ask_question', tool_call_id: 'question-call', result: {
+      success: true, status: 'awaiting_answer', widget: { type: 'text', data: {
+        id: 'concept', question: 'Who would you like to play?',
+      } },
+    },
+  } };
+  h.state.bridge.session_history_page = async (_id, before) => {
+    if (before != null) return gap.promise;
+    if (!advanced) return { messages: [{ message_id: 'user', sequence: 1, kind: 'user',
+      content: { text: 'Create a character' } }], latest_sequence: 1, latest_user_sequence: 1,
+      builder_question_messages: [], next_before_sequence: null };
+    return { messages: [{ message_id: 'progress', sequence: 104, kind: 'talk',
+      content: { text: 'Builder progress' } }], latest_sequence: 104, latest_user_sequence: 1,
+      builder_question_messages: [question], next_before_sequence: 100 };
+  };
+  await h.openBuilderChat('a');
+  h.state.builderQuestionDrafts.set('a', new Map([['question', { text: 'Keep Rowan' }]]));
+  advanced = true;
+  const refresh = h.renderBuilderSession('a');
+  await h.flush();
+  assert.equal(h.state.builderQuestionDrafts.get('a').get('question').text, 'Keep Rowan');
+  gap.resolve({ messages: [question], latest_sequence: 105, latest_user_sequence: 105,
+    builder_question_messages: [], next_before_sequence: null });
+  await refresh;
+  assert.doesNotMatch(h.node('chronology').dataset.chronologyHtml, /Submit answers/);
+  assert.equal(h.state.displayHistory.context.latest_user_sequence, 105);
+  assert.equal(h.calls.submissions.length, 0);
 });
 
 test('paged DM history keeps its canonical acknowledgement outside the visible page', async () => {
@@ -1163,6 +1448,235 @@ test('two Builder chats keep their requests, drafts, steering and Stop separate'
   await second;
   assert.equal(h.state.sessionActivities.get('b').phase, 'stopped');
   assert.equal(h.node('player-input').value, 'A new unsent draft');
+});
+
+test('host dictation bridge passes identity and language without audio or submission fields', async () => {
+  const h = harness();
+  const calls = [];
+  h.window.__TAURI__ = { core: { invoke: async (...args) => { calls.push(args); } } };
+  const bridge = h.createHostBridge();
+  await bridge.dictation_capabilities();
+  await bridge.dictation_capabilities('capture');
+  await bridge.dictation_start('capture', 'installed-language');
+  await bridge.dictation_stop('capture');
+  await bridge.dictation_cancel('capture');
+  assert.deepEqual(JSON.parse(JSON.stringify(calls)), [
+    ['dictation_capabilities'], ['dictation_capabilities', { id: 'capture' }],
+    ['dictation_start', { id: 'capture', engine: 'installed-language' }],
+    ['dictation_stop', { id: 'capture' }], ['dictation_cancel', { id: 'capture' }],
+  ]);
+});
+
+test('host bridge carries structured question refs and exact answer values to the native command', async () => {
+  const h = harness();
+  const calls = [];
+  h.window.__TAURI__ = { core: { invoke: async (...args) => { calls.push(args); } } };
+  const bridge = h.createHostBridge();
+  const answers = [{ question_message_id: 'question', value: '  Rowan\n<watcher>  ', custom: false }];
+  await bridge.submit_session_input({ session_id: 'a', attempt_id: 'attempt', message_id: 'answer',
+    user_text: 'genuine input', builder_question_answers: answers });
+  assert.equal(calls[0][0], 'submit_session_input');
+  assert.deepEqual(calls[0][1].builderQuestionAnswers, answers);
+  await bridge.submit_session_input({ session_id: 'a', user_text: 'Plain chat' });
+  assert.equal('builderQuestionAnswers' in calls[1][1], false);
+});
+
+test('cancel during language discovery prevents native capture and keeps the draft', async () => {
+  const h = harness();
+  await h.openBuilderChat('a');
+  const capabilities = deferred();
+  let starts = 0, loadingId;
+  const cancellations = [];
+  h.state.bridge.dictation_capabilities = id => { loadingId = id; return capabilities.promise; };
+  h.state.bridge.dictation_start = async () => { starts += 1; };
+  h.state.bridge.dictation_stop = async () => 'words';
+  h.state.bridge.dictation_cancel = async id => { cancellations.push(id); };
+  h.initDictation(); h.node('player-input').value = 'Keep this draft';
+  const pending = h.getDictation().start();
+  h.getDictation().cancel();
+  capabilities.resolve({ engines: [{ id: 'test', language: 'en-GB' }] });
+  await pending;
+  assert.equal(starts, 0);
+  assert.equal(typeof loadingId, 'string');
+  assert.deepEqual(cancellations, [loadingId]);
+  assert.equal(h.node('player-input').value, 'Keep this draft');
+  assert.equal(h.calls.submissions.length, 0);
+});
+
+test('unavailable local speech leaves typing and explicit retry available', async () => {
+  const h = harness();
+  await h.openBuilderChat('a');
+  let starts = 0;
+  h.state.bridge.dictation_capabilities = async () => ({ engines: [] });
+  h.state.bridge.dictation_start = async () => { starts += 1; };
+  h.state.bridge.dictation_stop = async () => '';
+  h.state.bridge.dictation_cancel = async () => {};
+  h.initDictation(); h.node('player-input').value = 'Keep this draft';
+  await h.getDictation().start();
+  assert.equal(h.getDictation().snapshot().phase, 'error');
+  assert.match(h.getDictation().snapshot().message, /Local dictation is unavailable/);
+  assert.equal(starts, 0);
+  assert.equal(h.node('player-input').disabled, false);
+  assert.equal(h.node('player-input').value, 'Keep this draft');
+});
+
+test('missing local model offers explicit setup without capturing or sending the draft', async () => {
+  const h = harness(); await h.openBuilderChat('a');
+  let ready = false, starts = 0;
+  const preparation = deferred();
+  h.state.bridge.dictation_capabilities = async () => ({ ready, engines: [{ id: 'en', language: 'en' }],
+    devices: [{ id: 'default', label: 'System default: Test microphone' }] });
+  h.state.bridge.dictation_start = async () => { starts++; };
+  h.state.bridge.dictation_stop = async () => 'words';
+  h.state.bridge.dictation_cancel = async () => {};
+  h.state.bridge.dictation_prepare = () => preparation.promise;
+  h.initDictation(); h.node('player-input').value = 'Keep my typed action';
+  await h.getDictation().start();
+  assert.match(h.getDictation().snapshot().message, /Download the local speech model/);
+  assert.equal(h.node('settings-overlay').hidden, false);
+  assert.equal(h.node('settings-panel-dictation').hidden, false);
+  assert.equal(h.node('dictation-download').hidden, false);
+  h.node('dictation-download').dispatchEvent({ type: 'click' }); await h.flush();
+  assert.match(h.node('dictation-model-status').textContent, /Downloading/);
+  assert.equal(h.node('dictation-toggle').disabled, true);
+  assert.equal(h.node('player-input').disabled, false);
+  ready = true; preparation.resolve({ status: 'ready' }); await h.flush();
+  assert.match(h.node('dictation-model-status').textContent, /ready/);
+  assert.equal(starts, 0);
+  assert.equal(h.calls.submissions.length, 0);
+  assert.equal(h.node('player-input').value, 'Keep my typed action');
+  await h.getDictation().start(); assert.equal(starts, 1);
+  h.getDictation().cancel();
+});
+
+test('cancelling setup ignores late completion and keeps typing available', async () => {
+  const h = harness(); await h.openBuilderChat('a');
+  const preparation = deferred(), cancellations = [];
+  h.state.bridge.dictation_capabilities = async () => ({ ready: false, engines: [{ id: 'en', language: 'en' }] });
+  h.state.bridge.dictation_start = async () => { throw new Error('must not capture during setup'); };
+  h.state.bridge.dictation_stop = async () => '';
+  h.state.bridge.dictation_cancel = async id => cancellations.push(id);
+  h.state.bridge.dictation_prepare = () => preparation.promise;
+  h.initDictation(); h.node('player-input').value = 'My preserved draft';
+  await h.getDictation().start();
+  h.node('dictation-download').dispatchEvent({ type: 'click' }); await h.flush();
+  h.node('dictation-download').dispatchEvent({ type: 'click' }); await h.flush();
+  const before = h.node('dictation-model-status').textContent;
+  assert.match(before, /cancelled/);
+  preparation.resolve({ status: 'ready' }); await h.flush();
+  assert.equal(h.node('dictation-model-status').textContent, before);
+  assert.ok(cancellations.length >= 1);
+  assert.equal(h.node('player-input').disabled, false);
+  assert.equal(h.node('player-input').value, 'My preserved draft');
+  assert.equal(h.calls.submissions.length, 0);
+});
+
+test('explicit language and microphone selections reach the capture contract unchanged', async () => {
+  const h = harness(); await h.openBuilderChat('a'); const starts = [];
+  h.state.bridge.dictation_capabilities = async () => ({ ready: true,
+    engines: [{ id: 'auto', language: 'auto' }, { id: 'es', language: 'es' }],
+    devices: [{ id: 'default', label: 'System default' }, { id: 'd-2-test', label: 'Selected input' }] });
+  h.state.bridge.dictation_start = async (...args) => starts.push(args);
+  h.state.bridge.dictation_stop = async () => '';
+  h.state.bridge.dictation_cancel = async () => {};
+  h.initDictation();
+  h.node('dictation-language').value = 'es'; h.node('dictation-device').value = 'd-2-test';
+  await h.getDictation().start();
+  assert.equal(starts.length, 1);
+  assert.equal(starts[0][1], 'es'); assert.equal(starts[0][2], 'd-2-test');
+  h.getDictation().cancel();
+});
+
+test('a disappeared selected microphone is retained for explicit correction, never replaced by default', async () => {
+  const h = harness(); await h.openBuilderChat('a'); const starts = [];
+  h.state.bridge.dictation_capabilities = async () => ({ ready: true,
+    engines: [{ id: 'en', language: 'en' }], devices: [{ id: 'default', label: 'System default' }] });
+  h.state.bridge.dictation_start = async (...args) => { starts.push(args); throw 'device'; };
+  h.state.bridge.dictation_stop = async () => '';
+  h.state.bridge.dictation_cancel = async () => {};
+  h.initDictation(); h.node('player-input').value = 'Keep my correction';
+  h.node('dictation-device').value = 'd-2-unplugged';
+  await h.getDictation().start();
+  assert.equal(starts[0][2], 'd-2-unplugged');
+  assert.equal(h.node('dictation-device').value, 'd-2-unplugged');
+  assert.match(h.getDictation().snapshot().message, /selected microphone/);
+  assert.equal(h.node('player-input').value, 'Keep my correction');
+  assert.equal(h.calls.submissions.length, 0);
+});
+
+test('model download failure is redacted, preserves the draft and allows explicit retry', async () => {
+  const h = harness(); await h.openBuilderChat('a'); let attempts = 0, ready = false;
+  h.state.bridge.dictation_capabilities = async () => ({ ready, engines: [{ id: 'en', language: 'en' }] });
+  h.state.bridge.dictation_start = async () => { throw new Error('setup must not capture'); };
+  h.state.bridge.dictation_stop = async () => '';
+  h.state.bridge.dictation_cancel = async () => {};
+  h.state.bridge.dictation_prepare = async () => {
+    attempts++; if (attempts === 1) throw 'private network details'; ready = true; return { status: 'ready' };
+  };
+  h.initDictation(); h.node('player-input').value = 'Keep this action';
+  await h.getDictation().start();
+  h.node('dictation-download').dispatchEvent({ type: 'click' }); await h.flush();
+  assert.match(h.node('dictation-model-status').textContent, /download failed/);
+  assert.doesNotMatch(h.node('dictation-model-status').textContent, /private/);
+  assert.equal(h.node('player-input').value, 'Keep this action');
+  h.node('dictation-download').dispatchEvent({ type: 'click' }); await h.flush();
+  assert.equal(attempts, 2);
+  assert.match(h.node('dictation-model-status').textContent, /ready/);
+  assert.equal(h.calls.submissions.length, 0);
+});
+
+test('late readiness metadata cannot overwrite a cancelled setup state', async () => {
+  const h = harness(); await h.openBuilderChat('a'); const metadata = deferred(); let reads = 0;
+  h.state.bridge.dictation_capabilities = () => ++reads <= 2
+    ? Promise.resolve({ ready: false, engines: [{ id: 'en', language: 'en' }] }) : metadata.promise;
+  h.state.bridge.dictation_start = async () => {};
+  h.state.bridge.dictation_stop = async () => '';
+  h.state.bridge.dictation_cancel = async () => {};
+  h.state.bridge.dictation_prepare = async () => ({ status: 'ready' });
+  h.initDictation(); h.node('player-input').value = 'Keep my draft';
+  await h.getDictation().start();
+  h.node('dictation-download').dispatchEvent({ type: 'click' }); await h.flush();
+  assert.equal(reads, 3); // initial attempt, actual Settings opening, then completed-download refresh
+  h.node('dictation-download').dispatchEvent({ type: 'click' }); await h.flush();
+  const cancelled = h.node('dictation-model-status').textContent;
+  metadata.resolve({ ready: true, engines: [{ id: 'en', language: 'en' }] }); await h.flush();
+  assert.match(cancelled, /cancelled/);
+  assert.equal(h.node('dictation-model-status').textContent, cancelled);
+  assert.equal(h.node('player-input').value, 'Keep my draft');
+  assert.equal(h.calls.submissions.length, 0);
+});
+
+for (const accepted of [true, false]) for (const early of [true, false]) test(`Builder ${accepted ? 'accepted' : 'rejected'} steering preserves dictation ownership (${early ? 'during' : 'after'} request)`, async () => {
+  const h = harness();
+  await h.openBuilderChat('a');
+  const running = h.submitInput('Make a scout');
+  await h.flush();
+  const transcript = deferred();
+  const steering = deferred();
+  let cancelled = 0;
+  h.state.bridge.dictation_capabilities = async () => ({ engines: [{ id: 'test', language: 'en-GB', label: 'English' }] });
+  h.state.bridge.dictation_start = async () => {};
+  h.state.bridge.dictation_stop = () => transcript.promise;
+  h.state.bridge.dictation_cancel = async () => { cancelled += 1; };
+  h.state.bridge.steer_session = () => steering.promise;
+  h.initDictation();
+  const input = h.node('player-input');
+  input.value = 'Use a desert'; input.setSelectionRange(input.value.length, input.value.length);
+  const dictation = h.getDictation();
+  await dictation.start();
+  const stopping = dictation.stop();
+  const sending = h.submitInput(input.value);
+  if (early) { transcript.resolve('late captured words'); await stopping; }
+  if (accepted) steering.resolve({}); else steering.reject(new Error('rejected'));
+  await sending;
+  if (!early) transcript.resolve('late captured words');
+  await stopping;
+  assert.equal(input.value, accepted ? '' : 'Use a desert');
+  assert.equal(dictation.snapshot().transcript, '');
+  assert.equal(cancelled, 1);
+  assert.equal(h.calls.submissions.length, 1);
+  h.pending.get(h.calls.submissions[0].attempt_id).resolve({ status: 'completed' });
+  await running;
 });
 
 test('Stop waits for owner cancellation to settle before starting another request', async () => {
@@ -1491,7 +2005,6 @@ test('reopening a session uses the saved campaign name even when its snapshot ti
   h.state.campaigns[0].display_name = 'PES Companion Return · Interview';
   await h.openCampaign('campaign', 'gm');
   assert.equal(h.node('session-title').textContent, 'PES Companion Return · Interview');
-  assert.equal(h.node('ctx-campaign').textContent, 'PES Companion Return · Interview');
 });
 
 test('opening a saved campaign names the pending campaign before projections load', async () => {
@@ -1898,6 +2411,27 @@ test('repeated Builder failures explain the interruption and keep input usable',
   assert.equal(h.calls.submissions.length, 0);
 });
 
+for(const reason_code of ['required_reference_unavailable','repeated_reference_failure']){
+  test(`${reason_code} stops with source-specific recovery and never auto-submits`,async()=>{
+    const h=harness();
+    h.state.bridge.session_context=async()=>({
+      activity:{attempt_id:'source-failed',status:'interrupted'},
+      messages:[{message_id:'terminal',kind:'evidence',content:{
+        kind:'builder_attempt_terminal',status:'interrupted',attempt_id:'source-failed',reason_code,
+        error:'PRIVATE SOURCE DETAIL',
+      }}],
+    });
+    await h.openBuilderChat('a');
+    const html=h.node('chronology').dataset.chronologyHtml;
+    assert.match(html,/selected source|same source/i);
+    assert.match(html,/Saved work is retained/);
+    assert.match(html,/before continuing/);
+    assert.doesNotMatch(html,/PRIVATE SOURCE DETAIL|Send a message when you are ready/);
+    assert.equal(h.node('send-btn').disabled,false);
+    assert.equal(h.calls.submissions.length,0);
+  });
+}
+
 test('a migrated independent Builder chat does not render Campaign return actions', async () => {
   const h = harness();
   h.state.bridge.session_context = async () => ({
@@ -2103,3 +2637,207 @@ test('a claimed Builder heartbeat reconnects during owner disconnect grace', asy
   h.pending.get(h.calls.submissions[0].attempt_id).resolve({ status: 'completed' });
   await pending;
 });
+
+// Saved queue snapshots exactly as the owner records them, for the Story outcome regressions.
+function queueSnapshot(status, steps, extra = {}) {
+  return { kind: 'action_sequence', sequence_id: 'queue-1', session_id: 'gm', campaign_id: 'campaign',
+    status, error: null, steps, ...extra };
+}
+function queueStep(label, status, extra = {}) {
+  return { step_id: `step-${label}`, operation_id: `op-${label}`, actor: 'vesper', actor_name: 'Vesper',
+    label, status, error: null, receipt: status === 'committed' ? { action_id: `op-${label}`, status: 'committed' } : null,
+    ...extra };
+}
+function storyHistory(h, snapshots) {
+  const messages = snapshots.map((content, index) => ({ sequence: index + 1,
+    message_id: `queue-1-${index + 1}`, kind: 'evidence', content }));
+  h.state.bridge.session_history_page = async () => ({ messages, latest_sequence: messages.length });
+}
+
+// The desktop invoke rejects with the owner's "code: message" string rather than an Error object.
+for (const [uncertain, nativeString] of [[false, false], [true, false], [false, true]]) {
+  test(`committed queue action stays saved when its narration request ${uncertain ? 'is unconfirmed'
+    : nativeString ? 'is refused through the desktop bridge' : 'is refused'}`, async () => {
+    const h = harness();
+    configureGM(h);
+    storyHistory(h, [
+      queueSnapshot('ready', [queueStep('Aim', 'pending')]),
+      queueSnapshot('running', [queueStep('Aim', 'executing')]),
+      queueSnapshot('running', [queueStep('Aim', 'committed')]),
+      queueSnapshot('completed', [queueStep('Aim', 'committed')], { committed_action_ids: ['op-Aim'] }),
+    ]);
+    await h.openCampaign('campaign', 'gm');
+    const narration = h.submitInput('', { playerAction: { campaignId: 'campaign', sessionId: 'gm',
+      actionId: 'op-Aim', automatic: false } });
+    const command = h.calls.submissions[0];
+    assert.equal(command.player_action_id, 'op-Aim');
+    h.pending.get(command.attempt_id).reject(uncertain
+      ? Object.assign(new Error('The local connection was interrupted.'), { code: 'outcome_unknown' })
+      : nativeString ? 'command_rejected: Agent session provider is not configured'
+        : new Error('Agent session provider is not configured'));
+    await narration;
+    await h.flush();
+    const html = h.node('chronology').dataset.chronologyHtml;
+    assert.equal((html.match(/Action saved/g) || []).length, 1);
+    assert.match(html, /Vesper · Aim/);
+    assert.match(html, uncertain ? /Narration request unconfirmed/ : /Narration unavailable · Agent session provider is not configured/);
+    assert.doesNotMatch(html, /command_rejected/);
+    assert.match(html, /was not repeated/);
+    assert.doesNotMatch(html, /could not complete|Try again|manual-retry|Awaiting confirmation|Not done/);
+    assert.doesNotMatch(h.node('session-status-text').textContent, /Session request rejected/);
+    assert.equal(h.calls.submissions.length, 1, 'narration is never retried silently');
+  });
+}
+
+test('Builder without a configured model explains itself in Models, not in the open campaign chat', async () => {
+  const h = harness();
+  configureGM(h);
+  h.state.builderChats = [];
+  let creates = 0;
+  h.state.bridge.create_builder_chat = async () => { creates += 1; };
+  await h.openCampaign('campaign', 'gm');
+  h.node('player-input').value = 'Keep this unsent action';
+  const scrolled = [];
+  h.node('models-action-status').scrollIntoView = (options) => scrolled.push(options);
+  h.openBuilderMode();
+  await h.flush();
+  assert.equal(h.node('settings-overlay').hidden, false);
+  assert.equal(h.node('settings-panel-models').hidden, false);
+  assert.match(h.node('models-action-status').textContent, /Configure a provider before starting Builder/);
+  // Narrow Settings is one tall scroll; the refusal sits below the fold unless it is brought into view.
+  assert.equal(JSON.stringify(scrolled), '[{"block":"nearest"}]');
+  // That scroll must not carry into the next Settings tab, which starts at its own top.
+  h.node('settings-content-test').scrollTop = 70;
+  h.showSettingsTab('dictation');
+  assert.equal(h.node('settings-content-test').scrollTop, 0);
+  assert.equal(creates, 0, 'no Builder session is created without a model');
+  h.closeSettings();
+  assert.doesNotMatch(h.node('session-status-text').textContent, /Configure a provider/,
+    'the refusal does not stay in the campaign status line after Settings closes');
+  assert.equal(h.state.activeSessionId, 'gm');
+  assert.equal(h.node('player-input').value, 'Keep this unsent action');
+  assert.equal(h.calls.submissions.length, 0);
+});
+
+test('a rules refusal shows the owner reason, saves nothing and invites no blind retry', async () => {
+  const h = harness();
+  configureGM(h);
+  const reason = 'This actor is already in that stance.';
+  storyHistory(h, [
+    queueSnapshot('ready', [queueStep('Stand', 'pending')]),
+    queueSnapshot('failed', [queueStep('Stand', 'pending', { error: reason })], { error: reason }),
+    queueSnapshot('ready', []),
+  ]);
+  await h.openCampaign('campaign', 'gm');
+  const html = h.node('chronology').dataset.chronologyHtml;
+  assert.match(html, /Not done/);
+  assert.match(html, /Vesper · Stand/);
+  assert.match(html, /This actor is already in that stance\./);
+  assert.match(html, /This step was not saved/);
+  assert.doesNotMatch(html, /Action saved|could not complete|Try again|Awaiting confirmation/);
+});
+
+test('a committed prefix and a later refusal are reported once each, in owner words', async () => {
+  const h = harness();
+  configureGM(h);
+  // Mirrors the real SRD-Lite queue: the second melee attack is refused once the Action is spent.
+  const reason = 'Panel mechanic is unavailable';
+  storyHistory(h, [
+    queueSnapshot('ready', [queueStep('Melee', 'pending'), queueStep('Again', 'pending')]),
+    queueSnapshot('running', [queueStep('Melee', 'executing'), queueStep('Again', 'pending')]),
+    queueSnapshot('running', [queueStep('Melee', 'committed'), queueStep('Again', 'pending')]),
+    queueSnapshot('failed', [queueStep('Melee', 'committed'), queueStep('Again', 'pending', { error: reason })],
+      { error: reason }),
+  ]);
+  await h.openCampaign('campaign', 'gm');
+  const html = h.node('chronology').dataset.chronologyHtml;
+  assert.equal((html.match(/Action saved/g) || []).length, 1);
+  assert.match(html, /Vesper · Melee/);
+  assert.equal((html.match(/Not done/g) || []).length, 1);
+  assert.match(html, /Vesper · Again/);
+  assert.match(html, /Panel mechanic is unavailable\. This step was not saved\./);
+  assert.doesNotMatch(html, /Awaiting confirmation|could not complete|Try again/);
+});
+
+test('an unconfirmed queued send is shown as unconfirmed, not success or failure', async () => {
+  const h = harness();
+  configureGM(h);
+  storyHistory(h, [
+    queueSnapshot('ready', [queueStep('Aim', 'pending')]),
+    queueSnapshot('running', [queueStep('Aim', 'executing')]),
+  ]);
+  await h.openCampaign('campaign', 'gm');
+  const html = h.node('chronology').dataset.chronologyHtml;
+  assert.match(html, /Awaiting confirmation/);
+  assert.match(html, /Vesper · Aim/);
+  assert.match(html, /has not been sent again/);
+  assert.doesNotMatch(html, /Action saved|Not done|could not complete|Try again/);
+  assert.equal(h.calls.submissions.length, 0);
+});
+
+
+for (const navigateAway of [false, true]) {
+  test(`prepared campaign opening failure repaints terminal activity without changing navigation (${navigateAway})`, async () => {
+    const h = harness();
+    configureGM(h);
+    let ended = false;
+    const input = { sequence: 1, message_id: 'opening-input', kind: 'user',
+      content: { text: 'Begin this prepared adventure.', attempt_id: 'ready-opening' } };
+    h.state.bridge.session_context = async (id) => id !== 'gm'
+      ? ({ messages: [{ message_id: 'answer-a', kind: 'talk', content: { text: 'Answer a' } }] })
+      : ({ messages: [input], activity_progress: {
+      attempt_id: 'ready-opening', basis_message_id: 'opening-input', phase: 'working', elapsed_ms: 2000,
+    } });
+    h.state.bridge.session_history_page = async (id) => id !== 'gm'
+      ? ({ latest_sequence: 1, messages: [{ sequence: 1, message_id: 'answer-a', kind: 'talk', content: { text: 'Answer a' } }] })
+      : ({ latest_sequence: ended ? 2 : 1,
+      messages: [input, ...(ended ? [{ sequence: 2, message_id: 'opening-ended', kind: 'evidence',
+        content: { kind: 'session_attempt_terminal', attempt_id: 'ready-opening',
+          status: 'interrupted', failure_category: 'provider_error' } }] : [])] });
+    h.state.bridge.player_projection_page = async () => [];
+    const response = deferred();
+    h.state.bridge.start_dm_session = () => response.promise;
+    const opening = h.openReadyCampaign({ campaign_id: 'campaign', dm_session_id: 'gm',
+      dm_attempt_id: 'ready-opening', dm_turn_id: 'turn' });
+    await h.flush();
+    // The opening has a live activity row before its provider request fails.
+    await h.window.SylviaGMFrontend.renderPlayerProjection('campaign', 'gm');
+    assert.match(h.node('chronology').dataset.chronologyHtml, /data-activity-phase="queued"/);
+    if (navigateAway) await h.openBuilderChat('a');
+    ended = true;
+    response.reject(Error('Synthetic context capacity failure'));
+    await opening;
+    assert.equal(h.state.sessionActivities.get('gm').phase, 'interrupted');
+    const html = h.node('chronology').dataset.chronologyHtml;
+    if (navigateAway) {
+      assert.equal(h.state.activeSessionId, 'a');
+      assert.match(html, /Answer a/);
+      assert.doesNotMatch(html, /Begin this prepared adventure/);
+    } else {
+      assert.match(html, /data-activity-phase="failed"/);
+      assert.doesNotMatch(html, /data-activity-phase="working"/);
+      assert.match(h.node('session-status-text').textContent, /opening was interrupted/i);
+    }
+  });
+}
+
+for (const indexStatus of ['loading', 'error']) {
+  test(`campaign index ${indexStatus} is distinct from an empty library and can recover`, async () => {
+    const h = harness();
+    h.state.campaignIndexStatus = indexStatus;
+    const retained = [{campaign_id: 'retained', lifecycle: 'active', display_name: 'Retained'}];
+    h.state.campaigns = retained;
+    h.renderHome();
+    assert.doesNotMatch(h.node('campaign-shelves').innerHTML, /No ongoing campaigns yet/);
+    assert.match(h.node('campaign-shelves').innerHTML,
+      indexStatus === 'loading' ? /Loading campaigns/ : /Campaign list could not be loaded/);
+    assert.equal(h.state.campaigns, retained);
+    if (indexStatus === 'error') {
+      h.state.bridge = {campaign_index: async () => []};
+      h.node('campaign-index-retry-btn').dispatchEvent({type: 'click'});
+      await new Promise(resolve => setImmediate(resolve));
+      assert.equal(h.state.campaignIndexStatus, 'ready');
+      assert.match(h.node('campaign-shelves').innerHTML, /No ongoing campaigns yet/);
+    }
+  });
+}

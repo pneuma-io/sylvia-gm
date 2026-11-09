@@ -1,0 +1,24 @@
+{
+  "format": 1,
+  "title": "Signal console",
+  "status": [{"label": "Cycle", "value": "3"}, {"label": "Charge", "value": "8"}],
+  "areas": [
+    {
+      "id": "public", "label": "Relay", "position": "center",
+      "groups": [{"id": "route", "label": "Route", "visibility": "public", "pieces": [
+        {"id": "relay-a", "label": "A", "detail": "Online", "emphasis": "accent"},
+        {"id": "relay-b", "label": "B", "detail": "Offline", "emphasis": "muted"}
+      ]}]
+    },
+    {
+      "id": "player", "label": "Operator", "position": "bottom",
+      "groups": [{"id": "programs", "label": "Programs", "visibility": "owner", "owner": "operator",
+        "show_count": true, "pieces": [{"id": "ghost", "label": "Ghost route", "detail": "1 charge", "action_id": "run"}]}]
+    },
+    {
+      "id": "opponent", "label": "Remote operator", "position": "top",
+      "groups": [{"id": "remote-programs", "label": "Programs", "visibility": "owner", "owner": "remote",
+        "show_count": true, "pieces": [{"id": "hidden-intercept", "label": "Private intercept", "detail": "Private instruction"}]}]
+    }
+  ]
+}

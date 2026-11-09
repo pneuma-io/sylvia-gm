@@ -6,7 +6,10 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from sylvia_gm.application.bundled_packages import bundled_rift_authority
+from sylvia_gm.application.bundled_packages import (
+    bundled_rift_archive_for_closure,
+    bundled_rift_authority,
+)
 from sylvia_gm.application.plan_state_admission import validate_starting_declarations
 from sylvia_gm.domain.starting_state import parse_state_schemas
 from sylvia_gm.application.setting_character_requirements import (
@@ -129,6 +132,7 @@ def campaign_plan_sources(
             path,
         )
 
+    primary_record = owner.package_record(primary.package_id, primary.version, primary.sha256)
     return CampaignPlanToolAuthority(
         ruleset=PackageBinding(primary.package_id, primary.version, primary.sha256),
         setting=PackageBinding(setting.package_id, setting.version, setting.sha256),
@@ -136,16 +140,8 @@ def campaign_plan_sources(
         setting_paths=setting_paths,
         read_setting=read_setting,
         setting_knowledge_ids=setting_knowledge_ids,
-        participant_schemas=tuple(
-            owner.package_record(primary.package_id, primary.version, primary.sha256).get(
-                "participant_artifacts", ()
-            )
-        ),
-        state_schemas=tuple(
-            owner.package_record(primary.package_id, primary.version, primary.sha256).get(
-                "state_schemas", (),
-            )
-        ),
+        participant_schemas=tuple(primary_record.get("participant_artifacts", ())),
+        state_schemas=tuple(primary_record.get("state_schemas", ())),
         setting_character_schema=(
             parse_setting_character_requirements(read_setting(CHARACTER_REQUIREMENTS_PATH))
             if CHARACTER_REQUIREMENTS_PATH in setting_paths else None
@@ -179,7 +175,12 @@ def validate_retained_campaign_plan(
     else:
         sources = bundled_rift_authority()
         if closure != sources.closure_sha256:
-            raise ValueError("Reusable Campaign Plan exact packages are unavailable")
+            snapshot = bundled_rift_archive_for_closure(closure)
+            if snapshot is None:
+                raise ValueError("Reusable Campaign Plan exact packages are unavailable")
+            from sylvia_gm.application.plan_snapshot import validate_plan_snapshot
+
+            return validate_plan_snapshot(snapshot, payload, readable_markdown)
     return validate_campaign_plan(
         payload,
         readable_markdown=readable_markdown,

@@ -6,15 +6,20 @@ use std::collections::HashMap;
 use std::io::{BufRead, BufReader, Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Child, ChildStdin, ChildStdout, Command, Stdio};
-use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicI64, AtomicU64, Ordering};
 use std::sync::{mpsc, Arc, Mutex};
 use std::time::{Duration, Instant};
 use tauri::{Emitter, Manager, State, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
 
 mod desktop_storage;
+mod desktop_update;
+mod desktop_update_process;
+mod dictation;
 mod instance_policy;
 mod panel_drag;
 mod panel_windows;
+#[cfg(all(test, windows))]
+mod owner_shutdown_tests;
 use panel_windows::PanelWindows;
 
 const HANDSHAKE_TRANSCRIPT: &[u8] = b"sylvia-gm-f6-local-owner-handshake-v1";
@@ -22,31 +27,72 @@ const MAX_MESSAGE_BYTES: usize = 67_108_864;
 
 type HmacSha256 = Hmac<Sha256>;
 
+struct DesktopUpdateLaunch {
+    portable: bool,
+    startup: Option<Value>,
+    data: PathBuf,
+    live: PathBuf,
+    applying: AtomicBool,
+}
+
+const OWNER_CLOSE_PENDING: &str = "Sylvia GM owner is still running; close has not completed";
+const OWNER_CLOSE_PIPE_CLOSED: &str = "Sylvia GM owner reply pipe closed while its process is still running; close has not completed";
+const OWNER_CLOSE_NO_ACK: &str = "Sylvia GM owner has not acknowledged shutdown; its process and saved data remain owned";
+// This bounds admission of a close request, not the owner's cleanup lifetime.
+const OWNER_SHUTDOWN_REPLY_TIMEOUT: Duration = Duration::from_secs(3);
+// Every i32 exit status fits below this unknown sentinel. Store only after
+// observing actual process exit and, on Windows, an empty owned process job.
+const OWNER_EXIT_UNKNOWN: i64 = i64::MAX;
+
+struct OwnerShutdownRequest {
+    request_id: String,
+    receiver: mpsc::Receiver<Result<Value, String>>,
+    started: Instant,
+    reply: Option<Result<(), String>>,
+    rejected: bool,
+}
+
 pub struct OwnerBridge {
-    child: Mutex<Child>,
-    input: Mutex<ChildStdin>,
+    recovery_only: bool,
+    child: Arc<Mutex<Child>>,
+    input: Arc<Mutex<ChildStdin>>,
     pending: Arc<Mutex<HashMap<String, mpsc::Sender<Result<Value, String>>>>>,
     next_request_id: AtomicU64,
     closed: Arc<AtomicBool>,
+    closing: AtomicBool,
+    shutdown_request: Mutex<Option<OwnerShutdownRequest>>,
+    exit_code: Arc<AtomicI64>,
+    exit_notice: Mutex<Option<mpsc::Receiver<Result<i32, String>>>>,
+    close_requested: Arc<AtomicBool>,
+    #[cfg(windows)]
+    job: Arc<dictation::ProcessJob>,
 }
 
 impl OwnerBridge {
     pub fn spawn_python(python: &Path, database: &Path) -> Result<Self, String> {
         let mut command = Command::new(python);
         command.args(["-m", "sylvia_gm.interfaces.owner_process"]);
-        Self::spawn_command(command, database)
+        Self::spawn_command(command, database, None, None)
     }
 
     pub fn spawn_packaged(executable: &Path, database: &Path) -> Result<Self, String> {
-        Self::spawn_command(Command::new(executable), database)
+        Self::spawn_command(Command::new(executable), database, None, None)
     }
 
-    fn spawn_default(database: &Path) -> Result<Self, String> {
+    fn spawn_default(database: &Path, portable: bool, startup: Option<Value>) -> Result<Self, String> {
+        if startup.is_some() && (
+            !cfg!(all(windows, target_arch = "x86_64"))
+            || (cfg!(debug_assertions) && !portable)
+            || std::env::var_os("SYLVIA_GM_OWNER_EXECUTABLE").is_some()
+            || std::env::var_os("SYLVIA_GM_AUTHORITY_DATABASE").is_some()
+        ) {
+            return Err("Update restart is unavailable with this engineering launch".into());
+        }
         if let Some(executable) = std::env::var_os("SYLVIA_GM_OWNER_EXECUTABLE") {
             return Self::spawn_packaged(Path::new(&executable), database);
         }
 
-        if cfg!(debug_assertions) {
+        if cfg!(debug_assertions) && !portable {
             let python = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
                 .parent()
                 .ok_or_else(|| "Sylvia GM repository root is unavailable".to_string())?
@@ -61,14 +107,29 @@ impl OwnerBridge {
             .parent()
             .ok_or_else(|| "Sylvia GM executable directory is unavailable".to_string())?
             .join("sylvia-gm-owner.exe");
-        Self::spawn_packaged(&executable, database)
+        let application = std::env::current_exe()
+            .map_err(|_| "Sylvia GM executable path is unavailable".to_string())?;
+        let context = if !cfg!(all(windows, target_arch = "x86_64"))
+            || std::env::var_os("SYLVIA_GM_AUTHORITY_DATABASE").is_some()
+        {
+            None
+        } else {
+            Some(desktop_update_launch_context(&application, database, portable)?)
+        };
+        Self::spawn_command(Command::new(executable), database, context, startup)
     }
 
-    fn spawn_command(mut command: Command, database: &Path) -> Result<Self, String> {
+    fn spawn_command(
+        mut command: Command,
+        database: &Path,
+        update_context: Option<Value>,
+        update_start: Option<Value>,
+    ) -> Result<Self, String> {
         #[cfg(windows)]
         {
             use std::os::windows::process::CommandExt;
-            command.creation_flags(0x0800_0000);
+            use windows_sys::Win32::System::Threading::{CREATE_NO_WINDOW, CREATE_SUSPENDED};
+            command.creation_flags(CREATE_NO_WINDOW | CREATE_SUSPENDED);
         }
         command
             .stdin(Stdio::piped())
@@ -77,6 +138,22 @@ impl OwnerBridge {
         let mut child = command
             .spawn()
             .map_err(|_| "Sylvia GM authority process could not be launched".to_string())?;
+        #[cfg(windows)]
+        let job = match dictation::ProcessJob::own(&child) {
+            Ok(job) => Arc::new(job),
+            Err(error) => {
+                let _ = child.kill();
+                let _ = child.wait();
+                return Err(error);
+            }
+        };
+        #[cfg(windows)]
+        if let Err(error) = dictation::ProcessJob::resume(&child) {
+            drop(job);
+            let _ = child.kill();
+            let _ = child.wait();
+            return Err(error);
+        }
         let mut input = child
             .stdin
             .take()
@@ -91,12 +168,18 @@ impl OwnerBridge {
         OsRng.fill_bytes(&mut secret);
         let mut secret_hex = hex::encode(secret);
         let owner_id = format!("owner-desktop-{}", &secret_hex[..16]);
-        let launch = json!({
+        let mut launch = json!({
             "type": "launch",
             "secret_hex": secret_hex,
             "database_path": database.to_string_lossy(),
             "owner_id": owner_id,
         });
+        if let Some(context) = update_context {
+            launch["desktop_update_context"] = context;
+        }
+        if let Some(start) = update_start {
+            launch["desktop_update_start"] = start;
+        }
         Self::write_to(&mut input, &launch)?;
         let ready = Self::read_from(&mut output)?;
 
@@ -111,6 +194,11 @@ impl OwnerBridge {
             .get("response_hex")
             .and_then(Value::as_str)
             .unwrap_or_default();
+        if ready.get("type").and_then(Value::as_str) == Some("update_recovery_required") {
+            // The owner rejects before opening data and closes normally. No forced shutdown.
+            let _ = child.wait();
+            return Err("Update recovery is required before opening saved data".into());
+        }
         if ready.get("ok") != Some(&Value::Bool(true))
             || ready.get("type").and_then(Value::as_str) != Some("ready")
             || response != expected
@@ -125,9 +213,17 @@ impl OwnerBridge {
         let reader_pending = Arc::clone(&pending);
         let closed = Arc::new(AtomicBool::new(false));
         let reader_closed = Arc::clone(&closed);
+        let child = Arc::new(Mutex::new(child));
+        let reader_child = Arc::clone(&child);
+        #[cfg(windows)]
+        let reader_job = Arc::clone(&job);
+        let exit_code = Arc::new(AtomicI64::new(OWNER_EXIT_UNKNOWN));
+        let reader_exit_code = Arc::clone(&exit_code);
+        let (exit_sender, exit_receiver) = mpsc::channel();
         std::thread::Builder::new()
             .name("sylvia-gm-owner-replies".to_string())
-            .spawn(move || loop {
+            .spawn(move || {
+              loop {
                 let reply = Self::read_from(&mut output);
                 let request_id = reply
                     .as_ref()
@@ -152,19 +248,46 @@ impl OwnerBridge {
                                 let _ = sender.send(Err(error.clone()));
                             }
                         }
-                        return;
+                        break;
                     }
                     _ => {}
                 }
+              }
+              // The existing reply reader retains the exact child/job after bridge Drop.
+              // EOF is transport failure; collection is a separate actual process observation.
+              #[cfg(windows)]
+              let drained = reader_job.wait_empty();
+              #[cfg(not(windows))]
+              let drained: Result<(), String> = Ok(());
+              let result = drained.and_then(|_| loop {
+                  let status = reader_child.lock()
+                      .map_err(|_| "The owned authority handle is unavailable".to_string())?
+                      .try_wait()
+                      .map_err(|_| "The owned authority exit could not be checked".to_string())?;
+                  if let Some(status) = status { break Ok(status.code().unwrap_or(-1)); }
+                  std::thread::sleep(Duration::from_millis(20));
+              });
+              if let Ok(code) = result {
+                  reader_exit_code.store(i64::from(code), Ordering::Release);
+              }
+              let _ = exit_sender.send(result);
             })
             .map_err(|_| "Sylvia GM authority response reader could not start".to_string())?;
 
         Ok(Self {
-            child: Mutex::new(child),
-            input: Mutex::new(input),
+            recovery_only: ready.get("recovery_only") == Some(&Value::Bool(true)),
+            child,
+            input: Arc::new(Mutex::new(input)),
             pending,
             next_request_id: AtomicU64::new(1),
             closed,
+            closing: AtomicBool::new(false),
+            shutdown_request: Mutex::new(None),
+            exit_code,
+            exit_notice: Mutex::new(Some(exit_receiver)),
+            close_requested: Arc::new(AtomicBool::new(false)),
+            #[cfg(windows)]
+            job,
         })
     }
 
@@ -187,7 +310,7 @@ impl OwnerBridge {
             .read_line(&mut line)
             .map_err(|_| "Sylvia GM authority response could not be read".to_string())?;
         if read == 0 {
-            return Err("Sylvia GM authority process exited".to_string());
+            return Err("Sylvia GM authority reply pipe closed".to_string());
         }
         if line.len() > MAX_MESSAGE_BYTES || !line.ends_with('\n') {
             return Err("Sylvia GM authority response exceeded its bounded protocol".to_string());
@@ -197,6 +320,9 @@ impl OwnerBridge {
     }
 
     pub fn request(&self, method: &str, params: Value) -> Result<Value, String> {
+        if self.closing.load(Ordering::Acquire) {
+            return Err("Sylvia GM authority is closing; editing is suspended".into());
+        }
         if self.closed.load(Ordering::Acquire) {
             return Err("Sylvia GM authority process is closed".to_string());
         }
@@ -277,49 +403,186 @@ impl OwnerBridge {
         }
     }
 
-    pub fn shutdown(&self) -> Result<(), String> {
-        if self.closed.load(Ordering::Acquire) {
-            return Ok(());
+    // Never hold a child lock across a wait. A live job is retained, not called clean.
+    fn poll_owner_exit(&self) -> Result<Option<i32>, String> {
+        let verified = self.exit_code.load(Ordering::Acquire);
+        if verified != OWNER_EXIT_UNKNOWN {
+            return Ok(Some(verified as i32));
         }
-        let request_result = self.request("shutdown", json!({}));
-        let deadline = Instant::now() + Duration::from_secs(3);
-        loop {
-            let status = self
-                .child
-                .lock()
-                .map_err(|_| "Sylvia GM authority process handle is unavailable".to_string())?
-                .try_wait();
-            match status {
-                Ok(Some(status)) => {
-                    self.closed.store(true, Ordering::Release);
-                    if status.success() && request_result.is_ok() {
-                        return Ok(());
+        let status = self.child.try_lock()
+            .map_err(|error| match error {
+                std::sync::TryLockError::WouldBlock => OWNER_CLOSE_PENDING.to_string(),
+                std::sync::TryLockError::Poisoned(_) => "The owned authority handle is unavailable".to_string(),
+            })?
+            .try_wait().map_err(|_| "The owned authority exit could not be checked".to_string())?;
+        let Some(status) = status else { return Ok(None); };
+        #[cfg(windows)]
+        if !self.job.is_empty()? { return Ok(None); }
+        let code = status.code().unwrap_or(-1);
+        self.exit_code.store(i64::from(code), Ordering::Release);
+        Ok(Some(code))
+    }
+
+    // Bound only the reply wait. Acknowledgement and EOF never substitute for exit.
+    // Repeated observations use one request, including a reply arriving after its deadline.
+    pub fn shutdown(&self) -> Result<(), String> {
+        if let Some(code) = self.poll_owner_exit()? {
+            return if code == 0 { Ok(()) } else {
+                Err(format!("Sylvia GM authority did not close cleanly (exit {code})"))
+            };
+        }
+        self.closing.store(true, Ordering::Release);
+        let mut shutdown_request = self.shutdown_request.try_lock()
+            .map_err(|_| OWNER_CLOSE_PENDING.to_string())?;
+        if shutdown_request.is_none() {
+            if self.closed.load(Ordering::Acquire) { return Err(OWNER_CLOSE_PIPE_CLOSED.into()); }
+            let request_id = format!("desktop-{}", self.next_request_id.fetch_add(1, Ordering::Relaxed));
+            let (sender, receiver) = mpsc::channel();
+            self.pending.try_lock()
+                .map_err(|_| {
+                    self.closing.store(false, Ordering::Release);
+                    "The authority reply registry is busy".to_string()
+                })?
+                .insert(request_id.clone(), sender);
+            let input = Arc::clone(&self.input);
+            let pending = Arc::clone(&self.pending);
+            let write_id = request_id.clone();
+            let spawn = std::thread::Builder::new().name("sylvia-gm-owner-close".into()).spawn(move || {
+                let result = input.lock()
+                    .map_err(|_| "The authority input pipe is unavailable".to_string())
+                    .and_then(|mut input| Self::write_to(&mut input, &json!({
+                        "id": write_id, "method": "shutdown", "params": {}
+                    })));
+                if let Err(error) = result {
+                    if let Ok(mut registry) = pending.lock() {
+                        if let Some(sender) = registry.remove(&write_id) { let _ = sender.send(Err(error)); }
                     }
-                    return Err("Sylvia GM authority process did not close cleanly".to_string());
                 }
-                Ok(None) if Instant::now() < deadline => {
-                    std::thread::sleep(Duration::from_millis(20));
+            });
+            if spawn.is_err() {
+                if let Ok(mut pending) = self.pending.try_lock() { pending.remove(&request_id); }
+                self.closing.store(false, Ordering::Release);
+                return Err("The owned shutdown request could not be started".into());
+            }
+            *shutdown_request = Some(OwnerShutdownRequest { request_id, receiver, started: Instant::now(), reply: None, rejected: false });
+        }
+        let request = shutdown_request.as_mut().unwrap();
+        if request.reply.is_none() {
+            let remaining = OWNER_SHUTDOWN_REPLY_TIMEOUT.saturating_sub(request.started.elapsed());
+            match request.receiver.recv_timeout(remaining) {
+                Ok(Ok(reply)) => {
+                    request.rejected = reply.get("id").and_then(Value::as_str) == Some(request.request_id.as_str())
+                        && reply.get("ok") == Some(&Value::Bool(false));
+                    request.reply = Some(if reply.get("id").and_then(Value::as_str) != Some(request.request_id.as_str()) {
+                        Err("The shutdown reply identity did not match".into())
+                    } else if reply.get("ok") != Some(&Value::Bool(true)) {
+                        Err("The authority rejected shutdown; its process and saved data remain owned".into())
+                    } else if reply.pointer("/result/status").and_then(Value::as_str) != Some("closed") {
+                        Err("The authority did not acknowledge shutdown; its process remains owned".into())
+                    } else { Ok(()) });
                 }
-                _ => {
-                    if let Ok(mut child) = self.child.lock() {
-                        let _ = child.kill();
-                        let _ = child.wait();
-                    }
-                    self.closed.store(true, Ordering::Release);
-                    return Err("Sylvia GM authority process required forced shutdown".to_string());
-                }
+                Ok(Err(error)) => request.reply = Some(Err(if self.closed.load(Ordering::Acquire) {
+                    OWNER_CLOSE_PIPE_CLOSED.into()
+                } else { error })),
+                Err(mpsc::RecvTimeoutError::Timeout) => return Err(OWNER_CLOSE_NO_ACK.into()),
+                Err(mpsc::RecvTimeoutError::Disconnected) => return Err(OWNER_CLOSE_PIPE_CLOSED.into()),
             }
         }
+        if let Some(Err(error)) = &request.reply {
+            let error = error.clone();
+            if request.rejected {
+                self.closing.store(false, Ordering::Release);
+                // Only a definite refusal permits a later new close request.
+                *shutdown_request = None;
+            }
+            return Err(error);
+        }
+        match self.poll_owner_exit()? {
+            Some(0) => Ok(()),
+            Some(code) => Err(format!("Sylvia GM authority did not close cleanly (exit {code})")),
+            None => Err(OWNER_CLOSE_PENDING.into()),
+        }
+    }
+
+    pub fn shutdown_for_update(&self, operation: &str) -> Result<(), String> {
+        let reply = self.request("desktop_update_shutdown", json!({"operation_id": operation}))?;
+        if reply.get("status").and_then(Value::as_str) != Some("closed") {
+            return Err("The update owner did not admit a safe close".into());
+        }
+        let status = self.child.lock()
+            .map_err(|_| "The owned authority handle is unavailable".to_string())?
+            .wait()
+            .map_err(|_| "The authority's normal exit could not be verified".to_string())?;
+        self.closed.store(true, Ordering::Release);
+        if !status.success() {
+            return Err("The authority did not finish update shutdown normally".into());
+        }
+        Ok(())
+    }
+
+    fn shutdown_for_recovery(&self) -> Result<(), String> {
+        if !self.recovery_only { return Err("This is not the recovery server".into()); }
+        if self.closed.load(Ordering::Acquire) { return Ok(()); }
+        let reply = self.request("shutdown", json!({}))?;
+        if reply.get("status").and_then(Value::as_str) != Some("closed") {
+            return Err("The recovery server did not admit a safe close".into());
+        }
+        let status = self.child.lock().map_err(|_| "The owned recovery handle is unavailable")?
+            .wait().map_err(|_| "The recovery server exit could not be verified")?;
+        self.closed.store(true, Ordering::Release);
+        if !status.success() { return Err("The recovery server did not close normally".into()); }
+        Ok(())
     }
 }
 
-impl Drop for OwnerBridge {
-    fn drop(&mut self) {
-        if !self.closed.load(Ordering::Acquire) {
-            let _ = self.shutdown();
-        }
+fn desktop_update_start_arguments(arguments: &[std::ffi::OsString]) -> Result<Option<Value>, String> {
+    let is_start = |part: &std::ffi::OsString| {
+        part == "--sylvia-update-start" || part == "--sylvia-update-recovery-start"
+    };
+    if !arguments.iter().any(is_start) {
+        return Ok(None);
     }
+    if arguments.len() != 4 || !is_start(&arguments[0]) {
+        return Err("The update restart arguments are incomplete".into());
+    }
+    let mut ids = Vec::new();
+    for part in &arguments[1..] {
+        let value = part.to_str().ok_or("The update restart identity is invalid")?;
+        if value.len() != 32 || !value.bytes().all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b)) {
+            return Err("The update restart identity is invalid".into());
+        }
+        ids.push(value);
+    }
+    let mut request = json!({"operation_id": ids[0], "attempt": ids[1], "nonce": ids[2]});
+    if arguments[0] == "--sylvia-update-recovery-start" { request["recovery"] = Value::Bool(true); }
+    Ok(Some(request))
 }
+
+// Captured on the private launch pipe, never from renderer paths or per-request retargeting.
+fn desktop_update_launch_context(
+    application: &Path,
+    database: &Path,
+    portable: bool,
+) -> Result<Value, String> {
+    let app_root = application.parent()
+        .ok_or_else(|| "Sylvia GM application folder is unavailable".to_string())?;
+    let data_root = database.parent()
+        .ok_or_else(|| "Sylvia GM data folder is unavailable".to_string())?;
+    if !app_root.is_absolute() || !data_root.is_absolute() {
+        return Err("Sylvia GM update folders must be absolute".to_string());
+    }
+    Ok(json!({
+        "live": app_root,
+        "data_root": data_root,
+        "version": env!("CARGO_PKG_VERSION"),
+        "target": format!("{}-{}", std::env::consts::OS, std::env::consts::ARCH),
+        "distribution": if portable { "portable" } else { "installed" },
+    }))
+}
+
+// Drop performs no blocking protocol call. Closing the last input drops its pipe;
+// the reply reader retains the exact child and Windows job through real collection.
+// Abnormal desktop termination closes that kill-on-close job, containing its tree.
 
 fn trusted_asset_url(url: &tauri::Url) -> bool {
     let host = url.host_str().unwrap_or_default();
@@ -350,6 +613,22 @@ fn trusted_caller(window: &WebviewWindow) -> Result<(), String> {
     if !trusted_asset_url(&url) {
         return Err("Sylvia GM command caller is not trusted".to_string());
     }
+    Ok(())
+}
+
+fn trusted_recovery_asset_url(url: &tauri::Url) -> bool {
+    if url.path() != "/update-recovery.html" { return false; }
+    let mut ordinary = url.clone();
+    ordinary.set_path("/app.html");
+    trusted_asset_url(&ordinary) // Same exact origin/port/query/fragment restrictions.
+}
+
+fn trusted_recovery_caller(window: &WebviewWindow) -> Result<(), String> {
+    if window.label() != "main" || !window.state::<OwnerBridge>().recovery_only {
+        return Err("Recovery is available only from the main recovery window".into());
+    }
+    let url = window.url().map_err(|_| "The recovery caller URL is unavailable")?;
+    if !trusted_recovery_asset_url(&url) { return Err("The recovery caller is not trusted".into()); }
     Ok(())
 }
 
@@ -418,6 +697,70 @@ mod trusted_caller_tests {
             })
         );
     }
+
+    #[test]
+    fn application_info_channel_handles_stable_prerelease_and_build_metadata() {
+        for (version, expected) in [
+            ("1.0.0", "stable"),
+            ("1.0.0+build-with-dashes", "stable"),
+            ("1.0.0-alpha.2", "alpha"),
+            ("1.0.0-beta.3+build", "beta"),
+        ] {
+            assert_eq!(super::build_release_channel(version), expected);
+        }
+    }
+
+    #[test]
+    fn update_launch_context_binds_native_copy_and_distribution_without_filesystem_writes() {
+        let application = std::env::temp_dir().join("sylvia-fixture/sylvia-gm.exe");
+        let database = std::env::temp_dir().join("sylvia-fixture/isolated-data/authority.sqlite3");
+        let context = super::desktop_update_launch_context(&application, &database, true).unwrap();
+        assert_eq!(context["live"], serde_json::json!(application.parent().unwrap()));
+        assert_eq!(context["data_root"], serde_json::json!(database.parent().unwrap()));
+        assert_eq!(context["version"], env!("CARGO_PKG_VERSION"));
+        assert_eq!(context["distribution"], "portable");
+        assert_eq!(context.as_object().unwrap().len(), 5);
+        assert!(super::desktop_update_launch_context(
+            std::path::Path::new("relative.exe"), &database, false,
+        ).is_err());
+    }
+
+    #[test]
+    fn update_recovery_asset_does_not_expand_the_ordinary_caller_guard() {
+        for origin in ["http://tauri.localhost", "tauri://localhost"] {
+            let recovery = tauri::Url::parse(&format!("{origin}/update-recovery.html")).unwrap();
+            assert!(super::trusted_recovery_asset_url(&recovery));
+            assert!(!super::trusted_asset_url(&recovery));
+            let ordinary = tauri::Url::parse(&format!("{origin}/app.html")).unwrap();
+            assert!(super::trusted_asset_url(&ordinary));
+            assert!(!super::trusted_recovery_asset_url(&ordinary));
+        }
+        for url in [
+            "https://example.com/update-recovery.html", "http://tauri.localhost:123/update-recovery.html",
+            "http://user@tauri.localhost/update-recovery.html", "tauri://localhost/update-recovery.html?x=1",
+            "tauri://localhost/update-recovery.html#command", "tauri://localhost/update-recovery.html/",
+        ] {
+            assert!(!super::trusted_recovery_asset_url(&tauri::Url::parse(url).unwrap()));
+        }
+    }
+
+    #[test]
+    fn update_start_arguments_bind_only_exact_bounded_normal_or_recovery_restarts() {
+        use std::ffi::OsString;
+        for flag in ["--sylvia-update-start", "--sylvia-update-recovery-start"] {
+            let args: Vec<OsString> = [flag.to_string(), "a".repeat(32), "b".repeat(32), "c".repeat(32)]
+                .into_iter().map(Into::into).collect();
+            let parsed = super::desktop_update_start_arguments(&args).unwrap().unwrap();
+            assert_eq!(parsed["nonce"], "c".repeat(32));
+            assert_eq!(parsed.get("recovery").is_some(), flag.ends_with("recovery-start"));
+            for bad in ["../other", "D", "", "c?command"] {
+                let mut invalid = args.clone();
+                invalid[3] = bad.into();
+                assert!(super::desktop_update_start_arguments(&invalid).is_err());
+            }
+            assert!(super::desktop_update_start_arguments(&args[..3]).is_err());
+        }
+    }
 }
 
 async fn owner_call_async(
@@ -441,11 +784,18 @@ async fn owner_request_async(
         .map_err(|_| "Sylvia GM authority worker could not complete".to_string())?
 }
 
+fn build_release_channel(version: &str) -> &str {
+    let precedence = version.split('+').next().unwrap_or(version);
+    precedence.split_once('-')
+        .and_then(|(_, prerelease)| prerelease.split('.').next())
+        .unwrap_or("stable")
+}
+
 fn application_info_projection() -> Value {
     json!({
         "product_name": "Sylvia GM",
         "version": env!("CARGO_PKG_VERSION"),
-        "release_channel": "alpha",
+        "release_channel": build_release_channel(env!("CARGO_PKG_VERSION")),
         "signing_status": "unsigned",
     })
 }
@@ -456,14 +806,319 @@ fn application_info(window: WebviewWindow) -> Result<Value, String> {
     Ok(application_info_projection())
 }
 
+// Only the native host supplies version, architecture and distribution. The renderer
+// can select an operation ID but cannot select an artifact, URL, key, path or command.
+async fn desktop_update_call(
+    window: WebviewWindow,
+    action: &'static str,
+    operation_id: Option<String>,
+) -> Result<Value, String> {
+    trusted_caller(&window)?;
+    if window.label() != "main" {
+        return Err("Application updates are available from the main Settings window".into());
+    }
+    let portable = window.state::<DesktopUpdateLaunch>().portable;
+    let mut params = json!({ "host": {
+        "version": env!("CARGO_PKG_VERSION"),
+        "target": format!("{}-{}", std::env::consts::OS, std::env::consts::ARCH),
+        "distribution": if portable { "portable" } else { "installed" },
+    }});
+    if let Some(identity) = operation_id {
+        params["operation_id"] = Value::String(identity);
+    }
+    owner_request_async(window, action, params).await
+}
+
+#[tauri::command]
+async fn desktop_update_state(window: WebviewWindow) -> Result<Value, String> {
+    desktop_update_call(window, "desktop_update_state", None).await
+}
+
+#[tauri::command]
+async fn desktop_update_check(window: WebviewWindow) -> Result<Value, String> {
+    desktop_update_call(window, "desktop_update_check", None).await
+}
+
+#[tauri::command]
+async fn desktop_update_download(window: WebviewWindow, operation_id: String) -> Result<Value, String> {
+    desktop_update_call(window, "desktop_update_download", Some(operation_id)).await
+}
+
+#[tauri::command]
+async fn desktop_update_cancel(window: WebviewWindow, operation_id: String) -> Result<Value, String> {
+    desktop_update_call(window, "desktop_update_cancel", Some(operation_id)).await
+}
+
+#[tauri::command]
+async fn desktop_update_defer(window: WebviewWindow, operation_id: String) -> Result<Value, String> {
+    desktop_update_call(window, "desktop_update_defer", Some(operation_id)).await
+}
+
+#[tauri::command]
+fn desktop_update_startup_state(window: WebviewWindow) -> Result<Value, String> {
+    trusted_caller(&window)?;
+    if window.label() != "main" {
+        return Err("Only the main window confirms application startup".into());
+    }
+    let launch = window.state::<DesktopUpdateLaunch>();
+    Ok(json!({"pending": launch.startup.is_some(),
+              "operation_id": launch.startup.as_ref().and_then(|start| start.get("operation_id"))}))
+}
+
+#[tauri::command]
+async fn desktop_update_confirm_startup(window: WebviewWindow) -> Result<Value, String> {
+    trusted_caller(&window)?;
+    if window.label() != "main" {
+        return Err("Only the main window confirms application startup".into());
+    }
+    if window.state::<DesktopUpdateLaunch>().startup.is_none() {
+        return Ok(json!({"status": "ordinary_startup"}));
+    }
+    desktop_update_call(window, "desktop_update_confirm_startup", None).await
+}
+
+fn desktop_update_host(portable: bool) -> Value {
+    json!({"version": env!("CARGO_PKG_VERSION"),
+           "target": format!("{}-{}", std::env::consts::OS, std::env::consts::ARCH),
+           "distribution": if portable { "portable" } else { "installed" }})
+}
+
+fn install_desktop_update(app: &tauri::AppHandle, identity: &str) -> Result<Value, String> {
+    if !desktop_update::valid_id(identity) { return Err("Invalid update operation".into()); }
+    let launch = app.state::<DesktopUpdateLaunch>();
+    let bridge = app.state::<OwnerBridge>();
+    let host = desktop_update_host(launch.portable);
+    let state = bridge.request("desktop_update_state", json!({"host": host}))?;
+    // This remains false until the complete installed/portable lifecycle is qualified.
+    // A renderer cannot enable apply by invoking the native command directly.
+    if state.get("can_apply") != Some(&Value::Bool(true))
+        || state.get("operation_id").and_then(Value::as_str) != Some(identity)
+    {
+        return Err("Application update installation is unavailable in this build".into());
+    }
+    if launch.applying.compare_exchange(false, true, Ordering::AcqRel, Ordering::Acquire).is_err() {
+        return Err("Another update restart is already preparing".into());
+    }
+    let mut reserved = false;
+    let result = (|| {
+        bridge.request("desktop_update_reserve", json!({"operation_id": identity}))?;
+        reserved = true;
+        app.state::<dictation::Dictation>().park_for_update()?;
+        bridge.request("desktop_update_prepare", json!({"host": host, "operation_id": identity}))?;
+        loop {
+            let status = bridge.request("desktop_update_state", json!({"host": host}))?;
+            if status.get("operation_id").and_then(Value::as_str) != Some(identity) {
+                return Err("The update selection changed during preparation".into());
+            }
+            if status.get("busy") != Some(&Value::Bool(true)) {
+                if status.get("phase").and_then(Value::as_str) != Some("prepared") {
+                    return Err("Update preparation failed; the current application is retained".into());
+                }
+                break;
+            }
+            std::thread::sleep(Duration::from_millis(50));
+        }
+        let metadata = bridge.request("desktop_update_handoff", json!({"host": host, "operation_id": identity}))?;
+        let spec = desktop_update::HelperSpec::from_prepared(&launch.data, &launch.live, launch.portable, &metadata)?;
+        if spec.operation != identity { return Err("The prepared update operation changed".into()); }
+        let helper = {
+            let owner = bridge.child.lock().map_err(|_| "The owned authority handle is unavailable")?;
+            desktop_update::Handoff::spawn(spec, &owner)?
+        };
+        // The helper is ready but cannot apply until this explicit commit. A rejected
+        // shutdown closes its input by Drop, leaving application files untouched.
+        bridge.shutdown_for_update(identity)?;
+        let _committed_helper = helper.commit()?;
+        app.exit(0); // All webviews belong to this desktop; the helper waits for its exact handle.
+        Ok(json!({"status": "closing"}))
+    })();
+    if result.is_err() {
+        launch.applying.store(false, Ordering::Release);
+        if bridge.closed.load(Ordering::Acquire) {
+            // Lost pipe contact is not proof of a clean process exit. Keep editing
+            // frozen; the helper's retained handles still govern any replacement.
+            return Ok(json!({"status": "owner_unavailable"}));
+        }
+        if reserved {
+            let _ = bridge.request("desktop_update_abort", json!({"operation_id": identity}));
+        }
+        app.state::<dictation::Dictation>().resume_after_update_abort();
+    }
+    result
+}
+
+#[tauri::command]
+async fn desktop_update_install(window: WebviewWindow, operation_id: String) -> Result<Value, String> {
+    trusted_caller(&window)?;
+    if window.label() != "main" {
+        return Err("Application updates are available from the main Settings window".into());
+    }
+    let app = window.app_handle().clone();
+    tauri::async_runtime::spawn_blocking(move || install_desktop_update(&app, &operation_id))
+        .await.map_err(|_| "The native update worker could not complete".to_string())?
+}
+
+#[tauri::command]
+async fn desktop_update_recovery_state(window: WebviewWindow) -> Result<Value, String> {
+    trusted_recovery_caller(&window)?;
+    let host = desktop_update_host(window.state::<DesktopUpdateLaunch>().portable);
+    owner_request_async(window, "desktop_update_recovery_state", json!({"host": host})).await
+}
+
+fn recover_desktop_update(
+    app: &tauri::AppHandle, identity: &str, choice: &str, restart_nonce: Option<&str>,
+) -> Result<Value, String> {
+    if !desktop_update::valid_id(identity) || !["keep", "restore"].contains(&choice)
+        || restart_nonce.is_some_and(|nonce| !desktop_update::valid_id(nonce)) {
+        return Err("The recovery choice is invalid".into());
+    }
+    let bridge = app.state::<OwnerBridge>();
+    if !bridge.recovery_only { return Err("This window is not in update recovery".into()); }
+    let launch = app.state::<DesktopUpdateLaunch>();
+    let host = desktop_update_host(launch.portable);
+    let status = bridge.request("desktop_update_recovery_state", json!({"host": host}))?;
+    if status.get("can_recover") != Some(&Value::Bool(true))
+        || status.get("operation_id").and_then(Value::as_str) != Some(identity)
+        || (choice == "keep" && status.get("can_keep_data") != Some(&Value::Bool(true)))
+        || status.get("restart_nonce").and_then(Value::as_str) != restart_nonce
+    {
+        return Err("Automatic recovery is unavailable for this selection".into());
+    }
+    if launch.applying.compare_exchange(false, true, Ordering::AcqRel, Ordering::Acquire).is_err() {
+        return Err("Another recovery is already preparing".into());
+    }
+    let result = (|| {
+        let metadata = bridge.request("desktop_update_recovery_handoff", json!({
+            "host": host, "operation_id": identity, "choice": choice, "restart_nonce": restart_nonce,
+        }))?;
+        let spec = desktop_update::HelperSpec::from_recovery(
+            &launch.data, &launch.live, launch.portable, &metadata,
+        )?;
+        if spec.operation != identity { return Err("The recovery selection changed".into()); }
+        let helper = {
+            let owner = bridge.child.lock().map_err(|_| "The owned recovery handle is unavailable")?;
+            desktop_update::Handoff::spawn_recovery(spec, &owner, choice)?
+        };
+        bridge.shutdown_for_recovery()?;
+        let _committed_helper = helper.commit()?;
+        app.exit(0);
+        Ok(json!({"status": "closing"}))
+    })();
+    if result.is_err() {
+        launch.applying.store(false, Ordering::Release);
+        if bridge.closed.load(Ordering::Acquire) { return Ok(json!({"status": "owner_unavailable"})); }
+    }
+    result
+}
+
+#[tauri::command]
+async fn desktop_update_recover(
+    window: WebviewWindow, operation_id: String, choice: String, restart_nonce: Option<String>,
+) -> Result<Value, String> {
+    trusted_recovery_caller(&window)?;
+    let app = window.app_handle().clone();
+    tauri::async_runtime::spawn_blocking(move || recover_desktop_update(
+        &app, &operation_id, &choice, restart_nonce.as_deref(),
+    ))
+        .await.map_err(|_| "The native recovery worker could not complete".to_string())?
+}
+
+// Only the main composer persists drafts. Detached panel windows cannot replace its snapshot.
+async fn desktop_drafts_call(window: WebviewWindow, method: &'static str, params: Value) -> Result<Value, String> {
+    trusted_caller(&window)?;
+    if window.label() != "main" {
+        return Err("Unsent drafts belong to the main window".into());
+    }
+    owner_request_async(window, method, params).await
+}
+
+#[tauri::command]
+async fn load_desktop_drafts(window: WebviewWindow) -> Result<Value, String> {
+    desktop_drafts_call(window, "load_desktop_drafts", json!({})).await
+}
+
+#[tauri::command]
+async fn save_desktop_drafts(window: WebviewWindow, drafts: Value) -> Result<Value, String> {
+    desktop_drafts_call(window, "save_desktop_drafts", json!({"drafts": drafts})).await
+}
+
+#[tauri::command]
+async fn dictation_capabilities(window: WebviewWindow, id: Option<String>) -> Result<Value, String> {
+    trusted_caller(&window)?;
+    let app = window.app_handle().clone();
+    tauri::async_runtime::spawn_blocking(move || app.state::<dictation::Dictation>().capabilities_for(id.as_deref()))
+        .await
+        .map_err(|_| "unavailable".to_string())?
+}
+
+#[tauri::command]
+async fn dictation_start(window: WebviewWindow, id: String, engine: String, device: Option<String>) -> Result<(), String> {
+    trusted_caller(&window)?;
+    let app = window.app_handle().clone();
+    tauri::async_runtime::spawn_blocking(move || {
+        app.state::<dictation::Dictation>().start(&id, &engine, device.as_deref().unwrap_or("default"))
+    })
+    .await
+    .map_err(|_| "unavailable".to_string())?
+}
+
+#[tauri::command]
+async fn dictation_prepare(window: WebviewWindow, id: String) -> Result<Value, String> {
+    trusted_caller(&window)?;
+    let app = window.app_handle().clone();
+    tauri::async_runtime::spawn_blocking(move || app.state::<dictation::Dictation>().prepare(&id))
+        .await.map_err(|_| "download".to_string())?
+}
+
+#[tauri::command]
+async fn dictation_stop(window: WebviewWindow, id: String) -> Result<String, String> {
+    trusted_caller(&window)?;
+    let app = window.app_handle().clone();
+    tauri::async_runtime::spawn_blocking(move || app.state::<dictation::Dictation>().stop(&id))
+        .await
+        .map_err(|_| "provider".to_string())?
+}
+
+#[tauri::command]
+async fn dictation_cancel(window: WebviewWindow, id: String) -> Result<(), String> {
+    trusted_caller(&window)?;
+    let app = window.app_handle().clone();
+    tauri::async_runtime::spawn_blocking(move || app.state::<dictation::Dictation>().cancel(&id))
+        .await
+        .map_err(|_| "provider".to_string())
+}
+
 #[tauri::command]
 async fn campaign_index(window: WebviewWindow) -> Result<Value, String> {
     owner_call_async(window.clone(), "campaign_index", json!({})).await
 }
 
 #[tauri::command]
-async fn campaign_creation_catalog(window: WebviewWindow) -> Result<Value, String> {
-    owner_call_async(window.clone(), "campaign_creation_catalog", json!({})).await
+async fn campaign_creation_catalog(
+    window: WebviewWindow,
+    include_participants: Option<bool>,
+) -> Result<Value, String> {
+    owner_call_async(
+        window.clone(),
+        "campaign_creation_catalog",
+        json!({ "include_participants": include_participants.unwrap_or(true) }),
+    )
+    .await
+}
+
+#[tauri::command]
+async fn campaign_sequel_context(window: WebviewWindow, request: Value) -> Result<Value, String> {
+    owner_call_async(window, "campaign_sequel_context", request).await
+}
+
+#[tauri::command]
+async fn preview_campaign_sequel(window: WebviewWindow, request: Value) -> Result<Value, String> {
+    owner_call_async(window, "preview_campaign_sequel", request).await
+}
+
+#[tauri::command]
+async fn append_campaign_sequel(window: WebviewWindow, request: Value) -> Result<Value, String> {
+    owner_call_async(window, "append_campaign_sequel", request).await
 }
 
 #[tauri::command]
@@ -900,6 +1555,53 @@ async fn package_candidates(window: WebviewWindow) -> Result<Value, String> {
 }
 
 #[tauri::command]
+async fn campaign_rules_update_options(
+    window: WebviewWindow,
+    campaign_id: String,
+) -> Result<Value, String> {
+    owner_call_async(
+        window,
+        "campaign_rules_update_options",
+        json!({"campaign_id": campaign_id}),
+    )
+    .await
+}
+
+#[tauri::command]
+async fn preview_campaign_rules_update(
+    window: WebviewWindow,
+    campaign_id: String,
+    candidate_id: String,
+) -> Result<Value, String> {
+    owner_call_async(
+        window,
+        "preview_campaign_rules_update",
+        json!({"campaign_id": campaign_id, "candidate_id": candidate_id}),
+    )
+    .await
+}
+
+#[tauri::command]
+async fn adopt_campaign_rules_update(
+    window: WebviewWindow,
+    campaign_id: String,
+    candidate_id: String,
+    activation_id: String,
+    expected_revision: u64,
+    expected_lock_id: String,
+    confirmation: String,
+) -> Result<Value, String> {
+    owner_call_async(
+        window,
+        "adopt_campaign_rules_update",
+        json!({"campaign_id": campaign_id, "candidate_id": candidate_id,
+            "activation_id": activation_id, "expected_revision": expected_revision,
+            "expected_lock_id": expected_lock_id, "confirmation": confirmation}),
+    )
+    .await
+}
+
+#[tauri::command]
 async fn inspect_package_candidate(
     window: WebviewWindow,
     candidate_id: String,
@@ -963,6 +1665,7 @@ async fn submit_session_input(
     automatic_response: Option<bool>,
     redirect_interruption_id: Option<String>,
     campaign_ending_choice: Option<Value>,
+    builder_question_answers: Option<Value>,
 ) -> Result<Value, String> {
     owner_call_async(
         window,
@@ -980,6 +1683,7 @@ async fn submit_session_input(
             "automatic_response": automatic_response.unwrap_or(false),
             "redirect_interruption_id": redirect_interruption_id,
             "campaign_ending_choice": campaign_ending_choice,
+            "builder_question_answers": builder_question_answers,
         }),
     )
     .await
@@ -1817,6 +2521,8 @@ async fn start_guided_creation_subflow(
     trigger_message_id: Option<String>,
     character_profile_id: Option<String>,
     character_profile_sha256: Option<String>,
+    character_artifact_id: Option<String>,
+    character_artifact_sha256: Option<String>,
 ) -> Result<Value, String> {
     owner_call_async(
         window.clone(),
@@ -1831,6 +2537,8 @@ async fn start_guided_creation_subflow(
             "trigger_message_id": trigger_message_id,
             "character_profile_id": character_profile_id,
             "character_profile_sha256": character_profile_sha256,
+            "character_artifact_id": character_artifact_id,
+            "character_artifact_sha256": character_artifact_sha256,
         }),
     )
     .await
@@ -1951,6 +2659,21 @@ async fn start_rift_campaign(
         }),
     )
     .await
+}
+
+#[tauri::command]
+async fn ready_campaign_catalog(window: WebviewWindow) -> Result<Value, String> {
+    owner_call_async(window, "ready_campaign_catalog", json!({})).await
+}
+
+#[tauri::command]
+async fn start_ready_campaign(window: WebviewWindow, command: Value) -> Result<Value, String> {
+    owner_call_async(window, "start_ready_campaign", command).await
+}
+
+#[tauri::command]
+async fn customize_ready_campaign(window: WebviewWindow, command: Value) -> Result<Value, String> {
+    owner_call_async(window, "customize_ready_campaign", command).await
 }
 
 #[tauri::command]
@@ -2437,6 +3160,78 @@ async fn recover_campaign_file(
 }
 
 #[tauri::command]
+async fn record_local_fault(
+    window: WebviewWindow,
+    category: String,
+    delta: u32,
+) -> Result<Value, String> {
+    trusted_caller(&window)?;
+    owner_call_async(
+        window,
+        "record_local_fault",
+        json!({"category": category, "delta": delta}),
+    )
+    .await
+}
+
+#[tauri::command]
+async fn preview_local_report(
+    window: WebviewWindow,
+    kind: String,
+    reproduction: String,
+    feedback: String,
+) -> Result<Value, String> {
+    trusted_caller(&window)?;
+    owner_call_async(
+        window,
+        "preview_local_report",
+        json!({
+            "kind": kind, "reproduction": reproduction, "feedback": feedback,
+        }),
+    )
+    .await
+}
+
+#[tauri::command]
+async fn cancel_local_report(window: WebviewWindow, preview_id: String) -> Result<Value, String> {
+    trusted_caller(&window)?;
+    owner_call_async(
+        window,
+        "cancel_local_report",
+        json!({"preview_id": preview_id}),
+    )
+    .await
+}
+
+#[tauri::command]
+async fn save_local_report(window: WebviewWindow, preview_id: String) -> Result<Value, String> {
+    trusted_caller(&window)?;
+    let Some(destination) = rfd::AsyncFileDialog::new()
+        .set_parent(&window)
+        .add_filter("Sylvia local report JSON", &["json"])
+        .set_file_name("sylvia-local-report.json")
+        .save_file()
+        .await
+    else {
+        owner_call_async(
+            window,
+            "cancel_local_report",
+            json!({"preview_id": preview_id}),
+        )
+        .await?;
+        return Ok(json!({"status": "cancelled"}));
+    };
+    owner_call_async(
+        window,
+        "save_local_report",
+        json!({
+            "preview_id": preview_id, "destination_path": destination.path().to_string_lossy(),
+        }),
+    )
+    .await
+}
+
+#[tauri::command]
 async fn export_admin_audit_file(window: WebviewWindow) -> Result<Value, String> {
     trusted_caller(&window)?;
     // Audit has a passive spoilers notice; only the ordinary save chooser is needed here.
@@ -2513,28 +3308,111 @@ pub fn run() {
             .map_err(std::io::Error::other)?;
             if let Some(parent) = database.parent() {
                 std::fs::create_dir_all(parent)?;
+                app.manage(dictation::Dictation::new(parent.join("dictation-models/base-ebe41f70")));
             }
-            let bridge = OwnerBridge::spawn_default(&database).map_err(|error| {
+            let startup = desktop_update_start_arguments(&std::env::args_os().skip(1).collect::<Vec<_>>())
+                .map_err(std::io::Error::other)?;
+            let bridge = OwnerBridge::spawn_default(&database, portable.is_some(), startup.clone()).map_err(|error| {
+                let interrupted = startup.is_some() || database.parent().map(|root| {
+                    root.join(".application-updates/current.json").is_file()
+                }).unwrap_or(false);
+                let description = if interrupted {
+                    "Sylvia could not start the update recovery component. Keep saved data and retained update files intact. Repair with the same or a newer compatible official Sylvia version. For an installed copy, use its ordinary installer. For a portable copy, replace only application files and keep isolated-data in place. Do not open an older app against migrated data; use checkpoint recovery after repairing the application."
+                } else {
+                    "Sylvia cannot open the selected data folder. Close any other Sylvia copy using that same folder, then try again. A different installed or portable copy keeps its own data."
+                };
                 rfd::MessageDialog::new()
-                    .set_title("Sylvia GM - selected data unavailable")
-                    .set_description("Sylvia cannot open the selected data folder. Close any other Sylvia copy using that same folder, then try again. A different installed or portable copy keeps its own data.")
+                    .set_title(if interrupted { "Sylvia GM - update repair required" } else { "Sylvia GM - selected data unavailable" })
+                    .set_description(description)
                     .set_level(rfd::MessageLevel::Error)
                     .show();
                 std::io::Error::other(error)
             })?;
+            let recovery_only = bridge.recovery_only;
             app.manage(bridge);
-            let main = WebviewWindowBuilder::new(app, "main", WebviewUrl::App("app.html".into()))
+            // Retain the distribution that selected this launch's data root.
+            let application = std::env::current_exe()?;
+            app.manage(DesktopUpdateLaunch {
+                portable: portable.is_some(), startup,
+                data: database.parent().ok_or_else(|| std::io::Error::other("Data root unavailable"))?.into(),
+                live: application.parent().ok_or_else(|| std::io::Error::other("Application root unavailable"))?.into(),
+                applying: AtomicBool::new(false),
+            });
+            let main = WebviewWindowBuilder::new(app, "main", WebviewUrl::App(
+                if recovery_only { "update-recovery.html" } else { "app.html" }.into(),
+            ))
                 .title("Sylvia GM")
                 .inner_size(1400.0, 900.0)
                 .min_inner_size(960.0, 640.0)
                 .disable_drag_drop_handler()
                 .build()?;
+            let exit_notice = app.state::<OwnerBridge>().exit_notice.lock()
+                .map_err(|_| std::io::Error::other("Owner collection notice unavailable"))?
+                .take().ok_or_else(|| std::io::Error::other("Owner collection notice already taken"))?;
+            let close_requested = Arc::clone(&app.state::<OwnerBridge>().close_requested);
+            let exit_app = app.handle().clone();
+            std::thread::Builder::new().name("sylvia-gm-owner-close-observer".into())
+                .spawn(move || {
+                    if let Ok(result) = exit_notice.recv() {
+                        if close_requested.swap(false, Ordering::AcqRel) {
+                            if result == Ok(0) {
+                                if let Some(window) = exit_app.get_webview_window("main") { let _ = window.close(); }
+                            } else {
+                                rfd::MessageDialog::new().set_title("Sylvia GM - owner close failed")
+                                    .set_description("The owner did not close cleanly. Keep saved campaign data and application files intact; this was not a clean shutdown.")
+                                    .set_level(rfd::MessageLevel::Error).show();
+                                if exit_app.state::<OwnerBridge>().poll_owner_exit().ok().flatten().is_some() {
+                                    exit_app.exit(1);
+                                }
+                            }
+                        }
+                    }
+                })?;
             let panel_app = app.handle().clone();
             main.on_window_event(move |event| {
+                if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                    if panel_app.state::<DesktopUpdateLaunch>().applying.load(Ordering::Acquire) {
+                        api.prevent_close();
+                        let _ = panel_app.emit("desktop_update_close_blocked", json!({}));
+                        return;
+                    }
+                    panel_app.state::<dictation::Dictation>().close();
+                    let owner = panel_app.state::<OwnerBridge>();
+                    owner.close_requested.store(true, Ordering::Release);
+                    if let Err(error) = owner.shutdown() {
+                        match owner.poll_owner_exit() {
+                            Ok(Some(0)) => {}
+                            Ok(Some(_)) => {
+                                api.prevent_close();
+                                if owner.close_requested.swap(false, Ordering::AcqRel) {
+                                    rfd::MessageDialog::new().set_title("Sylvia GM - owner close failed")
+                                        .set_description(&error).set_level(rfd::MessageLevel::Error).show();
+                                    panel_app.exit(1);
+                                }
+                                return;
+                            }
+                            _ => {
+                                api.prevent_close();
+                                if error == OWNER_CLOSE_PENDING || error == OWNER_CLOSE_PIPE_CLOSED {
+                                    if let Some(window) = panel_app.get_webview_window("main") {
+                                        let _ = window.set_title("Sylvia GM - waiting for owner cleanup");
+                                    }
+                                } else {
+                                    if error != OWNER_CLOSE_NO_ACK { owner.close_requested.store(false, Ordering::Release); }
+                                    rfd::MessageDialog::new().set_title("Sylvia GM - close not completed")
+                                        .set_description(format!("{error}. Sylvia is staying open because the owner has not been collected. Keep saved campaign data and application files in place."))
+                                        .set_level(rfd::MessageLevel::Error).show();
+                                }
+                                return;
+                            }
+                        }
+                    }
+                }
                 if matches!(
                     event,
                     tauri::WindowEvent::Destroyed | tauri::WindowEvent::CloseRequested { .. }
                 ) {
+                    panel_app.state::<dictation::Dictation>().close();
                     panel_app
                         .state::<panel_drag::PanelDrags>()
                         .cancel_window("main");
@@ -2555,8 +3433,28 @@ pub fn run() {
             panel_drag::begin_panel_drag,
             panel_drag::finish_panel_drag,
             application_info,
+            desktop_update_state,
+            desktop_update_check,
+            desktop_update_download,
+            desktop_update_cancel,
+            desktop_update_defer,
+            desktop_update_startup_state,
+            desktop_update_confirm_startup,
+            desktop_update_recovery_state,
+            desktop_update_recover,
+            desktop_update_install,
+            load_desktop_drafts,
+            save_desktop_drafts,
+            dictation_capabilities,
+            dictation_prepare,
+            dictation_start,
+            dictation_stop,
+            dictation_cancel,
             campaign_index,
             campaign_creation_catalog,
+            campaign_sequel_context,
+            preview_campaign_sequel,
+            append_campaign_sequel,
             delete_reusable_library_entry,
             builder_chat_index,
             create_builder_chat,
@@ -2585,6 +3483,9 @@ pub fn run() {
             inspect_provider_thinking,
             steer_session,
             package_candidates,
+            campaign_rules_update_options,
+            preview_campaign_rules_update,
+            adopt_campaign_rules_update,
             inspect_package_candidate,
             package_candidate_text,
             compare_package_candidates,
@@ -2628,6 +3529,9 @@ pub fn run() {
             rift_template,
             campaign_party_options,
             start_rift_campaign,
+            ready_campaign_catalog,
+            start_ready_campaign,
+            customize_ready_campaign,
             start_guided_campaign,
             create_guided_campaign_draft,
             advance_guided_campaign_draft,
@@ -2656,14 +3560,47 @@ pub fn run() {
             recover_campaign,
             recover_campaign_file,
             export_admin_audit_file,
+            preview_local_report,
+            record_local_fault,
+            cancel_local_report,
+            save_local_report,
         ])
         .build(tauri::generate_context!())
         .expect("error while building Sylvia GM")
         .run(|app, event| {
-            // Tauri exits the process without dropping managed state. Wait for the owner
-            // here so it cannot retain database or executable handles after desktop exit.
+            // A failed or pending close retains the desktop and its positively owned job.
+            if let tauri::RunEvent::ExitRequested { api, code, .. } = &event {
+                let owner = app.state::<OwnerBridge>();
+                owner.close_requested.store(true, Ordering::Release);
+                let result = owner.shutdown();
+                let collected = owner.poll_owner_exit().ok().flatten();
+                if matches!(collected, Some(status) if status != 0) && *code != Some(1) {
+                    api.prevent_exit();
+                    owner.close_requested.store(false, Ordering::Release);
+                    rfd::MessageDialog::new().set_title("Sylvia GM - owner close failed")
+                        .set_description("The owner exited unsuccessfully. Saved campaign data and application files have been retained; this was not a clean shutdown.")
+                        .set_level(rfd::MessageLevel::Error).show();
+                    app.exit(1);
+                } else if collected.is_none() {
+                    api.prevent_exit();
+                    if let Err(error) = result {
+                        if error == OWNER_CLOSE_PENDING || error == OWNER_CLOSE_PIPE_CLOSED {
+                            if let Some(window) = app.get_webview_window("main") {
+                                let _ = window.set_title("Sylvia GM - waiting for owner cleanup");
+                            }
+                        } else {
+                            if error != OWNER_CLOSE_NO_ACK { owner.close_requested.store(false, Ordering::Release); }
+                            rfd::MessageDialog::new().set_title("Sylvia GM - exit not completed")
+                                .set_description(format!("{error}. Sylvia retains the owner and saved data; exit has been stopped."))
+                                .set_level(rfd::MessageLevel::Error).show();
+                        }
+                    }
+                }
+            }
             if matches!(event, tauri::RunEvent::Exit) {
-                let _ = app.state::<OwnerBridge>().shutdown();
+                app.state::<dictation::Dictation>().close();
+                let owner = app.state::<OwnerBridge>();
+                let _ = owner.poll_owner_exit();
             }
         });
 }

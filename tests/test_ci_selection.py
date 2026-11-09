@@ -21,6 +21,20 @@ def test_readme_does_not_replay_campaigns_or_compile_owner():
     assert plan["reasons"][0]["path"] == "README.md"
 
 
+@pytest.mark.parametrize("path", [
+    "branding/sprites/tutorial-poses.png",
+    "branding/sprites/provenance.json",
+    "scripts/extract_tutorial_sprites.py",
+])
+def test_tutorial_artwork_selects_its_packaging_and_ui_consumers(path):
+    plan = choose([path])
+    assert not plan["broad_fallback"]
+    assert not plan["native"]
+    assert plan["python"]["tutorial-assets"] == ["tests/test_tutorial_assets.py"]
+    assert "tests/frontend_tutorials.browser.cjs" in plan["ui"]
+    assert "campaign-play" not in plan["python"]
+
+
 @pytest.mark.parametrize(
     "path", ["rulesets/srd-lite/ATTRIBUTION.md", "campaign-settings/severed-lands/ATTRIBUTION.md"]
 )
@@ -48,6 +62,12 @@ def test_edited_campaign_test_helper_selects_all_plan_lifecycle_variants():
     assert "tests/test_migrated_plan_lifecycle.py" in selectors
     assert "tests/test_fc_party_combat.py" in selectors
     assert "tests/test_fc_campaign_progress.py" in selectors
+
+
+def test_authored_plan_checks_keep_srd_and_dedicated_riichi_coverage():
+    plan = choose(["campaign-plans/riichi-quick-test/plan.json"])
+    assert "tests/test_migrated_plan_lifecycle.py" in plan["python"]["campaign-play"]
+    assert "tests/test_riichi_quick_test_plan.py" in plan["python"]["campaign-play"]
 
 
 @pytest.mark.parametrize("module", ["bundled_packages", "bundled_campaign_plans"])
@@ -230,3 +250,82 @@ def test_workflow_separates_full_qualification_and_prevents_branch_push_duplicat
         if step.get("name") == "Retain compact synthetic diagnostics"
     )
     assert diagnostic["with"]["path"].endswith("/retained-diagnostics/")
+
+
+def test_rust_workflow_exports_validated_base_python_before_unchanged_cargo_tests():
+    import yaml
+
+    root = Path(__file__).resolve().parents[1]
+    workflow = yaml.load(
+        (root / ".github/workflows/supported-journeys.yml").read_text(), Loader=yaml.BaseLoader
+    )
+    steps = workflow["jobs"]["rust-tests"]["steps"]
+    cargo = next(
+        index
+        for index, step in enumerate(steps)
+        if step.get("run")
+        == "cargo test --locked --all-targets --manifest-path src-tauri/Cargo.toml"
+    )
+    setup = steps[cargo - 1]
+    run = setup["run"]
+    assert '"SYLVIA_GM_TEST_PYTHON=$basePython" >> $env:GITHUB_ENV' in run
+    assert setup["shell"] == "pwsh"
+    assert "uv run --no-sync --no-python-downloads python" in run
+    assert "--no-project" not in run and "--managed-python" not in run
+    assert "print(sys._base_executable)" in run
+    assert run.count("if ($LASTEXITCODE -ne 0) { throw ") == 2
+    assert "[string]::IsNullOrWhiteSpace($basePython)" in run
+    assert "Test-Path -LiteralPath $basePython -PathType Leaf" in run
+    assert "sys.version_info[:2] == (3, 11)" in run
+    assert "sys.prefix == sys.base_prefix" in run
+    assert "os.path.samefile(sys.executable, sys._base_executable)" in run
+    assert run.rstrip().endswith('"SYLVIA_GM_TEST_PYTHON=$basePython" >> $env:GITHUB_ENV')
+
+
+def test_rust_python_discovery_reuses_project_venv_without_a_managed_python_cache(tmp_path):
+    import os
+    import shlex
+    import subprocess
+    import sys
+    import venv
+
+    import yaml
+
+    root = Path(__file__).resolve().parents[1]
+    workflow = yaml.load(
+        (root / ".github/workflows/supported-journeys.yml").read_text(), Loader=yaml.BaseLoader
+    )
+    setup = next(
+        step
+        for step in workflow["jobs"]["rust-tests"]["steps"]
+        if step.get("name") == "Select base Python for Rust owner fixtures"
+    )
+    command = shlex.split(setup["run"].splitlines()[0].split(" = ", 1)[1])
+    (tmp_path / "pyproject.toml").write_text(
+        '[project]\nname = "hosted-toolcache-python"\nversion = "0.0.0"\n'
+        'requires-python = ">=3.11"\n'
+    )
+    # Model a hosted-toolcache interpreter outside uv's managed store.
+    venv.EnvBuilder(with_pip=False).create(tmp_path / ".venv")
+    env = dict(
+        os.environ,
+        UV_PYTHON_INSTALL_DIR=str(tmp_path / "empty-managed-python"),
+        UV_CACHE_DIR=str(tmp_path / "empty-uv-cache"),
+        UV_OFFLINE="1",
+    )
+    subprocess.run(
+        ["uv", "lock", "--offline", "--no-python-downloads"],
+        cwd=tmp_path,
+        env=env,
+        capture_output=True,
+        text=True,
+        check=True,
+        timeout=30,
+    )
+    lock = (tmp_path / "uv.lock").read_bytes()
+    result = subprocess.run(
+        command, cwd=tmp_path, env=env, capture_output=True, text=True, timeout=30
+    )
+    assert result.returncode == 0, result.stderr
+    assert Path(result.stdout.strip()).samefile(sys._base_executable)
+    assert (tmp_path / "uv.lock").read_bytes() == lock

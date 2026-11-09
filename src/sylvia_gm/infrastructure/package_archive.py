@@ -73,16 +73,15 @@ class AdmittedPackageArchive:
         self.manifests = manifests
         self.files = files
         self.package_lock = resolve_exact_closure(manifests)
+        # The spool is already admitted and privately owned. Share its read-only
+        # ZIP directory instead of reparsing every member for every streamed file.
+        self._archive = zipfile.ZipFile(spool, "r")
         self._closed = False
 
     def iter_file_chunks(self, archive_file: ArchiveFile) -> Iterator[bytes]:
         if self._closed:
             raise RuntimeError("Admitted package archive is closed")
-        self._spool.seek(0)
-        with (
-            zipfile.ZipFile(self._spool, "r") as archive,
-            archive.open(archive_file.member_name, "r") as member,
-        ):
+        with self._archive.open(archive_file.member_name, "r") as member:
             while True:
                 chunk = member.read(PACKAGE_CHUNK_LIMIT)
                 if not chunk:
@@ -93,7 +92,10 @@ class AdmittedPackageArchive:
         if self._closed:
             return
         self._closed = True
-        self._spool.close()
+        try:
+            self._archive.close()
+        finally:
+            self._spool.close()
 
     def __enter__(self) -> AdmittedPackageArchive:
         return self

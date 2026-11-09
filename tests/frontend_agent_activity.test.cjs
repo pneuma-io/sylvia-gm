@@ -4,10 +4,10 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const path = require('node:path');
 
-function group(messages, cards, context, role) {
+function group(messages, cards, context, role, live = null) {
   const sandbox = { window: {}, document: { addEventListener() {} } };
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../src-tauri/frontend/app.js'), 'utf8'), sandbox);
-  return sandbox.window.SylviaGMFrontend.groupedAgentActivity(messages, cards, context, role).join('');
+  return sandbox.window.SylviaGMFrontend.groupedAgentActivity(messages, cards, context, role, live).join('');
 }
 
 test('GM activity labels identify current provider aliases for reads and campaign writes', () => {
@@ -179,6 +179,16 @@ test('actual Builder reference tools remain inside the collapsed activity group'
   assert(!html.includes('RAW '));
   assert.equal((html.match(/class="agent-operation"/g) || []).length, 3);
   assert(!html.includes('<details open'));
+});
+
+test('working Builder summary shows the last completed stage without opening private thinking',()=>{
+  const messages=[{message_id:'input',kind:'user',content:{}},
+    {message_id:'read',kind:'evidence',content:{tool_name:'inspect_builder_references',result:{success:true},
+      activity:{attempt_id:'a',basis_message_id:'input',source_order:1}}}];
+  const html=group(messages,['USER','PRIVATE SOURCE'],{},'builder',{attemptId:'a',phase:'working'});
+  assert.match(html,/<summary>Builder activity[^]*Last: Reviewed references[^]*<\/summary>/);
+  assert.doesNotMatch(html,/PRIVATE SOURCE|<details open/);
+  assert.doesNotMatch(group(messages,['USER','PRIVATE SOURCE'],{},'builder'),/Last:/);
 });
 
 test('failed reference copies and meaningful result cards remain visible', () => {

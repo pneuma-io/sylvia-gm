@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from sylvia_gm.provider._base import ModelInfo, ProviderResponse, TokenUsage
+from sylvia_gm.provider._base import ModelInfo, ProviderResponse
 
 
 @dataclass
@@ -24,8 +24,10 @@ class ModelUsageSnapshot:
     total_tokens: int = 0
     request_count: int = 0
     estimated_cost_usd: float = 0.0
-    cache_read_tokens: int = 0
-    cache_write_tokens: int = 0
+    cache_read_tokens: int | None = None
+    cache_write_tokens: int | None = None
+    cache_read_requests: int = 0
+    cache_write_requests: int = 0
 
 
 @dataclass
@@ -37,8 +39,10 @@ class SessionUsageSnapshot:
     total_tokens: int = 0
     request_count: int = 0
     estimated_cost_usd: float = 0.0
-    cache_read_tokens: int = 0
-    cache_write_tokens: int = 0
+    cache_read_tokens: int | None = None
+    cache_write_tokens: int | None = None
+    cache_read_requests: int = 0
+    cache_write_requests: int = 0
     by_model: dict[str, ModelUsageSnapshot] = field(default_factory=dict)
 
 
@@ -59,8 +63,10 @@ class SessionUsageTracker:
         self.total_tokens: int = 0
         self.request_count: int = 0
         self.estimated_cost_usd: float = 0.0
-        self.cache_read_tokens: int = 0
-        self.cache_write_tokens: int = 0
+        self.cache_read_tokens: int | None = None
+        self.cache_write_tokens: int | None = None
+        self.cache_read_requests = 0
+        self.cache_write_requests = 0
         self._by_model: dict[str, ModelUsageSnapshot] = {}
 
     def record(
@@ -87,8 +93,12 @@ class SessionUsageTracker:
         # Cache stats
         cu = response.cache_usage
         if cu:
-            self.cache_read_tokens += cu.cache_read_tokens
-            self.cache_write_tokens += cu.cache_write_tokens
+            if cu.cache_read_tokens is not None:
+                self.cache_read_tokens = (self.cache_read_tokens or 0) + cu.cache_read_tokens
+                self.cache_read_requests += 1
+            if cu.cache_write_tokens is not None:
+                self.cache_write_tokens = (self.cache_write_tokens or 0) + cu.cache_write_tokens
+                self.cache_write_requests += 1
 
         # Cost estimation (blended rate)
         cost_per_1k = model_info.cost_per_1k_tokens if model_info else 0.0
@@ -106,8 +116,12 @@ class SessionUsageTracker:
         ms.request_count += 1
         ms.estimated_cost_usd += cost
         if cu:
-            ms.cache_read_tokens += cu.cache_read_tokens
-            ms.cache_write_tokens += cu.cache_write_tokens
+            if cu.cache_read_tokens is not None:
+                ms.cache_read_tokens = (ms.cache_read_tokens or 0) + cu.cache_read_tokens
+                ms.cache_read_requests += 1
+            if cu.cache_write_tokens is not None:
+                ms.cache_write_tokens = (ms.cache_write_tokens or 0) + cu.cache_write_tokens
+                ms.cache_write_requests += 1
 
     def reset(self) -> None:
         """Reset all accumulators to zero."""
@@ -116,8 +130,10 @@ class SessionUsageTracker:
         self.total_tokens = 0
         self.request_count = 0
         self.estimated_cost_usd = 0.0
-        self.cache_read_tokens = 0
-        self.cache_write_tokens = 0
+        self.cache_read_tokens = None
+        self.cache_write_tokens = None
+        self.cache_read_requests = 0
+        self.cache_write_requests = 0
         self._by_model.clear()
 
     def snapshot(self) -> SessionUsageSnapshot:
@@ -130,6 +146,8 @@ class SessionUsageTracker:
             estimated_cost_usd=self.estimated_cost_usd,
             cache_read_tokens=self.cache_read_tokens,
             cache_write_tokens=self.cache_write_tokens,
+            cache_read_requests=self.cache_read_requests,
+            cache_write_requests=self.cache_write_requests,
             by_model=dict(self._by_model),
         )
 

@@ -8,6 +8,9 @@ from collections import Counter
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
+from sylvia_gm.domain.errors import CommandRejected
+from sylvia_gm.domain.package_library import canonical_json_bytes
+
 _STOP_WORDS = frozenset(
     [
         "a",
@@ -108,6 +111,52 @@ class KnowledgeReference:
     result: Mapping[str, object]
     identity: str
     body: str
+
+
+def bounded_search_page(
+    metadata: Mapping[str, object],
+    matches: Sequence[dict[str, object]],
+    *,
+    offset: int,
+    limit: int,
+    maximum_bytes: int,
+) -> dict[str, object]:
+    """Page exact references without dropping a result that exceeds the remaining bytes."""
+    if not isinstance(offset, int) or isinstance(offset, bool) or not 0 <= offset <= len(matches):
+        raise CommandRejected(
+            "Campaign knowledge parameter 'offset' is outside the current results",
+            code="campaign_knowledge_offset_invalid",
+        )
+    selected: list[dict[str, object]] = []
+
+    def payload() -> dict[str, object]:
+        end = offset + len(selected)
+        return {
+            **metadata,
+            "offset": offset,
+            "limit": limit,
+            "matches": list(selected),
+            "truncated": end < len(matches),
+            "next_offset": end if end < len(matches) else None,
+        }
+
+    if len(canonical_json_bytes(payload())) > maximum_bytes:
+        raise CommandRejected(
+            "Campaign knowledge search metadata exceeds the reply byte bound",
+            code="campaign_knowledge_metadata_too_large",
+        )
+    for match in matches[offset : offset + limit]:
+        selected.append(match)
+        if len(canonical_json_bytes(payload())) <= maximum_bytes:
+            continue
+        selected.pop()
+        if not selected:
+            raise CommandRejected(
+                "An exact campaign knowledge reference exceeds the reply byte bound",
+                code="campaign_knowledge_result_too_large",
+            )
+        break
+    return payload()
 
 
 def rank_references(

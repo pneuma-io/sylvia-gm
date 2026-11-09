@@ -1,4 +1,4 @@
-// Exercise the real layout host across main and two panel renderers with a local event transport.
+// Exercise the selected inline-only host. Old window layouts are migration fixtures, never live windows.
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -72,7 +72,7 @@ function renderer(bus, id, state, storage, context, options = {}) {
         remove() { this.removed = true; } }) },
     localStorage: { getItem: (key) => storage.get(key) || null,
       setItem: (key, value) => storage.set(key, value) },
-    crypto: webcrypto, Date: { now: () => clock.now },
+    crypto: webcrypto, CSS: {escape: value => String(value)}, Date: { now: () => clock.now },
     setTimeout: options.setTimeout || setTimeout, clearTimeout: options.clearTimeout || clearTimeout,
   };
   for (const name of ['panel-workspace.js', 'shot-playback.js', 'panel-host.js']) {
@@ -122,6 +122,28 @@ function state() {
     ] } };
 }
 
+
+test('keyboard tabs restore focus after synchronous main layout changes and cancel late focus after leaving', async () => {
+  const bus=transport(),s=state();
+  s.panelProjection.surfaces=[{id:'map',title:'Map',renderer:'tactical_grid',group:'scene'},
+    {id:'network',title:'Network',renderer:'network_graph',group:'scene'}];
+  const original=JSON.stringify(s.panelProjection),main=renderer(bus,'main',s,new Map());
+  await main.host.init();main.render();await flush();
+  const group=main.host.snapshot().sidebar.id,handlers=new Map();let focused=null;
+  const tabs=['map','network'].map(id=>({dataset:{workspacePanel:id,workspaceTab:group},
+    addEventListener:(name,handler)=>handlers.set(id+':'+name,handler),focus:()=>{focused=id;}}));
+  const parent={querySelectorAll:()=>tabs};tabs.forEach(tab=>{tab.parentElement=parent;});
+  const container={classList:{add(){},remove(){}},querySelectorAll:selector=>selector==='[data-workspace-tab]'?tabs:[],
+    querySelector:selector=>tabs.find(tab=>selector.includes(`data-workspace-panel="${tab.dataset.workspacePanel}"`))};
+  main.host.wire(container);
+  let prevented=false;handlers.get('map:keydown')({key:'ArrowRight',preventDefault:()=>{prevented=true;}});
+  await flush();assert.equal(prevented,true);assert.equal(focused,'network');
+  assert.equal(main.host.snapshot().sidebar.active,'network');
+  assert.equal(JSON.stringify(s.panelProjection),original);assert.deepEqual(main.dispatches,[]);assert.deepEqual(main.errors,[]);
+  focused=null;handlers.get('network:keydown')({key:'Home',preventDefault(){}});main.host.leave();await flush();
+  assert.equal(focused,null);assert.deepEqual(main.errors,[]);
+});
+
 function dragHarness(panelId, destination) {
   const listeners = new Map(), values = new Map();
   const classes = new Set();
@@ -169,96 +191,230 @@ function burstRecord(revision = 3) {
       color: '#FFFFFF', width: 2, travel_ms: 90, impact_ms: 100, fire_sound: null, cues: {},
     },
   }));
-  return { action_id: `child-shot-${revision}`, revision, shots, unavailable: false };
+  return { action_id: `inline-shot-${revision}`, revision, shots, unavailable: false };
 }
 
-test('the app theme setting updates an already-open child through the owner transport', async () => {
-  const bus = transport(), storage = new Map();
-  const main = renderer(bus, 'main', state(), storage, null, { frontendTheme: true });
-  await main.host.init(); main.render(); await flush();
-  main.host.changed({ type: 'move', panelId: 'party', destination: { windowId: 'new' } });
-  await flush();
-  const [windowId, context] = Array.from(bus.windows.entries())[0];
-  const child = renderer(bus, windowId, state(), storage, context);
-  await child.host.init(); await flush();
-  for (const theme of ['sylvia', 'sylvia-dark', 'slate']) {
-    main.setTheme(theme);
-    await flush();
-    assert.equal(main.bodyTheme(), theme);
-    assert.equal(child.bodyTheme(), theme, 'An open child must follow the app setting immediately');
-    assert.equal(child.state.selectedTheme, theme);
-  }
-  assert.deepEqual(main.dispatches, []);
-  assert.deepEqual(child.dispatches, []);
-  assert.deepEqual([...main.errors, ...child.errors].filter(Boolean), []);
-});
 
-test('saved extra windows restore during loading without old state, then receive current panels', async () => {
-  const bus = transport({ enforceRegisteredContext: true }), storage = new Map();
-  const main = renderer(bus, 'main', state(), storage);
-  await main.host.init(); main.render(); await flush();
-  main.host.changed({ type: 'move', panelId: 'map', destination: { windowId: 'new' } });
-  main.host.changed({ type: 'move', panelId: 'party', destination: { windowId: 'new' } });
-  await flush();
-  const saved = storage.get('sylvia-gm-panel-workspace-v1:campaign:td');
-  const ready = main.state.panelProjection;
-  main.host.leave(); await flush();
-  main.render(main.host.loading('td', 'gm'));
-  assert.equal(main.host.effectRevision(), null, 'opening must not request all old shot effects');
-  await flush();
-  assert.equal(bus.windows.size, 2);
-  assert.equal(storage.get('sylvia-gm-panel-workspace-v1:campaign:td'), saved);
-  const initial = bus.calls.filter((call) => call.command === 'publish_panel_workspace').at(-1).args;
-  assert.equal(initial.payload.projection.loading, 'loading');
-  assert.equal(initial.payload.projection.surfaces.some((surface) => surface.data), false);
-  assert.equal(initial.payload.effects.active.length, 0);
-  const windowId = bus.windows.keys().next().value;
-  const child = renderer(bus, windowId, state(), storage, bus.windows.get(windowId));
-  await child.host.init(); await main.host.publish();
-  assert.equal(child.state.activeSnapshot, null);
-  main.render({ ...ready, revision: 5, shot_effects: [burstRecord(4)] });
-  await flush();
-  assert.equal(child.state.activeSnapshot.revision, 5);
-  assert.equal(child.state.panelProjection.loading, undefined);
-  assert.equal(main.host.effects.snapshot().active.length, 0, 'old shots do not replay on opening');
-  assert.equal(bus.windows.get(windowId).generation, initial.context.generation);
-  assert.deepEqual(main.errors, []);
-  assert.deepEqual(child.errors.filter(Boolean), []);
-  main.host.leave(); await flush();
+
+const { createStore } = require('../src-tauri/frontend/panel-workspace.js');
+const copy = value => JSON.parse(JSON.stringify(value));
+const panels = tree => !tree ? [] : tree.kind === 'tabs' ? Array.from(tree.panels)
+  : [...panels(tree.first), ...panels(tree.second)];
+const groupOf = (tree, id) => !tree ? null : tree.kind === 'tabs'
+  ? tree.panels.includes(id) ? tree : null : groupOf(tree.first, id) || groupOf(tree.second, id);
+const stored = storage => JSON.parse(storage.get('sylvia-gm-panel-workspace-v1:campaign:td'));
+
+function assertInline(main, bus) {
+  const layout = main.host.snapshot();
+  assert.equal(layout.windows.length, 0);
   assert.equal(bus.windows.size, 0);
-});
+  assert.deepEqual([...panels(layout.sidebar), ...layout.hidden].sort(), Array.from(layout.known).sort(),
+    'every known panel occurs exactly once, visible or explicitly hidden');
+  assert.ok(bus.calls.filter(call => call.command === 'sync_panel_windows')
+    .every(call => call.args.windows.length === 0), 'no native window was opened, including during loading');
+  assert.deepEqual(main.dispatches, [], 'presentation must not issue a game mutation');
+}
 
-test('applying a saved Ruleset layout restores native window placement only on explicit reset', async () => {
+// The store retains the legacy data format; only the selected host policy returns windows inline.
+function seedLegacy(storage) {
+  const fixture = state();
+  const store = createStore({ getItem: key => storage.get(key), setItem: (key, value) => storage.set(key, value) });
+  store.select({ campaignId: 'td', rulesetId: 'td-rules', surfaces: fixture.panelProjection.surfaces });
+  store.change({ type: 'move', panelId: 'map', destination: { windowId: 'new',
+    placement: { x: -1200, y: 100, width: 650, height: 700 } } });
+  store.change({ type: 'move', panelId: 'party', destination: { windowId: 'new' } });
+  store.change({ type: 'hide', panelId: 'inventory' });
+  store.change({ type: 'inspection', value: { campaignId: 'td', rulesetId: 'td-rules', id: 'bravo',
+    unavailableId: null, expanded: ['alpha', 'bravo'] } });
+  store.saveView('map:floor', { zoom: 1.5, scrollLeft: 80, scrollTop: 40, coverInfo: true });
+  return store.snapshot();
+}
+
+test('saved legacy windows return inline before loading publishes and survive a cold reopen without data loss', async () => {
   const bus = transport(), storage = new Map();
+  const legacy = seedLegacy(storage);
   const main = renderer(bus, 'main', state(), storage);
   await main.host.init();
-  main.render();
-  main.host.changed({ type: 'move', panelId: 'map', destination: { windowId: 'new' } });
-  await flush();
-  const windowId = main.host.snapshot().windows[0].id;
-  const context = bus.windows.get(windowId);
-  const saved = { x: 1920, y: 120, width: 1200, height: 900 };
-  bus.emit('main', 'panel-window-placement', { context, window_id: windowId, placement: saved });
+  const loading = main.host.loading('td', 'gm');
+  main.render(loading); await flush();
+  assertInline(main, bus);
+  assert.deepEqual(Array.from(main.host.snapshot().hidden), ['inventory']);
+  main.render({ ...state().panelProjection, revision: 9 }); await flush();
+  await main.host.publish();
+  const migrated = copy(main.host.snapshot());
+  assertInline(main, bus);
+  assert.deepEqual(migrated.views, legacy.views);
+  assert.deepEqual(migrated.inspection, legacy.inspection);
+  assert.equal(main.state.characterInspection.id, 'bravo');
+  assert.equal(main.state.tacticalViews.map.zoom, 1.5);
+  assert.equal(main.host.effectRevision(), 9, 'history establishes a baseline without replay');
+  assert.equal(main.host.effects.snapshot().active.length, 0);
+  assert.deepEqual(stored(storage), migrated);
+  main.host.leave(); await flush();
+  const reopenedBus = transport(), reopened = renderer(reopenedBus, 'main', state(), storage);
+  await reopened.host.init(); reopened.render(); await flush();
+  assertInline(reopened, reopenedBus);
+  assert.deepEqual(copy(reopened.host.snapshot()), migrated);
+  reopened.host.leave();
+});
+
+test('independent inline viewer profiles keep inspection, arrangement and map views on reopen', async () => {
+  const projection = state().panelProjection, original = JSON.stringify(projection);
+  for (const [index, inspected] of ['alpha', 'bravo'].entries()) {
+    const bus = transport(), storage = new Map(), current = state();
+    current.panelProjection = projection;
+    const main = renderer(bus, 'main', current, storage);
+    await main.host.init(); main.render(); await flush();
+    main.state.characterInspection = { campaignId: 'td', rulesetId: 'td-rules', id: inspected,
+      unavailableId: null, expanded: [inspected] };
+    if (index === 0) main.host.changed({ type: 'hide', panelId: 'inventory' });
+    main.host.saveView(projection.surfaces[0], { zoom: 1.5 + index, scrollLeft: 80, scrollTop: 40 });
+    await main.host.publish();
+    const saved = copy(main.host.snapshot()); main.host.leave(); await flush();
+    const reopenedBus = transport(), reopened = renderer(reopenedBus, 'main', state(), storage);
+    await reopened.host.init(); reopened.render(); await flush();
+    assertInline(reopened, reopenedBus);
+    assert.deepEqual(copy(reopened.host.snapshot()), saved);
+    assert.equal(reopened.state.characterInspection.id, inspected);
+    assert.equal(reopened.host.snapshot().hidden.includes('inventory'), index === 0);
+    reopened.host.leave();
+  }
+  assert.equal(JSON.stringify(projection), original, 'viewers do not mutate their shared projection');
+});
+
+test('reveal restores hidden inline panels and selects background tabs in place, with durable focus', async () => {
+  const bus = transport(), storage = new Map(), main = renderer(bus, 'main', state(), storage);
+  await main.host.init(); main.render();
+  main.host.changed({ type: 'hide', panelId: 'inventory' });
+  assert.equal(main.host.snapshot().hidden.includes('inventory'), true);
+  main.host.reveal('inventory'); await flush();
+  assert.equal(main.host.snapshot().hidden.includes('inventory'), false);
+  assert.equal(groupOf(main.host.snapshot().sidebar, 'inventory').active, 'inventory');
+  main.host.changed({ type: 'move', panelId: 'inventory', destination: {
+    windowId: 'sidebar', targetPanelId: 'party', position: 'tab' } });
+  const group = groupOf(main.host.snapshot().sidebar, 'party');
+  main.host.changed({ type: 'tab', groupId: group.id, panelId: 'party' });
+  main.host.reveal('inventory'); await flush();
+  assert.equal(groupOf(main.host.snapshot().sidebar, 'inventory').active, 'inventory');
+  assert.equal(groupOf(stored(storage).sidebar, 'inventory').active, 'inventory');
+  const focuses = bus.calls.filter(call => call.command === 'focus_panel_window');
+  assert.equal(focuses.length, 2);
+  assert.ok(focuses.every(call => call.args.windowId === 'sidebar'));
+  assertInline(main, bus); assert.deepEqual(main.errors, []); main.host.leave();
+});
+
+test('inline tab grouping, edge splits, dimensions and hidden state persist through loading and reopen', async () => {
+  const bus = transport(), storage = new Map(), main = renderer(bus, 'main', state(), storage);
+  await main.host.init(); main.render();
+  main.host.changed({ type: 'move', panelId: 'inventory', destination: {
+    windowId: 'sidebar', targetPanelId: 'party', position: 'tab' } });
+  main.host.changed({ type: 'move', panelId: 'map', destination: {
+    windowId: 'sidebar', targetPanelId: 'party', position: 'right' } });
+  const split = main.host.snapshot().sidebar;
+  assert.equal(split.kind, 'split'); assert.equal(split.axis, 'row');
+  main.host.changed({ type: 'ratio', nodeId: split.id, ratio: .65 });
+  main.host.changed({ type: 'size', panelId: 'map', height: 620 });
+  main.host.changed({ type: 'hide', panelId: 'inventory' });
+  const saved = copy(main.host.snapshot());
+  assert.equal(saved.sidebar.ratio, .65); assert.equal(saved.panel_sizes.map, 620);
+  assertInline(main, bus); main.host.leave(); await flush();
+  const reopenedBus = transport(), reopened = renderer(reopenedBus, 'main', state(), storage);
+  await reopened.host.init(); reopened.render(reopened.host.loading('td', 'gm'));
+  reopened.render(state().panelProjection); await flush();
+  assert.deepEqual(copy(reopened.host.snapshot()), saved);
+  assertInline(reopened, reopenedBus); reopened.host.leave();
+});
+
+test('saved and original layout preferences stay inline and preserve viewer state', async () => {
+  const bus = transport(), storage = new Map(), main = renderer(bus, 'main', state(), storage);
+  await main.host.init(); main.render();
+  main.host.changed({ type: 'hide', panelId: 'inventory' });
   applyPreference(main.host, 'save');
-  await flush();
-  assert.equal(bus.calls.filter((call) => call.command === 'sync_panel_windows')
-    .some((call) => call.args.restoreLayout), false);
-
-  const moved = { x: 100, y: 200, width: 800, height: 600 };
-  bus.emit('main', 'panel-window-placement', { context, window_id: windowId, placement: moved });
-  main.render();
-  await flush();
-  assert.deepEqual({ ...main.host.snapshot().windows[0].placement }, moved);
-
+  main.host.changed({ type: 'show', panelId: 'inventory' });
+  main.host.saveView(main.state.panelProjection.surfaces[0], { zoom: 1.5, scrollLeft: 80, scrollTop: 40 });
+  const views = copy(main.host.snapshot().views);
   applyPreference(main.host, 'mine');
+  assert.equal(main.host.snapshot().hidden.includes('inventory'), true);
+  applyPreference(main.host, 'original'); await flush();
+  assert.equal(main.host.snapshot().hidden.includes('inventory'), false);
+  assert.deepEqual(copy(main.host.snapshot().views), views);
+  assertInline(main, bus); main.host.leave();
+});
+
+test('old window messages cannot mutate the inline workspace or dispatch an action after navigation', async () => {
+  const bus = transport(), main = renderer(bus, 'main', state(), new Map());
+  await main.host.init(); main.render(); await flush();
+  const previous = bus.calls.filter(call => call.command === 'publish_panel_workspace').at(-1).args;
+  main.host.leave(); main.state.activeSessionId = 'other-gm';
+  main.state.activeCampaignId = 'other';
+  main.render({ ...state().panelProjection, campaign_id: 'other' }); await flush();
+  const before = JSON.stringify(main.host.snapshot());
+  const current = bus.calls.filter(call => call.command === 'publish_panel_workspace').at(-1).args.context;
+  for (const context of [previous.context, current]) bus.emit('main', 'panel-window-message', {
+    context, window_id: 'retired-window', payload: { type: 'rpc', request_id: 'retired-action',
+      method: 'execute_panel_action', args: { panelId: 'map' } } });
+  bus.emit('main', 'panel-window-closed', { context: previous.context, window_id: 'retired-window' });
   await flush();
-  const restore = bus.calls.filter((call) => call.command === 'sync_panel_windows').at(-1);
-  assert.equal(restore.args.restoreLayout, true);
-  assert.deepEqual({ ...restore.args.windows[0].placement }, saved);
-  main.render();
-  await flush();
-  assert.equal(bus.calls.filter((call) => call.command === 'sync_panel_windows').at(-1)
-    .args.restoreLayout, false);
+  assert.equal(JSON.stringify(main.host.snapshot()), before);
+  assertInline(main, bus); main.host.leave();
+});
+
+test('dragging within the workspace reorders inline; an outside or cancelled release changes nothing', async () => {
+  const bus = transport(), main = renderer(bus, 'main', state(), new Map());
+  await main.host.init(); main.render();
+  const unmoved = panels(main.host.snapshot().sidebar).filter(id => id !== 'map');
+  const drag = dragHarness('map', 'sidebar'); main.host.wire(drag.container);
+  drag.drag(); drag.drop(); drag.end(); await flush();
+  assert.deepEqual(panels(main.host.snapshot().sidebar), [...unmoved, 'map']);
+  const before = JSON.stringify(main.host.snapshot());
+  for (const cancelled of [false, true]) {
+    const outside = dragHarness('party', 'new'); main.host.wire(outside.container);
+    outside.drag(); if (cancelled) outside.dataTransfer.dropEffect = 'none';
+    outside.end(); await flush();
+    assert.equal(JSON.stringify(main.host.snapshot()), before);
+    assert.equal(outside.classes.size, 0); assert.equal(main.previews.at(-1).removed, true);
+  }
+  assert.equal(bus.calls.some(call => ['begin_panel_drag', 'finish_panel_drag'].includes(call.command)), false);
+  assertInline(main, bus); main.host.leave();
+});
+
+test('inline shot playback starts after replacement paint without waiting for a detached renderer', async () => {
+  const frames = [], clock = { now: 1000 }, bus = transport();
+  const main = renderer(bus, 'main', state(), new Map(), null, {
+    clock, renderCost: 1800, requestAnimationFrame: callback => frames.push(callback) });
+  await main.host.init(); main.render();
+  while (frames.length) frames.shift()(); await flush();
+  const record = burstRecord();
+  record.shots.forEach(shot => { shot.delay_ms += 10000; });
+  main.render({ ...main.state.panelProjection, revision: 3, shot_effects: [record] });
+  assert.equal(main.host.effects.snapshot().active.length, 0, 'replacement has not painted');
+  while (frames.length) frames.shift()(); await flush();
+  assert.equal(main.host.effects.snapshot().active.length, 5);
+  assert.equal(main.host.effects.snapshot().active[0].start_ms, clock.now + 10000);
+  const start = main.host.effects.snapshot().active[0].start_ms;
+  main.host.changed({ type: 'move', panelId: 'party', destination: {
+    windowId: 'sidebar', targetPanelId: 'map', position: 'tab' } });
+  while (frames.length) frames.shift()(); await flush();
+  assert.equal(main.host.effects.snapshot().active[0].start_ms, start, 'arrangement cannot replay the effect');
+  await main.host.configureEffects({ visual: 'static', muted: true });
+  assert.equal(main.host.effects.preferences().muted, true);
+  await main.host.skipEffects(); assert.equal(main.host.effects.snapshot().active.length, 0);
+  assertInline(main, bus); main.host.leave();
+});
+
+test('historical and empty projections advance inline effects without replaying a backlog', async () => {
+  const bus = transport(), main = renderer(bus, 'main', state(), new Map());
+  await main.host.init();
+  main.render({ ...main.state.panelProjection, revision: 4, shot_effects: [burstRecord(3)] });
+  assert.equal(main.host.effectRevision(), 4); assert.equal(main.host.effects.snapshot().active.length, 0);
+  main.render({ ...main.state.panelProjection, revision: 5, shot_effects: [] });
+  assert.equal(main.host.effectRevision(), 5); assert.equal(main.host.effects.snapshot().active.length, 0);
+  main.render({ ...main.state.panelProjection, revision: 6, shot_effects: [burstRecord(6)] });
+  assert.equal(main.host.effects.snapshot().active.length, 5);
+  const start = main.host.effects.snapshot().active[0].start_ms;
+  main.render({ ...main.state.panelProjection, presentation_key: 'queue:changed' });
+  assert.equal(main.host.effects.snapshot().active[0].start_ms, start);
+  assertInline(main, bus); main.host.leave();
 });
 
 test('returning to a campaign waits for native context registration before publishing', async () => {
@@ -293,587 +449,19 @@ test('returning to a campaign waits for native context registration before publi
   assert.deepEqual(main.errors, []);
 });
 
-test('drop destinations detach a panel and return it to an empty sidebar', async () => {
-  const bus = transport({ dropPlacement: { x: 1700, y: 200, width: 500, height: 500 } }), storage = new Map();
-  const main = renderer(bus, 'main', state(), storage);
-  await main.host.init();
-  main.render();
-
-  const detach = dragHarness('map', 'new');
-  main.host.wire(detach.container);
-  detach.drag();
-  assert.equal(detach.classes.has('panel-workspace-dragging'), true);
-  detach.drop();
-  detach.end();
-  assert.equal(detach.classes.has('panel-workspace-dragging'), false);
-  await flush();
-  const panelWindow = main.host.snapshot().windows[0];
-  assert.ok(panelWindow);
-  assert.deepEqual(Array.from(panelWindow.tree.panels), ['map']);
-  main.host.changed({ type: 'move', panelId: 'party', destination: { windowId: panelWindow.id } });
-  main.host.changed({ type: 'move', panelId: 'inventory', destination: { windowId: panelWindow.id } });
-  assert.equal(main.host.snapshot().sidebar, null);
-  await flush();
-
-  const child = renderer(bus, panelWindow.id, state(), storage, bus.windows.get(panelWindow.id));
-  await child.host.init();
-  await flush();
-  const redock = dragHarness('map', 'sidebar');
-  child.host.wire(redock.container);
-  redock.drag();
-  redock.drop();
-  redock.end();
-  await flush();
-  assert.equal(main.host.snapshot().windows.length, 1);
-  const panels = (tree) => tree.kind === 'tabs' ? tree.panels : [...panels(tree.first), ...panels(tree.second)];
-  assert.deepEqual(Array.from(panels(main.host.snapshot().sidebar)), ['map']);
-  assert.deepEqual(Array.from(panels(main.host.snapshot().windows[0].tree)).sort(), ['inventory', 'party']);
-  assert.equal(bus.calls.filter((call) => call.command === 'finish_panel_drag')
-    .every((call) => call.args.cancelled), true);
-  assert.deepEqual(main.errors, []);
-});
-
-test('outside release detaches once with a panel preview, saved placement and no game action', async () => {
-  const placement = { x: -1300, y: 250, width: 600, height: 630 };
-  const bus = transport({ dropPlacement: placement }), storage = new Map();
-  const main = renderer(bus, 'main', state(), storage);
+test('phase one keeps default window panels inline and refuses new floating windows without game actions', async () => {
+  const bus = transport(), current = state();
+  current.panelProjection.surfaces[2].default_placement = 'window';
+  const main = renderer(bus, 'main', current, new Map());
   await main.host.init(); main.render(); await flush();
-  const drag = dragHarness('party', 'new');
-  main.host.wire(drag.container);
-  drag.drag(); await flush();
-  assert.match(drag.dataTransfer.image.element.innerHTML, /<article>Party<\/article>/);
-  assert.equal(drag.dataTransfer.image.x, 32);
-  drag.end(); drag.end(); await flush();
-  const layout = main.host.snapshot();
-  assert.equal(layout.windows.length, 1);
-  assert.deepEqual(Array.from(layout.windows[0].tree.panels), ['party']);
-  assert.deepEqual({ ...layout.windows[0].placement }, placement);
-  assert.equal(bus.calls.filter((call) => call.command === 'finish_panel_drag').length, 1);
-  assert.equal(drag.dataTransfer.image.element.removed, true);
+  assert.equal(main.host.snapshot().windows.length, 0, 'a window default is returned to the main workspace');
+  assert.equal(bus.windows.size, 0);
+  const before = JSON.stringify(main.host.snapshot());
+  await main.host.changed({ type: 'move', panelId: 'party', destination: { windowId: 'new' } });
+  await flush();
+  assert.equal(JSON.stringify(main.host.snapshot()), before);
+  assert.equal(bus.windows.size, 0);
+  assert.match(main.errors.at(-1), /keeps panels in the main workspace/);
   assert.deepEqual(main.dispatches, []);
-  assert.deepEqual(main.errors, []);
-  main.host.leave(); await flush();
-  main.render(); await flush();
-  assert.deepEqual({ ...main.host.snapshot().windows[0].placement }, placement);
-});
-
-test('an extra-window tab detaches through the main owner and failed creation redocks it', async () => {
-  let failWindow = false, keptWindow;
-  const bus = transport({ dropPlacement: { x: 1700, y: 200, width: 500, height: 500 },
-    failWindow: (window) => failWindow && window.id !== keptWindow }), storage = new Map();
-  const main = renderer(bus, 'main', state(), storage);
-  await main.host.init(); main.render();
-  main.host.changed({ type: 'move', panelId: 'map', destination: { windowId: 'new' } });
-  await flush();
-  const oldId = main.host.snapshot().windows[0].id;
-  const child = renderer(bus, oldId, state(), storage, bus.windows.get(oldId));
-  await child.host.init(); await flush();
-  const drag = dragHarness('map', 'new');
-  child.host.wire(drag.container);
-  drag.drag(); await flush(); drag.end(); await flush();
-  const newWindow = main.host.snapshot().windows[0];
-  assert.notEqual(newWindow.id, oldId);
-  assert.deepEqual({ ...newWindow.placement }, { x: 1700, y: 200, width: 500, height: 500 });
-  assert.equal(bus.windows.has(oldId), false);
-  assert.equal(bus.windows.size, 1);
-  assert.deepEqual(child.dispatches, []);
-
-  keptWindow = newWindow.id;
-  failWindow = true;
-  main.host.changed({ type: 'move', panelId: 'party', destination: { windowId: 'new' } });
-  await flush();
-  assert.equal(main.host.snapshot().windows.length, 1);
-  assert.equal(bus.windows.size, 1);
-  assert.equal(main.host.snapshot().windows[0].id, keptWindow);
-  assert.match(main.html(), /data-workspace-panel="party"/);
-  assert.match(main.errors.at(-1), /returned to the sidebar/);
-  assert.equal(JSON.parse(storage.get('sylvia-gm-panel-workspace-v1:campaign:td')).windows.length, 1);
-});
-
-test('cancelled or inside release preserves layout and an unavailable observer explains recovery', async () => {
-  for (const unavailable of [false, true]) {
-    const bus = transport({ beforeDrag: () => { if (unavailable) throw new Error('unavailable'); } });
-    const main = renderer(bus, 'main', state(), new Map());
-    await main.host.init(); main.render(); await flush();
-    const before = JSON.stringify(main.host.snapshot());
-    const drag = dragHarness('map', 'new');
-    main.host.wire(drag.container);
-    drag.drag(); await flush(); drag.end(); await flush();
-    assert.equal(JSON.stringify(main.host.snapshot()), before);
-    assert.equal(bus.windows.size, 0);
-    assert.equal(drag.classes.size, 0);
-    assert.equal(main.previews.at(-1).removed, true);
-    if (unavailable) assert.match(main.errors.at(-1), /Try again or use Arrange panels/);
-    else assert.deepEqual(main.errors, []);
-  }
-});
-
-test('leaving during observer startup cancels the old gesture after startup completes', async () => {
-  let ready;
-  const bus = transport({ beforeDrag: () => new Promise((resolve) => { ready = resolve; }),
-    dropPlacement: { x: 1700, y: 200, width: 500, height: 500 } });
-  const main = renderer(bus, 'main', state(), new Map());
-  await main.host.init(); main.render(); await flush();
-  const drag = dragHarness('map', 'new');
-  main.host.wire(drag.container);
-  drag.drag(); await flush();
-  main.host.leave();
-  main.state.activeCampaignId = 'another';
-  main.state.activeSessionId = 'another-gm';
-  main.render({ ...main.state.panelProjection, campaign_id: 'another' });
-  ready(); await flush();
-  assert.equal(bus.windows.size, 0);
-  assert.equal(main.host.snapshot().windows.length, 0);
-  assert.equal(bus.calls.find((call) => call.command === 'finish_panel_drag').args.cancelled, true);
-  assert.deepEqual(main.errors, []);
-});
-
-test('active shot timing survives window moves and settings share the main playback owner', async () => {
-  const bus = transport(), storage = new Map();
-  const main = renderer(bus, 'main', state(), storage);
-  await main.host.init();
-  main.render();
-  assert.equal(main.host.effectRevision(), 2);
-  const cue = { map_id: 'floor', origin: [1, 1, 1], destination: [4, 1, 1],
-    delay_ms: 1000, miss: true, contacts: [], style: {
-      color: '#FFFFFF', width: 2, travel_ms: 100, impact_ms: 100, fire_sound: null, cues: {},
-    } };
-  main.render({ ...main.state.panelProjection, revision: 3,
-    shot_effects: [{ action_id: 'shot', revision: 3, shots: [cue], unavailable: false }] });
-  const started = main.host.effects.snapshot().active[0].start_ms;
-  main.host.changed({ type: 'move', panelId: 'map', destination: { windowId: 'new' } });
-  await flush();
-  const window = main.host.snapshot().windows[0];
-  const child = renderer(bus, window.id, state(), storage, bus.windows.get(window.id));
-  await child.host.init();
-  await flush();
-  assert.equal(child.host.effects.snapshot().active[0].start_ms, started);
-  main.render();
-  await flush();
-  assert.equal(main.host.effects.snapshot().active.length, 1);
-  assert.equal(child.host.effects.snapshot().active[0].start_ms, started);
-  await child.host.configureEffects({ visual: 'static', muted: true });
-  await flush();
-  assert.equal(main.host.effects.preferences().visual, 'static');
-  assert.equal(child.host.effects.preferences().muted, true);
-  assert.equal(main.dispatches.length, 0);
-  await child.host.skipEffects();
-  await flush();
-  assert.equal(main.host.effects.snapshot().active.length, 0);
-  assert.equal(child.host.effects.snapshot().active.length, 0);
-  main.host.leave();
-  main.render();
-  await flush();
-  assert.equal(main.host.effects.snapshot().active.length, 0);
-  assert.equal(main.host.effectRevision(), 3);
-  assert.deepEqual(main.errors, []);
-  main.host.leave();
-});
-
-test('two windows share current selection and requests; navigation preserves their saved arrangement', async () => {
-  const bus = transport(), storage = new Map();
-  const main = renderer(bus, 'main', state(), storage);
-  await main.host.init();
-  main.render();
-  main.host.changed({ type: 'move', panelId: 'map', destination: { windowId: 'new' } });
-  main.host.changed({ type: 'move', panelId: 'party', destination: { windowId: 'new' } });
-  const [mapWindow, partyWindow] = main.host.snapshot().windows;
-  main.host.changed({ type: 'move', panelId: 'inventory', destination: { windowId: partyWindow.id } });
-  await flush();
-  assert.equal(bus.windows.size, 2);
-  const context = bus.windows.get(mapWindow.id);
-  const map = renderer(bus, mapWindow.id, state(), storage, context);
-  const party = renderer(bus, partyWindow.id, state(), storage, context);
-  await map.host.init();
-  await party.host.init();
-  await flush();
-  assert.match(map.html(), /<article>Map/);
-  assert.doesNotMatch(map.html(), /<article>Party/);
-  assert.match(party.html(), /<article>Party/);
-  assert.match(party.html(), /<article>Inventory/);
-  assert.doesNotMatch(main.html(), /<article>/);
-  party.host.choose('party', { actor: 'bravo' });
-  await flush();
-  assert.equal(map.state.tacticalSelections.map.actor, 'bravo');
-  assert.equal(main.dispatches.length, 0);
-  const result = await map.host.request('snapshot', {});
-  assert.equal(result.revision, 2);
-  assert.deepEqual(main.dispatches.map((item) => item.campaign), ['td']);
-  map.host.saveView(map.state.panelProjection.surfaces[0], { zoom: 1.5, scrollLeft: 80, scrollTop: 40 });
-  await flush();
-  main.state.panelWindowBusy = true;
-  await main.host.publish();
-  assert.equal(map.state.panelWindowBusy, true);
-  main.host.leave();
-  await flush();
-  assert.equal(bus.windows.size, 0);
-  const count = main.selections.length;
-  bus.emit('main', 'panel-window-message', { context, window_id: partyWindow.id,
-    payload: { type: 'rpc', request_id: 'stale', method: 'selection',
-      args: { surfaceId: 'party', patch: { actor: 'stale' } } } });
-  await flush();
-  assert.equal(main.selections.length, count);
-  main.render();
-  await flush();
-  assert.equal(bus.windows.size, 2);
-  assert.notEqual(bus.windows.get(mapWindow.id).generation, context.generation);
-  assert.equal(main.state.tacticalViews.map.zoom, 1.5);
-  assert.equal(main.state.tacticalSelections.map, undefined);
-  bus.emit('main', 'panel-window-closed', { context: bus.windows.get(partyWindow.id), window_id: partyWindow.id });
-  await flush();
-  assert.equal(bus.windows.size, 1);
-  assert.match(main.html(), /<article>Party/);
-  assert.match(main.html(), /<article>Inventory/);
-  assert.deepEqual(main.errors, []);
-  assert.equal(map.errors.every((message) => !message || message === 'Sylvia is working…'), true);
-  assert.equal(party.errors.every((message) => !message || message === 'Sylvia is working…'), true);
-});
-
-test('fresh detached-window shots survive the child map replacement render', async () => {
-  const bus = transport(), storage = new Map(), clock = { now: 1000 };
-  const main = renderer(bus, 'main', state(), storage, null, { clock });
-  await main.host.init();
-  main.render();
-  main.host.changed({ type: 'move', panelId: 'map', destination: { windowId: 'new' } });
-  await flush();
-  const panelWindow = main.host.snapshot().windows[0];
-  const child = renderer(bus, panelWindow.id, state(), storage, bus.windows.get(panelWindow.id), {
-    clock, renderCost: 600,
-  });
-  await child.host.init();
-  await flush();
-  const rendersBefore = child.renderCount();
-  main.render({ ...main.state.panelProjection, revision: 3,
-    shot_effects: [burstRecord()] });
-  await flush();
-
-  assert.equal(child.host.effects.snapshot().active.length, 5,
-    'receiving the timeline before a slow replacement render must not expire every child cue');
-  assert.equal(child.renderCount(), rendersBefore + 1,
-    'the prepared projection renders once and the started clock arrives effects-only');
-});
-
-test('child waits for two paint frames and rejects stale readiness', async () => {
-  const bus = transport(), storage = new Map(), frames = [];
-  const main = renderer(bus, 'main', state(), storage);
-  await main.host.init();
-  main.render();
-  main.host.changed({ type: 'move', panelId: 'map', destination: { windowId: 'new' } });
-  await flush();
-  const panelWindow = main.host.snapshot().windows[0];
-  const context = bus.windows.get(panelWindow.id);
-  const child = renderer(bus, panelWindow.id, state(), storage, context, {
-    requestAnimationFrame: (callback) => { frames.push(callback); return frames.length; },
-  });
-  await child.host.init();
-  await flush();
-
-  main.render({ ...main.state.panelProjection, revision: 3, shot_effects: [burstRecord()] });
-  await flush();
-  assert.equal(main.host.effects.snapshot().active.length, 0);
-  const prepare = bus.calls.filter((call) => call.args?.payload?.effects_prepare).at(-1)
-    .args.payload.effects_prepare;
-  bus.emit('main', 'panel-window-message', { context: { ...context, generation: 'stale' },
-    window_id: panelWindow.id, payload: { type: 'effects-ready', ...prepare } });
-  bus.emit('main', 'panel-window-message', { context, window_id: panelWindow.id,
-    payload: { type: 'effects-ready', ...prepare, playback_sequence: prepare.playback_sequence - 1 } });
-  assert.equal(main.host.effects.snapshot().active.length, 0);
-
-  frames.splice(0).forEach((callback) => callback());
-  assert.equal(main.host.effects.snapshot().active.length, 0);
-  frames.splice(0).forEach((callback) => callback());
-  await flush();
-  assert.equal(main.host.effects.snapshot().active.length, 5);
-  assert.equal(child.host.effects.snapshot().active.length, 5);
-});
-
-test('equivalent workspace snapshots skip rendering while real presentation changes render', async () => {
-  const bus = transport(), storage = new Map();
-  const main = renderer(bus, 'main', state(), storage);
-  await main.host.init();
-  main.render();
-  main.host.changed({ type: 'move', panelId: 'map', destination: { windowId: 'new' } });
-  await flush();
-  const panelWindow = main.host.snapshot().windows[0];
-  const child = renderer(bus, panelWindow.id, state(), storage, bus.windows.get(panelWindow.id));
-  await child.host.init();
-  await flush();
-
-  main.render({ ...main.state.panelProjection, revision: 3, shot_effects: [burstRecord()] });
-  await flush();
-  const staleWorkspace = bus.calls.filter((call) => call.args?.payload?.effects_prepare).at(-1).args;
-  let renders = child.renderCount();
-  bus.emit(panelWindow.id, 'panel-workspace', {
-    context: staleWorkspace.context, window_id: panelWindow.id, payload: staleWorkspace.payload,
-  });
-  assert.equal(child.renderCount(), renders);
-  assert.equal(child.host.effects.snapshot().active.length, 5);
-  await main.host.publish();
-  assert.equal(child.renderCount(), renders);
-  assert.equal(child.host.effects.snapshot().active.length, 5);
-
-  main.state.panelWindowBusy = true;
-  await main.host.publish();
-  assert.equal(child.renderCount(), ++renders);
-  main.state.tacticalSelections = { map: { actor: 'bravo' } };
-  await main.host.publish();
-  assert.equal(child.renderCount(), ++renders);
-  main.host.configureEffects({ muted: true });
-  await flush();
-  assert.equal(child.renderCount(), ++renders);
-  assert.equal(child.host.effects.preferences().muted, true);
-  main.host.changed({ type: 'move', panelId: 'party', destination: { windowId: panelWindow.id } });
-  await flush();
-  assert.equal(child.renderCount(), ++renders);
-});
-
-test('closing an unready child recomputes ownership and starts the pending timeline', async () => {
-  const bus = transport(), storage = new Map(), frames = [];
-  const main = renderer(bus, 'main', state(), storage);
-  await main.host.init();
-  main.render();
-  main.host.changed({ type: 'move', panelId: 'map', destination: { windowId: 'new' } });
-  await flush();
-  const panelWindow = main.host.snapshot().windows[0];
-  const context = bus.windows.get(panelWindow.id);
-  const child = renderer(bus, panelWindow.id, state(), storage, context, {
-    requestAnimationFrame: (callback) => { frames.push(callback); return frames.length; },
-  });
-  await child.host.init();
-  await flush();
-  main.render({ ...main.state.panelProjection, revision: 3, shot_effects: [burstRecord()] });
-  await flush();
-  assert.equal(main.host.effects.snapshot().active.length, 0);
-
-  bus.emit('main', 'panel-window-closed', { context, window_id: panelWindow.id });
-  await flush();
-  assert.equal(main.host.effects.snapshot().active.length, 5);
-  assert.equal(main.host.snapshot().windows.length, 0);
-});
-
-test('historical records and empty fresh projections advance without waiting for a child', async () => {
-  const bus = transport(), storage = new Map(), frames = [], timers = [];
-  let holdFrames = false;
-  const schedule = (callback, milliseconds) => {
-    const timer = { callback, milliseconds, active: true };
-    timers.push(timer);
-    return timer;
-  };
-  const main = renderer(bus, 'main', state(), storage, null,
-    { setTimeout: schedule, clearTimeout: (timer) => { timer.active = false; } });
-  await main.host.init();
-  main.render();
-  main.host.changed({ type: 'move', panelId: 'map', destination: { windowId: 'new' } });
-  await flush();
-  const panelWindow = main.host.snapshot().windows[0];
-  const child = renderer(bus, panelWindow.id, state(), storage, bus.windows.get(panelWindow.id), {
-    requestAnimationFrame: (callback) => {
-      if (holdFrames) frames.push(callback);
-      else callback();
-      return frames.length;
-    },
-  });
-  await child.host.init();
-  await flush();
-  main.render({ ...main.state.panelProjection, revision: 3, shot_effects: [burstRecord()] });
-  await flush();
-  assert.equal(main.host.effectRevision(), 3);
-
-  holdFrames = true;
-  main.render(main.state.panelProjection);
-  await flush();
-  assert.equal(timers.some((timer) => timer.active && timer.milliseconds === 2000), false);
-  main.render({ ...main.state.panelProjection, revision: 4, shot_effects: [] });
-  await flush();
-  assert.equal(main.host.effectRevision(), 4);
-  assert.equal(timers.some((timer) => timer.active && timer.milliseconds === 2000), false);
-});
-
-test('an inactive tactical tab does not delay playback waiting for an absent map DOM', async () => {
-  const bus = transport(), storage = new Map(), frames = [], timers = [];
-  const schedule = (callback, milliseconds) => {
-    const timer = { callback, milliseconds, active: true };
-    timers.push(timer);
-    return timer;
-  };
-  const main = renderer(bus, 'main', state(), storage, null,
-    { setTimeout: schedule, clearTimeout: (timer) => { timer.active = false; } });
-  await main.host.init();
-  main.render();
-  main.host.changed({ type: 'move', panelId: 'map', destination: { windowId: 'new' } });
-  const panelWindow = main.host.snapshot().windows[0];
-  main.host.changed({ type: 'move', panelId: 'party', destination: {
-    windowId: panelWindow.id, targetPanelId: 'map', position: 'tab',
-  } });
-  await flush();
-  const group = main.host.snapshot().windows[0].tree;
-  main.host.changed({ type: 'tab', groupId: group.id, panelId: 'party' });
-  await flush();
-  const child = renderer(bus, panelWindow.id, state(), storage, bus.windows.get(panelWindow.id), {
-    requestAnimationFrame: (callback) => { frames.push(callback); return frames.length; },
-  });
-  await child.host.init();
-  await flush();
-
-  main.render({ ...main.state.panelProjection, revision: 3, shot_effects: [burstRecord()] });
-  await flush();
-  assert.equal(main.host.effects.snapshot().active.length, 5);
-  assert.equal(timers.some((timer) => timer.active && timer.milliseconds === 2000), false);
-});
-
-test('an unready child cannot hold playback forever or accept the timed-out clock late', async () => {
-  const bus = transport(), storage = new Map(), frames = [], timers = [], clock = { now: 1000 };
-  const schedule = (callback, milliseconds) => {
-    const timer = { callback, milliseconds, active: true };
-    timers.push(timer);
-    return timer;
-  };
-  const cancel = (timer) => { timer.active = false; };
-  const main = renderer(bus, 'main', state(), storage, null,
-    { clock, setTimeout: schedule, clearTimeout: cancel });
-  await main.host.init();
-  main.render();
-  main.host.changed({ type: 'move', panelId: 'map', destination: { windowId: 'new' } });
-  await flush();
-  const panelWindow = main.host.snapshot().windows[0];
-  const child = renderer(bus, panelWindow.id, state(), storage, bus.windows.get(panelWindow.id), {
-    clock,
-    requestAnimationFrame: (callback) => { frames.push(callback); return frames.length; },
-  });
-  await child.host.init();
-  await flush();
-  main.render({ ...main.state.panelProjection, revision: 3, shot_effects: [burstRecord()] });
-  await flush();
-
-  const deadline = timers.find((timer) => timer.active && timer.milliseconds === 2000);
-  assert.ok(deadline);
-  deadline.callback();
-  assert.equal(main.host.effects.snapshot().active.length, 5);
-  assert.equal(child.host.effects.snapshot().active.length, 0);
-  assert.match(main.errors.at(-1), /not ready for shot effects/);
-  frames.splice(0).forEach((callback) => callback());
-  frames.splice(0).forEach((callback) => callback());
-  await flush();
-  assert.equal(child.host.effects.snapshot().active.length, 0);
-  const ownerStart = main.host.effects.snapshot().active[0].start_ms;
-  clock.now += 50;
-  await main.host.publish();
-  assert.equal(child.host.effects.snapshot().active.length, 5);
-  assert.equal(child.host.effects.snapshot().active[0].start_ms, ownerStart,
-    'a late ready child may join only the existing owner clock without rebasing it');
-});
-
-test('the readiness deadline is armed before native publication settles', async () => {
-  const bus = transport(), storage = new Map(), timers = [];
-  const schedule = (callback, milliseconds) => {
-    const timer = { callback, milliseconds, active: true };
-    timers.push(timer);
-    return timer;
-  };
-  const main = renderer(bus, 'main', state(), storage, null,
-    { setTimeout: schedule, clearTimeout: (timer) => { timer.active = false; } });
-  await main.host.init();
-  main.render();
-  main.host.changed({ type: 'move', panelId: 'map', destination: { windowId: 'new' } });
-  await flush();
-  const panelWindow = main.host.snapshot().windows[0];
-  const child = renderer(bus, panelWindow.id, state(), storage, bus.windows.get(panelWindow.id));
-  await child.host.init();
-  await flush();
-  bus.stallPublishes();
-  main.render({ ...main.state.panelProjection, revision: 3, shot_effects: [burstRecord()] });
-  await flush();
-
-  const deadline = timers.find((timer) => timer.active && timer.milliseconds === 2000);
-  assert.ok(deadline);
-  deadline.callback();
-  assert.equal(main.host.effects.snapshot().active.length, 5);
-});
-
-test('a child that missed prepare joins a later current clock after rendering without rebasing', async () => {
-  const bus = transport(), storage = new Map(), timers = [], clock = { now: 1000 };
-  const schedule = (callback, milliseconds) => {
-    const timer = { callback, milliseconds, active: true };
-    timers.push(timer);
-    return timer;
-  };
-  const main = renderer(bus, 'main', state(), storage, null, {
-    clock, setTimeout: schedule, clearTimeout: (timer) => { timer.active = false; },
-  });
-  await main.host.init();
-  main.render();
-  main.host.changed({ type: 'move', panelId: 'map', destination: { windowId: 'new' } });
-  await flush();
-  const panelWindow = main.host.snapshot().windows[0];
-  const child = renderer(bus, panelWindow.id, state(), storage, bus.windows.get(panelWindow.id), {
-    clock, renderCost: 100,
-  });
-  await child.host.init();
-  await flush();
-  bus.stallPublishes();
-  main.render({ ...main.state.panelProjection, revision: 3, shot_effects: [burstRecord()] });
-  await flush();
-  timers.find((timer) => timer.active && timer.milliseconds === 2000).callback();
-  const ownerStart = main.host.effects.snapshot().active[0].start_ms;
-  assert.equal(child.host.effects.snapshot().active.length, 0);
-
-  bus.resumePublishes();
-  clock.now += 50;
-  await main.host.publish();
-  assert.equal(child.host.effects.snapshot().active.length, 5);
-  assert.equal(child.host.effects.snapshot().active[0].start_ms, ownerStart);
-});
-
-test('duplicate same-sequence preparation does not cancel the child paint acknowledgement', async () => {
-  const bus = transport(), storage = new Map(), frames = [], timers = [];
-  const main = renderer(bus, 'main', state(), storage, null, {
-    setTimeout: (callback, milliseconds) => {
-      const timer = { callback, milliseconds, active: true };
-      timers.push(timer);
-      return timer;
-    },
-    clearTimeout: (timer) => { timer.active = false; },
-  });
-  await main.host.init();
-  main.render();
-  main.host.changed({ type: 'move', panelId: 'map', destination: { windowId: 'new' } });
-  await flush();
-  const panelWindow = main.host.snapshot().windows[0];
-  const context = bus.windows.get(panelWindow.id);
-  const child = renderer(bus, panelWindow.id, state(), storage, context, {
-    requestAnimationFrame: (callback) => { frames.push(callback); return frames.length; },
-  });
-  await child.host.init();
-  await flush();
-
-  main.render({ ...main.state.panelProjection, revision: 3, shot_effects: [burstRecord()] });
-  await flush();
-  const preparedCall = bus.calls.filter((call) => call.args?.payload?.effects_prepare).at(-1);
-  assert.ok(preparedCall);
-  assert.equal(main.host.effects.snapshot().active.length, 0);
-
-  const firstPaint = frames.shift();
-  firstPaint();
-  bus.emit(panelWindow.id, 'panel-workspace', {
-    context: preparedCall.args.context,
-    window_id: panelWindow.id,
-    payload: preparedCall.args.payload,
-  });
-  const secondPaint = frames.shift();
-  secondPaint();
-  await flush();
-
-  assert.equal(main.host.effects.snapshot().active.length, 5,
-    'an equivalent prepare packet must not invalidate paint readiness already in progress');
-  assert.equal(timers.some((timer) => timer.active && timer.milliseconds === 2000), false);
-});
-
-
-test('queue-only presentation keys update an open child at the same mechanical revision',async()=>{
- const bus=transport(),storage=new Map(),main=renderer(bus,'main',state(),storage);await main.host.init();main.render();main.host.changed({type:'move',panelId:'map',destination:{windowId:'new'}});await flush();
- const popped=main.host.snapshot().windows[0],child=renderer(bus,popped.id,state(),storage,bus.windows.get(popped.id));await child.host.init();await flush();const revision=main.state.panelProjection.revision;let count=child.renderCount();
- for(const key of ['queue:one:1:ready','queue:one:2:ready','queue:one:2:busy','queue:one:2:paused']){
-  main.state.panelProjection={...main.state.panelProjection,presentation_key:key};await main.host.publish();assert.equal(child.renderCount(),++count);assert.equal(child.state.panelProjection.revision,revision);
- }
- main.host.leave();await flush();
+  assert.equal(main.html().includes('data-panel-workspace-destination="new"'), false);
 });

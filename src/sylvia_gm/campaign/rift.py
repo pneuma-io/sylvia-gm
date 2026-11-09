@@ -22,6 +22,7 @@ from sylvia_gm.domain.authority import (
     ParticipantValidationStatus,
     SafePayload,
     StateValue,
+    thaw_json_value,
 )
 from sylvia_gm.domain.campaign_plan import (
     StartingPartyPolicy,
@@ -135,7 +136,8 @@ def rift_public_template(
 
     value = _template() if template is None else validate_rift_template(template)
     local_players = [
-        participant.catalog_payload()
+        {**participant.catalog_payload(), **({"starter_preview": participant.rift_source()}
+         if participant.builtin_starter else {})}
         for participant in reusable_participants
         if participant.role == "player_character"
     ]
@@ -167,6 +169,9 @@ def rift_public_template(
                 "reusable": True,
                 "profile_status": item["profile_status"],
                 "campaign_ready": item["profile_status"] == "authored",
+                **({"builtin_starter": True, "starter_preview": item["starter_preview"],
+                    "content_sha256": item["content_sha256"]}
+                   if item.get("builtin_starter") else {}),
                 **(
                     {"source_profile": item["source_profile"]} if item.get("source_profile") else {}
                 ),
@@ -472,9 +477,13 @@ def materialize_rift_selection(
         )
         participants.append(participant)
         entities[participant_id] = state
-    entities.update(copy.deepcopy(value["encounter_entities"]))
-
     plan_artifact = bundled_rift_campaign_plan() if selected_plan is None else selected_plan
+    entities.update(copy.deepcopy(value["encounter_entities"]))
+    # A new start uses the Plan's declared encounter states exactly. Older
+    # templates supply only fallback states, including intentionally missing fields.
+    for row in plan_artifact.payload["initial_state"]["entities"]:
+        if row["id"] in value["encounter_entities"]:
+            entities[row["id"]] = thaw_json_value(row["state"])
     plan = plan_artifact.readable_markdown
     roster = ", ".join([player_name, *(str(item["name"]) for item in selected_companions)])
     plan += f"\n\n## Selected campaign party\n\n{roster}\n"

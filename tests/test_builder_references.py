@@ -359,5 +359,14 @@ def test_non_dnd_builder_reads_its_installed_ruleset_and_setting(tmp_path: Path)
             reader.read(setting_path)
             == (setting_root / setting_path.removeprefix("setting/")).read_text()
         )
+        tool = _builder_reference_tool(reader)
+        pages = [{"path": path, "limit": 4000} for path in (
+            "ruleset/runtime/ruleset.yaml", setting_path,
+        )]
+        batch = tool.handler({"action": "read_many", "pages": pages}, None)
+        assert batch["success"] is True
+        assert batch["pages"] == [
+            tool.handler({"action": "read", **page}, None) for page in pages
+        ]
         assert "campaign-plan/plan.md" not in reader.paths
         assert not any("severed" in path or "wotc" in path for path in reader.paths)

@@ -10,7 +10,11 @@ import yaml
 from sylvia_gm.agent._builder_session import _participant_draft_check_tool
 from sylvia_gm.agent._content_definition_tool import content_definition_tool
 from sylvia_gm.application.authority import AuthorityOwner
-from sylvia_gm.application.character_rules import validate_character_rules, verify_character_rules
+from sylvia_gm.application.character_rules import (
+    prepare_character_rules,
+    validate_character_rules,
+    verify_character_rules,
+)
 from sylvia_gm.application.initial_character_state import (
     materialize_initial_character_state,
     verify_initial_character_state,
@@ -38,6 +42,40 @@ def _program():
                          "error": "Choose a rank at or below the maximum."}},
         ],
     }
+
+
+def test_prepared_rules_recheck_state_and_isolate_aliased_tables():
+    program = {
+        "description": "Check every state using fresh local table data.",
+        "definitions": {"lists": {"seed": [0]}},
+        "effects": [
+            {"table_lookup": {"table": "definitions.lists", "key": "'seed'", "required": True},
+             "store_as": "_items"},
+            {"list_push": {"list": "_items", "value": "state.charge"}},
+            {"require": {"condition": "state.charge <= participant.rank",
+                         "error": "Charge exceeds rank."}},
+            {"set": {"field": "_charge", "value": "state.charge * 2"}},
+        ],
+    }
+    before = deepcopy(program)
+    check = prepare_character_rules({"rank": 3}, program)
+    first = check({"charge": 1})
+    assert first == {"_items": [0, 1], "_charge": 2}
+    first["_items"].append(99)
+    assert check({"charge": 2}) == {"_items": [0, 2], "_charge": 4}
+    assert check({"charge": 1}) == {"_items": [0, 1], "_charge": 2}
+    with pytest.raises(CommandRejected, match="Charge exceeds rank"):
+        check({"charge": 4})
+    assert program == before
+
+
+def test_prepared_rules_reject_effectful_programs_before_execution():
+    program = _program()
+    program["effects"].append({"set": {"field": "state.charge", "value": "99"}})
+    before = deepcopy(program)
+    with pytest.raises(CommandRejected, match="private local variables"):
+        prepare_character_rules({"rank": 3}, program)
+    assert program == before
 
 
 def test_creation_projects_read_only_rule_results_and_rechecks_saved_values():

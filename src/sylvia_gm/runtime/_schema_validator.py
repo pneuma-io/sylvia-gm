@@ -9,6 +9,7 @@ from __future__ import annotations
 import math
 import re
 from collections.abc import Iterator, Mapping, Sequence, Set
+from functools import lru_cache
 from typing import Any, cast
 
 import yaml
@@ -42,6 +43,12 @@ VALID_PARAM_TYPES: frozenset[str] = frozenset(
 VALID_EFFECT_KEYS: frozenset[str] = frozenset(_EFFECT_HANDLERS)
 
 _SPATIAL_QUERY_FIELDS: dict[str, frozenset[str]] = {
+    "circle_route": frozenset(
+        {"map_id", "moving_entity_id", "destination", "moving_radius", "circles", "metadata_filter", "max_tests", "edge_costs"}
+    ),
+    "circle_overlap": frozenset(
+        {"map_id", "moving_entity_id", "fixed_entity_id", "destination", "moving_radius", "fixed_radius", "origin"}
+    ),
     "body_proximity": frozenset(
         {
             "map_id",
@@ -144,6 +151,12 @@ VALID_TRIGGER_PATTERN: re.Pattern[str] = re.compile(r"^on_[a-z][a-z0-9_]*$")
 
 
 # ── Top-level validation ──────────────────────────────────────────────────
+
+
+@lru_cache(maxsize=1024)
+def _validate_expression(expression: str) -> None:
+    """Reuse successful bounded syntax checks, retaining neither ASTs nor caller diagnostics."""
+    parse_expression(expression)
 
 
 def validate_ruleset(yaml_content: str) -> list[str]:
@@ -789,7 +802,7 @@ def _validate_model_decision_boundary(value: Any) -> list[str]:
         return []
     required_fields = {"active_actor", "actor_entities", "participant_control", "default_owner"}
     if (not isinstance(value, dict) or not required_fields <= set(value)
-            or set(value) - required_fields - {"preparation"}):
+            or set(value) - required_fields - {"preparation", "isolated_participant"}):
         return ["'model_decision_boundary' fields are invalid"]
     errors: list[str] = []
     for field in ("active_actor", "actor_entities"):
@@ -803,9 +816,15 @@ def _validate_model_decision_boundary(value: Any) -> list[str]:
         ):
             errors.append(f"Model decision boundary {field} reference is invalid")
     control = value["participant_control"]
-    if not isinstance(control, dict) or set(control) != {"field", "player_values"}:
+    if (not isinstance(control, dict) or not {"field", "player_values"} <= set(control)
+            or set(control) - {"field", "player_values", "actor_participant_field"}):
         errors.append("Model decision boundary participant_control fields are invalid")
     else:
+        if "actor_participant_field" in control and (
+            not isinstance(control["actor_participant_field"], str)
+            or re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]{0,63}", control["actor_participant_field"]) is None
+        ):
+            errors.append("Model decision boundary actor participant field is invalid")
         player_values = control["player_values"]
         if not isinstance(control["field"], str) or not control["field"].strip():
             errors.append("Model decision boundary participant control field is invalid")
@@ -819,6 +838,31 @@ def _validate_model_decision_boundary(value: Any) -> list[str]:
     if value["default_owner"] not in {"player", "gm"}:
         errors.append("Model decision boundary default owner is invalid")
     errors.extend(_validate_campaign_preparation(value.get("preparation")))
+    isolated = value.get("isolated_participant")
+    if "isolated_participant" in value:
+        fields = {"instructions", "observation_path", "actions_path", "public_observation"}
+        if (not isinstance(isolated, dict) or not fields <= set(isolated)
+                or set(isolated) - fields - {"persona_path"}):
+            errors.append("Isolated participant fields are invalid")
+        else:
+            if (not isinstance(isolated["instructions"], str)
+                    or not isolated["instructions"].strip()
+                    or len(isolated["instructions"].encode("utf-8")) > 8192):
+                errors.append("Isolated participant instructions are invalid")
+            for key in ("observation_path", "actions_path", "persona_path"):
+                if key not in isolated:
+                    continue
+                path = isolated[key]
+                if (not isinstance(path, list) or len(path) > 8
+                        or any(not isinstance(part, str)
+                               or re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]{0,63}", part) is None
+                               for part in path)):
+                    errors.append("Isolated participant path is invalid")
+            reference = isolated["public_observation"]
+            if (not isinstance(reference, dict) or set(reference) != {"namespace", "key"}
+                    or any(not isinstance(reference.get(key), str) or not reference[key].strip()
+                           for key in ("namespace", "key"))):
+                errors.append("Isolated participant public observation is invalid")
     return errors
 
 
@@ -986,7 +1030,7 @@ def _validate_pre_conditions(tool_name: str, pre_conds: list[Any]) -> list[str]:
             errors.append(f"Tool '{tool_name}': pre_condition {i} missing 'condition'")
         elif isinstance(condition, str):
             try:
-                parse_expression(condition)
+                _validate_expression(condition)
             except ExpressionError as e:
                 errors.append(
                     f"Tool '{tool_name}': pre_condition {i} invalid expression '{condition}': {e}"
@@ -1041,7 +1085,7 @@ def _validate_single_effect(tool_name: str, effect: dict[str, Any], path: str) -
 
     if isinstance(condition, str):
         try:
-            parse_expression(condition)
+            _validate_expression(condition)
         except ExpressionError as error:
             errors.append(f"Tool '{tool_name}': {path} condition invalid expression: {error}")
 
@@ -1236,6 +1280,10 @@ def _validate_spatial_query_effect(
         errors.append(f"{label} query must be an object")
         return errors
     expected_query = _SPATIAL_QUERY_FIELDS[cast(str, operation)]
+    if operation == 'circle_overlap' and 'origin' not in query:
+        expected_query = expected_query - {'origin'}
+    if operation == 'circle_route' and 'edge_costs' not in query:
+        expected_query = expected_query - {'edge_costs'}
     if operation == "path" and "moving_entity_id" not in query:
         expected_query = expected_query - {"moving_entity_id"}
     if operation in {"path", "exposure"} and "metadata_filter" not in query:
@@ -1292,20 +1340,47 @@ def _validate_spatial_query_effect(
             or not _spatial_literal_or_template(selector.get("missing_matches"), bool)
         ):
             errors.append(f"{label} metadata filter is invalid")
-    elif operation == "body_proximity":
+    elif operation == 'circle_route':
+        if not _spatial_coordinate(query.get('destination'), 3):
+            errors.append(f'{label} destination must contain three coordinates')
+        if not isinstance(query.get('moving_entity_id'), str) or not query['moving_entity_id']:
+            errors.append(f'{label} moving_entity_id must be text or a template')
+        radius = query.get('moving_radius')
+        if not (isinstance(radius, str) and _SPATIAL_TEMPLATE.fullmatch(radius)) and not (
+            isinstance(radius, (int, float)) and not isinstance(radius, bool) and math.isfinite(radius) and radius > 0
+        ):
+            errors.append(f'{label} moving_radius must be positive or a template')
+        circles = query.get('circles')
+        if not (isinstance(circles, str) and _SPATIAL_TEMPLATE.fullmatch(circles)) and not (
+            isinstance(circles, list) and len(circles) <= 64
+            and all(isinstance(row, Mapping) and set(row) == {'entity_id', 'radius', 'blocking'} for row in circles)
+        ):
+            errors.append(f'{label} circles must be a bounded list or a template')
+        selector = query.get('metadata_filter')
+        if not isinstance(selector, Mapping) or set(selector) != {'key', 'value', 'missing_matches'}:
+            errors.append(f'{label} metadata filter is invalid')
+        edge_costs = query.get('edge_costs', [])
+        if not (isinstance(edge_costs, str) and _SPATIAL_TEMPLATE.fullmatch(edge_costs)) and not (
+            isinstance(edge_costs, list) and len(edge_costs) <= 16384
+            and all(isinstance(row, Mapping) and set(row) == {'start', 'end', 'cost'} for row in edge_costs)
+        ):
+            errors.append(f'{label} edge_costs must be a bounded list or a template')
+        _validate_spatial_limit(errors, label, query.get('max_tests'), 'max_tests', 1, 16384)
+    elif operation in {"body_proximity", "circle_overlap"}:
+        if 'origin' in query and not _spatial_coordinate(query['origin'], 3):
+            errors.append(f'{label} origin must contain three coordinates')
         if not _spatial_coordinate(query.get("destination"), 3):
             errors.append(f"{label} destination must contain three coordinates")
         for name in ("moving_entity_id", "fixed_entity_id"):
             if not isinstance(query.get(name), str) or not query.get(name):
                 errors.append(f"{label} {name} must be text or a template")
-        radius = query.get("radius")
-        if not (isinstance(radius, str) and _SPATIAL_TEMPLATE.fullmatch(radius)) and not (
-            isinstance(radius, (int, float))
-            and not isinstance(radius, bool)
-            and math.isfinite(radius)
-            and radius >= 0
-        ):
-            errors.append(f"{label} radius must be a finite nonnegative number or a template")
+        for name in (("radius",) if operation == "body_proximity" else ("moving_radius", "fixed_radius")):
+            radius = query.get(name)
+            if not (isinstance(radius, str) and _SPATIAL_TEMPLATE.fullmatch(radius)) and not (
+                isinstance(radius, (int, float)) and not isinstance(radius, bool)
+                and math.isfinite(radius) and (radius >= 0 if name == "radius" else radius > 0)
+            ):
+                errors.append(f"{label} {name} must be a finite valid radius or a template")
     elif operation == "sweep":
         if not _spatial_coordinate(query.get("destination"), 3):
             errors.append(f"{label} destination must contain three coordinates")
@@ -1590,7 +1665,7 @@ def _validate_procedures(procedures: dict[str, Any], all_tool_names: set[str]) -
         condition = proc_def.get("condition")
         if isinstance(condition, str):
             try:
-                parse_expression(condition)
+                _validate_expression(condition)
             except ExpressionError as e:
                 errors.append(
                     f"Procedure '{proc_name}': invalid condition expression '{condition}': {e}"

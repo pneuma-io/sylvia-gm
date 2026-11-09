@@ -12,6 +12,7 @@ from types import SimpleNamespace
 import pytest
 
 from sylvia_gm.config._env import apply_env_overrides
+from sylvia_gm.domain import package_library
 from sylvia_gm.domain.package_library import content_root_for_record, manifest_from_record
 from sylvia_gm.infrastructure.campaign_archive import FORMAT_ID, PRODUCT_ID
 
@@ -89,6 +90,10 @@ def test_sylvia_gm_structural_identifiers_are_exact_and_old_package_ids_fail_clo
             "runtime_require.v1",
             "starting_state_validation.v1",
             "tactical_grid.v1",
+            "spatial_circle_overlap.v1",
+            "player_action_preflight.v1",
+            "spatial_circle_route.v1",
+            "player_action_preflight_path.v1",
         ],
     }
     assert fixture_record["compatibility"] == compatibility
@@ -116,6 +121,47 @@ def test_sylvia_gm_structural_identifiers_are_exact_and_old_package_ids_fail_clo
     }
     minimal_record["content_sha256"] = content_root_for_record(minimal_record)
     assert manifest_from_record(minimal_record, format_version=1).package_id == "example.identity"
+
+    for feature in (
+        "spatial_circle_overlap.v1",
+        "player_action_preflight.v1",
+        "spatial_circle_route.v1",
+        "player_action_preflight_path.v1",
+    ):
+        required_record = deepcopy(minimal_record)
+        required_record["compatibility"] = {**compatibility, "requires": [feature]}
+        required_record["content_sha256"] = content_root_for_record(required_record)
+        assert (
+            manifest_from_record(required_record, format_version=1).package_id == "example.identity"
+        )
+        with monkeypatch.context() as unsupported_host:
+            unsupported_host.setattr(
+                package_library,
+                "SUPPORTED_ENGINE_FEATURES",
+                package_library.SUPPORTED_ENGINE_FEATURES - {feature},
+            )
+            with pytest.raises(ValueError, match="Package engine feature is unsupported"):
+                manifest_from_record(required_record, format_version=1)
+
+    for field, value, error in (
+        ("id", " ", "Package identity"),
+        ("version", " ", "Package version"),
+        ("compatibility", {**compatibility, "host_contract": 2}, "Package host contract"),
+        ("compatibility", {**compatibility, "runtime_format": 2}, "Package runtime format"),
+        ("compatibility", {"host_contract": 1, "runtime_format": 1}, "Package compatibility"),
+        (
+            "compatibility",
+            {**compatibility, "requires": ["spatial.future.v1"]},
+            "Package engine feature is unsupported",
+        ),
+    ):
+        invalid_record = deepcopy(minimal_record)
+        invalid_record[field] = value
+        invalid_record["content_sha256"] = content_root_for_record(invalid_record)
+        with pytest.raises(ValueError, match=error):
+            manifest_from_record(invalid_record, format_version=1)
+    with pytest.raises(ValueError, match="Package record format is unsupported"):
+        manifest_from_record(minimal_record, format_version=0)
 
     retired_record = deepcopy(minimal_record)
     retired_record["compatibility"] = {_RETIRED_IDENTITY: "alpha"}
@@ -212,7 +258,10 @@ def test_informational_cli_cannot_launch_a_competing_application() -> None:
         text=True,
     )
     assert help_result.returncode == 0
-    assert "installed Windows desktop application" in help_result.stdout
+    # The installed desktop stays the named product; the only other launch is the explicit-root WebUI.
+    help_text = " ".join(help_result.stdout.split())
+    assert "Use the installed Windows desktop" in help_text
+    assert "launch the WebUI with an explicit data root" in help_text
     assert "{serve,desktop}" not in help_result.stdout
     assert "Start the HTTP server" not in help_result.stdout
 

@@ -10,6 +10,7 @@ import pytest
 from sylvia_gm.agent._builder_reference_copy_tool import builder_reference_copy_tool
 from sylvia_gm.application.builder_references import BuilderReferences
 from sylvia_gm.builder._workspace_files import content_version
+from sylvia_gm.tools._builder_handlers import tool_edit_file
 
 
 def test_full_reference_copy_preserves_large_source_and_rejects_stale_replacement(tmp_path: Path):
@@ -71,3 +72,27 @@ def test_reference_copy_cannot_read_an_unlisted_source(tmp_path: Path):
     assert result["success"] is False
     assert reads == []
     assert not (tmp_path / "copy.json").exists()
+
+
+def test_known_complete_source_can_be_edited_with_copy_version_without_reread(tmp_path: Path):
+    source = '{"name":"Fictional monk","level":1}\n'
+    references = BuilderReferences(("character-profile/profile.json",), lambda _path: source)
+    tool = builder_reference_copy_tool(references, tmp_path)
+    args = {"source_path": "character-profile/profile.json", "destination_path": "character.json"}
+    copied = tool.handler(args, None)
+    target = tmp_path / "character.json"
+    edit = tool_edit_file({
+        "_resolved_path": target, "old_text": "Fictional monk", "new_text": "Test monk",
+        "expected_version": copied["version"],
+    }, None)
+    assert edit["success"] is True
+    assert target.read_text() == '{"name":"Test monk","level":1}\n'
+    before = target.read_bytes()
+    stale = tool_edit_file({
+        "_resolved_path": target, "old_text": "Test monk", "new_text": "Stale overwrite",
+        "expected_version": copied["version"],
+    }, None)
+    assert stale["error_code"] == "stale_file"
+    assert tool.handler(args, None)["error_code"] == "stale_file"
+    assert target.read_bytes() == before
+    assert references.read(args["source_path"]) == source

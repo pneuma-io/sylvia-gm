@@ -148,6 +148,8 @@ def test_level_up_grants_or_expands_wholeness_without_restoring_spent_uses(
         award(owner)
         proposal = build(owner)
         proposal["class_id"] = "monk"
+        # Monk 6 and 8 retain base Speed 30 and gain 15 feet while unarmored.
+        proposal["build"][0]["speed"] = 45
         proposal["build"][0]["armor_class"] = 15
         if level == 7:
             proposal["build"][0]["abilities"]["wisdom"] = 18
@@ -156,18 +158,45 @@ def test_level_up_grants_or_expands_wholeness_without_restoring_spent_uses(
             {"id": "wholeness_of_body", "maximum": 99, "source": "Open Hand"},
         ]
         before = owner.snapshot("advancement")
+        prior = before.state[f"{SRD}.entities"]["hero"]
+        assert before.participants[0].data["speed"] == 30
+        assert prior["resource_maxima"]["wholeness_of_body"] == old_maximum
+        assert prior["resources"]["wholeness_of_body"] == 0
+        assert prior["resource_maxima"]["focus_point"] == level
+        assert prior["resources"]["focus_point"] == 0
         with pytest.raises(CommandRejected, match="Wholeness of Body capacity"):
             owner.execute_action(command(owner, "level_up_srd_character", proposal, "invented"))
-        assert owner.snapshot("advancement").state == before.state
+        assert owner.snapshot("advancement") == before
         proposal["build"][0]["resources"] = []
-        waiting = owner.execute_action(command(owner, "level_up_srd_character", proposal, "level"))
-        assert resolve(owner, waiting).status is ActionStatus.COMMITTED
+        request = command(owner, "level_up_srd_character", proposal, "level")
+        waiting = owner.execute_action(request)
+        assert owner.snapshot("advancement") == before
+        assert owner.execute_action(request) == waiting
+        receipt = resolve(owner, waiting)
+        assert receipt.status is ActionStatus.COMMITTED
         saved = owner.snapshot("advancement")
         hero = saved.state[f"{SRD}.entities"]["hero"]
+        assert saved.revision == before.revision + 1
+        assert saved.participants[0].data["speed"] == 30
+        assert saved.participants[0].data["classes"] == [{"id": "monk", "level": level + 1}]
+        assert saved.participants[0].data["subclasses"] == {"monk": "warrior_of_the_open_hand"}
+        assert hero["speed"] == 45
         assert hero["resource_maxima"]["wholeness_of_body"] == next_maximum
         assert hero["resources"]["wholeness_of_body"] == next_maximum - old_maximum
+        assert hero["resource_maxima"]["focus_point"] == level + 1
+        assert hero["resources"]["focus_point"] == 1
+        assert hero["resources"]["hit_die"] == 1
+        assert hero["hp"] == 5
+        assert owner.execute_action(request) == receipt
+        assert resolve(owner, waiting) == receipt
+        assert owner.snapshot("advancement") == saved
     with AuthorityOwner.open(database, "test") as owner:
         assert owner.snapshot("advancement").state == saved.state
+        assert owner.snapshot("advancement") == saved
+        assert owner.saved_action_receipt("advancement", "level") == receipt
+        assert owner.execute_action(request) == receipt
+        assert resolve(owner, waiting) == receipt
+        assert owner.snapshot("advancement") == saved
 
 
 def test_public_wholeness_reopens_replays_once_and_requires_completed_long_rest(tmp_path):

@@ -44,6 +44,9 @@ PYTHON_JOURNEYS = {
         "tests/test_qa_lite_physical_range.py",
     ],
     "campaign-play": [
+        "tests/test_campaign_rules_update.py",
+        "tests/test_campaign_rules_update_bindings.py",
+        "tests/test_campaign_rules_update_knowledge.py",
         "tests/test_action_sequences.py",
         "tests/test_action_sequence_provider.py",
         "tests/test_td_native_panel_repairs.py",
@@ -51,6 +54,7 @@ PYTHON_JOURNEYS = {
         "tests/test_fc_party_combat.py",
         "tests/test_fc_campaign_progress.py",
         "tests/test_migrated_plan_lifecycle.py",
+        "tests/test_riichi_quick_test_plan.py",
         "tests/test_no_rules_interview.py",
     ],
     "builder-and-admission": [
@@ -170,6 +174,7 @@ PYTHON_JOURNEYS = {
         "tests/test_srd_generation_boundaries.py",
     ],
     "release-integrity": [
+        "tests/test_pyav_release_packaging.py",
         "tests/test_protected_provider_settings.py",
         "tests/test_portable_identity.py",
         "tests/test_fc01_release_exclusions.py",
@@ -191,8 +196,10 @@ PYTHON_JOURNEYS = {
     ],
 }
 UI_JOURNEY = [
+    "tests/frontend_campaign_rules_update.browser.cjs",
     "tests/frontend_character_equipment.test.cjs",
     "tests/frontend_character_selection.test.cjs",
+    "tests/frontend_character_inspection.browser.cjs",
     "tests/frontend_game_controls.test.cjs",
     "tests/frontend_saved_choice_commit.test.cjs",
     "tests/frontend_map_initial_camera.test.cjs",
@@ -212,6 +219,7 @@ UI_JOURNEY = [
     "tests/frontend_party_panel_actions.test.cjs",
     "tests/frontend_result_migration.browser.cjs",
     "tests/frontend_shell.browser.cjs",
+    "tests/frontend_tutorials.browser.cjs",
     "tests/frontend_saved_equipment.browser.cjs",
 ]
 

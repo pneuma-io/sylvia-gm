@@ -17,6 +17,14 @@ handoffs and checkout-specific records do not activate work.
 
 ## 1. Current work
 
+**9 November 2026: optional onboarding and the complete tutorial suite.** The owner selected a new
+PR for all independently accessible lessons and a guided welcome, AI connection, Ready campaign
+and first-scene journey. Project Desk work item **Build the tutorial suite and current new-player
+onboarding** records the approved scope. Implementation uses an isolated checkout and preserves
+the separate Alpha build owner. The attract-mode showcase and no-AI battles remain future work.
+Source/browser checks qualify this PR's UI behavior; genuine-provider, native installed-app,
+visual approval, merge and release acceptance remain separate.
+
 **17 October 2026: reviewed combined source and final-sprint repairs.** The combined source is
 maintained at [pneuma-io/sylvia-gm](https://github.com/pneuma-io/sylvia-gm). The repository remains
 private. The reviewed code/content import is commit `cebc66f2245af071f6b2f4cfdeeefbeb980a70de`,

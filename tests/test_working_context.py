@@ -235,6 +235,21 @@ async def test_private_reasoning_never_enters_summary_or_saved_archive():
 
 
 @pytest.mark.asyncio
+async def test_fresh_application_data_does_not_displace_the_latest_player_correction():
+    messages = history()
+    latest_player = messages[-1]
+    for index in range(30, 50):
+        messages.extend(pair(index))
+    fresh = {"role": "user", "content": "CURRENT_ENGINE_REVISION=42",
+             "_application_data": True, "_fresh_application_data": True}
+    messages.append(fresh)
+    wrapper, _, _ = working()
+    projected = await wrapper.prepare(messages, force=True)
+    assert latest_player in projected
+    assert projected[-1] == fresh
+
+
+@pytest.mark.asyncio
 @pytest.mark.parametrize("streaming", [False, True])
 async def test_native_replay_after_restored_compaction_reads_only_retained_responses(streaming):
     messages = history()

@@ -2,7 +2,19 @@
 from threading import Event, Lock, Thread
 
 
-def request_attached(harness, identity, method, params, *, campaign_id, attempt_id):
+def request_attached(
+    harness, identity, method, params, *, campaign_id, attempt_id, provider_session_id=None,
+):
+    """Renew narration by campaign, or Builder provider work by its independent session."""
+    provider_work = provider_session_id is not None
+    lease_owner = provider_session_id if provider_work else campaign_id
+    heartbeat_method = "provider_stream_heartbeat" if provider_work else "stream_heartbeat"
+    unavailable = (
+        {"Provider stream attachment is unavailable"}
+        if provider_work else {
+            "Narration attachment is unavailable", "Narration attempt is not actively attached",
+        }
+    )
     stopped, lock = Event(), Lock()
     identities, replies = [], {}
     generation = None
@@ -15,10 +27,10 @@ def request_attached(harness, identity, method, params, *, campaign_id, attempt_
             with lock:
                 heartbeat_id = identity + "-heartbeat-" + str(len(identities))
                 identities.append(heartbeat_id)
-                payload = {"campaign_id": campaign_id, "attempt_id": attempt_id}
+                payload = {"campaign_id": lease_owner, "attempt_id": attempt_id}
                 if generation is not None:
                     payload["attachment_generation"] = generation
-            harness.send(heartbeat_id, {"method": "stream_heartbeat", "params": payload})
+            harness.send(heartbeat_id, {"method": heartbeat_method, "params": payload})
             stopped.wait(2.0)
 
     def accept(reply):
@@ -35,10 +47,7 @@ def request_attached(harness, identity, method, params, *, campaign_id, attempt_
         else:
             # The same benign race exists when the frontend first attaches or
             # the request finishes before its last queued heartbeat is handled.
-            assert reply["error"]["message"] in {
-                "Narration attachment is unavailable",
-                "Narration attempt is not actively attached",
-            }, reply
+            assert reply["error"]["message"] in unavailable, reply
 
     worker = Thread(target=renew, daemon=True)
     worker.start()

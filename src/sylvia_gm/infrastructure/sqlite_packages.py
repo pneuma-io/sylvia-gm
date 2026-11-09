@@ -49,6 +49,15 @@ from sylvia_gm.domain.package_library import (
 from sylvia_gm.infrastructure import sqlite_campaign, sqlite_draft_history, sqlite_state_ownership
 from sylvia_gm.infrastructure.package_archive import AdmittedPackageArchive
 
+COMPATIBLE_UPDATE_AUTHORITY = "campaign-compatible-update.v1"
+
+
+def _compatible_migration_identity(migration_id: str) -> bool:
+    token = migration_id.removeprefix("compatible-update-")
+    return (token != migration_id and len(token) == 64
+            and all(c in "0123456789abcdef" for c in token))
+
+
 MIGRATION_3_NAME = "f3_sqlite_package_library"
 MIGRATION_3_SQL = """
 ALTER TABLE package_dependencies ADD COLUMN dependency_namespace TEXT NOT NULL DEFAULT 'legacy';
@@ -1012,6 +1021,91 @@ def current_lock_record(connection: sqlite3.Connection, campaign_id: str) -> Pac
     return read_lock_record(connection, str(row["current_lock_id"]))
 
 
+def compatible_binding_entries(
+    connection: sqlite3.Connection,
+    campaign_id: str,
+    source_identity: tuple[str, str, str],
+) -> tuple[PackageLockEntry, ...]:
+    """Follow this campaign's committed compatible transitions to one exact source.
+
+    Retained membership, package names and another campaign's receipt alone do
+    not resolve a binding. Return entries from the current lock back to source.
+    """
+    current = current_lock_record(connection, campaign_id)
+    entry = next(
+        (e for e in current.package_lock.entries if e.package_id == source_identity[0]), None,
+    )
+    if entry is None:
+        return ()
+    entries: list[PackageLockEntry] = []
+    seen: set[str] = set()
+    while current.lock_id not in seen:
+        seen.add(current.lock_id)
+        identity = (entry.package_id, entry.version, entry.sha256)
+        entries.append(entry)
+        if identity == source_identity:
+            return tuple(entries)
+        if current.predecessor_lock_id is None:
+            return ()
+        previous = read_lock_record(connection, current.predecessor_lock_id)
+        if (previous.campaign_id != campaign_id
+                or previous.created_revision >= current.created_revision):
+            return ()
+        prior = next(
+            (e for e in previous.package_lock.entries if e.package_id == entry.package_id), None,
+        )
+        if prior is None or prior.role != entry.role:
+            return ()
+        if (prior.package_id, prior.version, prior.sha256) != identity:
+            receipt = connection.execute(
+                "SELECT * FROM package_activations WHERE campaign_id = ? "
+                "AND old_lock_id = ? AND new_lock_id = ? AND status = 'committed'",
+                (campaign_id, previous.lock_id, current.lock_id),
+            ).fetchone()
+            if receipt is None:
+                return ()
+            report = _parse(str(receipt["result_json"]))
+            if (
+                not _compatible_migration_identity(str(receipt["migration_id"]))
+                or not isinstance(report, Mapping)
+                or report.get("authority") != COMPATIBLE_UPDATE_AUTHORITY
+                or _activation_result_from_row(receipt).resulting_revision
+                != current.created_revision
+            ):
+                return ()
+        current, entry = previous, prior
+    return ()
+
+
+def participant_owner_is_current(
+    connection: sqlite3.Connection,
+    *,
+    campaign_id: str,
+    source_identity: tuple[str, str, str],
+    actor_identity: tuple[str, str, str],
+    kind: str,
+    schema_id: str,
+    schema_sha256: str,
+) -> bool:
+    """Require current exact authority and unchanged character contracts along lineage."""
+    entries = compatible_binding_entries(connection, campaign_id, source_identity)
+    if not entries or (
+        entries[0].package_id, entries[0].version, entries[0].sha256
+    ) != actor_identity:
+        return False
+    declaration = next(
+        (item for item in exact_participant_declarations(connection, source_identity)
+         if item.kind == kind and item.schema_id == schema_id
+         and item.schema_sha256 == schema_sha256), None,
+    )
+    return declaration is not None and all(
+        declaration in exact_participant_declarations(
+            connection, (e.package_id, e.version, e.sha256),
+        )
+        for e in entries
+    )
+
+
 def lock_is_ancestor(connection: sqlite3.Connection, campaign_id: str, lock_id: str) -> bool:
     """Follow the current lock's authenticated predecessor chain, never detached history."""
     current = current_lock_record(connection, campaign_id)
@@ -1145,6 +1239,12 @@ def _activation_result_from_row(row: sqlite3.Row) -> ActivationResult:
         "payload_sha256": payload_sha256,
     }
     report = _parse(str(row["result_json"]))
+    if isinstance(report, Mapping) and "authority" in report:
+        if (report["authority"] != COMPATIBLE_UPDATE_AUTHORITY
+                or not _compatible_migration_identity(str(row["migration_id"]))):
+            raise CommandRejected("Stored activation authority is invalid",
+                                  code="activation_result_corrupt")
+        expected_report["authority"] = COMPATIBLE_UPDATE_AUTHORITY
     if not isinstance(report, Mapping) or dict(report) != expected_report:
         raise CommandRejected(
             "Stored activation result is inconsistent",
@@ -1207,7 +1307,12 @@ def commit_activation(
     expected_lock_id: str,
     migration_id: str,
     migrated_state: Mapping[str, JsonValue],
+    compatible_update: bool = False,
 ) -> ActivationResult:
+    if (migration_id.startswith("compatible-update-") != compatible_update
+            or compatible_update and not _compatible_migration_identity(migration_id)):
+        raise CommandRejected("Compatible update authority is reserved for reviewed adoption",
+                              code="reserved_migration_identity")
     existing = activation_hit(connection, activation_id)
     if existing is not None:
         if existing[0] != payload_sha256:
@@ -1225,8 +1330,10 @@ def commit_activation(
         raise CommandRejected("Activation authority changed", code="stale_revision")
     if (
         connection.execute(
-            "SELECT 1 FROM turns WHERE campaign_id = ? AND status = ? LIMIT 1",
-            (campaign_id, TurnStatus.COMPLETED.value),
+            "SELECT 1 FROM turns WHERE campaign_id = ? AND status = ? "
+            "AND NOT EXISTS (SELECT 1 FROM turns WHERE campaign_id = ? "
+            "AND status = 'open') LIMIT 1",
+            (campaign_id, TurnStatus.COMPLETED.value, campaign_id),
         ).fetchone()
         is None
     ):
@@ -1355,6 +1462,7 @@ def commit_activation(
                     "new_lock_id": new.lock_id,
                     "resulting_revision": resulting_revision,
                     "payload_sha256": payload_sha256,
+                    **({"authority": COMPATIBLE_UPDATE_AUTHORITY} if compatible_update else {}),
                 }
             ),
         ),

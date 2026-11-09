@@ -148,7 +148,7 @@ from sylvia_gm.infrastructure import (
     sqlite_session,
     sqlite_state_ownership,
 )
-from sylvia_gm.infrastructure.owner_lock import DatabaseOwnerLock
+from sylvia_gm.infrastructure.owner_lock import DatabaseOwnerLock, authority_lock_identity
 from sylvia_gm.infrastructure.package_archive import (
     PACKAGE_CHUNK_LIMIT,
     AdmittedPackageArchive,
@@ -296,7 +296,7 @@ def _handoff_candidate_matches_lock(
         return candidate is None
     return (
         candidate is not None
-        and candidate.status.value == "validated"
+        and candidate.status.value in {"validated", "activated"}
         and candidate.package_lock == lock.package_lock
         and candidate.closure_sha256 == lock.closure_sha256
     )
@@ -1037,6 +1037,7 @@ class SQLiteAuthorityStore:
         database_path: Path,
         *,
         _application_owner_gate: object | None = None,
+        before_migration: Callable[[], None] | None = None,
     ) -> None:
         if _application_owner_gate is not _APPLICATION_OWNER_GATE:
             raise CommandRejected(
@@ -1044,14 +1045,34 @@ class SQLiteAuthorityStore:
                 code="application_owner_required",
             )
         self._database_path = database_path.resolve()
-        lock_identity = self._database_path.with_name(f"{self._database_path.name}.authority-owner")
-        self._owner_lock = DatabaseOwnerLock(lock_identity)
+        self._owner_lock = DatabaseOwnerLock(authority_lock_identity(self._database_path))
+        self._created_new_database = False
         try:
+            # Startup admission must stay under this ownership lock through migrations.
+            if before_migration is not None:
+                before_migration()
             self._migrate()
         except BaseException:
             self._owner_lock.close()
             raise
         self._closed = False
+
+    def prepare_new_campaign_storage(self) -> None:
+        """Finish fresh-profile migrations before bundles make verified backups expensive."""
+        if not self._created_new_database:
+            return
+        connection = self._connect()
+        try:
+            connection.execute("BEGIN IMMEDIATE")
+            self._ensure_campaign_schema(connection)
+            connection.commit()
+            self._created_new_database = False
+        except BaseException:
+            if connection.in_transaction:
+                connection.rollback()
+            raise
+        finally:
+            connection.close()
 
     def _connect(self) -> sqlite3.Connection:
         if self._closed:
@@ -3651,6 +3672,7 @@ class SQLiteAuthorityStore:
         return version
 
     def _migrate(self) -> None:
+        new_database = not self._database_path.exists()
         if self._database_path.exists() and self._database_path.stat().st_size == 0:
             raise SchemaIdentityError("Authority schema identity is incomplete")
         self._database_path.parent.mkdir(parents=True, exist_ok=True)
@@ -3717,6 +3739,7 @@ class SQLiteAuthorityStore:
                 )
                 connection.execute("PRAGMA user_version = 1")
                 connection.commit()
+                self._created_new_database = new_database
                 version = 1
             if version == 1:
                 connection.executescript("BEGIN IMMEDIATE;\n" + _MIGRATION_2)
@@ -5530,13 +5553,35 @@ class SQLiteAuthorityStore:
                             "FROM canonical_events WHERE campaign_id = ? AND sequence = ?",
                             (session.campaign_id, message.canonical_sequence),
                         ).fetchone()
-                        if event is None or message.content != owned_payload(
-                            {
-                                "event_type": str(event["event_type"]),
-                                "visibility": str(event["visibility"]),
-                                "safe_payload": _load_payload(str(event["safe_payload_json"])),
-                            }
+                        if event is None:
+                            raise ValueError("Stored canonical session reference is invalid")
+                        payload = _load_payload(str(event["safe_payload_json"]))
+                        expected_reference = owned_payload({
+                            "event_type": str(event["event_type"]),
+                            "visibility": str(event["visibility"]),
+                            "safe_payload": payload,
+                        })
+                        if (
+                            message.content != expected_reference
+                            and str(event["event_type"]) == CanonicalEventType.TOOL_CALL.value
                         ):
+                            identity = tuple(payload.get(key) for key in (
+                                "package_id", "package_version", "package_sha256",
+                            ))
+                            if all(isinstance(value, str) for value in identity):
+                                manifest = sqlite_packages.exact_manifest(
+                                    connection, cast(tuple[str, str, str], identity),
+                                )
+                                # Canonical replay omits private engine inputs. Validate that
+                                # exact projection against the retained package declaration.
+                                if manifest is not None and any(
+                                    item.visibility == "engine" for item in manifest.state_schemas
+                                ):
+                                    expected_reference = owned_payload({
+                                        **expected_reference,
+                                        "safe_payload": {**payload, "parameters": {}},
+                                    })
+                        if message.content != expected_reference:
                             raise ValueError("Stored canonical session reference is invalid")
                 if session.status is SessionStatus.REVIEW_REQUIRED and not any(
                     message.kind is SessionMessageKind.HUMAN_REVIEW for message in messages
@@ -5646,12 +5691,19 @@ class SQLiteAuthorityStore:
                                         lifecycle_state["tombstone_prior_session_id"]
                                         == designated_source
                                     )
+                    sequel = plan.content.get("sequel")
+                    source_role_valid = source is not None and (
+                        (source.role is WriterRole.BUILDER
+                         and source.selected_skill == "BUILD CAMPAIGN PLAN" and sequel is None)
+                        or (source.role is WriterRole.DM and isinstance(sequel, Mapping)
+                            and handoff is not None
+                            and handoff["dm_session_id"] == source.session_id)
+                    )
                     if (
                         source is None
                         or source.campaign_id != plan.campaign_id
                         or source.parent_session_id is not None
-                        or source.role is not WriterRole.BUILDER
-                        or source.selected_skill != "BUILD CAMPAIGN PLAN"
+                        or not source_role_valid
                         or (
                             source.status
                             not in {SessionStatus.ACTIVE, SessionStatus.HANDOFF_CLOSED}
@@ -5673,6 +5725,20 @@ class SQLiteAuthorityStore:
                         plan.content_sha256
                     ):
                         raise ValueError("Stored Campaign Plan content identity is invalid")
+                    if isinstance(sequel, Mapping):
+                        from sylvia_gm.domain.campaign_sequel import digest
+                        from sylvia_gm.infrastructure.sqlite_sequel import verify_sequel
+
+                        previous = plans.get(str(sequel.get("previous_plan_id")))
+                        if previous is None:
+                            raise ValueError("Stored sequel predecessor is unavailable")
+                        verify_sequel(plan, previous)
+                        evidence = source_messages[plan.provenance_evidence_ids[0]]
+                        if (evidence.content != {
+                            "kind": "campaign_sequel_adoption", "plan_id": plan.plan_id,
+                            "request_sha256": digest(sequel["request"]),
+                        } or evidence.sequence != sequel["preview"]["latest_message_sequence"] + 1):
+                            raise ValueError("Stored sequel adoption evidence is invalid")
                     expected_plan_payload = campaign_plan_payload_sha256(
                         plan_id=plan.plan_id,
                         campaign_id=plan.campaign_id,
@@ -6378,6 +6444,20 @@ class SQLiteAuthorityStore:
         finally:
             connection.close()
 
+    def actor_context(
+        self, session_id: str, context_id: str, *, provider_id: str, model_id: str,
+    ) -> Mapping[str, object] | None:
+        """Read one actor-owned private history without reading the GM conversation."""
+        connection = self._connect_read_only()
+        try:
+            if int(connection.execute("PRAGMA user_version").fetchone()[0]) < 11:
+                return None
+            return sqlite_reasoning.read_actor_context(
+                connection, session_id, context_id, provider_id=provider_id, model_id=model_id,
+            )
+        finally:
+            connection.close()
+
     def session_history_page(
         self, session_id: str, *, before_sequence: int | None = None, limit: int = 50,
     ) -> SessionHistoryPage:
@@ -6538,6 +6618,27 @@ class SQLiteAuthorityStore:
         connection = self._connect()
         try:
             return sqlite_session.read_handoff(connection, handoff_id)
+        finally:
+            connection.close()
+
+    def campaign_adventures(self, campaign_id: str) -> tuple[CampaignPlan, ...]:
+        """Read the ordered accepted adventure lineage, excluding abandoned Builder revisions."""
+        from sylvia_gm.infrastructure.sqlite_sequel import adventure_rows
+
+        connection = self._connect_read_only()
+        try:
+            return tuple(sqlite_session.plan_from_row(row)
+                         for row in adventure_rows(connection, campaign_id))
+        finally:
+            connection.close()
+
+    def commit_campaign_sequel(self, plan: CampaignPlan) -> CampaignPlan:
+        """Use the same durability domain for the reviewed source and its admission receipt."""
+        from sylvia_gm.infrastructure.sqlite_sequel import commit_sequel
+
+        connection = self._connect()
+        try:
+            return commit_sequel(connection, plan)
         finally:
             connection.close()
 
@@ -7233,6 +7334,25 @@ class SQLiteAuthorityStore:
         ):
             raise IdempotencyConflict("Campaign operation identity payload does not match")
         return self._campaign_operation_result(row)
+
+    def campaign_confirmation(self, operation_id: str) -> CampaignConfirmation | None:
+        """Project the saved confirmation; absence never requires schema mutation."""
+        connection = self._connect_read_only()
+        try:
+            version = self._verify_exact_schema_identity(connection)
+            if version in (_SCHEMA_VERSION, _SESSION_SCHEMA_VERSION):
+                return None
+            row = connection.execute(
+                "SELECT * FROM campaign_operations WHERE operation_id = ?", (operation_id,)
+            ).fetchone()
+            if row is None:
+                return None
+            result = self._campaign_operation_result(row)
+            if not isinstance(result, CampaignConfirmation):
+                raise IdempotencyConflict("Campaign operation is not a confirmation")
+            return result
+        finally:
+            connection.close()
 
     def campaign_operation_hit(
         self,
@@ -11014,10 +11134,17 @@ class SQLiteAuthorityStore:
                 "WHERE p.campaign_id = ? AND p.participant_id = ?",
                 (campaign_id, mutation.participant_id),
             ).fetchone()
-            if row is None or (
-                row["package_id"], row["package_version"], row["package_sha256"],
-                row["validation_status"],
-            ) != (package_id, package_version, package_sha256, "validated"):
+            if (
+                row is None or row["validation_status"] != "validated"
+                or not sqlite_packages.participant_owner_is_current(
+                    connection, campaign_id=campaign_id,
+                    source_identity=(str(row["package_id"]), str(row["package_version"]),
+                                     str(row["package_sha256"])),
+                    actor_identity=(package_id, package_version, package_sha256),
+                    kind=str(row["kind"]), schema_id=str(row["schema_id"]),
+                    schema_sha256=str(row["schema_sha256"]),
+                )
+            ):
                 raise CommandRejected(
                     "Live character updates require the owning exact Ruleset and schema",
                     code="participant_mutation_unowned",
@@ -12342,16 +12469,9 @@ class SQLiteAuthorityStore:
             connection.execute("BEGIN IMMEDIATE")
             sqlite_packages.begin_staging(connection, install_id, manifest_json)
             connection.commit()
-        except BaseException:
-            if connection.in_transaction:
-                connection.rollback()
-            raise
-        finally:
-            connection.close()
-        for file_order, archive_file in enumerate(admitted.files):
-            for chunk_order, chunk in enumerate(admitted.iter_file_chunks(archive_file)):
-                connection = self._connect()
-                try:
+            # Retain each committed retry prefix without reopening SQLite for every chunk.
+            for file_order, archive_file in enumerate(admitted.files):
+                for chunk_order, chunk in enumerate(admitted.iter_file_chunks(archive_file)):
                     connection.execute("BEGIN IMMEDIATE")
                     sqlite_packages.append_staging_chunk(
                         connection,
@@ -12365,12 +12485,12 @@ class SQLiteAuthorityStore:
                         chunk=chunk,
                     )
                     connection.commit()
-                except BaseException:
-                    if connection.in_transaction:
-                        connection.rollback()
-                    raise
-                finally:
-                    connection.close()
+        except BaseException:
+            if connection.in_transaction:
+                connection.rollback()
+            raise
+        finally:
+            connection.close()
 
     def publish_package_archive(
         self, admitted: AdmittedPackageArchive, install_id: str
@@ -12668,6 +12788,20 @@ class SQLiteAuthorityStore:
         try:
             return sqlite_packages.current_lock_record(connection, campaign_id)
         finally:
+            connection.close()
+
+    def compatible_package_binding(
+        self, campaign_id: str, identity: tuple[str, str, str],
+    ) -> PackageLockEntry | None:
+        """Resolve a retained binding only through this campaign's compatible lineage."""
+        connection = self._connect_read_only()
+        try:
+            connection.execute("BEGIN")
+            entries = sqlite_packages.compatible_binding_entries(connection, campaign_id, identity)
+            return entries[0] if entries else None
+        finally:
+            if connection.in_transaction:
+                connection.rollback()
             connection.close()
 
     def primary_package_manifest(self, lock_id: str) -> PackageManifest | None:
@@ -13112,8 +13246,11 @@ class SQLiteAuthorityStore:
             state = self._read_state(connection, campaign_id)
             completed = (
                 connection.execute(
-                    "SELECT 1 FROM turns WHERE campaign_id = ? AND status = 'completed' LIMIT 1",
-                    (campaign_id,),
+                    "SELECT 1 FROM turns WHERE campaign_id = ? AND status = 'completed' "
+                    "AND NOT EXISTS (SELECT 1 FROM turns WHERE campaign_id = ? "
+                    "AND status = 'open') "
+                    "LIMIT 1",
+                    (campaign_id, campaign_id),
                 ).fetchone()
                 is not None
             )
@@ -13172,6 +13309,7 @@ class SQLiteAuthorityStore:
         expected_lock_id: str,
         migration_id: str,
         migrated_state: Mapping[str, JsonValue],
+        compatible_update: bool = False,
     ) -> ActivationResult:
         connection = self._connect()
         commit_started = False
@@ -13201,6 +13339,7 @@ class SQLiteAuthorityStore:
                 expected_lock_id=expected_lock_id,
                 migration_id=migration_id,
                 migrated_state=migrated_state,
+                compatible_update=compatible_update,
             )
             self._before_activation_commit()
             commit_started = True
@@ -13324,10 +13463,13 @@ class SQLiteAuthorityStore:
 
 
 
-def _open_for_application_owner(database_path: Path) -> SQLiteAuthorityStore:
-    """Package-private construction gate used only by application authority."""
+def _open_for_application_owner(
+    database_path: Path, *, before_migration: Callable[[], None] | None = None,
+) -> SQLiteAuthorityStore:
+    """Application-only construction; validate startup under ownership before opening SQLite."""
 
     return SQLiteAuthorityStore(
         database_path,
         _application_owner_gate=_APPLICATION_OWNER_GATE,
+        before_migration=before_migration,
     )

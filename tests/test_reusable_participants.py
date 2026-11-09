@@ -768,8 +768,12 @@ def test_reusable_participant_catalog_does_not_require_a_preinstalled_rift_candi
         assert owner.package_candidates() == ()
         catalog = _campaign_creation_catalog(tmp_path, owner)
 
-    assert sum(item.get("kind") == "ruleset" for item in catalog) == 1
-    assert sum(item.get("kind") == "player_character" for item in catalog) == 1
+    assert {item["id"] for item in catalog if item.get("kind") == "ruleset"} == {
+        "sylvia.srd-lite.bg3", "pneuma.riichi-mahjong",
+    }
+    players = [item for item in catalog if item.get("kind") == "player_character"]
+    assert sum(not item.get("builtin_starter", False) for item in players) == 1
+    assert sum(item.get("builtin_starter", False) for item in players) == 12
     assert sum(item.get("kind") == "companion" for item in catalog) == 1
 
 
@@ -991,13 +995,29 @@ def test_owner_dispatch_projects_only_compatible_local_participant_metadata(
             participant=_participant("Ilyra"), entity_state=_starting_state(max_hp=9),
             package=plan_package, declaration=plan_declaration, campaign_setting=plan_setting,
         )
+        foreign = save_reusable_participant(
+            tmp_path, operation_id="save-foreign-owner-dispatch-player", role="player_character",
+            summary="A synthetic character from another Setting.",
+            authored_profile="# Foreign fixture\n\nA controlled compatibility check.",
+            participant=_participant("Foreign fixture"), entity_state=_starting_state(),
+            package=plan_package, declaration=plan_declaration,
+            campaign_setting=dataclasses.replace(plan_setting, package_id="example.foreign-setting"),
+        )
         assert saved.artifact_id != legacy_saved.artifact_id
         options = dispatch("campaign_party_options", {
             "ruleset_selection": "sylvia.srd-lite.bg3", "setting_id": "pneuma.severed-lands",
             "plan_id": "last-cart-through",
         })
         ids = {item["id"] for item in options["player_archetypes"]}
-        assert saved.artifact_id in ids and legacy_saved.artifact_id not in ids
+        assert saved.artifact_id in ids and foreign.artifact_id not in ids
+        same_binding = (
+            legacy_saved.package_sha256 == saved.package_sha256
+            and legacy_saved.schema_sha256 == saved.schema_sha256
+            and legacy_saved.campaign_setting_id == saved.campaign_setting_id
+            and legacy_saved.campaign_setting_version == saved.campaign_setting_version
+            and legacy_saved.campaign_setting_sha256 == saved.campaign_setting_sha256
+        )
+        assert (legacy_saved.artifact_id in ids) == same_binding
         assert (tmp_path / "participants" / legacy_saved.artifact_id / "profile.md").is_file()
         catalog = dispatch("campaign_creation_catalog", {})
         ruleset = next(item for item in catalog if item["kind"] == "ruleset")

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
 from copy import deepcopy
@@ -17,7 +18,6 @@ from sylvia_gm.application.package_materialization import (
 from sylvia_gm.domain.campaign_plan import (
     PackageBinding,
     ValidatedCampaignPlan,
-    validate_campaign_plan,
 )
 from sylvia_gm.domain.interview_contribution import (
     InterviewContribution,
@@ -25,14 +25,20 @@ from sylvia_gm.domain.interview_contribution import (
 )
 from sylvia_gm.domain.package_library import (
     CAMPAIGN_SETTING_KNOWLEDGE_PATH,
+    PackageManifest,
     ParticipantArtifactDeclaration,
     canonical_json_bytes,
+    manifest_from_record,
     parse_campaign_setting_knowledge_bytes,
 )
 
 _SRD_PACKAGE_ID = "sylvia.srd-lite.bg3"
 _SRD_REFERENCE_PACKAGE_ID = "pneuma.srd.5.2.1.reference"
 _SEVERED_LANDS_PACKAGE_ID = "pneuma.severed-lands"
+BUNDLED_RIICHI_PACKAGES = (
+    ("pneuma.riichi-mahjong", "0.1.1"),
+    ("pneuma.riichi-club", "0.1.1"),
+)
 _SRD_SHARED_NOTICE_FILES = (
     "ATTRIBUTION.md",
     "LICENSE",
@@ -53,6 +59,15 @@ class BundledRiftAuthority:
     closure_sha256: str
     setting_paths: frozenset[str]
     setting_knowledge_ids: frozenset[str]
+
+
+@dataclass(frozen=True)
+class _BundledArchive:
+    """Private admitted metadata and bytes share one exact source-keyed lifetime."""
+
+    archive: bytes
+    manifests: tuple[PackageManifest, ...]
+    closure_sha256: str
 
 
 def _bundled_srd_root() -> Path:
@@ -150,8 +165,8 @@ def _package_draft(
     )
 
 
-def _srd_drafts() -> tuple[NormalizedPackageDraft, NormalizedPackageDraft]:
-    """Adapt one checked-in SRD source tree into gameplay and exact-reference packages."""
+def _srd_source_drafts() -> tuple[NormalizedPackageDraft, NormalizedPackageDraft]:
+    """Read authored SRD inputs, retaining claims for explicit record regeneration."""
 
     root = _bundled_srd_root()
     reference_record = json.loads(
@@ -171,14 +186,6 @@ def _srd_drafts() -> tuple[NormalizedPackageDraft, NormalizedPackageDraft]:
     }
     reference = NormalizedPackageDraft(reference_record, reference_payload, 4)
     primary_record = json.loads((root / "package-record.json").read_text(encoding="utf-8"))
-    primary_record["dependencies"] = [
-        {
-            "namespace": "rules_reference",
-            "kind": "rules_reference",
-            "id": _SRD_REFERENCE_PACKAGE_ID,
-            "version": str(reference_record["version"]),
-        },
-    ]
     # Lite is the active launch package; preserve all authored payloads. Original
     # source corpus bytes stay in the non-executable exact-reference dependency.
     primary_payload = _package_payload(root)
@@ -190,8 +197,31 @@ def _srd_drafts() -> tuple[NormalizedPackageDraft, NormalizedPackageDraft]:
     return NormalizedPackageDraft(primary_record, primary_payload, 4), reference
 
 
+def _srd_drafts() -> tuple[NormalizedPackageDraft, NormalizedPackageDraft]:
+    """Reject stale checked-in SRD claims before the materializer can replace them."""
+
+    drafts = _srd_source_drafts()
+    for draft in drafts:
+        manifest = manifest_from_record(draft.record, format_version=draft.format_version)
+        if {item.path for item in manifest.files} != set(draft.payloads):
+            raise ValueError("Bundled SRD payload descriptor paths do not match source files")
+        for item in manifest.files:
+            value = draft.payloads[item.path]
+            if item.byte_count != len(value) or item.sha256 != hashlib.sha256(value).hexdigest():
+                raise ValueError(
+                    f"Bundled SRD payload descriptor does not match source: {item.path}"
+                )
+    return drafts
+
+
 def _archive(drafts: tuple[NormalizedPackageDraft, ...]) -> bytes:
     """Reuse bundled bytes only while every source record and payload byte agrees."""
+
+    return _bundled_content(drafts).archive
+
+
+def _bundled_content(drafts: tuple[NormalizedPackageDraft, ...]) -> _BundledArchive:
+    """Share completed admission across bundled byte and metadata consumers."""
 
     key = tuple(
         (
@@ -205,7 +235,7 @@ def _archive(drafts: tuple[NormalizedPackageDraft, ...]) -> bytes:
 
 
 @lru_cache(maxsize=4)
-def _exact_bundled_archive(key: tuple) -> bytes:
+def _exact_bundled_archive(key: tuple) -> _BundledArchive:
     """Bound retained immutable inputs; each changed draft still gets full admission."""
 
     drafts = tuple(
@@ -213,7 +243,9 @@ def _exact_bundled_archive(key: tuple) -> bytes:
         for version, record, payloads in key
     )
     with materialize_package_archive(drafts) as materialized:
-        return materialized.archive.read()
+        return _BundledArchive(
+            materialized.archive.read(), materialized.manifests, materialized.closure_sha256,
+        )
 
 
 def _rift_drafts() -> tuple[
@@ -293,6 +325,34 @@ def bundled_rift_archive() -> bytes:
     return _archive(_rift_drafts())
 
 
+def bundled_rift_archive_for_closure(expected: object) -> bytes | None:
+    """Resolve only an exact available Rift closure; never replace an unknown saved pin."""
+    if not isinstance(expected, str):
+        return None
+    if expected == bundled_rift_authority().closure_sha256:
+        return bundled_rift_archive()
+    from sylvia_gm.application.plan_snapshot import _admitted_snapshot_facts
+
+    try:
+        retained = (_bundled_rift_plan_root() / "setting.sylvia-gm-package").read_bytes()
+    except FileNotFoundError:
+        return None
+    return retained if _admitted_snapshot_facts(retained)[2] == expected else None
+
+
+def bundled_riichi_archive() -> bytes:
+    """Read the validated Riichi/Setting archive unchanged in source and frozen builds."""
+
+    relative = Path("rulesets/riichi-mahjong/riichi-mahjong-0.1.1.sylvia-gm-package")
+    frozen_root = getattr(sys, "_MEIPASS", None)
+    root = (
+        Path(frozen_root)
+        if isinstance(frozen_root, str)
+        else Path(__file__).resolve().parents[3]
+    )
+    return (root / relative).read_bytes()
+
+
 @lru_cache(maxsize=1)
 def bundled_rift_authority() -> BundledRiftAuthority:
     """Reuse immutable bundled identities while each caller validates its own saved content."""
@@ -302,52 +362,46 @@ def bundled_rift_authority() -> BundledRiftAuthority:
     setting_knowledge = parse_campaign_setting_knowledge_bytes(
         setting_files[CAMPAIGN_SETTING_KNOWLEDGE_PATH]
     )
-    with materialize_package_archive(
-        (ruleset_draft, reference_draft, setting_draft)
-    ) as materialized:
-        ruleset = next(
-            item for item in materialized.manifests if item.package_id == _SRD_PACKAGE_ID
-        )
-        setting = next(
-            item for item in materialized.manifests if item.package_id == _SEVERED_LANDS_PACKAGE_ID
-        )
-        return BundledRiftAuthority(
-            ruleset=PackageBinding(*ruleset.identity),
-            setting=PackageBinding(*setting.identity),
-            closure_sha256=materialized.closure_sha256,
-            setting_paths=frozenset(setting_files),
-            setting_knowledge_ids=frozenset(item.identity for item in setting_knowledge.facts),
-        )
+    materialized = _bundled_content((ruleset_draft, reference_draft, setting_draft))
+    ruleset = next(
+        item for item in materialized.manifests if item.package_id == _SRD_PACKAGE_ID
+    )
+    setting = next(
+        item for item in materialized.manifests if item.package_id == _SEVERED_LANDS_PACKAGE_ID
+    )
+    return BundledRiftAuthority(
+        ruleset=PackageBinding(*ruleset.identity),
+        setting=PackageBinding(*setting.identity),
+        closure_sha256=materialized.closure_sha256,
+        setting_paths=frozenset(setting_files),
+        setting_knowledge_ids=frozenset(item.identity for item in setting_knowledge.facts),
+    )
 
 
 def bundled_rift_participant_declaration() -> ParticipantArtifactDeclaration:
     """Return the exact participant schema materialized into the bundled Rift Ruleset."""
 
-    with materialize_package_archive(_rift_drafts()) as materialized:
-        ruleset = next(
-            item for item in materialized.manifests if item.package_id == _SRD_PACKAGE_ID
-        )
-        declarations = tuple(
-            item for item in ruleset.participant_artifacts if item.kind == "player_character"
-        )
-        if len(declarations) != 1:
-            raise RuntimeError("The bundled D&D participant schema is unavailable")
-        return declarations[0]
+    materialized = _bundled_content(_rift_drafts())
+    ruleset = next(
+        item for item in materialized.manifests if item.package_id == _SRD_PACKAGE_ID
+    )
+    declarations = tuple(
+        item for item in ruleset.participant_artifacts if item.kind == "player_character"
+    )
+    if len(declarations) != 1:
+        raise RuntimeError("The bundled D&D participant schema is unavailable")
+    return deepcopy(declarations[0])
 
 
 def bundled_rift_campaign_plan() -> ValidatedCampaignPlan:
-    """Load and validate the checked-in structured Rift plan against bundled packages."""
+    """Validate retained Rift against its owned snapshot, independent of the base world."""
+    from sylvia_gm.application.plan_snapshot import validate_plan_snapshot
 
-    authority = bundled_rift_authority()
     root = _bundled_rift_plan_root()
-    return validate_campaign_plan(
+    return validate_plan_snapshot(
+        (root / "setting.sylvia-gm-package").read_bytes(),
         json.loads((root / "plan.json").read_text(encoding="utf-8")),
-        readable_markdown=(root / "plan.md").read_text(encoding="utf-8"),
-        expected_ruleset=authority.ruleset,
-        expected_setting=authority.setting,
-        expected_closure_sha256=authority.closure_sha256,
-        setting_paths=authority.setting_paths,
-        setting_knowledge_ids=authority.setting_knowledge_ids,
+        (root / "plan.md").read_text(encoding="utf-8"),
     )
 
 
@@ -375,17 +429,14 @@ def _bundled_campaign_content_catalog() -> tuple[dict[str, object], ...]:
 
     from sylvia_gm.application.bundled_campaign_plans import bundled_plan_catalog
 
-    with materialize_package_archive(_srd_drafts()) as materialized:
-        ruleset_record = next(
-            item for item in materialized.manifests if item.package_id == _SRD_PACKAGE_ID
-        )
-    ruleset_draft, reference_draft, setting_draft = _rift_drafts()
-    with materialize_package_archive(
-        (ruleset_draft, reference_draft, setting_draft)
-    ) as materialized:
-        setting_record = next(
-            item for item in materialized.manifests if item.package_id == _SEVERED_LANDS_PACKAGE_ID
-        )
+    srd = _bundled_content(_srd_drafts())
+    ruleset_record = next(
+        item for item in srd.manifests if item.package_id == _SRD_PACKAGE_ID
+    )
+    rift = _bundled_content(_rift_drafts())
+    setting_record = next(
+        item for item in rift.manifests if item.package_id == _SEVERED_LANDS_PACKAGE_ID
+    )
     return (
         {
             "kind": "ruleset",

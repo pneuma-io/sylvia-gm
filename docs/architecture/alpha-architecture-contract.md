@@ -401,6 +401,15 @@ The owner classifies provider output at ingress:
   exclude them. Clearing or disabling Full Audit clears its own trace store, not saved Thinking.
   Partial reasoning retained after interruption is labelled as such and is never promoted to a
   completed narrative or an authoritative game fact;
+- **isolated Ruleset participants:** an explicit package opt-in creates separate actor-owned
+  inference histories. The GM retains its campaign and narration history. Participant requests
+  start from the declared observation/persona/action envelope, never a filtered GM transcript.
+  Native fields and private compaction notes remain with the campaign, session, stable actor,
+  exact package and compatible provider/model context. Revisions fence proposals, not history
+  lifetime. Missing private continuation starts a fresh actor-only context. Readable participant
+  reasoning uses the same private inspection sink; signatures and opaque data are not previews
+  or summary prose. Only the engine's committed published result enters GM history. Cancellation
+  before commit discards a proposal; recovery after commit reads its receipt without replay;
 - **TALK:** provisionally streamed, canonically stored only on completion;
 - **Admin Full Audit trace:** off by default during ordinary use and required during testing; it
   mirrors each complete provider request, source-event/role provenance, exact tool surface and
@@ -958,6 +967,23 @@ retained Setting and Ruleset copies. The editable Plan keeps its original source
 derives effective hashes after package admission and validates references against the edited copy.
 Runtime validation precedes saving a selectable Plan. Publication never rewrites source packages.
 
+An explicit adventure append admits another immutable Campaign Plan revision under the existing GM
+writer. It retains its predecessor, exact selected source identity and hashes, original structured
+and readable preparation, reviewed story-identity mapping and the player's continuity review.
+Application evidence records adoption without manufacturing player dialogue. The original handoff
+continues to certify its original Plan; the GM loads the current accepted adventure only through
+that retained lineage. Earlier preparation, unresolved secrets and progress remain addressable.
+History projects chapter ordinals and previous completion markers across the ordered adventures,
+while the active adventure keeps its own ending gates.
+
+Append requires an idle active campaign and an unchanged exact package lock. The owner revalidates
+the source, campaign revision, accepted predecessor and latest saved message sequence immediately
+before one short transaction writes the Plan, adoption evidence and revision receipt. The message
+fence catches newly narrated futures even when no game-state value changed. Stable request identity
+recovers a committed result without loading the authoring library again; a changed request rejects.
+No starting state, participants, package activation or layout is written by this transaction.
+Existing campaign export and backup retain all accepted revisions and the same exact source closure.
+
 Optional Plan party placements apply at Start in player-first selection order. Each slot supplies
 Ruleset-authored character-state fields and additions to existing Ruleset state lists, such as map
 tokens or actor rosters. Exact participant-reference values bind only the assigned ID or display
@@ -1054,6 +1080,31 @@ Activation requires:
 - successful deterministic migration preview/application;
 
 One short transaction revalidates those conditions, writes migrated state if any, switches the campaign lock manifest, records lineage, and increments the campaign revision. Failure leaves the old lock authoritative. Candidate bytes cannot imply activation.
+
+The compatible-only campaign update path uses this transaction with an identity migration:
+saved values and participant records are preserved. Owner previews bind the campaign identity,
+revision, current exact lock and selected immutable closure. Apply rechecks the preview inside
+the activation reservation; idempotent receipts resolve retries without repeating adoption.
+Both admission and commit require no open TURN, including after an earlier completed TURN.
+Changed existing state/character contracts, removed content, renamed/incompatible panels and
+invalid current values are conflicts, not repair instructions. Retained lock lineage and package
+memberships keep prior bytes available; a return to those bytes is a fresh compatible adoption
+using present state. The renderer reconciles new panels through the existing campaign workspace
+store and never substitutes the incoming starting layout for a saved arrangement.
+Character source identity and accepted Plan bindings remain immutable. Resolving an active binding
+requires the current exact lock and this campaign's connected compatible activation receipts;
+retained membership or another campaign's history is insufficient. Character mutation additionally
+requires the unchanged complete participant declaration throughout that chain. Ruleset references,
+Setting reference discovery and Setting knowledge use the same resolution. Structured content and
+knowledge comparisons retain record identities and reference edges before activation. Historical
+handoffs still validate their exact original closure, including candidates subsequently activated.
+Only the validated adoption seam may use the reserved compatible migration identity and stamp
+compatible authority in its transactional receipt. Generic activation rejects that namespace;
+historical marker-only records confer no compatible binding authority. The existing opaque receipt
+JSON preserves this proof through backup/export/recovery without rewriting source or Plan bindings.
+Preview also merges candidate Setting knowledge against the actual accepted Plan and retained
+adventure preparation using the normal knowledge catalog rules. A collision or missing fact
+reference blocks adoption rather than renaming immutable preparation.
 
 Package reclamation may remove bytes only when no active campaign, tombstoned campaign, retained campaign history/lineage, installed candidate, or pending recovery reference requires them. Portable backup/export includes the exact required closure, so a later post-purge recovery does not depend on local garbage-collection history.
 

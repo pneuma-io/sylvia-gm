@@ -148,6 +148,7 @@ class Case:
         entities = state[FULL + ".entities"]
         entities["hero"].update(
             name="Lite caster",
+            size_rank=data["size_rank"],
             creature_type="humanoid",
             prepared_spells=[spell],
             spell_slot_cast_this_turn=False,

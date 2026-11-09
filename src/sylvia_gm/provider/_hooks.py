@@ -272,13 +272,13 @@ class LoggingHook:
         # Cache stats
         if response and response.cache_usage:
             cu = response.cache_usage
-            if cu.cache_read_tokens > 0:
+            if cu.cache_read_tokens is not None and cu.cache_read_tokens > 0:
                 logger.info(
-                    "cache_stats hit_ratio=%.1f%% cached=%d total=%d write=%d",
-                    cu.savings_pct,
+                    "cache_stats hit_ratio=%s cached=%d total=%d write=%s",
+                    "unavailable" if cu.savings_pct is None else f"{cu.savings_pct:.1f}%",
                     cu.cache_read_tokens,
                     cu.total_prompt_tokens,
-                    cu.cache_write_tokens,
+                    "unavailable" if cu.cache_write_tokens is None else cu.cache_write_tokens,
                 )
 
     async def on_error(self, context: HookContext) -> None:

@@ -9,6 +9,11 @@ from typing import BinaryIO
 from sylvia_gm.domain.errors import OwnerConflict
 
 
+def authority_lock_identity(database_path: Path) -> Path:
+    """One lock identity is shared by authority startup and application-update recovery."""
+    return database_path.with_name(f"{database_path.name}.authority-owner")
+
+
 class DatabaseOwnerLock:
     """Hold a non-blocking operating-system lock for an owner's lifetime."""
 

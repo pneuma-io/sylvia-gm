@@ -254,7 +254,7 @@ class _CampaignDiscoveryProvider(_ScriptedProvider):
                     "id": "prepare-rift",
                     "function": {
                         "name": "prepare_campaign_setup",
-                        "arguments": json.dumps({"campaign_plan_id": "the-rift-awakening"}),
+                        "arguments": json.dumps({"campaign_plan_id": "rift-awakening"}),
                     },
                 },
                 finish_reason="tool_calls",
@@ -982,7 +982,7 @@ def test_owner_transport_opens_independent_participant_builder(
         for step, visible, answer in (
             ("ruleset", "D&D SRD", {"candidate_id": "sylvia.srd-lite.bg3"}),
             ("setting", "Severed Lands", {"setting_id": "pneuma.severed-lands"}),
-            ("plan", "The Rift Awakening", {"plan_id": "the-rift-awakening"}),
+            ("plan", "Rift Awakening", {"plan_id": "rift-awakening"}),
             ("name", "Transport Subflow", {"display_name": "Transport Subflow"}),
         ):
             advanced = harness.request(
@@ -1317,7 +1317,7 @@ def test_general_builder_chat_is_durable_and_campaign_independent(tmp_path: Path
         index = harness.request("builder-chat-index", "builder_chat_index")
         assert [entry["session"]["session_id"] for entry in index] == [session_id]
         assert index[0]["display_name"] == (
-            "Help me build a campaign plan for an observatory mystery."
+            "Help me build a campaign plan for an observatory…"
         )
         context = harness.request(
             "general-builder-context",
@@ -1350,6 +1350,34 @@ def test_general_builder_chat_is_durable_and_campaign_independent(tmp_path: Path
         assert reopened.request("reopened-campaigns-empty", "campaign_index") == []
     finally:
         reopened.close()
+
+
+def test_builder_turn_does_not_read_unused_content_catalog(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Ordinary file work must reach the provider without preparing discovery data."""
+    def unused_catalog(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("Content catalog must be read only when its tool is called")
+
+    monkeypatch.setattr(owner_process, "_campaign_content_tool_authority", unused_catalog)
+    provider = _BuilderToolProvider()
+    harness = _OwnerHarness(tmp_path / "authority.sqlite3", provider)
+    try:
+        _campaign_id, session_id = _create_builder_session(harness, "unused-catalog")
+        monkeypatch.setattr(owner_process, "bundled_rift_authority", unused_catalog)
+        result = harness.request(
+            "submit-unused-catalog", "submit_session_input",
+            {"session_id": session_id, "turn_id": "turn-builder-unused-catalog",
+             "attempt_id": "attempt-unused-catalog", "message_id": "message-unused-catalog",
+             "user_text": "Write the plan."},
+        )
+        assert result["tool_calls_made"] == ["write_file"]
+        assert len(provider.calls) == 2
+        assert {"discover_campaign_content", "prepare_campaign_setup"}.issubset(
+            tool["function"]["name"] for tool in provider.calls[0][1] or []
+        )
+    finally:
+        harness.close()
 
 
 def test_delete_builder_chat_removes_only_its_workspace_and_history(
@@ -1486,9 +1514,9 @@ def test_new_campaign_builder_discovers_content_on_demand_without_starting_play(
             "discover_campaign_content",
             "prepare_campaign_setup",
         ]
-        assert evidence[0]["result"]["items"][0]["title"] == "The Rift Awakening"
+        assert evidence[0]["result"]["items"][0]["title"] == "Rift Awakening"
         assert evidence[1]["result"]["status"] == "setup_ready"
-        assert evidence[1]["result"]["setup_id"] == "the-rift-awakening"
+        assert evidence[1]["result"]["campaign_plan_id"] == "rift-awakening"
         assert harness.request("campaign-discovery-index", "campaign_index") == []
     finally:
         harness.close()
@@ -1908,6 +1936,19 @@ def test_owner_provider_settings_save_reload_and_remove_without_echoing_keys(
             "openrouter",
             "featherless",
             "openai",
+            "groq",
+            "together",
+            "deepseek",
+            "anthropic",
+            "gemini",
+            "xai",
+            "mistral",
+            "minimax",
+            "moonshot",
+            "zai",
+            "alibaba",
+            "fireworks",
+            "cerebras",
             "custom",
         ]
         assert settings["configured"] == []
@@ -2003,9 +2044,13 @@ def test_lm_studio_model_discovery_uses_the_explicit_local_endpoint(
             "context_window": None,
             "context_window_source": "unknown",
             "max_output_tokens": None,
+            "declared_max_output_tokens": None,
+            "configured_output_tokens": None,
             "transport": "chat_completions",
             "supports_tools": None,
             "supports_streaming": None,
+            "documented_source": None,
+            "documented_at": None,
         }
     ]
     assert requests[0].url == httpx.URL("http://127.0.0.1:1234/v1/models")
@@ -3581,6 +3626,8 @@ def test_owner_shutdown_cancels_live_builder_provider_and_fences_output(
     session_id = ""
     try:
         _campaign_id, session_id = _create_builder_session(harness, "shutdown-live")
+        # Qualify shutdown after provider admission, independently of first catalog materialization.
+        harness.request("prepare-shutdown-catalog", "campaign_creation_catalog")
         harness.send(
             "submit-builder-shutdown-live",
             {
