@@ -183,7 +183,10 @@ def list_characters(
                 continue
             for file in sorted(chars_dir.iterdir()):
                 if file.suffix in (".md", ".json"):
-                    name = _extract_title_from_md(file) if file.suffix == ".md" else file.stem.replace("-", " ").title()
+                    name = (
+                        _extract_title_from_md(
+                        file) if file.suffix == ".md" else file.stem.replace("-", " ").title()
+                    )
                     results.append({
                         "slug": file.stem,
                         "name": name or file.stem.replace("-", " ").title(),
@@ -221,7 +224,10 @@ def list_companions(
         if companions_dir.is_dir():
             for file in sorted(companions_dir.iterdir()):
                 if file.suffix in (".md", ".json"):
-                    name = _extract_title_from_md(file) if file.suffix == ".md" else file.stem.replace("-", " ").title()
+                    name = (
+                        _extract_title_from_md(
+                        file) if file.suffix == ".md" else file.stem.replace("-", " ").title()
+                    )
                     results.append({
                         "slug": file.stem,
                         "name": name or file.stem.replace("-", " ").title(),
@@ -235,7 +241,10 @@ def list_companions(
             if npcs_dir.is_dir():
                 for file in sorted(npcs_dir.iterdir()):
                     if file.suffix in (".md", ".json"):
-                        name = _extract_title_from_md(file) if file.suffix == ".md" else file.stem.replace("-", " ").title()
+                        name = (
+                            _extract_title_from_md(
+                            file) if file.suffix == ".md" else file.stem.replace("-", " ").title()
+                        )
                         results.append({
                             "slug": file.stem,
                             "name": name or file.stem.replace("-", " ").title(),

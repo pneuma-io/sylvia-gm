@@ -14,10 +14,9 @@ from typing import Any
 
 import yaml
 
-logger = logging.getLogger(__name__)
-
 from sylvia_gm.provider import Provider, ProviderResponse
 
+logger = logging.getLogger(__name__)
 
 # ── CampaignBrief ────────────────────────────────────────────────────────
 

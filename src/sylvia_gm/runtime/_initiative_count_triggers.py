@@ -9,6 +9,7 @@ check_and_fire() is called during turn advancement.
 
 from __future__ import annotations
 
+import contextlib
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -141,10 +142,8 @@ class InitiativeTriggerManager:
 
             # Fire procedure via ctx.procedure_executor (LOCK-1)
             if ctx.procedure_executor:
-                try:
+                with contextlib.suppress(Exception):
                     ctx.procedure_executor(trigger.procedure_name, ctx)
-                except Exception:
-                    pass
 
             if not trigger.repeats:
                 to_remove.append(trigger.trigger_id)

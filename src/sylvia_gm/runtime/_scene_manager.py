@@ -8,6 +8,7 @@ Provides:
 
 from __future__ import annotations
 
+import contextlib
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -235,10 +236,8 @@ class SceneManager:
                     pass
 
                 # Also trigger generic on_scene_change
-                try:
+                with contextlib.suppress(Exception):
                     ctx.procedure_executor("on_scene_change", ctx)
-                except Exception:
-                    pass
 
             # Set flags_on_leave (always, regardless of procedure_executor)
             if old_scene is not None:
@@ -259,12 +258,10 @@ class SceneManager:
 
         # Persist to campaign state
         if self._state_bridge is not None:
-            try:
+            with contextlib.suppress(Exception):
                 self._state_bridge.write_field(
                     "_campaign", "current_scene_id", new_scene_id
                 )
-            except Exception:
-                pass
 
         # ── Enter new scene ─────────────────────────────────────────
         # Trigger on_enter procedure

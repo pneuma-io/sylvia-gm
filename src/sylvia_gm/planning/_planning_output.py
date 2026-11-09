@@ -17,7 +17,6 @@ from pydantic import BaseModel, Field
 from sylvia_gm.planning._campaign_bible import CampaignBible
 from sylvia_gm.planning._reveal_registry import RevealRegistry
 
-
 # ── Planning Output ───────────────────────────────────────────────────────
 
 

@@ -19,11 +19,10 @@ from typing import Any
 
 import yaml
 
-logger = logging.getLogger(__name__)
-
 from sylvia_gm.planner.interview import CampaignBrief
 from sylvia_gm.provider import Provider, ProviderResponse
 
+logger = logging.getLogger(__name__)
 
 # ── CampaignPlan ───────────────────────────────────────────────────────
 
@@ -294,7 +293,7 @@ Return ONLY a valid JSON object (no markdown, no extra text):
             abilities = self._ruleset.get("abilities", {})
             combat = self._ruleset.get("combat", {})
             if abilities or combat:
-                relevant = {k: v for k, v in {**abilities, **combat}.items()}
+                relevant = dict({**abilities, **combat}.items())
                 ruleset_block = f"Ruleset mechanics context:\n{json.dumps(relevant, indent=2)}\n\n"
 
         return f"""You are a Dungeon Master designing Act {act_num}: "{act_name}".

@@ -65,7 +65,7 @@ def extract_ability_schema(ruleset_path: str | Path) -> list[str]:
     if not path.exists():
         raise FileNotFoundError(f"Ruleset file not found: {ruleset_path}")
 
-    with open(path, "r", encoding="utf-8") as fh:
+    with open(path, encoding="utf-8") as fh:
         data = yaml.safe_load(fh) or {}
 
     abilities = data.get("abilities")

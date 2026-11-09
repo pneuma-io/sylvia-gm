@@ -103,9 +103,9 @@ class CrossPlanValidator:
         - location.connecting_locations → must reference existing locations
         """
         npc_ids = {n.id for n in bible.npcs}
-        location_ids = {l.id for l in bible.locations}
+        location_ids = {location.id for location in bible.locations}
         faction_ids = {f.id for f in bible.factions}
-        item_ids = {i.id for i in bible.items}
+        {i.id for i in bible.items}
 
         errors: list[str] = []
 
@@ -147,12 +147,11 @@ class CrossPlanValidator:
 
         # Item owner references
         for item in bible.items:
-            if item.owner:
-                if item.owner not in npc_ids and item.owner not in location_ids:
-                    errors.append(
-                        f"Item '{item.id}' owner '{item.owner}' "
-                        f"does not reference an existing NPC or location"
-                    )
+            if item.owner and item.owner not in npc_ids and item.owner not in location_ids:
+                errors.append(
+                    f"Item '{item.id}' owner '{item.owner}' "
+                    f"does not reference an existing NPC or location"
+                )
 
         if errors:
             raise PlanningError(
@@ -166,7 +165,7 @@ class CrossPlanValidator:
         all_ids.append(bible.world.id)
         all_ids.extend(f.id for f in bible.factions)
         all_ids.extend(n.id for n in bible.npcs)
-        all_ids.extend(l.id for l in bible.locations)
+        all_ids.extend(location.id for location in bible.locations)
         all_ids.extend(i.id for i in bible.items)
 
         seen: set[str] = set()

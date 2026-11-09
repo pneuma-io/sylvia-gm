@@ -12,7 +12,6 @@ Defined in plan: ~/.hermes/plans/interview-planning-pipeline-v3.md §3, §8-9
 
 from __future__ import annotations
 
-import asyncio
 import json
 import logging
 import re
@@ -38,7 +37,7 @@ from sylvia_gm.planning._prompt import (
 )
 from sylvia_gm.planning._reveal_registry import RevealRegistry
 from sylvia_gm.planning._validator import CrossPlanValidator
-from sylvia_gm.provider._base import Provider, ProviderResponse
+from sylvia_gm.provider._base import Provider
 from sylvia_gm.provider._exceptions import (
     ProviderTimeoutError,
     TokenLimitError,
@@ -145,14 +144,14 @@ class PlanningEngine:
                 last_raw = response.content or ""
                 return self._parse_response(last_raw)
 
-            except asyncio.TimeoutError:
-                raise PlanningTimeoutError(
+            except TimeoutError:
+                raise PlanningTimeoutError(  # noqa: B904 - preserve legacy exception chaining.
                     "Planning took too long (60s timeout). "
                     "Try again or use a faster model."
                 )
 
             except ProviderTimeoutError as e:
-                raise PlanningTimeoutError(
+                raise PlanningTimeoutError(  # noqa: B904 - preserve legacy exception chaining.
                     f"Provider timed out during planning: {e}"
                 ) from e
 
@@ -197,7 +196,7 @@ class PlanningEngine:
                 )
 
         # Should be unreachable — but safety net
-        raise PlanningError(
+        raise PlanningError(  # noqa: B904 - preserve legacy exception chaining.
             f"Planning failed after all retry attempts. "
             f"Last error: {last_error}"
         )
@@ -219,7 +218,7 @@ class PlanningEngine:
                 data.get("reveal_registry", {})
             )
         except ValidationError as e:
-            raise PlanningError(
+            raise PlanningError(  # noqa: B904 - preserve legacy exception chaining.
                 f"Output failed schema validation: {e}"
             ) from e
 
@@ -229,31 +228,31 @@ class PlanningEngine:
         # 4. Validate chapters list
         chapters = data.get("chapters", [])
         if not isinstance(chapters, list):
-            raise PlanningError(
+            raise PlanningError(  # noqa: B904 - preserve legacy exception chaining.
                 f"'chapters' must be a list, got {type(chapters).__name__}"
             )
 
         for i, ch in enumerate(chapters):
             if not isinstance(ch, dict):
-                raise PlanningError(
+                raise PlanningError(  # noqa: B904 - preserve legacy exception chaining.
                     f"Chapter {i} must be a dict, got {type(ch).__name__}"
                 )
             if "frontmatter" not in ch:
-                raise PlanningError(
+                raise PlanningError(  # noqa: B904 - preserve legacy exception chaining.
                     f"Chapter {i} missing required 'frontmatter' key"
                 )
             fm = ch.get("frontmatter", {})
             if not isinstance(fm, dict):
-                raise PlanningError(
+                raise PlanningError(  # noqa: B904 - preserve legacy exception chaining.
                     f"Chapter {i} 'frontmatter' must be a dict, "
                     f"got {type(fm).__name__}"
                 )
             if "chapter" not in fm:
-                raise PlanningError(
+                raise PlanningError(  # noqa: B904 - preserve legacy exception chaining.
                     f"Chapter {i} 'frontmatter' missing required 'chapter' number"
                 )
             if "body" not in ch:
-                raise PlanningError(
+                raise PlanningError(  # noqa: B904 - preserve legacy exception chaining.
                     f"Chapter {i} missing required 'body' key (markdown content)"
                 )
 
@@ -293,7 +292,7 @@ class PlanningEngine:
                 if isinstance(data, dict):
                     return data  # type: ignore[return-value]
             except json.JSONDecodeError as e:
-                raise PlanningError(
+                raise PlanningError(  # noqa: B904 - preserve legacy exception chaining.
                     f"LLM output is not valid JSON (even after extracting "
                     f"from code block): {e}"
                 ) from e
@@ -308,7 +307,7 @@ class PlanningEngine:
             except json.JSONDecodeError:
                 pass
 
-        raise PlanningError(
+        raise PlanningError(  # noqa: B904 - preserve legacy exception chaining.
             f"LLM output is not valid JSON. "
             f"First 200 chars of response: {stripped[:200]}"
         )
@@ -403,14 +402,14 @@ class PlanningEngine:
         except OSError as e:
             # Clean up temp on failure
             shutil.rmtree(temp_dir, ignore_errors=True)
-            raise PlanningError(
+            raise PlanningError(  # noqa: B904 - preserve legacy exception chaining.
                 f"Cannot write to planning directory. Check permissions: {e}"
             ) from e
 
         except Exception:
             # Clean up temp on any failure
             shutil.rmtree(temp_dir, ignore_errors=True)
-            raise PlanningError(
+            raise PlanningError(  # noqa: B904 - preserve legacy exception chaining.
                 "Atomic write failed — partial output has been removed."
             )
 

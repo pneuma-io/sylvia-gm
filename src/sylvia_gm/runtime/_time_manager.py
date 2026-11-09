@@ -29,6 +29,7 @@ State Memo injection:
 
 from __future__ import annotations
 
+import contextlib
 import re
 from typing import Any
 
@@ -222,10 +223,8 @@ def advance_time(
 
     # LOCK-1: Trigger on_time_advanced procedure
     if ctx is not None and ctx.procedure_executor:
-        try:
+        with contextlib.suppress(Exception):
             ctx.procedure_executor("on_time_advanced", ctx)
-        except Exception:
-            pass
 
     return combat_state
 

@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from sylvia_gm.application.launch_compatibility import require_active_ruleset
-
 import hashlib
 import io
 from collections.abc import Mapping
@@ -18,6 +16,7 @@ from sylvia_gm.application.bundled_packages import (
     bundled_rift_authority,
 )
 from sylvia_gm.application.campaign_plan_sources import validate_retained_campaign_plan
+from sylvia_gm.application.launch_compatibility import require_active_ruleset
 from sylvia_gm.application.reusable_plans import load_reusable_campaign_plan
 from sylvia_gm.domain.authority import PackageRole, SafePayload
 from sylvia_gm.domain.errors import CommandRejected
@@ -125,9 +124,17 @@ def resolve_interview_content(
                 if candidate is None:
                     candidate = owner.install_package_archive(
                         io.BytesIO(snapshot),
-                        install_id=f"interview-snapshot-{hashlib.sha256(snapshot).hexdigest()[:24]}",
+                        install_id=(
+                            "interview-snapshot-"
+                            f"{hashlib.sha256(snapshot).hexdigest()[:24]}"
+                        ),
                     )
-        if candidate is None or not any(item.package_id == setting_id for item in campaign_setting_entries(candidate.package_lock)):
+        if (
+            candidate is None
+            or not any(
+            item.package_id == setting_id
+            for item in campaign_setting_entries(candidate.package_lock))
+        ):
             snapshot = bundled_setting_snapshot(logical_ruleset, setting_id)
             if snapshot is not None:
                 candidate = owner.install_package_archive(io.BytesIO(snapshot),

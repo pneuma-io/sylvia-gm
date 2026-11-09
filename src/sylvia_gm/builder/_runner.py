@@ -12,7 +12,6 @@ from sylvia_gm.agent._mode import AgentMode
 from sylvia_gm.agent._runner import AgentLoopError, AgentRunner, AgentTurnResult
 from sylvia_gm.provider._base import Provider
 
-
 # Aliases for backward compat
 BuilderLoopError = AgentLoopError
 BuilderTurnResult = AgentTurnResult

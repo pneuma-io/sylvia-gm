@@ -57,7 +57,8 @@ def resolve_retry_basis_message(
         for message in context.messages
         if message.content.get("attempt_id") == failed_attempt_id
         and message.kind in {SessionMessageKind.USER, SessionMessageKind.EVIDENCE}
-        and message.content.get("kind") not in {"session_attempt_terminal", "player_action_response_retry"}
+        and message.content.get(
+        "kind") not in {"session_attempt_terminal", "player_action_response_retry"}
     )
     if len(direct) == 1:
         return direct[0]
@@ -81,7 +82,8 @@ def resolve_retry_basis_message(
         for message in context.messages
         if message.message_id == original_message_id
         and message.kind in {SessionMessageKind.USER, SessionMessageKind.EVIDENCE}
-        and message.content.get("kind") not in {"session_attempt_terminal", "player_action_response_retry"}
+        and message.content.get(
+        "kind") not in {"session_attempt_terminal", "player_action_response_retry"}
     )
     if len(original) != 1:
         raise CommandRejected("Retry input identity is unavailable or ambiguous")
@@ -1062,7 +1064,8 @@ class CampaignSessionLoop:
                         "player_action_id": request.player_action_id,
                         "player_action_ids": [record["action_id"] for record in
                             self._owner.player_action_context(
-                                self._owner.session_context(request.session_id).session.campaign_id)],
+                                self._owner.session_context(
+                                request.session_id).session.campaign_id)],
                         "automatic_response": request.automatic_response,
                     } if request.input_kind is SessionInputKind.PLAYER_ACTION_RESPONSE else {}),
                     "canonical_start_sequence": initial_high_water,

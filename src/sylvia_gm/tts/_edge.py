@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING
 import edge_tts  # type: ignore[import-untyped]
 
 if TYPE_CHECKING:
-    from sylvia_gm.config.loader import TTSConfig
+    pass
 
 logger = logging.getLogger(__name__)
 

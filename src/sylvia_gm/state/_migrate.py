@@ -97,7 +97,7 @@ def _migrate_0_1_0_to_0_2_0(state: dict[str, Any]) -> dict[str, Any]:
 
     # Fix characters
     characters = state.get("characters", {})
-    for cid, char in characters.items():
+    for _cid, char in characters.items():
         if not isinstance(char, dict):
             continue
         char.setdefault("spells_known", [])
@@ -117,7 +117,7 @@ def _migrate_0_1_0_to_0_2_0(state: dict[str, Any]) -> dict[str, Any]:
 
     # Fix monsters
     monsters = state.get("monsters", {})
-    for mid, mon in monsters.items():
+    for _mid, mon in monsters.items():
         if not isinstance(mon, dict):
             continue
         mon.setdefault("cr", None)
@@ -127,7 +127,7 @@ def _migrate_0_1_0_to_0_2_0(state: dict[str, Any]) -> dict[str, Any]:
 
     # Fix NPCs
     npcs = state.get("npcs", {})
-    for nid, npc in npcs.items():
+    for _nid, npc in npcs.items():
         if not isinstance(npc, dict):
             continue
         npc.setdefault("notes", [])

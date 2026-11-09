@@ -33,7 +33,8 @@ from sylvia_gm.provider._model_defaults import documented_model_defaults, docume
 from sylvia_gm.provider._protocol_routes import model_protocol
 
 ProviderTransport = Literal[
-    "chat_completions", "responses", "anthropic_messages", "codex_app_server", "gemini_generate_content"
+    "chat_completions",
+    "responses", "anthropic_messages", "codex_app_server", "gemini_generate_content"
 ]
 
 _DISCOVERY_RESPONSE_LIMIT = 32 * 1024 * 1024
@@ -43,7 +44,9 @@ _HEADER_COUNT_LIMIT = 16
 _HEADER_NAME = re.compile(r"^[A-Za-z0-9!#$%&'*+.^_`|~-]{1,80}$")
 _PROFILE_ID = re.compile(r"^[a-z][a-z0-9_]{0,63}$")
 _TRANSPORTS: frozenset[str] = frozenset(
-    {"chat_completions", "responses", "anthropic_messages", "codex_app_server", "gemini_generate_content"}
+    {
+    "chat_completions",
+    "responses", "anthropic_messages", "codex_app_server", "gemini_generate_content"}
 )
 _CONFIG_LOCK = CONFIG_LOCK
 _P = ParamSpec("_P")
@@ -774,7 +777,8 @@ def _model_transport_for_preset(
     preset_id: str, model_id: str, declared: object | None = None
 ) -> ProviderTransport:
     return cast(ProviderTransport, model_protocol(
-        preset_id, model_id, declared, fallback=str(_PROVIDER_PRESETS[preset_id]["default_transport"]),
+        preset_id,
+        model_id, declared, fallback=str(_PROVIDER_PRESETS[preset_id]["default_transport"]),
     ))
 
 
@@ -1514,13 +1518,21 @@ def validate_provider_model(
             elif selected_transport == "gemini_generate_content":
                 from urllib.parse import quote
 
-                route = "/models/" + quote(upstream_model_id.removeprefix("models/"), safe="") + ":streamGenerateContent?alt=sse"
+                route = (
+                    "/models/" + quote(
+                    upstream_model_id.removeprefix(
+                    "models/"), safe="") + ":streamGenerateContent?alt=sse"
+                )
                 payload = {
-                    "contents": [{"role": "user", "parts": [{"text": "Call sylvia_compatibility_probe with an empty object."}]}],
+                    "contents": [{"role": "user", "parts": [{"text": (
+                        "Call sylvia_compatibility_probe with an empty object."
+                    )}]}],
                     "generationConfig": {"maxOutputTokens": 128},
                     "tools": [{"functionDeclarations": [{"name": tool_name,
-                        "parametersJsonSchema": {"type": "object", "properties": {}, "additionalProperties": False}}]}],
-                    "toolConfig": {"functionCallingConfig": {"mode": "ANY", "allowedFunctionNames": [tool_name]}},
+                        "parametersJsonSchema": {
+                        "type": "object", "properties": {}, "additionalProperties": False}}]}],
+                    "toolConfig": {
+                    "functionCallingConfig": {"mode": "ANY", "allowedFunctionNames": [tool_name]}},
                 }
             elif selected_transport == "anthropic_messages":
                 route = "/messages"
@@ -1625,7 +1637,9 @@ def validate_provider_model(
                         candidates = event.get("candidates", [])
                         for candidate in candidates if isinstance(candidates, list) else []:
                             for part in candidate.get("content", {}).get("parts", []):
-                                saw_tool_call |= part.get("functionCall", {}).get("name") == tool_name
+                                saw_tool_call |= (
+                                    part.get("functionCall", {}).get("name") == tool_name
+                                )
                     elif selected_transport == "anthropic_messages":
                         block = event.get("content_block")
                         saw_tool_call |= bool(
@@ -1879,7 +1893,8 @@ def save_provider_settings(
             and capacity.effective_context_window is not None):
         output = min(output, max(1, capacity.effective_context_window // 4))
     if (capacity.effective_context_window is not None and output is not None
-            and model_transport != "codex_app_server" and output > capacity.effective_context_window):
+            and model_transport != "codex_app_server"
+            and output > capacity.effective_context_window):
         raise ConfigError("Provider model output limit exceeds its effective context capacity")
     previous_builder_budget = prior.get("builder_output_tokens") if prior is not None else None
     if previous_builder_budget is not None:
@@ -1888,7 +1903,8 @@ def save_provider_settings(
         )
     builder_budget = (
         _model_integer(builder_output_tokens, "Builder output limit", 1, output or 10_000_000)
-        if builder_output_tokens is not None else min(previous_builder_budget or 32_000, output or 32_000)
+        if builder_output_tokens is not None
+        else min(previous_builder_budget or 32_000, output or 32_000)
     )
     replacement = {
         "id": upstream_model_id,

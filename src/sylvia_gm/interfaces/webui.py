@@ -17,6 +17,7 @@ import sys
 import tempfile
 import time
 from collections import OrderedDict
+from contextlib import suppress
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -244,16 +245,14 @@ class OwnerProcess:
                 raise WebUIError("The owner did not become ready.")
             handshake.verify(ready["response_hex"])
         except asyncio.CancelledError:
-            try:
+            # Preserve launch cancellation after collecting the child.
+            with suppress(WebUIError):
                 await self.close()
-            except WebUIError:
-                pass  # Preserve launch cancellation after collecting the child.
             raise
         except Exception:
-            try:
+            # The launch failure remains the caller's recovery reason.
+            with suppress(WebUIError):
                 await self.close()
-            except WebUIError:
-                pass  # The launch failure remains the caller's recovery reason.
             raise WebUIError(
                 "Sylvia could not open this data root. If it is already open in another "
                 "desktop or WebUI, close that owner first. No second writer was started."
@@ -348,10 +347,9 @@ class OwnerProcess:
                 except (Exception, asyncio.CancelledError) as error:
                     failure = error
                     if process.returncode is None:
-                        try:
+                        # Exit can race the decision to terminate this exact child.
+                        with suppress(ProcessLookupError):
                             process.terminate()
-                        except ProcessLookupError:
-                            pass  # Exit can race the decision to terminate this exact child.
                         await process.wait()
         finally:
             if process.returncode is not None:
@@ -362,7 +360,9 @@ class OwnerProcess:
         if isinstance(failure, asyncio.CancelledError):
             raise failure
         if failure is not None:
-            reason = "timed out" if isinstance(failure, TimeoutError) else "did not finish gracefully"
+            reason = (
+                "timed out" if isinstance(failure, TimeoutError) else "did not finish gracefully"
+            )
             raise WebUIError(
                 f"Sylvia owner shutdown {reason} (exit {process.returncode}). "
                 "Saved work is retained; launch again to inspect it.", "owner_close_failed",
@@ -872,7 +872,8 @@ class LocalWebUI:
             for _, task in self.requests.values():
                 if not task.done():
                     task.cancel()
-            await asyncio.gather(*(task for _, task in self.requests.values()), return_exceptions=True)
+            await asyncio.gather(
+                *(task for _, task in self.requests.values()), return_exceptions=True)
             self.downloads.clear()
             if self.download_directory is not None:
                 self.download_directory.cleanup()

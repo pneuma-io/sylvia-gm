@@ -15,8 +15,6 @@ request envelopes and receive exactly one JSON response each.
 
 from __future__ import annotations
 
-from sylvia_gm.application.launch_compatibility import ARCHIVED_RULESET_IDS
-
 import base64
 import binascii
 import dataclasses
@@ -120,6 +118,7 @@ from sylvia_gm.application.import_repair_sessions import (
     offer_import_repair,
     start_import_repair_chat,
 )
+from sylvia_gm.application.launch_compatibility import ARCHIVED_RULESET_IDS
 from sylvia_gm.application.library_sources import LibrarySourceReader
 from sylvia_gm.application.plan_bundle import (
     PLAN_BUNDLE_BYTE_LIMIT,
@@ -244,10 +243,10 @@ from sylvia_gm.provider._exceptions import (
     ModelNotFoundError,
     ProviderConnectionError,
     ProviderContinuationRequiredError,
-    ProviderPausedError,
-    ProviderRefusalError,
     ProviderError,
     ProviderOutputLimitError,
+    ProviderPausedError,
+    ProviderRefusalError,
     ProviderTimeoutError,
     ProviderUnavailableError,
     RateLimitError,
@@ -518,12 +517,29 @@ def _campaign_creation_catalog(
         ) from error
     # Portable built-in Plans own exact world snapshots. Offer those worlds before
     # installation; the Interview admits the selected snapshot through normal checks.
-    public_plans = [item for item in items if item.get("kind") == "campaign_plan" and item.get("ruleset") and item.get("campaign_setting")]
+    public_plans = (
+        [
+        item
+        for item in items
+        if item.get(
+        "kind") == "campaign_plan" and item.get("ruleset") and item.get("campaign_setting")]
+    )
     for plan_item in public_plans:
         rule, world = plan_item["ruleset"], plan_item["campaign_setting"]
-        choice = next((item for item in items if item.get("kind") == "ruleset" and item.get("id") == rule["id"]), None)
+        choice = (
+            next(
+            (
+            item
+            for item in items
+            if item.get("kind") == "ruleset" and item.get("id") == rule["id"]), None)
+        )
         if choice is None:
-            choice = {"kind": "ruleset", **dict(rule), "title": rule["id"], "selection_id": rule["id"], "compatible_settings": ()}
+            choice = (
+                {
+                "kind": "ruleset",
+                **dict(
+                rule), "title": rule["id"], "selection_id": rule["id"], "compatible_settings": ()}
+            )
             installed = next((entry for candidate in candidates
                               for entry in candidate.package_lock.entries
                               if (entry.package_id, entry.version, entry.sha256) == (
@@ -536,7 +552,9 @@ def _campaign_creation_catalog(
             items.append(choice)
         settings = tuple(choice.get("compatible_settings", ()))
         if not any(binding["id"] == world["id"] for binding in settings):
-            choice["compatible_settings"] = settings + ({**dict(world), "candidate_id": None, "ruleset": dict(rule)},)
+            choice["compatible_settings"] = (
+                settings + ({**dict(world), "candidate_id": None, "ruleset": dict(rule)},)
+            )
     # A catalogue may replace the historical starter with portable Plans. The
     # legacy binding adjustment is needed only when that Plan is inventoried.
     base_authority = bundled_rift_authority()
@@ -653,7 +671,8 @@ def _campaign_creation_catalog(
             "selection_id": (
                 primary.package_id
                 if ((primary.package_id, primary.version, primary.sha256) == (
-                    bundled_ruleset["id"], bundled_ruleset["version"], bundled_ruleset["content_sha256"],
+                    bundled_ruleset[
+                    "id"], bundled_ruleset["version"], bundled_ruleset["content_sha256"],
                 ) or (existing_index is not None
                       and items[existing_index].get("selection_id") == primary.package_id
                       and items[existing_index].get("content_sha256") == primary.sha256))
@@ -1988,7 +2007,10 @@ def _dispatch_selected(
     if method == "snapshot":
         return bus.snapshot(_required_text(params, "campaign_id"))
     if method == "display_snapshot":
-        return application_owner.desktop_snapshot(_required_text(params, "campaign_id"), display_only=True)
+        return (
+            application_owner.desktop_snapshot(
+            _required_text(params, "campaign_id"), display_only=True)
+        )
     if method == "player_projection":
         return bus.player_projection(_required_text(params, "campaign_id"))
     if method == "player_projection_page":
@@ -2870,7 +2892,11 @@ def _dispatch_selected(
 
             def import_profile(data: bytes) -> SafePayload:
                 from sylvia_gm.application.character_card_import import save_character_card_import
-                return save_character_card_import(storage_root, operation_id=f"{session_id}:card:{hashlib.sha256(data).hexdigest()}", source=data)
+                return save_character_card_import(storage_root, operation_id=(
+                    f'{session_id}'
+                    f':card:'
+                    f'{hashlib.sha256(data).hexdigest()}'
+                ), source=data)
 
             from sylvia_gm.agent._character_profile_tools import character_profile_tools
 
@@ -3561,7 +3587,10 @@ def _dispatch_selected(
             install_id=_required_text(params, "install_id"),
         )
     if method in ("preview_character_card_file", "confirm_character_card_import"):
-        from sylvia_gm.application.character_card_import import stage_card_preview, confirm_card_preview
+        from sylvia_gm.application.character_card_import import (
+            confirm_card_preview,
+            stage_card_preview,
+        )
         try:
             if method == "preview_character_card_file":
                 return stage_card_preview(storage_root, Path(_required_text(params, "source_path")))
@@ -3745,7 +3774,10 @@ def _dispatch_selected(
             campaign_id=campaign_id,
             display_name=display_name,
             package_lock=package_lock,
-            turn_id=f"turn-construction-{hashlib.sha256(operation_id.encode('utf-8')).hexdigest()[:24]}",
+            turn_id=(
+                "turn-construction-"
+                f"{hashlib.sha256(operation_id.encode('utf-8')).hexdigest()[:24]}"
+            ),
             builder_session_id=builder_session_id,
             package_candidate_id=candidate_id,
             participants=participants,
@@ -4339,7 +4371,8 @@ def _dispatch_selected(
                 expected_revision=_required_nonnegative_int(params, "expected_revision"),
                 choice_id=_required_text(params, "choice_id"),
                 option_id=_required_text(params, "option_id"),
-                choice_sequence=_required_nonnegative_int({"choice_sequence": params.get("choice_sequence", 0)}, "choice_sequence"),
+                choice_sequence=_required_nonnegative_int(
+                {"choice_sequence": params.get("choice_sequence", 0)}, "choice_sequence"),
                 session_id=(
                     None
                     if params.get("session_id") is None

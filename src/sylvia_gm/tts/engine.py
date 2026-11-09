@@ -183,8 +183,13 @@ class TTSEngine:
         """
         detail_lower = speaker_detail.lower()
 
-        female_hints = {"female", "woman", "girl", "lady", "woman", "she", "her", "sister", "queen", "witch", "mother"}
-        male_hints = {"male", "man", "boy", "lord", "he", "him", "his", "brother", "king", "wizard", "father"}
+        female_hints = (
+            {"female", "woman", "girl", "lady", "she", "her", "sister", "queen", "witch", "mother"}
+        )
+        male_hints = (
+            {
+            "male", "man", "boy", "lord", "he", "him", "his", "brother", "king", "wizard", "father"}
+        )
 
         for hint in female_hints:
             if hint in detail_lower:

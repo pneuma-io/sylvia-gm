@@ -7,12 +7,10 @@ DIAGNOSTIC_HEADERS constant (subset of interesting response headers).
 
 from __future__ import annotations
 
-import statistics
 from collections import deque
 from dataclasses import dataclass, field
 
 from sylvia_gm.provider._base import TokenUsage
-
 
 # ── DIAGNOSTIC_HEADERS — subset of interesting response headers ──────
 

@@ -12,7 +12,7 @@ from __future__ import annotations
 import logging
 import re
 from dataclasses import dataclass, field
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import yaml
 
@@ -297,7 +297,7 @@ class CampaignValidator:
 
     def _check_stat_block_consistency(self, plan: CampaignPlan) -> list[ValidationIssue]:
         """Check that monster stat blocks have required mechanical fields."""
-        known = self._known_bestiary()
+        self._known_bestiary()
         issues: list[ValidationIssue] = []
 
         for enc_idx, enc in enumerate(plan.encounters):
