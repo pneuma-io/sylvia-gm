@@ -174,6 +174,7 @@ PYTHON_JOURNEYS = {
         "tests/test_srd_generation_boundaries.py",
     ],
     "release-integrity": [
+        "tests/test_test_inventory.py",
         "tests/test_public_fixture_packages.py",
         "tests/test_pyav_release_packaging.py",
         "tests/test_protected_provider_settings.py",
@@ -255,6 +256,7 @@ def source_identity() -> dict[str, object]:
             files[path.relative_to(ROOT).as_posix()] = hashlib.sha256(path.read_bytes()).hexdigest()
     for name in (
         "pyproject.toml",
+        "conftest.py",
         "uv.lock",
         "README.md",
         "AGENTS.md",
