@@ -3477,7 +3477,8 @@ const SylviaGMFrontend = (() => {
     const chatSelection = state.sessionReasoning?.modelState?.current ||
       (chatSelect.value === '' ? null : state.modelChoices[Number(chatSelect.value)]);
     const status = $('model-status');
-    const homeCreationButtons = [
+    // New Campaign needs no model; Home's Build Something opens provider-setup guidance when none is configured.
+    const deterministicCampaignButtons = [
       $('home-new-campaign-btn'), $('home-build-btn')
     ];
     const modelRequiredCreationButtons = [
@@ -3486,7 +3487,7 @@ const SylviaGMFrontend = (() => {
     select.disabled = true;
     chatSelect.disabled = true;
     $('set-default-model-btn').disabled = true;
-    [...homeCreationButtons, ...modelRequiredCreationButtons]
+    [...deterministicCampaignButtons, ...modelRequiredCreationButtons]
       .forEach((button) => { button.disabled = true; });
     state.modelChoices = [];
     if (!state.bridge || !state.bridge.model_choices) {
@@ -3504,7 +3505,7 @@ const SylviaGMFrontend = (() => {
     } catch (e) {
       state.modelChoices = [];
     }
-    homeCreationButtons.forEach((button) => { button.disabled = false; });
+    deterministicCampaignButtons.forEach((button) => { button.disabled = false; });
     if (!state.modelChoices.length) {
       select.innerHTML = '<option value="">No configured models</option>';
       chatSelect.innerHTML = select.innerHTML;
