@@ -28,7 +28,8 @@ def grid_lane_zone(scene: Mapping[str, Any], owner_id: str, selection: object) -
     def reject(message):
         raise SpatialValidationError(message, code="spatial_lane_invalid", path="$.lane")
 
-    if isinstance(selection, (list, tuple)) and len(selection) == 1:
+    if (isinstance(selection, Sequence) and not isinstance(selection, (str, bytes))
+            and len(selection) == 1):
         selection = selection[0]
     if not isinstance(selection, Mapping) or set(selection) != LANE_FIELDS:
         reject("Choose a complete grid lane: pattern, direction, extent, width and current pose")

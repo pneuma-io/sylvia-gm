@@ -9,7 +9,6 @@ import unittest
 from pathlib import Path
 
 from balance_suite.parameters import default_manifest
-from balance_suite.provenance import ENCODED_SOURCE_COMMIT
 from sylvia_ruleset.builder import (
     CANONICAL_ROOTS,
     CONFORMANCE_SETTING_ID,
@@ -25,11 +24,25 @@ HOST_COMPATIBILITY = {
     "host_contract": 1,
     "runtime_format": 1,
     "requires": [
+        "panel_workspaces.v1",
+        "participant_mutation.v1",
+        "runtime_immutable_collections.v1",
         "shot_effects.v1",
         "spatial_clearance.v1",
+        "spatial_exposure_path.v1",
+        "spatial_path_cost_profile.v1",
         "spatial_mutation.v1",
+        "spatial_grid_edge.v1",
+        "spatial_edge_continuity.v1",
+        "spatial_wall_authoring.v1",
+        "spatial_grid_lanes.v1",
         "spatial_path_moving_entity.v1",
+        "starting_state_validation.v1",
+        "private_state.v1",
+        "public_results.v1",
         "tactical_grid.v1",
+        "runtime_choice_sequences.v1",
+        "runtime_require.v1",
     ],
 }
 
@@ -174,8 +187,13 @@ class SylviaRulesetBuilderTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls._temporary = tempfile.TemporaryDirectory()
         cls.draft = Path(cls._temporary.name) / "ruleset-draft"
-        cls.source_commit = ENCODED_SOURCE_COMMIT
-        build_draft(ROOT, source_commit=cls.source_commit, draft_path=cls.draft)
+        cls.source_commit = subprocess.check_output(
+            ["git", "-C", str(ROOT), "rev-parse", "HEAD"], text=True,
+        ).strip()
+        build_draft(
+            ROOT, source_commit=cls.source_commit, draft_path=cls.draft,
+            include_test_tools=True,
+        )
         cls.manifest = json.loads((cls.draft / "package.json").read_text())
         cls.setting_draft = cls.draft / "dependencies" / "conformance-setting"
         cls.setting_manifest = json.loads(
@@ -192,14 +210,22 @@ class SylviaRulesetBuilderTests(unittest.TestCase):
     def test_build_is_byte_deterministic_and_does_not_modify_canon(self) -> None:
         canon_before = _canonical_hashes()
         first = _generated_hashes(self.draft)
-        build_draft(ROOT, source_commit=self.source_commit, draft_path=self.draft)
+        build_draft(
+            ROOT, source_commit=self.source_commit, draft_path=self.draft,
+            include_test_tools=True,
+        )
         self.assertEqual(first, _generated_hashes(self.draft))
         self.assertEqual(canon_before, _canonical_hashes())
 
-    def test_committed_draft_matches_deterministic_builder_output(self) -> None:
+    def test_fresh_draft_matches_deterministic_builder_output(self) -> None:
+        fresh = Path(self._temporary.name) / "fresh-draft"
+        build_draft(
+            ROOT, source_commit=self.source_commit, draft_path=fresh,
+            include_test_tools=True,
+        )
         self.assertEqual(
             _generated_hashes(self.draft),
-            _generated_hashes(ROOT / "ruleset-draft"),
+            _generated_hashes(fresh),
         )
 
     def test_format4_descriptor_has_closed_tools_and_exact_state_references(self) -> None:
@@ -209,7 +235,8 @@ class SylviaRulesetBuilderTests(unittest.TestCase):
         )
         self.assertNotIn("meta", self.runtime)
         tools = {item["name"]: item for item in self.manifest["tools"]}
-        self.assertEqual(24, len(tools))
+        self.assertEqual(47, len(tools))
+        self.assertEqual(set(tools), set(self.runtime["tools"]))
         self.assertEqual(HOST_COMPATIBILITY, self.manifest["compatibility"])
         self.assertEqual(HOST_COMPATIBILITY, self.setting_manifest["compatibility"])
         for tool in tools.values():

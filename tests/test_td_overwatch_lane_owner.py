@@ -18,10 +18,14 @@ from tests.test_td_overwatch_lanes import NS
 
 
 @pytest.fixture(scope="module")
-def archive():
-    target = Path(os.environ["SYLVIA_TD_CANDIDATE"])
-    assert target.is_file()
-    return target
+def archive(tmp_path_factory):
+    if selected := os.environ.get("SYLVIA_TD_CANDIDATE"):
+        target = Path(selected)
+        assert target.is_file()
+        return target
+    from tests.td_source_fixture import build_archive
+
+    return build_archive(tmp_path_factory.mktemp("lane-owner-package"))
 
 
 def start(owner, admitted, archive, configure=None):
@@ -84,6 +88,32 @@ def request(owner, identity="lane-setup", actor_id="vesper", **changes):
         "expected_revision": owner.snapshot("lanes").revision,
         "selection": selection,
     }
+
+
+def test_desktop_dispatch_accepts_owned_lane_arrays_and_retries_once(archive, tmp_path):
+    from sylvia_gm.interfaces.owner_process import _dispatch
+
+    with admitted_fixture_owner(
+        tmp_path / "desktop.sqlite3", "lane-owner", archive.read_bytes(),
+    ) as (owner, admitted):
+        start(owner, admitted, archive)
+        command = request(owner, "desktop-lane")
+
+        def dispatch(method):
+            return _dispatch(
+                None, method, command, application_owner=owner, owner_id="lane-owner",
+                provider_resolver=None, model_choices=lambda: (), session_loop=None,
+                storage_root=tmp_path,
+            )
+
+        before = owner.snapshot("lanes")
+        dispatch("preview_panel_action")
+        assert owner.snapshot("lanes") == before
+        receipt = dispatch("execute_panel_action")
+        after = owner.snapshot("lanes")
+        assert after.state[NS + ".entities"]["vesper"]["ap"] == 4
+        assert dispatch("execute_panel_action") == receipt
+        assert owner.snapshot("lanes") == after
 
 
 def test_real_owner_preview_costs_nothing_and_commit_reopens_exactly(archive, tmp_path):

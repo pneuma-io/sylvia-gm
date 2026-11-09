@@ -661,8 +661,9 @@ def _selection_value_valid(
         return isinstance(value, str) and value in entity_ids
     if source == "lane":
         from sylvia_gm.spatial._grid_lane import LANE_FIELDS
-        return (isinstance(value, (list, tuple)) and len(value) == 1
-                and isinstance(value[0], Mapping) and set(value[0]) == LANE_FIELDS)
+        values = _sequence(value)
+        return (values is not None and len(values) == 1
+                and isinstance(values[0], Mapping) and set(values[0]) == LANE_FIELDS)
     if source == "zone":
         return isinstance(value, str) and any(
             item.get("id") == value

@@ -32,7 +32,7 @@ def test_candidate_has_real_panel_layout_and_no_test_only_gameplay_tool(tmp_path
     inventory = next(tool for tool in descriptor["tools"] if tool["name"] == "handle_weapon")["input_schema"]["x-sylvia-gm-inventory"]
     assert inventory["format"] == "mechanics"
     assert inventory["surface_id"] == "operations.loadout"
-    assert {"handle_weapon", "switch_weapon", "transfer_reserve_weapon", "drop_weapon", "pickup_weapon", "reload_weapon", "cycle_weapon"} == set(inventory["tools"])
+    assert {"handle_weapon", "switch_weapon", "transfer_reserve_weapon", "drop_weapon", "pickup_weapon", "reload_weapon", "cycle_weapon", "load_one_shell"} == set(inventory["tools"])
     assert "exercise_specialty_counterfactual" not in {tool["name"] for tool in descriptor["tools"]}
     support = parse_gameplay_support_bytes(files["support/gameplay-resolution.json"])
     assert any(item.gameplay_resolution == "gm_adjudicated" for item in support.records)

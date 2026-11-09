@@ -195,11 +195,11 @@ def test_empty_current_slot_accepts_pickup_with_a_full_reserve_inventory(dropped
 
 
 def test_stale_ground_counter_cannot_overwrite_an_existing_weapon(game):
-    from sylvia_gm.application.package_runtime import PackageRuntimeError
+    from sylvia_gm.domain.errors import RulesetPreconditionRejected
 
     _, state = parts(game)
     state["ground_objects"]["weapon_1"] = {"kind": "WEAPON", "weapon": {"id": "someone-elses"}}
     before = deepcopy(game.state)
-    with pytest.raises(PackageRuntimeError):
+    with pytest.raises(RulesetPreconditionRejected, match="Ground object sequence"):
         drop(game)
     assert game.state == before

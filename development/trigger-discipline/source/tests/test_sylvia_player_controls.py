@@ -322,7 +322,7 @@ class PlayerControlRuntimeTests(unittest.TestCase):
             row["label"]: row["value"] for row in moved["result_card"]["details"]
         }
         self.assertEqual([2, 2], move_details["Origin"])
-        self.assertEqual([3, 2], move_details["Destination"])
+        self.assertEqual([3, 2], move_details["Requested destination"])
         self.assertEqual(
             [3, 2], self.state[f"{builder.PACKAGE_ID}.entities"]["vesper"]["position_cell"]
         )
@@ -690,7 +690,7 @@ class PlayerControlRuntimeTests(unittest.TestCase):
         self.assertEqual(0, self.state[entities]["hostile_alpha"]["ap"])
 
     def test_authored_roster_preserves_actor_pools_and_rejects_partial_handoff(self):
-        from sylvia_gm.application.package_runtime import PackageRuntimeError
+        from sylvia_gm.domain.errors import RulesetPreconditionRejected
 
         package_key = f"{builder.PACKAGE_ID}.state"
         entities_key = f"{builder.PACKAGE_ID}.entities"
@@ -720,7 +720,7 @@ class PlayerControlRuntimeTests(unittest.TestCase):
                          {identity: actor["ap"] for identity, actor in self.state[entities_key].items()})
         self.state[package_key]["turn_roster"].insert(2, "missing-actor")
         before = deepcopy(self.state)
-        with self.assertRaises(PackageRuntimeError):
+        with self.assertRaises(RulesetPreconditionRejected):
             self.execute("end_allies_turn", {})
         self.assertEqual(before, self.state)
 
