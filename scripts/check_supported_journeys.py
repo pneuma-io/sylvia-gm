@@ -176,6 +176,7 @@ PYTHON_JOURNEYS = {
         "tests/test_srd_generation_boundaries.py",
     ],
     "release-integrity": [
+        "tests/test_public_fixture_packages.py",
         "tests/test_pyav_release_packaging.py",
         "tests/test_protected_provider_settings.py",
         "tests/test_portable_identity.py",

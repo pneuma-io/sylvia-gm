@@ -1589,6 +1589,16 @@ def _surface_source(value: object, *, depth: int = 0) -> SafePayload:
             raise ValueError("UI Campaign Plan path is invalid")
         for item in path:
             validate_authority_identity(item, "UI Campaign Plan path component")
+    elif kind == "keyed_values":
+        _exact_keys(source, frozenset({"kind", "entries"}), "UI keyed values source")
+        entries = _array(source["entries"], "UI keyed values entries")
+        if not entries or len(entries) > 16:
+            raise ValueError("UI keyed values entry count is invalid")
+        for value in entries:
+            entry = _object(value, "UI keyed values entry")
+            _exact_keys(entry, frozenset({"key", "value"}), "UI keyed values entry")
+            _surface_source(entry["key"], depth=depth + 1)
+            _surface_source(entry["value"], depth=depth + 1)
     elif kind == "object":
         _exact_keys(source, frozenset({"kind", "fields"}), "UI object source")
         fields = _object(source["fields"], "UI object source fields")

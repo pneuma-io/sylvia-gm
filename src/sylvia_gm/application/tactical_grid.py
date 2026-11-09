@@ -101,6 +101,16 @@ def resolve_surface_source(
                     }
                 )
         return result
+    if kind == "keyed_values":
+        keyed_values: dict[str, object] = {}
+        for entry in _sequence(source.get("entries")) or ():
+            if not isinstance(entry, Mapping):
+                continue
+            key = resolve_surface_source(entry.get("key"), state=state, participants=participants)
+            value = resolve_surface_source(entry.get("value"), state=state, participants=participants)
+            if isinstance(key, str) and key.strip() and value is not None:
+                keyed_values[key] = value
+        return keyed_values
     if kind == "object":
         fields = source.get("fields")
         if not isinstance(fields, Mapping):
