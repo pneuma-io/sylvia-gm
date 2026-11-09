@@ -5334,7 +5334,9 @@ def _drone_target_entity(parameter_values: dict[str, Any]) -> dict[str, Any]:
     target.update(
         {
             "hp": 50,
+            "max_hp": 50,
             "res": 20,
+            "max_res": 20,
             "center": [31.5, 30.5, 0.9],
             "muzzle": [31.05, 30.5, 1.4],
         }

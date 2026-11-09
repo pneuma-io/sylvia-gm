@@ -4233,3 +4233,6 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
 .tactical-zone.tactical-lane-cell.inactive { opacity:.35; border-style:dashed; }
 .tactical-lane-anchor { position:absolute; z-index:8; pointer-events:none; color:#ffe398; font-size:28px; text-align:center; line-height:24px; transform:translate(12px,-22px); text-shadow:0 1px 3px #000; }
 .game-workspace .ruleset-map-panel:has(.map-lane-inputs) .tactical-scroll { min-height:300px; flex:1 0 300px; }
+
+/* A retained split must leave a usable map body when its command deck wraps. */
+.session-frame.has-panels .ruleset-map-panel .ruleset-panel-content { min-height: 260px !important; }

@@ -28,8 +28,10 @@ result card. Engine accounting and retained balance parameters are unchanged.
 Resumed after the owner's DBD pause. Hosted qualification on `0954bed` failed despite the
 separate Windows Rust pass: public event references differed between panel commits, narration
 replay and reopen validation. The repair uses one public projection, normalizes only exact
-legacy references, and retains canonical events and tamper rejection. Focused checks pass;
-hosted qualification and the rebuilt native candidate still need fresh results. The exclusion
+legacy references, and retains canonical events and tamper rejection. The 19-case local replay passed. A fresh native candidate passed ordinary package import,
+retained-campaign reopen and double-click queue execution with exact AP accounting; hosted
+qualification remains pending. The next hosted attempt ended after selection without starting
+test jobs; its retry is queued, so it is not a hosted test pass. The exclusion
 test's undeclared local codec-stage dependency is replaced by a labelled synthetic subprocess
 fixture; actual codec verification remains with staging and final build checks.
 
@@ -39,7 +41,12 @@ Conformance characters explicitly declare their synthetic maxima and capacities.
 are not new-character defaults or a balance selection.
 
 The newer Opus frontend production port remains separate in [PR #28](https://github.com/pneuma-io/sylvia-gm/pull/28).
-Its current `8b0371f` correction is under Fluff's independent review. The TD acceptance includes
+Its frozen `aecb47d55cca3babb89f6a483d4fa05deb436313` correction is under Fluff's independent review.
+A temporary, unpushed qualification composition preserves both PR branches. Native testing
+found the retained TD layout could clip the battlefield behind its wrapped command deck;
+the map content now keeps a usable minimum height. The shipped-shell regression reproduces
+the collapse without the repair and passes on initial render and redraw with it. Native
+replay of that layout repair and the combined Reload journey remain required. The TD acceptance includes
 the single Reload control's magazine-change/cycle order, AP exhaustion, refusal/stale-state
 recovery, and committed animation occurring once without replay on reopen. Qualification must
 name the exact frontend composition; PR6-only native evidence cannot close that combined check.

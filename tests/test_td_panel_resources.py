@@ -18,6 +18,8 @@ def test_resource_projection_and_reload_keep_authored_maxima_and_capacity(candid
             "initial_state"
         ]
     actor = state[NS + ".entities"]["vesper"]
+    target = state[NS + ".entities"]["drone_target"]
+    assert (target["hp"], target["max_hp"], target["res"], target["max_res"]) == (50, 50, 20, 20)
     actor.update(hp=3, res=2)
     actor["weapon"]["magazine"]["rounds"] = 7
     with admitted_fixture_owner(database, "owner", candidate.read_bytes()) as (owner, admitted):

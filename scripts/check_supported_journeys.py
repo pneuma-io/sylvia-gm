@@ -198,6 +198,7 @@ PYTHON_JOURNEYS = {
     ],
 }
 UI_JOURNEY = [
+    "tests/frontend_td_retained_layout.browser.cjs",
     "tests/frontend_campaign_rules_update.browser.cjs",
     "tests/frontend_character_equipment.test.cjs",
     "tests/frontend_character_selection.test.cjs",
