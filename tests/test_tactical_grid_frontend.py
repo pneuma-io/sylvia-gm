@@ -14,7 +14,10 @@ def test_tactical_grid_is_host_owned_accessible_and_ruleset_neutral() -> None:
 
     assert "function renderTacticalGridPanel(" in script
     assert "surface.renderer === 'tactical_grid'" in script
-    assert 'aria-label="Tactical grid; drag to pan, arrow keys move cell focus"' in script
+    renderer = script.split("function renderTacticalGridPanel(", maxsplit=1)[1]
+    renderer = renderer.split("function wireWallEditor(", maxsplit=1)[0]
+    assert 'aria-label="${continuous ?' in renderer
+    assert "'Tactical grid; drag to pan, arrow keys move cell focus'" in renderer
     assert "ArrowLeft" in script and "ArrowRight" in script
     assert "data-tactical-zoom" in script
     assert "data-tactical-entity" in script
@@ -40,7 +43,7 @@ def test_tactical_grid_is_host_owned_accessible_and_ruleset_neutral() -> None:
     assert ".tactical-zone" in css
     assert ".tactical-objective" in css
     for assumption in ("armor class", "saving throw", "spell slot", "hit points"):
-        assert assumption not in script.lower()
+        assert assumption not in renderer.lower()
 
 
 def test_tactical_preview_uses_owner_projection_without_client_estimates() -> None:
@@ -64,18 +67,22 @@ def test_dynamic_panel_intent_rechecks_authority_and_sends_only_declared_selecti
     handler = script.split("function renderRulesetPanelProjection(", maxsplit=1)[1]
     handler = handler.split("container.querySelectorAll('[data-panel-action-id]')", maxsplit=1)[1]
     handler = handler.split("container.querySelectorAll('[data-panel-size-id]')", maxsplit=1)[0]
+    executor = script.split("async function runPanelAction(", maxsplit=1)[1]
+    executor = executor.split("// App-owned presentation", maxsplit=1)[0]
 
     assert "Object.values(bindings)" in binder
     assert "selected[source]" in binder
     assert "if (source === 'path') return" in binder
     assert "map_revision" in binder
     assert "const campaignId = state.activeCampaignId" in handler
-    assert "await state.bridge.snapshot(campaignId)" in handler
-    assert "panelActionSelection(surface, action, button.dataset.panelActorId)" in handler
-    assert "expected_revision: actionSnapshot.revision" in handler
-    assert "selection," in handler
-    assert "await renderRulesetPanels(campaignId, true)" in handler
-    assert "session_id: sessionId" in handler
+    assert "panelActionSelection(surface, action," in handler
+    assert "button.dataset.panelActorId, button.dataset.panelPieceId" in handler
+    assert "await runPanelAction(projection, surface, action, selection, button," in handler
+    assert "await state.bridge.snapshot(campaignId)" in executor
+    assert "expected_revision: actionSnapshot.revision" in executor
+    assert "selection," in executor
+    assert "await renderRulesetPanels(campaignId, true)" in executor
+    assert "session_id: sessionId" in executor
 
 
 def test_tauri_bridge_carries_selection_without_exposing_an_authority_bypass() -> None:

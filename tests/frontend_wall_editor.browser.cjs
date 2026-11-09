@@ -90,7 +90,11 @@ test('wall editor drafts real borders and submits only declared selections', { t
   try {
     assert.equal(await panel.locator('.map-command-deck button', { hasText: /wall/i }).count(), 0,
       'Wall edits are not bare command-deck buttons');
+    assert.equal(await panel.locator('.tactical-scroll').getAttribute('aria-label'),
+      'Tactical grid; drag to pan, arrow keys move cell focus');
     await panel.locator('.tactical-toolbar [data-tactical-wall-edit]').click();
+    assert.equal(await panel.locator('.tactical-scroll').getAttribute('aria-label'),
+      'Tactical grid wall editor; click or drag along cell borders to draft a wall, arrow keys move cell focus');
     // A drag along one border crosses corners without drafting the perpendicular borders there.
     await drag(page, panel, [[1, 8.02], [2.5, 8], [3.98, 7.98]]);
     assert.equal(await panel.locator('[data-wall-draft-overlay] .wall-draft-edge').count(), 3);
