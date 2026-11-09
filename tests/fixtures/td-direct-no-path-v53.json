@@ -1,0 +1,1505 @@
+{
+  "state": {
+    "pneuma-io.trigger-discipline.entities": {
+      "A_KORA_3": {
+        "active": true,
+        "aim": {
+          "ap": 0,
+          "point": null,
+          "target": null
+        },
+        "ap": 6,
+        "aptitudes": {
+          "acuity": 0,
+          "force": 0,
+          "nerve": 1,
+          "precision": 0,
+          "presence": 0,
+          "reason": 0
+        },
+        "center": [
+          34.5,
+          17.5,
+          0.9
+        ],
+        "class_id": "BULWARK",
+        "control": null,
+        "downed": false,
+        "hp": 10,
+        "id": "A_KORA_3",
+        "intrusion_ap_discount": 0,
+        "level": 4,
+        "life_threatening": {
+          "state": "NONE",
+          "within_reversible_window": false
+        },
+        "local_access": false,
+        "max_ap": 6,
+        "max_hp": 10,
+        "max_res": 10,
+        "medical_kit_capable": false,
+        "medicine_bonus": 0,
+        "movement_m_per_ap": 0.25,
+        "muzzle": [
+          34.91,
+          17.5,
+          1.4
+        ],
+        "name": "Synthetic Kora vector L4",
+        "position_cell": [
+          34,
+          17
+        ],
+        "recoil_recovery_per_ap": 1,
+        "res": 10,
+        "resuscitation_kit_capable": false,
+        "side": "allies",
+        "skills": {
+          "athletics": 2,
+          "cqc": 2,
+          "drone_operations": 0,
+          "engineering": 0,
+          "grenades": 0,
+          "influence": 0,
+          "investigation": 0,
+          "local_hacking": 0,
+          "marksmanship": 2,
+          "medicine": 0,
+          "networking": 0,
+          "recon": 0,
+          "social_read": 0,
+          "stealth": 0,
+          "tactics": 4,
+          "vehicles": 0
+        },
+        "specialties": [],
+        "stance": "STANDING",
+        "weapon": {
+          "chamber": "LIVE",
+          "current_recoil": 0,
+          "cycle_ap": 0,
+          "cyclic_rate_rpm": 750,
+          "damage": 5,
+          "feed": "DETACHABLE_MAGAZINE",
+          "fire_modes": [
+            "SEMI_AUTO",
+            "BURST",
+            "FULL_AUTO"
+          ],
+          "id": "service_rifle",
+          "location": "READY",
+          "magazine": {
+            "id": "A_KORA_3-service_rifle-magazine-0",
+            "rounds": 30
+          },
+          "material_pen": 3,
+          "mechanism": "SELF_LOADING",
+          "needs_cycle": false,
+          "range_breakpoints_m": [
+            120,
+            250,
+            400
+          ],
+          "range_modifiers": [
+            0,
+            2,
+            5,
+            8
+          ],
+          "recoil": 2,
+          "reload_ap": 2,
+          "retained_magazines": [],
+          "spare_magazines": [
+            {
+              "id": "A_KORA_3-service_rifle-magazine-1",
+              "rounds": 30
+            },
+            {
+              "id": "A_KORA_3-service_rifle-magazine-2",
+              "rounds": 30
+            }
+          ],
+          "target_pen": 2
+        }
+      },
+      "A_PIXIE_4": {
+        "active": true,
+        "aim": {
+          "ap": 0,
+          "point": null,
+          "target": null
+        },
+        "ap": 6,
+        "aptitudes": {
+          "acuity": 1,
+          "force": 0,
+          "nerve": 0,
+          "precision": 0,
+          "presence": 0,
+          "reason": 0
+        },
+        "center": [
+          34.5,
+          21.5,
+          0.9
+        ],
+        "class_id": "GHOST",
+        "control": null,
+        "downed": false,
+        "hp": 10,
+        "id": "A_PIXIE_4",
+        "intrusion_ap_discount": 0,
+        "level": 4,
+        "life_threatening": {
+          "state": "NONE",
+          "within_reversible_window": false
+        },
+        "local_access": false,
+        "max_ap": 6,
+        "max_hp": 10,
+        "max_res": 7,
+        "medical_kit_capable": false,
+        "medicine_bonus": 0,
+        "movement_m_per_ap": 2.0,
+        "muzzle": [
+          34.91,
+          21.5,
+          1.4
+        ],
+        "name": "Synthetic Pixie vector L4",
+        "position_cell": [
+          34,
+          21
+        ],
+        "recoil_recovery_per_ap": 1,
+        "res": 7,
+        "resuscitation_kit_capable": false,
+        "side": "allies",
+        "skills": {
+          "athletics": 2,
+          "cqc": 2,
+          "drone_operations": 0,
+          "engineering": 0,
+          "grenades": 0,
+          "influence": 0,
+          "investigation": 0,
+          "local_hacking": 0,
+          "marksmanship": 0,
+          "medicine": 0,
+          "networking": 0,
+          "recon": 2,
+          "social_read": 0,
+          "stealth": 4,
+          "tactics": 0,
+          "vehicles": 0
+        },
+        "specialties": [],
+        "stance": "STANDING",
+        "weapon": {
+          "chamber": "LIVE",
+          "current_recoil": 0,
+          "cycle_ap": 0,
+          "cyclic_rate_rpm": 900,
+          "damage": 4,
+          "feed": "DETACHABLE_MAGAZINE",
+          "fire_modes": [
+            "SEMI_AUTO",
+            "FULL_AUTO"
+          ],
+          "id": "smg",
+          "location": "READY",
+          "magazine": {
+            "id": "A_PIXIE_4-smg-magazine-0",
+            "rounds": 30
+          },
+          "material_pen": 1,
+          "mechanism": "SELF_LOADING",
+          "needs_cycle": false,
+          "range_breakpoints_m": [
+            30,
+            60,
+            100
+          ],
+          "range_modifiers": [
+            0,
+            2,
+            5,
+            8
+          ],
+          "recoil": 1,
+          "reload_ap": 2,
+          "retained_magazines": [],
+          "spare_magazines": [
+            {
+              "id": "A_PIXIE_4-smg-magazine-1",
+              "rounds": 30
+            },
+            {
+              "id": "A_PIXIE_4-smg-magazine-2",
+              "rounds": 30
+            }
+          ],
+          "target_pen": 1
+        }
+      },
+      "A_VESPER_1": {
+        "active": true,
+        "aim": {
+          "ap": 0,
+          "point": null,
+          "target": null
+        },
+        "ap": 5,
+        "aptitudes": {
+          "acuity": 0,
+          "force": 0,
+          "nerve": 0,
+          "precision": 1,
+          "presence": 0,
+          "reason": 0
+        },
+        "center": [
+          10.5,
+          6.5,
+          0.9
+        ],
+        "class_id": "RIFLEMAN",
+        "control": null,
+        "downed": false,
+        "hp": 10,
+        "id": "A_VESPER_1",
+        "intrusion_ap_discount": 0,
+        "level": 4,
+        "life_threatening": {
+          "state": "NONE",
+          "within_reversible_window": false
+        },
+        "local_access": false,
+        "max_ap": 6,
+        "max_hp": 10,
+        "max_res": 7,
+        "medical_kit_capable": false,
+        "medicine_bonus": 0,
+        "movement_m_per_ap": 1.0,
+        "muzzle": [
+          10.91,
+          6.2,
+          1.4
+        ],
+        "name": "Synthetic Vesper vector L4",
+        "position_cell": [
+          10,
+          6
+        ],
+        "recoil_recovery_per_ap": 2,
+        "res": 7,
+        "resuscitation_kit_capable": false,
+        "side": "allies",
+        "skills": {
+          "athletics": 0,
+          "cqc": 2,
+          "drone_operations": 0,
+          "engineering": 0,
+          "grenades": 0,
+          "influence": 0,
+          "investigation": 0,
+          "local_hacking": 0,
+          "marksmanship": 4,
+          "medicine": 0,
+          "networking": 0,
+          "recon": 2,
+          "social_read": 0,
+          "stealth": 0,
+          "tactics": 2,
+          "vehicles": 0
+        },
+        "specialties": [],
+        "stance": "STANDING",
+        "weapon": {
+          "chamber": "LIVE",
+          "current_recoil": 0,
+          "cycle_ap": 0,
+          "cyclic_rate_rpm": 750,
+          "damage": 5,
+          "feed": "DETACHABLE_MAGAZINE",
+          "fire_modes": [
+            "SEMI_AUTO",
+            "BURST",
+            "FULL_AUTO"
+          ],
+          "id": "service_rifle",
+          "location": "READY",
+          "magazine": {
+            "id": "A_VESPER_1-service_rifle-magazine-0",
+            "rounds": 30
+          },
+          "material_pen": 3,
+          "mechanism": "SELF_LOADING",
+          "needs_cycle": false,
+          "range_breakpoints_m": [
+            120,
+            250,
+            400
+          ],
+          "range_modifiers": [
+            0,
+            2,
+            5,
+            8
+          ],
+          "recoil": 2,
+          "reload_ap": 2,
+          "retained_magazines": [],
+          "spare_magazines": [
+            {
+              "id": "A_VESPER_1-service_rifle-magazine-1",
+              "rounds": 30
+            },
+            {
+              "id": "A_VESPER_1-service_rifle-magazine-2",
+              "rounds": 30
+            }
+          ],
+          "target_pen": 2
+        }
+      },
+      "A_VESPER_2": {
+        "active": true,
+        "aim": {
+          "ap": 0,
+          "point": null,
+          "target": null
+        },
+        "ap": 6,
+        "aptitudes": {
+          "acuity": 0,
+          "force": 0,
+          "nerve": 0,
+          "precision": 1,
+          "presence": 0,
+          "reason": 0
+        },
+        "center": [
+          9.5,
+          5.5,
+          0.9
+        ],
+        "class_id": "RIFLEMAN",
+        "control": null,
+        "downed": false,
+        "hp": 10,
+        "id": "A_VESPER_2",
+        "intrusion_ap_discount": 0,
+        "level": 4,
+        "life_threatening": {
+          "state": "NONE",
+          "within_reversible_window": false
+        },
+        "local_access": false,
+        "max_ap": 6,
+        "max_hp": 10,
+        "max_res": 7,
+        "medical_kit_capable": false,
+        "medicine_bonus": 0,
+        "movement_m_per_ap": 1.0,
+        "muzzle": [
+          8.91,
+          5.5,
+          1.4
+        ],
+        "name": "Synthetic Vesper vector L4",
+        "position_cell": [
+          9,
+          5
+        ],
+        "recoil_recovery_per_ap": 2,
+        "res": 7,
+        "resuscitation_kit_capable": false,
+        "side": "allies",
+        "skills": {
+          "athletics": 0,
+          "cqc": 2,
+          "drone_operations": 0,
+          "engineering": 0,
+          "grenades": 0,
+          "influence": 0,
+          "investigation": 0,
+          "local_hacking": 0,
+          "marksmanship": 4,
+          "medicine": 0,
+          "networking": 0,
+          "recon": 2,
+          "social_read": 0,
+          "stealth": 0,
+          "tactics": 2,
+          "vehicles": 0
+        },
+        "specialties": [],
+        "stance": "STANDING",
+        "weapon": {
+          "chamber": "LIVE",
+          "current_recoil": 0,
+          "cycle_ap": 0,
+          "cyclic_rate_rpm": 750,
+          "damage": 5,
+          "feed": "DETACHABLE_MAGAZINE",
+          "fire_modes": [
+            "SEMI_AUTO",
+            "BURST",
+            "FULL_AUTO"
+          ],
+          "id": "service_rifle",
+          "location": "READY",
+          "magazine": {
+            "id": "A_VESPER_2-service_rifle-magazine-0",
+            "rounds": 30
+          },
+          "material_pen": 3,
+          "mechanism": "SELF_LOADING",
+          "needs_cycle": false,
+          "range_breakpoints_m": [
+            120,
+            250,
+            400
+          ],
+          "range_modifiers": [
+            0,
+            2,
+            5,
+            8
+          ],
+          "recoil": 2,
+          "reload_ap": 2,
+          "retained_magazines": [],
+          "spare_magazines": [
+            {
+              "id": "A_VESPER_2-service_rifle-magazine-1",
+              "rounds": 30
+            },
+            {
+              "id": "A_VESPER_2-service_rifle-magazine-2",
+              "rounds": 30
+            }
+          ],
+          "target_pen": 2
+        }
+      },
+      "B_HEX_1": {
+        "active": true,
+        "aim": {
+          "ap": 0,
+          "point": null,
+          "target": null
+        },
+        "ap": 0,
+        "aptitudes": {
+          "acuity": 0,
+          "force": 0,
+          "nerve": 0,
+          "precision": 0,
+          "presence": 0,
+          "reason": 1
+        },
+        "center": [
+          5.5,
+          12.5,
+          0.9
+        ],
+        "class_id": "HACKER",
+        "control": null,
+        "downed": false,
+        "hp": 10,
+        "id": "B_HEX_1",
+        "intrusion_ap_discount": 1,
+        "level": 4,
+        "life_threatening": {
+          "state": "NONE",
+          "within_reversible_window": false
+        },
+        "local_access": false,
+        "max_ap": 6,
+        "max_hp": 10,
+        "max_res": 7,
+        "medical_kit_capable": false,
+        "medicine_bonus": 0,
+        "movement_m_per_ap": 1.0,
+        "muzzle": [
+          4.91,
+          12.5,
+          1.4
+        ],
+        "name": "Synthetic Hex vector L4",
+        "position_cell": [
+          5,
+          12
+        ],
+        "recoil_recovery_per_ap": 1,
+        "res": 7,
+        "resuscitation_kit_capable": false,
+        "side": "hostiles",
+        "skills": {
+          "athletics": 0,
+          "cqc": 0,
+          "drone_operations": 0,
+          "engineering": 2,
+          "grenades": 0,
+          "influence": 0,
+          "investigation": 2,
+          "local_hacking": 2,
+          "marksmanship": 0,
+          "medicine": 0,
+          "networking": 4,
+          "recon": 0,
+          "social_read": 0,
+          "stealth": 0,
+          "tactics": 0,
+          "vehicles": 0
+        },
+        "specialties": [
+          "specialty.networker.entry.map_the_links"
+        ],
+        "stance": "STANDING",
+        "weapon": {
+          "chamber": "LIVE",
+          "current_recoil": 0,
+          "cycle_ap": 0,
+          "cyclic_rate_rpm": 750,
+          "damage": 5,
+          "feed": "DETACHABLE_MAGAZINE",
+          "fire_modes": [
+            "SEMI_AUTO",
+            "BURST",
+            "FULL_AUTO"
+          ],
+          "id": "service_rifle",
+          "location": "READY",
+          "magazine": {
+            "id": "B_HEX_1-service_rifle-magazine-0",
+            "rounds": 30
+          },
+          "material_pen": 3,
+          "mechanism": "SELF_LOADING",
+          "needs_cycle": false,
+          "range_breakpoints_m": [
+            120,
+            250,
+            400
+          ],
+          "range_modifiers": [
+            0,
+            2,
+            5,
+            8
+          ],
+          "recoil": 2,
+          "reload_ap": 2,
+          "retained_magazines": [],
+          "spare_magazines": [
+            {
+              "id": "B_HEX_1-service_rifle-magazine-1",
+              "rounds": 30
+            },
+            {
+              "id": "B_HEX_1-service_rifle-magazine-2",
+              "rounds": 30
+            }
+          ],
+          "target_pen": 2
+        }
+      },
+      "B_PIXIE_2": {
+        "active": true,
+        "aim": {
+          "ap": 0,
+          "point": null,
+          "target": null
+        },
+        "ap": 0,
+        "aptitudes": {
+          "acuity": 1,
+          "force": 0,
+          "nerve": 0,
+          "precision": 0,
+          "presence": 0,
+          "reason": 0
+        },
+        "center": [
+          5.5,
+          15.5,
+          0.9
+        ],
+        "class_id": "GHOST",
+        "control": null,
+        "downed": false,
+        "hp": 10,
+        "id": "B_PIXIE_2",
+        "intrusion_ap_discount": 0,
+        "level": 4,
+        "life_threatening": {
+          "state": "NONE",
+          "within_reversible_window": false
+        },
+        "local_access": false,
+        "max_ap": 6,
+        "max_hp": 10,
+        "max_res": 7,
+        "medical_kit_capable": false,
+        "medicine_bonus": 0,
+        "movement_m_per_ap": 2.0,
+        "muzzle": [
+          4.91,
+          15.5,
+          1.4
+        ],
+        "name": "Synthetic Pixie vector L4",
+        "position_cell": [
+          5,
+          15
+        ],
+        "recoil_recovery_per_ap": 1,
+        "res": 7,
+        "resuscitation_kit_capable": false,
+        "side": "hostiles",
+        "skills": {
+          "athletics": 2,
+          "cqc": 2,
+          "drone_operations": 0,
+          "engineering": 0,
+          "grenades": 0,
+          "influence": 0,
+          "investigation": 0,
+          "local_hacking": 0,
+          "marksmanship": 0,
+          "medicine": 0,
+          "networking": 0,
+          "recon": 2,
+          "social_read": 0,
+          "stealth": 4,
+          "tactics": 0,
+          "vehicles": 0
+        },
+        "specialties": [],
+        "stance": "STANDING",
+        "weapon": {
+          "chamber": "LIVE",
+          "current_recoil": 0,
+          "cycle_ap": 0,
+          "cyclic_rate_rpm": 900,
+          "damage": 4,
+          "feed": "DETACHABLE_MAGAZINE",
+          "fire_modes": [
+            "SEMI_AUTO",
+            "FULL_AUTO"
+          ],
+          "id": "smg",
+          "location": "READY",
+          "magazine": {
+            "id": "B_PIXIE_2-smg-magazine-0",
+            "rounds": 30
+          },
+          "material_pen": 1,
+          "mechanism": "SELF_LOADING",
+          "needs_cycle": false,
+          "range_breakpoints_m": [
+            30,
+            60,
+            100
+          ],
+          "range_modifiers": [
+            0,
+            2,
+            5,
+            8
+          ],
+          "recoil": 1,
+          "reload_ap": 2,
+          "retained_magazines": [],
+          "spare_magazines": [
+            {
+              "id": "B_PIXIE_2-smg-magazine-1",
+              "rounds": 30
+            },
+            {
+              "id": "B_PIXIE_2-smg-magazine-2",
+              "rounds": 30
+            }
+          ],
+          "target_pen": 1
+        }
+      },
+      "B_SABLE_4": {
+        "active": true,
+        "aim": {
+          "ap": 0,
+          "point": null,
+          "target": null
+        },
+        "ap": 0,
+        "aptitudes": {
+          "acuity": 1,
+          "force": 0,
+          "nerve": 0,
+          "precision": 0,
+          "presence": 0,
+          "reason": 0
+        },
+        "center": [
+          5.5,
+          5.5,
+          0.9
+        ],
+        "class_id": "SHARPSHOOTER",
+        "control": null,
+        "downed": false,
+        "hp": 10,
+        "id": "B_SABLE_4",
+        "intrusion_ap_discount": 0,
+        "level": 4,
+        "life_threatening": {
+          "state": "NONE",
+          "within_reversible_window": false
+        },
+        "local_access": false,
+        "max_ap": 6,
+        "max_hp": 10,
+        "max_res": 7,
+        "medical_kit_capable": false,
+        "medicine_bonus": 0,
+        "movement_m_per_ap": 1.0,
+        "muzzle": [
+          5.91,
+          5.5,
+          1.4
+        ],
+        "name": "Synthetic Sable vector L4",
+        "position_cell": [
+          5,
+          5
+        ],
+        "recoil_recovery_per_ap": 1,
+        "res": 7,
+        "resuscitation_kit_capable": false,
+        "side": "hostiles",
+        "skills": {
+          "athletics": 0,
+          "cqc": 0,
+          "drone_operations": 0,
+          "engineering": 0,
+          "grenades": 0,
+          "influence": 0,
+          "investigation": 2,
+          "local_hacking": 0,
+          "marksmanship": 4,
+          "medicine": 0,
+          "networking": 0,
+          "recon": 2,
+          "social_read": 0,
+          "stealth": 2,
+          "tactics": 0,
+          "vehicles": 0
+        },
+        "specialties": [
+          "specialty.sentinel.entry.prepared_sightline",
+          "specialty.sentinel.tier_1.broad_sector",
+          "specialty.sentinel.tier_1.stable_nest",
+          "specialty.sentinel.tier_2.second_trigger"
+        ],
+        "stance": "STANDING",
+        "weapon": {
+          "chamber": "LIVE",
+          "current_recoil": 2,
+          "cycle_ap": 0,
+          "cyclic_rate_rpm": 750,
+          "damage": 5,
+          "feed": "DETACHABLE_MAGAZINE",
+          "fire_modes": [
+            "SEMI_AUTO",
+            "BURST",
+            "FULL_AUTO"
+          ],
+          "id": "service_rifle",
+          "location": "READY",
+          "magazine": {
+            "id": "B_SABLE_4-service_rifle-magazine-0",
+            "rounds": 29
+          },
+          "material_pen": 3,
+          "mechanism": "SELF_LOADING",
+          "needs_cycle": false,
+          "range_breakpoints_m": [
+            120,
+            250,
+            400
+          ],
+          "range_modifiers": [
+            0,
+            2,
+            5,
+            8
+          ],
+          "recoil": 2,
+          "reload_ap": 2,
+          "retained_magazines": [],
+          "spare_magazines": [
+            {
+              "id": "B_SABLE_4-service_rifle-magazine-1",
+              "rounds": 30
+            },
+            {
+              "id": "B_SABLE_4-service_rifle-magazine-2",
+              "rounds": 30
+            }
+          ],
+          "target_pen": 2
+        }
+      },
+      "B_VESPER_3": {
+        "active": true,
+        "aim": {
+          "ap": 0,
+          "point": null,
+          "target": null
+        },
+        "ap": 0,
+        "aptitudes": {
+          "acuity": 0,
+          "force": 0,
+          "nerve": 0,
+          "precision": 1,
+          "presence": 0,
+          "reason": 0
+        },
+        "center": [
+          5.5,
+          18.5,
+          0.9
+        ],
+        "class_id": "RIFLEMAN",
+        "control": null,
+        "downed": false,
+        "hp": 10,
+        "id": "B_VESPER_3",
+        "intrusion_ap_discount": 0,
+        "level": 4,
+        "life_threatening": {
+          "state": "NONE",
+          "within_reversible_window": false
+        },
+        "local_access": false,
+        "max_ap": 6,
+        "max_hp": 10,
+        "max_res": 7,
+        "medical_kit_capable": false,
+        "medicine_bonus": 0,
+        "movement_m_per_ap": 1.0,
+        "muzzle": [
+          4.91,
+          18.5,
+          1.4
+        ],
+        "name": "Synthetic Vesper vector L4",
+        "position_cell": [
+          5,
+          18
+        ],
+        "recoil_recovery_per_ap": 2,
+        "res": 7,
+        "resuscitation_kit_capable": false,
+        "side": "hostiles",
+        "skills": {
+          "athletics": 0,
+          "cqc": 2,
+          "drone_operations": 0,
+          "engineering": 0,
+          "grenades": 0,
+          "influence": 0,
+          "investigation": 0,
+          "local_hacking": 0,
+          "marksmanship": 4,
+          "medicine": 0,
+          "networking": 0,
+          "recon": 2,
+          "social_read": 0,
+          "stealth": 0,
+          "tactics": 2,
+          "vehicles": 0
+        },
+        "specialties": [],
+        "stance": "STANDING",
+        "weapon": {
+          "chamber": "LIVE",
+          "current_recoil": 0,
+          "cycle_ap": 0,
+          "cyclic_rate_rpm": 750,
+          "damage": 5,
+          "feed": "DETACHABLE_MAGAZINE",
+          "fire_modes": [
+            "SEMI_AUTO",
+            "BURST",
+            "FULL_AUTO"
+          ],
+          "id": "service_rifle",
+          "location": "READY",
+          "magazine": {
+            "id": "B_VESPER_3-service_rifle-magazine-0",
+            "rounds": 30
+          },
+          "material_pen": 3,
+          "mechanism": "SELF_LOADING",
+          "needs_cycle": false,
+          "range_breakpoints_m": [
+            120,
+            250,
+            400
+          ],
+          "range_modifiers": [
+            0,
+            2,
+            5,
+            8
+          ],
+          "recoil": 2,
+          "reload_ap": 2,
+          "retained_magazines": [],
+          "spare_magazines": [
+            {
+              "id": "B_VESPER_3-service_rifle-magazine-1",
+              "rounds": 30
+            },
+            {
+              "id": "B_VESPER_3-service_rifle-magazine-2",
+              "rounds": 30
+            }
+          ],
+          "target_pen": 2
+        }
+      }
+    },
+    "pneuma-io.trigger-discipline.state": {
+      "active_side": "allies",
+      "decision_owner": "player",
+      "eligible_actor_ids": [
+        "A_VESPER_1"
+      ],
+      "focused_actor": null,
+      "ground_object_sequence": 0,
+      "ground_objects": {},
+      "last_attack": {},
+      "last_reload": {},
+      "last_trigger": {
+        "actor": "A_VESPER_1",
+        "available_ap": 6,
+        "first_effect": "OVERWATCH",
+        "movement_ap_spent": 1,
+        "movement_cost_status": "ROUTE_WEIGHTED",
+        "overwatch": {
+          "outcome": "MISS",
+          "roll": 1,
+          "status": "RESOLVED",
+          "total": 5
+        },
+        "point": [
+          10.5,
+          6.2,
+          0.9
+        ],
+        "required_ap": 1,
+        "status": "RESUMED",
+        "travelled_cost": 1.0,
+        "travelled_distance": 1.0
+      },
+      "network_motion": {
+        "A_VESPER_1": 1
+      },
+      "prepared": {
+        "overwatch": {
+          "active": true,
+          "owner": "B_SABLE_4",
+          "shots": 1,
+          "stationary_origin": null,
+          "zone_id": "declared-prepared-lane"
+        },
+        "suppression": {
+          "active": false,
+          "capacity": 0,
+          "owner": null,
+          "zone_id": null
+        }
+      },
+      "spatial_scene": {
+        "entities": [
+          {
+            "active": true,
+            "facing": [
+              1,
+              0
+            ],
+            "footprint": {
+              "half_extents": [
+                0.4,
+                0.4
+              ],
+              "kind": "box"
+            },
+            "height": 1.8,
+            "id": "A_KORA_3",
+            "map_id": "MAP_LONG_1000",
+            "metadata": {
+              "player": {
+                "kind": "unit",
+                "label": "A_KORA_3"
+              },
+              "td_muzzle_offset": [
+                0.4099999999999966,
+                0.0
+              ]
+            },
+            "movement": "blocking",
+            "position": [
+              34.5,
+              17.5,
+              0
+            ],
+            "visibility": "opaque"
+          },
+          {
+            "active": true,
+            "facing": [
+              1,
+              0
+            ],
+            "footprint": {
+              "half_extents": [
+                0.4,
+                0.4
+              ],
+              "kind": "box"
+            },
+            "height": 1.8,
+            "id": "A_PIXIE_4",
+            "map_id": "MAP_LONG_1000",
+            "metadata": {
+              "player": {
+                "kind": "unit",
+                "label": "A_PIXIE_4"
+              },
+              "td_muzzle_offset": [
+                0.4099999999999966,
+                0.0
+              ]
+            },
+            "movement": "blocking",
+            "position": [
+              34.5,
+              21.5,
+              0
+            ],
+            "visibility": "opaque"
+          },
+          {
+            "active": true,
+            "facing": [
+              1,
+              0
+            ],
+            "footprint": {
+              "half_extents": [
+                0.4,
+                0.4
+              ],
+              "kind": "box"
+            },
+            "height": 1.8,
+            "id": "A_VESPER_1",
+            "map_id": "MAP_LONG_1000",
+            "metadata": {
+              "player": {
+                "kind": "unit",
+                "label": "A_VESPER_1"
+              },
+              "td_muzzle_offset": [
+                -0.5899999999999999,
+                0.0
+              ]
+            },
+            "movement": "blocking",
+            "position": [
+              10.5,
+              6.5,
+              0
+            ],
+            "visibility": "opaque"
+          },
+          {
+            "active": true,
+            "facing": [
+              1,
+              0
+            ],
+            "footprint": {
+              "half_extents": [
+                0.4,
+                0.4
+              ],
+              "kind": "box"
+            },
+            "height": 1.8,
+            "id": "A_VESPER_2",
+            "map_id": "MAP_LONG_1000",
+            "metadata": {
+              "player": {
+                "kind": "unit",
+                "label": "A_VESPER_2"
+              },
+              "td_muzzle_offset": [
+                -0.5899999999999999,
+                0.0
+              ]
+            },
+            "movement": "blocking",
+            "position": [
+              9.5,
+              5.5,
+              0
+            ],
+            "visibility": "opaque"
+          },
+          {
+            "active": true,
+            "facing": [
+              -1,
+              0
+            ],
+            "footprint": {
+              "half_extents": [
+                0.4,
+                0.4
+              ],
+              "kind": "box"
+            },
+            "height": 1.8,
+            "id": "B_HEX_1",
+            "map_id": "MAP_LONG_1000",
+            "metadata": {
+              "player": {
+                "kind": "unit",
+                "label": "B_HEX_1"
+              },
+              "td_muzzle_offset": [
+                -0.5899999999999999,
+                0.0
+              ]
+            },
+            "movement": "blocking",
+            "position": [
+              5.5,
+              12.5,
+              0
+            ],
+            "visibility": "opaque"
+          },
+          {
+            "active": true,
+            "facing": [
+              -1,
+              0
+            ],
+            "footprint": {
+              "half_extents": [
+                0.4,
+                0.4
+              ],
+              "kind": "box"
+            },
+            "height": 1.8,
+            "id": "B_PIXIE_2",
+            "map_id": "MAP_LONG_1000",
+            "metadata": {
+              "player": {
+                "kind": "unit",
+                "label": "B_PIXIE_2"
+              },
+              "td_muzzle_offset": [
+                -0.5899999999999999,
+                0.0
+              ]
+            },
+            "movement": "blocking",
+            "position": [
+              5.5,
+              15.5,
+              0
+            ],
+            "visibility": "opaque"
+          },
+          {
+            "active": true,
+            "facing": [
+              -1,
+              0
+            ],
+            "footprint": {
+              "half_extents": [
+                0.4,
+                0.4
+              ],
+              "kind": "box"
+            },
+            "height": 1.8,
+            "id": "B_SABLE_4",
+            "map_id": "MAP_LONG_1000",
+            "metadata": {
+              "player": {
+                "kind": "unit",
+                "label": "B_SABLE_4"
+              },
+              "td_muzzle_offset": [
+                0.41000000000000014,
+                0.0
+              ]
+            },
+            "movement": "blocking",
+            "position": [
+              5.5,
+              5.5,
+              0
+            ],
+            "visibility": "opaque"
+          },
+          {
+            "active": true,
+            "facing": [
+              -1,
+              0
+            ],
+            "footprint": {
+              "half_extents": [
+                0.4,
+                0.4
+              ],
+              "kind": "box"
+            },
+            "height": 1.8,
+            "id": "B_VESPER_3",
+            "map_id": "MAP_LONG_1000",
+            "metadata": {
+              "player": {
+                "kind": "unit",
+                "label": "B_VESPER_3"
+              },
+              "td_muzzle_offset": [
+                -0.5899999999999999,
+                0.0
+              ]
+            },
+            "movement": "blocking",
+            "position": [
+              5.5,
+              18.5,
+              0
+            ],
+            "visibility": "opaque"
+          }
+        ],
+        "format": 1,
+        "geometry": [
+          {
+            "active": true,
+            "destroyed": {
+              "active": false,
+              "movement": "passable",
+              "visibility": "clear"
+            },
+            "id": "PREPARED_APPROACH_WALL",
+            "map_id": "MAP_LONG_1000",
+            "metadata": {
+              "player": {
+                "kind": "wall",
+                "label": "WALL_NORTH"
+              }
+            },
+            "movement": "blocking",
+            "occupies_cells": false,
+            "visibility": "opaque",
+            "volume": {
+              "kind": "box",
+              "max": [
+                8.05,
+                5.71,
+                3
+              ],
+              "min": [
+                7.95,
+                4,
+                0
+              ]
+            }
+          }
+        ],
+        "map": {
+          "bounds": {
+            "max": [
+              1000,
+              60,
+              3
+            ],
+            "min": [
+              0,
+              0,
+              0
+            ]
+          },
+          "grid": {
+            "cell_size": 1,
+            "origin": [
+              0,
+              0
+            ],
+            "unit": "m"
+          },
+          "id": "MAP_LONG_1000",
+          "layers": [
+            {
+              "id": "floor",
+              "max_elevation": 3,
+              "min_elevation": 0
+            }
+          ],
+          "revision": 4
+        },
+        "terrain": [],
+        "zones": [
+          {
+            "id": "declared-prepared-lane",
+            "map_id": "MAP_LONG_1000",
+            "metadata": {
+              "player": {
+                "kind": "overwatch",
+                "label": "Known approach lane"
+              }
+            },
+            "shape": {
+              "kind": "box",
+              "max": [
+                12,
+                8,
+                2.5
+              ],
+              "min": [
+                9,
+                6.2,
+                0
+              ]
+            }
+          }
+        ]
+      },
+      "turn_roster": [
+        "A_VESPER_1",
+        "A_VESPER_2",
+        "A_KORA_3",
+        "A_PIXIE_4",
+        "B_HEX_1",
+        "B_PIXIE_2",
+        "B_VESPER_3",
+        "B_SABLE_4"
+      ]
+    }
+  },
+  "availability": {
+    "available": true,
+    "reason": null,
+    "preview": {
+      "version": 1,
+      "summary": [
+        {
+          "label": "Character",
+          "value": "Synthetic Vesper vector L4",
+          "emphasis": false
+        },
+        {
+          "label": "Target",
+          "value": "Synthetic Sable vector L4",
+          "emphasis": false
+        },
+        {
+          "label": "Aim point",
+          "value": [
+            5.5,
+            5.5,
+            0.9
+          ],
+          "emphasis": false
+        },
+        {
+          "label": "AP cost",
+          "value": 2,
+          "emphasis": false
+        }
+      ],
+      "details": [],
+      "title": "Confirm fire",
+      "actions": []
+    },
+    "map_preview": {
+      "notice": "Based on the visible map. The action rechecks current game state.",
+      "map_id": "MAP_LONG_1000",
+      "map_revision": 4,
+      "exposure": {
+        "fraction": 0.0,
+        "cover_ids": []
+      },
+      "ray": {
+        "origin": [
+          10.91,
+          6.2,
+          1.4
+        ],
+        "destination": [
+          5.5,
+          5.5,
+          0.9
+        ],
+        "contacts": [
+          {
+            "kind": "entity",
+            "id": "A_VESPER_1",
+            "point": [
+              10.9,
+              6.198706099815,
+              1.399075785582
+            ]
+          },
+          {
+            "kind": "entity",
+            "id": "B_SABLE_4",
+            "point": [
+              5.9,
+              5.551756007394,
+              0.93696857671
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "selection": {
+    "actor": "A_VESPER_1",
+    "target": "B_SABLE_4",
+    "aim_point": [
+      5.5,
+      5.5,
+      0.9
+    ],
+    "map_revision": 4
+  },
+  "actor": "A_VESPER_1",
+  "target": "B_SABLE_4",
+  "provenance": {
+    "source_commit": "f1b93b1a77636fc3c08c333903132934bd68d394",
+    "source_package_sha256": "6755b861a4bcb16aa9a2de331d2671cebd61854e8d2f1bcebd0fbef141c73ee6",
+    "generated_by": "Actual admitted resolve_trigger_crossing, mirror-second authored pose, deterministic face1; only ordinary player-ready decision phase was declared before crossing. No actor/target/muzzle/scene/numeric transforms.",
+    "red_witness_sha256": "06c2c0e61db128f9e127ae72b0f0fbd016ce3cb1793c4f9e3eabd021a6c7a05d",
+    "qualification": "Retained invalid no-direct-path state for negative admission, never a proposed pose repair or canonical profile."
+  }
+}

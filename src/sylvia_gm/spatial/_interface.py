@@ -7,6 +7,7 @@ import math
 import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from fractions import Fraction
 from typing import Never, cast
 
 from sylvia_gm.domain.authority import SafePayload, owned_payload, thaw_json_value
@@ -18,6 +19,7 @@ _IDENTITY = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$")
 _MAX_ABSOLUTE_COORDINATE = 1_000_000.0
 _MAX_AXIS_CELLS = 2_048
 _MAX_TOTAL_CELLS = 4_000_000
+_MAX_PATH_COST_PROFILE_CELLS = 256
 _MAX_GEOMETRY = 20_000
 _MAX_ENTITIES = 5_000
 _MAX_ZONES = 5_000
@@ -26,6 +28,10 @@ _MAX_JSON_DEPTH = 24
 _MAX_JSON_NODES = 100_000
 _MAX_METADATA_BYTES = 16_384
 _INCLUDE_ORDER = ("geometry", "entities", "zones")
+_EDGE_JOIN_REPAIR_MESSAGE = (
+    "This action cannot resolve an ambiguous wall junction. Ask the map author to confirm "
+    "which segments form one continuous wall and which are separate barriers before retrying."
+)
 
 _SCENE_KEYS = frozenset({"format", "map", "geometry", "entities", "zones", "terrain"})
 _MAP_KEYS = frozenset({"id", "revision", "bounds", "grid", "layers"})
@@ -63,11 +69,15 @@ _ENTITY_KEYS = frozenset(
 _ZONE_KEYS = frozenset({"id", "map_id", "shape", "metadata"})
 _TERRAIN_KEYS = frozenset({"cell", "layer_id", "cost"})
 _MUTATION_KEYS = frozenset({"map_id", "expected_revision", "target", "patch"})
+_WALL_MUTATION_KEYS = frozenset(
+    {"map_id", "expected_revision", "operation", "geometry_ids", "segments"}
+)
 _MUTATION_TARGET_KEYS = frozenset({"kind", "id"})
 _MUTABLE_FIELDS = {
     "geometry": frozenset(
         {
             "volume",
+            "edge_layer_id",
             "active",
             "movement",
             "occupies_cells",
@@ -98,6 +108,7 @@ _QUERY_KEYS = {
         {"kind", "map_id", "moving_entity_id", "fixed_entity_id", "destination",
          "moving_radius", "fixed_radius", "origin"}
     ),
+    "grid_lane": frozenset({"kind", "map_id", "owner_id", "lane"}),
     "body_proximity": frozenset(
         {
             "kind",
@@ -136,6 +147,10 @@ _QUERY_KEYS = {
     "exposure": frozenset(
         {"kind", "map_id", "observer", "target", "samples", "include", "metadata_filter"}
     ),
+    "exposure_path": frozenset(
+        {"kind", "map_id", "observer", "target", "samples", "include", "metadata_filter",
+         "path", "zone_id", "max_tests"}
+    ),
     "path": frozenset(
         {
             "kind",
@@ -148,6 +163,7 @@ _QUERY_KEYS = {
             "moving_entity_id",
             "metadata_filter",
             "max_steps",
+            "cost_profile",
         }
     ),
     "crossed_zones": frozenset({"kind", "map_id", "path", "max_crossings"}),
@@ -162,6 +178,11 @@ _RESULT_KEYS = {
     "circle_overlap": frozenset(
         {"kind", "map_id", "snapshot_id", "geometry_revision", "algorithm_version",
          "hit", "entry", "exit", "starts_inside", "ends_inside"}
+    ),
+    "grid_lane": frozenset({"kind", "map_id", "snapshot_id", "geometry_revision", "algorithm_version", "zone"}),
+    "exposure_path": frozenset(
+        {"kind", "map_id", "snapshot_id", "geometry_revision", "algorithm_version",
+         "supported", "found", "point", "distance", "exposure", "reason", "tests"}
     ),
     "body_proximity": frozenset(
         {
@@ -500,11 +521,108 @@ def _box(value: object, *, bounds: Mapping[str, object], code: str, path: str) -
     return {"kind": "box", "min": lower, "max": upper}
 
 
+def _grid_vertex(
+    value: int | float,
+    origin: int | float,
+    size: int | float,
+    *,
+    code: str,
+    path: str,
+    bounds: tuple[int | float, int | float] | None = None,
+) -> tuple[int, int | float]:
+    """Recover a grid index while accepting only bounded floating construction noise.
+
+    Eight ULPs of the construction operands cover multiply/add and cancellation noise;
+    the absolute cap is one billionth of a cell. This is numeric admission tolerance,
+    not physical thickness. Canonical decimal grid arithmetic makes shared vertices
+    identical. Exact existing coordinates retain their numeric representation.
+    """
+    step = Fraction(str(size))
+    base = Fraction(str(origin))
+    index = round((Fraction(str(value)) - base) / step)
+    canonical = float(base + index * step)
+    def tolerance(candidate: int | float) -> float:
+        return min(
+            float(size) * 1e-9,
+            8 * max(
+                math.ulp(float(v)) for v in (candidate, origin, index * float(size), canonical)
+            ),
+        )
+
+    if abs(float(value) - canonical) > tolerance(value):
+        _reject("Grid edge vertex is off grid", code=code, path=path)
+    coordinate = value if value == canonical else canonical
+    # The map's unchanged boundary is authoritative. If it names this same grid
+    # vertex within the identical tolerance, use its representation, not an
+    # expanded domain or a canonical endpoint just outside the query bounds.
+    for boundary in bounds or ():
+        if abs(float(boundary) - canonical) <= tolerance(boundary):
+            return index, coordinate if coordinate == boundary else boundary
+    return index, coordinate
+
+
+def _geometry_surface(
+    value: object,
+    *,
+    bounds: Mapping[str, object],
+    origin: Sequence[int | float],
+    cell_size: int | float,
+    code: str,
+    path: str,
+) -> dict[str, object]:
+    """Admit a solid box or one exact shared grid edge extruded through its authored height."""
+    if not isinstance(value, Mapping) or value.get("kind") != "grid_edge":
+        return _box(value, bounds=bounds, code=code, path=path)
+    item = _object(value, frozenset({"kind", "min", "max"}), code=code, path=path)
+    lower = _coordinate(item["min"], 3, code=code, path=f"{path}.min")
+    upper = _coordinate(item["max"], 3, code=code, path=f"{path}.max")
+    grid_lower: list[int] = []
+    grid_upper: list[int] = []
+    limit_lower = cast(Sequence[int | float], bounds["min"])
+    limit_upper = cast(Sequence[int | float], bounds["max"])
+    for field, point, indices in (("min", lower, grid_lower), ("max", upper, grid_upper)):
+        for axis in range(2):
+            index, coordinate = _grid_vertex(
+                point[axis], origin[axis], cell_size, code=code, path=f"{path}.{field}[{axis}]",
+                bounds=(limit_lower[axis], limit_upper[axis]),
+            )
+            indices.append(index)
+            point[axis] = coordinate
+    spans = [grid_upper[i] - grid_lower[i] for i in range(2)]
+    if spans not in ([0, 1], [1, 0]) or lower[2] >= upper[2]:
+        _reject(
+            "Grid edge must join adjacent grid vertices and have positive height",
+            code=code,
+            path=path,
+        )
+    if not _inside(lower, bounds) or not _inside(upper, bounds):
+        _reject("Grid edge is outside map bounds", code="spatial_out_of_bounds", path=path)
+    return {"kind": "grid_edge", "min": lower, "max": upper}
+
+
 def _shape(
     value: object, *, bounds: Mapping[str, object], code: str, path: str
 ) -> dict[str, object]:
     if not isinstance(value, Mapping):
         _reject("Spatial shape must be an object", code=code, path=path)
+    if value.get("kind") == "grid_cells":
+        item = _object(value, frozenset({"kind", "cells", "origin", "cell_size", "min_elevation", "max_elevation"}), code=code, path=path)
+        origin = _coordinate(item["origin"], 2, code=code, path=path + ".origin")
+        size = _number(item["cell_size"], minimum=0, code=code, path=path + ".cell_size")
+        low = _number(item["min_elevation"], minimum=None, code=code, path=path)
+        high = _number(item["max_elevation"], minimum=None, code=code, path=path)
+        if size <= 0 or low >= high:
+            _reject("Grid cell dimensions are invalid", code=code, path=path)
+        cells = [_cell(c, code=code, path=path + ".cells") for c in
+                 _array(item["cells"], minimum=1, maximum=4096, code=code, path=path + ".cells")]
+        if len({tuple(c) for c in cells}) != len(cells):
+            _reject("Grid cells must be unique", code=code, path=path)
+        for x, y in cells:
+            if not _inside([origin[0] + x * size, origin[1] + y * size, low], bounds) or not _inside(
+                [origin[0] + (x + 1) * size, origin[1] + (y + 1) * size, high], bounds):
+                _reject("Grid cell is outside map bounds", code=code, path=path)
+        return {**item, "origin": origin, "cell_size": size, "cells": sorted(cells),
+                "min_elevation": low, "max_elevation": high}
     if value.get("kind") == "box":
         return _box(value, bounds=bounds, code=code, path=path)
     item = _object(
@@ -702,8 +820,13 @@ def _validate_scene(payload: dict[str, object]) -> dict[str, object]:
     for index, raw in enumerate(geometry_input):
         path = f"$.geometry[{index}]"
         if isinstance(raw, Mapping):
-            raw = {"occupies_cells": True, **raw}
-        item = _object(raw, _GEOMETRY_KEYS, code=code, path=path)
+            volume = raw.get("volume")
+            is_edge = isinstance(volume, Mapping) and volume.get("kind") == "grid_edge"
+            raw = {"occupies_cells": not is_edge, **raw}
+        geometry_keys = _GEOMETRY_KEYS
+        if isinstance(raw, Mapping) and "edge_layer_id" in raw:
+            geometry_keys |= {"edge_layer_id"}
+        item = _object(raw, geometry_keys, code=code, path=path)
         item_id = _identity(item["id"], code=code, path=f"{path}.id")
         if item_id in seen_ids:
             _reject(
@@ -717,11 +840,27 @@ def _validate_scene(payload: dict[str, object]) -> dict[str, object]:
                 path=f"{path}.map_id",
             )
         destroyed = _object(item["destroyed"], _DESTROYED_KEYS, code=code, path=f"{path}.destroyed")
+        volume = _geometry_surface(
+            item["volume"], bounds=bounds, origin=origin, cell_size=cell_size,
+            code=code, path=f"{path}.volume",
+        )
+        if volume["kind"] == "grid_edge" and item["occupies_cells"] is not False:
+            _reject(
+                "A grid edge cannot occupy either adjacent cell",
+                code=code,
+                path=f"{path}.occupies_cells",
+            )
+        edge_layer = None
+        if "edge_layer_id" in item:
+            if volume["kind"] != "grid_edge":
+                _reject("Edge layer identity requires a grid edge", code=code, path=path)
+            edge_layer = _identity(item["edge_layer_id"], code=code, path=f"{path}.edge_layer_id")
         geometry.append(
             {
                 "id": item_id,
                 "map_id": map_id,
-                "volume": _box(item["volume"], bounds=bounds, code=code, path=f"{path}.volume"),
+                "volume": volume,
+                **({"edge_layer_id": edge_layer} if edge_layer is not None else {}),
                 "active": _boolean(item["active"], code=code, path=f"{path}.active"),
                 "movement": _movement(item["movement"], code=code, path=f"{path}.movement"),
                 "occupies_cells": _boolean(
@@ -840,11 +979,17 @@ def _validate_scene(payload: dict[str, object]) -> dict[str, object]:
                 code="spatial_cross_map",
                 path=f"{path}.map_id",
             )
+        normalized_shape = _shape(item["shape"], bounds=bounds, code=code, path=f"{path}.shape")
+        if normalized_shape["kind"] == "grid_cells" and (
+            normalized_shape["origin"] != grid_value["origin"]
+            or normalized_shape["cell_size"] != grid_value["cell_size"]
+        ):
+            _reject("Cell mask must use this map's grid", code=code, path=f"{path}.shape")
         zones.append(
             {
                 "id": item_id,
                 "map_id": map_id,
-                "shape": _shape(item["shape"], bounds=bounds, code=code, path=f"{path}.shape"),
+                "shape": normalized_shape,
                 "metadata": _metadata(item["metadata"], code=code, path=f"{path}.metadata"),
             }
         )
@@ -929,10 +1074,14 @@ def mutate_spatial_scene(
     scene: AdmittedSpatialScene,
     value: object,
 ) -> AdmittedSpatialMutation:
-    """Apply one exact neutral object patch and advance the authoritative map revision."""
+    """Apply one revision-guarded object patch or explicit wall edit."""
 
     code = "spatial_mutation_invalid"
-    request = _object(_capture_payload(value, code=code), _MUTATION_KEYS, code=code, path="$")
+    captured = _capture_payload(value, code=code)
+    keys = (frozenset({"map_id", "expected_revision", "operation", "owner_id", "lane"})
+            if captured.get("operation") == "grid_lane" else
+            _WALL_MUTATION_KEYS if "operation" in captured else _MUTATION_KEYS)
+    request = _object(captured, keys, code=code, path="$")
     if request["map_id"] != scene.map_id:
         _reject(
             "Spatial mutation belongs to another map",
@@ -952,6 +1101,14 @@ def mutate_spatial_scene(
             code="spatial_stale_revision",
             path="$.expected_revision",
         )
+    if request.get("operation") == "grid_lane":
+        from sylvia_gm.spatial._grid_lane import mutate_grid_lane
+        _identity(request["owner_id"], code=code, path="$.owner_id")
+        return mutate_grid_lane(scene, request)
+    if "operation" in request:
+        from sylvia_gm.spatial._wall_authoring import mutate_wall_scene
+
+        return mutate_wall_scene(scene, request)
     target = _object(request["target"], _MUTATION_TARGET_KEYS, code=code, path="$.target")
     target_kind = _enum(target["kind"], frozenset(_MUTABLE_FIELDS), code=code, path="$.target.kind")
     target_id = _identity(target["id"], code=code, path="$.target.id")
@@ -1055,9 +1212,11 @@ def admit_spatial_query(scene: AdmittedSpatialScene, value: object) -> AdmittedS
         expected_keys = expected_keys - {"origin"}
     if kind == "circle_route" and "edge_costs" not in payload:
         expected_keys = expected_keys - {"edge_costs"}
+    if kind == "path" and "cost_profile" not in payload:
+        expected_keys = expected_keys - {"cost_profile"}
     if kind == "path" and "moving_entity_id" not in payload:
         expected_keys = expected_keys - {"moving_entity_id"}
-    if kind in {"path", "exposure"} and "metadata_filter" not in payload:
+    if kind in {"path", "exposure", "exposure_path"} and "metadata_filter" not in payload:
         expected_keys = expected_keys - {"metadata_filter"}
     if kind == "sweep":
         expected_keys = expected_keys - ({"metadata_filter", "exclude_entity_ids"} - set(payload))
@@ -1070,7 +1229,12 @@ def admit_spatial_query(scene: AdmittedSpatialScene, value: object) -> AdmittedS
     map_value = cast(dict[str, object], admitted["map"])
     bounds = cast(dict[str, object], map_value["bounds"])
     normalized: dict[str, object] = {"kind": kind, "map_id": scene.map_id}
-    if kind == "ray":
+    if kind == "grid_lane":
+        from sylvia_gm.spatial._grid_lane import grid_lane_zone
+        owner_id = _identity(item["owner_id"], code=code, path="$.owner_id")
+        zone = grid_lane_zone(admitted, owner_id, item["lane"])
+        normalized.update({"owner_id": owner_id, "lane": zone["metadata"]["lane"]})
+    elif kind == "ray":
         origin = _coordinate(item["origin"], 3, code=code, path="$.origin")
         destination = _coordinate(item["destination"], 3, code=code, path="$.destination")
         if not _inside(origin, bounds) or not _inside(destination, bounds):
@@ -1091,7 +1255,7 @@ def admit_spatial_query(scene: AdmittedSpatialScene, value: object) -> AdmittedS
                 ),
             }
         )
-    elif kind == "exposure":
+    elif kind in {"exposure", "exposure_path"}:
         observer = _object(item["observer"], frozenset({"point"}), code=code, path="$.observer")
         point = _coordinate(observer["point"], 3, code=code, path="$.observer.point")
         if not _inside(point, bounds):
@@ -1139,6 +1303,21 @@ def admit_spatial_query(scene: AdmittedSpatialScene, value: object) -> AdmittedS
             normalized["metadata_filter"] = _metadata_selector(
                 item["metadata_filter"], code=code, path="$.metadata_filter"
             )
+        if kind == "exposure_path":
+            points = _array(item["path"], minimum=2, maximum=256, code=code, path="$.path")
+            path_points = [_coordinate(value, 3, code=code, path=f"$.path[{index}]")
+                           for index, value in enumerate(points)]
+            if any(not _inside(value, bounds) for value in path_points):
+                _reject(
+                    "Exposure path is outside map bounds",
+                    code="spatial_out_of_bounds", path="$.path",
+                )
+            zone_id = _identity(item["zone_id"], code=code, path="$.zone_id")
+            if zone_id not in {zone["id"] for zone in admitted["zones"]}:
+                _reject("Exposure zone is unknown", code=code, path="$.zone_id")
+            normalized.update(path=path_points, zone_id=zone_id,
+                              max_tests=_integer(item["max_tests"], minimum=1, maximum=4096,
+                                                 code=code, path="$.max_tests"))
     elif kind == "circle_route":
         entities = {entry['id']: entry for entry in admitted['entities'] if entry['active']}
         moving_id = _identity(item['moving_entity_id'], code=code, path='$.moving_entity_id')
@@ -1439,6 +1618,10 @@ def admit_spatial_query(scene: AdmittedSpatialScene, value: object) -> AdmittedS
                 ),
             }
         )
+        if "cost_profile" in item:
+            normalized["cost_profile"] = _boolean(
+                item["cost_profile"], code=code, path="$.cost_profile"
+            )
         if moving_entity_id is not None:
             normalized["moving_entity_id"] = moving_entity_id
         if "metadata_filter" in item:
@@ -1540,7 +1723,10 @@ def admit_spatial_result(scene: AdmittedSpatialScene, value: object) -> Admitted
     kind = payload.get("kind")
     if not isinstance(kind, str) or kind not in _RESULT_KEYS:
         _reject("Spatial result kind is invalid", code=code, path="$.kind")
-    item = _object(payload, _RESULT_KEYS[kind], code=code, path="$")
+    result_keys = _RESULT_KEYS[kind]
+    if kind == "path" and "cost_profile" in payload:
+        result_keys = result_keys | {"cost_profile"}
+    item = _object(payload, result_keys, code=code, path="$")
     if item["map_id"] != scene.map_id:
         _reject("Spatial result belongs to another map", code="spatial_cross_map", path="$.map_id")
     if item["snapshot_id"] != scene.snapshot_id:
@@ -1576,7 +1762,16 @@ def admit_spatial_result(scene: AdmittedSpatialScene, value: object) -> Admitted
         "geometry_revision": scene.geometry_revision,
         "algorithm_version": SPATIAL_ALGORITHM_VERSION,
     }
-    if kind == "ray":
+    if kind == "grid_lane":
+        from sylvia_gm.spatial._grid_lane import grid_lane_zone
+        zone = item["zone"]
+        if not isinstance(zone, dict) or not isinstance(zone.get("metadata"), dict):
+            _reject("Grid lane result is invalid", code=code, path="$.zone")
+        expected = grid_lane_zone(scene_payload, zone["metadata"].get("owner"), zone["metadata"].get("lane"))
+        if zone != expected:
+            _reject("Grid lane result is not authoritative", code=code, path="$.zone")
+        normalized["zone"] = expected
+    elif kind == "ray":
         cells_input = _array(
             item["cells"], minimum=1, maximum=sum(axis_cells) + 2, code=code, path="$.cells"
         )
@@ -1606,6 +1801,35 @@ def admit_spatial_result(scene: AdmittedSpatialScene, value: object) -> Admitted
                 "intersections": intersections,
                 "truncated": _boolean(item["truncated"], code=code, path="$.truncated"),
             }
+        )
+    elif kind == "exposure_path":
+        supported = _boolean(item["supported"], code=code, path="$.supported")
+        found = _boolean(item["found"], code=code, path="$.found")
+        if found and not supported:
+            _reject("Unsupported exposure path cannot have a result", code=code, path="$")
+        point = None
+        distance = None
+        exposure = _number(item["exposure"], minimum=0, code=code, path="$.exposure")
+        if exposure > 1 or (found and exposure <= 0):
+            _reject("Invalid path exposure fraction", code=code, path="$.exposure")
+        if found:
+            point = _coordinate(item["point"], 3, code=code, path="$.point")
+            if not _inside(point, bounds):
+                _reject("Exposure point is outside map bounds", code=code, path="$.point")
+            distance = _number(item["distance"], minimum=0, code=code, path="$.distance")
+        elif item["point"] is not None or item["distance"] is not None or exposure != 0:
+            _reject("Missing path exposure must have no point or distance", code=code, path="$")
+        reason = _enum(
+            item["reason"],
+            frozenset({"FOUND", "NO_EXPOSURE", "UNSUPPORTED_SHAPE", "TEST_LIMIT"}),
+            code=code, path="$.reason",
+        )
+        if (reason == "FOUND") != found or supported != (reason in {"FOUND", "NO_EXPOSURE"}):
+            _reject("Exposure path status and reason disagree", code=code, path="$.reason")
+        normalized.update(
+            supported=supported, found=found, point=point, distance=distance, exposure=exposure,
+            reason=reason,
+            tests=_integer(item["tests"], minimum=0, maximum=4096, code=code, path="$.tests"),
         )
     elif kind == "exposure":
         samples_input = _array(item["samples"], minimum=1, maximum=81, code=code, path="$.samples")
@@ -1826,6 +2050,29 @@ def admit_spatial_result(scene: AdmittedSpatialScene, value: object) -> Admitted
                 "truncated": _boolean(item["truncated"], code=code, path="$.truncated"),
             }
         )
+        if "cost_profile" in item:
+            profile = _array(item["cost_profile"], minimum=len(cells),
+                             maximum=min(len(cells), _MAX_PATH_COST_PROFILE_CELLS),
+                             code=code, path="$.cost_profile")
+            retained = []
+            previous_distance = previous_cost = 0.0
+            for index, raw in enumerate(profile):
+                path = f"$.cost_profile[{index}]"
+                row = _object(raw, frozenset({"distance", "cost", "terrain"}), code=code, path=path)
+                distance = _number(row["distance"], minimum=0, code=code, path=path + ".distance")
+                prefix_cost = _number(row["cost"], minimum=0, code=code, path=path + ".cost")
+                terrain = _number(
+                    row["terrain"], minimum=0.000001, code=code, path=path + ".terrain"
+                )
+                if (index == 0 and (distance != 0 or prefix_cost != 0)) or (
+                    index > 0 and (distance <= previous_distance or prefix_cost <= previous_cost)
+                ):
+                    _reject("Path cost profile is inconsistent", code=code, path=path)
+                retained.append({"distance": distance, "cost": prefix_cost, "terrain": terrain})
+                previous_distance, previous_cost = float(distance), float(prefix_cost)
+            if retained and abs(previous_cost - float(cost)) > 0.000000001:
+                _reject("Path cost profile total differs", code=code, path="$.cost_profile")
+            normalized["cost_profile"] = retained
     elif kind == "crossed_zones":
         crossings_input = _array(
             item["crossings"], minimum=0, maximum=4096, code=code, path="$.crossings"

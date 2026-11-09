@@ -44,9 +44,10 @@ def state_schemas() -> list[dict[str, Any]]:
         for name in ("CREDENTIAL", "FOOTHOLD", "ROUTE_PERSISTENCE")
     }, ())
     interface = _object({
-        "kind": _enum("local_stationary", "remote_service"), "active": boolean,
+        "kind": _enum("local_stationary", "local_carried", "remote_service"), "active": boolean,
         "generation": generation, "ap": count, "map_id": text,
         "position_cell": _array(number, 2, 2), "connections": _records(lifetime),
+        "carrier_id": text,
     }, ("kind", "active", "generation", "ap"))
     interface["allOf"] = [{
         "type": "object",
@@ -55,6 +56,7 @@ def state_schemas() -> list[dict[str, Any]]:
     } for kind, required in [
         ("local_stationary", ("map_id", "position_cell")),
         ("remote_service", ("connections",)),
+        ("local_carried", ("carrier_id", "connections")),
     ]]
     session = _object({
         "active": boolean, "generation": generation, "privilege": count,
@@ -64,6 +66,9 @@ def state_schemas() -> list[dict[str, Any]]:
         "link_generations": _array(generation, 7),
         "session_generations": _array(generation, 8, 1),
     })
+    # Friendly routes are projected from current known node labels. Accept old
+    # authored display text without requiring new runtime grants to cache it.
+    session["required"].remove("route_label")
     entry = _object({
         "active": boolean, "generation": generation, "interface_generation": generation,
         "node_generation": generation, "motion_generation": count, "connection_generation": count,
@@ -161,4 +166,6 @@ def state_schemas() -> list[dict[str, Any]]:
     reference(["network_functions", "*", "functions", "*", "map_id"], ["spatial_scene", "map", "id"])
     reference(["network_functions", "*", "functions", "*", "geometry_id"], ["spatial_scene", "geometry", "*", "id"])
     reference(["network_interfaces", "*", "map_id"], ["spatial_scene", "map", "id"])
+    reference(["network_interfaces", "$node", "carrier_id"],
+              ["network", "nodes", "$node", "physical_binding", "entity_id"])
     return [{"key": "state", "schema": schema, "references": references}]

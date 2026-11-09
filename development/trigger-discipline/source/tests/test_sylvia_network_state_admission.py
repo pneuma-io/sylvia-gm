@@ -71,6 +71,44 @@ def test_remote_service_interface_is_valid_authoring(manifest, remote):
     validate_plan_state(plan(world(remote)), manifest)
 
 
+def test_carried_local_interface_requires_actual_carrier_and_connection_records(manifest, network):
+    state = world(network)
+    state["network"]["nodes"]["dock_console"]["physical_binding"] = {
+        "surface_id": "operations.map", "entity_id": "engineer",
+    }
+    state["network_interfaces"]["dock_console"] = {
+        "kind": "local_carried", "active": True, "generation": 1, "ap": 1,
+        "carrier_id": "engineer", "connections": {"engineer": {"active": True, "generation": 1}},
+    }
+    validate_plan_state(plan(state), manifest)
+    for field in ("carrier_id", "connections"):
+        invalid = deepcopy(state)
+        invalid["network_interfaces"]["dock_console"].pop(field)
+        with pytest.raises(ContentShapeError):
+            validate_plan_state(plan(invalid), manifest)
+    invalid = deepcopy(state)
+    invalid["network_interfaces"]["dock_console"]["carrier_id"] = "vesper"
+    with pytest.raises(ContentShapeError):
+        validate_plan_state(plan(invalid), manifest)
+
+
+def test_runtime_created_sessions_admit_without_a_cached_display_label(manifest, network):
+    world(network)["network_sessions"] = {}
+    network.execute("intrude_network", {
+        "actor": "engineer", "node_id": "dock_console", "action": "GET_IN",
+    })
+    validate_plan_state(plan(world(network)), manifest)
+    network.execute("pivot_network", {
+        "actor": "engineer", "node_id": "floodgate",
+        "route_step": ["dock_console", "floodgate", "dock_cable"],
+    })
+    validate_plan_state(plan(world(network)), manifest)
+    invalid = deepcopy(world(network))
+    invalid["network_sessions"]["engineer"]["nodes"]["floodgate"]["route_label"] = None
+    with pytest.raises(ContentShapeError):
+        validate_plan_state(plan(invalid), manifest)
+
+
 @pytest.mark.parametrize("fault, suffix", [
     ("cost", ".network_functions.floodgate.functions.raise_gate.ap"),
     ("geometry", ".network_functions.floodgate.functions.raise_gate.geometry_id"),

@@ -28,8 +28,14 @@ TACTICAL_BINDINGS = [
     "target",
     "aim_point",
     "area",
+    "lane",
     "orientation",
     "declared_action",
+    "edges",
+    "edge_anchor",
+    "edge_walls",
+    "map_id",
+    "map_revision",
 ]
 NETWORK_BINDINGS = ["actor", "node", "link", "route_step", "remote_function", "declared_action"]
 
@@ -72,7 +78,7 @@ PANEL_DECLARATION_SCHEMA: dict[str, Any] = {
         },
         "actions": {
             "type": "array",
-            "maxItems": 16,
+            "maxItems": 24,
             "items": {"$ref": "#/$defs/action"},
             "default": [],
         },
@@ -156,6 +162,25 @@ PANEL_DECLARATION_SCHEMA: dict[str, Any] = {
                     },
                 },
                 "spatial_preview": {"enum": ["segment"]},
+                "edge_segment": {
+                    "type": "object",
+                    "additionalProperties": False,
+                    "required": [
+                        "height", "active", "movement", "visibility", "metadata", "destroyed",
+                    ],
+                    "properties": {
+                        "height": {"type": "number", "exclusiveMinimum": 0},
+                        "active": {"type": "boolean"},
+                        "movement": {"type": "string"},
+                        "visibility": {"type": "string"},
+                        "metadata": {"type": "object"},
+                        "destroyed": {"type": "object"},
+                    },
+                    "description": (
+                        "Tactical grid only: the authored barrier each selected grid border "
+                        "becomes."
+                    ),
+                },
                 "target_reference": {
                     "type": "string", "minLength": 1, "maxLength": 64,
                     "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
@@ -263,6 +288,11 @@ FORMAT_NOTES = (
     ),
     "Capability and action intent references require package-level checks.",
     "Binding keys must not overlap params keys; binding sources must be unique within an action.",
+    (
+        "Tactical edges bind selected grid borders as complete segments built from the action's "
+        "edge_segment; edge_anchor binds one visible grid-edge segment and edge_walls the visible "
+        "segments of chosen walls. map_id and map_revision bind the current public map."
+    ),
     "Object source nesting is limited to depth 3 by the package validator.",
     "Small-label validation also rejects unsafe text; its byte-level rule remains procedural here.",
 )

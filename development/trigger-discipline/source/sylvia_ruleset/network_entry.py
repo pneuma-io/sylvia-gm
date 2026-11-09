@@ -29,17 +29,19 @@ def live_checks(node: str) -> list[tuple[str, str]]:
         (
             (f"{node} in nx and {interface}.active == true and "
             f"{entry}.interface_generation == {interface}.generation and "
-            f"{entry}.node_generation == nt.nodes[{node}].generation"),
+            f"{entry}.node_generation == nt.nodes[{node}].generation and "
+            f"({interface}.kind != 'local_carried' or {interface}.carrier_id == _actor_id)"),
             "The entry interface has changed or ended. Reconnect to it.",
         ),
         (
             _connection_condition(node),
-            "The actor left the local interface or the remote connection ended. Reconnect before establishing access.",
+            "The local interface or connected service is unavailable. "
+            "Reconnect before establishing access.",
         ),
         (
             (f"({interface}.kind != 'local_stationary' or (_actor_id in nm and "
              f"{entry}.motion_generation == nm[_actor_id])) and "
-             f"({interface}.kind != 'remote_service' or "
+             f"({interface}.kind == 'local_stationary' or "
              f"{entry}.connection_generation == {interface}.connections[_actor_id].generation)"),
             "This connection was interrupted or replaced. Reconnect before establishing access.",
         ),
@@ -47,7 +49,7 @@ def live_checks(node: str) -> list[tuple[str, str]]:
 
 
 def _connection_condition(node: str) -> str:
-    """Remote reachability is an actor-bound authored connection, never inferred from visibility."""
+    """Use actual actor-bound connections; carried interfaces also require the real carrier."""
     interface = f"nx[{node}]"
     local = (
         f"{interface}.kind == 'local_stationary' and {interface}.map_id == map_id and "
@@ -55,12 +57,15 @@ def _connection_condition(node: str) -> str:
         f"actor.position_cell[1] == {interface}.position_cell[1]"
     )
     remote = (
-        f"{interface}.kind == 'remote_service' and 'connections' in {interface} and "
+        f"({interface}.kind == 'remote_service' or {interface}.kind == 'local_carried') and "
+        f"'connections' in {interface} and "
         f"_actor_id in {interface}.connections and "
         f"{interface}.connections[_actor_id].active == true and "
         f"{interface}.connections[_actor_id].generation >= 1"
     )
-    return f"(({local}) or ({remote}))"
+    # Preserve the bounded 32-check/eight-node route contract. Whitespace does
+    # not need to consume the host's 500-character expression allowance.
+    return f"({local})or({remote})".replace(" == ", "==").replace(" >= ", ">=")
 
 
 def checks() -> list[dict[str, str]]:
@@ -74,12 +79,14 @@ def checks() -> list[dict[str, str]]:
         ),
         (
             ("action == 'DISCONNECT' or (node_id in nt.nodes and nt.nodes[node_id].online == true "
-            "and node_id in nx and nx[node_id].active == true)"),
+            "and node_id in nx and nx[node_id].active == true "
+            "and (nx[node_id].kind != 'local_carried' or nx[node_id].carrier_id == _actor_id))"),
             "This device has no active entry interface.",
         ),
         (
             "action == 'DISCONNECT' or " + _connection_condition("node_id"),
-            "Move to the local interface or establish this actor's actual remote-service connection first.",
+            "Use the actual local interface/carrier or establish this actor's "
+            "remote-service connection first.",
         ),
         (
             "action == 'DISCONNECT' or (nx[node_id].ap >= 0 and actor.ap >= nx[node_id].ap)",
@@ -114,7 +121,7 @@ def effects() -> list[dict[str, Any]]:
                 {"set": {"field": "_connection_generation", "value": 0}},
                 {"set": {"field": "_connection_generation",
                          "value": "nx[node_id].connections[_actor_id].generation"},
-                 "condition": "nx[node_id].kind == 'remote_service'"},
+                 "condition": "nx[node_id].kind != 'local_stationary'"},
                 {"set": {"field": "_motion_generation", "value": 0}},
                 {"set": {"field": "_motion_generation", "value": "nm[_actor_id]"},
                  "condition": "_actor_id in nm"},

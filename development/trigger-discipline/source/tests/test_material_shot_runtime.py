@@ -58,7 +58,7 @@ def test_stopped_projectile_ends_at_ordered_stop_contact():
     assert attack["target_reached"] is False
     assert [contact["cue"] for contact in shot["contacts"]] == ["stop"]
     assert shot["destination"] == shot["contacts"][-1]["point"]
-    assert shot["contacts"][0]["point"][0] == 6
+    assert shot["contacts"][0]["point"][0] == 5.95
 
 
 def test_penetrating_projectile_preserves_order_and_destroys_cover():

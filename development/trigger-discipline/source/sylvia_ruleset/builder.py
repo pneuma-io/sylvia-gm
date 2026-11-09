@@ -14,21 +14,38 @@ from typing import Any
 
 from balance_suite.parameters import default_manifest
 from balance_suite.specialties import specialty_coverage
+
 from sylvia_ruleset import (
+    advancement,
+    drone_orders,
+    evader,
+    field_engineering,
     ground_weapons,
     medical,
+    network_discovery,
     network_entry,
     network_functions,
     network_intrusion,
     network_reroute,
     network_security,
     network_state_schema,
+    overwatch_lanes,
+    overwatch_dispatch,
+    panel_prices,
+    range_damage,
+    rifleman_entries,
+    sentinel,
+    shell_loading,
+    sniper,
     weapon_handling,
+)
+from sylvia_ruleset import (
+    snapshot as quick_solution,
 )
 from sylvia_ruleset.character_build import eligibility_catalog, eligibility_constraints
 
 PACKAGE_ID = "pneuma-io.trigger-discipline"
-PACKAGE_VERSION = "0.1.5"
+PACKAGE_VERSION = "0.1.29"
 CONFORMANCE_SETTING_ID = "pneuma-io.trigger-discipline-conformance-setting"
 CONFORMANCE_SETTING_VERSION = "0.1.3"
 SYLVIA_BASELINE = "0eccde944309f25560dcf7d2dd182084642787e5"
@@ -37,12 +54,24 @@ HOST_COMPATIBILITY = {
     "runtime_format": 1,
     "requires": [
         "panel_workspaces.v1",
+        "participant_mutation.v1",
+        "runtime_immutable_collections.v1",
         "shot_effects.v1",
         "spatial_clearance.v1",
+        "spatial_exposure_path.v1",
+        "spatial_path_cost_profile.v1",
         "spatial_mutation.v1",
+        "spatial_grid_edge.v1",
+        "spatial_edge_continuity.v1",
+        "spatial_wall_authoring.v1",
+        "spatial_grid_lanes.v1",
         "spatial_path_moving_entity.v1",
         "starting_state_validation.v1",
+        "private_state.v1",
+        "public_results.v1",
         "tactical_grid.v1",
+        "runtime_choice_sequences.v1",
+        "runtime_require.v1",
     ],
 }
 
@@ -238,7 +267,7 @@ def _schema(parameters: list[dict[str, Any]]) -> dict[str, Any]:
         if kind == "enum":
             value: dict[str, Any] = {"type": "string", "enum": parameter["enum_values"]}
         else:
-            value = {"type": {"number": "number", "integer": "integer", "array": "array"}.get(kind, "string")}
+            value = {"type": {"number": "number", "integer": "integer", "array": "array", "boolean": "boolean"}.get(kind, "string")}
         if "minimum" in parameter:
             value["minimum"] = parameter["minimum"]
         if "maximum" in parameter:
@@ -264,6 +293,8 @@ def _schema(parameters: list[dict[str, Any]]) -> dict[str, Any]:
 
 def _action_guard_parts(name: str) -> list[tuple[str, str]]:
     """Return non-spatial effect prerequisites shared with player-control checks."""
+    if name == "load_one_shell":
+        return shell_loading.guards()
     actor_name = (
         "attacker" if name in {"aim", "fire_single", "fire_burst", "fire_full_auto"} else "actor"
     )
@@ -278,6 +309,7 @@ def _action_guard_parts(name: str) -> list[tuple[str, str]]:
         "move_actor": [
             ("actor.ap >= 1", "This actor has no action points remaining."),
             ("actor.active == true", "This actor is not active."),
+            ("actor.downed == false", "A downed actor cannot move."),
         ],
         "change_stance": [
             ("actor.active == true", "This actor is not active."),
@@ -285,8 +317,12 @@ def _action_guard_parts(name: str) -> list[tuple[str, str]]:
             ("actor.stance != stance", "This actor is already in that stance."),
         ],
         "aim": [
-            ("attacker.ap >= ap", "This actor does not have enough action points to aim."),
+            (
+                f"attacker.ap >= {quick_solution.PRICE}",
+                "This actor does not have enough action points to aim.",
+            ),
             ("attacker.active == true", "This actor is not active."),
+            ("attacker.downed == false", "A downed actor cannot aim."),
             *common_weapon,
         ],
         "fire_single": [
@@ -342,6 +378,8 @@ def _action_guard_parts(name: str) -> list[tuple[str, str]]:
             ("target.active == true", "The selected target is not active."),
         ],
         "prepare_overwatch": [
+            ("(counter_prep == false or _cp_eligible == true)",
+             "Configured COUNTER-PREP requires its legal SHARPSHOOTER specialty build."),
             (
                 "actor.ap >= definitions.parameters.overwatch.setup_ap",
                 "This actor does not have enough action points to prepare overwatch.",
@@ -350,6 +388,7 @@ def _action_guard_parts(name: str) -> list[tuple[str, str]]:
             *common_weapon,
         ],
         "establish_suppression": [
+            ("actor.downed == false", "A downed actor cannot establish suppression."),
             (
                 "actor.ap >= definitions.parameters.suppression.setup_ap",
                 "This actor does not have enough action points to establish suppression.",
@@ -365,13 +404,23 @@ def _action_guard_parts(name: str) -> list[tuple[str, str]]:
             ),
             *common_weapon,
         ],
+        "reload_weapon": [
+            ("actor.weapon != null", "This actor has no current firearm."),
+            ("actor.weapon.feed == 'DETACHABLE_MAGAZINE'",
+             "This reload operation requires a detachable magazine; tube and belt loading are separate."),
+            ("actor.weapon.reload_ap != null", "This firearm has no declared magazine-reload price."),
+            ("actor.ap >= _manipulation_ap", "This actor does not have enough action points to reload."),
+            ("actor.weapon.spare_magazines", "No carried replacement magazine is available."),
+            *common_weapon,
+        ],
         "cycle_weapon": [
             ("actor.weapon != null", "This actor has no current firearm."),
+            ("actor.weapon.cycle_ap != null and actor.weapon.cycle_ap > 0",
+             "This weapon has no supported manual cycling price."),
             (
-                "actor.ap >= actor.weapon.cycle_ap",
+                "actor.ap >= _manipulation_ap",
                 "This actor does not have enough action points to cycle the weapon.",
             ),
-            ("actor.weapon.cycle_ap > 0", "This weapon cannot be cycled manually."),
             ("actor.weapon.needs_cycle == true", "This weapon does not need to be cycled."),
             *common_weapon,
         ],
@@ -413,6 +462,10 @@ def _action_guard_parts(name: str) -> list[tuple[str, str]]:
             (
                 "actor.standing_order.target == _target_id",
                 "The selected target is outside this drone's standing order.",
+            ),
+            (
+                "_order_condition",
+                "The additional order condition is not currently observed; continue watching.",
             ),
             (
                 "_target_id in actor.sensor_confirmed_targets",
@@ -477,6 +530,7 @@ def _stance_effects(actor_id: str, stance: str) -> list[dict[str, Any]]:
         ]}},
         # Mutate the exact map body before actor fields; a missing body rejects the whole action.
         {"spatial_mutation": {"scene": "state.spatial_scene", "map_id": "{map_id}", "expected_revision": "{_stance_snapshot.geometry_revision}", "target": {"kind": "entity", "id": f"{{{actor_id}}}"}, "patch": {"height": "{_stance_height}", "metadata": "{_stance_metadata}"}}, "store_as": "_stance_scene"},
+        {"condition": f"{actor}.stance != {stance}", "on_true": overwatch_lanes.break_lane(actor_id), "on_false": []},
         {"set": {"field": f"{{{actor_id}}}.stance", "value": stance}},
         {"set": {"field": f"{{{actor_id}}}.movement_m_per_ap", "value": "_stance_movement"}},
         {"set": {"field": f"{{{actor_id}}}.muzzle", "value": [f"_stance_origin[0] + {actor}.muzzle[0] - {actor}.center[0]", f"_stance_origin[1] + {actor}.muzzle[1] - {actor}.center[1]", "_stance_origin[2] + _stance_height * 0.7777777777777778"]}},
@@ -576,7 +630,7 @@ def _tool_specs(
                 "Destination is a zero-based [x, y] cell: increasing x moves right on Sylvia's map; "
                 "increasing y moves down. Start from the actor's current position_cell. "
                 "Use the authored scene for compass directions and the returned origin and "
-                "destination for narration."
+                "actual position for narration; prepared fire can interrupt the requested route."
             ),
             "parameters": [actor, cell("destination")],
             "effects": [
@@ -592,13 +646,23 @@ def _tool_specs(
                                 {"set": {"field": "state.last_move.origin", "value": "actor.position_cell"}},
                                 {"set": {"field": "_destination_position", "value": ["destination[0] + 0.5", "destination[1] + 0.5", 0]}},
                                 {"set": {"field": "_destination_center", "value": ["destination[0] + 0.5", "destination[1] + 0.5", "actor.center[2]"]}},
-                                {"set": {"field": "_destination_muzzle", "value": ["destination[0] + 0.91", "destination[1] + 0.5", "actor.muzzle[2]"]}},
-                                {"set": {"field": "_destination_muzzle", "value": ["destination[0] - 0.09", "destination[1] + 0.5", "actor.muzzle[2]"]}, "condition": "actor.side == 'hostiles'"},
+                                # Preserve the authored relative pose through ordinary movement.
+                                {"set": {
+                                    "field": "_destination_muzzle",
+                                    "value": [
+                                        "_destination_center[0] + "
+                                        "(actor.muzzle[0] - actor.center[0])",
+                                        "_destination_center[1] + "
+                                        "(actor.muzzle[1] - actor.center[1])",
+                                        "actor.muzzle[2]",
+                                    ],
+                                }},
                                 {"spatial_mutation": {"scene": "state.spatial_scene", "map_id": "{map_id}", "expected_revision": "{_move_snapshot.geometry_revision}", "target": {"kind": "entity", "id": "{_actor_id}"}, "patch": {"position": "{_destination_position}"}}, "store_as": "_move_scene"},
                                 {"set": {"field": "{_actor_id}.position_cell", "value": "destination"}},
                                 {"condition": "_path.cost > 0", "on_true": [
                                     *network_entry.movement_effects(),
                                     *weapon_handling.end_suppression(),
+                                    *sentinel.movement_effects(),
                                 ], "on_false": []},
                                 {"set": {"field": "{_actor_id}.center", "value": "_destination_center"}},
                                 {"set": {"field": "{_actor_id}.muzzle", "value": "_destination_muzzle"}},
@@ -638,13 +702,18 @@ def _tool_specs(
             "description": "Spend AP to maintain a bounded firing solution.",
             "parameters": [attacker, target, point("aim_point"), _param("ap", "integer", minimum=1, maximum=2)],
             "effects": [
+                *quick_solution.price_calculations(),
                 {
                     "condition": _action_guard("aim"),
                     "on_true": [
-                        {"decrement": {"field": "{_attacker_id}.ap", "amount": "ap"}},
+                        {"decrement": {
+                            "field": "{_attacker_id}.ap", "amount": quick_solution.PRICE,
+                        }},
                         {"set": {"field": "{_attacker_id}.aim.target", "value": "_target_id"}},
                         {"set": {"field": "{_attacker_id}.aim.point", "value": "aim_point"}},
                         {"set": {"field": "{_attacker_id}.aim.ap", "value": "ap"}},
+                        *sniper.capture_ordinary(),
+                        *quick_solution.performed("aimed_targets"),
                         {"set": {"field": "state.focused_actor", "value": "_attacker_id"}},
                     ],
                     "on_false": [{"set": {"field": "state.last_attack.outcome", "value": "'AIM_REJECTED'"}}],
@@ -701,6 +770,8 @@ def _tool_specs(
                         {"set": {"field": "_recovered", "value": "min(actor.weapon.current_recoil, ap * actor.recoil_recovery_per_ap)"}},
                         {"decrement": {"field": "{_actor_id}.ap", "amount": "ap"}},
                         {"decrement": {"field": "{_actor_id}.weapon.current_recoil", "amount": "_recovered"}},
+                        {"condition": "actor.weapon.current_recoil == 0",
+                         "on_true": rifleman_entries.end_chain(), "on_false": []},
                     ],
                     "on_false": [{"set": {"field": "state.last_attack.outcome", "value": "'RECOIL_RECOVERY_REJECTED'"}}],
                 }
@@ -731,10 +802,12 @@ def _tool_specs(
         },
         "prepare_overwatch": {
             "capability": "trigger-discipline.triggers",
-            "description": "Spend AP and reserve a normal attack against the authored OVERWATCH zone.",
+            "description": "Legacy externally authored fixed-zone setup for compatibility. Ordinary shooter-origin controls use prepare_overwatch_lane. Spend the existing setup AP and reserve a normal attack against the explicit authored zone.",
             "parameters": [actor, _param("zone_id", "string"),
+                           _param("counter_prep", "boolean", required=False, default=False),
                            _param("prepared_zones", "array", items="object", from_state="state.spatial_scene.zones")],
             "effects": [
+                *sentinel.counter_prep_calculations(),
                 *_prepared_zone_check(),
                 {
                     "condition": "_prepared_zone_exists == true and " + _action_guard("prepare_overwatch"),
@@ -744,6 +817,11 @@ def _tool_specs(
                         {"set": {"field": "state.prepared.overwatch.zone_id", "value": "zone_id"}},
                         {"set": {"field": "state.prepared.overwatch.shots", "value": "definitions.parameters.overwatch.shot_allowance"}},
                         {"set": {"field": "state.prepared.overwatch.active", "value": "true"}},
+                        {"set": {"field": "state.prepared.overwatch.stationary_origin", "value": "null"}},
+                        *[{"set": {"field": "state.prepared.overwatch." + field, "value": "null"}}
+                          for field in ("lane_origin", "lane_facing", "lane_shape", "lane_stance")],
+                        {"set": {"field": "state.prepared.overwatch.counter_prep",
+                                 "value": "counter_prep"}},
                     ],
                     "on_false": [{"set": {"field": "state.last_trigger.status", "value": "'PREPARATION_REJECTED'"}}],
                 }
@@ -770,11 +848,18 @@ def _tool_specs(
                         {"set": {"field": "_pre_suppression_magazine_rounds", "value": "actor.weapon.magazine.rounds"}},
                         {"set": {"field": "{_actor_id}.weapon.magazine.rounds", "value": "max(0, _pre_suppression_magazine_rounds - rounds)"}},
                         {"set": {"field": "{_actor_id}.weapon.chamber", "value": "'EMPTY'"}, "condition": "_pre_suppression_magazine_rounds < rounds"},
-                        {"increment": {"field": "{_actor_id}.weapon.current_recoil", "amount": "actor.weapon.recoil + (rounds + definitions.parameters.recoil.full_auto_round_step - 1) // definitions.parameters.recoil.full_auto_round_step - 1"}},
+                        *rifleman_entries.recoil_gain(
+                            "actor", "_actor_id",
+                            "actor.weapon.recoil + (rounds + definitions.parameters.recoil."
+                            "full_auto_round_step - 1) // definitions.parameters.recoil."
+                            "full_auto_round_step - 1",
+                            prefix="_suppression_commit",
+                        ),
                         {"set": {"field": "state.prepared.suppression.owner", "value": "_actor_id"}},
                         {"set": {"field": "state.prepared.suppression.zone_id", "value": "zone_id"}},
                         {"set": {"field": "state.prepared.suppression.capacity", "value": "max(1, rounds // definitions.parameters.suppression.exposure_capacity_round_divisor)"}},
                         {"set": {"field": "state.prepared.suppression.active", "value": "true"}},
+                        *_initial_suppression_effects(),
                     ],
                     "on_false": [{"set": {"field": "state.last_trigger.status", "value": "'PREPARATION_REJECTED'"}}],
                 }
@@ -1083,7 +1168,21 @@ def _tool_specs(
             "predicate": ("state.active_side", "hostiles"),
         },
     }
+    advance_rules = advancement.rules(eligibility_catalog(Path(__file__).resolve().parents[1]))
+    specs["advance_character"] = advancement.specification(actor, _param, advance_rules)
+    specs["prepare_sentinel_overwatch"] = sentinel.specification(specs["prepare_overwatch"], _param)
+    specs["prepare_sentinel_sightline"] = sentinel.sightline_specification(
+        specs["prepare_overwatch"], specs["aim"], _param,
+    )
+    specs["discover_network_quietly"] = network_discovery.specification(specs["intrude_network"])
+    specs["assign_drone_order"] = drone_orders.specification(actor, _param)
+    specs["reorient_field_node"] = field_engineering.specification(actor, _param)
+    specs["attempt_break_contact"] = evader.specification(actor, _param)
+    specs["enter_deep_aim"] = sniper.specification(
+        attacker, target, point, _param, _firing_exposure_query(store_as="_deep_exposure"),
+    )
     specs["handle_weapon"] = weapon_handling.specification(actor, _param)
+    specs["load_one_shell"] = shell_loading.specification(actor, _param)
     specs["switch_weapon"] = weapon_handling.switch_specification(actor, _param)
     specs["transfer_reserve_weapon"] = weapon_handling.transfer_specification(actor, _param)
     specs["drop_weapon"] = ground_weapons.drop_specification(actor, _param)
@@ -1107,12 +1206,20 @@ def _tool_specs(
         ],
         "costs_action": False,
     }
+    for name in ("fire_single", "fire_burst", "fire_full_auto"):
+        specs[name]["effects"] = range_damage.guard_attack(
+            specs[name]["effects"],
+            _firing_ray_query(store_as="_profile_ray", include=("entities",)),
+        )
     for name, spec in specs.items():
-        if name in {"end_allies_turn", "end_hostiles_turn", "recover_between_encounters"}:
+        if name in {
+            "end_allies_turn", "end_hostiles_turn", "recover_between_encounters",
+            "advance_character", "attempt_break_contact",
+        }:
             continue
         actor_name = (
             "attacker"
-            if name in {"aim", "fire_single", "fire_burst", "fire_full_auto"}
+            if name in {"aim", "enter_deep_aim", "fire_single", "fire_burst", "fire_full_auto"}
             else "actor"
         )
         spec["parameters"].append(
@@ -1133,15 +1240,22 @@ def _tool_specs(
                 ],
             }
         ]
-    for name in ("move_actor", "reload_weapon", "recover_recoil", "fire_single", "fire_burst", "fire_full_auto"):
+    for name in ("move_actor", "change_stance", "resolve_cqc", "resolve_cqc_displacement", "reload_weapon", "recover_recoil", "fire_single", "fire_burst", "fire_full_auto"):
         specs[name]["parameters"].append(_param("prepared", "object", from_state="state.prepared"))
+    pending_moves = list(specs["move_actor"]["effects"])
+    while pending_moves:
+        effect = pending_moves.pop()
+        if effect.get("condition") == "_path.found == true and actor.ap >= _move_ap":
+            effect["on_true"] = _ordinary_move_route(effect["on_true"])
+        else:
+            pending_moves.extend(effect.get("on_true", []))
     # Resolve the campaign's map through the existing hidden state-parameter binding.
     for name in (
         "move_actor", "change_stance", "fire_single", "fire_burst", "fire_full_auto",
         "inspect_trigger_crossing", "resolve_trigger_crossing", "resolve_cqc",
         "resolve_cqc_displacement", "resolve_blast_snapshot", "fpv_fragmentation_strike",
-        "autodrone_fire", "operate_remote_function", "prepare_overwatch", "establish_suppression",
-        "network_connection", "intrude_network", "pivot_network", "preserve_network_route", "treat_casualty",
+        "autodrone_fire", "operate_remote_function", "prepare_overwatch", "prepare_sentinel_overwatch", "prepare_sentinel_sightline", "establish_suppression",
+        "network_connection", "intrude_network", "discover_network_quietly", "pivot_network", "preserve_network_route", "treat_casualty",
     ):
         specs[name]["parameters"].append(
             _param("map_id", "string", from_state="state.spatial_scene.map.id")
@@ -1151,6 +1265,156 @@ def _tool_specs(
             _param("stance_bodies", "array", items="object", min_items=0, max_items=4096,
                    from_state="state.spatial_scene.entities")
         )
+    for name in ("aim", "fire_single", "fire_burst", "fire_full_auto"):
+        specs[name]["parameters"].extend(
+            [
+                _param("incoming_suppression", "object", from_state="state.prepared.suppression"),
+            ]
+        )
+        pending = list(specs[name]["effects"])
+        while pending:
+            effect = pending.pop(0)
+            if effect.get("condition") == _action_guard(name):
+                body = effect["on_true"]
+                effect["condition"] += " and attacker.downed == false"
+                effect["on_true"] = [
+                    {
+                        "call": "td_suppression_exposure",
+                        "params": {
+                            "actor": "{_attacker_id}",
+                            "suppressor": "{incoming_suppression.owner}",
+                            "event": name.upper(),
+                            "inspect_only": False,
+                            "prepared_suppression": "{state.prepared.suppression}",
+                            "suppression_zones": "{state.spatial_scene.zones}",
+                            "map_id": "{state.spatial_scene.map.id}",
+                        },
+                        "condition": (
+                            "incoming_suppression.active == true "
+                            "and incoming_suppression.owner != null "
+                            "and incoming_suppression.owner != _attacker_id"
+                        ),
+                    },
+                    {
+                        "condition": _action_guard(name) + " and attacker.downed == false",
+                        "on_true": body,
+                        "on_false": [
+                            {
+                                "set": {
+                                    "field": "state.last_attack.outcome",
+                                    "value": "'INTERRUPTED_BY_SUPPRESSION'",
+                                }
+                            }
+                        ],
+                    },
+                ]
+                if name == "aim":
+                    effect["on_true"][0] = sentinel.preparation_exposure("_attacker_id", "AIM")
+                    effect["on_true"][1]["on_false"].append({
+                        "set": {"field": "state.last_attack.outcome",
+                                "value": "'INTERRUPTED_BY_COUNTER_PREP'"},
+                        "condition": "_prep_interruption == 'COUNTER_PREP'",
+                    })
+                break
+            pending.extend(effect.get("on_true", []))
+        else:
+            raise ValueError(f"{name}: incoming suppression guard was not installed")
+    # Ordinary setup is a new exposed action. Resolve incoming fire only after
+    # its own prerequisites pass, then recheck before reserving watch or AP.
+    watch = specs["prepare_overwatch"]
+    watch["parameters"].append(
+        _param("incoming_suppression", "object", from_state="state.prepared.suppression"),
+    )
+    pending = list(watch["effects"])
+    preparations = []
+    while pending:
+        effect = pending.pop(0)
+        if effect.get("condition") == (
+            "_prepared_zone_exists == true and " + _action_guard("prepare_overwatch")
+        ):
+            preparations.append(effect)
+        pending.extend(effect.get("on_true", []))
+    if len(preparations) != 1:
+        raise ValueError("prepare_overwatch: expected one guarded setup commit")
+    preparation = preparations[0]
+    ready = preparation["condition"] + " and actor.active == true and actor.downed == false"
+    preparation["condition"] = ready
+    commit = preparation["on_true"] + [
+        {"set": {"field": "_card_watch_status", "value": "'PREPARED'"}},
+        {"set": {"field": "_card_watch_ap", "value": "definitions.parameters.overwatch.setup_ap"}},
+    ]
+    preparation["on_true"] = [
+        {
+            "call": "td_suppression_exposure",
+            "params": {
+                "actor": "{_actor_id}", "suppressor": "{incoming_suppression.owner}",
+                "event": "PREPARE_OVERWATCH", "inspect_only": False,
+                "prepared_suppression": "{state.prepared.suppression}",
+                "suppression_zones": "{state.spatial_scene.zones}",
+                "map_id": "{state.spatial_scene.map.id}",
+            },
+            "condition": (
+                "incoming_suppression.active == true and incoming_suppression.owner != null "
+                "and incoming_suppression.owner != _actor_id"
+            ),
+        },
+        {
+            "condition": ready, "on_true": commit,
+            "on_false": [
+                {"set": {"field": "state.last_trigger.status",
+                         "value": "'INTERRUPTED_BY_SUPPRESSION'"}},
+                {"set": {"field": "_card_watch_status",
+                         "value": "'INTERRUPTED_BY_SUPPRESSION'"}},
+            ],
+        },
+    ]
+    preparation["on_true"][0] = sentinel.preparation_exposure("_actor_id", "PREPARE_OVERWATCH")
+    preparation["on_true"][1]["on_false"].extend([
+        {"set": {"field": field, "value": "'INTERRUPTED_BY_COUNTER_PREP'"},
+         "condition": "_prep_interruption == 'COUNTER_PREP'"}
+        for field in ("state.last_trigger.status", "_card_watch_status")
+    ])
+    watch["effects"][0:0] = [
+        {"set": {"field": "_card_watch_status", "value": "'PREPARATION_REJECTED'"}},
+        {"set": {"field": "_card_watch_ap", "value": 0}},
+    ]
+    specs["establish_suppression"]["parameters"].append(
+        _param("exposure_roster", "array", items="string", from_state="state.turn_roster"),
+    )
+    specs["author_wall"] = {
+        "capability": "trigger-discipline.map-authoring",
+        "description": (
+            "Explicitly draw, extend, connect or keep selected grid-edge walls separate. "
+            "Draw takes new segments and no selection; extend takes one selected segment "
+            "and new segments; connect takes every segment of the chosen walls; separate "
+            "makes each selected segment independent. New segments contain volume, active, "
+            "movement, visibility, metadata and destroyed, optionally occupies_cells false. "
+            "Select existing geometry through the map; never ask the user to enter an ID. "
+            "The owner allocates geometry and continuity identities. No combat resources are spent."
+        ),
+        "parameters": [
+            _param("map_id", "string"),
+            _param("expected_revision", "integer", minimum=0),
+            _param("operation", "enum", enum=("draw", "extend", "connect", "separate")),
+            _param("geometry_ids", "array", items="string", min_items=0, max_items=256),
+            _param("segments", "array", items="object", min_items=0, max_items=256),
+        ],
+        "effects": [{
+            "spatial_mutation": {
+                "scene": "state.spatial_scene", "map_id": "{map_id}",
+                "expected_revision": "{expected_revision}", "operation": "{operation}",
+                "geometry_ids": "{geometry_ids}", "segments": "{segments}",
+            },
+            "store_as": "_wall_edit",
+        }, {"publish": {"fields": {"operation": "operation"}}}],
+        "costs_action": False,
+    }
+    for name in ("resolve_trigger_crossing",):
+        specs[name]["parameters"].extend([
+            _param("watch_bodies", "array", items="object", from_state="state.spatial_scene.entities"),
+            _param("watch_zones", "array", items="object", from_state="state.spatial_scene.zones"),
+        ])
+    overwatch_lanes.install_specs(specs, _param)
     return specs
 
 
@@ -1280,6 +1544,7 @@ def _ordered_material_route(
     cover_damage = f"{prefix}_cover_damage"
     cover_after = f"{prefix}_cover_hp_after"
     mutation = f"{prefix}_cover_mutation"
+    metadata = f"{prefix}_cover_metadata"
     geometry = f"{continues} == true and {item}.kind == 'geometry'"
     material = f"{geometry} and {item}.metadata.material_resistance != null"
     destructible = f"{material} and {item}.metadata.cover_hp != null"
@@ -1311,13 +1576,16 @@ def _ordered_material_route(
                     {"set": {"field": cover_before, "value": f"{item}.metadata.cover_hp"}, "condition": destructible},
                     {"set": {"field": cover_damage, "value": f"max(0, {damage} - {resistance})"}, "condition": destructible},
                     {"set": {"field": cover_after, "value": f"max(0, {cover_before} - {cover_damage})"}, "condition": destructible},
+                    # Retain the source's authored material/thickness profile and other metadata.
+                    {"set": {"field": metadata, "value": {"cover_hp": cover_after}}, "condition": destructible},
+                    {"set": {"field": metadata, "value": f"merge({item}.metadata, {metadata})"}, "condition": destructible},
                     {
                         "spatial_mutation": {
                             "scene": "state.spatial_scene",
                             "map_id": "{map_id}",
                             "expected_revision": f"{{{revision}}}",
                             "target": {"kind": "geometry", "id": f"{{{item}.id}}"},
-                            "patch": {"metadata": {"player": f"{{{item}.metadata.player}}", "material_resistance": f"{{{resistance}}}", "cover_hp": f"{{{cover_after}}}"}},
+                            "patch": {"metadata": f"{{{metadata}}}"},
                         },
                         "store_as": mutation,
                         "condition": f"{destructible} and {cover_damage} > 0 and {cover_after} > 0",
@@ -1328,7 +1596,7 @@ def _ordered_material_route(
                             "map_id": "{map_id}",
                             "expected_revision": f"{{{revision}}}",
                             "target": {"kind": "geometry", "id": f"{{{item}.id}}"},
-                            "patch": {"active": False, "movement": "passable", "visibility": "clear", "metadata": {"player": f"{{{item}.metadata.player}}", "material_resistance": f"{{{resistance}}}", "cover_hp": f"{{{cover_after}}}"}},
+                            "patch": {"active": False, "movement": "passable", "visibility": "clear", "metadata": f"{{{metadata}}}"},
                         },
                         "store_as": mutation,
                         "condition": f"{destructible} and {cover_damage} > 0 and {cover_after} == 0",
@@ -1377,7 +1645,10 @@ def _trigger_attack_effects(
     difficulty_modifier: str,
     critical_effect: str,
     consume_round: bool,
+    apply_aim: bool = True,
+    choose_critical: bool = False,
 ) -> list[dict[str, Any]]:
+    """Resolve prepared fire; only ordinary overwatch uses a stored AIM solution."""
     snapshot = f"{prefix}_snapshot"
     exposure = f"{prefix}_exposure"
     ray = f"{prefix}_ray"
@@ -1393,6 +1664,18 @@ def _trigger_attack_effects(
     target_pen = f"{prefix}_target_pen"
     material_pen = f"{prefix}_material_pen"
     route_prefix = f"{prefix}_route"
+    aim_effects = []
+    if apply_aim:
+        aim_effects = [{
+            "set": {
+                "field": f"{prefix}_aim_offset",
+                "value": (
+                    f"min({shooter}.aim.ap, definitions.parameters.fire.aim.max_ap_on_one_solution)"
+                    " * definitions.parameters.fire.aim.attack_difficulty_offset_per_ap"
+                ),
+            },
+            "condition": f"{shooter}.aim != null and {shooter}.aim.target == {target_id}",
+        }]
     effects: list[dict[str, Any]] = [
         {"spatial_query": {"scene": "state.spatial_scene", "operation": "snapshot"}, "store_as": snapshot},
         {"spatial_query": {"scene": "state.spatial_scene", "operation": "exposure", "snapshot": f"{{{snapshot}}}", "query": {"map_id": "{map_id}", "observer": {"point": f"{{{shooter}.muzzle}}"}, "target": {"entity_id": f"{{{target_id}}}"}, "samples": {"horizontal": 3, "vertical": 3}, "include": ["geometry", "entities"]}}, "store_as": exposure},
@@ -1407,8 +1690,10 @@ def _trigger_attack_effects(
         {"set": {"field": f"{prefix}_cover_offset", "value": 0}},
         {"set": {"field": f"{prefix}_cover_offset", "value": "definitions.parameters.cover.actual_difficulty_offset.half"}, "condition": f"{exposure}.exposure < 1 and {exposure}.exposure >= 0.5"},
         {"set": {"field": f"{prefix}_cover_offset", "value": "definitions.parameters.cover.actual_difficulty_offset.quarter"}, "condition": f"{exposure}.exposure < 0.5 and {exposure}.exposure > 0"},
+        {"set": {"field": f"{prefix}_aim_offset", "value": 0}},
+        *aim_effects,
         {"dice": {"expression": "d20"}, "store_as": attack},
-        {"set": {"field": open_difficulty, "value": f"max(1, definitions.parameters.check.difficulty.standard + {range_modifier} + {shooter}.weapon.current_recoil + {difficulty_modifier})"}},
+        {"set": {"field": open_difficulty, "value": f"max(1, definitions.parameters.check.difficulty.standard + {range_modifier} + {shooter}.weapon.current_recoil + {difficulty_modifier} + {prefix}_aim_offset)"}},
         {"set": {"field": actual_difficulty, "value": f"{open_difficulty} + {prefix}_cover_offset"}},
         {"set": {"field": total, "value": f"{attack}.total + {shooter}.skills.marksmanship + {shooter}.aptitudes.precision"}},
         {"set": {"field": f"{prefix}_margin", "value": f"{total} - {actual_difficulty}"}},
@@ -1417,7 +1702,19 @@ def _trigger_attack_effects(
         {"set": {"field": quality, "value": "'CLEAN_HIT'"}, "condition": f"{quality} != 'MISS' and {prefix}_margin >= definitions.parameters.hit_quality.clean_margin"},
         {"set": {"field": quality, "value": "'DECISIVE_HIT'"}, "condition": f"{quality} != 'MISS' and {prefix}_margin >= definitions.parameters.hit_quality.decisive_margin"},
         {"set": {"field": quality, "value": "'CRITICAL_HIT'"}, "condition": f"{attack}.total != 1 and {exposure}.exposure > 0 and ({prefix}_margin >= definitions.parameters.hit_quality.critical_margin or {attack}.total == 20)"},
-        {"set": {"field": damage, "value": f"{shooter}.weapon.damage"}},
+        *([{
+            "request_choice": {
+                "choice_id": (
+                    "overwatch-critical-effect" if consume_round else "suppression-critical-effect"
+                ),
+                "prompt": "Choose the overwatch critical effect."
+                if consume_round
+                else "Choose the suppressive critical effect.",
+                "options": [{"id": "DEEP_HIT", "label": "Deep hit"},
+                            {"id": "DEVASTATING_HIT", "label": "Devastating hit"}],
+            }, "store_as": critical_effect, "condition": f"{quality} == 'CRITICAL_HIT'",
+        }] if choose_critical else []),
+        {"set": {"field": damage, "value": f"{prefix}_base_damage"}},
         {"set": {"field": target_pen, "value": f"{shooter}.weapon.target_pen"}},
         {"set": {"field": material_pen, "value": f"{shooter}.weapon.material_pen"}},
         {"set": {"field": f"_fx_{prefix.lstrip('_')}_contacts", "value": []}},
@@ -1472,30 +1769,658 @@ def _trigger_attack_effects(
                 {"decrement": {"field": f"{{{shooter_id}}}.weapon.magazine.rounds", "amount": 1}, "condition": f"{shooter}.weapon.mechanism == 'SELF_LOADING' and {shooter}.weapon.magazine.rounds > 0"},
                 {"set": {"field": f"{{{shooter_id}}}.weapon.chamber", "value": "'LIVE'"}, "condition": f"{shooter}.weapon.mechanism == 'SELF_LOADING' and {shooter}.weapon.magazine.rounds > 0"},
                 {"set": {"field": f"{{{shooter_id}}}.weapon.chamber", "value": "'EMPTY'"}, "condition": f"{shooter}.weapon.mechanism == 'SELF_LOADING' and {shooter}.weapon.magazine.rounds == 0"},
-                {"increment": {"field": f"{{{shooter_id}}}.weapon.current_recoil", "amount": f"max(1, {shooter}.weapon.recoil)"}},
+                *rifleman_entries.recoil_gain(
+                    shooter, shooter_id, f"max(1, {shooter}.weapon.recoil)", prefix=prefix,
+                ),
+                {"set": {"field": f"{{{shooter_id}}}.aim.ap", "value": 0}, "condition": f"{shooter}.aim != null"},
             ]
         )
     # Keep the entire attack behind one runtime branch. Gating every individual
     # effect would still make Sylvia parse hundreds of conditions for the three
     # unselected ordering branches on every crossing.
-    return [{"condition": condition, "on_true": effects, "on_false": []}]
+    dice_index = next(index for index, effect in enumerate(effects) if "dice" in effect)
+    effects[dice_index + 1:dice_index + 1] = quick_solution.performed(
+        "attacked_targets", shooter, shooter_id, target_id,
+    )
+    guarded = effects[:dice_index] + [
+        *range_damage.selection(f"{shooter}.weapon", distance, f"{prefix}_base_damage"),
+        {
+            "condition": f"{prefix}_base_damage != null",
+            "on_true": effects[dice_index:],
+            "on_false": [
+                {"set": {"field": f"{record}.status", "value": "'UNRESOLVED_RANGE_DAMAGE'"}},
+                {"set": {"field": f"{prefix}_ready", "value": False}},
+                {"set": {"field": "_card_trigger_range_status", "value": repr(
+                    "A prepared shot has unresolved damage at this range; no shot or trigger "
+                    "allowance was spent."
+                )}},
+            ],
+        },
+    ]
+    # Crossing a drawn zone is insufficient: prepared fire needs current real exposure.
+    # Reject before dice, ammunition, recoil and trigger consumption.
+    visible = effects[:2] + [{
+        "condition": f"{exposure}.exposure > 0",
+        "on_true": guarded[2:],
+        "on_false": [
+            {"set": {"field": f"{record}.status", "value": "'NO_VALID_EXPOSURE'"}},
+            {"set": {"field": f"{prefix}_ready", "value": False}},
+        ],
+    }]
+    return [{"condition": condition, "on_true": visible, "on_false": []}]
 
 
-def _trigger_crossing_effects() -> list[dict[str, Any]]:
+def _suppression_exposure_helper() -> dict[str, Any]:
+    """Resolve one real current exposure from committed fire without new AP/ammo costs."""
+    ready = (
+        "prepared_suppression.active == true and prepared_suppression.capacity > 0 "
+        "and prepared_suppression.owner == _suppressor_id and _actor_id != _suppressor_id "
+        "and actor.active == true and actor.downed == false "
+        "and suppressor.active == true and suppressor.downed == false "
+        "and suppressor.weapon.location == 'READY' and suppressor.weapon.controlled_by == null"
+    )
+    effects = [
+        {"set": {"field": "_suppression_side", "value": "suppressor.side"}},
+        {"set": {"field": "_suppression_exposed", "value": False}},
+        {
+            "set": {
+                "field": "_suppression_target_name",
+                "value": "'Unidentified exposure'",
+            }
+        },
+        {"set": {"field": "_incoming_zone", "value": None}},
+        {
+            "for_each": {
+                "collection": "suppression_zones",
+                "as": "_incoming_candidate",
+                "do": [
+                    {
+                        "set": {"field": "_incoming_zone", "value": "_incoming_candidate"},
+                        "condition": "_incoming_candidate.id == prepared_suppression.zone_id",
+                    },
+                ],
+            }
+        },
+        {
+            "condition": ready + " and _incoming_zone != null",
+            "on_true": [
+                {
+                    "spatial_query": {"scene": "state.spatial_scene", "operation": "snapshot"},
+                    "store_as": "_incoming_snapshot",
+                },
+                {
+                    "spatial_query": {
+                        "scene": "state.spatial_scene",
+                        "operation": "crossed_zones",
+                        "snapshot": "{_incoming_snapshot}",
+                        "query": {
+                            "map_id": "{map_id}",
+                            "path": ["{actor.center}", "{actor.center}"],
+                            "max_crossings": 4096,
+                        },
+                    },
+                    "store_as": "_incoming_area",
+                },
+                {"set": {"field": "_incoming_inside", "value": False}},
+                {"set": {"field": "_incoming_crossings", "value": "_incoming_area.crossings"}},
+                {
+                    "for_each": {
+                        "collection": "_incoming_crossings",
+                        "as": "_incoming_body",
+                        "do": [
+                            {
+                                "set": {"field": "_incoming_inside", "value": True},
+                                "condition": (
+                                    "_incoming_body.zone_id == prepared_suppression.zone_id"
+                                ),
+                            },
+                        ],
+                    }
+                },
+                {
+                    "condition": "_incoming_inside == true",
+                    "on_true": [
+                        {
+                            "spatial_query": {
+                                "scene": "state.spatial_scene",
+                                "operation": "exposure",
+                                "snapshot": "{_incoming_snapshot}",
+                                "query": {
+                                    "map_id": "{map_id}",
+                                    "observer": {"point": "{suppressor.muzzle}"},
+                                    "target": {"entity_id": "{_actor_id}"},
+                                    "samples": {"horizontal": 3, "vertical": 3},
+                                    "include": ["geometry", "entities"],
+                                },
+                            },
+                            "store_as": "_incoming_exposure",
+                        },
+                        {
+                            "set": {
+                                "field": "_suppression_exposed",
+                                "value": "_incoming_exposure.exposure > 0",
+                            }
+                        },
+                    ],
+                    "on_false": [],
+                },
+            ],
+            "on_false": [],
+        },
+        {
+            "set": {
+                "field": "_incoming_suppression_ready",
+                "value": "_suppression_exposed == true and inspect_only == false",
+            }
+        },
+        {"set": {"field": "_incoming_critical", "value": None}},
+        # Choices may publish map labels, never private character names or IDs.
+        {
+            "for_each": {
+                "collection": "exposure_bodies",
+                "as": "_public_exposure_body",
+                "do": [
+                    {
+                        "set": {
+                            "field": "_suppression_target_name",
+                            "value": "_public_exposure_body.metadata.player.label",
+                        },
+                        "condition": (
+                            "_public_exposure_body.id == _actor_id "
+                            "and _public_exposure_body.metadata.player != null "
+                            "and _public_exposure_body.metadata.player.label != null"
+                        ),
+                    },
+                ],
+            },
+            "condition": "inspect_only == true and _suppression_exposed == true",
+        },
+    ]
+    effects.extend(
+        _trigger_attack_effects(
+            prefix="_incoming_suppression",
+            shooter="suppressor",
+            shooter_id="_suppressor_id",
+            target="actor",
+            target_id="_actor_id",
+            target_point="actor.center",
+            record="state.last_suppression_exposure",
+            condition="_incoming_suppression_ready == true",
+            difficulty_modifier="definitions.parameters.suppression.attack_difficulty_modifier",
+            critical_effect="_incoming_critical",
+            consume_round=False,
+            apply_aim=False,
+            choose_critical=True,
+        )
+    )
+    effects.extend(
+        [
+            {
+                "decrement": {"field": "state.prepared.suppression.capacity", "amount": 1},
+                "condition": "_incoming_suppression_ready == true",
+            },
+            {
+                "set": {"field": "state.prepared.suppression.active", "value": False},
+                "condition": "state.prepared.suppression.capacity <= 0",
+            },
+            {
+                "set": {"field": "state.last_suppression_exposure.actor", "value": "_actor_id"},
+                "condition": "_incoming_suppression_ready == true",
+            },
+            {
+                "set": {"field": "state.last_suppression_exposure.event", "value": "event"},
+                "condition": "_incoming_suppression_ready == true",
+            },
+        ]
+    )
+    return {
+        "description": "Inspect or resolve one exposure against the saved active suppressor.",
+        "parameters": [
+            _param("actor", "entity_id", resolve="entity"),
+            _param("suppressor", "entity_id", resolve="entity"),
+            _param("event", "string"),
+            _param("inspect_only", "boolean"),
+            _param(
+                "exposure_bodies",
+                "array",
+                items="object",
+                from_state="state.spatial_scene.entities",
+            ),
+            _param("map_id", "string", from_state="state.spatial_scene.map.id"),
+            _param(
+                "suppression_zones", "array", items="object", from_state="state.spatial_scene.zones"
+            ),
+            _param("prepared_suppression", "object", from_state="state.prepared.suppression"),
+        ],
+        "effects": effects,
+        "metadata": {"costs_action": False},
+    }
+
+
+def _initial_suppression_effects() -> list[dict[str, Any]]:
+    """Resolve real occupied exposures in controller-chosen order with live rechecks."""
+    return [
+        {"set": {"field": "_initial_exposed", "value": []}},
+        {"set": {"field": "_initial_options", "value": []}},
+        {"set": {"field": "_initial_bindings", "value": []}},
+        {
+            "for_each": {
+                "collection": "exposure_roster",
+                "as": "_initial_target",
+                "do": [
+                    {
+                        "call": "td_suppression_exposure",
+                        "params": {
+                            "actor": "{_initial_target}",
+                            "suppressor": "{_actor_id}",
+                            "event": "INITIAL",
+                            "inspect_only": True,
+                            "prepared_suppression": "{state.prepared.suppression}",
+                            "suppression_zones": "{state.spatial_scene.zones}",
+                            "map_id": "{state.spatial_scene.map.id}",
+                        },
+                        "export_context": {
+                            "_initial_valid": "_suppression_exposed",
+                            "_initial_label": "_suppression_target_name",
+                        },
+                    },
+                    {
+                        "list_push": {"list": "_initial_exposed", "value": "_initial_target"},
+                        "condition": "_initial_valid == true",
+                    },
+                    {
+                        "set": {
+                            "field": "_initial_option_id",
+                            "value": "'exposure-' + text(len(_initial_options))",
+                        },
+                        "condition": "_initial_valid == true",
+                    },
+                    {
+                        "set": {
+                            "field": "_initial_label",
+                            "value": (
+                                "_initial_label + ' [' + text(len(_initial_options) + 1) + ']'"
+                            ),
+                        },
+                        "condition": "_initial_valid == true",
+                    },
+                    # One authored interpolation keeps published label data literal.
+                    *[
+                        {
+                            "set": {"field": f"_initial_label_{index}", "value": "_initial_label"},
+                            "condition": (
+                                f"_initial_valid == true and len(_initial_options) == {index}"
+                            ),
+                        }
+                        for index in range(16)
+                    ],
+                    {
+                        "set": {
+                            "field": "_initial_label_template",
+                            "value": "'{' + '_initial_label_' + text(len(_initial_options)) + '}'",
+                        },
+                        "condition": "_initial_valid == true",
+                    },
+                    {
+                        "set": {
+                            "field": "_initial_option",
+                            "value": {
+                                "id": "_initial_option_id",
+                                "label": "_initial_label_template",
+                            },
+                        },
+                        "condition": "_initial_valid == true",
+                    },
+                    {
+                        "list_push": {"list": "_initial_options", "value": "_initial_option"},
+                        "condition": "_initial_valid == true",
+                    },
+                    {
+                        "set": {
+                            "field": "_initial_binding",
+                            "value": {
+                                "id": "_initial_option_id",
+                                "actor_id": "_initial_target",
+                            },
+                        },
+                        "condition": "_initial_valid == true",
+                    },
+                    {
+                        "list_push": {"list": "_initial_bindings", "value": "_initial_binding"},
+                        "condition": "_initial_valid == true",
+                    },
+                ],
+            }
+        },
+        {
+            "require": {
+                "condition": "len(_initial_options) <= 16",
+                "error": (
+                    "More than 16 simultaneous initial exposures exceed "
+                    "the supported controller-choice bound."
+                ),
+            }
+        },
+        {
+            "for_each": {
+                "collection": "_initial_exposed",
+                "as": "_initial_window",
+                "do": [
+                    {
+                        "condition": (
+                            "state.prepared.suppression.active == true "
+                            "and state.prepared.suppression.capacity > 0 "
+                            "and len(_initial_options) > 0"
+                        ),
+                        "on_true": [
+                            {
+                                "set": {
+                                    "field": "_initial_choice_id",
+                                    "value": "_initial_options[0].id",
+                                }
+                            },
+                            {
+                                "request_choice": {
+                                    "choice_id": "initial-suppression-order",
+                                    "prompt": "Choose which initial exposure resolves next.",
+                                    "options": "_initial_options",
+                                },
+                                "store_as": "_initial_choice_id",
+                                "condition": "len(_initial_options) > 1",
+                            },
+                            {
+                                "for_each": {
+                                    "collection": "_initial_bindings",
+                                    "as": "_initial_binding",
+                                    "do": [
+                                        {
+                                            "set": {
+                                                "field": "_initial_actor_id",
+                                                "value": "_initial_binding.actor_id",
+                                            },
+                                            "condition": (
+                                                "_initial_binding.id == _initial_choice_id"
+                                            ),
+                                        },
+                                    ],
+                                }
+                            },
+                            {
+                                "call": "td_suppression_exposure",
+                                "params": {
+                                    "actor": "{_initial_actor_id}",
+                                    "suppressor": "{_actor_id}",
+                                    "event": "INITIAL",
+                                    "inspect_only": False,
+                                    "prepared_suppression": "{state.prepared.suppression}",
+                                    "suppression_zones": "{state.spatial_scene.zones}",
+                                    "map_id": "{state.spatial_scene.map.id}",
+                                },
+                            },
+                            {
+                                "for_each": {
+                                    "collection": "_initial_options",
+                                    "as": "_initial_option",
+                                    "do": [
+                                        {
+                                            "set": {
+                                                "field": "_initial_selected",
+                                                "value": "_initial_option",
+                                            },
+                                            "condition": "_initial_option.id == _initial_choice_id",
+                                        },
+                                    ],
+                                }
+                            },
+                            {
+                                "set": {
+                                    "field": "_initial_options",
+                                    "value": "without(_initial_options, one(_initial_selected))",
+                                }
+                            },
+                        ],
+                        "on_false": [],
+                    },
+                ],
+            }
+        },
+    ]
+
+
+def _ordinary_move_route(untriggered: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Commit a legal ordinary move once, using saved prepared fire before its fallback."""
+    return [
+        {"set": {"field": "_move_origin_before", "value": "actor.position_cell"}},
+        {"set": {"field": "_move_ap_before", "value": "actor.ap"}},
+        {"set": {"field": "_move_overwatcher", "value": "_actor_id"}},
+        {"set": {"field": "_move_suppressor", "value": "_actor_id"}},
+        *[
+            {
+                "set": {"field": field, "value": f"prepared.{kind}.owner"},
+                "condition": (
+                    f"prepared.{kind}.active == true and prepared.{kind}.owner != null "
+                    f"and prepared.{kind}.owner != _actor_id"
+                ),
+            }
+            for kind, field in (
+                ("overwatch", "_move_overwatcher"),
+                ("suppression", "_move_suppressor"),
+            )
+        ],
+        {
+            "call": "td_move_with_prepared_fire",
+            "params": {
+                "actor": "{_actor_id}",
+                "destination": "{destination}",
+                "overwatcher": "{_move_overwatcher}",
+                "suppressor": "{_move_suppressor}",
+            },
+            "export_context": {
+                "_move_was_paused": "_trigger_paused",
+                "_move_path_supported": "_exposure_path_supported",
+                "_move_trigger_status": "_card_trigger_status",
+                "_move_actual_distance": "_ordinary_distance",
+                "_move_geometry_revision": "_ordinary_geometry_revision",
+            },
+        },
+        {
+            "require": {
+                "condition": "_move_path_supported == true",
+                "error": (
+                    "This movement crosses an unsupported exposure path "
+                    "or separate trigger windows."
+                ),
+            }
+        },
+        {
+            "condition": "_move_was_paused == true",
+            "on_true": [
+                {"set": {"field": "state.focused_actor", "value": "_actor_id"}},
+                {"set": {"field": "state.last_move.actor", "value": "_actor_id"}},
+                {"set": {"field": "state.last_move.origin", "value": "_move_origin_before"}},
+                {"set": {"field": "state.last_move.cost", "value": "_move_actual_distance"}},
+                {"set": {"field": "state.last_move.ap", "value": "_move_ap_before - actor.ap"}},
+                {
+                    "set": {
+                        "field": "state.last_move.geometry_revision",
+                        "value": "_move_geometry_revision",
+                    }
+                },
+                {"set": {"field": "state.last_move.status", "value": "'MOVED'"}},
+                {
+                    "set": {
+                        "field": "state.last_move.status",
+                        "value": "'INTERRUPTED_BY_PREPARED_FIRE'",
+                    },
+                    "condition": "_move_trigger_status == 'INTERRUPTED'",
+                },
+            ],
+            "on_false": untriggered,
+        },
+    ]
+
+
+def _ordinary_crossing_helper() -> dict[str, Any]:
+    """Keep ordinary map/queue/chat movement on the existing trigger procedure."""
+    return {
+        "description": "Resolve saved prepared fire for one ordinary movement commitment.",
+        "parameters": [
+            *[
+                _param(name, "string", resolve="entity")
+                for name in ("actor", "overwatcher", "suppressor")
+            ],
+            _param("destination", "array", items="integer", min_items=2, max_items=2),
+            _param("prepared_fire", "object", from_state="state.prepared"),
+            _param("watch_bodies", "array", items="object", from_state="state.spatial_scene.entities"),
+            _param("watch_zones", "array", items="object", from_state="state.spatial_scene.zones"),
+            _param("prepared", "object", from_state="state.prepared"),
+            _param("active_side", "string", from_state="state.active_side"),
+            _param("map_id", "string", from_state="state.spatial_scene.map.id"),
+        ],
+        "effects": _trigger_crossing_effects(automatic=True),
+        "metadata": {"costs_action": False},
+    }
+
+
+def _ordinary_trigger_order() -> list[dict[str, Any]]:
+    """Use authored non-active-side priority; ask for same-controller same-tier order."""
+    return [
+        {"set": {"field": "_automatic_first_effect", "value": "'OVERWATCH'"}},
+        {"set": {"field": "_automatic_overwatch_critical", "value": None}},
+        {"set": {"field": "_automatic_suppression_critical", "value": None}},
+        {
+            "set": {"field": "_automatic_first_effect", "value": "'SUPPRESSION'"},
+            "condition": "_watch_path_ready == false or suppressor.side != active_side",
+        },
+        {
+            "request_choice": {
+                "choice_id": "movement-trigger-order",
+                "prompt": "Choose which same-side prepared reaction resolves first.",
+                "options": [
+                    {"id": "OVERWATCH", "label": "Overwatch first"},
+                    {"id": "SUPPRESSION", "label": "Suppression first"},
+                ],
+            },
+            "store_as": "_automatic_first_effect",
+            "condition": (
+                "_trigger_move_ready == true and _watch_path_ready == true "
+                "and _suppression_path_ready == true and overwatcher.side == suppressor.side"
+            ),
+        },
+    ]
+
+
+def _weighted_prefix_effects(*, require_supported: bool = True) -> list[dict[str, Any]]:
+    """Price retained prefixes and optionally reject unresolved terrain transitions."""
+    return [
+        {"set": {"field": "_trigger_prefix_cost", "value": None}},
+        {"set": {"field": "_prefix_cost_supported", "value": False}},
+        {"set": {"field": "_prefix_rows", "value": "_trigger_path.cost_profile"}},
+        {
+            "set": {"field": "_prefix_previous", "value": "_prefix_rows[0]"},
+            "condition": "len(_prefix_rows) > 0",
+        },
+        {
+            "for_each": {
+                "collection": "_prefix_rows",
+                "as": "_prefix_row",
+                "do": [
+                    {
+                        "condition": "abs(_trigger_distance - _prefix_row.distance) <= 0.000000001",
+                        "on_true": [
+                            {"set": {"field": "_trigger_prefix_cost", "value": "_prefix_row.cost"}},
+                            {"set": {"field": "_prefix_cost_supported", "value": True}},
+                        ],
+                        "on_false": [],
+                    },
+                    {
+                        "condition": (
+                            "_trigger_distance > _prefix_previous.distance + 0.000000001 "
+                            "and _trigger_distance < _prefix_row.distance - 0.000000001 "
+                            "and _prefix_previous.terrain == _prefix_row.terrain"
+                        ),
+                        "on_true": [
+                            {
+                                "set": {
+                                    "field": "_trigger_prefix_cost",
+                                    "value": (
+                                        "_prefix_previous.cost + "
+                                        "(_trigger_distance - _prefix_previous.distance) "
+                                        "* (_prefix_row.distance - _prefix_previous.distance) "
+                                        "** (-1) "
+                                        "* (_prefix_row.cost - _prefix_previous.cost)"
+                                    ),
+                                }
+                            },
+                            {"set": {"field": "_prefix_cost_supported", "value": True}},
+                        ],
+                        "on_false": [],
+                    },
+                    {"set": {"field": "_prefix_previous", "value": "_prefix_row"}},
+                ],
+            },
+            "condition": "_trigger_found == true",
+        },
+        *([{
+            "require": {
+                "condition": "_prefix_cost_supported == true",
+                "error": (
+                    "Movement pauses between centres across differing terrain costs; "
+                    "the partial-edge cost policy is unspecified. No movement or AP was spent."
+                ),
+            },
+            "condition": "_trigger_found == true",
+        }] if require_supported else []),
+    ]
+
+
+def _trigger_crossing_effects(*, automatic: bool = False) -> list[dict[str, Any]]:
     """Resolve movement against the saved preparation, including absent/inactive entries."""
-    overwatch_ready = "prepared_fire.overwatch.active == true and prepared_fire.overwatch.owner == _overwatcher_id and prepared_fire.overwatch.shots > 0 and _overwatch_found == true and overwatcher.active == true and overwatcher.weapon.chamber == 'LIVE' and overwatcher.weapon.location == 'READY' and overwatcher.weapon.controlled_by == null"
-    suppression_ready = "prepared_fire.suppression.active == true and prepared_fire.suppression.owner == _suppressor_id and prepared_fire.suppression.capacity > 0 and _suppression_found == true and suppressor.active == true and suppressor.weapon.location == 'READY' and suppressor.weapon.controlled_by == null"
+    overwatch_ready = "prepared_fire.overwatch.active == true and prepared_fire.overwatch.owner == _overwatcher_id and prepared_fire.overwatch.shots > 0 and _overwatch_found == true and overwatcher.active == true and overwatcher.downed == false and overwatcher.weapon.chamber == 'LIVE' and overwatcher.weapon.location == 'READY' and overwatcher.weapon.controlled_by == null and _watch_stationary == true"
+    suppression_ready = "prepared_fire.suppression.active == true and prepared_fire.suppression.owner == _suppressor_id and prepared_fire.suppression.capacity > 0 and _suppression_found == true and suppressor.active == true and suppressor.downed == false and suppressor.weapon.location == 'READY' and suppressor.weapon.controlled_by == null"
+    if automatic:
+        overwatch_ready += " and _overwatcher_id != _actor_id and overwatcher.side != actor.side"
+        suppression_ready += " and _suppressor_id != _actor_id"
+    order = "_automatic_first_effect" if automatic else "first_effect"
+    watch_critical = "_automatic_overwatch_critical" if automatic else "overwatch_critical_effect"
+    suppression_critical = (
+        "_automatic_suppression_critical" if automatic else "suppression_critical_effect"
+    )
     target_ready = "actor.active == true and actor.downed == false"
     overwatch_condition = f"{target_ready} and {overwatch_ready}"
     suppression_condition = f"{target_ready} and {suppression_ready}"
+    watch_branch_condition = (
+        f"{target_ready} and _ordinary_watch_ready == true" if automatic else overwatch_condition
+    )
     effects: list[dict[str, Any]] = [
+        # Both movement routes translate the authored pose; allegiance never selects it.
+        {"set": {"field": "_ordinary_origin_center", "value": "actor.center"}},
+        {"set": {"field": "_ordinary_origin_muzzle", "value": "actor.muzzle"}},
         {"set": {"field": "state.last_trigger", "value": {}}},
+        {"set": {"field": "_watch_stationary", "value": "prepared_fire.overwatch.stationary_origin == null or (prepared_fire.overwatch.stationary_origin[0] == overwatcher.position_cell[0] and prepared_fire.overwatch.stationary_origin[1] == overwatcher.position_cell[1])"}},
+        *overwatch_lanes.validity(),
+        {"set": {"field": "_card_trigger_range_status", "value": "null"}},
         {"spatial_query": {"scene": "state.spatial_scene", "operation": "snapshot"}, "store_as": "_trigger_move_snapshot"},
-        {"spatial_query": {"scene": "state.spatial_scene", "operation": "path", "snapshot": "{_trigger_move_snapshot}", "query": {"map_id": "{map_id}", "start": "{actor.position_cell}", "goal": "{destination}", "allow_diagonal": True, "corner_policy": "forbid_cutting", "include_entities": True, "moving_entity_id": "{_actor_id}", "max_steps": 256}}, "store_as": "_trigger_path"},
+        {
+            "spatial_query": {
+                "scene": "state.spatial_scene", "operation": "path",
+                "snapshot": "{_trigger_move_snapshot}",
+                "query": {
+                    "map_id": "{map_id}", "start": "{actor.position_cell}",
+                    "goal": "{destination}", "allow_diagonal": True,
+                    "corner_policy": "forbid_cutting", "include_entities": True,
+                    "moving_entity_id": "{_actor_id}", "max_steps": 256,
+                    "cost_profile": True,
+                },
+            },
+            "store_as": "_trigger_path",
+        },
         {"set": {"field": "_trigger_path_points", "value": []}},
         {"set": {"field": "_trigger_path_cells", "value": "_trigger_path.cells"}, "condition": "_trigger_path.found == true"},
         {"for_each": {"collection": "_trigger_path_cells", "as": "_trigger_path_cell", "do": [
-            {"set": {"field": "_trigger_path_point", "value": ["_trigger_path_cell[0] + 0.5", "_trigger_path_cell[1] + 0.5", 0.9]}},
+            {"set": {"field": "_trigger_path_point", "value": [
+                "_trigger_path_cell[0] + 0.5", "_trigger_path_cell[1] + 0.5", "actor.center[2]",
+            ]}},
             {"list_push": {"list": "_trigger_path_points", "value": "_trigger_path_point"}, "store_as": "_trigger_path_points"},
         ]}, "condition": "_trigger_path.found == true"},
         {"spatial_query": {"scene": "state.spatial_scene", "operation": "crossed_zones", "snapshot": "{_trigger_move_snapshot}", "query": {"map_id": "{map_id}", "path": "{_trigger_path_points}", "max_crossings": 32}}, "store_as": "_trigger_crossings", "condition": "_trigger_path.found == true and len(_trigger_path_points) > 1"},
@@ -1511,6 +2436,28 @@ def _trigger_crossing_effects() -> list[dict[str, Any]]:
             {"set": {"field": "_suppression_distance", "value": "_trigger_crossing.distance"}, "condition": "_suppression_found == false and _trigger_crossing.zone_id == prepared_fire.suppression.zone_id"},
             {"set": {"field": "_suppression_found", "value": "true"}, "condition": "_suppression_found == false and _trigger_crossing.zone_id == prepared_fire.suppression.zone_id"},
         ]}, "condition": "_trigger_path.found == true"},
+        {"set": {"field": "_suppression_entry_found", "value": "_suppression_found"}},
+        {"set": {"field": "_exposure_path_supported", "value": True}},
+        {"condition": f"_suppression_found == true and {suppression_ready}", "on_true": [
+            {"spatial_query": {
+                "scene": "state.spatial_scene", "operation": "exposure_path",
+                "snapshot": "{_trigger_move_snapshot}", "query": {
+                "map_id": "{map_id}", "observer": {"point": "{suppressor.muzzle}"},
+                "target": {"entity_id": "{_actor_id}"}, "samples": {"horizontal": 3, "vertical": 3},
+                "include": ["geometry", "entities"], "path": "{_trigger_path_points}",
+                "zone_id": "{prepared_fire.suppression.zone_id}", "max_tests": 4096,
+            }}, "store_as": "_suppression_path_exposure"},
+            {"set": {
+                "field": "_exposure_path_supported",
+                "value": "_suppression_path_exposure.supported",
+            }},
+            {"set": {"field": "_suppression_found", "value": "_suppression_path_exposure.found"}},
+            {"set": {"field": "_suppression_point", "value": "_suppression_path_exposure.point"},
+             "condition": "_suppression_found == true"},
+            {"set": {
+                "field": "_suppression_distance", "value": "_suppression_path_exposure.distance",
+            }, "condition": "_suppression_found == true"},
+        ], "on_false": []},
         {"set": {"field": "_trigger_found", "value": "false"}},
         {"set": {"field": "_trigger_distance", "value": 1000000}},
         {"set": {"field": "_trigger_point", "value": "_overwatch_point"}, "condition": overwatch_ready},
@@ -1519,29 +2466,111 @@ def _trigger_crossing_effects() -> list[dict[str, Any]]:
         {"set": {"field": "_trigger_point", "value": "_suppression_point"}, "condition": f"{suppression_ready} and _suppression_distance < _trigger_distance"},
         {"set": {"field": "_trigger_distance", "value": "_suppression_distance"}, "condition": f"{suppression_ready} and _suppression_distance < _trigger_distance"},
         {"set": {"field": "_trigger_found", "value": "true"}, "condition": suppression_ready},
+        # A wholly concealed live lane still permits the ordinary movement. Keep
+        # its entry only as a no-shot pause/resume point, never an exposure event.
+        {"condition": "false" if automatic else (
+            "_trigger_found == false and _suppression_entry_found == true "
+            "and prepared_fire.suppression.active == true "
+            "and prepared_fire.suppression.capacity > 0 and _exposure_path_supported == true"
+        ), "on_true": [
+            {"set": {"field": "_trigger_point", "value": "_suppression_point"}},
+            {"set": {"field": "_trigger_distance", "value": "_suppression_distance"}},
+            {"set": {"field": "_trigger_found", "value": True}},
+        ], "on_false": []},
+        {"set": {"field": "_watch_path_ready", "value": overwatch_ready}},
+        {"set": {"field": "_suppression_path_ready", "value": suppression_ready}},
+        {"set": {"field": "_exposure_path_supported", "value": False}, "condition": (
+            "_watch_path_ready == true and _suppression_path_ready == true "
+            "and abs(_overwatch_distance - _suppression_distance) > 0.000000001"
+        )},
         {"set": {"field": "_trigger_cell", "value": ["floor(_trigger_point[0])", "floor(_trigger_point[1])"]}, "condition": "_trigger_found == true"},
         {"set": {"field": "_trigger_position", "value": ["_trigger_point[0]", "_trigger_point[1]", 0]}, "condition": "_trigger_found == true"},
-        {"set": {"field": "_trigger_center", "value": ["_trigger_point[0]", "_trigger_point[1]", 0.9]}, "condition": "_trigger_found == true"},
+        {
+            "set": {
+                "field": "_trigger_center",
+                "value": [
+                    "_trigger_point[0]",
+                    "_trigger_point[1]",
+                    "actor.center[2]",
+                ],
+            },
+            "condition": "_trigger_found == true",
+        },
         # Sylvia 0eccde9's universal supercover walk does not terminate when a
         # ray destination lands exactly on an integer grid intersection. Keep
         # the entity at the exact crossing, but select an aim point one micron
         # inside the same occupied body volume until the host defect is fixed.
-        {"set": {"field": "_trigger_aim_center", "value": ["_trigger_point[0] + 0.000001", "_trigger_point[1] + 0.000001", 0.9]}, "condition": "_trigger_found == true"},
-        {"set": {"field": "_trigger_muzzle", "value": ["_trigger_point[0] + 0.41", "_trigger_point[1]", 1.4]}, "condition": "_trigger_found == true"},
-        {"set": {"field": "_trigger_muzzle", "value": ["_trigger_point[0] - 0.09", "_trigger_point[1]", 1.4]}, "condition": "_trigger_found == true and actor.side == 'hostiles'"},
-        {"set": {"field": "_trigger_partial_ap", "value": "max(1, (_trigger_distance + actor.movement_m_per_ap - 0.000001) // actor.movement_m_per_ap)"}, "condition": "_trigger_found == true"},
+        {
+            "set": {
+                "field": "_trigger_aim_center",
+                "value": [
+                    "_trigger_point[0] + 0.000001",
+                    "_trigger_point[1] + 0.000001",
+                    "actor.center[2]",
+                ],
+            },
+            "condition": "_trigger_found == true",
+        },
+        {
+            "set": {
+                "field": "_trigger_muzzle",
+                "value": [
+                    "_trigger_point[0] + (_ordinary_origin_muzzle[0] - _ordinary_origin_center[0])",
+                    "_trigger_point[1] + (_ordinary_origin_muzzle[1] - _ordinary_origin_center[1])",
+                    "_ordinary_origin_muzzle[2]",
+                ],
+            },
+            "condition": "_trigger_found == true",
+        },
+        *_weighted_prefix_effects(require_supported=automatic),
+        {
+            "set": {
+                "field": "_trigger_partial_ap",
+                "value": (
+                    "max(0, (_trigger_prefix_cost + actor.movement_m_per_ap "
+                    "- 0.000001) // actor.movement_m_per_ap)"
+                ) if automatic else (
+                    f"max({0 if automatic else 1}, (_trigger_distance + actor.movement_m_per_ap "
+                    "- 0.000001) // actor.movement_m_per_ap)"
+                ),
+            },
+            "condition": "_trigger_found == true",
+        },
+        *([{
+            "set": {
+                "field": "_trigger_partial_ap",
+                "value": (
+                    "max(0, (_trigger_prefix_cost + actor.movement_m_per_ap "
+                    "- 0.000001) // actor.movement_m_per_ap)"
+                ),
+            },
+            "condition": "_trigger_found == true and _prefix_cost_supported == true",
+        }] if not automatic else []),
         {"set": {"field": "_trigger_full_ap", "value": "(_trigger_path.cost + actor.movement_m_per_ap - 0.000001) // actor.movement_m_per_ap"}, "condition": "_trigger_path.found == true"},
         {"set": {"field": "_trigger_available_ap", "value": "actor.ap"}},
-        {"set": {"field": "_trigger_move_ready", "value": "_trigger_found == true and actor.ap >= _trigger_full_ap"}},
+        {"set": {"field": "_trigger_move_ready", "value": (
+            "_trigger_found == true and actor.ap >= _trigger_full_ap "
+            "and _exposure_path_supported == true"
+        )}},
+        *(_ordinary_trigger_order() if automatic else []),
         {"spatial_mutation": {"scene": "state.spatial_scene", "map_id": "{map_id}", "expected_revision": "{_trigger_move_snapshot.geometry_revision}", "target": {"kind": "entity", "id": "{_actor_id}"}, "patch": {"position": "{_trigger_position}"}}, "store_as": "_trigger_pause_mutation", "condition": "_trigger_move_ready == true"},
+        {"condition": "_trigger_move_ready == true and (_trigger_point[0] != actor.center[0] or _trigger_point[1] != actor.center[1])",
+         "on_true": sentinel.movement_effects(prepared="prepared_fire"), "on_false": []},
         {"set": {"field": "{_actor_id}.position_cell", "value": "_trigger_cell"}, "condition": "_trigger_move_ready == true"},
         {"set": {"field": "{_actor_id}.center", "value": "_trigger_center"}, "condition": "_trigger_move_ready == true"},
         {"set": {"field": "{_actor_id}.muzzle", "value": "_trigger_muzzle"}, "condition": "_trigger_move_ready == true"},
         {"decrement": {"field": "{_actor_id}.ap", "amount": "_trigger_partial_ap"}, "condition": "_trigger_move_ready == true"},
         {"set": {"field": "state.last_trigger.actor", "value": "_actor_id"}},
         {"set": {"field": "state.last_trigger.point", "value": "_trigger_point"}, "condition": "_trigger_found == true"},
-        {"set": {"field": "state.last_trigger.first_effect", "value": "first_effect"}, "condition": "_trigger_found == true"},
+        {
+            "set": {"field": "state.last_trigger.first_effect", "value": order},
+            "condition": "_trigger_found == true",
+        },
         {"set": {"field": "_card_trigger_status", "value": "'NO_ACTIVE_TRIGGER'"}},
+        {"set": {
+            "field": "_card_trigger_status",
+            "value": "'UNSUPPORTED_EXPOSURE_PATH_OR_SEPARATE_WINDOWS'",
+        }, "condition": "_exposure_path_supported == false"},
         {"set": {"field": "_card_trigger_status", "value": "'NO_PATH'"}, "condition": "_trigger_path.found == false"},
         {"set": {"field": "state.last_trigger.required_ap", "value": "_trigger_full_ap"}, "condition": "_trigger_found == true"},
         {"set": {"field": "state.last_trigger.available_ap", "value": "_trigger_available_ap"}, "condition": "_trigger_found == true"},
@@ -1549,46 +2578,240 @@ def _trigger_crossing_effects() -> list[dict[str, Any]]:
         {"set": {"field": "_card_trigger_status", "value": "'PAUSED'"}, "condition": "_trigger_move_ready == true"},
         {"set": {"field": "_trigger_paused", "value": "false"}},
         {"set": {"field": "_trigger_paused", "value": "true"}, "condition": "_trigger_move_ready == true"},
-        {"condition": "_trigger_paused == true", "on_true": network_entry.movement_effects(), "on_false": []},
+        {
+            "condition": "_trigger_paused == true and _trigger_distance > 0"
+            if automatic
+            else "_trigger_paused == true",
+            "on_true": network_entry.movement_effects()
+            + (weapon_handling.end_suppression() if automatic else []),
+            "on_false": [],
+        },
     ]
     effects.append({"set": {"field": "_trigger_overwatch_first_ready", "value": "false"}})
-    effects.append({"set": {"field": "_trigger_overwatch_first_ready", "value": "true"}, "condition": f"_trigger_paused == true and first_effect == 'OVERWATCH' and {overwatch_condition}"})
-    effects.extend(_trigger_attack_effects(prefix="_trigger_overwatch_first", shooter="overwatcher", shooter_id="_overwatcher_id", target="actor", target_id="_actor_id", target_point="_trigger_aim_center", record="state.last_trigger.overwatch", condition="_trigger_overwatch_first_ready == true", difficulty_modifier="0", critical_effect="overwatch_critical_effect", consume_round=True))
+    if automatic:
+        effects.append({"set": {"field": "_ordinary_watch_ready", "value": overwatch_ready}})
+    effects.append(
+        {
+            "set": {"field": "_trigger_overwatch_first_ready", "value": "true"},
+            "condition": (
+                f"_trigger_paused == true and {order} == 'OVERWATCH' and {watch_branch_condition}"
+            ),
+        }
+    )
+    effects.extend(
+        _trigger_attack_effects(
+            prefix="_trigger_overwatch_first",
+            shooter="overwatcher",
+            shooter_id="_overwatcher_id",
+            target="actor",
+            target_id="_actor_id",
+            target_point="_trigger_aim_center",
+            record="state.last_trigger.overwatch",
+            condition="_trigger_overwatch_first_ready == true",
+            difficulty_modifier="0",
+            critical_effect=watch_critical,
+            consume_round=True,
+            choose_critical=automatic,
+        )
+    )
     effects.extend([
         {"decrement": {"field": "state.prepared.overwatch.shots", "amount": 1}, "condition": "_trigger_overwatch_first_ready == true"},
         {"set": {"field": "state.prepared.overwatch.active", "value": "false"}, "condition": "_trigger_overwatch_first_ready == true and prepared_fire.overwatch.shots <= 1"},
     ])
     effects.append({"set": {"field": "_trigger_suppression_second_ready", "value": "false"}})
-    effects.append({"set": {"field": "_trigger_suppression_second_ready", "value": "true"}, "condition": f"_trigger_paused == true and first_effect == 'OVERWATCH' and {suppression_condition}"})
-    effects.extend(_trigger_attack_effects(prefix="_trigger_suppression_second", shooter="suppressor", shooter_id="_suppressor_id", target="actor", target_id="_actor_id", target_point="_trigger_aim_center", record="state.last_trigger.suppression", condition="_trigger_suppression_second_ready == true", difficulty_modifier="definitions.parameters.suppression.attack_difficulty_modifier", critical_effect="suppression_critical_effect", consume_round=False))
+    effects.append(
+        {
+            "set": {"field": "_trigger_suppression_second_ready", "value": "true"},
+            "condition": (
+                f"_trigger_paused == true and {order} == 'OVERWATCH' and {suppression_condition}"
+            ),
+        }
+    )
+    effects.extend(
+        _trigger_attack_effects(
+            prefix="_trigger_suppression_second",
+            shooter="suppressor",
+            shooter_id="_suppressor_id",
+            target="actor",
+            target_id="_actor_id",
+            target_point="_trigger_aim_center",
+            record="state.last_trigger.suppression",
+            condition="_trigger_suppression_second_ready == true",
+            difficulty_modifier="definitions.parameters.suppression.attack_difficulty_modifier",
+            critical_effect=suppression_critical,
+            consume_round=False,
+            apply_aim=False,
+            choose_critical=automatic,
+        )
+    )
     effects.extend([
         {"decrement": {"field": "state.prepared.suppression.capacity", "amount": 1}, "condition": "_trigger_suppression_second_ready == true"},
         {"set": {"field": "state.prepared.suppression.active", "value": "false"}, "condition": "_trigger_suppression_second_ready == true and prepared_fire.suppression.capacity <= 1"},
     ])
     effects.append({"set": {"field": "_trigger_suppression_first_ready", "value": "false"}})
-    effects.append({"set": {"field": "_trigger_suppression_first_ready", "value": "true"}, "condition": f"_trigger_paused == true and first_effect == 'SUPPRESSION' and {suppression_condition}"})
-    effects.extend(_trigger_attack_effects(prefix="_trigger_suppression_first", shooter="suppressor", shooter_id="_suppressor_id", target="actor", target_id="_actor_id", target_point="_trigger_aim_center", record="state.last_trigger.suppression", condition="_trigger_suppression_first_ready == true", difficulty_modifier="definitions.parameters.suppression.attack_difficulty_modifier", critical_effect="suppression_critical_effect", consume_round=False))
+    effects.append(
+        {
+            "set": {"field": "_trigger_suppression_first_ready", "value": "true"},
+            "condition": (
+                f"_trigger_paused == true and {order} == 'SUPPRESSION' and {suppression_condition}"
+            ),
+        }
+    )
+    effects.extend(
+        _trigger_attack_effects(
+            prefix="_trigger_suppression_first",
+            shooter="suppressor",
+            shooter_id="_suppressor_id",
+            target="actor",
+            target_id="_actor_id",
+            target_point="_trigger_aim_center",
+            record="state.last_trigger.suppression",
+            condition="_trigger_suppression_first_ready == true",
+            difficulty_modifier="definitions.parameters.suppression.attack_difficulty_modifier",
+            critical_effect=suppression_critical,
+            consume_round=False,
+            apply_aim=False,
+            choose_critical=automatic,
+        )
+    )
     effects.extend([
         {"decrement": {"field": "state.prepared.suppression.capacity", "amount": 1}, "condition": "_trigger_suppression_first_ready == true"},
         {"set": {"field": "state.prepared.suppression.active", "value": "false"}, "condition": "_trigger_suppression_first_ready == true and prepared_fire.suppression.capacity <= 1"},
     ])
     effects.append({"set": {"field": "_trigger_overwatch_second_ready", "value": "false"}})
-    effects.append({"set": {"field": "_trigger_overwatch_second_ready", "value": "true"}, "condition": f"_trigger_paused == true and first_effect == 'SUPPRESSION' and {overwatch_condition}"})
-    effects.extend(_trigger_attack_effects(prefix="_trigger_overwatch_second", shooter="overwatcher", shooter_id="_overwatcher_id", target="actor", target_id="_actor_id", target_point="_trigger_aim_center", record="state.last_trigger.overwatch", condition="_trigger_overwatch_second_ready == true", difficulty_modifier="0", critical_effect="overwatch_critical_effect", consume_round=True))
+    if automatic:
+        effects.append({"set": {"field": "_ordinary_watch_ready", "value": overwatch_ready}})
+    effects.append(
+        {
+            "set": {"field": "_trigger_overwatch_second_ready", "value": "true"},
+            "condition": (
+                f"_trigger_paused == true and {order} == 'SUPPRESSION' and {watch_branch_condition}"
+            ),
+        }
+    )
+    effects.extend(
+        _trigger_attack_effects(
+            prefix="_trigger_overwatch_second",
+            shooter="overwatcher",
+            shooter_id="_overwatcher_id",
+            target="actor",
+            target_id="_actor_id",
+            target_point="_trigger_aim_center",
+            record="state.last_trigger.overwatch",
+            condition="_trigger_overwatch_second_ready == true",
+            difficulty_modifier="0",
+            critical_effect=watch_critical,
+            consume_round=True,
+            choose_critical=automatic,
+        )
+    )
     effects.extend([
         {"decrement": {"field": "state.prepared.overwatch.shots", "amount": 1}, "condition": "_trigger_overwatch_second_ready == true"},
         {"set": {"field": "state.prepared.overwatch.active", "value": "false"}, "condition": "_trigger_overwatch_second_ready == true and prepared_fire.overwatch.shots <= 1"},
         {"spatial_query": {"scene": "state.spatial_scene", "operation": "snapshot"}, "store_as": "_trigger_resume_snapshot", "condition": "_trigger_paused == true and actor.downed == false"},
         {"set": {"field": "_trigger_destination_position", "value": ["destination[0] + 0.5", "destination[1] + 0.5", 0]}, "condition": "_trigger_paused == true and actor.downed == false"},
         {"spatial_mutation": {"scene": "state.spatial_scene", "map_id": "{map_id}", "expected_revision": "{_trigger_resume_snapshot.geometry_revision}", "target": {"kind": "entity", "id": "{_actor_id}"}, "patch": {"position": "{_trigger_destination_position}"}}, "store_as": "_trigger_resume_mutation", "condition": "_trigger_paused == true and actor.downed == false"},
+        {"condition": "_trigger_paused == true and actor.downed == false and (actor.center[0] != destination[0] + 0.5 or actor.center[1] != destination[1] + 0.5)",
+         "on_true": sentinel.movement_effects(prepared="prepared_fire"), "on_false": []},
         {"set": {"field": "{_actor_id}.position_cell", "value": "destination"}, "condition": "_trigger_paused == true and actor.downed == false"},
-        {"set": {"field": "{_actor_id}.center", "value": ["destination[0] + 0.5", "destination[1] + 0.5", 0.9]}, "condition": "_trigger_paused == true and actor.downed == false"},
-        {"set": {"field": "{_actor_id}.muzzle", "value": ["destination[0] - 0.09", "destination[1] + 0.5", 1.4]}, "condition": "_trigger_paused == true and actor.downed == false and actor.side == 'hostiles'"},
+        {
+            "set": {
+                "field": "{_actor_id}.center",
+                "value": [
+                    "destination[0] + 0.5",
+                    "destination[1] + 0.5",
+                    "actor.center[2]",
+                ],
+            },
+            "condition": "_trigger_paused == true and actor.downed == false",
+        },
+        {
+            "set": {
+                "field": "{_actor_id}.muzzle",
+                "value": [
+                    "destination[0] + 0.5 + (_ordinary_origin_muzzle[0] "
+                    "- _ordinary_origin_center[0])",
+                    "destination[1] + 0.5 + (_ordinary_origin_muzzle[1] "
+                    "- _ordinary_origin_center[1])",
+                    "_ordinary_origin_muzzle[2]",
+                ],
+            },
+            "condition": "_trigger_paused == true and actor.downed == false",
+        },
+        *([{
+            "condition": (
+                "_trigger_paused == true and actor.downed == false "
+                "and _trigger_distance <= 0 and _trigger_path.cost > 0"
+            ),
+            "on_true": network_entry.movement_effects() + weapon_handling.end_suppression(),
+            "on_false": [],
+        }] if automatic else []),
         {"decrement": {"field": "{_actor_id}.ap", "amount": "max(0, _trigger_full_ap - _trigger_partial_ap)"}, "condition": "_trigger_paused == true and actor.downed == false"},
         {"set": {"field": "_card_trigger_status", "value": "'RESUMED'"}, "condition": "_trigger_paused == true and actor.downed == false"},
         {"set": {"field": "_card_trigger_status", "value": "'INTERRUPTED'"}, "condition": "_trigger_paused == true and actor.downed == true"},
     ])
     effects.append({"set": {"field": "state.last_trigger.status", "value": "_card_trigger_status"}})
+    if automatic:
+        effects.extend([
+            {"set": {"field": "_ordinary_distance", "value": None}},
+            {"set": {"field": "_ordinary_geometry_revision", "value": None}},
+            {"set": {"field": "_ordinary_distance", "value": "_trigger_prefix_cost"},
+             "condition": "_trigger_paused == true"},
+            {"set": {"field": "_ordinary_geometry_revision",
+                     "value": "_trigger_pause_mutation.geometry_revision"},
+             "condition": "_trigger_paused == true"},
+            {"set": {"field": "_ordinary_distance", "value": "_trigger_path.cost"},
+             "condition": "_card_trigger_status == 'RESUMED'"},
+            {"set": {"field": "_ordinary_geometry_revision",
+                     "value": "_trigger_resume_mutation.geometry_revision"},
+             "condition": "_card_trigger_status == 'RESUMED'"},
+            {"set": {"field": "state.last_trigger.travelled_cost", "value": "_ordinary_distance"},
+             "condition": "_trigger_paused == true"},
+            {"set": {"field": "state.last_trigger.travelled_distance",
+                     "value": "_trigger_distance"},
+             "condition": "_trigger_paused == true"},
+            {"set": {"field": "state.last_trigger.travelled_distance",
+                     "value": "_prefix_previous.distance"},
+             "condition": "_card_trigger_status == 'RESUMED'"},
+        ])
+    else:
+        # Preserve the explicit tool's unresolved transition-fraction behavior,
+        # while exposing its legacy AP basis instead of claiming a priced prefix.
+        effects.extend([
+            {"set": {"field": "_card_trigger_cost_status", "value": None}},
+            {"set": {"field": "_card_trigger_travelled_cost", "value": None}},
+            {"set": {"field": "_card_trigger_spent_ap", "value": 0}},
+            {"set": {"field": "state.last_trigger.travelled_distance",
+                     "value": "_trigger_distance"},
+             "condition": "_trigger_paused == true"},
+            {"set": {"field": "_card_trigger_cost_status", "value": "'ROUTE_WEIGHTED'"},
+             "condition": "_trigger_paused == true and _prefix_cost_supported == true"},
+            {"set": {"field": "_card_trigger_cost_status",
+                     "value": "'UNRESOLVED_TERRAIN_TRANSITION_LEGACY_AP'"},
+             "condition": "_trigger_paused == true and _prefix_cost_supported == false"},
+            {"set": {"field": "_card_trigger_travelled_cost", "value": "_trigger_prefix_cost"},
+             "condition": "_trigger_paused == true and _prefix_cost_supported == true"},
+            {"set": {"field": "_card_trigger_spent_ap", "value": "_trigger_partial_ap"},
+             "condition": "_trigger_paused == true"},
+            {"set": {"field": "_card_trigger_travelled_cost", "value": "_trigger_path.cost"},
+             "condition": "_card_trigger_status == 'RESUMED'"},
+            {"set": {"field": "state.last_trigger.travelled_distance",
+                     "value": "_prefix_previous.distance"},
+             "condition": "_card_trigger_status == 'RESUMED'"},
+            {"set": {"field": "_card_trigger_spent_ap",
+                     "value": ("_trigger_partial_ap "
+                               "+ max(0, _trigger_full_ap - _trigger_partial_ap)")},
+             "condition": "_card_trigger_status == 'RESUMED'"},
+            {"set": {"field": "state.last_trigger.travelled_cost",
+                     "value": "_card_trigger_travelled_cost"},
+             "condition": "_trigger_paused == true"},
+            {"set": {"field": "state.last_trigger.movement_ap_spent",
+                     "value": "_card_trigger_spent_ap"},
+             "condition": "_trigger_paused == true"},
+            {"set": {"field": "state.last_trigger.movement_cost_status",
+                     "value": "_card_trigger_cost_status"},
+             "condition": "_trigger_paused == true"},
+        ])
     return effects
 
 
@@ -1630,12 +2853,14 @@ def _fire_single_effects() -> list[dict[str, Any]]:
                 {"set": {"field": "_range_modifier", "value": "attacker.weapon.range_modifiers[1]"}, "condition": "_range_distance <= attacker.weapon.range_breakpoints_m[1]"},
                 {"set": {"field": "_range_modifier", "value": "attacker.weapon.range_modifiers[0]"}, "condition": "_range_distance <= attacker.weapon.range_breakpoints_m[0]"},
                 {"dice": {"expression": "d20"}, "store_as": "_attack"},
+                *quick_solution.performed("attacked_targets"),
                 {"set": {"field": "_aim_offset", "value": "0"}},
                 {"set": {"field": "_aim_offset", "value": "min(attacker.aim.ap, definitions.parameters.fire.aim.max_ap_on_one_solution) * definitions.parameters.fire.aim.attack_difficulty_offset_per_ap"}, "condition": "attacker.aim.target == _target_id"},
+                *sniper.attack_offset("_exposure"),
                 {"set": {"field": "_cover_offset", "value": "0"}},
                 {"set": {"field": "_cover_offset", "value": "definitions.parameters.cover.actual_difficulty_offset.half"}, "condition": "_exposure.exposure < 1 and _exposure.exposure >= 0.5"},
                 {"set": {"field": "_cover_offset", "value": "definitions.parameters.cover.actual_difficulty_offset.quarter"}, "condition": "_exposure.exposure < 0.5 and _exposure.exposure > 0"},
-                {"set": {"field": "_open_solution_difficulty", "value": "max(1, definitions.parameters.check.difficulty.standard + _range_modifier + attacker.weapon.current_recoil + _aim_offset)"}},
+                {"set": {"field": "_open_solution_difficulty", "value": "max(1, definitions.parameters.check.difficulty.standard + _range_modifier + attacker.weapon.current_recoil + _aim_offset + _deep_aim_offset)"}},
                 {"set": {"field": "_actual_difficulty", "value": "_open_solution_difficulty + _cover_offset"}},
                 {"set": {"field": "_attack_total", "value": "_attack.total + attacker.skills.marksmanship + attacker.aptitudes.precision"}},
                 {"set": {"field": "_margin", "value": "_attack_total - _actual_difficulty"}},
@@ -1644,7 +2869,7 @@ def _fire_single_effects() -> list[dict[str, Any]]:
                 {"set": {"field": "_quality", "value": "'CLEAN_HIT'"}, "condition": "_quality != 'MISS' and _margin >= definitions.parameters.hit_quality.clean_margin"},
                 {"set": {"field": "_quality", "value": "'DECISIVE_HIT'"}, "condition": "_quality != 'MISS' and _margin >= definitions.parameters.hit_quality.decisive_margin"},
                 {"set": {"field": "_quality", "value": "'CRITICAL_HIT'"}, "condition": "_attack.total != 1 and _exposure.exposure > 0 and (_margin >= definitions.parameters.hit_quality.critical_margin or _attack.total == 20)"},
-                {"set": {"field": "_damage", "value": "attacker.weapon.damage"}},
+                {"set": {"field": "_damage", "value": "_profile_damage"}},
                 {"set": {"field": "_target_pen", "value": "attacker.weapon.target_pen"}},
                 {"set": {"field": "_material_pen", "value": "attacker.weapon.material_pen"}},
                 {"set": {"field": "_fx_single_contacts", "value": []}},
@@ -1684,16 +2909,18 @@ def _fire_single_effects() -> list[dict[str, Any]]:
                         {"set": {"field": "_cover_hp_before", "value": "_cover_intersection.metadata.cover_hp"}},
                         {"set": {"field": "_cover_damage", "value": "max(0, _damage - _cover_intersection.metadata.material_resistance)"}},
                         {"set": {"field": "_cover_hp_after", "value": "max(0, _cover_hp_before - _cover_damage)"}},
+                        {"set": {"field": "_cover_metadata", "value": {"cover_hp": "_cover_hp_after"}}},
+                        {"set": {"field": "_cover_metadata", "value": "merge(_cover_intersection.metadata, _cover_metadata)"}},
                         {
                             "condition": "_cover_damage > 0 and _cover_hp_after > 0",
                             "on_true": [
-                                {"spatial_mutation": {"scene": "state.spatial_scene", "map_id": "{map_id}", "expected_revision": "{_shot_snapshot.geometry_revision}", "target": {"kind": "geometry", "id": "{_cover_intersection_id}"}, "patch": {"metadata": {"player": "{_cover_intersection.metadata.player}", "material_resistance": "{_cover_intersection.metadata.material_resistance}", "cover_hp": "{_cover_hp_after}"}}}, "store_as": "_cover_mutation"}
+                                {"spatial_mutation": {"scene": "state.spatial_scene", "map_id": "{map_id}", "expected_revision": "{_shot_snapshot.geometry_revision}", "target": {"kind": "geometry", "id": "{_cover_intersection_id}"}, "patch": {"metadata": "{_cover_metadata}"}}, "store_as": "_cover_mutation"}
                             ],
                         },
                         {
                             "condition": "_cover_damage > 0 and _cover_hp_after == 0",
                             "on_true": [
-                                {"spatial_mutation": {"scene": "state.spatial_scene", "map_id": "{map_id}", "expected_revision": "{_shot_snapshot.geometry_revision}", "target": {"kind": "geometry", "id": "{_cover_intersection_id}"}, "patch": {"active": False, "movement": "passable", "visibility": "clear", "metadata": {"player": "{_cover_intersection.metadata.player}", "material_resistance": "{_cover_intersection.metadata.material_resistance}", "cover_hp": "{_cover_hp_after}"}}}, "store_as": "_cover_mutation"}
+                                {"spatial_mutation": {"scene": "state.spatial_scene", "map_id": "{map_id}", "expected_revision": "{_shot_snapshot.geometry_revision}", "target": {"kind": "geometry", "id": "{_cover_intersection_id}"}, "patch": {"active": False, "movement": "passable", "visibility": "clear", "metadata": "{_cover_metadata}"}}, "store_as": "_cover_mutation"}
                             ],
                         },
                         {"set": {"field": "state.last_attack.cover_id", "value": "_cover_intersection_id"}},
@@ -1723,7 +2950,10 @@ def _fire_single_effects() -> list[dict[str, Any]]:
                         {"set": {"field": "{_attacker_id}.weapon.needs_cycle", "value": "true"}}
                     ],
                 },
-                {"increment": {"field": "{_attacker_id}.weapon.current_recoil", "amount": "max(1, attacker.weapon.recoil)"}},
+                *rifleman_entries.recoil_gain(
+                    "attacker", "_attacker_id", "max(1, attacker.weapon.recoil)", prefix="_single",
+                ),
+                *sniper.consume(),
                 {"set": {"field": "{_attacker_id}.aim.ap", "value": 0}},
                 {"set": {"field": "state.focused_actor", "value": "_attacker_id"}},
                 {"set": {"field": "state.last_attack.mode", "value": "'SEMI_AUTO'"}},
@@ -1947,7 +3177,7 @@ def _fire_multi_effects(mode: str) -> list[dict[str, Any]]:
                 {
                     "set": {
                         "field": "_projectile_damage",
-                        "value": "attacker.weapon.damage",
+                        "value": "_profile_damage",
                     },
                     "condition": "_projectile_slot <= _connection_opportunities",
                 },
@@ -2157,6 +3387,7 @@ def _fire_multi_effects(mode: str) -> list[dict[str, Any]]:
                 },
                 {"dice": {"expression": "d20"}, "store_as": "_attack"},
                 {"set": {"field": "_aim_offset", "value": 0}},
+                *quick_solution.performed("attacked_targets"),
                 {
                     "set": {
                         "field": "_aim_offset",
@@ -2167,6 +3398,7 @@ def _fire_multi_effects(mode: str) -> list[dict[str, Any]]:
                 {
                     "set": {"field": "_string_modifier", "value": string_modifier}
                 },
+                *sniper.attack_offset("_string_exposure"),
                 {"set": {"field": "_cover_offset", "value": 0}},
                 {
                     "set": {
@@ -2185,7 +3417,7 @@ def _fire_multi_effects(mode: str) -> list[dict[str, Any]]:
                 {
                     "set": {
                         "field": "_open_solution_difficulty",
-                        "value": "max(1, definitions.parameters.check.difficulty.standard + _range_modifier + attacker.weapon.current_recoil + _string_modifier + _aim_offset)",
+                        "value": "max(1, definitions.parameters.check.difficulty.standard + _range_modifier + attacker.weapon.current_recoil + _string_modifier + _aim_offset + _deep_aim_offset)",
                     }
                 },
                 {
@@ -2349,13 +3581,11 @@ def _fire_multi_effects(mode: str) -> list[dict[str, Any]]:
                     },
                     "condition": f"_pre_fire_magazine < {rounds}",
                 },
-                {
-                    "increment": {
-                        "field": "{_attacker_id}.weapon.current_recoil",
-                        "amount": recoil_gain,
-                    }
-                },
+                *rifleman_entries.recoil_gain(
+                    "attacker", "_attacker_id", recoil_gain, prefix="_string",
+                ),
                 {"decrement": {"field": "{_attacker_id}.ap", "amount": "_fire_ap"}},
+                *sniper.consume(),
                 {"set": {"field": "{_attacker_id}.aim.ap", "value": 0}},
                 {"set": {"field": "state.focused_actor", "value": "_attacker_id"}},
                 {"set": {"field": "state.last_attack.mode", "value": repr(mode)}},
@@ -2399,6 +3629,11 @@ def _fire_multi_effects(mode: str) -> list[dict[str, Any]]:
 def _cqc_resolve_check_effects() -> list[dict[str, Any]]:
     return [
         {"dice": {"expression": "d20"}, "store_as": "_cqc"},
+        {
+            "condition": "maneuver != 'ESCAPE'",
+            "on_true": quick_solution.performed("attacked_targets", "actor", "_actor_id"),
+            "on_false": [],
+        },
         {"set": {"field": "_cqc_total", "value": "_cqc.total + actor.skills.cqc + _cqc_aptitude"}},
         {"set": {"field": "_cqc_defense", "value": "definitions.parameters.cqc.defense_base + floor(target.skills.cqc * definitions.parameters.cqc.defense_skill_coefficient) + floor(_defense_aptitude * definitions.parameters.cqc.defense_aptitude_coefficient)"}},
         {"decrement": {"field": "{_actor_id}.ap", "amount": "_cqc_ap"}},
@@ -2430,10 +3665,11 @@ def _cqc_resolve_check_effects() -> list[dict[str, Any]]:
 
 def _cycle_weapon_effects() -> list[dict[str, Any]]:
     return [
+        *rifleman_entries.manipulation_price("actor.weapon.cycle_ap"),
         {
             "condition": _action_guard("cycle_weapon"),
             "on_true": [
-                {"decrement": {"field": "{_actor_id}.ap", "amount": "actor.weapon.cycle_ap"}},
+                {"decrement": {"field": "{_actor_id}.ap", "amount": "_manipulation_ap"}},
                 {
                     "condition": "actor.weapon.magazine.rounds > 0",
                     "on_true": [
@@ -2447,6 +3683,7 @@ def _cycle_weapon_effects() -> list[dict[str, Any]]:
                 {"set": {"field": "{_actor_id}.weapon.needs_cycle", "value": "false"}},
                 {"set": {"field": "state.last_reload.actor", "value": "_actor_id"}},
                 {"set": {"field": "state.last_reload.operation", "value": "'CYCLE'"}},
+                {"set": {"field": "state.last_reload.ap_spent", "value": "_manipulation_ap"}},
                 {"set": {"field": "state.last_reload.status", "value": "'COMMITTED'"}},
             ],
             "on_false": [
@@ -2460,8 +3697,9 @@ def _cycle_weapon_effects() -> list[dict[str, Any]]:
 
 def _reload_weapon_effects() -> list[dict[str, Any]]:
     return [
+        *rifleman_entries.manipulation_price("actor.weapon.reload_ap"),
         {
-            "condition": "actor.weapon != null and actor.ap >= actor.weapon.reload_ap and actor.weapon.feed == 'DETACHABLE_MAGAZINE' and actor.weapon.spare_magazines and actor.weapon.location == 'READY' and actor.weapon.controlled_by == null",
+            "condition": _action_guard("reload_weapon"),
             "on_true": [
                 *weapon_handling.end_suppression(),
                 {"set": {"field": "_spare_magazines", "value": "actor.weapon.spare_magazines"}},
@@ -2486,10 +3724,11 @@ def _reload_weapon_effects() -> list[dict[str, Any]]:
                     ],
                 },
                 {"set": {"field": "{_actor_id}.weapon.needs_cycle", "value": "true"}, "condition": "actor.weapon.chamber != 'LIVE' and actor.weapon.mechanism == 'MANUAL_ACTION'"},
-                {"decrement": {"field": "{_actor_id}.ap", "amount": "actor.weapon.reload_ap"}},
+                {"decrement": {"field": "{_actor_id}.ap", "amount": "_manipulation_ap"}},
                 {"set": {"field": "{_actor_id}.aim.ap", "value": 0}},
                 {"set": {"field": "state.last_reload.actor", "value": "_actor_id"}},
                 {"set": {"field": "state.last_reload.operation", "value": "'MAGAZINE_CHANGE'"}},
+                {"set": {"field": "state.last_reload.ap_spent", "value": "_manipulation_ap"}},
                 {"set": {"field": "state.last_reload.disposition", "value": "disposition"}},
                 {"set": {"field": "state.last_reload.status", "value": "'COMMITTED'"}},
             ],
@@ -2566,6 +3805,7 @@ def _cqc_displacement_effects() -> list[dict[str, Any]]:
                         {"spatial_mutation": {"scene": "state.spatial_scene", "map_id": "{map_id}", "expected_revision": "{_cqc_displacement_snapshot.geometry_revision}", "target": {"kind": "entity", "id": "{_target_id}"}, "patch": {"position": "{_displacement_position}"}}, "store_as": "_cqc_scene"},
                         {"set": {"field": "{_target_id}.position_cell", "value": "destination"}},
                         *network_entry.movement_effects("_target_id"),
+                        *sentinel.movement_effects("_target_id"),
                         {"set": {"field": "{_target_id}.center", "value": "_displacement_center"}},
                         {"set": {"field": "{_target_id}.muzzle", "value": "_displacement_muzzle"}},
                         {"set": {"field": "state.last_cqc.geometry_revision", "value": "_cqc_scene.geometry_revision"}},
@@ -2592,6 +3832,7 @@ def _fpv_fragmentation_effects() -> list[dict[str, Any]]:
             "condition": _action_guard("fpv_fragmentation_strike"),
             "on_true": [
                 {"dice": {"expression": "d20"}, "store_as": "_fpv_placement"},
+                *quick_solution.performed("attacked_targets", "actor", "_actor_id"),
                 {"set": {"field": "_fpv_total", "value": "_fpv_placement.total + actor.skills.drone_operations + actor.aptitudes.precision"}},
                 {"set": {"field": "_fpv_difficulty", "value": "definitions.parameters.check.difficulty.standard"}},
                 {"set": {"field": "_fpv_success", "value": "false"}},
@@ -2685,6 +3926,7 @@ def _fpv_fragmentation_effects() -> list[dict[str, Any]]:
 
 def _autodrone_fire_effects() -> list[dict[str, Any]]:
     return [
+        *drone_orders.condition_calculations(),
         {
             "condition": _action_guard("autodrone_fire"),
             "on_true": [
@@ -2814,6 +4056,7 @@ def _turn_actor_helper() -> dict[str, Any]:
             {"set": {"field": "{_actor_id}.ap", "value": 0}},
             {"set": {"field": "{_actor_id}.ap", "value": "actor.max_ap"},
              "condition": "_turn_actor_eligible == true"},
+            *quick_solution.reset(),
         ],
         "metadata": {"costs_action": False},
     }
@@ -2987,6 +4230,18 @@ def _card_effects(name: str, effects: list[dict[str, Any]]) -> list[dict[str, An
     Fresh context values prevent a rejected action from inheriting earlier state telemetry. Copy
     only the selected display assignments, preserving their guards and all existing game effects.
     """
+    if name == "enter_deep_aim":
+        return [
+            {"set": {"field": "_deep_stage_status", "value": "'INACTIVE_SIDE'"}},
+            {"set": {"field": "_deep_stage_spent", "value": 0}},
+        ] + effects
+    if name == "reorient_field_node":
+        return [
+            {"set": {"field": "_field_work_status", "value": "'INACTIVE_SIDE'"}},
+            {"set": {"field": "_field_work_spent", "value": 0}},
+        ] + effects
+    if name in {"prepare_sentinel_overwatch", "prepare_sentinel_sightline"}:
+        return [{"set": {"field": "_sentinel_status", "value": "'PREPARATION_REJECTED'"}}] + effects
     if name == "move_actor":
         fields = {"status": ("move_status", "INACTIVE_SIDE"),
                   "origin": ("move_origin", None),
@@ -2998,6 +4253,20 @@ def _card_effects(name: str, effects: list[dict[str, Any]]) -> list[dict[str, An
                   "actual_difficulty": ("attack_difficulty", None),
                   "rounds_fired": ("attack_rounds", 0)}
         state_root = "state.last_attack"
+    elif name == "discover_network_quietly":
+        fields = {"status": ("quiet_status", "INACTIVE_SIDE")}
+        state_root = "state.last_network"
+    elif name == "advance_character":
+        fields = {"status": ("advancement_status", "ADVANCEMENT_REJECTED"),
+                  "level": ("advancement_level", None)}
+        state_root = "state.last_advancement"
+    elif name == "load_one_shell":
+        fields = {"status": ("shell_status", "INACTIVE_SIDE"), "ap_spent": ("shell_ap", 0)}
+        state_root = "state.last_reload"
+    elif name == "assign_drone_order":
+        fields = {"status": ("drone_order_status", "INACTIVE_SIDE"),
+                  "ap_spent": ("drone_order_ap", 0)}
+        state_root = "state.last_drone_order"
     elif name == "treat_casualty":
         fields = {"status": ("medical_status", "INACTIVE_SIDE"),
                   "roll": ("medical_roll", None), "total": ("medical_total", None),
@@ -3018,6 +4287,14 @@ def _card_effects(name: str, effects: list[dict[str, Any]]) -> list[dict[str, An
             item = capture(original)
             result.append(item)
             assignment = item.get("set") if isinstance(item, dict) else None
+            if (name == "discover_network_quietly" and isinstance(assignment, dict)
+                    and assignment.get("field") == state_root
+                    and isinstance(assignment.get("value"), dict)):
+                for field, value in assignment["value"].items():
+                    if f"{state_root}.{field}" in names:
+                        result.append({"set": {
+                            "field": names[f"{state_root}.{field}"], "value": deepcopy(value),
+                        }})
             if isinstance(assignment, dict) and assignment.get("field") in names:
                 result.append({**deepcopy(item), "set": {
                     **deepcopy(assignment), "field": names[assignment["field"]],
@@ -3032,7 +4309,9 @@ def _card_effects(name: str, effects: list[dict[str, Any]]) -> list[dict[str, An
 
 def _player_control_checks(name: str) -> list[dict[str, str]]:
     """Expose existing effect prerequisites that can be evaluated before an action runs."""
-    actor_name = "attacker" if name in {"aim", "fire_single", "fire_burst", "fire_full_auto"} else "actor"
+    actor_name = "attacker" if name in {
+        "aim", "enter_deep_aim", "fire_single", "fire_burst", "fire_full_auto",
+    } else "actor"
     checks = [{
         "condition": f"{actor_name}.side == active_side",
         "reason": "This actor cannot act during the other side's turn.",
@@ -3041,6 +4320,18 @@ def _player_control_checks(name: str) -> list[dict[str, str]]:
         {"condition": condition, "reason": reason}
         for condition, reason in _action_guard_parts(name)
     )
+    if name in {"fire_single", "fire_burst", "fire_full_auto"}:
+        checks.append({
+            "condition": "_preview_exposure.exposure > 0",
+            "reason": "No valid direct path to this target. Ordinary direct fire is unavailable; "
+                      "through-material fire requires a separate GM firing solution.",
+        })
+    if name == "prepare_overwatch":
+        checks.extend([
+            {"condition": "actor.active == true", "reason": "This actor is not active."},
+            {"condition": "actor.downed == false",
+             "reason": "A downed actor cannot prepare overwatch."},
+        ])
     if name == "move_actor":
         checks.extend([
             {
@@ -3058,6 +4349,10 @@ def _player_control_checks(name: str) -> list[dict[str, str]]:
         checks.extend(network_intrusion.checks(pivot=name == "pivot_network"))
     if name == "operate_remote_function":
         checks.extend(network_functions.operation_checks())
+    if name == "reorient_field_node":
+        checks.extend(field_engineering.checks())
+    if name == "enter_deep_aim":
+        checks.extend(sniper.checks())
     return checks
 
 
@@ -3067,6 +4362,12 @@ def _tool_metadata(name: str, costs_action: bool) -> dict[str, Any]:
         "costs_action": costs_action,
         "source_provenance": _tool_sources(name),
     }
+    if name in {"aim", "fire_single", "fire_burst", "fire_full_auto"}:
+        metadata["source_provenance"].append("Specialties/SNAPSHOT.md")
+    if (name in {"aim", "prepare_overwatch", "prepare_sentinel_overwatch",
+                 "prepare_sentinel_sightline", "enter_deep_aim"}
+            and "Specialties/SENTINEL.md" not in metadata["source_provenance"]):
+        metadata["source_provenance"].append("Specialties/SENTINEL.md")
     actor_parameters = {
         "move_actor": "actor", "change_stance": "actor", "aim": "attacker", "fire_single": "attacker",
         "fire_burst": "attacker", "fire_full_auto": "attacker",
@@ -3075,6 +4376,9 @@ def _tool_metadata(name: str, costs_action: bool) -> dict[str, Any]:
         "intrude_network": "actor", "pivot_network": "actor", "operate_remote_function": "actor",
         "network_connection": "actor",
         "cycle_weapon": "actor",
+        "load_one_shell": "actor",
+        "reorient_field_node": "actor",
+        "enter_deep_aim": "attacker",
     }
     if name in actor_parameters:
         confirmation = "required" if name in {
@@ -3087,6 +4391,47 @@ def _tool_metadata(name: str, costs_action: bool) -> dict[str, Any]:
             "actor_parameter": actor_parameters[name],
             "checks": _player_control_checks(name),
         }
+        if name == "aim":
+            controls["calculations"] = quick_solution.price_calculations()
+            controls["preview"] = {
+                "version": 1, "title": "Aim preparation",
+                "summary": [
+                    {"label": "AIM investment", "value": {"path": "parameters.ap"}},
+                ],
+            }
+        if name == "prepare_overwatch":
+            controls["calculations"] = sentinel.counter_prep_calculations(pure=True) + [
+                {"set": {"field": "_preview_counter_prep", "value": "counter_prep == true"}},
+            ]
+            controls["preview"] = {
+                "version": 1, "title": "Overwatch preparation",
+                "summary": [{"label": "COUNTER-PREP enabled",
+                             "value": {"path": "context._preview_counter_prep"}}],
+            }
+        if name == "autodrone_fire":
+            controls["calculations"] = drone_orders.condition_calculations()
+        if name == "enter_deep_aim":
+            controls["queries"] = [_firing_exposure_query(store_as="_deep_exposure")]
+            controls["calculations"] = sniper.binding_calculations()
+            controls["preview"] = {
+                "version": 1, "title": "Enter Deep Aim",
+                "summary": [
+                    {"label": "Stage", "value": "Additional preparation after ordinary AIM"},
+                    {"label": "Shot benefit", "value": "-2 difficulty on the prepared attack"},
+                    {"label": "Firing", "value": "Separate action, AP and ammunition cost"},
+                ],
+            }
+        if name == "reorient_field_node":
+            controls["calculations"] = field_engineering.price()
+            controls["preview"] = {
+                "version": 1, "title": "Physical reorientation",
+                "summary": [
+                    {"label": "From", "value": {"path": "parameters.expected_orientation"}},
+                    {"label": "To", "value": {"path": "parameters.orientation"}},
+                    {"label": "Scope",
+                     "value": "Orientation only; existing capabilities unchanged"},
+                ],
+            }
         if name in {"intrude_network", "pivot_network"}:
             controls["calculations"] = network_intrusion.calculations(pivot=name == "pivot_network")
         if name == "operate_remote_function":
@@ -3138,6 +4483,20 @@ def _tool_metadata(name: str, costs_action: bool) -> dict[str, Any]:
                 _firing_exposure_query(store_as="_preview_exposure"),
                 _firing_ray_query(store_as="_preview_ray"),
             ]
+            controls["calculations"].extend(sniper.binding_calculations())
+            controls["calculations"].append({"set": {
+                "field": "_preview_deep_offset", "value": (
+                    "-2 * occurrences(one(_sniper_bound == true and "
+                    f"attacker.{sniper.STATE}.deep == true and _preview_exposure.exposure > 0), true)"
+                ),
+            }})
+            controls["calculations"].append({
+                "set": {"field": "_preview_range_note", "value": repr(
+                    "Damage follows the weapon's range bands. An unresolved band rejects firing "
+                    "without spending AP or ammunition."
+                )},
+                "condition": "attacker.weapon.range_damage != null",
+            })
             controls["map_preview"] = {
                 "ray": "_preview_ray",
                 "exposure": "_preview_exposure",
@@ -3162,6 +4521,14 @@ def _tool_metadata(name: str, costs_action: bool) -> dict[str, Any]:
                 ],
             })
         metadata["player_controls"] = controls
+        if name in {"fire_single", "fire_burst", "fire_full_auto"}:
+            controls["preview"]["summary"].append({
+                "label": "Deep Aim difficulty", "value": {"path": "context._preview_deep_offset"},
+            })
+            controls["preview"]["summary"].append({
+                "label": "Range damage", "value": {"path": "context._preview_range_note"},
+                "optional": True,
+            })
     elif name == "end_allies_turn":
         metadata["player_controls"] = {
             "confirmation": "required",
@@ -3174,15 +4541,17 @@ def _tool_metadata(name: str, costs_action: bool) -> dict[str, Any]:
             "summary": [
                 {"label": "Actor", "value": {"path": "context.actor.name"}},
                 {"label": "Status", "value": {"path": "context._card_move_status", "labels": {
-                    "MOVED": "Moved", "NO_AP_OR_INACTIVE": "No AP available or actor inactive",
+                    "MOVED": "Moved", "NO_AP_OR_INACTIVE": "Actor cannot move or has no AP",
+                    "INTERRUPTED_BY_PREPARED_FIRE": "Movement stopped by prepared fire",
                     "ILLEGAL_OR_UNREACHABLE": "Route unavailable", "INACTIVE_SIDE": "Other team's turn",
                 }}, "emphasis": True},
                 {"label": "AP spent", "value": {"path": "context._card_move_ap"}, "optional": True},
             ],
             "details": [
                 {"label": "Origin", "value": {"path": "context._card_move_origin"}, "optional": True},
-                {"label": "Destination", "value": {"path": "parameters.destination"}},
-                {"label": "Distance", "value": {"path": "context._card_move_distance"}, "optional": True},
+                {"label": "Requested destination", "value": {"path": "parameters.destination"}},
+                {"label": "Movement cost", "value": {"path": "context._card_move_distance"},
+                 "optional": True},
             ],
         }
     elif name == "change_stance":
@@ -3213,8 +4582,152 @@ def _tool_metadata(name: str, costs_action: bool) -> dict[str, Any]:
                 {"label": "Moving actor", "value": {"path": "context.actor.name"}},
                 {"label": "Movement AP required", "value": {"path": "context._trigger_full_ap"}, "optional": True},
                 {"label": "AP before movement", "value": {"path": "context._trigger_available_ap"}},
+                {"label": "Movement AP spent", "value": {"path": "context._card_trigger_spent_ap"}},
+                {"label": "Travelled route cost",
+                 "value": {"path": "context._card_trigger_travelled_cost"},
+                 "optional": True},
+                {"label": "Cost qualification",
+                 "value": {"path": "context._card_trigger_cost_status", "labels": {
+                    "ROUTE_WEIGHTED": "Actual retained-route cost",
+                    "UNRESOLVED_TERRAIN_TRANSITION_LEGACY_AP": (
+                        "Terrain-transition fraction unresolved; legacy AP charging retained"
+                    ),
+                }}, "optional": True},
+                {"label": "Range damage", "value": {"path": "context._card_trigger_range_status"},
+                 "optional": True},
             ],
         }
+    elif name == "load_one_shell":
+        metadata["result_card"] = {
+            "version": 1, "title": "Load one shell",
+            "summary": [
+                {"label": "Outcome", "value": {"path": "context._card_shell_status", "labels": {
+                    "COMMITTED": "One shell loaded into tube",
+                    "MISSING_PREREQUISITE": "Loading prerequisites not met",
+                    "INACTIVE_SIDE": "Other team's turn",
+                }}, "emphasis": True},
+                {"label": "AP spent", "value": {"path": "context._card_shell_ap"}},
+            ],
+        }
+    elif name == "discover_network_quietly":
+        metadata["result_card"] = {
+            "version": 1, "title": "Quiet discovery",
+            "summary": [{"label": "Outcome", "value": {
+                "path": "context._card_quiet_status", "labels": {
+                    "COMMITTED": "Discovery completed",
+                    "FAILED_CHECK": "Discovery check unsuccessful",
+                    "MISSING_ROUTE_OR_AP": "Discovery prerequisites not met",
+                    "INACTIVE_SIDE": "Other team's turn",
+                }}, "emphasis": True}],
+            "details": [{"label": "Visibility", "optional": True,
+                         "value": {"path": "context._quiet_visibility_after"}}],
+        }
+    elif name == "prepare_sentinel_sightline":
+        metadata["result_card"] = {
+            "version": 1, "title": "Prepared sightline",
+            "summary": [{"label": "Outcome", "value": {
+                "path": "context._sentinel_status", "labels": {
+                    "PREPARED": "Stationary watch and aim prepared",
+                    "PREPARATION_REJECTED": "Preparation prerequisites not met",
+                    "INTERRUPTED_BY_SUPPRESSION": "Incoming suppression stopped sightline setup",
+                    "INTERRUPTED_BY_COUNTER_PREP": "Counter-prep stopped sightline setup",
+                }}, "emphasis": True}],
+            "details": [{"label": "Adjudicated combined AP",
+                         "value": {"path": "parameters.ap_cost"}},
+                        {"label": "Setup AP spent",
+                         "value": {"path": "context._sentinel_setup_ap_spent"}}],
+        }
+    elif name == "prepare_overwatch":
+        metadata["result_card"] = {
+            "version": 1, "title": "Prepare overwatch",
+            "summary": [{"label": "Outcome", "emphasis": True, "value": {
+                "path": "context._card_watch_status", "labels": {
+                    "PREPARED": "Overwatch prepared",
+                    "PREPARATION_REJECTED": "Overwatch prerequisites not met",
+                    "INTERRUPTED_BY_SUPPRESSION": "Incoming suppression stopped watch setup",
+                    "INTERRUPTED_BY_COUNTER_PREP": "Counter-prep stopped watch setup",
+                },
+            }}],
+            "details": [
+                {"label": "Actor", "value": {"path": "context.actor.name"}},
+                {"label": "Setup AP spent", "value": {"path": "context._card_watch_ap"}},
+                {"label": "AP remaining", "value": {"path": "context.actor.ap"}},
+            ],
+        }
+    elif name == "prepare_sentinel_overwatch":
+        metadata["result_card"] = {
+            "version": 1, "title": "Retained overwatch",
+            "summary": [{"label": "Outcome", "value": {
+                "path": "context._sentinel_status", "labels": {
+                    "PREPARED": "Prepared for repeated valid triggers",
+                    "PREPARATION_REJECTED": "Preparation prerequisites not met",
+                    "INTERRUPTED_BY_SUPPRESSION": (
+                        "Incoming suppression stopped retained watch setup"
+                    ),
+                    "INTERRUPTED_BY_COUNTER_PREP": "Counter-prep stopped retained watch setup",
+                }}, "emphasis": True}],
+            "details": [{"label": "Requested shot allowance",
+                         "value": {"path": "parameters.shot_allowance"}},
+                        {"label": "Setup AP spent",
+                         "value": {"path": "context._sentinel_setup_ap_spent"}}],
+        }
+    elif name == "advance_character":
+        metadata["result_card"] = {
+            "version": 1, "title": "Character advancement",
+            "summary": [
+                {"label": "Outcome", "value": {"path": "context._card_advancement_status", "labels": {
+                    "ADVANCED": "Level and specialty recorded",
+                    "ALREADY_RECORDED": "Milestone already applied",
+                    "ADVANCEMENT_REJECTED": "Advancement prerequisites not met",
+                }}, "emphasis": True},
+                {"label": "New level", "value": {"path": "context._card_advancement_level"}, "optional": True},
+            ],
+            "details": [{"label": "Specialty", "value": {"path": "parameters.specialty_id"}}],
+        }
+    elif name == "enter_deep_aim":
+        metadata["result_card"] = {
+            "version": 1, "title": "Deep Aim",
+            "summary": [
+                {"label": "Stage", "value": {"path": "context._deep_stage_status", "labels": {
+                    "PREPARED": "Deep Aim prepared", "INTERRUPTED": "Preparation interrupted",
+                    "INACTIVE_SIDE": "Other team's turn; no preparation",
+                }}, "emphasis": True},
+                {"label": "AP spent", "value": {"path": "context._deep_stage_spent"}},
+            ],
+            "details": [{"label": "Shot", "value": "Separate AP and ammunition; no shot fired"}],
+        }
+    elif name == "reorient_field_node":
+        metadata["result_card"] = {
+            "version": 1, "title": "Field reorientation",
+            "summary": [
+                {"label": "Outcome", "value": {"path": "context._field_work_status", "labels": {
+                    "REORIENTED": "Physical orientation changed",
+                    "INACTIVE_SIDE": "Other team's turn; no change",
+                }}, "emphasis": True},
+                {"label": "AP spent", "value": {"path": "context._field_work_spent"}},
+            ],
+            "details": [
+                {"label": "Device", "value": {"path": "context.device.name"}},
+                {"label": "Scope", "value": "Declared orientation only; capabilities unchanged"},
+            ],
+        }
+    elif name == "assign_drone_order":
+        metadata["result_card"] = {
+            "version": 1, "title": "Drone standing order",
+            "summary": [
+                {"label": "Outcome", "value": {"path": "context._card_drone_order_status", "labels": {
+                    "ASSIGNED": "Order assigned", "ALREADY_ASSIGNED": "Order already assigned",
+                    "ORDER_ID_CONFLICT": "Order identity already used", "ORDER_REJECTED": "Order prerequisites not met",
+                    "INACTIVE_SIDE": "Other team's turn",
+                }}, "emphasis": True},
+                {"label": "Operator AP spent", "value": {"path": "context._card_drone_order_ap"}},
+            ],
+            "details": [{"label": "Drone", "value": {"path": "context.drone.name"}}],
+        }
+        metadata["result_card"]["summary"][0]["value"]["labels"].update({
+            "ORDER_HISTORY_UNAVAILABLE": "Earlier order identity reserved; receipt unavailable",
+            "ORDER_RECEIPT_LIMIT": "Order receipt limit reached; no new order assigned",
+        })
     elif name == "treat_casualty":
         metadata["result_card"] = {
             "version": 1, "title": "Treatment",
@@ -3248,6 +4761,7 @@ def _tool_metadata(name: str, costs_action: bool) -> dict[str, Any]:
                     )},
                     "COVER_INTERCEPT": "Cover intercepted", "PROJECTILE_STOP": "Projectile stopped",
                     "FIRE_REJECTED": "Unable to fire", "INACTIVE_SIDE": "Other team's turn",
+                    "UNRESOLVED_RANGE_DAMAGE": "Damage at this range is unresolved",
                 }}, "emphasis": True},
                 {"label": "Total", "value": {"path": "context._card_attack_total"}, "optional": True},
             ],
@@ -3257,6 +4771,8 @@ def _tool_metadata(name: str, costs_action: bool) -> dict[str, Any]:
                 {"label": "Roll", "value": {"path": "context._card_attack_roll"}, "optional": True},
                 {"label": "Difficulty", "value": {"path": "context._card_attack_difficulty"}, "optional": True},
                 {"label": "Rounds fired", "value": {"path": "context._card_attack_rounds"}},
+                {"label": "Deep Aim difficulty",
+                 "value": {"path": "context._deep_aim_offset"}, "optional": True},
             ],
         }
     return metadata
@@ -3266,6 +4782,7 @@ def _runtime(
     parameter_values: dict[str, Any],
     specialty_records: dict[str, dict[str, Any]],
 ) -> dict[str, Any]:
+    rifleman_entries.validate_configuration(parameter_values)
     specialty_branch_ids = sorted(
         {"DEFAULT"}
         | {
@@ -3279,14 +4796,83 @@ def _runtime(
         name: {
             "description": value["description"],
             "parameters": value["parameters"],
-            "effects": _card_effects(name, value["effects"]),
-            "metadata": _tool_metadata(name, value["costs_action"]),
+            "effects": _card_effects("prepare_overwatch" if name == "prepare_overwatch_lane" else name, value["effects"]),
+            "metadata": _tool_metadata("prepare_overwatch" if name in ("prepare_overwatch_lane", "cancel_overwatch_lane") else name, value["costs_action"]),
         }
         for name, value in tools.items()
     }
+    runtime_tools["prepare_overwatch_lane"]["metadata"] = overwatch_lanes.metadata(runtime_tools["prepare_overwatch"]["metadata"])
+    runtime_tools["cancel_overwatch_lane"]["metadata"]["player_controls"] = {
+        "confirmation": "none", "response": "on_request", "actor_parameter": "actor",
+        "checks": [{"condition": "prepared.overwatchers != null and _actor_id in prepared.overwatchers and " + overwatch_lanes.WATCH + ".owner == _actor_id", "reason": "Only the watcher can cancel this watch."}],
+    }
+    runtime_tools["cancel_overwatch_lane"]["metadata"]["result_card"] = {
+        "version": 1, "title": "Cancel Overwatch",
+        "summary": [{"label": "Status", "value": "Watch cancelled"}],
+        "details": [{"label": "AP refund", "value": 0}],
+    }
     runtime_tools["td_refresh_turn_actor"] = _turn_actor_helper()
+    runtime_tools["td_suppression_exposure"] = _suppression_exposure_helper()
+    runtime_tools["td_counter_prep_exposure"] = sentinel.counter_prep_helper(
+        _param, _trigger_attack_effects,
+    )
+    runtime_tools["td_preparation_exposure"] = sentinel.preparation_helper(_param)
+    runtime_tools["td_move_with_prepared_fire"] = _ordinary_crossing_helper()
+    runtime_tools["td_watch_probe"] = overwatch_dispatch.probe(_param)
+    runtime_tools["td_watch_resolve"] = overwatch_dispatch.resolve(_param, _trigger_attack_effects)
+    runtime_tools["td_lane_movement"] = overwatch_dispatch.movement(
+        _param, _weighted_prefix_effects,
+        lambda: sentinel.movement_effects() + network_entry.movement_effects() + weapon_handling.end_suppression(),
+    )
+    runtime_tools["td_lane_preparation"] = overwatch_dispatch.preparation(_param)
+    plural = "prepared.overwatchers != null and len(prepared.overwatchers) > 0"
+    for name in ("td_move_with_prepared_fire", "resolve_trigger_crossing"):
+        tool = runtime_tools[name]
+        if not any(p["name"] == "prepared" for p in tool["parameters"]):
+            tool["parameters"].append(_param("prepared", "object", from_state="state.prepared"))
+        original = tool["effects"]
+        tool["effects"] = [{"condition": plural, "on_true": [{
+            "call": "td_lane_movement", "params": {"actor": "{_actor_id}", "destination": "{destination}"},
+            "export_context": {key: key for key in (
+                "_trigger_paused", "_exposure_path_supported", "_card_trigger_status",
+                "_ordinary_distance", "_ordinary_geometry_revision")},
+        }], "on_false": original}]
+    tool = runtime_tools["td_preparation_exposure"]
+    tool["effects"] = [{"condition": plural, "on_true": [{
+        "call": "td_lane_preparation", "params": {"actor": "{_actor_id}", "event": "{event}"},
+        "export_context": {"_prep_interruption": "_prep_interruption"},
+    }], "on_false": tool["effects"]}]
     runtime_tools["td_drop_held_weapon"] = ground_weapons.drop_helper(_param)
     runtime_tools["td_place_dropped_weapon"] = ground_weapons.placement_helper(_param)
+    runtime_tools["td_break_observer"] = evader.observer_helper(_param)
+    runtime_tools["td_break_actor"] = evader.actor_helper(_param)
+    runtime_tools["td_refresh_break_contacts"] = evader.refresh_helper(_param)
+    runtime_tools["attempt_break_contact"]["metadata"]["player_controls"] = evader.controls()
+    runtime_tools["attempt_break_contact"]["metadata"]["result_card"] = {
+        "version": 1, "title": "Quiet equipment activity",
+        "summary": [
+            {"label": "Outcome", "value": {"path": "context.success", "labels": {
+                "true": "Activity succeeded", "false": "Activity failed",
+            }}},
+            {"label": "AP spent", "value": {"path": "context.ap_spent"}},
+            {"label": "Difficulty", "value": {"path": "context.difficulty"}},
+        ],
+        "details": [{"label": "Information", "value": "Observer evidence remains private"}],
+    }
+    evader.attach_refresh(runtime_tools, tools)
+    for name, ordinary in (
+        ("reload_weapon", "actor.weapon.reload_ap"),
+        ("cycle_weapon", "actor.weapon.cycle_ap"),
+        ("load_one_shell", "actor.weapon.shell_load_ap"),
+    ):
+        controls = runtime_tools[name]["metadata"].setdefault("player_controls", {})
+        controls.setdefault("calculations", []).extend(
+            rifleman_entries.manipulation_price(ordinary)
+        )
+        if name == "reload_weapon":
+            controls["actor_parameter"] = "actor"
+            controls["checks"] = _player_control_checks(name)
+    panel_prices.apply(runtime_tools)
     return {
         "sylvia_gm_runtime": {"format": 1, "state_namespace": PACKAGE_ID},
         "model_decision_scope": {
@@ -3299,6 +4885,14 @@ def _runtime(
         "tools": runtime_tools,
         "procedures": {},
         "definitions": {
+            "rifleman_entry_status": {
+                "status": "owner_approved_provisional_first_playable",
+                "approval_evidence": rifleman_entries.APPROVAL,
+                "final_balance": False,
+                "native_acceptance": False,
+                "reference": "references/rifleman-entry-provisional.md",
+            },
+            "advancement_nodes": advancement.rules(eligibility_catalog(Path(__file__).resolve().parents[1])),
             "parameters": _nested_parameters(parameter_values),
             "stances": {
                 stance: {"label": stance.lower(), "height": height,
@@ -3332,6 +4926,20 @@ def _runtime(
 
 def _tool_sources(name: str) -> list[str]:
     groups = {
+        "author_wall": ["Combat/GRID.md", "Combat/COVER.md"],
+        "attempt_break_contact": ["Specialties/EVADER.md", "Character/Skills/STEALTH.md",
+                                  "Character/TARGET KNOWLEDGE.md",
+                                  "Investigation/TEAM KNOWLEDGE.md",
+                                  "Character/CHECK.md"],
+        "enter_deep_aim": ["Specialties/SNIPER.md", "Firearms/AIM.md",
+                           "Classes/SHARPSHOOTER.md", "Combat/AP.md", "Combat/ATTACK ROLL.md"],
+        "reorient_field_node": ["Specialties/FIELD ENGINEER.md", "Classes/TECH.md",
+                                "Character/Skills/ENGINEERING.md", "Equipment/INVENTORY.md",
+                                "Equipment/READY.md"],
+        "load_one_shell": ["Firearms/RELOAD.md", "Firearms/MAGAZINE.md", "Firearms/CHAMBER.md",
+                           "Firearms/CYCLING.md", "Equipment/INVENTORY.md"],
+        "advance_character": ["Character/LEVEL.md", "Character/SPECIALTY.md", "Character/CLASS-SKILL INDEPENDENCE.md"],
+        "assign_drone_order": ["Drones/STANDING ORDER.md", "Drones/AUTONOMOUS DRONE.md", "Drones/SIGNAL.md", "Specialties/AUTODRONES.md"],
         "drop_weapon": ["Equipment/INVENTORY.md", "Equipment/READY.md", "CQC/DISARM.md"],
         "pickup_weapon": ["Equipment/INVENTORY.md", "Equipment/READY.md", "Equipment/QUICK ACCESS.md", "Equipment/STOWED.md", "CQC/DISARM.md", "Combat/GRID.md"],
         "transfer_reserve_weapon": ["Equipment/INVENTORY.md", "Equipment/QUICK ACCESS.md", "Equipment/STOWED.md", "Combat/GRID.md"],
@@ -3339,7 +4947,14 @@ def _tool_sources(name: str) -> list[str]:
         "handle_weapon": ["Equipment/INVENTORY.md", "Equipment/READY.md", "Equipment/QUICK ACCESS.md", "Equipment/STOWED.md", "Firearms/AIM.md", "Combat/OVERWATCH.md", "Combat/SUPPRESSION.md"],
         "recover_between_encounters": ["Systems/RES RECOVERY.md", "Systems/DOWNTIME.md", "Combat/RES.md"],
         "resolve_check": ["Character/CHECK.md", "Character/DIFFICULTY.md"],
-        "move_actor": ["Combat/GRID.md", "Combat/MOVEMENT.md", "Combat/AP.md"],
+        "move_actor": [
+            "Combat/GRID.md",
+            "Combat/MOVEMENT.md",
+            "Combat/AP.md",
+            "Combat/TRIGGER ORDERING.md",
+            "Combat/OVERWATCH.md",
+            "Combat/SUPPRESSION.md",
+        ],
         "change_stance": ["Combat/STANCE.md", "Combat/MOVEMENT.md", "Combat/AP.md"],
         "aim": ["Firearms/AIM.md", "Combat/AP.md"],
         "fire_single": ["Combat/ATTACK ROLL.md", "Combat/HIT QUALITY.md", "Combat/COVER.md", "Combat/DESTRUCTIBLE COVER.md", "Firearms/PROJECTILE.md", "Firearms/MATERIAL PENETRATION.md", "Combat/PENETRATION.md", "Combat/RES.md", "Combat/HP.md"],
@@ -3348,7 +4963,11 @@ def _tool_sources(name: str) -> list[str]:
         "recover_recoil": ["Firearms/RECOIL.md"],
         "cycle_weapon": ["Firearms/CYCLING.md", "Firearms/CHAMBER.md", "Firearms/MAGAZINE.md", "Testing/REFERENCE EQUIPMENT VALUES.md"],
         "reload_weapon": ["Firearms/RELOAD.md", "Firearms/MAGAZINE.md", "Firearms/CHAMBER.md", "Equipment/INVENTORY.md", "Testing/REFERENCE EQUIPMENT VALUES.md"],
-        "prepare_overwatch": ["Combat/PREP ACTION.md", "Combat/OVERWATCH.md"],
+        "prepare_overwatch": [
+            "Combat/PREP ACTION.md", "Combat/OVERWATCH.md", "Combat/SUPPRESSION.md",
+        ],
+        "prepare_sentinel_overwatch": ["Specialties/SENTINEL.md", "Combat/PREP ACTION.md", "Combat/OVERWATCH.md"],
+        "prepare_sentinel_sightline": ["Specialties/SENTINEL.md", "Firearms/AIM.md", "Combat/PREP ACTION.md", "Combat/OVERWATCH.md"],
         "establish_suppression": ["Combat/SUPPRESSION.md"],
         "inspect_trigger_crossing": ["Combat/TRIGGER ORDERING.md", "Combat/OVERWATCH.md", "Combat/SUPPRESSION.md"],
         "resolve_trigger_crossing": ["Combat/TRIGGER ORDERING.md", "Combat/OVERWATCH.md", "Combat/SUPPRESSION.md", "Firearms/PROJECTILE.md", "Firearms/MATERIAL PENETRATION.md"],
@@ -3359,6 +4978,7 @@ def _tool_sources(name: str) -> list[str]:
         "fpv_fragmentation_strike": ["Drones/FPV DRONE.md", "Drones/MANUAL CONTROL.md", "Explosives/GRENADE PLACEMENT.md", "Explosives/BLAST GEOMETRY.md", "Testing/REFERENCE EQUIPMENT VALUES.md"],
         "autodrone_fire": ["Drones/AUTONOMOUS DRONE.md", "Drones/STANDING ORDER.md", "Drones/DRONE OVERWATCH.md", "Firearms/PROJECTILE.md", "Combat/COVER.md", "Testing/REFERENCE EQUIPMENT VALUES.md"],
         "intrude_network": ["Hacking/INTRUSION.md", "Hacking/NETWORK.md", "Hacking/NODE.md", "Hacking/LINK.md"],
+        "discover_network_quietly": ["Specialties/NETWORKER.md", "Hacking/HACKING VISIBILITY.md", "Hacking/MONITORING.md", "Hacking/DETECTION.md"],
         "network_connection": ["Hacking/LOCAL ACCESS.md", "Hacking/INTRUSION.md", "Hacking/NODE.md"],
         "respond_network_defense": ["Hacking/DETECTION.md", "Hacking/MONITORING.md", "Hacking/INTRUSION.md"],
         "preserve_network_route": ["Specialties/NETWORKER.md", "Hacking/LINK.md", "Hacking/INTRUSION.md"],
@@ -3419,16 +5039,37 @@ def _character_declaration(schema: dict[str, Any]) -> dict[str, Any]:
     state_schema = json.loads(
         Path(__file__).with_name("character_state_schema.json").read_text(encoding="utf-8")
     )
+    state_schema["properties"][rifleman_entries.CHAIN] = {
+        "type": ["string", "null"], "minLength": 1,
+        "description": (
+            "Optional execution marker for the actor's last qualifying physical firearm. "
+            "Omit on a new character. Full recoil recovery or a successful weapon switch "
+            "clears it; it supplies no starting benefit."
+        ),
+    }
+    state_schema["properties"]["engineering_tool"] = field_engineering.equipment_schemas()[0]
+    state_schema["properties"][sniper.STATE] = sniper.state_schema()
+    state_schema["properties"][quick_solution.STATE] = quick_solution.state_schema()
     state_schema["properties"]["weapon"]["properties"]["owner_id"] = {
         "type": "string", "minLength": 1,
         "description": "Explicitly recorded owner, separate from the character currently carrying the firearm. Omit if ownership is unknown; a handoff does not change it.",
     }
     reserve_weapon = deepcopy(state_schema["properties"]["weapon"])
     state_schema["properties"]["weapon"]["type"] = ["object", "null"]
+    # Object-only conjunctions must also permit the empty ready slot. Present
+    # weapons still satisfy their range constraints; reserve slots stay objects.
+    for constraint in state_schema["properties"]["weapon"].get("allOf", []):
+        if constraint.get("type") == "object":
+            constraint["type"] = ["object", "null"]
     reserve_weapon["properties"]["location"]["enum"] = ["QUICK_ACCESS", "STOWED"]
     state_schema["properties"]["reserve_weapons"] = {
         "type": "array", "items": reserve_weapon, "maxItems": 16, "uniqueItems": True,
         "description": "Other physically carried firearms, with distinct physical IDs and complete state. Switching moves the existing objects; no starting allowance is implied.",
+    }
+    state_schema["properties"]["advancement_milestones"] = {
+        "type": "array", "items": {"type": "string", "minLength": 1},
+        "maxItems": 20, "uniqueItems": True,
+        "description": "Earned milestone identities already applied; reopening or retrying grants no further level.",
     }
     copied_fields = ("id", "name", "side", "class_id", "level", "skills", "aptitudes", "specialties")
     for field in copied_fields:
@@ -3472,7 +5113,7 @@ def _conformance_character() -> dict[str, Any]:
 def _scene() -> dict[str, Any]:
     public = lambda label, kind, **extra: {"player": {"label": label, "kind": kind, **extra}}
     geometry = [
-        {"id": "partial-cover", "map_id": "td-conformance-floor", "occupies_cells": True, "volume": {"kind": "box", "min": [6, 1, 0], "max": [6.5, 4, 1]}, "active": True, "movement": "blocking", "visibility": "opaque", "metadata": {**public("Destructible cover", "cover", material_label="Material resistance 3"), "material_resistance": 3, "cover_hp": 12}, "destroyed": {"active": False, "movement": "passable", "visibility": "clear"}},
+        {"id": "partial-cover", "map_id": "td-conformance-floor", "occupies_cells": False, "volume": {"kind": "box", "min": [5.95, 1, 0], "max": [6.05, 4, 1]}, "active": True, "movement": "blocking", "visibility": "opaque", "metadata": {**public("Destructible cover", "cover", material_label="Material resistance 3"), "material_resistance": 3, "cover_hp": 12}, "destroyed": {"active": False, "movement": "passable", "visibility": "clear"}},
         {"id": "full-wall", "map_id": "td-conformance-floor", "occupies_cells": False, "volume": {"kind": "box", "min": [6, 5, 0], "max": [6.5, 8, 3]}, "active": True, "movement": "blocking", "visibility": "opaque", "metadata": public("Full wall", "wall", height_label="Full"), "destroyed": {"active": True, "movement": "blocking", "visibility": "opaque"}},
         {"id": "security-door", "map_id": "td-conformance-floor", "occupies_cells": False, "volume": {"kind": "box", "min": [10, 4, 0], "max": [10.25, 5.5, 2.4]}, "active": True, "movement": "blocking", "visibility": "opaque", "metadata": {**public("Security door", "door", state="closed", material_label="Material resistance 2"), "material_resistance": 2, "cover_hp": 8}, "destroyed": {"active": False, "movement": "passable", "visibility": "clear"}},
     ]
@@ -3488,7 +5129,7 @@ def _scene() -> dict[str, Any]:
         {"id": "drone_target", "map_id": "td-conformance-floor", "position": [31.5, 30.5, 0], "footprint": {"kind": "box", "half_extents": [0.4, 0.4]}, "height": 1.8, "facing": [-1, 0], "active": True, "movement": "blocking", "visibility": "opaque", "metadata": public("Drone qualification target", "unit", stance="standing", side="hostiles")},
     ]
     zones = [
-        {"id": "overwatch-lane", "map_id": "td-conformance-floor", "shape": {"kind": "box", "min": [5, 0, 0], "max": [8, 4, 2.5]}, "metadata": public("Overwatch lane", "overwatch")},
+        {"id": "overwatch-lane", "map_id": "td-conformance-floor", "shape": {"kind": "box", "min": [5, 0, 0], "max": [8, 4, 2.5]}, "metadata": public("Legacy authored area (not shooter lane)", "authored-area")},
         {"id": "suppression-lane", "map_id": "td-conformance-floor", "shape": {"kind": "box", "min": [5, 0, 0], "max": [8, 4, 2.5]}, "metadata": public("Suppression lane", "suppression")},
         {"id": "objective-zone", "map_id": "td-conformance-floor", "shape": {"kind": "box", "min": [10.5, 3.5, 0], "max": [12, 6, 2.5]}, "metadata": public("Secure relay", "objective")},
     ]
@@ -3761,7 +5402,13 @@ def _coverage(
     for specialty in balance["specialties"].values():
         for item in specialty["nodes"]:
             node = item["node"]
-            package_status = "authored_runtime_hook" if node["node_id"] in authored_networker else "test_subject_implemented"
+            authored_hook = (
+                node["node_id"] in authored_networker
+                or node["node_id"] in {quick_solution.ENTRY, evader.ENTRY}
+            )
+            package_status = (
+                "authored_runtime_hook" if authored_hook else "test_subject_implemented"
+            )
             if item["state"] == "MISSING_DEPENDENCY":
                 package_status = "unresolved_design"
             elif item["state"] == "STRUCTURAL_FINDING":
@@ -3790,7 +5437,19 @@ def _coverage(
         {"id": "entity-aware-path", "source": ["Combat/GRID.md", "Combat/MOVEMENT.md"], "status": "implemented", "conformance": "move_actor and resolve_cqc_displacement retain entity blocking while excluding exactly the moving entity"},
         {"id": "dynamic-spatial-state", "source": ["Combat/MOVEMENT.md", "Combat/DESTRUCTIBLE COVER.md", "Combat/BREACHING.md", "CQC/SHOVE.md", "CQC/THROW.md"], "status": "implemented", "conformance": "exact revision-guarded scene mutation for movement, forced movement, cover damage/destruction, and the authored security door"},
         {"id": "single-fire-and-damage", "source": _tool_sources("fire_single"), "status": "implemented", "conformance": "fire_single"},
-        {"id": "ammunition-chamber-cycle-reload", "source": ["Firearms/AMMUNITION.md", "Firearms/MAGAZINE.md", "Firearms/CHAMBER.md", "Firearms/CYCLING.md", "Firearms/RELOAD.md", "Equipment/INVENTORY.md"], "status": "partial", "conformance": "fire_single consumes chamber/feed state; cycle_weapon executes declared manual-action cycle AP; reload_weapon preserves detachable magazines on retain/drop; handle_weapon commits GM-adjudicated ready/stow handling of the carried firearm without a default cost; switch_weapon and transfer_reserve_weapon move actual carried firearm objects with ammunition/ownership preserved; drop_weapon and pickup_weapon move full ground objects with explicit costs and physical reach, including successful DISARM; equipment creation, ownership changes and tube-fed shell loading remain unsupported by these actions"},
+        {"id": "ammunition-chamber-cycle-reload",
+         "source": ["Firearms/AMMUNITION.md", "Firearms/MAGAZINE.md", "Firearms/CHAMBER.md",
+                    "Firearms/CYCLING.md", "Firearms/RELOAD.md", "Equipment/INVENTORY.md"],
+         "status": "partial", "conformance": (
+             "fire_single consumes chamber/feed state; cycle_weapon executes declared manual-action "
+             "cycle AP; reload_weapon preserves detachable magazines on retain/drop; handle_weapon "
+             "commits GM-adjudicated ready/stow handling without a default cost; switch_weapon and "
+             "transfer_reserve_weapon move actual carried firearm objects with ammunition/ownership "
+             "preserved; drop_weapon and pickup_weapon move full ground objects with explicit costs "
+             "and reach, including DISARM; load_one_shell inserts an actual spare shell into an "
+             "explicitly authored manual-action tube at its declared AP cost, preserving partial "
+             "progress and separate chamber/cycle state; equipment creation and ownership changes "
+             "remain unsupported by these actions")},
         {"id": "multi-round-sequential-geometry", "source": sorted(set(_tool_sources("fire_burst") + _tool_sources("fire_full_auto"))), "status": "implemented", "conformance": "fire_burst/fire_full_auto use one ATTACK ROLL, the v0.1 admitted connection/recoil parameters, ordered projectile rays, and a fresh live snapshot after every geometry mutation"},
         {"id": "overwatch-suppression-triggering", "source": ["Combat/OVERWATCH.md", "Combat/SUPPRESSION.md", "Combat/TRIGGER ORDERING.md", "Firearms/PROJECTILE.md", "Firearms/MATERIAL PENETRATION.md"], "status": "implemented", "conformance": "resolve_trigger_crossing pauses exact movement at the first prepared-zone crossing, resolves same-moment OVERWATCH/SUPPRESSION in the declared controller order through ordinary attack, cover, projectile, material, ammunition, and capacity rules with fresh geometry between sequential shots, then resumes or interrupts the exact scene entity"},
         {"id": "cqc", "source": sorted(set(_tool_sources("resolve_cqc") + _tool_sources("resolve_cqc_displacement"))), "status": "partial", "conformance": "resolve_cqc implements reach-gated TRIP, DISARM, BODY CONTROL, WEAPON CONTROL, and ESCAPE; resolve_cqc_displacement implements path-valid SHOVE and THROW with exact scene/entity synchronization; situational leverage and environmental hazards remain GM judgment"},
@@ -3863,7 +5522,8 @@ def _manifest(
             tools[-1]["input_schema"]["x-sylvia-gm-inventory"] = {
                 "format": "mechanics", "state": {"namespace": PACKAGE_ID, "key": "entities"},
                 "surface_id": "operations.loadout",
-                "tools": ["handle_weapon", "switch_weapon", "transfer_reserve_weapon", "drop_weapon", "pickup_weapon", "reload_weapon", "cycle_weapon"],
+                "tools": ["handle_weapon", "switch_weapon", "transfer_reserve_weapon", "drop_weapon",
+                          "pickup_weapon", "reload_weapon", "load_one_shell", "cycle_weapon"],
             }
     stance_actions = [
         {"id": f"stance-{stance.lower()}", "label": label, "intent": "change_stance",
@@ -3872,15 +5532,47 @@ def _manifest(
     ]
     tactical_actions = [
         *deepcopy(stance_actions),
+        {"id": "keep-metal-quiet", "label": "Keep held metal quiet",
+         "intent": "attempt_break_contact", "params": {"activity_id": "quiet-metal"},
+         "bindings": {"actor": "actor"}},
+        {"id": "field-reorient-east", "label": "Reorient field node east",
+         "intent": "reorient_field_node",
+         "params": {"expected_orientation": "NORTH", "orientation": "EAST"},
+         "bindings": {"actor": "actor", "device": "device"}},
         {"id": "move", "label": "Move", "intent": "move_actor", "params": {}, "bindings": {"actor": "actor", "destination": "destination"}},
         {"id": "aim", "label": "Aim", "intent": "aim", "params": {"ap": 1}, "bindings": {"attacker": "actor", "target": "target", "aim_point": "aim_point"}},
+        {"id": "aim-two", "label": "Aim (2 investment)", "intent": "aim", "params": {"ap": 2},
+         "bindings": {"attacker": "actor", "target": "target", "aim_point": "aim_point"}},
+        {"id": "deep-aim", "label": "Enter Deep Aim", "intent": "enter_deep_aim", "params": {},
+         "bindings": {"attacker": "actor", "target": "target", "aim_point": "aim_point"}},
         {"id": "fire", "label": "Fire", "intent": "fire_single", "params": {"critical_effect": "DEVASTATING_HIT"}, "bindings": {"attacker": "actor", "target": "target", "aim_point": "aim_point"}},
         {"id": "burst", "label": "Burst", "intent": "fire_burst", "params": {"critical_effect": "DEVASTATING_HIT"}, "bindings": {"attacker": "actor", "target": "target", "aim_point": "aim_point"}},
         {"id": "full-auto", "label": "Full auto", "intent": "fire_full_auto", "params": {"rounds": 5, "critical_effect": "DEVASTATING_HIT"}, "bindings": {"attacker": "actor", "target": "target", "aim_point": "aim_point"}},
         {"id": "fpv-strike", "label": "FPV fragmentation strike", "intent": "fpv_fragmentation_strike", "params": {}, "bindings": {"actor": "actor", "drone": "device", "target": "target", "landing_point": "aim_point"}},
         {"id": "autodrone-fire", "label": "Autodrone fire", "intent": "autodrone_fire", "params": {}, "bindings": {"actor": "actor", "target": "target", "aim_point": "aim_point"}},
-        {"id": "overwatch", "label": "Prepare overwatch", "intent": "prepare_overwatch", "params": {}, "bindings": {"actor": "actor", "zone_id": "zone"}},
+        {"id": "overwatch", "label": "Prepare overwatch lane", "intent": "prepare_overwatch_lane", "params": {}, "bindings": {"actor": "actor", "lane": "lane"}},
+        {"id": "cancel-overwatch", "label": "Cancel overwatch", "intent": "cancel_overwatch_lane", "params": {}, "bindings": {"actor": "actor"}},
         {"id": "suppress", "label": "Suppress", "intent": "establish_suppression", "params": {"rounds": 10}, "bindings": {"actor": "actor", "zone_id": "zone"}},
+    ]
+    # Drawn borders reuse the conformance floor's authored Full wall; no new balance values.
+    full_wall = next(item for item in _scene()["geometry"] if item["id"] == "full-wall")
+    edge_segment = {
+        "height": full_wall["volume"]["max"][2] - full_wall["volume"]["min"][2],
+        **{key: deepcopy(full_wall[key])
+           for key in ("active", "movement", "visibility", "metadata", "destroyed")},
+    }
+    current_map = {"map_id": "map_id", "expected_revision": "map_revision"}
+    tactical_actions += [
+        {"id": "wall-draw", "label": "New wall", "intent": "author_wall",
+         "params": {"operation": "draw", "geometry_ids": []},
+         "bindings": {**current_map, "segments": "edges"}, "edge_segment": deepcopy(edge_segment)},
+        {"id": "wall-extend", "label": "Extend wall", "intent": "author_wall",
+         "params": {"operation": "extend"},
+         "bindings": {**current_map, "geometry_ids": "edge_anchor", "segments": "edges"},
+         "edge_segment": deepcopy(edge_segment)},
+        {"id": "wall-connect", "label": "Connect walls", "intent": "author_wall",
+         "params": {"operation": "connect", "segments": []},
+         "bindings": {**current_map, "geometry_ids": "edge_walls"}},
     ]
     network_actions = [
         {"id": "connect", "label": "Connect to interface", "intent": "network_connection", "params": {"action": "CONNECT"}, "bindings": {"actor": "actor", "node_id": "node"}},
@@ -3897,6 +5589,8 @@ def _manifest(
     party_actions = [
         *deepcopy(stance_actions),
         {"id": "cycle", "label": "Cycle weapon", "intent": "cycle_weapon", "params": {}, "bindings": {"actor": "actor"}},
+        {"id": "load-shell", "label": "Load one shell", "intent": "load_one_shell", "params": {},
+         "bindings": {"actor": "actor"}},
         {"id": "reload-retain", "label": "Reload · retain magazine", "intent": "reload_weapon", "params": {"disposition": "RETAIN"}, "bindings": {"actor": "actor"}},
         {"id": "recover-recoil", "label": "Recover recoil · 1 AP", "intent": "recover_recoil", "params": {"ap": 1}, "bindings": {"actor": "actor"}},
         {"id": "end-turn", "label": "End team turn", "intent": "end_allies_turn", "params": {}},
@@ -3916,7 +5610,7 @@ def _manifest(
         "tools": tools,
         "prompt_fragments": [{"id": "trigger-discipline.rules-guidance", "capability": "trigger-discipline.presentation"}],
         "ui_surfaces": [
-            {"id": "operations.map", "capability": "trigger-discipline.spatial", "title": "Tactical map", "icon": "▦", "renderer": "tactical_grid", "source": {"kind": "object", "fields": {"scene": {"kind": "state", "namespace": PACKAGE_ID, "key": "state.spatial_scene"}, "objectives": {"kind": "state", "namespace": PACKAGE_ID, "key": "state.objectives"}, "selection": {"kind": "state", "namespace": PACKAGE_ID, "key": "state.selection"}, "preview": {"kind": "state", "namespace": PACKAGE_ID, "key": "state.preview"}}}, "group": "operations", "order": 0, "default_size": 640, "minimum_size": 320, "default_placement": "docked", "allowed_placements": ["docked", "window"], "actions": tactical_actions},
+            {"id": "operations.map", "capability": "trigger-discipline.spatial", "title": "Tactical map", "icon": "▦", "renderer": "tactical_grid", "source": {"kind": "object", "fields": {"scene": {"kind": "state", "namespace": PACKAGE_ID, "key": "state.spatial_scene"}, "zone_state": {"kind": "state", "namespace": PACKAGE_ID, "key": "state.prepared"}, "objectives": {"kind": "state", "namespace": PACKAGE_ID, "key": "state.objectives"}, "selection": {"kind": "state", "namespace": PACKAGE_ID, "key": "state.selection"}, "preview": {"kind": "state", "namespace": PACKAGE_ID, "key": "state.preview"}}}, "group": "operations", "order": 0, "default_size": 640, "minimum_size": 320, "default_placement": "docked", "allowed_placements": ["docked", "window"], "actions": tactical_actions},
             {"id": "operations.network", "capability": "trigger-discipline.network", "title": "Network", "icon": "◇", "renderer": "network_graph", "source": {"kind": "state", "namespace": PACKAGE_ID, "key": "state.network"}, "group": "operations", "order": 1, "default_size": 520, "minimum_size": 320, "default_placement": "docked", "allowed_placements": ["docked", "window"], "actions": network_actions},
             {
                 "id": "operations.status", "capability": "trigger-discipline.presentation",
@@ -3936,7 +5630,11 @@ def _manifest(
             {"id": "operations.loadout", "capability": "trigger-discipline.presentation", "title": "Loadout", "icon": "▣", "renderer": "inventory", "source": {"kind": "object", "fields": {"entities": {"kind": "state", "namespace": PACKAGE_ID, "key": "entities"}, "participants": {"kind": "participants", "kinds": ["trigger-discipline.character"]}}}, "group": "operations", "order": 5, "default_size": 280, "minimum_size": 160, "default_placement": "docked", "allowed_placements": ["docked", "window"], "actions": []},
         ],
         "participant_artifacts": [_character_declaration(schema)],
-        "state_schemas": network_state_schema.state_schemas(),
+        "state_schemas": (
+            evader.state_schemas(sentinel.state_schemas(network_state_schema.state_schemas()))
+            + quick_solution.state_schemas(sniper.state_schemas(
+                field_engineering.state_schemas(drone_orders.state_schemas())))
+        ),
         "content_declarations": "content/content-declarations.json",
     }
 
@@ -3957,6 +5655,69 @@ def _panel_layout() -> dict[str, Any]:
 def _gameplay_support(coverage: dict[str, Any]) -> dict[str, Any]:
     """Publish real resolution boundaries separately from test-only counterfactual evidence."""
     hybrid_parts = {
+        evader.ENTRY: (
+            "attempt_break_contact owns paid STEALTH for the admitted stationary quiet-held-metal "
+            "search activity: conservative full-body visual contact proof, immediate per-observer "
+            "LAST KNOWN, next-use BREAK CONTACT price/difficulty, bounded listener-specific noise, "
+            "durable consumption and replay. No generic hiding or automatic team vision.",
+            "The encounter author supplies private typed sensory origins, observer identities, "
+            "already-held equipment and revision-bound meaningful uncertainty/noise facts. Only "
+            "the supported visual box-occlusion reference family is automated; unsupported facts "
+            "refuse without inventing certainty. No runtime opportunity editor or general "
+            "acoustics solver.",
+        ),
+        sniper.ENTRY: (
+            "enter_deep_aim spends one additional AP after ordinary AIM, preserving that "
+            "ordinary investment and binding a separate paid stage to the target, point, "
+            "firearm, firing pose and unchanged map revision. One ordinary prepared attack "
+            "receives -2 difficulty once; firing owns its own AP/ammo and validity checks.",
+            "This is immediate stationary support, not a general movement tolerance, "
+            "reacquisition/interleaving, turn/reaction lifetime or higher SNIPER implementation. "
+            "Changed scene bindings require fresh preparation; no benefit silently revives. "
+            "See references/deep-aim.md. No native, installed or final-balance acceptance.",
+        ),
+        field_engineering.ENTRY: (
+            "reorient_field_node performs the fully authored NORTH to EAST physical reorientation "
+            "of an already-deployed compatible FIELD SENSOR / RELAY NODE: baseline TECH 3 AP, "
+            "FIELD WORK 2 AP. Owning execution and player preview share physical prerequisites "
+            "and price. Only declared orientation changes; existing tools, installed mounting "
+            "material and authored technical/physical access are required.",
+            "Author the actual existing equipment, ready tool, installed mounting material and "
+            "technical capability. No defaults, deployment discount, wider repair/modification, "
+            "new sensor function or security privilege are supplied. See references/field-work.md. "
+            "Source/owner implementation is not native or final whole-specialty acceptance.",
+        ),
+        rifleman_entries.OPERATOR: (
+            "Owner-approved provisional entry: ordinary reload, cycle/chamber and one-shell "
+            "loading prices are reduced by 1 AP to a minimum of 1 AP, with their existing "
+            "physical prerequisites and inventory/chamber transitions intact. Effective "
+            "execution and preview costs share the same calculation.",
+            "handle_weapon and switch_weapon already accept final GM-adjudicated totals. "
+            "Account for the approved benefit once when adjudicating an ordinary manipulation; "
+            "the runtime preserves that final total without discounting it again. This is "
+            "first-playable provisional implementation, not final balance or native acceptance. "
+            "See references/rifleman-entry-provisional.md.",
+        ),
+        "specialty.autodrones.tier_1.conditional_order": (
+            "assign_drone_order can bind one additional actual entity to a confirmed-target engagement order. autodrone_fire requires that entity to remain sensor-confirmed as well as the ordinary target; otherwise the order continues WATCH without firing or spending resources. The durable order receipt binds the condition across replacement and recovery.",
+            "Establish actual sensor evidence and an explicit command cost. Other condition/response shapes, patrol, sensor simulation and numerical management reductions remain GM-owned; this is one supported conditional family, not whole-specialty automation.",
+        ),
+        "specialty.sentinel.entry.prepared_sightline": (
+            "prepare_sentinel_sightline stores ordinary target-specific AIM and OVERWATCH at the actor's current position, spending one explicit reduced combined cost. Valid triggers use ordinary geometry, ammunition, recoil and AIM resolution; movement invalidates this stationary preparation.",
+            "Supply the justified combined cost and ordinary AIM investment. No specialty discount, wider sector, improved attack number or extra trigger allowance is chosen by the package.",
+        ),
+        "specialty.networker.tier_1.quiet_enumeration": (
+            "discover_network_quietly uses ordinary discovery prerequisites, cost and discoverable links, lowering only this action's visibility one canonical band. Relevant monitoring and detection still apply.",
+            "Author actual discovery scope, barriers and monitoring evidence; no hidden topology or immunity is granted.",
+        ),
+        "specialty.sentinel.tier_2.second_trigger": (
+            "prepare_sentinel_overwatch pays ordinary setup AP and stores an explicit greater finite shot allowance. Each valid crossing uses the ordinary prepared-shot resolver, ammunition, recoil, cycling and break conditions.",
+            "Supply the adjudicated shot allowance; no specialty quantity or other SENTINEL benefit is selected automatically.",
+        ),
+        "specialty.autodrones.entry.tactical_autonomy": (
+            "assign_drone_order stores a watch or identified-target engagement order using the real controller, signal and explicit operator cost. autodrone_fire consumes the drone's own actions/ammunition and still requires actual sensor confirmation and firing geometry.",
+            "Establish the real communication link and authorized controller, choose the justified order cost, and adjudicate complex triggers, observation, patrol, movement and contingencies. This bounded order path does not automate the whole specialty or invent its numerical discounts.",
+        ),
         medical.COMBAT_MEDICINE: (
             "treat_casualty checks actual capability, reach, resources and the selected check; it stores first successful treatment per casualty/issue and restores at most 1 RES for COMBAT MEDICINE without healing HP or erasing an injury.",
             "Identify the actual distinct injury/condition with one stable issue_id, establish appropriate treatment and medical plausibility, and supply its explicit AP cost/difficulty. No automatic diagnosis, supply consumption, injury removal or unquantified specialty discount is claimed.",
@@ -3982,7 +5743,10 @@ def _gameplay_support(coverage: dict[str, Any]) -> dict[str, Any]:
                       else "gm_adjudicated")
         deterministic_part = gm_part = None
         if resolution != "unsupported":
-            if item["id"] == "specialty.networker.entry.map_the_links":
+            if item["id"] in {
+                quick_solution.ENTRY, rifleman_entries.GUNNER, sentinel.COUNTER_PREP,
+                "specialty.networker.entry.map_the_links",
+            }:
                 resolution = "engine_specialized"
             elif item["id"] in hybrid_parts:
                 resolution = "hybrid"
@@ -4248,12 +6012,30 @@ def build_draft(
     scenario = _scenario(source_commit, parameters.hash, parameters.values)
     files: dict[str, bytes] = {
         "runtime/ruleset.yaml": _canonical_json(runtime, pretty=True),
+        "references/overwatch-lanes.md": (
+            Path(__file__).parent / "references" / "overwatch-lanes.md"
+        ).read_bytes(),
         "ui/panel-layout.json": _canonical_json(_panel_layout()),
         "references/campaign-authoring.md": (
             Path(__file__).parent / "references" / "campaign-authoring.md"
         ).read_bytes(),
         "references/character-authoring.md": (
             Path(__file__).parent / "references" / "character-authoring.md"
+        ).read_bytes(),
+        "references/rifleman-entry-provisional.md": (
+            Path(__file__).parent / "references" / "rifleman-entry-provisional.md"
+        ).read_bytes(),
+        "references/field-work.md": (
+            Path(__file__).parent / "references" / "field-work.md"
+        ).read_bytes(),
+        "references/deep-aim.md": (
+            Path(__file__).parent / "references" / "deep-aim.md"
+        ).read_bytes(),
+        "references/quick-solution.md": (
+            Path(__file__).parent / "references" / "quick-solution.md"
+        ).read_bytes(),
+        "references/break-contact.md": (
+            Path(__file__).parent / "references" / "break-contact.md"
         ).read_bytes(),
         "conformance/specialty-counterfactuals.json": _canonical_json(
             {

@@ -17,6 +17,15 @@ handoffs and checkout-specific records do not activate work.
 
 ## 1. Current work
 
+**9 November 2026: Trigger Discipline integration before balancing.** The owner selected an
+integrated, ready, unmerged TD baseline in existing PR #6. The retained runtime, shooter-origin
+Overwatch and grid-edge controls are being reconciled with current main. TD 0.1.29 keeps the
+existing parameters and authored cycling costs. The normal standalone package build is
+`scripts/build_trigger_discipline_package.py`; Settings / Packages owns admission. Siren
+composition, balance-suite adoption and the separate Opus gamification candidate remain
+independent work. Merge and release are held. Source, owner, persistence and rendered-control
+checks are in progress; installed-app and genuine-provider acceptance are not yet claimed.
+
 **9 November 2026: optional onboarding and the complete tutorial suite.** The owner selected a new
 PR for all independently accessible lessons and a guided welcome, AI connection, Ready campaign
 and first-scene journey. Project Desk work item **Build the tutorial suite and current new-player

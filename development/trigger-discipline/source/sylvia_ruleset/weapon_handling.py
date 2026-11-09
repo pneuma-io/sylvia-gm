@@ -3,6 +3,8 @@
 from collections.abc import Callable
 from typing import Any
 
+from sylvia_ruleset.rifleman_entries import end_chain
+
 
 def end_suppression(actor_id: str = "_actor_id") -> list[dict[str, Any]]:
     """End only this actor's continuing fire after a committed incompatible action."""
@@ -136,6 +138,7 @@ def switch_specification(actor: dict[str, Any], param: Callable[..., dict[str, A
                     {"set": {"field": "{_actor_id}.reserve_weapons", "value": "_remaining_weapons"}},
                     {"set": {"field": "{_actor_id}.weapon", "value": "_next_weapon"}},
                     {"set": {"field": "{_actor_id}.weapon.location", "value": "'READY'"}},
+                    *end_chain(),
                     {"decrement": {"field": "{_actor_id}.ap", "amount": "ap_cost"}},
                     *break_prepared_fire(),
                     {"set": {"field": "state.last_equipment", "value": {

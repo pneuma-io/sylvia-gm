@@ -56,7 +56,11 @@ def project_spatial_preview(
         if "map_id" in output and any(output[key] != value for key, value in identity.items()):
             raise ValueError("A map preview cannot combine different maps or revisions")
         output.update(identity)
-        if operation == "path":
+        if operation == "grid_lane":
+            zone = result["zone"]
+            output["grid_lane"] = {"shape": zone["shape"], "owner": query["owner_id"],
+                                   "lane": query["lane"], "label": zone["metadata"]["player"]["label"]}
+        elif operation == "path":
             grid = scene["map"]["grid"]
             points = [
                 [

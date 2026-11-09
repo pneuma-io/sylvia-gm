@@ -55,6 +55,18 @@ clearance without reserving whole neighboring cells. Author its actual endpoints
 material, movement and visibility separately: a see-through fence can still block movement
 or stop a projectile. Never stretch its coverage to a whole cell in presentation or rules.
 
+Daniel's 26 October clarification places actual cover barriers on the grid lines between squares.
+For newly authored cover barriers, align their centerline and endpoints to those boundaries and
+use the existing `occupies_cells: false` physical-clearance path. Preserve real thickness, height,
+material and directional exposure. This does not turn crates, vehicles, actors or other solid
+objects into edge barriers; their actual occupied footprint remains meaningful. The shared engine
+supports both forms, and the renderer preserves that authored distinction. It does not infer a
+cover classification from a prop's appearance. Newly generated conformance `partial-cover` now
+uses a thin physical barrier centered on grid line x=6 with its existing height, material and
+destructibility. Earlier saved fixtures are unchanged. The older combat lab's cover model uses
+cell sets and remains historical benchmark evidence, not proof of the universal map's edge-cover
+behavior. Do not silently move every object or rewrite the lab's historical results.
+
 Full, Half and Quarter are editable height labels (2.4, 1.2 and 0.6 m), not protection
 percentages. Stance, body and muzzle height, firing angle and the actual intersection decide
 exposure. Keep numeric dimensions available for inspection. Set `metadata.player.material_label`
@@ -139,6 +151,17 @@ The private state records are separate from the public `network` projection:
 - `network_interfaces[node]` declares the supported `kind: local_stationary`, `active`,
   `generation`, exact `map_id`/`position_cell` and authored `ap`. A visible node alone grants no
   entry. `network_connection` requires the actor at that cell and the node/interface online.
+- For an existing carried local interface, use `kind: local_carried`, its real `carrier_id`,
+  `active`, `generation`, explicit `ap`, and `connections: {actor_id: {active, generation}}`.
+  This records a genuine physical connection to hardware currently carried by that actor;
+  it is not permission to create equipment, transfer ownership or infer an interface from a
+  known node. Bind its public map location to the carrier's actual token using the existing
+  `physical_binding`; admission checks that its entity ID matches `carrier_id`.
+  Moving together preserves that local connection. Disconnecting,
+  replacing or transferring it must deactivate or advance the actual connection generation;
+  returning the hardware does not revive old entry/session grants. Changing the carrier
+  blocks the previous actor immediately. This path does not simulate carried-device handoff,
+  arbitrary moving terminals, cable reach or wireless range. Those need actual authored facts.
 - For a genuinely remotely reachable service, use `kind: remote_service` with `active`,
   `generation`, explicit `ap` and `connections: {actor_id: {active, generation}}`. This records
   the actual actor-to-service connection, not a list of actors who merely know the node.
@@ -154,13 +177,15 @@ The private state records are separate from the public `network` projection:
   Reconnect a local interface after moving; reconnect either kind after disconnecting or
   replacing its interface/node, then establish fresh access.
   Disconnect remains possible when the device goes offline and affects only that actor's entry.
-  Remote entries additionally save `connection_generation` and reject access when it differs
-  from the actual service connection. Reconnection does not restore expired sessions.
+  Stationary entries use that motion generation to detect leaving and returning. Remote and
+  carried entries save `connection_generation` and reject access when it differs from the actual
+  connection. Reconnection does not restore expired sessions.
 - `network_sessions[actor].nodes[node]` is written by successful access tools. It holds privilege,
   entry generation, ordered node/link IDs, their generations, and actor-owned session generations.
   Replacing a parent session expires its old dependent grants; copied state cannot revive them.
-  Its friendly `route_label` supplies a read-only actor-specific panel preview after the owner
-  validates an available action; it does not expose private topology or grant permission. A selected
+  The read-only actor-specific route preview uses current known node labels after the owner
+  validates an available action. A legacy authored `route_label` remains optional display data;
+  new grants need not cache it. Neither display grants permission or exposes private topology. A selected
   function shows its public label, actual AP cost and permission to use that function without an
   intrusion check. This does not grant or claim control of other functions on the device.
 - `preserve_network_route` uses the usual `route_step` and requires the actual ROUTE PERSISTENCE

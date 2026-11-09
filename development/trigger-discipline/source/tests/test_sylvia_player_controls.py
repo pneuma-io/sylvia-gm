@@ -60,9 +60,12 @@ class PlayerControlRuntimeTests(unittest.TestCase):
         result = mechanic(MechanicContext(
             campaign_id="td-player-controls", turn_id="turn",
             action_id=f"action-{self.sequence}", state=self.state, parameters=parameters,
+            participants=getattr(self, "participants", {}),
         ))
         for mutation in result.mutations:
             self.state[f"{mutation.namespace}.{mutation.key}"] = thaw_json_value(mutation.value)
+        for mutation in result.participant_mutations:
+            self.participants[mutation.participant_id]["data"] = thaw_json_value(mutation.data)
         return result.result
 
     def check(self, tool_name, parameters):
@@ -282,7 +285,7 @@ class PlayerControlRuntimeTests(unittest.TestCase):
 
     def test_movement_readiness_uses_the_real_bounded_route_and_its_ap_cost(self):
         actor = self.state[f"{builder.PACKAGE_ID}.entities"]["vesper"]
-        blocked = {"actor": "vesper", "destination": [6, 2]}
+        blocked = {"actor": "vesper", "destination": [2, 3]}
         self.assertEqual(
             "A movement route to this destination could not be found.",
             self.check("move_actor", blocked),
@@ -592,6 +595,12 @@ class PlayerControlRuntimeTests(unittest.TestCase):
         state_key = f"{builder.PACKAGE_ID}.state"
         self.execute("prepare_overwatch", {"actor": "vesper", "zone_id": "overwatch-lane"})
         self.execute("end_allies_turn", {})
+        # Edge cover leaves adjoining cells free. This destination is blocked by a solid prop.
+        scene = self.state[state_key]["spatial_scene"]
+        crate = deepcopy(scene["geometry"][0])
+        crate.update(id="occupied-destination-crate", occupies_cells=True)
+        crate["volume"] = {"kind": "box", "min": [6, 2, 0], "max": [7, 3, 1.8]}
+        scene["geometry"].append(crate)
         before = deepcopy(self.state)
         result = self.execute("resolve_trigger_crossing", {
             "actor": "hostile_alpha", "overwatcher": "vesper", "suppressor": "hex",
@@ -720,7 +729,7 @@ class PlayerControlRuntimeTests(unittest.TestCase):
 
         package_state = self.state[f"{builder.PACKAGE_ID}.state"]
         geometry = {item["id"]: item for item in package_state["spatial_scene"]["geometry"]}
-        self.assertTrue(geometry["partial-cover"]["occupies_cells"])
+        self.assertFalse(geometry["partial-cover"]["occupies_cells"])
         self.assertFalse(geometry["full-wall"]["occupies_cells"])
         self.assertFalse(geometry["security-door"]["occupies_cells"])
         query = {
@@ -849,7 +858,7 @@ class PlayerControlRuntimeTests(unittest.TestCase):
                                  if surface["renderer"] == "party")["actions"])
         party = next(surface for surface in descriptor["ui_surfaces"]
                      if surface["renderer"] == "unit_list")
-        self.assertEqual(["change_stance"] * 3 + ["cycle_weapon", "reload_weapon", "recover_recoil", "end_allies_turn"],
+        self.assertEqual(["change_stance"] * 3 + ["cycle_weapon", "load_one_shell", "reload_weapon", "recover_recoil", "end_allies_turn"],
                          [action["intent"] for action in party["actions"]])
         self.assertEqual(["STANDING", "CROUCHED", "PRONE"],
                          [action["params"]["stance"] for action in party["actions"][:3]])

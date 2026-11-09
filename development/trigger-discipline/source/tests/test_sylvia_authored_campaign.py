@@ -166,7 +166,7 @@ def test_fresh_setting_plan_and_reusable_party_reach_persisted_td_play(tmp_path)
             "turn_roster": [hostile_id],
             "focused_actor": None,
             "spatial_scene": scene,
-            "selection": {}, "preview": {}, "network": {}, "network_access": {},
+            "selection": {}, "preview": {},
             "objectives": [], "mission": {"status": "ACTIVE"},
             "prepared": {"overwatch": {"active": False}, "suppression": {"active": False}},
             "physical": {"security_door_open": False},

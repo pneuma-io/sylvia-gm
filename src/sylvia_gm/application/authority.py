@@ -96,6 +96,7 @@ from sylvia_gm.application.player_actions import (
     player_action_records,
     player_action_request_matches,
     player_control_origin,
+    player_tool_result,
     resolve_inventory_action_parameters,
     resolve_party_action_parameters,
     retain_player_action_origin,
@@ -121,6 +122,7 @@ from sylvia_gm.application.tactical_grid import (
     player_known_spatial_value,
     project_coordinate_map,
     project_tactical_grid,
+    public_edge_segment,
     resolve_surface_source,
     resolve_tactical_action_parameters,
 )
@@ -4950,6 +4952,10 @@ class AuthorityOwner:
                 ),
             )
             pending_key = (command.campaign_id, command.action_id)
+            private_inputs = any(
+                key.startswith(command.package_id + ".")
+                for key in self._engine_private_keys(basis.package_lock)
+            )
             with self._narration_lock:
                 self._pending_tools[pending_key] = PlayerProjection(
                     kind=PlayerProjectionKind.PENDING_TOOL,
@@ -4960,7 +4966,7 @@ class AuthorityOwner:
                             "package_version": package.version,
                             "package_sha256": package.sha256,
                             "tool_name": command.tool_name,
-                            "parameters": parameters,
+                            "parameters": {} if private_inputs else parameters,
                         }
                     ),
                     collapsed_by_default=True,
@@ -6680,6 +6686,8 @@ class AuthorityOwner:
                         available = False
                 return owned_payload({
                     **action, "available": available, "actor_parameter": actor_parameter,
+                    **({"edge_segment": public_edge_segment(action["edge_segment"])}
+                       if "edge_segment" in action else {}),
                     "response_policy": tools[0].player_controls.response if len(tools) == 1 else None,
                     "checks_required": len(tools) == 1 and tools[0].check_player_action is not None,
                     "map_preview_enabled": bool(action.get("spatial_preview")) or (
@@ -7560,25 +7568,45 @@ class AuthorityOwner:
                 return replace(snapshot, state=safe_state, mutations=tuple(
                     item for item in snapshot.mutations
                     if f"{item.namespace}.{item.key}" not in private_keys
+                ), consequences=tuple(
+                    replace(item, payload=owned_payload({"kind": "spatial_query"}))
+                    if item.payload.get("kind") == "spatial_query" else item
+                    for item in snapshot.consequences
                 ))
             return replace(snapshot, state=safe_state)
 
     def _project_private_tool_inputs(
         self, snapshot: _Snapshot,
     ) -> _Snapshot:
-        """Keep canonical input bytes in storage and omit hidden-game arguments from readers."""
+        """Retain canonical bytes while omitting hidden inputs and spatial evidence from readers."""
         private_keys = self._engine_private_keys(snapshot.package_lock)
         private_packages = {entry.package_id for entry in snapshot.package_lock.entries
                             if any(key.startswith(entry.package_id + ".") for key in private_keys)}
-        actions = tuple(replace(action, parameters=owned_payload({}))
-                        if action.package_id in private_packages else action
-                        for action in snapshot.actions)
-        events = tuple(replace(event, safe_payload=owned_payload({
-                           **event.safe_payload, "parameters": {},
-                       }))
-                       if event.event_type is CanonicalEventType.TOOL_CALL
-                       and event.safe_payload.get("package_id") in private_packages else event
-                       for event in snapshot.events)
+        actions = tuple(replace(
+            action,
+            parameters=(owned_payload({}) if action.package_id in private_packages
+                        else action.parameters),
+            result=player_tool_result(action.result),
+        ) for action in snapshot.actions)
+
+        def public_event(event: CanonicalEvent) -> CanonicalEvent:
+            if (event.event_type is CanonicalEventType.TOOL_CALL
+                    and event.safe_payload.get("package_id") in private_packages):
+                return replace(event, safe_payload=owned_payload({
+                    **event.safe_payload, "parameters": {},
+                }))
+            if event.event_type is CanonicalEventType.TOOL_RESULT:
+                result = event.safe_payload.get("result")
+                if isinstance(result, Mapping):
+                    return replace(event, safe_payload=owned_payload({
+                        **event.safe_payload, "result": player_tool_result(result),
+                    }))
+            if (event.event_type is CanonicalEventType.CONSEQUENCE
+                    and event.safe_payload.get("kind") == "spatial_query"):
+                return replace(event, safe_payload=owned_payload({"kind": "spatial_query"}))
+            return event
+
+        events = tuple(public_event(event) for event in snapshot.events)
         return replace(snapshot, actions=actions, events=events)
 
     def _engine_private_keys(self, lock: PackageLock) -> frozenset[str]:

@@ -22,7 +22,13 @@ from sylvia_gm.spatial import (
     admit_spatial_scene,
 )
 
+# The wall editor groups visible pieces with the same endpoint rule as owner authoring.
+from sylvia_gm.spatial._wall_authoring import _components as _edge_components
+
 TACTICAL_SELECTION_BINDINGS = TACTICAL_UI_DYNAMIC_SELECTIONS
+# Owner-derived inputs are never accepted from the renderer's selection.
+_DERIVED_SOURCES = frozenset({"path", "map_id", "map_revision"})
+_EDGE_SOURCES = frozenset({"edges", "edge_anchor", "edge_walls"})
 
 _DISPLAY_FIELDS = frozenset(
     {
@@ -39,7 +45,7 @@ _DISPLAY_FIELDS = frozenset(
         "display_geometry",
     }
 )
-_SELECTION_FIELDS = TACTICAL_SELECTION_BINDINGS
+_SELECTION_FIELDS = TACTICAL_SELECTION_BINDINGS - {"map_id", "map_revision"} - _EDGE_SOURCES
 _MAX_LABEL_BYTES = 256
 _MAX_PATH_POINTS = 256
 
@@ -288,6 +294,32 @@ def _project_preview(value: object, map_revision: int) -> dict[str, object]:
     return result
 
 
+def _visible_edge_walls(geometry: list[dict[str, object]]) -> dict[str, str]:
+    """Name each visible grid-edge wall by its first visible segment.
+
+    Grouping uses only visible segments, so a hidden piece never links two visible
+    ones; owner continuity identities stay in storage.
+    """
+    layers: dict[object, list[dict[str, object]]] = {}
+    for item in geometry:
+        if cast(Mapping[str, object], item["volume"])["kind"] == "grid_edge":
+            key = item.get("edge_layer_id", ("unlayered", item["id"]))
+            layers.setdefault(key, []).append(item)
+    walls: dict[str, str] = {}
+    for members in layers.values():
+        for component in _edge_components(members):
+            for item in component:
+                walls[cast(str, item["id"])] = cast(str, component[0]["id"])
+    return walls
+
+
+def public_edge_segment(template: object) -> dict[str, object] | None:
+    """Show an action's authored barrier by height and public display only."""
+    if not isinstance(template, Mapping):
+        return None
+    return {"height": template.get("height"), "display": _public_display(template.get("metadata"))}
+
+
 def project_tactical_grid(value: object) -> SafePayload:
     """Create one bounded player-safe projection from package-owned spatial state."""
 
@@ -301,11 +333,14 @@ def project_tactical_grid(value: object) -> SafePayload:
     map_value = cast(dict[str, object], scene["map"])
     revision = cast(int, map_value["revision"])
 
+    visible_geometry = [
+        (item, display)
+        for item in cast(list[dict[str, object]], scene["geometry"])
+        if (display := _public_display(item["metadata"])) is not None
+    ]
+    walls = _visible_edge_walls([item for item, _ in visible_geometry])
     geometry: list[dict[str, object]] = []
-    for item in cast(list[dict[str, object]], scene["geometry"]):
-        display = _public_display(item["metadata"])
-        if display is None:
-            continue
+    for item, display in visible_geometry:
         geometry.append(
             {
                 "id": item["id"],
@@ -317,6 +352,7 @@ def project_tactical_grid(value: object) -> SafePayload:
                 "visibility": item["visibility"],
                 "destroyed": deepcopy(item["destroyed"]),
                 "display": display,
+                **({"edge_wall": walls[cast(str, item["id"])]} if item["id"] in walls else {}),
             }
         )
 
@@ -348,12 +384,43 @@ def project_tactical_grid(value: object) -> SafePayload:
         )
         if display is None:
             continue
+        lane = None
+        if item["shape"]["kind"] == "grid_cells" and "lane" in item["metadata"]:
+            raw_lane = item["metadata"]["lane"]
+            owner = item["metadata"].get("owner")
+            body = next((body for body in entities if body["id"] == owner), None)
+            if (body is not None and isinstance(raw_lane, Mapping)
+                    and _coordinate(raw_lane.get("origin"), 3) is not None
+                    and raw_lane.get("direction") in ("east", "south", "west", "north")
+                    and raw_lane.get("pattern") in ("lane", "triangle")):
+                lane = {key: deepcopy(raw_lane.get(key)) for key in
+                        ("origin", "direction", "pattern", "extent", "half_width")}
+                status = value.get("zone_state")
+                # Rulesets may supply one status or a map of owned status records.
+                # Inspect only this explicit source, without knowing game-specific keys.
+                pending = [status]
+                for _ in range(3):
+                    matched = next((entry for entry in pending if isinstance(entry, Mapping)
+                                    and entry.get("zone_id") == item["id"]), None)
+                    if matched is not None:
+                        status = matched
+                        break
+                    pending = [child for entry in pending if isinstance(entry, Mapping)
+                               for child in entry.values() if isinstance(child, Mapping)]
+                display["state"] = "declared"
+                if isinstance(status, Mapping) and status.get("zone_id") == item["id"]:
+                    current_pose = (raw_lane.get("origin") == body["position"]
+                                    and raw_lane.get("facing") == body["facing"]
+                                    and status.get("owner") == owner
+                                    and status.get("lane_shape") == item["shape"])
+                    display["state"] = "armed" if status.get("active") is True and current_pose else "inactive"
         zones.append(
             {
                 "id": item["id"],
                 "map_id": item["map_id"],
                 "shape": deepcopy(item["shape"]),
                 "display": display,
+                **({"lane": lane} if lane is not None else {}),
             }
         )
 
@@ -503,6 +570,64 @@ def _point_valid(value: object, projection: Mapping[str, object]) -> bool:
     )
 
 
+def _grid_edges(
+    value: object, projection: Mapping[str, object],
+) -> list[tuple[tuple[int, int], tuple[int, int]]] | None:
+    """Read distinct unit cell borders as ordered pairs of in-map grid vertices."""
+    items = _sequence(value)
+    if items is None or not 1 <= len(items) <= 256:
+        return None
+    lower, upper, cell_size = _map_bounds(projection)
+    limits = [math.ceil((upper[axis] - lower[axis]) / cell_size) for axis in range(2)]
+    edges: list[tuple[tuple[int, int], tuple[int, int]]] = []
+    for item in items:
+        ends = _sequence(item)
+        points = [_coordinate(end, 2, integer=True) for end in ends or ()]
+        if len(points) != 2 or any(
+            point is None
+            or not all(0 <= cast(int, point[axis]) <= limits[axis] for axis in range(2))
+            for point in points
+        ):
+            return None
+        first, second = sorted(
+            (cast(int, point[0]), cast(int, point[1])) for point in cast(list[list[object]], points)
+        )
+        if abs(first[0] - second[0]) + abs(first[1] - second[1]) != 1:
+            return None
+        edges.append((first, second))
+    return edges if len(set(edges)) == len(edges) else None
+
+
+def _edge_segments(
+    edges: list[tuple[tuple[int, int], tuple[int, int]]],
+    template: object,
+    projection: Mapping[str, object],
+) -> list[dict[str, object]]:
+    """Build each selected border as the Ruleset's authored barrier on the map floor."""
+    if not isinstance(template, Mapping):
+        raise TacticalGridError("Tactical edge declaration is invalid")
+    map_value = cast(Mapping[str, Mapping[str, object]], projection["map"])
+    lower = cast(Sequence[int | float], map_value["bounds"]["min"])
+    size = cast(int | float, map_value["grid"]["cell_size"])
+    body = {key: value for key, value in template.items() if key != "height"}
+
+    def point(vertex: tuple[int, int], height: int | float) -> list[int | float]:
+        return [lower[0] + vertex[0] * size, lower[1] + vertex[1] * size, lower[2] + height]
+
+    return [
+        {
+            **deepcopy(body),
+            "occupies_cells": False,
+            "volume": {
+                "kind": "grid_edge",
+                "min": point(first, 0),
+                "max": point(second, cast(int | float, template["height"])),
+            },
+        }
+        for first, second in edges
+    ]
+
+
 def _selection_value_valid(
     source: str,
     value: object,
@@ -510,12 +635,34 @@ def _selection_value_valid(
     *,
     action_id: str,
 ) -> bool:
+    if source in {"map_id", "map_revision"}:
+        return True
+    if source == "edges":
+        return _grid_edges(value, projection) is not None
+    if source in {"edge_anchor", "edge_walls"}:
+        # Only visible grid-edge segments in this exact projection can be selected.
+        segments = {
+            item.get("id")
+            for item in cast(Sequence[Mapping[str, object]], projection.get("geometry", ()))
+            if cast(Mapping[str, object], item.get("volume", {})).get("kind") == "grid_edge"
+        }
+        items = _sequence(value)
+        return (
+            items is not None
+            and (len(items) == 1 if source == "edge_anchor" else 1 <= len(items) <= 256)
+            and all(isinstance(item, str) and item in segments for item in items)
+            and len(set(cast(Sequence[str], items))) == len(items)
+        )
     entity_ids = {
         item.get("id")
         for item in cast(Sequence[Mapping[str, object]], projection.get("entities", ()))
     }
     if source in {"actor", "target", "device"}:
         return isinstance(value, str) and value in entity_ids
+    if source == "lane":
+        from sylvia_gm.spatial._grid_lane import LANE_FIELDS
+        return (isinstance(value, (list, tuple)) and len(value) == 1
+                and isinstance(value[0], Mapping) and set(value[0]) == LANE_FIELDS)
     if source == "zone":
         return isinstance(value, str) and any(
             item.get("id") == value
@@ -644,7 +791,7 @@ def resolve_tactical_action_parameters(
     if map_revision != projection.get("map_revision"):
         raise TacticalGridError("Tactical selection is stale")
     binding_sources = set(bindings.values())
-    client_sources = binding_sources - {"path"}
+    client_sources = binding_sources - _DERIVED_SOURCES
     if (
         not binding_sources <= TACTICAL_SELECTION_BINDINGS
         or set(selection) != client_sources | {"map_revision"}
@@ -663,6 +810,8 @@ def resolve_tactical_action_parameters(
                 destination=selection.get("destination"),
             )
             if source_value == "path" and authoritative_scene is not None
+            else cast(Mapping[str, object], projection["map"])["id"] if source_value == "map_id"
+            else projection["map_revision"] if source_value == "map_revision"
             else selection.get(source_value)
         )
         if source_value == "path" and authoritative_scene is None:
@@ -674,6 +823,15 @@ def resolve_tactical_action_parameters(
             action_id=action_id,
         ):
             raise TacticalGridError(f"Tactical {source_value} selection is invalid")
+        if source_value == "edges":
+            edges = cast(
+                list[tuple[tuple[int, int], tuple[int, int]]], _grid_edges(selected, projection)
+            )
+            selected = _edge_segments(
+                edges,
+                action.get("edge_segment"),
+                projection,
+            )
         reference = action.get('actor_reference' if source_value == 'actor' else 'target_reference')
         if source_value in {'actor', 'target'} and reference is not None:
             if reference != projection.get('actor_reference'):
@@ -694,6 +852,7 @@ __all__ = (
     "TacticalGridError",
     "project_tactical_grid",
     "project_coordinate_map",
+    "public_edge_segment",
     "coordinate_actor_reference",
     "resolve_surface_source",
     "resolve_tactical_action_parameters",

@@ -3,6 +3,7 @@
 from collections.abc import Callable
 from typing import Any
 
+from .rifleman_entries import CHAIN, end_chain
 from .weapon_handling import break_prepared_fire
 
 
@@ -156,6 +157,9 @@ def pickup_specification(actor: dict[str, Any], param: Callable[..., dict[str, A
                         {"set": {"field": "_pickup_location", "value": {"location": "location"}}},
                         {"set": {"field": "_picked_weapon", "value": "merge(_ground_weapon, _pickup_location)"}},
                         {"condition": "actor.weapon == null", "on_true": [
+                            {"condition": (
+                                f"'{CHAIN}' in actor and actor.{CHAIN} != _picked_weapon.id"
+                            ), "on_true": end_chain(), "on_false": []},
                             {"set": {"field": "{_actor_id}.weapon", "value": "_picked_weapon"}},
                         ], "on_false": [
                             {"list_push": {"list": "_pickup_reserves", "value": "_picked_weapon"}},

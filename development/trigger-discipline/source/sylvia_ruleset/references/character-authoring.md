@@ -86,6 +86,14 @@ read by firing and Loadout. It cannot retrieve a disarmed weapon from the ground
 transfer or swap equipment. Those operations are not automated by this action; do not report
 a generic inventory transfer as having changed the active TD firearm.
 
+GUNNER's SUSTAINED FIRE DISCIPLINE and OPERATOR's WEAPON MANIPULATION now have
+owner-approved provisional first-playable rules. Read
+`references/rifleman-entry-provisional.md` for their exact values, chain continuity,
+physical-operation boundaries and explicit-final-cost handling. Other specialty
+numbers and starting profiles remain unresolved. These implementations do not
+establish final balance or native acceptance. Do not author a starting
+`gunner_chain_weapon_id`; it records actual firing history during play.
+
 Optional `entity_state.reserve_weapons` contains at most 16 other carried firearms in
 QUICK_ACCESS or STOWED locations, each with the same complete weapon-state shape. Give each
 physical firearm its own stable ID; do not copy a weapon into both current and reserve slots.
@@ -122,6 +130,110 @@ The package explicitly selects these combat-state objects as its inventory. The 
 reads those same objects. Sylvia's fallback inventory ledger is unavailable for this package.
 Use the declared TD action for equipment changes and report unsupported acquisition or ownership
 changes as unresolved rather than recording a second ledger or claiming the weapon was changed.
+
+For an existing autonomous drone, `assign_drone_order` records WATCH or
+ENGAGE_CONFIRMED_TARGET against an actual target. Supply a stable `order_id` and the explicit
+operator `ap_cost`; a changed order needs a new identity. The authored drone must name its actual
+operator in `controlled_by` and have a genuinely established `signal_connected` link. This command
+does not create or change either fact. It preserves the drone's actions, ammunition and sensor
+knowledge. Repeating the same order identity and contents spends nothing; conflicting contents
+under that identity are rejected. Identities are durable per drone across replacement and reopen;
+the receipt also binds the operator, target, mode and explicit AP cost. Replaying an earlier order
+never restores it over a newer one. Each drone retains at most 256 identities, with no eviction:
+at the limit a new identity refuses before spending; retained replays/conflicts still resolve.
+An identified legacy order lacking a complete receipt is reserved across replacement and cannot
+execute again. History already lost by older bytes cannot be reconstructed or claimed as verified.
+The existing `autodrone_fire` resolver owns each shot and still
+requires actual confirmation of the assigned target. WATCH never authorizes fire. Complex
+AUTODRONES triggers, patrols, movement and contingencies retain explicit GM resolution; storing an
+order does not claim those effects executed. No default command cost or specialty discount is set.
+
+CONDITIONAL ORDER has one supported additional sensing condition. Supply an existing physical
+entity as `condition_entity_id` on an ENGAGE_CONFIRMED_TARGET order. Both the AUTODRONES ENTRY
+and CONDITIONAL ORDER must be selected. The drone fires only while that additional entity and
+the ordinary target are both in its actual `sensor_confirmed_targets`; otherwise it continues
+WATCH without spending shot resources. Preview and execution read the same condition. Assignment
+creates no sensor evidence. The receipt binds this optional condition, including across replacement
+and recovery; old receipts without it still identify an unconditional order. Other conditions,
+responses and autonomous sensor/movement simulation remain explicit GM work.
+
+`discover_network_quietly` applies selected QUIET ENUMERATION to ordinary DISCOVER. It uses the
+same actual compromised node, route, privilege, authored AP cost, check and discoverable links.
+Only this action's HACKING VISIBILITY drops one ordered band (HIGH to STANDARD, STANDARD to LOW,
+LOW stays LOW); relevant monitoring still resolves normally. It does not create access, bypass a
+boundary, reveal hidden paths or make reconnaissance undetectable. Other mapping actions and
+other NETWORKER nodes retain their separately stated support boundaries.
+
+For an operative who selected SECOND TRIGGER, `prepare_sentinel_overwatch` prepares ordinary
+OVERWATCH with an explicitly adjudicated total `shot_allowance` greater than the ordinary value.
+It pays the ordinary setup cost; it does not choose a specialty trigger-count default or apply
+other SENTINEL nodes. Each actual valid trigger uses the existing resolver, ammunition, RECOIL
+and cycling rules. Invalid or spent preparation grants no attack. Ordinary `prepare_overwatch`
+keeps its existing allowance.
+
+For PREPARED SIGHTLINE, `prepare_sentinel_sightline` combines one ordinary target-specific
+AIM action with ordinary OVERWATCH at the actor's current position. Supply `aim_ap` within
+the ordinary action's supported range and an explicitly adjudicated combined `ap_cost` below
+the separate costs. The package chooses no discount. The selected ENTRY, current zone, usable
+weapon, active/non-downed actor and actual target exposure are required before either preparation
+or cost changes. It stores the stationary origin; moving away ends this preparation and its AIM,
+even if the character returns. An ordinary replacement watch removes the stationary constraint.
+The normal prepared shot applies and consumes the same AIM benefit as ordinary deliberate fire.
+This does not automate BROAD SECTOR, STABLE NEST or CROSSING SHOT numerical benefits.
+For a build that also selected SECOND TRIGGER, the same combined action accepts an explicit
+`shot_allowance` greater than the ordinary value, with no second setup action or charge. Omit
+that input (or use the API sentinel 0) to keep ordinary OVERWATCH's existing allowance; 0 is not
+a new rule quantity. No retained-trigger count is chosen for the player.
+
+Retained triggers recheck the watcher's current condition, weapon and actual exposure. A downed
+watcher or a wholly screened crossing spends no ammunition, recoil or trigger allowance.
+
+For COUNTER-PREP, opt in with `counter_prep: true` on ordinary or derived watch setup.
+This is the same ordinary operation and setup price, available through its declared tool.
+The existing Map action continues to request ordinary watch; it has no configuration toggle.
+The watcher must have a legal SHARPSHOOTER build with ENTRY, two TIER 1 choices, two TIER 2
+choices and COUNTER-PREP (at least level 6). An old or omitted flag remains ordinary movement
+watch. Configuration adds exposed enemy AIM, OVERWATCH and the supported combined/DEEP AIM
+preparations as triggers; it does not remove movement triggers or add a shot allowance.
+An enemy must actually be inside the saved zone with current exposure. Entirely full-cover
+actions, invalid preparations and unavailable or spent watches cause no shot. Each response
+uses ordinary ammunition, chamber, RECOIL and AIM rules, with no generic reaction AP. Incoming
+watch and SUPPRESSION resolve through the existing same-moment ordering, with prerequisites
+rechecked before each effect and before the preparation continues. Combined sightline setup
+is one event, not separate AIM and watch events. Duplicate action receipts cannot fire again.
+The package still has its existing single watch slot and single suppression slot; this does
+not implement multiple simultaneous watcher ownership or periodic unchanged-watch events.
+
+`advance_character` records one GM-confirmed earned milestone, one level and one legal specialty.
+Supply the same identity for the actor and its live Character File, the current expected level,
+a stable milestone ID and the chosen specialty. The action updates both the runtime actor and
+the live participant together, preserving the saved reusable source profile. It uses
+the same class/tier prerequisites as Character File admission, rejects duplicate choices and caps
+level at 20. Repeating a recorded milestone grants nothing. It preserves skills, aptitudes, HP,
+RES, AP, injuries and equipment, including ammunition. Numerical progression is unresolved; this
+action supplies no resource gains, healing, skill increases or starting defaults.
+
+For a manual-action tube-fed firearm, `load_one_shell` moves one actual `spare_shells` round
+into its existing tube and spends the explicit weapon `shell_load_ap`. Author `tube_capacity`
+excluding the chamber. The B12's supplied equipment record specifies capacity 8 and loading/cycle
+cost 1 AP each; it does not select a starting quantity of shells. These optional state fields
+have no defaults. Each completed shell persists independently, including when AP runs out.
+The action preserves LIVE, EMPTY or SPENT chamber state; an empty/spent action then needs the
+separate existing `cycle_weapon` operation. Loading breaks the acting character's maintained aim
+and prepared fire. It supplies no automatic numerical recoil recovery. Other feed/mechanism
+combinations remain explicitly unsupported by this shell action.
+
+For an authored range-dependent firearm, `range_damage` has four entries matching its three
+`range_breakpoints_m` plus the beyond band. Omit it for ordinary fixed damage. A null entry is
+unresolved, not a fallback to `damage`: the B12 uses `[7, 5, 3, null]`, breakpoints `[10, 20, 35]`
+and difficulty modifiers `[0, 2, 5, 8]` from its supplied equipment record. The runtime uses the
+ordinary ray's actual target-intersection distance and existing hit-quality, cover and penetration
+resolution. No per-pellet rolls are introduced. Unknown-band ordinary fire rejects before rolling
+or changing AP, ammunition, recoil or preparation. A prepared shot in that band records its
+unsupported status without consuming its trigger allowance or ammunition. The existing bounded
+scalar preview cannot perform the ray-intersection search; it warns that range damage is checked
+on commit rather than claiming a numeric damage estimate or exact range eligibility. This is a
+presentation limitation, not permission for the GM to substitute an unsupplied damage value.
 
 Run the draft check after assembling the required inputs and correct every reported field error.
 The check verifies the declared structure, calculations and settled build constraints. The canonical

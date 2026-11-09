@@ -4196,3 +4196,40 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
   body.webui .view-switch { display: none; }
   body.webui .session-frame .play-header { padding-left: 12px; }
 }
+
+/* Discrete edge barriers are drawn along their grid boundary, inside exact physical bounds. */
+.tactical-world:not(.coordinate-world) .tactical-geometry.edge-barrier { border:0; box-shadow:none; background:transparent; }
+.tactical-edge-line { position:absolute; border-left:2px solid #91a6ad; border-top:2px solid #91a6ad; box-shadow:0 0 2px #0008; pointer-events:none; }
+.tactical-door .tactical-edge-line { border-color:#b3906a; }
+.tactical-world:not(.coordinate-world) .tactical-geometry.edge-barrier.selected .tactical-edge-line { border-color:var(--accent-primary-bright); }
+.tactical-world:not(.coordinate-world) .tactical-geometry.edge-barrier.preview-highlight .tactical-edge-line { border-color:var(--accent-red-bright); }
+
+.tactical-cover .tactical-edge-line { border-color:#d9ab62; }
+.tactical-wall .tactical-edge-line { border-color:#b7becb; }
+/* Grid-edge walls lie on one shared cell border; the 8px hit band is wider than the drawn line. */
+.tactical-geometry.grid-edge.vertical .tactical-edge-line { left:3px; top:0; width:0; height:100%; border-top:0; }
+.tactical-geometry.grid-edge.horizontal .tactical-edge-line { top:3px; left:0; width:100%; height:0; border-left:0; }
+.tactical-world.wall-editing .tactical-cell { cursor:crosshair; }
+.tactical-world.wall-editing .tactical-geometry.grid-edge.wall-chosen .tactical-edge-line { border-color:var(--accent-primary-bright); box-shadow:0 0 0 2px color-mix(in srgb, var(--accent-primary-bright) 40%, transparent); }
+.tactical-world.wall-editing .tactical-geometry.grid-edge.wall-chosen { outline:2px solid var(--accent-primary-bright); outline-offset:1px; }
+.wall-draft-overlay .wall-draft-edge { stroke:var(--accent-primary-bright); stroke-width:3; stroke-dasharray:6 4; stroke-linecap:round; }
+.wall-draft-overlay .wall-ghost-edge { stroke:var(--accent-primary-bright); stroke-opacity:.5; stroke-width:3; stroke-linecap:round; }
+.wall-editor { display:grid; gap:5px; flex-shrink:0; padding:7px 9px; border:1px dashed var(--accent-primary-bright); border-radius:7px; background:var(--bg-secondary); font-size:12px; }
+.wall-editor-summary { color:var(--text-bright); }
+.wall-editor-guidance { color:var(--text-dim); }
+.wall-editor-guidance:focus-visible { outline:2px solid var(--accent-primary-bright); outline-offset:2px; }
+.wall-editor-actions { display:flex; flex-wrap:wrap; gap:5px; }
+.wall-editor-keys { margin:0; color:var(--text-muted); font-size:11px; }
+
+/* Grid-pattern declarations are rendered cell by cell, including triangle boundaries. */
+.map-lane-inputs { display:flex; flex-wrap:wrap; gap:8px 12px; padding:10px; }
+.map-lane-inputs label { display:flex; flex-direction:column; gap:3px; }
+.map-lane-inputs input { width:110px; }
+.map-lane-inputs small { flex-basis:100%; max-width:660px; }
+.tactical-lane-preview-cell { fill:rgba(235,180,56,.24); stroke:#f4c75c; stroke-width:1.2; }
+.tactical-lane-origin { fill:none; stroke:#ffe398; stroke-width:2; }
+.tactical-lane-direction { stroke:#ffe398; stroke-width:3; }
+.tactical-zone.tactical-lane-cell { border:1px solid #f4c75c; border-radius:0; background:rgba(235,180,56,.17); }
+.tactical-zone.tactical-lane-cell.inactive { opacity:.35; border-style:dashed; }
+.tactical-lane-anchor { position:absolute; z-index:8; pointer-events:none; color:#ffe398; font-size:28px; text-align:center; line-height:24px; transform:translate(12px,-22px); text-shadow:0 1px 3px #000; }
+.game-workspace .ruleset-map-panel:has(.map-lane-inputs) .tactical-scroll { min-height:300px; flex:1 0 300px; }

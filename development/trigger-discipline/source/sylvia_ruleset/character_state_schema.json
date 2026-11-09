@@ -77,7 +77,6 @@
       "type": "object",
       "required": [
         "id",
-        "damage",
         "target_pen",
         "material_pen",
         "recoil",
@@ -85,14 +84,10 @@
         "range_modifiers",
         "current_recoil",
         "magazine",
-        "spare_magazines",
-        "retained_magazines",
         "chamber",
         "needs_cycle",
         "mechanism",
         "feed",
-        "reload_ap",
-        "cycle_ap",
         "location",
         "fire_modes"
       ],
@@ -104,6 +99,13 @@
         "damage": {
           "type": "integer",
           "minimum": 0
+        },
+        "range_damage": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {"type": ["integer", "null"], "minimum": 0},
+          "description": "Optional damage for the same three range breakpoints plus the beyond band. Null means unresolved: firing in that band must not execute. Omit for ordinary fixed damage."
         },
         "target_pen": {
           "type": "integer",
@@ -142,6 +144,7 @@
         },
         "magazine": {
           "$id": "pneuma-io.trigger-discipline.magazine.v0-1",
+          "description": "Existing loaded-feed container and actual remaining rounds. Feed identifies magazine, tube or belt; this counter does not authorize interchangeable loading operations.",
           "type": "object",
           "required": [
             "id",
@@ -223,16 +226,34 @@
           "type": "string",
           "enum": [
             "DETACHABLE_MAGAZINE",
-            "TUBE"
+            "TUBE",
+            "BELT"
           ]
         },
         "reload_ap": {
           "type": "integer",
-          "minimum": 0
+          "minimum": 0,
+          "description": "Declared detachable-magazine reload price. Does not supply a tube or belt-change operation."
         },
         "cycle_ap": {
           "type": "integer",
-          "minimum": 0
+          "minimum": 0,
+          "description": "Explicit manual cycling price. Automatic cycling does not imply a free manual rack; absent price leaves that action unavailable."
+        },
+        "tube_capacity": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Explicit capacity of the tube, excluding the chamber. No default."
+        },
+        "shell_load_ap": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Authored AP cost to insert one loose shell, excluding cycling. No default."
+        },
+        "spare_shells": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Actual carried loose shells available for loading. Starting quantity requires a separate choice."
         },
         "location": {
           "type": "string",
@@ -262,6 +283,41 @@
           "uniqueItems": true
         }
       },
+      "allOf": [{
+        "type": "object",
+        "if": {"type": "object", "properties": {
+                 "range_damage": {"type": "array", "items": {"type": ["integer", "null"]}}},
+               "required": ["range_damage"]},
+        "then": {"type": "object", "properties": {
+          "range_breakpoints_m": {"type": "array", "items": {"type": "number"},
+                                  "minItems": 3, "maxItems": 3},
+          "range_modifiers": {"type": "array", "items": {"type": "integer"},
+                              "minItems": 4, "maxItems": 4}
+        }}
+      }, {
+        "type": "object",
+        "if": {"type": "object", "properties": {"range_damage": {"type": "null"}}},
+        "then": {"type": "object", "required": ["damage"], "properties": {
+          "damage": {"type": "integer", "minimum": 0}
+        }}
+      }, {
+        "type": "object",
+        "if": {"type": "object", "required": ["feed"], "properties": {
+          "feed": {"type": "string", "enum": ["DETACHABLE_MAGAZINE"]}
+        }},
+        "then": {"type": "object", "required": ["reload_ap", "spare_magazines", "retained_magazines"],
+                 "properties": {"reload_ap": {"type": "integer", "minimum": 0},
+                   "spare_magazines": {"type": "array", "items": {"type": "object"}},
+                   "retained_magazines": {"type": "array", "items": {"type": "object"}}}}
+      }, {
+        "type": "object",
+        "if": {"type": "object", "required": ["mechanism"], "properties": {
+          "mechanism": {"type": "string", "enum": ["MANUAL_ACTION"]}
+        }},
+        "then": {"type": "object", "required": ["cycle_ap"], "properties": {
+          "cycle_ap": {"type": "integer", "minimum": 0}
+        }}
+      }],
       "additionalProperties": false
     },
     "aim": {

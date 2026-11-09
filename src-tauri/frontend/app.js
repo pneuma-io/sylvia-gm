@@ -363,7 +363,8 @@ const SylviaGMFrontend = (() => {
     if (!active || !container.contains(active)) return null;
     const surfaceId = active.closest('[data-panel-id]')?.dataset.panelId;
     if (!surfaceId) return null;
-    const attribute = ['data-party-select-actor', 'data-character-actor', 'data-inventory-character', 'data-tactical-cell']
+    const attribute = ['data-party-select-actor', 'data-character-actor', 'data-inventory-character', 'data-tactical-cell',
+      'data-tactical-geometry', 'data-tactical-wall-edit', 'data-wall-commit', 'data-wall-clear', 'data-wall-editor-status']
       .find(name => active.hasAttribute(name));
     if (attribute) return { surfaceId, selector: `[${attribute}="${CSS.escape(active.getAttribute(attribute))}"]` };
     const details = active.parentElement;
@@ -481,14 +482,14 @@ const SylviaGMFrontend = (() => {
           Object.keys(args).some(key => !allowed.includes(key)) ||
           args.campaign_id !== scope.campaign_id || args.session_id !== scope.session_id ||
           args.surface_id !== ACTION_QUEUE_PANEL_ID || !scope.owns(ACTION_QUEUE_PANEL_ID) ||
-          !['execute','remove','review'].includes(args.operation) ||
+          !['execute','remove','review','up','down','clear'].includes(args.operation) ||
           !(typeof args.sequence_id === 'string' && args.sequence_id && args.sequence_id.length <= 512 ||
             args.operation === 'execute' && args.sequence_id === null && args.expected_version === 0) ||
           (args.operation !== 'execute' && args.response_action_id !== undefined) ||
           (args.response_action_id !== undefined && args.response_action_id !== null &&
             (args.operation !== 'execute' || typeof args.response_action_id !== 'string' || !args.response_action_id || args.response_action_id.length > 512)) ||
           !Number.isSafeInteger(args.expected_version) || args.expected_version < 0 ||
-          (args.operation === 'remove' ? typeof args.step_id !== 'string' || !args.step_id || args.step_id.length > 512 : args.step_id !== undefined)) {
+          (['remove','up','down'].includes(args.operation) ? typeof args.step_id !== 'string' || !args.step_id || args.step_id.length > 512 : args.step_id !== undefined)) {
         throw new Error('This queued-action panel request is invalid or the panel has moved.');
       }
       const result = await queueOperation(args.operation, args.step_id, {
@@ -4531,21 +4532,24 @@ const SylviaGMFrontend = (() => {
     return Boolean(actorId) && playerControlsActor(actorId);
   }
 
-  function panelRecoveryKey() {
-    return `sylvia-panel-recovery-v1:${state.activeCampaignId}:${state.activeSessionId}`;
+  function panelRecoveryKey(campaignId = state.activeCampaignId, sessionId = state.activeSessionId) {
+    return `sylvia-panel-recovery-v1:${campaignId}:${sessionId}`;
   }
 
-  function pendingPanelCommand() {
+  function pendingPanelCommand(campaignId = state.activeCampaignId, sessionId = state.activeSessionId) {
     try {
-      const value = JSON.parse(localStorage.getItem(panelRecoveryKey()) || 'null');
-      return value?.campaign_id === state.activeCampaignId && value.session_id === state.activeSessionId
+      const value = JSON.parse(localStorage.getItem(panelRecoveryKey(campaignId, sessionId)) || 'null');
+      return value?.campaign_id === campaignId && value.session_id === sessionId
         && typeof value.operation_id === 'string' ? value : null;
     } catch (_) { return null; }
   }
 
-  function clearPanelRecovery() {
-    localStorage.removeItem(panelRecoveryKey());
-    state.panelRecoveryAbsent = null;
+  // Recheck the originating operation after any await; another campaign or send may now be selected.
+  function clearPanelRecovery(command) {
+    if (pendingPanelCommand(command.campaign_id, command.session_id)?.operation_id !== command.operation_id) return;
+    const key = panelRecoveryKey(command.campaign_id, command.session_id);
+    localStorage.removeItem(key);
+    if (key === panelRecoveryKey()) state.panelRecoveryAbsent = null;
   }
 
   async function recoverPanelAction(retry = false, dismiss = false) {
@@ -4557,12 +4561,12 @@ const SylviaGMFrontend = (() => {
         : await state.bridge.panel_action_receipt(command);
       if (!selectedActivityMatches(activity)) return;
       if (receipt) {
-        clearPanelRecovery();
+        clearPanelRecovery(command);
         selectedStatus(activity, receipt.status === 'awaiting_choice'
           ? 'Action saved; resolve the pending choice.' : 'Recovered the saved action.', 'panels');
         await refreshSelectedCampaign();
       } else if (dismiss) {
-        clearPanelRecovery();
+        clearPanelRecovery(command);
         selectedStatus(activity, 'No saved result was found. The pending send was dismissed.', 'panels');
       } else {
         state.panelRecoveryAbsent = command.operation_id;
@@ -4847,8 +4851,9 @@ const SylviaGMFrontend = (() => {
   function weaponReadinessMarkup(entity) {
     const weapon = entity.weapon;
     if (!weapon || typeof weapon !== 'object') return '';
-    const fields = [Number.isFinite(weapon.magazine?.rounds) ? `Rounds ${weapon.magazine.rounds}` : '',
+    const fields = [Number.isFinite(weapon.magazine?.rounds) ? `${weapon.feed === 'TUBE' ? 'Tube' : 'Rounds'} ${weapon.magazine.rounds}` : '',
       typeof weapon.chamber === 'string' ? `Chamber ${panelIdentifierLabel(weapon.chamber.toLowerCase())}` : '',
+      Number.isFinite(weapon.spare_shells) ? `Spare shells ${weapon.spare_shells}` : '',
       Number.isFinite(weapon.current_recoil) ? `Recoil ${weapon.current_recoil}` : '',
       weapon.needs_cycle === true ? 'Cycle required' : ''].filter(Boolean);
     return fields.length ? `<span class="panel-unit-meta">${fields.map(escapeHtml).join(' · ')}</span>` : '';
@@ -5018,6 +5023,20 @@ const SylviaGMFrontend = (() => {
     const drones = cards.filter((card) => card.drone);
     return cards.filter((card) => !card.drone).map((card) => card.markup).join('') +
       (drones.length ? `<div class="roster-group-label">Drones</div>${drones.map((card) => card.markup).join('')}` : '');
+  }
+
+  // Operator and standing order exactly as projected; absent fields are not inferred.
+  function droneStatusMarkup(entity, names) {
+    const rows = [];
+    if (typeof entity.controlled_by === 'string' && entity.controlled_by)
+      rows.push(`Controlled by ${names(entity.controlled_by)}`);
+    const order = entity.standing_order;
+    if (order && typeof order === 'object' && order.active === true) {
+      rows.push(['Standing order', typeof order.target === 'string' ? names(order.target) : '',
+        typeof order.authorized_fire === 'boolean' ? (order.authorized_fire ? 'fire authorised' : 'fire not authorised') : '',
+        typeof order.collateral_limit === 'string' ? displayIdentifier(order.collateral_limit) : ''].filter(Boolean).join(' · '));
+    }
+    return rows.length ? `<div class="panel-unit-meta drone-status">${rows.map(escapeHtml).join('<br>')}</div>` : '';
   }
 
   // Resource values come from committed state; an absent maximum never becomes a guessed bar.
@@ -5266,7 +5285,10 @@ const SylviaGMFrontend = (() => {
       const weapons = [weapon, ...reserves].filter(Boolean).map((carried) => {
         const weaponName = carried.label || carried.name || carried.profile || carried.id || 'Firearm';
         const ammunition = [
-          Number.isFinite(carried.magazine?.rounds) ? `Magazine: ${carried.magazine.rounds}${Number.isFinite(carried.magazine.capacity) ? ` / ${carried.magazine.capacity}` : ''}` : '',
+          Number.isFinite(carried.magazine?.rounds) ? carried.feed === 'TUBE'
+            ? `Tube: ${carried.magazine.rounds}${Number.isFinite(carried.tube_capacity) ? ` / ${carried.tube_capacity}` : ''}`
+            : `${carried.feed === 'BELT' ? 'Belt' : 'Magazine'}: ${carried.magazine.rounds}${Number.isFinite(carried.magazine.capacity) ? ` / ${carried.magazine.capacity}` : ''}` : '',
+          Number.isFinite(carried.spare_shells) ? `Spare shells: ${carried.spare_shells}` : '',
           carried.chamber != null ? `Chamber: ${typeof carried.chamber === 'object' ? (carried.chamber.loaded ? 'Loaded' : 'Empty') : panelIdentifierLabel(String(carried.chamber).toLowerCase())}` : '',
           typeof carried.location === 'string' ? panelIdentifierLabel(carried.location.toLowerCase()) : '',
           typeof carried.owner_id === 'string' ? `Owner: ${participants.find((item) => item.id === carried.owner_id)?.data?.name || panelIdentifierLabel(carried.owner_id)}` : '',
@@ -5358,7 +5380,8 @@ const SylviaGMFrontend = (() => {
       map_revision: surface.data.map_revision,
     };
     if (!sameRevision) {
-      for (const key of ['destination', 'aim_point', 'area', 'orientation', 'path']) {
+      if (state.tacticalViews[surface.id]) state.tacticalViews[surface.id].laneDraft = null;
+      for (const key of ['destination', 'aim_point', 'area', 'orientation', 'path', 'lane']) {
         delete selection[key];
       }
     }
@@ -5418,6 +5441,190 @@ const SylviaGMFrontend = (() => {
       `top:${offset}px;left:0;width:100%;height:0`;
   }
 
+  // ---- Grid-edge wall editor ----
+  // Walls lie on shared cell borders, like spreadsheet borders: they occupy neither adjoining cell.
+  // Edits are ordinary declared panel actions; the owner allocates every identity and checks joins.
+  const WALL_EDIT_SOURCES = ['edges', 'edge_anchor', 'edge_walls'];
+
+  function isWallEditAction(action) {
+    return Object.values(action?.bindings || {}).some((source) => WALL_EDIT_SOURCES.includes(source));
+  }
+
+  // The bound sources say what an action does; labels stay the Ruleset's own.
+  function wallEditActions(surface) {
+    const actions = {};
+    for (const action of surface?.actions || []) {
+      const sources = Object.values(action.bindings || {});
+      const kind = sources.includes('edge_walls') ? 'connect' : sources.includes('edge_anchor') ? 'extend'
+        : sources.includes('edges') ? 'draw' : null;
+      if (kind && !actions[kind]) actions[kind] = action;
+    }
+    return actions;
+  }
+
+  function wallEditing(view) { return Boolean(view?.wallEdit?.on); }
+
+  function wallEdgeKey(edge) { return edge.flat().join(','); }
+
+  function wallEdgeFromKey(key) {
+    const [x0, y0, x1, y1] = key.split(',').map(Number);
+    return [[x0, y0], [x1, y1]];
+  }
+
+  // Grid vertex indices of one projected grid-edge segment, or null off the drawn grid.
+  function gridEdgeVertices(item, dimensions) {
+    if (item?.volume?.kind !== 'grid_edge') return null;
+    const vertex = (point) => [0, 1].map((axis) =>
+      Math.round((point[axis] - dimensions.lower[axis]) / dimensions.cellSize));
+    const edge = [vertex(item.volume.min), vertex(item.volume.max)].sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+    const inside = edge.every(([x, y]) => x >= 0 && y >= 0 && x <= dimensions.width && y <= dimensions.height);
+    return inside && Math.abs(edge[0][0] - edge[1][0]) + Math.abs(edge[0][1] - edge[1][1]) === 1 ? edge : null;
+  }
+
+  // An 8px hit band centred on the border, so a thin wall stays easy to click and focus.
+  function tacticalGridEdgeStyle(edge) {
+    const [[x0, y0], [x1, y1]] = edge;
+    return x0 === x1 ? `left:${x0 * 32 - 4}px;top:${y0 * 32}px;width:8px;height:${(y1 - y0) * 32}px`
+      : `left:${x0 * 32}px;top:${y0 * 32 - 4}px;width:${(x1 - x0) * 32}px;height:8px`;
+  }
+
+  // Name a border by the cell it bounds, using the grid's 1-based cell labels.
+  function wallEdgeDescription(edge, dimensions) {
+    const [[x0, y0], [x1]] = edge;
+    if (x0 === x1) return x0 < dimensions.width ? `west border of cell ${x0 + 1}, ${y0 + 1}`
+      : `east border of cell ${x0}, ${y0 + 1}`;
+    return y0 < dimensions.height ? `north border of cell ${x0 + 1}, ${y0 + 1}`
+      : `south border of cell ${x0 + 1}, ${y0}`;
+  }
+
+  // The cell border under a map point given in cell units. Corners belong to no border, so a
+  // drag along one border never picks up the perpendicular borders at each vertex it crosses.
+  function nearestGridEdge(gx, gy, dimensions, threshold = 0.35) {
+    const vx = Math.round(gx), hy = Math.round(gy);
+    const dv = Math.abs(gx - vx), dh = Math.abs(gy - hy);
+    const middle = (value) => { const along = value - Math.floor(value); return along >= 0.15 && along <= 0.85; };
+    const vertical = dv <= threshold && middle(gy) && vx >= 0 && vx <= dimensions.width &&
+      gy >= 0 && gy < dimensions.height;
+    const horizontal = dh <= threshold && middle(gx) && hy >= 0 && hy <= dimensions.height &&
+      gx >= 0 && gx < dimensions.width;
+    if (vertical && (!horizontal || dv <= dh)) return [[vx, Math.floor(gy)], [vx, Math.floor(gy) + 1]];
+    return horizontal ? [[Math.floor(gx), hy], [Math.floor(gx) + 1, hy]] : null;
+  }
+
+  function nearGridCorner(gx, gy, threshold = 0.35) {
+    return Math.hypot(gx - Math.round(gx), gy - Math.round(gy)) <= threshold;
+  }
+
+  // The four borders of one cell, keyed by the Shift+Arrow that toggles each.
+  function cellBorder(x, y, key) {
+    return { ArrowUp: [[x, y], [x + 1, y]], ArrowDown: [[x, y + 1], [x + 1, y + 1]],
+      ArrowLeft: [[x, y], [x, y + 1]], ArrowRight: [[x + 1, y], [x + 1, y + 1]] }[key] || null;
+  }
+
+  function wallEdgesConnected(edges) {
+    if (!edges.length) return false;
+    const parent = new Map();
+    const find = (key) => { while (parent.get(key) !== key) key = parent.get(key); return key; };
+    for (const edge of edges) for (const point of edge) parent.set(point.join(','), parent.get(point.join(',')) ?? point.join(','));
+    for (const [a, b] of edges) parent.set(find(a.join(',')), find(b.join(',')));
+    return new Set(edges.map(([a]) => find(a.join(',')))).size === 1;
+  }
+
+  // Everything the editor shows and may submit, computed from the public map and the draft.
+  function wallDraftAnalysis(surface, view, dimensions) {
+    const edit = view.wallEdit || {};
+    const segments = (surface.data.geometry || []).flatMap((item) => {
+      const edge = item.active && item.edge_wall ? gridEdgeVertices(item, dimensions) : null;
+      return edge ? [{ item, edge, key: wallEdgeKey(edge) }] : [];
+    });
+    const walls = new Map();
+    segments.forEach((segment) => {
+      if (!walls.has(segment.item.edge_wall)) walls.set(segment.item.edge_wall, []);
+      walls.get(segment.item.edge_wall).push(segment);
+    });
+    const existing = new Set(segments.map((segment) => segment.key));
+    const keys = (edit.edges || []).filter((key) => !existing.has(key));
+    const edges = keys.map(wallEdgeFromKey);
+    const chosen = (edit.walls || []).filter((wall) => walls.has(wall));
+    const draftPoints = new Set(edges.flat().map((point) => point.join(',')));
+    const touches = (wall) => walls.get(wall).some((segment) => segment.edge.some((point) => draftPoints.has(point.join(','))));
+    const touching = [...walls.keys()].filter(touches);
+    const connected = wallEdgesConnected(edges);
+    const anchor = chosen.length === 1 && edges.length
+      ? walls.get(chosen[0]).find((segment) => segment.edge.some((point) => draftPoints.has(point.join(','))))?.item.id : null;
+    const connectSegments = chosen.flatMap((wall) => walls.get(wall));
+    const label = (wall) => {
+      const members = walls.get(wall);
+      const name = members[0].item.display?.label || 'Wall';
+      return `${name} (${members.length} ${members.length === 1 ? 'segment' : 'segments'})`;
+    };
+    const actions = wallEditActions(surface);
+    const available = (action) => Boolean(action) && panelActionAvailable(surface, action);
+    const enabled = {
+      draw: available(actions.draw) && edges.length > 0 && connected,
+      extend: available(actions.extend) && edges.length > 0 && connected && Boolean(anchor),
+      connect: available(actions.connect) && chosen.length >= 2 && !edges.length &&
+        wallEdgesConnected(connectSegments.map((segment) => segment.edge)),
+    };
+    let guidance;
+    if (!edges.length && !chosen.length) {
+      guidance = 'Click or drag along cell borders to draft a wall. Click an existing wall to select it.';
+    } else if (edges.length && !connected) {
+      guidance = 'Draft borders must join end to end to form one wall.';
+    } else if (chosen.length >= 2 && edges.length) {
+      guidance = 'Clear the draft to connect the selected walls.';
+    } else if (chosen.length >= 2) {
+      guidance = enabled.connect || !available(actions.connect) ? `Connect ${chosen.length} selected walls into one wall.`
+        : 'Selected walls must touch end to end to connect.';
+    } else if (chosen.length === 1 && edges.length) {
+      guidance = anchor ? `The draft touches ${label(chosen[0])}: choose ${actions.extend?.label || 'Extend'} to connect it, ` +
+        `or ${actions.draw?.label || 'New'} to keep it separate.`
+        : `The draft does not touch ${label(chosen[0])}; it can only be saved as a separate wall.`;
+    } else if (chosen.length === 1) {
+      guidance = `${label(chosen[0])} selected. Draft touching borders to extend it, or select another wall to connect.`;
+    } else if (touching.length) {
+      guidance = `The draft touches ${touching.map(label).join(', ')}. Select that wall to extend it, ` +
+        `or save as ${actions.draw?.label || 'a new wall'} to keep it separate.`;
+    } else {
+      guidance = `${edges.length} ${edges.length === 1 ? 'border' : 'borders'} drafted.`;
+    }
+    const ready = Object.entries(actions).some(([, action]) => available(action));
+    if (!ready) guidance = 'Wall changes cannot be saved right now. Wait for the current action or turn to finish.';
+    return { actions, edges, keys, chosen, anchor, enabled, guidance, walls, existing,
+      connectIds: connectSegments.map((segment) => segment.item.id), label };
+  }
+
+  function wallDraftSvg(edges, ghost) {
+    const line = ([[x0, y0], [x1, y1]], kind) =>
+      `<line class="${kind}" x1="${x0 * 32}" y1="${y0 * 32}" x2="${x1 * 32}" y2="${y1 * 32}"/>`;
+    return edges.map((edge) => line(edge, 'wall-draft-edge')).join('') + (ghost ? line(ghost, 'wall-ghost-edge') : '');
+  }
+
+  function wallEditorMarkup(surface, view, analysis) {
+    const { actions, edges, chosen } = analysis;
+    const piece = actions.draw?.edge_segment || actions.extend?.edge_segment;
+    const pieceText = piece?.display ? `${piece.display.label}${piece.display.height_label ? ` · ${piece.display.height_label}` : ''}` +
+      `${Number.isFinite(piece.height) ? ` · ${piece.height} ${surface.data.map.grid.unit || ''}`.trimEnd() : ''}` : '';
+    const direct = Boolean(state.bridge?.execute_panel_action && state.bridge?.preview_panel_action);
+    // Joining is never a default: when New and Extend both apply, neither is emphasised.
+    const ready = Object.keys(analysis.enabled).filter((kind) => analysis.enabled[kind]);
+    const commit = (kind) => actions[kind] ? `<button type="button" class="btn ${ready.length === 1 && ready[0] === kind ? 'btn-primary' : 'btn-secondary'} btn-sm" ` +
+      `data-wall-commit="${kind}" ${analysis.enabled[kind] ? '' : 'disabled'}>${escapeHtml(actions[kind].label || kind)}</button>` : '';
+    const summary = [`Draft: ${edges.length} ${edges.length === 1 ? 'border' : 'borders'}`,
+      chosen.length ? `Selected: ${chosen.map(analysis.label).join(', ')}` : '',
+      pieceText ? `New borders become ${pieceText}` : ''].filter(Boolean).join(' · ');
+    return `<div class="wall-editor" role="region" aria-label="Wall editor">` +
+      `<div class="wall-editor-summary">${escapeHtml(summary)}</div>` +
+      `<div class="wall-editor-guidance" data-wall-editor-status tabindex="-1" role="status" aria-live="polite">` +
+      `${escapeHtml(view.wallEdit.message || analysis.guidance)}</div>` +
+      (direct ? `<div class="wall-editor-actions">${commit('draw')}${commit('extend')}${commit('connect')}` +
+        `<button type="button" class="btn btn-secondary btn-sm" data-wall-clear ${edges.length || chosen.length ? '' : 'disabled'}>Clear</button>` +
+        `<button type="button" class="btn btn-secondary btn-sm" data-tactical-wall-edit>Done</button></div>` +
+        `<p class="wall-editor-keys">Keyboard: focus a cell, then Shift+Arrow toggles that border. ` +
+        `Enter on a wall selects it. Esc clears the draft.</p>`
+        : `<p class="wall-editor-keys">Edit walls from the map in the main Sylvia window.</p>`) + '</div>';
+  }
+
   function tacticalOccupiedCellsStyle(volume, dimensions) {
     const minX = Math.max(0, Math.floor(
       (volume.min[0] - dimensions.lower[0]) / dimensions.cellSize
@@ -5453,15 +5660,19 @@ const SylviaGMFrontend = (() => {
     return {
       label,
       heightText,
-      footprintSize: [0, 1].map((axis) =>
-        Number((item.volume.max[axis] - item.volume.min[axis]).toPrecision(12))
-      ).join(' × ') + (unit ? ` ${unit}` : ''),
+      footprintSize: item.volume.kind === 'grid_edge'
+        ? `${Number(Math.max(...[0, 1].map((axis) => item.volume.max[axis] - item.volume.min[axis])).toPrecision(12))}` +
+          `${unit ? ` ${unit}` : ''} along one cell border, no thickness`
+        : [0, 1].map((axis) =>
+          Number((item.volume.max[axis] - item.volume.min[axis]).toPrecision(12))
+        ).join(' × ') + (unit ? ` ${unit}` : ''),
       material: typeof display.material_label === 'string' && display.material_label.trim()
         ? display.material_label.trim() : 'Not specified',
       shortHeight: `${shortHeight}${unit ? ` ${unit}` : ''}`,
       authoredHeight,
       occupiesCells: item.occupies_cells !== false,
-      footprint: item.occupies_cells !== false ? `${reservedCells} reserved grid ${reservedCells === 1 ? 'cell' : 'cells'}` : 'Physical edge barrier',
+      footprint: item.occupies_cells !== false ? `${reservedCells} reserved grid ${reservedCells === 1 ? 'cell' : 'cells'}`
+        : item.volume.kind === 'grid_edge' ? 'Wall on a shared cell border; neither cell is occupied' : 'Physical edge barrier',
       movement: item.movement || 'unspecified',
       visibility: item.visibility || 'unspecified',
     };
@@ -5505,6 +5716,7 @@ const SylviaGMFrontend = (() => {
     if (missing.has('actor')) prompts.push('Choose an acting character');
     if (missing.has('target')) prompts.push('Select a target');
     if (missing.has('zone')) prompts.push('Select a zone');
+    if (missing.has('lane')) prompts.push('Choose the lane pattern, direction, extent and width');
     if (missing.has('device')) prompts.push('Select a device');
     if (['destination', 'area', 'orientation'].some((source) => missing.has(source)) ||
         (missing.has('aim_point') && !missing.has('target'))) prompts.push(surface.renderer === 'coordinate_map' ? 'Select a map point' : 'Select a map cell');
@@ -5518,6 +5730,100 @@ const SylviaGMFrontend = (() => {
       ((point[0] - dimensions.lower[0]) / dimensions.cellSize) * 32,
       ((point[1] - dimensions.lower[1]) / dimensions.cellSize) * 32,
     ];
+  }
+
+  // Project intentions, never future legality. Only a current owner receipt confirms a result.
+  function tacticalPlanningDetails(surface, dimensions, queue, revision, busy = false) {
+    const empty = { svg: '', rows: [], notice: '' };
+    if (!queue || queue.campaign_id !== state.activeCampaignId ||
+        queue.session_id !== state.activeSessionId) return empty;
+    if (busy) return { ...empty, notice: 'Updating intentions; waiting for the owner.' };
+    const current = queue.expected_revision === revision;
+    const ready = current && queue.status === 'ready';
+    const entities = surface.data.entities || [];
+    const entity = id => id != null && entities.find(item => item.id === id || item.actor_ref === id || item.participant_ref === id);
+    const center = item => {
+      const point = item && tacticalWorldPoint(item.position, dimensions);
+      return point;
+    };
+    const positions = new Map(), rows = [], drawings = [];
+    for (const [index, step] of (queue.steps || []).slice(0, 32).entries()) {
+      if (step.source?.kind !== 'panel' || step.source.surface_id !== surface.id) continue;
+      const action = surface.actions?.find(item => item.id === step.source.action_id);
+      const actor = entity(step.actor), origin = center(actor);
+      if (!action || !actor || !origin) continue;
+      const number = index + 1;
+      const receiptRevision = step.committed_revision ?? (step.receipt?.status === 'committed'
+        ? step.receipt.resulting_revision : null);
+      if (step.status === 'committed' && receiptRevision === revision && current) {
+        const label = `Confirmed ${number}: ${step.actor_name || actor.display?.label || actor.id} · ${step.label}`;
+        drawings.push(`<g class="map-plan-confirmed"><title>${escapeHtml(label)}</title>` +
+          `<circle cx="${origin[0]}" cy="${origin[1]}" r="15"/>` +
+          `<text x="${origin[0] + 17}" y="${origin[1] - 12}">✓${number}</text></g>`);
+        rows.push(label);
+        continue;
+      }
+      if (!ready || step.status !== 'pending') continue;
+      const selection = step.selection || {};
+      const destinationBinding = action.bindings?.destination;
+      const moving = ['destination', 'aim_point'].includes(destinationBinding);
+      let point = moving ? selection[destinationBinding] : selection.aim_point;
+      if (moving && surface.renderer === 'tactical_grid') {
+        if (!Array.isArray(point) || point.length !== 2 || !point.every(Number.isInteger) ||
+            point[0] < 0 || point[1] < 0 || point[0] >= dimensions.width || point[1] >= dimensions.height) continue;
+        point = [dimensions.lower[0] + (point[0] + 0.5) * dimensions.cellSize,
+          dimensions.lower[1] + (point[1] + 0.5) * dimensions.cellSize, dimensions.lower[2]];
+      }
+      const target = entity(selection.target);
+      const endpoint = tacticalWorldPoint(point, dimensions) || (!moving && center(target));
+      if (!endpoint || endpoint[0] < 0 || endpoint[1] < 0 ||
+          endpoint[0] > dimensions.width * 32 || endpoint[1] > dimensions.height * 32) continue;
+      const start = positions.get(actor.id) || origin;
+      const location = moving ? ` · ${destinationBinding === 'destination' ? 'cell' : 'point'} ${JSON.stringify(selection[destinationBinding])}` : '';
+      const label = `Queued ${number}: ${step.actor_name || actor.display?.label || actor.id} · ${step.label} · unvalidated intent${location}`;
+      const [x, y] = endpoint;
+      drawings.push(`<g class="map-plan-intent${moving ? ' map-plan-ghost' : ''}"><title>${escapeHtml(label)}</title>` +
+        `<line x1="${start[0]}" y1="${start[1]}" x2="${x}" y2="${y}"/>` +
+        `<path d="M ${x} ${y - 12} L ${x + 12} ${y} L ${x} ${y + 12} L ${x - 12} ${y} Z"/>` +
+        `<text x="${x}" y="${y + 4}" text-anchor="middle">${moving ? 'G' : 'Q'}${number}</text></g>`);
+      rows.push(label + (step.warning ? ' · Needs review' : ''));
+      if (moving) positions.set(actor.id, endpoint);
+    }
+    return { svg: drawings.join(''), rows, notice: !current ? 'Queue is out of date; review remaining intentions.' :
+      queue.status === 'running' ? 'Action outcome is not yet confirmed; waiting for the owner receipt.' :
+      !['ready', 'completed'].includes(queue.status) && !resolvedChoicePause(queue)
+        ? 'Queue stopped; inspect its saved decision before continuing.' : '' };
+  }
+
+  function tacticalPlanning(surface, dimensions) {
+    const view = state.panelProjection?.surfaces.find(item => item.id === ACTION_QUEUE_PANEL_ID)?.data;
+    return tacticalPlanningDetails(surface, dimensions, view?.queue || state.actionSequence,
+      state.panelProjection?.revision, Boolean(view?.busy));
+  }
+
+  function tacticalPlanningSummary(planning) {
+    return `<div class="map-planning-key">P: dashed preview · ◇ G1…: ghost unit · ◇ Q1…: queued target · ✓: confirmed</div>` +
+      (planning.notice ? `<p class="map-planning-notice" role="status">${escapeHtml(planning.notice)}</p>` : '') +
+      (planning.rows.length ? `<details class="map-planning-details"><summary>Map intentions and results (${planning.rows.length})</summary>` +
+        `<p>Ghosts and dashed intention lines do not validate routes, costs or future actions. Execute rechecks each action.</p>` +
+        `<ol>${planning.rows.map(row => `<li>${escapeHtml(row)}</li>`).join('')}</ol></details>` : '');
+  }
+
+  // Draw only the owner's rasterized cells; the renderer never substitutes a bounding box.
+  function tacticalLaneSvg(lane, dimensions) {
+    const shape = lane?.shape;
+    if (shape?.kind !== 'grid_cells' || !Array.isArray(shape.cells)) return '';
+    const cells = shape.cells.map(([x, y]) => {
+      const point = tacticalWorldPoint([shape.origin[0] + x * shape.cell_size,
+        shape.origin[1] + y * shape.cell_size, shape.min_elevation], dimensions);
+      const size = shape.cell_size / dimensions.cellSize * 32;
+      return `<rect class="tactical-lane-preview-cell" x="${point[0]}" y="${point[1]}" width="${size}" height="${size}"/>`;
+    }).join('');
+    const origin = tacticalWorldPoint(lane.lane?.origin, dimensions);
+    const direction = { east: [1, 0], south: [0, 1], west: [-1, 0], north: [0, -1] }[lane.lane?.direction];
+    return `<g class="tactical-lane-preview"><title>${escapeHtml(lane.label || 'Selected lane')}</title>${cells}` +
+      (origin && direction ? `<circle cx="${origin[0]}" cy="${origin[1]}" r="9" class="tactical-lane-origin"/>` +
+        `<line x1="${origin[0]}" y1="${origin[1]}" x2="${origin[0] + direction[0] * 29}" y2="${origin[1] + direction[1] * 29}" class="tactical-lane-direction"/>` : '') + '</g>';
   }
 
   function tacticalMapPreviewDetails(mapPreview, dimensions) {
@@ -5543,13 +5849,18 @@ const SylviaGMFrontend = (() => {
         `cy="${point[1]}" r="3"></circle>`).join('');
     return {
       highlighted,
-      svg: (pathPoints.length > 1
+      svg: tacticalLaneSvg(mapPreview.grid_lane, dimensions) + (pathPoints.length > 1
         ? `<polyline class="tactical-preview-route" points="${pathPoints.map(
           (point) => `${point[0]},${point[1]}`
         ).join(' ')}"></polyline>` : '') +
         (rayOrigin && rayDestination ? `<line class="tactical-preview-ray" ` +
           `x1="${rayOrigin[0]}" y1="${rayOrigin[1]}" x2="${rayDestination[0]}" ` +
-          `y2="${rayDestination[1]}"></line>` : '') + contactMarkers + zoneMarkers,
+          `y2="${rayDestination[1]}"></line>` : '') +
+        ((rayDestination || pathPoints.at(-1)) ? (() => {
+          const [x, y] = rayDestination || pathPoints.at(-1);
+          return `<g class="tactical-preview-target"><circle cx="${x}" cy="${y}" r="10"/>` +
+            `<text x="${x + 12}" y="${y - 10}">P</text></g>`;
+        })() : '') + contactMarkers + zoneMarkers,
     };
   }
 
@@ -5750,6 +6061,8 @@ const SylviaGMFrontend = (() => {
       '<span>Map effects</span><ul>' + Array.from(entries.values()).join('') + '</ul></div>' : '';
   }
 
+  // The one cell Tab enters: the last cell focused in this map view, else the chosen destination,
+  // else the acting unit's cell, else the first cell. Arrow keys move focus between cells.
   function tacticalFocusKey(surface) {
     return surface ? JSON.stringify([state.activeCampaignId, state.activeSessionId, surface.id,
       surface.data?.map?.id || surface.id]) : null;
@@ -5770,7 +6083,7 @@ const SylviaGMFrontend = (() => {
     return inside(cell) ? cell : [0, 0];
   }
 
-  function renderTacticalGridPanel(data, surfaceId) {
+  function renderTacticalGridPanel(data, surfaceId, intentControls = '') {
     if (typeof data?.unavailable_reason === 'string') {
       return `<div class="panel-empty" role="status">${escapeHtml(data.unavailable_reason)}</div>`;
     }
@@ -5791,15 +6104,26 @@ const SylviaGMFrontend = (() => {
     };
     const currentMapPreview = surface ? tacticalCurrentMapPreview(surface, previewState.check) : null;
     const previewDetails = tacticalMapPreviewDetails(currentMapPreview, dimensions);
+    const planning = surface ? tacticalPlanning(surface, dimensions) : { svg: '', rows: [], notice: '' };
+    const wallActions = surface && !continuous ? wallEditActions(surface) : {};
+    const canEditWalls = Object.keys(wallActions).length > 0;
+    if (!canEditWalls) view.wallEdit = null;
+    const editing = canEditWalls && wallEditing(view);
+    const wallAnalysis = editing ? wallDraftAnalysis(surface, view, dimensions) : null;
+    if (wallAnalysis) {
+      view.wallEdit.edges = wallAnalysis.keys;
+      view.wallEdit.walls = wallAnalysis.chosen;
+    }
     const cells = [];
     const entry = continuous ? null : tacticalEntryCell(view, selection, surface, dimensions);
     for (let y = 0; !continuous && y < dimensions.height; y += 1) {
       for (let x = 0; x < dimensions.width; x += 1) {
-        const selected = Array.isArray(selection.destination) &&
+        const selected = !editing && Array.isArray(selection.destination) &&
           selection.destination[0] === x && selection.destination[1] === y;
         cells.push(`<button type="button" class="tactical-cell${selected ? ' selected' : ''}" ` +
           `tabindex="${entry[0] === x && entry[1] === y ? 0 : -1}" ` +
           `data-tactical-cell="${x},${y}" data-cell-x="${x}" data-cell-y="${y}" ` +
+          (editing ? 'aria-keyshortcuts="Shift+ArrowUp Shift+ArrowDown Shift+ArrowLeft Shift+ArrowRight" ' : '') +
           `aria-label="Cell ${x + 1}, ${y + 1}" aria-pressed="${selected}"></button>`);
       }
     }
@@ -5809,13 +6133,31 @@ const SylviaGMFrontend = (() => {
         `top:${cell[1] * 32}px" title="Terrain cost ${escapeHtml(item.cost)}"></span>`;
     }).join('') : '';
     const geometry = Array.isArray(data.geometry) ? data.geometry.map((item) => {
-      if (!item.active || !item.volume || item.volume.kind !== 'box') return '';
+      if (!item.active || !item.volume || !['box', 'grid_edge'].includes(item.volume.kind)) return '';
       const kind = String(item.display && item.display.kind || 'barrier')
         .toLowerCase().replace(/[^a-z0-9_-]/g, '');
       const info = tacticalGeometryInfo(item, data);
       const selected = view.selectedGeometry === item.id;
       const heightDescription = info.authoredHeight
         ? `${info.authoredHeight}, ${info.heightText} high` : `${info.heightText} high`;
+      if (item.volume.kind === 'grid_edge') {
+        const edge = !continuous && gridEdgeVertices(item, dimensions);
+        if (!edge) return '';
+        const chosen = editing && wallAnalysis.chosen.includes(item.edge_wall);
+        const pressed = editing ? chosen : selected;
+        const [[x0], [x1]] = edge;
+        return `<button type="button" class="tactical-geometry tactical-${escapeHtml(kind)} edge-barrier grid-edge ` +
+          `${x0 === x1 ? 'vertical' : 'horizontal'}${selected && !editing ? ' selected' : ''}${chosen ? ' wall-chosen' : ''}` +
+          `${previewDetails.highlighted.has(String(item.id)) ? ' preview-highlight' : ''}" ` +
+          `aria-label="${escapeHtml(info.label)}, ${escapeHtml(heightDescription)}, wall on the ` +
+          `${escapeHtml(wallEdgeDescription(edge, dimensions))}${editing ? ', select for wall editing' : ''}" ` +
+          `aria-pressed="${pressed}" title="${escapeHtml(info.label)} · ${escapeHtml(heightDescription)}" ` +
+          `data-tactical-geometry="${escapeHtml(item.id)}" data-edge-wall="${escapeHtml(item.edge_wall || item.id)}" ` +
+          `style="${tacticalGridEdgeStyle(edge)}"><span class="tactical-edge-line" aria-hidden="true"></span>` +
+          `<span class="tactical-height-indicator" aria-hidden="true">${escapeHtml(info.shortHeight)}</span>` +
+          `<span class="tactical-cover-label" aria-hidden="true">${escapeHtml(info.label)} · ` +
+          `${escapeHtml(info.authoredHeight || info.heightText)}</span></button>`;
+      }
       const occupiedCells = !continuous && info.occupiesCells
         ? `<span class="tactical-occupied-cells" aria-hidden="true" ` +
           `style="${tacticalOccupiedCellsStyle(item.volume, dimensions)}"></span>` : '';
@@ -5848,6 +6190,19 @@ const SylviaGMFrontend = (() => {
           `aria-label="${escapeHtml([item.display.label, item.display.state].filter(Boolean).join(' · '))}" ` +
           `title="${escapeHtml(item.display.label)} · ${escapeHtml(item.display.state || '')} · height ${escapeHtml(shape.height)}" ` +
           `style="${tacticalBoxStyle(box, dimensions)}"></span>`;
+      }
+      if (item.shape.kind === 'grid_cells') {
+        const shape = item.shape;
+        const label = [item.display.label, item.display.state || 'declared'].join(' · ');
+        const cells = shape.cells.map(([x, y]) => `<span class="tactical-zone tactical-lane-cell${item.display.state === 'armed' ? ' armed' : ' inactive'}" ` +
+          `aria-label="${escapeHtml(label)}" title="${escapeHtml(label)}" style="${tacticalBoxStyle({
+            min: [shape.origin[0] + x * shape.cell_size, shape.origin[1] + y * shape.cell_size],
+            max: [shape.origin[0] + (x + 1) * shape.cell_size, shape.origin[1] + (y + 1) * shape.cell_size],
+          }, dimensions)}"></span>`).join('');
+        const origin = item.lane?.origin;
+        const arrow = {east:'→',south:'↓',west:'←',north:'↑'}[item.lane?.direction] || '';
+        return cells + (origin ? `<span class="tactical-lane-anchor" aria-label="${escapeHtml(label)} origin" ` +
+          `style="${tacticalPositionStyle(origin, dimensions)}">${arrow}</span>` : '');
       }
       if (item.shape.kind !== 'box') return '';
       return `<span class="tactical-zone${tacticalZoneStateClass(item)}" ` +
@@ -5894,6 +6249,21 @@ const SylviaGMFrontend = (() => {
       return `${entity?.display?.label || id}${posture ? ` (${posture})` : ''}`;
     };
     const actorOptions = data.entities.filter((entity) => tacticalControlsActor(surface, entity.id));
+    const usesLane = Object.values(previewState.action?.bindings || {}).includes('lane');
+    const armedLane = data.zones?.find(zone => zone.lane && zone.display?.state === 'armed' &&
+      zone.lane.origin?.every((value, index) => value === data.entities.find(e => e.id === selection.actor)?.position?.[index]));
+    const laneDraft = view.laneDraft || selection.lane?.[0] || armedLane?.lane || {};
+    const lanePicker = usesLane ? `<fieldset class="map-lane-inputs"><legend>${escapeHtml(armedLane ?
+      `Armed · ${armedLane.display.label}` : 'Shooter-origin Overwatch')}</legend>` +
+      `<span>Origin: ${escapeHtml(selection.actor ? selectedEntityLabel(selection.actor) : 'Choose a shooter')}</span>` +
+      `<label>Pattern<select data-tactical-lane="pattern" aria-label="Lane pattern"><option value="">Choose pattern</option>` +
+      [['lane', 'Rows / columns'], ['triangle', 'Triangle']].map(([id, label]) =>
+        `<option value="${id}" ${laneDraft.pattern === id ? 'selected' : ''}>${label}</option>`).join('') + `</select></label>` +
+      `<label>Direction<select data-tactical-lane="direction" aria-label="Lane direction"><option value="">Choose direction</option>` +
+      ['east', 'south', 'west', 'north'].map(id => `<option value="${id}" ${laneDraft.direction === id ? 'selected' : ''}>${id}</option>`).join('') + `</select></label>` +
+      `<label>Forward cells<input type="number" data-tactical-lane="extent" aria-label="Lane forward cells" min="1" max="2048" step="1" value="${escapeHtml(laneDraft.extent ?? '')}"></label>` +
+      `<label>Width in cells<input type="number" data-tactical-lane="width" aria-label="Lane width in cells" min="1" max="4097" step="2" value="${escapeHtml(laneDraft.width ?? (laneDraft.half_width == null ? '' : laneDraft.half_width * 2 + 1))}"></label>` +
+      `<small>Choose an odd width: 1 is a single row or column. Geometry is author-configured; no class width grant or width penalty is assigned. Changing your lane pays setup again. Each shooter keeps their own watch; cancel ends yours without a refund.</small></fieldset>` : '';
     const usesZone = Object.values(previewState.action?.bindings || {}).includes('zone');
     const zonePicker = usesZone ? `<label>Zone <select data-tactical-zone aria-label="Prepared fire zone">` +
       `<option value="">Select zone</option>` + (data.zones || []).map((zone) =>
@@ -5906,7 +6276,8 @@ const SylviaGMFrontend = (() => {
         `${escapeHtml(entityLabel(entity.id))}</option>`).join('') + `</select></label>` : '';
     const scope = state.panelProjection && state.panelProjection.player_control;
     const selectedGeometry = Array.isArray(data.geometry) && data.geometry.find(
-      (item) => item.active && item.id === view.selectedGeometry && item.volume && item.volume.kind === 'box'
+      (item) => item.active && item.id === view.selectedGeometry && item.volume &&
+        (item.volume.kind === 'box' || (!continuous && item.volume.kind === 'grid_edge'))
     );
     const geometryInspection = selectedGeometry ? (() => {
       const info = tacticalGeometryInfo(selectedGeometry, data);
@@ -5950,15 +6321,21 @@ const SylviaGMFrontend = (() => {
         `${selection.actor ? '' : 'disabled'} aria-label="Focus on ${escapeHtml(selection.actor ? entityLabel(selection.actor) : 'selected character')}">Focus</button>` +
       `<button type="button" class="btn btn-secondary btn-sm" data-tactical-cover-info ` +
       `aria-pressed="${Boolean(view.coverInfo)}">Cover info</button>` +
+      `<button type="button" class="btn btn-secondary btn-sm" data-tactical-clear-preview>Clear preview</button>` +
+      (canEditWalls ? `<button type="button" class="btn btn-secondary btn-sm" data-tactical-wall-edit ` +
+        `aria-pressed="${editing}">Edit walls</button>` : '') +
       `<button type="button" class="btn btn-secondary btn-sm map-offview" data-map-offview aria-expanded="${Boolean(view.overview)}" hidden></button>` +
       (continuous ? '' : shotControlsMarkup()) +
       '</div>' +
-      (usesZone || usesDevice ? `<div class="map-action-inputs">${zonePicker}${devicePicker}</div>` : '') +
+      (editing ? wallEditorMarkup(surface, view, wallAnalysis) : '') +
+      (usesZone || usesDevice || usesLane ? `<div class="map-action-inputs">${lanePicker}${zonePicker}${devicePicker}</div>` : '') +
       (selectedText ? `<div class="tactical-selection-summary" aria-live="polite">${escapeHtml('Target: ' + entityLabel(selection.target))}</div>` : '') +
       `<div class="tactical-scroll" tabindex="0" ` +
-       `aria-label="${continuous ? 'Coordinate map; click to select a point, drag to pan' : 'Tactical grid; drag to pan, arrow keys move cell focus'}">` +
+       `aria-label="${continuous ? 'Coordinate map; click to select a point, drag to pan' : editing
+         ? 'Tactical grid wall editor; click or drag along cell borders to draft a wall, arrow keys move cell focus'
+         : 'Tactical grid; drag to pan, arrow keys move cell focus'}">` +
        tacticalOverviewMarkup(data, dimensions) +
-       `<div class="tactical-world${continuous ? ' coordinate-world' : ''}${view.coverInfo ? ' show-cover-info' : ''}" ` +
+       `<div class="tactical-world${continuous ? ' coordinate-world' : ''}${view.coverInfo ? ' show-cover-info' : ''}${editing ? ' wall-editing' : ''}" ` +
       `style="width:${dimensions.width * 32}px;` +
       `height:${dimensions.height * 32}px;--tactical-zoom:${view.zoom}">` +
        cells.join('') + terrain + zones + geometry + objectives + entities +
@@ -5967,16 +6344,22 @@ const SylviaGMFrontend = (() => {
       `<svg class="tactical-map-preview-overlay" data-tactical-map-preview-overlay ` +
       `viewBox="0 0 ${dimensions.width * 32} ${dimensions.height * 32}" ` +
       `aria-hidden="true">${previewDetails.svg}</svg>` +
+      `<svg class="tactical-map-preview-overlay map-planning-overlay" data-tactical-planning-overlay ` +
+      `viewBox="0 0 ${dimensions.width * 32} ${dimensions.height * 32}" aria-hidden="true">${planning.svg}</svg>` +
+      (editing ? `<svg class="tactical-map-preview-overlay wall-draft-overlay" data-wall-draft-overlay ` +
+        `viewBox="0 0 ${dimensions.width * 32} ${dimensions.height * 32}" aria-hidden="true">` +
+        `${wallDraftSvg(wallAnalysis.edges, null)}</svg>` : '') +
       `<svg class="tactical-shot-overlay" data-shot-overlay ` +
       `viewBox="0 0 ${dimensions.width * 32} ${dimensions.height * 32}" ` +
       `aria-hidden="true"></svg></div></div>` +
+       `<div data-tactical-planning-summary>${tacticalPlanningSummary(planning)}</div>` +
        `<details class="map-detail-controls map-choice-fallback"><summary>Map tools</summary><span class="map-revision">Saved map revision ${escapeHtml(data.map_revision)}</span>${secondaryChoices}` +
       (continuous ? coordinatePointControls(data, selection) : '') + geometryInspection + tacticalZoneLegend(data.zones) +
       (networkReturns ? `<div class="network-return-list">${networkReturns}</div>` : '') + '</details>' +
       (continuous && !previewState.actions.length ? '' :
-        `<div class="tactical-preview" data-tactical-preview aria-live="polite">` +
+        `<div class="map-intent-card"><div class="tactical-preview" data-tactical-preview aria-live="polite">` +
         (surface ? tacticalPreviewMarkup(surface, view) : 'No Ruleset map preview is available.') +
-        `</div>`);
+        `</div>${intentControls}</div>`);
   }
 
   // Occupied space uses the owner's declared diameter; physical clearance remains separate.
@@ -6008,6 +6391,11 @@ const SylviaGMFrontend = (() => {
 
   function updateTacticalSelection(surface, patch) {
     const selection = tacticalSelection(surface);
+    if (Object.hasOwn(patch, 'actor') && patch.actor !== selection.actor) {
+      delete selection.lane;
+      if (state.tacticalViews[surface.id]) state.tacticalViews[surface.id].laneDraft = null;
+      patch = { ...patch, lane: null };
+    }
     Object.assign(selection, patch);
     gamePanels().choose(surface.id, patch);
   }
@@ -6167,6 +6555,149 @@ const SylviaGMFrontend = (() => {
     tacticalResizeObservers.clear();
   }
 
+  // Draft borders by pointer or keyboard, choose walls, then commit one explicit owner edit.
+  // The draft lives only in this view; nothing reaches the campaign until a commit succeeds.
+  function wireWallEditor(panel, surface, projection, view, dimensions, continuous) {
+    const actions = continuous ? {} : wallEditActions(surface);
+    const none = { escape() {}, toggleWall() {}, toggleCellBorder() {} };
+    if (!Object.keys(actions).length) return none;
+    const rerender = (focus = null) => {
+      renderRulesetPanelProjection(projection);
+      if (focus) document.querySelector(`.ruleset-panel[data-panel-id="${CSS.escape(surface.id)}"] ${focus}`)
+        ?.focus({ preventScroll: true });
+    };
+    const fresh = () => ({ on: true, edges: [], walls: [], message: '' });
+    const edit = () => view.wallEdit;
+    panel.querySelectorAll('[data-tactical-wall-edit]').forEach((button) => button.addEventListener('click', () => {
+      view.wallEdit = wallEditing(view) ? null : fresh();
+      rerender('.tactical-toolbar [data-tactical-wall-edit]');
+    }));
+    const controls = {
+      escape() {
+        const current = edit();
+        if (current.edges.length || current.walls.length) {
+          view.wallEdit = { ...fresh(), message: 'Draft cleared.' };
+          rerender();
+        } else {
+          view.wallEdit = null;
+          rerender('.tactical-toolbar [data-tactical-wall-edit]');
+        }
+      },
+      toggleWall(wall, geometryId) {
+        const current = edit();
+        current.walls = current.walls.includes(wall) ? current.walls.filter((item) => item !== wall)
+          : [...current.walls, wall];
+        current.message = '';
+        rerender(`[data-tactical-geometry="${CSS.escape(geometryId)}"]`);
+      },
+      toggleCellBorder(x, y, key) {
+        const edge = cellBorder(x, y, key);
+        const analysis = wallDraftAnalysis(surface, view, dimensions);
+        const current = edit();
+        const id = wallEdgeKey(edge);
+        const where = wallEdgeDescription(edge, dimensions);
+        if (analysis.existing.has(id)) {
+          current.message = `The ${where} already has a wall. Select that wall to extend or connect it.`;
+        } else {
+          const adding = !current.edges.includes(id);
+          current.edges = adding ? [...current.edges, id] : current.edges.filter((item) => item !== id);
+          current.message = `${adding ? 'Added' : 'Removed'} the ${where} ${adding ? 'to' : 'from'} the draft ` +
+            `(${current.edges.length} ${current.edges.length === 1 ? 'border' : 'borders'}).`;
+        }
+        rerender(`[data-tactical-cell="${x},${y}"]`);
+      },
+    };
+    if (!wallEditing(view)) return controls;
+    panel.querySelector('[data-wall-clear]')?.addEventListener('click', () => {
+      view.wallEdit = { ...fresh(), message: 'Draft cleared.' };
+      rerender('[data-wall-editor-status]');
+    });
+    panel.querySelectorAll('[data-wall-commit]').forEach((button) => button.addEventListener('click', async () => {
+      const kind = button.dataset.wallCommit;
+      const action = actions[kind];
+      const analysis = wallDraftAnalysis(surface, view, dimensions);
+      if (button.disabled || !action || !analysis.enabled[kind] || !state.activeCampaignId || !state.activeSnapshot ||
+          selectedSessionIsWorking() || !state.bridge.execute_panel_action || !state.bridge.preview_panel_action) return;
+      const selection = { map_revision: surface.data.map_revision, ...(kind === 'connect'
+        ? { edge_walls: analysis.connectIds }
+        : { edges: analysis.edges, ...(kind === 'extend' ? { edge_anchor: [analysis.anchor] } : {}) }) };
+      const count = analysis.edges.length;
+      const saved = kind === 'connect' ? `Connected ${analysis.chosen.length} walls into one wall.`
+        : `Saved ${count} ${count === 1 ? 'border' : 'borders'} as ${kind === 'extend' ? 'part of the selected wall' : 'a new wall'}.`;
+      // The pressed button is disabled while the owner works; keep keyboard focus on the result line.
+      const statusLine = panel.querySelector('[data-wall-editor-status]');
+      if (statusLine) { statusLine.textContent = 'Saving…'; statusLine.focus({ preventScroll: true }); }
+      const activity = selectedActivity();
+      await runPanelAction(projection, surface, action, selection, button,
+        { activity, campaignId: state.activeCampaignId, sessionId: state.activeSessionId },
+        { direct: true, completed: 'Wall saved', failed: 'Wall not saved', unconfirmed: 'Wall save unconfirmed',
+          onCommitted: () => { view.wallEdit = { ...fresh(), message: saved }; },
+          onRefused: (reason) => { if (view.wallEdit) view.wallEdit.message = `Not saved. ${reason}`; },
+          onUncertain: (reason) => { if (view.wallEdit) view.wallEdit.message =
+            `Save unconfirmed. Recover action before trying again. ${reason}`; } });
+      if (selectedActivityMatches(activity)) {
+        document.querySelector(`.ruleset-panel[data-panel-id="${CSS.escape(surface.id)}"] [data-wall-editor-status]`)
+          ?.focus({ preventScroll: true });
+      }
+    }));
+    // Pointer drafting: press near a border, then drag along borders to add (or erase) a run.
+    const world = panel.querySelector('.tactical-world');
+    const overlay = panel.querySelector('[data-wall-draft-overlay]');
+    if (!world || !overlay) return controls;
+    const existing = wallDraftAnalysis(surface, view, dimensions).existing;
+    const gridPoint = (event) => {
+      const rect = world.getBoundingClientRect();
+      return rect.width && rect.height ? [(event.clientX - rect.left) / rect.width * dimensions.width,
+        (event.clientY - rect.top) / rect.height * dimensions.height] : null;
+    };
+    const edgeAt = (event, threshold) => {
+      const point = gridPoint(event);
+      const edge = point && nearestGridEdge(point[0], point[1], dimensions, threshold);
+      return edge && !existing.has(wallEdgeKey(edge)) ? edge : null;
+    };
+    const redraw = (ghost) => {
+      overlay.innerHTML = wallDraftSvg(edit().edges.map(wallEdgeFromKey), ghost);
+    };
+    let paint = null;
+    world.addEventListener('pointerdown', (event) => {
+      if (event.button !== 0 || !event.isPrimary || event.target.closest?.('[data-tactical-entity]')) return;
+      const edge = edgeAt(event, 0.35);
+      const point = gridPoint(event);
+      const corner = Boolean(point && nearGridCorner(point[0], point[1]));
+      // A corner (including a wall's end) starts a drawing drag; a wall's middle selects it on
+      // click; a press inside a cell pans the map.
+      if (!corner && (!edge || event.target.closest?.('[data-tactical-geometry]'))) return;
+      event.stopPropagation();
+      event.preventDefault();
+      const id = edge && wallEdgeKey(edge);
+      paint = { pointerId: event.pointerId, add: !id || !edit().edges.includes(id) };
+      if (id) edit().edges = paint.add ? [...edit().edges, id] : edit().edges.filter((item) => item !== id);
+      edit().message = '';
+      world.setPointerCapture?.(event.pointerId);
+      redraw(null);
+    });
+    world.addEventListener('pointermove', (event) => {
+      const edge = edgeAt(event, paint ? 0.3 : 0.35);
+      if (paint && paint.pointerId === event.pointerId && edge) {
+        const id = wallEdgeKey(edge);
+        const present = edit().edges.includes(id);
+        if (paint.add && !present) edit().edges = [...edit().edges, id];
+        if (!paint.add && present) edit().edges = edit().edges.filter((item) => item !== id);
+      }
+      redraw(paint ? null : edge);
+    });
+    const finish = (event) => {
+      if (!paint || paint.pointerId !== event.pointerId) return;
+      paint = null;
+      if (world.hasPointerCapture?.(event.pointerId)) world.releasePointerCapture(event.pointerId);
+      rerender();
+    };
+    world.addEventListener('pointerup', finish);
+    world.addEventListener('pointercancel', finish);
+    world.addEventListener('pointerleave', () => { if (!paint) redraw(null); });
+    return controls;
+  }
+
   function wireTacticalGrid(container, projection, previewHeights = new Map()) {
     container.querySelectorAll('[data-panel-id]').forEach((panel) => {
       const surface = projection.surfaces.find((entry) => entry.id === panel.dataset.panelId);
@@ -6186,6 +6717,18 @@ const SylviaGMFrontend = (() => {
       }
       const maximumScrollLeft = () => Math.max(0, scroll.scrollWidth - scroll.clientWidth);
       const maximumScrollTop = () => Math.max(0, scroll.scrollHeight - scroll.clientHeight);
+      const clearPreview = () => {
+        updateTacticalSelection(surface, { destination: null, target: null, aim_point: null,
+          area: null, orientation: null, path: null, device: null, zone: null });
+        renderRulesetPanelProjection(projection);
+      };
+      panel.querySelector('[data-tactical-clear-preview]')?.addEventListener('click', clearPreview);
+      const wallControls = wireWallEditor(panel, surface, projection, view, dimensions, continuous);
+      scroll.addEventListener('keydown', event => {
+        if (event.key !== 'Escape') return;
+        event.preventDefault();
+        if (wallEditing(view)) wallControls.escape(); else clearPreview();
+      });
       const retainScroll = () => {
         view.initialFocus = false;
         view.scrollLeft = Math.max(0, Math.min(maximumScrollLeft(), scroll.scrollLeft));
@@ -6289,6 +6832,22 @@ const SylviaGMFrontend = (() => {
         updateTacticalSelection(surface, tacticalTargetSelection(surface, targetId));
         renderRulesetPanelProjection(projection);
       });
+      panel.querySelectorAll('[data-tactical-lane]').forEach(input => input.addEventListener('change', event => {
+        const view = state.tacticalViews[surface.id];
+        const draft = { ...(view.laneDraft || tacticalSelection(surface).lane?.[0] || {}),
+          [event.target.dataset.tacticalLane]: event.target.value };
+        view.laneDraft = draft;
+        const actor = surface.data.entities.find(e => e.id === tacticalSelection(surface).actor);
+        const width = draft.width === '' || draft.width == null ? NaN : Number(draft.width);
+        const extent = draft.extent === '' || draft.extent == null ? NaN : Number(draft.extent);
+        const valid = actor && ['lane', 'triangle'].includes(draft.pattern) &&
+          ['east', 'south', 'west', 'north'].includes(draft.direction) &&
+          Number.isInteger(width) && width > 0 && width % 2 === 1 && Number.isInteger(extent) && extent > 0;
+        updateTacticalSelection(surface, { lane: valid ? [{pattern: draft.pattern,
+          direction: draft.direction, extent, half_width: (width - 1) / 2,
+          origin: [...actor.position], facing: [...actor.facing]}] : null });
+        renderRulesetPanelProjection(projection);
+      }));
       panel.querySelector('[data-tactical-zone]')?.addEventListener('change', (event) => {
         const zone = event.target.value;
         if (zone && !surface.data.zones?.some((item) => item.id === zone)) return;
@@ -6329,6 +6888,10 @@ const SylviaGMFrontend = (() => {
         button.addEventListener('click', (event) => {
           if (performance.now() <= suppressSelectionUntil) return;
           event.stopPropagation();
+          if (wallEditing(view) && button.dataset.edgeWall) {
+            wallControls.toggleWall(button.dataset.edgeWall, button.dataset.tacticalGeometry);
+            return;
+          }
           view.selectedGeometry = button.dataset.tacticalGeometry;
           gamePanels().saveView(surface, view);
           renderRulesetPanelProjection(projection);
@@ -6371,7 +6934,8 @@ const SylviaGMFrontend = (() => {
       }
       panel.querySelectorAll('[data-tactical-cell]').forEach((button) => {
         button.addEventListener('click', () => {
-          if (performance.now() <= suppressSelectionUntil) return;
+          // The wall editor reads borders from pointer position; a cell is not a destination here.
+          if (performance.now() <= suppressSelectionUntil || wallEditing(view)) return;
           const x = Number(button.dataset.cellX);
           const y = Number(button.dataset.cellY);
           const actor = surface.data.entities.find(
@@ -6410,6 +6974,10 @@ const SylviaGMFrontend = (() => {
             ArrowUp: [0, -1], ArrowDown: [0, 1] }[event.key];
           if (!delta) return;
           event.preventDefault();
+          if (event.shiftKey && wallEditing(view)) {
+            wallControls.toggleCellBorder(Number(button.dataset.cellX), Number(button.dataset.cellY), event.key);
+            return;
+          }
           const x = Number(button.dataset.cellX) + delta[0];
           const y = Number(button.dataset.cellY) + delta[1];
           const next = panel.querySelector(`[data-tactical-cell="${x},${y}"]`);
@@ -6751,7 +7319,7 @@ const SylviaGMFrontend = (() => {
     return selected;
   }
 
-  function panelContent(surface) {
+  function panelContent(surface, intentControls = '') {
     if (surface.renderer === 'piece_table') {
       return window.SylviaPieceTable.render(surface.data, surface.actions);
     }
@@ -6766,7 +7334,7 @@ const SylviaGMFrontend = (() => {
     if (surface.renderer === 'generic_inventory') return renderGenericInventoryPanel(surface);
     if (surface.renderer === 'objectives') return renderObjectivesPanel(surface.data);
     if (['tactical_grid', 'coordinate_map'].includes(surface.renderer)) {
-      return renderTacticalGridPanel(surface.data, surface.id);
+      return renderTacticalGridPanel(surface.data, surface.id, intentControls);
     }
     if (surface.renderer === 'network_graph') {
       return renderNetworkGraphPanel(surface.data, surface.id);
@@ -6806,8 +7374,6 @@ const SylviaGMFrontend = (() => {
       `<p class="panel-empty" role="status">${surface.loading === 'error'
         ? 'Game panels could not be loaded. Retry loading in the campaign chat.'
         : 'Loading game panels…'}</p></section>`;
-    const content = panelContent(surface);
-    if (['encounter', 'inventory'].includes(surface.renderer) && !content) return '';
     const minimum = Number.isInteger(surface.minimum_size) ? surface.minimum_size : 96;
     const preferred = panelSize(surface);
     const header = includeHeader
@@ -6820,7 +7386,9 @@ const SylviaGMFrontend = (() => {
     ) : [];
     const mapSurface = ['tactical_grid', 'coordinate_map'].includes(surface.renderer);
     const selectedAction = mapSurface ? tacticalPreviewState(surface, state.tacticalViews[surface.id] || {}).action : null;
-    const shownActions = mapSurface ? footerActions.filter((action) => !actionBindsActor(action)) : footerActions;
+    // Wall edits submit from the map's wall editor, never as bare command-deck buttons.
+    const shownActions = mapSurface ? footerActions.filter((action) => !actionBindsActor(action) &&
+      !isWallEditAction(action)) : footerActions;
     const contextual = mapSurface ? (state.panelProjection?.surfaces || [])
       .filter((item) => item.id !== surface.id && ['party', 'unit_list', 'encounter'].includes(item.renderer))
       .flatMap((owner) => (owner.actions || []).filter((action) => !actionBindsActor(action) && /end.*turn/i.test(action.label || action.id))
@@ -6837,20 +7405,30 @@ const SylviaGMFrontend = (() => {
         tacticalSelectionGuidance(surface, selectedAction) || 'Review the preview before committing.')}</small></span>` +
       `<button type="button" class="btn btn-primary ruleset-panel-action" data-panel-action-id="${escapeHtml(selectedAction.id)}" ` +
       `${panelActionAvailable(surface, selectedAction) ? '' : 'disabled'}>${sequenceModeActive() ? 'Queue' : 'Commit'} ${escapeHtml(mapActionLabel(surface, selectedAction))}</button></div>` : '';
-    return `<section class="ruleset-panel ${surface.id === ACTION_QUEUE_PANEL_ID ? 'ruleset-queue-panel' : ''} ${['tactical_grid', 'coordinate_map'].includes(surface.renderer) ? 'ruleset-map-panel' : surface.renderer === 'party' ? 'ruleset-roster-panel' : surface.renderer === 'unit_list' ? 'ruleset-character-panel' : ''}" data-panel-id="${escapeHtml(surface.id)}" ` +
+    const content = panelContent(surface, commit);
+    if (['encounter', 'inventory'].includes(surface.renderer) && !content) return '';
+    return `<section id="panel-${escapeHtml(surface.id)}" role="tabpanel" class="ruleset-panel ${surface.id === ACTION_QUEUE_PANEL_ID ? 'ruleset-queue-panel' : ''} ${['tactical_grid', 'coordinate_map'].includes(surface.renderer) ? 'ruleset-map-panel' : surface.renderer === 'party' ? 'ruleset-roster-panel' : surface.renderer === 'unit_list' ? 'ruleset-character-panel' : ''}" data-panel-id="${escapeHtml(surface.id)}" ` +
       `style="min-height:${minimum}px"><div>${header}` +
       `<div class="ruleset-panel-content" data-panel-size-id="${escapeHtml(surface.id)}" ` +
       `style="height:${preferred}px;min-height:${minimum}px">${content}</div>` +
-      (mapSurface ? `<div class="map-command-deck"><div class="map-command-row">${mapActionPalette(surface)}${actions}${contextual}</div>${commit}</div>` :
+      (mapSurface ? `<div class="map-command-deck"><div class="map-command-row">${mapActionPalette(surface)}${actions}${contextual}</div></div>` :
         actions ? `<div class="ruleset-panel-actions contextual-action-bar" aria-label="Available actions">${actions}</div>` : '') +
       `</div></section>`;
   }
 
   function renderRulesetPanelProjection(projection) {
     projection = queueProjection(projection);
+    $('session-frame')?.classList.toggle('game-workspace', Boolean(projection?.surfaces?.some(
+      surface => ['tactical_grid', 'coordinate_map'].includes(surface.renderer))));
     if (window.__sylviaPanelContext && state.activeSessionId) ensureSessionActivity();
     const host = $('ruleset-panel-host');
     const container = $('ruleset-panels');
+    const queueFocus = document.activeElement && container.contains(document.activeElement) && document.activeElement.closest?.('.action-sequence')
+      ? ['remove', 'up', 'down', 'clear', 'run', 'reconfirm'].map(operation => {
+        const attribute = `data-sequence-${operation}`;
+        return document.activeElement.hasAttribute(attribute)
+          ? `[${attribute}="${CSS.escape(document.activeElement.getAttribute(attribute))}"]` : null;
+      }).find(Boolean) || '.action-sequence' : null;
     const savedShotControls = captureShotControls(container);
     const savedMapTools = captureMapTools(container);
     const savedPreviewHeights = captureTacticalPreviewHeights(container, projection);
@@ -6892,6 +7470,7 @@ const SylviaGMFrontend = (() => {
       issue.querySelector('p')?.textContent,
     ]);
     const openQueueIssues = new Set(Array.from(container.querySelectorAll('.sequence-issue[open]'), queueIssueKey));
+    const openQueueTools = new Set(Array.from(container.querySelectorAll('[data-sequence-tools][open]'), node => node.dataset.sequenceTools));
     const previousList = container.querySelector('.sequence-cards');
     const queueScroll = previousList ? {top:previousList.scrollTop,
       atEnd:previousList.scrollTop + previousList.clientHeight >= previousList.scrollHeight - 2} : null;
@@ -6910,9 +7489,14 @@ const SylviaGMFrontend = (() => {
         ?.querySelector(savedCharacterFocus.selector)?.focus({ preventScroll: true });
     }
     container.querySelectorAll('.sequence-issue').forEach(issue => { issue.open = openQueueIssues.has(queueIssueKey(issue)); });
+    container.querySelectorAll('[data-sequence-tools]').forEach(tools => { tools.open = openQueueTools.has(tools.dataset.sequenceTools); });
     const nextList = container.querySelector('.sequence-cards');
     if (nextList && queueScroll) nextList.scrollTop = queueScroll.atEnd ? nextList.scrollHeight : queueScroll.top;
     wireSequence(container);
+    if (sameCharacterScope && queueFocus) {
+      const button = container.querySelector(queueFocus);
+      (button && !button.disabled ? button : container.querySelector('.action-sequence'))?.focus({preventScroll:true});
+    }
     container.querySelector('[data-panel-recover]')?.addEventListener('click', () => void recoverPanelAction());
     container.querySelector('[data-panel-retry-original]')?.addEventListener('click', () => void recoverPanelAction(true));
     container.querySelector('[data-panel-dismiss-recovery]')?.addEventListener('click', () => void recoverPanelAction(false, true));
@@ -7002,59 +7586,9 @@ const SylviaGMFrontend = (() => {
         const action = surface && Array.isArray(surface.actions)
           ? surface.actions.find((entry) => entry.id === button.dataset.panelActionId) : null;
         if (!action || !panelActionAvailable(surface, action, button.dataset.panelActorId, button.dataset.panelPieceId)) return;
-        button.disabled = true;
         const selection = JSON.parse(JSON.stringify(panelActionSelection(surface, action,
           button.dataset.panelActorId, button.dataset.panelPieceId)));
-        const projectionRevision = projection.revision;
-        const pendingIntent = { campaignId, sessionId };
-        state.panelIntentPending = pendingIntent;
-        try {
-          if (sequenceModeActive()) {
-            const command = {campaign_id:campaignId,session_id:sessionId,surface_id:surface.id,
-              panel_action_id:action.id,operation_id:`panel-${crypto.randomUUID()}`,selection};
-            if (window.__sylviaPanelContext) await state.bridge.queue_panel_action(command);
-            else await appendQueuedAction({operation_id:command.operation_id,
-              source:{kind:'panel',surface_id:surface.id,action_id:action.id},selection},
-              {flush:action.response_policy === 'automatic'});
-            return;
-          }
-          // Streamed mechanics can advance after the last full campaign refresh.
-          const actionSnapshot = await state.bridge.snapshot(campaignId);
-          if (selectedActivityMatches(activity)) state.activeSnapshot = actionSnapshot;
-          const command = {
-            campaign_id: campaignId,
-            surface_id: panel.dataset.panelId,
-            panel_action_id: button.dataset.panelActionId,
-            operation_id: `panel-${crypto.randomUUID()}`,
-            expected_revision: actionSnapshot.revision,
-            selection,
-            session_id: sessionId,
-          };
-          if (!selectedActivityMatches(activity) || !panelActionStillCurrent(command, projectionRevision)) return;
-          const proposal = await state.bridge.preview_panel_action(command);
-          if (!selectedActivityMatches(activity) || !panelActionStillCurrent(command, projectionRevision) || !await confirmPlayerAction(proposal)) return;
-          if (!selectedActivityMatches(activity) || selectedSessionIsWorking() || !panelActionStillCurrent(command, projectionRevision)) return;
-          const confirmedCommand = { ...command, confirmation: proposal.confirmation };
-          localStorage.setItem(panelRecoveryKey(), JSON.stringify(confirmedCommand));
-          state.panelCommitPending = true;
-          const receipt = await state.bridge.execute_panel_action(confirmedCommand);
-          if (receipt.status === 'committed') tutorials?.notify('action-committed', sessionId);
-          if (selectedActivityMatches(activity)) clearPanelRecovery();
-          if (receipt.status !== 'failed' && surface.renderer === 'inventory') state.equipmentDrafts?.clear();
-          selectedStatus(activity, receipt.status === 'failed' ? 'Panel action failed' : 'Panel action completed', 'panels');
-          if (selectedActivityMatches(activity)) {
-            try { await refreshSelectedCampaign(); }
-            catch (error) { selectedStatus(activity, 'Action saved; refresh the campaign display', 'panels'); }
-          }
-          await respondToPlayerAction(campaignId, sessionId, command.operation_id);
-        } catch (error) {
-          selectedStatus(activity, friendlyCommandError('Panel action could not be completed', error), 'panels');
-        } finally {
-          if (state.panelIntentPending === pendingIntent) state.panelIntentPending = null;
-          state.panelCommitPending = false;
-          button.disabled = false;
-          if (selectedActivityMatches(activity)) await renderRulesetPanels(campaignId, true);
-        }
+        await runPanelAction(projection, surface, action, selection, button, { activity, campaignId, sessionId });
       });
     });
     wireTacticalGrid(container, projection, savedPreviewHeights);
@@ -7083,18 +7617,100 @@ const SylviaGMFrontend = (() => {
     if (!gamePanels().presentEffects(projection, animateShots)) animateShots();
   }
 
+  // Queue a declared action, or preview, confirm and commit it directly through the owner.
+  // `direct` bypasses the queue for edits bound to the current map, such as walls.
+  async function runPanelAction(projection, surface, action, selection, button,
+    { activity, campaignId, sessionId }, { direct = false, completed = 'Panel action completed',
+      failed = 'Panel action could not be completed', unconfirmed = 'Panel action status unconfirmed',
+      onCommitted = null, onRefused = null, onUncertain = null } = {}) {
+    button.disabled = true;
+    const projectionRevision = projection.revision;
+    const pendingIntent = { campaignId, sessionId };
+    state.panelIntentPending = pendingIntent;
+    let confirmedCommand = null;
+    // A recovered receipt follows the same saved-result path as the original response.
+    const finish = async (receipt) => {
+      const pending = pendingPanelCommand(campaignId, sessionId);
+      clearPanelRecovery(confirmedCommand);
+      if (selectedActivityMatches(activity) && (!pending || pending.operation_id === confirmedCommand.operation_id)) {
+        if (receipt.status !== 'failed' && surface.renderer === 'inventory') state.equipmentDrafts?.clear();
+        if (receipt.status !== 'failed') onCommitted?.();
+        selectedStatus(activity, receipt.status === 'failed' ? 'Panel action failed' : completed, 'panels');
+        try { await refreshSelectedCampaign(); }
+        catch (error) { selectedStatus(activity, 'Action saved; refresh the campaign display', 'panels'); }
+      }
+      await respondToPlayerAction(campaignId, sessionId, confirmedCommand.operation_id);
+    };
+    try {
+      if (sequenceModeActive() && !direct) {
+        const command = {campaign_id:campaignId,session_id:sessionId,surface_id:surface.id,
+          panel_action_id:action.id,operation_id:`panel-${crypto.randomUUID()}`,selection};
+        if (window.__sylviaPanelContext) await state.bridge.queue_panel_action(command);
+        else await appendQueuedAction({operation_id:command.operation_id,
+          source:{kind:'panel',surface_id:surface.id,action_id:action.id},selection},
+          {flush:action.response_policy === 'automatic'});
+        return;
+      }
+      // Streamed mechanics can advance after the last full campaign refresh.
+      const actionSnapshot = await state.bridge.snapshot(campaignId);
+      if (selectedActivityMatches(activity)) state.activeSnapshot = actionSnapshot;
+      const command = {
+        campaign_id: campaignId,
+        surface_id: surface.id,
+        panel_action_id: action.id,
+        operation_id: `panel-${crypto.randomUUID()}`,
+        expected_revision: actionSnapshot.revision,
+        selection,
+        session_id: sessionId,
+      };
+      if (!selectedActivityMatches(activity) || !panelActionStillCurrent(command, projectionRevision)) return;
+      const proposal = await state.bridge.preview_panel_action(command);
+      if (!selectedActivityMatches(activity) || !panelActionStillCurrent(command, projectionRevision) || !await confirmPlayerAction(proposal)) return;
+      if (!selectedActivityMatches(activity) || selectedSessionIsWorking() || !panelActionStillCurrent(command, projectionRevision)) return;
+      confirmedCommand = { ...command, confirmation: proposal.confirmation };
+      localStorage.setItem(panelRecoveryKey(campaignId, sessionId), JSON.stringify(confirmedCommand));
+      state.panelCommitPending = true;
+      const receipt = await state.bridge.execute_panel_action(confirmedCommand);
+      await finish(receipt);
+    } catch (error) {
+      // A definite owner rejection with nothing saved or pending leaves no reply to recover.
+      let refused = !confirmedCommand;
+      if (confirmedCommand && ownerRejected(error)) {
+        const receipt = await state.bridge.panel_action_receipt?.(confirmedCommand).catch(() => undefined);
+        if (receipt) { await finish(receipt); return; }
+        refused = receipt === null;
+        if (refused) clearPanelRecovery(confirmedCommand);
+      }
+      const pending = pendingPanelCommand(campaignId, sessionId);
+      if (selectedActivityMatches(activity) && (!pending || pending.operation_id === confirmedCommand?.operation_id)) {
+        if (refused) onRefused?.(ownerWords(error) || failed);
+        else onUncertain?.(ownerWords(error) || unconfirmed);
+        selectedStatus(activity, friendlyCommandError(refused ? failed : unconfirmed, error), 'panels');
+      }
+    } finally {
+      if (state.panelIntentPending === pendingIntent) state.panelIntentPending = null;
+      state.panelCommitPending = false;
+      button.disabled = false;
+      if (selectedActivityMatches(activity)) await renderRulesetPanels(campaignId, true);
+    }
+  }
+
   // App-owned presentation participates in the same workspace as package panels.
   // Child windows receive this view, never the native confirmation or full receipts.
   function queueView(queue = state.actionSequence) {
     if (!queue || queue.session_id !== state.activeSessionId) return null;
     return {
       session_id:queue.session_id, sequence_id:queue.sequence_id, version:queue.version,
+      campaign_id:queue.campaign_id, expected_revision:queue.expected_revision,
       status:queue.status, error:panelPlayerReason(queue.error),
       pause_summary:panelPlayerReason(queue.pause_summary), pause_reason:panelPlayerReason(queue.pause_reason),
       committed_action_ids:(queue.committed_action_ids || []).slice(0,32),
       steps:(queue.steps || []).slice(0,32).map(step => ({
         step_id:step.step_id, label:step.label, status:step.status, actor:step.actor,
         actor_name:step.actor_name, response_policy:step.response_policy,
+        source:step.source?.kind === 'panel' ? {kind:'panel',surface_id:step.source.surface_id,action_id:step.source.action_id} : null,
+        committed_revision:step.status === 'committed' && step.receipt?.status === 'committed'
+          ? step.receipt.resulting_revision : null,
         selection:step.selection ? Object.fromEntries(['target','destination','aim_point']
           .filter(key => Object.hasOwn(step.selection,key)).map(key => [key,step.selection[key]])) : null,
         preview:step.preview ? {summary:(step.preview.summary || []).filter(row => /cost|distance/i.test(row.label || ''))} : null,
@@ -7189,18 +7805,34 @@ const SylviaGMFrontend = (() => {
     };
     const rows = steps.map((step, index) => {
       const status = step.status === 'committed' ? 'Committed' : step.status === 'awaiting_choice' ? 'Awaiting choice' : step.status === 'executing' ? 'Sending' : 'Pending';
+      // A saved preview can contain a price even when current prerequisites refuse the action.
+      const previewDetails = (step.preview?.summary || []).filter(row => /cost|distance/i.test(row.label || '')).map(row => {
+        let value = row.value;
+        if (/cost/i.test(row.label || '')) {
+          if (stepReason(step)) value = step.error ? 'unconfirmed' : 'unavailable';
+          else if (value == null || value === '') value = 'unknown';
+        }
+        return `${row.label}: ${value}`;
+      });
       const detail = [
         multipleActors ? step.actor_name : null,
         step.selection?.target ? `Target: ${targetLabel(step.selection.target)}` : '',
         step.selection?.destination ? `Destination: ${JSON.stringify(step.selection.destination)}` : '',
         step.selection?.aim_point ? `Map point: ${JSON.stringify(step.selection.aim_point)}` : '',
-        ...(step.preview?.summary || []).filter(row => /cost|distance/i.test(row.label || '')).map(row => `${row.label}: ${row.value}`),
+        ...previewDetails,
+      ].filter(Boolean).join(' · ');
+      const compactDetail = [multipleActors ? step.actor_name : '',
+        step.selection?.target ? targetLabel(step.selection.target)
+          : step.selection?.destination ? JSON.stringify(step.selection.destination)
+          : step.selection?.aim_point ? JSON.stringify(step.selection.aim_point) : '',
+        ...previewDetails,
       ].filter(Boolean).join(' · ');
       return `<li class="sequence-step sequence-${step.status}">
         <span class="sequence-number" aria-label="Step ${index + 1}: ${status}" data-sequence-step="${escapeHtml(step.step_id)}" ${previousSteps.has(step.step_id) ? '' : 'data-sequence-enter'}>${index + 1}</span>
-        <div class="sequence-card-copy"><div class="sequence-card-heading"><strong title="${escapeHtml(step.actor_name ? step.actor_name + ': ' + step.label : step.label)}">${escapeHtml(step.label)}</strong>${status === 'Pending' ? '' : `<span class="sequence-status">${status}</span>`}</div>
-          <small title="${escapeHtml(detail)}">${detail ? `<span class="sequence-detail">${escapeHtml(detail)}</span>` : status}</small></div>
-        ${step.status === 'pending' ? `<button type="button" class="sequence-remove" data-sequence-remove="${escapeHtml(step.step_id)}" aria-label="Remove ${escapeHtml(step.label)}" title="Remove pending action" ${busy ? 'disabled' : ''}>×</button>` : ''}
+        <div class="sequence-card-copy"><div class="sequence-card-heading"><strong title="${escapeHtml(step.actor_name ? step.actor_name + ': ' + step.label : step.label)}">${escapeHtml(step.label)}</strong><span class="sequence-status">${status === 'Pending' ? 'Unvalidated intent' : status}</span></div>
+          <small title="${escapeHtml(detail)}">${compactDetail ? `<span class="sequence-detail">${escapeHtml(compactDetail)}</span>` : status}</small></div>
+        <details class="sequence-step-tools" data-sequence-tools="${escapeHtml(step.step_id)}"><summary aria-label="Details and controls for ${escapeHtml(step.label)}">⋯</summary><div><p>${escapeHtml(detail || status)}</p>
+        ${step.status === 'pending' ? `<div class="sequence-order-controls"><button type="button" data-sequence-remove="${escapeHtml(step.step_id)}" aria-label="Remove ${escapeHtml(step.label)}" ${busy ? 'disabled' : ''}>Remove ${escapeHtml(step.label)}</button><button type="button" data-sequence-up="${escapeHtml(step.step_id)}" aria-label="Move ${escapeHtml(step.label)} earlier" ${busy || steps[index - 1]?.status !== 'pending' ? 'disabled' : ''}>↑ Earlier</button><button type="button" data-sequence-down="${escapeHtml(step.step_id)}" aria-label="Move ${escapeHtml(step.label)} later" ${busy || steps[index + 1]?.status !== 'pending' ? 'disabled' : ''}>↓ Later</button></div>` : ''}</div></details>
         ${explanation(stepReason(step), step.status === 'awaiting_choice' ? 'Resolve this choice to continue' : 'Review this action')}
       </li>`;
     }).join('');
@@ -7213,9 +7845,10 @@ const SylviaGMFrontend = (() => {
           ? '<small class="sequence-note">Not yet run · each pending intent is rechecked on Execute</small>' : ''}</div>
       <ol class="sequence-cards" aria-label="Actions in execution order" ${rows ? 'tabindex="0"' : ''}>${rows}</ol>
       ${explanation(showQueueReason ? queueReason : '', queue?.status === 'paused' ? 'Resolve the decision to continue' : 'Review the stopped queue')}
+      <div class="sequence-controls">${steps.some(step => step.status === 'pending') ? `<button type="button" class="btn btn-secondary btn-sm" data-sequence-clear ${busy ? 'disabled' : ''}>Clear pending</button>` : ''}
       ${steps.some(step => step.status === 'pending') && ['failed','paused','stale'].includes(queue?.status)
         ? `<button type="button" class="sequence-review btn btn-secondary btn-sm" data-sequence-reconfirm ${busy ? 'disabled' : ''}>Review remaining actions</button>` : ''}
-      <button type="button" class="sequence-execute btn btn-primary btn-sm" data-sequence-execute ${canRun ? 'data-sequence-run' : ''} ${busy || !canRun ? 'disabled' : ''}>Execute</button>
+      <button type="button" class="sequence-execute btn btn-primary btn-sm" data-sequence-execute ${canRun ? 'data-sequence-run' : ''} ${busy || !canRun ? 'disabled' : ''}>Execute</button></div>
     </section>`;
   }
 
@@ -7384,9 +8017,23 @@ const SylviaGMFrontend = (() => {
     const options = {current,expected,operationId,responseActionId};
     if (operation === 'execute') return flushQueuedActions(options);
     return editQueuedActions((steps,queue) => {
-      if (operation === 'review') return steps;
-      if (operation !== 'remove' || !queue?.steps.some(step => step.step_id === stepId && step.status === 'pending'))
+      if (operation === 'review') return steps.map((step,index) => {
+        const surface = state.panelProjection?.surfaces.find(item => item.id === step.source?.surface_id);
+        if (queue.steps[index].status !== 'pending' || step.source?.kind !== 'panel' ||
+            !['tactical_grid','coordinate_map'].includes(surface?.renderer) || !step.selection) return step;
+        // Explicit review binds retained intentions to the displayed map, without executing or simulating them.
+        return {...step,selection:{...step.selection,map_revision:surface.data.map_revision}};
+      });
+      if (operation === 'clear') return steps.filter((step, index) => queue.steps[index].status !== 'pending');
+      const index = queue?.steps.findIndex(step => step.step_id === stepId && step.status === 'pending');
+      if (!['remove','up','down'].includes(operation) || index == null || index < 0)
         throw new Error('Only a pending queued action can be removed.');
+      if (operation === 'up' || operation === 'down') {
+        const other = index + (operation === 'up' ? -1 : 1);
+        if (queue.steps[other]?.status !== 'pending') throw new Error('Only adjacent pending intentions can be reordered.');
+        [steps[index],steps[other]] = [steps[other],steps[index]];
+        return steps;
+      }
       return steps.filter(step => step.step_id !== stepId);
     },options);
   }
@@ -7405,12 +8052,15 @@ const SylviaGMFrontend = (() => {
         if (window.__sylviaPanelContext) {
           await state.bridge.queue_sequence_operation({campaign_id:campaignId,session_id:sessionId,
             surface_id:ACTION_QUEUE_PANEL_ID,operation,sequence_id:expected.sequence_id,
-            expected_version:expected.version,...(operation === 'execute' ? {response_action_id:responseActionId} : {}),...(operation === 'remove' ? {step_id:stepId} : {})});
+            expected_version:expected.version,...(operation === 'execute' ? {response_action_id:responseActionId} : {}),...(['remove','up','down'].includes(operation) ? {step_id:stepId} : {})});
         } else await queueOperation(operation,stepId,{current,expected,responseActionId});
       } catch (error) { setInlineStatus(friendlyCommandError('Queued actions could not be updated', error),'panels'); }
     };
     container.querySelectorAll('[data-sequence-remove]').forEach(button =>
       button.addEventListener('click', () => void run('remove',button.dataset.sequenceRemove)));
+    for (const operation of ['up', 'down']) container.querySelectorAll(`[data-sequence-${operation}]`).forEach(button =>
+      button.addEventListener('click', () => void run(operation,button.getAttribute(`data-sequence-${operation}`))));
+    container.querySelector('[data-sequence-clear]')?.addEventListener('click', () => void run('clear'));
     container.querySelector('[data-sequence-reconfirm]')?.addEventListener('click', () => void run('review'));
     container.querySelector('[data-sequence-run]')?.addEventListener('click', () => void run('execute'));
   }
@@ -13340,6 +13990,19 @@ const SylviaGMFrontend = (() => {
     const payload = projection && projection.safe_payload || {};
     return `${kind}-${payload.action_id || projection && projection.action_id ||
       payload.interruption_id || ''}`;
+  }
+
+  // The bridges reject with "Error: owner_code: message"; keep only the owner's words.
+  // An owner-coded reply, not a lost or unreadable one; WebUI codes ride on the error object.
+  function ownerRejected(error) {
+    const code = typeof error?.code === 'string' ? error.code
+      : /^(?:Error:\s*)?([a-z]+(?:_[a-z]+)+):\s/.exec(String(error?.message || error || ''))?.[1];
+    return Boolean(code && !['outcome_unknown', 'webui_unavailable'].includes(code));
+  }
+
+  function ownerWords(error) {
+    return String(error?.message || error || '').replace(/^Error:\s*/, '')
+      .replace(/^[a-z]+(?:_[a-z]+)+:\s+/, '').trim();
   }
 
   function friendlyCommandError(fallback, error) {

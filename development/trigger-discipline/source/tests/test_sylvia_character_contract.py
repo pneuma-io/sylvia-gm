@@ -8,6 +8,10 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from balance_suite.parameters import default_manifest
+from sylvia_ruleset import builder
+from sylvia_ruleset.character_build import eligibility_catalog
+
 from sylvia_gm.application.initial_character_state import (
     materialize_initial_character_state,
     verify_initial_character_state,
@@ -17,10 +21,6 @@ from sylvia_gm.domain.package_library import participant_schema_sha256
 from sylvia_gm.runtime._condition_evaluator import evaluate
 from sylvia_gm.runtime._expression_parser import parse_expression
 from sylvia_gm.runtime._types import ExecutionContext
-
-from balance_suite.parameters import default_manifest
-from sylvia_ruleset import builder
-from sylvia_ruleset.character_build import eligibility_catalog
 
 
 def _authored_state(declaration):
@@ -83,8 +83,35 @@ def test_generated_creation_identity_matches_sylvia_complete_contract_hash():
     )
 
 
+def test_nullable_ready_weapon_keeps_present_range_constraints():
+    participant = builder._conformance_character()["artifact"]
+    declaration = builder._character_declaration(
+        builder._character_schema(participant["specialties"]),
+    )
+    authored = _authored_state(declaration)
+    authored["weapon"]["range_damage"] = [7, 5, 3, None]
+    authored["weapon"]["range_breakpoints_m"] = [10, 20]
+    from sylvia_gm.domain.errors import CommandRejected
+
+    with pytest.raises(CommandRejected):
+        materialize_initial_character_state(
+            participant, authored,
+            entity_state_schema=declaration["entity_state_schema"],
+            initial_state_calculations=declaration["initial_state_calculations"],
+        )
+    authored["weapon"]["range_breakpoints_m"] = [10, 20, 30]
+    complete = materialize_initial_character_state(
+        participant, authored,
+        entity_state_schema=declaration["entity_state_schema"],
+        initial_state_calculations=declaration["initial_state_calculations"],
+    )
+    assert complete["weapon"]["range_damage"] == [7, 5, 3, None]
+
+
 @pytest.mark.parametrize("unarmed", [False, True])
-def test_new_character_save_reopen_and_prerequisite_rejection_use_normal_owner_path(tmp_path, unarmed):
+def test_new_character_save_reopen_and_prerequisite_rejection_use_normal_owner_path(
+    tmp_path, unarmed,
+):
     from sylvia_gm.application.reusable_participants import (
         ParticipantValidationError,
         load_reusable_participant,
@@ -122,12 +149,12 @@ def test_new_character_save_reopen_and_prerequisite_rejection_use_normal_owner_p
     authored["reserve_weapons"] = [reserve]
     if unarmed:
         authored["weapon"] = None
-    arguments = dict(
-        role='player_character', summary='A synthetic dock engineer.',
-        authored_profile='# Maren\n\nA synthetic dock engineer.',
-        participant=participant, entity_state=authored, package=package,
-        declaration=declaration, campaign_setting=setting,
-    )
+    arguments = {
+        'role': 'player_character', 'summary': 'A synthetic dock engineer.',
+        'authored_profile': '# Maren\n\nA synthetic dock engineer.',
+        'participant': participant, 'entity_state': authored, 'package': package,
+        'declaration': declaration, 'campaign_setting': setting,
+    }
     saved = save_reusable_participant(tmp_path, operation_id='maren', **arguments)
     loaded = load_reusable_participant(
         tmp_path, saved.artifact_id, package=package, declaration=declaration,
