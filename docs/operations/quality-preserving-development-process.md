@@ -63,6 +63,10 @@ Recorded defects in `scripts/known_test_defects.py` still execute as strict expe
 The gate lists them separately from passes; they do not prove that the affected feature works.
 An unexpected pass, an unregistered skip or a missing required case fails the gate.
 
+The Python quality group runs `ruff check src` and `mypy src`. The explicit legacy type-debt
+list in `pyproject.toml` may only shrink; new modules stay under strict checking. Broad source
+formatting waits while another open PR changes `src`, to keep its integration review manageable.
+
 Wan's replacement for the cancelled AR-01 marathon is a comprehensive automated framework plus
 short targeted real-model and installed acceptance checks. Preserve continuity, progression,
 recovery and supported-journey evidence under product contract section 7.1. The aggregate

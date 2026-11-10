@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 
-@pytest.mark.parametrize("module,arguments", [("ruff", ("check", "src"))])
+@pytest.mark.parametrize("module,arguments", [("ruff", ("check", "src")), ("mypy", ("src",))])
 def test_python_quality(module, arguments, tmp_path):
     environment = dict(os.environ)
     environment["RUFF_CACHE_DIR"] = str(tmp_path / "ruff")
