@@ -63,7 +63,8 @@ def test_observer_preserves_requests_bounds_calls_and_keeps_stream_identity_unkn
     assert first["usage"]["total_tokens"] == 10
     assert observer.selections[0]["effective_context_window"] == 123456
     assert first["stage"] == "preparation"
-    tools = [{"type": "function", "function": {"name": "update_campaign_file"}}]
+    alias = "tool_123456abcdef_update_campaign_file"
+    tools = [{"type": "function", "function": {"name": alias}}]
 
     async def consume():
         return [chunk.content async for chunk in provider.generate_stream(messages, tools)]
@@ -73,7 +74,7 @@ def test_observer_preserves_requests_bounds_calls_and_keeps_stream_identity_unkn
     assert "observed_model" not in observer.requests[-1]
     assert "usage" not in observer.requests[-1]
     assert observer.requests[-1]["stage"] == "gm"
-    assert set(observer.requests[-1]["tool_fingerprints"]) == {"update_campaign_file"}
+    assert set(observer.requests[-1]["tool_fingerprints"]) == {alias}
     assert observer.requests[-1]["message_fingerprints"] == [
         {"role": "user", "sha256": digest(messages[0])}
     ]

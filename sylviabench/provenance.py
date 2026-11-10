@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from contextvars import ContextVar
 from dataclasses import asdict
 from pathlib import Path
@@ -57,7 +58,14 @@ class ObservedProvider:
             tool.get("function", tool).get("name", str(index)): digest(tool)
             for index, tool in enumerate(tools or [])
         }
-        stage = "gm" if "update_campaign_file" in tool_schemas else "preparation"
+        stage = (
+            "gm"
+            if any(
+                re.fullmatch(r"(?:tool_[0-9a-f]{12}_)?update_campaign_file", name)
+                for name in tool_schemas
+            )
+            else "preparation"
+        )
         first_gm = stage == "gm" and not any(r["stage"] == "gm" for r in self.observer.requests)
         row = {
             "stage": stage,

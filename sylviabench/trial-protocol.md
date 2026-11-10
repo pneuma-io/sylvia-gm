@@ -67,6 +67,11 @@ capability from it. Improving discovery or changing the output allowance needs a
 
 Compare the first GM request separately from preparation/compaction calls. Qualification can retain
 a private Full Audit to inspect exact differences; raw audits do not belong in the shared report.
+Sylvia's Codex route places application data differently and adds fixed data/control instructions.
+If complete request hashes differ, verify the shared GM instructions, campaign preparation, state,
+rules guide, response format, canonical dialogue and tool schemas. Record the remaining role/control
+differences. The resulting comparison concerns Sylvia setups; it does not isolate a foundation
+model from its transport and serving instructions.
 
 ## Spending and privacy
 
