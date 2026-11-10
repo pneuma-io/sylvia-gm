@@ -19,18 +19,15 @@ from tests.test_bundled_starter_characters import selection
 
 ROOT = Path(__file__).resolve().parents[1]
 WORLD = ROOT / "campaign-settings/severed-lands"
+ART = ROOT / "artwork"
 
 
 def test_prepared_bundles_match_starter_data_package_payloads_and_frozen_inventory():
-    catalogue = json.loads((WORLD / "provenance/character-art.json").read_bytes())
+    catalogue = json.loads((ART / "character-art.json").read_bytes())
     starters = json.loads((ROOT / "src/sylvia_gm/campaign/srd-starters.json").read_bytes())
     inventory = json.loads((ROOT / "src-tauri/sidecar-data-files.json").read_bytes())["files"]
     rules, reference, setting = _rift_drafts()
-    declarations = json.loads(setting.payloads["content/content-declarations.json"])
-    included = next(
-        row["links"]["artifacts"] for row in declarations["inclusions"]
-        if row["id"] == "image-hooks-selected-assets"
-    )
+    resources = json.loads((ROOT / "src-tauri/tauri.conf.json").read_bytes())["bundle"]["resources"]
     assert catalogue["characters"]
     for entry in catalogue["characters"]:
         visuals = validate_character_visuals(entry["visuals"])
@@ -45,31 +42,34 @@ def test_prepared_bundles_match_starter_data_package_payloads_and_frozen_invento
         for purpose in ("full_body", "reference_sheet", "portrait"):
             asset = entry["visuals"][purpose]
             raw = bundled_character_image(asset["path"], asset["sha256"])
-            assert raw is not None and raw == setting.payloads[asset["path"]]
-            assert asset["path"] in included
-            assert f"campaign-settings/severed-lands/{asset['path']}" in inventory
+            assert raw is not None and raw == (ART / asset["path"]).read_bytes()
+            assert asset["path"] not in setting.payloads
+            assert f"campaign-settings/severed-lands/{asset['path']}" not in inventory
+            assert resources[f"../artwork/{asset['path']}"] == f"artwork/{asset['path']}"
             assert ImageData(raw).dimensions == (
                 entry["outputs"][purpose]["width"], entry["outputs"][purpose]["height"]
             )
-    assert "campaign-settings/severed-lands/provenance/character-art.json" in inventory
+    assert not any("character-art.json" in path for path in inventory)
+    assert "provenance/character-art.json" not in setting.payloads
     assert rules.record["id"] == "sylvia.srd-lite.bg3"
     assert reference.record["id"] == "pneuma.srd.5.2.1.reference"
 
 
 def test_bundled_lookup_never_uses_unknown_hashes_or_a_checkout_fallback(tmp_path, monkeypatch):
-    entry = json.loads((WORLD / "provenance/character-art.json").read_bytes())["characters"][0]
+    entry = json.loads((ART / "character-art.json").read_bytes())["characters"][0]
     portrait = entry["visuals"]["portrait"]
     assert bundled_character_image("../private.png", portrait["sha256"]) is None
     assert bundled_character_image(portrait["path"], "0" * 64) is None
-    monkeypatch.setattr(sys, "_MEIPASS", str(tmp_path), raising=False)
+    monkeypatch.setattr(sys, "_MEIPASS", str(tmp_path / "onefile-extracted"), raising=False)
+    monkeypatch.setattr(sys, "executable", str(tmp_path / "installed/sylvia-gm-owner.exe"))
     assert bundled_character_image(portrait["path"], portrait["sha256"]) is None
-    frozen_world = tmp_path / "campaign-settings/severed-lands"
-    catalogue = frozen_world / "provenance/character-art.json"
+    frozen_world = tmp_path / "installed/artwork"
+    catalogue = frozen_world / "character-art.json"
     catalogue.parent.mkdir(parents=True)
-    catalogue.write_text(json.dumps({"characters": [entry]}), encoding="utf-8")
+    catalogue.write_text(json.dumps({"format": 1, "characters": [entry]}), encoding="utf-8")
     image = frozen_world / portrait["path"]
     image.parent.mkdir(parents=True)
-    expected = (WORLD / portrait["path"]).read_bytes()
+    expected = (ART / portrait["path"]).read_bytes()
     image.write_bytes(expected)
     assert bundled_character_image(portrait["path"], portrait["sha256"]) == expected
     image.write_bytes(b"damaged synthetic fixture")
@@ -107,6 +107,13 @@ def test_prepared_starter_reuses_art_offline_through_campaign_crop_reopen_and_tr
             expected_revision=0, canonical_input={"selected_party": party},
         )
         actor = participants[0].participant_id
+        # Export itself retains the used art before the first image view is opened.
+        assert owner._store.images.list_selections(confirmed.campaign_id) == []
+        before_view = tmp_path / "before-view.zip"
+        owner.export_campaign(
+            operation_id="export-before-view", campaign_id=confirmed.campaign_id, target=before_view
+        )
+        assert len(owner._store.images.list_selections(confirmed.campaign_id)) == 3
         art = ImageArt(owner)
         try:
             view = art.view("campaign-builder")
@@ -129,6 +136,13 @@ def test_prepared_starter_reuses_art_offline_through_campaign_crop_reopen_and_tr
     monkeypatch.setattr(
         "sylvia_gm.application.image_art.bundled_character_image", lambda *args: None
     )
+    with AuthorityOwner.open(tmp_path / "before-view-recipient.db", "early-reader") as recipient:
+        recipient.recover_campaign(recovery_id="early-recover", source=before_view)
+        art = ImageArt(recipient)
+        try:
+            assert art.character_assets("campaign-builder", actor) == expected
+        finally:
+            art.close()
     for path in (database, tmp_path / "recipient.db"):
         with AuthorityOwner.open(path, "prepared-reader") as owner:
             if path != database:

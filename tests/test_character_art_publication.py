@@ -2,10 +2,12 @@
 
 import io
 import json
+from pathlib import Path
 
 import pytest
 
 from sylvia_gm.application.authority import AuthorityOwner
+from sylvia_gm.application.bundled_character_art import bundled_character_image
 from sylvia_gm.application.image_art import ImageArt
 from sylvia_gm.application.package_character_art import include_character_art
 from sylvia_gm.application.package_materialization import NormalizedPackageDraft
@@ -14,6 +16,7 @@ from sylvia_gm.builder._setting_materializer import materialize_setting_draft
 from sylvia_gm.domain.package_library import campaign_setting_entries, canonical_json_bytes
 from tests.test_character_content_definition import _character
 from tests.test_image_art import Images
+from tests.test_image_hooks import png
 from tests.test_setting_draft_check import ARGS, _requirements, _setting_files, _source_candidate
 
 
@@ -106,3 +109,46 @@ def test_publication_rejects_missing_image_assets_without_mutating_the_draft():
     with pytest.raises(ValueError, match="missing"):
         include_character_art(draft)
     assert draft.payloads == {"characters/keeper.json": original}
+
+
+def test_shared_art_stays_in_app_library_and_custom_art_stays_portable():
+    root = Path(__file__).resolve().parents[1]
+    catalogue = json.loads((root / "artwork/character-art.json").read_bytes())
+    visuals = json.loads(json.dumps(catalogue["characters"][0]["visuals"]))
+    custom = png(64, 64, 119)
+    custom_path = f"assets/characters/{custom.sha256}.png"
+    visuals["portrait"] = {"path": custom_path, "sha256": custom.sha256}
+    original = canonical_json_bytes({**_character(), "visuals": visuals})
+    # A copied older Setting may already contain unrelated prepared images.
+    payloads = {
+        reference["path"]: bundled_character_image(reference["path"], reference["sha256"])
+        for entry in catalogue["characters"]
+        for purpose in ("full_body", "reference_sheet", "portrait")
+        for reference in (entry["visuals"][purpose],)
+    }
+    payloads.update({"characters/keeper.json": original, custom_path: custom.data})
+    draft = NormalizedPackageDraft({}, payloads, 4)
+    shared = include_character_art(draft)
+    assert shared.payloads == {"characters/keeper.json": original, custom_path: custom.data}
+    assert draft.payloads == payloads  # Publication never edits the source workspace.
+
+    # A character export deliberately includes the few images that character uses.
+    character_only = NormalizedPackageDraft({}, {
+        "characters/keeper.json": original, custom_path: custom.data,
+    }, 4)
+    portable = include_character_art(
+        character_only,
+        lambda reference: bundled_character_image(reference["path"], reference["sha256"]),
+        include_shared_art=True,
+    )
+    assert set(portable.payloads) == {"characters/keeper.json"} | {
+        visuals[purpose]["path"] for purpose in ("full_body", "reference_sheet", "portrait")
+    }
+
+
+def test_shared_reference_does_not_hide_a_corrupt_supplied_png():
+    root = Path(__file__).resolve().parents[1]
+    catalogue = json.loads((root / "artwork/character-art.json").read_bytes())
+    reference = catalogue["characters"][0]["visuals"]["portrait"]
+    with pytest.raises(ValueError, match="saved identity"):
+        include_character_art(NormalizedPackageDraft({}, {reference["path"]: b"damaged"}, 4))

@@ -5,10 +5,12 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import zipfile
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from pathlib import Path
 
+from sylvia_gm.application.bundled_character_art import artwork_payload_paths
 from sylvia_gm.domain.package_library import validate_portable_path
 from sylvia_gm.release_artifact import ReleaseArtifactError
 
@@ -24,6 +26,7 @@ REQUIRED_PAYLOADS = {
     "README-PORTABLE.txt",
     "SRD-Lite.sylvia-gm-package",
     "Severed-Lands.sylvia-gm-package",
+    "artwork/character-art.json",
     *LEGAL_FILES,
     *("licenses/" + name for name in LEGAL_FILES),
     "licenses/SRD-5.2.1.md",
@@ -36,7 +39,9 @@ def _validate_payload_path(name: str, *, metadata: bool = False) -> None:
     allowed = REQUIRED_PAYLOADS | (
         {ENTRY_MANIFEST, "BUILD-IDENTITY.json", "SOURCE-INPUTS.json"} if metadata else set()
     )
-    if name not in allowed and not name.startswith("licenses/"):
+    if name not in allowed and not name.startswith("licenses/") and not re.fullmatch(
+        r"artwork/assets/characters/[0-9a-f]{64}\.png", name
+    ):
         raise ReleaseArtifactError("Unexpected portable payload; mutable data is never packaged")
     try:
         validate_portable_path(name)
@@ -50,7 +55,7 @@ Extract the complete ZIP into a writable local folder, then open Sylvia GM.exe.
 No Python installation, CMD launcher or installer is required. Microsoft Edge
 WebView2 must be available. This build is unsigned; verify its release hashes.
 
-Keep the EXE, owner sidecar, portable marker and supplied notices together.
+Keep the EXE, owner sidecar, artwork folder, portable marker and supplied notices together.
 The marker selects adjacent isolated-data for campaigns, settings, WebView data
 and temporary files. The ZIP contains no mutable user data or credentials.
 
@@ -113,8 +118,12 @@ def portable_payloads(root: Path, *, desktop: Path, owner: Path) -> dict[str, by
         source_path = supplied.resolve(strict=True)
         if source_path != Path(os.path.abspath(supplied)):
             raise ReleaseArtifactError("Portable notice input must not be an alias")
-        if not source_path.is_relative_to(root) or not destination.startswith("licenses/"):
-            raise ReleaseArtifactError("Portable resources must be declared contained notices")
+        if (
+            not source_path.is_relative_to(root)
+            or not destination.startswith(("licenses/", "artwork/"))
+        ):
+            raise ReleaseArtifactError("Portable resources must be declared contained files")
+        _validate_payload_path(destination)
         relative = source_path.relative_to(root).as_posix()
         if (
             Path(destination).is_absolute()
@@ -123,6 +132,10 @@ def portable_payloads(root: Path, *, desktop: Path, owner: Path) -> dict[str, by
         ):
             raise ReleaseArtifactError("Portable notice destinations are invalid or duplicate")
         files[destination] = _source_file(root, relative)
+    _verify_artwork_inventory(files, files.get("artwork/character-art.json", b""))
+    for name, raw in files.items():
+        if name.startswith("artwork/assets/") and _digest(raw) + ".png" != Path(name).name:
+            raise ReleaseArtifactError("Shared artwork does not match its content hash")
     for name in ("LICENSE", "COPYRIGHT", "LICENSING-STATUS.md", "SYLVIA-ADDITIONAL-PERMISSIONS.md"):
         files[name] = _source_file(root, name)
         if files.get("licenses/" + name) != files[name]:
@@ -137,6 +150,19 @@ def portable_payloads(root: Path, *, desktop: Path, owner: Path) -> dict[str, by
                 "Portable required content/dependency attribution is missing"
             )
     return files
+
+
+def _verify_artwork_inventory(names: Iterable[str], catalogue: bytes) -> None:
+    """Require the complete declared shared library and refuse undeclared artwork payloads."""
+    try:
+        expected = artwork_payload_paths(catalogue)
+        actual = {name for name in names if name.startswith("artwork/")}
+        if actual != expected:
+            raise ValueError
+    except (ValueError, KeyError, TypeError):
+        raise ReleaseArtifactError(
+            "Shared artwork resource inventory is incomplete or invalid"
+        ) from None
 
 
 def assemble_portable_zip(
@@ -156,6 +182,7 @@ def assemble_portable_zip(
         raise ReleaseArtifactError("Portable payload or source inventory is incomplete")
     for name in files:
         _validate_payload_path(name)
+    _verify_artwork_inventory(files, files["artwork/character-art.json"])
     files["SOURCE-INPUTS.json"] = _json(dict(source_files))
     identity = {
         "format": 1,
@@ -197,6 +224,7 @@ def verify_portable_zip(path: Path) -> dict[str, object]:
             _validate_payload_path(name, metadata=True)
         if not REQUIRED_PAYLOADS <= set(names):
             raise ReleaseArtifactError("Portable archive required payload is incomplete")
+        _verify_artwork_inventory(names, archive.read("artwork/character-art.json"))
         entries = json.loads(archive.read(ENTRY_MANIFEST))
         if set(names) != set(entries) | {ENTRY_MANIFEST}:
             raise ReleaseArtifactError("Portable archive inventory does not match its manifest")

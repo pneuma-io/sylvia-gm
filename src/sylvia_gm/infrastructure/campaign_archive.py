@@ -24,6 +24,7 @@ from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
 from types import MappingProxyType
 from typing import Any, BinaryIO, Never, cast
+from uuid import NAMESPACE_URL, uuid5
 
 from sylvia_gm.domain.errors import CommandRejected
 from sylvia_gm.domain.package_library import (
@@ -1901,6 +1902,7 @@ class _AuthorityScanSummary:
     file_blob_byte_counts: dict[str, set[object]] = field(default_factory=dict)
     image_blob_sha256s: set[str] = field(default_factory=set)
     image_requests: dict[str, tuple[str, str, str | None]] = field(default_factory=dict)
+    local_image_requests: set[str] = field(default_factory=set)
     image_selections: list[tuple[str, str, str, str]] = field(default_factory=list)
     namespace_owners: dict[str, str | None] = field(default_factory=dict)
     state_namespaces: set[str] = field(default_factory=set)
@@ -2333,9 +2335,30 @@ def _record_authority_summary(
             )
     elif table == "image_requests":
         digest = materialized["result_sha256"]
-        summary.image_requests[str(materialized["operation_id"])] = (
+        operation_id = str(materialized["operation_id"])
+        summary.image_requests[operation_id] = (
             str(materialized["session_id"]), str(materialized["purpose"]), digest,
         )
+        value = json.loads(str(materialized["request_json"]))
+        # A local artwork copy can belong to a campaign before it has an agent session.
+        # Remote requests still require their original session and ordinary authority closure.
+        if (
+            isinstance(value, dict)
+            and {"source", "metadata", "adopted", "adopted_frame"} <= set(value)
+            <= {"source", "metadata", "adopted", "adopted_frame", "publications"}
+            and value["source"] == "campaign_asset"
+            and value["adopted"] is True
+            and isinstance(value["metadata"], dict)
+            and materialized["session_id"] == materialized["campaign_id"]
+            and materialized["status"] == "succeeded"
+            and materialized["request_sha256"] == hashlib.sha256(operation_id.encode()).hexdigest()
+            and operation_id == str(uuid5(
+                NAMESPACE_URL,
+                f"sylvia-character-art:{materialized['campaign_id']}:"
+                f"{materialized['target_id']}:{materialized['purpose']}:{digest}",
+            ))
+        ):
+            summary.local_image_requests.add(operation_id)
         if digest is not None:
             summary.image_blob_sha256s.add(str(digest))
     elif table == "image_selections":
@@ -2711,7 +2734,8 @@ def validate_campaign_archive(path: Path, *, expected_campaign_id: str) -> Mappi
         member_blobs = {name.removeprefix("blobs/") for name in blob_names}
         file_blobs = set(authority.file_blob_byte_counts) | authority.image_blob_sha256s
         if any(value[0] not in authority.parents["sessions"]
-               for value in authority.image_requests.values()):
+               and identity not in authority.local_image_requests
+               for identity, value in authority.image_requests.items()):
             raise _failure("portable_export_invalid_authority_closure")
         for operation_id, purpose, digest, scope in authority.image_selections:
             source = authority.image_requests.get(operation_id)

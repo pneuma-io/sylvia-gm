@@ -1,4 +1,4 @@
-"""Keep Character File images inside the same immutable package as their visual references."""
+"""Keep custom character art portable and reuse the shared first-party artwork library."""
 
 from __future__ import annotations
 
@@ -8,6 +8,7 @@ from collections.abc import Callable, Mapping
 from dataclasses import replace
 from typing import Any
 
+from sylvia_gm.application.bundled_character_art import bundled_character_reference
 from sylvia_gm.application.character_profiles import _parse
 from sylvia_gm.application.image_hooks import ImageData, _declare_images
 from sylvia_gm.application.package_materialization import NormalizedPackageDraft
@@ -20,10 +21,21 @@ ImageAssetReader = Callable[[Mapping[str, Any]], bytes]
 def include_character_art(
     draft: NormalizedPackageDraft,
     read_asset: ImageAssetReader | None = None,
+    *,
+    include_shared_art: bool = False,
 ) -> NormalizedPackageDraft:
     """Resolve only explicit character references; never generate images or read arbitrary files."""
     payloads = dict(draft.payloads)
     assets = set()
+    removed = set()
+    if not include_shared_art:
+        for path, data in draft.payloads.items():
+            digest = path.removeprefix("assets/characters/").removesuffix(".png")
+            if bundled_character_reference(path, digest):
+                if hashlib.sha256(data).hexdigest() != digest:
+                    raise ValueError("Character artwork does not match its saved identity")
+                del payloads[path]
+                removed.add(path)
     for path, data in draft.payloads.items():
         if not path.endswith(".json") or len(data) > 256 * 1024:
             continue
@@ -50,6 +62,11 @@ def include_character_art(
             if reference is None:
                 continue
             asset_path = reference.get("path", f"assets/characters/{reference['sha256']}.png")
+            if not include_shared_art and bundled_character_reference(
+                asset_path, reference["sha256"]
+            ):
+                reference["path"] = asset_path
+                continue
             if any(
                 member.casefold() == asset_path.casefold() and member != asset_path
                 for member in payloads
@@ -70,7 +87,14 @@ def include_character_art(
             reference["path"] = asset_path
         if visuals != character["visuals"]:
             payloads[path] = canonical_json_bytes({**character, "visuals": visuals})
-    if not assets:
-        return draft
-    _declare_images(draft, payloads, character_assets=frozenset(assets))
+    if assets or removed:
+        declarations_path = draft.record.get("content_declarations")
+        if removed and declarations_path in payloads:
+            declarations = json.loads(payloads[declarations_path])
+            assets.update(
+                path for inclusion in declarations["inclusions"]
+                if inclusion["id"] == "image-hooks-selected-assets"
+                for path in inclusion["links"]["artifacts"] if path in payloads
+            )
+        _declare_images(draft, payloads, character_assets=frozenset(assets))
     return replace(draft, payloads=payloads)

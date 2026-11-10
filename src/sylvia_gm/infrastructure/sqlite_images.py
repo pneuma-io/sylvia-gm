@@ -505,7 +505,9 @@ class ImageStore:
                     "target_id": target_id,
                     "request_sha256": hashlib.sha256(identity.encode()).hexdigest(),
                     "request_json": canonical_json_bytes(
-                        {"source": "character_file", "metadata": metadata}
+                        {"source": "campaign_asset"
+                         if session_id == campaign_id else "character_file",
+                         "metadata": metadata}
                     ).decode(),
                 }
                 admit(connection, copied)

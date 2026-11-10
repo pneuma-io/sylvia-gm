@@ -1089,6 +1089,12 @@ supported content catalogues. Reusing shipped art requires no generation request
 mechanical editions of the same identity reuse its art unless an authored appearance change
 requires a different version. Blank character templates obtain art when their appearance is known.
 
+Premade artwork ships once in Sylvia's shared app artwork library. Sharing a whole Setting or
+Plan retains its references to that library without duplicating unused premade PNGs. Custom
+art remains portable with the content that uses it. Character and campaign exports carry their
+used artwork, including premade images, so those exports retain the selected appearance and crop.
+The shared catalogue does not raise the existing content-package size limits.
+
 New characters and companions, imported cards, adaptations and later GM-created NPCs or enemies
 have discoverable artwork controls in their normal creation and character views. The Builder
 interview handles missing art within the character workflow, respecting Off/Review/Auto. Users

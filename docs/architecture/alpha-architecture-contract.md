@@ -1071,11 +1071,23 @@ card text metadata stripped; the unchanged original remains in the import librar
 image reuse works with generation Off. Supported PNG input includes grayscale, palette, RGB/RGBA,
 16-bit and interlaced images within the bounded artwork limits.
 
-Prepared first-party artwork is listed by exact PNG hash in the bundled character-art catalogue.
+Prepared first-party artwork is listed by exact PNG hash in the shared `artwork/character-art.json`
+catalogue. Installer and portable resources carry its declared PNGs beside the owner executable;
+they are outside the onefile sidecar and its per-launch extraction. Source execution uses the
+same `artwork` directory in the checkout. Resource inventories include only the declared library.
+Setting and Plan packages retain portable hash/path references to shared art without embedding
+the whole catalogue. Custom character artwork remains embedded in those packages. The public
+content-package archive and expansion limits remain unchanged.
 Starter Character Files retain the same portable visual records as user-created characters.
 The owner may resolve these listed assets from the installed catalogue when a retained Plan's
 older Setting does not contain them. This does not change that Plan's package pin. Restored bytes
 become campaign-owned selections and travel in its archive; a recipient does not need the catalogue.
+Export retains all used character artwork even when no artwork view was opened. This local copy
+does not submit an image request to a provider or require an active agent session. Missing shared
+or custom bytes produce a repair instruction instead of silently regenerating an image.
+These local copy receipts use the campaign scope as their owner. Archive verification admits
+that explicit local-copy source only with its deterministic campaign/target/purpose/hash identity,
+succeeded status and copy-request hash; provider requests still require their recorded session.
 Known NPCs and enemies use their committed Setting source reference. Catalogue lookup requires
 the exact package ID, path and normalized source hash; display names do not bind artwork. Private
 or retired identities do not acquire prepared art. Normal image status restores these selections
@@ -1087,8 +1099,10 @@ The character artwork workflow composes the existing image requests rather than 
 job store. Each persisted request records its workflow and stage. Adoption prepares the next
 missing stage; Auto may dispatch it, while Review waits for Generate. Reopen never dispatches
 work. Setting and Plan draft checks/publication resolve explicit Character File PNG references
-through the publishing session's scoped image reader and include the exact bytes and content
-declarations. They do not generate art, fetch external assets or change the source workspace.
+through the publishing session's scoped image reader and include custom bytes and content
+declarations. Exact shared-library references remain references; an explicit character export
+includes its used shared images as well. Publication does not generate art, fetch external assets
+or change the source workspace.
 Partial visual bundles explicitly list unfinished purposes while retaining usable bytes/framing.
 Owner-published source identity/hash pairs are associated with the existing image request receipts.
 Those associations are preserved when dispatch binds inputs and when later workflow stages are

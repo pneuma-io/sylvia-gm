@@ -37,14 +37,27 @@ package restoration. Follow-up work adds explicit partial-art records, saved-sou
 later adopted stages, library/campaign materialization and portrait-only reuse with generation Off.
 Saving a character now prepares its artwork workflow under Review/Auto; conversation-model image
 tool calls are optional. Focused source checks cover those handoffs and campaign-copy isolation.
-Prepared catalogue production has begun: Mara Flint, Neri Vale and Oren Reed each have a generated
+Prepared catalogue production has begun: Mara Flint, Neri Vale, Oren Reed, Sela Moss, Bram Alder
+and Iri Swift, plus Tess Rowan, Kest Wren and Pip Venn, each have a generated
 full-body image, multi-view sheet and portrait. Their starter files retain the shared visual
 records; the installed catalogue also supplies these assets to retained Plan editions. Real-PNG
 checks cover crop, reopen and export/recovery without the catalogue. Reopening resolves retained
 images for the same campaign, character, purpose and hash before looking for original assets.
 Anchor Sentinel also has a prepared nonhumanoid bundle and source profile links. Known entities
 reuse it through their exact Setting source reference during normal status refresh; names alone
-do not select art. Nine other starters, the NPCs, companions and remaining enemies still need artwork. Broader everyday journey
+do not select art. Three other starters, the NPCs, companions and remaining enemies still need artwork.
+The owner selected a shared app artwork library: whole Setting/Plan exports omit unused premade
+PNGs, while custom art stays portable and character/campaign exports carry used artwork. The
+source now maps the catalogue and PNGs as external installer/portable resources, outside the
+onefile sidecar. Campaign export retains used art before any artwork view has been opened.
+The prepared PNG pool now totals 70,937,190 bytes, beyond the 64 MiB content-package cap.
+The current Setting omits those PNGs; its existing content-package limits remain unchanged.
+Focused checks cover shared/custom publication, external resource inventory, portable ZIP assembly,
+and exact campaign art transfer before opening an image view. Local-copy receipts also transfer
+without creating an agent session, while provider requests retain their session requirement.
+The explicit character-payload helper includes used shared art; standalone character/profile export
+and import still need a normal user-facing path.
+Broader everyday journey
 qualification remains open. The unfinished-draft `candidate_unavailable` finding is fixed for new
 exports: confirmation references now retain their candidate and package closure. Recovery checks
 cover fresh/shared libraries, differing local activation markers, continuation and reopen. Shared
@@ -52,7 +65,7 @@ candidate reuse preserves recipient metadata and rejects different content. Imag
 actual Lite prepared-art transfer checks now retain the normal candidate reference. Older incomplete
 archives that omitted it require a fresh export from the source dataset.
 These source/scripted checks do not establish completion of the ordinary
-workflows. The owner's latest selection keeps live in-app checks pending. The twelve prepared assets
+workflows. The owner's latest selection keeps live in-app checks pending. The 30 prepared assets
 were produced with the built-in GPT Images tool, separately from Sylvia's deferred native check.
 Live Sylvia subscription, installed-app
 and TD trailer acceptance remain unverified. Merge follows the Pneuma IO rulebook's delivery and

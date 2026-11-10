@@ -8052,6 +8052,13 @@ class AuthorityOwner:
         validate_authority_identity(operation_id, "Operation id")
         validate_authority_identity(campaign_id, "Campaign id")
         with self._operation():
+            from sylvia_gm.application.image_art import ImageArt
+
+            art = ImageArt(self)
+            try:
+                art.retain_campaign_visuals(campaign_id)
+            finally:
+                art.close()
             return self._store.export_campaign(
                 campaign_id, target, include_thinking=include_thinking,
             )

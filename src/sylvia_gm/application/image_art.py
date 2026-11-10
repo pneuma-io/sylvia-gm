@@ -113,6 +113,29 @@ class ImageArt:
                 "kind": "character",
                 "name": name,
             }
+        self._restore_visuals(
+            scope, campaign_id, session_id, target_id, visuals,
+            assets=assets, name=name, asset_reader=asset_reader,
+        )
+
+    def retain_campaign_visuals(self, campaign_id: str) -> None:
+        """Make used art portable even when no image view or agent session has been opened."""
+        for target_id, visuals in self.owner.character_visuals(campaign_id).items():
+            # Local copy receipts belong to this campaign, without inventing an agent session.
+            self._restore_visuals(campaign_id, campaign_id, campaign_id, target_id, visuals)
+
+    def _restore_visuals(
+        self,
+        scope: str,
+        campaign_id: str | None,
+        session_id: str,
+        target_id: str,
+        visuals: object,
+        *,
+        assets: Mapping[str, bytes] | None = None,
+        name: str | None = None,
+        asset_reader: Callable[[str], bytes | None] | None = None,
+    ) -> None:
         bundle = validate_character_visuals(visuals)
         if bundle is not None:
             available = dict(assets or {})
@@ -140,7 +163,8 @@ class ImageArt:
                     if image is not None:
                         available[reference["path"]] = image
                 if reference["path"] not in available and campaign_id is not None:
-                    for entry in self.owner.snapshot(campaign_id).package_lock.entries:
+                    package_lock = self.owner._store.current_package_lock(campaign_id).package_lock
+                    for entry in package_lock.entries:
                         image = self.owner._store.package_file_bytes(
                             entry.package_id,
                             entry.version,
@@ -160,7 +184,8 @@ class ImageArt:
                         available[reference["path"]] = image
                 if reference["path"] not in available:
                     raise ValueError(
-                        "Saved character artwork is missing; reimport its complete asset package"
+                        "Saved character artwork is missing; restore Sylvia's artwork folder "
+                        "or reimport the character's complete asset package"
                     )
             self.store.attach_character_visuals(
                 scope_id=scope,
