@@ -17,3 +17,15 @@ She'll sell to anyone. She'll also slip an extra roll to the Warrens kids who ha
 ## Personality
 
 Warm, practical, and politically aware in the way that small business owners have to be. Tessa treats baking as craft and community — the bakery feeds Thornwall, and Thornwall takes care of the bakery. That's how it's always worked. She doesn't see why Riftborn should be any different.
+
+## Appearance and artwork
+
+An adult Human woman in her late thirties with a sturdy build, fair warm skin with freckles, blue-green eyes, a round friendly face and thick auburn hair braided and pinned back. A rust-brown rolled-sleeve work dress, cream flour-dusted apron, plain leather belt and practical brown boots. Bare forearms with a light dusting of flour, a small linen cloth and one simple round loaf in her hands. Warm, practical expression.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/f6d66aee896b350693861e4a95fddca13d39af59990d0576435cdfe067b4b89b.png)
+
+[Full-body reference](../assets/characters/a4677d0ef84b76e8ca6c5935d3b837fadab5d19b8511a592e727366d2995a4c2.png)
+
+[Multiview reference sheet](../assets/characters/b3c0bd4232cfeee3e47bfda305cb6ecba81865cd1a9ddd53fb50a7cd57530177.png)

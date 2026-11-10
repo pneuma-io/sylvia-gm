@@ -768,6 +768,366 @@
         "reference_sheet": "Use case: identity-preserve. Asset type: canonical multi-view reference sheet for Anchor Guardian, Sylvia GM Severed Lands. Input image 1 is the authoritative full-body identity reference. One landscape PNG, 1536x1024. Polished naturalistic digital RPG illustration, plain light neutral background and soft natural studio light. Three complete figures at the same scale, straight front, exact side and straight back, plus one enlarged frontal head detail. Preserve the exact silhouette, proportions, materials, construction, colors, wear, equipment and every identifying detail of image 1. A hulking roughly human-shaped Warden stone guardian with a broad heavy torso, thick asymmetrical stone limbs and blunt stony hands, fused with sealed muted gray-brown organic tissue along joints and cracks. Worn pale-gray carved stone plates, restrained angular Warden masonry and small sickly violet Rift glimmers inside a few seams. Heavy impassive carved stone brow and narrow dim eye slits, no human face. Ancient precise construction mixed with an uneasy living posture. No exposed organs, gore, armor, clothing, weapons or faction heraldry. Complete head and feet inside comfortable margins. Keep equipment and surfaces physically consistent between views. Maintain the same irregular stone plate placements and sealed intact organic seams, with restrained violet glimmers. No exposed organs, blood, wounds, new armor, new weapons or new limbs. No redesign, extra people, scenery, text, labels, borders, UI or invented emblems.",
         "portrait": "Use case: identity-preserve. Asset type: aligned reusable square portrait for Anchor Guardian, Sylvia GM Severed Lands. Input image 1 is the canonical full-body identity; input image 2 is the canonical multi-view reference. Produce one square PNG, 1024x1024. Polished naturalistic digital RPG illustration, plain light neutral background, soft natural studio light. Preserve the same head, silhouette, materials, colors, clothing and exact identity. A hulking roughly human-shaped Warden stone guardian with a broad heavy torso, thick asymmetrical stone limbs and blunt stony hands, fused with sealed muted gray-brown organic tissue along joints and cracks. Worn pale-gray carved stone plates, restrained angular Warden masonry and small sickly violet Rift glimmers inside a few seams. Heavy impassive carved stone brow and narrow dim eye slits, no human face. Ancient precise construction mixed with an uneasy living posture. No exposed organs, gore, armor, clothing, weapons or faction heraldry. Head and upper shoulders only, upright directly forward pose without tilt, centered head, comfortable margin above the entire head and on both sides for adjustable circular cropping. Place the eye slits at 35 percent of image height with a consistent large readable head scale. Retain the angular stone brow and long carved stone muzzle-like face structure, sealed organic neck seams and subtle violet eye slits. No human face, wounds, blood or exposed organs. No carried props, hands, map, divider or satchel inside the crop. No redesign, text, labels, borders, UI, scenery, invented emblems or extra people."
       }
+    },
+    {
+      "id": "severed-npc-baker-tessa",
+      "name": "Tessa",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/baker-tessa.md",
+          "sha256": "939f27479036aa63558fdd905fd5de709d2200af3721367d1faa431c590da1ac",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/baker-tessa.md",
+          "sha256": "b47fe274668368992046981bf044e05a46214f37890ef709a5473c70bff0e087",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult Human woman in her late thirties with a sturdy build, fair warm skin with freckles, blue-green eyes, a round friendly face and thick auburn hair braided and pinned back. A rust-brown rolled-sleeve work dress, cream flour-dusted apron, plain leather belt and practical brown boots. Bare forearms with a light dusting of flour, a small linen cloth and one simple round loaf in her hands. Warm, practical expression.",
+        "full_body": {
+          "path": "assets/characters/a4677d0ef84b76e8ca6c5935d3b837fadab5d19b8511a592e727366d2995a4c2.png",
+          "sha256": "a4677d0ef84b76e8ca6c5935d3b837fadab5d19b8511a592e727366d2995a4c2"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/b3c0bd4232cfeee3e47bfda305cb6ecba81865cd1a9ddd53fb50a7cd57530177.png",
+          "sha256": "b3c0bd4232cfeee3e47bfda305cb6ecba81865cd1a9ddd53fb50a7cd57530177"
+        },
+        "portrait": {
+          "path": "assets/characters/f6d66aee896b350693861e4a95fddca13d39af59990d0576435cdfe067b4b89b.png",
+          "sha256": "f6d66aee896b350693861e4a95fddca13d39af59990d0576435cdfe067b4b89b"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2189605
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2725069
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2602875
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body reference for Sylvia GM's Severed Lands premade catalogue. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG character illustration, plain light neutral background, soft natural studio light and subtle grounding shadow. Exactly one complete standing figure, top of hair to boot or shoe soles, inside comfortable margins; relaxed near-front three-quarter pose, clear face and physically sound anatomy. Character: Tessa. Authored requirements: Thornwall baker; a practical, warm community craftswoman from a family of bakers. Her food is ordinary food, without magical or mechanical effects. Appearance: An adult Human woman in her late thirties with a sturdy build, fair warm skin with freckles, blue-green eyes, a round friendly face and thick auburn hair braided and pinned back. A rust-brown rolled-sleeve work dress, cream flour-dusted apron, plain leather belt and practical brown boots. Bare forearms with a light dusting of flour, a small linen cloth and one simple round loaf in her hands. Warm, practical expression. Details not specified by the authored text are editable visual defaults, without changing biography, mechanics or secrets. No invented home, faction heraldry, religious symbols, labels or game statistics. No text, writing, borders, montage, UI, environment, scenery, magic effects or additional figures. Keep carried items modest and recognizable.",
+        "reference_sheet": "Use case: identity-preserve. Production canonical multi-view reference sheet for Tessa in Sylvia GM's Severed Lands. Input image 1 is the authoritative full-body identity reference. One landscape PNG, 1536x1024. Polished naturalistic digital RPG illustration, plain light neutral background, soft natural studio light. Three complete figures at identical scale: straight front, exact side profile, straight back; plus one enlarged directly forward head detail. Preserve the exact face, apparent adult age, body proportions, skin, eye color, hair arrangement, costume construction, colors, wear and equipment of input image 1. An adult Human woman in her late thirties with a sturdy build, fair warm skin with freckles, blue-green eyes, a round friendly face and thick auburn hair braided and pinned back. A rust-brown rolled-sleeve work dress, cream flour-dusted apron, plain leather belt and practical brown boots. Bare forearms with a light dusting of flour, a small linen cloth and one simple round loaf in her hands. Warm, practical expression. Authored requirements: Thornwall baker; a practical, warm community craftswoman from a family of bakers. Her food is ordinary food, without magical or mechanical effects. Outfit and props must remain physically consistent between views, with complete head and boot/shoe soles inside comfortable margins. Keep the face readable and unobstructed. No new accessories, new powers, character redesign, extra people, captions, writing, labels, borders, UI, scenery, symbols or magical effects.",
+        "portrait": "Use case: identity-preserve. Aligned reusable square portrait of Tessa for Sylvia GM. Input image 1 is the canonical full-body identity, and image 2 is this character's canonical multi-view sheet. One square PNG, 1024x1024. Polished naturalistic digital RPG illustration, plain light neutral background and soft natural studio light. Preserve the exact face, apparent adult age, skin, eye color, hair arrangement and upper clothing from these references. An adult Human woman in her late thirties with a sturdy build, fair warm skin with freckles, blue-green eyes, a round friendly face and thick auburn hair braided and pinned back. A rust-brown rolled-sleeve work dress, cream flour-dusted apron, plain leather belt and practical brown boots. Bare forearms with a light dusting of flour, a small linen cloth and one simple round loaf in her hands. Warm, practical expression. Authored constraints: Thornwall baker; a practical, warm community craftswoman from a family of bakers. Her food is ordinary food, without magical or mechanical effects. Composition: head and upper shoulders only, directly forward, upright head without tilt, level eyes facing viewer. Center the face with the eye line at 35 percent of image height, consistent head scale, and comfortable space above all hair and at both sides for adjustable circular cropping. Keep the face unobstructed. Preserve the referenced character's characteristic restrained expression; no exaggerated expression or redesign. No hands or carried props, weapons, cup, loaf, herbs, case, satchel or medicine inside the crop.  No text, labels, borders, UI, scenery, symbols or magic."
+      }
+    },
+    {
+      "id": "severed-npc-guard-miri",
+      "name": "Miri",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/guard-miri.md",
+          "sha256": "569c460e2007ee1a2de51451903fad396ce952cec1f20808e6e3768e17b85231",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/guard-miri.md",
+          "sha256": "0904b3092f4cb5d6a98aa05d2eff8e93e470d088f24fc8b429df4951afaf429c",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult Human woman in her early thirties with an athletic lean build, deep warm brown skin, dark brown eyes, a long oval face and tightly braided dark hair gathered behind her head. Plain muted blue-gray guard tunic, closed collar, practical steel mail shirt under a simple dark leather jerkin, dark trousers, brown boots, plain belt and sheathed short sidearm. No helmet so her face is clear. Quiet, composed, sympathetic expression. Her brother's ring and chain remain completely hidden beneath her closed uniform.",
+        "full_body": {
+          "path": "assets/characters/34091fd6cff0927bf288ec9b978842150d8291f4ae4f0d0cc9dbd6a028e209dc.png",
+          "sha256": "34091fd6cff0927bf288ec9b978842150d8291f4ae4f0d0cc9dbd6a028e209dc"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/9cd209a98c5f24059c56693ac8d51bb143af2194b600a25111e7c7924bee91a1.png",
+          "sha256": "9cd209a98c5f24059c56693ac8d51bb143af2194b600a25111e7c7924bee91a1"
+        },
+        "portrait": {
+          "path": "assets/characters/8141b920c712b0d5d72688a85f7eed35fb1eccb106fd17eed9dc4de75c499d97.png",
+          "sha256": "8141b920c712b0d5d72688a85f7eed35fb1eccb106fd17eed9dc4de75c499d97"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1913594
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2444054
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2414748
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body reference for Sylvia GM's Severed Lands premade catalogue. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG character illustration, plain light neutral background, soft natural studio light and subtle grounding shadow. Exactly one complete standing figure, top of hair to boot or shoe soles, inside comfortable margins; relaxed near-front three-quarter pose, clear face and physically sound anatomy. Character: Miri. Authored requirements: Thornwall gate guard with three years on duty, dutiful and quietly sympathetic. Her brother's ring is worn on a chain UNDER her uniform; do not expose it or illustrate her private grief as an overt emblem. Appearance: An adult Human woman in her early thirties with an athletic lean build, deep warm brown skin, dark brown eyes, a long oval face and tightly braided dark hair gathered behind her head. Plain muted blue-gray guard tunic, closed collar, practical steel mail shirt under a simple dark leather jerkin, dark trousers, brown boots, plain belt and sheathed short sidearm. No helmet so her face is clear. Quiet, composed, sympathetic expression. Her brother's ring and chain remain completely hidden beneath her closed uniform. Details not specified by the authored text are editable visual defaults, without changing biography, mechanics or secrets. No invented home, faction heraldry, religious symbols, labels or game statistics. No text, writing, borders, montage, UI, environment, scenery, magic effects or additional figures. Keep carried items modest and recognizable.",
+        "reference_sheet": "Use case: identity-preserve. Production canonical multi-view reference sheet for Miri in Sylvia GM's Severed Lands. Input image 1 is the authoritative full-body identity reference. One landscape PNG, 1536x1024. Polished naturalistic digital RPG illustration, plain light neutral background, soft natural studio light. Three complete figures at identical scale: straight front, exact side profile, straight back; plus one enlarged directly forward head detail. Preserve the exact face, apparent adult age, body proportions, skin, eye color, hair arrangement, costume construction, colors, wear and equipment of input image 1. An adult Human woman in her early thirties with an athletic lean build, deep warm brown skin, dark brown eyes, a long oval face and tightly braided dark hair gathered behind her head. Plain muted blue-gray guard tunic, closed collar, practical steel mail shirt under a simple dark leather jerkin, dark trousers, brown boots, plain belt and sheathed short sidearm. No helmet so her face is clear. Quiet, composed, sympathetic expression. Her brother's ring and chain remain completely hidden beneath her closed uniform. Authored requirements: Thornwall gate guard with three years on duty, dutiful and quietly sympathetic. Her brother's ring is worn on a chain UNDER her uniform; do not expose it or illustrate her private grief as an overt emblem. Outfit and props must remain physically consistent between views, with complete head and boot/shoe soles inside comfortable margins. Keep the face readable and unobstructed. No new accessories, new powers, character redesign, extra people, captions, writing, labels, borders, UI, scenery, symbols or magical effects.",
+        "portrait": "Use case: identity-preserve. Aligned reusable square portrait of Miri for Sylvia GM. Input image 1 is the canonical full-body identity, and image 2 is this character's canonical multi-view sheet. One square PNG, 1024x1024. Polished naturalistic digital RPG illustration, plain light neutral background and soft natural studio light. Preserve the exact face, apparent adult age, skin, eye color, hair arrangement and upper clothing from these references. An adult Human woman in her early thirties with an athletic lean build, deep warm brown skin, dark brown eyes, a long oval face and tightly braided dark hair gathered behind her head. Plain muted blue-gray guard tunic, closed collar, practical steel mail shirt under a simple dark leather jerkin, dark trousers, brown boots, plain belt and sheathed short sidearm. No helmet so her face is clear. Quiet, composed, sympathetic expression. Her brother's ring and chain remain completely hidden beneath her closed uniform. Authored constraints: Thornwall gate guard with three years on duty, dutiful and quietly sympathetic. Her brother's ring is worn on a chain UNDER her uniform; do not expose it or illustrate her private grief as an overt emblem. Composition: head and upper shoulders only, directly forward, upright head without tilt, level eyes facing viewer. Center the face with the eye line at 35 percent of image height, consistent head scale, and comfortable space above all hair and at both sides for adjustable circular cropping. Keep the face unobstructed. Preserve the referenced character's characteristic restrained expression; no exaggerated expression or redesign. No hands or carried props, weapons, cup, loaf, herbs, case, satchel or medicine inside the crop.  No text, labels, borders, UI, scenery, symbols or magic."
+      }
+    },
+    {
+      "id": "severed-npc-captain-harlan",
+      "name": "Captain Harlan",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/captain-harlan.md",
+          "sha256": "177a7256e9b7adf335a201511048c6c85041e8b5ff1c537d57698381bf07a893",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/captain-harlan.md",
+          "sha256": "b59af1f5605b1fdb11ca88c328d75a657c9f09b0e93a4a8d84f58a2588ea96d6",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A broad-shouldered adult Human man in his early fifties with weathered medium fair skin, brown eyes, short dark hair graying at the temples, a neatly trimmed salt-and-pepper beard and a square tired face. Practical worn steel breastplate over a muted blue-gray guard tunic, plain dark shoulder cloak, leather gloves, dark trousers and brown boots. A sheathed service sword and an ordinary belt pouch. Head uncovered, calm professional but troubled expression.",
+        "full_body": {
+          "path": "assets/characters/92b92797be29ccae49f12646a78e29208ff083048fbe19a532477887b2d3c1d9.png",
+          "sha256": "92b92797be29ccae49f12646a78e29208ff083048fbe19a532477887b2d3c1d9"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/cf1c300f328040e9a1ad976a93e2f60d39a485089f25d3699d0071660836a47f.png",
+          "sha256": "cf1c300f328040e9a1ad976a93e2f60d39a485089f25d3699d0071660836a47f"
+        },
+        "portrait": {
+          "path": "assets/characters/318d9862e76a38f725e7576507ca36116548e6c047fcf53999598c8e17eaa08f.png",
+          "sha256": "318d9862e76a38f725e7576507ca36116548e6c047fcf53999598c8e17eaa08f"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1984709
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2475028
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2507593
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body reference for Sylvia GM's Severed Lands premade catalogue. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG character illustration, plain light neutral background, soft natural studio light and subtle grounding shadow. Exactly one complete standing figure, top of hair to boot or shoe soles, inside comfortable margins; relaxed near-front three-quarter pose, clear face and physically sound anatomy. Character: Captain Harlan. Authored requirements: Thornwall guard captain, twenty years of service and captain for five. Professional, institutional and conflicted. His equipment is visual role shorthand, without new stats, abilities, insignia or political allegiance. Appearance: A broad-shouldered adult Human man in his early fifties with weathered medium fair skin, brown eyes, short dark hair graying at the temples, a neatly trimmed salt-and-pepper beard and a square tired face. Practical worn steel breastplate over a muted blue-gray guard tunic, plain dark shoulder cloak, leather gloves, dark trousers and brown boots. A sheathed service sword and an ordinary belt pouch. Head uncovered, calm professional but troubled expression. Details not specified by the authored text are editable visual defaults, without changing biography, mechanics or secrets. No invented home, faction heraldry, religious symbols, labels or game statistics. No text, writing, borders, montage, UI, environment, scenery, magic effects or additional figures. Keep carried items modest and recognizable.",
+        "reference_sheet": "Use case: identity-preserve. Production canonical multi-view reference sheet for Captain Harlan in Sylvia GM's Severed Lands. Input image 1 is the authoritative full-body identity reference. One landscape PNG, 1536x1024. Polished naturalistic digital RPG illustration, plain light neutral background, soft natural studio light. Three complete figures at identical scale: straight front, exact side profile, straight back; plus one enlarged directly forward head detail. Preserve the exact face, apparent adult age, body proportions, skin, eye color, hair arrangement, costume construction, colors, wear and equipment of input image 1. A broad-shouldered adult Human man in his early fifties with weathered medium fair skin, brown eyes, short dark hair graying at the temples, a neatly trimmed salt-and-pepper beard and a square tired face. Practical worn steel breastplate over a muted blue-gray guard tunic, plain dark shoulder cloak, leather gloves, dark trousers and brown boots. A sheathed service sword and an ordinary belt pouch. Head uncovered, calm professional but troubled expression. Authored requirements: Thornwall guard captain, twenty years of service and captain for five. Professional, institutional and conflicted. His equipment is visual role shorthand, without new stats, abilities, insignia or political allegiance. Outfit and props must remain physically consistent between views, with complete head and boot/shoe soles inside comfortable margins. Keep the face readable and unobstructed. No new accessories, new powers, character redesign, extra people, captions, writing, labels, borders, UI, scenery, symbols or magical effects.",
+        "portrait": "Use case: identity-preserve. Aligned reusable square portrait of Captain Harlan for Sylvia GM. Input image 1 is the canonical full-body identity, and image 2 is this character's canonical multi-view sheet. One square PNG, 1024x1024. Polished naturalistic digital RPG illustration, plain light neutral background and soft natural studio light. Preserve the exact face, apparent adult age, skin, eye color, hair arrangement and upper clothing from these references. A broad-shouldered adult Human man in his early fifties with weathered medium fair skin, brown eyes, short dark hair graying at the temples, a neatly trimmed salt-and-pepper beard and a square tired face. Practical worn steel breastplate over a muted blue-gray guard tunic, plain dark shoulder cloak, leather gloves, dark trousers and brown boots. A sheathed service sword and an ordinary belt pouch. Head uncovered, calm professional but troubled expression. Authored constraints: Thornwall guard captain, twenty years of service and captain for five. Professional, institutional and conflicted. His equipment is visual role shorthand, without new stats, abilities, insignia or political allegiance. Composition: head and upper shoulders only, directly forward, upright head without tilt, level eyes facing viewer. Center the face with the eye line at 35 percent of image height, consistent head scale, and comfortable space above all hair and at both sides for adjustable circular cropping. Keep the face unobstructed. Preserve the referenced character's characteristic restrained expression; no exaggerated expression or redesign. No hands or carried props, weapons, cup, loaf, herbs, case, satchel or medicine inside the crop.  No text, labels, borders, UI, scenery, symbols or magic."
+      }
+    },
+    {
+      "id": "severed-npc-auntie-salt",
+      "name": "Auntie Salt",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/auntie-salt.md",
+          "sha256": "e5f442cbdb2e1d04d5ae27ca9a2be6255d23e609d5ede6ed48e6da1cdd569588",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/auntie-salt.md",
+          "sha256": "1dc1fb98b9917dc75f59aa8f1b0dc25bbcb06025827a7d8777197ccf3df7d8d9",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A short stocky older Human woman in her seventies with warm brown skin, pale gray eyes, a softly lined broad face and white hair pinned into a tidy bun. Layers of practical burgundy clothing, a worn deep teal shawl, plain brown skirt, comfortable leather shoes, a small waist pouch and simple brass earrings. Carries one plain ceramic tea cup and saucer. A cheerful grandmotherly smile and sharp observant eyes.",
+        "full_body": {
+          "path": "assets/characters/2e64fd5f33cd1e550a037597da7b9bf36d8491e095adb0f0eb6dfa04c3fb84cc.png",
+          "sha256": "2e64fd5f33cd1e550a037597da7b9bf36d8491e095adb0f0eb6dfa04c3fb84cc"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/2feec661eab81aed24c3ddf5024902b0223cc8ab5f96eccb4e71cf9bba63dc98.png",
+          "sha256": "2feec661eab81aed24c3ddf5024902b0223cc8ab5f96eccb4e71cf9bba63dc98"
+        },
+        "portrait": {
+          "path": "assets/characters/e8d4361182d44f74ca5835af1ea007bf4528e29510e0b1587563d596f9cacc6a.png",
+          "sha256": "e8d4361182d44f74ca5835af1ea007bf4528e29510e0b1587563d596f9cacc6a"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2249735
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2761032
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2644178
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body reference for Sylvia GM's Severed Lands premade catalogue. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG character illustration, plain light neutral background, soft natural studio light and subtle grounding shadow. Exactly one complete standing figure, top of hair to boot or shoe soles, inside comfortable margins; relaxed near-front three-quarter pose, clear face and physically sound anatomy. Character: Auntie Salt. Authored requirements: Cheerful grandmotherly Warrens information broker, always offers tea, sells knowledge without loyalty to a faction. Do not put secrets, faction marks, poison effects or readable information into the image. Appearance: A short stocky older Human woman in her seventies with warm brown skin, pale gray eyes, a softly lined broad face and white hair pinned into a tidy bun. Layers of practical burgundy clothing, a worn deep teal shawl, plain brown skirt, comfortable leather shoes, a small waist pouch and simple brass earrings. Carries one plain ceramic tea cup and saucer. A cheerful grandmotherly smile and sharp observant eyes. Details not specified by the authored text are editable visual defaults, without changing biography, mechanics or secrets. No invented home, faction heraldry, religious symbols, labels or game statistics. No text, writing, borders, montage, UI, environment, scenery, magic effects or additional figures. Keep carried items modest and recognizable.",
+        "reference_sheet": "Use case: identity-preserve. Production canonical multi-view reference sheet for Auntie Salt in Sylvia GM's Severed Lands. Input image 1 is the authoritative full-body identity reference. One landscape PNG, 1536x1024. Polished naturalistic digital RPG illustration, plain light neutral background, soft natural studio light. Three complete figures at identical scale: straight front, exact side profile, straight back; plus one enlarged directly forward head detail. Preserve the exact face, apparent adult age, body proportions, skin, eye color, hair arrangement, costume construction, colors, wear and equipment of input image 1. A short stocky older Human woman in her seventies with warm brown skin, pale gray eyes, a softly lined broad face and white hair pinned into a tidy bun. Layers of practical burgundy clothing, a worn deep teal shawl, plain brown skirt, comfortable leather shoes, a small waist pouch and simple brass earrings. Carries one plain ceramic tea cup and saucer. A cheerful grandmotherly smile and sharp observant eyes. Authored requirements: Cheerful grandmotherly Warrens information broker, always offers tea, sells knowledge without loyalty to a faction. Do not put secrets, faction marks, poison effects or readable information into the image. Outfit and props must remain physically consistent between views, with complete head and boot/shoe soles inside comfortable margins. Keep the face readable and unobstructed. No new accessories, new powers, character redesign, extra people, captions, writing, labels, borders, UI, scenery, symbols or magical effects.",
+        "portrait": "Use case: identity-preserve. Aligned reusable square portrait of Auntie Salt for Sylvia GM. Input image 1 is the canonical full-body identity, and image 2 is this character's canonical multi-view sheet. One square PNG, 1024x1024. Polished naturalistic digital RPG illustration, plain light neutral background and soft natural studio light. Preserve the exact face, apparent adult age, skin, eye color, hair arrangement and upper clothing from these references. A short stocky older Human woman in her seventies with warm brown skin, pale gray eyes, a softly lined broad face and white hair pinned into a tidy bun. Layers of practical burgundy clothing, a worn deep teal shawl, plain brown skirt, comfortable leather shoes, a small waist pouch and simple brass earrings. Carries one plain ceramic tea cup and saucer. A cheerful grandmotherly smile and sharp observant eyes. Authored constraints: Cheerful grandmotherly Warrens information broker, always offers tea, sells knowledge without loyalty to a faction. Do not put secrets, faction marks, poison effects or readable information into the image. Composition: head and upper shoulders only, directly forward, upright head without tilt, level eyes facing viewer. Center the face with the eye line at 35 percent of image height, consistent head scale, and comfortable space above all hair and at both sides for adjustable circular cropping. Keep the face unobstructed. Preserve the referenced character's characteristic restrained expression; no exaggerated expression or redesign. No hands or carried props, weapons, cup, loaf, herbs, case, satchel or medicine inside the crop.  No text, labels, borders, UI, scenery, symbols or magic."
+      }
+    },
+    {
+      "id": "severed-npc-alchemist-fume",
+      "name": "Fume",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/alchemist-fume.md",
+          "sha256": "608657b866fd9f1b6f666ed46165dc477224ae1962d9f67d2f0c8afcce547b04",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/alchemist-fume.md",
+          "sha256": "b6d1a8593051093e1b122aa442e89e1d3c47f99e0be1772c1665e802227bc817",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult humanoid man in his forties with olive-tan skin, lively brown eyes, a long hooked nose, a bald crown and wispy copper-gray hair at the sides. Thin healed pale burn scars on his forearms, intact skin. Brass work goggles pushed above the eyes, a soot-stained mustard tunic, worn dark work coat, brown leather apron, dark trousers and heavy practical boots. A scuffed leather reagent case held closed at his side and two small sealed opaque containers on the belt. Enthusiastic slightly wild smile. No glowing compounds or magical effects.",
+        "full_body": {
+          "path": "assets/characters/c1ea5e720039fab6a737491d625911671653140dfe149f22fc1a274852d8fa90.png",
+          "sha256": "c1ea5e720039fab6a737491d625911671653140dfe149f22fc1a274852d8fa90"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/be1fe36a65617bb9405682aa6f4c8386f7cff7055c970ca00f8f8ccb94507914.png",
+          "sha256": "be1fe36a65617bb9405682aa6f4c8386f7cff7055c970ca00f8f8ccb94507914"
+        },
+        "portrait": {
+          "path": "assets/characters/b4234564413f65ee6c9f3524961accfe3144c01b999d203405992b3e6da22fc8.png",
+          "sha256": "b4234564413f65ee6c9f3524961accfe3144c01b999d203405992b3e6da22fc8"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2038961
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2628641
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2516454
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body reference for Sylvia GM's Severed Lands premade catalogue. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG character illustration, plain light neutral background, soft natural studio light and subtle grounding shadow. Exactly one complete standing figure, top of hair to boot or shoe soles, inside comfortable margins; relaxed near-front three-quarter pose, clear face and physically sound anatomy. Character: Fume. Authored requirements: A Riftborn alchemist from an alchemical home world; the narrative supplies enthusiasm, healed experiment burns and a case of formulas, but no fixed biological species or new powers. This illustration's humanoid appearance is an editable default. For current SRD Lite his supplies are narrative props, not usable consumables. No implied healing, light or mechanical effect. Appearance: An adult humanoid man in his forties with olive-tan skin, lively brown eyes, a long hooked nose, a bald crown and wispy copper-gray hair at the sides. Thin healed pale burn scars on his forearms, intact skin. Brass work goggles pushed above the eyes, a soot-stained mustard tunic, worn dark work coat, brown leather apron, dark trousers and heavy practical boots. A scuffed leather reagent case held closed at his side and two small sealed opaque containers on the belt. Enthusiastic slightly wild smile. No glowing compounds or magical effects. Details not specified by the authored text are editable visual defaults, without changing biography, mechanics or secrets. No invented home, faction heraldry, religious symbols, labels or game statistics. No text, writing, borders, montage, UI, environment, scenery, magic effects or additional figures. Keep carried items modest and recognizable.",
+        "reference_sheet": "Use case: identity-preserve. Production canonical multi-view reference sheet for Fume in Sylvia GM's Severed Lands. Input image 1 is the authoritative full-body identity reference. One landscape PNG, 1536x1024. Polished naturalistic digital RPG illustration, plain light neutral background, soft natural studio light. Three complete figures at identical scale: straight front, exact side profile, straight back; plus one enlarged directly forward head detail. Preserve the exact face, apparent adult age, body proportions, skin, eye color, hair arrangement, costume construction, colors, wear and equipment of input image 1. An adult humanoid man in his forties with olive-tan skin, lively brown eyes, a long hooked nose, a bald crown and wispy copper-gray hair at the sides. Thin healed pale burn scars on his forearms, intact skin. Brass work goggles pushed above the eyes, a soot-stained mustard tunic, worn dark work coat, brown leather apron, dark trousers and heavy practical boots. A scuffed leather reagent case held closed at his side and two small sealed opaque containers on the belt. Enthusiastic slightly wild smile. No glowing compounds or magical effects. Authored requirements: A Riftborn alchemist from an alchemical home world; the narrative supplies enthusiasm, healed experiment burns and a case of formulas, but no fixed biological species or new powers. This illustration's humanoid appearance is an editable default. For current SRD Lite his supplies are narrative props, not usable consumables. No implied healing, light or mechanical effect. Outfit and props must remain physically consistent between views, with complete head and boot/shoe soles inside comfortable margins. Keep the face readable and unobstructed. No new accessories, new powers, character redesign, extra people, captions, writing, labels, borders, UI, scenery, symbols or magical effects.",
+        "portrait": "Use case: identity-preserve. Aligned reusable square portrait of Fume for Sylvia GM. Input image 1 is the canonical full-body identity, and image 2 is this character's canonical multi-view sheet. One square PNG, 1024x1024. Polished naturalistic digital RPG illustration, plain light neutral background and soft natural studio light. Preserve the exact face, apparent adult age, skin, eye color, hair arrangement and upper clothing from these references. An adult humanoid man in his forties with olive-tan skin, lively brown eyes, a long hooked nose, a bald crown and wispy copper-gray hair at the sides. Thin healed pale burn scars on his forearms, intact skin. Brass work goggles pushed above the eyes, a soot-stained mustard tunic, worn dark work coat, brown leather apron, dark trousers and heavy practical boots. A scuffed leather reagent case held closed at his side and two small sealed opaque containers on the belt. Enthusiastic slightly wild smile. No glowing compounds or magical effects. Authored constraints: A Riftborn alchemist from an alchemical home world; the narrative supplies enthusiasm, healed experiment burns and a case of formulas, but no fixed biological species or new powers. This illustration's humanoid appearance is an editable default. For current SRD Lite his supplies are narrative props, not usable consumables. No implied healing, light or mechanical effect. Composition: head and upper shoulders only, directly forward, upright head without tilt, level eyes facing viewer. Center the face with the eye line at 35 percent of image height, consistent head scale, and comfortable space above all hair and at both sides for adjustable circular cropping. Keep the face unobstructed. Preserve the referenced character's characteristic restrained expression; no exaggerated expression or redesign. No hands or carried props, weapons, cup, loaf, herbs, case, satchel or medicine inside the crop. Retain the goggles on the forehead above the eyes. No text, labels, borders, UI, scenery, symbols or magic."
+      }
+    },
+    {
+      "id": "severed-npc-herbalist-saffron",
+      "name": "Saffron",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/herbalist-saffron.md",
+          "sha256": "58ecfa89dd6311e13e70e8df3d08d5657ab9b57b2a1cfa0dbc64477f6408ae8a",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/herbalist-saffron.md",
+          "sha256": "980e36d5c56806b5d3a482938d889cabcd75e720dff7ec7286a8ec0d0d867e37",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult Human woman in her late forties with medium brown skin, dark brown eyes, a narrow softly lined face and straight black hair with gray strands, center-parted and tied in a long practical braid. A muted forest-green wrap tunic, beige linen work apron, plain brown belt, long dark skirt and comfortable dark leather shoes. A small plain linen medical shoulder bag and a tied bundle of dried herbs held at waist level. Steady posture, tired compassionate expression and clear attentive eyes.",
+        "full_body": {
+          "path": "assets/characters/45993c405459111af401793a20b5ca08ccebb635a77f4d8f01942d1abe59797e.png",
+          "sha256": "45993c405459111af401793a20b5ca08ccebb635a77f4d8f01942d1abe59797e"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/d1e7f8041f038b1d20778dfc72e4ddcb4fc3f0850324165e1f1c734957473a7f.png",
+          "sha256": "d1e7f8041f038b1d20778dfc72e4ddcb4fc3f0850324165e1f1c734957473a7f"
+        },
+        "portrait": {
+          "path": "assets/characters/2579873c5819ffcbd7bc80990b74b1b6b784ff96a1a34a32f17ba881450a885e.png",
+          "sha256": "2579873c5819ffcbd7bc80990b74b1b6b784ff96a1a34a32f17ba881450a885e"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1855767
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2692272
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2549157
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body reference for Sylvia GM's Severed Lands premade catalogue. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG character illustration, plain light neutral background, soft natural studio light and subtle grounding shadow. Exactly one complete standing figure, top of hair to boot or shoe soles, inside comfortable margins; relaxed near-front three-quarter pose, clear face and physically sound anatomy. Character: Saffron. Authored requirements: Thornwall herbalist and Warrens volunteer healer, settled Human woman; tired, compassionate, practical and quietly determined. Ordinary medical and herbal props only. No glowing medicine, healing effect, divine symbol or invented magic. Appearance: An adult Human woman in her late forties with medium brown skin, dark brown eyes, a narrow softly lined face and straight black hair with gray strands, center-parted and tied in a long practical braid. A muted forest-green wrap tunic, beige linen work apron, plain brown belt, long dark skirt and comfortable dark leather shoes. A small plain linen medical shoulder bag and a tied bundle of dried herbs held at waist level. Steady posture, tired compassionate expression and clear attentive eyes. Details not specified by the authored text are editable visual defaults, without changing biography, mechanics or secrets. No invented home, faction heraldry, religious symbols, labels or game statistics. No text, writing, borders, montage, UI, environment, scenery, magic effects or additional figures. Keep carried items modest and recognizable.",
+        "reference_sheet": "Use case: identity-preserve. Production canonical multi-view reference sheet for Saffron in Sylvia GM's Severed Lands. Input image 1 is the authoritative full-body identity reference. One landscape PNG, 1536x1024. Polished naturalistic digital RPG illustration, plain light neutral background, soft natural studio light. Three complete figures at identical scale: straight front, exact side profile, straight back; plus one enlarged directly forward head detail. Preserve the exact face, apparent adult age, body proportions, skin, eye color, hair arrangement, costume construction, colors, wear and equipment of input image 1. An adult Human woman in her late forties with medium brown skin, dark brown eyes, a narrow softly lined face and straight black hair with gray strands, center-parted and tied in a long practical braid. A muted forest-green wrap tunic, beige linen work apron, plain brown belt, long dark skirt and comfortable dark leather shoes. A small plain linen medical shoulder bag and a tied bundle of dried herbs held at waist level. Steady posture, tired compassionate expression and clear attentive eyes. Authored requirements: Thornwall herbalist and Warrens volunteer healer, settled Human woman; tired, compassionate, practical and quietly determined. Ordinary medical and herbal props only. No glowing medicine, healing effect, divine symbol or invented magic. Outfit and props must remain physically consistent between views, with complete head and boot/shoe soles inside comfortable margins. Keep the face readable and unobstructed. No new accessories, new powers, character redesign, extra people, captions, writing, labels, borders, UI, scenery, symbols or magical effects.",
+        "portrait": "Use case: identity-preserve. Aligned reusable square portrait of Saffron for Sylvia GM. Input image 1 is the canonical full-body identity, and image 2 is this character's canonical multi-view sheet. One square PNG, 1024x1024. Polished naturalistic digital RPG illustration, plain light neutral background and soft natural studio light. Preserve the exact face, apparent adult age, skin, eye color, hair arrangement and upper clothing from these references. An adult Human woman in her late forties with medium brown skin, dark brown eyes, a narrow softly lined face and straight black hair with gray strands, center-parted and tied in a long practical braid. A muted forest-green wrap tunic, beige linen work apron, plain brown belt, long dark skirt and comfortable dark leather shoes. A small plain linen medical shoulder bag and a tied bundle of dried herbs held at waist level. Steady posture, tired compassionate expression and clear attentive eyes. Authored constraints: Thornwall herbalist and Warrens volunteer healer, settled Human woman; tired, compassionate, practical and quietly determined. Ordinary medical and herbal props only. No glowing medicine, healing effect, divine symbol or invented magic. Composition: head and upper shoulders only, directly forward, upright head without tilt, level eyes facing viewer. Center the face with the eye line at 35 percent of image height, consistent head scale, and comfortable space above all hair and at both sides for adjustable circular cropping. Keep the face unobstructed. Preserve the referenced character's characteristic restrained expression; no exaggerated expression or redesign. No hands or carried props, weapons, cup, loaf, herbs, case, satchel or medicine inside the crop.  No text, labels, borders, UI, scenery, symbols or magic."
+      }
     }
   ]
 }
