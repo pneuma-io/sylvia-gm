@@ -2877,11 +2877,16 @@ def _dispatch_selected(
 
             def read_profile(identity: str, digest: str) -> CharacterProfile:
                 source = load_character_profile(storage_root, identity, digest)
-                if source.profile.get("visuals") is not None:
-                    application_owner.image_art_service().restore_visuals(
-                        session_id, source.artifact_id, source.profile["visuals"],
-                    )
+                application_owner.image_art_service().restore_profile(
+                    session_id, source, storage_root,
+                )
                 return source
+
+            pinned_profile = (saved_references or {}).get("character_profile")
+            if pinned_profile is not None:
+                application_owner.image_art_service().restore_profile(
+                    session_id, profile_from_snapshot(pinned_profile), storage_root,
+                )
 
             from sylvia_gm.agent._character_profile_tools import character_profile_tools
             from sylvia_gm.agent._image_art_tools import image_art_builder_tools
@@ -3000,10 +3005,15 @@ def _dispatch_selected(
                 if len(declarations) != 1:
                     raise CommandRejected("Choose one of this Ruleset's participant schema IDs")
                 repair_character = (source.artifact_id, source.content_sha256)
-                if source.visuals is not None:
-                    application_owner.image_art_service().restore_visuals(
-                        session_id, source.artifact_id, source.visuals,
-                    )
+                application_owner.image_art_service().restore_visuals(
+                    session_id, source.artifact_id, source.visuals, name=source.name,
+                    asset_reader=lambda path: application_owner._store.package_file_bytes(
+                        participant_campaign_setting.package_id,
+                        participant_campaign_setting.version,
+                        participant_campaign_setting.content_sha256,
+                        path, maximum_bytes=16 * 1024 * 1024,
+                    ),
+                )
                 return {
                     "schema_id": declarations[0].schema_id,
                     "summary": source.summary, "authored_profile": source.authored_profile,

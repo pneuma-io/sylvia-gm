@@ -11,7 +11,7 @@ import struct
 import tempfile
 import threading
 import zlib
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
 from urllib.parse import urlsplit
 
@@ -184,9 +184,26 @@ class CardPreview:
     profile: dict
     source_sha256: str
     conversion: dict
+    portrait: bytes | None = field(default=None, repr=False)
 
     def report(self):
         return dict(self.conversion)
+
+
+def card_portrait(source: bytes) -> bytes:
+    """Read a local card image, stripping its text and foreign configuration from model inputs."""
+    from sylvia_gm.application.image_hooks import ImageData
+
+    _ = ImageData(source).dimensions
+    chunks = [source[:8]]
+    offset = 8
+    while offset < len(source):
+        size, kind = struct.unpack_from(">I4s", source, offset)
+        end = offset + size + 12
+        if kind in (b"IHDR", b"PLTE", b"tRNS", b"IDAT", b"IEND", b"sRGB", b"gAMA"):
+            chunks.append(source[offset:end])
+        offset = end
+    return b"".join(chunks)
 
 
 def preview_character_card(source: bytes) -> CardPreview:
@@ -379,6 +396,7 @@ def preview_character_card(source: bytes) -> CardPreview:
             "assets: inert references; embedded/data URIs identify retained original content"
         )
         # Retain full descriptors (including unknown asset metadata) as preserved-only.
+    portrait = None
     if container == "png":
         p.setdefault("assets", []).append(
             {
@@ -388,10 +406,18 @@ def preview_character_card(source: bytes) -> CardPreview:
                 "status": "reference_only",
             }
         )
-        report["preserved_only"].append(
-            "PNG portrait and auxiliary chunks retained in original; no"
-            " image decode or asset loading"
-        )
+        from sylvia_gm.application.image_hooks import ImageHookError
+
+        try:
+            portrait = card_portrait(source)
+        except ImageHookError:
+            report["unsupported"].append(
+                "Card portrait exceeds the supported PNG artwork limits (16 MiB / 4 megapixels). "
+                "The original is retained; use a smaller PNG or create new artwork."
+            )
+        else:
+            report["imported"].append("PNG portrait: usable artwork and a generation reference")
+        report["preserved_only"].append("Original PNG metadata retained separately from artwork")
     foreign = {k: v for k, v in data.items() if k not in consumed}
     report["preserved_only"].extend(
         ("data." if version > 1 and outer else "") + key for key in sorted(foreign)
@@ -428,7 +454,7 @@ def preview_character_card(source: bytes) -> CardPreview:
         )
     report["omitted"] = ["No source bytes discarded; unsupported behavior is not activated."]
     validate_character_profile(canonical_json_bytes(p))
-    return CardPreview(p, digest, report)
+    return CardPreview(p, digest, report, portrait)
 
 
 def _original_path(storage_root, digest):

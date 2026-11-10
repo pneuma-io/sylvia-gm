@@ -1062,10 +1062,14 @@ API connection or let model-supplied paths escape the runtime workspace. Admin F
 the selected image application's input/output and image protocol boundaries when enabled.
 
 Canonical full-body and multi-view references are bound to a stable character target and supplied
-to later generations. Optional Character File/profile `visuals` data retains their hashes and
-operation identities plus appearance and framing. The owner restores locally retained reference
-bytes when those characters enter a campaign. Campaign archives carry the bytes; an isolated
-Character File containing references alone does not embed the image files.
+to later generations. Optional Character File/profile `visuals` data retains their hashes,
+operation identities or portable package PNG paths, appearance and framing. The owner restores
+locally retained references or reads hash-matching assets from the selected admitted package.
+Campaign archives carry the bytes; an isolated JSON Character File still needs its referenced
+asset files. Selected imported PNG cards supply usable portraits and generation references with
+card text metadata stripped; the unchanged original remains in the import library. This local
+image reuse works with generation Off. Supported PNG input includes grayscale, palette, RGB/RGBA,
+16-bit and interlaced images within the bounded artwork limits.
 
 Underlay references are rendered from the existing player projection's static map geometry and
 terrain, without tokens, labels or hidden geometry. The selected image retains bounds and a

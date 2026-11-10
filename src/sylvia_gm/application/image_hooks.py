@@ -76,7 +76,7 @@ def _label(value: object) -> bool:
 
 @dataclass(frozen=True)
 class ImageData:
-    """Sealed byte input/output. The current hook accepts bounded RGB/RGBA PNG only."""
+    """Sealed byte input/output with bounded, validated PNG image data."""
 
     data: bytes = field(repr=False)
     media_type: str = "image/png"
@@ -101,7 +101,9 @@ def _dimensions(image: ImageData, maximum_bytes: int = MAX_IMAGE_BYTES) -> tuple
     ):
         raise ImageHookError("invalid_image")
     data, offset, compressed = image.data, 8, bytearray()
-    width = height = channels = 0
+    width = height = depth = color = interlace = 0
+    palette = 0
+    transparency = False
     saw_data = ended_data = ended = False
     while offset < len(data):
         if offset + 12 > len(data):
@@ -123,15 +125,36 @@ def _dimensions(image: ImageData, maximum_bytes: int = MAX_IMAGE_BYTES) -> tuple
             if (
                 not width
                 or not height
+                or width > 8192
+                or height > 8192
                 or width * height > MAX_PIXELS
-                or depth != 8
-                or color not in (2, 6)
+                or depth
+                not in {
+                    0: (1, 2, 4, 8, 16),
+                    2: (8, 16),
+                    3: (1, 2, 4, 8),
+                    4: (8, 16),
+                    6: (8, 16),
+                }.get(color, ())
                 or compression
                 or filtering
-                or interlace
+                or interlace not in (0, 1)
             ):
                 raise ImageHookError("invalid_image")
-            channels = 3 if color == 2 else 4
+        elif kind == b"PLTE" and not saw_data and not palette:
+            if color in (0, 4) or not length or length % 3 or length > 768:
+                raise ImageHookError("invalid_image")
+            if color == 3 and length // 3 > 2**depth:
+                raise ImageHookError("invalid_image")
+            palette = length // 3
+        elif kind == b"tRNS" and not saw_data and not transparency:
+            if not (
+                (color == 0 and length == 2)
+                or (color == 2 and length == 6)
+                or (color == 3 and 0 < length <= palette)
+            ):
+                raise ImageHookError("invalid_image")
+            transparency = True
         elif kind == b"IDAT" and not ended_data:
             compressed.extend(body)
             saw_data = True
@@ -148,9 +171,28 @@ def _dimensions(image: ImageData, maximum_bytes: int = MAX_IMAGE_BYTES) -> tuple
         else:
             raise ImageHookError("invalid_image")
         offset = end
-    expected = height * (1 + width * channels)
-    if not ended:
+    if not ended or (color == 3 and not palette):
         raise ImageHookError("invalid_image")
+    channels = {0: 1, 2: 3, 3: 1, 4: 2, 6: 4}[color]
+    passes = (
+        ((0, 0, 1, 1),)
+        if not interlace
+        else (
+            (0, 0, 8, 8),
+            (4, 0, 8, 8),
+            (0, 4, 4, 8),
+            (2, 0, 4, 4),
+            (0, 2, 2, 4),
+            (1, 0, 2, 2),
+            (0, 1, 1, 2),
+        )
+    )
+    scanlines = []
+    for x, y, dx, dy in passes:
+        columns, rows = max(0, (width - x + dx - 1) // dx), max(0, (height - y + dy - 1) // dy)
+        if columns and rows:
+            scanlines.extend([1 + (columns * channels * depth + 7) // 8] * rows)
+    expected = sum(scanlines)
     try:
         decoder = zlib.decompressobj()
         decoded = decoder.decompress(compressed, expected + 1)
@@ -159,9 +201,13 @@ def _dimensions(image: ImageData, maximum_bytes: int = MAX_IMAGE_BYTES) -> tuple
             or not decoder.eof
             or decoder.unused_data
             or decoder.unconsumed_tail
-            or any(decoded[row] > 4 for row in range(0, expected, 1 + width * channels))
         ):
             raise ImageHookError("invalid_image")
+        offset = 0
+        for stride in scanlines:
+            if decoded[offset] > 4:
+                raise ImageHookError("invalid_image")
+            offset += stride
     except zlib.error:
         raise ImageHookError("invalid_image") from None
     return width, height

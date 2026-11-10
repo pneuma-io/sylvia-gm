@@ -26,12 +26,16 @@ implementation. The owner clarified that phase one must also cover the overall o
 experience: prepared art throughout the shipped character/enemy catalogue, discoverable creation
 and editing, imported-card artwork, Builder interview integration and reuse throughout later play.
 The initial ready-to-merge claim does not cover that outcome and is withdrawn. Hold merge while
-these gaps are completed. Current source audit found no bundled character art added by this PR,
-no interview-owned art stage, and imported PNG card portraits still retained as reference-only
-descriptors. The existing source/scripted checks qualify the hooks, not completion of these
-workflows. Real generation remains deferred by the earlier owner selection; live subscription,
-installed-app and TD trailer acceptance remain unverified. Merge follows the Pneuma IO rulebook's
-delivery and cleanup sequence.
+these gaps are completed. The current implementation adds portable, hash-checked package PNG
+references and actively restores selected imported card portraits in Builder, including their use
+as later generation references. Local portrait reuse also works with generation Off. Focused checks cover fresh-owner restore,
+crop persistence, corrupt-asset rollback, common PNG inputs and card reference reuse. Prepared
+catalogue art, complete interview-owned artwork creation/editing and automatic portable publication
+remain unfinished. These source/scripted checks do not establish completion of the ordinary
+workflows. The owner's current goal includes real generation verification; no real generation has
+run, and the live test profile/environment still needs selection. Live subscription, installed-app
+and TD trailer acceptance remain unverified. Merge follows the Pneuma IO rulebook's delivery and
+cleanup sequence.
 
 **9 November 2026: optional onboarding and the complete tutorial suite.** The owner selected a new
 PR for all independently accessible lessons and a guided welcome, AI connection, Ready campaign

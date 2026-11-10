@@ -21,10 +21,12 @@ IMAGE_SIZES = {
 _ASSET_REFERENCE_SCHEMA = {
     "type": "object",
     "additionalProperties": False,
-    "required": ["sha256", "operation_id"],
+    "required": ["sha256"],
+    "anyOf": [{"required": ["operation_id"]}, {"required": ["path"]}],
     "properties": {
         "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
         "operation_id": {"type": "string", "minLength": 1, "maxLength": 128},
+        "path": {"type": "string", "minLength": 1, "maxLength": 512},
     },
 }
 CHARACTER_VISUALS_SCHEMA = {
@@ -50,7 +52,7 @@ CHARACTER_VISUALS_SCHEMA = {
 
 
 def validate_character_visuals(value: object) -> dict[str, Any] | None:
-    """Retain both canonical references as character data, never as arbitrary paths or URLs."""
+    """Retain canonical references with local receipts or hash-verified package asset paths."""
     if value is None:
         return None
     required = {"appearance", "full_body", "reference_sheet"}
@@ -69,13 +71,24 @@ def validate_character_visuals(value: object) -> dict[str, Any] | None:
         reference = value[purpose]
         if (
             not isinstance(reference, Mapping)
-            or set(reference) != {"sha256", "operation_id"}
+            or not {"sha256"} < set(reference) <= {"sha256", "operation_id", "path"}
             or not isinstance(reference["sha256"], str)
             or re.fullmatch(r"[0-9a-f]{64}", reference["sha256"]) is None
-            or not isinstance(reference["operation_id"], str)
-            or not 0 < len(reference["operation_id"]) <= 128
         ):
             raise ValueError("Character visual reference is invalid")
+        if "operation_id" in reference and (
+            not isinstance(reference["operation_id"], str)
+            or not 0 < len(reference["operation_id"]) <= 128
+            or "\x00" in reference["operation_id"]
+        ):
+            raise ValueError("Character visual operation identity is invalid")
+        if "path" in reference:
+            from sylvia_gm.domain.package_library import validate_portable_path
+
+            path = reference["path"]
+            if not isinstance(path, str) or len(path) > 512 or not path.endswith(".png"):
+                raise ValueError("Character visual asset must be a package PNG")
+            validate_portable_path(path)
         result[purpose] = dict(reference)
     if "frame" in value:
         frame = value["frame"]
@@ -101,7 +114,10 @@ def character_visuals_from_selections(
     value = {"appearance": appearance}
     for purpose in ("full_body", "reference_sheet", "portrait"):
         if purpose in selected and purpose not in missing:
-            value[purpose] = {key: selected[purpose][key] for key in ("sha256", "operation_id")}
+            value[purpose] = {
+                **{key: selected[purpose][key] for key in ("sha256", "operation_id")},
+                "path": f"assets/characters/{selected[purpose]['sha256']}.png",
+            }
     if "portrait" in selected and "portrait" not in missing:
         value["frame"] = selected["portrait"]["frame"]
     return validate_character_visuals(value)
@@ -161,21 +177,24 @@ class PortraitFrame:
 
 PURPOSE_INSTRUCTIONS = {
     "portrait": (
-        "Create one square character portrait. Frame the head and upper shoulders, facing "
-        "the viewer. Keep both eyes level, the face centered horizontally and its eye line "
+        "Create one square character portrait. For humanoids, frame the head and upper shoulders, "
+        "facing the viewer. Keep both eyes level, the face centered horizontally and its eye line "
         "about 35 percent down the image. Leave headroom and room around the shoulders for "
-        "a circular crop. Preserve the identity, outfit, colors and distinguishing features "
+        "a circular crop. For other creatures, frame the recognizable head or defining body "
+        "feature at the same focal point; preserve its actual anatomy and never invent a face. "
+        "Preserve the identity, outfit, colors and distinguishing features "
         "of the supplied full-body and multi-view references. No border, lettering or UI."
     ),
     "full_body": (
-        "Create a canonical full-body character reference, head to feet visible, neutral "
-        "standing pose, plain background, clear silhouette, consistent costume and equipment. "
+        "Create a canonical full-body character or creature reference, entire silhouette visible, "
+        "in a neutral natural pose, plain background, consistent costume and equipment. "
         "Preserve every established appearance detail and supplied character reference. "
         "This image will guide subsequent portraits and edits. No UI, border or lettering."
     ),
     "reference_sheet": (
         "Create one multi-view character reference sheet with front, side and back views of "
-        "the same character and a clear facial detail. Keep physique, face, hairstyle, outfit, "
+        "the same character and a clear detail of its face or defining anatomical feature. "
+        "Preserve nonhumanoid anatomy. Keep physique, face, hairstyle, outfit, "
         "equipment and colors identical across all views. Use the supplied canonical full-body "
         "reference. Plain background, coherent scale, no UI or decorative border."
     ),

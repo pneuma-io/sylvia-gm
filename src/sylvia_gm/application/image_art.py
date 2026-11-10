@@ -9,6 +9,7 @@ import threading
 from collections.abc import Callable, Mapping, Sequence
 from concurrent.futures import Future, ThreadPoolExecutor
 from contextlib import suppress
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 from uuid import NAMESPACE_URL, uuid5
 
@@ -36,6 +37,7 @@ from sylvia_gm.infrastructure.sqlite_images import ImageStore
 
 if TYPE_CHECKING:
     from sylvia_gm.application.authority import AuthorityOwner
+    from sylvia_gm.application.character_profiles import CharacterProfile
     from sylvia_gm.domain.session import SessionContext
 
 
@@ -60,6 +62,7 @@ class ImageArt:
         self._futures: dict[str, Future[dict[str, Any]]] = {}
         self._closed = False
         self._restored_visuals: set[tuple[str, str]] = set()
+        self._builder_targets: dict[str, dict[str, dict[str, Any]]] = {}
 
     def close(self) -> None:
         with self._lock:
@@ -88,18 +91,142 @@ class ImageArt:
         campaign_id = context.session.campaign_id
         return campaign_id or session_id, campaign_id
 
-    def restore_visuals(self, session_id: str, target_id: str, visuals: object) -> None:
-        """Rebind locally retained references from a selected immutable character source."""
+    def restore_visuals(
+        self,
+        session_id: str,
+        target_id: str,
+        visuals: object,
+        *,
+        assets: Mapping[str, bytes] | None = None,
+        name: str | None = None,
+        asset_reader: Callable[[str], bytes | None] | None = None,
+    ) -> None:
+        """Rebind immutable character artwork, including packaged bytes on a fresh installation."""
         scope, campaign_id = self._scope(session_id)
+        if campaign_id is None and name:
+            self._builder_targets.setdefault(session_id, {})[target_id] = {
+                "id": target_id,
+                "kind": "character",
+                "name": name,
+            }
         bundle = validate_character_visuals(visuals)
         if bundle is not None:
+            available = dict(assets or {})
+            for purpose in ("full_body", "reference_sheet", "portrait"):
+                reference = bundle.get(purpose)
+                if reference is None or "path" not in reference:
+                    continue
+                original = self.store.get(reference.get("operation_id", ""))
+                if (
+                    original is not None
+                    and original["status"] == "succeeded"
+                    and original["purpose"] == purpose
+                    and original["result_sha256"] == reference["sha256"]
+                ):
+                    continue
+                if reference["path"] not in available and asset_reader is not None:
+                    image = asset_reader(reference["path"])
+                    if image is not None:
+                        available[reference["path"]] = image
+                if reference["path"] not in available and campaign_id is not None:
+                    for entry in self.owner.snapshot(campaign_id).package_lock.entries:
+                        image = self.owner._store.package_file_bytes(
+                            entry.package_id,
+                            entry.version,
+                            entry.sha256,
+                            reference["path"],
+                            maximum_bytes=16 * 1024 * 1024,
+                        )
+                        if (
+                            image is not None
+                            and hashlib.sha256(image).hexdigest() == reference["sha256"]
+                        ):
+                            available[reference["path"]] = image
+                            break
+                if reference["path"] not in available:
+                    raise ValueError(
+                        "Saved character artwork is missing; reimport its complete asset package"
+                    )
             self.store.attach_character_visuals(
                 scope_id=scope,
                 campaign_id=campaign_id,
                 session_id=session_id,
                 target_id=target_id,
                 visuals=bundle,
+                assets=available,
+                name=name,
             )
+
+    def restore_profile(
+        self,
+        session_id: str,
+        profile: CharacterProfile,
+        storage_root: Path,
+    ) -> None:
+        """Make a selected reusable profile and its retained card portrait available to Builder."""
+        from sylvia_gm.application.character_card_import import card_portrait, load_import_original
+
+        value = cast(dict[str, Any], thaw_json_value(profile.profile))
+        self.restore_visuals(
+            session_id, profile.artifact_id, value.get("visuals"), name=value["name"]
+        )
+        source = value.get("import_source", {})
+        if source.get("container") != "png":
+            return
+        scope, _ = self._scope(session_id)
+        if any(
+            row["target_id"] == profile.artifact_id and row["purpose"] == "portrait"
+            for row in self.store.list_selections(scope)
+        ):
+            return
+        try:
+            portrait = card_portrait(load_import_original(storage_root, source["sha256"]))
+        except ImageHookError:
+            return  # The conversion preview explains unsupported portrait limits.
+        biography = value.get("biography", {})
+        appearance = biography.get("appearance") or biography.get("description") or value["name"]
+        self.restore_card_portrait(
+            session_id,
+            profile.artifact_id,
+            name=value["name"],
+            appearance=appearance[:16000],
+            image=portrait,
+        )
+
+    def restore_card_portrait(
+        self,
+        session_id: str,
+        target_id: str,
+        *,
+        name: str,
+        appearance: str,
+        image: bytes,
+    ) -> None:
+        """Use a selected local card's portrait even when generation is switched off."""
+        scope, campaign_id = self._scope(session_id)
+        self.restore_visuals(session_id, target_id, None, name=name)
+        self.store.import_portrait(
+            scope_id=scope,
+            campaign_id=campaign_id,
+            session_id=session_id,
+            target_id=target_id,
+            image=image,
+            appearance=appearance,
+            name=name,
+        )
+
+    def character_assets(self, session_id: str, target_id: str) -> dict[str, bytes]:
+        """Collect exact selected image bytes for Character File package publication."""
+        scope, _ = self._scope(session_id)
+        rows = self.store.list_selections(scope)
+        bundle = character_visuals_from_selections(rows, target_id)
+        if bundle is None:
+            raise ValueError("Finish both character references before publishing artwork")
+        return {
+            reference["path"]: self.store.image(reference["sha256"])
+            for purpose in ("full_body", "reference_sheet", "portrait")
+            if (reference := bundle.get(purpose)) is not None
+        }
 
     def _runtime(self, session_id: str) -> ImageSession:
         with self._lock:
@@ -128,7 +255,19 @@ class ImageArt:
     def targets(self, session_id: str) -> list[dict[str, Any]]:
         _, campaign_id = self._scope(session_id)
         if campaign_id is None:
-            return []
+            builder_targets = dict(self._builder_targets.get(session_id, {}))
+            for row in self.store.list_selections(session_id):
+                name = row["metadata"].get("target_name")
+                if name:
+                    builder_targets.setdefault(
+                        row["target_id"],
+                        {
+                            "id": row["target_id"],
+                            "kind": "character",
+                            "name": name,
+                        },
+                    )
+            return list(builder_targets.values())
         panels = cast(dict[str, Any], thaw_json_value(self.owner.campaign_panels(campaign_id)))
         targets: dict[str, dict[str, Any]] = {}
         for surface in panels.get("surfaces", []):
@@ -213,13 +352,7 @@ class ImageArt:
                 continue
             visuals = prepared.get(target["id"])
             if visuals is not None:
-                self.store.attach_character_visuals(
-                    scope_id=campaign_id,
-                    campaign_id=campaign_id,
-                    session_id=session_id,
-                    target_id=target["id"],
-                    visuals=visuals,
-                )
+                self.restore_visuals(session_id, target["id"], visuals, name=target["name"])
             self._restored_visuals.add(token)
         return list(targets.values())
 
@@ -467,7 +600,13 @@ class ImageArt:
         for item in selected:
             if (
                 row["purpose"] != "map_underlay"
-                and item["purpose"] in {"full_body", "reference_sheet"}
+                and (
+                    item["purpose"] in {"full_body", "reference_sheet"}
+                    or (
+                        item["purpose"] == "portrait"
+                        and item["metadata"].get("source") == "character_card"
+                    )
+                )
                 and item["sha256"] not in seen
             ):
                 references.append(ImageData(self.store.image(item["sha256"])))

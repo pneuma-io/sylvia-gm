@@ -281,9 +281,13 @@ class ImageStore:
         session_id: str,
         target_id: str,
         visuals: Mapping[str, Any],
+        assets: Mapping[str, bytes] | None = None,
+        name: str | None = None,
     ) -> None:
-        """Bind locally retained Character File art to a newly selected campaign identity."""
+        """Bind retained receipts or verified package assets without calling a provider."""
         from uuid import NAMESPACE_URL, uuid5
+
+        from sylvia_gm.application.image_hooks import ImageData
 
         with self._transaction() as connection:
             existing = {
@@ -295,14 +299,47 @@ class ImageStore:
                 if purpose in existing or purpose not in visuals:
                     continue
                 reference = visuals[purpose]
-                original = request(connection, reference["operation_id"])
-                if (
-                    original is None
-                    or original["status"] != "succeeded"
-                    or original["result_sha256"] != reference["sha256"]
-                    or original["purpose"] != purpose
-                ):
+                metadata = {
+                    "appearance": visuals["appearance"],
+                    "source_operation_id": reference.get("operation_id"),
+                    "source_path": reference.get("path"),
+                    "target_name": name,
+                    "references": {
+                        dependency: visuals[dependency]["sha256"]
+                        for dependency in (
+                            ()
+                            if purpose == "full_body"
+                            else ("full_body",)
+                            if purpose == "reference_sheet"
+                            else ("full_body", "reference_sheet")
+                        )
+                    },
+                }
+                original = request(connection, reference.get("operation_id", ""))
+                valid_original = (
+                    original is not None
+                    and original["status"] == "succeeded"
+                    and original["result_sha256"] == reference["sha256"]
+                    and original["purpose"] == purpose
+                )
+                image = (assets or {}).get(reference.get("path", ""))
+                if not valid_original and image is None:
                     continue
+                if image is not None:
+                    _ = ImageData(image).dimensions
+                    if hashlib.sha256(image).hexdigest() != reference["sha256"]:
+                        raise ValueError("Character artwork does not match its saved identity")
+                if original is None or not valid_original:
+                    original = {
+                        "purpose": purpose,
+                        "request_json": canonical_json_bytes(
+                            {
+                                "source": "package_asset",
+                                "metadata": metadata,
+                            }
+                        ).decode(),
+                        "status": "pending",
+                    }
                 identity = str(
                     uuid5(
                         NAMESPACE_URL,
@@ -318,21 +355,73 @@ class ImageStore:
                     "request_sha256": hashlib.sha256(identity.encode()).hexdigest(),
                 }
                 admit(connection, copied)
-                connection.execute(
-                    "UPDATE image_requests SET result_sha256=? WHERE operation_id=?",
-                    (reference["sha256"], identity),
-                )
+                if image is not None and not valid_original:
+                    complete(connection, identity, status="succeeded", image=image)
+                else:
+                    connection.execute(
+                        "UPDATE image_requests SET result_sha256=? WHERE operation_id=?",
+                        (reference["sha256"], identity),
+                    )
                 select(
                     connection,
                     scope_id=scope_id,
                     operation_id=identity,
                     expected_sha256=None,
                     frame=visuals.get("frame", {"x": 0.5, "y": 0.35, "zoom": 1}),
-                    metadata={
-                        "appearance": visuals["appearance"],
-                        "source_operation_id": reference["operation_id"],
-                    },
+                    metadata=metadata,
                 )
+
+    def import_portrait(
+        self,
+        *,
+        scope_id: str,
+        campaign_id: str | None,
+        session_id: str,
+        target_id: str,
+        image: bytes,
+        appearance: str,
+        name: str,
+    ) -> None:
+        """Adopt an imported card's image once, preserving any newer selected portrait."""
+        from uuid import NAMESPACE_URL, uuid5
+
+        from sylvia_gm.application.image_hooks import ImageData
+        from sylvia_gm.domain.image_art import PortraitFrame
+
+        asset = ImageData(image)
+        _ = asset.dimensions
+        identity = str(
+            uuid5(NAMESPACE_URL, f"sylvia-card-art:{scope_id}:{target_id}:{asset.sha256}")
+        )
+        with self._transaction() as connection:
+            if any(
+                row["target_id"] == target_id and row["purpose"] == "portrait"
+                for row in selections(connection, scope_id)
+            ):
+                return
+            metadata = {"appearance": appearance, "source": "character_card", "target_name": name}
+            admit(
+                connection,
+                {
+                    "operation_id": identity,
+                    "session_id": session_id,
+                    "campaign_id": campaign_id,
+                    "target_id": target_id,
+                    "purpose": "portrait",
+                    "request_sha256": hashlib.sha256(identity.encode()).hexdigest(),
+                    "request_json": canonical_json_bytes({"metadata": metadata}).decode(),
+                    "status": "pending",
+                },
+            )
+            complete(connection, identity, status="succeeded", image=image)
+            select(
+                connection,
+                scope_id=scope_id,
+                operation_id=identity,
+                expected_sha256=None,
+                frame=PortraitFrame().as_payload(),
+                metadata=metadata,
+            )
 
     def cancel(self, operation_id: str) -> dict[str, Any] | None:
         with self._transaction() as connection:
