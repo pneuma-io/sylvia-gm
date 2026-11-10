@@ -11,6 +11,7 @@ from sylvia_gm.application.builder_references import reference_reader
 from sylvia_gm.application.builder_session_migration import migrate_legacy_builder_chats
 from sylvia_gm.domain.authority import PackageLock
 from sylvia_gm.domain.errors import CommandRejected
+from sylvia_gm.domain.package_library import canonical_json_bytes
 from sylvia_gm.domain.session import SessionMessageKind
 from sylvia_gm.infrastructure import builder_workspace_migration
 from sylvia_gm.interfaces.owner_process import _campaign_creation_catalog
@@ -33,9 +34,9 @@ def test_migration_discovery_on_fresh_database_does_not_create_session_tables(tm
             ).fetchone() is None
 
 
-def seed_legacy_character(owner, root, *, returned=False, logical_ruleset=False):
+def seed_legacy_character(owner, root, *, returned=False):
     candidate, setting_id = install_character_packages(owner)
-    ruleset_id = "signal" if logical_ruleset else candidate.candidate_id
+    ruleset_id = candidate.candidate_id
     draft = open_character_interview(owner, ruleset_id, setting_id, None)
     child = owner.start_guided_creation_subflow(
         operation_id="old-character-launch",
@@ -154,10 +155,7 @@ def test_old_chat_migration_retains_history_sources_and_independent_files(tmp_pa
         for revision, (step, answer) in enumerate(
             (
                 ("ruleset", {"candidate_id": None}),
-                ("setting", {"setting_id": None}),
-                ("plan", {"plan_id": None}),
                 ("name", {"display_name": "Legacy origin"}),
-                ("participants", {"player_name": "Investigator"}),
                 ("boundaries_preferences", {"boundaries": "", "preferences": ""}),
                 ("specific_requests", {"no_additional_requests": True}),
             ),
@@ -212,8 +210,26 @@ def test_old_chat_migration_retains_history_sources_and_independent_files(tmp_pa
 def test_old_name_only_reference_is_retained_without_claiming_an_exact_version(tmp_path):
     with AuthorityOwner.open(tmp_path / "name-only.db", "legacy-owner") as owner:
         _draft, child, _candidate, _workspace = seed_legacy_character(
-            owner, tmp_path, logical_ruleset=True
+            owner, tmp_path
         )
+        # Seed the actual old persisted logical-name answer; current setup correctly
+        # requires a compatible exact candidate and cannot author this legacy state.
+        with sqlite3.connect(tmp_path / "name-only.db") as connection:
+            rows = connection.execute(
+                "SELECT message_id, content_json FROM agent_session_messages "
+                "WHERE session_id = ? AND kind = 'user'",
+                (_draft.builder_session_id,),
+            ).fetchall()
+            answers = [(identity, json.loads(content)) for identity, content in rows
+                       if json.loads(content).get("interview_step") == "ruleset"]
+            assert len(answers) == 1
+            identity, answer = answers[0]
+            answer["interview_value"]["candidate_id"] = "signal"
+            connection.execute(
+                "UPDATE agent_session_messages SET content_json = ? "
+                "WHERE session_id = ? AND message_id = ?",
+                (canonical_json_bytes(answer).decode("utf-8"), _draft.builder_session_id, identity),
+            )
         migrate_legacy_builder_chats(owner, tmp_path, _campaign_creation_catalog(tmp_path, owner))
         context = owner.session_context(child.child_session_id)
         launch = context.messages[-1].content

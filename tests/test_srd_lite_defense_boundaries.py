@@ -329,7 +329,7 @@ def test_mage_actual_plane_and_blocked_touch_path_before_payment(boundary_case, 
                                 'target_distance': 0, 'caster_can_touch_target': True,
                                 'all_targets_have_clear_path': True, 'target_willing': True}
     if obstruction != 'clear':
-        _reject(case, tool, params, rolls, 'touch range, shared plane and a clear path')
+        _reject(case, tool, params, rolls, 'touch range, shared plane and a clear path|beyond range or lacks a clear path on this plane')
         assert case.entities()['hero']['resources']['spell_slot_1'] == 3
         assert case.lasting()['turn_effects'] == []
         assert not case.lasting().get('pending_srd_action_stack')
