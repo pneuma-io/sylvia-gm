@@ -52,6 +52,21 @@ def bind_gm_feedback(runtime):
     """Keep rules facts in Lite while exposing every shared missing input before effects."""
     tools = runtime["tools"]
     definitions = runtime["definitions"]
+    somatic_guidance = (
+        "Defaults to true. Held weapons, shields and other items never prevent spell "
+        "gestures, in or out of combat. Set false only when the scene prevents the "
+        "caster from moving enough to gesture."
+    )
+    parameters = list(runtime.get("parameter_declarations", {}).values())
+    parameters.extend(
+        parameter
+        for tool in tools.values()
+        for parameter in tool.get("parameters", [])
+        if isinstance(parameter, dict)
+    )
+    for parameter in parameters:
+        if parameter.get("name") == "somatic_component_available":
+            parameter.update(default=True, description=somatic_guidance)
     implemented = sorted(set(definitions["srd_lite_implemented"]))
     aliases = definitions.get("srd_lite_aliases", {})
     single = []
@@ -73,7 +88,7 @@ def bind_gm_feedback(runtime):
         parameters = deepcopy(_parameters(runtime, tool))
         by_name = {p["name"]: p for p in parameters}
         by_name["spell"].update(type="enum", enum_values=implemented + sorted(aliases))
-        # Inline only changed parameters; the shared declaration table stays immutable.
+        # Inline spell choices while reusing the other parameter declarations.
         tool["parameters"] = [
             by_name["spell"] if p["name"] == "spell" else old
             for old, p in zip(tool["parameters"], parameters, strict=True)
@@ -105,11 +120,12 @@ def bind_gm_feedback(runtime):
                 "spell not in definitions.spell_casting or "
                 f"'{component}' not in definitions.spell_casting[spell].components or {exempt}"
             )
-            missing(
-                f"{scope} or {field} != null",
-                field,
-                "Supply the current scene fact or a saved stat-block exemption.",
-            )
+            if component != "somatic":
+                missing(
+                    f"{scope} or {field} != null",
+                    field,
+                    "Supply the current scene fact or a saved stat-block exemption.",
+                )
             checks.append(
                 {
                     "condition": f"{scope} or {field} == null or {field} == true",

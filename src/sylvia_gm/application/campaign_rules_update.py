@@ -376,6 +376,8 @@ def _tool_input_change(prior: ToolDeclaration, incoming: ToolDeclaration) -> str
         if not isinstance(left, dict) or not isinstance(right, dict):
             return None
         for child in (left, right):
+            if "description" in child and not isinstance(child.pop("description"), str):
+                return None
             for key in metadata:
                 value = child.pop(key, None)
                 if value is not None and (

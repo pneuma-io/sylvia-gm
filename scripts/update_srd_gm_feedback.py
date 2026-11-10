@@ -58,6 +58,7 @@ def update(version):
     record_path = package / "package-record.json"
     record = json.loads(record_path.read_bytes())
     before = {name: json.dumps(tool, sort_keys=True) for name, tool in runtime["tools"].items()}
+    before_parameters = json.dumps(runtime["parameter_declarations"], sort_keys=True)
     retired, removed = retire_refusal_stubs(runtime, record)
     aliases = bind_gm_feedback(runtime)
     result = original
@@ -70,6 +71,11 @@ def update(version):
             changed.append(name)
     for name in ("srd_lite_single_target_spells", "srd_lite_multiple_target_spells"):
         result = _replace_entry(result, "definitions", name, runtime["definitions"][name])
+    if json.dumps(runtime["parameter_declarations"], sort_keys=True) != before_parameters:
+        previous_parameters = json.loads(before_parameters)
+        for name, parameter in runtime["parameter_declarations"].items():
+            if parameter != previous_parameters.get(name):
+                result = _replace_entry(result, "parameter_declarations", name, parameter)
     # Verify the edited fragments still describe exactly the transformed runtime.
     if yaml.load(result, Loader=yaml.CSafeLoader) != runtime:
         raise ValueError("Targeted runtime rendering changed unrelated data")
@@ -82,6 +88,11 @@ def update(version):
                 expanded["tools"][tool["name"]],
                 tool["input_schema"],
             )
+        for parameter in expanded["tools"][tool["name"]].get("parameters", []):
+            if parameter["name"] == "somatic_component_available":
+                tool["input_schema"]["properties"][parameter["name"]]["description"] = (
+                    parameter["description"]
+                )
         if tool["name"] in CAST_ROOTS:
             tool["input_schema"]["properties"]["spell"]["x-sylvia-gm-value-aliases"] = aliases
             tool["input_schema"]["properties"]["spell"]["x-sylvia-gm-castable-spells"] = True
