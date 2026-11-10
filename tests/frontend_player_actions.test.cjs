@@ -110,10 +110,17 @@ for (const selection of [{ actor: 'participant-internal', destination: [4, 4] },
   });
 }
 
-test('confirm retains the prepared identity and revision even after a display refresh', async () => {
+test('panel click awaits fresh authority and retains its prepared identity after a display refresh', async () => {
   const h = harness();
+  const snapshot = deferred();
+  h.api.state.bridge.snapshot = () => snapshot.promise;
   const pending = h.click();
   await new Promise(setImmediate);
+  assert.equal(h.proposals.length, 0, 'preview waits for the authoritative snapshot');
+  assert.equal(h.executions.length, 0);
+  snapshot.resolve({ revision: 7 });
+  await new Promise(setImmediate);
+  assert.equal(h.proposals[0].expected_revision, 7, 'the cached revision zero is never previewed');
   h.api.state.activeSnapshot = { revision: 8 };
   h.body.children[0].close('confirm');
   await pending;

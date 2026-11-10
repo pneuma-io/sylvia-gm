@@ -2393,13 +2393,19 @@ class TestUI001Frame:
 
     def test_panel_actions_use_a_fresh_authoritative_revision(self) -> None:
         js = _renderer_runtime_text(FRONTEND_DIR / "app.js")
-        handler = js.split("container.querySelectorAll('[data-panel-action-id]')", maxsplit=1)[1]
-        handler = handler.split("container.querySelectorAll('[data-panel-size-id]')", maxsplit=1)[0]
+        assert (
+            "await runPanelAction(projection, surface, action, selection, button, "
+            "{ activity, campaignId, sessionId });"
+        ) in js
+        handler = js.split("async function runPanelAction(", maxsplit=1)[1]
+        handler = handler.split("function sequenceDisplaySummary(", maxsplit=1)[0]
 
         assert "await state.bridge.snapshot(campaignId)" in handler
         assert "expected_revision: actionSnapshot.revision" in handler
-        assert handler.index("await state.bridge.snapshot(campaignId)") < handler.index(
-            "await state.bridge.execute_panel_action("
+        assert (
+            handler.index("await state.bridge.snapshot(campaignId)")
+            < handler.index("await state.bridge.preview_panel_action(")
+            < handler.index("await state.bridge.execute_panel_action(")
         )
 
     def test_projection_polling_preserves_stable_chronology_dom_and_scroll(self) -> None:
