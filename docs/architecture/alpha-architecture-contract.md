@@ -1125,6 +1125,17 @@ without reading or parsing large definition files. `scripts/inventory_inherited_
 prepares Severed Lands subject bindings from current Lite and retained Plan source records,
 checking retained file hashes and preserving each distinct source edition. It generates no art
 and changes no gameplay data.
+For cast members authored only in a Plan, `campaign_plan#/...` identifies a prose passage in
+the accepted structured Plan. Catalogue sources use `plan_id`, the cited prose passage's canonical
+hash and declared subject name; a source cannot claim both Plan and package identity.
+The owner reads the accepted Plan once per refresh and preserves the same Setting scope and
+public/active entity filters. Display names alone do not connect different Plans or changed
+character passages. Accepted interview preferences and party placement preserve art when the
+cited character passage is unchanged.
+`artwork/plan-cast.json` records reviewed prose-only subjects for production, while
+`scripts/inventory_plan_artwork.py` checks each source passage against current Plan bytes and
+emits bindings. This roster supplies no runtime images and is not an alternate Plan or art store.
+Existing NPC profiles remain the preferred source when the Setting already declares the person.
 
 The character artwork workflow composes the existing image requests rather than adding a second
 job store. Each persisted request records its workflow and stage. Adoption prepares the next

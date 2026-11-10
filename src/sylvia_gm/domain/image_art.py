@@ -282,6 +282,10 @@ images. Indexed inherited creatures/forms use source_ref as the admitted file pa
 JSON Pointer, for example content/non-beast-form-index.json#/forms/aboleth. Preserve that reference
 when recording the entity; Sylvia resolves the current Setting's prepared rendition from package
 metadata. Resolve source identifiers from the authored data during preparation.
+Use the admitted NPC profile when one exists. For a person or creature authored only in the
+accepted Campaign Plan, retain campaign_plan plus the JSON Pointer to its introduction, such as
+campaign_plan#/structure/0/situations/1, and the person's authored name. Sylvia binds that passage
+to the exact accepted Plan, so a same-named person in another Plan does not select its art.
 Inspect current artwork before requesting anything. During ordinary character creation,
 adaptation or an introduction with missing art, use request_image_art with purpose character,
 its name and established appearance. Sylvia runs

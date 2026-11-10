@@ -6,13 +6,13 @@ import hashlib
 import json
 import re
 import sys
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
 from sylvia_gm.application.image_hooks import MAX_IMAGE_BYTES, ImageData
 from sylvia_gm.domain.image_art import validate_character_visuals
-from sylvia_gm.domain.package_library import PackageFile
+from sylvia_gm.domain.package_library import PackageFile, canonical_json_bytes
 
 
 def _art_root() -> Path:
@@ -94,6 +94,61 @@ def bundled_source_visuals(
         digest = source.sha256
     else:
         digest = hashlib.sha256(source.replace(b"\r\n", b"\n")).hexdigest()
+    return _source_visuals(
+        "package_id", package_id, portable_path, digest, subject_name, campaign_setting_ids,
+    )
+
+
+def plan_artwork_source(
+    plan: Mapping[str, object], source_ref: str,
+) -> tuple[str, str] | None:
+    """Identify one exact narrative passage, preserving art across unrelated interview choices."""
+    if not source_ref.startswith("campaign_plan#/"):
+        return None
+    pointer = source_ref.partition("#")[2]
+    if pointer != "/opening_direction" and not pointer.startswith((
+        "/structure/", "/side_content/",
+    )):
+        return None
+    value: object = plan
+    try:
+        for token in pointer[1:].split("/"):
+            token = token.replace("~1", "/").replace("~0", "~")
+            if isinstance(value, Mapping):
+                value = value[token]
+            elif isinstance(value, Sequence) and not isinstance(value, (str, bytes, bytearray)):
+                if re.fullmatch(r"0|[1-9][0-9]*", token) is None:
+                    return None
+                value = value[int(token)]
+            else:
+                return None
+        if isinstance(value, str) and value.strip():
+            return value, hashlib.sha256(canonical_json_bytes(value)).hexdigest()
+    except (KeyError, IndexError, ValueError, TypeError):
+        pass
+    return None
+
+
+def bundled_plan_visuals(
+    plan: Mapping[str, object], source_ref: str, *,
+    subject_name: str | None = None, campaign_setting_ids: frozenset[str] = frozenset(),
+) -> dict[str, Any] | None:
+    """Resolve a declared cast member inside the exact accepted structured Plan."""
+    source = plan_artwork_source(plan, source_ref)
+    plan_id = plan.get("id")
+    if source is None or not isinstance(plan_id, str):
+        return None
+    return _source_visuals(
+        "plan_id", plan_id, source_ref, source[1], subject_name, campaign_setting_ids,
+    )
+
+
+def _source_visuals(
+    identity_key: str, source_id: str, path: str, digest: str,
+    subject_name: str | None, campaign_setting_ids: frozenset[str],
+) -> dict[str, Any] | None:
+    """Match one source namespace before applying Setting and subject specificity."""
+    other_key = "plan_id" if identity_key == "package_id" else "package_id"
     try:
         catalogue = json.loads((_art_root() / "character-art.json").read_bytes())
         candidates: dict[tuple[int, int], dict[int, object]] = {}
@@ -101,8 +156,9 @@ def bundled_source_visuals(
             for reference in character["sources"]:
                 if not (
                     isinstance(reference, Mapping)
-                    and reference.get("package_id") == package_id
-                    and reference.get("path") == portable_path
+                    and reference.get(identity_key) == source_id
+                    and other_key not in reference
+                    and reference.get("path") == path
                     and reference.get("sha256") == digest
                 ):
                     continue

@@ -81,6 +81,12 @@ across the current and retained Lite sources. Exact file/JSON Pointer/hash bindi
 to the selected Setting. Portrait lookup uses admitted metadata without parsing the large
 definition files. Producer and owner composition checks cover these bindings and used-art
 transfer with generation Off; these fixtures do not supply the missing production artwork.
+Review of all eighteen shipped/retained Plan narratives identified seventy-two prose-only named
+subjects, including side-story cast and the Vigilant Engine. The production roster preserves
+separate identities for same-named people in different Plans. Exact accepted-Plan ID, cited prose,
+subject and Setting bindings now restore their prepared art through normal status and
+used-art campaign export. Source checks use synthetic PNGs; production of these images remains
+open, alongside the remaining Setting, inherited and selected TD art.
 The subsequent local handoff check found and fixed an execution dependency on a stopped source
 chat, including admission of the next character reference stage. An active chat in the same
 campaign can now generate/adopt an existing individual request or continue the whole character

@@ -955,7 +955,10 @@ class AuthorityOwner:
 
     def character_visuals(self, campaign_id: str) -> dict[str, Any]:
         """Read prepared artwork and overlay this campaign's selected images and framing."""
-        from sylvia_gm.application.bundled_character_art import bundled_source_visuals
+        from sylvia_gm.application.bundled_character_art import (
+            bundled_plan_visuals,
+            bundled_source_visuals,
+        )
         from sylvia_gm.domain.image_art import (
             character_visuals_from_selections,
             validate_character_visuals,
@@ -1002,6 +1005,8 @@ class AuthorityOwner:
             }
             source_packages: list[tuple[PackageLockEntry, dict[str, PackageFile]]] | None = None
             setting_ids: frozenset[str] = frozenset()
+            plan_source: Mapping[str, object] | None = None
+            plan_source_loaded = False
             for identity, record in entities.items():
                 source = record.payload.get("source_ref")
                 if (
@@ -1036,11 +1041,32 @@ class AuthorityOwner:
                         source_packages.append((
                             entry, {item.path: item for item in manifest.files},
                         ))
+                name = record.payload.get("name")
+                if source.startswith("campaign_plan#/"):
+                    if not plan_source_loaded:
+                        accepted = self._store.accepted_campaign_plan(campaign_id)
+                        structured = (
+                            accepted.content.get("campaign_plan") if accepted is not None else None
+                        )
+                        if (
+                            isinstance(structured, Mapping)
+                            and isinstance(structured.get("id"), str)
+                        ):
+                            plan_source = structured
+                        plan_source_loaded = True
+                    if plan_source is not None:
+                        visuals = bundled_plan_visuals(
+                            plan_source, source,
+                            subject_name=name if isinstance(name, str) else None,
+                            campaign_setting_ids=setting_ids,
+                        )
+                        if visuals is not None:
+                            result[identity] = visuals
+                    continue
                 for entry, files in source_packages:
                     descriptor = files.get(source) or files.get(portable)
                     if descriptor is None:
                         continue
-                    name = record.payload.get("name")
                     visuals = bundled_source_visuals(
                         entry.package_id, source, descriptor,
                         subject_name=name if isinstance(name, str) else None,
