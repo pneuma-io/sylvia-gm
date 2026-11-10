@@ -10,6 +10,7 @@ from sylvia_gm.application.campaign_library_selection import (
     resolve_campaign_library_selection,
 )
 from sylvia_gm.application.image_art import ImageArt
+from sylvia_gm.application.image_hooks import ImageUpdate
 from sylvia_gm.domain.image_art import validate_character_visuals
 from tests.test_campaign_library_selection import seed_campaign_library
 from tests.test_image_art import Images
@@ -164,6 +165,43 @@ def test_card_portrait_and_crop_survive_offline_reuse_as_explicit_partial_art(tm
         assert restored["frame"] == bundle["frame"]
         assert restored["missing"] == ["full_body", "reference_sheet", "portrait"]
         assert images.calls == []
+        art.close()
+
+
+def test_explicit_retry_keeps_publication_link_without_automatic_resubmission(tmp_path):
+    class FailsOnce(Images):
+        def submit(self, request):
+            if not self.calls:
+                self.calls.append(request)
+                return ImageUpdate(
+                    request.session_id, request.operation_id, "failed", error="rate_limited"
+                )
+            return super().submit(request)
+
+    with AuthorityOwner.open(tmp_path / "retry.db", "owner") as owner:
+        owner.create_builder_chat(provider_id="test", model_id="test", session_id="builder")
+        images = FailsOnce()
+        art = ImageArt(owner, adapters=(images,), settings=lambda: {"mode": "auto"})
+        request = {
+            "purpose": "character",
+            "name": "Mora",
+            "appearance": "Silver hair",
+            "brief": "Painterly",
+        }
+        failed = art.request("builder", operation_id="first", **request)
+        art.bind_publication("builder", "saved-mora", "a" * 64, name="Mora")
+        assert art._futures[failed["operation_id"]].result(timeout=15)["status"] == "failed"
+        assert (
+            art.ensure_character_art("builder", name="Mora", appearance="Silver hair")["status"]
+            == "failed"
+        )
+        assert len(images.calls) == 1
+        row = art.request("builder", operation_id="explicit-retry", **request)
+        for _ in range(3):
+            art._futures[row["operation_id"]].result(timeout=15)
+            row = art.view("builder")["requests"][0]
+        assert "status" not in owner._store.images.published_visuals("saved-mora", "a" * 64)
+        assert len(images.calls) == 4
         art.close()
 
 

@@ -29,7 +29,7 @@ test('one saved crop is reused in Party, Character, Map and labelled dialogue',{
       map:{id:'practice',bounds:{min:[0,0,0],max:[10,10,3]},grid:{cell_size:1,unit:'m'}},
       entities:[{id:'bram-body',actor_ref:'bram',position:[2,2,0],height:1.8,footprint:{kind:'circle',radius:.4},display:{label:'Bram'}}],
       geometry:[],terrain:[],zones:[],objectives:[],selection:{actor:'bram-body'}}}]};
-   const art={settings:{mode:'off'},targets:[{id:'bram',kind:'character',name:'Bram'}],requests:[],
+   const art={settings:{mode:'off'},targets:[{id:'bram',kind:'character',name:'Bram',appearance:'Silver hair'}],requests:[],
     selections:[{target_id:'bram',purpose:'portrait',sha256:'a'.repeat(64),frame:{x:.42,y:.31,zoom:1.5}}]};
    document.getElementById('connecting-overlay').classList.add('hidden');
    const frame=document.getElementById('session-frame');frame.style.display='flex';frame.classList.add('left-sidebar-collapsed');
@@ -62,6 +62,7 @@ test('one saved crop is reused in Party, Character, Map and labelled dialogue',{
   const dialog=page.getByRole('dialog',{name:'Images'});
   assert.equal(await dialog.locator('[name=target_id]').inputValue(),'bram');
   assert.equal(await dialog.locator('[name=purpose]').inputValue(),'character');
+  assert.equal(await dialog.locator('[name=appearance]').inputValue(),'Silver hair');
   await dialog.getByRole('button',{name:'Close images'}).click();
   const reads=await page.evaluate(async()=>{
    const scope={campaign_id:'image-surfaces',session_id:'gm',current:()=>true};

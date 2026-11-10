@@ -379,6 +379,23 @@ class ImageArt:
         _, campaign_id = self._scope(session_id)
         if campaign_id is None:
             builder_targets = dict(self._builder_targets.get(session_id, {}))
+            for row in self.store.list_requests(campaign_id=None, session_id=session_id):
+                value = json.loads(row["request_json"])
+                name = value.get("metadata", {}).get("target_name")
+                if name:
+                    builder_targets.setdefault(
+                        row["target_id"],
+                        {
+                            "id": row["target_id"],
+                            "kind": "character",
+                            "name": name,
+                            "appearance": value.get("appearance", ""),
+                        },
+                    )
+                    if value.get("character_flow"):
+                        builder_targets[row["target_id"]].setdefault(
+                            "appearance", value.get("appearance", "")
+                        )
             for row in self.store.list_selections(session_id):
                 name = row["metadata"].get("target_name")
                 if name:

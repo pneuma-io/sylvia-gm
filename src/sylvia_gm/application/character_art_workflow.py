@@ -79,6 +79,28 @@ class CharacterArtWorkflow:
         selected = [
             row for row in self.art.store.list_selections(scope) if row["target_id"] == target_id
         ]
+        previous = next(
+            (
+                row
+                for row in self.art.store.list_requests(
+                    campaign_id=campaign_id,
+                    session_id=session_id,
+                )
+                if row["target_id"] == target_id
+                and "character_flow" in json.loads(row["request_json"])
+            ),
+            None,
+        )
+        previous_value = json.loads(previous["request_json"]) if previous is not None else {}
+        established = next(
+            (
+                row["metadata"].get("appearance")
+                for row in selected
+                if row["metadata"].get("appearance")
+            ),
+            "",
+        )
+        appearance = appearance or established or previous_value.get("appearance", "")
         if not appearance and not any(row["metadata"].get("appearance") for row in selected):
             raise ValueError(
                 "Describe the character's established appearance before creating artwork"
@@ -94,6 +116,17 @@ class CharacterArtWorkflow:
             missing = list(STEPS)
         if not missing:
             return {"target_id": target_id, "status": "already_available", "name": name}
+        publications = []
+        if (
+            not edit_sha256
+            and previous is not None
+            and previous_value.get("appearance") == appearance
+        ):
+            if previous["status"] in {"proposed", "pending"} or (
+                previous["status"] == "succeeded" and not previous_value.get("adopted")
+            ):
+                return self.art._receipt(previous)
+            publications = previous_value.get("publications", [])
         flow = {
             "id": root,
             "fingerprint": fingerprint,
@@ -102,6 +135,7 @@ class CharacterArtWorkflow:
             "steps": missing,
             "brief": brief,
             "appearance": appearance,
+            "publications": publications,
         }
         return self._propose(session_id, flow, missing[0], edit_sha256=edit_sha256)
 

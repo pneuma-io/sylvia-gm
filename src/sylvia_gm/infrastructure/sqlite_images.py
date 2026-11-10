@@ -81,7 +81,7 @@ def admit(connection: sqlite3.Connection, value: Mapping[str, Any]) -> dict[str,
     payload = json.loads(value["request_json"])
     flow = payload.get("character_flow")
     if flow is not None:
-        publications = list(payload.get("publications", ()))
+        publications = list(payload.get("publications", flow.get("publications", ())))
         for row in connection.execute(
             "SELECT request_json FROM image_requests WHERE session_id=? AND "
             "json_extract(request_json, '$.character_flow.id')=?",

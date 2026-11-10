@@ -202,8 +202,10 @@
       dialog.querySelector('[data-art-name]').hidden = !!form.elements.target_id.value;
       form.elements.name.required = !form.elements.target_id.value;
       const complete=form.elements.purpose.value==='character';
+      const established=view?.targets.find(target=>target.id===form.elements.target_id.value)?.appearance;
+      if (complete&&!form.elements.appearance.value&&established) form.elements.appearance.value=established;
       dialog.querySelector('[data-art-workflow]').hidden=!complete;
-      form.elements.appearance.required=complete&&!view?.selections.some(item=>item.target_id===form.elements.target_id.value&&item.metadata?.appearance);
+      form.elements.appearance.required=complete&&!established&&!view?.selections.some(item=>item.target_id===form.elements.target_id.value&&item.metadata?.appearance);
       form.querySelector('[type=submit]').textContent=complete
         ? (view?.settings.mode==='auto'?'Create artwork':'Prepare artwork')
         : (view?.settings.mode==='auto'?'Generate and use':'Prepare request');
