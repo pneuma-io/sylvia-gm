@@ -31,7 +31,7 @@ from sylvia_gm.application.ready_campaigns import ready_campaign_catalog, resolv
 from sylvia_gm.domain._content_schema_character_profile import EXAMPLE as LEGACY
 from sylvia_gm.domain.errors import CommandRejected
 from sylvia_gm.domain.package_library import canonical_json_bytes
-from sylvia_gm.interfaces.webui import OwnerProcess
+from sylvia_gm.interfaces.webui import OwnerProcess, WebUIError
 from tests.test_character_art_import import card_png
 from tests.test_image_art import Images
 from tests.test_image_hooks import png
@@ -113,6 +113,64 @@ def test_real_owner_and_browser_transfer_selected_character_bytes_without_host_p
             assert not list(tmp_path.glob(".webui-upload-*"))
         finally:
             await browser.close()
+
+    asyncio.run(check())
+
+
+def test_owner_restart_retires_abandoned_previews_but_keeps_receipts_and_chosen_files(tmp_path):
+    source_root, recipient_root = tmp_path / "source", tmp_path / "recipient"
+    source_root.mkdir()
+    recipient_root.mkdir()
+    files = []
+    with AuthorityOwner.open(source_root / "owner.db", "preview-source") as source_owner:
+        for index in range(6):
+            profile = save_character_profile(
+                source_root, operation_id=f"source-{index}",
+                source=canonical_json_bytes({**LEGACY, "name": f"Preview {index}"}),
+            )
+            raw, _ = export(source_owner, source_root, profile)
+            path = tmp_path / f"chosen-{index}.sylvia-gm-character"
+            path.write_bytes(raw)
+            files.append((path, raw))
+
+    async def check():
+        owner = OwnerProcess(recipient_root)
+        await owner.start()
+        try:
+            async def preview(index):
+                return await owner.call(
+                    "preview_character_bundle_file", {"source_path": str(files[index][0])}
+                )
+
+            first = await preview(0)
+            token = {"source_sha256": first["source_sha256"]}
+            imported = await owner.call("confirm_character_bundle_import", token)
+            abandoned = await preview(1)
+            for index in range(2, 5):
+                await preview(index)
+            with pytest.raises(WebUIError, match="Import or cancel a pending"):
+                await preview(5)
+            previews = recipient_root / "character-bundle-previews"
+            unrelated = previews / "keep.txt"
+            unrelated.write_text("not a pending preview", encoding="utf-8")
+            await owner.close()
+
+            owner = OwnerProcess(recipient_root)
+            await owner.start()
+            assert {path.name for path in previews.iterdir()} == {
+                first["source_sha256"] + ".json", "keep.txt",
+            }
+            assert unrelated.read_text(encoding="utf-8") == "not a pending preview"
+            assert await owner.call("confirm_character_bundle_import", token) == imported
+            with pytest.raises(WebUIError, match="preview is no longer available") as unavailable:
+                await owner.call("confirm_character_bundle_import", {
+                    "source_sha256": abandoned["source_sha256"],
+                })
+            assert str(recipient_root) not in str(unavailable.value)
+            assert (await preview(5))["status"] == "preview"
+            assert all(path.read_bytes() == raw for path, raw in files)
+        finally:
+            await owner.close()
 
     asyncio.run(check())
 

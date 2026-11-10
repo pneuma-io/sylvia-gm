@@ -65,7 +65,15 @@ Standalone character/profile transfer now has a bounded `.sylvia-gm-character` f
 package checks, preview/confirm/cancel and owner/WebUI upload/download endpoints. It carries
 used art, crop and imported originals through the existing libraries and image store, preserving
 legacy v1 text. Focused checks cover an imported card's crop/edit/re-export/reference journey and
-actual Lite exact-package restoration with generation Off. Frontend controls remain pending.
+actual Lite exact-package restoration with generation Off. Library now offers Character File
+import with preview, confirm/cancel and a saved-character export list. Setup can export the exact
+selected Player Character, Companion or Universal card. Imports refresh the lists; refused imports
+retain their preview, and stale exports preserve setup choices and refresh the source list.
+Native chooser/save commands and browser upload/download wiring are implemented. Source WebUI
+checks cover actual Lite package refusal/recovery, portable artwork/original cards and zero image
+requests, plus desktop/mobile layouts. Compiled Rust checks cover verified handoff and safe names.
+Owner startup now retires abandoned temporary preview copies while retaining import receipts and
+the user's chosen files, so closing the app cannot permanently exhaust the four-preview limit.
 The following ordinary-edit audit confirmed that renaming a saved character could propose fresh
 art despite its complete references. Builder publication now uses the opened source target for
 preparation, reuse and links, with retained profile-open receipts across restart. Explicit sources
@@ -118,11 +126,12 @@ workflow with its original provenance and stable stage identities. Replays from 
 chat reuse those stages; unrelated chats remain refused. Nine local handoff/workflow checks pass,
 including exact reference order and export/recovery. The owner clarified that model delegation
 applies to visual design and frontend work. Backend design and implementation continue here.
-An attempted Opus handoff failed before launch (`thread_credential_required`); no child started.
-The owner has now explicitly selected Opus 5.5 for the remaining character import/export controls
-and confirmed delegation is being repaired. Do not retry that handoff while the repair is pending.
-Artwork production continues through GPT Images. The owner permits pausing if independent work
-runs out; substantial catalogue production remains. Live in-app checks remain deferred.
+The original Opus handoff failed before launch (`thread_credential_required`). After the owner
+selected Opus 5.5 and resumed following the app update, the direct handoff executed successfully
+with Fast mode off. Its transfer frontend is committed locally at `465d2fa`, including correction
+of accidental test-file line-ending churn. Parent review covers source, screenshots and the two
+bounded backend recovery findings. Artwork production continues through GPT Images; the remaining
+catalogue and broader everyday journeys are unfinished. Live in-app checks remain deferred.
 The nine prepared Ready character editions now carry the existing shared visual records for
 their exact authored starter identities. Their builds, equipment, prose and retained Plan
 bindings are unchanged; only visuals, character hashes and artwork provenance were added.

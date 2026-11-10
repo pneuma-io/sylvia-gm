@@ -196,7 +196,7 @@ def _character_context(
             if declaration is not None:
                 return primary, declaration, authority
     raise CommandRejected(
-        "Install this character's matching Ruleset and Setting packages, then import it again. "
+        "Install this character's matching Ruleset and Setting packages, then try again. "
         "Its package versions and character schema must match; no build is substituted.",
         code="character_packages_missing",
     )
@@ -398,6 +398,22 @@ def _preview_path(storage_root: Path, digest: str) -> Path:
     return target
 
 
+def discard_pending_character_previews(storage_root: Path) -> None:
+    """Retire prior-owner temporary previews at launch, preserving import receipts and originals."""
+    root = storage_root / "character-bundle-previews"
+    if not os.path.lexists(root):
+        return
+    if is_link_or_reparse(root) or not root.is_dir():
+        raise ValueError("Character preview storage is unsafe")
+    pending = [
+        _preview_path(storage_root, path.name)
+        for path in root.iterdir()
+        if _DIGEST.fullmatch(path.name)
+    ]
+    for path in pending:
+        path.unlink()
+
+
 def stage_character_preview(storage_root: Path, source: Path) -> dict[str, Any]:
     """Capture the exact chosen character file for a later deliberate import."""
     if is_link_or_reparse(source) or not source.is_file():
@@ -429,6 +445,10 @@ def confirm_character_preview(
     if os.path.lexists(receipt) and (is_link_or_reparse(receipt) or not receipt.is_file()):
         raise ValueError("Character import receipt is unsafe")
     if not source.exists():
+        if not receipt.exists():
+            raise ValueError(
+                "This character preview is no longer available. Choose the Character File again."
+            )
         with receipt.open("rb") as stream:
             raw = stream.read(64 * 1024 + 1)
         if len(raw) > 64 * 1024:

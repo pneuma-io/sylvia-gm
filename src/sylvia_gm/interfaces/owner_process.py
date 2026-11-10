@@ -4789,6 +4789,9 @@ def run(
         owner_config_path = storage_root / "config.yaml"
         application_owner = supervisor.application_owner()
         application_owner.prepare_new_campaign_storage()
+        from sylvia_gm.application.character_transfer import discard_pending_character_previews
+
+        discard_pending_character_previews(storage_root)
         _preinstall_bundled_srd(bus)
         _preinstall_bundled_riichi(bus)
         if application_owner.legacy_builder_contexts():
