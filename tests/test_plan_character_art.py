@@ -14,6 +14,8 @@ from sylvia_gm.application.campaign_library_selection import (
     plan_with_interview_intent,
     resolve_campaign_plan_selection,
 )
+from sylvia_gm.application.plan_bundle import export_plan_bundle, import_plan_bundle
+from sylvia_gm.application.reusable_plans import save_reusable_rift_plan
 from sylvia_gm.domain.authority import WriterRole
 from sylvia_gm.domain.package_library import canonical_json_bytes
 from sylvia_gm.domain.session import SessionMessageKind
@@ -97,10 +99,15 @@ def test_plan_binding_refuses_different_editions_subjects_or_source_namespaces(
 
     assert lookup()["appearance"] == subject["id"]
     assert lookup(plan={**plan, "id": "a-different-plan"}) is None
+    copy = {**plan, "id": "a-copy", "artwork_source_plan_id": plan["id"]}
+    assert lookup(plan=copy)["appearance"] == subject["id"]
+    assert lookup(plan={**copy, "artwork_source_plan_id": "another-plan"}) is None
+    assert lookup(plan={**copy, "artwork_source_plan_id": 123}) is None
     assert lookup(path="campaign_plan#/structure/0/situations/2") is None
     assert lookup(path="content/npcs/nessa.md") is None
     changed = json.loads(raw)
     changed["structure"][0]["situations"][1] += " The authored character passage changed."
+    changed["artwork_source_plan_id"] = plan["id"]
     assert lookup(plan=changed) is None
     preferences = json.loads(raw)
     preferences["boundaries"].append("Player Boundary: no graphic injury")
@@ -177,6 +184,46 @@ def test_actual_lite_plan_cast_reuses_art_and_exports_before_opening_artwork(
                 "preferences": "Include quiet dialogue",
             },
         ).payload
+        original = plan
+        with pytest.raises(ValueError, match="artwork source"):
+            selection.sources.validate(
+                {**plan, "artwork_source_plan_id": 123},
+                selection.plan.plan.readable_markdown,
+            )
+        copies = tmp_path / "plan-copies"
+        markdown = selection.plan.plan.readable_markdown
+        for index in range(2):
+            saved = save_reusable_rift_plan(
+                copies,
+                operation_id=f"copy-{index}",
+                title=f"Cart copy {index}",
+                source_payload=plan,
+                source_markdown=markdown,
+                package_snapshot=selection.plan.package_snapshot,
+            )
+            assert saved.plan.payload["artwork_source_plan_id"] == "last-cart-through"
+            assert saved.plan.payload["id"] != plan["id"]
+            plan, markdown = saved.plan.payload, saved.plan.readable_markdown
+        assert "artwork_source_plan_id" not in original
+        transferred = io.BytesIO()
+        export_plan_bundle(
+            copies,
+            saved.artifact_id,
+            expected_content_sha256=saved.content_sha256,
+            target=transferred,
+        )
+        transferred.seek(0)
+
+        def install_snapshot(raw, install_id):
+            owner.install_package_archive(io.BytesIO(raw), install_id=install_id)
+
+        received = import_plan_bundle(
+            tmp_path / "received-plans",
+            transferred,
+            install_snapshot=install_snapshot,
+        )
+        plan = received.plan.payload
+        assert plan["artwork_source_plan_id"] == "last-cart-through"
         owner.create_campaign(
             CampaignCreate(
                 campaign_id="cart",

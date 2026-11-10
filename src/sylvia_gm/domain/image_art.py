@@ -286,6 +286,7 @@ Use the admitted NPC profile when one exists. For a person or creature authored 
 accepted Campaign Plan, retain campaign_plan plus the JSON Pointer to its introduction, such as
 campaign_plan#/structure/0/situations/1, and the person's authored name. Sylvia binds that passage
 to the exact accepted Plan, so a same-named person in another Plan does not select its art.
+When copying or renaming a Plan, retain artwork_source_plan_id to reuse its unchanged cast art.
 Inspect current artwork before requesting anything. During ordinary character creation,
 adaptation or an introduction with missing art, use request_image_art with purpose character,
 its name and established appearance. Sylvia runs

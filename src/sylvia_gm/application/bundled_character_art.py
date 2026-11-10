@@ -135,7 +135,7 @@ def bundled_plan_visuals(
 ) -> dict[str, Any] | None:
     """Resolve a declared cast member inside the exact accepted structured Plan."""
     source = plan_artwork_source(plan, source_ref)
-    plan_id = plan.get("id")
+    plan_id = plan.get("artwork_source_plan_id", plan.get("id"))
     if source is None or not isinstance(plan_id, str):
         return None
     return _source_visuals(

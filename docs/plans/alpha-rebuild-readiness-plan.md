@@ -87,6 +87,15 @@ separate identities for same-named people in different Plans. Exact accepted-Pla
 subject and Setting bindings now restore their prepared art through normal status and
 used-art campaign export. Source checks use synthetic PNGs; production of these images remains
 open, alongside the remaining Setting, inherited and selected TD art.
+The subsequent reuse audit found that generalized Plan copies received new story IDs and lost
+their prepared cast binding. Copies now preserve a separate artwork source ID through repeated
+save-as and ordinary Plan transfer. Exact cited prose still controls reuse. The actual Lite
+composition check covers two copies, Plan export/import, Builder-to-GM handoff and offline used-art
+campaign recovery with generation Off; no new production images are supplied by those fixtures.
+The TD integration audit at `9968614adc97eddebb5a97f2cfccb772ee889cf1` found compiled mechanics
+and synthetic conformance characters, with no approved release cast. Its README keeps Siren
+Protocol as separate private content. The trailer Setting/Plan selection has been requested;
+test fixtures are excluded from premade production while that selection is pending.
 The subsequent local handoff check found and fixed an execution dependency on a stopped source
 chat, including admission of the next character reference stage. An active chat in the same
 campaign can now generate/adopt an existing individual request or continue the whole character

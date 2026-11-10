@@ -1132,6 +1132,11 @@ The owner reads the accepted Plan once per refresh and preserves the same Settin
 public/active entity filters. Display names alone do not connect different Plans or changed
 character passages. Accepted interview preferences and party placement preserve art when the
 cited character passage is unchanged.
+Optional Plan metadata `artwork_source_plan_id` retains that visual identity when a generalized
+reusable copy receives a new story ID. Save-as preserves the earliest declared artwork source
+through further copies; normal Plan validation checks the identity. The same passage hash,
+subject and Setting checks still apply. This metadata travels inside the existing Plan file
+and bundle, without changing package pins, archive limits or gameplay identity.
 `artwork/plan-cast.json` records reviewed prose-only subjects for production, while
 `scripts/inventory_plan_artwork.py` checks each source passage against current Plan bytes and
 emits bindings. This roster supplies no runtime images and is not an alternate Plan or art store.
