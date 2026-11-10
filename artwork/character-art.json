@@ -1878,6 +1878,366 @@
         "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for The Quartermaster in Sylvia GM's Severed Lands. Input image 1 is the approved full-body identity reference. Preserve that exact person, facial structure, skin, age, hair, proportions, clothes, equipment and material colors. One landscape PNG, 1536x1024, polished naturalistic digital RPG illustration on the same plain light neutral backdrop. Show three separate complete standing views of this ONE person: front, true side and back, evenly spaced at matching scale, each entire head and both feet visible within margins. Include one smaller clear face study in remaining space without overlapping the figures. These are multiple views of one identity, never extra cast. Appearance: A humanlike androgynous adult Riftborn in their late fifties with medium brown skin, a compact strong build, close-cropped gray hair, a broad angular face and steady dark eyes. A reserved exacting expression. A meticulously maintained but repeatedly repaired slate-blue field jacket, charcoal trousers, plain leather belt, stout boots and a small crossbody inventory pouch. Holds one closed plain ledger at the side. No rank insignia, faction crest, visible writing, parade medals or active weapon. No text, labels, names, UI, scenery, decorative frames, invented symbols, open books, extra equipment or duplicated limbs.",
         "portrait": "Use case: identity-preserve. Production reusable square portrait for The Quartermaster in Sylvia GM's Severed Lands. Input image 1 is the canonical full-body identity; input image 2 is that person's multiview reference sheet. Preserve this exact face, facial structure, skin tone, age, hair, expression, clothing and identity. One full-bleed square PNG, 1024x1024. Polished naturalistic digital RPG illustration with a continuous plain warm light-gray studio background extending all the way to all four corners and edges. Exactly one head-and-shoulders portrait, nearly frontal with a slight three-quarter turn. Standardized framing: face horizontally centered; both eyes about 35 percent down; top of all hair about 10 percent down; chin about 65 percent; shoulders filling lower quarter. Keep the entire hairstyle, jaw and neck visible, with comfortable room around the head. Clothing continues naturally to lower edges. Do not show hands, full body, held books or extra objects. Identity description: A humanlike androgynous adult Riftborn in their late fifties with medium brown skin, a compact strong build, close-cropped gray hair, a broad angular face and steady dark eyes. A reserved exacting expression. A meticulously maintained but repeatedly repaired slate-blue field jacket, charcoal trousers, plain leather belt, stout boots and a small crossbody inventory pouch. Holds one closed plain ledger at the side. No rank insignia, faction crest, visible writing, parade medals or active weapon. No circular or oval shape, cutout, white corners, vignette, frame, border, text, labels, UI, scene, extra faces or glamour changes."
       }
+    },
+    {
+      "id": "severed-npc-pike-rookie",
+      "name": "Pike",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/pike-rookie.md",
+          "sha256": "62824673fb6b5d637e090d487b3a2d565d2a38b4b3800daa610ef429192e3466",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/pike-rookie.md",
+          "sha256": "c8175a0f972d693df108c7e9745b45790ef29e6ad166b9a433c4ed2652045b0b",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A humanlike adult Riftborn man about twenty years old with a slim wiry build, medium brown skin, short unruly reddish-brown curls, bright brown eyes and an earnest clean-shaven face. An eager confident expression. A patched russet cloth patrol jacket over a plain oatmeal shirt, charcoal trousers, stout work boots and a small belt pouch. Holds one plain practical spear upright at his side, tip comfortably inside the frame. No medals, veteran scars, faction emblems, modern military gear or magical effects.",
+        "full_body": {
+          "path": "assets/characters/53925e0cb00e474ac5c608848488c99b1c5628ee229e1a6ecb859e8028f8de1b.png",
+          "sha256": "53925e0cb00e474ac5c608848488c99b1c5628ee229e1a6ecb859e8028f8de1b"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/c00ac3c36fc52d8ff6de3d25df55c2b60c4a12da4b7fe229cd9cc789efd6e574.png",
+          "sha256": "c00ac3c36fc52d8ff6de3d25df55c2b60c4a12da4b7fe229cd9cc789efd6e574"
+        },
+        "portrait": {
+          "path": "assets/characters/bf485af80c1a09436f83a6237239c02390e44a0982c8ab28ba4b12a23e5e6766.png",
+          "sha256": "bf485af80c1a09436f83a6237239c02390e44a0982c8ab28ba4b12a23e5e6766"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2077247
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2210368
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2470663
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Pike in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, tactile fabric and skin, plain light neutral backdrop, soft natural studio light and subtle ground shadow. Exactly one person standing naturally in a near-front three-quarter pose. Entire head, both hands and both feet comfortably inside the frame. Appearance: A humanlike adult Riftborn man about twenty years old with a slim wiry build, medium brown skin, short unruly reddish-brown curls, bright brown eyes and an earnest clean-shaven face. An eager confident expression. A patched russet cloth patrol jacket over a plain oatmeal shirt, charcoal trousers, stout work boots and a small belt pouch. Holds one plain practical spear upright at his side, tip comfortably inside the frame. No medals, veteran scars, faction emblems, modern military gear or magical effects. Unspecified visual details are editable defaults. Preserve the authored identity and pronouns without adding history, powers or allegiances. No text, labels, borders, UI, scenery, extra people, duplicated limbs or oversized equipment.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for Pike in Sylvia GM's Severed Lands. Input image 1 is the approved full-body identity reference. Preserve this exact face, age, skin, hairstyle, body proportions, clothing, equipment and colors. One landscape PNG, 1536x1024, polished naturalistic digital RPG illustration on the same plain light neutral backdrop. Show three separate complete standing views of this ONE person: front, true side and back, evenly spaced at matching scale. Entire head, hands, feet and any carried equipment fit comfortably within margins. Add one small clear face study in remaining space without overlap. Multiple views of the same person, never additional cast. Appearance: A humanlike adult Riftborn man about twenty years old with a slim wiry build, medium brown skin, short unruly reddish-brown curls, bright brown eyes and an earnest clean-shaven face. An eager confident expression. A patched russet cloth patrol jacket over a plain oatmeal shirt, charcoal trousers, stout work boots and a small belt pouch. Holds one plain practical spear upright at his side, tip comfortably inside the frame. No medals, veteran scars, faction emblems, modern military gear or magical effects. No labels, writing, UI, decorative border, scene, new symbols, extra equipment, duplicate limbs, motion ghosts or altered age.",
+        "portrait": "Use case: identity-preserve. Production reusable square portrait for Pike in Sylvia GM's Severed Lands. Input image 1 is the canonical full-body identity; input image 2 is that person's multiview reference sheet. Preserve this exact face, age, skin tone, hairstyle, expression, clothing and identity. One full-bleed square PNG, 1024x1024. Polished naturalistic digital RPG illustration, continuous plain warm light-gray studio background extending to all four corners and edges. Exactly one head-and-shoulders portrait, almost frontal with a slight three-quarter turn. Standardized framing: face centered horizontally, both eyes about 35 percent down the image, top of the complete hairstyle about 10 percent down, chin around 65 percent, shoulders filling the lower quarter. Keep all hair, any beard, the jaw and neck visible with comfortable margins. Clothing continues naturally to the lower edges. No hands, weapons, held objects, full body or extra people. Identity description: A humanlike adult Riftborn man about twenty years old with a slim wiry build, medium brown skin, short unruly reddish-brown curls, bright brown eyes and an earnest clean-shaven face. An eager confident expression. A patched russet cloth patrol jacket over a plain oatmeal shirt, charcoal trousers, stout work boots and a small belt pouch. Holds one plain practical spear upright at his side, tip comfortably inside the frame. No medals, veteran scars, faction emblems, modern military gear or magical effects. No painted circular or oval cutout, vignette, white corners, frame, border, text, labels, UI, scene, changed age, glamorous styling or invented features."
+      }
+    },
+    {
+      "id": "severed-npc-old-crane",
+      "name": "Old Crane",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/old-crane.md",
+          "sha256": "54ca940e0ea21b6c2e35eadd1a8cb24f104feb4c61e629a1a85190d03351c3e2",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/old-crane.md",
+          "sha256": "4d97f0a3c3b05c6f41f84814e21cd2b07e643ed7566cdd4051f35b52c3e5907c",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An extremely elderly Human man with a very lean stooped build, weathered light bronze skin, deeply lined face, long white eyebrows, a narrow wispy white beard and thin white hair tied in a small loose topknot. Dark gray eyes and a faint amused distant expression. Layered threadbare ash-gray monk robes with faded indigo patches, a simple cloth waist tie and worn flat cloth shoes. Empty relaxed hands; no weapon. One clearly readable physical silhouette in a still pose; do not show motion echoes, copies, ghost bodies or an invented revealed origin. No symbols, text, magic rays or jewelry.",
+        "full_body": {
+          "path": "assets/characters/1da585647c41b00eccb6188973e04cf53f8825cc8e64af60114fa5bb8a78e3cd.png",
+          "sha256": "1da585647c41b00eccb6188973e04cf53f8825cc8e64af60114fa5bb8a78e3cd"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/669f48e57ed4636c180c382286068505ec90be597d4ec1aa83c3844a1f815d9b.png",
+          "sha256": "669f48e57ed4636c180c382286068505ec90be597d4ec1aa83c3844a1f815d9b"
+        },
+        "portrait": {
+          "path": "assets/characters/0020e49bd1a0cc445ab8b7fbd2b998012263f721ebc7cef6768fcf72c1c62426.png",
+          "sha256": "0020e49bd1a0cc445ab8b7fbd2b998012263f721ebc7cef6768fcf72c1c62426"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2249365
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2604524
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2750629
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Old Crane in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, tactile fabric and skin, plain light neutral backdrop, soft natural studio light and subtle ground shadow. Exactly one person standing naturally in a near-front three-quarter pose. Entire head, both hands and both feet comfortably inside the frame. Appearance: An extremely elderly Human man with a very lean stooped build, weathered light bronze skin, deeply lined face, long white eyebrows, a narrow wispy white beard and thin white hair tied in a small loose topknot. Dark gray eyes and a faint amused distant expression. Layered threadbare ash-gray monk robes with faded indigo patches, a simple cloth waist tie and worn flat cloth shoes. Empty relaxed hands; no weapon. One clearly readable physical silhouette in a still pose; do not show motion echoes, copies, ghost bodies or an invented revealed origin. No symbols, text, magic rays or jewelry. Unspecified visual details are editable defaults. Preserve the authored identity and pronouns without adding history, powers or allegiances. No text, labels, borders, UI, scenery, extra people, duplicated limbs or oversized equipment.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for Old Crane in Sylvia GM's Severed Lands. Input image 1 is the approved full-body identity reference. Preserve this exact face, age, skin, hairstyle, body proportions, clothing, equipment and colors. One landscape PNG, 1536x1024, polished naturalistic digital RPG illustration on the same plain light neutral backdrop. Show three separate complete standing views of this ONE person: front, true side and back, evenly spaced at matching scale. Entire head, hands, feet and any carried equipment fit comfortably within margins. Add one small clear face study in remaining space without overlap. Multiple views of the same person, never additional cast. Appearance: An extremely elderly Human man with a very lean stooped build, weathered light bronze skin, deeply lined face, long white eyebrows, a narrow wispy white beard and thin white hair tied in a small loose topknot. Dark gray eyes and a faint amused distant expression. Layered threadbare ash-gray monk robes with faded indigo patches, a simple cloth waist tie and worn flat cloth shoes. Empty relaxed hands; no weapon. One clearly readable physical silhouette in a still pose; do not show motion echoes, copies, ghost bodies or an invented revealed origin. No symbols, text, magic rays or jewelry. No labels, writing, UI, decorative border, scene, new symbols, extra equipment, duplicate limbs, motion ghosts or altered age.",
+        "portrait": "Use case: identity-preserve. Production reusable square portrait for Old Crane in Sylvia GM's Severed Lands. Input image 1 is the canonical full-body identity; input image 2 is that person's multiview reference sheet. Preserve this exact face, age, skin tone, hairstyle, expression, clothing and identity. One full-bleed square PNG, 1024x1024. Polished naturalistic digital RPG illustration, continuous plain warm light-gray studio background extending to all four corners and edges. Exactly one head-and-shoulders portrait, almost frontal with a slight three-quarter turn. Standardized framing: face centered horizontally, both eyes about 35 percent down the image, top of the complete hairstyle about 10 percent down, chin around 65 percent, shoulders filling the lower quarter. Keep all hair, any beard, the jaw and neck visible with comfortable margins. Clothing continues naturally to the lower edges. No hands, weapons, held objects, full body or extra people. Identity description: An extremely elderly Human man with a very lean stooped build, weathered light bronze skin, deeply lined face, long white eyebrows, a narrow wispy white beard and thin white hair tied in a small loose topknot. Dark gray eyes and a faint amused distant expression. Layered threadbare ash-gray monk robes with faded indigo patches, a simple cloth waist tie and worn flat cloth shoes. Empty relaxed hands; no weapon. One clearly readable physical silhouette in a still pose; do not show motion echoes, copies, ghost bodies or an invented revealed origin. No symbols, text, magic rays or jewelry. No painted circular or oval cutout, vignette, white corners, frame, border, text, labels, UI, scene, changed age, glamorous styling or invented features."
+      }
+    },
+    {
+      "id": "severed-npc-rift-seeker-iro",
+      "name": "Iro",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/rift-seeker-iro.md",
+          "sha256": "e3dfed946a3b33ec196e4a5d93773de2f6dc94ac2688682ca93347e5d1a4ce8a",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/rift-seeker-iro.md",
+          "sha256": "ebd3d561b0aa18c225426d57401cedfb63c2b970efd74297c1491c81c654ee22",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A humanlike adult Riftborn man in his early forties with warm brown skin, a lean sturdy build, a long oval face, dark eyes, close-cropped black hair and a short neatly kept black beard. A calm melancholy expression. Simple sand-colored travel robes with a faded blue shoulder wrap, plain cloth belt, weathered soft boots and a small unadorned travel satchel. Empty open relaxed hands and no weapon. No Raider war paint, faction insignia, battle pose, glowing features or invented nonhuman anatomy.",
+        "full_body": {
+          "path": "assets/characters/0c802bfca7d8cb7ba6b92aa416d457c8cce5465894299e3769f6d2cf1e73086e.png",
+          "sha256": "0c802bfca7d8cb7ba6b92aa416d457c8cce5465894299e3769f6d2cf1e73086e"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/650da0633afa0f987288b3197ab15b976714705fc5d754e36db072725afe6cbe.png",
+          "sha256": "650da0633afa0f987288b3197ab15b976714705fc5d754e36db072725afe6cbe"
+        },
+        "portrait": {
+          "path": "assets/characters/b18357baadb1293a40723e515f41d8cd8ae29e85cf1210879aab14cd4c215c6e.png",
+          "sha256": "b18357baadb1293a40723e515f41d8cd8ae29e85cf1210879aab14cd4c215c6e"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2102382
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2329521
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2524980
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Iro in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, tactile fabric and skin, plain light neutral backdrop, soft natural studio light and subtle ground shadow. Exactly one person standing naturally in a near-front three-quarter pose. Entire head, both hands and both feet comfortably inside the frame. Appearance: A humanlike adult Riftborn man in his early forties with warm brown skin, a lean sturdy build, a long oval face, dark eyes, close-cropped black hair and a short neatly kept black beard. A calm melancholy expression. Simple sand-colored travel robes with a faded blue shoulder wrap, plain cloth belt, weathered soft boots and a small unadorned travel satchel. Empty open relaxed hands and no weapon. No Raider war paint, faction insignia, battle pose, glowing features or invented nonhuman anatomy. Unspecified visual details are editable defaults. Preserve the authored identity and pronouns without adding history, powers or allegiances. No text, labels, borders, UI, scenery, extra people, duplicated limbs or oversized equipment.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for Iro in Sylvia GM's Severed Lands. Input image 1 is the approved full-body identity reference. Preserve this exact face, age, skin, hairstyle, body proportions, clothing, equipment and colors. One landscape PNG, 1536x1024, polished naturalistic digital RPG illustration on the same plain light neutral backdrop. Show three separate complete standing views of this ONE person: front, true side and back, evenly spaced at matching scale. Entire head, hands, feet and any carried equipment fit comfortably within margins. Add one small clear face study in remaining space without overlap. Multiple views of the same person, never additional cast. Appearance: A humanlike adult Riftborn man in his early forties with warm brown skin, a lean sturdy build, a long oval face, dark eyes, close-cropped black hair and a short neatly kept black beard. A calm melancholy expression. Simple sand-colored travel robes with a faded blue shoulder wrap, plain cloth belt, weathered soft boots and a small unadorned travel satchel. Empty open relaxed hands and no weapon. No Raider war paint, faction insignia, battle pose, glowing features or invented nonhuman anatomy. No labels, writing, UI, decorative border, scene, new symbols, extra equipment, duplicate limbs, motion ghosts or altered age.",
+        "portrait": "Use case: identity-preserve. Production reusable square portrait for Iro in Sylvia GM's Severed Lands. Input image 1 is the canonical full-body identity; input image 2 is that person's multiview reference sheet. Preserve this exact face, age, skin tone, hairstyle, expression, clothing and identity. One full-bleed square PNG, 1024x1024. Polished naturalistic digital RPG illustration, continuous plain warm light-gray studio background extending to all four corners and edges. Exactly one head-and-shoulders portrait, almost frontal with a slight three-quarter turn. Standardized framing: face centered horizontally, both eyes about 35 percent down the image, top of the complete hairstyle about 10 percent down, chin around 65 percent, shoulders filling the lower quarter. Keep all hair, any beard, the jaw and neck visible with comfortable margins. Clothing continues naturally to the lower edges. No hands, weapons, held objects, full body or extra people. Identity description: A humanlike adult Riftborn man in his early forties with warm brown skin, a lean sturdy build, a long oval face, dark eyes, close-cropped black hair and a short neatly kept black beard. A calm melancholy expression. Simple sand-colored travel robes with a faded blue shoulder wrap, plain cloth belt, weathered soft boots and a small unadorned travel satchel. Empty open relaxed hands and no weapon. No Raider war paint, faction insignia, battle pose, glowing features or invented nonhuman anatomy. No painted circular or oval cutout, vignette, white corners, frame, border, text, labels, UI, scene, changed age, glamorous styling or invented features."
+      }
+    },
+    {
+      "id": "severed-npc-scavenger-vet-rigg",
+      "name": "Rigg",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/scavenger-vet-rigg.md",
+          "sha256": "11a02081bed4a25408ec1f60f65cd3f70e2d68b2573104286961e6aab21fde46",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/scavenger-vet-rigg.md",
+          "sha256": "59ed128402e21f4654879e8ef557f83b8e17439f1abdc3f4b5309200461c54a5",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult Human man in his late forties with a compact lean build, weathered light tan skin, short untidy black-and-gray hair, a scruffy dark-gray beard and alert green-brown eyes. A cautious crooked smile. A faded ochre work coat with patched elbows, dark wool shirt, reinforced charcoal trousers, battered boots and several modest closed salvage pouches. A small plain hand tool hangs safely in a belt loop. No crew badge, faction crest, treasure display, magical fragment, oversized weapon or active lantern.",
+        "full_body": {
+          "path": "assets/characters/d3858bf2fcdd6096bc5407ee559f532f9a770406e695daed03528dda1e61e045.png",
+          "sha256": "d3858bf2fcdd6096bc5407ee559f532f9a770406e695daed03528dda1e61e045"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/171765df2bf9276602c877f2a3bf5c103f0a44406834659583f9ca3612332400.png",
+          "sha256": "171765df2bf9276602c877f2a3bf5c103f0a44406834659583f9ca3612332400"
+        },
+        "portrait": {
+          "path": "assets/characters/c073b2ef78a15adf0086657331e8df947711652028a4b3fddb77ca8ca103974c.png",
+          "sha256": "c073b2ef78a15adf0086657331e8df947711652028a4b3fddb77ca8ca103974c"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2059187
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2402984
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2577991
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Rigg in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, tactile fabric and skin, plain light neutral backdrop, soft natural studio light and subtle ground shadow. Exactly one person standing naturally in a near-front three-quarter pose. Entire head, both hands and both feet comfortably inside the frame. Appearance: An adult Human man in his late forties with a compact lean build, weathered light tan skin, short untidy black-and-gray hair, a scruffy dark-gray beard and alert green-brown eyes. A cautious crooked smile. A faded ochre work coat with patched elbows, dark wool shirt, reinforced charcoal trousers, battered boots and several modest closed salvage pouches. A small plain hand tool hangs safely in a belt loop. No crew badge, faction crest, treasure display, magical fragment, oversized weapon or active lantern. Unspecified visual details are editable defaults. Preserve the authored identity and pronouns without adding history, powers or allegiances. No text, labels, borders, UI, scenery, extra people, duplicated limbs or oversized equipment.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for Rigg in Sylvia GM's Severed Lands. Input image 1 is the approved full-body identity reference. Preserve this exact face, age, skin, hairstyle, body proportions, clothing, equipment and colors. One landscape PNG, 1536x1024, polished naturalistic digital RPG illustration on the same plain light neutral backdrop. Show three separate complete standing views of this ONE person: front, true side and back, evenly spaced at matching scale. Entire head, hands, feet and any carried equipment fit comfortably within margins. Add one small clear face study in remaining space without overlap. Multiple views of the same person, never additional cast. Appearance: An adult Human man in his late forties with a compact lean build, weathered light tan skin, short untidy black-and-gray hair, a scruffy dark-gray beard and alert green-brown eyes. A cautious crooked smile. A faded ochre work coat with patched elbows, dark wool shirt, reinforced charcoal trousers, battered boots and several modest closed salvage pouches. A small plain hand tool hangs safely in a belt loop. No crew badge, faction crest, treasure display, magical fragment, oversized weapon or active lantern. No labels, writing, UI, decorative border, scene, new symbols, extra equipment, duplicate limbs, motion ghosts or altered age.",
+        "portrait": "Use case: identity-preserve. Production reusable square portrait for Rigg in Sylvia GM's Severed Lands. Input image 1 is the canonical full-body identity; input image 2 is that person's multiview reference sheet. Preserve this exact face, age, skin tone, hairstyle, expression, clothing and identity. One full-bleed square PNG, 1024x1024. Polished naturalistic digital RPG illustration, continuous plain warm light-gray studio background extending to all four corners and edges. Exactly one head-and-shoulders portrait, almost frontal with a slight three-quarter turn. Standardized framing: face centered horizontally, both eyes about 35 percent down the image, top of the complete hairstyle about 10 percent down, chin around 65 percent, shoulders filling the lower quarter. Keep all hair, any beard, the jaw and neck visible with comfortable margins. Clothing continues naturally to the lower edges. No hands, weapons, held objects, full body or extra people. Identity description: An adult Human man in his late forties with a compact lean build, weathered light tan skin, short untidy black-and-gray hair, a scruffy dark-gray beard and alert green-brown eyes. A cautious crooked smile. A faded ochre work coat with patched elbows, dark wool shirt, reinforced charcoal trousers, battered boots and several modest closed salvage pouches. A small plain hand tool hangs safely in a belt loop. No crew badge, faction crest, treasure display, magical fragment, oversized weapon or active lantern. No painted circular or oval cutout, vignette, white corners, frame, border, text, labels, UI, scene, changed age, glamorous styling or invented features."
+      }
+    },
+    {
+      "id": "severed-npc-streets-kit",
+      "name": "Kit",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/streets-kit.md",
+          "sha256": "82e4782bf48ea433108fd6a758f19426b86474b465f2ff83b0265fc8d05cf827",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/streets-kit.md",
+          "sha256": "0da50741d0af3ae7639db6124dfa0f156b356d2cdc240f1b49453c6fd731d01d",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A humanlike twelve-year-old Riftborn child with an age-appropriate slight build and youthful facial proportions, warm brown skin, short choppy dark hair, brown eyes and a guarded friendly expression. Androgynous presentation. Fully clothed in a plain oversized patched gray-brown jacket with its hood down, a muted green shirt, practical dark trousers and worn closed shoes. A small cloth messenger bag crosses the chest. Ordinary relaxed standing pose with empty hands. No weapon, adult proportions, makeup, jewelry, injuries or magical effects.",
+        "full_body": {
+          "path": "assets/characters/306a283a0c8668f66d03b1e7b602008815629baacdd34d1a7043bd0ae2ba538b.png",
+          "sha256": "306a283a0c8668f66d03b1e7b602008815629baacdd34d1a7043bd0ae2ba538b"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/26517a4671714b0880b3656c459de1e6754fd3a4ff7dd3d36f20bb80f7d672ba.png",
+          "sha256": "26517a4671714b0880b3656c459de1e6754fd3a4ff7dd3d36f20bb80f7d672ba"
+        },
+        "portrait": {
+          "path": "assets/characters/0a857916c94b175cb571e6f5071a0bae5040d1f508e93627bba252648ce49737.png",
+          "sha256": "0a857916c94b175cb571e6f5071a0bae5040d1f508e93627bba252648ce49737"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1952606
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2175273
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2418680
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Kit in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, tactile fabric and skin, plain light neutral backdrop, soft natural studio light and subtle ground shadow. Exactly one person standing naturally in a near-front three-quarter pose. Entire head, both hands and both feet comfortably inside the frame. Appearance: A humanlike twelve-year-old Riftborn child with an age-appropriate slight build and youthful facial proportions, warm brown skin, short choppy dark hair, brown eyes and a guarded friendly expression. Androgynous presentation. Fully clothed in a plain oversized patched gray-brown jacket with its hood down, a muted green shirt, practical dark trousers and worn closed shoes. A small cloth messenger bag crosses the chest. Ordinary relaxed standing pose with empty hands. No weapon, adult proportions, makeup, jewelry, injuries or magical effects. Unspecified visual details are editable defaults. Preserve the authored identity and pronouns without adding history, powers or allegiances. No text, labels, borders, UI, scenery, extra people, duplicated limbs or oversized equipment.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for Kit in Sylvia GM's Severed Lands. Input image 1 is the approved full-body identity reference. Preserve this exact face, age, skin, hairstyle, body proportions, clothing, equipment and colors. One landscape PNG, 1536x1024, polished naturalistic digital RPG illustration on the same plain light neutral backdrop. Show three separate complete standing views of this ONE person: front, true side and back, evenly spaced at matching scale. Entire head, hands, feet and any carried equipment fit comfortably within margins. Add one small clear face study in remaining space without overlap. Multiple views of the same person, never additional cast. Appearance: A humanlike twelve-year-old Riftborn child with an age-appropriate slight build and youthful facial proportions, warm brown skin, short choppy dark hair, brown eyes and a guarded friendly expression. Androgynous presentation. Fully clothed in a plain oversized patched gray-brown jacket with its hood down, a muted green shirt, practical dark trousers and worn closed shoes. A small cloth messenger bag crosses the chest. Ordinary relaxed standing pose with empty hands. No weapon, adult proportions, makeup, jewelry, injuries or magical effects. No labels, writing, UI, decorative border, scene, new symbols, extra equipment, duplicate limbs, motion ghosts or altered age.",
+        "portrait": "Use case: identity-preserve. Production reusable square portrait for Kit in Sylvia GM's Severed Lands. Input image 1 is the canonical full-body identity; input image 2 is that person's multiview reference sheet. Preserve this exact face, age, skin tone, hairstyle, expression, clothing and identity. One full-bleed square PNG, 1024x1024. Polished naturalistic digital RPG illustration, continuous plain warm light-gray studio background extending to all four corners and edges. Exactly one head-and-shoulders portrait, almost frontal with a slight three-quarter turn. Standardized framing: face centered horizontally, both eyes about 35 percent down the image, top of the complete hairstyle about 10 percent down, chin around 65 percent, shoulders filling the lower quarter. Keep all hair, any beard, the jaw and neck visible with comfortable margins. Clothing continues naturally to the lower edges. No hands, weapons, held objects, full body or extra people. Identity description: A humanlike twelve-year-old Riftborn child with an age-appropriate slight build and youthful facial proportions, warm brown skin, short choppy dark hair, brown eyes and a guarded friendly expression. Androgynous presentation. Fully clothed in a plain oversized patched gray-brown jacket with its hood down, a muted green shirt, practical dark trousers and worn closed shoes. A small cloth messenger bag crosses the chest. Ordinary relaxed standing pose with empty hands. No weapon, adult proportions, makeup, jewelry, injuries or magical effects. No painted circular or oval cutout, vignette, white corners, frame, border, text, labels, UI, scene, changed age, glamorous styling or invented features."
+      }
+    },
+    {
+      "id": "severed-npc-hunter-lorn",
+      "name": "Lorn",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/hunter-lorn.md",
+          "sha256": "5d2f3a35d202317e5c4ff309f7e2e8a63b06c8e2e96c732c906d08543ce3aa89",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/hunter-lorn.md",
+          "sha256": "3de4d8bfaafb61760e6c95ea9f16aee05c69ee6e3f07fa2c5ae3aa2ae2081baa",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An androgynous adult Human in their early forties with a lean athletic build, weathered dark olive skin, deep-set gray eyes, long dark brown hair gathered in a single practical braid and several old healed scars on the exposed forearms. A quiet watchful reserved expression. A worn muted forest-green hunting coat with the hood folded down, charcoal shirt, plain brown trousers, sturdy leather boots and a modest closed belt kit. Empty relaxed hands. No trophies, partner mementos, faction emblems, extravagant weapon, blood or magical effects.",
+        "full_body": {
+          "path": "assets/characters/bd8e9a03d84ff3aafe4bae71f9b78c501a4ea92984231c8c7607e5a2902bb0b0.png",
+          "sha256": "bd8e9a03d84ff3aafe4bae71f9b78c501a4ea92984231c8c7607e5a2902bb0b0"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/1417ccd2d84365507454ace5394232cc3ee08d47864bf2dcf0cd78297b263893.png",
+          "sha256": "1417ccd2d84365507454ace5394232cc3ee08d47864bf2dcf0cd78297b263893"
+        },
+        "portrait": {
+          "path": "assets/characters/6670579d085ecff6786a9b617b2cca0d8745481a65caeafb4054df14a623f307.png",
+          "sha256": "6670579d085ecff6786a9b617b2cca0d8745481a65caeafb4054df14a623f307"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1945954
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2308556
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2465825
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Lorn in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, tactile fabric and skin, plain light neutral backdrop, soft natural studio light and subtle ground shadow. Exactly one person standing naturally in a near-front three-quarter pose. Entire head, both hands and both feet comfortably inside the frame. Appearance: An androgynous adult Human in their early forties with a lean athletic build, weathered dark olive skin, deep-set gray eyes, long dark brown hair gathered in a single practical braid and several old healed scars on the exposed forearms. A quiet watchful reserved expression. A worn muted forest-green hunting coat with the hood folded down, charcoal shirt, plain brown trousers, sturdy leather boots and a modest closed belt kit. Empty relaxed hands. No trophies, partner mementos, faction emblems, extravagant weapon, blood or magical effects. Unspecified visual details are editable defaults. Preserve the authored identity and pronouns without adding history, powers or allegiances. No text, labels, borders, UI, scenery, extra people, duplicated limbs or oversized equipment.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for Lorn in Sylvia GM's Severed Lands. Input image 1 is the approved full-body identity reference. Preserve this exact face, age, skin, hairstyle, body proportions, clothing, equipment and colors. One landscape PNG, 1536x1024, polished naturalistic digital RPG illustration on the same plain light neutral backdrop. Show three separate complete standing views of this ONE person: front, true side and back, evenly spaced at matching scale. Entire head, hands, feet and any carried equipment fit comfortably within margins. Add one small clear face study in remaining space without overlap. Multiple views of the same person, never additional cast. Appearance: An androgynous adult Human in their early forties with a lean athletic build, weathered dark olive skin, deep-set gray eyes, long dark brown hair gathered in a single practical braid and several old healed scars on the exposed forearms. A quiet watchful reserved expression. A worn muted forest-green hunting coat with the hood folded down, charcoal shirt, plain brown trousers, sturdy leather boots and a modest closed belt kit. Empty relaxed hands. No trophies, partner mementos, faction emblems, extravagant weapon, blood or magical effects. No labels, writing, UI, decorative border, scene, new symbols, extra equipment, duplicate limbs, motion ghosts or altered age.",
+        "portrait": "Use case: identity-preserve. Production reusable square portrait for Lorn in Sylvia GM's Severed Lands. Input image 1 is the canonical full-body identity; input image 2 is that person's multiview reference sheet. Preserve this exact face, age, skin tone, hairstyle, expression, clothing and identity. One full-bleed square PNG, 1024x1024. Polished naturalistic digital RPG illustration, continuous plain warm light-gray studio background extending to all four corners and edges. Exactly one head-and-shoulders portrait, almost frontal with a slight three-quarter turn. Standardized framing: face centered horizontally, both eyes about 35 percent down the image, top of the complete hairstyle about 10 percent down, chin around 65 percent, shoulders filling the lower quarter. Keep all hair, any beard, the jaw and neck visible with comfortable margins. Clothing continues naturally to the lower edges. No hands, weapons, held objects, full body or extra people. Identity description: An androgynous adult Human in their early forties with a lean athletic build, weathered dark olive skin, deep-set gray eyes, long dark brown hair gathered in a single practical braid and several old healed scars on the exposed forearms. A quiet watchful reserved expression. A worn muted forest-green hunting coat with the hood folded down, charcoal shirt, plain brown trousers, sturdy leather boots and a modest closed belt kit. Empty relaxed hands. No trophies, partner mementos, faction emblems, extravagant weapon, blood or magical effects. No painted circular or oval cutout, vignette, white corners, frame, border, text, labels, UI, scene, changed age, glamorous styling or invented features."
+      }
     }
   ]
 }

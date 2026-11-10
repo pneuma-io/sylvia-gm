@@ -68,12 +68,19 @@ independent instance adjustments and Miri's exact source-bound artwork despite a
 name, followed by offline campaign export/recovery without the shared library. The final composed
 case passed in 70.71 seconds; two direct source-resolution checks also passed. Its earlier
 no-art assumption for Miri and a missing Setting scope in the updated fixture were corrected.
+Pike, Old Crane, Iro, Rigg, Kit and Lorn now have complete prepared bundles too. Their original
+profiles and the preceding 33 bundles are unchanged. Kit retains their authored age of twelve;
+Crane's unknown origin remains unknown. All six saved crops were inspected through the actual
+portrait renderer in square, dialogue-circle and map-sized forms.
+Two focused checks passed in 122.95 seconds for all 117 real images/resources/source aliases
+and all 218 authored subjects/246 current and retained source editions. Earlier owner, frontend
+and live acceptance layers were not replayed for this artwork-only addition.
 The other NPCs, companions and remaining enemies still need artwork.
 The owner selected a shared app artwork library: whole Setting/Plan exports omit unused premade
 PNGs, while custom art stays portable and character/campaign exports carry used artwork. The
 source now maps the catalogue and PNGs as external installer/portable resources, outside the
 onefile sidecar. Campaign export retains used art before any artwork view has been opened.
-The prepared PNG pool now totals 225,888,025 bytes across 99 images, beyond the content-package cap.
+The prepared PNG pool now totals 267,514,760 bytes across 117 images, beyond the content-package cap.
 The current Setting omits those PNGs; its existing content-package limits remain unchanged.
 Focused checks cover shared/custom publication, external resource inventory, portable ZIP assembly,
 and exact campaign art transfer before opening an image view. Local-copy receipts also transfer
@@ -140,7 +147,7 @@ The selected Siren repository's current main at `c7a9587b94f8e5125ea5818a9f708ec
 contains an eleven-character playable profile set. Its historical repository/profile names do
 not make the clean Siren material private; source preparation follows the owner's correction.
 The authored-source producer now covers 218 subjects (82 individual NPCs and 136 monsters),
-retaining 240 source editions across current content and Plan snapshots. Thread, Hook and Needle
+retaining 246 source editions across current content and Plan snapshots. Thread, Hook and Needle
 remain distinct; V and Anchor Sentinel variants and the artwork-annotated profiles retain
 their original editions. The
 snapshot-only opposition guide is explicitly excluded as encounter guidance. A composed source
@@ -171,7 +178,7 @@ candidate reuse preserves recipient metadata and rejects different content. Imag
 actual Lite prepared-art transfer checks now retain the normal candidate reference. Older incomplete
 archives that omitted it require a fresh export from the source dataset.
 These source/scripted checks do not establish completion of the ordinary
-workflows. The owner's latest selection keeps live in-app checks pending. The 99 prepared assets
+workflows. The owner's latest selection keeps live in-app checks pending. The 117 prepared assets
 were produced with the built-in GPT Images tool, separately from Sylvia's deferred native check.
 Live Sylvia subscription, installed-app
 and TD trailer acceptance remain unverified. Merge follows the Pneuma IO rulebook's delivery and

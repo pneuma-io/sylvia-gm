@@ -15,3 +15,15 @@ Iro occasionally serves as a translator between the Raiders and outsiders — on
 ## Personality
 
 Iro is calm, melancholy, and carrying the weight of his people's choices. He loves the Raiders. They're his family, his heritage, his blood. He also believes they're wrong — about the Eternal Battle, about violence as purpose, about everything. He can't change them. He can barely stand to watch. But he stays, because someone has to speak for them, and he's the only one who can.
+
+## Appearance and artwork
+
+A humanlike adult Riftborn man in his early forties with warm brown skin, a lean sturdy build, a long oval face, dark eyes, close-cropped black hair and a short neatly kept black beard. A calm melancholy expression. Simple sand-colored travel robes with a faded blue shoulder wrap, plain cloth belt, weathered soft boots and a small unadorned travel satchel. Empty open relaxed hands and no weapon. No Raider war paint, faction insignia, battle pose, glowing features or invented nonhuman anatomy.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/b18357baadb1293a40723e515f41d8cd8ae29e85cf1210879aab14cd4c215c6e.png)
+
+[Full-body reference](../assets/characters/0c802bfca7d8cb7ba6b92aa416d457c8cce5465894299e3769f6d2cf1e73086e.png)
+
+[Multiview reference sheet](../assets/characters/650da0633afa0f987288b3197ab15b976714705fc5d754e36db072725afe6cbe.png)
