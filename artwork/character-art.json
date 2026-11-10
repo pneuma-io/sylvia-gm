@@ -5476,6 +5476,186 @@
         "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Doctor Cipher from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, species, proportions, skin, eyes, hair, clothing, equipment, colors and wear. Appearance: An adult settled Human woman appearing in her mid fifties, with a tall lean build, light brown skin, dark hazel eyes, a long expressive face and dark hair streaked with gray secured in a neat coiled bun. Small plain round metal spectacles with clear lenses and visible eyes. An engaged, charming and self-assured scholarly expression, open relaxed posture. A worn charcoal-plum long scholar's coat over a dark sage layered tunic and cream collar, practical dark trousers and brown leather ankle boots. A plain brown belt carries one small closed leather tool pouch; both hands empty and relaxed. Her personable scholarly bearing follows the authored profile; age, physical features, spectacles and clothes are editable visual defaults. No invented affiliation insignia, Athenaeum badge, magical effects, visible Pool Stabilizer, subjects or experiments, syringe, modern lab coat, medical cross, villain costume, glowing eyes or invented past. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views, entire hair, hands, footwear and equipment within all margins. Same single character repeated as turnaround views. Keep anatomical sides fixed through the turn: where present the sheathed sword always stays on the character's anatomical LEFT hip; never mirror it to the other side. Change viewing angle only; keep face, practical costume and fastenings unchanged. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, extra characters or revealed secrets.",
         "portrait": "Use case: identity-preserve. Production square app portrait for Doctor Cipher from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, skin, eyes, hairstyle, expression, spectacles where present and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, border, caption, text, UI, scenery, new costume, magical effects, invented crest, animal or extra person. One 1024x1024 PNG."
       }
+    },
+    {
+      "id": "severed-npc-father-glass",
+      "name": "Father Glass",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/father-glass.md",
+          "sha256": "5744e21e256b57a8f71bbb3ef66804084a12fe4c0d73deb64d0a73d327ffbd48",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/father-glass.md",
+          "sha256": "9a2f134adfa587b61355e84e1e3b747aaee327c8c929d27fef8dbee5099bbdb1",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult settled Human man appearing in his early sixties, with a softly built medium frame, light brown skin, warm brown eyes, a receding hairline with short neatly combed silver-gray hair and a clean-shaven gently lined face. Patient, soft-spoken, quietly tired but welcoming expression and relaxed dignified posture. A plain sand-colored wool long robe beneath a worn muted blue-gray sleeveless overcoat, a simple dark brown leather belt with one small closed pouch, and practical brown leather shoes. Both hands relaxed and empty. His calm diplomatic and former-merchant bearing follows the authored profile; age, physical features and costume are editable visual defaults. No glass skin or body, transparency, supernatural effects, real-world religious icon, invented Anchor Church insignia, crown, ceremonial staff, scholar's inscriptions, evidence of secret research or revealed conclusions.",
+        "full_body": {
+          "path": "assets/characters/8c225f090d6a45686aadf3803761f865d07fe9f90619107b8fae147585f14fbb.png",
+          "sha256": "8c225f090d6a45686aadf3803761f865d07fe9f90619107b8fae147585f14fbb"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/12e6dda2d73a839f33e79c3e4bdbfaf16e53c0fac05169a4ee3a5757b617a86b.png",
+          "sha256": "12e6dda2d73a839f33e79c3e4bdbfaf16e53c0fac05169a4ee3a5757b617a86b"
+        },
+        "portrait": {
+          "path": "assets/characters/9b931662589c0ec29ce185664c35725a240d247b3dfe15bc141294ff7d8bf1fc.png",
+          "sha256": "9b931662589c0ec29ce185664c35725a240d247b3dfe15bc141294ff7d8bf1fc"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2143110
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2424046
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2555443
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Father Glass in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person standing naturally in a near-front three-quarter pose. Whole hair, both hands, clothing, footwear and equipment comfortably inside all margins. Appearance: An adult settled Human man appearing in his early sixties, with a softly built medium frame, light brown skin, warm brown eyes, a receding hairline with short neatly combed silver-gray hair and a clean-shaven gently lined face. Patient, soft-spoken, quietly tired but welcoming expression and relaxed dignified posture. A plain sand-colored wool long robe beneath a worn muted blue-gray sleeveless overcoat, a simple dark brown leather belt with one small closed pouch, and practical brown leather shoes. Both hands relaxed and empty. His calm diplomatic and former-merchant bearing follows the authored profile; age, physical features and costume are editable visual defaults. No glass skin or body, transparency, supernatural effects, real-world religious icon, invented Anchor Church insignia, crown, ceremonial staff, scholar's inscriptions, evidence of secret research or revealed conclusions. Preserve authored identity, species, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Father Glass from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin, eyes, hair, clothing, equipment, colors and wear. Appearance: An adult settled Human man appearing in his early sixties, with a softly built medium frame, light brown skin, warm brown eyes, a receding hairline with short neatly combed silver-gray hair and a clean-shaven gently lined face. Patient, soft-spoken, quietly tired but welcoming expression and relaxed dignified posture. A plain sand-colored wool long robe beneath a worn muted blue-gray sleeveless overcoat, a simple dark brown leather belt with one small closed pouch, and practical brown leather shoes. Both hands relaxed and empty. His calm diplomatic and former-merchant bearing follows the authored profile; age, physical features and costume are editable visual defaults. No glass skin or body, transparency, supernatural effects, real-world religious icon, invented Anchor Church insignia, crown, ceremonial staff, scholar's inscriptions, evidence of secret research or revealed conclusions. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views, entire hair, hands, footwear and equipment within all margins. Same single character repeated as turnaround views. Keep anatomical sides fixed: where present the sheathed sword stays on the character's anatomical LEFT hip and the pouch on the opposite hip; never mirror equipment. Change viewing angle only, keeping costume and identity. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, extra characters or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Father Glass from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, skin, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, border, caption, text, UI, scenery, new costume, magical effects, invented crest, animal or extra person. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-fortune-teller",
+      "name": "The Mirror",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/fortune-teller.md",
+          "sha256": "aca230fedb6a3a34e637689e95983b467f3d040c25189aae20b7d8e704f6f078",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/fortune-teller.md",
+          "sha256": "aa16347b007d15651c7cc1c5df96fc55ef97c484c8c7f1d8771fb2ecc6bc11a2",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A humanlike adult Riftborn woman appearing in her late thirties, with a slender medium-height build, deep umber-brown skin, a long angular face, dark eyebrows and dark chestnut hair gathered into a loose high knot with a few curls at the temples. Natural human eyes with clearly visible subtle VIOLET FLECKS in brown-hazel irises, normal round pupils and white sclera; the violet flecks are the only visible Hollowing sign. A shrewd, theatrical yet candid expression and self-possessed open posture. A layered muted indigo shawl over a faded mustard long-sleeved tunic, a plain russet sash, dark practical trousers and soft brown ankle boots. Small plain brass ear studs and two simple rings; empty relaxed hands. Her violet-flecked eyes and theatrical practical bearing follow the authored profile; age, other features and clothes are editable visual defaults. Her home world remains unspecified, and prophetic certainty is not established. No mirror face or body, crystals, tarot cards, glass sphere, glowing eyes, full violet irises, extra eyes, veins, lesions, mutations, magic effects, invented powers, faction symbols or revealed future.",
+        "full_body": {
+          "path": "assets/characters/8e6826b6a907e6c11a2c35a4320631ed688e8f4b1e29aaa002ac3d4144072990.png",
+          "sha256": "8e6826b6a907e6c11a2c35a4320631ed688e8f4b1e29aaa002ac3d4144072990"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/405141b186d5476f4b53c1254a028e69b77c01c4615eece1ec2953d828aeeffd.png",
+          "sha256": "405141b186d5476f4b53c1254a028e69b77c01c4615eece1ec2953d828aeeffd"
+        },
+        "portrait": {
+          "path": "assets/characters/2990cafb00453ccb364e18253e9efb9502afe821e93630c17dce143f281d55e0.png",
+          "sha256": "2990cafb00453ccb364e18253e9efb9502afe821e93630c17dce143f281d55e0"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2035290
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2493011
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2539483
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for The Mirror in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person standing naturally in a near-front three-quarter pose. Whole hair, both hands, clothing, footwear and equipment comfortably inside all margins. Appearance: A humanlike adult Riftborn woman appearing in her late thirties, with a slender medium-height build, deep umber-brown skin, a long angular face, dark eyebrows and dark chestnut hair gathered into a loose high knot with a few curls at the temples. Natural human eyes with clearly visible subtle VIOLET FLECKS in brown-hazel irises, normal round pupils and white sclera; the violet flecks are the only visible Hollowing sign. A shrewd, theatrical yet candid expression and self-possessed open posture. A layered muted indigo shawl over a faded mustard long-sleeved tunic, a plain russet sash, dark practical trousers and soft brown ankle boots. Small plain brass ear studs and two simple rings; empty relaxed hands. Her violet-flecked eyes and theatrical practical bearing follow the authored profile; age, other features and clothes are editable visual defaults. Her home world remains unspecified, and prophetic certainty is not established. No mirror face or body, crystals, tarot cards, glass sphere, glowing eyes, full violet irises, extra eyes, veins, lesions, mutations, magic effects, invented powers, faction symbols or revealed future. Preserve authored identity, species, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for The Mirror from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin, eyes, hair, clothing, equipment, colors and wear. Appearance: A humanlike adult Riftborn woman appearing in her late thirties, with a slender medium-height build, deep umber-brown skin, a long angular face, dark eyebrows and dark chestnut hair gathered into a loose high knot with a few curls at the temples. Natural human eyes with clearly visible subtle VIOLET FLECKS in brown-hazel irises, normal round pupils and white sclera; the violet flecks are the only visible Hollowing sign. A shrewd, theatrical yet candid expression and self-possessed open posture. A layered muted indigo shawl over a faded mustard long-sleeved tunic, a plain russet sash, dark practical trousers and soft brown ankle boots. Small plain brass ear studs and two simple rings; empty relaxed hands. Her violet-flecked eyes and theatrical practical bearing follow the authored profile; age, other features and clothes are editable visual defaults. Her home world remains unspecified, and prophetic certainty is not established. No mirror face or body, crystals, tarot cards, glass sphere, glowing eyes, full violet irises, extra eyes, veins, lesions, mutations, magic effects, invented powers, faction symbols or revealed future. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views, entire hair, hands, footwear and equipment within all margins. Same single character repeated as turnaround views. Keep anatomical sides fixed: where present the sheathed sword stays on the character's anatomical LEFT hip and the pouch on the opposite hip; never mirror equipment. Change viewing angle only, keeping costume and identity. The close face detail must clearly show natural brown-hazel irises with distinct small VIOLET FLECKS, round dark pupils and white sclera, without light emission. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, extra characters or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for The Mirror from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, skin, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Preserve the close reference's subtle but clearly visible VIOLET FLECKS in natural brown-hazel irises, round dark pupils and white sclera. Flecks only, no glow or full purple irises. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, border, caption, text, UI, scenery, new costume, magical effects, invented crest, animal or extra person. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-gareth-red-banner",
+      "name": "Gareth",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/gareth-red-banner.md",
+          "sha256": "e20ca5de6fb1658f5f8b793a0b883606d2f082ef7530f0952a590f330b291012",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/gareth-red-banner.md",
+          "sha256": "3c650738701b1dc40c49e82bea423d0c5ce2a8f7ad8b448298e6e66ac1c4f9f9",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult settled Human man appearing in his late forties, with a broad athletic former guard captain's build, dark brown skin, deep-set brown eyes, close-cropped black hair with salt-gray temples and short dark stubble. A firm unsmiling appraising expression, straight shoulders and controlled disciplined posture. A weathered plain dark iron breastplate over a brown quilted riding coat, a short faded brick-red wool shoulder cloak secured with a simple unmarked iron clasp, dark leather bracers, charcoal riding trousers and scuffed brown knee-high riding boots. A plain belt supports one ordinary straight sword fully sheathed at his anatomical LEFT hip and one small closed pouch at the opposite hip. Both hands relaxed and empty. His military bearing and practical hard-used equipment follow the authored profile; age, physical features and exact clothes are editable visual defaults. No current Thornwall uniform, invented crest or military rank badge, crown, flag, banner, horse, trophies, skulls, blood, drawn weapon, supernatural effects, invented scars or sadistic expression.",
+        "full_body": {
+          "path": "assets/characters/720f002d5eae50a2a11e014ab1616ac79585a88be4eea208769e4f0242eb59ca.png",
+          "sha256": "720f002d5eae50a2a11e014ab1616ac79585a88be4eea208769e4f0242eb59ca"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/8effa8214fc1fc6b54e5cee7b08746c0c637e434873cec0e8fcd7fbbe4e5863e.png",
+          "sha256": "8effa8214fc1fc6b54e5cee7b08746c0c637e434873cec0e8fcd7fbbe4e5863e"
+        },
+        "portrait": {
+          "path": "assets/characters/2cf341e95058fffd645192906c9766601fe07f7accca1ca9d67b9f41fac5156e.png",
+          "sha256": "2cf341e95058fffd645192906c9766601fe07f7accca1ca9d67b9f41fac5156e"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2044733
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2320615
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2581790
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Gareth in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person standing naturally in a near-front three-quarter pose. Whole hair, both hands, clothing, footwear and equipment comfortably inside all margins. Appearance: An adult settled Human man appearing in his late forties, with a broad athletic former guard captain's build, dark brown skin, deep-set brown eyes, close-cropped black hair with salt-gray temples and short dark stubble. A firm unsmiling appraising expression, straight shoulders and controlled disciplined posture. A weathered plain dark iron breastplate over a brown quilted riding coat, a short faded brick-red wool shoulder cloak secured with a simple unmarked iron clasp, dark leather bracers, charcoal riding trousers and scuffed brown knee-high riding boots. A plain belt supports one ordinary straight sword fully sheathed at his anatomical LEFT hip and one small closed pouch at the opposite hip. Both hands relaxed and empty. His military bearing and practical hard-used equipment follow the authored profile; age, physical features and exact clothes are editable visual defaults. No current Thornwall uniform, invented crest or military rank badge, crown, flag, banner, horse, trophies, skulls, blood, drawn weapon, supernatural effects, invented scars or sadistic expression. Preserve authored identity, species, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Gareth from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin, eyes, hair, clothing, equipment, colors and wear. Appearance: An adult settled Human man appearing in his late forties, with a broad athletic former guard captain's build, dark brown skin, deep-set brown eyes, close-cropped black hair with salt-gray temples and short dark stubble. A firm unsmiling appraising expression, straight shoulders and controlled disciplined posture. A weathered plain dark iron breastplate over a brown quilted riding coat, a short faded brick-red wool shoulder cloak secured with a simple unmarked iron clasp, dark leather bracers, charcoal riding trousers and scuffed brown knee-high riding boots. A plain belt supports one ordinary straight sword fully sheathed at his anatomical LEFT hip and one small closed pouch at the opposite hip. Both hands relaxed and empty. His military bearing and practical hard-used equipment follow the authored profile; age, physical features and exact clothes are editable visual defaults. No current Thornwall uniform, invented crest or military rank badge, crown, flag, banner, horse, trophies, skulls, blood, drawn weapon, supernatural effects, invented scars or sadistic expression. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views, entire hair, hands, footwear and equipment within all margins. Same single character repeated as turnaround views. Keep anatomical sides fixed: where present the sheathed sword stays on the character's anatomical LEFT hip and the pouch on the opposite hip; never mirror equipment. Change viewing angle only, keeping costume and identity. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, extra characters or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Gareth from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, skin, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, border, caption, text, UI, scenery, new costume, magical effects, invented crest, animal or extra person. One 1024x1024 PNG."
+      }
     }
   ]
 }
