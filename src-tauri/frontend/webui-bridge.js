@@ -62,10 +62,11 @@
     install_package_file: ['package', '.sylvia-gm-package,.sylvia-gm-plan'],
     recover_campaign_file: ['recovery', '.sylvia-gm-campaign'],
     preview_character_card_file: ['character', '.json,.png'],
+    preview_character_bundle_file: ['character_bundle', '.sylvia-gm-character'],
     ingest_builder_sources: ['builder', '.md,.txt,.json,.yaml,.yml,.pdf,.csv,.tsv,.html,.docx'],
   };
   const exports = new Set(['export_campaign_file', 'export_package_candidate_file',
-    'export_campaign_plan_file', 'backup_authority']);
+    'export_campaign_plan_file', 'export_character_file', 'backup_authority']);
 
   async function invoke(method, params = {}) {
     if (method === 'image_art') return rpc(method, params.params || params);
@@ -78,6 +79,11 @@
       return postResponse(`/api/upload/${kind}`, {
         method: 'POST', headers, credentials: 'same-origin', body,
       });
+    }
+    // A suggested file name serves only the desktop save dialog; downloads use the server's name.
+    if (method === 'export_character_file') {
+      const { suggestedName: _desktopOnly, ...owned } = params;
+      params = owned;
     }
     const result = await rpc(method, params);
     if (exports.has(method) && result.download) {

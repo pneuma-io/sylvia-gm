@@ -2198,6 +2198,51 @@ async fn confirm_character_card_import(window: WebviewWindow, source_sha256: Str
 }
 
 #[tauri::command]
+async fn preview_character_bundle_file(window: WebviewWindow) -> Result<Value, String> {
+    trusted_caller(&window)?;
+    let Some(source) = rfd::AsyncFileDialog::new()
+        .set_parent(&window)
+        .add_filter("Sylvia GM Character", &["sylvia-gm-character"])
+        .pick_file()
+        .await
+    else {
+        return Ok(json!({"status": "cancelled"}));
+    };
+    owner_call_async(
+        window,
+        "preview_character_bundle_file",
+        json!({"source_path": source.path()}),
+    )
+    .await
+}
+
+#[tauri::command]
+async fn confirm_character_bundle_import(
+    window: WebviewWindow,
+    source_sha256: String,
+) -> Result<Value, String> {
+    owner_call_async(
+        window,
+        "confirm_character_bundle_import",
+        json!({"source_sha256": source_sha256}),
+    )
+    .await
+}
+
+#[tauri::command]
+async fn cancel_character_bundle_import(
+    window: WebviewWindow,
+    source_sha256: String,
+) -> Result<Value, String> {
+    owner_call_async(
+        window,
+        "cancel_character_bundle_import",
+        json!({"source_sha256": source_sha256}),
+    )
+    .await
+}
+
+#[tauri::command]
 async fn install_package_file(window: WebviewWindow, install_id: String) -> Result<Value, String> {
     trusted_caller(&window)?;
     let Some(source) = rfd::AsyncFileDialog::new()
@@ -2367,6 +2412,192 @@ async fn export_campaign_plan_file(
     })
     .await
     .map_err(|error| format!("Export handoff failed: {error}"))?
+}
+
+// Offer the character's name as a Windows-safe default; the user still chooses the destination.
+fn character_export_file_name(suggested: Option<&str>) -> String {
+    let words: Vec<String> = suggested
+        .unwrap_or_default()
+        .split_whitespace()
+        .map(|word| {
+            word.chars()
+                .filter(|value| value.is_alphanumeric() || matches!(value, '-' | '_'))
+                .collect()
+        })
+        .filter(|word: &String| !word.is_empty())
+        .collect();
+    let mut base: String = words.join("-").chars().take(64).collect();
+    let upper = base.to_uppercase();
+    let device = upper.chars().count() == 4
+        && (upper.starts_with("COM") || upper.starts_with("LPT"))
+        && upper.chars().last().is_some_and(char::is_numeric);
+    if matches!(upper.as_str(), "CON" | "PRN" | "AUX" | "NUL") || device {
+        base = format!("character-{base}");
+    }
+    if base.is_empty() {
+        base = "character".to_string();
+    }
+    format!("{base}.sylvia-gm-character")
+}
+
+#[tauri::command]
+async fn export_character_file(
+    window: WebviewWindow,
+    export_id: String,
+    artifact_id: String,
+    expected_content_sha256: String,
+    kind: String,
+    suggested_name: Option<String>,
+) -> Result<Value, String> {
+    trusted_caller(&window)?;
+    let Some(destination) = rfd::AsyncFileDialog::new()
+        .set_parent(&window)
+        .add_filter("Sylvia GM Character", &["sylvia-gm-character"])
+        .set_file_name(character_export_file_name(suggested_name.as_deref()))
+        .save_file()
+        .await
+    else {
+        return Ok(json!({"status": "cancelled"}));
+    };
+    let destination = destination.path().to_path_buf();
+    let payload = owner_call_async(
+        window,
+        "export_character_file",
+        json!({"export_id": export_id, "artifact_id": artifact_id,
+               "expected_content_sha256": expected_content_sha256, "kind": kind}),
+    )
+    .await?;
+    tauri::async_runtime::spawn_blocking(move || {
+        handoff_content_archive(payload, &destination, "sylvia-gm-character")
+    })
+    .await
+    .map_err(|error| format!("Export handoff failed: {error}"))?
+}
+
+#[cfg(test)]
+mod character_handoff_tests {
+    use super::{character_export_file_name, handoff_content_archive};
+    use serde_json::{json, Value};
+    use sha2::{Digest, Sha256};
+    use std::fs;
+    use std::path::{Path, PathBuf};
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    fn fixture_root(label: &str) -> PathBuf {
+        let nonce = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("clock follows Unix epoch")
+            .as_nanos();
+        let root = std::env::temp_dir().join(format!("sylvia-gm-{label}-{nonce}"));
+        fs::create_dir_all(root.join("exports")).expect("create handoff fixture directory");
+        root
+    }
+
+    fn owner_payload(source: &Path, bytes: &[u8]) -> Value {
+        json!({
+            "artifact_path": source,
+            "export": {
+                "status": "exported",
+                "kind": "character_file",
+                "name": "Vela",
+                "image_count": 3,
+                "original_card_included": false,
+                "byte_count": bytes.len(),
+                "archive_sha256": hex::encode(Sha256::digest(bytes)),
+            },
+        })
+    }
+
+    #[test]
+    fn character_handoff_copies_verified_bytes_and_keeps_owner_path_private() {
+        let root = fixture_root("character-handoff");
+        let source = root.join("exports/owner-export-id.sylvia-gm-character");
+        let bytes = b"PK\x03\x04 synthetic exported character bundle";
+        fs::write(&source, bytes).expect("write owner export");
+        let destination = root.join("Chosen Vela.sylvia-gm-character");
+        let payload = owner_payload(&source, bytes);
+
+        let result = handoff_content_archive(payload.clone(), &destination, "sylvia-gm-character")
+            .expect("verified handoff");
+
+        assert_eq!(fs::read(&destination).expect("read destination"), bytes);
+        assert_eq!(result["status"], "exported");
+        assert_eq!(result["file_name"], "Chosen Vela.sylvia-gm-character");
+        assert_eq!(result["export"], payload["export"]);
+        assert!(result.get("artifact_path").is_none());
+        assert!(!result.to_string().contains("owner-export-id"));
+        fs::remove_dir_all(root).expect("remove handoff fixture directory");
+    }
+
+    #[test]
+    fn character_handoff_rejects_unverified_input_before_replacing_destination() {
+        let root = fixture_root("character-handoff-rejected");
+        let source = root.join("exports/owner-export.sylvia-gm-character");
+        let bytes = b"exported character bytes";
+        fs::write(&source, bytes).expect("write owner export");
+        let plan = root.join("exports/owner-export.sylvia-gm-plan");
+        fs::write(&plan, bytes).expect("write other content kind");
+        let destination = root.join("existing.sylvia-gm-character");
+        let previous = b"the user's previous character file";
+        fs::write(&destination, previous).expect("write existing destination");
+
+        let mut changed_hash = owner_payload(&source, bytes);
+        changed_hash["export"]["archive_sha256"] = json!("0".repeat(64));
+        let mut changed_size = owner_payload(&source, bytes);
+        changed_size["export"]["byte_count"] = json!(bytes.len() + 1);
+        let mut missing_receipt = owner_payload(&source, bytes);
+        missing_receipt.as_object_mut().unwrap().remove("export");
+        let missing_artifact =
+            owner_payload(&root.join("exports/missing.sylvia-gm-character"), bytes);
+        for (payload, target) in [
+            (changed_hash, destination.clone()),
+            (changed_size, destination.clone()),
+            (missing_receipt, destination.clone()),
+            (missing_artifact, destination.clone()),
+            (owner_payload(&plan, bytes), destination.clone()),
+            (
+                owner_payload(&source, bytes),
+                root.join("existing.sylvia-gm-plan"),
+            ),
+        ] {
+            let error = handoff_content_archive(payload, &target, "sylvia-gm-character")
+                .expect_err("unverified character export is refused");
+            assert!(!error.contains(&*root.to_string_lossy()), "{error}");
+            assert_eq!(fs::read(&destination).expect("read destination"), previous);
+        }
+        assert!(!root.join("existing.sylvia-gm-plan").exists());
+        fs::remove_dir_all(root).expect("remove handoff fixture directory");
+    }
+
+    #[test]
+    fn character_export_names_are_plain_windows_file_names() {
+        assert_eq!(
+            character_export_file_name(Some("  Vela  the Bold ")),
+            "Vela-the-Bold.sylvia-gm-character"
+        );
+        assert_eq!(
+            character_export_file_name(Some("Élise d'Arc")),
+            "Élise-dArc.sylvia-gm-character"
+        );
+        assert_eq!(
+            character_export_file_name(Some("..\\..\\CON")),
+            "character-CON.sylvia-gm-character"
+        );
+        assert_eq!(
+            character_export_file_name(Some("lpt1")),
+            "character-lpt1.sylvia-gm-character"
+        );
+        assert_eq!(
+            character_export_file_name(Some("<>:/")),
+            "character.sylvia-gm-character"
+        );
+        assert_eq!(
+            character_export_file_name(None),
+            "character.sylvia-gm-character"
+        );
+        let long = character_export_file_name(Some(&"x".repeat(300)));
+        assert_eq!(long, format!("{}.sylvia-gm-character", "x".repeat(64)));
+    }
 }
 
 #[tauri::command]
@@ -3530,6 +3761,10 @@ pub fn run() {
             install_package_file,
             preview_character_card_file,
             confirm_character_card_import,
+            preview_character_bundle_file,
+            confirm_character_bundle_import,
+            cancel_character_bundle_import,
+            export_character_file,
             start_import_repair,
             ingest_builder_sources,
             rift_template,

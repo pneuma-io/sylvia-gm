@@ -105,6 +105,9 @@ const SylviaGMFrontend = (() => {
     pendingImportRepair: null,
     pendingCharacterCard: null,
     characterCardBusy: false,
+    pendingCharacterFile: null,
+    characterFileBusy: false,
+    characterExportBusy: false,
     hasDerivedCampaignPlan: false,
     activeCreationSubflow: null,
     builderLaunchPending: new Set(),
@@ -1233,6 +1236,12 @@ const SylviaGMFrontend = (() => {
       install_package_file: (installId) => invoke('install_package_file', { installId }),
       preview_character_card_file: () => invoke('preview_character_card_file'),
       confirm_character_card_import: (digest) => invoke('confirm_character_card_import', { sourceSha256: digest }),
+      preview_character_bundle_file: () => invoke('preview_character_bundle_file'),
+      confirm_character_bundle_import: (digest) => invoke('confirm_character_bundle_import', { sourceSha256: digest }),
+      cancel_character_bundle_import: (digest) => invoke('cancel_character_bundle_import', { sourceSha256: digest }),
+      export_character_file: (exportId, artifactId, expectedContentSha256, kind, suggestedName) => invoke(
+        'export_character_file', { exportId, artifactId, expectedContentSha256, kind, suggestedName }
+      ),
       start_import_repair: (command) => invoke('start_import_repair', {
         repairId: command.repair_id, operationId: command.operation_id,
         providerId: command.provider_id, modelId: command.model_id,
@@ -1513,7 +1522,7 @@ const SylviaGMFrontend = (() => {
       button.addEventListener('click', () => {
         showSettingsTab(button.dataset.settingsTab);
         if (button.dataset.settingsTab === 'admin') void refreshAdminAudit();
-        if (button.dataset.settingsTab === 'packages') void refreshRulesetBrowser();
+        if (button.dataset.settingsTab === 'packages') { void refreshRulesetBrowser(); void refreshCharacterExportChoices(); }
       });
     });
     $('settings-overlay').addEventListener('click', (event) => {
@@ -1559,6 +1568,15 @@ const SylviaGMFrontend = (() => {
     $('cancel-character-card-btn').addEventListener('click', () => {
       if (state.characterCardBusy) return;
       state.pendingCharacterCard = null; $('character-card-preview').hidden = true;
+    });
+    $('import-character-file-btn').addEventListener('click', () => { void previewSelectedCharacterFile(); });
+    $('confirm-character-file-btn').addEventListener('click', () => { void confirmSelectedCharacterFile(); });
+    $('cancel-character-file-btn').addEventListener('click', () => { void cancelSelectedCharacterFile(); });
+    $('character-export-select').addEventListener('change', () => updateCharacterExportControls());
+    $('export-character-file-btn').addEventListener('click', () => {
+      void exportCharacterFile(selectedExportCharacter(), (message) => {
+        $('character-export-status').textContent = message;
+      });
     });
     $('repair-import-btn').addEventListener('click', () => { void startImportRepair(); });
     $('ruleset-refresh-btn').addEventListener('click', () => { void refreshRulesetBrowser(); });
@@ -1752,7 +1770,23 @@ const SylviaGMFrontend = (() => {
       );
       if (item) void deleteReusableLibraryEntry(item);
     });
+    $('export-reusable-player-btn').addEventListener('click', () => {
+      const item = (state.campaignPartyOptions?.player_archetypes || []).find(
+        (candidate) => candidate.id === $('rift-archetype').value
+      );
+      if (item) void exportCharacterFile(item, setupCharacterExportReporter());
+    });
     $('rift-companions').addEventListener('click', (event) => {
+      const exportButton = event.target.closest('[data-export-reusable-companion]');
+      if (exportButton) {
+        event.preventDefault();
+        event.stopPropagation();
+        const item = (state.campaignPartyOptions?.companions || []).find(
+          (candidate) => candidate.id === exportButton.dataset.exportReusableCompanion
+        );
+        if (item) void exportCharacterFile(item, setupCharacterExportReporter());
+        return;
+      }
       const button = event.target.closest('[data-delete-reusable-companion]');
       if (!button) return;
       event.preventDefault();
@@ -1771,6 +1805,11 @@ const SylviaGMFrontend = (() => {
       });
     });
     $('character-profile-select').addEventListener('change', updateCharacterProfileControls);
+    $('export-character-profile-btn').addEventListener('click', () => {
+      const profile = (state.campaignCreationCatalog || []).find((item) =>
+        item.kind === 'character_profile' && item.id === $('character-profile-select').value);
+      if (profile) void exportCharacterFile(profile, setupCharacterExportReporter());
+    });
     $('adapt-character-profile-btn').addEventListener('click', () => {
       void adaptSelectedCharacterProfile();
     });
@@ -1963,7 +2002,7 @@ const SylviaGMFrontend = (() => {
     showSettingsTab(selectedTab);
     document.querySelector('.settings-tab.active')?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
     $('close-settings-btn').focus();
-    if (selectedTab === 'packages') void refreshRulesetBrowser();
+    if (selectedTab === 'packages') { void refreshRulesetBrowser(); void refreshCharacterExportChoices(); }
   }
 
   let localSupportReport = null;
@@ -2068,6 +2107,212 @@ const SylviaGMFrontend = (() => {
       }
     } catch (error) { setPackageInstallStatus(friendlyCommandError('Character-card import failed', error)); }
     finally { setCharacterCardBusy(false); }
+  }
+
+  const CHARACTER_TRANSFER_KINDS = new Set(['character_profile', 'player_character', 'companion']);
+
+  function characterTransferKindLabel(kind) {
+    return kind === 'character_profile' ? 'Universal character card'
+      : kind === 'companion' ? 'Companion' : 'Player Character';
+  }
+
+  // Name a saved package binding as setup does, using an installed Setting title when known.
+  function characterBindingText(bindings) {
+    const ruleset = bindings?.ruleset, setting = bindings?.campaign_setting;
+    if (!ruleset?.id || !setting?.id) return 'its saved Ruleset and Setting';
+    const installed = (state.campaignCreationCatalog || []).find((item) =>
+      item.kind === 'campaign_setting' && item.id === setting.id && item.version === setting.version);
+    return `Ruleset ${rulesetPackageName(ruleset.id)} ${ruleset.version} and Setting ` +
+      `${installed?.title || setting.id} ${setting.version}`;
+  }
+
+  function setCharacterFileBusy(busy) {
+    state.characterFileBusy = busy;
+    for (const id of ['import-character-file-btn', 'confirm-character-file-btn', 'cancel-character-file-btn']) $(id).disabled = busy;
+  }
+
+  function renderCharacterFilePreview(preview) {
+    const unbound = preview.kind === 'character_profile';
+    const images = Number(preview.image_count) || 0;
+    $('character-file-preview-title').textContent =
+      `${preview.name} — ${characterTransferKindLabel(unbound ? 'character_profile' : preview.role)}`;
+    $('character-file-preview-status').textContent = unbound
+      ? 'Needs ruleset adaptations' : `Playable with ${characterBindingText(preview.bindings)}`;
+    $('character-file-preview-text').textContent = preview.summary || '';
+    $('character-file-preview-contents').textContent =
+      (images ? `Includes ${images} image${images === 1 ? '' : 's'}` : 'Includes no artwork') +
+      (preview.original_card_included ? ' and the original imported card.' : '.') +
+      ' Importing does not create new artwork.';
+    $('character-file-preview-guidance').textContent = unbound
+      ? 'It stays unbound. Choose it during campaign setup and adapt it to your selected ruleset.'
+      : 'Install exactly this Ruleset and Setting before importing. Sylvia keeps the character as exported and does not adapt it.';
+    $('character-file-preview').hidden = false;
+  }
+
+  // Preview the chosen file's exact bytes; nothing joins the library until Import character.
+  async function previewSelectedCharacterFile() {
+    if (state.characterFileBusy || !state.bridge?.preview_character_bundle_file) return;
+    setCharacterFileBusy(true);
+    try {
+      const result = await state.bridge.preview_character_bundle_file();
+      if (result.status === 'cancelled') return;
+      if (result.status !== 'preview' || !/^[0-9a-f]{64}$/.test(result.source_sha256 || '')) {
+        throw new Error('Invalid Character File preview');
+      }
+      const replaced = state.pendingCharacterFile;
+      state.pendingCharacterFile = result;
+      renderCharacterFilePreview(result);
+      // Retire a replaced preview so abandoned choices do not fill the owner's pending limit.
+      if (replaced && replaced.source_sha256 !== result.source_sha256) {
+        try { await state.bridge.cancel_character_bundle_import(replaced.source_sha256); }
+        catch (_) { /* The owner keeps it; a later preview or cancel can still retire it. */ }
+      }
+    } catch (error) { setPackageInstallStatus(uploadCommandError('Character File preview', error)); }
+    finally { setCharacterFileBusy(false); }
+  }
+
+  async function confirmSelectedCharacterFile() {
+    if (state.characterFileBusy || !state.pendingCharacterFile || !state.bridge?.confirm_character_bundle_import) return;
+    const preview = state.pendingCharacterFile; setCharacterFileBusy(true);
+    try {
+      const result = await state.bridge.confirm_character_bundle_import(preview.source_sha256);
+      const character = result?.character;
+      if (result?.status !== 'imported' || result.source_sha256 !== preview.source_sha256 || !character?.id) {
+        throw new Error('Character File import was not confirmed');
+      }
+      state.pendingCharacterFile = null; $('character-file-preview').hidden = true;
+      const message = character.kind === 'character_profile'
+        ? `Imported ${character.name} as a Universal character card. Needs ruleset adaptations. ` +
+          'Choose it during campaign setup and adapt it to your selected ruleset.'
+        : `Imported ${character.name} as a ${characterTransferKindLabel(character.kind)}. ` +
+          'Choose it during campaign setup with its saved Ruleset and Setting.';
+      setPackageInstallStatus(message);
+      try { await refreshCharacterLibrary({ party: true }); }
+      catch (_) { setPackageInstallStatus(`${message} Reopen Packages to refresh the character lists.`); }
+    } catch (error) {
+      // The owner keeps the verified preview, so the same choice can be imported after a fix.
+      setPackageInstallStatus(`${uploadCommandError('Character File import', error).replace(/\.?$/, '.')} ` +
+        'The preview is kept; import it again or cancel.');
+    } finally { setCharacterFileBusy(false); }
+  }
+
+  // Discard only Sylvia's temporary preview copy; the chosen file and the library are untouched.
+  async function cancelSelectedCharacterFile() {
+    if (state.characterFileBusy || !state.pendingCharacterFile || !state.bridge?.cancel_character_bundle_import) return;
+    const preview = state.pendingCharacterFile; setCharacterFileBusy(true);
+    try {
+      const result = await state.bridge.cancel_character_bundle_import(preview.source_sha256);
+      if (result?.status !== 'cancelled') throw new Error('Character File preview was not cancelled');
+      state.pendingCharacterFile = null; $('character-file-preview').hidden = true;
+      setPackageInstallStatus(`Cancelled importing ${preview.name}. Nothing was saved.`);
+    } catch (error) { setPackageInstallStatus(friendlyCommandError('Could not cancel the Character File preview', error)); }
+    finally { setCharacterFileBusy(false); }
+  }
+
+  // Setup, the Universal card picker and Saved characters all read the same library catalogue.
+  async function refreshCharacterLibrary({ party = false } = {}) {
+    if (!state.bridge?.campaign_creation_catalog) return;
+    state.campaignCreationCatalog = await state.bridge.campaign_creation_catalog() || [];
+    renderCharacterProfiles();
+    renderCharacterExportChoices();
+    if (party && !$('construction-panel').hidden && state.campaignPartyOptionsStatus !== 'loading' &&
+        state.campaignPartyOptionsKey === campaignPartyRequestKey()) {
+      void refreshCampaignPartyOptions();
+    }
+  }
+
+  async function refreshCharacterExportChoices() {
+    try { await refreshCharacterLibrary(); }
+    catch (error) { renderCharacterExportChoices(friendlyCommandError('Saved characters are unavailable', error)); }
+  }
+
+  function exportableCharacters() {
+    return (state.campaignCreationCatalog || []).filter((item) => CHARACTER_TRANSFER_KINDS.has(item.kind) &&
+      item.reusable === true && item.id && /^[0-9a-f]{64}$/.test(item.content_sha256 || ''));
+  }
+
+  const characterExportKey = (item) => `${item.kind}/${item.id}`;
+
+  function selectedExportCharacter() {
+    const key = $('character-export-select').value;
+    return exportableCharacters().find((item) => characterExportKey(item) === key) || null;
+  }
+
+  function renderCharacterExportChoices(problem = '') {
+    const select = $('character-export-select');
+    const previous = select.value;
+    const items = exportableCharacters();
+    const group = (kind, label) => {
+      const options = items.filter((item) => item.kind === kind).map((item) => {
+        const detail = kind === 'character_profile' ? 'Needs adaptation'
+          : [item.builtin_starter ? 'Built-in' : '', reusableCharacterTargetLabel(item)].filter(Boolean).join(' · ');
+        return `<option value="${escapeHtml(characterExportKey(item))}">${escapeHtml(item.name)}` +
+          `${detail ? ` — ${escapeHtml(detail)}` : ''}</option>`;
+      }).join('');
+      return options ? `<optgroup label="${escapeHtml(label)}">${options}</optgroup>` : '';
+    };
+    select.innerHTML = `<option value="">${items.length ? 'Choose a saved character' : 'No saved characters yet'}</option>` +
+      group('player_character', 'Player Characters') + group('companion', 'Companions') +
+      group('character_profile', 'Universal character cards');
+    select.value = items.some((item) => characterExportKey(item) === previous) ? previous : '';
+    updateCharacterExportControls(problem);
+  }
+
+  function updateCharacterExportControls(problem = '') {
+    const item = selectedExportCharacter(), available = exportableCharacters().length > 0;
+    const incomplete = item && item.kind !== 'character_profile' && item.profile_status && item.profile_status !== 'authored';
+    $('character-export-select').disabled = state.characterExportBusy || !available;
+    $('export-character-file-btn').disabled = state.characterExportBusy || !item || Boolean(incomplete) ||
+      !state.bridge?.export_character_file;
+    $('character-export-summary').textContent = problem ||
+      (!item ? (available ? 'Choose a character to export.' : 'Import a character or save one from a Builder chat first.')
+        : incomplete ? 'Open this character in Builder and complete its profile before exporting it.'
+          : item.kind === 'character_profile' ? `${item.summary} — Unbound; it needs adaptation before play.`
+            : `${item.summary} — Keeps its saved Ruleset and Setting.`);
+    $('export-reusable-player-btn').disabled = state.characterExportBusy;
+    $('rift-companions').querySelectorAll('[data-export-reusable-companion]').forEach((button) => {
+      button.disabled = state.characterExportBusy;
+    });
+    updateCharacterProfileControls();
+  }
+
+  // Report setup exports only while the same Interview is still shown.
+  function setupCharacterExportReporter() {
+    const sessionId = state.activeSessionId;
+    return (message) => {
+      if (sessionId === state.activeSessionId && !$('construction-panel').hidden) setInlineStatus(message, 'construction');
+    };
+  }
+
+  // Export the exact library entry the user selected; the owner refuses a changed or missing source.
+  async function exportCharacterFile(item, report) {
+    if (!item?.id || !item.content_sha256 || !CHARACTER_TRANSFER_KINDS.has(item.kind) ||
+        state.characterExportBusy || !state.bridge?.export_character_file) return;
+    state.characterExportBusy = true;
+    updateCharacterExportControls();
+    try {
+      const result = await state.bridge.export_character_file(
+        `export-character-${crypto.randomUUID()}`, item.id, item.content_sha256, item.kind, item.name,
+      );
+      if (result?.status === 'cancelled') { report(`Export of ${item.name} cancelled`); return; }
+      if (result?.status !== 'exported') throw new Error('Character export was not confirmed');
+      const receipt = result.export || {};
+      const images = Number(receipt.image_count) || 0;
+      report(`Exported ${item.name} with ${images ? `${images} image${images === 1 ? '' : 's'}` : 'no artwork'}` +
+        `${receipt.original_card_included ? ' and its original card' : ''}.` +
+        (item.kind === 'character_profile' ? '' : ' Whoever imports it needs the same Ruleset and Setting installed.'));
+    } catch (error) {
+      const message = friendlyCommandError(`Could not export ${item.name}`, error);
+      report(message);
+      // A changed or removed entry is refused; show the library as it is now.
+      try {
+        await refreshCharacterLibrary({ party: true });
+        report(`${message.replace(/\.?$/, '.')} Saved characters were refreshed.`);
+      } catch (_) { /* Keep the export failure visible. */ }
+    } finally {
+      state.characterExportBusy = false;
+      updateCharacterExportControls();
+    }
   }
 
   async function installSelectedPackage() {
@@ -10609,6 +10854,7 @@ const SylviaGMFrontend = (() => {
       (item) => item.id === $('rift-archetype').value
     );
     $('delete-reusable-player-btn').hidden = !(player?.reusable && player.content_sha256 && !player.builtin_starter);
+    $('export-reusable-player-btn').hidden = !(player?.reusable && player.content_sha256);
   }
 
   async function deleteReusableLibraryEntry(item) {
@@ -10963,6 +11209,7 @@ const SylviaGMFrontend = (() => {
     group.hidden = !allowed;
     select.disabled = busy || !profiles.length;
     button.disabled = !allowed || busy || !profile;
+    $('export-character-profile-btn').disabled = !profile || state.characterExportBusy;
     $('rift-create-companion').disabled = busy;
     summary.textContent = profile ? `${profile.summary} — Needs adaptation to this campaign.` :
       profiles.length ? 'Choose a source to adapt; the original will stay unchanged.' :
@@ -11797,6 +12044,10 @@ const SylviaGMFrontend = (() => {
         ? `<button type="button" class="btn btn-secondary btn-sm" ` +
           `data-delete-reusable-companion="${escapeHtml(item.id)}">Delete Saved Companion</button>`
         : '';
+      const exportButton = item.reusable && item.content_sha256
+        ? `<button type="button" class="btn btn-secondary btn-sm" ` +
+          `data-export-reusable-companion="${escapeHtml(item.id)}">Export Character File…</button>`
+        : '';
       return `<label class="companion-choice" for="rift-companion-${index}">` +
         `<input id="rift-companion-${index}" type="checkbox" value="${escapeHtml(item.id)}" ` +
         `data-profile-required="${profileRequired ? 'true' : 'false'}"` +
@@ -11806,7 +12057,7 @@ const SylviaGMFrontend = (() => {
         `<small>${escapeHtml(item.summary)}${status}` +
         `${item.source_profile ? ` · Adapted from ${escapeHtml(item.source_profile.name)}` : ''}` +
         `${reusableCharacterTargetLabel(item) ? `<br><span class="saved-character-target">${escapeHtml(reusableCharacterTargetLabel(item))}</span>` : ''}` +
-        `</small>${deleteButton}</label>`;
+        `</small>${exportButton}${deleteButton}</label>`;
     }).join('');
     $('rift-companions').querySelectorAll('input[type="checkbox"]').forEach((input) => {
       input.addEventListener('change', () => {
