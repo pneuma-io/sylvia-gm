@@ -232,6 +232,9 @@ PURPOSE_INSTRUCTIONS = {
         "about 35 percent down the image. Leave headroom and room around the shoulders for "
         "a circular crop. For other creatures, frame the recognizable head or defining body "
         "feature at the same focal point; preserve its actual anatomy and never invent a face. "
+        "Keep every authored head within the crop. When a faceless subject is recognizable by "
+        "its whole-body shape, frame its complete silhouette. Preserve intentional concealment: "
+        "a hood, mask or hidden identity must remain concealed. "
         "Preserve the identity, outfit, colors and distinguishing features "
         "of the supplied full-body and multi-view references. No border, lettering or UI."
     ),

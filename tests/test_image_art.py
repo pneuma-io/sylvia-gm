@@ -99,8 +99,13 @@ def test_review_generate_adopt_replay_and_reopen(art, tmp_path):
 def test_auto_saves_both_reference_formats_and_reuses_them_for_portrait(art):
     owner, service, provider, preferences = art
     preferences["mode"] = "auto"
+    appearance = "Two-headed Rift hound, four legs, slate fur; both heads must remain visible"
     for purpose in ("full_body", "reference_sheet", "portrait"):
-        row = request(service, purpose, purpose)
+        row = service.request(
+            "builder-art", operation_id=purpose, target_id="rift-hound", purpose=purpose,
+            brief="A two-headed creature portrait with both identities visible",
+            appearance=appearance,
+        )
         assert service._futures[row["operation_id"]].result(timeout=15)["status"] == "succeeded"
     assert {item["purpose"] for item in service.view("builder-art")["selections"]} == {
         "full_body",
@@ -109,11 +114,13 @@ def test_auto_saves_both_reference_formats_and_reuses_them_for_portrait(art):
     }
     assert len(provider.calls[1].reference_images) == 1
     assert len(provider.calls[2].reference_images) == 2
+    assert appearance in provider.calls[2].prompt
+    assert "Keep every authored head within the crop" in provider.calls[2].prompt
     portrait = next(
         row for row in service.view("builder-art")["selections"] if row["purpose"] == "portrait"
     )
     frame = PortraitFrame(0.42, 0.31, 1.5).as_payload()
-    service.frame("builder-art", "relay-keeper", portrait["sha256"], frame)
+    service.frame("builder-art", "rift-hound", portrait["sha256"], frame)
     assert (
         next(
             row for row in service.view("builder-art")["selections"] if row["purpose"] == "portrait"
