@@ -5,6 +5,7 @@ import json
 import re
 import shutil
 from importlib.resources import files
+from pathlib import Path
 
 import pytest
 
@@ -255,6 +256,26 @@ def test_actual_gm_catalog_excludes_permanent_refusals_and_preserves_lock(lite_s
         "mending",
         "command",
     }
+
+
+def test_retained_alpha4_catalog_filters_stubs_without_upgrading_the_saved_pin(tmp_path):
+    archive = (Path(__file__).parent / "fixtures/alpha4-lite.sylvia-gm-package").read_bytes()
+    database = create_cleric_save(tmp_path / "retained.sqlite3", archive)
+    with AuthorityOwner.open(database, "hotfix-owner", disconnect_grace_seconds=1.0) as owner:
+        before = owner.current_package_lock("casting")
+        primary = next(p for p in before.package_lock.entries if p.role is PackageRole.PRIMARY)
+        assert primary.version == "0.3.15"
+        declarations = owner.package_record(primary.package_id, primary.version, primary.sha256)[
+            "tools"
+        ]
+        assert any(tool["name"] == "select_srd_clone_body" for tool in declarations)
+        request = play(owner, CaptureGM(), campaign="casting", turn="casting-turn")
+        assert owner.current_package_lock("casting") == before
+    names = [tool["function"]["name"] for tool in request["tools"]]
+    assert not any(name.endswith("_select_srd_clone_body") for name in names)
+    assert any(name.endswith("_cast_spell_outside_combat") for name in names)
+    assert any(name.endswith("_read_campaign_reference") for name in names)
+    assert len(names) == 154
 
 
 class CaptureGM(LibraryProvider):
