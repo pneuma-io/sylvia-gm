@@ -4396,6 +4396,186 @@
         "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Wick from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, body proportions, skin, eyes, hair, clothing, colors, props and material wear. Appearance: An adult humanlike Riftborn woman appearing in her late forties, with a medium sturdy working build, warm tan skin, muted green eyes and chestnut-brown hair threaded with gray, braided beneath a plain cream linen head kerchief. A composed quiet expression and practiced relaxed posture. A faded ochre-brown long-sleeved work dress, a patched gray linen apron with a few small pale wax flecks, and worn brown work shoes. She holds a small ordinary bundle of unlit cream beeswax taper candles at waist height in one hand, the other relaxed. Her candle-making work and quiet bearing follow the authored profile; age, physical features and costume are editable visual defaults. Her home world remains forgotten and unnamed. She is the market chandler, distinct from Mother Wick. No candle body, head flame, invented warding powers, religious insignia, glowing eyes, burning candles, readable labels or invented origin. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Consistent scale across three body views. Entire bodies, hair, hands, footwear and applicable folio or ordinary unlit candles inside margins. Exactly the same one character repeated as turnaround views. No labels, readable text, captions, borders, logos, UI, scenery, extra characters, animals or invented insignia. Change viewing angle only; keep identity and practical costume unchanged.",
         "portrait": "Use case: identity-preserve. Production square app portrait for Wick from Severed Lands. Input image 1 is the canonical full-body reference, image 2 is the matching multiview sheet. Preserve this exact adult face, age, skin, eyes, hairstyle, expression, clothing and applicable head kerchief. Appearance: An adult humanlike Riftborn woman appearing in her late forties, with a medium sturdy working build, warm tan skin, muted green eyes and chestnut-brown hair threaded with gray, braided beneath a plain cream linen head kerchief. A composed quiet expression and practiced relaxed posture. A faded ochre-brown long-sleeved work dress, a patched gray linen apron with a few small pale wax flecks, and worn brown work shoes. She holds a small ordinary bundle of unlit cream beeswax taper candles at waist height in one hand, the other relaxed. Her candle-making work and quiet bearing follow the authored profile; age, physical features and costume are editable visual defaults. Her home world remains forgotten and unnamed. She is the market chandler, distinct from Mother Wick. No candle body, head flame, invented warding powers, religious insignia, glowing eyes, burning candles, readable labels or invented origin. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Head and upper shoulders, near-forward gaze, centered face, eye line near 35 percent down and chin near 65 percent down, comfortable headroom above all hair or kerchief. Continuous full-bleed square background and clothing to all edges. No painted circle, cutout, vignette, faded edge, border, captions, readable text, UI, scenery, new costume, magical effects, burning candles, animals or extra people. Preserve identity and change framing only. One 1024x1024 PNG."
       }
+    },
+    {
+      "id": "severed-npc-fishmonger-kale",
+      "name": "Kale",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/fishmonger-kale.md",
+          "sha256": "c222a00ecfe556c2212c37e65557444e1c8ff66ac6a0a980c7df743811c0becd",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/fishmonger-kale.md",
+          "sha256": "09696731fe8ee82e79d9e48c6d04097a247407e2c33a56adf5eb51ef6f36aa9e",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult settled Human man appearing in his early forties, with a broad stocky working build, warm golden-beige skin, dark brown eyes, short straight black hair graying slightly at the sides and short dark stubble. A quiet contented expression and an unhurried grounded posture. A plain cream linen shirt with rolled sleeves, a worn deep navy cloth cap, a faded blue-gray waxed-canvas work apron with ordinary water marks, dark brown practical trousers and sturdy worn leather boots. Empty relaxed hands, no fish or knife displayed. His practical fishmonger workwear and uninterested-in-gossip bearing reflect the authored profile; age, features and clothing details are editable visual defaults. No fish anatomy, scales on skin, magical effects, modern rubber apron, logos, readable labels, invented secrets or aristocratic finery.",
+        "full_body": {
+          "path": "assets/characters/c0e518e93359b79fc66f3bfb4d5f7c648600413c7894b88233a1dbaffbe8d019.png",
+          "sha256": "c0e518e93359b79fc66f3bfb4d5f7c648600413c7894b88233a1dbaffbe8d019"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/3ff081f4d02f790f93174988488e0ffea85582f408775a2928978330bde14a2b.png",
+          "sha256": "3ff081f4d02f790f93174988488e0ffea85582f408775a2928978330bde14a2b"
+        },
+        "portrait": {
+          "path": "assets/characters/6ae1c560e9680c450f06e0b225af8e749beda5394c7038ffda54a65bfd4f762c.png",
+          "sha256": "6ae1c560e9680c450f06e0b225af8e749beda5394c7038ffda54a65bfd4f762c"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1905663
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2415395
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2529783
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Kale in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person standing naturally in a near-front three-quarter pose with both empty hands visible, whole hair, hands, clothing, equipment and feet comfortably inside all margins. Appearance: An adult settled Human man appearing in his early forties, with a broad stocky working build, warm golden-beige skin, dark brown eyes, short straight black hair graying slightly at the sides and short dark stubble. A quiet contented expression and an unhurried grounded posture. A plain cream linen shirt with rolled sleeves, a worn deep navy cloth cap, a faded blue-gray waxed-canvas work apron with ordinary water marks, dark brown practical trousers and sturdy worn leather boots. Empty relaxed hands, no fish or knife displayed. His practical fishmonger workwear and uninterested-in-gossip bearing reflect the authored profile; age, features and clothing details are editable visual defaults. No fish anatomy, scales on skin, magical effects, modern rubber apron, logos, readable labels, invented secrets or aristocratic finery. Preserve authored identity, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Kale from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, body proportions, skin, eyes, hair, clothing, applicable cap or spectacles, colors, equipment and material wear. Appearance: An adult settled Human man appearing in his early forties, with a broad stocky working build, warm golden-beige skin, dark brown eyes, short straight black hair graying slightly at the sides and short dark stubble. A quiet contented expression and an unhurried grounded posture. A plain cream linen shirt with rolled sleeves, a worn deep navy cloth cap, a faded blue-gray waxed-canvas work apron with ordinary water marks, dark brown practical trousers and sturdy worn leather boots. Empty relaxed hands, no fish or knife displayed. His practical fishmonger workwear and uninterested-in-gossip bearing reflect the authored profile; age, features and clothing details are editable visual defaults. No fish anatomy, scales on skin, magical effects, modern rubber apron, logos, readable labels, invented secrets or aristocratic finery. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Consistent scale across three body views. Entire bodies, hair, hands, footwear and attached equipment inside margins. Exactly the same one character repeated as turnaround views. No labels, readable text, captions, borders, logos, UI, scenery, extra characters, animals or invented insignia. Change viewing angle only; keep identity and practical costume unchanged.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Kale from Severed Lands. Input image 1 is the canonical full-body identity reference, image 2 is the matching multiview sheet. Preserve that exact adult face, age, skin, eyes, hairstyle, expression, applicable cap or spectacles and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face is centered; eyes near 35 percent down and chin near 65 percent down, with comfortable headroom above all hair or cap. Face framing must be consistent with a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, borders, captions, readable text, UI, scenery, new costume, magical effects, animals or extra people. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-merchant-hennick",
+      "name": "Hennick",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/merchant-hennick.md",
+          "sha256": "d2768de209b1e9cd22d63f9f13d7fa4873d4dca23388b6a3ce7eeeeddffab41e",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/merchant-hennick.md",
+          "sha256": "d989200d3042a33418727c28d00daedb794d50d64d5221711a0f0b49e2fae3e6",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult settled Human man appearing in his early sixties, with a comfortable round build, light olive skin, blue-gray eyes, a rounded lined face, thinning curly silver hair, bushy gray eyebrows and a close short gray beard. A cheerful unflappable expression and easy upright posture. A plain faded brown short coat over an ochre wool waistcoat and an undyed collared shirt, charcoal trousers, practical brown leather shoes and an ordinary belt with one closed money pouch. Empty relaxed hands. His cheerful ordinary-merchant bearing follows the authored profile; age, features and clothing are editable visual defaults. No noble finery, gang or faction insignia, suspicious contraband, readable accounts, modern merchandise, magical effects or invented personal history.",
+        "full_body": {
+          "path": "assets/characters/083a867202a14fe53be1fe0c241bfa4617db9cd5837fc23160c55f614e4418e1.png",
+          "sha256": "083a867202a14fe53be1fe0c241bfa4617db9cd5837fc23160c55f614e4418e1"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/5f248cb52af95070a3da22967a85a717a320c0aa74aecc8d24dfa0a7dda2bee5.png",
+          "sha256": "5f248cb52af95070a3da22967a85a717a320c0aa74aecc8d24dfa0a7dda2bee5"
+        },
+        "portrait": {
+          "path": "assets/characters/8fd0445352922f7d3cc128275de6b2c3b4bb6fde8b722d962a074aea5c59c6ef.png",
+          "sha256": "8fd0445352922f7d3cc128275de6b2c3b4bb6fde8b722d962a074aea5c59c6ef"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2090841
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2411511
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2654459
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Hennick in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person standing naturally in a near-front three-quarter pose with both empty hands visible, whole hair, hands, clothing, equipment and feet comfortably inside all margins. Appearance: An adult settled Human man appearing in his early sixties, with a comfortable round build, light olive skin, blue-gray eyes, a rounded lined face, thinning curly silver hair, bushy gray eyebrows and a close short gray beard. A cheerful unflappable expression and easy upright posture. A plain faded brown short coat over an ochre wool waistcoat and an undyed collared shirt, charcoal trousers, practical brown leather shoes and an ordinary belt with one closed money pouch. Empty relaxed hands. His cheerful ordinary-merchant bearing follows the authored profile; age, features and clothing are editable visual defaults. No noble finery, gang or faction insignia, suspicious contraband, readable accounts, modern merchandise, magical effects or invented personal history. Preserve authored identity, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Hennick from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, body proportions, skin, eyes, hair, clothing, applicable cap or spectacles, colors, equipment and material wear. Appearance: An adult settled Human man appearing in his early sixties, with a comfortable round build, light olive skin, blue-gray eyes, a rounded lined face, thinning curly silver hair, bushy gray eyebrows and a close short gray beard. A cheerful unflappable expression and easy upright posture. A plain faded brown short coat over an ochre wool waistcoat and an undyed collared shirt, charcoal trousers, practical brown leather shoes and an ordinary belt with one closed money pouch. Empty relaxed hands. His cheerful ordinary-merchant bearing follows the authored profile; age, features and clothing are editable visual defaults. No noble finery, gang or faction insignia, suspicious contraband, readable accounts, modern merchandise, magical effects or invented personal history. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Consistent scale across three body views. Entire bodies, hair, hands, footwear and attached equipment inside margins. Exactly the same one character repeated as turnaround views. No labels, readable text, captions, borders, logos, UI, scenery, extra characters, animals or invented insignia. Change viewing angle only; keep identity and practical costume unchanged.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Hennick from Severed Lands. Input image 1 is the canonical full-body identity reference, image 2 is the matching multiview sheet. Preserve that exact adult face, age, skin, eyes, hairstyle, expression, applicable cap or spectacles and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face is centered; eyes near 35 percent down and chin near 65 percent down, with comfortable headroom above all hair or cap. Face framing must be consistent with a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, borders, captions, readable text, UI, scenery, new costume, magical effects, animals or extra people. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-tailor-lace",
+      "name": "Lace",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/tailor-lace.md",
+          "sha256": "2f12b57e10e397e472ba04c5dad3fecfb87f434e0b9103a0ebeff3cbebfc3dff",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/tailor-lace.md",
+          "sha256": "1a3a33a8fe5ff086b62119744cd54c58ee8e612b74fa134cc30caa50fa522887",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult settled Human woman appearing in her early fifties, with a compact slender build, deep brown skin, dark brown eyes, small plain oval wire-rim spectacles and tightly coiled black hair threaded with gray, gathered into a neat low puff. A focused composed expression with a hint of impatience, straight precise posture. A plain dark forest-green blouse with sleeves rolled neatly, a muted ochre long skirt, an unbleached linen work apron and worn brown shoes. A simple cloth measuring tape with no readable markings hangs at the apron; a small closed sewing pouch sits at her waist. Empty relaxed hands. Her precise tailoring bearing reflects the authored profile; age, features and clothing are editable visual defaults. She is the market tailor and is unrelated to the Lace Brothers. No crime-family insignia, shared sibling appearance, elaborate lace gown, readable text, magical effects, modern machines or invented origin.",
+        "full_body": {
+          "path": "assets/characters/a812195d424e33770a09c9b9969d8f75626a22c986167760a5aa7453fd5d2452.png",
+          "sha256": "a812195d424e33770a09c9b9969d8f75626a22c986167760a5aa7453fd5d2452"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/4eae285829cb09570a840d09f6beb5f63ef10d6c292f5b277cd6714ec7f15cd8.png",
+          "sha256": "4eae285829cb09570a840d09f6beb5f63ef10d6c292f5b277cd6714ec7f15cd8"
+        },
+        "portrait": {
+          "path": "assets/characters/4dab512a326c33d7d2263a4e708ab37f23d62f0d418409ac0c156f4a290f8772.png",
+          "sha256": "4dab512a326c33d7d2263a4e708ab37f23d62f0d418409ac0c156f4a290f8772"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2155834
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2431779
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2588127
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Lace in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person standing naturally in a near-front three-quarter pose with both empty hands visible, whole hair, hands, clothing, equipment and feet comfortably inside all margins. Appearance: An adult settled Human woman appearing in her early fifties, with a compact slender build, deep brown skin, dark brown eyes, small plain oval wire-rim spectacles and tightly coiled black hair threaded with gray, gathered into a neat low puff. A focused composed expression with a hint of impatience, straight precise posture. A plain dark forest-green blouse with sleeves rolled neatly, a muted ochre long skirt, an unbleached linen work apron and worn brown shoes. A simple cloth measuring tape with no readable markings hangs at the apron; a small closed sewing pouch sits at her waist. Empty relaxed hands. Her precise tailoring bearing reflects the authored profile; age, features and clothing are editable visual defaults. She is the market tailor and is unrelated to the Lace Brothers. No crime-family insignia, shared sibling appearance, elaborate lace gown, readable text, magical effects, modern machines or invented origin. Preserve authored identity, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Lace from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, body proportions, skin, eyes, hair, clothing, applicable cap or spectacles, colors, equipment and material wear. Appearance: An adult settled Human woman appearing in her early fifties, with a compact slender build, deep brown skin, dark brown eyes, small plain oval wire-rim spectacles and tightly coiled black hair threaded with gray, gathered into a neat low puff. A focused composed expression with a hint of impatience, straight precise posture. A plain dark forest-green blouse with sleeves rolled neatly, a muted ochre long skirt, an unbleached linen work apron and worn brown shoes. A simple cloth measuring tape with no readable markings hangs at the apron; a small closed sewing pouch sits at her waist. Empty relaxed hands. Her precise tailoring bearing reflects the authored profile; age, features and clothing are editable visual defaults. She is the market tailor and is unrelated to the Lace Brothers. No crime-family insignia, shared sibling appearance, elaborate lace gown, readable text, magical effects, modern machines or invented origin. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Consistent scale across three body views. Entire bodies, hair, hands, footwear and attached equipment inside margins. Exactly the same one character repeated as turnaround views. No labels, readable text, captions, borders, logos, UI, scenery, extra characters, animals or invented insignia. Change viewing angle only; keep identity and practical costume unchanged.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Lace from Severed Lands. Input image 1 is the canonical full-body identity reference, image 2 is the matching multiview sheet. Preserve that exact adult face, age, skin, eyes, hairstyle, expression, applicable cap or spectacles and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face is centered; eyes near 35 percent down and chin near 65 percent down, with comfortable headroom above all hair or cap. Face framing must be consistent with a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, borders, captions, readable text, UI, scenery, new costume, magical effects, animals or extra people. One 1024x1024 PNG."
+      }
     }
   ]
 }
