@@ -146,6 +146,16 @@ remain excluded; test fixtures do not become premade release characters.
 The selected Siren repository's current main at `c7a9587b94f8e5125ea5818a9f708ec32d0bab01`
 contains an eleven-character playable profile set. Its historical repository/profile names do
 not make the clean Siren material private; source preparation follows the owner's correction.
+The eleven locked originals have now been delivered locally. Independent checks confirm the
+normalized master archive hash, exact internal image bytes/checksums and browser decoding of all
+eleven at 1024×1536. Ten historical registry hashes differ from that master; the discrepancy is
+retained without an invented cause. The images remain unchanged and are not yet adopted into
+the prepared catalogue. Their standard PNG background-color hint exposed an overly narrow image
+validator. Bounded `bKGD` support now preserves original bytes while refusing malformed or misplaced
+hints. The six minimal failure cases pass after the repair; 78 related source checks pass in
+120.81 seconds, including saved-owner restoration/reopen and actual Lite image lifecycle. Strict
+module typing and touched Ruff pass; all eleven originals pass the repaired validator. This is
+source qualification only, with native/live acceptance still pending.
 The authored-source producer now covers 218 subjects (82 individual NPCs and 136 monsters),
 retaining 246 source editions across current content and Plan snapshots. Thread, Hook and Needle
 remain distinct; V and Anchor Sentinel variants and the artwork-annotated profiles retain

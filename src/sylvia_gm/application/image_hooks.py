@@ -104,6 +104,7 @@ def _dimensions(image: ImageData, maximum_bytes: int = MAX_IMAGE_BYTES) -> tuple
     width = height = depth = color = interlace = 0
     palette = 0
     transparency = False
+    background = False
     saw_data = ended_data = ended = False
     while offset < len(data):
         if offset + 12 > len(data):
@@ -141,12 +142,19 @@ def _dimensions(image: ImageData, maximum_bytes: int = MAX_IMAGE_BYTES) -> tuple
                 or interlace not in (0, 1)
             ):
                 raise ImageHookError("invalid_image")
-        elif kind == b"PLTE" and not saw_data and not palette:
+        elif kind == b"PLTE" and not saw_data and not palette and not background:
             if color in (0, 4) or not length or length % 3 or length > 768:
                 raise ImageHookError("invalid_image")
             if color == 3 and length // 3 > 2**depth:
                 raise ImageHookError("invalid_image")
             palette = length // 3
+        elif kind == b"bKGD" and not saw_data and not background:
+            # A display hint may be retained without changing the reference's original pixels.
+            if length != {0: 2, 2: 6, 3: 1, 4: 2, 6: 6}[color] or (
+                color == 3 and (not palette or body[0] >= palette)
+            ):
+                raise ImageHookError("invalid_image")
+            background = True
         elif kind == b"tRNS" and not saw_data and not transparency:
             if not (
                 (color == 0 and length == 2)

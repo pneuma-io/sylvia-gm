@@ -38,7 +38,8 @@ def portable_art():
     assets = {}
     visuals = {"appearance": "Silver hair, brown eyes, blue coat"}
     for index, purpose in enumerate(("full_body", "reference_sheet", "portrait")):
-        image = png(32, 48, 40 + index).data
+        pixels = png(32, 48, 40 + index).data
+        image = pixels[:33] + chunk(b"bKGD", b"\0" * 6) + pixels[33:]
         digest = hashlib.sha256(image).hexdigest()
         path = f"assets/characters/{digest}.png"
         assets[path] = image
