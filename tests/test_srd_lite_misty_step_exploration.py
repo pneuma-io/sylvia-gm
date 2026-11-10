@@ -25,8 +25,8 @@ from scripts.srd_lite_misty_step_exploration import (
     bind_misty_step_exploration,
 )
 from scripts.srd_timed_actor_defenses import _load_runtime
-from tests.test_srd_lite_instant_combat_areas import scene
-from tests.test_srd_lite_mass_cure_geometry import NAMESPACE, _calls, _wall
+from tests.srd_lite_instant_combat_areas_fixtures import scene
+from tests.srd_lite_mass_cure_geometry_fixtures import NAMESPACE, _calls, _wall
 
 from sylvia_gm import dice
 from sylvia_gm.application.package_runtime import AuthorityMemoryStateBridge

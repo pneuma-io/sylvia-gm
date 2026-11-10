@@ -20,8 +20,8 @@ from scripts.srd_lite_steed_exploration_abilities import (
     bind_steed_exploration_abilities,
 )
 from tests.test_srd_lite_combat_scene_reentry import admission_source as _admission_source
-from tests.test_srd_lite_mass_cure_geometry import _calls
-from tests.test_srd_lite_steed_healing_touch import _case, _snapshot
+from tests.srd_lite_mass_cure_geometry_fixtures import _calls
+from tests.srd_lite_steed_healing_touch_fixtures import _case, _snapshot
 
 from sylvia_gm import dice
 from sylvia_gm.application.package_runtime import _json_safe

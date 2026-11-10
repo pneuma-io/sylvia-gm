@@ -9,7 +9,7 @@ import pytest
 from scripts import srd_lite_dispel_decision_widgets as widgets
 from scripts.srd_control_behaviors import _param, _set, _tool
 from scripts.srd_lite_profiles import lists
-from tests.test_srd_lite_exploration_objects import invoke
+from tests.srd_lite_exploration_objects_fixtures import invoke
 
 from sylvia_gm.application.result_cards import project_result_card
 from sylvia_gm.runtime import RulesetRuntime

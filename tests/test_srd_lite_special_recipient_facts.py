@@ -11,9 +11,9 @@ from scripts.srd_spell_removal_adoption import SELECTED_KINDS
 from scripts.srd_timed_actor_defenses import _load_runtime, _set
 
 from sylvia_gm.runtime import RulesetRuntime
-from tests.test_srd_lite_combat_target_facts import state
-from tests.test_srd_lite_instant_combat_areas import preflight
-from tests.test_srd_lite_mass_cure_geometry import NAMESPACE, _calls, _wall
+from tests.srd_lite_combat_target_facts_fixtures import state
+from tests.srd_lite_instant_combat_areas_fixtures import preflight
+from tests.srd_lite_mass_cure_geometry_fixtures import NAMESPACE, _calls, _wall
 
 
 @pytest.fixture(scope="module")

@@ -1,6 +1,6 @@
 """Native Faerie sphere boundaries, actual placement rejection and combat payment."""
 from tests.lite_fixture_archive import archive_closed_case
-from tests.test_srd_lite_zones import retain
+from tests.srd_lite_zones_fixtures import retain
 from tests.lite_imported_fixture import ImportedCase
 from tests.test_srd_lite_foundation import VARIANT_ID
 

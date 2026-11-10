@@ -25,7 +25,7 @@ from scripts.srd_timed_actor_defenses import _load_runtime
 
 from sylvia_gm import dice
 from sylvia_gm.runtime._schema_validator import validate_ruleset_data
-from tests import test_srd_solid_spell_walls as force
+from tests import srd_solid_spell_walls_fixtures as force
 
 ROOT, SRD = force.ROOT, force.SRD
 BASE = Path(

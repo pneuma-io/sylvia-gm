@@ -24,8 +24,8 @@ from scripts.srd_lite_exploration_objects import (
 )
 from scripts.srd_lite_profiles import lists
 from scripts.srd_timed_actor_defenses import _load_runtime
-from tests.test_srd_lite_combat_target_facts import state
-from tests.test_srd_lite_mass_cure_geometry import NAMESPACE, _calls, _scene_entity
+from tests.srd_lite_combat_target_facts_fixtures import state
+from tests.srd_lite_mass_cure_geometry_fixtures import NAMESPACE, _calls, _scene_entity
 
 from sylvia_gm import dice
 from sylvia_gm.application.package_runtime import AuthorityMemoryStateBridge

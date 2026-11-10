@@ -26,8 +26,8 @@ from scripts.srd_lite_combat_scene_reentry import (
 from scripts.srd_lite_combat_scene_setup import GUIDANCE, ROOTS, _setup_effects
 from scripts.srd_lite_exploration_objects import _capture_tool, _reconcile_tool
 from scripts.srd_timed_actor_defenses import _load_runtime
-from tests.test_srd_lite_combat_scene_setup import initial
-from tests.test_srd_lite_mass_cure_geometry import NAMESPACE, _calls, _wall
+from tests.srd_lite_combat_scene_setup_fixtures import initial
+from tests.srd_lite_mass_cure_geometry_fixtures import NAMESPACE, _calls, _wall
 
 from sylvia_gm import dice
 from sylvia_gm.application.package_runtime import AuthorityMemoryStateBridge

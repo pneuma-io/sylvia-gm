@@ -17,8 +17,8 @@ from sylvia_gm import dice
 from sylvia_gm.runtime import RulesetRuntime
 from sylvia_gm.application.package_runtime import _json_safe
 from sylvia_gm.application.result_cards import project_result_card
-from tests.test_srd_lite_mass_cure_geometry import NAMESPACE, _calls
-from tests.test_srd_lite_steed_healing_touch import _case, _snapshot
+from tests.srd_lite_mass_cure_geometry_fixtures import NAMESPACE, _calls
+from tests.srd_lite_steed_healing_touch_fixtures import _case, _snapshot
 
 
 @pytest.fixture(scope='module')

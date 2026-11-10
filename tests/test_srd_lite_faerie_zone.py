@@ -3,7 +3,7 @@
 import json
 from tests.lite_imported_fixture import ImportedCase
 from tests.lite_fixture_archive import archive_closed_case
-from tests.test_srd_lite_zones import retain
+from tests.srd_lite_zones_fixtures import retain
 from sylvia_gm.domain.authority import thaw_json_value
 
 

@@ -8,8 +8,8 @@ import pytest
 from scripts.srd_lite_attacks import _copy_optional_fact
 from scripts.srd_lite_profiles import lists
 from scripts.srd_timed_actor_defenses import _load_runtime
-from tests.test_srd_lite_combat_target_facts import state
-from tests.test_srd_lite_instant_combat_areas import preflight
+from tests.srd_lite_combat_target_facts_fixtures import state
+from tests.srd_lite_instant_combat_areas_fixtures import preflight
 
 from sylvia_gm.runtime import RulesetRuntime
 

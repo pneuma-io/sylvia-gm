@@ -8,7 +8,7 @@ from copy import deepcopy
 import pytest
 from scripts.srd_lite_family_dispatch import ROOTS, omit_unselected_family_dispatch
 from scripts.srd_timed_actor_defenses import _load_runtime
-from tests.test_srd_lite_mass_cure_geometry import NAMESPACE
+from tests.srd_lite_mass_cure_geometry_fixtures import NAMESPACE
 
 
 def possibilities(node, family):

@@ -15,7 +15,7 @@ from sylvia_gm.application.schema_admission import validate_json_value
 from sylvia_gm.domain.authority import ActionStatus
 from sylvia_gm.domain.errors import CommandRejected, RulesetPreconditionRejected
 from sylvia_gm.domain.package_library import canonical_json_bytes, participant_schema_sha256
-from tests import test_srd_magic_jar as jar
+from tests import srd_magic_jar_fixtures as jar
 from tests import test_srd_plant_growth as growth
 from tests.test_srd_extended_casting import _begin
 from tests.test_srd_npc_spell_casting import _act

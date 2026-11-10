@@ -11,7 +11,7 @@ import yaml
 
 from sylvia_gm.domain.errors import RulesetPreconditionRejected
 from tests import test_srd_awaken as awaken
-from tests import test_srd_magic_jar as jar
+from tests import srd_magic_jar_fixtures as jar
 from tests.test_srd_extended_casting import _begin
 from tests.test_srd_spell_wave3_information import _entity, _scene
 

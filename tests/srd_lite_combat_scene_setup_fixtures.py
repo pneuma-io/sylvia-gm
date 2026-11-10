@@ -14,8 +14,8 @@ from scripts.srd_lite_combat_scene_setup import (
     bind_combat_scene_setup,
 )
 from scripts.srd_timed_actor_defenses import _load_runtime
-from tests.test_srd_lite_mass_cure_geometry import NAMESPACE, _calls, _wall
-from tests.test_srd_lite_multi_target_facts import scene
+from tests.srd_lite_mass_cure_geometry_fixtures import NAMESPACE, _calls, _wall
+from tests.srd_lite_multi_target_facts_fixtures import scene
 
 from sylvia_gm import dice
 from sylvia_gm.application.package_runtime import AuthorityMemoryStateBridge

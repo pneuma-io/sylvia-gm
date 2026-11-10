@@ -14,7 +14,7 @@ from sylvia_gm.domain.authority import thaw_json_value
 from sylvia_gm.runtime import RulesetRuntime
 from sylvia_gm.runtime._tool_executor import execute_tool
 from sylvia_gm.runtime._types import ExecutionBudget
-from tests.test_srd_lite_mass_cure_geometry import NAMESPACE, _calls
+from tests.srd_lite_mass_cure_geometry_fixtures import NAMESPACE, _calls
 
 ROOTS = ('resolve_srd_web_body_segment', 'resolve_srd_web_intervals',
          'resolve_srd_environment_point', 'resolve_srd_environment_segment')

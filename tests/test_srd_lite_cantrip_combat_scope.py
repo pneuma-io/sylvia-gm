@@ -9,9 +9,9 @@ from scripts.srd_lite_cantrip_combat_scope import COMBAT, LEAVES, ROOTS, bind_ca
 from scripts.srd_lite_offensive_cantrips import OFFENSIVE
 from scripts.srd_lite_profiles import lists
 from scripts.srd_timed_actor_defenses import _load_runtime
-from tests.test_srd_lite_combat_target_facts import state
-from tests.test_srd_lite_instant_combat_areas import preflight
-from tests.test_srd_lite_mass_cure_geometry import NAMESPACE, _calls, _wall
+from tests.srd_lite_combat_target_facts_fixtures import state
+from tests.srd_lite_instant_combat_areas_fixtures import preflight
+from tests.srd_lite_mass_cure_geometry_fixtures import NAMESPACE, _calls, _wall
 
 from sylvia_gm.runtime import RulesetRuntime
 

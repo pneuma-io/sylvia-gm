@@ -10,7 +10,7 @@ from sylvia_gm.runtime import RulesetRuntime
 from sylvia_gm.runtime._tool_executor import execute_tool
 from sylvia_gm.runtime._types import ExecutionBudget
 from scripts.srd_timed_actor_defenses import _load_runtime
-from tests.test_srd_lite_mass_cure_geometry import _calls
+from tests.srd_lite_mass_cure_geometry_fixtures import _calls
 
 NS = 'sylvia.srd-lite.bg3'
 

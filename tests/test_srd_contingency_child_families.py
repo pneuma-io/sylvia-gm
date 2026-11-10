@@ -14,9 +14,9 @@ from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.domain.authority import ActionStatus
 from sylvia_gm.runtime._effect_executor import execute_effects
 from sylvia_gm.runtime._types import ExecutionContext
-from tests import test_srd_contingency_child_casting as native
-from tests import test_srd_contingency_child_public as prior
-from tests import test_srd_contingency_combined_public as combined
+from tests import srd_contingency_child_casting_fixtures as native
+from tests import srd_contingency_child_public_fixtures as prior
+from tests import srd_contingency_combined_public_fixtures as combined
 from tests import test_srd_public_spell_casting as public_casting
 from tests.test_srd_npc_spell_casting import _act
 

@@ -7,7 +7,7 @@ import pytest
 import yaml
 from sylvia_gm import dice
 from sylvia_gm.runtime import RulesetRuntime
-from tests.test_srd_lite_steed_mount import _mount_case,_position
+from tests.srd_lite_steed_mount_fixtures import _mount_case,_position
 from scripts.srd_lite_steed_mount import MOUNT
 from scripts.srd_lite_steed_fey_step import ACTION,RIDER_FIELD,MOUNT_FIELD
 from scripts.srd_lite_steed_healing_touch import CHARGE

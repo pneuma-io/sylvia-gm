@@ -12,7 +12,7 @@ from sylvia_gm.application.package_runtime import AuthorityMemoryStateBridge
 from sylvia_gm.runtime import RulesetRuntime
 from sylvia_gm.runtime._tool_executor import execute_tool
 from sylvia_gm.runtime._types import ExecutionBudget
-from tests.test_srd_lite_mass_cure_geometry import NAMESPACE, _scene_entity, _calls
+from tests.srd_lite_mass_cure_geometry_fixtures import NAMESPACE, _scene_entity, _calls
 
 SPHERE = 'collect_srd_sunburst_creature_targets'
 FIRE = 'qualify_srd_lite_fire_storm_cubes'

@@ -11,7 +11,7 @@ import pytest
 from sylvia_gm import dice
 from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.domain.authority import ActionStatus
-from tests import test_srd_contingency_combined_public as combined
+from tests import srd_contingency_combined_public_fixtures as combined
 from tests import test_srd_public_spell_casting as public_casting
 from tests.test_srd_npc_spell_casting import _act
 

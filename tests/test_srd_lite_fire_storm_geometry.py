@@ -15,7 +15,7 @@ from sylvia_gm.runtime._types import ExecutionBudget
 from sylvia_gm.runtime._effect_executor import execute_effects
 from sylvia_gm.runtime._types import ExecutionContext
 from sylvia_gm import dice
-from tests.test_srd_lite_mass_cure_geometry import NAMESPACE, _scene_entity, _wall, _calls
+from tests.srd_lite_mass_cure_geometry_fixtures import NAMESPACE, _scene_entity, _wall, _calls
 
 
 def cube(minimum=(0, 0, 0), *, origin=None, include_origin=False):

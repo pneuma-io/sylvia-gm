@@ -11,7 +11,7 @@ from scripts.srd_actor_spell_modifiers import _emit
 from scripts.srd_control_behaviors import _param, _walk
 from scripts.srd_timed_actor_defenses import _load_runtime
 
-from tests import test_srd_contingency_child_casting as native
+from tests import srd_contingency_child_casting_fixtures as native
 from tests import test_srd_contingency_recovery_children as recovery
 
 ADOPTION = native.CURRENT / "scripts/srd_spell_removal_adoption.py"

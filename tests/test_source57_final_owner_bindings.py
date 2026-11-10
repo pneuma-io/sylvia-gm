@@ -7,7 +7,7 @@ from scripts import srd_contingency_child_casting as child
 from scripts.srd_control_behaviors import _walk
 from sylvia_gm.spatial import admit_spatial_scene
 
-from tests import test_srd_contingency_child_casting as native
+from tests import srd_contingency_child_casting_fixtures as native
 from tests import test_srd_contingency_removal as removal
 
 SOURCE_BINDINGS = {

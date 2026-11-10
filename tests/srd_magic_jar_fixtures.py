@@ -17,13 +17,13 @@ from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.domain.authority import ActionStatus, MechanicContext, owned_payload
 from sylvia_gm.domain.errors import RulesetPreconditionRejected
 from tests import test_srd_action_budget as budget
-from tests import test_srd_planar_binding as binding
+from tests import srd_planar_binding_fixtures as binding
 from tests import test_srd_public_spell_casting as public_casting
 from tests import test_srd_spell_result_cards as cards
 from tests.test_srd_extended_casting import _begin
-from tests.test_srd_illusion_removals import _prepare
+from tests.srd_illusion_removals_fixtures import _prepare
 from tests.test_srd_npc_spell_casting import _act, _prepare_mage
-from tests.test_srd_shared_source_adoption import _case as _source_case
+from tests.srd_shared_source_adoption_fixtures import _case as _source_case
 from tests.test_srd_spell_wave3_information import _entity
 
 SRD = cards.SRD

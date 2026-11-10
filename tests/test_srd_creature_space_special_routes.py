@@ -6,11 +6,11 @@ import pytest
 
 from scripts.srd_timed_actor_defenses import _load_runtime
 from sylvia_gm.runtime import RulesetRuntime
-from tests.test_srd_lite_mass_cure_geometry import _calls
-from tests import test_srd_lite_steed_mount as mount
-from tests import test_srd_lite_steed_fey_step as fey
-from tests import test_srd_lite_steed_turns as turns
-from tests.test_srd_lite_steed_mount import _position
+from tests.srd_lite_mass_cure_geometry_fixtures import _calls
+from tests import srd_lite_steed_mount_fixtures as mount
+from tests import srd_lite_steed_fey_step_fixtures as fey
+from tests import srd_lite_steed_turns_fixtures as turns
+from tests.srd_lite_steed_mount_fixtures import _position
 
 
 @pytest.fixture(scope='module')

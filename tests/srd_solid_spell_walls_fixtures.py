@@ -28,7 +28,7 @@ from sylvia_gm.domain.errors import RulesetPreconditionRejected
 from sylvia_gm.domain.package_library import ToolDeclaration
 from sylvia_gm.runtime._schema_validator import validate_ruleset_data
 from tests import test_srd_action_budget as actions
-from tests import test_srd_prismatic_wall as wall
+from tests import srd_prismatic_wall_fixtures as wall
 from tests import test_srd_spell_object_content as objects
 from tests import test_srd_spell_result_cards as cards
 

@@ -10,7 +10,7 @@ import pytest
 from scripts.srd_lite_instant_area import QUALIFY, bind_instant_combat_areas
 from scripts.srd_lite_instant_area_pruning import omit_unselected_instant_area_branches
 from scripts.srd_timed_actor_defenses import _load_runtime
-from tests.test_srd_lite_mass_cure_geometry import NAMESPACE, _calls, _scene_entity, _wall
+from tests.srd_lite_mass_cure_geometry_fixtures import NAMESPACE, _calls, _scene_entity, _wall
 from tests.test_srd_lite_vertical_cones import run, state_for
 
 from sylvia_gm import dice

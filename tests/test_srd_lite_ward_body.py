@@ -8,7 +8,7 @@ import pytest
 import yaml
 from scripts.srd_lite_ward_body import bind_ward_recipient_bodies
 from sylvia_gm.runtime import RulesetRuntime
-from tests.test_srd_lite_mass_cure_geometry import NAMESPACE, _calls
+from tests.srd_lite_mass_cure_geometry_fixtures import NAMESPACE, _calls
 from tests.test_srd_lite_vertical_cones import run, state_for
 
 TOOL = "resolve_srd_spell_ward_benefits"

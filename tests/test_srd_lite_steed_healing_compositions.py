@@ -11,8 +11,8 @@ from sylvia_gm.application.package_runtime import _json_safe
 from sylvia_gm.application.result_cards import project_result_card
 from sylvia_gm.application.result_card_admission import validate_result_card_declaration
 from scripts.srd_lite_catalogue import SELECTED
-from tests.test_srd_lite_steed_healing_touch import bound as touch_bound, _case
-from tests.test_srd_lite_mass_cure_geometry import _calls
+from tests.srd_lite_steed_healing_touch_fixtures import bound as touch_bound, _case
+from tests.srd_lite_mass_cure_geometry_fixtures import _calls
 
 
 @pytest.fixture(scope='module')

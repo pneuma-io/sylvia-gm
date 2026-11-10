@@ -30,8 +30,8 @@ from sylvia_gm.runtime import RulesetRuntime, _effect_executor
 from sylvia_gm.runtime._tool_executor import execute_tool
 from sylvia_gm.runtime._types import ExecutionBudget
 from tests.test_srd_lite_control_area_geometry import state
-from tests.test_srd_lite_instant_combat_areas import preflight
-from tests.test_srd_lite_mass_cure_geometry import NAMESPACE, _calls
+from tests.srd_lite_instant_combat_areas_fixtures import preflight
+from tests.srd_lite_mass_cure_geometry_fixtures import NAMESPACE, _calls
 
 
 @pytest.fixture(scope="module")

@@ -18,8 +18,8 @@ from scripts.srd_lite_flame_strike_geometry import bind_flame_strike_combat_cyli
 from scripts.srd_timed_actor_defenses import _load_runtime
 
 from sylvia_gm.runtime import RulesetRuntime
-from tests.test_srd_lite_instant_combat_areas import preflight, scene
-from tests.test_srd_lite_mass_cure_geometry import NAMESPACE, _calls, _scene_entity, _wall
+from tests.srd_lite_instant_combat_areas_fixtures import preflight, scene
+from tests.srd_lite_mass_cure_geometry_fixtures import NAMESPACE, _calls, _scene_entity, _wall
 
 
 @pytest.fixture(scope="module")

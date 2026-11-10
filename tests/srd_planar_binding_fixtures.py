@@ -22,9 +22,9 @@ from tests import test_srd_action_budget as budget
 from tests import test_srd_public_spell_casting as public_casting
 from tests import test_srd_spell_result_cards as cards
 from tests.test_srd_extended_casting import _begin
-from tests.test_srd_illusion_removals import _prepare
+from tests.srd_illusion_removals_fixtures import _prepare
 from tests.test_srd_npc_spell_casting import _act
-from tests.test_srd_shared_source_adoption import _case as _source_case
+from tests.srd_shared_source_adoption_fixtures import _case as _source_case
 
 SRD = cards.SRD
 

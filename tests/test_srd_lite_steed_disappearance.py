@@ -12,9 +12,9 @@ from scripts.srd_lite_steed_mount import MOUNT
 from scripts.srd_lite_steed_turns import RIDER, STEED, BUDGET, FIELDS
 from sylvia_gm import dice
 from sylvia_gm.runtime import RulesetRuntime
-from tests.test_srd_lite_mass_cure_geometry import NAMESPACE, _calls
-from tests.test_srd_lite_steed_healing_touch import _snapshot
-from tests.test_srd_lite_steed_mount import _mount_case, _position
+from tests.srd_lite_mass_cure_geometry_fixtures import NAMESPACE, _calls
+from tests.srd_lite_steed_healing_touch_fixtures import _snapshot
+from tests.srd_lite_steed_mount_fixtures import _mount_case, _position
 
 
 @pytest.fixture(scope='module')

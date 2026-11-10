@@ -12,7 +12,7 @@ from sylvia_gm.application.package_runtime import AuthorityMemoryStateBridge
 from sylvia_gm.runtime import RulesetRuntime
 from sylvia_gm.runtime._tool_executor import execute_tool
 from sylvia_gm.runtime._types import ExecutionBudget
-from tests.test_srd_lite_mass_cure_geometry import NAMESPACE, _calls, _scene_entity
+from tests.srd_lite_mass_cure_geometry_fixtures import NAMESPACE, _calls, _scene_entity
 
 EXPOSE = 'expose_srd_retained_web_fire'
 OBSERVE = 'observe_srd_retained_web_fire'

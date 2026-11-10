@@ -19,7 +19,7 @@ from sylvia_gm.application.package_materialization import NormalizedPackageDraft
 from sylvia_gm.domain.authority import ActionStatus
 from sylvia_gm.domain.package_library import canonical_json_bytes
 from tests import test_srd_public_spell_casting as public_casting
-from tests import test_srd_solid_spell_walls as schema_owner
+from tests import srd_solid_spell_walls_fixtures as schema_owner
 from tests import test_srd_spell_result_cards as cards
 from tests.test_srd_npc_spell_casting import _act
 
