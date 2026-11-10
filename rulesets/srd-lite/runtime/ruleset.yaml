@@ -73505,11 +73505,6 @@ tools:
       error: Input 'verbal_component_available' is unavailable for this spell.
     - condition: spell not in definitions.spell_casting or 'somatic' not in definitions.spell_casting[spell].components
         or (caster == null and caster_state.spellcasting_profile.component_exemptions != null and 'somatic'
-        in caster_state.spellcasting_profile.component_exemptions) or somatic_component_available != null
-      error: Missing input 'somatic_component_available'. Supply the current scene fact or a saved stat-block
-        exemption.
-    - condition: spell not in definitions.spell_casting or 'somatic' not in definitions.spell_casting[spell].components
-        or (caster == null and caster_state.spellcasting_profile.component_exemptions != null and 'somatic'
         in caster_state.spellcasting_profile.component_exemptions) or somatic_component_available == null
         or somatic_component_available == true
       error: Input 'somatic_component_available' is unavailable for this spell.
@@ -86505,11 +86500,6 @@ tools:
       error: Input 'verbal_component_available' is unavailable for this spell.
     - condition: spell not in definitions.spell_casting or 'somatic' not in definitions.spell_casting[spell].components
         or (caster == null and caster_state.spellcasting_profile.component_exemptions != null and 'somatic'
-        in caster_state.spellcasting_profile.component_exemptions) or somatic_component_available != null
-      error: Missing input 'somatic_component_available'. Supply the current scene fact or a saved stat-block
-        exemption.
-    - condition: spell not in definitions.spell_casting or 'somatic' not in definitions.spell_casting[spell].components
-        or (caster == null and caster_state.spellcasting_profile.component_exemptions != null and 'somatic'
         in caster_state.spellcasting_profile.component_exemptions) or somatic_component_available == null
         or somatic_component_available == true
       error: Input 'somatic_component_available' is unavailable for this spell.
@@ -97579,11 +97569,6 @@ tools:
       error: Input 'verbal_component_available' is unavailable for this spell.
     - condition: spell not in definitions.spell_casting or 'somatic' not in definitions.spell_casting[spell].components
         or (caster == null and caster_state.spellcasting_profile.component_exemptions != null and 'somatic'
-        in caster_state.spellcasting_profile.component_exemptions) or somatic_component_available != null
-      error: Missing input 'somatic_component_available'. Supply the current scene fact or a saved stat-block
-        exemption.
-    - condition: spell not in definitions.spell_casting or 'somatic' not in definitions.spell_casting[spell].components
-        or (caster == null and caster_state.spellcasting_profile.component_exemptions != null and 'somatic'
         in caster_state.spellcasting_profile.component_exemptions) or somatic_component_available == null
         or somatic_component_available == true
       error: Input 'somatic_component_available' is unavailable for this spell.
@@ -103973,11 +103958,6 @@ tools:
         in caster_state.spellcasting_profile.component_exemptions) or verbal_component_available == null
         or verbal_component_available == true
       error: Input 'verbal_component_available' is unavailable for this spell.
-    - condition: spell not in definitions.spell_casting or 'somatic' not in definitions.spell_casting[spell].components
-        or (caster == null and caster_state.spellcasting_profile.component_exemptions != null and 'somatic'
-        in caster_state.spellcasting_profile.component_exemptions) or somatic_component_available != null
-      error: Missing input 'somatic_component_available'. Supply the current scene fact or a saved stat-block
-        exemption.
     - condition: spell not in definitions.spell_casting or 'somatic' not in definitions.spell_casting[spell].components
         or (caster == null and caster_state.spellcasting_profile.component_exemptions != null and 'somatic'
         in caster_state.spellcasting_profile.component_exemptions) or somatic_component_available == null
@@ -116139,11 +116119,6 @@ tools:
         in caster_state.spellcasting_profile.component_exemptions) or verbal_component_available == null
         or verbal_component_available == true
       error: Input 'verbal_component_available' is unavailable for this spell.
-    - condition: spell not in definitions.spell_casting or 'somatic' not in definitions.spell_casting[spell].components
-        or (caster == null and caster_state.spellcasting_profile.component_exemptions != null and 'somatic'
-        in caster_state.spellcasting_profile.component_exemptions) or somatic_component_available != null
-      error: Missing input 'somatic_component_available'. Supply the current scene fact or a saved stat-block
-        exemption.
     - condition: spell not in definitions.spell_casting or 'somatic' not in definitions.spell_casting[spell].components
         or (caster == null and caster_state.spellcasting_profile.component_exemptions != null and 'somatic'
         in caster_state.spellcasting_profile.component_exemptions) or somatic_component_available == null
@@ -292275,11 +292250,6 @@ tools:
       error: Input 'verbal_component_available' is unavailable for this spell.
     - condition: spell not in definitions.spell_casting or 'somatic' not in definitions.spell_casting[spell].components
         or (caster == null and caster_state.spellcasting_profile.component_exemptions != null and 'somatic'
-        in caster_state.spellcasting_profile.component_exemptions) or somatic_component_available != null
-      error: Missing input 'somatic_component_available'. Supply the current scene fact or a saved stat-block
-        exemption.
-    - condition: spell not in definitions.spell_casting or 'somatic' not in definitions.spell_casting[spell].components
-        or (caster == null and caster_state.spellcasting_profile.component_exemptions != null and 'somatic'
         in caster_state.spellcasting_profile.component_exemptions) or somatic_component_available == null
         or somatic_component_available == true
       error: Input 'somatic_component_available' is unavailable for this spell.
@@ -368745,7 +368715,9 @@ parameter_declarations:
     name: somatic_component_available
     type: boolean
     required: false
-    default: false
+    default: true
+    description: Defaults to true. Held weapons, shields and other items never prevent spell gestures,
+      in or out of combat. Set false only when the scene prevents the caster from moving enough to gesture.
   param_source_advantage_73b8ea520c99d0ef:
     name: source_advantage
     type: boolean
@@ -369435,9 +369407,9 @@ parameter_declarations:
     name: somatic_component_available
     type: boolean
     required: false
-    description: Required for a spell with a Somatic component unless the saved NPC stat block waives
-      it. True only if the caster can perform the required gestures with a hand; a hand accessing
-      the spell material can also gesture.
+    description: Defaults to true. Held weapons, shields and other items never prevent spell gestures,
+      in or out of combat. Set false only when the scene prevents the caster from moving enough to gesture.
+    default: true
   param_verbal_component_available_40963c36e86ec0e0:
     name: verbal_component_available
     type: boolean

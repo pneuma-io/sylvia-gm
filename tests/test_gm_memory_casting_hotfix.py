@@ -5,6 +5,7 @@ import json
 import re
 import shutil
 from importlib.resources import files
+from pathlib import Path
 
 import pytest
 
@@ -257,6 +258,26 @@ def test_actual_gm_catalog_excludes_permanent_refusals_and_preserves_lock(lite_s
     }
 
 
+def test_retained_alpha4_catalog_filters_stubs_without_upgrading_the_saved_pin(tmp_path):
+    archive = (Path(__file__).parent / "fixtures/alpha4-lite.sylvia-gm-package").read_bytes()
+    database = create_cleric_save(tmp_path / "retained.sqlite3", archive)
+    with AuthorityOwner.open(database, "hotfix-owner", disconnect_grace_seconds=1.0) as owner:
+        before = owner.current_package_lock("casting")
+        primary = next(p for p in before.package_lock.entries if p.role is PackageRole.PRIMARY)
+        assert primary.version == "0.3.15"
+        declarations = owner.package_record(primary.package_id, primary.version, primary.sha256)[
+            "tools"
+        ]
+        assert any(tool["name"] == "select_srd_clone_body" for tool in declarations)
+        request = play(owner, CaptureGM(), campaign="casting", turn="casting-turn")
+        assert owner.current_package_lock("casting") == before
+    names = [tool["function"]["name"] for tool in request["tools"]]
+    assert not any(name.endswith("_select_srd_clone_body") for name in names)
+    assert any(name.endswith("_cast_spell_outside_combat") for name in names)
+    assert any(name.endswith("_read_campaign_reference") for name in names)
+    assert len(names) == 154
+
+
 class CaptureGM(LibraryProvider):
     """Capture assembled requests and settle using the advertised campaign-file tool."""
 
@@ -344,6 +365,7 @@ class HealingGM(CaptureGM):
             self.refusals.append(result)
             feedback = json.dumps(result)
             missing = set(re.findall(r"Missing input '([^']+)'", feedback))
+            assert "somatic_component_available" not in missing
             for name in missing:
                 assert name in schema["properties"], (name, result)
                 if name in {"caster", "caster_state", "target"}:
@@ -467,8 +489,8 @@ def test_advertised_healing_flow_corrects_once_and_commits_exact_effects(lite_sa
         "target",
         "slot_resource",
         "verbal_component_available",
-        "somatic_component_available",
     }
+    assert "somatic_component_available" not in provider.arguments
     assert "validation.issues" not in refused["instruction"]
     assert after.state[f"{SRD}.entities"]["hero"]["hp"] == 9
     assert after.state[f"{SRD}.entities"]["hero"]["resources"]["spell_slot_1"] == 1
@@ -479,6 +501,25 @@ def test_advertised_healing_flow_corrects_once_and_commits_exact_effects(lite_sa
     assert len(committed) == 1
     assert committed[0].parameters["spell"] == "cure_wounds"
     assert committed[0].parameters["target"] == "hero"
+
+
+def test_explicitly_unavailable_somatic_component_refuses_without_spending(lite_save, tmp_path):
+    database = tmp_path / "somatic-refused.sqlite3"
+    shutil.copyfile(lite_save, database)
+    provider = DefectGM(
+        "cast_spell_outside_combat",
+        {"caster_state": "hero", "spell": "Cure Wounds", "target": "hero",
+         "slot_resource": "spell_slot_1", "verbal_component_available": True,
+         "somatic_component_available": False},
+    )
+    with AuthorityOwner.open(database, "hotfix-owner", disconnect_grace_seconds=1.0) as owner:
+        before = owner.snapshot("casting")
+        play(owner, provider, campaign="casting", turn="casting-turn")
+        after = owner.snapshot("casting")
+    assert provider.receipt["status"] == "rejected"
+    assert provider.receipt["state_changed"] is False
+    assert "somatic_component_available" in json.dumps(provider.receipt)
+    assert after.state == before.state and after.revision == before.revision
 
 
 def play(owner, provider, *, campaign="memory", session="gm", turn="turn", user_text="I wait."):

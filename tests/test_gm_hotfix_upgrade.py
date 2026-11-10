@@ -60,12 +60,20 @@ def test_reviewed_input_changes_keep_authority_and_executable_schema_fences():
     incoming = replace(prior, input_schema=owned_payload(choices))
     assert _tool_input_change(prior, incoming) == "changed_input_choices"
     assert _tool_input_change(incoming, prior) == "changed_input_choices"
+    guidance = deepcopy(schema)
+    guidance["properties"]["choice"]["description"] = "Choose the actual scene fact."
+    described = replace(prior, input_schema=owned_payload(guidance))
+    assert _tool_input_change(prior, described) == "changed_model_guidance"
+    assert _tool_input_change(described, prior) == "changed_model_guidance"
+    guidance["properties"]["choice"]["description"] = False
+    assert _tool_input_change(prior, replace(prior, input_schema=owned_payload(guidance))) is None
     assert _tool_input_change(prior, replace(incoming, writers=("player",))) is None
     assert _tool_input_change(prior, replace(incoming, capability="another.capability")) is None
     for key, value in [
         ("type", "integer"),
         ("x-sylvia-gm-reference", "participant"),
         ("maxLength", 2),
+        ("default", True),
         ("x-sylvia-gm-model-required", "invalid"),
     ]:
         changed = deepcopy(choices)
@@ -182,7 +190,7 @@ def test_saved_pending_queue_invalidates_review_without_rewriting_it(prepared):
 
 def test_upgrade_keeps_custom_setting_files_and_records(tmp_path):
     fixture = Path(__file__).parent / "fixtures"
-    origin = "alpha4" if bundled_srd_version() == "0.3.16" else "integration"
+    origin = "alpha4" if bundled_srd_version() == "0.3.17" else "integration"
     with zipfile.ZipFile(fixture / "alpha4-lite.sylvia-gm-package") as published:
         world_record = next(
             r
@@ -270,8 +278,8 @@ def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state
             for r in json.loads(bundle.read("manifest.json"))["packages"]
             if r["role"] == "primary"
         )
-    assert current_version in {"0.3.16", "0.3.17"}
-    if current_version == "0.3.16" and origin == "integration":
+    assert current_version in {"0.3.17", "0.3.18"}
+    if current_version == "0.3.17" and origin == "integration":
         # Alpha4's schema refuses newer main-only panel metadata before it can be installed.
         with pytest.raises(CommandRejected, match="manifest fields are invalid"):
             create_cleric_save(database, archive)
@@ -325,7 +333,7 @@ def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state
         assert options["candidates"], options
         candidate = options["candidates"][0]["candidate_id"]
         preview = owner.preview_campaign_rules_update("casting", candidate)
-        if current_version != ("0.3.16" if origin == "alpha4" else "0.3.17"):
+        if current_version != ("0.3.17" if origin == "alpha4" else "0.3.18"):
             assert not preview["compatible"]
             assert any(".panels." in c["path"] for c in preview["conflicts"])
             with pytest.raises(CommandRejected, match="conflicts"):
