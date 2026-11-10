@@ -1894,6 +1894,7 @@ def _dispatch_selected(
     reload_provider_resolver: Callable[[], None] | None = None,
     gm_system_prompt: str | None = None,
 ) -> Any:
+    from .commands import packages
     from .commands import actions
     from .commands import builder
     from .commands import campaigns
@@ -1956,7 +1957,7 @@ def _dispatch_selected(
     if method in {"campaign_sequel_context", "preview_campaign_sequel", "append_campaign_sequel"}:
         return campaigns.handle_append_campaign_sequel(ctx, params)
     if method == "package_candidates":
-        return ctx.bus.package_candidates()
+        return packages.handle_package_candidates(ctx, params)
     if method == "campaign_rules_update_options":
         return campaigns.handle_campaign_rules_update_options(ctx, params)
     if method == "preview_campaign_rules_update":
@@ -1964,18 +1965,11 @@ def _dispatch_selected(
     if method == "adopt_campaign_rules_update":
         return campaigns.handle_adopt_campaign_rules_update(ctx, params)
     if method == "inspect_package_candidate":
-        return ctx.bus.inspect_package_candidate(_required_text(params, "candidate_id"))
+        return packages.handle_inspect_package_candidate(ctx, params)
     if method == "package_candidate_text":
-        return ctx.bus.package_candidate_text(
-            _required_text(params, "candidate_id"),
-            _required_text(params, "package_id"),
-            _required_text(params, "path"),
-        )
+        return packages.handle_package_candidate_text(ctx, params)
     if method == "compare_package_candidates":
-        return ctx.bus.compare_package_candidates(
-            _required_text(params, "left_candidate_id"),
-            _required_text(params, "right_candidate_id"),
-        )
+        return packages.handle_compare_package_candidates(ctx, params)
     if method == "rift_template":
         return campaigns.handle_rift_template(ctx, params)
     if method == "campaign_party_options":
@@ -3331,66 +3325,12 @@ def _dispatch_selected(
             )
         }
     if method == "install_package":
-        archive_text = _required_text(params, "archive_base64")
-        try:
-            archive_bytes = base64.b64decode(archive_text, validate=True)
-        except (binascii.Error, ValueError) as error:
-            raise OwnerProtocolError("archive_base64 is invalid") from error
-        if len(archive_bytes) > _MAX_PACKAGE_BYTES:
-            raise OwnerProtocolError("Package archive exceeds the desktop import limit")
-        return ctx.bus.install_package(
-            io.BytesIO(archive_bytes),
-            install_id=_required_text(params, "install_id"),
-        )
+        return packages.handle_install_package(ctx, params)
     if method in ("preview_character_card_file", "confirm_character_card_import"):
-        from sylvia_gm.application.character_card_import import (
-            confirm_card_preview,
-            stage_card_preview,
-        )
-        try:
-            if method == "preview_character_card_file":
-                return stage_card_preview(ctx.storage_root, Path(_required_text(params, "source_path")))
-            return confirm_card_preview(ctx.storage_root, _required_text(params, "source_sha256"))
-        except (ValueError, OSError) as error:
-            raise CommandRejected(str(error), code="character_card_invalid") from error
+        return packages.handle_confirm_character_card_import(ctx, params)
 
     if method == "install_package_file":
-        source = Path(_required_text(params, "source_path")).expanduser().resolve()
-        try:
-            if not source.is_file():
-                raise CommandRejected("Selected package file is unavailable")
-            is_plan = source.suffix.lower() == ".sylvia-gm-plan"
-            maximum = PLAN_BUNDLE_BYTE_LIMIT if is_plan else _MAX_PACKAGE_BYTES
-            if source.stat().st_size > maximum:
-                raise CommandRejected("Package archive exceeds the desktop import limit")
-            with source.open("rb") as archive_stream:
-                try:
-                    if is_plan:
-                        return import_plan_bundle(
-                            ctx.storage_root, archive_stream,
-                            install_snapshot=lambda snapshot, expected: _install_plan_snapshot(
-                                ctx.application_owner, snapshot, expected,
-                            ),
-                        ).catalog_payload()
-                    return ctx.bus.install_package(
-                        archive_stream,
-                        install_id=_required_text(params, "install_id"),
-                    )
-                except (AuthorityError, ValueError) as error:
-                    repair = offer_import_repair(
-                        ctx.storage_root, source,
-                        install_id=_required_text(params, "install_id"), error=error,
-                    )
-                    if repair is not None:
-                        return repair
-                    raise
-        except (ValueError, zipfile.BadZipFile) as error:
-            raise CommandRejected(
-                "Content archive could not be admitted. Check its format and content, "
-                "then export a new copy using Store or Deflate ZIP compression."
-            ) from error
-        except OSError as error:
-            raise CommandRejected("Selected package file is unavailable") from error
+        return packages.handle_install_package_file(ctx, params)
 
     if method == "start_rift_campaign":
         return campaigns.handle_start_rift_campaign(ctx, params)
@@ -3534,17 +3474,7 @@ def _dispatch_selected(
     if method == "export_campaign_plan_file":
         return campaigns.handle_export_campaign_plan_file(ctx, params)
     if method in {"export_package_candidate", "export_package_candidate_file"}:
-        export_id = _required_artifact_id(params, "export_id")
-        target = ctx.storage_root / "exports" / f"{export_id}.sylvia-gm-package"
-        target.parent.mkdir(parents=True, exist_ok=True)
-        with target.open("wb") as stream:
-            result = ctx.bus.export_package_candidate(
-                _required_text(params, "candidate_id"),
-                stream,
-            )
-        if method == "export_package_candidate_file":
-            return {"export": result, "artifact_path": str(target.resolve(strict=True))}
-        return result
+        return packages.handle_export_package_candidate(ctx, params)
     if method in {"export_campaign", "export_campaign_file"}:
         return campaigns.handle_export_campaign(ctx, params)
     if method == "recover_campaign":
