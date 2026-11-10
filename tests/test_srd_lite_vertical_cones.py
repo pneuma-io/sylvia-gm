@@ -114,11 +114,18 @@ def test_selected_vertical_apex_stays_in_the_actual_source(cones):
 
 
 @pytest.mark.parametrize(('direction', 'apex'), [
-    ([1, 0, 1], []), ([0, 0, 0], []), ([0, 0, 1], [0, 0, 7])])
+    ([0, 0, 0], []), ([0, 0, 1], [0, 0, 7])])
 def test_unsupported_or_invalid_intent_fails_before_mutation(cones, direction, apex):
     result = run(cones, state_for([0, 0, 10]), COLLECT,
         {'source_state': 'hero', 'length_feet': 15, 'direction': direction, 'apex': apex})
     assert not result.success
+
+
+def test_tilted_direction_uses_the_current_three_dimensional_cone(cones):
+    result = run(cones, state_for([8, 0, 8]), COLLECT,
+        {'source_state': 'hero', 'length_feet': 15, 'direction': [1, 0, 1]})
+    assert result.success, result.error
+    assert 'guard' in result.context['_srd_cone_targets']
 
 
 def test_non_creature_scenery_is_not_a_breath_target(cones):

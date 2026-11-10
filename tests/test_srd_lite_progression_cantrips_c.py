@@ -284,7 +284,10 @@ def test_complete_acolyte_thaumaturgy_mending_world_consumers_cost_expiry_and_re
 
         mending = _cast_parameters("mending", object_target_id="relic", object_break_id="tear")
         case.reject("cast_spell_outside_combat", mending)
-        _act(case, history, "begin_srd_spell_cast", **_cast_parameters("mending"))
+        _act(case, history, "begin_srd_spell_cast", **{
+            key: value for key, value in _cast_parameters("mending").items()
+            if key not in {"target_distance", "caster_can_touch_target", "cover"}
+        })
         assert case.entities()["hero"]["extended_casting"]["required_rounds"] == 10
         assert case.entities()["hero"]["extended_casting"]["progress_rounds"] == 0
         assert case.entities()["hero"]["concentration_spell_id"] == "mending"
@@ -297,7 +300,7 @@ def test_complete_acolyte_thaumaturgy_mending_world_consumers_cost_expiry_and_re
         _act(case, history, "continue_srd_spell_cast", elapsed_rounds=1, **continuation)
         assert case.entities()["hero"]["extended_casting"]["progress_rounds"] == 10
         case.reject("cast_spell_outside_combat", mending | {"object_break_id": "oversized"}, match="one foot")
-        case.reject("cast_spell_outside_combat", mending | {"object_target_id": "far_relic", "target_distance": 40, "caster_can_touch_target": False}, match="range")
+        case.reject("cast_spell_outside_combat", mending | {"object_target_id": "far_relic", "target_distance": 40, "caster_can_touch_target": False}, match="within reach")
         case.reject("cast_spell_outside_combat", mending | {"somatic_component_available": False})
         repair = _cast(case, history, "mending", object_target_id="relic", object_break_id="tear")
         cards.append(thaw_json_value(repair.result["result_card"]))

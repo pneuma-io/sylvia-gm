@@ -12,6 +12,6 @@ def test_daggers_movement_card_survives_guardian_rows(make_case,tmp_path):
     damage=before-case.entities()['guard']['hp']
     card=save_card(tmp_path,'daggers-movement',receipt)
     assert damage>0
-    assert any(row['label']=='guard' and row['value']==f'Cloud of Daggers: {damage} slashing' for row in card['summary'])
+    assert any(row['label']=='Cloud of Daggers slashing damage' and row['value']==damage for row in card['summary'])
     assert any(row['label']=='guard' and '4d4' in row['value'] for row in card['details'])
     assert not any(row['label']=='Guardian radiant damage' for row in card['summary'])

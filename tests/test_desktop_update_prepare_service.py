@@ -5,13 +5,19 @@ from types import SimpleNamespace
 
 import pytest
 
-from sylvia_gm.application.desktop_update import service
+from sylvia_gm.application.desktop_update import launch, service
 from sylvia_gm.application.desktop_update.controller import UpdateController
 from sylvia_gm.application.desktop_update.launch import Installation
 from sylvia_gm.application.desktop_update.manifest import UpdateError, Version
 from tests.test_desktop_update_lifecycle import ReleaseFixture
 from tests.test_desktop_update_manifest import accept_stub
 from tests.test_desktop_update_preparation import fixture
+
+
+@pytest.fixture(autouse=True)
+def synthetic_old_installation(monkeypatch):
+    monkeypatch.setattr(launch, "__version__", "0.3.0-alpha.1")
+    monkeypatch.setattr(service, "__version__", "0.3.0-alpha.1")
 
 
 def setup(tmp_path):
