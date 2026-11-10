@@ -32,8 +32,8 @@ test('actual Lite panels, Settings, separate drafts and reopen at desktop and ph
           await page.getByRole('button', { name: 'Sign in', exact: true }).click();
         }
         await page.locator('#home-view').waitFor({ state: 'visible' });
-        await page.locator('#home-tutorial').waitFor({ state: 'visible' });
-        await page.keyboard.press('Escape');
+        await page.locator('#connecting-overlay').waitFor({ state: 'hidden' });
+        await page.locator('#home-tutorial').waitFor({ state: 'hidden' });
         // Cold Lite projection materialization is backend work; keep UI readiness bounded after its reply.
         const initialPanels = page.waitForResponse(response => {
           if (new URL(response.url()).pathname !== '/api/command') return false;
