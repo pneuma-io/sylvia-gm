@@ -39,7 +39,8 @@ Fast mode is off. No prompts or checks are tuned for an individual model.
 
 1. Qualify the supported account/API route using the synthetic fixture. Qualification observations
    stay separate from comparison scores.
-2. Freeze one `gm-trial-v1` pack and verify it before each run. Keep this exact artifact for later
+2. Freeze one named pack and verify it before each run. The first funded sample uses `selftest-v1`.
+   Keep this exact artifact for later
    batches. Use the same application/content bytes, scenario versions and paired-dice policy.
 3. Run T1 healing, T2 secret and T3 save/reopen recall twice per setup: six runs per model. Use at
    most two manual retries and sixteen Sylvia provider calls per run. Preserve unsuccessful first
@@ -75,8 +76,9 @@ model from its transport and serving instructions.
 
 ## Spending and privacy
 
-Additional spending is zero. ChatGPT must use Sylvia's managed account connection. Claude requires
-a supported API key and verified included-credit funding with no paid fallback; a Claude app login
+Do not buy credits, enable automatic reload or reset a usage limit. Existing balances may be used
+only when the account owner has explicitly selected that funding policy. ChatGPT must use Sylvia's
+managed account connection. Claude requires a supported API key and selected funding; a Claude app login
 alone does not establish that route. Defer any unfunded API runs and retain those families as pending.
 Haiku through Go is a separately identified setup.
 For OCG, disable Extra Usage or verify that no paid balance and no automatic top-up can fund it.

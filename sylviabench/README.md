@@ -158,7 +158,7 @@ their weight. Reports show sample counts, interruptions and measured waits; with
 runs per observed scenario they also show bootstrap bands for this fixed scenario set. These
 bands do not establish player-experience validity. No reference-relative verdict thresholds are set.
 
-## Connecting a model later
+## Connect a live model
 
 The runner has an explicitly enabled route to Sylvia's configured provider resolver. A `model`
 setup names an exact `provider_id`, `model_id` and `owner_config` path. It cannot execute unless
@@ -176,10 +176,11 @@ Retry. Sylvia's transport-level retries retain their product policy and can make
 attempts. The manifest records this bound. Provider adapter identity is recorded as adapter evidence;
 it is not automatically treated as an independently confirmed service identity.
 
-That code path has no live acceptance claim. Headless ChatGPT account authentication, provider
-usage extraction, cost limits, service-failure rerun policy and natural-language checker calibration
-must be qualified before using it for comparisons. Select the models, connection access and
-spending limits first. The framework does not enforce a monetary spending cap or infer subscription
+The first pilot qualified headless managed ChatGPT authentication and Go routes using both supported
+API formats. That establishes those selected connections, not general access to every listed model.
+Provider usage and service identity remain dependent on what the route actually reports. Natural-language
+checker calibration is still limited to the supplied controls and bounded patterns. Select the models,
+connection access and funding policy before a live run. The framework does not enforce a monetary spending cap or infer subscription
 quota from elapsed time. The explicit opt-in is an execution switch, not evidence of a budget.
 
 Provider configuration stays at the explicitly selected local path and is never copied into the
