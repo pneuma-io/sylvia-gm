@@ -3496,6 +3496,186 @@
         "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for Needle, one individual adult Lace Brother in Severed Lands. Input image 1 is the canonical full-body identity and exact costume/equipment reference. Preserve that one person's face, age, build, skin, hairstyle, hair color, outfit, colors and equipment. One landscape PNG, 1536x1024. Polished naturalistic digital RPG illustration on a plain light neutral gray background, soft consistent studio light. Show front, exact side profile and back views of the SAME person as three complete standing figures at one common scale, with comfortable margins around all hair/hands/feet; one additional close facial detail. Repeated views of a single identity, no other siblings. Appearance: A young adult humanlike Riftborn man in his early twenties, medium warm brown skin, slim slightly tall build, dark hazel eyes, a broad brow and narrow chin, straight black hair tied in one short neat braid at the nape, clean-shaven. Focused observant expression and an upright attentive posture. Faded slate-blue waistcoat over an oatmeal shirt with rolled sleeves, charcoal trousers, simple brown lace-up shoes, a plain belt with a small document pouch. Holds a modest closed worn brown ledger at his side; no readable writing or weapon displayed. He shares a subtle family resemblance with his two brothers, who remain separate people. No revealed home world, unusual anatomy, faction symbols or invented rank. Keep accessories physically consistent between views. No captions, text, labels, borders, UI, magical effects or invented emblems.",
         "portrait": "Use case: identity-preserve. One square app portrait of Needle, an individual adult Lace Brother from Severed Lands. Input image 1 is his canonical full-body reference; input image 2 is his multiview sheet. Preserve his exact face, age, hairstyle, skin tone, eye color, expression and costume. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft studio light. Head and upper shoulders, looking near-forward, face horizontally centered, eyes near 35 percent down, chin near 65 percent down, comfortable space above all hair. No other siblings. Appearance: A young adult humanlike Riftborn man in his early twenties, medium warm brown skin, slim slightly tall build, dark hazel eyes, a broad brow and narrow chin, straight black hair tied in one short neat braid at the nape, clean-shaven. Focused observant expression and an upright attentive posture. Faded slate-blue waistcoat over an oatmeal shirt with rolled sleeves, charcoal trousers, simple brown lace-up shoes, a plain belt with a small document pouch. Holds a modest closed worn brown ledger at his side; no readable writing or weapon displayed. He shares a subtle family resemblance with his two brothers, who remain separate people. No revealed home world, unusual anatomy, faction symbols or invented rank. Continuous full-bleed square background and clothing to all edges. No painted circle, rounded cutout, vignette, frame, captions, text, labels, logos, magic, scenery or UI. Preserve identity; change only framing. One 1024x1024 PNG."
       }
+    },
+    {
+      "id": "severed-npc-madame-thistle",
+      "name": "Madame Thistle",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/madame-thistle.md",
+          "sha256": "18cbf0de043b6861a2df775669708d38dfb17abc9a858d973a643535dbefa044",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/madame-thistle.md",
+          "sha256": "7c535af6631ac061f6a68cde5906a55ed859038b6264e79abc52e6210095d62f",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An elderly humanlike Riftborn woman appearing in her late seventies, with a thin frail build, deeply lined warm brown skin, gray-green eyes, silver-gray hair arranged in a practical loose bun, and a tired, faintly amused expression. Slightly stooped but composed, with quiet dignity. A well-kept faded mulberry wool shawl over a simple dark olive ankle-length dress, plain leather shoes, and one small unadorned brass shawl pin. One hand rests lightly on a plain wooden walking stick; the other relaxed. These are editable visual defaults. Her unknown home world remains unknown. No crown, gang insignia, magical aura, invented anatomy, exposed illness effects or modern medical equipment.",
+        "full_body": {
+          "path": "assets/characters/bb3c52d4141528d7636270ebb7c2d7de5b592af1f463b00f0047d8dceb33ee57.png",
+          "sha256": "bb3c52d4141528d7636270ebb7c2d7de5b592af1f463b00f0047d8dceb33ee57"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/9bb74835f0dad1c11b72582c03b505ec8a6650ae97fa2571a970faa6194eaf35.png",
+          "sha256": "9bb74835f0dad1c11b72582c03b505ec8a6650ae97fa2571a970faa6194eaf35"
+        },
+        "portrait": {
+          "path": "assets/characters/7369bd10e9a72038aadad5746f2847e13ce7f291f6af55ac30c5b53d5ed793d7.png",
+          "sha256": "7369bd10e9a72038aadad5746f2847e13ce7f291f6af55ac30c5b53d5ed793d7"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2152942
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2687084
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2775473
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Madame Thistle in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, tactile skin and cloth, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete person standing naturally in a near-front three-quarter pose. Entire hair, both hands, clothing, feet and any held walking stick comfortably within the frame. Appearance: An elderly humanlike Riftborn woman appearing in her late seventies, with a thin frail build, deeply lined warm brown skin, gray-green eyes, silver-gray hair arranged in a practical loose bun, and a tired, faintly amused expression. Slightly stooped but composed, with quiet dignity. A well-kept faded mulberry wool shawl over a simple dark olive ankle-length dress, plain leather shoes, and one small unadorned brass shawl pin. One hand rests lightly on a plain wooden walking stick; the other relaxed. These are editable visual defaults. Her unknown home world remains unknown. No crown, gang insignia, magical aura, invented anatomy, exposed illness effects or modern medical equipment. Preserve the authored character identity and personality. No extra people, duplicated limbs, text, labels, UI, borders, scenery, logos or oversized equipment.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for Madame Thistle in Sylvia GM's Severed Lands. Input image 1 is the canonical full-body identity and exact clothing/equipment reference. Preserve the same face, age, build, skin tone, hairstyle and costume. One landscape PNG, 1536x1024, polished naturalistic digital RPG illustration on a plain light neutral gray background, soft consistent studio light. Front, exact side profile and back views of the SAME person as three complete standing figures at one common scale, comfortably inside all margins; one additional close facial detail. Appearance: An elderly humanlike Riftborn woman appearing in her late seventies, with a thin frail build, deeply lined warm brown skin, gray-green eyes, silver-gray hair arranged in a practical loose bun, and a tired, faintly amused expression. Slightly stooped but composed, with quiet dignity. A well-kept faded mulberry wool shawl over a simple dark olive ankle-length dress, plain leather shoes, and one small unadorned brass shawl pin. One hand rests lightly on a plain wooden walking stick; the other relaxed. These are editable visual defaults. Her unknown home world remains unknown. No crown, gang insignia, magical aura, invented anatomy, exposed illness effects or modern medical equipment. Keep any stick, satchel or pouch physically consistent and on the same side between views. No other characters, captions, text, labels, UI, borders, new symbols, magic or scenery.",
+        "portrait": "Use case: identity-preserve. Production square app portrait of Madame Thistle from Severed Lands. Input image 1 is the canonical full-body reference; input image 2 is the multiview sheet. Preserve the exact adult face, age, hairstyle, skin, eyes, expression, clothing and accessories. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background, soft natural studio light. Head and upper shoulders, near-forward gaze, face horizontally centered, eye line near 35 percent down, chin near 65 percent down, comfortable space above all hair and beside the head. Appearance: An elderly humanlike Riftborn woman appearing in her late seventies, with a thin frail build, deeply lined warm brown skin, gray-green eyes, silver-gray hair arranged in a practical loose bun, and a tired, faintly amused expression. Slightly stooped but composed, with quiet dignity. A well-kept faded mulberry wool shawl over a simple dark olive ankle-length dress, plain leather shoes, and one small unadorned brass shawl pin. One hand rests lightly on a plain wooden walking stick; the other relaxed. These are editable visual defaults. Her unknown home world remains unknown. No crown, gang insignia, magical aura, invented anatomy, exposed illness effects or modern medical equipment. Continuous full-bleed square background and clothing to every edge. No painted circle, cutout, vignette, border, caption, text, UI, scenery, magical effects or new costume. Preserve identity; change only framing. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-grim",
+      "name": "Grim",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/grim.md",
+          "sha256": "f3352df28da809b061ec2491272ab9bae9c0116d9f345529da8127c30b5a2b3b",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/grim.md",
+          "sha256": "28c5e1e4c1694190e623a4291baa9ce19b7884de00bb1f427752c93cb42fb86c",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A humanlike adult Riftborn man appearing in his late forties, with a sturdy broad build, medium brown weathered skin, dark brown eyes, closely cropped black hair graying at the temples, and a short square black-and-gray beard. A calm reserved expression and level, businesslike posture. A worn dark brown practical short coat over a soot-gray collared shirt, charcoal work trousers, plain heavy leather boots and a modest closed canvas shoulder satchel. Empty relaxed hands; no weapon or visible map. These are editable visual defaults. His unknown home world remains unknown. No grim-reaper hood, skull motifs, magical effects, faction emblems, invented rank or unusual anatomy.",
+        "full_body": {
+          "path": "assets/characters/bd26fd2b5e178ed8732db0d8405fc3e388ca31ea034503f725ea926187b31061.png",
+          "sha256": "bd26fd2b5e178ed8732db0d8405fc3e388ca31ea034503f725ea926187b31061"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/4b66e7835e59227d478a2ffd664d24aaf646b58e08de3c53f00baaa3e313eaae.png",
+          "sha256": "4b66e7835e59227d478a2ffd664d24aaf646b58e08de3c53f00baaa3e313eaae"
+        },
+        "portrait": {
+          "path": "assets/characters/30186dbfea19464f230988b053785a432d5db2bf8cef62b74cb5e82a7f4969b7.png",
+          "sha256": "30186dbfea19464f230988b053785a432d5db2bf8cef62b74cb5e82a7f4969b7"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2019858
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2401778
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2478890
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Grim in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, tactile skin and cloth, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete person standing naturally in a near-front three-quarter pose. Entire hair, both hands, clothing, feet and any held walking stick comfortably within the frame. Appearance: A humanlike adult Riftborn man appearing in his late forties, with a sturdy broad build, medium brown weathered skin, dark brown eyes, closely cropped black hair graying at the temples, and a short square black-and-gray beard. A calm reserved expression and level, businesslike posture. A worn dark brown practical short coat over a soot-gray collared shirt, charcoal work trousers, plain heavy leather boots and a modest closed canvas shoulder satchel. Empty relaxed hands; no weapon or visible map. These are editable visual defaults. His unknown home world remains unknown. No grim-reaper hood, skull motifs, magical effects, faction emblems, invented rank or unusual anatomy. Preserve the authored character identity and personality. No extra people, duplicated limbs, text, labels, UI, borders, scenery, logos or oversized equipment.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for Grim in Sylvia GM's Severed Lands. Input image 1 is the canonical full-body identity and exact clothing/equipment reference. Preserve the same face, age, build, skin tone, hairstyle and costume. One landscape PNG, 1536x1024, polished naturalistic digital RPG illustration on a plain light neutral gray background, soft consistent studio light. Front, exact side profile and back views of the SAME person as three complete standing figures at one common scale, comfortably inside all margins; one additional close facial detail. Appearance: A humanlike adult Riftborn man appearing in his late forties, with a sturdy broad build, medium brown weathered skin, dark brown eyes, closely cropped black hair graying at the temples, and a short square black-and-gray beard. A calm reserved expression and level, businesslike posture. A worn dark brown practical short coat over a soot-gray collared shirt, charcoal work trousers, plain heavy leather boots and a modest closed canvas shoulder satchel. Empty relaxed hands; no weapon or visible map. These are editable visual defaults. His unknown home world remains unknown. No grim-reaper hood, skull motifs, magical effects, faction emblems, invented rank or unusual anatomy. Keep any stick, satchel or pouch physically consistent and on the same side between views. No other characters, captions, text, labels, UI, borders, new symbols, magic or scenery.",
+        "portrait": "Use case: identity-preserve. Production square app portrait of Grim from Severed Lands. Input image 1 is the canonical full-body reference; input image 2 is the multiview sheet. Preserve the exact adult face, age, hairstyle, skin, eyes, expression, clothing and accessories. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background, soft natural studio light. Head and upper shoulders, near-forward gaze, face horizontally centered, eye line near 35 percent down, chin near 65 percent down, comfortable space above all hair and beside the head. Appearance: A humanlike adult Riftborn man appearing in his late forties, with a sturdy broad build, medium brown weathered skin, dark brown eyes, closely cropped black hair graying at the temples, and a short square black-and-gray beard. A calm reserved expression and level, businesslike posture. A worn dark brown practical short coat over a soot-gray collared shirt, charcoal work trousers, plain heavy leather boots and a modest closed canvas shoulder satchel. Empty relaxed hands; no weapon or visible map. These are editable visual defaults. His unknown home world remains unknown. No grim-reaper hood, skull motifs, magical effects, faction emblems, invented rank or unusual anatomy. Continuous full-bleed square background and clothing to every edge. No painted circle, cutout, vignette, border, caption, text, UI, scenery, magical effects or new costume. Preserve identity; change only framing. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-shrike",
+      "name": "Shrike",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/shrike.md",
+          "sha256": "06a8821c53a33ef2e094877c722822eacb75b17774640cb9a526728bd4870bed",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/shrike.md",
+          "sha256": "53baf5ea2a292e0d813929661a424b5e3c37523d9b1608a9f1da4cfd3858c22b",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult Human woman appearing in her early thirties, with a lean athletic build, warm olive-brown skin, dark brown eyes, short practical dark brown hair tucked behind her ears, and a focused measured expression. Balanced relaxed stance, professional rather than threatening. Worn charcoal-gray travel jacket over a muted slate shirt, practical dark brown trousers, soft scuffed leather boots, plain belt and a small closed utility pouch. Empty hands with no weapon displayed. These are editable visual defaults. No bird features or feathered costume, gang insignia, killer trophies, blood, glamorous armor, magical powers or invented campaign history.",
+        "full_body": {
+          "path": "assets/characters/9eb71f267f6eeda9dc516f27c78940f322a647a6f338d29535d6ad79e3f81a77.png",
+          "sha256": "9eb71f267f6eeda9dc516f27c78940f322a647a6f338d29535d6ad79e3f81a77"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/92b0c454a80c544657a35ed2cbbc23b80d6ea6a6d21798c6b7cd5f589471d32d.png",
+          "sha256": "92b0c454a80c544657a35ed2cbbc23b80d6ea6a6d21798c6b7cd5f589471d32d"
+        },
+        "portrait": {
+          "path": "assets/characters/52048bb26cabcc3801b869d453145a4283f49595f697be7ec8e2db895e30c94e.png",
+          "sha256": "52048bb26cabcc3801b869d453145a4283f49595f697be7ec8e2db895e30c94e"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1814075
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2293779
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2309627
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Shrike in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, tactile skin and cloth, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete person standing naturally in a near-front three-quarter pose. Entire hair, both hands, clothing, feet and any held walking stick comfortably within the frame. Appearance: An adult Human woman appearing in her early thirties, with a lean athletic build, warm olive-brown skin, dark brown eyes, short practical dark brown hair tucked behind her ears, and a focused measured expression. Balanced relaxed stance, professional rather than threatening. Worn charcoal-gray travel jacket over a muted slate shirt, practical dark brown trousers, soft scuffed leather boots, plain belt and a small closed utility pouch. Empty hands with no weapon displayed. These are editable visual defaults. No bird features or feathered costume, gang insignia, killer trophies, blood, glamorous armor, magical powers or invented campaign history. Preserve the authored character identity and personality. No extra people, duplicated limbs, text, labels, UI, borders, scenery, logos or oversized equipment.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for Shrike in Sylvia GM's Severed Lands. Input image 1 is the canonical full-body identity and exact clothing/equipment reference. Preserve the same face, age, build, skin tone, hairstyle and costume. One landscape PNG, 1536x1024, polished naturalistic digital RPG illustration on a plain light neutral gray background, soft consistent studio light. Front, exact side profile and back views of the SAME person as three complete standing figures at one common scale, comfortably inside all margins; one additional close facial detail. Appearance: An adult Human woman appearing in her early thirties, with a lean athletic build, warm olive-brown skin, dark brown eyes, short practical dark brown hair tucked behind her ears, and a focused measured expression. Balanced relaxed stance, professional rather than threatening. Worn charcoal-gray travel jacket over a muted slate shirt, practical dark brown trousers, soft scuffed leather boots, plain belt and a small closed utility pouch. Empty hands with no weapon displayed. These are editable visual defaults. No bird features or feathered costume, gang insignia, killer trophies, blood, glamorous armor, magical powers or invented campaign history. Keep any stick, satchel or pouch physically consistent and on the same side between views. No other characters, captions, text, labels, UI, borders, new symbols, magic or scenery.",
+        "portrait": "Use case: identity-preserve. Production square app portrait of Shrike from Severed Lands. Input image 1 is the canonical full-body reference; input image 2 is the multiview sheet. Preserve the exact adult face, age, hairstyle, skin, eyes, expression, clothing and accessories. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background, soft natural studio light. Head and upper shoulders, near-forward gaze, face horizontally centered, eye line near 35 percent down, chin near 65 percent down, comfortable space above all hair and beside the head. Appearance: An adult Human woman appearing in her early thirties, with a lean athletic build, warm olive-brown skin, dark brown eyes, short practical dark brown hair tucked behind her ears, and a focused measured expression. Balanced relaxed stance, professional rather than threatening. Worn charcoal-gray travel jacket over a muted slate shirt, practical dark brown trousers, soft scuffed leather boots, plain belt and a small closed utility pouch. Empty hands with no weapon displayed. These are editable visual defaults. No bird features or feathered costume, gang insignia, killer trophies, blood, glamorous armor, magical powers or invented campaign history. Continuous full-bleed square background and clothing to every edge. No painted circle, cutout, vignette, border, caption, text, UI, scenery, magical effects or new costume. Preserve identity; change only framing. One 1024x1024 PNG."
+      }
     }
   ]
 }

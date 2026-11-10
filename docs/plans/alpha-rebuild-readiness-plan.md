@@ -81,17 +81,24 @@ Their shared Lace Brothers profile retains its original text and adds all three 
 defaults together. Each binding uses the exact shared file hash plus the individual subject, so
 an unnamed group reference remains ambiguous. The prior fifty bundles and their bindings are
 unchanged. Actual square, dialogue-circle and map-token crops were inspected for all three.
-The shared catalogue now contains 53 complete bundles. The new nine-image/resource check and
+The Lace Brothers increment brought the catalogue to 53 complete bundles. Its nine-image/resource check and
 the 218-subject/249-edition roster check pass. The group transfer's initial full-record assertion
 found expected recipient-local operation IDs after recovery; image hashes/paths, appearance and
 crop were unchanged. The corrected case passed in 41.66 seconds, checking all portable fields
 and exact image bytes with no catalogue readers or image requests. Touched Ruff, docs-index and
 diff checks pass. Completed frontend/native matrices were not repeated.
+Madame Thistle, Grim and Shrike now also have complete full-body, multiview and portrait bundles.
+Their original profile prefixes and the preceding 53 bundles/bindings are unchanged. All nine new
+PNG bytes, hashes/dimensions, installer resources and six current/retained source editions pass
+offline verification, including refusal outside the selected Setting and lookup from actual
+current Lite Setting payloads. All three square/dialogue/map-token crops were inspected. The
+authored roster check passed in 2.63 seconds for 218 subjects/252 source editions. This data-only
+addition reuses earlier lifecycle/owner/frontend qualifications; no completed matrix was replayed.
 The owner selected a shared app artwork library: whole Setting/Plan exports omit unused premade
 PNGs, while custom art stays portable and character/campaign exports carry used artwork. The
 source now maps the catalogue and PNGs as external installer/portable resources, outside the
 onefile sidecar. Campaign export retains used art before any artwork view has been opened.
-The prepared PNG pool now totals 369,035,488 bytes across 159 images, beyond the content-package cap.
+The prepared PNG pool now totals 389,968,994 bytes across 168 images, beyond the content-package cap.
 The current Setting omits those PNGs; its existing content-package limits remain unchanged.
 Focused checks cover shared/custom publication, external resource inventory, portable ZIP assembly,
 and exact campaign art transfer before opening an image view. Local-copy receipts also transfer
@@ -194,7 +201,7 @@ hints. The six minimal failure cases pass after the repair; 78 related source ch
 module typing and touched Ruff pass; all eleven originals pass the repaired validator. This is
 source qualification only, with native/live acceptance still pending.
 The authored-source producer now covers 218 subjects (82 individual NPCs and 136 monsters),
-retaining 249 source editions across current content and Plan snapshots. Thread, Hook and Needle
+retaining 252 source editions across current content and Plan snapshots. Thread, Hook and Needle
 remain distinct; V and Anchor Sentinel variants and the artwork-annotated profiles retain
 their original editions. The
 snapshot-only opposition guide is explicitly excluded as encounter guidance. A composed source
@@ -225,8 +232,8 @@ candidate reuse preserves recipient metadata and rejects different content. Imag
 actual Lite prepared-art transfer checks now retain the normal candidate reference. Older incomplete
 archives that omitted it require a fresh export from the source dataset.
 These source/scripted checks do not establish completion of the ordinary
-workflows. The owner's latest selection keeps live in-app checks pending. Of the 159 prepared assets,
-148 were produced with the built-in GPT Images tool and eleven are the unchanged supplied Siren
+workflows. The owner's latest selection keeps live in-app checks pending. Of the 168 prepared assets,
+157 were produced with the built-in GPT Images tool and eleven are the unchanged supplied Siren
 master sheets. Asset preparation is separate from Sylvia's deferred native check.
 Live Sylvia subscription, installed-app
 and TD trailer acceptance remain unverified. Merge follows the Pneuma IO rulebook's delivery and

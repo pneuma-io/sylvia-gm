@@ -21,3 +21,15 @@ Thistle is tired, amused, and too old to be intimidated. She speaks slowly, as i
 ## Hook
 
 Thistle is ready to name her successor — but she wants something first. A Rift pool in the northern quarter, hidden in a basement, cultivated by someone she can't identify. She wants it found and destroyed before she dies. She's offering her endorsement — and her territory's loyalty — to whoever helps.
+
+## Appearance and artwork
+
+An elderly humanlike Riftborn woman appearing in her late seventies, with a thin frail build, deeply lined warm brown skin, gray-green eyes, silver-gray hair arranged in a practical loose bun, and a tired, faintly amused expression. Slightly stooped but composed, with quiet dignity. A well-kept faded mulberry wool shawl over a simple dark olive ankle-length dress, plain leather shoes, and one small unadorned brass shawl pin. One hand rests lightly on a plain wooden walking stick; the other relaxed. These are editable visual defaults. Her unknown home world remains unknown. No crown, gang insignia, magical aura, invented anatomy, exposed illness effects or modern medical equipment.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/7369bd10e9a72038aadad5746f2847e13ce7f291f6af55ac30c5b53d5ed793d7.png)
+
+[Full-body reference](../assets/characters/bb3c52d4141528d7636270ebb7c2d7de5b592af1f463b00f0047d8dceb33ee57.png)
+
+[Multiview reference sheet](../assets/characters/9bb74835f0dad1c11b72582c03b505ec8a6650ae97fa2571a970faa6194eaf35.png)
