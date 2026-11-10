@@ -83,7 +83,7 @@ def test_prepared_starter_reuses_art_offline_through_campaign_crop_reopen_and_tr
     archive = tmp_path / "campaign.zip"
     with AuthorityOwner.open(database, "prepared-starter") as owner:
         selected = selection(owner, tmp_path)
-        starter = next(item for item in selected.participants if item.name == "Mara Flint")
+        starter = next(item for item in selected.participants if item.name == "Luma Ash")
         source_visuals = json.loads(json.dumps(starter.visuals))
         # The retained Plan remains pinned to its original Setting, without these new PNGs.
         world = selected.sources.setting

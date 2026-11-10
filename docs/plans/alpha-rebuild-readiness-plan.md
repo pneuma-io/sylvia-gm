@@ -37,20 +37,20 @@ package restoration. Follow-up work adds explicit partial-art records, saved-sou
 later adopted stages, library/campaign materialization and portrait-only reuse with generation Off.
 Saving a character now prepares its artwork workflow under Review/Auto; conversation-model image
 tool calls are optional. Focused source checks cover those handoffs and campaign-copy isolation.
-Prepared catalogue production has begun: Mara Flint, Neri Vale, Oren Reed, Sela Moss, Bram Alder
-and Iri Swift, plus Tess Rowan, Kest Wren and Pip Venn, each have a generated
-full-body image, multi-view sheet and portrait. Their starter files retain the shared visual
+All twelve SRD starters now have complete prepared art: Mara Flint, Neri Vale, Oren Reed,
+Sela Moss, Bram Alder, Iri Swift, Tess Rowan, Kest Wren, Pip Venn, Luma Ash, Veya Quill and
+Eli Penn each have a generated full-body image, multi-view sheet and portrait. Their starter files retain the shared visual
 records; the installed catalogue also supplies these assets to retained Plan editions. Real-PNG
 checks cover crop, reopen and export/recovery without the catalogue. Reopening resolves retained
 images for the same campaign, character, purpose and hash before looking for original assets.
 Anchor Sentinel also has a prepared nonhumanoid bundle and source profile links. Known entities
 reuse it through their exact Setting source reference during normal status refresh; names alone
-do not select art. Three other starters, the NPCs, companions and remaining enemies still need artwork.
+do not select art. The NPCs, companions and remaining enemies still need artwork.
 The owner selected a shared app artwork library: whole Setting/Plan exports omit unused premade
 PNGs, while custom art stays portable and character/campaign exports carry used artwork. The
 source now maps the catalogue and PNGs as external installer/portable resources, outside the
 onefile sidecar. Campaign export retains used art before any artwork view has been opened.
-The prepared PNG pool now totals 70,937,190 bytes, beyond the 64 MiB content-package cap.
+The prepared PNG pool now totals 91,419,431 bytes across 39 images, beyond the content-package cap.
 The current Setting omits those PNGs; its existing content-package limits remain unchanged.
 Focused checks cover shared/custom publication, external resource inventory, portable ZIP assembly,
 and exact campaign art transfer before opening an image view. Local-copy receipts also transfer
@@ -109,12 +109,12 @@ chat, including admission of the next character reference stage. An active chat 
 campaign can now generate/adopt an existing individual request or continue the whole character
 workflow with its original provenance and stable stage identities. Replays from another active
 chat reuse those stages; unrelated chats remain refused. Nine local handoff/workflow checks pass,
-including exact reference order and export/recovery. The owner clarified that Opus 5.5 applies
-to visual design and frontend work, rather than all design. Backend design and implementation
-continue here. T3 lists Opus, but that handoff could not start (`thread_credential_required`),
-and the direct delegation tool is unavailable. This is an internal agent-tooling issue; the
-owner is not expected to troubleshoot it. Remaining visual/frontend work awaits that connection;
-backend work continues. Live in-app checks remain deferred at the owner's request.
+including exact reference order and export/recovery. The owner clarified that model delegation
+applies to visual design and frontend work. Backend design and implementation continue here.
+An attempted Opus handoff failed before launch (`thread_credential_required`); no child started.
+The current rulebook requires the owner's choice of Opus or Fable per frontend task. The earlier
+Opus selection was inferred by the agent. Remaining frontend controls await that model selection;
+artwork production continues through GPT Images. Live in-app checks remain deferred.
 The nine prepared Ready character editions now carry the existing shared visual records for
 their exact authored starter identities. Their builds, equipment, prose and retained Plan
 bindings are unchanged; only visuals, character hashes and artwork provenance were added.
@@ -128,7 +128,7 @@ candidate reuse preserves recipient metadata and rejects different content. Imag
 actual Lite prepared-art transfer checks now retain the normal candidate reference. Older incomplete
 archives that omitted it require a fresh export from the source dataset.
 These source/scripted checks do not establish completion of the ordinary
-workflows. The owner's latest selection keeps live in-app checks pending. The 30 prepared assets
+workflows. The owner's latest selection keeps live in-app checks pending. The 39 prepared assets
 were produced with the built-in GPT Images tool, separately from Sylvia's deferred native check.
 Live Sylvia subscription, installed-app
 and TD trailer acceptance remain unverified. Merge follows the Pneuma IO rulebook's delivery and

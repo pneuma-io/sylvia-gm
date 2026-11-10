@@ -501,6 +501,153 @@
         "reference_sheet": "Use case: stylized-concept. Asset type: canonical multi-view RPG character reference sheet, one LANDSCAPE PNG 1536x1024. Input image 1 is the authoritative identity, proportions, outfit, palette and illustration-style reference for Pip Venn. Show this SAME adult Human with they/them pronouns as three separated complete full-body views at a common scale: front, exact side profile, back; also include one larger frontal facial detail. Entire figures from all hair to boot soles, full weapons visible with margins. Preserve the exact face, age, skin, eyes, hair, scars/freckles, clothing, armor, accessories and equipment from the input. Subject details: Adult Human in their early twenties, short wiry build, fair freckled skin, hazel eyes and short tousled reddish-brown curls with one stubborn forelock; bright curious eyes and a restrained mischievous smile. Worn dark-brown leather armor over a plain muted plum shirt, charcoal trousers, soft dark boots, a simple belt and fingerless leather gloves. Holds a shortbow lowered at one side without drawing it; a small quiver of arrows on the back, a sheathed shortsword and dagger at the belt and a practical closed thieves'-tools pouch. No shield, mask or hood across the face. Match the polished naturalistic digital RPG character illustration, soft natural light and plain light neutral backdrop with subtle grounding shadows. The views must describe one consistent physical outfit and gear when rotated. No redesign, alternate costumes, additional people, text, labels, captions, UI, border, scenery, faction marks or magical effects.",
         "portrait": "Use case: stylized-concept. Asset type: canonical RPG character portrait, one SQUARE PNG 1024x1024. Input image 1 is Pip Venn's authoritative full-body identity reference; input image 2 is their same-identity multiview sheet. Preserve this exact person, age, face, hair, eyes, skin tone and clothing, with no redesign. Adult Human in their early twenties, short wiry build, fair freckled skin, hazel eyes and short tousled reddish-brown curls with one stubborn forelock; bright curious eyes and a restrained mischievous smile. Worn dark-brown leather armor over a plain muted plum shirt, charcoal trousers, soft dark boots, a simple belt and fingerless leather gloves. Holds a shortbow lowered at one side without drawing it; a small quiver of arrows on the back, a sheathed shortsword and dagger at the belt and a practical closed thieves'-tools pouch. No shield, mask or hood across the face. Compose a near-frontal head-and-upper-shoulders portrait on the same plain light neutral backdrop with soft natural light and the same polished naturalistic RPG illustration. Face centered horizontally, eyes on the horizontal line at 35 percent of image height; consistent medium head scale, whole hair visible with generous top margin, shoulders visible, face unobstructed and enough side space for a circular portrait crop. Expression relaxed and attentive. No weapon across the face, extra people, text, labels, logos, border, scenery or magical effects."
       }
+    },
+    {
+      "id": "srd-starter-sorcerer",
+      "name": "Luma Ash",
+      "sources": [
+        "src/sylvia_gm/campaign/srd-starters.json#sorcerer"
+      ],
+      "visuals": {
+        "appearance": "Adult Human with warm olive-tan freckled skin, brown eyes, shoulder-length dark brown curls with a light golden streak at the front, and a lively warm expression. Practical plum hooded robe over a cream laced shirt, plain brown belt, loose dark trousers and brown lace-up boots. An unlit purple orb focus in a brass-colored cage hangs at their belt. Carries a plain wooden spear; no armor or shield.",
+        "full_body": {
+          "path": "assets/characters/6773011d1deed4dd8b46ef552d51d74ff285783d063bb859899d7e5ea3067916.png",
+          "sha256": "6773011d1deed4dd8b46ef552d51d74ff285783d063bb859899d7e5ea3067916"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/453b7f7533820f579bac825e406a650b6d2446c692630864ea7d62cf95689c1a.png",
+          "sha256": "453b7f7533820f579bac825e406a650b6d2446c692630864ea7d62cf95689c1a"
+        },
+        "portrait": {
+          "path": "assets/characters/38e6b01ec980efd570ef006a55f983976ea0081ffb99ca32821ee4b665e0f9c8.png",
+          "sha256": "38e6b01ec980efd570ef006a55f983976ea0081ffb99ca32821ee4b665e0f9c8"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1767011
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2384584
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2577914
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset type: canonical full-body reference for Luma Ash, Sylvia GM's editable premade Human Sorcerer. One portrait PNG, 1024x1536. Polished naturalistic digital RPG character illustration, plain light neutral background, soft natural light and subtle grounding shadow, clear silhouette. Complete figure from hair to boot soles with comfortable margins, relaxed near-front three-quarter stance, no foreshortening. Luma is an adult Human using they/them pronouns, expressive and hopeful, with a warm lively face and a small delighted smile. Outfit and equipment: simple practical robe, plain belt and boots, no armor or shield; carry one ordinary spear lowered safely at their side and a small unlit arcane focus on the belt. Keep the clothing and gear believable for an ordinary beginning adventurer. This image establishes editable appearance defaults only; assign no home, faction, religion, patron, allegiance or campaign history. No text, labels, borders, UI, scenery, insignia, glowing effects or magical effects. Keep the face unobstructed and distinct, hands anatomically sound, full spear and both feet inside the frame.",
+        "reference_sheet": "Use case: identity-preserve. Asset type: canonical multi-view reference sheet for Luma Ash. Input image 1 is the authoritative full-body identity reference, not a style-only reference. Generate one landscape PNG, 1536x1024, plain light neutral background and the same polished naturalistic digital RPG illustration and soft natural light. Show the exact same adult Human in three complete figures at equal scale: straight front, exact side profile, and straight back, plus one enlarged frontal head detail. Preserve the face, freckled warm olive-tan skin, brown eyes, dark brown shoulder-length curls with the golden front streak, body proportions, practical plum hooded robe, cream laced shirt, brown belt, trousers and boots, unlit purple orb focus and ordinary spear. Keep the hood lowered in all views. The spear is equipment, not part of their body; use a single consistent outfit and physically sensible gear placement. Comfortable margins around all figures, full heads and boot soles visible. No redesign, extra characters, captions, labels, text, borders, UI, scenery, symbols, insignia or magic effects. This is editable character-reference artwork and assigns no campaign history.",
+        "portrait": "Use case: identity-preserve. Asset type: reusable aligned portrait for Luma Ash in Sylvia GM. Input image 1 is the canonical full-body identity, image 2 is the canonical multi-view reference sheet. Produce one square PNG, 1024x1024, in the same polished naturalistic digital RPG illustration style, light neutral background and soft natural light. Preserve this exact adult Human face, age, freckled warm olive-tan skin, brown eyes, dark brown curls and golden front streak, plum robe and cream collar. Head and upper shoulders only, looking directly forward, head upright without tilt, eyes level toward the viewer, centered face, eye line at 35 percent of image height. Keep consistent face scale and comfortable clear margin above all hair and beside the head for an adjustable circular portrait crop. Warm hopeful slight smile. Hood lowered; face unobstructed. No spear, focus, hands, props, magic effects, text, labels, borders, insignia, scenery or UI. Do not redesign their identity or change their outfit."
+      }
+    },
+    {
+      "id": "srd-starter-warlock",
+      "name": "Veya Quill",
+      "sources": [
+        "src/sylvia_gm/campaign/srd-starters.json#warlock"
+      ],
+      "visuals": {
+        "appearance": "Adult Human in their forties with deep warm brown skin, dark brown eyes, a narrow angular face, straight black chin-length hair with a side part, and a calm courteous expression. Plain brown leather cuirass and shoulder guards over a moss-green robe with cream collar and cuffs, dark trousers, brown belt and worn brown calf boots. Carries a closed leather notebook, a sheathed dagger and a small unlit round focus at the belt; no shield or supernatural body traits.",
+        "full_body": {
+          "path": "assets/characters/a03a2047445aaaf685b515688f778a9feb18e70e7a8e11e172cb7d8792f36aa5.png",
+          "sha256": "a03a2047445aaaf685b515688f778a9feb18e70e7a8e11e172cb7d8792f36aa5"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/d53de14fe01d6860b9ac76c7d5e82b6fb558b17ac986b3f10165517e92119138.png",
+          "sha256": "d53de14fe01d6860b9ac76c7d5e82b6fb558b17ac986b3f10165517e92119138"
+        },
+        "portrait": {
+          "path": "assets/characters/a6aa03f22b1c3b04db9eaf3481f35f5f814eba6a8f47219d4f643567d345d9ac.png",
+          "sha256": "a6aa03f22b1c3b04db9eaf3481f35f5f814eba6a8f47219d4f643567d345d9ac"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1889981
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2421993
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2352981
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. New distinct character identity for Sylvia GM's editable premade roster. One portrait PNG, 1024x1536, polished naturalistic digital RPG character illustration, plain light neutral background, soft natural light, subtle grounding shadow, complete figure from hair to boot soles and comfortable margins. Relaxed near-front three-quarter stance, clear face, sound anatomy. Adult Human, they/them pronouns. Editable visual defaults only; assign no home, faction, religion, patron, allegiance or campaign history. No text, labels, borders, scenery, UI, insignia or magical effects. Veya Quill, Human Warlock: a lean adult in their forties, deep brown skin, narrow angular face, dark brown eyes, straight black chin-length blunt-cut hair tucked behind one ear, calm courteous and inquisitive expression. This face must be individually distinct: smooth unfreckled skin and straight black hair, with none of the curly golden-streaked hair or face of the earlier sorcerer. Plain brown leather armor over a practical dark moss-green robe, cream collar, plain belt, dark trousers and worn brown boots, no shield. A small closed notebook held in one hand; sheathed dagger and modest unlit focus at the belt. Light leather, no metal plate; ordinary beginning-adventurer gear. Human features throughout, without horns, wings, glowing eyes or demonic symbols.",
+        "reference_sheet": "Use case: identity-preserve. Asset type: canonical multi-view reference sheet for Veya Quill. Input image 1 is the authoritative identity reference for this character. Produce one landscape PNG, 1536x1024, with three complete figures at identical scale—straight front, exact side profile, straight back—and one enlarged frontal face detail. Plain light neutral background, polished naturalistic digital RPG illustration and soft natural light. Preserve the exact face, adult age, body proportions, hair, skin, clothing colors, seams, equipment and accessories from input image 1. Adult Human in their forties with deep warm brown skin, dark brown eyes, a narrow angular face, straight black chin-length hair with a side part, and a calm courteous expression. Plain brown leather cuirass and shoulder guards over a moss-green robe with cream collar and cuffs, dark trousers, brown belt and worn brown calf boots. Carries a closed leather notebook, a sheathed dagger and a small unlit round focus at the belt; no shield or supernatural body traits. Keep one consistent outfit and physically sensible gear placement across all views. Complete hair and boot soles inside comfortable margins. Head uncovered. No redesign, new people, captions, labels, borders, text, UI, scenery, insignia or magic effects.",
+        "portrait": "Use case: identity-preserve. Asset type: aligned reusable square portrait for Veya Quill in Sylvia GM. Input image 1 is the canonical full-body identity; image 2 is this character's canonical multi-view reference. One square PNG, 1024x1024, polished naturalistic digital RPG illustration, plain light neutral background, soft natural light. Preserve the exact face, adult age, skin, eyes, hair and clothing from these references. Adult Human in their forties with deep warm brown skin, dark brown eyes, a narrow angular face, straight black chin-length hair with a side part, and a calm courteous expression. Plain brown leather cuirass and shoulder guards over a moss-green robe with cream collar and cuffs, dark trousers, brown belt and worn brown calf boots. Carries a closed leather notebook, a sheathed dagger and a small unlit round focus at the belt; no shield or supernatural body traits. Portrait composition: head and upper shoulders only, directly forward, upright head with no tilt, level eyes facing viewer, centered face, eye line at 35 percent of image height. Consistent face scale and comfortable space above all hair and beside the head for an adjustable circular crop. Head uncovered, face unobstructed, a restrained warm approachable expression. No book, staff, dagger, focus, hands or other props in the crop; no text, labels, borders, UI, scenery, insignia or magic. Preserve identity rather than redesigning it."
+      }
+    },
+    {
+      "id": "srd-starter-wizard",
+      "name": "Eli Penn",
+      "sources": [
+        "src/sylvia_gm/campaign/srd-starters.json#wizard"
+      ],
+      "visuals": {
+        "appearance": "Tall slim adult Human in their sixties with lightly weathered medium fair skin, gray-blue eyes, silver-gray hair tied at the nape, a short neatly trimmed gray beard and mustache, and a kind patient expression. A modest navy-blue robe over a cream buttoned shirt, plain brown belt, loose dark trousers and brown lace-up boots. Carries a plain wooden quarterstaff and a closed worn brown spellbook; no armor, shield, hat or jewelry.",
+        "full_body": {
+          "path": "assets/characters/d4b3c80c92a4dfae74e39abdf80a2667d86ce5455d27ffba90310dbfc1a8066e.png",
+          "sha256": "d4b3c80c92a4dfae74e39abdf80a2667d86ce5455d27ffba90310dbfc1a8066e"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/612d7a4de0392d7d2553b8f86d027e28bd3164008f0e5083e514c1288b394575.png",
+          "sha256": "612d7a4de0392d7d2553b8f86d027e28bd3164008f0e5083e514c1288b394575"
+        },
+        "portrait": {
+          "path": "assets/characters/33ed2655f8642e5b4d7e4d2dfe29fde5a37fc0fdf814624353f69d59986bdc15.png",
+          "sha256": "33ed2655f8642e5b4d7e4d2dfe29fde5a37fc0fdf814624353f69d59986bdc15"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1961235
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2600437
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2526105
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. New distinct character identity for Sylvia GM's editable premade roster. One portrait PNG, 1024x1536, polished naturalistic digital RPG character illustration, plain light neutral background, soft natural light, subtle grounding shadow, complete figure from hair to boot soles and comfortable margins. Relaxed near-front three-quarter stance, clear face, sound anatomy. Adult Human, they/them pronouns. Editable visual defaults only; assign no home, faction, religion, patron, allegiance or campaign history. No text, labels, borders, scenery, UI, insignia or magical effects. Eli Penn, Human Wizard: a tall slim older adult in their sixties, lightly weathered medium fair skin, gray-blue eyes, straight silver-gray hair neatly tied at the nape, short neatly trimmed gray beard, long kind face and a patient welcoming expression. This is a clearly older individual, distinct from the earlier young curly-haired characters. A modest navy blue scholar's robe over a cream shirt, plain brown belt, loose trousers and practical brown boots; no armor, shield, hat or jewelry. One simple straight wooden quarterstaff held safely at their side and a closed worn spellbook in their other hand. Full staff and both boot soles inside the frame. No ornate high-level regalia, oversized crystals or glowing runes.",
+        "reference_sheet": "Use case: identity-preserve. Asset type: canonical multi-view reference sheet for Eli Penn. Input image 1 is the authoritative identity reference for this character. Produce one landscape PNG, 1536x1024, with three complete figures at identical scale—straight front, exact side profile, straight back—and one enlarged frontal face detail. Plain light neutral background, polished naturalistic digital RPG illustration and soft natural light. Preserve the exact face, adult age, body proportions, hair, skin, clothing colors, seams, equipment and accessories from input image 1. Tall slim adult Human in their sixties with lightly weathered medium fair skin, gray-blue eyes, silver-gray hair tied at the nape, a short neatly trimmed gray beard and mustache, and a kind patient expression. A modest navy-blue robe over a cream buttoned shirt, plain brown belt, loose dark trousers and brown lace-up boots. Carries a plain wooden quarterstaff and a closed worn brown spellbook; no armor, shield, hat or jewelry. Keep one consistent outfit and physically sensible gear placement across all views. Complete hair and boot soles inside comfortable margins. Head uncovered. No redesign, new people, captions, labels, borders, text, UI, scenery, insignia or magic effects.",
+        "portrait": "Use case: identity-preserve. Asset type: aligned reusable square portrait for Eli Penn in Sylvia GM. Input image 1 is the canonical full-body identity; image 2 is this character's canonical multi-view reference. One square PNG, 1024x1024, polished naturalistic digital RPG illustration, plain light neutral background, soft natural light. Preserve the exact face, adult age, skin, eyes, hair and clothing from these references. Tall slim adult Human in their sixties with lightly weathered medium fair skin, gray-blue eyes, silver-gray hair tied at the nape, a short neatly trimmed gray beard and mustache, and a kind patient expression. A modest navy-blue robe over a cream buttoned shirt, plain brown belt, loose dark trousers and brown lace-up boots. Carries a plain wooden quarterstaff and a closed worn brown spellbook; no armor, shield, hat or jewelry. Portrait composition: head and upper shoulders only, directly forward, upright head with no tilt, level eyes facing viewer, centered face, eye line at 35 percent of image height. Consistent face scale and comfortable space above all hair and beside the head for an adjustable circular crop. Head uncovered, face unobstructed, a restrained warm approachable expression. No book, staff, dagger, focus, hands or other props in the crop; no text, labels, borders, UI, scenery, insignia or magic. Preserve identity rather than redesigning it."
+      }
     }
   ]
 }
