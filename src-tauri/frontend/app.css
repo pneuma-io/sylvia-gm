@@ -3656,6 +3656,18 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
 .sequence-remove { display:grid; place-items:center; padding:0; width:1.75rem; height:1.75rem; border:0; border-radius:var(--radius-sm); background:transparent; color:var(--text-dim); font-size:1.15rem; cursor:pointer; }
 .sequence-remove:hover { background:var(--bg-secondary); color:var(--text-bright); }
 .sequence-remove:disabled { opacity:.45; cursor:default; }
+.sequence-step-tools { grid-column:3; grid-row:1; min-width:0; align-self:start; }
+.sequence-step-tools > summary { display:grid; place-items:center; list-style:none; width:1.75rem; min-height:1.75rem; cursor:pointer; color:var(--text-dim); border-radius:var(--radius-sm); }
+.sequence-step-tools > summary::-webkit-details-marker { display:none; }
+.sequence-step-tools > summary:hover { background:var(--bg-secondary); color:var(--text-bright); }
+.sequence-step-tools > summary:focus-visible { outline:2px solid var(--accent-primary); outline-offset:2px; }
+/* Expanded controls need the whole card rather than the disclosure's narrow grid column. */
+.sequence-step-tools[open] { grid-column:1 / -1; grid-row:auto; }
+.sequence-step-tools[open] > summary { margin-left:auto; }
+.sequence-step-tools > div { min-width:0; overflow-wrap:anywhere; font-size:.72rem; }
+.sequence-step-tools p { margin:.2rem 0 .4rem; }
+.sequence-order-controls { display:flex; flex-wrap:wrap; gap:.35rem; }
+.sequence-order-controls > button { max-width:100%; white-space:normal; overflow-wrap:anywhere; }
 .sequence-committed { opacity:.7; }
 .sequence-issue { margin:.4rem .15rem; font-size:.72rem; overflow-wrap:anywhere; }
 .sequence-step .sequence-issue { grid-column:2 / -1; margin:.2rem 0 0; }

@@ -18,49 +18,41 @@ handoffs and checkout-specific records do not activate work.
 ## 1. Current work
 
 **10 November 2026: native TD qualification, with merge held.** The owner selected completing
-PR #6 through a separate Windows candidate and isolated synthetic data, including ordinary
-package import, supported controls, preview/queue/execute, resource accounting, cancellation,
-rejection, save/reopen and duplicate-action safety. Exact candidate results belong in the PR's
-qualification section. The native queue journey exposed a committed-card price that retained
-its earlier preview after a stance change; completed summaries now use the declared public
-result card. Engine accounting and retained balance parameters are unchanged.
+PR #6 through a separate Windows candidate and isolated synthetic data before balancing.
+The goal is active again. Host desktop control remains stopped; native checks use the dedicated
+PNEUMA-AGENT guest. No merge, publication, release, settlement or balancing is authorized.
 
-Resumed after the owner's DBD pause. Hosted qualification on `0954bed` failed despite the
-separate Windows Rust pass: public event references differed between panel commits, narration
-replay and reopen validation. The repair uses one public projection, normalizes only exact
-legacy references, and retains canonical events and tamper rejection. The 19-case local replay passed. A fresh native candidate passed ordinary package import,
-retained-campaign reopen and double-click queue execution with exact AP accounting; hosted
-qualification remains pending. The next hosted attempt ended after selection without starting
-test jobs; its retry is queued, so it is not a hosted test pass. The exclusion
-test's undeclared local codec-stage dependency is replaced by a labelled synthetic subprocess
-fixture; actual codec verification remains with staging and final build checks.
+PR #28's reviewed frontend is merged on main and included in the TD branch. The exact `9968614`
+portable passed normal TD package import in the guest. Native Reload on a spent manual rifle
+queued magazine change then cycle without spending resources; Execute charged 2 + 1 AP,
+retained the old magazine, and left one live chambered round plus 4/5 in the magazine.
+Repeat Execute left resources unchanged. At 2 AP, only the magazine change committed;
+cycling stopped for insufficient AP, preserving the spent chamber and 5/5 magazine.
+Window-frame captures show the committed rig steps. Reopen, refusal/stale-state recovery,
+the remaining selected controls and the final replacement candidate still require native proof.
+Synthetic setup and direct authority checks are distinct from UI gameplay evidence.
 
-The TD character format accepts authored magazine capacities and firearm labels. Existing
-HP/RES maxima and tube capacity project without frontend changes; unknown values stay absent.
-Conformance characters explicitly declare their synthetic maxima and capacities. These values
-are not new-character defaults or a balance selection.
+The native run also exposed expanded queue controls squeezed into the disclosure's narrow
+column. The repair gives expanded details the card width and applies the existing button style.
+Focused queue and retained-layout checks pass; native replay remains open. Previous map minimum
+height, queue reachability, committed-price and completed-queue-warning repairs remain included.
 
-The newer Opus frontend production port remains separate in [PR #28](https://github.com/pneuma-io/sylvia-gm/pull/28).
-Its frozen `aecb47d55cca3babb89f6a483d4fa05deb436313` correction is under Fluff's independent review.
-A temporary, unpushed qualification composition preserves both PR branches. Native testing
-found the retained TD layout could clip the battlefield behind its wrapped command deck;
-the map content now keeps a usable minimum height. The shipped-shell regression reproduces
-the collapse without the repair and passes on initial render and redraw with it. Native
-replay passed for that layout repair and the combined Reload sequence, AP stop and stale
-revision recovery. A later map edit also exposed a warning that demanded review of an
-already completed queue; warnings now depend on unfinished steps. Stale pending actions,
-uncertain execution and current receipt markers retain their distinct indications. The full
-20-control TD toolbar also exposed a clipped Execute button; the queue now retains its declared
-minimum body height. The browser fixture is checked against the current package declarations,
-with Show queue coverage at both native viewport sizes. Native replay of this queue repair and
-the warning repair remains required. The TD acceptance includes
-the single Reload control's magazine-change/cycle order, AP exhaustion, refusal/stale-state
-recovery, and committed animation occurring once without replay on reopen. Qualification must
-name the exact frontend composition; PR6-only native evidence cannot close that combined check.
-The final combined product must match the current approved mock-up and receive the later Opus
-pass. TD mechanics qualification does not close that visual acceptance. Siren composition and
-balance-suite refactoring remain separate. The following 9 November entry records the earlier
-source-integration selection; it does not supersede this native qualification requirement.
+The strict type repairs in TD's new grid-lane and exposure modules pass affected checks. A
+provisional refactor composition passes the supplied measured type gate, but it is not a final
+PR #33 handoff. Reconcile the refactor owner's checked identity when supplied; do not import
+unfinished refactor work or claim the preview as final composition qualification.
+
+The public compiler accepts optional private notes as an input. Public packages omit
+`references/canon/`; private local builds may include it. TD vault notes and Siren remain private.
+Older private-repository statements below describe historical visibility. Public full-session
+adequacy without private prose or a future Rulebook remains unproven and is a release boundary.
+Authored values are preserved; fixture resource maxima and capacities are synthetic test data,
+not new-character defaults. Unknown legacy values remain absent.
+
+The final combined UI must match the approved mock-up and receive the later Opus pass.
+Mechanics tests do not close that visual acceptance. Exact source/package/candidate identities,
+fresh versus reused evidence and remaining qualification belong in PR #6 and Project Desk.
+Siren composition, numerical balancing and balance-suite refactoring remain separate.
 
 **9 November 2026: Trigger Discipline integration before balancing.** The owner selected an
 integrated, ready, unmerged TD baseline in existing PR #6. The retained runtime, shooter-origin

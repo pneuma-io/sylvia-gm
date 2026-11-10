@@ -24,7 +24,7 @@ async function open(browser, viewport, { freshLayout = false } = {}) {
     if (name === 'app.js') body = body.toString()
       .replace("document.addEventListener('DOMContentLoaded', () => { void SylviaGMFrontend.init(); });", '')
       .replace('  // ---- Public API ----', `window.stripQA = { state, wireControls, initSidebarResize, renderRulesetPanelProjection,
-        renderSidebarState, showSessionView, ensureSessionActivity }; // ---- Public API ----`);
+        renderSidebarState, showSessionView, ensureSessionActivity, sequenceMarkup }; // ---- Public API ----`);
     await route.fulfill({ body, contentType: name.endsWith('.js') ? 'text/javascript' : name.endsWith('.css') ? 'text/css'
       : name.endsWith('.png') ? 'image/png' : 'text/html' });
   });
@@ -54,6 +54,45 @@ async function open(browser, viewport, { freshLayout = false } = {}) {
     window.stripProjection = projection;
   }, { source: fixture, freshLayout });
   return { page, errors };
+}
+
+for (const width of [860, 320]) {
+  test(`expanded queue tools fit the card at panel width ${width}`, async () => {
+    const browser = await chromium.launch({ headless: true, args: ['--disable-gpu'],
+      channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined) });
+    try {
+      const { page, errors } = await open(browser, { width: 1030, height: 779 });
+      await page.evaluate(width => {
+        const panel = document.querySelector('.ruleset-queue-panel');
+        panel.style.width = `${width}px`;
+        const queue = window.stripQA.state.actionSequence;
+        queue.steps[0].label = 'Cycle weapon';
+        queue.steps[0].error = 'This character does not have enough action points to cycle the weapon.';
+        panel.querySelector('.ruleset-panel-content').innerHTML = window.stripQA.sequenceMarkup();
+      }, width);
+      const tools = page.locator('.sequence-step-tools');
+      await tools.locator('summary').click();
+      const geometry = await tools.evaluate(node => {
+        const card = node.closest('.sequence-step').getBoundingClientRect();
+        const content = node.querySelector(':scope > div').getBoundingClientRect();
+        const buttons = [...node.querySelectorAll('button')].map(button => {
+          const rect = button.getBoundingClientRect();
+          return { left: rect.left, right: rect.right, width: rect.width, height: rect.height,
+            themed: button.classList.contains('btn-secondary') };
+        });
+        return { card: { left: card.left, right: card.right, width: card.width },
+          content: { left: content.left, right: content.right, width: content.width }, buttons };
+      });
+      assert.ok(geometry.content.width > geometry.card.width * .8, JSON.stringify(geometry));
+      for (const button of geometry.buttons) {
+        assert.ok(button.left >= geometry.card.left && button.right <= geometry.card.right,
+          `expanded control spills outside its card: ${JSON.stringify(geometry)}`);
+        assert.ok(button.width >= 60 && button.height >= 24 && button.themed,
+          `expanded control is cramped or unthemed: ${JSON.stringify(button)}`);
+      }
+      assert.deepEqual(errors, []);
+    } finally { await browser.close(); }
+  });
 }
 
 for (const viewport of [{ width: 1440, height: 900 }, { width: 1366, height: 768 }]) {
