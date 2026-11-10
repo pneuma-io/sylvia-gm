@@ -87,6 +87,7 @@ def test_known_enemy_gets_art_in_normal_status_and_transfers_without_catalogue(
     tmp_path, monkeypatch
 ):
     enemy_source = "content/monsters/rift-basilisk.md"
+    inherited_source = "content/non-beast-form-index.json#/forms/basilisk"
     archive = tmp_path / "campaign.zip"
     with AuthorityOwner.open(tmp_path / "source.db", "prepared-enemy") as owner:
         candidate = owner.install_package_archive(
@@ -113,7 +114,7 @@ def test_known_enemy_gets_art_in_normal_status_and_transfers_without_catalogue(
                  "known_by": ["player"] if visibility == "player_known" else [],
                  "source_ref": path}
                 for identity, name, visibility, path in (
-                    ("watcher", "Rust Watcher", "player_known", enemy_source),
+                    ("watcher", "Rust Watcher", "player_known", inherited_source),
                     ("watcher-two", "Second Watcher", "player_known", enemy_source),
                     ("secret", "Hidden Basilisk", "gm_private", enemy_source),
                     ("other", "Anchor Sentinel", "player_known", "npcs/guard-miri.md"),

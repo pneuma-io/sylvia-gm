@@ -4,7 +4,7 @@
 >
 > **Endpoint:** A Windows Alpha candidate accepted by the project owner; publication requires separate approval.
 >
-> **Updated:** 2026-11-10
+> **Updated:** 2026-11-11
 
 PES-06 scope correction, 2026-09-15: the project owner permits starting a new campaign for current panel
 verification. Existing-campaign rules updates, including preserving layout when new panels are
@@ -112,6 +112,15 @@ across the current and retained Lite sources. Exact file/JSON Pointer/hash bindi
 to the selected Setting. Portrait lookup uses admitted metadata without parsing the large
 definition files. Producer and owner composition checks cover these bindings and used-art
 transfer with generation Off; these fixtures do not supply the missing production artwork.
+Five inherited forms now reuse their prepared Severed Lands rendition: Ankheg, Basilisk,
+Darkmantle, Death Dog and Gelatinous Cube. Exact Ruleset file/hash/JSON Pointer plus Setting
+scope selects the existing complete bundle, with no copied images or changed mechanics.
+Other Settings do not inherit those renditions. The mixed NPC/creature journey selects one
+Basilisk through its inherited form and another through its authored Rift profile, preserving
+independent crops and offline used-art recovery. The remaining 325 inherited forms still need art.
+The current actual-image/resource/alias check passed in 84.91 seconds, including refusal outside
+Severed Lands; the mixed authored/inherited/NPC offline journey passed in 73.42 seconds. All
+33 visual bundles and their previous bindings are unchanged. These are source checks only.
 Review of all eighteen shipped/retained Plan narratives identified seventy-two prose-only named
 subjects, including side-story cast and the Vigilant Engine. The production roster preserves
 separate identities for same-named people in different Plans. Exact accepted-Plan ID, cited prose,

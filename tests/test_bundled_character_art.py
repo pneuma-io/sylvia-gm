@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 
 from scripts.inventory_authored_artwork import authored_artwork_subjects
+from scripts.inventory_inherited_artwork import inherited_artwork_subjects
 
 from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.application.bundled_character_art import (
@@ -17,6 +18,7 @@ from sylvia_gm.application.campaign_library_selection import materialize_library
 from sylvia_gm.application.image_art import ImageArt
 from sylvia_gm.application.image_hooks import ImageData
 from sylvia_gm.domain.image_art import validate_character_visuals
+from sylvia_gm.domain.package_library import PackageFile
 from tests.test_bundled_starter_characters import selection
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -38,6 +40,12 @@ def test_prepared_bundles_match_starter_data_package_payloads_and_frozen_invento
         for edition in subject["editions"]
         for source in (edition["source"],)
     }
+    inherited_sources = {
+        (item["package_id"], item["path"], item["sha256"]): PackageFile(
+            path=item["path"], byte_count=item["byte_count"], sha256=item["sha256"]
+        )
+        for item in inherited_artwork_subjects()["source_files"]
+    }
     assert catalogue["characters"]
     for entry in catalogue["characters"]:
         visuals = validate_character_visuals(entry["visuals"])
@@ -46,10 +54,21 @@ def test_prepared_bundles_match_starter_data_package_payloads_and_frozen_invento
             assert source["visuals"] == visuals
         else:
             for source in entry["sources"]:
-                raw = authored_sources[(source["package_id"], source["path"], source["sha256"])]
+                if "#/" in source["path"]:
+                    raw = inherited_sources[
+                        (source["package_id"], source["path"].partition("#")[0], source["sha256"])
+                    ]
+                    assert bundled_source_visuals(
+                        source["package_id"], source["path"], raw,
+                        campaign_setting_ids=frozenset({"another-setting"}),
+                    ) is None
+                else:
+                    raw = authored_sources[
+                        (source["package_id"], source["path"], source["sha256"])
+                    ]
                 assert bundled_source_visuals(
                     source["package_id"], source["path"], raw, subject_name=entry["name"],
-                    campaign_setting_ids=frozenset({source["package_id"]}),
+                    campaign_setting_ids=frozenset({"pneuma.severed-lands"}),
                 ) == visuals
         for purpose in ("full_body", "reference_sheet", "portrait"):
             asset = entry["visuals"][purpose]
