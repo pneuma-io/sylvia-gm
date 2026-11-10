@@ -5174,4 +5174,6 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    # Topic handlers must share the protocol's exception identity under python -m.
+    sys.modules["sylvia_gm.interfaces.owner_process"] = sys.modules[__name__]
     raise SystemExit(main())
