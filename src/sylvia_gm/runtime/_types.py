@@ -60,6 +60,7 @@ class ToolResult:
     narrative_directives: list[dict[str, Any]] = field(default_factory=list)
     error: str | None = None
     failure_kind: str | None = None
+    failure_reasons: tuple[str, ...] = ()
     logs: list[dict[str, Any]] = field(default_factory=list)
     available_tools: list[str] = field(default_factory=list)
     public_context: dict[str, Any] | None = None

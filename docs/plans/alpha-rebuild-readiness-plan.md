@@ -2,6 +2,8 @@
 
 > **Status:** Active planning and handoff authority
 >
+> **Endpoint:** A Windows Alpha candidate accepted by the project owner; publication requires separate approval.
+>
 > **Updated:** 2026-11-11
 
 This is the repository status surface synchronized with Dot Desk (formerly Project Desk).
@@ -13,6 +15,107 @@ The existing PR #6 current-work paragraphs are retained by that branch and must 
 the branches meet. Their desktop/native, merge and release qualifications continue to apply.
 
 ## 1. Current work
+
+**11 November 2026: native TD build17 passed; final composition remains open.** The owner
+selected completing PR #6 through a separate Windows candidate and isolated synthetic data
+before balancing. Host desktop control stays stopped. Native testing uses PNEUMA-AGENT.
+Merge, publication, release, settlement and numerical balancing remain held.
+
+Build17 is bound to source `4b438d7a0f9b5b04dca050a8b9f5005d2b02ac7e`, including
+main `6526904` and merged PR #28 frontend `9a434b1`. The standard optimized Windows
+recipe completed exit 0; release/portable verification and both invocation cleanup receipts
+passed. Owner `721e3dfa` matches the binary that passed 12 fresh compiled protocol checks.
+Desktop `f9d8c324`, portable `c2fd0df2` and installer `4d773a0f` are SHA256 prefixes;
+PR #6 and the private work report retain the full source/package/artifact identities.
+The public TD0.1.29 archive is `8cf2fa62`, content `1d8e1e38`. Runtime, panels, guides,
+eligibility and parameters match the preceding `882103e` package byte-for-byte.
+
+Fresh native build17 testing used a new isolated synthetic profile. Settings / Packages and
+the native file picker admitted the exact archive; the installed caption, TD0.1.29 and content
+identity were observed. Full Audit was enabled and verified per app process, with zero model
+exchanges. Synthetic campaign setup through AuthorityOwner is distinct from native gameplay
+and does not qualify guided Builder creation or a complete adventure.
+
+At restored 1020 by 710, single Reload queued magazine change then cycle without changing
+r0/AP2 or the spent 1/5 weapon. Expanded controls initially lay below the short horizontal
+tray. Background wheel was refused by the driver; foreground wheel inside the leased guest
+visibly revealed them. Binding the card list to its row passed all 12 retained-layout cases;
+both native-size regressions were also rerun at committed `4b438d7`.
+
+Execute committed only the authored 2 AP magazine change: r1/AP0, spent chamber, 5/5 magazine,
+one spare and one retained magazine. The 1 AP cycle stayed pending with an explicit
+insufficient-AP refusal. Real scrolling exposed Remove Cycle weapon; removal preserved the
+paid prefix and resources. Repeat Execute, fresh-owner reopen and another Execute preserved
+the same result and zero pending steps. Readonly closed-profile assertions confirm the exact
+package pin, all 11 magazine rounds conserved and every other entity field unchanged.
+Apps closed normally; exact candidate processes/windows and nonempty WAL were absent before
+copying. Transfers matched hashes, then the session ended and the hotfix owner received the
+safe handoff. No TD guest operation or heavy build remains active.
+
+Earlier native `882103e` proof remains separate: manual Reload at 2 + 1 AP and saved-state
+reopen; the tube fixture's explicit 2 + 2 AP shell/cycle steps and corrected caption; eligible
+Deep Aim, suppression, quiet activity with its actual failed roll, and field reorientation.
+Network proof covers the ten controls at the native test size, priced entry/discovery/pivot,
+AP0 refusal/clear/reopen, persistent local and connected access, escalation/establishment,
+disconnect and generation-based route invalidation. Remote operation refused without
+privilege, then changed the door's saved geometry and native barrier; duplicate Execute spent
+nothing. The corresponding closed-state assertions passed.
+
+Native `9968614` evidence is reused for stale cycle review/recovery, rig steps once and 72
+unchanged drawn reopen frames, movement/stances/fire/recoil, independent shooter-origin
+watches, drones, wall editing and wall-induced queue review. Rig motion bytes are unchanged.
+Build17 independently proves saved resources and queue state; no fresh frame-motion
+comparison is claimed. Passing earlier mechanics are retained with their exact identities.
+
+The TD branch now incorporates PR #36's frozen corrected main-source input
+`11c279d2ef24fd821be7a163054fa7471a55bd65`, including explicit existing-campaign review/adoption
+and the approved somatic omission default. That input provides Lite 0.3.18. The hotfix owner's
+separate Alpha4-based binary `e543957` provides Lite 0.3.17; its installed upgrade and omitted-field
+healing passed, with portable reopen audit readback still pending at the handoff. Those native
+results do not qualify the TD composition. Build17 and its public TD package retain their exact
+`4b438d7` provenance; no replacement binary is claimed for the new source.
+
+At preceding TD source `72522a8`, full Reload and AP2-stopped Reload each produced one scripted
+HTTP request and one saved closing narration through the real owner process, using admitted Plans
+and Builder-to-DM handoffs. Narration left committed mechanics and receipts unchanged. This is
+source/HTTP evidence; the app's automatic queue-to-GM handoff still needs final native qualification.
+The isolated fixture/helper are prepared without holding the guest.
+
+The strict repairs in TD's new grid-lane and exposure modules pass affected checks. The refactor
+owner's scratch composition of PR #33 `870af5d`, corrected hotfix `11c279d` and TD `72522a8` passed
+Ruff, mypy across 350 files and four representative scripted request checks. This is not a checked
+final handoff. The standalone full run at `5df45da` finished with 6,054 Python passes, 21 registered
+expected failures and 240 failures; all 6,315 required cases ran once, and frontend passed 760/760.
+Its owner is repairing fixture/test gaps and attributing remaining failures. Keep that ownership
+separate, consume the stable checked identity and qualify the actual final composition. Do not
+import unfinished refactor source, duplicate its gate or claim hosted CI success.
+
+The frontend handoff's priority resource fields and Reload acceptance are covered. Round
+display remains unresolved: TD has no round counter, while the frontend currently reads
+round from encounter combat state. Its definition/disposition is awaiting the owner.
+Portrait references, committed movement cues, class lane grants and final combined 1:1
+mock-up/Opus acceptance retain their separate contracts. Mechanics proof does not close them.
+
+The public compiler accepts optional private notes as an input. Public packages omit
+`references/canon/`; private local builds may include it. TD vault notes and Siren remain
+private. Public GM/Builder reads use compiled reference guides/catalogues and runtime
+declarations. Public full-session adequacy without private prose or a future Rulebook remains
+unproven and is a release boundary. Authored numerical values are preserved; unknown legacy
+maxima/capacities stay absent.
+
+Final candidate/package delivery, reporting and dependency-safe disposable cleanup remain
+unfinished. Exact current status belongs in PR #6 and Project Desk. Preserve personal data,
+playable installations, other workers and actual dependencies. Siren composition, Image Hook,
+numerical balancing and balance-suite adaptation remain separate.
+
+**9 November 2026: Trigger Discipline integration before balancing.** The owner selected an
+integrated, ready, unmerged TD baseline in existing PR #6. The retained runtime, shooter-origin
+Overwatch and grid-edge controls are being reconciled with current main. TD 0.1.29 keeps the
+existing parameters and authored cycling costs. The normal standalone package build is
+`scripts/build_trigger_discipline_package.py`; Settings / Packages owns admission. Siren
+composition, balance-suite adoption and the separate Opus gamification candidate remain
+independent work. Merge and release are held. Source, owner, persistence and rendered-control
+checks are in progress; installed-app and genuine-provider acceptance are not yet claimed.
 
 **9 November 2026: optional onboarding and the complete tutorial suite.** The owner selected a new
 PR for all independently accessible lessons and a guided welcome, AI connection, Ready campaign

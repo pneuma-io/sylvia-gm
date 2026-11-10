@@ -975,6 +975,9 @@ def _handle_spatial_query(
 ) -> None:
     """Resolve one neutral physical query through the package-local owner bridge."""
 
+    # Spatial admission depends on content bootstrap; import only when executing.
+    from sylvia_gm.spatial._interface import _EDGE_JOIN_REPAIR_MESSAGE, SpatialValidationError
+
     del tool_executor
     if not isinstance(body, dict):
         raise EffectExecutionError("spatial_query", "body must be an object")
@@ -1008,6 +1011,14 @@ def _handle_spatial_query(
             )
     except EffectExecutionError:
         raise
+    except SpatialValidationError as error:
+        if operation == "grid_lane":
+            raise PreConditionError(error.code, str(error)) from error
+        if error.code == "spatial_ambiguous_edge_join":
+            # This fixed, source-free authoring explanation is safe to surface.
+            # Other spatial failures retain the ordinary private failure path.
+            raise PreConditionError(error.code, _EDGE_JOIN_REPAIR_MESSAGE) from error
+        raise EffectExecutionError("spatial_query", str(error)) from error
     except Exception as error:
         raise EffectExecutionError("spatial_query", str(error)) from error
     ctx.vars[store_as] = result
@@ -1039,7 +1050,10 @@ def _handle_spatial_mutation(
     ctx: ExecutionContext,
     tool_executor: NestedToolExecutor | None,
 ) -> None:
-    """Apply one neutral exact-object patch through the package-local spatial bridge."""
+    """Apply a neutral object patch or explicit wall edit through the owner bridge."""
+
+    from sylvia_gm.spatial._interface import SpatialValidationError
+    from sylvia_gm.spatial._wall_authoring import WALL_SELECTION_MESSAGE
 
     del tool_executor
     if not isinstance(body, dict):
@@ -1062,7 +1076,28 @@ def _handle_spatial_mutation(
         result = bridge.spatial_mutation(scene_path, request)
     except EffectExecutionError:
         raise
+    except SpatialValidationError as error:
+        if body.get("operation") == "grid_lane":
+            raise PreConditionError(error.code, str(error)) from error
+        if error.code == "spatial_wall_selection_required":
+            raise PreConditionError(error.code, WALL_SELECTION_MESSAGE) from error
+        if "operation" in body:
+            message = (
+                "The map changed. Refresh the map and try this wall edit again."
+                if error.code == "spatial_stale_revision" else
+                "This wall edit is invalid. Check the selected wall and its grid-border "
+                "segments, then retry."
+            )
+            raise PreConditionError(error.code, message) from error
+        raise EffectExecutionError("spatial_mutation", str(error)) from error
     except Exception as error:
+        if body.get("operation") == "grid_lane":
+            raise EffectExecutionError("spatial_mutation", str(error)) from error
+        if "operation" in body:
+            raise PreConditionError(
+                "spatial_wall_edit_failed",
+                "This wall edit could not be saved. Nothing changed. Retry the edit.",
+            ) from error
         raise EffectExecutionError("spatial_mutation", str(error)) from error
     ctx.vars[store_as] = result
     bridge.register_spatial_private_variable(store_as)
@@ -2164,7 +2199,9 @@ def _resolve_value(expr: Any, ctx: ExecutionContext) -> Any:
         match = re.match(r"^([A-Za-z_][A-Za-z_0-9]*)", expr)
         root = match.group(1) if match else None
         declared = root in ctx.params or root in ctx.vars or root in ctx.entities
-        scoped_path = root in {"state", "combat", "ruleset", "definitions"} and ("." in expr or "[" in expr)
+        scoped_path = root in {"state", "combat", "ruleset", "definitions"} and (
+            "." in expr or "[" in expr
+        )
         if declared or scoped_path:
             return None
         return expr

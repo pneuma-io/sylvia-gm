@@ -324,13 +324,25 @@ def _required_engine_features(value: object) -> tuple[str, ...]:
                 features.update({ENGINE_FEATURE_SHOT_EFFECTS, ENGINE_FEATURE_TACTICAL_GRID})
             if "occupies_cells" in item:
                 features.add(ENGINE_FEATURE_SPATIAL_CLEARANCE)
+            if item.get("kind") == "grid_edge":
+                features.add("spatial_grid_edge.v1")
+            if "edge_layer_id" in item:
+                features.update({"spatial_grid_edge.v1", "spatial_edge_continuity.v1"})
             if "spatial_mutation" in item:
                 features.update(
                     {ENGINE_FEATURE_SPATIAL_MUTATION, ENGINE_FEATURE_TACTICAL_GRID}
                 )
+                mutation = item["spatial_mutation"]
+                if isinstance(mutation, Mapping) and mutation.get("operation") == "grid_lane":
+                    features.add("spatial_grid_lanes.v1")
+                elif isinstance(mutation, Mapping) and "operation" in mutation:
+                    features.update({"spatial_wall_authoring.v1", "spatial_grid_edge.v1",
+                                     "spatial_edge_continuity.v1"})
             query = item.get("spatial_query")
             if isinstance(query, Mapping):
                 features.add(ENGINE_FEATURE_TACTICAL_GRID)
+                if query.get("operation") == "grid_lane":
+                    features.add("spatial_grid_lanes.v1")
                 if query.get("operation") == "path":
                     features.add(ENGINE_FEATURE_SPATIAL_CLEARANCE)
                 path_query = query.get("query")

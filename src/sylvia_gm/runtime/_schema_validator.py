@@ -49,6 +49,7 @@ _SPATIAL_QUERY_FIELDS: dict[str, frozenset[str]] = {
     "circle_overlap": frozenset(
         {"map_id", "moving_entity_id", "fixed_entity_id", "destination", "moving_radius", "fixed_radius", "origin"}
     ),
+    "grid_lane": frozenset({"map_id", "owner_id", "lane"}),
     "body_proximity": frozenset(
         {
             "map_id",
@@ -84,6 +85,10 @@ _SPATIAL_QUERY_FIELDS: dict[str, frozenset[str]] = {
     "exposure": frozenset(
         {"map_id", "observer", "target", "samples", "include", "metadata_filter"}
     ),
+    "exposure_path": frozenset(
+        {"map_id", "observer", "target", "samples", "include", "metadata_filter",
+         "path", "zone_id", "max_tests"}
+    ),
     "path": frozenset(
         {
             "map_id",
@@ -95,6 +100,7 @@ _SPATIAL_QUERY_FIELDS: dict[str, frozenset[str]] = {
             "moving_entity_id",
             "metadata_filter",
             "max_steps",
+            "cost_profile",
         }
     ),
     "crossed_zones": frozenset({"map_id", "path", "max_crossings"}),
@@ -105,6 +111,7 @@ _SPATIAL_MUTATION_FIELDS = {
     "geometry": frozenset(
         {
             "volume",
+            "edge_layer_id",
             "active",
             "movement",
             "occupies_cells",
@@ -822,7 +829,9 @@ def _validate_model_decision_boundary(value: Any) -> list[str]:
     else:
         if "actor_participant_field" in control and (
             not isinstance(control["actor_participant_field"], str)
-            or re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]{0,63}", control["actor_participant_field"]) is None
+            or re.fullmatch(
+                r"[A-Za-z_][A-Za-z0-9_]{0,63}", control["actor_participant_field"]
+            ) is None
         ):
             errors.append("Model decision boundary actor participant field is invalid")
         player_values = control["player_values"]
@@ -1190,11 +1199,14 @@ def _validate_spatial_mutation_effect(
     body: Mapping[str, Any],
     path: str,
 ) -> list[str]:
-    """Validate the closed static shape of one neutral scene-object patch."""
+    """Validate either closed scene-mutation variant before package admission."""
 
     label = f"Tool '{tool_name}': {path} spatial_mutation"
     errors: list[str] = []
-    if set(body) != {"scene", "map_id", "expected_revision", "target", "patch"}:
+    lane = body.get("operation") == "grid_lane"
+    wall = "operation" in body
+    fields = ({"operation", "owner_id", "lane"} if lane else {"operation", "geometry_ids", "segments"} if wall else {"target", "patch"})
+    if set(body) != {"scene", "map_id", "expected_revision"} | fields:
         errors.append(f"{label} uses an invalid closed body")
     if set(effect) - {"spatial_mutation", "store_as", "condition"}:
         errors.append(f"{label} effect contains unsupported fields")
@@ -1214,6 +1226,22 @@ def _validate_spatial_mutation_effect(
     store_as = effect.get("store_as")
     if not isinstance(store_as, str) or re.fullmatch(r"_[A-Za-z0-9_]+", store_as) is None:
         errors.append(f"{label} requires a private store_as")
+    if lane:
+        if not isinstance(body.get("owner_id"), str) or not _spatial_literal_or_template(body.get("lane"), dict):
+            errors.append(f"{label} grid lane owner or selection is invalid")
+        return errors
+    if wall:
+        operation = body.get("operation")
+        if not isinstance(operation, str) or (
+            operation not in {"draw", "extend", "connect", "separate"}
+            and _SPATIAL_TEMPLATE.fullmatch(operation) is None
+        ):
+            errors.append(f"{label} wall operation is invalid")
+        for field in ("geometry_ids", "segments"):
+            value = body.get(field)
+            if not _spatial_literal_or_template(value, list):
+                errors.append(f"{label} {field} must be an array or context template")
+        return errors
     target = body.get("target")
     if not isinstance(target, Mapping) or set(target) != {"kind", "id"}:
         errors.append(f"{label} target is invalid")
@@ -1284,9 +1312,11 @@ def _validate_spatial_query_effect(
         expected_query = expected_query - {'origin'}
     if operation == 'circle_route' and 'edge_costs' not in query:
         expected_query = expected_query - {'edge_costs'}
+    if operation == "path" and "cost_profile" not in query:
+        expected_query = expected_query - {"cost_profile"}
     if operation == "path" and "moving_entity_id" not in query:
         expected_query = expected_query - {"moving_entity_id"}
-    if operation in {"path", "exposure"} and "metadata_filter" not in query:
+    if operation in {"path", "exposure", "exposure_path"} and "metadata_filter" not in query:
         expected_query = expected_query - {"metadata_filter"}
     if operation == "sweep":
         expected_query = expected_query - ({"metadata_filter", "exclude_entity_ids"} - set(query))
@@ -1307,7 +1337,7 @@ def _validate_spatial_query_effect(
         _validate_spatial_limit(
             errors, label, query.get("max_intersections"), "max_intersections", 1, 1024
         )
-    elif operation == "exposure":
+    elif operation in {"exposure", "exposure_path"}:
         observer = query.get("observer")
         if not isinstance(observer, Mapping) or set(observer) != {"point"}:
             errors.append(f"{label} observer is invalid")
@@ -1340,6 +1370,15 @@ def _validate_spatial_query_effect(
             or not _spatial_literal_or_template(selector.get("missing_matches"), bool)
         ):
             errors.append(f"{label} metadata filter is invalid")
+        if operation == "exposure_path":
+            value = query.get("path")
+            if not ((isinstance(value, str) and _SPATIAL_TEMPLATE.fullmatch(value)) or
+                    (isinstance(value, list) and 2 <= len(value) <= 256 and
+                     all(_spatial_coordinate(point, 3) for point in value))):
+                errors.append(f"{label} path must contain 2 to 256 points")
+            if not isinstance(query.get("zone_id"), str) or not query["zone_id"]:
+                errors.append(f"{label} zone_id must be text or a template")
+            _validate_spatial_limit(errors, label, query.get("max_tests"), "max_tests", 1, 4096)
     elif operation == 'circle_route':
         if not _spatial_coordinate(query.get('destination'), 3):
             errors.append(f'{label} destination must contain three coordinates')
@@ -1453,6 +1492,11 @@ def _validate_spatial_query_effect(
             errors, label, query.get("max_candidates"), "max_candidates", 1, 100000
         )
     elif operation == "path":
+        if (
+            "cost_profile" in query
+            and not _spatial_literal_or_template(query["cost_profile"], bool)
+        ):
+            errors.append(f"{label} cost_profile must be boolean")
         selector = query.get("metadata_filter")
         if selector is not None and (
             not isinstance(selector, Mapping)
@@ -1482,6 +1526,9 @@ def _validate_spatial_query_effect(
         ):
             errors.append(f"{label} moving_entity_id must be text or a context template")
         _validate_spatial_limit(errors, label, query.get("max_steps"), "max_steps", 1, 4_000_000)
+    elif operation == "grid_lane":
+        if not isinstance(query.get("owner_id"), str) or not _spatial_literal_or_template(query.get("lane"), dict):
+            errors.append(f"{label} grid lane owner or selection is invalid")
     elif operation == "crossed_zones":
         value = query.get("path")
         if isinstance(value, str):

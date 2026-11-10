@@ -21,7 +21,10 @@ from types import MappingProxyType
 from typing import Any, Never, cast
 from uuid import uuid4
 
-from sylvia_gm.application.player_actions import valid_player_action_consequence
+from sylvia_gm.application.player_actions import (
+    player_canonical_payload,
+    valid_player_action_consequence,
+)
 from sylvia_gm.application.schema_admission import validate_json_value
 from sylvia_gm.domain.authority import (
     ActionReceipt,
@@ -988,6 +991,28 @@ def _load_payload(value: str) -> SafePayload:
     if not isinstance(parsed, Mapping):
         raise TypeError("Stored payload must be a canonical JSON object")
     return cast(SafePayload, parsed)
+
+
+def _public_session_reference(
+    connection: sqlite3.Connection, event_type: str, visibility: str, payload: SafePayload,
+) -> SafePayload:
+    """Reconstruct the exact public reference from canonical bytes and retained package pins."""
+    private_inputs = False
+    identity = tuple(payload.get(key) for key in (
+        "package_id", "package_version", "package_sha256",
+    ))
+    if (event_type == CanonicalEventType.TOOL_CALL.value
+            and all(isinstance(value, str) for value in identity)):
+        manifest = sqlite_packages.exact_manifest(connection, cast(tuple[str, str, str], identity))
+        private_inputs = manifest is not None and any(
+            item.visibility == "engine" for item in manifest.state_schemas
+        )
+    return owned_payload({
+        "event_type": event_type, "visibility": visibility,
+        "safe_payload": player_canonical_payload(
+            CanonicalEventType(event_type), payload, private_inputs=private_inputs,
+        ),
+    })
 
 
 @dataclass(frozen=True)
@@ -5561,26 +5586,13 @@ class SQLiteAuthorityStore:
                             "visibility": str(event["visibility"]),
                             "safe_payload": payload,
                         })
-                        if (
-                            message.content != expected_reference
-                            and str(event["event_type"]) == CanonicalEventType.TOOL_CALL.value
-                        ):
-                            identity = tuple(payload.get(key) for key in (
-                                "package_id", "package_version", "package_sha256",
-                            ))
-                            if all(isinstance(value, str) for value in identity):
-                                manifest = sqlite_packages.exact_manifest(
-                                    connection, cast(tuple[str, str, str], identity),
-                                )
-                                # Canonical replay omits private engine inputs. Validate that
-                                # exact projection against the retained package declaration.
-                                if manifest is not None and any(
-                                    item.visibility == "engine" for item in manifest.state_schemas
-                                ):
-                                    expected_reference = owned_payload({
-                                        **expected_reference,
-                                        "safe_payload": {**payload, "parameters": {}},
-                                    })
+                        if message.content != expected_reference:
+                            # Older references may retain canonical bytes. New public references
+                            # must match exactly the same redaction used by live and replay paths.
+                            expected_reference = _public_session_reference(
+                                connection, str(event["event_type"]), str(event["visibility"]),
+                                payload,
+                            )
                         if message.content != expected_reference:
                             raise ValueError("Stored canonical session reference is invalid")
                 if session.status is SessionStatus.REVIEW_REQUIRED and not any(
@@ -6566,25 +6578,57 @@ class SQLiteAuthorityStore:
         connection = self._connect()
         try:
             connection.execute("BEGIN IMMEDIATE")
-            messages = tuple(
-                sqlite_session.append_message(
+            session = sqlite_session.read_session(connection, session_id)
+            messages = []
+            for event in events:
+                row = connection.execute(
+                    "SELECT event_type, visibility, safe_payload_json FROM canonical_events "
+                    "WHERE campaign_id = ? AND sequence = ?",
+                    (session.campaign_id, event.sequence),
+                ).fetchone()
+                if row is None:
+                    raise CommandRejected("Canonical session reference is unavailable")
+                payload = _load_payload(str(row["safe_payload_json"]))
+                raw = owned_payload({
+                    "event_type": str(row["event_type"]), "visibility": str(row["visibility"]),
+                    "safe_payload": payload,
+                })
+                public = _public_session_reference(
+                    connection, str(row["event_type"]), str(row["visibility"]), payload,
+                )
+                supplied = owned_payload({
+                    "event_type": event.event_type.value, "visibility": event.visibility.value,
+                    "safe_payload": event.safe_payload,
+                })
+                if supplied not in (raw, public):
+                    raise IdempotencyConflict("Canonical session reference payload does not match")
+                identity = f"canonical-{event.sequence}"
+                existing = connection.execute(
+                    "SELECT * FROM agent_session_messages WHERE session_id = ? AND message_id = ?",
+                    (session_id, identity),
+                ).fetchone()
+                if existing is not None:
+                    captured = sqlite_session.message_from_row(existing)
+                    if (captured.kind is SessionMessageKind.CANONICAL_REFERENCE
+                            and captured.canonical_sequence == event.sequence
+                            and captured.content == raw and raw != public):
+                        # Normalize only an exact legacy reference. Never overwrite conflicting
+                        # content or change campaign events, actions or session chronology.
+                        connection.execute(
+                            "UPDATE agent_session_messages SET content_json = ? "
+                            "WHERE session_id = ? AND message_id = ?",
+                            (canonical_json_bytes(public).decode(), session_id, identity),
+                        )
+                messages.append(sqlite_session.append_message(
                     connection,
                     session_id=session_id,
-                    message_id=f"canonical-{event.sequence}",
+                    message_id=identity,
                     kind=SessionMessageKind.CANONICAL_REFERENCE,
-                    content=owned_payload(
-                        {
-                            "event_type": event.event_type.value,
-                            "visibility": event.visibility.value,
-                            "safe_payload": event.safe_payload,
-                        }
-                    ),
+                    content=public,
                     canonical_sequence=event.sequence,
-                )
-                for event in events
-            )
+                ))
             connection.commit()
-            return messages
+            return tuple(messages)
         except BaseException:
             if connection.in_transaction:
                 connection.rollback()
@@ -12217,17 +12261,20 @@ class SQLiteAuthorityStore:
         self, campaign_id: str, *, event_after: int | None = None,
         actions_after_revision: int | None = None,
         action_ids: tuple[str, ...] = (),
+        include_continuity: bool = False,
     ) -> CampaignDisplaySnapshot:
         """Read current state plus requested event/action history in one transaction."""
         return cast(CampaignDisplaySnapshot, self._read_snapshot(
             campaign_id, display_only=True, event_after=event_after,
             actions_after_revision=actions_after_revision, display_action_ids=action_ids,
+            include_continuity=include_continuity,
         ))
 
     def _read_snapshot(
         self, campaign_id: str, *, display_only: bool = False,
         event_after: int | None = None, actions_after_revision: int | None = None,
         display_action_ids: tuple[str, ...] = (),
+        include_continuity: bool = False,
     ) -> CampaignSnapshot | CampaignDisplaySnapshot:
         connection = self._connect()
         try:
@@ -12384,6 +12431,8 @@ class SQLiteAuthorityStore:
                     package_lock=self._read_lock(connection, campaign_id),
                     state=self._read_state(connection, campaign_id), participants=participants,
                     actions=actions, events=events, turns=turns,
+                    continuity=(sqlite_continuity.read_view(connection, campaign_id)
+                                if include_continuity and has_f5 else CampaignContinuityView()),
                 )
                 connection.commit()
                 return display

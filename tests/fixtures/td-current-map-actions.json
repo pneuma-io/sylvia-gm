@@ -1,0 +1,278 @@
+[
+  {
+    "bindings": {
+      "actor": "actor"
+    },
+    "id": "stance-standing",
+    "intent": "change_stance",
+    "label": "Stand",
+    "params": {
+      "stance": "STANDING"
+    }
+  },
+  {
+    "bindings": {
+      "actor": "actor"
+    },
+    "id": "stance-crouched",
+    "intent": "change_stance",
+    "label": "Crouch",
+    "params": {
+      "stance": "CROUCHED"
+    }
+  },
+  {
+    "bindings": {
+      "actor": "actor"
+    },
+    "id": "stance-prone",
+    "intent": "change_stance",
+    "label": "Go prone",
+    "params": {
+      "stance": "PRONE"
+    }
+  },
+  {
+    "bindings": {
+      "actor": "actor"
+    },
+    "id": "keep-metal-quiet",
+    "intent": "attempt_break_contact",
+    "label": "Keep held metal quiet",
+    "params": {
+      "activity_id": "quiet-metal"
+    }
+  },
+  {
+    "bindings": {
+      "actor": "actor",
+      "device": "device"
+    },
+    "id": "field-reorient-east",
+    "intent": "reorient_field_node",
+    "label": "Reorient field node east",
+    "params": {
+      "expected_orientation": "NORTH",
+      "orientation": "EAST"
+    }
+  },
+  {
+    "bindings": {
+      "actor": "actor",
+      "destination": "destination"
+    },
+    "id": "move",
+    "intent": "move_actor",
+    "label": "Move",
+    "params": {}
+  },
+  {
+    "bindings": {
+      "aim_point": "aim_point",
+      "attacker": "actor",
+      "target": "target"
+    },
+    "id": "aim",
+    "intent": "aim",
+    "label": "Aim",
+    "params": {
+      "ap": 1
+    }
+  },
+  {
+    "bindings": {
+      "aim_point": "aim_point",
+      "attacker": "actor",
+      "target": "target"
+    },
+    "id": "aim-two",
+    "intent": "aim",
+    "label": "Aim (2 investment)",
+    "params": {
+      "ap": 2
+    }
+  },
+  {
+    "bindings": {
+      "aim_point": "aim_point",
+      "attacker": "actor",
+      "target": "target"
+    },
+    "id": "deep-aim",
+    "intent": "enter_deep_aim",
+    "label": "Enter Deep Aim",
+    "params": {}
+  },
+  {
+    "bindings": {
+      "aim_point": "aim_point",
+      "attacker": "actor",
+      "target": "target"
+    },
+    "id": "fire",
+    "intent": "fire_single",
+    "label": "Fire",
+    "params": {
+      "critical_effect": "DEVASTATING_HIT"
+    }
+  },
+  {
+    "bindings": {
+      "aim_point": "aim_point",
+      "attacker": "actor",
+      "target": "target"
+    },
+    "id": "burst",
+    "intent": "fire_burst",
+    "label": "Burst",
+    "params": {
+      "critical_effect": "DEVASTATING_HIT"
+    }
+  },
+  {
+    "bindings": {
+      "aim_point": "aim_point",
+      "attacker": "actor",
+      "target": "target"
+    },
+    "id": "full-auto",
+    "intent": "fire_full_auto",
+    "label": "Full auto",
+    "params": {
+      "critical_effect": "DEVASTATING_HIT",
+      "rounds": 5
+    }
+  },
+  {
+    "bindings": {
+      "actor": "actor",
+      "drone": "device",
+      "landing_point": "aim_point",
+      "target": "target"
+    },
+    "id": "fpv-strike",
+    "intent": "fpv_fragmentation_strike",
+    "label": "FPV fragmentation strike",
+    "params": {}
+  },
+  {
+    "bindings": {
+      "actor": "actor",
+      "aim_point": "aim_point",
+      "target": "target"
+    },
+    "id": "autodrone-fire",
+    "intent": "autodrone_fire",
+    "label": "Autodrone fire",
+    "params": {}
+  },
+  {
+    "bindings": {
+      "actor": "actor",
+      "lane": "lane"
+    },
+    "id": "overwatch",
+    "intent": "prepare_overwatch_lane",
+    "label": "Prepare overwatch lane",
+    "params": {}
+  },
+  {
+    "bindings": {
+      "actor": "actor"
+    },
+    "id": "cancel-overwatch",
+    "intent": "cancel_overwatch_lane",
+    "label": "Cancel overwatch",
+    "params": {}
+  },
+  {
+    "bindings": {
+      "actor": "actor",
+      "zone_id": "zone"
+    },
+    "id": "suppress",
+    "intent": "establish_suppression",
+    "label": "Suppress",
+    "params": {
+      "rounds": 10
+    }
+  },
+  {
+    "bindings": {
+      "expected_revision": "map_revision",
+      "map_id": "map_id",
+      "segments": "edges"
+    },
+    "edge_segment": {
+      "active": true,
+      "destroyed": {
+        "active": true,
+        "movement": "blocking",
+        "visibility": "opaque"
+      },
+      "height": 3,
+      "metadata": {
+        "player": {
+          "height_label": "Full",
+          "kind": "wall",
+          "label": "Full wall"
+        }
+      },
+      "movement": "blocking",
+      "visibility": "opaque"
+    },
+    "id": "wall-draw",
+    "intent": "author_wall",
+    "label": "New wall",
+    "params": {
+      "geometry_ids": [],
+      "operation": "draw"
+    }
+  },
+  {
+    "bindings": {
+      "expected_revision": "map_revision",
+      "geometry_ids": "edge_anchor",
+      "map_id": "map_id",
+      "segments": "edges"
+    },
+    "edge_segment": {
+      "active": true,
+      "destroyed": {
+        "active": true,
+        "movement": "blocking",
+        "visibility": "opaque"
+      },
+      "height": 3,
+      "metadata": {
+        "player": {
+          "height_label": "Full",
+          "kind": "wall",
+          "label": "Full wall"
+        }
+      },
+      "movement": "blocking",
+      "visibility": "opaque"
+    },
+    "id": "wall-extend",
+    "intent": "author_wall",
+    "label": "Extend wall",
+    "params": {
+      "operation": "extend"
+    }
+  },
+  {
+    "bindings": {
+      "expected_revision": "map_revision",
+      "geometry_ids": "edge_walls",
+      "map_id": "map_id"
+    },
+    "id": "wall-connect",
+    "intent": "author_wall",
+    "label": "Connect walls",
+    "params": {
+      "operation": "connect",
+      "segments": []
+    }
+  }
+]

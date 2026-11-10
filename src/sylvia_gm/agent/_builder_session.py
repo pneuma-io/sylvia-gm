@@ -42,6 +42,7 @@ from sylvia_gm.agent._working_context import (
 from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.application.builder_references import BuilderReferences, ReferenceSource
 from sylvia_gm.application.campaign_plan_sources import CampaignPlanToolAuthority
+from sylvia_gm.application.initial_character_state import InitialCharacterStateSchemaError
 from sylvia_gm.application.library_sources import LibrarySourceReader
 from sylvia_gm.application.package_library import validate_admitted_package_runtimes
 from sylvia_gm.application.reusable_participants import (
@@ -1198,6 +1199,10 @@ def _participant_artifact_tool(
                 "state_changed": False,
                 "message": str(error),
                 "validation_errors": [item.as_payload() for item in error.diagnostics[:16]],
+                **({"validation_issues": [
+                    {**issue.as_payload(), "parameter": "entity_state"}
+                    for issue in error.validation_issues
+                ]} if isinstance(error, InitialCharacterStateSchemaError) else {}),
             }
         except (AuthorityError, OSError, UnicodeError, ValueError, TypeError):
             return {

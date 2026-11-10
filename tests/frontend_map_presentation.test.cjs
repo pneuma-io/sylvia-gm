@@ -562,3 +562,50 @@ test('geometry inspector shows physical footprint and only the public material l
   html = api.renderTacticalGridPanel(map.data, map.id);
   assert.match(html, /Material: Not specified/);
 });
+
+
+test('completed or empty queues do not demand review after an unrelated campaign change', () => {
+  for (const steps of [[], [{status: 'committed', committed_revision: 7,
+    source: {kind: 'panel', surface_id: 'network', action_id: 'connect'}}]]) {
+    const api = harness();
+    const map = surface();
+    Object.assign(api.state, {activeCampaignId: 'td', activeSessionId: 'dm',
+      actionSequence: {campaign_id: 'td', session_id: 'dm', expected_revision: 7,
+        status: steps.length ? 'completed' : 'ready', steps},
+      panelProjection: {revision: 8, surfaces: [map]}});
+    const html = api.renderTacticalGridPanel(map.data, map.id);
+    assert.doesNotMatch(html, /Queue is out of date|review remaining intentions/);
+    assert.doesNotMatch(html, /map-plan-confirmed|map-plan-ghost/);
+  }
+});
+
+test('unfinished stale queues and uncertain execution retain their warnings', () => {
+  for (const [status, steps, warning] of [
+    ['ready', [{status: 'pending'}], /Queue is out of date; review remaining intentions/],
+    ['running', [], /Action outcome is not yet confirmed/],
+  ]) {
+    const api = harness();
+    const map = surface();
+    Object.assign(api.state, {activeCampaignId: 'td', activeSessionId: 'dm',
+      actionSequence: {campaign_id: 'td', session_id: 'dm', expected_revision: 7, status, steps},
+      panelProjection: {revision: 8, surfaces: [map]}});
+    assert.match(api.renderTacticalGridPanel(map.data, map.id), warning);
+  }
+});
+
+
+test('a latest committed map receipt still draws confirmation until the campaign changes', () => {
+  const api = harness();
+  const map = surface();
+  map.actions = [{id: 'move', label: 'Move', intent: 'move_actor', bindings: {actor: 'actor', destination: 'destination'}}];
+  map.data.entities = [{id: 'hero', position: [1.5, 1.5, 0], display: {label: 'Hero'}}];
+  Object.assign(api.state, {activeCampaignId: 'td', activeSessionId: 'dm',
+    actionSequence: {campaign_id: 'td', session_id: 'dm', expected_revision: 8, status: 'completed',
+      steps: [{status: 'committed', committed_revision: 8, actor: 'hero', label: 'Move',
+        source: {kind: 'panel', surface_id: 'map', action_id: 'move'}}]},
+    panelProjection: {revision: 8, surfaces: [map]}});
+  assert.match(api.renderTacticalGridPanel(map.data, map.id), /map-plan-confirmed/);
+  api.state.panelProjection.revision = 9;
+  const changed = api.renderTacticalGridPanel(map.data, map.id);
+  assert.doesNotMatch(changed, /map-plan-confirmed|Queue is out of date/);
+});

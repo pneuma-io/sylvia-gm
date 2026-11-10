@@ -140,6 +140,22 @@ SPATIAL_SCENE_SCHEMA: dict[str, object] = {
                 "height": {"$ref": "#/$defs/positiveNumber"},
             },
         },
+        "gridEdge": {
+            "type": "object",
+            "additionalProperties": False,
+            "required": ["kind", "min", "max"],
+            "description": (
+                "One shared grid-cell boundary, independent of occupancy. min/max join adjacent "
+                "grid vertices in XY with positive vertical height. Spatial admission checks "
+                "alignment and one-cell length. Keep material/thickness and durability on this "
+                "single geometry source; no physical thickness is inferred from the drawing."
+            ),
+            "properties": {
+                "kind": {"const": "grid_edge"},
+                "min": {"$ref": "#/$defs/coordinate3"},
+                "max": {"$ref": "#/$defs/coordinate3"},
+            },
+        },
         "shape": {"oneOf": [{"$ref": "#/$defs/box"}, {"$ref": "#/$defs/cylinder"}]},
         "metadata": {
             "type": "object",
@@ -174,13 +190,31 @@ SPATIAL_SCENE_SCHEMA: dict[str, object] = {
             "properties": {
                 "id": {"$ref": "#/$defs/identity"},
                 "map_id": {"$ref": "#/$defs/identity"},
-                "volume": {"$ref": "#/$defs/box"},
+                "volume": {"oneOf": [{"$ref": "#/$defs/box"}, {"$ref": "#/$defs/gridEdge"}]},
+                "edge_layer_id": {
+                    "$ref": "#/$defs/identity",
+                    "description": (
+                        "Optional producer-assigned grid-edge continuity identity, generated "
+                        "from an explicit draw/connect operation rather than entered by users. "
+                        "Only an explicitly shared "
+                        "layer permits adjoining collinear endpoint contacts to collapse. "
+                        "This does not share HP or infer continuity from material or height. "
+                        "The revision-guarded spatial_mutation draw/extend/connect/separate "
+                        "operations manage this identity internally; new segment input omits "
+                        "id, map_id and edge_layer_id. Selection uses existing geometry "
+                        "references. "
+                        "Ambiguous legacy joins need authoring repair; isolated edges remain valid."
+                    ),
+                },
                 "active": {"type": "boolean"},
                 "movement": {"$ref": "#/$defs/movement"},
                 "occupies_cells": {
                     "type": "boolean",
                     "default": True,
-                    "description": "Omission is admitted as true for older scenes.",
+                    "description": (
+                        "Omission is true for legacy boxes and false for grid edges. "
+                        "Grid edges require false."
+                    ),
                 },
                 "visibility": {"$ref": "#/$defs/visibility"},
                 "metadata": {"$ref": "#/$defs/metadata"},
@@ -352,7 +386,8 @@ TACTICAL_GRID_SOURCE_SCHEMA: dict[str, object] = {
     "title": "Sylvia GM tactical-grid surface source v1",
     "description": (
         "Ruleset-owned source object resolved by a tactical_grid or coordinate_map panel. "
-        "Coordinate maps use continuous aim_point input rather than destination cells. scene uses the spatial "
+        "Coordinate maps use continuous aim_point input rather than destination cells. "
+        "scene uses the spatial "
         "scene definition; the other fields are optional player presentation and selection state."
     ),
     "type": "object",
