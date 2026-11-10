@@ -8,6 +8,8 @@ remains the only writer.
 
 from __future__ import annotations
 
+from ._provider_turn_state import ProviderTurnState
+
 import asyncio
 import hashlib
 import json
@@ -1678,37 +1680,38 @@ class ProviderSessionAdapter:
         *,
         turn_id: str,
     ) -> Iterable[ProviderEvent]:
-        campaign_id = provider_input.session.campaign_id
-        if campaign_id is None:
+        state = ProviderTurnState()
+        state.campaign_id = provider_input.session.campaign_id
+        if state.campaign_id is None:
             raise CommandRejected("A DM provider turn requires a campaign")
-        canonical_player_narration = _canonical_player_narration(
+        state.canonical_player_narration = _canonical_player_narration(
             self._owner,
-            campaign_id,
+            state.campaign_id,
         )
-        messages = self._messages(
+        state.messages = self._messages(
             provider_input,
             campaign_has_mechanics=False,
             tools_available=False,
-            canonical_player_narration=canonical_player_narration,
+            canonical_player_narration=state.canonical_player_narration,
         )
-        context_owner = self._gm_context_owner(provider_input)
-        context_fields = {"context_owner": context_owner} if context_owner is not None else {}
-        basis_message_id = provider_input.basis_message_id
+        state.context_owner = self._gm_context_owner(provider_input)
+        state.context_fields = {"context_owner": state.context_owner} if state.context_owner is not None else {}
+        state.basis_message_id = provider_input.basis_message_id
         persisted_system_contract = any(
             message.kind is SessionMessageKind.EVIDENCE
             and message.content.get("kind") == "gm_system_contract"
             for message in provider_input.history.messages
         )
-        if basis_message_id is not None and not persisted_system_contract:
+        if state.basis_message_id is not None and not persisted_system_contract:
             yield ProviderEvent.tool_evidence(
                 message_id=f"gm-system-contract-{provider_input.session.session_id}",
                 payload={
                     "kind": "gm_system_contract",
                     "version": _GM_SYSTEM_CONTRACT_VERSION,
-                    "contract": cast(str, messages[0]["content"]),
+                    "contract": cast(str, state.messages[0]["content"]),
                 },
             )
-        if basis_message_id is None:
+        if state.basis_message_id is None:
             basis_message = next(
                 (
                     message
@@ -1723,19 +1726,19 @@ class ProviderSessionAdapter:
                 ),
                 None,
             )
-            basis_message_id = basis_message.message_id if basis_message is not None else None
-        direct_response = any(
-            message.message_id == basis_message_id
+            state.basis_message_id = basis_message.message_id if basis_message is not None else None
+        state.direct_response = any(
+            message.message_id == state.basis_message_id
             and message.kind is SessionMessageKind.EVIDENCE
             and message.content.get("kind") == "player_action_response"
             for message in provider_input.history.messages
         )
-        post_mechanics_recovery = provider_input.recovery_kind == "post_mechanics_narration"
+        state.post_mechanics_recovery = provider_input.recovery_kind == "post_mechanics_narration"
         redirected = next((message for message in provider_input.history.messages
-                           if message.message_id == basis_message_id), None)
+                           if message.message_id == state.basis_message_id), None)
         if redirected is not None and redirected.content.get("redirect_interruption_id"):
             start_sequence = redirected.content.get("canonical_start_sequence", 0)
-            saved_events = self._owner.snapshot(campaign_id).events
+            saved_events = self._owner.snapshot(state.campaign_id).events
             saved_action_ids = {
                 event.action_id for event in saved_events
                 if isinstance(start_sequence, int) and event.sequence > start_sequence
@@ -1752,7 +1755,7 @@ class ProviderSessionAdapter:
                 if event.action_id in saved_action_ids
                 and event.event_type is CanonicalEventType.TOOL_RESULT
             ]
-            messages.append({
+            state.messages.append({
                 "role": "system",
                 "content": (
                     "SYLVIA_GM_REDIRECTED_CONTINUATION (trusted application instruction): "
@@ -1769,13 +1772,13 @@ class ProviderSessionAdapter:
                 ),
             })
         retry_receipt = provider_input.retry_action_receipt
-        if post_mechanics_recovery:
+        if state.post_mechanics_recovery:
             if retry_receipt is None:
                 raise CommandRejected(
                     "Post-mechanics recovery requires its committed action receipt",
                     code="retry_action_receipt_unavailable",
                 )
-            messages.append(
+            state.messages.append(
                 {
                     "role": "system",
                     "content": (
@@ -1810,7 +1813,7 @@ class ProviderSessionAdapter:
                     ),
                 }
             )
-        opening_request = not direct_response and any(
+        state.opening_request = not state.direct_response and any(
             message.kind is SessionMessageKind.EVIDENCE
             and message.content.get("kind") == "campaign_start"
             for message in provider_input.history.messages
@@ -1818,38 +1821,38 @@ class ProviderSessionAdapter:
             message.kind in {SessionMessageKind.USER, SessionMessageKind.TALK}
             for message in provider_input.history.messages
         )
-        participants = tuple(getattr(self._owner.snapshot(campaign_id), "participants", ()))
-        opening_footing = self._opening_footing_payload(provider_input) if opening_request else None
-        current_player_message = next(
+        state.participants = tuple(getattr(self._owner.snapshot(state.campaign_id), "participants", ()))
+        state.opening_footing = self._opening_footing_payload(provider_input) if state.opening_request else None
+        state.current_player_message = next(
             (
                 message
                 for message in reversed(provider_input.history.messages)
-                if message.kind is SessionMessageKind.USER and not direct_response
+                if message.kind is SessionMessageKind.USER and not state.direct_response
             ),
             None,
         )
-        current_player_action = (
-            str(current_player_message.content.get("text", ""))
-            if current_player_message is not None
+        state.current_player_action = (
+            str(state.current_player_message.content.get("text", ""))
+            if state.current_player_message is not None
             else None
         )
-        current_user_wire_text = (
-            _player_turn_text(current_player_message.content)
-            if current_player_message is not None
+        state.current_user_wire_text = (
+            _player_turn_text(state.current_player_message.content)
+            if state.current_player_message is not None
             else None
         )
-        saved_sequence_results = _saved_action_sequence_results(provider_input, self._owner)
-        pending_narration_facts = [
-            facts for result in saved_sequence_results
+        state.saved_sequence_results = _saved_action_sequence_results(provider_input, self._owner)
+        state.pending_narration_facts = [
+            state.facts for result in state.saved_sequence_results
             if (
-                facts := _action_sequence_narration_facts(self._owner, campaign_id, result)
+                facts := state.bind('facts', _action_sequence_narration_facts(self._owner, state.campaign_id, result))
             ) is not None
         ]
-        provisional_tool_prose_pending = False
-        player_intent_pending = False
-        committed_action_ids = {
+        state.provisional_tool_prose_pending = False
+        state.player_intent_pending = False
+        state.committed_action_ids = {
             event.action_id
-            for event in self._owner.snapshot(campaign_id).events
+            for event in self._owner.snapshot(state.campaign_id).events
             if event.event_type is CanonicalEventType.ACTION_COMMITTED
             and event.action_id is not None
         }
@@ -1859,15 +1862,15 @@ class ProviderSessionAdapter:
             contract = history_message.content
             if (
                 contract.get("kind") != "provider_mechanics_action_contract"
-                or contract.get("basis_message_id") != basis_message_id
+                or contract.get("basis_message_id") != state.basis_message_id
             ):
                 continue
-            action_id = contract.get("action_id")
+            state.action_id = contract.get("action_id")
             raw_behavior = contract.get("model_behavior")
             decision_owner = contract.get("decision_owner")
             if (
-                not isinstance(action_id, str)
-                or not action_id
+                not isinstance(state.action_id, str)
+                or not state.action_id
                 or not isinstance(raw_behavior, str)
                 or decision_owner not in {None, *tuple(owner.value for owner in ModelDecisionOwner)}
             ):
@@ -1875,20 +1878,20 @@ class ProviderSessionAdapter:
                     "Persisted mechanics action contract is invalid",
                     code="provider_tool_evidence_invalid",
                 )
-            if action_id not in committed_action_ids:
+            if state.action_id not in state.committed_action_ids:
                 continue
             try:
-                behavior = ModelToolBehavior(raw_behavior)
+                state.behavior = ModelToolBehavior(raw_behavior)
             except ValueError as error:
                 raise CommandRejected(
                     "Persisted mechanics action behavior is invalid",
                     code="provider_tool_evidence_invalid",
                 ) from error
-            if behavior is ModelToolBehavior.LEAVES_PLAYER_INTENT_PENDING:
+            if state.behavior is ModelToolBehavior.LEAVES_PLAYER_INTENT_PENDING:
                 try:
-                    player_intent_pending = _preparation_keeps_intent_pending(
+                    state.player_intent_pending = _preparation_keeps_intent_pending(
                         contract.get(_PREPARATION_INTENT_ARGUMENT, _UNSPECIFIED_PREPARATION_INTENT),
-                        pending=player_intent_pending,
+                        pending=state.player_intent_pending,
                     )
                 except CommandRejected as error:
                     raise CommandRejected(
@@ -1896,100 +1899,100 @@ class ProviderSessionAdapter:
                         code="provider_tool_evidence_invalid",
                     ) from error
             elif (
-                behavior is ModelToolBehavior.RESOLVES_PLAYER_INTENT
+                state.behavior is ModelToolBehavior.RESOLVES_PLAYER_INTENT
                 and decision_owner == ModelDecisionOwner.PLAYER.value
             ):
-                player_intent_pending = False
-        buffered_narration: str | None = None
-        buffered_response_blocks: tuple[SafePayload, ...] | None = None
-        buffered_raw_response_blocks: tuple[SafePayload, ...] | None = None
-        ooc_ack_required = bool(
-            current_player_message is not None
-            and isinstance(current_player_message.content.get("ooc_text"), str)
-            and str(current_player_message.content.get("ooc_text", "")).strip()
+                state.player_intent_pending = False
+        state.buffered_narration = None
+        state.buffered_response_blocks = None
+        state.buffered_raw_response_blocks = None
+        state.ooc_ack_required = bool(
+            state.current_player_message is not None
+            and isinstance(state.current_player_message.content.get("ooc_text"), str)
+            and str(state.current_player_message.content.get("ooc_text", "")).strip()
         )
         # An OOC-only correction does not resume an opted-in participant's pending game turn.
-        participant_ooc_only = (
-            context_owner is not None and ooc_ack_required
-            and not str(current_player_action or "").strip()
+        state.participant_ooc_only = (
+            state.context_owner is not None and state.ooc_ack_required
+            and not str(state.current_player_action or "").strip()
         )
-        buffered_narration_needs_disposition = False
-        any_commit_in_exchange = post_mechanics_recovery or direct_response
-        campaign_file_commit_in_exchange = False
-        campaign_file_disposition_in_exchange = False
-        campaign_file_narration_pending = False
-        missing_required_tool_corrections_used = 0
-        max_missing_required_tool_corrections = 3
-        rejected_tool_corrections_used = 0
-        max_rejected_tool_corrections = 5
-        empty_completion_corrections_used = 0
-        max_empty_completion_corrections = 2
-        private_deliberation_corrections_used = 0
-        max_private_deliberation_corrections = 2
-        private_deliberation_correction_message: dict[str, object] | None = None
-        required_tool_call_correction_message: dict[str, object] | None = None
-        current_application_controls: list[dict[str, object]] = []
-        repeated_response_corrections_used = 0
-        max_repeated_response_corrections = 2
-        pending_failed_tool_call = False
-        force_campaign_file_update = False
+        state.buffered_narration_needs_disposition = False
+        state.any_commit_in_exchange = state.post_mechanics_recovery or state.direct_response
+        state.campaign_file_commit_in_exchange = False
+        state.campaign_file_disposition_in_exchange = False
+        state.campaign_file_narration_pending = False
+        state.missing_required_tool_corrections_used = 0
+        state.max_missing_required_tool_corrections = 3
+        state.rejected_tool_corrections_used = 0
+        state.max_rejected_tool_corrections = 5
+        state.empty_completion_corrections_used = 0
+        state.max_empty_completion_corrections = 2
+        state.private_deliberation_corrections_used = 0
+        state.max_private_deliberation_corrections = 2
+        state.private_deliberation_correction_message = None
+        state.required_tool_call_correction_message = None
+        state.current_application_controls = []
+        state.repeated_response_corrections_used = 0
+        state.max_repeated_response_corrections = 2
+        state.pending_failed_tool_call = False
+        state.force_campaign_file_update = False
         # Native assistant history before the current task is completed player-facing dialogue,
         # not a held draft. Persisted same-turn provider evidence is appended after the current
         # task by _messages(), so only that suffix may resume an unsettled draft or tool result.
         current_task_index = max(
             (
                 index
-                for index, message in enumerate(messages)
+                for index, message in enumerate(state.messages)
                 if message.get("role") == "user"
-                and current_user_wire_text is not None
-                and message.get("content") == current_user_wire_text
+                and state.current_user_wire_text is not None
+                and message.get("content") == state.current_user_wire_text
             ),
-            default=len(messages) - 1,
+            default=len(state.messages) - 1,
         )
-        if opening_request:
+        if state.opening_request:
             # _messages emits the trusted opening task, optional validated Ready input, then
             # persisted same-turn evidence. Anchor recovery before that evidence suffix.
             current_task_index = next(
                 index
-                for index, message in enumerate(messages)
+                for index, message in enumerate(state.messages)
                 if message.get("role") == "system"
                 and str(message.get("content", "")).startswith("SYLVIA_GM_OPENING_TASK ")
             )
             if (
-                current_task_index + 1 < len(messages)
-                and messages[current_task_index + 1].get("role") == "user"
+                current_task_index + 1 < len(state.messages)
+                and state.messages[current_task_index + 1].get("role") == "user"
             ):
                 current_task_index += 1
-        elif direct_response:
+        elif state.direct_response:
             current_task_index = next(
-                index for index, message in enumerate(messages)
+                index for index, message in enumerate(state.messages)
                 if message.get("role") == "system"
                 and str(message.get("content", "")).startswith(
                     "SYLVIA_PLAYER_ACTION_RESPONSE_TASK "
                 )
             )
-        campaign_file_mutation_attempted = _persisted_campaign_file_mutation_attempted(
-            messages[current_task_index + 1 :]
+        state.campaign_file_mutation_attempted = _persisted_campaign_file_mutation_attempted(
+            state.messages[current_task_index + 1 :]
         )
         player_actions = [
             str(message.content.get("text", ""))
             for message in provider_input.history.messages
             if message.kind is SessionMessageKind.USER
         ]
-        previous_player_action = player_actions[-2] if len(player_actions) >= 2 else None
-        previous_player_facing_response = next(
+        state.previous_player_action = player_actions[-2] if len(player_actions) >= 2 else None
+        state.previous_player_facing_response = next(
             (
                 str(record.get("text"))
-                for record in reversed(canonical_player_narration)
+                for record in reversed(state.canonical_player_narration)
                 if isinstance(record.get("text"), str) and bool(str(record.get("text")))
             ),
             None,
         )
-        if previous_player_facing_response is None:
-            previous_player_facing_response = next(
+        if state.previous_player_facing_response is None:
+            state.previous_player_facing_response = next(
                 (
                     str(message.get("content"))
-                    for message in reversed(messages[:current_task_index])
+                    for message in reversed(state.messages[:current_task_index])
                     if message.get("role") == "assistant"
                     and isinstance(message.get("content"), str)
                     and bool(str(message.get("content")))
@@ -1997,64 +2000,64 @@ class ProviderSessionAdapter:
                 ),
                 None,
             )
-        resumed_messages = messages[current_task_index + 1 :]
-        for message in resumed_messages:
-            if message.get("role") == "assistant":
-                content = message.get("content")
+        state.resumed_messages = state.messages[current_task_index + 1 :]
+        for state.message in state.resumed_messages:
+            if state.message.get("role") == "assistant":
+                content = state.message.get("content")
                 if isinstance(content, str) and content:
-                    buffered_narration = content
-                    buffered_response_blocks = None
-                    buffered_raw_response_blocks = None
-                    buffered_narration_needs_disposition = True
-                raw_calls = message.get("tool_calls")
-                if isinstance(raw_calls, Sequence) and not isinstance(
-                    raw_calls, (str, bytes, bytearray)
+                    state.buffered_narration = content
+                    state.buffered_response_blocks = None
+                    state.buffered_raw_response_blocks = None
+                    state.buffered_narration_needs_disposition = True
+                state.raw_calls = state.message.get("tool_calls")
+                if isinstance(state.raw_calls, Sequence) and not isinstance(
+                    state.raw_calls, (str, bytes, bytearray)
                 ):
-                    for raw_call in raw_calls:
-                        function = (
+                    for raw_call in state.raw_calls:
+                        state.function = (
                             raw_call.get("function")
                             if isinstance(raw_call, Mapping)
                             else None
                         )
-                        if not isinstance(function, Mapping):
+                        if not isinstance(state.function, Mapping):
                             continue
-                        name = function.get("name")
-                        if not isinstance(name, str) or not (
-                            name == "update_campaign_file"
-                            or name.endswith("_update_campaign_file")
+                        state.name = state.function.get("name")
+                        if not isinstance(state.name, str) or not (
+                            state.name == "update_campaign_file"
+                            or state.name.endswith("_update_campaign_file")
                         ):
                             continue
                         try:
-                            arguments = json.loads(str(function.get("arguments", "{}")))
-                            raw_blocks = arguments.get(
+                            state.arguments = json.loads(str(state.function.get("arguments", "{}")))
+                            raw_blocks = state.arguments.get(
                                 _CAMPAIGN_FILE_REVISED_NARRATION_ARGUMENT
                             )
                             if isinstance(raw_blocks, list):
-                                buffered_raw_response_blocks = (
+                                state.buffered_raw_response_blocks = (
                                     _validated_raw_response_blocks(
                                         raw_blocks, allow_legacy_dialogue_text=True
                                     )
                                 )
-                                buffered_narration = None
-                                buffered_response_blocks = None
-                                buffered_narration_needs_disposition = True
+                                state.buffered_narration = None
+                                state.buffered_response_blocks = None
+                                state.buffered_narration_needs_disposition = True
                             elif (
                                 isinstance(raw_blocks, str)
                                 and raw_blocks.strip()
                                 and not _contains_serialized_tool_call(raw_blocks)
                             ):
-                                buffered_narration = raw_blocks
-                                buffered_response_blocks = None
-                                buffered_raw_response_blocks = None
-                                buffered_narration_needs_disposition = True
+                                state.buffered_narration = raw_blocks
+                                state.buffered_response_blocks = None
+                                state.buffered_raw_response_blocks = None
+                                state.buffered_narration_needs_disposition = True
                         except (json.JSONDecodeError, ValueError, AttributeError):
                             pass
-                if raw_calls:
-                    pending_failed_tool_call = False
-            if message.get("role") != "tool":
+                if state.raw_calls:
+                    state.pending_failed_tool_call = False
+            if state.message.get("role") != "tool":
                 continue
             try:
-                resumed_result = json.loads(str(message.get("content", "{}")))
+                resumed_result = json.loads(str(state.message.get("content", "{}")))
             except json.JSONDecodeError:
                 continue
             if not isinstance(resumed_result, Mapping):
@@ -2063,165 +2066,165 @@ class ProviderSessionAdapter:
             if status in {"rejected", CanonicalEventType.ACTION_FAILED.value} and not bool(
                 resumed_result.get("correction_optional")
             ):
-                pending_failed_tool_call = True
+                state.pending_failed_tool_call = True
             if status in {
                 "campaign_file_updated",
                 CanonicalEventType.ACTION_COMMITTED.value,
             }:
-                any_commit_in_exchange = True
+                state.any_commit_in_exchange = True
             if status == "campaign_file_updated":
-                settled_narration = resumed_result.get("player_facing_response")
+                state.settled_narration = resumed_result.get("player_facing_response")
                 persisted_blocks = resumed_result.get("response_blocks")
                 if persisted_blocks is not None:
                     try:
-                        buffered_response_blocks = validate_response_blocks(persisted_blocks)
+                        state.buffered_response_blocks = validate_response_blocks(persisted_blocks)
                     except ValueError as error:
                         raise CommandRejected(
                             "Persisted Campaign File response blocks are invalid",
                             code="provider_tool_evidence_invalid",
                         ) from error
                 else:
-                    buffered_response_blocks = None
-                if settled_narration is not None:
-                    if not isinstance(settled_narration, str) or not settled_narration.strip():
+                    state.buffered_response_blocks = None
+                if state.settled_narration is not None:
+                    if not isinstance(state.settled_narration, str) or not state.settled_narration.strip():
                         raise CommandRejected(
                             "Persisted Campaign File disposition narration is invalid",
                             code="provider_tool_evidence_invalid",
                         )
-                    buffered_narration = settled_narration
-                    if buffered_response_blocks is None:
-                        buffered_raw_response_blocks = None
-                campaign_file_commit_in_exchange = True
-                campaign_file_disposition_in_exchange = True
-                if buffered_narration is not None:
-                    buffered_narration_needs_disposition = False
-                    campaign_file_narration_pending = False
+                    state.buffered_narration = state.settled_narration
+                    if state.buffered_response_blocks is None:
+                        state.buffered_raw_response_blocks = None
+                state.campaign_file_commit_in_exchange = True
+                state.campaign_file_disposition_in_exchange = True
+                if state.buffered_narration is not None:
+                    state.buffered_narration_needs_disposition = False
+                    state.campaign_file_narration_pending = False
                 else:
-                    campaign_file_narration_pending = True
+                    state.campaign_file_narration_pending = True
             if status == "campaign_file_unchanged":
-                settled_narration = resumed_result.get("player_facing_response")
+                state.settled_narration = resumed_result.get("player_facing_response")
                 persisted_blocks = resumed_result.get("response_blocks")
                 if persisted_blocks is not None:
                     try:
-                        buffered_response_blocks = validate_response_blocks(persisted_blocks)
+                        state.buffered_response_blocks = validate_response_blocks(persisted_blocks)
                     except ValueError as error:
                         raise CommandRejected(
                             "Persisted Campaign File response blocks are invalid",
                             code="provider_tool_evidence_invalid",
                         ) from error
                 else:
-                    buffered_response_blocks = None
-                if settled_narration is not None:
-                    if not isinstance(settled_narration, str) or not settled_narration.strip():
+                    state.buffered_response_blocks = None
+                if state.settled_narration is not None:
+                    if not isinstance(state.settled_narration, str) or not state.settled_narration.strip():
                         raise CommandRejected(
                             "Persisted Campaign File disposition narration is invalid",
                             code="provider_tool_evidence_invalid",
                         )
-                    buffered_narration = settled_narration
-                    if buffered_response_blocks is None:
-                        buffered_raw_response_blocks = None
-                campaign_file_disposition_in_exchange = True
-                if buffered_narration is not None:
-                    buffered_narration_needs_disposition = False
-                    campaign_file_narration_pending = False
+                    state.buffered_narration = state.settled_narration
+                    if state.buffered_response_blocks is None:
+                        state.buffered_raw_response_blocks = None
+                state.campaign_file_disposition_in_exchange = True
+                if state.buffered_narration is not None:
+                    state.buffered_narration_needs_disposition = False
+                    state.campaign_file_narration_pending = False
                 else:
-                    campaign_file_narration_pending = True
+                    state.campaign_file_narration_pending = True
             if status == CanonicalEventType.ACTION_COMMITTED.value:
-                campaign_file_disposition_in_exchange = False
-                campaign_file_narration_pending = False
-                buffered_narration = None
-                buffered_response_blocks = None
-                buffered_raw_response_blocks = None
-                buffered_narration_needs_disposition = False
+                state.campaign_file_disposition_in_exchange = False
+                state.campaign_file_narration_pending = False
+                state.buffered_narration = None
+                state.buffered_response_blocks = None
+                state.buffered_raw_response_blocks = None
+                state.buffered_narration_needs_disposition = False
             elif status not in {
                 "rejected",
                 CanonicalEventType.ACTION_FAILED.value,
                 "campaign_file_updated",
                 "campaign_file_unchanged",
             }:
-                buffered_narration = None
-                buffered_response_blocks = None
-                buffered_raw_response_blocks = None
-                buffered_narration_needs_disposition = False
-        if ooc_ack_required and campaign_file_disposition_in_exchange and not (
-            buffered_response_blocks is not None
-            and any(block.get("kind") == "ooc" for block in buffered_response_blocks)
+                state.buffered_narration = None
+                state.buffered_response_blocks = None
+                state.buffered_raw_response_blocks = None
+                state.buffered_narration_needs_disposition = False
+        if state.ooc_ack_required and state.campaign_file_disposition_in_exchange and not (
+            state.buffered_response_blocks is not None
+            and any(block.get("kind") == "ooc" for block in state.buffered_response_blocks)
         ):
             raise CommandRejected(
                 "Persisted OOC turn response omits its acknowledgement",
                 code="provider_tool_evidence_invalid",
             )
-        force_campaign_file_update = bool(
-            (buffered_narration is not None or buffered_raw_response_blocks is not None)
-            and buffered_narration_needs_disposition
+        state.force_campaign_file_update = bool(
+            (state.buffered_narration is not None or state.buffered_raw_response_blocks is not None)
+            and state.buffered_narration_needs_disposition
         )
         if (
-            buffered_narration is not None
-            and campaign_file_disposition_in_exchange
-            and not buffered_narration_needs_disposition
+            state.buffered_narration is not None
+            and state.campaign_file_disposition_in_exchange
+            and not state.buffered_narration_needs_disposition
         ):
             yield ProviderEvent.talk(
-                buffered_narration, response_blocks=buffered_response_blocks
+                state.buffered_narration, response_blocks=state.buffered_response_blocks
             )
             return
-        entity_display_names = {
+        state.entity_display_names = {
             str(participant.participant_id): str(data["name"])
-            for participant in participants
+            for participant in state.participants
             if (data := _participant_data(participant)).get("name") is not None
         }
         # Useful tool work continues until completion or cancellation. Engine bookkeeping
         # does not consume a model request, and neither has an arbitrary total-round cutoff.
-        provider_round = 0
-        engine_transition_review_pending = False
-        sequence_execution_stopped = any(
+        state.provider_round = 0
+        state.engine_transition_review_pending = False
+        state.sequence_execution_stopped = any(
             result.get("status") in {"paused", "failed", "stale"}
             or result.get("provider_execution_stopped") is True
-            for result in saved_sequence_results
+            for result in state.saved_sequence_results
         )
         while True:
             if provider_input.control.cancelled:
                 raise CommandRejected("Agent session provider work was cancelled")
-            inference_id = f"inference-{uuid.uuid4().hex}"
-            discovery_id = f"mcp-discovery-{uuid.uuid4().hex}"
-            current_catalog = provider_input.current_catalog(discovery_id)
+            state.inference_id = f"inference-{uuid.uuid4().hex}"
+            state.discovery_id = f"mcp-discovery-{uuid.uuid4().hex}"
+            state.current_catalog = provider_input.current_catalog(state.discovery_id)
             if provider_input.session.role is WriterRole.DM:
                 queue_tools = action_sequence_model_tools(self._owner)
-                if queue_tools and self._owner.snapshot(campaign_id).package_lock.entries:
-                    current_catalog = (
-                        *current_catalog,
+                if queue_tools and self._owner.snapshot(state.campaign_id).package_lock.entries:
+                    state.current_catalog = (
+                        *state.current_catalog,
                         *(tool for tool in queue_tools
-                          if not sequence_execution_stopped or tool.category == "reference"),
+                          if not state.sequence_execution_stopped or tool.category == "reference"),
                     )
-            if participant_ooc_only:
-                current_catalog = tuple(
-                    tool for tool in current_catalog
+            if state.participant_ooc_only:
+                state.current_catalog = tuple(
+                    tool for tool in state.current_catalog
                     if tool.category in {"reference", "narrative_state"}
                 )
             if provider_input.control.cancelled:
                 raise CommandRejected("Agent session provider work was cancelled")
-            required_transitions = tuple(
+            state.required_transitions = tuple(
                 tool
-                for tool in current_catalog
+                for tool in state.current_catalog
                 if tool.model_behavior is ModelToolBehavior.REQUIRED_ENGINE_TRANSITION
             )
-            if (required_transitions and provider_round == 0
-                    and current_player_message is not None
-                    and any(tool.name == "end_combat_encounter" for tool in current_catalog)):
-                combat_at_input = _current_combat_state(self._owner.snapshot(campaign_id).state)
+            if (state.required_transitions and state.provider_round == 0
+                    and state.current_player_message is not None
+                    and any(tool.name == "end_combat_encounter" for tool in state.current_catalog)):
+                combat_at_input = _current_combat_state(self._owner.snapshot(state.campaign_id).state)
                 # A new instruction can end the fight at the just-resolved NPC action.
                 # Read it before finishing that turn or advancing to a Death Save.
-                engine_transition_review_pending = (
+                state.engine_transition_review_pending = (
                     combat_at_input.get("turn_active") is True
                     and combat_at_input.get("active_actor_kind") == "monster"
                     and combat_at_input.get("action_available") is False
                 )
-            if required_transitions and not engine_transition_review_pending:
-                if len(required_transitions) != 1:
+            if state.required_transitions and not state.engine_transition_review_pending:
+                if len(state.required_transitions) != 1:
                     raise CommandRejected(
                         "Ruleset exposed more than one automatic engine transition",
                         code="ambiguous_engine_transition",
                     )
-                transition = required_transitions[0]
+                transition = state.required_transitions[0]
                 properties = transition.input_schema.get("properties", {})
                 required = transition.input_schema.get("required", ())
                 # A package may expose optional context or optional overrides on
@@ -2232,27 +2235,27 @@ class ProviderSessionAdapter:
                         "Automatic engine transitions cannot require model judgment",
                         code="invalid_engine_transition_surface",
                     )
-                before = self._owner.snapshot(campaign_id)
-                action_id = f"action-{uuid.uuid4().hex}"
-                feedback = ProviderActionFeedback()
-                recorder = getattr(self._owner, "record_admin_full_audit", None)
-                if callable(recorder):
-                    recorder(
+                before = self._owner.snapshot(state.campaign_id)
+                state.action_id = f"action-{uuid.uuid4().hex}"
+                state.feedback = ProviderActionFeedback()
+                state.recorder = getattr(self._owner, "record_admin_full_audit", None)
+                if callable(state.recorder):
+                    state.recorder(
                         {
                             "kind": "automatic_engine_transition_requested",
-                            "campaign_id": campaign_id,
+                            "campaign_id": state.campaign_id,
                             "session_id": provider_input.session.session_id,
                             "turn_id": turn_id,
-                            "action_id": action_id,
-                            "mcp_discovery_id": discovery_id,
+                            "action_id": state.action_id,
+                            "mcp_discovery_id": state.discovery_id,
                             "tool_name": transition.name,
                             "basis_revision": before.revision,
                         }
                     )
                 yield ProviderEvent.action(
                     ActionCommand(
-                        campaign_id=campaign_id,
-                        action_id=action_id,
+                        campaign_id=state.campaign_id,
+                        action_id=state.action_id,
                         idempotency_key=f"engine-transition-{uuid.uuid4().hex}",
                         owner_id=self._owner_id,
                         writer=provider_input.session.role,
@@ -2263,19 +2266,19 @@ class ProviderSessionAdapter:
                         parameters=cast(Mapping[str, JsonValue], {}),
                         initiating_session_id=provider_input.session.session_id,
                     ),
-                    feedback=feedback,
+                    feedback=state.feedback,
                 )
-                if feedback.rejection is not None:
+                if state.feedback.rejection is not None:
                     raise CommandRejected(
                         "Automatic engine transition was rejected",
-                        code=str(feedback.rejection.get("code", "engine_transition_rejected")),
+                        code=str(state.feedback.rejection.get("code", "engine_transition_rejected")),
                     )
-                after = self._owner.snapshot(campaign_id)
-                terminal_event = next(
+                after = self._owner.snapshot(state.campaign_id)
+                state.terminal_event = next(
                     (
                         event
                         for event in reversed(after.events)
-                        if event.action_id == action_id
+                        if event.action_id == state.action_id
                         and event.event_type
                         in {
                             CanonicalEventType.ACTION_COMMITTED,
@@ -2284,23 +2287,23 @@ class ProviderSessionAdapter:
                     ),
                     None,
                 )
-                tool_result_event = next(
+                state.tool_result_event = next(
                     (
                         event
                         for event in reversed(after.events)
-                        if event.action_id == action_id
+                        if event.action_id == state.action_id
                         and event.event_type is CanonicalEventType.TOOL_RESULT
                     ),
                     None,
                 )
-                if terminal_event is None or tool_result_event is None:
+                if state.terminal_event is None or state.tool_result_event is None:
                     raise CommandRejected("Canonical engine transition result is unavailable")
-                if terminal_event.event_type is CanonicalEventType.ACTION_FAILED:
+                if state.terminal_event.event_type is CanonicalEventType.ACTION_FAILED:
                     raise CommandRejected(
                         "Automatic engine transition failed",
                         code="engine_transition_failed",
                     )
-                result_payload = _plain_json(tool_result_event.safe_payload.get("result", {}))
+                state.result_payload = _plain_json(state.tool_result_event.safe_payload.get("result", {}))
                 combat = _current_combat_state(after.state)
                 current_actor = combat.get("active_actor", combat.get("current_actor"))
                 entity_parameters = (
@@ -2308,31 +2311,31 @@ class ProviderSessionAdapter:
                     if isinstance(current_actor, str) and current_actor
                     else {}
                 )
-                current_entities = _current_referenced_entities(
+                state.current_entities = _current_referenced_entities(
                     entity_parameters,
                     after.state,
                 )
-                facts = _mechanics_narration_facts(
+                state.facts = _mechanics_narration_facts(
                     transition.name,
-                    result_payload,
-                    current_entities,
+                    state.result_payload,
+                    state.current_entities,
                     {},
                     {},
                     combat,
-                    entity_display_names,
+                    state.entity_display_names,
                 )
-                pending_narration_facts.append(facts)
-                any_commit_in_exchange = True
+                state.pending_narration_facts.append(state.facts)
+                state.any_commit_in_exchange = True
                 if provider_input.session.role is WriterRole.DM:
-                    campaign_file_disposition_in_exchange = False
+                    state.campaign_file_disposition_in_exchange = False
                 transition_result = {
-                    "status": terminal_event.event_type.value,
+                    "status": state.terminal_event.event_type.value,
                     "campaign_revision": after.revision,
                     "tool": transition.name,
-                    "result": result_payload,
-                    "current_entities": current_entities,
+                    "result": state.result_payload,
+                    "current_entities": state.current_entities,
                 }
-                messages.append(
+                state.messages.append(
                     {
                         "role": "system",
                         "content": (
@@ -2348,15 +2351,15 @@ class ProviderSessionAdapter:
                         ),
                     }
                 )
-                if callable(recorder):
-                    recorder(
+                if callable(state.recorder):
+                    state.recorder(
                         {
                             "kind": "automatic_engine_transition_completed",
-                            "campaign_id": campaign_id,
+                            "campaign_id": state.campaign_id,
                             "session_id": provider_input.session.session_id,
                             "turn_id": turn_id,
-                            "action_id": action_id,
-                            "mcp_discovery_id": discovery_id,
+                            "action_id": state.action_id,
+                            "mcp_discovery_id": state.discovery_id,
                             "tool_name": transition.name,
                             "resulting_revision": after.revision,
                             "result": transition_result,
@@ -2364,54 +2367,54 @@ class ProviderSessionAdapter:
                     )
                 continue
 
-            if not engine_transition_review_pending and not participant_ooc_only:
+            if not state.engine_transition_review_pending and not state.participant_ooc_only:
                 # Build the envelope only after required bookkeeping has drained and refreshed.
                 actor_reader = getattr(self._owner, "actor_decision_request", None)
-                actor_request = (actor_reader(campaign_id, turn_id=turn_id)
+                state.actor_request = (actor_reader(state.campaign_id, turn_id=turn_id)
                                  if callable(actor_reader) else None)
-                if actor_request is not None:
+                if state.actor_request is not None:
                     from sylvia_gm.agent._actor_decisions import run_actor_decision
 
                     public_result = yield from run_actor_decision(
-                        self._owner, self._provider, provider_input, actor_request,
+                        self._owner, self._provider, provider_input, state.actor_request,
                         owner_id=self._owner_id, stream=self._stream_round,
                     )
                     yield ProviderEvent.tool_evidence(
-                        message_id="participant-result-" + actor_request.decision_id,
+                        message_id="participant-result-" + state.actor_request.decision_id,
                         payload={"kind": "isolated_participant_result", "turn_id": turn_id,
-                                 "basis_message_id": basis_message_id,
-                                 "inference_id": actor_request.decision_id,
+                                 "basis_message_id": state.basis_message_id,
+                                 "inference_id": state.actor_request.decision_id,
                                  "public_result": public_result},
                     )
-                    messages.append(self._participant_result_message(public_result))
-                    any_commit_in_exchange = True
+                    state.messages.append(self._participant_result_message(public_result))
+                    state.any_commit_in_exchange = True
                     continue
 
-            model_catalog = current_catalog
-            opening_update_required = opening_request and not campaign_file_commit_in_exchange
-            campaign_file_disposition_supported = any(
+            model_catalog = state.current_catalog
+            opening_update_required = state.opening_request and not state.campaign_file_commit_in_exchange
+            state.campaign_file_disposition_supported = any(
                 tool.category == "narrative_state"
                 and tool.capability == "narrative_state.update_campaign_file"
                 and not bool(tool.input_schema.get("minProperties"))
-                for tool in current_catalog
+                for tool in state.current_catalog
             )
             # Keep every valid next operation available, but do not let a committed
             # Ruleset result skip the Campaign File checkpoint by ending in prose.
-            post_commit_tool_required = (
-                any_commit_in_exchange
-                and not campaign_file_disposition_in_exchange
-                and campaign_file_disposition_supported
-                and not campaign_file_narration_pending
+            state.post_commit_tool_required = (
+                state.any_commit_in_exchange
+                and not state.campaign_file_disposition_in_exchange
+                and state.campaign_file_disposition_supported
+                and not state.campaign_file_narration_pending
             )
             # The same GM completes each ordinary turn as one agent loop. Requiring a tool does
             # not select a mechanic: the model may read a source, resolve a Ruleset operation, or
             # finish directly with the Campaign File disposition that contains its narration.
-            if campaign_file_narration_pending:
+            if state.campaign_file_narration_pending:
                 model_catalog = ()
-            elif force_campaign_file_update:
+            elif state.force_campaign_file_update:
                 model_catalog = tuple(
                     tool
-                    for tool in current_catalog
+                    for tool in state.current_catalog
                     if tool.category == "narrative_state"
                     and tool.capability == "narrative_state.update_campaign_file"
                 )
@@ -2421,64 +2424,64 @@ class ProviderSessionAdapter:
                         code="campaign_file_update_unavailable",
                     )
             else:
-                if opening_update_required and not campaign_file_disposition_supported:
+                if opening_update_required and not state.campaign_file_disposition_supported:
                     raise CommandRejected(
                         "Campaign opening requires the Campaign File update operation",
                         code="campaign_file_update_unavailable",
                     )
-            tools, aliases = self._provider_tools(model_catalog)
-            decision_boundary: ModelDecisionBoundary | None = None
+            state.tools, state.aliases = self._provider_tools(model_catalog)
+            state.decision_boundary = None
             boundary_reader = getattr(
-                self._owner, "model_decision_boundary" if any_commit_in_exchange
+                self._owner, "model_decision_boundary" if state.any_commit_in_exchange
                                       else "campaign_preparation_boundary", None)
-            if callable(boundary_reader) and not participant_ooc_only:
-                decision_boundary = boundary_reader(campaign_id)
-            if (decision_boundary is None and not any_commit_in_exchange
-                    and not participant_ooc_only):
+            if callable(boundary_reader) and not state.participant_ooc_only:
+                state.decision_boundary = boundary_reader(state.campaign_id)
+            if (state.decision_boundary is None and not state.any_commit_in_exchange
+                    and not state.participant_ooc_only):
                 # An already active private game must resume its GM decision before narration.
-                _, private_boundary = self._owner.model_context_snapshot(campaign_id)
+                state._, private_boundary = self._owner.model_context_snapshot(state.campaign_id)
                 if (private_boundary is not None
                         and private_boundary.owner is ModelDecisionOwner.GM):
-                    decision_boundary = private_boundary
-            player_boundary_narration = False
-            player_intent_resolution_required = False
-            gm_boundary_decision = False
-            if decision_boundary is not None:
-                recorder = getattr(self._owner, "record_admin_full_audit", None)
-                if callable(recorder):
-                    recorder(
+                    state.decision_boundary = private_boundary
+            state.player_boundary_narration = False
+            state.player_intent_resolution_required = False
+            state.gm_boundary_decision = False
+            if state.decision_boundary is not None:
+                state.recorder = getattr(self._owner, "record_admin_full_audit", None)
+                if callable(state.recorder):
+                    state.recorder(
                         {
                             "kind": "model_decision_boundary",
-                            "campaign_id": campaign_id,
+                            "campaign_id": state.campaign_id,
                             "session_id": provider_input.session.session_id,
                             "turn_id": turn_id,
-                            "mcp_discovery_id": discovery_id,
-                            "owner": decision_boundary.owner.value,
-                            "actor_id": decision_boundary.actor_id,
-                            "actor_name": decision_boundary.actor_name,
-                            "active_side_id": decision_boundary.active_side_id,
-                            "focused_actor_id": decision_boundary.focused_actor_id,
+                            "mcp_discovery_id": state.discovery_id,
+                            "owner": state.decision_boundary.owner.value,
+                            "actor_id": state.decision_boundary.actor_id,
+                            "actor_name": state.decision_boundary.actor_name,
+                            "active_side_id": state.decision_boundary.active_side_id,
+                            "focused_actor_id": state.decision_boundary.focused_actor_id,
                             "eligible_actor_ids": [
-                                actor.actor_id for actor in decision_boundary.eligible_actors
+                                actor.actor_id for actor in state.decision_boundary.eligible_actors
                             ],
-                            "campaign_revision": decision_boundary.campaign_revision,
+                            "campaign_revision": state.decision_boundary.campaign_revision,
                         }
                     )
-                if decision_boundary.preparation is not None:
-                    preparation = decision_boundary.preparation
-                    model_catalog = tuple(tool for tool in current_catalog
+                if state.decision_boundary.preparation is not None:
+                    preparation = state.decision_boundary.preparation
+                    model_catalog = tuple(tool for tool in state.current_catalog
                         if tool.category in {"reference", "narrative_state"}
                         or (tool.package_id == preparation["package_id"]
                             and tool.name == preparation["intent"]))
-                    tools, aliases = self._provider_tools(model_catalog)
-                elif decision_boundary.owner is ModelDecisionOwner.PLAYER:
-                    player_boundary_narration = True
-                    if player_intent_pending:
-                        player_intent_resolution_required = True
-                        force_campaign_file_update = False
+                    state.tools, state.aliases = self._provider_tools(model_catalog)
+                elif state.decision_boundary.owner is ModelDecisionOwner.PLAYER:
+                    state.player_boundary_narration = True
+                    if state.player_intent_pending:
+                        state.player_intent_resolution_required = True
+                        state.force_campaign_file_update = False
                         model_catalog = tuple(
                             tool
-                            for tool in current_catalog
+                            for tool in state.current_catalog
                             if tool.category == "reference"
                             or tool.model_behavior in {
                                 ModelToolBehavior.RESOLVES_PLAYER_INTENT,
@@ -2494,89 +2497,89 @@ class ProviderSessionAdapter:
                                 "Ruleset left player intent pending without exposing a resolver",
                                 code="player_intent_resolution_unavailable",
                             )
-                        tools, aliases = self._provider_tools(model_catalog)
+                        state.tools, state.aliases = self._provider_tools(model_catalog)
                 else:
-                    gm_boundary_decision = True
+                    state.gm_boundary_decision = True
                     # A Campaign File disposition is terminal for this provider exchange. Keep
                     # it unavailable until Ruleset control reaches the player, or prose can
                     # strand an active GM-controlled combat turn.
-                    force_campaign_file_update = False
+                    state.force_campaign_file_update = False
                     model_catalog = tuple(
-                        tool for tool in current_catalog if tool.category != "narrative_state"
+                        tool for tool in state.current_catalog if tool.category != "narrative_state"
                     )
-                    tools, aliases = self._provider_tools(model_catalog)
+                    state.tools, state.aliases = self._provider_tools(model_catalog)
             _require_checked_campaign_file_narration(
-                tools,
-                aliases,
+                state.tools,
+                state.aliases,
                 narration_held=(
-                    buffered_narration is not None
-                    or buffered_raw_response_blocks is not None
+                    state.buffered_narration is not None
+                    or state.buffered_raw_response_blocks is not None
                 ),
             )
-            provider_tool_schemas = {
-                str(function["name"]): parameters
-                for provider_tool in tools
-                if isinstance((function := provider_tool.get("function")), dict)
-                and isinstance(function.get("name"), str)
-                and isinstance((parameters := function.get("parameters")), dict)
+            state.provider_tool_schemas = {
+                str(state.function["name"]): state.parameters
+                for provider_tool in state.tools
+                if isinstance((function := state.bind('function', provider_tool.get("function"))), dict)
+                and isinstance(state.function.get("name"), str)
+                and isinstance((parameters := state.bind('parameters', state.function.get("parameters"))), dict)
             }
-            _, refreshed_context = self._campaign_context_messages(
+            state._, refreshed_context = self._campaign_context_messages(
                 provider_input,
-                include_opening_direction=opening_request,
+                include_opening_direction=state.opening_request,
             )
             if refreshed_context is not None:
-                for index, message in enumerate(messages):
+                for state.index, state.message in enumerate(state.messages):
                     owned_data = (
-                        message.get("role") == "system" or message.get("_fresh_application_data")
+                        state.message.get("role") == "system" or state.message.get("_fresh_application_data")
                     )
-                    if owned_data and str(message.get("content", "")).startswith(
+                    if owned_data and str(state.message.get("content", "")).startswith(
                         "SYLVIA_GM_FRESH_CAMPAIGN_STATE "
                     ):
-                        messages[index] = refreshed_context
+                        state.messages[state.index] = refreshed_context
                         break
-            assemblies: dict[int, _ToolCallAssembly] = {}
-            mechanics_action_ids: dict[str, str] = {}
-            mechanics_parameters: dict[str, dict[str, object]] = {}
-            mechanics_tool_names: dict[str, str] = {}
-            mechanics_tool_behaviors: dict[str, ModelToolBehavior] = {}
-            mechanics_preparation_scopes: dict[str, object] = {}
-            mechanics_pre_entities: dict[str, dict[str, object]] = {}
-            local_tool_results: dict[str, dict[str, object]] = {}
-            local_tool_failures: set[str] = set()
-            sequence_narration_facts: list[dict[str, object]] = []
-            assistant_text: list[str] = []
-            assistant_reasoning: list[str] = []
-            native_assistant_content: list[dict[str, Any]] | None = None
-            native_chat_metadata: dict[str, Any] | None = None
-            round_finish_reason: str | None = None
-            provider_round += 1
+            state.assemblies = {}
+            state.mechanics_action_ids = {}
+            state.mechanics_parameters = {}
+            state.mechanics_tool_names = {}
+            state.mechanics_tool_behaviors = {}
+            state.mechanics_preparation_scopes = {}
+            state.mechanics_pre_entities = {}
+            state.local_tool_results = {}
+            state.local_tool_failures = set()
+            state.sequence_narration_facts = []
+            state.assistant_text = []
+            state.assistant_reasoning = []
+            state.native_assistant_content = None
+            state.native_chat_metadata = None
+            state.round_finish_reason = None
+            state.provider_round += 1
             set_audit_context = getattr(self._provider, "set_audit_context", None)
             if callable(set_audit_context):
                 set_audit_context(
                     {
-                        "inference_id": inference_id,
-                        "mcp_discovery_id": discovery_id,
-                        "campaign_id": campaign_id,
+                        "inference_id": state.inference_id,
+                        "mcp_discovery_id": state.discovery_id,
+                        "campaign_id": state.campaign_id,
                         "turn_id": turn_id,
-                        "round": provider_round,
+                        "round": state.provider_round,
                         "context_id": self._gm_request_context_id(provider_input),
                     }
                 )
-            exchange_messages = messages
-            inference_messages = list(exchange_messages)
-            if engine_transition_review_pending:
-                engine_control = _engine_turn_control_message(aliases)
+            state.exchange_messages = state.messages
+            state.inference_messages = list(state.exchange_messages)
+            if state.engine_transition_review_pending:
+                engine_control = _engine_turn_control_message(state.aliases)
                 if engine_control is not None:
-                    inference_messages.append(engine_control)
-            if pending_narration_facts:
-                inference_messages.append(
+                    state.inference_messages.append(engine_control)
+            if state.pending_narration_facts:
+                state.inference_messages.append(
                     {
                         "role": "system",
                         "content": (
                             "SYLVIA_GM_EXACT_NARRATION_FACTS "
                             "(committed mechanics and application-owned continuation control):\n"
                             + json.dumps(
-                                pending_narration_facts,
+                                state.pending_narration_facts,
                                 sort_keys=True,
                                 separators=(",", ":"),
                                 ensure_ascii=False,
@@ -2587,7 +2590,7 @@ class ProviderSessionAdapter:
                                 "before its result is an unsettled draft, not established fiction; "
                                 "revise or discard it wherever the result or the player's declared "
                                 "limits require. "
-                                if provisional_tool_prose_pending
+                                if state.provisional_tool_prose_pending
                                 else ""
                             )
                             + "Use another exposed "
@@ -2596,173 +2599,173 @@ class ProviderSessionAdapter:
                         ),
                     }
                 )
-            inference_messages.extend(current_application_controls)
-            current_application_controls.clear()
-            if campaign_file_narration_pending:
-                inference_messages.append(
+            state.inference_messages.extend(state.current_application_controls)
+            state.current_application_controls.clear()
+            if state.campaign_file_narration_pending:
+                state.inference_messages.append(
                     _campaign_file_updated_narration_message(
-                        opening_footing=opening_footing,
-                        current_player_action=current_player_action,
+                        opening_footing=state.opening_footing,
+                        current_player_action=state.current_player_action,
                     )
                 )
-            elif force_campaign_file_update and (
-                buffered_narration is not None or buffered_raw_response_blocks is not None
+            elif state.force_campaign_file_update and (
+                state.buffered_narration is not None or state.buffered_raw_response_blocks is not None
             ):
-                inference_messages.append(
+                state.inference_messages.append(
                     _campaign_file_disposition_message(
-                        opening_footing=opening_footing,
-                        current_player_action=current_player_action,
+                        opening_footing=state.opening_footing,
+                        current_player_action=state.current_player_action,
                     )
                 )
             # Keep the player's exact message in its natural user role. The stable GM contract
             # owns action scope; replacing live speech with a synthetic prose recipe both repeats
             # that contract and makes an ordinary turn unlike the dialogue agent models expect.
-            if decision_boundary is not None:
-                inference_messages.append(
-                    _campaign_preparation_message(decision_boundary)
-                    if decision_boundary.preparation is not None else
+            if state.decision_boundary is not None:
+                state.inference_messages.append(
+                    _campaign_preparation_message(state.decision_boundary)
+                    if state.decision_boundary.preparation is not None else
                     _player_boundary_narration_message(
-                        decision_boundary,
-                        current_player_action=current_player_action,
+                        state.decision_boundary,
+                        current_player_action=state.current_player_action,
                         committed_operations=tuple(
                             str(fact["tool"])
-                            for fact in pending_narration_facts
+                            for fact in state.pending_narration_facts
                             if isinstance(fact.get("tool"), str)
                         ),
-                        player_intent_pending=player_intent_pending,
+                        player_intent_pending=state.player_intent_pending,
                     )
-                    if player_boundary_narration
-                    else _gm_decision_control_message(decision_boundary)
+                    if state.player_boundary_narration
+                    else _gm_decision_control_message(state.decision_boundary)
                 )
-            if private_deliberation_correction_message is not None:
-                inference_messages.append(private_deliberation_correction_message)
-                private_deliberation_correction_message = None
-            if required_tool_call_correction_message is not None:
-                inference_messages.append(required_tool_call_correction_message)
-                required_tool_call_correction_message = None
+            if state.private_deliberation_correction_message is not None:
+                state.inference_messages.append(state.private_deliberation_correction_message)
+                state.private_deliberation_correction_message = None
+            if state.required_tool_call_correction_message is not None:
+                state.inference_messages.append(state.required_tool_call_correction_message)
+                state.required_tool_call_correction_message = None
             atomic_campaign_file_completion_required = (
                 provider_input.session.role is WriterRole.DM
-                and campaign_file_disposition_supported
-                and not campaign_file_disposition_in_exchange
-                and not campaign_file_narration_pending
+                and state.campaign_file_disposition_supported
+                and not state.campaign_file_disposition_in_exchange
+                and not state.campaign_file_narration_pending
             )
-            provider_tool_call_required = (
-                engine_transition_review_pending
-                or force_campaign_file_update
-                or post_commit_tool_required
-                or gm_boundary_decision
-                or player_intent_resolution_required
+            state.provider_tool_call_required = (
+                state.engine_transition_review_pending
+                or state.force_campaign_file_update
+                or state.post_commit_tool_required
+                or state.gm_boundary_decision
+                or state.player_intent_resolution_required
                 or atomic_campaign_file_completion_required
             )
             for chunk in self._stream_round(
-                inference_messages,
-                tools,
+                state.inference_messages,
+                state.tools,
                 control=provider_input.control,
                 provider_input=provider_input,
-                tool_choice="required" if provider_tool_call_required else None,
-                history_allowed=not (force_campaign_file_update or campaign_file_narration_pending),
+                tool_choice="required" if state.provider_tool_call_required else None,
+                history_allowed=not (state.force_campaign_file_update or state.campaign_file_narration_pending),
             ):
                 if chunk.finish_reason is not None:
-                    round_finish_reason = chunk.finish_reason
+                    state.round_finish_reason = chunk.finish_reason
                 if chunk.chat_completion_metadata is not None:
-                    native_chat_metadata = chunk.chat_completion_metadata
+                    state.native_chat_metadata = chunk.chat_completion_metadata
                 if chunk.anthropic_content is not None:
-                    native_assistant_content = chunk.anthropic_content
+                    state.native_assistant_content = chunk.anthropic_content
                 if chunk.reasoning_content:
-                    assistant_reasoning.append(chunk.reasoning_content)
+                    state.assistant_reasoning.append(chunk.reasoning_content)
                     # Only provider-classified reasoning enters the private inspection sink.
                     yield ProviderEvent.private_reasoning(
-                        chunk.reasoning_content, response_id=inference_id,
+                        chunk.reasoning_content, response_id=state.inference_id,
                     )
                 if chunk.content:
-                    assistant_text.append(chunk.content)
+                    state.assistant_text.append(chunk.content)
                 if chunk.tool_call_delta is not None:
-                    index, call_id, name, arguments = parse_tool_call_delta(chunk.tool_call_delta)
-                    assembly = assemblies.setdefault(index, _ToolCallAssembly())
-                    assembly.call_id += call_id
-                    assembly.name += name
-                    assembly.arguments += arguments
+                    state.index, call_id, state.name, state.arguments = parse_tool_call_delta(chunk.tool_call_delta)
+                    state.assembly = state.assemblies.setdefault(state.index, _ToolCallAssembly())
+                    state.assembly.call_id += call_id
+                    state.assembly.name += state.name
+                    state.assembly.arguments += state.arguments
 
             # Preserve the provider's original fields before any application normalization.
             # This event goes only to private owner storage, never canonical tool evidence.
             native_continuation: dict[str, object] = {}
-            if native_chat_metadata is not None:
-                native_continuation["chat_completion_metadata"] = native_chat_metadata
-            if native_assistant_content is not None:
-                native_continuation["anthropic_content"] = native_assistant_content
-            if assistant_reasoning:
-                native_continuation["reasoning_content"] = "".join(assistant_reasoning)
+            if state.native_chat_metadata is not None:
+                native_continuation["chat_completion_metadata"] = state.native_chat_metadata
+            if state.native_assistant_content is not None:
+                native_continuation["anthropic_content"] = state.native_assistant_content
+            if state.assistant_reasoning:
+                native_continuation["reasoning_content"] = "".join(state.assistant_reasoning)
             if native_continuation:
-                native_continuation.update(context_fields)
+                native_continuation.update(state.context_fields)
                 yield ProviderEvent.private_continuation(
-                    native_continuation, response_id=inference_id,
+                    native_continuation, response_id=state.inference_id,
                 )
 
-            if not assemblies and provider_tool_call_required:
-                encoded_text = "".join(assistant_text)
-                normalized_call = _forced_single_tool_call_from_json(encoded_text, aliases)
+            if not state.assemblies and state.provider_tool_call_required:
+                encoded_text = "".join(state.assistant_text)
+                normalized_call = _forced_single_tool_call_from_json(encoded_text, state.aliases)
                 if normalized_call is not None:
                     normalized_native_content = _native_content_for_text_operation(
-                        native_assistant_content,
+                        state.native_assistant_content,
                         encoded_text,
                         normalized_call,
                     )
-                    if native_assistant_content is None or normalized_native_content is not None:
-                        native_assistant_content = normalized_native_content
-                        assemblies[0] = normalized_call
-                        assistant_text.clear()
+                    if state.native_assistant_content is None or normalized_native_content is not None:
+                        state.native_assistant_content = normalized_native_content
+                        state.assemblies[0] = normalized_call
+                        state.assistant_text.clear()
                         yield ProviderEvent.tool_evidence(
-                            message_id=f"{inference_id}-forced-tool-json-normalized",
+                            message_id=f"{state.inference_id}-forced-tool-json-normalized",
                             payload={
                                 "kind": "provider_forced_tool_json_normalized",
                                 "turn_id": turn_id,
-                                "inference_id": inference_id,
-                                "basis_message_id": basis_message_id,
+                                "inference_id": state.inference_id,
+                                "basis_message_id": state.basis_message_id,
                                 "tool_name": normalized_call.name,
                             },
                         )
 
-            if assemblies:
+            if state.assemblies:
                 # Empty-completion recovery is about consecutive empty rounds. Even a rejected
                 # tool assembly is substantive provider progress and receives its own bounded
                 # correction path, so a later empty round starts a fresh empty sequence.
-                empty_completion_corrections_used = 0
+                state.empty_completion_corrections_used = 0
 
-            if not assemblies:
-                narration = "".join(assistant_text)
+            if not state.assemblies:
+                state.narration = "".join(state.assistant_text)
                 if (
-                    not narration
-                    and buffered_narration is not None
-                    and campaign_file_narration_pending
+                    not state.narration
+                    and state.buffered_narration is not None
+                    and state.campaign_file_narration_pending
                 ):
-                    narration = buffered_narration
-                if _contains_serialized_tool_call(narration):
+                    state.narration = state.buffered_narration
+                if _contains_serialized_tool_call(state.narration):
                     raise CommandRejected(
                         "Provider returned serialized tool syntax as narration",
                         code="provider_serialized_tool_call",
                     )
-                if not narration:
-                    finish_reason = round_finish_reason or "stream_ended_without_finish_reason"
-                    next_correction = empty_completion_corrections_used + 1
+                if not state.narration:
+                    state.finish_reason = state.round_finish_reason or "stream_ended_without_finish_reason"
+                    next_correction = state.empty_completion_corrections_used + 1
                     yield ProviderEvent.tool_evidence(
-                        message_id=f"{inference_id}-empty-completion",
+                        message_id=f"{state.inference_id}-empty-completion",
                         payload={
                             "kind": "provider_empty_completion",
                             "turn_id": turn_id,
-                            "inference_id": inference_id,
-                            "basis_message_id": basis_message_id,
-                            "finish_reason": finish_reason,
-                            "tool_call_required": provider_tool_call_required,
+                            "inference_id": state.inference_id,
+                            "basis_message_id": state.basis_message_id,
+                            "finish_reason": state.finish_reason,
+                            "tool_call_required": state.provider_tool_call_required,
                             "correction_attempt": next_correction,
-                            "max_corrections": max_empty_completion_corrections,
+                            "max_corrections": state.max_empty_completion_corrections,
                         },
                     )
-                    if empty_completion_corrections_used < max_empty_completion_corrections:
-                        empty_completion_corrections_used += 1
+                    if state.empty_completion_corrections_used < state.max_empty_completion_corrections:
+                        state.empty_completion_corrections_used += 1
                         required_output = (
                             "A required tool call was expected. Return one complete call to an "
                             "exposed tool. Do not return prose without that call."
-                            if provider_tool_call_required
+                            if state.provider_tool_call_required
                             else (
                                 "Return one complete in-world response, or call an exposed tool "
                                 "if the unresolved current action genuinely needs it."
@@ -2772,55 +2775,55 @@ class ProviderSessionAdapter:
                             "role": "system",
                             "content": (
                                 "SYLVIA_GM_EMPTY_COMPLETION_CORRECTION: Your preceding "
-                                f"response completed with finish_reason='{finish_reason}' but "
+                                f"response completed with finish_reason='{state.finish_reason}' but "
                                 "contained no text, private reasoning, or complete tool call. "
                                 "Continue the same turn from the supplied context; do not "
                                 "restart the scene or repeat an already accepted operation. "
                                 f"{required_output} This is empty-completion correction "
-                                f"{empty_completion_corrections_used} of "
-                                f"{max_empty_completion_corrections}."
+                                f"{state.empty_completion_corrections_used} of "
+                                f"{state.max_empty_completion_corrections}."
                             ),
                         }
-                        current_application_controls.append(empty_completion_correction)
+                        state.current_application_controls.append(empty_completion_correction)
                         continue
                     raise CommandRejected(
                         "Provider completed without player-visible narration or a tool call",
                         code="provider_empty_completion",
                     )
-                empty_completion_corrections_used = 0
+                state.empty_completion_corrections_used = 0
                 repeated_previous_response = (
-                    not force_campaign_file_update
-                    and not campaign_file_narration_pending
-                    and not provider_tool_call_required
-                    and current_player_action is not None
-                    and previous_player_action is not None
-                    and current_player_action != previous_player_action
-                    and previous_player_facing_response is not None
-                    and narration == previous_player_facing_response
+                    not state.force_campaign_file_update
+                    and not state.campaign_file_narration_pending
+                    and not state.provider_tool_call_required
+                    and state.current_player_action is not None
+                    and state.previous_player_action is not None
+                    and state.current_player_action != state.previous_player_action
+                    and state.previous_player_facing_response is not None
+                    and state.narration == state.previous_player_facing_response
                 )
                 if repeated_previous_response:
-                    if repeated_response_corrections_used < max_repeated_response_corrections:
-                        repeated_response_corrections_used += 1
+                    if state.repeated_response_corrections_used < state.max_repeated_response_corrections:
+                        state.repeated_response_corrections_used += 1
                         yield ProviderEvent.tool_evidence(
                             message_id=(
-                                f"{inference_id}-repeated-response-"
-                                f"{repeated_response_corrections_used}"
+                                f"{state.inference_id}-repeated-response-"
+                                f"{state.repeated_response_corrections_used}"
                             ),
                             payload={
                                 "kind": "provider_repeated_player_facing_response",
                                 "turn_id": turn_id,
-                                "inference_id": inference_id,
-                                "basis_message_id": basis_message_id,
+                                "inference_id": state.inference_id,
+                                "basis_message_id": state.basis_message_id,
                                 "response_sha256": hashlib.sha256(
-                                    narration.encode("utf-8")
+                                    state.narration.encode("utf-8")
                                 ).hexdigest(),
-                                "response_characters": len(narration),
-                                "correction_attempt": repeated_response_corrections_used,
-                                "max_corrections": max_repeated_response_corrections,
+                                "response_characters": len(state.narration),
+                                "correction_attempt": state.repeated_response_corrections_used,
+                                "max_corrections": state.max_repeated_response_corrections,
                             },
                         )
-                        exchange_messages.append({"role": "assistant", "content": narration})
-                        current_application_controls.append(
+                        state.exchange_messages.append({"role": "assistant", "content": state.narration})
+                        state.current_application_controls.append(
                             {
                                 "role": "system",
                                 "content": (
@@ -2834,8 +2837,8 @@ class ProviderSessionAdapter:
                                     "operation if resolution genuinely requires one; otherwise "
                                     "return one complete in-world response. Do not repeat or "
                                     "continue the prior answer. This is correction "
-                                    f"{repeated_response_corrections_used} of "
-                                    f"{max_repeated_response_corrections}."
+                                    f"{state.repeated_response_corrections_used} of "
+                                    f"{state.max_repeated_response_corrections}."
                                 ),
                             }
                         )
@@ -2844,24 +2847,24 @@ class ProviderSessionAdapter:
                         "Provider repeatedly returned the previous player-facing response",
                         code="provider_repeated_player_facing_response",
                     )
-                if provider_tool_call_required and not force_campaign_file_update:
+                if state.provider_tool_call_required and not state.force_campaign_file_update:
                     if (
-                        missing_required_tool_corrections_used
-                        < max_missing_required_tool_corrections
+                        state.missing_required_tool_corrections_used
+                        < state.max_missing_required_tool_corrections
                     ):
-                        missing_required_tool_corrections_used += 1
+                        state.missing_required_tool_corrections_used += 1
                         yield ProviderEvent.tool_evidence(
-                            message_id=f"{inference_id}-forced-tool-call-missing",
+                            message_id=f"{state.inference_id}-forced-tool-call-missing",
                             payload={
                                 "kind": "provider_forced_tool_call_missing",
                                 "turn_id": turn_id,
-                                "inference_id": inference_id,
-                                "basis_message_id": basis_message_id,
-                                "correction_attempt": missing_required_tool_corrections_used,
-                                "max_corrections": max_missing_required_tool_corrections,
+                                "inference_id": state.inference_id,
+                                "basis_message_id": state.basis_message_id,
+                                "correction_attempt": state.missing_required_tool_corrections_used,
+                                "max_corrections": state.max_missing_required_tool_corrections,
                             },
                         )
-                        required_tool_call_correction_message = {
+                        state.required_tool_call_correction_message = {
                             "role": "system",
                             "content": (
                                 "SYLVIA_GM_REQUIRED_TOOL_CALL_CORRECTION "
@@ -2874,8 +2877,8 @@ class ProviderSessionAdapter:
                                 "operation, or call the Campaign File disposition directly when "
                                 "no mechanic is needed. Do not repeat or continue the discarded "
                                 "prose. This is correction "
-                                f"{missing_required_tool_corrections_used} of "
-                                f"{max_missing_required_tool_corrections}."
+                                f"{state.missing_required_tool_corrections_used} of "
+                                f"{state.max_missing_required_tool_corrections}."
                             ),
                         }
                         continue
@@ -2883,11 +2886,11 @@ class ProviderSessionAdapter:
                         "Provider repeatedly returned prose where a tool call was required",
                         code="provider_required_tool_call_missing",
                     )
-                if not force_campaign_file_update and _looks_like_private_deliberation(narration):
-                    if private_deliberation_corrections_used < max_private_deliberation_corrections:
-                        private_deliberation_corrections_used += 1
-                        exchange_messages.append({"role": "assistant", "content": narration})
-                        private_deliberation_correction_message = {
+                if not state.force_campaign_file_update and _looks_like_private_deliberation(state.narration):
+                    if state.private_deliberation_corrections_used < state.max_private_deliberation_corrections:
+                        state.private_deliberation_corrections_used += 1
+                        state.exchange_messages.append({"role": "assistant", "content": state.narration})
+                        state.private_deliberation_correction_message = {
                             "role": "system",
                             "content": (
                                 "SYLVIA_GM_PRIVATE_DELIBERATION_CORRECTION "
@@ -2901,8 +2904,8 @@ class ProviderSessionAdapter:
                                 "response, beginning with what the player experiences and "
                                 "containing no analysis, alternatives, check summary, statement "
                                 "of intent, or workflow note. This is correction "
-                                f"{private_deliberation_corrections_used} of "
-                                f"{max_private_deliberation_corrections}."
+                                f"{state.private_deliberation_corrections_used} of "
+                                f"{state.max_private_deliberation_corrections}."
                             ),
                         }
                         continue
@@ -2910,42 +2913,42 @@ class ProviderSessionAdapter:
                         "Provider repeatedly returned private deliberation as narration",
                         code="provider_private_deliberation",
                     )
-                if campaign_file_narration_pending:
+                if state.campaign_file_narration_pending:
                     yield ProviderEvent.tool_evidence(
-                        message_id=f"{inference_id}-final-response-reference",
+                        message_id=f"{state.inference_id}-final-response-reference",
                         payload={
                             "kind": "provider_final_response_reference",
-                            **context_fields,
-                            "response_id": inference_id,
-                            "basis_message_id": basis_message_id,
+                            **state.context_fields,
+                            "response_id": state.inference_id,
+                            "basis_message_id": state.basis_message_id,
                             "requirement": {
                                 "provider_id": provider_input.session.provider_id,
                                 "model_id": provider_input.session.model_id,
-                                "reasoning_required": bool(assistant_reasoning),
-                                "chat_completion_required": native_chat_metadata is not None,
+                                "reasoning_required": bool(state.assistant_reasoning),
+                                "chat_completion_required": state.native_chat_metadata is not None,
                             },
                         },
                     )
-                    yield ProviderEvent.talk(narration)
+                    yield ProviderEvent.talk(state.narration)
                     return
-                if force_campaign_file_update:
+                if state.force_campaign_file_update:
                     if (
-                        missing_required_tool_corrections_used
-                        < max_missing_required_tool_corrections
+                        state.missing_required_tool_corrections_used
+                        < state.max_missing_required_tool_corrections
                     ):
-                        missing_required_tool_corrections_used += 1
+                        state.missing_required_tool_corrections_used += 1
                         yield ProviderEvent.tool_evidence(
-                            message_id=f"{inference_id}-forced-tool-call-missing",
+                            message_id=f"{state.inference_id}-forced-tool-call-missing",
                             payload={
                                 "kind": "provider_forced_tool_call_missing",
                                 "turn_id": turn_id,
-                                "inference_id": inference_id,
-                                "basis_message_id": basis_message_id,
-                                "correction_attempt": missing_required_tool_corrections_used,
-                                "max_corrections": max_missing_required_tool_corrections,
+                                "inference_id": state.inference_id,
+                                "basis_message_id": state.basis_message_id,
+                                "correction_attempt": state.missing_required_tool_corrections_used,
+                                "max_corrections": state.max_missing_required_tool_corrections,
                             },
                         )
-                        current_application_controls.append(
+                        state.current_application_controls.append(
                             {
                                 "role": "system",
                                 "content": (
@@ -2963,8 +2966,8 @@ class ProviderSessionAdapter:
                                         "already selected. Do not repeat it in "
                                         "the tool arguments. "
                                         if (
-                                            buffered_narration is not None
-                                            or buffered_raw_response_blocks is not None
+                                            state.buffered_narration is not None
+                                            or state.buffered_raw_response_blocks is not None
                                         )
                                         else "SYLVIA_GM_CAMPAIGN_FILE_UPDATE_CORRECTION "
                                         "(application-owned control, not player speech): The prior "
@@ -2975,8 +2978,8 @@ class ProviderSessionAdapter:
                                         "succeeds. "
                                     )
                                     + "This is correction "
-                                    f"{missing_required_tool_corrections_used} of "
-                                    f"{max_missing_required_tool_corrections}."
+                                    f"{state.missing_required_tool_corrections_used} of "
+                                    f"{state.max_missing_required_tool_corrections}."
                                 ),
                             }
                         )
@@ -2985,26 +2988,26 @@ class ProviderSessionAdapter:
                         "Provider completed without settling the Campaign File",
                         code="campaign_file_disposition_required",
                     )
-                if pending_failed_tool_call:
+                if state.pending_failed_tool_call:
                     raise CommandRejected(
                         "Provider abandoned a required tool-call correction",
                         code="provider_tool_correction_abandoned",
                     )
-                if gm_boundary_decision:
-                    draft_message = _assistant_draft_message(narration)
-                    exchange_messages.append(draft_message)
+                if state.gm_boundary_decision:
+                    state.draft_message = _assistant_draft_message(state.narration)
+                    state.exchange_messages.append(state.draft_message)
                     yield ProviderEvent.tool_evidence(
-                        message_id=f"{inference_id}-gm-boundary-draft",
+                        message_id=f"{state.inference_id}-gm-boundary-draft",
                         payload={
                             "kind": "provider_gm_boundary_draft",
-                            **context_fields,
+                            **state.context_fields,
                             "turn_id": turn_id,
-                            "inference_id": inference_id,
-                            "basis_message_id": basis_message_id,
-                            "assistant": cast(SafePayload, _plain_json(draft_message)),
+                            "inference_id": state.inference_id,
+                            "basis_message_id": state.basis_message_id,
+                            "assistant": cast(SafePayload, _plain_json(state.draft_message)),
                         },
                     )
-                    current_application_controls.append(
+                    state.current_application_controls.append(
                         {
                             "role": "system",
                             "content": (
@@ -3020,21 +3023,21 @@ class ProviderSessionAdapter:
                         }
                     )
                     continue
-                if player_intent_resolution_required:
-                    draft_message = _assistant_draft_message(narration)
-                    exchange_messages.append(draft_message)
+                if state.player_intent_resolution_required:
+                    state.draft_message = _assistant_draft_message(state.narration)
+                    state.exchange_messages.append(state.draft_message)
                     yield ProviderEvent.tool_evidence(
-                        message_id=f"{inference_id}-player-intent-pending-draft",
+                        message_id=f"{state.inference_id}-player-intent-pending-draft",
                         payload={
                             "kind": "provider_player_intent_pending_draft",
-                            **context_fields,
+                            **state.context_fields,
                             "turn_id": turn_id,
-                            "inference_id": inference_id,
-                            "basis_message_id": basis_message_id,
-                            "assistant": cast(SafePayload, _plain_json(draft_message)),
+                            "inference_id": state.inference_id,
+                            "basis_message_id": state.basis_message_id,
+                            "assistant": cast(SafePayload, _plain_json(state.draft_message)),
                         },
                     )
-                    current_application_controls.append(
+                    state.current_application_controls.append(
                         {
                             "role": "system",
                             "content": (
@@ -3049,61 +3052,61 @@ class ProviderSessionAdapter:
                         }
                     )
                     continue
-                if campaign_file_disposition_supported:
-                    buffered_narration = narration
-                    buffered_response_blocks = None
-                    buffered_raw_response_blocks = None
-                    buffered_narration_needs_disposition = True
-                    campaign_file_disposition_in_exchange = False
-                    force_campaign_file_update = True
-                    draft_message = _assistant_draft_message(narration)
-                    exchange_messages.append(draft_message)
+                if state.campaign_file_disposition_supported:
+                    state.buffered_narration = state.narration
+                    state.buffered_response_blocks = None
+                    state.buffered_raw_response_blocks = None
+                    state.buffered_narration_needs_disposition = True
+                    state.campaign_file_disposition_in_exchange = False
+                    state.force_campaign_file_update = True
+                    state.draft_message = _assistant_draft_message(state.narration)
+                    state.exchange_messages.append(state.draft_message)
                     yield ProviderEvent.tool_evidence(
-                        message_id=f"{inference_id}-held-narration",
+                        message_id=f"{state.inference_id}-held-narration",
                         payload={
                             "kind": "provider_held_narration",
-                            **context_fields,
+                            **state.context_fields,
                             "turn_id": turn_id,
-                            "inference_id": inference_id,
-                            "basis_message_id": basis_message_id,
-                            "assistant": cast(SafePayload, _plain_json(draft_message)),
+                            "inference_id": state.inference_id,
+                            "basis_message_id": state.basis_message_id,
+                            "assistant": cast(SafePayload, _plain_json(state.draft_message)),
                         },
                     )
                     continue
                 yield ProviderEvent.tool_evidence(
-                    message_id=f"{inference_id}-final-response-reference",
+                    message_id=f"{state.inference_id}-final-response-reference",
                     payload={
                         "kind": "provider_final_response_reference",
-                        **context_fields,
-                        "response_id": inference_id,
-                        "basis_message_id": basis_message_id,
+                        **state.context_fields,
+                        "response_id": state.inference_id,
+                        "basis_message_id": state.basis_message_id,
                         "requirement": {
                             "provider_id": provider_input.session.provider_id,
                             "model_id": provider_input.session.model_id,
-                            "reasoning_required": bool(assistant_reasoning),
-                                "chat_completion_required": native_chat_metadata is not None,
+                            "reasoning_required": bool(state.assistant_reasoning),
+                                "chat_completion_required": state.native_chat_metadata is not None,
                         },
                     },
                 )
-                yield ProviderEvent.talk(narration)
+                yield ProviderEvent.talk(state.narration)
                 return
 
-            ordered = [assemblies[index] for index in sorted(assemblies)]
-            if ordered and assistant_text:
-                provisional_tool_prose_pending = True
-            for assembly in ordered:
-                if not assembly.call_id:
-                    assembly.call_id = f"call-{uuid.uuid4().hex}"
-            for assembly in ordered:
-                resolved_tool = _resolve_provider_tool_alias(assembly.name, aliases)
-                if resolved_tool is not None:
-                    assembly.name = resolved_tool[0]
-            round_has_non_narrative_call = any(
+            state.ordered = [state.assemblies[index] for index in sorted(state.assemblies)]
+            if state.ordered and state.assistant_text:
+                state.provisional_tool_prose_pending = True
+            for state.assembly in state.ordered:
+                if not state.assembly.call_id:
+                    state.assembly.call_id = f"call-{uuid.uuid4().hex}"
+            for state.assembly in state.ordered:
+                state.resolved_tool = _resolve_provider_tool_alias(state.assembly.name, state.aliases)
+                if state.resolved_tool is not None:
+                    state.assembly.name = state.resolved_tool[0]
+            state.round_has_non_narrative_call = any(
                 resolved is None or resolved[1].category != "narrative_state"
-                for assembly in ordered
-                for resolved in (_resolve_provider_tool_alias(assembly.name, aliases),)
+                for assembly in state.ordered
+                for resolved in (_resolve_provider_tool_alias(assembly.name, state.aliases),)
             )
-            raw_calls = [
+            state.raw_calls = [
                 {
                     "id": assembly.call_id,
                     "type": "function",
@@ -3112,74 +3115,74 @@ class ProviderSessionAdapter:
                         "arguments": assembly.arguments or "{}",
                     },
                 }
-                for assembly in ordered
+                for assembly in state.ordered
             ]
             assistant_message: dict[str, object] = {
                 "role": "assistant",
                 "content": (
-                    None if round_has_non_narrative_call else "".join(assistant_text) or None
+                    None if state.round_has_non_narrative_call else "".join(state.assistant_text) or None
                 ),
-                "tool_calls": raw_calls,
+                "tool_calls": state.raw_calls,
             }
             # Signed native blocks belong only to this in-memory provider exchange. The separate
             # evidence message below stays player-safe and must never persist private thinking.
-            exchange_messages.append(attach_chat_metadata(
+            state.exchange_messages.append(attach_chat_metadata(
                 {**assistant_message,
-                 **({"anthropic_content": native_assistant_content}
-                    if native_assistant_content is not None else {}),
-                 **({"reasoning_content": "".join(assistant_reasoning)}
-                    if assistant_reasoning else {})},
-                native_chat_metadata,
+                 **({"anthropic_content": state.native_assistant_content}
+                    if state.native_assistant_content is not None else {}),
+                 **({"reasoning_content": "".join(state.assistant_reasoning)}
+                    if state.assistant_reasoning else {})},
+                state.native_chat_metadata,
             ))
             yield ProviderEvent.tool_evidence(
-                message_id=f"{inference_id}-assistant-tools",
+                message_id=f"{state.inference_id}-assistant-tools",
                 payload={
                     "kind": "provider_tool_calls",
-                    **context_fields,
+                    **state.context_fields,
                     "turn_id": turn_id,
-                    "inference_id": inference_id,
-                    "basis_message_id": basis_message_id,
+                    "inference_id": state.inference_id,
+                    "basis_message_id": state.basis_message_id,
                     "assistant": cast(SafePayload, _plain_json(assistant_message)),
                     "native_continuation": {
                         "provider_id": provider_input.session.provider_id,
                         "model_id": provider_input.session.model_id,
-                        "anthropic_required": native_assistant_content is not None,
-                        "chat_completion_required": native_chat_metadata is not None,
-                        "reasoning_required": bool(assistant_reasoning),
+                        "anthropic_required": state.native_assistant_content is not None,
+                        "chat_completion_required": state.native_chat_metadata is not None,
+                        "reasoning_required": bool(state.assistant_reasoning),
                     },
                 },
             )
-            state_changing_call_submitted = False
-            for position, assembly in enumerate(ordered):
-                provider_input.control.progress.update("tool", assembly.name)
-                if assembly.name == "read_session_history":
+            state.state_changing_call_submitted = False
+            for position, state.assembly in enumerate(state.ordered):
+                provider_input.control.progress.update("tool", state.assembly.name)
+                if state.assembly.name == "read_session_history":
                     try:
-                        history_parameters = json.loads(assembly.arguments or "{}")
+                        history_parameters = json.loads(state.assembly.arguments or "{}")
                         if not isinstance(history_parameters, dict):
                             raise ValueError("History parameters must be an object")
                         working, _bridge = self._working_contexts[provider_input.session.session_id]
                         if not working.history_retrieval_enabled or not working.records:
                             raise ValueError("Historical reads are unavailable in this transaction")
-                        local_tool_results[assembly.call_id] = working.read_history(
+                        state.local_tool_results[state.assembly.call_id] = working.read_history(
                             history_parameters,
                         )
                     except (ValueError, KeyError):
-                        local_tool_results[assembly.call_id] = {"error": "Invalid history request"}
-                        local_tool_failures.add(assembly.call_id)
+                        state.local_tool_results[state.assembly.call_id] = {"error": "Invalid history request"}
+                        state.local_tool_failures.add(state.assembly.call_id)
                     continue
-                resolved_tool = _resolve_provider_tool_alias(assembly.name, aliases)
-                if resolved_tool is None:
-                    local_tool_results[assembly.call_id] = {
+                state.resolved_tool = _resolve_provider_tool_alias(state.assembly.name, state.aliases)
+                if state.resolved_tool is None:
+                    state.local_tool_results[state.assembly.call_id] = {
                         "status": "rejected",
                         "code": "unavailable_catalog_tool",
                         "state_changed": False,
-                        "requested_provider_tool_name": assembly.name,
+                        "requested_provider_tool_name": state.assembly.name,
                         "available_operations": [
                             {
                                 "provider_tool_name": alias,
                                 "operation": tool.name,
                             }
-                            for alias, tool in aliases.items()
+                            for alias, tool in state.aliases.items()
                         ],
                         "instruction": (
                             "This provider tool is absent from the current request and cannot "
@@ -3189,15 +3192,15 @@ class ProviderSessionAdapter:
                             "is marked required, call that transition first."
                         ),
                     }
-                    local_tool_failures.add(assembly.call_id)
+                    state.local_tool_failures.add(state.assembly.call_id)
                     continue
-                _, catalog_tool = resolved_tool
+                state._, state.catalog_tool = state.resolved_tool
                 if (
                     position > 0
-                    and state_changing_call_submitted
-                    and catalog_tool.category != ("reference")
+                    and state.state_changing_call_submitted
+                    and state.catalog_tool.category != ("reference")
                 ):
-                    local_tool_results[assembly.call_id] = {
+                    state.local_tool_results[state.assembly.call_id] = {
                         "status": "superseded_by_catalog_refresh",
                         "state_changed": False,
                         "instruction": (
@@ -3208,16 +3211,16 @@ class ProviderSessionAdapter:
                     }
                     continue
                 try:
-                    parameters = json.loads(assembly.arguments or "{}")
+                    state.parameters = json.loads(state.assembly.arguments or "{}")
                 except json.JSONDecodeError as error:
-                    local_tool_results[assembly.call_id] = {
+                    state.local_tool_results[state.assembly.call_id] = {
                         "status": "rejected",
                         "code": "provider_tool_arguments_invalid_json",
                         "state_changed": False,
                         "provider_response_finish_reason": (
-                            round_finish_reason or "stream_ended_without_finish_reason"
+                            state.round_finish_reason or "stream_ended_without_finish_reason"
                         ),
-                        "received_argument_characters": len(assembly.arguments),
+                        "received_argument_characters": len(state.assembly.arguments),
                         "json_error": {
                             "message": error.msg,
                             "line": error.lineno,
@@ -3230,49 +3233,49 @@ class ProviderSessionAdapter:
                             "character; do not continue the partial text."
                         ),
                     }
-                    local_tool_failures.add(assembly.call_id)
+                    state.local_tool_failures.add(state.assembly.call_id)
                     continue
-                if not isinstance(parameters, dict):
-                    local_tool_results[assembly.call_id] = {
+                if not isinstance(state.parameters, dict):
+                    state.local_tool_results[state.assembly.call_id] = {
                         "status": "rejected",
                         "code": "provider_tool_arguments_not_object",
                         "state_changed": False,
                         "instruction": "Call the tool again with a JSON object.",
                     }
-                    local_tool_failures.add(assembly.call_id)
+                    state.local_tool_failures.add(state.assembly.call_id)
                     continue
-                scope = parameters.pop(
+                scope = state.parameters.pop(
                     _PREPARATION_INTENT_ARGUMENT, _UNSPECIFIED_PREPARATION_INTENT,
                 )
                 if scope is not _UNSPECIFIED_PREPARATION_INTENT:
                     try:
                         if (
-                            catalog_tool.model_behavior
+                            state.catalog_tool.model_behavior
                             is not ModelToolBehavior.LEAVES_PLAYER_INTENT_PENDING
                         ):
                             raise CommandRejected(
                                 "This operation does not declare a preparation scope",
                                 code="provider_player_intent_scope_invalid",
                             )
-                        _preparation_keeps_intent_pending(scope, pending=player_intent_pending)
+                        _preparation_keeps_intent_pending(scope, pending=state.player_intent_pending)
                     except CommandRejected as error:
-                        local_tool_results[assembly.call_id] = {
+                        state.local_tool_results[state.assembly.call_id] = {
                             "status": "rejected", "code": error.code,
                             "field_paths": [_PREPARATION_INTENT_ARGUMENT], "state_changed": False,
                             "instruction": str(error),
                         }
-                        local_tool_failures.add(assembly.call_id)
+                        state.local_tool_failures.add(state.assembly.call_id)
                         continue
-                    mechanics_preparation_scopes[assembly.call_id] = scope
-                snapshot = self._owner.snapshot(campaign_id)
+                    state.mechanics_preparation_scopes[state.assembly.call_id] = scope
+                state.snapshot = self._owner.snapshot(state.campaign_id)
                 try:
-                    parameters = _derive_mechanics_parameters(
-                        parameters,
-                        catalog_tool.parameter_derivations or {},
-                        snapshot.participants,
+                    state.parameters = _derive_mechanics_parameters(
+                        state.parameters,
+                        state.catalog_tool.parameter_derivations or {},
+                        state.snapshot.participants,
                     )
                 except CommandRejected as error:
-                    local_tool_results[assembly.call_id] = {
+                    state.local_tool_results[state.assembly.call_id] = {
                         "status": "rejected",
                         "code": error.code,
                         "field_paths": [],
@@ -3281,16 +3284,16 @@ class ProviderSessionAdapter:
                             "Correct the selected participant or operation fields and retry once."
                         ),
                     }
-                    local_tool_failures.add(assembly.call_id)
+                    state.local_tool_failures.add(state.assembly.call_id)
                     continue
                 try:
-                    parameters = _normalize_state_references(
-                        parameters,
-                        catalog_tool.input_schema,
-                        snapshot.state,
+                    state.parameters = _normalize_state_references(
+                        state.parameters,
+                        state.catalog_tool.input_schema,
+                        state.snapshot.state,
                     )
                 except CommandRejected as error:
-                    local_tool_results[assembly.call_id] = {
+                    state.local_tool_results[state.assembly.call_id] = {
                         "status": "rejected",
                         "code": error.code,
                         "state_changed": False,
@@ -3298,17 +3301,17 @@ class ProviderSessionAdapter:
                             "Correct the state reference from current Campaign State and retry."
                         ),
                     }
-                    local_tool_failures.add(assembly.call_id)
+                    state.local_tool_failures.add(state.assembly.call_id)
                     continue
-                mechanics_tool_names[assembly.call_id] = catalog_tool.name
-                mechanics_tool_behaviors[assembly.call_id] = catalog_tool.model_behavior
-                validation_schema = provider_tool_schemas.get(
-                    assembly.name,
-                    catalog_tool.input_schema,
+                state.mechanics_tool_names[state.assembly.call_id] = state.catalog_tool.name
+                state.mechanics_tool_behaviors[state.assembly.call_id] = state.catalog_tool.model_behavior
+                validation_schema = state.provider_tool_schemas.get(
+                    state.assembly.name,
+                    state.catalog_tool.input_schema,
                 )
-                missing = _missing_required_arguments(parameters, validation_schema)
-                if missing:
-                    if catalog_tool.category == "narrative_state":
+                state.missing = _missing_required_arguments(state.parameters, validation_schema)
+                if state.missing:
+                    if state.catalog_tool.category == "narrative_state":
                         diagnostic_recorder = getattr(
                             self._owner,
                             "record_mechanics_diagnostic",
@@ -3318,44 +3321,44 @@ class ProviderSessionAdapter:
                             diagnostic_recorder(
                                 session_id=provider_input.session.session_id,
                                 turn_id=turn_id,
-                                action_id=assembly.call_id,
-                                tool_name=catalog_tool.name,
+                                action_id=state.assembly.call_id,
+                                tool_name=state.catalog_tool.name,
                                 rejection_code="missing_required_arguments",
-                                validation_field_paths=missing,
+                                validation_field_paths=state.missing,
                                 state_changed=False,
                             )
-                    local_tool_results[assembly.call_id] = {
+                    state.local_tool_results[state.assembly.call_id] = {
                         "status": "rejected",
                         "code": "missing_required_arguments",
-                        "missing": list(missing),
+                        "missing": list(state.missing),
                         "instruction": "Retry this tool with every required argument.",
                     }
-                    local_tool_failures.add(assembly.call_id)
+                    state.local_tool_failures.add(state.assembly.call_id)
                     continue
-                if (catalog_tool.package_id == "sylvia.application"
-                        and catalog_tool.capability.startswith("action_sequence.")):
-                    state_changing_call_submitted = (
-                        state_changing_call_submitted or catalog_tool.category != "reference"
+                if (state.catalog_tool.package_id == "sylvia.application"
+                        and state.catalog_tool.capability.startswith("action_sequence.")):
+                    state.state_changing_call_submitted = (
+                        state.state_changing_call_submitted or state.catalog_tool.category != "reference"
                     )
                     try:
                         result = call_action_sequence_tool(
-                            self._owner, campaign_id=campaign_id,
+                            self._owner, campaign_id=state.campaign_id,
                             session_id=provider_input.session.session_id,
-                            name=catalog_tool.name, parameters=parameters,
+                            name=state.catalog_tool.name, parameters=state.parameters,
                         )
-                        local_tool_results[assembly.call_id] = result
-                        if catalog_tool.name == "execute_action_sequence":
+                        state.local_tool_results[state.assembly.call_id] = result
+                        if state.catalog_tool.name == "execute_action_sequence":
                             saved = result.get("result")
                             if not isinstance(saved, Mapping):
                                 raise CommandRejected("Action sequence result is unavailable")
-                            facts = _action_sequence_narration_facts(
-                                self._owner, campaign_id, saved
+                            state.facts = _action_sequence_narration_facts(
+                                self._owner, state.campaign_id, saved
                             )
-                            if facts is not None:
-                                sequence_narration_facts.append(facts)
+                            if state.facts is not None:
+                                state.sequence_narration_facts.append(state.facts)
                             if saved.get("status") in {"paused", "failed", "stale"}:
-                                sequence_execution_stopped = True
-                                current_application_controls.append({"role": "system", "content": (
+                                state.sequence_execution_stopped = True
+                                state.current_application_controls.append({"role": "system", "content": (
                                     "SYLVIA_ACTION_SEQUENCE_STOP "
                                     "(trusted application instruction): "
                                     "The executable sequence stopped at an authoritative boundary. "
@@ -3370,26 +3373,26 @@ class ProviderSessionAdapter:
                                     "direction before a further sequence execution."
                                 )})
                     except (CommandRejected, MechanicsRejected) as error:
-                        if catalog_tool.name == "execute_action_sequence":
+                        if state.catalog_tool.name == "execute_action_sequence":
                             # The service may have persisted a prefix before its reply failed.
                             # Recover receipts by reading; never retry execution implicitly.
-                            sequence_execution_stopped = True
+                            state.sequence_execution_stopped = True
                             saved = self._owner.action_sequence(
                                 session_id=provider_input.session.session_id,
-                                sequence_id=parameters.get("sequence_id"),
+                                sequence_id=state.parameters.get("sequence_id"),
                             )
-                            local_tool_results[assembly.call_id] = {
-                                "kind": "action_sequence_result", "operation": catalog_tool.name,
+                            state.local_tool_results[state.assembly.call_id] = {
+                                "kind": "action_sequence_result", "operation": state.catalog_tool.name,
                                 "result": _plain_json(saved), "execution_stopped": True,
                                 "delivery_error": {"code": error.code},
                             }
                             if isinstance(saved, Mapping):
-                                facts = _action_sequence_narration_facts(
-                                    self._owner, campaign_id, saved
+                                state.facts = _action_sequence_narration_facts(
+                                    self._owner, state.campaign_id, saved
                                 )
-                                if facts is not None:
-                                    sequence_narration_facts.append(facts)
-                            current_application_controls.append({"role": "system", "content": (
+                                if state.facts is not None:
+                                    state.sequence_narration_facts.append(state.facts)
+                            state.current_application_controls.append({"role": "system", "content": (
                                 "SYLVIA_ACTION_SEQUENCE_STOP "
                                 "(trusted application instruction): "
                                 "Execution did not return a confirmed reply. The saved queue and "
@@ -3399,18 +3402,18 @@ class ProviderSessionAdapter:
                                 "remaining intentions, and wait for fresh player direction."
                             )})
                         else:
-                            local_tool_results[assembly.call_id] = {
+                            state.local_tool_results[state.assembly.call_id] = {
                                 "status": "rejected", "code": error.code, "state_changed": False,
                             }
-                            local_tool_failures.add(assembly.call_id)
+                            state.local_tool_failures.add(state.assembly.call_id)
                     continue
-                if catalog_tool.category == "reference":
-                    if catalog_tool.capability == "context.search":
+                if state.catalog_tool.category == "reference":
+                    if state.catalog_tool.capability == "context.search":
                         searcher = provider_input.knowledge_searcher
-                        query = parameters.get("query")
-                        raw_sources = parameters.get("sources")
-                        limit = parameters.get("limit", 5)
-                        offset = parameters.get("offset", 0)
+                        query = state.parameters.get("query")
+                        raw_sources = state.parameters.get("sources")
+                        limit = state.parameters.get("limit", 5)
+                        offset = state.parameters.get("offset", 0)
                         sources = (
                             tuple(str(item) for item in raw_sources)
                             if isinstance(raw_sources, Sequence)
@@ -3429,53 +3432,53 @@ class ProviderSessionAdapter:
                             or isinstance(offset, bool)
                             or offset < 0
                         ):
-                            local_tool_results[assembly.call_id] = {
+                            state.local_tool_results[state.assembly.call_id] = {
                                 "status": "rejected",
                                 "code": "campaign_knowledge_search_unavailable",
                             }
-                            local_tool_failures.add(assembly.call_id)
+                            state.local_tool_failures.add(state.assembly.call_id)
                             continue
                         try:
                             matches = searcher(query, sources, limit, offset)
                         except CommandRejected as error:
-                            local_tool_results[assembly.call_id] = {
+                            state.local_tool_results[state.assembly.call_id] = {
                                 "status": "rejected",
                                 "code": error.code,
                             }
-                            local_tool_failures.add(assembly.call_id)
+                            state.local_tool_failures.add(state.assembly.call_id)
                             continue
-                        local_tool_results[assembly.call_id] = {
+                        state.local_tool_results[state.assembly.call_id] = {
                             "status": "knowledge_search",
                             "result": dict(matches),
                         }
                         continue
                     reader = provider_input.reference_reader
-                    source = parameters.get("source")
-                    path = parameters.get("path")
+                    source = state.parameters.get("source")
+                    path = state.parameters.get("path")
                     if reader is None or not isinstance(source, str) or not isinstance(path, str):
-                        local_tool_results[assembly.call_id] = {
+                        state.local_tool_results[state.assembly.call_id] = {
                             "status": "rejected",
                             "code": "campaign_reference_unavailable",
                         }
-                        local_tool_failures.add(assembly.call_id)
+                        state.local_tool_failures.add(state.assembly.call_id)
                         continue
                     try:
                         reference = reader(source, path)
                     except CommandRejected as error:
-                        local_tool_results[assembly.call_id] = {
+                        state.local_tool_results[state.assembly.call_id] = {
                             "status": "rejected",
                             "code": error.code,
                         }
-                        local_tool_failures.add(assembly.call_id)
+                        state.local_tool_failures.add(state.assembly.call_id)
                         continue
-                    local_tool_results[assembly.call_id] = {
+                    state.local_tool_results[state.assembly.call_id] = {
                         "status": "reference_read",
                         "result": dict(reference),
                     }
                     continue
-                if catalog_tool.category == "narrative_state":
-                    if len(ordered) != 1:
-                        local_tool_results[assembly.call_id] = {
+                if state.catalog_tool.category == "narrative_state":
+                    if len(state.ordered) != 1:
+                        state.local_tool_results[state.assembly.call_id] = {
                             "status": "rejected",
                             "code": "campaign_file_update_must_be_only_tool",
                             "state_changed": False,
@@ -3486,60 +3489,60 @@ class ProviderSessionAdapter:
                                 "After it succeeds, narrate the admitted outcome."
                             ),
                         }
-                        local_tool_failures.add(assembly.call_id)
+                        state.local_tool_failures.add(state.assembly.call_id)
                         continue
-                    state_changing_call_submitted = True
+                    state.state_changing_call_submitted = True
                     attached_narration = (
-                        "".join(assistant_text) if not force_campaign_file_update else ""
+                        "".join(state.assistant_text) if not state.force_campaign_file_update else ""
                     )
                     if attached_narration.strip():
                         if _contains_serialized_tool_call(attached_narration):
-                            local_tool_results[assembly.call_id] = {
+                            state.local_tool_results[state.assembly.call_id] = {
                                 "status": "rejected",
                                 "code": "provider_serialized_tool_call",
                                 "state_changed": False,
                             }
-                            local_tool_failures.add(assembly.call_id)
+                            state.local_tool_failures.add(state.assembly.call_id)
                             continue
-                        buffered_narration = attached_narration
-                        buffered_response_blocks = None
-                        buffered_raw_response_blocks = None
-                        buffered_narration_needs_disposition = True
-                        campaign_file_disposition_in_exchange = False
-                    revised_narration_supplied = (
-                        _CAMPAIGN_FILE_REVISED_NARRATION_ARGUMENT in parameters
+                        state.buffered_narration = attached_narration
+                        state.buffered_response_blocks = None
+                        state.buffered_raw_response_blocks = None
+                        state.buffered_narration_needs_disposition = True
+                        state.campaign_file_disposition_in_exchange = False
+                    state.revised_narration_supplied = (
+                        _CAMPAIGN_FILE_REVISED_NARRATION_ARGUMENT in state.parameters
                     )
-                    revised_narration = parameters.pop(
+                    state.revised_narration = state.parameters.pop(
                         _CAMPAIGN_FILE_REVISED_NARRATION_ARGUMENT,
                         None,
                     )
-                    revised_raw_blocks: tuple[SafePayload, ...] | None = None
-                    if isinstance(revised_narration, list):
+                    state.revised_raw_blocks = None
+                    if isinstance(state.revised_narration, list):
                         try:
-                            revised_raw_blocks = _validated_raw_response_blocks(revised_narration)
-                            revised_narration = ""
+                            state.revised_raw_blocks = _validated_raw_response_blocks(state.revised_narration)
+                            state.revised_narration = ""
                         except ValueError:
-                            revised_raw_blocks = None
-                            revised_narration = None
-                    selected_raw_blocks = (
-                        revised_raw_blocks
-                        if revised_narration_supplied
-                        else buffered_raw_response_blocks
+                            state.revised_raw_blocks = None
+                            state.revised_narration = None
+                    state.selected_raw_blocks = (
+                        state.revised_raw_blocks
+                        if state.revised_narration_supplied
+                        else state.buffered_raw_response_blocks
                     )
                     pending_reader = getattr(self._owner, "campaign_preparation_boundary", None)
-                    pending_boundary = (
-                        pending_reader(campaign_id) if callable(pending_reader) else None
+                    state.pending_boundary = (
+                        pending_reader(state.campaign_id) if callable(pending_reader) else None
                     )
                     if (
-                        pending_boundary is not None
-                        and pending_boundary.preparation is not None
+                        state.pending_boundary is not None
+                        and state.pending_boundary.preparation is not None
                         and (
-                            selected_raw_blocks is None
-                            or any(block.get("kind") != "ooc" for block in selected_raw_blocks)
-                            or _campaign_file_arguments_establish_changes(parameters)
+                            state.selected_raw_blocks is None
+                            or any(block.get("kind") != "ooc" for block in state.selected_raw_blocks)
+                            or _campaign_file_arguments_establish_changes(state.parameters)
                         )
                     ):
-                        local_tool_results[assembly.call_id] = {
+                        state.local_tool_results[state.assembly.call_id] = {
                             "status": "rejected", "code": "campaign_preparation_pending",
                             "state_changed": False,
                             "instruction": (
@@ -3548,26 +3551,26 @@ class ProviderSessionAdapter:
                                 "story, rewards or act progress."
                             ),
                         }
-                        local_tool_failures.add(assembly.call_id)
+                        state.local_tool_failures.add(state.assembly.call_id)
                         continue
-                    ooc_ack_missing = ooc_ack_required and not (
-                        selected_raw_blocks is not None
-                        and any(block.get("kind") == "ooc" for block in selected_raw_blocks)
+                    state.ooc_ack_missing = state.ooc_ack_required and not (
+                        state.selected_raw_blocks is not None
+                        and any(block.get("kind") == "ooc" for block in state.selected_raw_blocks)
                     )
-                    if ooc_ack_missing:
-                        revised_narration = None
-                    unsupported_speakers = (
-                        selected_raw_blocks is not None
+                    if state.ooc_ack_missing:
+                        state.revised_narration = None
+                    state.unsupported_speakers = (
+                        state.selected_raw_blocks is not None
                         and bool(_unsupported_response_speaker_ids(
-                            selected_raw_blocks,
-                            self._owner.snapshot(campaign_id),
-                            parameters,
+                            state.selected_raw_blocks,
+                            self._owner.snapshot(state.campaign_id),
+                            state.parameters,
                         ))
                     )
-                    if ooc_ack_missing or unsupported_speakers or (
-                        revised_narration_supplied and revised_raw_blocks is None
+                    if state.ooc_ack_missing or state.unsupported_speakers or (
+                        state.revised_narration_supplied and state.revised_raw_blocks is None
                     ):
-                        local_tool_results[assembly.call_id] = {
+                        state.local_tool_results[state.assembly.call_id] = {
                             "status": "rejected",
                             "code": "campaign_file_revised_narration_invalid",
                             "field_paths": [
@@ -3587,32 +3590,32 @@ class ProviderSessionAdapter:
                                 "block. Correct the complete Campaign File disposition and retry."
                             ),
                         }
-                        local_tool_failures.add(assembly.call_id)
+                        state.local_tool_failures.add(state.assembly.call_id)
                         continue
-                    settled_narration = buffered_narration
-                    if revised_raw_blocks is None and isinstance(revised_narration, str):
-                        settled_narration = revised_narration
-                    if isinstance(settled_narration, str):
+                    state.settled_narration = state.buffered_narration
+                    if state.revised_raw_blocks is None and isinstance(state.revised_narration, str):
+                        state.settled_narration = state.revised_narration
+                    if isinstance(state.settled_narration, str):
                         # Keep the prose decision while a malformed state payload is corrected.
                         # Omission in a later tool call means these exact bytes remain selected.
-                        buffered_narration = settled_narration
-                        if revised_narration_supplied:
-                            buffered_response_blocks = None
-                            buffered_raw_response_blocks = revised_raw_blocks
-                        buffered_narration_needs_disposition = True
-                    elif revised_raw_blocks is not None:
-                        buffered_raw_response_blocks = revised_raw_blocks
-                        buffered_response_blocks = None
-                        buffered_narration_needs_disposition = True
-                    parameters_establish_changes = _campaign_file_arguments_establish_changes(
-                        parameters
+                        state.buffered_narration = state.settled_narration
+                        if state.revised_narration_supplied:
+                            state.buffered_response_blocks = None
+                            state.buffered_raw_response_blocks = state.revised_raw_blocks
+                        state.buffered_narration_needs_disposition = True
+                    elif state.revised_raw_blocks is not None:
+                        state.buffered_raw_response_blocks = state.revised_raw_blocks
+                        state.buffered_response_blocks = None
+                        state.buffered_narration_needs_disposition = True
+                    state.parameters_establish_changes = _campaign_file_arguments_establish_changes(
+                        state.parameters
                     )
-                    empty_collection_paths = _campaign_file_empty_collection_paths(parameters)
-                    if empty_collection_paths:
-                        local_tool_results[assembly.call_id] = {
+                    state.empty_collection_paths = _campaign_file_empty_collection_paths(state.parameters)
+                    if state.empty_collection_paths:
+                        state.local_tool_results[state.assembly.call_id] = {
                             "status": "rejected",
                             "code": "campaign_file_empty_collections",
-                            "field_paths": list(empty_collection_paths),
+                            "field_paths": list(state.empty_collection_paths),
                             "state_changed": False,
                             "instruction": (
                                 "Omit collections that have no items. If the decided outcome "
@@ -3621,10 +3624,10 @@ class ProviderSessionAdapter:
                                 "a non-empty collection."
                             ),
                         }
-                        local_tool_failures.add(assembly.call_id)
+                        state.local_tool_failures.add(state.assembly.call_id)
                         continue
-                    if not parameters_establish_changes and campaign_file_mutation_attempted:
-                        local_tool_results[assembly.call_id] = {
+                    if not state.parameters_establish_changes and state.campaign_file_mutation_attempted:
+                        state.local_tool_results[state.assembly.call_id] = {
                             "status": "rejected",
                             "code": "campaign_file_unchanged_after_rejected_update",
                             "state_changed": False,
@@ -3635,21 +3638,21 @@ class ProviderSessionAdapter:
                                 "fail the turn without releasing narration."
                             ),
                         }
-                        local_tool_failures.add(assembly.call_id)
+                        state.local_tool_failures.add(state.assembly.call_id)
                         continue
-                    mutation_attempted_before_call = campaign_file_mutation_attempted
-                    if parameters_establish_changes:
-                        campaign_file_mutation_attempted = True
+                    state.mutation_attempted_before_call = state.campaign_file_mutation_attempted
+                    if state.parameters_establish_changes:
+                        state.campaign_file_mutation_attempted = True
                     writer = provider_input.narrative_writer
                     if writer is None:
-                        local_tool_results[assembly.call_id] = {
+                        state.local_tool_results[state.assembly.call_id] = {
                             "status": "rejected",
                             "code": "campaign_narrative_state_unavailable",
                         }
-                        local_tool_failures.add(assembly.call_id)
+                        state.local_tool_failures.add(state.assembly.call_id)
                         continue
                     try:
-                        update = writer(parameters)
+                        state.update = writer(state.parameters)
                     except CommandRejected as error:
                         rejection: dict[str, object] = {
                             "status": "rejected",
@@ -3689,32 +3692,32 @@ class ProviderSessionAdapter:
                                     "spoken words. Otherwise omit that field to keep the held "
                                     "response."
                                     if (
-                                        buffered_narration is not None
-                                        or buffered_raw_response_blocks is not None
+                                        state.buffered_narration is not None
+                                        or state.buffered_raw_response_blocks is not None
                                     )
                                     else ""
                                 )
                             )
-                        local_tool_results[assembly.call_id] = rejection
-                        local_tool_failures.add(assembly.call_id)
+                        state.local_tool_results[state.assembly.call_id] = rejection
+                        state.local_tool_failures.add(state.assembly.call_id)
                         continue
-                    if buffered_raw_response_blocks is not None:
-                        response_snapshot = self._owner.snapshot(campaign_id)
-                        settled_narration, buffered_response_blocks = _project_response_blocks(
-                            buffered_raw_response_blocks,
+                    if state.buffered_raw_response_blocks is not None:
+                        response_snapshot = self._owner.snapshot(state.campaign_id)
+                        state.settled_narration, state.buffered_response_blocks = _project_response_blocks(
+                            state.buffered_raw_response_blocks,
                             response_snapshot,
                             party_roles=_persisted_selected_party_roles(
                                 self._owner,
-                                campaign_id,
+                                state.campaign_id,
                                 response_snapshot.participants,
                             ),
                         )
-                        buffered_narration = settled_narration
-                    update_status = str(update.get("status", "campaign_file_updated"))
+                        state.buffered_narration = state.settled_narration
+                    update_status = str(state.update.get("status", "campaign_file_updated"))
                     if update_status == "campaign_file_unchanged":
-                        if parameters_establish_changes:
-                            campaign_file_mutation_attempted = mutation_attempted_before_call
-                            local_tool_results[assembly.call_id] = {
+                        if state.parameters_establish_changes:
+                            state.campaign_file_mutation_attempted = state.mutation_attempted_before_call
+                            state.local_tool_results[state.assembly.call_id] = {
                                 "status": "rejected",
                                 "code": "campaign_file_duplicate_collections",
                                 "state_changed": False,
@@ -3730,111 +3733,111 @@ class ProviderSessionAdapter:
                                     "unchanged scene merely because the prose mentions it."
                                 ),
                             }
-                            local_tool_failures.add(assembly.call_id)
+                            state.local_tool_failures.add(state.assembly.call_id)
                             continue
-                        local_tool_results[assembly.call_id] = {
+                        state.local_tool_results[state.assembly.call_id] = {
                             "status": "campaign_file_unchanged",
-                            "result": dict(update),
-                            "player_facing_response": settled_narration,
+                            "result": dict(state.update),
+                            "player_facing_response": state.settled_narration,
                             **(
-                                {"response_blocks": list(buffered_response_blocks)}
-                                if buffered_response_blocks is not None
+                                {"response_blocks": list(state.buffered_response_blocks)}
+                                if state.buffered_response_blocks is not None
                                 else {}
                             ),
                             "instruction": (
                                 "Campaign File review is settled without a database write. Sylvia "
                                 "will now deliver the settled player-facing response."
-                                if settled_narration is not None
+                                if state.settled_narration is not None
                                 else "Campaign File review is settled without a database write. "
                                 "Now return only the complete in-world GM response for the "
                                 "reviewed outcome."
                             ),
                         }
-                        campaign_file_disposition_in_exchange = True
-                        if settled_narration is not None:
-                            buffered_narration = settled_narration
-                            buffered_narration_needs_disposition = False
-                            campaign_file_narration_pending = False
+                        state.campaign_file_disposition_in_exchange = True
+                        if state.settled_narration is not None:
+                            state.buffered_narration = state.settled_narration
+                            state.buffered_narration_needs_disposition = False
+                            state.campaign_file_narration_pending = False
                         else:
-                            campaign_file_narration_pending = True
-                        force_campaign_file_update = False
+                            state.campaign_file_narration_pending = True
+                        state.force_campaign_file_update = False
                         continue
-                    local_tool_results[assembly.call_id] = {
+                    state.local_tool_results[state.assembly.call_id] = {
                         "status": "campaign_file_updated",
-                        "result": dict(update),
-                        "player_facing_response": settled_narration,
+                        "result": dict(state.update),
+                        "player_facing_response": state.settled_narration,
                         **(
-                            {"response_blocks": list(buffered_response_blocks)}
-                            if buffered_response_blocks is not None
+                            {"response_blocks": list(state.buffered_response_blocks)}
+                            if state.buffered_response_blocks is not None
                             else {}
                         ),
                         "instruction": (
                             "Campaign File review is settled at this admitted revision. Sylvia "
                             "will now deliver the settled player-facing response."
-                            if settled_narration is not None
+                            if state.settled_narration is not None
                             else "Campaign File update is settled at this admitted revision. Now "
                             "return only the complete in-world GM response for the admitted "
                             "outcome."
                         ),
                     }
-                    any_commit_in_exchange = True
-                    campaign_file_commit_in_exchange = True
-                    campaign_file_disposition_in_exchange = True
-                    if settled_narration is not None:
-                        buffered_narration = settled_narration
-                        buffered_narration_needs_disposition = False
-                        campaign_file_narration_pending = False
+                    state.any_commit_in_exchange = True
+                    state.campaign_file_commit_in_exchange = True
+                    state.campaign_file_disposition_in_exchange = True
+                    if state.settled_narration is not None:
+                        state.buffered_narration = state.settled_narration
+                        state.buffered_narration_needs_disposition = False
+                        state.campaign_file_narration_pending = False
                     else:
-                        campaign_file_narration_pending = True
-                    force_campaign_file_update = False
+                        state.campaign_file_narration_pending = True
+                    state.force_campaign_file_update = False
                     continue
-                action_id = f"action-{uuid.uuid4().hex}"
+                state.action_id = f"action-{uuid.uuid4().hex}"
                 command = ActionCommand(
-                    campaign_id=campaign_id,
-                    action_id=action_id,
+                    campaign_id=state.campaign_id,
+                    action_id=state.action_id,
                     idempotency_key=f"provider-{uuid.uuid4().hex}",
                     owner_id=self._owner_id,
                     writer=provider_input.session.role,
-                    expected_revision=snapshot.revision,
+                    expected_revision=state.snapshot.revision,
                     turn_id=turn_id,
-                    package_id=catalog_tool.package_id,
-                    tool_name=catalog_tool.name,
-                    parameters=cast(Mapping[str, JsonValue], parameters),
+                    package_id=state.catalog_tool.package_id,
+                    tool_name=state.catalog_tool.name,
+                    parameters=cast(Mapping[str, JsonValue], state.parameters),
                     initiating_session_id=provider_input.session.session_id,
                 )
-                mechanics_action_ids[assembly.call_id] = action_id
-                mechanics_parameters[assembly.call_id] = parameters
-                mechanics_pre_entities[assembly.call_id] = _current_referenced_entities(
-                    parameters, snapshot.state
+                state.mechanics_action_ids[state.assembly.call_id] = state.action_id
+                state.mechanics_parameters[state.assembly.call_id] = state.parameters
+                state.mechanics_pre_entities[state.assembly.call_id] = _current_referenced_entities(
+                    state.parameters, state.snapshot.state
                 )
-                state_changing_call_submitted = True
-                feedback = ProviderActionFeedback()
+                state.state_changing_call_submitted = True
+                state.feedback = ProviderActionFeedback()
                 yield ProviderEvent.tool_evidence(
-                    message_id=f"{inference_id}-{assembly.call_id}-mechanics-contract",
+                    message_id=f"{state.inference_id}-{state.assembly.call_id}-mechanics-contract",
                     payload={
                         "kind": "provider_mechanics_action_contract",
                         "turn_id": turn_id,
-                        "inference_id": inference_id,
-                        "basis_message_id": basis_message_id,
-                        "action_id": action_id,
-                        "operation": catalog_tool.name,
-                        "model_behavior": catalog_tool.model_behavior.value,
+                        "inference_id": state.inference_id,
+                        "basis_message_id": state.basis_message_id,
+                        "action_id": state.action_id,
+                        "operation": state.catalog_tool.name,
+                        "model_behavior": state.catalog_tool.model_behavior.value,
                         **(
                             {
                                 _PREPARATION_INTENT_ARGUMENT:
-                                    mechanics_preparation_scopes[assembly.call_id]
+                                    state.mechanics_preparation_scopes[state.assembly.call_id]
                             }
-                            if assembly.call_id in mechanics_preparation_scopes else {}
+                            if state.assembly.call_id in state.mechanics_preparation_scopes else {}
                         ),
                         "decision_owner": (
-                            decision_boundary.owner.value if decision_boundary is not None else None
+                            state.decision_boundary.owner.value if state.decision_boundary is not None else None
                         ),
                     },
                 )
-                yield ProviderEvent.action(command, feedback=feedback)
-                if feedback.rejection is not None:
-                    local_tool_results[assembly.call_id] = dict(feedback.rejection)
-                    local_tool_failures.add(assembly.call_id)
+                yield ProviderEvent.action(command, feedback=state.feedback)
+                if state.feedback.rejection is not None:
+                    state.local_tool_results[state.assembly.call_id] = dict(state.feedback.rejection)
+                    state.local_tool_failures.add(state.assembly.call_id)
 
             reference_failure_instruction = (
                 "This was an optional read-only Campaign File reference lookup. It cannot update, "
@@ -3850,37 +3853,37 @@ class ProviderSessionAdapter:
                 "still needed; otherwise continue from supplied authoritative context."
             )
             optional_reference_failures: set[str] = set()
-            for assembly in ordered:
-                if assembly.call_id not in local_tool_failures:
+            for state.assembly in state.ordered:
+                if state.assembly.call_id not in state.local_tool_failures:
                     continue
-                resolved_tool = _resolve_provider_tool_alias(assembly.name, aliases)
-                if resolved_tool is None or resolved_tool[1].category != "reference":
+                state.resolved_tool = _resolve_provider_tool_alias(state.assembly.name, state.aliases)
+                if state.resolved_tool is None or state.resolved_tool[1].category != "reference":
                     continue
-                optional_reference_failures.add(assembly.call_id)
-                local_tool_results[assembly.call_id].update(
+                optional_reference_failures.add(state.assembly.call_id)
+                state.local_tool_results[state.assembly.call_id].update(
                     {
                         "correction_optional": True,
                         "instruction": reference_failure_instruction,
                     }
                 )
-            required_tool_failures = local_tool_failures - optional_reference_failures
-            round_failed = bool(local_tool_failures)
-            round_has_any_commit = bool(sequence_narration_facts)
+            state.required_tool_failures = state.local_tool_failures - optional_reference_failures
+            state.round_failed = bool(state.local_tool_failures)
+            round_has_any_commit = bool(state.sequence_narration_facts)
             round_leaves_player_intent_pending = False
             round_resolves_player_intent = False
-            round_narration_facts: list[dict[str, object]] = list(sequence_narration_facts)
-            tool_messages_start = len(exchange_messages)
-            for assembly in ordered:
-                if assembly.call_id in local_tool_results:
-                    if assembly.call_id in local_tool_failures:
-                        round_failed = True
-                    exchange_messages.append(
+            round_narration_facts: list[dict[str, object]] = list(state.sequence_narration_facts)
+            tool_messages_start = len(state.exchange_messages)
+            for state.assembly in state.ordered:
+                if state.assembly.call_id in state.local_tool_results:
+                    if state.assembly.call_id in state.local_tool_failures:
+                        state.round_failed = True
+                    state.exchange_messages.append(
                         {
                             "role": "tool",
-                            "tool_call_id": assembly.call_id,
-                            "name": assembly.name,
+                            "tool_call_id": state.assembly.call_id,
+                            "name": state.assembly.name,
                             "content": json.dumps(
-                                local_tool_results[assembly.call_id],
+                                state.local_tool_results[state.assembly.call_id],
                                 sort_keys=True,
                                 separators=(",", ":"),
                                 ensure_ascii=False,
@@ -3888,13 +3891,13 @@ class ProviderSessionAdapter:
                         }
                     )
                     continue
-                snapshot = self._owner.snapshot(campaign_id)
-                action_id = mechanics_action_ids[assembly.call_id]
-                terminal_event = next(
+                state.snapshot = self._owner.snapshot(state.campaign_id)
+                state.action_id = state.mechanics_action_ids[state.assembly.call_id]
+                state.terminal_event = next(
                     (
                         item
-                        for item in reversed(snapshot.events)
-                        if item.action_id == action_id
+                        for item in reversed(state.snapshot.events)
+                        if item.action_id == state.action_id
                         and item.event_type
                         in {
                             CanonicalEventType.ACTION_COMMITTED,
@@ -3903,71 +3906,71 @@ class ProviderSessionAdapter:
                     ),
                     None,
                 )
-                tool_result_event = next(
+                state.tool_result_event = next(
                     (
                         item
-                        for item in reversed(snapshot.events)
-                        if item.action_id == action_id
+                        for item in reversed(state.snapshot.events)
+                        if item.action_id == state.action_id
                         and item.event_type is CanonicalEventType.TOOL_RESULT
                     ),
                     None,
                 )
-                if terminal_event is None or tool_result_event is None:
+                if state.terminal_event is None or state.tool_result_event is None:
                     raise CommandRejected(
                         "Canonical mechanic result is unavailable",
                         code="canonical_mechanic_result_unavailable",
                     )
-                if terminal_event.event_type is CanonicalEventType.ACTION_FAILED:
-                    round_failed = True
-                    required_tool_failures.add(assembly.call_id)
+                if state.terminal_event.event_type is CanonicalEventType.ACTION_FAILED:
+                    state.round_failed = True
+                    state.required_tool_failures.add(state.assembly.call_id)
                 else:
                     round_has_any_commit = True
-                    behavior = mechanics_tool_behaviors[assembly.call_id]
-                    if behavior is ModelToolBehavior.LEAVES_PLAYER_INTENT_PENDING:
+                    state.behavior = state.mechanics_tool_behaviors[state.assembly.call_id]
+                    if state.behavior is ModelToolBehavior.LEAVES_PLAYER_INTENT_PENDING:
                         round_leaves_player_intent_pending = _preparation_keeps_intent_pending(
-                            mechanics_preparation_scopes.get(
-                                assembly.call_id, _UNSPECIFIED_PREPARATION_INTENT,
+                            state.mechanics_preparation_scopes.get(
+                                state.assembly.call_id, _UNSPECIFIED_PREPARATION_INTENT,
                             ),
-                            pending=player_intent_pending,
+                            pending=state.player_intent_pending,
                         )
                     elif (
-                        behavior is ModelToolBehavior.RESOLVES_PLAYER_INTENT
-                        and player_boundary_narration
+                        state.behavior is ModelToolBehavior.RESOLVES_PLAYER_INTENT
+                        and state.player_boundary_narration
                     ):
                         round_resolves_player_intent = True
-                result_payload = _plain_json(tool_result_event.safe_payload.get("result", {}))
-                current_entities = _current_referenced_entities(
-                    mechanics_parameters[assembly.call_id], snapshot.state
+                state.result_payload = _plain_json(state.tool_result_event.safe_payload.get("result", {}))
+                state.current_entities = _current_referenced_entities(
+                    state.mechanics_parameters[state.assembly.call_id], state.snapshot.state
                 )
                 round_result: object = {
-                    "status": terminal_event.event_type.value,
-                    "action_id": tool_result_event.action_id,
-                    "campaign_revision": snapshot.revision,
-                    "safe_payload": _plain_json(terminal_event.safe_payload),
-                    "result": result_payload,
-                    "current_entities": current_entities,
+                    "status": state.terminal_event.event_type.value,
+                    "action_id": state.tool_result_event.action_id,
+                    "campaign_revision": state.snapshot.revision,
+                    "safe_payload": _plain_json(state.terminal_event.safe_payload),
+                    "result": state.result_payload,
+                    "current_entities": state.current_entities,
                 }
-                if terminal_event.event_type is CanonicalEventType.ACTION_COMMITTED:
-                    if (mechanics_tool_names[assembly.call_id] == "end_combat_encounter"
-                            or mechanics_tool_names[assembly.call_id] in
-                            {tool.name for tool in required_transitions}):
-                        engine_transition_review_pending = False
+                if state.terminal_event.event_type is CanonicalEventType.ACTION_COMMITTED:
+                    if (state.mechanics_tool_names[state.assembly.call_id] == "end_combat_encounter"
+                            or state.mechanics_tool_names[state.assembly.call_id] in
+                            {tool.name for tool in state.required_transitions}):
+                        state.engine_transition_review_pending = False
                     round_narration_facts.append(
                         _mechanics_narration_facts(
-                            mechanics_tool_names[assembly.call_id],
-                            result_payload,
-                            current_entities,
-                            mechanics_pre_entities[assembly.call_id],
-                            mechanics_parameters[assembly.call_id],
-                            _current_combat_state(snapshot.state),
-                            entity_display_names,
+                            state.mechanics_tool_names[state.assembly.call_id],
+                            state.result_payload,
+                            state.current_entities,
+                            state.mechanics_pre_entities[state.assembly.call_id],
+                            state.mechanics_parameters[state.assembly.call_id],
+                            _current_combat_state(state.snapshot.state),
+                            state.entity_display_names,
                         ),
                     )
-                exchange_messages.append(
+                state.exchange_messages.append(
                     {
                         "role": "tool",
-                        "tool_call_id": assembly.call_id,
-                        "name": assembly.name,
+                        "tool_call_id": state.assembly.call_id,
+                        "name": state.assembly.name,
                         "content": json.dumps(
                             round_result,
                             sort_keys=True,
@@ -3976,16 +3979,16 @@ class ProviderSessionAdapter:
                         ),
                     }
                 )
-            tool_messages = exchange_messages[tool_messages_start:]
+            tool_messages = state.exchange_messages[tool_messages_start:]
             if tool_messages:
                 yield ProviderEvent.tool_evidence(
-                    message_id=f"{inference_id}-tool-results",
+                    message_id=f"{state.inference_id}-tool-results",
                     payload={
                         "kind": "provider_tool_results",
-                        **context_fields,
+                        **state.context_fields,
                         "turn_id": turn_id,
-                        "inference_id": inference_id,
-                        "basis_message_id": basis_message_id,
+                        "inference_id": state.inference_id,
+                        "basis_message_id": state.basis_message_id,
                         "results": cast(
                             JsonValue,
                             _plain_json(tool_messages),
@@ -3994,34 +3997,34 @@ class ProviderSessionAdapter:
                 )
             provider_input.control.progress.update("working")
             if round_has_any_commit:
-                any_commit_in_exchange = True
+                state.any_commit_in_exchange = True
                 if round_leaves_player_intent_pending:
-                    player_intent_pending = True
+                    state.player_intent_pending = True
                 if round_resolves_player_intent:
-                    player_intent_pending = False
+                    state.player_intent_pending = False
                 if provider_input.session.role is WriterRole.DM:
-                    campaign_file_disposition_in_exchange = False
-                buffered_narration = None
-                buffered_response_blocks = None
-                buffered_raw_response_blocks = None
-                buffered_narration_needs_disposition = False
+                    state.campaign_file_disposition_in_exchange = False
+                state.buffered_narration = None
+                state.buffered_response_blocks = None
+                state.buffered_raw_response_blocks = None
+                state.buffered_narration_needs_disposition = False
             if round_has_any_commit:
-                pending_narration_facts.extend(round_narration_facts)
-            if round_failed:
+                state.pending_narration_facts.extend(round_narration_facts)
+            if state.round_failed:
                 provider_input.control.progress.expect_correction()
-                if round_has_non_narrative_call:
-                    buffered_narration = None
-                    buffered_response_blocks = None
-                    buffered_raw_response_blocks = None
-                    buffered_narration_needs_disposition = False
+                if state.round_has_non_narrative_call:
+                    state.buffered_narration = None
+                    state.buffered_response_blocks = None
+                    state.buffered_raw_response_blocks = None
+                    state.buffered_narration_needs_disposition = False
                 elif (
-                    buffered_narration is not None
-                    or buffered_raw_response_blocks is not None
+                    state.buffered_narration is not None
+                    or state.buffered_raw_response_blocks is not None
                 ):
-                    force_campaign_file_update = True
-                if not required_tool_failures:
-                    pending_failed_tool_call = False
-                    current_application_controls.append(
+                    state.force_campaign_file_update = True
+                if not state.required_tool_failures:
+                    state.pending_failed_tool_call = False
+                    state.current_application_controls.append(
                         {
                             "role": "system",
                             "content": (
@@ -4034,10 +4037,10 @@ class ProviderSessionAdapter:
                         }
                     )
                     continue
-                pending_failed_tool_call = True
-                if rejected_tool_corrections_used < max_rejected_tool_corrections:
-                    rejected_tool_corrections_used += 1
-                    current_application_controls.append(
+                state.pending_failed_tool_call = True
+                if state.rejected_tool_corrections_used < state.max_rejected_tool_corrections:
+                    state.rejected_tool_corrections_used += 1
+                    state.current_application_controls.append(
                         {
                             "role": "system",
                             "content": (
@@ -4054,23 +4057,23 @@ class ProviderSessionAdapter:
                                     "Sylvia already holds the exact player-facing response. Do not "
                                     "repeat it in the corrected tool arguments. "
                                     if (
-                                        buffered_narration is not None
-                                        or buffered_raw_response_blocks is not None
+                                        state.buffered_narration is not None
+                                        or state.buffered_raw_response_blocks is not None
                                     )
                                     else ""
                                 )
                                 + "This is correction "
-                                f"{rejected_tool_corrections_used} of "
-                                f"{max_rejected_tool_corrections}."
+                                f"{state.rejected_tool_corrections_used} of "
+                                f"{state.max_rejected_tool_corrections}."
                             ),
                         }
                     )
                     continue
                 failed_result = next(
                     (
-                        local_tool_results[assembly.call_id]
-                        for assembly in ordered
-                        if assembly.call_id in local_tool_failures
+                        state.local_tool_results[assembly.call_id]
+                        for assembly in state.ordered
+                        if assembly.call_id in state.local_tool_failures
                     ),
                     {},
                 )
@@ -4079,16 +4082,16 @@ class ProviderSessionAdapter:
                     code=str(failed_result.get("code", "mechanics_rejected")),
                 )
             if (
-                not round_has_non_narrative_call
-                and buffered_narration is not None
-                and campaign_file_disposition_in_exchange
-                and not buffered_narration_needs_disposition
+                not state.round_has_non_narrative_call
+                and state.buffered_narration is not None
+                and state.campaign_file_disposition_in_exchange
+                and not state.buffered_narration_needs_disposition
             ):
                 yield ProviderEvent.talk(
-                    buffered_narration, response_blocks=buffered_response_blocks
+                    state.buffered_narration, response_blocks=state.buffered_response_blocks
                 )
                 return
-            pending_failed_tool_call = False
+            state.pending_failed_tool_call = False
 
     def _provider_tools(
         self,
