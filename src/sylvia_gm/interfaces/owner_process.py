@@ -36,6 +36,8 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Any, BinaryIO, TextIO, cast
 
+from sylvia_gm.interfaces.commands import DispatchContext
+
 from sylvia_gm.agent._builder_question_answers import (
     builder_question_answer_content,
     builder_question_details,
@@ -1892,13 +1894,25 @@ def _dispatch_selected(
     reload_provider_resolver: Callable[[], None] | None = None,
     gm_system_prompt: str | None = None,
 ) -> Any:
+    ctx = DispatchContext(
+        application_owner=application_owner,
+        bus=bus,
+        gm_system_prompt=gm_system_prompt,
+        method=method,
+        model_choices=model_choices,
+        owner_id=owner_id,
+        provider_resolver=provider_resolver,
+        reload_provider_resolver=reload_provider_resolver,
+        session_loop=session_loop,
+        storage_root=storage_root,
+    )
     if method == "handshake_status":
-        return bus.handshake_status()
+        return ctx.bus.handshake_status()
     if method == "campaign_index":
-        return bus.campaign_index()
+        return ctx.bus.campaign_index()
     if method == "campaign_creation_catalog":
         return _campaign_creation_catalog(
-            storage_root, application_owner,
+            ctx.storage_root, ctx.application_owner,
             include_participants=_optional_bool(params, "include_participants", default=True),
         )
     if method == "ready_campaign_catalog":
@@ -1914,9 +1928,9 @@ def _dispatch_selected(
             "expected_content_sha256": _required_text(params, "expected_content_sha256"),
         }
         if method == "customize_ready_campaign":
-            return customize_ready_campaign(application_owner, storage_root, **ready_arguments)
+            return customize_ready_campaign(ctx.application_owner, ctx.storage_root, **ready_arguments)
         return start_ready_campaign(
-            application_owner, storage_root, **ready_arguments,
+            ctx.application_owner, ctx.storage_root, **ready_arguments,
             display_name=_required_text(params, "display_name"),
             provider_id=_required_text(params, "provider_id"),
             model_id=_required_text(params, "model_id"),
@@ -1930,14 +1944,14 @@ def _dispatch_selected(
         try:
             if kind in {"player_character", "companion"}:
                 deleted = delete_reusable_participant(
-                    storage_root,
+                    ctx.storage_root,
                     artifact_id,
                     expected_content_sha256=expected_content_sha256,
                     confirmation=confirmation,
                 )
             elif kind == "campaign_plan":
                 deleted = delete_reusable_campaign_plan(
-                    storage_root,
+                    ctx.storage_root,
                     artifact_id,
                     expected_content_sha256=expected_content_sha256,
                     confirmation=confirmation,
@@ -1955,18 +1969,18 @@ def _dispatch_selected(
             ) from error
         return {"artifact_id": artifact_id, "deleted": deleted}
     if method == "builder_chat_index":
-        return application_owner.builder_chat_index()
+        return ctx.application_owner.builder_chat_index()
     if method == "start_import_repair":
         provider_id = _optional_text(params, "provider_id")
         model_id = _optional_text(params, "model_id")
         if provider_id is None or model_id is None:
-            default = provider_settings(storage_root / "config.yaml").get("default_model")
+            default = provider_settings(ctx.storage_root / "config.yaml").get("default_model")
             if not isinstance(default, Mapping):
                 raise CommandRejected("Configure a default model before creating a chat")
             provider_id = _required_text(default, "provider_id")
             model_id = _required_text(default, "model_id")
         return start_import_repair_chat(
-            application_owner, storage_root,
+            ctx.application_owner, ctx.storage_root,
             repair_id=_required_text(params, "repair_id"),
             operation_id=_required_text(params, "operation_id"),
             provider_id=provider_id, model_id=model_id,
@@ -1979,52 +1993,52 @@ def _dispatch_selected(
         provider_id = _optional_text(params, "provider_id")
         model_id = _optional_text(params, "model_id")
         if provider_id is None or model_id is None:
-            default = provider_settings(storage_root / "config.yaml").get("default_model")
+            default = provider_settings(ctx.storage_root / "config.yaml").get("default_model")
             if not isinstance(default, Mapping):
                 raise CommandRejected("Configure a default model before creating a chat")
             provider_id = _required_text(default, "provider_id")
             model_id = _required_text(default, "model_id")
-        return application_owner.create_builder_chat(
+        return ctx.application_owner.create_builder_chat(
             session_id=session_id,
             provider_id=provider_id,
             model_id=model_id,
             display_name=_optional_text(params, "display_name") or "New chat",
         )
     if method == "rename_builder_chat":
-        return application_owner.rename_builder_chat(
+        return ctx.application_owner.rename_builder_chat(
             _required_text(params, "session_id"),
             _required_text(params, "display_name"),
         )
     if method == "delete_builder_chat":
-        return application_owner.delete_builder_chat(
+        return ctx.application_owner.delete_builder_chat(
             _required_text(params, "session_id"),
             confirmation=_required_text(params, "confirmation"),
         )
     if method in {"archive_builder_chat", "restore_builder_chat"}:
-        return session_loop.set_builder_chat_archived(
+        return ctx.session_loop.set_builder_chat_archived(
             _required_text(params, "session_id"), archived=method == "archive_builder_chat"
         )
     if method == "snapshot":
-        return bus.snapshot(_required_text(params, "campaign_id"))
+        return ctx.bus.snapshot(_required_text(params, "campaign_id"))
     if method == "display_snapshot":
         return (
-            application_owner.desktop_snapshot(
+            ctx.application_owner.desktop_snapshot(
             _required_text(params, "campaign_id"), display_only=True)
         )
     if method == "player_projection":
-        return bus.player_projection(_required_text(params, "campaign_id"))
+        return ctx.bus.player_projection(_required_text(params, "campaign_id"))
     if method == "player_projection_page":
-        return application_owner.player_projection_page(
+        return ctx.application_owner.player_projection_page(
             _required_text(params, "campaign_id"),
             after_sequence=_optional_nonnegative_int(params, "after_sequence"),
         )
     if method == "campaign_panels":
-        return application_owner.campaign_panels(
+        return ctx.application_owner.campaign_panels(
             _required_text(params, "campaign_id"),
             after_revision=_optional_nonnegative_int(params, "after_revision"),
         )
     if method == "action_sequence":
-        return application_owner.action_sequence(
+        return ctx.application_owner.action_sequence(
             session_id=_required_text(params, "session_id"),
             sequence_id=_optional_text(params, "sequence_id"),
         )
@@ -2036,16 +2050,16 @@ def _dispatch_selected(
             "expected_version": _required_nonnegative_int(params, "expected_version"),
         }
         if method == "compose_action_sequence":
-            return application_owner.compose_action_sequence(
+            return ctx.application_owner.compose_action_sequence(
                 **arguments,
                 expected_revision=_required_nonnegative_int(params, "expected_revision"),
                 steps=params.get("steps"),
             )
-        return application_owner.execute_action_sequence(
+        return ctx.application_owner.execute_action_sequence(
             **arguments, confirmation=_optional_text(params, "confirmation"),
         )
     if method == "player_action_availability":
-        return application_owner.player_action_availability(
+        return ctx.application_owner.player_action_availability(
             campaign_id=_required_text(params, "campaign_id"),
             expected_revision=_required_nonnegative_int(params, "expected_revision"),
             requests=params.get("requests"),
@@ -2056,7 +2070,7 @@ def _dispatch_selected(
         if (not isinstance(source, dict)
                 or (selection is not None and not isinstance(selection, dict))):
             raise OwnerProtocolError("Player control source and selection must be objects")
-        return application_owner.player_action(
+        return ctx.application_owner.player_action(
             campaign_id=_required_text(params, "campaign_id"),
             session_id=_required_text(params, "session_id"),
             operation_id=_required_text(params, "operation_id"),
@@ -2076,10 +2090,10 @@ def _dispatch_selected(
             "session_id": _optional_text(params, "session_id"),
         }
         if method == "panel_action_receipt":
-            return application_owner.panel_action_receipt(**action_arguments)
+            return ctx.application_owner.panel_action_receipt(**action_arguments)
         if method == "preview_panel_action":
-            return application_owner.preview_panel_action(**action_arguments)
-        return application_owner.execute_panel_action(
+            return ctx.application_owner.preview_panel_action(**action_arguments)
+        return ctx.application_owner.execute_panel_action(
             **action_arguments, confirmation=_optional_text(params, "confirmation"),
         )
     if method in {"campaign_sequel_context", "preview_campaign_sequel", "append_campaign_sequel"}:
@@ -2088,27 +2102,27 @@ def _dispatch_selected(
             "session_id": _required_text(params, "session_id"),
         }
         if method == "campaign_sequel_context":
-            return application_owner.campaign_sequel_context(**arguments)
+            return ctx.application_owner.campaign_sequel_context(**arguments)
         arguments["source_id"] = _required_text(params, "source_id")
         if method == "preview_campaign_sequel":
-            return application_owner.preview_campaign_sequel(**arguments)
-        return application_owner.append_campaign_sequel(
+            return ctx.application_owner.preview_campaign_sequel(**arguments)
+        return ctx.application_owner.append_campaign_sequel(
             **arguments, operation_id=_required_text(params, "operation_id"),
             expected_revision=_required_nonnegative_int(params, "expected_revision"),
             preview_sha256=_required_text(params, "preview_sha256"), review=params.get("review"),
         )
     if method == "package_candidates":
-        return bus.package_candidates()
+        return ctx.bus.package_candidates()
     if method == "campaign_rules_update_options":
-        return application_owner.campaign_rules_update_options(
+        return ctx.application_owner.campaign_rules_update_options(
             _required_text(params, "campaign_id")
         )
     if method == "preview_campaign_rules_update":
-        return application_owner.preview_campaign_rules_update(
+        return ctx.application_owner.preview_campaign_rules_update(
             _required_text(params, "campaign_id"), _required_text(params, "candidate_id"),
         )
     if method == "adopt_campaign_rules_update":
-        return application_owner.adopt_campaign_rules_update(
+        return ctx.application_owner.adopt_campaign_rules_update(
             campaign_id=_required_text(params, "campaign_id"),
             candidate_id=_required_text(params, "candidate_id"),
             activation_id=_required_text(params, "activation_id"),
@@ -2117,21 +2131,21 @@ def _dispatch_selected(
             confirmation=_required_text(params, "confirmation"),
         )
     if method == "inspect_package_candidate":
-        return bus.inspect_package_candidate(_required_text(params, "candidate_id"))
+        return ctx.bus.inspect_package_candidate(_required_text(params, "candidate_id"))
     if method == "package_candidate_text":
-        return bus.package_candidate_text(
+        return ctx.bus.package_candidate_text(
             _required_text(params, "candidate_id"),
             _required_text(params, "package_id"),
             _required_text(params, "path"),
         )
     if method == "compare_package_candidates":
-        return bus.compare_package_candidates(
+        return ctx.bus.compare_package_candidates(
             _required_text(params, "left_candidate_id"),
             _required_text(params, "right_candidate_id"),
         )
     if method == "rift_template":
         try:
-            participants = _rift_reusable_participants(storage_root)
+            participants = _rift_reusable_participants(ctx.storage_root)
         except (OSError, UnicodeError, ValueError, json.JSONDecodeError) as error:
             raise CommandRejected(
                 "Reusable participant library contains an invalid artifact",
@@ -2144,13 +2158,13 @@ def _dispatch_selected(
         plan_id = _required_text(params, "plan_id")
         catalog_plan = next((
             item for item in _campaign_creation_catalog(
-                storage_root, application_owner, include_participants=False,
+                ctx.storage_root, ctx.application_owner, include_participants=False,
             )
             if item.get("kind") == "campaign_plan" and item.get("id") == plan_id
         ), None)
         if catalog_plan is not None and catalog_plan.get("setup_id") == "the-rift-awakening":
             candidate, sources, _plan, template = _resolve_rift_library_selection(
-                application_owner, storage_root, ruleset_selection=ruleset_selection,
+                ctx.application_owner, ctx.storage_root, ruleset_selection=ruleset_selection,
                 setting_id=setting_id, plan_id=plan_id,
             )
             primary = next(
@@ -2158,13 +2172,13 @@ def _dispatch_selected(
                 if entry.role is PackageRole.PRIMARY
             )
             declaration = next(
-                item for item in application_owner.exact_participant_declarations(
+                item for item in ctx.application_owner.exact_participant_declarations(
                     primary.package_id, primary.version, primary.sha256,
                 ) if item.kind == "player_character"
             )
             return rift_public_template(
                 reusable_participants=available_reusable_participants(
-                    storage_root, package=primary, declaration=declaration,
+                    ctx.storage_root, package=primary, declaration=declaration,
                     campaign_setting=sources.setting,
                     legacy_campaign_setting=bundled_rift_authority().setting,
                     setting_character_schema=sources.setting_character_schema,
@@ -2172,35 +2186,35 @@ def _dispatch_selected(
                 template=template,
             )
         return resolve_campaign_library_selection(
-            application_owner, storage_root, candidate_id=ruleset_selection,
+            ctx.application_owner, ctx.storage_root, candidate_id=ruleset_selection,
             setting_id=setting_id, plan_id=plan_id,
         ).party_options()
     if method == "model_choices":
-        return tuple(model_choices())
+        return tuple(ctx.model_choices())
     if method == "provider_settings":
-        return provider_settings(storage_root / "config.yaml")
+        return provider_settings(ctx.storage_root / "config.yaml")
     if method == "open_provider_setup":
         return open_provider_setup(params.get("preset_id"))
     if method == "chatgpt_connection":
         from sylvia_gm.config.chatgpt_settings import chatgpt_settings_action
         from sylvia_gm.provider._codex_rpc import CodexConnectionError
 
-        if params.get("action") == "add_model" and reload_provider_resolver is None:
+        if params.get("action") == "add_model" and ctx.reload_provider_resolver is None:
             raise OwnerProtocolError("Provider settings reload is unavailable")
         try:
             result = chatgpt_settings_action(
-                storage_root, params.get("action"), params.get("model"),
+                ctx.storage_root, params.get("action"), params.get("model"),
             )
         except CodexConnectionError as error:
             raise OwnerProtocolError(str(error)) from None
-        if params.get("action") == "add_model" and reload_provider_resolver is not None:
-            reload_provider_resolver()
+        if params.get("action") == "add_model" and ctx.reload_provider_resolver is not None:
+            ctx.reload_provider_resolver()
         return result
     if method == "admin_full_audit_status":
-        return application_owner.admin_full_audit_status()
+        return ctx.application_owner.admin_full_audit_status()
     if method == "admin_full_audit_record":
         index = _required_nonnegative_int(params, "index")
-        record = application_owner.admin_full_audit_record(index)
+        record = ctx.application_owner.admin_full_audit_record(index)
         encoded = json.dumps(
             _json_value(record),
             ensure_ascii=True,
@@ -2230,14 +2244,14 @@ def _dispatch_selected(
                 "Audit export destination is not a regular file. "
                 "Choose a file in a writable folder."
             )
-        return application_owner.export_admin_full_audit(destination)
+        return ctx.application_owner.export_admin_full_audit(destination)
     if method == "set_admin_full_audit":
-        return application_owner.set_admin_full_audit(_optional_bool(params, "enabled"))
+        return ctx.application_owner.set_admin_full_audit(_optional_bool(params, "enabled"))
     if method == "detect_local_providers":
-        return detect_local_providers(storage_root / "config.yaml")
+        return detect_local_providers(ctx.storage_root / "config.yaml")
     if method == "discover_provider_models":
         return discover_provider_models(
-            storage_root / "config.yaml",
+            ctx.storage_root / "config.yaml",
             provider_id=params.get("provider_id"),
             preset_id=params.get("preset_id"),
             base_url=params.get("base_url"),
@@ -2249,7 +2263,7 @@ def _dispatch_selected(
         )
     if method == "validate_provider_model":
         return validate_provider_model(
-            storage_root / "config.yaml",
+            ctx.storage_root / "config.yaml",
             provider_id=params.get("provider_id"),
             preset_id=params.get("preset_id"),
             base_url=params.get("base_url"),
@@ -2259,10 +2273,10 @@ def _dispatch_selected(
             headers=params.get("headers"),
         )
     if method == "save_provider_settings":
-        if reload_provider_resolver is None:
+        if ctx.reload_provider_resolver is None:
             raise OwnerProtocolError("Provider settings reload is unavailable")
         saved_provider = save_provider_settings(
-            storage_root / "config.yaml",
+            ctx.storage_root / "config.yaml",
             provider_id=params.get("provider_id"),
             preset_id=params.get("preset_id"),
             display_name=params.get("display_name"),
@@ -2288,54 +2302,54 @@ def _dispatch_selected(
             supports_streaming=params.get("supports_streaming"),
             supports_tools=params.get("supports_tools"),
         )
-        reload_provider_resolver()
+        ctx.reload_provider_resolver()
         return saved_provider
     if method == "remove_provider_settings":
-        if reload_provider_resolver is None:
+        if ctx.reload_provider_resolver is None:
             raise OwnerProtocolError("Provider settings reload is unavailable")
-        remove_provider_settings(storage_root / "config.yaml", params.get("provider_id"))
-        reload_provider_resolver()
+        remove_provider_settings(ctx.storage_root / "config.yaml", params.get("provider_id"))
+        ctx.reload_provider_resolver()
         return {"status": "removed"}
     if method == "set_default_model":
         return set_default_model_settings(
-            storage_root / "config.yaml",
+            ctx.storage_root / "config.yaml",
             provider_id=params.get("provider_id"),
             model_id=params.get("model_id"),
         )
     if method == "switch_session_model":
         session_id = _required_text(params, "session_id")
         return _switch_session_model(
-            application_owner=application_owner,
-            session_loop=session_loop,
-            config_path=storage_root / "config.yaml",
+            application_owner=ctx.application_owner,
+            session_loop=ctx.session_loop,
+            config_path=ctx.storage_root / "config.yaml",
             session_id=session_id,
             provider_id=params.get("provider_id"),
             model_id=params.get("model_id"),
             mode=_optional_text(params, "mode") or "current",
-            choices=model_choices(),
+            choices=ctx.model_choices(),
         )
     if method == "switch_session_reasoning":
         if "effort" not in params:
             raise OwnerProtocolError("Reasoning selection requires effort")
         return _switch_session_reasoning(
-            application_owner=application_owner, session_loop=session_loop,
-            config_path=storage_root / "config.yaml",
+            application_owner=ctx.application_owner, session_loop=ctx.session_loop,
+            config_path=ctx.storage_root / "config.yaml",
             session_id=_required_text(params, "session_id"),
             effort=params["effort"], mode=_optional_text(params, "mode") or "current",
-            choices=model_choices(),
+            choices=ctx.model_choices(),
         )
     if method == "inspect_provider_thinking":
-        return {"text": application_owner.inspect_provider_thinking(
+        return {"text": ctx.application_owner.inspect_provider_thinking(
             _required_text(params, "session_id"), _required_text(params, "attempt_id"),
             _required_text(params, "response_id"),
         )}
     if method in {"session_context", "session_history_page"}:
         session_id = _required_text(params, "session_id")
-        activity = session_loop.builder_activity(session_id)
+        activity = ctx.session_loop.builder_activity(session_id)
         # Read chronology after its activity basis so a completed result includes its final prose.
         page_fields = {}
         if method == "session_history_page":
-            history_page = application_owner.session_history_page(
+            history_page = ctx.application_owner.session_history_page(
                 session_id, before_sequence=params.get("before_sequence"),
                 limit=params.get("limit", 50),
             )
@@ -2356,23 +2370,23 @@ def _dispatch_selected(
             display_session = history_page.session
             display_messages = history_page.messages
         else:
-            context = application_owner.session_context(session_id)
+            context = ctx.application_owner.session_context(session_id)
             display_session = context.session
             display_messages = context.messages
-        settings = provider_settings(storage_root / "config.yaml")
+        settings = provider_settings(ctx.storage_root / "config.yaml")
         pending_model = session_model_once_settings(
-            storage_root / "config.yaml", session_id=session_id,
+            ctx.storage_root / "config.yaml", session_id=session_id,
         )
         return {
             "session": display_session,
             "messages": display_messages,
-            "thinking": application_owner.private_provider_index(session_id),
+            "thinking": ctx.application_owner.private_provider_index(session_id),
             **page_fields,
-            "provisional": session_loop.provisional_session_projection(session_id),
+            "provisional": ctx.session_loop.provisional_session_projection(session_id),
             "activity": activity,
-            "activity_progress": session_loop.activity_progress(session_id),
-            "context_status_hint": session_loop.context_status_hint(session_id),
-            "reasoning_state": reasoning_state(display_session, model_choices(), pending_model),
+            "activity_progress": ctx.session_loop.activity_progress(session_id),
+            "context_status_hint": ctx.session_loop.context_status_hint(session_id),
+            "reasoning_state": reasoning_state(display_session, ctx.model_choices(), pending_model),
             "model_state": {
                 "current": {
                     "provider_id": display_session.provider_id,
@@ -2392,8 +2406,8 @@ def _dispatch_selected(
             or any(not isinstance(item, str) or not item for item in raw_paths)
         ):
             raise OwnerProtocolError("source_paths must contain one to eight selected paths")
-        with application_owner.builder_session_work(session_id) as builder_context:
-            workspace = _builder_workspace(storage_root, builder_context.session)
+        with ctx.application_owner.builder_session_work(session_id) as builder_context:
+            workspace = _builder_workspace(ctx.storage_root, builder_context.session)
             batch = ingest_builder_sources(
                 workspace,
                 tuple(Path(item) for item in raw_paths),
@@ -2401,7 +2415,7 @@ def _dispatch_selected(
             )
             safe_sources = [source.safe_projection() for source in batch.sources]
             try:
-                message = application_owner.append_agent_message(
+                message = ctx.application_owner.append_agent_message(
                     session_id=session_id,
                     message_id=(
                         "builder-sources-"
@@ -2434,7 +2448,7 @@ def _dispatch_selected(
         steering_text = _required_text(params, "text")
         if len(steering_text) > _MAX_USER_TEXT_CHARS:
             raise OwnerProtocolError("text exceeds the session steering limit")
-        session_loop.steer(
+        ctx.session_loop.steer(
             _required_text(params, "session_id"),
             steering_text,
             message_id=_required_text(params, "message_id"),
@@ -2477,7 +2491,7 @@ def _dispatch_selected(
             raise OwnerProtocolError("ooc_text exceeds the session input limit")
         session_id = _required_text(params, "session_id")
         question_answers = params.get("builder_question_answers")
-        context = application_owner.session_context(session_id)
+        context = ctx.application_owner.session_context(session_id)
         if question_answers is not None:
             if (builder_start or player_action_id or ending_choice is not None or ooc_text
                     or params.get("redirect_interruption_id")):
@@ -2487,18 +2501,18 @@ def _dispatch_selected(
         if model_command is not None:
             reference, mode = model_command
             if reference is None:
-                session_loop.assert_idle(session_id)
+                ctx.session_loop.assert_idle(session_id)
                 return {"status": "model_picker_requested", "mode": mode}
-            selection = _selection_from_reference(model_choices(), reference)
+            selection = _selection_from_reference(ctx.model_choices(), reference)
             return _switch_session_model(
-                application_owner=application_owner,
-                session_loop=session_loop,
-                config_path=storage_root / "config.yaml",
+                application_owner=ctx.application_owner,
+                session_loop=ctx.session_loop,
+                config_path=ctx.storage_root / "config.yaml",
                 session_id=session_id,
                 provider_id=selection["provider_id"],
                 model_id=selection["model_id"],
                 mode=mode,
-                choices=model_choices(),
+                choices=ctx.model_choices(),
             )
         if ending_choice is not None and (
             context.session.role is not WriterRole.DM or builder_start or player_action_id
@@ -2515,20 +2529,20 @@ def _dispatch_selected(
             else (_optional_text(params, "turn_id") or f"builder-chat-{session_id}")
         )
         if player_action_id is not None:
-            basis = application_owner.player_action_response_basis(
+            basis = ctx.application_owner.player_action_response_basis(
                 session_id, player_action_id, automatic=automatic_response,
             )
             if basis["turn_id"] != turn_id:
                 raise OwnerProtocolError("The saved player action belongs to another turn")
         pending_once = session_model_once_settings(
-            storage_root / "config.yaml", session_id=session_id
+            ctx.storage_root / "config.yaml", session_id=session_id
         )
 
         def consume_pending_once() -> None:
             if pending_once is None:
                 return
             clear_session_model_once_settings(
-                storage_root / "config.yaml",
+                ctx.storage_root / "config.yaml",
                 session_id=session_id,
                 expected_provider_id=pending_once["provider_id"],
                 expected_model_id=pending_once["model_id"],
@@ -2544,14 +2558,14 @@ def _dispatch_selected(
             )
         )
         try:
-            provider = provider_resolver(effective_session)
+            provider = ctx.provider_resolver(effective_session)
         except BaseException:
             consume_pending_once()
             raise
-        if application_owner.admin_full_audit_enabled():
+        if ctx.application_owner.admin_full_audit_enabled():
             provider = AdminAuditedProvider(
                 provider,
-                sink=application_owner.record_admin_full_audit,
+                sink=ctx.application_owner.record_admin_full_audit,
                 session_id=session_id,
                 role=effective_session.role.value,
                 provider_id=effective_session.provider_id,
@@ -2567,7 +2581,7 @@ def _dispatch_selected(
             from sylvia_gm.agent._working_context import compact_saved_messages
 
             if context.session.role is WriterRole.BUILDER and context.session.campaign_id:
-                basis = application_owner.campaign_construction_basis(context.session.campaign_id)
+                basis = ctx.application_owner.campaign_construction_basis(context.session.campaign_id)
                 if basis.builder_session_id == session_id and basis.completion_revision is None:
                     raise OwnerProtocolError(
                         "The campaign Interview keeps its exact transcript. "
@@ -2578,7 +2592,7 @@ def _dispatch_selected(
                 if context.session.role is WriterRole.BUILDER:
                     messages = _provider_history(provider_input.history)
                 else:
-                    adapter = ProviderSessionAdapter(application_owner, provider, owner_id=owner_id)
+                    adapter = ProviderSessionAdapter(ctx.application_owner, provider, owner_id=ctx.owner_id)
                     messages = adapter._messages(
                         provider_input, campaign_has_mechanics=False, tools_available=False,
                     )
@@ -2587,7 +2601,7 @@ def _dispatch_selected(
                 )
 
             try:
-                session_loop.run_compaction(
+                ctx.session_loop.run_compaction(
                     session_id, _required_text(params, "attempt_id"), compact_provider,
                 )
                 return {"session_id": session_id, "status": "context_compacted",
@@ -2603,7 +2617,7 @@ def _dispatch_selected(
                 current_chat = next(
                     (
                         chat
-                        for chat in application_owner.builder_chat_index()
+                        for chat in ctx.application_owner.builder_chat_index()
                         if chat.session.session_id == session_id
                     ),
                     None,
@@ -2612,7 +2626,7 @@ def _dispatch_selected(
                         and question_answers is None):
                     title = opening_title(user_text)
                     if title:
-                        application_owner.rename_builder_chat(session_id, title, automatic=True)
+                        ctx.application_owner.rename_builder_chat(session_id, title, automatic=True)
                         fallback_title = title
                         request_title = len(" ".join(user_text.split())) > TITLE_LIMIT and not any(
                             message.kind in {SessionMessageKind.USER, SessionMessageKind.TALK}
@@ -2639,7 +2653,7 @@ def _dispatch_selected(
                 "BUILD CAMPAIGN PLAN",
             }:
                 campaign_plan_authority = _campaign_plan_tool_authority(
-                    application_owner,
+                    ctx.application_owner,
                     context.session.campaign_id,
                 )
             participant_purpose = next(
@@ -2679,7 +2693,7 @@ def _dispatch_selected(
                         participant_setting_selection = setting_value.get("setting_id")
                 parent_session_id = link.get("parent_session_id")
                 if isinstance(parent_session_id, str):
-                    parent_context = application_owner.session_context(parent_session_id)
+                    parent_context = ctx.application_owner.session_context(parent_session_id)
                     parent_states = tuple(
                         message
                         for message in parent_context.messages
@@ -2755,8 +2769,8 @@ def _dispatch_selected(
             from sylvia_gm.application.builder_source_selection import BuilderSourceSelection
 
             source_selection = BuilderSourceSelection(
-                application_owner, storage_root, context,
-                lambda: _campaign_creation_catalog(storage_root, application_owner),
+                ctx.application_owner, ctx.storage_root, context,
+                lambda: _campaign_creation_catalog(ctx.storage_root, ctx.application_owner),
             )
             library_sources = None
             if saved_references is not None:
@@ -2764,7 +2778,7 @@ def _dispatch_selected(
                 participant_package = None
                 participant_declarations = ()
                 participant_campaign_setting = None
-                candidate = launch_candidate(application_owner, context)
+                candidate = launch_candidate(ctx.application_owner, context)
                 setting_reference = next(
                     (item for item in saved_references.get("packages", [])
                      if item.get("prefix") == "setting"),
@@ -2776,13 +2790,13 @@ def _dispatch_selected(
                         if entry.role is PackageRole.PRIMARY
                     )
                     library_sources = LibrarySourceReader(
-                        application_owner, primary.package_id,
+                        ctx.application_owner, primary.package_id,
                         str(setting_reference["id"]) if setting_reference is not None else None,
                     )
                 if candidate is not None and setting_reference is not None:
                     if context.session.selected_skill in {None, "BUILD CAMPAIGN PLAN"}:
                         campaign_plan_authority = campaign_plan_sources(
-                            application_owner, candidate.package_lock,
+                            ctx.application_owner, candidate.package_lock,
                             setting_id=str(setting_reference["id"]),
                         )
                     if participant_purpose is not None:
@@ -2792,7 +2806,7 @@ def _dispatch_selected(
                             None,
                         )
                         participant_declarations = (
-                            application_owner.exact_participant_declarations(
+                            ctx.application_owner.exact_participant_declarations(
                                 participant_package.package_id,
                                 participant_package.version,
                                 participant_package.sha256,
@@ -2803,7 +2817,7 @@ def _dispatch_selected(
                             str(setting_reference["content_sha256"]),
                         )
                         participant_sources = campaign_plan_sources(
-                            application_owner, candidate.package_lock,
+                            ctx.application_owner, candidate.package_lock,
                             setting_id=participant_campaign_setting.package_id,
                         )
                         participant_setting_schema = (
@@ -2848,8 +2862,8 @@ def _dispatch_selected(
                         (
                             item
                             for item in _reusable_participant_catalog(
-                                storage_root,
-                                application_owner,
+                                ctx.storage_root,
+                                ctx.application_owner,
                             )
                             if item.artifact_id == repair_character[0]
                             and item.content_sha256 == repair_character[1]
@@ -2873,7 +2887,7 @@ def _dispatch_selected(
                         code="stale_character_profile",
                     )
                 return load_character_profile(
-                    storage_root,
+                    ctx.storage_root,
                     str(requested["artifact_id"]),
                     str(requested["content_sha256"]),
                 ).provenance()
@@ -2884,7 +2898,7 @@ def _dispatch_selected(
 
                 canonical = canonical_json_bytes(validate_character_profile(data))
                 saved = save_character_profile(
-                    storage_root,
+                    ctx.storage_root,
                     operation_id=f"{session_id}:{hashlib.sha256(canonical).hexdigest()}",
                     source=data,
                 )
@@ -2892,7 +2906,7 @@ def _dispatch_selected(
 
             def import_profile(data: bytes) -> SafePayload:
                 from sylvia_gm.application.character_card_import import save_character_card_import
-                return save_character_card_import(storage_root, operation_id=(
+                return save_character_card_import(ctx.storage_root, operation_id=(
                     f'{session_id}'
                     f':card:'
                     f'{hashlib.sha256(data).hexdigest()}'
@@ -2902,11 +2916,11 @@ def _dispatch_selected(
 
             profile_tools = (
                 character_profile_tools(
-                    _builder_workspace(storage_root, context.session),
+                    _builder_workspace(ctx.storage_root, context.session),
                     save=publish_profile,
                     import_source=import_profile,
                     read=lambda identity, digest: load_character_profile(
-                        storage_root, identity, digest
+                        ctx.storage_root, identity, digest
                     ),
                 )
                 if context.session.campaign_id is None
@@ -2920,7 +2934,7 @@ def _dispatch_selected(
                 expected_closure_sha256: str,
             ) -> SafePayload:
                 return _publish_builder_ruleset_candidate(
-                    application_owner,
+                    ctx.application_owner,
                     session_id,
                     archive,
                     install_id=install_id,
@@ -2966,7 +2980,7 @@ def _dispatch_selected(
                 )
                 operation_suffix = hashlib.sha256(content_basis).hexdigest()[:24]
                 saved = save_reusable_participant(
-                    storage_root,
+                    ctx.storage_root,
                     operation_id=f"builder-participant-{operation_suffix}",
                     role=role,
                     summary=summary,
@@ -2982,10 +2996,10 @@ def _dispatch_selected(
                 )
                 if context.session.campaign_id is None:
                     label = "Character" if role == "player_character" else "Companion"
-                    application_owner.rename_builder_chat(
+                    ctx.application_owner.rename_builder_chat(
                         session_id, f"{saved.name} · {label}"[:120].strip(), automatic=True
                     )
-                return participant_catalog_payload(application_owner, saved)
+                return participant_catalog_payload(ctx.application_owner, saved)
 
             def read_participant(
                 *, artifact_id: str, expected_content_sha256: str, schema_id: str | None = None,
@@ -2995,7 +3009,7 @@ def _dispatch_selected(
                 if participant_package is None or participant_campaign_setting is None:
                     raise CommandRejected("Character editing needs this chat's saved Setting")
                 source = next((
-                    item for item in _reusable_participant_catalog(storage_root, application_owner)
+                    item for item in _reusable_participant_catalog(ctx.storage_root, ctx.application_owner)
                     if item.artifact_id == artifact_id and item.role == participant_purpose
                 ), None)
                 if source is None:
@@ -3027,7 +3041,7 @@ def _dispatch_selected(
                 if participant_package is None or participant_campaign_setting is None:
                     raise CommandRejected("Character reuse needs this chat's saved Setting")
                 source = next((
-                    item for item in _reusable_participant_catalog(storage_root, application_owner)
+                    item for item in _reusable_participant_catalog(ctx.storage_root, ctx.application_owner)
                     if item.artifact_id == artifact_id and item.role == participant_purpose
                 ), None)
                 if source is None:
@@ -3045,7 +3059,7 @@ def _dispatch_selected(
                     "schema_id": declarations[0].schema_id,
                 })
                 saved = copy_compatible_character(
-                    storage_root, source=source, expected_content_sha256=expected_content_sha256,
+                    ctx.storage_root, source=source, expected_content_sha256=expected_content_sha256,
                     operation_id="builder-character-copy-" + hashlib.sha256(basis).hexdigest()[:32],
                     package=participant_package, declaration=declarations[0],
                     campaign_setting=participant_campaign_setting,
@@ -3053,11 +3067,11 @@ def _dispatch_selected(
                 )
                 if context.session.campaign_id is None:
                     label = "Character" if saved.role == "player_character" else "Companion"
-                    application_owner.rename_builder_chat(
+                    ctx.application_owner.rename_builder_chat(
                         session_id, f"{saved.name} · {label}"[:120].strip(), automatic=True
                     )
                 return {
-                    **dict(participant_catalog_payload(application_owner, saved)),
+                    **dict(participant_catalog_payload(ctx.application_owner, saved)),
                     "source_artifact_id": source.artifact_id,
                 }
 
@@ -3080,7 +3094,7 @@ def _dispatch_selected(
                 if setting is None or source is None:
                     return None
                 return campaign_plan_sources(
-                    application_owner, source.package_lock, setting_id=str(setting["id"]),
+                    ctx.application_owner, source.package_lock, setting_id=str(setting["id"]),
                 )
 
             def check_plan() -> SafePayload:
@@ -3089,7 +3103,7 @@ def _dispatch_selected(
                 if source is None or selected_authority is None:
                     raise CommandRejected("Plan checking needs this chat's saved Setting")
                 return check_plan_draft(
-                    application_owner, _builder_workspace(storage_root, context.session),
+                    ctx.application_owner, _builder_workspace(ctx.storage_root, context.session),
                     candidate_id=source.candidate_id, expected_authority=selected_authority,
                     require_complete_characters=completing_required_characters,
                 )
@@ -3099,7 +3113,7 @@ def _dispatch_selected(
                 if source is None or context.session.campaign_id is not None:
                     raise CommandRejected("Setting checking needs this chat's saved Ruleset")
                 return check_setting_draft(
-                    application_owner, _builder_workspace(storage_root, context.session),
+                    ctx.application_owner, _builder_workspace(ctx.storage_root, context.session),
                     candidate_id=source.candidate_id,
                     package_id=package_id, version=version, title=title,
                 )
@@ -3111,9 +3125,9 @@ def _dispatch_selected(
                 source = source_selection.candidate()
                 if source is None:
                     raise CommandRejected("Plan publication needs this chat's saved Setting")
-                workspace = _builder_workspace(storage_root, context.session)
+                workspace = _builder_workspace(ctx.storage_root, context.session)
                 with materialize_plan_snapshot_draft(
-                    application_owner, workspace, candidate_id=source.candidate_id,
+                    ctx.application_owner, workspace, candidate_id=source.candidate_id,
                     expected_authority=selected_authority,
                 ) as materialized:
                     effective_candidate = source
@@ -3123,7 +3137,7 @@ def _dispatch_selected(
                         ).hexdigest()[:32]
                         # Runtime admission precedes saving a selectable Plan.
                         effective_candidate = _publish_builder_package_candidate(
-                            application_owner, session_id, materialized.archive,
+                            ctx.application_owner, session_id, materialized.archive,
                             install_id=f"builder-plan-snapshot-{suffix}",
                             expected_closure_sha256=materialized.closure_sha256,
                         )
@@ -3131,20 +3145,20 @@ def _dispatch_selected(
                     plan = materialized.plan
                     if completing_required_characters:
                         require_completed_plan_characters(
-                            application_owner, effective_candidate.candidate_id, plan,
+                            ctx.application_owner, effective_candidate.candidate_id, plan,
                         )
                     saved = save_reusable_campaign_plan(
-                        storage_root,
+                        ctx.storage_root,
                         operation_id=f"builder-plan-{session_id}-{plan.content_sha256}",
                         source_payload=plan.payload,
                         source_markdown=plan.readable_markdown,
                         validate_plan=lambda payload, text: validate_retained_campaign_plan(
-                            application_owner, payload, text,
+                            ctx.application_owner, payload, text,
                         ),
                         package_snapshot=materialized.archive.read(),
                     )
                 published = publish_campaign_plan_files(workspace, saved.plan)
-                application_owner.rename_builder_chat(
+                ctx.application_owner.rename_builder_chat(
                     session_id, f"{saved.title} · Campaign Plan"[:120].strip(), automatic=True
                 )
                 return published, saved.catalog_payload()
@@ -3154,7 +3168,7 @@ def _dispatch_selected(
                 if source is None or context.session.campaign_id is not None:
                     raise CommandRejected("Setting publication needs this chat's saved Ruleset")
                 with materialize_setting_draft(
-                    application_owner, _builder_workspace(storage_root, context.session),
+                    ctx.application_owner, _builder_workspace(ctx.storage_root, context.session),
                     candidate_id=source.candidate_id,
                     package_id=package_id, version=version, title=title,
                 ) as materialized:
@@ -3162,12 +3176,12 @@ def _dispatch_selected(
                         f"{session_id}:{materialized.closure_sha256}".encode()
                     ).hexdigest()[:32]
                     installed = _publish_builder_package_candidate(
-                        application_owner, session_id, materialized.archive,
+                        ctx.application_owner, session_id, materialized.archive,
                         install_id=f"builder-setting-{suffix}",
                         expected_closure_sha256=materialized.closure_sha256,
                     )
                 setting = campaign_setting_entries(installed.package_lock)[0]
-                application_owner.rename_builder_chat(
+                ctx.application_owner.rename_builder_chat(
                     session_id, f"{title} · Campaign Setting"[:120].strip(), automatic=True,
                 )
                 return {
@@ -3186,7 +3200,7 @@ def _dispatch_selected(
                 if repair_context is None or context.session.campaign_id is not None:
                     raise CommandRejected("This chat has no selected import repair")
                 with materialize_repair_draft(
-                    _builder_workspace(storage_root, context.session),
+                    _builder_workspace(ctx.storage_root, context.session),
                     expected_kind=repair_context["import_kind"],
                 ) as materialized:
                     if not publishing:
@@ -3199,7 +3213,7 @@ def _dispatch_selected(
                         f"{session_id}:{materialized.closure_sha256}".encode()
                     ).hexdigest()[:32]
                     installed = _publish_builder_package_candidate(
-                        application_owner, session_id, materialized.archive,
+                        ctx.application_owner, session_id, materialized.archive,
                         install_id=f"builder-repair-{suffix}",
                         expected_closure_sha256=materialized.closure_sha256,
                     )
@@ -3208,7 +3222,7 @@ def _dispatch_selected(
                         snapshot = materialized.archive.read()
                         plan = materialized.plan
                         saved = save_reusable_campaign_plan(
-                            storage_root,
+                            ctx.storage_root,
                             operation_id=f"builder-repair-{session_id}-{plan.content_sha256}",
                             source_payload=plan.payload, source_markdown=plan.readable_markdown,
                             validate_plan=lambda payload, text: validate_plan_snapshot(
@@ -3247,11 +3261,11 @@ def _dispatch_selected(
                     context=provider_input.history,
                     message_id=request.message_id,
                     user_text=request.user_text,
-                    workspace=_builder_workspace(storage_root, context.session),
+                    workspace=_builder_workspace(ctx.storage_root, context.session),
                     control=provider_input.control,
                     complete=complete,
                     request_title=request_title,
-                    continuation_reader=lambda response_id: application_owner.provider_continuation(
+                    continuation_reader=lambda response_id: ctx.application_owner.provider_continuation(
                         provider_input.session.session_id, response_id,
                         provider_id=provider_input.session.provider_id,
                         model_id=provider_input.session.model_id,
@@ -3297,11 +3311,11 @@ def _dispatch_selected(
                         # Discovery refreshes the catalog only when its tool is called.
                         items=(),
                         refresh=lambda: _campaign_content_tool_authority(
-                            application_owner, storage_root
+                            ctx.application_owner, ctx.storage_root
                         ).items,
                     ),
                     references=(source_selection.reader if source_selection.selectable
-                                else reference_reader(application_owner, provider_input.history)),
+                                else reference_reader(ctx.application_owner, provider_input.history)),
                     source_tools=(builder_source_tool(source_selection),
                                   builder_setting_source_tool(source_selection))
                     if source_selection.selectable else (),
@@ -3314,13 +3328,13 @@ def _dispatch_selected(
                 if builder_result is None:
                     raise RuntimeError("Builder provider completed without a result")
                 return persist_builder_turn(
-                    application_owner,
+                    ctx.application_owner,
                     session_id=session_id,
                     result=builder_result,
                 )
 
             try:
-                appended = session_loop.run_builder(
+                appended = ctx.session_loop.run_builder(
                     request,
                     builder_provider,
                     persist_builder_result,
@@ -3330,11 +3344,11 @@ def _dispatch_selected(
                 if builder_result.suggested_title:
                     # Publication-derived names and explicit user renames take precedence.
                     current_chat = next(
-                        (chat for chat in application_owner.builder_chat_index()
+                        (chat for chat in ctx.application_owner.builder_chat_index()
                          if chat.session.session_id == session_id), None,
                     )
                     if current_chat is not None and current_chat.display_name == fallback_title:
-                        application_owner.rename_builder_chat(
+                        ctx.application_owner.rename_builder_chat(
                             session_id, builder_result.suggested_title, automatic=True,
                         )
                 return {
@@ -3350,20 +3364,20 @@ def _dispatch_selected(
         if context.session.campaign_id is None:
             raise OwnerProtocolError("DM sessions require campaign authority")
         campaign_plan_text, campaign_plan = _admitted_dm_campaign_plan(
-            application_owner,
+            ctx.application_owner,
             campaign_id=context.session.campaign_id,
             session_id=session_id,
         )
         adapter = ProviderSessionAdapter(
-            application_owner,
+            ctx.application_owner,
             provider,
-            owner_id=owner_id,
-            gm_system_prompt=gm_system_prompt,
+            owner_id=ctx.owner_id,
+            gm_system_prompt=ctx.gm_system_prompt,
             campaign_plan_text=campaign_plan_text,
             campaign_plan=campaign_plan,
         )
         try:
-            return session_loop.run(
+            return ctx.session_loop.run(
                 SessionRunRequest(
                     session_id=session_id,
                     turn_id=turn_id,
@@ -3385,26 +3399,26 @@ def _dispatch_selected(
         finally:
             consume_pending_once()
     if method == "interrupt_stream":
-        return bus.interrupt_stream(
+        return ctx.bus.interrupt_stream(
             _required_text(params, "campaign_id"),
             _required_text(params, "attempt_id"),
         )
     if method == "interrupt_provider_stream":
-        bus.interrupt_provider_stream(
+        ctx.bus.interrupt_provider_stream(
             _required_text(params, "campaign_id"),
             _required_text(params, "attempt_id"),
         )
         return {"status": "interrupted"}
     if method == "retryable_interruption":
-        return bus.retryable_interruption(
+        return ctx.bus.retryable_interruption(
             _required_text(params, "campaign_id"),
             failed_attempt_id=_required_text(params, "failed_attempt_id"),
         )
     if method == "manual_retry_session":
         session_id = _required_text(params, "session_id")
-        context = application_owner.session_context(session_id)
+        context = ctx.application_owner.session_context(session_id)
         pending_once = session_model_once_settings(
-            storage_root / "config.yaml", session_id=session_id
+            ctx.storage_root / "config.yaml", session_id=session_id
         )
         effective_session = (
             context.session
@@ -3416,20 +3430,20 @@ def _dispatch_selected(
             )
         )
         try:
-            provider = provider_resolver(effective_session)
+            provider = ctx.provider_resolver(effective_session)
         except BaseException:
             if pending_once is not None:
                 clear_session_model_once_settings(
-                    storage_root / "config.yaml",
+                    ctx.storage_root / "config.yaml",
                     session_id=session_id,
                     expected_provider_id=pending_once["provider_id"],
                     expected_model_id=pending_once["model_id"],
                 )
             raise
-        if application_owner.admin_full_audit_enabled():
+        if ctx.application_owner.admin_full_audit_enabled():
             provider = AdminAuditedProvider(
                 provider,
-                sink=application_owner.record_admin_full_audit,
+                sink=ctx.application_owner.record_admin_full_audit,
                 session_id=session_id,
                 role=effective_session.role.value,
                 provider_id=effective_session.provider_id,
@@ -3446,20 +3460,20 @@ def _dispatch_selected(
         campaign_knowledge: SafePayload | None = None
         if effective_session.role is WriterRole.DM and effective_session.campaign_id is not None:
             retry_plan_text, retry_plan = _admitted_dm_campaign_plan(
-                application_owner,
+                ctx.application_owner,
                 campaign_id=effective_session.campaign_id,
                 session_id=session_id,
             )
             if retry_plan is not None:
-                campaign_knowledge = application_owner.campaign_knowledge_catalog_for_plan(
+                campaign_knowledge = ctx.application_owner.campaign_knowledge_catalog_for_plan(
                     effective_session.campaign_id,
                     retry_plan,
                 )
         adapter = ProviderSessionAdapter(
-            application_owner,
+            ctx.application_owner,
             provider,
-            owner_id=owner_id,
-            gm_system_prompt=gm_system_prompt,
+            owner_id=ctx.owner_id,
+            gm_system_prompt=ctx.gm_system_prompt,
             campaign_plan_text=retry_plan_text,
             campaign_plan=retry_plan,
             campaign_knowledge=campaign_knowledge,
@@ -3471,7 +3485,7 @@ def _dispatch_selected(
                 tuple(
                     cast(
                         Sequence[ModelMechanicsTool],
-                        bus.catalog(effective_session.campaign_id),
+                        ctx.bus.catalog(effective_session.campaign_id),
                     )
                 )
                 if effective_session.campaign_id is not None
@@ -3480,7 +3494,7 @@ def _dispatch_selected(
             control=control,
         )
         try:
-            return session_loop.retry(
+            return ctx.session_loop.retry(
                 session_id,
                 interruption_id=_required_text(params, "interruption_id"),
                 retry_id=_required_text(params, "retry_id"),
@@ -3496,14 +3510,14 @@ def _dispatch_selected(
         finally:
             if pending_once is not None:
                 clear_session_model_once_settings(
-                    storage_root / "config.yaml",
+                    ctx.storage_root / "config.yaml",
                     session_id=session_id,
                     expected_provider_id=pending_once["provider_id"],
                     expected_model_id=pending_once["model_id"],
                 )
     if method == "disconnect_stream":
         return {
-            "disconnect_deadline": bus.disconnect_stream(
+            "disconnect_deadline": ctx.bus.disconnect_stream(
                 _required_text(params, "campaign_id"),
                 _required_text(params, "attempt_id"),
                 expected_generation=_required_nonnegative_int(params, "attachment_generation"),
@@ -3511,14 +3525,14 @@ def _dispatch_selected(
         }
     if method == "disconnect_provider_stream":
         return {
-            "disconnect_deadline": bus.disconnect_provider_stream(
+            "disconnect_deadline": ctx.bus.disconnect_provider_stream(
                 _required_text(params, "campaign_id"),
                 _required_text(params, "attempt_id"),
                 expected_generation=_optional_nonnegative_int(params, "attachment_generation"),
             )
         }
     if method == "stream_heartbeat":
-        attachment_deadline, attachment_generation = bus.heartbeat_stream(
+        attachment_deadline, attachment_generation = ctx.bus.heartbeat_stream(
             _required_text(params, "campaign_id"),
             _required_text(params, "attempt_id"),
             expected_generation=_optional_nonnegative_int(params, "attachment_generation"),
@@ -3528,7 +3542,7 @@ def _dispatch_selected(
             "attachment_generation": attachment_generation,
         }
     if method == "provider_stream_heartbeat":
-        attachment_deadline, attachment_generation = bus.heartbeat_provider_stream(
+        attachment_deadline, attachment_generation = ctx.bus.heartbeat_provider_stream(
             _required_text(params, "campaign_id"),
             _required_text(params, "attempt_id"),
             expected_generation=_optional_nonnegative_int(params, "attachment_generation"),
@@ -3539,7 +3553,7 @@ def _dispatch_selected(
         }
     if method == "narration_attempt_status":
         return {
-            "status": bus.narration_attempt_status(
+            "status": ctx.bus.narration_attempt_status(
                 _required_text(params, "campaign_id"),
                 _required_text(params, "attempt_id"),
             )
@@ -3547,10 +3561,10 @@ def _dispatch_selected(
     if method == "provider_stream_status":
         session_id = _required_text(params, "campaign_id")
         attempt_id = _required_text(params, "attempt_id")
-        activity = session_loop.builder_activity(session_id, attempt_id=attempt_id)
+        activity = ctx.session_loop.builder_activity(session_id, attempt_id=attempt_id)
         if activity is not None and activity["status"] != "active":
             return activity
-        status = bus.provider_stream_status(session_id, attempt_id)
+        status = ctx.bus.provider_stream_status(session_id, attempt_id)
         # A live admitted run can precede lease registration or outlive its release.
         # Only saved terminal evidence can complete that run.
         if activity is not None and status == "completed":
@@ -3559,7 +3573,7 @@ def _dispatch_selected(
             "status": status,
         }
     if method == "reconnect_stream":
-        return bus.reconnect_stream(
+        return ctx.bus.reconnect_stream(
             campaign_id=_required_text(params, "campaign_id"),
             attempt_id=_required_text(params, "attempt_id"),
             acknowledged_sequence=_required_nonnegative_int(params, "acknowledged_sequence"),
@@ -3568,7 +3582,7 @@ def _dispatch_selected(
         )
     if method == "reconnect_provider_stream":
         return {
-            "attachment_generation": bus.reconnect_provider_stream(
+            "attachment_generation": ctx.bus.reconnect_provider_stream(
                 _required_text(params, "campaign_id"),
                 _required_text(params, "attempt_id"),
                 expected_generation=_optional_nonnegative_int(params, "attachment_generation"),
@@ -3582,7 +3596,7 @@ def _dispatch_selected(
             raise OwnerProtocolError("archive_base64 is invalid") from error
         if len(archive_bytes) > _MAX_PACKAGE_BYTES:
             raise OwnerProtocolError("Package archive exceeds the desktop import limit")
-        return bus.install_package(
+        return ctx.bus.install_package(
             io.BytesIO(archive_bytes),
             install_id=_required_text(params, "install_id"),
         )
@@ -3593,8 +3607,8 @@ def _dispatch_selected(
         )
         try:
             if method == "preview_character_card_file":
-                return stage_card_preview(storage_root, Path(_required_text(params, "source_path")))
-            return confirm_card_preview(storage_root, _required_text(params, "source_sha256"))
+                return stage_card_preview(ctx.storage_root, Path(_required_text(params, "source_path")))
+            return confirm_card_preview(ctx.storage_root, _required_text(params, "source_sha256"))
         except (ValueError, OSError) as error:
             raise CommandRejected(str(error), code="character_card_invalid") from error
 
@@ -3611,18 +3625,18 @@ def _dispatch_selected(
                 try:
                     if is_plan:
                         return import_plan_bundle(
-                            storage_root, archive_stream,
+                            ctx.storage_root, archive_stream,
                             install_snapshot=lambda snapshot, expected: _install_plan_snapshot(
-                                application_owner, snapshot, expected,
+                                ctx.application_owner, snapshot, expected,
                             ),
                         ).catalog_payload()
-                    return bus.install_package(
+                    return ctx.bus.install_package(
                         archive_stream,
                         install_id=_required_text(params, "install_id"),
                     )
                 except (AuthorityError, ValueError) as error:
                     repair = offer_import_repair(
-                        storage_root, source,
+                        ctx.storage_root, source,
                         install_id=_required_text(params, "install_id"), error=error,
                     )
                     if repair is not None:
@@ -3651,9 +3665,9 @@ def _dispatch_selected(
         if not isinstance(construction_intent, dict):
             raise OwnerProtocolError("construction_intent must be an object")
         return _start_rift_campaign(
-            bus,
-            application_owner,
-            storage_root,
+            ctx.bus,
+            ctx.application_owner,
+            ctx.storage_root,
             operation_id=_required_text(params, "operation_id"),
             campaign_id=_required_text(params, "campaign_id"),
             builder_session_id=_required_text(params, "builder_session_id"),
@@ -3678,7 +3692,7 @@ def _dispatch_selected(
         selection = None
         if params.get("plan_id") is not None:
             selection = resolve_campaign_library_selection(
-                application_owner, storage_root,
+                ctx.application_owner, ctx.storage_root,
                 candidate_id=_required_text(params, "candidate_id"),
                 setting_id=_required_text(params, "setting_id"),
                 plan_id=_required_text(params, "plan_id"),
@@ -3687,7 +3701,7 @@ def _dispatch_selected(
         if candidate_id is None:
             package_lock = PackageLock(entries=())
         elif isinstance(candidate_id, str) and candidate_id:
-            package_lock = _candidate_package_lock(bus, candidate_id)
+            package_lock = _candidate_package_lock(ctx.bus, candidate_id)
         else:
             raise OwnerProtocolError("candidate_id must be a nonempty string or null")
         premise = params.get("premise", "")
@@ -3713,7 +3727,7 @@ def _dispatch_selected(
                 raise OwnerProtocolError("construction_intent must be an object")
             assert selection is not None
             participants, initial_state, selected_party = materialize_library_party(
-                application_owner, selection, operation_id=operation_id,
+                ctx.application_owner, selection, operation_id=operation_id,
                 player_character_id=_required_text(params, "player_character_id"),
                 companion_ids=tuple(raw_companions),
             )
@@ -3734,7 +3748,7 @@ def _dispatch_selected(
             raise CommandRejected("Selected characters require a concrete Campaign Plan")
         display_name = _required_text(params, "display_name")
         try:
-            existing_basis = application_owner.campaign_construction_basis(campaign_id)
+            existing_basis = ctx.application_owner.campaign_construction_basis(campaign_id)
         except CommandRejected as error:
             if str(error) not in {
                 "Confirmed campaign construction is unavailable",
@@ -3757,7 +3771,7 @@ def _dispatch_selected(
                 "builder_session_id": builder_session_id,
                 "resulting_revision": existing_basis.begin_revision,
             }
-        application_owner.append_agent_message(
+        ctx.application_owner.append_agent_message(
             session_id=builder_session_id,
             message_id=(
                 "guided-ready-" + hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]
@@ -3769,7 +3783,7 @@ def _dispatch_selected(
                 "interview_value": {"action": "ready_to_begin"},
             },
         )
-        confirmation = bus.bind_guided_campaign_basis(
+        confirmation = ctx.bus.bind_guided_campaign_basis(
             operation_id=f"{operation_id}-bind",
             campaign_id=campaign_id,
             display_name=display_name,
@@ -3785,12 +3799,12 @@ def _dispatch_selected(
         )
         if selected_plan is not None:
             _seed_campaign_plan(
-                storage_root, campaign_id,
+                ctx.storage_root, campaign_id,
                 selected_plan.readable_markdown, selected_plan.payload,
             )
         elif candidate_id is None:
             _seed_campaign_plan(
-                storage_root, campaign_id,
+                ctx.storage_root, campaign_id,
                 f"# {display_name}\n\n"
                 "This is an open-ended narrative sandbox with no Ruleset or game mechanics. "
                 "Use the player's setup below as the starting brief. When it leaves the "
@@ -3798,7 +3812,7 @@ def _dispatch_selected(
                 "those details. Preserve player choices and boundaries.\n\n"
                 f"## Player setup\n\n{premise.strip() or 'No starting premise supplied.'}\n",
             )
-        begun = bus.begin_campaign_construction(
+        begun = ctx.bus.begin_campaign_construction(
             operation_id=f"{operation_id}-begin",
             campaign_id=campaign_id,
             lane="customize" if premise.strip() else "quick_start",
@@ -3818,7 +3832,7 @@ def _dispatch_selected(
         builder_session_id = (
             "session-guided-" + hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]
         )
-        draft = bus.create_guided_campaign_draft(
+        draft = ctx.bus.create_guided_campaign_draft(
             operation_id=operation_id,
             display_name=_required_text(params, "display_name"),
             builder_session_id=builder_session_id,
@@ -3834,7 +3848,7 @@ def _dispatch_selected(
             "answer_message_id": draft.answer_message_id,
         }
     if method == "navigate_guided_campaign_draft":
-        draft = bus.navigate_guided_campaign_draft(
+        draft = ctx.bus.navigate_guided_campaign_draft(
             operation_id=_required_text(params, "operation_id"),
             campaign_id=_required_text(params, "campaign_id"),
             builder_session_id=_required_text(params, "builder_session_id"),
@@ -3854,7 +3868,7 @@ def _dispatch_selected(
         answer = params.get("answer")
         if not isinstance(answer, dict):
             raise OwnerProtocolError("answer must be an object")
-        draft = bus.advance_guided_campaign_draft(
+        draft = ctx.bus.advance_guided_campaign_draft(
             operation_id=_required_text(params, "operation_id"),
             campaign_id=_required_text(params, "campaign_id"),
             builder_session_id=_required_text(params, "builder_session_id"),
@@ -3874,7 +3888,7 @@ def _dispatch_selected(
             "answer_message_id": draft.answer_message_id,
         }
     if method == "guided_campaign_contribution":
-        return application_owner.guided_campaign_contribution(
+        return ctx.application_owner.guided_campaign_contribution(
             builder_session_id=_required_text(params, "builder_session_id"),
             contribution_step=_required_text(params, "contribution_step"),
         )
@@ -3883,7 +3897,7 @@ def _dispatch_selected(
         campaign_id = _required_text(params, "campaign_id")
         builder_session_id = _required_text(params, "builder_session_id")
         expected_revision = _required_nonnegative_int(params, "expected_construction_revision")
-        context = application_owner.session_context(builder_session_id)
+        context = ctx.application_owner.session_context(builder_session_id)
         if context.session.campaign_id != campaign_id:
             raise CommandRejected("Reusable Campaign Plan source session is unavailable")
         states = tuple(
@@ -3911,18 +3925,18 @@ def _dispatch_selected(
                 "Only a current reviewed campaign-local Derived Plan can be saved for reuse",
                 code="reusable_campaign_plan_source_unavailable",
             )
-        payload = _campaign_plan_payload(storage_root, campaign_id)
+        payload = _campaign_plan_payload(ctx.storage_root, campaign_id)
         if payload is None:
             raise CommandRejected("Derived structured Campaign Plan is unavailable")
-        markdown = _campaign_plan_text(storage_root, campaign_id)
+        markdown = _campaign_plan_text(ctx.storage_root, campaign_id)
         try:
             reusable = save_reusable_rift_plan(
-                storage_root,
+                ctx.storage_root,
                 operation_id=operation_id,
                 title=_required_text(params, "title"),
                 source_payload=payload,
                 source_markdown=markdown,
-                package_snapshot=retained_plan_snapshot(application_owner, payload),
+                package_snapshot=retained_plan_snapshot(ctx.application_owner, payload),
             )
         except (OSError, UnicodeError, ValueError, json.JSONDecodeError) as error:
             raise CommandRejected(
@@ -3955,34 +3969,34 @@ def _dispatch_selected(
             "session-subflow-" + hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]
         )
         launch = (
-            application_owner.start_interview_builder_chat
+            ctx.application_owner.start_interview_builder_chat
             if purpose in {"ruleset", "setting", "plan", "player_character", "companion"}
-            else bus.start_guided_creation_subflow
+            else ctx.bus.start_guided_creation_subflow
         )
         reference_options = {}
         if purpose in {"ruleset", "setting", "plan", "player_character", "companion"}:
             existing = next(
                 (
                     chat
-                    for chat in application_owner.builder_chat_index()
+                    for chat in ctx.application_owner.builder_chat_index()
                     if chat.session.session_id == child_session_id
                 ),
                 None,
             )
             reference_options["references"] = (
-                launch_references(application_owner.session_context(child_session_id))
+                launch_references(ctx.application_owner.session_context(child_session_id))
                 if existing is not None
                 else capture_launch_references(
-                    application_owner,
-                    storage_root,
-                    application_owner.session_context(_required_text(params, "parent_session_id")),
-                    _campaign_creation_catalog(storage_root, application_owner),
+                    ctx.application_owner,
+                    ctx.storage_root,
+                    ctx.application_owner.session_context(_required_text(params, "parent_session_id")),
+                    _campaign_creation_catalog(ctx.storage_root, ctx.application_owner),
                 )
             )
             retained = cast(dict[str, Any], reference_options["references"] or {})
             if existing is None and purpose in {"player_character", "companion"}:
                 retained = with_character_examples(
-                    application_owner, storage_root, retained, purpose=purpose,
+                    ctx.application_owner, ctx.storage_root, retained, purpose=purpose,
                 )
                 reference_options["references"] = retained
             pinned = retained.get("character_profile")
@@ -3997,8 +4011,8 @@ def _dispatch_selected(
                         code="stale_character_profile",
                     )
             elif profile_id is not None:
-                profile = load_character_profile(storage_root, profile_id, profile_hash)
-                selected_candidate = candidate_for_references(application_owner, retained)
+                profile = load_character_profile(ctx.storage_root, profile_id, profile_hash)
+                selected_candidate = candidate_for_references(ctx.application_owner, retained)
                 profile_primary = (
                     next(
                         (
@@ -4012,7 +4026,7 @@ def _dispatch_selected(
                     else None
                 )
                 declarations = (
-                    application_owner.exact_participant_declarations(
+                    ctx.application_owner.exact_participant_declarations(
                         profile_primary.package_id,
                         profile_primary.version,
                         profile_primary.sha256,
@@ -4027,7 +4041,7 @@ def _dispatch_selected(
                     else {}
                 )
                 maximum = profile_policy.get("custom_companions", {}).get("maximum", 0)
-                profile_parent = application_owner.session_context(
+                profile_parent = ctx.application_owner.session_context(
                     _required_text(params, "parent_session_id")
                 )
                 profile_parent_state = cast(
@@ -4088,7 +4102,7 @@ def _dispatch_selected(
                     )
             elif character_id is not None:
                 source = next((
-                    item for item in _reusable_participant_catalog(storage_root, application_owner)
+                    item for item in _reusable_participant_catalog(ctx.storage_root, ctx.application_owner)
                     if item.artifact_id == character_id and item.role == purpose
                 ), None)
                 if source is None or source.content_sha256 != character_hash:
@@ -4119,7 +4133,7 @@ def _dispatch_selected(
         )
         return _json_value(subflow)
     if method == "return_guided_creation_subflow":
-        subflow = bus.return_guided_creation_subflow(
+        subflow = ctx.bus.return_guided_creation_subflow(
             operation_id=_required_text(params, "operation_id"),
             campaign_id=_required_text(params, "campaign_id"),
             parent_session_id=_required_text(params, "parent_session_id"),
@@ -4141,10 +4155,10 @@ def _dispatch_selected(
         if candidate_id is None:
             package_lock = PackageLock(entries=())
         elif isinstance(candidate_id, str) and candidate_id:
-            package_lock = _candidate_package_lock(bus, candidate_id)
+            package_lock = _candidate_package_lock(ctx.bus, candidate_id)
         else:
             raise OwnerProtocolError("candidate_id must be a nonempty string or null")
-        confirmation = bus.confirm_new_campaign(
+        confirmation = ctx.bus.confirm_new_campaign(
             operation_id=operation_id,
             display_name=_required_text(params, "display_name"),
             package_lock=package_lock,
@@ -4169,7 +4183,7 @@ def _dispatch_selected(
         operation_id = _required_text(params, "operation_id")
         campaign_id = _required_text(params, "campaign_id")
         lane = _required_text(params, "lane")
-        begun = bus.begin_campaign_construction(
+        begun = ctx.bus.begin_campaign_construction(
             operation_id=operation_id,
             campaign_id=campaign_id,
             lane=lane,
@@ -4178,13 +4192,13 @@ def _dispatch_selected(
         )
         campaign = next(
             entry
-            for entry in application_owner.campaign_index()
+            for entry in ctx.application_owner.campaign_index()
             if entry.campaign_id == campaign_id
         )
         builder_session = next(
             session for session in campaign.sessions if session.role == "builder"
         )
-        application_owner.append_agent_message(
+        ctx.application_owner.append_agent_message(
             session_id=builder_session.session_id,
             message_id=(
                 "construction-brief-"
@@ -4202,14 +4216,14 @@ def _dispatch_selected(
         canonical_plan = params.get("canonical_plan")
         if not isinstance(canonical_plan, dict):
             raise OwnerProtocolError("canonical_plan must be an object")
-        return bus.complete_campaign_construction(
+        return ctx.bus.complete_campaign_construction(
             operation_id=_required_text(params, "operation_id"),
             campaign_id=_required_text(params, "campaign_id"),
             expected_revision=_required_nonnegative_int(params, "expected_revision"),
             canonical_plan=canonical_plan,
         )
     if method == "model_guidance":
-        guidance: Any = bus.model_guidance(
+        guidance: Any = ctx.bus.model_guidance(
             campaign_id=_required_text(params, "campaign_id"),
             model_id=_required_text(params, "model_id"),
             override_accepted=_optional_bool(params, "override_accepted"),
@@ -4223,21 +4237,21 @@ def _dispatch_selected(
         campaign_id = _required_text(params, "campaign_id")
         dm_provider_id = _required_text(params, "dm_provider_id")
         dm_model_id = _required_text(params, "dm_model_id")
-        plan_text = _campaign_plan_text(storage_root, campaign_id)
-        structured_plan = _campaign_plan_payload(storage_root, campaign_id)
+        plan_text = _campaign_plan_text(ctx.storage_root, campaign_id)
+        structured_plan = _campaign_plan_payload(ctx.storage_root, campaign_id)
         _preflight_guided_start(
-            application_owner=application_owner,
-            bus=bus,
-            provider_resolver=provider_resolver,
-            owner_id=owner_id,
+            application_owner=ctx.application_owner,
+            bus=ctx.bus,
+            provider_resolver=ctx.provider_resolver,
+            owner_id=ctx.owner_id,
             campaign_id=campaign_id,
             provider_id=dm_provider_id,
             model_id=dm_model_id,
             plan_text=plan_text,
             structured_plan=structured_plan,
-            gm_system_prompt=gm_system_prompt,
+            gm_system_prompt=ctx.gm_system_prompt,
         )
-        construction, plan, handoff = bus.finalize_campaign_construction(
+        construction, plan, handoff = ctx.bus.finalize_campaign_construction(
             campaign_id=campaign_id,
             dm_provider_id=dm_provider_id,
             dm_model_id=dm_model_id,
@@ -4248,11 +4262,11 @@ def _dispatch_selected(
                 "model_guidance_override",
             ),
         )
-        dm_turn_id = application_owner.current_open_turn(campaign_id)
+        dm_turn_id = ctx.application_owner.current_open_turn(campaign_id)
         if dm_turn_id is None:
             suffix = hashlib.sha256(campaign_id.encode("utf-8")).hexdigest()[:24]
             dm_turn_id = f"turn-dm-{suffix}"
-            bus.open_turn(campaign_id, dm_turn_id)
+            ctx.bus.open_turn(campaign_id, dm_turn_id)
         return {
             "construction": construction,
             "plan": plan,
@@ -4267,11 +4281,11 @@ def _dispatch_selected(
         campaign_id = _required_text(params, "campaign_id")
         session_id = _required_text(params, "session_id")
         turn_id = _required_text(params, "turn_id")
-        dm_context = application_owner.session_context(session_id)
+        dm_context = ctx.application_owner.session_context(session_id)
         if (
             dm_context.session.role is not WriterRole.DM
             or dm_context.session.campaign_id != campaign_id
-            or application_owner.current_open_turn(campaign_id) != turn_id
+            or ctx.application_owner.current_open_turn(campaign_id) != turn_id
         ):
             raise CommandRejected("Campaign start session authority does not match")
         has_start_event = any(
@@ -4286,11 +4300,11 @@ def _dispatch_selected(
         )
         if has_start_event and has_opening_narration:
             return {"status": "already_started", "session_id": session_id}
-        provider = provider_resolver(dm_context.session)
-        if application_owner.admin_full_audit_enabled():
+        provider = ctx.provider_resolver(dm_context.session)
+        if ctx.application_owner.admin_full_audit_enabled():
             provider = AdminAuditedProvider(
                 provider,
-                sink=application_owner.record_admin_full_audit,
+                sink=ctx.application_owner.record_admin_full_audit,
                 session_id=session_id,
                 role=dm_context.session.role.value,
                 provider_id=dm_context.session.provider_id,
@@ -4301,20 +4315,20 @@ def _dispatch_selected(
             bind_session_reasoning(provider, dm_context.session), gm_mode=True,
         )
         opening_plan_text, opening_plan = _admitted_dm_campaign_plan(
-            application_owner,
+            ctx.application_owner,
             campaign_id=campaign_id,
             session_id=session_id,
         )
         adapter = ProviderSessionAdapter(
-            application_owner,
+            ctx.application_owner,
             provider,
-            owner_id=owner_id,
-            gm_system_prompt=gm_system_prompt,
+            owner_id=ctx.owner_id,
+            gm_system_prompt=ctx.gm_system_prompt,
             campaign_plan_text=opening_plan_text,
             campaign_plan=opening_plan,
         )
         suffix = hashlib.sha256(campaign_id.encode("utf-8")).hexdigest()[:24]
-        return session_loop.run(
+        return ctx.session_loop.run(
             SessionRunRequest(
                 session_id=session_id,
                 turn_id=turn_id,
@@ -4326,7 +4340,7 @@ def _dispatch_selected(
             adapter.for_turn(turn_id),
         )
     if method == "catalog":
-        catalog: Any = bus.catalog(_required_text(params, "campaign_id"))
+        catalog: Any = ctx.bus.catalog(_required_text(params, "campaign_id"))
         return [
             {
                 "package_id": tool.package_id,
@@ -4342,12 +4356,12 @@ def _dispatch_selected(
         parameters = params.get("parameters", {})
         if not isinstance(parameters, dict):
             raise OwnerProtocolError("parameters must be an object")
-        return bus.execute_action(
+        return ctx.bus.execute_action(
             ActionCommand(
                 campaign_id=_required_text(params, "campaign_id"),
                 action_id=_required_text(params, "action_id"),
                 idempotency_key=_required_text(params, "idempotency_key"),
-                owner_id=owner_id,
+                owner_id=ctx.owner_id,
                 writer=WriterRole(_required_text(params, "writer")),
                 expected_revision=_required_nonnegative_int(params, "expected_revision"),
                 turn_id=_required_text(params, "turn_id"),
@@ -4362,12 +4376,12 @@ def _dispatch_selected(
             )
         )
     if method == "resolve_mechanics_choice":
-        return bus.resolve_mechanics_choice(
+        return ctx.bus.resolve_mechanics_choice(
             ResolveMechanicsChoiceCommand(
                 campaign_id=_required_text(params, "campaign_id"),
                 action_id=_required_text(params, "action_id"),
                 resolution_id=_required_text(params, "resolution_id"),
-                owner_id=owner_id,
+                owner_id=ctx.owner_id,
                 expected_revision=_required_nonnegative_int(params, "expected_revision"),
                 choice_id=_required_text(params, "choice_id"),
                 option_id=_required_text(params, "option_id"),
@@ -4381,61 +4395,61 @@ def _dispatch_selected(
             )
         )
     if method == "open_turn":
-        bus.open_turn(
+        ctx.bus.open_turn(
             _required_text(params, "campaign_id"),
             _required_text(params, "turn_id"),
         )
         return {"status": "open"}
     if method == "complete_turn":
-        bus.complete_turn(
+        ctx.bus.complete_turn(
             _required_text(params, "campaign_id"),
             _required_text(params, "turn_id"),
         )
         return {"status": "completed"}
     if method == "stop_agent_session":
         session_id = _required_text(params, "session_id")
-        context = application_owner.session_context(session_id)
-        stopped = session_loop.stop_agent_session(session_id)
+        context = ctx.application_owner.session_context(session_id)
+        stopped = ctx.session_loop.stop_agent_session(session_id)
         if context.session.role is WriterRole.DM:
             stopped_campaign_id = context.session.campaign_id
             if stopped_campaign_id is None:
                 raise OwnerProtocolError("DM sessions require campaign authority")
-            open_turn_id = application_owner.current_open_turn(stopped_campaign_id)
+            open_turn_id = ctx.application_owner.current_open_turn(stopped_campaign_id)
             if open_turn_id is not None:
-                application_owner.complete_turn(stopped_campaign_id, open_turn_id)
+                ctx.application_owner.complete_turn(stopped_campaign_id, open_turn_id)
         return stopped
     if method == "resume_agent_session":
-        return bus.resume_agent_session(_required_text(params, "session_id"))
+        return ctx.bus.resume_agent_session(_required_text(params, "session_id"))
     if method == "rename_campaign":
-        return bus.rename_campaign(
+        return ctx.bus.rename_campaign(
             operation_id=_required_text(params, "operation_id"),
             campaign_id=_required_text(params, "campaign_id"),
             display_name=_required_text(params, "display_name"),
             expected_revision=_required_nonnegative_int(params, "expected_revision"),
         )
     if method == "archive_campaign":
-        return bus.archive_campaign(
+        return ctx.bus.archive_campaign(
             operation_id=_required_text(params, "operation_id"),
             campaign_id=_required_text(params, "campaign_id"),
             expected_revision=_required_nonnegative_int(params, "expected_revision"),
             designated_session_id=_optional_text(params, "designated_session_id"),
         )
     if method == "restore_archived_campaign":
-        return bus.restore_archived_campaign(
+        return ctx.bus.restore_archived_campaign(
             operation_id=_required_text(params, "operation_id"),
             campaign_id=_required_text(params, "campaign_id"),
             expected_revision=_required_nonnegative_int(params, "expected_revision"),
             session_id=_optional_text(params, "session_id"),
         )
     if method == "trash_campaign":
-        return bus.trash_campaign(
+        return ctx.bus.trash_campaign(
             operation_id=_required_text(params, "operation_id"),
             campaign_id=_required_text(params, "campaign_id"),
             expected_revision=_required_nonnegative_int(params, "expected_revision"),
             designated_session_id=_optional_text(params, "designated_session_id"),
         )
     if method == "restore_trashed_campaign":
-        return bus.restore_trashed_campaign(
+        return ctx.bus.restore_trashed_campaign(
             operation_id=_required_text(params, "operation_id"),
             campaign_id=_required_text(params, "campaign_id"),
             expected_revision=_required_nonnegative_int(params, "expected_revision"),
@@ -4443,7 +4457,7 @@ def _dispatch_selected(
     if method == "purge_campaign":
         campaign_id = _required_text(params, "campaign_id")
         operation_id = _required_text(params, "operation_id")
-        workspace = storage_root / "campaigns" / campaign_id
+        workspace = ctx.storage_root / "campaigns" / campaign_id
         purge_stage = None
 
         def prepare_external_purge() -> None:
@@ -4458,7 +4472,7 @@ def _dispatch_selected(
             if purge_stage is not None:
                 restore_builder_sources_after_failed_purge(purge_stage)
 
-        purge_result = application_owner.purge_campaign(
+        purge_result = ctx.application_owner.purge_campaign(
             operation_id=operation_id,
             campaign_id=campaign_id,
             expected_revision=_required_nonnegative_int(params, "expected_revision"),
@@ -4477,16 +4491,16 @@ def _dispatch_selected(
         return purge_result
     if method == "backup_database":
         backup_id = _required_artifact_id(params, "backup_id")
-        target = storage_root / "backups" / f"{backup_id}.sqlite3"
+        target = ctx.storage_root / "backups" / f"{backup_id}.sqlite3"
         target.parent.mkdir(parents=True, exist_ok=True)
-        bus.backup_database(target)
+        ctx.bus.backup_database(target)
         return {"backup_id": backup_id, "status": "created"}
     if method == "export_campaign_plan_file":
         export_id = _required_artifact_id(params, "export_id")
         plan_id = _required_text(params, "plan_id")
         expected = _required_text(params, "expected_content_sha256")
         selected = next(
-            (item for item in _campaign_creation_catalog(storage_root, application_owner)
+            (item for item in _campaign_creation_catalog(ctx.storage_root, ctx.application_owner)
              if item.get("kind") == "campaign_plan" and item.get("id") == plan_id),
             None,
         )
@@ -4501,31 +4515,31 @@ def _dispatch_selected(
                 selected["bundled"] = True
         if selected is None or selected.get("content_sha256") != expected:
             raise CommandRejected("Selected Campaign Plan changed; refresh its library entry")
-        target = storage_root / "exports" / f"{export_id}.sylvia-gm-plan"
+        target = ctx.storage_root / "exports" / f"{export_id}.sylvia-gm-plan"
         target.parent.mkdir(parents=True, exist_ok=True)
         if selected.get("reusable"):
             saved = load_reusable_campaign_plan(
-                storage_root, plan_id,
+                ctx.storage_root, plan_id,
                 validate_plan=lambda payload, text: validate_retained_campaign_plan(
-                    application_owner, payload, text,
+                    ctx.application_owner, payload, text,
                 ),
             )
             plan = saved.plan
         else:
-            saved = selected_campaign_plan(storage_root, plan_id)
+            saved = selected_campaign_plan(ctx.storage_root, plan_id)
             plan = saved.plan
         if selected.get("reusable") and saved.package_snapshot is not None:
             with target.open("wb") as stream:
                 receipt = export_plan_bundle(
-                    storage_root, saved.artifact_id,
+                    ctx.storage_root, saved.artifact_id,
                     expected_content_sha256=saved.content_sha256, target=stream,
                 )
         else:
             # Capture an older Plan's retained sources without changing its library entry.
             snapshot = saved.package_snapshot if saved.package_snapshot is not None else (
-                retained_plan_snapshot(application_owner, plan.payload)
+                retained_plan_snapshot(ctx.application_owner, plan.payload)
             )
-            with tempfile.TemporaryDirectory(prefix=".plan-export-", dir=storage_root) as temporary:
+            with tempfile.TemporaryDirectory(prefix=".plan-export-", dir=ctx.storage_root) as temporary:
                 export_root = Path(temporary)
                 portable = save_reusable_campaign_plan(
                     export_root, operation_id=f"portable-{plan_id}",
@@ -4548,10 +4562,10 @@ def _dispatch_selected(
         return {"export": receipt, "artifact_path": str(target.resolve(strict=True))}
     if method in {"export_package_candidate", "export_package_candidate_file"}:
         export_id = _required_artifact_id(params, "export_id")
-        target = storage_root / "exports" / f"{export_id}.sylvia-gm-package"
+        target = ctx.storage_root / "exports" / f"{export_id}.sylvia-gm-package"
         target.parent.mkdir(parents=True, exist_ok=True)
         with target.open("wb") as stream:
-            result = bus.export_package_candidate(
+            result = ctx.bus.export_package_candidate(
                 _required_text(params, "candidate_id"),
                 stream,
             )
@@ -4560,9 +4574,9 @@ def _dispatch_selected(
         return result
     if method in {"export_campaign", "export_campaign_file"}:
         export_id = _required_artifact_id(params, "export_id")
-        target = storage_root / "exports" / f"{export_id}.sylvia-gm-campaign"
+        target = ctx.storage_root / "exports" / f"{export_id}.sylvia-gm-campaign"
         target.parent.mkdir(parents=True, exist_ok=True)
-        result = bus.export_campaign(
+        result = ctx.bus.export_campaign(
             _required_text(params, "operation_id"),
             _required_text(params, "campaign_id"),
             target,
@@ -4573,8 +4587,8 @@ def _dispatch_selected(
         return result
     if method == "recover_campaign":
         export_id = _required_artifact_id(params, "export_id")
-        source = storage_root / "exports" / f"{export_id}.sylvia-gm-campaign"
-        return bus.recover_campaign(
+        source = ctx.storage_root / "exports" / f"{export_id}.sylvia-gm-campaign"
+        return ctx.bus.recover_campaign(
             recovery_id=_required_text(params, "recovery_id"),
             source=source,
         )
@@ -4582,7 +4596,7 @@ def _dispatch_selected(
         source = Path(_required_text(params, "source_path")).resolve(strict=True)
         if source.suffix != ".sylvia-gm-campaign" or not source.is_file():
             raise OwnerProtocolError("Selected recovery source is not a Sylvia GM campaign archive")
-        return bus.recover_campaign(
+        return ctx.bus.recover_campaign(
             recovery_id=_required_text(params, "recovery_id"),
             source=source,
         )
