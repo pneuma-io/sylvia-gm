@@ -5636,8 +5636,18 @@ const SylviaGMFrontend = (() => {
   // Caster sheet for an actor without a carried firearm when the map declares cast actions. Every number shown is a
   // projected value and every label is the projected label or one derived from its projected key; no ruleset
   // arithmetic, unit, attribute list or level naming is assumed here.
+  // A package-declared, catalogue-derived category per spell (for example `fire_bolt: evocation`). The owning
+  // surface's map is preferred; any other surface projecting the same map is the fallback. Absent entries show nothing.
+  function projectedSpellCategories(surface) {
+    const isMap = (value) => value && typeof value === 'object' && !Array.isArray(value);
+    if (isMap(surface?.data?.spell_categories)) return surface.data.spell_categories;
+    const other = (state.panelProjection?.surfaces || []).find((item) => isMap(item?.data?.spell_categories));
+    return other ? other.data.spell_categories : {};
+  }
+
   function grimoireMarkup(surface, actorId, { participant, entity, name, details, values }) {
     const { map, casts } = mapCastActions();
+    const categories = projectedSpellCategories(surface);
     const word = (value) => String(panelIdentifierLabel(value || '')).replace(/\b\w/g, (letter) => letter.toUpperCase());
     const initials = (key) => word(key).split(/\s+/).map((part) => part.charAt(0)).join('');
     const classes = Array.isArray(details.classes) ? details.classes.map((item) => `${word(item.id)}${Number.isFinite(item.level) ? ` ${item.level}` : ''}`).join(' / ') : '';
@@ -5672,9 +5682,12 @@ const SylviaGMFrontend = (() => {
       const resource = action.params?.slot_resource;
       const available = panelActionAvailable(map, action, actorId);
       const label = action.label || panelIdentifierLabel(action.id);
+      const category = typeof categories[action.params?.spell] === 'string' ? categories[action.params.spell].trim() : '';
+      const subline = [category ? word(category) : '', resource ? word(resource) : ''].filter(Boolean).join(' · ');
       return `<button type="button" class="grim-spell${available ? '' : ' is-off'}" data-grimoire-cast="${escapeHtml(action.id)}" data-grimoire-map="${escapeHtml(map.id)}" ` +
+        (category ? `data-spell-category="${escapeHtml(category)}" ` : '') +
         `aria-label="Ready ${escapeHtml(label)}: choose a target on ${escapeHtml(map.title || 'the map')}" ${available ? '' : 'aria-disabled="true"'}>${suiteIcon(suiteActionIcon(action) || 'burstarea')}` +
-        `<span class="grim-spell-main"><b>${escapeHtml(label)}</b>${resource ? `<small>${escapeHtml(word(resource))}</small>` : ''}</span>` +
+        `<span class="grim-spell-main"><b>${escapeHtml(label)}</b>${subline ? `<small>${escapeHtml(subline)}</small>` : ''}</span>` +
         `<span class="grim-spell-cost">${resourceCost(resource)}</span></button>`;
     };
     // Projected scores as projected, in projected order; membership in a projected proficiency list is highlighted.
@@ -5816,6 +5829,9 @@ const SylviaGMFrontend = (() => {
       `<div class="panel-unit-meta">Round ${escapeHtml(combat.round || 1)} · ` +
       `Current: ${escapeHtml(names[combat.current_actor] || combat.current_actor || '—')}</div></div>`;
     const place = (id) => orderedIds.indexOf(id) + 1;
+    // A package-declared map of each actor's recorded turn-order value; an actor without one shows only its place.
+    const orderValues = data && data.order_values && typeof data.order_values === 'object' ? data.order_values : {};
+    const orderValue = (id) => Number.isFinite(orderValues[id]) ? orderValues[id] : null;
     const current = orderedIds.indexOf(combat.current_actor);
     const rotated = current < 0 ? orderedIds : [...orderedIds.slice(current), ...orderedIds.slice(0, current)];
     const units = rotated.map((id, index) => {
@@ -5826,7 +5842,7 @@ const SylviaGMFrontend = (() => {
         `${String(panelIdentifierLabel(item.id || '')).replace(/\b\w/g, (letter) => letter.toUpperCase())}${Number.isFinite(item.level) ? ` ${item.level}` : ''}`).join(' / ') : '';
       const vitals = [Number.isFinite(entity.armor_class) ? `AC ${entity.armor_class}` : '',
         Number.isFinite(entity.hp) ? `${entity.hp}${Number.isFinite(entity.max_hp) ? `/${entity.max_hp}` : ''} HP` : '',
-        `Order ${place(id)}`].filter(Boolean);
+        orderValue(id) === null ? `Order ${place(id)}` : `Order ${place(id)} · value ${orderValue(id)}`].filter(Boolean);
       const tone = entityTone(id);
       const medal = suiteMedal(id, names[id], entity, now ? 64 : 34);
       if (now) return `<section class="panel-unit ladder-now turn-current" data-panel-entity="${escapeHtml(id)}" data-tone="${tone}" aria-label="Acting now">` +
@@ -5835,7 +5851,9 @@ const SylviaGMFrontend = (() => {
         (vitals.length ? `<span class="ladder-vitals">${vitals.map((item) => `<span>${escapeHtml(item)}</span>`).join('')}</span>` : '') +
         conditionPanelMarkup(entity) + '</div></section>';
       return `<div class="panel-unit ladder-rung${entity.is_alive === false ? ' down' : ''}" data-panel-entity="${escapeHtml(id)}" data-tone="${tone}">` +
-        `<span class="ladder-init" aria-label="Turn order ${place(id)}">${place(id)}</span>${medal}` +
+        (orderValue(id) === null ? `<span class="ladder-init" aria-label="Turn order ${place(id)}">${place(id)}</span>`
+          : `<span class="ladder-init has-value" data-order-value="${escapeHtml(orderValue(id))}" aria-label="Turn order ${place(id)}, order value ${escapeHtml(orderValue(id))}" ` +
+            `title="Turn order ${place(id)} · order value ${escapeHtml(orderValue(id))}">${escapeHtml(orderValue(id))}</span>`) + medal +
         `<span class="ladder-name"><strong>${escapeHtml(names[id] || id)}</strong><small>${escapeHtml([Number.isFinite(entity.armor_class) ? `AC ${entity.armor_class}` : '',
           Number.isFinite(entity.hp) ? `${entity.hp}${Number.isFinite(entity.max_hp) ? `/${entity.max_hp}` : ''} HP` : ''].filter(Boolean).join(' · ') ||
           panelIdentifierLabel(entity.creature_kind || 'creature'))}</small></span><span class="ladder-in">in ${index}</span>` + conditionPanelMarkup(entity) + '</div>';
