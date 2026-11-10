@@ -3310,6 +3310,192 @@
         "reference_sheet": "Owner-supplied normalized locked master design sheet, retained byte-for-byte. Generated writing inside it is non-canonical. This image was not generated or altered by this task.",
         "portrait": "Use case: identity-preserve. Asset type: square app character portrait for Nova, an adult Siren Protocol character. Image 1 is the clean full-body design to reframe; image 2 is the original locked master and final visual authority. Preserve that person's exact adult face, hair, fringe, eye color, expression, jewelry, visible head/neck technology and upper clothing, with the same detailed anime/cyberpunk style. Authored appearance: Nova's locked appearance is severe black, white, and red tailored cyberwear: short white hair, structured long coat, fitted trousers, polished tactical boots, fine red/black jewellery, command-interface cuffs, and multiple compact spherical/hovering drone forms. Her silhouette should read as engineered control, executive precision, and technical authority rather than generic laboratory clothing. Produce one 1024x1024 head-and-shoulders portrait, with face centered horizontally, eye line near 35% of image height, chin near 65%, shoulders filling the lower portion. Leave comfortable headroom and keep distinctive head features within the square. Preserve any original face concealment, visor, hood or fringe, on the same side and in the same position. Keep her face at the same close portrait scale; the surrounding drone ring may extend beyond the square, as the full-body and master retain its complete design. Plain light neutral gray background. Full-bleed square artwork: continuous background and clothing to every edge. No painted circle, vignette, border, panels, captions, labels, new symbols, watermark or UI. Preserve the person and costume; change only framing. The source sheet's generated writing is not narrative canon."
       }
+    },
+    {
+      "id": "severed-npc-lace-brothers-thread",
+      "name": "Thread",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/lace-brothers.md",
+          "sha256": "fd977fb3de2137e4f49b2300cabf2a61478b64608ead10fe5ec097f740b29e7d",
+          "campaign_setting_id": "pneuma.severed-lands",
+          "subject_name": "Thread"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/lace-brothers.md",
+          "sha256": "546a8b0f4bca9cc2c6bb6301b6faea98a961b0cb08c7ac373e897cec7edafdd6",
+          "campaign_setting_id": "pneuma.severed-lands",
+          "subject_name": "Thread"
+        }
+      ],
+      "visuals": {
+        "appearance": "A young adult humanlike Riftborn man in his mid-twenties, medium warm brown skin, lean build, dark hazel eyes, a broad brow and narrow chin, soft black curls swept neatly back, clean-shaven. A warm, practiced charming smile and relaxed open posture. Worn but carefully kept muted-plum knee-length coat, oatmeal shirt, charcoal trousers, soft brown ankle boots and a plain belt. Empty hands, no weapon displayed. He shares a subtle family resemblance with his two brothers, who remain separate people. No revealed home world, unusual anatomy, faction symbols or invented rank.",
+        "full_body": {
+          "path": "assets/characters/336f25ce6b740eb1f481e2f46e5a2ec9da73e06dfc1784c75d1c6fb4101f8926.png",
+          "sha256": "336f25ce6b740eb1f481e2f46e5a2ec9da73e06dfc1784c75d1c6fb4101f8926"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/e7458bcf94306776c42f827657fa55e92cb2480cc77bc13492018ddf32337398.png",
+          "sha256": "e7458bcf94306776c42f827657fa55e92cb2480cc77bc13492018ddf32337398"
+        },
+        "portrait": {
+          "path": "assets/characters/e51b745e0fac50f6bd9da4ea5a68373ed4415ed58b3a6578d6d9d91b8e44abd8.png",
+          "sha256": "e51b745e0fac50f6bd9da4ea5a68373ed4415ed58b3a6578d6d9d91b8e44abd8"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1917160
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2260140
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2453113
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Thread, one of the three adult Lace Brothers in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, tactile fabric and skin, plain light neutral gray backdrop, soft natural studio light and subtle grounding shadow. Exactly ONE complete person standing naturally in a near-front three-quarter pose, whole hair, both hands and both feet comfortably inside margins. Appearance: A young adult humanlike Riftborn man in his mid-twenties, medium warm brown skin, lean build, dark hazel eyes, a broad brow and narrow chin, soft black curls swept neatly back, clean-shaven. A warm, practiced charming smile and relaxed open posture. Worn but carefully kept muted-plum knee-length coat, oatmeal shirt, charcoal trousers, soft brown ankle boots and a plain belt. Empty hands, no weapon displayed. He shares a subtle family resemblance with his two brothers, who remain separate people. No revealed home world, unusual anatomy, faction symbols or invented rank. Unspecified appearance and costume details are editable visual defaults; preserve the authored Riftborn sibling identity and individual personality without inventing lore, powers or allegiances. No extra brothers or people in this image, text, labels, borders, UI, scenery, magic, duplicate limbs or oversized equipment.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for Thread, one individual adult Lace Brother in Severed Lands. Input image 1 is the canonical full-body identity and exact costume/equipment reference. Preserve that one person's face, age, build, skin, hairstyle, hair color, outfit, colors and equipment. One landscape PNG, 1536x1024. Polished naturalistic digital RPG illustration on a plain light neutral gray background, soft consistent studio light. Show front, exact side profile and back views of the SAME person as three complete standing figures at one common scale, with comfortable margins around all hair/hands/feet; one additional close facial detail. Repeated views of a single identity, no other siblings. Appearance: A young adult humanlike Riftborn man in his mid-twenties, medium warm brown skin, lean build, dark hazel eyes, a broad brow and narrow chin, soft black curls swept neatly back, clean-shaven. A warm, practiced charming smile and relaxed open posture. Worn but carefully kept muted-plum knee-length coat, oatmeal shirt, charcoal trousers, soft brown ankle boots and a plain belt. Empty hands, no weapon displayed. He shares a subtle family resemblance with his two brothers, who remain separate people. No revealed home world, unusual anatomy, faction symbols or invented rank. Keep accessories physically consistent between views. No captions, text, labels, borders, UI, magical effects or invented emblems.",
+        "portrait": "Use case: identity-preserve. One square app portrait of Thread, an individual adult Lace Brother from Severed Lands. Input image 1 is his canonical full-body reference; input image 2 is his multiview sheet. Preserve his exact face, age, hairstyle, skin tone, eye color, expression and costume. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft studio light. Head and upper shoulders, looking near-forward, face horizontally centered, eyes near 35 percent down, chin near 65 percent down, comfortable space above all hair. No other siblings. Appearance: A young adult humanlike Riftborn man in his mid-twenties, medium warm brown skin, lean build, dark hazel eyes, a broad brow and narrow chin, soft black curls swept neatly back, clean-shaven. A warm, practiced charming smile and relaxed open posture. Worn but carefully kept muted-plum knee-length coat, oatmeal shirt, charcoal trousers, soft brown ankle boots and a plain belt. Empty hands, no weapon displayed. He shares a subtle family resemblance with his two brothers, who remain separate people. No revealed home world, unusual anatomy, faction symbols or invented rank. Continuous full-bleed square background and clothing to all edges. No painted circle, rounded cutout, vignette, frame, captions, text, labels, logos, magic, scenery or UI. Preserve identity; change only framing. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-lace-brothers-hook",
+      "name": "Hook",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/lace-brothers.md",
+          "sha256": "fd977fb3de2137e4f49b2300cabf2a61478b64608ead10fe5ec097f740b29e7d",
+          "campaign_setting_id": "pneuma.severed-lands",
+          "subject_name": "Hook"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/lace-brothers.md",
+          "sha256": "546a8b0f4bca9cc2c6bb6301b6faea98a961b0cb08c7ac373e897cec7edafdd6",
+          "campaign_setting_id": "pneuma.severed-lands",
+          "subject_name": "Hook"
+        }
+      ],
+      "visuals": {
+        "appearance": "A young adult humanlike Riftborn man in his late twenties, medium warm brown skin, compact sturdy athletic build, dark hazel eyes, a broad brow and narrow chin, close-cropped black hair and short rough black stubble. Quiet watchful expression and still balanced posture. Weathered dark charcoal short coat, moss-gray shirt, dark brown work trousers, practical black boots and a simple sheathed short knife at the belt. Empty hands kept close to the belt. He shares a subtle family resemblance with his two brothers, who remain separate people. No literal hook hand, revealed home world, unusual anatomy, faction symbols or invented rank.",
+        "full_body": {
+          "path": "assets/characters/3fc80d77a433618dc4a336d620615c5d21271de8e53c76378225f7ebeb1dbac7.png",
+          "sha256": "3fc80d77a433618dc4a336d620615c5d21271de8e53c76378225f7ebeb1dbac7"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/b4ac12399f1132bf5b79a2e03360f109115c622ff2f4d59d0d0b542d5a3ef377.png",
+          "sha256": "b4ac12399f1132bf5b79a2e03360f109115c622ff2f4d59d0d0b542d5a3ef377"
+        },
+        "portrait": {
+          "path": "assets/characters/b04507d6e0f0acca127826a8aa918b0f99372a66ec70e7b3d9cc61ba9186dd9c.png",
+          "sha256": "b04507d6e0f0acca127826a8aa918b0f99372a66ec70e7b3d9cc61ba9186dd9c"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1942099
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2323971
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2354632
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Hook, one of the three adult Lace Brothers in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, tactile fabric and skin, plain light neutral gray backdrop, soft natural studio light and subtle grounding shadow. Exactly ONE complete person standing naturally in a near-front three-quarter pose, whole hair, both hands and both feet comfortably inside margins. Appearance: A young adult humanlike Riftborn man in his late twenties, medium warm brown skin, compact sturdy athletic build, dark hazel eyes, a broad brow and narrow chin, close-cropped black hair and short rough black stubble. Quiet watchful expression and still balanced posture. Weathered dark charcoal short coat, moss-gray shirt, dark brown work trousers, practical black boots and a simple sheathed short knife at the belt. Empty hands kept close to the belt. He shares a subtle family resemblance with his two brothers, who remain separate people. No literal hook hand, revealed home world, unusual anatomy, faction symbols or invented rank. Unspecified appearance and costume details are editable visual defaults; preserve the authored Riftborn sibling identity and individual personality without inventing lore, powers or allegiances. No extra brothers or people in this image, text, labels, borders, UI, scenery, magic, duplicate limbs or oversized equipment.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for Hook, one individual adult Lace Brother in Severed Lands. Input image 1 is the canonical full-body identity and exact costume/equipment reference. Preserve that one person's face, age, build, skin, hairstyle, hair color, outfit, colors and equipment. One landscape PNG, 1536x1024. Polished naturalistic digital RPG illustration on a plain light neutral gray background, soft consistent studio light. Show front, exact side profile and back views of the SAME person as three complete standing figures at one common scale, with comfortable margins around all hair/hands/feet; one additional close facial detail. Repeated views of a single identity, no other siblings. Appearance: A young adult humanlike Riftborn man in his late twenties, medium warm brown skin, compact sturdy athletic build, dark hazel eyes, a broad brow and narrow chin, close-cropped black hair and short rough black stubble. Quiet watchful expression and still balanced posture. Weathered dark charcoal short coat, moss-gray shirt, dark brown work trousers, practical black boots and a simple sheathed short knife at the belt. Empty hands kept close to the belt. He shares a subtle family resemblance with his two brothers, who remain separate people. No literal hook hand, revealed home world, unusual anatomy, faction symbols or invented rank. Keep accessories physically consistent between views. No captions, text, labels, borders, UI, magical effects or invented emblems.",
+        "portrait": "Use case: identity-preserve. One square app portrait of Hook, an individual adult Lace Brother from Severed Lands. Input image 1 is his canonical full-body reference; input image 2 is his multiview sheet. Preserve his exact face, age, hairstyle, skin tone, eye color, expression and costume. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft studio light. Head and upper shoulders, looking near-forward, face horizontally centered, eyes near 35 percent down, chin near 65 percent down, comfortable space above all hair. No other siblings. Appearance: A young adult humanlike Riftborn man in his late twenties, medium warm brown skin, compact sturdy athletic build, dark hazel eyes, a broad brow and narrow chin, close-cropped black hair and short rough black stubble. Quiet watchful expression and still balanced posture. Weathered dark charcoal short coat, moss-gray shirt, dark brown work trousers, practical black boots and a simple sheathed short knife at the belt. Empty hands kept close to the belt. He shares a subtle family resemblance with his two brothers, who remain separate people. No literal hook hand, revealed home world, unusual anatomy, faction symbols or invented rank. Continuous full-bleed square background and clothing to all edges. No painted circle, rounded cutout, vignette, frame, captions, text, labels, logos, magic, scenery or UI. Preserve identity; change only framing. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-lace-brothers-needle",
+      "name": "Needle",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/lace-brothers.md",
+          "sha256": "fd977fb3de2137e4f49b2300cabf2a61478b64608ead10fe5ec097f740b29e7d",
+          "campaign_setting_id": "pneuma.severed-lands",
+          "subject_name": "Needle"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/lace-brothers.md",
+          "sha256": "546a8b0f4bca9cc2c6bb6301b6faea98a961b0cb08c7ac373e897cec7edafdd6",
+          "campaign_setting_id": "pneuma.severed-lands",
+          "subject_name": "Needle"
+        }
+      ],
+      "visuals": {
+        "appearance": "A young adult humanlike Riftborn man in his early twenties, medium warm brown skin, slim slightly tall build, dark hazel eyes, a broad brow and narrow chin, straight black hair tied in one short neat braid at the nape, clean-shaven. Focused observant expression and an upright attentive posture. Faded slate-blue waistcoat over an oatmeal shirt with rolled sleeves, charcoal trousers, simple brown lace-up shoes, a plain belt with a small document pouch. Holds a modest closed worn brown ledger at his side; no readable writing or weapon displayed. He shares a subtle family resemblance with his two brothers, who remain separate people. No revealed home world, unusual anatomy, faction symbols or invented rank.",
+        "full_body": {
+          "path": "assets/characters/c1642c3bb956d8520f12e990d8e0f9e5789565fd7d230ddfbe0b13862b1f5c7e.png",
+          "sha256": "c1642c3bb956d8520f12e990d8e0f9e5789565fd7d230ddfbe0b13862b1f5c7e"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/9abf71064b730d699496fea7fb94a42084f6bc4cb4c7497525186710c99a1948.png",
+          "sha256": "9abf71064b730d699496fea7fb94a42084f6bc4cb4c7497525186710c99a1948"
+        },
+        "portrait": {
+          "path": "assets/characters/b79eb2d7513460191cd80f469534877caef81c21e324d453582017c4a9c260b3.png",
+          "sha256": "b79eb2d7513460191cd80f469534877caef81c21e324d453582017c4a9c260b3"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1850582
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2264688
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2426519
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Needle, one of the three adult Lace Brothers in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, tactile fabric and skin, plain light neutral gray backdrop, soft natural studio light and subtle grounding shadow. Exactly ONE complete person standing naturally in a near-front three-quarter pose, whole hair, both hands and both feet comfortably inside margins. Appearance: A young adult humanlike Riftborn man in his early twenties, medium warm brown skin, slim slightly tall build, dark hazel eyes, a broad brow and narrow chin, straight black hair tied in one short neat braid at the nape, clean-shaven. Focused observant expression and an upright attentive posture. Faded slate-blue waistcoat over an oatmeal shirt with rolled sleeves, charcoal trousers, simple brown lace-up shoes, a plain belt with a small document pouch. Holds a modest closed worn brown ledger at his side; no readable writing or weapon displayed. He shares a subtle family resemblance with his two brothers, who remain separate people. No revealed home world, unusual anatomy, faction symbols or invented rank. Unspecified appearance and costume details are editable visual defaults; preserve the authored Riftborn sibling identity and individual personality without inventing lore, powers or allegiances. No extra brothers or people in this image, text, labels, borders, UI, scenery, magic, duplicate limbs or oversized equipment.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for Needle, one individual adult Lace Brother in Severed Lands. Input image 1 is the canonical full-body identity and exact costume/equipment reference. Preserve that one person's face, age, build, skin, hairstyle, hair color, outfit, colors and equipment. One landscape PNG, 1536x1024. Polished naturalistic digital RPG illustration on a plain light neutral gray background, soft consistent studio light. Show front, exact side profile and back views of the SAME person as three complete standing figures at one common scale, with comfortable margins around all hair/hands/feet; one additional close facial detail. Repeated views of a single identity, no other siblings. Appearance: A young adult humanlike Riftborn man in his early twenties, medium warm brown skin, slim slightly tall build, dark hazel eyes, a broad brow and narrow chin, straight black hair tied in one short neat braid at the nape, clean-shaven. Focused observant expression and an upright attentive posture. Faded slate-blue waistcoat over an oatmeal shirt with rolled sleeves, charcoal trousers, simple brown lace-up shoes, a plain belt with a small document pouch. Holds a modest closed worn brown ledger at his side; no readable writing or weapon displayed. He shares a subtle family resemblance with his two brothers, who remain separate people. No revealed home world, unusual anatomy, faction symbols or invented rank. Keep accessories physically consistent between views. No captions, text, labels, borders, UI, magical effects or invented emblems.",
+        "portrait": "Use case: identity-preserve. One square app portrait of Needle, an individual adult Lace Brother from Severed Lands. Input image 1 is his canonical full-body reference; input image 2 is his multiview sheet. Preserve his exact face, age, hairstyle, skin tone, eye color, expression and costume. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft studio light. Head and upper shoulders, looking near-forward, face horizontally centered, eyes near 35 percent down, chin near 65 percent down, comfortable space above all hair. No other siblings. Appearance: A young adult humanlike Riftborn man in his early twenties, medium warm brown skin, slim slightly tall build, dark hazel eyes, a broad brow and narrow chin, straight black hair tied in one short neat braid at the nape, clean-shaven. Focused observant expression and an upright attentive posture. Faded slate-blue waistcoat over an oatmeal shirt with rolled sleeves, charcoal trousers, simple brown lace-up shoes, a plain belt with a small document pouch. Holds a modest closed worn brown ledger at his side; no readable writing or weapon displayed. He shares a subtle family resemblance with his two brothers, who remain separate people. No revealed home world, unusual anatomy, faction symbols or invented rank. Continuous full-bleed square background and clothing to all edges. No painted circle, rounded cutout, vignette, frame, captions, text, labels, logos, magic, scenery or UI. Preserve identity; change only framing. One 1024x1024 PNG."
+      }
     }
   ]
 }

@@ -76,11 +76,22 @@ Two focused checks passed in 122.95 seconds for all 117 real images/resources/so
 and all 218 authored subjects/246 current and retained source editions. Earlier owner, frontend
 and live acceptance layers were not replayed for this artwork-only addition.
 The other NPCs, companions and remaining enemies still need artwork.
+Thread, Hook and Needle now each have a separate full-body reference, multiview sheet and portrait.
+Their shared Lace Brothers profile retains its original text and adds all three editable visual
+defaults together. Each binding uses the exact shared file hash plus the individual subject, so
+an unnamed group reference remains ambiguous. The prior fifty bundles and their bindings are
+unchanged. Actual square, dialogue-circle and map-token crops were inspected for all three.
+The shared catalogue now contains 53 complete bundles. The new nine-image/resource check and
+the 218-subject/249-edition roster check pass. The group transfer's initial full-record assertion
+found expected recipient-local operation IDs after recovery; image hashes/paths, appearance and
+crop were unchanged. The corrected case passed in 41.66 seconds, checking all portable fields
+and exact image bytes with no catalogue readers or image requests. Touched Ruff, docs-index and
+diff checks pass. Completed frontend/native matrices were not repeated.
 The owner selected a shared app artwork library: whole Setting/Plan exports omit unused premade
 PNGs, while custom art stays portable and character/campaign exports carry used artwork. The
 source now maps the catalogue and PNGs as external installer/portable resources, outside the
 onefile sidecar. Campaign export retains used art before any artwork view has been opened.
-The prepared PNG pool now totals 349,242,584 bytes across 150 images, beyond the content-package cap.
+The prepared PNG pool now totals 369,035,488 bytes across 159 images, beyond the content-package cap.
 The current Setting omits those PNGs; its existing content-package limits remain unchanged.
 Focused checks cover shared/custom publication, external resource inventory, portable ZIP assembly,
 and exact campaign art transfer before opening an image view. Local-copy receipts also transfer
@@ -144,7 +155,7 @@ and synthetic conformance characters. The owner selected clean Siren Protocol co
 trailer and corrected that README's blanket private-content label. Legacy private campaign notes
 remain excluded; test fixtures do not become premade release characters.
 The selected Siren repository's current main at `c7a9587b94f8e5125ea5818a9f708ec32d0bab01`
-contains an eleven-character playable profile set. Its historical repository/profile names do
+contains eleven authored profiles and runtime build inputs. Its historical repository/profile names do
 not make the clean Siren material private; source preparation follows the owner's correction.
 The eleven locked originals have now been delivered locally. Independent checks confirm the
 normalized master archive hash, exact internal image bytes/checksums and browser decoding of all
@@ -153,7 +164,7 @@ retained without an invented cause. All eleven original sheets are now retained 
 the prepared catalogue, alongside separate full-body and square-portrait derivatives. Each complete
 bundle records its original filename/hash, archive identity and historical registry discrepancy;
 generated sheet writing does not change the clean profile's narrative authority. The shared library
-now has fifty complete bundles. All eleven portraits were inspected through the actual square,
+contained fifty complete bundles after that increment. All eleven portraits were inspected through the actual square,
 dialogue-circle and map-sized crop renderer. Fifty-one exact source bindings cover the selected
 upstream profiles and the delivered Siren Protocol 0.2.0 package source. Raw and normalized hashes
 are retained where they differ, and other Settings do not select this cast. The twelve selected
@@ -161,6 +172,15 @@ source files were compared directly; existing visual identity and runtime charac
 preserved. The delivered package source is separate from TD PR #6's checked head
 `882103eee8d511d08d31d9d0b4fe4d9d67b813f8`, which does not contain that Setting. Actual TD party
 and Builder handoff remains open. No other work item's source was modified.
+The active TD owner subsequently confirmed that the retained Siren 0.2.0 adapter is explicitly
+`included_nonmechanical` / `NOT_COMPLETE`, with no participant artifacts or converted Character
+File envelopes. Sixteen selected immutable source blobs were checked independently; the twelve
+clean character files match the retained artwork source copy after line-ending normalization.
+This verifies provenance without establishing a TD 0.1.29 playable composition. Real conversion
+and its party/Builder qualification require explicit reconciliation of the separate Siren
+composition scope. The existing `visuals` field can carry prepared art through the generic
+Character File and party path while preserving source identities and campaign participant IDs.
+No adapter build, TD checkout write, guest use or native/live check was performed for this handoff.
 Two focused checks passed in 122.04 seconds: all 150 real PNGs/resources/source bindings and a
 real Siren bundle exported/imported through fresh owner libraries without the shared image reader.
 The transfer retains all three exact PNGs, including the original sheet, and the adjusted crop,
@@ -174,7 +194,7 @@ hints. The six minimal failure cases pass after the repair; 78 related source ch
 module typing and touched Ruff pass; all eleven originals pass the repaired validator. This is
 source qualification only, with native/live acceptance still pending.
 The authored-source producer now covers 218 subjects (82 individual NPCs and 136 monsters),
-retaining 246 source editions across current content and Plan snapshots. Thread, Hook and Needle
+retaining 249 source editions across current content and Plan snapshots. Thread, Hook and Needle
 remain distinct; V and Anchor Sentinel variants and the artwork-annotated profiles retain
 their original editions. The
 snapshot-only opposition guide is explicitly excluded as encounter guidance. A composed source
@@ -205,8 +225,9 @@ candidate reuse preserves recipient metadata and rejects different content. Imag
 actual Lite prepared-art transfer checks now retain the normal candidate reference. Older incomplete
 archives that omitted it require a fresh export from the source dataset.
 These source/scripted checks do not establish completion of the ordinary
-workflows. The owner's latest selection keeps live in-app checks pending. The 117 prepared assets
-were produced with the built-in GPT Images tool, separately from Sylvia's deferred native check.
+workflows. The owner's latest selection keeps live in-app checks pending. Of the 159 prepared assets,
+148 were produced with the built-in GPT Images tool and eleven are the unchanged supplied Siren
+master sheets. Asset preparation is separate from Sylvia's deferred native check.
 Live Sylvia subscription, installed-app
 and TD trailer acceptance remain unverified. Merge follows the Pneuma IO rulebook's delivery and
 cleanup sequence.
