@@ -544,3 +544,17 @@ def test_historical_gm_check_keeps_original_modules_and_expected_failure(tmp_pat
     manifest.write_text(json.dumps(plan))
     with pytest.raises(ValueError, match="complete declared selection"):
         load_selection(manifest, revision="a" * 40, root=tmp_path)
+
+
+def test_readme_resets_explicit_plugin_environment_before_runner_commands():
+    import re
+
+    root = Path(__file__).resolve().parents[1]
+    readme = (root / "README.md").read_text()
+    blocks = re.findall(r"```powershell\s+(.*?)```", readme, flags=re.DOTALL)
+    standalone = next(block for block in blocks if "-m pytest" in block)
+    runner = next(block for block in blocks if "scripts/check_supported_journeys.py" in block)
+    assert standalone.index("$env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=1") < standalone.index("-p pytest_asyncio.plugin")
+    assert runner.index("$env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=$null") < runner.index("scripts/select_checks.py")
+    assert "$env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=1" not in runner
+    assert "-p pytest_asyncio.plugin" not in runner

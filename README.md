@@ -192,6 +192,8 @@ opening a PR does not start it. To select affected checks against current main, 
 output directory for each run and use:
 
 ```powershell
+# The runner uses normal plugin autoload after the direct-pytest example above.
+$env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=$null
 git fetch origin
 .venv/Scripts/python.exe scripts/select_checks.py --base origin/main --output ../checks/run-1/selection.json
 .venv/Scripts/python.exe scripts/check_supported_journeys.py --selection-manifest ../checks/run-1/selection.json --jobs 2 --case-workers 1 --scheduler case --output-dir ../checks/run-1/journeys
