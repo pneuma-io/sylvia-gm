@@ -417,6 +417,51 @@ def test_queue_edits_select_their_expensive_behavior_and_fast_provider_consumer(
     assert "campaign-play" not in plan["python"]
 
 
+@pytest.mark.parametrize("path", [
+    "src-tauri/src/lib.rs",
+    "scripts/build_windows_prerelease.py",
+    "rulesets/srd-lite.sylvia-gm-package",
+    "campaign-settings/severed-lands/setting.json",
+    "campaign-plans/riichi-quick-test/plan.json",
+    "src/sylvia_gm/ruleset/runtime/procedure_executor.py",
+    "src/sylvia_gm/application/bundled_packages.py",
+    "src/sylvia_gm/application/bundled_campaign_plans.py",
+    "src/sylvia_gm/application/builder.py",
+    "src/sylvia_gm/agent/skills/game-master/SKILL.md",
+])
+def test_session_dependencies_keep_behavioral_coverage_after_group_move(path):
+    plan = choose([path])
+    selectors = [item for values in plan["python"].values() for item in values]
+    assert not plan["broad_fallback"]
+    assert "interruption-and-recovery" in plan["python"]
+    assert selectors.count("tests/test_alpha_f4_generic_sessions.py") == 1
+    assert selectors.count("tests/test_alpha_f4_provider_session_adapter.py") == 1
+
+
+def test_combined_session_dependency_diff_selects_each_module_once():
+    plan = choose([
+        "src-tauri/src/lib.rs", "rulesets/srd-lite.sylvia-gm-package",
+        "src/sylvia_gm/ruleset/runtime/procedure_executor.py",
+        "src/sylvia_gm/application/bundled_packages.py",
+        "src/sylvia_gm/application/builder.py",
+    ])
+    selectors = [item for values in plan["python"].values() for item in values]
+    assert len(selectors) == len(set(selectors))
+    assert selectors.count("tests/test_alpha_f4_generic_sessions.py") == 1
+
+
+def test_guide_uses_one_plugin_loading_policy_for_standalone_and_runner_commands():
+    root = Path(__file__).resolve().parents[1]
+    guide = (root / "docs/operations/local-checks-and-release.md").read_text()
+    block = guide.split("```powershell", 1)[1].split("```", 1)[0]
+    standalone = block.index(".venv/Scripts/python.exe -m pytest")
+    runner = block.index(".venv/Scripts/python.exe scripts/check_supported_journeys.py")
+    assert block.index("$env:PYTHONDONTWRITEBYTECODE=1") < standalone < runner
+    assert block.index("$env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=$null") < standalone
+    assert "-p pytest_asyncio.plugin" not in block
+    assert "$env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=1" not in block
+
+
 @pytest.mark.parametrize("document", ["README.md", "docs/INDEX.md", "docs/operations/local-checks-and-release.md"])
 def test_check_guide_edits_do_not_select_gm_or_campaign_runtime(document):
     plan = choose([document])

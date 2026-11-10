@@ -180,7 +180,7 @@ def select_checks(paths, *, source, base, diff_complete=True, full=False, root=N
                 ui.update(UI_JOURNEY)
                 reason = "Shipped frontend: JavaScript invariants and rendered browser journeys"
             elif path.startswith("src-tauri/") or path.startswith("scripts/build_"):
-                add("release-integrity", "interruption-and-recovery")
+                add("release-integrity", "interruption-and-recovery", "gm-turn")
                 ui.update(UI_JOURNEY)
                 plan["native"] = True
                 reason = "Native ownership/storage and release assembly boundaries"
@@ -207,6 +207,7 @@ def select_checks(paths, *, source, base, diff_complete=True, full=False, root=N
                     "campaign-play",
                     "builder-and-admission",
                     "interruption-and-recovery",
+                    "gm-turn",
                 )
                 if path.startswith("rulesets/"):
                     add(
@@ -251,6 +252,7 @@ def select_checks(paths, *, source, base, diff_complete=True, full=False, root=N
                     "mechanics-and-state",
                     "campaign-play",
                     "interruption-and-recovery",
+                    "gm-turn",
                     "launch-lite-compatibility",
                     "lite-admitted-qa",
                 )
@@ -266,6 +268,7 @@ def select_checks(paths, *, source, base, diff_complete=True, full=False, root=N
                     "campaign-play",
                     "builder-and-admission",
                     "interruption-and-recovery",
+                    "gm-turn",
                 )
                 if path.endswith("bundled_packages.py"):
                     add("launch-lite-compatibility", "lite-admitted-qa")
@@ -281,6 +284,7 @@ def select_checks(paths, *, source, base, diff_complete=True, full=False, root=N
                     "campaign-play",
                     "interruption-and-recovery",
                     "provider-contracts",
+                    "gm-turn",
                 )
                 reason = "Application unit/composed journeys and durable owner boundaries"
             elif path.startswith("tests/") and path.endswith(".py"):

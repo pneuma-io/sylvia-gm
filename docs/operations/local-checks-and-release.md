@@ -35,9 +35,13 @@ Choose a fresh output directory beside the checkout, within the current work ite
 
 ```powershell
 $checks = '..\checks'
+$env:PYTHONDONTWRITEBYTECODE=1
+# Both standalone pytest and the journey runner use normal plugin autoload.
+# Clear the setting if this shell previously used the README's explicit-plugin command.
+$env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=$null
 
 # One focused file, or append ::test_name for one scenario.
-.venv/Scripts/python.exe -m pytest -s -p pytest_asyncio.plugin -p no:cacheprovider tests/test_command_registry.py
+.venv/Scripts/python.exe -m pytest -s -p no:cacheprovider tests/test_command_registry.py
 
 # The fast GM behavioral group.
 .venv/Scripts/python.exe scripts/check_supported_journeys.py --journey gm-turn --jobs 1 --output-dir "$checks\gm-turn"

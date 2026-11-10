@@ -16,6 +16,37 @@ def gate():
     return module
 
 
+def test_documented_autoload_environment_runs_async_standalone_then_runner(
+    gate, tmp_path, monkeypatch,
+):
+    import os
+    import sys
+
+    # The guide clears the README's explicit-plugin setting before either command.
+    monkeypatch.delenv("PYTEST_DISABLE_PLUGIN_AUTOLOAD", raising=False)
+    monkeypatch.delenv("PYTEST_ADDOPTS", raising=False)
+    root = tmp_path / "checkout"
+    tests = root / "tests"
+    tests.mkdir(parents=True)
+    (root / "pyproject.toml").write_text('[tool.pytest.ini_options]\naddopts = ""\n')
+    relative = "tests/test_async_behavior.py"
+    (root / relative).write_text(
+        "import asyncio\nimport pytest\n"
+        "@pytest.mark.asyncio\nasync def test_async_behavior():\n"
+        "    await asyncio.sleep(0)\n    assert asyncio.get_running_loop().is_running()\n"
+    )
+    standalone = subprocess.run(
+        [sys.executable, "-m", "pytest", "-s", "-p", "no:cacheprovider", relative],
+        cwd=root, env=dict(os.environ), capture_output=True, text=True, timeout=30,
+    )
+    assert standalone.returncode == 0, standalone.stdout + standalone.stderr
+    monkeypatch.setattr(gate, "ROOT", root)
+    monkeypatch.setattr(gate, "PYTHON_JOURNEYS", {"gm-turn": [relative]})
+    output = tmp_path / "runner"
+    output.mkdir()
+    assert gate._run("gm-turn", output)[0], (output / "gm-turn.log").read_text()
+
+
 @pytest.mark.parametrize(
     "failure",
     [
