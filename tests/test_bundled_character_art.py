@@ -98,6 +98,7 @@ def test_prepared_starter_reuses_art_offline_through_campaign_crop_reopen_and_tr
         confirmed = owner.confirm_new_campaign(
             operation_id="confirm", display_name="Prepared artwork",
             package_lock=selected.candidate.package_lock, turn_id="construction",
+            package_candidate_id=selected.candidate.candidate_id,
             builder_session_id="campaign-builder", builder_provider_id="test",
             builder_model_id="test", participants=participants, initial_state=state,
         )

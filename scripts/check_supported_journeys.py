@@ -148,6 +148,7 @@ PYTHON_JOURNEYS = {
         "tests/test_result_cards.py",
     ],
     "interruption-and-recovery": [
+        "tests/test_draft_candidate_recovery.py",
         "tests/test_fc_recovery_composition.py",
         "tests/test_session_history_pages.py",
         "tests/test_alpha_f6e_owner_session_transport.py::"

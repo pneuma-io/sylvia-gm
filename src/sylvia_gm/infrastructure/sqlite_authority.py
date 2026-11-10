@@ -1999,8 +1999,13 @@ class SQLiteAuthorityStore:
             "SELECT candidate_id FROM package_activations "
             "WHERE campaign_id = ? AND candidate_id IS NOT NULL "
             "UNION SELECT package_candidate_id FROM builder_dm_handoffs "
-            "WHERE campaign_id = ? AND package_candidate_id IS NOT NULL"
+            "WHERE campaign_id = ? AND package_candidate_id IS NOT NULL "
+            "UNION SELECT json_extract(semantic_payload_json, '$.package_candidate_id') "
+            "FROM campaign_operations WHERE campaign_id = ? "
+            "AND operation_kind = 'confirm_new_campaign' "
+            "AND json_type(semantic_payload_json, '$.package_candidate_id') = 'text'"
         )
+        candidate_parameters = (campaign_id, campaign_id, campaign_id)
         predicates["campaign_lock_memberships"] = (
             '"lock_id" IN (SELECT lock_id FROM campaign_locks WHERE campaign_id = ?)',
             (campaign_id,),
@@ -2010,16 +2015,16 @@ class SQLiteAuthorityStore:
             (campaign_id,),
         )
         candidate_predicate = f'"candidate_id" IN ({selected_candidates})'
-        predicates["package_candidates"] = (candidate_predicate, (campaign_id, campaign_id))
+        predicates["package_candidates"] = (candidate_predicate, candidate_parameters)
         predicates["package_candidate_memberships"] = (
             candidate_predicate,
-            (campaign_id, campaign_id),
+            candidate_parameters,
         )
         predicates["package_staging"] = (
             '"install_id" IN (SELECT install_id FROM package_candidates WHERE '
             + candidate_predicate
             + ")",
-            (campaign_id, campaign_id),
+            candidate_parameters,
         )
 
         def exact_identity(table: str, sha_column: str) -> tuple[str, tuple[object, ...]]:
@@ -2037,7 +2042,7 @@ class SQLiteAuthorityStore:
                 f'AND export_candidate_member.version = "{table}"."version" '
                 f'AND export_candidate_member.content_sha256 = "{table}"."{sha_column}"))'
             )
-            return where, (campaign_id, campaign_id, campaign_id)
+            return where, (campaign_id, *candidate_parameters)
 
         for table in (
             "package_manifests",

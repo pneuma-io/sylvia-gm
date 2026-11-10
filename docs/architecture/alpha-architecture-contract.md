@@ -1114,13 +1114,18 @@ layout digest. The renderer hides stale art and draws the existing mechanical ov
 
 Installation never activates or repins a campaign.
 
-Installed candidates remain immutable package-library and recovery records; Alpha does not expose
-individual candidate removal. Guided campaign creation projects one candidate per logical Ruleset:
+Installed candidates retain their exact validated package identity in library and recovery records.
+Alpha does not expose individual candidate removal. Guided creation projects one candidate per logical Ruleset:
 the highest semantic version wins, and the most recently completed successful installation wins
 within the same package ID and version. Installation recency is durable publication order, never
 the lexical order of an opaque candidate ID. Failed or invalid staging attempts are not campaign
 choices. Exact-candidate activation and retained campaign locks continue to use their recorded
 identities rather than this convenience projection.
+
+Portable export includes the candidate named by campaign confirmation before any activation or
+Builder handoff exists. Recovery can reuse a matching installed candidate while preserving the
+recipient's current validated/activated use marker. Every other candidate field must match exactly;
+incompatible candidates are rejected before import.
 
 Bundled, Builder-created, and third-party content use the same compact portable package format. Alpha may import that format through the file picker or a controlled developer discovery surface, but discovery is candidate preparation—not activation. Sylvia GM hosts no Alpha marketplace/catalog and validates technical compatibility rather than rights ownership. Source/provenance metadata supports reproducibility; the user remains responsible for material shared through third-party channels. Exhaustive document forensics is an optional certified-source conversion and release-qualification path, not a requirement for ordinary ruleset authors or installed runtime packages. A certified package carries the useful semantic source map and compact hash-bound receipt; detailed extraction and review evidence remains build/release evidence unless a measured runtime or audit requirement selects it.
 

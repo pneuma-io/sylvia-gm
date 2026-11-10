@@ -63,6 +63,7 @@ def test_early_saved_library_character_receives_later_adopted_stages_in_campaign
             operation_id="confirm",
             display_name="Artwork handoff",
             package_lock=candidate.package_lock,
+            package_candidate_id=candidate.candidate_id,
             turn_id="construction",
             builder_session_id="campaign-builder",
             builder_provider_id="test",

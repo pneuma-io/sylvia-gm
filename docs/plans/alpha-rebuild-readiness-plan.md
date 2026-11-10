@@ -45,9 +45,12 @@ images for the same campaign, character, purpose and hash before looking for ori
 Anchor Sentinel also has a prepared nonhumanoid bundle and source profile links. Known entities
 reuse it through their exact Setting source reference during normal status refresh; names alone
 do not select art. Nine other starters, the NPCs, companions and remaining enemies still need artwork. Broader everyday journey
-qualification remains open. A separate
-probe found that an unfinished draft archive carrying a package-candidate identity fails recovery
-with `candidate_unavailable`, even without any image requests; its release impact remains unresolved.
+qualification remains open. The unfinished-draft `candidate_unavailable` finding is fixed for new
+exports: confirmation references now retain their candidate and package closure. Recovery checks
+cover fresh/shared libraries, differing local activation markers, continuation and reopen. Shared
+candidate reuse preserves recipient metadata and rejects different content. Image handoff and
+actual Lite prepared-art transfer checks now retain the normal candidate reference. Older incomplete
+archives that omitted it require a fresh export from the source dataset.
 These source/scripted checks do not establish completion of the ordinary
 workflows. The owner's latest selection keeps live in-app checks pending. The twelve prepared assets
 were produced with the built-in GPT Images tool, separately from Sylvia's deferred native check.
