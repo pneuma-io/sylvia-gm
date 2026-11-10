@@ -366,3 +366,33 @@ def test_unknown_or_adapter_only_command_keeps_protocol_error():
             _dispatch_selected(None, method, {}, application_owner=None, owner_id="pin",
                                provider_resolver=None, model_choices=None, session_loop=None,
                                storage_root=None)
+
+
+def test_frozen_owner_collects_every_dynamic_command_topic():
+    import importlib.util
+    from pathlib import Path
+
+    from sylvia_gm.interfaces import commands
+
+    root = Path(__file__).resolve().parents[1]
+    hooks = root / "src-tauri/scripts/hooks"
+    hook_path = hooks / "hook-sylvia_gm.interfaces.commands.py"
+    spec = importlib.util.spec_from_file_location("command_collection_hook", hook_path)
+    hook = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(hook)
+    expected = {
+        "sylvia_gm.interfaces.commands." + path.stem
+        for path in Path(commands.__file__).parent.glob("*.py")
+        if path.name != "__init__.py"
+    }
+    assert expected <= set(hook.hiddenimports)
+
+    # Exercise the real builder's argument producer, without compiling an owner.
+    spec = importlib.util.spec_from_file_location(
+        "owner_sidecar_builder", root / "src-tauri/scripts/build_owner_sidecar.py",
+    )
+    builder = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(builder)
+    arguments = builder.dictation_build_arguments(root)
+    index = arguments.index("--additional-hooks-dir")
+    assert Path(arguments[index + 1]).resolve() == hooks.resolve()

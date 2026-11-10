@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import dataclasses
 import hashlib
-from collections.abc import Iterator, Mapping, Sequence
-from typing import Any, BinaryIO, cast
+from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
+from typing import Any, BinaryIO, Literal, cast
 
 from sylvia_gm.agent._builder_question_answers import (
     builder_question_answer_content,
@@ -72,7 +72,11 @@ from sylvia_gm.config.provider_settings import (
 from sylvia_gm.domain.authority import PackageRole, SafePayload, WriterRole
 from sylvia_gm.domain.campaign_plan import PackageBinding
 from sylvia_gm.domain.errors import CommandRejected
-from sylvia_gm.domain.package_library import campaign_setting_entries, canonical_json_bytes
+from sylvia_gm.domain.package_library import (
+    ParticipantArtifactDeclaration,
+    campaign_setting_entries,
+    canonical_json_bytes,
+)
 from sylvia_gm.domain.session import SessionMessageKind
 from sylvia_gm.interfaces._session_reasoning import reasoning_state
 from sylvia_gm.provider._admin_audit import AdminAuditedProvider
@@ -258,10 +262,10 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
         else (_optional_text(params, "turn_id") or f"builder-chat-{session_id}")
     )
     if player_action_id is not None:
-        basis = ctx.application_owner.player_action_response_basis(
+        response_basis = ctx.application_owner.player_action_response_basis(
             session_id, player_action_id, automatic=automatic_response,
         )
-        if basis["turn_id"] != turn_id:
+        if response_basis["turn_id"] != turn_id:
             raise OwnerProtocolError("The saved player action belongs to another turn")
     pending_once = session_model_once_settings(
         ctx.storage_root / "config.yaml", session_id=session_id
@@ -310,14 +314,14 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
         from sylvia_gm.agent._working_context import compact_saved_messages
 
         if context.session.role is WriterRole.BUILDER and context.session.campaign_id:
-            basis = ctx.application_owner.campaign_construction_basis(context.session.campaign_id)
-            if basis.builder_session_id == session_id and basis.completion_revision is None:
+            construction_basis = ctx.application_owner.campaign_construction_basis(context.session.campaign_id)
+            if construction_basis.builder_session_id == session_id and construction_basis.completion_revision is None:
                 raise OwnerProtocolError(
                     "The campaign Interview keeps its exact transcript. "
                     "Compaction is unavailable."
                 )
 
-        def compact_provider(provider_input):
+        def compact_provider(provider_input: SessionProviderInput) -> Iterator[ProviderEvent]:
             if context.session.role is WriterRole.BUILDER:
                 messages = _provider_history(provider_input.history)
             else:
@@ -327,7 +331,7 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
                 messages = adapter._messages(
                     provider_input, campaign_has_mechanics=False, tools_available=False,
                 )
-            yield from compact_saved_messages(
+            yield from cast(Callable[..., Iterable[ProviderEvent]], compact_saved_messages)(
                 provider, provider_input.history, messages, provider_input.control,
             )
 
@@ -488,7 +492,7 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
         participant_package = (
             None if participant_authority is None else participant_authority[0]
         )
-        participant_declarations = (
+        participant_declarations: tuple[ParticipantArtifactDeclaration, ...] = (
             () if participant_authority is None else (participant_authority[1],)
         )
         participant_setting_schema = None
@@ -511,7 +515,7 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
             participant_campaign_setting = None
             candidate = launch_candidate(ctx.application_owner, context)
             setting_reference = next(
-                (item for item in saved_references.get("packages", [])
+                (item for item in cast(Sequence[Mapping[str, Any]], saved_references.get("packages", []))
                  if item.get("prefix") == "setting"),
                 None,
             )
@@ -785,7 +789,7 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
             )
             if len(declarations) != 1:
                 raise CommandRejected("Choose one of this Ruleset's participant schema IDs")
-            basis = canonical_json_bytes({
+            copy_basis = canonical_json_bytes({
                 "session_id": session_id, "source": artifact_id,
                 "content_sha256": expected_content_sha256,
                 "setting": participant_campaign_setting.as_payload(),
@@ -793,7 +797,7 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
             })
             saved = copy_compatible_character(
                 ctx.storage_root, source=source, expected_content_sha256=expected_content_sha256,
-                operation_id="builder-character-copy-" + hashlib.sha256(basis).hexdigest()[:32],
+                operation_id="builder-character-copy-" + hashlib.sha256(copy_basis).hexdigest()[:32],
                 package=participant_package, declaration=declarations[0],
                 campaign_setting=participant_campaign_setting,
                 setting_character_schema=participant_setting_schema,
@@ -821,7 +825,9 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
             if not source_selection.selectable:
                 return campaign_plan_authority
             references = source_selection.references
-            setting = next((item for item in (references or {}).get("packages", ())
+            setting = next((item for item in cast(
+                Sequence[Mapping[str, Any]], (references or {}).get("packages", ())
+            )
                             if item.get("prefix") == "setting"), None)
             source = source_selection.candidate()
             if setting is None or source is None:
@@ -934,7 +940,7 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
                 raise CommandRejected("This chat has no selected import repair")
             with materialize_repair_draft(
                 _builder_workspace(ctx.storage_root, context.session),
-                expected_kind=repair_context["import_kind"],
+                expected_kind=cast(Literal["package", "plan"], repair_context["import_kind"]),
             ) as materialized:
                 if not publishing:
                     return {

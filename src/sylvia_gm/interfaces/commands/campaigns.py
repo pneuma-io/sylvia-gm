@@ -40,7 +40,7 @@ from sylvia_gm.application.reusable_plans import (
     save_reusable_rift_plan,
 )
 from sylvia_gm.campaign.rift import rift_public_template
-from sylvia_gm.domain.authority import PackageLock, PackageRole, SafePayload
+from sylvia_gm.domain.authority import PackageLock, PackageRole, Participant, SafePayload, StateValue
 from sylvia_gm.domain.errors import CommandRejected
 from sylvia_gm.domain.session import SessionMessageKind
 from sylvia_gm.infrastructure.builder_source_ingestion import (
@@ -326,9 +326,9 @@ def handle_start_guided_campaign(ctx: DispatchContext, params: Mapping[str, Any]
     premise = params.get("premise", "")
     if not isinstance(premise, str) or len(premise) > _MAX_USER_TEXT_CHARS:
         raise OwnerProtocolError("premise must be a bounded string")
-    canonical_input = {"premise": premise.strip()} if premise.strip() else {}
-    participants = ()
-    initial_state = ()
+    canonical_input: dict[str, Any] = {"premise": premise.strip()} if premise.strip() else {}
+    participants: tuple[Participant, ...] = ()
+    initial_state: tuple[StateValue, ...] = ()
     selected_plan = None
     plan_id = params.get("plan_id")
     if plan_id is not None:
@@ -623,7 +623,7 @@ def handle_start_guided_creation_subflow(ctx: DispatchContext, params: Mapping[s
                 _campaign_creation_catalog(ctx.storage_root, ctx.application_owner),
             )
         )
-        retained = cast(dict[str, Any], reference_options["references"] or {})
+        retained: Mapping[str, Any] = cast(dict[str, Any], reference_options["references"] or {})
         if existing is None and purpose in {"player_character", "companion"}:
             retained = with_character_examples(
                 ctx.application_owner, ctx.storage_root, retained, purpose=purpose,
@@ -1066,7 +1066,7 @@ def handle_export_campaign_plan_file(ctx: DispatchContext, params: Mapping[str, 
                     snapshot, payload, text,
                 ),
                 package_snapshot=snapshot,
-                setup_id=selected.get("setup_id"),
+                setup_id=cast(str | None, selected.get("setup_id")),
                 interview_contribution=(
                     saved.interview_contribution if saved is not None
                     else selected.get("interview_contribution")

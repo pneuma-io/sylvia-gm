@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
-from typing import Any
+from collections.abc import Callable, Mapping
+from typing import Any, cast
 
 from sylvia_gm.application.authority import ActionCommand, ResolveMechanicsChoiceCommand
 from sylvia_gm.domain.authority import WriterRole
@@ -27,26 +27,26 @@ def handle_campaign_panels(ctx: DispatchContext, params: Mapping[str, Any]) -> A
 
 
 def handle_action_sequence(ctx: DispatchContext, params: Mapping[str, Any]) -> Any:
-    return ctx.application_owner.action_sequence(
+    return cast(Callable[..., Any], ctx.application_owner.action_sequence)(
         session_id=_required_text(params, "session_id"),
         sequence_id=_optional_text(params, "sequence_id"),
     )
 
 
 def handle_compose_action_sequence(ctx: DispatchContext, params: Mapping[str, Any]) -> Any:
-    arguments = {
+    arguments: dict[str, Any] = {
         "campaign_id": _required_text(params, "campaign_id"),
         "session_id": _required_text(params, "session_id"),
         "sequence_id": _required_text(params, "sequence_id"),
         "expected_version": _required_nonnegative_int(params, "expected_version"),
     }
     if ctx.method == "compose_action_sequence":
-        return ctx.application_owner.compose_action_sequence(
+        return cast(Callable[..., Any], ctx.application_owner.compose_action_sequence)(
             **arguments,
             expected_revision=_required_nonnegative_int(params, "expected_revision"),
             steps=params.get("steps"),
         )
-    return ctx.application_owner.execute_action_sequence(
+    return cast(Callable[..., Any], ctx.application_owner.execute_action_sequence)(
         **arguments, confirmation=_optional_text(params, "confirmation"),
     )
 
@@ -55,7 +55,7 @@ def handle_player_action_availability(ctx: DispatchContext, params: Mapping[str,
     return ctx.application_owner.player_action_availability(
         campaign_id=_required_text(params, "campaign_id"),
         expected_revision=_required_nonnegative_int(params, "expected_revision"),
-        requests=params.get("requests"),
+        requests=cast(Any, params.get("requests")),
     )
 
 
@@ -65,7 +65,7 @@ def handle_execute_player_action(ctx: DispatchContext, params: Mapping[str, Any]
     if (not isinstance(source, dict)
             or (selection is not None and not isinstance(selection, dict))):
         raise OwnerProtocolError("Player control source and selection must be objects")
-    return ctx.application_owner.player_action(
+    return cast(Callable[..., Any], ctx.application_owner.player_action)(
         campaign_id=_required_text(params, "campaign_id"),
         session_id=_required_text(params, "session_id"),
         operation_id=_required_text(params, "operation_id"),
@@ -77,7 +77,7 @@ def handle_execute_player_action(ctx: DispatchContext, params: Mapping[str, Any]
 
 
 def handle_execute_panel_action(ctx: DispatchContext, params: Mapping[str, Any]) -> Any:
-    action_arguments = {
+    action_arguments: dict[str, Any] = {
         "campaign_id": _required_text(params, "campaign_id"),
         "surface_id": _required_text(params, "surface_id"),
         "panel_action_id": _required_text(params, "panel_action_id"),
