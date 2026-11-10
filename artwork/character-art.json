@@ -3676,6 +3676,186 @@
         "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for Shrike in Sylvia GM's Severed Lands. Input image 1 is the canonical full-body identity and exact clothing/equipment reference. Preserve the same face, age, build, skin tone, hairstyle and costume. One landscape PNG, 1536x1024, polished naturalistic digital RPG illustration on a plain light neutral gray background, soft consistent studio light. Front, exact side profile and back views of the SAME person as three complete standing figures at one common scale, comfortably inside all margins; one additional close facial detail. Appearance: An adult Human woman appearing in her early thirties, with a lean athletic build, warm olive-brown skin, dark brown eyes, short practical dark brown hair tucked behind her ears, and a focused measured expression. Balanced relaxed stance, professional rather than threatening. Worn charcoal-gray travel jacket over a muted slate shirt, practical dark brown trousers, soft scuffed leather boots, plain belt and a small closed utility pouch. Empty hands with no weapon displayed. These are editable visual defaults. No bird features or feathered costume, gang insignia, killer trophies, blood, glamorous armor, magical powers or invented campaign history. Keep any stick, satchel or pouch physically consistent and on the same side between views. No other characters, captions, text, labels, UI, borders, new symbols, magic or scenery.",
         "portrait": "Use case: identity-preserve. Production square app portrait of Shrike from Severed Lands. Input image 1 is the canonical full-body reference; input image 2 is the multiview sheet. Preserve the exact adult face, age, hairstyle, skin, eyes, expression, clothing and accessories. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background, soft natural studio light. Head and upper shoulders, near-forward gaze, face horizontally centered, eye line near 35 percent down, chin near 65 percent down, comfortable space above all hair and beside the head. Appearance: An adult Human woman appearing in her early thirties, with a lean athletic build, warm olive-brown skin, dark brown eyes, short practical dark brown hair tucked behind her ears, and a focused measured expression. Balanced relaxed stance, professional rather than threatening. Worn charcoal-gray travel jacket over a muted slate shirt, practical dark brown trousers, soft scuffed leather boots, plain belt and a small closed utility pouch. Empty hands with no weapon displayed. These are editable visual defaults. No bird features or feathered costume, gang insignia, killer trophies, blood, glamorous armor, magical powers or invented campaign history. Continuous full-bleed square background and clothing to every edge. No painted circle, cutout, vignette, border, caption, text, UI, scenery, magical effects or new costume. Preserve identity; change only framing. One 1024x1024 PNG."
       }
+    },
+    {
+      "id": "severed-npc-maw",
+      "name": "Maw",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/maw.md",
+          "sha256": "61500009c21cb19dcd8229fe38f62ffd834b609dad56b6d08126de5ab577e053",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/maw.md",
+          "sha256": "d795bfecf7e632bb4ec0d72d05515b5d84a73d9daf8956d64cdae0602d1364d5",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A compact, slightly short adult humanlike Riftborn woman appearing in her early forties, with a wiry practical build, deep brown skin, dark amber-brown eyes, and close-cropped black hair with a few gray strands. A calm, direct, untroubled expression and a steady commanding posture despite her small stature. A worn dark teal neck scarf, ash-brown fitted travel coat, muted charcoal shirt, practical brown trousers, scuffed leather work boots and a plain belt with one small closed pouch. Empty relaxed hands. These are editable visual defaults. Her home world and the reasons for her survival remain unknown. No monstrous mouth, fangs, oversized body, visible mutation, supernatural glow, faction insignia or revealed secret powers.",
+        "full_body": {
+          "path": "assets/characters/8ee8318eef80dd777a186aaafbd25e95a676da99abc7ed34e37398863e7e5858.png",
+          "sha256": "8ee8318eef80dd777a186aaafbd25e95a676da99abc7ed34e37398863e7e5858"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/9b319c046f102ed513f9c75096e2e52c3a4cc5f22c2c4ab9d4599ed7bc0c4b4d.png",
+          "sha256": "9b319c046f102ed513f9c75096e2e52c3a4cc5f22c2c4ab9d4599ed7bc0c4b4d"
+        },
+        "portrait": {
+          "path": "assets/characters/7d8f2d4139f54fbebbf7648ff66dfd298184923512a93701ba705fc28b64cda2.png",
+          "sha256": "7d8f2d4139f54fbebbf7648ff66dfd298184923512a93701ba705fc28b64cda2"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1962506
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2484845
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2468200
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Maw in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin and cloth, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete person standing naturally in a near-front three-quarter pose, whole hair, hands, clothing and feet comfortably inside all margins. Appearance: A compact, slightly short adult humanlike Riftborn woman appearing in her early forties, with a wiry practical build, deep brown skin, dark amber-brown eyes, and close-cropped black hair with a few gray strands. A calm, direct, untroubled expression and a steady commanding posture despite her small stature. A worn dark teal neck scarf, ash-brown fitted travel coat, muted charcoal shirt, practical brown trousers, scuffed leather work boots and a plain belt with one small closed pouch. Empty relaxed hands. These are editable visual defaults. Her home world and the reasons for her survival remain unknown. No monstrous mouth, fangs, oversized body, visible mutation, supernatural glow, faction insignia or revealed secret powers. Preserve the authored character identity, personality and pronouns. No other people, duplicate limbs, scenery, captions, text, labels, logo, border, UI or oversized equipment.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for Maw in Sylvia GM's Severed Lands. Input image 1 is the canonical full-body identity and exact clothing/accessory reference. Preserve that one person's exact face, age, build, skin, hair, expression, clothes, footwear and equipment. One landscape PNG, 1536x1024. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background, soft consistent studio light. Show front, exact side profile and back views of the SAME person as three complete standing figures at a common scale, all comfortably within margins, plus one close facial detail. Preserve the hairstyle, braid position, scarf, spectacles and costume construction between views as applicable. Appearance: A compact, slightly short adult humanlike Riftborn woman appearing in her early forties, with a wiry practical build, deep brown skin, dark amber-brown eyes, and close-cropped black hair with a few gray strands. A calm, direct, untroubled expression and a steady commanding posture despite her small stature. A worn dark teal neck scarf, ash-brown fitted travel coat, muted charcoal shirt, practical brown trousers, scuffed leather work boots and a plain belt with one small closed pouch. Empty relaxed hands. These are editable visual defaults. Her home world and the reasons for her survival remain unknown. No monstrous mouth, fangs, oversized body, visible mutation, supernatural glow, faction insignia or revealed secret powers. No other characters, captions, readable text, labels, symbols, border, UI, magic or scenery.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Maw from Severed Lands. Input image 1 is the canonical full-body reference and image 2 is the multiview sheet. Preserve this exact adult face, age, skin, eyes, hairstyle, expression, clothing and applicable scarf/spectacles. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light. Head and upper shoulders, near-forward gaze, centered face, eye line near 35 percent down and chin near 65 percent down, with comfortable headroom above all hair. Appearance: A compact, slightly short adult humanlike Riftborn woman appearing in her early forties, with a wiry practical build, deep brown skin, dark amber-brown eyes, and close-cropped black hair with a few gray strands. A calm, direct, untroubled expression and a steady commanding posture despite her small stature. A worn dark teal neck scarf, ash-brown fitted travel coat, muted charcoal shirt, practical brown trousers, scuffed leather work boots and a plain belt with one small closed pouch. Empty relaxed hands. These are editable visual defaults. Her home world and the reasons for her survival remain unknown. No monstrous mouth, fangs, oversized body, visible mutation, supernatural glow, faction insignia or revealed secret powers. Continuous full-bleed square background and clothing to all edges. No painted circle, cutout, vignette, border, captions, readable text, UI, scene, new costume, magical effects or extra people. Preserve identity and change only framing. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-tallow",
+      "name": "Tallow",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/tallow.md",
+          "sha256": "243203ca6d5b1fc6456e25ce08d5adbec3530f31790e396ab5f91c8ae709b9f1",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/tallow.md",
+          "sha256": "6055c0c436bfcf0449e0f85eaf1ee0f673d99eb7db7c0c7fdb347e3bd0362da3",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult humanlike Riftborn woman appearing in her mid-thirties, with a slender athletic build, warm bronze skin, dark brown eyes, and dark brown hair pulled back into one practical long braid. An intent articulate expression, with a slight tension around the eyes, held beneath a composed attentive posture. Simple indigo traveling robes with divided layered hems suitable for movement, a faded slate waist sash, plain cloth wrist wraps and soft dark ankle boots. Empty relaxed hands, no weapon. These are editable visual defaults. Her home world and the hidden nature of what she sensed remain unknown. No literal wax or candle features, magical portals, glowing eyes, invented religious insignia or revealed otherworldly identity.",
+        "full_body": {
+          "path": "assets/characters/64e9ceb163c25caed078cb3d83a9cdf2da3d8590cc98bf535dd387f39893bd00.png",
+          "sha256": "64e9ceb163c25caed078cb3d83a9cdf2da3d8590cc98bf535dd387f39893bd00"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/8f69db623030ea30cc8c29b7954a501d4b5738bd5adf5de8578e238d2572472c.png",
+          "sha256": "8f69db623030ea30cc8c29b7954a501d4b5738bd5adf5de8578e238d2572472c"
+        },
+        "portrait": {
+          "path": "assets/characters/1a50829269808f9f2eef07dc17f43f877713e030a7626b225ec954c2f9bb13f4.png",
+          "sha256": "1a50829269808f9f2eef07dc17f43f877713e030a7626b225ec954c2f9bb13f4"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1936935
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2492612
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2474131
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Tallow in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin and cloth, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete person standing naturally in a near-front three-quarter pose, whole hair, hands, clothing and feet comfortably inside all margins. Appearance: An adult humanlike Riftborn woman appearing in her mid-thirties, with a slender athletic build, warm bronze skin, dark brown eyes, and dark brown hair pulled back into one practical long braid. An intent articulate expression, with a slight tension around the eyes, held beneath a composed attentive posture. Simple indigo traveling robes with divided layered hems suitable for movement, a faded slate waist sash, plain cloth wrist wraps and soft dark ankle boots. Empty relaxed hands, no weapon. These are editable visual defaults. Her home world and the hidden nature of what she sensed remain unknown. No literal wax or candle features, magical portals, glowing eyes, invented religious insignia or revealed otherworldly identity. Preserve the authored character identity, personality and pronouns. No other people, duplicate limbs, scenery, captions, text, labels, logo, border, UI or oversized equipment.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for Tallow in Sylvia GM's Severed Lands. Input image 1 is the canonical full-body identity and exact clothing/accessory reference. Preserve that one person's exact face, age, build, skin, hair, expression, clothes, footwear and equipment. One landscape PNG, 1536x1024. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background, soft consistent studio light. Show front, exact side profile and back views of the SAME person as three complete standing figures at a common scale, all comfortably within margins, plus one close facial detail. Preserve the hairstyle, braid position, scarf, spectacles and costume construction between views as applicable. Appearance: An adult humanlike Riftborn woman appearing in her mid-thirties, with a slender athletic build, warm bronze skin, dark brown eyes, and dark brown hair pulled back into one practical long braid. An intent articulate expression, with a slight tension around the eyes, held beneath a composed attentive posture. Simple indigo traveling robes with divided layered hems suitable for movement, a faded slate waist sash, plain cloth wrist wraps and soft dark ankle boots. Empty relaxed hands, no weapon. These are editable visual defaults. Her home world and the hidden nature of what she sensed remain unknown. No literal wax or candle features, magical portals, glowing eyes, invented religious insignia or revealed otherworldly identity. No other characters, captions, readable text, labels, symbols, border, UI, magic or scenery.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Tallow from Severed Lands. Input image 1 is the canonical full-body reference and image 2 is the multiview sheet. Preserve this exact adult face, age, skin, eyes, hairstyle, expression, clothing and applicable scarf/spectacles. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light. Head and upper shoulders, near-forward gaze, centered face, eye line near 35 percent down and chin near 65 percent down, with comfortable headroom above all hair. Appearance: An adult humanlike Riftborn woman appearing in her mid-thirties, with a slender athletic build, warm bronze skin, dark brown eyes, and dark brown hair pulled back into one practical long braid. An intent articulate expression, with a slight tension around the eyes, held beneath a composed attentive posture. Simple indigo traveling robes with divided layered hems suitable for movement, a faded slate waist sash, plain cloth wrist wraps and soft dark ankle boots. Empty relaxed hands, no weapon. These are editable visual defaults. Her home world and the hidden nature of what she sensed remain unknown. No literal wax or candle features, magical portals, glowing eyes, invented religious insignia or revealed otherworldly identity. Continuous full-bleed square background and clothing to all edges. No painted circle, cutout, vignette, border, captions, readable text, UI, scene, new costume, magical effects or extra people. Preserve identity and change only framing. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-warrens-fence",
+      "name": "Drum",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/warrens-fence.md",
+          "sha256": "734d7a473d361e6951dd7893745e96324478e084fa753fe4de4467c9a4fa0118",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/warrens-fence.md",
+          "sha256": "f55ce3cd6368f5b3fb1450bc08a708e7cc5935f501f4a2562a18481632fbf550",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An unassuming adult Human man appearing in his early fifties, with a lean medium build, light olive skin, brown eyes, short neatly combed dark hair graying at the temples, a clean-shaven face and modest round wire-rim spectacles. A restrained cautious expression with a slightly worried brow; tidy contained posture. A plain faded olive-brown short coat over a light gray collared shirt and dark gray waistcoat, practical brown trousers, worn brown leather shoes and an ordinary belt. Empty hands and no displayed valuables. These are editable visual defaults. No drum or musical instrument, gang symbols, noble finery, weapon, branded goods, readable ledgers, exposed contraband or invented identifying history.",
+        "full_body": {
+          "path": "assets/characters/3dc6638629249248442a29fbd0d250993ae1bdb2ecaa09316997e1ca1a245aeb.png",
+          "sha256": "3dc6638629249248442a29fbd0d250993ae1bdb2ecaa09316997e1ca1a245aeb"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/6781953f652ba8a346778dd7f9faeaf89ed18cece0d960b6294523c0b39612e9.png",
+          "sha256": "6781953f652ba8a346778dd7f9faeaf89ed18cece0d960b6294523c0b39612e9"
+        },
+        "portrait": {
+          "path": "assets/characters/7232fbc14281a27a6caa5bd552f7444eecc3e99af03e2b44d783cd5ff98e6450.png",
+          "sha256": "7232fbc14281a27a6caa5bd552f7444eecc3e99af03e2b44d783cd5ff98e6450"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1749157
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2375682
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2402433
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Drum in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin and cloth, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete person standing naturally in a near-front three-quarter pose, whole hair, hands, clothing and feet comfortably inside all margins. Appearance: An unassuming adult Human man appearing in his early fifties, with a lean medium build, light olive skin, brown eyes, short neatly combed dark hair graying at the temples, a clean-shaven face and modest round wire-rim spectacles. A restrained cautious expression with a slightly worried brow; tidy contained posture. A plain faded olive-brown short coat over a light gray collared shirt and dark gray waistcoat, practical brown trousers, worn brown leather shoes and an ordinary belt. Empty hands and no displayed valuables. These are editable visual defaults. No drum or musical instrument, gang symbols, noble finery, weapon, branded goods, readable ledgers, exposed contraband or invented identifying history. Preserve the authored character identity, personality and pronouns. No other people, duplicate limbs, scenery, captions, text, labels, logo, border, UI or oversized equipment.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for Drum in Sylvia GM's Severed Lands. Input image 1 is the canonical full-body identity and exact clothing/accessory reference. Preserve that one person's exact face, age, build, skin, hair, expression, clothes, footwear and equipment. One landscape PNG, 1536x1024. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background, soft consistent studio light. Show front, exact side profile and back views of the SAME person as three complete standing figures at a common scale, all comfortably within margins, plus one close facial detail. Preserve the hairstyle, braid position, scarf, spectacles and costume construction between views as applicable. Appearance: An unassuming adult Human man appearing in his early fifties, with a lean medium build, light olive skin, brown eyes, short neatly combed dark hair graying at the temples, a clean-shaven face and modest round wire-rim spectacles. A restrained cautious expression with a slightly worried brow; tidy contained posture. A plain faded olive-brown short coat over a light gray collared shirt and dark gray waistcoat, practical brown trousers, worn brown leather shoes and an ordinary belt. Empty hands and no displayed valuables. These are editable visual defaults. No drum or musical instrument, gang symbols, noble finery, weapon, branded goods, readable ledgers, exposed contraband or invented identifying history. No other characters, captions, readable text, labels, symbols, border, UI, magic or scenery.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Drum from Severed Lands. Input image 1 is the canonical full-body reference and image 2 is the multiview sheet. Preserve this exact adult face, age, skin, eyes, hairstyle, expression, clothing and applicable scarf/spectacles. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light. Head and upper shoulders, near-forward gaze, centered face, eye line near 35 percent down and chin near 65 percent down, with comfortable headroom above all hair. Appearance: An unassuming adult Human man appearing in his early fifties, with a lean medium build, light olive skin, brown eyes, short neatly combed dark hair graying at the temples, a clean-shaven face and modest round wire-rim spectacles. A restrained cautious expression with a slightly worried brow; tidy contained posture. A plain faded olive-brown short coat over a light gray collared shirt and dark gray waistcoat, practical brown trousers, worn brown leather shoes and an ordinary belt. Empty hands and no displayed valuables. These are editable visual defaults. No drum or musical instrument, gang symbols, noble finery, weapon, branded goods, readable ledgers, exposed contraband or invented identifying history. Continuous full-bleed square background and clothing to all edges. No painted circle, cutout, vignette, border, captions, readable text, UI, scene, new costume, magical effects or extra people. Preserve identity and change only framing. One 1024x1024 PNG."
+      }
     }
   ]
 }
