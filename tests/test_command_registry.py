@@ -333,10 +333,10 @@ DIAGNOSTICS = ('action_sequence',
  'trash_campaign',
  'validate_provider_model')
 
-EXPORTS = {'backup_authority': ['backups', '.sqlite3'],
- 'export_campaign_file': ['exports', '.sylvia-gm-campaign'],
- 'export_campaign_plan_file': ['exports', '.sylvia-gm-plan'],
- 'export_package_candidate_file': ['exports', '.sylvia-gm-package']}
+EXPORTS = {'backup_authority': ('backups', '.sqlite3'),
+ 'export_campaign_file': ('exports', '.sylvia-gm-campaign'),
+ 'export_campaign_plan_file': ('exports', '.sylvia-gm-plan'),
+ 'export_package_candidate_file': ('exports', '.sylvia-gm-package')}
 
 WRAPPED = ('append_campaign_sequel',
  'campaign_sequel_context',

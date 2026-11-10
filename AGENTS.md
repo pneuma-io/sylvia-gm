@@ -1,7 +1,5 @@
 # Sylvia launch work
 
-Before starting, read the shared Pneuma IO Rulebook at `D:/CodexWork/deliverables/Pneuma/Rulebook/PNEUMA-IO-RULEBOOK.md`. It governs work items, delivery, reporting and cleanup.
-
 For launch mechanics, content, imports/builders, schemas, defaults/discovery, examples, tests, CI or packaging, read `docs/launch-compatibility.md` before editing. Finish by accounting for every affected item and verifying actual Lite compatibility, content equivalence and the relevant final-byte checks. Keep first-party Full work in its labelled inactive archive and preserve the multi-ruleset architecture.
 
 ## Canonical repository guidance
