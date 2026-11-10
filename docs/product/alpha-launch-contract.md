@@ -1074,6 +1074,33 @@ portrait uses both references. Character Files and unbound character profiles ca
 managed asset references in their optional `visuals` data. Saved portraits use one adjustable
 focal point and zoom across Map, Party, character details and speaker-labelled dialogue.
 
+The phase-one experience applies throughout ordinary use. Shipped premade characters, companions,
+named NPCs and enemy archetypes include prepared artwork and references, with coverage across the
+supported content catalogues. Reusing shipped art requires no generation request. Multiple
+mechanical editions of the same identity reuse its art unless an authored appearance change
+requires a different version. Blank character templates obtain art when their appearance is known.
+
+New characters and companions, imported cards, adaptations and later GM-created NPCs or enemies
+have discoverable artwork controls in their normal creation and character views. The Builder
+interview handles missing art within the character workflow, respecting Off/Review/Auto. Users
+are not required to supply internal IDs, choose reference formats or discover a separate technical
+image form. Existing usable artwork is reused; an imported card's embedded portrait can become
+an explicit appearance reference without silently fetching external assets. Missing images have
+a clear creation path. Changes, regeneration and crop adjustments preserve the established identity
+and appear consistently wherever that character is shown.
+
+Character information and its selected artwork remain associated through publication, library
+reuse, campaign creation, save/reopen and supported content transfers. The same common visual
+record serves the supported Character File/profile/card paths and displayed character views.
+Failures, sign-in requirements, usage limits and interrupted work give an actionable recovery
+path while preserving usable art. The user remains able to continue without generating images.
+
+Release acceptance includes representative ordinary journeys for prepared and custom characters,
+companions, imported cards with and without usable art, and enemies added during play. Check SRD
+Lite with Severed Lands and the selected Trigger Discipline release content. Verify creation,
+reuse, editing/framing, persistence and failure recovery with the actual image connection before
+crediting trailer readiness. Available tools and instructions alone do not establish these outcomes.
+
 Map underlays use a raster reference rendered from the actual player-known map geometry and
 terrain. Bounds and orientation match the playable map. Tokens, labels and secret geometry are
 excluded from the reference. Artwork sits beneath the authoritative mechanical overlays and

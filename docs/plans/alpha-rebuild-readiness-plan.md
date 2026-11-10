@@ -21,11 +21,17 @@ handoffs and checkout-specific records do not activate work.
 the managed ChatGPT subscription connection, Off/Review/Auto permissions, saved full-body and
 multi-view character references, shared adjustable portrait framing and map-data-guided underlays.
 GM and Builder receive autonomous art discovery and request tools. Separate scene illustrations
-and ambient backgrounds remain deferred. PR #34 contains the implementation. The owner selected
-leaving real image generation pending, then asked to finish implementation and integration.
-Source checks cover the current changes; live subscription, installed-app and TD trailer
-acceptance remain separate and unverified. Merge follows the Pneuma IO rulebook's delivery and
-cleanup sequence.
+and ambient backgrounds remain deferred. PR #34 contains the hook, persistence and shared-display
+implementation. The owner clarified that phase one must also cover the overall ordinary user
+experience: prepared art throughout the shipped character/enemy catalogue, discoverable creation
+and editing, imported-card artwork, Builder interview integration and reuse throughout later play.
+The initial ready-to-merge claim does not cover that outcome and is withdrawn. Hold merge while
+these gaps are completed. Current source audit found no bundled character art added by this PR,
+no interview-owned art stage, and imported PNG card portraits still retained as reference-only
+descriptors. The existing source/scripted checks qualify the hooks, not completion of these
+workflows. Real generation remains deferred by the earlier owner selection; live subscription,
+installed-app and TD trailer acceptance remain unverified. Merge follows the Pneuma IO rulebook's
+delivery and cleanup sequence.
 
 **9 November 2026: optional onboarding and the complete tutorial suite.** The owner selected a new
 PR for all independently accessible lessons and a guided welcome, AI connection, Ready campaign
