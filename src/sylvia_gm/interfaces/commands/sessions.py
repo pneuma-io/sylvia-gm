@@ -2,35 +2,85 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
-from typing import Any
+import dataclasses
+import hashlib
+from collections.abc import Iterator, Mapping, Sequence
+from typing import Any, BinaryIO, cast
+
+from sylvia_gm.agent._builder_question_answers import (
+    builder_question_answer_content,
+    builder_question_details,
+)
+from sylvia_gm.agent._builder_session import (
+    BuilderTurnResult,
+    CampaignContentToolAuthority,
+    persist_builder_turn,
+    stream_builder_turn,
+)
+from sylvia_gm.agent._provider_session import ProviderSessionAdapter
+from sylvia_gm.agent._session_loop import (
+    ProviderControl,
+    ProviderEvent,
+    SessionInputKind,
+    SessionProviderInput,
+    SessionRunRequest,
+)
+from sylvia_gm.agent._stateless_mcp import ModelMechanicsTool
+from sylvia_gm.application.builder_references import (
+    launch_candidate,
+    launch_references,
+    reference_reader,
+)
+from sylvia_gm.application.bundled_packages import bundled_rift_authority
+from sylvia_gm.application.campaign_library_selection import (
+    participant_catalog_payload,
+    require_completed_plan_characters,
+)
+from sylvia_gm.application.campaign_plan_sources import (
+    CampaignPlanToolAuthority,
+    campaign_plan_sources,
+    validate_retained_campaign_plan,
+)
+from sylvia_gm.application.character_profiles import (
+    load_character_profile,
+    profile_from_snapshot,
+    save_character_profile,
+)
+from sylvia_gm.application.compatible_character_copy import (
+    authored_character_state,
+    copy_compatible_character,
+)
+from sylvia_gm.application.import_repair import materialize_repair_draft
+from sylvia_gm.application.library_sources import LibrarySourceReader
+from sylvia_gm.application.plan_snapshot import validate_plan_snapshot
+from sylvia_gm.application.reusable_participants import save_reusable_participant
+from sylvia_gm.application.reusable_plans import save_reusable_campaign_plan
+from sylvia_gm.builder._campaign_plan_materializer import (
+    CampaignPlanDraft,
+    publish_campaign_plan_files,
+)
+from sylvia_gm.builder._plan_draft_check import check_plan_draft
+from sylvia_gm.builder._plan_snapshot_materializer import materialize_plan_snapshot_draft
+from sylvia_gm.builder._setting_draft_check import check_setting_draft
+from sylvia_gm.builder._setting_materializer import materialize_setting_draft
+from sylvia_gm.campaign.rift import RIFT_RULESET_ID
+from sylvia_gm.config.provider_settings import (
+    clear_session_model_once_settings,
+    provider_settings,
+    session_model_once_settings,
+)
+from sylvia_gm.domain.authority import PackageRole, SafePayload, WriterRole
+from sylvia_gm.domain.campaign_plan import PackageBinding
+from sylvia_gm.domain.errors import CommandRejected
+from sylvia_gm.domain.package_library import campaign_setting_entries, canonical_json_bytes
+from sylvia_gm.domain.session import SessionMessageKind
+from sylvia_gm.interfaces._session_reasoning import reasoning_state
+from sylvia_gm.provider._admin_audit import AdminAuditedProvider
+from sylvia_gm.provider._reasoning import bind_session_reasoning
 
 from ..owner_process import (
     _MAX_USER_TEXT_CHARS,
-    RIFT_RULESET_ID,
-    AdminAuditedProvider,
-    BinaryIO,
-    BuilderTurnResult,
-    CampaignContentToolAuthority,
-    CampaignPlanDraft,
-    CampaignPlanToolAuthority,
-    CommandRejected,
-    Iterator,
-    LibrarySourceReader,
-    ModelMechanicsTool,
     OwnerProtocolError,
-    PackageBinding,
-    PackageRole,
-    ProviderControl,
-    ProviderEvent,
-    ProviderSessionAdapter,
-    SafePayload,
-    Sequence,
-    SessionInputKind,
-    SessionMessageKind,
-    SessionProviderInput,
-    SessionRunRequest,
-    WriterRole,
     _admitted_dm_campaign_plan,
     _builder_workspace,
     _campaign_content_tool_authority,
@@ -50,42 +100,6 @@ from ..owner_process import (
     _selection_from_reference,
     _switch_session_model,
     _switch_session_reasoning,
-    authored_character_state,
-    bind_session_reasoning,
-    builder_question_answer_content,
-    builder_question_details,
-    bundled_rift_authority,
-    campaign_plan_sources,
-    campaign_setting_entries,
-    canonical_json_bytes,
-    cast,
-    check_plan_draft,
-    check_setting_draft,
-    clear_session_model_once_settings,
-    copy_compatible_character,
-    dataclasses,
-    hashlib,
-    launch_candidate,
-    launch_references,
-    load_character_profile,
-    materialize_plan_snapshot_draft,
-    materialize_repair_draft,
-    materialize_setting_draft,
-    participant_catalog_payload,
-    persist_builder_turn,
-    profile_from_snapshot,
-    provider_settings,
-    publish_campaign_plan_files,
-    reasoning_state,
-    reference_reader,
-    require_completed_plan_characters,
-    save_character_profile,
-    save_reusable_campaign_plan,
-    save_reusable_participant,
-    session_model_once_settings,
-    stream_builder_turn,
-    validate_plan_snapshot,
-    validate_retained_campaign_plan,
 )
 from . import DispatchContext
 

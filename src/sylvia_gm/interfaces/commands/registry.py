@@ -49,7 +49,8 @@ _COMMANDS = (
         True, False,
     ),
     Command(
-        'delete_reusable_library_entry', _handler('campaigns', 'handle_delete_reusable_library_entry'),
+        'delete_reusable_library_entry',
+        _handler('campaigns', 'handle_delete_reusable_library_entry'),
         True, True,
     ),
     Command('builder_chat_index', _handler('builder', 'handle_builder_chat_index'), True, True),
@@ -105,11 +106,13 @@ _COMMANDS = (
     ),
     Command('package_candidates', _handler('packages', 'handle_package_candidates'), True, True),
     Command(
-        'campaign_rules_update_options', _handler('campaigns', 'handle_campaign_rules_update_options'),
+        'campaign_rules_update_options',
+        _handler('campaigns', 'handle_campaign_rules_update_options'),
         True, False,
     ),
     Command(
-        'preview_campaign_rules_update', _handler('campaigns', 'handle_preview_campaign_rules_update'),
+        'preview_campaign_rules_update',
+        _handler('campaigns', 'handle_preview_campaign_rules_update'),
         True, False,
     ),
     Command(
@@ -235,7 +238,8 @@ _COMMANDS = (
     ),
     Command('install_package', _handler('packages', 'handle_install_package'), False, True),
     Command(
-        'confirm_character_card_import', _handler('packages', 'handle_confirm_character_card_import'),
+        'confirm_character_card_import',
+        _handler('packages', 'handle_confirm_character_card_import'),
         True, True,
     ),
     Command(
@@ -252,11 +256,13 @@ _COMMANDS = (
         True, True,
     ),
     Command(
-        'create_guided_campaign_draft', _handler('campaigns', 'handle_create_guided_campaign_draft'),
+        'create_guided_campaign_draft',
+        _handler('campaigns', 'handle_create_guided_campaign_draft'),
         True, True,
     ),
     Command(
-        'navigate_guided_campaign_draft', _handler('campaigns', 'handle_navigate_guided_campaign_draft'),
+        'navigate_guided_campaign_draft',
+        _handler('campaigns', 'handle_navigate_guided_campaign_draft'),
         True, True,
     ),
     Command(

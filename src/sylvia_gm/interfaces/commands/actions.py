@@ -5,11 +5,11 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
+from sylvia_gm.application.authority import ActionCommand, ResolveMechanicsChoiceCommand
+from sylvia_gm.domain.authority import WriterRole
+
 from ..owner_process import (
-    ActionCommand,
     OwnerProtocolError,
-    ResolveMechanicsChoiceCommand,
-    WriterRole,
     _optional_nonnegative_int,
     _optional_payload,
     _optional_text,
