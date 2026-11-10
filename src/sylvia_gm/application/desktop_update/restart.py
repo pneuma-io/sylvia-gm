@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import uuid
 from collections.abc import Callable
+from enum import StrEnum
 from pathlib import Path
 from typing import TypeVar
 
 from .checkpoint import schema_identity
 from .manifest import UpdateError, Version, bounded_json
 from .storage import (
+    UpdatePhase,
     atomic_receipt,
     checked_file,
     directory_identity,
@@ -17,13 +19,26 @@ from .storage import (
     operation_id,
 )
 
+
+class RestartPhase(StrEnum):
+    PENDING = "pending"
+    LAUNCHING = "launching"
+    LAUNCHED = "launched"
+    LAUNCH_FAILED = "launch_failed"
+
+
 Launched = TypeVar("Launched")
 MAX_RECOVERY_STARTS = 64
 
 
 class RestartHandshake:
     def __init__(
-        self, data_root: Path, identity: str, attempt: str, *, recovery: bool = False,
+        self,
+        data_root: Path,
+        identity: str,
+        attempt: str,
+        *,
+        recovery: bool = False,
     ) -> None:
         self.root = data_root
         self.identity, self.attempt = operation_id(identity), operation_id(attempt)
@@ -40,8 +55,10 @@ class RestartHandshake:
     def _generation(self) -> Path:
         selected = bounded_json(checked_file(self.selection, maximum=4096))
         if (
-            not isinstance(selected, dict) or set(selected) != {"format_version", "nonce"}
-            or type(selected["format_version"]) is not int or selected["format_version"] != 1
+            not isinstance(selected, dict)
+            or set(selected) != {"format_version", "nonce"}
+            or type(selected["format_version"]) is not int
+            or selected["format_version"] != 1
         ):
             raise UpdateError("invalid_restart", "The selected recovery restart is invalid.")
         path = self.stage / "rollback-starts" / operation_id(selected["nonce"])
@@ -54,14 +71,18 @@ class RestartHandshake:
 
     @property
     def receipt(self) -> Path:
-        return self._generation() / "startup-confirmed.json" if self.recovery else (
-            self.stage / "startup-confirmed.json"
+        return (
+            self._generation() / "startup-confirmed.json"
+            if self.recovery
+            else (self.stage / "startup-confirmed.json")
         )
 
     @property
     def error_receipt(self) -> Path:
-        return self._generation() / "helper-error.json" if self.recovery else (
-            self.stage / "helper-error.json"
+        return (
+            self._generation() / "helper-error.json"
+            if self.recovery
+            else (self.stage / "helper-error.json")
         )
 
     def _select_recovery(self, row: dict[str, object]) -> None:
@@ -120,7 +141,7 @@ class RestartHandshake:
             "operation_id": self.identity,
             "attempt": self.attempt,
             "nonce": nonce,
-            "phase": "pending",
+            "phase": RestartPhase.PENDING.value,
             "version": version.text,
             "target": target,
             "distribution": distribution,
@@ -143,7 +164,7 @@ class RestartHandshake:
             raise UpdateError("stale_restart", "The reviewed recovery restart changed.")
         # The previous generation, acknowledgement and failure stay immutable in their folder.
         nonce = uuid.uuid4().hex
-        self._select_recovery({**row, "nonce": nonce, "phase": "pending"})
+        self._select_recovery({**row, "nonce": nonce, "phase": RestartPhase.PENDING.value})
         return nonce
 
     def _load(self) -> dict[str, object]:
@@ -169,7 +190,13 @@ class RestartHandshake:
             or row["format_version"] != 1
             or row["operation_id"] != self.identity
             or row["attempt"] != self.attempt
-            or row["phase"] not in {"pending", "launching", "launched", "launch_failed"}
+            or row["phase"]
+            not in {
+                RestartPhase.PENDING,
+                RestartPhase.LAUNCHING,
+                RestartPhase.LAUNCHED,
+                RestartPhase.LAUNCH_FAILED,
+            }
             or row["target"] != "windows-x86_64"
             or row["distribution"] not in {"installed", "portable"}
             or type(row["storage_compatibility"]) is not int
@@ -180,7 +207,8 @@ class RestartHandshake:
         operation_id(row["nonce"])
         if self.recovery and self._generation().name != row["nonce"]:
             raise UpdateError(
-                "invalid_restart", "The recovery generation does not match its ticket.",
+                "invalid_restart",
+                "The recovery generation does not match its ticket.",
             )
         Version.parse(row["version"])
         for name in ("data_identity", "app_identity"):
@@ -195,27 +223,31 @@ class RestartHandshake:
 
     def launch_once(self, launch: Callable[[tuple[str, ...]], Launched]) -> Launched:
         row = self._load()
-        if row["phase"] != "pending":
+        if row["phase"] != RestartPhase.PENDING:
             raise UpdateError(
                 "restart_already_attempted",
                 "This restart has already been attempted. "
                 "Reconcile its result before starting another process.",
             )
-        row["phase"] = "launching"
+        row["phase"] = RestartPhase.LAUNCHING.value
         atomic_receipt(self.ticket, row)
         try:
             process = launch(
-                ("--sylvia-update-recovery-start" if self.recovery else "--sylvia-update-start",
-                 self.identity, self.attempt, str(row["nonce"]))
+                (
+                    "--sylvia-update-recovery-start" if self.recovery else "--sylvia-update-start",
+                    self.identity,
+                    self.attempt,
+                    str(row["nonce"]),
+                )
             )
         except OSError as error:
-            row["phase"] = "launch_failed"
+            row["phase"] = RestartPhase.LAUNCH_FAILED.value
             atomic_receipt(self.ticket, row)
             raise UpdateError(
                 "restart_failed", "The updated app could not start. Recovery is retained."
             ) from error
         # If this write fails the launch remains ambiguous. No automatic second launch is allowed.
-        row["phase"] = "launched"
+        row["phase"] = RestartPhase.LAUNCHED.value
         atomic_receipt(self.ticket, row)
         return process
 
@@ -233,7 +265,7 @@ class RestartHandshake:
         """Check the exact native/owner context before migrations, without acknowledging startup."""
         row = self._load()
         if (
-            row["phase"] not in {"launching", "launched"}
+            row["phase"] not in {RestartPhase.LAUNCHING, RestartPhase.LAUNCHED}
             or operation_id(nonce) != row["nonce"]
             or desktop_version != row["version"]
             or owner_version != row["version"]
@@ -261,15 +293,19 @@ class RestartHandshake:
     ) -> None:
         """Called after the actual app/owner have opened usable storage, never before migration."""
         row = self.authorize(
-            nonce=nonce, live=live, desktop_version=desktop_version,
-            owner_version=owner_version, target=target, distribution=distribution,
+            nonce=nonce,
+            live=live,
+            desktop_version=desktop_version,
+            owner_version=owner_version,
+            target=target,
+            distribution=distribution,
             storage_compatibility=storage_compatibility,
         )
         database = self.root / "authority.sqlite3"
         schema_version, schema_sha256 = schema_identity(database)
         value = {
             **row,
-            "phase": "confirmed",
+            "phase": UpdatePhase.CONFIRMED.value,
             "desktop_version": desktop_version,
             "owner_version": owner_version,
             "schema_version": schema_version,
@@ -290,11 +326,11 @@ class RestartHandshake:
             return False
         receipt = bounded_json(checked_file(self.receipt, maximum=8192))
         if (
-            row["phase"] not in {"launching", "launched"}
+            row["phase"] not in {RestartPhase.LAUNCHING, RestartPhase.LAUNCHED}
             or not isinstance(receipt, dict)
             or set(receipt)
             != row.keys() | {"schema_version", "schema_sha256", "desktop_version", "owner_version"}
-            or receipt.get("phase") != "confirmed"
+            or receipt.get("phase") != UpdatePhase.CONFIRMED
             or receipt["desktop_version"] != row["version"]
             or receipt["owner_version"] != row["version"]
             or any(receipt[key] != value for key, value in row.items() if key != "phase")
