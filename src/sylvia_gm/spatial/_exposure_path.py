@@ -10,13 +10,13 @@ unchanged. The query projects translated poses without mutating its input scene.
 from __future__ import annotations
 
 import math
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import replace
 from itertools import combinations
 from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:
-    from sylvia_gm.spatial._engine import Vec3, _CompiledScene
+    from sylvia_gm.spatial._engine import Vec3, _CompiledScene, _SpatialObject
 
 
 class _TestLimitError(Exception):
@@ -78,7 +78,10 @@ def resolve_exposure_path(scene: _CompiledScene, query: Mapping[str, object]) ->
     tests = 0
 
     def result(
-        reason: str, point: Vec3 | None = None, distance: float | None = None, exposure: float = 0
+        reason: str,
+        point: Sequence[float] | None = None,
+        distance: float | None = None,
+        exposure: float = 0,
     ) -> dict[str, object]:
         return {
             **_provenance(scene, "exposure_path"),
@@ -95,21 +98,30 @@ def resolve_exposure_path(scene: _CompiledScene, query: Mapping[str, object]) ->
         # Each covered cell uses the existing exact box/edge visibility solver.
         # Never run the bounding rectangle as though it were covered ground.
         witnesses = []
-        remaining = query["max_tests"]
+        remaining = cast(int, query["max_tests"])
         for part in zone.shape.parts:
             if remaining <= 0:
                 return result("TEST_LIMIT")
-            cell_scene = replace(scene, zones=tuple(replace(z, shape=part) if z is zone else z for z in scene.zones))
+            cell_scene = replace(
+                scene,
+                zones=tuple(replace(z, shape=part) if z is zone else z for z in scene.zones),
+            )
             witness = resolve_exposure_path(cell_scene, {**query, "max_tests": remaining})
-            tests += witness["tests"]
-            remaining -= witness["tests"]
+            witness_tests = cast(int, witness["tests"])
+            tests += witness_tests
+            remaining -= witness_tests
             if not witness["supported"]:
-                return result(witness["reason"])
+                return result(cast(str, witness["reason"]))
             if witness["found"]:
                 witnesses.append(witness)
         if witnesses:
-            witness = min(witnesses, key=lambda v: v["distance"])
-            return result("FOUND", witness["point"], witness["distance"], witness["exposure"])
+            witness = min(witnesses, key=lambda v: cast(float, v["distance"]))
+            return result(
+                "FOUND",
+                cast(Sequence[float], witness["point"]),
+                cast(float, witness["distance"]),
+                cast(float, witness["exposure"]),
+            )
         return result("NO_EXPOSURE")
     if (
         target.shape.kind != "box"
@@ -123,7 +135,7 @@ def resolve_exposure_path(scene: _CompiledScene, query: Mapping[str, object]) ->
     if "metadata_filter" in query:
         exposure_query["metadata_filter"] = query["metadata_filter"]
 
-    def projected(point: Vec3):
+    def projected(point: Vec3) -> _SpatialObject:
         shift = tuple(point[i] - center[i] for i in range(3))
         shape = replace(
             target.shape,
@@ -200,15 +212,15 @@ def resolve_exposure_path(scene: _CompiledScene, query: Mapping[str, object]) ->
                                 )
                 if len(cuts) > 20_000:
                     return result("TEST_LIMIT")
-            cuts = sorted(cuts)
-            for index, left in enumerate(cuts):
+            ordered_cuts = sorted(cuts)
+            for index, left in enumerate(ordered_cuts):
                 point = _point_at(start, delta, left)
                 fraction = exposure_at(point)
                 if fraction > 0 and _inside_shape(zone.shape, point):
                     return result("FOUND", point, cumulative + left * length, fraction)
-                if index + 1 == len(cuts):
+                if index + 1 == len(ordered_cuts):
                     continue
-                right = (left + cuts[index + 1]) / 2
+                right = (left + ordered_cuts[index + 1]) / 2
                 fraction = exposure_at(_point_at(start, delta, right))
                 if fraction <= 0:
                     continue

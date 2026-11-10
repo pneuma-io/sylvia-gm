@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import math
 from collections.abc import Mapping, Sequence
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Never, cast
 
 if TYPE_CHECKING:
     from sylvia_gm.spatial._interface import AdmittedSpatialMutation, AdmittedSpatialScene
@@ -25,7 +25,7 @@ def grid_lane_zone(scene: Mapping[str, Any], owner_id: str, selection: object) -
     """
     from sylvia_gm.spatial._interface import SpatialValidationError
 
-    def reject(message):
+    def reject(message: str) -> Never:
         raise SpatialValidationError(message, code="spatial_lane_invalid", path="$.lane")
 
     if (isinstance(selection, Sequence) and not isinstance(selection, (str, bytes))
@@ -124,7 +124,8 @@ def mutate_grid_lane(
         admit_spatial_scene,
     )
 
-    payload = scene.as_payload()
+    # Scene admission validated these nested JSON containers before mutation.
+    payload = cast(dict[str, Any], scene.as_payload())
     zone = grid_lane_zone(payload, request["owner_id"], request["lane"])
     existing = next((z for z in payload["zones"] if z["id"] == zone["id"]), None)
     if existing is not None and existing["metadata"].get("owner") != request["owner_id"]:
@@ -139,7 +140,7 @@ def mutate_grid_lane(
     payload["map"]["revision"] += 1
     advanced = admit_spatial_scene(payload)
 
-    def digest(value):
+    def digest(value: object) -> str:
         return hashlib.sha256(canonical_json_bytes(value)).hexdigest()
 
     return AdmittedSpatialMutation(

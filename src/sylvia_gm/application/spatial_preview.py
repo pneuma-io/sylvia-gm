@@ -58,8 +58,10 @@ def project_spatial_preview(
         output.update(identity)
         if operation == "grid_lane":
             zone = result["zone"]
-            output["grid_lane"] = {"shape": zone["shape"], "owner": query["owner_id"],
-                                   "lane": query["lane"], "label": zone["metadata"]["player"]["label"]}
+            output["grid_lane"] = {
+                "shape": zone["shape"], "owner": query["owner_id"],
+                "lane": query["lane"], "label": zone["metadata"]["player"]["label"],
+            }
         elif operation == "path":
             grid = scene["map"]["grid"]
             points = [
