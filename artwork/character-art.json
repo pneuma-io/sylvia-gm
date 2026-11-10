@@ -3856,6 +3856,186 @@
         "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for Drum in Sylvia GM's Severed Lands. Input image 1 is the canonical full-body identity and exact clothing/accessory reference. Preserve that one person's exact face, age, build, skin, hair, expression, clothes, footwear and equipment. One landscape PNG, 1536x1024. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background, soft consistent studio light. Show front, exact side profile and back views of the SAME person as three complete standing figures at a common scale, all comfortably within margins, plus one close facial detail. Preserve the hairstyle, braid position, scarf, spectacles and costume construction between views as applicable. Appearance: An unassuming adult Human man appearing in his early fifties, with a lean medium build, light olive skin, brown eyes, short neatly combed dark hair graying at the temples, a clean-shaven face and modest round wire-rim spectacles. A restrained cautious expression with a slightly worried brow; tidy contained posture. A plain faded olive-brown short coat over a light gray collared shirt and dark gray waistcoat, practical brown trousers, worn brown leather shoes and an ordinary belt. Empty hands and no displayed valuables. These are editable visual defaults. No drum or musical instrument, gang symbols, noble finery, weapon, branded goods, readable ledgers, exposed contraband or invented identifying history. No other characters, captions, readable text, labels, symbols, border, UI, magic or scenery.",
         "portrait": "Use case: identity-preserve. Production square app portrait for Drum from Severed Lands. Input image 1 is the canonical full-body reference and image 2 is the multiview sheet. Preserve this exact adult face, age, skin, eyes, hairstyle, expression, clothing and applicable scarf/spectacles. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light. Head and upper shoulders, near-forward gaze, centered face, eye line near 35 percent down and chin near 65 percent down, with comfortable headroom above all hair. Appearance: An unassuming adult Human man appearing in his early fifties, with a lean medium build, light olive skin, brown eyes, short neatly combed dark hair graying at the temples, a clean-shaven face and modest round wire-rim spectacles. A restrained cautious expression with a slightly worried brow; tidy contained posture. A plain faded olive-brown short coat over a light gray collared shirt and dark gray waistcoat, practical brown trousers, worn brown leather shoes and an ordinary belt. Empty hands and no displayed valuables. These are editable visual defaults. No drum or musical instrument, gang symbols, noble finery, weapon, branded goods, readable ledgers, exposed contraband or invented identifying history. Continuous full-bleed square background and clothing to all edges. No painted circle, cutout, vignette, border, captions, readable text, UI, scene, new costume, magical effects or extra people. Preserve identity and change only framing. One 1024x1024 PNG."
       }
+    },
+    {
+      "id": "severed-npc-brother-ash",
+      "name": "Brother Ash",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/brother-ash.md",
+          "sha256": "8e186a775084ce525d0708d803576b0a64a6cb4e7c7a19a8ed40b01d23eb4a77",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/brother-ash.md",
+          "sha256": "ac9acd77e64aa026e9cf7e3b994e2205c4aeada991b26e4c6bd0616285c0c04b",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An eighty-year-old humanlike Riftborn man with a lean, age-worn build, warm brown skin, kind dark brown eyes, short thin white hair and a close white beard. His face is deeply lined and patient. Battered dull steel armor with mismatched repaired plates over a faded charcoal padded coat, plain dark trousers and scuffed brown boots. He cradles a thick closed leather-bound ledger with yellowed page edges in one arm; the book is treasured and unlabelled. His posture is gently stooped but steady. Age, battered armor and the ledger follow the authored profile; other appearance details are editable visual defaults. His home world remains unknown. No glowing magic, religious insignia, youthful physique, grand ceremonial armor, readable names or invented origin.",
+        "full_body": {
+          "path": "assets/characters/666110908fad7f65a8e1c528e6960478b156270651715a1f55db7d24f09394b0.png",
+          "sha256": "666110908fad7f65a8e1c528e6960478b156270651715a1f55db7d24f09394b0"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/2dc5caeb6c518283f271c9acdbd088de871a655e689103d7c803211d03bdbea2.png",
+          "sha256": "2dc5caeb6c518283f271c9acdbd088de871a655e689103d7c803211d03bdbea2"
+        },
+        "portrait": {
+          "path": "assets/characters/0e37e601e59867fc6dc631afed193f64aa197ae1323a14654d4c11c67666e7af.png",
+          "sha256": "0e37e601e59867fc6dc631afed193f64aa197ae1323a14654d4c11c67666e7af"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2067909
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2395886
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2660124
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Brother Ash in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete person standing quietly in a near-front three-quarter pose, the closed ledger tucked against his torso, whole hair, hands, clothing, feet and any chair comfortably inside all margins. Appearance: An eighty-year-old humanlike Riftborn man with a lean, age-worn build, warm brown skin, kind dark brown eyes, short thin white hair and a close white beard. His face is deeply lined and patient. Battered dull steel armor with mismatched repaired plates over a faded charcoal padded coat, plain dark trousers and scuffed brown boots. He cradles a thick closed leather-bound ledger with yellowed page edges in one arm; the book is treasured and unlabelled. His posture is gently stooped but steady. Age, battered armor and the ledger follow the authored profile; other appearance details are editable visual defaults. His home world remains unknown. No glowing magic, religious insignia, youthful physique, grand ceremonial armor, readable names or invented origin. Preserve authored identity, personality, age and pronouns. No other people, duplicate limbs, scenery, captions, text, labels, logo, border or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Brother Ash from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve that exact elderly face, age, body proportions, hair, clothing, colors and material wear. All body views show the same quiet natural standing posture. Appearance: An eighty-year-old humanlike Riftborn man with a lean, age-worn build, warm brown skin, kind dark brown eyes, short thin white hair and a close white beard. His face is deeply lined and patient. Battered dull steel armor with mismatched repaired plates over a faded charcoal padded coat, plain dark trousers and scuffed brown boots. He cradles a thick closed leather-bound ledger with yellowed page edges in one arm; the book is treasured and unlabelled. His posture is gently stooped but steady. Age, battered armor and the ledger follow the authored profile; other appearance details are editable visual defaults. His home world remains unknown. No glowing magic, religious insignia, youthful physique, grand ceremonial armor, readable names or invented origin. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Entire bodies, footwear and applicable chair or closed ledger inside margins, consistent scale across three body views. Exactly the same one character repeated as turnaround views, no extra character. No labels, readable text, captions, borders, logos, UI, scenery or invented insignia. Change viewing angle only; keep identity and practical costume unchanged.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Brother Ash from Severed Lands. Input image 1 is the canonical full-body reference, image 2 is the matching multiview sheet. Preserve this exact elderly face, skin, eyes, wrinkles, age, hairstyle, expression and practical clothing. Appearance: An eighty-year-old humanlike Riftborn man with a lean, age-worn build, warm brown skin, kind dark brown eyes, short thin white hair and a close white beard. His face is deeply lined and patient. Battered dull steel armor with mismatched repaired plates over a faded charcoal padded coat, plain dark trousers and scuffed brown boots. He cradles a thick closed leather-bound ledger with yellowed page edges in one arm; the book is treasured and unlabelled. His posture is gently stooped but steady. Age, battered armor and the ledger follow the authored profile; other appearance details are editable visual defaults. His home world remains unknown. No glowing magic, religious insignia, youthful physique, grand ceremonial armor, readable names or invented origin. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Head and upper shoulders, near-forward gaze, centered face, eye line near 35 percent down and chin near 65 percent down, with comfortable headroom above all hair. Continuous full-bleed square background and clothing to all edges. No painted circle, cutout, vignette, border, captions, readable text, UI, scene, new costume, magical effects or extra people. Preserve identity and change framing only. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-mother-wick",
+      "name": "Mother Wick",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/mother-wick.md",
+          "sha256": "1d2c0b2044d0decb9111d192fcef4a5839e53ef09b208028eecd3588172d2ac3",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/mother-wick.md",
+          "sha256": "c0a63058c5cffe1ddfe53a2989b29e37d18d21eca4a8b11c6bec17aa3ae56d21",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A small humanlike Riftborn woman appearing in her early sixties, with a slight build, medium olive skin, dark brown eyes, soft facial lines and tired but protective warmth. Gray hair is gathered in a simple low bun. A plain muted clay-brown ankle-length robe, faded blue-gray wool shawl, narrow unadorned cloth belt and worn dark leather shoes. Empty hands rest quietly together. Her small stature and gentle tired bearing follow the authored profile; other appearance details are editable visual defaults. Her home world remains unknown. No candles growing from her body, flames, glowing eyes, invented Church symbols, elaborate vestments, exposed private records or invented origin.",
+        "full_body": {
+          "path": "assets/characters/ab94aec5d29135248f5dff655ec86953be948386e8ba031b2413602539eac169.png",
+          "sha256": "ab94aec5d29135248f5dff655ec86953be948386e8ba031b2413602539eac169"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/af54c08682e7c00c729005f083b52554de07033d317875ffddb25ad63e5b2498.png",
+          "sha256": "af54c08682e7c00c729005f083b52554de07033d317875ffddb25ad63e5b2498"
+        },
+        "portrait": {
+          "path": "assets/characters/48cc4ada082e4bd68b746dd737559d634c45abdd678234eb33bdcd5b481ffaf8.png",
+          "sha256": "48cc4ada082e4bd68b746dd737559d634c45abdd678234eb33bdcd5b481ffaf8"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2067818
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2441721
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2502920
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Mother Wick in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete person standing naturally in a near-front three-quarter pose, both hands quietly together, whole hair, hands, clothing, feet and any chair comfortably inside all margins. Appearance: A small humanlike Riftborn woman appearing in her early sixties, with a slight build, medium olive skin, dark brown eyes, soft facial lines and tired but protective warmth. Gray hair is gathered in a simple low bun. A plain muted clay-brown ankle-length robe, faded blue-gray wool shawl, narrow unadorned cloth belt and worn dark leather shoes. Empty hands rest quietly together. Her small stature and gentle tired bearing follow the authored profile; other appearance details are editable visual defaults. Her home world remains unknown. No candles growing from her body, flames, glowing eyes, invented Church symbols, elaborate vestments, exposed private records or invented origin. Preserve authored identity, personality, age and pronouns. No other people, duplicate limbs, scenery, captions, text, labels, logo, border or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Mother Wick from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve that exact elderly face, age, body proportions, hair, clothing, colors and material wear. All body views show the same quiet natural standing posture. Appearance: A small humanlike Riftborn woman appearing in her early sixties, with a slight build, medium olive skin, dark brown eyes, soft facial lines and tired but protective warmth. Gray hair is gathered in a simple low bun. A plain muted clay-brown ankle-length robe, faded blue-gray wool shawl, narrow unadorned cloth belt and worn dark leather shoes. Empty hands rest quietly together. Her small stature and gentle tired bearing follow the authored profile; other appearance details are editable visual defaults. Her home world remains unknown. No candles growing from her body, flames, glowing eyes, invented Church symbols, elaborate vestments, exposed private records or invented origin. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Entire bodies, footwear and applicable chair or closed ledger inside margins, consistent scale across three body views. Exactly the same one character repeated as turnaround views, no extra character. No labels, readable text, captions, borders, logos, UI, scenery or invented insignia. Change viewing angle only; keep identity and practical costume unchanged.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Mother Wick from Severed Lands. Input image 1 is the canonical full-body reference, image 2 is the matching multiview sheet. Preserve this exact elderly face, skin, eyes, wrinkles, age, hairstyle, expression and practical clothing. Appearance: A small humanlike Riftborn woman appearing in her early sixties, with a slight build, medium olive skin, dark brown eyes, soft facial lines and tired but protective warmth. Gray hair is gathered in a simple low bun. A plain muted clay-brown ankle-length robe, faded blue-gray wool shawl, narrow unadorned cloth belt and worn dark leather shoes. Empty hands rest quietly together. Her small stature and gentle tired bearing follow the authored profile; other appearance details are editable visual defaults. Her home world remains unknown. No candles growing from her body, flames, glowing eyes, invented Church symbols, elaborate vestments, exposed private records or invented origin. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Head and upper shoulders, near-forward gaze, centered face, eye line near 35 percent down and chin near 65 percent down, with comfortable headroom above all hair. Continuous full-bleed square background and clothing to all edges. No painted circle, cutout, vignette, border, captions, readable text, UI, scene, new costume, magical effects or extra people. Preserve identity and change framing only. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-old-finch",
+      "name": "Old Finch",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/old-finch.md",
+          "sha256": "03d47f86e6bd4a742f11a602d42d4649f19fd19ac6bce4c6fa8a17feaa729314",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/old-finch.md",
+          "sha256": "0307489b58ef2c1c1d217b11489cd01bcc8e7ed7da3c10acec11e3a0876a809e",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An elderly humanlike Riftborn man appearing in his late seventies, with a thin frail build, pale weathered skin, hazel eyes, sparse swept-back silver hair and a short uneven white beard. A cranky but warm expression with alert storytelling eyes. A faded rust-brown wool vest over a plain cream shirt, soft charcoal trousers and worn dark shoes. He sits comfortably in a simple sturdy wooden armchair, legs resting naturally and both age-worn hands loosely supported on his lap or the chair arms. His reduced leg mobility and shaky hands follow the authored profile; age styling, chair and other appearance details are editable visual defaults. His home world remains unknown. No bird anatomy, wings, youthful adventurer pose, forced unsupported standing, magical disability cure, invented medals or origin.",
+        "full_body": {
+          "path": "assets/characters/c81e712a246729154846bb96d43eb13e54fff30426a0cbb231e5b62c690bd575.png",
+          "sha256": "c81e712a246729154846bb96d43eb13e54fff30426a0cbb231e5b62c690bd575"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/9fb44e360041c09740696a7222a1ed080b412fda91bc663b1c1368e98934715d.png",
+          "sha256": "9fb44e360041c09740696a7222a1ed080b412fda91bc663b1c1368e98934715d"
+        },
+        "portrait": {
+          "path": "assets/characters/6efdedc822e541239a931f35b66e9acd5e3a282bcf8b0ab3f916b3d72efe42e7.png",
+          "sha256": "6efdedc822e541239a931f35b66e9acd5e3a282bcf8b0ab3f916b3d72efe42e7"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2353926
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2489936
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2798078
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Old Finch in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete person seated comfortably in a simple wooden armchair in a near-front three-quarter view, the whole body, both feet and entire chair visible, whole hair, hands, clothing, feet and any chair comfortably inside all margins. Appearance: An elderly humanlike Riftborn man appearing in his late seventies, with a thin frail build, pale weathered skin, hazel eyes, sparse swept-back silver hair and a short uneven white beard. A cranky but warm expression with alert storytelling eyes. A faded rust-brown wool vest over a plain cream shirt, soft charcoal trousers and worn dark shoes. He sits comfortably in a simple sturdy wooden armchair, legs resting naturally and both age-worn hands loosely supported on his lap or the chair arms. His reduced leg mobility and shaky hands follow the authored profile; age styling, chair and other appearance details are editable visual defaults. His home world remains unknown. No bird anatomy, wings, youthful adventurer pose, forced unsupported standing, magical disability cure, invented medals or origin. Preserve authored identity, personality, age and pronouns. No other people, duplicate limbs, scenery, captions, text, labels, logo, border or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Old Finch from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve that exact elderly face, age, body proportions, hair, clothing, colors and material wear. Every body view keeps him seated in the same simple wooden chair with both feet supported naturally. Do not make him stand or remove his mobility limits. Appearance: An elderly humanlike Riftborn man appearing in his late seventies, with a thin frail build, pale weathered skin, hazel eyes, sparse swept-back silver hair and a short uneven white beard. A cranky but warm expression with alert storytelling eyes. A faded rust-brown wool vest over a plain cream shirt, soft charcoal trousers and worn dark shoes. He sits comfortably in a simple sturdy wooden armchair, legs resting naturally and both age-worn hands loosely supported on his lap or the chair arms. His reduced leg mobility and shaky hands follow the authored profile; age styling, chair and other appearance details are editable visual defaults. His home world remains unknown. No bird anatomy, wings, youthful adventurer pose, forced unsupported standing, magical disability cure, invented medals or origin. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Entire bodies, footwear and applicable chair or closed ledger inside margins, consistent scale across three body views. Exactly the same one character repeated as turnaround views, no extra character. No labels, readable text, captions, borders, logos, UI, scenery or invented insignia. Change viewing angle only; keep identity and practical costume unchanged.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Old Finch from Severed Lands. Input image 1 is the canonical full-body reference, image 2 is the matching multiview sheet. Preserve this exact elderly face, skin, eyes, wrinkles, age, hairstyle, expression and practical clothing. Appearance: An elderly humanlike Riftborn man appearing in his late seventies, with a thin frail build, pale weathered skin, hazel eyes, sparse swept-back silver hair and a short uneven white beard. A cranky but warm expression with alert storytelling eyes. A faded rust-brown wool vest over a plain cream shirt, soft charcoal trousers and worn dark shoes. He sits comfortably in a simple sturdy wooden armchair, legs resting naturally and both age-worn hands loosely supported on his lap or the chair arms. His reduced leg mobility and shaky hands follow the authored profile; age styling, chair and other appearance details are editable visual defaults. His home world remains unknown. No bird anatomy, wings, youthful adventurer pose, forced unsupported standing, magical disability cure, invented medals or origin. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Head and upper shoulders, near-forward gaze, centered face, eye line near 35 percent down and chin near 65 percent down, with comfortable headroom above all hair. Continuous full-bleed square background and clothing to all edges. No painted circle, cutout, vignette, border, captions, readable text, UI, scene, new costume, magical effects or extra people. Preserve identity and change framing only. One 1024x1024 PNG."
+      }
     }
   ]
 }
