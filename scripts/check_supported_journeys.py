@@ -156,6 +156,7 @@ PYTHON_JOURNEYS = {
         "tests/test_alpha_f5_campaign_lifecycle.py::test_probe_13_recovery_collision_blocks",
     ],
     "provider-contracts": [
+        "tests/test_gm_memory_casting_hotfix.py",
         "tests/test_provider_session_transport_projection.py",
         "tests/test_required_ruleset_decisions.py",
         "tests/test_gm_model_narration_blocks.py",
