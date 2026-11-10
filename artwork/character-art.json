@@ -5296,6 +5296,186 @@
         "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Kell from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, species, body proportions, skin, eyes, hair, clothing, equipment, colors and material wear. Appearance: A humanlike Riftborn woman in her fifties, with a broad-shouldered athletic working build, deep olive skin, dark brown eyes and black hair streaked with iron gray pulled into a tight practical knot. A blunt fair-minded expression, tired watchful eyes and disciplined upright posture. A weathered slate-blue wool work jacket over a brown waistcoat and neutral linen shirt, plain leather wrist guards, dark practical trousers and scuffed calf-high work boots. A plain belt has one small closed pouch and a short neatly coiled work rope. Empty relaxed hands. Her age, professional crew-leader bearing and tired steadiness follow the authored profile; other features and costume details are editable visual defaults. Her home world and reasons for leaving the Returners remain unknown. No invented crew logo, revealed past, glowing sigils, sealed-chamber keys, dramatic villain costume, magical effects or invented origin. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Consistent scale across three body views. Entire bodies, hair, hands, footwear and equipment inside margins. Exactly the same one character repeated as turnaround views. Preserve the Dwarf's short broad proportions and limb-to-torso ratios where applicable. No labels, readable text, captions, borders, logos, UI, scenery, extra characters, animals, invented insignia or revealed secrets. Change viewing angle only; keep identity and practical costume unchanged.",
         "portrait": "Use case: identity-preserve. Production square app portrait for Kell from Severed Lands. Input image 1 is the canonical full-body identity reference, image 2 is the matching multiview sheet. Preserve that exact adult face, age, species-specific facial proportions, skin, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face is centered; eyes near 35 percent down and chin near 65 percent down, with comfortable headroom above all hair. Face framing must be consistent with a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, borders, captions, readable text, UI, scenery, new costume, magical effects, invented crests, animals or extra people. One 1024x1024 PNG."
       }
+    },
+    {
+      "id": "severed-npc-councillor-merrow",
+      "name": "Councillor Merrow",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/councillor-merrow.md",
+          "sha256": "4bba8602b704d9089e438c44db944e758227690dac4e94d1b046570581594487",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/councillor-merrow.md",
+          "sha256": "551e461d3682e0217c2db2d9c263c968866004c93585eb4d1ea016eca03f7261",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A humanlike adult Riftborn woman appearing in her early fifties, with a sturdy medium build, tawny brown skin, dark brown eyes, a softly square lined face and black hair threaded with silver arranged in a tidy braided crown. Calm, persistent, quietly tired but attentive expression and composed upright posture. A well-kept warm gray wool long coat over a muted teal waistcoat and cream high-collared blouse, plain dark trousers and practical polished brown ankle boots. Small plain brass coat fastenings and one closed leather belt pouch. Empty relaxed hands. Her steady experienced civic and merchant bearing follows the authored profile; apparent age, features and clothes are editable visual defaults. Her home world and lost past remain unknown. No invented species traits, crown, noble heraldry, council crest, faction badge, magical effects, readable documents, invented memories or revealed origin.",
+        "full_body": {
+          "path": "assets/characters/5cb7f5146f64d7dd9072d47fe5dfc17a2327361060397fa8895bd0ebf8a24e38.png",
+          "sha256": "5cb7f5146f64d7dd9072d47fe5dfc17a2327361060397fa8895bd0ebf8a24e38"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/5fc7d4a572b5458adba47ca033cb8b2eeebd080656b30edcea0915305a892911.png",
+          "sha256": "5fc7d4a572b5458adba47ca033cb8b2eeebd080656b30edcea0915305a892911"
+        },
+        "portrait": {
+          "path": "assets/characters/fc957cdf5a61ff54505e0ce8f4255179f52529642bb9cf6d202c60e5464d8f54.png",
+          "sha256": "fc957cdf5a61ff54505e0ce8f4255179f52529642bb9cf6d202c60e5464d8f54"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2128347
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2438444
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2623238
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Councillor Merrow in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person standing naturally in a near-front three-quarter pose. Whole hair, both hands, clothing, footwear and equipment comfortably inside all margins. Appearance: A humanlike adult Riftborn woman appearing in her early fifties, with a sturdy medium build, tawny brown skin, dark brown eyes, a softly square lined face and black hair threaded with silver arranged in a tidy braided crown. Calm, persistent, quietly tired but attentive expression and composed upright posture. A well-kept warm gray wool long coat over a muted teal waistcoat and cream high-collared blouse, plain dark trousers and practical polished brown ankle boots. Small plain brass coat fastenings and one closed leather belt pouch. Empty relaxed hands. Her steady experienced civic and merchant bearing follows the authored profile; apparent age, features and clothes are editable visual defaults. Her home world and lost past remain unknown. No invented species traits, crown, noble heraldry, council crest, faction badge, magical effects, readable documents, invented memories or revealed origin. Preserve authored identity, species, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Councillor Merrow from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, species, proportions, skin, eyes, hair, clothing, equipment, colors and wear. Appearance: A humanlike adult Riftborn woman appearing in her early fifties, with a sturdy medium build, tawny brown skin, dark brown eyes, a softly square lined face and black hair threaded with silver arranged in a tidy braided crown. Calm, persistent, quietly tired but attentive expression and composed upright posture. A well-kept warm gray wool long coat over a muted teal waistcoat and cream high-collared blouse, plain dark trousers and practical polished brown ankle boots. Small plain brass coat fastenings and one closed leather belt pouch. Empty relaxed hands. Her steady experienced civic and merchant bearing follows the authored profile; apparent age, features and clothes are editable visual defaults. Her home world and lost past remain unknown. No invented species traits, crown, noble heraldry, council crest, faction badge, magical effects, readable documents, invented memories or revealed origin. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views, entire hair, hands, footwear and equipment within all margins. Same single character repeated as turnaround views. Keep anatomical sides fixed through the turn: where present the sheathed sword always stays on the character's anatomical LEFT hip; never mirror it to the other side. Change viewing angle only; keep face, practical costume and fastenings unchanged. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, extra characters or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Councillor Merrow from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, skin, eyes, hairstyle, expression, spectacles where present and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, border, caption, text, UI, scenery, new costume, magical effects, invented crest, animal or extra person. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-deacon-ash",
+      "name": "Deacon Ash",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/deacon-ash.md",
+          "sha256": "f85182cf45ef8aec9c291fef87ce9dd9f37fd116bd359d9a3615667df4358cb5",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/deacon-ash.md",
+          "sha256": "68b898b3bf22b727661252d4f9d01f0820f26cf340a86422c6dfa58e600d84a2",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult settled Human man appearing in his early forties, with a lean strong former guard's build, medium olive skin, dark brown eyes, close-cropped black hair graying slightly at the temples and a short neatly trimmed black beard. Quiet watchful expression, shoulders back and balanced guarded posture. A practical slate-gray quilted gambeson under a sleeveless worn dark brown leather jerkin, plain leather bracers, dark wool trousers and scuffed sturdy calf-high boots. One ordinary straight sword hangs fully sheathed at his anatomical LEFT hip on a plain reddish-brown leather belt; his left hand hangs near the hilt without gripping it, right hand relaxed and empty. His former-guard bearing follows the authored profile; age, features, clothing and exact weapon design are editable visual defaults. No current Thornwall uniform, invented Church symbol, real-world religious icon, militant faction badge, glowing Door fragment, magical effects, drawn blade, shield, invented scar or public revelation of private sympathies.",
+        "full_body": {
+          "path": "assets/characters/eaadc4369be7222f7e2d65c122555df63f64369116c414520ff282f014d09518.png",
+          "sha256": "eaadc4369be7222f7e2d65c122555df63f64369116c414520ff282f014d09518"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/43880674696f2e8bcbd18516cd2a7362010a4b7d05a6d31967476c01a17e3f14.png",
+          "sha256": "43880674696f2e8bcbd18516cd2a7362010a4b7d05a6d31967476c01a17e3f14"
+        },
+        "portrait": {
+          "path": "assets/characters/7815154e478b0ca033a45681287635cbabcd25d6364b8172a558cfd700ce7487.png",
+          "sha256": "7815154e478b0ca033a45681287635cbabcd25d6364b8172a558cfd700ce7487"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1971006
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2297203
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2453845
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Deacon Ash in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person standing naturally in a near-front three-quarter pose. Whole hair, both hands, clothing, footwear and equipment comfortably inside all margins. Appearance: An adult settled Human man appearing in his early forties, with a lean strong former guard's build, medium olive skin, dark brown eyes, close-cropped black hair graying slightly at the temples and a short neatly trimmed black beard. Quiet watchful expression, shoulders back and balanced guarded posture. A practical slate-gray quilted gambeson under a sleeveless worn dark brown leather jerkin, plain leather bracers, dark wool trousers and scuffed sturdy calf-high boots. One ordinary straight sword hangs fully sheathed at his anatomical LEFT hip on a plain reddish-brown leather belt; his left hand hangs near the hilt without gripping it, right hand relaxed and empty. His former-guard bearing follows the authored profile; age, features, clothing and exact weapon design are editable visual defaults. No current Thornwall uniform, invented Church symbol, real-world religious icon, militant faction badge, glowing Door fragment, magical effects, drawn blade, shield, invented scar or public revelation of private sympathies. Preserve authored identity, species, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Deacon Ash from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, species, proportions, skin, eyes, hair, clothing, equipment, colors and wear. Appearance: An adult settled Human man appearing in his early forties, with a lean strong former guard's build, medium olive skin, dark brown eyes, close-cropped black hair graying slightly at the temples and a short neatly trimmed black beard. Quiet watchful expression, shoulders back and balanced guarded posture. A practical slate-gray quilted gambeson under a sleeveless worn dark brown leather jerkin, plain leather bracers, dark wool trousers and scuffed sturdy calf-high boots. One ordinary straight sword hangs fully sheathed at his anatomical LEFT hip on a plain reddish-brown leather belt; his left hand hangs near the hilt without gripping it, right hand relaxed and empty. His former-guard bearing follows the authored profile; age, features, clothing and exact weapon design are editable visual defaults. No current Thornwall uniform, invented Church symbol, real-world religious icon, militant faction badge, glowing Door fragment, magical effects, drawn blade, shield, invented scar or public revelation of private sympathies. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views, entire hair, hands, footwear and equipment within all margins. Same single character repeated as turnaround views. Keep anatomical sides fixed through the turn: where present the sheathed sword always stays on the character's anatomical LEFT hip; never mirror it to the other side. Change viewing angle only; keep face, practical costume and fastenings unchanged. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, extra characters or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Deacon Ash from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, skin, eyes, hairstyle, expression, spectacles where present and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, border, caption, text, UI, scenery, new costume, magical effects, invented crest, animal or extra person. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-doctor-cipher",
+      "name": "Doctor Cipher",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/doctor-cipher.md",
+          "sha256": "27274ec394532ab4ac944e2424c5f2bbb1998c3582a99aa39346a884f275d869",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/doctor-cipher.md",
+          "sha256": "0e49d6ec8ef31408a63158e2846891b57d2fc5f4572b4fefb9d9cb9c521678d6",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult settled Human woman appearing in her mid fifties, with a tall lean build, light brown skin, dark hazel eyes, a long expressive face and dark hair streaked with gray secured in a neat coiled bun. Small plain round metal spectacles with clear lenses and visible eyes. An engaged, charming and self-assured scholarly expression, open relaxed posture. A worn charcoal-plum long scholar's coat over a dark sage layered tunic and cream collar, practical dark trousers and brown leather ankle boots. A plain brown belt carries one small closed leather tool pouch; both hands empty and relaxed. Her personable scholarly bearing follows the authored profile; age, physical features, spectacles and clothes are editable visual defaults. No invented affiliation insignia, Athenaeum badge, magical effects, visible Pool Stabilizer, subjects or experiments, syringe, modern lab coat, medical cross, villain costume, glowing eyes or invented past.",
+        "full_body": {
+          "path": "assets/characters/2023e964b804a17059817a18f8f016b2660c0dd8ce589e0708d7709ae8426834.png",
+          "sha256": "2023e964b804a17059817a18f8f016b2660c0dd8ce589e0708d7709ae8426834"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/16b8a9dd5797fd2cfa24e01817ceaba02053dc0bf26b0fab2eb163c0033cf6cf.png",
+          "sha256": "16b8a9dd5797fd2cfa24e01817ceaba02053dc0bf26b0fab2eb163c0033cf6cf"
+        },
+        "portrait": {
+          "path": "assets/characters/138bbda0595e744a44b8f9d3d62c6f6f975ba008dafaf029078aa4476da32b33.png",
+          "sha256": "138bbda0595e744a44b8f9d3d62c6f6f975ba008dafaf029078aa4476da32b33"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2017720
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2340925
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2569245
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Doctor Cipher in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person standing naturally in a near-front three-quarter pose. Whole hair, both hands, clothing, footwear and equipment comfortably inside all margins. Appearance: An adult settled Human woman appearing in her mid fifties, with a tall lean build, light brown skin, dark hazel eyes, a long expressive face and dark hair streaked with gray secured in a neat coiled bun. Small plain round metal spectacles with clear lenses and visible eyes. An engaged, charming and self-assured scholarly expression, open relaxed posture. A worn charcoal-plum long scholar's coat over a dark sage layered tunic and cream collar, practical dark trousers and brown leather ankle boots. A plain brown belt carries one small closed leather tool pouch; both hands empty and relaxed. Her personable scholarly bearing follows the authored profile; age, physical features, spectacles and clothes are editable visual defaults. No invented affiliation insignia, Athenaeum badge, magical effects, visible Pool Stabilizer, subjects or experiments, syringe, modern lab coat, medical cross, villain costume, glowing eyes or invented past. Preserve authored identity, species, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Doctor Cipher from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, species, proportions, skin, eyes, hair, clothing, equipment, colors and wear. Appearance: An adult settled Human woman appearing in her mid fifties, with a tall lean build, light brown skin, dark hazel eyes, a long expressive face and dark hair streaked with gray secured in a neat coiled bun. Small plain round metal spectacles with clear lenses and visible eyes. An engaged, charming and self-assured scholarly expression, open relaxed posture. A worn charcoal-plum long scholar's coat over a dark sage layered tunic and cream collar, practical dark trousers and brown leather ankle boots. A plain brown belt carries one small closed leather tool pouch; both hands empty and relaxed. Her personable scholarly bearing follows the authored profile; age, physical features, spectacles and clothes are editable visual defaults. No invented affiliation insignia, Athenaeum badge, magical effects, visible Pool Stabilizer, subjects or experiments, syringe, modern lab coat, medical cross, villain costume, glowing eyes or invented past. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views, entire hair, hands, footwear and equipment within all margins. Same single character repeated as turnaround views. Keep anatomical sides fixed through the turn: where present the sheathed sword always stays on the character's anatomical LEFT hip; never mirror it to the other side. Change viewing angle only; keep face, practical costume and fastenings unchanged. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, extra characters or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Doctor Cipher from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, skin, eyes, hairstyle, expression, spectacles where present and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, border, caption, text, UI, scenery, new costume, magical effects, invented crest, animal or extra person. One 1024x1024 PNG."
+      }
     }
   ]
 }

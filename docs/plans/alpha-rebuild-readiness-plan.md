@@ -175,11 +175,20 @@ pass offline verification against actual current Lite payloads and Setting scope
 prefixes and the previous 80 bundles/bindings are unchanged. The authored roster check passed in
 2.77 seconds for 218 subjects/279 source editions. Completed owner/frontend/native matrices
 were not replayed for this artwork-only increment.
+Councillor Merrow, Deacon Ash and Doctor Cipher now have complete full-body, multiview and portrait
+bundles, bringing the catalogue to 86 complete bundles. Their original profile prefixes and the
+previous 83 bundles/bindings are unchanged. Unspecified appearances remain editable defaults;
+Merrow's home world stays unknown, Ash's sheathed sword stays on his left hip through the
+turnaround, and Cipher retains her personable scholarly bearing. Actual square/dialogue/map-token
+crops passed visual review. All nine exact PNGs, external resources and six current/retained
+source editions pass offline verification against actual current Lite payloads and Setting scope.
+The authored roster check passed in 2.68 seconds for 218 subjects/282 source editions. Completed
+owner/frontend/native matrices were not replayed for this artwork-only increment.
 The owner selected a shared app artwork library: whole Setting/Plan exports omit unused premade
 PNGs, while custom art stays portable and character/campaign exports carry used artwork. The
 source now maps the catalogue and PNGs as external installer/portable resources, outside the
 onefile sidecar. Campaign export retains used art before any artwork view has been opened.
-The prepared PNG pool now totals 577,801,423 bytes across 249 images, beyond the content-package cap.
+The prepared PNG pool now totals 598,641,396 bytes across 258 images, beyond the content-package cap.
 The current Setting omits those PNGs; its existing content-package limits remain unchanged.
 Focused checks cover shared/custom publication, external resource inventory, portable ZIP assembly,
 and exact campaign art transfer before opening an image view. Local-copy receipts also transfer
@@ -282,7 +291,7 @@ hints. The six minimal failure cases pass after the repair; 78 related source ch
 module typing and touched Ruff pass; all eleven originals pass the repaired validator. This is
 source qualification only, with native/live acceptance still pending.
 The authored-source producer now covers 218 subjects (82 individual NPCs and 136 monsters),
-retaining 279 source editions across current content and Plan snapshots. Thread, Hook and Needle
+retaining 282 source editions across current content and Plan snapshots. Thread, Hook and Needle
 remain distinct; V and Anchor Sentinel variants and the artwork-annotated profiles retain
 their original editions. The
 snapshot-only opposition guide is explicitly excluded as encounter guidance. A composed source
@@ -313,8 +322,8 @@ candidate reuse preserves recipient metadata and rejects different content. Imag
 actual Lite prepared-art transfer checks now retain the normal candidate reference. Older incomplete
 archives that omitted it require a fresh export from the source dataset.
 These source/scripted checks do not establish completion of the ordinary
-workflows. The owner's latest selection keeps live in-app checks pending. Of the 249 prepared assets,
-238 were produced with the built-in GPT Images tool and eleven are the unchanged supplied Siren
+workflows. The owner's latest selection keeps live in-app checks pending. Of the 258 prepared assets,
+247 were produced with the built-in GPT Images tool and eleven are the unchanged supplied Siren
 master sheets. Asset preparation is separate from Sylvia's deferred native check.
 Live Sylvia subscription, installed-app
 and TD trailer acceptance remain unverified. Merge follows the Pneuma IO rulebook's delivery and
