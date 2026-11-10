@@ -182,3 +182,21 @@ def test_duplicate_json_keys_and_changed_manifest_are_rejected(tmp_path):
     with pytest.raises(ValueError, match="Manifest identity"):
         load_results(tmp_path)
     assert digest({"a": 1, "b": 2}) == digest({"b": 2, "a": 1})
+
+
+def test_an_unanswered_turn_cannot_pass_using_the_previous_narration():
+    from sylviabench.checks import evaluate
+
+    fact = "Use a blue lantern at the west gate."
+    unchanged = {"talks": [fact], "facts": [{"text": fact, "visibility": "player_known"}]}
+    scenario = next(s for s in scenarios() if s.id == "T3")
+    checks = evaluate(
+        scenario,
+        {
+            "before": unchanged,
+            "after": unchanged,
+            "saved": unchanged,
+            "reopened": unchanged,
+        },
+    )
+    assert all(check.status == "not_evaluated" for check in checks)

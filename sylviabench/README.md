@@ -93,6 +93,8 @@ manifests and mixed source/scenario/setup records are rejected.
 Results retain requested provider/model/reasoning separately from observed identity. Unknown
 identity, token use and cost stay unknown. Scripted runs have no model usage. Error attribution
 requires evidence; unclassified failures remain unknown. Missing or interrupted checks never pass.
+An unchanged history cannot pass a turn by reusing its previous narration: a new committed
+player-visible response is required. Technical or unclassified failures leave their category unscored.
 
 Category scores average the share of passed runs within each scenario, then average scenarios
 within the category. The planned weights are Rules 30, Memory 25, Fair play 25 and Story 20. Story

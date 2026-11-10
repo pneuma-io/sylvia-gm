@@ -18,6 +18,8 @@ def evaluate(scenario: Scenario, observations: dict[str, Any]) -> list[Check]:
     """Missing observations remain unevaluated, including when execution was interrupted."""
     try:
         before, after = observations["before"], observations["after"]
+        if len(after["talks"]) <= len(before["talks"]):
+            raise KeyError("No new player-visible response was committed")
         narration = after["talks"][-1]
         if scenario.id == "T1":
             actor = before["player_id"]

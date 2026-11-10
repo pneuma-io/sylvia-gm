@@ -202,7 +202,13 @@ def report(directory: Path, destination: Path | None = None) -> Path:
                 f"<td>{escape(check.reason)}<pre>{escape(evidence)}</pre></td></tr>"
             )
         body.append(
-            "</table><p>Requested model: "
+            "</table><p>Run started: "
+            + escape(row.started_at)
+            + "; requested provider: "
+            + escape(row.setup.provider_id)
+            + "; requested reasoning: "
+            + escape(row.setup.reasoning or "No override")
+            + "; requested model: "
             + escape(row.setup.model_id)
             + "; observed model: "
             + escape(row.observed_model or "Unknown")
