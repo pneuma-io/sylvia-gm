@@ -5,10 +5,32 @@ from __future__ import annotations
 from collections.abc import Callable, Iterable
 from typing import TYPE_CHECKING, Any
 
+from ._provider_turn_decisions import (
+    _buffered_narration_can_be_replaced,
+    _campaign_file_must_be_settled,
+    _campaign_file_needs_narration,
+    _campaign_file_requires_atomic_completion,
+    _committed_tool_resolves_player_boundary,
+    _committed_work_needs_campaign_file_disposition,
+    _engine_transition_needs_review,
+    _exchange_has_committed_work,
+    _held_disposition_must_be_retried,
+    _opening_needs_campaign_file_update,
+    _player_intent_remains_pending,
+    _provisional_tool_prose_needs_review,
+    _round_allows_history_tool,
+    _round_is_at_player_boundary,
+    _round_requires_tool_call,
+    _saved_gm_boundary_should_be_read,
+    _settled_disposition_still_owes_ooc_acknowledgement,
+    _tool_call_needs_fresh_catalog,
+)
 from ._provider_turn_state import ProviderTurnState
 from ._session_loop import ProviderEvent, SessionProviderInput
 
 if TYPE_CHECKING:
+    from sylvia_gm.application.actor_decisions import ActorDecisionRequest
+
     from ._provider_session import ProviderSessionAdapter
 
 import hashlib
@@ -99,17 +121,17 @@ def execute_required_transition(
             code="invalid_engine_transition_surface",
         )
     before = self._owner.snapshot(state.campaign_id)
-    state.action_id = f"action-{uuid.uuid4().hex}"
-    state.feedback = ProviderActionFeedback()
-    state.recorder = getattr(self._owner, "record_admin_full_audit", None)
-    if callable(state.recorder):
-        state.recorder(
+    action_id = f"action-{uuid.uuid4().hex}"
+    feedback = ProviderActionFeedback()
+    recorder = getattr(self._owner, "record_admin_full_audit", None)
+    if callable(recorder):
+        recorder(
             {
                 "kind": "automatic_engine_transition_requested",
                 "campaign_id": state.campaign_id,
                 "session_id": provider_input.session.session_id,
                 "turn_id": turn_id,
-                "action_id": state.action_id,
+                "action_id": action_id,
                 "mcp_discovery_id": state.discovery_id,
                 "tool_name": transition.name,
                 "basis_revision": before.revision,
@@ -118,7 +140,7 @@ def execute_required_transition(
     yield ProviderEvent.action(
         ActionCommand(
             campaign_id=state.campaign_id,
-            action_id=state.action_id,
+            action_id=action_id,
             idempotency_key=f"engine-transition-{uuid.uuid4().hex}",
             owner_id=self._owner_id,
             writer=provider_input.session.role,
@@ -129,19 +151,19 @@ def execute_required_transition(
             parameters=cast(Mapping[str, JsonValue], {}),
             initiating_session_id=provider_input.session.session_id,
         ),
-        feedback=state.feedback,
+        feedback=feedback,
     )
-    if state.feedback.rejection is not None:
+    if feedback.rejection is not None:
         raise CommandRejected(
             "Automatic engine transition was rejected",
-            code=str(state.feedback.rejection.get("code", "engine_transition_rejected")),
+            code=str(feedback.rejection.get("code", "engine_transition_rejected")),
         )
     after = self._owner.snapshot(state.campaign_id)
-    state.terminal_event = next(
+    terminal_event = next(
         (
             event
             for event in reversed(after.events)
-            if event.action_id == state.action_id
+            if event.action_id == action_id
             and event.event_type
             in {
                 CanonicalEventType.ACTION_COMMITTED,
@@ -150,51 +172,50 @@ def execute_required_transition(
         ),
         None,
     )
-    state.tool_result_event = next(
+    tool_result_event = next(
         (
             event
             for event in reversed(after.events)
-            if event.action_id == state.action_id
-            and event.event_type is CanonicalEventType.TOOL_RESULT
+            if event.action_id == action_id and event.event_type is CanonicalEventType.TOOL_RESULT
         ),
         None,
     )
-    if state.terminal_event is None or state.tool_result_event is None:
+    if terminal_event is None or tool_result_event is None:
         raise CommandRejected("Canonical engine transition result is unavailable")
-    if state.terminal_event.event_type is CanonicalEventType.ACTION_FAILED:
+    if terminal_event.event_type is CanonicalEventType.ACTION_FAILED:
         raise CommandRejected(
             "Automatic engine transition failed",
             code="engine_transition_failed",
         )
-    state.result_payload = _plain_json(state.tool_result_event.safe_payload.get("result", {}))
+    result_payload = _plain_json(tool_result_event.safe_payload.get("result", {}))
     combat = _current_combat_state(after.state)
     current_actor = combat.get("active_actor", combat.get("current_actor"))
     entity_parameters = (
         {"actor": current_actor} if isinstance(current_actor, str) and current_actor else {}
     )
-    state.current_entities = _current_referenced_entities(
+    current_entities = _current_referenced_entities(
         entity_parameters,
         after.state,
     )
     state.facts = _mechanics_narration_facts(
         transition.name,
-        state.result_payload,
-        state.current_entities,
+        result_payload,
+        current_entities,
         {},
         {},
         combat,
         state.entity_display_names,
     )
     state.pending_narration_facts.append(state.facts)
-    state.any_commit_in_exchange = True
+    state.progress.any_commit_in_exchange = True
     if provider_input.session.role is WriterRole.DM:
-        state.campaign_file_disposition_in_exchange = False
+        state.progress.campaign_file_disposition_in_exchange = False
     transition_result = {
-        "status": state.terminal_event.event_type.value,
+        "status": terminal_event.event_type.value,
         "campaign_revision": after.revision,
         "tool": transition.name,
-        "result": state.result_payload,
-        "current_entities": state.current_entities,
+        "result": result_payload,
+        "current_entities": current_entities,
     }
     state.messages.append(
         {
@@ -212,14 +233,14 @@ def execute_required_transition(
             ),
         }
     )
-    if callable(state.recorder):
-        state.recorder(
+    if callable(recorder):
+        recorder(
             {
                 "kind": "automatic_engine_transition_completed",
                 "campaign_id": state.campaign_id,
                 "session_id": provider_input.session.session_id,
                 "turn_id": turn_id,
-                "action_id": state.action_id,
+                "action_id": action_id,
                 "mcp_discovery_id": state.discovery_id,
                 "tool_name": transition.name,
                 "resulting_revision": after.revision,
@@ -241,22 +262,23 @@ def run_required_actor_decision(
         self._owner,
         self._provider,
         provider_input,
-        state.actor_request,
+        cast("ActorDecisionRequest", state.actor_request),
         owner_id=self._owner_id,
         stream=self._stream_round,
     )
     yield ProviderEvent.tool_evidence(
-        message_id="participant-result-" + state.actor_request.decision_id,
+        message_id="participant-result-"
+        + cast("ActorDecisionRequest", state.actor_request).decision_id,
         payload={
             "kind": "isolated_participant_result",
             "turn_id": turn_id,
             "basis_message_id": state.basis_message_id,
-            "inference_id": state.actor_request.decision_id,
+            "inference_id": cast("ActorDecisionRequest", state.actor_request).decision_id,
             "public_result": cast(JsonValue, public_result),
         },
     )
     state.messages.append(self._participant_result_message(public_result))
-    state.any_commit_in_exchange = True
+    state.progress.any_commit_in_exchange = True
 
 
 def retry_empty_completion(
@@ -516,8 +538,8 @@ def preserve_boundary_narration(
     *,
     turn_id: str,
 ) -> Iterable[ProviderEvent]:
-    state.draft_message = _assistant_draft_message(state.narration)
-    state.exchange_messages.append(state.draft_message)
+    draft_message = _assistant_draft_message(state.narration)
+    state.exchange_messages.append(draft_message)
     yield ProviderEvent.tool_evidence(
         message_id=f"{state.inference_id}-gm-boundary-draft",
         payload={
@@ -526,7 +548,7 @@ def preserve_boundary_narration(
             "turn_id": turn_id,
             "inference_id": state.inference_id,
             "basis_message_id": state.basis_message_id,
-            "assistant": cast(SafePayload, _plain_json(state.draft_message)),
+            "assistant": cast(SafePayload, _plain_json(draft_message)),
         },
     )
     state.current_application_controls.append(
@@ -553,8 +575,8 @@ def preserve_player_intent_narration(
     *,
     turn_id: str,
 ) -> Iterable[ProviderEvent]:
-    state.draft_message = _assistant_draft_message(state.narration)
-    state.exchange_messages.append(state.draft_message)
+    draft_message = _assistant_draft_message(state.narration)
+    state.exchange_messages.append(draft_message)
     yield ProviderEvent.tool_evidence(
         message_id=f"{state.inference_id}-player-intent-pending-draft",
         payload={
@@ -563,7 +585,7 @@ def preserve_player_intent_narration(
             "turn_id": turn_id,
             "inference_id": state.inference_id,
             "basis_message_id": state.basis_message_id,
-            "assistant": cast(SafePayload, _plain_json(state.draft_message)),
+            "assistant": cast(SafePayload, _plain_json(draft_message)),
         },
     )
     state.current_application_controls.append(
@@ -592,11 +614,11 @@ def retain_campaign_file_narration(
     state.buffered_narration = state.narration
     state.buffered_response_blocks = None
     state.buffered_raw_response_blocks = None
-    state.buffered_narration_needs_disposition = True
-    state.campaign_file_disposition_in_exchange = False
-    state.force_campaign_file_update = True
-    state.draft_message = _assistant_draft_message(state.narration)
-    state.exchange_messages.append(state.draft_message)
+    state.obligations.buffered_narration_needs_disposition = True
+    state.progress.campaign_file_disposition_in_exchange = False
+    state.obligations.force_campaign_file_update = True
+    draft_message = _assistant_draft_message(state.narration)
+    state.exchange_messages.append(draft_message)
     yield ProviderEvent.tool_evidence(
         message_id=f"{state.inference_id}-held-narration",
         payload={
@@ -605,7 +627,7 @@ def retain_campaign_file_narration(
             "turn_id": turn_id,
             "inference_id": state.inference_id,
             "basis_message_id": state.basis_message_id,
-            "assistant": cast(SafePayload, _plain_json(state.draft_message)),
+            "assistant": cast(SafePayload, _plain_json(draft_message)),
         },
     )
 
@@ -735,8 +757,8 @@ def execute_action_sequence_call(
     *,
     turn_id: str,
 ) -> None:
-    state.state_changing_call_submitted = (
-        state.state_changing_call_submitted or state.catalog_tool.category != "reference"
+    state.progress.state_changing_call_submitted = (
+        state.progress.state_changing_call_submitted or state.catalog_tool.category != "reference"
     )
     try:
         result = call_action_sequence_tool(
@@ -755,7 +777,7 @@ def execute_action_sequence_call(
             if state.facts is not None:
                 state.sequence_narration_facts.append(state.facts)
             if saved.get("status") in {"paused", "failed", "stale"}:
-                state.sequence_execution_stopped = True
+                state.progress.sequence_execution_stopped = True
                 state.current_application_controls.append(
                     {
                         "role": "system",
@@ -779,7 +801,7 @@ def execute_action_sequence_call(
         if state.catalog_tool.name == "execute_action_sequence":
             # The service may have persisted a prefix before its reply failed.
             # Recover receipts by reading; never retry execution implicitly.
-            state.sequence_execution_stopped = True
+            state.progress.sequence_execution_stopped = True
             saved = cast(Callable[..., object], self._owner.action_sequence)(
                 session_id=provider_input.session.session_id,
                 sequence_id=state.parameters.get("sequence_id"),
@@ -956,14 +978,14 @@ def record_unchanged_campaign_file(
             "reviewed outcome."
         ),
     }
-    state.campaign_file_disposition_in_exchange = True
+    state.progress.campaign_file_disposition_in_exchange = True
     if state.settled_narration is not None:
         state.buffered_narration = state.settled_narration
-        state.buffered_narration_needs_disposition = False
-        state.campaign_file_narration_pending = False
+        state.obligations.buffered_narration_needs_disposition = False
+        state.obligations.campaign_file_narration_pending = False
     else:
-        state.campaign_file_narration_pending = True
-    state.force_campaign_file_update = False
+        state.obligations.campaign_file_narration_pending = True
+    state.obligations.force_campaign_file_update = False
 
 
 def prepare_campaign_file_revision(
@@ -1034,11 +1056,11 @@ def settle_campaign_file_narration(
         if state.revised_narration_supplied:
             state.buffered_response_blocks = None
             state.buffered_raw_response_blocks = state.revised_raw_blocks
-        state.buffered_narration_needs_disposition = True
+        state.obligations.buffered_narration_needs_disposition = True
     elif state.revised_raw_blocks is not None:
         state.buffered_raw_response_blocks = state.revised_raw_blocks
         state.buffered_response_blocks = None
-        state.buffered_narration_needs_disposition = True
+        state.obligations.buffered_narration_needs_disposition = True
     state.parameters_establish_changes = _campaign_file_arguments_establish_changes(
         state.parameters
     )
@@ -1070,16 +1092,16 @@ def record_updated_campaign_file(
             "outcome."
         ),
     }
-    state.any_commit_in_exchange = True
-    state.campaign_file_commit_in_exchange = True
-    state.campaign_file_disposition_in_exchange = True
+    state.progress.any_commit_in_exchange = True
+    state.progress.campaign_file_commit_in_exchange = True
+    state.progress.campaign_file_disposition_in_exchange = True
     if state.settled_narration is not None:
         state.buffered_narration = state.settled_narration
-        state.buffered_narration_needs_disposition = False
-        state.campaign_file_narration_pending = False
+        state.obligations.buffered_narration_needs_disposition = False
+        state.obligations.campaign_file_narration_pending = False
     else:
-        state.campaign_file_narration_pending = True
-    state.force_campaign_file_update = False
+        state.obligations.campaign_file_narration_pending = True
+    state.obligations.force_campaign_file_update = False
 
 
 def submit_mechanics_call(
@@ -1089,10 +1111,10 @@ def submit_mechanics_call(
     *,
     turn_id: str,
 ) -> Iterable[ProviderEvent]:
-    state.action_id = f"action-{uuid.uuid4().hex}"
+    action_id = f"action-{uuid.uuid4().hex}"
     command = ActionCommand(
         campaign_id=state.campaign_id,
-        action_id=state.action_id,
+        action_id=action_id,
         idempotency_key=f"provider-{uuid.uuid4().hex}",
         owner_id=self._owner_id,
         writer=provider_input.session.role,
@@ -1103,13 +1125,13 @@ def submit_mechanics_call(
         parameters=cast(Mapping[str, JsonValue], state.parameters),
         initiating_session_id=provider_input.session.session_id,
     )
-    state.mechanics_action_ids[state.assembly.call_id] = state.action_id
+    state.mechanics_action_ids[state.assembly.call_id] = action_id
     state.mechanics_parameters[state.assembly.call_id] = state.parameters
     state.mechanics_pre_entities[state.assembly.call_id] = _current_referenced_entities(
         state.parameters, state.snapshot.state
     )
-    state.state_changing_call_submitted = True
-    state.feedback = ProviderActionFeedback()
+    state.progress.state_changing_call_submitted = True
+    feedback = ProviderActionFeedback()
     yield ProviderEvent.tool_evidence(
         message_id=f"{state.inference_id}-{state.assembly.call_id}-mechanics-contract",
         payload={
@@ -1117,7 +1139,7 @@ def submit_mechanics_call(
             "turn_id": turn_id,
             "inference_id": state.inference_id,
             "basis_message_id": state.basis_message_id,
-            "action_id": state.action_id,
+            "action_id": action_id,
             "operation": state.catalog_tool.name,
             "model_behavior": state.catalog_tool.model_behavior.value,
             **(
@@ -1134,9 +1156,9 @@ def submit_mechanics_call(
             ),
         },
     )
-    yield ProviderEvent.action(command, feedback=state.feedback)
-    if state.feedback.rejection is not None:
-        state.local_tool_results[state.assembly.call_id] = dict(state.feedback.rejection)
+    yield ProviderEvent.action(command, feedback=feedback)
+    if feedback.rejection is not None:
+        state.local_tool_results[state.assembly.call_id] = dict(feedback.rejection)
         state.local_tool_failures.add(state.assembly.call_id)
 
 
@@ -1198,7 +1220,7 @@ def prepare_round_catalog(
                 *(
                     tool
                     for tool in queue_tools
-                    if not state.sequence_execution_stopped or tool.category == "reference"
+                    if not state.progress.sequence_execution_stopped or tool.category == "reference"
                 ),
             )
     if state.participant_ooc_only:
@@ -1223,7 +1245,7 @@ def prepare_round_catalog(
         combat_at_input = _current_combat_state(self._owner.snapshot(state.campaign_id).state)
         # A new instruction can end the fight at the just-resolved NPC action.
         # Read it before finishing that turn or advancing to a Death Save.
-        state.engine_transition_review_pending = (
+        state.obligations.engine_transition_review_pending = (
             combat_at_input.get("turn_active") is True
             and combat_at_input.get("active_actor_kind") == "monster"
             and combat_at_input.get("action_available") is False
@@ -1238,7 +1260,7 @@ def prepare_provider_round(
     turn_id: str,
 ) -> None:
     model_catalog = state.current_catalog
-    opening_update_required = state.opening_request and not state.campaign_file_commit_in_exchange
+    opening_update_required = _opening_needs_campaign_file_update(state)
     state.campaign_file_disposition_supported = any(
         tool.category == "narrative_state"
         and tool.capability == "narrative_state.update_campaign_file"
@@ -1247,18 +1269,13 @@ def prepare_provider_round(
     )
     # Keep every valid next operation available, but do not let a committed
     # Ruleset result skip the Campaign File checkpoint by ending in prose.
-    state.post_commit_tool_required = (
-        state.any_commit_in_exchange
-        and not state.campaign_file_disposition_in_exchange
-        and state.campaign_file_disposition_supported
-        and not state.campaign_file_narration_pending
-    )
+    state.post_commit_tool_required = _committed_work_needs_campaign_file_disposition(state)
     # The same GM completes each ordinary turn as one agent loop. Requiring a tool does
     # not select a mechanic: the model may read a source, resolve a Ruleset operation, or
     # finish directly with the Campaign File disposition that contains its narration.
-    if state.campaign_file_narration_pending:
+    if _campaign_file_needs_narration(state):
         model_catalog = ()
-    elif state.force_campaign_file_update:
+    elif _campaign_file_must_be_settled(state):
         model_catalog = tuple(
             tool
             for tool in state.current_catalog
@@ -1281,28 +1298,24 @@ def prepare_provider_round(
     boundary_reader = getattr(
         self._owner,
         "model_decision_boundary"
-        if state.any_commit_in_exchange
+        if _exchange_has_committed_work(state)
         else "campaign_preparation_boundary",
         None,
     )
     if callable(boundary_reader) and not state.participant_ooc_only:
         state.decision_boundary = boundary_reader(state.campaign_id)
-    if (
-        state.decision_boundary is None
-        and not state.any_commit_in_exchange
-        and not state.participant_ooc_only
-    ):
+    if _saved_gm_boundary_should_be_read(state):
         # An already active private game must resume its GM decision before narration.
-        state._, private_boundary = self._owner.model_context_snapshot(state.campaign_id)
+        _, private_boundary = self._owner.model_context_snapshot(state.campaign_id)
         if private_boundary is not None and private_boundary.owner is ModelDecisionOwner.GM:
             state.decision_boundary = private_boundary
-    state.player_boundary_narration = False
-    state.player_intent_resolution_required = False
-    state.gm_boundary_decision = False
+    state.decisions.player_boundary_narration = False
+    state.obligations.player_intent_resolution_required = False
+    state.decisions.gm_boundary_decision = False
     if state.decision_boundary is not None:
-        state.recorder = getattr(self._owner, "record_admin_full_audit", None)
-        if callable(state.recorder):
-            state.recorder(
+        recorder = getattr(self._owner, "record_admin_full_audit", None)
+        if callable(recorder):
+            recorder(
                 {
                     "kind": "model_decision_boundary",
                     "campaign_id": state.campaign_id,
@@ -1333,10 +1346,10 @@ def prepare_provider_round(
             )
             state.tools, state.aliases = self._provider_tools(model_catalog)
         elif state.decision_boundary.owner is ModelDecisionOwner.PLAYER:
-            state.player_boundary_narration = True
-            if state.player_intent_pending:
-                state.player_intent_resolution_required = True
-                state.force_campaign_file_update = False
+            state.decisions.player_boundary_narration = True
+            if _player_intent_remains_pending(state):
+                state.obligations.player_intent_resolution_required = True
+                state.obligations.force_campaign_file_update = False
                 model_catalog = tuple(
                     tool
                     for tool in state.current_catalog
@@ -1358,11 +1371,11 @@ def prepare_provider_round(
                     )
                 state.tools, state.aliases = self._provider_tools(model_catalog)
         else:
-            state.gm_boundary_decision = True
+            state.decisions.gm_boundary_decision = True
             # A Campaign File disposition is terminal for this provider exchange. Keep
             # it unavailable until Ruleset control reaches the player, or prose can
             # strand an active GM-controlled combat turn.
-            state.force_campaign_file_update = False
+            state.obligations.force_campaign_file_update = False
             model_catalog = tuple(
                 tool for tool in state.current_catalog if tool.category != "narrative_state"
             )
@@ -1375,27 +1388,25 @@ def prepare_provider_round(
         ),
     )
     state.provider_tool_schemas = {
-        str(state.function["name"]): state.parameters
+        str(function["name"]): parameters
         for provider_tool in state.tools
-        if isinstance((state.bind("function", provider_tool.get("function"))), dict)
-        and isinstance(state.function.get("name"), str)
-        and isinstance((state.bind("parameters", state.function.get("parameters"))), dict)
+        if isinstance((function := provider_tool.get("function")), dict)
+        and isinstance(function.get("name"), str)
+        and isinstance((parameters := function.get("parameters")), dict)
     }
-    state._, refreshed_context = self._campaign_context_messages(
+    _, refreshed_context = self._campaign_context_messages(
         provider_input,
         include_opening_direction=state.opening_request,
     )
     if refreshed_context is not None:
         for _turn_index, _turn_message in enumerate(state.messages):
-            state.index = _turn_index
-            state.message = _turn_message
-            owned_data = state.message.get("role") == "system" or state.message.get(
-                "_fresh_application_data"
-            )
-            if owned_data and str(state.message.get("content", "")).startswith(
+            index = _turn_index
+            message = _turn_message
+            owned_data = message.get("role") == "system" or message.get("_fresh_application_data")
+            if owned_data and str(message.get("content", "")).startswith(
                 "SYLVIA_GM_FRESH_CAMPAIGN_STATE "
             ):
-                state.messages[state.index] = refreshed_context
+                state.messages[index] = refreshed_context
                 break
     state.assemblies = {}
     state.mechanics_action_ids = {}
@@ -1427,7 +1438,7 @@ def prepare_provider_round(
         )
     state.exchange_messages = state.messages
     state.inference_messages = list(state.exchange_messages)
-    if state.engine_transition_review_pending:
+    if _engine_transition_needs_review(state):
         engine_control = _engine_turn_control_message(state.aliases)
         if engine_control is not None:
             state.inference_messages.append(engine_control)
@@ -1459,7 +1470,7 @@ def stream_provider_round(
                         "before its result is an unsettled draft, not established fiction; "
                         "revise or discard it wherever the result or the player's declared "
                         "limits require. "
-                        if state.provisional_tool_prose_pending
+                        if _provisional_tool_prose_needs_review(state)
                         else ""
                     )
                     + "Use another exposed "
@@ -1470,16 +1481,14 @@ def stream_provider_round(
         )
     state.inference_messages.extend(state.current_application_controls)
     state.current_application_controls.clear()
-    if state.campaign_file_narration_pending:
+    if _campaign_file_needs_narration(state):
         state.inference_messages.append(
             _campaign_file_updated_narration_message(
                 opening_footing=state.opening_footing,
                 current_player_action=state.current_player_action,
             )
         )
-    elif state.force_campaign_file_update and (
-        state.buffered_narration is not None or state.buffered_raw_response_blocks is not None
-    ):
+    elif _held_disposition_must_be_retried(state):
         state.inference_messages.append(
             _campaign_file_disposition_message(
                 opening_footing=state.opening_footing,
@@ -1501,9 +1510,9 @@ def stream_provider_round(
                     for fact in state.pending_narration_facts
                     if isinstance(fact.get("tool"), str)
                 ),
-                player_intent_pending=state.player_intent_pending,
+                player_intent_pending=state.obligations.player_intent_pending,
             )
-            if state.player_boundary_narration
+            if _round_is_at_player_boundary(state)
             else _gm_decision_control_message(state.decision_boundary)
         )
     if state.private_deliberation_correction_message is not None:
@@ -1512,19 +1521,11 @@ def stream_provider_round(
     if state.required_tool_call_correction_message is not None:
         state.inference_messages.append(state.required_tool_call_correction_message)
         state.required_tool_call_correction_message = None
-    atomic_campaign_file_completion_required = (
-        provider_input.session.role is WriterRole.DM
-        and state.campaign_file_disposition_supported
-        and not state.campaign_file_disposition_in_exchange
-        and not state.campaign_file_narration_pending
+    atomic_campaign_file_completion_required = _campaign_file_requires_atomic_completion(
+        state, provider_input
     )
-    state.provider_tool_call_required = (
-        state.engine_transition_review_pending
-        or state.force_campaign_file_update
-        or state.post_commit_tool_required
-        or state.gm_boundary_decision
-        or state.player_intent_resolution_required
-        or atomic_campaign_file_completion_required
+    state.provider_tool_call_required = _round_requires_tool_call(
+        state, atomic_campaign_file_completion_required
     )
     for chunk in self._stream_round(
         state.inference_messages,
@@ -1532,9 +1533,7 @@ def stream_provider_round(
         control=provider_input.control,
         provider_input=provider_input,
         tool_choice="required" if state.provider_tool_call_required else None,
-        history_allowed=not (
-            state.force_campaign_file_update or state.campaign_file_narration_pending
-        ),
+        history_allowed=_round_allows_history_tool(state),
     ):
         if chunk.finish_reason is not None:
             state.round_finish_reason = chunk.finish_reason
@@ -1552,13 +1551,11 @@ def stream_provider_round(
         if chunk.content:
             state.assistant_text.append(chunk.content)
         if chunk.tool_call_delta is not None:
-            state.index, call_id, state.name, state.arguments = parse_tool_call_delta(
-                chunk.tool_call_delta
-            )
-            state.assembly = state.assemblies.setdefault(state.index, _ToolCallAssembly())
+            index, call_id, name, arguments = parse_tool_call_delta(chunk.tool_call_delta)
+            state.assembly = state.assemblies.setdefault(index, _ToolCallAssembly())
             state.assembly.call_id += call_id
-            state.assembly.name += state.name
-            state.assembly.arguments += state.arguments
+            state.assembly.name += name
+            state.assembly.arguments += arguments
 
     # Preserve the provider's original fields before any application normalization.
     # This event goes only to private owner storage, never canonical tool evidence.
@@ -1616,22 +1613,22 @@ def prepare_tool_batch(
 ) -> Iterable[ProviderEvent]:
     state.ordered = [state.assemblies[index] for index in sorted(state.assemblies)]
     if state.ordered and state.assistant_text:
-        state.provisional_tool_prose_pending = True
+        state.obligations.provisional_tool_prose_pending = True
     for _turn_assembly in state.ordered:
         state.assembly = _turn_assembly
         if not state.assembly.call_id:
             state.assembly.call_id = f"call-{uuid.uuid4().hex}"
     for _turn_assembly in state.ordered:
         state.assembly = _turn_assembly
-        state.resolved_tool = _resolve_provider_tool_alias(state.assembly.name, state.aliases)
-        if state.resolved_tool is not None:
-            state.assembly.name = state.resolved_tool[0]
+        resolved_tool = _resolve_provider_tool_alias(state.assembly.name, state.aliases)
+        if resolved_tool is not None:
+            state.assembly.name = resolved_tool[0]
     state.round_has_non_narrative_call = any(
         resolved is None or resolved[1].category != "narrative_state"
         for assembly in state.ordered
         for resolved in (_resolve_provider_tool_alias(assembly.name, state.aliases),)
     )
-    state.raw_calls = [
+    raw_calls = [
         {
             "id": assembly.call_id,
             "type": "function",
@@ -1647,7 +1644,7 @@ def prepare_tool_batch(
         "content": (
             None if state.round_has_non_narrative_call else "".join(state.assistant_text) or None
         ),
-        "tool_calls": state.raw_calls,
+        "tool_calls": raw_calls,
     }
     # Signed native blocks belong only to this in-memory provider exchange. The separate
     # evidence message below stays player-safe and must never persist private thinking.
@@ -1687,7 +1684,7 @@ def prepare_tool_batch(
             },
         },
     )
-    state.state_changing_call_submitted = False
+    state.progress.state_changing_call_submitted = False
 
 
 def execute_tool_batch(
@@ -1717,16 +1714,12 @@ def execute_tool_batch(
                 }
                 state.local_tool_failures.add(state.assembly.call_id)
             continue
-        state.resolved_tool = _resolve_provider_tool_alias(state.assembly.name, state.aliases)
-        if state.resolved_tool is None:
+        resolved_tool = _resolve_provider_tool_alias(state.assembly.name, state.aliases)
+        if resolved_tool is None:
             reject_unavailable_tool(self, state, provider_input, turn_id=turn_id)
             continue
-        state._, state.catalog_tool = state.resolved_tool
-        if (
-            position > 0
-            and state.state_changing_call_submitted
-            and state.catalog_tool.category != ("reference")
-        ):
+        _, state.catalog_tool = resolved_tool
+        if _tool_call_needs_fresh_catalog(state, position):
             state.local_tool_results[state.assembly.call_id] = {
                 "status": "superseded_by_catalog_refresh",
                 "state_changed": False,
@@ -1765,7 +1758,9 @@ def execute_tool_batch(
                         "This operation does not declare a preparation scope",
                         code="provider_player_intent_scope_invalid",
                     )
-                _preparation_keeps_intent_pending(scope, pending=state.player_intent_pending)
+                _preparation_keeps_intent_pending(
+                    scope, pending=state.obligations.player_intent_pending
+                )
             except CommandRejected as error:
                 state.local_tool_results[state.assembly.call_id] = {
                     "status": "rejected",
@@ -1913,9 +1908,9 @@ def execute_tool_batch(
                 }
                 state.local_tool_failures.add(state.assembly.call_id)
                 continue
-            state.state_changing_call_submitted = True
+            state.progress.state_changing_call_submitted = True
             attached_narration = (
-                "".join(state.assistant_text) if not state.force_campaign_file_update else ""
+                "".join(state.assistant_text) if _buffered_narration_can_be_replaced(state) else ""
             )
             if attached_narration.strip():
                 if _contains_serialized_tool_call(attached_narration):
@@ -1929,8 +1924,8 @@ def execute_tool_batch(
                 state.buffered_narration = attached_narration
                 state.buffered_response_blocks = None
                 state.buffered_raw_response_blocks = None
-                state.buffered_narration_needs_disposition = True
-                state.campaign_file_disposition_in_exchange = False
+                state.obligations.buffered_narration_needs_disposition = True
+                state.progress.campaign_file_disposition_in_exchange = False
             prepare_campaign_file_revision(self, state, provider_input, turn_id=turn_id)
             if (
                 state.pending_boundary is not None
@@ -2058,8 +2053,8 @@ def reconcile_tool_batch(
         state.assembly = _turn_assembly
         if state.assembly.call_id not in state.local_tool_failures:
             continue
-        state.resolved_tool = _resolve_provider_tool_alias(state.assembly.name, state.aliases)
-        if state.resolved_tool is None or state.resolved_tool[1].category != "reference":
+        resolved_tool = _resolve_provider_tool_alias(state.assembly.name, state.aliases)
+        if resolved_tool is None or resolved_tool[1].category != "reference":
             continue
         optional_reference_failures.add(state.assembly.call_id)
         state.local_tool_results[state.assembly.call_id].update(
@@ -2069,7 +2064,7 @@ def reconcile_tool_batch(
             }
         )
     state.required_tool_failures = state.local_tool_failures - optional_reference_failures
-    state.round_failed = bool(state.local_tool_failures)
+    state.progress.round_failed = bool(state.local_tool_failures)
     round_has_any_commit = bool(state.sequence_narration_facts)
     round_leaves_player_intent_pending = False
     round_resolves_player_intent = False
@@ -2079,7 +2074,7 @@ def reconcile_tool_batch(
         state.assembly = _turn_assembly
         if state.assembly.call_id in state.local_tool_results:
             if state.assembly.call_id in state.local_tool_failures:
-                state.round_failed = True
+                state.progress.round_failed = True
             state.exchange_messages.append(
                 {
                     "role": "tool",
@@ -2095,12 +2090,12 @@ def reconcile_tool_batch(
             )
             continue
         state.snapshot = self._owner.snapshot(state.campaign_id)
-        state.action_id = state.mechanics_action_ids[state.assembly.call_id]
-        state.terminal_event = next(
+        action_id = state.mechanics_action_ids[state.assembly.call_id]
+        terminal_event = next(
             (
                 item
                 for item in reversed(state.snapshot.events)
-                if item.action_id == state.action_id
+                if item.action_id == action_id
                 and item.event_type
                 in {
                     CanonicalEventType.ACTION_COMMITTED,
@@ -2109,22 +2104,21 @@ def reconcile_tool_batch(
             ),
             None,
         )
-        state.tool_result_event = next(
+        tool_result_event = next(
             (
                 item
                 for item in reversed(state.snapshot.events)
-                if item.action_id == state.action_id
-                and item.event_type is CanonicalEventType.TOOL_RESULT
+                if item.action_id == action_id and item.event_type is CanonicalEventType.TOOL_RESULT
             ),
             None,
         )
-        if state.terminal_event is None or state.tool_result_event is None:
+        if terminal_event is None or tool_result_event is None:
             raise CommandRejected(
                 "Canonical mechanic result is unavailable",
                 code="canonical_mechanic_result_unavailable",
             )
-        if state.terminal_event.event_type is CanonicalEventType.ACTION_FAILED:
-            state.round_failed = True
+        if terminal_event.event_type is CanonicalEventType.ACTION_FAILED:
+            state.progress.round_failed = True
             state.required_tool_failures.add(state.assembly.call_id)
         else:
             round_has_any_commit = True
@@ -2135,37 +2129,34 @@ def reconcile_tool_batch(
                         state.assembly.call_id,
                         _UNSPECIFIED_PREPARATION_INTENT,
                     ),
-                    pending=state.player_intent_pending,
+                    pending=state.obligations.player_intent_pending,
                 )
-            elif (
-                state.behavior is ModelToolBehavior.RESOLVES_PLAYER_INTENT
-                and state.player_boundary_narration
-            ):
+            elif _committed_tool_resolves_player_boundary(state):
                 round_resolves_player_intent = True
-        state.result_payload = _plain_json(state.tool_result_event.safe_payload.get("result", {}))
-        state.current_entities = _current_referenced_entities(
+        result_payload = _plain_json(tool_result_event.safe_payload.get("result", {}))
+        current_entities = _current_referenced_entities(
             state.mechanics_parameters[state.assembly.call_id], state.snapshot.state
         )
         round_result: object = {
-            "status": state.terminal_event.event_type.value,
-            "action_id": state.tool_result_event.action_id,
+            "status": terminal_event.event_type.value,
+            "action_id": tool_result_event.action_id,
             "campaign_revision": state.snapshot.revision,
-            "safe_payload": _plain_json(state.terminal_event.safe_payload),
-            "result": state.result_payload,
-            "current_entities": state.current_entities,
+            "safe_payload": _plain_json(terminal_event.safe_payload),
+            "result": result_payload,
+            "current_entities": current_entities,
         }
-        if state.terminal_event.event_type is CanonicalEventType.ACTION_COMMITTED:
+        if terminal_event.event_type is CanonicalEventType.ACTION_COMMITTED:
             if state.mechanics_tool_names[
                 state.assembly.call_id
             ] == "end_combat_encounter" or state.mechanics_tool_names[state.assembly.call_id] in {
                 tool.name for tool in state.required_transitions
             }:
-                state.engine_transition_review_pending = False
+                state.obligations.engine_transition_review_pending = False
             round_narration_facts.append(
                 _mechanics_narration_facts(
                     state.mechanics_tool_names[state.assembly.call_id],
-                    state.result_payload,
-                    state.current_entities,
+                    result_payload,
+                    current_entities,
                     state.mechanics_pre_entities[state.assembly.call_id],
                     state.mechanics_parameters[state.assembly.call_id],
                     _current_combat_state(state.snapshot.state),
@@ -2203,17 +2194,17 @@ def reconcile_tool_batch(
         )
     provider_input.control.progress.update("working")
     if round_has_any_commit:
-        state.any_commit_in_exchange = True
+        state.progress.any_commit_in_exchange = True
         if round_leaves_player_intent_pending:
-            state.player_intent_pending = True
+            state.obligations.player_intent_pending = True
         if round_resolves_player_intent:
-            state.player_intent_pending = False
+            state.obligations.player_intent_pending = False
         if provider_input.session.role is WriterRole.DM:
-            state.campaign_file_disposition_in_exchange = False
+            state.progress.campaign_file_disposition_in_exchange = False
         state.buffered_narration = None
         state.buffered_response_blocks = None
         state.buffered_raw_response_blocks = None
-        state.buffered_narration_needs_disposition = False
+        state.obligations.buffered_narration_needs_disposition = False
     if round_has_any_commit:
         state.pending_narration_facts.extend(round_narration_facts)
 
@@ -2225,7 +2216,7 @@ def prepare_turn_recovery(
     *,
     turn_id: str,
 ) -> Iterable[ProviderEvent]:
-    state.campaign_id = provider_input.session.campaign_id
+    state.campaign_id = cast(str, provider_input.session.campaign_id)
     if state.campaign_id is None:
         raise CommandRejected("A DM provider turn requires a campaign")
     state.canonical_player_narration = _canonical_player_narration(
@@ -2239,8 +2230,9 @@ def prepare_turn_recovery(
         canonical_player_narration=state.canonical_player_narration,
     )
     state.context_owner = self._gm_context_owner(provider_input)
-    state.context_fields = (
-        {"context_owner": state.context_owner} if state.context_owner is not None else {}
+    state.context_fields = cast(
+        "dict[str, JsonValue]",
+        {"context_owner": state.context_owner} if state.context_owner is not None else {},
     )
     state.basis_message_id = provider_input.basis_message_id
     persisted_system_contract = any(
@@ -2412,17 +2404,13 @@ def prepare_turn_recovery(
     )
     state.saved_sequence_results = _saved_action_sequence_results(provider_input, self._owner)
     state.pending_narration_facts = [
-        state.facts
+        facts
         for result in state.saved_sequence_results
-        if (
-            state.bind(
-                "facts", _action_sequence_narration_facts(self._owner, state.campaign_id, result)
-            )
-        )
+        if (facts := _action_sequence_narration_facts(self._owner, state.campaign_id, result))
         is not None
     ]
-    state.provisional_tool_prose_pending = False
-    state.player_intent_pending = False
+    state.obligations.provisional_tool_prose_pending = False
+    state.obligations.player_intent_pending = False
     state.committed_action_ids = {
         event.action_id
         for event in self._owner.snapshot(state.campaign_id).events
@@ -2446,12 +2434,12 @@ def restore_saved_turn_progress(
             or contract.get("basis_message_id") != state.basis_message_id
         ):
             continue
-        state.action_id = contract.get("action_id")
+        action_id = contract.get("action_id")
         raw_behavior = contract.get("model_behavior")
         decision_owner = contract.get("decision_owner")
         if (
-            not isinstance(state.action_id, str)
-            or not state.action_id
+            not isinstance(action_id, str)
+            or not action_id
             or not isinstance(raw_behavior, str)
             or decision_owner not in {None, *tuple(owner.value for owner in ModelDecisionOwner)}
         ):
@@ -2459,7 +2447,7 @@ def restore_saved_turn_progress(
                 "Persisted mechanics action contract is invalid",
                 code="provider_tool_evidence_invalid",
             )
-        if state.action_id not in state.committed_action_ids:
+        if action_id not in state.committed_action_ids:
             continue
         try:
             state.behavior = ModelToolBehavior(raw_behavior)
@@ -2470,9 +2458,9 @@ def restore_saved_turn_progress(
             ) from error
         if state.behavior is ModelToolBehavior.LEAVES_PLAYER_INTENT_PENDING:
             try:
-                state.player_intent_pending = _preparation_keeps_intent_pending(
+                state.obligations.player_intent_pending = _preparation_keeps_intent_pending(
                     contract.get(_PREPARATION_INTENT_ARGUMENT, _UNSPECIFIED_PREPARATION_INTENT),
-                    pending=state.player_intent_pending,
+                    pending=state.obligations.player_intent_pending,
                 )
             except CommandRejected as error:
                 raise CommandRejected(
@@ -2483,7 +2471,7 @@ def restore_saved_turn_progress(
             state.behavior is ModelToolBehavior.RESOLVES_PLAYER_INTENT
             and decision_owner == ModelDecisionOwner.PLAYER.value
         ):
-            state.player_intent_pending = False
+            state.obligations.player_intent_pending = False
     state.buffered_narration = None
     state.buffered_response_blocks = None
     state.buffered_raw_response_blocks = None
@@ -2498,11 +2486,11 @@ def restore_saved_turn_progress(
         and state.ooc_ack_required
         and not str(state.current_player_action or "").strip()
     )
-    state.buffered_narration_needs_disposition = False
-    state.any_commit_in_exchange = state.post_mechanics_recovery or state.direct_response
-    state.campaign_file_commit_in_exchange = False
-    state.campaign_file_disposition_in_exchange = False
-    state.campaign_file_narration_pending = False
+    state.obligations.buffered_narration_needs_disposition = False
+    state.progress.any_commit_in_exchange = state.post_mechanics_recovery or state.direct_response
+    state.progress.campaign_file_commit_in_exchange = False
+    state.progress.campaign_file_disposition_in_exchange = False
+    state.obligations.campaign_file_narration_pending = False
     state.missing_required_tool_corrections_used = 0
     state.max_missing_required_tool_corrections = 3
     state.rejected_tool_corrections_used = 0
@@ -2516,8 +2504,8 @@ def restore_saved_turn_progress(
     state.current_application_controls = []
     state.repeated_response_corrections_used = 0
     state.max_repeated_response_corrections = 2
-    state.pending_failed_tool_call = False
-    state.force_campaign_file_update = False
+    state.obligations.pending_failed_tool_call = False
+    state.obligations.force_campaign_file_update = False
     # Native assistant history before the current task is completed player-facing dialogue,
     # not a held draft. Persisted same-turn provider evidence is appended after the current
     # task by _messages(), so only that suffix may resume an unsettled draft or tool result.
@@ -2592,40 +2580,37 @@ def resume_exchange_results(
     turn_id: str,
 ) -> None:
     for _turn_message in state.resumed_messages:
-        state.message = _turn_message
-        if state.message.get("role") == "assistant":
-            content = state.message.get("content")
+        message = _turn_message
+        if message.get("role") == "assistant":
+            content = message.get("content")
             if isinstance(content, str) and content:
                 state.buffered_narration = content
                 state.buffered_response_blocks = None
                 state.buffered_raw_response_blocks = None
-                state.buffered_narration_needs_disposition = True
-            state.raw_calls = state.message.get("tool_calls")
-            if isinstance(state.raw_calls, Sequence) and not isinstance(
-                state.raw_calls, (str, bytes, bytearray)
+                state.obligations.buffered_narration_needs_disposition = True
+            raw_calls = message.get("tool_calls")
+            if isinstance(raw_calls, Sequence) and not isinstance(
+                raw_calls, (str, bytes, bytearray)
             ):
-                for raw_call in state.raw_calls:
-                    state.function = (
-                        raw_call.get("function") if isinstance(raw_call, Mapping) else None
-                    )
-                    if not isinstance(state.function, Mapping):
+                for raw_call in raw_calls:
+                    function = raw_call.get("function") if isinstance(raw_call, Mapping) else None
+                    if not isinstance(function, Mapping):
                         continue
-                    state.name = state.function.get("name")
-                    if not isinstance(state.name, str) or not (
-                        state.name == "update_campaign_file"
-                        or state.name.endswith("_update_campaign_file")
+                    name = function.get("name")
+                    if not isinstance(name, str) or not (
+                        name == "update_campaign_file" or name.endswith("_update_campaign_file")
                     ):
                         continue
                     try:
-                        state.arguments = json.loads(str(state.function.get("arguments", "{}")))
-                        raw_blocks = state.arguments.get(_CAMPAIGN_FILE_REVISED_NARRATION_ARGUMENT)
+                        arguments = json.loads(str(function.get("arguments", "{}")))
+                        raw_blocks = arguments.get(_CAMPAIGN_FILE_REVISED_NARRATION_ARGUMENT)
                         if isinstance(raw_blocks, list):
                             state.buffered_raw_response_blocks = _validated_raw_response_blocks(
                                 raw_blocks, allow_legacy_dialogue_text=True
                             )
                             state.buffered_narration = None
                             state.buffered_response_blocks = None
-                            state.buffered_narration_needs_disposition = True
+                            state.obligations.buffered_narration_needs_disposition = True
                         elif (
                             isinstance(raw_blocks, str)
                             and raw_blocks.strip()
@@ -2634,15 +2619,15 @@ def resume_exchange_results(
                             state.buffered_narration = raw_blocks
                             state.buffered_response_blocks = None
                             state.buffered_raw_response_blocks = None
-                            state.buffered_narration_needs_disposition = True
+                            state.obligations.buffered_narration_needs_disposition = True
                     except (json.JSONDecodeError, ValueError, AttributeError):
                         pass
-            if state.raw_calls:
-                state.pending_failed_tool_call = False
-        if state.message.get("role") != "tool":
+            if raw_calls:
+                state.obligations.pending_failed_tool_call = False
+        if message.get("role") != "tool":
             continue
         try:
-            resumed_result = json.loads(str(state.message.get("content", "{}")))
+            resumed_result = json.loads(str(message.get("content", "{}")))
         except json.JSONDecodeError:
             continue
         if not isinstance(resumed_result, Mapping):
@@ -2651,14 +2636,14 @@ def resume_exchange_results(
         if status in {"rejected", CanonicalEventType.ACTION_FAILED.value} and not bool(
             resumed_result.get("correction_optional")
         ):
-            state.pending_failed_tool_call = True
+            state.obligations.pending_failed_tool_call = True
         if status in {
             "campaign_file_updated",
             CanonicalEventType.ACTION_COMMITTED.value,
         }:
-            state.any_commit_in_exchange = True
+            state.progress.any_commit_in_exchange = True
         if status == "campaign_file_updated":
-            state.settled_narration = resumed_result.get("player_facing_response")
+            settled_narration = resumed_result.get("player_facing_response")
             persisted_blocks = resumed_result.get("response_blocks")
             if persisted_blocks is not None:
                 try:
@@ -2670,27 +2655,24 @@ def resume_exchange_results(
                     ) from error
             else:
                 state.buffered_response_blocks = None
-            if state.settled_narration is not None:
-                if (
-                    not isinstance(state.settled_narration, str)
-                    or not state.settled_narration.strip()
-                ):
+            if settled_narration is not None:
+                if not isinstance(settled_narration, str) or not settled_narration.strip():
                     raise CommandRejected(
                         "Persisted Campaign File disposition narration is invalid",
                         code="provider_tool_evidence_invalid",
                     )
-                state.buffered_narration = state.settled_narration
+                state.buffered_narration = settled_narration
                 if state.buffered_response_blocks is None:
                     state.buffered_raw_response_blocks = None
-            state.campaign_file_commit_in_exchange = True
-            state.campaign_file_disposition_in_exchange = True
+            state.progress.campaign_file_commit_in_exchange = True
+            state.progress.campaign_file_disposition_in_exchange = True
             if state.buffered_narration is not None:
-                state.buffered_narration_needs_disposition = False
-                state.campaign_file_narration_pending = False
+                state.obligations.buffered_narration_needs_disposition = False
+                state.obligations.campaign_file_narration_pending = False
             else:
-                state.campaign_file_narration_pending = True
+                state.obligations.campaign_file_narration_pending = True
         if status == "campaign_file_unchanged":
-            state.settled_narration = resumed_result.get("player_facing_response")
+            settled_narration = resumed_result.get("player_facing_response")
             persisted_blocks = resumed_result.get("response_blocks")
             if persisted_blocks is not None:
                 try:
@@ -2702,31 +2684,28 @@ def resume_exchange_results(
                     ) from error
             else:
                 state.buffered_response_blocks = None
-            if state.settled_narration is not None:
-                if (
-                    not isinstance(state.settled_narration, str)
-                    or not state.settled_narration.strip()
-                ):
+            if settled_narration is not None:
+                if not isinstance(settled_narration, str) or not settled_narration.strip():
                     raise CommandRejected(
                         "Persisted Campaign File disposition narration is invalid",
                         code="provider_tool_evidence_invalid",
                     )
-                state.buffered_narration = state.settled_narration
+                state.buffered_narration = settled_narration
                 if state.buffered_response_blocks is None:
                     state.buffered_raw_response_blocks = None
-            state.campaign_file_disposition_in_exchange = True
+            state.progress.campaign_file_disposition_in_exchange = True
             if state.buffered_narration is not None:
-                state.buffered_narration_needs_disposition = False
-                state.campaign_file_narration_pending = False
+                state.obligations.buffered_narration_needs_disposition = False
+                state.obligations.campaign_file_narration_pending = False
             else:
-                state.campaign_file_narration_pending = True
+                state.obligations.campaign_file_narration_pending = True
         if status == CanonicalEventType.ACTION_COMMITTED.value:
-            state.campaign_file_disposition_in_exchange = False
-            state.campaign_file_narration_pending = False
+            state.progress.campaign_file_disposition_in_exchange = False
+            state.obligations.campaign_file_narration_pending = False
             state.buffered_narration = None
             state.buffered_response_blocks = None
             state.buffered_raw_response_blocks = None
-            state.buffered_narration_needs_disposition = False
+            state.obligations.buffered_narration_needs_disposition = False
         elif status not in {
             "rejected",
             CanonicalEventType.ACTION_FAILED.value,
@@ -2736,20 +2715,13 @@ def resume_exchange_results(
             state.buffered_narration = None
             state.buffered_response_blocks = None
             state.buffered_raw_response_blocks = None
-            state.buffered_narration_needs_disposition = False
-    if (
-        state.ooc_ack_required
-        and state.campaign_file_disposition_in_exchange
-        and not (
-            state.buffered_response_blocks is not None
-            and any(block.get("kind") == "ooc" for block in state.buffered_response_blocks)
-        )
-    ):
+            state.obligations.buffered_narration_needs_disposition = False
+    if _settled_disposition_still_owes_ooc_acknowledgement(state):
         raise CommandRejected(
             "Persisted OOC turn response omits its acknowledgement",
             code="provider_tool_evidence_invalid",
         )
-    state.force_campaign_file_update = bool(
+    state.obligations.force_campaign_file_update = bool(
         (state.buffered_narration is not None or state.buffered_raw_response_blocks is not None)
-        and state.buffered_narration_needs_disposition
+        and state.obligations.buffered_narration_needs_disposition
     )

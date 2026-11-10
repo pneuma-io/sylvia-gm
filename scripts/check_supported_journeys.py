@@ -368,6 +368,7 @@ PYTHON_JOURNEYS = {
         'tests/test_session_reasoning_preferences.py',
         'tests/test_alpha_admin_full_audit.py',
         'tests/test_builder_native_thinking.py',
+        "tests/test_provider_turn_state.py",
     ],
     "bundled-content": [
         "tests/test_plan_snapshot_cache.py",

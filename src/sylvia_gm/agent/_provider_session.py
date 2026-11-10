@@ -56,6 +56,22 @@ from sylvia_gm.domain.errors import CommandRejected
 from sylvia_gm.domain.session import SessionMessageKind
 from sylvia_gm.provider._base import Provider, ProviderStreamChunk
 
+from ._provider_turn_decisions import (
+    _actor_decision_can_be_requested,
+    _buffered_narration_is_settled,
+    _campaign_file_must_be_settled,
+    _campaign_file_needs_narration,
+    _held_campaign_file_narration_is_needed,
+    _narration_needs_private_correction,
+    _narration_repeats_previous_player_response,
+    _required_tool_call_is_missing,
+    _required_tool_correction_was_abandoned,
+    _required_transition_can_run,
+    _round_needs_gm_decision,
+    _round_needs_player_intent_resolution,
+    _tool_round_can_release_narration,
+    _tool_round_needs_correction,
+)
 from ._provider_turn_state import ProviderTurnState
 
 _STREAM_POLL_SECONDS = 0.05
@@ -1703,11 +1719,7 @@ class ProviderSessionAdapter:
         yield from prepare_turn_recovery(self, state, provider_input, turn_id=turn_id)
         restore_saved_turn_progress(self, state, provider_input, turn_id=turn_id)
         resume_exchange_results(self, state, provider_input, turn_id=turn_id)
-        if (
-            state.buffered_narration is not None
-            and state.campaign_file_disposition_in_exchange
-            and not state.buffered_narration_needs_disposition
-        ):
+        if _buffered_narration_is_settled(state):
             yield ProviderEvent.talk(
                 state.buffered_narration, response_blocks=state.buffered_response_blocks
             )
@@ -1720,19 +1732,19 @@ class ProviderSessionAdapter:
         # Useful tool work continues until completion or cancellation. Engine bookkeeping
         # does not consume a model request, and neither has an arbitrary total-round cutoff.
         state.provider_round = 0
-        state.engine_transition_review_pending = False
-        state.sequence_execution_stopped = any(
+        state.obligations.engine_transition_review_pending = False
+        state.progress.sequence_execution_stopped = any(
             result.get("status") in {"paused", "failed", "stale"}
             or result.get("provider_execution_stopped") is True
             for result in state.saved_sequence_results
         )
         while True:
             prepare_round_catalog(self, state, provider_input, turn_id=turn_id)
-            if state.required_transitions and not state.engine_transition_review_pending:
+            if _required_transition_can_run(state):
                 yield from execute_required_transition(self, state, provider_input, turn_id=turn_id)
                 continue
 
-            if not state.engine_transition_review_pending and not state.participant_ooc_only:
+            if _actor_decision_can_be_requested(state):
                 # Build the envelope only after required bookkeeping has drained and refreshed.
                 actor_reader = getattr(self._owner, "actor_decision_request", None)
                 state.actor_request = (
@@ -1751,11 +1763,7 @@ class ProviderSessionAdapter:
 
             if not state.assemblies:
                 state.narration = "".join(state.assistant_text)
-                if (
-                    not state.narration
-                    and state.buffered_narration is not None
-                    and state.campaign_file_narration_pending
-                ):
+                if _held_campaign_file_narration_is_needed(state):
                     state.narration = state.buffered_narration
                 if _contains_serialized_tool_call(state.narration):
                     raise CommandRejected(
@@ -1775,16 +1783,7 @@ class ProviderSessionAdapter:
                         code="provider_empty_completion",
                     )
                 state.empty_completion_corrections_used = 0
-                repeated_previous_response = (
-                    not state.force_campaign_file_update
-                    and not state.campaign_file_narration_pending
-                    and not state.provider_tool_call_required
-                    and state.current_player_action is not None
-                    and state.previous_player_action is not None
-                    and state.current_player_action != state.previous_player_action
-                    and state.previous_player_facing_response is not None
-                    and state.narration == state.previous_player_facing_response
-                )
+                repeated_previous_response = _narration_repeats_previous_player_response(state)
                 if repeated_previous_response:
                     if (
                         state.repeated_response_corrections_used
@@ -1798,7 +1797,7 @@ class ProviderSessionAdapter:
                         "Provider repeatedly returned the previous player-facing response",
                         code="provider_repeated_player_facing_response",
                     )
-                if state.provider_tool_call_required and not state.force_campaign_file_update:
+                if _required_tool_call_is_missing(state):
                     if (
                         state.missing_required_tool_corrections_used
                         < state.max_missing_required_tool_corrections
@@ -1811,9 +1810,7 @@ class ProviderSessionAdapter:
                         "Provider repeatedly returned prose where a tool call was required",
                         code="provider_required_tool_call_missing",
                     )
-                if not state.force_campaign_file_update and _looks_like_private_deliberation(
-                    state.narration
-                ):
+                if _narration_needs_private_correction(state, _looks_like_private_deliberation):
                     if (
                         state.private_deliberation_corrections_used
                         < state.max_private_deliberation_corrections
@@ -1824,10 +1821,10 @@ class ProviderSessionAdapter:
                         "Provider repeatedly returned private deliberation as narration",
                         code="provider_private_deliberation",
                     )
-                if state.campaign_file_narration_pending:
+                if _campaign_file_needs_narration(state):
                     yield from record_held_narration(self, state, provider_input, turn_id=turn_id)
                     return
-                if state.force_campaign_file_update:
+                if _campaign_file_must_be_settled(state):
                     if (
                         state.missing_required_tool_corrections_used
                         < state.max_missing_required_tool_corrections
@@ -1840,17 +1837,17 @@ class ProviderSessionAdapter:
                         "Provider completed without settling the Campaign File",
                         code="campaign_file_disposition_required",
                     )
-                if state.pending_failed_tool_call:
+                if _required_tool_correction_was_abandoned(state):
                     raise CommandRejected(
                         "Provider abandoned a required tool-call correction",
                         code="provider_tool_correction_abandoned",
                     )
-                if state.gm_boundary_decision:
+                if _round_needs_gm_decision(state):
                     yield from preserve_boundary_narration(
                         self, state, provider_input, turn_id=turn_id
                     )
                     continue
-                if state.player_intent_resolution_required:
+                if _round_needs_player_intent_resolution(state):
                     yield from preserve_player_intent_narration(
                         self, state, provider_input, turn_id=turn_id
                     )
@@ -1867,20 +1864,20 @@ class ProviderSessionAdapter:
             yield from execute_tool_batch(self, state, provider_input, turn_id=turn_id)
 
             yield from reconcile_tool_batch(self, state, provider_input, turn_id=turn_id)
-            if state.round_failed:
+            if _tool_round_needs_correction(state):
                 provider_input.control.progress.expect_correction()
                 if state.round_has_non_narrative_call:
                     state.buffered_narration = None
                     state.buffered_response_blocks = None
                     state.buffered_raw_response_blocks = None
-                    state.buffered_narration_needs_disposition = False
+                    state.obligations.buffered_narration_needs_disposition = False
                 elif (
                     state.buffered_narration is not None
                     or state.buffered_raw_response_blocks is not None
                 ):
-                    state.force_campaign_file_update = True
+                    state.obligations.force_campaign_file_update = True
                 if not state.required_tool_failures:
-                    state.pending_failed_tool_call = False
+                    state.obligations.pending_failed_tool_call = False
                     state.current_application_controls.append(
                         {
                             "role": "system",
@@ -1894,7 +1891,7 @@ class ProviderSessionAdapter:
                         }
                     )
                     continue
-                state.pending_failed_tool_call = True
+                state.obligations.pending_failed_tool_call = True
                 if state.rejected_tool_corrections_used < state.max_rejected_tool_corrections:
                     retry_rejected_tool_call(self, state, provider_input, turn_id=turn_id)
                     continue
@@ -1910,17 +1907,12 @@ class ProviderSessionAdapter:
                     "The provider tool call remained invalid after bounded correction",
                     code=str(failed_result.get("code", "mechanics_rejected")),
                 )
-            if (
-                not state.round_has_non_narrative_call
-                and state.buffered_narration is not None
-                and state.campaign_file_disposition_in_exchange
-                and not state.buffered_narration_needs_disposition
-            ):
+            if _tool_round_can_release_narration(state):
                 yield ProviderEvent.talk(
                     state.buffered_narration, response_blocks=state.buffered_response_blocks
                 )
                 return
-            state.pending_failed_tool_call = False
+            state.obligations.pending_failed_tool_call = False
 
     def _provider_tools(
         self,
