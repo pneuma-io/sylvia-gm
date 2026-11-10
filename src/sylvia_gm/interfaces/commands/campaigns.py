@@ -40,7 +40,13 @@ from sylvia_gm.application.reusable_plans import (
     save_reusable_rift_plan,
 )
 from sylvia_gm.campaign.rift import rift_public_template
-from sylvia_gm.domain.authority import PackageLock, PackageRole, Participant, SafePayload, StateValue
+from sylvia_gm.domain.authority import (
+    PackageLock,
+    PackageRole,
+    Participant,
+    SafePayload,
+    StateValue,
+)
 from sylvia_gm.domain.errors import CommandRejected
 from sylvia_gm.domain.session import SessionMessageKind
 from sylvia_gm.infrastructure.builder_source_ingestion import (

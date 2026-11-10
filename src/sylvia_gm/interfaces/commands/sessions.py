@@ -314,8 +314,13 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
         from sylvia_gm.agent._working_context import compact_saved_messages
 
         if context.session.role is WriterRole.BUILDER and context.session.campaign_id:
-            construction_basis = ctx.application_owner.campaign_construction_basis(context.session.campaign_id)
-            if construction_basis.builder_session_id == session_id and construction_basis.completion_revision is None:
+            construction_basis = ctx.application_owner.campaign_construction_basis(
+                context.session.campaign_id
+            )
+            if (
+                construction_basis.builder_session_id == session_id
+                and construction_basis.completion_revision is None
+            ):
                 raise OwnerProtocolError(
                     "The campaign Interview keeps its exact transcript. "
                     "Compaction is unavailable."
@@ -515,8 +520,13 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
             participant_campaign_setting = None
             candidate = launch_candidate(ctx.application_owner, context)
             setting_reference = next(
-                (item for item in cast(Sequence[Mapping[str, Any]], saved_references.get("packages", []))
-                 if item.get("prefix") == "setting"),
+                (
+                    item
+                    for item in cast(
+                        Sequence[Mapping[str, Any]], saved_references.get("packages", [])
+                    )
+                    if item.get("prefix") == "setting"
+                ),
                 None,
             )
             if candidate is not None and context.session.campaign_id is None:
@@ -797,7 +807,9 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
             })
             saved = copy_compatible_character(
                 ctx.storage_root, source=source, expected_content_sha256=expected_content_sha256,
-                operation_id="builder-character-copy-" + hashlib.sha256(copy_basis).hexdigest()[:32],
+                operation_id=(
+                    "builder-character-copy-" + hashlib.sha256(copy_basis).hexdigest()[:32]
+                ),
                 package=participant_package, declaration=declarations[0],
                 campaign_setting=participant_campaign_setting,
                 setting_character_schema=participant_setting_schema,

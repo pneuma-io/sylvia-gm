@@ -8,8 +8,6 @@ remains the only writer.
 
 from __future__ import annotations
 
-from ._provider_turn_state import ProviderTurnState
-
 import asyncio
 import hashlib
 import json
@@ -22,7 +20,6 @@ from typing import Any, cast
 
 from sylvia_gm.agent._campaign_memory import select_campaign_memory
 from sylvia_gm.agent._inference_identity import inference_context_id
-from sylvia_gm.agent._native_continuation import attach_chat_metadata
 from sylvia_gm.agent._provider_runtime import _PROVIDER_ASYNC_RUNTIME
 from sylvia_gm.agent._request_data import (
     APPLICATION_DATA_GUIDANCE,
@@ -30,7 +27,6 @@ from sylvia_gm.agent._request_data import (
     application_data_after_history,
 )
 from sylvia_gm.agent._session_loop import (
-    ProviderActionFeedback,
     ProviderControl,
     ProviderEvent,
     SessionProvider,
@@ -39,17 +35,13 @@ from sylvia_gm.agent._session_loop import (
 )
 from sylvia_gm.agent._stateless_mcp import (
     ModelMechanicsTool,
-    action_sequence_model_tools,
-    call_action_sequence_tool,
 )
-from sylvia_gm.application.authority import ActionCommand, AuthorityOwner
+from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.domain.authority import (
     CampaignContinuityView,
     CanonicalEventType,
     EventVisibility,
-    JsonValue,
     ModelDecisionBoundary,
-    ModelDecisionOwner,
     ModelToolBehavior,
     NarrationStream,
     ProseChannel,
@@ -60,10 +52,11 @@ from sylvia_gm.domain.authority import (
     validate_authority_identity,
     validate_response_blocks,
 )
-from sylvia_gm.domain.errors import CommandRejected, MechanicsRejected
+from sylvia_gm.domain.errors import CommandRejected
 from sylvia_gm.domain.session import SessionMessageKind
 from sylvia_gm.provider._base import Provider, ProviderStreamChunk
-from sylvia_gm.provider._tool_delta import parse_tool_call_delta
+
+from ._provider_turn_state import ProviderTurnState
 
 _STREAM_POLL_SECONDS = 0.05
 _MAX_CAMPAIGN_PLAN_BYTES = 1024 * 1024
@@ -1682,28 +1675,28 @@ class ProviderSessionAdapter:
     ) -> Iterable[ProviderEvent]:
         from ._provider_turn_phases import (
             execute_required_transition,
-            run_required_actor_decision,
-            retry_empty_completion,
-            record_empty_completion,
-            retry_repeated_response,
-            retry_missing_tool_call,
-            retry_private_deliberation,
-            record_held_narration,
-            retry_missing_campaign_file_update,
+            execute_tool_batch,
+            prepare_provider_round,
+            prepare_round_catalog,
+            prepare_tool_batch,
+            prepare_turn_recovery,
             preserve_boundary_narration,
             preserve_player_intent_narration,
-            retain_campaign_file_narration,
-            record_final_narration,
-            retry_rejected_tool_call,
-            prepare_round_catalog,
-            prepare_provider_round,
-            stream_provider_round,
-            prepare_tool_batch,
-            execute_tool_batch,
             reconcile_tool_batch,
-            prepare_turn_recovery,
+            record_empty_completion,
+            record_final_narration,
+            record_held_narration,
             restore_saved_turn_progress,
             resume_exchange_results,
+            retain_campaign_file_narration,
+            retry_empty_completion,
+            retry_missing_campaign_file_update,
+            retry_missing_tool_call,
+            retry_private_deliberation,
+            retry_rejected_tool_call,
+            retry_repeated_response,
+            run_required_actor_decision,
+            stream_provider_round,
         )
 
         state = ProviderTurnState()
@@ -1742,10 +1735,15 @@ class ProviderSessionAdapter:
             if not state.engine_transition_review_pending and not state.participant_ooc_only:
                 # Build the envelope only after required bookkeeping has drained and refreshed.
                 actor_reader = getattr(self._owner, "actor_decision_request", None)
-                state.actor_request = (actor_reader(state.campaign_id, turn_id=turn_id)
-                                 if callable(actor_reader) else None)
+                state.actor_request = (
+                    actor_reader(state.campaign_id, turn_id=turn_id)
+                    if callable(actor_reader)
+                    else None
+                )
                 if state.actor_request is not None:
-                    yield from run_required_actor_decision(self, state, provider_input, turn_id=turn_id)
+                    yield from run_required_actor_decision(
+                        self, state, provider_input, turn_id=turn_id
+                    )
                     continue
 
             prepare_provider_round(self, state, provider_input, turn_id=turn_id)
@@ -1766,7 +1764,10 @@ class ProviderSessionAdapter:
                     )
                 if not state.narration:
                     yield from record_empty_completion(self, state, provider_input, turn_id=turn_id)
-                    if state.empty_completion_corrections_used < state.max_empty_completion_corrections:
+                    if (
+                        state.empty_completion_corrections_used
+                        < state.max_empty_completion_corrections
+                    ):
                         retry_empty_completion(self, state, provider_input, turn_id=turn_id)
                         continue
                     raise CommandRejected(
@@ -1785,8 +1786,13 @@ class ProviderSessionAdapter:
                     and state.narration == state.previous_player_facing_response
                 )
                 if repeated_previous_response:
-                    if state.repeated_response_corrections_used < state.max_repeated_response_corrections:
-                        yield from retry_repeated_response(self, state, provider_input, turn_id=turn_id)
+                    if (
+                        state.repeated_response_corrections_used
+                        < state.max_repeated_response_corrections
+                    ):
+                        yield from retry_repeated_response(
+                            self, state, provider_input, turn_id=turn_id
+                        )
                         continue
                     raise CommandRejected(
                         "Provider repeatedly returned the previous player-facing response",
@@ -1797,14 +1803,21 @@ class ProviderSessionAdapter:
                         state.missing_required_tool_corrections_used
                         < state.max_missing_required_tool_corrections
                     ):
-                        yield from retry_missing_tool_call(self, state, provider_input, turn_id=turn_id)
+                        yield from retry_missing_tool_call(
+                            self, state, provider_input, turn_id=turn_id
+                        )
                         continue
                     raise CommandRejected(
                         "Provider repeatedly returned prose where a tool call was required",
                         code="provider_required_tool_call_missing",
                     )
-                if not state.force_campaign_file_update and _looks_like_private_deliberation(state.narration):
-                    if state.private_deliberation_corrections_used < state.max_private_deliberation_corrections:
+                if not state.force_campaign_file_update and _looks_like_private_deliberation(
+                    state.narration
+                ):
+                    if (
+                        state.private_deliberation_corrections_used
+                        < state.max_private_deliberation_corrections
+                    ):
                         retry_private_deliberation(self, state, provider_input, turn_id=turn_id)
                         continue
                     raise CommandRejected(
@@ -1819,7 +1832,9 @@ class ProviderSessionAdapter:
                         state.missing_required_tool_corrections_used
                         < state.max_missing_required_tool_corrections
                     ):
-                        yield from retry_missing_campaign_file_update(self, state, provider_input, turn_id=turn_id)
+                        yield from retry_missing_campaign_file_update(
+                            self, state, provider_input, turn_id=turn_id
+                        )
                         continue
                     raise CommandRejected(
                         "Provider completed without settling the Campaign File",
@@ -1831,13 +1846,19 @@ class ProviderSessionAdapter:
                         code="provider_tool_correction_abandoned",
                     )
                 if state.gm_boundary_decision:
-                    yield from preserve_boundary_narration(self, state, provider_input, turn_id=turn_id)
+                    yield from preserve_boundary_narration(
+                        self, state, provider_input, turn_id=turn_id
+                    )
                     continue
                 if state.player_intent_resolution_required:
-                    yield from preserve_player_intent_narration(self, state, provider_input, turn_id=turn_id)
+                    yield from preserve_player_intent_narration(
+                        self, state, provider_input, turn_id=turn_id
+                    )
                     continue
                 if state.campaign_file_disposition_supported:
-                    yield from retain_campaign_file_narration(self, state, provider_input, turn_id=turn_id)
+                    yield from retain_campaign_file_narration(
+                        self, state, provider_input, turn_id=turn_id
+                    )
                     continue
                 yield from record_final_narration(self, state, provider_input, turn_id=turn_id)
                 return

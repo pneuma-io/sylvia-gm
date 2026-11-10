@@ -6,9 +6,8 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, TypeVar
 
 if TYPE_CHECKING:
-    from sylvia_gm.domain.authority import ModelDecisionBoundary
-    from sylvia_gm.domain.authority import ModelToolBehavior
-    from sylvia_gm.domain.authority import SafePayload
+    from sylvia_gm.domain.authority import ModelDecisionBoundary, ModelToolBehavior, SafePayload
+
     from ._provider_session import (
         _ToolCallAssembly,
     )
