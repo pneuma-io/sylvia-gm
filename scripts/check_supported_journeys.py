@@ -22,10 +22,12 @@ from pathlib import Path
 
 if __package__:
     from .check_catalog import PRODUCT_CASE_EXCLUSIONS, qualification_cases
+    from .journey_fixture_inputs import candidate_identity, prepare_candidate
     from .known_test_defects import accepted_case, case_key, report_outcomes
 else:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
     from scripts.check_catalog import PRODUCT_CASE_EXCLUSIONS, qualification_cases
+    from scripts.journey_fixture_inputs import candidate_identity, prepare_candidate
     from scripts.known_test_defects import accepted_case, case_key, report_outcomes
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -36,6 +38,7 @@ PYTHON_JOURNEYS = {
         "tests/test_runtime_payload_cache.py",
         "tests/test_package_runtime_loading.py",
         "tests/test_runtime_disk_cache.py",
+        "tests/test_journey_fixture_inputs.py",
         "tests/test_retained_117.py",
         "tests/test_admitted_fixture_isolation.py",
         "tests/test_interrupted_package_staging.py",
@@ -704,13 +707,16 @@ def source_identity() -> dict[str, object]:
         head = subprocess.run(
             ["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True, check=True
         ).stdout.strip()
-    digest = hashlib.sha256(
-        json.dumps(files, sort_keys=True, separators=(",", ":")).encode()
-    ).hexdigest()
+    selected_candidate = candidate_identity(os.environ)
+    digest = hashlib.sha256(json.dumps(
+        {"files": files, "srd_lite_candidate": selected_candidate},
+        sort_keys=True, separators=(",", ":"),
+    ).encode()).hexdigest()
     expected = os.environ.get("SYLVIA_EXPECTED_REVISION")
     if expected and head != expected:
         raise ValueError("Checked-out revision differs from required current workflow revision")
-    return {"sha256": digest, "head": head, "files": files}
+    return {"sha256": digest, "head": head, "files": files,
+            "srd_lite_candidate": selected_candidate}
 
 
 def _remaining_timeout(deadline):
@@ -849,13 +855,6 @@ def _run(
         child_environment[variable] = str(temporary.resolve())
     if name == "ui-controls":
         child_environment["SYLVIA_TEST_PYTHON"] = sys.executable
-    if name in ("lite-admitted-qa", "launch-lite-compatibility", "builder-and-admission"):
-        # This exact input is included in source_identity, regardless of ambient
-        # candidate overrides. Missing or unreadable bytes fail test execution.
-        child_environment.setdefault(
-            "SRD_LITE_CANDIDATE",
-            str(ROOT / "tests/fixtures/SRD-Lite-117-QA-Legacy-Contract-Clean.sylvia-gm-package"),
-        )
     expected_cases = set()
     collected_nodeids = []
     try:
@@ -1059,6 +1058,10 @@ def main() -> int:
             }
         ),
         encoding="utf-8",
+    )
+    candidate = prepare_candidate(os.environ, ROOT, destination)
+    (destination / "srd-candidate-input.json").write_text(
+        json.dumps(candidate, indent=2), encoding="utf-8"
     )
     initial_identity = source_identity()
     (destination / "source-identity.json").write_text(

@@ -120,10 +120,6 @@ def run_balanced_gate(
     )
     environment["SYLVIA_QA_FIXTURE_ROOT"] = str(destination.resolve())
     environment["SYLVIA_RUNTIME_CACHE_DIR"] = str(destination.resolve() / "runtime-cache")
-    environment.setdefault(
-        "SRD_LITE_CANDIDATE",
-        str(root / "tests/fixtures/SRD-Lite-117-QA-Legacy-Contract-Clean.sylvia-gm-package"),
-    )
     temporary = destination / "temporary" / "shared-pool"
     temporary.mkdir(parents=True, exist_ok=True)
     for variable in ("TEMP", "TMP", "TMPDIR"):

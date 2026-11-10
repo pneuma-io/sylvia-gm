@@ -7,10 +7,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 sys.path[:0] = [str(ROOT / "src"), str(ROOT)]
-os.environ.setdefault(
-    "SRD_LITE_CANDIDATE",
-    str(ROOT / "tests/fixtures/SRD-Lite-117-QA-Legacy-Contract-Clean.sylvia-gm-package"),
-)
 if "SYLVIA_QA_FIXTURE_ROOT" not in os.environ:
     owned = ROOT.parent / f"{ROOT.name}-checks"
     owned.mkdir(parents=True, exist_ok=True)
@@ -23,6 +19,10 @@ os.environ.setdefault(
 )
 # Match the normal runner: optional evidence archival is an explicit selection.
 os.environ.setdefault("SYLVIA_RETAIN_SUCCESSFUL_FIXTURES", "0")
+if "SRD_LITE_CANDIDATE" not in os.environ:
+    from scripts.journey_fixture_inputs import prepare_candidate
+
+    prepare_candidate(os.environ, ROOT, Path(os.environ["SYLVIA_QA_FIXTURE_ROOT"]))
 
 
 def pytest_configure(config):
@@ -36,7 +36,6 @@ def pytest_configure(config):
 def pytest_collection_modifyitems(items):
     """Known failures still execute; an unexpected pass fails until the entry is reviewed."""
     import pytest
-
     from scripts.known_test_defects import KNOWN_DEFECTS, failure_reason
 
     for item in items:

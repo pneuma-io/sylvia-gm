@@ -34,12 +34,19 @@ Use PowerShell in the checkout after `uv sync --locked --all-extras`. For JavaSc
 checks, install the locked dependencies once with `npm ci --prefix tests --ignore-scripts`.
 Choose a fresh output directory beside the checkout, within the current work item.
 
+By default, pytest and the runner materialize the current public Lite source into the
+run's own `inputs` directory. The committed legacy package stays available for explicit
+compatibility checks. Set `SRD_LITE_CANDIDATE` only to deliberately select another input;
+the runner records and guards its exact bytes as well as the checked source.
+
 ```powershell
 $checks = '..\checks'
 $env:PYTHONDONTWRITEBYTECODE=1
 # Both standalone pytest and the journey runner use normal plugin autoload.
 # Clear the setting if this shell previously used the README's explicit-plugin command.
 $env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=$null
+# Use the current source unless this check deliberately selects a historical package.
+$env:SRD_LITE_CANDIDATE=$null
 
 # One focused file, or append ::test_name for one scenario.
 .venv/Scripts/python.exe -m pytest -s -p no:cacheprovider tests/test_command_registry.py
