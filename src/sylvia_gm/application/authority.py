@@ -4990,7 +4990,14 @@ class AuthorityOwner:
                         raise TypeError("Mechanic outcome violates state ownership")
                 except RulesetPreconditionRejected:
                     raise
-                except Exception:
+                except Exception as error:
+                    self.record_admin_full_audit({
+                        "kind": "ruleset_execution_defect",
+                        "package_id": command.package_id,
+                        "tool_name": command.tool_name,
+                        "error": str(error)[:2000],
+                        "cause": str(error.__cause__)[:2000] if error.__cause__ else None,
+                    })
                     outcome = _safe_tool_failure_outcome()
                     status = ActionStatus.FAILED
                 else:
@@ -8917,7 +8924,7 @@ class AuthorityOwner:
             return self._admin_full_audit_enabled
 
     def record_admin_full_audit(self, payload: object) -> None:
-        """Capture one raw provider exchange only while the explicit admin mode is enabled."""
+        """Capture a private exchange or defect only while explicit admin mode is enabled."""
 
         with self._operation(), self._narration_lock:
             if self._admin_full_audit_enabled:
