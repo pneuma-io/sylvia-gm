@@ -4936,6 +4936,186 @@
         "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Lord Harren Dorn from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, body proportions, skin, eyes, hair, clothing, applicable plain earrings, colors and material wear. Appearance: An adult settled Human man appearing in his late fifties, with a broad heavy working build, weathered tan skin, dark brown eyes, thick dark hair graying at the sides and combed back, and a full neatly squared salt-and-pepper beard. A practical appraising expression and steady grounded posture. A sturdy well-made charcoal wool merchant's coat with plain copper buttons over a muted rust-brown waistcoat and cream linen shirt, dark trousers, a plain leather belt and good worn brown boots. Empty relaxed hands. His practical industrial merchant bearing follows the authored profile; age, physical features and clothing are editable visual defaults. No dwarf anatomy, crown, smith's apron, hammer, invented house crest, stolen metal, readable accounts, magical forge effects or visual disclosure of plot secrets. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Consistent scale across three body views. Entire bodies, hair, hands and footwear inside margins. Exactly the same one character repeated as turnaround views. No labels, readable text, captions, borders, logos, UI, scenery, extra characters, animals or invented insignia. Change viewing angle only; keep identity and costume unchanged.",
         "portrait": "Use case: identity-preserve. Production square app portrait for Lord Harren Dorn from Severed Lands. Input image 1 is the canonical full-body identity reference, image 2 is the matching multiview sheet. Preserve that exact adult face, age, skin, eyes, hairstyle, expression, applicable simple earrings and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face is centered; eyes near 35 percent down and chin near 65 percent down, with comfortable headroom above all hair. Face framing must be consistent with a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, borders, captions, readable text, UI, scenery, new costume, magical effects, house crests, animals or extra people. One 1024x1024 PNG."
       }
+    },
+    {
+      "id": "severed-npc-lord-merrick",
+      "name": "Lord Silas Merrick",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/lord-merrick.md",
+          "sha256": "1ee2be94f5e25bc29e3eeb29527dd8cf984bbdd979e398f2db1be03971c12553",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/lord-merrick.md",
+          "sha256": "3c3e01497ef8e1dd9eb4aa53559ce4cc8619e7fb20158f5f9e96ca8bd183866c",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult settled Human man appearing in his early sixties, with a lean medium build, light brown skin, dark hazel eyes, fine lined features, straight black hair graying at the temples and neatly side-parted, and a tidy short dark mustache with gray strands. A quiet patient curious expression and contained upright posture. A restrained well-made deep ink-blue merchant's coat over a muted umber waistcoat and pale gray linen collared shirt, dark tailored trousers and neat brown leather shoes. One plain closed belt pouch, empty relaxed hands. His patient merchant-councillor bearing follows the authored profile; age, physical features and costume are editable visual defaults. No spy gadgets, secret files, readable papers, hidden-network symbols, assassin costume, villainous glow, invented house crest or visual disclosure of private knowledge.",
+        "full_body": {
+          "path": "assets/characters/f0b9ca8cb0a188f4a5e35a3fd11a268873f64057a8d133034c72655fe0b21758.png",
+          "sha256": "f0b9ca8cb0a188f4a5e35a3fd11a268873f64057a8d133034c72655fe0b21758"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/6666cd1bdb68a4359cc58f7fe34b4c6749e04a0e381dd98577462e2623314ebb.png",
+          "sha256": "6666cd1bdb68a4359cc58f7fe34b4c6749e04a0e381dd98577462e2623314ebb"
+        },
+        "portrait": {
+          "path": "assets/characters/9cd42556589f2725b317d1f80bf2193ed92e810d7e3932656290997924e58b9d.png",
+          "sha256": "9cd42556589f2725b317d1f80bf2193ed92e810d7e3932656290997924e58b9d"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1919905
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2240561
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2386070
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Lord Silas Merrick in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person standing naturally in a near-front three-quarter pose with both empty hands visible, whole hair, hands, clothing, footwear and all equipment comfortably inside all margins. Appearance: An adult settled Human man appearing in his early sixties, with a lean medium build, light brown skin, dark hazel eyes, fine lined features, straight black hair graying at the temples and neatly side-parted, and a tidy short dark mustache with gray strands. A quiet patient curious expression and contained upright posture. A restrained well-made deep ink-blue merchant's coat over a muted umber waistcoat and pale gray linen collared shirt, dark tailored trousers and neat brown leather shoes. One plain closed belt pouch, empty relaxed hands. His patient merchant-councillor bearing follows the authored profile; age, physical features and costume are editable visual defaults. No spy gadgets, secret files, readable papers, hidden-network symbols, assassin costume, villainous glow, invented house crest or visual disclosure of private knowledge. Preserve authored identity, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Lord Silas Merrick from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, body proportions, skin, eyes, hair, clothing, armor where applicable, colors and material wear. Appearance: An adult settled Human man appearing in his early sixties, with a lean medium build, light brown skin, dark hazel eyes, fine lined features, straight black hair graying at the temples and neatly side-parted, and a tidy short dark mustache with gray strands. A quiet patient curious expression and contained upright posture. A restrained well-made deep ink-blue merchant's coat over a muted umber waistcoat and pale gray linen collared shirt, dark tailored trousers and neat brown leather shoes. One plain closed belt pouch, empty relaxed hands. His patient merchant-councillor bearing follows the authored profile; age, physical features and costume are editable visual defaults. No spy gadgets, secret files, readable papers, hidden-network symbols, assassin costume, villainous glow, invented house crest or visual disclosure of private knowledge. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Consistent scale across three body views. Entire bodies, hair, hands, footwear and equipment inside margins. Exactly the same one character repeated as turnaround views. For the knight, preserve the heavy gauntlet on his RIGHT hand, shield on LEFT arm and sheathed sword at LEFT hip through all viewing angles; never mirror their anatomical sides. No labels, readable text, captions, borders, logos, UI, scenery, extra characters, animals, invented insignia or visible secret illness. Change viewing angle only; keep identity and costume unchanged.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Lord Silas Merrick from Severed Lands. Input image 1 is the canonical full-body identity reference, image 2 is the matching multiview sheet. Preserve that exact adult face, age, skin, eyes, hairstyle, facial hair, expression and upper clothing or armor. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face is centered; eyes near 35 percent down and chin near 65 percent down, with comfortable headroom above all hair. Face framing must be consistent with a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin, fabric and applicable worn steel, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, borders, captions, readable text, UI, scenery, new costume, magical effects, invented crests, illness clues, animals or extra people. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-lord-voss",
+      "name": "Lord Aldric Voss",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/lord-voss.md",
+          "sha256": "357fd3fa3633c089640fcc018ff47a051f3d7aa3c6d198ed67e7f43b93dc667f",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/lord-voss.md",
+          "sha256": "18af13e5125b4946ad41fc1b9227883dcb697f1efd62f0a8f62eea8bb88bc8ab",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An elderly settled Human man appearing in his mid-seventies, with a broad upright build, weathered light olive skin, pale blue-gray eyes, thinning silver-white hair neatly combed back and a short carefully trimmed white beard. A formal deliberate composed expression and dignified erect posture. A fine plain dark forest-green wool coat over a muted brown-gold waistcoat and ivory collared shirt, dark brown tailored trousers, an ordinary leather belt and polished dark brown shoes. Empty relaxed hands. His senior formal council bearing follows the authored profile; age styling, physical features and clothing are editable visual defaults. No crown, invented house crest, hostile political banners, readable policies, memorial clues, monstrous features, magical effects or visual disclosure of private grief.",
+        "full_body": {
+          "path": "assets/characters/7e9d9b184aa23cb319fd6d7bbb3977485667ec6e9bcf11002c7cb2165466c63b.png",
+          "sha256": "7e9d9b184aa23cb319fd6d7bbb3977485667ec6e9bcf11002c7cb2165466c63b"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/2ed7e5d3f835e5238927c6d3aeafbab63b8a4177c7f4b7146e8bf311e741c8b5.png",
+          "sha256": "2ed7e5d3f835e5238927c6d3aeafbab63b8a4177c7f4b7146e8bf311e741c8b5"
+        },
+        "portrait": {
+          "path": "assets/characters/d3d69f5042e0b55a956d21df4690767adceef7d935b6d481b389736e7f963d72.png",
+          "sha256": "d3d69f5042e0b55a956d21df4690767adceef7d935b6d481b389736e7f963d72"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1903764
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2212187
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2517388
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Lord Aldric Voss in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person standing formally in a near-front three-quarter pose with both empty hands visible, whole hair, hands, clothing, footwear and all equipment comfortably inside all margins. Appearance: An elderly settled Human man appearing in his mid-seventies, with a broad upright build, weathered light olive skin, pale blue-gray eyes, thinning silver-white hair neatly combed back and a short carefully trimmed white beard. A formal deliberate composed expression and dignified erect posture. A fine plain dark forest-green wool coat over a muted brown-gold waistcoat and ivory collared shirt, dark brown tailored trousers, an ordinary leather belt and polished dark brown shoes. Empty relaxed hands. His senior formal council bearing follows the authored profile; age styling, physical features and clothing are editable visual defaults. No crown, invented house crest, hostile political banners, readable policies, memorial clues, monstrous features, magical effects or visual disclosure of private grief. Preserve authored identity, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Lord Aldric Voss from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, body proportions, skin, eyes, hair, clothing, armor where applicable, colors and material wear. Appearance: An elderly settled Human man appearing in his mid-seventies, with a broad upright build, weathered light olive skin, pale blue-gray eyes, thinning silver-white hair neatly combed back and a short carefully trimmed white beard. A formal deliberate composed expression and dignified erect posture. A fine plain dark forest-green wool coat over a muted brown-gold waistcoat and ivory collared shirt, dark brown tailored trousers, an ordinary leather belt and polished dark brown shoes. Empty relaxed hands. His senior formal council bearing follows the authored profile; age styling, physical features and clothing are editable visual defaults. No crown, invented house crest, hostile political banners, readable policies, memorial clues, monstrous features, magical effects or visual disclosure of private grief. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Consistent scale across three body views. Entire bodies, hair, hands, footwear and equipment inside margins. Exactly the same one character repeated as turnaround views. For the knight, preserve the heavy gauntlet on his RIGHT hand, shield on LEFT arm and sheathed sword at LEFT hip through all viewing angles; never mirror their anatomical sides. No labels, readable text, captions, borders, logos, UI, scenery, extra characters, animals, invented insignia or visible secret illness. Change viewing angle only; keep identity and costume unchanged.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Lord Aldric Voss from Severed Lands. Input image 1 is the canonical full-body identity reference, image 2 is the matching multiview sheet. Preserve that exact adult face, age, skin, eyes, hairstyle, facial hair, expression and upper clothing or armor. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face is centered; eyes near 35 percent down and chin near 65 percent down, with comfortable headroom above all hair. Face framing must be consistent with a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin, fabric and applicable worn steel, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, borders, captions, readable text, UI, scenery, new costume, magical effects, invented crests, illness clues, animals or extra people. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-castellan-voss",
+      "name": "Castellan Voss",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/castellan-voss.md",
+          "sha256": "603c0e8c26a75918c8986a450c9994bc110dd4e626acfadd98af52785c872af5",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/castellan-voss.md",
+          "sha256": "30afdaa487e0a38ee6582f6bd0bc7deb50e49a4a639ddc9ca6a251d8ed6d928e",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult settled Human man appearing in his mid-fifties, with a strong sinewy build, medium-deep brown skin, hazel-gray eyes, close-cropped dark hair graying at the sides and a short close salt-and-pepper beard. A stern direct expression with attentive warmth and a steady experienced warrior's stance. Worn plain steel plate-and-mail armor over a desaturated burgundy padded gambeson, practical dark trousers and armored brown boots. A distinctive heavy layered steel gauntlet fully covers his right hand and wrist and stays on; a plain oval metal-rimmed shield rests on his left arm beside his body, and a sheathed sword at his left hip keeps its hilt visible near the waist. The sword, shield and ever-worn gauntlet follow the authored profile; their uninscribed shapes and materials, age styling and other physical details are editable visual defaults. He is the Warden Lodge's Knight-Commander, unrelated to House Voss. No invented heraldry, readable inscriptions, visible illness, lung-condition clues, glowing artifacts, bare right hand, crown or invented family resemblance.",
+        "full_body": {
+          "path": "assets/characters/b8ef7bab26c055e6bf61d35594a5b404e3edb8411a787ba6cd2d3fe8952d448f.png",
+          "sha256": "b8ef7bab26c055e6bf61d35594a5b404e3edb8411a787ba6cd2d3fe8952d448f"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/81b497deae72052e193563156ae9897896be304a5197bc73a3457f3320fa56b1.png",
+          "sha256": "81b497deae72052e193563156ae9897896be304a5197bc73a3457f3320fa56b1"
+        },
+        "portrait": {
+          "path": "assets/characters/2bd637ea35934d09c2289fd497795d101de056e3d64bcc5503a22b5a33ce22c5.png",
+          "sha256": "2bd637ea35934d09c2289fd497795d101de056e3d64bcc5503a22b5a33ce22c5"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2228533
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2486892
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2612343
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Castellan Voss in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person standing naturally in a near-front three-quarter pose with the heavy right-hand gauntlet visible, shield held low at his left side and sword sheathed with visible hilt, whole hair, hands, clothing, footwear and all equipment comfortably inside all margins. Appearance: An adult settled Human man appearing in his mid-fifties, with a strong sinewy build, medium-deep brown skin, hazel-gray eyes, close-cropped dark hair graying at the sides and a short close salt-and-pepper beard. A stern direct expression with attentive warmth and a steady experienced warrior's stance. Worn plain steel plate-and-mail armor over a desaturated burgundy padded gambeson, practical dark trousers and armored brown boots. A distinctive heavy layered steel gauntlet fully covers his right hand and wrist and stays on; a plain oval metal-rimmed shield rests on his left arm beside his body, and a sheathed sword at his left hip keeps its hilt visible near the waist. The sword, shield and ever-worn gauntlet follow the authored profile; their uninscribed shapes and materials, age styling and other physical details are editable visual defaults. He is the Warden Lodge's Knight-Commander, unrelated to House Voss. No invented heraldry, readable inscriptions, visible illness, lung-condition clues, glowing artifacts, bare right hand, crown or invented family resemblance. Preserve authored identity, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Castellan Voss from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, body proportions, skin, eyes, hair, clothing, armor where applicable, colors and material wear. Appearance: An adult settled Human man appearing in his mid-fifties, with a strong sinewy build, medium-deep brown skin, hazel-gray eyes, close-cropped dark hair graying at the sides and a short close salt-and-pepper beard. A stern direct expression with attentive warmth and a steady experienced warrior's stance. Worn plain steel plate-and-mail armor over a desaturated burgundy padded gambeson, practical dark trousers and armored brown boots. A distinctive heavy layered steel gauntlet fully covers his right hand and wrist and stays on; a plain oval metal-rimmed shield rests on his left arm beside his body, and a sheathed sword at his left hip keeps its hilt visible near the waist. The sword, shield and ever-worn gauntlet follow the authored profile; their uninscribed shapes and materials, age styling and other physical details are editable visual defaults. He is the Warden Lodge's Knight-Commander, unrelated to House Voss. No invented heraldry, readable inscriptions, visible illness, lung-condition clues, glowing artifacts, bare right hand, crown or invented family resemblance. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Consistent scale across three body views. Entire bodies, hair, hands, footwear and equipment inside margins. Exactly the same one character repeated as turnaround views. For the knight, preserve the heavy gauntlet on his RIGHT hand, shield on LEFT arm and sheathed sword at LEFT hip through all viewing angles; never mirror their anatomical sides. No labels, readable text, captions, borders, logos, UI, scenery, extra characters, animals, invented insignia or visible secret illness. Change viewing angle only; keep identity and costume unchanged.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Castellan Voss from Severed Lands. Input image 1 is the canonical full-body identity reference, image 2 is the matching multiview sheet. Preserve that exact adult face, age, skin, eyes, hairstyle, facial hair, expression and upper clothing or armor. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face is centered; eyes near 35 percent down and chin near 65 percent down, with comfortable headroom above all hair. Face framing must be consistent with a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin, fabric and applicable worn steel, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, borders, captions, readable text, UI, scenery, new costume, magical effects, invented crests, illness clues, animals or extra people. One 1024x1024 PNG."
+      }
     }
   ]
 }
