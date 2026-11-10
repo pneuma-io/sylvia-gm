@@ -86,6 +86,7 @@ def test_prepared_source_requires_exact_identity_and_preserves_original_text():
 def test_known_enemy_gets_art_in_normal_status_and_transfers_without_catalogue(
     tmp_path, monkeypatch
 ):
+    enemy_source = "content/monsters/rift-basilisk.md"
     archive = tmp_path / "campaign.zip"
     with AuthorityOwner.open(tmp_path / "source.db", "prepared-enemy") as owner:
         candidate = owner.install_package_archive(
@@ -101,7 +102,9 @@ def test_known_enemy_gets_art_in_normal_status_and_transfers_without_catalogue(
         )
         owner.append_agent_message(
             session_id="gm", message_id="basis", kind=SessionMessageKind.USER,
-            content={"text": "The player meets a sentinel called the Rust Watcher."},
+            content={
+                "text": "The player meets two basilisks called the Rust Watchers and a guard."
+            },
         )
         owner.update_campaign_file(
             session_id="gm", update_id="introduced", basis_message_ids=("basis",), updates=tuple(
@@ -110,29 +113,45 @@ def test_known_enemy_gets_art_in_normal_status_and_transfers_without_catalogue(
                  "known_by": ["player"] if visibility == "player_known" else [],
                  "source_ref": path}
                 for identity, name, visibility, path in (
-                    ("watcher", "Rust Watcher", "player_known", SOURCE),
-                    ("watcher-two", "Second Watcher", "player_known", SOURCE),
-                    ("secret", "Hidden Sentinel", "gm_private", SOURCE),
+                    ("watcher", "Rust Watcher", "player_known", enemy_source),
+                    ("watcher-two", "Second Watcher", "player_known", enemy_source),
+                    ("secret", "Hidden Basilisk", "gm_private", enemy_source),
                     ("other", "Anchor Sentinel", "player_known", "npcs/guard-miri.md"),
                     ("image-source", "Not a profile", "player_known", "assets/characters/"
                      "b5d89a10fe76c5cb60806910ee0ebd815725358fdeb72e1b2cec422e3010f2da.png"),
                 )
             ),
         )
-        assert set(owner.character_visuals("enemies")) == {"watcher", "watcher-two"}
+        assert set(owner.character_visuals("enemies")) == {"watcher", "watcher-two", "other"}
         art = ImageArt(owner)
         try:
             view = art.view("gm", include_targets=False)
             rows = view["selections"]
-            assert len(rows) == 6
-            assert {row["target_id"] for row in rows} == {"watcher", "watcher-two"}
+            assert len(rows) == 9
+            assert {row["target_id"] for row in rows} == {"watcher", "watcher-two", "other"}
             assert {row["metadata"]["target_name"] for row in rows} == {
-                "Rust Watcher", "Second Watcher",
+                "Rust Watcher", "Second Watcher", "Anchor Sentinel",
             }
             assert not art.adapters and not art._futures
             expected = art.character_assets("gm", "watcher")
             assert art.character_assets("gm", "watcher-two") == expected
-            portrait = next(row for row in rows if row["purpose"] == "portrait")
+            guard_assets = art.character_assets("gm", "other")
+            # Display names do not override an exact source: this guard still uses Miri's art.
+            miri = bundled_source_visuals(
+                "pneuma.severed-lands", "npcs/guard-miri.md",
+                (ROOT / "campaign-settings/severed-lands/npcs/guard-miri.md").read_bytes(),
+                campaign_setting_ids=frozenset({"pneuma.severed-lands"}),
+            )
+            assert miri is not None
+            assert {hashlib.sha256(raw).hexdigest() for raw in guard_assets.values()} == {
+                miri[purpose]["sha256"] for purpose in ("full_body", "reference_sheet", "portrait")
+            }
+            assert guard_assets != expected
+            portrait = next(
+                row for row in rows
+                if row["purpose"] == "portrait" and row["target_id"] == "watcher"
+            )
+            assert portrait["frame"] == {"x": 0.5, "y": 0.75, "zoom": 1.25}
             art.frame("gm", "watcher", portrait["sha256"], {"x": 0.45, "y": 0.4, "zoom": 1.2})
             portraits = {
                 row["target_id"]: row["frame"]
@@ -140,7 +159,8 @@ def test_known_enemy_gets_art_in_normal_status_and_transfers_without_catalogue(
                 if row["purpose"] == "portrait"
             }
             assert portraits["watcher"]["zoom"] == 1.2
-            assert portraits["watcher-two"]["zoom"] == 1
+            assert portraits["watcher-two"] == {"x": 0.5, "y": 0.75, "zoom": 1.25}
+            assert portraits["other"] == miri["frame"]
             canonical = owner.character_visuals("enemies")
             assert canonical["watcher"]["frame"] == portraits["watcher"]
             assert canonical["watcher-two"]["frame"] == portraits["watcher-two"]
@@ -165,13 +185,14 @@ def test_known_enemy_gets_art_in_normal_status_and_transfers_without_catalogue(
         art = ImageArt(owner)
         try:
             restored = art.view("gm", include_targets=False)["selections"]
-            assert len(restored) == 6
+            assert len(restored) == 9
             assert {
                 row["target_id"]: row["frame"] for row in restored
                 if row["purpose"] == "portrait"
             } == portraits
             assert art.character_assets("gm", "watcher") == expected
             assert art.character_assets("gm", "watcher-two") == expected
-            assert set(owner.character_visuals("enemies")) == {"watcher", "watcher-two"}
+            assert art.character_assets("gm", "other") == guard_assets
+            assert set(owner.character_visuals("enemies")) == {"watcher", "watcher-two", "other"}
         finally:
             art.close()

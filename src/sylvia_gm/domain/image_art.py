@@ -227,16 +227,18 @@ class PortraitFrame:
 
 PURPOSE_INSTRUCTIONS = {
     "portrait": (
-        "Create one square character portrait. For humanoids, frame the head and upper shoulders, "
-        "facing the viewer. Keep both eyes level, the face centered horizontally and its eye line "
-        "about 35 percent down the image. Leave headroom and room around the shoulders for "
-        "a circular crop. For other creatures, frame the recognizable head or defining body "
+        "Create one full-bleed square character portrait. Extend the background and clothing "
+        "naturally to all four edges and corners. For humanoids, frame the head and upper "
+        "shoulders, facing the viewer. Keep both eyes level, the face centered horizontally "
+        "and its eye line about 35 percent down the image. Leave headroom and room around "
+        "the shoulders. For other creatures, frame the recognizable head or defining body "
         "feature at the same focal point; preserve its actual anatomy and never invent a face. "
         "Keep every authored head within the crop. When a faceless subject is recognizable by "
         "its whole-body shape, frame its complete silhouette. Preserve intentional concealment: "
         "a hood, mask or hidden identity must remain concealed. "
         "Preserve the identity, outfit, colors and distinguishing features "
-        "of the supplied full-body and multi-view references. No border, lettering or UI."
+        "of the supplied full-body and multi-view references. No painted circular or oval cutout, "
+        "vignette, white corners, border, lettering or UI."
     ),
     "full_body": (
         "Create a canonical full-body character or creature reference, entire silhouette visible, "

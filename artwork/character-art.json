@@ -1488,6 +1488,366 @@
         "reference_sheet": "Use case: identity-preserve. Canonical multi-view reference sheet for Rift Behir, Sylvia GM Severed Lands. Input image 1 is the corrected canonical full-body identity. One landscape PNG, 1536x1024. Three complete coherent views at the same scale, front, side profile and back, plus a larger head detail. Preserve the exact horned head, amber eyes, blue scales, gray belly plates, violet seams, proportions and many-legged serpentine anatomy of image 1. A massive long-bodied serpent with many matched pairs of short powerful clawed legs, an elongated horned reptilian head, two amber eyes and a long tapering tail. Deep storm-blue overlapping scales, paler blue-gray belly plates and restrained violet Rift glimmers along a few scale seams. One long continuous body follows a gentle curve from the single head to a single tapering tail, with the successive leg pairs clearly readable. No wings, humanoid limbs, jewelry, lightning breath or prey. Use simple uncoiled or gently curving poses so the continuous trunk and single tapering tail remain readable. ONE head and ONE tail per view; never fork, branch, overlap or duplicate the trunk. Keep the limb arrangement and overall anatomy consistent with the reference across views. Entire silhouettes and tail tips inside comfortable margins. Polished naturalistic digital RPG illustration, plain light neutral background, soft natural light. No wings, new anatomy, people, prey, lightning, text, labels, borders, UI or scenery.",
         "portrait": "Use case: identity-preserve. Aligned reusable square portrait for Rift Behir, Sylvia GM Severed Lands. Input 1 is the canonical full-body identity; input 2 is the canonical multi-view reference. One square PNG, 1024x1024, polished naturalistic digital RPG illustration, plain light neutral background and soft natural studio light. Preserve the exact identity, materials, colors, markings and actual anatomy in both references. A massive long-bodied serpent with many matched pairs of short powerful clawed legs, an elongated horned reptilian head, two amber eyes and a long tapering tail. Deep storm-blue overlapping scales, paler blue-gray belly plates and restrained violet Rift glimmers along a few scale seams. One long continuous body follows a gentle curve from the single head to a single tapering tail, with the successive leg pairs clearly readable. No wings, humanoid limbs, jewelry, lightning breath or prey. Head and upper neck only, directly forward, upright, centered, eye line about 35 percent down the image. Keep the complete head, horns, mandibles or antennae inside generous margins for an adjustable circular crop. No humanoid features or new anatomy. No other figures, hands, prey, attack effects, text, lettering, labels, borders, UI, scenery, blood or gore."
       }
+    },
+    {
+      "id": "severed-npc-patrol-veteran-stern",
+      "name": "Stern",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/patrol-veteran-stern.md",
+          "sha256": "e47cf06f16d428fea7fe7d0a3dbd327c0bc6767a279607335998bafb3e058bbe",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/patrol-veteran-stern.md",
+          "sha256": "1eb029def2204157d617cf9ac720d102dc7cda8f3477c50a516fbed1b578a47e",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A humanlike adult Riftborn woman in her late forties with dark brown skin, a strong lean build, short salt-and-pepper hair, dark eyes and one healed claw scar across her jaw. Quiet vigilant expression. Practical patched dark olive patrol leathers over a charcoal shirt, plain trousers, sturdy worn boots and a compact belt kit. A closed personal notebook stays inside a closed belt pouch. No emblems, medals, exposed notebook pages or visible magical effects.",
+        "full_body": {
+          "path": "assets/characters/9d83f6c5bedeeaa58f1eb9e25520bd8324e7cd8c84eb9eb38ac45b1bbc9f8ef7.png",
+          "sha256": "9d83f6c5bedeeaa58f1eb9e25520bd8324e7cd8c84eb9eb38ac45b1bbc9f8ef7"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/6b6fd5ec67d9643a6d968cf570d3f69ace954dcf1801926f439ede375baad89e.png",
+          "sha256": "6b6fd5ec67d9643a6d968cf570d3f69ace954dcf1801926f439ede375baad89e"
+        },
+        "portrait": {
+          "path": "assets/characters/458e6a0aa402aff8fb22d1ea9ce48c1f1f26c6daed1b908f6b20951bc786205a.png",
+          "sha256": "458e6a0aa402aff8fb22d1ea9ce48c1f1f26c6daed1b908f6b20951bc786205a"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1917347
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2206429
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2315027
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Stern in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, tactile fabric and skin, plain light neutral backdrop, soft natural studio light and subtle ground shadow. Exactly one person standing naturally in a near-front three-quarter pose. Entire head, both hands and both feet comfortably inside the frame. Appearance: A humanlike adult Riftborn woman in her late forties with dark brown skin, a strong lean build, short salt-and-pepper hair, dark eyes and one healed claw scar across her jaw. Quiet vigilant expression. Practical patched dark olive patrol leathers over a charcoal shirt, plain trousers, sturdy worn boots and a compact belt kit. A closed personal notebook stays inside a closed belt pouch. No emblems, medals, exposed notebook pages or visible magical effects. These unspecified visual details are editable defaults; preserve the authored identity and pronouns without adding history, powers or allegiances. No text, labels, borders, UI, scenery, extra people, duplicated limbs, glamour pose or oversized equipment.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for Stern in Sylvia GM's Severed Lands. Input image 1 is the approved full-body identity reference. Preserve that exact person, facial structure, skin, age, hair, proportions, clothes, equipment and material colors. One landscape PNG, 1536x1024, polished naturalistic digital RPG illustration on the same plain light neutral backdrop. Show three separate complete standing views of this ONE person: front, true side and back, evenly spaced at matching scale, each entire head and both feet visible within margins. Include one smaller clear face study in remaining space without overlapping the figures. These are multiple views of one identity, never extra cast. Appearance: A humanlike adult Riftborn woman in her late forties with dark brown skin, a strong lean build, short salt-and-pepper hair, dark eyes and one healed claw scar across her jaw. Quiet vigilant expression. Practical patched dark olive patrol leathers over a charcoal shirt, plain trousers, sturdy worn boots and a compact belt kit. A closed personal notebook stays inside a closed belt pouch. No emblems, medals, exposed notebook pages or visible magical effects. No text, labels, names, UI, scenery, decorative frames, invented symbols, open books, extra equipment or duplicated limbs.",
+        "portrait": "Use case: identity-preserve. Input image 1 is the EDIT TARGET portrait of Stern. Correct only the painted round cutout. Produce one full-bleed square PNG, 1024x1024. Fill all four white corner regions with the existing warm light-gray studio background, and naturally continue the existing shoulder fabric into the lower corners where it was cut off. The entire square must be filled edge-to-edge with continuous background and clothing. Preserve this exact face, hair, skin, expression, age, scar if present, clothing detail, lighting, head size and head position. Do not move or rescale the face. No circular or oval boundary, mask, vignette, white corner, frame, border, text or UI. This is a regular square head-and-shoulders image with no decorative shape."
+      }
+    },
+    {
+      "id": "severed-npc-researcher-linden",
+      "name": "Linden",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/researcher-linden.md",
+          "sha256": "55da24e1f2a5172c8bbcabe2aa17cc92d2444d6b525b0e00fc1a1e062bead54b",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/researcher-linden.md",
+          "sha256": "4ebf579856662a320dec17fa161f89a517fb12e24f4975e5208b9992bcbf8019",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A humanlike androgynous adult Riftborn in their late thirties with light olive skin, a slender build, untidy short dark curls, hazel eyes and visible sleep shadows. An absorbed thoughtful expression. A worn moss-gray research coat over a muted plum shirt, charcoal trousers, scuffed ankle boots and a small shoulder satchel. Holds one closed plain notebook. No glowing eyes, readable notes, magical effects or invented faction symbols.",
+        "full_body": {
+          "path": "assets/characters/59d9d0d90ee27ac631f7420c8ea063d9782e17732489694f81acf3605bdc342f.png",
+          "sha256": "59d9d0d90ee27ac631f7420c8ea063d9782e17732489694f81acf3605bdc342f"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/646f0c74bbe391942dc2b8b3bf7ab662a6f52f4391ad7e48f44cd33e04e12918.png",
+          "sha256": "646f0c74bbe391942dc2b8b3bf7ab662a6f52f4391ad7e48f44cd33e04e12918"
+        },
+        "portrait": {
+          "path": "assets/characters/078863ebdc04b1fd453c449256c3d28be104cbb1cb0407e58165c05a39541e98.png",
+          "sha256": "078863ebdc04b1fd453c449256c3d28be104cbb1cb0407e58165c05a39541e98"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1948262
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2268592
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2272911
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Linden in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, tactile fabric and skin, plain light neutral backdrop, soft natural studio light and subtle ground shadow. Exactly one person standing naturally in a near-front three-quarter pose. Entire head, both hands and both feet comfortably inside the frame. Appearance: A humanlike androgynous adult Riftborn in their late thirties with light olive skin, a slender build, untidy short dark curls, hazel eyes and visible sleep shadows. An absorbed thoughtful expression. A worn moss-gray research coat over a muted plum shirt, charcoal trousers, scuffed ankle boots and a small shoulder satchel. Holds one closed plain notebook. No glowing eyes, readable notes, magical effects or invented faction symbols. These unspecified visual details are editable defaults; preserve the authored identity and pronouns without adding history, powers or allegiances. No text, labels, borders, UI, scenery, extra people, duplicated limbs, glamour pose or oversized equipment.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for Linden in Sylvia GM's Severed Lands. Input image 1 is the approved full-body identity reference. Preserve that exact person, facial structure, skin, age, hair, proportions, clothes, equipment and material colors. One landscape PNG, 1536x1024, polished naturalistic digital RPG illustration on the same plain light neutral backdrop. Show three separate complete standing views of this ONE person: front, true side and back, evenly spaced at matching scale, each entire head and both feet visible within margins. Include one smaller clear face study in remaining space without overlapping the figures. These are multiple views of one identity, never extra cast. Appearance: A humanlike androgynous adult Riftborn in their late thirties with light olive skin, a slender build, untidy short dark curls, hazel eyes and visible sleep shadows. An absorbed thoughtful expression. A worn moss-gray research coat over a muted plum shirt, charcoal trousers, scuffed ankle boots and a small shoulder satchel. Holds one closed plain notebook. No glowing eyes, readable notes, magical effects or invented faction symbols. No text, labels, names, UI, scenery, decorative frames, invented symbols, open books, extra equipment or duplicated limbs.",
+        "portrait": "Use case: identity-preserve. Input image 1 is the EDIT TARGET portrait of Linden. Correct only the painted round cutout. Produce one full-bleed square PNG, 1024x1024. Fill all four white corner regions with the existing warm light-gray studio background, and naturally continue the existing shoulder fabric into the lower corners where it was cut off. The entire square must be filled edge-to-edge with continuous background and clothing. Preserve this exact face, hair, skin, expression, age, scar if present, clothing detail, lighting, head size and head position. Do not move or rescale the face. No circular or oval boundary, mask, vignette, white corner, frame, border, text or UI. This is a regular square head-and-shoulders image with no decorative shape."
+      }
+    },
+    {
+      "id": "severed-npc-marla-cook",
+      "name": "Marla",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/marla-cook.md",
+          "sha256": "9191eda4dd50dde1f3d20401a0dda31dcec44d635ccbab716ae7aa2e0b205751",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/marla-cook.md",
+          "sha256": "5d6144b10d9cf355da90d610ca5b92ce17b91cc83a234b0386e30c7c221ce00e",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A humanlike adult Riftborn woman in her fifties with warm copper-brown skin, a broad sturdy build, dark auburn curls gathered in a loose bun and kind dark brown eyes. A warm observant expression. Rolled-sleeve terracotta shirt, a well-used pale linen apron over a dark full-length work skirt and sturdy flat shoes. A closed cloth knife roll hangs at her belt; no exposed knives or visible spice recipe. No jewelry, text, food effects or faction symbols.",
+        "full_body": {
+          "path": "assets/characters/f61f6eb8270e641ca26828f3c10a5bba17f3f81e028adf0c75edea2dc0a0c8b4.png",
+          "sha256": "f61f6eb8270e641ca26828f3c10a5bba17f3f81e028adf0c75edea2dc0a0c8b4"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/fa7d1c50a730d5bcd38d7222d56c7e9be0a357d6a158db5bdd409110474210d2.png",
+          "sha256": "fa7d1c50a730d5bcd38d7222d56c7e9be0a357d6a158db5bdd409110474210d2"
+        },
+        "portrait": {
+          "path": "assets/characters/6d2f5303617dc3d6e2b9d8cb44b3b5032764d94e9f202e0500a5626b4c150d57.png",
+          "sha256": "6d2f5303617dc3d6e2b9d8cb44b3b5032764d94e9f202e0500a5626b4c150d57"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2237565
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2474183
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2501624
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Marla in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, tactile fabric and skin, plain light neutral backdrop, soft natural studio light and subtle ground shadow. Exactly one person standing naturally in a near-front three-quarter pose. Entire head, both hands and both feet comfortably inside the frame. Appearance: A humanlike adult Riftborn woman in her fifties with warm copper-brown skin, a broad sturdy build, dark auburn curls gathered in a loose bun and kind dark brown eyes. A warm observant expression. Rolled-sleeve terracotta shirt, a well-used pale linen apron over a dark full-length work skirt and sturdy flat shoes. A closed cloth knife roll hangs at her belt; no exposed knives or visible spice recipe. No jewelry, text, food effects or faction symbols. These unspecified visual details are editable defaults; preserve the authored identity and pronouns without adding history, powers or allegiances. No text, labels, borders, UI, scenery, extra people, duplicated limbs, glamour pose or oversized equipment.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for Marla in Sylvia GM's Severed Lands. Input image 1 is the approved full-body identity reference. Preserve that exact person, facial structure, skin, age, hair, proportions, clothes, equipment and material colors. One landscape PNG, 1536x1024, polished naturalistic digital RPG illustration on the same plain light neutral backdrop. Show three separate complete standing views of this ONE person: front, true side and back, evenly spaced at matching scale, each entire head and both feet visible within margins. Include one smaller clear face study in remaining space without overlapping the figures. These are multiple views of one identity, never extra cast. Appearance: A humanlike adult Riftborn woman in her fifties with warm copper-brown skin, a broad sturdy build, dark auburn curls gathered in a loose bun and kind dark brown eyes. A warm observant expression. Rolled-sleeve terracotta shirt, a well-used pale linen apron over a dark full-length work skirt and sturdy flat shoes. A closed cloth knife roll hangs at her belt; no exposed knives or visible spice recipe. No jewelry, text, food effects or faction symbols. No text, labels, names, UI, scenery, decorative frames, invented symbols, open books, extra equipment or duplicated limbs.",
+        "portrait": "Use case: identity-preserve. Input image 1 is the EDIT TARGET portrait of Marla. Correct only the painted round cutout. Produce one full-bleed square PNG, 1024x1024. Fill all four white corner regions with the existing warm light-gray studio background, and naturally continue the existing shoulder fabric into the lower corners where it was cut off. The entire square must be filled edge-to-edge with continuous background and clothing. Preserve this exact face, hair, skin, expression, age, scar if present, clothing detail, lighting, head size and head position. Do not move or rescale the face. No circular or oval boundary, mask, vignette, white corner, frame, border, text or UI. This is a regular square head-and-shoulders image with no decorative shape."
+      }
+    },
+    {
+      "id": "severed-npc-waystation-healer",
+      "name": "Henna",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/waystation-healer.md",
+          "sha256": "4dbc708ab5cf7d13ee76e9b08fa85eaa5d3fe292e69386031a4e284fbbe251db",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/waystation-healer.md",
+          "sha256": "d31557e4c00ca9cd326d1fed25142d40b60730c8d1ba769e7aca53c661f3bfc1",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A humanlike adult Riftborn woman in her early fifties with deep brown skin, an average sturdy build, short silver-streaked braids and calm dark eyes. A patient composed expression. Plain undyed linen clinic tunic with rolled sleeves, muted blue-gray trousers, practical shoes and a small cloth pouch holding a visible clean folded bandage. Empty relaxed hands. No surgical instruments, magical glow, blood, faction emblems or modern medical logos.",
+        "full_body": {
+          "path": "assets/characters/49e72cbac6a856d9bded187acec11242e51055bb36174631973664fb906d960c.png",
+          "sha256": "49e72cbac6a856d9bded187acec11242e51055bb36174631973664fb906d960c"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/6b759baa23eb3d323354a32cb9f6a16b45b4a452b7f483563a817703f9226e0b.png",
+          "sha256": "6b759baa23eb3d323354a32cb9f6a16b45b4a452b7f483563a817703f9226e0b"
+        },
+        "portrait": {
+          "path": "assets/characters/5b0b64dc6a685452ed330e30a1e4aa018e468b1356be95e098d35b9cbb5903e3.png",
+          "sha256": "5b0b64dc6a685452ed330e30a1e4aa018e468b1356be95e098d35b9cbb5903e3"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2105853
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2292563
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2511817
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Henna in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, tactile fabric and skin, plain light neutral backdrop, soft natural studio light and subtle ground shadow. Exactly one person standing naturally in a near-front three-quarter pose. Entire head, both hands and both feet comfortably inside the frame. Appearance: A humanlike adult Riftborn woman in her early fifties with deep brown skin, an average sturdy build, short silver-streaked braids and calm dark eyes. A patient composed expression. Plain undyed linen clinic tunic with rolled sleeves, muted blue-gray trousers, practical shoes and a small cloth pouch holding a visible clean folded bandage. Empty relaxed hands. No surgical instruments, magical glow, blood, faction emblems or modern medical logos. These unspecified visual details are editable defaults; preserve the authored identity and pronouns without adding history, powers or allegiances. No text, labels, borders, UI, scenery, extra people, duplicated limbs, glamour pose or oversized equipment.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for Henna in Sylvia GM's Severed Lands. Input image 1 is the approved full-body identity reference. Preserve that exact person, facial structure, skin, age, hair, proportions, clothes, equipment and material colors. One landscape PNG, 1536x1024, polished naturalistic digital RPG illustration on the same plain light neutral backdrop. Show three separate complete standing views of this ONE person: front, true side and back, evenly spaced at matching scale, each entire head and both feet visible within margins. Include one smaller clear face study in remaining space without overlapping the figures. These are multiple views of one identity, never extra cast. Appearance: A humanlike adult Riftborn woman in her early fifties with deep brown skin, an average sturdy build, short silver-streaked braids and calm dark eyes. A patient composed expression. Plain undyed linen clinic tunic with rolled sleeves, muted blue-gray trousers, practical shoes and a small cloth pouch holding a visible clean folded bandage. Empty relaxed hands. No surgical instruments, magical glow, blood, faction emblems or modern medical logos. No text, labels, names, UI, scenery, decorative frames, invented symbols, open books, extra equipment or duplicated limbs.",
+        "portrait": "Use case: identity-preserve. Production reusable square portrait for Henna in Sylvia GM's Severed Lands. Input image 1 is the canonical full-body identity; input image 2 is that person's multiview reference sheet. Preserve this exact face, facial structure, skin tone, age, hair, expression, clothing and identity. One full-bleed square PNG, 1024x1024. Polished naturalistic digital RPG illustration with a continuous plain warm light-gray studio background extending all the way to all four corners and edges. Exactly one head-and-shoulders portrait, nearly frontal with a slight three-quarter turn. Standardized framing: face horizontally centered; both eyes about 35 percent down; top of all hair about 10 percent down; chin about 65 percent; shoulders filling lower quarter. Keep the entire hairstyle, jaw and neck visible, with comfortable room around the head. Clothing continues naturally to lower edges. Do not show hands, full body, held books or extra objects. Identity description: A humanlike adult Riftborn woman in her early fifties with deep brown skin, an average sturdy build, short silver-streaked braids and calm dark eyes. A patient composed expression. Plain undyed linen clinic tunic with rolled sleeves, muted blue-gray trousers, practical shoes and a small cloth pouch holding a visible clean folded bandage. Empty relaxed hands. No surgical instruments, magical glow, blood, faction emblems or modern medical logos. No circular or oval shape, cutout, white corners, vignette, frame, border, text, labels, UI, scene, extra faces or glamour changes."
+      }
+    },
+    {
+      "id": "severed-npc-waystation-smith",
+      "name": "Anvil",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/waystation-smith.md",
+          "sha256": "fde23eac5202a4c9d1374933a5a0176313d702d561c5be26170a6d9a870a3256",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/waystation-smith.md",
+          "sha256": "a03032436bcd0b6a97125dd8c6983b32ccce06febd9d1de3193e4665b4a2d71e",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult Human woman in her early forties with sun-browned freckled skin, a muscular broad-shouldered build, brown hair tied into a short practical ponytail, a square face and gray-green eyes. A blunt level appraising expression. Charcoal rolled-sleeve shirt, a heavy worn brown leather smith's apron, plain dark trousers and reinforced work boots; a small plain hammer rests in a belt loop. Faint soot on forearms and apron. No house crest, political symbol, weapon, jewelry or magic.",
+        "full_body": {
+          "path": "assets/characters/ef276d7776ad8cdf0e563b0718a3250702b06be15b7aa652200f82220f588187.png",
+          "sha256": "ef276d7776ad8cdf0e563b0718a3250702b06be15b7aa652200f82220f588187"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/eaa6bf065dbafd5c6559a5641e9f3937ef549dbf521de6fbee68f9c96b0858f9.png",
+          "sha256": "eaa6bf065dbafd5c6559a5641e9f3937ef549dbf521de6fbee68f9c96b0858f9"
+        },
+        "portrait": {
+          "path": "assets/characters/9e69568b684f9a5a43b3f49160b909e53fc407479596ad234050185e6470673e.png",
+          "sha256": "9e69568b684f9a5a43b3f49160b909e53fc407479596ad234050185e6470673e"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2050973
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2276826
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2473389
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Anvil in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, tactile fabric and skin, plain light neutral backdrop, soft natural studio light and subtle ground shadow. Exactly one person standing naturally in a near-front three-quarter pose. Entire head, both hands and both feet comfortably inside the frame. Appearance: An adult Human woman in her early forties with sun-browned freckled skin, a muscular broad-shouldered build, brown hair tied into a short practical ponytail, a square face and gray-green eyes. A blunt level appraising expression. Charcoal rolled-sleeve shirt, a heavy worn brown leather smith's apron, plain dark trousers and reinforced work boots; a small plain hammer rests in a belt loop. Faint soot on forearms and apron. No house crest, political symbol, weapon, jewelry or magic. These unspecified visual details are editable defaults; preserve the authored identity and pronouns without adding history, powers or allegiances. No text, labels, borders, UI, scenery, extra people, duplicated limbs, glamour pose or oversized equipment.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for Anvil in Sylvia GM's Severed Lands. Input image 1 is the approved full-body identity reference. Preserve that exact person, facial structure, skin, age, hair, proportions, clothes, equipment and material colors. One landscape PNG, 1536x1024, polished naturalistic digital RPG illustration on the same plain light neutral backdrop. Show three separate complete standing views of this ONE person: front, true side and back, evenly spaced at matching scale, each entire head and both feet visible within margins. Include one smaller clear face study in remaining space without overlapping the figures. These are multiple views of one identity, never extra cast. Appearance: An adult Human woman in her early forties with sun-browned freckled skin, a muscular broad-shouldered build, brown hair tied into a short practical ponytail, a square face and gray-green eyes. A blunt level appraising expression. Charcoal rolled-sleeve shirt, a heavy worn brown leather smith's apron, plain dark trousers and reinforced work boots; a small plain hammer rests in a belt loop. Faint soot on forearms and apron. No house crest, political symbol, weapon, jewelry or magic. No text, labels, names, UI, scenery, decorative frames, invented symbols, open books, extra equipment or duplicated limbs.",
+        "portrait": "Use case: identity-preserve. Production reusable square portrait for Anvil in Sylvia GM's Severed Lands. Input image 1 is the canonical full-body identity; input image 2 is that person's multiview reference sheet. Preserve this exact face, facial structure, skin tone, age, hair, expression, clothing and identity. One full-bleed square PNG, 1024x1024. Polished naturalistic digital RPG illustration with a continuous plain warm light-gray studio background extending all the way to all four corners and edges. Exactly one head-and-shoulders portrait, nearly frontal with a slight three-quarter turn. Standardized framing: face horizontally centered; both eyes about 35 percent down; top of all hair about 10 percent down; chin about 65 percent; shoulders filling lower quarter. Keep the entire hairstyle, jaw and neck visible, with comfortable room around the head. Clothing continues naturally to lower edges. Do not show hands, full body, held books or extra objects. Identity description: An adult Human woman in her early forties with sun-browned freckled skin, a muscular broad-shouldered build, brown hair tied into a short practical ponytail, a square face and gray-green eyes. A blunt level appraising expression. Charcoal rolled-sleeve shirt, a heavy worn brown leather smith's apron, plain dark trousers and reinforced work boots; a small plain hammer rests in a belt loop. Faint soot on forearms and apron. No house crest, political symbol, weapon, jewelry or magic. No circular or oval shape, cutout, white corners, vignette, frame, border, text, labels, UI, scene, extra faces or glamour changes."
+      }
+    },
+    {
+      "id": "severed-npc-the-quartermaster",
+      "name": "The Quartermaster",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/the-quartermaster.md",
+          "sha256": "ec842a086ea6228eb69255803589c1f28ddd4f5a6779f78c7f9362f7fbd44a90",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/the-quartermaster.md",
+          "sha256": "dc064c81221e2420ee91db0eebf5d1f17e18f9ac7c259c2ca24e043c759aaa60",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A humanlike androgynous adult Riftborn in their late fifties with medium brown skin, a compact strong build, close-cropped gray hair, a broad angular face and steady dark eyes. A reserved exacting expression. A meticulously maintained but repeatedly repaired slate-blue field jacket, charcoal trousers, plain leather belt, stout boots and a small crossbody inventory pouch. Holds one closed plain ledger at the side. No rank insignia, faction crest, visible writing, parade medals or active weapon.",
+        "full_body": {
+          "path": "assets/characters/6c2bc244d71e7678ba002ff478e0ddd13e84c586c3c3f3891edbcbc8e537292d.png",
+          "sha256": "6c2bc244d71e7678ba002ff478e0ddd13e84c586c3c3f3891edbcbc8e537292d"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/e7c9ff192d73463a730eb95da6c8f0f0dd7dc6a62ebe919d1e04b0be6096fbc5.png",
+          "sha256": "e7c9ff192d73463a730eb95da6c8f0f0dd7dc6a62ebe919d1e04b0be6096fbc5"
+        },
+        "portrait": {
+          "path": "assets/characters/0539b9a591bc59c82b4adf82d50e5cd7950b526e938ec607ad204a94d2919e41.png",
+          "sha256": "0539b9a591bc59c82b4adf82d50e5cd7950b526e938ec607ad204a94d2919e41"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2010294
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2280982
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2393130
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for The Quartermaster in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, tactile fabric and skin, plain light neutral backdrop, soft natural studio light and subtle ground shadow. Exactly one person standing naturally in a near-front three-quarter pose. Entire head, both hands and both feet comfortably inside the frame. Appearance: A humanlike androgynous adult Riftborn in their late fifties with medium brown skin, a compact strong build, close-cropped gray hair, a broad angular face and steady dark eyes. A reserved exacting expression. A meticulously maintained but repeatedly repaired slate-blue field jacket, charcoal trousers, plain leather belt, stout boots and a small crossbody inventory pouch. Holds one closed plain ledger at the side. No rank insignia, faction crest, visible writing, parade medals or active weapon. These unspecified visual details are editable defaults; preserve the authored identity and pronouns without adding history, powers or allegiances. No text, labels, borders, UI, scenery, extra people, duplicated limbs, glamour pose or oversized equipment.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for The Quartermaster in Sylvia GM's Severed Lands. Input image 1 is the approved full-body identity reference. Preserve that exact person, facial structure, skin, age, hair, proportions, clothes, equipment and material colors. One landscape PNG, 1536x1024, polished naturalistic digital RPG illustration on the same plain light neutral backdrop. Show three separate complete standing views of this ONE person: front, true side and back, evenly spaced at matching scale, each entire head and both feet visible within margins. Include one smaller clear face study in remaining space without overlapping the figures. These are multiple views of one identity, never extra cast. Appearance: A humanlike androgynous adult Riftborn in their late fifties with medium brown skin, a compact strong build, close-cropped gray hair, a broad angular face and steady dark eyes. A reserved exacting expression. A meticulously maintained but repeatedly repaired slate-blue field jacket, charcoal trousers, plain leather belt, stout boots and a small crossbody inventory pouch. Holds one closed plain ledger at the side. No rank insignia, faction crest, visible writing, parade medals or active weapon. No text, labels, names, UI, scenery, decorative frames, invented symbols, open books, extra equipment or duplicated limbs.",
+        "portrait": "Use case: identity-preserve. Production reusable square portrait for The Quartermaster in Sylvia GM's Severed Lands. Input image 1 is the canonical full-body identity; input image 2 is that person's multiview reference sheet. Preserve this exact face, facial structure, skin tone, age, hair, expression, clothing and identity. One full-bleed square PNG, 1024x1024. Polished naturalistic digital RPG illustration with a continuous plain warm light-gray studio background extending all the way to all four corners and edges. Exactly one head-and-shoulders portrait, nearly frontal with a slight three-quarter turn. Standardized framing: face horizontally centered; both eyes about 35 percent down; top of all hair about 10 percent down; chin about 65 percent; shoulders filling lower quarter. Keep the entire hairstyle, jaw and neck visible, with comfortable room around the head. Clothing continues naturally to lower edges. Do not show hands, full body, held books or extra objects. Identity description: A humanlike androgynous adult Riftborn in their late fifties with medium brown skin, a compact strong build, close-cropped gray hair, a broad angular face and steady dark eyes. A reserved exacting expression. A meticulously maintained but repeatedly repaired slate-blue field jacket, charcoal trousers, plain leather belt, stout boots and a small crossbody inventory pouch. Holds one closed plain ledger at the side. No rank insignia, faction crest, visible writing, parade medals or active weapon. No circular or oval shape, cutout, white corners, vignette, frame, border, text, labels, UI, scene, extra faces or glamour changes."
+      }
     }
   ]
 }
