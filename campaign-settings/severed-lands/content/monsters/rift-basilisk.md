@@ -30,3 +30,15 @@ A Rift-touched reptile whose petrifying gaze channels the Veil's boundary-lockin
 
 ## Actions
 **Bite.** +5 to hit, 10 (2d6 + 3) piercing + 7 (2d6) poison.
+
+## Appearance and artwork
+
+A heavy low-slung reptile with eight short strong legs in four pairs, a thick curling tapering tail, a broad blunt crocodilian head and two large pale yellow-green eyes. Pebbled slate-green scales, dusty gray spinal ridges and faint violet coloration around eyes and scale seams. A wary grounded posture with a closed mouth. No wings, human features, victims or active gaze effects.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/527bdfd7fa63799b99f5f018b65937b3d704b46316d894ae25d44f1586459b08.png)
+
+[Full-body reference](../../assets/characters/a5a5703fbf78aa46c88773ab065eb0252f7fe64f2cfeffe1af97b3e633a5bb1a.png)
+
+[Multiview reference sheet](../../assets/characters/7dbaa4e6d5e31f32db8b6393bccee4e7b29dc16ced6980af06d4225f6649ba22.png)

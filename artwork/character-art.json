@@ -1128,6 +1128,366 @@
         "reference_sheet": "Use case: identity-preserve. Production canonical multi-view reference sheet for Saffron in Sylvia GM's Severed Lands. Input image 1 is the authoritative full-body identity reference. One landscape PNG, 1536x1024. Polished naturalistic digital RPG illustration, plain light neutral background, soft natural studio light. Three complete figures at identical scale: straight front, exact side profile, straight back; plus one enlarged directly forward head detail. Preserve the exact face, apparent adult age, body proportions, skin, eye color, hair arrangement, costume construction, colors, wear and equipment of input image 1. An adult Human woman in her late forties with medium brown skin, dark brown eyes, a narrow softly lined face and straight black hair with gray strands, center-parted and tied in a long practical braid. A muted forest-green wrap tunic, beige linen work apron, plain brown belt, long dark skirt and comfortable dark leather shoes. A small plain linen medical shoulder bag and a tied bundle of dried herbs held at waist level. Steady posture, tired compassionate expression and clear attentive eyes. Authored requirements: Thornwall herbalist and Warrens volunteer healer, settled Human woman; tired, compassionate, practical and quietly determined. Ordinary medical and herbal props only. No glowing medicine, healing effect, divine symbol or invented magic. Outfit and props must remain physically consistent between views, with complete head and boot/shoe soles inside comfortable margins. Keep the face readable and unobstructed. No new accessories, new powers, character redesign, extra people, captions, writing, labels, borders, UI, scenery, symbols or magical effects.",
         "portrait": "Use case: identity-preserve. Aligned reusable square portrait of Saffron for Sylvia GM. Input image 1 is the canonical full-body identity, and image 2 is this character's canonical multi-view sheet. One square PNG, 1024x1024. Polished naturalistic digital RPG illustration, plain light neutral background and soft natural studio light. Preserve the exact face, apparent adult age, skin, eye color, hair arrangement and upper clothing from these references. An adult Human woman in her late forties with medium brown skin, dark brown eyes, a narrow softly lined face and straight black hair with gray strands, center-parted and tied in a long practical braid. A muted forest-green wrap tunic, beige linen work apron, plain brown belt, long dark skirt and comfortable dark leather shoes. A small plain linen medical shoulder bag and a tied bundle of dried herbs held at waist level. Steady posture, tired compassionate expression and clear attentive eyes. Authored constraints: Thornwall herbalist and Warrens volunteer healer, settled Human woman; tired, compassionate, practical and quietly determined. Ordinary medical and herbal props only. No glowing medicine, healing effect, divine symbol or invented magic. Composition: head and upper shoulders only, directly forward, upright head without tilt, level eyes facing viewer. Center the face with the eye line at 35 percent of image height, consistent head scale, and comfortable space above all hair and at both sides for adjustable circular cropping. Keep the face unobstructed. Preserve the referenced character's characteristic restrained expression; no exaggerated expression or redesign. No hands or carried props, weapons, cup, loaf, herbs, case, satchel or medicine inside the crop.  No text, labels, borders, UI, scenery, symbols or magic."
       }
+    },
+    {
+      "id": "severed-monster-rift-death-hound",
+      "name": "Rift Death Hound",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-death-hound.md",
+          "sha256": "0c5752e116b0c17dfd2015757a64ff98926514eaa7a0c6e180df86b2f4888bdd",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-death-hound.md",
+          "sha256": "8f7ebb5aa38aa0a90a55c4409ae357c9f849516febfdba88d9aad1a6ec405de4",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A powerful four-legged hound with exactly two separate canine heads on two necks sharing one broad shoulder girdle and one body. Short rough slate-black fur, lean muscular flanks, broad paws, a long lowered tail, four small amber eyes in total and faint violet Rift glimmers beneath a few patches of fur. Both heads are distinct and equally visible, with alert closed jaws and intact skin. No collar, armor, extra legs or additional heads.",
+        "full_body": {
+          "path": "assets/characters/7f28a63aebdd2a929afdbb3801a5dc12cb3d033375ae8d27e204a178aaffe7c0.png",
+          "sha256": "7f28a63aebdd2a929afdbb3801a5dc12cb3d033375ae8d27e204a178aaffe7c0"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/af8d71fad138f0d122a81bfcbc2daa8d4ee9dd472f5b136deb85f510ce0ba0ba.png",
+          "sha256": "af8d71fad138f0d122a81bfcbc2daa8d4ee9dd472f5b136deb85f510ce0ba0ba"
+        },
+        "portrait": {
+          "path": "assets/characters/9b0dc0b34a8e77a9e7f39be21e6c10378b264fdcedf7199f8ead1d3f94d7693d.png",
+          "sha256": "9b0dc0b34a8e77a9e7f39be21e6c10378b264fdcedf7199f8ead1d3f94d7693d"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2065058
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2089799
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2268735
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body creature reference for Rift Death Hound in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, plain light neutral background, soft natural studio light and a subtle grounding shadow. Exactly one complete creature in a neutral natural pose, near-front three-quarter view chosen to make its anatomy clear. Entire silhouette, every head, appendage and complete tail inside comfortable margins. Authored requirements: Medium Rift-touched hunting hound with the authored Two-Headed trait: exactly two heads. Preserve both heads in every portrait and reference. It senses living Rift signatures; do not add extra eyes or visible sensing rays. Appearance: A powerful four-legged hound with exactly two separate canine heads on two necks sharing one broad shoulder girdle and one body. Short rough slate-black fur, lean muscular flanks, broad paws, a long lowered tail, four small amber eyes in total and faint violet Rift glimmers beneath a few patches of fur. Both heads are distinct and equally visible, with alert closed jaws and intact skin. No collar, armor, extra legs or additional heads. Details not specified by the authored source are editable visual defaults; do not change lore or mechanics. No text, labels, borders, UI, scenery, decorative emblems, diagrams, other creatures, attack effects, blood, gore or exposed organs. ",
+        "reference_sheet": "Use case: identity-preserve. Canonical multi-view creature reference sheet for Rift Death Hound in Sylvia GM's Severed Lands. Input image 1 is the authoritative full-body identity reference. One landscape PNG, 1536x1024. Polished naturalistic digital RPG illustration, plain light neutral background, soft natural studio light. Show three complete views at the same scale, straight front, side profile and back, plus one clear detail of the head or defining anatomy. Preserve the exact identity, body proportions, colors, materials, markings, head count, limb count and distinguishing features of input image 1. A powerful four-legged hound with exactly two separate canine heads on two necks sharing one broad shoulder girdle and one body. Short rough slate-black fur, lean muscular flanks, broad paws, a long lowered tail, four small amber eyes in total and faint violet Rift glimmers beneath a few patches of fur. Both heads are distinct and equally visible, with alert closed jaws and intact skin. No collar, armor, extra legs or additional heads. Authored requirements: Medium Rift-touched hunting hound with the authored Two-Headed trait: exactly two heads. Preserve both heads in every portrait and reference. It senses living Rift signatures; do not add extra eyes or visible sensing rays. Both heads must remain present and visible in all applicable views; do not merge them or omit one. Complete silhouettes, all heads, appendages and tails inside comfortable margins. No attack effects, darkness sphere, prey, text, lettering, labels, borders, UI, scenery, new equipment or redesign.",
+        "portrait": "Use case: identity-preserve. Aligned reusable square portrait for Rift Death Hound, Sylvia GM Severed Lands. Input 1 is the canonical full-body identity; input 2 is the canonical multi-view reference. One square PNG, 1024x1024, polished naturalistic digital RPG illustration, plain light neutral background and soft natural studio light. Preserve the exact identity, materials, colors, markings and actual anatomy in both references. A powerful four-legged hound with exactly two separate canine heads on two necks sharing one broad shoulder girdle and one body. Short rough slate-black fur, lean muscular flanks, broad paws, a long lowered tail, four small amber eyes in total and faint violet Rift glimmers beneath a few patches of fur. Both heads are distinct and equally visible, with alert closed jaws and intact skin. No collar, armor, extra legs or additional heads. Show BOTH complete heads, ears and upper necks facing forward, with all four eyes visible. Keep the heads close enough to fit inside the central 70 percent of the canvas. Eye lines around 35 percent image height; center the combined pair. Leave generous top and side margins for circular cropping. Do not merge the heads or omit one. No other figures, hands, prey, attack effects, text, lettering, labels, borders, UI, scenery, blood or gore."
+      }
+    },
+    {
+      "id": "severed-monster-rift-basilisk",
+      "name": "Rift Basilisk",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-basilisk.md",
+          "sha256": "8075badb903a1c9fee6f5af4b1786b35a4d66cf66608ab63593dc8037b2a9d07",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-basilisk.md",
+          "sha256": "e271b46b8c3e9936b943ae84c4f9402418d9befb65addad339a9fe90aae43655",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A heavy low-slung reptile with eight short strong legs in four pairs, a thick curling tapering tail, a broad blunt crocodilian head and two large pale yellow-green eyes. Pebbled slate-green scales, dusty gray spinal ridges and faint violet coloration around eyes and scale seams. A wary grounded posture with a closed mouth. No wings, human features, victims or active gaze effects.",
+        "full_body": {
+          "path": "assets/characters/a5a5703fbf78aa46c88773ab065eb0252f7fe64f2cfeffe1af97b3e633a5bb1a.png",
+          "sha256": "a5a5703fbf78aa46c88773ab065eb0252f7fe64f2cfeffe1af97b3e633a5bb1a"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/7dbaa4e6d5e31f32db8b6393bccee4e7b29dc16ced6980af06d4225f6649ba22.png",
+          "sha256": "7dbaa4e6d5e31f32db8b6393bccee4e7b29dc16ced6980af06d4225f6649ba22"
+        },
+        "portrait": {
+          "path": "assets/characters/527bdfd7fa63799b99f5f018b65937b3d704b46316d894ae25d44f1586459b08.png",
+          "sha256": "527bdfd7fa63799b99f5f018b65937b3d704b46316d894ae25d44f1586459b08"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.75,
+          "zoom": 1.25
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1862874
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2442877
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2664531
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: identity-preserve. Correct the leg count in the supplied Rift Basilisk full-body reference. Preserve this exact head, eyes, scales, violet seams, spinal ridges and tail design. Rebuild the torso slightly shorter, with exactly FOUR paired leg stations from shoulder to hip: one front pair, two middle pairs and one hind pair. Eight legs total, four on each side. The reference has an extra pair; REMOVE that extra pair. Show exactly four near-side legs clearly spaced along the side; far-side legs may be partly occluded but there are only four of them. Do not duplicate leg stations or add a fifth pair. One complete creature, one head, one tail, compact low-slung reptilian body. A clear side-biased three-quarter stance; complete head, all feet and tail inside comfortable margins. One PNG, 1024x1536, polished naturalistic digital RPG illustration, plain light neutral background, soft natural light. A heavy low-slung reptile with eight short strong legs in four pairs, a thick curling tapering tail, a broad blunt crocodilian head and two large pale yellow-green eyes. Pebbled slate-green scales, dusty gray spinal ridges and faint violet coloration around eyes and scale seams. A wary grounded posture with a closed mouth. No wings, human features, victims or active gaze effects. No text, labels, UI, border, scene, attack effects, other creatures or gore. Prioritize the exact eight-leg anatomy over preserving the reference's overlong torso.",
+        "reference_sheet": "Use case: identity-preserve. Final canonical multi-view sheet for Rift Basilisk. Input 1 is the CORRECTED authoritative eight-legged body. One landscape PNG, 1536x1024, polished naturalistic digital RPG illustration, plain light neutral background and soft natural light. Three complete views at equal scale: front, exact side and back, plus one head detail. Preserve the reference's exact head, pale yellow-green eyes, gray-green pebbled scales, violet seams, spinal ridges, compact torso and curling tail. EXACTLY FOUR leg pairs, eight legs total, matching the corrected reference: front pair, two middle pairs, hind pair. Side view shows four near-side legs and four corresponding far-side legs with natural occlusion. Do not add a fifth pair, elongate the torso, merge feet or crop any silhouette. No victims, attack effects, labels, text, UI, borders or scenery.",
+        "portrait": "Use case: identity-preserve. Edit image 1 into a true aligned square HEADSHOT for the same Rift Basilisk. Images 2 and 3 are canonical identity references. Preserve the exact face, pale yellow-green slit-pupil eyes, gray-green pebbled scales, violet seams and head ridges. Remove the raised tail and the entire rear body from the portrait. Show ONLY the head and upper neck against the same plain light neutral background. No tail, back, legs, extra body silhouette or attack effects anywhere in the image. Recompose the head upward: directly frontal upright head, centered horizontally, eyes level at 35 percent of canvas height. Head crown around 12 percent from the top, mouth around 65 percent down, upper neck ending near the bottom. Use comfortable side margins for a circular crop. One square PNG, 1024x1024, polished naturalistic digital RPG illustration and soft natural studio light. Preserve identity rather than redesigning. No human features, text, labels, borders, UI, scenery or other creatures."
+      }
+    },
+    {
+      "id": "severed-monster-rift-darkmantle",
+      "name": "Rift Darkmantle",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-darkmantle.md",
+          "sha256": "165c99f5f6f1b75b15420a1b094f0bebae7491c1ef57a8417a18d8c922ed60f9",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-darkmantle.md",
+          "sha256": "0ec96badf4ada1f04a9c23658440f886b75c6e6ac85042818559062ab44f0684",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A small eyeless cave predator with a tall pointed stone-gray leathery conical mantle and eight tapering flexible arms around its underside, forming a stalactite-like silhouette when gathered. A few faint violet Rift-nodules stud the irregular mantle. Dark pliable folds and a subtle underside beak-like opening, no visible eyes or humanoid face. Arms spread enough to make their structure readable. No wings, legs, clothing or active darkness sphere.",
+        "full_body": {
+          "path": "assets/characters/f25d9c5cacc0fa9f5e393063ba646f185738155a95d6cc997235208874471ae4.png",
+          "sha256": "f25d9c5cacc0fa9f5e393063ba646f185738155a95d6cc997235208874471ae4"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/f46e12824efe455b724501797495bf1c255134556cfe1cca50b697e30bcb72bc.png",
+          "sha256": "f46e12824efe455b724501797495bf1c255134556cfe1cca50b697e30bcb72bc"
+        },
+        "portrait": {
+          "path": "assets/characters/d0b8971c381e20f7bc2e7797ebeac1be29e471f1ee0188014d033c6be835847b.png",
+          "sha256": "d0b8971c381e20f7bc2e7797ebeac1be29e471f1ee0188014d033c6be835847b"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1730761
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 1986886
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 1802460
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body creature reference for Rift Darkmantle in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, plain light neutral background, soft natural studio light and a subtle grounding shadow. Exactly one complete creature in a neutral natural pose, near-front three-quarter view chosen to make its anatomy clear. Entire silhouette, every head, appendage and complete tail inside comfortable margins. Authored requirements: Small ceiling-clinging cave creature with echolocation, faint Rift-nodules and stalactite false appearance. Its darkness aura must not obscure reference art. The mantle and arms are the identifying features. Appearance: A small eyeless cave predator with a tall pointed stone-gray leathery conical mantle and eight tapering flexible arms around its underside, forming a stalactite-like silhouette when gathered. A few faint violet Rift-nodules stud the irregular mantle. Dark pliable folds and a subtle underside beak-like opening, no visible eyes or humanoid face. Arms spread enough to make their structure readable. No wings, legs, clothing or active darkness sphere. Details not specified by the authored source are editable visual defaults; do not change lore or mechanics. No text, labels, borders, UI, scenery, decorative emblems, diagrams, other creatures, attack effects, blood, gore or exposed organs. ",
+        "reference_sheet": "Use case: identity-preserve. Canonical multi-view creature reference sheet for Rift Darkmantle in Sylvia GM's Severed Lands. Input image 1 is the authoritative full-body identity reference. One landscape PNG, 1536x1024. Polished naturalistic digital RPG illustration, plain light neutral background, soft natural studio light. Show three complete views at the same scale, straight front, side profile and back, plus one clear detail of the head or defining anatomy. Preserve the exact identity, body proportions, colors, materials, markings, head count, limb count and distinguishing features of input image 1. A small eyeless cave predator with a tall pointed stone-gray leathery conical mantle and eight tapering flexible arms around its underside, forming a stalactite-like silhouette when gathered. A few faint violet Rift-nodules stud the irregular mantle. Dark pliable folds and a subtle underside beak-like opening, no visible eyes or humanoid face. Arms spread enough to make their structure readable. No wings, legs, clothing or active darkness sphere. Authored requirements: Small ceiling-clinging cave creature with echolocation, faint Rift-nodules and stalactite false appearance. Its darkness aura must not obscure reference art. The mantle and arms are the identifying features. The detail shows the mantle/underside arm attachment. Keep the creature eyeless and preserve its eight flexible arms. Complete silhouettes, all heads, appendages and tails inside comfortable margins. No attack effects, darkness sphere, prey, text, lettering, labels, borders, UI, scenery, new equipment or redesign.",
+        "portrait": "Use case: identity-preserve. Aligned reusable square portrait for Rift Darkmantle, Sylvia GM Severed Lands. Input 1 is the canonical full-body identity; input 2 is the canonical multi-view reference. One square PNG, 1024x1024, polished naturalistic digital RPG illustration, plain light neutral background and soft natural studio light. Preserve the exact identity, materials, colors, markings and actual anatomy in both references. A small eyeless cave predator with a tall pointed stone-gray leathery conical mantle and eight tapering flexible arms around its underside, forming a stalactite-like silhouette when gathered. A few faint violet Rift-nodules stud the irregular mantle. Dark pliable folds and a subtle underside beak-like opening, no visible eyes or humanoid face. Arms spread enough to make their structure readable. No wings, legs, clothing or active darkness sphere. The complete silhouette is the portrait. Center the ENTIRE creature in the square with generous margins, fitting within the central 65 percent of both width and height so an adjustable circular crop preserves every corner, mantle tip and tentacle. No face, eyes or invented human features. No other figures, hands, prey, attack effects, text, lettering, labels, borders, UI, scenery, blood or gore."
+      }
+    },
+    {
+      "id": "severed-monster-rift-cube",
+      "name": "Rift Cube",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-cube.md",
+          "sha256": "c3ede7a67bf9d961fa791804b41453c851193ba58716ca015f9ef93779d2e083",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-cube.md",
+          "sha256": "2708335755d66c6d10a1c342bc340b6ce90d72c8de566ed54496e2cf4012a9f0",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A complete mathematically regular translucent cube of nearly clear pale-violet gelatinous material, with straight perpendicular edges and flat square faces that never slump. Subtle internal Rift haze and delicate violet edge refraction make the volume readable. Empty interior without victims, bones, gear or debris. No eyes, face, mouth, limbs, core crystal, container or metal frame. The complete geometric silhouette is its identifying feature.",
+        "full_body": {
+          "path": "assets/characters/1e5234c0bfa9ab3b9577f0579c4f6ef9ddf4a3be29196ec64ca98727867fdd13.png",
+          "sha256": "1e5234c0bfa9ab3b9577f0579c4f6ef9ddf4a3be29196ec64ca98727867fdd13"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/36a1a7285fef391d6ac27dad2d004bbcea766622e1b1cbee5c80cc87767bdde3.png",
+          "sha256": "36a1a7285fef391d6ac27dad2d004bbcea766622e1b1cbee5c80cc87767bdde3"
+        },
+        "portrait": {
+          "path": "assets/characters/b9fb9450127728e6876d66aea96b7a57106919c76b9083a62ec1b09e35821651.png",
+          "sha256": "b9fb9450127728e6876d66aea96b7a57106919c76b9083a62ec1b09e35821651"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1735181
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 1676272
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 1642533
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body creature reference for Rift Cube in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, plain light neutral background, soft natural studio light and a subtle grounding shadow. Exactly one complete creature in a neutral natural pose, near-front three-quarter view chosen to make its anatomy clear. Entire silhouette, every head, appendage and complete tail inside comfortable margins. Authored requirements: Large translucent Rift ooze with a perfect cube shape that never falters. Condensed Rift energy and latent dissolution, not ice or a glass container. Keep its geometric shape, transparency and complete lack of a face. No engulfing scene or prey. Appearance: A complete mathematically regular translucent cube of nearly clear pale-violet gelatinous material, with straight perpendicular edges and flat square faces that never slump. Subtle internal Rift haze and delicate violet edge refraction make the volume readable. Empty interior without victims, bones, gear or debris. No eyes, face, mouth, limbs, core crystal, container or metal frame. The complete geometric silhouette is its identifying feature. Details not specified by the authored source are editable visual defaults; do not change lore or mechanics. No text, labels, borders, UI, scenery, decorative emblems, diagrams, other creatures, attack effects, blood, gore or exposed organs. Show one solid-volume cube from an elevated three-quarter angle, with three faces and its complete silhouette visible. All edges remain straight; all faces remain flat.",
+        "reference_sheet": "Use case: identity-preserve. Canonical multi-view creature reference sheet for Rift Cube in Sylvia GM's Severed Lands. Input image 1 is the authoritative full-body identity reference. One landscape PNG, 1536x1024. Polished naturalistic digital RPG illustration, plain light neutral background, soft natural studio light. Show three complete views at the same scale, straight front, side profile and back, plus one clear detail of the head or defining anatomy. Preserve the exact identity, body proportions, colors, materials, markings, head count, limb count and distinguishing features of input image 1. A complete mathematically regular translucent cube of nearly clear pale-violet gelatinous material, with straight perpendicular edges and flat square faces that never slump. Subtle internal Rift haze and delicate violet edge refraction make the volume readable. Empty interior without victims, bones, gear or debris. No eyes, face, mouth, limbs, core crystal, container or metal frame. The complete geometric silhouette is its identifying feature. Authored requirements: Large translucent Rift ooze with a perfect cube shape that never falters. Condensed Rift energy and latent dissolution, not ice or a glass container. Keep its geometric shape, transparency and complete lack of a face. No engulfing scene or prey. All three views must preserve one complete perfect cube, without any face or added objects. The detail is a close view of the translucent material, not a face. Complete silhouettes, all heads, appendages and tails inside comfortable margins. No attack effects, darkness sphere, prey, text, lettering, labels, borders, UI, scenery, new equipment or redesign.",
+        "portrait": "Use case: identity-preserve. Aligned reusable square portrait for Rift Cube, Sylvia GM Severed Lands. Input 1 is the canonical full-body identity; input 2 is the canonical multi-view reference. One square PNG, 1024x1024, polished naturalistic digital RPG illustration, plain light neutral background and soft natural studio light. Preserve the exact identity, materials, colors, markings and actual anatomy in both references. A complete mathematically regular translucent cube of nearly clear pale-violet gelatinous material, with straight perpendicular edges and flat square faces that never slump. Subtle internal Rift haze and delicate violet edge refraction make the volume readable. Empty interior without victims, bones, gear or debris. No eyes, face, mouth, limbs, core crystal, container or metal frame. The complete geometric silhouette is its identifying feature. The complete silhouette is the portrait. Center the ENTIRE creature in the square with generous margins, fitting within the central 65 percent of both width and height so an adjustable circular crop preserves every corner, mantle tip and tentacle. No face, eyes or invented human features. No other figures, hands, prey, attack effects, text, lettering, labels, borders, UI, scenery, blood or gore."
+      }
+    },
+    {
+      "id": "severed-monster-rift-ankheg",
+      "name": "Rift Ankheg",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-ankheg.md",
+          "sha256": "6e755c94813e130eb1632ad9a088830b9b9998b44841a74f64a404d5acd23b88",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-ankheg.md",
+          "sha256": "6116bc5664fb6d96ff1d1eefa863b42f50c568ba47da39614a0596bf49b8c99a",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A large burrowing insectoid with six strong articulated legs in three pairs, a long segmented low body, a heavy wedge-shaped insect head and two massive opposing mandibles. Dark brown mineralized chitin has an iridescent violet sheen. Compact black compound eyes, short paired antennae and broad digging forelegs. The rear abdomen tapers naturally. No wings, humanoid torso, extra legs, acid spray or prey.",
+        "full_body": {
+          "path": "assets/characters/dfcd0a0b67574e52821b7aa2e563c56fe602c8f299de86082d7b52334744ca09.png",
+          "sha256": "dfcd0a0b67574e52821b7aa2e563c56fe602c8f299de86082d7b52334744ca09"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/bb634005aa7776725185203984cfc7b200fe51cdcb4cb35f887796da14f3c24d.png",
+          "sha256": "bb634005aa7776725185203984cfc7b200fe51cdcb4cb35f887796da14f3c24d"
+        },
+        "portrait": {
+          "path": "assets/characters/d58b63c805ea3abf5aeb538d291a5e56ddef01e46796904ab66d602c2b3fd89e.png",
+          "sha256": "d58b63c805ea3abf5aeb538d291a5e56ddef01e46796904ab66d602c2b3fd89e"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1768194
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2273218
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2397666
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body creature reference for Rift Ankheg in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, plain light neutral background, soft natural studio light and a subtle grounding shadow. Exactly one complete creature in a neutral natural pose, near-front three-quarter view chosen to make its anatomy clear. Entire silhouette, every head, appendage and complete tail inside comfortable margins. Authored requirements: Large alien burrowing insectoid established in the Cairnfields. Its carapace absorbs Rift minerals and has a violet sheen. Keep the insect anatomy; acid abilities remain unactivated in reference art. Appearance: A large burrowing insectoid with six strong articulated legs in three pairs, a long segmented low body, a heavy wedge-shaped insect head and two massive opposing mandibles. Dark brown mineralized chitin has an iridescent violet sheen. Compact black compound eyes, short paired antennae and broad digging forelegs. The rear abdomen tapers naturally. No wings, humanoid torso, extra legs, acid spray or prey. Details not specified by the authored source are editable visual defaults; do not change lore or mechanics. No text, labels, borders, UI, scenery, decorative emblems, diagrams, other creatures, attack effects, blood, gore or exposed organs. ",
+        "reference_sheet": "Use case: identity-preserve. Canonical multi-view creature reference sheet for Rift Ankheg in Sylvia GM's Severed Lands. Input image 1 is the authoritative full-body identity reference. One landscape PNG, 1536x1024. Polished naturalistic digital RPG illustration, plain light neutral background, soft natural studio light. Show three complete views at the same scale, straight front, side profile and back, plus one clear detail of the head or defining anatomy. Preserve the exact identity, body proportions, colors, materials, markings, head count, limb count and distinguishing features of input image 1. A large burrowing insectoid with six strong articulated legs in three pairs, a long segmented low body, a heavy wedge-shaped insect head and two massive opposing mandibles. Dark brown mineralized chitin has an iridescent violet sheen. Compact black compound eyes, short paired antennae and broad digging forelegs. The rear abdomen tapers naturally. No wings, humanoid torso, extra legs, acid spray or prey. Authored requirements: Large alien burrowing insectoid established in the Cairnfields. Its carapace absorbs Rift minerals and has a violet sheen. Keep the insect anatomy; acid abilities remain unactivated in reference art.  Complete silhouettes, all heads, appendages and tails inside comfortable margins. No attack effects, darkness sphere, prey, text, lettering, labels, borders, UI, scenery, new equipment or redesign.",
+        "portrait": "Use case: identity-preserve. Aligned reusable square portrait for Rift Ankheg, Sylvia GM Severed Lands. Input 1 is the canonical full-body identity; input 2 is the canonical multi-view reference. One square PNG, 1024x1024, polished naturalistic digital RPG illustration, plain light neutral background and soft natural studio light. Preserve the exact identity, materials, colors, markings and actual anatomy in both references. A large burrowing insectoid with six strong articulated legs in three pairs, a long segmented low body, a heavy wedge-shaped insect head and two massive opposing mandibles. Dark brown mineralized chitin has an iridescent violet sheen. Compact black compound eyes, short paired antennae and broad digging forelegs. The rear abdomen tapers naturally. No wings, humanoid torso, extra legs, acid spray or prey. Head and upper neck only, directly forward, upright, centered, eye line about 35 percent down the image. Keep the complete head, horns, mandibles or antennae inside generous margins for an adjustable circular crop. No humanoid features or new anatomy. No other figures, hands, prey, attack effects, text, lettering, labels, borders, UI, scenery, blood or gore."
+      }
+    },
+    {
+      "id": "severed-monster-rift-behir",
+      "name": "Rift Behir",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-behir.md",
+          "sha256": "95e1a8e8e040cca459d43906c277986ab6a27c149d77d1d79a857bc5c5bcb1dc",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-behir.md",
+          "sha256": "b50dea23ff2836746a0a2b1eb533112776be2262eee235c642d6fed9bc6562b9",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A massive long-bodied serpent with many matched pairs of short powerful clawed legs, an elongated horned reptilian head, two amber eyes and a long tapering tail. Deep storm-blue overlapping scales, paler blue-gray belly plates and restrained violet Rift glimmers along a few scale seams. One long continuous body follows a gentle curve from the single head to a single tapering tail, with the successive leg pairs clearly readable. No wings, humanoid limbs, jewelry, lightning breath or prey.",
+        "full_body": {
+          "path": "assets/characters/db34e46a9ebd559642eb53b9025d0503606eceaa93646c656fcb6716e3007cd5.png",
+          "sha256": "db34e46a9ebd559642eb53b9025d0503606eceaa93646c656fcb6716e3007cd5"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/5523462b3a2d377467e82df71a405c177c4dea502bd5701a79faa5ee3f516e8c.png",
+          "sha256": "5523462b3a2d377467e82df71a405c177c4dea502bd5701a79faa5ee3f516e8c"
+        },
+        "portrait": {
+          "path": "assets/characters/676d8272d09e390ea706df5254008f420607f76efe86ff401c338c00c1734cb5.png",
+          "sha256": "676d8272d09e390ea706df5254008f420607f76efe86ff401c338c00c1734cb5"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1631957
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2097562
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2248649
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: identity-preserve. Corrected canonical full-body reference for Rift Behir, Sylvia GM Severed Lands. Input image 1 is a MATERIAL AND HEAD DESIGN reference only: retain its blue scales, gray belly plates, violet seams, amber eyes and horned head, but rebuild the body anatomy. The input has an ambiguous forked/coiled body and must not be copied as anatomy. One portrait-orientation PNG, 1024x1536, polished naturalistic digital RPG illustration, plain light neutral background and soft natural light. Show exactly ONE long serpent in a simple, uncoiled, gently curving diagonal pose: ONE head at the upper-left end, ONE uninterrupted trunk descending diagonally through the canvas, ONE long tapering tail at the lower-right end. Six matched pairs of short powerful clawed legs are spaced along that single trunk: twelve legs total, no more. The trunk narrows gradually toward the tail; no body forks, no branches, no S-coils, no overlapping loops, no second thick body end, no disconnected parts. Entire head, horns, legs and tip of tail inside generous margins. A massive long-bodied serpent with six matched pairs of short powerful clawed legs, twelve legs total, an elongated horned reptilian head, two amber eyes and a long tapering tail. Deep storm-blue overlapping scales, paler blue-gray belly plates and restrained violet Rift glimmers along a few scale seams. One long continuous body follows a gentle curve from the single head to a single tapering tail, with the successive leg pairs clearly readable. No wings, humanoid limbs, jewelry, lightning breath or prey. This is a many-legged serpent rather than a winged dragon. No wings, arms, clothes, text, labels, borders, UI, scenery, lightning breath, other creatures, victims or gore. Prioritize clear continuous anatomy over filling every part of the canvas.",
+        "reference_sheet": "Use case: identity-preserve. Canonical multi-view reference sheet for Rift Behir, Sylvia GM Severed Lands. Input image 1 is the corrected canonical full-body identity. One landscape PNG, 1536x1024. Three complete coherent views at the same scale, front, side profile and back, plus a larger head detail. Preserve the exact horned head, amber eyes, blue scales, gray belly plates, violet seams, proportions and many-legged serpentine anatomy of image 1. A massive long-bodied serpent with many matched pairs of short powerful clawed legs, an elongated horned reptilian head, two amber eyes and a long tapering tail. Deep storm-blue overlapping scales, paler blue-gray belly plates and restrained violet Rift glimmers along a few scale seams. One long continuous body follows a gentle curve from the single head to a single tapering tail, with the successive leg pairs clearly readable. No wings, humanoid limbs, jewelry, lightning breath or prey. Use simple uncoiled or gently curving poses so the continuous trunk and single tapering tail remain readable. ONE head and ONE tail per view; never fork, branch, overlap or duplicate the trunk. Keep the limb arrangement and overall anatomy consistent with the reference across views. Entire silhouettes and tail tips inside comfortable margins. Polished naturalistic digital RPG illustration, plain light neutral background, soft natural light. No wings, new anatomy, people, prey, lightning, text, labels, borders, UI or scenery.",
+        "portrait": "Use case: identity-preserve. Aligned reusable square portrait for Rift Behir, Sylvia GM Severed Lands. Input 1 is the canonical full-body identity; input 2 is the canonical multi-view reference. One square PNG, 1024x1024, polished naturalistic digital RPG illustration, plain light neutral background and soft natural studio light. Preserve the exact identity, materials, colors, markings and actual anatomy in both references. A massive long-bodied serpent with many matched pairs of short powerful clawed legs, an elongated horned reptilian head, two amber eyes and a long tapering tail. Deep storm-blue overlapping scales, paler blue-gray belly plates and restrained violet Rift glimmers along a few scale seams. One long continuous body follows a gentle curve from the single head to a single tapering tail, with the successive leg pairs clearly readable. No wings, humanoid limbs, jewelry, lightning breath or prey. Head and upper neck only, directly forward, upright, centered, eye line about 35 percent down the image. Keep the complete head, horns, mandibles or antennae inside generous margins for an adjustable circular crop. No humanoid features or new anatomy. No other figures, hands, prey, attack effects, text, lettering, labels, borders, UI, scenery, blood or gore."
+      }
     }
   ]
 }
