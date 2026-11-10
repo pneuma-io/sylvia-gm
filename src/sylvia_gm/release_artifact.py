@@ -22,7 +22,7 @@ from sylvia_gm.covered_source_delivery import (
 )
 
 PRERELEASE_VERSION = __version__
-WINDOWS_INSTALLER_VERSION = "0.3.0-4"
+WINDOWS_INSTALLER_VERSION = "0.3.0-5"
 RELEASE_FORMAT_ID = "sylvia-gm-windows-release-manifest"
 RELEASE_FORMAT_VERSION = 3
 DEPENDENCY_NOTICES_SOURCE = "dependency-notices.txt"

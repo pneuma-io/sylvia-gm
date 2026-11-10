@@ -102,7 +102,7 @@ def _synthetic_release_notice_record(release: Path) -> dict[str, object]:
 def test_alpha_09_prerelease_version_is_exact_host_displayed_and_unsigned() -> None:
     from sylvia_gm.config.loader import load_config
 
-    assert PRERELEASE_VERSION == "0.3.0-alpha.4"
+    assert PRERELEASE_VERSION == "0.3.0-alpha.5"
     assert validate_version_sources(ROOT) == PRERELEASE_VERSION
     default_config = load_config(load_dotenv_file=False)
     assert default_config.app.version == PRERELEASE_VERSION
@@ -293,10 +293,10 @@ def test_alpha_09_windows_builder_is_locked_unsigned_and_selects_exact_bundles(
         "--bundles",
         "nsis",
         "--config",
-        '{"version":"0.3.0-4"}',
+        '{"version":"0.3.0-5"}',
     )
-    assert WINDOWS_INSTALLER_VERSION == "0.3.0-4"
-    assert TAURI_WINDOWS_VERSION_OVERRIDE == '{"version":"0.3.0-4"}'
+    assert WINDOWS_INSTALLER_VERSION == "0.3.0-5"
+    assert TAURI_WINDOWS_VERSION_OVERRIDE == '{"version":"0.3.0-5"}'
     assert ("uv", "lock", "--check") in LOCK_CHECK_COMMANDS
     assert any("--locked" in command for command in LOCK_CHECK_COMMANDS)
 
