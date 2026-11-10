@@ -47,7 +47,8 @@ test('review, adopt, crop and reopen art through the source WebUI',{timeout:1800
     await frame.locator('[name=y]').fill('0.31');
     await frame.locator('[name=zoom]').fill('1.5');
     const preview=frame.locator('..').locator('.image-art-selected-preview img');
-    const crop=await preview.evaluate(image=>{
+    const crop=await page.evaluate(()=>{
+      const image=document.querySelector('[data-art-frame]').closest('.image-art-card').querySelector('.image-art-selected-preview img');
       const outer=image.parentElement.getBoundingClientRect(),inner=image.getBoundingClientRect();
       return {x:(outer.left-inner.left)/outer.width,y:(outer.top-inner.top)/outer.height};
     });

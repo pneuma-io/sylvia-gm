@@ -62,14 +62,15 @@ class CharacterArtWorkflow:
             return self.art._receipt(existing[-1])
         targets = self.art.targets(session_id)
         target = next((item for item in targets if item["id"] == target_id), None)
-        if target_id is None and campaign_id is not None:
+        if target_id is None:
             matches = [
                 item for item in targets if item["kind"] == "character" and item["name"] == name
             ]
-            if len(matches) != 1:
+            if len(matches) > 1 or (campaign_id is not None and not matches):
                 raise ValueError("Choose the character whose artwork you want to create")
-            target = matches[0]
-            target_id = target["id"]
+            if matches:
+                target = matches[0]
+                target_id = target["id"]
         if target_id is None:
             if not name.strip():
                 raise ValueError("Enter the character's name")

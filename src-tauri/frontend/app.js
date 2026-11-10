@@ -26,6 +26,9 @@ const SylviaGMFrontend = (() => {
     if (!imageArtController) imageArtController = window.SylviaImageArt.create({
       bridge: () => state.bridge,
       context: () => ({session_id:state.activeSessionId,campaign_id:state.activeCampaignId}),
+      navigateSource: source => source.source_campaign_id
+        ? openCampaign(source.source_campaign_id,source.source_session_id)
+        : openBuilderChat(source.source_session_id),
       changed: () => {
         if (state.panelProjection) renderRulesetPanelProjection({...state.panelProjection,
           image_art_revision:imageArtController.revision()});

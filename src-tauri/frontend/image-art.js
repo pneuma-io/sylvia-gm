@@ -6,7 +6,7 @@
   const escape = value => String(value ?? '').replace(/[&<>"']/g, c =>
     ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-  function create({bridge, context, changed}) {
+  function create({bridge, context, changed, navigateSource = null}) {
     let scopeKey = '', stamps = new Map(), generation = 0, view = null, dialog = null;
     let error = '', busy = new Set(), assets = new Map(), refreshing = null, pollTimer = null;
     let refreshSerial = 0;
@@ -29,15 +29,18 @@
       const pending = (async () => {
         const next = await call({action:statusOnly?'status':'view'});
         if (!current(scope, epoch) || serial !== refreshSerial) return;
+        const previous=JSON.stringify(view);
         view = statusOnly ? {...view,...next} : next;
+        let loaded=false;
         const digests = new Set(next.selections.map(item => item.sha256));
         next.requests.slice(0,12).filter(item => item.result_sha256).forEach(item => digests.add(item.result_sha256));
         await Promise.all([...digests].filter(digest => !assets.has(digest)).map(async digest => {
           const asset = await call({action:'asset', sha256:digest});
-          if (current(scope, epoch) && /^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(asset.data_url))
-            assets.set(digest, asset.data_url);
+          if (current(scope, epoch) && /^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(asset.data_url)) {
+            assets.set(digest, asset.data_url); loaded=true;
+          }
         }));
-        if (current(scope, epoch) && serial === refreshSerial) { render(); changed(); }
+        if (current(scope, epoch) && serial === refreshSerial && (loaded || previous!==JSON.stringify(view))) { render(); changed(); }
       })();
       refreshing = pending;
       try { await pending; }
@@ -46,7 +49,7 @@
         if (refreshing === pending) refreshing = null;
         if (current(scope,epoch) && serial === refreshSerial) {
           clearTimeout(pollTimer);
-          if (view?.requests.some(item=>item.status==='pending'))
+          if (view?.requests.some(item=>item.status==='pending') || view?.pending_character_art?.some(item=>['pending','advancing'].includes(item.status)))
             pollTimer=setTimeout(()=>{if(current(scope,epoch)) void refresh(true);},1000);
         }
       }
@@ -151,6 +154,9 @@
         ['off','review','auto'].map(mode => `<option value="${mode}" ${settings.mode===mode?'selected':''}>${mode[0].toUpperCase()+mode.slice(1)}</option>`).join('') +
         `</select></label><p>ChatGPT subscription · Uses your usage limits and eligible credits. Auto lets Sylvia generate and use images. Review asks before generation and adoption.</p></section>` +
         `<p class="image-art-error" role="status">${escape(error)}</p>` +
+        ((view?.pending_character_art || []).length ? `<section><h2>Artwork from Builder</h2>${view.pending_character_art.map((item,index)=>
+          `<p>${escape(item.name)} · ${escape(item.status==='pending'?'Generating':item.status==='proposed'||item.status==='review'?'Waiting for approval':item.status.replaceAll('_',' '))} ` +
+          (navigateSource&&!item.source_unavailable?`<button type="button" class="btn btn-secondary" data-art-source="${index}">Open Builder artwork</button>`:'')+'</p>').join('')}</section>`:'') +
         (context().session_id ? `<form data-art-form><div class="image-art-fields"><label>Character or map ` +
           `<select name="target_id">${targets.map(target => `<option value="${escape(target.id)}">${escape(target.name)} (${target.kind})</option>`).join('')}${!context().campaign_id?'<option value="">New character</option>':''}</select>` +
           `</label><label data-art-name>Character name <input name="name" maxlength="160" placeholder="Name of your character or companion">` +
@@ -212,6 +218,10 @@
         dialog.addEventListener('click', event => {
           const button = event.target.closest('button'); if (!button) return;
           if (button.hasAttribute('data-art-close')) return dialog.close();
+          if (button.hasAttribute('data-art-source')) {
+            const source=view.pending_character_art[Number(button.dataset.artSource)];
+            dialog.close(); if(navigateSource) void navigateSource(source); return;
+          }
           if (button.hasAttribute('data-art-new')) {
             dialog.querySelector('[data-art-form]').elements.edit_sha256.value=''; updateForm(); return;
           }

@@ -92,6 +92,8 @@ def test_unbound_builder_save_discovery_and_reopen(tmp_path, version):
         assert outcomes["check_character_profile_draft"]["valid"]
         saved = outcomes["publish_character_profile"]
         assert saved["success"] and saved["campaign_ready"] is False
+        assert saved["artwork"]["status"] == "proposed"
+        assert saved["artwork"]["character_flow"]["name"] == "Vela"
         assert any(
             item["id"] == saved["id"] for item in outcomes["discover_campaign_content"]["items"]
         )

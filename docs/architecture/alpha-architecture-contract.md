@@ -1077,6 +1077,13 @@ missing stage; Auto may dispatch it, while Review waits for Generate. Reopen nev
 work. Setting and Plan draft checks/publication resolve explicit Character File PNG references
 through the publishing session's scoped image reader and include the exact bytes and content
 declarations. They do not generate art, fetch external assets or change the source workspace.
+Partial visual bundles explicitly list unfinished purposes while retaining usable bytes/framing.
+Owner-published source identity/hash pairs are associated with the existing image request receipts.
+Those associations are preserved when dispatch binds inputs and when later workflow stages are
+admitted. Only adopted results project into linked sources. Campaign materialization captures
+available art and its exact source identity; subsequent reads restore later adopted stages into
+campaign-owned selections. Imported selections do not inherit the source publication links, so
+editing a campaign copy does not update the original. This uses the existing schema and blob store.
 
 Underlay references are rendered from the existing player projection's static map geometry and
 terrain, without tokens, labels or hidden geometry. The selected image retains bounds and a

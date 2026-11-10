@@ -32,12 +32,29 @@ _ASSET_REFERENCE_SCHEMA = {
 CHARACTER_VISUALS_SCHEMA = {
     "type": "object",
     "additionalProperties": False,
-    "required": ["appearance", "full_body", "reference_sheet"],
+    "required": ["appearance"],
+    "anyOf": [
+        {"required": ["full_body", "reference_sheet"], "not": {"required": ["status"]}},
+        {
+            "required": ["status", "missing"],
+            "anyOf": [
+                {"required": [purpose]} for purpose in ("full_body", "reference_sheet", "portrait")
+            ],
+        },
+    ],
     "properties": {
         "appearance": {"type": "string", "minLength": 1, "maxLength": 16000},
         "full_body": _ASSET_REFERENCE_SCHEMA,
         "reference_sheet": _ASSET_REFERENCE_SCHEMA,
         "portrait": _ASSET_REFERENCE_SCHEMA,
+        "status": {"const": "partial"},
+        "missing": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "uniqueItems": True,
+            "items": {"enum": ["full_body", "reference_sheet", "portrait"]},
+        },
         "frame": {
             "type": "object",
             "additionalProperties": False,
@@ -55,8 +72,19 @@ def validate_character_visuals(value: object) -> dict[str, Any] | None:
     """Retain canonical references with local receipts or hash-verified package asset paths."""
     if value is None:
         return None
-    required = {"appearance", "full_body", "reference_sheet"}
+    partial = isinstance(value, Mapping) and value.get("status") == "partial"
+    required = (
+        {"appearance", "status", "missing"}
+        if partial
+        else {
+            "appearance",
+            "full_body",
+            "reference_sheet",
+        }
+    )
     if not isinstance(value, Mapping) or not required <= set(value) <= required | {
+        "full_body",
+        "reference_sheet",
         "portrait",
         "frame",
     }:
@@ -65,6 +93,21 @@ def validate_character_visuals(value: object) -> dict[str, Any] | None:
     if not isinstance(appearance, str) or not 0 < len(appearance) <= 16000 or "\x00" in appearance:
         raise ValueError("Character visuals require an established appearance description")
     result: dict[str, Any] = {"appearance": appearance}
+    if partial:
+        missing = value["missing"]
+        if (
+            not isinstance(missing, Sequence)
+            or isinstance(missing, (str, bytes))
+            or not 0 < len(missing) <= 3
+            or any(
+                not isinstance(purpose, str) or purpose not in CHARACTER_IMAGE_PURPOSES
+                for purpose in missing
+            )
+            or len(set(missing)) != len(missing)
+            or not CHARACTER_IMAGE_PURPOSES.intersection(value)
+        ):
+            raise ValueError("Partial artwork must identify its unfinished image stages")
+        result.update(status="partial", missing=list(missing))
     for purpose in ("full_body", "reference_sheet", "portrait"):
         if purpose not in value:
             continue
@@ -103,22 +146,29 @@ def character_visuals_from_selections(
 ) -> dict[str, Any] | None:
     """Project normalized saved art into the portable Character File visual bundle."""
     selected = {row["purpose"]: row for row in rows if row["target_id"] == target_id}
-    if not {"full_body", "reference_sheet"} <= set(selected):
+    if not selected:
         return None
     missing = missing_character_art(list(selected.values()))
-    if "reference_sheet" in missing:
-        return None
-    appearance = selected["full_body"]["metadata"].get("appearance")
+    appearance = next(
+        (
+            row["metadata"].get("appearance")
+            for row in selected.values()
+            if row["metadata"].get("appearance")
+        ),
+        None,
+    )
     if not appearance:
         return None
     value = {"appearance": appearance}
+    if missing:
+        value.update(status="partial", missing=missing)
     for purpose in ("full_body", "reference_sheet", "portrait"):
-        if purpose in selected and purpose not in missing:
+        if purpose in selected:
             value[purpose] = {
                 **{key: selected[purpose][key] for key in ("sha256", "operation_id")},
                 "path": f"assets/characters/{selected[purpose]['sha256']}.png",
             }
-    if "portrait" in selected and "portrait" not in missing:
+    if "portrait" in selected:
         value["frame"] = selected["portrait"]["frame"]
     return validate_character_visuals(value)
 
@@ -128,7 +178,7 @@ def missing_character_art(rows: Sequence[Mapping[str, Any]]) -> list[str]:
     selected = {row["purpose"]: row for row in rows}
     missing = []
     for purpose in ("full_body", "reference_sheet", "portrait"):
-        if purpose not in selected:
+        if purpose not in selected or selected[purpose]["metadata"].get("needs_refresh"):
             missing.append(purpose)
             continue
         dependencies = (

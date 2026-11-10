@@ -2876,7 +2876,18 @@ def _dispatch_selected(
                     operation_id=f"{session_id}:{hashlib.sha256(canonical).hexdigest()}",
                     source=canonical,
                 )
-                return saved.catalog_payload()
+                biography = profile.get("biography", {})
+                appearance = (
+                    biography.get("appearance") or biography.get("description")
+                    if isinstance(biography, Mapping) else None
+                ) or profile.get("authored_profile") or profile["summary"]
+                artwork = application_owner.image_art_service().ensure_character_art(
+                    session_id, name=str(profile["name"]), appearance=str(appearance),
+                )
+                application_owner.image_art_service().bind_publication(
+                    session_id, saved.artifact_id, saved.content_sha256, name=str(profile["name"]),
+                )
+                return {**saved.catalog_payload(), "artwork": artwork}
 
             def import_profile(data: bytes) -> SafePayload:
                 from sylvia_gm.application.character_card_import import save_character_card_import
@@ -2989,12 +3000,19 @@ def _dispatch_selected(
                     source_profile=source_profile,
                     visuals=visuals,
                 )
+                artwork = application_owner.image_art_service().ensure_character_art(
+                    session_id, name=saved.name, appearance=authored_profile,
+                )
+                application_owner.image_art_service().bind_publication(
+                    session_id, saved.artifact_id, saved.content_sha256, name=saved.name,
+                    source_target_id=str(source_profile["artifact_id"]) if source_profile else None,
+                )
                 if context.session.campaign_id is None:
                     label = "Character" if role == "player_character" else "Companion"
                     application_owner.rename_builder_chat(
                         session_id, f"{saved.name} · {label}"[:120].strip(), automatic=True
                     )
-                return participant_catalog_payload(application_owner, saved)
+                return {**participant_catalog_payload(application_owner, saved), "artwork": artwork}
 
             def read_participant(
                 *, artifact_id: str, expected_content_sha256: str, schema_id: str | None = None,
@@ -3020,8 +3038,11 @@ def _dispatch_selected(
                 if len(declarations) != 1:
                     raise CommandRejected("Choose one of this Ruleset's participant schema IDs")
                 repair_character = (source.artifact_id, source.content_sha256)
+                visuals = application_owner._store.images.published_visuals(
+                    source.artifact_id, source.content_sha256,
+                ) or source.visuals
                 application_owner.image_art_service().restore_visuals(
-                    session_id, source.artifact_id, source.visuals, name=source.name,
+                    session_id, source.artifact_id, visuals, name=source.name,
                     asset_reader=lambda path: application_owner._store.package_file_bytes(
                         participant_campaign_setting.package_id,
                         participant_campaign_setting.version,
@@ -3032,7 +3053,7 @@ def _dispatch_selected(
                 return {
                     "schema_id": declarations[0].schema_id,
                     "summary": source.summary, "authored_profile": source.authored_profile,
-                    **({"visuals": source.visuals} if source.visuals is not None else {}),
+                    **({"visuals": visuals} if visuals is not None else {}),
                     "participant": dict(source.participant),
                     "entity_state": dict(authored_character_state(
                         source.entity_state, declarations[0]
@@ -3069,6 +3090,14 @@ def _dispatch_selected(
                     package=participant_package, declaration=declarations[0],
                     campaign_setting=participant_campaign_setting,
                     setting_character_schema=participant_setting_schema,
+                    visuals=application_owner._store.images.published_visuals(
+                        source.artifact_id, source.content_sha256,
+                    ) or source.visuals,
+                )
+                application_owner._store.images.bind_publication(
+                    application_owner._store.images.publication_operations(
+                        source.artifact_id, source.content_sha256,
+                    ), saved.artifact_id, saved.content_sha256,
                 )
                 if context.session.campaign_id is None:
                     label = "Character" if saved.role == "player_character" else "Companion"

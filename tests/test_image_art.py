@@ -197,7 +197,9 @@ def test_changed_canonical_reference_requires_a_new_sheet_before_another_portrai
         service._futures[row["operation_id"]].result(timeout=15)
     replacement = request(service, "new-full-body")
     service._futures[replacement["operation_id"]].result(timeout=15)
-    assert service.view("builder-art")["character_visuals"] == {}
+    partial = service.view("builder-art")["character_visuals"]["relay-keeper"]
+    assert partial["status"] == "partial"
+    assert partial["missing"] == ["reference_sheet", "portrait"]
     portrait = request(service, "portrait-too-early", "portrait")
     result = service._futures[portrait["operation_id"]].result(timeout=15)
     assert result["error"] == "missing_character_references"

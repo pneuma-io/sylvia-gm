@@ -33,11 +33,16 @@ crop persistence, corrupt-asset rollback, common PNG inputs and card reference r
 increment adds a complete character artwork request, Review/Auto stage progression, Party and
 character Artwork actions, and automatic image inclusion in Setting/Plan publication. Source
 checks cover staged creation, failure/cancellation, the WebUI, GM export and fresh-recipient
-package restoration. Prepared catalogue art, character saves made while art is pending,
-portrait-only handoff with generation Off, and the remaining interview integration still need
-work. These source/scripted checks do not establish completion of the ordinary
-workflows. The owner's current goal includes real generation verification; no real generation has
-run, and the live test profile/environment still needs selection. Live subscription, installed-app
+package restoration. Follow-up work adds explicit partial-art records, saved-source links for
+later adopted stages, library/campaign materialization and portrait-only reuse with generation Off.
+Saving a character now prepares its artwork workflow under Review/Auto; conversation-model image
+tool calls are optional. Focused source checks cover those handoffs and campaign-copy isolation.
+Prepared catalogue artwork and broader everyday journey qualification still need work. A separate
+probe found that an unfinished draft archive carrying a package-candidate identity fails recovery
+with `candidate_unavailable`, even without any image requests; its release impact remains unresolved.
+These source/scripted checks do not establish completion of the ordinary
+workflows. The owner's latest selection keeps live in-app checks pending. No real generation has
+run. Live subscription, installed-app
 and TD trailer acceptance remain unverified. Merge follows the Pneuma IO rulebook's delivery and
 cleanup sequence.
 

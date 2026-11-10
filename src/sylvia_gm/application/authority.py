@@ -981,6 +981,14 @@ class AuthorityOwner:
                     if not isinstance(character, Mapping):
                         continue
                     visuals = validate_character_visuals(character.get("visuals"))
+                    source_id = character.get("source_id")
+                    source_sha = character.get("source_content_sha256") or character.get(
+                        "content_sha256"
+                    )
+                    if isinstance(source_id, str) and isinstance(source_sha, str):
+                        visuals = self._store.images.published_visuals(
+                            source_id, source_sha
+                        ) or visuals
                     identity = selected.get("participant_id")
                     if visuals is not None and isinstance(identity, str):
                         result[identity] = visuals
@@ -988,7 +996,14 @@ class AuthorityOwner:
             for target in {row["target_id"] for row in rows if row["purpose"] != "map_underlay"}:
                 visuals = character_visuals_from_selections(rows, target)
                 if visuals is not None:
-                    result[target] = visuals
+                    local = [row for row in rows if row["target_id"] == target]
+                    edited = any(
+                        not (row["metadata"].get("source_operation_id")
+                             or row["metadata"].get("source_path"))
+                        for row in local
+                    )
+                    if target not in result or edited:
+                        result[target] = visuals
         return result
 
     def image_art_action(self, params: dict[str, Any]) -> dict[str, Any]:

@@ -24,6 +24,7 @@ from sylvia_gm.application.image_hooks import (
 from sylvia_gm.application.map_art_reference import map_art_reference
 from sylvia_gm.application.tactical_grid import project_tactical_grid
 from sylvia_gm.domain.authority import thaw_json_value
+from sylvia_gm.domain.errors import CommandRejected
 from sylvia_gm.domain.image_art import (
     IMAGE_PURPOSES,
     IMAGE_SIZES,
@@ -170,7 +171,11 @@ class ImageArt:
 
         value = cast(dict[str, Any], thaw_json_value(profile.profile))
         self.restore_visuals(
-            session_id, profile.artifact_id, value.get("visuals"), name=value["name"]
+            session_id,
+            profile.artifact_id,
+            self.store.published_visuals(profile.artifact_id, profile.content_sha256)
+            or value.get("visuals"),
+            name=value["name"],
         )
         source = value.get("import_source", {})
         if source.get("container") != "png":
@@ -193,6 +198,13 @@ class ImageArt:
             name=value["name"],
             appearance=appearance[:16000],
             image=portrait,
+        )
+        self.bind_publication(
+            session_id,
+            profile.artifact_id,
+            profile.content_sha256,
+            name=value["name"],
+            source_target_id=profile.artifact_id,
         )
 
     def restore_card_portrait(
@@ -223,7 +235,7 @@ class ImageArt:
         rows = self.store.list_selections(scope)
         bundle = character_visuals_from_selections(rows, target_id)
         if bundle is None:
-            raise ValueError("Finish both character references before publishing artwork")
+            raise ValueError("This character has no selected artwork to publish")
         return {
             reference["path"]: self.store.image(reference["sha256"])
             for purpose in ("full_body", "reference_sheet", "portrait")
@@ -262,6 +274,73 @@ class ImageArt:
             if (bundle := character_visuals_from_selections(rows, target)) is not None
         ]
         return bundles[0] if len(bundles) == 1 else None
+
+    def ensure_character_art(
+        self, session_id: str, *, name: str, appearance: str
+    ) -> dict[str, Any]:
+        """Make artwork an owned part of saving a character, without retrying an existing flow."""
+        if self.settings().get("mode") == "off":
+            return {"status": "off"}
+        _, campaign_id = self._scope(session_id)
+        for row in self.store.list_requests(campaign_id=campaign_id, session_id=session_id):
+            flow = json.loads(row["request_json"]).get("character_flow")
+            if flow and flow["name"] == name:
+                return self._receipt(row)
+        try:
+            return self.request(
+                session_id,
+                operation_id="publish:" + hashlib.sha256((name + appearance).encode()).hexdigest(),
+                purpose="character",
+                name=name,
+                appearance=appearance[:16000],
+                brief=(
+                    "Create artwork consistent with this character and their established campaign."
+                ),
+            )
+        except ValueError as error:
+            return {"status": "unavailable", "message": str(error)}
+
+    def bind_publication(
+        self,
+        session_id: str,
+        artifact_id: str,
+        content_sha256: str,
+        *,
+        name: str,
+        source_target_id: str | None = None,
+    ) -> None:
+        """Let a saved character receive already-requested art that finishes after publication."""
+        scope, campaign_id = self._scope(session_id)
+        rows = self.store.list_requests(campaign_id=campaign_id, session_id=session_id)
+        candidates = [
+            row
+            for row in rows
+            if json.loads(row["request_json"]).get("metadata", {}).get("target_name") == name
+            or row["target_id"] == source_target_id
+        ]
+        flow = next(
+            (
+                json.loads(row["request_json"])["character_flow"]
+                for row in candidates
+                if "character_flow" in json.loads(row["request_json"])
+            ),
+            None,
+        )
+        ids = [
+            row["operation_id"]
+            for row in candidates
+            if flow is None
+            or json.loads(row["request_json"]).get("character_flow", {}).get("id") == flow["id"]
+        ]
+        target_ids = {row["target_id"] for row in candidates}
+        ids.extend(
+            row["operation_id"]
+            for row in self.store.list_selections(scope)
+            if row["target_id"] in target_ids or row["target_id"] == source_target_id
+        )
+        for identity in ids:
+            self._owned(session_id, identity)
+        self.store.bind_publication(list(set(ids)), artifact_id, content_sha256)
 
     def _runtime(self, session_id: str) -> ImageSession:
         with self._lock:
@@ -397,12 +476,71 @@ class ImageArt:
             visuals = prepared.get(target["id"])
             if visuals is not None:
                 self.restore_visuals(session_id, target["id"], visuals, name=target["name"])
-            self._restored_visuals.add(token)
+            if visuals is not None and visuals.get("status") != "partial" and "portrait" in visuals:
+                self._restored_visuals.add(token)
         return list(targets.values())
 
     def view(self, session_id: str, *, include_targets: bool = True) -> dict[str, Any]:
         scope, campaign_id = self._scope(session_id)
         targets = self.targets(session_id) if include_targets else []
+        linked = []
+        if campaign_id is not None:
+            try:
+                party = self.owner._store.campaign_construction_basis(
+                    campaign_id
+                ).canonical_input.get("selected_party", ())
+            except CommandRejected:
+                party = ()
+            if not isinstance(party, Sequence) or isinstance(party, (str, bytes)):
+                party = ()
+            prepared = self.owner.character_visuals(campaign_id)
+            for member in party:
+                if not isinstance(member, Mapping):
+                    continue
+                character = member.get("character_file", {})
+                identity = member.get("participant_id")
+                if not isinstance(character, Mapping) or not isinstance(identity, str):
+                    continue
+                bundle = prepared.get(identity)
+                name = member.get("name")
+                name = name if isinstance(name, str) else "Character"
+                if not include_targets and bundle is not None:
+                    self.restore_visuals(session_id, identity, bundle, name=name)
+                if (
+                    bundle is not None
+                    and bundle.get("status") != "partial"
+                    and "portrait" in bundle
+                ):
+                    continue
+                source_id = character.get("source_id")
+                source_sha = character.get("source_content_sha256") or character.get(
+                    "content_sha256"
+                )
+                if not isinstance(source_id, str) or not isinstance(source_sha, str):
+                    continue
+                progress = self.store.publication_progress(source_id, source_sha)
+                if progress is not None:
+                    if progress["status"] == "succeeded":
+                        progress["status"] = "review" if not progress["adopted"] else "partial"
+                        if (
+                            progress["adopted"]
+                            and progress["has_flow"]
+                            and self.settings().get("mode") != "off"
+                        ):
+                            try:
+                                source = self.owner.session_context(progress["source_session_id"])
+                            except CommandRejected:
+                                progress.update(status="interrupted", source_unavailable=True)
+                            else:
+                                if source.session.status.value == "active":
+                                    progress["status"] = "advancing"
+                    linked.append(
+                        {
+                            **progress,
+                            "target_id": identity,
+                            "name": name,
+                        }
+                    )
         rows = self.store.list_selections(scope)
         needs = []
         for target in targets:
@@ -448,6 +586,7 @@ class ImageArt:
             ],
             "purposes": sorted(IMAGE_PURPOSES),
             "needed_art": needs,
+            "pending_character_art": linked,
         }
 
     def _owned(self, session_id: str, operation_id: str) -> dict[str, Any]:
@@ -650,9 +789,7 @@ class ImageArt:
             item["purpose"] for item in selected
         }:
             raise ImageHookError("missing_character_references")
-        if row["purpose"] == "reference_sheet" and not any(
-            item["purpose"] == "full_body" for item in selected
-        ):
+        if row["purpose"] == "reference_sheet" and "full_body" in missing_character_art(selected):
             raise ImageHookError("missing_character_references")
         if row["purpose"] == "portrait" and "reference_sheet" in missing_character_art(selected):
             raise ImageHookError("missing_character_references")

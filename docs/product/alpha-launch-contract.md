@@ -1079,6 +1079,9 @@ a multi-view reference sheet; both reference formats are required for the visual
 portrait uses both references. Character Files and unbound character profiles can retain the
 managed asset references in their optional `visuals` data. Saved portraits use one adjustable
 focal point and zoom across Map, Party, character details and speaker-labelled dialogue.
+An explicitly marked partial visual record retains usable portraits/references and identifies
+unfinished stages. Partial art never satisfies the completed reference requirement. It can be
+saved, reused and transferred while generation is Off or a requested stage remains unfinished.
 
 The phase-one experience applies throughout ordinary use. Shipped premade characters, companions,
 named NPCs and enemy archetypes include prepared artwork and references, with coverage across the
@@ -1098,6 +1101,11 @@ and appear consistently wherever that character is shown.
 Character information and its selected artwork remain associated through publication, library
 reuse, campaign creation, save/reopen and supported content transfers. The same common visual
 record serves the supported Character File/profile/card paths and displayed character views.
+Saving through Builder prepares missing artwork under Review/Auto without requiring an image-tool
+call from the conversation model. The saved source is linked to that requested workflow; later
+adopted results follow it into a campaign without republishing the character. Campaigns show linked
+generation/approval status and can return to the owning Builder chat. Reusing a character never
+retries failed art automatically or changes the original character source.
 Failures, sign-in requirements, usage limits and interrupted work give an actionable recovery
 path while preserving usable art. The user remains able to continue without generating images.
 

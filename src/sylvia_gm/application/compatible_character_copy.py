@@ -103,6 +103,7 @@ def copy_compatible_character(
     declaration: ParticipantArtifactDeclaration,
     campaign_setting: PackageBinding,
     setting_character_schema: SafePayload | None = None,
+    visuals: SafePayload | None = None,
 ) -> ReusableParticipant:
     """Save a new exact binding only when every unchanged source value satisfies the destination."""
 
@@ -165,7 +166,7 @@ def copy_compatible_character(
         campaign_setting=campaign_setting,
         setting_character_schema=setting_character_schema,
         source_profile=source.source_profile,
-        visuals=source.visuals,
+        visuals=visuals if visuals is not None else source.visuals,
     )
 
 
