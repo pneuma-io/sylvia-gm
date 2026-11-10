@@ -1,5 +1,7 @@
 # Sylvia launch work
 
+Before starting, read the shared Pneuma IO Rulebook at `D:/CodexWork/deliverables/Pneuma/Rulebook/PNEUMA-IO-RULEBOOK.md`. It governs work items, delivery, reporting and cleanup.
+
 For launch mechanics, content, imports/builders, schemas, defaults/discovery, examples, tests, CI or packaging, read `docs/launch-compatibility.md` before editing. Finish by accounting for every affected item and verifying actual Lite compatibility, content equivalence and the relevant final-byte checks. Keep first-party Full work in its labelled inactive archive and preserve the multi-ruleset architecture.
 
 ## Canonical repository guidance
@@ -115,6 +117,8 @@ product specification.
 
 ## Test proportionately
 
+The supported-journey gate runs locally; the GitHub workflow is manual-only. A PR is ready for review when its description records the locally checked head commit, commands, results, elapsed time and checks not run.
+
 - Follow [`docs/operations/quality-preserving-development-process.md`](docs/operations/quality-preserving-development-process.md).
 - Live Sylvia testing uses the Windows environment selected for the current run in that process
   and the active plan. The old test VM is retired. Using Wan's desktop or Computer Use requires
@@ -140,7 +144,7 @@ product specification.
   in a dirty tree.
 - Exactly one worker writes the live worktree. Other workers are read-only unless ownership is
   explicitly transferred. Fluff coordinates Codex tasks with bounded scope, file ownership,
-  acceptance criteria and a mandatory return report. Use current Project Desk decisions and the
+  acceptance criteria and a mandatory return report. Use current Dot Desk (formerly Project Desk) decisions and the
   synchronized repository guidance; historical ownership statements do not assign a writer.
 - Staging, commits, pushes, deployment, publication, destructive data operations, spending, and
   credential access require direct authority in the current human-authored task.
@@ -160,7 +164,7 @@ product specification.
 
 ### Issue tracker
 
-Issues and specs use local Markdown files under `.scratch/`. See `docs/agents/issue-tracker.md`.
+Dot Desk holds current work items and decisions. GitHub holds project source; local scratch files are temporary evidence. See `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 
