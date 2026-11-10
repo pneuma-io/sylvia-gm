@@ -15,6 +15,7 @@ else:
     from check_supported_journeys import PYTHON_JOURNEYS, UI_JOURNEY
 
 CORE = [
+    "tests/test_python_quality.py",
     "tests/test_private_provider_records.py",
     "tests/test_protected_provider_settings.py",
     "tests/test_runtime_procedure_failures.py",

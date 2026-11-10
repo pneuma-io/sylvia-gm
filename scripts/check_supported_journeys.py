@@ -22,6 +22,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PYTHON_JOURNEYS = {
+    "python-quality": ["tests/test_python_quality.py"],
     "launch-lite-compatibility": [
         "tests/test_launch_lite_safety.py",
         "tests/test_runtime_payload_cache.py",
