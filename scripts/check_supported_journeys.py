@@ -46,6 +46,7 @@ PYTHON_JOURNEYS = {
         "tests/test_qa_lite_victory_boundaries.py",
         "tests/test_qa_lite_physical_range.py",
     ],
+    "command-registry": ["tests/test_command_registry.py"],
     "campaign-play": [
         "tests/test_campaign_rules_update.py",
         "tests/test_campaign_rules_update_bindings.py",
