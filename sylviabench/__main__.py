@@ -10,6 +10,7 @@ from pathlib import Path
 from pydantic import ValidationError
 
 from .checks import evaluate
+from .comparison import comparison
 from .contracts import scenarios, setups
 from .packs import freeze, verify
 from .report import load_results, report
@@ -29,6 +30,9 @@ def main(argv: list[str] | None = None) -> int:
     fixture.add_argument("--id", required=True)
     check = commands.add_parser("verify-fixtures", help="Verify frozen save and authored files")
     check.add_argument("directory", type=Path)
+    compare = commands.add_parser("compare", help="Report compatible batches without model calls")
+    compare.add_argument("directories", type=Path, nargs="+")
+    compare.add_argument("--output", type=Path, required=True)
     for name in ("run", "selftest"):
         command = commands.add_parser(name)
         command.add_argument("--output", required=True, type=Path)
@@ -67,6 +71,8 @@ def main(argv: list[str] | None = None) -> int:
             print(verify(args.directory, source_identity())["sha256"])
         elif args.command == "report":
             print(report(args.directory))
+        elif args.command == "compare":
+            print(comparison(args.directories, args.output))
         elif args.command == "replay":
             _manifest, rows = load_results(args.directory)
             replay_suite = {s.id: s for s in scenarios()}

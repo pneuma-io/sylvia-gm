@@ -32,6 +32,8 @@ from .packs import freeze, verify
 from .provenance import MAX_REQUESTS, ObservedResolver, configuration
 from .randomness import POLICY, PairedDice
 
+OWNER_REPLY_SECONDS = 300
+
 
 def source_identity() -> dict[str, Any]:
     """Bind source HEAD and actual implementation/content changes, including this framework."""
@@ -138,7 +140,7 @@ def execute(
     observed: ObservedResolver | None = None
     try:
         observed = ObservedResolver(_resolver(setup, provider))
-        with pairing, OwnerClient(database, observed, timeout=300) as client:
+        with pairing, OwnerClient(database, observed, timeout=OWNER_REPLY_SECONDS) as client:
             client.request("set_admin_full_audit", {"enabled": True})
             for turn_number, message in enumerate(scenario.player_messages):
                 pairing.turn = turn_number
@@ -159,6 +161,7 @@ def execute(
                 for attempt in range(retries + 1):
                     start = time.monotonic()
                     interruption: str | None = None
+                    fatal_error: Exception | None = None
                     reply: Any = None
                     try:
                         if attempt == 0:
@@ -199,6 +202,11 @@ def execute(
                             succeeded = True
                     except OwnerError as rejected:
                         interruption = str(rejected)
+                    except Exception as interrupted:
+                        # A caller timeout can arrive before the owner has an interruption to retry.
+                        # Preserve this failed attempt, then close the owner instead of guessing.
+                        interruption = f"Benchmark command ended with {type(interrupted).__name__}."
+                        fatal_error = interrupted
                     attempts.append(
                         Attempt(
                             turn=turn_number,
@@ -209,6 +217,8 @@ def execute(
                         )
                     )
                     write_json(directory / "attempts.json", [a.model_dump() for a in attempts])
+                    if fatal_error is not None:
+                        raise fatal_error
                     if succeeded:
                         break
                 if not succeeded:
@@ -272,6 +282,11 @@ def execute(
     cause: FailureCause | None = (
         None if passed else ("scripted_driver" if injected and not error else "unknown")
     )
+    if (
+        isinstance(error, TimeoutError)
+        and str(error) == "Owner command exceeded its configured timeout"
+    ):
+        cause = "benchmark_fault"
     return Result(
         run_id=directory.name,
         suite_id=suite_id,
@@ -297,6 +312,9 @@ def execute(
         else (
             "The selected scripted behavior injected the observed failure."
             if cause == "scripted_driver"
+            else f"The benchmark's {OWNER_REPLY_SECONDS}-second owner reply limit was reached; "
+            "a provider or GM failure was not established."
+            if cause == "benchmark_fault"
             else "Execution or checker evidence is insufficient to assign a specific cause."
         ),
         session_breakers=breakers(
@@ -354,6 +372,7 @@ def run(
         "retries": retries,
         "randomness_policy": POLICY,
         "provider_requests_per_run": MAX_REQUESTS,
+        "owner_reply_timeout_seconds": OWNER_REPLY_SECONDS,
         "retain_private_audit": retain_private_audit,
         "provider_configuration": {s.id: configuration(s) for s in selected},
         "fixture_pack_sha256": pack["sha256"] if pack else None,

@@ -68,6 +68,10 @@ def score(rows: list[Result], categories: dict[str, str]) -> dict[str, Any]:
         "runs": len(rows),
         "passed": sum(row.outcome == "pass" for row in rows),
         "incomplete": sum(row.outcome in {"incomplete", "error"} for row in rows),
+        "missing_attempt_records": sum(
+            not row.attempts and bool((row.observations.get("provider") or {}).get("requests"))
+            for row in rows
+        ),
         "session_breaker_share": statistics.mean(bool(row.session_breakers) for row in rows)
         if rows
         else None,
@@ -182,6 +186,13 @@ def challenge_comparison(rows: list[Result]) -> list[dict[str, Any]]:
 
 def report(directory: Path, destination: Path | None = None) -> Path:
     manifest, rows = load_results(directory)
+    return render(directory, manifest, rows, destination)
+
+
+def render(
+    directory: Path, manifest: dict[str, Any], rows: list[Result], destination: Path | None = None
+) -> Path:
+    """Render validated records without rewriting their execution lineage."""
     destination = destination or directory / "report.html"
     categories = {s["id"]: s["category"] for s in manifest["scenarios"]}
     grouped: dict[str, list[Result]] = defaultdict(list)
@@ -234,10 +245,18 @@ def report(directory: Path, destination: Path | None = None) -> Path:
             f"<td>{number(summary['median_turn_seconds'])} / "
             f"{number(summary['p90_turn_seconds'])}</td></tr>"
         )
+        if summary["missing_attempt_records"]:
+            body.append(
+                "<tr><td colspan='9'>Attempt details are unavailable for "
+                + str(summary["missing_attempt_records"])
+                + " run(s) with provider activity. Wait and first-attempt interruption figures "
+                "cover recorded attempts only; missing time is not replaced with zero.</td></tr>"
+            )
     body += [
         "</tbody></table><p>Bracketed ranges are 95% bootstrap intervals within each scenario, "
         "only when every observed scenario has at least two runs. They describe this fixed "
-        "scenario set. Wait includes Retry attempts. "
+        "scenario set. With very few runs or identical outcomes these empirical ranges can "
+        "collapse; they do not establish general reliability. Wait includes Retry attempts. "
         "Usage and cost stay unknown unless reported.</p>",
         "<h2>Challenge comparison</h2><p>The starting save and fixed player messages are checked "
         "separately from the first GM input at Sylvia's provider boundary. Preparation calls are "
@@ -261,6 +280,10 @@ def report(directory: Path, destination: Path | None = None) -> Path:
             f"<p>Session-breakers: {escape(breaker_text)}. "
             f"Cause: {escape(row.failure_cause or 'No failure')}. "
             f"{escape(row.usage_note)}</p>"
+        )
+        body.append(
+            f"<p>Whole run elapsed: {number(row.elapsed_seconds)} seconds, including "
+            "setup and observation. This is separate from the recorded turn waits.</p>"
         )
         body.append(
             "<table border='1' cellpadding='4'><tr><th>Check</th>"

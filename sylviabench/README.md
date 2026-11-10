@@ -78,6 +78,9 @@ file; each setup ID must be unique. Omit `--scenario` to run the whole supplied 
 `recover` deliberately interrupts the first attempt. `stuck` interrupts three attempts. These
 are framework probes, not model behavior. The runner uses Sylvia's manual Retry command at most
 twice (`--retries 0`, `1` or `2`), preserving every attempt's outcome and measured wait.
+The benchmark waits at most 300 seconds for an owner reply. A caller timeout is a benchmark
+transport limit, not proof of a provider or GM failure. Its failed attempt is journalled. The
+runner closes the uncertain owner instead of assuming that manual Retry is available.
 
 ## What the checks cover
 
@@ -124,6 +127,23 @@ directory. The runner never replaces an existing save.
 provider. `report` validates records and regenerates the HTML. Neither command executes model
 work. Keep the corresponding source checkout when replaying an older suite. Edited or mismatched
 manifests and mixed source/scenario/setup records are rejected.
+
+To compare separately recorded model groups on the same frozen pack:
+
+```powershell
+python -m sylviabench compare ../Results/go ../Results/chatgpt --output ../Results/comparison
+```
+
+`compare` validates each original batch, then requires identical application/framework bytes,
+scenario versions, fixture pack and starting database, repetitions, retries and reply/request limits.
+Source commits may differ only when those actual bytes match. Setup IDs must be distinct across
+batches. It writes `comparison.json`, `summary.json` and `report.html`; original manifests and
+result records remain untouched. Repeating the command rebuilds the same comparison. An output
+directory belonging to another comparison is rejected.
+
+Some early runner records can have provider activity and a caller timeout but no attempt journal.
+Reports show that measurement gap rather than inserting zero wait or inventing a retry. Whole-run
+elapsed time includes setup and observation and is displayed separately from turn waits.
 
 Results retain requested provider/model/reasoning separately from observed identity. Unknown
 identity, token use and cost stay unknown. Scripted runs have no model usage. Error attribution
