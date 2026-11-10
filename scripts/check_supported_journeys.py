@@ -642,6 +642,13 @@ UI_JOURNEY = [
     'tests/frontend_map_header.browser.cjs',
     'tests/frontend_panel_drag.browser.cjs',
     'tests/frontend_settings_layout.browser.cjs',
+    'tests/frontend_home.browser.cjs',
+    'tests/frontend_rig_motion.browser.cjs',
+    'tests/frontend_suite_order_categories.browser.cjs',
+    'tests/frontend_suite_roster_strip.browser.cjs',
+    'tests/frontend_weapon_reload.browser.cjs',
+    'tests/frontend_weapon_reload.test.cjs',
+    'tests/frontend_weapon_reload_queue.test.cjs',
 ]
 
 
