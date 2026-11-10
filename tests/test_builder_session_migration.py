@@ -314,19 +314,23 @@ def test_workspace_migration_refuses_existing_unrelated_target_and_path_escape(t
 
 def test_campaign_customization_keeps_its_existing_link_and_completion_prompt(tmp_path):
     with AuthorityOwner.open(tmp_path / "customization.db", "customization-owner") as owner:
-        draft = open_character_interview(owner, None, None, None)
-        for revision, (step, answer) in enumerate(
-            (
-                ("participants", {"player_name": "Investigator"}),
-                ("boundaries_preferences", {"boundaries": "", "preferences": ""}),
-            ),
-            start=4,
+        draft = owner.create_guided_campaign_draft(
+            operation_id="customization-draft",
+            display_name="Source context",
+            builder_session_id="source-interview",
+            builder_provider_id="test",
+            builder_model_id="test",
+        )
+        for step, answer in (
+            ("ruleset", {"candidate_id": None}),
+            ("name", {"display_name": "Source context"}),
+            ("boundaries_preferences", {"boundaries": "", "preferences": ""}),
         ):
-            owner.advance_guided_campaign_draft(
+            draft = owner.advance_guided_campaign_draft(
                 operation_id=f"choose-{step}",
                 campaign_id=draft.campaign_id,
                 builder_session_id=draft.builder_session_id,
-                expected_construction_revision=revision,
+                expected_construction_revision=draft.construction_revision,
                 current_step=step,
                 visible_answer=step,
                 answer=answer,
@@ -335,7 +339,7 @@ def test_campaign_customization_keeps_its_existing_link_and_completion_prompt(tm
             operation_id="customize",
             campaign_id=draft.campaign_id,
             parent_session_id=draft.builder_session_id,
-            expected_construction_revision=6,
+            expected_construction_revision=draft.construction_revision,
             purpose="campaign_customization",
             visible_answer="Move the starting town",
             child_session_id="customize-chat",

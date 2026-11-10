@@ -199,6 +199,7 @@ def _shield(event_id):
 
 def _hold_scalar(case, monkeypatch, rolls, *, seed=8, cover='none'):
     case.start()
+    rolls.clear()  # Initiative is outside the spell's no-roll admission boundary.
     monkeypatch.setattr(dice, '_rng', Random(seed))
     begun, begin_command = case.act('begin_srd_spell_action', **_guiding(case, cover))
     event_id = begun.result['context']['_pending_action_id']

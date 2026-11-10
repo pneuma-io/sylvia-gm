@@ -839,7 +839,7 @@ def test_committed_mechanic_reference_survives_provider_failure_retry_and_reopen
         assert isinstance(result, Mapping)
         result_card = result.get("result_card")
         assert isinstance(result_card, Mapping)
-        assert result_card.get("title") == "perception"
+        assert result_card.get("title") == "Perception"
         result_sequence = result_event.sequence
 
         failed_references = [

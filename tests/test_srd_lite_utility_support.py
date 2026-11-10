@@ -265,7 +265,7 @@ def test_animals_combat_paid_pending_cast_speech_action_and_real_rest(tmp_path):
         params = case.parameters | {"target": "hero", "targets": ["hero"], "target_distance": 0, "spell_grant": "bard"}
         slots = dict(case.entities()["hero"]["resources"])
         case.start()
-        case.reject("begin_srd_spell_action", params | {"casting_mode": "ritual", "slot_resource": "ritual"}, match="free exploration")
+        case.reject("begin_srd_spell_action", params | {"casting_mode": "ritual", "slot_resource": "ritual"}, match="Action, Bonus Action or Reaction spell")
         begin, begin_command = case.act("begin_srd_spell_action", **params)
         assert case.entities()["hero"]["resources"] == slots
         assert case.snapshot().state[VARIANT_ID + ".combat"]["action_available"] is False

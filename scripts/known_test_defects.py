@@ -33,38 +33,6 @@ KNOWN_DEFECTS: dict[str, KnownDefect] = {
         'Ordinary panel/action display still reads the complete engine snapshot',
         'Create the synthetic moved campaign, reject full snapshots, then request its ordinary panels and action availability.',
     ),
-    'tests/test_srd_creature_space_detours.py::test_open_destination_beyond_hostile_has_a_legal_affordable_detour': KnownDefect(
-        'The retained movement action does not provide the expected affordable-detour preview/confirmation contract',
-        'Start the admitted Lite movement scene with a hostile body between the actor and destination; request its move-walk preview and continuation.',
-    ),
-    'tests/test_srd_creature_space_detours.py::test_unaffordable_destination_does_not_commit_a_partial_detour': KnownDefect(
-        'The retained movement action does not provide the expected affordable-detour preview/confirmation contract',
-        'Start the admitted Lite movement scene with a hostile body between the actor and destination; request its move-walk preview and continuation.',
-    ),
-    'tests/test_srd_creature_space_route_continuation.py::test_detour_reaction_keeps_final_destination_and_reopens_before_resuming': KnownDefect(
-        'The retained movement action does not provide the expected affordable-detour preview/confirmation contract',
-        'Start the admitted Lite movement scene with a hostile body between the actor and destination; request its move-walk preview and continuation.',
-    ),
-    'tests/test_result_presentation_completion.py::test_stable_recovery_card_keeps_actual_recovery_and_clock[1-Recovery time advanced-0]': KnownDefect(
-        'Selected admitted recovery/escape/factual operations omit the expected committed result card',
-        "Run the committed Lite recovery, Freedom of Movement escape and factual-result scenarios; inspect each committed receipt's result_card.",
-    ),
-    'tests/test_result_presentation_completion.py::test_stable_recovery_card_keeps_actual_recovery_and_clock[2-Regained 1 HP-1]': KnownDefect(
-        'Selected admitted recovery/escape/factual operations omit the expected committed result card',
-        "Run the committed Lite recovery, Freedom of Movement escape and factual-result scenarios; inspect each committed receipt's result_card.",
-    ),
-    'tests/test_result_presentation_completion.py::test_freedom_escape_card_records_actual_removed_condition_and_movement[grappled]': KnownDefect(
-        'Selected admitted recovery/escape/factual operations omit the expected committed result card',
-        "Run the committed Lite recovery, Freedom of Movement escape and factual-result scenarios; inspect each committed receipt's result_card.",
-    ),
-    'tests/test_result_presentation_completion.py::test_freedom_escape_card_records_actual_removed_condition_and_movement[restrained]': KnownDefect(
-        'Selected admitted recovery/escape/factual operations omit the expected committed result card',
-        "Run the committed Lite recovery, Freedom of Movement escape and factual-result scenarios; inspect each committed receipt's result_card.",
-    ),
-    'tests/test_result_presentation_completion.py::test_supported_factual_results_retain_exact_committed_public_values': KnownDefect(
-        'Selected admitted recovery/escape/factual operations omit the expected committed result card',
-        "Run the committed Lite recovery, Freedom of Movement escape and factual-result scenarios; inspect each committed receipt's result_card.",
-    ),
     'tests/test_srd_lite_false_life_diagnosis.py::test_actual_false_life_rejection_diagnostic': KnownDefect(
         'The selected admitted False Life owner rolls dice instead of the authored fixed Lite pool',
         'Cast first-level False Life in the default admitted candidate while guarding against RNG calls; the fixed-pool diagnostic fails.',
@@ -84,14 +52,6 @@ KNOWN_DEFECTS: dict[str, KnownDefect] = {
     'tests/test_srd_lite_multicaster_persistence.py::test_independent_caster_survives_other_source_end_then_expires_and_reopens[true_strike-2]': KnownDefect(
         'The selected admitted True Strike owner lacks the expected independently retained concentration source',
         "Cast True Strike from two admitted casters, end the first source and check the other's retained source, expiry and reopen state.",
-    ),
-    'tests/test_srd_creature_space_review.py::test_public_preview_does_not_disclose_hidden_scene_changes[blocking]': KnownDefect(
-        'Authoritative movement through a hidden blocking body spends the straight-line cost',
-        'Compare plain and hidden-blocker player previews, then commit the authoritative move and inspect its actual movement debit.',
-    ),
-    'tests/test_srd_creature_space_review.py::test_halfling_public_preview_commit_cost_endpoint_and_reopen': KnownDefect(
-        'The admitted Halfling movement owner accepts the occupied endpoint the retained rule rejects',
-        "Start the declared Halfling/guard scene and request the guard's occupied position before testing passage and reopen.",
     ),
     'tests/test_gcs_message_presentation.py::test_composer_sends_one_typed_turn_and_clears_only_accepted_draft[failed_after_accept]': KnownDefect(
         'A provider failure after accepted input leaves the already accepted composer draft',
