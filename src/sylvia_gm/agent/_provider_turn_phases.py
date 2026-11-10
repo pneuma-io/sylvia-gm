@@ -39,6 +39,7 @@ from ._provider_session import (
     _ToolCallAssembly,
     _UNSPECIFIED_PREPARATION_INTENT,
     _action_sequence_narration_facts,
+    _assistant_draft_message,
     _campaign_file_arguments_establish_changes,
     _campaign_file_disposition_message,
     _campaign_file_empty_collection_paths,
@@ -243,6 +244,163 @@ def run_required_actor_decision(
     )
     state.messages.append(self._participant_result_message(public_result))
     state.any_commit_in_exchange = True
+
+
+def record_empty_completion(
+    self: ProviderSessionAdapter, state: ProviderTurnState,
+    provider_input: SessionProviderInput, *, turn_id: str,
+) -> Iterable[ProviderEvent]:
+    state.finish_reason = state.round_finish_reason or "stream_ended_without_finish_reason"
+    next_correction = state.empty_completion_corrections_used + 1
+    yield ProviderEvent.tool_evidence(
+        message_id=f"{state.inference_id}-empty-completion",
+        payload={
+            "kind": "provider_empty_completion",
+            "turn_id": turn_id,
+            "inference_id": state.inference_id,
+            "basis_message_id": state.basis_message_id,
+            "finish_reason": state.finish_reason,
+            "tool_call_required": state.provider_tool_call_required,
+            "correction_attempt": next_correction,
+            "max_corrections": state.max_empty_completion_corrections,
+        },
+    )
+
+
+def record_held_narration(
+    self: ProviderSessionAdapter, state: ProviderTurnState,
+    provider_input: SessionProviderInput, *, turn_id: str,
+) -> Iterable[ProviderEvent]:
+    yield ProviderEvent.tool_evidence(
+        message_id=f"{state.inference_id}-final-response-reference",
+        payload={
+            "kind": "provider_final_response_reference",
+            **state.context_fields,
+            "response_id": state.inference_id,
+            "basis_message_id": state.basis_message_id,
+            "requirement": {
+                "provider_id": provider_input.session.provider_id,
+                "model_id": provider_input.session.model_id,
+                "reasoning_required": bool(state.assistant_reasoning),
+                "chat_completion_required": state.native_chat_metadata is not None,
+            },
+        },
+    )
+    yield ProviderEvent.talk(state.narration)
+
+
+def preserve_boundary_narration(
+    self: ProviderSessionAdapter, state: ProviderTurnState,
+    provider_input: SessionProviderInput, *, turn_id: str,
+) -> Iterable[ProviderEvent]:
+    state.draft_message = _assistant_draft_message(state.narration)
+    state.exchange_messages.append(state.draft_message)
+    yield ProviderEvent.tool_evidence(
+        message_id=f"{state.inference_id}-gm-boundary-draft",
+        payload={
+            "kind": "provider_gm_boundary_draft",
+            **state.context_fields,
+            "turn_id": turn_id,
+            "inference_id": state.inference_id,
+            "basis_message_id": state.basis_message_id,
+            "assistant": cast(SafePayload, _plain_json(state.draft_message)),
+        },
+    )
+    state.current_application_controls.append(
+        {
+            "role": "system",
+            "content": (
+                "SYLVIA_GM_RULESET_DECISION_STILL_ACTIVE "
+                "(application-owned control, not player speech): The preceding "
+                "prose is held and has not been shown. A GM-controlled Ruleset "
+                "decision is still active, so Campaign File disposition is not "
+                "available yet. Continue from the fresh decision request. Call "
+                "one currently exposed Ruleset operation that represents what "
+                "this actor does next; if the actor is finished, call the exposed "
+                "end-turn operation. Do not repeat a removed operation."
+            ),
+        }
+    )
+
+
+def preserve_player_intent_narration(
+    self: ProviderSessionAdapter, state: ProviderTurnState,
+    provider_input: SessionProviderInput, *, turn_id: str,
+) -> Iterable[ProviderEvent]:
+    state.draft_message = _assistant_draft_message(state.narration)
+    state.exchange_messages.append(state.draft_message)
+    yield ProviderEvent.tool_evidence(
+        message_id=f"{state.inference_id}-player-intent-pending-draft",
+        payload={
+            "kind": "provider_player_intent_pending_draft",
+            **state.context_fields,
+            "turn_id": turn_id,
+            "inference_id": state.inference_id,
+            "basis_message_id": state.basis_message_id,
+            "assistant": cast(SafePayload, _plain_json(state.draft_message)),
+        },
+    )
+    state.current_application_controls.append(
+        {
+            "role": "system",
+            "content": (
+                "SYLVIA_GM_PLAYER_INTENT_STILL_PENDING "
+                "(application-owned control, not player speech): The preceding "
+                "prose is held and has not been shown. The Ruleset says the "
+                "player's declared action is still unresolved. Call one exposed "
+                "Ruleset resolver for that exact action. Do not ask the player "
+                "to declare it again, choose a replacement action, end the turn, "
+                "or update the Campaign File first."
+            ),
+        }
+    )
+
+
+def retain_campaign_file_narration(
+    self: ProviderSessionAdapter, state: ProviderTurnState,
+    provider_input: SessionProviderInput, *, turn_id: str,
+) -> Iterable[ProviderEvent]:
+    state.buffered_narration = state.narration
+    state.buffered_response_blocks = None
+    state.buffered_raw_response_blocks = None
+    state.buffered_narration_needs_disposition = True
+    state.campaign_file_disposition_in_exchange = False
+    state.force_campaign_file_update = True
+    state.draft_message = _assistant_draft_message(state.narration)
+    state.exchange_messages.append(state.draft_message)
+    yield ProviderEvent.tool_evidence(
+        message_id=f"{state.inference_id}-held-narration",
+        payload={
+            "kind": "provider_held_narration",
+            **state.context_fields,
+            "turn_id": turn_id,
+            "inference_id": state.inference_id,
+            "basis_message_id": state.basis_message_id,
+            "assistant": cast(SafePayload, _plain_json(state.draft_message)),
+        },
+    )
+
+
+def record_final_narration(
+    self: ProviderSessionAdapter, state: ProviderTurnState,
+    provider_input: SessionProviderInput, *, turn_id: str,
+) -> Iterable[ProviderEvent]:
+    yield ProviderEvent.tool_evidence(
+        message_id=f"{state.inference_id}-final-response-reference",
+        payload={
+            "kind": "provider_final_response_reference",
+            **state.context_fields,
+            "response_id": state.inference_id,
+            "basis_message_id": state.basis_message_id,
+            "requirement": {
+                "provider_id": provider_input.session.provider_id,
+                "model_id": provider_input.session.model_id,
+                "reasoning_required": bool(state.assistant_reasoning),
+                    "chat_completion_required": state.native_chat_metadata is not None,
+            },
+        },
+    )
+    yield ProviderEvent.talk(state.narration)
 
 
 def reject_unavailable_tool(
