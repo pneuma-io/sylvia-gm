@@ -28,6 +28,7 @@ from sylvia_gm.agent._stateless_mcp import action_sequence_model_tools
 from sylvia_gm.agent._native_continuation import attach_chat_metadata
 from sylvia_gm.agent._stateless_mcp import call_action_sequence_tool
 from typing import cast
+import hashlib
 import json
 from sylvia_gm.provider._tool_delta import parse_tool_call_delta
 import uuid
@@ -246,6 +247,36 @@ def run_required_actor_decision(
     state.any_commit_in_exchange = True
 
 
+def retry_empty_completion(
+    self: ProviderSessionAdapter, state: ProviderTurnState,
+    provider_input: SessionProviderInput, *, turn_id: str,
+) -> None:
+    state.empty_completion_corrections_used += 1
+    required_output = (
+        "A required tool call was expected. Return one complete call to an "
+        "exposed tool. Do not return prose without that call."
+        if state.provider_tool_call_required
+        else (
+            "Return one complete in-world response, or call an exposed tool "
+            "if the unresolved current action genuinely needs it."
+        )
+    )
+    empty_completion_correction: dict[str, object] = {
+        "role": "system",
+        "content": (
+            "SYLVIA_GM_EMPTY_COMPLETION_CORRECTION: Your preceding "
+            f"response completed with finish_reason='{state.finish_reason}' but "
+            "contained no text, private reasoning, or complete tool call. "
+            "Continue the same turn from the supplied context; do not "
+            "restart the scene or repeat an already accepted operation. "
+            f"{required_output} This is empty-completion correction "
+            f"{state.empty_completion_corrections_used} of "
+            f"{state.max_empty_completion_corrections}."
+        ),
+    }
+    state.current_application_controls.append(empty_completion_correction)
+
+
 def record_empty_completion(
     self: ProviderSessionAdapter, state: ProviderTurnState,
     provider_input: SessionProviderInput, *, turn_id: str,
@@ -265,6 +296,112 @@ def record_empty_completion(
             "max_corrections": state.max_empty_completion_corrections,
         },
     )
+
+
+def retry_repeated_response(
+    self: ProviderSessionAdapter, state: ProviderTurnState,
+    provider_input: SessionProviderInput, *, turn_id: str,
+) -> Iterable[ProviderEvent]:
+    state.repeated_response_corrections_used += 1
+    yield ProviderEvent.tool_evidence(
+        message_id=(
+            f"{state.inference_id}-repeated-response-"
+            f"{state.repeated_response_corrections_used}"
+        ),
+        payload={
+            "kind": "provider_repeated_player_facing_response",
+            "turn_id": turn_id,
+            "inference_id": state.inference_id,
+            "basis_message_id": state.basis_message_id,
+            "response_sha256": hashlib.sha256(
+                state.narration.encode("utf-8")
+            ).hexdigest(),
+            "response_characters": len(state.narration),
+            "correction_attempt": state.repeated_response_corrections_used,
+            "max_corrections": state.max_repeated_response_corrections,
+        },
+    )
+    state.exchange_messages.append({"role": "assistant", "content": state.narration})
+    state.current_application_controls.append(
+        {
+            "role": "system",
+            "content": (
+                "SYLVIA_GM_CURRENT_ACTION_RESPONSE_CORRECTION "
+                "(application-owned control, not player speech): The preceding "
+                "completion exactly repeated the immediately prior "
+                "player-facing response even though the player's current "
+                "action is different. It has been discarded and will never be "
+                "shown to the player. Resolve the current action from the "
+                "authoritative context already supplied. Call an exposed "
+                "operation if resolution genuinely requires one; otherwise "
+                "return one complete in-world response. Do not repeat or "
+                "continue the prior answer. This is correction "
+                f"{state.repeated_response_corrections_used} of "
+                f"{state.max_repeated_response_corrections}."
+            ),
+        }
+    )
+
+
+def retry_missing_tool_call(
+    self: ProviderSessionAdapter, state: ProviderTurnState,
+    provider_input: SessionProviderInput, *, turn_id: str,
+) -> Iterable[ProviderEvent]:
+    state.missing_required_tool_corrections_used += 1
+    yield ProviderEvent.tool_evidence(
+        message_id=f"{state.inference_id}-forced-tool-call-missing",
+        payload={
+            "kind": "provider_forced_tool_call_missing",
+            "turn_id": turn_id,
+            "inference_id": state.inference_id,
+            "basis_message_id": state.basis_message_id,
+            "correction_attempt": state.missing_required_tool_corrections_used,
+            "max_corrections": state.max_missing_required_tool_corrections,
+        },
+    )
+    state.required_tool_call_correction_message = {
+        "role": "system",
+        "content": (
+            "SYLVIA_GM_REQUIRED_TOOL_CALL_CORRECTION "
+            "(application-owned control, not player speech): The provider "
+            "returned prose where this round required a tool call. That prose "
+            "has been discarded, is not current fiction, and will never be "
+            "shown or persisted. The exact unresolved player action remains "
+            "the latest User message. Choose one operation from the complete "
+            "tool surface still exposed. You may read a source, use a Ruleset "
+            "operation, or call the Campaign File disposition directly when "
+            "no mechanic is needed. Do not repeat or continue the discarded "
+            "prose. This is correction "
+            f"{state.missing_required_tool_corrections_used} of "
+            f"{state.max_missing_required_tool_corrections}."
+        ),
+    }
+
+
+def retry_private_deliberation(
+    self: ProviderSessionAdapter, state: ProviderTurnState,
+    provider_input: SessionProviderInput, *, turn_id: str,
+) -> None:
+    state.private_deliberation_corrections_used += 1
+    state.exchange_messages.append({"role": "assistant", "content": state.narration})
+    state.private_deliberation_correction_message = {
+        "role": "system",
+        "content": (
+            "SYLVIA_GM_PRIVATE_DELIBERATION_CORRECTION "
+            "(application-owned control, not player speech): The preceding "
+            "assistant content is private GM planning, not player-facing "
+            "narration. It has been discarded and will never be shown to the "
+            "player or persisted as dialogue. Continue as the same GM from "
+            "the current action and all authoritative results already above. "
+            "If another exposed operation is genuinely required, call it "
+            "without prose. Otherwise return only the complete in-world "
+            "response, beginning with what the player experiences and "
+            "containing no analysis, alternatives, check summary, statement "
+            "of intent, or workflow note. This is correction "
+            f"{state.private_deliberation_corrections_used} of "
+            f"{state.max_private_deliberation_corrections}."
+        ),
+    }
 
 
 def record_held_narration(
@@ -287,6 +424,59 @@ def record_held_narration(
         },
     )
     yield ProviderEvent.talk(state.narration)
+
+
+def retry_missing_campaign_file_update(
+    self: ProviderSessionAdapter, state: ProviderTurnState,
+    provider_input: SessionProviderInput, *, turn_id: str,
+) -> Iterable[ProviderEvent]:
+    state.missing_required_tool_corrections_used += 1
+    yield ProviderEvent.tool_evidence(
+        message_id=f"{state.inference_id}-forced-tool-call-missing",
+        payload={
+            "kind": "provider_forced_tool_call_missing",
+            "turn_id": turn_id,
+            "inference_id": state.inference_id,
+            "basis_message_id": state.basis_message_id,
+            "correction_attempt": state.missing_required_tool_corrections_used,
+            "max_corrections": state.max_missing_required_tool_corrections,
+        },
+    )
+    state.current_application_controls.append(
+        {
+            "role": "system",
+            "content": (
+                (
+                    "SYLVIA_GM_CAMPAIGN_FILE_DISPOSITION_CORRECTION "
+                    "(application-owned control, not player speech): Your "
+                    "preceding completion did not call the required Campaign "
+                    "File tool. That completion is discarded and will never be "
+                    "shown to the player. Do not rewrite or continue the held "
+                    "player-facing response. Return only one call to the "
+                    "exposed Campaign File tool. Declare state_change as "
+                    "'changed' and supply every lasting change, or declare it "
+                    "'unchanged' and omit state collections only when the held "
+                    "response changes no durable truth. The held response is "
+                    "already selected. Do not repeat it in "
+                    "the tool arguments. "
+                    if (
+                        state.buffered_narration is not None
+                        or state.buffered_raw_response_blocks is not None
+                    )
+                    else "SYLVIA_GM_CAMPAIGN_FILE_UPDATE_CORRECTION "
+                    "(application-owned control, not player speech): The prior "
+                    "Campaign File call was rejected, and your preceding prose "
+                    "completion is discarded and will never be shown to the "
+                    "player. Return only one corrected call to the exposed "
+                    "Campaign File update tool. Do not narrate until that call "
+                    "succeeds. "
+                )
+                + "This is correction "
+                f"{state.missing_required_tool_corrections_used} of "
+                f"{state.max_missing_required_tool_corrections}."
+            ),
+        }
+    )
 
 
 def preserve_boundary_narration(
@@ -856,6 +1046,41 @@ def submit_mechanics_call(
     if state.feedback.rejection is not None:
         state.local_tool_results[state.assembly.call_id] = dict(state.feedback.rejection)
         state.local_tool_failures.add(state.assembly.call_id)
+
+
+def retry_rejected_tool_call(
+    self: ProviderSessionAdapter, state: ProviderTurnState,
+    provider_input: SessionProviderInput, *, turn_id: str,
+) -> None:
+    state.rejected_tool_corrections_used += 1
+    state.current_application_controls.append(
+        {
+            "role": "system",
+            "content": (
+                "SYLVIA_GM_TOOL_CORRECTION: One or more preceding calls were "
+                "rejected. Read each structured tool result, preserve every "
+                "successful result, and address only the rejected operation. That "
+                "may require corrected arguments or a different currently exposed "
+                "operation when the result says the original is unavailable or "
+                "unsuitable. Do not "
+                "narrate an uncommitted outcome. Correct every reported issue "
+                "against the currently exposed schema instead of patching only "
+                "one symptom. "
+                + (
+                    "Sylvia already holds the exact player-facing response. Do not "
+                    "repeat it in the corrected tool arguments. "
+                    if (
+                        state.buffered_narration is not None
+                        or state.buffered_raw_response_blocks is not None
+                    )
+                    else ""
+                )
+                + "This is correction "
+                f"{state.rejected_tool_corrections_used} of "
+                f"{state.max_rejected_tool_corrections}."
+            ),
+        }
+    )
 
 
 def prepare_round_catalog(
