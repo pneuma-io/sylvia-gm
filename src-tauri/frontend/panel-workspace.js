@@ -99,21 +99,27 @@
     const party = ordered.find(item => item.renderer === 'party');
     const character = ordered.find(item => item.renderer === 'unit_list');
     if (map && party && character && [map, party, character].every(item => item.default_placement !== 'window')) {
+      // Accepted panel suite: the map leads with the character's column beside it and the queue as a tab there.
+      // A turn-order (encounter) surface takes a left column with the party; otherwise the roster runs as a
+      // short strip above. Key-value status starts hidden because the map bar shows it; it stays restorable.
       const queue = ordered.find(item => item.renderer === 'action_queue');
-      const utility = ordered.filter(item => ![map.id, party.id, character.id, queue?.id].includes(item.id));
+      const encounter = ordered.find(item => item.renderer === 'encounter' && item.default_placement !== 'window');
+      const utility = ordered.filter(item => ![map.id, party.id, character.id, queue?.id, encounter?.id].includes(item.id));
       const loadout = utility.filter(item => item.renderer === 'inventory').map(item => item.id);
-      const status = utility.filter(item => !loadout.includes(item.id) && item.default_placement !== 'window').map(item => item.id);
+      const docked = utility.filter(item => !loadout.includes(item.id) && item.default_placement !== 'window');
+      const status = docked.filter(item => item.renderer === 'key_value').map(item => item.id);
+      const roster = docked.filter(item => !status.includes(item.id)).map(item => item.id);
+      const side = tabs('game-character', [character.id, ...loadout, ...(queue ? [queue.id] : [])]);
+      const field = { kind: 'split', id: 'game-field', axis: 'row', ratio: encounter ? 0.64 : 0.62, first: tabs('game-map', [map.id]), second: side };
       return { version: VERSION,
-        sidebar: { kind: 'split', id: 'game-columns', axis: 'row', ratio: 0.34,
-          first: { kind: 'split', id: 'game-roster-character', axis: 'column', ratio: 0.4,
-            first: tabs('game-party', [party.id, ...status]), second: queue
-              ? {kind:'split',id:'game-character-queue',axis:'column',ratio:0.65,
-                first:tabs('game-character',[character.id,...loadout]),second:tabs('game-action-queue',[queue.id])}
-              : tabs('game-character', [character.id, ...loadout]) },
-          second: tabs('game-map', [map.id]) },
+        sidebar: encounter
+          ? { kind: 'split', id: 'game-columns', axis: 'row', ratio: 0.2,
+            first: tabs('game-turn-order', [encounter.id, party.id, ...roster]), second: field }
+          : { kind: 'split', id: 'game-rows', axis: 'column', ratio: 0.2,
+            first: tabs('game-party', [party.id, ...roster]), second: field },
         windows: utility.filter(item => item.default_placement === 'window').map(item =>
           ({ id: identifier('window', item.id), title: item.title || item.id, tree: tabs(identifier('tabs',item.id),[item.id]) })),
-        hidden: [], known: ordered.map(item => item.id), panel_sizes: {}, sidebar_width: null, views: {} };
+        hidden: status, known: ordered.map(item => item.id), panel_sizes: {}, sidebar_width: null, views: {} };
     }
     const groups = [];
     const byGroup = new Map();

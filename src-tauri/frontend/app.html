@@ -116,20 +116,24 @@
   <!-- Home command centre - campaign orientation without the play sidebar. -->
   <main class="home-view" id="home-view" hidden>
     <header class="home-header">
-      <h1 class="home-kicker">Home</h1>
+      <h1 class="home-heading">Home</h1>
       <div class="home-command-area">
         <div class="home-actions">
           <button class="btn btn-primary" id="home-new-campaign-btn" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
             New Campaign
           </button>
           <button class="btn btn-secondary" id="home-ready-campaign-btn" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg>
             Ready campaigns
           </button>
           <button class="btn btn-secondary" id="home-build-btn" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4"/></svg>
             Build Something
           </button>
           <button class="btn btn-secondary" id="home-settings-btn" type="button"
                   aria-haspopup="dialog" aria-controls="settings-overlay">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>
             Settings
           </button>
           <button class="btn btn-secondary" id="home-tutorials-btn" type="button">Tutorials</button>
@@ -152,7 +156,7 @@
 
     <section class="home-collections" aria-labelledby="home-collections-title">
       <div class="home-section-heading">
-        <h2 id="home-collections-title">Collections</h2>
+        <h2 id="home-collections-title">Your campaigns</h2>
         <span id="home-campaign-count">0 ongoing campaigns</span>
       </div>
       <div class="campaign-shelves" id="campaign-shelves" aria-live="polite">

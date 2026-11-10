@@ -312,6 +312,12 @@
     }
 
     function number(value) { return Number(value.toFixed(3)); }
+    // Deterministic per-cue variation (spark angles) so a redrawn frame keeps the same pixels.
+    function seeded(text) {
+      let state = 0;
+      for (const character of String(text)) state = (state * 31 + character.charCodeAt(0)) >>> 0;
+      return () => ((state = (state * 1664525 + 1013904223) >>> 0) / 4294967296);
+    }
     function circle(location, radius, stroke, width, opacity, extra = '') {
       return `<circle cx="${number(location[0])}" cy="${number(location[1])}" r="${number(radius)}" fill="none" stroke="${stroke}" stroke-width="${number(width)}" opacity="${number(opacity)}"${extra}/>`;
     }
@@ -348,28 +354,61 @@
           if (!value.miss) value.contacts.forEach((contact, index) => markup.push(marker(contact.cue, screen[index + 1], value.style.cues[contact.cue], value.style.width, opacity)));
           return;
         }
+        // Motion: a short tapered muzzle flash and gas puff at the origin, a thin tracer streak that fades
+        // toward its tail, and compact impacts (ricochet sparks and dust, exit spall, hit ticks) beside the
+        // contact markers. Sizes are screen pixels scaled from the cue's own width.
+        const width = value.style.width;
+        const screenLengths = screen.slice(1).map((location, index) => Math.hypot(location[0] - screen[index][0], location[1] - screen[index][1]));
+        const screenTotal = screenLengths.reduce((sum, length) => sum + length, 0) || 1;
+        const pointAt = (distance) => {
+          let left = Math.max(0, Math.min(total, distance));
+          for (let index = 0; index < lengths.length; index += 1) {
+            if (left <= lengths[index] || index === lengths.length - 1) {
+              const k = lengths[index] > 0 ? Math.min(1, left / lengths[index]) : 0;
+              return [screen[index][0] + (screen[index + 1][0] - screen[index][0]) * k, screen[index][1] + (screen[index + 1][1] - screen[index][1]) * k];
+            }
+            left -= lengths[index];
+          }
+          return screen[screen.length - 1];
+        };
+        const firstLength = screenLengths[0] || 1;
+        const direction = [(screen[1][0] - screen[0][0]) / firstLength, (screen[1][1] - screen[0][1]) / firstLength];
+        const seed = seeded(item.id);
+        const flashMs = Math.min(70, value.style.travel_ms * 0.5);
+        if (elapsed < flashMs) {
+          const fade = 1 - elapsed / flashMs;
+          const reach = (3 * width + 5) * (0.6 + 0.4 * fade);
+          const half = (0.9 * width + 0.6) * fade;
+          const origin = screen[0];
+          const tip = [origin[0] + direction[0] * reach, origin[1] + direction[1] * reach];
+          markup.push(`<path d="M ${number(origin[0] - direction[1] * half)} ${number(origin[1] + direction[0] * half)} L ${number(tip[0])} ${number(tip[1])} L ${number(origin[0] + direction[1] * half)} ${number(origin[1] - direction[0] * half)} Z" fill="#fff1cf" opacity="${number(fade)}"/>`);
+          markup.push(`<circle cx="${number(origin[0])}" cy="${number(origin[1])}" r="${number(0.6 * width + 0.6)}" fill="#fffaf0" opacity="${number(fade)}"/>`);
+        }
+        const puffMs = value.style.travel_ms + value.style.impact_ms;
+        if (elapsed < puffMs) {
+          const k = elapsed / puffMs;
+          const size = Math.max(1, width * 0.6);
+          markup.push(`<circle cx="${number(screen[0][0] + direction[0] * (2 + 7 * k) * size)}" cy="${number(screen[0][1] + direction[1] * (2 + 7 * k) * size - 2 * k)}" r="${number((1.2 + 4 * k) * size)}" fill="#b9c1ca" opacity="${number(0.12 * (1 - k))}"/>`);
+        }
         const progress = Math.min(1, elapsed / value.style.travel_ms);
         const head = progress * total;
-        const tail = Math.max(0, head - total * 0.18);
-        let travelled = 0;
-        lengths.forEach((length, index) => {
-          const segmentStart = travelled;
-          const segmentEnd = travelled + length;
-          const from = Math.max(tail, segmentStart);
-          const to = Math.min(head, segmentEnd);
-          if (to > from && length > 0) {
-            const a = (from - segmentStart) / length;
-            const b = (to - segmentStart) / length;
-            const start = [screen[index][0] + (screen[index + 1][0] - screen[index][0]) * a, screen[index][1] + (screen[index + 1][1] - screen[index][1]) * a];
-            const end = [screen[index][0] + (screen[index + 1][0] - screen[index][0]) * b, screen[index][1] + (screen[index + 1][1] - screen[index][1]) * b];
-            const opacity = value.miss || value.contacts.length === 0 ? Math.max(0, 1 - progress)
-              : Math.max(0, 1 - Math.max(0, elapsed - value.style.travel_ms) / value.style.impact_ms);
-            markup.push(`<line x1="${number(start[0])}" y1="${number(start[1])}" x2="${number(end[0])}" y2="${number(end[1])}" stroke="${value.style.color}" stroke-width="${number(value.style.width)}" stroke-linecap="round" opacity="${number(opacity)}"/>`);
+        // The streak stays about 60 screen pixels long however far the round travels.
+        const streak = total * Math.max(0.06, Math.min(0.3, 60 / screenTotal));
+        const tail = Math.max(0, head - streak);
+        const tracerOpacity = Math.max(0, 1 - Math.max(0, elapsed - value.style.travel_ms) / 90);
+        if (head - tail > 0 && tracerOpacity > 0) {
+          // Butt-capped pieces with rising opacity read as one streak fading toward its tail (no overlapping caps).
+          const pieces = 6;
+          for (let piece = 0; piece < pieces; piece += 1) {
+            const a = pointAt(tail + (head - tail) * piece / pieces);
+            const b = pointAt(tail + (head - tail) * (piece + 1) / pieces);
+            const ramp = Math.pow((piece + 1) / pieces, 1.6);
+            markup.push(`<line x1="${number(a[0])}" y1="${number(a[1])}" x2="${number(b[0])}" y2="${number(b[1])}" stroke="${value.style.color}" stroke-width="${number(width * 2.4)}" stroke-linecap="butt" opacity="${number(0.14 * ramp * tracerOpacity)}"/>`);
+            markup.push(`<line x1="${number(a[0])}" y1="${number(a[1])}" x2="${number(b[0])}" y2="${number(b[1])}" stroke="#fff4dc" stroke-width="${number(Math.max(1, width * 0.65))}" stroke-linecap="butt" opacity="${number(ramp * tracerOpacity)}"/>`);
           }
-          travelled = segmentEnd;
-        });
+        }
         if (value.miss) return;
-        travelled = 0;
+        let travelled = 0;
         value.contacts.forEach((contact, index) => {
           travelled += lengths[index];
           const arrival = value.style.travel_ms * travelled / total;
@@ -377,8 +416,36 @@
           if (age < 0 || age > value.style.impact_ms) return;
           const opacity = 1 - age / value.style.impact_ms;
           const style = value.style.cues[contact.cue];
-          markup.push(marker(contact.cue, screen[index + 1], style,
-            value.style.width * (1 + age / value.style.impact_ms * 0.5), opacity));
+          const at = screen[index + 1];
+          const quick = Math.min(1, age / 170);
+          const scale = Math.max(1, width);
+          if (contact.cue === 'cover' || contact.cue === 'stop') {
+            if (quick < 1) {
+              const back = Math.atan2(-direction[1], -direction[0]);
+              for (let spark = 0; spark < 5; spark += 1) {
+                const angle = back + (seed() - 0.5) * 2.4;
+                const reach = (3 + seed() * 5) * scale;
+                const near = reach * quick * 0.35, far = reach * (0.3 + quick);
+                markup.push(`<line x1="${number(at[0] + Math.cos(angle) * near)}" y1="${number(at[1] + Math.sin(angle) * near)}" x2="${number(at[0] + Math.cos(angle) * far)}" y2="${number(at[1] + Math.sin(angle) * far)}" stroke="#ffe3b8" stroke-width="1" stroke-linecap="round" opacity="${number(1 - quick)}"/>`);
+              }
+            }
+            markup.push(`<circle cx="${number(at[0] - direction[0] * 3 * (1 - opacity))}" cy="${number(at[1] - direction[1] * 3 * (1 - opacity) - 2 * (1 - opacity))}" r="${number((1.5 + 6 * (1 - opacity)) * scale * 0.6)}" fill="#9ea8b3" opacity="${number(0.3 * opacity)}"/>`);
+          } else if (contact.cue === 'penetration' && quick < 1) {
+            for (let chip = 0; chip < 4; chip += 1) {
+              const angle = Math.atan2(direction[1], direction[0]) + (seed() - 0.5) * 1.1;
+              const reach = (3 + seed() * 6) * scale * (0.2 + quick);
+              markup.push(`<circle cx="${number(at[0] + Math.cos(angle) * reach)}" cy="${number(at[1] + Math.sin(angle) * reach)}" r="0.8" fill="#d8cbb0" opacity="${number(1 - quick)}"/>`);
+            }
+          } else if (contact.cue === 'character' && age < 340) {
+            const reach = (5 + 2.5 * quick) * scale * 0.7;
+            const tick = 3 * scale * 0.7;
+            const fade = Math.max(0, 1 - Math.max(0, age - 120) / 220);
+            [[1, 1], [-1, 1], [1, -1], [-1, -1]].forEach(([sx, sy]) => {
+              const ux = sx * 0.707, uy = sy * 0.707;
+              markup.push(`<line x1="${number(at[0] + ux * reach)}" y1="${number(at[1] + uy * reach)}" x2="${number(at[0] + ux * (reach + tick))}" y2="${number(at[1] + uy * (reach + tick))}" stroke="#fff4ef" stroke-width="1.5" stroke-linecap="round" opacity="${number(fade)}"/>`);
+            });
+          }
+          markup.push(marker(contact.cue, at, style, Math.max(1, width * 0.7) * (1 + age / value.style.impact_ms * 0.4), opacity));
         });
       });
       return markup.length ? `<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" style="pointer-events:none;overflow:visible">${markup.join('')}</svg>` : '';

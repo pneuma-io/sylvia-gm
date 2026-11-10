@@ -498,12 +498,18 @@ const SylviaGMFrontend = (() => {
       });
       return queueView(result);
     }
-    if (!['player_action_availability', 'preview_panel_action', 'queue_panel_action', 'panel_action_receipt'].includes(method)) {
+    if (!['player_action_availability', 'preview_panel_action', 'queue_panel_action', 'queue_weapon_reload',
+      'panel_action_receipt'].includes(method)) {
       throw new Error('This operation is unavailable in a panel window.');
     }
     if (args.campaign_id !== scope.campaign_id ||
         (args.session_id && args.session_id !== scope.session_id)) {
       throw new Error('The action belongs to another session.');
+    }
+    if (method === 'queue_weapon_reload') {
+      if (args.campaign_id !== scope.campaign_id || args.session_id !== scope.session_id || !scope.owns(args.surface_id))
+        throw new Error('The action panel has moved or is unavailable.');
+      return queueWeaponReloadSteps(args.surface_id, args.actor, { current: () => current() && scope.owns(args.surface_id) });
     }
     const sources = method === 'player_action_availability'
       ? args.requests?.map((request) => request.source) : [{ kind: 'panel', surface_id: args.surface_id }];
@@ -535,6 +541,7 @@ const SylviaGMFrontend = (() => {
       player_action_availability: (command) => request('player_action_availability', command),
       preview_panel_action: (command) => request('preview_panel_action', command),
       queue_panel_action: (command) => request('queue_panel_action', command),
+      queue_weapon_reload: (command) => request('queue_weapon_reload', command),
       queue_sequence_operation: (command) => request('queue_sequence_operation', command),
       panel_action_receipt: (command) => request('panel_action_receipt', command),
     };
@@ -3477,11 +3484,12 @@ const SylviaGMFrontend = (() => {
     const chatSelection = state.sessionReasoning?.modelState?.current ||
       (chatSelect.value === '' ? null : state.modelChoices[Number(chatSelect.value)]);
     const status = $('model-status');
+    // New Campaign needs no model; Home's Build Something opens provider-setup guidance when none is configured.
     const deterministicCampaignButtons = [
-      $('home-new-campaign-btn')
+      $('home-new-campaign-btn'), $('home-build-btn')
     ];
     const modelRequiredCreationButtons = [
-      $('new-builder-chat-btn'), $('home-build-btn')
+      $('new-builder-chat-btn')
     ];
     select.disabled = true;
     chatSelect.disabled = true;
@@ -3945,12 +3953,20 @@ const SylviaGMFrontend = (() => {
       sessions.find((session) => session.role === 'dm') || sessions[0] || null;
   }
 
+  // Plain session wording for Home; a non-active status stays visible.
   function sessionSummary(session) {
-    if (!session) return 'No session';
-    return `${session.role === 'builder' ? 'Builder' : 'DM'} session · ${session.status}`;
+    if (!session) return 'No saved session';
+    const label = `${session.role === 'builder' ? 'Builder' : 'Game Master'} session`;
+    return session.status === 'active' ? label : `${label} · ${session.status}`;
   }
 
+  const HOME_WORKING_MARKUP = '<span class="home-working"><span class="builder-stream-spinner" ' +
+    'aria-hidden="true"></span>Working…</span>';
+
   function wireHomeCampaignLinks() {
+    if (state.campaignIndexStatus === 'error') {
+      $('campaign-index-retry-btn')?.addEventListener('click', () => { void refreshCampaignIndex(); }, { once: true });
+    }
     document.querySelectorAll('[data-home-campaign-id]').forEach((button) => {
       button.addEventListener('click', () => {
         void openCampaign(button.dataset.homeCampaignId, button.dataset.homeSessionId || null);
@@ -3961,31 +3977,43 @@ const SylviaGMFrontend = (() => {
     });
   }
 
+  // Keep keyboard navigation on the same Home control when the live index replaces its markup.
   function renderHome() {
+    const focused = document.activeElement;
+    const controlClass = ['home-continue', 'campaign-shelf-item', 'campaign-archive-link']
+      .find((name) => focused?.classList?.contains(name));
+    const campaignId = focused?.dataset?.homeCampaignId || focused?.dataset?.archiveCampaign;
+    const sessionId = focused?.dataset?.homeSessionId;
+    renderHomeContents();
+    if (!controlClass || !campaignId || focused.isConnected ||
+        document.activeElement !== document.body || state.view !== 'home') return;
+    [...$('home-view').querySelectorAll(`.${controlClass}`)].find((button) =>
+      (button.dataset.homeCampaignId || button.dataset.archiveCampaign) === campaignId &&
+      button.dataset.homeSessionId === sessionId)?.focus({ preventScroll: true });
+  }
+
+  function renderHomeContents() {
     renderArchivedItems();
-    if (state.campaignIndexStatus !== 'ready') {
-      const failed = state.campaignIndexStatus === 'error';
-      const message = failed ? 'Campaign list could not be loaded' : 'Loading campaigns…';
-      $('home-campaign-count').textContent = message;
-      $('home-recent').innerHTML = '<div class="home-empty-copy">' + message + '</div>';
-      $('campaign-shelves').innerHTML = '<div class="home-empty-copy" role="status">' +
-        message + (failed ? ' <button class="btn btn-secondary" type="button" ' +
-          'id="campaign-index-retry-btn">Retry</button>' : '') + '</div>';
-      if (failed) $('campaign-index-retry-btn').addEventListener('click', () => {
-        void refreshCampaignIndex();
-      });
-      return;
-    }
     const campaigns = state.campaigns.filter((campaign) => campaign.lifecycle === 'active');
     const count = campaigns.length;
     $('home-campaign-count').textContent =
       `${count} ongoing campaign${count === 1 ? '' : 's'}`;
 
+    // The index can still be loading or have failed; campaigns already shown stay listed, and an empty
+    // list then does not mean no campaigns.
+    const indexNote = state.campaignIndexStatus === 'error'
+      ? '<p class="settings-note settings-note-warn" role="status"><strong>Campaign list could not be loaded.</strong> ' +
+        'Sylvia couldn’t load your campaign list just now and will try again shortly. ' +
+        '<button class="btn btn-secondary btn-sm" type="button" id="campaign-index-retry-btn">Retry</button></p>'
+      : state.campaignIndexStatus === 'loading'
+        ? '<p class="settings-note" role="status">Loading campaigns…</p>' : '';
+
     const recent = recentCampaign(campaigns);
+    // With nothing to continue, the campaign list below explains the empty or loading state.
+    $('home-recent').hidden = !recent;
     if (!recent) {
       $('home-recent').innerHTML =
-        '<h2 class="visually-hidden" id="home-recent-title">Most recently updated campaign</h2>' +
-        '<div class="home-empty-copy">Your most recently updated campaign will appear here.</div>';
+        '<h2 class="visually-hidden" id="home-recent-title">Most recently updated campaign</h2>';
     } else {
       const session = preferredCampaignSession(recent);
       const isDraft = recent.availability === 'draft';
@@ -3997,24 +4025,28 @@ const SylviaGMFrontend = (() => {
         : concisePackageLabel(recent.campaign_setting_label, 'setting');
       const streaming = Boolean(session && activityIsWorking(activityForSession(session.session_id)));
       $('home-recent').innerHTML =
-        '<div class="home-recent-copy"><div class="home-recent-kicker">Most recently updated</div>' +
+        '<div class="home-recent-copy"><div class="home-recent-kicker">Continue where you left off</div>' +
         `<h2 id="home-recent-title">${escapeHtml(recent.display_name)}</h2>` +
         `<div class="home-recent-path">${escapeHtml(ruleset)}` +
-        '<span aria-hidden="true">→</span>' + `${escapeHtml(setting)}</div>` +
+        '<span aria-hidden="true">·</span>' + `${escapeHtml(setting)}</div>` +
         '<div class="home-recent-meta">' +
-        `<span>${escapeHtml(sessionSummary(session))}</span>` +
+        `<span${session ? '' : ' class="home-missing-session"'}>${escapeHtml(sessionSummary(session))}</span>` +
         `<span>Revision ${escapeHtml(recent.revision)}</span>` +
-        `${streaming ? '<span class="home-working"><span class="builder-stream-spinner" aria-hidden="true"></span>Working…</span>' : ''}` +
-        '</div></div>' +
-        `<button class="btn btn-secondary home-continue" type="button" ` +
+        `${streaming ? HOME_WORKING_MARKUP : ''}` +
+        '</div>' +
+        `${session ? '' : '<p class="settings-note settings-note-warn">This campaign has no saved session to continue.</p>'}` +
+        '</div>' +
+        `<button class="btn btn-primary home-continue" type="button" ` +
         `data-home-campaign-id="${escapeHtml(recent.campaign_id)}" ` +
         `data-home-session-id="${escapeHtml(session && session.session_id)}" ` +
-        `${session ? '' : 'disabled'}>Continue</button>`;
+        `${session ? '' : 'disabled'}><svg viewBox="0 0 24 24" aria-hidden="true">` +
+        '<path d="M7 4.5v15l12-7.5z"/></svg>Continue</button>';
     }
 
     if (!campaigns.length) {
-      $('campaign-shelves').innerHTML =
-        '<div class="home-empty-copy">No ongoing campaigns yet.</div>';
+      $('campaign-shelves').innerHTML = indexNote + (!indexNote
+        ? '<div class="home-empty-copy home-empty-card">No ongoing campaigns yet. ' +
+          'Start a New Campaign, or choose a Ready campaign to play with a premade party.</div>' : '');
       wireHomeCampaignLinks();
       return;
     }
@@ -4040,7 +4072,7 @@ const SylviaGMFrontend = (() => {
       ruleset.settings.get(settingKey).campaigns.push(campaign);
     });
 
-    $('campaign-shelves').innerHTML = [...rulesets.values()].map((ruleset) => {
+    $('campaign-shelves').innerHTML = indexNote + [...rulesets.values()].map((ruleset) => {
       const rulesetCount = [...ruleset.settings.values()].reduce(
         (total, setting) => total + setting.campaigns.length, 0
       );
@@ -4054,21 +4086,22 @@ const SylviaGMFrontend = (() => {
             );
             return `<div class="campaign-shelf-entry"><button class="campaign-shelf-item" type="button" ` +
               `data-home-campaign-id="${escapeHtml(campaign.campaign_id)}" ` +
-              `data-home-session-id="${escapeHtml(session && session.session_id)}">` +
+              `data-home-session-id="${escapeHtml(session && session.session_id)}" ` +
+              `title="${escapeHtml(campaign.display_name)}">` +
               `<span class="campaign-shelf-name">${escapeHtml(campaign.display_name)}</span>` +
-              `<span class="campaign-shelf-meta">${escapeHtml(sessionSummary(session))} · ` +
-              `Revision ${escapeHtml(campaign.revision)}</span>` +
-              `${streaming ? '<span class="campaign-shelf-working"><span class="builder-stream-spinner" aria-hidden="true"></span>Working…</span>' : ''}` +
+              `<span class="campaign-shelf-meta${session ? '' : ' home-missing-session'}">` +
+              `${escapeHtml(sessionSummary(session))}</span>` +
+              `${streaming ? HOME_WORKING_MARKUP : ''}` +
               '</button>' + `<button class="archive-link campaign-archive-link" type="button" ` +
               `data-archive-campaign="${escapeHtml(campaign.campaign_id)}" ` +
               `aria-label="Archive campaign ${escapeHtml(campaign.display_name)}" ` +
               `${state.archivingItems.has(campaign.campaign_id) ? 'disabled' : ''}>Archive</button></div>`;
           }).join('');
-        return `<section class="setting-shelf"><h3>${escapeHtml(setting.label)}</h3>` +
+        return `<section class="setting-shelf"><h4>${escapeHtml(setting.label)}</h4>` +
           `<div class="campaign-shelf-items">${tiles}</div></section>`;
       }).join('');
       return '<section class="ruleset-shelf">' +
-        `<div class="ruleset-shelf-heading"><h2>${escapeHtml(ruleset.label)}</h2>` +
+        `<div class="ruleset-shelf-heading"><h3>${escapeHtml(ruleset.label)}</h3>` +
         `<span>${rulesetCount} campaign${rulesetCount === 1 ? '' : 's'}</span></div>` +
         settings + '</section>';
     }).join('');
@@ -4206,7 +4239,8 @@ const SylviaGMFrontend = (() => {
       ...campaigns.map((campaign) => ({ id: campaign.campaign_id, name: campaign.display_name,
         type: campaign.availability === 'draft' ? 'Campaign draft · includes Interview' : 'Campaign · includes saved sessions', action: 'campaign' })),
     ].map((item) => `<div class="archived-item"><div><strong>${escapeHtml(item.name)}</strong>` +
-      `<small>${escapeHtml(item.type)}</small></div><button class="btn btn-secondary btn-sm" ` +
+      `<small>${escapeHtml(item.type)}</small></div><button class="btn btn-secondary btn-sm" type="button" ` +
+      `aria-label="Restore ${escapeHtml(item.name)}" ` +
       `data-restore-${item.action}="${escapeHtml(item.id)}" ` +
       `${state.archivingItems.has(item.id) ? 'disabled' : ''}>Restore</button></div>`).join('') ||
       '<p class="home-empty-copy">No archived items.</p>';
@@ -4762,14 +4796,14 @@ const SylviaGMFrontend = (() => {
   function selectedMapActorMarkup(surface, selection) {
     const actorId = tacticalActorId(surface, selection.actor);
     const body = surface.data.entities.find((item) => item.id === selection.actor);
-    if (!body) return '<div class="map-turn-strip panel-empty">Choose an acting character on the map. Inspect characters in Party.</div>';
+    if (!body) return '<div class="map-turn-strip panel-empty"><span>Choose an acting character on the map. Inspect characters in Party.</span>' + mapTurnLabelMarkup() + '<!--map-turn-end--></div>';
     const source = state.panelProjection?.surfaces.find((item) =>
       ['party', 'unit_list'].includes(item.renderer) && item.data?.entities?.[actorId]);
     const entity = source?.data.entities[actorId] || {};
     const actingName = source?.data.participants?.find(member => member.id === actorId)?.data?.name || body.display?.label || entity.name || actorId;
     return `<div class="map-turn-strip" data-selected-actor="${escapeHtml(actorId)}">${actorTokenMarkup(actorId, actingName)}` +
       `<strong>Acting: ${escapeHtml(actingName)}</strong>` +
-      personalResourceMarkup(entity) + actionReadinessMarkup(entity, actorId) + '</div>';
+      personalResourceMarkup(entity) + actionReadinessMarkup(entity, actorId) + mapTurnLabelMarkup() + '<!--map-turn-end--></div>';
   }
 
   // Labels reflect admitted actions and the selected saved loadout, never prototype mechanics.
@@ -4816,8 +4850,9 @@ const SylviaGMFrontend = (() => {
   function mapActionPalette(surface) {
     const selected = tacticalPreviewState(surface, state.tacticalViews[surface.id] || {});
     const button = action => `<button type="button" class="map-action-choice${action.id === selected.action?.id ? ' active' : ''}" ` +
-      `data-tactical-action="${escapeHtml(action.id)}" aria-pressed="${action.id === selected.action?.id}">` +
-      `${escapeHtml(mapActionLabel(surface, action))}</button>`;
+      `data-tactical-action="${escapeHtml(action.id)}" aria-pressed="${action.id === selected.action?.id}" title="${escapeHtml(mapActionLabel(surface, action))}">` +
+      `${suiteIcon(suiteActionIcon(action))}<span class="map-action-name" aria-hidden="true">${escapeHtml(action.id === 'end-turn' ? 'End turn' : action.label || action.id)}</span>` +
+      `<span class="visually-hidden">${escapeHtml(mapActionLabel(surface, action))}</span></button>`;
     const groups = [['self', 'Self'], ['move', 'Move'], ['target', 'Target'], ['area', 'Area'], ['devices', 'Devices']]
       .map(([id, label]) => [id, label, selected.actions.filter((action) => mapActionGroup(action) === id)])
       .filter(([, , actions]) => actions.length);
@@ -4825,6 +4860,62 @@ const SylviaGMFrontend = (() => {
       `<div class="map-action-group" role="group" aria-label="${label} actions" data-action-group="${id}">` +
       `<span class="map-action-group-label" aria-hidden="true">${label}</span><div class="map-action-group-buttons">` +
       actions.map(button).join('') + '</div></div>').join('') + '</div>';
+  }
+
+  // The projected record for a map body's actor (party/character surfaces), or {}.
+  function projectedActorEntity(actorId) {
+    return state.panelProjection?.surfaces.find((item) => ['party', 'unit_list'].includes(item.renderer) &&
+      item.data?.entities?.[actorId])?.data.entities[actorId] || {};
+  }
+
+  // Token dressing from projected values only: an AP ring when AP and its maximum are projected, and a facing mark
+  // from the body's projected facing vector.
+  function mapTokenDecorations(surface, item) {
+    if (!surface) return '';
+    const entity = projectedActorEntity(tacticalActorId(surface, item.id));
+    const parts = [];
+    if (Number.isInteger(entity.ap) && Number.isInteger(entity.max_ap) && entity.max_ap > 0 && entity.max_ap <= 12) {
+      const r = 21, arcs = Array.from({ length: entity.max_ap }, (_, index) => {
+        const a0 = -Math.PI / 2 + index * (Math.PI * 2 / entity.max_ap) + 0.1, a1 = a0 + Math.PI * 2 / entity.max_ap - 0.2;
+        const point = (angle) => `${(Math.cos(angle) * r).toFixed(2)} ${(Math.sin(angle) * r).toFixed(2)}`;
+        return `<path class="${index < entity.ap ? 'on' : ''}" d="M${point(a0)} A${r} ${r} 0 0 1 ${point(a1)}"/>`;
+      }).join('');
+      parts.push(`<svg class="map-token-ap" viewBox="-25 -25 50 50" aria-hidden="true">${arcs}</svg>`);
+    }
+    if (Array.isArray(item.facing) && item.facing.length >= 2 && (item.facing[0] || item.facing[1])) {
+      const angle = Math.atan2(item.facing[1], item.facing[0]) * 180 / Math.PI;
+      parts.push(`<span class="map-token-facing" style="--facing:${angle.toFixed(1)}deg" aria-hidden="true"></span>`);
+    }
+    return parts.join('');
+  }
+
+  // A key for what this map draws: the tones of its bodies and the kinds of its geometry.
+  function mapLegendMarkup(data, continuous) {
+    const tones = new Set((data.entities || []).map((item) => entityTone(item.id, item.display)));
+    const kinds = new Set((data.geometry || []).filter((item) => item.active).map((item) => String(item.display?.kind || '').toLowerCase()));
+    const items = [tones.has('ally') && ['ally', continuous ? 'Party' : 'Squad'], tones.has('hostile') && ['hostile', 'Hostile'],
+      tones.has('device') && ['device', 'Device'], kinds.has('cover') && ['cover', 'Cover'], kinds.has('wall') && ['wall', 'Wall'],
+      kinds.has('door') && ['door', 'Door']].filter(Boolean);
+    return items.length ? `<span class="map-legend" aria-hidden="true">${items.map(([kind, label]) =>
+      `<span class="map-legend-item" data-legend="${kind}">${label}</span>`).join('')}</span>` : '';
+  }
+
+  // Whose turn and the saved revision, read from projected status/encounter values only.
+  function mapTurnLabelMarkup() {
+    const projection = state.panelProjection;
+    const status = (projection?.surfaces || []).filter((item) => item.renderer === 'key_value' && item.data && typeof item.data === 'object')
+      .reduce((all, item) => Object.assign(all, item.data), {});
+    const combat = projection?.surfaces.find((item) => item.renderer === 'encounter')?.data?.combat;
+    const side = typeof status['Active side'] === 'string' ? status['Active side'] : '';
+    const encounter = projection?.surfaces.find((item) => item.renderer === 'encounter')?.data;
+    const currentId = combat?.encounter_active ? combat.current_actor || combat.active_actor : null;
+    const currentName = currentId ? encounter?.participants?.find((item) => item.id === currentId)?.data?.name ||
+      encounter?.entities?.[currentId]?.name || null : null;
+    const label = currentName ? `${currentName}’s turn` : side ? `${side.charAt(0).toUpperCase()}${side.slice(1)}’ turn` : '';
+    const round = Number.isFinite(combat?.round) ? `Round ${combat.round}` : '';
+    const lead = label || round;
+    return `<span class="map-turn-label">${lead ? `<b data-side="${escapeHtml(side.toLowerCase())}">${escapeHtml(lead)}</b>${label && round ? ` · ${escapeHtml(round)}` : ''}` : ''}` +
+      (Number.isFinite(projection?.revision) ? `<span class="map-turn-revision" title="Saved game revision. Selection and layout never change it.">Game r${escapeHtml(projection.revision)}</span>` : '') + '</span>';
   }
 
   // Hide near-integer calculation residue in presentation; authoritative values stay untouched.
@@ -4841,7 +4932,18 @@ const SylviaGMFrontend = (() => {
       typeof entity.reaction_available === 'boolean' ? `Reaction ${entity.reaction_available ? 'ready' : 'spent'}` : '',
       active && Number.isFinite(combat.movement_remaining) ? `Move remaining ${presentNumber(combat.movement_remaining)}` : ''].filter(Boolean);
     return `<span class="panel-unit-meta" data-action-readiness="${escapeHtml(actorId)}">${fields.map((field) =>
-      `<span class="panel-tag" data-tone="${/ready|remaining/i.test(field) ? 'good' : 'neutral'}">${escapeHtml(field)}</span>`).join(' ')}</span>`;
+      `<span class="panel-tag" data-tone="${/ready|remaining/i.test(field) ? 'good' : 'neutral'}" ` +
+      `data-econ="${/^Action/.test(field) ? 'action' : /^Bonus/.test(field) ? 'bonus' : /^Reaction/.test(field) ? 'reaction' : /^Move/.test(field) ? 'move' : 'wait'}" ` +
+      `data-econ-state="${/ready|remaining/i.test(field) ? 'on' : 'off'}">${escapeHtml(field)}</span>`).join(' ')}</span>`;
+  }
+
+  // The active weapon set as "Set: main / off", or a plain note when no set or no held item is selected.
+  function weaponSetMarkup(sets) {
+    if (!sets || typeof sets !== 'object') return '';
+    const active = sets.active_set;
+    const held = active ? [sets[active]?.main_hand, sets[active]?.off_hand].filter(Boolean).map(panelIdentifierLabel) : [];
+    if (!active || !held.length) return '<div class="weapon-set-line panel-unit-meta">No weapon set in hand</div>';
+    return `<div class="weapon-set-line"><span>${escapeHtml(panelIdentifierLabel(active))}</span> ${escapeHtml(held.join(' / '))}</div>`;
   }
 
   function weaponReadinessMarkup(entity) {
@@ -4884,6 +4986,117 @@ const SylviaGMFrontend = (() => {
       `${display?.kind === 'drone' ? ' data-token-kind="drone"' : ''} aria-hidden="true">${escapeHtml(actorInitials(name || id))}</span>`;
   }
 
+  // ---- Game panel suite (accepted mockup ebf068e6): shared presentation pieces. Every value comes from the
+  // projection; an absent maximum shows the number alone and never becomes a guessed bar. ----
+  const SUITE_ICON = {
+    stand: '<svg viewBox="0 0 20 20"><circle cx="10" cy="3.5" r="2.2"/><path d="M10 6v7M10 13l-3 5M10 13l3 5M6 9h8"/></svg>',
+    crouch: '<svg viewBox="0 0 20 20"><circle cx="9" cy="6" r="2.2"/><path d="M9 8.5l1.5 4.5M10.5 13l4 1M10.5 13l-3 4.5M14.5 14l-1 4M6 11h7"/></svg>',
+    prone: '<svg viewBox="0 0 20 20"><circle cx="3.5" cy="12" r="2"/><path d="M6 12.5h10M10 12.5l3 3M16 12.5l2 2M7 10.5l4-1"/></svg>',
+    move: '<svg viewBox="0 0 20 20"><path d="M3 15c3-1 4-6 8-6h5M13 6l3 3-3 3"/></svg>',
+    aim: '<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="6"/><path d="M10 1v5M10 14v5M1 10h5M14 10h5"/></svg>',
+    fire: '<svg viewBox="0 0 20 20"><path d="M2 10h9M13 7l5 3-5 3"/><circle cx="11" cy="10" r="1.4"/></svg>',
+    burst: '<svg viewBox="0 0 20 20"><path d="M2 6h7M2 10h9M2 14h7M13 7l5 3-5 3"/></svg>',
+    auto: '<svg viewBox="0 0 20 20"><path d="M1 5h6M1 8h7M1 11h8M1 14h7M12 6l6 4-6 4"/></svg>',
+    drone: '<svg viewBox="0 0 20 20"><circle cx="4" cy="5" r="2.4"/><circle cx="16" cy="5" r="2.4"/><circle cx="4" cy="15" r="2.4"/><circle cx="16" cy="15" r="2.4"/><rect x="7" y="7.5" width="6" height="5" rx="1"/></svg>',
+    eye: '<svg viewBox="0 0 20 20"><path d="M1 10s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z"/><circle cx="10" cy="10" r="2.5"/></svg>',
+    wave: '<svg viewBox="0 0 20 20"><path d="M2 14c2-4 4-4 6 0s4 4 6 0 3-3 4-2M2 8c2-4 4-4 6 0s4 4 6 0 3-3 4-2"/></svg>',
+    cycle: '<svg viewBox="0 0 20 20"><path d="M4 10a6 6 0 0 1 10.5-4M16 10a6 6 0 0 1-10.5 4M14 2.5v4h-4M6 17.5v-4h4"/></svg>',
+    reload: '<svg viewBox="0 0 20 20"><rect x="7" y="2" width="6" height="12" rx="1"/><path d="M8 5h4M8 8h4M8 11h4M10 16v3M7 17l3 2 3-2"/></svg>',
+    drop: '<svg viewBox="0 0 20 20"><rect x="7" y="2" width="6" height="10" rx="1" transform="rotate(18 10 7)"/><path d="M3 18h14"/></svg>',
+    recoil: '<svg viewBox="0 0 20 20"><path d="M3 15l5-5 3 3 6-7M13 6h4v4"/></svg>',
+    shell: '<svg viewBox="0 0 20 20"><rect x="5" y="4" width="10" height="5" rx="1.5"/><rect x="5" y="4" width="3" height="5"/><path d="M10 11v6M7 15l3 3 3-3"/></svg>',
+    end: '<svg viewBox="0 0 20 20"><path d="M5 4v12M9 4l7 6-7 6z"/></svg>',
+    dash: '<svg viewBox="0 0 20 20"><path d="M2 10h8M4 6h6M4 14h6M12 5l6 5-6 5"/></svg>',
+    fly: '<svg viewBox="0 0 20 20"><path d="M2 12c4-1 6-6 8-6s4 5 8 6M10 6v10"/></svg>',
+    climb: '<svg viewBox="0 0 20 20"><path d="M6 2v16M14 2v16M6 6h8M6 10h8M6 14h8"/></svg>',
+    swim: '<svg viewBox="0 0 20 20"><path d="M1 14c2-2 4-2 6 0s4 2 6 0 4-2 6 0M8 9l4-3 3 3"/></svg>',
+    sword: '<svg viewBox="0 0 20 20"><path d="M3 17l10-10M13 3h4v4L7 17M5 13l2 2M3 17l2-2"/></svg>',
+    bow: '<svg viewBox="0 0 20 20"><path d="M4 2c8 3 8 13 0 16M4 2v16M4 10h13M14 7l3 3-3 3"/></svg>',
+    flame: '<svg viewBox="0 0 20 20"><path d="M10 2c1 4 6 6 6 10a6 6 0 0 1-12 0c0-3 2-4 3-6 0 2 1 3 2 3 0-3 1-5 1-7z"/></svg>',
+    frost: '<svg viewBox="0 0 20 20"><path d="M10 2v16M3 6l14 8M17 6L3 14M8 3l2 2 2-2M8 17l2-2 2 2"/></svg>',
+    missile: '<svg viewBox="0 0 20 20"><path d="M2 16c4-2 8-8 14-12M2 11c3-1 6-4 9-7M6 18c4-1 7-4 11-9"/></svg>',
+    burstarea: '<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="4"/><path d="M10 1v3M10 16v3M1 10h3M16 10h3M3.5 3.5l2 2M14.5 14.5l2 2M3.5 16.5l2-2M14.5 5.5l2-2"/></svg>',
+    network: '<svg viewBox="0 0 20 20"><circle cx="4" cy="10" r="2.4"/><circle cx="16" cy="5" r="2.4"/><circle cx="16" cy="15" r="2.4"/><path d="M6.2 9l7.6-3.2M6.2 11l7.6 3.2"/></svg>',
+    gear: '<svg viewBox="0 0 20 20"><path d="M4 7h12v10H4zM7 7V4h6v3M4 11h12"/></svg>',
+  };
+  // A declared action's icon, from its declared intent/params/id (never from mechanics).
+  function suiteActionIcon(action) {
+    const id = String(action?.id || ''), intent = String(action?.intent || ''), stance = String(action?.params?.stance || '').toLowerCase();
+    if (/stand/.test(stance) || /stance-standing/.test(id)) return 'stand';
+    if (/crouch/.test(stance) || /crouch/.test(id)) return 'crouch';
+    if (/prone/.test(stance) || /prone/.test(id)) return 'prone';
+    if (intent === 'cycle_weapon' || id === 'cycle') return 'cycle';
+    if (intent === 'reload_weapon' || /^reload/.test(id)) return /drop/.test(id) ? 'drop' : 'reload';
+    if (intent === 'recover_recoil' || /recoil/.test(id)) return 'recoil';
+    if (/shell/.test(id)) return 'shell';
+    if (/end.*turn/.test(id)) return 'end';
+    if (/fly/.test(id)) return 'fly';
+    if (/climb/.test(id)) return 'climb';
+    if (/swim/.test(id)) return 'swim';
+    if (/^dash$/.test(id)) return 'dash';
+    if (/^move|walk/.test(id)) return 'move';
+    if (/^aim/.test(id)) return 'aim';
+    if (/burst/.test(id)) return 'burst';
+    if (/full-auto|auto$/.test(id) && !/drone/.test(id)) return 'auto';
+    if (/drone|fpv/.test(id)) return 'drone';
+    if (/overwatch|watch/.test(id)) return 'eye';
+    if (/suppress/.test(id)) return 'wave';
+    if (/fire_bolt|fire-bolt/.test(id)) return 'flame';
+    if (/frost/.test(id)) return 'frost';
+    if (/missile/.test(id)) return 'missile';
+    if (/fireball/.test(id)) return 'burstarea';
+    if (/melee/.test(id)) return 'sword';
+    if (/ranged|thrown/.test(id)) return /thrown/.test(id) ? 'sword' : 'bow';
+    if (/fire$|^fire/.test(id)) return 'fire';
+    return '';
+  }
+  function suiteIcon(name) {
+    return SUITE_ICON[name] ? `<span class="suite-ico" aria-hidden="true">${SUITE_ICON[name]}</span>` : '';
+  }
+  function suitePips(value, maximum, extra = '') {
+    if (!Number.isInteger(value) || !Number.isInteger(maximum) || maximum < 1 || maximum > 12) return '';
+    return `<span class="suite-pips ${extra}" role="img" aria-label="${value} of ${maximum}">` +
+      Array.from({ length: maximum }, (_, index) => `<i${index < value ? ' class="on"' : ''}></i>`).join('') + '</span>';
+  }
+  function suiteBar(value, maximum, tone, label) {
+    if (!Number.isFinite(value) || !Number.isFinite(maximum) || maximum <= 0) return '';
+    const segments = Math.max(1, Math.min(Math.round(maximum), 14));
+    const lit = Math.round(Math.max(0, Math.min(1, value / maximum)) * segments);
+    return `<span class="suite-bar" data-tone="${tone}" role="meter" aria-valuemin="0" aria-valuemax="${maximum}" aria-valuenow="${value}" ` +
+      `aria-label="${escapeHtml(label)} ${value} of ${maximum}">` + Array.from({ length: segments }, (_, index) =>
+      `<i${index < lit ? ' class="on"' : ''}></i>`).join('') + '</span>';
+  }
+  // HP/RES/AP row: a bar or pips when a maximum is projected, otherwise the bare value.
+  function suiteStatRow(label, entity, field, tone) {
+    const value = entity?.[field];
+    if (!Number.isFinite(value)) return '';
+    const maximum = entity[`max_${field}`];
+    const meter = field === 'ap' ? suitePips(value, maximum, 'big') : suiteBar(value, maximum, tone, label);
+    return `<div class="suite-stat" data-suite-stat="${field}"><span class="k">${label}</span>${meter || '<span class="suite-stat-gap"></span>'}` +
+      `<span class="v">${escapeHtml(value)}${Number.isFinite(maximum) ? `<small>/${escapeHtml(maximum)}</small>` : ''}</span></div>`;
+  }
+  // A weapon line for roster cards: chamber light, label and rounds as projected.
+  function suiteWeaponLine(weapon) {
+    if (!weapon || typeof weapon !== 'object') return '';
+    const chamber = typeof weapon.chamber === 'string' ? weapon.chamber.toLowerCase() : '';
+    const rounds = weapon.magazine?.rounds;
+    const capacity = weapon.feed === 'TUBE' ? weapon.tube_capacity : weapon.magazine?.capacity;
+    const warn = weapon.needs_cycle === true ? '<span class="suite-tag" data-tone="intent">Needs cycle</span>'
+      : weapon.chamber === 'EMPTY' && rounds === 0 ? '<span class="suite-tag" data-tone="bad">Dry</span>' : '';
+    return `<span class="sq-weap">${chamber ? `<i class="cdot" data-chamber="${escapeHtml(chamber)}" title="Chamber ${escapeHtml(chamber)}"></i>` : ''}` +
+      `${escapeHtml(panelIdentifierLabel(weapon.label || weapon.id || 'Weapon'))}` +
+      `${Number.isFinite(rounds) ? ` · ${escapeHtml(rounds)}${Number.isFinite(capacity) ? `/${escapeHtml(capacity)}` : ''}` : ''} ${warn}</span>`;
+  }
+
+  function suiteMedal(id, name, entity, size) {
+    const fraction = Number.isFinite(entity?.hp) && Number.isFinite(entity?.max_hp) && entity.max_hp > 0
+      ? Math.max(0, Math.min(1, entity.hp / entity.max_hp)) : null;
+    return `<span class="suite-medal" data-tone="${entityTone(id)}" style="--s:${size}px" aria-hidden="true">` +
+      `<svg viewBox="0 0 40 40"><circle class="m-rim" cx="20" cy="20" r="18"/>` +
+      (fraction === null ? '' : `<circle class="m-hp" cx="20" cy="20" r="18" style="stroke-dasharray:${(113.1 * fraction).toFixed(2)} 200"/>`) +
+      `<circle class="m-face" cx="20" cy="20" r="14.5"/></svg><b>${escapeHtml(actorInitials(name || id))}</b></span>`;
+  }
+
   // Pips only when the projection supplies a current value and a small declared maximum.
   function resourcePipsMarkup(value, maximum) {
     if (!Number.isInteger(value) || !Number.isInteger(maximum) || maximum < 1 || maximum > 12) return '';
@@ -4899,6 +5112,267 @@ const SylviaGMFrontend = (() => {
   }
 
   // Ready-weapon card from the projected carried weapon; absent fields are omitted, never estimated.
+  // A side-profile drawing of the ready weapon, built only from projected fields: the feed and mechanism pick the
+  // silhouette, and the chamber and magazine/tube count draw the state. It shows authority; it never animates
+  // manipulations the owner did not commit.
+  function weaponRigMarkup(weapon) {
+    if (!weapon || typeof weapon !== 'object' || !weapon.feed) return '';
+    const kind = weapon.feed === 'TUBE' ? 'pump' : weapon.mechanism === 'SELF_LOADING' ? 'rifle' : 'bolt';
+    const rounds = Number.isInteger(weapon.magazine?.rounds) ? weapon.magazine.rounds : null;
+    const spares = Array.isArray(weapon.spare_magazines) ? weapon.spare_magazines.map((item) => item?.rounds).filter(Number.isInteger) : [];
+    const capacityValue = weapon.feed === 'TUBE' ? weapon.tube_capacity : weapon.magazine?.capacity;
+    const capacity = Number.isInteger(capacityValue) && capacityValue > 0 ? capacityValue : Math.max(rounds || 0, ...spares, 1);
+    const slots = Math.min(capacity, 30);
+    const filled = rounds === null ? 0 : Math.round(Math.min(rounds, capacity) / capacity * slots);
+    const strip = (x, y, w, h, vertical) => Array.from({ length: slots }, (_, index) => {
+      const on = index < filled;
+      if (vertical) { const step = (h - 2) / slots; return `<rect x="${x + 1}" y="${(y + h - 1 - (index + 1) * step + 0.4).toFixed(2)}" width="${w - 2}" height="${Math.max(0.6, step - 0.8).toFixed(2)}" rx="0.6" class="${on ? 'rig-brass' : 'rig-slot'}"/>`; }
+      const step = (w - 2) / slots;
+      return `<rect x="${(x + 1 + index * step + 0.4).toFixed(2)}" y="${y + 1}" width="${Math.max(0.6, step - 0.8).toFixed(2)}" height="${h - 2}" rx="0.6" class="${on ? 'rig-brass' : 'rig-slot'}"/>`;
+    }).join('');
+    const chamber = (x, y) => weapon.chamber === 'LIVE'
+      ? `<g data-rig-chamber="live"><rect x="${x}" y="${y}" width="16" height="6" rx="2" class="rig-brass"/><rect x="${x + 13}" y="${y + 0.5}" width="5" height="5" rx="2.4" class="rig-tip"/></g>`
+      : weapon.chamber === 'SPENT'
+        ? `<g data-rig-chamber="spent"><rect x="${x}" y="${y}" width="15" height="6" rx="1.4" class="rig-spent"/><circle cx="${x + 1.5}" cy="${y + 3}" r="1.2" class="rig-hole"/></g>`
+        : '<g data-rig-chamber="empty"></g>';
+    const body = {
+      bolt: '<path class="rig-poly" d="M8 70 L58 63 L132 60 L136 88 L116 92 L98 98 L66 114 L20 118 L8 110 Z"/>' +
+        '<rect class="rig-metal" x="134" y="56" width="114" height="26" rx="4"/><rect class="rig-metal" x="246" y="63" width="142" height="8" rx="2"/>' +
+        '<rect class="rig-metal" x="384" y="59" width="26" height="16" rx="3"/><rect class="rig-optic" x="150" y="32" width="102" height="14" rx="7"/>' +
+        '<path class="rig-optic" d="M252 30 h26 a4 4 0 0 1 4 4 v12 a4 4 0 0 1 -4 4 h-26 z"/><circle class="rig-lens" cx="279" cy="40" r="5"/>' +
+        '<path class="rig-hi" d="M154 35 h94 M138 58 h106 M250 64.5 h132"/><rect class="rig-port" x="194" y="58" width="30" height="11" rx="2"/>' +
+        chamber(201, 60.5) + '<g data-rig-part="bolt-handle" style="transform-origin:172px 64px"><rect class="rig-steel" x="176" y="60" width="20" height="7" rx="2"/><path class="rig-steel" d="M168 64 L176 64 L188 86 L182 89 Z"/>' +
+        '<circle class="rig-knob" cx="186" cy="90" r="6"/></g><path class="rig-metal" d="M150 82 h28 v4 c0 10 -26 12 -28 0 z"/><path class="rig-trigger" d="M162 84 q4 6 0 10"/>' +
+        `<g data-rig-feed><rect class="rig-mag" x="204" y="81" width="34" height="27" rx="3"/>${strip(208, 86, 26, 6)}</g>`,
+      rifle: '<path class="rig-poly" d="M10 60 h70 l14 4 v26 l-14 6 h-58 l-12 -8 z"/><rect class="rig-metal" x="92" y="64" width="50" height="11" rx="3"/>' +
+        '<rect class="rig-metal" x="140" y="50" width="132" height="27" rx="3"/><path class="rig-metal" d="M150 76 h104 l-6 15 h-90 z"/>' +
+        '<rect class="rig-poly" x="270" y="53" width="92" height="22" rx="3"/><rect class="rig-metal" x="360" y="60" width="44" height="7" rx="2"/>' +
+        '<rect class="rig-metal" x="400" y="57" width="16" height="13" rx="2"/><rect class="rig-optic" x="184" y="34" width="40" height="17" rx="3"/>' +
+        '<circle class="rig-lens" cx="220" cy="42" r="4"/><path class="rig-hi" d="M142 52 h126 M362 61 h40"/><rect class="rig-port" x="210" y="57" width="30" height="11" rx="2"/>' +
+        chamber(217, 59.5) + '<rect class="rig-steel" data-rig-part="charging" x="144" y="53" width="12" height="5" rx="1.5"/><path class="rig-poly" d="M168 88 l20 0 l6 34 l-16 2 z"/><path class="rig-metal" d="M156 88 h26 v3 c0 10 -24 10 -26 0 z"/><path class="rig-trigger" d="M168 90 q4 6 0 10"/>' +
+        `<g data-rig-feed><path class="rig-mag" d="M222 88 h30 l10 46 l-28 6 z"/><g transform="rotate(-12 240 110)">${strip(234, 92, 7, 40, true)}</g></g>`,
+      pump: '<path class="rig-poly" d="M8 66 L64 62 L120 60 L124 86 L104 92 L60 112 L18 116 L8 108 Z"/><rect class="rig-metal" x="120" y="56" width="100" height="30" rx="4"/>' +
+        '<rect class="rig-metal" x="218" y="57" width="192" height="9" rx="2"/><rect class="rig-metal" x="218" y="68" width="160" height="9" rx="3"/>' +
+        `<g data-rig-feed>${strip(222, 69, 152, 7)}</g><path class="rig-hi" d="M124 59 h92 M222 58.5 h184"/><rect class="rig-port" x="156" y="59" width="30" height="11" rx="2"/>` +
+        chamber(163, 61.5) + '<rect class="rig-poly" data-rig-part="pump" x="256" y="64" width="78" height="19" rx="5"/><path class="rig-metal" d="M136 86 h28 v3 c0 10 -26 12 -28 0 z"/><path class="rig-trigger" d="M148 88 q4 6 0 10"/>',
+    }[kind];
+    const feedName = weapon.feed === 'TUBE' ? 'tube' : 'magazine';
+    const chamberName = typeof weapon.chamber === 'string' ? weapon.chamber.toLowerCase() : 'unknown';
+    const muzzle = { bolt: [412, 67], rifle: [418, 63.5], pump: [412, 61.5] }[kind];
+    return `<svg class="weapon-rig" viewBox="0 22 424 124" role="img" data-rig="${kind}" aria-label="Weapon: chamber ${escapeHtml(chamberName)}` +
+      `${rounds === null ? '' : `, ${rounds} in ${feedName}`}"><g data-rig-part="body">${body}</g>` +
+      `<g data-rig-part="flash" opacity="0" style="transform-origin:${muzzle[0]}px ${muzzle[1]}px"><ellipse class="rig-flash" cx="${muzzle[0] + 7}" cy="${muzzle[1]}" rx="8" ry="2.6"/>` +
+      `<path class="rig-flash-prong" d="M${muzzle[0] + 2} ${muzzle[1]} l7 -5 M${muzzle[0] + 2} ${muzzle[1]} l7 5"/></g>` +
+      `<circle data-rig-part="smoke" class="rig-smoke" cx="${muzzle[0] + 10}" cy="${muzzle[1] - 2}" r="5" opacity="0"/><g data-rig-part="fx"></g></svg>`;
+  }
+
+  // ---- Rig motion for committed weapon changes (accepted suite; phase plans from the effects demo) ----
+  const RIG_EASE = 'cubic-bezier(.3,.7,.2,1)';
+  const RIG_PORT = { bolt: [194, 58], rifle: [210, 57], pump: [156, 59] };
+  function rigWeaponSnapshot(weapon) {
+    if (!weapon || typeof weapon !== 'object') return null;
+    return { id: weapon.id, feed: weapon.feed, mechanism: weapon.mechanism, chamber: weapon.chamber, needs_cycle: weapon.needs_cycle === true,
+      magazine: weapon.magazine?.id ?? null, rounds: Number.isInteger(weapon.magazine?.rounds) ? weapon.magazine.rounds : null,
+      retained: Array.isArray(weapon.retained_magazines) ? weapon.retained_magazines.length : null };
+  }
+  // What changed between two committed states of the same weapon, in the order it happens.
+  function rigManipulations(before, after, { gap = 1 } = {}) {
+    if (!before || !after || before.id !== after.id) return [];
+    const kinds = [];
+    const sameMagazine = before.magazine === after.magazine;
+    if (after.feed !== 'TUBE' && before.magazine !== null && after.magazine !== null && before.magazine !== after.magazine) {
+      kinds.push({ kind: 'reload', retained: after.retained !== null && before.retained !== null && after.retained > before.retained,
+        needsCycle: after.needs_cycle, chamberAfter: after.chamber });
+    } else if (after.feed === 'TUBE' && before.rounds !== null && after.rounds !== null && after.rounds > before.rounds &&
+        before.chamber === after.chamber) {
+      kinds.push({ kind: 'load-shell' });
+    } else if (gap === 1 && sameMagazine && ((before.chamber === 'LIVE' && after.chamber === 'SPENT') ||
+        (before.rounds !== null && after.rounds !== null && after.rounds < before.rounds && after.mechanism === 'SELF_LOADING'))) {
+      kinds.push({ kind: 'fire' });
+    }
+    if ((before.needs_cycle && !after.needs_cycle) || (after.mechanism !== 'SELF_LOADING' && before.chamber !== 'LIVE' && after.chamber === 'LIVE' &&
+        !kinds.some((item) => item.kind === 'reload' && after.mechanism === 'SELF_LOADING'))) {
+      kinds.push({ kind: 'cycle', ejected: before.chamber === 'SPENT' ? 'SPENT' : before.chamber === 'LIVE' ? 'LIVE' : null });
+    }
+    return kinds;
+  }
+  function rigAnimate(element, frames, ms, delay = 0, easing = RIG_EASE) {
+    return element && typeof element.animate === 'function' ? element.animate(frames, { duration: ms, delay, easing, fill: 'forwards' }) : null;
+  }
+  function rigEject(svg, rig, delay, spent) {
+    const fx = svg.querySelector('[data-rig-part="fx"]');
+    if (!fx || !RIG_PORT[rig]) return null;
+    const [x, y] = RIG_PORT[rig];
+    const group = document.createElementNS(svg.namespaceURI, 'g');
+    group.innerHTML = `<rect x="${x}" y="${y}" width="14" height="6" rx="1.5" class="${spent ? 'rig-spent' : 'rig-brass'}"/>`;
+    group.style.transformBox = 'view-box';
+    group.style.transformOrigin = `${x + 7}px ${y + 3}px`;
+    group.style.opacity = '0';
+    fx.appendChild(group);
+    return rigAnimate(group, [{ transform: 'translate(0,0) rotate(0)', opacity: 1 },
+      { transform: 'translate(16px,-20px) rotate(150deg)', opacity: 1, offset: 0.38 },
+      { transform: 'translate(34px,24px) rotate(360deg)', opacity: 0 }], 560, delay, 'cubic-bezier(.25,.6,.45,1)');
+  }
+  // Labelled phases for one committed manipulation: [{label, ms, run(svg)}].
+  function rigPhasePlan(step, rig) {
+    const part = (svg, name) => svg.querySelector(`[data-rig-part="${name}"]`);
+    const chamber = (svg) => svg.querySelector('[data-rig-chamber]');
+    const feedIn = (svg) => rigAnimate(chamber(svg), [{ opacity: 0 }, { opacity: 1 }], 160, 140);
+    if (step.kind === 'fire') return [{ label: 'Fire', ms: 360, run: (svg) => [
+      rigAnimate(part(svg, 'flash'), [{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(1.25)' }], 90, 0, 'cubic-bezier(.2,.8,.3,1)'),
+      rigAnimate(part(svg, 'smoke'), [{ opacity: 0, transform: 'translate(0,0) scale(.6)' }, { opacity: .4, transform: 'translate(3px,-1px) scale(1)', offset: .18 },
+        { opacity: 0, transform: 'translate(14px,-7px) scale(1.9)' }], 340, 40, 'cubic-bezier(.2,.6,.4,1)'),
+      rigAnimate(part(svg, 'body'), [{ transform: 'translate(0,0) rotate(0)' }, { transform: 'translate(-5px,.5px) rotate(-1.5deg)', offset: .14 },
+        { transform: 'translate(.7px,0) rotate(.25deg)', offset: .55 }, { transform: 'translate(0,0) rotate(0)' }], 360, 0, 'cubic-bezier(.25,.7,.3,1)'),
+      rig === 'rifle' ? rigEject(svg, rig, 40, true) : null] }];
+    if (step.kind === 'cycle' && rig === 'pump') return [
+      { label: 'Pump back · eject shell', ms: 340, run: (svg) => [rigAnimate(part(svg, 'pump'), [{ transform: 'translateX(0)' }, { transform: 'translateX(-34px)' }], 320),
+        rigAnimate(chamber(svg), [{ opacity: 1 }, { opacity: 0 }], 80), step.ejected ? rigEject(svg, rig, 90, step.ejected !== 'LIVE') : null] },
+      { label: 'Pump forward · chamber shell', ms: 320, run: (svg) => [rigAnimate(part(svg, 'pump'), [{ transform: 'translateX(-34px)' }, { transform: 'translateX(0)' }], 300), feedIn(svg)] }];
+    if (step.kind === 'cycle') return [
+      { label: 'Lift bolt', ms: 260, run: (svg) => [rigAnimate(part(svg, 'bolt-handle') || part(svg, 'charging'), [{ transform: 'rotate(0)' }, { transform: 'rotate(-70deg)' }], 240, 0, 'cubic-bezier(.45,0,.2,1)')] },
+      { label: 'Draw back · eject case', ms: 380, run: (svg) => [rigAnimate(part(svg, 'bolt-handle') || part(svg, 'charging'), [{ transform: 'rotate(-70deg)' }, { transform: 'translateX(-30px) rotate(-70deg)' }], 360),
+        rigAnimate(chamber(svg), [{ opacity: 1 }, { opacity: 0 }], 80), step.ejected ? rigEject(svg, rig, 120, step.ejected !== 'LIVE') : null] },
+      { label: 'Push forward · feed round', ms: 340, run: (svg) => [rigAnimate(part(svg, 'bolt-handle') || part(svg, 'charging'), [{ transform: 'translateX(-30px) rotate(-70deg)' }, { transform: 'rotate(-70deg)' }], 300, 0, 'cubic-bezier(.5,0,.25,1)'), feedIn(svg)] },
+      { label: 'Lock down', ms: 220, run: (svg) => [rigAnimate(part(svg, 'bolt-handle') || part(svg, 'charging'), [{ transform: 'rotate(-70deg)' }, { transform: 'rotate(0)' }], 200, 0, 'cubic-bezier(.45,0,.2,1)'),
+        rigAnimate(part(svg, 'body'), [{ transform: 'translate(0,0)' }, { transform: 'translate(0,.8px)', offset: .9 }, { transform: 'translate(0,0)' }], 220)] }];
+    if (step.kind === 'load-shell') return [
+      { label: 'Press shell into tube', ms: 420, run: (svg) => [rigAnimate(svg.querySelector('[data-rig-feed]'), [{ opacity: .4 }, { opacity: 1 }], 400)] }];
+    if (step.kind === 'reload') {
+      const plan = [
+        { label: 'Magazine release', ms: 300, run: (svg) => [rigAnimate(svg.querySelector('[data-rig-feed]'), [{ transform: 'translate(0,0)' }, { transform: 'translate(0,7px)' }], 280)] },
+        { label: step.retained ? 'Retain in dump pouch' : 'Magazine out', ms: 520, run: (svg) => [rigAnimate(svg.querySelector('[data-rig-feed]'),
+          [{ transform: 'translate(0,7px)', opacity: 1 }, { transform: step.retained ? 'translate(-150px,70px) scale(.6)' : 'translate(10px,90px) rotate(28deg)', opacity: 0 }], 500, 0, 'cubic-bezier(.5,0,.8,.4)')] },
+        { label: 'Draw fresh magazine', ms: 420, run: (svg) => {
+          const feed = svg.querySelector('[data-rig-feed]');
+          feed?.getAnimations?.().forEach((animation) => animation.cancel());
+          return [rigAnimate(feed, [{ transform: 'translate(130px,80px) rotate(-14deg)', opacity: 0 }, { transform: 'translate(0,26px) rotate(0)', opacity: 1 }], 400)];
+        } },
+        { label: 'Insert & seat', ms: 300, run: (svg) => [rigAnimate(svg.querySelector('[data-rig-feed]'), [{ transform: 'translate(0,26px)' }, { transform: 'translate(0,-2px)', offset: .8 }, { transform: 'translate(0,0)' }], 280),
+          rigAnimate(part(svg, 'body'), [{ transform: 'translate(0,0)' }, { transform: 'translate(0,-2px)', offset: .85 }, { transform: 'translate(0,0)' }], 300)] }];
+      if (step.needsCycle) plan.push({ label: step.chamberAfter === 'SPENT' ? 'Spent case remains · cycle next' : 'Chamber empty · cycle next', ms: 420, run: () => [] });
+      return plan;
+    }
+    return [];
+  }
+  // A run belongs to one campaign/session/Ruleset context, one panel and one actor's weapon. It writes only into
+  // that panel's own caption while the context is still selected, survives same-revision redraws by re-attaching its
+  // drawing, and is cancelled (drawing and caption back to the committed rest state) on Off/Static/Skip, reduced
+  // motion, a context change, the actor or panel going away, or a different weapon. Leaving a context forgets what it
+  // saw, so reopening never replays commits made while away.
+  const rigRuns = new Map();
+  function rigContextKey() {
+    return JSON.stringify([state.panelProjection?.campaign_id || null, state.activeSessionId || null, state.panelProjection?.ruleset_id || null]);
+  }
+  function rigMotionAllowed() {
+    return gamePanels().effects?.preferences?.().visual === 'motion' && !window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+  }
+  function rigCaption(run) {
+    return document.querySelector(`[data-panel-id="${CSS.escape(run.surfaceId)}"] [data-rig-phase="${CSS.escape(run.actorId)}"]`);
+  }
+  function cancelRigRuns(filter = () => true) {
+    for (const [key, run] of rigRuns) if (filter(run)) { run.finish(); rigRuns.delete(key); }
+  }
+  let rigMotionWatch = null;
+  function playCommittedRigMotion(projection, container) {
+    if (!rigMotionWatch && window.matchMedia) {
+      rigMotionWatch = window.matchMedia('(prefers-reduced-motion: reduce)');
+      rigMotionWatch.addEventListener?.('change', (event) => { if (event.matches) cancelRigRuns(); });
+    }
+    const context = rigContextKey();
+    if (state.rigContext !== context) {
+      cancelRigRuns();
+      state.rigMemory = new Map();
+      state.rigContext = context;
+    }
+    const memory = state.rigMemory ||= new Map();
+    const motion = rigMotionAllowed();
+    if (!motion) cancelRigRuns();
+    const seen = new Set();
+    container.querySelectorAll('[data-rig-stage]').forEach((stage) => {
+      const actorId = stage.dataset.rigStage;
+      const surfaceId = stage.closest('[data-panel-id]')?.dataset.panelId || '';
+      const key = JSON.stringify([surfaceId, actorId]);
+      seen.add(key);
+      const weapon = rigWeaponSnapshot(projectedActorEntity(actorId).weapon);
+      const run = rigRuns.get(key);
+      if (run && !run.done) {
+        if (run.revision === projection?.revision && run.weaponId === weapon?.id) {
+          const fresh = stage.querySelector('svg.weapon-rig');
+          if (fresh && run.svg !== fresh) fresh.replaceWith(run.svg);
+          const caption = rigCaption(run);
+          if (caption && run.label) caption.innerHTML = `<span class="pulse"></span>${escapeHtml(run.label)}`;
+          return;
+        }
+        run.finish();
+        rigRuns.delete(key);
+      }
+      const previous = memory.get(key);
+      memory.set(key, { revision: projection?.revision, weapon });
+      if (!motion || !previous || !Number.isFinite(projection?.revision) || !(projection.revision > previous.revision)) return;
+      const svg = stage.querySelector('svg.weapon-rig');
+      const steps = rigManipulations(previous.weapon, weapon, { gap: projection.revision - previous.revision });
+      if (!svg || !steps.length) return;
+      const phases = steps.flatMap((step) => rigPhasePlan(step, svg.dataset.rig));
+      const timers = [], animations = [];
+      const live = { svg, actorId, surfaceId, context, weaponId: weapon?.id, revision: projection.revision, done: false, label: '',
+        rest: stage.parentElement?.querySelector('[data-rig-phase]')?.innerHTML || 'Ready' };
+      const current = () => !live.done && rigContextKey() === live.context;
+      live.finish = () => {
+        if (live.done) return;
+        const owned = rigContextKey() === live.context;
+        live.done = true;
+        timers.forEach(clearTimeout);
+        animations.forEach((animation) => { try { animation.cancel(); } catch (_) { /* detached */ } });
+        svg.querySelector('[data-rig-part="fx"]')?.replaceChildren();
+        // Restore the rest caption only where this run's own phase is still shown; a newer render keeps its caption.
+        const caption = owned ? rigCaption(live) : null;
+        if (caption && live.label && caption.textContent === live.label) caption.innerHTML = live.rest;
+      };
+      rigRuns.set(key, live);
+      let at = 0;
+      phases.forEach((phase) => {
+        timers.push(setTimeout(() => {
+          // A drawing that is no longer in the document (panel hidden or behind another tab) has stopped.
+          if (!current() || !rigMotionAllowed() || !live.svg.isConnected) { live.finish(); rigRuns.delete(key); memory.delete(key); return; }
+          live.label = phase.label;
+          const caption = rigCaption(live);
+          if (caption) caption.innerHTML = `<span class="pulse"></span>${escapeHtml(phase.label)}`;
+          (phase.run(live.svg) || []).filter(Boolean).forEach((animation) => animations.push(animation));
+        }, at));
+        at += phase.ms;
+      });
+      timers.push(setTimeout(() => { live.finish(); if (rigRuns.get(key) === live) rigRuns.delete(key); }, at + 120));
+    });
+    // A rig whose stage is no longer drawn anywhere in this document (actor switch, panel hidden or behind another
+    // tab) stops, and what was observed for it is forgotten: when it returns, its first sight is the current committed
+    // state, never a replay of commits made while it was absent. A drawing still live elsewhere keeps its owner.
+    const shown = (key) => { const [surfaceId, actorId] = JSON.parse(key);
+      return Boolean(document.querySelector(`[data-panel-id="${CSS.escape(surfaceId)}"] [data-rig-stage="${CSS.escape(actorId)}"]`)); };
+    cancelRigRuns((run) => { const key = JSON.stringify([run.surfaceId, run.actorId]); return !seen.has(key) && !run.svg.isConnected; });
+    for (const key of Array.from(memory.keys())) if (!seen.has(key) && !shown(key)) memory.delete(key);
+  }
+
+  // Which declared steps a single Reload should queue for this weapon, in order. The owner still prices and
+  // checks every step when the queue is composed and run; this only chooses among actions the surface declares.
+  function weaponReloadPlan(weapon, actions) {
+    const declared = (intent) => (actions || []).find((action) => action.intent === intent && actionBindsActor(action));
+    const reload = declared('reload_weapon');
+    const cycle = declared('cycle_weapon');
+    if (!weapon || typeof weapon !== 'object' || (!reload && !cycle)) return { steps: [], summary: '' };
+    const rounds = Number.isInteger(weapon.magazine?.rounds) ? weapon.magazine.rounds : null;
+    const spares = Array.isArray(weapon.spare_magazines) ? weapon.spare_magazines.map((item) => item?.rounds).filter(Number.isInteger) : [];
+    const steps = [];
+    // A magazine change only helps when a carried spare holds more rounds than the inserted magazine.
+    if (reload && weapon.feed === 'DETACHABLE_MAGAZINE' && rounds !== null && spares.some((count) => count > rounds)) steps.push(reload);
+    const chamberNeedsCycle = weapon.needs_cycle === true ||
+      (steps.length && weapon.mechanism !== 'SELF_LOADING' && weapon.chamber !== 'LIVE');
+    if (cycle && chamberNeedsCycle && Number(weapon.cycle_ap) > 0) steps.push(cycle);
+    const summary = steps.length ? steps.map((action) => action.label || action.id).join(' → ')
+      : weapon.feed === 'TUBE' && !weapon.needs_cycle ? 'Tube top-up has no declared action' : 'Loaded · nothing to queue';
+    return { steps, summary };
+  }
+
   function weaponCardMarkup(entity) {
     const weapon = entity?.weapon;
     if (!weapon || typeof weapon !== 'object') return '';
@@ -4922,6 +5396,7 @@ const SylviaGMFrontend = (() => {
         ? `${weapon.range_breakpoints_m.join(' / ')} m` : null]].filter(([, value]) => value != null && value !== '');
     return `<div class="weapon-card"><div class="weapon-card-top"><strong>${escapeHtml(panelIdentifierLabel(weapon.label || weapon.id || 'Weapon'))}</strong>` +
       tags.map(([text, tone]) => `<span class="panel-tag"${tone ? ` data-tone="${tone}"` : ''}>${escapeHtml(text)}</span>`).join('') + '</div>' +
+      weaponRigMarkup(weapon) +
       (Array.isArray(weapon.fire_modes) && weapon.fire_modes.length ? `<div class="weapon-modes">${weapon.fire_modes.map((mode) =>
         `<span class="panel-tag">${escapeHtml(displayIdentifier(String(mode)))}</span>`).join('')}</div>` : '') +
       (Number.isFinite(rounds) ? `<div class="weapon-ammo">${strip}<span class="weapon-ammo-count">${feed} <b>${rounds}</b>` +
@@ -4997,12 +5472,23 @@ const SylviaGMFrontend = (() => {
       const classLevel = [details.class_id || details.class || entity.class_id,
         Number.isFinite(details.level ?? entity.level) ? `Level ${details.level ?? entity.level}` : '']
         .filter(Boolean).map((value) => panelIdentifierLabel(value)).join(' · ');
-      const markup = `<div class="panel-unit${selectedOnMap ? ' character-inspected' : ''}${acting === participant.id ? ' roster-acting' : ''}" data-panel-entity="${escapeHtml(participant.id)}">` +
-        `<div class="panel-unit-heading">${actorTokenMarkup(participant.id, details.name)}<span class="panel-unit-name"><strong>${escapeHtml(details.name || participant.id)}</strong>` +
-        (classLevel ? `<small>${escapeHtml(classLevel)}</small>` : '') +
-        (role ? `<span class="panel-unit-role">${escapeHtml(panelIdentifierLabel(role))}</span>` : '') + '</span>' +
-        (acting === participant.id ? '<span class="panel-tag" data-tone="ally">Acting</span>' : '') +
-        selectActor + `</div>` +
+      // Suite card: the whole card face is the inspect control; vitals, AP and weapon read at a glance.
+      const shortClass = [details.class_id || details.class || entity.class_id ? panelIdentifierLabel(details.class_id || details.class || entity.class_id) : '',
+        Number.isFinite(details.level ?? entity.level) ? `L${details.level ?? entity.level}` : ''].filter(Boolean).join(' · ');
+      const cardFace = `${actorTokenMarkup(participant.id, details.name)}<span class="sq-main"><span class="sq-name"><strong>${escapeHtml(details.name || participant.id)}</strong>` +
+        (shortClass ? `<small>${escapeHtml(shortClass)}</small>` : '') + '</span>' +
+        `<span class="sq-bars">${suiteBar(entity.hp, entity.max_hp, 'hp', 'HP') || (Number.isFinite(entity.hp) ? `<span class="sq-num">HP <b>${escapeHtml(entity.hp)}</b></span>` : '')}` +
+        `${suitePips(entity.ap, entity.max_ap)}${Number.isFinite(entity.ap) && !suitePips(entity.ap, entity.max_ap) ? `<span class="sq-num">AP <b>${escapeHtml(entity.ap)}</b></span>` : ''}</span>` +
+        suiteWeaponLine(entity.weapon) + '</span>';
+      const selectFace = inspectableCharacters().some((item) => item.id === participant.id)
+        ? `<button type="button" class="squad-card-face" ` +
+          `data-party-select-actor="${escapeHtml(participant.id)}" aria-pressed="${selectedOnMap}" aria-label="${selectedOnMap ? 'Inspecting' : 'Inspect'} ${escapeHtml(details.name || participant.id)}">` +
+          `${cardFace}</button>` : `<div class="squad-card-face">${cardFace}</div>`;
+      void selectActor;
+      const markup = `<div class="panel-unit squad-card${selectedOnMap ? ' character-inspected' : ''}${acting === participant.id ? ' roster-acting' : ''}" data-panel-entity="${escapeHtml(participant.id)}">` +
+        `<div class="panel-unit-heading">${selectFace}` +
+        (role ? `<span class="panel-unit-role">${escapeHtml(panelIdentifierLabel(role))}</span>` : '') +
+        (acting === participant.id ? '<span class="panel-tag" data-tone="ally">Acting</span>' : '') + `</div>` +
         `<div class="roster-vitals">${hpPanelMarkup(entity)}${personalResourceMarkup(entity)}</div>` +
         droneStatusMarkup(entity, (id) => participants.find((member) => member.id === id)?.data?.name ||
           entities[id]?.name || mapBodyForActor(id)?.display?.label || displayIdentifier(id)) + conditionPanelMarkup(entity) +
@@ -5016,8 +5502,22 @@ const SylviaGMFrontend = (() => {
       return { markup, drone: mapBodyForActor(participant.id)?.display?.kind === 'drone' };
     });
     const drones = cards.filter((card) => card.drone);
-    return cards.filter((card) => !card.drone).map((card) => card.markup).join('') +
-      (drones.length ? `<div class="roster-group-label">Drones</div>${drones.map((card) => card.markup).join('')}` : '');
+    // Contacts: projected opposing bodies this roster already carries, read-only (no control or inspection).
+    const contacts = Object.entries(entities).filter(([id, entity]) => entity && typeof entity === 'object' &&
+      !participants.some((member) => member.id === id) && !controlledActorIds?.has(id) &&
+      entityTone(id, mapBodyForActor(id)?.display || { side: entity.side }) === 'hostile')
+      .map(([id, entity]) => {
+        const name = entity.name || mapBodyForActor(id)?.display?.label || displayIdentifier(id);
+        return `<div class="squad-card squad-contact${entity.downed ? ' down' : ''}" data-contact-entity="${escapeHtml(id)}">` +
+          `<span class="panel-actor-token" data-tone="hostile" aria-hidden="true">${escapeHtml(actorInitials(name))}</span>` +
+          `<span class="sq-main"><span class="sq-name"><strong>${escapeHtml(name)}</strong>` +
+          `${entity.class_id ? `<small>${escapeHtml(panelIdentifierLabel(entity.class_id))}</small>` : ''}</span>` +
+          `<span class="sq-bars">${suiteBar(entity.hp, entity.max_hp, 'hostile', 'HP') ||
+            (Number.isFinite(entity.hp) ? `<span class="sq-num">HP <b>${escapeHtml(entity.hp)}</b></span>` : '')}</span></span></div>`;
+      });
+    return `<div class="squad-list">` + cards.filter((card) => !card.drone).map((card) => card.markup).join('') +
+      (drones.length ? `<div class="roster-group-label">Drones</div>${drones.map((card) => card.markup.replace('class="panel-unit squad-card', 'class="panel-unit squad-card squad-drone')).join('')}` : '') +
+      (contacts.length ? `<div class="roster-group-label">Contacts</div>${contacts.join('')}` : '') + '</div>';
   }
 
   // Resource values come from committed state; an absent maximum never becomes a guessed bar.
@@ -5062,7 +5562,13 @@ const SylviaGMFrontend = (() => {
       state.panelActionChecks.get(panelActionCheckKey(surface, action, actorId))?.available === false);
     const ready = handling.filter((action) => !refused(action));
     const unavailable = handling.filter(refused);
-    return `<div class="character-action-groups" data-panel-id="${escapeHtml(surface.id)}">` +
+    const plan = weaponReloadPlan(surface.data?.entities?.[actorId]?.weapon, surface.actions);
+    // One Reload queues the declared steps this weapon needs; the individual actions stay available below.
+    const reload = sequenceModeActive() && (plan.steps.length || plan.summary) ? `<div class="weapon-reload">` +
+      `<button type="button" class="btn btn-primary btn-sm" data-weapon-reload="${escapeHtml(actorId)}" ` +
+      `${plan.steps.length && !state.panelCommitPending ? '' : 'disabled'}>Reload</button>` +
+      `<span class="weapon-reload-plan">${escapeHtml(plan.steps.length ? `Queues ${plan.summary}` : plan.summary)}</span></div>` : '';
+    return `<div class="character-action-groups" data-panel-id="${escapeHtml(surface.id)}">` + reload +
       (posture.length ? `<div class="character-posture"><span>Posture</span><div class="ruleset-panel-actions posture-switch" role="group" aria-label="Posture">${buttons(posture)}</div></div>` : '') +
       (ready.length ? `<div class="character-ready-actions"><span>${equipmentOnly ? 'Equipment actions' : 'Actions'}</span><div class="ruleset-panel-actions">${buttons(ready)}</div></div>` : '') +
       (unavailable.length ? `<details class="character-handling" data-character-stat="${escapeHtml(JSON.stringify([actorId, 'handling']))}"><summary>${unavailable.length} unavailable now</summary><div class="ruleset-panel-actions">${buttons(unavailable)}</div></details>` : '') + '</div>';
@@ -5102,6 +5608,7 @@ const SylviaGMFrontend = (() => {
       return entries.length ? `<details class="character-stat-group" data-character-stat="${escapeHtml(JSON.stringify([actorId, field]))}"><summary>${escapeHtml(panelIdentifierLabel(field))}</summary>` +
         entries.map(([name, value]) => `<span>${escapeHtml(panelIdentifierLabel(name))} <b>${value}</b></span>`).join('') + '</details>' : '';
     }).join('');
+    if (!compact) return operatorMarkup(surface, actorId, { participant, entity, name, details, level, values });
     return `<div class="${compact ? 'character-expanded-details' : 'character-hero'}" data-character-details="${escapeHtml(actorId)}"${compact ? '' : ` ${participant ? 'data-panel-entity' : 'data-character-entity'}="${escapeHtml(actorId)}"`}>` +
       (compact ? (description ? `<p class="character-description">${description}</p>` : '') : `<div class="character-identity">${actorTokenMarkup(actorId, name)}` +
       `<div><small>Inspecting</small><h3><strong>${escapeHtml(name)}</strong></h3>${description ? `<span class="character-description">${description}</span>` : ''}` +
@@ -5111,11 +5618,196 @@ const SylviaGMFrontend = (() => {
       (!compact && weaponCardMarkup(entity) ? `<div class="character-loadout"><strong>Ready weapon</strong>${weaponCardMarkup(entity)}`
         : `<div class="character-loadout"><strong>Ready equipment</strong>${weaponReadinessMarkup(entity || {})}` +
           (entity?.weapon?.id ? `<h4>${escapeHtml(panelIdentifierLabel(entity.weapon.id))}</h4>` : '')) +
-      (entity?.weapon_sets ? `<div>${escapeHtml(panelIdentifierLabel(entity.weapon_sets.active_set || ''))}: ` +
-        `${escapeHtml([entity.weapon_sets[entity.weapon_sets.active_set]?.main_hand, entity.weapon_sets[entity.weapon_sets.active_set]?.off_hand].filter(Boolean).map(panelIdentifierLabel).join(' / '))}</div>` : '') +
+      weaponSetMarkup(entity?.weapon_sets) +
       (!compact && entity?.resources ? `<div class="character-resources">${Object.entries(entity.resources).map(([key,value]) =>
         `<span>${escapeHtml(panelIdentifierLabel(key))}<b>${escapeHtml(value)}</b></span>`).join('')}</div>` : '') +
       '</div>' + (compact ? '' : characterActionMarkup(surface, actorId)) + actionReadinessMarkup(entity || {}, actorId) + '</div>' + (!participant ? '<p class="panel-unit-meta">Full character details are unavailable. These are the selected character’s current combat stats.</p>' : '') + values;
+  }
+
+  // Operator (accepted suite): a portrait plate with vitals and posture beside it, then the ready weapon with its
+  // rig, readouts, one Reload and the granular handling steps. Only projected values and declared actions appear;
+  // no portrait is projected, so the plate shows the initials fallback the suite specifies.
+  // The first map surface and its declared, actor-bound cast actions.
+  function mapCastActions() {
+    const map = (state.panelProjection?.surfaces || []).find((item) => ['tactical_grid', 'coordinate_map'].includes(item.renderer));
+    return { map, casts: (map?.actions || []).filter((action) => action.intent === 'cast_spell' && actionBindsActor(action)) };
+  }
+
+  // Caster sheet for an actor without a carried firearm when the map declares cast actions. Every number shown is a
+  // projected value and every label is the projected label or one derived from its projected key; no ruleset
+  // arithmetic, unit, attribute list or level naming is assumed here.
+  // A package-declared, catalogue-derived category per spell (for example `fire_bolt: evocation`). The owning
+  // surface's map is preferred; any other surface projecting the same map is the fallback. Absent entries show nothing.
+  function projectedSpellCategories(surface) {
+    const isMap = (value) => value && typeof value === 'object' && !Array.isArray(value);
+    if (isMap(surface?.data?.spell_categories)) return surface.data.spell_categories;
+    const other = (state.panelProjection?.surfaces || []).find((item) => isMap(item?.data?.spell_categories));
+    return other ? other.data.spell_categories : {};
+  }
+
+  function grimoireMarkup(surface, actorId, { participant, entity, name, details, values }) {
+    const { map, casts } = mapCastActions();
+    const categories = projectedSpellCategories(surface);
+    const word = (value) => String(panelIdentifierLabel(value || '')).replace(/\b\w/g, (letter) => letter.toUpperCase());
+    const initials = (key) => word(key).split(/\s+/).map((part) => part.charAt(0)).join('');
+    const classes = Array.isArray(details.classes) ? details.classes.map((item) => `${word(item.id)}${Number.isFinite(item.level) ? ` ${item.level}` : ''}`).join(' / ') : '';
+    const lineage = [details.species, details.background].filter((item) => typeof item === 'string' && item).map(word).join(' ');
+    const fraction = Number.isFinite(entity.hp) && Number.isFinite(entity.max_hp) && entity.max_hp > 0 ? Math.max(0, Math.min(1, entity.hp / entity.max_hp)) : null;
+    const flask = Number.isFinite(entity.hp) ? `<span class="grim-flask" title="${escapeHtml(word('hp'))}"><svg viewBox="0 0 30 40" aria-hidden="true"><defs><clipPath id="flask-${escapeHtml(actorId)}">` +
+      `<path d="M11 2h8v9c6 3 9 8 9 14a13 13 0 0 1-26 0c0-6 3-11 9-14z"/></clipPath></defs><path class="fl-glass" d="M11 2h8v9c6 3 9 8 9 14a13 13 0 0 1-26 0c0-6 3-11 9-14z"/>` +
+      (fraction === null ? '' : `<rect class="fl-liquid" clip-path="url(#flask-${escapeHtml(actorId)})" x="0" y="${(39 - 28 * fraction).toFixed(1)}" width="30" height="40"/>`) +
+      `</svg><b>${escapeHtml(entity.hp)}${Number.isFinite(entity.max_hp) ? `<small>/${escapeHtml(entity.max_hp)}</small>` : ''}</b><small>HP</small></span>` : '';
+    const shield = Number.isFinite(entity.armor_class) ? `<span class="grim-shield" title="${escapeHtml(word('armor_class'))}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v6c0 5-3 8-7 9-4-1-7-4-7-9V6z"/></svg>` +
+      `<b>${escapeHtml(entity.armor_class)}</b><small>${escapeHtml(initials('armor_class'))}</small></span>` : '';
+    // The distance unit is the map's own projected grid unit; without one the value stands alone.
+    const unit = map?.data?.map?.grid?.unit;
+    const speedValue = entity.speed ?? details.speed;
+    const speed = Number.isFinite(speedValue) ? `<span class="grim-speed"><b>${escapeHtml(speedValue)}</b><small>${escapeHtml([unit, word('speed')].filter(Boolean).join(' · '))}</small></span>` : '';
+    // Numbered resource families (key_1 … key_n) read as one ribbon labelled from their shared projected key.
+    const families = new Map();
+    for (const [key, value] of Object.entries(entity.resources || {})) {
+      const match = /^(.+?)_(\d+)$/.exec(key);
+      if (!match || !Number.isInteger(value)) continue;
+      if (!families.has(match[1])) families.set(match[1], []);
+      families.get(match[1]).push([Number(match[2]), value, key]);
+    }
+    families.forEach((items) => items.sort((a, b) => a[0] - b[0]));
+    const familyKeys = new Set(Array.from(families.values()).flat().map((item) => item[2]));
+    const resourceCost = (resource) => {
+      const count = entity.resources?.[resource];
+      if (!resource) return '';
+      return Number.isInteger(count) ? `<span class="grim-crystals">${'<i class="on"></i>'.repeat(Math.max(0, Math.min(count, 6)))}</span><small>${escapeHtml(count)} left</small>` : '';
+    };
+    const spellCard = (action) => {
+      const resource = action.params?.slot_resource;
+      const available = panelActionAvailable(map, action, actorId);
+      const label = action.label || panelIdentifierLabel(action.id);
+      const category = typeof categories[action.params?.spell] === 'string' ? categories[action.params.spell].trim() : '';
+      const subline = [category ? word(category) : '', resource ? word(resource) : ''].filter(Boolean).join(' · ');
+      return `<button type="button" class="grim-spell${available ? '' : ' is-off'}" data-grimoire-cast="${escapeHtml(action.id)}" data-grimoire-map="${escapeHtml(map.id)}" ` +
+        (category ? `data-spell-category="${escapeHtml(category)}" ` : '') +
+        `aria-label="Ready ${escapeHtml(label)}: choose a target on ${escapeHtml(map.title || 'the map')}" ${available ? '' : 'aria-disabled="true"'}>${suiteIcon(suiteActionIcon(action) || 'burstarea')}` +
+        `<span class="grim-spell-main"><b>${escapeHtml(label)}</b>${subline ? `<small>${escapeHtml(subline)}</small>` : ''}</span>` +
+        `<span class="grim-spell-cost">${resourceCost(resource)}</span></button>`;
+    };
+    // Projected scores as projected, in projected order; membership in a projected proficiency list is highlighted.
+    const abilities = details.abilities && typeof details.abilities === 'object' ? Object.entries(details.abilities).filter(([, score]) => Number.isFinite(score)) : [];
+    const savesKey = 'saving_throw_proficiencies';
+    const saves = Array.isArray(details[savesKey]) ? details[savesKey] : [];
+    const otherResources = Object.entries(entity.resources || {}).filter(([key]) => !familyKeys.has(key));
+    return `<div class="character-hero grimoire" data-character-details="${escapeHtml(actorId)}" ${participant ? 'data-panel-entity' : 'data-character-entity'}="${escapeHtml(actorId)}">` +
+      `<header class="grim-head"><div class="grim-plinth" role="img" aria-label="${escapeHtml(name)}: initials (no portrait projected)"><b>${escapeHtml(actorInitials(name))}</b><small>no portrait · initials</small></div>` +
+      `<div class="grim-id"><small class="op-kicker">Inspecting</small><h3><strong>${escapeHtml(name)}</strong></h3><p>${escapeHtml([lineage, classes].filter(Boolean).join(' · '))}</p>` +
+      `<div class="grim-vitals">${flask}${shield}${speed}</div></div></header>` + conditionPanelMarkup(entity) +
+      `<section class="grim-book"><span class="grim-sec">Prepared · choose, then target on the ${escapeHtml(map.title || 'map')}</span>${casts.map(spellCard).join('')}</section>` +
+      Array.from(families, ([prefix, items]) => `<section class="grim-slots" aria-label="${escapeHtml(word(prefix))}"><span class="grim-sec">${escapeHtml(word(prefix))}</span>` +
+        `<div class="grim-ribbon">${items.map(([number, value, key]) => `<span class="grim-tier" title="${escapeHtml(word(key))}: ${escapeHtml(value)}"><small>${escapeHtml(number)}</small>` +
+        `${'<i class="on"></i>'.repeat(Math.min(value, 6))}${value === 0 ? '<em>0</em>' : ''}</span>`).join('')}</div></section>`).join('') +
+      (abilities.length ? `<div class="grim-runes" role="list" aria-label="${escapeHtml(word('abilities'))}">${abilities.map(([key, score]) =>
+        `<span role="listitem" class="grim-rune${saves.includes(key) ? ' save' : ''}" title="${escapeHtml(word(key))} ${escapeHtml(score)}${saves.includes(key) ? ` · ${escapeHtml(word(savesKey))}` : ''}">` +
+        `<small>${escapeHtml(String(key).slice(0, 3).toUpperCase())}</small><b>${escapeHtml(score)}</b></span>`).join('')}</div>` : '') +
+      `<div class="character-loadout grim-gear">${weaponSetMarkup(entity?.weapon_sets)}</div>` +
+      (otherResources.length ? `<div class="character-resources">${otherResources.map(([key, value]) => `<span>${escapeHtml(panelIdentifierLabel(key))}<b>${escapeHtml(value)}</b></span>`).join('')}</div>` : '') +
+      characterActionMarkup(surface, actorId) + actionReadinessMarkup(entity || {}, actorId) +
+      (!participant ? '<p class="panel-unit-meta">Full character details are unavailable. These are the selected character’s current combat stats.</p>' : '') + values + '</div>';
+  }
+
+  function operatorMarkup(surface, actorId, { participant, entity, name, details, level, values }) {
+    // The caster sheet is chosen only from declared map actions, never from which stat fields an entity happens to carry.
+    if (!(entity.weapon && typeof entity.weapon === 'object') && mapCastActions().casts.length)
+      return grimoireMarkup(surface, actorId, { participant, entity, name, details, values });
+    const classId = details.class_id || details.class || entity.class_id;
+    const actions = (surface.actions || []).filter(actionBindsActor);
+    const refused = (action) => action.available === false || (action.checks_required &&
+      state.panelActionChecks.get(panelActionCheckKey(surface, action, actorId))?.available === false);
+    const button = (action, cls, label = action.label || action.id) =>
+      `<button type="button" class="${cls} ruleset-panel-action" data-panel-action-id="${escapeHtml(action.id)}" ` +
+      `data-panel-actor-id="${escapeHtml(actorId)}" ` +
+      `${action.params?.stance != null && action.params.stance === entity.stance ? 'aria-current="true" ' : ''}` +
+      `${panelActionAvailable(surface, action, actorId) ? '' : 'disabled'}>${suiteIcon(suiteActionIcon(action))}` +
+      `<span>${escapeHtml(label)}</span></button>`;
+    const posture = actions.filter((action) => action.intent === 'set_stance' || action.id.startsWith('stance-'));
+    const handling = actions.filter((action) => !posture.includes(action));
+    const weaponStep = (action) => ['cycle_weapon', 'reload_weapon', 'recover_recoil', 'load_shell'].includes(action.intent) ||
+      ['cycle', 'reload', 'drop', 'recoil', 'shell'].includes(suiteActionIcon(action));
+    const weapon = entity.weapon && typeof entity.weapon === 'object' ? entity.weapon : null;
+    const manip = weapon ? handling.filter(weaponStep) : [];
+    const other = handling.filter((action) => !manip.includes(action));
+    const otherReady = other.filter((action) => !refused(action));
+    const otherRefused = other.filter(refused);
+    const opSwitch = (() => {
+      const choices = inspectableCharacters().filter((item) => playerControlsActor(item.id));
+      if (choices.length < 2) return '';
+      return `<nav class="op-switch" aria-label="Operator">${choices.map((item) =>
+        `<button type="button" class="op-pick${item.id === actorId ? ' on' : ''}" data-operator-pick="${escapeHtml(item.id)}" ` +
+        `aria-pressed="${item.id === actorId}" aria-label="Show ${escapeHtml(item.name)} in ${escapeHtml(surface.title || 'Character')}">` +
+        `${actorTokenMarkup(item.id, item.name)}<span>${escapeHtml(item.name)}</span></button>`).join('')}</nav>`;
+    })();
+    const chevrons = [classId ? panelIdentifierLabel(classId) : '', Number.isFinite(level) ? `L${level}` : ''].filter(Boolean);
+    const description = [classId, Number.isFinite(level) ? `Level ${level}` : ''].filter(Boolean).map((value) => escapeHtml(panelIdentifierLabel(value))).join(' · ');
+    const hero = `<section class="op-hero"><div class="op-art no-art" role="img" aria-label="${escapeHtml(name)}: initials (no portrait projected)">` +
+      `<div class="op-monogram"><b>${escapeHtml(actorInitials(name))}</b><span>No portrait · initials</span></div>` +
+      (chevrons.length ? `<div class="op-chevrons">${chevrons.map((text) => `<span>${escapeHtml(text)}</span>`).join('')}</div>` : '') + '</div>' +
+      `<div class="op-stats"><small class="op-kicker">Inspecting</small><h3><strong>${escapeHtml(name)}</strong></h3>` +
+      (details.party_role ? `<span class="panel-unit-role">${escapeHtml(panelIdentifierLabel(details.party_role))}</span>` : '') +
+      (description ? `<span class="character-description op-kicker">${description}</span>` : '') +
+      `<div class="character-vitals" aria-hidden="true">${suiteStatRow('HP', entity, 'hp', 'hp')}${suiteStatRow('RES', entity, 'res', 'res')}${suiteStatRow('AP', entity, 'ap', 'ap')}</div>` +
+      `<div class="op-kicker">${hpPanelMarkup(entity)}${personalResourceMarkup(entity)}</div>` +
+      (posture.length ? `<div class="op-stances posture-switch" role="group" aria-label="Posture">${posture.map((action) =>
+        button(action, 'op-stance', String(action.label || action.id).replace(/^Go\s+/i, '').replace(/^\w/, (letter) => letter.toUpperCase()))).join('')}</div>` : '') +
+      '</div></section>';
+    let weaponSection = '';
+    if (weapon) {
+      const chamber = typeof weapon.chamber === 'string' ? weapon.chamber.toLowerCase() : '';
+      const rounds = weapon.magazine?.rounds;
+      const capacity = weapon.feed === 'TUBE' ? weapon.tube_capacity : weapon.magazine?.capacity;
+      const spares = Array.isArray(weapon.spare_magazines) ? weapon.spare_magazines.filter((item) => Number.isFinite(item?.rounds)) : [];
+      const retained = Array.isArray(weapon.retained_magazines) ? weapon.retained_magazines : null;
+      const phase = weapon.needs_cycle === true && weapon.chamber === 'SPENT' ? 'Spent case chambered · cycle before firing'
+        : weapon.needs_cycle === true ? 'Chamber empty · cycle to feed a round'
+          : weapon.chamber === 'EMPTY' ? 'Chamber empty' : weapon.chamber === 'SPENT' ? 'Spent case chambered' : 'Ready';
+      const cell = (label, value) => value == null || value === '' ? '' : `<span><small>${label}</small><b>${value}</b></span>`;
+      const readouts = [
+        cell(weapon.feed === 'TUBE' ? 'Tube' : 'Mag', Number.isFinite(rounds) ? `${escapeHtml(rounds)}${Number.isFinite(capacity) ? `<i>/${escapeHtml(capacity)}</i>` : ''}` : null),
+        cell('Spares', weapon.feed === 'TUBE' ? (Number.isFinite(weapon.spare_shells) ? `${escapeHtml(weapon.spare_shells)}<i> sh</i>` : null)
+          : Array.isArray(weapon.spare_magazines) ? escapeHtml(spares.length) : null),
+        cell('Retained', retained ? escapeHtml(retained.length) : null),
+        cell('Recoil', Number.isFinite(weapon.current_recoil) ? escapeHtml(weapon.current_recoil) : null),
+        cell('Dmg · Pen', Number.isFinite(weapon.damage) ? `${escapeHtml(weapon.damage)}${Number.isFinite(weapon.material_pen) ? `<i> · ${escapeHtml(weapon.material_pen)}${Number.isFinite(weapon.target_pen) ? `/${escapeHtml(weapon.target_pen)}` : ''}</i>` : ''}` : null),
+      ].filter(Boolean).join('');
+      const facts = [Array.isArray(weapon.fire_modes) && weapon.fire_modes.length ? weapon.fire_modes.map((mode) => displayIdentifier(String(mode))).join(' · ') : '',
+        Array.isArray(weapon.range_breakpoints_m) && weapon.range_breakpoints_m.length ? `Range ${weapon.range_breakpoints_m.join(' / ')} m` : '',
+        Number.isFinite(weapon.reload_ap) ? `Base reload ${weapon.reload_ap} AP` : '',
+        Number.isFinite(weapon.cycle_ap) && weapon.cycle_ap > 0 ? `Cycle ${weapon.cycle_ap} AP` : ''].filter(Boolean);
+      const plan = weaponReloadPlan(weapon, surface.actions);
+      const reload = sequenceModeActive() && (plan.steps.length || plan.summary) ? `<div class="op-reload weapon-reload" role="group" aria-label="Reload sequence">` +
+        `<button type="button" class="suite-act op-reload-btn" data-weapon-reload="${escapeHtml(actorId)}" ` +
+        `${plan.steps.length && !state.panelCommitPending ? '' : 'disabled'}>${suiteIcon('reload')}<span>Reload</span></button>` +
+        `<p class="op-reload-plan"><small>Sequence</small><span class="weapon-reload-plan">${escapeHtml(plan.steps.length ? `Queues ${plan.summary}` : plan.summary)}</span></p></div>` : '';
+      weaponSection = `<section class="op-weapon character-loadout" data-rig-owner="${escapeHtml(actorId)}">` +
+        `<header class="op-weapon-head"><strong>${escapeHtml(panelIdentifierLabel(weapon.label || weapon.id || 'Weapon'))}</strong>` +
+        (weapon.mechanism ? `<span class="suite-tag">${weapon.mechanism === 'SELF_LOADING' ? 'Self-loading' : 'Manual action'}</span>` : '') +
+        (weapon.feed ? `<span class="suite-tag">${weapon.feed === 'TUBE' ? 'Tube feed' : weapon.feed === 'BELT' ? 'Belt' : 'Detachable mag'}</span>` : '') +
+        (chamber ? `<span class="op-chamber" data-chamber="${escapeHtml(chamber)}" title="Chamber state (authoritative)">● ${chamber === 'live' ? 'Live round' : chamber === 'spent' ? 'Spent case' : panelIdentifierLabel(chamber)}</span>` : '') +
+        `</header><div class="op-rig-stage" data-rig-stage="${escapeHtml(actorId)}">${weaponRigMarkup(weapon)}</div>` +
+        `<div class="op-rig-phase" data-rig-phase="${escapeHtml(actorId)}" aria-live="polite">${phase === 'Ready' ? 'Ready' : `<span class="warn">${escapeHtml(phase)}</span>`}</div>` +
+        (readouts ? `<div class="op-readouts">${readouts}</div>` : '') +
+        (facts.length ? `<div class="op-weapon-facts">${facts.map((fact) => `<span>${escapeHtml(fact)}</span>`).join('')}</div>` : '') +
+        reload + (manip.length ? `<div class="op-manip" role="group" aria-label="Weapon handling · individual steps" data-panel-id="${escapeHtml(surface.id)}">` +
+          manip.map((action) => button(action, 'suite-act')).join('') + '</div>' : '') + '</section>';
+    } else {
+      weaponSection = `<div class="character-loadout"><strong>Ready equipment</strong>${weaponReadinessMarkup(entity || {})}</div>`;
+    }
+    const resources = entity?.resources ? `<div class="character-resources">${Object.entries(entity.resources).map(([key, value]) =>
+      `<span>${escapeHtml(panelIdentifierLabel(key))}<b>${escapeHtml(value)}</b></span>`).join('')}</div>` : '';
+    return `<div class="character-hero operator" data-character-details="${escapeHtml(actorId)}" ${participant ? 'data-panel-entity' : 'data-character-entity'}="${escapeHtml(actorId)}">` +
+      opSwitch + hero + conditionPanelMarkup(entity) + weaponSection + weaponSetMarkup(entity?.weapon_sets) + resources +
+      (otherReady.length || otherRefused.length ? `<div class="character-action-groups" data-panel-id="${escapeHtml(surface.id)}">` +
+        (otherReady.length ? `<div class="character-ready-actions"><span>Actions</span><div class="ruleset-panel-actions op-actions">${otherReady.map((action) => button(action, 'suite-act')).join('')}</div></div>` : '') +
+        (otherRefused.length ? `<details class="character-handling" data-character-stat="${escapeHtml(JSON.stringify([actorId, 'handling']))}"><summary>${otherRefused.length} unavailable now</summary><div class="ruleset-panel-actions">${otherRefused.map((action) => button(action, 'suite-act')).join('')}</div></details>` : '') + '</div>' : '') +
+      actionReadinessMarkup(entity || {}, actorId) +
+      (!participant ? '<p class="panel-unit-meta">Full character details are unavailable. These are the selected character’s current combat stats.</p>' : '') +
+      values + '</div>';
   }
 
   function renderEncounterPanel(data) {
@@ -5133,18 +5825,40 @@ const SylviaGMFrontend = (() => {
     const orderedIds = [...new Set((turnOrderIds.length ? turnOrderIds : [
       combat.order_first, combat.order_second, combat.current_actor
     ]).filter(Boolean))];
-    const header = `<div class="panel-unit-meta">Round ${escapeHtml(combat.round || 1)} · ` +
-      `Current: ${escapeHtml(names[combat.current_actor] || combat.current_actor || '—')}</div>`;
-    const units = orderedIds.map((id, index) => {
+    const header = `<div class="ladder-head"><div class="ladder-seal" aria-hidden="true"><small>Round</small><b>${escapeHtml(combat.round || 1)}</b></div>` +
+      `<div class="panel-unit-meta">Round ${escapeHtml(combat.round || 1)} · ` +
+      `Current: ${escapeHtml(names[combat.current_actor] || combat.current_actor || '—')}</div></div>`;
+    const place = (id) => orderedIds.indexOf(id) + 1;
+    // A package-declared map of each actor's recorded turn-order value; an actor without one shows only its place.
+    const orderValues = data && data.order_values && typeof data.order_values === 'object' ? data.order_values : {};
+    const orderValue = (id) => Number.isFinite(orderValues[id]) ? orderValues[id] : null;
+    const current = orderedIds.indexOf(combat.current_actor);
+    const rotated = current < 0 ? orderedIds : [...orderedIds.slice(current), ...orderedIds.slice(0, current)];
+    const units = rotated.map((id, index) => {
       const entity = entities[id] || {};
-      const active = id === combat.current_actor ? ' · Current turn' : '';
-      return `<div class="panel-unit${active ? ' turn-current' : ''}" data-panel-entity="${escapeHtml(id)}">` +
-        `<div class="panel-unit-heading"><span class="turn-order" aria-hidden="true">${index + 1}</span>` +
-        `${actorTokenMarkup(id, names[id])}<strong>${escapeHtml(names[id] || id)}</strong>` +
-        `<span class="panel-unit-role">${escapeHtml(entity.creature_kind || 'creature')}${active}</span></div>` +
-        hpPanelMarkup(entity) + personalResourceMarkup(entity) + conditionPanelMarkup(entity) + `</div>`;
-    }).join('');
-    return header + units;
+      const now = id === combat.current_actor;
+      const participant = participants.find((entry) => entry.id === id)?.data || {};
+      const classes = Array.isArray(participant.classes) ? participant.classes.map((item) =>
+        `${String(panelIdentifierLabel(item.id || '')).replace(/\b\w/g, (letter) => letter.toUpperCase())}${Number.isFinite(item.level) ? ` ${item.level}` : ''}`).join(' / ') : '';
+      const vitals = [Number.isFinite(entity.armor_class) ? `AC ${entity.armor_class}` : '',
+        Number.isFinite(entity.hp) ? `${entity.hp}${Number.isFinite(entity.max_hp) ? `/${entity.max_hp}` : ''} HP` : '',
+        orderValue(id) === null ? `Order ${place(id)}` : `Order ${place(id)} · value ${orderValue(id)}`].filter(Boolean);
+      const tone = entityTone(id);
+      const medal = suiteMedal(id, names[id], entity, now ? 64 : 34);
+      if (now) return `<section class="panel-unit ladder-now turn-current" data-panel-entity="${escapeHtml(id)}" data-tone="${tone}" aria-label="Acting now">` +
+        `${medal}<div class="ladder-now-text"><span class="ladder-now-tag">Acting now</span><strong>${escapeHtml(names[id] || id)}</strong>` +
+        `<span class="ladder-now-class">${escapeHtml(classes || panelIdentifierLabel(entity.creature_kind || 'creature'))} · Current turn</span>` +
+        (vitals.length ? `<span class="ladder-vitals">${vitals.map((item) => `<span>${escapeHtml(item)}</span>`).join('')}</span>` : '') +
+        conditionPanelMarkup(entity) + '</div></section>';
+      return `<div class="panel-unit ladder-rung${entity.is_alive === false ? ' down' : ''}" data-panel-entity="${escapeHtml(id)}" data-tone="${tone}">` +
+        (orderValue(id) === null ? `<span class="ladder-init" aria-label="Turn order ${place(id)}">${place(id)}</span>`
+          : `<span class="ladder-init has-value" data-order-value="${escapeHtml(orderValue(id))}" aria-label="Turn order ${place(id)}, order value ${escapeHtml(orderValue(id))}" ` +
+            `title="Turn order ${place(id)} · order value ${escapeHtml(orderValue(id))}">${escapeHtml(orderValue(id))}</span>`) + medal +
+        `<span class="ladder-name"><strong>${escapeHtml(names[id] || id)}</strong><small>${escapeHtml([Number.isFinite(entity.armor_class) ? `AC ${entity.armor_class}` : '',
+          Number.isFinite(entity.hp) ? `${entity.hp}${Number.isFinite(entity.max_hp) ? `/${entity.max_hp}` : ''} HP` : ''].filter(Boolean).join(' · ') ||
+          panelIdentifierLabel(entity.creature_kind || 'creature'))}</small></span><span class="ladder-in">in ${index}</span>` + conditionPanelMarkup(entity) + '</div>';
+    });
+    return `<div class="ladder">${header}${units[0] || ''}${units.length > 1 ? `<span class="ladder-sec">Up next</span><div class="ladder-list">${units.slice(1).join('')}</div>` : ''}</div>`;
   }
 
   function renderObjectivesPanel(data) {
@@ -5879,7 +6593,7 @@ const SylviaGMFrontend = (() => {
         `title="${escapeHtml(label)}${posture ? `, ${escapeHtml(posture)}` : ''}" ` +
         `aria-pressed="${actor || target}" style="${tacticalPositionStyle(
           item.position, dimensions, continuous ? null : undefined
-        )}${continuous ? coordinateBodyStyle(item, dimensions, view.zoom) : ''}"><span class="map-token-label" aria-hidden="true">${escapeHtml(actorInitials(label))}</span>` +
+        )}${continuous ? coordinateBodyStyle(item, dimensions, view.zoom) : ''}">${mapTokenDecorations(surface, item)}<span class="map-token-label" aria-hidden="true">${escapeHtml(actorInitials(label))}</span>` +
         `<span class="map-name-label" aria-hidden="true">${escapeHtml(label)}</span>` +
         (continuous && space?.status === 'unavailable' ?
           '<span class="coordinate-space-warning" aria-hidden="true">Space unknown</span>' : '') +
@@ -5940,22 +6654,24 @@ const SylviaGMFrontend = (() => {
         `<option value="${escapeHtml(entity.id)}" ${entity.id === selection.target ? 'selected' : ''}>` +
         `${escapeHtml(entityLabel(entity.id))}</option>`).join('') + '</select></label>';
 
-    return (surface ? selectedMapActorMarkup(surface, selection) : '') + mapStatusMarkup() +
+    const turnStrip = surface ? selectedMapActorMarkup(surface, selection) : '';
+    return ((turnStrip.includes('<!--map-turn-end-->') ? turnStrip.replace('<span class="map-turn-label">', mapStatusMarkup() + '<span class="map-turn-label">')
+      : turnStrip + mapStatusMarkup()) +
       `<div class="tactical-toolbar" role="toolbar" aria-label="Tactical map controls">` +
-      `<button type="button" class="btn btn-secondary btn-sm" data-tactical-zoom="out" ` +
+      `<span class="map-zoom-controls"><button type="button" class="btn btn-secondary btn-sm" data-tactical-zoom="out" ` +
       `aria-label="Zoom out">−</button><span class="map-zoom-level" aria-label="Map zoom">${Math.round(view.zoom * 100)}%</span>` +
       `<button type="button" class="btn btn-secondary btn-sm" data-tactical-zoom="in" ` +
-      `aria-label="Zoom in">+</button>` +
+      `aria-label="Zoom in">+</button></span>` +
       `<button type="button" class="btn btn-secondary btn-sm" data-tactical-center ` +
         `${selection.actor ? '' : 'disabled'} aria-label="Focus on ${escapeHtml(selection.actor ? entityLabel(selection.actor) : 'selected character')}">Focus</button>` +
       `<button type="button" class="btn btn-secondary btn-sm" data-tactical-cover-info ` +
       `aria-pressed="${Boolean(view.coverInfo)}">Cover info</button>` +
       `<button type="button" class="btn btn-secondary btn-sm map-offview" data-map-offview aria-expanded="${Boolean(view.overview)}" hidden></button>` +
-      (continuous ? '' : shotControlsMarkup()) +
+      (continuous ? '' : shotControlsMarkup()) + '<!--map-tools-->' +
       '</div>' +
       (usesZone || usesDevice ? `<div class="map-action-inputs">${zonePicker}${devicePicker}</div>` : '') +
       (selectedText ? `<div class="tactical-selection-summary" aria-live="polite">${escapeHtml('Target: ' + entityLabel(selection.target))}</div>` : '') +
-      `<div class="tactical-scroll" tabindex="0" ` +
+      `<div class="map-stage">${mapLegendMarkup(data, continuous)}<div class="tactical-scroll" tabindex="0" ` +
        `aria-label="${continuous ? 'Coordinate map; click to select a point, drag to pan' : 'Tactical grid; drag to pan, arrow keys move cell focus'}">` +
        tacticalOverviewMarkup(data, dimensions) +
        `<div class="tactical-world${continuous ? ' coordinate-world' : ''}${view.coverInfo ? ' show-cover-info' : ''}" ` +
@@ -5969,14 +6685,14 @@ const SylviaGMFrontend = (() => {
       `aria-hidden="true">${previewDetails.svg}</svg>` +
       `<svg class="tactical-shot-overlay" data-shot-overlay ` +
       `viewBox="0 0 ${dimensions.width * 32} ${dimensions.height * 32}" ` +
-      `aria-hidden="true"></svg></div></div>` +
-       `<details class="map-detail-controls map-choice-fallback"><summary>Map tools</summary><span class="map-revision">Saved map revision ${escapeHtml(data.map_revision)}</span>${secondaryChoices}` +
-      (continuous ? coordinatePointControls(data, selection) : '') + geometryInspection + tacticalZoneLegend(data.zones) +
-      (networkReturns ? `<div class="network-return-list">${networkReturns}</div>` : '') + '</details>' +
+      `aria-hidden="true"></svg></div></div></div>` +
       (continuous && !previewState.actions.length ? '' :
-        `<div class="tactical-preview" data-tactical-preview aria-live="polite">` +
+        `<div class="tactical-preview${previewState.action && selection.actor ? ' has-action' : ''}" data-tactical-preview aria-live="polite">` +
         (surface ? tacticalPreviewMarkup(surface, view) : 'No Ruleset map preview is available.') +
-        `</div>`);
+        `</div>`)).replace('<!--map-tools-->',
+       `<details class="map-detail-controls map-choice-fallback"><summary>Map tools</summary><div class="map-detail-body"><span class="map-revision">Saved map revision ${escapeHtml(data.map_revision)}</span>${secondaryChoices}` +
+      (continuous ? coordinatePointControls(data, selection) : '') + geometryInspection + tacticalZoneLegend(data.zones) +
+      (networkReturns ? `<div class="network-return-list">${networkReturns}</div>` : '') + '</div></details>');
   }
 
   // Occupied space uses the owner's declared diameter; physical clearance remains separate.
@@ -6814,8 +7530,12 @@ const SylviaGMFrontend = (() => {
       ? `<div class="ruleset-panel-header"><span class="ruleset-panel-icon">` +
         `${escapeHtml(surface.icon || '◆')}</span>${escapeHtml(surface.title || surface.id)}</div>`
       : '';
+    const hidden = gamePanels().snapshot?.()?.hidden || [];
+    const mapShown = (state.panelProjection?.surfaces || []).some((item) => ['tactical_grid', 'coordinate_map'].includes(item.renderer) &&
+      !hidden.includes(item.id));
     const footerActions = Array.isArray(surface.actions) ? surface.actions.filter(
       (action) => (!['party', 'unit_list', 'inventory'].includes(surface.renderer) || !actionBindsActor(action)) &&
+        !(mapShown && ['party', 'unit_list', 'encounter'].includes(surface.renderer) && /end.*turn/i.test(action.label || action.id)) &&
         !(surface.renderer === 'piece_table' && Object.values(action.bindings || {}).includes('piece'))
     ) : [];
     const mapSurface = ['tactical_grid', 'coordinate_map'].includes(surface.renderer);
@@ -6827,7 +7547,9 @@ const SylviaGMFrontend = (() => {
         .map((action) => `<span data-panel-id="${escapeHtml(owner.id)}"><button type="button" class="btn btn-secondary ruleset-panel-action map-end-turn" ` +
           `data-panel-action-id="${escapeHtml(action.id)}" ${panelActionAvailable(owner, action) ? '' : 'disabled'}>` +
           `${escapeHtml(action.label || action.id)}</button></span>`)).join('') : '';
-    const actions = shownActions.map((action) =>
+    const turnSlot = mapSurface && panelContent(surface).includes('<!--map-turn-end-->');
+    const endTurns = turnSlot ? shownActions.filter((action) => /end.*turn/i.test(action.label || action.id)) : [];
+    const actions = shownActions.filter((action) => !endTurns.includes(action)).map((action) =>
       `<button class="btn btn-secondary ruleset-panel-action${mapSurface ? ' map-end-turn' : ''}" type="button" ` +
       `data-panel-action-id="${escapeHtml(action.id || '')}" ${panelActionAvailable(surface, action) ? '' : 'disabled'}>` +
       `${escapeHtml(mapSurface ? mapActionLabel(surface, action) : action.label || action.id || 'Action')}</button>`).join('');
@@ -6840,8 +7562,10 @@ const SylviaGMFrontend = (() => {
     return `<section class="ruleset-panel ${surface.id === ACTION_QUEUE_PANEL_ID ? 'ruleset-queue-panel' : ''} ${['tactical_grid', 'coordinate_map'].includes(surface.renderer) ? 'ruleset-map-panel' : surface.renderer === 'party' ? 'ruleset-roster-panel' : surface.renderer === 'unit_list' ? 'ruleset-character-panel' : ''}" data-panel-id="${escapeHtml(surface.id)}" ` +
       `style="min-height:${minimum}px"><div>${header}` +
       `<div class="ruleset-panel-content" data-panel-size-id="${escapeHtml(surface.id)}" ` +
-      `style="height:${preferred}px;min-height:${minimum}px">${content}</div>` +
-      (mapSurface ? `<div class="map-command-deck"><div class="map-command-row">${mapActionPalette(surface)}${actions}${contextual}</div>${commit}</div>` :
+      `style="height:${preferred}px;min-height:${minimum}px">${mapSurface ? content.replace('<!--map-turn-end-->', contextual || endTurns.length
+        ? `<span class="map-turn-end">${contextual}${endTurns.map((action) => `<button class="btn btn-secondary ruleset-panel-action map-end-turn" type="button" ` +
+          `data-panel-action-id="${escapeHtml(action.id)}" ${panelActionAvailable(surface, action) ? '' : 'disabled'}>${escapeHtml(action.label || action.id)}</button>`).join('')}</span>` : '') : content}</div>` +
+      (mapSurface ? `<div class="map-command-deck"><div class="map-command-row">${mapActionPalette(surface)}${actions}${content.includes('<!--map-turn-end-->') ? '' : contextual}</div>${commit}</div>` :
         actions ? `<div class="ruleset-panel-actions contextual-action-bar" aria-label="Available actions">${actions}</div>` : '') +
       `</div></section>`;
   }
@@ -6949,12 +7673,14 @@ const SylviaGMFrontend = (() => {
         const patch = control.hasAttribute('data-shot-visual') ? { visual: control.value }
           : control.hasAttribute('data-shot-volume') ? { volume: Number(control.value) / 100 }
             : { muted: control.checked };
+        if (patch.visual && patch.visual !== 'motion') cancelRigRuns();
         void Promise.resolve(gamePanels().configureEffects(patch)).catch((error) => {
           setInlineStatus(friendlyCommandError('Effects settings could not be updated', error), 'panels');
         });
       }));
     container.querySelectorAll('[data-shot-skip]').forEach((button) => {
       button.addEventListener('click', () => {
+        cancelRigRuns();
         void Promise.resolve(gamePanels().skipEffects()).then(animateShots);
       });
     });
@@ -6972,6 +7698,24 @@ const SylviaGMFrontend = (() => {
         gamePanels().choose(surfaceId, { character: button.dataset.partySelectActor });
         renderRulesetPanelProjection(projection);
         container.querySelector(`[data-party-select-actor="${CSS.escape(button.dataset.partySelectActor)}"]`)?.focus({ preventScroll: true });
+      });
+    });
+    container.querySelectorAll('[data-grimoire-cast]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const surface = projection?.surfaces.find((item) => item.id === button.dataset.grimoireMap);
+        if (!surface) return;
+        const view = state.tacticalViews[surface.id] ||= { zoom: 1, scrollLeft: 0, scrollTop: 0, coverInfo: false, selectedGeometry: null, initialFocus: true };
+        view.previewActionId = button.dataset.grimoireCast;
+        renderRulesetPanelProjection(projection);
+        document.querySelector(`[data-panel-id="${CSS.escape(surface.id)}"] [data-tactical-action="${CSS.escape(button.dataset.grimoireCast)}"]`)?.focus({ preventScroll: true });
+      });
+    });
+    container.querySelectorAll('[data-operator-pick]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const surfaceId = button.closest('[data-panel-id]')?.dataset.panelId;
+        gamePanels().choose(surfaceId, { character: button.dataset.operatorPick });
+        renderRulesetPanelProjection(projection);
+        container.querySelector(`[data-operator-pick="${CSS.escape(button.dataset.operatorPick)}"]`)?.focus({ preventScroll: true });
       });
     });
     container.querySelectorAll('[data-character-action-panel]').forEach((button) => {
@@ -7057,6 +7801,9 @@ const SylviaGMFrontend = (() => {
         }
       });
     });
+    container.querySelectorAll('[data-weapon-reload]').forEach((button) => {
+      button.addEventListener('click', () => { void queueWeaponReload(button, projection); });
+    });
     wireTacticalGrid(container, projection, savedPreviewHeights);
     wireNetworkGraph(container, projection);
     void refreshPanelActionChecks(projection, container);
@@ -7079,6 +7826,7 @@ const SylviaGMFrontend = (() => {
           height });
       });
     });
+    playCommittedRigMotion(projection, container);
     // Let replacement maps paint before the shared audio and visual timeline starts.
     if (!gamePanels().presentEffects(projection, animateShots)) animateShots();
   }
@@ -7137,6 +7885,71 @@ const SylviaGMFrontend = (() => {
   function refreshQueuePresentation() {
     if (panelHost && state.panelProjection && !state.panelProjection.loading && !window.__sylviaPanelContext)
       renderRulesetPanelProjection(state.panelProjection);
+  }
+
+  // The step a queued entry stands for: same declared panel action, bound to the same actor.
+  function queuedStepFor(step, surface, action, actorId) {
+    if (!['pending', 'executing', 'awaiting_choice'].includes(step?.status) || step.source?.kind !== 'panel' ||
+        step.source.surface_id !== surface.id || step.source.action_id !== action.id) return false;
+    const bound = step.actor ?? step.selection?.[action.actor_parameter || 'actor'];
+    return bound === actorId;
+  }
+
+  // Queue the declared reload steps this actor's weapon needs, reading the owner's current queue first so a step
+  // that is already pending is never added twice (after a retry, an unknown reply, an edit or switching actors).
+  // All missing steps go in one owner compose request; the owner prices and checks them, and nothing is executed
+  // unless the declared response policy already runs it automatically.
+  async function queueWeaponReloadSteps(surfaceId, actorId, { current = () => true } = {}) {
+    const context = queueContext(current);
+    return inSequenceLane(context, async () => {
+      const surface = state.panelProjection?.surfaces.find((entry) => entry.id === surfaceId);
+      const plan = weaponReloadPlan(surface?.data?.entities?.[actorId]?.weapon, surface?.actions);
+      if (!surface || !plan.steps.length) return { queued: [], present: [], summary: plan.summary };
+      let queue = await readQueuedActions(context);
+      if (queue?.status === 'completed' || automaticQueueCommitted(queue)) queue = null;
+      const present = plan.steps.filter((action) => (queue?.steps || []).some((step) => queuedStepFor(step, surface, action, actorId)));
+      const missing = plan.steps.filter((action) => !present.includes(action));
+      const blocked = missing.find((action) => !panelActionAvailable(surface, action, actorId));
+      if (blocked) throw new Error(`${blocked.label || blocked.id} is unavailable now.`);
+      if (!missing.length) return { queued: [], present: present.map((action) => action.label || action.id), summary: plan.summary };
+      const steps = intendedSteps(queue);
+      missing.forEach((action) => steps.push({ step_id: `panel-${crypto.randomUUID()}`,
+        source: { kind: 'panel', surface_id: surface.id, action_id: action.id },
+        selection: JSON.parse(JSON.stringify(panelActionSelection(surface, action, actorId))) }));
+      queue = await composeQueuedActions(context, queue, steps);
+      if (queue?.steps.at(-1)?.response_policy === 'automatic') await executeQueuedActions(context, queue);
+      return { queued: missing.map((action) => action.label || action.id), present: present.map((action) => action.label || action.id),
+        summary: plan.summary };
+    });
+  }
+
+  // Reload click: one request in flight per session and actor; the owner queue decides what is already queued.
+  const weaponReloadsInFlight = new Set();
+  async function queueWeaponReload(button, projection) {
+    if (button.disabled || !sequenceModeActive() || !state.activeCampaignId || selectedSessionIsWorking()) return;
+    const panel = button.closest('[data-panel-id]');
+    const surfaceId = panel?.dataset.panelId, actorId = button.dataset.weaponReload;
+    const activity = selectedActivity();
+    const campaignId = state.activeCampaignId, sessionId = state.activeSessionId;
+    const key = JSON.stringify([campaignId, sessionId, surfaceId, actorId]);
+    if (!surfaceId || weaponReloadsInFlight.has(key)) return;
+    weaponReloadsInFlight.add(key);
+    button.disabled = true;
+    try {
+      const result = window.__sylviaPanelContext
+        ? await state.bridge.queue_weapon_reload({ campaign_id: campaignId, session_id: sessionId, surface_id: surfaceId, actor: actorId })
+        : await queueWeaponReloadSteps(surfaceId, actorId);
+      const text = result.queued.length && result.present.length
+        ? `Reload queued ${result.queued.join(' → ')}; ${result.present.join(' and ')} was already queued. Review and run the queue.`
+        : result.queued.length ? `Reload queued: ${result.queued.join(' → ')}. Review and run the queue.`
+          : result.present.length ? 'Reload is already queued for this character. Run or edit the queue.' : result.summary;
+      selectedStatus(activity, text, 'panels');
+    } catch (error) {
+      selectedStatus(activity, friendlyCommandError('Reload could not be queued', error), 'panels');
+    } finally {
+      weaponReloadsInFlight.delete(key);
+      if (selectedActivityMatches(activity)) await renderRulesetPanels(campaignId, true);
+    }
   }
 
   function sequenceModeActive() {

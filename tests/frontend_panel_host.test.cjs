@@ -310,13 +310,18 @@ test('inline tab grouping, edge splits, dimensions and hidden state persist thro
     windowId: 'sidebar', targetPanelId: 'party', position: 'tab' } });
   main.host.changed({ type: 'move', panelId: 'map', destination: {
     windowId: 'sidebar', targetPanelId: 'party', position: 'right' } });
-  const split = main.host.snapshot().sidebar;
+  // The edge split that now holds the map (the suite default nests it under the roster strip).
+  const holding = (tree) => tree?.kind !== 'split' ? null
+    : [tree.first, tree.second].some(child => child.kind === 'tabs' && child.panels.includes('map')) ? tree
+      : holding(tree.first) || holding(tree.second);
+  const split = holding(main.host.snapshot().sidebar);
   assert.equal(split.kind, 'split'); assert.equal(split.axis, 'row');
   main.host.changed({ type: 'ratio', nodeId: split.id, ratio: .65 });
   main.host.changed({ type: 'size', panelId: 'map', height: 620 });
   main.host.changed({ type: 'hide', panelId: 'inventory' });
   const saved = copy(main.host.snapshot());
-  assert.equal(saved.sidebar.ratio, .65); assert.equal(saved.panel_sizes.map, 620);
+  const savedSplit = (function find(tree) { return tree?.kind !== 'split' ? null : tree.id === split.id ? tree : find(tree.first) || find(tree.second); })(saved.sidebar);
+  assert.equal(savedSplit.ratio, .65); assert.equal(saved.panel_sizes.map, 620);
   assertInline(main, bus); main.host.leave(); await flush();
   const reopenedBus = transport(), reopened = renderer(reopenedBus, 'main', state(), storage);
   await reopened.host.init(); reopened.render(reopened.host.loading('td', 'gm'));
