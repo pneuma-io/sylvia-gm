@@ -7,10 +7,10 @@ import os
 import sqlite3
 import stat
 import uuid
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from enum import StrEnum
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Final
 
 from .identity import STORAGE_COMPATIBILITY
 from .manifest import (
@@ -34,6 +34,12 @@ from .storage import (
 class RestorePhase(StrEnum):
     RESTORING = "restoring"
     RESTORED = "restored"
+
+
+RESTORE_MOVES: Final[Mapping[RestorePhase, frozenset[RestorePhase]]] = {
+    RestorePhase.RESTORING: frozenset({RestorePhase.RESTORED}),
+    RestorePhase.RESTORED: frozenset(),
+}
 
 
 RESTORE_CONFIRMATION = "Restore pre-update data"
@@ -335,15 +341,19 @@ class DataCheckpoint:
                 return  # A duplicate request must never discard subsequent player progress.
         else:
             generation = uuid.uuid4().hex
-            row = {
-                "format_version": 1,
-                "phase": RestorePhase.RESTORING.value,
-                "generation": generation,
-                "before": {
-                    key: _record(_fingerprint(path)) if path.exists() or path.is_symlink() else None
-                    for key, path in paths.items()
-                },
-            }
+            row = {"format_version": 1}
+            _move_restore(row, RestorePhase.RESTORING)
+            row.update(
+                {
+                    "generation": generation,
+                    "before": {
+                        key: _record(_fingerprint(path))
+                        if path.exists() or path.is_symlink()
+                        else None
+                        for key, path in paths.items()
+                    },
+                }
+            )
             atomic_receipt(receipt, row)
         before = row["before"]
         assert isinstance(before, dict)
@@ -399,5 +409,10 @@ class DataCheckpoint:
             if not processes_exited() or target.exists() or target.is_symlink():
                 raise UpdateError("checkpoint_changed", "The intended restore location changed.")
             os.replace(temporary, target)
-        row["phase"] = RestorePhase.RESTORED.value
+        _move_restore(row, RestorePhase.RESTORED)
         atomic_receipt(receipt, row)
+
+
+def _move_restore(row: dict[str, object], new: RestorePhase) -> None:
+    """The sole phase write for this record; store its plain wire value."""
+    row["phase"] = new.value

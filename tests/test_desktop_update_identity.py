@@ -7,6 +7,9 @@ import sys
 from pathlib import Path
 
 from sylvia_gm import __version__
+from tests.desktop_update_move_checks import (
+    assert_desktop_update_moves as assert_desktop_update_moves,
+)
 
 
 def test_owner_identity_entry_returns_only_public_metadata_without_owner_startup(tmp_path):

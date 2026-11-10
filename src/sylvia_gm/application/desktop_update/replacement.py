@@ -7,9 +7,10 @@ import os
 import shutil
 import stat
 import uuid
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from enum import StrEnum
 from pathlib import Path
+from typing import Final
 
 from .manifest import (
     ARTIFACT_LIMIT,
@@ -31,6 +32,31 @@ class ReplacementPhase(StrEnum):
     ROLLING_BACK = "rolling_back"
     ROLLED_BACK = "rolled_back"
     CONFIRMED = "confirmed"
+
+
+REPLACEMENT_MOVES: Final[Mapping[ReplacementPhase, frozenset[ReplacementPhase]]] = {
+    ReplacementPhase.RETAINING: frozenset({ReplacementPhase.PREPARED}),
+    ReplacementPhase.PREPARED: frozenset(
+        {ReplacementPhase.APPLYING, ReplacementPhase.ROLLING_BACK}
+    ),
+    ReplacementPhase.APPLYING: frozenset(
+        {
+            ReplacementPhase.APPLYING,
+            ReplacementPhase.AWAITING_RESTART,
+            ReplacementPhase.ROLLING_BACK,
+        }
+    ),
+    ReplacementPhase.AWAITING_RESTART: frozenset(
+        {ReplacementPhase.APPLYING, ReplacementPhase.CONFIRMED, ReplacementPhase.ROLLING_BACK}
+    ),
+    ReplacementPhase.ROLLING_BACK: frozenset(
+        {ReplacementPhase.ROLLING_BACK, ReplacementPhase.ROLLED_BACK}
+    ),
+    ReplacementPhase.ROLLED_BACK: frozenset({ReplacementPhase.ROLLING_BACK}),
+    ReplacementPhase.CONFIRMED: frozenset(
+        {ReplacementPhase.CONFIRMED, ReplacementPhase.ROLLING_BACK}
+    ),
+}
 
 
 def file_matches(path: Path, row: PayloadFile) -> bool:
@@ -164,6 +190,9 @@ class PortableReplacement:
             raise UpdateError("unsafe_staging", "The application or update folder changed.")
 
     def _save(self, phase: str) -> None:
+        self._move_phase(phase)
+
+    def _move_phase(self, phase: str) -> None:
         phase = phase.value if isinstance(phase, ReplacementPhase) else phase
         self._directories()
         atomic_receipt(

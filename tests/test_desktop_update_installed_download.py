@@ -6,6 +6,9 @@ import pytest
 
 from sylvia_gm.application.desktop_update.controller import UpdateController
 from sylvia_gm.application.desktop_update.manifest import OFFICIAL_RELEASES, Version
+from tests.desktop_update_move_checks import (
+    assert_desktop_update_moves as assert_desktop_update_moves,
+)
 from tests.test_desktop_update_installed import release
 from tests.test_desktop_update_lifecycle import available, finished
 from tests.test_desktop_update_manifest import accept_stub, envelope

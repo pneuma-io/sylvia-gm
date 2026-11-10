@@ -501,6 +501,8 @@ PYTHON_JOURNEYS = {
         'tests/test_public_zone_display_anchor.py',
         'tests/test_public_zone_display_geometry.py',
         'tests/test_result_presentation_completion.py',
+        "tests/test_desktop_update_states.py",
+        "tests/test_updater_move_observer.py",
     ],
     "generic-procedures": [
         "tests/test_runtime_procedure_failures.py",

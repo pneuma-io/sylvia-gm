@@ -55,7 +55,7 @@ class UpdateController:
         self._cancel = threading.Event()
         self._thread: threading.Thread | None = None
         self._identity: str | None = None
-        self._phase = UpdatePhase.IDLE.value
+        self._move_phase(UpdatePhase.IDLE.value)
         self._candidate: Manifest | None = None
         self._error: UpdateError | None = None
         self._received = 0
@@ -72,7 +72,7 @@ class UpdateController:
         self._identity = operation_id(row["operation_id"])
         phase = str(row["phase"])
         if phase in _APPLY_PHASES:
-            self._phase = UpdatePhase.RECOVERY_REQUIRED.value
+            self._move_phase(UpdatePhase.RECOVERY_REQUIRED.value)
             return
         if phase in {UpdatePhase.AVAILABLE, UpdatePhase.VERIFIED, UpdatePhase.DEFERRED}:
             try:
@@ -110,11 +110,13 @@ class UpdateController:
                             previous,
                         )
                     self._downloaded = True
-                self._phase = phase
+                self._move_phase(phase)
             except UpdateError as error:
-                self._phase, self._error = UpdatePhase.ERROR.value, error
+                _next_phase, _next_error = (UpdatePhase.ERROR.value, error)
+                self._move_phase(_next_phase)
+                self._error = _next_error
             return
-        self._phase = (
+        self._move_phase(
             UpdatePhase.INTERRUPTED.value
             if phase in {UpdatePhase.CHECKING, UpdatePhase.DOWNLOADING}
             else phase
@@ -152,7 +154,9 @@ class UpdateController:
             self._candidate.version.text if self._candidate else None,
             error.code if error else None,
         )
-        self._phase, self._error = phase, error
+        _next_phase, _next_error = (phase, error)
+        self._move_phase(_next_phase)
+        self._error = _next_error
         self.store.prune_empty_terminal(self._identity)
 
     def _require(self, identity: str) -> None:
@@ -188,7 +192,9 @@ class UpdateController:
                     try:
                         self._phase_to(phase, error)
                     except UpdateError as journal_error:
-                        self._phase, self._error = UpdatePhase.ERROR.value, journal_error
+                        _next_phase, _next_error = (UpdatePhase.ERROR.value, journal_error)
+                        self._move_phase(_next_phase)
+                        self._error = _next_error
 
         self._thread = threading.Thread(target=work, name="sylvia-desktop-update", daemon=True)
         try:
@@ -369,3 +375,7 @@ class UpdateController:
         worker = self._thread
         if worker is not None and worker is not threading.current_thread():
             worker.join()
+
+    def _move_phase(self, phase: str) -> None:
+        """Set memory only, preserving the caller's existing save boundary."""
+        self._phase = phase

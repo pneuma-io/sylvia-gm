@@ -21,6 +21,9 @@ from sylvia_gm.infrastructure.owner_lock import (
     OwnerConflict,
     authority_lock_identity,
 )
+from tests.desktop_update_move_checks import (
+    assert_desktop_update_moves as assert_desktop_update_moves,
+)
 from tests.test_desktop_update_manifest import accept_stub
 from tests.test_desktop_update_preparation import fixture
 from tests.test_desktop_update_replacement import assert_tree

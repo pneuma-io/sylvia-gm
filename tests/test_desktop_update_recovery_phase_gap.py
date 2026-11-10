@@ -12,6 +12,9 @@ from sylvia_gm.application.desktop_update.manifest import UpdateError
 from sylvia_gm.application.desktop_update.recovery import KEEP_DATA, RecoveryOperation
 from sylvia_gm.application.desktop_update.startup import authorize_startup
 from sylvia_gm.application.desktop_update.storage import UpdateStore
+from tests.desktop_update_move_checks import (
+    assert_desktop_update_moves as assert_desktop_update_moves,
+)
 from tests.test_desktop_update_manifest import accept_stub
 from tests.test_desktop_update_recovery import old_identity
 from tests.test_desktop_update_recovery_service import service_fixture

@@ -10,6 +10,9 @@ from pathlib import Path
 import pytest
 
 from sylvia_gm.application.desktop_update.replacement import PortableReplacement
+from tests.desktop_update_move_checks import (
+    assert_desktop_update_moves as assert_desktop_update_moves,
+)
 from tests.test_desktop_update_replacement import (
     assert_player_data,
     assert_tree,

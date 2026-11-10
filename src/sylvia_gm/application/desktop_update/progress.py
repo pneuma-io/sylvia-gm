@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import sys
 import threading
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from enum import StrEnum
-from typing import Any, Protocol
+from typing import Any, Final, Protocol
 
 from .manifest import UpdateError
 
@@ -20,12 +20,75 @@ class ProgressPhase(StrEnum):
     CONFIRMING = "confirming"
 
 
+PROGRESS_MOVES: Final[Mapping[ProgressPhase, frozenset[ProgressPhase]]] = {
+    ProgressPhase.WAITING: frozenset(
+        {
+            ProgressPhase.WAITING,
+            ProgressPhase.APPLYING,
+            ProgressPhase.RESTORING,
+            ProgressPhase.VERIFYING,
+            ProgressPhase.STARTING,
+            ProgressPhase.CONFIRMING,
+        }
+    ),
+    ProgressPhase.APPLYING: frozenset(
+        {
+            ProgressPhase.WAITING,
+            ProgressPhase.APPLYING,
+            ProgressPhase.RESTORING,
+            ProgressPhase.VERIFYING,
+            ProgressPhase.STARTING,
+            ProgressPhase.CONFIRMING,
+        }
+    ),
+    ProgressPhase.RESTORING: frozenset(
+        {
+            ProgressPhase.WAITING,
+            ProgressPhase.APPLYING,
+            ProgressPhase.RESTORING,
+            ProgressPhase.VERIFYING,
+            ProgressPhase.STARTING,
+            ProgressPhase.CONFIRMING,
+        }
+    ),
+    ProgressPhase.VERIFYING: frozenset(
+        {
+            ProgressPhase.WAITING,
+            ProgressPhase.APPLYING,
+            ProgressPhase.RESTORING,
+            ProgressPhase.VERIFYING,
+            ProgressPhase.STARTING,
+            ProgressPhase.CONFIRMING,
+        }
+    ),
+    ProgressPhase.STARTING: frozenset(
+        {
+            ProgressPhase.WAITING,
+            ProgressPhase.APPLYING,
+            ProgressPhase.RESTORING,
+            ProgressPhase.VERIFYING,
+            ProgressPhase.STARTING,
+            ProgressPhase.CONFIRMING,
+        }
+    ),
+    ProgressPhase.CONFIRMING: frozenset(
+        {
+            ProgressPhase.WAITING,
+            ProgressPhase.APPLYING,
+            ProgressPhase.RESTORING,
+            ProgressPhase.VERIFYING,
+            ProgressPhase.STARTING,
+            ProgressPhase.CONFIRMING,
+        }
+    ),
+}
+
+
 STAGES = {
     ProgressPhase.WAITING.value: "Waiting for Sylvia and its owned background work to close.",
     ProgressPhase.APPLYING.value: "Applying the verified application update.",
     ProgressPhase.RESTORING.value: (
-        "Recovering the previous application "
-        "using your selected data option."
+        "Recovering the previous application using your selected data option."
     ),
     ProgressPhase.VERIFYING.value: "Checking the application and its saved-data compatibility.",
     ProgressPhase.STARTING.value: "Starting the selected Sylvia application.",
@@ -60,7 +123,9 @@ class ProgressWindow:
         self.ready = threading.Event()
         self.done = threading.Event()
         self._lock = threading.Lock()
-        self._phase, self._finished = ProgressPhase.WAITING.value, False
+        _next_phase, _next_finished = (ProgressPhase.WAITING.value, False)
+        self._move_phase(_next_phase)
+        self._finished = _next_finished
         self._failure: str | None = None
         self._created = False
         self._thread = threading.Thread(target=self._run, args=(runner,), name="update-status")
@@ -96,7 +161,7 @@ class ProgressWindow:
         if self.done.is_set():
             raise UpdateError("progress_lost", "The update status window is no longer available.")
         with self._lock:
-            self._phase = phase
+            self._move_phase(phase)
 
     def snapshot(self) -> tuple[str, bool, bool]:
         with self._lock:
@@ -119,6 +184,10 @@ class ProgressWindow:
         with self._lock:
             self._failure = code
         self._thread.join()  # The error remains visible until its own Close button is chosen.
+
+    def _move_phase(self, phase: str) -> None:
+        """Set memory only, preserving the caller's existing save boundary."""
+        self._phase = phase
 
 
 def _dialog_types() -> tuple[Any, Any, Any]:

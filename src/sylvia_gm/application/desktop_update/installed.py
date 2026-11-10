@@ -10,7 +10,7 @@ import uuid
 from collections.abc import Callable, Mapping
 from enum import StrEnum
 from pathlib import Path
-from typing import Protocol
+from typing import Final, Protocol
 
 from .manifest import Manifest, PayloadFile, UpdateError, Version, bounded_json
 from .payload import verify_artifact
@@ -26,6 +26,22 @@ class InstalledPhase(StrEnum):
     ROLLING_BACK = "rolling_back"
     ROLLED_BACK = "rolled_back"
     CONFIRMED = "confirmed"
+
+
+INSTALLED_MOVES: Final[Mapping[InstalledPhase, frozenset[InstalledPhase]]] = {
+    InstalledPhase.PREPARED: frozenset({InstalledPhase.APPLYING, InstalledPhase.ROLLING_BACK}),
+    InstalledPhase.APPLYING: frozenset(
+        {InstalledPhase.APPLYING, InstalledPhase.AWAITING_RESTART, InstalledPhase.ROLLING_BACK}
+    ),
+    InstalledPhase.AWAITING_RESTART: frozenset(
+        {InstalledPhase.APPLYING, InstalledPhase.CONFIRMED, InstalledPhase.ROLLING_BACK}
+    ),
+    InstalledPhase.ROLLING_BACK: frozenset(
+        {InstalledPhase.ROLLING_BACK, InstalledPhase.ROLLED_BACK}
+    ),
+    InstalledPhase.ROLLED_BACK: frozenset({InstalledPhase.ROLLING_BACK}),
+    InstalledPhase.CONFIRMED: frozenset({InstalledPhase.CONFIRMED, InstalledPhase.ROLLING_BACK}),
+}
 
 
 # Match the current Tauri product/identifier and its default publisher fallback, not a search.
@@ -206,6 +222,9 @@ class InstalledReplacement:
         verify_artifact(self.artifacts / "previous-installer/artifact.verified", self.previous)
 
     def _save(self, phase: str) -> None:
+        self._move_phase(phase)
+
+    def _move_phase(self, phase: str) -> None:
         phase = phase.value if isinstance(phase, InstalledPhase) else phase
         atomic_receipt(
             self._journal,

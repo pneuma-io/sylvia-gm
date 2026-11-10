@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import uuid
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from enum import StrEnum
 from pathlib import Path
-from typing import TypeVar
+from typing import Final, TypeVar
 
 from .checkpoint import schema_identity
 from .manifest import UpdateError, Version, bounded_json
@@ -25,6 +25,16 @@ class RestartPhase(StrEnum):
     LAUNCHING = "launching"
     LAUNCHED = "launched"
     LAUNCH_FAILED = "launch_failed"
+
+
+RESTART_MOVES: Final[Mapping[RestartPhase, frozenset[RestartPhase]]] = {
+    RestartPhase.PENDING: frozenset({RestartPhase.PENDING, RestartPhase.LAUNCHING}),
+    RestartPhase.LAUNCHING: frozenset(
+        {RestartPhase.PENDING, RestartPhase.LAUNCHED, RestartPhase.LAUNCH_FAILED}
+    ),
+    RestartPhase.LAUNCHED: frozenset({RestartPhase.PENDING}),
+    RestartPhase.LAUNCH_FAILED: frozenset({RestartPhase.PENDING}),
+}
 
 
 Launched = TypeVar("Launched")
@@ -141,14 +151,18 @@ class RestartHandshake:
             "operation_id": self.identity,
             "attempt": self.attempt,
             "nonce": nonce,
-            "phase": RestartPhase.PENDING.value,
-            "version": version.text,
-            "target": target,
-            "distribution": distribution,
-            "storage_compatibility": owner_storage_compatibility,
-            "data_identity": list(self._root_identity),
-            "app_identity": list(directory_identity(live)),
         }
+        _move_restart(row, RestartPhase.PENDING)
+        row.update(
+            {
+                "version": version.text,
+                "target": target,
+                "distribution": distribution,
+                "storage_compatibility": owner_storage_compatibility,
+                "data_identity": list(self._root_identity),
+                "app_identity": list(directory_identity(live)),
+            }
+        )
         if self.recovery:
             self._select_recovery(row)
         else:
@@ -164,7 +178,10 @@ class RestartHandshake:
             raise UpdateError("stale_restart", "The reviewed recovery restart changed.")
         # The previous generation, acknowledgement and failure stay immutable in their folder.
         nonce = uuid.uuid4().hex
-        self._select_recovery({**row, "nonce": nonce, "phase": RestartPhase.PENDING.value})
+        _pending_restart = {**row, "nonce": nonce}
+        _move_restart(_pending_restart, RestartPhase.PENDING)
+        _pending_restart.update({})
+        self._select_recovery(_pending_restart)
         return nonce
 
     def _load(self) -> dict[str, object]:
@@ -229,7 +246,7 @@ class RestartHandshake:
                 "This restart has already been attempted. "
                 "Reconcile its result before starting another process.",
             )
-        row["phase"] = RestartPhase.LAUNCHING.value
+        _move_restart(row, RestartPhase.LAUNCHING)
         atomic_receipt(self.ticket, row)
         try:
             process = launch(
@@ -241,13 +258,13 @@ class RestartHandshake:
                 )
             )
         except OSError as error:
-            row["phase"] = RestartPhase.LAUNCH_FAILED.value
+            _move_restart(row, RestartPhase.LAUNCH_FAILED)
             atomic_receipt(self.ticket, row)
             raise UpdateError(
                 "restart_failed", "The updated app could not start. Recovery is retained."
             ) from error
         # If this write fails the launch remains ambiguous. No automatic second launch is allowed.
-        row["phase"] = RestartPhase.LAUNCHED.value
+        _move_restart(row, RestartPhase.LAUNCHED)
         atomic_receipt(self.ticket, row)
         return process
 
@@ -344,3 +361,8 @@ class RestartHandshake:
                 "wrong_startup_receipt", "The startup acknowledgement is inconsistent."
             )
         return True
+
+
+def _move_restart(row: dict[str, object], new: RestartPhase) -> None:
+    """The sole phase write for this record; store its plain wire value."""
+    row["phase"] = new.value

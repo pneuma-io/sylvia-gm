@@ -6,6 +6,9 @@ import pytest
 
 from sylvia_gm.application.desktop_update import drafts
 from sylvia_gm.application.desktop_update.manifest import UpdateError
+from tests.desktop_update_move_checks import (
+    assert_desktop_update_moves as assert_desktop_update_moves,
+)
 
 
 def snapshot(session="builder-fictional"):
