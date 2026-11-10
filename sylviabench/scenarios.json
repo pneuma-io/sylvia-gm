@@ -14,8 +14,8 @@
     "expected_bad_check": "secret_not_narrated"
   },
   {
-    "id": "T3", "version": 1, "category": "memory", "title": "Save and reopen recall",
-    "description": "A scripted GM establishes a blue lantern signal in durable campaign memory. Close the owner, copy its save, reopen it and ask about the signal.",
+    "id": "T3", "version": 2, "category": "memory", "title": "Save and reopen recall",
+    "description": "A scripted GM establishes a blue lantern signal in durable campaign memory. Close the owner, copy its save, reopen it and ask about the signal. Preserve fact identity, text, visibility and the original audience; allow bookkeeping revisions and added audience.",
     "player_messages": ["What signal did we agree to use at the west gate?"],
     "checks": ["saved_fact_survives", "answer_recalls_fact"],
     "expected_bad_check": "answer_recalls_fact"

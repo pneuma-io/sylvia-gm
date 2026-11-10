@@ -117,11 +117,28 @@ def evaluate(scenario: Scenario, observations: dict[str, Any]) -> list[Check]:
             def facts(snapshot: dict[str, Any]) -> list[dict[str, Any]]:
                 return [f for f in snapshot["facts"] if f.get("text") == FACT]
 
+            required = facts(saved)
+
+            def survives(snapshot: dict[str, Any]) -> bool:
+                # Re-admission can advance revisions and add audience without losing a fact.
+                return bool(required) and all(
+                    any(
+                        all(
+                            current.get(key) == original.get(key)
+                            for key in ("record_id", "record_kind", "text", "visibility")
+                        )
+                        and set(original.get("known_by", [])) <= set(current.get("known_by", []))
+                        for current in facts(snapshot)
+                    )
+                    for original in required
+                )
+
             return [
                 _check(
                     "saved_fact_survives",
-                    bool(facts(saved)) and facts(saved) == facts(reopened) == facts(after),
-                    "The established fact must survive closing and reopening the copied save.",
+                    survives(reopened) and survives(after),
+                    "The fact's identity, text, visibility and original audience must survive; "
+                    "bookkeeping revisions and added audience do not erase it.",
                     saved=facts(saved),
                     reopened=facts(reopened),
                     final=facts(after),

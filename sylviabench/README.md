@@ -103,6 +103,12 @@ or ambiguous amounts remain unscored; they do not establish a false outcome. The
 session breaker requires the first attempt and both manual retries to have failed. Stopping with
 a smaller retry budget remains an interruption without that breaker claim.
 
+T3 version 2 compares the fact's identity, text, visibility and original audience. A new bookkeeping
+revision or added audience alone does not establish lost progress. Version 1 compared whole fact
+records and could falsely flag such enrichment. Original version-1 trial grades remain unchanged;
+replay them with their recorded execution checkout. The newer report/compare commands can render
+the original records without regrading them. Do not pool the two scenario versions.
+
 ## Records, resume and replay
 
 A results directory contains:
