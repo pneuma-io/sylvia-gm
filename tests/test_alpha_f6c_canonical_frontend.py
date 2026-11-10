@@ -822,7 +822,7 @@ class TestUI001Frame:
         home_header = html.split('<header class="home-header">', maxsplit=1)[1].split(
             "</header>", maxsplit=1
         )[0]
-        assert '<h1 class="home-kicker">Home</h1>' in home_header
+        assert '<h1 class="home-heading">Home</h1>' in home_header
         assert "Welcome back." not in html
 
     def test_existing_player_character_is_selected_without_a_rename_field(self) -> None:
@@ -1833,8 +1833,7 @@ class TestUI001Frame:
         assert ".session-frame.home-active .home-brand" not in css
         assert ".session-frame.home-active .session-context" not in css
         assert ".campaign-shelf-items" in css
-        assert "grid-template-columns: repeat(auto-fit, minmax(220px, 240px));" in css
-        assert "justify-content: start;" in css
+        assert "grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));" in css
         assert ".builder-stream-spinner" in css
         assert "function renderHome()" in js
         assert "campaign.ruleset_label" in js

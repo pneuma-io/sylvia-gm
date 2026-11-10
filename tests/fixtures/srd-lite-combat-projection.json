@@ -1,0 +1,3337 @@
+{
+ "campaign_id": "lite",
+ "revision": 4,
+ "direct_actions_available": true,
+ "ruleset_id": "sylvia.srd-lite.bg3",
+ "layout": null,
+ "player_control": {
+  "available": true,
+  "focused_actor_id": "hero",
+  "actors": [
+   {
+    "id": "hero",
+    "name": "Lite caster"
+   }
+  ]
+ },
+ "response_action": null,
+ "surfaces": [
+  {
+   "id": "dnd-party",
+   "title": "Party",
+   "icon": "\u2726",
+   "renderer": "party",
+   "source": {
+    "fields": {
+     "entities": {
+      "key": "entities",
+      "kind": "state",
+      "namespace": "sylvia.srd-lite.bg3"
+     },
+     "participants": {
+      "kind": "participants",
+      "kinds": [
+       "player_character"
+      ]
+     },
+     "spell_categories": {
+      "kind": "literal",
+      "value": {
+       "acid_splash": "evocation",
+       "aid": "abjuration",
+       "alter_self": "transmutation",
+       "arcane_eye": "divination",
+       "aura_of_life": "abjuration",
+       "beacon_of_hope": "abjuration",
+       "bless": "enchantment",
+       "blight": "necromancy",
+       "blur": "illusion",
+       "burning_hands": "evocation",
+       "charm_monster": "enchantment",
+       "chromatic_orb": "evocation",
+       "circle_of_death": "necromancy",
+       "cloud_of_daggers": "conjuration",
+       "command": "enchantment",
+       "commune": "divination",
+       "cone_of_cold": "evocation",
+       "contact_other_plane": "divination",
+       "counterspell": "abjuration",
+       "cure_wounds": "abjuration",
+       "darkvision": "transmutation",
+       "daylight": "evocation",
+       "death_ward": "abjuration",
+       "dispel_magic": "abjuration",
+       "divine_smite": "evocation",
+       "dragons_breath": "transmutation",
+       "eldritch_blast": "evocation",
+       "etherealness": "conjuration",
+       "fear": "illusion",
+       "find_steed": "conjuration",
+       "fire_bolt": "evocation",
+       "fire_shield": "evocation",
+       "fire_storm": "evocation",
+       "fireball": "evocation",
+       "flame_strike": "evocation",
+       "fly": "transmutation",
+       "fog_cloud": "conjuration",
+       "foresight": "divination",
+       "freedom_of_movement": "abjuration",
+       "geas": "enchantment",
+       "greater_restoration": "abjuration",
+       "guardian_of_faith": "conjuration",
+       "guidance": "divination",
+       "guiding_bolt": "evocation",
+       "heal": "abjuration",
+       "healing_word": "abjuration",
+       "hex": "enchantment",
+       "hold_monster": "enchantment",
+       "hold_person": "enchantment",
+       "hunters_mark": "divination",
+       "ice_storm": "evocation",
+       "insect_plague": "conjuration",
+       "legend_lore": "divination",
+       "lesser_restoration": "abjuration",
+       "light": "evocation",
+       "lightning_bolt": "evocation",
+       "longstrider": "transmutation",
+       "mage_armor": "abjuration",
+       "mage_hand": "conjuration",
+       "magic_missile": "evocation",
+       "mass_cure_wounds": "abjuration",
+       "mass_healing_word": "abjuration",
+       "mending": "transmutation",
+       "misty_step": "conjuration",
+       "poison_spray": "necromancy",
+       "polymorph": "transmutation",
+       "power_word_heal": "enchantment",
+       "power_word_kill": "enchantment",
+       "power_word_stun": "enchantment",
+       "protection_from_energy": "abjuration",
+       "protection_from_evil_and_good": "abjuration",
+       "ray_of_frost": "evocation",
+       "ray_of_sickness": "necromancy",
+       "revivify": "necromancy",
+       "sacred_flame": "evocation",
+       "scorching_ray": "evocation",
+       "shield": "abjuration",
+       "shield_of_faith": "abjuration",
+       "shillelagh": "transmutation",
+       "shocking_grasp": "evocation",
+       "sleep": "enchantment",
+       "sleet_storm": "conjuration",
+       "spare_the_dying": "necromancy",
+       "speak_with_animals": "divination",
+       "stinking_cloud": "conjuration",
+       "suggestion": "enchantment",
+       "summon_dragon": "conjuration",
+       "sunburst": "evocation",
+       "thaumaturgy": "transmutation",
+       "tree_stride": "conjuration",
+       "true_strike": "divination",
+       "vicious_mockery": "enchantment",
+       "wall_of_fire": "evocation",
+       "wall_of_stone": "evocation",
+       "web": "conjuration",
+       "zone_of_truth": "enchantment"
+      }
+     }
+    },
+    "kind": "object"
+   },
+   "group": null,
+   "order": 10,
+   "default_size": 260,
+   "minimum_size": 140,
+   "default_placement": "docked",
+   "allowed_placements": [
+    "docked",
+    "floating",
+    "window"
+   ],
+   "actions": [],
+   "data": {
+    "entities": {
+     "extra": {
+      "armor_class": 1,
+      "attitudes": {
+       "hero": "friendly"
+      },
+      "available_reactions": [
+       "opportunity_attack"
+      ],
+      "conditions": [],
+      "creature_kind": "monster",
+      "creature_type": "humanoid",
+      "damage_immunities": [],
+      "damage_resistances": [],
+      "damage_vulnerabilities": [],
+      "death_failures": 0,
+      "death_successes": 0,
+      "exhaustion_level": 0,
+      "hp": 1000,
+      "initiative_modifier": 0,
+      "is_alive": true,
+      "max_hp": 1000,
+      "melee_reach": 5,
+      "name": "extra",
+      "reaction_available": true,
+      "resource_maxima": {},
+      "resources": {},
+      "saving_throw_modifiers": {
+       "charisma": 0,
+       "constitution": 0,
+       "dexterity": 0,
+       "intelligence": 0,
+       "strength": 0,
+       "wisdom": 0
+      },
+      "size_rank": 2,
+      "speed": 30,
+      "stable": false,
+      "stable_recovery_hours_remaining": 0,
+      "temp_hp": 0
+     },
+     "guard": {
+      "armor_class": 1,
+      "attitudes": {
+       "hero": "friendly"
+      },
+      "available_reactions": [
+       "opportunity_attack"
+      ],
+      "conditions": [],
+      "creature_kind": "monster",
+      "creature_type": "humanoid",
+      "damage_immunities": [],
+      "damage_resistances": [],
+      "damage_vulnerabilities": [],
+      "death_failures": 0,
+      "death_successes": 0,
+      "exhaustion_level": 0,
+      "hp": 1000,
+      "initiative_modifier": 0,
+      "is_alive": true,
+      "max_hp": 1000,
+      "melee_reach": 5,
+      "name": "guard",
+      "reaction_available": true,
+      "resource_maxima": {},
+      "resources": {},
+      "saving_throw_modifiers": {
+       "charisma": 0,
+       "constitution": 0,
+       "dexterity": 0,
+       "intelligence": 0,
+       "strength": 0,
+       "wisdom": 0
+      },
+      "size_rank": 2,
+      "speed": 30,
+      "stable": false,
+      "stable_recovery_hours_remaining": 0,
+      "temp_hp": 0
+     },
+     "hero": {
+      "ammunition": {
+       "arrow": 20
+      },
+      "armor_class": 17,
+      "bonus_action_available": true,
+      "conditions": [],
+      "constitution_modifier": 2,
+      "creature_kind": "character",
+      "creature_type": "humanoid",
+      "damage_immunities": [],
+      "damage_resistances": [],
+      "damage_vulnerabilities": [],
+      "dodging": false,
+      "exhaustion_level": 0,
+      "fighter_level": 0,
+      "flurry_attacks_remaining": 0,
+      "held_attack_names": [],
+      "held_items": [
+       "spear"
+      ],
+      "hp": 20,
+      "initiative_modifier": 20,
+      "inventory": [
+       "spear",
+       "shortbow"
+      ],
+      "inventory_weapon_copies": {
+       "shortbow": {
+        "maximum": 1,
+        "minimum": 1,
+        "removed": []
+       },
+       "spear": {
+        "maximum": 1,
+        "minimum": 1,
+        "removed": []
+       }
+      },
+      "is_alive": true,
+      "jump_distance_multiplier": 1,
+      "light_attack_source_weapon": null,
+      "light_attack_source_weapons": [],
+      "light_extra_attack_available": false,
+      "light_extra_attack_used": false,
+      "light_unrestricted_source_weapons": [],
+      "max_hp": 20,
+      "melee_reach": 5,
+      "name": "Lite caster",
+      "prepared_spells": [
+       "fire_bolt"
+      ],
+      "reaction_available": true,
+      "resources": {
+       "spell_slot_1": 3,
+       "spell_slot_2": 3,
+       "spell_slot_3": 3,
+       "spell_slot_4": 3,
+       "spell_slot_5": 3,
+       "spell_slot_6": 3,
+       "spell_slot_7": 3,
+       "spell_slot_8": 3,
+       "spell_slot_9": 3
+      },
+      "saving_throw_modifiers": {
+       "charisma": 0,
+       "constitution": 0,
+       "dexterity": 0,
+       "intelligence": 0,
+       "strength": 0,
+       "wisdom": 0
+      },
+      "size_rank": 1,
+      "speed": 30,
+      "spell_jump_used": false,
+      "spell_materials": [],
+      "spell_slot_cast_this_turn": false,
+      "spell_speed_reduction": 0,
+      "temp_hp": 0,
+      "turns_started": 1,
+      "weapon_copy_refs": {
+       "melee": {
+        "main_hand": 1,
+        "off_hand": null
+       },
+       "ranged": {
+        "main_hand": 1,
+        "off_hand": 1
+       }
+      },
+      "weapon_sets": {
+       "active_set": "melee",
+       "format": 1,
+       "melee": {
+        "main_hand": "spear",
+        "off_hand": null
+       },
+       "ranged": {
+        "main_hand": "shortbow",
+        "off_hand": "shortbow"
+       }
+      }
+     },
+     "other": {
+      "armor_class": 1,
+      "attitudes": {
+       "hero": "friendly"
+      },
+      "available_reactions": [
+       "opportunity_attack"
+      ],
+      "conditions": [],
+      "creature_kind": "monster",
+      "creature_type": "humanoid",
+      "damage_immunities": [],
+      "damage_resistances": [],
+      "damage_vulnerabilities": [],
+      "death_failures": 0,
+      "death_successes": 0,
+      "exhaustion_level": 0,
+      "hp": 1000,
+      "initiative_modifier": 0,
+      "is_alive": true,
+      "max_hp": 1000,
+      "melee_reach": 5,
+      "name": "other",
+      "reaction_available": true,
+      "resource_maxima": {},
+      "resources": {},
+      "saving_throw_modifiers": {
+       "charisma": 0,
+       "constitution": 0,
+       "dexterity": 0,
+       "intelligence": 0,
+       "strength": 0,
+       "wisdom": 0
+      },
+      "size_rank": 2,
+      "speed": 30,
+      "stable": false,
+      "stable_recovery_hours_remaining": 0,
+      "temp_hp": 0
+     }
+    },
+    "participants": [
+     {
+      "id": "hero",
+      "kind": "player_character",
+      "data": {
+       "abilities": {
+        "charisma": 10,
+        "constitution": 14,
+        "dexterity": 14,
+        "intelligence": 18,
+        "strength": 16,
+        "wisdom": 10
+       },
+       "background": "sage",
+       "classes": [
+        {
+         "id": "wizard",
+         "level": 17
+        }
+       ],
+       "level": 17,
+       "name": "Lite caster",
+       "origin_feats": [
+        "magic_initiate"
+       ],
+       "party_role": "player_character",
+       "saving_throw_proficiencies": [
+        "intelligence",
+        "wisdom"
+       ],
+       "size_rank": 1,
+       "species": "human",
+       "speed": 30,
+       "spellcasting_grants": [
+        {
+         "ability": "intelligence",
+         "source": "wizard",
+         "spells": [
+          "fire_bolt"
+         ]
+        }
+       ],
+       "weapon_masteries": [
+        "dagger",
+        "scimitar"
+       ],
+       "weapon_proficiencies": [
+        "simple_weapons",
+        "martial_weapons"
+       ],
+       "wizard_spellbook": []
+      }
+     }
+    ],
+    "spell_categories": {
+     "acid_splash": "evocation",
+     "aid": "abjuration",
+     "alter_self": "transmutation",
+     "arcane_eye": "divination",
+     "aura_of_life": "abjuration",
+     "beacon_of_hope": "abjuration",
+     "bless": "enchantment",
+     "blight": "necromancy",
+     "blur": "illusion",
+     "burning_hands": "evocation",
+     "charm_monster": "enchantment",
+     "chromatic_orb": "evocation",
+     "circle_of_death": "necromancy",
+     "cloud_of_daggers": "conjuration",
+     "command": "enchantment",
+     "commune": "divination",
+     "cone_of_cold": "evocation",
+     "contact_other_plane": "divination",
+     "counterspell": "abjuration",
+     "cure_wounds": "abjuration",
+     "darkvision": "transmutation",
+     "daylight": "evocation",
+     "death_ward": "abjuration",
+     "dispel_magic": "abjuration",
+     "divine_smite": "evocation",
+     "dragons_breath": "transmutation",
+     "eldritch_blast": "evocation",
+     "etherealness": "conjuration",
+     "fear": "illusion",
+     "find_steed": "conjuration",
+     "fire_bolt": "evocation",
+     "fire_shield": "evocation",
+     "fire_storm": "evocation",
+     "fireball": "evocation",
+     "flame_strike": "evocation",
+     "fly": "transmutation",
+     "fog_cloud": "conjuration",
+     "foresight": "divination",
+     "freedom_of_movement": "abjuration",
+     "geas": "enchantment",
+     "greater_restoration": "abjuration",
+     "guardian_of_faith": "conjuration",
+     "guidance": "divination",
+     "guiding_bolt": "evocation",
+     "heal": "abjuration",
+     "healing_word": "abjuration",
+     "hex": "enchantment",
+     "hold_monster": "enchantment",
+     "hold_person": "enchantment",
+     "hunters_mark": "divination",
+     "ice_storm": "evocation",
+     "insect_plague": "conjuration",
+     "legend_lore": "divination",
+     "lesser_restoration": "abjuration",
+     "light": "evocation",
+     "lightning_bolt": "evocation",
+     "longstrider": "transmutation",
+     "mage_armor": "abjuration",
+     "mage_hand": "conjuration",
+     "magic_missile": "evocation",
+     "mass_cure_wounds": "abjuration",
+     "mass_healing_word": "abjuration",
+     "mending": "transmutation",
+     "misty_step": "conjuration",
+     "poison_spray": "necromancy",
+     "polymorph": "transmutation",
+     "power_word_heal": "enchantment",
+     "power_word_kill": "enchantment",
+     "power_word_stun": "enchantment",
+     "protection_from_energy": "abjuration",
+     "protection_from_evil_and_good": "abjuration",
+     "ray_of_frost": "evocation",
+     "ray_of_sickness": "necromancy",
+     "revivify": "necromancy",
+     "sacred_flame": "evocation",
+     "scorching_ray": "evocation",
+     "shield": "abjuration",
+     "shield_of_faith": "abjuration",
+     "shillelagh": "transmutation",
+     "shocking_grasp": "evocation",
+     "sleep": "enchantment",
+     "sleet_storm": "conjuration",
+     "spare_the_dying": "necromancy",
+     "speak_with_animals": "divination",
+     "stinking_cloud": "conjuration",
+     "suggestion": "enchantment",
+     "summon_dragon": "conjuration",
+     "sunburst": "evocation",
+     "thaumaturgy": "transmutation",
+     "tree_stride": "conjuration",
+     "true_strike": "divination",
+     "vicious_mockery": "enchantment",
+     "wall_of_fire": "evocation",
+     "wall_of_stone": "evocation",
+     "web": "conjuration",
+     "zone_of_truth": "enchantment"
+    }
+   }
+  },
+  {
+   "id": "dnd-encounter",
+   "title": "Encounter",
+   "icon": "\u2694",
+   "renderer": "encounter",
+   "source": {
+    "fields": {
+     "combat": {
+      "key": "combat",
+      "kind": "state",
+      "namespace": "sylvia.srd-lite.bg3"
+     },
+     "entities": {
+      "key": "entities",
+      "kind": "state",
+      "namespace": "sylvia.srd-lite.bg3"
+     },
+     "order_values": {
+      "entries": [
+       {
+        "key": {
+         "key": "combat.initiative_first_actor",
+         "kind": "state",
+         "namespace": "sylvia.srd-lite.bg3"
+        },
+        "value": {
+         "key": "combat.initiative_first_total",
+         "kind": "state",
+         "namespace": "sylvia.srd-lite.bg3"
+        }
+       },
+       {
+        "key": {
+         "key": "combat.initiative_second_actor",
+         "kind": "state",
+         "namespace": "sylvia.srd-lite.bg3"
+        },
+        "value": {
+         "key": "combat.initiative_second_total",
+         "kind": "state",
+         "namespace": "sylvia.srd-lite.bg3"
+        }
+       }
+      ],
+      "kind": "keyed_values"
+     },
+     "participants": {
+      "kind": "participants",
+      "kinds": [
+       "player_character"
+      ]
+     },
+     "spell_categories": {
+      "kind": "literal",
+      "value": {
+       "acid_splash": "evocation",
+       "aid": "abjuration",
+       "alter_self": "transmutation",
+       "arcane_eye": "divination",
+       "aura_of_life": "abjuration",
+       "beacon_of_hope": "abjuration",
+       "bless": "enchantment",
+       "blight": "necromancy",
+       "blur": "illusion",
+       "burning_hands": "evocation",
+       "charm_monster": "enchantment",
+       "chromatic_orb": "evocation",
+       "circle_of_death": "necromancy",
+       "cloud_of_daggers": "conjuration",
+       "command": "enchantment",
+       "commune": "divination",
+       "cone_of_cold": "evocation",
+       "contact_other_plane": "divination",
+       "counterspell": "abjuration",
+       "cure_wounds": "abjuration",
+       "darkvision": "transmutation",
+       "daylight": "evocation",
+       "death_ward": "abjuration",
+       "dispel_magic": "abjuration",
+       "divine_smite": "evocation",
+       "dragons_breath": "transmutation",
+       "eldritch_blast": "evocation",
+       "etherealness": "conjuration",
+       "fear": "illusion",
+       "find_steed": "conjuration",
+       "fire_bolt": "evocation",
+       "fire_shield": "evocation",
+       "fire_storm": "evocation",
+       "fireball": "evocation",
+       "flame_strike": "evocation",
+       "fly": "transmutation",
+       "fog_cloud": "conjuration",
+       "foresight": "divination",
+       "freedom_of_movement": "abjuration",
+       "geas": "enchantment",
+       "greater_restoration": "abjuration",
+       "guardian_of_faith": "conjuration",
+       "guidance": "divination",
+       "guiding_bolt": "evocation",
+       "heal": "abjuration",
+       "healing_word": "abjuration",
+       "hex": "enchantment",
+       "hold_monster": "enchantment",
+       "hold_person": "enchantment",
+       "hunters_mark": "divination",
+       "ice_storm": "evocation",
+       "insect_plague": "conjuration",
+       "legend_lore": "divination",
+       "lesser_restoration": "abjuration",
+       "light": "evocation",
+       "lightning_bolt": "evocation",
+       "longstrider": "transmutation",
+       "mage_armor": "abjuration",
+       "mage_hand": "conjuration",
+       "magic_missile": "evocation",
+       "mass_cure_wounds": "abjuration",
+       "mass_healing_word": "abjuration",
+       "mending": "transmutation",
+       "misty_step": "conjuration",
+       "poison_spray": "necromancy",
+       "polymorph": "transmutation",
+       "power_word_heal": "enchantment",
+       "power_word_kill": "enchantment",
+       "power_word_stun": "enchantment",
+       "protection_from_energy": "abjuration",
+       "protection_from_evil_and_good": "abjuration",
+       "ray_of_frost": "evocation",
+       "ray_of_sickness": "necromancy",
+       "revivify": "necromancy",
+       "sacred_flame": "evocation",
+       "scorching_ray": "evocation",
+       "shield": "abjuration",
+       "shield_of_faith": "abjuration",
+       "shillelagh": "transmutation",
+       "shocking_grasp": "evocation",
+       "sleep": "enchantment",
+       "sleet_storm": "conjuration",
+       "spare_the_dying": "necromancy",
+       "speak_with_animals": "divination",
+       "stinking_cloud": "conjuration",
+       "suggestion": "enchantment",
+       "summon_dragon": "conjuration",
+       "sunburst": "evocation",
+       "thaumaturgy": "transmutation",
+       "tree_stride": "conjuration",
+       "true_strike": "divination",
+       "vicious_mockery": "enchantment",
+       "wall_of_fire": "evocation",
+       "wall_of_stone": "evocation",
+       "web": "conjuration",
+       "zone_of_truth": "enchantment"
+      }
+     }
+    },
+    "kind": "object"
+   },
+   "group": null,
+   "order": 20,
+   "default_size": 300,
+   "minimum_size": 160,
+   "default_placement": "docked",
+   "allowed_placements": [
+    "docked",
+    "floating",
+    "window"
+   ],
+   "actions": [],
+   "data": {
+    "combat": {
+     "action_available": true,
+     "action_surge_available": false,
+     "action_surge_used": false,
+     "action_used_this_turn": false,
+     "active_actor": "hero",
+     "active_actor_at_zero_hp": false,
+     "active_actor_available_bonus_actions": [],
+     "active_actor_can_act": true,
+     "active_actor_form_restricted": false,
+     "active_actor_form_wind_only_actions": false,
+     "active_actor_kind": "character",
+     "active_actor_prepared_spells": [
+      "fire_bolt"
+     ],
+     "active_actor_spell_slow": false,
+     "active_actor_stable": false,
+     "attack_available": true,
+     "attacks_remaining": 0,
+     "bonus_action_used_this_turn": false,
+     "current_actor": "hero",
+     "dashes_taken": 0,
+     "disengaged_actor": null,
+     "encounter_active": true,
+     "first_surprised": false,
+     "group_order": false,
+     "haste_action_available": false,
+     "haste_action_granted": false,
+     "haste_action_selected": false,
+     "initiative_first_actor": "hero",
+     "initiative_first_total": 39,
+     "initiative_second_actor": "guard",
+     "initiative_second_total": 13,
+     "last_end_reason": null,
+     "light_attack_followup_available": false,
+     "monk_bonus_strike_available": false,
+     "monk_focus_action_available": false,
+     "movement_mode": "walk",
+     "movement_remaining": 30,
+     "movement_spent": 0,
+     "multiattack_remaining": [],
+     "normal_action_spent": false,
+     "order": [],
+     "order_first": "hero",
+     "order_second": "guard",
+     "phase": "turn_active",
+     "round": 1,
+     "second_surprised": false,
+     "step_wind_companion": null,
+     "turn_active": true,
+     "turn_index": 0,
+     "turn_sequence": 1
+    },
+    "entities": {
+     "extra": {
+      "armor_class": 1,
+      "attitudes": {
+       "hero": "friendly"
+      },
+      "available_reactions": [
+       "opportunity_attack"
+      ],
+      "conditions": [],
+      "creature_kind": "monster",
+      "creature_type": "humanoid",
+      "damage_immunities": [],
+      "damage_resistances": [],
+      "damage_vulnerabilities": [],
+      "death_failures": 0,
+      "death_successes": 0,
+      "exhaustion_level": 0,
+      "hp": 1000,
+      "initiative_modifier": 0,
+      "is_alive": true,
+      "max_hp": 1000,
+      "melee_reach": 5,
+      "name": "extra",
+      "reaction_available": true,
+      "resource_maxima": {},
+      "resources": {},
+      "saving_throw_modifiers": {
+       "charisma": 0,
+       "constitution": 0,
+       "dexterity": 0,
+       "intelligence": 0,
+       "strength": 0,
+       "wisdom": 0
+      },
+      "size_rank": 2,
+      "speed": 30,
+      "stable": false,
+      "stable_recovery_hours_remaining": 0,
+      "temp_hp": 0
+     },
+     "guard": {
+      "armor_class": 1,
+      "attitudes": {
+       "hero": "friendly"
+      },
+      "available_reactions": [
+       "opportunity_attack"
+      ],
+      "conditions": [],
+      "creature_kind": "monster",
+      "creature_type": "humanoid",
+      "damage_immunities": [],
+      "damage_resistances": [],
+      "damage_vulnerabilities": [],
+      "death_failures": 0,
+      "death_successes": 0,
+      "exhaustion_level": 0,
+      "hp": 1000,
+      "initiative_modifier": 0,
+      "is_alive": true,
+      "max_hp": 1000,
+      "melee_reach": 5,
+      "name": "guard",
+      "reaction_available": true,
+      "resource_maxima": {},
+      "resources": {},
+      "saving_throw_modifiers": {
+       "charisma": 0,
+       "constitution": 0,
+       "dexterity": 0,
+       "intelligence": 0,
+       "strength": 0,
+       "wisdom": 0
+      },
+      "size_rank": 2,
+      "speed": 30,
+      "stable": false,
+      "stable_recovery_hours_remaining": 0,
+      "temp_hp": 0
+     },
+     "hero": {
+      "ammunition": {
+       "arrow": 20
+      },
+      "armor_class": 17,
+      "bonus_action_available": true,
+      "conditions": [],
+      "constitution_modifier": 2,
+      "creature_kind": "character",
+      "creature_type": "humanoid",
+      "damage_immunities": [],
+      "damage_resistances": [],
+      "damage_vulnerabilities": [],
+      "dodging": false,
+      "exhaustion_level": 0,
+      "fighter_level": 0,
+      "flurry_attacks_remaining": 0,
+      "held_attack_names": [],
+      "held_items": [
+       "spear"
+      ],
+      "hp": 20,
+      "initiative_modifier": 20,
+      "inventory": [
+       "spear",
+       "shortbow"
+      ],
+      "inventory_weapon_copies": {
+       "shortbow": {
+        "maximum": 1,
+        "minimum": 1,
+        "removed": []
+       },
+       "spear": {
+        "maximum": 1,
+        "minimum": 1,
+        "removed": []
+       }
+      },
+      "is_alive": true,
+      "jump_distance_multiplier": 1,
+      "light_attack_source_weapon": null,
+      "light_attack_source_weapons": [],
+      "light_extra_attack_available": false,
+      "light_extra_attack_used": false,
+      "light_unrestricted_source_weapons": [],
+      "max_hp": 20,
+      "melee_reach": 5,
+      "name": "Lite caster",
+      "prepared_spells": [
+       "fire_bolt"
+      ],
+      "reaction_available": true,
+      "resources": {
+       "spell_slot_1": 3,
+       "spell_slot_2": 3,
+       "spell_slot_3": 3,
+       "spell_slot_4": 3,
+       "spell_slot_5": 3,
+       "spell_slot_6": 3,
+       "spell_slot_7": 3,
+       "spell_slot_8": 3,
+       "spell_slot_9": 3
+      },
+      "saving_throw_modifiers": {
+       "charisma": 0,
+       "constitution": 0,
+       "dexterity": 0,
+       "intelligence": 0,
+       "strength": 0,
+       "wisdom": 0
+      },
+      "size_rank": 1,
+      "speed": 30,
+      "spell_jump_used": false,
+      "spell_materials": [],
+      "spell_slot_cast_this_turn": false,
+      "spell_speed_reduction": 0,
+      "temp_hp": 0,
+      "turns_started": 1,
+      "weapon_copy_refs": {
+       "melee": {
+        "main_hand": 1,
+        "off_hand": null
+       },
+       "ranged": {
+        "main_hand": 1,
+        "off_hand": 1
+       }
+      },
+      "weapon_sets": {
+       "active_set": "melee",
+       "format": 1,
+       "melee": {
+        "main_hand": "spear",
+        "off_hand": null
+       },
+       "ranged": {
+        "main_hand": "shortbow",
+        "off_hand": "shortbow"
+       }
+      }
+     },
+     "other": {
+      "armor_class": 1,
+      "attitudes": {
+       "hero": "friendly"
+      },
+      "available_reactions": [
+       "opportunity_attack"
+      ],
+      "conditions": [],
+      "creature_kind": "monster",
+      "creature_type": "humanoid",
+      "damage_immunities": [],
+      "damage_resistances": [],
+      "damage_vulnerabilities": [],
+      "death_failures": 0,
+      "death_successes": 0,
+      "exhaustion_level": 0,
+      "hp": 1000,
+      "initiative_modifier": 0,
+      "is_alive": true,
+      "max_hp": 1000,
+      "melee_reach": 5,
+      "name": "other",
+      "reaction_available": true,
+      "resource_maxima": {},
+      "resources": {},
+      "saving_throw_modifiers": {
+       "charisma": 0,
+       "constitution": 0,
+       "dexterity": 0,
+       "intelligence": 0,
+       "strength": 0,
+       "wisdom": 0
+      },
+      "size_rank": 2,
+      "speed": 30,
+      "stable": false,
+      "stable_recovery_hours_remaining": 0,
+      "temp_hp": 0
+     }
+    },
+    "order_values": {
+     "hero": 39,
+     "guard": 13
+    },
+    "participants": [
+     {
+      "id": "hero",
+      "kind": "player_character",
+      "data": {
+       "abilities": {
+        "charisma": 10,
+        "constitution": 14,
+        "dexterity": 14,
+        "intelligence": 18,
+        "strength": 16,
+        "wisdom": 10
+       },
+       "background": "sage",
+       "classes": [
+        {
+         "id": "wizard",
+         "level": 17
+        }
+       ],
+       "level": 17,
+       "name": "Lite caster",
+       "origin_feats": [
+        "magic_initiate"
+       ],
+       "party_role": "player_character",
+       "saving_throw_proficiencies": [
+        "intelligence",
+        "wisdom"
+       ],
+       "size_rank": 1,
+       "species": "human",
+       "speed": 30,
+       "spellcasting_grants": [
+        {
+         "ability": "intelligence",
+         "source": "wizard",
+         "spells": [
+          "fire_bolt"
+         ]
+        }
+       ],
+       "weapon_masteries": [
+        "dagger",
+        "scimitar"
+       ],
+       "weapon_proficiencies": [
+        "simple_weapons",
+        "martial_weapons"
+       ],
+       "wizard_spellbook": []
+      }
+     }
+    ],
+    "spell_categories": {
+     "acid_splash": "evocation",
+     "aid": "abjuration",
+     "alter_self": "transmutation",
+     "arcane_eye": "divination",
+     "aura_of_life": "abjuration",
+     "beacon_of_hope": "abjuration",
+     "bless": "enchantment",
+     "blight": "necromancy",
+     "blur": "illusion",
+     "burning_hands": "evocation",
+     "charm_monster": "enchantment",
+     "chromatic_orb": "evocation",
+     "circle_of_death": "necromancy",
+     "cloud_of_daggers": "conjuration",
+     "command": "enchantment",
+     "commune": "divination",
+     "cone_of_cold": "evocation",
+     "contact_other_plane": "divination",
+     "counterspell": "abjuration",
+     "cure_wounds": "abjuration",
+     "darkvision": "transmutation",
+     "daylight": "evocation",
+     "death_ward": "abjuration",
+     "dispel_magic": "abjuration",
+     "divine_smite": "evocation",
+     "dragons_breath": "transmutation",
+     "eldritch_blast": "evocation",
+     "etherealness": "conjuration",
+     "fear": "illusion",
+     "find_steed": "conjuration",
+     "fire_bolt": "evocation",
+     "fire_shield": "evocation",
+     "fire_storm": "evocation",
+     "fireball": "evocation",
+     "flame_strike": "evocation",
+     "fly": "transmutation",
+     "fog_cloud": "conjuration",
+     "foresight": "divination",
+     "freedom_of_movement": "abjuration",
+     "geas": "enchantment",
+     "greater_restoration": "abjuration",
+     "guardian_of_faith": "conjuration",
+     "guidance": "divination",
+     "guiding_bolt": "evocation",
+     "heal": "abjuration",
+     "healing_word": "abjuration",
+     "hex": "enchantment",
+     "hold_monster": "enchantment",
+     "hold_person": "enchantment",
+     "hunters_mark": "divination",
+     "ice_storm": "evocation",
+     "insect_plague": "conjuration",
+     "legend_lore": "divination",
+     "lesser_restoration": "abjuration",
+     "light": "evocation",
+     "lightning_bolt": "evocation",
+     "longstrider": "transmutation",
+     "mage_armor": "abjuration",
+     "mage_hand": "conjuration",
+     "magic_missile": "evocation",
+     "mass_cure_wounds": "abjuration",
+     "mass_healing_word": "abjuration",
+     "mending": "transmutation",
+     "misty_step": "conjuration",
+     "poison_spray": "necromancy",
+     "polymorph": "transmutation",
+     "power_word_heal": "enchantment",
+     "power_word_kill": "enchantment",
+     "power_word_stun": "enchantment",
+     "protection_from_energy": "abjuration",
+     "protection_from_evil_and_good": "abjuration",
+     "ray_of_frost": "evocation",
+     "ray_of_sickness": "necromancy",
+     "revivify": "necromancy",
+     "sacred_flame": "evocation",
+     "scorching_ray": "evocation",
+     "shield": "abjuration",
+     "shield_of_faith": "abjuration",
+     "shillelagh": "transmutation",
+     "shocking_grasp": "evocation",
+     "sleep": "enchantment",
+     "sleet_storm": "conjuration",
+     "spare_the_dying": "necromancy",
+     "speak_with_animals": "divination",
+     "stinking_cloud": "conjuration",
+     "suggestion": "enchantment",
+     "summon_dragon": "conjuration",
+     "sunburst": "evocation",
+     "thaumaturgy": "transmutation",
+     "tree_stride": "conjuration",
+     "true_strike": "divination",
+     "vicious_mockery": "enchantment",
+     "wall_of_fire": "evocation",
+     "wall_of_stone": "evocation",
+     "web": "conjuration",
+     "zone_of_truth": "enchantment"
+    }
+   }
+  },
+  {
+   "id": "dnd-inventory",
+   "title": "Inventory",
+   "icon": "\u25a3",
+   "renderer": "inventory",
+   "source": {
+    "fields": {
+     "entities": {
+      "key": "entities",
+      "kind": "state",
+      "namespace": "sylvia.srd-lite.bg3"
+     },
+     "equipment": {
+      "kind": "literal",
+      "value": {
+       "cost_note": "Equipping uses one Action in combat. Switching prepared sets is free on your turn.",
+       "main_hand_label": "Main hand",
+       "off_hand_label": "Off hand",
+       "prepare_label": "Equip",
+       "remove_shield_action": "remove-shield",
+       "sets": [
+        {
+         "id": "melee",
+         "label": "Melee",
+         "prepare_action": "prepare-melee",
+         "switch_action": "activate-melee"
+        },
+        {
+         "id": "ranged",
+         "label": "Ranged",
+         "prepare_action": "prepare-ranged",
+         "switch_action": "activate-ranged"
+        }
+       ],
+       "shield_inventory_item": "shield",
+       "shield_label": "Shield",
+       "shield_set": "melee",
+       "weapons": [
+        {
+         "hands": 1,
+         "id": "battleaxe",
+         "label": "Battleaxe",
+         "sets": [
+          "melee"
+         ],
+         "versatile": true
+        },
+        {
+         "hands": 1,
+         "id": "blowgun",
+         "label": "Blowgun",
+         "sets": [
+          "ranged"
+         ],
+         "versatile": false
+        },
+        {
+         "hands": 1,
+         "id": "club",
+         "label": "Club",
+         "sets": [
+          "melee"
+         ],
+         "versatile": false
+        },
+        {
+         "hands": 1,
+         "id": "dagger",
+         "label": "Dagger",
+         "sets": [
+          "melee",
+          "ranged"
+         ],
+         "versatile": false
+        },
+        {
+         "hands": 1,
+         "id": "dart",
+         "label": "Dart",
+         "sets": [
+          "ranged"
+         ],
+         "versatile": false
+        },
+        {
+         "hands": 1,
+         "id": "flail",
+         "label": "Flail",
+         "sets": [
+          "melee"
+         ],
+         "versatile": false
+        },
+        {
+         "hands": 2,
+         "id": "glaive",
+         "label": "Glaive",
+         "sets": [
+          "melee"
+         ],
+         "versatile": false
+        },
+        {
+         "hands": 2,
+         "id": "greataxe",
+         "label": "Greataxe",
+         "sets": [
+          "melee"
+         ],
+         "versatile": false
+        },
+        {
+         "hands": 2,
+         "id": "greatclub",
+         "label": "Greatclub",
+         "sets": [
+          "melee"
+         ],
+         "versatile": false
+        },
+        {
+         "hands": 2,
+         "id": "greatsword",
+         "label": "Greatsword",
+         "sets": [
+          "melee"
+         ],
+         "versatile": false
+        },
+        {
+         "hands": 2,
+         "id": "halberd",
+         "label": "Halberd",
+         "sets": [
+          "melee"
+         ],
+         "versatile": false
+        },
+        {
+         "hands": 1,
+         "id": "hand_crossbow",
+         "label": "Hand Crossbow",
+         "sets": [
+          "ranged"
+         ],
+         "versatile": false
+        },
+        {
+         "hands": 1,
+         "id": "handaxe",
+         "label": "Handaxe",
+         "sets": [
+          "melee",
+          "ranged"
+         ],
+         "versatile": false
+        },
+        {
+         "hands": 2,
+         "id": "heavy_crossbow",
+         "label": "Heavy Crossbow",
+         "sets": [
+          "ranged"
+         ],
+         "versatile": false
+        },
+        {
+         "hands": 1,
+         "id": "javelin",
+         "label": "Javelin",
+         "sets": [
+          "melee",
+          "ranged"
+         ],
+         "versatile": false
+        },
+        {
+         "hands": 1,
+         "id": "lance",
+         "label": "Lance",
+         "sets": [
+          "melee"
+         ],
+         "versatile": false
+        },
+        {
+         "hands": 2,
+         "id": "light_crossbow",
+         "label": "Light Crossbow",
+         "sets": [
+          "ranged"
+         ],
+         "versatile": false
+        },
+        {
+         "hands": 1,
+         "id": "light_hammer",
+         "label": "Light Hammer",
+         "sets": [
+          "melee",
+          "ranged"
+         ],
+         "versatile": false
+        },
+        {
+         "hands": 2,
+         "id": "longbow",
+         "label": "Longbow",
+         "sets": [
+          "ranged"
+         ],
+         "versatile": false
+        },
+        {
+         "hands": 1,
+         "id": "longsword",
+         "label": "Longsword",
+         "sets": [
+          "melee"
+         ],
+         "versatile": true
+        },
+        {
+         "hands": 1,
+         "id": "mace",
+         "label": "Mace",
+         "sets": [
+          "melee"
+         ],
+         "versatile": false
+        },
+        {
+         "hands": 2,
+         "id": "maul",
+         "label": "Maul",
+         "sets": [
+          "melee"
+         ],
+         "versatile": false
+        },
+        {
+         "hands": 1,
+         "id": "morningstar",
+         "label": "Morningstar",
+         "sets": [
+          "melee"
+         ],
+         "versatile": false
+        },
+        {
+         "hands": 2,
+         "id": "musket",
+         "label": "Musket",
+         "sets": [
+          "ranged"
+         ],
+         "versatile": false
+        },
+        {
+         "hands": 2,
+         "id": "pike",
+         "label": "Pike",
+         "sets": [
+          "melee"
+         ],
+         "versatile": false
+        },
+        {
+         "hands": 1,
+         "id": "pistol",
+         "label": "Pistol",
+         "sets": [
+          "ranged"
+         ],
+         "versatile": false
+        },
+        {
+         "hands": 1,
+         "id": "quarterstaff",
+         "label": "Quarterstaff",
+         "sets": [
+          "melee"
+         ],
+         "versatile": true
+        },
+        {
+         "hands": 1,
+         "id": "rapier",
+         "label": "Rapier",
+         "sets": [
+          "melee"
+         ],
+         "versatile": false
+        },
+        {
+         "hands": 1,
+         "id": "scimitar",
+         "label": "Scimitar",
+         "sets": [
+          "melee"
+         ],
+         "versatile": false
+        },
+        {
+         "hands": 2,
+         "id": "shortbow",
+         "label": "Shortbow",
+         "sets": [
+          "ranged"
+         ],
+         "versatile": false
+        },
+        {
+         "hands": 1,
+         "id": "shortsword",
+         "label": "Shortsword",
+         "sets": [
+          "melee"
+         ],
+         "versatile": false
+        },
+        {
+         "hands": 1,
+         "id": "sickle",
+         "label": "Sickle",
+         "sets": [
+          "melee"
+         ],
+         "versatile": false
+        },
+        {
+         "hands": 1,
+         "id": "sling",
+         "label": "Sling",
+         "sets": [
+          "ranged"
+         ],
+         "versatile": false
+        },
+        {
+         "hands": 1,
+         "id": "spear",
+         "label": "Spear",
+         "sets": [
+          "melee",
+          "ranged"
+         ],
+         "versatile": true
+        },
+        {
+         "hands": 1,
+         "id": "trident",
+         "label": "Trident",
+         "sets": [
+          "melee",
+          "ranged"
+         ],
+         "versatile": true
+        },
+        {
+         "hands": 1,
+         "id": "war_pick",
+         "label": "War Pick",
+         "sets": [
+          "melee"
+         ],
+         "versatile": true
+        },
+        {
+         "hands": 1,
+         "id": "warhammer",
+         "label": "Warhammer",
+         "sets": [
+          "melee"
+         ],
+         "versatile": true
+        },
+        {
+         "hands": 1,
+         "id": "whip",
+         "label": "Whip",
+         "sets": [
+          "melee"
+         ],
+         "versatile": false
+        }
+       ],
+       "wear_shield_action": "wear-shield"
+      }
+     },
+     "participants": {
+      "kind": "participants",
+      "kinds": [
+       "player_character"
+      ]
+     }
+    },
+    "kind": "object"
+   },
+   "group": null,
+   "order": 30,
+   "default_size": 220,
+   "minimum_size": 120,
+   "default_placement": "docked",
+   "allowed_placements": [
+    "docked",
+    "floating",
+    "window"
+   ],
+   "actions": [
+    {
+     "bindings": {
+      "actor_state": "actor",
+      "loadout": "declared_action"
+     },
+     "id": "prepare-melee",
+     "intent": "prepare_srd_weapon_set",
+     "label": "Equip melee",
+     "params": {},
+     "available": true,
+     "actor_parameter": "actor_state",
+     "response_policy": "on_request",
+     "checks_required": true,
+     "map_preview_enabled": false
+    },
+    {
+     "bindings": {
+      "actor_state": "actor"
+     },
+     "id": "activate-melee",
+     "intent": "activate_srd_weapon_set",
+     "label": "Use melee",
+     "params": {
+      "set_name": "melee"
+     },
+     "available": true,
+     "actor_parameter": "actor_state",
+     "response_policy": "on_request",
+     "checks_required": true,
+     "map_preview_enabled": false
+    },
+    {
+     "bindings": {
+      "actor_state": "actor",
+      "loadout": "declared_action"
+     },
+     "id": "prepare-ranged",
+     "intent": "prepare_srd_weapon_set",
+     "label": "Equip ranged",
+     "params": {},
+     "available": true,
+     "actor_parameter": "actor_state",
+     "response_policy": "on_request",
+     "checks_required": true,
+     "map_preview_enabled": false
+    },
+    {
+     "bindings": {
+      "actor_state": "actor"
+     },
+     "id": "activate-ranged",
+     "intent": "activate_srd_weapon_set",
+     "label": "Use ranged",
+     "params": {
+      "set_name": "ranged"
+     },
+     "available": true,
+     "actor_parameter": "actor_state",
+     "response_policy": "on_request",
+     "checks_required": true,
+     "map_preview_enabled": false
+    },
+    {
+     "bindings": {
+      "actor": "actor"
+     },
+     "id": "wear-shield",
+     "intent": "change_srd_character_shield",
+     "label": "Wear Shield",
+     "params": {
+      "item": [
+       {
+        "armor_type": "shield",
+        "inventory_item": "shield",
+        "magic_bonus": 0
+       }
+      ]
+     },
+     "available": true,
+     "actor_parameter": "actor",
+     "response_policy": "on_request",
+     "checks_required": true,
+     "map_preview_enabled": false
+    },
+    {
+     "bindings": {
+      "actor": "actor"
+     },
+     "id": "remove-shield",
+     "intent": "change_srd_character_shield",
+     "label": "Remove Shield",
+     "params": {
+      "item": []
+     },
+     "available": true,
+     "actor_parameter": "actor",
+     "response_policy": "on_request",
+     "checks_required": true,
+     "map_preview_enabled": false
+    }
+   ],
+   "data": {
+    "entities": {
+     "extra": {
+      "armor_class": 1,
+      "attitudes": {
+       "hero": "friendly"
+      },
+      "available_reactions": [
+       "opportunity_attack"
+      ],
+      "conditions": [],
+      "creature_kind": "monster",
+      "creature_type": "humanoid",
+      "damage_immunities": [],
+      "damage_resistances": [],
+      "damage_vulnerabilities": [],
+      "death_failures": 0,
+      "death_successes": 0,
+      "exhaustion_level": 0,
+      "hp": 1000,
+      "initiative_modifier": 0,
+      "is_alive": true,
+      "max_hp": 1000,
+      "melee_reach": 5,
+      "name": "extra",
+      "reaction_available": true,
+      "resource_maxima": {},
+      "resources": {},
+      "saving_throw_modifiers": {
+       "charisma": 0,
+       "constitution": 0,
+       "dexterity": 0,
+       "intelligence": 0,
+       "strength": 0,
+       "wisdom": 0
+      },
+      "size_rank": 2,
+      "speed": 30,
+      "stable": false,
+      "stable_recovery_hours_remaining": 0,
+      "temp_hp": 0
+     },
+     "guard": {
+      "armor_class": 1,
+      "attitudes": {
+       "hero": "friendly"
+      },
+      "available_reactions": [
+       "opportunity_attack"
+      ],
+      "conditions": [],
+      "creature_kind": "monster",
+      "creature_type": "humanoid",
+      "damage_immunities": [],
+      "damage_resistances": [],
+      "damage_vulnerabilities": [],
+      "death_failures": 0,
+      "death_successes": 0,
+      "exhaustion_level": 0,
+      "hp": 1000,
+      "initiative_modifier": 0,
+      "is_alive": true,
+      "max_hp": 1000,
+      "melee_reach": 5,
+      "name": "guard",
+      "reaction_available": true,
+      "resource_maxima": {},
+      "resources": {},
+      "saving_throw_modifiers": {
+       "charisma": 0,
+       "constitution": 0,
+       "dexterity": 0,
+       "intelligence": 0,
+       "strength": 0,
+       "wisdom": 0
+      },
+      "size_rank": 2,
+      "speed": 30,
+      "stable": false,
+      "stable_recovery_hours_remaining": 0,
+      "temp_hp": 0
+     },
+     "hero": {
+      "ammunition": {
+       "arrow": 20
+      },
+      "armor_class": 17,
+      "bonus_action_available": true,
+      "conditions": [],
+      "constitution_modifier": 2,
+      "creature_kind": "character",
+      "creature_type": "humanoid",
+      "damage_immunities": [],
+      "damage_resistances": [],
+      "damage_vulnerabilities": [],
+      "dodging": false,
+      "exhaustion_level": 0,
+      "fighter_level": 0,
+      "flurry_attacks_remaining": 0,
+      "held_attack_names": [],
+      "held_items": [
+       "spear"
+      ],
+      "hp": 20,
+      "initiative_modifier": 20,
+      "inventory": [
+       "spear",
+       "shortbow"
+      ],
+      "inventory_weapon_copies": {
+       "shortbow": {
+        "maximum": 1,
+        "minimum": 1,
+        "removed": []
+       },
+       "spear": {
+        "maximum": 1,
+        "minimum": 1,
+        "removed": []
+       }
+      },
+      "is_alive": true,
+      "jump_distance_multiplier": 1,
+      "light_attack_source_weapon": null,
+      "light_attack_source_weapons": [],
+      "light_extra_attack_available": false,
+      "light_extra_attack_used": false,
+      "light_unrestricted_source_weapons": [],
+      "max_hp": 20,
+      "melee_reach": 5,
+      "name": "Lite caster",
+      "prepared_spells": [
+       "fire_bolt"
+      ],
+      "reaction_available": true,
+      "resources": {
+       "spell_slot_1": 3,
+       "spell_slot_2": 3,
+       "spell_slot_3": 3,
+       "spell_slot_4": 3,
+       "spell_slot_5": 3,
+       "spell_slot_6": 3,
+       "spell_slot_7": 3,
+       "spell_slot_8": 3,
+       "spell_slot_9": 3
+      },
+      "saving_throw_modifiers": {
+       "charisma": 0,
+       "constitution": 0,
+       "dexterity": 0,
+       "intelligence": 0,
+       "strength": 0,
+       "wisdom": 0
+      },
+      "size_rank": 1,
+      "speed": 30,
+      "spell_jump_used": false,
+      "spell_materials": [],
+      "spell_slot_cast_this_turn": false,
+      "spell_speed_reduction": 0,
+      "temp_hp": 0,
+      "turns_started": 1,
+      "weapon_copy_refs": {
+       "melee": {
+        "main_hand": 1,
+        "off_hand": null
+       },
+       "ranged": {
+        "main_hand": 1,
+        "off_hand": 1
+       }
+      },
+      "weapon_sets": {
+       "active_set": "melee",
+       "format": 1,
+       "melee": {
+        "main_hand": "spear",
+        "off_hand": null
+       },
+       "ranged": {
+        "main_hand": "shortbow",
+        "off_hand": "shortbow"
+       }
+      }
+     },
+     "other": {
+      "armor_class": 1,
+      "attitudes": {
+       "hero": "friendly"
+      },
+      "available_reactions": [
+       "opportunity_attack"
+      ],
+      "conditions": [],
+      "creature_kind": "monster",
+      "creature_type": "humanoid",
+      "damage_immunities": [],
+      "damage_resistances": [],
+      "damage_vulnerabilities": [],
+      "death_failures": 0,
+      "death_successes": 0,
+      "exhaustion_level": 0,
+      "hp": 1000,
+      "initiative_modifier": 0,
+      "is_alive": true,
+      "max_hp": 1000,
+      "melee_reach": 5,
+      "name": "other",
+      "reaction_available": true,
+      "resource_maxima": {},
+      "resources": {},
+      "saving_throw_modifiers": {
+       "charisma": 0,
+       "constitution": 0,
+       "dexterity": 0,
+       "intelligence": 0,
+       "strength": 0,
+       "wisdom": 0
+      },
+      "size_rank": 2,
+      "speed": 30,
+      "stable": false,
+      "stable_recovery_hours_remaining": 0,
+      "temp_hp": 0
+     }
+    },
+    "equipment": {
+     "cost_note": "Equipping uses one Action in combat. Switching prepared sets is free on your turn.",
+     "main_hand_label": "Main hand",
+     "off_hand_label": "Off hand",
+     "prepare_label": "Equip",
+     "remove_shield_action": "remove-shield",
+     "sets": [
+      {
+       "id": "melee",
+       "label": "Melee",
+       "prepare_action": "prepare-melee",
+       "switch_action": "activate-melee"
+      },
+      {
+       "id": "ranged",
+       "label": "Ranged",
+       "prepare_action": "prepare-ranged",
+       "switch_action": "activate-ranged"
+      }
+     ],
+     "shield_inventory_item": "shield",
+     "shield_label": "Shield",
+     "shield_set": "melee",
+     "weapons": [
+      {
+       "hands": 1,
+       "id": "battleaxe",
+       "label": "Battleaxe",
+       "sets": [
+        "melee"
+       ],
+       "versatile": true
+      },
+      {
+       "hands": 1,
+       "id": "blowgun",
+       "label": "Blowgun",
+       "sets": [
+        "ranged"
+       ],
+       "versatile": false
+      },
+      {
+       "hands": 1,
+       "id": "club",
+       "label": "Club",
+       "sets": [
+        "melee"
+       ],
+       "versatile": false
+      },
+      {
+       "hands": 1,
+       "id": "dagger",
+       "label": "Dagger",
+       "sets": [
+        "melee",
+        "ranged"
+       ],
+       "versatile": false
+      },
+      {
+       "hands": 1,
+       "id": "dart",
+       "label": "Dart",
+       "sets": [
+        "ranged"
+       ],
+       "versatile": false
+      },
+      {
+       "hands": 1,
+       "id": "flail",
+       "label": "Flail",
+       "sets": [
+        "melee"
+       ],
+       "versatile": false
+      },
+      {
+       "hands": 2,
+       "id": "glaive",
+       "label": "Glaive",
+       "sets": [
+        "melee"
+       ],
+       "versatile": false
+      },
+      {
+       "hands": 2,
+       "id": "greataxe",
+       "label": "Greataxe",
+       "sets": [
+        "melee"
+       ],
+       "versatile": false
+      },
+      {
+       "hands": 2,
+       "id": "greatclub",
+       "label": "Greatclub",
+       "sets": [
+        "melee"
+       ],
+       "versatile": false
+      },
+      {
+       "hands": 2,
+       "id": "greatsword",
+       "label": "Greatsword",
+       "sets": [
+        "melee"
+       ],
+       "versatile": false
+      },
+      {
+       "hands": 2,
+       "id": "halberd",
+       "label": "Halberd",
+       "sets": [
+        "melee"
+       ],
+       "versatile": false
+      },
+      {
+       "hands": 1,
+       "id": "hand_crossbow",
+       "label": "Hand Crossbow",
+       "sets": [
+        "ranged"
+       ],
+       "versatile": false
+      },
+      {
+       "hands": 1,
+       "id": "handaxe",
+       "label": "Handaxe",
+       "sets": [
+        "melee",
+        "ranged"
+       ],
+       "versatile": false
+      },
+      {
+       "hands": 2,
+       "id": "heavy_crossbow",
+       "label": "Heavy Crossbow",
+       "sets": [
+        "ranged"
+       ],
+       "versatile": false
+      },
+      {
+       "hands": 1,
+       "id": "javelin",
+       "label": "Javelin",
+       "sets": [
+        "melee",
+        "ranged"
+       ],
+       "versatile": false
+      },
+      {
+       "hands": 1,
+       "id": "lance",
+       "label": "Lance",
+       "sets": [
+        "melee"
+       ],
+       "versatile": false
+      },
+      {
+       "hands": 2,
+       "id": "light_crossbow",
+       "label": "Light Crossbow",
+       "sets": [
+        "ranged"
+       ],
+       "versatile": false
+      },
+      {
+       "hands": 1,
+       "id": "light_hammer",
+       "label": "Light Hammer",
+       "sets": [
+        "melee",
+        "ranged"
+       ],
+       "versatile": false
+      },
+      {
+       "hands": 2,
+       "id": "longbow",
+       "label": "Longbow",
+       "sets": [
+        "ranged"
+       ],
+       "versatile": false
+      },
+      {
+       "hands": 1,
+       "id": "longsword",
+       "label": "Longsword",
+       "sets": [
+        "melee"
+       ],
+       "versatile": true
+      },
+      {
+       "hands": 1,
+       "id": "mace",
+       "label": "Mace",
+       "sets": [
+        "melee"
+       ],
+       "versatile": false
+      },
+      {
+       "hands": 2,
+       "id": "maul",
+       "label": "Maul",
+       "sets": [
+        "melee"
+       ],
+       "versatile": false
+      },
+      {
+       "hands": 1,
+       "id": "morningstar",
+       "label": "Morningstar",
+       "sets": [
+        "melee"
+       ],
+       "versatile": false
+      },
+      {
+       "hands": 2,
+       "id": "musket",
+       "label": "Musket",
+       "sets": [
+        "ranged"
+       ],
+       "versatile": false
+      },
+      {
+       "hands": 2,
+       "id": "pike",
+       "label": "Pike",
+       "sets": [
+        "melee"
+       ],
+       "versatile": false
+      },
+      {
+       "hands": 1,
+       "id": "pistol",
+       "label": "Pistol",
+       "sets": [
+        "ranged"
+       ],
+       "versatile": false
+      },
+      {
+       "hands": 1,
+       "id": "quarterstaff",
+       "label": "Quarterstaff",
+       "sets": [
+        "melee"
+       ],
+       "versatile": true
+      },
+      {
+       "hands": 1,
+       "id": "rapier",
+       "label": "Rapier",
+       "sets": [
+        "melee"
+       ],
+       "versatile": false
+      },
+      {
+       "hands": 1,
+       "id": "scimitar",
+       "label": "Scimitar",
+       "sets": [
+        "melee"
+       ],
+       "versatile": false
+      },
+      {
+       "hands": 2,
+       "id": "shortbow",
+       "label": "Shortbow",
+       "sets": [
+        "ranged"
+       ],
+       "versatile": false
+      },
+      {
+       "hands": 1,
+       "id": "shortsword",
+       "label": "Shortsword",
+       "sets": [
+        "melee"
+       ],
+       "versatile": false
+      },
+      {
+       "hands": 1,
+       "id": "sickle",
+       "label": "Sickle",
+       "sets": [
+        "melee"
+       ],
+       "versatile": false
+      },
+      {
+       "hands": 1,
+       "id": "sling",
+       "label": "Sling",
+       "sets": [
+        "ranged"
+       ],
+       "versatile": false
+      },
+      {
+       "hands": 1,
+       "id": "spear",
+       "label": "Spear",
+       "sets": [
+        "melee",
+        "ranged"
+       ],
+       "versatile": true
+      },
+      {
+       "hands": 1,
+       "id": "trident",
+       "label": "Trident",
+       "sets": [
+        "melee",
+        "ranged"
+       ],
+       "versatile": true
+      },
+      {
+       "hands": 1,
+       "id": "war_pick",
+       "label": "War Pick",
+       "sets": [
+        "melee"
+       ],
+       "versatile": true
+      },
+      {
+       "hands": 1,
+       "id": "warhammer",
+       "label": "Warhammer",
+       "sets": [
+        "melee"
+       ],
+       "versatile": true
+      },
+      {
+       "hands": 1,
+       "id": "whip",
+       "label": "Whip",
+       "sets": [
+        "melee"
+       ],
+       "versatile": false
+      }
+     ],
+     "wear_shield_action": "wear-shield"
+    },
+    "participants": [
+     {
+      "id": "hero",
+      "kind": "player_character",
+      "data": {
+       "abilities": {
+        "charisma": 10,
+        "constitution": 14,
+        "dexterity": 14,
+        "intelligence": 18,
+        "strength": 16,
+        "wisdom": 10
+       },
+       "background": "sage",
+       "classes": [
+        {
+         "id": "wizard",
+         "level": 17
+        }
+       ],
+       "level": 17,
+       "name": "Lite caster",
+       "origin_feats": [
+        "magic_initiate"
+       ],
+       "party_role": "player_character",
+       "saving_throw_proficiencies": [
+        "intelligence",
+        "wisdom"
+       ],
+       "size_rank": 1,
+       "species": "human",
+       "speed": 30,
+       "spellcasting_grants": [
+        {
+         "ability": "intelligence",
+         "source": "wizard",
+         "spells": [
+          "fire_bolt"
+         ]
+        }
+       ],
+       "weapon_masteries": [
+        "dagger",
+        "scimitar"
+       ],
+       "weapon_proficiencies": [
+        "simple_weapons",
+        "martial_weapons"
+       ],
+       "wizard_spellbook": []
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "srd-coordinate-map",
+   "title": "Combat map",
+   "icon": "\u25c7",
+   "renderer": "coordinate_map",
+   "source": {
+    "fields": {
+     "enabled": {
+      "key": "combat.encounter_active",
+      "kind": "state",
+      "namespace": "sylvia.srd-lite.bg3"
+     },
+     "occupied_space": {
+      "fields": {
+       "actors": {
+        "key": "entities",
+        "kind": "state",
+        "namespace": "sylvia.srd-lite.bg3"
+       },
+       "declaration": {
+        "kind": "literal",
+        "value": {
+         "category_field": "size_rank",
+         "convention": "srd.5.2.1.control-circle.v1",
+         "widths": [
+          2.5,
+          5,
+          5,
+          10,
+          15,
+          20
+         ]
+        }
+       }
+      },
+      "kind": "object"
+     },
+     "scene": {
+      "key": "state.spatial_scene",
+      "kind": "state",
+      "namespace": "sylvia.srd-lite.bg3"
+     }
+    },
+    "kind": "object"
+   },
+   "group": null,
+   "order": 5,
+   "default_size": 520,
+   "minimum_size": 240,
+   "default_placement": "docked",
+   "allowed_placements": [
+    "docked",
+    "floating",
+    "window"
+   ],
+   "actions": [
+    {
+     "actor_reference": "participant_ref",
+     "bindings": {
+      "actor_state": "actor",
+      "destination": "aim_point"
+     },
+     "id": "move-walk",
+     "intent": "move_srd_scene_creature",
+     "label": "Move",
+     "params": {
+      "mode": "walk"
+     },
+     "spatial_preview": "segment",
+     "available": true,
+     "actor_parameter": "actor_state",
+     "response_policy": "on_request",
+     "checks_required": true,
+     "map_preview_enabled": true
+    },
+    {
+     "actor_reference": "participant_ref",
+     "bindings": {
+      "actor_state": "actor",
+      "destination": "aim_point"
+     },
+     "id": "move-fly",
+     "intent": "move_srd_scene_creature",
+     "label": "Fly",
+     "params": {
+      "mode": "fly"
+     },
+     "spatial_preview": "segment",
+     "available": true,
+     "actor_parameter": "actor_state",
+     "response_policy": "on_request",
+     "checks_required": true,
+     "map_preview_enabled": true
+    },
+    {
+     "actor_reference": "participant_ref",
+     "bindings": {
+      "actor_state": "actor",
+      "destination": "aim_point"
+     },
+     "id": "move-climb",
+     "intent": "move_srd_scene_creature",
+     "label": "Climb",
+     "params": {
+      "mode": "climb"
+     },
+     "spatial_preview": "segment",
+     "available": true,
+     "actor_parameter": "actor_state",
+     "response_policy": "on_request",
+     "checks_required": true,
+     "map_preview_enabled": true
+    },
+    {
+     "actor_reference": "participant_ref",
+     "bindings": {
+      "actor_state": "actor",
+      "destination": "aim_point"
+     },
+     "id": "move-swim",
+     "intent": "move_srd_scene_creature",
+     "label": "Swim",
+     "params": {
+      "mode": "swim"
+     },
+     "spatial_preview": "segment",
+     "available": true,
+     "actor_parameter": "actor_state",
+     "response_policy": "on_request",
+     "checks_required": true,
+     "map_preview_enabled": true
+    },
+    {
+     "actor_reference": "participant_ref",
+     "bindings": {
+      "actor": "actor",
+      "target": "target"
+     },
+     "id": "attack-melee-strength",
+     "intent": "resolve_combat_attack",
+     "label": "Melee (Str)",
+     "params": {
+      "actor_can_see_target": false,
+      "advantage": false,
+      "attack_ability": "strength",
+      "attack_distance": 0,
+      "attack_mode": "melee",
+      "attack_sequence": "primary",
+      "circumstantial_modifier": 0,
+      "disadvantage": false,
+      "fear_source_in_sight": false,
+      "mounted": false,
+      "target_can_see_actor": false,
+      "target_is_charmer": false,
+      "use_graze_on_miss": false
+     },
+     "spatial_preview": "segment",
+     "target_reference": "participant_ref",
+     "available": true,
+     "actor_parameter": "actor",
+     "response_policy": "on_request",
+     "checks_required": true,
+     "map_preview_enabled": true
+    },
+    {
+     "actor_reference": "participant_ref",
+     "bindings": {
+      "actor": "actor",
+      "target": "target"
+     },
+     "id": "attack-melee-dexterity",
+     "intent": "resolve_combat_attack",
+     "label": "Melee (Dex)",
+     "params": {
+      "actor_can_see_target": false,
+      "advantage": false,
+      "attack_ability": "dexterity",
+      "attack_distance": 0,
+      "attack_mode": "melee",
+      "attack_sequence": "primary",
+      "circumstantial_modifier": 0,
+      "disadvantage": false,
+      "fear_source_in_sight": false,
+      "mounted": false,
+      "target_can_see_actor": false,
+      "target_is_charmer": false,
+      "use_graze_on_miss": false
+     },
+     "spatial_preview": "segment",
+     "target_reference": "participant_ref",
+     "available": true,
+     "actor_parameter": "actor",
+     "response_policy": "on_request",
+     "checks_required": true,
+     "map_preview_enabled": true
+    },
+    {
+     "actor_reference": "participant_ref",
+     "bindings": {
+      "actor": "actor",
+      "target": "target"
+     },
+     "id": "attack-ranged-dexterity",
+     "intent": "resolve_combat_attack",
+     "label": "Ranged",
+     "params": {
+      "actor_can_see_target": false,
+      "advantage": false,
+      "attack_ability": "dexterity",
+      "attack_distance": 0,
+      "attack_mode": "ranged",
+      "attack_sequence": "primary",
+      "circumstantial_modifier": 0,
+      "disadvantage": false,
+      "fear_source_in_sight": false,
+      "mounted": false,
+      "target_can_see_actor": false,
+      "target_is_charmer": false,
+      "use_graze_on_miss": false
+     },
+     "spatial_preview": "segment",
+     "target_reference": "participant_ref",
+     "available": true,
+     "actor_parameter": "actor",
+     "response_policy": "on_request",
+     "checks_required": true,
+     "map_preview_enabled": true
+    },
+    {
+     "actor_reference": "participant_ref",
+     "bindings": {
+      "actor": "actor",
+      "target": "target"
+     },
+     "id": "attack-thrown-strength",
+     "intent": "resolve_combat_attack",
+     "label": "Throw (Str)",
+     "params": {
+      "actor_can_see_target": false,
+      "advantage": false,
+      "attack_ability": "strength",
+      "attack_distance": 0,
+      "attack_mode": "thrown",
+      "attack_sequence": "primary",
+      "circumstantial_modifier": 0,
+      "disadvantage": false,
+      "fear_source_in_sight": false,
+      "mounted": false,
+      "target_can_see_actor": false,
+      "target_is_charmer": false,
+      "use_graze_on_miss": false
+     },
+     "spatial_preview": "segment",
+     "target_reference": "participant_ref",
+     "available": true,
+     "actor_parameter": "actor",
+     "response_policy": "on_request",
+     "checks_required": true,
+     "map_preview_enabled": true
+    },
+    {
+     "actor_reference": "participant_ref",
+     "bindings": {
+      "actor": "actor",
+      "target": "target"
+     },
+     "id": "attack-thrown-dexterity",
+     "intent": "resolve_combat_attack",
+     "label": "Throw (Dex)",
+     "params": {
+      "actor_can_see_target": false,
+      "advantage": false,
+      "attack_ability": "dexterity",
+      "attack_distance": 0,
+      "attack_mode": "thrown",
+      "attack_sequence": "primary",
+      "circumstantial_modifier": 0,
+      "disadvantage": false,
+      "fear_source_in_sight": false,
+      "mounted": false,
+      "target_can_see_actor": false,
+      "target_is_charmer": false,
+      "use_graze_on_miss": false
+     },
+     "spatial_preview": "segment",
+     "target_reference": "participant_ref",
+     "available": true,
+     "actor_parameter": "actor",
+     "response_policy": "on_request",
+     "checks_required": true,
+     "map_preview_enabled": true
+    },
+    {
+     "actor_reference": "participant_ref",
+     "bindings": {
+      "caster": "actor",
+      "caster_state": "actor",
+      "target": "target"
+     },
+     "id": "cast-fire_bolt",
+     "intent": "cast_spell",
+     "label": "Fire Bolt",
+     "params": {
+      "material_component_available": true,
+      "slot_resource": "cantrip",
+      "somatic_component_available": true,
+      "spell": "fire_bolt",
+      "verbal_component_available": true
+     },
+     "spatial_preview": "segment",
+     "target_reference": "participant_ref",
+     "available": true,
+     "actor_parameter": "caster_state",
+     "response_policy": "on_request",
+     "checks_required": true,
+     "map_preview_enabled": true
+    },
+    {
+     "actor_reference": "participant_ref",
+     "bindings": {
+      "caster": "actor",
+      "caster_state": "actor",
+      "target": "target"
+     },
+     "id": "cast-ray_of_frost",
+     "intent": "cast_spell",
+     "label": "Ray of Frost",
+     "params": {
+      "material_component_available": true,
+      "slot_resource": "cantrip",
+      "somatic_component_available": true,
+      "spell": "ray_of_frost",
+      "verbal_component_available": true
+     },
+     "spatial_preview": "segment",
+     "target_reference": "participant_ref",
+     "available": true,
+     "actor_parameter": "caster_state",
+     "response_policy": "on_request",
+     "checks_required": true,
+     "map_preview_enabled": true
+    },
+    {
+     "actor_reference": "participant_ref",
+     "bindings": {
+      "caster": "actor",
+      "caster_state": "actor",
+      "target": "target"
+     },
+     "id": "cast-magic_missile",
+     "intent": "cast_spell",
+     "label": "Magic Missile (1)",
+     "params": {
+      "material_component_available": true,
+      "slot_resource": "spell_slot_1",
+      "somatic_component_available": true,
+      "spell": "magic_missile",
+      "verbal_component_available": true
+     },
+     "spatial_preview": "segment",
+     "target_reference": "participant_ref",
+     "available": true,
+     "actor_parameter": "caster_state",
+     "response_policy": "on_request",
+     "checks_required": true,
+     "map_preview_enabled": true
+    },
+    {
+     "actor_reference": "participant_ref",
+     "bindings": {
+      "actor": "actor",
+      "actor_state": "actor"
+     },
+     "id": "dash",
+     "intent": "dash_combat_action",
+     "label": "Dash",
+     "params": {},
+     "available": true,
+     "actor_parameter": "actor",
+     "response_policy": "on_request",
+     "checks_required": true,
+     "map_preview_enabled": false
+    },
+    {
+     "id": "end-turn",
+     "intent": "end_combat_turn",
+     "label": "End combat turn",
+     "params": {},
+     "available": true,
+     "actor_parameter": null,
+     "response_policy": "automatic",
+     "checks_required": true,
+     "map_preview_enabled": false
+    }
+   ],
+   "data": {
+    "format": 1,
+    "map_revision": 0,
+    "map": {
+     "id": "lite",
+     "revision": 0,
+     "bounds": {
+      "min": [
+       -100,
+       -100,
+       -100
+      ],
+      "max": [
+       100,
+       100,
+       100
+      ]
+     },
+     "grid": {
+      "cell_size": 5,
+      "unit": "ft",
+      "origin": [
+       -100,
+       -100
+      ]
+     },
+     "layers": [
+      {
+       "id": "world",
+       "min_elevation": -100,
+       "max_elevation": 100
+      }
+     ]
+    },
+    "geometry": [],
+    "entities": [
+     {
+      "id": "guard",
+      "map_id": "lite",
+      "position": [
+       30,
+       10,
+       0
+      ],
+      "footprint": {
+       "kind": "box",
+       "half_extents": [
+        0.4,
+        0.4
+       ]
+      },
+      "height": 6,
+      "facing": [
+       1,
+       0
+      ],
+      "active": true,
+      "movement": "blocking",
+      "visibility": "opaque",
+      "display": {
+       "label": "Guard",
+       "kind": "unit"
+      },
+      "actor_ref": "guard",
+      "occupied_space": {
+       "status": "declared",
+       "kind": "circle",
+       "diameter": 5,
+       "convention": "srd.5.2.1.control-circle.v1"
+      }
+     },
+     {
+      "id": "hero",
+      "map_id": "lite",
+      "position": [
+       0,
+       0,
+       0
+      ],
+      "footprint": {
+       "kind": "box",
+       "half_extents": [
+        0.4,
+        0.4
+       ]
+      },
+      "height": 6,
+      "facing": [
+       1,
+       0
+      ],
+      "active": true,
+      "movement": "blocking",
+      "visibility": "opaque",
+      "display": {
+       "label": "Hero",
+       "kind": "unit"
+      },
+      "actor_ref": "hero",
+      "occupied_space": {
+       "status": "declared",
+       "kind": "circle",
+       "diameter": 5,
+       "convention": "srd.5.2.1.control-circle.v1"
+      }
+     }
+    ],
+    "zones": [],
+    "terrain": [],
+    "objectives": [],
+    "selection": {},
+    "preview": {
+     "authoritative": false,
+     "label": "Preview only \u2014 the owner resolves the committed action",
+     "map_revision": 0,
+     "path_cost": null,
+     "los": null,
+     "exposure": null,
+     "crossed_zones": []
+    },
+    "actor_reference": "participant_ref"
+   }
+  },
+  {
+   "id": "dnd-character",
+   "title": "Character",
+   "icon": "\u2726",
+   "renderer": "unit_list",
+   "source": {
+    "fields": {
+     "entities": {
+      "key": "entities",
+      "kind": "state",
+      "namespace": "sylvia.srd-lite.bg3"
+     },
+     "participants": {
+      "kind": "participants",
+      "kinds": [
+       "player_character"
+      ]
+     },
+     "spell_categories": {
+      "kind": "literal",
+      "value": {
+       "acid_splash": "evocation",
+       "aid": "abjuration",
+       "alter_self": "transmutation",
+       "arcane_eye": "divination",
+       "aura_of_life": "abjuration",
+       "beacon_of_hope": "abjuration",
+       "bless": "enchantment",
+       "blight": "necromancy",
+       "blur": "illusion",
+       "burning_hands": "evocation",
+       "charm_monster": "enchantment",
+       "chromatic_orb": "evocation",
+       "circle_of_death": "necromancy",
+       "cloud_of_daggers": "conjuration",
+       "command": "enchantment",
+       "commune": "divination",
+       "cone_of_cold": "evocation",
+       "contact_other_plane": "divination",
+       "counterspell": "abjuration",
+       "cure_wounds": "abjuration",
+       "darkvision": "transmutation",
+       "daylight": "evocation",
+       "death_ward": "abjuration",
+       "dispel_magic": "abjuration",
+       "divine_smite": "evocation",
+       "dragons_breath": "transmutation",
+       "eldritch_blast": "evocation",
+       "etherealness": "conjuration",
+       "fear": "illusion",
+       "find_steed": "conjuration",
+       "fire_bolt": "evocation",
+       "fire_shield": "evocation",
+       "fire_storm": "evocation",
+       "fireball": "evocation",
+       "flame_strike": "evocation",
+       "fly": "transmutation",
+       "fog_cloud": "conjuration",
+       "foresight": "divination",
+       "freedom_of_movement": "abjuration",
+       "geas": "enchantment",
+       "greater_restoration": "abjuration",
+       "guardian_of_faith": "conjuration",
+       "guidance": "divination",
+       "guiding_bolt": "evocation",
+       "heal": "abjuration",
+       "healing_word": "abjuration",
+       "hex": "enchantment",
+       "hold_monster": "enchantment",
+       "hold_person": "enchantment",
+       "hunters_mark": "divination",
+       "ice_storm": "evocation",
+       "insect_plague": "conjuration",
+       "legend_lore": "divination",
+       "lesser_restoration": "abjuration",
+       "light": "evocation",
+       "lightning_bolt": "evocation",
+       "longstrider": "transmutation",
+       "mage_armor": "abjuration",
+       "mage_hand": "conjuration",
+       "magic_missile": "evocation",
+       "mass_cure_wounds": "abjuration",
+       "mass_healing_word": "abjuration",
+       "mending": "transmutation",
+       "misty_step": "conjuration",
+       "poison_spray": "necromancy",
+       "polymorph": "transmutation",
+       "power_word_heal": "enchantment",
+       "power_word_kill": "enchantment",
+       "power_word_stun": "enchantment",
+       "protection_from_energy": "abjuration",
+       "protection_from_evil_and_good": "abjuration",
+       "ray_of_frost": "evocation",
+       "ray_of_sickness": "necromancy",
+       "revivify": "necromancy",
+       "sacred_flame": "evocation",
+       "scorching_ray": "evocation",
+       "shield": "abjuration",
+       "shield_of_faith": "abjuration",
+       "shillelagh": "transmutation",
+       "shocking_grasp": "evocation",
+       "sleep": "enchantment",
+       "sleet_storm": "conjuration",
+       "spare_the_dying": "necromancy",
+       "speak_with_animals": "divination",
+       "stinking_cloud": "conjuration",
+       "suggestion": "enchantment",
+       "summon_dragon": "conjuration",
+       "sunburst": "evocation",
+       "thaumaturgy": "transmutation",
+       "tree_stride": "conjuration",
+       "true_strike": "divination",
+       "vicious_mockery": "enchantment",
+       "wall_of_fire": "evocation",
+       "wall_of_stone": "evocation",
+       "web": "conjuration",
+       "zone_of_truth": "enchantment"
+      }
+     }
+    },
+    "kind": "object"
+   },
+   "group": null,
+   "order": 15,
+   "default_size": 240,
+   "minimum_size": 140,
+   "default_placement": "docked",
+   "allowed_placements": [
+    "docked",
+    "floating",
+    "window"
+   ],
+   "actions": [],
+   "data": {
+    "entities": {
+     "extra": {
+      "armor_class": 1,
+      "attitudes": {
+       "hero": "friendly"
+      },
+      "available_reactions": [
+       "opportunity_attack"
+      ],
+      "conditions": [],
+      "creature_kind": "monster",
+      "creature_type": "humanoid",
+      "damage_immunities": [],
+      "damage_resistances": [],
+      "damage_vulnerabilities": [],
+      "death_failures": 0,
+      "death_successes": 0,
+      "exhaustion_level": 0,
+      "hp": 1000,
+      "initiative_modifier": 0,
+      "is_alive": true,
+      "max_hp": 1000,
+      "melee_reach": 5,
+      "name": "extra",
+      "reaction_available": true,
+      "resource_maxima": {},
+      "resources": {},
+      "saving_throw_modifiers": {
+       "charisma": 0,
+       "constitution": 0,
+       "dexterity": 0,
+       "intelligence": 0,
+       "strength": 0,
+       "wisdom": 0
+      },
+      "size_rank": 2,
+      "speed": 30,
+      "stable": false,
+      "stable_recovery_hours_remaining": 0,
+      "temp_hp": 0
+     },
+     "guard": {
+      "armor_class": 1,
+      "attitudes": {
+       "hero": "friendly"
+      },
+      "available_reactions": [
+       "opportunity_attack"
+      ],
+      "conditions": [],
+      "creature_kind": "monster",
+      "creature_type": "humanoid",
+      "damage_immunities": [],
+      "damage_resistances": [],
+      "damage_vulnerabilities": [],
+      "death_failures": 0,
+      "death_successes": 0,
+      "exhaustion_level": 0,
+      "hp": 1000,
+      "initiative_modifier": 0,
+      "is_alive": true,
+      "max_hp": 1000,
+      "melee_reach": 5,
+      "name": "guard",
+      "reaction_available": true,
+      "resource_maxima": {},
+      "resources": {},
+      "saving_throw_modifiers": {
+       "charisma": 0,
+       "constitution": 0,
+       "dexterity": 0,
+       "intelligence": 0,
+       "strength": 0,
+       "wisdom": 0
+      },
+      "size_rank": 2,
+      "speed": 30,
+      "stable": false,
+      "stable_recovery_hours_remaining": 0,
+      "temp_hp": 0
+     },
+     "hero": {
+      "ammunition": {
+       "arrow": 20
+      },
+      "armor_class": 17,
+      "bonus_action_available": true,
+      "conditions": [],
+      "constitution_modifier": 2,
+      "creature_kind": "character",
+      "creature_type": "humanoid",
+      "damage_immunities": [],
+      "damage_resistances": [],
+      "damage_vulnerabilities": [],
+      "dodging": false,
+      "exhaustion_level": 0,
+      "fighter_level": 0,
+      "flurry_attacks_remaining": 0,
+      "held_attack_names": [],
+      "held_items": [
+       "spear"
+      ],
+      "hp": 20,
+      "initiative_modifier": 20,
+      "inventory": [
+       "spear",
+       "shortbow"
+      ],
+      "inventory_weapon_copies": {
+       "shortbow": {
+        "maximum": 1,
+        "minimum": 1,
+        "removed": []
+       },
+       "spear": {
+        "maximum": 1,
+        "minimum": 1,
+        "removed": []
+       }
+      },
+      "is_alive": true,
+      "jump_distance_multiplier": 1,
+      "light_attack_source_weapon": null,
+      "light_attack_source_weapons": [],
+      "light_extra_attack_available": false,
+      "light_extra_attack_used": false,
+      "light_unrestricted_source_weapons": [],
+      "max_hp": 20,
+      "melee_reach": 5,
+      "name": "Lite caster",
+      "prepared_spells": [
+       "fire_bolt"
+      ],
+      "reaction_available": true,
+      "resources": {
+       "spell_slot_1": 3,
+       "spell_slot_2": 3,
+       "spell_slot_3": 3,
+       "spell_slot_4": 3,
+       "spell_slot_5": 3,
+       "spell_slot_6": 3,
+       "spell_slot_7": 3,
+       "spell_slot_8": 3,
+       "spell_slot_9": 3
+      },
+      "saving_throw_modifiers": {
+       "charisma": 0,
+       "constitution": 0,
+       "dexterity": 0,
+       "intelligence": 0,
+       "strength": 0,
+       "wisdom": 0
+      },
+      "size_rank": 1,
+      "speed": 30,
+      "spell_jump_used": false,
+      "spell_materials": [],
+      "spell_slot_cast_this_turn": false,
+      "spell_speed_reduction": 0,
+      "temp_hp": 0,
+      "turns_started": 1,
+      "weapon_copy_refs": {
+       "melee": {
+        "main_hand": 1,
+        "off_hand": null
+       },
+       "ranged": {
+        "main_hand": 1,
+        "off_hand": 1
+       }
+      },
+      "weapon_sets": {
+       "active_set": "melee",
+       "format": 1,
+       "melee": {
+        "main_hand": "spear",
+        "off_hand": null
+       },
+       "ranged": {
+        "main_hand": "shortbow",
+        "off_hand": "shortbow"
+       }
+      }
+     },
+     "other": {
+      "armor_class": 1,
+      "attitudes": {
+       "hero": "friendly"
+      },
+      "available_reactions": [
+       "opportunity_attack"
+      ],
+      "conditions": [],
+      "creature_kind": "monster",
+      "creature_type": "humanoid",
+      "damage_immunities": [],
+      "damage_resistances": [],
+      "damage_vulnerabilities": [],
+      "death_failures": 0,
+      "death_successes": 0,
+      "exhaustion_level": 0,
+      "hp": 1000,
+      "initiative_modifier": 0,
+      "is_alive": true,
+      "max_hp": 1000,
+      "melee_reach": 5,
+      "name": "other",
+      "reaction_available": true,
+      "resource_maxima": {},
+      "resources": {},
+      "saving_throw_modifiers": {
+       "charisma": 0,
+       "constitution": 0,
+       "dexterity": 0,
+       "intelligence": 0,
+       "strength": 0,
+       "wisdom": 0
+      },
+      "size_rank": 2,
+      "speed": 30,
+      "stable": false,
+      "stable_recovery_hours_remaining": 0,
+      "temp_hp": 0
+     }
+    },
+    "participants": [
+     {
+      "id": "hero",
+      "kind": "player_character",
+      "data": {
+       "abilities": {
+        "charisma": 10,
+        "constitution": 14,
+        "dexterity": 14,
+        "intelligence": 18,
+        "strength": 16,
+        "wisdom": 10
+       },
+       "background": "sage",
+       "classes": [
+        {
+         "id": "wizard",
+         "level": 17
+        }
+       ],
+       "level": 17,
+       "name": "Lite caster",
+       "origin_feats": [
+        "magic_initiate"
+       ],
+       "party_role": "player_character",
+       "saving_throw_proficiencies": [
+        "intelligence",
+        "wisdom"
+       ],
+       "size_rank": 1,
+       "species": "human",
+       "speed": 30,
+       "spellcasting_grants": [
+        {
+         "ability": "intelligence",
+         "source": "wizard",
+         "spells": [
+          "fire_bolt"
+         ]
+        }
+       ],
+       "weapon_masteries": [
+        "dagger",
+        "scimitar"
+       ],
+       "weapon_proficiencies": [
+        "simple_weapons",
+        "martial_weapons"
+       ],
+       "wizard_spellbook": []
+      }
+     }
+    ],
+    "spell_categories": {
+     "acid_splash": "evocation",
+     "aid": "abjuration",
+     "alter_self": "transmutation",
+     "arcane_eye": "divination",
+     "aura_of_life": "abjuration",
+     "beacon_of_hope": "abjuration",
+     "bless": "enchantment",
+     "blight": "necromancy",
+     "blur": "illusion",
+     "burning_hands": "evocation",
+     "charm_monster": "enchantment",
+     "chromatic_orb": "evocation",
+     "circle_of_death": "necromancy",
+     "cloud_of_daggers": "conjuration",
+     "command": "enchantment",
+     "commune": "divination",
+     "cone_of_cold": "evocation",
+     "contact_other_plane": "divination",
+     "counterspell": "abjuration",
+     "cure_wounds": "abjuration",
+     "darkvision": "transmutation",
+     "daylight": "evocation",
+     "death_ward": "abjuration",
+     "dispel_magic": "abjuration",
+     "divine_smite": "evocation",
+     "dragons_breath": "transmutation",
+     "eldritch_blast": "evocation",
+     "etherealness": "conjuration",
+     "fear": "illusion",
+     "find_steed": "conjuration",
+     "fire_bolt": "evocation",
+     "fire_shield": "evocation",
+     "fire_storm": "evocation",
+     "fireball": "evocation",
+     "flame_strike": "evocation",
+     "fly": "transmutation",
+     "fog_cloud": "conjuration",
+     "foresight": "divination",
+     "freedom_of_movement": "abjuration",
+     "geas": "enchantment",
+     "greater_restoration": "abjuration",
+     "guardian_of_faith": "conjuration",
+     "guidance": "divination",
+     "guiding_bolt": "evocation",
+     "heal": "abjuration",
+     "healing_word": "abjuration",
+     "hex": "enchantment",
+     "hold_monster": "enchantment",
+     "hold_person": "enchantment",
+     "hunters_mark": "divination",
+     "ice_storm": "evocation",
+     "insect_plague": "conjuration",
+     "legend_lore": "divination",
+     "lesser_restoration": "abjuration",
+     "light": "evocation",
+     "lightning_bolt": "evocation",
+     "longstrider": "transmutation",
+     "mage_armor": "abjuration",
+     "mage_hand": "conjuration",
+     "magic_missile": "evocation",
+     "mass_cure_wounds": "abjuration",
+     "mass_healing_word": "abjuration",
+     "mending": "transmutation",
+     "misty_step": "conjuration",
+     "poison_spray": "necromancy",
+     "polymorph": "transmutation",
+     "power_word_heal": "enchantment",
+     "power_word_kill": "enchantment",
+     "power_word_stun": "enchantment",
+     "protection_from_energy": "abjuration",
+     "protection_from_evil_and_good": "abjuration",
+     "ray_of_frost": "evocation",
+     "ray_of_sickness": "necromancy",
+     "revivify": "necromancy",
+     "sacred_flame": "evocation",
+     "scorching_ray": "evocation",
+     "shield": "abjuration",
+     "shield_of_faith": "abjuration",
+     "shillelagh": "transmutation",
+     "shocking_grasp": "evocation",
+     "sleep": "enchantment",
+     "sleet_storm": "conjuration",
+     "spare_the_dying": "necromancy",
+     "speak_with_animals": "divination",
+     "stinking_cloud": "conjuration",
+     "suggestion": "enchantment",
+     "summon_dragon": "conjuration",
+     "sunburst": "evocation",
+     "thaumaturgy": "transmutation",
+     "tree_stride": "conjuration",
+     "true_strike": "divination",
+     "vicious_mockery": "enchantment",
+     "wall_of_fire": "evocation",
+     "wall_of_stone": "evocation",
+     "web": "conjuration",
+     "zone_of_truth": "enchantment"
+    }
+   }
+  }
+ ],
+ "shot_effects": []
+}

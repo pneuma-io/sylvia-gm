@@ -261,11 +261,13 @@ test('Ruleset default placements create their declared window groups', () => {
 });
 
 
-test('fresh game layout gives the app queue its own compact leaf, not a Party tab',()=>{
+test('fresh game layout keeps the app queue beside the character, not behind Party',()=>{
  const store=createStore(memoryStorage());const panels=[{id:'map',renderer:'coordinate_map'},{id:'party',renderer:'party'},{id:'character',renderer:'unit_list'},{id:'sylvia.action-queue',renderer:'action_queue',default_size:220}];
  const layout=store.select({campaignId:'queue',rulesetId:'rules',surfaces:panels});
  const leaves=[];const visit=t=>{if(t.kind==='tabs')leaves.push(t.panels);else{visit(t.first);visit(t.second);}};visit(layout.sidebar);
- assert.ok(leaves.some(ids=>ids.length===1&&ids[0]==='sylvia.action-queue'));assert.ok(leaves.some(ids=>ids.length===1&&ids[0]==='party'));
+ // Accepted panel suite: the queue is a tab in the character column; Party keeps its own leaf.
+ assert.ok(leaves.some(ids=>ids[0]==='character'&&ids.includes('sylvia.action-queue')));assert.ok(leaves.some(ids=>ids.length===1&&ids[0]==='party'));
+ assert.ok(!leaves.some(ids=>ids.includes('party')&&ids.includes('sylvia.action-queue')));
 });
 test('adding queue to a saved workspace preserves its existing tree, windows and sizes',()=>{
  const storage=memoryStorage(),store=createStore(storage);store.select({campaignId:'saved',rulesetId:'r',surfaces});store.change({type:'size',panelId:'party',height:321});store.change({type:'move',panelId:'inventory',destination:{windowId:'new'}});const before=store.snapshot();
