@@ -648,6 +648,126 @@
         "reference_sheet": "Use case: identity-preserve. Asset type: canonical multi-view reference sheet for Eli Penn. Input image 1 is the authoritative identity reference for this character. Produce one landscape PNG, 1536x1024, with three complete figures at identical scale—straight front, exact side profile, straight back—and one enlarged frontal face detail. Plain light neutral background, polished naturalistic digital RPG illustration and soft natural light. Preserve the exact face, adult age, body proportions, hair, skin, clothing colors, seams, equipment and accessories from input image 1. Tall slim adult Human in their sixties with lightly weathered medium fair skin, gray-blue eyes, silver-gray hair tied at the nape, a short neatly trimmed gray beard and mustache, and a kind patient expression. A modest navy-blue robe over a cream buttoned shirt, plain brown belt, loose dark trousers and brown lace-up boots. Carries a plain wooden quarterstaff and a closed worn brown spellbook; no armor, shield, hat or jewelry. Keep one consistent outfit and physically sensible gear placement across all views. Complete hair and boot soles inside comfortable margins. Head uncovered. No redesign, new people, captions, labels, borders, text, UI, scenery, insignia or magic effects.",
         "portrait": "Use case: identity-preserve. Asset type: aligned reusable square portrait for Eli Penn in Sylvia GM. Input image 1 is the canonical full-body identity; image 2 is this character's canonical multi-view reference. One square PNG, 1024x1024, polished naturalistic digital RPG illustration, plain light neutral background, soft natural light. Preserve the exact face, adult age, skin, eyes, hair and clothing from these references. Tall slim adult Human in their sixties with lightly weathered medium fair skin, gray-blue eyes, silver-gray hair tied at the nape, a short neatly trimmed gray beard and mustache, and a kind patient expression. A modest navy-blue robe over a cream buttoned shirt, plain brown belt, loose dark trousers and brown lace-up boots. Carries a plain wooden quarterstaff and a closed worn brown spellbook; no armor, shield, hat or jewelry. Portrait composition: head and upper shoulders only, directly forward, upright head with no tilt, level eyes facing viewer, centered face, eye line at 35 percent of image height. Consistent face scale and comfortable space above all hair and beside the head for an adjustable circular crop. Head uncovered, face unobstructed, a restrained warm approachable expression. No book, staff, dagger, focus, hands or other props in the crop; no text, labels, borders, UI, scenery, insignia or magic. Preserve identity rather than redesigning it."
       }
+    },
+    {
+      "id": "severed-npc-the-cartographer",
+      "name": "The Cartographer",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/the-cartographer.md",
+          "sha256": "686da9452b487286b455536469e1670dfc9af182a62290a949f6616e510ff271",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/the-cartographer.md",
+          "sha256": "ffe2e1d0968581c58b13a98ba5f250744326ef20069dbf14da1b8f123bec1d68",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An anonymous adult cartographer fully concealed in a worn charcoal hooded travelling robe and simple layered dark cloth. Deep opaque shadow hides the entire face from every angle; no visible eyes, skin, hair, ears, facial features or species cues. Plain dark gloves, practical dark covered footwear, a rolled parchment map, a small leather document satchel and a simple brass divider. A slightly stooped, exhausted, guarded posture. No revealed identity, gender, species, tattoos, insignia or magical effects.",
+        "full_body": {
+          "path": "assets/characters/4f46b1dea7fa75d42c6aa1017412b8e7de4b6a6bcc8710245557d66385d2ded6.png",
+          "sha256": "4f46b1dea7fa75d42c6aa1017412b8e7de4b6a6bcc8710245557d66385d2ded6"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/dd0fdd6326effc66c0cb5fe9ee28da709db60eadc44c8e673d2f252c57e1e86d.png",
+          "sha256": "dd0fdd6326effc66c0cb5fe9ee28da709db60eadc44c8e673d2f252c57e1e86d"
+        },
+        "portrait": {
+          "path": "assets/characters/74572688cc5a720bc4769ca53d971276258c5aa356c5d20f2871d68201638b6f.png",
+          "sha256": "74572688cc5a720bc4769ca53d971276258c5aa356c5d20f2871d68201638b6f"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2136070
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2414550
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2422866
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body reference for The Cartographer in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration matching a grounded fantasy character catalogue, plain light neutral background and soft natural studio light, subtle grounding shadow. Exactly one complete standing figure from top of hood to boot soles with comfortable margins, near-front three-quarter stance, clear silhouette and plausible anatomy. Canon: an anonymous obsessive cartographer who always wears a hood; no one knows their identity or what they look like, and they never meet visitors in person. Preserve that mystery absolutely. Worn charcoal hooded travelling robe and plain layered dark cloth completely conceal the body; a deep, completely opaque hood shadow hides the entire face. Dark gloves and covered practical dark footwear conceal all skin. Show no eyes, face, skin, hair, ears, beard, gender or species cues in any view. Slightly stooped tired posture, holding one rolled parchment map, a small plain leather document satchel at the hip, a small brass drawing divider attached safely to the belt. Outfit details are editable visual defaults, not new story facts. No facial mask design, glowing eyes, horns, supernatural anatomy, obvious armor, weapons, runes, heraldry or magical effects. No text, writing, labels, borders, collage, scenery, UI or extra figures. Concealed-face portrait treatment is intentional and must remain consistent in later images.",
+        "reference_sheet": "Use case: identity-preserve. Asset type: canonical multi-view reference sheet for The Cartographer, Sylvia GM Severed Lands. Input image 1 is the authoritative full-body identity reference. One landscape PNG, 1536x1024. Polished naturalistic digital RPG illustration, plain light neutral background and soft natural studio light. Three complete figures at the same scale, straight front, exact side and straight back, plus one enlarged frontal head detail. Preserve the exact silhouette, proportions, materials, construction, colors, wear, equipment and every identifying detail of image 1. An anonymous adult cartographer fully concealed in a worn charcoal hooded travelling robe and simple layered dark cloth. Deep opaque shadow hides the entire face from every angle; no visible eyes, skin, hair, ears, facial features or species cues. Plain dark gloves, practical dark covered footwear, a rolled parchment map, a small leather document satchel and a simple brass divider. A slightly stooped, exhausted, guarded posture. No revealed identity, gender, species, tattoos, insignia or magical effects. Complete head and feet inside comfortable margins. Keep equipment and surfaces physically consistent between views. The head detail must show only the same hood and completely opaque shadow. Do not invent or reveal any face, eyes, skin, hair, ears, gender, species or identity from any direction. The figure is a concealed cartographer rather than a supernatural being. No redesign, extra people, scenery, text, labels, borders, UI or invented emblems.",
+        "portrait": "Use case: identity-preserve. Asset type: aligned reusable square portrait for The Cartographer, Sylvia GM Severed Lands. Input image 1 is the canonical full-body identity; input image 2 is the canonical multi-view reference. Produce one square PNG, 1024x1024. Polished naturalistic digital RPG illustration, plain light neutral background, soft natural studio light. Preserve the same head, silhouette, materials, colors, clothing and exact identity. An anonymous adult cartographer fully concealed in a worn charcoal hooded travelling robe and simple layered dark cloth. Deep opaque shadow hides the entire face from every angle; no visible eyes, skin, hair, ears, facial features or species cues. Plain dark gloves, practical dark covered footwear, a rolled parchment map, a small leather document satchel and a simple brass divider. A slightly stooped, exhausted, guarded posture. No revealed identity, gender, species, tattoos, insignia or magical effects. Head and upper shoulders only, upright directly forward pose without tilt, centered head, comfortable margin above the entire head and on both sides for adjustable circular cropping. The center of the opaque hood opening is at 35 percent of image height, matching the common eye-line framing while revealing no eyes or face. Show the same hood, scarf and upper shoulders. The hood interior must be completely featureless opaque darkness, without any visible skin, eyes, nose, mouth, hair, ears, mask or supernatural glow. Never infer the hidden identity. No carried props, hands, map, divider or satchel inside the crop. No redesign, text, labels, borders, UI, scenery, invented emblems or extra people."
+      }
+    },
+    {
+      "id": "severed-monster-anchor-guardian-flesh",
+      "name": "Anchor Guardian",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/anchor-guardian-flesh.md",
+          "sha256": "a31c9e00171f83e37739fa77c369444453432c69c5f1e6778128395dacce0a7f",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/anchor-guardian-flesh.md",
+          "sha256": "a1d130d4a909a23e5a875874631ddaac7db01b88cdd4b31ee4df6a1683be88da",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A hulking roughly human-shaped Warden stone guardian with a broad heavy torso, thick asymmetrical stone limbs and blunt stony hands, fused with sealed muted gray-brown organic tissue along joints and cracks. Worn pale-gray carved stone plates, restrained angular Warden masonry and small sickly violet Rift glimmers inside a few seams. Heavy impassive carved stone brow and narrow dim eye slits, no human face. Ancient precise construction mixed with an uneasy living posture. No exposed organs, gore, armor, clothing, weapons or faction heraldry.",
+        "full_body": {
+          "path": "assets/characters/490bec00a1aa0a8ed147116aac054609ac745c1ea464dbe5c8dde1cf17381409.png",
+          "sha256": "490bec00a1aa0a8ed147116aac054609ac745c1ea464dbe5c8dde1cf17381409"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/3b0657c5968e06687cbe3149b7e4ff81659be4a7038b008285e5c074230ec589.png",
+          "sha256": "3b0657c5968e06687cbe3149b7e4ff81659be4a7038b008285e5c074230ec589"
+        },
+        "portrait": {
+          "path": "assets/characters/c6bea40d00c94b47af7e4ec8b85042c9f1e87fde898220468d6728755ade5450.png",
+          "sha256": "c6bea40d00c94b47af7e4ec8b85042c9f1e87fde898220468d6728755ade5450"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2459682
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2417758
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2501216
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body creature reference for the Anchor Guardian (flesh-fused form) in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG creature illustration, grounded fantasy materials, plain light neutral background, soft natural studio light, subtle grounding shadow. Exactly one complete standing creature, front three-quarter stance, complete head, hands and feet inside comfortable margins. Canon: an ancient Warden construct guarding an Anchor Door, a grotesque fusion of stone construction and Rift-touched organic matter, with both ancient precision and feral hunger. Hulking roughly human-shaped construct with a broad heavy torso, thick asymmetrical stone limbs and blunt stony hands, worn pale-gray angular carved stone plates joined by sealed muted gray-brown organic tissue along joints and cracks. Small restrained sickly violet Rift glimmers inside a few seams; glowing seams do not obscure the silhouette or surfaces. Heavy impassive carved stone brow, narrow dim eye slits, no human face. A subtly uneasy living posture, physically coherent stone anatomy. This is an enemy archetype rather than a named human identity; equipment and exact stat values are not illustrated. Non-graphic creature design: closed intact tissue, no blood, wounds or exposed organs. No clothes, metal armor, carried weapons, invented insignia, text, labels, borders, UI, scenery, doorway, extra people or props.",
+        "reference_sheet": "Use case: identity-preserve. Asset type: canonical multi-view reference sheet for Anchor Guardian, Sylvia GM Severed Lands. Input image 1 is the authoritative full-body identity reference. One landscape PNG, 1536x1024. Polished naturalistic digital RPG illustration, plain light neutral background and soft natural studio light. Three complete figures at the same scale, straight front, exact side and straight back, plus one enlarged frontal head detail. Preserve the exact silhouette, proportions, materials, construction, colors, wear, equipment and every identifying detail of image 1. A hulking roughly human-shaped Warden stone guardian with a broad heavy torso, thick asymmetrical stone limbs and blunt stony hands, fused with sealed muted gray-brown organic tissue along joints and cracks. Worn pale-gray carved stone plates, restrained angular Warden masonry and small sickly violet Rift glimmers inside a few seams. Heavy impassive carved stone brow and narrow dim eye slits, no human face. Ancient precise construction mixed with an uneasy living posture. No exposed organs, gore, armor, clothing, weapons or faction heraldry. Complete head and feet inside comfortable margins. Keep equipment and surfaces physically consistent between views. Maintain the same irregular stone plate placements and sealed intact organic seams, with restrained violet glimmers. No exposed organs, blood, wounds, new armor, new weapons or new limbs. No redesign, extra people, scenery, text, labels, borders, UI or invented emblems.",
+        "portrait": "Use case: identity-preserve. Asset type: aligned reusable square portrait for Anchor Guardian, Sylvia GM Severed Lands. Input image 1 is the canonical full-body identity; input image 2 is the canonical multi-view reference. Produce one square PNG, 1024x1024. Polished naturalistic digital RPG illustration, plain light neutral background, soft natural studio light. Preserve the same head, silhouette, materials, colors, clothing and exact identity. A hulking roughly human-shaped Warden stone guardian with a broad heavy torso, thick asymmetrical stone limbs and blunt stony hands, fused with sealed muted gray-brown organic tissue along joints and cracks. Worn pale-gray carved stone plates, restrained angular Warden masonry and small sickly violet Rift glimmers inside a few seams. Heavy impassive carved stone brow and narrow dim eye slits, no human face. Ancient precise construction mixed with an uneasy living posture. No exposed organs, gore, armor, clothing, weapons or faction heraldry. Head and upper shoulders only, upright directly forward pose without tilt, centered head, comfortable margin above the entire head and on both sides for adjustable circular cropping. Place the eye slits at 35 percent of image height with a consistent large readable head scale. Retain the angular stone brow and long carved stone muzzle-like face structure, sealed organic neck seams and subtle violet eye slits. No human face, wounds, blood or exposed organs. No carried props, hands, map, divider or satchel inside the crop. No redesign, text, labels, borders, UI, scenery, invented emblems or extra people."
+      }
     }
   ]
 }

@@ -5,6 +5,8 @@ import json
 import sys
 from pathlib import Path
 
+from scripts.inventory_authored_artwork import authored_artwork_subjects
+
 from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.application.bundled_character_art import (
     bundled_character_image,
@@ -28,6 +30,14 @@ def test_prepared_bundles_match_starter_data_package_payloads_and_frozen_invento
     inventory = json.loads((ROOT / "src-tauri/sidecar-data-files.json").read_bytes())["files"]
     rules, reference, setting = _rift_drafts()
     resources = json.loads((ROOT / "src-tauri/tauri.conf.json").read_bytes())["bundle"]["resources"]
+    authored_sources = {
+        (source["package_id"], source["path"], source["sha256"]): (
+            edition["document"].encode("utf-8")
+        )
+        for subject in authored_artwork_subjects()["subjects"]
+        for edition in subject["editions"]
+        for source in (edition["source"],)
+    }
     assert catalogue["characters"]
     for entry in catalogue["characters"]:
         visuals = validate_character_visuals(entry["visuals"])
@@ -35,10 +45,12 @@ def test_prepared_bundles_match_starter_data_package_payloads_and_frozen_invento
             source = next(row for row in starters if row["participant"]["name"] == entry["name"])
             assert source["visuals"] == visuals
         else:
-            path = entry["sources"][0]["path"]
-            assert bundled_source_visuals(
-                "pneuma.severed-lands", path, (WORLD / path).read_bytes()
-            ) == visuals
+            for source in entry["sources"]:
+                raw = authored_sources[(source["package_id"], source["path"], source["sha256"])]
+                assert bundled_source_visuals(
+                    source["package_id"], source["path"], raw, subject_name=entry["name"],
+                    campaign_setting_ids=frozenset({source["package_id"]}),
+                ) == visuals
         for purpose in ("full_body", "reference_sheet", "portrait"):
             asset = entry["visuals"][purpose]
             raw = bundled_character_image(asset["path"], asset["sha256"])
