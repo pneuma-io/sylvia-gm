@@ -27,9 +27,12 @@ from sylvia_gm.domain.authority import (
     ActionReceipt,
     ActionStatus,
     AwaitingChoiceReceipt,
+    CampaignDisplaySnapshot,
+    LifecycleState,
     MechanicOutcome,
     MechanicsChoiceOption,
     MechanicsChoiceRequest,
+    PackageLock,
     TurnStatus,
     WriterRole,
 )
@@ -94,14 +97,20 @@ class _OwnerProjection:
             resulting_revision=command.expected_revision + 1,
         )
 
-    def snapshot(self, campaign_id: str) -> object:
+    def snapshot(self, campaign_id: str) -> CampaignDisplaySnapshot:
         assert campaign_id == "campaign-stateless"
-        return SimpleNamespace(
+        return CampaignDisplaySnapshot(
+            campaign_id=campaign_id, display_name="Synthetic stateless campaign",
+            lifecycle=LifecycleState.ACTIVE, package_lock=PackageLock(entries=()),
+            participants=(), actions=(), events=(),
             revision=4,
             writer=WriterRole.DM,
             turns={"turn-stateless": TurnStatus.OPEN},
             state={"synthetic.stateless.combat": {"phase": "signal"}},
         )
+
+    def model_context_snapshot(self, campaign_id: str) -> tuple[CampaignDisplaySnapshot, None]:
+        return self.snapshot(campaign_id), None
 
     def record_admin_full_audit(self, payload: object) -> None:
         self.audit.append(payload)
