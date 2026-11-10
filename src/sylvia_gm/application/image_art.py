@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 from uuid import NAMESPACE_URL, uuid5
 
+from sylvia_gm.application.character_art_workflow import CharacterArtWorkflow
 from sylvia_gm.application.image_hooks import (
     ImageAdapter,
     ImageData,
@@ -63,6 +64,7 @@ class ImageArt:
         self._closed = False
         self._restored_visuals: set[tuple[str, str]] = set()
         self._builder_targets: dict[str, dict[str, dict[str, Any]]] = {}
+        self.characters = CharacterArtWorkflow(self)
 
     def close(self) -> None:
         with self._lock:
@@ -228,6 +230,39 @@ class ImageArt:
             if (reference := bundle.get(purpose)) is not None
         }
 
+    def package_asset(self, session_id: str, reference: Mapping[str, Any]) -> bytes:
+        """Publish only images selected or generated in the publishing session's own scope."""
+        scope, _ = self._scope(session_id)
+        if not any(
+            row["sha256"] == reference["sha256"] for row in self.store.list_selections(scope)
+        ):
+            row = self._owned(session_id, reference.get("operation_id", ""))
+            if row["status"] != "succeeded" or row["result_sha256"] != reference["sha256"]:
+                raise ValueError("Select this character's artwork before publishing it")
+        return self.store.image(reference["sha256"])
+
+    def visuals_for_publication(
+        self,
+        session_id: str,
+        name: str,
+        *,
+        source_target_id: str | None = None,
+    ) -> dict[str, Any] | None:
+        """Carry a finished character's artwork into its saved data without model bookkeeping."""
+        scope, _ = self._scope(session_id)
+        rows = self.store.list_selections(scope)
+        if source_target_id is not None:
+            source = character_visuals_from_selections(rows, source_target_id)
+            if source is not None:
+                return source
+        matches = {row["target_id"] for row in rows if row["metadata"].get("target_name") == name}
+        bundles = [
+            bundle
+            for target in matches
+            if (bundle := character_visuals_from_selections(rows, target)) is not None
+        ]
+        return bundles[0] if len(bundles) == 1 else None
+
     def _runtime(self, session_id: str) -> ImageSession:
         with self._lock:
             if session_id not in self._sessions:
@@ -240,7 +275,7 @@ class ImageArt:
     @staticmethod
     def _receipt(row: dict[str, Any]) -> dict[str, Any]:
         """Routine projections contain identity and status, never prompts or raw provider output."""
-        return {
+        result = {
             key: row.get(key)
             for key in (
                 "operation_id",
@@ -251,6 +286,15 @@ class ImageArt:
                 "result_sha256",
             )
         }
+        flow = json.loads(row["request_json"]).get("character_flow")
+        if flow:
+            result["character_flow"] = {
+                "id": flow["id"],
+                "step": flow["steps"].index(row["purpose"]) + 1,
+                "total": len(flow["steps"]),
+                "name": flow["name"],
+            }
+        return result
 
     def targets(self, session_id: str) -> list[dict[str, Any]]:
         _, campaign_id = self._scope(session_id)
@@ -416,7 +460,15 @@ class ImageArt:
             raise ValueError("Image operation is unavailable in this session")
         return row
 
-    def request(
+    def request(self, session_id: str, **parameters: Any) -> dict[str, Any]:
+        """Select the complete character workflow or an explicit individual image operation."""
+        if parameters.get("purpose") == "character":
+            return self.characters.request(
+                session_id, **{key: value for key, value in parameters.items() if key != "purpose"}
+            )
+        return self._request_single(session_id, **parameters)
+
+    def _request_single(
         self,
         session_id: str,
         *,
@@ -427,6 +479,8 @@ class ImageArt:
         appearance: str = "",
         map_scene: Mapping[str, Any] | None = None,
         edit_sha256: str | None = None,
+        name: str = "",
+        character_flow: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         scope, campaign_id = self._scope(session_id)
         settings = self.settings()
@@ -488,7 +542,13 @@ class ImageArt:
                 None,
             )
             appearance = appearance or (prior["metadata"]["appearance"] if prior else brief)
-            metadata = {"appearance": appearance}
+            metadata = {"appearance": appearance, "target_name": name}
+            if campaign_id is None and name:
+                self._builder_targets.setdefault(session_id, {})[target_id] = {
+                    "id": target_id,
+                    "kind": "character",
+                    "name": name,
+                }
         value = {
             "brief": brief,
             "appearance": appearance,
@@ -496,6 +556,7 @@ class ImageArt:
             "map_projection": projection,
             "edit_sha256": edit_sha256,
             "adapter_id": self.adapters[0].capabilities.adapter_id,
+            **({"character_flow": character_flow} if character_flow else {}),
         }
         fingerprint = hashlib.sha256(
             canonical_json_bytes(
@@ -597,11 +658,19 @@ class ImageArt:
             raise ImageHookError("missing_character_references")
         references = []
         seen = set()
+        canonical_purposes = (
+            {"full_body"}
+            if row["purpose"] == "reference_sheet"
+            else {
+                "full_body",
+                "reference_sheet",
+            }
+        )
         for item in selected:
             if (
                 row["purpose"] != "map_underlay"
                 and (
-                    item["purpose"] in {"full_body", "reference_sheet"}
+                    item["purpose"] in canonical_purposes
                     or (
                         item["purpose"] == "portrait"
                         and item["metadata"].get("source") == "character_card"
@@ -651,7 +720,7 @@ class ImageArt:
         metadata["references"] = {
             item["purpose"]: item["sha256"]
             for item in selected
-            if item["purpose"] in {"full_body", "reference_sheet"}
+            if item["purpose"] in canonical_purposes
         }
         value["metadata"] = metadata
         value["reference_sha256s"] = [image.sha256 for image in references]
@@ -708,13 +777,15 @@ class ImageArt:
             ),
             None,
         )
-        return self.store.adopt(
+        selected = self.store.adopt(
             scope_id=scope,
             operation_id=operation_id,
             expected_sha256=expected_sha256,
             frame=previous["frame"] if previous else PortraitFrame().as_payload(),
             metadata=value["metadata"],
         )
+        next_request = self.characters.after_adoption(session_id, row)
+        return {**selected, **({"next_request": next_request} if next_request else {})}
 
     def cancel(self, session_id: str, operation_id: str) -> dict[str, Any]:
         row = self._owned(session_id, operation_id)

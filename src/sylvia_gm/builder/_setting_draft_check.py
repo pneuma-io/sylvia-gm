@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from sylvia_gm.application.package_character_art import ImageAssetReader
 from sylvia_gm.application.package_library import validate_admitted_package_runtimes
 from sylvia_gm.builder._setting_materializer import materialize_setting_draft
 from sylvia_gm.domain.authority import SafePayload
@@ -22,6 +23,7 @@ def check_setting_draft(
     package_id: str,
     version: str,
     title: str,
+    image_asset_reader: ImageAssetReader | None = None,
 ) -> SafePayload:
     """Validate one Setting draft without installing it or changing its workspace."""
 
@@ -32,6 +34,7 @@ def check_setting_draft(
         package_id=package_id,
         version=version,
         title=title,
+        image_asset_reader=image_asset_reader,
     ) as materialized:
         with admit_package_archive(materialized.archive) as admitted:
             validate_admitted_package_runtimes(admitted)

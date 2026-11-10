@@ -34,7 +34,17 @@ _REQUEST = {
             "maxLength": 128,
             "description": "The saved character ID or actual map ID, never a file path.",
         },
-        "purpose": {"type": "string", "enum": sorted(IMAGE_PURPOSES)},
+        "purpose": {
+            "type": "string",
+            "enum": sorted(IMAGE_PURPOSES | {"character"}),
+            "description": "Use character for the complete reference-and-portrait workflow.",
+        },
+        "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160,
+            "description": "Human-readable character name, including a new Builder character.",
+        },
         "brief": {
             "type": "string",
             "minLength": 1,
@@ -65,7 +75,7 @@ _REQUEST = {
             ),
         },
     },
-    "required": ["operation_id", "target_id", "purpose", "brief"],
+    "required": ["operation_id", "purpose", "brief"],
 }
 
 
@@ -106,7 +116,7 @@ def image_art_model_tools(owner: AuthorityOwner) -> tuple[ModelMechanicsTool, ..
             "image_art.request",
             _REQUEST,
             description=(
-                "Request generation or editing of one character reference, portrait or "
+                "Create complete character artwork, or generate/edit an individual image or "
                 "map underlay. "
                 "The owner adds saved canonical references and renders the actual map reference. "
                 "Review mode proposes it; Auto generates and uses it. A failed request "

@@ -623,7 +623,12 @@ def _image_path(digest: str) -> str:
     return f"assets/image-hooks/{digest}.png"
 
 
-def _declare_images(draft: NormalizedPackageDraft, payloads: dict[str, bytes]) -> None:
+def _declare_images(
+    draft: NormalizedPackageDraft,
+    payloads: dict[str, bytes],
+    *,
+    character_assets: frozenset[str] = frozenset(),
+) -> None:
     """Extend content declarations with one nonmechanical image inclusion."""
     path = draft.record.get("content_declarations")
     if path is None:
@@ -670,7 +675,8 @@ def _declare_images(draft: NormalizedPackageDraft, payloads: dict[str, bytes]) -
         inclusion["links"]["artifacts"] = sorted(
             p
             for p in payloads
-            if p == ASSOCIATIONS_PATH
+            if p in character_assets
+            or p == ASSOCIATIONS_PATH
             or (
                 p.startswith("assets/image-hooks/")
                 and p.endswith(".png")

@@ -58,6 +58,11 @@ test('one saved crop is reused in Party, Character, Map and labelled dialogue',{
   });
   assert.ok(Math.abs(crop.x-.21)<.01,`Saved horizontal crop moves square art: ${crop.x}`);
   assert.ok(Math.abs(crop.y-.155)<.01,`Saved vertical crop moves square art: ${crop.y}`);
+  await page.locator('.ruleset-roster-panel [data-character-art]').first().dispatchEvent('click');
+  const dialog=page.getByRole('dialog',{name:'Images'});
+  assert.equal(await dialog.locator('[name=target_id]').inputValue(),'bram');
+  assert.equal(await dialog.locator('[name=purpose]').inputValue(),'character');
+  await dialog.getByRole('button',{name:'Close images'}).click();
   const reads=await page.evaluate(async()=>{
    const scope={campaign_id:'image-surfaces',session_id:'gm',current:()=>true};
    const call=window.artSurfaceQA.dispatchPanelWindowRequest;

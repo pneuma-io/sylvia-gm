@@ -2863,11 +2863,18 @@ def _dispatch_selected(
                 """Save unbound content without selecting or mutating a campaign."""
                 from sylvia_gm.application.character_profiles import validate_character_profile
 
-                canonical = canonical_json_bytes(validate_character_profile(data))
+                profile = dict(validate_character_profile(data))
+                if profile.get("format_version") == 2 and profile.get("visuals") is None:
+                    artwork = application_owner.image_art_service().visuals_for_publication(
+                        session_id, str(profile["name"]),
+                    )
+                    if artwork is not None:
+                        profile["visuals"] = artwork
+                canonical = canonical_json_bytes(profile)
                 saved = save_character_profile(
                     storage_root,
                     operation_id=f"{session_id}:{hashlib.sha256(canonical).hexdigest()}",
-                    source=data,
+                    source=canonical,
                 )
                 return saved.catalog_payload()
 
@@ -2944,6 +2951,14 @@ def _dispatch_selected(
                     raise CommandRejected("Choose one of this Ruleset's participant schema IDs")
                 declaration = declarations[0]
                 source_profile = resolve_source_profile(source_profile)
+                if visuals is None:
+                    visuals = application_owner.image_art_service().visuals_for_publication(
+                        session_id, str(participant.get("name", "")),
+                        source_target_id=(
+                            str(source_profile["artifact_id"]) if source_profile is not None
+                            else repair_character[0] if repair_character is not None else None
+                        ),
+                    )
                 content_basis = canonical_json_bytes(
                     {
                         "session_id": session_id,
@@ -3087,6 +3102,9 @@ def _dispatch_selected(
                     application_owner, source.package_lock, setting_id=str(setting["id"]),
                 )
 
+            def read_image_asset(reference: Mapping[str, Any]) -> bytes:
+                return application_owner.image_art_service().package_asset(session_id, reference)
+
             def check_plan() -> SafePayload:
                 source = source_selection.candidate()
                 selected_authority = selected_plan_authority()
@@ -3096,6 +3114,7 @@ def _dispatch_selected(
                     application_owner, _builder_workspace(storage_root, context.session),
                     candidate_id=source.candidate_id, expected_authority=selected_authority,
                     require_complete_characters=completing_required_characters,
+                    image_asset_reader=read_image_asset,
                 )
 
             def check_setting(*, package_id: str, version: str, title: str) -> SafePayload:
@@ -3106,6 +3125,7 @@ def _dispatch_selected(
                     application_owner, _builder_workspace(storage_root, context.session),
                     candidate_id=source.candidate_id,
                     package_id=package_id, version=version, title=title,
+                    image_asset_reader=read_image_asset,
                 )
 
             def publish_plan() -> tuple[CampaignPlanDraft, SafePayload]:
@@ -3119,6 +3139,7 @@ def _dispatch_selected(
                 with materialize_plan_snapshot_draft(
                     application_owner, workspace, candidate_id=source.candidate_id,
                     expected_authority=selected_authority,
+                    image_asset_reader=read_image_asset,
                 ) as materialized:
                     effective_candidate = source
                     if materialized.closure_sha256 != source.closure_sha256:
@@ -3161,6 +3182,7 @@ def _dispatch_selected(
                     application_owner, _builder_workspace(storage_root, context.session),
                     candidate_id=source.candidate_id,
                     package_id=package_id, version=version, title=title,
+                    image_asset_reader=read_image_asset,
                 ) as materialized:
                     suffix = hashlib.sha256(
                         f"{session_id}:{materialized.closure_sha256}".encode()

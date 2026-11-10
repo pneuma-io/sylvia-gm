@@ -1019,7 +1019,10 @@ class AuthorityOwner:
                 **{
                     key: value
                     for key, value in params.items()
-                    if key not in {"action", "session_id"}
+                    if key in {
+                        "operation_id", "target_id", "purpose", "brief", "appearance", "name",
+                        "map_scene", "edit_sha256",
+                    }
                 },
             )
         if action == "generate":

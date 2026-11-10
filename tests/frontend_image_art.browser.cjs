@@ -34,10 +34,10 @@ test('review, adopt, crop and reopen art through the source WebUI',{timeout:1800
     await form.locator('[name=target_id]').selectOption('operator');
     await form.locator('[name=appearance]').fill('Silver hair, brown eyes, blue coat');
     await form.locator('[name=brief]').fill('Synthetic visual calibration');
+    assert.equal(await form.locator('[name=purpose]').inputValue(),'character');
+    await form.getByRole('button',{name:'Prepare artwork',exact:true}).click();
     let expected=0;
     for(const purpose of ['full_body','reference_sheet','portrait']){
-      await form.locator('[name=purpose]').selectOption(purpose);
-      await form.getByRole('button',{name:'Prepare request',exact:true}).click();
       await dialog.getByRole('button',{name:'Generate',exact:true}).click();
       await dialog.getByRole('button',{name:'Adopt',exact:true}).click();
       await page.waitForFunction(count=>document.querySelectorAll('.image-art-selected-preview').length===count,++expected);
@@ -51,8 +51,8 @@ test('review, adopt, crop and reopen art through the source WebUI',{timeout:1800
       const outer=image.parentElement.getBoundingClientRect(),inner=image.getBoundingClientRect();
       return {x:(outer.left-inner.left)/outer.width,y:(outer.top-inner.top)/outer.height};
     });
-    assert.ok(Math.abs(crop.x-.21)<.01,'Horizontal crop previews before Save');
-    assert.ok(Math.abs(crop.y-.155)<.01,'Vertical crop previews before Save');
+    assert.ok(Math.abs(crop.x-.21)<.01,`Horizontal crop previews before Save: ${crop.x}`);
+    assert.ok(Math.abs(crop.y-.155)<.01,`Vertical crop previews before Save: ${crop.y}`);
     await frame.getByRole('button',{name:'Save framing'}).click();
     await form.locator('[name=target_id]').selectOption('training-floor');
     assert.equal(await form.locator('[name=purpose]').inputValue(),'map_underlay');

@@ -1071,6 +1071,13 @@ card text metadata stripped; the unchanged original remains in the import librar
 image reuse works with generation Off. Supported PNG input includes grayscale, palette, RGB/RGBA,
 16-bit and interlaced images within the bounded artwork limits.
 
+The character artwork workflow composes the existing image requests rather than adding a second
+job store. Each persisted request records its workflow and stage. Adoption prepares the next
+missing stage; Auto may dispatch it, while Review waits for Generate. Reopen never dispatches
+work. Setting and Plan draft checks/publication resolve explicit Character File PNG references
+through the publishing session's scoped image reader and include the exact bytes and content
+declarations. They do not generate art, fetch external assets or change the source workspace.
+
 Underlay references are rendered from the existing player projection's static map geometry and
 terrain, without tokens, labels or hidden geometry. The selected image retains bounds and a
 layout digest. The renderer hides stale art and draws the existing mechanical overlays above it.

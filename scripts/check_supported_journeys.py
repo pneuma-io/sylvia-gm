@@ -28,6 +28,8 @@ PYTHON_JOURNEYS = {
         "tests/test_image_subscription.py",
         "tests/test_character_visuals.py",
         "tests/test_character_art_import.py",
+        "tests/test_character_art_workflow.py",
+        "tests/test_character_art_publication.py",
         "tests/test_image_hooks.py",
     ],
     "launch-lite-compatibility": [

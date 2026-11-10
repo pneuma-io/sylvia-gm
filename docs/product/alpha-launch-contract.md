@@ -1068,6 +1068,12 @@ as the default. Review saves a proposal, requires Generate, then previews the re
 Auto authorizes GM and Builder to recognize missing art, generate it and adopt the result.
 Failed, refused, cancelled and interrupted requests never automatically retry.
 
+Complete character artwork is one user-facing request. Sylvia prepares the missing reference
+and portrait stages in order, retaining the established appearance and existing usable images.
+Review requires Generate and Adopt at each stage; Auto continues after adoption. Cancelling,
+changing permissions or a failed stage stops further generation. Party and character views offer
+an Artwork action for the selected character; users do not enter internal target identities.
+
 Character art includes a complete appearance description, a canonical full-body reference and
 a multi-view reference sheet; both reference formats are required for the visual bundle. A
 portrait uses both references. Character Files and unbound character profiles can retain the

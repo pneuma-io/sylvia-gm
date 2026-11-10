@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, BinaryIO, Never, cast
 
 from sylvia_gm.application.campaign_plan_sources import CampaignPlanToolAuthority
+from sylvia_gm.application.package_character_art import ImageAssetReader, include_character_art
 from sylvia_gm.application.package_materialization import (
     MaterializedPackageArchive,
     NormalizedPackageDraft,
@@ -192,8 +193,9 @@ def _apply_plan_file_edits(drafts, setting_changes, ruleset_changes, removals):
             result.append(draft)
             continue
         payloads = dict(draft.payloads)
-        removed = {path.split("/", 1)[1] for path in removals
-                   if path.startswith(prefixes[kind] + "/")}
+        removed = {
+            path.split("/", 1)[1] for path in removals if path.startswith(prefixes[kind] + "/")
+        }
         changed = changes[kind]
         if removed - payloads.keys():
             raise CommandRejected("Campaign Plan cannot remove an unknown inherited file")
@@ -243,6 +245,7 @@ def materialize_plan_snapshot_draft(
     *,
     candidate_id: str,
     expected_authority: CampaignPlanToolAuthority,
+    image_asset_reader: ImageAssetReader | None = None,
 ) -> MaterializedPlanSnapshotDraft:
     """Validate a Plan and return its exact original or newly owned package snapshot."""
 
@@ -273,6 +276,7 @@ def materialize_plan_snapshot_draft(
     drafts = select_snapshot_sources(owner, workspace, root, drafts)
     drafts = _apply_plan_file_edits(drafts, setting_changes, ruleset_changes, removals)
     drafts = apply_package_record_edits(workspace, root, drafts)
+    drafts = tuple(include_character_art(draft, image_asset_reader) for draft in drafts)
     materialized: MaterializedPackageArchive | None = None
     try:
         materialized = materialize_package_archive(drafts)

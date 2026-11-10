@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 
 from sylvia_gm.application.campaign_library_selection import read_required_plan_characters
 from sylvia_gm.application.campaign_plan_sources import CampaignPlanToolAuthority
+from sylvia_gm.application.package_character_art import ImageAssetReader
 from sylvia_gm.application.package_library import validate_admitted_package_runtimes
 from sylvia_gm.application.plan_spatial_admission import plan_spatial_warnings
 from sylvia_gm.application.setting_character_requirements import (
@@ -31,12 +32,17 @@ def check_plan_draft(
     candidate_id: str,
     expected_authority: CampaignPlanToolAuthority,
     require_complete_characters: bool = False,
+    image_asset_reader: ImageAssetReader | None = None,
 ) -> SafePayload:
     """Use publication and party validators against the draft's actual contained package bytes."""
 
     with (
         materialize_plan_snapshot_draft(
-            owner, workspace, candidate_id=candidate_id, expected_authority=expected_authority
+            owner,
+            workspace,
+            candidate_id=candidate_id,
+            expected_authority=expected_authority,
+            image_asset_reader=image_asset_reader,
         ) as materialized,
         admit_package_archive(materialized.archive) as admitted,
     ):
@@ -96,6 +102,7 @@ def check_plan_draft(
             "character_message": character_message,
             "character_validation_errors": character_errors,
             "authoring_warnings": plan_spatial_warnings(
-                materialized.plan.payload, manifest.ui_surfaces,
+                materialized.plan.payload,
+                manifest.ui_surfaces,
             ),
         }

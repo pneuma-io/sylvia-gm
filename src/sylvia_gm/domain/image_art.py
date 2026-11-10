@@ -226,6 +226,14 @@ character. Save the returned visual references in character data when publishing
 Portraits share consistent face framing and one saved focal point/zoom across Map, Party, character
 and dialogue presentation. An image generation is visual content, never a mechanics mutation.
 
+During ordinary character creation/adaptation and when introducing a known character or enemy,
+use request_image_art with purpose character, its name and established appearance. Sylvia runs
+the required reference/portrait stages in order, reuses current art, and prepares the next stage
+after adoption. You do not need to schedule each format. Auto continues automatically; Review
+requires the user's Generate and Adopt at each stage. Give the user the artwork status before
+finishing the character interview; missing art or Off must not block saving/play. Save the final
+returned character_visuals bundle when publishing. Never call a partial or failed flow complete.
+
 For map_underlay, select the actual authored map by ID. Sylvia supplies a raster reference rendered
 from its geometry and terrain, with the same orientation and bounds as the playable map. Use that
 reference, describe the environment and visual style, and preserve its layout. Never substitute a

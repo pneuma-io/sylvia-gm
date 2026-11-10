@@ -5519,6 +5519,7 @@ const SylviaGMFrontend = (() => {
         (role ? `<span class="panel-unit-role">${escapeHtml(panelIdentifierLabel(role))}</span>` : '') +
         (acting === participant.id ? '<span class="panel-tag" data-tone="ally">Acting</span>' : '') + `</div>` +
         `<div class="roster-vitals">${hpPanelMarkup(entity)}${personalResourceMarkup(entity)}</div>` +
+        (imageArt()?.button?.(participant.id, details.name || participant.id) || '') +
         droneStatusMarkup(entity, (id) => participants.find((member) => member.id === id)?.data?.name ||
           entities[id]?.name || mapBodyForActor(id)?.display?.label || displayIdentifier(id)) + conditionPanelMarkup(entity) +
         `<details class="roster-inspection" data-character-expansion="${escapeHtml(participant.id)}"${inspection.expanded.includes(participant.id) ? ' open' : ''}><summary aria-label="Details for ${escapeHtml(details.name || participant.id)}">Details</summary>` +
@@ -5639,6 +5640,7 @@ const SylviaGMFrontend = (() => {
     }).join('');
     if (!compact) return operatorMarkup(surface, actorId, { participant, entity, name, details, level, values });
     return `<div class="${compact ? 'character-expanded-details' : 'character-hero'}" data-character-details="${escapeHtml(actorId)}"${compact ? '' : ` ${participant ? 'data-panel-entity' : 'data-character-entity'}="${escapeHtml(actorId)}"`}>` +
+      (imageArt()?.button?.(actorId,name) || '') +
       (compact ? (description ? `<p class="character-description">${description}</p>` : '') : `<div class="character-identity">${actorTokenMarkup(actorId, name)}` +
       `<div><small>Inspecting</small><h3><strong>${escapeHtml(name)}</strong></h3>${description ? `<span class="character-description">${description}</span>` : ''}` +
       (details.party_role ? `<span class="panel-unit-role">${escapeHtml(panelIdentifierLabel(details.party_role))}</span>` : '') + '</div></div>') +
@@ -5725,6 +5727,7 @@ const SylviaGMFrontend = (() => {
     const saves = Array.isArray(details[savesKey]) ? details[savesKey] : [];
     const otherResources = Object.entries(entity.resources || {}).filter(([key]) => !familyKeys.has(key));
     return `<div class="character-hero grimoire" data-character-details="${escapeHtml(actorId)}" ${participant ? 'data-panel-entity' : 'data-character-entity'}="${escapeHtml(actorId)}">` +
+      (imageArt()?.button?.(actorId,name) || '') +
       `<header class="grim-head"><div class="grim-plinth" role="img" aria-label="${escapeHtml(name)}">${imageArt()?.portrait(actorId,name) || `<b>${escapeHtml(actorInitials(name))}</b><small>no portrait · initials</small>`}</div>` +
       `<div class="grim-id"><small class="op-kicker">Inspecting</small><h3><strong>${escapeHtml(name)}</strong></h3><p>${escapeHtml([lineage, classes].filter(Boolean).join(' · '))}</p>` +
       `<div class="grim-vitals">${flask}${shield}${speed}</div></div></header>` + conditionPanelMarkup(entity) +
@@ -5830,6 +5833,7 @@ const SylviaGMFrontend = (() => {
     const resources = entity?.resources ? `<div class="character-resources">${Object.entries(entity.resources).map(([key, value]) =>
       `<span>${escapeHtml(panelIdentifierLabel(key))}<b>${escapeHtml(value)}</b></span>`).join('')}</div>` : '';
     return `<div class="character-hero operator" data-character-details="${escapeHtml(actorId)}" ${participant ? 'data-panel-entity' : 'data-character-entity'}="${escapeHtml(actorId)}">` +
+      (imageArt()?.button?.(actorId,name) || '') +
       opSwitch + hero + conditionPanelMarkup(entity) + weaponSection + weaponSetMarkup(entity?.weapon_sets) + resources +
       (otherReady.length || otherRefused.length ? `<div class="character-action-groups" data-panel-id="${escapeHtml(surface.id)}">` +
         (otherReady.length ? `<div class="character-ready-actions"><span>Actions</span><div class="ruleset-panel-actions op-actions">${otherReady.map((action) => button(action, 'suite-act')).join('')}</div></div>` : '') +
@@ -7750,6 +7754,11 @@ const SylviaGMFrontend = (() => {
     });
     container.querySelectorAll('[data-character-action-panel]').forEach((button) => {
       button.addEventListener('click', () => void gamePanels().reveal(button.dataset.characterActionPanel));
+    });
+    container.querySelectorAll('[data-character-art]').forEach((button) => {
+      button.addEventListener('click', () => void imageArt()?.open({
+        target_id:button.dataset.characterArt, name:button.dataset.artName,
+      }));
     });
     container.querySelectorAll('[data-character-expansion]').forEach((details) => {
       details.addEventListener('toggle', () => {

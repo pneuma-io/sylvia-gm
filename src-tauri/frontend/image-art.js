@@ -1,7 +1,7 @@
 /* Saved image art. All generation permissions, references and selections belong to the owner. */
 (() => {
   'use strict';
-  const labels = {full_body:'Full-body reference', reference_sheet:'Multi-view reference sheet',
+  const labels = {character:'Complete character artwork', full_body:'Full-body reference', reference_sheet:'Multi-view reference sheet',
     portrait:'Portrait', map_underlay:'Map underlay'};
   const escape = value => String(value ?? '').replace(/[&<>"']/g, c =>
     ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -13,6 +13,15 @@
     const key = () => `${context().campaign_id || ''}:${context().session_id || ''}`;
     const call = params => bridge().image_art({...params, session_id:context().session_id});
     const current = (scope, epoch) => scope === key() && epoch === generation;
+    const nameFor = target => view?.targets.find(item=>item.id===target)?.name ||
+      view?.selections.find(item=>item.target_id===target)?.metadata?.target_name || 'Character';
+    const recovery = code => ({
+      credentials_refused:'Sign in to ChatGPT in Settings, then prepare a new artwork request.',
+      rate_limited:'ChatGPT image usage is currently limited. Your saved artwork is safe. Prepare a new request when usage is available.',
+      interrupted:'Generation was interrupted. Your saved artwork is safe. Prepare a new request to try again.',
+      provider_failure:'Generation did not finish. Your saved artwork is safe. Check your connection and prepare a new request.',
+      missing_character_references:'Use Complete character artwork to prepare the required references first.',
+    }[code] || String(code).replaceAll('_',' '));
 
     async function refresh(statusOnly = false) {
       if (!bridge()?.image_art || !context().session_id) return;
@@ -92,18 +101,19 @@
     async function perform(token, operation) {
       const scope = key(), epoch = generation;
       busy.add(token); error = ''; render();
-      try { await operation(); if (current(scope, epoch)) await refresh(); }
-      catch (problem) { if (current(scope, epoch)) { error = problem.message; await refresh(); } }
-      finally { if (current(scope, epoch)) { busy.delete(token); render(); } }
+      try { await operation(); }
+      catch (problem) { if (current(scope, epoch)) error = problem.message; }
+      finally { if (current(scope, epoch)) { busy.delete(token); await refresh(); } }
     }
 
     function requestCard(item) {
       const url = assets.get(item.result_sha256), saved = selected(item.target_id, item.purpose);
       const isBusy = busy.has(item.operation_id), status = isBusy ? 'Submitting…' : item.status;
       return `<article class="image-art-card"><h3>${escape(labels[item.purpose])}</h3>` +
-        `<p>${escape(item.target_id)} · ${escape(status)}</p>` +
+        `<p>${escape(item.character_flow?.name || nameFor(item.target_id))} · ${escape(status)}</p>` +
+        (item.character_flow ? `<p>Character artwork · Step ${item.character_flow.step} of up to ${item.character_flow.total}</p>` : '') +
         (url ? `<img class="image-art-preview" src="${url}" alt="${escape(labels[item.purpose])} preview">` : '') +
-        (item.error ? `<p role="status">${escape(item.error.replaceAll('_',' '))}</p>` : '') +
+        (item.error ? `<p role="status">${escape(recovery(item.error))}</p>` : '') +
         `<div class="image-art-actions">` +
         (item.status === 'proposed' ? `<button type="button" class="btn btn-primary" data-art-generate="${escape(item.operation_id)}" ${isBusy ? 'disabled' : ''}>Generate</button>` : '') +
         (item.status === 'pending' || item.status === 'proposed' || isBusy ? `<button type="button" class="btn btn-secondary" data-art-cancel="${escape(item.operation_id)}">Cancel</button>` : '') +
@@ -118,7 +128,7 @@
         [['x','Horizontal position',0,1,.01],['y','Vertical position',0,1,.01],['zoom','Zoom',1,4,.05]].map(([name,label,min,max,step]) =>
           `<label>${label}<input type="range" name="${name}" min="${min}" max="${max}" step="${step}" value="${frame[name]}"></label>`).join('') +
         '<p>Zoom in, then position the face. Save framing applies this crop everywhere.</p><button type="button" class="btn btn-secondary" data-art-save-frame>Save framing</button></fieldset>' : '';
-      return `<article class="image-art-card"><h3>${escape(item.target_id)} · ${escape(labels[item.purpose])}</h3>` +
+      return `<article class="image-art-card"><h3>${escape(nameFor(item.target_id))} · ${escape(labels[item.purpose])}</h3>` +
         (url ? `<div class="image-art-selected-preview">${item.purpose === 'portrait' ? portrait(item.target_id,item.target_id) : `<img class="image-art-preview" src="${url}" alt="${escape(labels[item.purpose])}">`}</div>` : '<p>Image unavailable.</p>') + controls +
         `<button type="button" class="btn btn-secondary" data-art-edit="${item.sha256}" data-art-target="${escape(item.target_id)}" data-art-purpose="${item.purpose}">Edit image</button></article>`;
     }
@@ -142,12 +152,14 @@
         `</select></label><p>ChatGPT subscription · Uses your usage limits and eligible credits. Auto lets Sylvia generate and use images. Review asks before generation and adoption.</p></section>` +
         `<p class="image-art-error" role="status">${escape(error)}</p>` +
         (context().session_id ? `<form data-art-form><div class="image-art-fields"><label>Character or map ` +
-          (targets.length ? `<select name="target_id">${targets.map(target => `<option value="${escape(target.id)}">${escape(target.name)} (${target.kind})</option>`).join('')}</select>` : '<input name="target_id" required maxlength="128" placeholder="Character ID used in this Builder chat">') +
+          `<select name="target_id">${targets.map(target => `<option value="${escape(target.id)}">${escape(target.name)} (${target.kind})</option>`).join('')}${!context().campaign_id?'<option value="">New character</option>':''}</select>` +
+          `</label><label data-art-name>Character name <input name="name" maxlength="160" placeholder="Name of your character or companion">` +
           `</label><label>Image type <select name="purpose">${Object.entries(labels).filter(([purpose]) => purpose !== 'map_underlay' || targets.some(target=>target.kind==='map')).map(([purpose,label]) => `<option value="${purpose}">${label}</option>`).join('')}</select></label></div>` +
           `<label>Established appearance <textarea name="appearance" rows="2" maxlength="16000" placeholder="Identity, face, hair, physique, outfit and equipment"></textarea></label>` +
-          `<label>Art brief <textarea name="brief" rows="3" required maxlength="12000" placeholder="Describe the visual style and requested changes"></textarea></label>` +
+          `<label>Art brief <textarea name="brief" rows="3" maxlength="12000" placeholder="Optional visual style, or describe the changes you want"></textarea></label>` +
+          `<p data-art-workflow>Creates the missing full-body reference, other views and portrait in order. Review asks before each generation; Auto continues for you. Existing artwork is reused.</p>` +
           `<input type="hidden" name="edit_sha256"><p data-art-editing hidden>Editing the selected image. <button type="button" class="btn btn-secondary" data-art-new>Start a new image</button></p><button type="submit" class="btn btn-primary" ${busy.has('request')||settings.mode==='off'?'disabled':''}>${settings.mode==='auto'?'Generate and use':'Prepare request'}</button></form>` +
-          `<h2>Recent requests</h2><div class="image-art-grid">${(view?.requests || []).slice(0,12).map(requestCard).join('') || '<p>No image requests yet. Sylvia can prepare these as it builds or runs your game.</p>'}</div>` +
+          `<h2>Recent requests</h2><div class="image-art-grid">${(view?.requests || []).filter((item,index,rows)=>!item.character_flow||rows.findIndex(other=>other.character_flow?.id===item.character_flow.id)===index).slice(0,12).map(requestCard).join('') || '<p>No image requests yet. Sylvia can prepare these as it builds or runs your game.</p>'}</div>` +
           `<h2>Saved art</h2><div class="image-art-grid">${(view?.selections || []).map(selectionCard).join('') || '<p>No selected art yet.</p>'}</div>` : '<p>Open a GM or Builder chat to prepare images.</p>');
       const nextForm = dialog.querySelector('[data-art-form]');
       if (nextForm) for (const [name,value] of Object.entries(values)) {
@@ -177,13 +189,21 @@
       if (!form) return;
       const kind = view?.targets.find(target=>target.id===form.elements.target_id.value)?.kind;
       for (const option of form.elements.purpose.options)
-        option.disabled = kind ? (option.value==='map_underlay') !== (kind==='map') : false;
+        option.disabled = kind ? (option.value==='map_underlay') !== (kind==='map') : option.value!=='character';
       if (form.elements.purpose.selectedOptions[0]?.disabled)
         form.elements.purpose.value = [...form.elements.purpose.options].find(option=>!option.disabled)?.value || '';
       dialog.querySelector('[data-art-editing]').hidden = !form.elements.edit_sha256.value;
+      dialog.querySelector('[data-art-name]').hidden = !!form.elements.target_id.value;
+      form.elements.name.required = !form.elements.target_id.value;
+      const complete=form.elements.purpose.value==='character';
+      dialog.querySelector('[data-art-workflow]').hidden=!complete;
+      form.elements.appearance.required=complete&&!view?.selections.some(item=>item.target_id===form.elements.target_id.value&&item.metadata?.appearance);
+      form.querySelector('[type=submit]').textContent=complete
+        ? (view?.settings.mode==='auto'?'Create artwork':'Prepare artwork')
+        : (view?.settings.mode==='auto'?'Generate and use':'Prepare request');
     }
 
-    async function open() {
+    async function open(options = {}) {
       if (!bridge()?.image_art) return;
       sync();
       if (!dialog) {
@@ -206,8 +226,9 @@
           if (button.dataset.artEdit) {
             const form = dialog.querySelector('[data-art-form]');
             form.elements.target_id.value=button.dataset.artTarget;
-            form.elements.purpose.value=button.dataset.artPurpose;
+            form.elements.purpose.value=button.dataset.artPurpose==='full_body'?'character':button.dataset.artPurpose;
             form.elements.edit_sha256.value=button.dataset.artEdit;
+            form.elements.appearance.value=selected(button.dataset.artTarget,button.dataset.artPurpose)?.metadata?.appearance || '';
             updateForm();
             form.elements.brief.focus();
           }
@@ -220,6 +241,10 @@
         });
         dialog.addEventListener('change', event => {
           if (event.target.matches('[name="target_id"],[name="purpose"]')) {
+            if (event.target.name==='target_id') {
+              const form=dialog.querySelector('[data-art-form]');
+              form.elements.appearance.value=view?.selections.find(item=>item.target_id===form.elements.target_id.value&&item.metadata?.appearance)?.metadata.appearance || '';
+            }
             dialog.querySelector('[data-art-form]').elements.edit_sha256.value=''; updateForm();
           }
           if (event.target.matches('[data-art-mode]')) void perform('mode',async()=>{
@@ -235,6 +260,9 @@
           if (!event.target.matches('[data-art-form]')) return;
           event.preventDefault(); const data=Object.fromEntries(new FormData(event.target));
           if (!data.edit_sha256) delete data.edit_sha256;
+          if (!data.target_id) delete data.target_id;
+          if (data.target_id || !data.name) delete data.name;
+          data.brief=data.brief.trim()||'Create artwork that fits the established character and campaign.';
           void perform('request',async()=>{
             await call({action:'request',operation_id:crypto.randomUUID(),...data});
             const form=dialog.querySelector('[data-art-form]');
@@ -248,11 +276,23 @@
         const scope=key(),epoch=generation,settings=await call({action:'settings'});
         if (current(scope,epoch)) { view={settings,targets:[],requests:[],selections:[]}; render(); }
       }
+      if (options.target_id) {
+        const form=dialog.querySelector('[data-art-form]');
+        if (form) {
+          form.elements.target_id.value=options.target_id;
+          form.elements.purpose.value='character';
+          form.elements.appearance.value=selected(options.target_id,'full_body')?.metadata?.appearance || '';
+          updateForm();
+          form.elements.appearance.focus();
+        }
+      }
     }
     const revision = () => JSON.stringify((view?.selections || []).map(item=>[
       item.target_id,item.purpose,item.sha256,item.frame
     ]));
-    return {open,sync,refresh,portrait,underlay,revision};
+    const button = (target,name) => !window.__sylviaPanelContext && context().session_id
+      ? `<button type="button" class="btn btn-secondary btn-sm" data-character-art="${escape(target)}" data-art-name="${escape(name)}">Artwork</button>` : '';
+    return {open,sync,refresh,portrait,underlay,revision,button};
   }
   window.SylviaImageArt={create};
 })();

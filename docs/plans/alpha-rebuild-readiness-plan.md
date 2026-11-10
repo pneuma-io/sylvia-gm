@@ -29,9 +29,13 @@ The initial ready-to-merge claim does not cover that outcome and is withdrawn. H
 these gaps are completed. The current implementation adds portable, hash-checked package PNG
 references and actively restores selected imported card portraits in Builder, including their use
 as later generation references. Local portrait reuse also works with generation Off. Focused checks cover fresh-owner restore,
-crop persistence, corrupt-asset rollback, common PNG inputs and card reference reuse. Prepared
-catalogue art, complete interview-owned artwork creation/editing and automatic portable publication
-remain unfinished. These source/scripted checks do not establish completion of the ordinary
+crop persistence, corrupt-asset rollback, common PNG inputs and card reference reuse. The next
+increment adds a complete character artwork request, Review/Auto stage progression, Party and
+character Artwork actions, and automatic image inclusion in Setting/Plan publication. Source
+checks cover staged creation, failure/cancellation, the WebUI, GM export and fresh-recipient
+package restoration. Prepared catalogue art, character saves made while art is pending,
+portrait-only handoff with generation Off, and the remaining interview integration still need
+work. These source/scripted checks do not establish completion of the ordinary
 workflows. The owner's current goal includes real generation verification; no real generation has
 run, and the live test profile/environment still needs selection. Live subscription, installed-app
 and TD trailer acceptance remain unverified. Merge follows the Pneuma IO rulebook's delivery and

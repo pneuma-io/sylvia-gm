@@ -55,13 +55,16 @@ def test_art_export_recovers_exact_bytes_and_reference_associations(tmp_path):
             "art-session",
             operation_id="full-body",
             target_id="keeper",
-            purpose="full_body",
+            purpose="character",
             brief="Archivist",
             appearance="Silver hair",
         )
-        result = service._futures[row["operation_id"]].result(timeout=15)
-        assert result["status"] == "succeeded"
+        for _ in range(3):
+            result = service._futures[row["operation_id"]].result(timeout=15)
+            assert result["status"] == "succeeded"
+            row = service.view("art-session")["requests"][0]
         saved = service.view("art-session")["selections"]
+        assert {item["purpose"] for item in saved} == {"full_body", "reference_sheet", "portrait"}
         raw = owner._store.images.image(saved[0]["sha256"])
         owner.export_campaign(operation_id="export-art", campaign_id="art-campaign", target=archive)
         service.close()
