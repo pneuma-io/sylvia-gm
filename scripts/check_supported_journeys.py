@@ -21,10 +21,12 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 if __package__:
-    from .known_test_defects import accepted_case, report_outcomes
+    from .check_catalog import PRODUCT_CASE_EXCLUSIONS, qualification_cases
+    from .known_test_defects import accepted_case, case_key, report_outcomes
 else:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-    from scripts.known_test_defects import accepted_case, report_outcomes
+    from scripts.check_catalog import PRODUCT_CASE_EXCLUSIONS, qualification_cases
+    from scripts.known_test_defects import accepted_case, case_key, report_outcomes
 
 ROOT = Path(__file__).resolve().parents[1]
 PYTHON_JOURNEYS = {
@@ -326,7 +328,10 @@ PYTHON_JOURNEYS = {
         'tests/test_private_session_reopen.py',
         'tests/test_saved_builder_sessions.py',
         'tests/test_working_context_sessions.py',
-        'tests/test_alpha_f4_generic_sessions.py',
+    ],
+    "gm-turn": [
+        "tests/test_alpha_f4_provider_session_adapter.py",
+        "tests/test_alpha_f4_generic_sessions.py",
     ],
     "provider-contracts": [
         "tests/test_provider_session_transport_projection.py",
@@ -335,10 +340,6 @@ PYTHON_JOURNEYS = {
         "tests/test_fc_provider_routes.py",
         "tests/test_provider_continuation_metadata.py",
         "tests/test_private_provider_records.py",
-        "tests/test_alpha_f4_provider_session_adapter.py::"
-        "test_only_one_state_changing_mechanic_executes_per_catalog_snapshot",
-        "tests/test_alpha_f4_provider_session_adapter.py::"
-        "test_persisted_mixed_turn_recovers_exact_rejected_blocks_without_replaying_action",
         'tests/test_alpha_07_model_guidance.py',
         'tests/test_alpha_09_provider_management.py',
         'tests/test_automatic_model_defaults.py',
@@ -787,7 +788,8 @@ def _parallel_pytest_cases(name, destination, testdata, environment, nodeids, co
 
 
 def _run(
-    name: str, destination: Path, *, case_workers: int = 1, deadline=None
+    name: str, destination: Path, *, case_workers: int = 1, deadline=None,
+    include_historical=False,
 ) -> tuple[bool, float]:
     """Keep complete synthetic test diagnostics and reject incomplete required coverage."""
     xml = destination / f"{name}.xml"
@@ -825,6 +827,8 @@ def _run(
         ]
         if os.environ.get("SYLVIA_RETAIN_SUCCESSFUL_FIXTURES") == "0":
             command.extend(["-o", "tmp_path_retention_policy=failed"])
+        if not include_historical:
+            command.extend(f"--deselect={nodeid}" for nodeid in PRODUCT_CASE_EXCLUSIONS)
     started = time.monotonic()
     print(f"RUN  {name}", flush=True)
     child_environment = dict(os.environ)
@@ -876,14 +880,15 @@ def _run(
             for line in collection.stdout.splitlines():
                 if line.startswith("tests/") and "::" in line:
                     collected_nodeids.append(line)
-                    path, *parts = line.split("::")
-                    expected_cases.add(
-                        (
-                            path.removesuffix(".py").replace("/", ".")
-                            + ("." + ".".join(parts[:-1]) if len(parts) > 1 else ""),
-                            parts[-1],
-                        )
-                    )
+            if len(set(collected_nodeids)) != len(collected_nodeids):
+                raise ValueError("Required collection contains duplicate cases")
+            collected_nodeids, excluded = qualification_cases(
+                collected_nodeids, include_historical=include_historical,
+            )
+            expected_cases = {tuple(case_key(nodeid).split("::", 1)) for nodeid in collected_nodeids}
+            (destination / f"{name}-excluded-cases.json").write_text(
+                json.dumps(excluded, indent=2), encoding="utf-8",
+            )
             (destination / f"{name}-required-cases.json").write_text(
                 json.dumps(sorted(expected_cases), indent=2),
                 encoding="utf-8",
@@ -952,12 +957,14 @@ def _run(
 
 
 def _run_guarded(
-    name: str, destination: Path, *, case_workers: int = 1, deadline=None
+    name: str, destination: Path, *, case_workers: int = 1, deadline=None,
+    include_historical=False,
 ) -> tuple[bool, float]:
     """Preserve an early setup failure as required-group evidence rather than lose the summary."""
     started = time.monotonic()
     try:
-        return _run(name, destination, case_workers=case_workers, deadline=deadline)
+        return _run(name, destination, case_workers=case_workers, deadline=deadline,
+                    include_historical=include_historical)
     except (OSError, ValueError, MemoryError) as error:
         log = destination / f"{name}.log"
         prior = log.read_text(encoding="utf-8") if log.exists() else ""
@@ -1073,9 +1080,11 @@ def main() -> int:
     started = time.monotonic()
     time_budget = 1800 if args.ci else None
     deadline = None if time_budget is None else started + time_budget
+    include_historical = bool(selection and selection.get("qualification_kind") == "historical")
 
     def run_group(name, output, *, case_workers=1):
-        return _run_guarded(name, output, case_workers=case_workers, deadline=deadline)
+        return _run_guarded(name, output, case_workers=case_workers, deadline=deadline,
+                            include_historical=include_historical)
 
     # Each group runs in its own process and pytest temporary directory; only immutable
     # repository inputs are shared. Keep concurrency bounded on the Windows CI runner.
@@ -1092,6 +1101,7 @@ def main() -> int:
             run_group,
             deadline=deadline,
             scheduler=args.scheduler,
+            include_historical=include_historical,
         )
     else:
         with ThreadPoolExecutor(max_workers=args.jobs) as executor:
@@ -1133,14 +1143,19 @@ def main() -> int:
             except ET.ParseError:
                 pass  # The owning group already fails malformed or missing reports.
     case_counts, expected_failures = report_outcomes(python_cases)
+    excluded_cases = [case for path in sorted(destination.glob("*-excluded-cases.json"))
+                      for case in json.loads(path.read_text(encoding="utf-8"))]
     summary = {
         "python_case_counts": case_counts,
         "expected_failures": expected_failures,
+        "qualification_kind": "historical" if include_historical else "product",
+        "historical_check": selection.get("check") if include_historical else None,
+        "excluded_cases": excluded_cases,
         "status": "completed",
         "passed": not failed and within_time_budget,
         "complete_gate": args.journey is None
         and (selection is None or selection["mode"] == "full"),
-        "gate_kind": "affected PR"
+        "gate_kind": "historical checkpoint" if include_historical else "affected PR"
         if selection and selection["mode"] == "affected"
         else "complete deterministic",
         "missing_groups": missing_groups,

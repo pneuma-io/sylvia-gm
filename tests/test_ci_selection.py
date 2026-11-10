@@ -132,7 +132,11 @@ def test_affected_runtime_and_content_keep_security_and_composed_boundaries(path
     assert group in plan["python"]
     assert "core-invariants" in plan["python"]
     assert "tests/test_private_provider_records.py" in plan["python"]["core-invariants"]
-    assert any("recovery" in name for name in plan["python"])
+    if path.startswith("src/sylvia_gm/provider/"):
+        assert "gm-turn" in plan["python"]
+        assert "tests/test_alpha_f4_generic_sessions.py" in plan["python"]["gm-turn"]
+    else:
+        assert any("recovery" in name for name in plan["python"])
 
 
 @pytest.mark.parametrize(
@@ -383,3 +387,97 @@ def test_rust_python_discovery_reuses_project_venv_without_a_managed_python_cach
     assert result.returncode == 0, result.stderr
     assert Path(result.stdout.strip()).samefile(sys._base_executable)
     assert (tmp_path / "uv.lock").read_bytes() == lock
+
+
+@pytest.mark.parametrize("path", [
+    "src/sylvia_gm/agent/_provider_session.py",
+    "src/sylvia_gm/agent/_provider_turn_phases.py",
+    "src/sylvia_gm/agent/_provider_turn_state.py",
+    "src/sylvia_gm/agent/_provider_turn_decisions.py",
+    "src/sylvia_gm/agent/_session_loop.py",
+])
+def test_gm_edits_select_full_behavioral_modules_without_campaign_replay(path):
+    plan = choose([path])
+    assert not plan["broad_fallback"] and not plan["native"] and not plan["ui"]
+    assert plan["python"]["gm-turn"] == [
+        "tests/test_alpha_f4_provider_session_adapter.py",
+        "tests/test_alpha_f4_generic_sessions.py",
+    ]
+    assert "campaign-play" not in plan["python"]
+    assert not any("test_action_sequence" in selector or "test_fc_campaign" in selector
+                   for paths in plan["python"].values() for selector in paths)
+
+
+def test_queue_edits_select_their_expensive_behavior_and_fast_provider_consumer():
+    plan = choose(["src/sylvia_gm/application/action_sequences.py"])
+    assert "gm-turn" in plan["python"]
+    assert plan["python"]["action-sequences"] == [
+        "tests/test_action_sequences.py", "tests/test_action_sequence_provider.py",
+    ]
+    assert "campaign-play" not in plan["python"]
+
+
+@pytest.mark.parametrize("document", ["README.md", "docs/INDEX.md", "docs/operations/local-checks-and-release.md"])
+def test_check_guide_edits_do_not_select_gm_or_campaign_runtime(document):
+    plan = choose([document])
+    assert set(plan["python"]) == {"copy-and-links"}
+    assert not plan["ui"] and not plan["native"]
+    assert plan["documents"] == [document]
+
+
+def test_full_has_unique_whole_gm_modules_and_each_historical_campaign_module():
+    from scripts.check_catalog import HISTORICAL_CHECKS
+    plan = choose([], full=True)
+    selectors = [selector for values in plan["python"].values() for selector in values]
+    for paths in HISTORICAL_CHECKS["gm-turn-checkpoint"].values():
+        for path in paths:
+            assert selectors.count(path) == 1
+    assert not any(selector.startswith("tests/test_alpha_f4_provider_session_adapter.py::")
+                   for selector in selectors)
+
+
+def test_product_exclusion_preserves_other_and_future_cases_and_historical_selection():
+    from scripts.check_catalog import PRODUCT_CASE_EXCLUSIONS, qualification_cases
+    historical = next(iter(PRODUCT_CASE_EXCLUSIONS))
+    existing = "tests/test_alpha_f4_generic_sessions.py::test_existing_behavior"
+    future = "tests/test_alpha_f4_generic_sessions.py::test_future_behavior[new-parameter]"
+    required, excluded = qualification_cases([existing, historical, future])
+    assert required == [existing, future]
+    assert excluded == [{"nodeid": historical, "reason": PRODUCT_CASE_EXCLUSIONS[historical]}]
+    assert qualification_cases([existing, historical, future], include_historical=True) == (
+        [existing, historical, future], [],
+    )
+
+
+def test_historical_gm_check_keeps_original_modules_and_expected_failure(tmp_path):
+    import json
+    from scripts.check_catalog import HISTORICAL_CHECKS
+    from scripts.known_test_defects import KNOWN_DEFECTS
+    from scripts.select_checks import historical_check, load_selection
+
+    plan = historical_check("gm-turn-checkpoint", source="a" * 40)
+    assert plan["qualification_kind"] == "historical" and plan["mode"] == "affected"
+    assert plan["python"] == HISTORICAL_CHECKS["gm-turn-checkpoint"]
+    campaign = plan["python"]["campaign-play"]
+    assert campaign == [
+        "tests/test_campaign_rules_update.py", "tests/test_campaign_rules_update_bindings.py",
+        "tests/test_campaign_rules_update_knowledge.py", "tests/test_action_sequences.py",
+        "tests/test_action_sequence_provider.py", "tests/test_td_native_panel_repairs.py",
+        "tests/test_fc_campaign_journey.py", "tests/test_fc_party_combat.py",
+        "tests/test_fc_campaign_progress.py", "tests/test_migrated_plan_lifecycle.py",
+        "tests/test_riichi_quick_test_plan.py", "tests/test_no_rules_interview.py",
+    ]
+    known = "tests/test_migrated_plan_lifecycle.py::test_retained_rift_legacy_reusable_copy_resolves_its_exact_available_snapshot"
+    assert known in KNOWN_DEFECTS and known.split("::")[0] in campaign
+    for paths in plan["python"].values():
+        for relative in paths:
+            path = tmp_path / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("", encoding="utf-8")
+    manifest = tmp_path / "selection.json"
+    manifest.write_text(json.dumps(plan))
+    assert load_selection(manifest, revision="a" * 40, root=tmp_path) == plan
+    plan["python"]["turn-provider-contracts"].pop()
+    manifest.write_text(json.dumps(plan))
+    with pytest.raises(ValueError, match="complete declared selection"):
+        load_selection(manifest, revision="a" * 40, root=tmp_path)

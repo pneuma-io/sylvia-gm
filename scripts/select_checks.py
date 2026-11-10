@@ -10,9 +10,11 @@ import subprocess
 from pathlib import Path, PurePosixPath
 
 if __package__:
+    from .check_catalog import HISTORICAL_CHECKS
     from .test_inventory import JAVASCRIPT_HARNESSES
     from .check_supported_journeys import FULL_ONLY_JOURNEYS, PYTHON_JOURNEYS, UI_JOURNEY
 else:
+    from check_catalog import HISTORICAL_CHECKS
     from test_inventory import JAVASCRIPT_HARNESSES
     from check_supported_journeys import FULL_ONLY_JOURNEYS, PYTHON_JOURNEYS, UI_JOURNEY
 
@@ -30,6 +32,30 @@ HARNESS = [
     "tests/test_admitted_fixture_isolation.py",
     "tests/test_journey_progress.py",
 ]
+
+GM_TURN_SOURCES = frozenset({
+    "src/sylvia_gm/agent/_provider_session.py",
+    "src/sylvia_gm/agent/_provider_turn_phases.py",
+    "src/sylvia_gm/agent/_provider_turn_state.py",
+    "src/sylvia_gm/agent/_provider_turn_decisions.py",
+    "src/sylvia_gm/agent/_session_loop.py",
+    "src/sylvia_gm/agent/_native_continuation.py",
+    "src/sylvia_gm/agent/_provider_runtime.py",
+    "src/sylvia_gm/agent/_stateless_mcp.py",
+})
+
+
+def historical_check(name, *, source):
+    """Name the original checkpoint without making it an automatic product gate."""
+    return {
+        "schema": 1, "mode": "affected", "source": source, "base": source,
+        "diff_complete": True, "changed_paths": [], "broad_fallback": False,
+        "qualification_kind": "historical", "check": name,
+        "python": {group: list(paths) for group, paths in HISTORICAL_CHECKS[name].items()},
+        "ui": [], "native": False, "documents": [],
+        "reasons": [{"path": None, "selection": name,
+                     "reason": "Explicit historical GM checkpoint; not product qualification"}],
+    }
 
 
 def reverse_test_dependents(paths, root):
@@ -135,6 +161,7 @@ def select_checks(paths, *, source, base, diff_complete=True, full=False, root=N
                 "scripts/journey_progress.py",
                 "scripts/journey_pool.py",
                 "scripts/check_supported_journeys.py",
+                "scripts/check_catalog.py",
                 "scripts/journey_case_timings.json",
                 "scripts/check_document_links.py",
                 "tests/admitted_library_fixture.py",
@@ -191,10 +218,22 @@ def select_checks(paths, *, source, base, diff_complete=True, full=False, root=N
                 if path.endswith(".md"):
                     add("release-integrity")
                 reason = "Actual package admission/closures, supported mechanics and Plan lifecycle"
+            elif path in GM_TURN_SOURCES:
+                groups["core-invariants"] = list(CORE)
+                add("gm-turn")
+                reason = "GM provider/session behavior; expensive campaign cases remain risk-selected or full"
+            elif path == "src/sylvia_gm/application/action_sequences.py":
+                groups["core-invariants"] = list(CORE)
+                add("gm-turn")
+                groups["action-sequences"] = [
+                    "tests/test_action_sequences.py", "tests/test_action_sequence_provider.py",
+                ]
+                reason = "Queue execution/recovery and its provider consumer"
             elif path.startswith("src/sylvia_gm/agent/skills/"):
                 groups["core-invariants"] = list(CORE)
                 add(
                     "provider-contracts",
+                    "gm-turn",
                     "campaign-play",
                     "builder-and-admission",
                     "interruption-and-recovery",
@@ -203,8 +242,8 @@ def select_checks(paths, *, source, base, diff_complete=True, full=False, root=N
                 reason = "Shipped agent instructions affect provider tools, gameplay and Builder"
             elif path.startswith("src/sylvia_gm/provider/"):
                 groups["core-invariants"] = list(CORE)
-                add("provider-contracts", "interruption-and-recovery", "campaign-play")
-                reason = "Provider privacy, recovery and composed session boundaries"
+                add("provider-contracts", "gm-turn")
+                reason = "Provider privacy/wire contracts and GM/session recovery behavior"
             elif path.startswith("src/sylvia_gm/ruleset/"):
                 groups["core-invariants"] = list(CORE)
                 add(
@@ -358,6 +397,15 @@ def load_selection(path, *, revision, root):
         raise ValueError("UI selection contains a non-JavaScript test")
     if _disjoint(groups) != groups or len(ui) != len(set(ui)):
         raise ValueError("Selected checks overlap")
+    kind = plan.get("qualification_kind", "product")
+    if kind not in {"product", "historical"}:
+        raise ValueError("Unsupported qualification kind")
+    if kind == "historical" and (
+        plan.get("check") not in HISTORICAL_CHECKS
+        or groups != HISTORICAL_CHECKS.get(plan.get("check"))
+        or ui or plan.get("native") or plan["mode"] != "affected"
+    ):
+        raise ValueError("Historical checkpoint must preserve its complete declared selection")
     if plan["mode"] == "full" and (
         groups != PYTHON_JOURNEYS or ui != UI_JOURNEY or not plan.get("native")
     ):
@@ -369,12 +417,17 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--full", action="store_true")
+    parser.add_argument("--check", choices=tuple(HISTORICAL_CHECKS),
+                        help="Select an explicit historical checkpoint, not product qualification")
     parser.add_argument("--base", help="Local comparison branch/commit, for example origin/main")
     args = parser.parse_args()
+    if args.full and args.check:
+        parser.error("A historical checkpoint cannot be combined with --full")
     source = git("rev-parse", "HEAD").decode().strip()
     event_path = os.environ.get("GITHUB_EVENT_PATH")
     event = json.loads(Path(event_path).read_text(encoding="utf-8")) if event_path else {}
-    base = args.base or event.get("pull_request", {}).get("base", {}).get("sha") or event.get("before")
+    base = (source if args.check else
+            args.base or event.get("pull_request", {}).get("base", {}).get("sha") or event.get("before"))
     complete, paths, error = True, [], None
     try:
         if not base or set(base) == {"0"}:
@@ -384,7 +437,8 @@ def main():
         paths = [item.decode("utf-8", errors="strict") for item in raw.split(b"\0") if item]
     except (ValueError, OSError, subprocess.CalledProcessError, UnicodeError) as problem:
         complete, error = False, str(problem)
-    plan = select_checks(paths, source=source, base=base, diff_complete=complete, full=args.full)
+    plan = (historical_check(args.check, source=source) if args.check else
+            select_checks(paths, source=source, base=base, diff_complete=complete, full=args.full))
     plan["diff_error"] = error
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(plan, indent=2) + "\n", encoding="utf-8")

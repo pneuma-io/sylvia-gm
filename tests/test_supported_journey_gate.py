@@ -82,6 +82,41 @@ def test_runner_rejects_incomplete_or_failed_required_checks(gate, tmp_path, mon
     assert len(calls) == 2
 
 
+@pytest.mark.parametrize("include_historical", [False, True])
+def test_group_runner_applies_historical_policy_to_collection_and_execution(
+    gate, tmp_path, monkeypatch, include_historical,
+):
+    import json
+    from types import SimpleNamespace
+    from scripts.check_catalog import PRODUCT_CASE_EXCLUSIONS
+
+    historical = next(iter(PRODUCT_CASE_EXCLUSIONS))
+    module, historical_function = historical.split("::")
+    behavior = module + "::test_behavior"
+    executed = []
+
+    def run(command, **kwargs):
+        if "--collect-only" in command:
+            return subprocess.CompletedProcess(command, 0, behavior + "\n" + historical + "\n", "")
+        deselected = f"--deselect={historical}" in command
+        executed.append(deselected)
+        classname = module.removesuffix(".py").replace("/", ".")
+        rows = f'<testcase classname="{classname}" name="test_behavior"/>'
+        if not deselected:
+            rows += f'<testcase classname="{classname}" name="{historical_function}"/>'
+        (tmp_path / "gm-turn.xml").write_text("<testsuites><testsuite>" + rows + "</testsuite></testsuites>")
+        return subprocess.CompletedProcess(command, 0, "", "")
+
+    monkeypatch.setattr(gate, "PYTHON_JOURNEYS", {"gm-turn": [module]})
+    monkeypatch.setattr(gate, "subprocess", SimpleNamespace(
+        run=run, TimeoutExpired=subprocess.TimeoutExpired, STDOUT=subprocess.STDOUT,
+    ))
+    assert gate._run("gm-turn", tmp_path, include_historical=include_historical)[0]
+    assert executed == [not include_historical]
+    required = json.loads((tmp_path / "gm-turn-required-cases.json").read_text())
+    assert len(required) == (2 if include_historical else 1)
+
+
 def test_revision_guard_and_hash_include_new_source_bytes(gate, tmp_path, monkeypatch):
     monkeypatch.delenv("SYLVIA_EXPECTED_REVISION", raising=False)
     monkeypatch.setattr(gate, "ROOT", tmp_path)
@@ -183,7 +218,7 @@ def test_relative_cli_output_is_absolute_before_worker_cwd_changes(gate, tmp_pat
 
     observed = []
 
-    def balanced(root, destination, journeys, selected, count, started, run_ui, *, deadline=None, scheduler="module"):
+    def balanced(root, destination, journeys, selected, count, started, run_ui, *, deadline=None, scheduler="module", include_historical=False):
         assert destination == (tmp_path / "relative-output").resolve()
         assert destination.is_absolute()
         assert deadline is None
@@ -207,7 +242,7 @@ def test_development_runs_can_complete_after_ci_allowance(gate, tmp_path, monkey
     import sys
     from types import SimpleNamespace
 
-    def balanced(root, destination, journeys, selected, count, started, run_ui, *, deadline=None, scheduler="module"):
+    def balanced(root, destination, journeys, selected, count, started, run_ui, *, deadline=None, scheduler="module", include_historical=False):
         assert deadline == (1800 if ci else None)
         return dict.fromkeys(selected, (True, 2001.0))
 

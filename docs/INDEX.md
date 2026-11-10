@@ -122,6 +122,7 @@ the complete documentation set. Their original dates and evidence limits remain 
 | Document | Use |
 |---|---|
 | [`agents/issue-tracker.md`](agents/issue-tracker.md) | Dot Desk work items, source/PR links and the status of local scratch records. |
+| [`operations/local-checks-and-release.md`](operations/local-checks-and-release.md) | Plain-English local check commands, evidence and release acceptance; the Development Process remains policy. |
 | [`reference/content-formats.md`](reference/content-formats.md) | Installed content-definition retrieval, examples and validation owners; a supporting implementation reference. |
 | [`launch-compatibility.md`](launch-compatibility.md) | Lite package compatibility, current implementation ownership and bounded candidate evidence; current task and product contract select scope. |
 

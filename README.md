@@ -172,6 +172,9 @@ with the Tauri command above.
 
 ### Developer tests
 
+See [How Sylvia is checked before release](docs/operations/local-checks-and-release.md)
+for focused, affected and full local checks, their evidence, and the separate release acceptance steps.
+
 From the repository root, after syncing the Python dependencies:
 
 ```powershell
