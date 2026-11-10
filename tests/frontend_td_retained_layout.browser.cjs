@@ -1,4 +1,4 @@
-// Render the shipped shell over the declared TD layout, including its command deck and appended queue.
+// Render the shipped shell over fresh and retained TD layouts, including the command deck and appended queue.
 // Scripted bridge: regression coverage for retained layout clipping, not native acceptance.
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
@@ -11,7 +11,7 @@ const fixture = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/td-del
 fixture.surfaces.find(surface => surface.id === 'operations.map').actions =
   JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/td-current-map-actions.json'), 'utf8'));
 
-async function open(browser, viewport) {
+async function open(browser, viewport, { freshLayout = false } = {}) {
   const page = await browser.newPage({ viewport });
   page.setDefaultTimeout(5000);
   const errors = [];
@@ -29,8 +29,9 @@ async function open(browser, viewport) {
       : name.endsWith('.png') ? 'image/png' : 'text/html' });
   });
   await page.goto('https://sylvia-strip.test/app.html');
-  await page.evaluate((source) => {
+  await page.evaluate(({ source, freshLayout }) => {
     const projection = JSON.parse(JSON.stringify(source));
+    if (freshLayout) delete projection.layout;
     const api = window.stripQA;
     document.getElementById('connecting-overlay').classList.add('hidden');
     document.getElementById('session-frame').style.display = 'flex';
@@ -44,13 +45,51 @@ async function open(browser, viewport) {
       campaigns: [{ campaign_id: projection.campaign_id, display_name: 'Strip', lifecycle: 'active', sessions: [{ session_id: 'strip-gm', role: 'dm', status: 'active' }] }],
       bridge: { compose_action_sequence: async () => queue, action_sequence: async () => queue, snapshot: async () => ({ revision: projection.revision }),
         campaign_panels: async () => projection,
+        preview_panel_action: async () => { throw new Error('Layout checks must not preview a commit'); },
+        execute_panel_action: async () => { throw new Error('Layout checks must not commit an action'); },
         player_action_availability: async (c) => ({ revision: c.expected_revision, results: c.requests.map(() => ({ available: true })) }) } });
     api.ensureSessionActivity({ sessionId: 'strip-gm', sessionRole: 'dm', campaignId: projection.campaign_id });
     api.wireControls(); api.initSidebarResize(); api.showSessionView();
     api.renderRulesetPanelProjection(projection); api.renderSidebarState();
     window.stripProjection = projection;
-  }, fixture);
+  }, { source: fixture, freshLayout });
   return { page, errors };
+}
+
+for (const viewport of [{ width: 1440, height: 900 }, { width: 1366, height: 768 }]) {
+  test(`fresh TD layout exposes the map and Execute with all declared controls at ${viewport.width}x${viewport.height}`, async () => {
+    const browser = await chromium.launch({ headless: true, args: ['--disable-gpu'],
+      channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined) });
+    try {
+      const { page, errors } = await open(browser, viewport, { freshLayout: true });
+      const map = page.locator('[data-panel-id="operations.map"]');
+      const declared = fixture.surfaces.find(surface => surface.id === 'operations.map').actions;
+      // The three wall declarations live in Edit walls; the other declarations form the hotbar.
+      const wallActions = ['wall-draw', 'wall-extend', 'wall-connect'];
+      const expectedActions = declared.filter(action => !wallActions.includes(action.id)).map(action => action.id).sort();
+      const visibleActions = await map.locator('[data-tactical-action]').evaluateAll(nodes => nodes.map(node => node.dataset.tacticalAction).sort());
+      assert.deepEqual(visibleActions, expectedActions);
+      await map.locator('.tactical-toolbar [data-tactical-wall-edit]').click();
+      const wallControls = await map.locator('[data-wall-commit]').evaluateAll(nodes => nodes.map(node => `wall-${node.dataset.wallCommit}`).sort());
+      assert.deepEqual(wallControls, wallActions.sort());
+      await map.locator('.tactical-toolbar [data-tactical-wall-edit]').click();
+      const mapVisibility = await map.locator('.tactical-scroll').evaluate(node => new Promise(resolve => {
+        const observer = new IntersectionObserver(([entry]) => {
+          observer.disconnect(); resolve(entry.intersectionRect.height);
+        }); observer.observe(node);
+      }));
+      assert.ok(mapVisibility >= 100, `the full toolbar clips the fresh map: ${mapVisibility}`);
+      await page.locator('#queue-badge').click();
+      const visibility = await page.locator('[data-panel-id="sylvia.action-queue"] [data-sequence-execute]')
+        .evaluate(node => new Promise(resolve => {
+          const observer = new IntersectionObserver(([entry]) => {
+            observer.disconnect(); resolve(entry.intersectionRatio);
+          }); observer.observe(node);
+        }));
+      assert.ok(visibility > 0.99, `Execute is clipped in the fresh layout: ${visibility}`);
+      assert.deepEqual(errors, []);
+    } finally { await browser.close(); }
+  });
 }
 
 for (const viewport of [{ width: 1402, height: 932 }, { width: 1366, height: 768 }]) {
