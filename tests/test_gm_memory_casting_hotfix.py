@@ -116,13 +116,10 @@ def test_permanent_refusal_detection_requires_first_unconditional_literal_false(
     assert runtime.permanently_refused_tool_names == frozenset({"stub", "stub_with_tail"})
 
 
-@pytest.fixture(scope="module")
-def lite_save(tmp_path_factory):
-    database = tmp_path_factory.mktemp("hotfix-lite") / "starter.sqlite3"
+def create_cleric_save(database, archive):
+    """Create an admitted actual starter Cleric against the selected retained package."""
     with AuthorityOwner.open(database, "hotfix-owner") as owner:
-        candidate = owner.install_package_archive(
-            io.BytesIO(bundled_srd_archive()), install_id="starter"
-        )
+        candidate = owner.install_package_archive(io.BytesIO(archive), install_id="starter")
         primary = next(p for p in candidate.package_lock.entries if p.role is PackageRole.PRIMARY)
         declaration = next(
             d
@@ -155,7 +152,16 @@ def lite_save(tmp_path_factory):
         )
         entity["hp"] = 4
         state = _state()
-        state[f"{SRD}.state"] = {}
+        state[f"{SRD}.state"] = {
+            "advancement": {
+                "method": "fixed",
+                "starting_level": 1,
+                "maximum_level": 1,
+                "recipients": "whole_party",
+                "timing": "No advancement awards.",
+                "allocation": "No advancement awards.",
+            }
+        }
         state[f"{SRD}.entities"]["hero"] = entity
         state[f"{SRD}.entities"]["guard"] = {
             "name": "Guard",
@@ -211,6 +217,14 @@ def lite_save(tmp_path_factory):
             model_id="fixture",
         )
     return database
+
+
+@pytest.fixture(scope="module")
+def lite_save(tmp_path_factory):
+    return create_cleric_save(
+        tmp_path_factory.mktemp("hotfix-lite") / "starter.sqlite3",
+        bundled_srd_archive(),
+    )
 
 
 def test_actual_gm_catalog_excludes_permanent_refusals_and_preserves_lock(lite_save, tmp_path):

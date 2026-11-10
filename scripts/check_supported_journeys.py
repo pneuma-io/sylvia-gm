@@ -44,6 +44,7 @@ PYTHON_JOURNEYS = {
         "tests/test_qa_lite_physical_range.py",
     ],
     "campaign-play": [
+        "tests/test_gm_hotfix_upgrade.py",
         "tests/test_campaign_rules_update.py",
         "tests/test_campaign_rules_update_bindings.py",
         "tests/test_campaign_rules_update_knowledge.py",
