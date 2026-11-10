@@ -5,8 +5,8 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
-from . import DispatchContext
 from ..owner_process import (
+    _MAX_USER_TEXT_CHARS,
     CommandRejected,
     OwnerProtocolError,
     PackageLock,
@@ -15,7 +15,6 @@ from ..owner_process import (
     SafePayload,
     Sequence,
     SessionMessageKind,
-    _MAX_USER_TEXT_CHARS,
     _campaign_creation_catalog,
     _campaign_plan_payload,
     _campaign_plan_text,
@@ -68,6 +67,7 @@ from ..owner_process import (
     validate_retained_campaign_plan,
     with_character_examples,
 )
+from . import DispatchContext
 
 
 def handle_handshake_status(ctx: DispatchContext, params: Mapping[str, Any]) -> Any:
@@ -727,7 +727,8 @@ def handle_start_guided_creation_subflow(ctx: DispatchContext, params: Mapping[s
                 )
         elif character_id is not None:
             source = next((
-                item for item in _reusable_participant_catalog(ctx.storage_root, ctx.application_owner)
+                item
+                for item in _reusable_participant_catalog(ctx.storage_root, ctx.application_owner)
                 if item.artifact_id == character_id and item.role == purpose
             ), None)
             if source is None or source.content_sha256 != character_hash:

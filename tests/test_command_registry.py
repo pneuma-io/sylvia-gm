@@ -1,9 +1,6 @@
 """Literal protocol and trust-boundary sets from the pre-refactor owner."""
-import ast
-import inspect
-import textwrap
 
-from sylvia_gm.interfaces import _local_diagnostics, owner_process, webui
+from sylvia_gm.interfaces import _local_diagnostics, webui
 
 DISPATCH = ('action_sequence',
  'admin_full_audit_record',
@@ -348,14 +345,24 @@ WRAPPED = ('append_campaign_sequel',
 
 
 def test_command_registry_preserves_exact_protocol_sets():
-    tree = ast.parse(textwrap.dedent(inspect.getsource(owner_process._dispatch_selected)))
-    names = set()
-    for branch in tree.body[0].body:
-        if isinstance(branch, ast.If) and isinstance(branch.test, ast.Compare):
-            value = ast.literal_eval(branch.test.comparators[0])
-            names.update([value] if isinstance(value, str) else value)
+    from sylvia_gm.interfaces.commands.registry import COMMAND_REGISTRY
+
+    names = {name for name, command in COMMAND_REGISTRY.items() if command.handler is not None}
     assert names == set(DISPATCH)
+    assert len(names) == 114
     assert webui.COMMANDS == frozenset(WEBUI)
     assert webui.EXPORTS == EXPORTS
     assert webui.WRAPPED == frozenset(WRAPPED)
     assert _local_diagnostics.OPERATIONS == frozenset(DIAGNOSTICS)
+
+
+def test_unknown_or_adapter_only_command_keeps_protocol_error():
+    import pytest
+
+    from sylvia_gm.interfaces.owner_process import OwnerProtocolError, _dispatch_selected
+
+    for method in ("not_a_command", "record_local_fault", "renderer"):
+        with pytest.raises(OwnerProtocolError, match=f"^Unsupported owner method: {method}$"):
+            _dispatch_selected(None, method, {}, application_owner=None, owner_id="pin",
+                               provider_resolver=None, model_choices=None, session_loop=None,
+                               storage_root=None)

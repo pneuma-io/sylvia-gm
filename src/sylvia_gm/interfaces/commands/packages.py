@@ -5,14 +5,13 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
-from . import DispatchContext
 from ..owner_process import (
+    _MAX_PACKAGE_BYTES,
+    PLAN_BUNDLE_BYTE_LIMIT,
     AuthorityError,
     CommandRejected,
     OwnerProtocolError,
-    PLAN_BUNDLE_BYTE_LIMIT,
     Path,
-    _MAX_PACKAGE_BYTES,
     _install_plan_snapshot,
     _required_artifact_id,
     _required_text,
@@ -23,6 +22,7 @@ from ..owner_process import (
     offer_import_repair,
     zipfile,
 )
+from . import DispatchContext
 
 
 def handle_package_candidates(ctx: DispatchContext, params: Mapping[str, Any]) -> Any:

@@ -15,8 +15,6 @@ request envelopes and receive exactly one JSON response each.
 
 from __future__ import annotations
 
-import base64
-import binascii
 import dataclasses
 import functools
 import hashlib
@@ -28,25 +26,15 @@ import sys
 import tempfile
 import threading
 import time
-import zipfile
-from collections.abc import Callable, Iterator, Mapping, Sequence, Set
+from collections.abc import Callable, Mapping, Sequence, Set
 from contextlib import ExitStack, nullcontext
 from enum import Enum
 from pathlib import Path
 from types import MappingProxyType
 from typing import Any, BinaryIO, TextIO, cast
 
-from sylvia_gm.interfaces.commands import DispatchContext
-
-from sylvia_gm.agent._builder_question_answers import (
-    builder_question_answer_content,
-    builder_question_details,
-)
 from sylvia_gm.agent._builder_session import (
-    BuilderTurnResult,
     CampaignContentToolAuthority,
-    persist_builder_turn,
-    stream_builder_turn,
 )
 from sylvia_gm.agent._provider_resolver import (
     ConfiguredProviderResolver,
@@ -56,31 +44,16 @@ from sylvia_gm.agent._provider_session import ProviderSessionAdapter
 from sylvia_gm.agent._session_loop import (
     CampaignSessionLoop,
     ProviderControl,
-    ProviderEvent,
-    SessionInputKind,
     SessionProviderInput,
-    SessionRunRequest,
 )
 from sylvia_gm.agent._stateless_mcp import ModelMechanicsTool
 from sylvia_gm.application.authority import (
-    ActionCommand,
     AuthorityOwner,
-    ResolveMechanicsChoiceCommand,
-    audit_export_save_error,
-)
-from sylvia_gm.application.builder_references import (
-    candidate_for_references,
-    capture_launch_references,
-    launch_candidate,
-    launch_references,
-    reference_reader,
-    with_character_examples,
 )
 from sylvia_gm.application.builder_session_migration import migrate_legacy_builder_chats
 from sylvia_gm.application.bundled_campaign_plans import (
     bundled_plan,
     known_builtin_public_summary,
-    selected_campaign_plan,
 )
 from sylvia_gm.application.bundled_packages import (
     BUNDLED_RIICHI_PACKAGES,
@@ -94,11 +67,7 @@ from sylvia_gm.application.bundled_packages import (
 )
 from sylvia_gm.application.bundled_starter_characters import available_reusable_participants
 from sylvia_gm.application.campaign_library_selection import (
-    materialize_library_party,
     participant_catalog_payload,
-    plan_with_interview_intent,
-    require_completed_plan_characters,
-    resolve_campaign_library_selection,
 )
 from sylvia_gm.application.campaign_plan_sources import (
     CampaignPlanToolAuthority,
@@ -107,74 +76,30 @@ from sylvia_gm.application.campaign_plan_sources import (
 )
 from sylvia_gm.application.character_profiles import (
     character_profile_catalog,
-    load_character_profile,
-    profile_from_snapshot,
-    save_character_profile,
-)
-from sylvia_gm.application.compatible_character_copy import (
-    authored_character_state,
-    copy_compatible_character,
-)
-from sylvia_gm.application.import_repair import materialize_repair_draft
-from sylvia_gm.application.import_repair_sessions import (
-    offer_import_repair,
-    start_import_repair_chat,
 )
 from sylvia_gm.application.launch_compatibility import ARCHIVED_RULESET_IDS
-from sylvia_gm.application.library_sources import LibrarySourceReader
-from sylvia_gm.application.plan_bundle import (
-    PLAN_BUNDLE_BYTE_LIMIT,
-    export_plan_bundle,
-    import_plan_bundle,
-)
-from sylvia_gm.application.plan_snapshot import retained_plan_snapshot, validate_plan_snapshot
-from sylvia_gm.application.ready_campaigns import (
-    customize_ready_campaign,
-    ready_campaign_catalog,
-    start_ready_campaign,
-)
 from sylvia_gm.application.reusable_participants import (
     ReusableParticipant,
     compatible_reusable_participants,
-    delete_reusable_participant,
-    save_reusable_participant,
 )
 from sylvia_gm.application.reusable_plans import (
-    delete_reusable_campaign_plan,
     load_reusable_campaign_plan,
     reusable_campaign_plan_catalog,
-    save_reusable_campaign_plan,
-    save_reusable_rift_plan,
 )
-from sylvia_gm.builder._campaign_plan_materializer import (
-    CampaignPlanDraft,
-    publish_campaign_plan_files,
-)
-from sylvia_gm.builder._plan_draft_check import check_plan_draft
-from sylvia_gm.builder._plan_snapshot_materializer import materialize_plan_snapshot_draft
-from sylvia_gm.builder._setting_draft_check import check_setting_draft
-from sylvia_gm.builder._setting_materializer import materialize_setting_draft
 from sylvia_gm.campaign.rift import (
     RIFT_RULESET_ID,
     materialize_rift_selection,
-    rift_public_template,
     validate_rift_party_handoff,
     validate_rift_template,
 )
 from sylvia_gm.config._resolver import ConfigError
 from sylvia_gm.config.provider_settings import (
     clear_session_model_once_settings,
-    detect_local_providers,
-    discover_provider_models,
-    open_provider_setup,
     provider_settings,
-    remove_provider_settings,
     require_configured_model,
-    save_provider_settings,
     session_model_once_settings,
     set_default_model_settings,
     set_session_model_once_settings,
-    validate_provider_model,
 )
 from sylvia_gm.domain.authority import (
     PackageLock,
@@ -210,14 +135,7 @@ from sylvia_gm.domain.session import (
     SessionStatus,
 )
 from sylvia_gm.infrastructure.builder_source_ingestion import (
-    MAX_SOURCE_FILES,
-    finalize_builder_source_purge,
-    finalize_existing_builder_source_purge,
-    ingest_builder_sources,
     reconcile_builder_source_purges,
-    restore_builder_sources_after_failed_purge,
-    rollback_builder_source_batch,
-    stage_builder_sources_for_purge,
 )
 from sylvia_gm.infrastructure.launch_handshake import derive_owner_response
 from sylvia_gm.interfaces._display_reads import DisplayReads
@@ -227,6 +145,7 @@ from sylvia_gm.interfaces._session_reasoning import (
     selected_model_info,
     validate_model_preferences,
 )
+from sylvia_gm.interfaces.commands import DispatchContext
 from sylvia_gm.interfaces.local_api import LocalCommandBus
 from sylvia_gm.interfaces.local_owner import LocalOwnerSupervisor
 from sylvia_gm.provider._admin_audit import AdminAuditedProvider
@@ -1894,12 +1813,8 @@ def _dispatch_selected(
     reload_provider_resolver: Callable[[], None] | None = None,
     gm_system_prompt: str | None = None,
 ) -> Any:
-    from .commands import sessions
-    from .commands import providers
-    from .commands import packages
-    from .commands import actions
-    from .commands import builder
-    from .commands import campaigns
+    from .commands.registry import COMMAND_REGISTRY
+
     ctx = DispatchContext(
         application_owner=application_owner,
         bus=bus,
@@ -1912,215 +1827,10 @@ def _dispatch_selected(
         session_loop=session_loop,
         storage_root=storage_root,
     )
-    if method == "handshake_status":
-        return campaigns.handle_handshake_status(ctx, params)
-    if method == "campaign_index":
-        return campaigns.handle_campaign_index(ctx, params)
-    if method == "campaign_creation_catalog":
-        return campaigns.handle_campaign_creation_catalog(ctx, params)
-    if method == "ready_campaign_catalog":
-        return campaigns.handle_ready_campaign_catalog(ctx, params)
-    if method in {"start_ready_campaign", "customize_ready_campaign"}:
-        return campaigns.handle_customize_ready_campaign(ctx, params)
-    if method == "delete_reusable_library_entry":
-        return campaigns.handle_delete_reusable_library_entry(ctx, params)
-    if method == "builder_chat_index":
-        return builder.handle_builder_chat_index(ctx, params)
-    if method == "start_import_repair":
-        return builder.handle_start_import_repair(ctx, params)
-    if method == "create_builder_chat":
-        return builder.handle_create_builder_chat(ctx, params)
-    if method == "rename_builder_chat":
-        return builder.handle_rename_builder_chat(ctx, params)
-    if method == "delete_builder_chat":
-        return builder.handle_delete_builder_chat(ctx, params)
-    if method in {"archive_builder_chat", "restore_builder_chat"}:
-        return builder.handle_archive_builder_chat(ctx, params)
-    if method == "snapshot":
-        return campaigns.handle_snapshot(ctx, params)
-    if method == "display_snapshot":
-        return campaigns.handle_display_snapshot(ctx, params)
-    if method == "player_projection":
-        return campaigns.handle_player_projection(ctx, params)
-    if method == "player_projection_page":
-        return campaigns.handle_player_projection_page(ctx, params)
-    if method == "campaign_panels":
-        return actions.handle_campaign_panels(ctx, params)
-    if method == "action_sequence":
-        return actions.handle_action_sequence(ctx, params)
-    if method in {"compose_action_sequence", "execute_action_sequence"}:
-        return actions.handle_compose_action_sequence(ctx, params)
-    if method == "player_action_availability":
-        return actions.handle_player_action_availability(ctx, params)
-    if method in {"preview_player_action", "execute_player_action"}:
-        return actions.handle_execute_player_action(ctx, params)
-    if method in {"preview_panel_action", "execute_panel_action", "panel_action_receipt"}:
-        return actions.handle_execute_panel_action(ctx, params)
-    if method in {"campaign_sequel_context", "preview_campaign_sequel", "append_campaign_sequel"}:
-        return campaigns.handle_append_campaign_sequel(ctx, params)
-    if method == "package_candidates":
-        return packages.handle_package_candidates(ctx, params)
-    if method == "campaign_rules_update_options":
-        return campaigns.handle_campaign_rules_update_options(ctx, params)
-    if method == "preview_campaign_rules_update":
-        return campaigns.handle_preview_campaign_rules_update(ctx, params)
-    if method == "adopt_campaign_rules_update":
-        return campaigns.handle_adopt_campaign_rules_update(ctx, params)
-    if method == "inspect_package_candidate":
-        return packages.handle_inspect_package_candidate(ctx, params)
-    if method == "package_candidate_text":
-        return packages.handle_package_candidate_text(ctx, params)
-    if method == "compare_package_candidates":
-        return packages.handle_compare_package_candidates(ctx, params)
-    if method == "rift_template":
-        return campaigns.handle_rift_template(ctx, params)
-    if method == "campaign_party_options":
-        return campaigns.handle_campaign_party_options(ctx, params)
-    if method == "model_choices":
-        return providers.handle_model_choices(ctx, params)
-    if method == "provider_settings":
-        return providers.handle_provider_settings(ctx, params)
-    if method == "open_provider_setup":
-        return providers.handle_open_provider_setup(ctx, params)
-    if method == "chatgpt_connection":
-        return providers.handle_chatgpt_connection(ctx, params)
-    if method == "admin_full_audit_status":
-        return providers.handle_admin_full_audit_status(ctx, params)
-    if method == "admin_full_audit_record":
-        return providers.handle_admin_full_audit_record(ctx, params)
-    if method == "export_admin_full_audit":
-        return providers.handle_export_admin_full_audit(ctx, params)
-    if method == "set_admin_full_audit":
-        return providers.handle_set_admin_full_audit(ctx, params)
-    if method == "detect_local_providers":
-        return providers.handle_detect_local_providers(ctx, params)
-    if method == "discover_provider_models":
-        return providers.handle_discover_provider_models(ctx, params)
-    if method == "validate_provider_model":
-        return providers.handle_validate_provider_model(ctx, params)
-    if method == "save_provider_settings":
-        return providers.handle_save_provider_settings(ctx, params)
-    if method == "remove_provider_settings":
-        return providers.handle_remove_provider_settings(ctx, params)
-    if method == "set_default_model":
-        return providers.handle_set_default_model(ctx, params)
-    if method == "switch_session_model":
-        return providers.handle_switch_session_model(ctx, params)
-    if method == "switch_session_reasoning":
-        return sessions.handle_switch_session_reasoning(ctx, params)
-    if method == "inspect_provider_thinking":
-        return providers.handle_inspect_provider_thinking(ctx, params)
-    if method in {"session_context", "session_history_page"}:
-        return sessions.handle_session_context(ctx, params)
-    if method == "ingest_builder_sources":
-        return builder.handle_ingest_builder_sources(ctx, params)
-    if method == "steer_session":
-        return sessions.handle_steer_session(ctx, params)
-    if method == "submit_session_input":
-        return sessions.handle_submit_session_input(ctx, params)
-    if method == "interrupt_stream":
-        return sessions.handle_interrupt_stream(ctx, params)
-    if method == "interrupt_provider_stream":
-        return providers.handle_interrupt_provider_stream(ctx, params)
-    if method == "retryable_interruption":
-        return campaigns.handle_retryable_interruption(ctx, params)
-    if method == "manual_retry_session":
-        return sessions.handle_manual_retry_session(ctx, params)
-    if method == "disconnect_stream":
-        return sessions.handle_disconnect_stream(ctx, params)
-    if method == "disconnect_provider_stream":
-        return providers.handle_disconnect_provider_stream(ctx, params)
-    if method == "stream_heartbeat":
-        return sessions.handle_stream_heartbeat(ctx, params)
-    if method == "provider_stream_heartbeat":
-        return providers.handle_provider_stream_heartbeat(ctx, params)
-    if method == "narration_attempt_status":
-        return sessions.handle_narration_attempt_status(ctx, params)
-    if method == "provider_stream_status":
-        return providers.handle_provider_stream_status(ctx, params)
-    if method == "reconnect_stream":
-        return sessions.handle_reconnect_stream(ctx, params)
-    if method == "reconnect_provider_stream":
-        return providers.handle_reconnect_provider_stream(ctx, params)
-    if method == "install_package":
-        return packages.handle_install_package(ctx, params)
-    if method in ("preview_character_card_file", "confirm_character_card_import"):
-        return packages.handle_confirm_character_card_import(ctx, params)
-
-    if method == "install_package_file":
-        return packages.handle_install_package_file(ctx, params)
-
-    if method == "start_rift_campaign":
-        return campaigns.handle_start_rift_campaign(ctx, params)
-
-    if method == "start_guided_campaign":
-        return campaigns.handle_start_guided_campaign(ctx, params)
-
-    if method == "create_guided_campaign_draft":
-        return campaigns.handle_create_guided_campaign_draft(ctx, params)
-    if method == "navigate_guided_campaign_draft":
-        return campaigns.handle_navigate_guided_campaign_draft(ctx, params)
-    if method == "advance_guided_campaign_draft":
-        return campaigns.handle_advance_guided_campaign_draft(ctx, params)
-    if method == "guided_campaign_contribution":
-        return campaigns.handle_guided_campaign_contribution(ctx, params)
-    if method == "save_reusable_campaign_plan":
-        return campaigns.handle_save_reusable_campaign_plan(ctx, params)
-    if method == "start_guided_creation_subflow":
-        return campaigns.handle_start_guided_creation_subflow(ctx, params)
-    if method == "return_guided_creation_subflow":
-        return campaigns.handle_return_guided_creation_subflow(ctx, params)
-    if method == "confirm_new_campaign":
-        return campaigns.handle_confirm_new_campaign(ctx, params)
-    if method == "begin_campaign_construction":
-        return campaigns.handle_begin_campaign_construction(ctx, params)
-    if method == "complete_campaign_construction":
-        return campaigns.handle_complete_campaign_construction(ctx, params)
-    if method == "model_guidance":
-        return providers.handle_model_guidance(ctx, params)
-    if method == "finalize_campaign_construction":
-        return campaigns.handle_finalize_campaign_construction(ctx, params)
-    if method == "start_dm_session":
-        return sessions.handle_start_dm_session(ctx, params)
-    if method == "catalog":
-        return campaigns.handle_catalog(ctx, params)
-    if method == "execute_action":
-        return actions.handle_execute_action(ctx, params)
-    if method == "resolve_mechanics_choice":
-        return actions.handle_resolve_mechanics_choice(ctx, params)
-    if method == "open_turn":
-        return actions.handle_open_turn(ctx, params)
-    if method == "complete_turn":
-        return actions.handle_complete_turn(ctx, params)
-    if method == "stop_agent_session":
-        return sessions.handle_stop_agent_session(ctx, params)
-    if method == "resume_agent_session":
-        return sessions.handle_resume_agent_session(ctx, params)
-    if method == "rename_campaign":
-        return campaigns.handle_rename_campaign(ctx, params)
-    if method == "archive_campaign":
-        return campaigns.handle_archive_campaign(ctx, params)
-    if method == "restore_archived_campaign":
-        return campaigns.handle_restore_archived_campaign(ctx, params)
-    if method == "trash_campaign":
-        return campaigns.handle_trash_campaign(ctx, params)
-    if method == "restore_trashed_campaign":
-        return campaigns.handle_restore_trashed_campaign(ctx, params)
-    if method == "purge_campaign":
-        return campaigns.handle_purge_campaign(ctx, params)
-    if method == "backup_database":
-        return campaigns.handle_backup_database(ctx, params)
-    if method == "export_campaign_plan_file":
-        return campaigns.handle_export_campaign_plan_file(ctx, params)
-    if method in {"export_package_candidate", "export_package_candidate_file"}:
-        return packages.handle_export_package_candidate(ctx, params)
-    if method in {"export_campaign", "export_campaign_file"}:
-        return campaigns.handle_export_campaign(ctx, params)
-    if method == "recover_campaign":
-        return campaigns.handle_recover_campaign(ctx, params)
-    if method == "recover_campaign_file":
-        return campaigns.handle_recover_campaign_file(ctx, params)
-    raise OwnerProtocolError(f"Unsupported owner method: {method}")
+    command = COMMAND_REGISTRY.get(method)
+    if command is None or command.handler is None:
+        raise OwnerProtocolError(f'Unsupported owner method: {method}')
+    return command.handler(ctx, params)
 
 
 def run(

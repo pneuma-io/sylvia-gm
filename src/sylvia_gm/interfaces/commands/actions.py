@@ -5,7 +5,6 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
-from . import DispatchContext
 from ..owner_process import (
     ActionCommand,
     OwnerProtocolError,
@@ -17,6 +16,7 @@ from ..owner_process import (
     _required_nonnegative_int,
     _required_text,
 )
+from . import DispatchContext
 
 
 def handle_campaign_panels(ctx: DispatchContext, params: Mapping[str, Any]) -> Any:

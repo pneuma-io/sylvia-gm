@@ -5,10 +5,9 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
-from . import DispatchContext
 from ..owner_process import (
-    CommandRejected,
     MAX_SOURCE_FILES,
+    CommandRejected,
     OwnerProtocolError,
     Path,
     SafePayload,
@@ -24,6 +23,7 @@ from ..owner_process import (
     rollback_builder_source_batch,
     start_import_repair_chat,
 )
+from . import DispatchContext
 
 
 def handle_builder_chat_index(ctx: DispatchContext, params: Mapping[str, Any]) -> Any:

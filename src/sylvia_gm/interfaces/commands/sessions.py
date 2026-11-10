@@ -5,8 +5,9 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
-from . import DispatchContext
 from ..owner_process import (
+    _MAX_USER_TEXT_CHARS,
+    RIFT_RULESET_ID,
     AdminAuditedProvider,
     BinaryIO,
     BuilderTurnResult,
@@ -23,7 +24,6 @@ from ..owner_process import (
     ProviderControl,
     ProviderEvent,
     ProviderSessionAdapter,
-    RIFT_RULESET_ID,
     SafePayload,
     Sequence,
     SessionInputKind,
@@ -31,7 +31,6 @@ from ..owner_process import (
     SessionProviderInput,
     SessionRunRequest,
     WriterRole,
-    _MAX_USER_TEXT_CHARS,
     _admitted_dm_campaign_plan,
     _builder_workspace,
     _campaign_content_tool_authority,
@@ -88,6 +87,7 @@ from ..owner_process import (
     validate_plan_snapshot,
     validate_retained_campaign_plan,
 )
+from . import DispatchContext
 
 
 def handle_switch_session_reasoning(ctx: DispatchContext, params: Mapping[str, Any]) -> Any:
@@ -307,7 +307,9 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
             if context.session.role is WriterRole.BUILDER:
                 messages = _provider_history(provider_input.history)
             else:
-                adapter = ProviderSessionAdapter(ctx.application_owner, provider, owner_id=ctx.owner_id)
+                adapter = (
+                    ProviderSessionAdapter(ctx.application_owner, provider, owner_id=ctx.owner_id)
+                )
                 messages = adapter._messages(
                     provider_input, campaign_has_mechanics=False, tools_available=False,
                 )
@@ -724,7 +726,8 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
             if participant_package is None or participant_campaign_setting is None:
                 raise CommandRejected("Character editing needs this chat's saved Setting")
             source = next((
-                item for item in _reusable_participant_catalog(ctx.storage_root, ctx.application_owner)
+                item
+                for item in _reusable_participant_catalog(ctx.storage_root, ctx.application_owner)
                 if item.artifact_id == artifact_id and item.role == participant_purpose
             ), None)
             if source is None:
@@ -756,7 +759,8 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
             if participant_package is None or participant_campaign_setting is None:
                 raise CommandRejected("Character reuse needs this chat's saved Setting")
             source = next((
-                item for item in _reusable_participant_catalog(ctx.storage_root, ctx.application_owner)
+                item
+                for item in _reusable_participant_catalog(ctx.storage_root, ctx.application_owner)
                 if item.artifact_id == artifact_id and item.role == participant_purpose
             ), None)
             if source is None:

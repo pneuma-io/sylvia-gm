@@ -5,12 +5,11 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
-from . import DispatchContext
 from ..owner_process import (
+    _MAX_ADMIN_AUDIT_VIEW_BYTES,
     CommandRejected,
     OwnerProtocolError,
     Path,
-    _MAX_ADMIN_AUDIT_VIEW_BYTES,
     _json_value,
     _optional_bool,
     _optional_nonnegative_int,
@@ -29,6 +28,7 @@ from ..owner_process import (
     set_default_model_settings,
     validate_provider_model,
 )
+from . import DispatchContext
 
 
 def handle_model_choices(ctx: DispatchContext, params: Mapping[str, Any]) -> Any:
