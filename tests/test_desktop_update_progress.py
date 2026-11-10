@@ -132,6 +132,7 @@ def test_task_dialog_packing_callback_timer_and_own_window_close_rules_without_n
 
 
 def main_fixture(tmp_path, monkeypatch, factory, execute):
+    monkeypatch.setattr(helper, "__version__", "0.3.0-alpha.1")
     update, _, backup, _, _, database = fixture(tmp_path)
     update.prepare(backup, lambda: True)
     events = []

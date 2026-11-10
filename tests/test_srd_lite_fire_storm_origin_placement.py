@@ -6,6 +6,7 @@ from pathlib import Path
 import zipfile
 
 import pytest
+from sylvia_gm.domain.authority import thaw_json_value
 import yaml
 
 from tests.test_native_followups import make_case

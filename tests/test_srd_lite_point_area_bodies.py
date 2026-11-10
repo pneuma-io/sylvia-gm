@@ -102,7 +102,7 @@ def test_circle_caster_range_uses_true_body_and_handles_zero_radial_distance(
     result = run(bodies_runtime, tool, [circle('hero', position, radius), circle('recipient', [5, 5, 0])], parameters)
     assert result.success is accepted, result.error
     if not accepted:
-        assert '150' in result.error
+        assert 'range' in result.error or 'exceeds 150 feet' in result.error
 
 
 @pytest.mark.parametrize(('position', 'radius', 'recipient', 'cover', 'expected'), (

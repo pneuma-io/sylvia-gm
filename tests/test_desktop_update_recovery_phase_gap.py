@@ -21,6 +21,7 @@ from tests.test_desktop_update_recovery_service import service_fixture
 def test_failed_phase_save_requires_fresh_reviewed_intent_and_full_retry_ack(
     tmp_path, monkeypatch, choice,
 ):
+    monkeypatch.setattr(helper, "__version__", "0.3.0-alpha.1")
     update, boundary, host, database = service_fixture(tmp_path)
     recovery = RecoveryOperation(update)
     saved, failures, launches, starts, presentations = UpdateStore.save, [], [], [], []

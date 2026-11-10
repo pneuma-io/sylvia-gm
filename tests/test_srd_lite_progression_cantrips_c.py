@@ -129,6 +129,8 @@ def _cast_parameters(spell, **choices):
         "verbal_component_available": True, "somatic_component_available": True,
         "material_component_available": True,
         "material_item_ids": ["lodestones"] if spell == "mending" else [],
+        **({"target_distance": 3, "caster_can_touch_target": True, "cover": "none"}
+           if spell == "mending" else {}),
         **choices,
     }
 
@@ -295,7 +297,7 @@ def test_complete_acolyte_thaumaturgy_mending_world_consumers_cost_expiry_and_re
         _act(case, history, "continue_srd_spell_cast", elapsed_rounds=1, **continuation)
         assert case.entities()["hero"]["extended_casting"]["progress_rounds"] == 10
         case.reject("cast_spell_outside_combat", mending | {"object_break_id": "oversized"}, match="one foot")
-        case.reject("cast_spell_outside_combat", mending | {"object_target_id": "far_relic"}, match="range")
+        case.reject("cast_spell_outside_combat", mending | {"object_target_id": "far_relic", "target_distance": 40, "caster_can_touch_target": False}, match="range")
         case.reject("cast_spell_outside_combat", mending | {"somatic_component_available": False})
         repair = _cast(case, history, "mending", object_target_id="relic", object_break_id="tear")
         cards.append(thaw_json_value(repair.result["result_card"]))

@@ -181,6 +181,61 @@ def test_combined_selection_has_no_repeated_or_overlapping_selectors():
             assert item.split("::")[0] not in selectors
 
 
+def test_slow_files_are_selected_only_for_explicit_full_qualification():
+    from scripts.check_supported_journeys import FULL_ONLY_JOURNEYS, PYTHON_JOURNEYS
+
+    slow = {
+        item.split("::")[0]
+        for group in FULL_ONLY_JOURNEYS for item in PYTHON_JOURNEYS[group]
+    }
+    assert slow
+    for plan in (choose(["unmapped.file"]), choose([sorted(slow)[0]])):
+        selected = {
+            item.split("::")[0] for values in plan["python"].values() for item in values
+        }
+        assert selected and not selected & slow
+    full = choose([], full=True)
+    assert slow <= {
+        item.split("::")[0] for values in full["python"].values() for item in values
+    }
+
+
+def test_browser_fixture_helpers_select_their_python_backend():
+    from scripts.check_supported_journeys import FULL_ONLY_JOURNEYS, PYTHON_JOURNEYS
+    from scripts.test_inventory import JAVASCRIPT_HARNESSES
+
+    for helper, owner in JAVASCRIPT_HARNESSES.items():
+        plan = choose([helper])
+        assert helper not in plan["ui"]
+        selected = [item for values in plan["python"].values() for item in values]
+        full_only = {item for group in FULL_ONLY_JOURNEYS for item in PYTHON_JOURNEYS[group]}
+        if owner in full_only:
+            assert owner not in selected
+            assert any(row["selection"] == "explicit --full only" for row in plan["reasons"])
+        else:
+            assert owner in selected
+        full = choose([helper], full=True)
+        assert owner in [item for values in full["python"].values() for item in values]
+
+
+def test_local_cli_accepts_an_explicit_base_without_a_github_event(tmp_path, monkeypatch):
+    import json
+    import subprocess
+    import sys
+
+    root = Path(__file__).resolve().parents[1]
+    output = tmp_path / "selection.json"
+    monkeypatch.delenv("GITHUB_EVENT_PATH", raising=False)
+    result = subprocess.run(
+        [sys.executable, "scripts/select_checks.py", "--base", "HEAD", "--output", str(output)],
+        cwd=root, capture_output=True, text=True, check=False,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    plan = json.loads(output.read_text())
+    assert plan["diff_complete"] and plan["base"] == plan["source"]
+    assert plan["python"]  # An empty diff still cannot silently select zero work.
+
+
 def test_all_selected_current_tests_exist():
     plan = choose(["unmapped.file"])
     root = Path(__file__).resolve().parents[1]

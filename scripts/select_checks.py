@@ -10,9 +10,11 @@ import subprocess
 from pathlib import Path, PurePosixPath
 
 if __package__:
-    from .check_supported_journeys import PYTHON_JOURNEYS, UI_JOURNEY
+    from .test_inventory import JAVASCRIPT_HARNESSES
+    from .check_supported_journeys import FULL_ONLY_JOURNEYS, PYTHON_JOURNEYS, UI_JOURNEY
 else:
-    from check_supported_journeys import PYTHON_JOURNEYS, UI_JOURNEY
+    from test_inventory import JAVASCRIPT_HARNESSES
+    from check_supported_journeys import FULL_ONLY_JOURNEYS, PYTHON_JOURNEYS, UI_JOURNEY
 
 CORE = [
     "tests/test_python_quality.py",
@@ -101,7 +103,10 @@ def select_checks(paths, *, source, base, diff_complete=True, full=False, root=N
             groups.setdefault(name, list(PYTHON_JOURNEYS[name]))
 
     def broad(path, reason):
-        groups.update({name: list(items) for name, items in PYTHON_JOURNEYS.items()})
+        groups.update({
+            name: list(items) for name, items in PYTHON_JOURNEYS.items()
+            if full or name not in FULL_ONLY_JOURNEYS
+        })
         ui.update(UI_JOURNEY)
         plan["native"] = True
         plan["broad_fallback"] = not full
@@ -243,7 +248,10 @@ def select_checks(paths, *, source, base, diff_complete=True, full=False, root=N
                 if Path(path).name.startswith("test_"):
                     groups.setdefault("changed-tests", []).append(path)
                 reason = "Changed Python tests and statically mapped helper consumers"
-            elif path.startswith("tests/") and path.endswith((".test.cjs", ".browser.cjs")):
+            elif path in JAVASCRIPT_HARNESSES:
+                groups.setdefault("changed-tests", []).append(JAVASCRIPT_HARNESSES[path])
+                reason = "Browser helper with its required Python fixture backend"
+            elif path.startswith("tests/") and path.endswith(".cjs"):
                 ui.add(path)
                 ui.update(item for item in UI_JOURNEY if item.endswith(".test.cjs"))
                 reason = "Changed browser/JavaScript test and pure JavaScript invariants"
@@ -281,6 +289,27 @@ def select_checks(paths, *, source, base, diff_complete=True, full=False, root=N
                     broad(test_paths, "Shared test helper has no mapped supported consumers")
             except (OSError, SyntaxError, UnicodeError):
                 broad(test_paths, "Test import graph unavailable: conservative broad fallback")
+    if not full:
+        full_only = {
+            item.split("::")[0]
+            for name in FULL_ONLY_JOURNEYS for item in PYTHON_JOURNEYS[name]
+        }
+        withheld = sorted({
+            item for values in groups.values() for item in values
+            if item.split("::")[0] in full_only
+        })
+        groups = {
+            name: [item for item in values if item.split("::")[0] not in full_only]
+            for name, values in groups.items()
+        }
+        groups = {name: values for name, values in groups.items() if values}
+        if withheld:
+            plan["reasons"].append({
+                "path": withheld, "selection": "explicit --full only",
+                "reason": "Individually observed over four minutes; excluded from affected runs",
+            })
+        if not groups and not ui:
+            groups["core-invariants"] = list(CORE)
     plan["python"] = _disjoint(groups)
     plan["ui"] = sorted(ui)
     if full:
@@ -325,7 +354,7 @@ def load_selection(path, *, revision, root):
             raise ValueError("Selected required test is missing or outside source")
     if any(not item.split("::")[0].endswith(".py") for items in groups.values() for item in items):
         raise ValueError("Python selection contains a non-Python test")
-    if any(not item.endswith((".test.cjs", ".browser.cjs")) for item in ui):
+    if any(not item.endswith(".cjs") for item in ui):
         raise ValueError("UI selection contains a non-JavaScript test")
     if _disjoint(groups) != groups or len(ui) != len(set(ui)):
         raise ValueError("Selected checks overlap")
@@ -340,11 +369,12 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--full", action="store_true")
+    parser.add_argument("--base", help="Local comparison branch/commit, for example origin/main")
     args = parser.parse_args()
     source = git("rev-parse", "HEAD").decode().strip()
     event_path = os.environ.get("GITHUB_EVENT_PATH")
     event = json.loads(Path(event_path).read_text(encoding="utf-8")) if event_path else {}
-    base = event.get("pull_request", {}).get("base", {}).get("sha") or event.get("before")
+    base = args.base or event.get("pull_request", {}).get("base", {}).get("sha") or event.get("before")
     complete, paths, error = True, [], None
     try:
         if not base or set(base) == {"0"}:

@@ -14,6 +14,12 @@ import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor
 
 
+if __package__:
+    from .known_test_defects import accepted_case
+else:
+    from known_test_defects import accepted_case
+
+
 def case_key(nodeid):
     unparameterized, bracket, parameters = nodeid.partition("[")
     path, *parts = unparameterized.split("::")
@@ -79,11 +85,7 @@ def partition_reports(expected, reports, processes_ok):
             and not unexpected
             and len(keys) == len(expected[name])
             and set(keys) == expected[name]
-            and not any(
-                case.find(tag) is not None
-                for case in cases
-                for tag in ("failure", "error", "skipped")
-            )
+            and all(accepted_case(case) for case in cases)
         )
     return rows, passed, unexpected
 

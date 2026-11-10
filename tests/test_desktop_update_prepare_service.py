@@ -5,7 +5,6 @@ from types import SimpleNamespace
 
 import pytest
 
-from sylvia_gm import __version__
 from sylvia_gm.application.desktop_update import service
 from sylvia_gm.application.desktop_update.controller import UpdateController
 from sylvia_gm.application.desktop_update.launch import Installation
@@ -18,12 +17,12 @@ from tests.test_desktop_update_preparation import fixture
 def setup(tmp_path):
     update, _, backup, _, _, _ = fixture(tmp_path)
     context = {
-        "live": str(update.live), "data_root": str(update.root), "version": __version__,
+        "live": str(update.live), "data_root": str(update.root), "version": "0.3.0-alpha.1",
         "target": "windows-x86_64", "distribution": "portable",
     }
     installation = Installation.from_launch(context, update.root)
     controller = UpdateController(
-        root=update.root / ".application-updates", current=Version.parse(__version__),
+        root=update.root / ".application-updates", current=Version.parse("0.3.0-alpha.1"),
         target="windows-x86_64", distribution="portable", transport=ReleaseFixture(),
         verify=accept_stub,
     )
