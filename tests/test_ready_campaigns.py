@@ -288,7 +288,7 @@ def test_interrupted_start_resumes_same_copy_and_preserves_real_selection(tmp_pa
 def test_owner_transport_loads_ready_state_without_resolving_a_provider(tmp_path, monkeypatch):
     from threading import Event
 
-    from sylvia_gm.interfaces import owner_process
+    from sylvia_gm.interfaces.commands import campaigns as campaign_commands
     from sylvia_gm.provider._base import ProviderStreamChunk
     from tests.qa_attached_request import request_attached
     from tests.test_alpha_f6e_owner_session_transport import (
@@ -305,7 +305,7 @@ def test_owner_transport_loads_ready_state_without_resolving_a_provider(tmp_path
     provider = _ScriptedProvider((ProviderStreamChunk(content="The driver waves you forward."),))
     harness = _OwnerHarness(tmp_path / "transport.db", provider)
     entered, release, expired = Event(), Event(), Event()
-    start = owner_process.start_ready_campaign
+    start = campaign_commands.start_ready_campaign
 
     def delayed(*args, **kwargs):
         entered.set()
@@ -314,7 +314,7 @@ def test_owner_transport_loads_ready_state_without_resolving_a_provider(tmp_path
             raise RuntimeError("The owner reader was blocked by local ready work")
         return start(*args, **kwargs)
 
-    monkeypatch.setattr(owner_process, "start_ready_campaign", delayed)
+    monkeypatch.setattr(campaign_commands, "start_ready_campaign", delayed)
     try:
         catalog = harness.request("ready-catalog", "ready_campaign_catalog")
         assert len(catalog) == 4
