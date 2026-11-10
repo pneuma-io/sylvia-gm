@@ -5656,6 +5656,186 @@
         "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Gareth from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin, eyes, hair, clothing, equipment, colors and wear. Appearance: An adult settled Human man appearing in his late forties, with a broad athletic former guard captain's build, dark brown skin, deep-set brown eyes, close-cropped black hair with salt-gray temples and short dark stubble. A firm unsmiling appraising expression, straight shoulders and controlled disciplined posture. A weathered plain dark iron breastplate over a brown quilted riding coat, a short faded brick-red wool shoulder cloak secured with a simple unmarked iron clasp, dark leather bracers, charcoal riding trousers and scuffed brown knee-high riding boots. A plain belt supports one ordinary straight sword fully sheathed at his anatomical LEFT hip and one small closed pouch at the opposite hip. Both hands relaxed and empty. His military bearing and practical hard-used equipment follow the authored profile; age, physical features and exact clothes are editable visual defaults. No current Thornwall uniform, invented crest or military rank badge, crown, flag, banner, horse, trophies, skulls, blood, drawn weapon, supernatural effects, invented scars or sadistic expression. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views, entire hair, hands, footwear and equipment within all margins. Same single character repeated as turnaround views. Keep anatomical sides fixed: where present the sheathed sword stays on the character's anatomical LEFT hip and the pouch on the opposite hip; never mirror equipment. Change viewing angle only, keeping costume and identity. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, extra characters or revealed secrets.",
         "portrait": "Use case: identity-preserve. Production square app portrait for Gareth from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, skin, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, border, caption, text, UI, scenery, new costume, magical effects, invented crest, animal or extra person. One 1024x1024 PNG."
       }
+    },
+    {
+      "id": "severed-npc-healer-cassian",
+      "name": "Cassian",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/healer-cassian.md",
+          "sha256": "2cc5dbbb06e3e448fcd4726313fda6c4903f84da45cee8513dee05e7eb2712a3",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/healer-cassian.md",
+          "sha256": "940621a4dfa423371b81a79059ddffc48523bf89fd7306b43bb07e5cb8c701de",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A humanlike adult Riftborn man appearing in his early forties, with a lean medium-height frame, dark brown skin, a shaved head, dark brown eyes and a short close-trimmed black beard. A direct, analytical, unsmiling expression and brisk upright working posture. A plain faded blue-gray knee-length linen work coat over a clean cream collarless shirt, sleeves neatly rolled to the forearms, dark olive trousers and practical dark brown leather boots. A simple brown leather belt with one small closed pouch and a compact closed worn canvas shoulder bag at his side. Empty relaxed hands. His practical adapted physician's bearing follows the authored profile; age, physical features and clothing are editable visual defaults. His original medical equipment was lost on arrival, and the image does not establish his home world's appearance. No stethoscope, syringe, modern medical device, white lab coat, medical cross, hospital logo, invented Athenaeum insignia, glowing healing effects, injury, invented scars, futuristic clothing or recovered original equipment.",
+        "full_body": {
+          "path": "assets/characters/9b306d56162561a9336a8c4765455d2785a2f91ef0f52863455c7973ae1f0d11.png",
+          "sha256": "9b306d56162561a9336a8c4765455d2785a2f91ef0f52863455c7973ae1f0d11"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/c2f3ae23e00842b0534c6efaed1638f536df917f800920c5f2f1acaa77da681c.png",
+          "sha256": "c2f3ae23e00842b0534c6efaed1638f536df917f800920c5f2f1acaa77da681c"
+        },
+        "portrait": {
+          "path": "assets/characters/fa4d135f59fc0a113e245084e19477ea039a16e78c0705ced9aa8bc1573d8373.png",
+          "sha256": "fa4d135f59fc0a113e245084e19477ea039a16e78c0705ced9aa8bc1573d8373"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1976776
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2273508
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2467757
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Cassian in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person in a near-front three-quarter standing pose. Whole hair, both hands, clothing, footwear and equipment comfortably inside all margins. Appearance: A humanlike adult Riftborn man appearing in his early forties, with a lean medium-height frame, dark brown skin, a shaved head, dark brown eyes and a short close-trimmed black beard. A direct, analytical, unsmiling expression and brisk upright working posture. A plain faded blue-gray knee-length linen work coat over a clean cream collarless shirt, sleeves neatly rolled to the forearms, dark olive trousers and practical dark brown leather boots. A simple brown leather belt with one small closed pouch and a compact closed worn canvas shoulder bag at his side. Empty relaxed hands. His practical adapted physician's bearing follows the authored profile; age, physical features and clothing are editable visual defaults. His original medical equipment was lost on arrival, and the image does not establish his home world's appearance. No stethoscope, syringe, modern medical device, white lab coat, medical cross, hospital logo, invented Athenaeum insignia, glowing healing effects, injury, invented scars, futuristic clothing or recovered original equipment. Preserve authored identity, species, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Cassian from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin, eyes, hair, spectacles where present, clothing, equipment, colors and wear. Appearance: A humanlike adult Riftborn man appearing in his early forties, with a lean medium-height frame, dark brown skin, a shaved head, dark brown eyes and a short close-trimmed black beard. A direct, analytical, unsmiling expression and brisk upright working posture. A plain faded blue-gray knee-length linen work coat over a clean cream collarless shirt, sleeves neatly rolled to the forearms, dark olive trousers and practical dark brown leather boots. A simple brown leather belt with one small closed pouch and a compact closed worn canvas shoulder bag at his side. Empty relaxed hands. His practical adapted physician's bearing follows the authored profile; age, physical features and clothing are editable visual defaults. His original medical equipment was lost on arrival, and the image does not establish his home world's appearance. No stethoscope, syringe, modern medical device, white lab coat, medical cross, hospital logo, invented Athenaeum insignia, glowing healing effects, injury, invented scars, futuristic clothing or recovered original equipment. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views; entire hair, hands, footwear and equipment within all margins. The same single character repeated as turnaround views. Keep bags, pouches and clothing fastenings on the same anatomical sides through the turn. Change viewing angle only, keeping costume and identity. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, extra characters or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Cassian from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, skin, eyes, hairstyle, expression, spectacles where present and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, border, caption, text, UI, scenery, new costume, magical effects, invented crest, animal or extra person. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-hollowed-prophet",
+      "name": "The Prophet of Four Corners",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/hollowed-prophet.md",
+          "sha256": "122b9577bc2515dbbf248c56d71cf26e88644205a3e9a6bf5adb20e4194b7727",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/hollowed-prophet.md",
+          "sha256": "f8ecebfccd31cca423c277d0f2077a9b61802383a8493eafb6520b16c7a0d9c1",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult Human man at the Hollowed Speaker stage, appearing in his early seventies, with a tall gaunt frame, weathered pale copper skin, a long lined face, untidy shoulder-length white hair and a sparse white beard. Both eyes have uniformly VIOLET irises with dark round pupils and natural white sclera, fully violet eye color rather than mere flecks; no glow. Distant listening expression, eyes attentive and lips slightly parted as if speaking quietly. An utterly still upright stance with both feet grounded and both empty hands hanging naturally. A patched gray-brown long wool coat over a faded unbleached linen tunic, a plain cord belt, dark loose trousers and worn closed brown leather shoes. His stationary presence, speaking/listening bearing and Speaker-stage violet eye color follow the authored profile and Hollowed source; age, other physical features and clothes are editable visual defaults. No threatening pose, staff, weapon, throne, restraints, deformities, transparent body, glowing eyes, magical aura, floating runes, curse imagery, readable prophecy or invented cause of the guards' tragedies.",
+        "full_body": {
+          "path": "assets/characters/c98b0409cb61db269f32b3fb02556cf96b93bafe81c0154babea6966b1b81a9a.png",
+          "sha256": "c98b0409cb61db269f32b3fb02556cf96b93bafe81c0154babea6966b1b81a9a"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/f6bd2c2339a375a0c4a428779c74f3e1ecae58ce1ea6fc88060addbd2d8c15ec.png",
+          "sha256": "f6bd2c2339a375a0c4a428779c74f3e1ecae58ce1ea6fc88060addbd2d8c15ec"
+        },
+        "portrait": {
+          "path": "assets/characters/4a31ca0ef09e7463bb4b82ea8f13e8ddec7982c4ea96fe274d673cbc6d5728e6.png",
+          "sha256": "4a31ca0ef09e7463bb4b82ea8f13e8ddec7982c4ea96fe274d673cbc6d5728e6"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2157636
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2740402
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2799176
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for The Prophet of Four Corners in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person in a near-front three-quarter standing pose. Whole hair, both hands, clothing, footwear and equipment comfortably inside all margins. Appearance: An adult Human man at the Hollowed Speaker stage, appearing in his early seventies, with a tall gaunt frame, weathered pale copper skin, a long lined face, untidy shoulder-length white hair and a sparse white beard. Both eyes have uniformly VIOLET irises with dark round pupils and natural white sclera, fully violet eye color rather than mere flecks; no glow. Distant listening expression, eyes attentive and lips slightly parted as if speaking quietly. An utterly still upright stance with both feet grounded and both empty hands hanging naturally. A patched gray-brown long wool coat over a faded unbleached linen tunic, a plain cord belt, dark loose trousers and worn closed brown leather shoes. His stationary presence, speaking/listening bearing and Speaker-stage violet eye color follow the authored profile and Hollowed source; age, other physical features and clothes are editable visual defaults. No threatening pose, staff, weapon, throne, restraints, deformities, transparent body, glowing eyes, magical aura, floating runes, curse imagery, readable prophecy or invented cause of the guards' tragedies. Preserve authored identity, species, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for The Prophet of Four Corners from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin, eyes, hair, spectacles where present, clothing, equipment, colors and wear. Appearance: An adult Human man at the Hollowed Speaker stage, appearing in his early seventies, with a tall gaunt frame, weathered pale copper skin, a long lined face, untidy shoulder-length white hair and a sparse white beard. Both eyes have uniformly VIOLET irises with dark round pupils and natural white sclera, fully violet eye color rather than mere flecks; no glow. Distant listening expression, eyes attentive and lips slightly parted as if speaking quietly. An utterly still upright stance with both feet grounded and both empty hands hanging naturally. A patched gray-brown long wool coat over a faded unbleached linen tunic, a plain cord belt, dark loose trousers and worn closed brown leather shoes. His stationary presence, speaking/listening bearing and Speaker-stage violet eye color follow the authored profile and Hollowed source; age, other physical features and clothes are editable visual defaults. No threatening pose, staff, weapon, throne, restraints, deformities, transparent body, glowing eyes, magical aura, floating runes, curse imagery, readable prophecy or invented cause of the guards' tragedies. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views; entire hair, hands, footwear and equipment within all margins. The same single character repeated as turnaround views. Keep bags, pouches and clothing fastenings on the same anatomical sides through the turn. Change viewing angle only, keeping costume and identity. The face detail must clearly show uniformly violet irises across both eyes, dark pupils and natural white sclera, with no glow or added mutation. Preserve his utterly still standing/listening bearing and slightly parted lips. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, extra characters or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for The Prophet of Four Corners from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, skin, eyes, hairstyle, expression, spectacles where present and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Preserve both uniformly VIOLET irises from the Speaker-stage reference, with dark pupils and natural white sclera; violet color across the irises rather than small flecks. No eye glow. Preserve his distant listening expression and slightly parted lips. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, border, caption, text, UI, scenery, new costume, magical effects, invented crest, animal or extra person. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-librarian-vesper",
+      "name": "Vesper",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/librarian-vesper.md",
+          "sha256": "b0a69e2a1f1cd926b258c2b1fa9075657c56c470606c652ac5e198045b982a6d",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/librarian-vesper.md",
+          "sha256": "92bd9a0cc88ac831a661b7dd22e2dfd9a0d4bf5248bf6cb0dc5c2b9f825575ac",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult settled Human woman appearing in her late sixties, with a compact medium build, warm light olive skin, dark green-brown eyes, a narrow gently lined face and silver-gray hair neatly secured in a low bun. Plain rectangular bronze-rim reading spectacles with clear lenses and visible eyes. A quiet precise attentive expression and composed careful posture. A well-kept muted sage wool cardigan-jacket over a cream high-collared blouse, a plain rust-brown ankle-length skirt and practical dark brown leather shoes. A simple narrow leather belt carries one small closed pouch; empty relaxed hands. Her experienced librarian's care and precision follow the authored profile; age, features, spectacles and clothing are editable visual defaults. No invented Athenaeum insignia, hidden research, forbidden notes, readable book or document, keys to dangerous shelves, magical effects, invented history, uniform from another setting or revealing private knowledge.",
+        "full_body": {
+          "path": "assets/characters/363c11ebda42dfd42a0004bebd47eaa83e0ba005b48a3f1276789d273ffe82a2.png",
+          "sha256": "363c11ebda42dfd42a0004bebd47eaa83e0ba005b48a3f1276789d273ffe82a2"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/9d3dea1c220f655cae1ec4b6599f8ec883c4e072126fdd7114e63f8cf49fa5be.png",
+          "sha256": "9d3dea1c220f655cae1ec4b6599f8ec883c4e072126fdd7114e63f8cf49fa5be"
+        },
+        "portrait": {
+          "path": "assets/characters/78f98f458093f90301ef53c9597896a187230191dc27e398688bb8e346d2a7be.png",
+          "sha256": "78f98f458093f90301ef53c9597896a187230191dc27e398688bb8e346d2a7be"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2124657
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2485682
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2628449
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Vesper in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person in a near-front three-quarter standing pose. Whole hair, both hands, clothing, footwear and equipment comfortably inside all margins. Appearance: An adult settled Human woman appearing in her late sixties, with a compact medium build, warm light olive skin, dark green-brown eyes, a narrow gently lined face and silver-gray hair neatly secured in a low bun. Plain rectangular bronze-rim reading spectacles with clear lenses and visible eyes. A quiet precise attentive expression and composed careful posture. A well-kept muted sage wool cardigan-jacket over a cream high-collared blouse, a plain rust-brown ankle-length skirt and practical dark brown leather shoes. A simple narrow leather belt carries one small closed pouch; empty relaxed hands. Her experienced librarian's care and precision follow the authored profile; age, features, spectacles and clothing are editable visual defaults. No invented Athenaeum insignia, hidden research, forbidden notes, readable book or document, keys to dangerous shelves, magical effects, invented history, uniform from another setting or revealing private knowledge. Preserve authored identity, species, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Vesper from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin, eyes, hair, spectacles where present, clothing, equipment, colors and wear. Appearance: An adult settled Human woman appearing in her late sixties, with a compact medium build, warm light olive skin, dark green-brown eyes, a narrow gently lined face and silver-gray hair neatly secured in a low bun. Plain rectangular bronze-rim reading spectacles with clear lenses and visible eyes. A quiet precise attentive expression and composed careful posture. A well-kept muted sage wool cardigan-jacket over a cream high-collared blouse, a plain rust-brown ankle-length skirt and practical dark brown leather shoes. A simple narrow leather belt carries one small closed pouch; empty relaxed hands. Her experienced librarian's care and precision follow the authored profile; age, features, spectacles and clothing are editable visual defaults. No invented Athenaeum insignia, hidden research, forbidden notes, readable book or document, keys to dangerous shelves, magical effects, invented history, uniform from another setting or revealing private knowledge. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views; entire hair, hands, footwear and equipment within all margins. The same single character repeated as turnaround views. Keep bags, pouches and clothing fastenings on the same anatomical sides through the turn. Change viewing angle only, keeping costume and identity. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, extra characters or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Vesper from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, skin, eyes, hairstyle, expression, spectacles where present and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, border, caption, text, UI, scenery, new costume, magical effects, invented crest, animal or extra person. One 1024x1024 PNG."
+      }
     }
   ]
 }

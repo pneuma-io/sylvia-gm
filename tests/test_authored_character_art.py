@@ -15,7 +15,7 @@ def test_all_authored_subject_editions_bind_without_merging_group_members(tmp_pa
     inventory = authored_artwork_subjects()
     subjects = inventory["subjects"]
     assert Counter(item["kind"] for item in subjects) == {"npc": 82, "monster": 136}
-    assert sum(len(item["editions"]) for item in subjects) == 285
+    assert sum(len(item["editions"]) for item in subjects) == 288
     assert len({item["id"] for item in subjects}) == 218
     assert len(inventory["excluded_sources"]) == 1
     assert inventory["excluded_sources"][0]["path"].endswith("rift-awakening-opposition.md")
@@ -49,6 +49,8 @@ def test_all_authored_subject_editions_bind_without_merging_group_members(tmp_pa
         "severed-npc-iron-mother-hest", "severed-npc-prospector-joss", "severed-npc-kell",
         "severed-npc-councillor-merrow", "severed-npc-deacon-ash", "severed-npc-doctor-cipher",
         "severed-npc-father-glass", "severed-npc-fortune-teller", "severed-npc-gareth-red-banner",
+        "severed-npc-healer-cassian", "severed-npc-hollowed-prophet",
+        "severed-npc-librarian-vesper",
     }
     catalogue = {
         "format": 1,
