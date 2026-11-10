@@ -1125,6 +1125,11 @@ without reading or parsing large definition files. `scripts/inventory_inherited_
 prepares Severed Lands subject bindings from current Lite and retained Plan source records,
 checking retained file hashes and preserving each distinct source edition. It generates no art
 and changes no gameplay data.
+`scripts/inventory_authored_artwork.py` prepares the separate authored NPC/monster sources.
+It preserves exact current/retained documents and checks retained member hashes. Declared group
+members receive separate subject bindings; differing source editions remain separate for review.
+The snapshot's opposition guide is recorded as guidance, rather than a creature to illustrate.
+This preparation emits source material only; the shared catalogue still lists actual complete art.
 For cast members authored only in a Plan, `campaign_plan#/...` identifies a prose passage in
 the accepted structured Plan. Catalogue sources use `plan_id`, the cited prose passage's canonical
 hash and declared subject name; a source cannot claim both Plan and package identity.

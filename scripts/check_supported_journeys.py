@@ -40,6 +40,7 @@ PYTHON_JOURNEYS = {
         "tests/test_prepared_enemy_art.py",
         "tests/test_inherited_character_art.py",
         "tests/test_plan_character_art.py",
+        "tests/test_authored_character_art.py",
         "tests/test_image_hooks.py",
     ],
     "launch-lite-compatibility": [

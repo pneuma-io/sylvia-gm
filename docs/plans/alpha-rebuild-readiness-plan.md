@@ -93,9 +93,17 @@ save-as and ordinary Plan transfer. Exact cited prose still controls reuse. The 
 composition check covers two copies, Plan export/import, Builder-to-GM handoff and offline used-art
 campaign recovery with generation Off; no new production images are supplied by those fixtures.
 The TD integration audit at `9968614adc97eddebb5a97f2cfccb772ee889cf1` found compiled mechanics
-and synthetic conformance characters, with no approved release cast. Its README keeps Siren
-Protocol as separate private content. The trailer Setting/Plan selection has been requested;
-test fixtures are excluded from premade production while that selection is pending.
+and synthetic conformance characters. The owner selected clean Siren Protocol content for the
+trailer and corrected that README's blanket private-content label. Legacy private campaign notes
+remain excluded; test fixtures do not become premade release characters.
+The selected Siren repository's current main at `c7a9587b94f8e5125ea5818a9f708ec32d0bab01`
+contains an eleven-character playable profile set. Its historical repository/profile names do
+not make the clean Siren material private; source preparation follows the owner's correction.
+The authored-source producer now covers 218 subjects (82 individual NPCs and 136 monsters),
+retaining 220 source editions across current content and Plan snapshots. Thread, Hook and Needle
+remain distinct; V and Anchor Sentinel source variants are preserved for artwork review. The
+snapshot-only opposition guide is explicitly excluded as encounter guidance. A composed source
+check verifies every declared binding through the runtime resolver; this supplies no new images.
 The subsequent local handoff check found and fixed an execution dependency on a stopped source
 chat, including admission of the next character reference stage. An active chat in the same
 campaign can now generate/adopt an existing individual request or continue the whole character
