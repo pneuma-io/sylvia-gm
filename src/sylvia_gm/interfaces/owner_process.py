@@ -3641,6 +3641,39 @@ def _dispatch_selected(
             io.BytesIO(archive_bytes),
             install_id=_required_text(params, "install_id"),
         )
+    if method in {
+        "preview_character_bundle_file", "confirm_character_bundle_import",
+        "cancel_character_bundle_import", "export_character_file",
+    }:
+        from sylvia_gm.application.character_transfer import (
+            cancel_character_preview,
+            confirm_character_preview,
+            export_character_file,
+            stage_character_preview,
+        )
+        try:
+            if method == "preview_character_bundle_file":
+                return stage_character_preview(
+                    storage_root, Path(_required_text(params, "source_path")),
+                )
+            if method == "confirm_character_bundle_import":
+                return confirm_character_preview(
+                    application_owner, storage_root, _required_text(params, "source_sha256"),
+                )
+            if method == "cancel_character_bundle_import":
+                return cancel_character_preview(
+                    storage_root, _required_text(params, "source_sha256"),
+                )
+            return export_character_file(
+                application_owner, storage_root,
+                export_id=_required_artifact_id(params, "export_id"),
+                artifact_id=_required_text(params, "artifact_id"),
+                expected_content_sha256=_required_text(params, "expected_content_sha256"),
+                kind=_required_text(params, "kind"),
+            )
+        except (ValueError, OSError) as error:
+            raise CommandRejected(str(error), code="character_bundle_invalid") from error
+
     if method in ("preview_character_card_file", "confirm_character_card_import"):
         from sylvia_gm.application.character_card_import import stage_card_preview, confirm_card_preview
         try:

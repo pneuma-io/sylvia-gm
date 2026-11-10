@@ -884,6 +884,7 @@ class ImageArt:
                 "reference_sheet",
             }
         )
+        needs_body = "full_body" in missing_character_art(selected)
         for item in selected:
             if (
                 row["purpose"] != "map_underlay"
@@ -891,7 +892,9 @@ class ImageArt:
                     item["purpose"] in canonical_purposes
                     or (
                         item["purpose"] == "portrait"
-                        and item["metadata"].get("source") == "character_card"
+                        and (
+                            item["metadata"].get("source") == "character_card" or needs_body
+                        )
                     )
                 )
                 and item["sha256"] not in seen

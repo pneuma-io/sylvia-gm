@@ -457,7 +457,7 @@ def preview_character_card(source: bytes) -> CardPreview:
     return CardPreview(p, digest, report, portrait)
 
 
-def _original_path(storage_root, digest):
+def _original_path(storage_root: Path, digest: str) -> Path:
     if not isinstance(digest, str) or re.fullmatch("[0-9a-f]{64}", digest) is None:
         raise ValueError("Invalid import source identity")
     root = storage_root / "character-card-imports"
@@ -491,16 +491,22 @@ def load_import_original(storage_root: Path, digest: str) -> bytes:
     return source
 
 
-def save_character_card_import(storage_root: Path, *, operation_id: str, source: bytes) -> dict:
-    preview = preview_character_card(source)
-    target = _original_path(storage_root, preview.source_sha256)
+def retain_import_original(storage_root: Path, source: bytes, *, expected_sha256: str) -> None:
+    """Retain one already-validated selected card without publishing a second profile."""
+    if (
+        not source
+        or len(source) > MAX_CARD_BYTES
+        or hashlib.sha256(source).hexdigest() != expected_sha256
+    ):
+        raise ValueError("Original-source identity is invalid")
+    target = _original_path(storage_root, expected_sha256)
     if target.exists():
-        if load_import_original(storage_root, preview.source_sha256) != source:
+        if load_import_original(storage_root, expected_sha256) != source:
             raise ValueError("Original-source conflict") from None
     else:
         target.parent.mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory(prefix=".card-import-", dir=storage_root) as temporary:
-            staged = Path(temporary) / preview.source_sha256
+            staged = Path(temporary) / expected_sha256
             staged.mkdir()
             for name, data in [
                 ("source.bin", source),
@@ -510,7 +516,7 @@ def save_character_card_import(storage_root: Path, *, operation_id: str, source:
                         {
                             "format_id": "sylvia-gm-character-card-source",
                             "format_version": 1,
-                            "sha256": preview.source_sha256,
+                            "sha256": expected_sha256,
                             "byte_count": len(source),
                         }
                     ),
@@ -523,8 +529,13 @@ def save_character_card_import(storage_root: Path, *, operation_id: str, source:
             try:
                 staged.rename(target)
             except FileExistsError:
-                if load_import_original(storage_root, preview.source_sha256) != source:
+                if load_import_original(storage_root, expected_sha256) != source:
                     raise ValueError("Original-source conflict") from None
+
+
+def save_character_card_import(storage_root: Path, *, operation_id: str, source: bytes) -> dict:
+    preview = preview_character_card(source)
+    retain_import_original(storage_root, source, expected_sha256=preview.source_sha256)
     saved = save_character_profile(
         storage_root, operation_id=operation_id, source=canonical_json_bytes(preview.profile)
     )

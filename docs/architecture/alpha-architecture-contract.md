@@ -1084,6 +1084,16 @@ same `artwork` directory in the checkout. Resource inventories include only the 
 Setting and Plan packages retain portable hash/path references to shared art without embedding
 the whole catalogue. Custom character artwork remains embedded in those packages. The public
 content-package archive and expansion limits remain unchanged.
+Standalone `.sylvia-gm-character` transfers use a closed, bounded ZIP containing one canonical
+Character File/profile, a hash/byte-count manifest, at most three referenced PNGs and the selected
+imported card's original when applicable. No package closure or campaign/chat history is included.
+The owner validates every member before import, resolves exact installed package/schema bindings
+for playable files and uses the existing immutable character libraries and image store. Local
+request identities are rebound on import. Legacy v1 profile text remains unchanged; its artwork
+travels alongside it rather than forcing a lossy v2 conversion. Previews retain the selected bytes
+under an owned digest, with at most four pending archives; confirmation retires that temporary
+archive and retains a small idempotent receipt. Replays revalidate the saved library entry.
+Browser uploads and downloads use server-owned temporary paths and expose no host file paths.
 Starter Character Files retain the same portable visual records as user-created characters.
 The owner may resolve these listed assets from the installed catalogue when a retained Plan's
 older Setting does not contain them. This does not change that Plan's package pin. Restored bytes

@@ -55,8 +55,11 @@ The current Setting omits those PNGs; its existing content-package limits remain
 Focused checks cover shared/custom publication, external resource inventory, portable ZIP assembly,
 and exact campaign art transfer before opening an image view. Local-copy receipts also transfer
 without creating an agent session, while provider requests retain their session requirement.
-The explicit character-payload helper includes used shared art; standalone character/profile export
-and import still need a normal user-facing path.
+Standalone character/profile transfer now has a bounded `.sylvia-gm-character` format, exact
+package checks, preview/confirm/cancel and owner/WebUI upload/download endpoints. It carries
+used art, crop and imported originals through the existing libraries and image store, preserving
+legacy v1 text. Focused checks cover an imported card's crop/edit/re-export/reference journey and
+actual Lite exact-package restoration with generation Off. Frontend controls remain pending.
 The subsequent local handoff check found and fixed an execution dependency on a stopped source
 chat, including admission of the next character reference stage. An active chat in the same
 campaign can now generate/adopt an existing individual request or continue the whole character
@@ -67,7 +70,7 @@ to visual design and frontend work, rather than all design. Backend design and i
 continue here. T3 lists Opus, but that handoff could not start (`thread_credential_required`),
 and the direct delegation tool is unavailable. This is an internal agent-tooling issue; the
 owner is not expected to troubleshoot it. Remaining visual/frontend work awaits that connection;
-standalone transfer logic can proceed. Live in-app checks remain deferred at the owner's request.
+backend work continues. Live in-app checks remain deferred at the owner's request.
 The nine prepared Ready character editions now carry the existing shared visual records for
 their exact authored starter identities. Their builds, equipment, prose and retained Plan
 bindings are unchanged; only visuals, character hashes and artwork provenance were added.

@@ -108,6 +108,8 @@ COMMANDS = frozenset(
         "reconnect_stream",
         "reconnect_provider_stream",
         "confirm_character_card_import",
+        "confirm_character_bundle_import",
+        "cancel_character_bundle_import",
         "start_import_repair",
         "create_guided_campaign_draft",
         "navigate_guided_campaign_draft",
@@ -143,6 +145,7 @@ EXPORTS = {
     "export_campaign_file": ("exports", ".sylvia-gm-campaign"),
     "export_package_candidate_file": ("exports", ".sylvia-gm-package"),
     "export_campaign_plan_file": ("exports", ".sylvia-gm-plan"),
+    "export_character_file": ("exports", ".sylvia-gm-character"),
     "backup_authority": ("backups", ".sqlite3"),
 }
 WRAPPED = frozenset(
@@ -757,8 +760,11 @@ class LocalWebUI:
 
     async def upload(self, request: web.Request) -> web.Response:
         kind = request.match_info["kind"]
-        if kind not in {"package", "recovery", "builder", "character"}:
+        if kind not in {"package", "recovery", "builder", "character", "character_bundle"}:
             raise web.HTTPNotFound()
+        maximum_bytes = (
+            MAX_BYTES + MAX_UPLOAD_PARAMS_BYTES if kind == "character_bundle" else MAX_UPLOAD_BYTES
+        )
         reader = await request.multipart()
         params: dict = {}
         received_params = False
@@ -787,9 +793,9 @@ class LocalWebUI:
                         if not chunk:
                             break
                         total += len(chunk)
-                        if total > MAX_UPLOAD_BYTES:
+                        if total > maximum_bytes:
                             raise web.HTTPRequestEntityTooLarge(
-                                max_size=MAX_UPLOAD_BYTES, actual_size=total
+                                max_size=maximum_bytes, actual_size=total
                             )
                         text.extend(chunk[:remaining])
                         if len(text) > MAX_UPLOAD_PARAMS_BYTES:
@@ -821,9 +827,9 @@ class LocalWebUI:
                     with target.open("xb") as output:
                         while chunk := await part.read_chunk(65536):
                             total += len(chunk)
-                            if total > MAX_UPLOAD_BYTES:
+                            if total > maximum_bytes:
                                 raise web.HTTPRequestEntityTooLarge(
-                                    max_size=MAX_UPLOAD_BYTES, actual_size=total
+                                    max_size=maximum_bytes, actual_size=total
                                 )
                             output.write(chunk)
                     paths.append(target)
@@ -845,6 +851,7 @@ class LocalWebUI:
                     "package": "install_package_file",
                     "recovery": "recover_campaign_file",
                     "character": "preview_character_card_file",
+                    "character_bundle": "preview_character_bundle_file",
                 }[kind]
                 _, safe = browser_command(method, params)
                 result = await self._file_command(method, {**safe, "source_path": str(paths[0])})

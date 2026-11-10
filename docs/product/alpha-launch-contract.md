@@ -1095,6 +1095,12 @@ art remains portable with the content that uses it. Character and campaign expor
 used artwork, including premade images, so those exports retain the selected appearance and crop.
 The shared catalogue does not raise the existing content-package size limits.
 
+A standalone `.sylvia-gm-character` transfer carries one selected Character File or unbound
+profile, its used images, crop and any retained original imported card. Import previews the
+selected bytes and requires confirmation. A playable file keeps its exact Ruleset and Setting
+bindings; missing matching packages require installation, without silently adapting the build.
+An unbound profile remains unbound and needs the ordinary Builder adaptation for playable use.
+
 New characters and companions, imported cards, adaptations and later GM-created NPCs or enemies
 have discoverable artwork controls in their normal creation and character views. The Builder
 interview handles missing art within the character workflow, respecting Off/Review/Auto. Users
