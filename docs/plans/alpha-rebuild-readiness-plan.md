@@ -4,7 +4,7 @@
 >
 > **Endpoint:** A Windows Alpha candidate accepted by the project owner; publication requires separate approval.
 >
-> **Updated:** 2026-10-17
+> **Updated:** 2026-11-11
 
 PES-06 scope correction, 2026-09-15: the project owner permits starting a new campaign for current panel
 verification. Existing-campaign rules updates, including preserving layout when new panels are
@@ -17,92 +17,83 @@ handoffs and checkout-specific records do not activate work.
 
 ## 1. Current work
 
-**10 November 2026: native TD qualification, with merge held.** The owner selected completing
-PR #6 through a separate Windows candidate and isolated synthetic data before balancing.
-The goal is active again. Host desktop control remains stopped; native checks use the dedicated
-PNEUMA-AGENT guest. No merge, publication, release, settlement or balancing is authorized.
+**11 November 2026: native TD build17 passed; final composition remains open.** The owner
+selected completing PR #6 through a separate Windows candidate and isolated synthetic data
+before balancing. Host desktop control stays stopped. Native testing uses PNEUMA-AGENT.
+Merge, publication, release, settlement and numerical balancing remain held.
 
-PR #28's reviewed frontend is merged on main and included in the TD branch. The exact `9968614`
-portable passed normal TD package import in the guest. Native Reload on a spent manual rifle
-queued magazine change then cycle without spending resources; Execute charged 2 + 1 AP,
-retained the old magazine, and left one live chambered round plus 4/5 in the magazine.
-Repeat Execute left resources unchanged. At 2 AP, only the magazine change committed;
-cycling stopped for insufficient AP, preserving the spent chamber and 5/5 magazine.
-Window-frame captures show the committed rig steps. Fresh-owner reopen preserved the completed
-queue and did not replay rig motion. A changed revision required review before a queued cycle;
-review then executed it once from current state. The AP2 recovery queued only that missing cycle.
-Native Crouch then Move rechecked the stance and charged the actual 2 AP movement cost. Aim,
-single fire and a 2 AP Aim investment committed with their declared costs. Shooter-origin watch
-setup spent 2 AP; cancellation did not refund it. Deep Aim rejected the unsupported specialty.
-The remaining selected controls and the final replacement candidate still require native proof.
-Synthetic setup and direct authority checks are distinct from UI gameplay evidence.
+Build17 is bound to source `4b438d7a0f9b5b04dca050a8b9f5005d2b02ac7e`, including
+main `6526904` and merged PR #28 frontend `9a434b1`. The standard optimized Windows
+recipe completed exit 0; release/portable verification and both invocation cleanup receipts
+passed. Owner `721e3dfa` matches the binary that passed 12 fresh compiled protocol checks.
+Desktop `f9d8c324`, portable `c2fd0df2` and installer `4d773a0f` are SHA256 prefixes;
+PR #6 and the private work report retain the full source/package/artifact identities.
+The public TD0.1.29 archive is `8cf2fa62`, content `1d8e1e38`. Runtime, panels, guides,
+eligibility and parameters match the preceding `882103e` package byte-for-byte.
 
-The native run also exposed expanded queue controls squeezed into the disclosure's narrow
-column. The repair gives expanded details the card width and applies the existing button style.
-The native replacement confirms the corrected width and theme, but exposed a separate vertical
-scroll trap: expanded controls extend below the short horizontal tray and wheel scrolling does
-not reveal them. Two rendered regressions reproduce the failure at the native window sizes.
-Binding the card list to the row height restores scrolling; all 12 retained-layout checks pass.
-This latest repair needs a rebuilt candidate and native replay. Previous map minimum height,
-queue reachability, committed-price and completed-queue-warning repairs remain included.
-The standard Windows build at `bab0ad4` completed and verified its artifacts. A subsequent native
-tube test exposed a misleading Reload caption denying the separately declared shell-loading
-control. The caption now names that control without adding Reload steps; focused checks pass.
-Build15 stopped when its PowerShell wrapper treated the unsigned build warning as an error;
-its incomplete artifacts are not a verified candidate. Build16 at `882103e` captures native
-output directly and completed the standard optimized recipe, release/portable verification
-and both invocation-owned cleanup receipts. Its owner is `56ab666c`, desktop `97c49b52`,
-portable `59c37c50` and installer `ba86e984` (SHA256 prefixes; full identities are in PR #6).
-The public package archive is `33bf3383`, content `422ed199`; its runtime and parameters are
-unchanged from the earlier native candidate. At this source, 48 focused queue/Reload checks,
-10 retained-layout checks and 12 fresh compiled-owner protocol checks pass.
+Fresh native build17 testing used a new isolated synthetic profile. Settings / Packages and
+the native file picker admitted the exact archive; the installed caption, TD0.1.29 and content
+identity were observed. Full Audit was enabled and verified per app process, with zero model
+exchanges. Synthetic campaign setup through AuthorityOwner is distinct from native gameplay
+and does not qualify guided Builder creation or a complete adventure.
 
-Native Network testing exposed a second clipping defect: Board mode left only about 22px for
-device selection below the ten declared actions. A minimum body height repairs the existing
-layout. The rendered regression reproduces the failure in Board mode at the guest's window
-sizes, then passes with the repair. On exact build16 in a restored 1020 by 710 guest window,
-the actor selector, device view and all ten actions are now usable. Full Audit was enabled
-and verified before gameplay. In the explicit no-check network fixture, Connect, Get in,
-Discover and Pivot committed at 0, 2, 2 and 2 AP, taking Hex from 6 to 0 AP and creating a
-live gateway session. Escalate then stayed pending for review; clear and empty Execute made
-no further commit. Normal Close completed; candidate processes, WAL and windows were absent.
-Read-only saved-state checks confirm campaign revision 4, graph revision 5, AP0, unchanged
-ammunition and both live sessions. This is persistence readback, not native fresh-owner reopen.
+At restored 1020 by 710, single Reload queued magazine change then cycle without changing
+r0/AP2 or the spent 1/5 weapon. Expanded controls initially lay below the short horizontal
+tray. Background wheel was refused by the driver; foreground wheel inside the leased guest
+visibly revealed them. Binding the card list to its row passed all 12 retained-layout cases;
+both native-size regressions were also rerun at committed `4b438d7`.
 
-After a safe hotfix handoff, the next native run on exact build16 also confirmed manual Reload
-at 2 + 1 AP (live chamber, 4/5 magazine); repeat Execute preserved revision 2 and AP3. Tube shell
-load and cycle each charged the explicit diagnostic 2 AP, and the corrected caption names
-Load one shell. Eligible Deep Aim committed at 1 AP after ordinary Aim. Suppress charged 2 AP
-and ten rounds. The contact-breaking move charged 2 AP, then quiet-metal activity charged its
-first-use 1 AP and became unavailable as consumed. Field reorientation charged 2 AP through
-the explicit Action device selector. An incomplete target-only selection did not queue or
-spend. Normal Close completed; saved-state assertions and completed-Reload reopen continue.
+Execute committed only the authored 2 AP magazine change: r1/AP0, spent chamber, 5/5 magazine,
+one spare and one retained magazine. The 1 AP cycle stayed pending with an explicit
+insufficient-AP refusal. Real scrolling exposed Remove Cycle weapon; removal preserved the
+paid prefix and resources. Repeat Execute, fresh-owner reopen and another Execute preserved
+the same result and zero pending steps. Readonly closed-profile assertions confirm the exact
+package pin, all 11 magazine rounds conserved and every other entity field unchanged.
+Apps closed normally; exact candidate processes/windows and nonempty WAL were absent before
+copying. Transfers matched hashes, then the session ended and the hotfix owner received the
+safe handoff. No TD guest operation or heavy build remains active.
 
-The hotfix and TD owners exchange the guest at safe session boundaries; host control remains
-stopped. No TD heavy build/check is active. Finish the remaining foothold/remote-door controls,
-saved-state/reopen checks and replacement native queue-scroll replay before claiming readiness.
-Two additional network contexts have passed Plan-state admission and nonmutating starting-action
-checks; their fixture setup is not native gameplay. Preserve passing earlier evidence instead
-of repeating unchanged mechanics without a reason. No new numerical defaults are selected.
+Earlier native `882103e` proof remains separate: manual Reload at 2 + 1 AP and saved-state
+reopen; the tube fixture's explicit 2 + 2 AP shell/cycle steps and corrected caption; eligible
+Deep Aim, suppression, quiet activity with its actual failed roll, and field reorientation.
+Network proof covers the ten controls at the native test size, priced entry/discovery/pivot,
+AP0 refusal/clear/reopen, persistent local and connected access, escalation/establishment,
+disconnect and generation-based route invalidation. Remote operation refused without
+privilege, then changed the door's saved geometry and native barrier; duplicate Execute spent
+nothing. The corresponding closed-state assertions passed.
 
-The strict type repairs in TD's new grid-lane and exposure modules pass affected checks. A
-provisional refactor composition passes the supplied measured type gate. The refactor owner
-also reports a newer PR #33 `5df45da` plus TD `882103e` composition passing typing across
-350 files; its full gate and the separate hotfix reconciliation remain unfinished. Neither
-preview is a final PR #33 handoff. Reconcile the owner's checked identity when supplied;
-do not import unfinished refactor work or claim the preview as final composition qualification.
+Native `9968614` evidence is reused for stale cycle review/recovery, rig steps once and 72
+unchanged drawn reopen frames, movement/stances/fire/recoil, independent shooter-origin
+watches, drones, wall editing and wall-induced queue review. Rig motion bytes are unchanged.
+Build17 independently proves saved resources and queue state; no fresh frame-motion
+comparison is claimed. Passing earlier mechanics are retained with their exact identities.
+
+The strict repairs in TD's new grid-lane and exposure modules pass affected checks.
+A supplied provisional refactor type composition passed 349 files; the refactor owner reports
+a newer PR #33 `5df45da` plus TD `882103e` preview passing 350 files. Neither preview is
+a final checked handoff. The standalone full Python gate is still progressing. Its owner
+reports two tactical-grid source checks covered by pending TD integration; final validation
+and reconciliation with PR #36's newer existing-campaign upgrade remain unfinished.
+Consume the stable checked identity and qualify the actual final composition. Do not import
+unfinished refactor source, duplicate the healthy gate or claim hosted CI success.
+
+The frontend handoff's priority resource fields and Reload acceptance are covered. Round
+display remains unresolved: TD has no round counter, while the frontend currently reads
+round from encounter combat state. Its definition/disposition is awaiting the owner.
+Portrait references, committed movement cues, class lane grants and final combined 1:1
+mock-up/Opus acceptance retain their separate contracts. Mechanics proof does not close them.
 
 The public compiler accepts optional private notes as an input. Public packages omit
-`references/canon/`; private local builds may include it. TD vault notes and Siren remain private.
-Older private-repository statements below describe historical visibility. Public full-session
-adequacy without private prose or a future Rulebook remains unproven and is a release boundary.
-Authored values are preserved; fixture resource maxima and capacities are synthetic test data,
-not new-character defaults. Unknown legacy values remain absent.
+`references/canon/`; private local builds may include it. TD vault notes and Siren remain
+private. Public GM/Builder reads use compiled reference guides/catalogues and runtime
+declarations. Public full-session adequacy without private prose or a future Rulebook remains
+unproven and is a release boundary. Authored numerical values are preserved; unknown legacy
+maxima/capacities stay absent.
 
-The final combined UI must match the approved mock-up and receive the later Opus pass.
-Mechanics tests do not close that visual acceptance. Exact source/package/candidate identities,
-fresh versus reused evidence and remaining qualification belong in PR #6 and Project Desk.
-Siren composition, numerical balancing and balance-suite refactoring remain separate.
+Final candidate/package delivery, reporting and dependency-safe disposable cleanup remain
+unfinished. Exact current status belongs in PR #6 and Project Desk. Preserve personal data,
+playable installations, other workers and actual dependencies. Siren composition, Image Hook,
+numerical balancing and balance-suite adaptation remain separate.
 
 **9 November 2026: Trigger Discipline integration before balancing.** The owner selected an
 integrated, ready, unmerged TD baseline in existing PR #6. The retained runtime, shooter-origin
