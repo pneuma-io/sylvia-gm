@@ -20,6 +20,23 @@
 
 const SylviaGMFrontend = (() => {
   'use strict';
+  let imageArtController = null;
+  function imageArt() {
+    if (!window.SylviaImageArt || !state.bridge?.image_art) return null;
+    if (!imageArtController) imageArtController = window.SylviaImageArt.create({
+      bridge: () => state.bridge,
+      context: () => ({session_id:state.activeSessionId,campaign_id:state.activeCampaignId}),
+      changed: () => {
+        if (state.panelProjection) renderRulesetPanelProjection({...state.panelProjection,
+          image_art_revision:imageArtController.revision()});
+        document.querySelectorAll('[data-image-art-speaker]').forEach(element => {
+          element.innerHTML = imageArtController.portrait(element.dataset.imageArtSpeaker,
+            element.dataset.imageArtName);
+        });
+      },
+    });
+    return imageArtController;
+  }
 
   // ---- State: only authoritative projections; no secrets, no paths ----
   const state = {
@@ -464,6 +481,13 @@ const SylviaGMFrontend = (() => {
       return { revision: snapshot.revision };
     }
     if (method === 'campaign_panels') return state.panelProjection;
+    if (method === 'image_art') {
+      if (!args || args.session_id !== scope.session_id ||
+          !['view','status','asset'].includes(args.action) ||
+          Object.keys(args).some(key=>!['action','session_id','sha256'].includes(key)))
+        throw new Error('This image read belongs to another session or is unavailable.');
+      return state.bridge.image_art(args);
+    }
     if (method === 'refresh') {
       await refreshSelectedCampaign();
       return null;
@@ -538,6 +562,7 @@ const SylviaGMFrontend = (() => {
     return {
       snapshot: () => request('snapshot', {}),
       campaign_panels: () => request('campaign_panels', {}),
+      image_art: (command) => request('image_art', command),
       player_action_availability: (command) => request('player_action_availability', command),
       preview_panel_action: (command) => request('preview_panel_action', command),
       queue_panel_action: (command) => request('queue_panel_action', command),
@@ -922,6 +947,7 @@ const SylviaGMFrontend = (() => {
         invoke('player_projection_page', { campaignId, afterSequence, loadId }),
       campaign_panels: (campaignId, afterRevision = null, loadId = null) =>
         invoke('campaign_panels', { campaignId, afterRevision, loadId }),
+      image_art: (params) => invoke('image_art', {params}),
       cancel_display_load: (loadId) => invoke('cancel_display_load', { loadId }),
       action_sequence: (command) => invoke('action_sequence', {sessionId:command.session_id, sequenceId:command.sequence_id || null}),
       compose_action_sequence: (command) => invoke('compose_action_sequence', {command}),
@@ -1476,6 +1502,9 @@ const SylviaGMFrontend = (() => {
       button.addEventListener('click', () => setTheme(button.dataset.theme));
     });
     $('open-settings-btn').addEventListener('click', () => openSettings());
+    $('image-art-btn')?.addEventListener('click', () => imageArt()?.open());
+    $('image-art-settings-btn')?.addEventListener('click', () => imageArt()?.open());
+    if ($('image-art-btn')) $('image-art-btn').hidden = !state.bridge?.image_art;
     $('close-settings-btn').addEventListener('click', closeSettings);
     document.querySelectorAll('[data-settings-tab]').forEach((button) => {
       button.addEventListener('click', () => {
@@ -4983,7 +5012,7 @@ const SylviaGMFrontend = (() => {
   function actorTokenMarkup(id, name) {
     const display = mapBodyForActor(id)?.display;
     return `<span class="panel-actor-token" data-tone="${entityTone(id, display)}"` +
-      `${display?.kind === 'drone' ? ' data-token-kind="drone"' : ''} aria-hidden="true">${escapeHtml(actorInitials(name || id))}</span>`;
+      `${display?.kind === 'drone' ? ' data-token-kind="drone"' : ''} aria-hidden="true">${imageArt()?.portrait(id,name || id) || escapeHtml(actorInitials(name || id))}</span>`;
   }
 
   // ---- Game panel suite (accepted mockup ebf068e6): shared presentation pieces. Every value comes from the
@@ -5696,7 +5725,7 @@ const SylviaGMFrontend = (() => {
     const saves = Array.isArray(details[savesKey]) ? details[savesKey] : [];
     const otherResources = Object.entries(entity.resources || {}).filter(([key]) => !familyKeys.has(key));
     return `<div class="character-hero grimoire" data-character-details="${escapeHtml(actorId)}" ${participant ? 'data-panel-entity' : 'data-character-entity'}="${escapeHtml(actorId)}">` +
-      `<header class="grim-head"><div class="grim-plinth" role="img" aria-label="${escapeHtml(name)}: initials (no portrait projected)"><b>${escapeHtml(actorInitials(name))}</b><small>no portrait · initials</small></div>` +
+      `<header class="grim-head"><div class="grim-plinth" role="img" aria-label="${escapeHtml(name)}">${imageArt()?.portrait(actorId,name) || `<b>${escapeHtml(actorInitials(name))}</b><small>no portrait · initials</small>`}</div>` +
       `<div class="grim-id"><small class="op-kicker">Inspecting</small><h3><strong>${escapeHtml(name)}</strong></h3><p>${escapeHtml([lineage, classes].filter(Boolean).join(' · '))}</p>` +
       `<div class="grim-vitals">${flask}${shield}${speed}</div></div></header>` + conditionPanelMarkup(entity) +
       `<section class="grim-book"><span class="grim-sec">Prepared · choose, then target on the ${escapeHtml(map.title || 'map')}</span>${casts.map(spellCard).join('')}</section>` +
@@ -5745,8 +5774,8 @@ const SylviaGMFrontend = (() => {
     })();
     const chevrons = [classId ? panelIdentifierLabel(classId) : '', Number.isFinite(level) ? `L${level}` : ''].filter(Boolean);
     const description = [classId, Number.isFinite(level) ? `Level ${level}` : ''].filter(Boolean).map((value) => escapeHtml(panelIdentifierLabel(value))).join(' · ');
-    const hero = `<section class="op-hero"><div class="op-art no-art" role="img" aria-label="${escapeHtml(name)}: initials (no portrait projected)">` +
-      `<div class="op-monogram"><b>${escapeHtml(actorInitials(name))}</b><span>No portrait · initials</span></div>` +
+    const hero = `<section class="op-hero"><div class="op-art${imageArt()?.portrait(actorId,name) ? '' : ' no-art'}" role="img" aria-label="${escapeHtml(name)}">` +
+      (imageArt()?.portrait(actorId,name) || `<div class="op-monogram"><b>${escapeHtml(actorInitials(name))}</b><span>No portrait · initials</span></div>`) +
       (chevrons.length ? `<div class="op-chevrons">${chevrons.map((text) => `<span>${escapeHtml(text)}</span>`).join('')}</div>` : '') + '</div>' +
       `<div class="op-stats"><small class="op-kicker">Inspecting</small><h3><strong>${escapeHtml(name)}</strong></h3>` +
       (details.party_role ? `<span class="panel-unit-role">${escapeHtml(panelIdentifierLabel(details.party_role))}</span>` : '') +
@@ -6593,7 +6622,7 @@ const SylviaGMFrontend = (() => {
         `title="${escapeHtml(label)}${posture ? `, ${escapeHtml(posture)}` : ''}" ` +
         `aria-pressed="${actor || target}" style="${tacticalPositionStyle(
           item.position, dimensions, continuous ? null : undefined
-        )}${continuous ? coordinateBodyStyle(item, dimensions, view.zoom) : ''}">${mapTokenDecorations(surface, item)}<span class="map-token-label" aria-hidden="true">${escapeHtml(actorInitials(label))}</span>` +
+        )}${continuous ? coordinateBodyStyle(item, dimensions, view.zoom) : ''}">${mapTokenDecorations(surface, item)}<span class="map-token-label" aria-hidden="true">${imageArt()?.portrait(tacticalActorId(surface,item.id),label) || escapeHtml(actorInitials(label))}</span>` +
         `<span class="map-name-label" aria-hidden="true">${escapeHtml(label)}</span>` +
         (continuous && space?.status === 'unavailable' ?
           '<span class="coordinate-space-warning" aria-hidden="true">Space unknown</span>' : '') +
@@ -6677,7 +6706,7 @@ const SylviaGMFrontend = (() => {
        `<div class="tactical-world${continuous ? ' coordinate-world' : ''}${view.coverInfo ? ' show-cover-info' : ''}" ` +
       `style="width:${dimensions.width * 32}px;` +
       `height:${dimensions.height * 32}px;--tactical-zoom:${view.zoom}">` +
-       cells.join('') + terrain + zones + geometry + objectives + entities +
+       (imageArt()?.underlay(data.map) || '') + cells.join('') + terrain + zones + geometry + objectives + entities +
        (continuous && Array.isArray(selection.aim_point) ? `<span class="coordinate-point-marker" ` +
          `style="${tacticalPositionStyle(selection.aim_point, dimensions, 0.35)}" aria-hidden="true">+</span>` : '') +
       `<svg class="tactical-map-preview-overlay" data-tactical-map-preview-overlay ` +
@@ -7571,6 +7600,7 @@ const SylviaGMFrontend = (() => {
   }
 
   function renderRulesetPanelProjection(projection) {
+    imageArt()?.sync(`${projection?.revision ?? projection?.campaign_revision ?? ''}:${projection?.image_art_revision || ''}`, 'panels');
     projection = queueProjection(projection);
     if (window.__sylviaPanelContext && state.activeSessionId) ensureSessionActivity();
     const host = $('ruleset-panel-host');
@@ -9818,6 +9848,7 @@ const SylviaGMFrontend = (() => {
   }
 
   function renderBuilderHistory(activity, context) {
+    imageArt()?.sync(context?.messages?.length ?? '', 'history');
     const sessionId = activity.sessionId;
     const container = $('chronology');
     reconcileBuilderActivity(activity, context && context.activity);
@@ -10131,6 +10162,7 @@ const SylviaGMFrontend = (() => {
   }
 
   function renderDMHistory(activity, context, projections, displayStatus = null) {
+    imageArt()?.sync(context?.messages?.length ?? '', 'history');
     const campaignId = activity.campaignId;
     const container = $('chronology');
     if (!selectedActivityMatches(activity) || state.activeSessionRole !== 'dm' ||
@@ -13020,6 +13052,7 @@ const SylviaGMFrontend = (() => {
     return blocks.map((block) => {
       if (block.kind === 'npc_dialogue') {
         return `<section class="response-block npc-dialogue" aria-label="NPC dialogue">` +
+          `<span data-image-art-speaker="${escapeHtml(block.speaker_id || '')}" data-image-art-name="${escapeHtml(block.speaker_label || '')}">${imageArt()?.portrait(block.speaker_id,block.speaker_label) || ''}</span>` +
           `<div class="response-label">${escapeHtml(block.speaker_label || 'Unknown speaker')}</div>` +
           `<div class="story-text">${renderNarrationMarkdown(block.text || '')}</div></section>`;
       }

@@ -2,7 +2,7 @@
 
 > **Status:** Active authority map
 >
-> **Last authority update:** 2026-10-16
+> **Last authority update:** 2026-11-10
 
 This is the sole human-maintained map of repository documents that may direct Sylvia GM operation
 or implementation. Project Desk is Wan's current planning and decision source; the contracts below

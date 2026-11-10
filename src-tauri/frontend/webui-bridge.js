@@ -68,6 +68,7 @@
     'export_campaign_plan_file', 'backup_authority']);
 
   async function invoke(method, params = {}) {
+    if (method === 'image_art') return rpc(method, params.params || params);
     if (Object.hasOwn(uploads, method)) {
       const [kind, accept] = uploads[method];
       const files = await chooseFiles(accept, kind === 'builder');

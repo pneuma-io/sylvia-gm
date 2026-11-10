@@ -1039,6 +1039,38 @@ For Alpha, validated package and dependency bytes are immutable content-addresse
 
 This selection avoids a cross-store publication split. An external content-addressed store is considered only after measured package/media volume materially harms backup, integrity, update, or runtime behavior.
 
+### 11.2.1 Managed image art
+
+The authority owner admits image requests and saves their lifecycle receipts and selected art in
+normalized SQLite records. Image bytes reuse the existing immutable hash-verified blob storage.
+Schema 13 adds image requests and selections through the ordinary verified migration path.
+Campaign export/recovery includes the campaign's image receipts, selections, framing and exact
+image bytes, while retaining support for pre-image export schema inventories.
+
+GM and Builder can inspect art and submit a stable request identity. User-only commands control
+Off/Review/Auto, Generate, Adopt, Cancel and portrait framing. Admission precedes network work;
+one background worker runs generation outside database transactions. Replaying a request does
+not dispatch it twice. Reopening marks an unknown pending result interrupted, without retrying.
+Selection adoption compares the prior asset hash. Cancellation is persisted before transport
+interruption, and late results cannot replace selected art.
+
+The ChatGPT adapter uses the existing managed runtime profile and an isolated ephemeral image
+turn with image generation enabled and shell, environments, user skills and application tools
+disabled. It checks the subscription account and runtime image capability, submits supplied PNG
+references and accepts bounded PNG output. It does not read credential files, fall back to an
+API connection or let model-supplied paths escape the runtime workspace. Admin Full Audit records
+the selected image application's input/output and image protocol boundaries when enabled.
+
+Canonical full-body and multi-view references are bound to a stable character target and supplied
+to later generations. Optional Character File/profile `visuals` data retains their hashes and
+operation identities plus appearance and framing. The owner restores locally retained reference
+bytes when those characters enter a campaign. Campaign archives carry the bytes; an isolated
+Character File containing references alone does not embed the image files.
+
+Underlay references are rendered from the existing player projection's static map geometry and
+terrain, without tokens, labels or hidden geometry. The selected image retains bounds and a
+layout digest. The renderer hides stale art and draws the existing mechanical overlays above it.
+
 ### 11.3 Install and candidate states
 
 **Install Package** performs:

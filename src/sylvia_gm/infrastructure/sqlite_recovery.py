@@ -151,6 +151,8 @@ RELATION_UNIQUE_KEYS: Mapping[str, tuple[tuple[str, ...], ...]] = {
         ("package_id", "version", "content_sha256", "kind"),
     ),
     "package_blobs": (("blob_sha256",),),
+    "image_requests": (("operation_id",),),
+    "image_selections": (("scope_id", "target_id", "purpose"),),
     "package_blob_chunks": (("blob_sha256", "chunk_order"),),
     "package_staging_chunks": (("install_id", "file_order", "chunk_order"),),
 }
@@ -383,6 +385,7 @@ def verify_recovery_receipts(connection: sqlite3.Connection) -> None:
                     campaign_archive.PREDECESSOR_SOURCE_AUTHORITY_SCHEMA_VERSION,
                     campaign_archive.PRE_REASONING_SOURCE_AUTHORITY_SCHEMA_VERSION,
                     campaign_archive.PRE_EFFORT_SOURCE_AUTHORITY_SCHEMA_VERSION,
+                    campaign_archive.PRE_IMAGE_SOURCE_AUTHORITY_SCHEMA_VERSION,
                     campaign_archive.SOURCE_AUTHORITY_SCHEMA_VERSION,
                 }
                 or payload["source_authority_schema_identity_sha256"]

@@ -165,6 +165,7 @@ def copy_compatible_character(
         campaign_setting=campaign_setting,
         setting_character_schema=setting_character_schema,
         source_profile=source.source_profile,
+        visuals=source.visuals,
     )
 
 

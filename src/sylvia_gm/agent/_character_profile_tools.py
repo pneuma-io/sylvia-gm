@@ -121,6 +121,7 @@ def character_profile_tools(
                 "lore",
                 "metadata",
                 "assets",
+                "visuals",
                 "foreign_configuration",
                 "import_source",
                 "authored_profile",

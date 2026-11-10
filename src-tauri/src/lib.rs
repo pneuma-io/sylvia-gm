@@ -1270,6 +1270,11 @@ async fn player_projection(
 }
 
 #[tauri::command]
+async fn image_art(window: WebviewWindow, params: Value) -> Result<Value, String> {
+    owner_call_async(window, "image_art", params).await
+}
+
+#[tauri::command]
 async fn campaign_panels(
     window: WebviewWindow,
     campaign_id: String,
@@ -3468,6 +3473,7 @@ pub fn run() {
             player_projection_page,
             cancel_display_load,
             campaign_panels,
+            image_art,
             action_sequence,
             compose_action_sequence,
             execute_action_sequence,

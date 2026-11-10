@@ -106,6 +106,7 @@ from sylvia_gm.application.campaign_plan_sources import (
     validate_retained_campaign_plan,
 )
 from sylvia_gm.application.character_profiles import (
+    CharacterProfile,
     character_profile_catalog,
     load_character_profile,
     profile_from_snapshot,
@@ -2157,6 +2158,8 @@ def _dispatch_selected(
         return tuple(model_choices())
     if method == "provider_settings":
         return provider_settings(storage_root / "config.yaml")
+    if method == "image_art":
+        return application_owner.image_art_action(dict(params))
     if method == "open_provider_setup":
         return open_provider_setup(params.get("preset_id"))
     if method == "chatgpt_connection":
@@ -2872,20 +2875,29 @@ def _dispatch_selected(
                 from sylvia_gm.application.character_card_import import save_character_card_import
                 return save_character_card_import(storage_root, operation_id=f"{session_id}:card:{hashlib.sha256(data).hexdigest()}", source=data)
 
+            def read_profile(identity: str, digest: str) -> CharacterProfile:
+                source = load_character_profile(storage_root, identity, digest)
+                if source.profile.get("visuals") is not None:
+                    application_owner.image_art_service().restore_visuals(
+                        session_id, source.artifact_id, source.profile["visuals"],
+                    )
+                return source
+
             from sylvia_gm.agent._character_profile_tools import character_profile_tools
+            from sylvia_gm.agent._image_art_tools import image_art_builder_tools
 
             profile_tools = (
                 character_profile_tools(
                     _builder_workspace(storage_root, context.session),
                     save=publish_profile,
                     import_source=import_profile,
-                    read=lambda identity, digest: load_character_profile(
-                        storage_root, identity, digest
-                    ),
+                    read=read_profile,
                 )
                 if context.session.campaign_id is None
                 else ()
             )
+
+            profile_tools += image_art_builder_tools(application_owner, session_id)
 
             def publish_ruleset_candidate(
                 archive: BinaryIO,
@@ -2911,6 +2923,7 @@ def _dispatch_selected(
                 schema_id: str | None = None,
                 setting_data: SafePayload | None = None,
                 source_profile: SafePayload | None = None,
+                visuals: SafePayload | None = None,
             ) -> SafePayload:
                 if (
                     participant_package is None
@@ -2936,6 +2949,7 @@ def _dispatch_selected(
                         "entity_state": entity_state,
                         "setting_data": setting_data,
                         "source_profile": source_profile,
+                        "visuals": visuals,
                     }
                 )
                 operation_suffix = hashlib.sha256(content_basis).hexdigest()[:24]
@@ -2953,6 +2967,7 @@ def _dispatch_selected(
                     setting_data=setting_data,
                     setting_character_schema=participant_setting_schema,
                     source_profile=source_profile,
+                    visuals=visuals,
                 )
                 if context.session.campaign_id is None:
                     label = "Character" if role == "player_character" else "Companion"
@@ -2985,9 +3000,14 @@ def _dispatch_selected(
                 if len(declarations) != 1:
                     raise CommandRejected("Choose one of this Ruleset's participant schema IDs")
                 repair_character = (source.artifact_id, source.content_sha256)
+                if source.visuals is not None:
+                    application_owner.image_art_service().restore_visuals(
+                        session_id, source.artifact_id, source.visuals,
+                    )
                 return {
                     "schema_id": declarations[0].schema_id,
                     "summary": source.summary, "authored_profile": source.authored_profile,
+                    **({"visuals": source.visuals} if source.visuals is not None else {}),
                     "participant": dict(source.participant),
                     "entity_state": dict(authored_character_state(
                         source.entity_state, declarations[0]

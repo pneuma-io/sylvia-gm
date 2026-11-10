@@ -17,6 +17,15 @@ handoffs and checkout-specific records do not activate work.
 
 ## 1. Current work
 
+**10 November 2026: GPT Images phase one (PL-10).** The owner selected generation/editing through
+the managed ChatGPT subscription connection, Off/Review/Auto permissions, saved full-body and
+multi-view character references, shared adjustable portrait framing and map-data-guided underlays.
+GM and Builder receive autonomous art discovery and request tools. Separate scene illustrations
+and ambient backgrounds remain deferred. The current handoff is a reviewable PR: the owner
+explicitly selected leaving real image generation pending. Scripted/source verification does not
+close live subscription, installed-app or TD trailer acceptance. Keep the PR unmerged pending that
+verification and the subsequent merge decision.
+
 **9 November 2026: optional onboarding and the complete tutorial suite.** The owner selected a new
 PR for all independently accessible lessons and a guided welcome, AI connection, Ready campaign
 and first-scene journey. Project Desk work item **Build the tutorial suite and current new-player

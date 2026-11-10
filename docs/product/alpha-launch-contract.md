@@ -1059,6 +1059,31 @@ replacement without overwriting saves, installed/portable coexistence, same-data
 and credential re-entry on another Windows account. `alpha-10b` publishes only those exact
 qualified artifacts through GitHub Releases after direct approval.
 
+### 8.1 Optional GPT Images: phase one
+
+The selected image-generation increment supports GPT Images generation and editing through the
+managed ChatGPT subscription connection. It consumes subscription usage and eligible credits;
+there is no automatic API-billed fallback. Image settings are Off, Review and Auto, with Review
+as the default. Review saves a proposal, requires Generate, then previews the result for Adopt.
+Auto authorizes GM and Builder to recognize missing art, generate it and adopt the result.
+Failed, refused, cancelled and interrupted requests never automatically retry.
+
+Character art includes a complete appearance description, a canonical full-body reference and
+a multi-view reference sheet; both reference formats are required for the visual bundle. A
+portrait uses both references. Character Files and unbound character profiles can retain the
+managed asset references in their optional `visuals` data. Saved portraits use one adjustable
+focal point and zoom across Map, Party, character details and speaker-labelled dialogue.
+
+Map underlays use a raster reference rendered from the actual player-known map geometry and
+terrain. Bounds and orientation match the playable map. Tokens, labels and secret geometry are
+excluded from the reference. Artwork sits beneath the authoritative mechanical overlays and
+cannot change collision, visibility, movement or other rules. A changed layout requires a new
+underlay; token movement alone does not. GM and Builder receive the same purpose, format,
+reference-order and reuse guidance and owner-controlled request tools.
+
+Separate scene illustrations, app-wide ambient backgrounds and additional image providers are
+deferred. Source or scripted-provider checks do not establish installed or live-provider readiness.
+
 ## 9. Explicitly post-Alpha
 
 - incompatible rules-update migrations and player-resolved conflict handling beyond the
@@ -1069,7 +1094,7 @@ qualified artifacts through GitHub Releases after direct approval.
 - Windows 10 qualification, installer formats other than NSIS, and elevated MSI qualification;
 - third-party executable plugins and Unsafe Mode execution;
 - importing unreleased predecessor-prototype campaign state;
-- campaign cloning, marketplace, visual map editor, and image generation;
+- campaign cloning, marketplace, visual map editor, and image generation beyond section 8.1;
 - a large bundled campaign library;
 - Sylvia-hosted monetization/subscription infrastructure, billing, quotas, and telemetry;
 - general-purpose software-development promises for Builder;

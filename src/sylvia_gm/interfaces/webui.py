@@ -80,6 +80,7 @@ COMMANDS = frozenset(
         "return_guided_creation_subflow",
         "model_choices",
         "provider_settings",
+        "image_art",
         "open_provider_setup",
         "discover_provider_models",
         "detect_local_providers",

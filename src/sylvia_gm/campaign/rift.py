@@ -230,6 +230,7 @@ def _character_file_record(source: Mapping[str, object]) -> dict[str, object]:
         "profile_status": profile_status,
         "authored_profile": authored_profile,
         "setting_data": source.get("setting_data", {}),
+        **({"visuals": source["visuals"]} if source.get("visuals") is not None else {}),
     }
 
 

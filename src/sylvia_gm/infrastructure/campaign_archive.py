@@ -34,7 +34,7 @@ from sylvia_gm.domain.package_library import (
     resolve_package_graph,
 )
 from sylvia_gm.domain.state_ownership import owner_matches_package_lock
-from sylvia_gm.infrastructure import private_records_archive
+from sylvia_gm.infrastructure import private_records_archive, sqlite_images
 from sylvia_gm.infrastructure.zip_bounds import preflight_zip_directory
 
 FORMAT_ID = "sylvia-gm-campaign-export"
@@ -45,7 +45,8 @@ PRODUCT_GENERATION = "alpha"
 PREDECESSOR_SOURCE_AUTHORITY_SCHEMA_VERSION = 9
 PRE_REASONING_SOURCE_AUTHORITY_SCHEMA_VERSION = 10
 PRE_EFFORT_SOURCE_AUTHORITY_SCHEMA_VERSION = 11
-SOURCE_AUTHORITY_SCHEMA_VERSION = 12
+PRE_IMAGE_SOURCE_AUTHORITY_SCHEMA_VERSION = 12
+SOURCE_AUTHORITY_SCHEMA_VERSION = 13
 STREAM_CHUNK_BYTES = 65_536
 
 # W12 freezes a conservative physical ZIP envelope around the W11 logical limits.
@@ -109,6 +110,8 @@ TABLES_IN_ORDER = (
     "package_ui_surfaces",
     "package_participant_artifacts",
     "package_blobs",
+    "image_requests",
+    "image_selections",
 )
 
 TABLE_COLUMNS: Mapping[str, tuple[str, ...]] = {
@@ -491,6 +494,10 @@ TABLE_COLUMNS: Mapping[str, tuple[str, ...]] = {
         "schema_json",
     ),
     "package_blobs": ("blob_sha256", "byte_count", "chunk_count"),
+    "image_requests": ("operation_id", "session_id", "campaign_id", "target_id", "purpose",
+                       "request_sha256", "request_json", "status", "error", "result_sha256"),
+    "image_selections": ("scope_id", "campaign_id", "target_id", "purpose", "operation_id",
+                         "sha256", "frame_json", "metadata_json"),
 }
 
 TABLE_KEYS: Mapping[str, tuple[str, ...]] = {
@@ -537,6 +544,8 @@ TABLE_KEYS: Mapping[str, tuple[str, ...]] = {
     "package_ui_surfaces": ("package_id", "version", "content_sha256", "surface_order"),
     "package_participant_artifacts": ("package_id", "version", "content_sha256", "artifact_order"),
     "package_blobs": ("blob_sha256",),
+    "image_requests": ("operation_id",),
+    "image_selections": ("scope_id", "target_id", "purpose"),
 }
 
 MANIFEST_FIELDS = (
@@ -638,6 +647,10 @@ EXPECTED_SCHEMA_MIGRATION_PROVENANCE += (
     (12, "session_reasoning_preferences",
      "d1e89bcbf082d1046e7eec8326e9bc2ba3217b1c2439bcc0667c8201ebb6ca28"),
 )
+PRE_IMAGE_SCHEMA_MIGRATION_PROVENANCE = EXPECTED_SCHEMA_MIGRATION_PROVENANCE
+EXPECTED_SCHEMA_MIGRATION_PROVENANCE += (
+    (13, sqlite_images.MIGRATION_13_NAME, sqlite_images.MIGRATION_13_SHA256),
+)
 EXPECTED_SCHEMA_EXTENSION_PROVENANCE = (
     (
         "f5_portable_campaign_recovery_v1",
@@ -695,6 +708,11 @@ def _json_bytes(value: object) -> bytes:
     ).encode("utf-8")
 
 
+def authority_tables(source_schema_version: int) -> tuple[str, ...]:
+    """Older exports retain their exact table inventory and schema-claim digest."""
+    return TABLES_IN_ORDER if source_schema_version >= 13 else TABLES_IN_ORDER[:-2]
+
+
 def authority_columns(table: str, source_schema_version: int) -> tuple[str, ...]:
     """Preserve the exact exported session shape of archives made before effort preferences."""
     columns = TABLE_COLUMNS[table]
@@ -719,7 +737,7 @@ def source_authority_schema_claim_sha256(
                 "columns": list(authority_columns(table, source_schema_version)),
                 "key": list(TABLE_KEYS[table]),
             }
-            for table in TABLES_IN_ORDER
+            for table in authority_tables(source_schema_version)
         ],
     }
     return hashlib.sha256(_json_bytes(preimage)).hexdigest()
@@ -893,7 +911,8 @@ def validate_migration_provenance(
     if type(source_schema_version) is not int or source_schema_version not in {
         PREDECESSOR_SOURCE_AUTHORITY_SCHEMA_VERSION,
         PRE_REASONING_SOURCE_AUTHORITY_SCHEMA_VERSION,
-        PRE_EFFORT_SOURCE_AUTHORITY_SCHEMA_VERSION, SOURCE_AUTHORITY_SCHEMA_VERSION,
+        PRE_EFFORT_SOURCE_AUTHORITY_SCHEMA_VERSION,
+        PRE_IMAGE_SOURCE_AUTHORITY_SCHEMA_VERSION, SOURCE_AUTHORITY_SCHEMA_VERSION,
     }:
         raise _failure("portable_export_invalid_source_schema")
     expected_migrations = (
@@ -903,6 +922,8 @@ def validate_migration_provenance(
         if source_schema_version == PRE_REASONING_SOURCE_AUTHORITY_SCHEMA_VERSION
         else PRE_EFFORT_SCHEMA_MIGRATION_PROVENANCE
         if source_schema_version == PRE_EFFORT_SOURCE_AUTHORITY_SCHEMA_VERSION
+        else PRE_IMAGE_SCHEMA_MIGRATION_PROVENANCE
+        if source_schema_version == PRE_IMAGE_SOURCE_AUTHORITY_SCHEMA_VERSION
         else EXPECTED_SCHEMA_MIGRATION_PROVENANCE
     )
     if migration_rows != expected_migrations or extension_rows not in allowed_extension_rows:
@@ -926,7 +947,10 @@ def make_manifest(
     if source_schema_identity_sha256 != expected_identity:
         raise _failure("portable_export_invalid_source_schema")
     normalized_provenance = validate_migration_provenance(migration_provenance)
-    table_counts = {table: len(rows_by_table[table]) for table in TABLES_IN_ORDER}
+    table_counts = {
+        table: len(rows_by_table.get(table, ()))
+        for table in authority_tables(source_schema_version)
+    }
     return {
         "format_id": FORMAT_ID,
         "format_version": PRIVATE_FORMAT_VERSION if any(
@@ -1663,9 +1687,10 @@ def _validate_manifest_shape_and_bytes(
         enforce_declared_order_bytes=enforce_declared_order_bytes,
         source_schema_version=manifest["source_authority_schema_version"],
     )
-    if not isinstance(table_counts, Mapping) or set(table_counts) != set(TABLES_IN_ORDER):
+    expected_tables = authority_tables(int(manifest["source_authority_schema_version"]))
+    if not isinstance(table_counts, Mapping) or set(table_counts) != set(expected_tables):
         raise _failure("portable_export_invalid_manifest")
-    if enforce_declared_order_bytes and tuple(table_counts) != TABLES_IN_ORDER:
+    if enforce_declared_order_bytes and tuple(table_counts) != expected_tables:
         raise _failure("portable_export_invalid_manifest_canonical_bytes")
     if not isinstance(closure, Mapping) or set(closure) != set(CLOSURE_INDEX_FIELDS):
         raise _failure("portable_export_invalid_manifest")
@@ -1874,6 +1899,9 @@ class _AuthorityScanSummary:
     closure_session_ids: set[str] = field(default_factory=set)
     blob_metadata: dict[str, tuple[object, object]] = field(default_factory=dict)
     file_blob_byte_counts: dict[str, set[object]] = field(default_factory=dict)
+    image_blob_sha256s: set[str] = field(default_factory=set)
+    image_requests: dict[str, tuple[str, str, str | None]] = field(default_factory=dict)
+    image_selections: list[tuple[str, str, str, str]] = field(default_factory=list)
     namespace_owners: dict[str, str | None] = field(default_factory=dict)
     state_namespaces: set[str] = field(default_factory=set)
 
@@ -2303,6 +2331,17 @@ def _record_authority_summary(
                     str(materialized["schema_sha256"]),
                 )
             )
+    elif table == "image_requests":
+        digest = materialized["result_sha256"]
+        summary.image_requests[str(materialized["operation_id"])] = (
+            str(materialized["session_id"]), str(materialized["purpose"]), digest,
+        )
+        if digest is not None:
+            summary.image_blob_sha256s.add(str(digest))
+    elif table == "image_selections":
+        summary.image_selections.append((str(materialized["operation_id"]),
+                                        str(materialized["purpose"]), str(materialized["sha256"]),
+                                        str(materialized["scope_id"])))
     elif table == "package_blobs":
         blob_sha256 = str(materialized["blob_sha256"])
         summary.closure_blob_sha256s.add(blob_sha256)
@@ -2670,7 +2709,14 @@ def validate_campaign_archive(path: Path, *, expected_campaign_id: str) -> Mappi
         _validate_streamed_authority(authority, expected_campaign_id=expected_campaign_id)
         expected_blobs = set(authority.blob_metadata)
         member_blobs = {name.removeprefix("blobs/") for name in blob_names}
-        file_blobs = set(authority.file_blob_byte_counts)
+        file_blobs = set(authority.file_blob_byte_counts) | authority.image_blob_sha256s
+        if any(value[0] not in authority.parents["sessions"]
+               for value in authority.image_requests.values()):
+            raise _failure("portable_export_invalid_authority_closure")
+        for operation_id, purpose, digest, scope in authority.image_selections:
+            source = authority.image_requests.get(operation_id)
+            if source is None or source[1:] != (purpose, digest) or scope != expected_campaign_id:
+                raise _failure("portable_export_invalid_authority_closure")
         if expected_blobs != member_blobs or expected_blobs != file_blobs:
             raise _failure("portable_export_invalid_blob_closure")
         for blob_sha256, metadata in authority.blob_metadata.items():
@@ -2684,7 +2730,8 @@ def validate_campaign_archive(path: Path, *, expected_campaign_id: str) -> Mappi
                 or declared_bytes != byte_count
                 or declared_chunks != (byte_count + STREAM_CHUNK_BYTES - 1) // STREAM_CHUNK_BYTES
                 or streamed_sha256 != blob_sha256
-                or authority.file_blob_byte_counts[blob_sha256] != {byte_count}
+                or (blob_sha256 in authority.file_blob_byte_counts
+                    and authority.file_blob_byte_counts[blob_sha256] != {byte_count})
             ):
                 raise _failure("portable_export_invalid_blob_closure")
         if not authority.canonical_bytes_valid:
@@ -2705,6 +2752,7 @@ def validate_campaign_archive(path: Path, *, expected_campaign_id: str) -> Mappi
                 PREDECESSOR_SOURCE_AUTHORITY_SCHEMA_VERSION,
                 PRE_REASONING_SOURCE_AUTHORITY_SCHEMA_VERSION,
                 PRE_EFFORT_SOURCE_AUTHORITY_SCHEMA_VERSION,
+                PRE_IMAGE_SOURCE_AUTHORITY_SCHEMA_VERSION,
                 SOURCE_AUTHORITY_SCHEMA_VERSION,
             }
             or manifest["source_authority_schema_identity_sha256"]
@@ -2718,7 +2766,10 @@ def validate_campaign_archive(path: Path, *, expected_campaign_id: str) -> Mappi
         if int(cast(Any, manifest["captured_revision"])) != authority.campaign_revision:
             raise _failure("portable_export_invalid_authority_closure")
         if (
-            manifest["table_row_counts"] != authority.table_counts
+            manifest["table_row_counts"] != {
+                table: authority.table_counts[table] for table in
+                authority_tables(int(manifest["source_authority_schema_version"]))
+            }
             or manifest["authority_record_count"] != authority.record_count
         ):
             raise _failure("portable_export_invalid_authority_closure")

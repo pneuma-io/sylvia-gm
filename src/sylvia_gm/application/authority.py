@@ -18,9 +18,12 @@ from contextlib import contextmanager, suppress
 from dataclasses import dataclass, replace
 from pathlib import Path
 from types import MappingProxyType
-from typing import BinaryIO, TypeVar, cast
+from typing import TYPE_CHECKING, Any, BinaryIO, TypeVar, cast
 
 import yaml
+
+if TYPE_CHECKING:
+    from sylvia_gm.application.image_art import ImageArt
 
 from sylvia_gm.application.actor_decisions import (
     ActorDecisionRequest,
@@ -685,6 +688,8 @@ class AuthorityOwner:
         ):
             raise ValueError("Disconnect grace must be positive and finite")
         self._store = store
+        self._image_art: ImageArt | None = None
+        self._image_art_lock = threading.RLock()
         self._content_storage_root = content_storage_root
         self._owner_id = owner_id
         self._owner_session_id = f"owner-session-{uuid.uuid4()}"
@@ -919,6 +924,122 @@ class AuthorityOwner:
             )
             self._tools[identity] = materialized
             return materialized
+
+    def image_art_service(self) -> ImageArt:
+        """Build the optional image service over this owner's existing storage and sign-in."""
+        from sylvia_gm.application.image_art import ImageArt
+        from sylvia_gm.config.image_settings import ImageSettings
+        from sylvia_gm.provider._image_subscription import SubscriptionImageAdapter
+
+        with self._image_art_lock:
+            self._require_open()
+            if self._image_art is None:
+                root = self._content_storage_root
+                if root is None:
+                    self._image_art = ImageArt(self)
+                else:
+                    preferences = ImageSettings(root)
+                    self._image_art = ImageArt(
+                        self,
+                        adapters=(
+                            SubscriptionImageAdapter(
+                                root / "chatgpt-runtime",
+                                "gpt-6.1-sol",
+                                audit=self.record_admin_full_audit,
+                            ),
+                        ),
+                        settings=preferences.read,
+                    )
+            return self._image_art
+
+    def character_visuals(self, campaign_id: str) -> dict[str, Any]:
+        """Read prepared Character File references and overlay this campaign's current choices."""
+        from sylvia_gm.domain.image_art import (
+            character_visuals_from_selections,
+            validate_character_visuals,
+        )
+
+        result: dict[str, Any] = {}
+        with self._operation():
+            try:
+                construction = self._store.campaign_construction_basis(campaign_id)
+            except CommandRejected:
+                construction = None
+            if construction is not None:
+                party = construction.canonical_input.get("selected_party")
+                for selected in (
+                    party
+                    if (
+                        isinstance(party, Sequence)
+                        and not isinstance(party, (str, bytes, bytearray))
+                    )
+                    else ()
+                ):
+                    if not isinstance(selected, Mapping):
+                        continue
+                    character = selected.get("character_file", {})
+                    if not isinstance(character, Mapping):
+                        continue
+                    visuals = validate_character_visuals(character.get("visuals"))
+                    identity = selected.get("participant_id")
+                    if visuals is not None and isinstance(identity, str):
+                        result[identity] = visuals
+            rows = self._store.images.list_selections(campaign_id)
+            for target in {row["target_id"] for row in rows if row["purpose"] != "map_underlay"}:
+                visuals = character_visuals_from_selections(rows, target)
+                if visuals is not None:
+                    result[target] = visuals
+        return result
+
+    def image_art_action(self, params: dict[str, Any]) -> dict[str, Any]:
+        """Expose image commands without giving the renderer provider or filesystem access."""
+        from sylvia_gm.config.image_settings import ImageSettings
+
+        action = params.get("action", "view")
+        if action in {"settings", "save_settings"}:
+            if self._content_storage_root is None:
+                raise CommandRejected("Image settings are unavailable")
+            preferences = ImageSettings(self._content_storage_root)
+            return (
+                preferences.save(params.get("mode"))
+                if action == "save_settings"
+                else preferences.read()
+            )
+        service = self.image_art_service()
+        session_id = params.get("session_id")
+        if action == "view":
+            return service.view(session_id)
+        if action == "status":
+            result = service.view(session_id, include_targets=False)
+            result.pop("targets", None)
+            return result
+        if action == "request":
+            return service.request(
+                session_id,
+                **{
+                    key: value
+                    for key, value in params.items()
+                    if key not in {"action", "session_id"}
+                },
+            )
+        if action == "generate":
+            return service.generate(session_id, params.get("operation_id"))
+        if action == "adopt":
+            return service.adopt(
+                session_id,
+                params.get("operation_id"),
+                expected_sha256=params.get("expected_sha256"),
+            )
+        if action == "cancel":
+            return service.cancel(session_id, params.get("operation_id"))
+        if action == "frame":
+            service.frame(
+                session_id, params.get("target_id"), params.get("sha256"), params.get("frame", {})
+            )
+            return service.view(session_id)
+        if action == "asset":
+            return service.asset(session_id, params.get("sha256"))
+        raise CommandRejected("This image command is unavailable")
 
     def create_agent_session(
         self,
@@ -6145,6 +6266,9 @@ class AuthorityOwner:
                         else {}
                     ),
                 }
+                visuals = self.character_visuals(campaign_id).get(participant.participant_id)
+                if visuals is not None:
+                    character_file["visuals"] = visuals
                 bookkeeping = self._character_update_tool(campaign_id)
                 if bookkeeping is not None:
                     target = bookkeeping.input_schema["x-sylvia-gm-character-update"]
@@ -9455,6 +9579,10 @@ class AuthorityOwner:
                     self._lifecycle_condition.wait()
                 return
             self._lifecycle = "closing"
+        with self._image_art_lock:
+            if self._image_art is not None:
+                self._image_art.close()
+        with self._lifecycle_condition:
             while self._active_operations:
                 self._lifecycle_condition.wait()
         try:

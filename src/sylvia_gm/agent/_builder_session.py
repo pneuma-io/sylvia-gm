@@ -68,6 +68,7 @@ from sylvia_gm.builder._tools import (
 )
 from sylvia_gm.domain.authority import SafePayload, thaw_json_value
 from sylvia_gm.domain.errors import AuthorityError, CommandRejected, RulesetDiagnostic
+from sylvia_gm.domain.image_art import CHARACTER_VISUALS_SCHEMA, validate_character_visuals
 from sylvia_gm.domain.package_library import ParticipantArtifactDeclaration, canonical_json_bytes
 from sylvia_gm.domain.session import (
     BUILDER_SKILLS,
@@ -140,6 +141,7 @@ class ParticipantPublisher(Protocol):
         schema_id: str | None = None,
         setting_data: SafePayload | None = None,
         source_profile: SafePayload | None = None,
+        visuals: SafePayload | None = None,
     ) -> SafePayload: ...
 
 
@@ -1053,6 +1055,7 @@ def _participant_artifact_tool(
                         ),
                     },
                     "participant": {"type": "object", "additionalProperties": True},
+                    "visuals": CHARACTER_VISUALS_SCHEMA,
                     "source_profile": {
                         "type": "object", "additionalProperties": False,
                         "required": ["artifact_id", "content_sha256"],
@@ -1114,7 +1117,7 @@ def _participant_artifact_tool(
             required.add("role")
         if (
             not required <= set(params)
-            or set(params) - required - {"schema_id", "setting_data", "source_profile"}
+            or set(params) - required - {"schema_id", "setting_data", "source_profile", "visuals"}
             or ("schema_id" in params and params["schema_id"] not in schema_ids)
             or (len(schema_ids) > 1 and "schema_id" not in params)
             or (role is None and params.get("role") not in ("player_character", "companion"))
@@ -1166,7 +1169,7 @@ def _participant_artifact_tool(
             }
         try:
             optional_arguments: dict[str, Any] = {}
-            for key in ("schema_id", "source_profile"):
+            for key in ("schema_id", "source_profile", "visuals"):
                 if key in params:
                     optional_arguments[key] = params[key]
             if "setting_data" in params:
@@ -1228,7 +1231,9 @@ def _participant_draft_check_tool(
         entity_state: SafePayload, schema_id: str | None = None,
         setting_data: SafePayload | None = None,
         source_profile: SafePayload | None = None,
+        visuals: SafePayload | None = None,
     ) -> SafePayload:
+        validate_character_visuals(visuals)
         if resolve_source_profile is not None:
             resolve_source_profile(source_profile)
         elif source_profile is not None:
