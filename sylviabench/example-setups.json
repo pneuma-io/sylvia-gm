@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "setups": [
+    {
+      "id": "scripted-good",
+      "name": "Scripted good fixture",
+      "kind": "scripted",
+      "provider_id": "sylviabench.scripted",
+      "model_id": "sylviabench.scripted/good",
+      "reasoning": null,
+      "behavior": "good",
+      "owner_config": null
+    }
+  ]
+}
