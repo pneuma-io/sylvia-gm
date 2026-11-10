@@ -18,7 +18,8 @@ Record the exact checked commit so the build can use those same bytes.
 | Historical GM checkpoint | Explicitly reproduce the original refactor selection when requested. |
 
 The fast `gm-turn` group collects both complete provider-adapter and generic-session
-modules. It currently has 282 behavioral cases. Campaign/action-sequence and authored-plan
+modules, plus their small turn-state checks. Collection determines its current size.
+Campaign/action-sequence and authored-plan
 checks are selected for their relevant risks and full qualification. Documentation-only
 changes select copy/link checks, without campaign replay or a build.
 

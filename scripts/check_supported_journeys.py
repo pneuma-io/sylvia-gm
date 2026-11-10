@@ -332,6 +332,7 @@ PYTHON_JOURNEYS = {
     "gm-turn": [
         "tests/test_alpha_f4_provider_session_adapter.py",
         "tests/test_alpha_f4_generic_sessions.py",
+        "tests/test_provider_turn_state.py",
     ],
     "provider-contracts": [
         "tests/test_provider_session_transport_projection.py",
@@ -368,7 +369,6 @@ PYTHON_JOURNEYS = {
         'tests/test_session_reasoning_preferences.py',
         'tests/test_alpha_admin_full_audit.py',
         'tests/test_builder_native_thinking.py',
-        "tests/test_provider_turn_state.py",
     ],
     "bundled-content": [
         "tests/test_plan_snapshot_cache.py",

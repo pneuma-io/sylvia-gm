@@ -402,6 +402,7 @@ def test_gm_edits_select_full_behavioral_modules_without_campaign_replay(path):
     assert plan["python"]["gm-turn"] == [
         "tests/test_alpha_f4_provider_session_adapter.py",
         "tests/test_alpha_f4_generic_sessions.py",
+        "tests/test_provider_turn_state.py",
     ]
     assert "campaign-play" not in plan["python"]
     assert not any("test_action_sequence" in selector or "test_fc_campaign" in selector
@@ -497,6 +498,9 @@ def test_full_has_unique_whole_gm_modules_and_each_historical_campaign_module():
             assert selectors.count(path) == 1
     assert not any(selector.startswith("tests/test_alpha_f4_provider_session_adapter.py::")
                    for selector in selectors)
+    assert selectors.count("tests/test_provider_turn_state.py") == 1
+    assert "tests/test_provider_turn_state.py" in plan["python"]["gm-turn"]
+    assert "tests/test_provider_turn_state.py" not in plan["python"]["provider-contracts"]
 
 
 def test_product_exclusion_preserves_other_and_future_cases_and_historical_selection():
