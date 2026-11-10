@@ -49,13 +49,12 @@ Fast mode is off. No prompts or checks are tuned for an individual model.
 5. Keep incomplete or unattributed failures explicit. Do not replace missing data, redistribute
    untested story weight or invent a headline rank. Two repetitions are a feasibility sample.
 
-The full general-access family sample plus three OCG choices would mean 66 scored runs. Following
-Daniel's funding selection, the first funded batch is four ChatGPT models, three Go flash models
-and Haiku through Go: eight setups and 48 planned scored runs, subject to inference qualification.
-Fable, Opus and Sonnet stay pending testing credits; a later direct Haiku run would be a separate
-route comparison. Mythos access remains separately restricted. Stop on exhausted allowance; retain
-missing matched runs as untested and resume when the supported allowance renews. Do not fill in
-another model.
+The full general-access family sample plus three OCG choices would mean 66 scored runs. A smaller
+funded batch can use four ChatGPT models, three Go flash models and Haiku through Go: eight setups
+and 48 planned scored runs, subject to inference qualification. Record actual funding/access choices
+privately and keep unavailable families visibly pending. A later direct Haiku run is a separate
+route comparison. Mythos access is separately restricted. Stop on exhausted allowance; retain missing
+matched runs as untested and resume when the supported allowance renews. Do not fill in another model.
 
 The current Sylvia discovery parser misses the newer Go catalog's nested `limit` metadata. This
 pilot enters each published 1,000,000-token context size through Advanced settings and records
@@ -68,10 +67,10 @@ capability from it. Improving discovery or changing the output allowance needs a
 
 Additional spending is zero. ChatGPT must use Sylvia's managed account connection. Claude requires
 a supported API key and verified included-credit funding with no paid fallback; a Claude app login
-alone does not establish that route. Daniel deferred the direct Claude runs until testing credits
-are available; retain those families as pending. Haiku through Go is a separately identified setup.
+alone does not establish that route. Defer any unfunded API runs and retain those families as pending.
+Haiku through Go is a separately identified setup.
 For OCG, disable Extra Usage or verify that no paid balance and no automatic top-up can fund it.
-Daniel confirmed a zero credit balance and auto top-up off for this pilot. The benchmark request
+Keep the account balance and funding verification in private work records. The benchmark request
 bound is not a monetary spending cap.
 
 Keep keys, account configuration and raw Full Audit traces out of Git and the comparison report.
