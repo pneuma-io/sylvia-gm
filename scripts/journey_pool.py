@@ -112,6 +112,7 @@ def run_balanced_gate(
         [str(root / "src"), str(root), environment.get("PYTHONPATH", "")]
     )
     environment["SYLVIA_QA_FIXTURE_ROOT"] = str(destination.resolve())
+    environment["SYLVIA_RUNTIME_CACHE_DIR"] = str(destination.resolve() / "runtime-cache")
     environment.setdefault(
         "SRD_LITE_CANDIDATE",
         str(root / "tests/fixtures/SRD-Lite-117-QA-Legacy-Contract-Clean.sylvia-gm-package"),

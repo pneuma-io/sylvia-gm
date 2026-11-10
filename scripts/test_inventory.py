@@ -1,5 +1,13 @@
 """Tests awaiting local-gate triage. Remove entries; assign new tests directly to a group."""
 
+# These browser checks receive real fixture backends from their Python test owners.
+JAVASCRIPT_HARNESSES = {
+    'tests/webui_expiry_recovery.cjs': 'tests/test_webui_private_proxy.py',
+    'tests/webui_logout_loss.cjs': 'tests/test_webui_private_proxy.py',
+    'tests/webui_private_proxy.cjs': 'tests/test_webui_private_proxy.py',
+    'tests/weekend_candidate_lite.cjs': 'tests/test_weekend_candidate.py',
+}
+
 UNASSIGNED_PYTHON = (
     'tests/test_activity_progress.py',
     'tests/test_activity_workflow_integration.py',
@@ -175,7 +183,6 @@ UNASSIGNED_PYTHON = (
     'tests/test_package_archive_streaming.py',
     'tests/test_package_content_definitions.py',
     'tests/test_package_record_diagnostics.py',
-    'tests/test_package_runtime_loading.py',
     'tests/test_package_subformat_content_definitions.py',
     'tests/test_package_update_rejections.py',
     'tests/test_panel_starting_layout.py',
@@ -451,6 +458,7 @@ UNASSIGNED_JAVASCRIPT = (
     'tests/frontend_character_target.test.cjs',
     'tests/frontend_compact_queue.test.cjs',
     'tests/frontend_content_security.browser.cjs',
+    'tests/frontend_coordinate_zone_legend.cjs',
     'tests/frontend_desktop_drafts.test.cjs',
     'tests/frontend_desktop_startup.test.cjs',
     'tests/frontend_desktop_updates.browser.cjs',
@@ -473,6 +481,7 @@ UNASSIGNED_JAVASCRIPT = (
     'tests/frontend_shared_queue.test.cjs',
     'tests/frontend_shell_layout.browser.cjs',
     'tests/frontend_shot_playback.test.cjs',
+    'tests/frontend_spell_roll_occurrences.cjs',
     'tests/frontend_starter_characters.browser.cjs',
     'tests/frontend_support_report.browser.cjs',
     'tests/frontend_support_report.test.cjs',
@@ -485,5 +494,9 @@ UNASSIGNED_JAVASCRIPT = (
     'tests/frontend_webui_bridge.test.cjs',
     'tests/frontend_webui_mobile.test.cjs',
     'tests/frontend_webui_navigation.browser.cjs',
+    'tests/webui_expiry_recovery.cjs',
+    'tests/webui_logout_loss.cjs',
+    'tests/webui_private_proxy.cjs',
+    'tests/weekend_candidate_lite.cjs',
 )
 

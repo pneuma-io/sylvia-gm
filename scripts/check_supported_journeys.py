@@ -26,6 +26,8 @@ PYTHON_JOURNEYS = {
     "launch-lite-compatibility": [
         "tests/test_launch_lite_safety.py",
         "tests/test_runtime_payload_cache.py",
+        "tests/test_package_runtime_loading.py",
+        "tests/test_runtime_disk_cache.py",
         "tests/test_retained_117.py",
         "tests/test_admitted_fixture_isolation.py",
         "tests/test_interrupted_package_staging.py",
@@ -59,6 +61,7 @@ PYTHON_JOURNEYS = {
         "tests/test_no_rules_interview.py",
     ],
     "builder-and-admission": [
+        "tests/test_package_inspector_runtime.py",
         "tests/test_character_card_import_lifecycle.py",
         "tests/test_journey_pool.py",
         "tests/test_rich_character_profiles.py",
@@ -409,6 +412,7 @@ def _run(
     child_environment.pop("PYTEST_ADDOPTS", None)
     child_environment["PYTHONUNBUFFERED"] = "1"
     child_environment["SYLVIA_QA_FIXTURE_ROOT"] = str(destination.resolve())
+    child_environment["SYLVIA_RUNTIME_CACHE_DIR"] = str(destination.resolve() / "runtime-cache")
     # Keep archive spools and browser profiles in this run's owned data volume.
     temporary = destination / "temporary" / name
     temporary.mkdir(parents=True, exist_ok=True)
