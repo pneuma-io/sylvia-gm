@@ -1033,6 +1033,14 @@ def validate_package_runtime(
                 ) from error
 
 
+def package_tool_permanently_refused(
+    *, package_id: str, declaration: ToolDeclaration, runtime_bytes: bytes,
+) -> bool:
+    """Read the refusal set computed once for these immutable runtime bytes."""
+    runtime = _parse_runtime(package_id=package_id, runtime_bytes=runtime_bytes)
+    return declaration.name in runtime.permanently_refused_tool_names
+
+
 def package_tool_description(
     *,
     package_id: str,
@@ -1213,7 +1221,7 @@ def _player_preflight(
         if not result.success:
             # Preserve authored refusals; unexpected runtime failures stay private.
             if result.failure_kind == "precondition" and result.error is not None:
-                raise RulesetPreconditionRejected(result.error)
+                raise RulesetPreconditionRejected(result.error, reasons=result.failure_reasons)
             raise PackageRuntimeError('This path or destination is unavailable; check the visible map and creature-space declarations.')
         scalars.update({key: value for key, value in result.context.items()
                         if value is None or isinstance(value, (str, bool, int, float))})
@@ -1509,7 +1517,7 @@ def materialize_package_mechanic(
                 )
         if not result.success:
             if result.failure_kind == "precondition" and result.error is not None:
-                raise RulesetPreconditionRejected(result.error)
+                raise RulesetPreconditionRejected(result.error, reasons=result.failure_reasons)
             raise PackageRuntimeError("Package mechanic execution failed")
         if choice_control is not None and not choice_control.consumed:
             raise PackageRuntimeError("Package mechanic did not consume the authorized choice")

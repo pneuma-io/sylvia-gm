@@ -612,6 +612,20 @@ def compose(runtime, root, output, progress):
         bind_gm_encounter_boundary(runtime, record)
         from .srd_lite_creature_space import bind_creature_space
         bind_creature_space(runtime, record)
+        from .srd_lite_gm_feedback import CAST_ROOTS as FEEDBACK_CAST_ROOTS
+        from .srd_lite_gm_feedback import bind_gm_feedback, retire_refusal_stubs
+        retired_refusal_tools, _removed = retire_refusal_stubs(runtime, record)
+        bind_gm_feedback(runtime)
+        for tool in record["tools"]:
+            tool["input_schema"] = _tool_schema(
+                runtime["tools"][tool["name"]], tool["input_schema"],
+            )
+            if tool["name"] in FEEDBACK_CAST_ROOTS:
+                spell_schema = tool["input_schema"]["properties"]["spell"]
+                spell_schema["x-sylvia-gm-value-aliases"] = runtime["definitions"].get(
+                    "srd_lite_aliases", {},
+                )
+                spell_schema["x-sylvia-gm-castable-spells"] = True
         # Final wrappers can retire private helpers; use the existing reachability check
         # after all movement bindings, preserving the unchanged runtime admission limit.
         omit_unreachable_private_tools(runtime, record)
@@ -646,6 +660,9 @@ def compose(runtime, root, output, progress):
         link_opportunity_movement_content(declarations)
         (output / "declarations-before.json").write_text(json.dumps(declarations, indent=2))
         for item in declarations["inclusions"]:
+            item["links"]["tools"] = [
+                name for name in item["links"]["tools"] if name not in retired_refusal_tools
+            ]
             item["links"]["schemas"] = [
                 VARIANT_ID + ".player-character"
                 if value == "sylvia.srd-lite.bg3.player-character"
