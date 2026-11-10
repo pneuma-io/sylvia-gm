@@ -39,9 +39,12 @@ Synthetic setup and direct authority checks are distinct from UI gameplay eviden
 
 The native run also exposed expanded queue controls squeezed into the disclosure's narrow
 column. The repair gives expanded details the card width and applies the existing button style.
-Focused queue and retained-layout checks pass; full affected native replay remains open.
-Previous map minimum height, queue reachability, committed-price and completed-queue-warning
-repairs remain included.
+The native replacement confirms the corrected width and theme, but exposed a separate vertical
+scroll trap: expanded controls extend below the short horizontal tray and wheel scrolling does
+not reveal them. Two rendered regressions reproduce the failure at the native window sizes.
+Binding the card list to the row height restores scrolling; all 12 retained-layout checks pass.
+This latest repair needs a rebuilt candidate and native replay. Previous map minimum height,
+queue reachability, committed-price and completed-queue-warning repairs remain included.
 The standard Windows build at `bab0ad4` completed and verified its artifacts. A subsequent native
 tube test exposed a misleading Reload caption denying the separately declared shell-loading
 control. The caption now names that control without adding Reload steps; focused checks pass.
@@ -66,12 +69,21 @@ no further commit. Normal Close completed; candidate processes, WAL and windows 
 Read-only saved-state checks confirm campaign revision 4, graph revision 5, AP0, unchanged
 ammunition and both live sessions. This is persistence readback, not native fresh-owner reopen.
 
-The TD guest session ended at a safe handoff to the separately owned hotfix qualification;
-do not reacquire it until that owner releases the guest. No TD heavy build/check remains active.
-After handoff, finish the affected queue/Reload/caption and reopen checks, positive Deep Aim,
-quiet-metal and field-work contexts, suppression and remaining relevant network controls.
-Prepared fixtures and source checks do not count as those native journeys. Preserve the
-passing earlier native evidence instead of repeating unchanged mechanics without a reason.
+After a safe hotfix handoff, the next native run on exact build16 also confirmed manual Reload
+at 2 + 1 AP (live chamber, 4/5 magazine); repeat Execute preserved revision 2 and AP3. Tube shell
+load and cycle each charged the explicit diagnostic 2 AP, and the corrected caption names
+Load one shell. Eligible Deep Aim committed at 1 AP after ordinary Aim. Suppress charged 2 AP
+and ten rounds. The contact-breaking move charged 2 AP, then quiet-metal activity charged its
+first-use 1 AP and became unavailable as consumed. Field reorientation charged 2 AP through
+the explicit Action device selector. An incomplete target-only selection did not queue or
+spend. Normal Close completed; saved-state assertions and completed-Reload reopen continue.
+
+The hotfix and TD owners exchange the guest at safe session boundaries; host control remains
+stopped. No TD heavy build/check is active. Finish the remaining foothold/remote-door controls,
+saved-state/reopen checks and replacement native queue-scroll replay before claiming readiness.
+Two additional network contexts have passed Plan-state admission and nonmutating starting-action
+checks; their fixture setup is not native gameplay. Preserve passing earlier evidence instead
+of repeating unchanged mechanics without a reason. No new numerical defaults are selected.
 
 The strict type repairs in TD's new grid-lane and exposure modules pass affected checks. A
 provisional refactor composition passes the supplied measured type gate. The refactor owner

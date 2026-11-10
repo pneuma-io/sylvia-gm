@@ -95,6 +95,43 @@ for (const width of [860, 320]) {
   });
 }
 
+for (const viewport of [{ width: 1030, height: 779 }, { width: 1022, height: 696 }]) {
+  test(`expanded queue controls remain reachable by scrolling at ${viewport.width}x${viewport.height}`, async () => {
+    const browser = await chromium.launch({ headless: true, args: ['--disable-gpu'],
+      channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined) });
+    try {
+      const { page, errors } = await open(browser, viewport);
+      await page.getByRole('button', { name: 'Board', exact: true }).click();
+      await page.evaluate(() => {
+        const queue = window.stripQA.state.actionSequence;
+        const first = { ...queue.steps[0], label: 'Reload · retain magazine' };
+        queue.steps = [first, { ...first, step_id: 'pending-cycle', label: 'Cycle weapon' }];
+        document.querySelector('.ruleset-queue-panel .ruleset-panel-content').innerHTML =
+          window.stripQA.sequenceMarkup();
+      });
+      await page.getByLabel('Details and controls for Reload · retain magazine', { exact: true }).click();
+      await page.locator('#queue-badge').click();
+      const card = page.locator('.sequence-step').first();
+      const box = await card.boundingBox();
+      await page.mouse.move(box.x + box.width / 2, Math.min(box.y + 32, viewport.height - 12));
+      await page.mouse.wheel(0, 700);
+      const visibility = await card.locator('[data-sequence-remove]').evaluate(node =>
+        new Promise(resolve => {
+          const observer = new IntersectionObserver(([entry]) => {
+            observer.disconnect();
+            const list = node.closest('.sequence-cards');
+            resolve({ ratio: entry.intersectionRatio, listHeight: list.clientHeight,
+              listContent: list.scrollHeight, listScroll: list.scrollTop });
+          });
+          observer.observe(node);
+        }));
+      assert.ok(visibility.ratio > .99,
+        `expanded Remove remains clipped after wheel scrolling: ${JSON.stringify(visibility)}`);
+      assert.deepEqual(errors, []);
+    } finally { await browser.close(); }
+  });
+}
+
 for (const viewport of [{ width: 1440, height: 900 }, { width: 1366, height: 768 }]) {
   test(`fresh TD layout exposes the map and Execute with all declared controls at ${viewport.width}x${viewport.height}`, async () => {
     const browser = await chromium.launch({ headless: true, args: ['--disable-gpu'],
