@@ -1155,9 +1155,12 @@ def main() -> int:
         "passed": not failed and within_time_budget,
         "complete_gate": args.journey is None
         and (selection is None or selection["mode"] == "full"),
-        "gate_kind": "historical checkpoint" if include_historical else "affected PR"
-        if selection and selection["mode"] == "affected"
-        else "complete deterministic",
+        "gate_kind": (
+            "historical checkpoint" if include_historical
+            else "affected PR" if selection and selection["mode"] == "affected"
+            else "selected product checks" if args.journey
+            else "complete deterministic"
+        ),
         "missing_groups": missing_groups,
         "unexpected_groups": unexpected_groups,
         "qualification_mode": "ci" if args.ci else "development",
@@ -1165,9 +1168,11 @@ def main() -> int:
         "within_time_budget": within_time_budget,
         "elapsed_seconds": round(elapsed, 2),
         "jobs": args.jobs,
-        "case_workers": dict.fromkeys(
-            ("mechanics-and-state", "campaign-play", "launch-lite-compatibility"), args.case_workers
-        )
+        "case_workers": {
+            name: args.case_workers
+            if name in ("mechanics-and-state", "campaign-play", "launch-lite-compatibility") else 1
+            for name in selected if name != "ui-controls"
+        }
         if args.journey
         else {},
         "execution_mode": "selected groups" if args.journey else "shared balanced pool",

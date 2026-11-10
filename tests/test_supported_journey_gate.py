@@ -236,6 +236,25 @@ def test_relative_cli_output_is_absolute_before_worker_cwd_changes(gate, tmp_pat
     assert len(observed) == 1
 
 
+def test_explicit_product_group_is_reported_as_partial_with_its_actual_worker_limit(
+    gate, tmp_path, monkeypatch,
+):
+    import json
+    import sys
+
+    monkeypatch.setattr(gate, "PYTHON_JOURNEYS", {"gm-turn": ["tests/test_required.py"]})
+    monkeypatch.setattr(gate, "_run_guarded", lambda *args, **kwargs: (True, 0.0))
+    monkeypatch.setattr(gate, "source_identity", lambda: {"sha256": "same", "head": None, "files": {}})
+    monkeypatch.setattr(sys, "argv", [
+        "gate", "--journey", "gm-turn", "--jobs", "1", "--output-dir", str(tmp_path / "evidence"),
+    ])
+    assert gate.main() == 0
+    summary = json.loads((tmp_path / "evidence/summary.json").read_text())
+    assert not summary["complete_gate"]
+    assert summary["gate_kind"] == "selected product checks"
+    assert summary["case_workers"] == {"gm-turn": 1}
+
+
 @pytest.mark.parametrize("ci", [False, True])
 def test_development_runs_can_complete_after_ci_allowance(gate, tmp_path, monkeypatch, ci):
     import json
