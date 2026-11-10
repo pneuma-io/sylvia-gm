@@ -258,7 +258,16 @@
       "../artwork/assets/characters/6ae1c560e9680c450f06e0b225af8e749beda5394c7038ffda54a65bfd4f762c.png": "artwork/assets/characters/6ae1c560e9680c450f06e0b225af8e749beda5394c7038ffda54a65bfd4f762c.png",
       "../artwork/assets/characters/8fd0445352922f7d3cc128275de6b2c3b4bb6fde8b722d962a074aea5c59c6ef.png": "artwork/assets/characters/8fd0445352922f7d3cc128275de6b2c3b4bb6fde8b722d962a074aea5c59c6ef.png",
       "../artwork/assets/characters/a812195d424e33770a09c9b9969d8f75626a22c986167760a5aa7453fd5d2452.png": "artwork/assets/characters/a812195d424e33770a09c9b9969d8f75626a22c986167760a5aa7453fd5d2452.png",
-      "../artwork/assets/characters/c0e518e93359b79fc66f3bfb4d5f7c648600413c7894b88233a1dbaffbe8d019.png": "artwork/assets/characters/c0e518e93359b79fc66f3bfb4d5f7c648600413c7894b88233a1dbaffbe8d019.png"
+      "../artwork/assets/characters/c0e518e93359b79fc66f3bfb4d5f7c648600413c7894b88233a1dbaffbe8d019.png": "artwork/assets/characters/c0e518e93359b79fc66f3bfb4d5f7c648600413c7894b88233a1dbaffbe8d019.png",
+      "../artwork/assets/characters/0de94a31215221295de3da3f2ecd68c0f1e272292cb2b5d8dc8025ee94db46e8.png": "artwork/assets/characters/0de94a31215221295de3da3f2ecd68c0f1e272292cb2b5d8dc8025ee94db46e8.png",
+      "../artwork/assets/characters/3eacc5ff991896fb6975720bdc10635a42574e6032def1064586d5572dd38cf5.png": "artwork/assets/characters/3eacc5ff991896fb6975720bdc10635a42574e6032def1064586d5572dd38cf5.png",
+      "../artwork/assets/characters/67d177ee75294dbdf6f8bf6d495d72590c4469d227c1ea0f1f63f10ee699fc53.png": "artwork/assets/characters/67d177ee75294dbdf6f8bf6d495d72590c4469d227c1ea0f1f63f10ee699fc53.png",
+      "../artwork/assets/characters/9498423da0cb8e757135612ce011a293f5ac3117fc881237e52e9d0ea213f179.png": "artwork/assets/characters/9498423da0cb8e757135612ce011a293f5ac3117fc881237e52e9d0ea213f179.png",
+      "../artwork/assets/characters/bf876acc5c19715619f93c4c4ef71d9771f076a4d94d66276a173a639253efb8.png": "artwork/assets/characters/bf876acc5c19715619f93c4c4ef71d9771f076a4d94d66276a173a639253efb8.png",
+      "../artwork/assets/characters/c6909e247c6ed59689bd60220ef5a27dbecaea5036a3b660c0f721dbb4587fd2.png": "artwork/assets/characters/c6909e247c6ed59689bd60220ef5a27dbecaea5036a3b660c0f721dbb4587fd2.png",
+      "../artwork/assets/characters/cd7c40c7af05f7a7db8024cb827d444c7f399601d8330d8edb8c8a26f2b19023.png": "artwork/assets/characters/cd7c40c7af05f7a7db8024cb827d444c7f399601d8330d8edb8c8a26f2b19023.png",
+      "../artwork/assets/characters/d4326e30a427d3667221d12d282a892127a5a86b0c6f4f58f70716311d2f88b9.png": "artwork/assets/characters/d4326e30a427d3667221d12d282a892127a5a86b0c6f4f58f70716311d2f88b9.png",
+      "../artwork/assets/characters/d9b39a2f77b897022aaf602439c030a919a3ad115991285f8ce82d522c29092f.png": "artwork/assets/characters/d9b39a2f77b897022aaf602439c030a919a3ad115991285f8ce82d522c29092f.png"
     },
     "externalBin": [
       "binaries/sylvia-gm-owner"

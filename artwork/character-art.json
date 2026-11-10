@@ -4576,6 +4576,186 @@
         "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Lace from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, body proportions, skin, eyes, hair, clothing, applicable cap or spectacles, colors, equipment and material wear. Appearance: An adult settled Human woman appearing in her early fifties, with a compact slender build, deep brown skin, dark brown eyes, small plain oval wire-rim spectacles and tightly coiled black hair threaded with gray, gathered into a neat low puff. A focused composed expression with a hint of impatience, straight precise posture. A plain dark forest-green blouse with sleeves rolled neatly, a muted ochre long skirt, an unbleached linen work apron and worn brown shoes. A simple cloth measuring tape with no readable markings hangs at the apron; a small closed sewing pouch sits at her waist. Empty relaxed hands. Her precise tailoring bearing reflects the authored profile; age, features and clothing are editable visual defaults. She is the market tailor and is unrelated to the Lace Brothers. No crime-family insignia, shared sibling appearance, elaborate lace gown, readable text, magical effects, modern machines or invented origin. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Consistent scale across three body views. Entire bodies, hair, hands, footwear and attached equipment inside margins. Exactly the same one character repeated as turnaround views. No labels, readable text, captions, borders, logos, UI, scenery, extra characters, animals or invented insignia. Change viewing angle only; keep identity and practical costume unchanged.",
         "portrait": "Use case: identity-preserve. Production square app portrait for Lace from Severed Lands. Input image 1 is the canonical full-body identity reference, image 2 is the matching multiview sheet. Preserve that exact adult face, age, skin, eyes, hairstyle, expression, applicable cap or spectacles and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face is centered; eyes near 35 percent down and chin near 65 percent down, with comfortable headroom above all hair or cap. Face framing must be consistent with a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, borders, captions, readable text, UI, scenery, new costume, magical effects, animals or extra people. One 1024x1024 PNG."
       }
+    },
+    {
+      "id": "severed-npc-innkeep-vesper",
+      "name": "Old Vesper",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/innkeep-vesper.md",
+          "sha256": "8b304c214766f32c9ef94d88dfbf33fee710d1888afb1e2c37a370ec5324bafc",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/innkeep-vesper.md",
+          "sha256": "b91a44e0cc47fb27e2897d83c99c8c24c99af8ef5af2158c0ed5a1731aef60f8",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An elderly settled Human woman appearing in her late sixties, with a sturdy medium build, warm tawny skin, a deeply lined face, keen dark green eyes and thick silver-gray hair gathered into a practical rolled bun. A sharp observant expression, calm closed mouth and composed upright bearing. A plain dark burgundy ankle-length wool dress, worn charcoal sleeveless waistcoat, practical natural linen apron and sturdy dark brown shoes. One small unlabelled iron key ring at her belt. Empty relaxed hands. Her experienced observant innkeeper bearing follows the authored profile; age styling, physical features and clothing are editable visual defaults. She is Old Vesper of the Fortress Inn. No noble finery, faction insignia, readable tabs, private testimony, magical effects or invented history.",
+        "full_body": {
+          "path": "assets/characters/9498423da0cb8e757135612ce011a293f5ac3117fc881237e52e9d0ea213f179.png",
+          "sha256": "9498423da0cb8e757135612ce011a293f5ac3117fc881237e52e9d0ea213f179"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/0de94a31215221295de3da3f2ecd68c0f1e272292cb2b5d8dc8025ee94db46e8.png",
+          "sha256": "0de94a31215221295de3da3f2ecd68c0f1e272292cb2b5d8dc8025ee94db46e8"
+        },
+        "portrait": {
+          "path": "assets/characters/3eacc5ff991896fb6975720bdc10635a42574e6032def1064586d5572dd38cf5.png",
+          "sha256": "3eacc5ff991896fb6975720bdc10635a42574e6032def1064586d5572dd38cf5"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2218742
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2503395
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2547342
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Old Vesper in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person standing naturally in a near-front three-quarter pose with both empty hands visible, whole hair, hands, clothing, equipment and feet comfortably inside all margins. Appearance: An elderly settled Human woman appearing in her late sixties, with a sturdy medium build, warm tawny skin, a deeply lined face, keen dark green eyes and thick silver-gray hair gathered into a practical rolled bun. A sharp observant expression, calm closed mouth and composed upright bearing. A plain dark burgundy ankle-length wool dress, worn charcoal sleeveless waistcoat, practical natural linen apron and sturdy dark brown shoes. One small unlabelled iron key ring at her belt. Empty relaxed hands. Her experienced observant innkeeper bearing follows the authored profile; age styling, physical features and clothing are editable visual defaults. She is Old Vesper of the Fortress Inn, distinct from the Athenaeum librarian and Siren Protocol's Vesper. No shared appearance with those other characters, noble finery, faction insignia, readable tabs, private testimony, magical effects or invented history. Preserve authored identity, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Old Vesper from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, body proportions, skin, eyes, hair, clothing, colors, equipment and material wear. Appearance: An elderly settled Human woman appearing in her late sixties, with a sturdy medium build, warm tawny skin, a deeply lined face, keen dark green eyes and thick silver-gray hair gathered into a practical rolled bun. A sharp observant expression, calm closed mouth and composed upright bearing. A plain dark burgundy ankle-length wool dress, worn charcoal sleeveless waistcoat, practical natural linen apron and sturdy dark brown shoes. One small unlabelled iron key ring at her belt. Empty relaxed hands. Her experienced observant innkeeper bearing follows the authored profile; age styling, physical features and clothing are editable visual defaults. She is Old Vesper of the Fortress Inn, distinct from the Athenaeum librarian and Siren Protocol's Vesper. No shared appearance with those other characters, noble finery, faction insignia, readable tabs, private testimony, magical effects or invented history. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Consistent scale across three body views. Entire bodies, hair, hands, footwear and attached equipment inside margins. Exactly the same one character repeated as turnaround views. No labels, readable text, captions, borders, logos, UI, scenery, extra characters, animals or invented insignia. Change viewing angle only; keep identity and practical costume unchanged.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Old Vesper from Severed Lands. Input image 1 is the canonical full-body identity reference, image 2 is the matching multiview sheet. Preserve that exact adult face, age, skin, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face is centered; eyes near 35 percent down and chin near 65 percent down, with comfortable headroom above all hair. Face framing must be consistent with a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, borders, captions, readable text, UI, scenery, new costume, magical effects, ideological symbols, animals or extra people. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-stablemaster-corin",
+      "name": "Corin",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/stablemaster-corin.md",
+          "sha256": "356f3223815bade46d96ec973f903c814f12fa6c4ef15e0d2691b0e20f424eb5",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/stablemaster-corin.md",
+          "sha256": "559bc56b583495b256969de1436774406216c7eb10210c47228bcca7532a154c",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult settled Human man appearing in his early fifties, with a strong sinewy working build, deep brown skin, dark amber-brown eyes, short tightly curled black hair graying at the temples and a short dense salt-and-pepper beard. A gruff thoughtful expression softened by attentive eyes, with a relaxed capable posture. A plain cream work shirt with rolled sleeves, faded tan wool waistcoat, worn brown leather stable apron with a short split front, deep olive work trousers and mud-marked sturdy leather boots. An ordinary belt has one small closed work pouch. Empty relaxed hands. His practical stablemaster bearing follows the authored profile; age, features and costume are editable visual defaults. No horse anatomy, animal companion, magical healing, modern veterinary equipment, noble finery, faction insignia, readable records or invented origin.",
+        "full_body": {
+          "path": "assets/characters/d9b39a2f77b897022aaf602439c030a919a3ad115991285f8ce82d522c29092f.png",
+          "sha256": "d9b39a2f77b897022aaf602439c030a919a3ad115991285f8ce82d522c29092f"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/bf876acc5c19715619f93c4c4ef71d9771f076a4d94d66276a173a639253efb8.png",
+          "sha256": "bf876acc5c19715619f93c4c4ef71d9771f076a4d94d66276a173a639253efb8"
+        },
+        "portrait": {
+          "path": "assets/characters/cd7c40c7af05f7a7db8024cb827d444c7f399601d8330d8edb8c8a26f2b19023.png",
+          "sha256": "cd7c40c7af05f7a7db8024cb827d444c7f399601d8330d8edb8c8a26f2b19023"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1762213
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2339250
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2558839
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Corin in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person standing naturally in a near-front three-quarter pose with both empty hands visible, whole hair, hands, clothing, equipment and feet comfortably inside all margins. Appearance: An adult settled Human man appearing in his early fifties, with a strong sinewy working build, deep brown skin, dark amber-brown eyes, short tightly curled black hair graying at the temples and a short dense salt-and-pepper beard. A gruff thoughtful expression softened by attentive eyes, with a relaxed capable posture. A plain cream work shirt with rolled sleeves, faded tan wool waistcoat, worn brown leather stable apron with a short split front, deep olive work trousers and mud-marked sturdy leather boots. An ordinary belt has one small closed work pouch. Empty relaxed hands. His practical stablemaster bearing follows the authored profile; age, features and costume are editable visual defaults. No horse anatomy, animal companion, magical healing, modern veterinary equipment, noble finery, faction insignia, readable records or invented origin. Preserve authored identity, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Corin from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, body proportions, skin, eyes, hair, clothing, colors, equipment and material wear. Appearance: An adult settled Human man appearing in his early fifties, with a strong sinewy working build, deep brown skin, dark amber-brown eyes, short tightly curled black hair graying at the temples and a short dense salt-and-pepper beard. A gruff thoughtful expression softened by attentive eyes, with a relaxed capable posture. A plain cream work shirt with rolled sleeves, faded tan wool waistcoat, worn brown leather stable apron with a short split front, deep olive work trousers and mud-marked sturdy leather boots. An ordinary belt has one small closed work pouch. Empty relaxed hands. His practical stablemaster bearing follows the authored profile; age, features and costume are editable visual defaults. No horse anatomy, animal companion, magical healing, modern veterinary equipment, noble finery, faction insignia, readable records or invented origin. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Consistent scale across three body views. Entire bodies, hair, hands, footwear and attached equipment inside margins. Exactly the same one character repeated as turnaround views. No labels, readable text, captions, borders, logos, UI, scenery, extra characters, animals or invented insignia. Change viewing angle only; keep identity and practical costume unchanged.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Corin from Severed Lands. Input image 1 is the canonical full-body identity reference, image 2 is the matching multiview sheet. Preserve that exact adult face, age, skin, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face is centered; eyes near 35 percent down and chin near 65 percent down, with comfortable headroom above all hair. Face framing must be consistent with a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, borders, captions, readable text, UI, scenery, new costume, magical effects, ideological symbols, animals or extra people. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-guard-davith",
+      "name": "Davith",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/guard-davith.md",
+          "sha256": "536ed803302c4eaf40fc6a4811221f3b90e572a564891226f6b137717eb7bd43",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/guard-davith.md",
+          "sha256": "2699e85d2dfec748327a20ed9f480f439827372a15f2caa0cfc3f58d6462358f",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A young adult settled Human man appearing in his early twenties, with a lean athletic build, warm beige skin, hazel eyes, short straight ash-brown hair and a clean-shaven youthful face. An earnest expression with a slightly worried brow, held within an attentive restrained guard posture. Plain worn chainmail over a charcoal quilted gambeson, practical brown leather belt and bracers, dark trousers and scuffed calf-high boots. A modest sheathed short sword at his hip, empty visible hands and no helmet covering his face. His youth and uneasy earnest bearing follow the authored profile; physical features, age styling and unmarked uniform are editable visual defaults. No ideological or secret faction symbols, incriminating papers, readable orders, invented city crest, magical effects or visual disclosure of private loyalties.",
+        "full_body": {
+          "path": "assets/characters/67d177ee75294dbdf6f8bf6d495d72590c4469d227c1ea0f1f63f10ee699fc53.png",
+          "sha256": "67d177ee75294dbdf6f8bf6d495d72590c4469d227c1ea0f1f63f10ee699fc53"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/c6909e247c6ed59689bd60220ef5a27dbecaea5036a3b660c0f721dbb4587fd2.png",
+          "sha256": "c6909e247c6ed59689bd60220ef5a27dbecaea5036a3b660c0f721dbb4587fd2"
+        },
+        "portrait": {
+          "path": "assets/characters/d4326e30a427d3667221d12d282a892127a5a86b0c6f4f58f70716311d2f88b9.png",
+          "sha256": "d4326e30a427d3667221d12d282a892127a5a86b0c6f4f58f70716311d2f88b9"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2015895
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2441699
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2467922
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Davith in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person standing at ease in a near-front three-quarter pose with both empty hands visible and the ordinary short sword sheathed, whole hair, hands, clothing, equipment and feet comfortably inside all margins. Appearance: A young adult settled Human man appearing in his early twenties, with a lean athletic build, warm beige skin, hazel eyes, short straight ash-brown hair and a clean-shaven youthful face. An earnest expression with a slightly worried brow, held within an attentive restrained guard posture. Plain worn chainmail over a charcoal quilted gambeson, practical brown leather belt and bracers, dark trousers and scuffed calf-high boots. A modest sheathed short sword at his hip, empty visible hands and no helmet covering his face. His youth and uneasy earnest bearing follow the authored profile; physical features, age styling and unmarked uniform are editable visual defaults. No ideological or secret faction symbols, incriminating papers, readable orders, invented city crest, magical effects or visual disclosure of private loyalties. Preserve authored identity, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Davith from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, body proportions, skin, eyes, hair, clothing, colors, equipment and material wear. Appearance: A young adult settled Human man appearing in his early twenties, with a lean athletic build, warm beige skin, hazel eyes, short straight ash-brown hair and a clean-shaven youthful face. An earnest expression with a slightly worried brow, held within an attentive restrained guard posture. Plain worn chainmail over a charcoal quilted gambeson, practical brown leather belt and bracers, dark trousers and scuffed calf-high boots. A modest sheathed short sword at his hip, empty visible hands and no helmet covering his face. His youth and uneasy earnest bearing follow the authored profile; physical features, age styling and unmarked uniform are editable visual defaults. No ideological or secret faction symbols, incriminating papers, readable orders, invented city crest, magical effects or visual disclosure of private loyalties. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Consistent scale across three body views. Entire bodies, hair, hands, footwear and attached equipment inside margins. Exactly the same one character repeated as turnaround views. No labels, readable text, captions, borders, logos, UI, scenery, extra characters, animals or invented insignia. Change viewing angle only; keep identity and practical costume unchanged.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Davith from Severed Lands. Input image 1 is the canonical full-body identity reference, image 2 is the matching multiview sheet. Preserve that exact adult face, age, skin, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face is centered; eyes near 35 percent down and chin near 65 percent down, with comfortable headroom above all hair. Face framing must be consistent with a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, borders, captions, readable text, UI, scenery, new costume, magical effects, ideological symbols, animals or extra people. One 1024x1024 PNG."
+      }
     }
   ]
 }
