@@ -450,6 +450,24 @@ def test_combined_session_dependency_diff_selects_each_module_once():
     assert selectors.count("tests/test_alpha_f4_generic_sessions.py") == 1
 
 
+@pytest.mark.parametrize("removed", ["tests/test_removed_behavior.py", "tests/removed_helper.py"])
+def test_deleted_tests_select_existing_consumers_without_missing_required_paths(tmp_path, removed):
+    import json
+    from scripts.select_checks import load_selection
+
+    root = Path(__file__).resolve().parents[1]
+    assert not (root / removed).exists()
+    plan = choose([removed], root=root)
+    selectors = [item for values in plan["python"].values() for item in values]
+    assert plan["broad_fallback"]
+    assert removed not in selectors
+    assert "tests/test_alpha_f4_generic_sessions.py" in selectors
+    assert any("Removed test" in row["reason"] for row in plan["reasons"])
+    manifest = tmp_path / "selection.json"
+    manifest.write_text(json.dumps(plan))
+    assert load_selection(manifest, revision="a" * 40, root=root) == plan
+
+
 def test_guide_uses_one_plugin_loading_policy_for_standalone_and_runner_commands():
     root = Path(__file__).resolve().parents[1]
     guide = (root / "docs/operations/local-checks-and-release.md").read_text()

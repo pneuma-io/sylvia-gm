@@ -288,6 +288,10 @@ def select_checks(paths, *, source, base, diff_complete=True, full=False, root=N
                 )
                 reason = "Application unit/composed journeys and durable owner boundaries"
             elif path.startswith("tests/") and path.endswith(".py"):
+                test_root = root or Path(__file__).resolve().parents[1]
+                if not (test_root / path).is_file():
+                    broad(path, "Removed test: check remaining supported behavior and import consumers")
+                    continue
                 if Path(path).name.startswith("test_"):
                     groups.setdefault("changed-tests", []).append(path)
                 reason = "Changed Python tests and statically mapped helper consumers"
