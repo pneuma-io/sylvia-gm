@@ -39,7 +39,7 @@ UNASSIGNED_PYTHON = (
     'tests/test_srd_contingency_concealment_children.py',
     'tests/test_srd_contingency_mask_children.py',
     'tests/test_srd_contingency_recovery_children.py',
-    'tests/test_srd_creature_space.py',
+    'tests/srd_creature_space_fixtures.py',
     'tests/test_srd_creature_space_detours.py',
     'tests/test_srd_creature_space_route_continuation.py',
     'tests/test_srd_extended_casting.py',

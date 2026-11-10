@@ -3,8 +3,8 @@ from copy import deepcopy
 
 import pytest
 
-from tests.test_srd_creature_space import NS, run, state
-from tests.test_srd_creature_space import runtime as runtime
+from tests.srd_creature_space_fixtures import NS, run, state
+from tests.srd_creature_space_fixtures import runtime as runtime
 from tests.test_srd_creature_space_owner import request
 from tests.lite_imported_fixture import ImportedCase
 from sylvia_gm.domain.errors import CommandRejected

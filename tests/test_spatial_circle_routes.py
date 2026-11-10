@@ -5,7 +5,7 @@ from math import cos, dist, pi, sin
 import pytest
 
 from sylvia_gm.spatial import SpatialEngine, SpatialValidationError
-from tests.test_srd_creature_space import NS, state
+from tests.srd_creature_space_fixtures import NS, state
 
 
 def route_scene():
