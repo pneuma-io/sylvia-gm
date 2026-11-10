@@ -236,6 +236,7 @@ from sylvia_gm.domain.package_library import (
     ActivationResult,
     PackageBlobReadReceipt,
     PackageCandidate,
+    PackageFile,
     PackageLockRecord,
     PackageStagingRecord,
     PackageSurfaceProjection,
@@ -999,7 +1000,8 @@ class AuthorityOwner:
                 record.record_id: record for record in continuity.records
                 if record.kind == "entity"
             }
-            package_lock: PackageLock | None = None
+            source_packages: list[tuple[PackageLockEntry, dict[str, PackageFile]]] | None = None
+            setting_ids: frozenset[str] = frozenset()
             for identity, record in entities.items():
                 source = record.payload.get("source_ref")
                 if (
@@ -1010,15 +1012,48 @@ class AuthorityOwner:
                 ):
                     continue
                 try:
-                    portable = validate_portable_path(source)
+                    portable = validate_portable_path(source.partition("#/")[0])
                 except ValueError:
                     continue
-                if package_lock is None:
+                if source_packages is None:
                     package_lock = self._store.current_package_lock(campaign_id).package_lock
-                for entry in package_lock.entries:
+                    available_settings = frozenset(
+                        entry.package_id for entry in campaign_setting_entries(package_lock)
+                    )
+                    selected_setting = (
+                        construction.canonical_input.get("setting_id")
+                        if construction is not None else None
+                    )
+                    if isinstance(selected_setting, str):
+                        setting_ids = frozenset({selected_setting}) & available_settings
+                    elif len(available_settings) == 1:
+                        setting_ids = available_settings
+                    source_packages = []
+                    for entry in package_lock.entries:
+                        manifest = self._store.exact_package_manifest(
+                            entry.package_id, entry.version, entry.sha256,
+                        )
+                        source_packages.append((
+                            entry, {item.path: item for item in manifest.files},
+                        ))
+                for entry, files in source_packages:
+                    descriptor = files.get(source) or files.get(portable)
+                    if descriptor is None:
+                        continue
+                    name = record.payload.get("name")
+                    visuals = bundled_source_visuals(
+                        entry.package_id, source, descriptor,
+                        subject_name=name if isinstance(name, str) else None,
+                        campaign_setting_ids=setting_ids,
+                    )
+                    if visuals is not None:
+                        result[identity] = visuals
+                        break
+                    if "#/" in source and descriptor.path != source:
+                        continue
                     try:
                         raw = self._store.package_file_bytes(
-                            entry.package_id, entry.version, entry.sha256, portable,
+                            entry.package_id, entry.version, entry.sha256, descriptor.path,
                             maximum_bytes=256 * 1024,
                         )
                     except CommandRejected as error:
@@ -1030,6 +1065,7 @@ class AuthorityOwner:
                         visuals = bundled_source_visuals(
                             entry.package_id, portable, raw,
                             subject_name=name if isinstance(name, str) else None,
+                            campaign_setting_ids=setting_ids,
                         )
                         if visuals is not None:
                             result[identity] = visuals

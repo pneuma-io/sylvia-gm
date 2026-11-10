@@ -1115,6 +1115,16 @@ declared subject inside that same package/path/hash match. Subject comparison ig
 surrounding whitespace. A specific subject binding takes precedence over a common archetype
 binding. Conflicting matches are refused; an unknown subject uses only an explicit common
 binding, when one exists. This keeps named groups from collapsing to the first catalogue entry.
+An indexed creature/form uses `source_ref` as its admitted file path followed by a JSON Pointer
+(`content/non-beast-form-index.json#/forms/aboleth`, for example). Its catalogue binding uses the
+whole source file's exact admitted hash. Optional `campaign_setting_id` selects that Setting's
+rendition and takes precedence over an unscoped image. The selected construction Setting controls
+this scope; without a selected construction Setting, only a sole admitted Setting is inferred.
+Ambiguous Setting context does not select a scoped image. Lookup uses the installed manifest
+without reading or parsing large definition files. `scripts/inventory_inherited_artwork.py`
+prepares Severed Lands subject bindings from current Lite and retained Plan source records,
+checking retained file hashes and preserving each distinct source edition. It generates no art
+and changes no gameplay data.
 
 The character artwork workflow composes the existing image requests rather than adding a second
 job store. Each persisted request records its workflow and stage. Adoption prepares the next

@@ -278,7 +278,11 @@ and dialogue presentation. An image generation is visual content, never a mechan
 
 When recording a known NPC or enemy from admitted Setting content, retain its exact source path
 in source_ref. Sylvia uses that source identity to restore prepared art; names alone do not bind
-images. Inspect current artwork before requesting anything. During ordinary character creation,
+images. Indexed inherited creatures/forms use source_ref as the admitted file path plus its
+JSON Pointer, for example content/non-beast-form-index.json#/forms/aboleth. Preserve that reference
+when recording the entity; Sylvia resolves the current Setting's prepared rendition from package
+metadata. Resolve source identifiers from the authored data during preparation.
+Inspect current artwork before requesting anything. During ordinary character creation,
 adaptation or an introduction with missing art, use request_image_art with purpose character,
 its name and established appearance. Sylvia runs
 the required reference/portrait stages in order, reuses current art, and prepares the next stage

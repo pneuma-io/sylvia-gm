@@ -76,6 +76,11 @@ file contains three distinct named siblings. Shared-source lookup now supports a
 inside an exact package/path/hash match and refuses ambiguous bindings. The owner clarified that
 premade coverage includes the Severed Lands inherited versions of SRD creatures/forms. Those
 inherited identities, prose-only Plan casts and remaining authored subjects still need artwork.
+The inherited inventory now identifies 330 Severed Lands subjects (90 beasts and 240 other forms)
+across the current and retained Lite sources. Exact file/JSON Pointer/hash bindings are scoped
+to the selected Setting. Portrait lookup uses admitted metadata without parsing the large
+definition files. Producer and owner composition checks cover these bindings and used-art
+transfer with generation Off; these fixtures do not supply the missing production artwork.
 The subsequent local handoff check found and fixed an execution dependency on a stopped source
 chat, including admission of the next character reference stage. An active chat in the same
 campaign can now generate/adopt an existing individual request or continue the whole character

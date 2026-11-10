@@ -12,6 +12,7 @@ from typing import Any
 
 from sylvia_gm.application.image_hooks import MAX_IMAGE_BYTES, ImageData
 from sylvia_gm.domain.image_art import validate_character_visuals
+from sylvia_gm.domain.package_library import PackageFile
 
 
 def _art_root() -> Path:
@@ -83,14 +84,19 @@ def bundled_character_image(portable_path: str, sha256: str) -> bytes | None:
 
 
 def bundled_source_visuals(
-    package_id: str, portable_path: str, source: bytes, *, subject_name: str | None = None,
+    package_id: str, portable_path: str, source: bytes | PackageFile, *,
+    subject_name: str | None = None, campaign_setting_ids: frozenset[str] = frozenset(),
 ) -> dict[str, Any] | None:
-    """Match exact source bytes, with an optional declared subject inside a shared source."""
-    digest = hashlib.sha256(source.replace(b"\r\n", b"\n")).hexdigest()
+    """Resolve exact admitted source/subject bindings, including Setting-specific inherited art."""
+    if isinstance(source, PackageFile):
+        if source.path not in {portable_path, portable_path.partition("#/")[0]}:
+            return None
+        digest = source.sha256
+    else:
+        digest = hashlib.sha256(source.replace(b"\r\n", b"\n")).hexdigest()
     try:
         catalogue = json.loads((_art_root() / "character-art.json").read_bytes())
-        specific: dict[int, object] = {}
-        common: dict[int, object] = {}
+        candidates: dict[tuple[int, int], dict[int, object]] = {}
         for index, character in enumerate(catalogue["characters"]):
             for reference in character["sources"]:
                 if not (
@@ -100,18 +106,24 @@ def bundled_source_visuals(
                     and reference.get("sha256") == digest
                 ):
                     continue
+                setting = reference.get("campaign_setting_id")
+                if setting is not None and (
+                    not isinstance(setting, str) or setting not in campaign_setting_ids
+                ):
+                    continue
                 subject = reference.get("subject_name")
-                if subject is None:
-                    common[index] = character["visuals"]
-                elif (
+                if subject is not None and not (
                     isinstance(subject, str)
                     and isinstance(subject_name, str)
                     and subject_name.strip().casefold() == subject.strip().casefold()
                 ):
-                    specific[index] = character["visuals"]
-        matches = specific or common
-        if len(matches) == 1:
-            return validate_character_visuals(next(iter(matches.values())))
+                    continue
+                priority = (int(setting is not None), int(subject is not None))
+                candidates.setdefault(priority, {})[index] = character["visuals"]
+        if candidates:
+            matches = candidates[max(candidates)]
+            if len(matches) == 1:
+                return validate_character_visuals(next(iter(matches.values())))
     except (OSError, ValueError, KeyError, TypeError):
         pass
     return None
