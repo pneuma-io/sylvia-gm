@@ -5364,6 +5364,7 @@ const SylviaGMFrontend = (() => {
     const declared = (intent) => (actions || []).find((action) => action.intent === intent && actionBindsActor(action));
     const reload = declared('reload_weapon');
     const cycle = declared('cycle_weapon');
+    const loadShell = declared('load_one_shell');
     if (!weapon || typeof weapon !== 'object' || (!reload && !cycle)) return { steps: [], summary: '' };
     const rounds = Number.isInteger(weapon.magazine?.rounds) ? weapon.magazine.rounds : null;
     const spares = Array.isArray(weapon.spare_magazines) ? weapon.spare_magazines.map((item) => item?.rounds).filter(Number.isInteger) : [];
@@ -5374,7 +5375,9 @@ const SylviaGMFrontend = (() => {
       (steps.length && weapon.mechanism !== 'SELF_LOADING' && weapon.chamber !== 'LIVE');
     if (cycle && chamberNeedsCycle && Number(weapon.cycle_ap) > 0) steps.push(cycle);
     const summary = steps.length ? steps.map((action) => action.label || action.id).join(' → ')
-      : weapon.feed === 'TUBE' && !weapon.needs_cycle ? 'Tube top-up has no declared action' : 'Loaded · nothing to queue';
+      : weapon.feed === 'TUBE' && !weapon.needs_cycle
+        ? loadShell ? `Use ${loadShell.label || loadShell.id} to top up the tube` : 'Tube top-up has no declared action'
+        : 'Loaded · nothing to queue';
     return { steps, summary };
   }
 

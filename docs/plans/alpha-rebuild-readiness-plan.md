@@ -28,14 +28,23 @@ queued magazine change then cycle without spending resources; Execute charged 2 
 retained the old magazine, and left one live chambered round plus 4/5 in the magazine.
 Repeat Execute left resources unchanged. At 2 AP, only the magazine change committed;
 cycling stopped for insufficient AP, preserving the spent chamber and 5/5 magazine.
-Window-frame captures show the committed rig steps. Reopen, refusal/stale-state recovery,
-the remaining selected controls and the final replacement candidate still require native proof.
+Window-frame captures show the committed rig steps. Fresh-owner reopen preserved the completed
+queue and did not replay rig motion. A changed revision required review before a queued cycle;
+review then executed it once from current state. The AP2 recovery queued only that missing cycle.
+Native Crouch then Move rechecked the stance and charged the actual 2 AP movement cost. Aim,
+single fire and a 2 AP Aim investment committed with their declared costs. Shooter-origin watch
+setup spent 2 AP; cancellation did not refund it. Deep Aim rejected the unsupported specialty.
+The remaining selected controls and the final replacement candidate still require native proof.
 Synthetic setup and direct authority checks are distinct from UI gameplay evidence.
 
 The native run also exposed expanded queue controls squeezed into the disclosure's narrow
 column. The repair gives expanded details the card width and applies the existing button style.
 Focused queue and retained-layout checks pass; native replay remains open. Previous map minimum
 height, queue reachability, committed-price and completed-queue-warning repairs remain included.
+The standard Windows build at `bab0ad4` completed and verified its artifacts. A subsequent native
+tube test exposed a misleading Reload caption denying the separately declared shell-loading
+control. The caption now names that control without adding Reload steps; focused checks pass.
+This replacement still needs a build and native replay.
 
 The strict type repairs in TD's new grid-lane and exposure modules pass affected checks. A
 provisional refactor composition passes the supplied measured type gate, but it is not a final
