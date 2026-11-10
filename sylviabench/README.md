@@ -29,6 +29,35 @@ are required. Package admission can take several minutes on a fresh process; pro
 The command succeeds only when all three good cases pass and each bad case fails its intended
 check. It records six runs, not six real-model observations.
 
+## Reuse the same challenge across batches
+
+Create a named fixture pack once, then select it for every comparison:
+
+```powershell
+python -m sylviabench freeze --id gm-trial-v1 --output ../Fixtures/gm-trial-v1
+python -m sylviabench verify-fixtures ../Fixtures/gm-trial-v1
+python -m sylviabench selftest --fixtures ../Fixtures/gm-trial-v1 --output ../Results/selftest
+```
+
+The pack contains a closed synthetic save, its campaign and participant files, starting observations,
+and file hashes. It excludes provider settings and raw audit traces. Keep it locally with the comparison
+deliverables, outside Git. The runner verifies every file before use. A pack requires the same Sylvia
+application, dependency-lock and content bytes; a benchmark-only commit can reuse it. Its generation
+commit remains recorded. Changing the starting injury or history requires a new pack identity.
+
+Dice use the benchmark's `package-tool-occurrence-v1` policy. Within the same fixture, scenario,
+repetition and player turn, the same numbered invocation of a package mechanic starts with the same
+random stream. Model names, native call IDs and parameter values do not change that seed. Models can
+still choose different actions or consume different numbers of dice. The policy records each tool,
+occurrence, parameter hash and seed; it does not force equal outcomes for different actions. It runs
+only inside this developer runner and leaves the shipped game's normal dice policy unchanged.
+
+Records also contain hashes of the initial observations, player messages and provider-boundary
+messages/tools, plus the selected context/output/reasoning metadata. The report compares the first
+provider input in matched runs. Differences need inspection before making an equivalent-challenge
+claim. Inputs after the first model response can naturally diverge. Transport-specific serialization
+and hidden service instructions are outside this equality check.
+
 ## Other commands
 
 ```powershell
@@ -107,7 +136,19 @@ bands do not establish player-experience validity. No reference-relative verdict
 
 The runner has an explicitly enabled route to Sylvia's configured provider resolver. A `model`
 setup names an exact `provider_id`, `model_id` and `owner_config` path. It cannot execute unless
-`run` also receives `--allow-model-calls`. No supplied setup enables this route.
+`run` also receives `--allow-model-calls` and a verified `--fixtures` pack. No supplied setup enables
+this route. For example, after creating a private setup file:
+
+```powershell
+python -m sylviabench run --config ../Private/setups.json --setup selected-model `
+  --fixtures ../Fixtures/gm-trial-v1 --repetitions 2 --output ../Results/first-model `
+  --allow-model-calls
+```
+
+Each run allows at most 16 calls at Sylvia's provider boundary, including calls made during manual
+Retry. Sylvia's transport-level retries retain their product policy and can make additional HTTP
+attempts. The manifest records this bound. Provider adapter identity is recorded as adapter evidence;
+it is not automatically treated as an independently confirmed service identity.
 
 That code path has no live acceptance claim. Headless ChatGPT account authentication, provider
 usage extraction, cost limits, service-failure rerun policy and natural-language checker calibration
@@ -132,6 +173,8 @@ commits. The built-in fixtures contain only synthetic facts and bundled content.
 
 The framework uses closed Pydantic records for setup, scenario, attempt, check and result data.
 `owner.py` owns transport and stream attachment; `fixtures.py` owns synthetic campaign preparation;
+`packs.py` owns reusable fixture verification; `randomness.py` owns the paired dice override;
+`provenance.py` observes the unchanged provider boundary;
 `runner.py` owns isolation, retry and resume; `checks.py` owns evidence interpretation; `report.py`
 owns aggregation and HTML output. Additional checkers should stay at that same boundary.
 

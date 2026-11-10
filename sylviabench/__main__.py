@@ -11,8 +11,9 @@ from pydantic import ValidationError
 
 from .checks import evaluate
 from .contracts import scenarios, setups
+from .packs import freeze, verify
 from .report import load_results, report
-from .runner import run
+from .runner import run, source_identity
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -23,10 +24,16 @@ def main(argv: list[str] | None = None) -> int:
     )
     listing.add_argument("--config", type=Path)
     commands.add_parser("scenarios", help="List the versioned scenario set and checks")
+    fixture = commands.add_parser("freeze", help="Create a reusable synthetic fixture pack")
+    fixture.add_argument("--output", required=True, type=Path)
+    fixture.add_argument("--id", required=True)
+    check = commands.add_parser("verify-fixtures", help="Verify frozen save and authored files")
+    check.add_argument("directory", type=Path)
     for name in ("run", "selftest"):
         command = commands.add_parser(name)
         command.add_argument("--output", required=True, type=Path)
         command.add_argument("--resume", action="store_true")
+        command.add_argument("--fixtures", type=Path)
         if name == "run":
             command.add_argument("--config", type=Path)
             command.add_argument("--setup", required=True, action="append")
@@ -43,6 +50,20 @@ def main(argv: list[str] | None = None) -> int:
             print(json.dumps([s.model_dump() for s in setups(args.config)], indent=2))
         elif args.command == "scenarios":
             print(json.dumps([s.model_dump() for s in scenarios()], indent=2))
+        elif args.command == "freeze":
+            pack = freeze(args.output, args.id, source_identity())
+            print(
+                json.dumps(
+                    {
+                        "id": pack["id"],
+                        "sha256": pack["sha256"],
+                        "directory": str(args.output.resolve()),
+                    },
+                    indent=2,
+                )
+            )
+        elif args.command == "verify-fixtures":
+            print(verify(args.directory, source_identity())["sha256"])
         elif args.command == "report":
             print(report(args.directory))
         elif args.command == "replay":
@@ -62,7 +83,7 @@ def main(argv: list[str] | None = None) -> int:
             suite = scenarios()
             if args.command == "selftest":
                 selected = [s for s in setups() if s.behavior in {"good", "bad"}]
-                rows = run(args.output, selected, suite, resume=args.resume)
+                rows = run(args.output, selected, suite, resume=args.resume, fixtures=args.fixtures)
                 for row in rows:
                     scenario = next(s for s in suite if s.id == row.scenario_id)
                     if row.setup.behavior == "good" and row.outcome != "pass":
@@ -93,6 +114,7 @@ def main(argv: list[str] | None = None) -> int:
                     retries=args.retries,
                     resume=args.resume,
                     allow_model_calls=args.allow_model_calls,
+                    fixtures=args.fixtures,
                 )
                 print(f"Recorded {len(rows)} runs.")
             print(report(args.output))

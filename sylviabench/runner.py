@@ -26,8 +26,11 @@ from .contracts import (
     read_json,
     write_json,
 )
-from .fixtures import ScriptedResolver, copy_save, observe, receipt_summary, script, seed
+from .fixtures import ScriptedResolver, copy_save, observe, receipt_summary, script
 from .owner import OwnerClient, OwnerError
+from .packs import freeze, verify
+from .provenance import MAX_REQUESTS, ObservedResolver, configuration
+from .randomness import POLICY, PairedDice
 
 
 def source_identity() -> dict[str, Any]:
@@ -39,8 +42,28 @@ def source_identity() -> dict[str, Any]:
     files = sorted(Path(__file__).parent.glob("*.py")) + [
         Path(__file__).with_name("scenarios.json")
     ]
+    app_paths = [
+        "src",
+        "rulesets",
+        "campaign-plans",
+        "campaign-settings",
+        "config/config.yaml",
+        "uv.lock",
+        "pyproject.toml",
+    ]
+    if git("ls-files", "--others", "--exclude-standard", "--", *app_paths):
+        raise ValueError("Untracked application files prevent a reproducible benchmark")
+    app_files = git("ls-files", "--", *app_paths).splitlines()
     return {
         "commit": git("rev-parse", "HEAD"),
+        "application_sha256": digest(
+            {
+                p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest()
+                if (ROOT / p).is_file()
+                else None
+                for p in app_files
+            }
+        ),
         "working_diff_sha256": hashlib.sha256(
             subprocess.check_output(
                 [
@@ -83,6 +106,7 @@ def execute(
     suite_id: str,
     source: dict[str, Any],
     retries: int,
+    expected_baseline: dict[str, Any] | None = None,
 ) -> Result:
     """A run owns a fresh save; retries go through Sylvia's manual Retry command."""
     started = datetime.now(UTC).isoformat()
@@ -91,6 +115,8 @@ def execute(
     database = directory / "campaign.sqlite3"
     copy_save(frozen, database)
     before = observe(database, **ids)
+    if expected_baseline is not None and before != expected_baseline:
+        raise ValueError("Copied starting observations differ from the frozen fixture")
     observations: dict[str, Any] = {"before": before, "saved": before}
     if scenario.id == "T3":
         reopened = directory / "reopened" / "campaign.sqlite3"
@@ -107,10 +133,14 @@ def execute(
     attempts: list[Attempt] = []
     completed = True
     error: Exception | None = None
+    pairing = PairedDice(hashlib.sha256(frozen.read_bytes()).hexdigest(), scenario.id, repetition)
+    observed: ObservedResolver | None = None
     try:
-        with OwnerClient(database, _resolver(setup, provider), timeout=300) as client:
+        observed = ObservedResolver(_resolver(setup, provider))
+        with pairing, OwnerClient(database, observed, timeout=300) as client:
             client.request("set_admin_full_audit", {"enabled": True})
             for turn_number, message in enumerate(scenario.player_messages):
+                pairing.turn = turn_number
                 basis = client.request("display_snapshot", {"campaign_id": ids["campaign"]})
                 identity = uuid.uuid4().hex
                 params = {
@@ -187,6 +217,12 @@ def execute(
         completed = False
         error = caught
     observations["after"] = observe(database, **ids)
+    observations["provider"] = observed.summary() if observed else None
+    observations["randomness"] = {"policy": POLICY, "trace": pairing.trace}
+    observations["challenge"] = {
+        "baseline_sha256": digest(before),
+        "player_messages_sha256": digest(scenario.player_messages),
+    }
     observations["receipts"] = (
         [{"id": row["id"], **receipt_summary(row["result"])} for row in provider.receipts]
         if provider
@@ -240,6 +276,8 @@ def execute(
         repetition=repetition,
         execution_kind="framework_selftest" if setup.kind == "scripted" else "model_run",
         setup=setup,
+        observed_model=observed.confirmed("confirmed_model") if observed else None,
+        observed_reasoning=observed.confirmed("observed_reasoning") if observed else None,
         started_at=started,
         elapsed_seconds=time.monotonic() - begin,
         attempts=attempts,
@@ -257,10 +295,13 @@ def execute(
         observations=observations,
         identity_note="Scripted provider; no model inference occurred."
         if setup.kind == "scripted"
-        else "Requested selection only; provider-confirmed identity is unavailable.",
+        else "Provider confirmations, where available, are recorded at their stated boundary; "
+        "adapter echoes of the requested ID do not count as confirmation.",
+        usage=observed.usage() if observed and setup.kind == "model" else None,
         usage_note="Scripted execution; no model usage or monetary cost."
         if setup.kind == "scripted"
-        else "Usage and cost were not reported; no estimate is substituted.",
+        else "Usage is reported for the recorded requests only; missing usage and monetary cost "
+        "remain unknown. Transport retries may be unreported.",
     )
 
 
@@ -273,6 +314,7 @@ def run(
     retries: int = 2,
     resume: bool = False,
     allow_model_calls: bool = False,
+    fixtures: Path | None = None,
 ) -> list[Result]:
     """Freeze configuration before any owner starts; never guess a setup or resume identity."""
     if repetitions < 1 or repetitions > 100 or retries not in range(3):
@@ -285,13 +327,20 @@ def run(
             "Output must be a dedicated results directory, not the source or its parent"
         )
     source = source_identity()
-    specification = {
+    if any(s.kind == "model" for s in selected) and fixtures is None:
+        raise ValueError("Model comparisons require an explicitly selected --fixtures pack")
+    pack = verify(fixtures, source) if fixtures is not None else None
+    specification: dict[str, Any] = {
         "schema_version": 1,
         "source": source,
         "setups": [s.model_dump() for s in selected],
         "scenarios": [s.model_dump() for s in suite],
         "repetitions": repetitions,
         "retries": retries,
+        "randomness_policy": POLICY,
+        "provider_requests_per_run": MAX_REQUESTS,
+        "provider_configuration": {s.id: configuration(s) for s in selected},
+        "fixture_pack_sha256": pack["sha256"] if pack else None,
     }
     suite_id = digest(specification)
     manifest = {**specification, "suite_id": suite_id}
@@ -331,8 +380,6 @@ def run(
                         results.append(result)
                     else:
                         pending.append((setup, scenario, repetition, key, result_path))
-        if not pending:
-            return results
         seed_path = output / "seed" / "campaign.sqlite3"
         ids_path = output / "seed.json"
         if seed_path.exists() or ids_path.exists():
@@ -342,17 +389,47 @@ def run(
             if hashlib.sha256(seed_path.read_bytes()).hexdigest() != seed_record["database_sha256"]:
                 raise ValueError("Frozen campaign identity mismatch")
             ids = {k: seed_record[k] for k in ("campaign", "session")}
+            if (output / "fixtures").exists() and fixtures is None:
+                fixtures = output / "fixtures"
+                verify(fixtures, source)
         else:
             print("Preparing the synthetic campaign through Sylvia's owner...", flush=True)
-            seed_path, ids = seed(output)
+            if pack is None:
+                pack = freeze(output / "fixtures", "selftest-v1", source)
+                fixtures = output / "fixtures"
+            assert fixtures is not None
+            copy_save(fixtures / "save" / "campaign.sqlite3", seed_path)
+            ids = pack["ids"]
+            write_json(
+                ids_path,
+                {
+                    **ids,
+                    "observation": pack["observation"],
+                    "database_sha256": hashlib.sha256(seed_path.read_bytes()).hexdigest(),
+                    "fixture_pack_sha256": pack["sha256"],
+                },
+            )
         for setup, scenario, repetition, key, result_path in pending:
+            if configuration(setup) != specification["provider_configuration"][setup.id]:
+                raise ValueError("Selected provider configuration changed during the experiment")
+            if fixtures is not None:
+                verify(fixtures, source)
             print(
                 f"Running {setup.id}/{scenario.id}/{repetition + 1} ({setup.kind})...", flush=True
             )
             # A previously interrupted process keeps its directory and attempt journal as evidence.
             directory = output / "runs" / (key + "-" + uuid.uuid4().hex[:8])
             result = execute(
-                scenario, setup, repetition, directory, seed_path, ids, suite_id, source, retries
+                scenario,
+                setup,
+                repetition,
+                directory,
+                seed_path,
+                ids,
+                suite_id,
+                source,
+                retries,
+                expected_baseline=read_json(ids_path)["observation"],
             )
             write_json(result_path, result.model_dump())
             results.append(result)

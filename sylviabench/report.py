@@ -106,6 +106,22 @@ def load_results(directory: Path) -> tuple[dict[str, Any], list[Result]]:
             or seed_record is None
             or row.fixture_sha256 != seed_record["database_sha256"]
             or (
+                manifest.get("fixture_pack_sha256") is not None
+                and seed_record.get("fixture_pack_sha256") != manifest["fixture_pack_sha256"]
+            )
+            or (
+                "randomness_policy" in manifest
+                and (
+                    row.observations.get("randomness", {}).get("policy")
+                    != manifest["randomness_policy"]
+                    or row.observations.get("challenge")
+                    != {
+                        "baseline_sha256": digest(seed_record["observation"]),
+                        "player_messages_sha256": digest(scenario["player_messages"]),
+                    }
+                )
+            )
+            or (
                 row.outcome == "pass"
                 and {a.turn for a in row.attempts} != set(range(len(scenario["player_messages"])))
             )
@@ -115,6 +131,50 @@ def load_results(directory: Path) -> tuple[dict[str, Any], list[Result]]:
         identities.add(key)
         results.append(row)
     return manifest, results
+
+
+def challenge_comparison(rows: list[Result]) -> list[dict[str, Any]]:
+    """Compare the actual starting observations and first provider input in matched runs."""
+    groups: dict[tuple[str, int], list[Result]] = defaultdict(list)
+    for row in rows:
+        groups[row.scenario_id, row.repetition].append(row)
+    comparisons = []
+    for (scenario, repetition), members in sorted(groups.items()):
+        baselines, requests, seeds = set(), set(), defaultdict(set)
+        for row in members:
+            challenge = row.observations.get("challenge")
+            if challenge:
+                baselines.add(digest(challenge))
+            provider = row.observations.get("provider") or {}
+            calls = provider.get("requests", [])
+            if calls:
+                requests.add((calls[0]["messages_sha256"], calls[0]["tools_sha256"]))
+            for item in row.observations.get("randomness", {}).get("trace", []):
+                key = (item["turn"], item["package"], item["tool"], item["occurrence"])
+                seeds[key].add(item["seed"])
+        observed_challenges = sum(bool(r.observations.get("challenge")) for r in members)
+        observed_inputs = sum(
+            bool((r.observations.get("provider") or {}).get("requests")) for r in members
+        )
+        comparisons.append(
+            {
+                "scenario": scenario,
+                "repetition": repetition,
+                "runs": len(members),
+                "starting_challenge": "identical"
+                if len(baselines) == 1 and observed_challenges == len(members) and len(members) > 1
+                else "unverified"
+                if len(baselines) < 2
+                else "different",
+                "first_provider_input": "identical"
+                if len(requests) == 1 and observed_inputs == len(members) and len(members) > 1
+                else "unverified"
+                if len(requests) < 2
+                else "different",
+                "paired_seed_conflicts": sum(len(values) > 1 for values in seeds.values()),
+            }
+        )
+    return comparisons
 
 
 def report(directory: Path, destination: Path | None = None) -> Path:
@@ -127,6 +187,7 @@ def report(directory: Path, destination: Path | None = None) -> Path:
     summaries = {s["id"]: score(grouped[s["id"]], categories) for s in manifest["setups"]}
     expected = len(manifest["setups"]) * len(manifest["scenarios"]) * manifest["repetitions"]
     scripted = all(s["kind"] == "scripted" for s in manifest["setups"])
+    comparisons = challenge_comparison(rows)
 
     def escape(value: Any) -> str:
         return html.escape(str(value), quote=True)
@@ -175,7 +236,13 @@ def report(directory: Path, destination: Path | None = None) -> Path:
         "only when every observed scenario has at least two runs. They describe this fixed "
         "scenario set. Wait includes Retry attempts. "
         "Usage and cost stay unknown unless reported.</p>",
-        "<h2>Run details</h2>",
+        "<h2>Challenge comparison</h2><p>The starting save and fixed player messages are checked "
+        "separately from the first input at Sylvia's provider boundary. A different input needs "
+        "inspection before treating setups as an equivalent challenge. Transport serialization "
+        "may differ. Paired dice applies to matching package/tool occurrences; models can choose "
+        "different actions and consume different numbers of rolls.</p><pre>",
+        escape(json_text(comparisons)),
+        "</pre><h2>Run details</h2>",
     ]
     for row in rows:
         body.append(
@@ -219,12 +286,15 @@ def report(directory: Path, destination: Path | None = None) -> Path:
         body.append(
             "<details><summary>Attempts and waits</summary><pre>"
             + escape(json_text([a.model_dump() for a in row.attempts]))
+            + "</pre></details><details><summary>Provider metadata and usage</summary><pre>"
+            + escape(json_text({"provider": row.observations.get("provider"), "usage": row.usage}))
             + "</pre></details></details>"
         )
     body += [
         "<h2>Scope and source</h2><p>Three SRD trial scenarios. Secret checking uses a declared "
         "phrase and knowledge visibility; semantic leaks, story judgement, long context and "
-        "compaction are untested. Live account authentication and model behavior are unverified. "
+        "compaction are untested. Provider selections and request hashes are recorded per run; "
+        "adapter-reported identity is not automatically provider confirmation. "
         "This report supplies no calibrated verdict or model recommendation.</p><pre>",
         escape(json_text(manifest["source"])),
         "</pre></html>",
@@ -238,6 +308,7 @@ def report(directory: Path, destination: Path | None = None) -> Path:
             "recorded_runs": len(rows),
             "planned_runs": expected,
             "setups": summaries,
+            "challenge_comparison": comparisons,
         },
     )
     return destination

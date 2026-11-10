@@ -56,6 +56,54 @@ def test_real_owner_good_and_bad_cases_fail_for_the_intended_reason(experiment):
     assert main(["replay", str(output)]) == 0
 
 
+def test_frozen_pack_reuses_identical_challenge_and_dice_in_a_later_batch(experiment, tmp_path):
+    from sylviabench.packs import verify
+
+    output, rows = experiment
+    pack = output / "fixtures"
+    descriptor = verify(pack, source_identity())
+    assert not (pack / "preparation").exists()
+    assert any(path.startswith("participants/") for path in descriptor["files"])
+    healing = next(s for s in scenarios() if s.id == "T1")
+    later = run(tmp_path / "later", [setups()[0]], [healing], fixtures=pack)[0]
+    original = next(r for r in rows if r.scenario_id == "T1" and r.setup.id == "good")
+    assert later.outcome == "pass", later.model_dump()
+    assert later.fixture_sha256 == original.fixture_sha256
+    assert later.observations["challenge"] == original.observations["challenge"]
+    assert later.observations["randomness"] == original.observations["randomness"]
+    assert later.observations["randomness"]["trace"], "Pairing must reach the real mechanic"
+    assert later.observations["provider"]["requests"]
+    bad = next(r for r in rows if r.scenario_id == "T1" and r.setup.id == "bad")
+    assert bad.observations["randomness"] == original.observations["randomness"]
+    assert bad.observations["before"] == original.observations["before"]
+    assert (
+        read_json(tmp_path / "later/manifest.json")["fixture_pack_sha256"] == descriptor["sha256"]
+    )
+    with pytest.raises(ValueError, match="same Sylvia"):
+        verify(pack, {"application_sha256": "different"})
+
+
+def test_fixture_pack_rejects_changed_bytes_and_file_links(tmp_path):
+    from sylviabench.packs import inventory, verify
+
+    save = tmp_path / "save"
+    save.mkdir()
+    (save / "campaign.sqlite3").write_bytes(b"synthetic bytes")
+    descriptor = {
+        "schema_version": 1,
+        "recipe_version": 1,
+        "source": {"application_sha256": "app"},
+        "files": inventory(save),
+    }
+    write_json(tmp_path / "fixture.json", {**descriptor, "sha256": digest(descriptor)})
+    (save / "campaign.sqlite3").write_bytes(b"changed")
+    with pytest.raises(ValueError, match="file identity"):
+        verify(tmp_path, {"application_sha256": "app"})
+    (save / "config.yaml").write_text("must never ship credentials", encoding="utf-8")
+    with pytest.raises(ValueError, match="Unexpected fixture file"):
+        inventory(save)
+
+
 def test_recovery_preserves_first_failure_and_stops_after_two_retries(experiment, tmp_path):
     output, rows = experiment
     ids = {k: read_json(output / "seed.json")[k] for k in ("campaign", "session")}
@@ -91,7 +139,7 @@ def test_resume_is_offline_and_refuses_changed_source(experiment, monkeypatch):
     output, original = experiment
     from sylviabench import runner
 
-    monkeypatch.setattr(runner, "seed", lambda *_: pytest.fail("Completed runs must not rebuild"))
+    monkeypatch.setattr(runner, "freeze", lambda *_: pytest.fail("Completed runs must not rebuild"))
     resumed = run(
         output, [s for s in setups() if s.id in {"good", "bad"}], scenarios(), resume=True
     )

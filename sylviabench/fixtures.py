@@ -9,6 +9,7 @@ import shutil
 import sqlite3
 import uuid
 from collections.abc import Callable
+from contextlib import closing
 from pathlib import Path
 from typing import Any
 
@@ -301,11 +302,12 @@ def copy_save(source: Path, target: Path) -> None:
     if target.exists():
         raise ValueError("Refusing to replace an existing scenario save")
     target.parent.mkdir(parents=True, exist_ok=True)
-    with sqlite3.connect(source) as saved, sqlite3.connect(target) as copied:
+    with closing(sqlite3.connect(source)) as saved, closing(sqlite3.connect(target)) as copied:
         saved.backup(copied)
-    campaigns = source.parent / "campaigns"
-    if campaigns.exists():
-        shutil.copytree(campaigns, target.parent / "campaigns")
+    for name in ("campaigns", "participants"):
+        authored = source.parent / name
+        if authored.exists():
+            shutil.copytree(authored, target.parent / name)
 
 
 def seed(directory: Path) -> tuple[Path, dict[str, str]]:
