@@ -1894,6 +1894,7 @@ def _dispatch_selected(
     reload_provider_resolver: Callable[[], None] | None = None,
     gm_system_prompt: str | None = None,
 ) -> Any:
+    from .commands import providers
     from .commands import packages
     from .commands import actions
     from .commands import builder
@@ -1975,144 +1976,35 @@ def _dispatch_selected(
     if method == "campaign_party_options":
         return campaigns.handle_campaign_party_options(ctx, params)
     if method == "model_choices":
-        return tuple(ctx.model_choices())
+        return providers.handle_model_choices(ctx, params)
     if method == "provider_settings":
-        return provider_settings(ctx.storage_root / "config.yaml")
+        return providers.handle_provider_settings(ctx, params)
     if method == "open_provider_setup":
-        return open_provider_setup(params.get("preset_id"))
+        return providers.handle_open_provider_setup(ctx, params)
     if method == "chatgpt_connection":
-        from sylvia_gm.config.chatgpt_settings import chatgpt_settings_action
-        from sylvia_gm.provider._codex_rpc import CodexConnectionError
-
-        if params.get("action") == "add_model" and ctx.reload_provider_resolver is None:
-            raise OwnerProtocolError("Provider settings reload is unavailable")
-        try:
-            result = chatgpt_settings_action(
-                ctx.storage_root, params.get("action"), params.get("model"),
-            )
-        except CodexConnectionError as error:
-            raise OwnerProtocolError(str(error)) from None
-        if params.get("action") == "add_model" and ctx.reload_provider_resolver is not None:
-            ctx.reload_provider_resolver()
-        return result
+        return providers.handle_chatgpt_connection(ctx, params)
     if method == "admin_full_audit_status":
-        return ctx.application_owner.admin_full_audit_status()
+        return providers.handle_admin_full_audit_status(ctx, params)
     if method == "admin_full_audit_record":
-        index = _required_nonnegative_int(params, "index")
-        record = ctx.application_owner.admin_full_audit_record(index)
-        encoded = json.dumps(
-            _json_value(record),
-            ensure_ascii=True,
-            separators=(",", ":"),
-            allow_nan=False,
-        ).encode("utf-8")
-        if len(encoded) > _MAX_ADMIN_AUDIT_VIEW_BYTES:
-            return {
-                "index": index,
-                "trace": None,
-                "unavailable_reason": "record_too_large_for_live_view",
-                "bytes": len(encoded),
-            }
-        return record
+        return providers.handle_admin_full_audit_record(ctx, params)
     if method == "export_admin_full_audit":
-        selected = Path(_required_text(params, "destination_path"))
-        if not selected.is_absolute() or not selected.name:
-            raise OwnerProtocolError("Audit export destination must be an absolute file path")
-        try:
-            parent = selected.parent.resolve(strict=True)
-            destination = parent / selected.name
-            regular_file = not destination.exists() or destination.is_file()
-        except OSError as error:
-            raise CommandRejected(audit_export_save_error(error)) from error
-        if not regular_file:
-            raise OwnerProtocolError(
-                "Audit export destination is not a regular file. "
-                "Choose a file in a writable folder."
-            )
-        return ctx.application_owner.export_admin_full_audit(destination)
+        return providers.handle_export_admin_full_audit(ctx, params)
     if method == "set_admin_full_audit":
-        return ctx.application_owner.set_admin_full_audit(_optional_bool(params, "enabled"))
+        return providers.handle_set_admin_full_audit(ctx, params)
     if method == "detect_local_providers":
-        return detect_local_providers(ctx.storage_root / "config.yaml")
+        return providers.handle_detect_local_providers(ctx, params)
     if method == "discover_provider_models":
-        return discover_provider_models(
-            ctx.storage_root / "config.yaml",
-            provider_id=params.get("provider_id"),
-            preset_id=params.get("preset_id"),
-            base_url=params.get("base_url"),
-            credential=params.get("credential"),
-            headers=params.get("headers"),
-            query=params.get("query"),
-            offset=params.get("offset", 0),
-            limit=params.get("limit", 100),
-        )
+        return providers.handle_discover_provider_models(ctx, params)
     if method == "validate_provider_model":
-        return validate_provider_model(
-            ctx.storage_root / "config.yaml",
-            provider_id=params.get("provider_id"),
-            preset_id=params.get("preset_id"),
-            base_url=params.get("base_url"),
-            credential=params.get("credential"),
-            model_id=params.get("model_id"),
-            transport=params.get("transport"),
-            headers=params.get("headers"),
-        )
+        return providers.handle_validate_provider_model(ctx, params)
     if method == "save_provider_settings":
-        if ctx.reload_provider_resolver is None:
-            raise OwnerProtocolError("Provider settings reload is unavailable")
-        saved_provider = save_provider_settings(
-            ctx.storage_root / "config.yaml",
-            provider_id=params.get("provider_id"),
-            preset_id=params.get("preset_id"),
-            display_name=params.get("display_name"),
-            base_url=params.get("base_url"),
-            credential=params.get("credential"),
-            model_id=params.get("model_id"),
-            model_name=params.get("model_name"),
-            context_window=params.get("context_window"),
-            max_output_tokens=params.get("max_output_tokens"),
-            declared_max_output_tokens=params.get("declared_max_output_tokens"),
-            builder_output_tokens=params.get("builder_output_tokens"),
-            declared_context_window=params.get("declared_context_window"),
-            declared_context_source=params.get("declared_context_source"),
-            runtime_context_window=params.get("runtime_context_window"),
-            runtime_context_source=params.get("runtime_context_source"),
-            configured_context_window=params.get("configured_context_window"),
-            context_observed_at=params.get("context_observed_at"),
-            declared_context_observed_at=params.get("declared_context_observed_at"),
-            runtime_context_observed_at=params.get("runtime_context_observed_at"),
-            configured_context_observed_at=params.get("configured_context_observed_at"),
-            transport=params.get("transport"),
-            headers=params.get("headers"),
-            supports_streaming=params.get("supports_streaming"),
-            supports_tools=params.get("supports_tools"),
-        )
-        ctx.reload_provider_resolver()
-        return saved_provider
+        return providers.handle_save_provider_settings(ctx, params)
     if method == "remove_provider_settings":
-        if ctx.reload_provider_resolver is None:
-            raise OwnerProtocolError("Provider settings reload is unavailable")
-        remove_provider_settings(ctx.storage_root / "config.yaml", params.get("provider_id"))
-        ctx.reload_provider_resolver()
-        return {"status": "removed"}
+        return providers.handle_remove_provider_settings(ctx, params)
     if method == "set_default_model":
-        return set_default_model_settings(
-            ctx.storage_root / "config.yaml",
-            provider_id=params.get("provider_id"),
-            model_id=params.get("model_id"),
-        )
+        return providers.handle_set_default_model(ctx, params)
     if method == "switch_session_model":
-        session_id = _required_text(params, "session_id")
-        return _switch_session_model(
-            application_owner=ctx.application_owner,
-            session_loop=ctx.session_loop,
-            config_path=ctx.storage_root / "config.yaml",
-            session_id=session_id,
-            provider_id=params.get("provider_id"),
-            model_id=params.get("model_id"),
-            mode=_optional_text(params, "mode") or "current",
-            choices=ctx.model_choices(),
-        )
+        return providers.handle_switch_session_model(ctx, params)
     if method == "switch_session_reasoning":
         if "effort" not in params:
             raise OwnerProtocolError("Reasoning selection requires effort")
@@ -2124,10 +2016,7 @@ def _dispatch_selected(
             choices=ctx.model_choices(),
         )
     if method == "inspect_provider_thinking":
-        return {"text": ctx.application_owner.inspect_provider_thinking(
-            _required_text(params, "session_id"), _required_text(params, "attempt_id"),
-            _required_text(params, "response_id"),
-        )}
+        return providers.handle_inspect_provider_thinking(ctx, params)
     if method in {"session_context", "session_history_page"}:
         session_id = _required_text(params, "session_id")
         activity = ctx.session_loop.builder_activity(session_id)
@@ -3143,11 +3032,7 @@ def _dispatch_selected(
             _required_text(params, "attempt_id"),
         )
     if method == "interrupt_provider_stream":
-        ctx.bus.interrupt_provider_stream(
-            _required_text(params, "campaign_id"),
-            _required_text(params, "attempt_id"),
-        )
-        return {"status": "interrupted"}
+        return providers.handle_interrupt_provider_stream(ctx, params)
     if method == "retryable_interruption":
         return campaigns.handle_retryable_interruption(ctx, params)
     if method == "manual_retry_session":
@@ -3260,13 +3145,7 @@ def _dispatch_selected(
             )
         }
     if method == "disconnect_provider_stream":
-        return {
-            "disconnect_deadline": ctx.bus.disconnect_provider_stream(
-                _required_text(params, "campaign_id"),
-                _required_text(params, "attempt_id"),
-                expected_generation=_optional_nonnegative_int(params, "attachment_generation"),
-            )
-        }
+        return providers.handle_disconnect_provider_stream(ctx, params)
     if method == "stream_heartbeat":
         attachment_deadline, attachment_generation = ctx.bus.heartbeat_stream(
             _required_text(params, "campaign_id"),
@@ -3278,15 +3157,7 @@ def _dispatch_selected(
             "attachment_generation": attachment_generation,
         }
     if method == "provider_stream_heartbeat":
-        attachment_deadline, attachment_generation = ctx.bus.heartbeat_provider_stream(
-            _required_text(params, "campaign_id"),
-            _required_text(params, "attempt_id"),
-            expected_generation=_optional_nonnegative_int(params, "attachment_generation"),
-        )
-        return {
-            "attachment_deadline": attachment_deadline,
-            "attachment_generation": attachment_generation,
-        }
+        return providers.handle_provider_stream_heartbeat(ctx, params)
     if method == "narration_attempt_status":
         return {
             "status": ctx.bus.narration_attempt_status(
@@ -3295,19 +3166,7 @@ def _dispatch_selected(
             )
         }
     if method == "provider_stream_status":
-        session_id = _required_text(params, "campaign_id")
-        attempt_id = _required_text(params, "attempt_id")
-        activity = ctx.session_loop.builder_activity(session_id, attempt_id=attempt_id)
-        if activity is not None and activity["status"] != "active":
-            return activity
-        status = ctx.bus.provider_stream_status(session_id, attempt_id)
-        # A live admitted run can precede lease registration or outlive its release.
-        # Only saved terminal evidence can complete that run.
-        if activity is not None and status == "completed":
-            status = "active"
-        return {
-            "status": status,
-        }
+        return providers.handle_provider_stream_status(ctx, params)
     if method == "reconnect_stream":
         return ctx.bus.reconnect_stream(
             campaign_id=_required_text(params, "campaign_id"),
@@ -3317,13 +3176,7 @@ def _dispatch_selected(
             listener=lambda _channel, _token: None,
         )
     if method == "reconnect_provider_stream":
-        return {
-            "attachment_generation": ctx.bus.reconnect_provider_stream(
-                _required_text(params, "campaign_id"),
-                _required_text(params, "attempt_id"),
-                expected_generation=_optional_nonnegative_int(params, "attachment_generation"),
-            )
-        }
+        return providers.handle_reconnect_provider_stream(ctx, params)
     if method == "install_package":
         return packages.handle_install_package(ctx, params)
     if method in ("preview_character_card_file", "confirm_character_card_import"):
@@ -3359,16 +3212,7 @@ def _dispatch_selected(
     if method == "complete_campaign_construction":
         return campaigns.handle_complete_campaign_construction(ctx, params)
     if method == "model_guidance":
-        guidance: Any = ctx.bus.model_guidance(
-            campaign_id=_required_text(params, "campaign_id"),
-            model_id=_required_text(params, "model_id"),
-            override_accepted=_optional_bool(params, "override_accepted"),
-        )
-        return {
-            **_json_value(guidance),
-            "warning_required": guidance.warning_required,
-            "may_continue": guidance.may_continue,
-        }
+        return providers.handle_model_guidance(ctx, params)
     if method == "finalize_campaign_construction":
         return campaigns.handle_finalize_campaign_construction(ctx, params)
     if method == "start_dm_session":
