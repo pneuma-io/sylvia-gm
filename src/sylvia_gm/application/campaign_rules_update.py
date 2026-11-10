@@ -66,51 +66,67 @@ Report = Callable[[str, str], None]
 
 
 def _offer_bundled_update(owner: AuthorityOwner, campaign_id: str) -> None:
-    """Install one current shipped closure only when its owned Setting files are identical."""
-    from sylvia_gm.application.bundled_campaign_plans import bundled_plan_files, bundled_plans_root
+    """Offer shipped rules with the campaign's own exact Setting files, without activating."""
+    from sylvia_gm.application.bundled_packages import bundled_ruleset_update_archive
+    from sylvia_gm.application.package_materialization import materialize_package_archive
+    from sylvia_gm.builder._package_snapshots import (
+        rebind_ruleset_snapshot,
+        retained_package_drafts,
+    )
 
-    current = owner._store.current_package_lock(campaign_id).package_lock
-    primary, settings = _ownership(current)
+    current = owner._store.current_package_lock(campaign_id)
+    primary, settings = _ownership(current.package_lock)
+    if primary is None:
+        return
+    raw = bundled_ruleset_update_archive(primary)
+    if raw is None:
+        return
+    old = _manifests(owner, current.package_lock)
+    with zipfile.ZipFile(io.BytesIO(raw)) as archive:
+        records = json.loads(archive.read("manifest.json"))["packages"]
+    incoming = next(r for r in records if r["role"] == "primary")
+    if (incoming["id"], incoming["version"], incoming["content_sha256"]) == old[primary].identity:
+        return
+    candidates = owner._store.package_candidates()
+    identities = {(r["id"], r["version"], r["content_sha256"]) for r in records}
+    bundled = next(
+        (
+            c
+            for c in candidates
+            if {(e.package_id, e.version, e.sha256) for e in c.package_lock.entries} == identities
+        ),
+        None,
+    )
+    if bundled is None:
+        bundled = owner.install_package_archive(
+            io.BytesIO(raw),
+            install_id="bundled-update-" + hashlib.sha256(raw).hexdigest(),
+        )
     if not settings:
-        return  # Ordinary startup already installs the bare bundled Rulesets.
-    root = bundled_plans_root()
-    if not root.is_dir():
         return
-    old = _manifests(owner, current)
-    old_primary = next(m for m in old.values() if m.role is PackageRole.PRIMARY)
-    setting_files = {
-        identity: {f.path: f.sha256 for f in old[identity].files} for identity in settings
-    }
-    for path in bundled_plan_files(root):
-        if path.name != "setting.sylvia-gm-package":
-            continue
-        raw = path.read_bytes()
-        with zipfile.ZipFile(io.BytesIO(raw)) as archive:
-            records = json.loads(archive.read("manifest.json"))["packages"]
-        incoming = next((r for r in records if r["role"] == "primary"), None)
-        worlds = {r["id"]: r for r in records if r["content_kind"] == "campaign_setting"}
-        if (
-            incoming is None
-            or incoming["id"] != primary
-            or set(worlds) != set(settings)
-            or incoming["content_sha256"] == old_primary.content_sha256
-        ):
-            continue
-        if any(
-            {f["path"]: f["sha256"] for f in worlds[key]["files"]} != expected
-            for key, expected in setting_files.items()
-        ):
-            continue
-        identities = {(r["id"], r["version"], r["content_sha256"]) for r in records}
-        if not any(
-            {(e.package_id, e.version, e.sha256) for e in c.package_lock.entries} == identities
-            for c in owner._store.package_candidates()
-        ):
-            owner.install_package_archive(
-                io.BytesIO(raw),
-                install_id="bundled-update-" + hashlib.sha256(raw).hexdigest(),
-            )
+    install_id = (
+        "rules-update-"
+        + hashlib.sha256(
+            f"{current.closure_sha256}:{bundled.closure_sha256}".encode("ascii")
+        ).hexdigest()
+    )
+    if any(c.install_id == install_id for c in candidates):
         return
+    source = next((c for c in candidates if c.closure_sha256 == current.closure_sha256), None)
+    if source is None:
+        raise CommandRejected("The campaign's retained package source is unavailable")
+    original = retained_package_drafts(owner, source.candidate_id, include_setting=True)
+    rules = retained_package_drafts(owner, bundled.candidate_id, include_setting=False)
+    drafts = rebind_ruleset_snapshot(original, rules)
+    with materialize_package_archive(drafts) as result:
+        for identity in settings:
+            retained = old[identity]
+            replacement = next(m for m in result.manifests if m.package_id == identity)
+            if {f.path: f.sha256 for f in retained.files} != {
+                f.path: f.sha256 for f in replacement.files
+            }:
+                raise CommandRejected("The update must preserve every owned Setting file")
+        owner.install_package_archive(result.archive, install_id=install_id)
 
 
 def _ownership(lock: PackageLock) -> tuple[str | None, tuple[str, ...]]:

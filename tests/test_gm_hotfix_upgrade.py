@@ -18,8 +18,12 @@ import pytest
 import yaml
 
 from sylvia_gm.application.authority import AuthorityOwner, CampaignCreate
-from sylvia_gm.application.bundled_packages import bundled_srd_archive
+from sylvia_gm.application.bundled_packages import bundled_srd_archive, bundled_srd_version
 from sylvia_gm.application.campaign_rules_update import _tool_input_change
+from sylvia_gm.application.package_materialization import (
+    NormalizedPackageDraft,
+    materialize_package_archive,
+)
 from sylvia_gm.application.package_runtime import PACKAGE_RUNTIME_PATH
 from sylvia_gm.domain.authority import StateValue, WriterRole, owned_payload
 from sylvia_gm.domain.errors import CommandRejected
@@ -176,10 +180,104 @@ def test_saved_pending_queue_invalidates_review_without_rewriting_it(prepared):
     assert owner.preview_campaign_rules_update("running", new.candidate_id)["compatible"]
 
 
+def test_upgrade_keeps_custom_setting_files_and_records(tmp_path):
+    fixture = Path(__file__).parent / "fixtures"
+    origin = "alpha4" if bundled_srd_version() == "0.3.16" else "integration"
+    with zipfile.ZipFile(fixture / "alpha4-lite.sylvia-gm-package") as published:
+        world_record = next(
+            r
+            for r in json.loads(published.read("manifest.json"))["packages"]
+            if r["content_kind"] == "campaign_setting"
+        )
+        world_files = {
+            f["path"]: published.read(f"packages/{world_record['id']}/{f['path']}")
+            for f in world_record["files"]
+        }
+    with zipfile.ZipFile(fixture / f"{origin}-lite.sylvia-gm-package") as inherited:
+        records = [
+            r
+            for r in json.loads(inherited.read("manifest.json"))["packages"]
+            if r["content_kind"] != "campaign_setting"
+        ]
+        drafts = [
+            NormalizedPackageDraft(
+                r,
+                {f["path"]: inherited.read(f"packages/{r['id']}/{f['path']}") for f in r["files"]},
+                4,
+            )
+            for r in records
+        ]
+    world_record = deepcopy(world_record)
+    world_record.pop("content_sha256")
+    world_record.pop("files")
+    world_record.update(version="1.0.0-hotfix-fixture")
+    world_record["dependencies"] = [
+        {k: v for k, v in d.items() if k != "content_sha256"} for d in world_record["dependencies"]
+    ]
+    world_files["campaigns/the-rift-awakening/act-1.md"] += (
+        b"\nA green bell records a synthetic private garden clue.\n"
+    )
+    drafts.append(NormalizedPackageDraft(world_record, world_files, 4))
+    database = tmp_path / "custom-world.sqlite3"
+    with materialize_package_archive(tuple(drafts)) as archive:
+        create_cleric_save(database, archive.archive.read())
+    with AuthorityOwner.open(database, "hotfix-owner") as owner:
+        owner.complete_turn("casting", "casting-turn")
+        before = owner.snapshot("casting")
+        pin = owner.current_package_lock("casting")
+        options = owner.campaign_rules_update_options("casting")
+        assert options["candidates"], options
+        count = len(owner.package_candidates())
+        assert owner.campaign_rules_update_options("casting") == options
+        assert len(owner.package_candidates()) == count
+        candidate = options["candidates"][0]["candidate_id"]
+        preview = owner.preview_campaign_rules_update("casting", candidate)
+        assert preview["compatible"], preview["conflicts"]
+        assert owner.current_package_lock("casting") == pin
+        assert owner.snapshot("casting") == before
+        adopt(owner, preview)
+        after = owner.snapshot("casting")
+        assert after.state == before.state and after.participants == before.participants
+        assert after.continuity == before.continuity
+        world_pin = next(
+            p for p in after.package_lock.entries if p.package_id == world_record["id"]
+        )
+        world = owner._store.exact_package_manifest(
+            *(world_pin.package_id, world_pin.version, world_pin.sha256)
+        )
+        assert world.version == world_record["version"]
+        assert world.metadata == world_record["metadata"]
+        for descriptor in world.files:
+            assert (
+                owner._store.package_file_bytes(
+                    *world.identity, descriptor.path, maximum_bytes=descriptor.byte_count
+                )
+                == world_files[descriptor.path]
+            )
+        assert owner.package_lock_lineage("casting")[0] == pin
+    with AuthorityOwner.open(database, "hotfix-owner") as reopened:
+        assert reopened.snapshot("casting") == after
+
+
 @pytest.mark.parametrize("origin", ["alpha4", "integration"])
 def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state(tmp_path, origin):
     database = tmp_path / "alpha4.sqlite3"
     archive = (Path(__file__).parent / f"fixtures/{origin}-lite.sylvia-gm-package").read_bytes()
+    current_archive = bundled_srd_archive()
+    with zipfile.ZipFile(io.BytesIO(current_archive)) as bundle:
+        current_version = next(
+            r["version"]
+            for r in json.loads(bundle.read("manifest.json"))["packages"]
+            if r["role"] == "primary"
+        )
+    assert current_version in {"0.3.16", "0.3.17"}
+    if current_version == "0.3.16" and origin == "integration":
+        # Alpha4's schema refuses newer main-only panel metadata before it can be installed.
+        with pytest.raises(CommandRejected, match="manifest fields are invalid"):
+            create_cleric_save(database, archive)
+        with AuthorityOwner.open(database, "hotfix-owner") as owner:
+            assert not owner.campaign_index()
+        return
     create_cleric_save(database, archive)
     with AuthorityOwner.open(database, "hotfix-owner", disconnect_grace_seconds=1.0) as owner:
         owner.append_agent_message(
@@ -220,14 +318,6 @@ def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state
             else "dd42e6239820558385c316b7e5aacefa2e9b26b457175815570b1faeec2c04eb"
         )
         assert primary.sha256 == expected
-        current_archive = bundled_srd_archive()
-        with zipfile.ZipFile(io.BytesIO(current_archive)) as bundle:
-            current_version = next(
-                r["version"]
-                for r in json.loads(bundle.read("manifest.json"))["packages"]
-                if r["role"] == "primary"
-            )
-        assert current_version in {"0.3.16", "0.3.17"}
         if origin == "integration":
             # Packaged startup installs bare Rulesets; Setting descendants are offered lazily.
             owner.install_package_archive(io.BytesIO(current_archive), install_id="startup-current")
