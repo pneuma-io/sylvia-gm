@@ -116,6 +116,7 @@ def _package_payload(root: Path) -> dict[str, bytes]:
     """Read one checked-in package with checkout-independent text bytes."""
 
     source_names = (
+        "assets",
         "campaigns",
         "characters",
         "companions",
@@ -299,6 +300,16 @@ def _rift_drafts() -> tuple[
         }
     )
     setting_payloads["content/content-declarations.json"] = canonical_json_bytes(declarations)
+    from sylvia_gm.application.image_hooks import _declare_images
+
+    _declare_images(
+        setting,
+        setting_payloads,
+        character_assets=frozenset(
+            path for path in setting_payloads
+            if path.startswith("assets/characters/") or path == "provenance/character-art.json"
+        ),
+    )
     setting = NormalizedPackageDraft(setting.record, setting_payloads, 4)
     return ruleset, reference, setting
 

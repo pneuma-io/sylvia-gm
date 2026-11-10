@@ -1,0 +1,154 @@
+{
+  "format": 1,
+  "tool_mode": "built-in GPT Images",
+  "prepared_at": "2026-11-10",
+  "characters": [
+    {
+      "id": "srd-starter-barbarian",
+      "name": "Mara Flint",
+      "sources": [
+        "src/sylvia_gm/campaign/srd-starters.json#barbarian"
+      ],
+      "visuals": {
+        "appearance": "Adult Human in their early thirties, sturdy athletic build, warm brown skin, dark brown eyes, short practical dark braids with simple metal beads, a thin healed diagonal cheek scar and a warm, blunt expression. Worn open-collar shirt with rolled sleeves, plain trousers, leather belt and boots, cloth wrist wraps and a rust sash; unarmored, no shield. Carries a greataxe.",
+        "full_body": {
+          "path": "assets/characters/4a5ed67d4a13562c509192b5a53fbdb097bd34f31020e148dec0a5bf230b4f6f.png",
+          "sha256": "4a5ed67d4a13562c509192b5a53fbdb097bd34f31020e148dec0a5bf230b4f6f"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/40e1f069b2cda6e046c33ef719f83bea028ccbd2e4d099bbe3ec5471d2496d41.png",
+          "sha256": "40e1f069b2cda6e046c33ef719f83bea028ccbd2e4d099bbe3ec5471d2496d41"
+        },
+        "portrait": {
+          "path": "assets/characters/3d88dde7ab69cde750cdebf3df2d0ea55b84eb5e4ab1b453f4147f40f8b339ac.png",
+          "sha256": "3d88dde7ab69cde750cdebf3df2d0ea55b84eb5e4ab1b453f4147f40f8b339ac"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1830033
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2320490
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2314535
+        }
+      },
+      "prompt_set": {
+        "full_body": "Polished naturalistic digital RPG character illustration, plain light neutral background, soft natural light and subtle grounding shadow, clear silhouette, no text, labels, borders, UI, scenery, faction insignia or magical effects. Adult Human starters use they/them pronouns. These editable visual defaults assign no home, allegiance or campaign history. One PNG, portrait orientation 1024x1536. Complete figure from hair to boot soles, comfortable margins, relaxed near-front three-quarter stance, no foreshortening. Match the character's actual starting armor and principal equipment. Other characters are style references only; preserve this character's individual identity. Subject: Adult Human in their early thirties, sturdy athletic build, warm brown skin, dark brown eyes, short practical dark braids with simple metal beads, a thin healed diagonal cheek scar and a warm, blunt expression. Worn open-collar shirt with rolled sleeves, plain trousers, leather belt and boots, cloth wrist wraps and a rust sash; unarmored, no shield. Carries a greataxe.",
+        "reference_sheet": "Polished naturalistic digital RPG character illustration, plain light neutral background, soft natural light and subtle grounding shadow, clear silhouette, no text, labels, borders, UI, scenery, faction insignia or magical effects. Adult Human starters use they/them pronouns. These editable visual defaults assign no home, allegiance or campaign history. One landscape PNG, 1536x1024. The canonical full-body image is the authoritative identity, proportions, colors, outfit and equipment reference. Front, exact side profile and back, all complete figures at common scale with margins, plus one large frontal facial detail. One consistent physical outfit and gear; no captions or labels. Subject: Adult Human in their early thirties, sturdy athletic build, warm brown skin, dark brown eyes, short practical dark braids with simple metal beads, a thin healed diagonal cheek scar and a warm, blunt expression. Worn open-collar shirt with rolled sleeves, plain trousers, leather belt and boots, cloth wrist wraps and a rust sash; unarmored, no shield. Carries a greataxe.",
+        "portrait": "Polished naturalistic digital RPG character illustration, plain light neutral background, soft natural light and subtle grounding shadow, clear silhouette, no text, labels, borders, UI, scenery, faction insignia or magical effects. Adult Human starters use they/them pronouns. These editable visual defaults assign no home, allegiance or campaign history. One square PNG, 1024x1024. Use the canonical full-body and multiview sheet as identity references. Head and upper shoulders, directly forward, eyes level toward viewer, centered face, eye line 35 percent down, consistent face scale and comfortable space above all hair and beside the head for a circular crop. Preserve face, age, hair, skin and outfit; no redesign or equipment obscuring the face. Subject: Adult Human in their early thirties, sturdy athletic build, warm brown skin, dark brown eyes, short practical dark braids with simple metal beads, a thin healed diagonal cheek scar and a warm, blunt expression. Worn open-collar shirt with rolled sleeves, plain trousers, leather belt and boots, cloth wrist wraps and a rust sash; unarmored, no shield. Carries a greataxe."
+      }
+    },
+    {
+      "id": "srd-starter-bard",
+      "name": "Neri Vale",
+      "sources": [
+        "src/sylvia_gm/campaign/srd-starters.json#bard"
+      ],
+      "visuals": {
+        "appearance": "Adult Human in their late twenties, slender build, fair freckled skin, gray-green eyes and chin-length tousled auburn hair; curious, playful expression. Brown leather armor over an ivory rolled-sleeve shirt, rust scarf, plain trousers and boots. Carries a lute and a sheathed dagger; no shield.",
+        "full_body": {
+          "path": "assets/characters/39512f61f70403b4f3c46988e5c8cb42450326b511fcbfc25a7c1f2a268bfc54.png",
+          "sha256": "39512f61f70403b4f3c46988e5c8cb42450326b511fcbfc25a7c1f2a268bfc54"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/4e0647607d6f3b23188ca6ec25886da3857b6b332fcdb182472c31ad1ece00ea.png",
+          "sha256": "4e0647607d6f3b23188ca6ec25886da3857b6b332fcdb182472c31ad1ece00ea"
+        },
+        "portrait": {
+          "path": "assets/characters/740fae595bcb116204af1b16ee1454bc39e327ebc8ddfb18f00b639e8d1b322a.png",
+          "sha256": "740fae595bcb116204af1b16ee1454bc39e327ebc8ddfb18f00b639e8d1b322a"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1973058
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2569371
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2598498
+        }
+      },
+      "prompt_set": {
+        "full_body": "Polished naturalistic digital RPG character illustration, plain light neutral background, soft natural light and subtle grounding shadow, clear silhouette, no text, labels, borders, UI, scenery, faction insignia or magical effects. Adult Human starters use they/them pronouns. These editable visual defaults assign no home, allegiance or campaign history. One PNG, portrait orientation 1024x1536. Complete figure from hair to boot soles, comfortable margins, relaxed near-front three-quarter stance, no foreshortening. Match the character's actual starting armor and principal equipment. Other characters are style references only; preserve this character's individual identity. Subject: Adult Human in their late twenties, slender build, fair freckled skin, gray-green eyes and chin-length tousled auburn hair; curious, playful expression. Brown leather armor over an ivory rolled-sleeve shirt, rust scarf, plain trousers and boots. Carries a lute and a sheathed dagger; no shield.",
+        "reference_sheet": "Polished naturalistic digital RPG character illustration, plain light neutral background, soft natural light and subtle grounding shadow, clear silhouette, no text, labels, borders, UI, scenery, faction insignia or magical effects. Adult Human starters use they/them pronouns. These editable visual defaults assign no home, allegiance or campaign history. One landscape PNG, 1536x1024. The canonical full-body image is the authoritative identity, proportions, colors, outfit and equipment reference. Front, exact side profile and back, all complete figures at common scale with margins, plus one large frontal facial detail. One consistent physical outfit and gear; no captions or labels. Subject: Adult Human in their late twenties, slender build, fair freckled skin, gray-green eyes and chin-length tousled auburn hair; curious, playful expression. Brown leather armor over an ivory rolled-sleeve shirt, rust scarf, plain trousers and boots. Carries a lute and a sheathed dagger; no shield.",
+        "portrait": "Polished naturalistic digital RPG character illustration, plain light neutral background, soft natural light and subtle grounding shadow, clear silhouette, no text, labels, borders, UI, scenery, faction insignia or magical effects. Adult Human starters use they/them pronouns. These editable visual defaults assign no home, allegiance or campaign history. One square PNG, 1024x1024. Use the canonical full-body and multiview sheet as identity references. Head and upper shoulders, directly forward, eyes level toward viewer, centered face, eye line 35 percent down, consistent face scale and comfortable space above all hair and beside the head for a circular crop. Preserve face, age, hair, skin and outfit; no redesign or equipment obscuring the face. Subject: Adult Human in their late twenties, slender build, fair freckled skin, gray-green eyes and chin-length tousled auburn hair; curious, playful expression. Brown leather armor over an ivory rolled-sleeve shirt, rust scarf, plain trousers and boots. Carries a lute and a sheathed dagger; no shield."
+      }
+    },
+    {
+      "id": "srd-starter-cleric",
+      "name": "Oren Reed",
+      "sources": [
+        "src/sylvia_gm/campaign/srd-starters.json#cleric"
+      ],
+      "visuals": {
+        "appearance": "Adult Human in their mid fifties, broad steady build, medium olive-brown skin, dark eyes, short curly salt-and-pepper hair and a short salt-and-pepper beard; patient, practical expression. Chain shirt with plain tunic, earth-tone cloak and scarf layers, trousers, belt and boots, and a plain geometric pendant without deity or faction insignia. Lowered mace in their right hand, round wooden shield on their left arm.",
+        "full_body": {
+          "path": "assets/characters/df35ffe755907da99519d1297beb3848d952fcfc42ad6930328ebe5053ba6633.png",
+          "sha256": "df35ffe755907da99519d1297beb3848d952fcfc42ad6930328ebe5053ba6633"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/f2f736622cc7e01554dfc5004666fe3c94e8def39f6d0ae037559cb07aa11698.png",
+          "sha256": "f2f736622cc7e01554dfc5004666fe3c94e8def39f6d0ae037559cb07aa11698"
+        },
+        "portrait": {
+          "path": "assets/characters/b24035d5f13d92ff015da5af1596898cc671d985c6ecec76f9e0a435f2549843.png",
+          "sha256": "b24035d5f13d92ff015da5af1596898cc671d985c6ecec76f9e0a435f2549843"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2202449
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2795320
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2635306
+        }
+      },
+      "prompt_set": {
+        "full_body": "Polished naturalistic digital RPG character illustration, plain light neutral background, soft natural light and subtle grounding shadow, clear silhouette, no text, labels, borders, UI, scenery, faction insignia or magical effects. Adult Human starters use they/them pronouns. These editable visual defaults assign no home, allegiance or campaign history. One PNG, portrait orientation 1024x1536. Complete figure from hair to boot soles, comfortable margins, relaxed near-front three-quarter stance, no foreshortening. Match the character's actual starting armor and principal equipment. Other characters are style references only; preserve this character's individual identity. Subject: Adult Human in their mid fifties, broad steady build, medium olive-brown skin, dark eyes, short curly salt-and-pepper hair and a short salt-and-pepper beard; patient, practical expression. Chain shirt with plain tunic, earth-tone cloak and scarf layers, trousers, belt and boots, and a plain geometric pendant without deity or faction insignia. Lowered mace in their right hand, round wooden shield on their left arm.",
+        "reference_sheet": "Polished naturalistic digital RPG character illustration, plain light neutral background, soft natural light and subtle grounding shadow, clear silhouette, no text, labels, borders, UI, scenery, faction insignia or magical effects. Adult Human starters use they/them pronouns. These editable visual defaults assign no home, allegiance or campaign history. One landscape PNG, 1536x1024. The canonical full-body image is the authoritative identity, proportions, colors, outfit and equipment reference. Front, exact side profile and back, all complete figures at common scale with margins, plus one large frontal facial detail. One consistent physical outfit and gear; no captions or labels. Subject: Adult Human in their mid fifties, broad steady build, medium olive-brown skin, dark eyes, short curly salt-and-pepper hair and a short salt-and-pepper beard; patient, practical expression. Chain shirt with plain tunic, earth-tone cloak and scarf layers, trousers, belt and boots, and a plain geometric pendant without deity or faction insignia. Lowered mace in their right hand, round wooden shield on their left arm.",
+        "portrait": "Polished naturalistic digital RPG character illustration, plain light neutral background, soft natural light and subtle grounding shadow, clear silhouette, no text, labels, borders, UI, scenery, faction insignia or magical effects. Adult Human starters use they/them pronouns. These editable visual defaults assign no home, allegiance or campaign history. One square PNG, 1024x1024. Use the canonical full-body and multiview sheet as identity references. Head and upper shoulders, directly forward, eyes level toward viewer, centered face, eye line 35 percent down, consistent face scale and comfortable space above all hair and beside the head for a circular crop. Preserve face, age, hair, skin and outfit; no redesign or equipment obscuring the face. Subject: Adult Human in their mid fifties, broad steady build, medium olive-brown skin, dark eyes, short curly salt-and-pepper hair and a short salt-and-pepper beard; patient, practical expression. Chain shirt with plain tunic, earth-tone cloak and scarf layers, trousers, belt and boots, and a plain geometric pendant without deity or faction insignia. Lowered mace in their right hand, round wooden shield on their left arm."
+      }
+    }
+  ]
+}

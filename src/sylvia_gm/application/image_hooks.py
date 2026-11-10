@@ -228,6 +228,7 @@ class ImageCapabilities:
     media_types: frozenset[str] = frozenset({"image/png"})
     input_media_types: frozenset[str] = frozenset({"image/png"})
     synthetic: bool = False
+    flexible_output_size: bool = False
 
 
 @dataclass(frozen=True)
@@ -326,7 +327,9 @@ class ImageSession:
                 or ("edit" in cap.operations and not cap.input_media_types)
                 or any(
                     type(flag) is not bool
-                    for flag in (cap.asynchronous, cap.progress, cap.cancellation)
+                    for flag in (
+                        cap.asynchronous, cap.progress, cap.cancellation, cap.flexible_output_size
+                    )
                 )
                 or (cap.progress and not cap.asynchronous)
             ):
@@ -486,9 +489,16 @@ class ImageSession:
                 raise ImageHookError("invalid_response")
             record.job_token = update.job_token
         if update.image is not None:
-            if _dimensions(update.image, cap.maximum_bytes) != (
-                record.request.width,
-                record.request.height,
+            width, height = _dimensions(update.image, cap.maximum_bytes)
+            requested_width, requested_height = record.request.width, record.request.height
+            # Subscription images can vary in pixel size. Preserve the requested shape
+            # within one pixel of rounding and reject unusably small results.
+            if (width, height) != (requested_width, requested_height) and not (
+                cap.flexible_output_size
+                and width * 2 >= requested_width
+                and height * 2 >= requested_height
+                and abs(width * requested_height - height * requested_width)
+                <= max(requested_width, requested_height)
             ):
                 raise ImageHookError("invalid_response")
             record.image = update.image

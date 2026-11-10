@@ -37,12 +37,19 @@ package restoration. Follow-up work adds explicit partial-art records, saved-sou
 later adopted stages, library/campaign materialization and portrait-only reuse with generation Off.
 Saving a character now prepares its artwork workflow under Review/Auto; conversation-model image
 tool calls are optional. Focused source checks cover those handoffs and campaign-copy isolation.
-Prepared catalogue artwork and broader everyday journey qualification still need work. A separate
+Prepared catalogue production has begun: Mara Flint, Neri Vale and Oren Reed each have a generated
+full-body image, multi-view sheet and portrait. Their starter files retain the shared visual
+records; the installed catalogue also supplies these assets to retained Plan editions. Real-PNG
+checks cover crop, reopen and export/recovery without the catalogue. Reopening resolves retained
+images for the same campaign, character, purpose and hash before looking for original assets. The other
+starters, NPCs, companions and enemy catalogue still need artwork. Broader everyday journey
+qualification remains open. A separate
 probe found that an unfinished draft archive carrying a package-candidate identity fails recovery
 with `candidate_unavailable`, even without any image requests; its release impact remains unresolved.
 These source/scripted checks do not establish completion of the ordinary
-workflows. The owner's latest selection keeps live in-app checks pending. No real generation has
-run. Live subscription, installed-app
+workflows. The owner's latest selection keeps live in-app checks pending. The nine prepared assets
+were produced with the built-in GPT Images tool, separately from Sylvia's deferred native check.
+Live Sylvia subscription, installed-app
 and TD trailer acceptance remain unverified. Merge follows the Pneuma IO rulebook's delivery and
 cleanup sequence.
 

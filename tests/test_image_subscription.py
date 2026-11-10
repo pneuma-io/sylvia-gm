@@ -4,7 +4,7 @@ import base64
 
 import pytest
 
-from sylvia_gm.application.image_hooks import ImageHookError, ImageRequest
+from sylvia_gm.application.image_hooks import ImageHookError, ImageRequest, ImageSession
 from sylvia_gm.provider._image_subscription import SubscriptionImageAdapter
 from tests.test_image_hooks import png, uid
 
@@ -125,3 +125,39 @@ def test_signed_out_or_api_account_is_rejected_before_any_image_turn(tmp_path, a
         adapter.submit(ImageRequest(uid(1), uid(2), "gpt.subscription", "create", 1, 1, "Draw"))
     assert connection.closed
     assert [method for method, _ in connection.calls] == ["account/read"]
+
+
+@pytest.mark.parametrize(
+    ("requested", "returned", "status"),
+    [
+        ((1024, 1024), (1254, 1254), "succeeded"),
+        ((1024, 1536), (836, 1254), "succeeded"),
+        ((1536, 1024), (1254, 836), "succeeded"),
+        ((1024, 1536), (835, 1254), "succeeded"),
+        ((1024, 1536), (900, 1254), "failed"),
+        ((1024, 1024), (1254, 836), "failed"),
+        ((1024, 1024), (256, 256), "failed"),
+    ],
+)
+def test_subscription_output_keeps_requested_shape_without_requiring_exact_pixels(
+    tmp_path, requested, returned, status
+):
+    connection = Connection(tmp_path, image_generation=True)
+    events = list(connection.events)
+    output = png(*returned)
+    events[0]["params"]["item"]["result"] = base64.b64encode(output.data).decode()
+    connection.events = iter(events)
+    adapter = SubscriptionImageAdapter(
+        tmp_path, "fixture-model", connection_factory=lambda *a, **k: connection
+    )
+    session = ImageSession(uid(1), [adapter])
+    result = session.submit(
+        ImageRequest(uid(1), uid(2), "gpt.subscription", "create", *requested, "Draw")
+    )
+    assert result.status == status
+    if status == "succeeded":
+        assert session.result_for_owner(uid(2)).dimensions == returned
+    else:
+        assert result.error == "invalid_response"
+    assert [method for method, _ in connection.calls].count("turn/start") == 1
+    assert connection.closed

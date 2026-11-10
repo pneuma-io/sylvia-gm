@@ -33,6 +33,7 @@ class SubscriptionImageAdapter:
         frozenset({"create", "edit"}),
         frozenset({(1024, 1024), (1024, 1536), (1536, 1024)}),
         maximum_bytes=MAX_IMAGE_BYTES,
+        flexible_output_size=True,
     )
 
     def __init__(

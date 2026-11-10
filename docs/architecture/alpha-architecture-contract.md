@@ -1071,6 +1071,12 @@ card text metadata stripped; the unchanged original remains in the import librar
 image reuse works with generation Off. Supported PNG input includes grayscale, palette, RGB/RGBA,
 16-bit and interlaced images within the bounded artwork limits.
 
+Prepared first-party artwork is listed by exact PNG hash in the bundled character-art catalogue.
+Starter Character Files retain the same portable visual records as user-created characters.
+The owner may resolve these listed assets from the installed catalogue when a retained Plan's
+older Setting does not contain them. This does not change that Plan's package pin. Restored bytes
+become campaign-owned selections and travel in its archive; a recipient does not need the catalogue.
+
 The character artwork workflow composes the existing image requests rather than adding a second
 job store. Each persisted request records its workflow and stage. Adoption prepares the next
 missing stage; Auto may dispatch it, while Review waits for Generate. Reopen never dispatches

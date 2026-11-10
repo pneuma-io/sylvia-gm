@@ -31,6 +31,7 @@ PYTHON_JOURNEYS = {
         "tests/test_character_art_workflow.py",
         "tests/test_character_art_publication.py",
         "tests/test_character_art_handoff.py",
+        "tests/test_bundled_character_art.py",
         "tests/test_image_hooks.py",
     ],
     "launch-lite-compatibility": [

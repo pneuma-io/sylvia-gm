@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 from uuid import NAMESPACE_URL, uuid5
 
+from sylvia_gm.application.bundled_character_art import bundled_character_image
 from sylvia_gm.application.character_art_workflow import CharacterArtWorkflow
 from sylvia_gm.application.image_hooks import (
     ImageAdapter,
@@ -127,6 +128,13 @@ class ImageArt:
                     and original["result_sha256"] == reference["sha256"]
                 ):
                     continue
+                if reference["path"] not in available:
+                    image = self.store.retained_character_image(
+                        campaign_id=campaign_id, session_id=session_id,
+                        target_id=target_id, purpose=purpose, digest=reference["sha256"],
+                    )
+                    if image is not None:
+                        available[reference["path"]] = image
                 if reference["path"] not in available and asset_reader is not None:
                     image = asset_reader(reference["path"])
                     if image is not None:
@@ -146,6 +154,10 @@ class ImageArt:
                         ):
                             available[reference["path"]] = image
                             break
+                if reference["path"] not in available:
+                    image = bundled_character_image(reference["path"], reference["sha256"])
+                    if image is not None:
+                        available[reference["path"]] = image
                 if reference["path"] not in available:
                     raise ValueError(
                         "Saved character artwork is missing; reimport its complete asset package"

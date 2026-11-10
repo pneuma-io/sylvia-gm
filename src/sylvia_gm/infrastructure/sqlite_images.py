@@ -633,3 +633,21 @@ class ImageStore:
         with self._transaction() as connection:
             data = b"".join(sqlite_packages.verify_blob(connection, digest))
             return data
+
+    def retained_character_image(
+        self, *, campaign_id: str | None, session_id: str,
+        target_id: str, purpose: str, digest: str,
+    ) -> bytes | None:
+        """Reuse a character's completed local bytes even when its source package is absent."""
+        from sylvia_gm.infrastructure import sqlite_packages
+
+        where, key = ("campaign_id", campaign_id) if campaign_id else ("session_id", session_id)
+        with self._transaction() as connection:
+            retained = connection.execute(
+                f"SELECT 1 FROM image_requests WHERE {where}=? AND target_id=? AND purpose=? "
+                "AND status='succeeded' AND result_sha256=? LIMIT 1",
+                (key, target_id, purpose, digest),
+            ).fetchone()
+            if retained is None:
+                return None
+            return b"".join(sqlite_packages.verify_blob(connection, digest))
