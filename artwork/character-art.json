@@ -4036,6 +4036,186 @@
         "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Old Finch from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve that exact elderly face, age, body proportions, hair, clothing, colors and material wear. Every body view keeps him seated in the same simple wooden chair with both feet supported naturally. Do not make him stand or remove his mobility limits. Appearance: An elderly humanlike Riftborn man appearing in his late seventies, with a thin frail build, pale weathered skin, hazel eyes, sparse swept-back silver hair and a short uneven white beard. A cranky but warm expression with alert storytelling eyes. A faded rust-brown wool vest over a plain cream shirt, soft charcoal trousers and worn dark shoes. He sits comfortably in a simple sturdy wooden armchair, legs resting naturally and both age-worn hands loosely supported on his lap or the chair arms. His reduced leg mobility and shaky hands follow the authored profile; age styling, chair and other appearance details are editable visual defaults. His home world remains unknown. No bird anatomy, wings, youthful adventurer pose, forced unsupported standing, magical disability cure, invented medals or origin. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Entire bodies, footwear and applicable chair or closed ledger inside margins, consistent scale across three body views. Exactly the same one character repeated as turnaround views, no extra character. No labels, readable text, captions, borders, logos, UI, scenery or invented insignia. Change viewing angle only; keep identity and practical costume unchanged.",
         "portrait": "Use case: identity-preserve. Production square app portrait for Old Finch from Severed Lands. Input image 1 is the canonical full-body reference, image 2 is the matching multiview sheet. Preserve this exact elderly face, skin, eyes, wrinkles, age, hairstyle, expression and practical clothing. Appearance: An elderly humanlike Riftborn man appearing in his late seventies, with a thin frail build, pale weathered skin, hazel eyes, sparse swept-back silver hair and a short uneven white beard. A cranky but warm expression with alert storytelling eyes. A faded rust-brown wool vest over a plain cream shirt, soft charcoal trousers and worn dark shoes. He sits comfortably in a simple sturdy wooden armchair, legs resting naturally and both age-worn hands loosely supported on his lap or the chair arms. His reduced leg mobility and shaky hands follow the authored profile; age styling, chair and other appearance details are editable visual defaults. His home world remains unknown. No bird anatomy, wings, youthful adventurer pose, forced unsupported standing, magical disability cure, invented medals or origin. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Head and upper shoulders, near-forward gaze, centered face, eye line near 35 percent down and chin near 65 percent down, with comfortable headroom above all hair. Continuous full-bleed square background and clothing to all edges. No painted circle, cutout, vignette, border, captions, readable text, UI, scene, new costume, magical effects or extra people. Preserve identity and change framing only. One 1024x1024 PNG."
       }
+    },
+    {
+      "id": "severed-npc-gavin-thatch",
+      "name": "Gavin Thatch",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/gavin-thatch.md",
+          "sha256": "58146c3d63376d51353af2eda2cbf13bb25b29420d1f49d5175cf727397907df",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/gavin-thatch.md",
+          "sha256": "9859579fb1e831f890519d8fb584b853444a0f74f51205e86b0475393aacc929",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult humanlike Riftborn man appearing in his mid-forties, with a broad practical working build, warm copper-brown skin, brown eyes, short curly black hair and a neat short black beard with a few gray strands. A steady optimistic expression and relaxed capable posture. A plain tan linen work shirt with rolled sleeves, a faded dark olive waistcoat, dark brown patched work trousers and scuffed leather boots. A plain belt carries a closed leather tool pouch and one small ordinary hammer secured at his hip. Empty hands with light work grime. Workwear and practical bearing reflect his authored building work; age, features and other details are editable visual defaults. His home world remains unknown. No magical building powers, modern hard hat, faction insignia, noble finery, readable plans or invented origin.",
+        "full_body": {
+          "path": "assets/characters/62e0338259c7a3b6b1e81ace2363d9fe51884300bf132d92d3fc062718b13980.png",
+          "sha256": "62e0338259c7a3b6b1e81ace2363d9fe51884300bf132d92d3fc062718b13980"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/45ec7d138f159c918b8383f4d303bc108c708eb4f80df5c29d1e027679b03859.png",
+          "sha256": "45ec7d138f159c918b8383f4d303bc108c708eb4f80df5c29d1e027679b03859"
+        },
+        "portrait": {
+          "path": "assets/characters/a8ce8a8b1a3aa93d015e72876ea89ca0c8b7c55649ba55018ae6f60de6e885bb.png",
+          "sha256": "a8ce8a8b1a3aa93d015e72876ea89ca0c8b7c55649ba55018ae6f60de6e885bb"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1985597
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2307911
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2583226
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Gavin Thatch in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person standing naturally in a near-front three-quarter pose with both empty hands visible, whole hair, hands, clothing, equipment and feet comfortably inside all margins. Appearance: An adult humanlike Riftborn man appearing in his mid-forties, with a broad practical working build, warm copper-brown skin, brown eyes, short curly black hair and a neat short black beard with a few gray strands. A steady optimistic expression and relaxed capable posture. A plain tan linen work shirt with rolled sleeves, a faded dark olive waistcoat, dark brown patched work trousers and scuffed leather boots. A plain belt carries a closed leather tool pouch and one small ordinary hammer secured at his hip. Empty hands with light work grime. Workwear and practical bearing reflect his authored building work; age, features and other details are editable visual defaults. His home world remains unknown. No magical building powers, modern hard hat, faction insignia, noble finery, readable plans or invented origin. Preserve authored identity, personality and pronouns. No other people, duplicate limbs, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Gavin Thatch from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, body proportions, skin, eyes, hair, clothing, colors, attached equipment and material wear. Appearance: An adult humanlike Riftborn man appearing in his mid-forties, with a broad practical working build, warm copper-brown skin, brown eyes, short curly black hair and a neat short black beard with a few gray strands. A steady optimistic expression and relaxed capable posture. A plain tan linen work shirt with rolled sleeves, a faded dark olive waistcoat, dark brown patched work trousers and scuffed leather boots. A plain belt carries a closed leather tool pouch and one small ordinary hammer secured at his hip. Empty hands with light work grime. Workwear and practical bearing reflect his authored building work; age, features and other details are editable visual defaults. His home world remains unknown. No magical building powers, modern hard hat, faction insignia, noble finery, readable plans or invented origin. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Consistent scale across the three body views. Entire bodies, hair, hands, footwear and any secured tools or closed bag inside margins. Exactly the same one character repeated as turnaround views. No labels, readable text, captions, borders, logos, UI, scenery, extra characters, animals or invented insignia. Change viewing angle only; keep identity and practical costume unchanged.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Gavin Thatch from Severed Lands. Input image 1 is the canonical full-body reference, image 2 is the matching multiview sheet. Preserve this exact adult face, age, skin, eyes, hairstyle, expression, clothing and applicable cap. Appearance: An adult humanlike Riftborn man appearing in his mid-forties, with a broad practical working build, warm copper-brown skin, brown eyes, short curly black hair and a neat short black beard with a few gray strands. A steady optimistic expression and relaxed capable posture. A plain tan linen work shirt with rolled sleeves, a faded dark olive waistcoat, dark brown patched work trousers and scuffed leather boots. A plain belt carries a closed leather tool pouch and one small ordinary hammer secured at his hip. Empty hands with light work grime. Workwear and practical bearing reflect his authored building work; age, features and other details are editable visual defaults. His home world remains unknown. No magical building powers, modern hard hat, faction insignia, noble finery, readable plans or invented origin. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Head and upper shoulders, near-forward gaze, centered face, eye line near 35 percent down and chin near 65 percent down, comfortable headroom above all hair or cap. Continuous full-bleed square background and clothing to all edges. No painted circle, cutout, vignette, faded edge, border, captions, readable text, UI, scenery, new costume, magical effects, animals or extra people. Preserve identity and change framing only. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-orphanage-keeper",
+      "name": "Dame Maris",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/orphanage-keeper.md",
+          "sha256": "42109ef888eec2b99d7a30f99085fa04fe13f2eba61816f8e30cb0b75a55de3f",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/orphanage-keeper.md",
+          "sha256": "286e9d39df0c82a76cd5617f96250e1c9d33866b9220f516df72df54b91e6383",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult humanlike Riftborn woman appearing in her late fifties, with a sturdy medium-tall build, fair freckled skin, gray-green eyes and dark brown hair threaded with gray and pinned into a practical bun. Deep tired lines beneath alert eyes, a firm protective expression and an upright grounded stance. A faded muted plum blouse, long charcoal wool skirt, patched natural linen work apron and worn plain brown shoes. Empty hands rest loosely at her sides. Her exhausted protective bearing follows the authored profile; physical features, age styling and clothing are editable visual defaults. Her home world remains unknown. No aristocratic gown, crown, weapons, invented insignia, shown children, sentimental scene or invented origin.",
+        "full_body": {
+          "path": "assets/characters/6ebaa551287f058b16b9fe9cf46bbf3688e3d9db1ce07db007517ca63efc50e4.png",
+          "sha256": "6ebaa551287f058b16b9fe9cf46bbf3688e3d9db1ce07db007517ca63efc50e4"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/fa00077d7311238cf39db7c90e45cfe2ec5644ec5e0ca49174f72a1a228633f3.png",
+          "sha256": "fa00077d7311238cf39db7c90e45cfe2ec5644ec5e0ca49174f72a1a228633f3"
+        },
+        "portrait": {
+          "path": "assets/characters/f8f534e3fb4315f588e0dfc8a45d3d5bb4911c7938d02bd129da46d5a95a90ee.png",
+          "sha256": "f8f534e3fb4315f588e0dfc8a45d3d5bb4911c7938d02bd129da46d5a95a90ee"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2120427
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2436550
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2603861
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Dame Maris in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person standing naturally in a near-front three-quarter pose, both hands relaxed and visible, whole hair, hands, clothing, equipment and feet comfortably inside all margins. Appearance: An adult humanlike Riftborn woman appearing in her late fifties, with a sturdy medium-tall build, fair freckled skin, gray-green eyes and dark brown hair threaded with gray and pinned into a practical bun. Deep tired lines beneath alert eyes, a firm protective expression and an upright grounded stance. A faded muted plum blouse, long charcoal wool skirt, patched natural linen work apron and worn plain brown shoes. Empty hands rest loosely at her sides. Her exhausted protective bearing follows the authored profile; physical features, age styling and clothing are editable visual defaults. Her home world remains unknown. No aristocratic gown, crown, weapons, invented insignia, shown children, sentimental scene or invented origin. Preserve authored identity, personality and pronouns. No other people, duplicate limbs, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Dame Maris from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, body proportions, skin, eyes, hair, clothing, colors, attached equipment and material wear. Appearance: An adult humanlike Riftborn woman appearing in her late fifties, with a sturdy medium-tall build, fair freckled skin, gray-green eyes and dark brown hair threaded with gray and pinned into a practical bun. Deep tired lines beneath alert eyes, a firm protective expression and an upright grounded stance. A faded muted plum blouse, long charcoal wool skirt, patched natural linen work apron and worn plain brown shoes. Empty hands rest loosely at her sides. Her exhausted protective bearing follows the authored profile; physical features, age styling and clothing are editable visual defaults. Her home world remains unknown. No aristocratic gown, crown, weapons, invented insignia, shown children, sentimental scene or invented origin. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Consistent scale across the three body views. Entire bodies, hair, hands, footwear and any secured tools or closed bag inside margins. Exactly the same one character repeated as turnaround views. No labels, readable text, captions, borders, logos, UI, scenery, extra characters, animals or invented insignia. Change viewing angle only; keep identity and practical costume unchanged.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Dame Maris from Severed Lands. Input image 1 is the canonical full-body reference, image 2 is the matching multiview sheet. Preserve this exact adult face, age, skin, eyes, hairstyle, expression, clothing and applicable cap. Appearance: An adult humanlike Riftborn woman appearing in her late fifties, with a sturdy medium-tall build, fair freckled skin, gray-green eyes and dark brown hair threaded with gray and pinned into a practical bun. Deep tired lines beneath alert eyes, a firm protective expression and an upright grounded stance. A faded muted plum blouse, long charcoal wool skirt, patched natural linen work apron and worn plain brown shoes. Empty hands rest loosely at her sides. Her exhausted protective bearing follows the authored profile; physical features, age styling and clothing are editable visual defaults. Her home world remains unknown. No aristocratic gown, crown, weapons, invented insignia, shown children, sentimental scene or invented origin. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Head and upper shoulders, near-forward gaze, centered face, eye line near 35 percent down and chin near 65 percent down, comfortable headroom above all hair or cap. Continuous full-bleed square background and clothing to all edges. No painted circle, cutout, vignette, faded edge, border, captions, readable text, UI, scenery, new costume, magical effects, animals or extra people. Preserve identity and change framing only. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-ratcatcher",
+      "name": "Soot",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/ratcatcher.md",
+          "sha256": "7a689c33cafe0496cf263182d45e9b34174d19189027b1d04336ade570a134b1",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/ratcatcher.md",
+          "sha256": "d33550f734f1280b653d60634d357559cc4ebbf9ac603128aab7a615c1487fc6",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult settled Human man appearing in his late forties, with a lean wiry build, medium tan skin, dark brown eyes, short uneven dark hair under a faded charcoal cloth cap and short dark stubble. A quiet watchful sympathetic expression, slight forward working stoop and natural grime on face, hands and clothing. A patched brown leather work coat over a dull gray shirt, dark practical trousers, mud-marked sturdy leather boots and a closed plain canvas shoulder bag. Empty hands. His quiet grimy ratcatcher appearance follows the authored profile; age, features and costume details are editable visual defaults. No rat anatomy, animal ears or tail, actual rats, gruesome remains, plague sores, visible medicine, readable private messages, weapons or invented history.",
+        "full_body": {
+          "path": "assets/characters/65bf74de6367d269664a6966043e8d23d03bffc86d9113389bf8b70a4fef85ea.png",
+          "sha256": "65bf74de6367d269664a6966043e8d23d03bffc86d9113389bf8b70a4fef85ea"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/3014f79cc53a38b66930e429e7ea0c6533cd35a310e5f74d6441894cfeccafd3.png",
+          "sha256": "3014f79cc53a38b66930e429e7ea0c6533cd35a310e5f74d6441894cfeccafd3"
+        },
+        "portrait": {
+          "path": "assets/characters/4aae467b7e5824da3b34925b49aad632081bae584a40e62c0bb33a785e81f953.png",
+          "sha256": "4aae467b7e5824da3b34925b49aad632081bae584a40e62c0bb33a785e81f953"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2012793
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2491766
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2594972
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Soot in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person standing quietly in a near-front three-quarter pose with both hands visible and the bag closed, whole hair, hands, clothing, equipment and feet comfortably inside all margins. Appearance: An adult settled Human man appearing in his late forties, with a lean wiry build, medium tan skin, dark brown eyes, short uneven dark hair under a faded charcoal cloth cap and short dark stubble. A quiet watchful sympathetic expression, slight forward working stoop and natural grime on face, hands and clothing. A patched brown leather work coat over a dull gray shirt, dark practical trousers, mud-marked sturdy leather boots and a closed plain canvas shoulder bag. Empty hands. His quiet grimy ratcatcher appearance follows the authored profile; age, features and costume details are editable visual defaults. No rat anatomy, animal ears or tail, actual rats, gruesome remains, plague sores, visible medicine, readable private messages, weapons or invented history. Preserve authored identity, personality and pronouns. No other people, duplicate limbs, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Soot from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, body proportions, skin, eyes, hair, clothing, colors, attached equipment and material wear. Appearance: An adult settled Human man appearing in his late forties, with a lean wiry build, medium tan skin, dark brown eyes, short uneven dark hair under a faded charcoal cloth cap and short dark stubble. A quiet watchful sympathetic expression, slight forward working stoop and natural grime on face, hands and clothing. A patched brown leather work coat over a dull gray shirt, dark practical trousers, mud-marked sturdy leather boots and a closed plain canvas shoulder bag. Empty hands. His quiet grimy ratcatcher appearance follows the authored profile; age, features and costume details are editable visual defaults. No rat anatomy, animal ears or tail, actual rats, gruesome remains, plague sores, visible medicine, readable private messages, weapons or invented history. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Consistent scale across the three body views. Entire bodies, hair, hands, footwear and any secured tools or closed bag inside margins. Exactly the same one character repeated as turnaround views. No labels, readable text, captions, borders, logos, UI, scenery, extra characters, animals or invented insignia. Change viewing angle only; keep identity and practical costume unchanged.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Soot from Severed Lands. Input image 1 is the canonical full-body reference, image 2 is the matching multiview sheet. Preserve this exact adult face, age, skin, eyes, hairstyle, expression, clothing and applicable cap. Appearance: An adult settled Human man appearing in his late forties, with a lean wiry build, medium tan skin, dark brown eyes, short uneven dark hair under a faded charcoal cloth cap and short dark stubble. A quiet watchful sympathetic expression, slight forward working stoop and natural grime on face, hands and clothing. A patched brown leather work coat over a dull gray shirt, dark practical trousers, mud-marked sturdy leather boots and a closed plain canvas shoulder bag. Empty hands. His quiet grimy ratcatcher appearance follows the authored profile; age, features and costume details are editable visual defaults. No rat anatomy, animal ears or tail, actual rats, gruesome remains, plague sores, visible medicine, readable private messages, weapons or invented history. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Head and upper shoulders, near-forward gaze, centered face, eye line near 35 percent down and chin near 65 percent down, comfortable headroom above all hair or cap. Continuous full-bleed square background and clothing to all edges. No painted circle, cutout, vignette, faded edge, border, captions, readable text, UI, scenery, new costume, magical effects, animals or extra people. Preserve identity and change framing only. One 1024x1024 PNG."
+      }
     }
   ]
 }
