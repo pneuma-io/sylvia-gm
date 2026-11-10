@@ -81,6 +81,7 @@ from sylvia_gm.application.package_runtime import (
     package_tool_description,
     package_tool_model_behavior,
     package_tool_player_controls,
+    package_tool_permanently_refused,
 )
 from sylvia_gm.application.piece_table import (
     PieceTableError,
@@ -528,6 +529,7 @@ class CatalogTool:
     check_player_action: PlayerActionChecker | None = None
     preview_player_action: PlayerActionPreviewer | None = None
     decision_title: str = ""
+    permanently_refused: bool = False
 
     def __post_init__(self) -> None:
         validate_authority_identity(self.package_id, "Catalog package identity")
@@ -919,6 +921,10 @@ class AuthorityOwner:
                 player_controls=player_controls,
                 check_player_action=check_player_action,
                 preview_player_action=preview_player_action,
+                permanently_refused=package_tool_permanently_refused(
+                    package_id=package.package_id, declaration=declaration,
+                    runtime_bytes=runtime_bytes,
+                ),
             )
             self._tools[identity] = materialized
             return materialized
@@ -4554,6 +4560,7 @@ class AuthorityOwner:
             tool = self._package_tool(entry, declaration)
             if (
                 tool is not None
+                and not tool.permanently_refused
                 and tool.capability == declaration.capability
                 and tool.capability in entry.capabilities
             ):
@@ -4990,7 +4997,14 @@ class AuthorityOwner:
                         raise TypeError("Mechanic outcome violates state ownership")
                 except RulesetPreconditionRejected:
                     raise
-                except Exception:
+                except Exception as error:
+                    self.record_admin_full_audit({
+                        "kind": "ruleset_execution_defect",
+                        "package_id": command.package_id,
+                        "tool_name": command.tool_name,
+                        "error": str(error)[:2000],
+                        "cause": str(error.__cause__)[:2000] if error.__cause__ else None,
+                    })
                     outcome = _safe_tool_failure_outcome()
                     status = ActionStatus.FAILED
                 else:
@@ -7624,9 +7638,9 @@ class AuthorityOwner:
     def model_context_snapshot(
         self, campaign_id: str,
     ) -> tuple[CampaignDisplaySnapshot, ModelDecisionBoundary | None]:
-        """Project public state and a private game's permitted actor from one revision."""
+        """Read permitted model state, continuity and actor scope from one revision."""
         with self._operation():
-            snapshot = self._store.display_snapshot(campaign_id)
+            snapshot = self._store.display_snapshot(campaign_id, include_continuity=True)
             private_keys = self._engine_private_keys(snapshot.package_lock)
             visible = replace(snapshot, state={
                 key: value for key, value in snapshot.state.items() if key not in private_keys
@@ -8937,7 +8951,7 @@ class AuthorityOwner:
             return self._admin_full_audit_enabled
 
     def record_admin_full_audit(self, payload: object) -> None:
-        """Capture one raw provider exchange only while the explicit admin mode is enabled."""
+        """Capture a private exchange or defect only while explicit admin mode is enabled."""
 
         with self._operation(), self._narration_lock:
             if self._admin_full_audit_enabled:
@@ -9500,7 +9514,11 @@ class AuthorityOwner:
 
 def _safe_tool_failure_outcome() -> MechanicOutcome:
     return MechanicOutcome(
-        result=owned_payload({"status": "failed", "code": "tool_execution_failed"})
+        result=owned_payload({"status": "failed", "code": "tool_execution_failed",
+                              "reason": (
+                                  "The Ruleset could not complete this operation. Check its "
+                                  "declared inputs; if they are valid, report a Ruleset defect."
+                              )})
     )
 
 

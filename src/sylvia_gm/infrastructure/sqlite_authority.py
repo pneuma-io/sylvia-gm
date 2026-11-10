@@ -12261,17 +12261,20 @@ class SQLiteAuthorityStore:
         self, campaign_id: str, *, event_after: int | None = None,
         actions_after_revision: int | None = None,
         action_ids: tuple[str, ...] = (),
+        include_continuity: bool = False,
     ) -> CampaignDisplaySnapshot:
         """Read current state plus requested event/action history in one transaction."""
         return cast(CampaignDisplaySnapshot, self._read_snapshot(
             campaign_id, display_only=True, event_after=event_after,
             actions_after_revision=actions_after_revision, display_action_ids=action_ids,
+            include_continuity=include_continuity,
         ))
 
     def _read_snapshot(
         self, campaign_id: str, *, display_only: bool = False,
         event_after: int | None = None, actions_after_revision: int | None = None,
         display_action_ids: tuple[str, ...] = (),
+        include_continuity: bool = False,
     ) -> CampaignSnapshot | CampaignDisplaySnapshot:
         connection = self._connect()
         try:
@@ -12428,6 +12431,8 @@ class SQLiteAuthorityStore:
                     package_lock=self._read_lock(connection, campaign_id),
                     state=self._read_state(connection, campaign_id), participants=participants,
                     actions=actions, events=events, turns=turns,
+                    continuity=(sqlite_continuity.read_view(connection, campaign_id)
+                                if include_continuity and has_f5 else CampaignContinuityView()),
                 )
                 connection.commit()
                 return display

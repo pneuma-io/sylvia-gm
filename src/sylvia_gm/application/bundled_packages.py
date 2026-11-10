@@ -353,6 +353,15 @@ def bundled_riichi_archive() -> bytes:
     return (root / relative).read_bytes()
 
 
+def bundled_ruleset_update_archive(package_id: str) -> bytes | None:
+    """Select a shipped Ruleset source without choosing a campaign's Setting for it."""
+    if package_id == _SRD_PACKAGE_ID:
+        return bundled_srd_archive()
+    if package_id == BUNDLED_RIICHI_PACKAGES[0][0]:
+        return bundled_riichi_archive()
+    return None
+
+
 @lru_cache(maxsize=1)
 def bundled_rift_authority() -> BundledRiftAuthority:
     """Reuse immutable bundled identities while each caller validates its own saved content."""

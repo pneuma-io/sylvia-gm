@@ -715,8 +715,12 @@ def test_cross_campaign_participant_reference_is_rejected(tmp_path: Path) -> Non
     owner.close()
 
 
-def test_accepted_tool_failure_commits_only_safe_canonical_chronology(tmp_path: Path) -> None:
+@pytest.mark.parametrize("full_audit", [False, True])
+def test_accepted_tool_failure_commits_only_safe_canonical_chronology(
+    tmp_path: Path, full_audit: bool,
+) -> None:
     owner = _open_counter_owner(tmp_path / "sylvia-gm.db")
+    owner.set_admin_full_audit(full_audit)
 
     def fail_with_sensitive_diagnostics(_context: MechanicContext) -> MechanicOutcome:
         raise RuntimeError("credential=SECRET private_reasoning=never-store")
@@ -754,7 +758,15 @@ def test_accepted_tool_failure_commits_only_safe_canonical_chronology(tmp_path: 
         [(event.sequence, event.event_type.value, event.safe_payload) for event in snapshot.events],
     )
     assert receipt.status is ActionStatus.FAILED
-    assert receipt.result == {"status": "failed", "code": "tool_execution_failed"}
+    assert receipt.result["status"] == "failed"
+    assert receipt.result["code"] == "tool_execution_failed"
+    assert "declared inputs" in receipt.result["reason"]
+    traces = owner.admin_full_audit_projection()["traces"]
+    if full_audit:
+        assert traces[-1]["kind"] == "ruleset_execution_defect"
+        assert "private_reasoning=never-store" in traces[-1]["error"]
+    else:
+        assert traces == []
     assert snapshot.revision == 1
     assert snapshot.state == {"clockwork.counter": 0}
     assert snapshot.mutations == ()
@@ -861,7 +873,9 @@ def test_successful_mechanic_private_channels_become_one_safe_failed_action(
             reloaded.revision,
         )
         assert receipt.status is ActionStatus.FAILED
-        assert receipt.result == {"status": "failed", "code": "tool_execution_failed"}
+        assert receipt.result["status"] == "failed"
+        assert receipt.result["code"] == "tool_execution_failed"
+        assert "declared inputs" in receipt.result["reason"]
         assert replayed == receipt
         assert before_close == reloaded == after_replay
         assert reloaded.revision == 1
@@ -1526,7 +1540,9 @@ def test_structural_privacy_channel_families_fail_to_generic_safe_chronology(
             [(event.sequence, event.event_type.value) for event in snapshot.events],
         )
         assert receipt.status is ActionStatus.FAILED
-        assert receipt.result == {"status": "failed", "code": "tool_execution_failed"}
+        assert receipt.result["status"] == "failed"
+        assert receipt.result["code"] == "tool_execution_failed"
+        assert "declared inputs" in receipt.result["reason"]
         assert snapshot.revision == 1
         assert snapshot.mutations == ()
         assert snapshot.consequences == ()
@@ -1656,7 +1672,9 @@ def test_malformed_mechanic_result_commits_one_generic_safe_failed_action(tmp_pa
     )
     assert executed is True
     assert receipt.status is ActionStatus.FAILED
-    assert receipt.result == {"status": "failed", "code": "tool_execution_failed"}
+    assert receipt.result["status"] == "failed"
+    assert receipt.result["code"] == "tool_execution_failed"
+    assert "declared inputs" in receipt.result["reason"]
     assert snapshot.revision == 1
     assert snapshot.mutations == ()
     assert snapshot.consequences == ()
@@ -3103,10 +3121,9 @@ def test_all_malformed_mechanic_internals_collapse_to_safe_failed_chronology(
                 tuple(event.event_type for event in snapshot.events),
             )
         )
-        assert receipt.result == {
-            "status": "failed",
-            "code": "tool_execution_failed",
-        }
+        assert receipt.result["status"] == "failed"
+        assert receipt.result["code"] == "tool_execution_failed"
+        assert "declared inputs" in receipt.result["reason"]
         assert snapshot.state == {"clockwork.counter": 0}
         assert b"RAW_ITERATOR_DIAGNOSTIC" not in database.read_bytes()
 
@@ -3484,10 +3501,9 @@ def test_private_channel_families_are_order_independent_and_never_persist(
                 tuple(event.event_type for event in snapshot.events),
             )
         )
-        assert receipt.result == {
-            "status": "failed",
-            "code": "tool_execution_failed",
-        }
+        assert receipt.result["status"] == "failed"
+        assert receipt.result["code"] == "tool_execution_failed"
+        assert "declared inputs" in receipt.result["reason"]
         assert sentinel.encode() not in database.read_bytes()
 
     print("F1 ORDER-INDEPENDENT PRIVATE FAMILIES", observed)

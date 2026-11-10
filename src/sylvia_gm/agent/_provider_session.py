@@ -42,7 +42,8 @@ from sylvia_gm.agent._stateless_mcp import (
 )
 from sylvia_gm.application.authority import ActionCommand, AuthorityOwner
 from sylvia_gm.domain.authority import (
-    CampaignContinuityView,
+    CampaignDisplaySnapshot,
+    CampaignSnapshot,
     CanonicalEventType,
     EventVisibility,
     JsonValue,
@@ -718,7 +719,7 @@ def _normalize_state_references(
     schema: Mapping[str, object],
     state: Mapping[str, object],
 ) -> dict[str, object]:
-    """Fill an omitted ``*_state`` sibling only when its exact entity ID exists."""
+    """Fill exact entity/participant siblings and normalize declared spell identifiers."""
 
     normalized = dict(parameters)
     properties = schema.get("properties")
@@ -730,6 +731,32 @@ def _normalize_state_references(
         if str(key).endswith(".entities") and isinstance(entities, Mapping)
         for entity_id in entities
     }
+    caster_schema = properties.get("caster")
+    caster_state = normalized.get("caster_state")
+    if ("caster" not in normalized and isinstance(caster_schema, Mapping)
+            and caster_schema.get("x-sylvia-gm-reference") == "participant"
+            and isinstance(caster_state, str) and caster_state in entity_ids
+            and caster_state in caster_schema.get("enum", ())):
+        normalized["caster"] = caster_state
+    spell_schema = properties.get("spell")
+    spell = normalized.get("spell")
+    if isinstance(spell, str) and isinstance(spell_schema, Mapping):
+        choices = spell_schema.get("enum", ())
+        def key(value: str) -> str:
+            return re.sub(r"[\s_-]+", "_", re.sub(r"['’]", "", value.casefold())).strip("_")
+
+        value_aliases = spell_schema.get("x-sylvia-gm-value-aliases", {})
+        candidates = {choice: choice for choice in choices if isinstance(choice, str)}
+        if isinstance(value_aliases, Mapping):
+            candidates.update({
+                alias: value for alias, value in value_aliases.items()
+                if isinstance(alias, str) and isinstance(value, str) and value in choices
+            })
+        matches = sorted({
+            value for choice, value in candidates.items() if key(choice) == key(spell)
+        })
+        if len(matches) == 1:
+            normalized["spell"] = matches[0]
     for raw_name, property_schema in properties.items():
         name = str(raw_name)
         if name in normalized or not name.endswith("_state"):
@@ -767,9 +794,10 @@ def _derive_mechanics_parameters(
             continue
         source = specification.get("source")
         if not isinstance(source, str) or source not in derived:
-            raise CommandRejected(
-                f"Authority could not derive '{target}' from the selected operation",
+            raise MechanicsRejected(
+                f"Missing input '{source}' needed to derive '{target}'.",
                 code="mechanics_derivation_source_missing",
+                field_paths=(source,) if isinstance(source, str) else (),
             )
         if kind == "copy":
             derived[target] = derived[source]
@@ -1129,7 +1157,8 @@ def _validated_raw_response_blocks(
 
 
 def _unsupported_response_speaker_ids(
-    blocks: Sequence[SafePayload], snapshot: object, parameters: Mapping[str, object]
+    blocks: Sequence[SafePayload], snapshot: CampaignSnapshot | CampaignDisplaySnapshot,
+    parameters: Mapping[str, object],
 ) -> tuple[str, ...]:
     """Reject provider speaker IDs that the current disposition cannot establish."""
 
@@ -1137,7 +1166,7 @@ def _unsupported_response_speaker_ids(
         str(getattr(participant, "participant_id", ""))
         for participant in getattr(snapshot, "participants", ())
     }
-    continuity = getattr(snapshot, "continuity", CampaignContinuityView())
+    continuity = snapshot.continuity
     latest_entities: dict[str, object] = {}
     for record in sorted(
         getattr(continuity, "records", ()),
@@ -1212,7 +1241,7 @@ def _persisted_selected_party_roles(
 
 def _project_response_blocks(
     blocks: Sequence[SafePayload],
-    snapshot: object,
+    snapshot: CampaignSnapshot | CampaignDisplaySnapshot,
     *,
     party_roles: Mapping[str, str] | None = None,
 ) -> tuple[str, tuple[SafePayload, ...]]:
@@ -1240,7 +1269,7 @@ def _project_response_blocks(
         name = data.get("name")
         if not player_controlled and visible and isinstance(name, str) and name.strip():
             names[participant_id] = name
-    continuity = getattr(snapshot, "continuity", CampaignContinuityView())
+    continuity = snapshot.continuity
     latest_entities: dict[str, object] = {}
     for record in sorted(
         getattr(continuity, "records", ()),
@@ -3266,7 +3295,10 @@ class ProviderSessionAdapter:
                     local_tool_results[assembly.call_id] = {
                         "status": "rejected",
                         "code": error.code,
-                        "field_paths": [],
+                        "reason": str(error),
+                        "field_paths": (
+                            list(error.field_paths) if isinstance(error, MechanicsRejected) else []
+                        ),
                         "state_changed": False,
                         "instruction": (
                             "Correct the selected participant or operation fields and retry once."
@@ -4122,8 +4154,10 @@ class ProviderSessionAdapter:
             else None
         )
         campaign_id = provider_input.session.campaign_id
-        snapshot = self._owner.snapshot(campaign_id) if campaign_id is not None else None
-        continuity = getattr(snapshot, "continuity", CampaignContinuityView())
+        if campaign_id is None:
+            raise CommandRejected("DM campaign context requires campaign authority")
+        snapshot = self._owner.snapshot(campaign_id)
+        continuity = snapshot.continuity
         player_known_initial_facts = [
             str(fact["text"])
             for fact in sorted(
@@ -5062,7 +5096,7 @@ class ProviderSessionAdapter:
         if campaign_id is None:
             raise CommandRejected("DM campaign context requires campaign authority")
         snapshot, private_decision = self._owner.model_context_snapshot(campaign_id)
-        continuity = getattr(snapshot, "continuity", CampaignContinuityView())
+        continuity = snapshot.continuity
         plan = self._campaign_plan if isinstance(self._campaign_plan, Mapping) else {}
         structure = plan.get("structure")
         acts = (
@@ -5234,7 +5268,7 @@ class ProviderSessionAdapter:
                     if "player" in audiences:
                         player_revealed_facts.append({"secret_id": secret_id, "fact": secret_fact})
                     for identity in audiences:
-                        if identity != "player":
+                        if isinstance(identity, str) and identity != "player":
                             character_knowledge.setdefault(identity, []).append(secret_fact)
                 prepared_secrets.append(
                     {**secret, "revealed_to": audiences, "player_known": "player" in audiences}
@@ -5341,7 +5375,7 @@ class ProviderSessionAdapter:
                             "their known_by audiences define who knows them. Other entries are "
                             "explicitly revealed facts. These lists contain only selected memory."
                         ),
-                        "more_state_available_via": {
+                        "more_state_available_via": cast(dict[str, object], {
                             "tool": "search_campaign_knowledge",
                             "sources": ["campaign_state"],
                             "limit": 5,
@@ -5354,7 +5388,7 @@ class ProviderSessionAdapter:
                                 "path='current' is size-bounded and may be too large; "
                                 "prefer exact records."
                             ),
-                        },
+                        }),
                     },
                     "campaign_plan_preparation": plan_preparation,
                     "participants": self._participant_prompt_payloads(provider_input),

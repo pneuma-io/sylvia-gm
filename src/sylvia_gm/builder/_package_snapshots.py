@@ -182,26 +182,41 @@ def select_snapshot_sources(
     if selected is None:
         return drafts
     incoming = ruleset_copy(owner, selected.candidate_id)
-    if setting is None:
+    return rebind_ruleset_snapshot(drafts, incoming)
+
+
+def rebind_ruleset_snapshot(
+    drafts: tuple[NormalizedPackageDraft, ...],
+    incoming: tuple[NormalizedPackageDraft, ...],
+) -> tuple[NormalizedPackageDraft, ...]:
+    """Reuse incoming mechanics while retaining every owned Setting and its dependencies."""
+    primary = next(item for item in drafts if item.record["content_kind"] == "ruleset")
+    new_primary = next(item for item in incoming if item.record["content_kind"] == "ruleset")
+    if primary.record["id"] != new_primary.record["id"]:
+        raise CommandRejected("Incoming rules must preserve the Ruleset identity")
+    settings = [item for item in drafts if item.record["content_kind"] == "campaign_setting"]
+    if not settings:
         return incoming
     original = {item.record["id"]: item for item in drafts}
-    world = _reachable(original, [setting.record["id"]], exclude=(primary.record["id"],))
+    world = _reachable(
+        original, [item.record["id"] for item in settings], exclude=(primary.record["id"],)
+    )
     for item in incoming:
         retained = world.get(item.record["id"])
         if retained is not None and retained != item:
             raise CommandRejected("Incoming rules conflict with a Setting-owned dependency")
         world.pop(item.record["id"], None)
-    new_primary = next(item for item in incoming if item.record["content_kind"] == "ruleset")
-    world[setting.record["id"]] = replace(
-        setting,
-        record={
-            **setting.record,
-            "dependencies": [
-                {**dep, "version": new_primary.record["version"]}
-                if dep["kind"] == "ruleset_snapshot"
-                else dep
-                for dep in setting.record["dependencies"]
-            ],
-        },
-    )
+    for setting in settings:
+        world[setting.record["id"]] = replace(
+            setting,
+            record={
+                **setting.record,
+                "dependencies": [
+                    {**dep, "version": new_primary.record["version"]}
+                    if dep["kind"] == "ruleset_snapshot" and dep["id"] == primary.record["id"]
+                    else dep
+                    for dep in setting.record["dependencies"]
+                ],
+            },
+        )
     return (*incoming, *world.values())
