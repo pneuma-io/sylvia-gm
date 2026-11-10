@@ -107,6 +107,7 @@ def execute(
     source: dict[str, Any],
     retries: int,
     expected_baseline: dict[str, Any] | None = None,
+    retain_private_audit: bool = False,
 ) -> Result:
     """A run owns a fresh save; retries go through Sylvia's manual Retry command."""
     started = datetime.now(UTC).isoformat()
@@ -213,6 +214,13 @@ def execute(
                 if not succeeded:
                     completed = False
                     break
+            if retain_private_audit:
+                client.request(
+                    "export_admin_full_audit",
+                    {
+                        "destination_path": str((directory / "private-audit.json").resolve()),
+                    },
+                )
     except Exception as caught:
         completed = False
         error = caught
@@ -315,6 +323,7 @@ def run(
     resume: bool = False,
     allow_model_calls: bool = False,
     fixtures: Path | None = None,
+    retain_private_audit: bool = False,
 ) -> list[Result]:
     """Freeze configuration before any owner starts; never guess a setup or resume identity."""
     if repetitions < 1 or repetitions > 100 or retries not in range(3):
@@ -339,6 +348,7 @@ def run(
         "retries": retries,
         "randomness_policy": POLICY,
         "provider_requests_per_run": MAX_REQUESTS,
+        "retain_private_audit": retain_private_audit,
         "provider_configuration": {s.id: configuration(s) for s in selected},
         "fixture_pack_sha256": pack["sha256"] if pack else None,
     }
@@ -430,6 +440,7 @@ def run(
                 source,
                 retries,
                 expected_baseline=read_json(ids_path)["observation"],
+                retain_private_audit=retain_private_audit,
             )
             write_json(result_path, result.model_dump())
             results.append(result)

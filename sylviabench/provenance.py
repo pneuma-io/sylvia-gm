@@ -53,7 +53,14 @@ class ObservedProvider:
     def request(self, messages: Any, tools: Any, kwargs: Any) -> dict[str, Any]:
         if len(self.observer.requests) >= MAX_REQUESTS:
             raise RuntimeError("SylviaBench per-run provider request limit reached")
+        tool_schemas = {
+            tool.get("function", tool).get("name", str(index)): digest(tool)
+            for index, tool in enumerate(tools or [])
+        }
+        stage = "gm" if "update_campaign_file" in tool_schemas else "preparation"
+        first_gm = stage == "gm" and not any(r["stage"] == "gm" for r in self.observer.requests)
         row = {
+            "stage": stage,
             "messages_sha256": digest(messages),
             "tools_sha256": digest(tools),
             "message_count": len(messages),
@@ -64,6 +71,11 @@ class ObservedProvider:
                 if key in kwargs
             },
         }
+        if first_gm:
+            row["message_fingerprints"] = [
+                {"role": message.get("role"), "sha256": digest(message)} for message in messages
+            ]
+            row["tool_fingerprints"] = tool_schemas
         self.observer.requests.append(row)
         return row
 

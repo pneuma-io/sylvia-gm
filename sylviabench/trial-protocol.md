@@ -57,11 +57,16 @@ route comparison. Mythos access is separately restricted. Stop on exhausted allo
 matched runs as untested and resume when the supported allowance renews. Do not fill in another model.
 
 The current Sylvia discovery parser misses the newer Go catalog's nested `limit` metadata. This
-pilot enters each published 1,000,000-token context size through Advanced settings and records
-`provider_metadata` as its source. All four Go setups retain the existing 4,096-token output
+pilot enters each published 1,000,000-token context size through Advanced settings as an explicit
+operating cap, separately retaining the declared `provider_metadata` value. An advertised limit
+alone does not establish Sylvia's effective working limit. Runtime confirmation remains unknown.
+All four Go setups retain the existing 4,096-token output
 fallback. Their reasoning control is unrecognized by this Sylvia version and remains unset.
 Report truncation or unknown effort as a harness limitation; do not infer a model's general
 capability from it. Improving discovery or changing the output allowance needs a new setup/batch.
+
+Compare the first GM request separately from preparation/compaction calls. Qualification can retain
+a private Full Audit to inspect exact differences; raw audits do not belong in the shared report.
 
 ## Spending and privacy
 

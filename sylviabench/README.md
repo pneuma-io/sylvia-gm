@@ -54,7 +54,9 @@ only inside this developer runner and leaves the shipped game's normal dice poli
 
 Records also contain hashes of the initial observations, player messages and provider-boundary
 messages/tools, plus the selected context/output/reasoning metadata. The report compares the first
-provider input in matched runs. Differences need inspection before making an equivalent-challenge
+GM input in matched runs, separately from preparation or compaction requests. Per-message and
+per-tool fingerprints locate differences without copying their content. Differences need inspection
+before making an equivalent-challenge
 claim. Inputs after the first model response can naturally diverge. Transport-specific serialization
 and hidden service instructions are outside this equality check.
 
@@ -159,6 +161,12 @@ quota from elapsed time. The explicit opt-in is an execution switch, not evidenc
 Provider configuration stays at the explicitly selected local path and is never copied into the
 results directory. Keep that path and any benchmark result containing private material out of
 commits. The built-in fixtures contain only synthetic facts and bundled content.
+
+For a qualification run needing exact input inspection, `--retain-private-audit` exports the enabled
+owner's Full Audit into each run's `private-audit.json` before shutdown. It can contain raw model
+input, output and reasoning. Keep it private; do not commit it or include it in a shared delivery.
+Normal result records contain fingerprints and selected metadata. Remove retained raw audits after
+the relevant discrepancy has been diagnosed.
 
 ## Add a scenario
 

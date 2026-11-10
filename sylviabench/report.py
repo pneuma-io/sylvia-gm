@@ -141,6 +141,7 @@ def challenge_comparison(rows: list[Result]) -> list[dict[str, Any]]:
     comparisons = []
     for (scenario, repetition), members in sorted(groups.items()):
         baselines, requests, seeds = set(), set(), defaultdict(set)
+        observed_inputs = 0
         for row in members:
             challenge = row.observations.get("challenge")
             if challenge:
@@ -148,14 +149,16 @@ def challenge_comparison(rows: list[Result]) -> list[dict[str, Any]]:
             provider = row.observations.get("provider") or {}
             calls = provider.get("requests", [])
             if calls:
-                requests.add((calls[0]["messages_sha256"], calls[0]["tools_sha256"]))
+                gm = next((r for r in calls if r.get("stage") == "gm"), None)
+                if gm is None and not any("stage" in r for r in calls):
+                    gm = next((r for r in calls if r["tool_count"] > 0), None)
+                if gm is not None:
+                    requests.add((gm["messages_sha256"], gm["tools_sha256"]))
+                    observed_inputs += 1
             for item in row.observations.get("randomness", {}).get("trace", []):
                 key = (item["turn"], item["package"], item["tool"], item["occurrence"])
                 seeds[key].add(item["seed"])
         observed_challenges = sum(bool(r.observations.get("challenge")) for r in members)
-        observed_inputs = sum(
-            bool((r.observations.get("provider") or {}).get("requests")) for r in members
-        )
         comparisons.append(
             {
                 "scenario": scenario,
@@ -237,7 +240,8 @@ def report(directory: Path, destination: Path | None = None) -> Path:
         "scenario set. Wait includes Retry attempts. "
         "Usage and cost stay unknown unless reported.</p>",
         "<h2>Challenge comparison</h2><p>The starting save and fixed player messages are checked "
-        "separately from the first input at Sylvia's provider boundary. A different input needs "
+        "separately from the first GM input at Sylvia's provider boundary. Preparation calls are "
+        "recorded separately. A different input needs "
         "inspection before treating setups as an equivalent challenge. Transport serialization "
         "may differ. Paired dice applies to matching package/tool occurrences; models can choose "
         "different actions and consume different numbers of rolls.</p><pre>",

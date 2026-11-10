@@ -34,6 +34,7 @@ def main(argv: list[str] | None = None) -> int:
         command.add_argument("--output", required=True, type=Path)
         command.add_argument("--resume", action="store_true")
         command.add_argument("--fixtures", type=Path)
+        command.add_argument("--retain-private-audit", action="store_true")
         if name == "run":
             command.add_argument("--config", type=Path)
             command.add_argument("--setup", required=True, action="append")
@@ -83,7 +84,14 @@ def main(argv: list[str] | None = None) -> int:
             suite = scenarios()
             if args.command == "selftest":
                 selected = [s for s in setups() if s.behavior in {"good", "bad"}]
-                rows = run(args.output, selected, suite, resume=args.resume, fixtures=args.fixtures)
+                rows = run(
+                    args.output,
+                    selected,
+                    suite,
+                    resume=args.resume,
+                    fixtures=args.fixtures,
+                    retain_private_audit=args.retain_private_audit,
+                )
                 for row in rows:
                     scenario = next(s for s in suite if s.id == row.scenario_id)
                     if row.setup.behavior == "good" and row.outcome != "pass":
@@ -115,6 +123,7 @@ def main(argv: list[str] | None = None) -> int:
                     resume=args.resume,
                     allow_model_calls=args.allow_model_calls,
                     fixtures=args.fixtures,
+                    retain_private_audit=args.retain_private_audit,
                 )
                 print(f"Recorded {len(rows)} runs.")
             print(report(args.output))
