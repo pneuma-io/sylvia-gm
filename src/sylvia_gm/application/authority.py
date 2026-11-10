@@ -1026,7 +1026,11 @@ class AuthorityOwner:
                             continue
                         raise
                     if raw is not None:
-                        visuals = bundled_source_visuals(entry.package_id, portable, raw)
+                        name = record.payload.get("name")
+                        visuals = bundled_source_visuals(
+                            entry.package_id, portable, raw,
+                            subject_name=name if isinstance(name, str) else None,
+                        )
                         if visuals is not None:
                             result[identity] = visuals
                             break

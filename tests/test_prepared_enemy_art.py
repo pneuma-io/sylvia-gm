@@ -1,6 +1,8 @@
 """Known NPC/enemy identities reuse prepared source art without generation or name matching."""
 
+import hashlib
 import io
+import json
 from pathlib import Path
 
 from sylvia_gm.application.authority import AuthorityOwner, CampaignCreate
@@ -12,6 +14,59 @@ from sylvia_gm.domain.session import SessionMessageKind
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = "content/monsters/anchor-sentinel.md"
+
+
+def test_shared_source_subjects_are_exact_and_ambiguous_bindings_are_refused(tmp_path, monkeypatch):
+    from sylvia_gm.application import bundled_character_art as library
+
+    raw = b"Thread, Hook and Needle are three distinct siblings.\n"
+    digest = hashlib.sha256(raw).hexdigest()
+    reference = {"package_id": "example.world", "path": "npcs/siblings.md", "sha256": digest}
+
+    def character(identity, subject=None):
+        visual = {"appearance": identity}
+        for purpose in ("full_body", "reference_sheet", "portrait"):
+            image_sha = hashlib.sha256((identity + purpose).encode()).hexdigest()
+            visual[purpose] = {"path": f"assets/characters/{image_sha}.png", "sha256": image_sha}
+        return {
+            "id": identity,
+            "name": identity,
+            "visuals": visual,
+            "sources": [
+                {**reference, **({"subject_name": subject} if subject is not None else {})}
+            ],
+        }
+
+    catalogue = {
+        "format": 1,
+        "characters": [character("thread", "Thread"), character("hook", "Hook")],
+    }
+    path = tmp_path / "character-art.json"
+    path.write_text(json.dumps(catalogue), encoding="utf-8")
+    monkeypatch.setattr(library, "_art_root", lambda: tmp_path)
+
+    def read(subject=None, **overrides):
+        return library.bundled_source_visuals(
+            overrides.get("package", "example.world"),
+            overrides.get("path", "npcs/siblings.md"),
+            overrides.get("source", raw),
+            subject_name=subject,
+        )
+
+    assert read("Thread")["appearance"] == "thread"
+    assert read("Hook")["appearance"] == "hook"
+    assert read() is None and read("Needle") is None
+    assert read(" thread ")["appearance"] == "thread"
+    assert read("Thread", package="another.world") is None
+    assert read("Thread", path="npcs/another.md") is None
+    assert read("Thread", source=raw + b"changed") is None
+    catalogue["characters"].append(character("group"))
+    path.write_text(json.dumps(catalogue), encoding="utf-8")
+    assert read("Thread")["appearance"] == "thread"
+    assert read("Rust Watcher")["appearance"] == "group"
+    catalogue["characters"].append(character("another-thread", "THREAD"))
+    path.write_text(json.dumps(catalogue), encoding="utf-8")
+    assert read("Thread") is None
 
 
 def test_prepared_source_requires_exact_identity_and_preserves_original_text():
@@ -99,7 +154,8 @@ def test_known_enemy_gets_art_in_normal_status_and_transfers_without_catalogue(
         finally:
             art.close()
     monkeypatch.setattr(
-        "sylvia_gm.application.bundled_character_art.bundled_source_visuals", lambda *args: None
+        "sylvia_gm.application.bundled_character_art.bundled_source_visuals",
+        lambda *args, **kwargs: None,
     )
     monkeypatch.setattr(
         "sylvia_gm.application.image_art.bundled_character_image", lambda *args: None

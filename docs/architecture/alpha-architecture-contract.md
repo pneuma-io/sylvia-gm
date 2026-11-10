@@ -1105,11 +1105,16 @@ These local copy receipts use the campaign scope as their owner. Archive verific
 that explicit local-copy source only with its deterministic campaign/target/purpose/hash identity,
 succeeded status and copy-request hash; provider requests still require their recorded session.
 Known NPCs and enemies use their committed Setting source reference. Catalogue lookup requires
-the exact package ID, path and normalized source hash; display names do not bind artwork. Private
+the exact package ID, path and normalized source hash; display names alone do not bind artwork. Private
 or retired identities do not acquire prepared art. Normal image status restores these selections
 with generation Off, without requiring the user or GM to submit an image request.
 The lookup reads continuity and exact package metadata without loading mechanics state. Saved
 framing overrides a prepared default only when the selected portrait hash still matches.
+For a source containing several subjects, an optional catalogue `subject_name` selects one
+declared subject inside that same package/path/hash match. Subject comparison ignores casing and
+surrounding whitespace. A specific subject binding takes precedence over a common archetype
+binding. Conflicting matches are refused; an unknown subject uses only an explicit common
+binding, when one exists. This keeps named groups from collapsing to the first catalogue entry.
 
 The character artwork workflow composes the existing image requests rather than adding a second
 job store. Each persisted request records its workflow and stage. Adoption prepares the next

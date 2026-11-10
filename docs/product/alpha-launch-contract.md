@@ -1088,6 +1088,8 @@ named NPCs and enemy archetypes include prepared artwork and references, with co
 supported content catalogues. Reusing shipped art requires no generation request. Multiple
 mechanical editions of the same identity reuse its art unless an authored appearance change
 requires a different version. Blank character templates obtain art when their appearance is known.
+Coverage for Severed Lands includes the Setting's versions of inherited SRD creatures and forms.
+When a source describes several named characters, each retains its own references and portrait.
 
 Premade artwork ships once in Sylvia's shared app artwork library. Sharing a whole Setting or
 Plan retains its references to that library without duplicating unused premade PNGs. Custom

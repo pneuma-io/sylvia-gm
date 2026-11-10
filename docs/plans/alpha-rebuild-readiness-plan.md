@@ -71,6 +71,11 @@ and links later adopted results to the copy, without cross-chat action authority
 receipts no longer mask a provider failure. Four local checks cover pending/failed/partial art,
 Auto without submission, permission refusal and deleted-chat recovery; twenty-one direct consumers
 also pass, including actual Lite. Live and installed acceptance remain deferred.
+The following source audit found 80 NPC files and 136 authored monster files; the Lace Brothers
+file contains three distinct named siblings. Shared-source lookup now supports an explicit subject
+inside an exact package/path/hash match and refuses ambiguous bindings. The owner clarified that
+premade coverage includes the Severed Lands inherited versions of SRD creatures/forms. Those
+inherited identities, prose-only Plan casts and remaining authored subjects still need artwork.
 The subsequent local handoff check found and fixed an execution dependency on a stopped source
 chat, including admission of the next character reference stage. An active chat in the same
 campaign can now generate/adopt an existing individual request or continue the whole character

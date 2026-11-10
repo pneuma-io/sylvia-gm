@@ -83,21 +83,35 @@ def bundled_character_image(portable_path: str, sha256: str) -> bytes | None:
 
 
 def bundled_source_visuals(
-    package_id: str, portable_path: str, source: bytes,
+    package_id: str, portable_path: str, source: bytes, *, subject_name: str | None = None,
 ) -> dict[str, Any] | None:
-    """Reuse an authored identity only for its exact admitted source, never a name match."""
+    """Match exact source bytes, with an optional declared subject inside a shared source."""
     digest = hashlib.sha256(source.replace(b"\r\n", b"\n")).hexdigest()
     try:
         catalogue = json.loads((_art_root() / "character-art.json").read_bytes())
-        for character in catalogue["characters"]:
-            if any(
-                isinstance(reference, Mapping)
-                and reference.get("package_id") == package_id
-                and reference.get("path") == portable_path
-                and reference.get("sha256") == digest
-                for reference in character["sources"]
-            ):
-                return validate_character_visuals(character["visuals"])
+        specific: dict[int, object] = {}
+        common: dict[int, object] = {}
+        for index, character in enumerate(catalogue["characters"]):
+            for reference in character["sources"]:
+                if not (
+                    isinstance(reference, Mapping)
+                    and reference.get("package_id") == package_id
+                    and reference.get("path") == portable_path
+                    and reference.get("sha256") == digest
+                ):
+                    continue
+                subject = reference.get("subject_name")
+                if subject is None:
+                    common[index] = character["visuals"]
+                elif (
+                    isinstance(subject, str)
+                    and isinstance(subject_name, str)
+                    and subject_name.strip().casefold() == subject.strip().casefold()
+                ):
+                    specific[index] = character["visuals"]
+        matches = specific or common
+        if len(matches) == 1:
+            return validate_character_visuals(next(iter(matches.values())))
     except (OSError, ValueError, KeyError, TypeError):
         pass
     return None
