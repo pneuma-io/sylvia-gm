@@ -4216,6 +4216,186 @@
         "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Soot from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, body proportions, skin, eyes, hair, clothing, colors, attached equipment and material wear. Appearance: An adult settled Human man appearing in his late forties, with a lean wiry build, medium tan skin, dark brown eyes, short uneven dark hair under a faded charcoal cloth cap and short dark stubble. A quiet watchful sympathetic expression, slight forward working stoop and natural grime on face, hands and clothing. A patched brown leather work coat over a dull gray shirt, dark practical trousers, mud-marked sturdy leather boots and a closed plain canvas shoulder bag. Empty hands. His quiet grimy ratcatcher appearance follows the authored profile; age, features and costume details are editable visual defaults. No rat anatomy, animal ears or tail, actual rats, gruesome remains, plague sores, visible medicine, readable private messages, weapons or invented history. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Consistent scale across the three body views. Entire bodies, hair, hands, footwear and any secured tools or closed bag inside margins. Exactly the same one character repeated as turnaround views. No labels, readable text, captions, borders, logos, UI, scenery, extra characters, animals or invented insignia. Change viewing angle only; keep identity and practical costume unchanged.",
         "portrait": "Use case: identity-preserve. Production square app portrait for Soot from Severed Lands. Input image 1 is the canonical full-body reference, image 2 is the matching multiview sheet. Preserve this exact adult face, age, skin, eyes, hairstyle, expression, clothing and applicable cap. Appearance: An adult settled Human man appearing in his late forties, with a lean wiry build, medium tan skin, dark brown eyes, short uneven dark hair under a faded charcoal cloth cap and short dark stubble. A quiet watchful sympathetic expression, slight forward working stoop and natural grime on face, hands and clothing. A patched brown leather work coat over a dull gray shirt, dark practical trousers, mud-marked sturdy leather boots and a closed plain canvas shoulder bag. Empty hands. His quiet grimy ratcatcher appearance follows the authored profile; age, features and costume details are editable visual defaults. No rat anatomy, animal ears or tail, actual rats, gruesome remains, plague sores, visible medicine, readable private messages, weapons or invented history. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Head and upper shoulders, near-forward gaze, centered face, eye line near 35 percent down and chin near 65 percent down, comfortable headroom above all hair or cap. Continuous full-bleed square background and clothing to all edges. No painted circle, cutout, vignette, faded edge, border, captions, readable text, UI, scenery, new costume, magical effects, animals or extra people. Preserve identity and change framing only. One 1024x1024 PNG."
       }
+    },
+    {
+      "id": "severed-npc-archivist-apprentice",
+      "name": "Thorn",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/archivist-apprentice.md",
+          "sha256": "bf9e9a4d959f0221ffefc5d1557a1ea863a61086925ae982ce8ca917c9b73607",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/archivist-apprentice.md",
+          "sha256": "5327dd21167ddee5bbdcb7b6d08554394f551e6864f9ea7f9090f04d9a766cc7",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A young adult humanlike Riftborn scholar appearing in their early twenties, with a slim build, warm medium-brown skin, hazel eyes, short tousled dark brown hair and an androgynous face. An anxious attentive expression, faint tired shadows beneath the eyes and a slightly tense earnest posture. A plain undyed linen shirt beneath a faded ink-blue sleeveless scholar's vest, practical brown trousers, soft dark leather ankle boots and one small plain belt pouch. They hold a slim closed worn notes folio against their torso with both hands. Their scholarly and overworked bearing follows the authored profile; age styling, physical features and clothing are editable visual defaults. Use they/them pronouns. Their academic home world remains unnamed. No invented school crest, magical eyes, glowing Door diagrams, readable notes, heroic armor or invented answers to their research.",
+        "full_body": {
+          "path": "assets/characters/b4aadffba1f5e847f2c118594d78dbe4d12778bdba960611f5323729cac815e0.png",
+          "sha256": "b4aadffba1f5e847f2c118594d78dbe4d12778bdba960611f5323729cac815e0"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/952f399bbffd71400aaa9e632c98b2d0fc70d4e615df107988611a7c430c26d1.png",
+          "sha256": "952f399bbffd71400aaa9e632c98b2d0fc70d4e615df107988611a7c430c26d1"
+        },
+        "portrait": {
+          "path": "assets/characters/f1d8853a6e8348361574ee41e9304ed4c4dcc2a76598f0631fd43eb396b65051.png",
+          "sha256": "f1d8853a6e8348361574ee41e9304ed4c4dcc2a76598f0631fd43eb396b65051"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0,
+          "zoom": 1.35
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1765276
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2158153
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2304454
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Thorn in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person standing naturally in a near-front three-quarter pose with the closed notes folio held quietly against their torso, whole hair, hands, clothing, props and feet comfortably inside all margins. Appearance: A young adult humanlike Riftborn scholar appearing in their early twenties, with a slim build, warm medium-brown skin, hazel eyes, short tousled dark brown hair and an androgynous face. An anxious attentive expression, faint tired shadows beneath the eyes and a slightly tense earnest posture. A plain undyed linen shirt beneath a faded ink-blue sleeveless scholar's vest, practical brown trousers, soft dark leather ankle boots and one small plain belt pouch. They hold a slim closed worn notes folio against their torso with both hands. Their scholarly and overworked bearing follows the authored profile; age styling, physical features and clothing are editable visual defaults. Use they/them pronouns. Their academic home world remains unnamed. No invented school crest, magical eyes, glowing Door diagrams, readable notes, heroic armor or invented answers to their research. Preserve authored identity, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Thorn from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, body proportions, skin, eyes, hair, clothing, colors, props and material wear. Appearance: A young adult humanlike Riftborn scholar appearing in their early twenties, with a slim build, warm medium-brown skin, hazel eyes, short tousled dark brown hair and an androgynous face. An anxious attentive expression, faint tired shadows beneath the eyes and a slightly tense earnest posture. A plain undyed linen shirt beneath a faded ink-blue sleeveless scholar's vest, practical brown trousers, soft dark leather ankle boots and one small plain belt pouch. They hold a slim closed worn notes folio against their torso with both hands. Their scholarly and overworked bearing follows the authored profile; age styling, physical features and clothing are editable visual defaults. Use they/them pronouns. Their academic home world remains unnamed. No invented school crest, magical eyes, glowing Door diagrams, readable notes, heroic armor or invented answers to their research. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Consistent scale across three body views. Entire bodies, hair, hands, footwear and applicable folio or ordinary unlit candles inside margins. Exactly the same one character repeated as turnaround views. No labels, readable text, captions, borders, logos, UI, scenery, extra characters, animals or invented insignia. Change viewing angle only; keep identity and practical costume unchanged.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Thorn from Severed Lands. Input image 1 is the canonical full-body reference, image 2 is the matching multiview sheet. Preserve this exact adult face, age, skin, eyes, hairstyle, expression, clothing and applicable head kerchief. Appearance: A young adult humanlike Riftborn scholar appearing in their early twenties, with a slim build, warm medium-brown skin, hazel eyes, short tousled dark brown hair and an androgynous face. An anxious attentive expression, faint tired shadows beneath the eyes and a slightly tense earnest posture. A plain undyed linen shirt beneath a faded ink-blue sleeveless scholar's vest, practical brown trousers, soft dark leather ankle boots and one small plain belt pouch. They hold a slim closed worn notes folio against their torso with both hands. Their scholarly and overworked bearing follows the authored profile; age styling, physical features and clothing are editable visual defaults. Use they/them pronouns. Their academic home world remains unnamed. No invented school crest, magical eyes, glowing Door diagrams, readable notes, heroic armor or invented answers to their research. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Head and upper shoulders, near-forward gaze, centered face, eye line near 35 percent down and chin near 65 percent down, comfortable headroom above all hair or kerchief. Continuous full-bleed square background and clothing to all edges. No painted circle, cutout, vignette, faded edge, border, captions, readable text, UI, scenery, new costume, magical effects, burning candles, animals or extra people. Preserve identity and change framing only. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-signal-keeper",
+      "name": "Wren",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/signal-keeper.md",
+          "sha256": "9944c39675a4ba5a612d0856de2ccd6f87818950701e1f083b139d39d0a076aa",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/signal-keeper.md",
+          "sha256": "8669007813be4f218625f1a7e971bb94fff7dfff4ad01ef26e07f50650b69694",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult settled Human woman appearing in her early thirties, with a tall lean build, medium olive-brown skin, focused gray eyes and dark brown hair pulled into a practical single braid. A quiet watchful expression and steady upright posture. A weather-worn dark blue watch coat over a muted brown linen shirt, charcoal trousers tucked into practical brown boots, a short faded slate wool shoulder mantle and an ordinary belt with one closed pouch. Empty relaxed hands, with plain worn work gloves tucked at the belt. Her solitary observant bearing follows the authored profile; age, features and clothing are editable visual defaults. No bird anatomy, wings, bird companion, invented military insignia, modern optical equipment, glowing eyes or depicted secret event.",
+        "full_body": {
+          "path": "assets/characters/a6ce1df32ca17a093cee6125455a71fbd7e2e49492f6f5595ac5ecd0e49b149b.png",
+          "sha256": "a6ce1df32ca17a093cee6125455a71fbd7e2e49492f6f5595ac5ecd0e49b149b"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/85bada17674899461c3e9d28b1cda2310c4d489490173d4acf124eb761b805a1.png",
+          "sha256": "85bada17674899461c3e9d28b1cda2310c4d489490173d4acf124eb761b805a1"
+        },
+        "portrait": {
+          "path": "assets/characters/e3c6d98b464f5cddfb02dbf6415addc6c5dd85b684b0114b29d9dcba219e024a.png",
+          "sha256": "e3c6d98b464f5cddfb02dbf6415addc6c5dd85b684b0114b29d9dcba219e024a"
+        },
+        "frame": {
+          "x": 0.6,
+          "y": 0,
+          "zoom": 1.4
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1937640
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2286722
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2514108
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Wren in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person standing quietly in a near-front three-quarter pose with both empty hands visible, whole hair, hands, clothing, props and feet comfortably inside all margins. Appearance: An adult settled Human woman appearing in her early thirties, with a tall lean build, medium olive-brown skin, focused gray eyes and dark brown hair pulled into a practical single braid. A quiet watchful expression and steady upright posture. A weather-worn dark blue watch coat over a muted brown linen shirt, charcoal trousers tucked into practical brown boots, a short faded slate wool shoulder mantle and an ordinary belt with one closed pouch. Empty relaxed hands, with plain worn work gloves tucked at the belt. Her solitary observant bearing follows the authored profile; age, features and clothing are editable visual defaults. No bird anatomy, wings, bird companion, invented military insignia, modern optical equipment, glowing eyes or depicted secret event. Preserve authored identity, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Wren from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, body proportions, skin, eyes, hair, clothing, colors, props and material wear. Appearance: An adult settled Human woman appearing in her early thirties, with a tall lean build, medium olive-brown skin, focused gray eyes and dark brown hair pulled into a practical single braid. A quiet watchful expression and steady upright posture. A weather-worn dark blue watch coat over a muted brown linen shirt, charcoal trousers tucked into practical brown boots, a short faded slate wool shoulder mantle and an ordinary belt with one closed pouch. Empty relaxed hands, with plain worn work gloves tucked at the belt. Her solitary observant bearing follows the authored profile; age, features and clothing are editable visual defaults. No bird anatomy, wings, bird companion, invented military insignia, modern optical equipment, glowing eyes or depicted secret event. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Consistent scale across three body views. Entire bodies, hair, hands, footwear and applicable folio or ordinary unlit candles inside margins. Exactly the same one character repeated as turnaround views. No labels, readable text, captions, borders, logos, UI, scenery, extra characters, animals or invented insignia. Change viewing angle only; keep identity and practical costume unchanged.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Wren from Severed Lands. Input image 1 is the canonical full-body reference, image 2 is the matching multiview sheet. Preserve this exact adult face, age, skin, eyes, hairstyle, expression, clothing and applicable head kerchief. Appearance: An adult settled Human woman appearing in her early thirties, with a tall lean build, medium olive-brown skin, focused gray eyes and dark brown hair pulled into a practical single braid. A quiet watchful expression and steady upright posture. A weather-worn dark blue watch coat over a muted brown linen shirt, charcoal trousers tucked into practical brown boots, a short faded slate wool shoulder mantle and an ordinary belt with one closed pouch. Empty relaxed hands, with plain worn work gloves tucked at the belt. Her solitary observant bearing follows the authored profile; age, features and clothing are editable visual defaults. No bird anatomy, wings, bird companion, invented military insignia, modern optical equipment, glowing eyes or depicted secret event. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Head and upper shoulders, near-forward gaze, centered face, eye line near 35 percent down and chin near 65 percent down, comfortable headroom above all hair or kerchief. Continuous full-bleed square background and clothing to all edges. No painted circle, cutout, vignette, faded edge, border, captions, readable text, UI, scenery, new costume, magical effects, burning candles, animals or extra people. Preserve identity and change framing only. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-candle-maker",
+      "name": "Wick",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/candle-maker.md",
+          "sha256": "6957ee9d9fb8abc5c2129696c28dfaed32b2e072d592edca204cb99f857b2ebc",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/candle-maker.md",
+          "sha256": "da7facc5bdd3e2364e3e6e3bc17b50ce2d4a022304a4e92b54464cb7d20ca46c",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult humanlike Riftborn woman appearing in her late forties, with a medium sturdy working build, warm tan skin, muted green eyes and chestnut-brown hair threaded with gray, braided beneath a plain cream linen head kerchief. A composed quiet expression and practiced relaxed posture. A faded ochre-brown long-sleeved work dress, a patched gray linen apron with a few small pale wax flecks, and worn brown work shoes. She holds a small ordinary bundle of unlit cream beeswax taper candles at waist height in one hand, the other relaxed. Her candle-making work and quiet bearing follow the authored profile; age, physical features and costume are editable visual defaults. Her home world remains forgotten and unnamed. She is the market chandler, distinct from Mother Wick. No candle body, head flame, invented warding powers, religious insignia, glowing eyes, burning candles, readable labels or invented origin.",
+        "full_body": {
+          "path": "assets/characters/258ee995c96efdc2200004e2a0d273b5a3d403ed3a34223ff0eba6916b9d0145.png",
+          "sha256": "258ee995c96efdc2200004e2a0d273b5a3d403ed3a34223ff0eba6916b9d0145"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/9c109d36033b8150746956762a646efc8ab259c50fd837402a0251d75a640a44.png",
+          "sha256": "9c109d36033b8150746956762a646efc8ab259c50fd837402a0251d75a640a44"
+        },
+        "portrait": {
+          "path": "assets/characters/8b60a54464ad1faf4d3eaa53f96936151269f303c2f621a36ecc10c74c7b019e.png",
+          "sha256": "8b60a54464ad1faf4d3eaa53f96936151269f303c2f621a36ecc10c74c7b019e"
+        },
+        "frame": {
+          "x": 0.6,
+          "y": 0,
+          "zoom": 1.85
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2258632
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2592943
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2585584
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Wick in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person standing naturally in a near-front three-quarter pose with a small bundle of ordinary unlit tapers at waist height, whole hair, hands, clothing, props and feet comfortably inside all margins. Appearance: An adult humanlike Riftborn woman appearing in her late forties, with a medium sturdy working build, warm tan skin, muted green eyes and chestnut-brown hair threaded with gray, braided beneath a plain cream linen head kerchief. A composed quiet expression and practiced relaxed posture. A faded ochre-brown long-sleeved work dress, a patched gray linen apron with a few small pale wax flecks, and worn brown work shoes. She holds a small ordinary bundle of unlit cream beeswax taper candles at waist height in one hand, the other relaxed. Her candle-making work and quiet bearing follow the authored profile; age, physical features and costume are editable visual defaults. Her home world remains forgotten and unnamed. She is the market chandler, distinct from Mother Wick. No candle body, head flame, invented warding powers, religious insignia, glowing eyes, burning candles, readable labels or invented origin. Preserve authored identity, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Wick from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, body proportions, skin, eyes, hair, clothing, colors, props and material wear. Appearance: An adult humanlike Riftborn woman appearing in her late forties, with a medium sturdy working build, warm tan skin, muted green eyes and chestnut-brown hair threaded with gray, braided beneath a plain cream linen head kerchief. A composed quiet expression and practiced relaxed posture. A faded ochre-brown long-sleeved work dress, a patched gray linen apron with a few small pale wax flecks, and worn brown work shoes. She holds a small ordinary bundle of unlit cream beeswax taper candles at waist height in one hand, the other relaxed. Her candle-making work and quiet bearing follow the authored profile; age, physical features and costume are editable visual defaults. Her home world remains forgotten and unnamed. She is the market chandler, distinct from Mother Wick. No candle body, head flame, invented warding powers, religious insignia, glowing eyes, burning candles, readable labels or invented origin. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Consistent scale across three body views. Entire bodies, hair, hands, footwear and applicable folio or ordinary unlit candles inside margins. Exactly the same one character repeated as turnaround views. No labels, readable text, captions, borders, logos, UI, scenery, extra characters, animals or invented insignia. Change viewing angle only; keep identity and practical costume unchanged.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Wick from Severed Lands. Input image 1 is the canonical full-body reference, image 2 is the matching multiview sheet. Preserve this exact adult face, age, skin, eyes, hairstyle, expression, clothing and applicable head kerchief. Appearance: An adult humanlike Riftborn woman appearing in her late forties, with a medium sturdy working build, warm tan skin, muted green eyes and chestnut-brown hair threaded with gray, braided beneath a plain cream linen head kerchief. A composed quiet expression and practiced relaxed posture. A faded ochre-brown long-sleeved work dress, a patched gray linen apron with a few small pale wax flecks, and worn brown work shoes. She holds a small ordinary bundle of unlit cream beeswax taper candles at waist height in one hand, the other relaxed. Her candle-making work and quiet bearing follow the authored profile; age, physical features and costume are editable visual defaults. Her home world remains forgotten and unnamed. She is the market chandler, distinct from Mother Wick. No candle body, head flame, invented warding powers, religious insignia, glowing eyes, burning candles, readable labels or invented origin. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Head and upper shoulders, near-forward gaze, centered face, eye line near 35 percent down and chin near 65 percent down, comfortable headroom above all hair or kerchief. Continuous full-bleed square background and clothing to all edges. No painted circle, cutout, vignette, faded edge, border, captions, readable text, UI, scenery, new costume, magical effects, burning candles, animals or extra people. Preserve identity and change framing only. One 1024x1024 PNG."
+      }
     }
   ]
 }
