@@ -39,25 +39,46 @@ Synthetic setup and direct authority checks are distinct from UI gameplay eviden
 
 The native run also exposed expanded queue controls squeezed into the disclosure's narrow
 column. The repair gives expanded details the card width and applies the existing button style.
-Focused queue and retained-layout checks pass; native replay remains open. Previous map minimum
-height, queue reachability, committed-price and completed-queue-warning repairs remain included.
+Focused queue and retained-layout checks pass; full affected native replay remains open.
+Previous map minimum height, queue reachability, committed-price and completed-queue-warning
+repairs remain included.
 The standard Windows build at `bab0ad4` completed and verified its artifacts. A subsequent native
 tube test exposed a misleading Reload caption denying the separately declared shell-loading
 control. The caption now names that control without adding Reload steps; focused checks pass.
-The first build of this replacement stopped when its PowerShell wrapper treated the unsigned
-build warning as an error. Its incomplete artifacts are not a verified candidate. The invocation
-will capture native output directly, preserving the builder's actual exit status.
+Build15 stopped when its PowerShell wrapper treated the unsigned build warning as an error;
+its incomplete artifacts are not a verified candidate. Build16 at `882103e` captures native
+output directly and completed the standard optimized recipe, release/portable verification
+and both invocation-owned cleanup receipts. Its owner is `56ab666c`, desktop `97c49b52`,
+portable `59c37c50` and installer `ba86e984` (SHA256 prefixes; full identities are in PR #6).
+The public package archive is `33bf3383`, content `422ed199`; its runtime and parameters are
+unchanged from the earlier native candidate. At this source, 48 focused queue/Reload checks,
+10 retained-layout checks and 12 fresh compiled-owner protocol checks pass.
 
 Native Network testing exposed a second clipping defect: Board mode left only about 22px for
 device selection below the ten declared actions. A minimum body height repairs the existing
 layout. The rendered regression reproduces the failure in Board mode at the guest's window
-sizes, then passes with the repair; the ten retained-layout checks pass. This repair and the
-tube caption still need their replacement build and native replay.
+sizes, then passes with the repair. On exact build16 in a restored 1020 by 710 guest window,
+the actor selector, device view and all ten actions are now usable. Full Audit was enabled
+and verified before gameplay. In the explicit no-check network fixture, Connect, Get in,
+Discover and Pivot committed at 0, 2, 2 and 2 AP, taking Hex from 6 to 0 AP and creating a
+live gateway session. Escalate then stayed pending for review; clear and empty Execute made
+no further commit. Normal Close completed; candidate processes, WAL and windows were absent.
+Read-only saved-state checks confirm campaign revision 4, graph revision 5, AP0, unchanged
+ammunition and both live sessions. This is persistence readback, not native fresh-owner reopen.
+
+The TD guest session ended at a safe handoff to the separately owned hotfix qualification;
+do not reacquire it until that owner releases the guest. No TD heavy build/check remains active.
+After handoff, finish the affected queue/Reload/caption and reopen checks, positive Deep Aim,
+quiet-metal and field-work contexts, suppression and remaining relevant network controls.
+Prepared fixtures and source checks do not count as those native journeys. Preserve the
+passing earlier native evidence instead of repeating unchanged mechanics without a reason.
 
 The strict type repairs in TD's new grid-lane and exposure modules pass affected checks. A
-provisional refactor composition passes the supplied measured type gate, but it is not a final
-PR #33 handoff. Reconcile the refactor owner's checked identity when supplied; do not import
-unfinished refactor work or claim the preview as final composition qualification.
+provisional refactor composition passes the supplied measured type gate. The refactor owner
+also reports a newer PR #33 `5df45da` plus TD `882103e` composition passing typing across
+350 files; its full gate and the separate hotfix reconciliation remain unfinished. Neither
+preview is a final PR #33 handoff. Reconcile the owner's checked identity when supplied;
+do not import unfinished refactor work or claim the preview as final composition qualification.
 
 The public compiler accepts optional private notes as an input. Public packages omit
 `references/canon/`; private local builds may include it. TD vault notes and Siren remain private.
