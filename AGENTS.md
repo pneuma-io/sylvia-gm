@@ -107,6 +107,7 @@ product specification.
 
 ## Code and comments
 
+- A value that moves through three or more named states gets a `StrEnum` and a table of allowed moves next to it. Store `.value`.
 - Keep modules and interfaces direct, readable, and maintainable by one person.
 - Comment a function's purpose, non-obvious invariant, or important tradeoff near its declaration.
 - Do not narrate obvious operations with line-by-line comments.

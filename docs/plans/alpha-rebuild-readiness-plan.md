@@ -2,7 +2,7 @@
 
 > **Status:** Active planning and handoff authority
 >
-> **Updated:** 2026-11-10
+> **Updated:** 2026-11-11
 
 This is the repository status surface synchronized with Dot Desk (formerly Project Desk).
 The latest owner-selected work item determines scope. The product contract owns requirements,
@@ -34,9 +34,10 @@ history and old release source archives; this work does not rewrite history.
 | Work | Current boundary |
 |---|---|
 | Frontend overhaul, PR #28 | Merged on main `6526904` before PR #6. PR #6 owns its composed TD qualification; source/browser evidence does not by itself establish final installed acceptance. |
-| Trigger Discipline integration, PR #6 | Separate active owner; draft head `bc86db1` includes main `6526904`. Public compiler source may remain; vault notes and Siren Protocol stay private. Privacy removal is complete. Public packages exclude canonical vault text; full public-session adequacy without the private prose/future Rulebook remains unproven. Desktop testing remains held until the owner releases that hold. |
-| Refactor, [PR #33](https://github.com/pneuma-io/sylvia-gm/pull/33) | Stages 1–8 are selected. The `app.js` split waits for both PR #28 and PR #6 to merge and may ship as a second PR. Preserve their work and document collisions. |
+| Trigger Discipline integration, PR #6 | Separate active owner; draft head `882103e` includes main `6526904`; its Python/runtime bytes retain the `9968614` spatial typing repairs, with later caption and Network layout fixes committed. Public compiler source may remain; vault notes and Siren Protocol stay private. Privacy removal is complete. Public packages exclude canonical vault text; full public-session adequacy without the private prose/future Rulebook remains unproven. The dedicated VM is ready; host desktop control remains held. TD build 16 is in progress and native evidence remains on `9968614`, owned separately. The final combined refactor/hotfix candidate still needs rebuilding and its own selected native qualification. |
+| Refactor, [PR #33](https://github.com/pneuma-io/sylvia-gm/pull/33) | Stages 1–8, including the approved stage 7A state-machine addendum, are selected. The `app.js` split waits for both PR #28 and PR #6 to merge and may ship as a second PR. Preserve their work and document collisions. |
 | SRD Full, PR #3 | Parked, inactive work; it does not expand the 117-spell Lite launch roster. |
+| GM memory and casting hotfix | Selected separately on 11 November: restore GM memory, remove disabled tool advertising and repair healing inputs/refusals with a new Lite package. Real-owner request regressions and final checked-source composition remain required. |
 | SylviaBench | Outside this refactor. |
 
 Tutorials/onboarding, desktop updates, local diagnostics and compatible campaign Ruleset updates
