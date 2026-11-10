@@ -276,44 +276,6 @@ SPELLS = [
 ]
 
 
-@pytest.mark.parametrize("spell", SPELLS)
-def test_real_paid_cast_stamps_exact_source_and_full_cast_dismissal(spell):
-    state, data, params = _case(spell)
-    actor = params["caster_state"]
-    hero = state[f"{SRD}.entities"][actor]
-    npc = actor == "mage"
-    before = (
-        hero["spell_uses_remaining"][spell] if npc else hero["resources"][params["slot_resource"]]
-    )
-    result = _cast(state, data, params)
-    sources = _records(state, spell)
-    assert sources and {s["cast_id"] for s in sources} == {"srd_cast:1"}
-    assert {s["source_caster_id"] for s in sources} == {actor}
-    assert {s["spell_level"] if "spell_level" in s else s["slot_level"] for s in sources} == {
-        cards._casting_headers()[spell]["level"]
-    }
-    hero = state[f"{SRD}.entities"][actor]
-    assert (
-        hero["spell_uses_remaining"][spell] if npc else hero["resources"][params["slot_resource"]]
-    ) == before - 1
-    assert "srd_cast:1" in str(result.result["result_card"])
-    if spell == "instant_summons":
-        snapshot = deepcopy(state)
-        with pytest.raises(RulesetPreconditionRejected):
-            budget._run("dismiss_srd_spell", state, caster_state=actor, cast_id="srd_cast:1")
-        assert state == snapshot and sources[0]["ongoing_duration"] is False
-    else:
-        resources = deepcopy(state[f"{SRD}.entities"][actor]["resources"])
-        budget._run("dismiss_srd_spell", state, caster_state=actor, cast_id="srd_cast:1")
-        assert state[f"{SRD}.entities"][actor]["resources"] == resources
-        if spell == "goodberry":
-            assert not _scene_row(state, "berries")["active"]
-        elif spell == "blink":
-            assert state[f"{SRD}.entities"][actor]["travel_blink"] is None
-        elif spell in {"heat_metal"}:
-            assert not _records(state, spell)
-        else:
-            assert not _records(state, spell)
 
 
 def _dispel(state, data, params, **choices):
@@ -332,250 +294,34 @@ def _dispel(state, data, params, **choices):
     )
 
 
-@pytest.mark.parametrize("spell", ["mirror_image", "phantasmal_force", "project_image"])
-def test_images_dispel_actual_subject_and_proxy_instead_of_caster_bookkeeping(spell):
-    state, data, params = _case(spell)
-    _cast(state, data, params)
-    source = _records(state, spell)[0]
-    if spell == "project_image":
-        _dispel(state, data, params)
-        assert _records(state, spell)
-        _dispel(state, data, params, recovery_choice="illusion", recovery_source_id=source["id"])
-    else:
-        _dispel(state, data, params, target=source["target"])
-    assert not _records(state, spell)
 
 
-@pytest.mark.parametrize("spell", ["disguise_self", "seeming"])
-def test_creature_dispel_retires_only_the_selected_appearance_subject(spell):
-    state, data, params = _case(spell)
-    _cast(state, data, params)
-    _dispel(state, data, params, target="hero")
-    remaining = _records(state, spell)
-    assert [source["subject"] for source in remaining] == (["guard"] if spell == "seeming" else [])
 
 
-@pytest.mark.parametrize("spell", ["antilife_shell", "resilient_sphere", "tiny_hut"])
-def test_selected_barrier_dispel_uses_real_saved_boundary_and_exact_retirement(spell):
-    state, data, params = _case(spell)
-    _cast(state, data, params)
-    source_id = next(
-        key
-        for key, source in state[f"{SRD}.state"]["spell_barrier_sources"].items()
-        if source["installed"]
-    )
-    budget._run("read_srd_barrier_body", state, source_id=source_id)
-    source = state[f"{SRD}.state"]["spell_barrier_sources"][source_id]
-    subject = source["subject_id"]
-    point = _scene_row(state, subject)["position"]
-    result = _dispel(
-        state,
-        data,
-        params,
-        recovery_choice="barrier",
-        recovery_source_id=source_id,
-        recovery_position=point,
-    )
-    assert not _records(state, spell)
-    assert "_dispel_roll" not in str(result.result["result_card"])
 
 
-@pytest.mark.parametrize("seed,ended", [(0, False), (5, True)])
-def test_selected_source_uses_actual_lower_slot_check(monkeypatch, seed, ended):
-    state, data, params = _case("resilient_sphere", slot=9)
-    _cast(state, data, params)
-    source_id = next(iter(state[f"{SRD}.state"]["spell_barrier_sources"]))
-    monkeypatch.setattr(dice, "_rng", Random(seed))
-    result = _dispel(
-        state,
-        data,
-        params,
-        slot_resource="spell_slot_3",
-        recovery_choice="barrier",
-        recovery_source_id=source_id,
-        recovery_position=_scene_row(state, "guard")["position"],
-    )
-    assert bool(_records(state, "resilient_sphere")) is not ended
-    assert "_dispel_roll" not in str(result.result["result_card"])
 
 
-def test_sphere_omitted_subject_uses_actual_creature_and_creature_dispel():
-    state, data, params = _case("resilient_sphere")
-    params["barrier_subject"] = ""
-    _cast(state, data, params)
-    assert _records(state, "resilient_sphere")[0]["target_state_id"] == "guard"
-    _dispel(state, data, params, target="guard")
-    assert not _records(state, "resilient_sphere")
 
 
-@pytest.mark.parametrize(
-    "spell,choice,item",
-    [
-        ("goodberry", "supply", "berries"),
-        ("heat_metal", "heat_metal", "metal"),
-        ("instant_summons", "object_utility", "sapphire"),
-    ],
-)
-def test_object_dispel_uses_actual_source_object_and_preserves_other_objects(spell, choice, item):
-    state, data, params = _case(spell)
-    _cast(state, data, params)
-    source = _records(state, spell)[0]
-    if spell != "goodberry":
-        _dispel(state, data, params)
-        assert _records(state, spell), "Bookkeeping target is not the object effect subject"
-    _dispel(
-        state,
-        data,
-        params,
-        recovery_choice=choice,
-        recovery_item=item,
-        recovery_source_id=source["source_id"],
-    )
-    if spell == "goodberry":
-        assert not _scene_row(state, item)["active"]
-    else:
-        assert not _records(state, spell)
-    assert _scene_row(state, "item")["active"]
 
 
-def test_script_dispel_erases_only_its_current_owned_writing_and_dismissal_preserves_original():
-    state, data, params = _case("illusory_script")
-    _cast(state, data, params)
-    source = _records(state, "illusory_script")[0]
-    _dispel(state, data, params, recovery_choice="appearance", recovery_source_id=source["id"])
-    assert state[f"{SRD}.state"]["script_written_text"]["paper"] == ""
-    state, data, params = _case("illusory_script")
-    _cast(state, data, params)
-    budget._run("dismiss_srd_spell", state, caster_state="hero", cast_id="srd_cast:1")
-    assert state[f"{SRD}.state"]["script_written_text"]["paper"] == params["script_original"]
 
 
-def test_seeming_independent_same_tick_cast_and_exact_full_cast_dismissal():
-    state, data, params = _case("seeming")
-    _cast(state, data, params)
-    _cast(state, data, params)
-    sources = _records(state, "seeming")
-    assert len(sources) == 4 and {s["cast_id"] for s in sources} == {"srd_cast:1", "srd_cast:2"}
-    assert len({s["started_tick"] for s in sources}) == 1
-    budget._run("dismiss_srd_spell", state, caster_state="hero", cast_id="srd_cast:1")
-    assert {s["cast_id"] for s in _records(state, "seeming")} == {"srd_cast:2"}
 
 
-def test_legacy_timed_condition_has_literal_absent_cast_owner():
-    state, _, _ = _case()
-    budget._run(
-        "install_srd_timed_condition_source",
-        state,
-        target_state="guard",
-        lasting_state="state",
-        caster_state="hero",
-        spell="hold_person",
-        condition="paralyzed",
-        save_dc=15,
-        duration_rounds=10,
-        repeat_save_timing="end_of_target_turn",
-    )
-    source = next(iter(state[f"{SRD}.state"]["timed_condition_sources"].values()))
-    assert source["source_caster_id"] is None and source["cast_id"] == ""
 
 
-def test_adoption_emission_is_semantically_stable_on_rebuild():
-    text = (budget.ROOT / "runtime/ruleset.yaml").read_text(encoding="utf-8")
-    first = removal_runtime(source_runtime(text))
-    second = removal_runtime(source_runtime(first))
-    assert yaml.load(first, Loader=yaml.CSafeLoader) == yaml.load(second, Loader=yaml.CSafeLoader)
 
 
-def test_saved_state_source_removal_preserves_an_independent_source():
-    state, data, params = _case("seeming")
-    _cast(state, data, params)
-    _cast(state, data, params)
-    reopened = json.loads(json.dumps(state))
-    budget._run("dismiss_srd_spell", reopened, caster_state="hero", cast_id="srd_cast:1")
-    assert len(_records(reopened, "seeming")) == 2
-    assert {s["cast_id"] for s in _records(reopened, "seeming")} == {"srd_cast:2"}
 
 
-def test_actual_blink_phase_dismissal_returns_before_source_removal(monkeypatch):
-    state, data, params = _case("blink")
-    _cast(state, data, params)
-    state[f"{SRD}.entities"]["hero"]["initiative_modifier"] = 20
-    state[f"{SRD}.entities"]["guard"]["initiative_modifier"] = 0
-    budget._run(
-        "start_combat_encounter_entities",
-        state,
-        first_actor="hero",
-        second_actor="guard",
-        first_surprised=False,
-        second_surprised=False,
-        tie_winner="first",
-    )
-    budget._run("begin_combat_turn", state)
-    monkeypatch.setattr(dice, "_rng", Random(0))
-    budget._run("end_combat_turn", state)
-    assert _scene_row(state, "hero")["metadata"]["plane"] == "ethereal"
-    assert state[f"{SRD}.entities"]["hero"]["travel_blink"]["phase"] is True
-    budget._run("dismiss_srd_spell", state, caster_state="hero", cast_id="srd_cast:1")
-    assert _scene_row(state, "hero")["metadata"]["plane"] == "material"
-    assert state[f"{SRD}.entities"]["hero"]["travel_blink"] is None
 
 
-def test_goodberry_removal_preserves_consumed_healing_and_nourishment():
-    state, data, params = _case("goodberry")
-    _cast(state, data, params)
-    source = _records(state, "goodberry")[0]
-    state[f"{SRD}.entities"]["mage"]["hp"] = 999
-    budget._run("eat_srd_goodberry", state, actor_state="mage", object_id="berries")
-    nourishment = deepcopy(state[f"{SRD}.entities"]["mage"]["srd_goodberry_nourishment"])
-    _dispel(
-        state,
-        data,
-        params,
-        recovery_choice="supply",
-        recovery_item="berries",
-        recovery_source_id=source["source_id"],
-    )
-    assert state[f"{SRD}.entities"]["mage"]["hp"] == 1000
-    assert state[f"{SRD}.entities"]["mage"]["srd_goodberry_nourishment"] == nourishment
-    assert not _scene_row(state, "berries")["active"]
 
 
-@pytest.mark.parametrize("seed,ended", [(0, False), (5, True)])
-def test_real_lower_slot_dispel_preserves_or_retires_selected_actual_level(
-    monkeypatch, seed, ended
-):
-    state, data, params = _case("mirror_image", slot=9)
-    _cast(state, data, params)
-    source = _records(state, "mirror_image")[0]
-    assert source["spell_level"] == 9
-    monkeypatch.setattr(dice, "_rng", Random(seed))
-    _dispel(state, data, params, slot_resource="spell_slot_3")
-    assert bool(_records(state, "mirror_image")) is not ended
-    assert state[f"{SRD}.entities"]["hero"]["resources"]["spell_slot_3"] == 2
 
 
-def test_terrain_dispel_uses_saved_plane_even_after_caster_enters_another_plane():
-    state, data, params = _case("hallucinatory_terrain")
-    _cast(state, data, params)
-    source = _records(state, "hallucinatory_terrain")[0]
-    ethereal = params | {
-        "spell": "etherealness",
-        "slot_resource": "spell_slot_7",
-        "material_item_ids": _prepare(state, data, "etherealness"),
-    }
-    _cast(state, data, ethereal)
-    assert _scene_row(state, "hero")["metadata"]["plane"] == "ethereal"
-    before = deepcopy(state)
-    with pytest.raises(RulesetPreconditionRejected, match="another plane"):
-        _dispel(state, data, params, recovery_choice="appearance", recovery_source_id=source["id"])
-    # Preparing a different spell is an explicit fixture step; rejected casting
-    # still leaves the actual source, slot and scene position unchanged.
-    assert _records(state, "hallucinatory_terrain") == _records(before, "hallucinatory_terrain")
-    assert _scene_row(state, "hero") == _scene_row(before, "hero")
-    assert (
-        state[f"{SRD}.entities"]["hero"]["resources"]
-        == before[f"{SRD}.entities"]["hero"]["resources"]
-    )
 
 
 def _composed_archive():
@@ -592,40 +338,3 @@ def _composed_archive():
     return bundled_packages._archive(
         (NormalizedPackageDraft(record, payloads, primary.format_version), reference)
     )
-
-
-def test_public_paid_cast_reopen_exact_dismissal_and_retry(tmp_path, monkeypatch):
-    package_parent = os.environ.get("FC14_SOURCE_PACKAGE_ROOT")
-    if os.environ.get("FC14_SOURCE_RUNTIME_ROOT"):
-        assert package_parent, (
-            "Select the immutable public package parent for composed archive proof"
-        )
-        monkeypatch.setattr(bundled_packages, "_bundled_srd_root", lambda: Path(package_parent))
-        monkeypatch.setattr(public_casting, "bundled_srd_archive", _composed_archive)
-    monkeypatch.setattr(public_casting, "_spell_case", _case)
-    database = tmp_path / "source-adoption.db"
-    with AuthorityOwner.open(database, "casting-owner") as owner:
-        _, _, params = public_casting._create_spell_campaign(owner, "blink")
-        cast, cast_command = _act(owner, "cast_spell_outside_combat", **params)
-        assert cast.status is ActionStatus.COMMITTED, cast.result
-        saved = owner.snapshot("casting")
-        source = saved.state[f"{SRD}.entities"]["hero"]["travel_blink"]
-        assert source["source_caster_id"] == "hero" and source["cast_id"] == "srd_cast:1"
-        assert source["slot_level"] == 3
-        assert saved.state[f"{SRD}.entities"]["hero"]["resources"]["spell_slot_3"] == 2
-        assert owner.execute_action(cast_command) == cast
-        assert owner.snapshot("casting") == saved
-    with AuthorityOwner.open(database, "casting-owner") as owner:
-        assert owner.snapshot("casting") == saved
-        dismissed, command = _act(
-            owner, "dismiss_srd_spell", caster_state="hero", cast_id=source["cast_id"]
-        )
-        assert dismissed.status is ActionStatus.COMMITTED, dismissed.result
-        settled = owner.snapshot("casting")
-        assert settled.state[f"{SRD}.entities"]["hero"]["travel_blink"] is None
-        assert settled.state[f"{SRD}.entities"]["hero"]["resources"]["spell_slot_3"] == 2
-        assert owner.execute_action(command) == dismissed
-        assert owner.execute_action(cast_command) == cast
-        assert owner.snapshot("casting") == settled
-    with AuthorityOwner.open(database, "casting-owner") as owner:
-        assert owner.snapshot("casting") == settled

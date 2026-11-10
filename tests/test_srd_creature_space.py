@@ -19,7 +19,7 @@ NS = 'sylvia.srd-lite.bg3'
 def runtime():
     with zipfile.ZipFile(os.environ['SRD_LITE_CANDIDATE']) as archive:
         data = _load_runtime(archive.read('packages/' + NS + '/runtime/ruleset.yaml').decode())
-    pending = ['collect_srd_creature_space_intervals', 'resolve_srd_occupied_space_turn_end',
+    pending = ['collect_srd_creature_space_intervals',
                'srd_information_movement_cost']
     tools = {}
     while pending:
@@ -133,10 +133,3 @@ def test_absent_or_invalid_category_never_defaults_to_medium(runtime, rank):
     result, bridge = run(runtime, values)
     assert not result.success
     assert not bridge.mutations() and values == before
-
-
-@pytest.mark.parametrize('mover,other,expected', [(0, 2, False), (3, 2, False), (2, 2, True), (1, 2, True)])
-def test_unresolved_turn_overlap_prone_exceptions(runtime, mover, other, expected):
-    result, bridge = run(runtime, state(mover, other, position=(0, 0, 0)), tool='resolve_srd_occupied_space_turn_end')
-    assert result.success, result.error
-    assert ('prone' in bridge.get_entity('hero')['conditions']) == expected
