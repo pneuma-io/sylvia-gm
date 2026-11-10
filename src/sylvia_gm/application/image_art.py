@@ -693,8 +693,16 @@ class ImageArt:
         edit_sha256: str | None = None,
         name: str = "",
         character_flow: dict[str, Any] | None = None,
+        origin_session_id: str | None = None,
     ) -> dict[str, Any]:
         scope, campaign_id = self._scope(session_id)
+        origin_session_id = origin_session_id or session_id
+        if origin_session_id != session_id and (
+            character_flow is None
+            or campaign_id is None
+            or self.owner.session_context(origin_session_id).session.campaign_id != campaign_id
+        ):
+            raise ValueError("A character workflow can continue only within its original campaign")
         settings = self.settings()
         if settings.get("mode") == "off" or not self.adapters:
             raise ValueError("Enable an image connection in Settings before requesting art")
@@ -714,7 +722,7 @@ class ImageArt:
         if not isinstance(operation_id, str) or not 0 < len(operation_id) <= 128:
             raise ValueError("Supply a stable operation identity")
         identity = str(
-            uuid5(NAMESPACE_URL, "sylvia-image-operation:" + session_id + ":" + operation_id)
+            uuid5(NAMESPACE_URL, f"sylvia-image-operation:{origin_session_id}:{operation_id}")
         )
         metadata: dict[str, Any] = {"appearance": appearance}
         projection = None
@@ -773,7 +781,7 @@ class ImageArt:
         fingerprint = hashlib.sha256(
             canonical_json_bytes(
                 {
-                    "session_id": session_id,
+                    "session_id": origin_session_id,
                     "target_id": target_id,
                     "purpose": purpose,
                     "brief": brief,
@@ -787,7 +795,7 @@ class ImageArt:
         row = self.store.admit(
             {
                 "operation_id": identity,
-                "session_id": session_id,
+                "session_id": origin_session_id,
                 "campaign_id": campaign_id,
                 "target_id": target_id,
                 "purpose": purpose,
@@ -852,7 +860,7 @@ class ImageArt:
         # Dispatch uses the owning session even when another session in the campaign approves it.
         runtime = self._runtime(row["session_id"])
         value = json.loads(row["request_json"])
-        scope, _ = self._scope(row["session_id"])
+        scope, _ = self._scope(session_id)
         selected = [
             item
             for item in self.store.list_selections(scope)

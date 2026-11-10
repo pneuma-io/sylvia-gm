@@ -57,6 +57,22 @@ and exact campaign art transfer before opening an image view. Local-copy receipt
 without creating an agent session, while provider requests retain their session requirement.
 The explicit character-payload helper includes used shared art; standalone character/profile export
 and import still need a normal user-facing path.
+The subsequent local handoff check found and fixed an execution dependency on a stopped source
+chat, including admission of the next character reference stage. An active chat in the same
+campaign can now generate/adopt an existing individual request or continue the whole character
+workflow with its original provenance and stable stage identities. Replays from another active
+chat reuse those stages; unrelated chats remain refused. Nine local handoff/workflow checks pass,
+including exact reference order and export/recovery. The owner clarified that Opus 5.5 applies
+to visual design and frontend work, rather than all design. Backend design and implementation
+continue here. T3 lists Opus, but that handoff could not start (`thread_credential_required`),
+and the direct delegation tool is unavailable. This is an internal agent-tooling issue; the
+owner is not expected to troubleshoot it. Remaining visual/frontend work awaits that connection;
+standalone transfer logic can proceed. Live in-app checks remain deferred at the owner's request.
+The nine prepared Ready character editions now carry the existing shared visual records for
+their exact authored starter identities. Their builds, equipment, prose and retained Plan
+bindings are unchanged; only visuals, character hashes and artwork provenance were added.
+Customize also passes those visual records into saved editable Character Files. The actual
+Lite Ready-party resolve/customize check passes, including immutable source/build comparisons.
 Broader everyday journey
 qualification remains open. The unfinished-draft `candidate_unavailable` finding is fixed for new
 exports: confirmation references now retain their candidate and package closure. Recovery checks

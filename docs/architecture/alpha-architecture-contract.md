@@ -1053,6 +1053,12 @@ one background worker runs generation outside database transactions. Replaying a
 not dispatch it twice. Reopening marks an unknown pending result interrupted, without retrying.
 Selection adoption compares the prior asset hash. Cancellation is persisted before transport
 interruption, and late results cannot replace selected art.
+Executing a saved request uses the currently authorized campaign scope while retaining its
+original session provenance and runtime identity. Another active chat in that campaign can
+generate and adopt it after the originating chat stops. Further character workflow stages use
+that active chat's authority while retaining the original stage identities and request hashes;
+replaying adoption from another chat cannot create duplicate stages. The original session must
+belong to the same campaign.
 
 The ChatGPT adapter uses the existing managed runtime profile and an isolated ephemeral image
 turn with image generation enabled and shell, environments, user skills and application tools

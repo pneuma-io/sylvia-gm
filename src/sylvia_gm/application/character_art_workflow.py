@@ -150,6 +150,7 @@ class CharacterArtWorkflow:
         purpose: str,
         *,
         edit_sha256: str | None = None,
+        origin_session_id: str | None = None,
     ) -> dict[str, Any]:
         return self.art._request_single(
             session_id,
@@ -161,6 +162,7 @@ class CharacterArtWorkflow:
             name=flow["name"],
             edit_sha256=edit_sha256,
             character_flow=flow,
+            origin_session_id=origin_session_id,
         )
 
     def after_adoption(self, session_id: str, row: dict[str, Any]) -> dict[str, Any] | None:
@@ -177,4 +179,9 @@ class CharacterArtWorkflow:
         missing = missing_character_art(selected)
         following = flow["steps"][flow["steps"].index(row["purpose"]) + 1 :]
         purpose = next((purpose for purpose in following if purpose in missing), None)
-        return self._propose(row["session_id"], flow, purpose) if purpose else None
+        if purpose is None:
+            return None
+        # Authorize with the current chat while keeping every stage's original replay identity.
+        return self._propose(
+            session_id, flow, purpose, origin_session_id=row["session_id"]
+        )

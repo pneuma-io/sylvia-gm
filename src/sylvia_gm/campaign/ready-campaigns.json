@@ -9,7 +9,8 @@
       "LICENSING-STATUS.md",
       "campaign-settings/severed-lands/ATTRIBUTION.md",
       "rulesets/srd-lite/ATTRIBUTION.md"
-    ]
+    ],
+    "artwork": "Existing authored SRD starter identities reuse their shared prepared visual records across Ready levels and roles. Character builds, equipment, prose and retained Plan bindings are unchanged."
   },
   "campaigns": [
     {
@@ -226,9 +227,29 @@
               "climb_speed": 0,
               "swim_speed": 0
             },
-            "setting_data": {}
+            "setting_data": {},
+            "visuals": {
+              "appearance": "Adult Human in their mid fifties, broad steady build, medium olive-brown skin, dark eyes, short curly salt-and-pepper hair and a short salt-and-pepper beard; patient, practical expression. Chain shirt with plain tunic, earth-tone cloak and scarf layers, trousers, belt and boots, and a plain geometric pendant without deity or faction insignia. Lowered mace in their right hand, round wooden shield on their left arm.",
+              "full_body": {
+                "path": "assets/characters/df35ffe755907da99519d1297beb3848d952fcfc42ad6930328ebe5053ba6633.png",
+                "sha256": "df35ffe755907da99519d1297beb3848d952fcfc42ad6930328ebe5053ba6633"
+              },
+              "reference_sheet": {
+                "path": "assets/characters/f2f736622cc7e01554dfc5004666fe3c94e8def39f6d0ae037559cb07aa11698.png",
+                "sha256": "f2f736622cc7e01554dfc5004666fe3c94e8def39f6d0ae037559cb07aa11698"
+              },
+              "portrait": {
+                "path": "assets/characters/b24035d5f13d92ff015da5af1596898cc671d985c6ecec76f9e0a435f2549843.png",
+                "sha256": "b24035d5f13d92ff015da5af1596898cc671d985c6ecec76f9e0a435f2549843"
+              },
+              "frame": {
+                "x": 0.5,
+                "y": 0.35,
+                "zoom": 1
+              }
+            }
           },
-          "content_sha256": "8b0554e6d8e7145f50a91d10fe710d5c4f184a18822e4fc3001df9a84ec9c0a5"
+          "content_sha256": "de1045c1dbe92b162f9debc00d98c35ac22700696ae7bd4e92ea0bd1098c8c00"
         }
       ]
     },
@@ -447,9 +468,29 @@
               "climb_speed": 0,
               "swim_speed": 0
             },
-            "setting_data": {}
+            "setting_data": {},
+            "visuals": {
+              "appearance": "Adult Human in their early forties, broad stocky build, fair weathered skin, blue eyes, short dark-ginger hair and a neatly trimmed short ginger beard; steady dry-witted expression and a slight reassuring smile. Worn chain mail over a plain brown padded gambeson, a muted navy sleeveless surcoat without heraldry, belt, trousers and sturdy leather boots and fingerless leather gloves. Bareheaded, no shield. Holds a plain greatsword with both hands low on the hilt, blade pointed safely down beside the body; a compact flail hangs secured at the belt.",
+              "full_body": {
+                "path": "assets/characters/a0bb304b124ec85673e990bb8ca11573389e19b6757c5299a92ef16d58a7b276.png",
+                "sha256": "a0bb304b124ec85673e990bb8ca11573389e19b6757c5299a92ef16d58a7b276"
+              },
+              "reference_sheet": {
+                "path": "assets/characters/dfdc3dec6ab159101e71da2ecb6386ca4bb8c0006d22b96e2f0954e3e6aed0dd.png",
+                "sha256": "dfdc3dec6ab159101e71da2ecb6386ca4bb8c0006d22b96e2f0954e3e6aed0dd"
+              },
+              "portrait": {
+                "path": "assets/characters/92f098e4f0b4807c8a713330a1a14d5473ee596bdd096c4d943ab1265fcf2f04.png",
+                "sha256": "92f098e4f0b4807c8a713330a1a14d5473ee596bdd096c4d943ab1265fcf2f04"
+              },
+              "frame": {
+                "x": 0.5,
+                "y": 0.35,
+                "zoom": 1
+              }
+            }
           },
-          "content_sha256": "12d4ce7cb5a2312dd3fc5672610ec84e818d7cbca7b6667a13c96f15dd048118"
+          "content_sha256": "d205c10a2ae4bfad8b52e64c478180bc4b1e32b283ed019a176aec373d8d0249"
         },
         {
           "role": "companion",
@@ -667,9 +708,29 @@
               "climb_speed": 0,
               "swim_speed": 0
             },
-            "setting_data": {}
+            "setting_data": {},
+            "visuals": {
+              "appearance": "Adult Human in their mid fifties, broad steady build, medium olive-brown skin, dark eyes, short curly salt-and-pepper hair and a short salt-and-pepper beard; patient, practical expression. Chain shirt with plain tunic, earth-tone cloak and scarf layers, trousers, belt and boots, and a plain geometric pendant without deity or faction insignia. Lowered mace in their right hand, round wooden shield on their left arm.",
+              "full_body": {
+                "path": "assets/characters/df35ffe755907da99519d1297beb3848d952fcfc42ad6930328ebe5053ba6633.png",
+                "sha256": "df35ffe755907da99519d1297beb3848d952fcfc42ad6930328ebe5053ba6633"
+              },
+              "reference_sheet": {
+                "path": "assets/characters/f2f736622cc7e01554dfc5004666fe3c94e8def39f6d0ae037559cb07aa11698.png",
+                "sha256": "f2f736622cc7e01554dfc5004666fe3c94e8def39f6d0ae037559cb07aa11698"
+              },
+              "portrait": {
+                "path": "assets/characters/b24035d5f13d92ff015da5af1596898cc671d985c6ecec76f9e0a435f2549843.png",
+                "sha256": "b24035d5f13d92ff015da5af1596898cc671d985c6ecec76f9e0a435f2549843"
+              },
+              "frame": {
+                "x": 0.5,
+                "y": 0.35,
+                "zoom": 1
+              }
+            }
           },
-          "content_sha256": "9fe73145567c27f752e5e81f71d99c69a5c6bcca5cddbd36163ece64a7be32c2"
+          "content_sha256": "4e5323b7c668cacad38fb903e7ad021ac483fce0fdd2c547c56ae18b7de1200b"
         }
       ]
     },
@@ -878,9 +939,29 @@
               "climb_speed": 0,
               "swim_speed": 0
             },
-            "setting_data": {}
+            "setting_data": {},
+            "visuals": {
+              "appearance": "Adult Human in their early twenties, short wiry build, fair freckled skin, hazel eyes and short tousled reddish-brown curls with one stubborn forelock; bright curious eyes and a restrained mischievous smile. Worn dark-brown leather armor over a plain muted plum shirt, charcoal trousers, soft dark boots, a simple belt and fingerless leather gloves. Holds a shortbow lowered at one side without drawing it; a small quiver of arrows on the back, a sheathed shortsword and dagger at the belt and a practical closed thieves'-tools pouch. No shield, mask or hood across the face.",
+              "full_body": {
+                "path": "assets/characters/484b5b0b84402411f1a9f4c5ab011aefa8af978588e4f494afff27e3fe46f4e7.png",
+                "sha256": "484b5b0b84402411f1a9f4c5ab011aefa8af978588e4f494afff27e3fe46f4e7"
+              },
+              "reference_sheet": {
+                "path": "assets/characters/88af2223a0426ee70da3a7bbfe01480de58d1ee6d9a17a2fa224dda68d5ba62d.png",
+                "sha256": "88af2223a0426ee70da3a7bbfe01480de58d1ee6d9a17a2fa224dda68d5ba62d"
+              },
+              "portrait": {
+                "path": "assets/characters/10d5029db3dbcdbb7f36526b7a95a8e738855e05b22ffa5ba5ec464f637ae821.png",
+                "sha256": "10d5029db3dbcdbb7f36526b7a95a8e738855e05b22ffa5ba5ec464f637ae821"
+              },
+              "frame": {
+                "x": 0.5,
+                "y": 0.35,
+                "zoom": 1
+              }
+            }
           },
-          "content_sha256": "1f95454629494f037a1d0fda82a9703323e3c82c5dede890a55cfa8b992319f6"
+          "content_sha256": "4f28d281c5c2172e44a1a8078550998908f96dc77d2f8e010d971a7caa6dfe32"
         },
         {
           "role": "companion",
@@ -1080,9 +1161,29 @@
               "climb_speed": 0,
               "swim_speed": 0
             },
-            "setting_data": {}
+            "setting_data": {},
+            "visuals": {
+              "appearance": "Adult Human in their early forties, broad stocky build, fair weathered skin, blue eyes, short dark-ginger hair and a neatly trimmed short ginger beard; steady dry-witted expression and a slight reassuring smile. Worn chain mail over a plain brown padded gambeson, a muted navy sleeveless surcoat without heraldry, belt, trousers and sturdy leather boots and fingerless leather gloves. Bareheaded, no shield. Holds a plain greatsword with both hands low on the hilt, blade pointed safely down beside the body; a compact flail hangs secured at the belt.",
+              "full_body": {
+                "path": "assets/characters/a0bb304b124ec85673e990bb8ca11573389e19b6757c5299a92ef16d58a7b276.png",
+                "sha256": "a0bb304b124ec85673e990bb8ca11573389e19b6757c5299a92ef16d58a7b276"
+              },
+              "reference_sheet": {
+                "path": "assets/characters/dfdc3dec6ab159101e71da2ecb6386ca4bb8c0006d22b96e2f0954e3e6aed0dd.png",
+                "sha256": "dfdc3dec6ab159101e71da2ecb6386ca4bb8c0006d22b96e2f0954e3e6aed0dd"
+              },
+              "portrait": {
+                "path": "assets/characters/92f098e4f0b4807c8a713330a1a14d5473ee596bdd096c4d943ab1265fcf2f04.png",
+                "sha256": "92f098e4f0b4807c8a713330a1a14d5473ee596bdd096c4d943ab1265fcf2f04"
+              },
+              "frame": {
+                "x": 0.5,
+                "y": 0.35,
+                "zoom": 1
+              }
+            }
           },
-          "content_sha256": "1fdba2d792f0b9e63f18a925056f90ab2ffe48a3232d387173992de5f7e2e618"
+          "content_sha256": "dae162efb0159302d5cf8267225f2af80d073474e1f81ddca7aaae27be6b9402"
         },
         {
           "role": "companion",
@@ -1300,9 +1401,29 @@
               "climb_speed": 0,
               "swim_speed": 0
             },
-            "setting_data": {}
+            "setting_data": {},
+            "visuals": {
+              "appearance": "Adult Human in their mid fifties, broad steady build, medium olive-brown skin, dark eyes, short curly salt-and-pepper hair and a short salt-and-pepper beard; patient, practical expression. Chain shirt with plain tunic, earth-tone cloak and scarf layers, trousers, belt and boots, and a plain geometric pendant without deity or faction insignia. Lowered mace in their right hand, round wooden shield on their left arm.",
+              "full_body": {
+                "path": "assets/characters/df35ffe755907da99519d1297beb3848d952fcfc42ad6930328ebe5053ba6633.png",
+                "sha256": "df35ffe755907da99519d1297beb3848d952fcfc42ad6930328ebe5053ba6633"
+              },
+              "reference_sheet": {
+                "path": "assets/characters/f2f736622cc7e01554dfc5004666fe3c94e8def39f6d0ae037559cb07aa11698.png",
+                "sha256": "f2f736622cc7e01554dfc5004666fe3c94e8def39f6d0ae037559cb07aa11698"
+              },
+              "portrait": {
+                "path": "assets/characters/b24035d5f13d92ff015da5af1596898cc671d985c6ecec76f9e0a435f2549843.png",
+                "sha256": "b24035d5f13d92ff015da5af1596898cc671d985c6ecec76f9e0a435f2549843"
+              },
+              "frame": {
+                "x": 0.5,
+                "y": 0.35,
+                "zoom": 1
+              }
+            }
           },
-          "content_sha256": "9fe73145567c27f752e5e81f71d99c69a5c6bcca5cddbd36163ece64a7be32c2"
+          "content_sha256": "4e5323b7c668cacad38fb903e7ad021ac483fce0fdd2c547c56ae18b7de1200b"
         }
       ]
     },
@@ -1514,9 +1635,29 @@
               "climb_speed": 0,
               "swim_speed": 0
             },
-            "setting_data": {}
+            "setting_data": {},
+            "visuals": {
+              "appearance": "Adult Human in their late twenties, slender build, fair freckled skin, gray-green eyes and chin-length tousled auburn hair; curious, playful expression. Brown leather armor over an ivory rolled-sleeve shirt, rust scarf, plain trousers and boots. Carries a lute and a sheathed dagger; no shield.",
+              "full_body": {
+                "path": "assets/characters/39512f61f70403b4f3c46988e5c8cb42450326b511fcbfc25a7c1f2a268bfc54.png",
+                "sha256": "39512f61f70403b4f3c46988e5c8cb42450326b511fcbfc25a7c1f2a268bfc54"
+              },
+              "reference_sheet": {
+                "path": "assets/characters/4e0647607d6f3b23188ca6ec25886da3857b6b332fcdb182472c31ad1ece00ea.png",
+                "sha256": "4e0647607d6f3b23188ca6ec25886da3857b6b332fcdb182472c31ad1ece00ea"
+              },
+              "portrait": {
+                "path": "assets/characters/740fae595bcb116204af1b16ee1454bc39e327ebc8ddfb18f00b639e8d1b322a.png",
+                "sha256": "740fae595bcb116204af1b16ee1454bc39e327ebc8ddfb18f00b639e8d1b322a"
+              },
+              "frame": {
+                "x": 0.5,
+                "y": 0.35,
+                "zoom": 1
+              }
+            }
           },
-          "content_sha256": "2e7af37fe3a43d6c4f058ddccbae9b09a4c71a5a28b46ea53a2dd025ac708093"
+          "content_sha256": "779f903def484c0610d28561828d45b342b6c038e5c1ef2e0c6634895e561da3"
         },
         {
           "role": "companion",
@@ -1695,9 +1836,29 @@
               "climb_speed": 0,
               "swim_speed": 0
             },
-            "setting_data": {}
+            "setting_data": {},
+            "visuals": {
+              "appearance": "Adult Human in their early forties, broad stocky build, fair weathered skin, blue eyes, short dark-ginger hair and a neatly trimmed short ginger beard; steady dry-witted expression and a slight reassuring smile. Worn chain mail over a plain brown padded gambeson, a muted navy sleeveless surcoat without heraldry, belt, trousers and sturdy leather boots and fingerless leather gloves. Bareheaded, no shield. Holds a plain greatsword with both hands low on the hilt, blade pointed safely down beside the body; a compact flail hangs secured at the belt.",
+              "full_body": {
+                "path": "assets/characters/a0bb304b124ec85673e990bb8ca11573389e19b6757c5299a92ef16d58a7b276.png",
+                "sha256": "a0bb304b124ec85673e990bb8ca11573389e19b6757c5299a92ef16d58a7b276"
+              },
+              "reference_sheet": {
+                "path": "assets/characters/dfdc3dec6ab159101e71da2ecb6386ca4bb8c0006d22b96e2f0954e3e6aed0dd.png",
+                "sha256": "dfdc3dec6ab159101e71da2ecb6386ca4bb8c0006d22b96e2f0954e3e6aed0dd"
+              },
+              "portrait": {
+                "path": "assets/characters/92f098e4f0b4807c8a713330a1a14d5473ee596bdd096c4d943ab1265fcf2f04.png",
+                "sha256": "92f098e4f0b4807c8a713330a1a14d5473ee596bdd096c4d943ab1265fcf2f04"
+              },
+              "frame": {
+                "x": 0.5,
+                "y": 0.35,
+                "zoom": 1
+              }
+            }
           },
-          "content_sha256": "30eea6478cc30917f3a2ccb6a7f57a9adc69bc99909972955cfe1382a5b732b2"
+          "content_sha256": "ea69c84c52e2805e75174cb168b0ea59d10fecbad00b79a0147e6f18530740bf"
         },
         {
           "role": "companion",
@@ -1892,9 +2053,29 @@
               "climb_speed": 0,
               "swim_speed": 0
             },
-            "setting_data": {}
+            "setting_data": {},
+            "visuals": {
+              "appearance": "Adult Human in their mid fifties, broad steady build, medium olive-brown skin, dark eyes, short curly salt-and-pepper hair and a short salt-and-pepper beard; patient, practical expression. Chain shirt with plain tunic, earth-tone cloak and scarf layers, trousers, belt and boots, and a plain geometric pendant without deity or faction insignia. Lowered mace in their right hand, round wooden shield on their left arm.",
+              "full_body": {
+                "path": "assets/characters/df35ffe755907da99519d1297beb3848d952fcfc42ad6930328ebe5053ba6633.png",
+                "sha256": "df35ffe755907da99519d1297beb3848d952fcfc42ad6930328ebe5053ba6633"
+              },
+              "reference_sheet": {
+                "path": "assets/characters/f2f736622cc7e01554dfc5004666fe3c94e8def39f6d0ae037559cb07aa11698.png",
+                "sha256": "f2f736622cc7e01554dfc5004666fe3c94e8def39f6d0ae037559cb07aa11698"
+              },
+              "portrait": {
+                "path": "assets/characters/b24035d5f13d92ff015da5af1596898cc671d985c6ecec76f9e0a435f2549843.png",
+                "sha256": "b24035d5f13d92ff015da5af1596898cc671d985c6ecec76f9e0a435f2549843"
+              },
+              "frame": {
+                "x": 0.5,
+                "y": 0.35,
+                "zoom": 1
+              }
+            }
           },
-          "content_sha256": "8b0554e6d8e7145f50a91d10fe710d5c4f184a18822e4fc3001df9a84ec9c0a5"
+          "content_sha256": "de1045c1dbe92b162f9debc00d98c35ac22700696ae7bd4e92ea0bd1098c8c00"
         }
       ]
     }

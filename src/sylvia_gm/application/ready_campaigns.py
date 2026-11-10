@@ -493,6 +493,7 @@ def customize_ready_campaign(
             authored_profile=cast(str, item.authored_profile),
             participant=item.participant,
             entity_state=authored_character_state(item.entity_state, declaration),
+            visuals=item.visuals,
             package=primary,
             declaration=declaration,
             campaign_setting=selection.sources.setting,

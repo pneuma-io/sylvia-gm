@@ -30,6 +30,8 @@ PYTHON_JOURNEYS = {
         "tests/test_character_art_import.py",
         "tests/test_character_art_workflow.py",
         "tests/test_character_art_publication.py",
+        "tests/test_image_art_session_handoff.py",
+        "tests/test_ready_character_art.py",
         "tests/test_character_art_handoff.py",
         "tests/test_bundled_character_art.py",
         "tests/test_prepared_enemy_art.py",
