@@ -21,3 +21,15 @@ Trask is energetic, direct, and terrible at hiding her ambitions. She's the only
 ## Hook
 
 Trask's Nexus negotiations have been discovered — not by the council, but by the Jackals. The Tollmen are demanding a cut of the new route's revenue in exchange for not informing Lord Voss. Trask needs the situation resolved quietly. She's willing to pay — in gold, in trade concessions, in political favors — to anyone who can make the Tollmen go away.
+
+## Appearance and artwork
+
+An adult settled Human woman appearing in her early thirties, with an athletic medium build, medium olive skin, direct steel-gray eyes and straight black hair tied into a neat high braid. An energetic confident expression, alert upright posture and slight forward engagement. A tailored deep plum merchant's long coat with small plain metal buttons over a cream high-collared blouse, dark charcoal fitted trousers, a plain narrow belt and practical polished dark boots. No weapon, empty relaxed hands. Her relative youth and energetic direct bearing follow the authored profile; age styling, physical features and costume are editable visual defaults. No crown, invented family or faction insignia, captain's hat, ship wheel, readable trade maps, secret negotiation papers, magical effects or invented history.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/9eb10d5501243dc0b17bf02227cec955a82da6e78a33dbc93ec233c48112189d.png)
+
+[Full-body reference](../assets/characters/45b47aa0f6a711b6a19b4a4793ce63b6e9276c01a29f2239e2f8d738e32ca800.png)
+
+[Multiview reference sheet](../assets/characters/87227427b61f4a5265111faf80c649a65a5fe79a0beb8b7d34d20a7b2060d075.png)

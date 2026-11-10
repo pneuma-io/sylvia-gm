@@ -4756,6 +4756,186 @@
         "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Davith from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, body proportions, skin, eyes, hair, clothing, colors, equipment and material wear. Appearance: A young adult settled Human man appearing in his early twenties, with a lean athletic build, warm beige skin, hazel eyes, short straight ash-brown hair and a clean-shaven youthful face. An earnest expression with a slightly worried brow, held within an attentive restrained guard posture. Plain worn chainmail over a charcoal quilted gambeson, practical brown leather belt and bracers, dark trousers and scuffed calf-high boots. A modest sheathed short sword at his hip, empty visible hands and no helmet covering his face. His youth and uneasy earnest bearing follow the authored profile; physical features, age styling and unmarked uniform are editable visual defaults. No ideological or secret faction symbols, incriminating papers, readable orders, invented city crest, magical effects or visual disclosure of private loyalties. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Consistent scale across three body views. Entire bodies, hair, hands, footwear and attached equipment inside margins. Exactly the same one character repeated as turnaround views. No labels, readable text, captions, borders, logos, UI, scenery, extra characters, animals or invented insignia. Change viewing angle only; keep identity and practical costume unchanged.",
         "portrait": "Use case: identity-preserve. Production square app portrait for Davith from Severed Lands. Input image 1 is the canonical full-body identity reference, image 2 is the matching multiview sheet. Preserve that exact adult face, age, skin, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face is centered; eyes near 35 percent down and chin near 65 percent down, with comfortable headroom above all hair. Face framing must be consistent with a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, borders, captions, readable text, UI, scenery, new costume, magical effects, ideological symbols, animals or extra people. One 1024x1024 PNG."
       }
+    },
+    {
+      "id": "severed-npc-lady-kael",
+      "name": "Lady Sera Kael",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/lady-kael.md",
+          "sha256": "5b6611298c0689308b3f4673c437ceec1f186e810fd690d35f4aaa5ae9f6196f",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/lady-kael.md",
+          "sha256": "24deb6ada353f54e0d8adaffb1799cd74df35c8bd990309772f81e2f6a8d1ce4",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult settled Human woman appearing in her mid-fifties, with a slender medium build, warm medium-brown skin, hazel-brown eyes and wavy chestnut hair graying at the temples, gathered into a neat low coil. A warm measured expression and composed open posture. A well-made but restrained deep teal wool overdress over a dark navy long-sleeved underdress, a narrow plain leather belt, small simple gold hoop earrings and neat dark leather shoes. Empty relaxed hands. Her measured merchant-councillor bearing follows the authored profile; age, physical features and clothing are editable visual defaults. No crown, invented house crest, ceremonial scepter, private family clues, research documents, symbolic Door imagery, magical effects or visual disclosure of hidden motives.",
+        "full_body": {
+          "path": "assets/characters/be3ecee37a19f9e622da4806ab48202b4ce585bc609ec6a2e03af3a9af63146b.png",
+          "sha256": "be3ecee37a19f9e622da4806ab48202b4ce585bc609ec6a2e03af3a9af63146b"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/bd227fd98e1203016f718920a93d062423c3ba1a868c94c8cea3ba11964fdbdd.png",
+          "sha256": "bd227fd98e1203016f718920a93d062423c3ba1a868c94c8cea3ba11964fdbdd"
+        },
+        "portrait": {
+          "path": "assets/characters/973732d84f4d2f3e7afd616ac3f2e774c1aed27942cc5ccd5b2311ce45a3aa1a.png",
+          "sha256": "973732d84f4d2f3e7afd616ac3f2e774c1aed27942cc5ccd5b2311ce45a3aa1a"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2014532
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2263674
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2383131
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Lady Sera Kael in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person standing naturally in a near-front three-quarter pose with both empty hands visible, whole hair, hands, clothing and feet comfortably inside all margins. Appearance: An adult settled Human woman appearing in her mid-fifties, with a slender medium build, warm medium-brown skin, hazel-brown eyes and wavy chestnut hair graying at the temples, gathered into a neat low coil. A warm measured expression and composed open posture. A well-made but restrained deep teal wool overdress over a dark navy long-sleeved underdress, a narrow plain leather belt, small simple gold hoop earrings and neat dark leather shoes. Empty relaxed hands. Her measured merchant-councillor bearing follows the authored profile; age, physical features and clothing are editable visual defaults. No crown, invented house crest, ceremonial scepter, private family clues, research documents, symbolic Door imagery, magical effects or visual disclosure of hidden motives. Preserve authored identity, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Lady Sera Kael from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, body proportions, skin, eyes, hair, clothing, applicable plain earrings, colors and material wear. Appearance: An adult settled Human woman appearing in her mid-fifties, with a slender medium build, warm medium-brown skin, hazel-brown eyes and wavy chestnut hair graying at the temples, gathered into a neat low coil. A warm measured expression and composed open posture. A well-made but restrained deep teal wool overdress over a dark navy long-sleeved underdress, a narrow plain leather belt, small simple gold hoop earrings and neat dark leather shoes. Empty relaxed hands. Her measured merchant-councillor bearing follows the authored profile; age, physical features and clothing are editable visual defaults. No crown, invented house crest, ceremonial scepter, private family clues, research documents, symbolic Door imagery, magical effects or visual disclosure of hidden motives. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Consistent scale across three body views. Entire bodies, hair, hands and footwear inside margins. Exactly the same one character repeated as turnaround views. No labels, readable text, captions, borders, logos, UI, scenery, extra characters, animals or invented insignia. Change viewing angle only; keep identity and costume unchanged.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Lady Sera Kael from Severed Lands. Input image 1 is the canonical full-body identity reference, image 2 is the matching multiview sheet. Preserve that exact adult face, age, skin, eyes, hairstyle, expression, applicable simple earrings and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face is centered; eyes near 35 percent down and chin near 65 percent down, with comfortable headroom above all hair. Face framing must be consistent with a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, borders, captions, readable text, UI, scenery, new costume, magical effects, house crests, animals or extra people. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-lady-trask",
+      "name": "Lady Maren Trask",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/lady-trask.md",
+          "sha256": "7ef82db68fc1dd7d200e00403dc95b22ce937a57ba07a470a3fcd2e4c1c08897",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/lady-trask.md",
+          "sha256": "f9f64271c93a2defef05bdda05198d4bf587baf3fce289604c4470e990bbc809",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult settled Human woman appearing in her early thirties, with an athletic medium build, medium olive skin, direct steel-gray eyes and straight black hair tied into a neat high braid. An energetic confident expression, alert upright posture and slight forward engagement. A tailored deep plum merchant's long coat with small plain metal buttons over a cream high-collared blouse, dark charcoal fitted trousers, a plain narrow belt and practical polished dark boots. No weapon, empty relaxed hands. Her relative youth and energetic direct bearing follow the authored profile; age styling, physical features and costume are editable visual defaults. No crown, invented family or faction insignia, captain's hat, ship wheel, readable trade maps, secret negotiation papers, magical effects or invented history.",
+        "full_body": {
+          "path": "assets/characters/45b47aa0f6a711b6a19b4a4793ce63b6e9276c01a29f2239e2f8d738e32ca800.png",
+          "sha256": "45b47aa0f6a711b6a19b4a4793ce63b6e9276c01a29f2239e2f8d738e32ca800"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/87227427b61f4a5265111faf80c649a65a5fe79a0beb8b7d34d20a7b2060d075.png",
+          "sha256": "87227427b61f4a5265111faf80c649a65a5fe79a0beb8b7d34d20a7b2060d075"
+        },
+        "portrait": {
+          "path": "assets/characters/9eb10d5501243dc0b17bf02227cec955a82da6e78a33dbc93ec233c48112189d.png",
+          "sha256": "9eb10d5501243dc0b17bf02227cec955a82da6e78a33dbc93ec233c48112189d"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1918552
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2165300
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2386185
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Lady Maren Trask in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person standing naturally in a near-front three-quarter pose with both empty hands visible, whole hair, hands, clothing and feet comfortably inside all margins. Appearance: An adult settled Human woman appearing in her early thirties, with an athletic medium build, medium olive skin, direct steel-gray eyes and straight black hair tied into a neat high braid. An energetic confident expression, alert upright posture and slight forward engagement. A tailored deep plum merchant's long coat with small plain metal buttons over a cream high-collared blouse, dark charcoal fitted trousers, a plain narrow belt and practical polished dark boots. No weapon, empty relaxed hands. Her relative youth and energetic direct bearing follow the authored profile; age styling, physical features and costume are editable visual defaults. No crown, invented family or faction insignia, captain's hat, ship wheel, readable trade maps, secret negotiation papers, magical effects or invented history. Preserve authored identity, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Lady Maren Trask from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, body proportions, skin, eyes, hair, clothing, applicable plain earrings, colors and material wear. Appearance: An adult settled Human woman appearing in her early thirties, with an athletic medium build, medium olive skin, direct steel-gray eyes and straight black hair tied into a neat high braid. An energetic confident expression, alert upright posture and slight forward engagement. A tailored deep plum merchant's long coat with small plain metal buttons over a cream high-collared blouse, dark charcoal fitted trousers, a plain narrow belt and practical polished dark boots. No weapon, empty relaxed hands. Her relative youth and energetic direct bearing follow the authored profile; age styling, physical features and costume are editable visual defaults. No crown, invented family or faction insignia, captain's hat, ship wheel, readable trade maps, secret negotiation papers, magical effects or invented history. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Consistent scale across three body views. Entire bodies, hair, hands and footwear inside margins. Exactly the same one character repeated as turnaround views. No labels, readable text, captions, borders, logos, UI, scenery, extra characters, animals or invented insignia. Change viewing angle only; keep identity and costume unchanged.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Lady Maren Trask from Severed Lands. Input image 1 is the canonical full-body identity reference, image 2 is the matching multiview sheet. Preserve that exact adult face, age, skin, eyes, hairstyle, expression, applicable simple earrings and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face is centered; eyes near 35 percent down and chin near 65 percent down, with comfortable headroom above all hair. Face framing must be consistent with a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, borders, captions, readable text, UI, scenery, new costume, magical effects, house crests, animals or extra people. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-lord-dorn",
+      "name": "Lord Harren Dorn",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/lord-dorn.md",
+          "sha256": "c4fe36eebe88d61bc27f20c6cf30008f307c3095876e7b3bfd9cccbad03d015a",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/lord-dorn.md",
+          "sha256": "5d3bc8cc245dd4065d827ce0f2db9140993c10ea108a9d37df9680528d9fd712",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult settled Human man appearing in his late fifties, with a broad heavy working build, weathered tan skin, dark brown eyes, thick dark hair graying at the sides and combed back, and a full neatly squared salt-and-pepper beard. A practical appraising expression and steady grounded posture. A sturdy well-made charcoal wool merchant's coat with plain copper buttons over a muted rust-brown waistcoat and cream linen shirt, dark trousers, a plain leather belt and good worn brown boots. Empty relaxed hands. His practical industrial merchant bearing follows the authored profile; age, physical features and clothing are editable visual defaults. No dwarf anatomy, crown, smith's apron, hammer, invented house crest, stolen metal, readable accounts, magical forge effects or visual disclosure of plot secrets.",
+        "full_body": {
+          "path": "assets/characters/ae451ad0cc82984a48a00ddcd5cf7d7665d13ba6d05dfce1547f2edbc900dd3a.png",
+          "sha256": "ae451ad0cc82984a48a00ddcd5cf7d7665d13ba6d05dfce1547f2edbc900dd3a"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/0491f63bdf838557790b473c7f8a5ec4747c9dfa6c715ca2bfa2f2a423857644.png",
+          "sha256": "0491f63bdf838557790b473c7f8a5ec4747c9dfa6c715ca2bfa2f2a423857644"
+        },
+        "portrait": {
+          "path": "assets/characters/8add00a8166bcaf8c9887353851e30a93b09244c3dc717b33a73aabc522291a8.png",
+          "sha256": "8add00a8166bcaf8c9887353851e30a93b09244c3dc717b33a73aabc522291a8"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2111365
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2477690
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2683378
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Lord Harren Dorn in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person standing naturally in a near-front three-quarter pose with both empty hands visible, whole hair, hands, clothing and feet comfortably inside all margins. Appearance: An adult settled Human man appearing in his late fifties, with a broad heavy working build, weathered tan skin, dark brown eyes, thick dark hair graying at the sides and combed back, and a full neatly squared salt-and-pepper beard. A practical appraising expression and steady grounded posture. A sturdy well-made charcoal wool merchant's coat with plain copper buttons over a muted rust-brown waistcoat and cream linen shirt, dark trousers, a plain leather belt and good worn brown boots. Empty relaxed hands. His practical industrial merchant bearing follows the authored profile; age, physical features and clothing are editable visual defaults. No dwarf anatomy, crown, smith's apron, hammer, invented house crest, stolen metal, readable accounts, magical forge effects or visual disclosure of plot secrets. Preserve authored identity, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Lord Harren Dorn from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, body proportions, skin, eyes, hair, clothing, applicable plain earrings, colors and material wear. Appearance: An adult settled Human man appearing in his late fifties, with a broad heavy working build, weathered tan skin, dark brown eyes, thick dark hair graying at the sides and combed back, and a full neatly squared salt-and-pepper beard. A practical appraising expression and steady grounded posture. A sturdy well-made charcoal wool merchant's coat with plain copper buttons over a muted rust-brown waistcoat and cream linen shirt, dark trousers, a plain leather belt and good worn brown boots. Empty relaxed hands. His practical industrial merchant bearing follows the authored profile; age, physical features and clothing are editable visual defaults. No dwarf anatomy, crown, smith's apron, hammer, invented house crest, stolen metal, readable accounts, magical forge effects or visual disclosure of plot secrets. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Consistent scale across three body views. Entire bodies, hair, hands and footwear inside margins. Exactly the same one character repeated as turnaround views. No labels, readable text, captions, borders, logos, UI, scenery, extra characters, animals or invented insignia. Change viewing angle only; keep identity and costume unchanged.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Lord Harren Dorn from Severed Lands. Input image 1 is the canonical full-body identity reference, image 2 is the matching multiview sheet. Preserve that exact adult face, age, skin, eyes, hairstyle, expression, applicable simple earrings and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face is centered; eyes near 35 percent down and chin near 65 percent down, with comfortable headroom above all hair. Face framing must be consistent with a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, borders, captions, readable text, UI, scenery, new costume, magical effects, house crests, animals or extra people. One 1024x1024 PNG."
+      }
     }
   ]
 }
