@@ -12,12 +12,14 @@ import threading
 import time
 import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 
 
 if __package__:
     from .known_test_defects import accepted_case
 else:
-    from known_test_defects import accepted_case
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    from scripts.known_test_defects import accepted_case
 
 
 def case_key(nodeid):

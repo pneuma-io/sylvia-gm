@@ -23,7 +23,8 @@ from pathlib import Path
 if __package__:
     from .known_test_defects import accepted_case, report_outcomes
 else:
-    from known_test_defects import accepted_case, report_outcomes
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    from scripts.known_test_defects import accepted_case, report_outcomes
 
 ROOT = Path(__file__).resolve().parents[1]
 PYTHON_JOURNEYS = {
