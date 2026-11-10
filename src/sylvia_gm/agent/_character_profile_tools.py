@@ -27,6 +27,7 @@ def character_profile_tools(
     save: Callable[[bytes], SafePayload],
     read: Callable[[str, str], CharacterProfile],
     import_source: Callable[[bytes], SafePayload] | None = None,
+    on_open: Callable[[str, str], None] | None = None,
 ) -> tuple[ToolSpec, ...]:
     """Keep library I/O owner-bound and expose only workspace copies to Builder."""
     guardrail = PathGuardrail(workspace)
@@ -193,6 +194,8 @@ def character_profile_tools(
             path = guardrail.validate(params["destination_path"], for_write=True)
             content = json.dumps(dict(source.profile), ensure_ascii=False, indent=2) + "\n"
             version = _workspace_files.write_text(path, content, params.get("expected_version"))
+            if on_open is not None:
+                on_open(source.artifact_id, source.content_sha256)
             return {
                 "success": True,
                 "published": False,

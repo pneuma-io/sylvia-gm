@@ -301,9 +301,7 @@ class ImageArt:
         scope, _ = self._scope(session_id)
         rows = self.store.list_selections(scope)
         if source_target_id is not None:
-            source = character_visuals_from_selections(rows, source_target_id)
-            if source is not None:
-                return source
+            return character_visuals_from_selections(rows, source_target_id)
         matches = {row["target_id"] for row in rows if row["metadata"].get("target_name") == name}
         bundles = [
             bundle
@@ -313,20 +311,33 @@ class ImageArt:
         return bundles[0] if len(bundles) == 1 else None
 
     def ensure_character_art(
-        self, session_id: str, *, name: str, appearance: str
+        self, session_id: str, *, name: str, appearance: str, target_id: str | None = None
     ) -> dict[str, Any]:
         """Make artwork an owned part of saving a character, without retrying an existing flow."""
         if self.settings().get("mode") == "off":
             return {"status": "off"}
-        _, campaign_id = self._scope(session_id)
+        scope, campaign_id = self._scope(session_id)
+        if target_id is not None:
+            selected = [
+                row for row in self.store.list_selections(scope) if row["target_id"] == target_id
+            ]
+            if not missing_character_art(selected):
+                return {"status": "already_available", "target_id": target_id, "name": name}
         for row in self.store.list_requests(campaign_id=campaign_id, session_id=session_id):
             flow = json.loads(row["request_json"]).get("character_flow")
-            if flow and flow["name"] == name:
+            if flow and (
+                row["target_id"] == target_id if target_id is not None else flow["name"] == name
+            ):
                 return self._receipt(row)
         try:
             return self.request(
                 session_id,
-                operation_id="publish:" + hashlib.sha256((name + appearance).encode()).hexdigest(),
+                operation_id="publish:" + hashlib.sha256(
+                    canonical_json_bytes({
+                        "name": name, "appearance": appearance, "target_id": target_id,
+                    })
+                ).hexdigest(),
+                target_id=target_id,
                 purpose="character",
                 name=name,
                 appearance=appearance[:16000],
@@ -352,8 +363,11 @@ class ImageArt:
         candidates = [
             row
             for row in rows
-            if json.loads(row["request_json"]).get("metadata", {}).get("target_name") == name
-            or row["target_id"] == source_target_id
+            if (
+                row["target_id"] == source_target_id
+                if source_target_id is not None
+                else json.loads(row["request_json"]).get("metadata", {}).get("target_name") == name
+            )
         ]
         flow = next(
             (

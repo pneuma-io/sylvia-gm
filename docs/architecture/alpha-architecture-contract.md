@@ -1126,6 +1126,10 @@ admitted. Only adopted results project into linked sources. Campaign materializa
 available art and its exact source identity; subsequent reads restore later adopted stages into
 campaign-owned selections. Imported selections do not inherit the source publication links, so
 editing a campaign copy does not update the original. This uses the existing schema and blob store.
+Builder edits retain the exact source opened for a Character File or profile, including across
+turns and restart. Artwork preparation and publication use that source target before considering
+a display name. A rename reuses its references and crop; it cannot attach another same-named
+character's workflow or automatically replace a complete bundle with a new generation request.
 
 Underlay references are rendered from the existing player projection's static map geometry and
 terrain, without tokens, labels or hidden geometry. The selected image retains bounds and a

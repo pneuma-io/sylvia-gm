@@ -60,6 +60,11 @@ package checks, preview/confirm/cancel and owner/WebUI upload/download endpoints
 used art, crop and imported originals through the existing libraries and image store, preserving
 legacy v1 text. Focused checks cover an imported card's crop/edit/re-export/reference journey and
 actual Lite exact-package restoration with generation Off. Frontend controls remain pending.
+The following ordinary-edit audit confirmed that renaming a saved character could propose fresh
+art despite its complete references. Builder publication now uses the opened source target for
+preparation, reuse and links, with retained profile-open receipts across restart. Explicit sources
+do not fall back to an unrelated same-named target. Four local edit checks pass, including actual
+Lite, an independent Ruleset, restart and Auto isolation; eighteen direct consumers also pass.
 The subsequent local handoff check found and fixed an execution dependency on a stopped source
 chat, including admission of the next character reference stage. An active chat in the same
 campaign can now generate/adopt an existing individual request or continue the whole character
