@@ -299,7 +299,13 @@ def execute(
             if cause == "scripted_driver"
             else "Execution or checker evidence is insufficient to assign a specific cause."
         ),
-        session_breakers=breakers(checks, completed) if not error else [],
+        session_breakers=breakers(
+            checks,
+            completed,
+            retries_exhausted=any(a.number == 2 and not a.completed for a in attempts),
+        )
+        if not error
+        else [],
         observations=observations,
         identity_note="Scripted provider; no model inference occurred."
         if setup.kind == "scripted"

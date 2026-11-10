@@ -95,6 +95,10 @@ scenarios, a simulated adventure player and player-experience calibration remain
 The owner records mechanics and TALK narration. Checks read those committed records rather than
 trusting the scripted driver's proposed actions. Admin Full Audit is enabled for the synthetic
 run; raw audit traces and model reasoning are not copied into result records or reports.
+Healing narration accepts bounded numeric paraphrases such as "regain 5 HP". Missing, spelled-out
+or ambiguous amounts remain unscored; they do not establish a false outcome. The stuck-turn
+session breaker requires the first attempt and both manual retries to have failed. Stopping with
+a smaller retry budget remains an interruption without that breaker claim.
 
 ## Records, resume and replay
 

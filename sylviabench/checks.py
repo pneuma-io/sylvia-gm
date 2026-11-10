@@ -14,6 +14,36 @@ def _check(identity: str, passed: bool, reason: str, **evidence: Any) -> Check:
     return Check(id=identity, status="pass" if passed else "fail", reason=reason, evidence=evidence)
 
 
+def healing_narration(narration: str, recorded: int) -> Check:
+    """Check bounded numeric healing statements; missing or ambiguous amounts stay unscored."""
+    text = re.sub(r"[*_`]", "", narration)
+    patterns = (
+        r"\b(?:restore[sd]?|regains?|recovers?|heals?|healed)\s+"
+        r"(?:(?:you|yourself|me|myself|him|her|them|it)\s+)?(?:for\s+)?"
+        r"(\d+)\s*(?:HP\b|hit points?\b)",
+        r"\b(\d+)\s*(?:HP|hit points?)\s+(?:restored|regained|recovered|healed)\b",
+        r"\+(\d+)\s*(?:HP\b|hit points?\b)",
+        r"\b(?:HP|hit points?)\s+(?:increase[sd]?|rise[sn]?)\s+by\s+(\d+)\b",
+    )
+    amounts = sorted(
+        {int(value) for pattern in patterns for value in re.findall(pattern, text, re.I)}
+    )
+    evidence = {"narration": narration, "recorded_amount": recorded, "matched_amounts": amounts}
+    if len(amounts) != 1:
+        return Check(
+            id="narrated_healing",
+            status="not_evaluated",
+            reason="No single unambiguous numeric healing amount was recognized.",
+            evidence=evidence,
+        )
+    return _check(
+        "narrated_healing",
+        amounts[0] == recorded,
+        "The stated restored amount must match the committed result.",
+        **evidence,
+    )
+
+
 def evaluate(scenario: Scenario, observations: dict[str, Any]) -> list[Check]:
     """Missing observations remain unevaluated, including when execution was interrupted."""
     try:
@@ -33,7 +63,6 @@ def evaluate(scenario: Scenario, observations: dict[str, Any]) -> list[Check]:
             faces, total, modifier = dice[-1]
             face_values = [int(value.strip()) for value in faces.split(",")]
             expected = min(new["max_hp"] - old["hp"], int(total) + int(modifier))
-            said = re.findall(r"restores (\d+) hit points", narration, flags=re.I)
             return [
                 _check(
                     "slot_spent",
@@ -56,13 +85,7 @@ def evaluate(scenario: Scenario, observations: dict[str, Any]) -> list[Check]:
                     dice_total=int(total),
                     modifier=int(modifier),
                 ),
-                _check(
-                    "narrated_healing",
-                    bool(said) and int(said[-1]) == amount,
-                    "Narrated healing must match the committed result.",
-                    narration=narration,
-                    recorded_amount=amount,
-                ),
+                healing_narration(narration, amount),
             ]
         if scenario.id == "T2":
             private_before = [f for f in before["facts"] if f.get("text") == SECRET]
@@ -118,9 +141,9 @@ def evaluate(scenario: Scenario, observations: dict[str, Any]) -> list[Check]:
         ]
 
 
-def breakers(checks: list[Check], completed: bool) -> list[str]:
+def breakers(checks: list[Check], completed: bool, *, retries_exhausted: bool = False) -> list[str]:
     found = []
-    if not completed:
+    if not completed and retries_exhausted:
         found.append("stuck_turn")
     for check in checks:
         if check.status != "fail":
