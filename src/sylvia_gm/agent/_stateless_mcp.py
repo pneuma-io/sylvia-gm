@@ -1358,7 +1358,7 @@ def build_stateless_mcp_server(owner: AuthorityOwner) -> Server[Any]:
                     participant_ids=participant_ids,
                     castable_spell_ids=castable_spell_ids,
                 )
-                properties = cast(Mapping[str, object], model_schema["properties"])
+                properties = cast(Mapping[str, object], model_schema.get("properties", {}))
                 spell_schema = properties.get("spell")
                 if isinstance(spell_schema, Mapping) and spell_schema.get("enum") == []:
                     continue
