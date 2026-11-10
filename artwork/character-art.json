@@ -5116,6 +5116,186 @@
         "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Castellan Voss from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, body proportions, skin, eyes, hair, clothing, armor where applicable, colors and material wear. Appearance: An adult settled Human man appearing in his mid-fifties, with a strong sinewy build, medium-deep brown skin, hazel-gray eyes, close-cropped dark hair graying at the sides and a short close salt-and-pepper beard. A stern direct expression with attentive warmth and a steady experienced warrior's stance. Worn plain steel plate-and-mail armor over a desaturated burgundy padded gambeson, practical dark trousers and armored brown boots. A distinctive heavy layered steel gauntlet fully covers his right hand and wrist and stays on; a plain oval metal-rimmed shield rests on his left arm beside his body, and a sheathed sword at his left hip keeps its hilt visible near the waist. The sword, shield and ever-worn gauntlet follow the authored profile; their uninscribed shapes and materials, age styling and other physical details are editable visual defaults. He is the Warden Lodge's Knight-Commander, unrelated to House Voss. No invented heraldry, readable inscriptions, visible illness, lung-condition clues, glowing artifacts, bare right hand, crown or invented family resemblance. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Consistent scale across three body views. Entire bodies, hair, hands, footwear and equipment inside margins. Exactly the same one character repeated as turnaround views. For the knight, preserve the heavy gauntlet on his RIGHT hand, shield on LEFT arm and sheathed sword at LEFT hip through all viewing angles; never mirror their anatomical sides. No labels, readable text, captions, borders, logos, UI, scenery, extra characters, animals, invented insignia or visible secret illness. Change viewing angle only; keep identity and costume unchanged.",
         "portrait": "Use case: identity-preserve. Production square app portrait for Castellan Voss from Severed Lands. Input image 1 is the canonical full-body identity reference, image 2 is the matching multiview sheet. Preserve that exact adult face, age, skin, eyes, hairstyle, facial hair, expression and upper clothing or armor. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face is centered; eyes near 35 percent down and chin near 65 percent down, with comfortable headroom above all hair. Face framing must be consistent with a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin, fabric and applicable worn steel, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, borders, captions, readable text, UI, scenery, new costume, magical effects, invented crests, illness clues, animals or extra people. One 1024x1024 PNG."
       }
+    },
+    {
+      "id": "severed-npc-iron-mother-hest",
+      "name": "Iron Mother Hest",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/iron-mother-hest.md",
+          "sha256": "9568e9c13c1bc7e2b1f4c49d675e37b9754c4516a821a757bed6818a4af4d9ad",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/iron-mother-hest.md",
+          "sha256": "4edff18f750c9cea3905544a63c0e31efbb893acfe928f55e11860610e7c68c2",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An older adult settled Dwarf woman, visibly short and broad with substantial Dwarf proportions, a deep chest, powerful forearms and a sturdy muscular build. Ruddy medium-brown skin, dark brown eyes, a broad lined face and thick copper-red hair threaded with gray, secured into two short practical braids. A clean-shaven face, direct unsentimental expression and grounded smith's posture. A dense faded ochre work shirt with sleeves rolled to the elbows, worn dark brown leather forge apron, charcoal work trousers and heavy scuffed leather boots. A small ordinary smith's hammer is secured in a belt loop at her right hip, with a closed tool pouch at the other side; empty relaxed hands. Her Dwarf identity and experienced smith bearing follow the authored profile; age styling, features and clothing are editable visual defaults. No human-height proportions, metal body, construct anatomy, oversized warhammer, glowing runes, invented insignia, readable inscriptions, modern welding gear or invented past.",
+        "full_body": {
+          "path": "assets/characters/6d80574d08ae3c18e322b3585c9856abd2d3bdd77a5256c4b0bbac8a91eae62d.png",
+          "sha256": "6d80574d08ae3c18e322b3585c9856abd2d3bdd77a5256c4b0bbac8a91eae62d"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/60ce7d0b6f64a2bcffc7fe045b98c23b2c5fae2137047fff691dd0f6a2ffa1ba.png",
+          "sha256": "60ce7d0b6f64a2bcffc7fe045b98c23b2c5fae2137047fff691dd0f6a2ffa1ba"
+        },
+        "portrait": {
+          "path": "assets/characters/1d08d1845e4ba83ceaf57726c8de3719d2fd9f02fd8eec473a7d061b6f74f449.png",
+          "sha256": "1d08d1845e4ba83ceaf57726c8de3719d2fd9f02fd8eec473a7d061b6f74f449"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0,
+          "zoom": 1.18
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2209550
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2496521
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2890637
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Iron Mother Hest in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person standing naturally in a near-front three-quarter pose, unmistakably short and broad rather than a scaled-down human, both empty hands visible, whole hair, hands, clothing, footwear and equipment comfortably inside all margins. Appearance: An older adult settled Dwarf woman, visibly short and broad with substantial Dwarf proportions, a deep chest, powerful forearms and a sturdy muscular build. Ruddy medium-brown skin, dark brown eyes, a broad lined face and thick copper-red hair threaded with gray, secured into two short practical braids. A clean-shaven face, direct unsentimental expression and grounded smith's posture. A dense faded ochre work shirt with sleeves rolled to the elbows, worn dark brown leather forge apron, charcoal work trousers and heavy scuffed leather boots. A small ordinary smith's hammer is secured in a belt loop at her right hip, with a closed tool pouch at the other side; empty relaxed hands. Her Dwarf identity and experienced smith bearing follow the authored profile; age styling, features and clothing are editable visual defaults. No human-height proportions, metal body, construct anatomy, oversized warhammer, glowing runes, invented insignia, readable inscriptions, modern welding gear or invented past. Preserve authored identity, species, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Iron Mother Hest from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, species, body proportions, skin, eyes, hair, clothing, equipment, colors and material wear. Appearance: An older adult settled Dwarf woman, visibly short and broad with substantial Dwarf proportions, a deep chest, powerful forearms and a sturdy muscular build. Ruddy medium-brown skin, dark brown eyes, a broad lined face and thick copper-red hair threaded with gray, secured into two short practical braids. A clean-shaven face, direct unsentimental expression and grounded smith's posture. A dense faded ochre work shirt with sleeves rolled to the elbows, worn dark brown leather forge apron, charcoal work trousers and heavy scuffed leather boots. A small ordinary smith's hammer is secured in a belt loop at her right hip, with a closed tool pouch at the other side; empty relaxed hands. Her Dwarf identity and experienced smith bearing follow the authored profile; age styling, features and clothing are editable visual defaults. No human-height proportions, metal body, construct anatomy, oversized warhammer, glowing runes, invented insignia, readable inscriptions, modern welding gear or invented past. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Consistent scale across three body views. Entire bodies, hair, hands, footwear and equipment inside margins. Exactly the same one character repeated as turnaround views. Preserve the Dwarf's short broad proportions and limb-to-torso ratios where applicable. No labels, readable text, captions, borders, logos, UI, scenery, extra characters, animals, invented insignia or revealed secrets. Change viewing angle only; keep identity and practical costume unchanged.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Iron Mother Hest from Severed Lands. Input image 1 is the canonical full-body identity reference, image 2 is the matching multiview sheet. Preserve that exact adult face, age, species-specific facial proportions, skin, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face is centered; eyes near 35 percent down and chin near 65 percent down, with comfortable headroom above all hair. Face framing must be consistent with a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, borders, captions, readable text, UI, scenery, new costume, magical effects, invented crests, animals or extra people. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-prospector-joss",
+      "name": "Joss",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/prospector-joss.md",
+          "sha256": "cf4199f024b98113775ae94121cb3f6a8a7e93fdc3a647203ec0cb456f8c525d",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/prospector-joss.md",
+          "sha256": "5395a58f59bc3b814e5baee0a328e4f0b60e828c5d76c03b02ce23030998ec80",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult settled Human prospector appearing in their early forties, with a lean sinewy build, sandy-brown skin, dark hazel eyes, short cropped sandy-blond hair and an androgynous weathered face. A pragmatic measuring expression and relaxed self-contained posture. A worn charcoal work coat over a muted olive waistcoat and brown linen shirt, practical dark trousers and sturdy dusty brown boots. A plain belt supports one small closed tool pouch and a modest canvas shoulder bag hangs closed at their side. Empty relaxed hands. Their practical independent scavenger bearing follows the authored profile; age, physical features and clothing are editable visual defaults. Use they/them pronouns. No guild or crew insignia, glowing fragments, invented relic powers, readable maps, heroic finery, sinister villain costume, oversized mining tools or invented history.",
+        "full_body": {
+          "path": "assets/characters/b37431f6d6fa3bd27a31fef4805a0aaa3a8db349a7504f5fba7323f633d1301e.png",
+          "sha256": "b37431f6d6fa3bd27a31fef4805a0aaa3a8db349a7504f5fba7323f633d1301e"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/77348cf87eddf93ab7a8e4729066b90e46522a9c3678560c4837b082f0ee30ab.png",
+          "sha256": "77348cf87eddf93ab7a8e4729066b90e46522a9c3678560c4837b082f0ee30ab"
+        },
+        "portrait": {
+          "path": "assets/characters/82bbc8c66777470563aceb0a727c3dd8cfffb073e332966a6dbe67a143199ea3.png",
+          "sha256": "82bbc8c66777470563aceb0a727c3dd8cfffb073e332966a6dbe67a143199ea3"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0,
+          "zoom": 1.1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2014198
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2300542
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2471494
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Joss in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person standing naturally in a near-front three-quarter pose with both empty hands visible and the plain shoulder bag closed, whole hair, hands, clothing, footwear and equipment comfortably inside all margins. Appearance: An adult settled Human prospector appearing in their early forties, with a lean sinewy build, sandy-brown skin, dark hazel eyes, short cropped sandy-blond hair and an androgynous weathered face. A pragmatic measuring expression and relaxed self-contained posture. A worn charcoal work coat over a muted olive waistcoat and brown linen shirt, practical dark trousers and sturdy dusty brown boots. A plain belt supports one small closed tool pouch and a modest canvas shoulder bag hangs closed at their side. Empty relaxed hands. Their practical independent scavenger bearing follows the authored profile; age, physical features and clothing are editable visual defaults. Use they/them pronouns. No guild or crew insignia, glowing fragments, invented relic powers, readable maps, heroic finery, sinister villain costume, oversized mining tools or invented history. Preserve authored identity, species, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Joss from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, species, body proportions, skin, eyes, hair, clothing, equipment, colors and material wear. Appearance: An adult settled Human prospector appearing in their early forties, with a lean sinewy build, sandy-brown skin, dark hazel eyes, short cropped sandy-blond hair and an androgynous weathered face. A pragmatic measuring expression and relaxed self-contained posture. A worn charcoal work coat over a muted olive waistcoat and brown linen shirt, practical dark trousers and sturdy dusty brown boots. A plain belt supports one small closed tool pouch and a modest canvas shoulder bag hangs closed at their side. Empty relaxed hands. Their practical independent scavenger bearing follows the authored profile; age, physical features and clothing are editable visual defaults. Use they/them pronouns. No guild or crew insignia, glowing fragments, invented relic powers, readable maps, heroic finery, sinister villain costume, oversized mining tools or invented history. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Consistent scale across three body views. Entire bodies, hair, hands, footwear and equipment inside margins. Exactly the same one character repeated as turnaround views. Preserve the Dwarf's short broad proportions and limb-to-torso ratios where applicable. No labels, readable text, captions, borders, logos, UI, scenery, extra characters, animals, invented insignia or revealed secrets. Change viewing angle only; keep identity and practical costume unchanged.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Joss from Severed Lands. Input image 1 is the canonical full-body identity reference, image 2 is the matching multiview sheet. Preserve that exact adult face, age, species-specific facial proportions, skin, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face is centered; eyes near 35 percent down and chin near 65 percent down, with comfortable headroom above all hair. Face framing must be consistent with a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, borders, captions, readable text, UI, scenery, new costume, magical effects, invented crests, animals or extra people. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-kell",
+      "name": "Kell",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/kell.md",
+          "sha256": "bc3db5b69f1bd1ea4e4066bad98579c914f7efa69e26aa184d7ccd8db478cab9",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/kell.md",
+          "sha256": "8eb4ea3672a892be1c34aedaf5b46e2e9d92826e3d2b116ef510174396bb9473",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A humanlike Riftborn woman in her fifties, with a broad-shouldered athletic working build, deep olive skin, dark brown eyes and black hair streaked with iron gray pulled into a tight practical knot. A blunt fair-minded expression, tired watchful eyes and disciplined upright posture. A weathered slate-blue wool work jacket over a brown waistcoat and neutral linen shirt, plain leather wrist guards, dark practical trousers and scuffed calf-high work boots. A plain belt has one small closed pouch and a short neatly coiled work rope. Empty relaxed hands. Her age, professional crew-leader bearing and tired steadiness follow the authored profile; other features and costume details are editable visual defaults. Her home world and reasons for leaving the Returners remain unknown. No invented crew logo, revealed past, glowing sigils, sealed-chamber keys, dramatic villain costume, magical effects or invented origin.",
+        "full_body": {
+          "path": "assets/characters/39d4c2142c11bb8f9868f9a0b75ee2f4a55847509e7a061c357aa07fe9ea3dcf.png",
+          "sha256": "39d4c2142c11bb8f9868f9a0b75ee2f4a55847509e7a061c357aa07fe9ea3dcf"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/7717bfaa1731262a12b04c45d526898cebe14e35b279b1bd08d64fe6d9024bd5.png",
+          "sha256": "7717bfaa1731262a12b04c45d526898cebe14e35b279b1bd08d64fe6d9024bd5"
+        },
+        "portrait": {
+          "path": "assets/characters/b8d2d4cfc13253210a9328a74e98d4ad3bf989279344db4bfc1356cfbcf1ad78.png",
+          "sha256": "b8d2d4cfc13253210a9328a74e98d4ad3bf989279344db4bfc1356cfbcf1ad78"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1966045
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2322754
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2545115
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Kell in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person standing naturally in a near-front three-quarter pose with both empty hands visible, whole hair, hands, clothing, footwear and equipment comfortably inside all margins. Appearance: A humanlike Riftborn woman in her fifties, with a broad-shouldered athletic working build, deep olive skin, dark brown eyes and black hair streaked with iron gray pulled into a tight practical knot. A blunt fair-minded expression, tired watchful eyes and disciplined upright posture. A weathered slate-blue wool work jacket over a brown waistcoat and neutral linen shirt, plain leather wrist guards, dark practical trousers and scuffed calf-high work boots. A plain belt has one small closed pouch and a short neatly coiled work rope. Empty relaxed hands. Her age, professional crew-leader bearing and tired steadiness follow the authored profile; other features and costume details are editable visual defaults. Her home world and reasons for leaving the Returners remain unknown. No invented crew logo, revealed past, glowing sigils, sealed-chamber keys, dramatic villain costume, magical effects or invented origin. Preserve authored identity, species, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Kell from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, age, species, body proportions, skin, eyes, hair, clothing, equipment, colors and material wear. Appearance: A humanlike Riftborn woman in her fifties, with a broad-shouldered athletic working build, deep olive skin, dark brown eyes and black hair streaked with iron gray pulled into a tight practical knot. A blunt fair-minded expression, tired watchful eyes and disciplined upright posture. A weathered slate-blue wool work jacket over a brown waistcoat and neutral linen shirt, plain leather wrist guards, dark practical trousers and scuffed calf-high work boots. A plain belt has one small closed pouch and a short neatly coiled work rope. Empty relaxed hands. Her age, professional crew-leader bearing and tired steadiness follow the authored profile; other features and costume details are editable visual defaults. Her home world and reasons for leaving the Returners remain unknown. No invented crew logo, revealed past, glowing sigils, sealed-chamber keys, dramatic villain costume, magical effects or invented origin. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, front, side profile and back, plus one smaller close face detail at the far right. Consistent scale across three body views. Entire bodies, hair, hands, footwear and equipment inside margins. Exactly the same one character repeated as turnaround views. Preserve the Dwarf's short broad proportions and limb-to-torso ratios where applicable. No labels, readable text, captions, borders, logos, UI, scenery, extra characters, animals, invented insignia or revealed secrets. Change viewing angle only; keep identity and practical costume unchanged.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Kell from Severed Lands. Input image 1 is the canonical full-body identity reference, image 2 is the matching multiview sheet. Preserve that exact adult face, age, species-specific facial proportions, skin, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face is centered; eyes near 35 percent down and chin near 65 percent down, with comfortable headroom above all hair. Face framing must be consistent with a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, borders, captions, readable text, UI, scenery, new costume, magical effects, invented crests, animals or extra people. One 1024x1024 PNG."
+      }
     }
   ]
 }
