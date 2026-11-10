@@ -6,7 +6,10 @@ import sys
 from pathlib import Path
 
 from sylvia_gm.application.authority import AuthorityOwner
-from sylvia_gm.application.bundled_character_art import bundled_character_image
+from sylvia_gm.application.bundled_character_art import (
+    bundled_character_image,
+    bundled_source_visuals,
+)
 from sylvia_gm.application.bundled_packages import _rift_drafts
 from sylvia_gm.application.campaign_library_selection import materialize_library_party
 from sylvia_gm.application.image_art import ImageArt
@@ -30,8 +33,15 @@ def test_prepared_bundles_match_starter_data_package_payloads_and_frozen_invento
     )
     assert catalogue["characters"]
     for entry in catalogue["characters"]:
-        source = next(row for row in starters if row["participant"]["name"] == entry["name"])
-        assert source["visuals"] == validate_character_visuals(entry["visuals"])
+        visuals = validate_character_visuals(entry["visuals"])
+        if entry["id"].startswith("srd-starter-"):
+            source = next(row for row in starters if row["participant"]["name"] == entry["name"])
+            assert source["visuals"] == visuals
+        else:
+            path = entry["sources"][0]["path"]
+            assert bundled_source_visuals(
+                "pneuma.severed-lands", path, (WORLD / path).read_bytes()
+            ) == visuals
         for purpose in ("full_body", "reference_sheet", "portrait"):
             asset = entry["visuals"][purpose]
             raw = bundled_character_image(asset["path"], asset["sha256"])
@@ -107,6 +117,7 @@ def test_prepared_starter_reuses_art_offline_through_campaign_crop_reopen_and_tr
             art.frame("campaign-builder", actor, source_visuals["portrait"]["sha256"], {
                 "x": 0.45, "y": 0.3, "zoom": 1.2,
             })
+            assert owner.character_visuals(confirmed.campaign_id)[actor]["frame"]["zoom"] == 1.2
             assert starter.visuals == source_visuals
             owner.export_campaign(
                 operation_id="export", campaign_id=confirmed.campaign_id, target=archive

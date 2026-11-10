@@ -953,11 +953,13 @@ class AuthorityOwner:
             return self._image_art
 
     def character_visuals(self, campaign_id: str) -> dict[str, Any]:
-        """Read prepared Character File references and overlay this campaign's current choices."""
+        """Read prepared artwork and overlay this campaign's selected images and framing."""
+        from sylvia_gm.application.bundled_character_art import bundled_source_visuals
         from sylvia_gm.domain.image_art import (
             character_visuals_from_selections,
             validate_character_visuals,
         )
+        from sylvia_gm.domain.package_library import validate_portable_path
 
         result: dict[str, Any] = {}
         with self._operation():
@@ -992,6 +994,42 @@ class AuthorityOwner:
                     identity = selected.get("participant_id")
                     if visuals is not None and isinstance(identity, str):
                         result[identity] = visuals
+            continuity = self._store.campaign_continuity_view(campaign_id)
+            entities = {
+                record.record_id: record for record in continuity.records
+                if record.kind == "entity"
+            }
+            package_lock: PackageLock | None = None
+            for identity, record in entities.items():
+                source = record.payload.get("source_ref")
+                if (
+                    identity in result
+                    or record.status != "active"
+                    or record.payload.get("visibility") != "player_known"
+                    or not isinstance(source, str)
+                ):
+                    continue
+                try:
+                    portable = validate_portable_path(source)
+                except ValueError:
+                    continue
+                if package_lock is None:
+                    package_lock = self._store.current_package_lock(campaign_id).package_lock
+                for entry in package_lock.entries:
+                    try:
+                        raw = self._store.package_file_bytes(
+                            entry.package_id, entry.version, entry.sha256, portable,
+                            maximum_bytes=256 * 1024,
+                        )
+                    except CommandRejected as error:
+                        if error.code == "package_file_oversized":
+                            continue
+                        raise
+                    if raw is not None:
+                        visuals = bundled_source_visuals(entry.package_id, portable, raw)
+                        if visuals is not None:
+                            result[identity] = visuals
+                            break
             rows = self._store.images.list_selections(campaign_id)
             for target in {row["target_id"] for row in rows if row["purpose"] != "map_underlay"}:
                 visuals = character_visuals_from_selections(rows, target)
@@ -1004,6 +1042,12 @@ class AuthorityOwner:
                     )
                     if target not in result or edited:
                         result[target] = visuals
+                    elif (
+                        "frame" in visuals and "portrait" in visuals
+                        and visuals["portrait"]["sha256"]
+                        == result[target].get("portrait", {}).get("sha256")
+                    ):
+                        result[target]["frame"] = visuals["frame"]
         return result
 
     def image_art_action(self, params: dict[str, Any]) -> dict[str, Any]:

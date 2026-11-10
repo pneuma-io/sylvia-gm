@@ -570,6 +570,25 @@ class ImageArt:
                             "name": name,
                         }
                     )
+            if not include_targets:
+                party_ids = {
+                    member["participant_id"] for member in party
+                    if isinstance(member, Mapping) and isinstance(member.get("participant_id"), str)
+                }
+                others = set(prepared) - party_ids
+                if others:
+                    continuity = self.owner._store.campaign_continuity_view(campaign_id)
+                    names = {
+                        record.record_id: record.payload.get("name")
+                        for record in continuity.records
+                        if record.kind == "entity"
+                    }
+                    for identity in others:
+                        name = names.get(identity)
+                        self.restore_visuals(
+                            session_id, identity, prepared[identity],
+                            name=name if isinstance(name, str) else None,
+                        )
         rows = self.store.list_selections(scope)
         needs = []
         for target in targets:

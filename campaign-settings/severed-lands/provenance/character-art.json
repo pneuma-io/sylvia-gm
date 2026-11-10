@@ -149,6 +149,64 @@
         "reference_sheet": "Polished naturalistic digital RPG character illustration, plain light neutral background, soft natural light and subtle grounding shadow, clear silhouette, no text, labels, borders, UI, scenery, faction insignia or magical effects. Adult Human starters use they/them pronouns. These editable visual defaults assign no home, allegiance or campaign history. One landscape PNG, 1536x1024. The canonical full-body image is the authoritative identity, proportions, colors, outfit and equipment reference. Front, exact side profile and back, all complete figures at common scale with margins, plus one large frontal facial detail. One consistent physical outfit and gear; no captions or labels. Subject: Adult Human in their mid fifties, broad steady build, medium olive-brown skin, dark eyes, short curly salt-and-pepper hair and a short salt-and-pepper beard; patient, practical expression. Chain shirt with plain tunic, earth-tone cloak and scarf layers, trousers, belt and boots, and a plain geometric pendant without deity or faction insignia. Lowered mace in their right hand, round wooden shield on their left arm.",
         "portrait": "Polished naturalistic digital RPG character illustration, plain light neutral background, soft natural light and subtle grounding shadow, clear silhouette, no text, labels, borders, UI, scenery, faction insignia or magical effects. Adult Human starters use they/them pronouns. These editable visual defaults assign no home, allegiance or campaign history. One square PNG, 1024x1024. Use the canonical full-body and multiview sheet as identity references. Head and upper shoulders, directly forward, eyes level toward viewer, centered face, eye line 35 percent down, consistent face scale and comfortable space above all hair and beside the head for a circular crop. Preserve face, age, hair, skin and outfit; no redesign or equipment obscuring the face. Subject: Adult Human in their mid fifties, broad steady build, medium olive-brown skin, dark eyes, short curly salt-and-pepper hair and a short salt-and-pepper beard; patient, practical expression. Chain shirt with plain tunic, earth-tone cloak and scarf layers, trousers, belt and boots, and a plain geometric pendant without deity or faction insignia. Lowered mace in their right hand, round wooden shield on their left arm."
       }
+    },
+    {
+      "id": "anchor-sentinel",
+      "name": "Anchor Sentinel",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/anchor-sentinel.md",
+          "sha256": "1f8fd5d862b4986ce9aad8af4ce3bdfbad433aab2aef3fcb7cf401257a713a72"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/anchor-sentinel.md",
+          "sha256": "d10357126413034ddd09484db8b213a3ea1de8bb6533a0ed13c61146a8f43558"
+        }
+      ],
+      "visuals": {
+        "appearance": "A Medium hovering orb of weathered dark stone and dull iron plates, with one large amber slit-pupil eye, four smaller amber perimeter eyes, a compact toothed split jaw, narrow pale-blue luminous seams, worn iron braces and age cracks. It has no humanoid limbs or clothing.",
+        "frame": {
+          "x": 0.5,
+          "y": 0.45,
+          "zoom": 1
+        },
+        "full_body": {
+          "path": "assets/characters/b5d89a10fe76c5cb60806910ee0ebd815725358fdeb72e1b2cec422e3010f2da.png",
+          "sha256": "b5d89a10fe76c5cb60806910ee0ebd815725358fdeb72e1b2cec422e3010f2da"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/4ab1179654199dd3a6c0221e1fb2811bafcb00d6c024a579f026d77b77b31433.png",
+          "sha256": "4ab1179654199dd3a6c0221e1fb2811bafcb00d6c024a579f026d77b77b31433"
+        },
+        "portrait": {
+          "path": "assets/characters/bc07a201d8c8e751c51ec483b22700f386c665dfddcec7264e58d72725414e31.png",
+          "sha256": "bc07a201d8c8e751c51ec483b22700f386c665dfddcec7264e58d72725414e31"
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2201395
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2318446
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2261626
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset type: canonical full-body RPG enemy reference, one portrait-orientation PNG 1024x1536. The input image is STYLE ONLY: match its polished naturalistic digital RPG illustration, material detail, soft natural light and plain light neutral backdrop; do not copy its human subject, face, body, clothes or equipment. Subject: an Anchor Sentinel, a Medium hovering ancient guardian from the Severed Lands, with NO human body or limbs. Its editable public visual default is a compact floating orb assembled from weathered dark stone and dull iron plates around one large amber glassy eye. Four smaller lens-like eyes sit around the perimeter; a compact toothed split jaw beneath the central eye suits its bite. Subtle pale-blue light in narrow seams, worn surfaces, asymmetrical age cracks, coherent constructed anatomy. A watchful wary presence, practical ancient fantasy craft rather than modern electronics. Show the entire single creature hovering just above an unobtrusive ground shadow, near-front three-quarter view, all perimeter eyes and the jaw clearly readable, comfortable blank margins. Keep the appearance self-contained: no environment, lore scenes, portal, other creatures, weapons, humanoid hands, legs, clothing, text, labels, UI, frame, faction insignia or magical attack effects. This image shows only visible physical appearance and reveals no identity or backstory.",
+        "reference_sheet": "Use case: stylized-concept. Asset type: canonical multi-view RPG enemy reference sheet, one LANDSCAPE PNG 1536x1024. Input image 1 is the authoritative identity, material, proportions and color reference for the Anchor Sentinel; preserve this exact nonhumanoid creature. Show three separated complete views at common scale: front, exact side profile and back; also one enlarged central-eye-and-jaw detail. The same hovering orb of weathered dark stone and dull iron plates, one large amber slit-pupil eye, four smaller amber perimeter eyes in the same mounts, compact toothed split jaw, narrow pale-blue glowing seams, matching age cracks and plate construction. Respect physical rotation: the back has the same stone shell and iron braces, never an extra front face, and only features genuinely visible from the side appear in profile. Entire creature visible in each view with margins and soft floating shadows on one plain light neutral backdrop. Match the reference's polished naturalistic digital RPG illustration and soft natural lighting. No humanoid bodies or limbs, weapons, clothing, portal, scenery, other species, labels, text, captions, UI, border, faction insignia or attack effects. This is a consistent visual turn-around of one creature, not variants.",
+        "portrait": "Use case: stylized-concept. Asset type: reusable RPG enemy portrait, one SQUARE PNG 1024x1024. Images 1 and 2 are the authoritative full-body and multiview identity references for this exact Anchor Sentinel. Preserve its weathered dark stone and dull iron shell, central amber slit-pupil eye, four smaller amber perimeter eyes in their existing mounts, toothed split jaw, cracks, braces and narrow pale-blue seams. It is a nonhumanoid hovering orb, not a person: never add a human face, neck, shoulders, limbs, clothing or equipment. Show the entire frontal face of this same creature directly toward the viewer, centered and at consistent scale, its large central eye roughly 35 percent down the square and the jaw below. Include sufficient neutral background margin around the complete orb so the perimeter eyes, top shell and jaw survive a circular portrait crop; no tight edge clipping. Match the references' polished naturalistic digital RPG illustration, soft natural light and plain light neutral background. No redesign, extra eyes, repeated faces, text, labels, UI, border, scenery, portal, faction marks or attack effects."
+      }
     }
   ]
 }

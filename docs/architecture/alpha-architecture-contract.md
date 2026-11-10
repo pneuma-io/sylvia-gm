@@ -1076,6 +1076,12 @@ Starter Character Files retain the same portable visual records as user-created 
 The owner may resolve these listed assets from the installed catalogue when a retained Plan's
 older Setting does not contain them. This does not change that Plan's package pin. Restored bytes
 become campaign-owned selections and travel in its archive; a recipient does not need the catalogue.
+Known NPCs and enemies use their committed Setting source reference. Catalogue lookup requires
+the exact package ID, path and normalized source hash; display names do not bind artwork. Private
+or retired identities do not acquire prepared art. Normal image status restores these selections
+with generation Off, without requiring the user or GM to submit an image request.
+The lookup reads continuity and exact package metadata without loading mechanics state. Saved
+framing overrides a prepared default only when the selected portrait hash still matches.
 
 The character artwork workflow composes the existing image requests rather than adding a second
 job store. Each persisted request records its workflow and stage. Adoption prepares the next

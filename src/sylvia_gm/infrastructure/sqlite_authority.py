@@ -12237,6 +12237,17 @@ class SQLiteAuthorityStore:
     def snapshot(self, campaign_id: str) -> CampaignSnapshot:
         return cast(CampaignSnapshot, self._read_snapshot(campaign_id))
 
+    def campaign_continuity_view(self, campaign_id: str) -> CampaignContinuityView:
+        """Read narrative identities without materializing the campaign's mechanics state."""
+        connection = self._connect_read_only()
+        try:
+            connection.execute("BEGIN")
+            return sqlite_continuity.read_view(connection, campaign_id)
+        finally:
+            if connection.in_transaction:
+                connection.rollback()
+            connection.close()
+
     def pending_player_response(self, campaign_id: str) -> SafePayload | None:
         """Read the latest unanswered player action since the last saved GM narration."""
         self._ensure_session_schema()
