@@ -2871,11 +2871,13 @@ def _dispatch_selected(
                 from sylvia_gm.application.character_profiles import validate_character_profile
 
                 profile = dict(validate_character_profile(data))
-                artwork_target = (
-                    repair_profile[0] if repair_profile is not None
-                    else str(pinned_profile["artifact_id"])
-                    if isinstance(pinned_profile, Mapping) else None
-                )
+                artwork_source = repair_profile
+                if artwork_source is None and isinstance(pinned_profile, Mapping):
+                    artwork_source = (
+                        str(pinned_profile["artifact_id"]), str(pinned_profile["content_sha256"]),
+                    )
+                artwork_target = artwork_source[0] if artwork_source is not None else None
+                artwork_source_sha = artwork_source[1] if artwork_source is not None else None
                 if profile.get("format_version") == 2 and profile.get("visuals") is None:
                     artwork = application_owner.image_art_service().visuals_for_publication(
                         session_id, str(profile["name"]), source_target_id=artwork_target,
@@ -2896,10 +2898,12 @@ def _dispatch_selected(
                 artwork = application_owner.image_art_service().ensure_character_art(
                     session_id, name=str(profile["name"]), appearance=str(appearance),
                     target_id=artwork_target,
+                    source_content_sha256=artwork_source_sha,
                 )
                 application_owner.image_art_service().bind_publication(
                     session_id, saved.artifact_id, saved.content_sha256, name=str(profile["name"]),
                     source_target_id=artwork_target,
+                    source_content_sha256=artwork_source_sha,
                 )
                 return {**saved.catalog_payload(), "artwork": artwork}
 
@@ -2981,10 +2985,13 @@ def _dispatch_selected(
                     raise CommandRejected("Choose one of this Ruleset's participant schema IDs")
                 declaration = declarations[0]
                 source_profile = resolve_source_profile(source_profile)
-                artwork_target = (
-                    repair_character[0] if repair_character is not None
-                    else str(source_profile["artifact_id"]) if source_profile is not None else None
-                )
+                artwork_source = repair_character
+                if artwork_source is None and source_profile is not None:
+                    artwork_source = (
+                        str(source_profile["artifact_id"]), str(source_profile["content_sha256"]),
+                    )
+                artwork_target = artwork_source[0] if artwork_source is not None else None
+                artwork_source_sha = artwork_source[1] if artwork_source is not None else None
                 if visuals is None:
                     visuals = application_owner.image_art_service().visuals_for_publication(
                         session_id, str(participant.get("name", "")),
@@ -3023,10 +3030,12 @@ def _dispatch_selected(
                 artwork = application_owner.image_art_service().ensure_character_art(
                     session_id, name=saved.name, appearance=authored_profile,
                     target_id=artwork_target,
+                    source_content_sha256=artwork_source_sha,
                 )
                 application_owner.image_art_service().bind_publication(
                     session_id, saved.artifact_id, saved.content_sha256, name=saved.name,
                     source_target_id=artwork_target,
+                    source_content_sha256=artwork_source_sha,
                 )
                 if context.session.campaign_id is None:
                     label = "Character" if role == "player_character" else "Companion"

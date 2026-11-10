@@ -311,7 +311,8 @@ class ImageArt:
         return bundles[0] if len(bundles) == 1 else None
 
     def ensure_character_art(
-        self, session_id: str, *, name: str, appearance: str, target_id: str | None = None
+        self, session_id: str, *, name: str, appearance: str, target_id: str | None = None,
+        source_content_sha256: str | None = None,
     ) -> dict[str, Any]:
         """Make artwork an owned part of saving a character, without retrying an existing flow."""
         if self.settings().get("mode") == "off":
@@ -323,6 +324,27 @@ class ImageArt:
             ]
             if not missing_character_art(selected):
                 return {"status": "already_available", "target_id": target_id, "name": name}
+            if source_content_sha256 is not None:
+                progress = self.store.publication_progress(target_id, source_content_sha256)
+                if progress is not None and (
+                    progress["has_flow"] or not progress["adopted"]
+                ):
+                    status = progress["status"]
+                    if status == "succeeded":
+                        status = "partial" if progress["adopted"] else "review"
+                    try:
+                        self.owner.session_context(progress["source_session_id"])
+                    except CommandRejected:
+                        return {
+                            **progress, "status": "unavailable", "linked": True,
+                            "source_unavailable": True, "target_id": target_id,
+                            "message": "The original artwork chat is unavailable. Create a new "
+                            "artwork request here to continue.",
+                        }
+                    return {
+                        **progress, "status": status, "linked": True, "target_id": target_id,
+                        "message": "Continue this artwork in its original Builder chat.",
+                    }
         for row in self.store.list_requests(campaign_id=campaign_id, session_id=session_id):
             flow = json.loads(row["request_json"]).get("character_flow")
             if flow and (
@@ -356,6 +378,7 @@ class ImageArt:
         *,
         name: str,
         source_target_id: str | None = None,
+        source_content_sha256: str | None = None,
     ) -> None:
         """Let a saved character receive already-requested art that finishes after publication."""
         scope, campaign_id = self._scope(session_id)
@@ -391,6 +414,9 @@ class ImageArt:
         )
         for identity in ids:
             self._owned(session_id, identity)
+        if source_target_id is not None and source_content_sha256 is not None:
+            # Exact library-source links share results, without granting cross-chat actions.
+            ids.extend(self.store.publication_operations(source_target_id, source_content_sha256))
         self.store.bind_publication(list(set(ids)), artifact_id, content_sha256)
 
     def _runtime(self, session_id: str) -> ImageSession:

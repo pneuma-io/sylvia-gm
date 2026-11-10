@@ -398,7 +398,10 @@ class ImageStore:
                 "SELECT * FROM image_requests WHERE EXISTS "
                 "(SELECT 1 FROM json_each(request_json, '$.publications') WHERE "
                 "json_extract(value, '$.artifact_id')=? AND "
-                "json_extract(value, '$.content_sha256')=?) ORDER BY rowid DESC LIMIT 1",
+                "json_extract(value, '$.content_sha256')=?) ORDER BY CASE WHEN "
+                "json_extract(request_json, '$.source') IN ('character_file','campaign_asset') "
+                "OR json_extract(request_json, '$.metadata.source')='character_card' "
+                "THEN 1 ELSE 0 END, rowid DESC LIMIT 1",
                 (artifact_id, content_sha256),
             ).fetchone()
             if row is None:

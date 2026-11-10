@@ -1130,6 +1130,14 @@ Builder edits retain the exact source opened for a Character File or profile, in
 turns and restart. Artwork preparation and publication use that source target before considering
 a display name. A rename reuses its references and crop; it cannot attach another same-named
 character's workflow or automatically replace a complete bundle with a new generation request.
+When the opened source has unfinished artwork, its exact identity/hash links the new saved copy
+to that existing request. Saving elsewhere neither resubmits nor retries it; later adopted stages
+reach both sources. The linked status identifies the original Builder chat without granting
+generation/adoption actions across unrelated chats. Provider status takes precedence over local
+asset-copy receipts, so copying usable partial art cannot hide a failed stage. This reuses the
+existing publication links and admission transaction, without another job store or migration.
+A deleted source chat produces an unavailable status and an explicit-new-request recovery path;
+it does not cause an automatic replacement generation.
 
 Underlay references are rendered from the existing player projection's static map geometry and
 terrain, without tokens, labels or hidden geometry. The selected image retains bounds and a
