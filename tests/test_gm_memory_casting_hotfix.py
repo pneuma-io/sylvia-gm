@@ -8,8 +8,16 @@ from importlib.resources import files
 
 import pytest
 
-from sylvia_gm.agent._provider_session import ProviderSessionAdapter, _normalize_state_references
-from sylvia_gm.agent._session_loop import CampaignSessionLoop, SessionRunRequest
+from sylvia_gm.agent._provider_session import (
+    ProviderSessionAdapter,
+    _derive_mechanics_parameters,
+    _normalize_state_references,
+)
+from sylvia_gm.agent._session_loop import (
+    CampaignSessionLoop,
+    SessionRunRequest,
+    _mechanics_rejection_feedback,
+)
 from sylvia_gm.application.authority import AuthorityOwner, CampaignCreate
 from sylvia_gm.application.bundled_packages import bundled_srd_archive
 from sylvia_gm.application.reusable_participants import validate_reusable_participant_draft
@@ -20,6 +28,7 @@ from sylvia_gm.domain.authority import (
     StateValue,
     WriterRole,
 )
+from sylvia_gm.domain.errors import MechanicsRejected
 from sylvia_gm.domain.session import SessionMessageKind
 from sylvia_gm.provider._base import ProviderStreamChunk
 from sylvia_gm.runtime._runtime import RulesetRuntime
@@ -48,6 +57,20 @@ def test_all_top_level_refusals_are_reported_before_effects():
     assert not result.success
     assert result.failure_reasons == ("First missing input.", "Second missing input.")
     assert "_written" not in result.context
+
+
+def test_missing_derivation_source_names_the_input_and_uses_actual_feedback_fields():
+    with pytest.raises(MechanicsRejected) as refused:
+        _derive_mechanics_parameters(
+            {},
+            {"actor": {"kind": "copy", "source": "actor_state"}},
+            (),
+        )
+    feedback = _mechanics_rejection_feedback(refused.value)
+    assert feedback["code"] == "mechanics_derivation_source_missing"
+    assert "actor_state" in feedback["reason"] and "actor" in feedback["reason"]
+    assert feedback["validation"]["field_paths"] == ["actor_state"]
+    assert "validation.issues" not in feedback["instruction"]
 
 
 @pytest.mark.parametrize("display", ["Cure Wounds", "CURE-WOUNDS", "cure_wounds"])

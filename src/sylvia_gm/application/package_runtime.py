@@ -1518,7 +1518,9 @@ def materialize_package_mechanic(
         if not result.success:
             if result.failure_kind == "precondition" and result.error is not None:
                 raise RulesetPreconditionRejected(result.error, reasons=result.failure_reasons)
-            raise PackageRuntimeError("Package mechanic execution failed")
+            raise PackageRuntimeError("Package mechanic execution failed") from RuntimeError(
+                result.error or "Unknown Ruleset execution failure"
+            )
         if choice_control is not None and not choice_control.consumed:
             raise PackageRuntimeError("Package mechanic did not consume the authorized choice")
         if result.private_random_sampled and result.public_context is None:
