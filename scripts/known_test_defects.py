@@ -13,6 +13,10 @@ class KnownDefect:
 
 
 KNOWN_DEFECTS: dict[str, KnownDefect] = {
+    "tests/test_migrated_plan_lifecycle.py::test_retained_rift_legacy_reusable_copy_resolves_its_exact_available_snapshot": KnownDefect(
+        "Builder reference capture rejects the available snapshot of a legacy reusable Rift Plan",
+        "Save the legacy Rift Plan without a duplicate package snapshot, resolve its retained packages, then capture its Builder source references from a fresh owner.",
+    ),
     "tests/test_effective_interview_content.py::test_setting_selection_retains_its_rules_and_builder_sources_after_catalog_refresh": KnownDefect(
         "Refreshing the catalog rejects an explicitly retained older Setting selection",
         "Choose the original Setting in an interview, refresh the catalog to its updated identity, then capture the Builder launch references.",
