@@ -13,23 +13,29 @@ if TYPE_CHECKING:
 
 from sylvia_gm.domain.authority import CanonicalEventType
 from sylvia_gm.domain.errors import CommandRejected
+from collections.abc import Mapping
 from sylvia_gm.domain.authority import ModelDecisionOwner
 from sylvia_gm.domain.authority import ModelToolBehavior
+from collections.abc import Sequence
 from sylvia_gm.domain.session import SessionMessageKind
 from typing import cast
 import json
+from sylvia_gm.domain.authority import validate_response_blocks
 from ._provider_session import (
+    _CAMPAIGN_FILE_REVISED_NARRATION_ARGUMENT,
     _GM_SYSTEM_CONTRACT_VERSION,
     _PREPARATION_INTENT_ARGUMENT,
     _UNSPECIFIED_PREPARATION_INTENT,
     _action_sequence_narration_facts,
     _canonical_player_narration,
+    _contains_serialized_tool_call,
     _persisted_campaign_file_mutation_attempted,
     _plain_json,
     _player_turn_text,
     _preparation_keeps_intent_pending,
     _public_action_result,
     _saved_action_sequence_results,
+    _validated_raw_response_blocks,
 )
 
 
@@ -363,3 +369,166 @@ def restore_saved_turn_progress(
             None,
         )
     state.resumed_messages = state.messages[current_task_index + 1 :]
+
+
+def resume_exchange_results(
+    self: ProviderSessionAdapter, state: ProviderTurnState,
+    provider_input: SessionProviderInput, *, turn_id: str,
+) -> None:
+    for state.message in state.resumed_messages:
+        if state.message.get("role") == "assistant":
+            content = state.message.get("content")
+            if isinstance(content, str) and content:
+                state.buffered_narration = content
+                state.buffered_response_blocks = None
+                state.buffered_raw_response_blocks = None
+                state.buffered_narration_needs_disposition = True
+            state.raw_calls = state.message.get("tool_calls")
+            if isinstance(state.raw_calls, Sequence) and not isinstance(
+                state.raw_calls, (str, bytes, bytearray)
+            ):
+                for raw_call in state.raw_calls:
+                    state.function = (
+                        raw_call.get("function")
+                        if isinstance(raw_call, Mapping)
+                        else None
+                    )
+                    if not isinstance(state.function, Mapping):
+                        continue
+                    state.name = state.function.get("name")
+                    if not isinstance(state.name, str) or not (
+                        state.name == "update_campaign_file"
+                        or state.name.endswith("_update_campaign_file")
+                    ):
+                        continue
+                    try:
+                        state.arguments = json.loads(str(state.function.get("arguments", "{}")))
+                        raw_blocks = state.arguments.get(
+                            _CAMPAIGN_FILE_REVISED_NARRATION_ARGUMENT
+                        )
+                        if isinstance(raw_blocks, list):
+                            state.buffered_raw_response_blocks = (
+                                _validated_raw_response_blocks(
+                                    raw_blocks, allow_legacy_dialogue_text=True
+                                )
+                            )
+                            state.buffered_narration = None
+                            state.buffered_response_blocks = None
+                            state.buffered_narration_needs_disposition = True
+                        elif (
+                            isinstance(raw_blocks, str)
+                            and raw_blocks.strip()
+                            and not _contains_serialized_tool_call(raw_blocks)
+                        ):
+                            state.buffered_narration = raw_blocks
+                            state.buffered_response_blocks = None
+                            state.buffered_raw_response_blocks = None
+                            state.buffered_narration_needs_disposition = True
+                    except (json.JSONDecodeError, ValueError, AttributeError):
+                        pass
+            if state.raw_calls:
+                state.pending_failed_tool_call = False
+        if state.message.get("role") != "tool":
+            continue
+        try:
+            resumed_result = json.loads(str(state.message.get("content", "{}")))
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(resumed_result, Mapping):
+            continue
+        status = resumed_result.get("status")
+        if status in {"rejected", CanonicalEventType.ACTION_FAILED.value} and not bool(
+            resumed_result.get("correction_optional")
+        ):
+            state.pending_failed_tool_call = True
+        if status in {
+            "campaign_file_updated",
+            CanonicalEventType.ACTION_COMMITTED.value,
+        }:
+            state.any_commit_in_exchange = True
+        if status == "campaign_file_updated":
+            state.settled_narration = resumed_result.get("player_facing_response")
+            persisted_blocks = resumed_result.get("response_blocks")
+            if persisted_blocks is not None:
+                try:
+                    state.buffered_response_blocks = validate_response_blocks(persisted_blocks)
+                except ValueError as error:
+                    raise CommandRejected(
+                        "Persisted Campaign File response blocks are invalid",
+                        code="provider_tool_evidence_invalid",
+                    ) from error
+            else:
+                state.buffered_response_blocks = None
+            if state.settled_narration is not None:
+                if not isinstance(state.settled_narration, str) or not state.settled_narration.strip():
+                    raise CommandRejected(
+                        "Persisted Campaign File disposition narration is invalid",
+                        code="provider_tool_evidence_invalid",
+                    )
+                state.buffered_narration = state.settled_narration
+                if state.buffered_response_blocks is None:
+                    state.buffered_raw_response_blocks = None
+            state.campaign_file_commit_in_exchange = True
+            state.campaign_file_disposition_in_exchange = True
+            if state.buffered_narration is not None:
+                state.buffered_narration_needs_disposition = False
+                state.campaign_file_narration_pending = False
+            else:
+                state.campaign_file_narration_pending = True
+        if status == "campaign_file_unchanged":
+            state.settled_narration = resumed_result.get("player_facing_response")
+            persisted_blocks = resumed_result.get("response_blocks")
+            if persisted_blocks is not None:
+                try:
+                    state.buffered_response_blocks = validate_response_blocks(persisted_blocks)
+                except ValueError as error:
+                    raise CommandRejected(
+                        "Persisted Campaign File response blocks are invalid",
+                        code="provider_tool_evidence_invalid",
+                    ) from error
+            else:
+                state.buffered_response_blocks = None
+            if state.settled_narration is not None:
+                if not isinstance(state.settled_narration, str) or not state.settled_narration.strip():
+                    raise CommandRejected(
+                        "Persisted Campaign File disposition narration is invalid",
+                        code="provider_tool_evidence_invalid",
+                    )
+                state.buffered_narration = state.settled_narration
+                if state.buffered_response_blocks is None:
+                    state.buffered_raw_response_blocks = None
+            state.campaign_file_disposition_in_exchange = True
+            if state.buffered_narration is not None:
+                state.buffered_narration_needs_disposition = False
+                state.campaign_file_narration_pending = False
+            else:
+                state.campaign_file_narration_pending = True
+        if status == CanonicalEventType.ACTION_COMMITTED.value:
+            state.campaign_file_disposition_in_exchange = False
+            state.campaign_file_narration_pending = False
+            state.buffered_narration = None
+            state.buffered_response_blocks = None
+            state.buffered_raw_response_blocks = None
+            state.buffered_narration_needs_disposition = False
+        elif status not in {
+            "rejected",
+            CanonicalEventType.ACTION_FAILED.value,
+            "campaign_file_updated",
+            "campaign_file_unchanged",
+        }:
+            state.buffered_narration = None
+            state.buffered_response_blocks = None
+            state.buffered_raw_response_blocks = None
+            state.buffered_narration_needs_disposition = False
+    if state.ooc_ack_required and state.campaign_file_disposition_in_exchange and not (
+        state.buffered_response_blocks is not None
+        and any(block.get("kind") == "ooc" for block in state.buffered_response_blocks)
+    ):
+        raise CommandRejected(
+            "Persisted OOC turn response omits its acknowledgement",
+            code="provider_tool_evidence_invalid",
+        )
+    state.force_campaign_file_update = bool(
+        (state.buffered_narration is not None or state.buffered_raw_response_blocks is not None)
+        and state.buffered_narration_needs_disposition
+    )
