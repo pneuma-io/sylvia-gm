@@ -4727,5 +4727,8 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
 /* A retained split must leave a usable map body when its command deck wraps. */
 .session-frame.has-panels .ruleset-map-panel .ruleset-panel-content { min-height: 260px !important; }
 
+/* Network actions must not consume the body used to select and inspect a device. */
+.session-frame.has-panels .panel-tab-group[data-renderer="network_graph"] .ruleset-panel-content { min-height: 260px !important; }
+
 /* The queue needs its declared 120px body plus the 42px tab header. */
 .session-frame.has-panels .panel-tab-group:has(.ruleset-queue-panel) { min-height: 162px !important; }

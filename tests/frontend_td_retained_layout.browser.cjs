@@ -181,3 +181,40 @@ for (const viewport of [{ width: 1402, height: 900 }, { width: 1366, height: 736
     } finally { await browser.close(); }
   });
 }
+
+for (const viewport of [{ width: 1030, height: 779 }, { width: 1022, height: 696 }]) {
+  test(`TD Network retains a usable body and reachable queue at ${viewport.width}x${viewport.height}`, async () => {
+    const browser = await chromium.launch({ headless: true, args: ['--disable-gpu'],
+      channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined) });
+    try {
+      const { page, errors } = await open(browser, viewport);
+      await page.locator('[data-view-mode="board"]').click();
+      await page.getByRole('tab', { name: 'Network', exact: true }).click();
+      const network = page.locator('[data-panel-id="operations.network"]');
+      const declared = fixture.surfaces.find(surface => surface.id === 'operations.network').actions;
+      assert.equal(declared.length, 10);
+      assert.deepEqual(await network.locator('[data-panel-action-id]').evaluateAll(
+        nodes => nodes.map(node => node.dataset.panelActionId).sort()), declared.map(action => action.id).sort());
+      const visibleHeight = await network.locator('.ruleset-panel-content').evaluate(node => new Promise(resolve => {
+        const observer = new IntersectionObserver(([entry]) => {
+          observer.disconnect(); resolve(entry.intersectionRect.height);
+        }); observer.observe(node);
+      }));
+      assert.ok(visibleHeight >= 160, `Network body is clipped: ${visibleHeight}`);
+      const device = network.locator('[data-network-node]').first();
+      await device.scrollIntoViewIfNeeded();
+      assert.ok(await device.evaluate(node => new Promise(resolve => {
+        const observer = new IntersectionObserver(([entry]) => {
+          observer.disconnect(); resolve(entry.intersectionRatio);
+        }); observer.observe(node);
+      })) > .99, 'Network device selection is clipped');
+      await page.locator('#queue-badge').click();
+      assert.ok(await page.locator('[data-sequence-execute]').evaluate(node => new Promise(resolve => {
+        const observer = new IntersectionObserver(([entry]) => {
+          observer.disconnect(); resolve(entry.intersectionRatio);
+        }); observer.observe(node);
+      })) > .99, 'Network tab prevents reaching Execute');
+      assert.deepEqual(errors, []);
+    } finally { await browser.close(); }
+  });
+}

@@ -44,7 +44,15 @@ height, queue reachability, committed-price and completed-queue-warning repairs 
 The standard Windows build at `bab0ad4` completed and verified its artifacts. A subsequent native
 tube test exposed a misleading Reload caption denying the separately declared shell-loading
 control. The caption now names that control without adding Reload steps; focused checks pass.
-This replacement still needs a build and native replay.
+The first build of this replacement stopped when its PowerShell wrapper treated the unsigned
+build warning as an error. Its incomplete artifacts are not a verified candidate. The invocation
+will capture native output directly, preserving the builder's actual exit status.
+
+Native Network testing exposed a second clipping defect: Board mode left only about 22px for
+device selection below the ten declared actions. A minimum body height repairs the existing
+layout. The rendered regression reproduces the failure in Board mode at the guest's window
+sizes, then passes with the repair; the ten retained-layout checks pass. This repair and the
+tube caption still need their replacement build and native replay.
 
 The strict type repairs in TD's new grid-lane and exposure modules pass affected checks. A
 provisional refactor composition passes the supplied measured type gate, but it is not a final
