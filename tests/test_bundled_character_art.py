@@ -52,6 +52,39 @@ def test_prepared_bundles_match_starter_data_package_payloads_and_frozen_invento
         if entry["id"].startswith("srd-starter-"):
             source = next(row for row in starters if row["participant"]["name"] == entry["name"])
             assert source["visuals"] == visuals
+        elif entry["id"].startswith("siren-protocol-"):
+            # Siren is an independently delivered Setting; its exact file descriptors bind art.
+            for source in entry["sources"]:
+                assert (
+                    source["package_id"]
+                    == source["campaign_setting_id"]
+                    == "pneuma-io.siren-protocol"
+                )
+                descriptor = PackageFile(
+                    path=source["path"].partition("#")[0],
+                    byte_count=source["byte_count"],
+                    sha256=source["sha256"],
+                )
+                assert (
+                    bundled_source_visuals(
+                        source["package_id"],
+                        source["path"],
+                        descriptor,
+                        campaign_setting_ids=frozenset({source["campaign_setting_id"]}),
+                    )
+                    == visuals
+                )
+                assert (
+                    bundled_source_visuals(
+                        source["package_id"],
+                        source["path"],
+                        descriptor,
+                        campaign_setting_ids=frozenset({"pneuma.severed-lands"}),
+                    )
+                    is None
+                )
+            assert visuals["reference_sheet"]["sha256"] == entry["reference_authority"]["sha256"]
+            assert entry["asset_origins"]["reference_sheet"] == "supplied locked normalized master"
         else:
             for source in entry["sources"]:
                 if "#/" in source["path"]:

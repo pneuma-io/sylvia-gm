@@ -80,7 +80,7 @@ The owner selected a shared app artwork library: whole Setting/Plan exports omit
 PNGs, while custom art stays portable and character/campaign exports carry used artwork. The
 source now maps the catalogue and PNGs as external installer/portable resources, outside the
 onefile sidecar. Campaign export retains used art before any artwork view has been opened.
-The prepared PNG pool now totals 267,514,760 bytes across 117 images, beyond the content-package cap.
+The prepared PNG pool now totals 349,242,584 bytes across 150 images, beyond the content-package cap.
 The current Setting omits those PNGs; its existing content-package limits remain unchanged.
 Focused checks cover shared/custom publication, external resource inventory, portable ZIP assembly,
 and exact campaign art transfer before opening an image view. Local-copy receipts also transfer
@@ -149,8 +149,25 @@ not make the clean Siren material private; source preparation follows the owner'
 The eleven locked originals have now been delivered locally. Independent checks confirm the
 normalized master archive hash, exact internal image bytes/checksums and browser decoding of all
 eleven at 1024×1536. Ten historical registry hashes differ from that master; the discrepancy is
-retained without an invented cause. The images remain unchanged and are not yet adopted into
-the prepared catalogue. Their standard PNG background-color hint exposed an overly narrow image
+retained without an invented cause. All eleven original sheets are now retained byte for byte in
+the prepared catalogue, alongside separate full-body and square-portrait derivatives. Each complete
+bundle records its original filename/hash, archive identity and historical registry discrepancy;
+generated sheet writing does not change the clean profile's narrative authority. The shared library
+now has fifty complete bundles. All eleven portraits were inspected through the actual square,
+dialogue-circle and map-sized crop renderer. Fifty-one exact source bindings cover the selected
+upstream profiles and the delivered Siren Protocol 0.2.0 package source. Raw and normalized hashes
+are retained where they differ, and other Settings do not select this cast. The twelve selected
+source files were compared directly; existing visual identity and runtime character identities are
+preserved. The delivered package source is separate from TD PR #6's checked head
+`882103eee8d511d08d31d9d0b4fe4d9d67b813f8`, which does not contain that Setting. Actual TD party
+and Builder handoff remains open. No other work item's source was modified.
+Two focused checks passed in 122.04 seconds: all 150 real PNGs/resources/source bindings and a
+real Siren bundle exported/imported through fresh owner libraries without the shared image reader.
+The transfer retains all three exact PNGs, including the original sheet, and the adjusted crop,
+with no image adapter or request. Its Universal fixture qualifies image transfer, not a TD build.
+The previous 39 bundles and their bindings are unchanged. Touched Ruff, docs-index and diff checks
+pass; previous frontend/Rust and broader campaign matrices were not repeated for this data addition.
+The originals' standard PNG background-color hint exposed an overly narrow image
 validator. Bounded `bKGD` support now preserves original bytes while refusing malformed or misplaced
 hints. The six minimal failure cases pass after the repair; 78 related source checks pass in
 120.81 seconds, including saved-owner restoration/reopen and actual Lite image lifecycle. Strict

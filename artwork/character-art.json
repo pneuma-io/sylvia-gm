@@ -1,7 +1,7 @@
 {
   "format": 1,
-  "tool_mode": "built-in GPT Images",
-  "prepared_at": "2026-11-10",
+  "tool_mode": "built-in GPT Images; supplied Siren master sheets retained",
+  "prepared_at": "2026-11-11",
   "characters": [
     {
       "id": "srd-starter-barbarian",
@@ -2237,6 +2237,1078 @@
         "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Lorn in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, tactile fabric and skin, plain light neutral backdrop, soft natural studio light and subtle ground shadow. Exactly one person standing naturally in a near-front three-quarter pose. Entire head, both hands and both feet comfortably inside the frame. Appearance: An androgynous adult Human in their early forties with a lean athletic build, weathered dark olive skin, deep-set gray eyes, long dark brown hair gathered in a single practical braid and several old healed scars on the exposed forearms. A quiet watchful reserved expression. A worn muted forest-green hunting coat with the hood folded down, charcoal shirt, plain brown trousers, sturdy leather boots and a modest closed belt kit. Empty relaxed hands. No trophies, partner mementos, faction emblems, extravagant weapon, blood or magical effects. Unspecified visual details are editable defaults. Preserve the authored identity and pronouns without adding history, powers or allegiances. No text, labels, borders, UI, scenery, extra people, duplicated limbs or oversized equipment.",
         "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for Lorn in Sylvia GM's Severed Lands. Input image 1 is the approved full-body identity reference. Preserve this exact face, age, skin, hairstyle, body proportions, clothing, equipment and colors. One landscape PNG, 1536x1024, polished naturalistic digital RPG illustration on the same plain light neutral backdrop. Show three separate complete standing views of this ONE person: front, true side and back, evenly spaced at matching scale. Entire head, hands, feet and any carried equipment fit comfortably within margins. Add one small clear face study in remaining space without overlap. Multiple views of the same person, never additional cast. Appearance: An androgynous adult Human in their early forties with a lean athletic build, weathered dark olive skin, deep-set gray eyes, long dark brown hair gathered in a single practical braid and several old healed scars on the exposed forearms. A quiet watchful reserved expression. A worn muted forest-green hunting coat with the hood folded down, charcoal shirt, plain brown trousers, sturdy leather boots and a modest closed belt kit. Empty relaxed hands. No trophies, partner mementos, faction emblems, extravagant weapon, blood or magical effects. No labels, writing, UI, decorative border, scene, new symbols, extra equipment, duplicate limbs, motion ghosts or altered age.",
         "portrait": "Use case: identity-preserve. Production reusable square portrait for Lorn in Sylvia GM's Severed Lands. Input image 1 is the canonical full-body identity; input image 2 is that person's multiview reference sheet. Preserve this exact face, age, skin tone, hairstyle, expression, clothing and identity. One full-bleed square PNG, 1024x1024. Polished naturalistic digital RPG illustration, continuous plain warm light-gray studio background extending to all four corners and edges. Exactly one head-and-shoulders portrait, almost frontal with a slight three-quarter turn. Standardized framing: face centered horizontally, both eyes about 35 percent down the image, top of the complete hairstyle about 10 percent down, chin around 65 percent, shoulders filling the lower quarter. Keep all hair, any beard, the jaw and neck visible with comfortable margins. Clothing continues naturally to the lower edges. No hands, weapons, held objects, full body or extra people. Identity description: An androgynous adult Human in their early forties with a lean athletic build, weathered dark olive skin, deep-set gray eyes, long dark brown hair gathered in a single practical braid and several old healed scars on the exposed forearms. A quiet watchful reserved expression. A worn muted forest-green hunting coat with the hood folded down, charcoal shirt, plain brown trousers, sturdy leather boots and a modest closed belt kit. Empty relaxed hands. No trophies, partner mementos, faction emblems, extravagant weapon, blood or magical effects. No painted circular or oval cutout, vignette, white corners, frame, border, text, labels, UI, scene, changed age, glamorous styling or invented features."
+      }
+    },
+    {
+      "id": "siren-protocol-vesper",
+      "name": "Vesper",
+      "sources": [
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "characters/Vesper.md",
+          "sha256": "004b3c70385dfa61235dad36b683fde9ad925c11132310bb9294c135248c8547",
+          "byte_count": 5019,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "characters/Vesper.md",
+          "sha256": "fa94691554ef91f638baeb309b053ace4355359382198a4b2a42e4e045add74b",
+          "byte_count": 5025,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/0",
+          "sha256": "a9e86e78f46d412d61fdf0d4f6771f1b6f762390885430ccf49ef8b99e78bc46",
+          "byte_count": 16200,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/0",
+          "sha256": "5b8babfefd9cccf4826930e7dee80c94fa9fd01f34a5e5f9f2bf81b877911991",
+          "byte_count": 23455,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/0",
+          "sha256": "7d04f8ebe972fee899abb9c9f9e0556f9c30e8acd41fe8e1319391fb49b2711c",
+          "byte_count": 22660,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        }
+      ],
+      "visuals": {
+        "appearance": "Vesper's locked appearance is elegant black-and-violet cyberpunk formalwear: long dark hair, violet eyes, a fitted black combat outfit under a flowing dark-purple outer layer, fine jewellery, heeled footwear, a thigh holster, and visibly augmented arm technology. Her silhouette should read as controlled, expensive, dangerous, and deliberately feminine rather than military-uniform generic.",
+        "full_body": {
+          "path": "assets/characters/69b779137385f2617210e7d1e2fbadbe3803c64befa31826b43e43c79e117766.png",
+          "sha256": "69b779137385f2617210e7d1e2fbadbe3803c64befa31826b43e43c79e117766"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/bd6f8b90db46db027f1e7bbc833d2c428be70bfbc47955c750f9b32563cfdf33.png",
+          "sha256": "bd6f8b90db46db027f1e7bbc833d2c428be70bfbc47955c750f9b32563cfdf33"
+        },
+        "portrait": {
+          "path": "assets/characters/42bf15c64fe8ae7f9d162d6b651bbf41938e5f7597d1e724a712eadb27cce826.png",
+          "sha256": "42bf15c64fe8ae7f9d162d6b651bbf41938e5f7597d1e724a712eadb27cce826"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1928065
+        },
+        "reference_sheet": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2069958
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2541108
+        }
+      },
+      "asset_origins": {
+        "full_body": "built-in GPT Images derivative",
+        "reference_sheet": "supplied locked normalized master",
+        "portrait": "built-in GPT Images derivative"
+      },
+      "reference_authority": {
+        "archive": "Locked_Character_Designs_v1.zip",
+        "archive_sha256": "3f80f71307cd84d2b2617c75a103053dd5f1e6a96e92b3bc2cf371e6c8e0065f",
+        "filename": "01_Vesper_LOCKED.png",
+        "sha256": "bd6f8b90db46db027f1e7bbc833d2c428be70bfbc47955c750f9b32563cfdf33",
+        "historical_registry_sha256": "3e1061dd3161816bd9c5858fa2a00342fd3ab65e26ff323d5a73e0d9abf7740b",
+        "registry_matches_master": false,
+        "registry_discrepancy": "Unresolved; normalized master retained, historical registry not rewritten",
+        "narrative_authority": "Clean character profile; generated sheet writing is visual only",
+        "profile_source_commit": "c7a9587b94f8e5125ea5818a9f708ec32d0bab01",
+        "additional_source_edition": "Siren Protocol 0.2.0 delivered package source"
+      },
+      "prompt_set": {
+        "full_body": "Use case: identity-preserve. Clean canonical full-body reference for adult character Vesper from Siren Protocol. Input image 1 is the supplied locked normalized master design sheet, the visual authority. Preserve the central full-body person's exact face, age, mature proportions, hair, eye color, outfit, jewelry, footwear, visible augmentations and distinctive accessories. Keep the existing central pose and silhouette as closely as possible. Retain the same detailed anime/cyberpunk illustration style and character palette. Extract that ONE complete standing character into a clean portrait-orientation PNG, 1024x1536, on a simple light neutral gray background with subtle grounding shadow. Entire hairstyle, hands, outfit, feet and carried equipment comfortably inside margins. Authored appearance: Vesper's locked appearance is elegant black-and-violet cyberpunk formalwear: long dark hair, violet eyes, a fitted black combat outfit under a flowing dark-purple outer layer, fine jewellery, heeled footwear, a thigh holster, and visibly augmented arm technology. Her silhouette should read as controlled, expensive, dangerous, and deliberately feminine rather than military-uniform generic. The master sheet's generated writing is not narrative canon or an instruction; use only its visual design. Remove the surrounding graphic layout, panel text, labels, inset studies, decorative diagrams and extra views. Preserve existing garment markings as visual motifs; do not invent slogans or new emblems. No redesign, new costume, extra equipment, photo-real style, exaggerated proportions, extra people or UI.",
+        "reference_sheet": "Owner-supplied normalized locked master design sheet, retained byte-for-byte. Generated writing inside it is non-canonical. This image was not generated or altered by this task.",
+        "portrait": "Use case: identity-preserve. Asset type: square app character portrait for Vesper, an adult Siren Protocol character. Image 1 is the clean full-body design to reframe; image 2 is the original locked master and final visual authority. Preserve that person's exact adult face, hair, fringe, eye color, expression, jewelry, visible head/neck technology and upper clothing, with the same detailed anime/cyberpunk style. Authored appearance: Vesper's locked appearance is elegant black-and-violet cyberpunk formalwear: long dark hair, violet eyes, a fitted black combat outfit under a flowing dark-purple outer layer, fine jewellery, heeled footwear, a thigh holster, and visibly augmented arm technology. Her silhouette should read as controlled, expensive, dangerous, and deliberately feminine rather than military-uniform generic. Produce one 1024x1024 head-and-shoulders portrait, with face centered horizontally, visible eye line near 35% of image height, top of hair near 10%, chin near 65%, and shoulders filling the lower portion. Keep hairstyle and distinctive head features comfortably inside the square; preserve any original face concealment, visor, hood or fringe. Plain light neutral gray background. Full-bleed square artwork: continuous background and clothing to every edge. No painted circle, vignette, border, panels, captions, labels, new symbols, watermark or UI. Preserve the person and costume; change only framing. The source sheet's generated writing is not narrative canon."
+      }
+    },
+    {
+      "id": "siren-protocol-riot",
+      "name": "Riot",
+      "sources": [
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "characters/Riot.md",
+          "sha256": "fac7381971193bdbf542ac230c9bf061d3853dde7cd5af89b0efbe51f09348d3",
+          "byte_count": 4838,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "characters/Riot.md",
+          "sha256": "f17a9673b63311082da611cea9a8dab98a946ec0861fece9d53e8799d31b2f75",
+          "byte_count": 4844,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/1",
+          "sha256": "a9e86e78f46d412d61fdf0d4f6771f1b6f762390885430ccf49ef8b99e78bc46",
+          "byte_count": 16200,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/1",
+          "sha256": "5b8babfefd9cccf4826930e7dee80c94fa9fd01f34a5e5f9f2bf81b877911991",
+          "byte_count": 23455,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/1",
+          "sha256": "7d04f8ebe972fee899abb9c9f9e0556f9c30e8acd41fe8e1319391fb49b2711c",
+          "byte_count": 22660,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        }
+      ],
+      "visuals": {
+        "appearance": "Riot's locked appearance is aggressive punk cyberwear built around hot pink, black, white, and acid green. She has split-colour hair, extensive piercings and accessories, heavy boots, strapped and patched street gear, and a large mechanical gauntlet/arm system that gives her silhouette much more mass on one side.",
+        "full_body": {
+          "path": "assets/characters/861d607fd67aa8ee6ce35546e5da74bd11d0ee7d3347b4df1511e59ee0d23f4b.png",
+          "sha256": "861d607fd67aa8ee6ce35546e5da74bd11d0ee7d3347b4df1511e59ee0d23f4b"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/8843b7cdc7eaae2f9924de146f3701eecac5430e59ff1ecc532ad7cc9f39b570.png",
+          "sha256": "8843b7cdc7eaae2f9924de146f3701eecac5430e59ff1ecc532ad7cc9f39b570"
+        },
+        "portrait": {
+          "path": "assets/characters/95ca9c672223a942a888fd2951a33ccf868bc4af9770a558cedc463391400cfd.png",
+          "sha256": "95ca9c672223a942a888fd2951a33ccf868bc4af9770a558cedc463391400cfd"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2302108
+        },
+        "reference_sheet": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2911303
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 3364436
+        }
+      },
+      "asset_origins": {
+        "full_body": "built-in GPT Images derivative",
+        "reference_sheet": "supplied locked normalized master",
+        "portrait": "built-in GPT Images derivative"
+      },
+      "reference_authority": {
+        "archive": "Locked_Character_Designs_v1.zip",
+        "archive_sha256": "3f80f71307cd84d2b2617c75a103053dd5f1e6a96e92b3bc2cf371e6c8e0065f",
+        "filename": "02_Riot_LOCKED.png",
+        "sha256": "8843b7cdc7eaae2f9924de146f3701eecac5430e59ff1ecc532ad7cc9f39b570",
+        "historical_registry_sha256": "04f5d47597215320d6919ede424a9d717f0ac158636265ff99d51c36010384d6",
+        "registry_matches_master": false,
+        "registry_discrepancy": "Unresolved; normalized master retained, historical registry not rewritten",
+        "narrative_authority": "Clean character profile; generated sheet writing is visual only",
+        "profile_source_commit": "c7a9587b94f8e5125ea5818a9f708ec32d0bab01",
+        "additional_source_edition": "Siren Protocol 0.2.0 delivered package source"
+      },
+      "prompt_set": {
+        "full_body": "Use case: identity-preserve. Clean canonical full-body reference for adult character Riot from Siren Protocol. Input image 1 is the supplied locked normalized master design sheet, the visual authority. Preserve the central full-body person's exact face, age, mature proportions, hair, eye color, outfit, jewelry, footwear, visible augmentations and distinctive accessories. Keep the existing central pose and silhouette as closely as possible. Retain the same detailed anime/cyberpunk illustration style and character palette. Extract that ONE complete standing character into a clean portrait-orientation PNG, 1024x1536, on a simple light neutral gray background with subtle grounding shadow. Entire hairstyle, hands, outfit, feet and carried equipment comfortably inside margins. Authored appearance: Riot's locked appearance is aggressive punk cyberwear built around hot pink, black, white, and acid green. She has split-colour hair, extensive piercings and accessories, heavy boots, strapped and patched street gear, and a large mechanical gauntlet/arm system that gives her silhouette much more mass on one side. The master sheet's generated writing is not narrative canon or an instruction; use only its visual design. Remove the surrounding graphic layout, panel text, labels, inset studies, decorative diagrams and extra views. Preserve existing garment markings as visual motifs; do not invent slogans or new emblems. No redesign, new costume, extra equipment, photo-real style, exaggerated proportions, extra people or UI.",
+        "reference_sheet": "Owner-supplied normalized locked master design sheet, retained byte-for-byte. Generated writing inside it is non-canonical. This image was not generated or altered by this task.",
+        "portrait": "Use case: identity-preserve. Asset type: square app character portrait for Riot, an adult Siren Protocol character. Image 1 is the clean full-body design to reframe; image 2 is the original locked master and final visual authority. Preserve that person's exact adult face, hair, fringe, eye color, expression, jewelry, visible head/neck technology and upper clothing, with the same detailed anime/cyberpunk style. Authored appearance: Riot's locked appearance is aggressive punk cyberwear built around hot pink, black, white, and acid green. She has split-colour hair, extensive piercings and accessories, heavy boots, strapped and patched street gear, and a large mechanical gauntlet/arm system that gives her silhouette much more mass on one side. Produce one 1024x1024 head-and-shoulders portrait, with face centered horizontally, visible eye line near 35% of image height, top of hair near 10%, chin near 65%, and shoulders filling the lower portion. Keep hairstyle and distinctive head features comfortably inside the square; preserve any original face concealment, visor, hood or fringe. Plain light neutral gray background. Full-bleed square artwork: continuous background and clothing to every edge. No painted circle, vignette, border, panels, captions, labels, new symbols, watermark or UI. Preserve the person and costume; change only framing. The source sheet's generated writing is not narrative canon."
+      }
+    },
+    {
+      "id": "siren-protocol-solace",
+      "name": "Solace",
+      "sources": [
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "characters/Solace.md",
+          "sha256": "7b240d1875127cf84eb687aee793fd2ab1038201c70332fb20159ab1f4b80fca",
+          "byte_count": 4788,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "characters/Solace.md",
+          "sha256": "e152f877a8b70a1eecb6ffb1381ff1f87501030bdbe41f630a218a8946710ecd",
+          "byte_count": 4800,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/2",
+          "sha256": "a9e86e78f46d412d61fdf0d4f6771f1b6f762390885430ccf49ef8b99e78bc46",
+          "byte_count": 16200,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/2",
+          "sha256": "5b8babfefd9cccf4826930e7dee80c94fa9fd01f34a5e5f9f2bf81b877911991",
+          "byte_count": 23455,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/2",
+          "sha256": "7d04f8ebe972fee899abb9c9f9e0556f9c30e8acd41fe8e1319391fb49b2711c",
+          "byte_count": 22660,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        }
+      ],
+      "visuals": {
+        "appearance": "Solace's locked appearance combines a dark fitted medical/combat underlayer with a long translucent white clinical coat, short black hair with cyan and pink colour accents, visible medical-interface hardware, precision gloves, injector/vial equipment, and white technical boots.",
+        "full_body": {
+          "path": "assets/characters/2cf8b5debe789f54d93cd682bd05036e3f7524172bc408f0efa3b9b3c57813f7.png",
+          "sha256": "2cf8b5debe789f54d93cd682bd05036e3f7524172bc408f0efa3b9b3c57813f7"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/f2611f2d254d574addd34761cab98d48f627c7faaa847a33c9d7b85266b914ba.png",
+          "sha256": "f2611f2d254d574addd34761cab98d48f627c7faaa847a33c9d7b85266b914ba"
+        },
+        "portrait": {
+          "path": "assets/characters/07410ad9a85c782cd98e1c4afe85a71131f6b43f04b47a962e21d25baa604b02.png",
+          "sha256": "07410ad9a85c782cd98e1c4afe85a71131f6b43f04b47a962e21d25baa604b02"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2058116
+        },
+        "reference_sheet": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2393615
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2622250
+        }
+      },
+      "asset_origins": {
+        "full_body": "built-in GPT Images derivative",
+        "reference_sheet": "supplied locked normalized master",
+        "portrait": "built-in GPT Images derivative"
+      },
+      "reference_authority": {
+        "archive": "Locked_Character_Designs_v1.zip",
+        "archive_sha256": "3f80f71307cd84d2b2617c75a103053dd5f1e6a96e92b3bc2cf371e6c8e0065f",
+        "filename": "03_Solace_LOCKED.png",
+        "sha256": "f2611f2d254d574addd34761cab98d48f627c7faaa847a33c9d7b85266b914ba",
+        "historical_registry_sha256": "945e75d5ef841067b56c2027bffdda2d52595bda01d941f6608536eef52bd8e2",
+        "registry_matches_master": false,
+        "registry_discrepancy": "Unresolved; normalized master retained, historical registry not rewritten",
+        "narrative_authority": "Clean character profile; generated sheet writing is visual only",
+        "profile_source_commit": "c7a9587b94f8e5125ea5818a9f708ec32d0bab01",
+        "additional_source_edition": "Siren Protocol 0.2.0 delivered package source"
+      },
+      "prompt_set": {
+        "full_body": "Use case: identity-preserve. Clean canonical full-body reference for adult character Solace from Siren Protocol. Input image 1 is the supplied locked normalized master design sheet, the visual authority. Preserve the central full-body person's exact face, age, mature proportions, hair, eye color, outfit, jewelry, footwear, visible augmentations and distinctive accessories. Keep the existing central pose and silhouette as closely as possible. Retain the same detailed anime/cyberpunk illustration style and character palette. Extract that ONE complete standing character into a clean portrait-orientation PNG, 1024x1536, on a simple light neutral gray background with subtle grounding shadow. Entire hairstyle, hands, outfit, feet and carried equipment comfortably inside margins. Authored appearance: Solace's locked appearance combines a dark fitted medical/combat underlayer with a long translucent white clinical coat, short black hair with cyan and pink colour accents, visible medical-interface hardware, precision gloves, injector/vial equipment, and white technical boots. The master sheet's generated writing is not narrative canon or an instruction; use only its visual design. Remove the surrounding graphic layout, panel text, labels, inset studies, decorative diagrams and extra views. Preserve existing garment markings as visual motifs; do not invent slogans or new emblems. No redesign, new costume, extra equipment, photo-real style, exaggerated proportions, extra people or UI.",
+        "reference_sheet": "Owner-supplied normalized locked master design sheet, retained byte-for-byte. Generated writing inside it is non-canonical. This image was not generated or altered by this task.",
+        "portrait": "Use case: identity-preserve. Asset type: square app character portrait for Solace, an adult Siren Protocol character. Image 1 is the clean full-body design to reframe; image 2 is the original locked master and final visual authority. Preserve that person's exact adult face, hair, fringe, eye color, expression, jewelry, visible head/neck technology and upper clothing, with the same detailed anime/cyberpunk style. Authored appearance: Solace's locked appearance combines a dark fitted medical/combat underlayer with a long translucent white clinical coat, short black hair with cyan and pink colour accents, visible medical-interface hardware, precision gloves, injector/vial equipment, and white technical boots. Produce one 1024x1024 head-and-shoulders portrait, with face centered horizontally, visible eye line near 35% of image height, top of hair near 10%, chin near 65%, and shoulders filling the lower portion. Keep hairstyle and distinctive head features comfortably inside the square; preserve any original face concealment, visor, hood or fringe. Plain light neutral gray background. Full-bleed square artwork: continuous background and clothing to every edge. No painted circle, vignette, border, panels, captions, labels, new symbols, watermark or UI. Preserve the person and costume; change only framing. The source sheet's generated writing is not narrative canon."
+      }
+    },
+    {
+      "id": "siren-protocol-blaze",
+      "name": "Blaze",
+      "sources": [
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "characters/Blaze.md",
+          "sha256": "41edb7619f582222d10559cec8ab48376d97a77a1b0059b94c2d3b99940264a1",
+          "byte_count": 4951,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "characters/Blaze.md",
+          "sha256": "ee3002bc1ad43823b193226118225c05348b9946dd915ed714a3db96ab94174f",
+          "byte_count": 4957,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/3",
+          "sha256": "a9e86e78f46d412d61fdf0d4f6771f1b6f762390885430ccf49ef8b99e78bc46",
+          "byte_count": 16200,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/3",
+          "sha256": "5b8babfefd9cccf4826930e7dee80c94fa9fd01f34a5e5f9f2bf81b877911991",
+          "byte_count": 23455,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/3",
+          "sha256": "7d04f8ebe972fee899abb9c9f9e0556f9c30e8acd41fe8e1319391fb49b2711c",
+          "byte_count": 22660,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        }
+      ],
+      "visuals": {
+        "appearance": "Blaze's locked appearance is black-and-orange high-speed street gear: long dark hair with fiery red/orange accents, cropped technical jacket, visor/goggles, reinforced gloves, exposed mechanical leg augmentation, heavy racing footwear, and a black/orange performance motorcycle aesthetic.",
+        "full_body": {
+          "path": "assets/characters/fb225a5e1ff36b71c525141f87f4f441ac2aeecc27429a03499502ead3724ff7.png",
+          "sha256": "fb225a5e1ff36b71c525141f87f4f441ac2aeecc27429a03499502ead3724ff7"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/3157c9b7e6828df0707cfe5e43f10a4a5569648924dff1a0a9b0924b5af01467.png",
+          "sha256": "3157c9b7e6828df0707cfe5e43f10a4a5569648924dff1a0a9b0924b5af01467"
+        },
+        "portrait": {
+          "path": "assets/characters/19d74eeb272097e85ac69310f5c223b17c14438b25095df52e9a63c98574fead.png",
+          "sha256": "19d74eeb272097e85ac69310f5c223b17c14438b25095df52e9a63c98574fead"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2032168
+        },
+        "reference_sheet": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2993496
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2953966
+        }
+      },
+      "asset_origins": {
+        "full_body": "built-in GPT Images derivative",
+        "reference_sheet": "supplied locked normalized master",
+        "portrait": "built-in GPT Images derivative"
+      },
+      "reference_authority": {
+        "archive": "Locked_Character_Designs_v1.zip",
+        "archive_sha256": "3f80f71307cd84d2b2617c75a103053dd5f1e6a96e92b3bc2cf371e6c8e0065f",
+        "filename": "04_Blaze_LOCKED.png",
+        "sha256": "3157c9b7e6828df0707cfe5e43f10a4a5569648924dff1a0a9b0924b5af01467",
+        "historical_registry_sha256": "365b6d307bb7e0f1e7c54e500e5e2ee59f38f283af9188488fb99d3f0750b967",
+        "registry_matches_master": false,
+        "registry_discrepancy": "Unresolved; normalized master retained, historical registry not rewritten",
+        "narrative_authority": "Clean character profile; generated sheet writing is visual only",
+        "profile_source_commit": "c7a9587b94f8e5125ea5818a9f708ec32d0bab01",
+        "additional_source_edition": "Siren Protocol 0.2.0 delivered package source"
+      },
+      "prompt_set": {
+        "full_body": "Use case: identity-preserve. Clean canonical full-body reference for adult character Blaze from Siren Protocol. Input image 1 is the supplied locked normalized master design sheet, the visual authority. Preserve the central full-body person's exact face, age, mature proportions, hair, eye color, outfit, jewelry, footwear, visible augmentations and distinctive accessories. Keep the existing central pose and silhouette as closely as possible. Retain the same detailed anime/cyberpunk illustration style and character palette. Extract that ONE complete standing character into a clean portrait-orientation PNG, 1024x1536, on a simple light neutral gray background with subtle grounding shadow. Entire hairstyle, hands, outfit, feet and carried equipment comfortably inside margins. Authored appearance: Blaze's locked appearance is black-and-orange high-speed street gear: long dark hair with fiery red/orange accents, cropped technical jacket, visor/goggles, reinforced gloves, exposed mechanical leg augmentation, heavy racing footwear, and a black/orange performance motorcycle aesthetic. The master sheet's generated writing is not narrative canon or an instruction; use only its visual design. Remove the surrounding graphic layout, panel text, labels, inset studies, decorative diagrams and extra views. Preserve existing garment markings as visual motifs; do not invent slogans or new emblems. No redesign, new costume, extra equipment, photo-real style, exaggerated proportions, extra people or UI.",
+        "reference_sheet": "Owner-supplied normalized locked master design sheet, retained byte-for-byte. Generated writing inside it is non-canonical. This image was not generated or altered by this task.",
+        "portrait": "Use case: identity-preserve. Asset type: square app character portrait for Blaze, an adult Siren Protocol character. Image 1 is the clean full-body design to reframe; image 2 is the original locked master and final visual authority. Preserve that person's exact adult face, hair, fringe, eye color, expression, jewelry, visible head/neck technology and upper clothing, with the same detailed anime/cyberpunk style. Authored appearance: Blaze's locked appearance is black-and-orange high-speed street gear: long dark hair with fiery red/orange accents, cropped technical jacket, visor/goggles, reinforced gloves, exposed mechanical leg augmentation, heavy racing footwear, and a black/orange performance motorcycle aesthetic. Produce one 1024x1024 head-and-shoulders portrait, with face centered horizontally, visible eye line near 35% of image height, chin near 65%, shoulders filling the lower portion. Leave comfortable headroom above hair and keep distinctive head features within the square. Preserve any original face concealment, visor, goggles, hood or fringe, on the same side and in the same position. Plain light neutral gray background. Full-bleed square artwork: continuous background and clothing to every edge. No painted circle, vignette, border, panels, captions, labels, new symbols, watermark or UI. Preserve the person and costume; change only framing. The source sheet's generated writing is not narrative canon."
+      }
+    },
+    {
+      "id": "siren-protocol-sable",
+      "name": "Sable",
+      "sources": [
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "characters/Sable.md",
+          "sha256": "bd0ffc9210fce031171009521b6fcc1cf6345021fed926998129da098cabf8c2",
+          "byte_count": 4966,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "characters/Sable.md",
+          "sha256": "2d9fe91473595a25755894fa3fd8ed6a888dd0a2ed966495e6eb9b25eaf4fd5a",
+          "byte_count": 4972,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/4",
+          "sha256": "a9e86e78f46d412d61fdf0d4f6771f1b6f762390885430ccf49ef8b99e78bc46",
+          "byte_count": 16200,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/4",
+          "sha256": "5b8babfefd9cccf4826930e7dee80c94fa9fd01f34a5e5f9f2bf81b877911991",
+          "byte_count": 23455,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/4",
+          "sha256": "7d04f8ebe972fee899abb9c9f9e0556f9c30e8acd41fe8e1319391fb49b2711c",
+          "byte_count": 22660,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        }
+      ],
+      "visuals": {
+        "appearance": "Sable's locked appearance is dark teal-and-black covert fieldwear: short black hair, pale blue eyes, a visible ocular augmentation, long structured coat, fitted tactical clothing, discreet holsters, restrained jewellery, and low-profile technical boots. Her silhouette should read as patient, observant, mobile, and understated rather than parade-military.",
+        "full_body": {
+          "path": "assets/characters/740fa5795bda42f807c059734ee7f4d5f81664290cbddd984a3ac5f847778fd6.png",
+          "sha256": "740fa5795bda42f807c059734ee7f4d5f81664290cbddd984a3ac5f847778fd6"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/0f8d60ae0d5aad51628d83a945c58c9d3aa2a5203dc29a42a3e4cd2ff0608619.png",
+          "sha256": "0f8d60ae0d5aad51628d83a945c58c9d3aa2a5203dc29a42a3e4cd2ff0608619"
+        },
+        "portrait": {
+          "path": "assets/characters/7a870597b3a098e7e75ad60c93118b01114063a93ec4ec3b317fa4e2ac4d7990.png",
+          "sha256": "7a870597b3a098e7e75ad60c93118b01114063a93ec4ec3b317fa4e2ac4d7990"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1891504
+        },
+        "reference_sheet": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1903621
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2375849
+        }
+      },
+      "asset_origins": {
+        "full_body": "built-in GPT Images derivative",
+        "reference_sheet": "supplied locked normalized master",
+        "portrait": "built-in GPT Images derivative"
+      },
+      "reference_authority": {
+        "archive": "Locked_Character_Designs_v1.zip",
+        "archive_sha256": "3f80f71307cd84d2b2617c75a103053dd5f1e6a96e92b3bc2cf371e6c8e0065f",
+        "filename": "05_Sable_LOCKED.png",
+        "sha256": "0f8d60ae0d5aad51628d83a945c58c9d3aa2a5203dc29a42a3e4cd2ff0608619",
+        "historical_registry_sha256": "9b7f3e4dd81e0e70dac3ef38e3a7a960b2328b37222043b6f42f58bdee31ebfa",
+        "registry_matches_master": false,
+        "registry_discrepancy": "Unresolved; normalized master retained, historical registry not rewritten",
+        "narrative_authority": "Clean character profile; generated sheet writing is visual only",
+        "profile_source_commit": "c7a9587b94f8e5125ea5818a9f708ec32d0bab01",
+        "additional_source_edition": "Siren Protocol 0.2.0 delivered package source"
+      },
+      "prompt_set": {
+        "full_body": "Use case: identity-preserve. Clean canonical full-body reference for adult character Sable from Siren Protocol. Input image 1 is the supplied locked normalized master design sheet, the visual authority. Preserve the central full-body person's exact face, age, mature proportions, hair, eye color, outfit, jewelry, footwear, visible augmentations and distinctive accessories. Keep the existing central pose and silhouette as closely as possible. Retain the same detailed anime/cyberpunk illustration style and character palette. Extract that ONE complete standing character into a clean portrait-orientation PNG, 1024x1536, on a simple light neutral gray background with subtle grounding shadow. Entire hairstyle, hands, outfit, feet and carried equipment comfortably inside margins. Authored appearance: Sable's locked appearance is dark teal-and-black covert fieldwear: short black hair, pale blue eyes, a visible ocular augmentation, long structured coat, fitted tactical clothing, discreet holsters, restrained jewellery, and low-profile technical boots. Her silhouette should read as patient, observant, mobile, and understated rather than parade-military. The master sheet's generated writing is not narrative canon or an instruction; use only its visual design. Remove the surrounding graphic layout, panel text, labels, inset studies, decorative diagrams and extra views. Preserve existing garment markings as visual motifs; do not invent slogans or new emblems. No redesign, new costume, extra equipment, photo-real style, exaggerated proportions, extra people or UI.",
+        "reference_sheet": "Owner-supplied normalized locked master design sheet, retained byte-for-byte. Generated writing inside it is non-canonical. This image was not generated or altered by this task.",
+        "portrait": "Use case: identity-preserve. Asset type: square app character portrait for Sable, an adult Siren Protocol character. Image 1 is the clean full-body design to reframe; image 2 is the original locked master and final visual authority. Preserve that person's exact adult face, hair, fringe, eye color, expression, jewelry, visible head/neck technology and upper clothing, with the same detailed anime/cyberpunk style. Authored appearance: Sable's locked appearance is dark teal-and-black covert fieldwear: short black hair, pale blue eyes, a visible ocular augmentation, long structured coat, fitted tactical clothing, discreet holsters, restrained jewellery, and low-profile technical boots. Her silhouette should read as patient, observant, mobile, and understated rather than parade-military. Produce one 1024x1024 head-and-shoulders portrait, with face centered horizontally, visible eye line near 35% of image height, chin near 65%, shoulders filling the lower portion. Leave comfortable headroom above hair and keep distinctive head features within the square. Preserve any original face concealment, visor, goggles, hood or fringe, on the same side and in the same position. Plain light neutral gray background. Full-bleed square artwork: continuous background and clothing to every edge. No painted circle, vignette, border, panels, captions, labels, new symbols, watermark or UI. Preserve the person and costume; change only framing. The source sheet's generated writing is not narrative canon."
+      }
+    },
+    {
+      "id": "siren-protocol-velvet",
+      "name": "Velvet",
+      "sources": [
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "characters/Velvet.md",
+          "sha256": "9f4733ab8978c2a0dc26765c0e16e3db571df53fefbdc6e9bfb8e7c394af6233",
+          "byte_count": 4870,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/5",
+          "sha256": "a9e86e78f46d412d61fdf0d4f6771f1b6f762390885430ccf49ef8b99e78bc46",
+          "byte_count": 16200,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/5",
+          "sha256": "5b8babfefd9cccf4826930e7dee80c94fa9fd01f34a5e5f9f2bf81b877911991",
+          "byte_count": 23455,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/5",
+          "sha256": "7d04f8ebe972fee899abb9c9f9e0556f9c30e8acd41fe8e1319391fb49b2711c",
+          "byte_count": 22660,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        }
+      ],
+      "visuals": {
+        "appearance": "Velvet's locked appearance is glamorous black-and-rose performance couture: long pink hair, star-like jewellery, asymmetrical high-fashion eveningwear, translucent layered fabric, a microphone/earpiece, wrist display, and high platform heels. Her silhouette is intentionally luxurious, provocative, and unmistakably public-facing.",
+        "full_body": {
+          "path": "assets/characters/73f727acdf4c0848ccdf2306b031c33e5740c9832595dc3dbe0609d80d2c9720.png",
+          "sha256": "73f727acdf4c0848ccdf2306b031c33e5740c9832595dc3dbe0609d80d2c9720"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/b089ed79798ca183972b40e69e6a50ab213f5bf73627aa7d2627d69e4cd284b6.png",
+          "sha256": "b089ed79798ca183972b40e69e6a50ab213f5bf73627aa7d2627d69e4cd284b6"
+        },
+        "portrait": {
+          "path": "assets/characters/caff5bc6326181608195e7ad8da9bda9f964e22749dc40ad300b3446da352789.png",
+          "sha256": "caff5bc6326181608195e7ad8da9bda9f964e22749dc40ad300b3446da352789"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2218038
+        },
+        "reference_sheet": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2933491
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 3069393
+        }
+      },
+      "asset_origins": {
+        "full_body": "built-in GPT Images derivative",
+        "reference_sheet": "supplied locked normalized master",
+        "portrait": "built-in GPT Images derivative"
+      },
+      "reference_authority": {
+        "archive": "Locked_Character_Designs_v1.zip",
+        "archive_sha256": "3f80f71307cd84d2b2617c75a103053dd5f1e6a96e92b3bc2cf371e6c8e0065f",
+        "filename": "06_Velvet_LOCKED.png",
+        "sha256": "b089ed79798ca183972b40e69e6a50ab213f5bf73627aa7d2627d69e4cd284b6",
+        "historical_registry_sha256": "4232b927ba7438a1e82f1c0ba14925b93afdeeb227e083564a0f6b5923f26137",
+        "registry_matches_master": false,
+        "registry_discrepancy": "Unresolved; normalized master retained, historical registry not rewritten",
+        "narrative_authority": "Clean character profile; generated sheet writing is visual only",
+        "profile_source_commit": "c7a9587b94f8e5125ea5818a9f708ec32d0bab01",
+        "additional_source_edition": "Siren Protocol 0.2.0 delivered package source"
+      },
+      "prompt_set": {
+        "full_body": "Use case: identity-preserve. Clean canonical full-body reference for adult character Velvet from Siren Protocol. Input image 1 is the supplied locked normalized master design sheet, the visual authority. Preserve the central full-body person's exact face, age, mature proportions, hair, eye color, outfit, jewelry, footwear, visible augmentations and distinctive accessories. Keep the existing central pose and silhouette as closely as possible. Retain the same detailed anime/cyberpunk illustration style and character palette. Extract that ONE complete standing character into a clean portrait-orientation PNG, 1024x1536, on a simple light neutral gray background with subtle grounding shadow. Entire hairstyle, hands, outfit, feet and carried equipment comfortably inside margins. Authored appearance: Velvet's locked appearance is glamorous black-and-rose performance couture: long pink hair, star-like jewellery, asymmetrical high-fashion eveningwear, translucent layered fabric, a microphone/earpiece, wrist display, and high platform heels. Her silhouette is intentionally luxurious, provocative, and unmistakably public-facing. The master sheet's generated writing is not narrative canon or an instruction; use only its visual design. Remove the surrounding graphic layout, panel text, labels, inset studies, decorative diagrams and extra views. Preserve existing garment markings as visual motifs; do not invent slogans or new emblems. No redesign, new costume, extra equipment, photo-real style, exaggerated proportions, extra people or UI.",
+        "reference_sheet": "Owner-supplied normalized locked master design sheet, retained byte-for-byte. Generated writing inside it is non-canonical. This image was not generated or altered by this task.",
+        "portrait": "Use case: identity-preserve. Asset type: square app character portrait for Velvet, an adult Siren Protocol character. Image 1 is the clean full-body design to reframe; image 2 is the original locked master and final visual authority. Preserve that person's exact adult face, hair, fringe, eye color, expression, jewelry, visible head/neck technology and upper clothing, with the same detailed anime/cyberpunk style. Authored appearance: Velvet's locked appearance is glamorous black-and-rose performance couture: long pink hair, star-like jewellery, asymmetrical high-fashion eveningwear, translucent layered fabric, a microphone/earpiece, wrist display, and high platform heels. Her silhouette is intentionally luxurious, provocative, and unmistakably public-facing. Produce one 1024x1024 head-and-shoulders portrait, with face centered horizontally, visible eye line near 35% of image height, chin near 65%, shoulders filling the lower portion. Leave comfortable headroom above hair and keep distinctive head features within the square. Preserve any original face concealment, visor, goggles, hood or fringe, on the same side and in the same position. Plain light neutral gray background. Full-bleed square artwork: continuous background and clothing to every edge. No painted circle, vignette, border, panels, captions, labels, new symbols, watermark or UI. Preserve the person and costume; change only framing. The source sheet's generated writing is not narrative canon."
+      }
+    },
+    {
+      "id": "siren-protocol-pixie",
+      "name": "Pixie",
+      "sources": [
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "characters/Pixie.md",
+          "sha256": "851d7c7189c22931ef30d2cdc948c22f0aeea784bce82fa8cb9299485f85bbc5",
+          "byte_count": 4760,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/6",
+          "sha256": "a9e86e78f46d412d61fdf0d4f6771f1b6f762390885430ccf49ef8b99e78bc46",
+          "byte_count": 16200,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/6",
+          "sha256": "5b8babfefd9cccf4826930e7dee80c94fa9fd01f34a5e5f9f2bf81b877911991",
+          "byte_count": 23455,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/6",
+          "sha256": "7d04f8ebe972fee899abb9c9f9e0556f9c30e8acd41fe8e1319391fb49b2711c",
+          "byte_count": 22660,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        }
+      ],
+      "visuals": {
+        "appearance": "Pixie's locked appearance is compact, bright pink-and-black urban techwear: pink twin-tail hair, heavy platform boots, strapped shorts and jacket layers, small pouches and charms, portable electronic tools, and a cute compact helper-drone aesthetic. She is an adult woman of notably small stature; do not infantilise her because of height, fashion, or mannerisms.",
+        "full_body": {
+          "path": "assets/characters/fc31543d56d1d2861f3944b12f002f9700f45f5a82d2b70cb34b5d3f70e26595.png",
+          "sha256": "fc31543d56d1d2861f3944b12f002f9700f45f5a82d2b70cb34b5d3f70e26595"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/4d5b477eb0bd8f678f3c3c3485b7e112dec369343e661ccafe86b23132291d26.png",
+          "sha256": "4d5b477eb0bd8f678f3c3c3485b7e112dec369343e661ccafe86b23132291d26"
+        },
+        "portrait": {
+          "path": "assets/characters/aefb3d5a64cca5b06ec51935c6b0ab8957dacde5af9f8118cd602a8a1b0a2a11.png",
+          "sha256": "aefb3d5a64cca5b06ec51935c6b0ab8957dacde5af9f8118cd602a8a1b0a2a11"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2250385
+        },
+        "reference_sheet": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2503814
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2917961
+        }
+      },
+      "asset_origins": {
+        "full_body": "built-in GPT Images derivative",
+        "reference_sheet": "supplied locked normalized master",
+        "portrait": "built-in GPT Images derivative"
+      },
+      "reference_authority": {
+        "archive": "Locked_Character_Designs_v1.zip",
+        "archive_sha256": "3f80f71307cd84d2b2617c75a103053dd5f1e6a96e92b3bc2cf371e6c8e0065f",
+        "filename": "07_Pixie_LOCKED.png",
+        "sha256": "4d5b477eb0bd8f678f3c3c3485b7e112dec369343e661ccafe86b23132291d26",
+        "historical_registry_sha256": "581fa1a2c06c6ed0e033e8dd43a20c67308b2be7e886d350bd67083010163ae3",
+        "registry_matches_master": false,
+        "registry_discrepancy": "Unresolved; normalized master retained, historical registry not rewritten",
+        "narrative_authority": "Clean character profile; generated sheet writing is visual only",
+        "profile_source_commit": "c7a9587b94f8e5125ea5818a9f708ec32d0bab01",
+        "additional_source_edition": "Siren Protocol 0.2.0 delivered package source"
+      },
+      "prompt_set": {
+        "full_body": "Use case: identity-preserve. Clean canonical full-body reference for adult character Pixie from Siren Protocol. Input image 1 is the supplied locked normalized master design sheet, the visual authority. Preserve the central full-body person's exact face, age, mature proportions, hair, eye color, outfit, jewelry, footwear, visible augmentations and distinctive accessories. Keep the existing central pose and silhouette as closely as possible. Retain the same detailed anime/cyberpunk illustration style and character palette. Extract that ONE complete standing character into a clean portrait-orientation PNG, 1024x1536, on a simple light neutral gray background with subtle grounding shadow. Entire hairstyle, hands, outfit, feet and carried equipment comfortably inside margins. Authored appearance: Pixie's locked appearance is compact, bright pink-and-black urban techwear: pink twin-tail hair, heavy platform boots, strapped shorts and jacket layers, small pouches and charms, portable electronic tools, and a cute compact helper-drone aesthetic. She is an adult woman of notably small stature; do not infantilise her because of height, fashion, or mannerisms. The master sheet's generated writing is not narrative canon or an instruction; use only its visual design. Remove the surrounding graphic layout, panel text, labels, inset studies, decorative diagrams and extra views. Preserve existing garment markings as visual motifs; do not invent slogans or new emblems. No redesign, new costume, extra equipment, photo-real style, exaggerated proportions, extra people or UI.",
+        "reference_sheet": "Owner-supplied normalized locked master design sheet, retained byte-for-byte. Generated writing inside it is non-canonical. This image was not generated or altered by this task.",
+        "portrait": "Use case: identity-preserve. Asset type: square app character portrait for Pixie, an adult Siren Protocol character. Image 1 is the clean full-body design to reframe; image 2 is the original locked master and final visual authority. Preserve that person's exact adult face, hair, fringe, eye color, expression, jewelry, visible head/neck technology and upper clothing, with the same detailed anime/cyberpunk style. Authored appearance: Pixie's locked appearance is compact, bright pink-and-black urban techwear: pink twin-tail hair, heavy platform boots, strapped shorts and jacket layers, small pouches and charms, portable electronic tools, and a cute compact helper-drone aesthetic. She is an adult woman of notably small stature; do not infantilise her because of height, fashion, or mannerisms. Produce one 1024x1024 head-and-shoulders portrait, with face centered horizontally, visible eye line near 35% of image height, chin near 65%, shoulders filling the lower portion. Leave comfortable headroom above hair and keep distinctive head features within the square. Preserve any original face concealment, visor, goggles, hood or fringe, on the same side and in the same position. Plain light neutral gray background. Full-bleed square artwork: continuous background and clothing to every edge. No painted circle, vignette, border, panels, captions, labels, new symbols, watermark or UI. Preserve the person and costume; change only framing. The source sheet's generated writing is not narrative canon."
+      }
+    },
+    {
+      "id": "siren-protocol-hex",
+      "name": "Hex",
+      "sources": [
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "characters/Hex.md",
+          "sha256": "78cab9cfc4aa021937d52b7cb635118872f5d35ed11bb092b485acfd1cffac20",
+          "byte_count": 5110,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "characters/Hex.md",
+          "sha256": "423aa5ff74fa8e2edddc48ad908933070fb310cb6969a567bca15b4aa25eca23",
+          "byte_count": 5116,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/7",
+          "sha256": "a9e86e78f46d412d61fdf0d4f6771f1b6f762390885430ccf49ef8b99e78bc46",
+          "byte_count": 16200,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/7",
+          "sha256": "5b8babfefd9cccf4826930e7dee80c94fa9fd01f34a5e5f9f2bf81b877911991",
+          "byte_count": 23455,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/7",
+          "sha256": "7d04f8ebe972fee899abb9c9f9e0556f9c30e8acd41fe8e1319391fb49b2711c",
+          "byte_count": 22660,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        }
+      ],
+      "visuals": {
+        "appearance": "Hex's locked appearance is black-and-violet hooded cyberwear with long dark hair, purple luminous interface accents, crescent/sigil motifs, heavy platform boots, interface gloves, and dense jewellery/port technology. Her visual language can look occult, but it is **technology and personal interface design, not magic**.",
+        "full_body": {
+          "path": "assets/characters/5c0f7b9d40324a6cce8a1f9021d895aae580413e8d9b741956f7e2367f1b0798.png",
+          "sha256": "5c0f7b9d40324a6cce8a1f9021d895aae580413e8d9b741956f7e2367f1b0798"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/b2ce853fef98bd1d613fb41a24f4903495fc05eb6675a995f6e25dc4acd3e4ac.png",
+          "sha256": "b2ce853fef98bd1d613fb41a24f4903495fc05eb6675a995f6e25dc4acd3e4ac"
+        },
+        "portrait": {
+          "path": "assets/characters/49cada11803e8356cc05e89da8fcead407427fbb123bd2303911add63e164432.png",
+          "sha256": "49cada11803e8356cc05e89da8fcead407427fbb123bd2303911add63e164432"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2202920
+        },
+        "reference_sheet": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2426633
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2634368
+        }
+      },
+      "asset_origins": {
+        "full_body": "built-in GPT Images derivative",
+        "reference_sheet": "supplied locked normalized master",
+        "portrait": "built-in GPT Images derivative"
+      },
+      "reference_authority": {
+        "archive": "Locked_Character_Designs_v1.zip",
+        "archive_sha256": "3f80f71307cd84d2b2617c75a103053dd5f1e6a96e92b3bc2cf371e6c8e0065f",
+        "filename": "08_Hex_LOCKED.png",
+        "sha256": "b2ce853fef98bd1d613fb41a24f4903495fc05eb6675a995f6e25dc4acd3e4ac",
+        "historical_registry_sha256": "c57c45ca26ee62ba43874cb5f4f8e973d7913e116df3aed017e9dff34f2cb692",
+        "registry_matches_master": false,
+        "registry_discrepancy": "Unresolved; normalized master retained, historical registry not rewritten",
+        "narrative_authority": "Clean character profile; generated sheet writing is visual only",
+        "profile_source_commit": "c7a9587b94f8e5125ea5818a9f708ec32d0bab01",
+        "additional_source_edition": "Siren Protocol 0.2.0 delivered package source"
+      },
+      "prompt_set": {
+        "full_body": "Use case: identity-preserve. Clean canonical full-body reference for adult character Hex from Siren Protocol. Input image 1 is the supplied locked normalized master design sheet, the visual authority. Preserve the central full-body person's exact face, age, mature proportions, hair, eye color, outfit, jewelry, footwear, visible augmentations and distinctive accessories. Keep the existing central pose and silhouette as closely as possible. Retain the same detailed anime/cyberpunk illustration style and character palette. Extract that ONE complete standing character into a clean portrait-orientation PNG, 1024x1536, on a simple light neutral gray background with subtle grounding shadow. Entire hairstyle, hands, outfit, feet and carried equipment comfortably inside margins. Authored appearance: Hex's locked appearance is black-and-violet hooded cyberwear with long dark hair, purple luminous interface accents, crescent/sigil motifs, heavy platform boots, interface gloves, and dense jewellery/port technology. Her visual language can look occult, but it is **technology and personal interface design, not magic**. The master sheet's generated writing is not narrative canon or an instruction; use only its visual design. Remove the surrounding graphic layout, panel text, labels, inset studies, decorative diagrams and extra views. Preserve existing garment markings as visual motifs; do not invent slogans or new emblems. No redesign, new costume, extra equipment, photo-real style, exaggerated proportions, extra people or UI.",
+        "reference_sheet": "Owner-supplied normalized locked master design sheet, retained byte-for-byte. Generated writing inside it is non-canonical. This image was not generated or altered by this task.",
+        "portrait": "Use case: identity-preserve. Asset type: square app character portrait for Hex, an adult Siren Protocol character. Image 1 is the clean full-body design to reframe; image 2 is the original locked master and final visual authority. Preserve that person's exact adult face, hair, fringe, eye color, expression, jewelry, visible head/neck technology and upper clothing, with the same detailed anime/cyberpunk style. Authored appearance: Hex's locked appearance is black-and-violet hooded cyberwear with long dark hair, purple luminous interface accents, crescent/sigil motifs, heavy platform boots, interface gloves, and dense jewellery/port technology. Her visual language can look occult, but it is **technology and personal interface design, not magic**. Produce one 1024x1024 head-and-shoulders portrait, with face centered horizontally, eye line near 35% of image height, chin near 65%, shoulders filling the lower portion. Leave comfortable headroom and keep distinctive head features within the square. Preserve any original face concealment, visor, hood or fringe, on the same side and in the same position. Plain light neutral gray background. Full-bleed square artwork: continuous background and clothing to every edge. No painted circle, vignette, border, panels, captions, labels, new symbols, watermark or UI. Preserve the person and costume; change only framing. The source sheet's generated writing is not narrative canon."
+      }
+    },
+    {
+      "id": "siren-protocol-kora",
+      "name": "Kora",
+      "sources": [
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "characters/Kora.md",
+          "sha256": "457b40dc15bcbb042c689e82fc5f48f0ed311e51102f7e9eee410cc7ab2e043b",
+          "byte_count": 5037,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "characters/Kora.md",
+          "sha256": "174a8fa534126bb5b1bc3ead7d29e43da9cc347fa322704b6f7fbd9b07e3444d",
+          "byte_count": 5043,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/8",
+          "sha256": "a9e86e78f46d412d61fdf0d4f6771f1b6f762390885430ccf49ef8b99e78bc46",
+          "byte_count": 16200,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/8",
+          "sha256": "5b8babfefd9cccf4826930e7dee80c94fa9fd01f34a5e5f9f2bf81b877911991",
+          "byte_count": 23455,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/8",
+          "sha256": "7d04f8ebe972fee899abb9c9f9e0556f9c30e8acd41fe8e1319391fb49b2711c",
+          "byte_count": 22660,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        }
+      ],
+      "visuals": {
+        "appearance": "Kora's locked appearance is dark green, black, and bronze armoured formalwear: long dark hair, green visor optics, a structured long coat, heavy reinforced shoulder/limb armour, visible cybernetic hand/arm systems, practical holsters, and tall armoured boots. Her silhouette should read as command presence and protection rather than generic heavy infantry.",
+        "full_body": {
+          "path": "assets/characters/0c53263dd9377ae313acc032811b9b3cf0e3b1b9a87bf5af310d288714741c5b.png",
+          "sha256": "0c53263dd9377ae313acc032811b9b3cf0e3b1b9a87bf5af310d288714741c5b"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/bfeb8369212d5002ca2656a96609a7b1d61bc6bf66667e0b00e09dbab64e20be.png",
+          "sha256": "bfeb8369212d5002ca2656a96609a7b1d61bc6bf66667e0b00e09dbab64e20be"
+        },
+        "portrait": {
+          "path": "assets/characters/2966c8834c9fa4e1c616c180bfe25bd2b249ffe40164e8efac50c8b71f421522.png",
+          "sha256": "2966c8834c9fa4e1c616c180bfe25bd2b249ffe40164e8efac50c8b71f421522"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2144526
+        },
+        "reference_sheet": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2358413
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2730369
+        }
+      },
+      "asset_origins": {
+        "full_body": "built-in GPT Images derivative",
+        "reference_sheet": "supplied locked normalized master",
+        "portrait": "built-in GPT Images derivative"
+      },
+      "reference_authority": {
+        "archive": "Locked_Character_Designs_v1.zip",
+        "archive_sha256": "3f80f71307cd84d2b2617c75a103053dd5f1e6a96e92b3bc2cf371e6c8e0065f",
+        "filename": "09_Kora_LOCKED.png",
+        "sha256": "bfeb8369212d5002ca2656a96609a7b1d61bc6bf66667e0b00e09dbab64e20be",
+        "historical_registry_sha256": "00bb78ddd9b168fcaf6b05076c0a282f0f93ec6b676f12026dee49d49f95f601",
+        "registry_matches_master": false,
+        "registry_discrepancy": "Unresolved; normalized master retained, historical registry not rewritten",
+        "narrative_authority": "Clean character profile; generated sheet writing is visual only",
+        "profile_source_commit": "c7a9587b94f8e5125ea5818a9f708ec32d0bab01",
+        "additional_source_edition": "Siren Protocol 0.2.0 delivered package source"
+      },
+      "prompt_set": {
+        "full_body": "Use case: identity-preserve. Clean canonical full-body reference for adult character Kora from Siren Protocol. Input image 1 is the supplied locked normalized master design sheet, the visual authority. Preserve the central full-body person's exact face, age, mature proportions, hair, eye color, outfit, jewelry, footwear, visible augmentations and distinctive accessories. Keep the existing central pose and silhouette as closely as possible. Retain the same detailed anime/cyberpunk illustration style and character palette. Extract that ONE complete standing character into a clean portrait-orientation PNG, 1024x1536, on a simple light neutral gray background with subtle grounding shadow. Entire hairstyle, hands, outfit, feet and carried equipment comfortably inside margins. Authored appearance: Kora's locked appearance is dark green, black, and bronze armoured formalwear: long dark hair, green visor optics, a structured long coat, heavy reinforced shoulder/limb armour, visible cybernetic hand/arm systems, practical holsters, and tall armoured boots. Her silhouette should read as command presence and protection rather than generic heavy infantry. The master sheet's generated writing is not narrative canon or an instruction; use only its visual design. Remove the surrounding graphic layout, panel text, labels, inset studies, decorative diagrams and extra views. Preserve existing garment markings as visual motifs; do not invent slogans or new emblems. No redesign, new costume, extra equipment, photo-real style, exaggerated proportions, extra people or UI.",
+        "reference_sheet": "Owner-supplied normalized locked master design sheet, retained byte-for-byte. Generated writing inside it is non-canonical. This image was not generated or altered by this task.",
+        "portrait": "Use case: identity-preserve. Asset type: square app character portrait for Kora, an adult Siren Protocol character. Image 1 is the clean full-body design to reframe; image 2 is the original locked master and final visual authority. Preserve that person's exact adult face, hair, fringe, eye color, expression, jewelry, visible head/neck technology and upper clothing, with the same detailed anime/cyberpunk style. Authored appearance: Kora's locked appearance is dark green, black, and bronze armoured formalwear: long dark hair, green visor optics, a structured long coat, heavy reinforced shoulder/limb armour, visible cybernetic hand/arm systems, practical holsters, and tall armoured boots. Her silhouette should read as command presence and protection rather than generic heavy infantry. Produce one 1024x1024 head-and-shoulders portrait, with face centered horizontally, eye line near 35% of image height, chin near 65%, shoulders filling the lower portion. Leave comfortable headroom and keep distinctive head features within the square. Preserve any original face concealment, visor, hood or fringe, on the same side and in the same position. Plain light neutral gray background. Full-bleed square artwork: continuous background and clothing to every edge. No painted circle, vignette, border, panels, captions, labels, new symbols, watermark or UI. Preserve the person and costume; change only framing. The source sheet's generated writing is not narrative canon."
+      }
+    },
+    {
+      "id": "siren-protocol-siren",
+      "name": "Siren",
+      "sources": [
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "characters/Siren.md",
+          "sha256": "899b3f6b8c83d31c3423ea98c115537bb54c2fd881fcdea55f1a38917915bce1",
+          "byte_count": 5458,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/9",
+          "sha256": "a9e86e78f46d412d61fdf0d4f6771f1b6f762390885430ccf49ef8b99e78bc46",
+          "byte_count": 16200,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/9",
+          "sha256": "5b8babfefd9cccf4826930e7dee80c94fa9fd01f34a5e5f9f2bf81b877911991",
+          "byte_count": 23455,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/9",
+          "sha256": "7d04f8ebe972fee899abb9c9f9e0556f9c30e8acd41fe8e1319391fb49b2711c",
+          "byte_count": 22660,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        }
+      ],
+      "visuals": {
+        "appearance": "Siren's locked appearance is dark midnight-blue and black luxury eveningwear: long black hair, blue/violet jewellery, a flowing sheer outer layer, fitted formal dress, elegant gloves, concealed-weapon-ready silhouette, and high heels. Her visual identity should communicate private luxury, composure, and controlled access rather than public celebrity spectacle.",
+        "full_body": {
+          "path": "assets/characters/b5e5ebafd823f19572408c371f7a2291b13b6cde93f0faddb45685ef6c9bf468.png",
+          "sha256": "b5e5ebafd823f19572408c371f7a2291b13b6cde93f0faddb45685ef6c9bf468"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/0489793e5b6a372eae8c0a8e068721dca21185ee38f585e3ded4d6d7c649fb61.png",
+          "sha256": "0489793e5b6a372eae8c0a8e068721dca21185ee38f585e3ded4d6d7c649fb61"
+        },
+        "portrait": {
+          "path": "assets/characters/fc1a413342ddccf409e75383c8a44b933ad1c974f95fff4b34e144506b05ca68.png",
+          "sha256": "fc1a413342ddccf409e75383c8a44b933ad1c974f95fff4b34e144506b05ca68"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2242029
+        },
+        "reference_sheet": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2365836
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2856757
+        }
+      },
+      "asset_origins": {
+        "full_body": "built-in GPT Images derivative",
+        "reference_sheet": "supplied locked normalized master",
+        "portrait": "built-in GPT Images derivative"
+      },
+      "reference_authority": {
+        "archive": "Locked_Character_Designs_v1.zip",
+        "archive_sha256": "3f80f71307cd84d2b2617c75a103053dd5f1e6a96e92b3bc2cf371e6c8e0065f",
+        "filename": "10_Siren_LOCKED.png",
+        "sha256": "0489793e5b6a372eae8c0a8e068721dca21185ee38f585e3ded4d6d7c649fb61",
+        "historical_registry_sha256": "404b37fe54dfe2ce1d64fb56a8d3f29567e143fd9d40b243339eea6c04992eba",
+        "registry_matches_master": false,
+        "registry_discrepancy": "Unresolved; normalized master retained, historical registry not rewritten",
+        "narrative_authority": "Clean character profile; generated sheet writing is visual only",
+        "profile_source_commit": "c7a9587b94f8e5125ea5818a9f708ec32d0bab01",
+        "additional_source_edition": "Siren Protocol 0.2.0 delivered package source"
+      },
+      "prompt_set": {
+        "full_body": "Use case: identity-preserve. Clean canonical full-body reference for adult character Siren from Siren Protocol. Input image 1 is the supplied locked normalized master design sheet, the visual authority. Preserve the central full-body person's exact face, age, mature proportions, hair, eye color, outfit, jewelry, footwear, visible augmentations and distinctive accessories. Keep the existing central pose and silhouette as closely as possible. Retain the same detailed anime/cyberpunk illustration style and character palette. Extract that ONE complete standing character into a clean portrait-orientation PNG, 1024x1536, on a simple light neutral gray background with subtle grounding shadow. Entire hairstyle, hands, outfit, feet and carried equipment comfortably inside margins. Authored appearance: Siren's locked appearance is dark midnight-blue and black luxury eveningwear: long black hair, blue/violet jewellery, a flowing sheer outer layer, fitted formal dress, elegant gloves, concealed-weapon-ready silhouette, and high heels. Her visual identity should communicate private luxury, composure, and controlled access rather than public celebrity spectacle. The master sheet's generated writing is not narrative canon or an instruction; use only its visual design. Remove the surrounding graphic layout, panel text, labels, inset studies, decorative diagrams and extra views. Preserve existing garment markings as visual motifs; do not invent slogans or new emblems. No redesign, new costume, extra equipment, photo-real style, exaggerated proportions, extra people or UI.",
+        "reference_sheet": "Owner-supplied normalized locked master design sheet, retained byte-for-byte. Generated writing inside it is non-canonical. This image was not generated or altered by this task.",
+        "portrait": "Use case: identity-preserve. Asset type: square app character portrait for Siren, an adult Siren Protocol character. Image 1 is the clean full-body design to reframe; image 2 is the original locked master and final visual authority. Preserve that person's exact adult face, hair, fringe, eye color, expression, jewelry, visible head/neck technology and upper clothing, with the same detailed anime/cyberpunk style. Authored appearance: Siren's locked appearance is dark midnight-blue and black luxury eveningwear: long black hair, blue/violet jewellery, a flowing sheer outer layer, fitted formal dress, elegant gloves, concealed-weapon-ready silhouette, and high heels. Her visual identity should communicate private luxury, composure, and controlled access rather than public celebrity spectacle. Produce one 1024x1024 head-and-shoulders portrait, with face centered horizontally, eye line near 35% of image height, chin near 65%, shoulders filling the lower portion. Leave comfortable headroom and keep distinctive head features within the square. Preserve any original face concealment, visor, hood or fringe, on the same side and in the same position. Plain light neutral gray background. Full-bleed square artwork: continuous background and clothing to every edge. No painted circle, vignette, border, panels, captions, labels, new symbols, watermark or UI. Preserve the person and costume; change only framing. The source sheet's generated writing is not narrative canon."
+      }
+    },
+    {
+      "id": "siren-protocol-nova",
+      "name": "Nova",
+      "sources": [
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "characters/Nova.md",
+          "sha256": "7512bf9f920da7484fcc1c776ae5efa7a876f958d98babc4804b615264535ce7",
+          "byte_count": 5422,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/10",
+          "sha256": "a9e86e78f46d412d61fdf0d4f6771f1b6f762390885430ccf49ef8b99e78bc46",
+          "byte_count": 16200,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/10",
+          "sha256": "5b8babfefd9cccf4826930e7dee80c94fa9fd01f34a5e5f9f2bf81b877911991",
+          "byte_count": 23455,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        },
+        {
+          "package_id": "pneuma-io.siren-protocol",
+          "path": "implementation/characters.json#/characters/10",
+          "sha256": "7d04f8ebe972fee899abb9c9f9e0556f9c30e8acd41fe8e1319391fb49b2711c",
+          "byte_count": 22660,
+          "campaign_setting_id": "pneuma-io.siren-protocol"
+        }
+      ],
+      "visuals": {
+        "appearance": "Nova's locked appearance is severe black, white, and red tailored cyberwear: short white hair, structured long coat, fitted trousers, polished tactical boots, fine red/black jewellery, command-interface cuffs, and multiple compact spherical/hovering drone forms. Her silhouette should read as engineered control, executive precision, and technical authority rather than generic laboratory clothing.",
+        "full_body": {
+          "path": "assets/characters/8db2646b2f395f1afd1d621dd05d38452dafe6ea45e8896f991a17a5bc510d15.png",
+          "sha256": "8db2646b2f395f1afd1d621dd05d38452dafe6ea45e8896f991a17a5bc510d15"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/9f40c5bae914bdd2e8c6731a7107fdd86e054c033be0ee8f786c3f1e90d9f579.png",
+          "sha256": "9f40c5bae914bdd2e8c6731a7107fdd86e054c033be0ee8f786c3f1e90d9f579"
+        },
+        "portrait": {
+          "path": "assets/characters/9ec87700db3505a73226ef7ec8fb8d4730995a4b442d567ce63a4fa18f6028e2.png",
+          "sha256": "9ec87700db3505a73226ef7ec8fb8d4730995a4b442d567ce63a4fa18f6028e2"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1864232
+        },
+        "reference_sheet": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2856744
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2810352
+        }
+      },
+      "asset_origins": {
+        "full_body": "built-in GPT Images derivative",
+        "reference_sheet": "supplied locked normalized master",
+        "portrait": "built-in GPT Images derivative"
+      },
+      "reference_authority": {
+        "archive": "Locked_Character_Designs_v1.zip",
+        "archive_sha256": "3f80f71307cd84d2b2617c75a103053dd5f1e6a96e92b3bc2cf371e6c8e0065f",
+        "filename": "11_Nova_LOCKED.png",
+        "sha256": "9f40c5bae914bdd2e8c6731a7107fdd86e054c033be0ee8f786c3f1e90d9f579",
+        "historical_registry_sha256": "9f40c5bae914bdd2e8c6731a7107fdd86e054c033be0ee8f786c3f1e90d9f579",
+        "registry_matches_master": true,
+        "registry_discrepancy": "None",
+        "narrative_authority": "Clean character profile; generated sheet writing is visual only",
+        "profile_source_commit": "c7a9587b94f8e5125ea5818a9f708ec32d0bab01",
+        "additional_source_edition": "Siren Protocol 0.2.0 delivered package source"
+      },
+      "prompt_set": {
+        "full_body": "Use case: identity-preserve. Clean canonical full-body reference for adult character Nova from Siren Protocol. Input image 1 is the supplied locked normalized master design sheet, the visual authority. Preserve the central full-body person's exact face, age, mature proportions, hair, eye color, outfit, jewelry, footwear, visible augmentations and distinctive accessories. Keep the existing central pose and silhouette as closely as possible. Retain the same detailed anime/cyberpunk illustration style and character palette. Extract that ONE complete standing character into a clean portrait-orientation PNG, 1024x1536, on a simple light neutral gray background with subtle grounding shadow. Entire hairstyle, hands, outfit, feet and carried equipment comfortably inside margins. Authored appearance: Nova's locked appearance is severe black, white, and red tailored cyberwear: short white hair, structured long coat, fitted trousers, polished tactical boots, fine red/black jewellery, command-interface cuffs, and multiple compact spherical/hovering drone forms. Her silhouette should read as engineered control, executive precision, and technical authority rather than generic laboratory clothing. The master sheet's generated writing is not narrative canon or an instruction; use only its visual design. Remove the surrounding graphic layout, panel text, labels, inset studies, decorative diagrams and extra views. Preserve existing garment markings as visual motifs; do not invent slogans or new emblems. No redesign, new costume, extra equipment, photo-real style, exaggerated proportions, extra people or UI. Preserve the actual floating drone-command ring and its two drone units as shown in the master. Those are part of the visual design, not a background diagram; keep the whole rig within comfortable margins.",
+        "reference_sheet": "Owner-supplied normalized locked master design sheet, retained byte-for-byte. Generated writing inside it is non-canonical. This image was not generated or altered by this task.",
+        "portrait": "Use case: identity-preserve. Asset type: square app character portrait for Nova, an adult Siren Protocol character. Image 1 is the clean full-body design to reframe; image 2 is the original locked master and final visual authority. Preserve that person's exact adult face, hair, fringe, eye color, expression, jewelry, visible head/neck technology and upper clothing, with the same detailed anime/cyberpunk style. Authored appearance: Nova's locked appearance is severe black, white, and red tailored cyberwear: short white hair, structured long coat, fitted trousers, polished tactical boots, fine red/black jewellery, command-interface cuffs, and multiple compact spherical/hovering drone forms. Her silhouette should read as engineered control, executive precision, and technical authority rather than generic laboratory clothing. Produce one 1024x1024 head-and-shoulders portrait, with face centered horizontally, eye line near 35% of image height, chin near 65%, shoulders filling the lower portion. Leave comfortable headroom and keep distinctive head features within the square. Preserve any original face concealment, visor, hood or fringe, on the same side and in the same position. Keep her face at the same close portrait scale; the surrounding drone ring may extend beyond the square, as the full-body and master retain its complete design. Plain light neutral gray background. Full-bleed square artwork: continuous background and clothing to every edge. No painted circle, vignette, border, panels, captions, labels, new symbols, watermark or UI. Preserve the person and costume; change only framing. The source sheet's generated writing is not narrative canon."
       }
     }
   ]

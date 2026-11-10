@@ -318,6 +318,79 @@ def test_legacy_profile_keeps_long_authored_text_and_portable_art_without_format
             art.close()
 
 
+def test_siren_original_and_derived_art_transfer_without_the_shared_library(tmp_path, monkeypatch):
+    """Use a Universal fixture to qualify real Siren image bytes, not a TD playable build."""
+    root = Path(__file__).resolve().parents[1]
+    catalogue = json.loads((root / "artwork/character-art.json").read_bytes())
+    entry = next(row for row in catalogue["characters"] if row["id"] == "siren-protocol-vesper")
+    source_root, recipient_root = tmp_path / "source", tmp_path / "recipient"
+    source_root.mkdir()
+    recipient_root.mkdir()
+    expected = {
+        entry["visuals"][purpose]["path"]: (
+            root / "artwork" / entry["visuals"][purpose]["path"]
+        ).read_bytes()
+        for purpose in ("full_body", "reference_sheet", "portrait")
+    }
+    with AuthorityOwner.open(source_root / "owner.db", "source") as owner:
+        profile = save_character_profile(
+            source_root, operation_id="fixture", source=canonical_json_bytes(LEGACY)
+        )
+        owner.create_builder_chat(provider_id="test", model_id="test", session_id="source-chat")
+        art = ImageArt(owner)
+        try:
+            art.restore_visuals("source-chat", profile.artifact_id, entry["visuals"], name="Vesper")
+            art.frame(
+                "source-chat",
+                profile.artifact_id,
+                entry["visuals"]["portrait"]["sha256"],
+                {
+                    "x": 0.45,
+                    "y": 0.4,
+                    "zoom": 1.15,
+                },
+            )
+            art.bind_publication(
+                "source-chat", profile.artifact_id, profile.content_sha256, name="Vesper"
+            )
+            archive, receipt = export(owner, source_root, profile)
+            assert receipt["image_count"] == 3
+            assert not art.adapters and not art._futures
+        finally:
+            art.close()
+    bundle = read_character_bundle(io.BytesIO(archive))
+    assert {path: raw for path, raw in bundle.files.items() if path.endswith(".png")} == expected
+    assert (
+        bundle.manifest["visuals"]["reference_sheet"]["sha256"]
+        == entry["reference_authority"]["sha256"]
+    )
+    monkeypatch.setattr(
+        "sylvia_gm.application.image_art.bundled_character_image", lambda *args: None
+    )
+    monkeypatch.setattr(
+        "sylvia_gm.application.character_transfer.bundled_character_image", lambda *args: None
+    )
+    with AuthorityOwner.open(recipient_root / "owner.db", "recipient") as owner:
+        received = import_character_source(
+            owner,
+            recipient_root,
+            io.BytesIO(archive),
+            expected_content_sha256=bundle.content_sha256,
+        )
+        restored = load_character_profile(recipient_root, received["character"]["id"])
+        owner.create_builder_chat(provider_id="test", model_id="test", session_id="received-chat")
+        art = ImageArt(owner)
+        try:
+            art.restore_profile("received-chat", restored, recipient_root)
+            assert art.character_assets("received-chat", restored.artifact_id) == expected
+            selections = art.view("received-chat")["selections"]
+            portrait = next(row for row in selections if row["purpose"] == "portrait")
+            assert portrait["frame"] == {"x": 0.45, "y": 0.4, "zoom": 1.15}
+            assert not art.adapters and not art._futures
+        finally:
+            art.close()
+
+
 def test_actual_lite_character_requires_exact_packages_and_restores_prepared_images_offline(
     tmp_path,
 ):
