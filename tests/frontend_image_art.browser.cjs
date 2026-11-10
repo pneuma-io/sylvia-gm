@@ -46,6 +46,13 @@ test('review, adopt, crop and reopen art through the source WebUI',{timeout:1800
     await frame.locator('[name=x]').fill('0.42');
     await frame.locator('[name=y]').fill('0.31');
     await frame.locator('[name=zoom]').fill('1.5');
+    const preview=frame.locator('..').locator('.image-art-selected-preview img');
+    const crop=await preview.evaluate(image=>{
+      const outer=image.parentElement.getBoundingClientRect(),inner=image.getBoundingClientRect();
+      return {x:(outer.left-inner.left)/outer.width,y:(outer.top-inner.top)/outer.height};
+    });
+    assert.ok(Math.abs(crop.x-.21)<.01,'Horizontal crop previews before Save');
+    assert.ok(Math.abs(crop.y-.155)<.01,'Vertical crop previews before Save');
     await frame.getByRole('button',{name:'Save framing'}).click();
     await form.locator('[name=target_id]').selectOption('training-floor');
     assert.equal(await form.locator('[name=purpose]').inputValue(),'map_underlay');

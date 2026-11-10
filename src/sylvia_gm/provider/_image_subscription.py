@@ -74,7 +74,8 @@ class SubscriptionImageAdapter:
         try:
             connection.start()
             account = connection.call("account/read", {"refreshToken": False})
-            if account.get("account", {}).get("type") != "chatgpt":
+            identity = account.get("account")
+            if not isinstance(identity, dict) or identity.get("type") != "chatgpt":
                 raise ImageHookError("credentials_refused")
             capabilities = connection.call("modelProvider/capabilities/read", {})
             if capabilities.get("imageGeneration") is not True:

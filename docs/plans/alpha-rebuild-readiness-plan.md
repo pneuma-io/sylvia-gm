@@ -4,7 +4,7 @@
 >
 > **Endpoint:** A Windows Alpha candidate accepted by the project owner; publication requires separate approval.
 >
-> **Updated:** 2026-10-17
+> **Updated:** 2026-11-10
 
 PES-06 scope correction, 2026-09-15: the project owner permits starting a new campaign for current panel
 verification. Existing-campaign rules updates, including preserving layout when new panels are
@@ -21,10 +21,11 @@ handoffs and checkout-specific records do not activate work.
 the managed ChatGPT subscription connection, Off/Review/Auto permissions, saved full-body and
 multi-view character references, shared adjustable portrait framing and map-data-guided underlays.
 GM and Builder receive autonomous art discovery and request tools. Separate scene illustrations
-and ambient backgrounds remain deferred. The current handoff is a reviewable PR: the owner
-explicitly selected leaving real image generation pending. Scripted/source verification does not
-close live subscription, installed-app or TD trailer acceptance. Keep the PR unmerged pending that
-verification and the subsequent merge decision.
+and ambient backgrounds remain deferred. PR #34 contains the implementation. The owner selected
+leaving real image generation pending, then asked to finish implementation and integration.
+Source checks cover the current changes; live subscription, installed-app and TD trailer
+acceptance remain separate and unverified. Merge follows the Pneuma IO rulebook's delivery and
+cleanup sequence.
 
 **9 November 2026: optional onboarding and the complete tutorial suite.** The owner selected a new
 PR for all independently accessible lessons and a guided welcome, AI connection, Ready campaign

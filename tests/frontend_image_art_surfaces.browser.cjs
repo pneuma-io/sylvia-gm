@@ -52,6 +52,12 @@ test('one saved crop is reused in Party, Character, Map and labelled dialogue',{
    assert.match(style,/object-position:42% 31%/);assert.match(style,/scale\(1.5\)/);
   }
   assert.equal(await page.locator('.npc-dialogue .image-art-portrait').count(),1);
+  const crop=await page.locator('.npc-dialogue .image-art-portrait img').evaluate(image=>{
+   const outer=image.parentElement.getBoundingClientRect(),inner=image.getBoundingClientRect();
+   return {x:(outer.left-inner.left)/outer.width,y:(outer.top-inner.top)/outer.height};
+  });
+  assert.ok(Math.abs(crop.x-.21)<.01,`Saved horizontal crop moves square art: ${crop.x}`);
+  assert.ok(Math.abs(crop.y-.155)<.01,`Saved vertical crop moves square art: ${crop.y}`);
   const reads=await page.evaluate(async()=>{
    const scope={campaign_id:'image-surfaces',session_id:'gm',current:()=>true};
    const call=window.artSurfaceQA.dispatchPanelWindowRequest;

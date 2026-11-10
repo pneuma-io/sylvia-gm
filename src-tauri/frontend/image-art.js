@@ -61,6 +61,11 @@
       return view?.selections.find(item => item.target_id === target && item.purpose === purpose);
     }
 
+    function frameStyle(frame) {
+      const position=`${Number(frame.x)*100}% ${Number(frame.y)*100}%`;
+      return `object-position:${position};transform-origin:${position};transform:scale(${Number(frame.zoom)})`;
+    }
+
     function portrait(target, name, className = '') {
       // Existing safe dialogue blocks retain labels. Resolve only an unambiguous public target.
       if (!target) {
@@ -72,7 +77,7 @@
       if (!url) return '';
       const frame = item.frame || {x:.5,y:.35,zoom:1};
       return `<span class="image-art-portrait ${escape(className)}" role="img" aria-label="${escape(name)}">` +
-        `<img src="${url}" alt="" draggable="false" style="object-position:${Number(frame.x)*100}% ${Number(frame.y)*100}%;transform:scale(${Number(frame.zoom)})"></span>`;
+        `<img src="${url}" alt="" draggable="false" style="${frameStyle(frame)}"></span>`;
     }
 
     function underlay(map) {
@@ -112,7 +117,7 @@
       const controls = item.purpose === 'portrait' ? `<fieldset data-art-frame="${escape(item.target_id)}" data-art-sha="${item.sha256}"><legend>Portrait framing</legend>` +
         [['x','Horizontal position',0,1,.01],['y','Vertical position',0,1,.01],['zoom','Zoom',1,4,.05]].map(([name,label,min,max,step]) =>
           `<label>${label}<input type="range" name="${name}" min="${min}" max="${max}" step="${step}" value="${frame[name]}"></label>`).join('') +
-        '<button type="button" class="btn btn-secondary" data-art-save-frame>Save framing</button></fieldset>' : '';
+        '<p>Zoom in, then position the face. Save framing applies this crop everywhere.</p><button type="button" class="btn btn-secondary" data-art-save-frame>Save framing</button></fieldset>' : '';
       return `<article class="image-art-card"><h3>${escape(item.target_id)} · ${escape(labels[item.purpose])}</h3>` +
         (url ? `<div class="image-art-selected-preview">${item.purpose === 'portrait' ? portrait(item.target_id,item.target_id) : `<img class="image-art-preview" src="${url}" alt="${escape(labels[item.purpose])}">`}</div>` : '<p>Image unavailable.</p>') + controls +
         `<button type="button" class="btn btn-secondary" data-art-edit="${item.sha256}" data-art-target="${escape(item.target_id)}" data-art-purpose="${item.purpose}">Edit image</button></article>`;
@@ -151,10 +156,20 @@
       updateForm();
       for (const saved of frames) {
         const fieldset = [...dialog.querySelectorAll('[data-art-frame]')].find(item=>item.dataset.artFrame===saved.target&&item.dataset.artSha===saved.sha);
-        if (fieldset) for (const input of fieldset.querySelectorAll('input')) input.value=saved.values[input.name];
+        if (fieldset) {
+          for (const input of fieldset.querySelectorAll('input')) input.value=saved.values[input.name];
+          updateFramePreview(fieldset);
+        }
       }
       const focus = focusName && nextForm?.elements.namedItem(focusName);
       if (focus) { focus.focus({preventScroll:true}); if (caret) focus.setSelectionRange(...caret); }
+    }
+
+    function updateFramePreview(fieldset) {
+      const preview=fieldset?.closest('.image-art-card')?.querySelector('.image-art-portrait img');
+      if (!preview) return;
+      const frame=Object.fromEntries([...fieldset.querySelectorAll('input')].map(input=>[input.name,Number(input.value)]));
+      preview.style.cssText=frameStyle(frame);
     }
 
     function updateForm() {
@@ -211,6 +226,10 @@
             const settings=await call({action:'save_settings',mode:event.target.value});
             if (!view) view={settings,selections:[],requests:[],targets:[]}; else view.settings=settings;
           });
+        });
+        dialog.addEventListener('input', event => {
+          const fieldset=event.target.closest('[data-art-frame]');
+          if (fieldset) updateFramePreview(fieldset);
         });
         dialog.addEventListener('submit', event => {
           if (!event.target.matches('[data-art-form]')) return;

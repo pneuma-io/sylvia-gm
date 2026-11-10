@@ -107,3 +107,21 @@ def test_result_path_cannot_escape_the_isolated_workspace(tmp_path):
     foreign.write_bytes(png().data)
     with pytest.raises(ImageHookError, match="invalid_response"):
         SubscriptionImageAdapter._image({"savedPath": str(foreign)}, connection)
+
+
+@pytest.mark.parametrize("account", [None, {}, {"type": "apiKey"}])
+def test_signed_out_or_api_account_is_rejected_before_any_image_turn(tmp_path, account):
+    connection = Connection(tmp_path, image_generation=True)
+
+    def signed_out(method, params):
+        connection.calls.append((method, params))
+        return {"account": account}
+
+    connection.call = signed_out
+    adapter = SubscriptionImageAdapter(
+        tmp_path, "fixture-model", connection_factory=lambda *args, **kwargs: connection
+    )
+    with pytest.raises(ImageHookError, match="credentials_refused"):
+        adapter.submit(ImageRequest(uid(1), uid(2), "gpt.subscription", "create", 1, 1, "Draw"))
+    assert connection.closed
+    assert [method for method, _ in connection.calls] == ["account/read"]
