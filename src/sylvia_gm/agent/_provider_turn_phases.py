@@ -16,13 +16,17 @@ from sylvia_gm.domain.authority import CanonicalEventType
 from sylvia_gm.domain.errors import CommandRejected
 from sylvia_gm.domain.authority import JsonValue
 from collections.abc import Mapping
+from sylvia_gm.domain.errors import MechanicsRejected
 from sylvia_gm.domain.authority import ModelDecisionOwner
 from sylvia_gm.domain.authority import ModelToolBehavior
 from sylvia_gm.agent._session_loop import ProviderActionFeedback
+from sylvia_gm.domain.authority import SafePayload
 from collections.abc import Sequence
 from sylvia_gm.domain.session import SessionMessageKind
 from sylvia_gm.domain.authority import WriterRole
 from sylvia_gm.agent._stateless_mcp import action_sequence_model_tools
+from sylvia_gm.agent._native_continuation import attach_chat_metadata
+from sylvia_gm.agent._stateless_mcp import call_action_sequence_tool
 from typing import cast
 import json
 from sylvia_gm.provider._tool_delta import parse_tool_call_delta
@@ -35,26 +39,35 @@ from ._provider_session import (
     _ToolCallAssembly,
     _UNSPECIFIED_PREPARATION_INTENT,
     _action_sequence_narration_facts,
+    _campaign_file_arguments_establish_changes,
     _campaign_file_disposition_message,
+    _campaign_file_empty_collection_paths,
     _campaign_file_updated_narration_message,
     _campaign_preparation_message,
     _canonical_player_narration,
     _contains_serialized_tool_call,
     _current_combat_state,
     _current_referenced_entities,
+    _derive_mechanics_parameters,
     _engine_turn_control_message,
     _forced_single_tool_call_from_json,
     _gm_decision_control_message,
     _mechanics_narration_facts,
+    _missing_required_arguments,
     _native_content_for_text_operation,
+    _normalize_state_references,
     _persisted_campaign_file_mutation_attempted,
+    _persisted_selected_party_roles,
     _plain_json,
     _player_boundary_narration_message,
     _player_turn_text,
     _preparation_keeps_intent_pending,
+    _project_response_blocks,
     _public_action_result,
     _require_checked_campaign_file_narration,
+    _resolve_provider_tool_alias,
     _saved_action_sequence_results,
+    _unsupported_response_speaker_ids,
     _validated_raw_response_blocks,
 )
 
@@ -230,6 +243,461 @@ def run_required_actor_decision(
     )
     state.messages.append(self._participant_result_message(public_result))
     state.any_commit_in_exchange = True
+
+
+def reject_unavailable_tool(
+    self: ProviderSessionAdapter, state: ProviderTurnState,
+    provider_input: SessionProviderInput, *, turn_id: str,
+) -> None:
+    state.local_tool_results[state.assembly.call_id] = {
+        "status": "rejected",
+        "code": "unavailable_catalog_tool",
+        "state_changed": False,
+        "requested_provider_tool_name": state.assembly.name,
+        "available_operations": [
+            {
+                "provider_tool_name": alias,
+                "operation": tool.name,
+            }
+            for alias, tool in state.aliases.items()
+        ],
+        "instruction": (
+            "This provider tool is absent from the current request and cannot "
+            "be called. Do not call it again in this correction. Choose one "
+            "exact provider_tool_name from available_operations only when its "
+            "operation fits the current Ruleset state. If an engine transition "
+            "is marked required, call that transition first."
+        ),
+    }
+    state.local_tool_failures.add(state.assembly.call_id)
+
+
+def reject_invalid_tool_json(
+    self: ProviderSessionAdapter, state: ProviderTurnState,
+    provider_input: SessionProviderInput, *, turn_id: str, error: Any,
+) -> None:
+    state.local_tool_results[state.assembly.call_id] = {
+        "status": "rejected",
+        "code": "provider_tool_arguments_invalid_json",
+        "state_changed": False,
+        "provider_response_finish_reason": (
+            state.round_finish_reason or "stream_ended_without_finish_reason"
+        ),
+        "received_argument_characters": len(state.assembly.arguments),
+        "json_error": {
+            "message": error.msg,
+            "line": error.lineno,
+            "column": error.colno,
+            "position": error.pos,
+        },
+        "instruction": (
+            "The streamed tool arguments were not a complete JSON object. Call "
+            "the same tool again with the full valid JSON object from its first "
+            "character; do not continue the partial text."
+        ),
+    }
+    state.local_tool_failures.add(state.assembly.call_id)
+
+
+def record_missing_tool_fields(
+    self: ProviderSessionAdapter, state: ProviderTurnState,
+    provider_input: SessionProviderInput, *, turn_id: str,
+) -> None:
+    if state.catalog_tool.category == "narrative_state":
+        diagnostic_recorder = getattr(
+            self._owner,
+            "record_mechanics_diagnostic",
+            None,
+        )
+        if callable(diagnostic_recorder):
+            diagnostic_recorder(
+                session_id=provider_input.session.session_id,
+                turn_id=turn_id,
+                action_id=state.assembly.call_id,
+                tool_name=state.catalog_tool.name,
+                rejection_code="missing_required_arguments",
+                validation_field_paths=state.missing,
+                state_changed=False,
+            )
+    state.local_tool_results[state.assembly.call_id] = {
+        "status": "rejected",
+        "code": "missing_required_arguments",
+        "missing": list(state.missing),
+        "instruction": "Retry this tool with every required argument.",
+    }
+    state.local_tool_failures.add(state.assembly.call_id)
+
+
+def execute_action_sequence_call(
+    self: ProviderSessionAdapter, state: ProviderTurnState,
+    provider_input: SessionProviderInput, *, turn_id: str,
+) -> None:
+    state.state_changing_call_submitted = (
+        state.state_changing_call_submitted or state.catalog_tool.category != "reference"
+    )
+    try:
+        result = call_action_sequence_tool(
+            self._owner, campaign_id=state.campaign_id,
+            session_id=provider_input.session.session_id,
+            name=state.catalog_tool.name, parameters=state.parameters,
+        )
+        state.local_tool_results[state.assembly.call_id] = result
+        if state.catalog_tool.name == "execute_action_sequence":
+            saved = result.get("result")
+            if not isinstance(saved, Mapping):
+                raise CommandRejected("Action sequence result is unavailable")
+            state.facts = _action_sequence_narration_facts(
+                self._owner, state.campaign_id, saved
+            )
+            if state.facts is not None:
+                state.sequence_narration_facts.append(state.facts)
+            if saved.get("status") in {"paused", "failed", "stale"}:
+                state.sequence_execution_stopped = True
+                state.current_application_controls.append({"role": "system", "content": (
+                    "SYLVIA_ACTION_SEQUENCE_STOP "
+                    "(trusted application instruction): "
+                    "The executable sequence stopped at an authoritative boundary. "
+                    "Preserve its saved committed action IDs "
+                    "and pending intentions. "
+                    "Do not execute, replace, or resume the remaining "
+                    "intentions in this "
+                    "exchange. Resolve only a currently required decision/Ruleset "
+                    "consequence; describe committed outcomes together through the "
+                    "ordinary final Campaign File disposition. Wait for "
+                    "fresh player "
+                    "direction before a further sequence execution."
+                )})
+    except (CommandRejected, MechanicsRejected) as error:
+        if state.catalog_tool.name == "execute_action_sequence":
+            # The service may have persisted a prefix before its reply failed.
+            # Recover receipts by reading; never retry execution implicitly.
+            state.sequence_execution_stopped = True
+            saved = self._owner.action_sequence(
+                session_id=provider_input.session.session_id,
+                sequence_id=state.parameters.get("sequence_id"),
+            )
+            state.local_tool_results[state.assembly.call_id] = {
+                "kind": "action_sequence_result", "operation": state.catalog_tool.name,
+                "result": _plain_json(saved), "execution_stopped": True,
+                "delivery_error": {"code": error.code},
+            }
+            if isinstance(saved, Mapping):
+                state.facts = _action_sequence_narration_facts(
+                    self._owner, state.campaign_id, saved
+                )
+                if state.facts is not None:
+                    state.sequence_narration_facts.append(state.facts)
+            state.current_application_controls.append({"role": "system", "content": (
+                "SYLVIA_ACTION_SEQUENCE_STOP "
+                "(trusted application instruction): "
+                "Execution did not return a confirmed reply. The saved queue and "
+                "committed receipts were recovered by reading. Do not submit "
+                "execution again in this exchange, infer an uncommitted outcome, "
+                "or spend costs again. Describe only the saved outcomes, preserve "
+                "remaining intentions, and wait for fresh player direction."
+            )})
+        else:
+            state.local_tool_results[state.assembly.call_id] = {
+                "status": "rejected", "code": error.code, "state_changed": False,
+            }
+            state.local_tool_failures.add(state.assembly.call_id)
+
+
+def reject_invalid_revision(
+    self: ProviderSessionAdapter, state: ProviderTurnState,
+    provider_input: SessionProviderInput, *, turn_id: str,
+) -> None:
+    state.local_tool_results[state.assembly.call_id] = {
+        "status": "rejected",
+        "code": "campaign_file_revised_narration_invalid",
+        "field_paths": [
+            _CAMPAIGN_FILE_REVISED_NARRATION_ARGUMENT,
+        ],
+        "state_changed": False,
+        "instruction": (
+            "revised_player_facing_response must be one complete non-empty "
+            "ordered response-block list with no serialized tool call. "
+            "npc_utterance blocks require speaker_id and spoken_words; "
+            "speaker_id must be anonymous, an exact current participant or "
+            "Campaign Entity ID, or an entity_id admitted by this same update; "
+            "narration and ooc "
+            "blocks use text. Put actions and attribution in separate "
+            "narration blocks; start a new utterance when that NPC resumes "
+            "speaking. OOC input requires an ooc acknowledgement "
+            "block. Correct the complete Campaign File disposition and retry."
+        ),
+    }
+    state.local_tool_failures.add(state.assembly.call_id)
+
+
+def record_campaign_file_rejection(
+    self: ProviderSessionAdapter, state: ProviderTurnState,
+    provider_input: SessionProviderInput, *, turn_id: str, error: Any,
+) -> None:
+    rejection: dict[str, object] = {
+        "status": "rejected",
+        "code": error.code,
+    }
+    if isinstance(error, MechanicsRejected):
+        rejection.update(
+            {
+                "field_paths": list(error.field_paths),
+                "validation": {
+                    "field_paths": list(error.field_paths),
+                    "issues": [
+                        issue.as_payload() for issue in error.validation_issues
+                    ],
+                },
+                "state_changed": error.state_changed,
+            }
+        )
+    if error.code in {
+        "campaign_file_update_invalid",
+        "campaign_file_disposition_inconsistent",
+    }:
+        rejection["instruction"] = (
+            "Rebuild the rejected state arguments against the currently "
+            "exposed tool schema. validation.issues identifies each path, "
+            "problem kind, "
+            "expected type, direct parent, and allowed values or size bound "
+            "when the schema declares one. It never echoes submitted values. "
+            "Correct every listed issue rather than patching one symptom. "
+            "The state_change declaration and supplied non-empty state "
+            "collections must agree."
+            + (
+                " Sylvia already holds the exact player-facing response from "
+                "this rejected call. If its layout needs correction, supply a "
+                "complete replacement in revised_player_facing_response, "
+                "preserving the decided outcome and separating narration from "
+                "spoken words. Otherwise omit that field to keep the held "
+                "response."
+                if (
+                    state.buffered_narration is not None
+                    or state.buffered_raw_response_blocks is not None
+                )
+                else ""
+            )
+        )
+    state.local_tool_results[state.assembly.call_id] = rejection
+    state.local_tool_failures.add(state.assembly.call_id)
+
+
+def restore_unchanged_narration(
+    self: ProviderSessionAdapter, state: ProviderTurnState,
+    provider_input: SessionProviderInput, *, turn_id: str,
+) -> None:
+    state.campaign_file_mutation_attempted = state.mutation_attempted_before_call
+    state.local_tool_results[state.assembly.call_id] = {
+        "status": "rejected",
+        "code": "campaign_file_duplicate_collections",
+        "state_changed": False,
+        "instruction": (
+            "Campaign File authority found every supplied collection to "
+            "be already current, so those collections must be omitted. "
+            "Review the complete held response before retrying. If it "
+            "introduces any new lasting clue, direction, discovery, "
+            "relationship, commitment, or scene change, submit those "
+            "actual changes. Otherwise remove unsupported new material "
+            "from the response and send only the complete concise "
+            "response with no state collections. Do not resubmit an "
+            "unchanged scene merely because the prose mentions it."
+        ),
+    }
+    state.local_tool_failures.add(state.assembly.call_id)
+
+
+def record_unchanged_campaign_file(
+    self: ProviderSessionAdapter, state: ProviderTurnState,
+    provider_input: SessionProviderInput, *, turn_id: str,
+) -> None:
+    state.local_tool_results[state.assembly.call_id] = {
+        "status": "campaign_file_unchanged",
+        "result": dict(state.update),
+        "player_facing_response": state.settled_narration,
+        **(
+            {"response_blocks": list(state.buffered_response_blocks)}
+            if state.buffered_response_blocks is not None
+            else {}
+        ),
+        "instruction": (
+            "Campaign File review is settled without a database write. Sylvia "
+            "will now deliver the settled player-facing response."
+            if state.settled_narration is not None
+            else "Campaign File review is settled without a database write. "
+            "Now return only the complete in-world GM response for the "
+            "reviewed outcome."
+        ),
+    }
+    state.campaign_file_disposition_in_exchange = True
+    if state.settled_narration is not None:
+        state.buffered_narration = state.settled_narration
+        state.buffered_narration_needs_disposition = False
+        state.campaign_file_narration_pending = False
+    else:
+        state.campaign_file_narration_pending = True
+    state.force_campaign_file_update = False
+
+
+def prepare_campaign_file_revision(
+    self: ProviderSessionAdapter, state: ProviderTurnState,
+    provider_input: SessionProviderInput, *, turn_id: str,
+) -> None:
+    state.revised_narration_supplied = (
+        _CAMPAIGN_FILE_REVISED_NARRATION_ARGUMENT in state.parameters
+    )
+    state.revised_narration = state.parameters.pop(
+        _CAMPAIGN_FILE_REVISED_NARRATION_ARGUMENT,
+        None,
+    )
+    state.revised_raw_blocks = None
+    if isinstance(state.revised_narration, list):
+        try:
+            state.revised_raw_blocks = _validated_raw_response_blocks(state.revised_narration)
+            state.revised_narration = ""
+        except ValueError:
+            state.revised_raw_blocks = None
+            state.revised_narration = None
+    state.selected_raw_blocks = (
+        state.revised_raw_blocks
+        if state.revised_narration_supplied
+        else state.buffered_raw_response_blocks
+    )
+    pending_reader = getattr(self._owner, "campaign_preparation_boundary", None)
+    state.pending_boundary = (
+        pending_reader(state.campaign_id) if callable(pending_reader) else None
+    )
+
+
+def validate_revision_speakers(
+    self: ProviderSessionAdapter, state: ProviderTurnState,
+    provider_input: SessionProviderInput, *, turn_id: str,
+) -> None:
+    state.ooc_ack_missing = state.ooc_ack_required and not (
+        state.selected_raw_blocks is not None
+        and any(block.get("kind") == "ooc" for block in state.selected_raw_blocks)
+    )
+    if state.ooc_ack_missing:
+        state.revised_narration = None
+    state.unsupported_speakers = (
+        state.selected_raw_blocks is not None
+        and bool(_unsupported_response_speaker_ids(
+            state.selected_raw_blocks,
+            self._owner.snapshot(state.campaign_id),
+            state.parameters,
+        ))
+    )
+
+
+def settle_campaign_file_narration(
+    self: ProviderSessionAdapter, state: ProviderTurnState,
+    provider_input: SessionProviderInput, *, turn_id: str,
+) -> None:
+    state.settled_narration = state.buffered_narration
+    if state.revised_raw_blocks is None and isinstance(state.revised_narration, str):
+        state.settled_narration = state.revised_narration
+    if isinstance(state.settled_narration, str):
+        # Keep the prose decision while a malformed state payload is corrected.
+        # Omission in a later tool call means these exact bytes remain selected.
+        state.buffered_narration = state.settled_narration
+        if state.revised_narration_supplied:
+            state.buffered_response_blocks = None
+            state.buffered_raw_response_blocks = state.revised_raw_blocks
+        state.buffered_narration_needs_disposition = True
+    elif state.revised_raw_blocks is not None:
+        state.buffered_raw_response_blocks = state.revised_raw_blocks
+        state.buffered_response_blocks = None
+        state.buffered_narration_needs_disposition = True
+    state.parameters_establish_changes = _campaign_file_arguments_establish_changes(
+        state.parameters
+    )
+    state.empty_collection_paths = _campaign_file_empty_collection_paths(state.parameters)
+
+
+def record_updated_campaign_file(
+    self: ProviderSessionAdapter, state: ProviderTurnState,
+    provider_input: SessionProviderInput, *, turn_id: str,
+) -> None:
+    state.local_tool_results[state.assembly.call_id] = {
+        "status": "campaign_file_updated",
+        "result": dict(state.update),
+        "player_facing_response": state.settled_narration,
+        **(
+            {"response_blocks": list(state.buffered_response_blocks)}
+            if state.buffered_response_blocks is not None
+            else {}
+        ),
+        "instruction": (
+            "Campaign File review is settled at this admitted revision. Sylvia "
+            "will now deliver the settled player-facing response."
+            if state.settled_narration is not None
+            else "Campaign File update is settled at this admitted revision. Now "
+            "return only the complete in-world GM response for the admitted "
+            "outcome."
+        ),
+    }
+    state.any_commit_in_exchange = True
+    state.campaign_file_commit_in_exchange = True
+    state.campaign_file_disposition_in_exchange = True
+    if state.settled_narration is not None:
+        state.buffered_narration = state.settled_narration
+        state.buffered_narration_needs_disposition = False
+        state.campaign_file_narration_pending = False
+    else:
+        state.campaign_file_narration_pending = True
+    state.force_campaign_file_update = False
+
+
+def submit_mechanics_call(
+    self: ProviderSessionAdapter, state: ProviderTurnState,
+    provider_input: SessionProviderInput, *, turn_id: str,
+) -> Iterable[ProviderEvent]:
+    state.action_id = f"action-{uuid.uuid4().hex}"
+    command = ActionCommand(
+        campaign_id=state.campaign_id,
+        action_id=state.action_id,
+        idempotency_key=f"provider-{uuid.uuid4().hex}",
+        owner_id=self._owner_id,
+        writer=provider_input.session.role,
+        expected_revision=state.snapshot.revision,
+        turn_id=turn_id,
+        package_id=state.catalog_tool.package_id,
+        tool_name=state.catalog_tool.name,
+        parameters=cast(Mapping[str, JsonValue], state.parameters),
+        initiating_session_id=provider_input.session.session_id,
+    )
+    state.mechanics_action_ids[state.assembly.call_id] = state.action_id
+    state.mechanics_parameters[state.assembly.call_id] = state.parameters
+    state.mechanics_pre_entities[state.assembly.call_id] = _current_referenced_entities(
+        state.parameters, state.snapshot.state
+    )
+    state.state_changing_call_submitted = True
+    state.feedback = ProviderActionFeedback()
+    yield ProviderEvent.tool_evidence(
+        message_id=f"{state.inference_id}-{state.assembly.call_id}-mechanics-contract",
+        payload={
+            "kind": "provider_mechanics_action_contract",
+            "turn_id": turn_id,
+            "inference_id": state.inference_id,
+            "basis_message_id": state.basis_message_id,
+            "action_id": state.action_id,
+            "operation": state.catalog_tool.name,
+            "model_behavior": state.catalog_tool.model_behavior.value,
+            **(
+                {
+                    _PREPARATION_INTENT_ARGUMENT:
+                        state.mechanics_preparation_scopes[state.assembly.call_id]
+                }
+                if state.assembly.call_id in state.mechanics_preparation_scopes else {}
+            ),
+            "decision_owner": (
+                state.decision_boundary.owner.value if state.decision_boundary is not None else None
+            ),
+        },
+    )
+    yield ProviderEvent.action(command, feedback=state.feedback)
+    if state.feedback.rejection is not None:
+        state.local_tool_results[state.assembly.call_id] = dict(state.feedback.rejection)
+        state.local_tool_failures.add(state.assembly.call_id)
 
 
 def prepare_round_catalog(
@@ -624,6 +1092,401 @@ def stream_provider_round(
         # tool assembly is substantive provider progress and receives its own bounded
         # correction path, so a later empty round starts a fresh empty sequence.
         state.empty_completion_corrections_used = 0
+
+
+def prepare_tool_batch(
+    self: ProviderSessionAdapter, state: ProviderTurnState,
+    provider_input: SessionProviderInput, *, turn_id: str,
+) -> Iterable[ProviderEvent]:
+    state.ordered = [state.assemblies[index] for index in sorted(state.assemblies)]
+    if state.ordered and state.assistant_text:
+        state.provisional_tool_prose_pending = True
+    for state.assembly in state.ordered:
+        if not state.assembly.call_id:
+            state.assembly.call_id = f"call-{uuid.uuid4().hex}"
+    for state.assembly in state.ordered:
+        state.resolved_tool = _resolve_provider_tool_alias(state.assembly.name, state.aliases)
+        if state.resolved_tool is not None:
+            state.assembly.name = state.resolved_tool[0]
+    state.round_has_non_narrative_call = any(
+        resolved is None or resolved[1].category != "narrative_state"
+        for assembly in state.ordered
+        for resolved in (_resolve_provider_tool_alias(assembly.name, state.aliases),)
+    )
+    state.raw_calls = [
+        {
+            "id": assembly.call_id,
+            "type": "function",
+            "function": {
+                "name": assembly.name or "unavailable_tool",
+                "arguments": assembly.arguments or "{}",
+            },
+        }
+        for assembly in state.ordered
+    ]
+    assistant_message: dict[str, object] = {
+        "role": "assistant",
+        "content": (
+            None if state.round_has_non_narrative_call else "".join(state.assistant_text) or None
+        ),
+        "tool_calls": state.raw_calls,
+    }
+    # Signed native blocks belong only to this in-memory provider exchange. The separate
+    # evidence message below stays player-safe and must never persist private thinking.
+    state.exchange_messages.append(attach_chat_metadata(
+        {**assistant_message,
+         **({"anthropic_content": state.native_assistant_content}
+            if state.native_assistant_content is not None else {}),
+         **({"reasoning_content": "".join(state.assistant_reasoning)}
+            if state.assistant_reasoning else {})},
+        state.native_chat_metadata,
+    ))
+    yield ProviderEvent.tool_evidence(
+        message_id=f"{state.inference_id}-assistant-tools",
+        payload={
+            "kind": "provider_tool_calls",
+            **state.context_fields,
+            "turn_id": turn_id,
+            "inference_id": state.inference_id,
+            "basis_message_id": state.basis_message_id,
+            "assistant": cast(SafePayload, _plain_json(assistant_message)),
+            "native_continuation": {
+                "provider_id": provider_input.session.provider_id,
+                "model_id": provider_input.session.model_id,
+                "anthropic_required": state.native_assistant_content is not None,
+                "chat_completion_required": state.native_chat_metadata is not None,
+                "reasoning_required": bool(state.assistant_reasoning),
+            },
+        },
+    )
+    state.state_changing_call_submitted = False
+
+
+def execute_tool_batch(
+    self: ProviderSessionAdapter, state: ProviderTurnState,
+    provider_input: SessionProviderInput, *, turn_id: str,
+) -> Iterable[ProviderEvent]:
+    for position, state.assembly in enumerate(state.ordered):
+        provider_input.control.progress.update("tool", state.assembly.name)
+        if state.assembly.name == "read_session_history":
+            try:
+                history_parameters = json.loads(state.assembly.arguments or "{}")
+                if not isinstance(history_parameters, dict):
+                    raise ValueError("History parameters must be an object")
+                working, _bridge = self._working_contexts[provider_input.session.session_id]
+                if not working.history_retrieval_enabled or not working.records:
+                    raise ValueError("Historical reads are unavailable in this transaction")
+                state.local_tool_results[state.assembly.call_id] = working.read_history(
+                    history_parameters,
+                )
+            except (ValueError, KeyError):
+                state.local_tool_results[state.assembly.call_id] = {"error": "Invalid history request"}
+                state.local_tool_failures.add(state.assembly.call_id)
+            continue
+        state.resolved_tool = _resolve_provider_tool_alias(state.assembly.name, state.aliases)
+        if state.resolved_tool is None:
+            reject_unavailable_tool(self, state, provider_input, turn_id=turn_id)
+            continue
+        state._, state.catalog_tool = state.resolved_tool
+        if (
+            position > 0
+            and state.state_changing_call_submitted
+            and state.catalog_tool.category != ("reference")
+        ):
+            state.local_tool_results[state.assembly.call_id] = {
+                "status": "superseded_by_catalog_refresh",
+                "state_changed": False,
+                "instruction": (
+                    "Only one state-changing operation may execute from one catalog "
+                    "snapshot. Continue as the same GM and choose the next operation from "
+                    "the freshly discovered tool surface."
+                ),
+            }
+            continue
+        try:
+            state.parameters = json.loads(state.assembly.arguments or "{}")
+        except json.JSONDecodeError as error:
+            reject_invalid_tool_json(self, state, provider_input, turn_id=turn_id, error=error)
+            continue
+        if not isinstance(state.parameters, dict):
+            state.local_tool_results[state.assembly.call_id] = {
+                "status": "rejected",
+                "code": "provider_tool_arguments_not_object",
+                "state_changed": False,
+                "instruction": "Call the tool again with a JSON object.",
+            }
+            state.local_tool_failures.add(state.assembly.call_id)
+            continue
+        scope = state.parameters.pop(
+            _PREPARATION_INTENT_ARGUMENT, _UNSPECIFIED_PREPARATION_INTENT,
+        )
+        if scope is not _UNSPECIFIED_PREPARATION_INTENT:
+            try:
+                if (
+                    state.catalog_tool.model_behavior
+                    is not ModelToolBehavior.LEAVES_PLAYER_INTENT_PENDING
+                ):
+                    raise CommandRejected(
+                        "This operation does not declare a preparation scope",
+                        code="provider_player_intent_scope_invalid",
+                    )
+                _preparation_keeps_intent_pending(scope, pending=state.player_intent_pending)
+            except CommandRejected as error:
+                state.local_tool_results[state.assembly.call_id] = {
+                    "status": "rejected", "code": error.code,
+                    "field_paths": [_PREPARATION_INTENT_ARGUMENT], "state_changed": False,
+                    "instruction": str(error),
+                }
+                state.local_tool_failures.add(state.assembly.call_id)
+                continue
+            state.mechanics_preparation_scopes[state.assembly.call_id] = scope
+        state.snapshot = self._owner.snapshot(state.campaign_id)
+        try:
+            state.parameters = _derive_mechanics_parameters(
+                state.parameters,
+                state.catalog_tool.parameter_derivations or {},
+                state.snapshot.participants,
+            )
+        except CommandRejected as error:
+            state.local_tool_results[state.assembly.call_id] = {
+                "status": "rejected",
+                "code": error.code,
+                "field_paths": [],
+                "state_changed": False,
+                "instruction": (
+                    "Correct the selected participant or operation fields and retry once."
+                ),
+            }
+            state.local_tool_failures.add(state.assembly.call_id)
+            continue
+        try:
+            state.parameters = _normalize_state_references(
+                state.parameters,
+                state.catalog_tool.input_schema,
+                state.snapshot.state,
+            )
+        except CommandRejected as error:
+            state.local_tool_results[state.assembly.call_id] = {
+                "status": "rejected",
+                "code": error.code,
+                "state_changed": False,
+                "instruction": (
+                    "Correct the state reference from current Campaign State and retry."
+                ),
+            }
+            state.local_tool_failures.add(state.assembly.call_id)
+            continue
+        state.mechanics_tool_names[state.assembly.call_id] = state.catalog_tool.name
+        state.mechanics_tool_behaviors[state.assembly.call_id] = state.catalog_tool.model_behavior
+        validation_schema = state.provider_tool_schemas.get(
+            state.assembly.name,
+            state.catalog_tool.input_schema,
+        )
+        state.missing = _missing_required_arguments(state.parameters, validation_schema)
+        if state.missing:
+            record_missing_tool_fields(self, state, provider_input, turn_id=turn_id)
+            continue
+        if (state.catalog_tool.package_id == "sylvia.application"
+                and state.catalog_tool.capability.startswith("action_sequence.")):
+            execute_action_sequence_call(self, state, provider_input, turn_id=turn_id)
+            continue
+        if state.catalog_tool.category == "reference":
+            if state.catalog_tool.capability == "context.search":
+                searcher = provider_input.knowledge_searcher
+                query = state.parameters.get("query")
+                raw_sources = state.parameters.get("sources")
+                limit = state.parameters.get("limit", 5)
+                offset = state.parameters.get("offset", 0)
+                sources = (
+                    tuple(str(item) for item in raw_sources)
+                    if isinstance(raw_sources, Sequence)
+                    and not isinstance(raw_sources, (str, bytes, bytearray))
+                    and all(isinstance(item, str) for item in raw_sources)
+                    else None
+                )
+                if (
+                    searcher is None
+                    or not isinstance(query, str)
+                    or not query.strip()
+                    or (raw_sources is not None and sources is None)
+                    or not isinstance(limit, int)
+                    or isinstance(limit, bool)
+                    or not isinstance(offset, int)
+                    or isinstance(offset, bool)
+                    or offset < 0
+                ):
+                    state.local_tool_results[state.assembly.call_id] = {
+                        "status": "rejected",
+                        "code": "campaign_knowledge_search_unavailable",
+                    }
+                    state.local_tool_failures.add(state.assembly.call_id)
+                    continue
+                try:
+                    matches = searcher(query, sources, limit, offset)
+                except CommandRejected as error:
+                    state.local_tool_results[state.assembly.call_id] = {
+                        "status": "rejected",
+                        "code": error.code,
+                    }
+                    state.local_tool_failures.add(state.assembly.call_id)
+                    continue
+                state.local_tool_results[state.assembly.call_id] = {
+                    "status": "knowledge_search",
+                    "result": dict(matches),
+                }
+                continue
+            reader = provider_input.reference_reader
+            source = state.parameters.get("source")
+            path = state.parameters.get("path")
+            if reader is None or not isinstance(source, str) or not isinstance(path, str):
+                state.local_tool_results[state.assembly.call_id] = {
+                    "status": "rejected",
+                    "code": "campaign_reference_unavailable",
+                }
+                state.local_tool_failures.add(state.assembly.call_id)
+                continue
+            try:
+                reference = reader(source, path)
+            except CommandRejected as error:
+                state.local_tool_results[state.assembly.call_id] = {
+                    "status": "rejected",
+                    "code": error.code,
+                }
+                state.local_tool_failures.add(state.assembly.call_id)
+                continue
+            state.local_tool_results[state.assembly.call_id] = {
+                "status": "reference_read",
+                "result": dict(reference),
+            }
+            continue
+        if state.catalog_tool.category == "narrative_state":
+            if len(state.ordered) != 1:
+                state.local_tool_results[state.assembly.call_id] = {
+                    "status": "rejected",
+                    "code": "campaign_file_update_must_be_only_tool",
+                    "state_changed": False,
+                    "instruction": (
+                        "A final Campaign File update must be the only tool call in its "
+                        "assistant message. Let any reference or Ruleset call finish "
+                        "first, then make one Campaign File update the final tool action. "
+                        "After it succeeds, narrate the admitted outcome."
+                    ),
+                }
+                state.local_tool_failures.add(state.assembly.call_id)
+                continue
+            state.state_changing_call_submitted = True
+            attached_narration = (
+                "".join(state.assistant_text) if not state.force_campaign_file_update else ""
+            )
+            if attached_narration.strip():
+                if _contains_serialized_tool_call(attached_narration):
+                    state.local_tool_results[state.assembly.call_id] = {
+                        "status": "rejected",
+                        "code": "provider_serialized_tool_call",
+                        "state_changed": False,
+                    }
+                    state.local_tool_failures.add(state.assembly.call_id)
+                    continue
+                state.buffered_narration = attached_narration
+                state.buffered_response_blocks = None
+                state.buffered_raw_response_blocks = None
+                state.buffered_narration_needs_disposition = True
+                state.campaign_file_disposition_in_exchange = False
+            prepare_campaign_file_revision(self, state, provider_input, turn_id=turn_id)
+            if (
+                state.pending_boundary is not None
+                and state.pending_boundary.preparation is not None
+                and (
+                    state.selected_raw_blocks is None
+                    or any(block.get("kind") != "ooc" for block in state.selected_raw_blocks)
+                    or _campaign_file_arguments_establish_changes(state.parameters)
+                )
+            ):
+                state.local_tool_results[state.assembly.call_id] = {
+                    "status": "rejected", "code": "campaign_preparation_pending",
+                    "state_changed": False,
+                    "instruction": (
+                        "Resolve queued starting choices first. Until then, return "
+                        "only OOC questions with an unchanged Campaign File; no "
+                        "story, rewards or act progress."
+                    ),
+                }
+                state.local_tool_failures.add(state.assembly.call_id)
+                continue
+            validate_revision_speakers(self, state, provider_input, turn_id=turn_id)
+            if state.ooc_ack_missing or state.unsupported_speakers or (
+                state.revised_narration_supplied and state.revised_raw_blocks is None
+            ):
+                reject_invalid_revision(self, state, provider_input, turn_id=turn_id)
+                continue
+            settle_campaign_file_narration(self, state, provider_input, turn_id=turn_id)
+            if state.empty_collection_paths:
+                state.local_tool_results[state.assembly.call_id] = {
+                    "status": "rejected",
+                    "code": "campaign_file_empty_collections",
+                    "field_paths": list(state.empty_collection_paths),
+                    "state_changed": False,
+                    "instruction": (
+                        "Omit collections that have no items. If the decided outcome "
+                        "changes no durable Campaign File truth, send only the required "
+                        "complete narration; otherwise resubmit every lasting change as "
+                        "a non-empty collection."
+                    ),
+                }
+                state.local_tool_failures.add(state.assembly.call_id)
+                continue
+            if not state.parameters_establish_changes and state.campaign_file_mutation_attempted:
+                state.local_tool_results[state.assembly.call_id] = {
+                    "status": "rejected",
+                    "code": "campaign_file_unchanged_after_rejected_update",
+                    "state_changed": False,
+                    "instruction": (
+                        "The decided outcome already led you to attempt durable Campaign "
+                        "File changes. An empty review cannot retract those facts. "
+                        "Correct the rejected non-empty update; otherwise Sylvia must "
+                        "fail the turn without releasing narration."
+                    ),
+                }
+                state.local_tool_failures.add(state.assembly.call_id)
+                continue
+            state.mutation_attempted_before_call = state.campaign_file_mutation_attempted
+            if state.parameters_establish_changes:
+                state.campaign_file_mutation_attempted = True
+            writer = provider_input.narrative_writer
+            if writer is None:
+                state.local_tool_results[state.assembly.call_id] = {
+                    "status": "rejected",
+                    "code": "campaign_narrative_state_unavailable",
+                }
+                state.local_tool_failures.add(state.assembly.call_id)
+                continue
+            try:
+                state.update = writer(state.parameters)
+            except CommandRejected as error:
+                record_campaign_file_rejection(self, state, provider_input, turn_id=turn_id, error=error)
+                continue
+            if state.buffered_raw_response_blocks is not None:
+                response_snapshot = self._owner.snapshot(state.campaign_id)
+                state.settled_narration, state.buffered_response_blocks = _project_response_blocks(
+                    state.buffered_raw_response_blocks,
+                    response_snapshot,
+                    party_roles=_persisted_selected_party_roles(
+                        self._owner,
+                        state.campaign_id,
+                        response_snapshot.participants,
+                    ),
+                )
+                state.buffered_narration = state.settled_narration
+            update_status = str(state.update.get("status", "campaign_file_updated"))
+            if update_status == "campaign_file_unchanged":
+                if state.parameters_establish_changes:
+                    restore_unchanged_narration(self, state, provider_input, turn_id=turn_id)
+                    continue
+                record_unchanged_campaign_file(self, state, provider_input, turn_id=turn_id)
+                continue
+            record_updated_campaign_file(self, state, provider_input, turn_id=turn_id)
+            continue
+        yield from submit_mechanics_call(self, state, provider_input, turn_id=turn_id)
 
 
 def prepare_turn_recovery(
