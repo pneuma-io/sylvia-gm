@@ -16,7 +16,7 @@ the branches meet. Their desktop/native, merge and release qualifications contin
 
 **9 November 2026: optional onboarding and the complete tutorial suite.** The owner selected a new
 PR for all independently accessible lessons and a guided welcome, AI connection, Ready campaign
-and first-scene journey. Project Desk work item **Build the tutorial suite and current new-player
+and first-scene journey. Dot Desk work item **Build the tutorial suite and current new-player
 onboarding** records the approved scope. Implementation uses an isolated checkout and preserves
 the separate Alpha build owner. The attract-mode showcase and no-AI battles remain future work.
 Source/browser checks qualify this PR's UI behavior; genuine-provider, native installed-app,
@@ -33,8 +33,8 @@ history and old release source archives; this work does not rewrite history.
 
 | Work | Current boundary |
 |---|---|
-| Frontend overhaul, PR #28 | Separate active owner; merge before PR #6. Existing source/browser evidence does not by itself establish final installed acceptance. |
-| Trigger Discipline integration, PR #6 | Separate active owner. Public compiler source may remain; vault notes and Siren Protocol stay private. Privacy removal is complete at PR head `7788bf8`. Public packages exclude canonical vault text; full public-session adequacy without the private prose/future Rulebook remains unproven. Desktop testing remains held until the owner releases that hold. |
+| Frontend overhaul, PR #28 | Merged on main `6526904` before PR #6. PR #6 owns its composed TD qualification; source/browser evidence does not by itself establish final installed acceptance. |
+| Trigger Discipline integration, PR #6 | Separate active owner; draft head `bc86db1` includes main `6526904`. Public compiler source may remain; vault notes and Siren Protocol stay private. Privacy removal is complete. Public packages exclude canonical vault text; full public-session adequacy without the private prose/future Rulebook remains unproven. Desktop testing remains held until the owner releases that hold. |
 | Refactor, [PR #33](https://github.com/pneuma-io/sylvia-gm/pull/33) | Stages 1–8 are selected. The `app.js` split waits for both PR #28 and PR #6 to merge and may ship as a second PR. Preserve their work and document collisions. |
 | SRD Full, PR #3 | Parked, inactive work; it does not expand the 117-spell Lite launch roster. |
 | SylviaBench | Outside this refactor. |
@@ -44,7 +44,7 @@ have implementation in the repository. Their existence does not approve a new re
 deployment. Ongoing Trigger Discipline work is no longer a blanket post-Alpha deferral.
 
 For the removed historical checkpoints, use
-`git show 612ac0a9dcae5c0d788ab4c493fb696d68ce6df8:docs/plans/alpha-rebuild-readiness-plan.md`.
+`git show 39aac5168d7e95f55a444efae98df0db82474616:docs/plans/alpha-rebuild-readiness-plan.md`.
 
 ## 2. Milestone record
 

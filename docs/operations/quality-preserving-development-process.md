@@ -59,6 +59,10 @@ preserve repository evidence.
 
 The supported-journey gate runs locally; the GitHub workflow is manual-only. A PR is ready for review when its description records the locally checked head commit, commands, results, elapsed time and checks not run.
 
+Recorded defects in `scripts/known_test_defects.py` still execute as strict expected failures.
+The gate lists them separately from passes; they do not prove that the affected feature works.
+An unexpected pass, an unregistered skip or a missing required case fails the gate.
+
 Wan's replacement for the cancelled AR-01 marathon is a comprehensive automated framework plus
 short targeted real-model and installed acceptance checks. Preserve continuity, progression,
 recovery and supported-journey evidence under product contract section 7.1. The aggregate

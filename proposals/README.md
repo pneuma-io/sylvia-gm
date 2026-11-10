@@ -16,7 +16,7 @@ not select work, extend the Alpha contract or authorize release. Dot Desk holds 
 | [Multiplayer](multiplayer-sessions.md) | Planned | `draft/plan-multiplayer-sessions` |
 | [Local diagnostics](compact-local-diagnostics.md) | Implemented | `draft/plan-compact-local-diagnostics`; deliberate local export and content-free automatic records retain their privacy limits. |
 | [Gameplay log contributions](opt-in-gameplay-log-contributions.md) | Planned | `draft/plan-gameplay-log-contributions` |
-| [Desktop update checker](manual-desktop-update-checker.md) | Implemented | `pl-16-desktop-updates`; explicit checking remains distinct from applying an update. |
+| [Desktop update checker](manual-desktop-update-checker.md) | Closed | `pl-16-desktop-updates`; superseded by the implemented in-app update scope below. |
 | [In-app update](in-app-self-update.md) | Implemented | `pl-16-desktop-updates`; source implementation does not close installed/native or signing qualification. |
 | [Campaign Ruleset updates](campaign-rules-update.md) | Implemented | `post-launch/pl-01-rules-update-plan:CAMPAIGN-RULES-UPDATE-DRAFT.md`; compatible update admission and persistence remain required. |
 
