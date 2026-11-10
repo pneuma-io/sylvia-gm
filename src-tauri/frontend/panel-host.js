@@ -600,7 +600,8 @@
         `role="tab" aria-controls="panel-${escape(surface.id)}" tabindex="${surface.id === selected.id ? '0' : '-1'}" ` +
         `draggable="true" data-workspace-panel="${escape(surface.id)}" data-workspace-tab="${escape(tree.id)}" ` +
         `title="Drag ${escape(surface.title || surface.id)} to move it" ` +
-        `aria-selected="${surface.id === selected.id}">${escape(surface.title || surface.id)}</button>`).join('');
+        `aria-selected="${surface.id === selected.id}">${surface.icon ? `<span class="panel-glyph" aria-hidden="true">${escape(surface.icon)}</span>` : ''}` +
+        `${escape(surface.title || surface.id)}</button>`).join('');
       return `<section class="panel-tab-group" data-renderer="${escape(selected.renderer)}" data-panel-drop="${escape(selected.id)}">` +
         `<div class="ruleset-panel-tabs" role="tablist" aria-label="Panel tabs">${tabs}<button type="button" class="panel-menu-button" ` +
         `data-panel-menu="${escape(selected.id)}" title="Arrange ${escape(selected.title || selected.id)}" ` +
@@ -628,7 +629,7 @@
         const title = surface.title || surface.id;
         return `<button type="button" class="panel-chip" data-panel-chip="${escape(surface.id)}" ` +
           `data-panel-placement="${placement}" aria-label="${escape(title)} · ${labels[placement]}" ` +
-          `title="${escape(title)} · ${labels[placement]}">${escape(title)}</button>`;
+          `title="${escape(title)} · ${labels[placement]}">${surface.icon ? `<span class="panel-glyph" aria-hidden="true">${escape(surface.icon)}</span>` : ''}${escape(title)}</button>`;
       }).join('') + '</div>';
     }
 
