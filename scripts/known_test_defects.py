@@ -427,6 +427,11 @@ KNOWN_DEFECTS: dict[str, KnownDefect] = {
         "Cast Darkvision or Speak with Animals through the actual admitted owner using the case's target boundary, paid cast, death, unprepare or earned-rest flow.",
         category='suspected retained contract discrepancy',
     ),
+    'tests/test_integrated_worker_seams.py::test_guardian_entry_damage_does_not_repeat_on_exit_or_reentry': KnownDefect(
+        "Ending a turn after creating Guardian of Faith rejects its saved actor as absent",
+        "Cast Guardian of Faith at an admitted position, start combat, then end the caster turn. The occupied-space resolver calls query_srd_creature_space_pair and rejects faith_guardian as missing before the entry-damage assertions.",
+        "suspected retained contract discrepancy",
+    ),
 }
 
 
