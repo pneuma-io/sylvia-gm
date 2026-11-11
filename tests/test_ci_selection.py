@@ -110,6 +110,18 @@ def test_unknown_or_cross_cutting_source_is_conservative(path):
     assert plan["broad_fallback"] and len(plan["python"]) >= 10
 
 
+@pytest.mark.parametrize(
+    "path", ["sylviabench/checks.py", "sylviabench/scenarios.json", "scripts/sylviabench.py"]
+)
+def test_benchmark_edits_select_their_own_fast_checks_without_product_replay(path):
+    plan = choose([path])
+    assert not plan["broad_fallback"] and not plan["native"] and not plan["ui"]
+    assert set(plan["python"]) == {"benchmark-framework"}
+    assert "tests/test_sylviabench_checks.py" in plan["python"]["benchmark-framework"]
+    # The real-owner acceptance module takes minutes and stays with explicit --full.
+    assert "tests/test_sylviabench_gameplay.py" not in plan["python"]["benchmark-framework"]
+
+
 def test_frontend_selects_javascript_and_browser_without_heavy_python():
     plan = choose(["src-tauri/frontend/app.js"])
     assert plan["ui"] and any(path.endswith(".browser.cjs") for path in plan["ui"])

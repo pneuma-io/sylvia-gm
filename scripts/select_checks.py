@@ -250,6 +250,12 @@ def select_checks(paths, *, source, base, diff_complete=True, full=False, root=N
                 groups["core-invariants"] = list(CORE)
                 add("provider-contracts", "gm-turn", "gm-request-contracts")
                 reason = "Provider privacy/wire contracts and GM/session recovery behavior"
+            elif path.startswith("sylviabench/") or path == "scripts/sylviabench.py":
+                add("benchmark-framework")
+                reason = (
+                    "Developer-only benchmark, outside the application; its real-owner "
+                    "acceptance module is slow and stays with explicit --full"
+                )
             elif path.startswith("src/sylvia_gm/ruleset/"):
                 groups["core-invariants"] = list(CORE)
                 add(
