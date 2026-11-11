@@ -2,6 +2,8 @@
 
 from copy import deepcopy
 
+from .srd_lite_recipient_contract import condition_inputs, recipient_contracts
+
 CAST_ROOTS = (
     "begin_srd_spell_action",
     "cast_srd_reaction_spell",
@@ -69,19 +71,9 @@ def bind_gm_feedback(runtime):
             parameter.update(default=True, description=somatic_guidance)
     implemented = sorted(set(definitions["srd_lite_implemented"]))
     aliases = definitions.get("srd_lite_aliases", {})
-    single = []
-    multiple = []
-    for spell, profile in definitions["spells"].items():
-        family = profile["family"]
-        names = ("cast_" + family, "cast_spell_" + family)
-        owner = next((tools[name] for name in names if name in tools), None)
-        required = {p["name"] for p in _parameters(runtime, owner or {}) if p.get("required", True)}
-        if "target" in required:
-            single.append(spell)
-        if "targets" in required:
-            multiple.append(spell)
-    definitions["srd_lite_single_target_spells"] = sorted(single)
-    definitions["srd_lite_multiple_target_spells"] = sorted(multiple)
+    definitions.pop("srd_lite_single_target_spells", None)
+    definitions.pop("srd_lite_multiple_target_spells", None)
+    definitions["srd_lite_recipient_contracts"] = recipient_contracts(runtime)
 
     for name in CAST_ROOTS:
         tool = tools[name]
@@ -132,25 +124,35 @@ def bind_gm_feedback(runtime):
                     "error": f"Input '{field}' is unavailable for this spell.",
                 }
             )
-        if "target" in by_name:
-            alternatives = ["target != null"]
-            if "targets" in by_name:
-                alternatives.append("(targets != null and len(targets) > 0)")
-            if "object_target_id" in by_name:
-                alternatives.append("object_target_id != ''")
-            missing(
-                "spell not in definitions.srd_lite_single_target_spells or "
-                + " or ".join(alternatives),
-                "target",
-                "Select the actual recipient. Self-touch is automatic; touching another "
-                "creature requires caster_can_touch_target=true.",
+        for identity, contract in definitions["srd_lite_recipient_contracts"].items():
+            field = contract["field"]
+            if field not in by_name or not condition_inputs(contract["when"]) <= by_name.keys():
+                continue
+            alternatives = []
+            for caller_input in contract["caller_inputs"]:
+                if caller_input not in by_name:
+                    continue
+                condition = caller_input + " != null"
+                if caller_input == "targets" and contract["nonempty"]:
+                    condition += " and len(targets) > 0"
+                if caller_input == "object_target_id":
+                    condition += " and object_target_id != ''"
+                alternatives.append("(" + condition + ")")
+            if not alternatives:
+                continue
+            mode_exempt = (
+                "combat.encounter_active != true"
+                if contract["in_combat"]
+                else "combat.encounter_active == true"
             )
-        if "targets" in by_name:
             missing(
-                "spell not in definitions.srd_lite_multiple_target_spells or "
-                "(targets != null and len(targets) > 0)",
-                "targets",
-                "Select the actual recipients for this spell.",
+                f"spell not in definitions.srd_lite_recipient_contracts.{identity}.spells or "
+                f"{mode_exempt} or not ({contract['when']}) or " + " or ".join(alternatives),
+                field,
+                "Select the actual recipients for this spell."
+                if field == "targets"
+                else "Select the actual recipient. Self-touch is automatic; touching another "
+                "creature requires caster_can_touch_target=true.",
             )
         # Idempotence permits the same binder during ordinary package regeneration.
         old = [

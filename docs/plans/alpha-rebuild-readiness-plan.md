@@ -68,13 +68,13 @@ watches, drones, wall editing and wall-induced queue review. Rig motion bytes ar
 Build17 independently proves saved resources and queue state; no fresh frame-motion
 comparison is claimed. Passing earlier mechanics are retained with their exact identities.
 
-The TD branch now incorporates PR #36's frozen corrected main-source input
-`11c279d2ef24fd821be7a163054fa7471a55bd65`, including explicit existing-campaign review/adoption
-and the approved somatic omission default. That input provides Lite 0.3.18. The hotfix owner's
-separate Alpha4-based binary `e543957` provides Lite 0.3.17; its installed upgrade and omitted-field
-healing passed, with portable reopen audit readback still pending at the handoff. Those native
-results do not qualify the TD composition. Build17 and its public TD package retain their exact
-`4b438d7` provenance; no replacement binary is claimed for the new source.
+The TD branch now incorporates PR #36's latest checked main-source input
+`ec8f8aa47195cda0497db53ccefeb67a57d78af8`, providing Lite 0.3.22. This succeeds `11c279d`
+and retains explicit existing-campaign review/adoption, the approved somatic omission default
+and recipient validation based on dispatch ownership. The separate Alpha4-based binary is
+`d71d641` / Lite 0.3.21; its owner reports completed native qualification and safe session closure.
+Those native results do not qualify the TD composition. Build17 and its public TD package retain
+their exact `4b438d7` provenance; no replacement TD binary is claimed for the new source.
 
 At preceding TD source `72522a8`, full Reload and AP2-stopped Reload each produced one scripted
 HTTP request and one saved closing narration through the real owner process, using admitted Plans
@@ -82,14 +82,14 @@ and Builder-to-DM handoffs. Narration left committed mechanics and receipts unch
 source/HTTP evidence; the app's automatic queue-to-GM handoff still needs final native qualification.
 The isolated fixture/helper are prepared without holding the guest.
 
-The strict repairs in TD's new grid-lane and exposure modules pass affected checks. The refactor
-owner's scratch composition of PR #33 `870af5d`, corrected hotfix `11c279d` and TD `72522a8` passed
-Ruff, mypy across 350 files and four representative scripted request checks. This is not a checked
-final handoff. The standalone full run at `5df45da` finished with 6,054 Python passes, 21 registered
-expected failures and 240 failures; all 6,315 required cases ran once, and frontend passed 760/760.
-Its owner is repairing fixture/test gaps and attributing remaining failures. Keep that ownership
-separate, consume the stable checked identity and qualify the actual final composition. Do not
-import unfinished refactor source, duplicate its gate or claim hosted CI success.
+The strict repairs in TD's new grid-lane and exposure modules pass affected checks. Earlier
+scratch composition typing/request evidence remains provisional. PR #33's latest standalone
+full run at `a808bbf` finished with 6,142 passes, 83 strict expected failures and the same three
+recorded baseline failures; all 6,228 required cases ran once, and frontend passed 760/760.
+The full gate remains red. Its owner has resumed focused composition checks after the hotfix
+resource hold and will reconcile the latest `ec8f8aa` input at a safe boundary. Keep that ownership
+separate, consume the stable checked handoff and qualify the final composition. Do not import
+unfinished refactor source, duplicate its healthy run or claim hosted CI success.
 
 The frontend handoff's priority resource fields and Reload acceptance are covered. Daniel
 deferred Round display and its counter to the later frontend pass on 11 November 2026.

@@ -70,7 +70,13 @@ def update(version):
             result = _replace_entry(result, "tools", name, tool)
             changed.append(name)
     for name in ("srd_lite_single_target_spells", "srd_lite_multiple_target_spells"):
-        result = _replace_entry(result, "definitions", name, runtime["definitions"][name])
+        result = _replace_entry(result, "definitions", name, None)
+    result = _replace_entry(
+        result,
+        "definitions",
+        "srd_lite_recipient_contracts",
+        runtime["definitions"]["srd_lite_recipient_contracts"],
+    )
     if json.dumps(runtime["parameter_declarations"], sort_keys=True) != before_parameters:
         previous_parameters = json.loads(before_parameters)
         for name, parameter in runtime["parameter_declarations"].items():
@@ -90,9 +96,9 @@ def update(version):
             )
         for parameter in expanded["tools"][tool["name"]].get("parameters", []):
             if parameter["name"] == "somatic_component_available":
-                tool["input_schema"]["properties"][parameter["name"]]["description"] = (
-                    parameter["description"]
-                )
+                tool["input_schema"]["properties"][parameter["name"]]["description"] = parameter[
+                    "description"
+                ]
         if tool["name"] in CAST_ROOTS:
             tool["input_schema"]["properties"]["spell"]["x-sylvia-gm-value-aliases"] = aliases
             tool["input_schema"]["properties"]["spell"]["x-sylvia-gm-castable-spells"] = True
