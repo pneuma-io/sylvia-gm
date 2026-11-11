@@ -81,14 +81,15 @@ and Builder-to-DM handoffs. Narration left committed mechanics and receipts unch
 source/HTTP evidence; the app's automatic queue-to-GM handoff still needs final native qualification.
 The isolated fixture/helper are prepared without holding the guest.
 
-The strict repairs in TD's new grid-lane and exposure modules pass affected checks. The refactor
-owner's scratch composition of PR #33 `870af5d`, corrected hotfix `11c279d` and TD `72522a8` passed
-Ruff, mypy across 350 files and four representative scripted request checks. This is not a checked
-final handoff. The standalone full run at `5df45da` finished with 6,054 Python passes, 21 registered
-expected failures and 240 failures; all 6,315 required cases ran once, and frontend passed 760/760.
-Its owner is repairing fixture/test gaps and attributing remaining failures. Keep that ownership
-separate, consume the stable checked identity and qualify the actual final composition. Do not
-import unfinished refactor source, duplicate its gate or claim hosted CI success.
+The TD strict spatial repairs are included in the refactor composition. The standalone
+PR #33 full run at `a808bbf` completed with 6,142 passes, three recorded baseline failures
+and 83 strict expected failures; all 6,228 required cases ran exactly once, source and
+selected input bytes stayed unchanged, and all 760 frontend cases passed. The ordinary
+failures remain two stale tactical-grid source assertions and the absent external codec
+stage fixture. This is a red full result, not release acceptance. The separate source
+composition includes final hotfix `ec8f8aa` and TD `98861e0`; its affected qualification
+and remaining limits are recorded in PR #33. No unfinished source was imported into
+PR #6. Final combined build/native acceptance remains separate.
 
 The frontend handoff's priority resource fields and Reload acceptance are covered. Daniel
 deferred Round display and its counter to the later frontend pass on 11 November 2026.
@@ -142,7 +143,7 @@ the separate Alpha build owner. The attract-mode showcase and no-AI battles rema
 Source/browser checks qualify this PR's UI behavior; genuine-provider, native installed-app,
 visual approval, merge and release acceptance remain separate.
 
-Sylvia GM has a public source repository and four published Alpha releases. The releases page
+Sylvia GM has a public source repository and five published Alpha prereleases. The releases page
 is the download destination; an older installed build does not verify newer source.
 
 The approved Fable refactor preserves game behavior while improving local checks, removing unused
@@ -157,7 +158,7 @@ history and old release source archives; this work does not rewrite history.
 | Trigger Discipline integration, PR #6 | Separate active owner; draft `98861e0` changes documentation only after source-checked `573b015`, which combines TD `72522a8` and main-targeted hotfix `11c279d` with no conflict. All code and package bytes are identical. Daniel deferred Round display and its counter to the later frontend pass; neither blocks this integration. TD package/frontend/Rust bytes retain native-tested `4b438d7` provenance; build 17 and its native replay are separate evidence. Eight final source checks and Full/AP2 owner-process plus loopback narration checks pass at `573b015`. Host desktop control, balancing, merge and release remain held. Privacy removal is complete; public packages exclude canonical vault text, and full public-session adequacy without private prose/future Rulebook remains unproven. The final combined refactor/hotfix candidate needs rebuilding and its own selected native qualification. |
 | Refactor, [PR #33](https://github.com/pneuma-io/sylvia-gm/pull/33) | Stages 1-8, including stage 7A, are implemented and undergoing final local qualification. The PR records exact checked heads, commands, outcomes, strict suspected defects and remaining baseline gaps. Independent acceptance and the final combined candidate remain open. Stage 9 (`app.js` and WebUI script policy) waits for PR #6 to merge; PR #28 is already merged. Broad formatting remains deferred while open PRs change source. |
 | SRD Full, PR #3 | Parked, inactive work; it does not expand the 117-spell Lite launch roster. |
-| GM memory and casting hotfix | Separate draft [PR #36](https://github.com/pneuma-io/sylvia-gm/pull/36), corrected checked main-source `6de3c9c`; GitHub main remains `6526904`. The prior `11c279d` staged Sunburst/Fire Storm recipient refusals are repaired; the owner records both original witnesses plus recipient-ownership/refusal, GM, upgrade and package checks passing across 55 unique final cases per source variant. Main supplies Lite 0.3.20; the separate Alpha4 backport supplies source 0.3.19. Existing `e543957` native evidence covers older 0.3.17 bytes and does not qualify this correction. The current refactor/TD composition is being reconciled against exact `6de3c9c`; no stable full/build/native/genuine-provider acceptance, merge or release is inferred. |
+| GM memory and casting hotfix | Main-targeted draft [PR #36](https://github.com/pneuma-io/sylvia-gm/pull/36) is checked at `ec8f8aa`, Lite 0.3.22. Build-time dispatch analysis derives recipient ownership per mode, replacing the earlier `6de3c9c` two-name exception. The owner independently verified 42 root casts and 142 request/upgrade/staged cases per source variant. The separately released Alpha 5 is `d71d641`, Lite 0.3.21; its exact installed/portable acceptance does not qualify this refactor/TD composition. GitHub main remains `6526904`; PR #36 is unmerged. The composition consumes exact `ec8f8aa`, with source checks and final build/native/provider acceptance kept distinct. |
 | SylviaBench | Outside this refactor. |
 
 Tutorials/onboarding, desktop updates, local diagnostics and compatible campaign Ruleset updates
