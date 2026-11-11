@@ -24,8 +24,8 @@ A humanlike adult Riftborn woman in her late forties with dark brown skin, a str
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/458e6a0aa402aff8fb22d1ea9ce48c1f1f26c6daed1b908f6b20951bc786205a.png)
+[Portrait](../assets/characters/95ebeafa41c9a664b1a534684fc66036c80a32b88988693825c2a0718365f9dd.png)
 
-[Full-body reference](../assets/characters/9d83f6c5bedeeaa58f1eb9e25520bd8324e7cd8c84eb9eb38ac45b1bbc9f8ef7.png)
+[Full-body reference](../assets/characters/4b7d14dcf70d152d64747fcd2c124739c017855507f0a07903889129b1710428.png)
 
-[Multiview reference sheet](../assets/characters/6b6fd5ec67d9643a6d968cf570d3f69ace954dcf1801926f439ede375baad89e.png)
+[Multiview reference sheet](../assets/characters/5419fb40b1ca39843c5c3330849015cffd10fdb57c616e33cfdc5d5e37d70a60.png)

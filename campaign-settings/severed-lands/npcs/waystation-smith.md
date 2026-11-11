@@ -22,8 +22,8 @@ An adult Human woman in her early forties with sun-browned freckled skin, a musc
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/9e69568b684f9a5a43b3f49160b909e53fc407479596ad234050185e6470673e.png)
+[Portrait](../assets/characters/89f5e376f42931de86837a7c750c907eaa3f511edc41658b7f12271494104b8c.png)
 
-[Full-body reference](../assets/characters/ef276d7776ad8cdf0e563b0718a3250702b06be15b7aa652200f82220f588187.png)
+[Full-body reference](../assets/characters/7154ed9699296993673c26a3ec3a9feb27f0949201c5b3267f83c1148db4a2f9.png)
 
-[Multiview reference sheet](../assets/characters/eaa6bf065dbafd5c6559a5641e9f3937ef549dbf521de6fbee68f9c96b0858f9.png)
+[Multiview reference sheet](../assets/characters/50a6ccdad7fc876a840e59e7f579205fb4b93be8d9195b574dffc81174e6209e.png)

@@ -22,8 +22,8 @@ A humanlike adult Riftborn woman in her fifties with warm copper-brown skin, a b
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/6d2f5303617dc3d6e2b9d8cb44b3b5032764d94e9f202e0500a5626b4c150d57.png)
+[Portrait](../assets/characters/91d1116b8cbda50cf5d0101671a5a5f6ece2b04c4495a01e1177734e31a239eb.png)
 
-[Full-body reference](../assets/characters/f61f6eb8270e641ca26828f3c10a5bba17f3f81e028adf0c75edea2dc0a0c8b4.png)
+[Full-body reference](../assets/characters/710f70bd2bdd2a8db08fb5daa9d98bf3025a829fef5f94919dee198e3b34254a.png)
 
-[Multiview reference sheet](../assets/characters/fa7d1c50a730d5bcd38d7222d56c7e9be0a357d6a158db5bdd409110474210d2.png)
+[Multiview reference sheet](../assets/characters/0f006364510b0f1931894618560b8cf91c81345b2120fe323e3898a6d2f1bdcf.png)

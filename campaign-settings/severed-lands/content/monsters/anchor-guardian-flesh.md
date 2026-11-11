@@ -53,8 +53,8 @@ A hulking roughly human-shaped Warden stone guardian with a broad heavy torso, t
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/c6bea40d00c94b47af7e4ec8b85042c9f1e87fde898220468d6728755ade5450.png)
+[Portrait](../../assets/characters/afee425aa4271a6e4af2b2d509ae6cc6a171d2467bc4a112832ff08f1c676702.png)
 
-[Full-body reference](../../assets/characters/490bec00a1aa0a8ed147116aac054609ac745c1ea464dbe5c8dde1cf17381409.png)
+[Full-body reference](../../assets/characters/8d5ca4ef4348d3fd6bbc806212ee59a3f1a0d98280fcf5924fd5b5b99a78c789.png)
 
-[Multiview reference sheet](../../assets/characters/3b0657c5968e06687cbe3149b7e4ff81659be4a7038b008285e5c074230ec589.png)
+[Multiview reference sheet](../../assets/characters/49e9bbbaa3c1e3f527b6d5f1fd7b6549a4795efc9cb3bb38a1fe2d2769a3c14e.png)

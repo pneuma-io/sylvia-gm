@@ -743,50 +743,57 @@
           "path": "content/non-beast-form-index.json#/forms/flesh_golem",
           "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/anchor-guardian-flesh.md",
+          "sha256": "70fc1df9d7ea171c240f36df6bac94fa2160be13839995037df157d45ad908f2",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
         "appearance": "A hulking roughly human-shaped Warden stone guardian with a broad heavy torso, thick asymmetrical stone limbs and blunt stony hands, fused with sealed muted gray-brown organic tissue along joints and cracks. Worn pale-gray carved stone plates, restrained angular Warden masonry and small sickly violet Rift glimmers inside a few seams. Heavy impassive carved stone brow and narrow dim eye slits, no human face. Ancient precise construction mixed with an uneasy living posture. No exposed organs, gore, armor, clothing, weapons or faction heraldry.",
-        "full_body": {
-          "path": "assets/characters/490bec00a1aa0a8ed147116aac054609ac745c1ea464dbe5c8dde1cf17381409.png",
-          "sha256": "490bec00a1aa0a8ed147116aac054609ac745c1ea464dbe5c8dde1cf17381409"
-        },
-        "reference_sheet": {
-          "path": "assets/characters/3b0657c5968e06687cbe3149b7e4ff81659be4a7038b008285e5c074230ec589.png",
-          "sha256": "3b0657c5968e06687cbe3149b7e4ff81659be4a7038b008285e5c074230ec589"
-        },
-        "portrait": {
-          "path": "assets/characters/c6bea40d00c94b47af7e4ec8b85042c9f1e87fde898220468d6728755ade5450.png",
-          "sha256": "c6bea40d00c94b47af7e4ec8b85042c9f1e87fde898220468d6728755ade5450"
-        },
         "frame": {
           "x": 0.5,
           "y": 0.35,
           "zoom": 1
+        },
+        "full_body": {
+          "path": "assets/characters/8d5ca4ef4348d3fd6bbc806212ee59a3f1a0d98280fcf5924fd5b5b99a78c789.png",
+          "sha256": "8d5ca4ef4348d3fd6bbc806212ee59a3f1a0d98280fcf5924fd5b5b99a78c789"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/49e9bbbaa3c1e3f527b6d5f1fd7b6549a4795efc9cb3bb38a1fe2d2769a3c14e.png",
+          "sha256": "49e9bbbaa3c1e3f527b6d5f1fd7b6549a4795efc9cb3bb38a1fe2d2769a3c14e"
+        },
+        "portrait": {
+          "path": "assets/characters/afee425aa4271a6e4af2b2d509ae6cc6a171d2467bc4a112832ff08f1c676702.png",
+          "sha256": "afee425aa4271a6e4af2b2d509ae6cc6a171d2467bc4a112832ff08f1c676702"
         }
       },
       "outputs": {
         "full_body": {
           "width": 1024,
           "height": 1536,
-          "bytes": 2459682
+          "bytes": 2363776
         },
         "reference_sheet": {
           "width": 1536,
           "height": 1024,
-          "bytes": 2417758
+          "bytes": 2382511
         },
         "portrait": {
           "width": 1254,
           "height": 1254,
-          "bytes": 2501216
+          "bytes": 2398338
         }
       },
       "prompt_set": {
-        "full_body": "Use case: stylized-concept. Production canonical full-body creature reference for the Anchor Guardian (flesh-fused form) in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG creature illustration, grounded fantasy materials, plain light neutral background, soft natural studio light, subtle grounding shadow. Exactly one complete standing creature, front three-quarter stance, complete head, hands and feet inside comfortable margins. Canon: an ancient Warden construct guarding an Anchor Door, a grotesque fusion of stone construction and Rift-touched organic matter, with both ancient precision and feral hunger. Hulking roughly human-shaped construct with a broad heavy torso, thick asymmetrical stone limbs and blunt stony hands, worn pale-gray angular carved stone plates joined by sealed muted gray-brown organic tissue along joints and cracks. Small restrained sickly violet Rift glimmers inside a few seams; glowing seams do not obscure the silhouette or surfaces. Heavy impassive carved stone brow, narrow dim eye slits, no human face. A subtly uneasy living posture, physically coherent stone anatomy. This is an enemy archetype rather than a named human identity; equipment and exact stat values are not illustrated. Non-graphic creature design: closed intact tissue, no blood, wounds or exposed organs. No clothes, metal armor, carried weapons, invented insignia, text, labels, borders, UI, scenery, doorway, extra people or props.",
-        "reference_sheet": "Use case: identity-preserve. Asset type: canonical multi-view reference sheet for Anchor Guardian, Sylvia GM Severed Lands. Input image 1 is the authoritative full-body identity reference. One landscape PNG, 1536x1024. Polished naturalistic digital RPG illustration, plain light neutral background and soft natural studio light. Three complete figures at the same scale, straight front, exact side and straight back, plus one enlarged frontal head detail. Preserve the exact silhouette, proportions, materials, construction, colors, wear, equipment and every identifying detail of image 1. A hulking roughly human-shaped Warden stone guardian with a broad heavy torso, thick asymmetrical stone limbs and blunt stony hands, fused with sealed muted gray-brown organic tissue along joints and cracks. Worn pale-gray carved stone plates, restrained angular Warden masonry and small sickly violet Rift glimmers inside a few seams. Heavy impassive carved stone brow and narrow dim eye slits, no human face. Ancient precise construction mixed with an uneasy living posture. No exposed organs, gore, armor, clothing, weapons or faction heraldry. Complete head and feet inside comfortable margins. Keep equipment and surfaces physically consistent between views. Maintain the same irregular stone plate placements and sealed intact organic seams, with restrained violet glimmers. No exposed organs, blood, wounds, new armor, new weapons or new limbs. No redesign, extra people, scenery, text, labels, borders, UI or invented emblems.",
-        "portrait": "Use case: identity-preserve. Asset type: aligned reusable square portrait for Anchor Guardian, Sylvia GM Severed Lands. Input image 1 is the canonical full-body identity; input image 2 is the canonical multi-view reference. Produce one square PNG, 1024x1024. Polished naturalistic digital RPG illustration, plain light neutral background, soft natural studio light. Preserve the same head, silhouette, materials, colors, clothing and exact identity. A hulking roughly human-shaped Warden stone guardian with a broad heavy torso, thick asymmetrical stone limbs and blunt stony hands, fused with sealed muted gray-brown organic tissue along joints and cracks. Worn pale-gray carved stone plates, restrained angular Warden masonry and small sickly violet Rift glimmers inside a few seams. Heavy impassive carved stone brow and narrow dim eye slits, no human face. Ancient precise construction mixed with an uneasy living posture. No exposed organs, gore, armor, clothing, weapons or faction heraldry. Head and upper shoulders only, upright directly forward pose without tilt, centered head, comfortable margin above the entire head and on both sides for adjustable circular cropping. Place the eye slits at 35 percent of image height with a consistent large readable head scale. Retain the angular stone brow and long carved stone muzzle-like face structure, sealed organic neck seams and subtle violet eye slits. No human face, wounds, blood or exposed organs. No carried props, hands, map, divider or satchel inside the crop. No redesign, text, labels, borders, UI, scenery, invented emblems or extra people."
-      }
+        "full_body": "Use case: style-transfer. Create ONE vertical 1024x1536 canonical FULL-BODY reference of Anchor Guardian ONLY. The supplied K board is RENDERING STYLE ONLY. Do not copy its faces, hair, body types, costumes, props or poses. This subject follows the written appearance and authored canon. \nEstablished appearance: A hulking roughly human-shaped Warden stone guardian with a broad heavy torso, thick asymmetrical stone limbs and blunt stony hands, fused with sealed muted gray-brown organic tissue along joints and cracks. Worn pale-gray carved stone plates, restrained angular Warden masonry and small sickly violet Rift glimmers inside a few seams. Heavy impassive carved stone brow and narrow dim eye slits, no human face. Ancient precise construction mixed with an uneasy living posture. No exposed organs, gore, armor, clothing, weapons or faction heraldry.\nSubject invariants: A MEDIUM construct with hulking proportions, not a giant. Stone Warden frame fused with sealed organic matter, nonhuman carved brow and dim slits, NEVER a human face. Thick asymmetrical limbs, blunt stone hands, muted violet seams. No exposed organs, gore, clothes, weapons, extra limbs or copied heraldry. Plain reference posture, no attack effects or invented runes. Preserve the authored stone/flesh fusion; do not turn it into either a clean robot or an ordinary flesh zombie.\nRendering: original dark heroic tabletop-fantasy painting with recognizably anime-influenced character drawing, designed expressive eyes and grouped hair appropriate to THIS subject's age/species. Deep cool colored shadows, warm ivory focal light, substantial painted materials, selective sharp highlights and soft lost edges. Keep this subject's true skin, hair, cloth/stone/metal colors. No photographic skin, glossy 3D render or copied franchise design. Composition: ONE complete figure, near-front three-quarter reference stance, crown, hands, hems and boots fully inside generous top/bottom/side margins. Coherent hands, anatomy and gear. Plain deep charcoal neutral ground with enough edge contrast to inspect the silhouette. No scenery, writing, lettering, labels, border, inset portrait, extra people or extra views. This selected body will govern later multiview and portrait identity.",
+        "reference_sheet": "Use case: identity-preserve. Make a FOUR-VIEW canonical reference sheet of Anchor Guardian, the ONE subject in image 1. The supplied body is authoritative identity AND approved rendering. Preserve this exact face/head, age, build, skin/eye/hair colors, clothing layers and all gear topology. No new design, mirrored item placement or extra props. \nEstablished appearance: A hulking roughly human-shaped Warden stone guardian with a broad heavy torso, thick asymmetrical stone limbs and blunt stony hands, fused with sealed muted gray-brown organic tissue along joints and cracks. Worn pale-gray carved stone plates, restrained angular Warden masonry and small sickly violet Rift glimmers inside a few seams. Heavy impassive carved stone brow and narrow dim eye slits, no human face. Ancient precise construction mixed with an uneasy living posture. No exposed organs, gore, armor, clothing, weapons or faction heraldry.\nSubject invariants: A MEDIUM construct with hulking proportions, not a giant. Stone Warden frame fused with sealed organic matter, nonhuman carved brow and dim slits, NEVER a human face. Thick asymmetrical limbs, blunt stone hands, muted violet seams. No exposed organs, gore, clothes, weapons, extra limbs or copied heraldry. Plain reference posture, no attack effects or invented runes. Preserve the authored stone/flesh fusion; do not turn it into either a clean robot or an ordinary flesh zombie.\nRendering: original dark heroic tabletop-fantasy painting with recognizably anime-influenced character drawing, designed expressive eyes and grouped hair appropriate to THIS subject's age/species. Deep cool colored shadows, warm ivory focal light, substantial painted materials, selective sharp highlights and soft lost edges. Keep this subject's true skin, hair, cloth/stone/metal colors. No photographic skin, glossy 3D render or copied franchise design. One LANDSCAPE 1536x1024 sheet with FRONT, THREE-QUARTER, SIDE and BACK views, all complete figures at equal scale. Complete crowns, hands, hems and boots inside generous margins; believable rotation of the same anatomy/gear. The Guardian remains the same asymmetrical stone/organic nonhuman construct from all sides; no human face or organs. No text, labels, numbers, border, extra panels, scenery, attack effects or additional characters. Plain charcoal neutral ground, enough silhouette contrast to inspect the full design.",
+        "portrait": "Use case: identity-preserve. Create ONE square 1024x1024 reusable head-and-shoulders PORTRAIT of Anchor Guardian. Input 1 is the canonical body; input 2 is the exact multiview identity reference. Preserve the exact face/head, age, complexion, hair, eyes, upper clothing and any scar details. Do not redesign or blend faces with another character. \nEstablished appearance: A hulking roughly human-shaped Warden stone guardian with a broad heavy torso, thick asymmetrical stone limbs and blunt stony hands, fused with sealed muted gray-brown organic tissue along joints and cracks. Worn pale-gray carved stone plates, restrained angular Warden masonry and small sickly violet Rift glimmers inside a few seams. Heavy impassive carved stone brow and narrow dim eye slits, no human face. Ancient precise construction mixed with an uneasy living posture. No exposed organs, gore, armor, clothing, weapons or faction heraldry.\nSubject invariants: A MEDIUM construct with hulking proportions, not a giant. Stone Warden frame fused with sealed organic matter, nonhuman carved brow and dim slits, NEVER a human face. Thick asymmetrical limbs, blunt stone hands, muted violet seams. No exposed organs, gore, clothes, weapons, extra limbs or copied heraldry. Plain reference posture, no attack effects or invented runes. Preserve the authored stone/flesh fusion; do not turn it into either a clean robot or an ordinary flesh zombie.\nRendering: original dark heroic tabletop-fantasy painting with recognizably anime-influenced character drawing, designed expressive eyes and grouped hair appropriate to THIS subject's age/species. Deep cool colored shadows, warm ivory focal light, substantial painted materials, selective sharp highlights and soft lost edges. Keep this subject's true skin, hair, cloth/stone/metal colors. No photographic skin, glossy 3D render or copied franchise design. Framing: horizontally centered complete head/hair/crown silhouette with comfortable top/side margins safe for a circular crop. Eye line around 40% of image height, chin near 65-70%, shoulders in the lower quarter, looking gently toward viewer. For the Guardian, this is its own carved nonhuman head/brow and upper stone shoulders, not a human head. Preserve age/build; do not de-age older people or lighten complexions. Keep faces readable at 64-pixel UI size. No raised hands, notebook or equipment covering the face. No scene, text, label, border, watermark, panels or effects. Plain charcoal neutral ground, legible outer silhouette, ONE portrait only."
+      },
+      "style_id": "severed-lands-dark-heroic-fantasy-k-v1"
     },
     {
       "id": "severed-npc-baker-tessa",
@@ -1601,50 +1608,57 @@
           "path": "npcs/patrol-veteran-stern.md",
           "sha256": "1eb029def2204157d617cf9ac720d102dc7cda8f3477c50a516fbed1b578a47e",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/patrol-veteran-stern.md",
+          "sha256": "717cbdcb78d83f5aaf704aa5a908eff37c4e43ff06c7668bafec00dc230ce840",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
         "appearance": "A humanlike adult Riftborn woman in her late forties with dark brown skin, a strong lean build, short salt-and-pepper hair, dark eyes and one healed claw scar across her jaw. Quiet vigilant expression. Practical patched dark olive patrol leathers over a charcoal shirt, plain trousers, sturdy worn boots and a compact belt kit. A closed personal notebook stays inside a closed belt pouch. No emblems, medals, exposed notebook pages or visible magical effects.",
-        "full_body": {
-          "path": "assets/characters/9d83f6c5bedeeaa58f1eb9e25520bd8324e7cd8c84eb9eb38ac45b1bbc9f8ef7.png",
-          "sha256": "9d83f6c5bedeeaa58f1eb9e25520bd8324e7cd8c84eb9eb38ac45b1bbc9f8ef7"
-        },
-        "reference_sheet": {
-          "path": "assets/characters/6b6fd5ec67d9643a6d968cf570d3f69ace954dcf1801926f439ede375baad89e.png",
-          "sha256": "6b6fd5ec67d9643a6d968cf570d3f69ace954dcf1801926f439ede375baad89e"
-        },
-        "portrait": {
-          "path": "assets/characters/458e6a0aa402aff8fb22d1ea9ce48c1f1f26c6daed1b908f6b20951bc786205a.png",
-          "sha256": "458e6a0aa402aff8fb22d1ea9ce48c1f1f26c6daed1b908f6b20951bc786205a"
-        },
         "frame": {
           "x": 0.5,
           "y": 0.35,
           "zoom": 1
+        },
+        "full_body": {
+          "path": "assets/characters/4b7d14dcf70d152d64747fcd2c124739c017855507f0a07903889129b1710428.png",
+          "sha256": "4b7d14dcf70d152d64747fcd2c124739c017855507f0a07903889129b1710428"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/5419fb40b1ca39843c5c3330849015cffd10fdb57c616e33cfdc5d5e37d70a60.png",
+          "sha256": "5419fb40b1ca39843c5c3330849015cffd10fdb57c616e33cfdc5d5e37d70a60"
+        },
+        "portrait": {
+          "path": "assets/characters/95ebeafa41c9a664b1a534684fc66036c80a32b88988693825c2a0718365f9dd.png",
+          "sha256": "95ebeafa41c9a664b1a534684fc66036c80a32b88988693825c2a0718365f9dd"
         }
       },
       "outputs": {
         "full_body": {
           "width": 1024,
           "height": 1536,
-          "bytes": 1917347
+          "bytes": 1956685
         },
         "reference_sheet": {
           "width": 1536,
           "height": 1024,
-          "bytes": 2206429
+          "bytes": 2001992
         },
         "portrait": {
           "width": 1254,
           "height": 1254,
-          "bytes": 2315027
+          "bytes": 2173788
         }
       },
       "prompt_set": {
-        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Stern in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, tactile fabric and skin, plain light neutral backdrop, soft natural studio light and subtle ground shadow. Exactly one person standing naturally in a near-front three-quarter pose. Entire head, both hands and both feet comfortably inside the frame. Appearance: A humanlike adult Riftborn woman in her late forties with dark brown skin, a strong lean build, short salt-and-pepper hair, dark eyes and one healed claw scar across her jaw. Quiet vigilant expression. Practical patched dark olive patrol leathers over a charcoal shirt, plain trousers, sturdy worn boots and a compact belt kit. A closed personal notebook stays inside a closed belt pouch. No emblems, medals, exposed notebook pages or visible magical effects. These unspecified visual details are editable defaults; preserve the authored identity and pronouns without adding history, powers or allegiances. No text, labels, borders, UI, scenery, extra people, duplicated limbs, glamour pose or oversized equipment.",
-        "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for Stern in Sylvia GM's Severed Lands. Input image 1 is the approved full-body identity reference. Preserve that exact person, facial structure, skin, age, hair, proportions, clothes, equipment and material colors. One landscape PNG, 1536x1024, polished naturalistic digital RPG illustration on the same plain light neutral backdrop. Show three separate complete standing views of this ONE person: front, true side and back, evenly spaced at matching scale, each entire head and both feet visible within margins. Include one smaller clear face study in remaining space without overlapping the figures. These are multiple views of one identity, never extra cast. Appearance: A humanlike adult Riftborn woman in her late forties with dark brown skin, a strong lean build, short salt-and-pepper hair, dark eyes and one healed claw scar across her jaw. Quiet vigilant expression. Practical patched dark olive patrol leathers over a charcoal shirt, plain trousers, sturdy worn boots and a compact belt kit. A closed personal notebook stays inside a closed belt pouch. No emblems, medals, exposed notebook pages or visible magical effects. No text, labels, names, UI, scenery, decorative frames, invented symbols, open books, extra equipment or duplicated limbs.",
-        "portrait": "Use case: identity-preserve. Input image 1 is the EDIT TARGET portrait of Stern. Correct only the painted round cutout. Produce one full-bleed square PNG, 1024x1024. Fill all four white corner regions with the existing warm light-gray studio background, and naturally continue the existing shoulder fabric into the lower corners where it was cut off. The entire square must be filled edge-to-edge with continuous background and clothing. Preserve this exact face, hair, skin, expression, age, scar if present, clothing detail, lighting, head size and head position. Do not move or rescale the face. No circular or oval boundary, mask, vignette, white corner, frame, border, text or UI. This is a regular square head-and-shoulders image with no decorative shape."
-      }
+        "full_body": "Use case: style-transfer. Create ONE vertical 1024x1536 canonical FULL-BODY reference of Stern ONLY. The supplied K board is RENDERING STYLE ONLY. Do not copy its faces, hair, body types, costumes, props or poses. This subject follows the written appearance and authored canon. \nEstablished appearance: A humanlike adult Riftborn woman in her late forties with dark brown skin, a strong lean build, short salt-and-pepper hair, dark eyes and one healed claw scar across her jaw. Quiet vigilant expression. Practical patched dark olive patrol leathers over a charcoal shirt, plain trousers, sturdy worn boots and a compact belt kit. A closed personal notebook stays inside a closed belt pouch. No emblems, medals, exposed notebook pages or visible magical effects.\nSubject invariants: A disciplined adult Riftborn woman in her late forties, dark brown skin, lean strong build, short salt-and-pepper hair and a HEALED jaw-claw scar. Her memorial notebook stays inside a CLOSED pouch in every view; no exposed book, names, written pages, emblems or new insignia. Quiet vigilance, no weapon or magic added. The military home-world background does not authorize modern combat gear.\nRendering: original dark heroic tabletop-fantasy painting with recognizably anime-influenced character drawing, designed expressive eyes and grouped hair appropriate to THIS subject's age/species. Deep cool colored shadows, warm ivory focal light, substantial painted materials, selective sharp highlights and soft lost edges. Keep this subject's true skin, hair, cloth/stone/metal colors. No photographic skin, glossy 3D render or copied franchise design. Composition: ONE complete figure, near-front three-quarter reference stance, crown, hands, hems and boots fully inside generous top/bottom/side margins. Coherent hands, anatomy and gear. Plain deep charcoal neutral ground with enough edge contrast to inspect the silhouette. No scenery, writing, lettering, labels, border, inset portrait, extra people or extra views. This selected body will govern later multiview and portrait identity.",
+        "reference_sheet": "Use case: identity-preserve. Make a FOUR-VIEW canonical reference sheet of Stern, the ONE subject in image 1. The supplied body is authoritative identity AND approved rendering. Preserve this exact face/head, age, build, skin/eye/hair colors, clothing layers and all gear topology. No new design, mirrored item placement or extra props. \nEstablished appearance: A humanlike adult Riftborn woman in her late forties with dark brown skin, a strong lean build, short salt-and-pepper hair, dark eyes and one healed claw scar across her jaw. Quiet vigilant expression. Practical patched dark olive patrol leathers over a charcoal shirt, plain trousers, sturdy worn boots and a compact belt kit. A closed personal notebook stays inside a closed belt pouch. No emblems, medals, exposed notebook pages or visible magical effects.\nSubject invariants: A disciplined adult Riftborn woman in her late forties, dark brown skin, lean strong build, short salt-and-pepper hair and a HEALED jaw-claw scar. Her memorial notebook stays inside a CLOSED pouch in every view; no exposed book, names, written pages, emblems or new insignia. Quiet vigilance, no weapon or magic added. The military home-world background does not authorize modern combat gear.\nRendering: original dark heroic tabletop-fantasy painting with recognizably anime-influenced character drawing, designed expressive eyes and grouped hair appropriate to THIS subject's age/species. Deep cool colored shadows, warm ivory focal light, substantial painted materials, selective sharp highlights and soft lost edges. Keep this subject's true skin, hair, cloth/stone/metal colors. No photographic skin, glossy 3D render or copied franchise design. One LANDSCAPE 1536x1024 sheet with FRONT, THREE-QUARTER, SIDE and BACK views, all complete figures at equal scale. Complete crowns, hands, hems and boots inside generous margins; believable rotation of the same anatomy/gear. The Guardian remains the same asymmetrical stone/organic nonhuman construct from all sides; no human face or organs. No text, labels, numbers, border, extra panels, scenery, attack effects or additional characters. Plain charcoal neutral ground, enough silhouette contrast to inspect the full design.",
+        "portrait": "Use case: identity-preserve. Create ONE square 1024x1024 reusable head-and-shoulders PORTRAIT of Stern. Input 1 is the canonical body; input 2 is the exact multiview identity reference. Preserve the exact face/head, age, complexion, hair, eyes, upper clothing and any scar details. Do not redesign or blend faces with another character. \nEstablished appearance: A humanlike adult Riftborn woman in her late forties with dark brown skin, a strong lean build, short salt-and-pepper hair, dark eyes and one healed claw scar across her jaw. Quiet vigilant expression. Practical patched dark olive patrol leathers over a charcoal shirt, plain trousers, sturdy worn boots and a compact belt kit. A closed personal notebook stays inside a closed belt pouch. No emblems, medals, exposed notebook pages or visible magical effects.\nSubject invariants: A disciplined adult Riftborn woman in her late forties, dark brown skin, lean strong build, short salt-and-pepper hair and a HEALED jaw-claw scar. Her memorial notebook stays inside a CLOSED pouch in every view; no exposed book, names, written pages, emblems or new insignia. Quiet vigilance, no weapon or magic added. The military home-world background does not authorize modern combat gear.\nRendering: original dark heroic tabletop-fantasy painting with recognizably anime-influenced character drawing, designed expressive eyes and grouped hair appropriate to THIS subject's age/species. Deep cool colored shadows, warm ivory focal light, substantial painted materials, selective sharp highlights and soft lost edges. Keep this subject's true skin, hair, cloth/stone/metal colors. No photographic skin, glossy 3D render or copied franchise design. Framing: horizontally centered complete head/hair/crown silhouette with comfortable top/side margins safe for a circular crop. Eye line around 40% of image height, chin near 65-70%, shoulders in the lower quarter, looking gently toward viewer. For the Guardian, this is its own carved nonhuman head/brow and upper stone shoulders, not a human head. Preserve age/build; do not de-age older people or lighten complexions. Keep faces readable at 64-pixel UI size. No raised hands, notebook or equipment covering the face. No scene, text, label, border, watermark, panels or effects. Plain charcoal neutral ground, legible outer silhouette, ONE portrait only."
+      },
+      "style_id": "severed-lands-dark-heroic-fantasy-k-v1"
     },
     {
       "id": "severed-npc-researcher-linden",
@@ -1661,50 +1675,57 @@
           "path": "npcs/researcher-linden.md",
           "sha256": "4ebf579856662a320dec17fa161f89a517fb12e24f4975e5208b9992bcbf8019",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/researcher-linden.md",
+          "sha256": "8ac5ef9bb3d5669410a3b57c2cb8e6505c9752ac9cf2ea668e1b44a711e06ee9",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
         "appearance": "A humanlike androgynous adult Riftborn in their late thirties with light olive skin, a slender build, untidy short dark curls, hazel eyes and visible sleep shadows. An absorbed thoughtful expression. A worn moss-gray research coat over a muted plum shirt, charcoal trousers, scuffed ankle boots and a small shoulder satchel. Holds one closed plain notebook. No glowing eyes, readable notes, magical effects or invented faction symbols.",
-        "full_body": {
-          "path": "assets/characters/59d9d0d90ee27ac631f7420c8ea063d9782e17732489694f81acf3605bdc342f.png",
-          "sha256": "59d9d0d90ee27ac631f7420c8ea063d9782e17732489694f81acf3605bdc342f"
-        },
-        "reference_sheet": {
-          "path": "assets/characters/646f0c74bbe391942dc2b8b3bf7ab662a6f52f4391ad7e48f44cd33e04e12918.png",
-          "sha256": "646f0c74bbe391942dc2b8b3bf7ab662a6f52f4391ad7e48f44cd33e04e12918"
-        },
-        "portrait": {
-          "path": "assets/characters/078863ebdc04b1fd453c449256c3d28be104cbb1cb0407e58165c05a39541e98.png",
-          "sha256": "078863ebdc04b1fd453c449256c3d28be104cbb1cb0407e58165c05a39541e98"
-        },
         "frame": {
           "x": 0.5,
           "y": 0.35,
           "zoom": 1
+        },
+        "full_body": {
+          "path": "assets/characters/82265788dd8a89bf193732116f02ac8917c821ed626e198cf7922280a92491bd.png",
+          "sha256": "82265788dd8a89bf193732116f02ac8917c821ed626e198cf7922280a92491bd"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/e8debb2cdc85947670b6621ff21534874c9b66a040b51e1dbde54ce178ed31d1.png",
+          "sha256": "e8debb2cdc85947670b6621ff21534874c9b66a040b51e1dbde54ce178ed31d1"
+        },
+        "portrait": {
+          "path": "assets/characters/85d11fab752b0c2aa91f750d0a46900945bfaf8123d8f4712774c31f9a1aa53e.png",
+          "sha256": "85d11fab752b0c2aa91f750d0a46900945bfaf8123d8f4712774c31f9a1aa53e"
         }
       },
       "outputs": {
         "full_body": {
           "width": 1024,
           "height": 1536,
-          "bytes": 1948262
+          "bytes": 1928462
         },
         "reference_sheet": {
           "width": 1536,
           "height": 1024,
-          "bytes": 2268592
+          "bytes": 2060958
         },
         "portrait": {
           "width": 1254,
           "height": 1254,
-          "bytes": 2272911
+          "bytes": 2135902
         }
       },
       "prompt_set": {
-        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Linden in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, tactile fabric and skin, plain light neutral backdrop, soft natural studio light and subtle ground shadow. Exactly one person standing naturally in a near-front three-quarter pose. Entire head, both hands and both feet comfortably inside the frame. Appearance: A humanlike androgynous adult Riftborn in their late thirties with light olive skin, a slender build, untidy short dark curls, hazel eyes and visible sleep shadows. An absorbed thoughtful expression. A worn moss-gray research coat over a muted plum shirt, charcoal trousers, scuffed ankle boots and a small shoulder satchel. Holds one closed plain notebook. No glowing eyes, readable notes, magical effects or invented faction symbols. These unspecified visual details are editable defaults; preserve the authored identity and pronouns without adding history, powers or allegiances. No text, labels, borders, UI, scenery, extra people, duplicated limbs, glamour pose or oversized equipment.",
-        "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for Linden in Sylvia GM's Severed Lands. Input image 1 is the approved full-body identity reference. Preserve that exact person, facial structure, skin, age, hair, proportions, clothes, equipment and material colors. One landscape PNG, 1536x1024, polished naturalistic digital RPG illustration on the same plain light neutral backdrop. Show three separate complete standing views of this ONE person: front, true side and back, evenly spaced at matching scale, each entire head and both feet visible within margins. Include one smaller clear face study in remaining space without overlapping the figures. These are multiple views of one identity, never extra cast. Appearance: A humanlike androgynous adult Riftborn in their late thirties with light olive skin, a slender build, untidy short dark curls, hazel eyes and visible sleep shadows. An absorbed thoughtful expression. A worn moss-gray research coat over a muted plum shirt, charcoal trousers, scuffed ankle boots and a small shoulder satchel. Holds one closed plain notebook. No glowing eyes, readable notes, magical effects or invented faction symbols. No text, labels, names, UI, scenery, decorative frames, invented symbols, open books, extra equipment or duplicated limbs.",
-        "portrait": "Use case: identity-preserve. Input image 1 is the EDIT TARGET portrait of Linden. Correct only the painted round cutout. Produce one full-bleed square PNG, 1024x1024. Fill all four white corner regions with the existing warm light-gray studio background, and naturally continue the existing shoulder fabric into the lower corners where it was cut off. The entire square must be filled edge-to-edge with continuous background and clothing. Preserve this exact face, hair, skin, expression, age, scar if present, clothing detail, lighting, head size and head position. Do not move or rescale the face. No circular or oval boundary, mask, vignette, white corner, frame, border, text or UI. This is a regular square head-and-shoulders image with no decorative shape."
-      }
+        "full_body": "Use case: style-transfer. Create ONE vertical 1024x1536 canonical FULL-BODY reference of Linden ONLY. The supplied K board is RENDERING STYLE ONLY. Do not copy its faces, hair, body types, costumes, props or poses. This subject follows the written appearance and authored canon. \nEstablished appearance: A humanlike androgynous adult Riftborn in their late thirties with light olive skin, a slender build, untidy short dark curls, hazel eyes and visible sleep shadows. An absorbed thoughtful expression. A worn moss-gray research coat over a muted plum shirt, charcoal trousers, scuffed ankle boots and a small shoulder satchel. Holds one closed plain notebook. No glowing eyes, readable notes, magical effects or invented faction symbols.\nSubject invariants: Androgynous adult Riftborn researcher, they/them, late thirties, slender, light olive skin, short untidy dark curls and hazel eyes with sleep shadows. Their own distinct face, not V or anyone from the style board. Moss-grey research coat/plum shirt, small satchel and ONE closed notebook. No readable research, invented Door symbols, portal, magic or faction insignia.\nRendering: original dark heroic tabletop-fantasy painting with recognizably anime-influenced character drawing, designed expressive eyes and grouped hair appropriate to THIS subject's age/species. Deep cool colored shadows, warm ivory focal light, substantial painted materials, selective sharp highlights and soft lost edges. Keep this subject's true skin, hair, cloth/stone/metal colors. No photographic skin, glossy 3D render or copied franchise design. Composition: ONE complete figure, near-front three-quarter reference stance, crown, hands, hems and boots fully inside generous top/bottom/side margins. Coherent hands, anatomy and gear. Plain deep charcoal neutral ground with enough edge contrast to inspect the silhouette. No scenery, writing, lettering, labels, border, inset portrait, extra people or extra views. This selected body will govern later multiview and portrait identity.",
+        "reference_sheet": "Use case: identity-preserve. Make a FOUR-VIEW canonical reference sheet of Linden, the ONE subject in image 1. The supplied body is authoritative identity AND approved rendering. Preserve this exact face/head, age, build, skin/eye/hair colors, clothing layers and all gear topology. No new design, mirrored item placement or extra props. \nEstablished appearance: A humanlike androgynous adult Riftborn in their late thirties with light olive skin, a slender build, untidy short dark curls, hazel eyes and visible sleep shadows. An absorbed thoughtful expression. A worn moss-gray research coat over a muted plum shirt, charcoal trousers, scuffed ankle boots and a small shoulder satchel. Holds one closed plain notebook. No glowing eyes, readable notes, magical effects or invented faction symbols.\nSubject invariants: Androgynous adult Riftborn researcher, they/them, late thirties, slender, light olive skin, short untidy dark curls and hazel eyes with sleep shadows. Their own distinct face, not V or anyone from the style board. Moss-grey research coat/plum shirt, small satchel and ONE closed notebook. No readable research, invented Door symbols, portal, magic or faction insignia.\nRendering: original dark heroic tabletop-fantasy painting with recognizably anime-influenced character drawing, designed expressive eyes and grouped hair appropriate to THIS subject's age/species. Deep cool colored shadows, warm ivory focal light, substantial painted materials, selective sharp highlights and soft lost edges. Keep this subject's true skin, hair, cloth/stone/metal colors. No photographic skin, glossy 3D render or copied franchise design. One LANDSCAPE 1536x1024 sheet with FRONT, THREE-QUARTER, SIDE and BACK views, all complete figures at equal scale. Complete crowns, hands, hems and boots inside generous margins; believable rotation of the same anatomy/gear. The Guardian remains the same asymmetrical stone/organic nonhuman construct from all sides; no human face or organs. No text, labels, numbers, border, extra panels, scenery, attack effects or additional characters. Plain charcoal neutral ground, enough silhouette contrast to inspect the full design.",
+        "portrait": "Use case: identity-preserve. Create ONE square 1024x1024 reusable head-and-shoulders PORTRAIT of Linden. Input 1 is the canonical body; input 2 is the exact multiview identity reference. Preserve the exact face/head, age, complexion, hair, eyes, upper clothing and any scar details. Do not redesign or blend faces with another character. \nEstablished appearance: A humanlike androgynous adult Riftborn in their late thirties with light olive skin, a slender build, untidy short dark curls, hazel eyes and visible sleep shadows. An absorbed thoughtful expression. A worn moss-gray research coat over a muted plum shirt, charcoal trousers, scuffed ankle boots and a small shoulder satchel. Holds one closed plain notebook. No glowing eyes, readable notes, magical effects or invented faction symbols.\nSubject invariants: Androgynous adult Riftborn researcher, they/them, late thirties, slender, light olive skin, short untidy dark curls and hazel eyes with sleep shadows. Their own distinct face, not V or anyone from the style board. Moss-grey research coat/plum shirt, small satchel and ONE closed notebook. No readable research, invented Door symbols, portal, magic or faction insignia.\nRendering: original dark heroic tabletop-fantasy painting with recognizably anime-influenced character drawing, designed expressive eyes and grouped hair appropriate to THIS subject's age/species. Deep cool colored shadows, warm ivory focal light, substantial painted materials, selective sharp highlights and soft lost edges. Keep this subject's true skin, hair, cloth/stone/metal colors. No photographic skin, glossy 3D render or copied franchise design. Framing: horizontally centered complete head/hair/crown silhouette with comfortable top/side margins safe for a circular crop. Eye line around 40% of image height, chin near 65-70%, shoulders in the lower quarter, looking gently toward viewer. For the Guardian, this is its own carved nonhuman head/brow and upper stone shoulders, not a human head. Preserve age/build; do not de-age older people or lighten complexions. Keep faces readable at 64-pixel UI size. No raised hands, notebook or equipment covering the face. No scene, text, label, border, watermark, panels or effects. Plain charcoal neutral ground, legible outer silhouette, ONE portrait only."
+      },
+      "style_id": "severed-lands-dark-heroic-fantasy-k-v1"
     },
     {
       "id": "severed-npc-marla-cook",
@@ -1721,50 +1742,57 @@
           "path": "npcs/marla-cook.md",
           "sha256": "5d6144b10d9cf355da90d610ca5b92ce17b91cc83a234b0386e30c7c221ce00e",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/marla-cook.md",
+          "sha256": "be7e88c13d5a251d0fd1e9ff34ffca3f15b93c577a2bd7990208336af6e75ad6",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
         "appearance": "A humanlike adult Riftborn woman in her fifties with warm copper-brown skin, a broad sturdy build, dark auburn curls gathered in a loose bun and kind dark brown eyes. A warm observant expression. Rolled-sleeve terracotta shirt, a well-used pale linen apron over a dark full-length work skirt and sturdy flat shoes. A closed cloth knife roll hangs at her belt; no exposed knives or visible spice recipe. No jewelry, text, food effects or faction symbols.",
-        "full_body": {
-          "path": "assets/characters/f61f6eb8270e641ca26828f3c10a5bba17f3f81e028adf0c75edea2dc0a0c8b4.png",
-          "sha256": "f61f6eb8270e641ca26828f3c10a5bba17f3f81e028adf0c75edea2dc0a0c8b4"
-        },
-        "reference_sheet": {
-          "path": "assets/characters/fa7d1c50a730d5bcd38d7222d56c7e9be0a357d6a158db5bdd409110474210d2.png",
-          "sha256": "fa7d1c50a730d5bcd38d7222d56c7e9be0a357d6a158db5bdd409110474210d2"
-        },
-        "portrait": {
-          "path": "assets/characters/6d2f5303617dc3d6e2b9d8cb44b3b5032764d94e9f202e0500a5626b4c150d57.png",
-          "sha256": "6d2f5303617dc3d6e2b9d8cb44b3b5032764d94e9f202e0500a5626b4c150d57"
-        },
         "frame": {
           "x": 0.5,
           "y": 0.35,
           "zoom": 1
+        },
+        "full_body": {
+          "path": "assets/characters/710f70bd2bdd2a8db08fb5daa9d98bf3025a829fef5f94919dee198e3b34254a.png",
+          "sha256": "710f70bd2bdd2a8db08fb5daa9d98bf3025a829fef5f94919dee198e3b34254a"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/0f006364510b0f1931894618560b8cf91c81345b2120fe323e3898a6d2f1bdcf.png",
+          "sha256": "0f006364510b0f1931894618560b8cf91c81345b2120fe323e3898a6d2f1bdcf"
+        },
+        "portrait": {
+          "path": "assets/characters/91d1116b8cbda50cf5d0101671a5a5f6ece2b04c4495a01e1177734e31a239eb.png",
+          "sha256": "91d1116b8cbda50cf5d0101671a5a5f6ece2b04c4495a01e1177734e31a239eb"
         }
       },
       "outputs": {
         "full_body": {
           "width": 1024,
           "height": 1536,
-          "bytes": 2237565
+          "bytes": 2177595
         },
         "reference_sheet": {
           "width": 1536,
           "height": 1024,
-          "bytes": 2474183
+          "bytes": 2337998
         },
         "portrait": {
           "width": 1254,
           "height": 1254,
-          "bytes": 2501624
+          "bytes": 2274469
         }
       },
       "prompt_set": {
-        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Marla in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, tactile fabric and skin, plain light neutral backdrop, soft natural studio light and subtle ground shadow. Exactly one person standing naturally in a near-front three-quarter pose. Entire head, both hands and both feet comfortably inside the frame. Appearance: A humanlike adult Riftborn woman in her fifties with warm copper-brown skin, a broad sturdy build, dark auburn curls gathered in a loose bun and kind dark brown eyes. A warm observant expression. Rolled-sleeve terracotta shirt, a well-used pale linen apron over a dark full-length work skirt and sturdy flat shoes. A closed cloth knife roll hangs at her belt; no exposed knives or visible spice recipe. No jewelry, text, food effects or faction symbols. These unspecified visual details are editable defaults; preserve the authored identity and pronouns without adding history, powers or allegiances. No text, labels, borders, UI, scenery, extra people, duplicated limbs, glamour pose or oversized equipment.",
-        "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for Marla in Sylvia GM's Severed Lands. Input image 1 is the approved full-body identity reference. Preserve that exact person, facial structure, skin, age, hair, proportions, clothes, equipment and material colors. One landscape PNG, 1536x1024, polished naturalistic digital RPG illustration on the same plain light neutral backdrop. Show three separate complete standing views of this ONE person: front, true side and back, evenly spaced at matching scale, each entire head and both feet visible within margins. Include one smaller clear face study in remaining space without overlapping the figures. These are multiple views of one identity, never extra cast. Appearance: A humanlike adult Riftborn woman in her fifties with warm copper-brown skin, a broad sturdy build, dark auburn curls gathered in a loose bun and kind dark brown eyes. A warm observant expression. Rolled-sleeve terracotta shirt, a well-used pale linen apron over a dark full-length work skirt and sturdy flat shoes. A closed cloth knife roll hangs at her belt; no exposed knives or visible spice recipe. No jewelry, text, food effects or faction symbols. No text, labels, names, UI, scenery, decorative frames, invented symbols, open books, extra equipment or duplicated limbs.",
-        "portrait": "Use case: identity-preserve. Input image 1 is the EDIT TARGET portrait of Marla. Correct only the painted round cutout. Produce one full-bleed square PNG, 1024x1024. Fill all four white corner regions with the existing warm light-gray studio background, and naturally continue the existing shoulder fabric into the lower corners where it was cut off. The entire square must be filled edge-to-edge with continuous background and clothing. Preserve this exact face, hair, skin, expression, age, scar if present, clothing detail, lighting, head size and head position. Do not move or rescale the face. No circular or oval boundary, mask, vignette, white corner, frame, border, text or UI. This is a regular square head-and-shoulders image with no decorative shape."
-      }
+        "full_body": "Use case: style-transfer. Create ONE vertical 1024x1536 canonical FULL-BODY reference of Marla ONLY. The supplied K board is RENDERING STYLE ONLY. Do not copy its faces, hair, body types, costumes, props or poses. This subject follows the written appearance and authored canon. \nEstablished appearance: A humanlike adult Riftborn woman in her fifties with warm copper-brown skin, a broad sturdy build, dark auburn curls gathered in a loose bun and kind dark brown eyes. A warm observant expression. Rolled-sleeve terracotta shirt, a well-used pale linen apron over a dark full-length work skirt and sturdy flat shoes. A closed cloth knife roll hangs at her belt; no exposed knives or visible spice recipe. No jewelry, text, food effects or faction symbols.\nSubject invariants: An adult woman in her fifties, broad sturdy build, warm copper-brown skin, auburn curls in a loose bun, kind dark eyes. Rolled sleeves, terracotta shirt, pale linen apron and dark full-length work skirt. Her knife roll is CLOSED at the belt, with no exposed blade, spice mixture, recipe, jewelry or faction symbol. Warm attentive expression, no youthful de-aging or slender fashion-model build.\nRendering: original dark heroic tabletop-fantasy painting with recognizably anime-influenced character drawing, designed expressive eyes and grouped hair appropriate to THIS subject's age/species. Deep cool colored shadows, warm ivory focal light, substantial painted materials, selective sharp highlights and soft lost edges. Keep this subject's true skin, hair, cloth/stone/metal colors. No photographic skin, glossy 3D render or copied franchise design. Composition: ONE complete figure, near-front three-quarter reference stance, crown, hands, hems and boots fully inside generous top/bottom/side margins. Coherent hands, anatomy and gear. Plain deep charcoal neutral ground with enough edge contrast to inspect the silhouette. No scenery, writing, lettering, labels, border, inset portrait, extra people or extra views. This selected body will govern later multiview and portrait identity.",
+        "reference_sheet": "Use case: identity-preserve. Make a FOUR-VIEW canonical reference sheet of Marla, the ONE subject in image 1. The supplied body is authoritative identity AND approved rendering. Preserve this exact face/head, age, build, skin/eye/hair colors, clothing layers and all gear topology. No new design, mirrored item placement or extra props. \nEstablished appearance: A humanlike adult Riftborn woman in her fifties with warm copper-brown skin, a broad sturdy build, dark auburn curls gathered in a loose bun and kind dark brown eyes. A warm observant expression. Rolled-sleeve terracotta shirt, a well-used pale linen apron over a dark full-length work skirt and sturdy flat shoes. A closed cloth knife roll hangs at her belt; no exposed knives or visible spice recipe. No jewelry, text, food effects or faction symbols.\nSubject invariants: An adult woman in her fifties, broad sturdy build, warm copper-brown skin, auburn curls in a loose bun, kind dark eyes. Rolled sleeves, terracotta shirt, pale linen apron and dark full-length work skirt. Her knife roll is CLOSED at the belt, with no exposed blade, spice mixture, recipe, jewelry or faction symbol. Warm attentive expression, no youthful de-aging or slender fashion-model build.\nRendering: original dark heroic tabletop-fantasy painting with recognizably anime-influenced character drawing, designed expressive eyes and grouped hair appropriate to THIS subject's age/species. Deep cool colored shadows, warm ivory focal light, substantial painted materials, selective sharp highlights and soft lost edges. Keep this subject's true skin, hair, cloth/stone/metal colors. No photographic skin, glossy 3D render or copied franchise design. One LANDSCAPE 1536x1024 sheet with FRONT, THREE-QUARTER, SIDE and BACK views, all complete figures at equal scale. Complete crowns, hands, hems and boots inside generous margins; believable rotation of the same anatomy/gear. The Guardian remains the same asymmetrical stone/organic nonhuman construct from all sides; no human face or organs. No text, labels, numbers, border, extra panels, scenery, attack effects or additional characters. Plain charcoal neutral ground, enough silhouette contrast to inspect the full design.",
+        "portrait": "Use case: identity-preserve. Create ONE square 1024x1024 reusable head-and-shoulders PORTRAIT of Marla. Input 1 is the canonical body; input 2 is the exact multiview identity reference. Preserve the exact face/head, age, complexion, hair, eyes, upper clothing and any scar details. Do not redesign or blend faces with another character. \nEstablished appearance: A humanlike adult Riftborn woman in her fifties with warm copper-brown skin, a broad sturdy build, dark auburn curls gathered in a loose bun and kind dark brown eyes. A warm observant expression. Rolled-sleeve terracotta shirt, a well-used pale linen apron over a dark full-length work skirt and sturdy flat shoes. A closed cloth knife roll hangs at her belt; no exposed knives or visible spice recipe. No jewelry, text, food effects or faction symbols.\nSubject invariants: An adult woman in her fifties, broad sturdy build, warm copper-brown skin, auburn curls in a loose bun, kind dark eyes. Rolled sleeves, terracotta shirt, pale linen apron and dark full-length work skirt. Her knife roll is CLOSED at the belt, with no exposed blade, spice mixture, recipe, jewelry or faction symbol. Warm attentive expression, no youthful de-aging or slender fashion-model build.\nRendering: original dark heroic tabletop-fantasy painting with recognizably anime-influenced character drawing, designed expressive eyes and grouped hair appropriate to THIS subject's age/species. Deep cool colored shadows, warm ivory focal light, substantial painted materials, selective sharp highlights and soft lost edges. Keep this subject's true skin, hair, cloth/stone/metal colors. No photographic skin, glossy 3D render or copied franchise design. Framing: horizontally centered complete head/hair/crown silhouette with comfortable top/side margins safe for a circular crop. Eye line around 40% of image height, chin near 65-70%, shoulders in the lower quarter, looking gently toward viewer. For the Guardian, this is its own carved nonhuman head/brow and upper stone shoulders, not a human head. Preserve age/build; do not de-age older people or lighten complexions. Keep faces readable at 64-pixel UI size. No raised hands, notebook or equipment covering the face. No scene, text, label, border, watermark, panels or effects. Plain charcoal neutral ground, legible outer silhouette, ONE portrait only."
+      },
+      "style_id": "severed-lands-dark-heroic-fantasy-k-v1"
     },
     {
       "id": "severed-npc-waystation-healer",
@@ -1781,50 +1809,57 @@
           "path": "npcs/waystation-healer.md",
           "sha256": "d31557e4c00ca9cd326d1fed25142d40b60730c8d1ba769e7aca53c661f3bfc1",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/waystation-healer.md",
+          "sha256": "181827c549d227053b7bc8e5a6d76bdc40cebed2057dd2c19edb212f7b2e171d",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
         "appearance": "A humanlike adult Riftborn woman in her early fifties with deep brown skin, an average sturdy build, short silver-streaked braids and calm dark eyes. A patient composed expression. Plain undyed linen clinic tunic with rolled sleeves, muted blue-gray trousers, practical shoes and a small cloth pouch holding a visible clean folded bandage. Empty relaxed hands. No surgical instruments, magical glow, blood, faction emblems or modern medical logos.",
-        "full_body": {
-          "path": "assets/characters/49e72cbac6a856d9bded187acec11242e51055bb36174631973664fb906d960c.png",
-          "sha256": "49e72cbac6a856d9bded187acec11242e51055bb36174631973664fb906d960c"
-        },
-        "reference_sheet": {
-          "path": "assets/characters/6b759baa23eb3d323354a32cb9f6a16b45b4a452b7f483563a817703f9226e0b.png",
-          "sha256": "6b759baa23eb3d323354a32cb9f6a16b45b4a452b7f483563a817703f9226e0b"
-        },
-        "portrait": {
-          "path": "assets/characters/5b0b64dc6a685452ed330e30a1e4aa018e468b1356be95e098d35b9cbb5903e3.png",
-          "sha256": "5b0b64dc6a685452ed330e30a1e4aa018e468b1356be95e098d35b9cbb5903e3"
-        },
         "frame": {
           "x": 0.5,
           "y": 0.35,
           "zoom": 1
+        },
+        "full_body": {
+          "path": "assets/characters/b5ec6ef3dfc14186c798fd946ba980d7ef048b8f8e33e6d16a99298e4e0271f5.png",
+          "sha256": "b5ec6ef3dfc14186c798fd946ba980d7ef048b8f8e33e6d16a99298e4e0271f5"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/791011d6613d614914d9cb20d4803b3df2d09f902334d08d65f00ba623e53639.png",
+          "sha256": "791011d6613d614914d9cb20d4803b3df2d09f902334d08d65f00ba623e53639"
+        },
+        "portrait": {
+          "path": "assets/characters/c527bf1ee36cfabab3c32112fec057b30d2bbd099f7f85624ae9672b13141b47.png",
+          "sha256": "c527bf1ee36cfabab3c32112fec057b30d2bbd099f7f85624ae9672b13141b47"
         }
       },
       "outputs": {
         "full_body": {
           "width": 1024,
           "height": 1536,
-          "bytes": 2105853
+          "bytes": 2035375
         },
         "reference_sheet": {
           "width": 1536,
           "height": 1024,
-          "bytes": 2292563
+          "bytes": 2153449
         },
         "portrait": {
           "width": 1254,
           "height": 1254,
-          "bytes": 2511817
+          "bytes": 2189405
         }
       },
       "prompt_set": {
-        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Henna in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, tactile fabric and skin, plain light neutral backdrop, soft natural studio light and subtle ground shadow. Exactly one person standing naturally in a near-front three-quarter pose. Entire head, both hands and both feet comfortably inside the frame. Appearance: A humanlike adult Riftborn woman in her early fifties with deep brown skin, an average sturdy build, short silver-streaked braids and calm dark eyes. A patient composed expression. Plain undyed linen clinic tunic with rolled sleeves, muted blue-gray trousers, practical shoes and a small cloth pouch holding a visible clean folded bandage. Empty relaxed hands. No surgical instruments, magical glow, blood, faction emblems or modern medical logos. These unspecified visual details are editable defaults; preserve the authored identity and pronouns without adding history, powers or allegiances. No text, labels, borders, UI, scenery, extra people, duplicated limbs, glamour pose or oversized equipment.",
-        "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for Henna in Sylvia GM's Severed Lands. Input image 1 is the approved full-body identity reference. Preserve that exact person, facial structure, skin, age, hair, proportions, clothes, equipment and material colors. One landscape PNG, 1536x1024, polished naturalistic digital RPG illustration on the same plain light neutral backdrop. Show three separate complete standing views of this ONE person: front, true side and back, evenly spaced at matching scale, each entire head and both feet visible within margins. Include one smaller clear face study in remaining space without overlapping the figures. These are multiple views of one identity, never extra cast. Appearance: A humanlike adult Riftborn woman in her early fifties with deep brown skin, an average sturdy build, short silver-streaked braids and calm dark eyes. A patient composed expression. Plain undyed linen clinic tunic with rolled sleeves, muted blue-gray trousers, practical shoes and a small cloth pouch holding a visible clean folded bandage. Empty relaxed hands. No surgical instruments, magical glow, blood, faction emblems or modern medical logos. No text, labels, names, UI, scenery, decorative frames, invented symbols, open books, extra equipment or duplicated limbs.",
-        "portrait": "Use case: identity-preserve. Production reusable square portrait for Henna in Sylvia GM's Severed Lands. Input image 1 is the canonical full-body identity; input image 2 is that person's multiview reference sheet. Preserve this exact face, facial structure, skin tone, age, hair, expression, clothing and identity. One full-bleed square PNG, 1024x1024. Polished naturalistic digital RPG illustration with a continuous plain warm light-gray studio background extending all the way to all four corners and edges. Exactly one head-and-shoulders portrait, nearly frontal with a slight three-quarter turn. Standardized framing: face horizontally centered; both eyes about 35 percent down; top of all hair about 10 percent down; chin about 65 percent; shoulders filling lower quarter. Keep the entire hairstyle, jaw and neck visible, with comfortable room around the head. Clothing continues naturally to lower edges. Do not show hands, full body, held books or extra objects. Identity description: A humanlike adult Riftborn woman in her early fifties with deep brown skin, an average sturdy build, short silver-streaked braids and calm dark eyes. A patient composed expression. Plain undyed linen clinic tunic with rolled sleeves, muted blue-gray trousers, practical shoes and a small cloth pouch holding a visible clean folded bandage. Empty relaxed hands. No surgical instruments, magical glow, blood, faction emblems or modern medical logos. No circular or oval shape, cutout, white corners, vignette, frame, border, text, labels, UI, scene, extra faces or glamour changes."
-      }
+        "full_body": "Use case: style-transfer. Create ONE vertical 1024x1536 canonical FULL-BODY reference of Henna ONLY. The supplied K board is RENDERING STYLE ONLY. Do not copy its faces, hair, body types, costumes, props or poses. This subject follows the written appearance and authored canon. \nEstablished appearance: A humanlike adult Riftborn woman in her early fifties with deep brown skin, an average sturdy build, short silver-streaked braids and calm dark eyes. A patient composed expression. Plain undyed linen clinic tunic with rolled sleeves, muted blue-gray trousers, practical shoes and a small cloth pouch holding a visible clean folded bandage. Empty relaxed hands. No surgical instruments, magical glow, blood, faction emblems or modern medical logos.\nSubject invariants: A calm competent woman in her early fifties, deep brown skin, sturdy average build, short silver-streaked braids and patient dark eyes. Undyed linen clinic tunic, rolled sleeves, blue-grey trousers, small cloth pouch with a clean folded bandage. Empty relaxed hands. No modern medical logo, surgical instrument, blood, religious icon or healer magic. Do not de-age or lighten her complexion.\nRendering: original dark heroic tabletop-fantasy painting with recognizably anime-influenced character drawing, designed expressive eyes and grouped hair appropriate to THIS subject's age/species. Deep cool colored shadows, warm ivory focal light, substantial painted materials, selective sharp highlights and soft lost edges. Keep this subject's true skin, hair, cloth/stone/metal colors. No photographic skin, glossy 3D render or copied franchise design. Composition: ONE complete figure, near-front three-quarter reference stance, crown, hands, hems and boots fully inside generous top/bottom/side margins. Coherent hands, anatomy and gear. Plain deep charcoal neutral ground with enough edge contrast to inspect the silhouette. No scenery, writing, lettering, labels, border, inset portrait, extra people or extra views. This selected body will govern later multiview and portrait identity.",
+        "reference_sheet": "Use case: identity-preserve. Make a FOUR-VIEW canonical reference sheet of Henna, the ONE subject in image 1. The supplied body is authoritative identity AND approved rendering. Preserve this exact face/head, age, build, skin/eye/hair colors, clothing layers and all gear topology. No new design, mirrored item placement or extra props. \nEstablished appearance: A humanlike adult Riftborn woman in her early fifties with deep brown skin, an average sturdy build, short silver-streaked braids and calm dark eyes. A patient composed expression. Plain undyed linen clinic tunic with rolled sleeves, muted blue-gray trousers, practical shoes and a small cloth pouch holding a visible clean folded bandage. Empty relaxed hands. No surgical instruments, magical glow, blood, faction emblems or modern medical logos.\nSubject invariants: A calm competent woman in her early fifties, deep brown skin, sturdy average build, short silver-streaked braids and patient dark eyes. Undyed linen clinic tunic, rolled sleeves, blue-grey trousers, small cloth pouch with a clean folded bandage. Empty relaxed hands. No modern medical logo, surgical instrument, blood, religious icon or healer magic. Do not de-age or lighten her complexion.\nRendering: original dark heroic tabletop-fantasy painting with recognizably anime-influenced character drawing, designed expressive eyes and grouped hair appropriate to THIS subject's age/species. Deep cool colored shadows, warm ivory focal light, substantial painted materials, selective sharp highlights and soft lost edges. Keep this subject's true skin, hair, cloth/stone/metal colors. No photographic skin, glossy 3D render or copied franchise design. One LANDSCAPE 1536x1024 sheet with FRONT, THREE-QUARTER, SIDE and BACK views, all complete figures at equal scale. Complete crowns, hands, hems and boots inside generous margins; believable rotation of the same anatomy/gear. The Guardian remains the same asymmetrical stone/organic nonhuman construct from all sides; no human face or organs. No text, labels, numbers, border, extra panels, scenery, attack effects or additional characters. Plain charcoal neutral ground, enough silhouette contrast to inspect the full design.",
+        "portrait": "Use case: identity-preserve. Create ONE square 1024x1024 reusable head-and-shoulders PORTRAIT of Henna. Input 1 is the canonical body; input 2 is the exact multiview identity reference. Preserve the exact face/head, age, complexion, hair, eyes, upper clothing and any scar details. Do not redesign or blend faces with another character. \nEstablished appearance: A humanlike adult Riftborn woman in her early fifties with deep brown skin, an average sturdy build, short silver-streaked braids and calm dark eyes. A patient composed expression. Plain undyed linen clinic tunic with rolled sleeves, muted blue-gray trousers, practical shoes and a small cloth pouch holding a visible clean folded bandage. Empty relaxed hands. No surgical instruments, magical glow, blood, faction emblems or modern medical logos.\nSubject invariants: A calm competent woman in her early fifties, deep brown skin, sturdy average build, short silver-streaked braids and patient dark eyes. Undyed linen clinic tunic, rolled sleeves, blue-grey trousers, small cloth pouch with a clean folded bandage. Empty relaxed hands. No modern medical logo, surgical instrument, blood, religious icon or healer magic. Do not de-age or lighten her complexion.\nRendering: original dark heroic tabletop-fantasy painting with recognizably anime-influenced character drawing, designed expressive eyes and grouped hair appropriate to THIS subject's age/species. Deep cool colored shadows, warm ivory focal light, substantial painted materials, selective sharp highlights and soft lost edges. Keep this subject's true skin, hair, cloth/stone/metal colors. No photographic skin, glossy 3D render or copied franchise design. Framing: horizontally centered complete head/hair/crown silhouette with comfortable top/side margins safe for a circular crop. Eye line around 40% of image height, chin near 65-70%, shoulders in the lower quarter, looking gently toward viewer. For the Guardian, this is its own carved nonhuman head/brow and upper stone shoulders, not a human head. Preserve age/build; do not de-age older people or lighten complexions. Keep faces readable at 64-pixel UI size. No raised hands, notebook or equipment covering the face. No scene, text, label, border, watermark, panels or effects. Plain charcoal neutral ground, legible outer silhouette, ONE portrait only."
+      },
+      "style_id": "severed-lands-dark-heroic-fantasy-k-v1"
     },
     {
       "id": "severed-npc-waystation-smith",
@@ -1841,50 +1876,57 @@
           "path": "npcs/waystation-smith.md",
           "sha256": "a03032436bcd0b6a97125dd8c6983b32ccce06febd9d1de3193e4665b4a2d71e",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/waystation-smith.md",
+          "sha256": "d0e187624f015c9a4b829cfe023e15e4fe90d3e757e2c95e8deb3cd34f3a962b",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
         "appearance": "An adult Human woman in her early forties with sun-browned freckled skin, a muscular broad-shouldered build, brown hair tied into a short practical ponytail, a square face and gray-green eyes. A blunt level appraising expression. Charcoal rolled-sleeve shirt, a heavy worn brown leather smith's apron, plain dark trousers and reinforced work boots; a small plain hammer rests in a belt loop. Faint soot on forearms and apron. No house crest, political symbol, weapon, jewelry or magic.",
-        "full_body": {
-          "path": "assets/characters/ef276d7776ad8cdf0e563b0718a3250702b06be15b7aa652200f82220f588187.png",
-          "sha256": "ef276d7776ad8cdf0e563b0718a3250702b06be15b7aa652200f82220f588187"
-        },
-        "reference_sheet": {
-          "path": "assets/characters/eaa6bf065dbafd5c6559a5641e9f3937ef549dbf521de6fbee68f9c96b0858f9.png",
-          "sha256": "eaa6bf065dbafd5c6559a5641e9f3937ef549dbf521de6fbee68f9c96b0858f9"
-        },
-        "portrait": {
-          "path": "assets/characters/9e69568b684f9a5a43b3f49160b909e53fc407479596ad234050185e6470673e.png",
-          "sha256": "9e69568b684f9a5a43b3f49160b909e53fc407479596ad234050185e6470673e"
-        },
         "frame": {
           "x": 0.5,
           "y": 0.35,
           "zoom": 1
+        },
+        "full_body": {
+          "path": "assets/characters/7154ed9699296993673c26a3ec3a9feb27f0949201c5b3267f83c1148db4a2f9.png",
+          "sha256": "7154ed9699296993673c26a3ec3a9feb27f0949201c5b3267f83c1148db4a2f9"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/50a6ccdad7fc876a840e59e7f579205fb4b93be8d9195b574dffc81174e6209e.png",
+          "sha256": "50a6ccdad7fc876a840e59e7f579205fb4b93be8d9195b574dffc81174e6209e"
+        },
+        "portrait": {
+          "path": "assets/characters/89f5e376f42931de86837a7c750c907eaa3f511edc41658b7f12271494104b8c.png",
+          "sha256": "89f5e376f42931de86837a7c750c907eaa3f511edc41658b7f12271494104b8c"
         }
       },
       "outputs": {
         "full_body": {
           "width": 1024,
           "height": 1536,
-          "bytes": 2050973
+          "bytes": 2014705
         },
         "reference_sheet": {
           "width": 1536,
           "height": 1024,
-          "bytes": 2276826
+          "bytes": 2155459
         },
         "portrait": {
           "width": 1254,
           "height": 1254,
-          "bytes": 2473389
+          "bytes": 2110469
         }
       },
       "prompt_set": {
-        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Anvil in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, tactile fabric and skin, plain light neutral backdrop, soft natural studio light and subtle ground shadow. Exactly one person standing naturally in a near-front three-quarter pose. Entire head, both hands and both feet comfortably inside the frame. Appearance: An adult Human woman in her early forties with sun-browned freckled skin, a muscular broad-shouldered build, brown hair tied into a short practical ponytail, a square face and gray-green eyes. A blunt level appraising expression. Charcoal rolled-sleeve shirt, a heavy worn brown leather smith's apron, plain dark trousers and reinforced work boots; a small plain hammer rests in a belt loop. Faint soot on forearms and apron. No house crest, political symbol, weapon, jewelry or magic. These unspecified visual details are editable defaults; preserve the authored identity and pronouns without adding history, powers or allegiances. No text, labels, borders, UI, scenery, extra people, duplicated limbs, glamour pose or oversized equipment.",
-        "reference_sheet": "Use case: identity-preserve. Production multiview reference sheet for Anvil in Sylvia GM's Severed Lands. Input image 1 is the approved full-body identity reference. Preserve that exact person, facial structure, skin, age, hair, proportions, clothes, equipment and material colors. One landscape PNG, 1536x1024, polished naturalistic digital RPG illustration on the same plain light neutral backdrop. Show three separate complete standing views of this ONE person: front, true side and back, evenly spaced at matching scale, each entire head and both feet visible within margins. Include one smaller clear face study in remaining space without overlapping the figures. These are multiple views of one identity, never extra cast. Appearance: An adult Human woman in her early forties with sun-browned freckled skin, a muscular broad-shouldered build, brown hair tied into a short practical ponytail, a square face and gray-green eyes. A blunt level appraising expression. Charcoal rolled-sleeve shirt, a heavy worn brown leather smith's apron, plain dark trousers and reinforced work boots; a small plain hammer rests in a belt loop. Faint soot on forearms and apron. No house crest, political symbol, weapon, jewelry or magic. No text, labels, names, UI, scenery, decorative frames, invented symbols, open books, extra equipment or duplicated limbs.",
-        "portrait": "Use case: identity-preserve. Production reusable square portrait for Anvil in Sylvia GM's Severed Lands. Input image 1 is the canonical full-body identity; input image 2 is that person's multiview reference sheet. Preserve this exact face, facial structure, skin tone, age, hair, expression, clothing and identity. One full-bleed square PNG, 1024x1024. Polished naturalistic digital RPG illustration with a continuous plain warm light-gray studio background extending all the way to all four corners and edges. Exactly one head-and-shoulders portrait, nearly frontal with a slight three-quarter turn. Standardized framing: face horizontally centered; both eyes about 35 percent down; top of all hair about 10 percent down; chin about 65 percent; shoulders filling lower quarter. Keep the entire hairstyle, jaw and neck visible, with comfortable room around the head. Clothing continues naturally to lower edges. Do not show hands, full body, held books or extra objects. Identity description: An adult Human woman in her early forties with sun-browned freckled skin, a muscular broad-shouldered build, brown hair tied into a short practical ponytail, a square face and gray-green eyes. A blunt level appraising expression. Charcoal rolled-sleeve shirt, a heavy worn brown leather smith's apron, plain dark trousers and reinforced work boots; a small plain hammer rests in a belt loop. Faint soot on forearms and apron. No house crest, political symbol, weapon, jewelry or magic. No circular or oval shape, cutout, white corners, vignette, frame, border, text, labels, UI, scene, extra faces or glamour changes."
-      }
+        "full_body": "Use case: style-transfer. Create ONE vertical 1024x1536 canonical FULL-BODY reference of Anvil ONLY. The supplied K board is RENDERING STYLE ONLY. Do not copy its faces, hair, body types, costumes, props or poses. This subject follows the written appearance and authored canon. \nEstablished appearance: An adult Human woman in her early forties with sun-browned freckled skin, a muscular broad-shouldered build, brown hair tied into a short practical ponytail, a square face and gray-green eyes. A blunt level appraising expression. Charcoal rolled-sleeve shirt, a heavy worn brown leather smith's apron, plain dark trousers and reinforced work boots; a small plain hammer rests in a belt loop. Faint soot on forearms and apron. No house crest, political symbol, weapon, jewelry or magic.\nSubject invariants: A muscular broad-shouldered Human woman in her early forties, sun-browned freckled skin, square face, grey-green eyes and short practical brown ponytail. Charcoal work shirt, heavy worn leather smith apron and reinforced boots, faint soot. ONE small ordinary work hammer rests in a belt loop, not raised as a weapon. Empty hands, blunt level expression, no jewelry, House Dorn crest, political symbol or magic. Preserve an actual working smith's build and protective work clothes.\nRendering: original dark heroic tabletop-fantasy painting with recognizably anime-influenced character drawing, designed expressive eyes and grouped hair appropriate to THIS subject's age/species. Deep cool colored shadows, warm ivory focal light, substantial painted materials, selective sharp highlights and soft lost edges. Keep this subject's true skin, hair, cloth/stone/metal colors. No photographic skin, glossy 3D render or copied franchise design. Composition: ONE complete figure, near-front three-quarter reference stance, crown, hands, hems and boots fully inside generous top/bottom/side margins. Coherent hands, anatomy and gear. Plain deep charcoal neutral ground with enough edge contrast to inspect the silhouette. No scenery, writing, lettering, labels, border, inset portrait, extra people or extra views. This selected body will govern later multiview and portrait identity.",
+        "reference_sheet": "Use case: identity-preserve. Make a FOUR-VIEW canonical reference sheet of Anvil, the ONE subject in image 1. The supplied body is authoritative identity AND approved rendering. Preserve this exact face/head, age, build, skin/eye/hair colors, clothing layers and all gear topology. No new design, mirrored item placement or extra props. \nEstablished appearance: An adult Human woman in her early forties with sun-browned freckled skin, a muscular broad-shouldered build, brown hair tied into a short practical ponytail, a square face and gray-green eyes. A blunt level appraising expression. Charcoal rolled-sleeve shirt, a heavy worn brown leather smith's apron, plain dark trousers and reinforced work boots; a small plain hammer rests in a belt loop. Faint soot on forearms and apron. No house crest, political symbol, weapon, jewelry or magic.\nSubject invariants: A muscular broad-shouldered Human woman in her early forties, sun-browned freckled skin, square face, grey-green eyes and short practical brown ponytail. Charcoal work shirt, heavy worn leather smith apron and reinforced boots, faint soot. ONE small ordinary work hammer rests in a belt loop, not raised as a weapon. Empty hands, blunt level expression, no jewelry, House Dorn crest, political symbol or magic. Preserve an actual working smith's build and protective work clothes.\nRendering: original dark heroic tabletop-fantasy painting with recognizably anime-influenced character drawing, designed expressive eyes and grouped hair appropriate to THIS subject's age/species. Deep cool colored shadows, warm ivory focal light, substantial painted materials, selective sharp highlights and soft lost edges. Keep this subject's true skin, hair, cloth/stone/metal colors. No photographic skin, glossy 3D render or copied franchise design. One LANDSCAPE 1536x1024 sheet with FRONT, THREE-QUARTER, SIDE and BACK views, all complete figures at equal scale. Complete crowns, hands, hems and boots inside generous margins; believable rotation of the same anatomy/gear. The Guardian remains the same asymmetrical stone/organic nonhuman construct from all sides; no human face or organs. No text, labels, numbers, border, extra panels, scenery, attack effects or additional characters. Plain charcoal neutral ground, enough silhouette contrast to inspect the full design.",
+        "portrait": "Use case: identity-preserve. Create ONE square 1024x1024 reusable head-and-shoulders PORTRAIT of Anvil. Input 1 is the canonical body; input 2 is the exact multiview identity reference. Preserve the exact face/head, age, complexion, hair, eyes, upper clothing and any scar details. Do not redesign or blend faces with another character. \nEstablished appearance: An adult Human woman in her early forties with sun-browned freckled skin, a muscular broad-shouldered build, brown hair tied into a short practical ponytail, a square face and gray-green eyes. A blunt level appraising expression. Charcoal rolled-sleeve shirt, a heavy worn brown leather smith's apron, plain dark trousers and reinforced work boots; a small plain hammer rests in a belt loop. Faint soot on forearms and apron. No house crest, political symbol, weapon, jewelry or magic.\nSubject invariants: A muscular broad-shouldered Human woman in her early forties, sun-browned freckled skin, square face, grey-green eyes and short practical brown ponytail. Charcoal work shirt, heavy worn leather smith apron and reinforced boots, faint soot. ONE small ordinary work hammer rests in a belt loop, not raised as a weapon. Empty hands, blunt level expression, no jewelry, House Dorn crest, political symbol or magic. Preserve an actual working smith's build and protective work clothes.\nRendering: original dark heroic tabletop-fantasy painting with recognizably anime-influenced character drawing, designed expressive eyes and grouped hair appropriate to THIS subject's age/species. Deep cool colored shadows, warm ivory focal light, substantial painted materials, selective sharp highlights and soft lost edges. Keep this subject's true skin, hair, cloth/stone/metal colors. No photographic skin, glossy 3D render or copied franchise design. Framing: horizontally centered complete head/hair/crown silhouette with comfortable top/side margins safe for a circular crop. Eye line around 40% of image height, chin near 65-70%, shoulders in the lower quarter, looking gently toward viewer. For the Guardian, this is its own carved nonhuman head/brow and upper stone shoulders, not a human head. Preserve age/build; do not de-age older people or lighten complexions. Keep faces readable at 64-pixel UI size. No raised hands, notebook or equipment covering the face. No scene, text, label, border, watermark, panels or effects. Plain charcoal neutral ground, legible outer silhouette, ONE portrait only."
+      },
+      "style_id": "severed-lands-dark-heroic-fantasy-k-v1"
     },
     {
       "id": "severed-npc-the-quartermaster",
@@ -12843,6 +12885,54 @@
       "campaign_setting_id": "pneuma.severed-lands",
       "document": "---\nname: \"Saffron\"\nrole: \"Thornwall herbalist, Warrens healer\"\ndisposition: \"Ally\"\nspecies: \"Human (settled)\"\nlocation: \"Thornwall market, Warrens\"\n---\n\n# Saffron\n\nSaffron runs a herbalist stall in the Thornwall market by day and a free clinic in the Warrens by night. She's settled — born in Thornwall, never been through the Rift — but she's spent enough time in the Warrens to know that the council's policies are killing people. She doesn't make a political statement about it. She just keeps showing up with medicine.\n\nHer knowledge of Rift-touched conditions is largely self-taught — the Athenaeum's medical texts don't cover Warrens-level care, and Saffron has had to figure out on her own what helps and what makes things worse. She's made mistakes. She's learned from them. She's saved more lives than Thornwall's official healers.\n\n## Personality\n\nSaffron is tired, compassionate, and quietly furious at the system she works within. She doesn't waste energy on anger. She uses it on patients. Her hands are steady. Her diagnostic eye is sharp. Her supply of Rift-burn salve is always running low.\n\n## Appearance and artwork\n\nAn adult Human woman in her late forties with medium brown skin, dark brown eyes, a narrow softly lined face and straight black hair with gray strands, center-parted and tied in a long practical braid. A muted forest-green wrap tunic, beige linen work apron, plain brown belt, long dark skirt and comfortable dark leather shoes. A small plain linen medical shoulder bag and a tied bundle of dried herbs held at waist level. Steady posture, tired compassionate expression and clear attentive eyes.\n\nThis prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.\n\n[Portrait](../assets/characters/2579873c5819ffcbd7bc80990b74b1b6b784ff96a1a34a32f17ba881450a885e.png)\n\n[Full-body reference](../assets/characters/45993c405459111af401793a20b5ca08ccebb635a77f4d8f01942d1abe59797e.png)\n\n[Multiview reference sheet](../assets/characters/d1e7f8041f038b1d20778dfc72e4ddcb4fc3f0850324165e1f1c734957473a7f.png)\n",
       "source_commit": "690fe7811f3e131850fc30710cb9e265bc714860"
+    },
+    {
+      "package_id": "pneuma.severed-lands",
+      "path": "content/monsters/anchor-guardian-flesh.md",
+      "sha256": "a1d130d4a909a23e5a875874631ddaac7db01b88cdd4b31ee4df6a1683be88da",
+      "campaign_setting_id": "pneuma.severed-lands",
+      "document": "---\nname: \"Anchor Guardian\"\nsize: Medium\ntype: construct\ncr: '5'\nxp: 1800\nac: 9\nhp: 93\nhit_dice: 11d8 + 44\nspeed: 30 ft.\nstats:\n  str: 19\n  dex: 9\n  con: 18\n  int: 6\n  wis: 10\n  cha: 5\nsaves: {}\nskills: {}\nsenses:\n  darkvision: 60 ft.\n  passive_perception: 10\nlanguages: understands its creator's language but can't speak\nhabitat:\n- urban\ndamage_immunities:\n- lightning\n- poison\n- bludgeoning/piercing/slashing from nonmagical non-adamantine weapons\ncondition_immunities:\n- charmed\n- exhaustion\n- frightened\n- paralyzed\n- petrified\n- poisoned\n---\nA grotesque fusion of Warden construction and Rift-touched flesh — an Anchor Door guardian that has absorbed organic matter into its stone frame over centuries of exposure. It pulses with a sickly blend of Warden-craft and Rift energy, its attacks carrying both ancient precision and feral hunger.\n## Traits\n**Berserk.** When starting turn with 40 HP or fewer, roll d6. On 6, the golem goes berserk, attacking the nearest creature. On a 1, the golem stops attacking its current target and targets the nearest creature instead.\n**Aversion of Fire.** If the golem takes fire damage, it has disadvantage on attack rolls and ability checks until the end of its next turn.\n**Immutable Form.** Immune to any spell or effect that would alter its form.\n**Lightning Absorption.** Whenever the golem is subjected to lightning damage, it takes no damage and instead regains HP equal to the lightning damage dealt.\n**Magic Resistance.** Advantage on saves against spells.\n\n## Actions\n**Multiattack.** Two slam attacks.\n**Slam.** +7 to hit, 13 (2d8 + 4) bludgeoning.\n\n## Appearance and artwork\n\nA hulking roughly human-shaped Warden stone guardian with a broad heavy torso, thick asymmetrical stone limbs and blunt stony hands, fused with sealed muted gray-brown organic tissue along joints and cracks. Worn pale-gray carved stone plates, restrained angular Warden masonry and small sickly violet Rift glimmers inside a few seams. Heavy impassive carved stone brow and narrow dim eye slits, no human face. Ancient precise construction mixed with an uneasy living posture. No exposed organs, gore, armor, clothing, weapons or faction heraldry.\n\nThis prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.\n\n[Portrait](../../assets/characters/c6bea40d00c94b47af7e4ec8b85042c9f1e87fde898220468d6728755ade5450.png)\n\n[Full-body reference](../../assets/characters/490bec00a1aa0a8ed147116aac054609ac745c1ea464dbe5c8dde1cf17381409.png)\n\n[Multiview reference sheet](../../assets/characters/3b0657c5968e06687cbe3149b7e4ff81659be4a7038b008285e5c074230ec589.png)\n",
+      "source_commit": "a643c80e3c0f932fbce39eb81738fc43e68efee1"
+    },
+    {
+      "package_id": "pneuma.severed-lands",
+      "path": "npcs/patrol-veteran-stern.md",
+      "sha256": "1eb029def2204157d617cf9ac720d102dc7cda8f3477c50a516fbed1b578a47e",
+      "campaign_setting_id": "pneuma.severed-lands",
+      "document": "---\nname: \"Stern\"\nrole: \"Returner patrol veteran\"\ndisposition: \"Ally\"\nspecies: \"Riftborn (home world — military)\"\nlocation: \"Waystation, field patrols\"\n---\n\n# Stern\n\nStern is a Returner patrol veteran — eight years in the field, more encounters than she's bothered to count, a scar across her jaw from a riftbeast claw that she doesn't talk about. She leads the most experienced patrol at Waystation. Her team has the lowest casualty rate and the highest artifact recovery rate. These statistics are related.\n\nStern doesn't give speeches. She doesn't inspire. She prepares — equipment checks, route planning, contingency drills. Her patrol members know exactly what to do in every situation because Stern has made them practice every situation. It's not exciting. It's effective.\n\nShe's lost patrol members. She remembers every one. Their names are in a notebook she keeps in her kit, separate from her patrol logs. She doesn't show it to anyone. She doesn't need to.\n\n## Personality\n\nStern is disciplined, unsentimental, and carrying her losses privately. She treats patrol leadership as a sacred responsibility. The patrol comes back. That's the only metric that matters.\n\n## Appearance and artwork\n\nA humanlike adult Riftborn woman in her late forties with dark brown skin, a strong lean build, short salt-and-pepper hair, dark eyes and one healed claw scar across her jaw. Quiet vigilant expression. Practical patched dark olive patrol leathers over a charcoal shirt, plain trousers, sturdy worn boots and a compact belt kit. A closed personal notebook stays inside a closed belt pouch. No emblems, medals, exposed notebook pages or visible magical effects.\n\nThis prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.\n\n[Portrait](../assets/characters/458e6a0aa402aff8fb22d1ea9ce48c1f1f26c6daed1b908f6b20951bc786205a.png)\n\n[Full-body reference](../assets/characters/9d83f6c5bedeeaa58f1eb9e25520bd8324e7cd8c84eb9eb38ac45b1bbc9f8ef7.png)\n\n[Multiview reference sheet](../assets/characters/6b6fd5ec67d9643a6d968cf570d3f69ace954dcf1801926f439ede375baad89e.png)\n",
+      "source_commit": "a643c80e3c0f932fbce39eb81738fc43e68efee1"
+    },
+    {
+      "package_id": "pneuma.severed-lands",
+      "path": "npcs/researcher-linden.md",
+      "sha256": "4ebf579856662a320dec17fa161f89a517fb12e24f4975e5208b9992bcbf8019",
+      "campaign_setting_id": "pneuma.severed-lands",
+      "document": "---\nname: \"Linden\"\nrole: \"Returner Door researcher\"\ndisposition: \"Ally\"\nspecies: \"Riftborn (home world — academic)\"\nlocation: \"Waystation (Door chamber)\"\n---\n\n# Linden\n\nLinden is one of V's senior Door researchers — a Riftborn from a world of universities and peer review, who's had to adapt to a research environment where \"peer review\" means \"the other researcher in the room.\" They've been studying the dormant Door for eight years. They know its fluctuations better than they know their own sleep schedule.\n\nLinden is the researcher who documented the Door's first flicker — three seconds of violet light, scorch marks on the cavern walls, and a frequency spike that their instruments are still trying to explain. They've been chasing that spike ever since. They're convinced it's a pattern — the Door communicating something, if they can just decode it.\n\n## Personality\n\nObsessive, brilliant, and perpetually sleep-deprived. Linden treats the Door like a conversation partner who only speaks in fragments. They've filled seventeen notebooks with observations. They're on their eighteenth.\n\n## Appearance and artwork\n\nA humanlike androgynous adult Riftborn in their late thirties with light olive skin, a slender build, untidy short dark curls, hazel eyes and visible sleep shadows. An absorbed thoughtful expression. A worn moss-gray research coat over a muted plum shirt, charcoal trousers, scuffed ankle boots and a small shoulder satchel. Holds one closed plain notebook. No glowing eyes, readable notes, magical effects or invented faction symbols.\n\nThis prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.\n\n[Portrait](../assets/characters/078863ebdc04b1fd453c449256c3d28be104cbb1cb0407e58165c05a39541e98.png)\n\n[Full-body reference](../assets/characters/59d9d0d90ee27ac631f7420c8ea063d9782e17732489694f81acf3605bdc342f.png)\n\n[Multiview reference sheet](../assets/characters/646f0c74bbe391942dc2b8b3bf7ab662a6f52f4391ad7e48f44cd33e04e12918.png)\n",
+      "source_commit": "a643c80e3c0f932fbce39eb81738fc43e68efee1"
+    },
+    {
+      "package_id": "pneuma.severed-lands",
+      "path": "npcs/marla-cook.md",
+      "sha256": "5d6144b10d9cf355da90d610ca5b92ce17b91cc83a234b0386e30c7c221ce00e",
+      "campaign_setting_id": "pneuma.severed-lands",
+      "document": "---\nname: \"Marla\"\nrole: \"Waystation cook\"\ndisposition: \"Ally\"\nspecies: \"Riftborn (home world — culinary trade)\"\nlocation: \"Waystation\"\n---\n\n# Marla\n\nMarla is Waystation's cook — a Riftborn from a world where food was currency and a well-prepared meal could settle a blood feud. She arrived through the Rift with nothing but her knife roll and a spice blend that she's never let anyone examine. The blend is running out. She's been experimenting with Severed Lands ingredients, trying to recreate what she can't replace. The results are... mixed. The Returners eat it anyway. Marla's kitchen is the warmest room in Waystation, and no one complains about the cook's experiments when the alternative is cold rations.\n\nMarla treats feeding people as a form of care. She notices who's eating less, who's not showing up to meals, who's been on patrol too many days in a row. She'll slide an extra portion onto a plate without comment. She'll remember how you take your tea.\n\n## Personality\n\nWarm, nosy, and utterly essential. Marla knows everyone's business because everyone talks in her kitchen. She doesn't share what she hears. The kitchen is neutral ground.\n\n## Appearance and artwork\n\nA humanlike adult Riftborn woman in her fifties with warm copper-brown skin, a broad sturdy build, dark auburn curls gathered in a loose bun and kind dark brown eyes. A warm observant expression. Rolled-sleeve terracotta shirt, a well-used pale linen apron over a dark full-length work skirt and sturdy flat shoes. A closed cloth knife roll hangs at her belt; no exposed knives or visible spice recipe. No jewelry, text, food effects or faction symbols.\n\nThis prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.\n\n[Portrait](../assets/characters/6d2f5303617dc3d6e2b9d8cb44b3b5032764d94e9f202e0500a5626b4c150d57.png)\n\n[Full-body reference](../assets/characters/f61f6eb8270e641ca26828f3c10a5bba17f3f81e028adf0c75edea2dc0a0c8b4.png)\n\n[Multiview reference sheet](../assets/characters/fa7d1c50a730d5bcd38d7222d56c7e9be0a357d6a158db5bdd409110474210d2.png)\n",
+      "source_commit": "a643c80e3c0f932fbce39eb81738fc43e68efee1"
+    },
+    {
+      "package_id": "pneuma.severed-lands",
+      "path": "npcs/waystation-healer.md",
+      "sha256": "d31557e4c00ca9cd326d1fed25142d40b60730c8d1ba769e7aca53c661f3bfc1",
+      "campaign_setting_id": "pneuma.severed-lands",
+      "document": "---\nname: \"Henna\"\nrole: \"Waystation healer\"\ndisposition: \"Ally\"\nspecies: \"Riftborn (home world — medical)\"\nlocation: \"Waystation\"\n---\n\n# Henna\n\nHenna is Waystation's healer — a Riftborn from a world where medicine was closer to art than science. She arrived with her training intact and her instruments lost. She's been improvising ever since. Her clinic is a converted storage room with a salvaged operating table, a collection of Margin herbs that Briar supplies, and the accumulated medical knowledge of a dozen Riftborn who've shared what they remember.\n\nHenna treats everything — patrol injuries, Rift exposure symptoms, the common illnesses that spread through a close-quarters settlement every winter. She's delivered three babies since she arrived. She's lost more patients than she's saved. She remembers every name. The Rememberers would understand.\n\nShe's also the unofficial therapist for half of Waystation. Patrol members talk to her while she's bandaging them. Researchers talk to her when the Door's silence gets too loud. She doesn't charge for this. She considers it part of the healing.\n\n## Personality\n\nHenna is calm, competent, and carrying the weight of everyone who's died on her table. She treats healing as a privilege rather than a burden. The patients trust her. She's earned it.\n\n## Appearance and artwork\n\nA humanlike adult Riftborn woman in her early fifties with deep brown skin, an average sturdy build, short silver-streaked braids and calm dark eyes. A patient composed expression. Plain undyed linen clinic tunic with rolled sleeves, muted blue-gray trousers, practical shoes and a small cloth pouch holding a visible clean folded bandage. Empty relaxed hands. No surgical instruments, magical glow, blood, faction emblems or modern medical logos.\n\nThis prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.\n\n[Portrait](../assets/characters/5b0b64dc6a685452ed330e30a1e4aa018e468b1356be95e098d35b9cbb5903e3.png)\n\n[Full-body reference](../assets/characters/49e72cbac6a856d9bded187acec11242e51055bb36174631973664fb906d960c.png)\n\n[Multiview reference sheet](../assets/characters/6b759baa23eb3d323354a32cb9f6a16b45b4a452b7f483563a817703f9226e0b.png)\n",
+      "source_commit": "a643c80e3c0f932fbce39eb81738fc43e68efee1"
+    },
+    {
+      "package_id": "pneuma.severed-lands",
+      "path": "npcs/waystation-smith.md",
+      "sha256": "a03032436bcd0b6a97125dd8c6983b32ccce06febd9d1de3193e4665b4a2d71e",
+      "campaign_setting_id": "pneuma.severed-lands",
+      "document": "---\nname: \"Anvil\"\nrole: \"Waystation smith, former Thornwall apprentice\"\ndisposition: \"Ally\"\nspecies: \"Human (settled)\"\nlocation: \"Waystation\"\n---\n\n# Anvil\n\nAnvil is Waystation's smith — a settled human who left Thornwall's Forge Quarter after a dispute with House Dorn's foremen. She won't discuss the details. She'll just say she prefers working for people who appreciate the craft, and the Returners appreciate the craft.\n\nHer forge is small — a converted storage room with a salvaged anvil and a bellows that wheezes. She produces functional rather than beautiful work: spearheads, arrow tips, patrol gear repairs. The Quartermaster keeps her supplied with metal. She keeps the patrols equipped. It's a good arrangement.\n\n## Personality\n\nBlunt, skilled, and allergic to politics. Anvil doesn't care about the Returner mission. She cares about the work. The work is honest. Everything else is noise.\n\n## Appearance and artwork\n\nAn adult Human woman in her early forties with sun-browned freckled skin, a muscular broad-shouldered build, brown hair tied into a short practical ponytail, a square face and gray-green eyes. A blunt level appraising expression. Charcoal rolled-sleeve shirt, a heavy worn brown leather smith's apron, plain dark trousers and reinforced work boots; a small plain hammer rests in a belt loop. Faint soot on forearms and apron. No house crest, political symbol, weapon, jewelry or magic.\n\nThis prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.\n\n[Portrait](../assets/characters/9e69568b684f9a5a43b3f49160b909e53fc407479596ad234050185e6470673e.png)\n\n[Full-body reference](../assets/characters/ef276d7776ad8cdf0e563b0718a3250702b06be15b7aa652200f82220f588187.png)\n\n[Multiview reference sheet](../assets/characters/eaa6bf065dbafd5c6559a5641e9f3937ef549dbf521de6fbee68f9c96b0858f9.png)\n",
+      "source_commit": "a643c80e3c0f932fbce39eb81738fc43e68efee1"
     }
   ],
   "retained_assets": [
@@ -12953,6 +13043,78 @@
     {
       "path": "assets/characters/2579873c5819ffcbd7bc80990b74b1b6b784ff96a1a34a32f17ba881450a885e.png",
       "sha256": "2579873c5819ffcbd7bc80990b74b1b6b784ff96a1a34a32f17ba881450a885e"
+    },
+    {
+      "path": "assets/characters/490bec00a1aa0a8ed147116aac054609ac745c1ea464dbe5c8dde1cf17381409.png",
+      "sha256": "490bec00a1aa0a8ed147116aac054609ac745c1ea464dbe5c8dde1cf17381409"
+    },
+    {
+      "path": "assets/characters/3b0657c5968e06687cbe3149b7e4ff81659be4a7038b008285e5c074230ec589.png",
+      "sha256": "3b0657c5968e06687cbe3149b7e4ff81659be4a7038b008285e5c074230ec589"
+    },
+    {
+      "path": "assets/characters/c6bea40d00c94b47af7e4ec8b85042c9f1e87fde898220468d6728755ade5450.png",
+      "sha256": "c6bea40d00c94b47af7e4ec8b85042c9f1e87fde898220468d6728755ade5450"
+    },
+    {
+      "path": "assets/characters/9d83f6c5bedeeaa58f1eb9e25520bd8324e7cd8c84eb9eb38ac45b1bbc9f8ef7.png",
+      "sha256": "9d83f6c5bedeeaa58f1eb9e25520bd8324e7cd8c84eb9eb38ac45b1bbc9f8ef7"
+    },
+    {
+      "path": "assets/characters/6b6fd5ec67d9643a6d968cf570d3f69ace954dcf1801926f439ede375baad89e.png",
+      "sha256": "6b6fd5ec67d9643a6d968cf570d3f69ace954dcf1801926f439ede375baad89e"
+    },
+    {
+      "path": "assets/characters/458e6a0aa402aff8fb22d1ea9ce48c1f1f26c6daed1b908f6b20951bc786205a.png",
+      "sha256": "458e6a0aa402aff8fb22d1ea9ce48c1f1f26c6daed1b908f6b20951bc786205a"
+    },
+    {
+      "path": "assets/characters/59d9d0d90ee27ac631f7420c8ea063d9782e17732489694f81acf3605bdc342f.png",
+      "sha256": "59d9d0d90ee27ac631f7420c8ea063d9782e17732489694f81acf3605bdc342f"
+    },
+    {
+      "path": "assets/characters/646f0c74bbe391942dc2b8b3bf7ab662a6f52f4391ad7e48f44cd33e04e12918.png",
+      "sha256": "646f0c74bbe391942dc2b8b3bf7ab662a6f52f4391ad7e48f44cd33e04e12918"
+    },
+    {
+      "path": "assets/characters/078863ebdc04b1fd453c449256c3d28be104cbb1cb0407e58165c05a39541e98.png",
+      "sha256": "078863ebdc04b1fd453c449256c3d28be104cbb1cb0407e58165c05a39541e98"
+    },
+    {
+      "path": "assets/characters/f61f6eb8270e641ca26828f3c10a5bba17f3f81e028adf0c75edea2dc0a0c8b4.png",
+      "sha256": "f61f6eb8270e641ca26828f3c10a5bba17f3f81e028adf0c75edea2dc0a0c8b4"
+    },
+    {
+      "path": "assets/characters/fa7d1c50a730d5bcd38d7222d56c7e9be0a357d6a158db5bdd409110474210d2.png",
+      "sha256": "fa7d1c50a730d5bcd38d7222d56c7e9be0a357d6a158db5bdd409110474210d2"
+    },
+    {
+      "path": "assets/characters/6d2f5303617dc3d6e2b9d8cb44b3b5032764d94e9f202e0500a5626b4c150d57.png",
+      "sha256": "6d2f5303617dc3d6e2b9d8cb44b3b5032764d94e9f202e0500a5626b4c150d57"
+    },
+    {
+      "path": "assets/characters/49e72cbac6a856d9bded187acec11242e51055bb36174631973664fb906d960c.png",
+      "sha256": "49e72cbac6a856d9bded187acec11242e51055bb36174631973664fb906d960c"
+    },
+    {
+      "path": "assets/characters/6b759baa23eb3d323354a32cb9f6a16b45b4a452b7f483563a817703f9226e0b.png",
+      "sha256": "6b759baa23eb3d323354a32cb9f6a16b45b4a452b7f483563a817703f9226e0b"
+    },
+    {
+      "path": "assets/characters/5b0b64dc6a685452ed330e30a1e4aa018e468b1356be95e098d35b9cbb5903e3.png",
+      "sha256": "5b0b64dc6a685452ed330e30a1e4aa018e468b1356be95e098d35b9cbb5903e3"
+    },
+    {
+      "path": "assets/characters/ef276d7776ad8cdf0e563b0718a3250702b06be15b7aa652200f82220f588187.png",
+      "sha256": "ef276d7776ad8cdf0e563b0718a3250702b06be15b7aa652200f82220f588187"
+    },
+    {
+      "path": "assets/characters/eaa6bf065dbafd5c6559a5641e9f3937ef549dbf521de6fbee68f9c96b0858f9.png",
+      "sha256": "eaa6bf065dbafd5c6559a5641e9f3937ef549dbf521de6fbee68f9c96b0858f9"
+    },
+    {
+      "path": "assets/characters/9e69568b684f9a5a43b3f49160b909e53fc407479596ad234050185e6470673e.png",
+      "sha256": "9e69568b684f9a5a43b3f49160b909e53fc407479596ad234050185e6470673e"
     }
   ]
 }

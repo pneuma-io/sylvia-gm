@@ -22,8 +22,8 @@ A humanlike androgynous adult Riftborn in their late thirties with light olive s
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/078863ebdc04b1fd453c449256c3d28be104cbb1cb0407e58165c05a39541e98.png)
+[Portrait](../assets/characters/85d11fab752b0c2aa91f750d0a46900945bfaf8123d8f4712774c31f9a1aa53e.png)
 
-[Full-body reference](../assets/characters/59d9d0d90ee27ac631f7420c8ea063d9782e17732489694f81acf3605bdc342f.png)
+[Full-body reference](../assets/characters/82265788dd8a89bf193732116f02ac8917c821ed626e198cf7922280a92491bd.png)
 
-[Multiview reference sheet](../assets/characters/646f0c74bbe391942dc2b8b3bf7ab662a6f52f4391ad7e48f44cd33e04e12918.png)
+[Multiview reference sheet](../assets/characters/e8debb2cdc85947670b6621ff21534874c9b66a040b51e1dbde54ce178ed31d1.png)
