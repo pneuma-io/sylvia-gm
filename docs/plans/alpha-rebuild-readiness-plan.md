@@ -281,8 +281,8 @@ exact assets/resources and twelve current/retained authored editions pass actual
 lookup, with prior 152 bundles/bindings and original profile prefixes preserved. The authored
 roster passed in 9.16 seconds for 218 subjects/354 editions. All 82 authored NPCs and 53 authored
 monsters were prepared; 83 authored monsters and wider catalogue/workflow acceptance remained open.
-Rift Hydra, Ice, Jelly, Kraken, Lamia and Lich now have complete full-body, multiview and portrait
-bundles, bringing the catalogue to 164 bundles/492 PNGs. Hydra retains five intact baseline heads;
+At f9c0886, Rift Hydra, Ice, Jelly, Kraken, Lamia and Lich received complete full-body, multiview
+and portrait bundles, bringing the catalogue to 164 bundles/492 PNGs. Hydra retains five baseline heads;
 Kraken retains ten tentacles in its complete references. Ice remains a faceless active shard,
 Jelly the authored violet drifting mass, and Lich an anonymous partly remembered spellcaster.
 Actual square/dialogue/map-token crops passed visual review, including all five Hydra heads.
@@ -290,10 +290,21 @@ Lamia and Lich use aligned saved framing without changing portrait PNG bytes. Al
 exact assets/resources and twelve current/retained authored editions pass actual Lite Setting
 lookup, preserving prior 158 bundles/bindings and original profile prefixes. The authored roster
 passed in 3.26 seconds for 218 subjects/360 editions. All 82 authored NPCs and 59 authored monsters
-are prepared; 77 authored monsters and the wider catalogue/workflow acceptance remain unfinished.
+were prepared; 77 authored monsters and wider catalogue/workflow acceptance remained unfinished.
 Anchor Sentinel's existing older catalogue ID still resolves both current/retained editions;
 its artwork was reused without a duplicate bundle. No completed owner/frontend/native matrix
 was replayed.
+Rift Magma, Medusa, Merrow, Mimic, Minotaur, Mud, Mummy, Mummy Lord, Ogre, Oni, Ooze and
+Owlbear now have complete full-body, multiview and portrait bundles. The catalogue totals
+176 bundles/528 PNGs, including all 82 authored NPCs and 71 authored monsters. All twelve actual
+square/dialogue/map-token crops passed visual review after three portrait framing corrections
+for Medusa, Minotaur and Oni; the other saved crops retain the selected PNG bytes. Complete
+faceless silhouettes, six serpent heads and both Minotaur horns remain visible in the circles.
+All 36 assets/resources, 24 current/retained authored editions and actual current Lite Setting
+lookup pass, preserving prior 164 bundles/bindings and original profile prefixes. The authored
+roster passed in 5.01 seconds for all 218 subjects/372 editions. There are 65 authored monsters
+left; wider catalogue and ordinary workflow acceptance remain unfinished. No completed
+owner/frontend/native matrix was replayed.
 At f85bbcb, all 82 authored NPCs across
 80 current profile files
 and 165 source editions resolved complete artwork, with all 246 NPC PNGs/resources and actual
@@ -306,7 +317,7 @@ The owner selected a shared app artwork library: whole Setting/Plan exports omit
 PNGs, while custom art stays portable and character/campaign exports carry used artwork. The
 source now maps the catalogue and PNGs as external installer/portable resources, outside the
 onefile sidecar. Campaign export retains used art before any artwork view has been opened.
-The prepared PNG pool now totals 1,127,257,460 bytes across 492 images, beyond the content-package cap.
+The prepared PNG pool now totals 1,202,379,442 bytes across 528 images, beyond the content-package cap.
 The current Setting omits those PNGs; its existing content-package limits remain unchanged.
 Focused checks cover shared/custom publication, external resource inventory, portable ZIP assembly,
 and exact campaign art transfer before opening an image view. Local-copy receipts also transfer
@@ -377,17 +388,26 @@ records remain construct and aberration respectively. Compatible physical artwor
 without changing either source type. Harpy retains its authored club without adding an inherited
 attack. Mechanical payloads and participant identities are unchanged; form execution remains
 unqualified by these artwork checks.
-Six further inherited records reuse the prepared Hydra, Ice Mephit, Ochre Jelly, Kraken, Lamia
-and Lich renditions, bringing inherited coverage to 39 forms. Exact current Lite bytes and admitted
+At f9c0886, six further inherited records reused the prepared Hydra, Ice Mephit, Ochre Jelly,
+Kraken, Lamia and Lich renditions, bringing inherited coverage to 39 forms. Exact Lite bytes and admitted
 metadata resolve all six; wrong Setting/hash/package/pointer/changed-byte lookups are refused.
 All eighteen reused PNGs pass runtime byte/hash lookup. Lamia retains authored monstrosity and
 inherited fiend labels, and her authored dagger adds no inherited attack. The shard, floating
 Jelly and partly remembered Lich are Setting-specific artwork choices; no movement, flight,
 regeneration, combat payload or participant identity changes are introduced. These checks qualify
 artwork lookup only, with inherited form execution and native/live acceptance still unqualified.
+Eleven new inherited records reuse the prepared Magma Mephit, Medusa, Merrow, Mimic,
+Minotaur of Baphomet, Mummy, Mummy Lord, Ogre, Oni, Gray Ooze and Owlbear renditions, bringing
+coverage to 50 forms. Exact current Lite bytes/admitted metadata, wrong scope/hash/package/
+pointer/changed-byte refusals and all 33 reused runtime PNG byte/hash lookups pass. Oni retains
+authored giant and inherited fiend labels. Authored visual equipment remains selected: the
+Minotaur has a greataxe and Oni a glaive; their inherited attack records remain unchanged.
+Mud Mephit is absent from the current inherited index and was not fabricated; the separate
+Minotaur Skeleton was not bound to living Minotaur artwork. These are artwork lookup checks,
+with no mechanical execution or equipped-loadout qualification and no extra image copies.
 Other Settings do not inherit those renditions. The mixed NPC/creature journey selects one
 Basilisk through its inherited form and another through its authored Rift profile, preserving
-independent crops and offline used-art recovery. The remaining 291 inherited forms still need art.
+independent crops and offline used-art recovery. The remaining 280 inherited forms still need art.
 At 3b7cc8a, the original five-form actual-image/resource/alias check passed in 84.91 seconds,
 including refusal outside Severed Lands; the mixed authored/inherited/NPC offline journey passed
 in 73.42 seconds. All 33 then-current visual bundles and previous bindings were preserved. Those

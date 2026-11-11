@@ -47,3 +47,15 @@ A Rift Echo of ritual death — formed when a burial ceremony was interrupted by
 **Multiattack.** The rift mummy can use its Dreadful Glare and makes one attack with its rotting fist.
 **Rotting Fist.** Melee Weapon Attack: +5 to hit, reach 5 ft., one target. Hit: 10 (2d6 + 3) bludgeoning damage plus 10 (3d6) necrotic damage. If the target is a creature, it must succeed on a DC 12 Constitution saving throw or be cursed with rift mummy rot. The cursed target can't regain hit points, and its hit point maximum decreases by 10 (3d6) for every 24 hours that elapse. If the curse reduces the target's hit point maximum to 0, the target dies.
 **Dreadful Glare.** The rift mummy targets one creature it can see within 60 feet. If the target can see the rift mummy, it must succeed on a DC 11 Wisdom saving throw or be frightened until the end of the rift mummy's next turn.
+
+## Appearance and artwork
+
+One Medium anonymous adult humanlike Rift Mummy Echo, completely wrapped in aged gray-beige funerary linen. Mature upright proportions, exactly TWO arms with individually wrapped five-fingered hands and TWO separate legs with complete linen-wrapped feet. The entire head and mouth stay covered; TWO dim violet glints show through narrow dark eye gaps, with no revealed identity. A plain worn outer burial shroud and simple linen waist tie, a restrained violet translucent edge around some linen folds. Funerary linens and unfinished-rite Echo follow authored source; exact wrap folds, outline and colors are editable defaults. Both hands empty. No exposed bone, skull face, wounds, blood, gore, crown, weapons, named deceased, tomb/ritual scene, victim or text.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/571c60f4b063e4c6456283dcd3fa0d16c36ddb97223d529179844f74203e4c5f.png)
+
+[Full-body reference](../../assets/characters/f363162a311b170143c1c3dc8ac2a0aeaa790f47c4062f8e29b14ce02e5b5d35.png)
+
+[Multiview reference sheet](../../assets/characters/947d350a938bd23c2dbfbb226480b6b254367bf9302da21ab23b33a52345fdaf.png)

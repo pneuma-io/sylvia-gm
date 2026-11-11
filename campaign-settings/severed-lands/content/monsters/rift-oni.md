@@ -44,3 +44,15 @@ A shapechanging Riftborn from a world of spirits and hungry gods. The oni fell t
 **Claw (rift oni Form Only).** +7 to hit, reach 5 ft., one target. 8 (1d8 + 4) slashing.
 **Glaive.** +7 to hit, reach 10 ft., one target. 15 (2d10 + 4) slashing, or 9 (1d10 + 4) in Small/Medium form.
 **Change Shape.** The rift oni magically polymorphs into a Small or Medium humanoid, a Large giant, or back to true form. Stats unchanged except size. Equipment not transformed.
+
+## Appearance and artwork
+
+One Large Rift Oni in an editable mature adult masculine Oni-form appearance, with no stolen or named human identity asserted: powerful blue-violet giant-like body, a broad stern face, TWO pale gray-violet eyes, TWO short curved dark horns, two small lower tusks and swept-back white hair gathered in a plain topknot. Exactly TWO arms with five clawed fingers per hand, TWO legs and complete dark boots. Plain dark iron chain mail over charcoal clothing, a muted plum waist sash and dark trousers. Anatomical RIGHT hand holds ONE long iron-bladed wooden-shafted glaive upright low beside the body, its entire blade/tip and butt visible inside the image; LEFT empty. Riftborn shapechanger, chain mail and glaive follow authored source; this representative form, face, horns, hair and palette are editable defaults. No wings, extra limbs/horns, actual stolen form, exorcism, victim, readable symbols or scenery.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/91ce08aedc29832f23f773c9ba46c57e0ef92f49004c7a6b7eb0c372dc52d957.png)
+
+[Full-body reference](../../assets/characters/ae3539ec9ea6cbbadf7e2384e5dd80d286cd4acdb29eeab5b504a3d38edb6ece.png)
+
+[Multiview reference sheet](../../assets/characters/321bf6d97a32c7d495b76d5b2d321b41a34f16e0678a1dff37626d3f35c2b5ba.png)
