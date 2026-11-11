@@ -22,6 +22,9 @@ from sylvia_gm.domain.authority import (
 )
 from sylvia_gm.domain.errors import CommandRejected, MechanicsRejected
 from sylvia_gm.provider._base import ProviderStreamChunk
+from tests.action_sequence_move_checks import (
+    assert_action_sequence_moves as assert_action_sequence_moves,
+)
 from tests.test_action_sequences import lite as lite
 from tests.test_action_sequences import td as td
 from tests.test_alpha_f4_provider_session_adapter import (

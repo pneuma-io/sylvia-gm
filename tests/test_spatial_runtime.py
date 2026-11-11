@@ -1021,7 +1021,7 @@ def test_repeated_snapshot_references_share_evidence_but_changed_scenes_do_not()
 
 def test_explicit_circle_overlap_reuses_proven_facts_and_invalidates_changed_bodies():
     from sylvia_gm.application.package_runtime import AuthorityMemoryStateBridge
-    from tests.test_srd_creature_space import NS, state
+    from tests.srd_creature_space_fixtures import NS, state
 
     values = state(position=(7.5, 0, 0))
     bridge = AuthorityMemoryStateBridge(NS, values)
@@ -1050,7 +1050,7 @@ def test_explicit_circle_overlap_reuses_proven_facts_and_invalidates_changed_bod
 def test_circle_overlap_reuse_keeps_default_origins_and_snapshot_requests_exact():
     from sylvia_gm.application.package_runtime import AuthorityMemoryStateBridge
     from sylvia_gm.spatial import SpatialValidationError
-    from tests.test_srd_creature_space import NS, state
+    from tests.srd_creature_space_fixtures import NS, state
 
     values = state(position=(7.5, 0, 0))
     bridge = AuthorityMemoryStateBridge(NS, values)

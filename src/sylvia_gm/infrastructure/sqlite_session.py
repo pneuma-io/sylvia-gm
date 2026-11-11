@@ -38,7 +38,9 @@ from sylvia_gm.domain.session import (
     builder_chat_payload_sha256,
 )
 from sylvia_gm.infrastructure.sqlite_continuity import (
-    read_act_markers, read_campaign_ending, read_campaign_endings,
+    read_act_markers,
+    read_campaign_ending,
+    read_campaign_endings,
 )
 
 

@@ -5,7 +5,7 @@ const vm = require('node:vm');
 
 const sandbox = {window: {}, document: {addEventListener() {}}};
 vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../src-tauri/frontend/app.js'), 'utf8'), sandbox);
-const render = sandbox.window.SylviaGMFrontend.toolCardMarkup;
+const render = sandbox.window.SylviaGMFrontend.toolResultMarkup;
 const attack = {label: 'guard', value: 'Attack roll', emphasis: false,
   equation: {die_sides: 20, roll: 4, modifier: 10, total: 14}};
 const damage = {label: 'guard', value: 'Force damage', emphasis: false,

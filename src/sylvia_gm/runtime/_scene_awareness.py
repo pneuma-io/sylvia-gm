@@ -50,8 +50,11 @@ _FACTION_SUMMARIES: dict[str, str] = {
         "fragmented of speech, shifting in perception. Some worship the Rift; others simply endure."
     ),
     "stayers": (
-        "Stayers are Riftborn who have given up on returning home, building permanent "
-        "communities in the Severed Lands instead. The Nexus Riftborn Quarter is their strongest foothold."
+
+            "Stayers are Riftborn who have given up on returning home, building permanent "
+            "communities in the Severed Lands instead. The Nexus Riftborn Quarter is their "
+            "strongest foothold."
+
     ),
 }
 

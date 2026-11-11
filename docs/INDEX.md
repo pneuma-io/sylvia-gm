@@ -5,8 +5,8 @@
 > **Last authority update:** 2026-11-11
 
 This is the sole human-maintained map of repository documents that may direct Sylvia GM operation
-or implementation. Project Desk is Wan's current planning and decision source; the contracts below
-are synchronized implementation guidance. Amend existing Project Desk decisions when choices change,
+or implementation. Dot Desk (formerly Project Desk) is Wan's current planning and decision source; the contracts below
+are synchronized implementation guidance. Amend existing Dot Desk decisions when choices change,
 preserving history rather than adding competing current instructions.
 [`AUTHORITY.json`](AUTHORITY.json) is its machine-readable mirror and must not add policy.
 
@@ -67,9 +67,9 @@ words such as `FINAL`, `LOCKED`, `AUTHORITATIVE`, or `SOURCE OF TRUTH`.
 
 | Document | Sole responsibility |
 |---|---|
-| [`plans/alpha-rebuild-readiness-plan.md`](plans/alpha-rebuild-readiness-plan.md) | Repository status synchronized with Project Desk, host/VM handoff, candidate evidence, `alpha-03`–`alpha-10b` status, and release boundary. |
+| [`plans/alpha-rebuild-readiness-plan.md`](plans/alpha-rebuild-readiness-plan.md) | Current state, work in flight, milestone summary, supported journeys and release boundary synchronized with Dot Desk. |
 
-The plan is the repository status surface synchronized with Project Desk. Product requirements
+The plan is the repository status surface synchronized with Dot Desk. Product requirements
 belong in the product contract;
 architecture invariants belong in the architecture contract; working method belongs in the
 process. Do not create another packet plan, phase roadmap, handover, overnight runbook, or
@@ -78,7 +78,7 @@ SRD plan unless the active plan truly cannot express one coherent deliverable.
 The plan's **Current work** section is also the compact handoff between the host and VM. A temporary
 handoff may carry unintegrated evidence across environments, but it must be reconciled into the plan
 and removed once consumed. Git history and the plan preserve repository evidence across environments;
-Project Desk holds current planning decisions. Codex chat synchronization is not durable authority.
+Dot Desk holds current planning decisions. Codex chat synchronization is not durable authority.
 
 A completed milestone row records status only. It does not activate follow-up implementation,
 specialist test matrices, or historical acceptance work. The plan's sole active implementation
@@ -92,7 +92,7 @@ boundary and the latest direct human task determine what may be worked on now.
 | [`evidence/model-input-audit/README.md`](evidence/model-input-audit/README.md) | Public synthetic exact-input captures for prompt, MCP, provider-application, and provider-wire inspection. |
 | [`evidence/gcs-engineering-closeout-2026-09-07.md`](evidence/gcs-engineering-closeout-2026-09-07.md) | Dated GCS implementation, limit-correction and installed-candidate evidence, including the unqualified gameplay boundary. |
 | [`research/narrative-ai-prompt-context-comparison.md`](research/narrative-ai-prompt-context-comparison.md) | Supporting comparison of narrative-agent prompt, memory, retrieval, spoiler, and deterministic-tool patterns used by audit item 14. |
-| [`research/claude-native-runtime-2026-11-11.md`](research/claude-native-runtime-2026-11-11.md) | Native Claude setup, current official authentication boundary, transport decisions, synthetic/native-protocol evidence and future SylviaBench configuration; not installed-release or real-account acceptance. |
+| [`research/claude-native-runtime-2026-11-11.md`](research/claude-native-runtime-2026-11-11.md) | Native Claude setup, current official authentication boundary, transport decisions, synthetic/native-protocol checks, bounded live-subscription evidence and future SylviaBench configuration; not installed-release or benchmark acceptance. |
 | [`research/comparable-stateful-narrative-agent-architectures-2026-09-03.md`](research/comparable-stateful-narrative-agent-architectures-2026-09-03.md) | Supporting comparison of agent loops, authoritative world models, opportunity-based narrative, tiered context, and spoiler-safe observability. |
 | [`research/codex-model-selection-and-routing-2026-09-10.md`](research/codex-model-selection-and-routing-2026-09-10.md) | Practitioner preferences, usage rates, and model-switching options for Wan's personal Codex workflow discussion. |
 | [`research/astra-from-scratch-assessment-2026-09-12.md`](research/astra-from-scratch-assessment-2026-09-12.md) | Advisory assessment of how Astra would build Sylvia GM from scratch, grounded in current source and recorded findings; not an implementation selection. |
@@ -122,7 +122,8 @@ the complete documentation set. Their original dates and evidence limits remain 
 
 | Document | Use |
 |---|---|
-| [`agents/issue-tracker.md`](agents/issue-tracker.md) | Local Markdown ticket location, checkout visibility, file conventions, and retrieval operations. |
+| [`agents/issue-tracker.md`](agents/issue-tracker.md) | Dot Desk work items, source/PR links and the status of local scratch records. |
+| [`operations/local-checks-and-release.md`](operations/local-checks-and-release.md) | Plain-English local check commands, evidence and release acceptance; the Development Process remains policy. |
 | [`reference/content-formats.md`](reference/content-formats.md) | Installed content-definition retrieval, examples and validation owners; a supporting implementation reference. |
 | [`launch-compatibility.md`](launch-compatibility.md) | Lite package compatibility, current implementation ownership and bounded candidate evidence; current task and product contract select scope. |
 

@@ -190,7 +190,7 @@ class StrictnessManager:
         tool_name: str,
         *,
         reason: str | None = None,
-    ) -> "StrictnessCheckResult":
+    ) -> StrictnessCheckResult:
         """Validate that an action is appropriate for the current subsystem.
 
         Called **before** tool execution to gate actions.
@@ -260,7 +260,7 @@ class StrictnessManager:
         *,
         error: str | None = None,
         context: dict[str, Any] | None = None,
-    ) -> "StrictnessCheckResult":
+    ) -> StrictnessCheckResult:
         """Validate the result of a tool execution against strictness.
 
         Called **after** tool execution to check whether the outcome
@@ -337,7 +337,7 @@ class StrictnessManager:
 
     def apply_check(
         self,
-        result: "StrictnessCheckResult",
+        result: StrictnessCheckResult,
         tool_result: Any,  # ToolResult (avoid circular import)
     ) -> None:
         """Apply strictness check results to a ToolResult.

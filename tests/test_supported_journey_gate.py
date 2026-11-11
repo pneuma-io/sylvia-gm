@@ -16,6 +16,37 @@ def gate():
     return module
 
 
+def test_documented_autoload_environment_runs_async_standalone_then_runner(
+    gate, tmp_path, monkeypatch,
+):
+    import os
+    import sys
+
+    # The guide clears the README's explicit-plugin setting before either command.
+    monkeypatch.delenv("PYTEST_DISABLE_PLUGIN_AUTOLOAD", raising=False)
+    monkeypatch.delenv("PYTEST_ADDOPTS", raising=False)
+    root = tmp_path / "checkout"
+    tests = root / "tests"
+    tests.mkdir(parents=True)
+    (root / "pyproject.toml").write_text('[tool.pytest.ini_options]\naddopts = ""\n')
+    relative = "tests/test_async_behavior.py"
+    (root / relative).write_text(
+        "import asyncio\nimport pytest\n"
+        "@pytest.mark.asyncio\nasync def test_async_behavior():\n"
+        "    await asyncio.sleep(0)\n    assert asyncio.get_running_loop().is_running()\n"
+    )
+    standalone = subprocess.run(
+        [sys.executable, "-m", "pytest", "-s", "-p", "no:cacheprovider", relative],
+        cwd=root, env=dict(os.environ), capture_output=True, text=True, timeout=30,
+    )
+    assert standalone.returncode == 0, standalone.stdout + standalone.stderr
+    monkeypatch.setattr(gate, "ROOT", root)
+    monkeypatch.setattr(gate, "PYTHON_JOURNEYS", {"gm-turn": [relative]})
+    output = tmp_path / "runner"
+    output.mkdir()
+    assert gate._run("gm-turn", output)[0], (output / "gm-turn.log").read_text()
+
+
 @pytest.mark.parametrize(
     "failure",
     [
@@ -80,6 +111,41 @@ def test_runner_rejects_incomplete_or_failed_required_checks(gate, tmp_path, mon
     )
     assert gate._run("campaign-play", tmp_path)[0] is False
     assert len(calls) == 2
+
+
+@pytest.mark.parametrize("include_historical", [False, True])
+def test_group_runner_applies_historical_policy_to_collection_and_execution(
+    gate, tmp_path, monkeypatch, include_historical,
+):
+    import json
+    from types import SimpleNamespace
+    from scripts.check_catalog import PRODUCT_CASE_EXCLUSIONS
+
+    historical = next(iter(PRODUCT_CASE_EXCLUSIONS))
+    module, historical_function = historical.split("::")
+    behavior = module + "::test_behavior"
+    executed = []
+
+    def run(command, **kwargs):
+        if "--collect-only" in command:
+            return subprocess.CompletedProcess(command, 0, behavior + "\n" + historical + "\n", "")
+        deselected = f"--deselect={historical}" in command
+        executed.append(deselected)
+        classname = module.removesuffix(".py").replace("/", ".")
+        rows = f'<testcase classname="{classname}" name="test_behavior"/>'
+        if not deselected:
+            rows += f'<testcase classname="{classname}" name="{historical_function}"/>'
+        (tmp_path / "gm-turn.xml").write_text("<testsuites><testsuite>" + rows + "</testsuite></testsuites>")
+        return subprocess.CompletedProcess(command, 0, "", "")
+
+    monkeypatch.setattr(gate, "PYTHON_JOURNEYS", {"gm-turn": [module]})
+    monkeypatch.setattr(gate, "subprocess", SimpleNamespace(
+        run=run, TimeoutExpired=subprocess.TimeoutExpired, STDOUT=subprocess.STDOUT,
+    ))
+    assert gate._run("gm-turn", tmp_path, include_historical=include_historical)[0]
+    assert executed == [not include_historical]
+    required = json.loads((tmp_path / "gm-turn-required-cases.json").read_text())
+    assert len(required) == (2 if include_historical else 1)
 
 
 def test_revision_guard_and_hash_include_new_source_bytes(gate, tmp_path, monkeypatch):
@@ -183,7 +249,7 @@ def test_relative_cli_output_is_absolute_before_worker_cwd_changes(gate, tmp_pat
 
     observed = []
 
-    def balanced(root, destination, journeys, selected, count, started, run_ui, *, deadline=None, scheduler="module"):
+    def balanced(root, destination, journeys, selected, count, started, run_ui, *, deadline=None, scheduler="module", include_historical=False):
         assert destination == (tmp_path / "relative-output").resolve()
         assert destination.is_absolute()
         assert deadline is None
@@ -201,13 +267,32 @@ def test_relative_cli_output_is_absolute_before_worker_cwd_changes(gate, tmp_pat
     assert len(observed) == 1
 
 
+def test_explicit_product_group_is_reported_as_partial_with_its_actual_worker_limit(
+    gate, tmp_path, monkeypatch,
+):
+    import json
+    import sys
+
+    monkeypatch.setattr(gate, "PYTHON_JOURNEYS", {"gm-turn": ["tests/test_required.py"]})
+    monkeypatch.setattr(gate, "_run_guarded", lambda *args, **kwargs: (True, 0.0))
+    monkeypatch.setattr(gate, "source_identity", lambda: {"sha256": "same", "head": None, "files": {}})
+    monkeypatch.setattr(sys, "argv", [
+        "gate", "--journey", "gm-turn", "--jobs", "1", "--output-dir", str(tmp_path / "evidence"),
+    ])
+    assert gate.main() == 0
+    summary = json.loads((tmp_path / "evidence/summary.json").read_text())
+    assert not summary["complete_gate"]
+    assert summary["gate_kind"] == "selected product checks"
+    assert summary["case_workers"] == {"gm-turn": 1}
+
+
 @pytest.mark.parametrize("ci", [False, True])
 def test_development_runs_can_complete_after_ci_allowance(gate, tmp_path, monkeypatch, ci):
     import json
     import sys
     from types import SimpleNamespace
 
-    def balanced(root, destination, journeys, selected, count, started, run_ui, *, deadline=None, scheduler="module"):
+    def balanced(root, destination, journeys, selected, count, started, run_ui, *, deadline=None, scheduler="module", include_historical=False):
         assert deadline == (1800 if ci else None)
         return dict.fromkeys(selected, (True, 2001.0))
 

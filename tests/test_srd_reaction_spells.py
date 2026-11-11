@@ -92,7 +92,7 @@ def _counterspell_case(constitution_save=0):
 
 @pytest.mark.parametrize("tool,parameters", [
     ("dismiss_srd_information_spell", {"caster_state": "hero", "spell": "arcane_eye"}),
-    ("move_srd_scene_creature", {"actor_state": "hero", "destination": [15, 0, 0]}),
+    ("move_srd_scene_creature", {"actor_state": "mage", "destination": [0, 5, 0]}),
 ])
 def test_pending_spell_fences_ordinary_support_actions_without_changing_saved_trigger(
     tool, parameters,

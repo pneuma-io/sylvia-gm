@@ -137,8 +137,14 @@ status data. Rust command checking excludes the absent packaged sidecar, so it i
 or installed-app acceptance result.
 
 A separate bounded smoke used the owner's existing native subscription sign-in and the `sonnet`
-alias. Claude reported a rejected native usage-limit event on the first provider step. Sylvia
-stopped and collected the process, with no completed response, tool execution, API fallback or
-benchmark run. Token consumption and the reset time were not reported by this adapter and are
-not estimated here. Successful real-account generation remains unverified until allowance is
-available. A packaged-app journey also remains unrun.
+alias. Its first attempt received a rejected native usage-limit event, which Sylvia surfaced without
+API fallback. After the owner confirmed that allowance had reset, the same smoke passed against
+Claude Code 2.1.322 and the reported model `claude-sonnet-5-5`. It admitted one synthetic counter
+operation, executed it once, and returned the expected reply after receiving canonical history and
+the tool result in a fresh provider process. Both owned processes were collected and no temporary
+turn directories remained. The two steps reported 1,152 and 1,386 total tokens. This verifies live
+subscription transport and continuation; it is not a benchmark comparison or a packaged-app journey.
+
+The merge with the current command-router refactor registers `claude_connection` in the shared
+catalog and its provider handler. Native sign-in remains excluded from browser-client commands;
+local diagnostics recognize the operation without recording account details.

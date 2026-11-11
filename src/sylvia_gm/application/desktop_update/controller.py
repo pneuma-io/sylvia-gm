@@ -17,12 +17,21 @@ from .manifest import (
     parse_manifest,
 )
 from .payload import verify_artifact
-from .storage import UpdateStore, atomic_receipt, checked_file, operation_id
+from .storage import UpdatePhase, UpdateStore, atomic_receipt, checked_file, operation_id
 from .transport import Transport, download_artifact
 
 _APPLY_PHASES = frozenset(
-    {"preparing", "prepared", "closing", "applying", "awaiting_restart", "recovery_required",
-     "rolling_back", "rollback_ready", "rollback_awaiting_restart"}
+    {
+        UpdatePhase.PREPARING,
+        UpdatePhase.PREPARED,
+        UpdatePhase.CLOSING,
+        UpdatePhase.APPLYING,
+        UpdatePhase.AWAITING_RESTART,
+        UpdatePhase.RECOVERY_REQUIRED,
+        UpdatePhase.ROLLING_BACK,
+        UpdatePhase.ROLLBACK_READY,
+        UpdatePhase.ROLLBACK_AWAITING_RESTART,
+    }
 )
 
 
@@ -46,7 +55,7 @@ class UpdateController:
         self._cancel = threading.Event()
         self._thread: threading.Thread | None = None
         self._identity: str | None = None
-        self._phase = "idle"
+        self._move_phase(UpdatePhase.IDLE.value)
         self._candidate: Manifest | None = None
         self._error: UpdateError | None = None
         self._received = 0
@@ -63,9 +72,9 @@ class UpdateController:
         self._identity = operation_id(row["operation_id"])
         phase = str(row["phase"])
         if phase in _APPLY_PHASES:
-            self._phase = "recovery_required"
+            self._move_phase(UpdatePhase.RECOVERY_REQUIRED.value)
             return
-        if phase in {"available", "verified", "deferred"}:
+        if phase in {UpdatePhase.AVAILABLE, UpdatePhase.VERIFIED, UpdatePhase.DEFERRED}:
             try:
                 raw = checked_file(
                     self.store.stage(self._identity) / "manifest.json", maximum=MANIFEST_LIMIT
@@ -82,7 +91,7 @@ class UpdateController:
                         "invalid_journal", "The stored update identity is inconsistent."
                     )
                 artifact = self.store.stage(self._identity) / "artifact.verified"
-                if phase == "verified" or artifact.exists() or artifact.is_symlink():
+                if phase == UpdatePhase.VERIFIED or artifact.exists() or artifact.is_symlink():
                     verify_artifact(artifact, self._candidate)
                     if self.distribution == "installed":
                         previous = parse_current_recovery_manifest(
@@ -101,11 +110,17 @@ class UpdateController:
                             previous,
                         )
                     self._downloaded = True
-                self._phase = phase
+                self._move_phase(phase)
             except UpdateError as error:
-                self._phase, self._error = "error", error
+                _next_phase, _next_error = (UpdatePhase.ERROR.value, error)
+                self._move_phase(_next_phase)
+                self._error = _next_error
             return
-        self._phase = "interrupted" if phase in {"checking", "downloading"} else phase
+        self._move_phase(
+            UpdatePhase.INTERRUPTED.value
+            if phase in {UpdatePhase.CHECKING, UpdatePhase.DOWNLOADING}
+            else phase
+        )
 
     def state(self) -> dict[str, object]:
         with self._lock:
@@ -131,6 +146,7 @@ class UpdateController:
             }
 
     def _phase_to(self, phase: str, error: UpdateError | None = None) -> None:
+        phase = phase.value if isinstance(phase, UpdatePhase) else phase
         assert self._identity is not None
         self.store.save(
             self._identity,
@@ -138,7 +154,9 @@ class UpdateController:
             self._candidate.version.text if self._candidate else None,
             error.code if error else None,
         )
-        self._phase, self._error = phase, error
+        _next_phase, _next_error = (phase, error)
+        self._move_phase(_next_phase)
+        self._error = _next_error
         self.store.prune_empty_terminal(self._identity)
 
     def _require(self, identity: str) -> None:
@@ -168,11 +186,15 @@ class UpdateController:
                 with self._lock:
                     if identity != self._identity:
                         return
-                    phase = "cancelled" if cancel.is_set() else "error"
+                    phase = (
+                        UpdatePhase.CANCELLED.value if cancel.is_set() else UpdatePhase.ERROR.value
+                    )
                     try:
                         self._phase_to(phase, error)
                     except UpdateError as journal_error:
-                        self._phase, self._error = "error", journal_error
+                        _next_phase, _next_error = (UpdatePhase.ERROR.value, journal_error)
+                        self._move_phase(_next_phase)
+                        self._error = _next_error
 
         self._thread = threading.Thread(target=work, name="sylvia-desktop-update", daemon=True)
         try:
@@ -181,7 +203,7 @@ class UpdateController:
             error = UpdateError(
                 "worker_unavailable", "The update worker could not start. You can retry."
             )
-            self._phase_to("error", error)
+            self._phase_to(UpdatePhase.ERROR.value, error)
             raise error from cause
 
     def check(self) -> dict[str, object]:
@@ -197,7 +219,7 @@ class UpdateController:
             self._downloaded = False
             self._transfer_kind = "update"
             self._received, self._total = 0, None
-            self._phase_to("checking")
+            self._phase_to(UpdatePhase.CHECKING.value)
 
             def action() -> None:
                 candidate = discover(
@@ -217,7 +239,9 @@ class UpdateController:
                             stage / "manifest.json", bounded_json(candidate.envelope_bytes)
                         )
                     self._candidate = candidate
-                    self._phase_to("available" if candidate else "current")
+                    self._phase_to(
+                        UpdatePhase.AVAILABLE.value if candidate else UpdatePhase.CURRENT.value
+                    )
 
             self._start(action)
             return self.state()
@@ -227,7 +251,7 @@ class UpdateController:
             self._require(identity)
             self._idle_worker()
             if (
-                self._phase not in {"available", "deferred"}
+                self._phase not in {UpdatePhase.AVAILABLE, UpdatePhase.DEFERRED}
                 or self._candidate is None
                 or self._downloaded
             ):
@@ -237,7 +261,7 @@ class UpdateController:
             manifest = self._candidate
             stage = self.store.stage(identity)
             self._cancel = threading.Event()
-            self._phase_to("downloading")
+            self._phase_to(UpdatePhase.DOWNLOADING.value)
 
             def progress(received: int, total: int | None) -> None:
                 with self._lock:
@@ -270,7 +294,7 @@ class UpdateController:
                     if self._cancel.is_set():
                         raise UpdateError("cancelled", "The update download was cancelled.")
                     self._downloaded = True
-                    self._phase_to("verified")
+                    self._phase_to(UpdatePhase.VERIFIED.value)
 
             self._start(action)
             return self.state()
@@ -278,7 +302,7 @@ class UpdateController:
     def cancel(self, identity: str) -> dict[str, object]:
         with self._lock:
             self._require(identity)
-            if self._phase not in {"checking", "downloading"}:
+            if self._phase not in {UpdatePhase.CHECKING, UpdatePhase.DOWNLOADING}:
                 raise UpdateError(
                     "invalid_phase", "This update can no longer be cancelled as a download."
                 )
@@ -292,17 +316,21 @@ class UpdateController:
         with self._lock:
             self._require(identity)
             self._idle_worker()
-            if not self._downloaded or self._phase not in {"verified", "deferred", "error"}:
+            if not self._downloaded or self._phase not in {
+                UpdatePhase.VERIFIED,
+                UpdatePhase.DEFERRED,
+                UpdatePhase.ERROR,
+            }:
                 raise UpdateError("invalid_phase", "Download and verify this update first.")
             self._prepared_attempt = None
-            self._phase_to("preparing")
+            self._phase_to(UpdatePhase.PREPARING.value)
 
             def work() -> None:
                 try:
                     attempt = operation_id(action())
                     with self._lock:
                         self._prepared_attempt = attempt
-                        self._phase_to("prepared")
+                        self._phase_to(UpdatePhase.PREPARED.value)
                 except Exception:
                     on_failure()
                     raise
@@ -318,10 +346,15 @@ class UpdateController:
         with self._lock:
             self._require(identity)
             self._idle_worker()
-            if self._phase not in {"available", "verified", "deferred", "prepared"}:
+            if self._phase not in {
+                UpdatePhase.AVAILABLE,
+                UpdatePhase.VERIFIED,
+                UpdatePhase.DEFERRED,
+                UpdatePhase.PREPARED,
+            }:
                 raise UpdateError("invalid_phase", "This update cannot be deferred at this stage.")
             self._prepared_attempt = None
-            self._phase_to("deferred")
+            self._phase_to(UpdatePhase.DEFERRED.value)
             return self.state()
 
     def arm_shutdown(self, identity: str) -> None:
@@ -329,9 +362,9 @@ class UpdateController:
         with self._lock:
             self._require(identity)
             self._idle_worker()
-            if self._phase != "prepared":
+            if self._phase != UpdatePhase.PREPARED:
                 raise UpdateError("invalid_phase", "The update is not prepared for shutdown.")
-            self._phase_to("closing")
+            self._phase_to(UpdatePhase.CLOSING.value)
 
     def close(self) -> None:
         # Network reads have a bounded transport timeout. Closing never starts apply or a retry.
@@ -342,3 +375,7 @@ class UpdateController:
         worker = self._thread
         if worker is not None and worker is not threading.current_thread():
             worker.join()
+
+    def _move_phase(self, phase: str) -> None:
+        """Set memory only, preserving the caller's existing save boundary."""
+        self._phase = phase

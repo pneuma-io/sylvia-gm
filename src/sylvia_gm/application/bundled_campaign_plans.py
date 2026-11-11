@@ -22,7 +22,11 @@ from sylvia_gm.application.reusable_plans import (
     load_reusable_campaign_plan,
 )
 from sylvia_gm.domain.authority import PackageRole
-from sylvia_gm.domain.campaign_plan import PackageBinding, ValidatedCampaignPlan, parse_starting_party_policy
+from sylvia_gm.domain.campaign_plan import (
+    PackageBinding,
+    ValidatedCampaignPlan,
+    parse_starting_party_policy,
+)
 from sylvia_gm.domain.interview_contribution import parse_interview_contribution_bytes
 from sylvia_gm.domain.package_library import canonical_json_bytes
 
@@ -176,10 +180,19 @@ def _bundled_plan(plan_id: str) -> ReusableCampaignPlan | None:
     if public is None:
         # Retain exact access for older saved setup references without adding a
         # seventeenth choice to the current public collection.
-        if plan_id != "the-rift-awakening" or not (bundled_plans_root() / plan_id / "plan.json").is_file():
+        if (
+            plan_id != "the-rift-awakening"
+            or not (bundled_plans_root() / plan_id / "plan.json").is_file()
+        ):
             return None
-        legacy = json.loads((bundled_plans_root() / plan_id / "plan.json").read_text(encoding="utf-8"))
-        public = {"id": plan_id, "title": legacy["title"], "pitch": "The original Rift Awakening campaign."}
+        legacy = (
+            json.loads((bundled_plans_root() / plan_id / "plan.json").read_text(encoding="utf-8"))
+        )
+        public = (
+            {
+            "id": plan_id,
+            "title": legacy["title"], "pitch": "The original Rift Awakening campaign."}
+        )
     root = bundled_plans_root() / plan_id
     sources = sources_for(root)
     plan = sources.validated_plan or validate_plan_snapshot(

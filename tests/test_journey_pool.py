@@ -210,3 +210,43 @@ def test_real_collection_and_workers_import_the_selected_source_before_ambient_p
         None,
     )
     assert results["binding"][0]
+
+
+@pytest.mark.parametrize("include_historical", [False, True])
+def test_real_pool_collects_new_behavior_once_and_reports_historical_exclusion(
+    tmp_path, monkeypatch, include_historical,
+):
+    from scripts.check_catalog import PRODUCT_CASE_EXCLUSIONS
+
+    historical = next(iter(PRODUCT_CASE_EXCLUSIONS))
+    module, historical_function = historical.split("::")
+    root = tmp_path / "source"
+    (root / "scripts").mkdir(parents=True)
+    (root / "scripts/journey_case_timings.json").write_text('{"seconds":{}}')
+    tests = root / "tests"
+    tests.mkdir()
+    (tests / "__init__.py").write_text("")
+    (root / module).write_text(
+        "def test_existing_behavior():\n    assert True\n"
+        "def test_future_behavior():\n    assert True\n"
+        f"def {historical_function}():\n    assert True\n"
+    )
+    destination = tmp_path / "evidence"
+    destination.mkdir()
+    monkeypatch.setenv("PYTEST_DISABLE_PLUGIN_AUTOLOAD", "1")
+    results = journey_pool.run_balanced_gate(
+        root, destination, {"gm-turn": [module]}, ["gm-turn"], 1, 0.0, None,
+        include_historical=include_historical,
+    )
+    assert results["gm-turn"][0]
+    assignments = json.loads((destination / "pool-assignments.json").read_text())
+    executed = [nodeid for bucket in assignments["tasks"] for _, nodeid in bucket]
+    assert len(executed) == len(set(executed)) == (3 if include_historical else 2)
+    assert module + "::test_future_behavior" in executed
+    assert (historical in executed) is include_historical
+    excluded = json.loads((destination / "gm-turn-excluded-cases.json").read_text())
+    assert excluded == ([] if include_historical else [
+        {"nodeid": historical, "reason": PRODUCT_CASE_EXCLUSIONS[historical]},
+    ])
+    cases = list(ET.parse(destination / "gm-turn.xml").iter("testcase"))
+    assert len(cases) == len(executed) and all(not list(case) for case in cases)

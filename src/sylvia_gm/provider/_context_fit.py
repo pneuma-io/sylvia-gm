@@ -253,7 +253,8 @@ class ContextFittingProvider(Provider):
         )
         required = required_tokens if required_tokens is not None else required_upper_bound
         decision: Literal["admitted", "rejected", "runtime_deferred"] = (
-            "runtime_deferred" if self.runtime_managed or valid_context_window is None else "admitted"
+            "runtime_deferred"
+            if self.runtime_managed or valid_context_window is None else "admitted"
             if required is not None
             and valid_context_window is not None
             and required <= valid_context_window

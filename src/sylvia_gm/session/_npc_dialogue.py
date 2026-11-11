@@ -44,7 +44,7 @@ class NPCDialogueManager:
 
     # ── Public API ────────────────────────────────────────────────────
 
-    def get_persona_block(self, npc_id: str, store: "StateAPI") -> str:
+    def get_persona_block(self, npc_id: str, store: StateAPI) -> str:
         """Build a persona block for an NPC.
 
         Format::
@@ -97,7 +97,7 @@ class NPCDialogueManager:
             relationship=relationship,
         )
 
-    def get_active_npcs(self, store: "StateAPI", scene: str) -> list[str]:
+    def get_active_npcs(self, store: StateAPI, scene: str) -> list[str]:
         """Get the IDs of NPCs present in the current scene.
 
         Args:
@@ -111,7 +111,7 @@ class NPCDialogueManager:
         return [n["id"] for n in npcs]
 
     def build_npc_blocks_for_scene(
-        self, store: "StateAPI", scene: str
+        self, store: StateAPI, scene: str
     ) -> list[str]:
         """Build persona blocks for all NPCs in a scene.
 
@@ -133,7 +133,7 @@ class NPCDialogueManager:
     # ── Internal Helpers ─────────────────────────────────────────────
 
     def _get_visible_knowledge(
-        self, npc_id: str, store: "StateAPI"
+        self, npc_id: str, store: StateAPI
     ) -> dict[str, str]:
         """Collect all non-secret knowledge entries for an NPC.
 

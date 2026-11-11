@@ -44,7 +44,7 @@ class ContextManager:
 
     # ── Public API ────────────────────────────────────────────────────
 
-    def snapshot(self, store: "StateAPI", scope: str) -> str:
+    def snapshot(self, store: StateAPI, scope: str) -> str:
         """Return a text snapshot of the requested scope.
 
         Args:
@@ -72,7 +72,7 @@ class ContextManager:
 
     # ── Snapshot Builders ─────────────────────────────────────────────
 
-    def _combat_snapshot(self, store: "StateAPI") -> str:
+    def _combat_snapshot(self, store: StateAPI) -> str:
         """Build a combat-focused text snapshot.
 
         Includes HP, AC, conditions, and initiative order for all
@@ -132,7 +132,7 @@ class ContextManager:
         result = "\n".join(lines)
         return self._truncate(result)
 
-    def _social_snapshot(self, store: "StateAPI") -> str:
+    def _social_snapshot(self, store: StateAPI) -> str:
         """Build a social-focused text snapshot.
 
         Includes NPC attitudes, relationships, and visible knowledge.
@@ -205,7 +205,7 @@ class ContextManager:
         result = "\n".join(lines)
         return self._truncate(result)
 
-    def _inventory_snapshot(self, store: "StateAPI") -> str:
+    def _inventory_snapshot(self, store: StateAPI) -> str:
         """Build an inventory-focused text snapshot.
 
         Includes items, equipment, and gold for all party members.
@@ -266,7 +266,7 @@ class ContextManager:
         result = "\n".join(lines)
         return self._truncate(result)
 
-    def _full_snapshot(self, store: "StateAPI") -> str:
+    def _full_snapshot(self, store: StateAPI) -> str:
         """Build a full state snapshot (all domains).
 
         Used sparingly — at session start or when the player needs

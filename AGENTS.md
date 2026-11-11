@@ -107,6 +107,7 @@ product specification.
 
 ## Code and comments
 
+- A value that moves through three or more named states gets a `StrEnum` and a table of allowed moves next to it. Store `.value`.
 - Keep modules and interfaces direct, readable, and maintainable by one person.
 - Comment a function's purpose, non-obvious invariant, or important tradeoff near its declaration.
 - Do not narrate obvious operations with line-by-line comments.
@@ -114,6 +115,8 @@ product specification.
   current need.
 
 ## Test proportionately
+
+The supported-journey gate runs locally; the GitHub workflow is manual-only. A PR is ready for review when its description records the locally checked head commit, commands, results, elapsed time and checks not run.
 
 - Follow [`docs/operations/quality-preserving-development-process.md`](docs/operations/quality-preserving-development-process.md).
 - Live Sylvia testing uses the Windows environment selected for the current run in that process
@@ -140,7 +143,7 @@ product specification.
   in a dirty tree.
 - Exactly one worker writes the live worktree. Other workers are read-only unless ownership is
   explicitly transferred. Fluff coordinates Codex tasks with bounded scope, file ownership,
-  acceptance criteria and a mandatory return report. Use current Project Desk decisions and the
+  acceptance criteria and a mandatory return report. Use current Dot Desk (formerly Project Desk) decisions and the
   synchronized repository guidance; historical ownership statements do not assign a writer.
 - Staging, commits, pushes, deployment, publication, destructive data operations, spending, and
   credential access require direct authority in the current human-authored task.
@@ -160,7 +163,7 @@ product specification.
 
 ### Issue tracker
 
-Issues and specs use local Markdown files under `.scratch/`. See `docs/agents/issue-tracker.md`.
+Dot Desk holds current work items and decisions. GitHub holds project source; local scratch files are temporary evidence. See `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 

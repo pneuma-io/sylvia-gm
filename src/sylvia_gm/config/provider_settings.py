@@ -788,7 +788,8 @@ def _model_transport_for_preset(
     preset_id: str, model_id: str, declared: object | None = None
 ) -> ProviderTransport:
     return cast(ProviderTransport, model_protocol(
-        preset_id, model_id, declared, fallback=str(_PROVIDER_PRESETS[preset_id]["default_transport"]),
+        preset_id,
+        model_id, declared, fallback=str(_PROVIDER_PRESETS[preset_id]["default_transport"]),
     ))
 
 
@@ -1536,13 +1537,21 @@ def validate_provider_model(
             elif selected_transport == "gemini_generate_content":
                 from urllib.parse import quote
 
-                route = "/models/" + quote(upstream_model_id.removeprefix("models/"), safe="") + ":streamGenerateContent?alt=sse"
+                route = (
+                    "/models/" + quote(
+                    upstream_model_id.removeprefix(
+                    "models/"), safe="") + ":streamGenerateContent?alt=sse"
+                )
                 payload = {
-                    "contents": [{"role": "user", "parts": [{"text": "Call sylvia_compatibility_probe with an empty object."}]}],
+                    "contents": [{"role": "user", "parts": [{"text": (
+                        "Call sylvia_compatibility_probe with an empty object."
+                    )}]}],
                     "generationConfig": {"maxOutputTokens": 128},
                     "tools": [{"functionDeclarations": [{"name": tool_name,
-                        "parametersJsonSchema": {"type": "object", "properties": {}, "additionalProperties": False}}]}],
-                    "toolConfig": {"functionCallingConfig": {"mode": "ANY", "allowedFunctionNames": [tool_name]}},
+                        "parametersJsonSchema": {
+                        "type": "object", "properties": {}, "additionalProperties": False}}]}],
+                    "toolConfig": {
+                    "functionCallingConfig": {"mode": "ANY", "allowedFunctionNames": [tool_name]}},
                 }
             elif selected_transport == "anthropic_messages":
                 route = "/messages"
@@ -1647,7 +1656,9 @@ def validate_provider_model(
                         candidates = event.get("candidates", [])
                         for candidate in candidates if isinstance(candidates, list) else []:
                             for part in candidate.get("content", {}).get("parts", []):
-                                saw_tool_call |= part.get("functionCall", {}).get("name") == tool_name
+                                saw_tool_call |= (
+                                    part.get("functionCall", {}).get("name") == tool_name
+                                )
                     elif selected_transport == "anthropic_messages":
                         block = event.get("content_block")
                         saw_tool_call |= bool(
@@ -1929,7 +1940,8 @@ def save_provider_settings(
         )
     builder_budget = (
         _model_integer(builder_output_tokens, "Builder output limit", 1, output or 10_000_000)
-        if builder_output_tokens is not None else min(previous_builder_budget or 32_000, output or 32_000)
+        if builder_output_tokens is not None
+        else min(previous_builder_budget or 32_000, output or 32_000)
     )
     replacement = {
         "id": upstream_model_id,

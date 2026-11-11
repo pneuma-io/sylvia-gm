@@ -14,6 +14,9 @@ from sylvia_gm.application.desktop_update.processes import (
     ProcessReceipt,
     WindowsHandles,
 )
+from tests.desktop_update_move_checks import (
+    assert_desktop_update_moves as assert_desktop_update_moves,
+)
 
 
 class Handles:

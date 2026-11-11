@@ -178,6 +178,9 @@ with the Tauri command above.
 
 ### Developer tests
 
+See [How Sylvia is checked before release](docs/operations/local-checks-and-release.md)
+for focused, affected and full local checks, their evidence, and the separate release acceptance steps.
+
 From the repository root, after syncing the Python dependencies:
 
 ```powershell
@@ -185,6 +188,31 @@ $env:PYTHONDONTWRITEBYTECODE=1
 $env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=1
 .venv/Scripts/python.exe -m pytest -s -p pytest_asyncio.plugin -p no:cacheprovider
 ```
+
+Append a test file to run a focused check, for example
+`tests/test_srd_lite_dispel_decision_widgets.py`. Root pytest supplies the import paths and
+default fixture; its disposable data stays outside the checkout.
+
+The supported-journey gate runs locally. GitHub Actions is dispatch-only: pushing a branch or
+opening a PR does not start it. To select affected checks against current main, choose a fresh
+output directory for each run and use:
+
+```powershell
+# The runner uses normal plugin autoload after the direct-pytest example above.
+$env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=$null
+git fetch origin
+.venv/Scripts/python.exe scripts/select_checks.py --base origin/main --output ../checks/run-1/selection.json
+.venv/Scripts/python.exe scripts/check_supported_journeys.py --selection-manifest ../checks/run-1/selection.json --jobs 2 --case-workers 1 --scheduler case --output-dir ../checks/run-1/journeys
+```
+
+For complete Python/Node qualification, replace `--base origin/main` with `--full`. That also
+selects the longer tests reserved for a full run. Record the checked head commit, results,
+elapsed time and gaps in the PR description. Known strict expected failures remain listed
+defects; an unexpected pass requires removing or reviewing that entry.
+
+After the selected PRs merge, check the combined main again and build from that same clean
+commit. Packaging, Rust, genuine-provider and installed/native acceptance are separate checks
+selected for the candidate; the Python/Node gate alone does not qualify a release.
 
 Node and browser checks also need a supported [Node.js LTS](https://nodejs.org/en/download) with
 npm. The [browser-test lockfile](tests/package-lock.json) requires Node 20 or newer and pins

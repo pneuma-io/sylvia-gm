@@ -17,6 +17,7 @@ import sys
 import tempfile
 import time
 from collections import OrderedDict
+from contextlib import suppress
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -27,6 +28,8 @@ from aiohttp import web
 from sylvia_gm import __version__
 from sylvia_gm.infrastructure.launch_handshake import LaunchHandshake
 
+from .commands.registry import WEBUI_COMMANDS
+
 MAX_BYTES = 64 * 1024 * 1024
 MAX_UPLOAD_BYTES = 48 * 1024 * 1024
 MAX_UPLOAD_PARAMS_BYTES = 16 * 1024
@@ -36,108 +39,7 @@ REMOTE_SESSION_SECONDS = 12 * 60 * 60
 OWNER_EXIT_TIMEOUT = 15
 # Only existing player/application commands. Path-taking native commands are
 # handled separately using server-owned upload/export destinations.
-COMMANDS = frozenset(
-    [
-        "campaign_index",
-        "ready_campaign_catalog",
-        "start_ready_campaign",
-        "customize_ready_campaign",
-        "campaign_creation_catalog",
-        "campaign_party_options",
-        "builder_chat_index",
-        "create_builder_chat",
-        "rename_builder_chat",
-        "archive_builder_chat",
-        "restore_builder_chat",
-        "delete_builder_chat",
-        "display_snapshot",
-        "player_projection",
-        "player_projection_page",
-        "campaign_panels",
-        "cancel_display_load",
-        "action_sequence",
-        "compose_action_sequence",
-        "execute_action_sequence",
-        "player_action_availability",
-        "execute_panel_action",
-        "preview_panel_action",
-        "panel_action_receipt",
-        "execute_player_action",
-        "preview_player_action",
-        "resolve_mechanics_choice",
-        "session_context",
-        "session_history_page",
-        "inspect_provider_thinking",
-        "steer_session",
-        "package_candidates",
-        "inspect_package_candidate",
-        "package_candidate_text",
-        "compare_package_candidates",
-        "rift_template",
-        "start_rift_campaign",
-        "start_guided_campaign",
-        "start_guided_creation_subflow",
-        "return_guided_creation_subflow",
-        "model_choices",
-        "provider_settings",
-        "open_provider_setup",
-        "discover_provider_models",
-        "detect_local_providers",
-        "validate_provider_model",
-        "save_provider_settings",
-        "remove_provider_settings",
-        "switch_session_model",
-        "switch_session_reasoning",
-        "set_default_model",
-        "admin_full_audit_status",
-        "admin_full_audit_record",
-        "set_admin_full_audit",
-        "submit_session_input",
-        "start_dm_session",
-        "interrupt_stream",
-        "interrupt_provider_stream",
-        "disconnect_stream",
-        "disconnect_provider_stream",
-        "stream_heartbeat",
-        "provider_stream_heartbeat",
-        "narration_attempt_status",
-        "provider_stream_status",
-        "retryable_interruption",
-        "manual_retry_session",
-        "reconnect_stream",
-        "reconnect_provider_stream",
-        "confirm_character_card_import",
-        "start_import_repair",
-        "create_guided_campaign_draft",
-        "navigate_guided_campaign_draft",
-        "advance_guided_campaign_draft",
-        "guided_campaign_contribution",
-        "save_reusable_campaign_plan",
-        "confirm_new_campaign",
-        "begin_campaign_construction",
-        "model_guidance",
-        "finalize_campaign_construction",
-        "catalog",
-        "stop_agent_session",
-        "resume_agent_session",
-        "rename_campaign",
-        "archive_campaign",
-        "restore_archived_campaign",
-        "trash_campaign",
-        "restore_trashed_campaign",
-        "purge_campaign",
-        "campaign_rules_update_options",
-        "preview_campaign_rules_update",
-        "adopt_campaign_rules_update",
-        "delete_reusable_library_entry",
-        "campaign_sequel_context",
-        "preview_campaign_sequel",
-        "append_campaign_sequel",
-        "load_desktop_drafts",
-        "save_desktop_drafts",
-        "record_local_fault",
-    ]
-)
+COMMANDS = WEBUI_COMMANDS
 EXPORTS = {
     "export_campaign_file": ("exports", ".sylvia-gm-campaign"),
     "export_package_candidate_file": ("exports", ".sylvia-gm-package"),
@@ -244,16 +146,14 @@ class OwnerProcess:
                 raise WebUIError("The owner did not become ready.")
             handshake.verify(ready["response_hex"])
         except asyncio.CancelledError:
-            try:
+            # Preserve launch cancellation after collecting the child.
+            with suppress(WebUIError):
                 await self.close()
-            except WebUIError:
-                pass  # Preserve launch cancellation after collecting the child.
             raise
         except Exception:
-            try:
+            # The launch failure remains the caller's recovery reason.
+            with suppress(WebUIError):
                 await self.close()
-            except WebUIError:
-                pass  # The launch failure remains the caller's recovery reason.
             raise WebUIError(
                 "Sylvia could not open this data root. If it is already open in another "
                 "desktop or WebUI, close that owner first. No second writer was started."
@@ -348,10 +248,9 @@ class OwnerProcess:
                 except (Exception, asyncio.CancelledError) as error:
                     failure = error
                     if process.returncode is None:
-                        try:
+                        # Exit can race the decision to terminate this exact child.
+                        with suppress(ProcessLookupError):
                             process.terminate()
-                        except ProcessLookupError:
-                            pass  # Exit can race the decision to terminate this exact child.
                         await process.wait()
         finally:
             if process.returncode is not None:
@@ -362,7 +261,9 @@ class OwnerProcess:
         if isinstance(failure, asyncio.CancelledError):
             raise failure
         if failure is not None:
-            reason = "timed out" if isinstance(failure, TimeoutError) else "did not finish gracefully"
+            reason = (
+                "timed out" if isinstance(failure, TimeoutError) else "did not finish gracefully"
+            )
             raise WebUIError(
                 f"Sylvia owner shutdown {reason} (exit {process.returncode}). "
                 "Saved work is retained; launch again to inspect it.", "owner_close_failed",
@@ -872,7 +773,8 @@ class LocalWebUI:
             for _, task in self.requests.values():
                 if not task.done():
                     task.cancel()
-            await asyncio.gather(*(task for _, task in self.requests.values()), return_exceptions=True)
+            await asyncio.gather(
+                *(task for _, task in self.requests.values()), return_exceptions=True)
             self.downloads.clear()
             if self.download_directory is not None:
                 self.download_directory.cleanup()

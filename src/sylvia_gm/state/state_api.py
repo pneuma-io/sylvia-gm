@@ -24,8 +24,6 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Literal
 
-logger = logging.getLogger(__name__)
-
 from ._changelog import Changelog
 from ._exceptions import (
     CombatAlreadyActiveError,
@@ -58,6 +56,8 @@ from ._validators import (
     validate_condition,
     validate_entity_id,
 )
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # StateAPI
@@ -105,7 +105,7 @@ class StateAPI:
         loaded_version = self._store.get_raw().get("metadata", {}).get(
             "schema_version", "0.1.0"
         )
-        
+
         # T5.5: Log state load
         session_id = self._state_path.stem
         logger.info("state_load session_id=%s schema_version=%s", session_id, loaded_version)
@@ -145,7 +145,7 @@ class StateAPI:
         state_path = Path(state_path)
         schema_path = Path(__file__).parent / "state_schema.json"
 
-        store = StateStore.create(state_path, campaign, ruleset, schema_path)
+        StateStore.create(state_path, campaign, ruleset, schema_path)
         return cls(state_path, schema_path)
 
     # ------------------------------------------------------------------
@@ -421,7 +421,7 @@ class StateAPI:
         """
         chars = self._store.get_raw().get("characters", {})
         result = []
-        for cid, char in chars.items():
+        for _cid, char in chars.items():
             if kind is None or char.get("kind") == kind:
                 result.append(deepcopy(char))
         return result
@@ -1275,7 +1275,7 @@ class StateAPI:
         """
         npcs = self._store.get_raw().get("npcs", {})
         result = []
-        for nid, npc in npcs.items():
+        for _nid, npc in npcs.items():
             if location is not None and npc.get("location") != location:
                 continue
             if faction is not None and npc.get("faction") != faction:
@@ -1472,7 +1472,7 @@ class StateAPI:
         """
         monsters = self._store.get_raw().get("monsters", {})
         result = []
-        for mid, mon in monsters.items():
+        for _mid, mon in monsters.items():
             if type is not None and mon.get("type") != type:
                 continue
             if cr_max is not None:
@@ -1902,8 +1902,8 @@ class StateAPI:
         # For now, append to end. Proper initiative ordering is T1.4's job.
         if entity_id not in order:
             # Insert AFTER last same-initiative entry
-            insert_at = len(order)
-            for i, pid in enumerate(order):
+            len(order)
+            for _i, _pid in enumerate(order):
                 # If current has lower initiative, insert here
                 pass  # Defer to T1.4 for actual sorting
             order.append(entity_id)
@@ -2217,7 +2217,7 @@ class StateAPI:
         """
         quests = self._store.get_raw().get("quests", {})
         result = []
-        for qid, quest in quests.items():
+        for _qid, quest in quests.items():
             if status is not None and quest.get("status") != status:
                 continue
             result.append(deepcopy(quest))

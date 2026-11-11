@@ -12,6 +12,9 @@ import pytest
 from sylvia_gm.application.desktop_update import helper, runtime, service
 from sylvia_gm.application.desktop_update.manifest import UpdateError
 from sylvia_gm.application.desktop_update.restart import RestartHandshake
+from tests.desktop_update_move_checks import (
+    assert_desktop_update_moves as assert_desktop_update_moves,
+)
 from tests.test_desktop_update_preparation import fixture
 from tests.test_desktop_update_replacement import assert_tree
 

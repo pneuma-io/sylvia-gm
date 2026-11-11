@@ -22,6 +22,9 @@ from sylvia_gm.application.desktop_update.manifest import (
     payload_path,
     release_url,
 )
+from tests.desktop_update_move_checks import (
+    assert_desktop_update_moves as assert_desktop_update_moves,
+)
 
 
 def manifest_fixture(distribution="portable"):
