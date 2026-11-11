@@ -516,6 +516,14 @@ PYTHON_JOURNEYS = {
         "tests/test_ruleset_modifier_evaluation.py",
         "tests/test_runtime_nested_rejections.py",
     ],
+    # Developer-only SylviaBench checks: offline and scripted, with no model connection.
+    "benchmark-framework": [
+        "tests/test_sylviabench_checks.py",
+        "tests/test_sylviabench_comparison.py",
+        "tests/test_sylviabench_protocol_v2.py",
+        "tests/test_sylviabench_provenance.py",
+        "tests/test_sylviabench_timeout.py",
+    ],
     "full-only-slow": [
         'tests/test_alpha_04_ruleset_neutral_package.py',
         'tests/test_alpha_05_rift_journey.py',
@@ -573,6 +581,7 @@ PYTHON_JOURNEYS = {
         'tests/test_starter_builder_copy.py',
         'tests/test_starting_advancement_flow.py',
         'tests/test_starting_advancement_session.py',
+        'tests/test_sylviabench_gameplay.py',
         'tests/test_webui.py',
         'tests/test_webui_private_proxy.py',
         'tests/test_weekend_candidate.py',
