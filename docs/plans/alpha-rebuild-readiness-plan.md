@@ -67,11 +67,11 @@ watches, drones, wall editing and wall-induced queue review. Rig motion bytes ar
 Build17 independently proves saved resources and queue state; no fresh frame-motion
 comparison is claimed. Passing earlier mechanics are retained with their exact identities.
 
-The TD branch now incorporates PR #36's frozen corrected main-source input
+The TD branch incorporates PR #36's prior main-targeted source input
 `11c279d2ef24fd821be7a163054fa7471a55bd65`, including explicit existing-campaign review/adoption
 and the approved somatic omission default. That input provides Lite 0.3.18. The hotfix owner's
 separate Alpha4-based binary `e543957` provides Lite 0.3.17; its installed upgrade and omitted-field
-healing passed, with portable reopen audit readback still pending at the handoff. Those native
+healing passed; its portable reopened-request and closed-save readbacks also passed, per the hotfix owner's closeout. Those native
 results do not qualify the TD composition. Build17 and its public TD package retain their exact
 `4b438d7` provenance; no replacement binary is claimed for the new source.
 
@@ -90,9 +90,10 @@ Its owner is repairing fixture/test gaps and attributing remaining failures. Kee
 separate, consume the stable checked identity and qualify the actual final composition. Do not
 import unfinished refactor source, duplicate its gate or claim hosted CI success.
 
-The frontend handoff's priority resource fields and Reload acceptance are covered. Round
-display remains unresolved: TD has no round counter, while the frontend currently reads
-round from encounter combat state. Its definition/disposition is awaiting the owner.
+The frontend handoff's priority resource fields and Reload acceptance are covered. Daniel
+deferred Round display and its counter to the later frontend pass on 11 November 2026.
+This is no longer an open decision or blocker for the current TD integration. No counter
+or turn-clock rule is added here.
 Portrait references, committed movement cues, class lane grants and final combined 1:1
 mock-up/Opus acceptance retain their separate contracts. Mechanics proof does not close them.
 
@@ -137,10 +138,10 @@ history and old release source archives; this work does not rewrite history.
 | Work | Current boundary |
 |---|---|
 | Frontend overhaul, PR #28 | Merged on main `6526904` before PR #6. PR #6 owns its composed TD qualification; source/browser evidence does not by itself establish final installed acceptance. |
-| Trigger Discipline integration, PR #6 | Separate active owner; checked draft `573b015` combines TD `72522a8` and main-targeted hotfix `11c279d`, with no conflict. TD package/frontend/Rust bytes retain native-tested `4b438d7` provenance; build 17 and its native replay are separate evidence. Eight final source checks and Full/AP2 owner-process plus loopback narration checks pass at `573b015`. Host desktop control, balancing, merge and release remain held. Privacy removal is complete; public packages exclude canonical vault text, and full public-session adequacy without private prose/future Rulebook remains unproven. The final combined refactor/hotfix candidate needs rebuilding and its own selected native qualification. |
+| Trigger Discipline integration, PR #6 | Separate active owner; draft `34eb451` changes documentation only after source-checked `573b015`, which combines TD `72522a8` and main-targeted hotfix `11c279d` with no conflict. All code and package bytes are identical. Daniel deferred Round display and its counter to the later frontend pass; neither blocks this integration. TD package/frontend/Rust bytes retain native-tested `4b438d7` provenance; build 17 and its native replay are separate evidence. Eight final source checks and Full/AP2 owner-process plus loopback narration checks pass at `573b015`. Host desktop control, balancing, merge and release remain held. Privacy removal is complete; public packages exclude canonical vault text, and full public-session adequacy without private prose/future Rulebook remains unproven. The final combined refactor/hotfix candidate needs rebuilding and its own selected native qualification. |
 | Refactor, [PR #33](https://github.com/pneuma-io/sylvia-gm/pull/33) | Stages 1-8, including stage 7A, are implemented and undergoing final local qualification. The PR records exact checked heads, commands, outcomes, strict suspected defects and remaining baseline gaps. Independent acceptance and the final combined candidate remain open. Stage 9 (`app.js` and WebUI script policy) waits for PR #6 to merge; PR #28 is already merged. Broad formatting remains deferred while open PRs change source. |
 | SRD Full, PR #3 | Parked, inactive work; it does not expand the 117-spell Lite launch roster. |
-| GM memory and casting hotfix | Separate draft [PR #36](https://github.com/pneuma-io/sylvia-gm/pull/36), checked main-targeted source `11c279d`; GitHub main remains `6526904`. The source handoff includes durable GM memory, usable advertised tools and healing input/refusal repairs. Fourteen scripted-provider request contracts and 285 focused GM cases pass on the separate checked composition. Its Lite 0.3.18 source and the Alpha4 backport Lite 0.3.17 native evidence have distinct provenance. Full combined/build/native/genuine-provider acceptance remains separate; no merge or release is inferred. |
+| GM memory and casting hotfix | Separate draft [PR #36](https://github.com/pneuma-io/sylvia-gm/pull/36), prior checked main-targeted source `11c279d`; GitHub main remains `6526904`. The composed staged Sunburst and Fire Storm checks reproduce premature recipient refusals on exact `11c279d`; the existing hotfix owner is repairing this, and the corrected checked main-source identity is pending. The source handoff includes durable GM memory, usable advertised tools and healing input/refusal repairs. Fourteen scripted-provider request contracts and 285 focused GM cases pass on the separate checked composition. Its Lite 0.3.18 source and the Alpha4 backport Lite 0.3.17 native evidence have distinct provenance. Full combined/build/native/genuine-provider acceptance remains separate; no merge or release is inferred. |
 | SylviaBench | Outside this refactor. |
 
 Tutorials/onboarding, desktop updates, local diagnostics and compatible campaign Ruleset updates
