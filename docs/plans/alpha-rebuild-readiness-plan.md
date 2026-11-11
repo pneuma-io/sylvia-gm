@@ -248,7 +248,18 @@ details remain editable visual defaults. Original profile prefixes and the previ
 and bindings are unchanged. Actual square/dialogue/map-token crops passed visual review. All 18
 exact PNGs, external resources and twelve current/retained authored source editions pass offline
 verification against actual current Lite payloads and Setting scope. The authored roster check
-passed in 3.09 seconds for 218 subjects/336 source editions. At f85bbcb, all 82 authored NPCs across
+passed in 3.09 seconds for 218 subjects/336 source editions.
+Rift Flameskull, Forge, Fungus, Violet Fungus, Ghast and Ghost now have complete full-body,
+multiview and portrait bundles, bringing the catalogue to 146 bundles/438 PNGs. Forge's selected
+body framing preserves its complete flame crown and hammer. Violet Fungus's selected sheet
+repair preserves five caps in each view; both original prompts and corrective edits remain
+recorded. Faceless fungi keep their complete silhouettes in portrait/token crops. Ghast and
+Ghost retain anonymous editable appearances without invented life histories. All six actual
+square/dialogue/map-token crops passed visual review. All eighteen exact assets/resources and
+twelve current/retained authored editions pass offline verification against current Lite Setting
+payloads, with the prior 140 bundles and original profile prefixes preserved. The authored roster
+check passed in 10.79 seconds for 218 subjects/342 editions. This is artwork preparation only;
+broader workflows and native/live acceptance remain unfinished. At f85bbcb, all 82 authored NPCs across
 80 current profile files
 and 165 source editions resolved complete artwork, with all 246 NPC PNGs/resources and actual
 Lite lookup verified. That unchanged preparation remains qualified. The wider monster, inherited
@@ -260,7 +271,7 @@ The owner selected a shared app artwork library: whole Setting/Plan exports omit
 PNGs, while custom art stays portable and character/campaign exports carry used artwork. The
 source now maps the catalogue and PNGs as external installer/portable resources, outside the
 onefile sidecar. Campaign export retains used art before any artwork view has been opened.
-The prepared PNG pool now totals 971,136,354 bytes across 420 images, beyond the content-package cap.
+The prepared PNG pool now totals 1,009,095,405 bytes across 438 images, beyond the content-package cap.
 The current Setting omits those PNGs; its existing content-package limits remain unchanged.
 Focused checks cover shared/custom publication, external resource inventory, portable ZIP assembly,
 and exact campaign art transfer before opening an image view. Local-copy receipts also transfer
@@ -299,20 +310,27 @@ across the current and retained Lite sources. Exact file/JSON Pointer/hash bindi
 to the selected Setting. Portrait lookup uses admitted metadata without parsing the large
 definition files. Producer and owner composition checks cover these bindings and used-art
 transfer with generation Off; these fixtures do not supply the missing production artwork.
-Seventeen inherited forms now reuse their prepared Severed Lands renditions: Ankheg, Basilisk,
+At 04f9e5f, seventeen inherited forms reused their prepared Severed Lands renditions: Ankheg, Basilisk,
 Darkmantle, Death Dog, Gelatinous Cube, Doppelganger, Dust Mephit, Earth Elemental, Ettercap, Ettin
 and Fire Elemental, plus Air Elemental, Behir, Bulette, Cockatrice, Flesh Golem and Magmin. Flesh
 Golem uses the prepared Anchor Guardian look; Magmin uses Rift Cinder. These are Setting-specific
 artwork choices; mechanical payloads and runtime identities are unchanged. Exact Ruleset
-file/hash/JSON Pointer plus Setting scope selects the existing complete bundle. The six new
+file/hash/JSON Pointer plus Setting scope selects the existing complete bundle. Those six added
 bindings pass actual current Lite byte/metadata lookup and wrong Setting/hash/package/pointer
 refusal. All 140 visual records, prompts and crops and all earlier bindings are preserved; the
 eighteen reused PNGs pass exact-byte/hash lookup. No images were created or copied, and external
-resources remain unchanged. This qualifies artwork lookup only; inherited form execution remains
+resources remained unchanged. This qualifies artwork lookup only; inherited form execution remains
 unqualified by this check.
+Four further inherited records now reuse the newly prepared renditions: Azer Sentinel uses Rift
+Forge; Violet Fungus, Ghast and Ghost use their matching Rift renditions. Actual current Lite
+file bytes and admitted hash/size metadata resolve all four exact records; wrong Setting, hash,
+package, pointer and changed bytes are refused. The previous 140 bundles remain unchanged. This
+brings inherited coverage to 21 forms, without extra image copies or mechanical payload changes.
+It qualifies artwork lookup, not inherited form execution. No missing Flameskull/Myconid entry
+was invented, and the walking Rift Fungus was not bound to the distinct Shrieker Fungus.
 Other Settings do not inherit those renditions. The mixed NPC/creature journey selects one
 Basilisk through its inherited form and another through its authored Rift profile, preserving
-independent crops and offline used-art recovery. The remaining 313 inherited forms still need art.
+independent crops and offline used-art recovery. The remaining 309 inherited forms still need art.
 At 3b7cc8a, the original five-form actual-image/resource/alias check passed in 84.91 seconds,
 including refusal outside Severed Lands; the mixed authored/inherited/NPC offline journey passed
 in 73.42 seconds. All 33 then-current visual bundles and previous bindings were preserved. Those

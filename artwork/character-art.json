@@ -8794,6 +8794,390 @@
         "reference_sheet": "Use case: identity-preserve. Asset: production multiview reference sheet for Rift Fire from Severed Lands. Input image 1 is the selected canonical complete reference. Preserve its exact anatomy/elemental form, identity, materials, colors and equipment. Appearance: One Large Rift Fire elemental: a complete upright column of cold-burning violet-white flame with an intense pale white-lavender inner column, vivid violet flame edges and many distinct upward leaping tongues. Its base narrows into an irregular hovering flame root just above the ground, with a few tiny ash flecks shimmering like trapped starlight close to the base. The single continuous flame column has an irregular natural fire silhouette, not a spiral tornado. No solid body, face, head, eyes, mouth, arms, fists, legs, wings or feet. Violet-white cold-burning flame and starlit ash follow the authored Setting lore; exact plume shape, palette intensity and ash pattern are editable visual defaults. No orange/red/yellow fire, ice body, burning human, fire imp, gray smoke creature, dust storm, lightning bolt, portal, victim, burning house, Anchor Door, readable text or scenery. Landscape 1536x1024 PNG with three clearly separated COMPLETE front, side-profile and back views at consistent scale, plus one smaller close detail panel at far right. Every head, limb, claw, weapon tip, rock edge, dust trail and flame tongue must be comfortably inside the margins. Same polished naturalistic digital RPG illustration, plain light neutral gray background and soft studio lighting as the input. Change viewing angle only. Three complete viewing angles of the same FACELESS violet-white flame column, preserving the pale inner column, vivid violet edges, leaping tongues and hovering root with small starlit ash flecks. Detail is flame/ash only. No face, eyes, limbs, orange fire, ice body or portal. No labels, captions, text, logos, UI, scenery, extra entities or revealed history.",
         "portrait": "Use case: identity-preserve. Asset: production portrait for Rift Fire from Severed Lands. Input image1 is the selected canonical complete reference; input image2 is its reviewed multiview sheet. Reframe this selected identity for a single portrait only, keeping its exact appearance and species/elemental form. Appearance: One Large Rift Fire elemental: a complete upright column of cold-burning violet-white flame with an intense pale white-lavender inner column, vivid violet flame edges and many distinct upward leaping tongues. Its base narrows into an irregular hovering flame root just above the ground, with a few tiny ash flecks shimmering like trapped starlight close to the base. The single continuous flame column has an irregular natural fire silhouette, not a spiral tornado. No solid body, face, head, eyes, mouth, arms, fists, legs, wings or feet. Violet-white cold-burning flame and starlit ash follow the authored Setting lore; exact plume shape, palette intensity and ash pattern are editable visual defaults. No orange/red/yellow fire, ice body, burning human, fire imp, gray smoke creature, dust storm, lightning bolt, portal, victim, burning house, Anchor Door, readable text or scenery. Portrait framing overrides the full-body layout of the references: Square 1024x1024 PNG: show ONE COMPLETE FACELESS ENTITY centered at x50%/y50%, occupying about 80% of width/height. Preserve the exact gathered elemental form from both references; all dust trails, rock outcrops or flame tongues remain inside comfortable margins. No eyes, head, face, mouth or humanoid anatomy. Match the polished naturalistic digital RPG illustration, plain light neutral gray background and soft studio light of both inputs. No circular cutout, border, text, labels, UI, detail panels, scenery, extra beings or revealed secrets."
       }
+    },
+    {
+      "id": "severed-monster-rift-flameskull",
+      "name": "Rift Flameskull",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-flameskull.md",
+          "sha256": "d5ca8bf66b62fe8e61b9c9f6686042a49b93cdb3ef4965f62f9f4616ef45f828",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-flameskull.md",
+          "sha256": "e9d44225eae9f0b00d2e9d29fcc1f410c93a61834d5293f91fa05b9d99092635",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Tiny hovering Rift Flameskull: a single complete dry adult humanlike skull, aged ivory bone with restrained gray-brown weathering, two eye sockets, one nasal cavity and one complete lower jaw with ordinary intact teeth. The skull is intact and recognizable, with no attached spine or body. Dim cold violet-white Rift spellfire curls continuously around the skull and flickers within the eye sockets; the bone remains clearly readable through the flame. The floating skull and residual cold spellfire follow the authored source; skull proportions, surface wear, flame color and tongue pattern are editable visual defaults, with no claim to a named spellcaster's identity. No living flesh, blood, gore, fresh injury, severed neck, second skull, skeleton body, horns, crown, runic spell labels, spell beams, victim, death scene, Rift pool or scenery.",
+        "full_body": {
+          "path": "assets/characters/89819dcf8890214eef2305563c1437c7212c53b74ebf6ba919dbf81920f20ad2.png",
+          "sha256": "89819dcf8890214eef2305563c1437c7212c53b74ebf6ba919dbf81920f20ad2"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/0a6a7884ec9ca4ca723d2c731bb02619486d0747ac1d1b9a037ccf2a3d8cf804.png",
+          "sha256": "0a6a7884ec9ca4ca723d2c731bb02619486d0747ac1d1b9a037ccf2a3d8cf804"
+        },
+        "portrait": {
+          "path": "assets/characters/77b628a9c3a68a7e847965611421e47c62a369635e568bc853ceb85e2e63c7c8.png",
+          "sha256": "77b628a9c3a68a7e847965611421e47c62a369635e568bc853ceb85e2e63c7c8"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1988825
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2112935
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2027292
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete enemy reference for Rift Flameskull in Sylvia GM's Severed Lands. Portrait-orientation 1024x1536 PNG, one complete single subject in a clear near-front three-quarter view, plain light neutral gray background, matching polished naturalistic digital RPG illustration, soft studio light and subtle grounding shadow. Keep every skull, flame tongue, cap edge, tendril, limb, hand, foot and hammer tip comfortably inside all margins. Appearance: One Tiny hovering Rift Flameskull: a single complete dry adult humanlike skull, aged ivory bone with restrained gray-brown weathering, two eye sockets, one nasal cavity and one complete lower jaw with ordinary intact teeth. The skull is intact and recognizable, with no attached spine or body. Dim cold violet-white Rift spellfire curls continuously around the skull and flickers within the eye sockets; the bone remains clearly readable through the flame. The floating skull and residual cold spellfire follow the authored source; skull proportions, surface wear, flame color and tongue pattern are editable visual defaults, with no claim to a named spellcaster's identity. No living flesh, blood, gore, fresh injury, severed neck, second skull, skeleton body, horns, crown, runic spell labels, spell beams, victim, death scene, Rift pool or scenery. Preserve the authored form, source equipment and intentional anonymity. No additional entities, text, labels, captions, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Asset: production multiview reference sheet for Rift Flameskull from Severed Lands. Input image1 is the selected canonical complete reference. Preserve its exact identity, anatomy or fungal/spectral form, materials, palette and source equipment. Appearance: One Tiny hovering Rift Flameskull: a single complete dry adult humanlike skull, aged ivory bone with restrained gray-brown weathering, two eye sockets, one nasal cavity and one complete lower jaw with ordinary intact teeth. The skull is intact and recognizable, with no attached spine or body. Dim cold violet-white Rift spellfire curls continuously around the skull and flickers within the eye sockets; the bone remains clearly readable through the flame. The floating skull and residual cold spellfire follow the authored source; skull proportions, surface wear, flame color and tongue pattern are editable visual defaults, with no claim to a named spellcaster's identity. No living flesh, blood, gore, fresh injury, severed neck, second skull, skeleton body, horns, crown, runic spell labels, spell beams, victim, death scene, Rift pool or scenery. Landscape 1536x1024 PNG with three clearly separated COMPLETE front, side-profile and back views at consistent scale, plus a smaller close detail panel at far right. Match input's polished naturalistic digital RPG illustration, light neutral gray background and soft studio lighting. Every cap, flame, limb, claw, foot, tendril and hammer tip must be comfortably inside margins. Change viewing angle only. Three complete angles of the same single floating skull, including the whole lower jaw and every cold violet-white flame tongue. Preserve bone proportions, tooth pattern, weathering and eye-socket spellfire. No extra skull, horns, flesh, spine, skeleton body or spell glyphs. No labels, text, captions, logos, borders around the whole page, UI, scenery, extra entities or revealed history.",
+        "portrait": "Use case: identity-preserve. Asset: production portrait for Rift Flameskull from Severed Lands. Input image1 is the selected canonical complete reference; input image2 is the reviewed multiview sheet. Reframe the same selected subject for one portrait; retain its exact identity, anatomy, materials, colors and expression. Appearance: One Tiny hovering Rift Flameskull: a single complete dry adult humanlike skull, aged ivory bone with restrained gray-brown weathering, two eye sockets, one nasal cavity and one complete lower jaw with ordinary intact teeth. The skull is intact and recognizable, with no attached spine or body. Dim cold violet-white Rift spellfire curls continuously around the skull and flickers within the eye sockets; the bone remains clearly readable through the flame. The floating skull and residual cold spellfire follow the authored source; skull proportions, surface wear, flame color and tongue pattern are editable visual defaults, with no claim to a named spellcaster's identity. No living flesh, blood, gore, fresh injury, severed neck, second skull, skeleton body, horns, crown, runic spell labels, spell beams, victim, death scene, Rift pool or scenery. Portrait framing overrides the complete-reference layout: Square 1024x1024 PNG: show ONE complete floating skull with its full lower jaw and entire cold violet-white flame outline inside a central circular safe area. Center the skull horizontally, with its eye sockets around38% from the top; let the bone face remain large and readable at map-token size. No neck, shoulders, body, second skull or added anatomy. Do not draw a circle. Match the references' polished naturalistic digital RPG illustration, plain light neutral gray full-bleed background and soft studio light. No labels, captions, logos, borders, UI, detail panels, scenery, additional beings or revealed history."
+      }
+    },
+    {
+      "id": "severed-monster-rift-forge",
+      "name": "Rift Forge",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-forge.md",
+          "sha256": "b13f787452172c8875fa499795a1fe81421b3d72ee7e7f70eea30b705b893485",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-forge.md",
+          "sha256": "1d6743ab48b855812538f4bd22a454f9eec6c9ba97524522a417ffdb2c645254",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/azer_sentinel",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Medium Rift Forge elemental shaped like a mature stocky adult dwarf of living bronze and violet flame. A broad lined bronze face with a heavy brow, two small pale violet-white glowing eyes, a short strong nose and a thick sculpted bronze beard; short violet flame tongues rise from the crown and between a few beard strands. Exactly two broad arms with five-digit bronze hands and two short powerful legs with fully visible feet. A plain charcoal leather smith's apron covers the chest and hips over dark rough trousers, with a simple plain waist tie and sturdy dark work boots. The anatomical RIGHT hand holds one ordinary iron-headed wooden-handled warhammer low beside the body, its complete head visible; the LEFT hand is open and empty. An intent craftsman's expression and balanced grounded stance. Living bronze, dwarf-like shape, violet flame, forge bearing and warhammer follow the authored source; facial features, beard, outfit and hammer details are editable visual defaults. No orange fire, shield, extra tool, extra limbs, inscribed crest, smithy/anvil scene, Warden ruin, named identity, victim or readable text.",
+        "full_body": {
+          "path": "assets/characters/a98a147e6f230480b835e0f4c3079ef7ce427362bea97cd1f175b2139f96901d.png",
+          "sha256": "a98a147e6f230480b835e0f4c3079ef7ce427362bea97cd1f175b2139f96901d"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/38f2c2c1dd378fdb748ce88cdc147350a55b51dfb02b60ed029075e63dbb1e28.png",
+          "sha256": "38f2c2c1dd378fdb748ce88cdc147350a55b51dfb02b60ed029075e63dbb1e28"
+        },
+        "portrait": {
+          "path": "assets/characters/c7d77e8c2cc9b5075e79c6102d817f2982cf23d20cf17019e7a6f8fa3a506434.png",
+          "sha256": "c7d77e8c2cc9b5075e79c6102d817f2982cf23d20cf17019e7a6f8fa3a506434"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1836980
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2339714
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2395006
+        }
+      },
+      "prompt_set": {
+        "full_body": "Original complete reference generation:\nUse case: stylized-concept. Asset: canonical complete enemy reference for Rift Forge in Sylvia GM's Severed Lands. Portrait-orientation 1024x1536 PNG, one complete single subject in a clear near-front three-quarter view, plain light neutral gray background, matching polished naturalistic digital RPG illustration, soft studio light and subtle grounding shadow. Keep every skull, flame tongue, cap edge, tendril, limb, hand, foot and hammer tip comfortably inside all margins. Appearance: One Medium Rift Forge elemental shaped like a mature stocky adult dwarf of living bronze and violet flame. A broad lined bronze face with a heavy brow, two small pale violet-white glowing eyes, a short strong nose and a thick sculpted bronze beard; short violet flame tongues rise from the crown and between a few beard strands. Exactly two broad arms with five-digit bronze hands and two short powerful legs with fully visible feet. A plain charcoal leather smith's apron covers the chest and hips over dark rough trousers, with a simple plain waist tie and sturdy dark work boots. The anatomical RIGHT hand holds one ordinary iron-headed wooden-handled warhammer low beside the body, its complete head visible; the LEFT hand is open and empty. An intent craftsman's expression and balanced grounded stance. Living bronze, dwarf-like shape, violet flame, forge bearing and warhammer follow the authored source; facial features, beard, outfit and hammer details are editable visual defaults. No orange fire, shield, extra tool, extra limbs, inscribed crest, smithy/anvil scene, Warden ruin, named identity, victim or readable text. Preserve the authored form, source equipment and intentional anonymity. No additional entities, text, labels, captions, logos, borders or UI.\n\nSelected framing repair:\nUse case: precise-object-edit. Reframe ONLY this complete bronze Rift Forge reference so no part is clipped. Zoom out the entire selected subject about12%, keeping it centered, and add matching plain light neutral gray background. Give at least8% clear headroom above the highest violet flame tongue and comfortable side/bottom margins around the open hand, full hammer, both boots and every flame tip. Complete the small top flame curl that currently touches the upper canvas edge, in the same violet flame style. Preserve exact mature bronze dwarf face, eyes, sculpted beard, all anatomy/proportions, bronze material, apron/tie/trousers/boots, warhammer in anatomical RIGHT hand, empty LEFT hand, pose and lighting. No new tools, shield, limbs, symbols, beings, captions, text or scenery. Portrait-orientation 1024x1536 PNG.",
+        "reference_sheet": "Use case: identity-preserve. Asset: production multiview reference sheet for Rift Forge from Severed Lands. Input image1 is the selected canonical complete reference. Preserve its exact identity, anatomy or fungal/spectral form, materials, palette and source equipment. Appearance: One Medium Rift Forge elemental shaped like a mature stocky adult dwarf of living bronze and violet flame. A broad lined bronze face with a heavy brow, two small pale violet-white glowing eyes, a short strong nose and a thick sculpted bronze beard; short violet flame tongues rise from the crown and between a few beard strands. Exactly two broad arms with five-digit bronze hands and two short powerful legs with fully visible feet. A plain charcoal leather smith's apron covers the chest and hips over dark rough trousers, with a simple plain waist tie and sturdy dark work boots. The anatomical RIGHT hand holds one ordinary iron-headed wooden-handled warhammer low beside the body, its complete head visible; the LEFT hand is open and empty. An intent craftsman's expression and balanced grounded stance. Living bronze, dwarf-like shape, violet flame, forge bearing and warhammer follow the authored source; facial features, beard, outfit and hammer details are editable visual defaults. No orange fire, shield, extra tool, extra limbs, inscribed crest, smithy/anvil scene, Warden ruin, named identity, victim or readable text. Landscape 1536x1024 PNG with three clearly separated COMPLETE front, side-profile and back views at consistent scale, plus a smaller close detail panel at far right. Match input's polished naturalistic digital RPG illustration, light neutral gray background and soft studio lighting. Every cap, flame, limb, claw, foot, tendril and hammer tip must be comfortably inside margins. Change viewing angle only. Preserve mature bronze dwarf face, violet-white eyes, bronze beard, full violet flame crown, two arms/two legs, five-digit hands, plain apron/trousers/boots and right-hand warhammer. LEFT hand stays empty. Keep ALL flame tips, boots and hammer comfortably inside margins. No shield, extra tool or orange fire. No labels, text, captions, logos, borders around the whole page, UI, scenery, extra entities or revealed history.",
+        "portrait": "Use case: identity-preserve. Asset: production portrait for Rift Forge from Severed Lands. Input image1 is the selected canonical complete reference; input image2 is the reviewed multiview sheet. Reframe the same selected subject for one portrait; retain its exact identity, anatomy, materials, colors and expression. Appearance: One Medium Rift Forge elemental shaped like a mature stocky adult dwarf of living bronze and violet flame. A broad lined bronze face with a heavy brow, two small pale violet-white glowing eyes, a short strong nose and a thick sculpted bronze beard; short violet flame tongues rise from the crown and between a few beard strands. Exactly two broad arms with five-digit bronze hands and two short powerful legs with fully visible feet. A plain charcoal leather smith's apron covers the chest and hips over dark rough trousers, with a simple plain waist tie and sturdy dark work boots. The anatomical RIGHT hand holds one ordinary iron-headed wooden-handled warhammer low beside the body, its complete head visible; the LEFT hand is open and empty. An intent craftsman's expression and balanced grounded stance. Living bronze, dwarf-like shape, violet flame, forge bearing and warhammer follow the authored source; facial features, beard, outfit and hammer details are editable visual defaults. No orange fire, shield, extra tool, extra limbs, inscribed crest, smithy/anvil scene, Warden ruin, named identity, victim or readable text. Portrait framing overrides the complete-reference layout: Square 1024x1024 PNG: one near-front head-and-shoulders portrait, upper chest visible. Head centered x50%, eyes near35% from top, crown near10% and chin/beard comfortably within the lower half. Keep the entire head/ears/hair or flame crown inside a generous circular safe area. Do not draw a circle. Hands, feet and weapons stay outside this portrait. Preserve mature bronze dwarf face, two violet-white eyes, bronze beard, the complete violet flame crown and plain apron straps. No clipped flame tip, orange fire, living human skin or extra tool. Match the references' polished naturalistic digital RPG illustration, plain light neutral gray full-bleed background and soft studio light. No labels, captions, logos, borders, UI, detail panels, scenery, additional beings or revealed history."
+      }
+    },
+    {
+      "id": "severed-monster-rift-fungus",
+      "name": "Rift Fungus",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-fungus.md",
+          "sha256": "af78b565915103dc38143c322d9654397b2d0a1fe3d41418b00f25fa98cd3467",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-fungus.md",
+          "sha256": "ca2579e7566e1b8262721583e0575b62b031ed23de154a932f8f6d756f45d2de",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Medium gathered walking fruiting body of Rift Fungus, an editable representative form of the pervasive fungal growth described in the Setting. A single broad dark umber mushroom cap with subtle muted violet margins rises from a thick pale gray-brown fungal stalk torso. Exactly two short sturdy fungal arms end in rounded fist-like masses without human fingers; two short root-cluster legs support the body, with fine mycelial threads close to their bases. Dense layered gill textures under the cap, rough velvety fungal flesh and small violet spore specks hovering immediately near the cap. No face, eyes, mouth, ears, human skin or clothing. The growth, Veil-feeding fungal material, spores, mobile form and fist-like appendages follow the authored traits/actions; this gathered body, exact cap shape, limbs and palette are editable visual defaults. No separate mushroom people, fairy, gnome face, actual corpse, visible feeding, choking victim, spore-vision scene, carpet landscape, weapons, text or scenery.",
+        "full_body": {
+          "path": "assets/characters/646f94cfb838936229379d0ed98b945375f62b790025e33bf5a570b74711f7ab.png",
+          "sha256": "646f94cfb838936229379d0ed98b945375f62b790025e33bf5a570b74711f7ab"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/8f9955f7978bed51dda58e9be272a4dc3a8635677804165c124ccc5c96e5301d.png",
+          "sha256": "8f9955f7978bed51dda58e9be272a4dc3a8635677804165c124ccc5c96e5301d"
+        },
+        "portrait": {
+          "path": "assets/characters/01403b1f59388290c8e614a1bbbe9e2edd9fffdefd75c45a7eaf1988d46167a3.png",
+          "sha256": "01403b1f59388290c8e614a1bbbe9e2edd9fffdefd75c45a7eaf1988d46167a3"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2403634
+        },
+        "reference_sheet": {
+          "width": 2172,
+          "height": 724,
+          "bytes": 2621968
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2096348
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete enemy reference for Rift Fungus in Sylvia GM's Severed Lands. Portrait-orientation 1024x1536 PNG, one complete single subject in a clear near-front three-quarter view, plain light neutral gray background, matching polished naturalistic digital RPG illustration, soft studio light and subtle grounding shadow. Keep every skull, flame tongue, cap edge, tendril, limb, hand, foot and hammer tip comfortably inside all margins. Appearance: One Medium gathered walking fruiting body of Rift Fungus, an editable representative form of the pervasive fungal growth described in the Setting. A single broad dark umber mushroom cap with subtle muted violet margins rises from a thick pale gray-brown fungal stalk torso. Exactly two short sturdy fungal arms end in rounded fist-like masses without human fingers; two short root-cluster legs support the body, with fine mycelial threads close to their bases. Dense layered gill textures under the cap, rough velvety fungal flesh and small violet spore specks hovering immediately near the cap. No face, eyes, mouth, ears, human skin or clothing. The growth, Veil-feeding fungal material, spores, mobile form and fist-like appendages follow the authored traits/actions; this gathered body, exact cap shape, limbs and palette are editable visual defaults. No separate mushroom people, fairy, gnome face, actual corpse, visible feeding, choking victim, spore-vision scene, carpet landscape, weapons, text or scenery. Preserve the authored form, source equipment and intentional anonymity. No additional entities, text, labels, captions, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Asset: production multiview reference sheet for Rift Fungus from Severed Lands. Input image1 is the selected canonical complete reference. Preserve its exact identity, anatomy or fungal/spectral form, materials, palette and source equipment. Appearance: One Medium gathered walking fruiting body of Rift Fungus, an editable representative form of the pervasive fungal growth described in the Setting. A single broad dark umber mushroom cap with subtle muted violet margins rises from a thick pale gray-brown fungal stalk torso. Exactly two short sturdy fungal arms end in rounded fist-like masses without human fingers; two short root-cluster legs support the body, with fine mycelial threads close to their bases. Dense layered gill textures under the cap, rough velvety fungal flesh and small violet spore specks hovering immediately near the cap. No face, eyes, mouth, ears, human skin or clothing. The growth, Veil-feeding fungal material, spores, mobile form and fist-like appendages follow the authored traits/actions; this gathered body, exact cap shape, limbs and palette are editable visual defaults. No separate mushroom people, fairy, gnome face, actual corpse, visible feeding, choking victim, spore-vision scene, carpet landscape, weapons, text or scenery. Landscape 1536x1024 PNG with three clearly separated COMPLETE front, side-profile and back views at consistent scale, plus a smaller close detail panel at far right. Match input's polished naturalistic digital RPG illustration, light neutral gray background and soft studio lighting. Every cap, flame, limb, claw, foot, tendril and hammer tip must be comfortably inside margins. Change viewing angle only. Preserve the SAME single faceless walking fruiting body: one broad umber/violet-edged cap, gilled underside, thick stalk torso, TWO fungal arms with rounded fist-like ends and TWO root-cluster legs. No eyes, mouth, human fingers, faces, extra caps or separate beings. No labels, text, captions, logos, borders around the whole page, UI, scenery, extra entities or revealed history.",
+        "portrait": "Use case: identity-preserve. Asset: production portrait for Rift Fungus from Severed Lands. Input image1 is the selected canonical complete reference; input image2 is the reviewed multiview sheet. Reframe the same selected subject for one portrait; retain its exact identity, anatomy, materials, colors and expression. Appearance: One Medium gathered walking fruiting body of Rift Fungus, an editable representative form of the pervasive fungal growth described in the Setting. A single broad dark umber mushroom cap with subtle muted violet margins rises from a thick pale gray-brown fungal stalk torso. Exactly two short sturdy fungal arms end in rounded fist-like masses without human fingers; two short root-cluster legs support the body, with fine mycelial threads close to their bases. Dense layered gill textures under the cap, rough velvety fungal flesh and small violet spore specks hovering immediately near the cap. No face, eyes, mouth, ears, human skin or clothing. The growth, Veil-feeding fungal material, spores, mobile form and fist-like appendages follow the authored traits/actions; this gathered body, exact cap shape, limbs and palette are editable visual defaults. No separate mushroom people, fairy, gnome face, actual corpse, visible feeding, choking victim, spore-vision scene, carpet landscape, weapons, text or scenery. Portrait framing overrides the complete-reference layout: Square 1024x1024 PNG: show ONE COMPLETE FACELESS subject, centered at x50%/y50%, with its complete silhouette fitting inside a central circular safe area of about80% diameter. Keep all cap edges, root feet or tendril tips visible with generous neutral background around them. Do not draw a circle. No invented eyes, mouth, face or humanoid head. Preserve one broad umber/violet-edged cap, the faceless stalk, TWO rounded fungal arms/fists and TWO root-cluster legs. No human face or fingers. Match the references' polished naturalistic digital RPG illustration, plain light neutral gray full-bleed background and soft studio light. No labels, captions, logos, borders, UI, detail panels, scenery, additional beings or revealed history."
+      }
+    },
+    {
+      "id": "severed-monster-rift-fungus-violet",
+      "name": "Rift Violet Fungus",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-fungus-violet.md",
+          "sha256": "015355b62e02e5014c71fe434d85d6ced5ec5f94a27721d853e238d8eb9e9a11",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-fungus-violet.md",
+          "sha256": "fe946cb8730ba1ce2464b6a93bac8dbdb1f7c075bb67d0e0bf7f2c1e02c47a43",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/violet_fungus",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Medium Rift Violet Fungus: a single connected cluster of five violet-capped mushrooms at varied heights, all rooted into one compact pale gray-lavender mycelial base. Broad fleshy violet caps with soft dull lilac edge glow and pale ribbed gills, slender uneven gray-lavender stalks. Exactly four flexible blunt violet-gray touch tendrils grow from the connected base, two curling low to each side; every tendril tip remains visible. A gathered active reference state with restrained cap glow, no attack cloud. No face, eyes, mouth, humanoid torso, arms, hands, legs or feet. The violet-capped cluster and reactive Rift glow follow authored lore; cap number, size arrangement, tendrils, textures and palette are editable visual defaults. No separate beings, mushroom face, fairy, living target, alchemical container, corruption wounds, actual Rift pool, poison fog, readable text or scenery.",
+        "full_body": {
+          "path": "assets/characters/d7aeeee50b8111341c5d43fd3a95dd4ff36dbbbb3dea0c90d1bef8615d244486.png",
+          "sha256": "d7aeeee50b8111341c5d43fd3a95dd4ff36dbbbb3dea0c90d1bef8615d244486"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/b874fad8ced623f45b24a240a6d73be4250d8baf3cc5147fce87e0dc72eea46d.png",
+          "sha256": "b874fad8ced623f45b24a240a6d73be4250d8baf3cc5147fce87e0dc72eea46d"
+        },
+        "portrait": {
+          "path": "assets/characters/fd2a0ca83aacee71d2bf6e472e03d3e33ffecba8f107b166a6bcbab82c07c0fd.png",
+          "sha256": "fd2a0ca83aacee71d2bf6e472e03d3e33ffecba8f107b166a6bcbab82c07c0fd"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1898455
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 1982563
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 1885791
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete enemy reference for Rift Violet Fungus in Sylvia GM's Severed Lands. Portrait-orientation 1024x1536 PNG, one complete single subject in a clear near-front three-quarter view, plain light neutral gray background, matching polished naturalistic digital RPG illustration, soft studio light and subtle grounding shadow. Keep every skull, flame tongue, cap edge, tendril, limb, hand, foot and hammer tip comfortably inside all margins. Appearance: One Medium Rift Violet Fungus: a single connected cluster of five violet-capped mushrooms at varied heights, all rooted into one compact pale gray-lavender mycelial base. Broad fleshy violet caps with soft dull lilac edge glow and pale ribbed gills, slender uneven gray-lavender stalks. Exactly four flexible blunt violet-gray touch tendrils grow from the connected base, two curling low to each side; every tendril tip remains visible. A gathered active reference state with restrained cap glow, no attack cloud. No face, eyes, mouth, humanoid torso, arms, hands, legs or feet. The violet-capped cluster and reactive Rift glow follow authored lore; cap number, size arrangement, tendrils, textures and palette are editable visual defaults. No separate beings, mushroom face, fairy, living target, alchemical container, corruption wounds, actual Rift pool, poison fog, readable text or scenery. Preserve the authored form, source equipment and intentional anonymity. No additional entities, text, labels, captions, logos, borders or UI.",
+        "reference_sheet": "Original sheet generation:\nUse case: identity-preserve. Asset: production multiview reference sheet for Rift Violet Fungus from Severed Lands. Input image1 is the selected canonical complete reference. Preserve its exact identity, anatomy or fungal/spectral form, materials, palette and source equipment. Appearance: One Medium Rift Violet Fungus: a single connected cluster of five violet-capped mushrooms at varied heights, all rooted into one compact pale gray-lavender mycelial base. Broad fleshy violet caps with soft dull lilac edge glow and pale ribbed gills, slender uneven gray-lavender stalks. Exactly four flexible blunt violet-gray touch tendrils grow from the connected base, two curling low to each side; every tendril tip remains visible. A gathered active reference state with restrained cap glow, no attack cloud. No face, eyes, mouth, humanoid torso, arms, hands, legs or feet. The violet-capped cluster and reactive Rift glow follow authored lore; cap number, size arrangement, tendrils, textures and palette are editable visual defaults. No separate beings, mushroom face, fairy, living target, alchemical container, corruption wounds, actual Rift pool, poison fog, readable text or scenery. Landscape 1536x1024 PNG with three clearly separated COMPLETE front, side-profile and back views at consistent scale, plus a smaller close detail panel at far right. Match input's polished naturalistic digital RPG illustration, light neutral gray background and soft studio lighting. Every cap, flame, limb, claw, foot, tendril and hammer tip must be comfortably inside margins. Change viewing angle only. Preserve FIVE violet mushroom caps at their selected varied heights, one connected mycelial base and FOUR blunt tendrils, two low curls to either side. Keep all caps/base/tendril tips inside the complete views. No face, humanoid anatomy, missing or additional cap/tendril. No labels, text, captions, logos, borders around the whole page, UI, scenery, extra entities or revealed history.\n\nSelected cap-count repair:\nUse case: precise-object-edit. Primary target image1 is a three-view Violet Fungus reference sheet; image2 is the canonical complete cluster reference. Correct ONLY the CENTRAL side-profile figure's cap count. It currently shows six mushroom caps. Remove its lowest extra little cap near x37%/y60% of the whole sheet and that cap's own short thin stalk, blending naturally into the unchanged shared mycelial base. The central side view must have EXACTLY FIVE caps, matching image2 and the left/right views: largest high cap, second large upper-right cap, one middle-left cap, one small lower-left cap and one front lower cap. Do not mistake gill folds for separate caps. Preserve the other two complete views and all right-hand detail panels, the FIVE violet caps in each complete view, connected base, FOUR smooth touch tendrils, palette, soft glow, scale, margins, background and lighting. No added caps, faces, beings, labels, text, crop or layout changes. Landscape PNG matching the sheet.",
+        "portrait": "Use case: identity-preserve. Asset: production portrait for Rift Violet Fungus from Severed Lands. Input image1 is the selected canonical complete reference; input image2 is the reviewed multiview sheet. Reframe the same selected subject for one portrait; retain its exact identity, anatomy, materials, colors and expression. Appearance: One Medium Rift Violet Fungus: a single connected cluster of five violet-capped mushrooms at varied heights, all rooted into one compact pale gray-lavender mycelial base. Broad fleshy violet caps with soft dull lilac edge glow and pale ribbed gills, slender uneven gray-lavender stalks. Exactly four flexible blunt violet-gray touch tendrils grow from the connected base, two curling low to each side; every tendril tip remains visible. A gathered active reference state with restrained cap glow, no attack cloud. No face, eyes, mouth, humanoid torso, arms, hands, legs or feet. The violet-capped cluster and reactive Rift glow follow authored lore; cap number, size arrangement, tendrils, textures and palette are editable visual defaults. No separate beings, mushroom face, fairy, living target, alchemical container, corruption wounds, actual Rift pool, poison fog, readable text or scenery. Portrait framing overrides the complete-reference layout: Square 1024x1024 PNG: show ONE COMPLETE FACELESS subject, centered at x50%/y50%, with its complete silhouette fitting inside a central circular safe area of about80% diameter. Keep all cap edges, root feet or tendril tips visible with generous neutral background around them. Do not draw a circle. No invented eyes, mouth, face or humanoid head. Preserve EXACTLY FIVE violet caps on the connected base and FOUR smooth tendrils. Keep the cap/tendril counts identical to both selected references. Match the references' polished naturalistic digital RPG illustration, plain light neutral gray full-bleed background and soft studio light. No labels, captions, logos, borders, UI, detail panels, scenery, additional beings or revealed history."
+      }
+    },
+    {
+      "id": "severed-monster-rift-ghast",
+      "name": "Rift Ghast",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-ghast.md",
+          "sha256": "78e673d82495a2ceee96db723ee9933b4fd44bb9fcd67bdf5c95fa72906c02fd",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-ghast.md",
+          "sha256": "b3b1fc591bfa4446aaf915be0ade1e0fef9a98efdca867f3fc9a240ab80e67b2",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/ghast",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One adult Medium Rift Ghast hunger-Echo in an editable humanlike appearance: a very gaunt mature body with long bony forearms, two arms and two legs, five-digit hands ending in long dark clawlike nails. An aged angular hollow-cheeked face, two deep-set dim violet-gray eyes, a slightly lengthened jaw with mouth narrowly parted and dry ordinary sharp teeth, sparse short gray hair and thin gray stubble. Muted cool ash-gray skin has faint violet translucent edging but is intact. A worn plain charcoal long-sleeved tunic with sleeves ending above the wrists, ragged dark trousers and bare gaunt feet. A tense hungry listening expression and low slightly hunched balanced stance, hands held away from the body so every claw is visible. The degraded hunger-imprint, claws and psychic decay follow authored lore; identity, face, age styling, clothing and palette are editable defaults. Its nausea aura is psychic, with no visible physical stench. No green rot fumes, exposed organs, wounds, blood, gore, actual starving person, feeding victim, corpse, captive, extra limbs, revealed life-history, text or scenery.",
+        "full_body": {
+          "path": "assets/characters/6a689246bbe5f7709844811e46057688d4fce31f0a47dad6c883495bf3ead3f0.png",
+          "sha256": "6a689246bbe5f7709844811e46057688d4fce31f0a47dad6c883495bf3ead3f0"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/68ac4789cf171685f700d1013a747f511e968f85e98cd8c7d19656c5ac7a0674.png",
+          "sha256": "68ac4789cf171685f700d1013a747f511e968f85e98cd8c7d19656c5ac7a0674"
+        },
+        "portrait": {
+          "path": "assets/characters/eb7da87ce690db4a0a74495a52409c5c5be107cc199430a6e83909cfdbc2623d.png",
+          "sha256": "eb7da87ce690db4a0a74495a52409c5c5be107cc199430a6e83909cfdbc2623d"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1778271
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2227478
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2503271
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete enemy reference for Rift Ghast in Sylvia GM's Severed Lands. Portrait-orientation 1024x1536 PNG, one complete single subject in a clear near-front three-quarter view, plain light neutral gray background, matching polished naturalistic digital RPG illustration, soft studio light and subtle grounding shadow. Keep every skull, flame tongue, cap edge, tendril, limb, hand, foot and hammer tip comfortably inside all margins. Appearance: One adult Medium Rift Ghast hunger-Echo in an editable humanlike appearance: a very gaunt mature body with long bony forearms, two arms and two legs, five-digit hands ending in long dark clawlike nails. An aged angular hollow-cheeked face, two deep-set dim violet-gray eyes, a slightly lengthened jaw with mouth narrowly parted and dry ordinary sharp teeth, sparse short gray hair and thin gray stubble. Muted cool ash-gray skin has faint violet translucent edging but is intact. A worn plain charcoal long-sleeved tunic with sleeves ending above the wrists, ragged dark trousers and bare gaunt feet. A tense hungry listening expression and low slightly hunched balanced stance, hands held away from the body so every claw is visible. The degraded hunger-imprint, claws and psychic decay follow authored lore; identity, face, age styling, clothing and palette are editable defaults. Its nausea aura is psychic, with no visible physical stench. No green rot fumes, exposed organs, wounds, blood, gore, actual starving person, feeding victim, corpse, captive, extra limbs, revealed life-history, text or scenery. Preserve the authored form, source equipment and intentional anonymity. No additional entities, text, labels, captions, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Asset: production multiview reference sheet for Rift Ghast from Severed Lands. Input image1 is the selected canonical complete reference. Preserve its exact identity, anatomy or fungal/spectral form, materials, palette and source equipment. Appearance: One adult Medium Rift Ghast hunger-Echo in an editable humanlike appearance: a very gaunt mature body with long bony forearms, two arms and two legs, five-digit hands ending in long dark clawlike nails. An aged angular hollow-cheeked face, two deep-set dim violet-gray eyes, a slightly lengthened jaw with mouth narrowly parted and dry ordinary sharp teeth, sparse short gray hair and thin gray stubble. Muted cool ash-gray skin has faint violet translucent edging but is intact. A worn plain charcoal long-sleeved tunic with sleeves ending above the wrists, ragged dark trousers and bare gaunt feet. A tense hungry listening expression and low slightly hunched balanced stance, hands held away from the body so every claw is visible. The degraded hunger-imprint, claws and psychic decay follow authored lore; identity, face, age styling, clothing and palette are editable defaults. Its nausea aura is psychic, with no visible physical stench. No green rot fumes, exposed organs, wounds, blood, gore, actual starving person, feeding victim, corpse, captive, extra limbs, revealed life-history, text or scenery. Landscape 1536x1024 PNG with three clearly separated COMPLETE front, side-profile and back views at consistent scale, plus a smaller close detail panel at far right. Match input's polished naturalistic digital RPG illustration, light neutral gray background and soft studio lighting. Every cap, flame, limb, claw, foot, tendril and hammer tip must be comfortably inside margins. Change viewing angle only. Preserve the mature gaunt gray face and sparse gray hair/stubble, two violet-gray eyes, narrowly parted mouth, five long dark claws on each hand, two arms/two legs and selected ragged clothing. Keep all feet and claws visible within margins. Its decay aura remains psychic, with no green fumes, rot, wounds or victims. No labels, text, captions, logos, borders around the whole page, UI, scenery, extra entities or revealed history.",
+        "portrait": "Use case: identity-preserve. Asset: production portrait for Rift Ghast from Severed Lands. Input image1 is the selected canonical complete reference; input image2 is the reviewed multiview sheet. Reframe the same selected subject for one portrait; retain its exact identity, anatomy, materials, colors and expression. Appearance: One adult Medium Rift Ghast hunger-Echo in an editable humanlike appearance: a very gaunt mature body with long bony forearms, two arms and two legs, five-digit hands ending in long dark clawlike nails. An aged angular hollow-cheeked face, two deep-set dim violet-gray eyes, a slightly lengthened jaw with mouth narrowly parted and dry ordinary sharp teeth, sparse short gray hair and thin gray stubble. Muted cool ash-gray skin has faint violet translucent edging but is intact. A worn plain charcoal long-sleeved tunic with sleeves ending above the wrists, ragged dark trousers and bare gaunt feet. A tense hungry listening expression and low slightly hunched balanced stance, hands held away from the body so every claw is visible. The degraded hunger-imprint, claws and psychic decay follow authored lore; identity, face, age styling, clothing and palette are editable defaults. Its nausea aura is psychic, with no visible physical stench. No green rot fumes, exposed organs, wounds, blood, gore, actual starving person, feeding victim, corpse, captive, extra limbs, revealed life-history, text or scenery. Portrait framing overrides the complete-reference layout: Square 1024x1024 PNG: one near-front head-and-shoulders portrait, upper chest visible. Head centered x50%, eyes near35% from top, crown near10% and chin/beard comfortably within the lower half. Keep the entire head/ears/hair or flame crown inside a generous circular safe area. Do not draw a circle. Hands, feet and weapons stay outside this portrait. Preserve the same mature gaunt face, sparse gray hair/stubble, dim violet-gray eyes, intact gray skin, slightly parted mouth and worn charcoal tunic. Its aura remains psychic, with no rot fumes or gore. Match the references' polished naturalistic digital RPG illustration, plain light neutral gray full-bleed background and soft studio light. No labels, captions, logos, borders, UI, detail panels, scenery, additional beings or revealed history."
+      }
+    },
+    {
+      "id": "severed-monster-rift-ghost",
+      "name": "Rift Ghost",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-ghost.md",
+          "sha256": "7b657f09d248c7d3729731d8948f8b86648ad7d60cc453ae2c5e660c2766fd7a",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-ghost.md",
+          "sha256": "998871916b4a469bfcee9d77f54929a041b29a416661b86a5af956d3df13eeaa",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/ghost",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Medium Rift Ghost in an editable anonymous adult humanlike personality-imprint appearance, not a named character or a declared historical identity. A mature middle-aged face with a concerned preoccupied expression, mouth closed, two pale silver-gray eyes, short neat gray hair and light gray stubble. A complete upright hovering humanlike figure with exactly two arms, five fingers on each open relaxed hand, two separate legs and two soft boots. Cool gray-lavender translucent skin and muted slate-blue spectral clothing: a plain high-collared long-sleeved coat, simple waist belt and dark plain trousers. Clothing and lower limbs fade gently at their edges while the complete figure remains readable. The detailed personality-imprint and incorporeal hovering form follow authored source; anonymous features, outfit, colors and age styling are editable visual defaults. No elven ears, banshee wail, gown dissolving into a single tail, skeleton, chains, weapon, horror wound, actual death scene, possessed victim, aged victim, home-world memory, named identity, Rift pool, text or scenery.",
+        "full_body": {
+          "path": "assets/characters/11bbacae8c7dafa2cdd3f503363fc1b2510368b4e815f65ae34279b6e3139e65.png",
+          "sha256": "11bbacae8c7dafa2cdd3f503363fc1b2510368b4e815f65ae34279b6e3139e65"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/10e863a8bab856f92fc2ec82ba3ac1abfad2218f184716e18399af0c11b58e7e.png",
+          "sha256": "10e863a8bab856f92fc2ec82ba3ac1abfad2218f184716e18399af0c11b58e7e"
+        },
+        "portrait": {
+          "path": "assets/characters/93c251f84b4c0169cd6cf13eb4314d28e53a3c2c20bec93c09de44153af2500a.png",
+          "sha256": "93c251f84b4c0169cd6cf13eb4314d28e53a3c2c20bec93c09de44153af2500a"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1574588
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2071250
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2214682
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete enemy reference for Rift Ghost in Sylvia GM's Severed Lands. Portrait-orientation 1024x1536 PNG, one complete single subject in a clear near-front three-quarter view, plain light neutral gray background, matching polished naturalistic digital RPG illustration, soft studio light and subtle grounding shadow. Keep every skull, flame tongue, cap edge, tendril, limb, hand, foot and hammer tip comfortably inside all margins. Appearance: One Medium Rift Ghost in an editable anonymous adult humanlike personality-imprint appearance, not a named character or a declared historical identity. A mature middle-aged face with a concerned preoccupied expression, mouth closed, two pale silver-gray eyes, short neat gray hair and light gray stubble. A complete upright hovering humanlike figure with exactly two arms, five fingers on each open relaxed hand, two separate legs and two soft boots. Cool gray-lavender translucent skin and muted slate-blue spectral clothing: a plain high-collared long-sleeved coat, simple waist belt and dark plain trousers. Clothing and lower limbs fade gently at their edges while the complete figure remains readable. The detailed personality-imprint and incorporeal hovering form follow authored source; anonymous features, outfit, colors and age styling are editable visual defaults. No elven ears, banshee wail, gown dissolving into a single tail, skeleton, chains, weapon, horror wound, actual death scene, possessed victim, aged victim, home-world memory, named identity, Rift pool, text or scenery. Preserve the authored form, source equipment and intentional anonymity. No additional entities, text, labels, captions, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Asset: production multiview reference sheet for Rift Ghost from Severed Lands. Input image1 is the selected canonical complete reference. Preserve its exact identity, anatomy or fungal/spectral form, materials, palette and source equipment. Appearance: One Medium Rift Ghost in an editable anonymous adult humanlike personality-imprint appearance, not a named character or a declared historical identity. A mature middle-aged face with a concerned preoccupied expression, mouth closed, two pale silver-gray eyes, short neat gray hair and light gray stubble. A complete upright hovering humanlike figure with exactly two arms, five fingers on each open relaxed hand, two separate legs and two soft boots. Cool gray-lavender translucent skin and muted slate-blue spectral clothing: a plain high-collared long-sleeved coat, simple waist belt and dark plain trousers. Clothing and lower limbs fade gently at their edges while the complete figure remains readable. The detailed personality-imprint and incorporeal hovering form follow authored source; anonymous features, outfit, colors and age styling are editable visual defaults. No elven ears, banshee wail, gown dissolving into a single tail, skeleton, chains, weapon, horror wound, actual death scene, possessed victim, aged victim, home-world memory, named identity, Rift pool, text or scenery. Landscape 1536x1024 PNG with three clearly separated COMPLETE front, side-profile and back views at consistent scale, plus a smaller close detail panel at far right. Match input's polished naturalistic digital RPG illustration, light neutral gray background and soft studio lighting. Every cap, flame, limb, claw, foot, tendril and hammer tip must be comfortably inside margins. Change viewing angle only. Preserve the same anonymous mature humanlike face, short neat gray hair/stubble, concerned expression, TWO arms/five-digit hands/TWO separate legs/boots, slate-blue high-collared coat/belt and softly translucent violet-gray edges. No new identity, banshee gown, single tail, elf ears or death scene. No labels, text, captions, logos, borders around the whole page, UI, scenery, extra entities or revealed history.",
+        "portrait": "Use case: identity-preserve. Asset: production portrait for Rift Ghost from Severed Lands. Input image1 is the selected canonical complete reference; input image2 is the reviewed multiview sheet. Reframe the same selected subject for one portrait; retain its exact identity, anatomy, materials, colors and expression. Appearance: One Medium Rift Ghost in an editable anonymous adult humanlike personality-imprint appearance, not a named character or a declared historical identity. A mature middle-aged face with a concerned preoccupied expression, mouth closed, two pale silver-gray eyes, short neat gray hair and light gray stubble. A complete upright hovering humanlike figure with exactly two arms, five fingers on each open relaxed hand, two separate legs and two soft boots. Cool gray-lavender translucent skin and muted slate-blue spectral clothing: a plain high-collared long-sleeved coat, simple waist belt and dark plain trousers. Clothing and lower limbs fade gently at their edges while the complete figure remains readable. The detailed personality-imprint and incorporeal hovering form follow authored source; anonymous features, outfit, colors and age styling are editable visual defaults. No elven ears, banshee wail, gown dissolving into a single tail, skeleton, chains, weapon, horror wound, actual death scene, possessed victim, aged victim, home-world memory, named identity, Rift pool, text or scenery. Portrait framing overrides the complete-reference layout: Square 1024x1024 PNG: one near-front head-and-shoulders portrait, upper chest visible. Head centered x50%, eyes near35% from top, crown near10% and chin/beard comfortably within the lower half. Keep the entire head/ears/hair or flame crown inside a generous circular safe area. Do not draw a circle. Hands, feet and weapons stay outside this portrait. Preserve the same anonymous mature face, short neat gray hair/stubble, pale silver-gray eyes, concerned expression, translucent edging and slate-blue high collar. No invented named identity or banshee transformation. Match the references' polished naturalistic digital RPG illustration, plain light neutral gray full-bleed background and soft studio light. No labels, captions, logos, borders, UI, detail panels, scenery, additional beings or revealed history."
+      }
     }
   ]
 }
