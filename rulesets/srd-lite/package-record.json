@@ -35,7 +35,7 @@
   },
   "content_declarations": "content/content-declarations.json",
   "content_kind": "ruleset",
-  "content_sha256": "1c533a2b356ace7602ac2fa10cc7228c159aeffec123f7aad0d17929f647e39d",
+  "content_sha256": "323b36f38d72d577a8682f01d079ae5218dc83b82fb5e39a0cace7410dda7eff",
   "dependencies": [
     {
       "content_sha256": "ad3da5b65b26ed1fb5076ef30ffd764713bc52deadfe5d5ae6e83b8078651461",
@@ -189,7 +189,7 @@
     {
       "bytes": 1640,
       "path": "package-identity.json",
-      "sha256": "4924b8a859b4e1b1dbafacd444fb358610ccf47bb7a1411f73c0ebaf00a256e3"
+      "sha256": "4504b8c563766ac0b2c1ecd972fdab92065e2f50e9a048b1f38e848c09bd2d1f"
     },
     {
       "bytes": 27051,
@@ -212,9 +212,9 @@
       "sha256": "e99cb13cdf36dca41c67b9041bf91a536c8b49c730bb27a8909eb4385a8908e3"
     },
     {
-      "bytes": 14440505,
+      "bytes": 14440477,
       "path": "runtime/ruleset.yaml",
-      "sha256": "38e45896788c0c0eba04c8f268cc5626a68ba81b329568ec25e54b9a05b4fdd9"
+      "sha256": "a8327fab30e2330c9b2d90c8936c93a5971e34696cdd2ba813497e367d3941ff"
     },
     {
       "bytes": 59661,
@@ -49587,5 +49587,5 @@
       "title": "Character"
     }
   ],
-  "version": "0.3.18"
+  "version": "0.3.20"
 }

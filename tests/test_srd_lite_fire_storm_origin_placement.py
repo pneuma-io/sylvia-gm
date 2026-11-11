@@ -9,9 +9,10 @@ import pytest
 from sylvia_gm.domain.authority import thaw_json_value
 import yaml
 
-from tests.test_native_followups import make_case
+from tests.test_native_followups import make_case as make_case
 
 from sylvia_gm import dice
+from sylvia_gm.domain.authority import thaw_json_value
 from sylvia_gm.application.package_runtime import AuthorityMemoryStateBridge
 from sylvia_gm.runtime import RulesetRuntime
 from sylvia_gm.runtime._tool_executor import execute_tool
