@@ -238,18 +238,18 @@ source editions pass offline verification against actual current Lite payloads a
 The authored roster check passed in 6.76 seconds for 218 subjects/297 source editions. Completed
 owner/frontend/native matrices were not replayed for this artwork-only increment. The broader
 catalogue, everyday journeys and deferred acceptance remain unfinished.
-Rift Boulder, Bulette, Centaur, Cinder, Cockatrice and Cyclops now have complete full-body,
-multiview and portrait bundles, bringing the catalogue to 134 complete bundles. Boulder and Cinder
-remain faceless stone and ash entities. Bulette retains four legs, one tail and mineral armor;
-Centaur retains four hooves, two arms and consistent equipment placement; Cockatrice retains two
-legs, two wings and one tail. Cyclops retains exactly one central eye after rejecting and correcting
-an extra-eye body reference before making derivatives. Bulette's saved 1.8 crop focuses on its head;
-Centaur's 1.4 crop aligns face scale, without changing PNG bytes. Unspecified details remain editable
-visual defaults. Original profile prefixes and the previous 128 bundles/bindings are unchanged.
-Actual square/dialogue/map-token crops passed visual review. All 18 exact PNGs, external resources
-and twelve current/retained source editions pass offline verification against actual current Lite
-payloads and Setting scope. The authored roster check passed in 3.58 seconds for 218 subjects/330
-source editions. At f85bbcb, all 82 authored NPCs across 80 current profile files
+Rift Doppelganger, Dust, Earth, Ettercap, Ettin and Fire now have complete full-body, multiview
+and portrait bundles, bringing the catalogue to 140 complete bundles. Doppelganger has an editable
+representative appearance, without declaring a canonical true form or impersonation. Dust, Earth
+and Fire retain their distinct faceless forms; Ettercap retains its selected four-eye arrangement.
+Both Ettin heads remain visible in the revised portrait's dialogue circle, with source equipment
+preserved in its body/sheet. The initial portrait and framing repair remain recorded. Unspecified
+details remain editable visual defaults. Original profile prefixes and the previous 134 bundles
+and bindings are unchanged. Actual square/dialogue/map-token crops passed visual review. All 18
+exact PNGs, external resources and twelve current/retained authored source editions pass offline
+verification against actual current Lite payloads and Setting scope. The authored roster check
+passed in 3.09 seconds for 218 subjects/336 source editions. At f85bbcb, all 82 authored NPCs across
+80 current profile files
 and 165 source editions resolved complete artwork, with all 246 NPC PNGs/resources and actual
 Lite lookup verified. That unchanged preparation remains qualified. The wider monster, inherited
 form, Plan-only and companion catalogue remains unfinished. Completed owner/frontend/native
@@ -260,7 +260,7 @@ The owner selected a shared app artwork library: whole Setting/Plan exports omit
 PNGs, while custom art stays portable and character/campaign exports carry used artwork. The
 source now maps the catalogue and PNGs as external installer/portable resources, outside the
 onefile sidecar. Campaign export retains used art before any artwork view has been opened.
-The prepared PNG pool now totals 929,343,179 bytes across 402 images, beyond the content-package cap.
+The prepared PNG pool now totals 971,136,354 bytes across 420 images, beyond the content-package cap.
 The current Setting omits those PNGs; its existing content-package limits remain unchanged.
 Focused checks cover shared/custom publication, external resource inventory, portable ZIP assembly,
 and exact campaign art transfer before opening an image view. Local-copy receipts also transfer
@@ -299,9 +299,12 @@ across the current and retained Lite sources. Exact file/JSON Pointer/hash bindi
 to the selected Setting. Portrait lookup uses admitted metadata without parsing the large
 definition files. Producer and owner composition checks cover these bindings and used-art
 transfer with generation Off; these fixtures do not supply the missing production artwork.
-Five inherited forms now reuse their prepared Severed Lands rendition: Ankheg, Basilisk,
-Darkmantle, Death Dog and Gelatinous Cube. Exact Ruleset file/hash/JSON Pointer plus Setting
-scope selects the existing complete bundle, with no copied images or changed mechanics.
+Eleven inherited forms now reuse their prepared Severed Lands renditions: Ankheg, Basilisk,
+Darkmantle, Death Dog, Gelatinous Cube, Doppelganger, Dust Mephit, Earth Elemental, Ettercap, Ettin
+and Fire Elemental. Exact Ruleset file/hash/JSON Pointer plus Setting scope selects the existing
+complete bundle, with no copied images or changed mechanics. The six new bindings pass actual
+current Lite byte/metadata lookup and wrong Setting/hash/package/pointer refusal. This qualifies
+artwork lookup only; it does not qualify inherited form execution.
 Other Settings do not inherit those renditions. The mixed NPC/creature journey selects one
 Basilisk through its inherited form and another through its authored Rift profile, preserving
 independent crops and offline used-art recovery. The remaining 325 inherited forms still need art.
