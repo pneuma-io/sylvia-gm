@@ -177,27 +177,12 @@ KNOWN_DEFECTS: dict[str, KnownDefect] = {
         "Cast valid Mage Armor with carried Materials and contact facts, then inspect its saved source/lifetime before the case's equip, unprepare, rest or reopen continuation.",
         category='suspected retained contract discrepancy',
     ),
-    'tests/test_srd_lite_defenses.py::test_mage_real_armor_equip_permanently_retires_and_old_retry_cannot_retire_new_cast': KnownDefect(
-        'The admitted Mage Armor effect lacks the retained preparation-source or until-Long-Rest lifetime contract',
-        "Cast valid Mage Armor with carried Materials and contact facts, then inspect its saved source/lifetime before the case's equip, unprepare, rest or reopen continuation.",
-        category='suspected retained contract discrepancy',
-    ),
     'tests/test_srd_lite_defenses.py::test_mage_real_far_target_rejects_before_spend_even_with_touch_claim[cast_spell_outside_combat]': KnownDefect(
         'A free-exploration Mage Armor cast accepts a false touch claim for an actual distant recipient',
         'Place the validated companion 30 feet away, claim distance zero/touch true, then attempt the public free-exploration Mage Armor cast and compare payment/state.',
         category='suspected retained contract discrepancy',
     ),
     'tests/test_srd_lite_defenses.py::test_mage_same_caster_two_real_grants_do_not_lose_independent_ownership': KnownDefect(
-        'The admitted Mage Armor effect lacks the retained preparation-source or until-Long-Rest lifetime contract',
-        "Cast valid Mage Armor with carried Materials and contact facts, then inspect its saved source/lifetime before the case's equip, unprepare, rest or reopen continuation.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_defenses.py::test_mage_trained_shield_and_stronger_real_unarmored_base_feed_attack[False]': KnownDefect(
-        'The admitted Mage Armor effect lacks the retained preparation-source or until-Long-Rest lifetime contract',
-        "Cast valid Mage Armor with carried Materials and contact facts, then inspect its saved source/lifetime before the case's equip, unprepare, rest or reopen continuation.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_defenses.py::test_mage_trained_shield_and_stronger_real_unarmored_base_feed_attack[True]': KnownDefect(
         'The admitted Mage Armor effect lacks the retained preparation-source or until-Long-Rest lifetime contract',
         "Cast valid Mage Armor with carried Materials and contact facts, then inspect its saved source/lifetime before the case's equip, unprepare, rest or reopen continuation.",
         category='suspected retained contract discrepancy',
