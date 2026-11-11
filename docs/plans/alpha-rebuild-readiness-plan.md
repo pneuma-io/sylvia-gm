@@ -91,9 +91,10 @@ Its owner is repairing fixture/test gaps and attributing remaining failures. Kee
 separate, consume the stable checked identity and qualify the actual final composition. Do not
 import unfinished refactor source, duplicate its gate or claim hosted CI success.
 
-The frontend handoff's priority resource fields and Reload acceptance are covered. Round
-display remains unresolved: TD has no round counter, while the frontend currently reads
-round from encounter combat state. Its definition/disposition is awaiting the owner.
+The frontend handoff's priority resource fields and Reload acceptance are covered. Daniel
+deferred Round display and its counter to the later frontend pass on 11 November 2026.
+This is no longer an open decision or blocker for the current TD integration. No counter
+or turn-clock rule is added here.
 Portrait references, committed movement cues, class lane grants and final combined 1:1
 mock-up/Opus acceptance retain their separate contracts. Mechanics proof does not close them.
 
