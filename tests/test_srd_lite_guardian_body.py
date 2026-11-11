@@ -26,7 +26,7 @@ def guardian_body():
         name = pending.pop()
         if name not in closure:
             tool = deepcopy(data['tools'][name])
-            tool['parameters'] = [deepcopy(pool[row]) if isinstance(row, str) else row for row in tool['parameters']]
+            tool['parameters'] = [deepcopy(pool[row]) if isinstance(row, str) else row for row in tool.get("parameters", [])]
             closure[name] = tool
             pending.extend(_calls(tool['effects']))
     subset = {key: value for key, value in data.items() if key not in {'tools', 'procedures'}}

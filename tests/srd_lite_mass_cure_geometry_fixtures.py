@@ -46,7 +46,7 @@ def bound():
         data = yaml.load(archive.read(entries[0]), Loader=yaml.CSafeLoader)
     pool = data.get('parameter_declarations', {})
     for tool in data['tools'].values():
-        tool['parameters'] = [deepcopy(pool[p]) if isinstance(p, str) else p for p in tool['parameters']]
+        tool['parameters'] = [deepcopy(pool[p]) if isinstance(p, str) else p for p in tool.get("parameters", [])]
     healing = deepcopy(data['tools'][FAMILY])
     profile = deepcopy(data['definitions']['spells']['mass_cure_wounds'])
     changed = bind_mass_cure_scene_geometry(data)

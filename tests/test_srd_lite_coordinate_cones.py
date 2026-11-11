@@ -27,7 +27,7 @@ def cones():
         if name not in closure:
             tool = deepcopy(data["tools"][name])
             tool["parameters"] = [
-                deepcopy(pool[row]) if isinstance(row, str) else row for row in tool["parameters"]
+                deepcopy(pool[row]) if isinstance(row, str) else row for row in tool.get("parameters", [])
             ]
             closure[name] = tool
             pending.extend(_calls(tool["effects"]))

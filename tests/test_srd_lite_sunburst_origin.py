@@ -26,7 +26,7 @@ def bound():
         data = yaml.load(archive.read('packages/' + NAMESPACE + '/runtime/ruleset.yaml'), Loader=yaml.CSafeLoader)
     pool = data.get('parameter_declarations', {})
     for tool in data['tools'].values():
-        tool['parameters'] = [deepcopy(pool[row]) if isinstance(row, str) else row for row in tool['parameters']]
+        tool['parameters'] = [deepcopy(pool[row]) if isinstance(row, str) else row for row in tool.get("parameters", [])]
     if os.environ.get('SUNBURST_PATCH_ORIGIN') == '1':
         from scripts.srd_sunburst_geometry import _sphere_tool, AREA_ORIGIN, _area_origin, SOLID_HIT, _solid_hit
         from scripts.srd_delayed_blast_fireball import _point_validator

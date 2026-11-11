@@ -27,7 +27,7 @@ def bound():
         data = yaml.load(archive.read('packages/' + NAMESPACE + '/runtime/ruleset.yaml'), Loader=yaml.CSafeLoader)
     pool = data.get('parameter_declarations', {})
     for tool in data['tools'].values():
-        tool['parameters'] = [deepcopy(pool[row]) if isinstance(row, str) else row for row in tool['parameters']]
+        tool['parameters'] = [deepcopy(pool[row]) if isinstance(row, str) else row for row in tool.get("parameters", [])]
     if os.environ.get('FIRE_STORM_PATCH_PLACEMENT') == '1':
         from scripts.srd_lite_fire_storm_geometry import _qualifier, _placement
         from scripts.srd_sunburst_geometry import _point_cover

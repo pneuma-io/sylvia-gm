@@ -58,7 +58,7 @@ def bound():
         data = yaml.load(archive.read(entries[0]), Loader=yaml.CSafeLoader)
     pool = data.get('parameter_declarations', {})
     for tool in data['tools'].values():
-        tool['parameters'] = [deepcopy(pool[p]) if isinstance(p, str) else p for p in tool['parameters']]
+        tool['parameters'] = [deepcopy(pool[p]) if isinstance(p, str) else p for p in tool.get("parameters", [])]
     original = {name: deepcopy(data['tools'][name]) for name in (FAMILY, 'ignite_srd_area_object')}
     profile = deepcopy(data['definitions']['spells']['fire_storm'])
     casting = deepcopy(data['definitions']['spell_casting']['fire_storm'])

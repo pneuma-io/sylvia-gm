@@ -25,7 +25,7 @@ def bound():
         data = yaml.load(archive.read('packages/' + NAMESPACE + '/runtime/ruleset.yaml'), Loader=yaml.CSafeLoader)
     pool = data.get('parameter_declarations', {})
     for tool in data['tools'].values():
-        tool['parameters'] = [deepcopy(pool[row]) if isinstance(row, str) else row for row in tool['parameters']]
+        tool['parameters'] = [deepcopy(pool[row]) if isinstance(row, str) else row for row in tool.get("parameters", [])]
     if os.environ.get('SRD_LITE_PATCH_SLEET_GROUND') == '1':
         from scripts.srd_lite_sleet_terrain import bind_sleet_ground_terrain
         bind_sleet_ground_terrain(data)

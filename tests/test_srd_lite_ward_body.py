@@ -31,7 +31,7 @@ def wards():
         if name not in closure:
             tool = deepcopy(data["tools"][name])
             tool["parameters"] = [
-                deepcopy(pool[p]) if isinstance(p, str) else p for p in tool["parameters"]
+                deepcopy(pool[p]) if isinstance(p, str) else p for p in tool.get("parameters", [])
             ]
             closure[name] = tool
             pending.extend(_calls(tool["effects"]))
