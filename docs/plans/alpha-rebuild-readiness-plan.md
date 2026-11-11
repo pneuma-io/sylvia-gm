@@ -123,9 +123,12 @@ refusal at fully concealed targets, preserving resources, duplicate receipts and
 This also exposed a separate gap: the refusal refers to a GM through-material firing solution,
 but the admitted TD package has no separate control for it. The retained rules permit such a
 shot only with a plausible positional firing solution; the current ordinary Fire path refuses
-both resistant and penetrable full walls. Daniel has been asked whether to integrate that missing
-GM path now or explicitly defer it. Do not invent a hidden-target hit rule or claim that full-wall
-penetration is qualified. This scope decision and final combined/native checks remain open.
+both resistant and penetrable full walls. Daniel confirmed that attempting to shoot through full
+walls with material penetration is an intended feature and requested a design discussion.
+Complete the missing firing path as part of this integration. Its targeting and positional
+uncertainty contract is still under discussion; no proposal is approved by this status entry.
+Do not bypass hidden-target knowledge, invent a hit rule or claim that full-wall penetration is
+qualified. Implementation and final combined/native checks remain open.
 
 The public compiler accepts optional private notes as an input. Public packages omit
 `references/canon/`; private local builds may include it. TD vault notes and Siren remain
