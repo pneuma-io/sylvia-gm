@@ -1070,10 +1070,13 @@ Failed, refused, cancelled and interrupted requests never automatically retry.
 
 The selected Setting may supply a rendering default and a separate style reference. Explicit
 user style choices take precedence; style references never replace a subject's canonical
-appearance, anatomy or map geometry. Severed Lands uses the owner-selected dark heroic fantasy
-illustration defined by the [K art guide](../../artwork/styles/severed-lands-k.md), with anime
-drawing as its foundation and selective painted depth. A changed default does not regenerate existing
-artwork or retry an old request.
+appearance, anatomy or map geometry. Severed Lands uses the owner-selected anime fantasy
+illustration defined by the [Severed Lands art guide](../../artwork/styles/severed-lands-k.md),
+with drawn construction and selective painted depth. First-party production follows the guide's
+accepted visual anchors; superseded artwork and its editable appearance notes are not constraints
+for replacement designs. Rift creatures carry psychedelic influence in material and structure
+while retaining authored anatomy and required geometry. A changed default does not regenerate
+existing artwork or retry an old request; saved user-selected art remains associated with its owner.
 
 Complete character artwork is one user-facing request. Sylvia prepares the missing reference
 and portrait stages in order, retaining the established appearance and existing usable images.

@@ -56,7 +56,7 @@ def test_lite_builder_gm_reopen_and_map_use_the_same_setting_style(tmp_path, mon
     )
     service = ImageArt(owner, adapters=(provider,), settings=lambda: {"mode": "review"})
     style = service.default_style(session_id)
-    assert style["id"] == "severed-lands-anime-heroic-k-v2"
+    assert style["id"] == "severed-lands-anime-fantasy-v3"
     guide = (ROOT / "artwork/styles/severed-lands-k.md").read_text(encoding="utf-8")
     assert style["brief"] == guide.split("## Rendering brief\n\n", 1)[1].split(
         "\n## Reference workflow", 1,
@@ -65,9 +65,12 @@ def test_lite_builder_gm_reopen_and_map_use_the_same_setting_style(tmp_path, mon
     assert service.view(session_id)["style_default"] == style
     assert provider.calls == []
 
-    # A request admitted under v1 must finish after the library moves to the new guide.
+    # A request admitted under v2 must finish after the library moves to the new guide.
     catalogue = json.loads((ROOT / "artwork/character-art.json").read_bytes())
-    old_style = catalogue["retained_styles"][0]
+    old_style = next(
+        row for row in catalogue["retained_styles"]
+        if row["id"] == "severed-lands-anime-heroic-k-v2"
+    )
     art_root = tmp_path / "artwork"
     for declared in catalogue_art_styles(catalogue, include_retained=True):
         path = art_root / declared.reference_path
@@ -176,15 +179,19 @@ def test_style_reference_and_resource_inventory_refuse_tampering(tmp_path, monke
     assert "artwork/" + style.reference_path in artwork_payload_paths(raw)
     assert resources["../artwork/" + style.reference_path] == "artwork/" + style.reference_path
     assert image.sha256 == style.reference_sha256
-    previous = catalogue_art_styles(catalogue, include_retained=True)[1]
-    assert bundled_art_styles.style_reference(previous.as_payload()).sha256 == (
-        previous.reference_sha256
-    )
-    assert "artwork/" + previous.reference_path in artwork_payload_paths(raw)
-    assert previous not in catalogue_art_styles(catalogue)
-    assert resources["../artwork/" + previous.reference_path] == (
-        "artwork/" + previous.reference_path
-    )
+    previous_styles = catalogue_art_styles(catalogue, include_retained=True)[1:]
+    assert {previous.style_id for previous in previous_styles} == {
+        "severed-lands-dark-heroic-fantasy-k-v1", "severed-lands-anime-heroic-k-v2",
+    }
+    for previous in previous_styles:
+        assert bundled_art_styles.style_reference(previous.as_payload()).sha256 == (
+            previous.reference_sha256
+        )
+        assert "artwork/" + previous.reference_path in artwork_payload_paths(raw)
+        assert previous not in catalogue_art_styles(catalogue)
+        assert resources["../artwork/" + previous.reference_path] == (
+            "artwork/" + previous.reference_path
+        )
     with pytest.raises(ValueError, match="conflicting"):
         catalogue_art_styles({"styles": [style.as_payload()], "retained_styles": [
             style.as_payload(),
