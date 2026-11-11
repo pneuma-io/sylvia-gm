@@ -23,3 +23,15 @@ He respects strength. A party that fights well might earn his acknowledgment —
 ## Behind the Screen
 
 Korr has information about the missing Anchor Doors — something his scouts found in the deep Cairnfields. He's sent a message to Waystation requesting a meeting with V. What he wants in exchange, and whether he's negotiating in good faith, is up to the DM. He might be a warlord seeking legitimacy. He might be a soldier who's found something that scares even him.
+
+## Appearance and artwork
+
+A humanlike adult male Riftborn soldier appearing in his mid-forties, with a broad athletic frame, warm bronze-brown skin, dark brown eyes, a square clean-shaven face and short dark hair drawn back into a small plain low tie. A precise assessing unsmiling expression and composed balanced military stance, empty relaxed hands. Worn plain dark steel lamellar armor over a charcoal padded coat, simple brown leather forearm guards, a muted dark russet waist sash, dark trousers and scuffed brown leather calf boots. One practical straight sword stays fully sheathed at his anatomical LEFT hip; one small closed plain pouch is secured at his anatomical RIGHT hip. His strategic soldier bearing follows the authored profile and Raider source; apparent age, physical features, armor, clothing and weapon design are editable visual defaults. No literal stone skin or face, invented claw anatomy, brute monster proportions, orc tusks, Ashen Claw crest, heraldry, rank text, crown, readable plans, revealing map, Warden artifact, magic aura, fresh injury, invented scars, gore, captive, mount, scenery or revealed negotiations.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/034a379ea1cf4bdac03ec0a1833131fc0fef6b5da26f35a9e590a582e9064b69.png)
+
+[Full-body reference](../assets/characters/bcc8a99a97827f3c1d17df14a4194c4fa890ebfde67dc4244fb818ada3ce978e.png)
+
+[Multiview reference sheet](../assets/characters/cce32b794e63534d5ae7c23f3d4da7595e65e0af7baceb3d9d8a0a0e6a6c579b.png)

@@ -238,23 +238,25 @@ source editions pass offline verification against actual current Lite payloads a
 The authored roster check passed in 6.76 seconds for 218 subjects/297 source editions. Completed
 owner/frontend/native matrices were not replayed for this artwork-only increment. The broader
 catalogue, everyday journeys and deferred acceptance remain unfinished.
-The Silent, Tide-Mother and Vale now have complete full-body, multiview and portrait bundles,
-bringing the catalogue to 110 complete bundles. The Silent retains their slate, chalk, closed
-ledger and silent warmth; Tide-Mother retains her ancient reptilian identity, healed Rift-burn
-scars, complete tail and spear; Vale retains their guarded guide bearing. Both they/them identities
-are unchanged. Unspecified appearances stay editable defaults. Tide-Mother's saved crop aligns
-face framing without changing PNG bytes. Original profile prefixes and the previous 107
-bundles/bindings are unchanged. Actual square/dialogue/map-token crops passed visual review. All
-nine exact PNGs, external resources and six current/retained source editions pass offline
-verification against actual current Lite payloads and Setting scope. The authored roster check
-passed in 10.32 seconds for 218 subjects/306 source editions. Completed owner/frontend/native
-matrices were not replayed for this artwork-only increment. The broader catalogue, everyday
-journeys and deferred acceptance remain unfinished.
+V, War-Captain Korr and War-Captain Vex now have complete full-body, multiview and portrait
+bundles, bringing the catalogue to 113 complete bundles. V's underlying identity remains with
+the selected campaign and DM; the default appearance does not resolve it. Korr retains his
+assessing soldier bearing and Vex her silent observant bearing without an invented throat
+injury. Unspecified appearances stay editable defaults. Original profile prefixes and the
+previous 110 bundles/bindings are unchanged. Actual square/dialogue/map-token crops passed visual
+review. All nine exact PNGs, external resources and seven current/retained source editions pass
+offline verification against actual current Lite payloads and Setting scope. The authored roster
+check passed in 9.33 seconds for 218 subjects/309 source editions. The authored NPC set is now
+prepared: all 82 subjects across 80 current profile files and 165 source editions resolve complete
+artwork. All 246 NPC PNGs, dimensions, hashes and external resources pass verification, including
+lookup through actual current Lite Setting payloads. This does not complete the monster, inherited
+form, Plan-only or companion catalogue. Completed owner/frontend/native matrices were not replayed.
+Broader everyday journeys and deferred acceptance remain unfinished.
 The owner selected a shared app artwork library: whole Setting/Plan exports omit unused premade
 PNGs, while custom art stays portable and character/campaign exports carry used artwork. The
 source now maps the catalogue and PNGs as external installer/portable resources, outside the
 onefile sidecar. Campaign export retains used art before any artwork view has been opened.
-The prepared PNG pool now totals 765,351,056 bytes across 330 images, beyond the content-package cap.
+The prepared PNG pool now totals 785,845,322 bytes across 339 images, beyond the content-package cap.
 The current Setting omits those PNGs; its existing content-package limits remain unchanged.
 Focused checks cover shared/custom publication, external resource inventory, portable ZIP assembly,
 and exact campaign art transfer before opening an image view. Local-copy receipts also transfer
@@ -357,7 +359,7 @@ hints. The six minimal failure cases pass after the repair; 78 related source ch
 module typing and touched Ruff pass; all eleven originals pass the repaired validator. This is
 source qualification only, with native/live acceptance still pending.
 The authored-source producer now covers 218 subjects (82 individual NPCs and 136 monsters),
-retaining 306 source editions across current content and Plan snapshots. Thread, Hook and Needle
+retaining 309 source editions across current content and Plan snapshots. Thread, Hook and Needle
 remain distinct; V and Anchor Sentinel variants and the artwork-annotated profiles retain
 their original editions. The
 snapshot-only opposition guide is explicitly excluded as encounter guidance. A composed source
@@ -388,8 +390,8 @@ candidate reuse preserves recipient metadata and rejects different content. Imag
 actual Lite prepared-art transfer checks now retain the normal candidate reference. Older incomplete
 archives that omitted it require a fresh export from the source dataset.
 These source/scripted checks do not establish completion of the ordinary
-workflows. The owner's latest selection keeps live in-app checks pending. Of the 330 prepared assets,
-319 were produced with the built-in GPT Images tool and eleven are the unchanged supplied Siren
+workflows. The owner's latest selection keeps live in-app checks pending. Of the 339 prepared assets,
+328 were produced with the built-in GPT Images tool and eleven are the unchanged supplied Siren
 master sheets. Asset preparation is separate from Sylvia's deferred native check.
 Live Sylvia subscription, installed-app
 and TD trailer acceptance remain unverified. Merge follows the Pneuma IO rulebook's delivery and

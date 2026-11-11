@@ -6916,6 +6916,192 @@
         "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Vale from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin or scales, eyes, hair, clothing, equipment, colors and material wear. Appearance: A humanlike androgynous adult Riftborn tunnel guide appearing in their mid-thirties, with a tall wiry build, deep brown skin, dark brown eyes, a broad-cheeked clean-shaven face and short tightly curled black hair. A professional guarded expression and quiet alert upright stance, with empty relaxed hands. A plain worn gray canvas thigh-length coat over a muted olive linen shirt, dark charcoal trousers and practical scuffed brown calf boots. A compact coil of ordinary rope is secured at their anatomical LEFT hip; one small closed unlit hooded metal lantern hangs at their anatomical RIGHT hip from a plain leather belt. Their guarded professional bearing follows the authored profile; apparent age, physical features, clothing and ordinary guide equipment are editable visual defaults. Use they/them pronouns. Their home world remains unknown. No revealed route or map, writing, client names, smuggler insignia, invented faction badge, magical lantern, visible flame, weapon, scars, cave scenery, animal, extra person or revealed lost clients. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at far right. Consistent scale across body views; entire head, hands, feet and equipment within all margins. The same single character repeated as turnaround views. Change viewing angle only, keeping costume and identity. Keep the rope coil at anatomical LEFT hip and the CLOSED UNLIT lantern at anatomical RIGHT hip in every view. Preserve their professional guarded face; use they/them pronouns. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, additional characters or revealed secrets.",
         "portrait": "Use case: identity-preserve. Production square app portrait for Vale from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, species, skin or scales, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a CLOSE HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair or scaled cranium. Consistent face scale for a standard RPG dialogue portrait. Preserve their exact deep-brown face, dark eyes, short tight curls and professional guarded expression. Polished naturalistic digital RPG illustration with tactile skin or scales and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, spear, slate, ledger, lantern, rope, full torso, painted circle, cutout, vignette, faded image edge, border, caption, text, UI, scenery, new costume, invented crest, animal or extra person. One 1024x1024 PNG."
       }
+    },
+    {
+      "id": "severed-npc-v",
+      "name": "V",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/v.md",
+          "sha256": "077a4769eb8ce88f84eb7e15261ae3e3bd087a661664e4ae316d2db35d1bbdb1",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/v.md",
+          "sha256": "d7443127297eb1d8da9e6f41fe8c2be5989c1c9792f18d993b569f5a1666381e",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/v.md",
+          "sha256": "a50d28145ff57d6ac9e1a5f12d22fa3d02e13364a887b7739923d96a8e1708c4",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A humanlike androgynous adult Riftborn field researcher with apparent age styling in their early sixties, a lean medium-height frame, warm copper-brown skin, gray-green eyes, a long softly lined clean-shaven face and straight silver-gray neck-length hair held back in a loose plain half-tie. Patient methodical guarded expression, quiet attentive upright posture and empty relaxed hands. A plain weathered brown knee-length travel coat over a muted sage-green linen tunic, charcoal trousers and worn dark brown leather boots. One small closed canvas field bag hangs at their anatomical LEFT hip from a strap over their RIGHT shoulder; one small closed plain notebook is secured at their anatomical RIGHT belt, with no writing or symbol on the cover. Their patient competent guarded bearing follows the authored sources; apparent age, physical features, clothing and field equipment are editable visual defaults. Use they/them pronouns. Their actual age, home world and underlying identity remain for the selected campaign and DM to establish. No weapon, armor, crown, divine or immortal appearance, Warden symbol, circle bisected by a line, identifying badge, visible Door fragment, open notebook, readable writing, glowing eyes, halo, portal, home-world scenery or revealed history.",
+        "full_body": {
+          "path": "assets/characters/b71f4e1189e2a549be128030cf3e312bfc6cefee63bc8c72c6eddaa03dd019d2.png",
+          "sha256": "b71f4e1189e2a549be128030cf3e312bfc6cefee63bc8c72c6eddaa03dd019d2"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/ba2a67b5000634ad41bbd307690675dd58e300ddff7f76965a2123c0b7af6b11.png",
+          "sha256": "ba2a67b5000634ad41bbd307690675dd58e300ddff7f76965a2123c0b7af6b11"
+        },
+        "portrait": {
+          "path": "assets/characters/05651541a780198d28a1558a3dd5253e6078c5df9d34f279cb5b8151e9a0c803.png",
+          "sha256": "05651541a780198d28a1558a3dd5253e6078c5df9d34f279cb5b8151e9a0c803"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1955095
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2393526
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2568216
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for V in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth, leather and worn metal where applicable. Plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person in a near-front three-quarter standing pose. Whole head, both hands, clothing, footwear and all equipment comfortably inside all margins. Appearance: A humanlike androgynous adult Riftborn field researcher with apparent age styling in their early sixties, a lean medium-height frame, warm copper-brown skin, gray-green eyes, a long softly lined clean-shaven face and straight silver-gray neck-length hair held back in a loose plain half-tie. Patient methodical guarded expression, quiet attentive upright posture and empty relaxed hands. A plain weathered brown knee-length travel coat over a muted sage-green linen tunic, charcoal trousers and worn dark brown leather boots. One small closed canvas field bag hangs at their anatomical LEFT hip from a strap over their RIGHT shoulder; one small closed plain notebook is secured at their anatomical RIGHT belt, with no writing or symbol on the cover. Their patient competent guarded bearing follows the authored sources; apparent age, physical features, clothing and field equipment are editable visual defaults. Use they/them pronouns. Their actual age, home world and underlying identity remain for the selected campaign and DM to establish. No weapon, armor, crown, divine or immortal appearance, Warden symbol, circle bisected by a line, identifying badge, visible Door fragment, open notebook, readable writing, glowing eyes, halo, portal, home-world scenery or revealed history. Preserve authored identity, personality and pronouns. No extra people, duplicate limbs, animals, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for V from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, body proportions, skin, eyes, hairstyle, clothing, equipment, colors and material wear. Appearance: A humanlike androgynous adult Riftborn field researcher with apparent age styling in their early sixties, a lean medium-height frame, warm copper-brown skin, gray-green eyes, a long softly lined clean-shaven face and straight silver-gray neck-length hair held back in a loose plain half-tie. Patient methodical guarded expression, quiet attentive upright posture and empty relaxed hands. A plain weathered brown knee-length travel coat over a muted sage-green linen tunic, charcoal trousers and worn dark brown leather boots. One small closed canvas field bag hangs at their anatomical LEFT hip from a strap over their RIGHT shoulder; one small closed plain notebook is secured at their anatomical RIGHT belt, with no writing or symbol on the cover. Their patient competent guarded bearing follows the authored sources; apparent age, physical features, clothing and field equipment are editable visual defaults. Use they/them pronouns. Their actual age, home world and underlying identity remain for the selected campaign and DM to establish. No weapon, armor, crown, divine or immortal appearance, Warden symbol, circle bisected by a line, identifying badge, visible Door fragment, open notebook, readable writing, glowing eyes, halo, portal, home-world scenery or revealed history. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at far right. Consistent scale across body views; whole head, hands, footwear and equipment within all margins. The same single character repeated as turnaround views. Change viewing angle only, keeping costume and identity. Keep the CLOSED field bag at anatomical LEFT hip with strap over RIGHT shoulder and the CLOSED plain notebook at anatomical RIGHT belt. Preserve their age styling, silver hair half-tie and guarded patient expression; use they/them pronouns. No weapon, identifying symbols or revealed origin. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, additional characters or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for V from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, skin, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a CLOSE HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Preserve their softly lined mature face, gray-green eyes, silver-gray hair half-tie and guarded patient expression. No de-aging or identifying symbols; their underlying identity remains undecided by this image. Polished naturalistic digital RPG illustration with tactile skin, fabric, leather and worn metal where applicable, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, weapon, notebook, bag, full torso, painted circle, cutout, vignette, faded image edge, border, caption, text, UI, scenery, new costume, invented crest, animal or extra person. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-war-captain-korr",
+      "name": "War-Captain Korr",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/war-captain-korr.md",
+          "sha256": "d9fbf97cc6b69127222c3d80b24231256528e03a44aeee0d3361739c51c975ff",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/war-captain-korr.md",
+          "sha256": "7173567863d705a27ae4b845bfddd5d67f075f6d8b39f8978016bd071d65a197",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A humanlike adult male Riftborn soldier appearing in his mid-forties, with a broad athletic frame, warm bronze-brown skin, dark brown eyes, a square clean-shaven face and short dark hair drawn back into a small plain low tie. A precise assessing unsmiling expression and composed balanced military stance, empty relaxed hands. Worn plain dark steel lamellar armor over a charcoal padded coat, simple brown leather forearm guards, a muted dark russet waist sash, dark trousers and scuffed brown leather calf boots. One practical straight sword stays fully sheathed at his anatomical LEFT hip; one small closed plain pouch is secured at his anatomical RIGHT hip. His strategic soldier bearing follows the authored profile and Raider source; apparent age, physical features, armor, clothing and weapon design are editable visual defaults. No literal stone skin or face, invented claw anatomy, brute monster proportions, orc tusks, Ashen Claw crest, heraldry, rank text, crown, readable plans, revealing map, Warden artifact, magic aura, fresh injury, invented scars, gore, captive, mount, scenery or revealed negotiations.",
+        "full_body": {
+          "path": "assets/characters/bcc8a99a97827f3c1d17df14a4194c4fa890ebfde67dc4244fb818ada3ce978e.png",
+          "sha256": "bcc8a99a97827f3c1d17df14a4194c4fa890ebfde67dc4244fb818ada3ce978e"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/cce32b794e63534d5ae7c23f3d4da7595e65e0af7baceb3d9d8a0a0e6a6c579b.png",
+          "sha256": "cce32b794e63534d5ae7c23f3d4da7595e65e0af7baceb3d9d8a0a0e6a6c579b"
+        },
+        "portrait": {
+          "path": "assets/characters/034a379ea1cf4bdac03ec0a1833131fc0fef6b5da26f35a9e590a582e9064b69.png",
+          "sha256": "034a379ea1cf4bdac03ec0a1833131fc0fef6b5da26f35a9e590a582e9064b69"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2007226
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2367431
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2476732
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for War-Captain Korr in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth, leather and worn metal where applicable. Plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person in a near-front three-quarter standing pose. Whole head, both hands, clothing, footwear and all equipment comfortably inside all margins. Appearance: A humanlike adult male Riftborn soldier appearing in his mid-forties, with a broad athletic frame, warm bronze-brown skin, dark brown eyes, a square clean-shaven face and short dark hair drawn back into a small plain low tie. A precise assessing unsmiling expression and composed balanced military stance, empty relaxed hands. Worn plain dark steel lamellar armor over a charcoal padded coat, simple brown leather forearm guards, a muted dark russet waist sash, dark trousers and scuffed brown leather calf boots. One practical straight sword stays fully sheathed at his anatomical LEFT hip; one small closed plain pouch is secured at his anatomical RIGHT hip. His strategic soldier bearing follows the authored profile and Raider source; apparent age, physical features, armor, clothing and weapon design are editable visual defaults. No literal stone skin or face, invented claw anatomy, brute monster proportions, orc tusks, Ashen Claw crest, heraldry, rank text, crown, readable plans, revealing map, Warden artifact, magic aura, fresh injury, invented scars, gore, captive, mount, scenery or revealed negotiations. Preserve authored identity, personality and pronouns. No extra people, duplicate limbs, animals, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for War-Captain Korr from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, body proportions, skin, eyes, hairstyle, clothing, equipment, colors and material wear. Appearance: A humanlike adult male Riftborn soldier appearing in his mid-forties, with a broad athletic frame, warm bronze-brown skin, dark brown eyes, a square clean-shaven face and short dark hair drawn back into a small plain low tie. A precise assessing unsmiling expression and composed balanced military stance, empty relaxed hands. Worn plain dark steel lamellar armor over a charcoal padded coat, simple brown leather forearm guards, a muted dark russet waist sash, dark trousers and scuffed brown leather calf boots. One practical straight sword stays fully sheathed at his anatomical LEFT hip; one small closed plain pouch is secured at his anatomical RIGHT hip. His strategic soldier bearing follows the authored profile and Raider source; apparent age, physical features, armor, clothing and weapon design are editable visual defaults. No literal stone skin or face, invented claw anatomy, brute monster proportions, orc tusks, Ashen Claw crest, heraldry, rank text, crown, readable plans, revealing map, Warden artifact, magic aura, fresh injury, invented scars, gore, captive, mount, scenery or revealed negotiations. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at far right. Consistent scale across body views; whole head, hands, footwear and equipment within all margins. The same single character repeated as turnaround views. Change viewing angle only, keeping costume and identity. Keep the fully SHEATHED straight sword at anatomical LEFT hip and closed pouch at anatomical RIGHT hip through the turn. Preserve his square assessing face, dark low hair tie, lamellar armor and russet sash. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, additional characters or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for War-Captain Korr from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, skin, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a CLOSE HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Preserve his exact square assessing unsmiling face, dark eyes, dark low hair tie and plain lamellar armor. Polished naturalistic digital RPG illustration with tactile skin, fabric, leather and worn metal where applicable, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, weapon, notebook, bag, full torso, painted circle, cutout, vignette, faded image edge, border, caption, text, UI, scenery, new costume, invented crest, animal or extra person. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-war-captain-vex",
+      "name": "War-Captain Vex",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/war-captain-vex.md",
+          "sha256": "7c45e736dd82319818199a11bd870e1b771e883c91c44c3eca7e4d9d8c0c9438",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/war-captain-vex.md",
+          "sha256": "956092b8a1f662aee8d318d9f31d3603386c4e41f07c3ee70a512078f6260566",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A humanlike adult female Riftborn aerial war-captain appearing in her early forties, with a lean athletic frame, warm dark copper skin, slate-gray eyes, high cheekbones, a firm angular jaw and dark auburn hair gathered into a short tight plain braid. Silent observant self-assured expression with mouth closed, still balanced upright posture and empty relaxed hands. A fitted charcoal leather-and-mail protective jacket with a plain high cloth collar, simple worn brown leather riding-harness straps over the jacket, fingerless dark leather gloves, muted slate trousers and practical dark brown leather riding boots. One ordinary short curved saber stays fully sheathed at her anatomical LEFT hip; one small closed plain pouch is secured at her anatomical RIGHT hip. Her disciplined silent aerial-commander bearing follows the authored profile; apparent age, physical features, clothing, equipment and weapon design are editable visual defaults. No invented throat injury or scar, bandage, gag, muzzle, sewn lips, speaking pose, open mouth, wings, feathers, bird anatomy, Silent Wing insignia, crown, readable orders, glowing eyes, Warden weapon or structure, magic aura, mount, extra creature, scenery or revealed discovery.",
+        "full_body": {
+          "path": "assets/characters/54542a3685238e2afd04ab42a0ba2ef91cf2d8ff32b80e45b34033cc3ef16bcd.png",
+          "sha256": "54542a3685238e2afd04ab42a0ba2ef91cf2d8ff32b80e45b34033cc3ef16bcd"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/bd738b5dd2b79a19ad584f418ef2e4cc769f8ba551279eb63199e012b9c6477e.png",
+          "sha256": "bd738b5dd2b79a19ad584f418ef2e4cc769f8ba551279eb63199e012b9c6477e"
+        },
+        "portrait": {
+          "path": "assets/characters/a109c982aeae0b372856e93e8e57ad1d29bdfe33d0614e9306dc8126057f4674.png",
+          "sha256": "a109c982aeae0b372856e93e8e57ad1d29bdfe33d0614e9306dc8126057f4674"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1961663
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2284188
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2480189
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for War-Captain Vex in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth, leather and worn metal where applicable. Plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person in a near-front three-quarter standing pose. Whole head, both hands, clothing, footwear and all equipment comfortably inside all margins. Appearance: A humanlike adult female Riftborn aerial war-captain appearing in her early forties, with a lean athletic frame, warm dark copper skin, slate-gray eyes, high cheekbones, a firm angular jaw and dark auburn hair gathered into a short tight plain braid. Silent observant self-assured expression with mouth closed, still balanced upright posture and empty relaxed hands. A fitted charcoal leather-and-mail protective jacket with a plain high cloth collar, simple worn brown leather riding-harness straps over the jacket, fingerless dark leather gloves, muted slate trousers and practical dark brown leather riding boots. One ordinary short curved saber stays fully sheathed at her anatomical LEFT hip; one small closed plain pouch is secured at her anatomical RIGHT hip. Her disciplined silent aerial-commander bearing follows the authored profile; apparent age, physical features, clothing, equipment and weapon design are editable visual defaults. No invented throat injury or scar, bandage, gag, muzzle, sewn lips, speaking pose, open mouth, wings, feathers, bird anatomy, Silent Wing insignia, crown, readable orders, glowing eyes, Warden weapon or structure, magic aura, mount, extra creature, scenery or revealed discovery. Preserve authored identity, personality and pronouns. No extra people, duplicate limbs, animals, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for War-Captain Vex from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, body proportions, skin, eyes, hairstyle, clothing, equipment, colors and material wear. Appearance: A humanlike adult female Riftborn aerial war-captain appearing in her early forties, with a lean athletic frame, warm dark copper skin, slate-gray eyes, high cheekbones, a firm angular jaw and dark auburn hair gathered into a short tight plain braid. Silent observant self-assured expression with mouth closed, still balanced upright posture and empty relaxed hands. A fitted charcoal leather-and-mail protective jacket with a plain high cloth collar, simple worn brown leather riding-harness straps over the jacket, fingerless dark leather gloves, muted slate trousers and practical dark brown leather riding boots. One ordinary short curved saber stays fully sheathed at her anatomical LEFT hip; one small closed plain pouch is secured at her anatomical RIGHT hip. Her disciplined silent aerial-commander bearing follows the authored profile; apparent age, physical features, clothing, equipment and weapon design are editable visual defaults. No invented throat injury or scar, bandage, gag, muzzle, sewn lips, speaking pose, open mouth, wings, feathers, bird anatomy, Silent Wing insignia, crown, readable orders, glowing eyes, Warden weapon or structure, magic aura, mount, extra creature, scenery or revealed discovery. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at far right. Consistent scale across body views; whole head, hands, footwear and equipment within all margins. The same single character repeated as turnaround views. Change viewing angle only, keeping costume and identity. Keep the fully SHEATHED short curved saber at anatomical LEFT hip and closed pouch at anatomical RIGHT hip through the turn. Preserve her short auburn braid, riding harness, fingerless gloves and silent closed-mouth expression; no invented throat wound or gag. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, additional characters or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for War-Captain Vex from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, skin, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a CLOSE HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Preserve her exact high-cheeked angular face, slate-gray eyes, dark auburn braid, high cloth collar, harness and silent self-assured CLOSED-mouth expression. No throat wound, bandage, gag or speaking pose. Polished naturalistic digital RPG illustration with tactile skin, fabric, leather and worn metal where applicable, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, weapon, notebook, bag, full torso, painted circle, cutout, vignette, faded image edge, border, caption, text, UI, scenery, new costume, invented crest, animal or extra person. One 1024x1024 PNG."
+      }
     }
   ]
 }
