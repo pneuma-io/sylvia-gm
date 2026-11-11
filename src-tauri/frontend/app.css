@@ -3760,6 +3760,40 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
 .ready-character-profile { white-space: pre-wrap; overflow-wrap: anywhere; }
 .ready-campaign-actions { display: flex; gap: .6rem; flex-wrap: wrap; justify-content: flex-end; margin-top: 1rem; }
 
+/* Start settings: the model, effort and speed a new chat begins with. */
+.chat-start-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(30rem, 92vw);
+  height: fit-content;
+  max-height: 85vh;
+  overflow: auto;
+  padding: 20px;
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-lg);
+  background: var(--bg-secondary);
+  color: var(--text-narration);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.55);
+  font: inherit;
+}
+.chat-start-dialog::backdrop { background: rgba(5, 8, 12, 0.78); backdrop-filter: blur(5px); }
+.chat-start-dialog h2 { margin-bottom: .6rem; color: var(--text-bright); font: 600 1.3rem/1.2 var(--font-serif); }
+.chat-start-dialog p { margin: .6rem 0; }
+.chat-start-dialog label { display: block; margin-top: .8rem; color: var(--text-dim); font-size: .82rem; }
+.chat-start-dialog select { width: 100%; min-width: 0; margin-top: .25rem; }
+.chat-start-note { color: var(--text-dim); font-size: .8rem; overflow-wrap: anywhere; }
+.chat-start-actions { display: flex; gap: .6rem; flex-wrap: wrap; justify-content: flex-end; margin-top: 1rem; }
+
+/* Settings: model, effort, speed and Save share one row, and wrap when the card is narrow. */
+.chat-default-fields { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px 12px; }
+.chat-default-fields > div { flex: 1 1 7rem; min-width: 0; }
+.chat-default-fields > .chat-default-model { flex: 2 1 11rem; }
+.chat-default-fields > .model-switch-actions { flex: 0 0 auto; margin: 0; }
+.chat-default-fields select { width: 100%; min-width: 0; }
+.chat-default-fields label { display: block; margin: 0 0 4px; }
+#default-speed-note:empty { display: none; }
+
 /* Character previews stay inside the existing Interview party chooser. */
 #starter-character-preview[hidden],
 .construction-fields .btn[hidden] {

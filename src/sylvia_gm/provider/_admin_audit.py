@@ -338,6 +338,7 @@ class AdminAuditedProvider(Provider):
         tool_call_deltas: list[object] = []
         finish_reason: str | None = None
         reported_effort: str | None = None
+        reported_tier: str | None = None
         status = "completed"
         try:
             with self._provider.hooks.scoped(observer):
@@ -359,6 +360,8 @@ class AdminAuditedProvider(Provider):
                             finish_reason = chunk.finish_reason
                         if chunk.provider_reported_reasoning_effort is not None:
                             reported_effort = chunk.provider_reported_reasoning_effort
+                        if chunk.provider_reported_service_tier is not None:
+                            reported_tier = chunk.provider_reported_service_tier
                         yield chunk
         except BaseException as error:
             status = "interrupted" if type(error).__name__ == "CancelledError" else "failed"
@@ -379,6 +382,7 @@ class AdminAuditedProvider(Provider):
                         "tool_call_deltas": tool_call_deltas,
                         "finish_reason": finish_reason,
                         "provider_reported_reasoning_effort": reported_effort,
+                        "provider_reported_service_tier": reported_tier,
                     },
                     "usage": _usage_projection(completed),
                     "retry_count": observer.retry_attempt,

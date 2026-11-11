@@ -238,6 +238,10 @@ class AnthropicMessagesTransport(ProviderTransport):
             request["thinking"] = kwargs["thinking"]
         if "output_config" in kwargs:
             request["output_config"] = kwargs["output_config"]
+        if "speed" in kwargs:
+            # Fast mode is a top-level body field the pinned SDK does not type yet.
+            # https://platform.claude.com/docs/en/build-with-claude/fast-mode (2026-11-12).
+            request["extra_body"] = {"speed": kwargs["speed"]}
 
         if system_text_or_blocks:
             request["system"] = system_text_or_blocks

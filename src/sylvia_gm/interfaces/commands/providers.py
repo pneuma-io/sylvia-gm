@@ -14,12 +14,16 @@ from sylvia_gm.config.provider_settings import (
     open_provider_setup,
     provider_settings,
     remove_provider_settings,
+    require_configured_model,
     save_provider_settings,
+    set_chat_defaults_settings,
     set_default_model_settings,
     validate_provider_model,
 )
 from sylvia_gm.domain.errors import CommandRejected
 
+from .._chat_start import explicit_effort, explicit_speed
+from .._session_reasoning import catalog_model_info
 from ..owner_process import (
     _MAX_ADMIN_AUDIT_VIEW_BYTES,
     OwnerProtocolError,
@@ -58,7 +62,9 @@ def handle_chatgpt_connection(ctx: DispatchContext, params: Mapping[str, Any]) -
         )
     except CodexConnectionError as error:
         raise OwnerProtocolError(str(error)) from None
-    if params.get("action") == "add_model" and ctx.reload_provider_resolver is not None:
+    if ctx.reload_provider_resolver is not None and (
+        params.get("action") == "add_model" or result.get("saved_models_refreshed")
+    ):
         ctx.reload_provider_resolver()
     return result
 
@@ -203,6 +209,26 @@ def handle_set_default_model(ctx: DispatchContext, params: Mapping[str, Any]) ->
         ctx.storage_root / "config.yaml",
         provider_id=params.get("provider_id"),
         model_id=params.get("model_id"),
+    )
+
+
+def handle_set_chat_defaults(ctx: DispatchContext, params: Mapping[str, Any]) -> Any:
+    """Save the model, effort and speed new chats start from; existing chats are untouched."""
+    config_path = ctx.storage_root / "config.yaml"
+    selection = require_configured_model(
+        config_path, provider_id=params.get("provider_id"), model_id=params.get("model_id"),
+    )
+    model = catalog_model_info(
+        selection["provider_id"], selection["model_id"], ctx.model_choices(),
+    )
+    effort, speed = params.get("reasoning_effort"), params.get("speed")
+    return set_chat_defaults_settings(
+        config_path,
+        provider_id=selection["provider_id"],
+        model_id=selection["model_id"],
+        # Role only picks the mode default, which is never saved as a named level.
+        reasoning_effort=None if effort is None else explicit_effort(model, "builder", effort),
+        speed=None if speed is None else explicit_speed(model, speed),
     )
 
 

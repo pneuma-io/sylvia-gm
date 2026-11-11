@@ -44,6 +44,7 @@ from sylvia_gm.provider._request_metadata import (
     opencode_request_headers,
     without_opencode_protocol_headers,
 )
+from sylvia_gm.provider._speed import configure_speed, speed_options
 
 ProviderResolver = Callable[[SessionRecord], Provider]
 
@@ -81,6 +82,7 @@ _MODEL_FIELDS = frozenset(
         "supports_tools",
         "supported_reasoning_efforts",
         "default_reasoning_effort",
+        "service_tiers",
     }
 )
 _MODEL_ID_LIMIT = 256
@@ -354,10 +356,12 @@ def _configured_provider_models(
             supported, suggested = reasoning_values(
                 row.get("supported_reasoning_efforts"), row.get("default_reasoning_effort"),
             )
+            advertised_speeds = speed_options(row.get("service_tiers"))
         except ValueError as error:
             raise ConfigError(str(error)) from error
         configured.append(replace(model, supported_reasoning_efforts=supported,
-                                  default_reasoning_effort=suggested))
+                                  default_reasoning_effort=suggested,
+                                  speed_options=advertised_speeds))
     return tuple(configured)
 
 
@@ -399,7 +403,9 @@ class ConfiguredProviderResolver:
             if not definition.base_url:
                 raise ConfigError(f"Enabled provider '{provider_key}' requires base_url")
             catalog.extend(
-                configure_reasoning(model, definition.base_url)
+                configure_speed(
+                    configure_reasoning(model, definition.base_url), definition.base_url,
+                )
                 for model in _configured_provider_models(provider_key, definition, known_catalog)
             )
             enabled.add(provider_key)
@@ -564,6 +570,12 @@ class ConfiguredProviderResolver:
                     "dm": mode_reasoning_default(model, "dm"),
                     "builder": mode_reasoning_default(model, "builder"),
                 },
+                "speed_options": (
+                    None if not model.speed_options else
+                    [option.projection() for option in model.speed_options]
+                ),
+                "speed_control": model.speed_control,
+                "speed_source": model.speed_source,
                 "capability_registry_version": MODEL_CAPABILITY_REGISTRY_VERSION,
                 "capability_tier_id": (
                     None

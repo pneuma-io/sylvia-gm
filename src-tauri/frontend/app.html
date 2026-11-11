@@ -113,6 +113,24 @@
     </div>
   </dialog>
 
+  <!-- Shown before a new chat whose first model call would otherwise start by itself. -->
+  <dialog id="chat-start-dialog" class="chat-start-dialog" aria-labelledby="chat-start-title">
+    <h2 id="chat-start-title">Start chat</h2>
+    <p id="chat-start-lead"></p>
+    <label for="chat-start-model">Model</label>
+    <select id="chat-start-model"></select>
+    <label for="chat-start-effort">Reasoning effort</label>
+    <select id="chat-start-effort"></select>
+    <label for="chat-start-speed">Speed</label>
+    <select id="chat-start-speed" aria-describedby="chat-start-speed-note"></select>
+    <p class="chat-start-note" id="chat-start-speed-note" role="status"></p>
+    <p class="chat-start-note">Nothing is sent to the model until you start. You can change these later from the chat’s message box.</p>
+    <div class="chat-start-actions">
+      <button class="btn btn-primary" id="chat-start-confirm" type="button">Start</button>
+      <button class="btn btn-secondary" id="chat-start-cancel" type="button">Cancel</button>
+    </div>
+  </dialog>
+
   <!-- Home command centre - campaign orientation without the play sidebar. -->
   <main class="home-view" id="home-view" hidden>
     <header class="home-header">
@@ -511,12 +529,15 @@
               Reasoning: Provider default
             </button>
             <div class="chat-model-popover chat-reasoning-popover" id="chat-reasoning-popover"
-                 role="dialog" aria-label="Reasoning effort" hidden>
-              <label for="chat-reasoning-current">This chat</label>
+                 role="dialog" aria-label="Reasoning effort and speed" hidden>
+              <label for="chat-reasoning-current">Effort · this chat</label>
               <select id="chat-reasoning-current" aria-describedby="chat-reasoning-hint"></select>
-              <label for="chat-reasoning-once">Next reply only</label>
+              <label for="chat-reasoning-once">Effort · next reply only</label>
               <select id="chat-reasoning-once" aria-describedby="chat-reasoning-hint"></select>
               <p class="chat-model-hint" id="chat-reasoning-hint" role="status"></p>
+              <label for="chat-speed-current">Speed · this chat</label>
+              <select id="chat-speed-current" aria-describedby="chat-speed-hint"></select>
+              <p class="chat-model-hint" id="chat-speed-hint" role="status"></p>
             </div>
           </div>
             </div>
@@ -699,17 +720,28 @@
             <section class="settings-section model-choice-panel" aria-labelledby="model-default-heading">
               <h3 class="settings-eyebrow" id="model-default-heading">Default for new chats</h3>
               <div class="settings-card">
-                <label for="model-choice">Model</label>
-                <div class="settings-inline-field">
-                  <select id="model-choice" disabled>
-                    <option value="">Loading configured models…</option>
-                  </select>
+                <div class="chat-default-fields">
+                  <div class="chat-default-model">
+                    <label for="model-choice">Model</label>
+                    <select id="model-choice" disabled>
+                      <option value="">Loading configured models…</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="default-effort-choice">Reasoning effort</label>
+                    <select id="default-effort-choice" disabled></select>
+                  </div>
+                  <div>
+                    <label for="default-speed-choice">Speed</label>
+                    <select id="default-speed-choice" disabled aria-describedby="default-speed-note"></select>
+                  </div>
                   <div class="provider-actions model-switch-actions">
                     <button class="btn btn-primary btn-sm" id="set-default-model-btn"
-                            type="button" disabled>Save default</button>
+                            type="button" disabled>Save defaults</button>
                   </div>
                 </div>
-                <p class="provider-field-help">Existing chats keep their model. To change one, use the model menu in its message box.</p>
+                <p class="provider-field-help" id="default-speed-note"></p>
+                <p class="provider-field-help">New chats start with these; existing chats keep their own. Change either from a chat’s message box.</p>
                 <div class="model-status" id="model-status" role="status">Loading model settings…</div>
               </div>
             </section>
@@ -1462,6 +1494,7 @@
 <script src="dictation.js"></script>
 <script src="support-report.js"></script>
 <script src="local-diagnostics.js"></script>
+<script src="chat-start.js"></script>
 <script src="ready-campaigns.js"></script>
 <script src="tutorials.js"></script>
 <script src="desktop-updates.js"></script>

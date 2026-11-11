@@ -123,6 +123,18 @@ class ChatGPTAccount:
                         and effort["reasoningEffort"]
                     )) if isinstance(efforts, list) else []
                     suggested = item.get("defaultReasoningEffort")
+                    tiers = item.get("serviceTiers", [])
+                    service_tiers = [
+                        {
+                            "id": tier["id"],
+                            "name": tier["name"],
+                            "description": tier.get("description")
+                            if isinstance(tier.get("description"), str) else "",
+                        }
+                        for tier in (tiers if isinstance(tiers, list) else [])
+                        if isinstance(tier, dict) and isinstance(tier.get("id"), str)
+                        and tier["id"] and isinstance(tier.get("name"), str) and tier["name"]
+                    ]
                     modalities = item.get("inputModalities", ["text", "image"])
                     supports_text = isinstance(modalities, list) and "text" in modalities
                     unavailable = (
@@ -139,6 +151,7 @@ class ChatGPTAccount:
                             "default_reasoning_effort": (
                                 suggested if suggested in supported else None
                             ),
+                            "service_tiers": service_tiers,
                         }
                     )
                 cursor = reply.get("nextCursor")

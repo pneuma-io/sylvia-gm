@@ -43,6 +43,9 @@ _DISCOVERY_PAGE_LIMIT = 200
 _HEADER_COUNT_LIMIT = 16
 _HEADER_NAME = re.compile(r"^[A-Za-z0-9!#$%&'*+.^_`|~-]{1,80}$")
 _PROFILE_ID = re.compile(r"^[a-z][a-z0-9_]{0,63}$")
+# Provider-native effort and speed names, the same shape the session record accepts.
+_NATIVE_SETTING = re.compile(r"[a-z][a-z0-9_-]{0,31}")
+_SESSION_SPEED_LIMIT = 500
 _TRANSPORTS: frozenset[str] = frozenset(
     {"chat_completions", "responses", "anthropic_messages", "codex_app_server",
      "gemini_generate_content", "claude_code"}
@@ -683,6 +686,26 @@ def _project_configured_model(
         "supports_tools": row.get("supports_tools"),
         "supported_reasoning_efforts": row.get("supported_reasoning_efforts"),
         "default_reasoning_effort": row.get("default_reasoning_effort"),
+        "service_tiers": row.get("service_tiers"),
+    }
+
+
+def _native_setting(value: object) -> str | None:
+    """Return a saved native option name, or None for anything that is not one."""
+    return value if isinstance(value, str) and _NATIVE_SETTING.fullmatch(value) else None
+
+
+def _chat_defaults(document: Mapping[str, object]) -> dict[str, str | None]:
+    """Project the saved new-chat effort and speed; a missing preference is None.
+
+    None means the mode default for effort and standard speed, which is exactly how
+    Sylvia behaved before these preferences existed.
+    """
+    raw = document.get("chat_defaults")
+    raw = raw if isinstance(raw, Mapping) else {}
+    return {
+        "reasoning_effort": _native_setting(raw.get("reasoning_effort")),
+        "speed": _native_setting(raw.get("speed")),
     }
 
 
@@ -750,6 +773,7 @@ def provider_settings(config_path: Path) -> dict[str, object]:
         ],
         "configured": configured,
         "default_model": safe_default,
+        "chat_defaults": _chat_defaults(raw_document),
         "model_defaults": [
             {"preset_id": preset_id,
              **(_discovery_model({"id": model_id}, preset_id=preset_id) or {})}
@@ -1708,16 +1732,17 @@ def validate_provider_model(
 @_serialized_settings_write
 def refresh_subscription_reasoning(
     config_path: Path, models: list[dict[str, object]],
-) -> None:
-    """Refresh advertised effort metadata on saved subscription models without other edits."""
+) -> bool:
+    """Refresh advertised effort and speed metadata on saved subscription models only."""
     from sylvia_gm.provider._reasoning import reasoning_values
+    from sylvia_gm.provider._speed import speed_options
 
     document = _read_user_config(config_path)
     providers = document.get("providers")
     configured = providers.get("chatgpt_subscription") if isinstance(providers, dict) else None
     rows = configured.get("models") if isinstance(configured, dict) else None
     if not isinstance(rows, list):
-        return
+        return False
     by_id = {item.get("id"): item for item in models if isinstance(item.get("id"), str)}
     changed = False
     for row in rows:
@@ -1725,20 +1750,31 @@ def refresh_subscription_reasoning(
             continue
         advertised = by_id.get(row.get("id"))
         if advertised is None:
+            if "service_tiers" not in row:
+                # The runtime answered and no longer lists this model: nothing to offer.
+                row["service_tiers"] = []
+                changed = True
             continue
         supported, suggested = reasoning_values(
             advertised.get("supported_reasoning_efforts"),
             advertised.get("default_reasoning_effort"),
         )
+        try:
+            tiers = speed_options(advertised.get("service_tiers"))
+        except ValueError:
+            tiers = None
         for key, value in {
             "supported_reasoning_efforts": None if supported is None else list(supported),
             "default_reasoning_effort": suggested,
+            # An empty list records "asked, none advertised", unlike a legacy missing key.
+            "service_tiers": [tier.projection() for tier in tiers or ()],
         }.items():
-            if row.get(key) != value:
+            if key not in row or row.get(key) != value:
                 row[key] = value
                 changed = True
     if changed:
         _write_user_config(config_path, document)
+    return changed
 
 
 @_serialized_settings_write
@@ -1762,6 +1798,7 @@ def save_provider_settings(
     supports_tools: object = None,
     supported_reasoning_efforts: object = None,
     default_reasoning_effort: object = None,
+    service_tiers: object = None,
     declared_context_window: object = None,
     declared_context_source: object = None,
     runtime_context_window: object = None,
@@ -1982,6 +2019,17 @@ def save_provider_settings(
             raise ConfigError(str(error)) from error
         replacement["supported_reasoning_efforts"] = None if supported is None else list(supported)
         replacement["default_reasoning_effort"] = suggested
+        from sylvia_gm.provider._speed import speed_options
+
+        tiers = service_tiers
+        if tiers is None and prior is not None:
+            tiers = prior.get("service_tiers")
+        try:
+            advertised_tiers = speed_options(tiers)
+        except ValueError as error:
+            raise ConfigError(str(error)) from error
+        if advertised_tiers is not None:
+            replacement["service_tiers"] = [tier.projection() for tier in advertised_tiers]
     updated_models: list[dict[str, object]] = []
     replaced = False
     for row in models:
@@ -2033,6 +2081,80 @@ def set_default_model_settings(
     document["default_model"] = default
     _write_user_config(config_path, document)
     return default
+
+
+@_serialized_settings_write
+def set_chat_defaults_settings(
+    config_path: Path,
+    *,
+    provider_id: object,
+    model_id: object,
+    reasoning_effort: object,
+    speed: object,
+) -> dict[str, object]:
+    """Persist the model, effort and speed that newly created chats start from.
+
+    Effort and speed are native option names, or None for the mode default and standard
+    speed. The caller checks them against the chosen model's capabilities; saving here
+    never changes an existing chat.
+    """
+    for value, label in ((reasoning_effort, "effort"), (speed, "speed")):
+        if value is not None and _native_setting(value) is None:
+            raise ConfigError(f"Default {label} must be a native setting name")
+    selection = require_configured_model(config_path, provider_id=provider_id, model_id=model_id)
+    document = _read_user_config(config_path)
+    document["default_model"] = selection
+    if reasoning_effort is None and speed is None:
+        document.pop("chat_defaults", None)
+    else:
+        document["chat_defaults"] = {"reasoning_effort": reasoning_effort, "speed": speed}
+    _write_user_config(config_path, document)
+    return {"default_model": selection, "chat_defaults": _chat_defaults(document)}
+
+
+def session_speed_settings(config_path: Path, *, session_id: object) -> str | None:
+    """Read one chat's saved speed tier; None is standard speed."""
+    if not isinstance(session_id, str) or not session_id:
+        return None
+    saved = _read_user_config(config_path).get("session_speed")
+    return _native_setting(saved.get(session_id)) if isinstance(saved, Mapping) else None
+
+
+@_serialized_settings_write
+def set_session_speed_settings(
+    config_path: Path, *, session_id: object, speed: object,
+) -> str | None:
+    """Save or clear one chat's speed tier beside the other owner-local model preferences.
+
+    Speed depends on the provider account on this device, so it is not part of a
+    campaign's portable data. Only chats with a non-standard speed are listed; the oldest
+    entries fall back to standard speed once the list is full.
+    """
+    if (
+        not isinstance(session_id, str)
+        or not session_id
+        or session_id != session_id.strip()
+        or len(session_id) > 512
+    ):
+        raise ConfigError("Session identity is invalid")
+    if speed is not None and _native_setting(speed) is None:
+        raise ConfigError("Chat speed must be a native setting name")
+    document = _read_user_config(config_path)
+    saved = document.get("session_speed")
+    entries: dict[str, Any] = dict(saved) if isinstance(saved, Mapping) else {}
+    if entries.get(session_id) == speed:
+        return cast(str | None, speed)
+    entries.pop(session_id, None)
+    if speed is not None:
+        entries[session_id] = speed
+        for stale in list(entries)[: max(0, len(entries) - _SESSION_SPEED_LIMIT)]:
+            entries.pop(stale)
+    if entries:
+        document["session_speed"] = entries
+    else:
+        document.pop("session_speed", None)
+    _write_user_config(config_path, document)
+    return cast(str | None, speed)
 
 
 @_serialized_settings_write

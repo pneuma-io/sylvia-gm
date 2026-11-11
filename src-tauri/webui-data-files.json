@@ -30,6 +30,7 @@
     "audit.js",
     "campaign-plan-browser.js",
     "campaign-rules-update.js",
+    "chat-start.js",
     "desktop-drafts.js",
     "desktop-updates.js",
     "dictation.js",

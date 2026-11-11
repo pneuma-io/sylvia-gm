@@ -1154,6 +1154,8 @@ async fn create_builder_chat(
     provider_id: Option<String>,
     model_id: Option<String>,
     display_name: Option<String>,
+    reasoning_effort: Option<String>,
+    speed: Option<String>,
 ) -> Result<Value, String> {
     owner_call_async(
         window.clone(),
@@ -1163,6 +1165,8 @@ async fn create_builder_chat(
             "provider_id": provider_id,
             "model_id": model_id,
             "display_name": display_name,
+            "reasoning_effort": reasoning_effort,
+            "speed": speed,
         }),
     )
     .await
@@ -2131,6 +2135,41 @@ async fn switch_session_reasoning(
 }
 
 #[tauri::command]
+async fn switch_session_speed(
+    window: WebviewWindow,
+    session_id: String,
+    speed: Option<String>,
+) -> Result<Value, String> {
+    owner_call_async(
+        window,
+        "switch_session_speed",
+        json!({"session_id": session_id, "speed": speed}),
+    )
+    .await
+}
+
+#[tauri::command]
+async fn set_chat_defaults(
+    window: WebviewWindow,
+    provider_id: String,
+    model_id: String,
+    reasoning_effort: Option<String>,
+    speed: Option<String>,
+) -> Result<Value, String> {
+    owner_call_async(
+        window,
+        "set_chat_defaults",
+        json!({
+            "provider_id": provider_id,
+            "model_id": model_id,
+            "reasoning_effort": reasoning_effort,
+            "speed": speed,
+        }),
+    )
+    .await
+}
+
+#[tauri::command]
 async fn switch_session_model(
     window: WebviewWindow,
     session_id: String,
@@ -2244,6 +2283,8 @@ async fn start_import_repair(
     operation_id: String,
     provider_id: Option<String>,
     model_id: Option<String>,
+    reasoning_effort: Option<String>,
+    speed: Option<String>,
 ) -> Result<Value, String> {
     owner_call_async(
         window.clone(),
@@ -2251,6 +2292,7 @@ async fn start_import_repair(
         json!({
             "repair_id": repair_id, "operation_id": operation_id,
             "provider_id": provider_id, "model_id": model_id,
+            "reasoning_effort": reasoning_effort, "speed": speed,
         }),
     )
     .await
@@ -2537,6 +2579,10 @@ async fn start_guided_creation_subflow(
     character_profile_sha256: Option<String>,
     character_artifact_id: Option<String>,
     character_artifact_sha256: Option<String>,
+    provider_id: Option<String>,
+    model_id: Option<String>,
+    reasoning_effort: Option<String>,
+    speed: Option<String>,
 ) -> Result<Value, String> {
     owner_call_async(
         window.clone(),
@@ -2553,6 +2599,10 @@ async fn start_guided_creation_subflow(
             "character_profile_sha256": character_profile_sha256,
             "character_artifact_id": character_artifact_id,
             "character_artifact_sha256": character_artifact_sha256,
+            "provider_id": provider_id,
+            "model_id": model_id,
+            "reasoning_effort": reasoning_effort,
+            "speed": speed,
         }),
     )
     .await
@@ -2758,6 +2808,8 @@ async fn finalize_campaign_construction(
     dm_provider_id: String,
     dm_model_id: String,
     model_guidance_override: bool,
+    reasoning_effort: Option<String>,
+    speed: Option<String>,
 ) -> Result<Value, String> {
     owner_call_async(
         window,
@@ -2767,6 +2819,8 @@ async fn finalize_campaign_construction(
             "dm_provider_id": dm_provider_id,
             "dm_model_id": dm_model_id,
             "model_guidance_override": model_guidance_override,
+            "reasoning_effort": reasoning_effort,
+            "speed": speed,
         }),
     )
     .await
@@ -3534,7 +3588,9 @@ pub fn run() {
             remove_provider_settings,
             switch_session_model,
             switch_session_reasoning,
+            switch_session_speed,
             set_default_model,
+            set_chat_defaults,
             install_package,
             install_package_file,
             preview_character_card_file,

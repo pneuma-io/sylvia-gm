@@ -61,8 +61,10 @@ def test_ordinary_catalog_load_refreshes_legacy_effort_without_inference(
         assert after == before
     else:
         assert choice["reasoning_mode_defaults"] == {"dm": "high", "builder": "xhigh"}
+        # The same discovery records that this model advertised no speed tiers.
         before["providers"]["chatgpt_subscription"]["models"][0].update(
             supported_reasoning_efforts=["low", "high", "xhigh"], default_reasoning_effort="low",
+            service_tiers=[],
         )
         assert after == before
         assert ConfiguredProviderResolver(path).model_choices()[0] == choice

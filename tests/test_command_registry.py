@@ -101,6 +101,7 @@ DISPATCH = ('action_sequence',
  'session_context',
  'session_history_page',
  'set_admin_full_audit',
+ 'set_chat_defaults',
  'set_default_model',
  'snapshot',
  'start_dm_session',
@@ -115,6 +116,7 @@ DISPATCH = ('action_sequence',
  'submit_session_input',
  'switch_session_model',
  'switch_session_reasoning',
+ 'switch_session_speed',
  'trash_campaign',
  'validate_provider_model')
 
@@ -201,6 +203,7 @@ WEBUI = ('action_sequence',
  'session_context',
  'session_history_page',
  'set_admin_full_audit',
+ 'set_chat_defaults',
  'set_default_model',
  'start_dm_session',
  'start_guided_campaign',
@@ -214,6 +217,7 @@ WEBUI = ('action_sequence',
  'submit_session_input',
  'switch_session_model',
  'switch_session_reasoning',
+ 'switch_session_speed',
  'trash_campaign',
  'validate_provider_model')
 
@@ -316,6 +320,7 @@ DIAGNOSTICS = ('action_sequence',
  'session_context',
  'session_history_page',
  'set_admin_full_audit',
+ 'set_chat_defaults',
  'set_default_model',
  'snapshot',
  'start_dm_session',
@@ -329,6 +334,7 @@ DIAGNOSTICS = ('action_sequence',
  'submit_session_input',
  'switch_session_model',
  'switch_session_reasoning',
+ 'switch_session_speed',
  'trash_campaign',
  'validate_provider_model')
 
@@ -351,7 +357,7 @@ def test_command_registry_preserves_exact_protocol_sets():
 
     names = {name for name, command in COMMAND_REGISTRY.items() if command.handler is not None}
     assert names == set(DISPATCH)
-    assert len(names) == 115
+    assert len(names) == 117
     assert webui.COMMANDS == frozenset(WEBUI)
     assert webui.EXPORTS == EXPORTS
     assert webui.WRAPPED == frozenset(WRAPPED)
