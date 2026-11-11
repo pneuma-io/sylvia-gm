@@ -605,6 +605,7 @@ def overwatch_probe(parameters: ParameterSet) -> dict[str, Any]:
     )
     return {
         "probe": "OW-CROSSING",
+        "qualification": "LEGACY_ANGLE_ONLY_NOT_SHOOTER_LANE_PARITY",
         "exact": True,
         "declared_arc_degrees": arc_degrees,
         "setup_ap": parameters.values["overwatch.setup_ap"],

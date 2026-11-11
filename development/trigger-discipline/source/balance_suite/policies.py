@@ -1,9 +1,27 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Any
 
 from .model import KnowledgeState, Position, Stance
+
+
+@dataclass(frozen=True, slots=True)
+class OverwatchSelection:
+    """Explicit measuring apparatus; these dimensions grant no canonical powers."""
+    pattern: str
+    direction: str
+    extent: int
+    width: int
+    fixture_id: str
+
+    def __post_init__(self) -> None:
+        if self.pattern not in {"lane", "triangle"} or self.direction not in {"east", "south", "west", "north"}:
+            raise ValueError("unsupported Overwatch pattern/direction")
+        if type(self.width) is not int or self.width < 1 or self.width % 2 != 1:
+            raise ValueError("Overwatch width must be a positive odd cell count")
+        if type(self.extent) is not int or not 1 <= self.extent <= 2048 or not self.fixture_id:
+            raise ValueError("Overwatch requires a bounded extent and a named fixture")
 
 
 @dataclass(frozen=True, slots=True)
@@ -33,6 +51,7 @@ class PolicyObservation:
     ally_casualty_visible: bool = False
     behind_cover: bool = False
     metadata: dict[str, Any] = field(default_factory=dict)
+    overwatch: OverwatchSelection | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -43,6 +62,11 @@ class PolicyDecision:
     rounds: int
     destination: Position | None
     reason: str
+    overwatch: OverwatchSelection | None = None
+    reaction_order: tuple[str, ...] = ()
+    movement_ap_budget: int = 1
+    critical_choice: str = "DEVASTATING HIT"
+    fixed_zone_id: str | None = None
 
 
 def _confirmed_targets(observation: PolicyObservation) -> list[KnownTarget]:
@@ -54,6 +78,14 @@ def _confirmed_targets(observation: PolicyObservation) -> list[KnownTarget]:
 
 
 def choose_action(policy_id: str, observation: PolicyObservation) -> PolicyDecision:
+    """Give movement the available AP ceiling; the executor prices the actual path."""
+    decision = _choose_action(policy_id, observation)
+    if decision.action in {"MOVE_OBJECTIVE", "MOVE_COVER", "FLANK"}:
+        return replace(decision, movement_ap_budget=observation.ap)
+    return decision
+
+
+def _choose_action(policy_id: str, observation: PolicyObservation) -> PolicyDecision:
     targets = sorted(_confirmed_targets(observation), key=lambda target: (target.distance_m or float("inf"), target.actor_id))
     visible_targets = [target for target in targets if target.exposed]
     target = visible_targets[0] if visible_targets else None
@@ -112,6 +144,7 @@ def choose_action(policy_id: str, observation: PolicyObservation) -> PolicyDecis
                 0,
                 target.position,
                 "establish the declared prepared sightline before ordinary fire",
+                observation.overwatch,
             )
         if metadata.get("can_cqc", False) and policy_id in {"POLICY_DIRECT", "POLICY_PRESSURE", "POLICY_OBJECTIVE"}:
             return PolicyDecision("CQC", target.actor_id, None, 0, None, "adjacent target permits one declared close-quarters maneuver")
@@ -140,7 +173,7 @@ def choose_action(policy_id: str, observation: PolicyObservation) -> PolicyDecis
     if known_target and observation.objective_position is None:
         return PolicyDecision("MOVE_OBJECTIVE", known_target.actor_id, None, 0, known_target.position, "move toward the last precise known target position to regain a firing solution")
     if metadata.get("can_overwatch", False) and observation.ammunition > 0:
-        return PolicyDecision("OVERWATCH", None, None, 0, observation.objective_position, "prepare a declared shot across the known approach")
+        return PolicyDecision("OVERWATCH", None, None, 0, observation.objective_position, "prepare a declared shot across the known approach", observation.overwatch)
     if observation.objective_position is not None:
         return PolicyDecision("MOVE_OBJECTIVE", None, None, 0, observation.objective_position, "advance toward the declared objective using known state only")
     return PolicyDecision("END", None, None, 0, None, "no confirmed target or declared objective")

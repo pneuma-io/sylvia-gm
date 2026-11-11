@@ -472,6 +472,7 @@ def fire_action(
     aim_ap: int = 0,
     sharpshooter: bool = False,
     legitimate: bool = True,
+    critical_choice: str = "DEVASTATING HIT",
 ) -> FireActionResult:
     mode = mode.upper()
     if mode not in weapon.fire_modes and not (mode == "BURST" and "3-round BURST" in weapon.fire_modes):
@@ -491,7 +492,7 @@ def fire_action(
     rounds_fired = _consume_rounds(weapon, requested_rounds)
     string_modifier = firing_string_modifier(mode, weapon_recoil, max(1, rounds_fired), parameters)
     difficulty = max(1, base_difficulty + range_penalty + recoil_before + string_modifier + aim_offset)
-    attack = resolve_attack(roll, skill, aptitude, difficulty, damage, target_pen, parameters, legitimate=legitimate and rounds_fired > 0)
+    attack = resolve_attack(roll, skill, aptitude, difficulty, damage, target_pen, parameters, legitimate=legitimate and rounds_fired > 0, critical_choice=critical_choice)
     opportunities = connection_opportunities(mode, rounds_fired, attack.quality, parameters)
     target_connections = min(opportunities, exposure_connection_cap(exposure, rounds_fired, parameters))
     blocked = max(0, opportunities - target_connections)

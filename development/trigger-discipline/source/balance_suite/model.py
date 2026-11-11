@@ -78,6 +78,10 @@ class WeaponState:
     mechanism: str = "self-loader"
     fire_modes: tuple[str, ...] = ("SEMI AUTO",)
     retained_magazines: list[int] = field(default_factory=list)
+    location: str = "READY"
+    controlled_by: str | None = None
+
+    cycle_ap: int | None = None
 
     def total_rounds(self) -> int:
         return self.magazine_rounds + self.reserve_rounds + sum(self.retained_magazines) + (1 if self.chamber == "LIVE" else 0)
@@ -125,6 +129,20 @@ class ActorState:
     casualty_id: str | None = None
     carried_by: str | None = None
     treatment_progress_ap: int = 0
+    facing: tuple[float, float] = (1.0, 0.0)
+    elevation: float = 0.0
+    pose_revision: int = 0
+    muzzle_offset: tuple[float, float] | None = None
+    active: bool = True
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        # All lab movement callers, including forced movement, pass this boundary.
+        # A return to an old pose must not revive a shooter-bound preparation.
+        if name in {"position", "stance", "elevation"}:
+            previous = getattr(self, name, value)
+            if previous != value and hasattr(self, "pose_revision"):
+                object.__setattr__(self, "pose_revision", self.pose_revision + 1)
+        object.__setattr__(self, name, value)
 
 
 @dataclass(slots=True)
@@ -161,11 +179,20 @@ class PreparedAction:
     shots_remaining: int = 1
     explicit_before: bool = False
     active: bool = True
+    lane_zone: dict[str, Any] | None = None
+    bound_pose_revision: int | None = None
+    bound_stance: Stance | None = None
+    policy_fixture_id: str | None = None
+    fixed_zone: dict[str, Any] | None = None
     _zone_digest: str = field(init=False, repr=False)
 
     def __post_init__(self) -> None:
         payload = json.dumps(sorted(self.zone_cells), separators=(",", ":"))
         self._zone_digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+    @property
+    def spatial_zone(self):
+        return self.lane_zone or self.fixed_zone
 
 
 @dataclass(slots=True)
@@ -201,6 +228,7 @@ class SimulationState:
     objective: dict[str, Any] = field(default_factory=dict)
     terminal: bool = False
     terminal_reason: str | None = None
+    spatial_zones: dict[str, dict[str, Any]] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return _normalize(self)
@@ -235,6 +263,11 @@ def _semantic_normalize(value: Any) -> Any:
             "shots_remaining": value.shots_remaining,
             "explicit_before": value.explicit_before,
             "active": value.active,
+            "lane_zone": _semantic_normalize(value.lane_zone),
+            "bound_pose_revision": value.bound_pose_revision,
+            "bound_stance": _semantic_normalize(value.bound_stance),
+            "policy_fixture_id": value.policy_fixture_id,
+            "fixed_zone": _semantic_normalize(value.fixed_zone),
         }
     if isinstance(value, Enum):
         return value.value

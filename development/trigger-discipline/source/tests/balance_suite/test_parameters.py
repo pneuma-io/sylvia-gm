@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import unittest
-from pathlib import Path
 import re
 
 from balance_suite.parameters import Authority, ParameterError, default_manifest
+from balance_suite.provenance import repo_root
 
 
 class ParameterManifestTests(unittest.TestCase):
@@ -163,7 +163,7 @@ class ParameterManifestTests(unittest.TestCase):
             )
 
     def test_markdown_and_executable_specialty_parameter_ids_match(self) -> None:
-        text = Path("Testing/BALANCE PARAMETERS.md").read_text(encoding="utf-8-sig")
+        text = (repo_root() / "Testing/BALANCE PARAMETERS.md").read_text(encoding="utf-8-sig")
         documented = set(re.findall(r"`(specialty\.[a-z0-9_.]+)`", text))
         executable = {parameter_id for parameter_id in self.manifest.specs if parameter_id.startswith("specialty.")}
         self.assertEqual(documented, executable)

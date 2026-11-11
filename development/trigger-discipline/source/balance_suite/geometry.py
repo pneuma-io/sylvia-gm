@@ -40,6 +40,7 @@ class GridMap:
     height: int
     full_blockers: set[tuple[int, int]] = field(default_factory=set)
     covers: dict[str, CoverObject] = field(default_factory=dict)
+    host_scene: dict | None = None
     _static_geometry_signature: tuple[object, ...] | None = field(default=None, init=False, repr=False)
     _static_cover_keys: tuple[str, ...] = field(default=(), init=False, repr=False)
 
@@ -281,7 +282,7 @@ def _walkable(grid: GridMap, cell: tuple[int, int], goal: tuple[int, int]) -> bo
     return cell == goal or not grid.occupied(cell)
 
 
-def shortest_path(start: Position, goal: Position, grid: GridMap, max_distance_m: float | None = None) -> list[Position]:
+def shortest_path(start: Position, goal: Position, grid: GridMap, max_distance_m: float | None = None, *, allow_diagonal: bool = True) -> list[Position]:
     """Deterministic eight-neighbour A* path on the declared 1m fixture grid.
 
     Returned positions exclude ``start``. Diagonal moves cannot cut between two
@@ -301,11 +302,14 @@ def shortest_path(start: Position, goal: Position, grid: GridMap, max_distance_m
     blocked.discard(goal_cell)
     if not (0 <= start_cell[0] < grid.width and 0 <= start_cell[1] < grid.height):
         raise ValueError(f"start cell {start_cell} is not walkable")
-    cache_key = (grid.map_id, grid.width, grid.height, tuple(sorted(blocked)), start_cell, goal_cell)
+    cache_key = (grid.map_id, grid.width, grid.height, tuple(sorted(blocked)), start_cell, goal_cell, allow_diagonal)
     cached = _PATH_CACHE.get(cache_key)
     if cached is not None:
         cells = list(cached)
-        return _truncate_path(start, cells, max_distance_m)
+        path = _truncate_path(start, cells, max_distance_m)
+        if not path and allow_diagonal and max_distance_m is not None and max_distance_m >= 1:
+            return shortest_path(start, goal, grid, max_distance_m, allow_diagonal=False)
+        return path
     directions = (
         (-1, 0, 1.0),
         (0, -1, 1.0),
@@ -316,6 +320,8 @@ def shortest_path(start: Position, goal: Position, grid: GridMap, max_distance_m
         (1, -1, math.sqrt(2)),
         (1, 1, math.sqrt(2)),
     )
+    if not allow_diagonal:
+        directions = directions[:4]
     frontier: list[tuple[float, float, int, int]] = [(start.distance_to(goal), 0.0, start_cell[0], start_cell[1])]
     came_from: dict[tuple[int, int], tuple[int, int] | None] = {start_cell: None}
     cost: dict[tuple[int, int], float] = {start_cell: 0.0}
@@ -354,7 +360,12 @@ def shortest_path(start: Position, goal: Position, grid: GridMap, max_distance_m
     if len(_PATH_CACHE) >= _PATH_CACHE_LIMIT:
         _PATH_CACHE.clear()
     _PATH_CACHE[cache_key] = tuple(cells)
-    return _truncate_path(start, cells, max_distance_m)
+    path = _truncate_path(start, cells, max_distance_m)
+    # A shortest diagonal prefix can be too expensive while a cardinal route
+    # still offers legal progress within the same distance budget.
+    if not path and allow_diagonal and max_distance_m is not None and max_distance_m >= 1:
+        return shortest_path(start, goal, grid, max_distance_m, allow_diagonal=False)
+    return path
 
 
 def _truncate_path(start: Position, cells: list[tuple[int, int]], max_distance_m: float | None) -> list[Position]:

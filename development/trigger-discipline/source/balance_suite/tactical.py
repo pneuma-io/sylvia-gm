@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from dataclasses import asdict, dataclass, replace
+from copy import deepcopy
+from dataclasses import asdict, dataclass, field, replace
 import math
 from typing import Any, Iterable
 
@@ -10,8 +11,10 @@ from .fixtures import benchmark_actor, build_map
 from .geometry import GridMap, actual_difficulty, shortest_path, trace_cells
 from .model import HitQuality, KnowledgeState, Position, PreparedAction, Side, SimulationState, Stance, SuppressionZone
 from .parameters import ParameterSet
-from .policies import KnownTarget, PolicyDecision, PolicyObservation, choose_action
+from .policies import KnownTarget, PolicyDecision, PolicyObservation, OverwatchSelection, choose_action
+from . import overwatch
 from .rng import derive_seed
+from .provenance import execution_source_hash
 from .rules import (
     apply_damage,
     attack_values_for_weapon,
@@ -32,7 +35,6 @@ from .specialty_runtime import (
     GUARDIAN_INTERPOSE,
     INFILTRATOR_APPROACH_PLAN,
     OPERATOR_WEAPON_MANIPULATION,
-    SENTINEL_PREPARED_SIGHTLINE,
     SHIELD_BEARER_SHIELD_TRAINING,
     SNAPSHOT_QUICK_SOLUTION,
     SNIPER_DEEP_AIM,
@@ -67,8 +69,11 @@ class TeamScenarioSpec:
     initial_magazine_rounds_a: tuple[int | None, ...] = (None, None, None, None)
     initial_magazine_rounds_b: tuple[int | None, ...] = (None, None, None, None)
     objective_fixture_id: str = "STANDARD"
+    overwatch_policy: dict[str, dict[str, Any]] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
+        if 'POLICY_PREPARED_FIRE' in (*self.policies_a, *self.policies_b) and not self.overwatch_policy:
+            raise ValueError('prepared-fire scenarios require explicit fixture-bound Overwatch selections')
         for label, values in (
             ("classes_a", self.classes_a),
             ("classes_b", self.classes_b),
@@ -114,6 +119,13 @@ class TeamScenarioSpec:
             initial_magazine_rounds_a=self.initial_magazine_rounds_b,
             initial_magazine_rounds_b=self.initial_magazine_rounds_a,
             objective_fixture_id=self.objective_fixture_id,
+            # Bind absolute directions to a half-turn of the declared geometry.
+            # The fixture still owns mirrored positions, objectives and turn order.
+            overwatch_policy={('B_' + key[2:] if key.startswith('A_') else 'A_' + key[2:] if key.startswith('B_') else key): {
+                                  **deepcopy(value),
+                                  'direction': {'east': 'west', 'west': 'east', 'north': 'south', 'south': 'north'}[value['direction']],
+                              }
+                              for key, value in self.overwatch_policy.items()},
         )
 
 
@@ -252,6 +264,7 @@ def _build_control_state(spec: TeamScenarioSpec, parameters: ParameterSet) -> tu
         "fixture_id": spec.objective_fixture_id,
         "entry_fixture": None,
         "team_turn_index": 0,
+        "overwatch_policy": deepcopy(spec.overwatch_policy),
     }
     subject = next(
         actor
@@ -428,9 +441,12 @@ def _refresh_knowledge(state: SimulationState, grid: GridMap) -> None:
 def _refresh_actor_knowledge(observer_id: str, state: SimulationState, grid: GridMap) -> None:
     observer = state.actors[observer_id]
     for target in state.actors.values():
-        if target.side is observer.side or target.downed:
+        if target.side is observer.side:
             continue
-        visible = grid.line_of_sight(observer.position, target.position, target.stance) and grid.exposure(observer.position, target.position, target.stance) != "none"
+        visible = (overwatch.exposure(state, grid, observer_id, target.actor_id) > 0
+                   if grid.host_scene is not None or state.objective.get('overwatch_policy')
+                   else grid.line_of_sight(observer.position, target.position, target.stance)
+                   and grid.exposure(observer.position, target.position, target.stance) != "none")
         if visible:
             observer.target_knowledge[target.actor_id] = KnowledgeState.CONFIRMED
             observer.target_last_known[target.actor_id] = target.position
@@ -458,12 +474,23 @@ def _flank_destination(actor_id: str, side: Side) -> Position:
 
 def _behind_cover(actor_id: str, state: SimulationState, grid: GridMap) -> bool:
     actor = state.actors[actor_id]
-    enemies = [enemy for enemy in state.actors.values() if enemy.side is not actor.side and not enemy.downed]
+    enemies = []
+    for enemy in state.actors.values():
+        if enemy.side is actor.side:
+            continue
+        knowledge = actor.target_knowledge.get(enemy.actor_id, KnowledgeState.UNAWARE)
+        if knowledge is KnowledgeState.CONFIRMED:
+            if not enemy.downed:
+                enemies.append(enemy.position)
+        elif knowledge is KnowledgeState.LAST_KNOWN:
+            position = actor.target_last_known.get(enemy.actor_id)
+            if position is not None:
+                enemies.append(position)
     if not enemies:
         return False
     protected = 0
-    for enemy in enemies:
-        exposure = grid.exposure(enemy.position, actor.position, actor.stance)
+    for position in enemies:
+        exposure = grid.exposure(position, actor.position, actor.stance)
         if exposure in {"none", "quarter", "half"}:
             protected += 1
     return protected >= math.ceil(len(enemies) / 2)
@@ -476,12 +503,23 @@ def _policy_observation(actor_id: str, state: SimulationState, grid: GridMap) ->
         if target.side is actor.side:
             continue
         knowledge = actor.target_knowledge.get(target.actor_id, KnowledgeState.UNAWARE)
-        position = target.position if knowledge is KnowledgeState.CONFIRMED else actor.target_last_known.get(target.actor_id)
+        position = (target.position if knowledge is KnowledgeState.CONFIRMED else
+                    actor.target_last_known.get(target.actor_id) if knowledge is KnowledgeState.LAST_KNOWN else None)
         los = bool(position is not None and knowledge is KnowledgeState.CONFIRMED and grid.line_of_sight(actor.position, target.position, target.stance))
         exposure = grid.exposure(actor.position, target.position, target.stance) if los else "none"
+        if position is not None and knowledge is KnowledgeState.CONFIRMED and (grid.host_scene is not None or state.objective.get('overwatch_policy')):
+            fraction = overwatch.exposure(state, grid, actor_id, target.actor_id)
+            los = fraction > 0
+            exposure = 'full' if fraction >= 1 else 'half' if fraction >= 0.5 else 'quarter' if fraction > 0 else 'none'
         direct_fire = los and exposure != "none"
-        known.append(KnownTarget(target.actor_id, knowledge, position, actor.position.distance_to(position) if position else None, direct_fire, target.downed))
+        known.append(KnownTarget(target.actor_id, knowledge, position, actor.position.distance_to(position) if position else None,
+                                 direct_fire, target.downed if knowledge is KnowledgeState.CONFIRMED else False))
     weapon = actor.weapon
+    ready_rounds = 0
+    if weapon and weapon.chamber == "LIVE" and not weapon.needs_cycle:
+        ready_rounds = 1
+        if weapon.mechanism not in {"bolt action", "pump action", "lever action"}:
+            ready_rounds += weapon.magazine_rounds
     visible_casualties = [
         ally
         for ally in state.actors.values()
@@ -504,7 +542,7 @@ def _policy_observation(actor_id: str, state: SimulationState, grid: GridMap) ->
             prep.owner_id == actor_id and prep.active
             for prep in state.prepared.values()
         ),
-        "can_overwatch": weapon is not None and not actor.downed,
+        "can_overwatch": ready_rounds > 0 and not actor.downed and actor_id in state.objective.get("overwatch_policy", {}),
         "can_establish_strongpoint": (
             has_node(actor, ANCHOR_ESTABLISH_STRONGPOINT)
             and _behind_cover(actor_id, state, grid)
@@ -519,6 +557,9 @@ def _policy_observation(actor_id: str, state: SimulationState, grid: GridMap) ->
         "needs_reload": bool(weapon and weapon.chamber != "LIVE" and weapon.magazine_rounds == 0),
         "can_reload": bool(weapon and weapon.reserve_rounds > 0),
         "magazine_rounds": weapon.magazine_rounds if weapon else 0,
+        "chamber": weapon.chamber if weapon else None,
+        "reserve_rounds": weapon.reserve_rounds if weapon else 0,
+        "total_rounds": weapon.total_rounds() if weapon else 0,
     }
     return PolicyObservation(
         actor.actor_id,
@@ -528,14 +569,16 @@ def _policy_observation(actor_id: str, state: SimulationState, grid: GridMap) ->
         actor.hp,
         actor.res,
         weapon.weapon_id if weapon else None,
-        weapon.total_rounds() if weapon else 0,
+        ready_rounds,
         weapon.current_recoil if weapon else 0,
         weapon.fire_modes if weapon else (),
         tuple(known),
-        _objective_goal(actor_id, actor.side),
+        state.objective['actor_objectives'][actor_id] if actor_id in state.objective.get('actor_objectives', {}) else _objective_goal(actor_id, actor.side),
         bool(visible_casualties),
         _behind_cover(actor_id, state, grid),
         metadata,
+        OverwatchSelection(**state.objective["overwatch_policy"][actor_id])
+        if actor_id in state.objective.get("overwatch_policy", {}) else None,
     )
 
 
@@ -1462,6 +1505,13 @@ def _resolve_overwatch_attack(
     target = engine.state.actors[target_id]
     mode = "SINGLE" if "SINGLE" in owner.weapon.fire_modes and "SEMI AUTO" not in owner.weapon.fire_modes else "SEMI AUTO"
     stream = engine.rng.stream(f"overwatch:{engine.event_count}:{prepared.prep_id}:{target.position.x}:{target.position.y}")
+    fraction = overwatch.exposure(engine.state, grid, owner.actor_id, target_id) if prepared.spatial_zone else 1.0
+    band = "full" if fraction >= 1 else "half" if fraction >= 0.5 else "quarter" if fraction > 0 else "none"
+    difficulty = actual_difficulty(engine.parameters.values["check.difficulty.standard"], band, engine.parameters)
+    distance = owner.position.distance_to(target.position)
+    if prepared.spatial_zone:
+        distance = next((hit['distance'] for hit in overwatch.ray(engine.state, grid, owner.actor_id, target_id)
+                         if hit['id'] == target_id), 1000000)
     result = fire_action(
         owner.weapon,
         mode,
@@ -1469,23 +1519,39 @@ def _resolve_overwatch_attack(
         stream.d20("OVERWATCH ATTACK"),
         owner.skill,
         owner.aptitude,
-        engine.parameters.values["check.difficulty.standard"],
-        owner.position.distance_to(target.position),
-        "full",
+        difficulty or engine.parameters.values["check.difficulty.standard"],
+        distance,
+        band,
         engine.parameters,
         aim_ap=int(engine.state.objective["prepared_aim_ap"].get(prepared.prep_id, 0)),
-        legitimate=grid.line_of_sight(owner.position, target.position, target.stance),
+        legitimate=fraction > 0 if prepared.spatial_zone else grid.line_of_sight(owner.position, target.position, target.stance),
     )
+    if prepared.spatial_zone and not owner.weapon.needs_cycle and owner.weapon.magazine_rounds == 0:
+        # Match TD's current self-loader transition at the final feed round.
+        owner.weapon.chamber = "EMPTY"
     side_metrics = metrics["by_side"][_side_key(owner.side)]
     side_metrics["shots"] += 1
     side_metrics["rounds"] += result.rounds_fired
-    side_metrics["connections"] += result.target_connections
     side_metrics["overwatch_triggers"] += 1
-    routed = _apply_connections(owner.actor_id, target_id, owner.side, result, engine.state, metrics, engine.parameters)
+    if prepared.spatial_zone:
+        routed = overwatch.route_shot(engine.state, grid, owner.actor_id, target_id, result, engine.parameters)
+        for contact in routed:
+            if 'target' in contact:
+                damage = contact['target']
+                side_metrics['res_damage'] += damage['res_damage']
+                side_metrics['hp_damage'] += damage['total_hp_damage']
+                metrics['by_actor'][owner.actor_id]['damage'] += damage['res_damage'] + damage['total_hp_damage']
+        reached = sum('target' in contact for contact in routed)
+        result = replace(result, target_connections=reached,
+                         blocked_connections=max(0, result.connection_opportunities - reached),
+                         ammunition_after=owner.weapon.total_rounds())
+    else:
+        routed = _apply_connections(owner.actor_id, target_id, owner.side, result, engine.state, metrics, engine.parameters)
+    side_metrics['connections'] += result.target_connections
     prepared.shots_remaining -= 1
     if prepared.shots_remaining <= 0:
         prepared.active = False
-    return {"result": result.to_dict(), "connections": routed, "shots_remaining": prepared.shots_remaining}
+    return {"result": result.to_dict(), "connections": routed, "shots_remaining": prepared.shots_remaining, "exposure": fraction}
 
 
 def _movement_trigger_provider(engine: EventEngine, grid: GridMap, metrics: dict[str, Any], actor_id: str) -> list[TriggerEffect]:
@@ -1513,6 +1579,8 @@ def _movement_trigger_provider(engine: EventEngine, grid: GridMap, metrics: dict
             )
         )
     for prepared in sorted(engine.state.prepared.values(), key=lambda item: item.prep_id):
+        if prepared.spatial_zone is not None:
+            continue  # Continuous lane paths use the shared host, below.
         if not prepared.active or prepared.shots_remaining <= 0 or prepared.owner_id not in engine.state.actors:
             continue
         owner = engine.state.actors[prepared.owner_id]
@@ -1604,13 +1672,16 @@ def _execute_decision(
     actor_id: str,
     decision: PolicyDecision,
     metrics: dict[str, Any],
-) -> None:
+    *, operation_id: str | None = None,
+) -> Any:
     state = engine.state
     actor = state.actors[actor_id]
     side = actor.side
     event_index = engine.event_count
     policy_id = policies[actor_id]
     choices = {"policy_id": policy_id, **asdict(decision)}
+    atomic = decision.action in {"OVERWATCH", "OVERWATCH_FIXED", "CANCEL_OVERWATCH", "STANCE", "MOVE_OBJECTIVE", "MOVE_COVER", "FLANK"} or (decision.action == "FIRE" and grid.host_scene is not None)
+    before_metrics = deepcopy(metrics) if atomic or operation_id else None
 
     def resolver(stages: list[dict[str, Any]], windows: list[dict[str, Any]], emitted: dict[str, Any]) -> str | None:
         before_ap = actor.ap
@@ -1709,7 +1780,9 @@ def _execute_decision(
         elif decision.action == "CYCLE":
             if actor.ap < 1 or actor.weapon is None or not actor.weapon.needs_cycle:
                 return "cycle is not currently legal"
-            ordinary_cost = 1
+            ordinary_cost = actor.weapon.cycle_ap
+            if type(ordinary_cost) is not int or ordinary_cost <= 0:
+                return "cycle requires a positive authored cycle_ap"
             cost = ordinary_cost
             if has_node(actor, OPERATOR_WEAPON_MANIPULATION):
                 cost = max(
@@ -1752,9 +1825,20 @@ def _execute_decision(
             if actor.ap < cost or actor.weapon.reserve_rounds <= 0:
                 return "reload prerequisites not met"
             loaded = reload_magazine(actor.weapon, actor.weapon.magazine_capacity)
+            chambered = 0
+            # The admitted service-rifle reload macro includes this feed transfer
+            # within its declared reload cost; it does not price a manual rack.
+            if (actor.weapon.weapon_id == "service_rifle" and actor.weapon.mechanism == "self-loader"
+                    and actor.weapon.chamber != "LIVE" and actor.weapon.magazine_rounds > 0):
+                actor.weapon.magazine_rounds -= 1
+                actor.weapon.chamber = "LIVE"
+                actor.weapon.needs_cycle = False
+                chambered = 1
             actor.ap -= cost
             metrics["by_side"][_side_key(side)]["reload_ap"] += cost
-            stages.append({"stage": "RELOAD", "loaded": loaded, "retained_magazines": list(actor.weapon.retained_magazines)})
+            stages.append({"stage": "RELOAD", "loaded": loaded, "chambered_rounds": chambered,
+                "chamber": actor.weapon.chamber, "magazine_rounds": actor.weapon.magazine_rounds,
+                "reserve_rounds": actor.weapon.reserve_rounds, "retained_magazines": list(actor.weapon.retained_magazines)})
             if weapon_manipulation and cost != ordinary_cost:
                 effect = record_effect(
                     metrics,
@@ -1769,8 +1853,8 @@ def _execute_decision(
         elif decision.action in {"MOVE_OBJECTIVE", "MOVE_COVER", "FLANK"}:
             if actor.ap < 1:
                 return "insufficient AP"
-            observation = _policy_observation(actor_id, state, grid)
             if decision.action == "MOVE_COVER":
+                observation = _policy_observation(actor_id, state, grid)
                 goal = observation.metadata["cover_destination"]
             elif decision.action == "FLANK":
                 goal = _flank_destination(actor_id, side)
@@ -1778,21 +1862,32 @@ def _execute_decision(
                 goal = decision.destination or _objective_goal(actor_id, side)
             if goal is None:
                 return "no legal movement destination"
-            nearest_enemy = min(
-                (actor.position.distance_to(enemy.position) for enemy in state.actors.values() if enemy.side is not side and not enemy.downed),
-                default=None,
-            )
+            nearest_enemy = min((target.distance_m for target in
+                _policy_observation(actor_id, state, grid).known_targets
+                if target.distance_m is not None and not target.downed), default=None)
             rate = movement_rate(actor.stance, actor.burden, actor.class_id, nearest_enemy, engine.parameters)
-            path = shortest_path(actor.position, goal, grid, rate)
+            budget = decision.movement_ap_budget
+            if type(budget) is not int or budget < 1:
+                return "invalid movement AP budget"
+            lane_context = any(p.spatial_zone is not None for p in state.prepared.values())
+            maximum_distance = rate * budget
+            path = (overwatch.movement_path(state, grid, actor_id, goal, maximum_distance)
+                    if lane_context else shortest_path(actor.position, goal, grid, maximum_distance))
             if not path:
-                return "no reachable path within one AP"
+                return "no reachable path within movement AP budget"
+            planned_distance = sum(left.distance_to(right) for left, right in zip([actor.position, *path], path))
+            if actor.ap < max(1, math.ceil((planned_distance - 1e-9) / rate)):
+                return 'insufficient AP for declared movement'
             before = actor.position
-            trigger_result = movement_with_triggers(
-                engine,
-                actor_id,
-                path,
-                lambda _state, moving_id: _movement_trigger_provider(engine, grid, metrics, moving_id),
-            )
+            if lane_context:
+                trigger_result = overwatch.move(engine, grid, actor_id, path,
+                    lambda prep: _resolve_overwatch_attack(engine, prep, actor_id, grid, metrics),
+                    decision.reaction_order,
+                    lambda: _movement_trigger_provider(engine, grid, metrics, actor_id))
+            else:
+                trigger_result = movement_with_triggers(
+                    engine, actor_id, path,
+                    lambda _state, moving_id: _movement_trigger_provider(engine, grid, metrics, moving_id))
             travelled = 0.0
             exposed = 0.0
             previous = before
@@ -1807,7 +1902,7 @@ def _execute_decision(
                 ):
                     exposed += step
                 previous = position
-            actor.ap -= 1
+            actor.ap -= max(1, math.ceil((travelled - 1e-9) / rate))
             if actor_id in state.objective["strongpoints"]:
                 del state.objective["strongpoints"][actor_id]
             state.objective["moved_this_turn"][actor_id] = True
@@ -1825,17 +1920,27 @@ def _execute_decision(
             if actor.weapon is None or decision.target_id not in state.actors:
                 return "no weapon or target"
             target = state.actors[decision.target_id]
+            spatial_fire = grid.host_scene is not None
             exposure = grid.exposure(actor.position, target.position, target.stance)
+            if spatial_fire:
+                fraction = overwatch.exposure(state, grid, actor_id, target.actor_id)
+                # An instructed shot through opaque material uses the selected
+                # target's firing solution; the actual ray still meets the wall.
+                exposure = ("full" if fraction == 0 or fraction >= 1 else
+                            "half" if fraction >= 0.5 else "quarter")
             attack_difficulty = actual_difficulty(engine.parameters.values["check.difficulty.standard"], exposure, engine.parameters)
-            legitimate = grid.line_of_sight(actor.position, target.position, target.stance) and attack_difficulty is not None
+            legitimate = spatial_fire or (grid.line_of_sight(actor.position, target.position, target.stance) and attack_difficulty is not None)
+            distance = actor.position.distance_to(target.position)
+            if spatial_fire:
+                distance = next((hit["distance"] for hit in overwatch.ray(state, grid, actor_id, target.actor_id)
+                                 if hit["id"] == target.actor_id), 1000000)
             mode = decision.mode or "SEMI AUTO"
             requested = decision.rounds or 1
             estimated = engine.parameters.values["fire.semi_single.ap"] if mode in {"SEMI AUTO", "SINGLE"} else (
                 engine.parameters.values["fire.burst_3.ap"] if mode == "BURST" else max(1, math.ceil(requested / engine.parameters.values["fire.full_auto.rounds_per_ap"]))
             )
             if actor.ap < estimated:
-                actor.ap = 0
-                stages.append({"stage": "END", "reason": "not enough AP for selected firing action"})
+                return "insufficient AP"
             elif not legitimate:
                 return "no direct firing solution through current geometry"
             else:
@@ -1848,11 +1953,12 @@ def _execute_decision(
                     actor.skill,
                     actor.aptitude,
                     attack_difficulty,
-                    actor.position.distance_to(target.position),
+                    distance,
                     exposure,
                     engine.parameters,
                     aim_ap=aim_ap,
                     sharpshooter=actor.class_id == "SHARPSHOOTER",
+                    critical_choice=decision.critical_choice,
                 )
                 sustained_fire = (
                     has_node(actor, GUNNER_SUSTAINED_FIRE_DISCIPLINE)
@@ -1898,8 +2004,23 @@ def _execute_decision(
                 side_metrics = metrics["by_side"][_side_key(side)]
                 side_metrics["shots"] += 1
                 side_metrics["rounds"] += result.rounds_fired
-                side_metrics["connections"] += result.target_connections
-                routed = _apply_connections(actor_id, target.actor_id, side, result, state, metrics, engine.parameters)
+                if spatial_fire:
+                    routed = []
+                    for connection_index in range(result.target_connections):
+                        routed.extend(overwatch.route_shot(
+                            state, grid, actor_id, target.actor_id, result, engine.parameters,
+                            preserve_target_ap=False, connection_index=connection_index,
+                        ))
+                    damage = [contact["target"] for contact in routed if "target" in contact]
+                    side_metrics["connections"] += len(damage)
+                    side_metrics["res_damage"] += sum(hit["res_damage"] for hit in damage)
+                    side_metrics["hp_damage"] += sum(hit["total_hp_damage"] for hit in damage)
+                    metrics["by_actor"][actor_id]["damage"] += sum(hit["res_damage"] + hit["total_hp_damage"] for hit in damage)
+                    if not actor.weapon.needs_cycle and actor.weapon.magazine_rounds == 0:
+                        actor.weapon.chamber = "EMPTY"
+                else:
+                    side_metrics["connections"] += result.target_connections
+                    routed = _apply_connections(actor_id, target.actor_id, side, result, state, metrics, engine.parameters)
                 stages.extend(
                     (
                         {"stage": "FIRING SOLUTION", "distance_m": actor.position.distance_to(target.position), "exposure": exposure, "aim_ap": aim_ap},
@@ -1958,62 +2079,75 @@ def _execute_decision(
                 side_metrics["rounds"] += commitment.rounds_fired
                 side_metrics["suppression_setups"] += 1
                 stages.append({"stage": "SUPPRESSION COMMITMENT", "result": commitment.to_dict(), "zone_id": zone_id, "capacity": capacity, "cells": len(state.suppression[zone_id].cells)})
-        elif decision.action == "OVERWATCH":
+        elif decision.action in {"OVERWATCH", "OVERWATCH_FIXED"}:
             if actor.weapon is None:
                 return "no weapon"
+            if decision.action == "OVERWATCH" and decision.overwatch is None:
+                return "Overwatch requires an explicit fixture pattern/direction/extent/odd width"
+            if '.' in actor_id:
+                return "shooter identity is unsupported by current TD state-field paths"
+            if (not actor.active or actor.downed or actor.weapon.chamber != "LIVE" or actor.weapon.needs_cycle
+                    or actor.weapon.location != 'READY' or actor.weapon.controlled_by is not None):
+                return "Overwatch requires a capable shooter and live ready firearm"
+            try:
+                if decision.action == "OVERWATCH":
+                    zone = overwatch.declaration(state, grid, actor_id, decision.overwatch)
+                else:
+                    zone = next((z for z in overwatch.scene(state, grid)['zones']
+                                 if z['id'] == decision.fixed_zone_id), None)
+                    if zone is None or zone['shape']['kind'] == 'grid_cells':
+                        return 'legacy setup requires an existing authored fixed zone'
+            except ValueError as error:
+                return str(error)
             setup_cost = int(engine.parameters.values["overwatch.setup_ap"])
-            ordinary_cost = setup_cost
-            prepared_sightline = (
-                has_node(actor, SENTINEL_PREPARED_SIGHTLINE)
-                and not state.objective["moved_this_turn"][actor_id]
-            )
-            if prepared_sightline:
-                ordinary_cost += 1
-            cost = ordinary_cost
-            if prepared_sightline:
-                cost = max(
-                    1,
-                    ordinary_cost
-                    - int(
-                        engine.parameters.values[
-                            "specialty.sentinel.prepared_sightline.ap_discount"
-                        ]
-                    ),
-                )
+            # prepare_overwatch_lane is ordinary setup in current TD. The distinct
+            # SENTINEL combined sightline tool must not be implied by this action.
+            cost = setup_cost
             if actor.ap < cost:
-                actor.ap = 0
-                stages.append({"stage": "END", "reason": "not enough AP for OVERWATCH"})
+                return "insufficient AP for OVERWATCH"
             else:
-                toward = decision.destination or _objective_goal(actor_id, side)
-                arc = engine.parameters.values["overwatch.arc_degrees"]
-                maximum_range = engine.parameters.values[f"equipment.{actor.weapon.weapon_id}.range_breakpoints_m"][1]
                 prep_id = f"OW:{actor_id}:{event_index}"
-                state.prepared[prep_id] = PreparedAction(
+                prepared = PreparedAction(
                     prep_id,
                     actor_id,
                     "OVERWATCH",
-                    _arc_cells(actor.position, toward, grid, arc, maximum_range),
+                    {tuple(cell) for cell in zone["shape"]["cells"]} if decision.overwatch else set(),
                     engine.parameters.values["overwatch.shot_allowance"],
                     False,
                     True,
+                    lane_zone=deepcopy(zone) if decision.overwatch else None,
+                    fixed_zone=zone if decision.action == 'OVERWATCH_FIXED' else None,
+                    bound_pose_revision=actor.pose_revision if decision.overwatch else None,
+                    bound_stance=actor.stance if decision.overwatch else None,
+                    policy_fixture_id=decision.overwatch.fixture_id if decision.overwatch else None,
                 )
-                if prepared_sightline:
-                    state.objective["prepared_aim_ap"][prep_id] = 1
-                    effect = record_effect(
-                        metrics,
-                        actor_id=actor.actor_id,
-                        node_id=SENTINEL_PREPARED_SIGHTLINE,
-                        action="OVERWATCH+AIM",
-                        field="ap_cost",
-                        before=ordinary_cost,
-                        after=cost,
-                    )
-                    stages.append(
-                        {"stage": "SPECIALTY EFFECT", "effects": [effect]}
-                    )
+                if decision.overwatch:
+                    state.spatial_zones[zone['id']] = deepcopy(zone)
+                overwatch.replace_watch(state, prepared)
                 actor.ap -= cost
                 metrics["by_side"][_side_key(side)]["overwatch_setups"] += 1
-                stages.append({"stage": "OVERWATCH", "prep_id": prep_id, "arc_degrees": arc, "zone_cells": len(state.prepared[prep_id].zone_cells), "shots": state.prepared[prep_id].shots_remaining})
+                stages.append({"stage": decision.action, "prep_id": prep_id, "selection": asdict(decision.overwatch) if decision.overwatch else None, "zone": zone, "shots": prepared.shots_remaining})
+        elif decision.action == "CANCEL_OVERWATCH":
+            own = [p for p in state.prepared.values() if p.owner_id == actor_id]
+            if not own:
+                return "no owned Overwatch preparation"
+            for prepared in own:
+                prepared.active, prepared.shots_remaining = False, 0
+            stages.append({"stage": "CANCEL OVERWATCH", "refund": 0})
+        elif decision.action == "STANCE":
+            try:
+                stance = Stance(decision.mode)
+            except ValueError:
+                return "unsupported stance"
+            cost = int(engine.parameters.values["move.stance_change_ap"]) if stance != actor.stance else 0
+            if actor.ap < cost:
+                return "insufficient AP for stance change"
+            actor.stance = stance
+            actor.ap -= cost
+            for prepared in state.prepared.values():
+                if prepared.owner_id == actor_id and prepared.lane_zone:
+                    overwatch.valid(state, prepared)
+            stages.append({"stage": "STANCE", "stance": stance.value})
         elif decision.action == "CQC":
             if decision.target_id not in state.actors:
                 return "no CQC target"
@@ -2038,6 +2172,9 @@ def _execute_decision(
             return f"unsupported policy action {decision.action}"
 
         state.objective["last_action"][actor_id] = decision.action
+        for prepared in state.prepared.values():
+            if prepared.lane_zone is not None:
+                overwatch.valid(state, prepared)
         spent = max(0, before_ap - actor.ap)
         _add_action_ap(metrics, actor_id, side, decision.action, spent)
         elapsed = spent * engine.parameters.values["fixture.ap_seconds"]
@@ -2054,17 +2191,30 @@ def _execute_decision(
         emitted["ap_spent"] = spent
         return None
 
-    entry = engine.record(actor_id, decision.action, choices, resolver)
+    try:
+        entry = engine.record(actor_id, decision.action, choices, resolver, operation_id=operation_id, atomic=atomic)
+    except Exception:
+        if before_metrics is not None:
+            metrics.clear()
+            metrics.update(before_metrics)
+            grid.covers = engine.state.covers
+        raise
+    if entry.rejected_reason == "PENDING_REACTION_ORDER":
+        metrics.clear()
+        metrics.update(before_metrics)
+        grid.covers = engine.state.covers
+        return entry
     if entry.rejected_reason:
         metrics["illegal_actions"] += 1
         metrics["unsupported_events"].append({"actor_id": actor_id, "action": decision.action, "reason": entry.rejected_reason})
-        actor.ap = 0
+    return entry
 
 
 def _expire_owner_preparations(state: SimulationState, side: Side) -> None:
     for zone_id in [zone_id for zone_id, zone in state.suppression.items() if state.actors[zone.owner_id].side is side]:
         del state.suppression[zone_id]
-    for prep_id in [prep_id for prep_id, prep in state.prepared.items() if state.actors[prep.owner_id].side is side]:
+    # Current TD _turn_actor_helper expires suppression, but never all watches.
+    for prep_id in [prep_id for prep_id, prep in state.prepared.items() if prep.kind != "OVERWATCH" and state.actors[prep.owner_id].side is side]:
         del state.prepared[prep_id]
 
 
@@ -2170,12 +2320,22 @@ def run_team_scenario(spec: TeamScenarioSpec, parameters: ParameterSet, seed: in
                 observation = _policy_observation(actor_id, state, grid)
                 decision = choose_action(policies[actor_id], observation)
                 before_ap = actor.ap
-                before_events = engine.event_count
-                _execute_decision(engine, grid, policies, actor_id, decision, metrics)
+                entry = _execute_decision(engine, grid, policies, actor_id, decision, metrics)
+                if entry.rejected_reason == "PENDING_REACTION_ORDER":
+                    state.terminal = True
+                    state.terminal_reason = "pending reaction order"
+                    metrics["invariant_failures"].append("pending reaction order")
+                    break
+                if entry.rejected_reason:
+                    # Retain the failed event, then explicitly yield this actor's
+                    # unused AP. A rejected attempt is never useful progress.
+                    _execute_decision(engine, grid, policies, actor_id,
+                        PolicyDecision("END", None, None, 0, None,
+                                       "yield after rejected action: " + entry.rejected_reason), metrics)
                 made_progress = (
                     made_progress
-                    or actor.ap < before_ap
-                    or engine.event_count > before_events
+                    or (entry.rejected_reason is None and
+                        (state.actors[actor_id].ap < before_ap or bool(entry.procedure_stages)))
                 )
                 action_guard += 1
                 if action_guard > len(capable) * actor.max_ap * 6:
@@ -2184,9 +2344,7 @@ def run_team_scenario(spec: TeamScenarioSpec, parameters: ParameterSet, seed: in
                     metrics["invariant_failures"].append("infinite-loop guard")
                     break
             if not made_progress and not state.terminal:
-                state.terminal = True
-                state.terminal_reason = "deadlock: no legal AP progress"
-                metrics["invariant_failures"].append("deadlock: no legal AP progress")
+                break
         alive = {candidate: len(_team_actor_ids(state, candidate, capable_only=True)) for candidate in Side}
         if not state.terminal and (alive[Side.A] == 0 or alive[Side.B] == 0):
             state.terminal = True
@@ -2231,6 +2389,7 @@ def run_team_scenario(spec: TeamScenarioSpec, parameters: ParameterSet, seed: in
         "map_geometry": map_geometry,
         "seed": seed,
         "parameter_set_hash": parameters.hash,
+        "execution_source_hash": execution_source_hash(),
         "winner_side": winner,
         "terminal_reason": state.terminal_reason,
         "elapsed_seconds": state.elapsed_seconds,
@@ -2241,7 +2400,7 @@ def run_team_scenario(spec: TeamScenarioSpec, parameters: ParameterSet, seed: in
         "objective": state.objective,
         "final_actors": {actor_id: {"hp": actor.hp, "res": actor.res, "ap": actor.ap, "downed": actor.downed, "position": asdict(actor.position), "stance": actor.stance.value, "ammunition": actor.weapon.total_rounds() if actor.weapon else 0} for actor_id, actor in sorted(state.actors.items())},
         "rng": engine.rng.provenance(),
-        "replay_spec": {"kind": "team", "spec": {**asdict(spec), "opening_side": spec.opening_side.value}, "seed": seed, "parameter_values": parameters.values},
+        "replay_spec": {"kind": "team", "spec": {**asdict(spec), "opening_side": spec.opening_side.value}, "seed": seed, "parameter_values": parameters.values, "execution_source_hash": execution_source_hash()},
     }
     if capture_events:
         result["events"] = [entry.to_dict() for entry in engine.log]
@@ -2417,6 +2576,7 @@ def merge_team_pair_chunks(
         }[spec.scenario_id],
         "parameter_set_hash": parameters.hash,
         "master_seed": master_seed,
+        "execution_source_hash": execution_source_hash(),
         "derived_seed_scheme": "sha256(master, scenario_id, paired-mirror, pair_index)",
         "paired_mirrored_runs": pairs,
         "total_trials": total,

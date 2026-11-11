@@ -4,6 +4,7 @@ from dataclasses import fields
 from typing import Any
 
 from .parameters import ParameterManifest
+from .provenance import execution_source_hash
 from .simulation import DuelSpec, run_duel
 from .model import Side
 from .tactical import TeamScenarioSpec, run_team_scenario
@@ -26,6 +27,8 @@ def replay_artifact(artifact: dict[str, Any], manifest: ParameterManifest) -> di
         raise ValueError("artifact has no replay_spec")
     parameters = manifest.load_set(replay_spec["parameter_values"])
     kind = replay_spec.get("kind")
+    if kind in {"duel", "team"} and replay_spec.get("execution_source_hash") != execution_source_hash():
+        raise ReplayMismatch("replay execution source is missing or differs from the current lab")
     if kind == "duel":
         allowed = {field.name for field in fields(DuelSpec)}
         unknown = set(replay_spec["spec"]) - allowed

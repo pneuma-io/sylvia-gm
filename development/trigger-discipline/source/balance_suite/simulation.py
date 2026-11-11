@@ -6,12 +6,13 @@ from typing import Any
 
 from .engine import EventEngine
 from .fixtures import benchmark_actor, build_map
-from .geometry import shortest_step_toward
+from .geometry import shortest_path
 from .model import HitQuality, KnowledgeState, Position, Side, SimulationState
 from .parameters import ParameterSet
 from .policies import KnownTarget, PolicyObservation, choose_action
 from .rng import derive_seed
 from .rules import apply_damage, fire_action, movement_rate, recover_recoil
+from .provenance import execution_source_hash
 from .statistics import mean_interval, wilson_interval
 
 
@@ -47,8 +48,9 @@ def _observation(state: SimulationState, actor_id: str, target_id: str, policy_i
     actor = state.actors[actor_id]
     target = state.actors[target_id]
     knowledge = actor.target_knowledge.get(target_id, KnowledgeState.UNAWARE)
-    position = target.position if knowledge is KnowledgeState.CONFIRMED else None
-    distance = actor.position.distance_to(target.position) if position else None
+    position = (target.position if knowledge is KnowledgeState.CONFIRMED else
+                actor.target_last_known.get(target_id) if knowledge is KnowledgeState.LAST_KNOWN else None)
+    distance = actor.position.distance_to(position) if position else None
     weapon = actor.weapon
     return PolicyObservation(
         actor.actor_id,
@@ -61,8 +63,10 @@ def _observation(state: SimulationState, actor_id: str, target_id: str, policy_i
         weapon.total_rounds() if weapon else 0,
         weapon.current_recoil if weapon else 0,
         weapon.fire_modes if weapon else (),
-        (KnownTarget(target.actor_id, knowledge, position, distance, True, target.downed),),
-        target.position,
+        (KnownTarget(target.actor_id, knowledge, position, distance,
+                     knowledge is KnowledgeState.CONFIRMED,
+                     target.downed if knowledge is KnowledgeState.CONFIRMED else False),),
+        position,
         False,
         False,
         {"policy_id": policy_id},
@@ -123,6 +127,15 @@ def run_duel(spec: DuelSpec, parameters: ParameterSet, seed: int, *, capture_eve
         "illegal_actions": 0,
     }
 
+    def end_participation(actor, reason):
+        """Record yielding unused AP separately from a refused action."""
+        def finish(stages, windows, emitted):
+            del windows
+            emitted["ap_spent"] = actor.ap
+            actor.ap = 0
+            stages.append({"stage": "END TEAM PARTICIPATION", "reason": reason})
+        engine.record(actor.actor_id, "END", {"reason": reason}, finish)
+
     for turn_number in range(spec.max_team_turns):
         side = Side.A if turn_number % 2 == 0 else Side.B
         state.active_side = side
@@ -144,7 +157,7 @@ def run_duel(spec: DuelSpec, parameters: ParameterSet, seed: int, *, capture_eve
             decision = choose_action(policy_id, observation)
             state.objective["policy_decisions"].append({"actor_id": actor.actor_id, "decision": asdict(decision)})
             if decision.action == "END":
-                actor.ap = 0
+                end_participation(actor, decision.reason)
                 break
             event_index = engine.event_count
             choices = {"policy_id": policy_id, **asdict(decision)}
@@ -171,29 +184,39 @@ def run_duel(spec: DuelSpec, parameters: ParameterSet, seed: int, *, capture_eve
                     return None
                 if decision.action in {"MOVE_OBJECTIVE", "FLANK", "MOVE_COVER"}:
                     before = actor.position
-                    rate = movement_rate(actor.stance, actor.burden, actor.class_id, before.distance_to(target.position), parameters)
+                    goal = decision.destination or observation.objective_position
+                    if goal is None:
+                        return "no known movement destination"
+                    rate = movement_rate(actor.stance, actor.burden, actor.class_id,
+                                         observation.known_targets[0].distance_m, parameters)
+                    budget = decision.movement_ap_budget
+                    if type(budget) is not int or budget < 1:
+                        return "invalid movement AP budget"
                     if decision.action == "FLANK":
-                        flank_goal = Position(target.position.x, 5 if actor.position.y >= 15 else 25)
-                        actor.position = shortest_step_toward(actor.position, flank_goal, rate, grid)
-                    else:
-                        actor.position = shortest_step_toward(actor.position, target.position, rate, grid)
-                    moved = before.distance_to(actor.position)
-                    actor.ap -= 1
-                    state.elapsed_seconds += 1
+                        goal = Position(goal.x, 5 if actor.position.y >= 15 else 25)
+                    path = shortest_path(before, goal, grid, rate * min(actor.ap, budget))
+                    if not path:
+                        return "no reachable path within movement AP budget"
+                    actor.position = path[-1]
+                    moved = sum(left.distance_to(right) for left, right in zip([before, *path], path))
+                    cost = max(1, math.ceil((moved - 1e-9) / rate))
+                    actor.ap -= cost
+                    state.elapsed_seconds += cost
                     metrics["movement_m"][side.value] += moved
                     stages.append({"stage": "MOVEMENT", "from": asdict(before), "to": asdict(actor.position), "distance_m": moved})
                     return None
                 if decision.action in {"FIRE", "SUPPRESS"}:
                     if actor.weapon is None:
                         return "no weapon"
-                    mode = decision.mode or "SEMI AUTO"
+                    mode = (decision.mode or "SEMI AUTO").upper()
                     requested = decision.rounds
                     estimated_ap = parameters.values["suppression.setup_ap"] if decision.action == "SUPPRESS" else (
-                        parameters.values["fire.semi_single.ap"] if mode == "SEMI AUTO" else max(1, math.ceil(requested / parameters.values["fire.full_auto.rounds_per_ap"]))
+                        parameters.values["fire.semi_single.ap"] if mode in {"SEMI AUTO", "SINGLE"} else (
+                            parameters.values["fire.burst_3.ap"] if mode == "BURST" else max(1, math.ceil(requested / parameters.values["fire.full_auto.rounds_per_ap"]))
+                        )
                     )
                     if actor.ap < estimated_ap:
-                        actor.ap = 0
-                        return None
+                        return "insufficient AP"
                     roll = stream.d20("ATTACK ROLL")
                     base_difficulty = parameters.values["check.difficulty.standard"]
                     if decision.action == "SUPPRESS":
@@ -211,6 +234,7 @@ def run_duel(spec: DuelSpec, parameters: ParameterSet, seed: int, *, capture_eve
                         parameters,
                         aim_ap=0 if decision.action == "SUPPRESS" else state.objective["aim_ap"][actor.actor_id],
                         sharpshooter=actor.class_id == "SHARPSHOOTER",
+                        critical_choice=decision.critical_choice,
                     )
                     actual_ap = parameters.values["suppression.setup_ap"] if decision.action == "SUPPRESS" else result.ap_cost
                     actor.ap -= actual_ap
@@ -242,7 +266,7 @@ def run_duel(spec: DuelSpec, parameters: ParameterSet, seed: int, *, capture_eve
             entry = engine.record(actor.actor_id, decision.action, choices, resolver)
             if entry.rejected_reason:
                 metrics["illegal_actions"] += 1
-                actor.ap = 0
+                end_participation(actor, entry.rejected_reason)
         if state.terminal_reason == "infinite-loop guard":
             break
         if actor_a.downed or actor_b.downed:
@@ -266,6 +290,7 @@ def run_duel(spec: DuelSpec, parameters: ParameterSet, seed: int, *, capture_eve
         "policies": [spec.policy_a, spec.policy_b],
         "seed": seed,
         "parameter_set_hash": parameters.hash,
+        "execution_source_hash": execution_source_hash(),
         "map_id": grid.map_id,
         "map_geometry": {"width": grid.width, "height": grid.height, "full_blockers": [], "covers": {}},
         "initial_state": initial_state,
@@ -278,7 +303,7 @@ def run_duel(spec: DuelSpec, parameters: ParameterSet, seed: int, *, capture_eve
         "metrics": metrics,
         "final_actors": {actor_id: {"hp": actor.hp, "res": actor.res, "downed": actor.downed, "position": asdict(actor.position)} for actor_id, actor in state.actors.items()},
         "rng": engine.rng.provenance(),
-        "replay_spec": {"kind": "duel", "spec": asdict(spec), "seed": seed, "parameter_values": parameters.values},
+        "replay_spec": {"kind": "duel", "spec": asdict(spec), "seed": seed, "parameter_values": parameters.values, "execution_source_hash": execution_source_hash()},
     }
     if capture_events:
         result["events"] = [entry.to_dict() for entry in engine.log]
@@ -363,6 +388,7 @@ def merge_duel_pair_chunks(
         "scenario_version": spec.scenario_version,
         "parameter_set_hash": parameters.hash,
         "master_seed": master_seed,
+        "execution_source_hash": execution_source_hash(),
         "derived_seed_scheme": "sha256(master, paired-mirror, pair_index)",
         "paired_mirrored_runs": pairs,
         "total_trials": total,

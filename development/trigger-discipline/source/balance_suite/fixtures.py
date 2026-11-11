@@ -40,6 +40,21 @@ CLASS_SPECIALTIES = {
 }
 
 
+def reference_overwatch_policy(classes_a, classes_b, policies_a, policies_b):
+    """Bind the declared 24-by-3 measuring fixture, without granting class coverage."""
+    return {
+        f"{side}_{CLASS_CAST[class_id]}_{index + 1}": {
+            "pattern": "lane", "direction": "east" if side == "A" else "west",
+            "extent": 24, "width": 3, "fixture_id": "REFERENCE-TEAM-LANES-24X3-V1",
+        }
+        for side, classes, policies in (
+            ("A", classes_a, policies_a), ("B", classes_b, policies_b)
+        )
+        for index, (class_id, policy) in enumerate(zip(classes, policies, strict=True))
+        if policy == "POLICY_PREPARED_FIRE"
+    }
+
+
 def benchmark_control_values(level: int, control: str) -> tuple[int, int]:
     primary, _secondary, aptitude, _choices = SPECIALIST_PROGRESSION[level]
     if control == "GENERALIST":
@@ -90,6 +105,7 @@ def weapon_state(weapon_id: str, parameters: ParameterSet) -> WeaponState:
         False,
         mechanisms[weapon_id],
         modes[weapon_id],
+        cycle_ap=parameters.values.get(f"equipment.{weapon_id}.cycle_ap"),
     )
 
 

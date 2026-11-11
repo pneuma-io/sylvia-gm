@@ -9,7 +9,7 @@ from .artifacts import write_csv, write_json
 from .fixtures import map_contracts
 from .parameters import ParameterSet
 from .probes import all_exact_probes
-from .provenance import provenance_record
+from .provenance import execution_source_hash, provenance_record
 from .rng import derive_seed
 from .scenario_runtime import EXACT_RESULT_KEYS
 from .scenarios import scenario_registry
@@ -28,6 +28,12 @@ from .tactical import (
     paired_mirrored_team_scenarios,
     team_pair_chunk,
 )
+
+
+def run_overwatch_parity(package: Path, fixtures: Path, output: Path) -> dict[str, Any]:
+    """Run only the named finite adoption fixtures through the actual lab consumer."""
+    from .lane_parity import run
+    return run(package, fixtures, output)
 
 
 def _chunk_ranges(total: int, chunk_count: int) -> list[tuple[int, int]]:
@@ -98,8 +104,6 @@ def build_baseline(
 ) -> dict[str, Any]:
     if workers <= 0:
         raise ValueError("workers must be positive")
-    exact = all_exact_probes(parameters)
-    specialty = specialty_coverage(parameters)
     effective_progression_runs = progression_runs if progression_runs is not None else runs
     effective_team_runs = runs if team_runs is None else team_runs
     team_specs = {
@@ -132,10 +136,14 @@ def build_baseline(
             raise ValueError(f"objective override parameter hash mismatch for {scenario_id}")
         if result.get("master_seed") != master_seed:
             raise ValueError(f"objective override master seed mismatch for {scenario_id}")
+        if result.get("execution_source_hash") != execution_source_hash():
+            raise ValueError(f"objective override execution source mismatch for {scenario_id}")
         if not result.get("sample_replay"):
             raise ValueError(f"objective override lacks deterministic sample replay for {scenario_id}")
         objective_scenarios[scenario_id] = result
 
+    exact = all_exact_probes(parameters)
+    specialty = specialty_coverage(parameters)
     if workers == 1:
         monte_carlo = paired_mirrored_duels(
             DuelSpec(), parameters, master_seed, runs

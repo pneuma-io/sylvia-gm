@@ -314,7 +314,7 @@ a{{color:#81b8ff}} code{{color:#d7e3f6}} details{{margin:12px 0}} .warning{{bord
   <h2>COVER, SUPPRESSION, OVERWATCH, CQC, explosives and medicine</h2>
   <h3>COVER routing</h3>{_table(['Exposure','Resolved route','Exact totals'],cover_rows)}
   <h3>SUPPRESSION exposure</h3>{_table(['Committed rounds','Exposure capacity','Setup AP','First exposure attacks','Protected damage'],suppression_rows)}
-  <h3>OVERWATCH crossing</h3>{_table(['Arc degrees','Setup AP','Shot allowance','Trigger position','Movement pauses','Hit rate'],overwatch_rows)}
+  <h3>Legacy angle-sector OVERWATCH probe (does not qualify shooter lanes)</h3>{_table(['Arc degrees','Setup AP','Shot allowance','Trigger position','Movement pauses','Hit rate'],overwatch_rows)}
   <h3>CQC exact comparisons</h3>{_table(['Maneuver','Attacker skill','Defender skill','Defense','Success rate','AP'],cqc_rows)}
   <h3>Explosive frozen-snapshot results</h3>{_table(['Material','Geometry','Cover HP after','Cover active','Frozen components'],explosive_rows)}
   <h3>Medical results</h3>{_table(['Level','Casualty','Action','Actor','Success rate','AP','Deterioration seconds','Reversible window'],medical_rows)}

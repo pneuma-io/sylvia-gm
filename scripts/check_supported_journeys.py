@@ -68,6 +68,8 @@ PYTHON_JOURNEYS = {
         "tests/test_td_native_panel_repairs.py",
         "tests/test_td_panel_resources.py",
         "tests/test_td_directional_cover.py",
+        "tests/test_balance_active_fire.py",
+        "tests/test_balance_lane_contract.py",
         "tests/test_fc_campaign_journey.py",
         "tests/test_fc_party_combat.py",
         "tests/test_fc_campaign_progress.py",

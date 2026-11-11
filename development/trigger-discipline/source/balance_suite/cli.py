@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 import sys
 from typing import Any
 
 from .artifacts import read_json, write_json
+from .fixtures import LEVELS
 from .optimizer import optimize, optimize_objective
 from .parameters import ParameterError, ParameterSet, default_manifest
 from .probes import all_exact_probes
@@ -14,10 +16,10 @@ from .provenance import fingerprint_hash, immutable_sources, protected_fingerpri
 from .regression import compare_results
 from .replay import ReplayMismatch, replay_artifact
 from .reports import render_html
-from .runner import build_baseline, write_baseline_artifacts
+from .runner import build_baseline, run_overwatch_parity, write_baseline_artifacts
 from .scenario_runtime import EXACT_RESULT_KEYS, execute_scenario, resolve_scenario_id
 from .scenarios import scenario_registry, validate_scenarios
-from .specialties import specialty_coverage
+from .specialties import parse_all_specialties, specialty_coverage
 
 
 def _path(value: str) -> Path:
@@ -46,13 +48,19 @@ def _tuple4(value: str | None, label: str) -> tuple[str, ...] | None:
 
 def command_validate(args: argparse.Namespace) -> int:
     parameters = _parameters(args.parameters)
-    coverage = specialty_coverage(parameters)
+    coverage = specialty_coverage(parameters, include_objective_scenarios=not args.structural_only)
     drift = source_drift()
     scenario_errors = validate_scenarios()
     fingerprint = protected_fingerprint()
     objective_scenarios = coverage["objective_scenario_matrix"]
+    authored_nodes = parse_all_specialties()
+    expected_specialties = {node.specialty for node in authored_nodes}
+    expected_nodes = {node.node_id for node in authored_nodes}
+    actual_nodes = [node["node"]["node_id"]
+                    for specialty in coverage["specialties"].values()
+                    for node in specialty["nodes"]]
     objective_scenarios_complete = (
-        len(objective_scenarios) == 26 * 5 * 3
+        len(objective_scenarios) == len(expected_specialties) * len(LEVELS) * 3
         and all(
             item["control_metrics"]["terminal_reason"]
             and item["candidate_metrics"]["terminal_reason"]
@@ -65,13 +73,16 @@ def command_validate(args: argparse.Namespace) -> int:
         "valid": (
             not drift
             and not scenario_errors
-            and coverage["specialty_count"] == 26
-            and coverage["node_count"] == 364
-            and objective_scenarios_complete
+            and set(coverage["specialties"]) == expected_specialties
+            and set(actual_nodes) == expected_nodes
+            and len(actual_nodes) == len(expected_nodes)
+            and (args.structural_only or objective_scenarios_complete)
         ),
         "balance_status": (
-            "STRUCTURAL FAILURE" if coverage["findings"] else "READY"
+            "STRUCTURAL FAILURE" if coverage["findings"] else "STRUCTURAL CHECKS PASSED"
         ),
+        "scope": "STRUCTURAL_ONLY" if args.structural_only else "STRUCTURAL_AND_OBJECTIVE",
+        "runtime_qualification": "NOT_ESTABLISHED_BY_STRUCTURAL_COUNTERFACTUALS",
         "parameter_count": len(parameters.manifest.specs),
         "parameter_hash": parameters.hash,
         "scenario_count": len(scenario_registry()),
@@ -100,7 +111,10 @@ def command_validate(args: argparse.Namespace) -> int:
 
 
 def command_coverage(args: argparse.Namespace) -> int:
-    result = specialty_coverage(_parameters(args.parameters))
+    result = specialty_coverage(_parameters(args.parameters),
+                                include_objective_scenarios=not args.structural_only)
+    result["scope"] = "STRUCTURAL_ONLY" if args.structural_only else "STRUCTURAL_AND_OBJECTIVE"
+    result["runtime_qualification"] = "NOT_ESTABLISHED_BY_STRUCTURAL_COUNTERFACTUALS"
     if args.specialty:
         selected = result["specialties"].get(args.specialty.upper())
         if selected is None:
@@ -284,15 +298,24 @@ def command_report(args: argparse.Namespace) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="trigger-balance", description="Deterministic Trigger Discipline balance and structural test suite")
+    parser.add_argument("--notes-directory", type=Path,
+                        help="separate private TD vault, kept outside the public code checkout")
     subparsers = parser.add_subparsers(dest="command", required=True)
+    parity = subparsers.add_parser("overwatch-parity", help="compare the lab with the selected current package")
+    parity.add_argument("--package", required=True, type=_path)
+    parity.add_argument("--fixtures", required=True, type=_path)
+    parity.add_argument("--output", required=True, type=_path)
+    parity.set_defaults(func=command_overwatch_parity)
 
     def parameter_option(command: argparse.ArgumentParser) -> None:
         command.add_argument("--parameters", help="complete validated parameter-set JSON; defaults to v0.1 seeds")
 
     validate = subparsers.add_parser("validate", help="validate provenance, manifest, scenarios, source drift, and coverage accounting")
     parameter_option(validate); validate.add_argument("--output"); validate.set_defaults(func=command_validate)
+    validate.add_argument("--structural-only", action="store_true", help="audit nodes without running tactical objective policies")
     coverage = subparsers.add_parser("coverage", help="report all specialty node coverage and formal gaps")
     parameter_option(coverage); coverage.add_argument("--specialty"); coverage.add_argument("--output"); coverage.set_defaults(func=command_coverage)
+    coverage.add_argument("--structural-only", action="store_true", help="inventory abilities separately from objective simulations")
     exact = subparsers.add_parser("exact", help="run exact finite probability and deterministic rule probes")
     parameter_option(exact); exact.add_argument("--family"); exact.add_argument("--output"); exact.set_defaults(func=command_exact)
     simulate = subparsers.add_parser("simulate", help="execute any declared exact, structural, duel, or tactical scenario")
@@ -310,16 +333,31 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def command_overwatch_parity(args: argparse.Namespace) -> int:
+    result = run_overwatch_parity(args.package, args.fixtures, args.output)
+    print(_summary({"passed": result["passed"], "failed": result["failed"], "output": str(args.output)}))
+    return 1 if result["failed"] else 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
-    root = repo_root()
+    previous_notes = os.environ.get("TD_BALANCE_NOTES_DIR")
+    if args.notes_directory is not None:
+        os.environ["TD_BALANCE_NOTES_DIR"] = str(args.notes_directory.resolve())
     try:
+        root = repo_root()
         with immutable_sources(root):
             return int(args.func(args))
     except (ParameterError, ValueError, ReplayMismatch, RuntimeError) as error:
         print(json.dumps({"error": type(error).__name__, "message": str(error)}, indent=2), file=sys.stderr)
         return 1
+    finally:
+        if args.notes_directory is not None:
+            if previous_notes is None:
+                os.environ.pop("TD_BALANCE_NOTES_DIR", None)
+            else:
+                os.environ["TD_BALANCE_NOTES_DIR"] = previous_notes
 
 
 if __name__ == "__main__":

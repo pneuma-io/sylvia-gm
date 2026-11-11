@@ -1,17 +1,24 @@
 from __future__ import annotations
 
+import hashlib
+import json
+import os
+import subprocess
+from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
-import hashlib
-import io
-import json
+from functools import cache
 from pathlib import Path
-import subprocess
-import tarfile
-from typing import Iterator
 
 
-ENCODED_SOURCE_COMMIT = "1b5b500"
+@cache
+def retained_inputs() -> dict:
+    """Read the compiler's data snapshot without importing its builder/coverage cycle."""
+    path = Path(__file__).resolve().parents[1] / "sylvia_ruleset/compiled-inputs.json"
+    return json.loads(path.read_bytes())
+
+
+ENCODED_SOURCE_COMMIT = retained_inputs()["notes_revision"]
 
 CANONICAL_DIRS = (
     "Character",
@@ -42,26 +49,176 @@ LOCKED_TESTING_SOURCES = (
 )
 
 RULE_MODULE_SOURCES: dict[str, tuple[str, ...]] = {
-    "checks": ("Character/CHECK.md", "Character/DIFFICULTY.md", "Character/NATURAL 1.md", "Character/NATURAL 20.md"),
+    "checks": (
+        "Character/CHECK.md",
+        "Character/DIFFICULTY.md",
+        "Character/NATURAL 1.md",
+        "Character/NATURAL 20.md",
+    ),
     "resources": ("Combat/AP.md", "Combat/HP.md", "Combat/RES.md", "Combat/PENETRATION.md"),
-    "movement_geometry": ("Combat/GRID.md", "Combat/MOVEMENT.md", "Combat/STANCE.md", "Combat/COVER.md", "Combat/DESTRUCTIBLE COVER.md", "Combat/BREACHING.md", "Combat/CASUALTY MOVEMENT.md", "Combat/LINE OF SIGHT.md"),
-    "firearms": ("Combat/ATTACK ROLL.md", "Combat/HIT QUALITY.md", "Combat/CRITICAL HIT.md", "Firearms/WEAPON PROFILE.md", "Firearms/PROJECTILE.md", "Firearms/MATERIAL PENETRATION.md", "Firearms/RECOIL.md", "Firearms/AMMUNITION.md", "Firearms/MAGAZINE.md", "Firearms/CHAMBER.md", "Firearms/CYCLING.md", "Firearms/RELOAD.md", "Firearms/FIREARM MANIPULATION.md", "Firearms/FULL AUTO.md", "Firearms/BURST FIRE.md", "Firearms/AIM.md"),
-    "prepared_fire": ("Combat/SUPPRESSION.md", "Combat/OVERWATCH.md", "Combat/PREP ACTION.md", "Combat/TRIGGER ORDERING.md", "Combat/TEAM TURN.md"),
-    "team_tactics": ("Combat/AP.md", "Combat/TEAM TURN.md", "Combat/TEAM INITIATIVE.md", "Combat/GRID.md", "Combat/LINE OF SIGHT.md", "Combat/COVER.md", "Character/TARGET KNOWLEDGE.md"),
-    "cqc": ("CQC/CQC ACTION.md", "CQC/CQC DEFENSE.md", "CQC/CONTROL.md", "CQC/ESCAPE.md", "CQC/SHOVE.md", "CQC/TRIP.md", "CQC/THROW.md", "CQC/DISARM.md"),
-    "explosives": ("Explosives/GRENADE.md", "Explosives/GRENADE PLACEMENT.md", "Explosives/FUSE TIMING.md", "Explosives/EXPLOSIVE SAVE.md", "Explosives/BLAST GEOMETRY.md"),
-    "medical": ("Character/Skills/MEDICINE.md", "Combat/DOWNED.md", "Combat/INJURY.md", "Combat/LIFE-THREATENING CONDITION.md", "Combat/STABILIZE.md", "Combat/RESUSCITATION.md", "Combat/DEATH'S DOOR.md"),
-    "information": ("Character/TARGET KNOWLEDGE.md", "Character/Skills/STEALTH.md", "Investigation/TEAM KNOWLEDGE.md"),
-    "drones": ("Drones/DRONE.md", "Drones/MANUAL CONTROL.md", "Drones/AUTONOMOUS DRONE.md", "Drones/STANDING ORDER.md", "Drones/SIGNAL.md", "Drones/LOSS OF SIGNAL.md"),
-    "hacking": ("Classes/HACKER.md", "Hacking/NODE.md", "Hacking/LINK.md", "Hacking/NETWORK.md", "Hacking/NETWORK SEGMENT.md", "Hacking/GATEWAY.md", "Hacking/LOCAL ACCESS.md", "Hacking/PRIVILEGE.md", "Hacking/INTRUSION.md", "Hacking/HACKING VISIBILITY.md", "Hacking/MONITORING.md", "Hacking/DETECTION.md", "Hacking/FOOTHOLD.md"),
-    "social": ("Classes/INFLUENCER.md", "Social/SOCIAL FACT.md", "Social/LEVERAGE.md", "Social/CONTACT.md", "Social/FACTION REPUTATION.md", "Social/NPC MORALE.md"),
-    "progression": ("Character/LEVEL.md", "Character/SPECIALTY.md", "Character/CLASS-SKILL INDEPENDENCE.md"),
-    "classes": tuple(f"Classes/{name}.md" for name in ("BULWARK", "RIFLEMAN", "BREACHER", "GHOST", "SHARPSHOOTER", "TECH", "HACKER", "CORPSMAN", "INFLUENCER")),
-    "specialties": tuple(f"Specialties/{name}.md" for name in ("ANCHOR", "ARSENAL", "AUTODRONES", "BREAKER", "DIPLOMAT", "ENFORCER", "EVADER", "FIELD ENGINEER", "FIELD MEDIC", "FLANKER", "FPV DRONES", "GUARDIAN", "GUNNER", "HANDLER", "ICON", "INFILTRATOR", "LOCAL HACKER", "NETWORKER", "OPERATOR", "RESUSCITATOR", "SENTINEL", "SHIELD BEARER", "SHOCK", "SNAPSHOT", "SNIPER", "TRAUMA")),
+    "movement_geometry": (
+        "Combat/GRID.md",
+        "Combat/MOVEMENT.md",
+        "Combat/STANCE.md",
+        "Combat/COVER.md",
+        "Combat/DESTRUCTIBLE COVER.md",
+        "Combat/BREACHING.md",
+        "Combat/CASUALTY MOVEMENT.md",
+        "Combat/LINE OF SIGHT.md",
+    ),
+    "firearms": (
+        "Combat/ATTACK ROLL.md",
+        "Combat/HIT QUALITY.md",
+        "Combat/CRITICAL HIT.md",
+        "Firearms/WEAPON PROFILE.md",
+        "Firearms/PROJECTILE.md",
+        "Firearms/MATERIAL PENETRATION.md",
+        "Firearms/RECOIL.md",
+        "Firearms/AMMUNITION.md",
+        "Firearms/MAGAZINE.md",
+        "Firearms/CHAMBER.md",
+        "Firearms/CYCLING.md",
+        "Firearms/RELOAD.md",
+        "Firearms/FIREARM MANIPULATION.md",
+        "Firearms/FULL AUTO.md",
+        "Firearms/BURST FIRE.md",
+        "Firearms/AIM.md",
+    ),
+    "prepared_fire": (
+        "Combat/SUPPRESSION.md",
+        "Combat/OVERWATCH.md",
+        "Combat/PREP ACTION.md",
+        "Combat/TRIGGER ORDERING.md",
+        "Combat/TEAM TURN.md",
+    ),
+    "team_tactics": (
+        "Combat/AP.md",
+        "Combat/TEAM TURN.md",
+        "Combat/TEAM INITIATIVE.md",
+        "Combat/GRID.md",
+        "Combat/LINE OF SIGHT.md",
+        "Combat/COVER.md",
+        "Character/TARGET KNOWLEDGE.md",
+    ),
+    "cqc": (
+        "CQC/CQC ACTION.md",
+        "CQC/CQC DEFENSE.md",
+        "CQC/CONTROL.md",
+        "CQC/ESCAPE.md",
+        "CQC/SHOVE.md",
+        "CQC/TRIP.md",
+        "CQC/THROW.md",
+        "CQC/DISARM.md",
+    ),
+    "explosives": (
+        "Explosives/GRENADE.md",
+        "Explosives/GRENADE PLACEMENT.md",
+        "Explosives/FUSE TIMING.md",
+        "Explosives/EXPLOSIVE SAVE.md",
+        "Explosives/BLAST GEOMETRY.md",
+    ),
+    "medical": (
+        "Character/Skills/MEDICINE.md",
+        "Combat/DOWNED.md",
+        "Combat/INJURY.md",
+        "Combat/LIFE-THREATENING CONDITION.md",
+        "Combat/STABILIZE.md",
+        "Combat/RESUSCITATION.md",
+        "Combat/DEATH'S DOOR.md",
+    ),
+    "information": (
+        "Character/TARGET KNOWLEDGE.md",
+        "Character/Skills/STEALTH.md",
+        "Investigation/TEAM KNOWLEDGE.md",
+    ),
+    "drones": (
+        "Drones/DRONE.md",
+        "Drones/MANUAL CONTROL.md",
+        "Drones/AUTONOMOUS DRONE.md",
+        "Drones/STANDING ORDER.md",
+        "Drones/SIGNAL.md",
+        "Drones/LOSS OF SIGNAL.md",
+    ),
+    "hacking": (
+        "Classes/HACKER.md",
+        "Hacking/NODE.md",
+        "Hacking/LINK.md",
+        "Hacking/NETWORK.md",
+        "Hacking/NETWORK SEGMENT.md",
+        "Hacking/GATEWAY.md",
+        "Hacking/LOCAL ACCESS.md",
+        "Hacking/PRIVILEGE.md",
+        "Hacking/INTRUSION.md",
+        "Hacking/HACKING VISIBILITY.md",
+        "Hacking/MONITORING.md",
+        "Hacking/DETECTION.md",
+        "Hacking/FOOTHOLD.md",
+    ),
+    "social": (
+        "Classes/INFLUENCER.md",
+        "Social/SOCIAL FACT.md",
+        "Social/LEVERAGE.md",
+        "Social/CONTACT.md",
+        "Social/FACTION REPUTATION.md",
+        "Social/NPC MORALE.md",
+    ),
+    "progression": (
+        "Character/LEVEL.md",
+        "Character/SPECIALTY.md",
+        "Character/CLASS-SKILL INDEPENDENCE.md",
+    ),
+    "classes": tuple(
+        f"Classes/{name}.md"
+        for name in (
+            "BULWARK",
+            "RIFLEMAN",
+            "BREACHER",
+            "GHOST",
+            "SHARPSHOOTER",
+            "TECH",
+            "HACKER",
+            "CORPSMAN",
+            "INFLUENCER",
+        )
+    ),
+    "specialties": tuple(
+        f"Specialties/{name}.md"
+        for name in (
+            "ANCHOR",
+            "ARSENAL",
+            "AUTODRONES",
+            "BREAKER",
+            "DIPLOMAT",
+            "ENFORCER",
+            "EVADER",
+            "FIELD ENGINEER",
+            "FIELD MEDIC",
+            "FLANKER",
+            "FPV DRONES",
+            "GUARDIAN",
+            "GUNNER",
+            "HANDLER",
+            "ICON",
+            "INFILTRATOR",
+            "LOCAL HACKER",
+            "NETWORKER",
+            "OPERATOR",
+            "RESUSCITATOR",
+            "SENTINEL",
+            "SHIELD BEARER",
+            "SHOCK",
+            "SNAPSHOT",
+            "SNIPER",
+            "TRAUMA",
+        )
+    ),
     "scenario_policies": ("Testing/BALANCE SCENARIOS.md",),
     "parameter_manifest": ("Testing/BALANCE PARAMETERS.md",),
     "benchmark_fixtures": ("Testing/BENCHMARK FIXTURES.md",),
-    "reference_equipment": ("Testing/REFERENCE EQUIPMENT.md", "Testing/REFERENCE EQUIPMENT VALUES.md"),
+    "reference_equipment": (
+        "Testing/REFERENCE EQUIPMENT.md",
+        "Testing/REFERENCE EQUIPMENT VALUES.md",
+    ),
 }
 
 
@@ -74,11 +231,20 @@ class SourceIdentity:
 
 
 def repo_root(start: Path | None = None) -> Path:
+    """Resolve private source separately from the public lab/compiler checkout."""
+    if start is None and (configured := os.environ.get("TD_BALANCE_NOTES_DIR")):
+        root = Path(configured).expanduser().resolve()
+        if (root / "AGENTS.md").is_file() and (root / "Testing").is_dir():
+            return root
+        raise RuntimeError("TD_BALANCE_NOTES_DIR must identify the selected private TD vault")
     candidate = (start or Path.cwd()).resolve()
     for path in (candidate, *candidate.parents):
         if (path / "AGENTS.md").is_file() and (path / "Testing").is_dir():
             return path
-    raise RuntimeError("could not locate Trigger Discipline repository root")
+    raise RuntimeError(
+        "Private TD notes are required for this source audit; select --notes-directory "
+        "or TD_BALANCE_NOTES_DIR. Keep the vault outside the public source checkout."
+    )
 
 
 def _sha256(path: Path) -> str:
@@ -87,6 +253,18 @@ def _sha256(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+@cache
+def execution_source_hash() -> str:
+    """Bind reusable results to the actual lab, compiler data and shared spatial code."""
+    source = Path(__file__).resolve().parents[1]
+    repository = source.parents[2]
+    paths = list((source / "balance_suite").glob("*.py"))
+    paths.extend((repository / "src/sylvia_gm/spatial").glob("*.py"))
+    paths.append(source / "sylvia_ruleset/compiled-inputs.json")
+    identities = {path.relative_to(repository).as_posix(): _sha256(path) for path in sorted(paths)}
+    return hashlib.sha256(json.dumps(identities, sort_keys=True).encode()).hexdigest()
 
 
 def _source_sha256_bytes(payload: bytes) -> str:
@@ -101,8 +279,15 @@ def protected_paths(root: Path | None = None) -> list[Path]:
     for directory in CANONICAL_DIRS:
         base = root / directory
         if base.exists():
-            paths.extend(path for path in base.rglob("*") if path.is_file())
-    paths.extend(root / relative for relative in LOCKED_TESTING_SOURCES if (root / relative).is_file())
+            paths.extend(
+                path
+                for path in base.rglob("*")
+                if path.is_file()
+                and path.relative_to(root).as_posix().casefold() != "hacking/credential.md"
+            )
+    paths.extend(
+        root / relative for relative in LOCKED_TESTING_SOURCES if (root / relative).is_file()
+    )
     canvas = root / "Trigger Discipline.canvas"
     if canvas.is_file():
         paths.append(canvas)
@@ -123,7 +308,10 @@ def immutable_sources(root: Path | None = None) -> Iterator[dict[str, str]]:
     finally:
         after = protected_fingerprint(root)
         if before != after:
-            changed = sorted(set(before) ^ set(after) | {key for key in before.keys() & after.keys() if before[key] != after[key]})
+            changed = sorted(
+                set(before) ^ set(after)
+                | {key for key in before.keys() & after.keys() if before[key] != after[key]}
+            )
             raise RuntimeError(f"canonical/locked source mutation detected: {', '.join(changed)}")
 
 
@@ -138,15 +326,19 @@ def implementation_sources(root: Path | None = None) -> list[dict[str, str]]:
             "path": path,
             "encoded_source_commit": ENCODED_SOURCE_COMMIT,
             "current_sha256": _source_sha256_bytes((root / path).read_bytes()),
+            "file_sha256": _sha256(root / path),
             "mechanic_modules": sorted(modules),
-            "implementation_coverage_status": "IMPLEMENTED" if "specialties" not in modules else "NODE_LEVEL_IN_COVERAGE_REPORT",
+            "implementation_coverage_status": "IMPLEMENTED"
+            if "specialties" not in modules
+            else "NODE_LEVEL_IN_COVERAGE_REPORT",
         }
         for path, modules in sorted(path_to_modules.items())
     ]
 
 
 def current_commit(root: Path | None = None) -> str:
-    root = repo_root(root)
+    # The lab and its private notes can have different repository histories.
+    root = root.resolve() if root is not None else Path(__file__).resolve().parents[1]
     try:
         return subprocess.run(
             ["git", "rev-parse", "HEAD"], cwd=root, check=True, capture_output=True, text=True
@@ -159,29 +351,24 @@ def source_drift(root: Path | None = None) -> list[dict[str, str]]:
     root = repo_root(root)
     findings: list[dict[str, str]] = []
     sources = implementation_sources(root)
-    relative_paths = [str(item["path"]) for item in sources]
-    try:
-        archive = subprocess.run(
-            ["git", "archive", "--format=tar", ENCODED_SOURCE_COMMIT, "--", *relative_paths],
-            cwd=root,
-            check=True,
-            capture_output=True,
-        ).stdout
-        with tarfile.open(fileobj=io.BytesIO(archive), mode="r:") as handle:
-            encoded_hashes = {
-                member.name.replace("\\", "/"): _source_sha256_bytes(extracted.read())
-                for member in handle.getmembers()
-                if member.isfile() and (extracted := handle.extractfile(member)) is not None
-            }
-    except (OSError, subprocess.CalledProcessError, tarfile.TarError):
-        encoded_hashes = {}
+    # The admitted compiler snapshot records the exact private input identities;
+    # a historical Git revision from the old standalone lab is not the runtime basis.
+    encoded_hashes = {
+        row["path"]: row["sha256"] for row in retained_inputs()["source_index"]["entries"]
+    }
     for item in sources:
         relative = item["path"]
         expected_hash = encoded_hashes.get(str(relative))
         if expected_hash is None:
-            findings.append({"path": relative, "status": "SOURCE_IDENTITY_UNAVAILABLE", "encoded_source_commit": ENCODED_SOURCE_COMMIT})
+            findings.append(
+                {
+                    "path": relative,
+                    "status": "SOURCE_IDENTITY_UNAVAILABLE",
+                    "encoded_source_commit": ENCODED_SOURCE_COMMIT,
+                }
+            )
             continue
-        if expected_hash != item["current_sha256"]:
+        if expected_hash not in {item["current_sha256"], item["file_sha256"]}:
             findings.append(
                 {
                     "path": relative,
@@ -196,7 +383,12 @@ def source_drift(root: Path | None = None) -> list[dict[str, str]]:
 
 def provenance_record(parameter_hash: str, root: Path | None = None) -> dict[str, object]:
     return {
-        "repository_commit": current_commit(root),
+        "repository_commit": current_commit(),
+        "execution_source_hash": execution_source_hash(),
+        "canonical_repository_commit": current_commit(repo_root(root)),
+        "suite_modules": {
+            path.name: _sha256(path) for path in sorted(Path(__file__).parent.glob("*.py"))
+        },
         "encoded_source_commit": ENCODED_SOURCE_COMMIT,
         "suite_version": "0.1.0",
         "parameter_set_hash": parameter_hash,

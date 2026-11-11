@@ -9,7 +9,7 @@ from pathlib import Path
 import re
 from typing import Any
 
-from .fixtures import CLASS_SPECIALTIES, LEVELS, map_contracts
+from .fixtures import CLASS_SPECIALTIES, LEVELS, map_contracts, reference_overwatch_policy
 from .model import CoverageState
 from .parameters import ParameterSet
 from .provenance import ENCODED_SOURCE_COMMIT, repo_root
@@ -3954,6 +3954,9 @@ def _specialty_objective_spec(
         specialty_nodes_a=tuple(specialty_nodes_a),
         initial_magazine_rounds_a=tuple(initial_magazine_rounds_a),
         objective_fixture_id=objective_fixture_id,
+        overwatch_policy=reference_overwatch_policy(
+            tuple(classes_a), base.classes_b, tuple(policies_a), base.policies_b,
+        ),
     )
 
 
