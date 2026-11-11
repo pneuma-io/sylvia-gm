@@ -8,7 +8,9 @@ from importlib.resources import files
 from pathlib import Path
 
 import pytest
+import yaml
 
+from sylvia_gm import dice
 from sylvia_gm.agent._provider_session import (
     ProviderSessionAdapter,
     _derive_mechanics_parameters,
@@ -43,6 +45,92 @@ from tests.test_fc_campaign_journey import _start_campaign
 from tests.test_srd_action_budget import _state
 
 SRD = "sylvia.srd-lite.bg3"
+
+
+@pytest.fixture(scope="module")
+def recipient_preflight_contract():
+    runtime = yaml.load(
+        (Path(__file__).resolve().parents[1] / "rulesets/srd-lite/runtime/ruleset.yaml")
+        .read_bytes(),
+        Loader=yaml.CSafeLoader,
+    )
+    return runtime
+
+
+@pytest.mark.parametrize(
+    "tool_name", ("begin_srd_spell_action", "cast_spell_outside_combat")
+)
+@pytest.mark.parametrize(
+    "spell,targets,accepted",
+    (
+        ("sunburst", None, True),
+        ("fire_storm", [], True),
+        ("bless", None, False),
+        ("bless", [], False),
+        ("bless", ["hero"], True),
+        ("mass_cure_wounds", None, False),
+        ("fireball", None, False),
+        ("fireball", ["hero"], True),
+    ),
+)
+def test_recipient_preflight_preserves_engine_and_caller_ownership(
+    recipient_preflight_contract, tool_name, spell, targets, accepted
+):
+    runtime = recipient_preflight_contract
+    checks = [
+        check
+        for check in runtime["tools"][tool_name]["pre_conditions"]
+        if check["error"].startswith("Missing input 'targets'.")
+    ]
+    assert len(checks) == 1
+    gate = ToolDef(
+        name="recipient-preflight",
+        pre_conditions=checks,
+        effects=[{"set": {"field": "_admitted", "value": True}}],
+    )
+    result = execute_tool(
+        gate.name,
+        {"spell": spell, "targets": targets},
+        {gate.name: gate},
+        None,
+        {},
+        runtime["definitions"],
+    )
+    assert result.success is accepted
+    if accepted:
+        assert result.context["_admitted"] is True
+    else:
+        assert result.failure_reasons == (
+            "Missing input 'targets'. Select the actual recipients for this spell.",
+        )
+        assert "_admitted" not in result.context
+
+
+def test_staged_caller_selected_recipients_still_refuse_before_spending(tmp_path, monkeypatch):
+    archive = tmp_path / "current-lite.sylvia-gm-package"
+    archive.write_bytes(bundled_srd_archive())
+    monkeypatch.setenv("SRD_LITE_CANDIDATE", str(archive))
+    from tests import test_srd_lite_foundation as support
+
+    monkeypatch.setattr(support, "ARCHIVE", archive)
+    case = support.Case(tmp_path / "manual-targets.sqlite3", "bless", casting_source="cleric")
+    try:
+        case.start()
+        samples = []
+        randint = dice._rng.randint
+
+        def observed_sample(*args, **kwargs):
+            samples.append((args, kwargs))
+            return randint(*args, **kwargs)
+
+        # An action reseeds normally; refusal must not sample that generator.
+        monkeypatch.setattr(dice._rng, "randint", observed_sample)
+        case.reject("begin_srd_spell_action", case.parameters, match="Missing input 'targets'")
+        assert samples == []
+        assert case.entities()["hero"]["resources"]["spell_slot_1"] == 3
+        assert case.snapshot().state[case.record["id"] + ".combat"]["action_available"]
+    finally:
+        case.close()
 
 
 def test_all_top_level_refusals_are_reported_before_effects():
