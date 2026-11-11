@@ -6016,6 +6016,186 @@
         "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Guildmaster Vance from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin, eyes, hair, clothing, equipment, colors and wear. Appearance: An adult settled Human man appearing in his early sixties, with a stocky well-fed build, light olive skin, dark brown eyes, a broad lined clean-shaven face and short sleek black hair graying at the temples and combed neatly back. A smooth, calculating, courteous expression with a restrained half-smile and assured upright posture. A finely made dark bottle-green wool frock coat with plain bronze buttons, over a muted ochre waistcoat and cream high-collared shirt, blue-gray tailored trousers and polished dark brown leather shoes. A simple dark leather belt supports one small closed pouch. Empty relaxed hands. His polished experienced merchant's bearing follows the authored profile; age, physical features and exact clothing are editable visual defaults. No council regalia, elected-office badge, noble heraldry, invented guild emblem, crown, contract, map, ledger, tariff scheme, magical effects, threatening villain pose or disclosure of private negotiations. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views; entire hair, hands, footwear and equipment within all margins. The same single character repeated as turnaround views. Keep bags, pouches, braid, clothing fastenings and hair details on the same anatomical sides through the turn. Change viewing angle only, keeping costume and identity. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, extra characters or revealed secrets.",
         "portrait": "Use case: identity-preserve. Production square app portrait for Guildmaster Vance from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, skin, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, border, caption, text, UI, scenery, new costume, magical effects, invented crest, animal or extra person. One 1024x1024 PNG."
       }
+    },
+    {
+      "id": "severed-npc-nexus-innkeep",
+      "name": "Palla",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/nexus-innkeep.md",
+          "sha256": "66071539fb68ef44bbd1535ceda9912aed1b5553a9845e61b8b9c014f84269ba",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/nexus-innkeep.md",
+          "sha256": "fb8b3fa6f59614653e2b1bb5a1d2a42b7df9d29aafe7ff120035772a1bd23c73",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult settled Human woman appearing in her early fifties, with a sturdy full working build, warm medium-tan skin, dark brown eyes, a round gently lined face and dark brown hair with one broad silver streak secured in a practical low knot. A warm, shrewd, quietly authoritative expression with a small knowing smile, balanced confident posture. A faded sky-blue linen blouse with sleeves rolled to the elbows, a plain ochre-brown ankle-length wool skirt and a clean cream linen apron, with practical dark brown leather shoes. A simple leather belt carries one small closed pouch; empty relaxed hands. Her welcoming but firm innkeeper's bearing follows the authored profile; age, physical features and clothing are editable visual defaults. No invented Anchor Church affiliation or insignia, revealed lost property, Warden fragments, forbidden journal, readable document, keys to the private cabinet, magical effects, crown, servant livery or invented history.",
+        "full_body": {
+          "path": "assets/characters/c3974e4a63a3f05acdf649f1af5d0325e34885598ca673f777f7e408803c98eb.png",
+          "sha256": "c3974e4a63a3f05acdf649f1af5d0325e34885598ca673f777f7e408803c98eb"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/201ce648a58d6293cee2af017ad03ba55063514cc7e366cbb3fbd88964675f6c.png",
+          "sha256": "201ce648a58d6293cee2af017ad03ba55063514cc7e366cbb3fbd88964675f6c"
+        },
+        "portrait": {
+          "path": "assets/characters/feffb64a8f1314697f6896785d94cb942b80e30a33af013f8772af9dde9995dd.png",
+          "sha256": "feffb64a8f1314697f6896785d94cb942b80e30a33af013f8772af9dde9995dd"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2029583
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2530885
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2700610
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Palla in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person in a near-front three-quarter standing pose. Whole hair, both hands, clothing, footwear and equipment comfortably inside all margins. Appearance: An adult settled Human woman appearing in her early fifties, with a sturdy full working build, warm medium-tan skin, dark brown eyes, a round gently lined face and dark brown hair with one broad silver streak secured in a practical low knot. A warm, shrewd, quietly authoritative expression with a small knowing smile, balanced confident posture. A faded sky-blue linen blouse with sleeves rolled to the elbows, a plain ochre-brown ankle-length wool skirt and a clean cream linen apron, with practical dark brown leather shoes. A simple leather belt carries one small closed pouch; empty relaxed hands. Her welcoming but firm innkeeper's bearing follows the authored profile; age, physical features and clothing are editable visual defaults. No invented Anchor Church affiliation or insignia, revealed lost property, Warden fragments, forbidden journal, readable document, keys to the private cabinet, magical effects, crown, servant livery or invented history. Preserve authored identity, species, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Palla from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin, eyes, hair, clothing, equipment, colors and wear. Appearance: An adult settled Human woman appearing in her early fifties, with a sturdy full working build, warm medium-tan skin, dark brown eyes, a round gently lined face and dark brown hair with one broad silver streak secured in a practical low knot. A warm, shrewd, quietly authoritative expression with a small knowing smile, balanced confident posture. A faded sky-blue linen blouse with sleeves rolled to the elbows, a plain ochre-brown ankle-length wool skirt and a clean cream linen apron, with practical dark brown leather shoes. A simple leather belt carries one small closed pouch; empty relaxed hands. Her welcoming but firm innkeeper's bearing follows the authored profile; age, physical features and clothing are editable visual defaults. No invented Anchor Church affiliation or insignia, revealed lost property, Warden fragments, forbidden journal, readable document, keys to the private cabinet, magical effects, crown, servant livery or invented history. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views; entire hair, hands, footwear and equipment within all margins. The same single character repeated as turnaround views. Keep bags, pouches, apron ties, clothing fastenings and hair details on the same anatomical sides through the turn. Change viewing angle only, keeping costume and identity. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, extra characters or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Palla from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, skin, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, border, caption, text, UI, scenery, new costume, magical effects, invented crest, animal or extra person. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-orin-thatch",
+      "name": "Orin Thatch",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/orin-thatch.md",
+          "sha256": "91fea1511f986fe4052c808bea9b0024c65e7d9ec8b15b1522fa48ae3c9cbf32",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/orin-thatch.md",
+          "sha256": "91e36d8fc9c9e72c5bca5c3643b521d8f247d3b9f65467f3bb1fd80c9ffb0250",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult settled Human man appearing in his early sixties, with a lean broad-shouldered working build, sun-weathered medium-brown skin, deep-set brown eyes, thinning short black-and-gray curls and heavy short gray stubble. A gruff honest measuring expression, slightly tired eyes and grounded competent posture. A worn reddish-brown canvas travel coat with plain leather shoulder patches over a faded olive waistcoat and gray linen shirt, charcoal work trousers and dusty sturdy brown leather calf boots. A closed plain canvas travel satchel hangs at his anatomical LEFT hip from a strap over his RIGHT shoulder; a small closed leather repair pouch sits at his opposite hip. Empty relaxed hands. His experienced route merchant's bearing follows the authored profile; age, physical features and exact clothes are editable visual defaults. He is an ordinary Human Route Warden, with no ancient Warden armor, metal body, glowing runes, invented guild crest, noble regalia, election badge, revealed private preference, readable route map, wagon, weapon, invented scars or invented family history.",
+        "full_body": {
+          "path": "assets/characters/0298dfe80cc6aaaeb55469d254811b74604aad6088e5d477a2be64c531f7cb33.png",
+          "sha256": "0298dfe80cc6aaaeb55469d254811b74604aad6088e5d477a2be64c531f7cb33"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/465abdba624dd4f43bde011686b0678f0e40246056008271bd2b56341fc25f18.png",
+          "sha256": "465abdba624dd4f43bde011686b0678f0e40246056008271bd2b56341fc25f18"
+        },
+        "portrait": {
+          "path": "assets/characters/910d57352819de179fa23eeee3144f326e626c0a83cd0332237267b0953a5a4f.png",
+          "sha256": "910d57352819de179fa23eeee3144f326e626c0a83cd0332237267b0953a5a4f"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2128350
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2488359
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2692183
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Orin Thatch in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person in a near-front three-quarter standing pose. Whole hair, both hands, clothing, footwear and equipment comfortably inside all margins. Appearance: An adult settled Human man appearing in his early sixties, with a lean broad-shouldered working build, sun-weathered medium-brown skin, deep-set brown eyes, thinning short black-and-gray curls and heavy short gray stubble. A gruff honest measuring expression, slightly tired eyes and grounded competent posture. A worn reddish-brown canvas travel coat with plain leather shoulder patches over a faded olive waistcoat and gray linen shirt, charcoal work trousers and dusty sturdy brown leather calf boots. A closed plain canvas travel satchel hangs at his anatomical LEFT hip from a strap over his RIGHT shoulder; a small closed leather repair pouch sits at his opposite hip. Empty relaxed hands. His experienced route merchant's bearing follows the authored profile; age, physical features and exact clothes are editable visual defaults. He is an ordinary Human Route Warden, with no ancient Warden armor, metal body, glowing runes, invented guild crest, noble regalia, election badge, revealed private preference, readable route map, wagon, weapon, invented scars or invented family history. Preserve authored identity, species, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Orin Thatch from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin, eyes, hair, clothing, equipment, colors and wear. Appearance: An adult settled Human man appearing in his early sixties, with a lean broad-shouldered working build, sun-weathered medium-brown skin, deep-set brown eyes, thinning short black-and-gray curls and heavy short gray stubble. A gruff honest measuring expression, slightly tired eyes and grounded competent posture. A worn reddish-brown canvas travel coat with plain leather shoulder patches over a faded olive waistcoat and gray linen shirt, charcoal work trousers and dusty sturdy brown leather calf boots. A closed plain canvas travel satchel hangs at his anatomical LEFT hip from a strap over his RIGHT shoulder; a small closed leather repair pouch sits at his opposite hip. Empty relaxed hands. His experienced route merchant's bearing follows the authored profile; age, physical features and exact clothes are editable visual defaults. He is an ordinary Human Route Warden, with no ancient Warden armor, metal body, glowing runes, invented guild crest, noble regalia, election badge, revealed private preference, readable route map, wagon, weapon, invented scars or invented family history. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views; entire hair, hands, footwear and equipment within all margins. The same single character repeated as turnaround views. Keep bags, pouches, apron ties, clothing fastenings and hair details on the same anatomical sides through the turn. The travel satchel stays on anatomical LEFT with its strap over RIGHT shoulder and the repair pouch at the opposite hip. Change viewing angle only, keeping costume and identity. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, extra characters or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Orin Thatch from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, skin, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, border, caption, text, UI, scenery, new costume, magical effects, invented crest, animal or extra person. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-quarter-merchant-rook",
+      "name": "Rook",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/quarter-merchant-rook.md",
+          "sha256": "a2fe033f213ae907af0a1dabdeb3126a2b5b55a47e7ef5e12542206abfc95b5a",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/quarter-merchant-rook.md",
+          "sha256": "12f484edb072658e3e452f244f3d488c8c24e944727514e0650a2058fed7bfd9",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A humanlike adult Riftborn man appearing in his early forties, with a slender medium-height build, warm light brown skin, hazel-brown eyes, a long softly lined clean-shaven face and wavy black hair reaching just below the ears, neatly tucked back. An open, resourceful, friendly expression and relaxed welcoming posture. A soft ochre knee-length sleeveless wool merchant's coat over a pale gray-cream linen shirt with rolled sleeves, dark blue loose work trousers and practical brown leather ankle boots. A plain braided cord belt carries one small closed leather pouch; both hands relaxed and empty. His generous approachable neighborhood-merchant bearing follows the authored profile; age, physical features and clothing are editable visual defaults. His home world remains unknown. No bird anatomy, rook or raven, invented noble crest or faction insignia, foreign-world uniform, visible magical Anchor Charm, glowing salve, supernatural effects, weapon, stall goods, readable trade guide, invented origin or revealed past.",
+        "full_body": {
+          "path": "assets/characters/9d29266fc512018d9f8dde6ea680f4be9b7d9e24fb2b5fe1cc5c622aa5c1a5ed.png",
+          "sha256": "9d29266fc512018d9f8dde6ea680f4be9b7d9e24fb2b5fe1cc5c622aa5c1a5ed"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/4ae0304e191ee03c7154c3a6954da882e76b51200d77df0033fcfb17cf5585d6.png",
+          "sha256": "4ae0304e191ee03c7154c3a6954da882e76b51200d77df0033fcfb17cf5585d6"
+        },
+        "portrait": {
+          "path": "assets/characters/409483a1e37375bb62183cd5e167d2fa3e9d20aa1ecc2046b02010589ef70cb7.png",
+          "sha256": "409483a1e37375bb62183cd5e167d2fa3e9d20aa1ecc2046b02010589ef70cb7"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2036791
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2414614
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2488371
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Rook in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person in a near-front three-quarter standing pose. Whole hair, both hands, clothing, footwear and equipment comfortably inside all margins. Appearance: A humanlike adult Riftborn man appearing in his early forties, with a slender medium-height build, warm light brown skin, hazel-brown eyes, a long softly lined clean-shaven face and wavy black hair reaching just below the ears, neatly tucked back. An open, resourceful, friendly expression and relaxed welcoming posture. A soft ochre knee-length sleeveless wool merchant's coat over a pale gray-cream linen shirt with rolled sleeves, dark blue loose work trousers and practical brown leather ankle boots. A plain braided cord belt carries one small closed leather pouch; both hands relaxed and empty. His generous approachable neighborhood-merchant bearing follows the authored profile; age, physical features and clothing are editable visual defaults. His home world remains unknown. No bird anatomy, rook or raven, invented noble crest or faction insignia, foreign-world uniform, visible magical Anchor Charm, glowing salve, supernatural effects, weapon, stall goods, readable trade guide, invented origin or revealed past. Preserve authored identity, species, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Rook from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin, eyes, hair, clothing, equipment, colors and wear. Appearance: A humanlike adult Riftborn man appearing in his early forties, with a slender medium-height build, warm light brown skin, hazel-brown eyes, a long softly lined clean-shaven face and wavy black hair reaching just below the ears, neatly tucked back. An open, resourceful, friendly expression and relaxed welcoming posture. A soft ochre knee-length sleeveless wool merchant's coat over a pale gray-cream linen shirt with rolled sleeves, dark blue loose work trousers and practical brown leather ankle boots. A plain braided cord belt carries one small closed leather pouch; both hands relaxed and empty. His generous approachable neighborhood-merchant bearing follows the authored profile; age, physical features and clothing are editable visual defaults. His home world remains unknown. No bird anatomy, rook or raven, invented noble crest or faction insignia, foreign-world uniform, visible magical Anchor Charm, glowing salve, supernatural effects, weapon, stall goods, readable trade guide, invented origin or revealed past. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views; entire hair, hands, footwear and equipment within all margins. The same single character repeated as turnaround views. Keep bags, pouches, apron ties, clothing fastenings and hair details on the same anatomical sides through the turn. Change viewing angle only, keeping costume and identity. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, extra characters or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Rook from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, skin, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, border, caption, text, UI, scenery, new costume, magical effects, invented crest, animal or extra person. One 1024x1024 PNG."
+      }
     }
   ]
 }
