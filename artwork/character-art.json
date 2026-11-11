@@ -7102,6 +7102,186 @@
         "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for War-Captain Vex from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, body proportions, skin, eyes, hairstyle, clothing, equipment, colors and material wear. Appearance: A humanlike adult female Riftborn aerial war-captain appearing in her early forties, with a lean athletic frame, warm dark copper skin, slate-gray eyes, high cheekbones, a firm angular jaw and dark auburn hair gathered into a short tight plain braid. Silent observant self-assured expression with mouth closed, still balanced upright posture and empty relaxed hands. A fitted charcoal leather-and-mail protective jacket with a plain high cloth collar, simple worn brown leather riding-harness straps over the jacket, fingerless dark leather gloves, muted slate trousers and practical dark brown leather riding boots. One ordinary short curved saber stays fully sheathed at her anatomical LEFT hip; one small closed plain pouch is secured at her anatomical RIGHT hip. Her disciplined silent aerial-commander bearing follows the authored profile; apparent age, physical features, clothing, equipment and weapon design are editable visual defaults. No invented throat injury or scar, bandage, gag, muzzle, sewn lips, speaking pose, open mouth, wings, feathers, bird anatomy, Silent Wing insignia, crown, readable orders, glowing eyes, Warden weapon or structure, magic aura, mount, extra creature, scenery or revealed discovery. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at far right. Consistent scale across body views; whole head, hands, footwear and equipment within all margins. The same single character repeated as turnaround views. Change viewing angle only, keeping costume and identity. Keep the fully SHEATHED short curved saber at anatomical LEFT hip and closed pouch at anatomical RIGHT hip through the turn. Preserve her short auburn braid, riding harness, fingerless gloves and silent closed-mouth expression; no invented throat wound or gag. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, additional characters or revealed secrets.",
         "portrait": "Use case: identity-preserve. Production square app portrait for War-Captain Vex from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, skin, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a CLOSE HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Preserve her exact high-cheeked angular face, slate-gray eyes, dark auburn braid, high cloth collar, harness and silent self-assured CLOSED-mouth expression. No throat wound, bandage, gag or speaking pose. Polished naturalistic digital RPG illustration with tactile skin, fabric, leather and worn metal where applicable, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, weapon, notebook, bag, full torso, painted circle, cutout, vignette, faded image edge, border, caption, text, UI, scenery, new costume, invented crest, animal or extra person. One 1024x1024 PNG."
       }
+    },
+    {
+      "id": "severed-monster-anchor-trap",
+      "name": "Anchor Trap",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/anchor-trap.md",
+          "sha256": "419a73155a8dc672501e71070626e17cadb0fd7220232ee2761a54b7860c8523",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/anchor-trap.md",
+          "sha256": "7343d517a45add9543e8bcd201d09c3de74d2e038adc2e1e26bd2d67739c5e2a",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An ACTIVATED Large non-humanoid Warden defensive construct made of interlocking stone rings and rune-plates. Several thick worn pale-gray stone hoops interlock around a hollow central space, with broad irregular dark-gray stone plates attached along the hoops, the articulated pieces arranged as an open enclosing mechanism. Restrained shallow abstract geometric rune-like carvings on the plates, no legible script. Heavy ancient masonry, chipped stone edges and subtle cool mineral accents, a single self-contained mechanism resting lightly on its lowest ring. No person is inside it. Its stone ring-and-plate construction and enclosing purpose follow the authored Setting lore; exact ring/plate count, geometry, material colors and carving pattern are editable visual defaults. This reference depicts its activated stone mechanism only and does not define its dormant disguise. No humanoid torso, head, face, eyes, arms, hands, feet, teeth, cloth body, creature occupant, prison victim, blood, readable rune, real-world religious symbol, invented Warden badge, beams, portal, Door, room, scenery or UI.",
+        "full_body": {
+          "path": "assets/characters/285aad677a3c2cfbfd87bdda5d20d43896d95d6a781cac40b5eeac8b175b6519.png",
+          "sha256": "285aad677a3c2cfbfd87bdda5d20d43896d95d6a781cac40b5eeac8b175b6519"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/de59286a26d0b1cebe728a4b92b114b778b539483c5c0407e0f0f344f161e674.png",
+          "sha256": "de59286a26d0b1cebe728a4b92b114b778b539483c5c0407e0f0f344f161e674"
+        },
+        "portrait": {
+          "path": "assets/characters/59c32a44636a8fa23fb9acc7199927f7cc819ef91764fb3fb72fe12882df0985.png",
+          "sha256": "59c32a44636a8fa23fb9acc7199927f7cc819ef91764fb3fb72fe12882df0985"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2411920
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2273678
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2395831
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body enemy reference for Anchor Trap in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, tactile materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. One complete non-humanoid stone mechanism in a near-front three-quarter view, with all rings and plates comfortably inside every margin. Appearance: An ACTIVATED Large non-humanoid Warden defensive construct made of interlocking stone rings and rune-plates. Several thick worn pale-gray stone hoops interlock around a hollow central space, with broad irregular dark-gray stone plates attached along the hoops, the articulated pieces arranged as an open enclosing mechanism. Restrained shallow abstract geometric rune-like carvings on the plates, no legible script. Heavy ancient masonry, chipped stone edges and subtle cool mineral accents, a single self-contained mechanism resting lightly on its lowest ring. No person is inside it. Its stone ring-and-plate construction and enclosing purpose follow the authored Setting lore; exact ring/plate count, geometry, material colors and carving pattern are editable visual defaults. This reference depicts its activated stone mechanism only and does not define its dormant disguise. No humanoid torso, head, face, eyes, arms, hands, feet, teeth, cloth body, creature occupant, prison victim, blood, readable rune, real-world religious symbol, invented Warden badge, beams, portal, Door, room, scenery or UI. Preserve the authored Setting appearance and required anatomy. No extra beings, animals, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview enemy reference sheet for Anchor Trap from Severed Lands. Input image 1 is the canonical complete reference. Preserve this exact anatomy or mechanism, proportions, materials, colors, distinctive details and equipment. Appearance: An ACTIVATED Large non-humanoid Warden defensive construct made of interlocking stone rings and rune-plates. Several thick worn pale-gray stone hoops interlock around a hollow central space, with broad irregular dark-gray stone plates attached along the hoops, the articulated pieces arranged as an open enclosing mechanism. Restrained shallow abstract geometric rune-like carvings on the plates, no legible script. Heavy ancient masonry, chipped stone edges and subtle cool mineral accents, a single self-contained mechanism resting lightly on its lowest ring. No person is inside it. Its stone ring-and-plate construction and enclosing purpose follow the authored Setting lore; exact ring/plate count, geometry, material colors and carving pattern are editable visual defaults. This reference depicts its activated stone mechanism only and does not define its dormant disguise. No humanoid torso, head, face, eyes, arms, hands, feet, teeth, cloth body, creature occupant, prison victim, blood, readable rune, real-world religious symbol, invented Warden badge, beams, portal, Door, room, scenery or UI. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete views, FRONT, SIDE PROFILE and BACK, plus one smaller close detail at far right. Consistent scale across the three complete views, with every part comfortably within margins. The same single subject repeated as turnaround views. Change viewing angle only. The subject is a FACELESS NON-HUMANOID STONE MECHANISM. Preserve the same ring count, hoop intersections, rune-plate placements, stone chips and material accents across all three views. Detail view shows a matching rune-plate and ring joint, not a face. Keep the hollow center empty and all hoops and plates within each view's margins. No person, head, eyes, limbs or victim. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, additional subjects or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait/token image for Anchor Trap from Severed Lands. Input image 1 is the canonical complete reference; input image 2 is its matching multiview sheet. Preserve this exact subject, materials, colors and distinctive features. Change framing only. FACELESS NON-HUMANOID MECHANISM: show the same whole activated interlocking stone ring-and-plate mechanism centered in a square, its full outline occupying about 85 percent of the frame with comfortable space on every side. Preserve the same ring count, hoop intersections, plate geometry, carvings and material wear. Hollow center empty. No invented face, eyes, head, limbs, person or captive. Polished naturalistic digital RPG illustration, tactile materials, plain light neutral gray background and soft natural studio light matching references. Continuous full-bleed square background to all edges. No painted circle, cutout, vignette, faded image edge, border, caption, text, UI, scenery, new costume or geometry, invented crest, animal or extra subject. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-monster-broken-one",
+      "name": "Broken One",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/broken-one.md",
+          "sha256": "55742da711978c188ff76c87ca3d2e517b9ca4f1972681cb92c6f7c1799954bb",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/broken-one.md",
+          "sha256": "ec04c68d93d777f4f1eaeb073df5794c95e8c5a19ed4595a39dbb327bf5ced12",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A single adult humanlike Broken One with a medium-sized strong frame, weathered muted brown skin, dull gray eyes, a gaunt clean-shaven face and untidy short dark hair. Their body is fractured by the Veil into subtly overlapping contradictory pieces: small offset translucent contour fragments along the cheek, shoulders and forearms, while retaining one legible face, one torso, exactly two arms and two legs. A distracted strained expression and tense unbalanced but standing posture. Ragged plain brown hide armor over a dark cloth tunic, worn charcoal trousers and rough brown leather boots. Their anatomical RIGHT hand holds one ordinary worn greataxe low beside the body with its full head and handle visible; one plain javelin is secured diagonally across their back with its point safely visible above the anatomical LEFT shoulder. Their fractured humanoid appearance follows the authored Setting lore, while hide armor, greataxe and javelin follow the source equipment. Age styling, features, clothing details and exact fracture pattern are editable visual defaults. No extra complete person, duplicate head, additional complete limbs, exposed organs, dismemberment, gore, open wounds, orc tusks, invented stone anatomy, glowing eyes, identity from an old world, readable text, insignia, scenery or captive.",
+        "full_body": {
+          "path": "assets/characters/0a723bc3180ec8d98f65d3a188ee3d360cbea1a443a1c844ffc1c410f93b66a4.png",
+          "sha256": "0a723bc3180ec8d98f65d3a188ee3d360cbea1a443a1c844ffc1c410f93b66a4"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/72cf2b5cef6f182b8fff8d3b3b95235071bb338d9ba95c59c2df3b48127f5108.png",
+          "sha256": "72cf2b5cef6f182b8fff8d3b3b95235071bb338d9ba95c59c2df3b48127f5108"
+        },
+        "portrait": {
+          "path": "assets/characters/13501ab03ef8ce0004c31ef850cca44dd4ea3a86377a989c405f1011649b3cfe.png",
+          "sha256": "13501ab03ef8ce0004c31ef850cca44dd4ea3a86377a989c405f1011649b3cfe"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2072512
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2393359
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2534600
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body enemy reference for Broken One in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, tactile materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult humanoid in a near-front three-quarter standing pose, whole head, both hands, feet and equipment comfortably inside every margin. Appearance: A single adult humanlike Broken One with a medium-sized strong frame, weathered muted brown skin, dull gray eyes, a gaunt clean-shaven face and untidy short dark hair. Their body is fractured by the Veil into subtly overlapping contradictory pieces: small offset translucent contour fragments along the cheek, shoulders and forearms, while retaining one legible face, one torso, exactly two arms and two legs. A distracted strained expression and tense unbalanced but standing posture. Ragged plain brown hide armor over a dark cloth tunic, worn charcoal trousers and rough brown leather boots. Their anatomical RIGHT hand holds one ordinary worn greataxe low beside the body with its full head and handle visible; one plain javelin is secured diagonally across their back with its point safely visible above the anatomical LEFT shoulder. Their fractured humanoid appearance follows the authored Setting lore, while hide armor, greataxe and javelin follow the source equipment. Age styling, features, clothing details and exact fracture pattern are editable visual defaults. No extra complete person, duplicate head, additional complete limbs, exposed organs, dismemberment, gore, open wounds, orc tusks, invented stone anatomy, glowing eyes, identity from an old world, readable text, insignia, scenery or captive. Preserve the authored Setting appearance and required anatomy. No extra beings, animals, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview enemy reference sheet for Broken One from Severed Lands. Input image 1 is the canonical complete reference. Preserve this exact anatomy or mechanism, proportions, materials, colors, distinctive details and equipment. Appearance: A single adult humanlike Broken One with a medium-sized strong frame, weathered muted brown skin, dull gray eyes, a gaunt clean-shaven face and untidy short dark hair. Their body is fractured by the Veil into subtly overlapping contradictory pieces: small offset translucent contour fragments along the cheek, shoulders and forearms, while retaining one legible face, one torso, exactly two arms and two legs. A distracted strained expression and tense unbalanced but standing posture. Ragged plain brown hide armor over a dark cloth tunic, worn charcoal trousers and rough brown leather boots. Their anatomical RIGHT hand holds one ordinary worn greataxe low beside the body with its full head and handle visible; one plain javelin is secured diagonally across their back with its point safely visible above the anatomical LEFT shoulder. Their fractured humanoid appearance follows the authored Setting lore, while hide armor, greataxe and javelin follow the source equipment. Age styling, features, clothing details and exact fracture pattern are editable visual defaults. No extra complete person, duplicate head, additional complete limbs, exposed organs, dismemberment, gore, open wounds, orc tusks, invented stone anatomy, glowing eyes, identity from an old world, readable text, insignia, scenery or captive. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete views, FRONT, SIDE PROFILE and BACK, plus one smaller close detail at far right. Consistent scale across the three complete views, with every part comfortably within margins. The same single subject repeated as turnaround views. Change viewing angle only. Preserve one adult face, one torso, exactly two arms/two legs and the subtle same-body offset fracture fragments. Keep the greataxe held in anatomical RIGHT hand, javelin secured across back with point above LEFT shoulder, and the same hide armor. No extra complete limbs, duplicate head, gore or exposed organs. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, additional subjects or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait/token image for Broken One from Severed Lands. Input image 1 is the canonical complete reference; input image 2 is its matching multiview sheet. Preserve this exact subject, materials, colors and distinctive features. Change framing only. CLOSE HEAD AND UPPER SHOULDERS, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for RPG dialogue portraits. Preserve the same gaunt adult face, gray eyes, untidy dark hair, strained distracted expression and subtle offset same-body fracture fragments on cheek and shoulder. No new complete face, duplicate head, gore or wounds. No hands, waist, weapon, javelin or full torso. Polished naturalistic digital RPG illustration, tactile materials, plain light neutral gray background and soft natural studio light matching references. Continuous full-bleed square background to all edges. No painted circle, cutout, vignette, faded image edge, border, caption, text, UI, scenery, new costume or geometry, invented crest, animal or extra subject. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-monster-cave-hollowed",
+      "name": "Cave Hollowed",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/cave-hollowed.md",
+          "sha256": "4d67547eb7f5e9c593bd83eaa26842573eb52a9618a67c70899412d83fd70d33",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/cave-hollowed.md",
+          "sha256": "2daad4cd002dc3ef05bb79b01a92755d712ac16a284083270e099c6e4143e682",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A single adult humanlike Cave Hollowed of medium size with a strong lean climbing build, gaunt angular face, pale sightless clouded eye orbs with no colored irises, sparse short white hair and gray-ashen translucent flesh. Subdued violet Veil-light is visible as a branching vein network under the translucent skin of the face, neck, arms and shins, without exposed organs or gore. Thickened skin at shoulders and forearms, two muscular arms, five long claw-tipped digits per hand, two legs and broad bare clawed feet. A closed-mouth intent expression with head slightly angled as if sensing, shoulders held forward and a low balanced standing stance. A ragged plain slate-gray sleeveless cloth tunic covers chest and hips, with worn dark cloth waist and thigh wraps; limbs remain visible. Their pale sightless eyes, translucent flesh and visible Veil-lit veins follow the authored profile, with claws following its attacks. Detailed anatomy, features, vein pattern and clothing are editable visual defaults. No violet irises, normal seeing eyes, extra eyes, animal fur, quaggoth or ape head, huge fangs, crystal or glass statue, skeleton, fresh wounds, organs, gore, extra limbs, weapon, jewelry, insignia, victim, cave scenery or readable text.",
+        "full_body": {
+          "path": "assets/characters/2356df30e5c6d83c55874962ab81ca93b5f4eebaf90090ee8da010102417b1ef.png",
+          "sha256": "2356df30e5c6d83c55874962ab81ca93b5f4eebaf90090ee8da010102417b1ef"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/660240126543e2b788de391f2feacd8e2d809241ad87016424b713a4e1aa5b1a.png",
+          "sha256": "660240126543e2b788de391f2feacd8e2d809241ad87016424b713a4e1aa5b1a"
+        },
+        "portrait": {
+          "path": "assets/characters/13a59bea878b8e00e6f6f5374bcd9b3aecfb07b31fe366ed509c13d52cfdf16b.png",
+          "sha256": "13a59bea878b8e00e6f6f5374bcd9b3aecfb07b31fe366ed509c13d52cfdf16b"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2053217
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2263399
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2382054
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body enemy reference for Cave Hollowed in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration, tactile materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult humanoid in a near-front three-quarter standing pose, whole head, both hands, feet and equipment comfortably inside every margin. Appearance: A single adult humanlike Cave Hollowed of medium size with a strong lean climbing build, gaunt angular face, pale sightless clouded eye orbs with no colored irises, sparse short white hair and gray-ashen translucent flesh. Subdued violet Veil-light is visible as a branching vein network under the translucent skin of the face, neck, arms and shins, without exposed organs or gore. Thickened skin at shoulders and forearms, two muscular arms, five long claw-tipped digits per hand, two legs and broad bare clawed feet. A closed-mouth intent expression with head slightly angled as if sensing, shoulders held forward and a low balanced standing stance. A ragged plain slate-gray sleeveless cloth tunic covers chest and hips, with worn dark cloth waist and thigh wraps; limbs remain visible. Their pale sightless eyes, translucent flesh and visible Veil-lit veins follow the authored profile, with claws following its attacks. Detailed anatomy, features, vein pattern and clothing are editable visual defaults. No violet irises, normal seeing eyes, extra eyes, animal fur, quaggoth or ape head, huge fangs, crystal or glass statue, skeleton, fresh wounds, organs, gore, extra limbs, weapon, jewelry, insignia, victim, cave scenery or readable text. Preserve the authored Setting appearance and required anatomy. No extra beings, animals, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview enemy reference sheet for Cave Hollowed from Severed Lands. Input image 1 is the canonical complete reference. Preserve this exact anatomy or mechanism, proportions, materials, colors, distinctive details and equipment. Appearance: A single adult humanlike Cave Hollowed of medium size with a strong lean climbing build, gaunt angular face, pale sightless clouded eye orbs with no colored irises, sparse short white hair and gray-ashen translucent flesh. Subdued violet Veil-light is visible as a branching vein network under the translucent skin of the face, neck, arms and shins, without exposed organs or gore. Thickened skin at shoulders and forearms, two muscular arms, five long claw-tipped digits per hand, two legs and broad bare clawed feet. A closed-mouth intent expression with head slightly angled as if sensing, shoulders held forward and a low balanced standing stance. A ragged plain slate-gray sleeveless cloth tunic covers chest and hips, with worn dark cloth waist and thigh wraps; limbs remain visible. Their pale sightless eyes, translucent flesh and visible Veil-lit veins follow the authored profile, with claws following its attacks. Detailed anatomy, features, vein pattern and clothing are editable visual defaults. No violet irises, normal seeing eyes, extra eyes, animal fur, quaggoth or ape head, huge fangs, crystal or glass statue, skeleton, fresh wounds, organs, gore, extra limbs, weapon, jewelry, insignia, victim, cave scenery or readable text. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete views, FRONT, SIDE PROFILE and BACK, plus one smaller close detail at far right. Consistent scale across the three complete views, with every part comfortably within margins. The same single subject repeated as turnaround views. Change viewing angle only. Preserve pale SIGHTLESS pupil-free eye orbs, translucent gray-ashen skin, the subdued violet vein pattern, five claw-tipped digits per hand and bare clawed feet. Keep one complete adult body, the same tunic/wraps and sparse white hair. No normal irises, animal fur, crystal body, gore or weapon. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, additional subjects or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait/token image for Cave Hollowed from Severed Lands. Input image 1 is the canonical complete reference; input image 2 is its matching multiview sheet. Preserve this exact subject, materials, colors and distinctive features. Change framing only. CLOSE HEAD AND UPPER SHOULDERS, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for RPG dialogue portraits. Preserve the same gaunt adult face, PALE SIGHTLESS CLOUDY ORBS WITH NO PUPILS OR COLORED IRISES, sparse white hair, translucent gray-ashen flesh and subdued branching violet veins. No seeing eyes, normal irises, animal fur, crystal body, gore or new anatomy. No hands, waist, weapon, javelin or full torso. Polished naturalistic digital RPG illustration, tactile materials, plain light neutral gray background and soft natural studio light matching references. Continuous full-bleed square background to all edges. No painted circle, cutout, vignette, faded image edge, border, caption, text, UI, scenery, new costume or geometry, invented crest, animal or extra subject. One 1024x1024 PNG."
+      }
     }
   ]
 }
