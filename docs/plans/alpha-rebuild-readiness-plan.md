@@ -67,13 +67,13 @@ watches, drones, wall editing and wall-induced queue review. Rig motion bytes ar
 Build17 independently proves saved resources and queue state; no fresh frame-motion
 comparison is claimed. Passing earlier mechanics are retained with their exact identities.
 
-The TD branch incorporates PR #36's prior main-targeted source input
-`11c279d2ef24fd821be7a163054fa7471a55bd65`, including explicit existing-campaign review/adoption
-and the approved somatic omission default. That input provides Lite 0.3.18. The hotfix owner's
-separate Alpha4-based binary `e543957` provides Lite 0.3.17; its installed upgrade and omitted-field
-healing passed; its portable reopened-request and closed-save readbacks also passed, per the hotfix owner's closeout. Those native
-results do not qualify the TD composition. Build17 and its public TD package retain their exact
-`4b438d7` provenance; no replacement binary is claimed for the new source.
+The TD branch now incorporates PR #36's latest checked main-source input
+`ec8f8aa47195cda0497db53ccefeb67a57d78af8`, providing Lite 0.3.22. This succeeds `11c279d`
+and retains explicit existing-campaign review/adoption, the approved somatic omission default
+and recipient validation based on dispatch ownership. The separate Alpha4-based binary is
+`d71d641` / Lite 0.3.21; its owner reports completed native qualification and safe session closure.
+Those native results do not qualify the TD composition. Build17 and its public TD package retain
+their exact `4b438d7` provenance; no replacement TD binary is claimed for the new source.
 
 At preceding TD source `72522a8`, full Reload and AP2-stopped Reload each produced one scripted
 HTTP request and one saved closing narration through the real owner process, using admitted Plans
@@ -83,13 +83,16 @@ The isolated fixture/helper are prepared without holding the guest.
 
 The TD strict spatial repairs are included in the refactor composition. The standalone
 PR #33 full run at `a808bbf` completed with 6,142 passes, three recorded baseline failures
-and 83 strict expected failures; all 6,228 required cases ran exactly once, source and
-selected input bytes stayed unchanged, and all 760 frontend cases passed. The ordinary
-failures remain two stale tactical-grid source assertions and the absent external codec
-stage fixture. This is a red full result, not release acceptance. The separate source
-composition includes final hotfix `ec8f8aa` and TD `98861e0`; its affected qualification
-and remaining limits are recorded in PR #33. No unfinished source was imported into
-PR #6. Final combined build/native acceptance remains separate.
+and 83 strict expected failures; all 6,228 required cases ran once, source and selected
+input bytes stayed unchanged, and all 760 frontend cases passed. It remains a red full
+result. The source-frozen refactor/TD/hotfix composition at `d4536b5` passed all 142
+affected request, upgrade and original staged-recipient cases on actual Lite 0.3.22,
+with unchanged source/input. The final TD handoff adds only its demo-copy helper, six
+real-owner cover checks, one campaign-play selector and this status reconciliation.
+Application, runtime/package, frontend and Rust bytes are unchanged by that update;
+its selection/cover checks and checked handoff are recorded in PR #33. Final combined
+build/native and owner acceptance remain separate. No unfinished source was imported
+into PR #6 and no hosted CI success is claimed.
 
 The frontend handoff's priority resource fields and Reload acceptance are covered. Daniel
 deferred Round display and its counter to the later frontend pass on 11 November 2026.
@@ -112,7 +115,20 @@ actors need an actual full-height obstruction for the shown wall contacts, or a 
 with physically valid low-cover poses and firing angles. Relabelling alone is insufficient;
 verify every shown contact against geometry and the resolved shot. Qualify these directional
 cover cases and the resulting stop/penetration cues in the final app before balancing. This
-correction and native qualification remain open; no demo or runtime repair is claimed here.
+native qualification remains open. On resumption, a separate corrected demo candidate removes
+the first shot's fabricated cover/penetration contacts and material deduction: its upper-body
+path clears the one-metre wall. The frozen donor and published reel remain unchanged. The
+reproducible copy helper is `scripts/qa/correct_td_cover_demo.py`; media stay external to Git.
+Its independent browser-fixture state key avoids restoring the donor's saved fixture.
+
+Six real-owner checks now cover clear upper-body/same-side contacts and ordinary direct-fire
+refusal at fully concealed targets, preserving resources, duplicate receipts and reopen state.
+This also exposed a separate gap: the refusal refers to a GM through-material firing solution,
+but the admitted TD package has no separate control for it. The retained rules permit such a
+shot only with a plausible positional firing solution; the current ordinary Fire path refuses
+both resistant and penetrable full walls. Daniel has been asked whether to integrate that missing
+GM path now or explicitly defer it. Do not invent a hidden-target hit rule or claim that full-wall
+penetration is qualified. This scope decision and final combined/native checks remain open.
 
 The public compiler accepts optional private notes as an input. Public packages omit
 `references/canon/`; private local builds may include it. TD vault notes and Siren remain
@@ -155,7 +171,7 @@ history and old release source archives; this work does not rewrite history.
 | Work | Current boundary |
 |---|---|
 | Frontend overhaul, PR #28 | Merged on main `6526904` before PR #6. PR #6 owns its composed TD qualification; source/browser evidence does not by itself establish final installed acceptance. |
-| Trigger Discipline integration, PR #6 | Separate active owner; draft `98861e0` changes documentation only after source-checked `573b015`, which combines TD `72522a8` and main-targeted hotfix `11c279d` with no conflict. All code and package bytes are identical. Daniel deferred Round display and its counter to the later frontend pass; neither blocks this integration. TD package/frontend/Rust bytes retain native-tested `4b438d7` provenance; build 17 and its native replay are separate evidence. Eight final source checks and Full/AP2 owner-process plus loopback narration checks pass at `573b015`. Host desktop control, balancing, merge and release remain held. Privacy removal is complete; public packages exclude canonical vault text, and full public-session adequacy without private prose/future Rulebook remains unproven. The final combined refactor/hotfix candidate needs rebuilding and its own selected native qualification. |
+| Trigger Discipline integration, PR #6 | Separate owner; draft `e28476a` includes exact hotfix `ec8f8aa` / Lite 0.3.22. Its own delta after `98861e0` adds a separate cover-demo copy helper, six real-owner source checks and one campaign-play routing entry. Application, TD runtime, frontend/Rust and numerical balance are unchanged. The donor/public reel is untouched; the corrected copy is not native acceptance. A GM through-material firing control is missing and Daniel's integrate/defer decision is open. Round remains deferred. Source/HTTP evidence retains its recorded provenance; native build17 remains `4b438d7`. Final combined build/native qualification, public-session adequacy, balancing, merge and release acceptance remain separate. |
 | Refactor, [PR #33](https://github.com/pneuma-io/sylvia-gm/pull/33) | Stages 1-8, including stage 7A, are implemented and undergoing final local qualification. The PR records exact checked heads, commands, outcomes, strict suspected defects and remaining baseline gaps. Independent acceptance and the final combined candidate remain open. Stage 9 (`app.js` and WebUI script policy) waits for PR #6 to merge; PR #28 is already merged. Broad formatting remains deferred while open PRs change source. |
 | SRD Full, PR #3 | Parked, inactive work; it does not expand the 117-spell Lite launch roster. |
 | GM memory and casting hotfix | Main-targeted draft [PR #36](https://github.com/pneuma-io/sylvia-gm/pull/36) is checked at `ec8f8aa`, Lite 0.3.22. Build-time dispatch analysis derives recipient ownership per mode, replacing the earlier `6de3c9c` two-name exception. The owner independently verified 42 root casts and 142 request/upgrade/staged cases per source variant. The separately released Alpha 5 is `d71d641`, Lite 0.3.21; its exact installed/portable acceptance does not qualify this refactor/TD composition. GitHub main remains `6526904`; PR #36 is unmerged. The composition consumes exact `ec8f8aa`, with source checks and final build/native/provider acceptance kept distinct. |
