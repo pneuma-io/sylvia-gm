@@ -46,7 +46,7 @@ from sylvia_ruleset.character_build import eligibility_catalog, eligibility_cons
 from sylvia_ruleset.compiler_inputs import public_compiler_inputs, retained_inputs
 
 PACKAGE_ID = "pneuma-io.trigger-discipline"
-PACKAGE_VERSION = "0.1.29"
+PACKAGE_VERSION = "0.1.30"
 CONFORMANCE_SETTING_ID = "pneuma-io.trigger-discipline-conformance-setting"
 CONFORMANCE_SETTING_VERSION = "0.1.3"
 SYLVIA_BASELINE = "0eccde944309f25560dcf7d2dd182084642787e5"
@@ -732,7 +732,7 @@ def _tool_specs(
         },
         "fire_single": {
             "capability": "trigger-discipline.firearms",
-            "description": "Resolve one deliberate projectile through authoritative exposure and ordered-ray facts, HIT QUALITY, target PENETRATION, RES, and HP.",
+            "description": "Take an instructed shot at the selected target, including through opaque material without shooter LOS; resolve ordered material routing, HIT QUALITY, target PENETRATION, RES, and HP.",
             "parameters": [
                 attacker,
                 target,
@@ -744,7 +744,7 @@ def _tool_specs(
         },
         "fire_burst": {
             "capability": "trigger-discipline.firearms",
-            "description": "Resolve one three-round BURST with one ATTACK ROLL, finite connection opportunities, and fresh authoritative geometry for every relevant projectile.",
+            "description": "Take an instructed three-round BURST, including through opaque material without shooter LOS, with one ATTACK ROLL, finite connection opportunities, and fresh ordered geometry for each projectile.",
             "parameters": [
                 attacker,
                 target,
@@ -756,7 +756,7 @@ def _tool_specs(
         },
         "fire_full_auto": {
             "capability": "trigger-discipline.firearms",
-            "description": "Resolve one flexible FULL AUTO string with one ATTACK ROLL, finite connection opportunities, and fresh authoritative geometry for every relevant projectile.",
+            "description": "Take an instructed FULL AUTO string, including through opaque material without shooter LOS, with one ATTACK ROLL, finite connection opportunities, and fresh ordered geometry for each projectile.",
             "parameters": [
                 attacker,
                 target,
@@ -2825,6 +2825,7 @@ def _trigger_crossing_effects(*, automatic: bool = False) -> list[dict[str, Any]
 
 
 def _fire_single_effects() -> list[dict[str, Any]]:
+    """Route an instructed active shot through material even without a visible silhouette."""
     return [
         {"set": {"field": "state.last_attack", "value": {}}},
         {
@@ -2874,10 +2875,10 @@ def _fire_single_effects() -> list[dict[str, Any]]:
                 {"set": {"field": "_attack_total", "value": "_attack.total + attacker.skills.marksmanship + attacker.aptitudes.precision"}},
                 {"set": {"field": "_margin", "value": "_attack_total - _actual_difficulty"}},
                 {"set": {"field": "_quality", "value": "'MISS'"}},
-                {"set": {"field": "_quality", "value": "'HIT'"}, "condition": "_attack.total != 1 and _attack_total >= _actual_difficulty and _exposure.exposure > 0"},
+                {"set": {"field": "_quality", "value": "'HIT'"}, "condition": "_attack.total != 1 and _attack_total >= _actual_difficulty"},
                 {"set": {"field": "_quality", "value": "'CLEAN_HIT'"}, "condition": "_quality != 'MISS' and _margin >= definitions.parameters.hit_quality.clean_margin"},
                 {"set": {"field": "_quality", "value": "'DECISIVE_HIT'"}, "condition": "_quality != 'MISS' and _margin >= definitions.parameters.hit_quality.decisive_margin"},
-                {"set": {"field": "_quality", "value": "'CRITICAL_HIT'"}, "condition": "_attack.total != 1 and _exposure.exposure > 0 and (_margin >= definitions.parameters.hit_quality.critical_margin or _attack.total == 20)"},
+                {"set": {"field": "_quality", "value": "'CRITICAL_HIT'"}, "condition": "_attack.total != 1 and (_margin >= definitions.parameters.hit_quality.critical_margin or _attack.total == 20)"},
                 {"set": {"field": "_damage", "value": "_profile_damage"}},
                 {"set": {"field": "_target_pen", "value": "attacker.weapon.target_pen"}},
                 {"set": {"field": "_material_pen", "value": "attacker.weapon.material_pen"}},
@@ -2999,6 +3000,7 @@ def _fire_single_effects() -> list[dict[str, Any]]:
 
 
 def _fire_multi_effects(mode: str) -> list[dict[str, Any]]:
+    """Resolve instructed strings through material, retaining per-projectile geometry."""
     if mode not in {"BURST", "FULL_AUTO"}:
         raise ValueError(f"unsupported multi-round fire mode {mode}")
     rounds = "3" if mode == "BURST" else "rounds"
@@ -3450,7 +3452,7 @@ def _fire_multi_effects(mode: str) -> list[dict[str, Any]]:
                 {"set": {"field": "_quality", "value": "'MISS'"}},
                 {
                     "set": {"field": "_quality", "value": "'HIT'"},
-                    "condition": "_attack.total != 1 and _attack_total >= _actual_difficulty and _string_exposure.exposure > 0",
+                    "condition": "_attack.total != 1 and _attack_total >= _actual_difficulty",
                 },
                 {
                     "set": {"field": "_quality", "value": "'CLEAN_HIT'"},
@@ -3465,7 +3467,7 @@ def _fire_multi_effects(mode: str) -> list[dict[str, Any]]:
                 },
                 {
                     "set": {"field": "_quality", "value": "'CRITICAL_HIT'"},
-                    "condition": "_attack.total != 1 and _string_exposure.exposure > 0 and (_margin >= definitions.parameters.hit_quality.critical_margin or _attack.total == 20)",
+                    "condition": "_attack.total != 1 and (_margin >= definitions.parameters.hit_quality.critical_margin or _attack.total == 20)",
                 },
                 {"set": {"field": "_connection_opportunities", "value": 0}},
                 *connection_effects,
@@ -3492,10 +3494,6 @@ def _fire_multi_effects(mode: str) -> list[dict[str, Any]]:
                         "value": "definitions.parameters.exposure_cap.quarter",
                     },
                     "condition": "_string_exposure.exposure < 0.5 and _string_exposure.exposure > 0",
-                },
-                {
-                    "set": {"field": "_exposure_cap", "value": 0},
-                    "condition": "_string_exposure.exposure == 0",
                 },
                 {
                     "set": {
@@ -4329,12 +4327,6 @@ def _player_control_checks(name: str) -> list[dict[str, str]]:
         {"condition": condition, "reason": reason}
         for condition, reason in _action_guard_parts(name)
     )
-    if name in {"fire_single", "fire_burst", "fire_full_auto"}:
-        checks.append({
-            "condition": "_preview_exposure.exposure > 0",
-            "reason": "No valid direct path to this target. Ordinary direct fire is unavailable; "
-                      "through-material fire requires a separate GM firing solution.",
-        })
     if name == "prepare_overwatch":
         checks.extend([
             {"condition": "actor.active == true", "reason": "This actor is not active."},

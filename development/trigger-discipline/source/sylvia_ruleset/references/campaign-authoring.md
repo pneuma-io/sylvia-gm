@@ -75,6 +75,14 @@ rating is public). Keep it in sync with the authored material. Private material 
 automatically shown; omit the public label when the material is unknown. This label is descriptive
 text, not a replacement for the numeric `material_resistance` used by projectile resolution.
 
+An active Fire, Burst or Full auto instruction may name a mapped enemy behind opaque material.
+The selected target and aim point authorize the attempt even when the shooter cannot see the
+target. No separate GM firing-solution control or last-known-position requirement applies.
+Resolve the attack and every intervening material in order: a wall can stop a successful shot,
+or penetration can reach the target with the remaining damage. Existing costs and target,
+weapon, side and map-revision checks still apply. A visible map token does not establish the
+character's sightline. Overwatch retains its visibility requirement before reaction fire.
+
 ## Party placement slot
 
 Each slot has exactly `entity_state` and `append`. Use participant markers as the entire value so Campaign Start can bind the selected character:

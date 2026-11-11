@@ -90,9 +90,11 @@ affected request, upgrade and original staged-recipient cases on actual Lite 0.3
 with unchanged source/input. The final TD handoff adds only its demo-copy helper, six
 real-owner cover checks, one campaign-play selector and this status reconciliation.
 Application, runtime/package, frontend and Rust bytes are unchanged by that update;
-its selection/cover checks and checked handoff are recorded in PR #33. Final combined
-build/native and owner acceptance remain separate. No unfinished source was imported
-into PR #6 and no hosted CI success is claimed.
+its selection/cover checks and checked handoff are recorded in PR #33. PR #6 incorporated
+the checked `00857303` handoff at `ed1353a`; all non-plan blobs matched that input.
+Fresh Ruff, strict mypy across 350 files and real-owner scripted HTTP Reload narration passed
+at `ed1353a`. Final combined build/native and owner acceptance remain separate. No unfinished
+source was imported into PR #6 and no hosted CI success is claimed.
 
 The frontend handoff's priority resource fields and Reload acceptance are covered. Daniel
 deferred Round display and its counter to the later frontend pass on 11 November 2026.
@@ -121,17 +123,18 @@ path clears the one-metre wall. The frozen donor and published reel remain uncha
 reproducible copy helper is `scripts/qa/correct_td_cover_demo.py`; media stay external to Git.
 Its independent browser-fixture state key avoids restoring the donor's saved fixture.
 
-Six real-owner checks now cover clear upper-body/same-side contacts and ordinary direct-fire
-refusal at fully concealed targets, preserving resources, duplicate receipts and reopen state.
-This also exposed a separate gap: the refusal refers to a GM through-material firing solution,
-but the admitted TD package has no separate control for it. The retained rules permit such a
-shot only with a plausible positional firing solution; the current ordinary Fire path refuses
-both resistant and penetrable full walls. Daniel confirmed that attempting to shoot through full
-walls with material penetration is an intended feature and requested a design discussion.
-Complete the missing firing path as part of this integration. Its targeting and positional
-uncertainty contract is still under discussion; no proposal is approved by this status entry.
-Do not bypass hidden-target knowledge, invent a hit rule or claim that full-wall penetration is
-qualified. Implementation and final combined/native checks remain open.
+The original six real-owner checks exposed ordinary Fire refusing fully concealed targets,
+including behind penetrable walls, while referring to a nonexistent separate GM firing control.
+Daniel clarified the intended behavior: an active instruction from the player or Sylvia to shoot
+at a mapped enemy is sufficient to take the shot. Character LOS is required for Overwatch, not
+for instructed Fire, Burst or Full auto. No extra knowledge, last-known-position or separate GM
+control gate is selected. Existing weapon, target, AP, side and map-revision checks remain.
+
+The TD0.1.30 worktree correction uses the existing attack and ordered material paths. Fourteen
+affected checks passed: clear upper-body/same-side shots, all three active firing controls at
+concealing low/full walls, resistant stops, penetration, exact AP/ammunition, duplicate/reopen
+safety and unchanged Overwatch LOS behavior. These are package/owner checks at a development
+worktree, not final-commit or Windows acceptance. Final combined/native qualification remains open.
 
 The public compiler accepts optional private notes as an input. Public packages omit
 `references/canon/`; private local builds may include it. TD vault notes and Siren remain

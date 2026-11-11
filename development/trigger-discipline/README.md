@@ -2,7 +2,7 @@
 
 This directory contains the public Trigger Discipline compiler, compiled contracts and retained
 mechanics integrated through [Sylvia #6](https://github.com/pneuma-io/sylvia-gm/pull/6).
-Version 0.1.29 is the unbalanced integration baseline. Merge, balance qualification and release
+Version 0.1.30 is the unbalanced integration candidate. Merge, balance qualification and release
 remain separate steps.
 
 ## Public build and import
@@ -10,7 +10,7 @@ remain separate steps.
 From a clean committed Sylvia checkout:
 
 ```powershell
-uv run --locked --group dev --extra dev python scripts/build_trigger_discipline_package.py --output ../trigger-discipline-0.1.29.sylvia-gm-package
+uv run --locked --group dev --extra dev python scripts/build_trigger_discipline_package.py --output ../trigger-discipline-0.1.30.sylvia-gm-package
 ```
 
 The default build works without the private vault and omits every `references/canon/` file.
@@ -51,6 +51,11 @@ The retained implementation includes firearm and chamber state, authored manipul
 movement and physical cover, grid-edge wall editing, shooter-origin Overwatch, and supported
 specialty hooks. Preview and execution use the shared spatial owner. Existing saved packages
 retain their exact pins; a new lane declaration does not reinterpret an older fixed zone.
+
+Active Fire, Burst and Full auto can attempt the mapped target specified by the player or Sylvia
+through opaque material. Ordered material resistance and penetration determine whether the shot
+reaches the target. Overwatch still requires the shooter's sightline. Low cover follows actual
+height, stance and firing direction, with no blanket adjacency rule.
 
 No numerical balancing is selected by this integration. Lane dimensions are explicit inputs;
 test extents and widths do not establish class allowances or accuracy penalties. The runtime
