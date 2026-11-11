@@ -433,7 +433,6 @@ class ConfiguredProviderResolver:
                 base_url=definition.base_url,
                 api_key=credential,
                 headers=headers,
-                runtime_executable=definition.runtime_executable,
                 runtime_home=(
                     str(self._user_config_path.resolve().parent / (
                         "claude-runtime" if provider_key == "claude_runtime" else "chatgpt-runtime"

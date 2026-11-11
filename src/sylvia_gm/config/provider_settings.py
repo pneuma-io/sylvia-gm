@@ -59,8 +59,8 @@ _PROVIDER_PRESETS: dict[str, dict[str, object]] = {
         "credential_required": False,
         "endpoint_editable": False,
         "default_transport": "claude_code",
-        "setup_hint": "Use Accounts to select the official Claude Code app and its native sign-in.",
-        "setup_url": "https://code.claude.com/docs/en/setup",
+        "setup_hint": "Use Accounts to set up Sylvia's own copy of Claude Code and sign in.",
+        "setup_url": "https://code.claude.com/docs/en/legal-and-compliance",
     },
     "chatgpt_subscription": {
         "name": "ChatGPT subscription",
@@ -715,7 +715,6 @@ def provider_settings(config_path: Path) -> dict[str, object]:
                 "name": definition.name or preset["name"],
                 "mode": definition.mode or preset["mode"],
                 "base_url": definition.base_url,
-                "runtime_executable": definition.runtime_executable,
                 "credential_configured": credential_configured,
                 "header_count": header_count,
                 "credential_error": credential_error,
@@ -1771,7 +1770,6 @@ def save_provider_settings(
     declared_context_observed_at: object = None,
     runtime_context_observed_at: object = None,
     configured_context_observed_at: object = None,
-    runtime_executable: object = None,
 ) -> dict[str, object]:
     """Atomically add or update one model without replacing its provider catalog."""
 
@@ -1834,13 +1832,6 @@ def save_provider_settings(
             )
         if configured_output is not None:
             raise ConfigError("The Claude runtime manages the output allowance")
-        selected_executable = (
-            runtime_executable if runtime_executable is not None
-            else existing_raw.get("runtime_executable", "")
-        )
-        if (not isinstance(selected_executable, str)
-                or selected_executable and not Path(selected_executable).is_absolute()):
-            raise ConfigError("Choose an absolute path to the native Claude executable")
     supplied = credential.strip() if isinstance(credential, str) else ""
 
     existing = providers.get(profile_id, {})
@@ -2003,8 +1994,6 @@ def save_provider_settings(
         "headers": dict(stored_headers),
         "models": updated_models,
     }
-    if preset_key == "claude_runtime":
-        providers[profile_id]["runtime_executable"] = selected_executable
     _write_user_config(config_path, document)
     return {
         "provider_id": profile_id,

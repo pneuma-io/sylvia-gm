@@ -740,7 +740,7 @@
             <p class="settings-eyebrow">Connect a service</p>
             <div class="model-connection-choices">
               <button class="model-connection-choice" id="open-account-signin-btn" type="button"><strong>ChatGPT subscription</strong><span>Sign in with your account. No API key.</span></button>
-              <button class="model-connection-choice" id="open-claude-signin-btn" type="button"><strong>Claude subscription</strong><span>Use Claude Code on this computer, signed in with your own account. No API key.</span></button>
+              <button class="model-connection-choice" id="open-claude-signin-btn" type="button"><strong>Claude subscription</strong><span>Sylvia sets up its own copy of Claude Code. Sign in with your own account. No API key.</span></button>
               <button class="model-connection-choice" type="button" data-model-route="api"><strong>API service</strong><span>A hosted service such as OpenAI or OpenRouter, or a custom endpoint. Uses an API key.</span></button>
               <button class="model-connection-choice" type="button" data-model-route="local"><strong>Local model server</strong><span>A model server you already run, on this or another computer.</span></button>
             </div>
@@ -985,13 +985,15 @@
           </div>
 
           <div class="account-view" id="account-view-claude" data-account-panel="claude" hidden>
-          <p class="settings-note">Claude Code, Anthropic&rsquo;s official app on this computer, manages the sign-in. Sylvia runs it
-            as installed and never reads or stores its sign-in details. Messages and relevant campaign or Builder content go to
-            Anthropic through Claude Code, and usage counts against the account Claude Code is signed in with.</p>
+          <p class="settings-note">Sylvia runs its own copy of Claude Code, Anthropic&rsquo;s official app, exactly as Anthropic
+            publishes it. That copy, its settings and its sign-in stay in Sylvia&rsquo;s own folder, so any Claude Code you
+            already use is never changed. Sylvia never reads or stores the sign-in details. Messages and relevant campaign or
+            Builder content go to Anthropic through Claude Code, and usage counts against the account you sign in with here.</p>
           <section class="settings-section" aria-labelledby="claude-signin-step">
-            <h3 class="settings-eyebrow" id="claude-signin-step">1. Find Claude Code</h3>
+            <h3 class="settings-eyebrow" id="claude-signin-step">1. Set up Claude Code</h3>
             <div class="settings-card" id="claude-connection-card">
-              <div class="model-status settings-status-line" id="claude-connection-status" role="status" aria-live="polite">Not checked yet. Sylvia looks for Claude Code only when you ask.</div>
+              <div class="model-status settings-status-line" id="claude-connection-status" role="status" aria-live="polite">Not checked yet. Sylvia starts Claude Code only when you ask.</div>
+              <progress id="claude-install-progress" aria-label="Claude Code download progress" hidden></progress>
               <p class="provider-field-help" id="claude-connection-detail" hidden></p>
               <dl class="account-facts" id="claude-runtime-facts" hidden>
                 <div><dt>Claude Code</dt><dd id="claude-fact-version"></dd></div>
@@ -1000,27 +1002,23 @@
               </dl>
               <p class="settings-note" id="claude-billing-note" role="status" hidden></p>
               <div class="provider-actions">
-                <button class="btn btn-primary btn-sm" type="button" data-claude-action="status">Check for Claude Code</button>
+                <button class="btn btn-primary btn-sm" type="button" data-claude-action="status">Check Claude Code</button>
+                <button class="btn btn-primary btn-sm" type="button" data-claude-action="install" hidden>Install Claude Code for Sylvia</button>
                 <button class="btn btn-primary btn-sm" type="button" data-claude-action="login" hidden>Sign in with Claude Code</button>
+                <button class="btn btn-secondary btn-sm" type="button" data-claude-action="login" data-claude-account="api" hidden>Sign in with a Console account</button>
                 <button class="btn btn-secondary btn-sm" type="button" data-claude-action="cancel" hidden>Cancel sign-in</button>
-                <button class="btn btn-secondary btn-sm" type="button" id="claude-install-guide-btn" hidden>Open install guide</button>
+                <button class="btn btn-secondary btn-sm" type="button" data-claude-action="logout" hidden>Sign out</button>
+                <button class="btn btn-secondary btn-sm" type="button" id="claude-terms-btn" hidden>Anthropic&rsquo;s terms</button>
               </div>
+              <p class="provider-field-help" id="claude-install-help" hidden>Sylvia downloads Claude Code from Anthropic (about
+                350 MB), checks that Anthropic signed it, and keeps it in Sylvia&rsquo;s own folder. Nothing else on this computer
+                is installed or changed. Claude Code is Anthropic&rsquo;s software, used under Anthropic&rsquo;s terms.</p>
               <p class="provider-field-help" id="claude-login-help" hidden>Claude Code opens Anthropic&rsquo;s sign-in page in your
-                browser for your subscription. To use a Console API account instead, sign in through Claude Code first, then check here.</p>
-              <p class="provider-field-help" id="claude-cancel-help" hidden>Cancel stops only the sign-in Sylvia started. Other
-                Claude Code sessions stay signed in.</p>
-              <p class="provider-field-help" id="claude-signout-help" hidden>To sign out or switch accounts, use Claude Code itself.
-                Sylvia never signs you out.</p>
-              <p class="provider-field-help" id="claude-install-help" hidden>Sylvia never installs or updates Claude Code. Follow
-                Anthropic&rsquo;s guide, then check again.</p>
-              <details id="claude-runtime-advanced" class="provider-advanced-fields">
-                <summary>Use a specific Claude Code app</summary>
-                <label for="claude-executable">Claude Code location (optional)</label>
-                <input id="claude-executable" type="text" spellcheck="false" autocomplete="off"
-                       placeholder="Found automatically" maxlength="1024">
-                <p class="provider-field-help">Leave empty to use the Claude Code found on this computer. Otherwise enter the
-                  full path to the claude program, for example C:\Users\you\.local\bin\claude.exe.</p>
-              </details>
+                browser. Use your Claude subscription, or sign in with an Anthropic Console account to pay per use instead.</p>
+              <p class="provider-field-help" id="claude-cancel-help" hidden>Cancel stops only what Sylvia started. Any other
+                Claude Code on this computer is unaffected.</p>
+              <p class="provider-field-help" id="claude-signout-help" hidden>Signing out or switching accounts here affects only
+                Sylvia&rsquo;s copy. Any other Claude Code on this computer stays signed in.</p>
             </div>
           </section>
           <section class="settings-section" id="claude-model-card" aria-labelledby="claude-model-heading" hidden>

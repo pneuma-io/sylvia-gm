@@ -1589,7 +1589,7 @@ const SylviaGMFrontend = (() => {
       button.addEventListener('click', () => showAccountView(button.dataset.accountView));
     });
     document.querySelectorAll('[data-claude-action]').forEach((button) => {
-      button.addEventListener('click', () => updateClaudeConnection(button.dataset.claudeAction));
+      button.addEventListener('click', () => updateClaudeConnection(button.dataset.claudeAction, button.dataset.claudeAccount));
     });
     document.querySelectorAll('[data-claude-alias]').forEach((button) => {
       button.addEventListener('click', () => {
@@ -1599,7 +1599,7 @@ const SylviaGMFrontend = (() => {
       });
     });
     $('claude-model-id').addEventListener('input', selectClaudeModel);
-    $('claude-install-guide-btn').addEventListener('click', () => { void openClaudeInstallGuide(); });
+    $('claude-terms-btn').addEventListener('click', () => { void openClaudeTerms(); });
     $('claude-api-route-btn').addEventListener('click', () => {
       resetModelsPage();
       showSettingsTab('models');
@@ -2960,7 +2960,7 @@ const SylviaGMFrontend = (() => {
   let claudeAccountStatus = null;
 
   // The Accounts page shows one subscription flow at a time. Opening the Claude view never starts
-  // Claude Code; only its buttons do, plus the read-only poll while a sign-in is unfinished.
+  // Claude Code; only its buttons do, plus the read-only poll while a download or sign-in is unfinished.
   function showAccountView(view) {
     if (view !== 'chatgpt' && view !== 'claude') return;
     accountView = view;
@@ -2974,8 +2974,6 @@ const SylviaGMFrontend = (() => {
       panel.hidden = panel.dataset.accountPanel !== accountView;
     });
     if (accountView === 'claude' && state.pendingClaudeModel) {
-      const savedRuntime = state.providerSettings?.configured?.find(item => item.preset_id === CLAUDE_RUNTIME_PRESET);
-      $('claude-executable').value = savedRuntime?.runtime_executable || '';
       $('claude-model-id').value = state.pendingClaudeModel.id || '';
       $('claude-model-context').value = state.pendingClaudeModel.context_window || '';
       $('claude-model-advanced').open = false;
@@ -2986,7 +2984,7 @@ const SylviaGMFrontend = (() => {
 
   function resumeClaudeConnection() {
     renderClaudeStatus(claudeAccountStatus);
-    if (claudeAccountStatus?.login_pending) void updateClaudeConnection('status');
+    if (claudeAccountStatus?.login_pending || claudeInstalling(claudeAccountStatus)) void updateClaudeConnection('status');
   }
 
   function savedClaudeModel(id) {
@@ -3014,31 +3012,58 @@ const SylviaGMFrontend = (() => {
   function claudeBillingNote(billing) {
     if (billing === 'subscription') return ['Uses your Claude subscription. Your plan’s usage limits apply, ' +
       'and Sylvia never moves this account to API billing.', false];
-    if (billing === 'api') return ['Claude Code is signed in with an Anthropic Console account, so usage is billed to ' +
-      'that Console account, not a subscription. To use your subscription instead, sign in again in Claude Code.', true];
-    return ['Claude Code didn’t report how this sign-in is billed. Check in Claude Code before relying on it.', true];
+    if (billing === 'api') return ['Sylvia’s copy of Claude Code is signed in with an Anthropic Console account, so usage is ' +
+      'billed to that Console account, not a subscription. To use your subscription instead, sign in again here.', true];
+    return ['Claude Code didn’t report how this sign-in is billed. Sign in again before relying on it.', true];
+  }
+
+  // True while Sylvia's own download of Claude Code is still running in the owner.
+  function claudeInstalling(result) {
+    return ['checking', 'downloading', 'verifying'].includes(result?.install?.state);
+  }
+
+  function claudeInstallLine(install) {
+    const megabytes = value => Math.round((Number(value) || 0) / 1048576);
+    if (install.state === 'downloading') {
+      return `Downloading Claude Code${install.version ? ` ${install.version}` : ''} from Anthropic: ` +
+        `${megabytes(install.received)} of ${megabytes(install.total)} MB. This page will update automatically.`;
+    }
+    return install.state === 'verifying' ? 'Checking that the download is Anthropic’s signed release…'
+      : 'Asking Anthropic which version to install…';
   }
 
   // Renders the last explicit check; null means Claude Code has not been contacted yet.
   function renderClaudeStatus(result) {
     const checked = Boolean(result);
+    const install = checked && result.install || {};
+    const installing = claudeInstalling(result);
     const installed = checked && result.installed === true;
     const supported = installed && result.supported === true;
     const pending = supported && result.login_pending === true;
     const signedIn = supported && result.signed_in === true && !pending;
-    $('claude-signin-step').textContent = !checked ? '1. Find Claude Code' : !installed ? '1. Install Claude Code'
-      : !supported ? '1. Update Claude Code' : signedIn ? '1. Claude connected'
+    $('claude-signin-step').textContent = !checked ? '1. Set up Claude Code' : installing ? '1. Installing Claude Code'
+      : !installed ? '1. Install Claude Code' : !supported ? '1. Update Claude Code' : signedIn ? '1. Claude connected'
         : pending ? '1. Finish sign-in in your browser' : '1. Sign in to Claude';
     if (checked) {
-      $('claude-connection-status').textContent = !installed ? 'Claude Code wasn’t found on this computer.'
-        : !supported ? `This version of Claude Code${result.version ? ` (${result.version})` : ''} isn’t supported. Update it, then check again.`
-          : signedIn ? 'Claude Code is signed in.'
-            : pending ? 'Finish sign-in in your browser. This page will update automatically.'
-              : 'Claude Code is ready. Sign in to use your account.';
+      $('claude-connection-status').textContent = installing ? claudeInstallLine(install)
+        : !installed ? 'Sylvia doesn’t have its copy of Claude Code yet.'
+          : !supported ? `Sylvia’s copy of Claude Code${result.version ? ` (${result.version})` : ''} needs updating.`
+            : signedIn ? 'Claude Code is signed in.'
+              : pending ? 'Finish sign-in in your browser. This page will update automatically.'
+                : 'Claude Code is ready. Sign in to use your account.';
     }
-    const detail = checked && typeof result.message === 'string' ? result.message.trim() : '';
-    $('claude-connection-detail').textContent = detail;
-    $('claude-connection-detail').hidden = !detail || detail === $('claude-connection-status').textContent;
+    const progress = $('claude-install-progress');
+    progress.hidden = !installing;
+    if (install.state === 'downloading' && install.total > 0) {
+      progress.max = install.total;
+      progress.value = Math.min(install.received || 0, install.total);
+    } else {
+      progress.removeAttribute('value');
+    }
+    const outcome = !installing && ['failed', 'ready', 'idle'].includes(install.state) && install.message;
+    const detail = String(outcome || (checked && typeof result.message === 'string' ? result.message : '')).trim();
+    $('claude-connection-detail').textContent = installing ? '' : detail;
+    $('claude-connection-detail').hidden = installing || !detail || detail === $('claude-connection-status').textContent;
     $('claude-runtime-facts').hidden = !installed;
     if (installed) {
       $('claude-fact-version').textContent = (result.version || 'Version not reported') + (supported ? '' : ' · unsupported');
@@ -3052,43 +3077,39 @@ const SylviaGMFrontend = (() => {
     $('claude-billing-note').textContent = signedIn ? billingText : '';
     $('claude-billing-note').classList.toggle('settings-note-warn', signedIn && billingWarn);
     const statusButton = document.querySelector('[data-claude-action="status"]');
-    statusButton.textContent = checked ? 'Check again' : 'Check for Claude Code';
-    statusButton.classList.toggle('btn-primary', !supported);
-    statusButton.classList.toggle('btn-secondary', supported);
-    const loginButton = document.querySelector('[data-claude-action="login"]');
-    loginButton.hidden = !supported || pending;
+    statusButton.textContent = checked ? 'Check again' : 'Check Claude Code';
+    statusButton.hidden = installing;
+    statusButton.classList.toggle('btn-primary', !checked);
+    statusButton.classList.toggle('btn-secondary', checked);
+    // One button installs, updates an unsupported copy, or looks for a newer release.
+    const installButton = document.querySelector('[data-claude-action="install"]');
+    installButton.hidden = !checked || installing || pending;
+    installButton.textContent = !installed ? 'Install Claude Code for Sylvia' : !supported ? 'Update Claude Code'
+      : 'Check for a newer version';
+    installButton.classList.toggle('btn-primary', !supported);
+    installButton.classList.toggle('btn-secondary', supported);
+    const [loginButton, consoleButton] = document.querySelectorAll('[data-claude-action="login"]');
+    loginButton.hidden = !supported || pending || installing;
     loginButton.textContent = signedIn ? 'Sign in again with Claude Code' : 'Sign in with Claude Code';
-    document.querySelector('[data-claude-action="cancel"]').hidden = !pending;
-    $('claude-install-guide-btn').hidden = !checked || supported;
+    consoleButton.hidden = loginButton.hidden || signedIn;
+    const cancelButton = document.querySelector('[data-claude-action="cancel"]');
+    cancelButton.hidden = !pending && !['checking', 'downloading'].includes(install.state);
+    cancelButton.textContent = pending ? 'Cancel sign-in' : 'Cancel download';
+    document.querySelector('[data-claude-action="logout"]').hidden = !signedIn || installing;
+    $('claude-terms-btn').hidden = !checked || supported;
     $('claude-install-help').hidden = !checked || supported;
-    $('claude-login-help').hidden = !supported || signedIn;
-    $('claude-cancel-help').hidden = !pending;
+    $('claude-login-help').hidden = !supported || signedIn || installing;
+    $('claude-cancel-help').hidden = cancelButton.hidden;
     $('claude-signout-help').hidden = !signedIn;
     $('claude-model-card').hidden = !signedIn;
   }
 
-  function claudeExecutableOption() {
-    const value = $('claude-executable').value.trim();
-    if (!value) return null;
-    if (!/^(?:[A-Za-z]:[\\/]|\\\\|\/)/.test(value)) {
-      throw new Error('Enter the full path to Claude Code, or leave the location empty to find it automatically.');
-    }
-    return value;
-  }
-
-  // Each call follows a button press on this page, or polls read-only status while sign-in is unfinished.
-  async function updateClaudeConnection(action) {
+  // Each call follows a button press on this page, or polls read-only status while a download or
+  // sign-in is unfinished.
+  async function updateClaudeConnection(action, account = null) {
     const status = $(action === 'add_model' ? 'claude-model-status' : 'claude-connection-status');
     const options = {};
-    try {
-      const executable = claudeExecutableOption();
-      if (executable) options.executable = executable;
-    } catch (error) {
-      $('claude-connection-status').textContent = error.message;
-      $('claude-runtime-advanced').open = true;
-      $('claude-executable').focus();
-      return;
-    }
+    if (action === 'login' && account) options.account_type = account;
     if (action === 'add_model') {
       const id = $('claude-model-id').value.trim();
       if (!id) {
@@ -3113,19 +3134,20 @@ const SylviaGMFrontend = (() => {
     if (claudeRequestBusy) return;
     claudeRequestBusy = true;
     clearTimeout(claudeStatusTimer);
-    const buttons = [...document.querySelectorAll('[data-claude-action], #claude-install-guide-btn')];
+    const buttons = [...document.querySelectorAll('[data-claude-action], #claude-terms-btn')];
     buttons.forEach((button) => { button.disabled = true; });
-    const quietPoll = action === 'status' && claudeAccountStatus?.login_pending;
+    const quietPoll = action === 'status' && (claudeAccountStatus?.login_pending || claudeInstalling(claudeAccountStatus));
     if (!quietPoll) {
       status.textContent = action === 'status' ? 'Checking Claude Code…' : action === 'login' ? 'Starting sign-in…'
-        : action === 'cancel' ? 'Cancelling sign-in…' : 'Saving…';
+        : action === 'install' ? 'Starting setup…' : action === 'logout' ? 'Signing out…'
+          : action === 'cancel' ? 'Cancelling…' : 'Saving…';
     }
     let pollAgain = false;
     try {
       if (!state.bridge?.claude_connection) throw new Error('Claude Code connection isn’t available in this copy of Sylvia.');
       const result = await state.bridge.claude_connection(action, Object.keys(options).length ? options : null);
       claudeAccountStatus = result;
-      pollAgain = Boolean(result.login_pending);
+      pollAgain = Boolean(result.login_pending) || claudeInstalling(result);
       renderClaudeStatus(result);
       if (result.saved_model) {
         await refreshProviderSettings();
@@ -3136,7 +3158,7 @@ const SylviaGMFrontend = (() => {
         status.textContent = 'Model saved.';
       } else if (action === 'add_model') {
         status.textContent = result.message || 'The model wasn’t saved.';
-      } else if (action === 'cancel' && !result.login_pending && !result.signed_in) {
+      } else if (action === 'cancel' && !result.login_pending && !result.signed_in && result.supported) {
         status.textContent = 'Sign-in cancelled.';
       }
     } catch (error) {
@@ -3151,15 +3173,15 @@ const SylviaGMFrontend = (() => {
     }
   }
 
-  async function openClaudeInstallGuide() {
+  async function openClaudeTerms() {
     const status = $('claude-connection-detail');
     status.hidden = false;
     try {
       const result = await state.bridge.open_provider_setup(CLAUDE_RUNTIME_PRESET);
-      status.textContent = result.opened ? 'Anthropic’s Claude Code guide opened in your browser. Check again when it’s ready.'
+      status.textContent = result.opened ? 'Anthropic’s terms for Claude Code opened in your browser.'
         : `Could not open your browser. Visit ${result.url}`;
     } catch (error) {
-      status.textContent = 'Could not open the Claude Code guide. Visit https://code.claude.com/docs/en/setup';
+      status.textContent = 'Could not open your browser. Visit https://code.claude.com/docs/en/legal-and-compliance';
     }
   }
 

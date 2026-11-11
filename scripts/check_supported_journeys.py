@@ -376,6 +376,7 @@ PYTHON_JOURNEYS = {
         'tests/test_session_reasoning_preferences.py',
         'tests/test_alpha_admin_full_audit.py',
         'tests/test_builder_native_thinking.py',
+        'tests/test_claude_install.py',
         'tests/test_claude_native_protocol.py',
         'tests/test_claude_runtime.py',
     ],

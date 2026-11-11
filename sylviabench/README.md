@@ -88,9 +88,11 @@ usage coverage and confirmed model identity where available. An adapter echo alo
 of the served model. Missing limits, reasoning controls, usage and costs remain unknown.
 The broader W7/W9 work is unfinished, so inspect these before drawing provider comparisons.
 
-Claude now uses Sylvia's supported `claude_runtime` / `claude_code` route and the user's official
-native subscription sign-in. Register exact IDs through `sylvia_gm.config.claude_settings` against
-an isolated benchmark config. Selected candidates are Opus, Sonnet and Haiku 5.5; Fable remains
+Claude now uses Sylvia's supported `claude_runtime` / `claude_code` route through Sylvia's own
+copy of Claude Code and the subscription sign-in made in that copy. In the isolated benchmark
+owner directory, run `python -m sylvia_gm.config.claude_settings --config OWNER/config.yaml`
+with `--install`, then `--login`, then register exact IDs with `--model`. A comparison pinned
+to a commit before 12 November 2026 keeps that commit's use of the installed Claude Code. Selected candidates are Opus, Sonnet and Haiku 5.5; Fable remains
 pending because the checked catalog lists 5.2 and Daniel selected 5.5 only. Catalog presence is
 not proof of account access. Verify billing and actual served IDs. No token extraction, API-key
 substitution, credit purchases or automatic top-ups are part of this selection. Existing approved

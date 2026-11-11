@@ -1,7 +1,9 @@
-"""Owned stdio access to the user's unmodified Claude Code executable.
+"""Owned stdio access to Sylvia's own unmodified copy of Claude Code.
 
-Only the binary accesses native authentication. The SDK MCP control channel
-advertises Sylvia tools but never executes an operation in the runtime process.
+Sylvia keeps a separate installation, profile and sign-in under its runtime home and never
+uses the Claude Code a person may already have. Only the binary accesses native
+authentication. The SDK MCP control channel advertises Sylvia tools but never executes an
+operation in the runtime process.
 """
 
 from __future__ import annotations
@@ -10,7 +12,6 @@ import json
 import os
 import queue
 import re
-import shutil
 import subprocess
 import threading
 from contextlib import suppress
@@ -28,8 +29,13 @@ MINIMUM_VERSION_TEXT = ".".join(map(str, MINIMUM_VERSION))
 MAX_FRAME_BYTES = 8 * 1024 * 1024
 
 
-def native_environment() -> dict[str, str]:
-    """Keep OS and native sign-in access without inherited inference or harness overrides."""
+def native_environment(home: Path) -> dict[str, str]:
+    """Run Sylvia's copy against Sylvia's profile, without inherited inference overrides.
+
+    Claude Code's documented directory variables keep its settings, sessions, sign-in and
+    temporary files inside ``home``. Its own updater is blocked because it would write to the
+    shared per-user installation; Sylvia replaces its copy itself.
+    """
     allowed = {
         "systemroot",
         "windir",
@@ -57,7 +63,12 @@ def native_environment() -> dict[str, str]:
     environment = {k: v for k, v in os.environ.items() if k.lower() in allowed}
     environment.update(
         {
+            "CLAUDE_CONFIG_DIR": str(home / "profile"),
+            "ANTHROPIC_CONFIG_DIR": str(home / "anthropic"),
+            "CLAUDE_CODE_TMPDIR": str(home / "temp"),
             "DISABLE_AUTOUPDATER": "1",
+            "DISABLE_UPDATES": "1",
+            "DISABLE_INSTALLATION_CHECKS": "1",
             "DISABLE_TELEMETRY": "1",
             "DISABLE_ERROR_REPORTING": "1",
             "ENABLE_CLAUDEAI_MCP_SERVERS": "false",
@@ -88,26 +99,23 @@ def native_auth_command(executable: Path, action: str) -> list[str]:
     ]
 
 
-def find_runtime(executable: str | Path | None = None) -> Path | None:
-    """Resolve a native executable, never a shell command, script or automatic installer."""
-    if executable:
-        path = Path(executable).expanduser()
-        if not path.is_absolute():
-            raise ProviderConnectionError("Choose an absolute path to the Claude executable.")
-        candidates = [path]
-    else:
-        located = shutil.which("claude")
-        candidates = [Path(located)] if located else []
-        candidates.append(
-            Path.home() / ".local" / "bin" / ("claude.exe" if os.name == "nt" else "claude")
-        )
-    for candidate in candidates:
-        if candidate.is_file() and (os.name != "nt" or candidate.suffix.lower() == ".exe"):
-            return candidate.absolute()
-    return None
+def executable_name() -> str:
+    """Name Anthropic publishes for this platform's binary."""
+    return "claude.exe" if os.name == "nt" else "claude"
 
 
-def runtime_version(executable: Path) -> str:
+def find_runtime(home: Path) -> Path | None:
+    """Return the newest copy Sylvia installed under ``home``; never another Claude Code."""
+    installed: list[tuple[tuple[int, ...], Path]] = []
+    directory = home / "install"
+    for entry in directory.iterdir() if directory.is_dir() else ():
+        candidate = entry / executable_name()
+        if re.fullmatch(r"\d+\.\d+\.\d+", entry.name) and candidate.is_file():
+            installed.append((tuple(int(part) for part in entry.name.split(".")), candidate))
+    return max(installed)[1].absolute() if installed else None
+
+
+def runtime_version(executable: Path, home: Path) -> str:
     """Check the native protocol prerequisite without sign-in or a model request."""
     try:
         result = subprocess.run(
@@ -117,7 +125,7 @@ def runtime_version(executable: Path) -> str:
             encoding="utf-8",
             errors="replace",
             timeout=10,
-            env=native_environment(),
+            env=native_environment(home),
             **process_options(),
         )
     except (OSError, subprocess.TimeoutExpired):
@@ -126,17 +134,19 @@ def runtime_version(executable: Path) -> str:
         ) from None
     match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+) \(Claude Code\)\s*", result.stdout)
     if result.returncode or match is None:
-        raise ProviderConnectionError("Choose the official native Claude Code executable.")
+        raise ProviderConnectionError(
+            "Sylvia's copy of Claude Code is damaged. Install it again in Settings > Accounts."
+        )
     version = tuple(int(v) for v in match.groups())
     if version < MINIMUM_VERSION:
         raise ProviderConnectionError(
             f"Claude Code {MINIMUM_VERSION_TEXT} or later is required. "
-            "Update it yourself, then check again."
+            "Update Sylvia's copy in Settings > Accounts."
         )
     return ".".join(map(str, version))
 
 
-def authentication_status(executable: Path) -> dict[str, object]:
+def authentication_status(executable: Path, home: Path) -> dict[str, object]:
     """Project allowlisted native status fields; discard emails, tokens and raw diagnostics."""
     try:
         result = subprocess.run(
@@ -146,14 +156,12 @@ def authentication_status(executable: Path) -> dict[str, object]:
             encoding="utf-8",
             errors="replace",
             timeout=10,
-            env=native_environment(),
+            env=native_environment(home),
             **process_options(),
         )
         raw = json.loads(result.stdout)
     except (OSError, subprocess.TimeoutExpired, ValueError):
-        raise ProviderConnectionError(
-            "Claude could not report its sign-in status. Check it in your terminal."
-        ) from None
+        raise ProviderConnectionError("Claude could not report its sign-in status.") from None
     if not isinstance(raw, dict) or result.returncode not in (0, 1):
         raise ProviderConnectionError("Claude could not report its sign-in status.")
     method = raw.get("authMethod")
@@ -180,10 +188,17 @@ def authentication_status(executable: Path) -> dict[str, object]:
 class ClaudeConnection:
     """Own exactly one native process and bound every stdio frame and pending reader."""
 
-    def __init__(self, executable: Path, workspace: Path, arguments: list[str]) -> None:
+    def __init__(
+        self,
+        executable: Path,
+        workspace: Path,
+        arguments: list[str],
+        environment: dict[str, str],
+    ) -> None:
         self.executable = executable
         self.workspace = workspace
         self.arguments = arguments
+        self.environment = environment
         self._process: subprocess.Popen[str] | None = None
         self._events: queue.Queue[dict[str, Any] | Exception | None] = queue.Queue(maxsize=1024)
         self._stopped = threading.Event()
@@ -204,7 +219,7 @@ class ClaudeConnection:
                 text=True,
                 encoding="utf-8",
                 errors="strict",
-                env=native_environment(),
+                env=self.environment,
                 **process_options(),
             )
         except OSError:

@@ -236,7 +236,7 @@
     };
     // Each desktop-only Settings page says what the browser cannot do, under its own heading.
     for (const [id, text] of [
-      ['settings-panel-accounts', 'In the browser, ChatGPT and Claude sign-in need the Sylvia desktop app. ' +
+      ['settings-panel-accounts', 'In the browser, ChatGPT and Claude setup and sign-in need the Sylvia desktop app. ' +
         'Models you have already saved remain available.'],
       ['settings-panel-dictation', 'Dictation needs the Sylvia desktop app. The browser never asks for your microphone.'],
       ['settings-panel-admin', 'In the browser, the live inspector window and Audit export need the Sylvia desktop app.'],

@@ -1,4 +1,5 @@
-// Exercise the Claude Code account flow with a synthetic owner; no runtime, account or inference is used.
+// Exercise the Claude Code setup and account flow with a synthetic owner; no download, runtime, account or
+// inference is used.
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -30,7 +31,8 @@ async function openShell(browser, viewport = { width: 1400, height: 950 }) {
     const api = window.settingsTest;
     const status = (extra = {}) => ({ installed: true, supported: true, version: '2.1.322', signed_in: false,
       login_pending: false, auth_method: null, billing: 'unknown', message: '',
-      executable: 'C:\\Users\\player\\.local\\bin\\claude.exe', ...extra });
+      install: { state: 'idle', version: null, received: 0, total: null, message: null },
+      executable: 'C:\\Users\\player\\AppData\\Roaming\\Sylvia\\claude-runtime\\install\\2.1.322\\claude.exe', ...extra });
     window.fixture = {
       calls: [],
       status,
@@ -107,7 +109,7 @@ test('opening and switching the Claude view never contacts Claude Code', { timeo
     assert.equal(await page.locator('#account-view-claude').isVisible(), true);
     assert.equal(await page.locator('#account-view-chatgpt').isVisible(), false);
     assert.match(await page.locator('#claude-connection-status').innerText(), /only when you ask/);
-    assert.equal(await page.locator('[data-claude-action="login"]').isVisible(), false);
+    assert.equal(await page.locator('[data-claude-action]:visible').count(), 1, 'only the explicit check is offered');
     assert.equal(await page.locator('#claude-model-card').isVisible(), false);
     await snap(page, '1-not-checked');
     await page.locator('[data-account-view="chatgpt"]').click();
@@ -120,33 +122,65 @@ test('opening and switching the Claude view never contacts Claude Code', { timeo
   } finally { await browser.close(); }
 });
 
-test('missing and unsupported runtimes offer the official guide and no sign-in', { timeout: 30000 }, async () => {
+test('Sylvia installs its own copy with visible progress and offers an update when needed', { timeout: 30000 }, async () => {
   const browser = await launch();
   try {
     const { page, errors, claudeCalls, setNext } = await openShell(browser);
     await page.evaluate(() => window.settingsTest.openSettings('accounts'));
     await page.locator('[data-account-view="claude"]').click();
-    await setNext({ installed: false, supported: false, version: null, executable: null });
+    const missing = { installed: false, supported: false, version: null, executable: null,
+      message: 'Sylvia uses its own copy of Claude Code. Install it to continue; any Claude Code you already have is left alone.' };
+    await setNext(missing);
     await page.locator('[data-claude-action="status"]').click();
-    await page.waitForFunction(() => /wasn’t found/.test(document.getElementById('claude-connection-status').textContent));
+    await page.waitForFunction(() => /doesn’t have its copy/.test(document.getElementById('claude-connection-status').textContent));
     assert.equal(await page.locator('#claude-signin-step').innerText(), '1. INSTALL CLAUDE CODE');
-    assert.equal(await page.locator('[data-claude-action="login"]').isVisible(), false);
+    assert.equal(await page.locator('[data-claude-action="login"]').first().isVisible(), false);
     assert.equal(await page.locator('#claude-runtime-facts').isVisible(), false);
-    assert.match(await page.locator('#claude-install-help').innerText(), /never installs or updates/);
+    assert.equal(await page.locator('[data-claude-action="install"]').innerText(), 'Install Claude Code for Sylvia');
+    assert.match(await page.locator('#claude-install-help').innerText(), /keeps it in Sylvia’s own folder/);
+    assert.match(await page.locator('#claude-connection-detail').innerText(), /already have is left alone/);
+    assert.equal(await page.locator('#account-view-claude input[type="text"]:visible').count(), 0,
+      'no field can point Sylvia at another Claude Code');
     await snap(page, '2-missing');
-    await page.locator('#claude-install-guide-btn').click();
+    await page.locator('#claude-terms-btn').click();
     await page.waitForFunction(() => window.fixture.calls.some(call => call.kind === 'setup'));
     assert.deepEqual(await page.evaluate(() => window.fixture.calls.filter(call => call.kind === 'setup')),
       [{ kind: 'setup', preset_id: 'claude_runtime' }]);
 
-    await setNext({ supported: false, version: '2.0.1', message: 'Sylvia needs Claude Code 2.1.322 or newer.' });
+    const downloading = received => ({ ...missing,
+      install: { state: 'downloading', version: '2.1.322', received, total: 346496160, message: null } });
+    await setNext(downloading(0), downloading(104857600));
+    await page.locator('[data-claude-action="install"]').click();
+    await page.waitForFunction(() => /100 of 330 MB/.test(document.getElementById('claude-connection-status').textContent),
+      null, { timeout: 8000 });
+    assert.equal(await page.locator('#claude-signin-step').innerText(), '1. INSTALLING CLAUDE CODE');
+    assert.equal(await page.locator('#claude-install-progress').isVisible(), true);
+    assert.equal(await page.locator('#claude-install-progress').evaluate(bar => bar.value / bar.max > 0.3), true);
+    assert.equal(await page.locator('[data-claude-action="cancel"]').innerText(), 'Cancel download');
+    assert.equal(await page.locator('[data-claude-action="install"]').isVisible(), false);
+    await snap(page, '2b-downloading');
+    await setNext({ install: { state: 'ready', version: '2.1.322', received: 346496160, total: 346496160,
+      message: 'Claude Code 2.1.322 is installed for Sylvia.' } });
+    await page.locator('[data-claude-action="login"]').first().waitFor({ timeout: 8000 });
+    assert.equal(await page.locator('#claude-install-progress').isVisible(), false);
+    assert.match(await page.locator('#claude-connection-detail').innerText(), /2\.1\.322 is installed for Sylvia/);
+    assert.equal(await page.locator('#claude-fact-version').innerText(), '2.1.322');
+    assert.equal(await page.locator('[data-claude-action="install"]').innerText(), 'Check for a newer version');
+    const settled = (await claudeCalls()).length;
+    await page.waitForTimeout(1700);
+    assert.equal((await claudeCalls()).length, settled, 'a finished download does not keep polling');
+
+    await setNext({ supported: false, version: '2.0.1',
+      message: 'Claude Code 2.1.322 or later is required. Update Sylvia’s copy in Settings > Accounts.' });
     await page.locator('[data-claude-action="status"]').click();
-    await page.waitForFunction(() => /isn’t supported/.test(document.getElementById('claude-connection-status').textContent));
+    await page.waitForFunction(() => /needs updating/.test(document.getElementById('claude-connection-status').textContent));
     assert.match(await page.locator('#claude-connection-status').innerText(), /2\.0\.1/);
-    assert.match(await page.locator('#claude-connection-detail').innerText(), /2\.1\.322 or newer/);
-    assert.equal(await page.locator('[data-claude-action="login"]').isVisible(), false);
-    assert.equal(await page.locator('#claude-install-guide-btn').isVisible(), true);
-    assert.deepEqual((await claudeCalls()).map(call => [call.action, call.options]), [['status', null], ['status', null]]);
+    assert.match(await page.locator('#claude-connection-detail').innerText(), /2\.1\.322 or later/);
+    assert.equal(await page.locator('[data-claude-action="login"]').first().isVisible(), false);
+    assert.equal(await page.locator('[data-claude-action="install"]').innerText(), 'Update Claude Code');
+    const calls = (await claudeCalls()).map(call => [call.action, call.options]);
+    assert.deepEqual(calls.slice(0, 2), [['status', null], ['install', null]]);
+    assert.equal(calls.slice(2).every(([action, options]) => action === 'status' && options === null), true);
     assert.deepEqual(errors, []);
   } finally { await browser.close(); }
 });
@@ -158,13 +192,15 @@ test('sign-in polls read-only status, can be cancelled, and states billing exact
     await page.evaluate(() => window.settingsTest.openSettings('accounts'));
     await page.locator('[data-account-view="claude"]').click();
     await page.locator('[data-claude-action="status"]').click();
-    await page.locator('[data-claude-action="login"]').waitFor();
-    assert.match(await page.locator('#claude-login-help').innerText(), /Console API account/);
+    const login = page.locator('[data-claude-action="login"]:not([data-claude-account])');
+    await login.waitFor();
+    assert.match(await page.locator('#claude-login-help').innerText(), /Anthropic Console account/);
 
     await setNext({ login_pending: true });
-    await page.locator('[data-claude-action="login"]').click();
+    await login.click();
     await page.locator('[data-claude-action="cancel"]').waitFor();
-    assert.match(await page.locator('#claude-cancel-help').innerText(), /Other\s+Claude Code sessions stay signed in/);
+    assert.equal(await page.locator('[data-claude-action="cancel"]').innerText(), 'Cancel sign-in');
+    assert.match(await page.locator('#claude-cancel-help').innerText(), /Any other\s+Claude Code on this computer is unaffected/);
     await snap(page, '3-pending');
     await setNext({});
     await page.locator('[data-claude-action="cancel"]').click();
@@ -173,30 +209,39 @@ test('sign-in polls read-only status, can be cancelled, and states billing exact
 
     await setNext({ login_pending: true }, { login_pending: true },
       { signed_in: true, auth_method: 'claude.ai', billing: 'subscription', email: 'player@example.test' });
-    await page.locator('[data-claude-action="login"]').click();
+    await login.click();
     await page.locator('#claude-model-card').waitFor({ timeout: 8000 });
     const actions = (await claudeCalls()).map(call => call.action);
     assert.deepEqual(actions, ['status', 'login', 'cancel', 'login', 'status', 'status']);
+    assert.equal((await claudeCalls()).every(call => call.options === null), true);
     assert.match(await page.locator('#claude-billing-note').innerText(), /Claude subscription/);
     assert.equal(await page.locator('#claude-fact-auth').innerText(), 'Claude account');
     assert.equal(await page.locator('#claude-signin-step').innerText(), '1. CLAUDE CONNECTED');
-    assert.match(await page.locator('#claude-signout-help').innerText(), /never signs you out/);
-    assert.equal(await page.locator('[data-claude-action="login"]').isVisible(), true);
-    assert.match(await page.locator('[data-claude-action="login"]').innerText(), /Sign in again/);
+    assert.match(await page.locator('#claude-signout-help').innerText(), /affects only\s+Sylvia’s copy/);
+    assert.equal(await login.isVisible(), true);
+    assert.match(await login.innerText(), /Sign in again/);
     assert.doesNotMatch(await page.locator('#settings-panel-accounts').innerText(), /player@example\.test/);
     await snap(page, '4-signed-in-subscription');
 
     await setNext({ signed_in: true, login_pending: true, billing: 'subscription' });
-    await page.locator('[data-claude-action="login"]').click();
+    await login.click();
     await page.locator('[data-claude-action="cancel"]').waitFor();
     assert.equal(await page.locator('#claude-model-card').isVisible(), false);
     await setNext({ signed_in: true, auth_method: 'claude.ai', billing: 'subscription' });
     await page.locator('[data-claude-action="cancel"]').click();
     await page.locator('#claude-model-card').waitFor();
 
+    // Signing out and the Console account choice act on Sylvia's own copy, through the same owner command.
+    await setNext({});
+    await page.locator('[data-claude-action="logout"]').click();
+    await page.waitForFunction(() => document.getElementById('claude-model-card').hidden);
+    assert.equal(await page.locator('[data-claude-action="logout"]').isVisible(), false);
+    assert.equal(await page.locator('#claude-fact-auth').innerText(), 'Not signed in');
     await setNext({ signed_in: true, auth_method: 'console', billing: 'api' });
-    await page.locator('[data-claude-action="status"]').click();
+    await page.locator('[data-claude-action="login"][data-claude-account="api"]').click();
     await page.waitForFunction(() => document.getElementById('claude-billing-note').classList.contains('settings-note-warn'));
+    assert.deepEqual((await claudeCalls()).slice(-2).map(call => [call.action, call.options]),
+      [['logout', null], ['login', { account_type: 'api' }]]);
     assert.match(await page.locator('#claude-billing-note').innerText(), /billed to that Console account/);
     assert.equal(await page.locator('#claude-fact-billing').innerText(), 'Anthropic Console API');
     await page.evaluate(() => window.settingsTest.closeSettings());
@@ -214,15 +259,9 @@ test('models are saved by typed alias, edited in place and kept out of API disco
     await setNext({ signed_in: true, auth_method: 'claude.ai', billing: 'subscription' });
     await page.evaluate(() => window.settingsTest.openSettings('accounts'));
     await page.locator('[data-account-view="claude"]').click();
-    await page.locator('#claude-runtime-advanced summary').click();
-    await page.locator('#claude-executable').fill('claude.exe');
-    await page.locator('[data-claude-action="status"]').click();
-    assert.match(await page.locator('#claude-connection-status').innerText(), /full path/);
-    assert.deepEqual(await claudeCalls(), []);
-    await page.locator('#claude-executable').fill('D:\\Tools\\claude.exe');
     await page.locator('[data-claude-action="status"]').click();
     await page.locator('#claude-model-card').waitFor();
-    assert.deepEqual((await claudeCalls())[0].options, { executable: 'D:\\Tools\\claude.exe' });
+    assert.equal((await claudeCalls())[0].options, null);
 
     await page.locator('[data-claude-action="add_model"]').click();
     assert.match(await page.locator('#claude-model-status').innerText(), /alias such as sonnet/);
@@ -236,7 +275,7 @@ test('models are saved by typed alias, edited in place and kept out of API disco
     await page.locator('[data-claude-action="add_model"]').click();
     await page.waitForFunction(() => !document.getElementById('models-overview').hidden);
     const added = (await claudeCalls()).filter(call => call.action === 'add_model');
-    assert.deepEqual(added.map(call => call.options), [{ executable: 'D:\\Tools\\claude.exe',
+    assert.deepEqual(added.map(call => call.options), [{
       model: { id: 'sonnet', context_window: null, max_output_tokens: null } }]);
 
     await page.locator('[data-edit-model="sonnet"]').click();

@@ -1,4 +1,4 @@
-"""Claude's native runtime as a streaming provider; Sylvia owns every game action."""
+"""Sylvia's own Claude Code copy as a streaming provider; Sylvia owns every game action."""
 
 from __future__ import annotations
 
@@ -26,6 +26,7 @@ from sylvia_gm.provider._base import (
 from sylvia_gm.provider._claude_runtime import (
     ClaudeConnection,
     find_runtime,
+    native_environment,
     runtime_version,
 )
 from sylvia_gm.provider._exceptions import (
@@ -165,12 +166,10 @@ class ClaudeProvider(Provider):
         home: Path,
         model_info: ModelInfo,
         *,
-        executable: Path | None = None,
         connection_factory: Callable[..., ClaudeConnection] = ClaudeConnection,
     ) -> None:
         super().__init__()
         self.home, self.model_info = home, model_info
-        self._executable = executable
         self._connection_factory = connection_factory
         self._active: ClaudeConnection | None = None
         self._lock = asyncio.Lock()
@@ -209,13 +208,12 @@ class ClaudeProvider(Provider):
         **kwargs: object,
     ) -> AsyncIterator[ProviderStreamChunk]:
         async with self._lock:
-            executable = find_runtime(self._executable)
+            executable = find_runtime(self.home)
             if executable is None:
                 raise ProviderConnectionError(
-                    "Install the official Claude Code runtime, "
-                    "then select it in Settings > Accounts."
+                    "Set up Claude Code for Sylvia in Settings > Accounts, then try again."
                 )
-            await asyncio.to_thread(runtime_version, executable)
+            await asyncio.to_thread(runtime_version, executable, self.home)
             self.home.mkdir(parents=True, exist_ok=True)
             with tempfile.TemporaryDirectory(prefix="turn-", dir=self.home) as directory:
                 workspace = Path(directory)
@@ -270,7 +268,9 @@ class ClaudeProvider(Provider):
                     )
                 else:
                     arguments.extend(["--mcp-config", '{"mcpServers":{}}'])
-                connection = self._connection_factory(executable, workspace, arguments)
+                connection = self._connection_factory(
+                    executable, workspace, arguments, native_environment(self.home)
+                )
                 self._active = connection
                 response = ProviderResponse(
                     model=self.model_info.wire_model_id, usage_reported=False
