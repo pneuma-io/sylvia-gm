@@ -35,6 +35,13 @@ is a technical coverage checkpoint, not completion of K. Wider K production and 
 catalogue are open. Live/in-app checks and separately owned Siren playable conversion remain
 deferred; this increment does not select merge or release.
 
+Daniel's subsequent portrait comparison reopened visual fidelity. The prepared K-labelled sets
+pass technical source/resource checks, but their drawing, texture and colour treatment are not
+accepted as a match to his supplied reference. Catalogue expansion now follows one controlled
+Marla portrait correction with her design fixed and the exact comparison image supplied separately
+for style. That local preview is not adopted into the catalogue; illustration style versus broader
+character-design feedback remains open. The selected K default and existing saved assets are unchanged.
+
 **10 November 2026: GPT Images phase one (PL-10).** The owner selected generation/editing through
 the managed ChatGPT subscription connection, Off/Review/Auto permissions, saved full-body and
 multi-view character references, shared adjustable portrait framing and map-data-guided underlays.
