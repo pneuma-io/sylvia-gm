@@ -6196,6 +6196,186 @@
         "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Rook from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin, eyes, hair, clothing, equipment, colors and wear. Appearance: A humanlike adult Riftborn man appearing in his early forties, with a slender medium-height build, warm light brown skin, hazel-brown eyes, a long softly lined clean-shaven face and wavy black hair reaching just below the ears, neatly tucked back. An open, resourceful, friendly expression and relaxed welcoming posture. A soft ochre knee-length sleeveless wool merchant's coat over a pale gray-cream linen shirt with rolled sleeves, dark blue loose work trousers and practical brown leather ankle boots. A plain braided cord belt carries one small closed leather pouch; both hands relaxed and empty. His generous approachable neighborhood-merchant bearing follows the authored profile; age, physical features and clothing are editable visual defaults. His home world remains unknown. No bird anatomy, rook or raven, invented noble crest or faction insignia, foreign-world uniform, visible magical Anchor Charm, glowing salve, supernatural effects, weapon, stall goods, readable trade guide, invented origin or revealed past. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views; entire hair, hands, footwear and equipment within all margins. The same single character repeated as turnaround views. Keep bags, pouches, apron ties, clothing fastenings and hair details on the same anatomical sides through the turn. Change viewing angle only, keeping costume and identity. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, extra characters or revealed secrets.",
         "portrait": "Use case: identity-preserve. Production square app portrait for Rook from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, skin, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, border, caption, text, UI, scenery, new costume, magical effects, invented crest, animal or extra person. One 1024x1024 PNG."
       }
+    },
+    {
+      "id": "severed-npc-salt-ash",
+      "name": "Salt-Ash",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/salt-ash.md",
+          "sha256": "4394ad691618e594ff1b1f6adbd0cfbd601b0799d02a27bc3905b3b20720ff10",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/salt-ash.md",
+          "sha256": "6aedc98e75aabd6269ac217731e2163851f603973ddb9d62b975e4e5bec40487",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult Human woman at the Hollowed Speaker stage, appearing in her late forties, with a lean angular build, tawny brown skin, an expressive narrow lined face and short black hair threaded with gray, loosely waved and slightly disheveled. Both eyes have uniformly VIOLET irises, dark round pupils and natural white sclera; violet eye color throughout each iris, with no glow. An intense searching scholarly expression, visibly concentrating, alert upright posture and empty relaxed hands. A careworn charcoal-blue knee-length wool scholar's coat over a gray linen shirt, muted brick-brown work trousers and scuffed dark leather ankle boots. A plain belt carries one small closed pouch. Her Speaker-stage violet eyes and intense scholarly concentration follow the authored profile and Hollowed source; age, other physical features and clothes are editable visual defaults. No invented Unbound or Athenaeum badge, readable notes or Warden inscription, magical effects, glowing eyes, cursed veins, lesions, deformity, weapon, revealed warning or invented conclusions about the last Door.",
+        "full_body": {
+          "path": "assets/characters/28db251053a742ae760ddc2806d3651bd8b346c9fed40f8cc2c7b481eeb1a913.png",
+          "sha256": "28db251053a742ae760ddc2806d3651bd8b346c9fed40f8cc2c7b481eeb1a913"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/6c3fb94da99ab3e7f3f82784d575e3f5fc3985f72d69b6caf029709c6cb70e13.png",
+          "sha256": "6c3fb94da99ab3e7f3f82784d575e3f5fc3985f72d69b6caf029709c6cb70e13"
+        },
+        "portrait": {
+          "path": "assets/characters/9823ac30ac6011d35c2099afc9742106b7828d5f52bec7dedafb2807924e1f0c.png",
+          "sha256": "9823ac30ac6011d35c2099afc9742106b7828d5f52bec7dedafb2807924e1f0c"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1988131
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2483682
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2640578
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Salt-Ash in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, scales where applicable, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person in a near-front three-quarter standing pose. Whole head, both hands, clothing, footwear or natural feet, equipment and any tail comfortably inside all margins. Appearance: An adult Human woman at the Hollowed Speaker stage, appearing in her late forties, with a lean angular build, tawny brown skin, an expressive narrow lined face and short black hair threaded with gray, loosely waved and slightly disheveled. Both eyes have uniformly VIOLET irises, dark round pupils and natural white sclera; violet eye color throughout each iris, with no glow. An intense searching scholarly expression, visibly concentrating, alert upright posture and empty relaxed hands. A careworn charcoal-blue knee-length wool scholar's coat over a gray linen shirt, muted brick-brown work trousers and scuffed dark leather ankle boots. A plain belt carries one small closed pouch. Her Speaker-stage violet eyes and intense scholarly concentration follow the authored profile and Hollowed source; age, other physical features and clothes are editable visual defaults. No invented Unbound or Athenaeum badge, readable notes or Warden inscription, magical effects, glowing eyes, cursed veins, lesions, deformity, weapon, revealed warning or invented conclusions about the last Door. Preserve authored identity, species, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Salt-Ash from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin or scales, eyes, hair where present, clothing, equipment, colors and wear. Appearance: An adult Human woman at the Hollowed Speaker stage, appearing in her late forties, with a lean angular build, tawny brown skin, an expressive narrow lined face and short black hair threaded with gray, loosely waved and slightly disheveled. Both eyes have uniformly VIOLET irises, dark round pupils and natural white sclera; violet eye color throughout each iris, with no glow. An intense searching scholarly expression, visibly concentrating, alert upright posture and empty relaxed hands. A careworn charcoal-blue knee-length wool scholar's coat over a gray linen shirt, muted brick-brown work trousers and scuffed dark leather ankle boots. A plain belt carries one small closed pouch. Her Speaker-stage violet eyes and intense scholarly concentration follow the authored profile and Hollowed source; age, other physical features and clothes are editable visual defaults. No invented Unbound or Athenaeum badge, readable notes or Warden inscription, magical effects, glowing eyes, cursed veins, lesions, deformity, weapon, revealed warning or invented conclusions about the last Door. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views; entire head, hands, feet, equipment and any tail tip within all margins. The same single character repeated as turnaround views. Keep pouches, knife sheath, writing-tool case and clothing fastenings on the same anatomical sides through the turn. The close face detail must clearly preserve uniformly violet irises in both eyes, dark pupils and natural white sclera, with no glow or added mutation. Change viewing angle only, keeping costume and identity. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, extra characters or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Salt-Ash from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, species, skin or scale pattern, eyes, hairstyle where present, expression and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above the complete head and any hair. Consistent face scale for a standard RPG dialogue portrait. Preserve uniformly VIOLET irises in both eyes with dark pupils and natural white sclera, no glow or new mutation. Polished naturalistic digital RPG illustration with tactile skin or scales and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, border, caption, text, UI, scenery, new costume, magical effects, invented crest, animal or extra person. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-scaled-hunter",
+      "name": "Reef",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/scaled-hunter.md",
+          "sha256": "e9306b5c49ec0a73b20bebb30c99c0b8fe359a031eddbe36c41d4786dead92d3",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/scaled-hunter.md",
+          "sha256": "1aa8661653707bfd697286a0af6b47fe1a3849e8aec4cd34e53f437f580fc898",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult female reptilian Riftborn of the Verdant Scaled, young by Scaled standards, with a lean athletic bipedal hunter's build. Clearly reptilian lizard head with a modest elongated blunt snout, scaled brow ridges, amber-brown eyes with narrow vertical pupils, small rounded external ear openings and no human hair. Fine dark olive and moss-green scales over the head, arms and legs, paler ochre scales along the lower jaw, throat and underside. Two arms with five claw-tipped digits per hand, two strong plantigrade legs with broad clawed feet, and ONE long strong tapering scaled tail, naturally curving behind the body with its complete tip visible within the frame. A patient, observant, slightly bemused expression and easy balanced upright stance, hands empty and relaxed. A plain brown woven sleeveless wrap tunic reaching mid-thigh over fitted muted green cloth leg wraps, simple leather forearm guards and a russet leather belt. One ordinary small hunting knife stays fully sheathed at her anatomical LEFT hip, one closed plain pouch at the RIGHT hip; naturally bare scaled clawed feet. Her reptilian identity and patient hunter bearing follow her profile and faction source; detailed anatomy, scale colors, features and clothes are editable visual defaults. Her home world remains unknown. No human skin, human face, hair, mammalian ears, feathers, wings, antlers, oversized horns, extra limbs, extra tails, glowing markings, Tide-Mother's Rift-burn scars, invented tribal emblem, magic, landscape, prey or animal companion.",
+        "full_body": {
+          "path": "assets/characters/b62bf7d3125dd262f8b478a8ba425914cb8189736be0c34c9a5d06b6e33422df.png",
+          "sha256": "b62bf7d3125dd262f8b478a8ba425914cb8189736be0c34c9a5d06b6e33422df"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/e637130a3245b6925301d1a1a665c16c870b86c9ab0c7b3e659ddc2e8cdc6269.png",
+          "sha256": "e637130a3245b6925301d1a1a665c16c870b86c9ab0c7b3e659ddc2e8cdc6269"
+        },
+        "portrait": {
+          "path": "assets/characters/0270a494af5fe2f18fbfaf963b4e9f0abf395ab60056942dd8b0fe3489f66512.png",
+          "sha256": "0270a494af5fe2f18fbfaf963b4e9f0abf395ab60056942dd8b0fe3489f66512"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0,
+          "zoom": 1.3
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2145195
+        },
+        "reference_sheet": {
+          "width": 1774,
+          "height": 887,
+          "bytes": 2262745
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2590478
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Reef in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, scales where applicable, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person in a near-front three-quarter standing pose. Whole head, both hands, clothing, footwear or natural feet, equipment and any tail comfortably inside all margins. Appearance: An adult female reptilian Riftborn of the Verdant Scaled, young by Scaled standards, with a lean athletic bipedal hunter's build. Clearly reptilian lizard head with a modest elongated blunt snout, scaled brow ridges, amber-brown eyes with narrow vertical pupils, small rounded external ear openings and no human hair. Fine dark olive and moss-green scales over the head, arms and legs, paler ochre scales along the lower jaw, throat and underside. Two arms with five claw-tipped digits per hand, two strong plantigrade legs with broad clawed feet, and ONE long strong tapering scaled tail, naturally curving behind the body with its complete tip visible within the frame. A patient, observant, slightly bemused expression and easy balanced upright stance, hands empty and relaxed. A plain brown woven sleeveless wrap tunic reaching mid-thigh over fitted muted green cloth leg wraps, simple leather forearm guards and a russet leather belt. One ordinary small hunting knife stays fully sheathed at her anatomical LEFT hip, one closed plain pouch at the RIGHT hip; naturally bare scaled clawed feet. Her reptilian identity and patient hunter bearing follow her profile and faction source; detailed anatomy, scale colors, features and clothes are editable visual defaults. Her home world remains unknown. No human skin, human face, hair, mammalian ears, feathers, wings, antlers, oversized horns, extra limbs, extra tails, glowing markings, Tide-Mother's Rift-burn scars, invented tribal emblem, magic, landscape, prey or animal companion. Preserve authored identity, species, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Reef from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin or scales, eyes, hair where present, clothing, equipment, colors and wear. Appearance: An adult female reptilian Riftborn of the Verdant Scaled, young by Scaled standards, with a lean athletic bipedal hunter's build. Clearly reptilian lizard head with a modest elongated blunt snout, scaled brow ridges, amber-brown eyes with narrow vertical pupils, small rounded external ear openings and no human hair. Fine dark olive and moss-green scales over the head, arms and legs, paler ochre scales along the lower jaw, throat and underside. Two arms with five claw-tipped digits per hand, two strong plantigrade legs with broad clawed feet, and ONE long strong tapering scaled tail, naturally curving behind the body with its complete tip visible within the frame. A patient, observant, slightly bemused expression and easy balanced upright stance, hands empty and relaxed. A plain brown woven sleeveless wrap tunic reaching mid-thigh over fitted muted green cloth leg wraps, simple leather forearm guards and a russet leather belt. One ordinary small hunting knife stays fully sheathed at her anatomical LEFT hip, one closed plain pouch at the RIGHT hip; naturally bare scaled clawed feet. Her reptilian identity and patient hunter bearing follow her profile and faction source; detailed anatomy, scale colors, features and clothes are editable visual defaults. Her home world remains unknown. No human skin, human face, hair, mammalian ears, feathers, wings, antlers, oversized horns, extra limbs, extra tails, glowing markings, Tide-Mother's Rift-burn scars, invented tribal emblem, magic, landscape, prey or animal companion. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views; entire head, hands, feet, equipment and any tail tip within all margins. The same single character repeated as turnaround views. Keep pouches, knife sheath, writing-tool case and clothing fastenings on the same anatomical sides through the turn. Preserve the exact fully reptilian lizard anatomy, scale pattern, head/snout, two arms, two legs and single complete tapering tail. Give each body view enough horizontal room for its whole curved tail without crossing into the adjacent figure; use a smaller face inset if needed. No humanization, missing tail, duplicated tail, wings or new horns. Change viewing angle only, keeping costume and identity. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, extra characters or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Reef from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, species, skin or scale pattern, eyes, hairstyle where present, expression and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above the complete head and any hair. Consistent face scale for a standard RPG dialogue portrait. Preserve the exact fully reptilian lizard head, blunt elongated snout, small scale crests, ear openings, amber-brown eyes with vertical pupils and pale ochre chin/throat. Keep the whole muzzle and head crest comfortably inside the frame. No human face, human skin, hair, mammalian ears, new horns, excessive neck-only framing or altered species. Polished naturalistic digital RPG illustration with tactile skin or scales and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, border, caption, text, UI, scenery, new costume, magical effects, invented crest, animal or extra person. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-scribe-apprentice",
+      "name": "Quill",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/scribe-apprentice.md",
+          "sha256": "79999006b8007b4f69f2859f1c361728333f02e2feabe32146343f3f56612224",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/scribe-apprentice.md",
+          "sha256": "f86581c16115f048292f59deceee686407369b2a626d3b6b27711d34110aeda8",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A humanlike young adult second-generation Riftborn woman appearing in her early twenties, with a slight medium-height build, warm medium-brown skin, dark brown eyes, a soft oval face and straight black hair in a practical chin-length bob tucked behind the ears. An earnest, curious, carefully attentive expression and slightly forward-focused upright posture. A plain dusty teal sleeveless wool over-tunic over an ivory long-sleeved linen blouse with sleeves neatly rolled to the forearms, a lead-gray ankle-length skirt and simple closed brown leather ankle boots. A narrow plain leather belt carries a small closed leather writing-tool case at her anatomical RIGHT hip. Empty relaxed hands, a light ordinary ink smudge near one fingertip. Her earnest meticulous apprentice bearing follows the authored profile; age, features, clothes and ink smudge are editable visual defaults. She was born in the Severed Lands and has never crossed the Rift. No invented home-world memories, arrival scars, bird anatomy, feathers, giant quill, readable text, Warden records, revealed findings, forbidden inscription, magic, invented Athenaeum badge, noble heraldry or invented parental origin.",
+        "full_body": {
+          "path": "assets/characters/803bb27d956a46ed16db10fdeb7fe57b7cf8807ae3ecfbaf424db27ff5ab3db1.png",
+          "sha256": "803bb27d956a46ed16db10fdeb7fe57b7cf8807ae3ecfbaf424db27ff5ab3db1"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/5e88d923d8606f9e5a41efc7a32237969f45a3a2b68f1ef268244905d3cfea69.png",
+          "sha256": "5e88d923d8606f9e5a41efc7a32237969f45a3a2b68f1ef268244905d3cfea69"
+        },
+        "portrait": {
+          "path": "assets/characters/b959c77cd346f06f1d4de88d8c8e531eb509ea8dacfaff0d466eb391ea1dda65.png",
+          "sha256": "b959c77cd346f06f1d4de88d8c8e531eb509ea8dacfaff0d466eb391ea1dda65"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1985591
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2256144
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2435574
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Quill in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, scales where applicable, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person in a near-front three-quarter standing pose. Whole head, both hands, clothing, footwear or natural feet, equipment and any tail comfortably inside all margins. Appearance: A humanlike young adult second-generation Riftborn woman appearing in her early twenties, with a slight medium-height build, warm medium-brown skin, dark brown eyes, a soft oval face and straight black hair in a practical chin-length bob tucked behind the ears. An earnest, curious, carefully attentive expression and slightly forward-focused upright posture. A plain dusty teal sleeveless wool over-tunic over an ivory long-sleeved linen blouse with sleeves neatly rolled to the forearms, a lead-gray ankle-length skirt and simple closed brown leather ankle boots. A narrow plain leather belt carries a small closed leather writing-tool case at her anatomical RIGHT hip. Empty relaxed hands, a light ordinary ink smudge near one fingertip. Her earnest meticulous apprentice bearing follows the authored profile; age, features, clothes and ink smudge are editable visual defaults. She was born in the Severed Lands and has never crossed the Rift. No invented home-world memories, arrival scars, bird anatomy, feathers, giant quill, readable text, Warden records, revealed findings, forbidden inscription, magic, invented Athenaeum badge, noble heraldry or invented parental origin. Preserve authored identity, species, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Quill from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin or scales, eyes, hair where present, clothing, equipment, colors and wear. Appearance: A humanlike young adult second-generation Riftborn woman appearing in her early twenties, with a slight medium-height build, warm medium-brown skin, dark brown eyes, a soft oval face and straight black hair in a practical chin-length bob tucked behind the ears. An earnest, curious, carefully attentive expression and slightly forward-focused upright posture. A plain dusty teal sleeveless wool over-tunic over an ivory long-sleeved linen blouse with sleeves neatly rolled to the forearms, a lead-gray ankle-length skirt and simple closed brown leather ankle boots. A narrow plain leather belt carries a small closed leather writing-tool case at her anatomical RIGHT hip. Empty relaxed hands, a light ordinary ink smudge near one fingertip. Her earnest meticulous apprentice bearing follows the authored profile; age, features, clothes and ink smudge are editable visual defaults. She was born in the Severed Lands and has never crossed the Rift. No invented home-world memories, arrival scars, bird anatomy, feathers, giant quill, readable text, Warden records, revealed findings, forbidden inscription, magic, invented Athenaeum badge, noble heraldry or invented parental origin. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views; entire head, hands, feet, equipment and any tail tip within all margins. The same single character repeated as turnaround views. Keep pouches, knife sheath, writing-tool case and clothing fastenings on the same anatomical sides through the turn. Change viewing angle only, keeping costume and identity. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, extra characters or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Quill from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, species, skin or scale pattern, eyes, hairstyle where present, expression and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above the complete head and any hair. Consistent face scale for a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin or scales and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, border, caption, text, UI, scenery, new costume, magical effects, invented crest, animal or extra person. One 1024x1024 PNG."
+      }
     }
   ]
 }
