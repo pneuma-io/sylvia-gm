@@ -20,12 +20,12 @@ The Cartographer is obsessive, brilliant, and terrified. The map has been their 
 
 ## Appearance and artwork
 
-An anonymous adult cartographer concealed in a deep-teal stitched hood and cape, ivory and sand layered scholar robes with asymmetrical panels, a brown chart satchel, map harness and cream rolled charts, dark gloves and brown covered boots. Slight guarded stoop and exhausted meticulous bearing. Use they/them pronouns. The entire face and species remain concealed: the hood opening is completely opaque black from every angle, with no eyes, skin, nose, mouth, hair, ears, face contour or lights. No revealed identity, gender/species cues or magical nature.
+A concealed figure in a deep teal hooded cloak with ochre stitching and worn edges, a cream scarf and layered map-patterned ivory cloth panels. The raised hood's opening is featureless shadow-black, revealing no eyes, skin, face, mask, gender or species. Both hands remain gloved. Brown leather straps support clustered rolled map tubes and a right-side satchel; a rolled scroll is held at the chest. Dark practical boots and loose lower garments. The identity remains unknown in every view.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/512c371bd179b156e9efc6672fdc62098e3f06a29d3311fc3f9c599cadfcea1a.png)
+[Portrait](../assets/characters/6209621496d366252629053860089fef16915e89fa687a5e7cc2f6c2f68c9fe5.png)
 
-[Full-body reference](../assets/characters/9c3ec289cd737d3d11b5e048beaae3cadf0232ce82c20294dcc594629f6848e3.png)
+[Full-body reference](../assets/characters/5d8d852a39d9600759f5333e11f3397a289aabb133cb3a55cf8fe1e5d7fdc25d.png)
 
-[Multiview reference sheet](../assets/characters/57be1c91029105397da2a334cc380b9bc5fa1d9606d7e470a4e128d5d842ac1c.png)
+[Multiview reference sheet](../assets/characters/bb4be3b3ac29858af47f061806118183ce2aa5a50e02cdf2e5b30216f49a5442.png)

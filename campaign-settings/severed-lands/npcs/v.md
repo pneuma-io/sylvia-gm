@@ -43,12 +43,12 @@ The truth is for the DM to decide. The ambiguity is the point.
 
 ## Appearance and artwork
 
-A mature humanlike androgynous adult Riftborn field researcher with olive-gold skin, grey-green eyes, short wavy dark-indigo hair and a pale cream forelock, small plain ear studs, and a lean medium-height build. A pearl half-cape with green lining and fine woven trim covers layered indigo and forest-green scholar travel clothes, loose indigo trousers and brown lace-up boots. A closed brown folio is held against the torso; a small brown field pouch hangs at the belt. Patient, methodical, guarded competence and quiet attentive authority. Use they/them pronouns. Actual age, original world and underlying identity remain unknown. No weapon, armor, magic, Warden mark, bisected-circle symbol, Door fragment, glowing eyes or immortal/divine revelation.
+An adult of androgynous appearance with warm medium-brown skin, a composed face, grey-olive eyes and short tousled deep-violet hair with a broad pale forelock. Indigo layered traveller clothing with restrained patterned trim, loose indigo trousers, a cream cloak with green lining and geometric edging, brown belt pouches and lace-up brown boots. A plain brown book is held against the chest. V's true nature and home world remain unrevealed; no visible species cue, power, weapon or new emblem resolves that ambiguity.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/a8d9d0953d1d95abc5f8466684b382d3bd5a51d45e0a5fc5818ab7e16014eeeb.png)
+[Portrait](../assets/characters/07d4c20da8fcf5efaee67075c92780938144759913767c50ac7e2ccba0486ec1.png)
 
-[Full-body reference](../assets/characters/db3a6071f69c4914e9cae1260fb1680bce4808b76d033b5f8f2a81857b6fdfa9.png)
+[Full-body reference](../assets/characters/5730eecd94e15c5872c1752de9a4ccc0a67dbe584595d5148848a46487781946.png)
 
-[Multiview reference sheet](../assets/characters/2c4d45e616870dea52ec1d0aad0e15c55415f96802c69ffee4e66b295b23a6d5.png)
+[Multiview reference sheet](../assets/characters/28f16ef4679c212b72e54cc549174618bea753dc5482a5ee665400b5335edf8a.png)

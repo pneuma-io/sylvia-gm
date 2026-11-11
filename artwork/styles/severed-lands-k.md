@@ -11,8 +11,8 @@ constraint for replacement catalogue art.
 - [Accepted Marla benchmark](../assets/styles/264bae18256a83fd10bea91715fb1aed8fa2ce8c309d8d122fe83c120fa660dc.png):
   use this exact image for drawing and painted finish, and for Marla's identity.
 
-The four designs are visual anchors, not complete body/sheet/portrait bundles. The historical
-catalogue still needs replacement. Siren Protocol has its separate supplied references.
+The four starting designs now have prepared body/sheet/portrait bundles linked below. The wider
+historical catalogue still needs replacement. Siren Protocol has its separate supplied references.
 
 ## Rendering brief
 
@@ -95,6 +95,15 @@ the pictured person supplies neither terrain geometry nor compulsory night light
 Both full-body and multiview references are required for a complete bundle. A selected concept
 image alone is not complete coverage. New references join production canon when selected against
 the authored facts and this guide. Individual creature studies remain outside canon until selected.
+
+### Prepared starting character references
+
+| Character | Full body | Multiview | Portrait |
+|---|---|---|---|
+| V | [Body](../assets/characters/5730eecd94e15c5872c1752de9a4ccc0a67dbe584595d5148848a46487781946.png) | [Sheet](../assets/characters/28f16ef4679c212b72e54cc549174618bea753dc5482a5ee665400b5335edf8a.png) | [Portrait](../assets/characters/07d4c20da8fcf5efaee67075c92780938144759913767c50ac7e2ccba0486ec1.png) |
+| Captain Harlan | [Body](../assets/characters/8f2f290cd552a3111dd2d499e9c728d53aa5672726d18b5f5e71b81e2ba1d4b1.png) | [Sheet](../assets/characters/edae40d87a4c327eb2a87b014094ed586cd6365aec562236c4bf9cc185e637ed.png) | [Portrait](../assets/characters/f19d122425359160b6da559f9a4b4e375f7f8ee18921c233b333354bf85a06d6.png) |
+| The Cartographer | [Body](../assets/characters/5d8d852a39d9600759f5333e11f3397a289aabb133cb3a55cf8fe1e5d7fdc25d.png) | [Sheet](../assets/characters/bb4be3b3ac29858af47f061806118183ce2aa5a50e02cdf2e5b30216f49a5442.png) | [Portrait](../assets/characters/6209621496d366252629053860089fef16915e89fa687a5e7cc2f6c2f68c9fe5.png) |
+| Marla | [Body](../assets/characters/c2b3187410bae93589ca6c4bbca4ba6407a6e882b6953c40dff7c74986eeea95.png) | [Sheet](../assets/characters/25c4568a26c048a3c1bd151b84c0061e0f7407bb5e54d59f0b87c9916e4d5d3f.png) | [Portrait](../assets/characters/112d0c99d1fcee3c196e0622d4fb3592847070c7b889632507619d8d12665552.png) |
 
 ### Selected Rift creature identity
 
