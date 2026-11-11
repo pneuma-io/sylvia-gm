@@ -158,8 +158,11 @@ def test_npc_components_follow_saved_stat_block_exemptions_after_reopen(tmp_path
             assert StatelessMcpMechanics(owner).execute_action(command) == receipt
             assert owner.snapshot("casting").state == saved.state
         else:
-            with pytest.raises(MechanicsRejected, match="Verbal component"):
+            with pytest.raises(MechanicsRejected) as refused:
                 _act(owner, "cast_spell_outside_combat", **parameters)
+            reasons = " ".join(refused.value.refusal_reasons)
+            assert "verbal_component_available" in reasons
+            assert "somatic_component_available" in reasons
             assert owner.snapshot("casting").state == before.state
 
 

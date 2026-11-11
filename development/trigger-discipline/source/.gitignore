@@ -1,0 +1,10 @@
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.trash/
+.DS_Store
+Thumbs.db
+balance-results/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage

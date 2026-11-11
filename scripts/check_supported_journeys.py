@@ -59,12 +59,15 @@ PYTHON_JOURNEYS = {
     ],
     "command-registry": ["tests/test_command_registry.py"],
     "campaign-play": [
+        "tests/test_gm_hotfix_upgrade.py",
         "tests/test_campaign_rules_update.py",
         "tests/test_campaign_rules_update_bindings.py",
         "tests/test_campaign_rules_update_knowledge.py",
         "tests/test_action_sequences.py",
         "tests/test_action_sequence_provider.py",
         "tests/test_td_native_panel_repairs.py",
+        "tests/test_td_panel_resources.py",
+        "tests/test_td_directional_cover.py",
         "tests/test_fc_campaign_journey.py",
         "tests/test_fc_party_combat.py",
         "tests/test_fc_campaign_progress.py",
@@ -301,6 +304,7 @@ PYTHON_JOURNEYS = {
         'tests/test_tactical_grid_frontend.py',
     ],
     "interruption-and-recovery": [
+        "tests/test_private_session_reopen.py",
         "tests/test_fc_recovery_composition.py",
         "tests/test_session_history_pages.py",
         "tests/test_alpha_f6e_owner_session_transport.py::"
@@ -328,7 +332,6 @@ PYTHON_JOURNEYS = {
         'tests/test_local_diagnostics_owner.py',
         'tests/test_package_archive_streaming.py',
         'tests/test_private_records_archive.py',
-        'tests/test_private_session_reopen.py',
         'tests/test_saved_builder_sessions.py',
         'tests/test_working_context_sessions.py',
     ],
@@ -336,6 +339,9 @@ PYTHON_JOURNEYS = {
         "tests/test_alpha_f4_provider_session_adapter.py",
         "tests/test_alpha_f4_generic_sessions.py",
         "tests/test_provider_turn_state.py",
+    ],
+    "gm-request-contracts": [
+        "tests/test_gm_memory_casting_hotfix.py",
     ],
     "provider-contracts": [
         "tests/test_provider_session_transport_projection.py",
@@ -577,6 +583,7 @@ PYTHON_JOURNEYS = {
 FULL_ONLY_JOURNEYS = frozenset({"full-only-slow"})
 
 UI_JOURNEY = [
+    "tests/frontend_td_retained_layout.browser.cjs",
     "tests/frontend_campaign_rules_update.browser.cjs",
     "tests/frontend_character_equipment.test.cjs",
     "tests/frontend_character_selection.test.cjs",

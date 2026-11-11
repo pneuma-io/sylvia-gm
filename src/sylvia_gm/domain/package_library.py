@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import re
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
@@ -284,6 +285,11 @@ PACKAGE_RUNTIME_FORMAT = 1
 ENGINE_FEATURE_SPATIAL_MUTATION = "spatial_mutation.v1"
 ENGINE_FEATURE_SPATIAL_PATH_MOVING_ENTITY = "spatial_path_moving_entity.v1"
 ENGINE_FEATURE_SPATIAL_CLEARANCE = "spatial_clearance.v1"
+ENGINE_FEATURE_SPATIAL_GRID_EDGE = "spatial_grid_edge.v1"
+ENGINE_FEATURE_SPATIAL_EDGE_CONTINUITY = "spatial_edge_continuity.v1"
+ENGINE_FEATURE_SPATIAL_WALL_AUTHORING = "spatial_wall_authoring.v1"
+ENGINE_FEATURE_SPATIAL_EXPOSURE_PATH = "spatial_exposure_path.v1"
+ENGINE_FEATURE_SPATIAL_PATH_COST_PROFILE = "spatial_path_cost_profile.v1"
 ENGINE_FEATURE_SHOT_EFFECTS = "shot_effects.v1"
 ENGINE_FEATURE_PANEL_WORKSPACES = "panel_workspaces.v1"
 ENGINE_FEATURE_TACTICAL_GRID = "tactical_grid.v1"
@@ -300,6 +306,12 @@ SUPPORTED_ENGINE_FEATURES = frozenset(
         ENGINE_FEATURE_SPATIAL_MUTATION,
         ENGINE_FEATURE_SPATIAL_PATH_MOVING_ENTITY,
         ENGINE_FEATURE_SPATIAL_CLEARANCE,
+        ENGINE_FEATURE_SPATIAL_GRID_EDGE,
+        ENGINE_FEATURE_SPATIAL_EDGE_CONTINUITY,
+        ENGINE_FEATURE_SPATIAL_WALL_AUTHORING,
+        "spatial_grid_lanes.v1",
+        ENGINE_FEATURE_SPATIAL_EXPOSURE_PATH,
+        ENGINE_FEATURE_SPATIAL_PATH_COST_PROFILE,
         ENGINE_FEATURE_SHOT_EFFECTS,
         ENGINE_FEATURE_PANEL_WORKSPACES,
         ENGINE_FEATURE_TACTICAL_GRID,
@@ -1522,8 +1534,14 @@ TACTICAL_UI_DYNAMIC_SELECTIONS = frozenset(
         "target",
         "aim_point",
         "area",
+        "lane",
         "orientation",
         "declared_action",
+        "edges",
+        "edge_anchor",
+        "edge_walls",
+        "map_id",
+        "map_revision",
     }
 )
 NETWORK_UI_DYNAMIC_SELECTIONS = frozenset(
@@ -1681,6 +1699,23 @@ def _ui_surface(
             if (renderer not in {'coordinate_map', 'tactical_grid'} or 'actor' not in sources
                     or not sources.intersection({'target', 'aim_point'})):
                 raise ValueError('Segment previews require declared spatial endpoints')
+        declared_bindings = action.get("bindings")
+        edge_bound = (isinstance(declared_bindings, Mapping)
+                      and "edges" in declared_bindings.values())
+        if "edge_segment" in action or edge_bound:
+            action_fields |= {"edge_segment"}
+            template = _object(action.get("edge_segment"), "UI edge segment")
+            _exact_keys(
+                template,
+                frozenset({"height", "active", "movement", "visibility", "metadata", "destroyed"}),
+                "UI edge segment",
+            )
+            height = template["height"]
+            if (renderer != "tactical_grid" or not edge_bound or isinstance(height, bool)
+                    or not isinstance(height, (int, float)) or not math.isfinite(height)
+                    or height <= 0):
+                raise ValueError("Edge segments require a tactical edges binding and height")
+            owned_payload(template)
         _exact_keys(action, action_fields, "UI surface action")
         validate_authority_identity(action["id"], "UI surface action identity")
         _safe_small_label(action["label"], "UI surface action label")
@@ -1710,7 +1745,7 @@ def _ui_surface(
             for parameter in bindings:
                 validate_authority_identity(parameter, "UI surface bound parameter")
         actions.append(owned_payload(action))
-    if len(actions) > 16:
+    if len(actions) > 24:
         raise ValueError("UI surface declares too many actions")
     actor_references = {action.get('actor_reference') for action in actions
                         if isinstance(action.get('bindings'), Mapping)

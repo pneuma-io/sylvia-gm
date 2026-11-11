@@ -42,7 +42,8 @@ function harness(required = true, proposal = {}, values = new Map()) {
   let source = fs.readFileSync(path.join(__dirname, '../src-tauri/frontend/app.js'), 'utf8');
   const insertion = source.lastIndexOf('  return {');
   source = source.slice(0, insertion) + `
-    window.panelTest = { state, ensureSessionActivity, renderRulesetPanelProjection, pendingPanelCommand, recoverPanelAction };
+    window.panelTest = { state, ensureSessionActivity, selectedActivity, renderRulesetPanelProjection,
+      pendingPanelCommand, recoverPanelAction, runPanelAction };
     refreshSelectedCampaign = async () => {};
     renderRulesetPanels = async () => {};
   ` + source.slice(insertion);
@@ -109,10 +110,17 @@ for (const selection of [{ actor: 'participant-internal', destination: [4, 4] },
   });
 }
 
-test('confirm retains the prepared identity and revision even after a display refresh', async () => {
+test('panel click awaits fresh authority and retains its prepared identity after a display refresh', async () => {
   const h = harness();
+  const snapshot = deferred();
+  h.api.state.bridge.snapshot = () => snapshot.promise;
   const pending = h.click();
   await new Promise(setImmediate);
+  assert.equal(h.proposals.length, 0, 'preview waits for the authoritative snapshot');
+  assert.equal(h.executions.length, 0);
+  snapshot.resolve({ revision: 7 });
+  await new Promise(setImmediate);
+  assert.equal(h.proposals[0].expected_revision, 7, 'the cached revision zero is never previewed');
   h.api.state.activeSnapshot = { revision: 8 };
   h.body.children[0].close('confirm');
   await pending;
@@ -172,4 +180,120 @@ test('an absent receipt offers only the original operation for explicit retry', 
   h.api.state.bridge.execute_panel_action = async value => { assert.deepEqual(JSON.parse(JSON.stringify(value)),original); return {status:'committed'}; };
   await h.api.recoverPanelAction(true);
   assert.equal(h.api.pendingPanelCommand(), null);
+});
+
+function deferred() {
+  let resolve;
+  const promise = new Promise((done) => { resolve = done; });
+  return { promise, resolve };
+}
+
+// Hold the actual receipt boundary so campaign switching does not depend on timers.
+for (const replacement of ['campaign', 'operation']) {
+  test(`a rejection receipt cannot erase a different ${replacement}'s recovery`, { timeout: 3000 }, async () => {
+    const storage = new Map(), h = harness(false, {}, storage), messages = [];
+    const lookup = deferred(), receipt = deferred();
+    const originalKey = 'sylvia-panel-recovery-v1:campaign:gm';
+    h.api.state.bridge.execute_panel_action = async (command) => {
+      h.executions.push(command);
+      throw Object.assign(new Error('The owner refused the edit.'), { code: 'ruleset_precondition_rejected' });
+    };
+    h.api.state.bridge.panel_action_receipt = (command) => {
+      lookup.resolve(command);
+      return receipt.promise;
+    };
+    const pending = runDirect(h, { onRefused: (reason) => messages.push(reason),
+      onUncertain: (reason) => messages.push(reason) });
+    const original = await lookup.promise;
+    assert.equal(JSON.parse(storage.get(originalKey)).operation_id, original.operation_id);
+    const campaignId = replacement === 'campaign' ? 'other-campaign' : 'campaign';
+    const sessionId = replacement === 'campaign' ? 'other-gm' : 'gm';
+    const otherKey = `sylvia-panel-recovery-v1:${campaignId}:${sessionId}`;
+    const other = JSON.stringify({ ...original, campaign_id: campaignId, session_id: sessionId,
+      operation_id: 'another-uncertain-operation' });
+    Object.assign(h.api.state, { activeCampaignId: campaignId, activeSessionId: sessionId,
+      panelRecoveryAbsent: 'another-uncertain-operation' });
+    h.api.ensureSessionActivity({ campaignId, sessionId, sessionRole: 'dm' });
+    storage.set(otherKey, other);
+    receipt.resolve(null);
+    await pending;
+    assert.equal(storage.get(otherKey), other, 'The other exact request must survive');
+    assert.equal(h.api.state.panelRecoveryAbsent, 'another-uncertain-operation');
+    if (replacement === 'campaign') assert.equal(storage.has(originalKey), false,
+      'Only the originating rejection, now proven absent, can be cleared');
+    assert.equal(h.executions.length, 1);
+    assert.equal(h.api.state.panelCommitPending, false);
+    assert.deepEqual(messages, [], 'A stale callback cannot change the selected editor');
+  });
+}
+
+async function runDirect(h, options) {
+  const projection = h.api.state.panelProjection, surface = projection.surfaces.find((item) => item.id === 'map');
+  await h.api.runPanelAction(projection, surface, surface.actions[0], {}, h.button,
+    { activity: h.api.selectedActivity(), campaignId: 'campaign', sessionId: 'gm' },
+    { direct: true, ...options });
+}
+
+for (const scenario of [
+  { name: 'WebUI uncertain outcome', error: Object.assign(new Error('The reply was lost.'), { code: 'outcome_unknown' }) },
+  { name: 'native uncertain outcome', error: new Error('outcome_unknown: The reply was lost.') },
+  { name: 'unavailable transport', error: Object.assign(new Error('Connection unavailable.'), { code: 'webui_unavailable' }) },
+  { name: 'uncoded transport exception', error: new Error('Connection reset.') },
+  { name: 'owner rejection with failed receipt lookup', error: Object.assign(new Error('The owner refused the edit.'),
+    { code: 'ruleset_precondition_rejected' }), lookup: true },
+]) {
+  test(`${scenario.name} stays uncertain until saved receipt recovery`, async () => {
+    const storage = new Map(), h = harness(false, {}, storage), refused = [], uncertain = [];
+    let lookups = 0;
+    h.api.state.bridge.execute_panel_action = async (command) => {
+      h.executions.push(command); throw scenario.error;
+    };
+    h.api.state.bridge.panel_action_receipt = async () => { lookups++; throw new Error('Lookup unavailable'); };
+    await runDirect(h, { onRefused: (reason) => refused.push(reason), onUncertain: (reason) => uncertain.push(reason) });
+    assert.deepEqual(refused, [], 'An unconfirmed send must never invoke refusal wording');
+    assert.equal(uncertain.length, 1);
+    const original = JSON.parse(JSON.stringify(h.api.pendingPanelCommand()));
+    assert.equal(original.operation_id, h.executions[0].operation_id);
+    assert.equal(lookups, scenario.lookup ? 1 : 0);
+    h.api.state.bridge.panel_action_receipt = async (command) => {
+      assert.deepEqual(JSON.parse(JSON.stringify(command)), original);
+      return { status: 'committed', action_id: original.operation_id };
+    };
+    await h.api.recoverPanelAction();
+    assert.equal(h.executions.length, 1, 'Receipt recovery cannot execute again');
+    assert.equal(h.api.pendingPanelCommand(), null);
+  });
+}
+
+test('a proven owner rejection reports refusal and clears only its original request', async () => {
+  const storage = new Map(), h = harness(false, {}, storage), refused = [], uncertain = [];
+  h.api.state.bridge.execute_panel_action = async (command) => {
+    h.executions.push(command);
+    throw Object.assign(new Error('The wall edit was refused.'), { code: 'ruleset_precondition_rejected' });
+  };
+  h.api.state.bridge.panel_action_receipt = async (command) => {
+    assert.equal(command.operation_id, h.executions[0].operation_id);
+    return null;
+  };
+  await runDirect(h, { onRefused: (reason) => refused.push(reason), onUncertain: (reason) => uncertain.push(reason) });
+  assert.deepEqual(refused, ['The wall edit was refused.']);
+  assert.deepEqual(uncertain, []);
+  assert.equal(storage.size, 0);
+});
+
+test('a saved receipt overrides a rejection reply without executing a second time', async () => {
+  const storage = new Map(), h = harness(false, {}, storage), outcomes = [];
+  h.api.state.bridge.execute_panel_action = async (command) => {
+    h.executions.push(command);
+    throw Object.assign(new Error('The owner refused a later request.'), { code: 'ruleset_precondition_rejected' });
+  };
+  h.api.state.bridge.panel_action_receipt = async (command) => {
+    assert.equal(command.operation_id, h.executions[0].operation_id);
+    return { status: 'committed', action_id: command.operation_id };
+  };
+  await runDirect(h, { onCommitted: () => outcomes.push('saved'), onRefused: () => outcomes.push('refused'),
+    onUncertain: () => outcomes.push('uncertain') });
+  assert.deepEqual(outcomes, ['saved']);
+  assert.equal(storage.size, 0);
+  assert.equal(h.executions.length, 1);
 });

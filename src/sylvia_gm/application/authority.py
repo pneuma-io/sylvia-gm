@@ -80,6 +80,7 @@ from sylvia_gm.application.package_runtime import (
     package_tool_decision_title,
     package_tool_description,
     package_tool_model_behavior,
+    package_tool_permanently_refused,
     package_tool_player_controls,
 )
 from sylvia_gm.application.piece_table import (
@@ -95,7 +96,9 @@ from sylvia_gm.application.player_actions import (
     player_action_origins,
     player_action_records,
     player_action_request_matches,
+    player_canonical_payload,
     player_control_origin,
+    player_tool_result,
     resolve_inventory_action_parameters,
     resolve_party_action_parameters,
     retain_player_action_origin,
@@ -121,6 +124,7 @@ from sylvia_gm.application.tactical_grid import (
     player_known_spatial_value,
     project_coordinate_map,
     project_tactical_grid,
+    public_edge_segment,
     resolve_surface_source,
     resolve_tactical_action_parameters,
 )
@@ -525,6 +529,7 @@ class CatalogTool:
     check_player_action: PlayerActionChecker | None = None
     preview_player_action: PlayerActionPreviewer | None = None
     decision_title: str = ""
+    permanently_refused: bool = False
 
     def __post_init__(self) -> None:
         validate_authority_identity(self.package_id, "Catalog package identity")
@@ -916,6 +921,10 @@ class AuthorityOwner:
                 player_controls=player_controls,
                 check_player_action=check_player_action,
                 preview_player_action=preview_player_action,
+                permanently_refused=package_tool_permanently_refused(
+                    package_id=package.package_id, declaration=declaration,
+                    runtime_bytes=runtime_bytes,
+                ),
             )
             self._tools[identity] = materialized
             return materialized
@@ -4551,6 +4560,7 @@ class AuthorityOwner:
             tool = self._package_tool(entry, declaration)
             if (
                 tool is not None
+                and not tool.permanently_refused
                 and tool.capability == declaration.capability
                 and tool.capability in entry.capabilities
             ):
@@ -4950,6 +4960,10 @@ class AuthorityOwner:
                 ),
             )
             pending_key = (command.campaign_id, command.action_id)
+            private_inputs = any(
+                key.startswith(command.package_id + ".")
+                for key in self._engine_private_keys(basis.package_lock)
+            )
             with self._narration_lock:
                 self._pending_tools[pending_key] = PlayerProjection(
                     kind=PlayerProjectionKind.PENDING_TOOL,
@@ -4960,7 +4974,7 @@ class AuthorityOwner:
                             "package_version": package.version,
                             "package_sha256": package.sha256,
                             "tool_name": command.tool_name,
-                            "parameters": parameters,
+                            "parameters": {} if private_inputs else parameters,
                         }
                     ),
                     collapsed_by_default=True,
@@ -4983,7 +4997,14 @@ class AuthorityOwner:
                         raise TypeError("Mechanic outcome violates state ownership")
                 except RulesetPreconditionRejected:
                     raise
-                except Exception:
+                except Exception as error:
+                    self.record_admin_full_audit({
+                        "kind": "ruleset_execution_defect",
+                        "package_id": command.package_id,
+                        "tool_name": command.tool_name,
+                        "error": str(error)[:2000],
+                        "cause": str(error.__cause__)[:2000] if error.__cause__ else None,
+                    })
                     outcome = _safe_tool_failure_outcome()
                     status = ActionStatus.FAILED
                 else:
@@ -6692,6 +6713,8 @@ class AuthorityOwner:
                         available = False
                 return owned_payload({
                     **action, "available": available, "actor_parameter": actor_parameter,
+                    **({"edge_segment": public_edge_segment(action["edge_segment"])}
+                       if "edge_segment" in action else {}),
                     "response_policy": tools[0].player_controls.response if len(tools) == 1 else None,
                     "checks_required": len(tools) == 1 and tools[0].check_player_action is not None,
                     "map_preview_enabled": bool(action.get("spatial_preview")) or (
@@ -7352,6 +7375,7 @@ class AuthorityOwner:
         if session_id is None:
             return
         snapshot = self._store.snapshot(receipt.campaign_id)
+        snapshot = self._project_private_tool_inputs(snapshot)
         events = tuple(
             event for event in snapshot.events
             if event.action_id == receipt.action_id
@@ -7572,25 +7596,34 @@ class AuthorityOwner:
                 return replace(snapshot, state=safe_state, mutations=tuple(
                     item for item in snapshot.mutations
                     if f"{item.namespace}.{item.key}" not in private_keys
+                ), consequences=tuple(
+                    replace(item, payload=owned_payload({"kind": "spatial_query"}))
+                    if item.payload.get("kind") == "spatial_query" else item
+                    for item in snapshot.consequences
                 ))
             return replace(snapshot, state=safe_state)
 
     def _project_private_tool_inputs(
         self, snapshot: _Snapshot,
     ) -> _Snapshot:
-        """Keep canonical input bytes in storage and omit hidden-game arguments from readers."""
+        """Retain canonical bytes while omitting hidden inputs and spatial evidence from readers."""
         private_keys = self._engine_private_keys(snapshot.package_lock)
         private_packages = {entry.package_id for entry in snapshot.package_lock.entries
                             if any(key.startswith(entry.package_id + ".") for key in private_keys)}
-        actions = tuple(replace(action, parameters=owned_payload({}))
-                        if action.package_id in private_packages else action
-                        for action in snapshot.actions)
-        events = tuple(replace(event, safe_payload=owned_payload({
-                           **event.safe_payload, "parameters": {},
-                       }))
-                       if event.event_type is CanonicalEventType.TOOL_CALL
-                       and event.safe_payload.get("package_id") in private_packages else event
-                       for event in snapshot.events)
+        actions = tuple(replace(
+            action,
+            parameters=(owned_payload({}) if action.package_id in private_packages
+                        else action.parameters),
+            result=player_tool_result(action.result),
+        ) for action in snapshot.actions)
+
+        def public_event(event: CanonicalEvent) -> CanonicalEvent:
+            return replace(event, safe_payload=player_canonical_payload(
+                event.event_type, event.safe_payload,
+                private_inputs=event.safe_payload.get("package_id") in private_packages,
+            ))
+
+        events = tuple(public_event(event) for event in snapshot.events)
         return replace(snapshot, actions=actions, events=events)
 
     def _engine_private_keys(self, lock: PackageLock) -> frozenset[str]:
@@ -7609,9 +7642,9 @@ class AuthorityOwner:
     def model_context_snapshot(
         self, campaign_id: str,
     ) -> tuple[CampaignDisplaySnapshot, ModelDecisionBoundary | None]:
-        """Project public state and a private game's permitted actor from one revision."""
+        """Read permitted model state, continuity and actor scope from one revision."""
         with self._operation():
-            snapshot = self._store.display_snapshot(campaign_id)
+            snapshot = self._store.display_snapshot(campaign_id, include_continuity=True)
             private_keys = self._engine_private_keys(snapshot.package_lock)
             visible = replace(snapshot, state={
                 key: value for key, value in snapshot.state.items() if key not in private_keys
@@ -8922,7 +8955,7 @@ class AuthorityOwner:
             return self._admin_full_audit_enabled
 
     def record_admin_full_audit(self, payload: object) -> None:
-        """Capture one raw provider exchange only while the explicit admin mode is enabled."""
+        """Capture a private exchange or defect only while explicit admin mode is enabled."""
 
         with self._operation(), self._narration_lock:
             if self._admin_full_audit_enabled:
@@ -9485,7 +9518,11 @@ class AuthorityOwner:
 
 def _safe_tool_failure_outcome() -> MechanicOutcome:
     return MechanicOutcome(
-        result=owned_payload({"status": "failed", "code": "tool_execution_failed"})
+        result=owned_payload({"status": "failed", "code": "tool_execution_failed",
+                              "reason": (
+                                  "The Ruleset could not complete this operation. Check its "
+                                  "declared inputs; if they are valid, report a Ruleset defect."
+                              )})
     )
 
 

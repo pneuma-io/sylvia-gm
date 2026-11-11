@@ -517,16 +517,38 @@ class AuthorityMemoryStateBridge:
         return result
 
     def spatial_mutation(self, scene_path: str, request: object) -> dict[str, object]:
-        """Advance one exact scene object while retaining prior in-action snapshots."""
+        """Stage one scene edit while retaining prior in-action snapshots and legacy data."""
 
         if not isinstance(request, Mapping):
             raise PackageRuntimeError("Spatial mutation input must be an object")
         engine = self._spatial_engine(scene_path)
         mutation = mutate_spatial_scene(engine.snapshot, request)
         field_path = scene_path.removeprefix("state.")
-        engine.replace_scene(mutation.scene.as_payload())
-        self.write_field("state", field_path, mutation.scene.as_payload())
         result = mutation.as_payload()
+        replacement = mutation.scene.as_payload()
+        if request.get("operation") == "grid_lane":
+            original = cast(dict[str, Any], deepcopy(self.read_field("state", field_path)))
+            zone = result["zone"]
+            original["zones"] = [z for z in original["zones"] if z["id"] != zone["id"]] + [zone]
+            original["map"]["revision"] = mutation.scene.geometry_revision
+            replacement = original
+        elif "operation" in request:
+            # Preserve omitted legacy defaults and all unrelated authored bytes.
+            original = cast(dict[str, Any], deepcopy(self.read_field("state", field_path)))
+            changed = set(cast(Mapping[str, Any], result["target"])["ids"])
+            canonical = {
+                item["id"]: item for item in cast(list[dict[str, Any]], replacement["geometry"])
+            }
+            for item in original["geometry"]:
+                if item["id"] in changed:
+                    item["edge_layer_id"] = canonical[item["id"]]["edge_layer_id"]
+            original["geometry"].extend(
+                canonical[identity] for identity in cast(list[str], result["created_ids"])
+            )
+            original["map"]["revision"] = mutation.scene.geometry_revision
+            replacement = original
+        engine.replace_scene(replacement)
+        self.write_field("state", field_path, replacement)
         self._record_spatial_evidence(
             operation="scene_mutation",
             query=cast(Mapping[str, object], _mutable_json(request)),
@@ -1041,6 +1063,14 @@ def validate_package_runtime(
                 ) from error
 
 
+def package_tool_permanently_refused(
+    *, package_id: str, declaration: ToolDeclaration, runtime_bytes: bytes,
+) -> bool:
+    """Read the refusal set computed once for these immutable runtime bytes."""
+    runtime = _parse_runtime(package_id=package_id, runtime_bytes=runtime_bytes)
+    return declaration.name in runtime.permanently_refused_tool_names
+
+
 def package_tool_description(
     *,
     package_id: str,
@@ -1221,7 +1251,7 @@ def _player_preflight(
         if not result.success:
             # Preserve authored refusals; unexpected runtime failures stay private.
             if result.failure_kind == "precondition" and result.error is not None:
-                raise RulesetPreconditionRejected(result.error)
+                raise RulesetPreconditionRejected(result.error, reasons=result.failure_reasons)
             raise PackageRuntimeError('This path or destination is unavailable; check the visible map and creature-space declarations.')
         scalars.update({key: value for key, value in result.context.items()
                         if value is None or isinstance(value, (str, bool, int, float))})
@@ -1366,7 +1396,9 @@ def materialize_package_mechanic(
     """Compile one exact package declaration into a data-only mechanic closure."""
 
     if package_id == "wotc.srd.5.2.1":
-        raise PackageRuntimeError("Full is archived; migrate this executable binding to SRD Lite before launch.")
+        raise PackageRuntimeError(
+            "Full is archived; migrate this executable binding to SRD Lite before launch."
+        )
 
     runtime = _parse_runtime(
         package_id=package_id,
@@ -1517,8 +1549,10 @@ def materialize_package_mechanic(
                 )
         if not result.success:
             if result.failure_kind == "precondition" and result.error is not None:
-                raise RulesetPreconditionRejected(result.error)
-            raise PackageRuntimeError("Package mechanic execution failed")
+                raise RulesetPreconditionRejected(result.error, reasons=result.failure_reasons)
+            raise PackageRuntimeError("Package mechanic execution failed") from RuntimeError(
+                result.error or "Unknown Ruleset execution failure"
+            )
         if choice_control is not None and not choice_control.consumed:
             raise PackageRuntimeError("Package mechanic did not consume the authorized choice")
         if result.private_random_sampled and result.public_context is None:
@@ -1527,7 +1561,9 @@ def materialize_package_mechanic(
                 and runtime.model_decision_boundary.get("isolated_participant")
                 and result.public_context is None):
             raise PackageRuntimeError("Isolated participant actions require explicit publication")
-        published_context = result.context if result.public_context is None else result.public_context
+        published_context = (
+            result.context if result.public_context is None else result.public_context
+        )
         visible_context = {
             key: value
             for key, value in published_context.items()

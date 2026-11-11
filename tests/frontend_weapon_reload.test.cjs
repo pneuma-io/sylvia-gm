@@ -57,6 +57,17 @@ test('tube feeds and undeclared actions stay honest', () => {
   assert.deepEqual(ids(weaponReloadPlan(weapon('hostile_alpha'), undeclared)), []);
 });
 
+test('a tube top-up names the actor-bound shell control without adding a Reload step', () => {
+  const { weaponReloadPlan } = load();
+  const tube = weapon('hostile_alpha', { feed: 'TUBE', needs_cycle: false, chamber: 'LIVE', magazine: { rounds: 2 } });
+  const shell = { id: 'load-shell', intent: 'load_one_shell', label: 'Load one shell', bindings: { actor_id: 'actor' } };
+  const plan = weaponReloadPlan(tube, [...fixture.character.actions, shell]);
+  assert.deepEqual(ids(plan), []);
+  assert.equal(plan.summary, 'Use Load one shell to top up the tube');
+  const unbound = { ...shell, bindings: { actor_id: 'target' } };
+  assert.match(weaponReloadPlan(tube, [...fixture.character.actions, unbound]).summary, /no declared action/);
+});
+
 test('the rig draws only projected state and the Reload control heads the granular actions', () => {
   const api = load();
   // Vesper carries the projected spent manual rifle (fire, then a granular magazine change: the AP2 counterexample).

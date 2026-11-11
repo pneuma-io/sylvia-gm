@@ -23,6 +23,16 @@ Campaign/action-sequence and authored-plan
 checks are selected for their relevant risks and full qualification. Documentation-only
 changes select copy/link checks, without campaign replay or a build.
 
+The `gm-request-contracts` group exercises the real owner, saved continuity, advertised
+tools and casting feedback with a scripted provider. Relevant GM, provider, authority
+and package changes select it through affected checks; full qualification includes
+each collected case once. The quick `gm-turn` selection stays separate.
+
+An earlier 11-case Alpha4 backport run took about 408 seconds. That observation uses
+different source and lacks this branch's test-cache changes; record current timings
+before choosing a smaller smoke check. Case collection may grow. Real-provider and
+installed-build acceptance remain separate.
+
 The historical `gm-turn-checkpoint` preserves the two full modules plus the original
 campaign group. Its original count was 430; future collection can grow. It includes one
 retained milestone-label test that is explicitly excluded from product qualification.
@@ -53,6 +63,9 @@ $env:SRD_LITE_CANDIDATE=$null
 
 # The fast GM behavioral group.
 .venv/Scripts/python.exe scripts/check_supported_journeys.py --journey gm-turn --jobs 1 --output-dir "$checks\gm-turn"
+
+# Real-owner GM request contracts, when that boundary needs a focused check.
+.venv/Scripts/python.exe scripts/check_supported_journeys.py --journey gm-request-contracts --jobs 1 --output-dir "$checks\gm-request-contracts"
 
 # Affected checks for the branch's complete diff.
 git fetch origin

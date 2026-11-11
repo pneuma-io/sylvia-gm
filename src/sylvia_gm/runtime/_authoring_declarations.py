@@ -35,7 +35,10 @@ EFFECT_BODY_FIELDS = {
     "log": ["level", "message"],
     "table_lookup": ["table", "key", "default", "required", "exact_selector"],
     "spatial_query": ["scene", "operation", "query", "snapshot"],
-    "spatial_mutation": ["scene", "map_id", "expected_revision", "target", "patch"],
+    "spatial_mutation": [
+        "scene", "map_id", "expected_revision", "target", "patch",
+        "operation", "geometry_ids", "segments", "owner_id", "lane",
+    ],
     "shot_effect": [
         "scene",
         "snapshot",

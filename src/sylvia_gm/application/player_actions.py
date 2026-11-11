@@ -6,6 +6,7 @@ from dataclasses import dataclass, replace
 
 from sylvia_gm.domain.authority import (
     CampaignSnapshot,
+    CanonicalEventType,
     MechanicOutcome,
     SafePayload,
     owned_payload,
@@ -34,7 +35,7 @@ def _valid_control_queries(queries: object, calculations: object) -> bool:
                 or not isinstance(body, Mapping) or set(body) != {"scene", "operation", "query"}
                 or not isinstance(body["scene"], str) or not body["scene"].startswith("state.")
                 or not isinstance(body["operation"], str)
-                or body["operation"] not in {"path", "ray", "exposure", "area", "crossed_zones"}
+                or body["operation"] not in {"path", "ray", "exposure", "area", "crossed_zones", "grid_lane"}
                 or not isinstance(body["query"], Mapping) or "kind" in body["query"]):
             return False
         names.add(name)
@@ -153,7 +154,7 @@ def parse_player_controls(value: object) -> PlayerControls:
     if map_preview is not None:
         query_kinds = {item["store_as"]: item["spatial_query"]["operation"] for item in queries}
         if (not isinstance(map_preview, Mapping) or not map_preview
-                or set(map_preview) - {"path", "ray", "exposure", "crossed_zones"}
+                or set(map_preview) - {"path", "ray", "exposure", "crossed_zones", "grid_lane"}
                 or any(not isinstance(name, str) or query_kinds.get(name) != kind
                        for kind, name in map_preview.items())):
             return PlayerControls(available=False)
@@ -301,6 +302,26 @@ def player_action_origins(snapshot: CampaignSnapshot) -> dict[str, SafePayload]:
     }
 
 
+def player_tool_result(result: SafePayload) -> SafePayload:
+    """Keep complete spatial replay evidence in owner storage, outside public results."""
+    return owned_payload({key: value for key, value in result.items() if key != "spatial_evidence"})
+
+
+def player_canonical_payload(
+    event_type: CanonicalEventType, payload: SafePayload, *, private_inputs: bool = False,
+) -> SafePayload:
+    """Use one public event projection for live references, replay and integrity checks."""
+    if event_type is CanonicalEventType.TOOL_CALL and private_inputs:
+        return owned_payload({**payload, "parameters": {}})
+    if event_type is CanonicalEventType.TOOL_RESULT:
+        result = payload.get("result")
+        if isinstance(result, Mapping):
+            return owned_payload({**payload, "result": player_tool_result(result)})
+    if event_type is CanonicalEventType.CONSEQUENCE and payload.get("kind") == "spatial_query":
+        return owned_payload({"kind": "spatial_query"})
+    return payload
+
+
 def player_action_records(snapshot: CampaignSnapshot) -> tuple[SafePayload, ...]:
     """Project the saved outcome, never re-executing or inferring its gameplay meaning."""
 
@@ -316,11 +337,7 @@ def player_action_records(snapshot: CampaignSnapshot) -> tuple[SafePayload, ...]
                 "package_id": action.package_id,
                 "tool_name": action.tool_name,
                 "parameters": action.parameters,
-                "result": {
-                    key: value
-                    for key, value in action.result.items()
-                    if key != "spatial_evidence"
-                },
+                "result": player_tool_result(action.result),
             }
         )
         for action in snapshot.actions

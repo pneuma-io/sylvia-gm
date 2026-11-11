@@ -562,3 +562,90 @@ def test_readme_resets_explicit_plugin_environment_before_runner_commands():
     assert runner.index("$env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=$null") < runner.index("scripts/select_checks.py")
     assert "$env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=1" not in runner
     assert "-p pytest_asyncio.plugin" not in runner
+
+
+
+@pytest.mark.parametrize("path", [
+    "src/sylvia_gm/agent/_provider_session.py",
+    "src/sylvia_gm/agent/_provider_turn_phases.py",
+    "src/sylvia_gm/agent/_provider_turn_state.py",
+    "src/sylvia_gm/agent/_provider_turn_decisions.py",
+    "src/sylvia_gm/agent/_session_loop.py",
+    "src/sylvia_gm/agent/_stateless_mcp.py",
+    "src/sylvia_gm/agent/_native_continuation.py",
+    "src/sylvia_gm/agent/_provider_runtime.py",
+    "src/sylvia_gm/provider/_base.py",
+    "src/sylvia_gm/provider/_codex_rpc.py",
+    "src/sylvia_gm/application/authority.py",
+    "src/sylvia_gm/infrastructure/sqlite_authority.py",
+    "src/sylvia_gm/infrastructure/sqlite_continuity.py",
+    "src/sylvia_gm/domain/authority.py",
+    "src/sylvia_gm/domain/errors.py",
+    "src/sylvia_gm/application/package_runtime.py",
+    "src/sylvia_gm/application/package_materialization.py",
+    "src/sylvia_gm/application/bundled_packages.py",
+    "src/sylvia_gm/application/bundled_campaign_plans.py",
+    "src/sylvia_gm/runtime/_runtime.py",
+    "src/sylvia_gm/runtime/_tool_executor.py",
+    "src/sylvia_gm/runtime/_types.py",
+    "rulesets/srd-lite/runtime/ruleset.yaml",
+    "campaign-plans/riichi-quick-test/plan.json",
+    "scripts/srd_lite_gm_feedback.py",
+    "src-tauri/scripts/build_sylvia_owner.ps1",
+])
+def test_real_gm_request_contracts_follow_relevant_changes(path):
+    plan = choose([path])
+    module = "tests/test_gm_memory_casting_hotfix.py"
+    assert plan["python"]["gm-request-contracts"] == [module]
+    selectors = [item for values in plan["python"].values() for item in values]
+    assert sum(item.split("::")[0] == module for item in selectors) == 1
+
+
+@pytest.mark.parametrize("path", [
+    "README.md", "docs/operations/local-checks-and-release.md",
+    "src-tauri/frontend/app.js", "src-tauri/frontend/app.css",
+    "scripts/select_checks.py",
+])
+def test_real_gm_request_contracts_are_not_selected_for_copy_or_harness_only_edits(path):
+    plan = choose([path])
+    assert "gm-request-contracts" not in plan["python"]
+
+
+def test_real_gm_request_contracts_have_one_full_owner_and_separate_quick_group():
+    from scripts.check_supported_journeys import FULL_ONLY_JOURNEYS, PYTHON_JOURNEYS
+
+    module = "tests/test_gm_memory_casting_hotfix.py"
+    owners = [(group, item) for group, items in PYTHON_JOURNEYS.items()
+              for item in items if item.split("::")[0] == module]
+    assert owners == [("gm-request-contracts", module)]
+    assert module not in PYTHON_JOURNEYS["gm-turn"]
+    assert "gm-request-contracts" not in FULL_ONLY_JOURNEYS
+    full = choose(["README.md"], full=True)
+    assert full["python"]["gm-request-contracts"] == [module]
+    assert full["python"]["gm-turn"] == PYTHON_JOURNEYS["gm-turn"]
+
+
+def test_complete_full_selection_loads_against_the_actual_checkout(tmp_path):
+    import json
+    from scripts.select_checks import load_selection
+
+    plan = choose(["README.md"], full=True)
+    manifest = tmp_path / "full-selection.json"
+    manifest.write_text(json.dumps(plan), encoding="utf-8")
+    root = Path(__file__).resolve().parents[1]
+
+    assert load_selection(manifest, revision="a" * 40, root=root) == plan
+
+
+def test_real_gm_request_contracts_are_unique_in_a_combined_affected_diff():
+    module = "tests/test_gm_memory_casting_hotfix.py"
+    plan = choose([
+        "src/sylvia_gm/agent/_provider_session.py",
+        "src/sylvia_gm/provider/_base.py",
+        "src/sylvia_gm/application/authority.py",
+        "src/sylvia_gm/application/package_runtime.py",
+        module,
+    ])
+    owners = [(group, item) for group, items in plan["python"].items()
+              for item in items if item.split("::")[0] == module]
+    assert owners == [("gm-request-contracts", module)]

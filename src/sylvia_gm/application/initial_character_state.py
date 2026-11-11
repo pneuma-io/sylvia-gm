@@ -15,7 +15,12 @@ from sylvia_gm.application.character_rules import (
 )
 from sylvia_gm.application.schema_admission import validate_json_schema, validate_parameters
 from sylvia_gm.domain.authority import SafePayload
-from sylvia_gm.domain.errors import CommandRejected, MechanicsRejected, RulesetDiagnostic
+from sylvia_gm.domain.errors import (
+    CommandRejected,
+    MechanicsRejected,
+    MechanicsValidationIssue,
+    RulesetDiagnostic,
+)
 from sylvia_gm.domain.package_library import ParticipantArtifactDeclaration, canonical_json_bytes
 from sylvia_gm.runtime._condition_evaluator import evaluate
 from sylvia_gm.runtime._exceptions import ExpressionError, FieldNotFoundError
@@ -55,6 +60,22 @@ def _rejection(
     )
 
 
+class InitialCharacterStateSchemaError(MechanicsRejected):
+    """Retain bounded schema issues alongside the legacy portable diagnostics."""
+
+    def __init__(
+        self, issues: tuple[MechanicsValidationIssue, ...],
+        diagnostics: tuple[RulesetDiagnostic, ...],
+    ) -> None:
+        super().__init__(
+            "Initial character state does not match its Ruleset schema",
+            code="character_initial_state_schema_invalid",
+            field_paths=tuple(dict.fromkeys(issue.path for issue in issues)),
+            validation_issues=issues,
+        )
+        self.diagnostics = diagnostics[:16]
+
+
 def _schema_rejection(error: Exception) -> CommandRejected:
     if isinstance(error, MechanicsRejected) and error.validation_issues:
         diagnostics = tuple(
@@ -79,6 +100,8 @@ def _schema_rejection(error: Exception) -> CommandRejected:
                 guidance="Correct the Ruleset's declared entity state schema.",
             ),
         )
+    if isinstance(error, MechanicsRejected) and error.validation_issues:
+        return InitialCharacterStateSchemaError(error.validation_issues, diagnostics)
     return CommandRejected(
         "Initial character state does not match its Ruleset schema",
         code="character_initial_state_schema_invalid",

@@ -62,11 +62,6 @@ KNOWN_DEFECTS: dict[str, KnownDefect] = {
         'Create the actual Rift owner, commit its opening, prepare the carried weapon through the declared control, then request combat; the scripted provider cannot find Riftwolf in the real request. Context-versus-fixture attribution remains open.',
         category='unresolved context or fixture discrepancy',
     ),
-    'tests/test_alpha_manual_campaign_plan.py::test_creation_catalog_keeps_current_bundle_over_stale_equal_version_closure': KnownDefect(
-        'The creation catalog prefers an older same-version bundled Plan closure to current source',
-        'Present current source and its stale equal-version bundled Plan closure, then inspect which Ruleset identity the campaign creation catalog selects.',
-        category='suspected retained contract discrepancy',
-    ),
     'tests/test_content_inheritance.py::test_plan_retains_its_copies_after_new_source_ruleset_is_installed': KnownDefect(
         "The Builder's advertised Plan example fails its declared content schema",
         'Build the advertised Plan example against its retained synthetic source Setting, then validate before saving its inherited copies.',
@@ -105,11 +100,6 @@ KNOWN_DEFECTS: dict[str, KnownDefect] = {
     'tests/test_integrated_worker_seams.py::test_area_damage_card_exposes_the_actual_concentration_roll': KnownDefect(
         'An area-damage card emits two concentration rows for one actual saving throw',
         'Damage the real concentrating caster with the admitted area action and inspect its actual result-card concentration rows.',
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_public_lite_descendants.py::test_every_public_lite_plan_selects_current_exact_mechanics': KnownDefect(
-        'Bundled public Plans retain an older same-version Ruleset closure than current source',
-        "Compare each bundled Plan's exact Ruleset closure with the current public Lite package and its selected mechanics.",
         category='suspected retained contract discrepancy',
     ),
     'tests/test_srd_lite_defense_boundaries.py::test_actual_guiding_bolt_shield_or_decline_reuses_scalar_roll_and_reopens[False]': KnownDefect(

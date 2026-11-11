@@ -58,6 +58,8 @@ from sylvia_gm.domain.authority import (
     ActionReceipt,
     ActionStatus,
     CampaignContinuityView,
+    CampaignDisplaySnapshot,
+    LifecycleState,
     CanonicalEvent,
     CanonicalEventType,
     EventVisibility,
@@ -978,8 +980,15 @@ class _OwnerProjection:
     def desktop_snapshot(self, campaign_id: str, *, display_only: bool = False) -> object:
         return self.snapshot(campaign_id)
 
-    def model_context_snapshot(self, campaign_id: str) -> tuple[object, None]:
-        return self.snapshot(campaign_id), None
+    def model_context_snapshot(self, campaign_id: str) -> tuple[CampaignDisplaySnapshot, None]:
+        snapshot = self.snapshot(campaign_id)
+        return CampaignDisplaySnapshot(
+            campaign_id=campaign_id, display_name=snapshot.display_name,
+            lifecycle=LifecycleState.ACTIVE, writer=WriterRole.DM,
+            revision=snapshot.revision, package_lock=PackageLock(entries=()),
+            state=snapshot.state, participants=snapshot.participants,
+            actions=(), events=snapshot.events, turns={}, continuity=snapshot.continuity,
+        ), None
 
     def canonical_replay(self, campaign_id: str, *, acknowledged_sequence: int) -> object:
         assert campaign_id == "campaign-provider"
@@ -1136,9 +1145,9 @@ def test_player_turn_input_preserves_ic_and_explicitly_labels_ooc(
 def test_dialogue_uses_party_control_not_character_schema_kind(
     data: dict[str, str], expected: str
 ) -> None:
-    snapshot = SimpleNamespace(participants=(SimpleNamespace(
+    snapshot, _ = _OwnerProjection(participants=(SimpleNamespace(
         participant_id="companion-chloe", kind="player_character", data=data,
-    ),))
+    ),)).model_context_snapshot("campaign-provider")
     _, blocks = _project_response_blocks(
         ({"kind": "npc_dialogue", "speaker_id": "companion-chloe", "text": "Wait."},),
         snapshot,
@@ -1148,11 +1157,11 @@ def test_dialogue_uses_party_control_not_character_schema_kind(
 
 
 def test_dialogue_prefers_persisted_companion_role_to_conflicting_character_data() -> None:
-    snapshot = SimpleNamespace(participants=(SimpleNamespace(
+    snapshot, _ = _OwnerProjection(participants=(SimpleNamespace(
         participant_id="companion-hex",
         kind="player_character",
         data={"name": "Hex", "party_role": "player_character"},
-    ),))
+    ),)).model_context_snapshot("campaign-provider")
 
     _, blocks = _project_response_blocks(
         ({"kind": "npc_dialogue", "speaker_id": "companion-hex", "text": "Ready."},),
@@ -1215,7 +1224,8 @@ def test_provider_spoken_words_normalize_without_rewriting_or_guessing() -> None
         {"kind": "npc_utterance", "speaker_id": "anonymous", "spoken_words": "Then the edge."},
     ]
     admitted = _validated_raw_response_blocks(blocks)
-    text, projected = _project_response_blocks(admitted, SimpleNamespace())
+    snapshot, _ = _OwnerProjection(participants=()).model_context_snapshot("campaign-provider")
+    text, projected = _project_response_blocks(admitted, snapshot)
     assert [block["text"] for block in projected] == [
         "Rowan studies the ground.", 'From the center. I call it "home base".',
         "He pauses.", "Then the edge.",

@@ -31,7 +31,11 @@ from sylvia_gm.domain.authority import (
     SafePayload,
     WriterRole,
 )
-from sylvia_gm.domain.errors import CommandRejected, IdempotencyConflict, MechanicsRejected
+from sylvia_gm.domain.errors import (
+    CommandRejected,
+    IdempotencyConflict,
+    MechanicsRejected,
+)
 from sylvia_gm.domain.provider_records import ProviderPrivateRecord
 from sylvia_gm.domain.session import (
     BuilderChatRecord,
@@ -189,16 +193,21 @@ def _mechanics_rejection_feedback(error: MechanicsRejected) -> SafePayload:
     validation: dict[str, object] = {"field_paths": list(error.field_paths)}
     if error.validation_issues:
         validation["issues"] = [issue.as_payload() for issue in error.validation_issues]
+    correction_source = (
+        "validation.issues" if error.validation_issues
+        else "the refusal reasons and validation.field_paths"
+    )
     return cast(
         SafePayload,
         {
             "status": "rejected",
             "code": error.code,
             "reason": str(error),
+            **({"reasons": list(error.refusal_reasons)} if len(error.refusal_reasons) > 1 else {}),
             "validation": validation,
             "state_changed": error.state_changed,
             "instruction": (
-                "Use validation.issues and the current tool schemas to correct every declared "
+                f"Use {correction_source} and the current tool schemas to correct every declared "
                 "field. If this operation cannot represent the intended action, choose a "
                 "different currently exposed operation that can. Do not repeat an identical "
                 "rejected call."

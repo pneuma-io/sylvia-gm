@@ -3,12 +3,10 @@
 from __future__ import annotations
 
 import contextlib
-import hashlib
 import importlib.util
 import io
 import json
 import os
-import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -390,16 +388,8 @@ def test_actual_sidecar_arguments_cover_all_synthetic_directory_sentinels(tmp_pa
     put(tmp_path, "src-tauri/webui-data-files.json", json.dumps({"format": 1, "files": ["app.html"]}))
     codec_manifest = "licenses/dictation/PYAV-LGPL-BUILD.json"
     put(tmp_path, codec_manifest, (FROZEN / codec_manifest).read_bytes())
-    manifest = json.loads((tmp_path / codec_manifest).read_text(encoding="utf-8"))
-    reused_stage = Path(os.environ["SYLVIA_TEST_PYAV_LGPL_STAGE"])
-    ffmpeg = Path(os.environ["SYLVIA_FFMPEG_LGPL_DIR"])
-    for library in manifest["libraries"]:
-        for root in (ffmpeg, reused_stage / "av.libs"):
-            payload = (root / library["path"]).read_bytes()
-            assert len(payload) == library["bytes"]
-            assert hashlib.sha256(payload).hexdigest() == library["sha256"]
-    for binding in manifest["bindings"]:
-        assert hashlib.sha256((reused_stage / binding["path"]).read_bytes()).hexdigest() == binding["after_sha256"]
+    ffmpeg = tmp_path / "synthetic-codec-inputs"
+    ffmpeg.mkdir()
     calls = []
     staging_calls = []
 
@@ -414,8 +404,9 @@ def test_actual_sidecar_arguments_cover_all_synthetic_directory_sentinels(tmp_pa
             assert cwd is None and env is None and check is True
             assert stage.parent.parent == tmp_path / ".owner-build"
             assert stage.name == "pyav-lgpl" and not stage.exists()
-            # Reuse verified release input at the existing subprocess boundary.
-            shutil.copytree(reused_stage, stage)
+            # This exclusion test intercepts codec staging and PyInstaller alike.
+            # Real codec hashes are qualified by the staging/build checks.
+            put(stage, "av/__init__.py", "# synthetic stage; never imported\n")
             staging_calls.append(command)
             return subprocess.CompletedProcess(command, 0)
         assert command[:3] == [sys.executable, "-m", "PyInstaller"]
@@ -435,6 +426,7 @@ def test_actual_sidecar_arguments_cover_all_synthetic_directory_sentinels(tmp_pa
         patch.dict(os.environ, {
             "TAURI_ENV_TARGET_TRIPLE": "x86_64-pc-windows-msvc",
             "SYLVIA_KEEP_OWNER_BUILD": "1",  # This test inspects staged payloads after return.
+            "SYLVIA_FFMPEG_LGPL_DIR": str(ffmpeg),
         }),
         patch.object(module.subprocess, "run", fake_run),
         patch.object(module, "version", module._DICTATION_VERSIONS.__getitem__),
@@ -489,18 +481,18 @@ def test_actual_sidecar_arguments_cover_all_synthetic_directory_sentinels(tmp_pa
                 "actual_command_constructor": "src-tauri/scripts/build_owner_sidecar.py:main",
                 "subprocess_intercepted": True,
                 "pyinstaller_ran": False,
-                "fixture_contents": "Synthetic data sentinels; pinned codec manifest and verified retained LGPL stage",
+                "fixture_contents": "Synthetic data sentinels and codec stage; pinned codec notice",
                 "codec_staging_intercepted": True,
-                "codec_stage_reused": True,
-                "ffmpeg_libraries_verified": len(manifest["libraries"]),
-                "pyav_bindings_verified": len(manifest["bindings"]),
+                "codec_stage_reused": False,
+                "ffmpeg_libraries_verified": 0,
+                "pyav_bindings_verified": 0,
                 "add_data_selectors": selectors,
                 "whole_directory_sentinels_covered": observed,
                 "covered_count": len(observed),
                 "release_exclusion_criterion": "passed at declared-source handoff",
                 "limit": (
                     "Staged data coverage verified; PyInstaller traversal/filtering and final "
-                    "executable bytes were not run or certified."
+                    "executable bytes and codec hashes were not run or certified."
                 ),
             },
             indent=2,

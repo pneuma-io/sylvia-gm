@@ -13,7 +13,11 @@ from typing import Literal, cast
 from sylvia_gm.domain.package_library import canonical_json_bytes
 from sylvia_gm.spatial._clearance import swept_footprint_hits_box
 from sylvia_gm.spatial._convex import convex_overlap
+from sylvia_gm.spatial._exposure_path import resolve_exposure_path
+from sylvia_gm.spatial._grid_lane import grid_lane_zone
 from sylvia_gm.spatial._interface import (
+    _EDGE_JOIN_REPAIR_MESSAGE,
+    _MAX_PATH_COST_PROFILE_CELLS,
     SPATIAL_ALGORITHM_VERSION,
     AdmittedSpatialResult,
     AdmittedSpatialScene,
@@ -32,7 +36,7 @@ Vec3 = tuple[float, float, float]
 Cell = tuple[int, int]
 PlacementNumber = float | Fraction
 PlacementPoint = tuple[PlacementNumber, PlacementNumber, PlacementNumber]
-ShapeKind = Literal["box", "cylinder", "sphere", "cone", "prism"]
+ShapeKind = Literal["grid_cells", "box", "grid_edge", "cylinder", "sphere", "cone", "prism"]
 ObjectKind = Literal["geometry", "entity", "zone"]
 
 
@@ -47,6 +51,7 @@ class _Shape:
     length: float | None = None
     basis: tuple[Vec3, Vec3, Vec3] | None = None
     half_extents: Vec3 | None = None
+    parts: tuple[_Shape, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -59,6 +64,7 @@ class _SpatialObject:
     visibility: str
     metadata: dict[str, object]
     occupies_cells: bool = True
+    edge_layer_id: str | None = None
 
 
 @dataclass(frozen=True)
@@ -100,8 +106,15 @@ def _clean_point(point: Vec3) -> list[float]:
 
 
 def _shape_from_payload(value: Mapping[str, object]) -> _Shape:
-    if value["kind"] == "box":
-        return _Shape("box", _vec3(value["min"]), _vec3(value["max"]))
+    if value["kind"] == "grid_cells":
+        origin, size = value["origin"], value["cell_size"]
+        parts = tuple(_Shape("box", (origin[0] + x * size, origin[1] + y * size, value["min_elevation"]),
+                             (origin[0] + (x + 1) * size, origin[1] + (y + 1) * size, value["max_elevation"]))
+                      for x, y in value["cells"])
+        return _Shape("grid_cells", tuple(min(p.lower[i] for p in parts) for i in range(3)),
+                      tuple(max(p.upper[i] for p in parts) for i in range(3)), parts=parts)
+    if value["kind"] in ("box", "grid_edge"):
+        return _Shape(value["kind"], _vec3(value["min"]), _vec3(value["max"]))
     if value["kind"] == "prism":
         origin, direction, up = (
             _vec3(value["origin"]),
@@ -216,6 +229,7 @@ def _compile(scene: AdmittedSpatialScene) -> _CompiledScene:
                 cast(str, value["visibility"]),
                 cast(dict[str, object], value["metadata"]),
                 cast(bool, value["occupies_cells"]),
+                cast(str | None, value.get("edge_layer_id")),
             )
         )
     for value in cast(Sequence[Mapping[str, object]], payload["entities"]):
@@ -436,6 +450,26 @@ def _cylinder_interval(
 
 
 def _shape_interval(shape: _Shape, origin: Vec3, delta: Vec3) -> tuple[float, float, Vec3] | None:
+    if shape.parts:
+        intervals = [_shape_interval(part, origin, delta) for part in shape.parts]
+        return min((v for v in intervals if v is not None), default=None)
+    if shape.kind == "grid_edge":
+        axis = 0 if shape.lower[0] == shape.upper[0] else 1
+        # Only a crossing meets the material. Coplanar travel never adds a second face.
+        if delta[axis] == 0:
+            return None
+        parameter = (shape.lower[axis] - origin[axis]) / delta[axis]
+        if not 0 <= parameter <= 1:
+            return None
+        point = _point_at(origin, delta, parameter)
+        if any(
+            point[i] < shape.lower[i] or point[i] > shape.upper[i]
+            for i in range(3) if i != axis
+        ):
+            return None
+        normal = [0.0, 0.0, 0.0]
+        normal[axis] = -1.0 if delta[axis] > 0 else 1.0
+        return parameter, parameter, cast(Vec3, tuple(normal))
     return (
         _box_interval(shape, origin, delta)
         if shape.kind == "box"
@@ -448,7 +482,13 @@ def _ray_hits(
     origin: Vec3,
     destination: Vec3,
     include: frozenset[str],
+    *,
+    eligible: Callable[[_SpatialObject, _RayHit], bool] | None = None,
 ) -> list[_RayHit]:
+    """Apply query eligibility before shared-edge ownership or ambiguity resolution.
+
+    Physical rays omit the predicate and retain every included active contact.
+    """
     delta = (
         destination[0] - origin[0],
         destination[1] - origin[1],
@@ -456,6 +496,9 @@ def _ray_hits(
     )
     length = math.sqrt(sum(value * value for value in delta))
     hits: list[_RayHit] = []
+    endpoints: dict[
+        tuple[int, float, float], tuple[list[_SpatialObject], list[_SpatialObject]]
+    ] = {}
     for item in scene.objects:
         plural = "geometry" if item.kind == "geometry" else "entities"
         if not item.active or plural not in include:
@@ -464,17 +507,61 @@ def _ray_hits(
         if interval is None:
             continue
         parameter, _exit, normal = interval
-        hits.append(
-            _RayHit(
-                cast(Literal["geometry", "entity"], item.kind),
-                item.item_id,
-                parameter * length,
-                parameter,
-                _point_at(origin, delta, parameter),
-                normal,
-                item.metadata,
-            )
+        hit = _RayHit(
+            cast(Literal["geometry", "entity"], item.kind),
+            item.item_id,
+            parameter * length,
+            parameter,
+            _point_at(origin, delta, parameter),
+            normal,
+            item.metadata,
         )
+        if eligible is not None and not eligible(item, hit):
+            continue
+        hits.append(hit)
+        if item.shape.kind == "grid_edge":
+            axis = 0 if item.shape.lower[0] == item.shape.upper[0] else 1
+            along = 1 - axis
+            coordinate = hit.point[along]
+            if coordinate in (item.shape.lower[along], item.shape.upper[along]):
+                starts, ends = endpoints.setdefault(
+                    (axis, item.shape.lower[axis], coordinate), ([], [])
+                )
+                (starts if coordinate == item.shape.lower[along] else ends).append(item)
+
+    # Only an explicitly authored layer proves continuity. Height, material and
+    # sorted IDs cannot identify which endpoints belong together. Ambiguous
+    # untagged joins fail before returning any partial/guessed contact sequence.
+    # A free end stays closed; different planes and declared layers stay distinct.
+    omitted: set[str] = set()
+    for (axis, _plane, _vertex), (starts, ends) in endpoints.items():
+        layers: dict[str, tuple[list[_SpatialObject], list[_SpatialObject]]] = {}
+        for side, members in enumerate((starts, ends)):
+            for member in members:
+                if member.edge_layer_id is not None:
+                    layers.setdefault(member.edge_layer_id, ([], []))[side].append(member)
+        joined: set[str] = set()
+        for layer_starts, layer_ends in layers.values():
+            if not layer_starts or not layer_ends:
+                continue
+            if len(layer_starts) != 1 or len(layer_ends) != 1:
+                raise SpatialValidationError(
+                    _EDGE_JOIN_REPAIR_MESSAGE,
+                    code="spatial_ambiguous_edge_join", path="$.geometry",
+                )
+            joined.update((layer_starts[0].item_id, layer_ends[0].item_id))
+            non_owner = layer_starts if delta[1 - axis] > 0 else layer_ends
+            omitted.add(non_owner[0].item_id)
+        remaining_starts = [member for member in starts if member.item_id not in joined]
+        remaining_ends = [member for member in ends if member.item_id not in joined]
+        if remaining_starts and remaining_ends and any(
+            member.edge_layer_id is None for member in (*remaining_starts, *remaining_ends)
+        ):
+            raise SpatialValidationError(
+                _EDGE_JOIN_REPAIR_MESSAGE,
+                code="spatial_ambiguous_edge_join", path="$.geometry",
+            )
+    hits = [hit for hit in hits if hit.item_id not in omitted]
     hits.sort(
         key=lambda hit: (
             _clean(hit.parameter),
@@ -585,6 +672,8 @@ def _crosses_shape_interior(shape: _Shape, origin: Vec3, destination: Vec3) -> b
     """Ignore surface-only visibility contact without changing physical ray hits."""
     delta = cast(Vec3, tuple(destination[axis] - origin[axis] for axis in range(3)))
     interval = _shape_interval(shape, origin, delta)
+    if shape.kind == "grid_edge":
+        return interval is not None and 0 < interval[0] < 1
     if interval is None or interval[1] - interval[0] <= _EPSILON:
         return False
     midpoint = _point_at(origin, delta, (interval[0] + interval[1]) / 2)
@@ -615,25 +704,21 @@ def _resolve_exposure(scene: _CompiledScene, query: Mapping[str, object]) -> dic
         sample_counts["vertical"],
     )
     include = frozenset(cast(Sequence[str], query["include"]))
-    object_lookup = {(item.kind, item.item_id): item for item in scene.objects}
+    metadata_filter = cast(Mapping[str, object] | None, query.get("metadata_filter"))
     sample_results: list[dict[str, object]] = []
     references: dict[tuple[str, str], dict[str, object]] = {}
     visible_count = 0
     for sample in samples:
-        occluding_hits = [
-            hit
-            for hit in _ray_hits(scene, observer, sample, include)
-            if hit.item_id != target_id
-            and hit.parameter < 1 - _EPSILON
-            and object_lookup[(hit.kind, hit.item_id)].visibility == "opaque"
-            and _matches_metadata(
-                object_lookup[(hit.kind, hit.item_id)],
-                cast(Mapping[str, object] | None, query.get("metadata_filter")),
+        def occludes(item: _SpatialObject, hit: _RayHit, destination: Vec3 = sample) -> bool:
+            return (
+                item.item_id != target_id
+                and hit.parameter < 1 - _EPSILON
+                and item.visibility == "opaque"
+                and _matches_metadata(item, metadata_filter)
+                and _crosses_shape_interior(item.shape, observer, destination)
             )
-            and _crosses_shape_interior(
-                object_lookup[(hit.kind, hit.item_id)].shape, observer, sample
-            )
-        ][:1]
+
+        occluding_hits = _ray_hits(scene, observer, sample, include, eligible=occludes)[:1]
         visible = not occluding_hits
         visible_count += int(visible)
         for hit in occluding_hits:
@@ -669,6 +754,14 @@ def _cell_span(scene: _CompiledScene, shape: _Shape) -> tuple[range, range]:
         scene.cell_counts[1] - 1,
         math.ceil((shape.upper[1] - scene.origin[1]) / scene.cell_size) - 1,
     )
+    if shape.kind == "grid_edge":
+        # Index both incident cells, including the boundary at either end of a sweep.
+        if shape.lower[0] == shape.upper[0]:
+            minimum_x = max(0, minimum_x - 1)
+            maximum_x = min(scene.cell_counts[0] - 1, maximum_x + 1)
+        else:
+            minimum_y = max(0, minimum_y - 1)
+            maximum_y = min(scene.cell_counts[1] - 1, maximum_y + 1)
     return range(minimum_x, maximum_x + 1), range(minimum_y, maximum_y + 1)
 
 
@@ -795,8 +888,15 @@ def _path_clearance(
                     ):
                         return False
                 edges.update(edge_cells.get((x, y), ()))
-        return not any(
-            swept_footprint_hits_box(
+
+        def intersects(shape: _Shape) -> bool:
+            if shape.kind == "grid_edge" and half == (0.0, 0.0):
+                return _shape_interval(
+                    shape,
+                    (*origin, (shape.lower[2] + shape.upper[2]) / 2),
+                    (destination[0] - origin[0], destination[1] - origin[1], 0),
+                ) is not None
+            return swept_footprint_hits_box(
                 origin,
                 destination,
                 (shape.lower[0], shape.lower[1]),
@@ -804,8 +904,8 @@ def _path_clearance(
                 half_extents=half,
                 radius=radius,
             )
-            for shape in edges
-        )
+
+        return not any(intersects(shape) for shape in edges)
 
     return clear
 
@@ -869,6 +969,7 @@ def _resolve_path(scene: _CompiledScene, query: Mapping[str, object]) -> dict[st
             "cost": None,
             "expanded": 0,
             "truncated": False,
+            **({"cost_profile": []} if query.get("cost_profile") else {}),
         }
     directions: tuple[tuple[int, int, float], ...] = (
         (-1, 0, 1.0),
@@ -933,11 +1034,31 @@ def _resolve_path(scene: _CompiledScene, query: Mapping[str, object]) -> dict[st
             "cost": None,
             "expanded": expanded,
             "truncated": truncated,
+            **({"cost_profile": []} if query.get("cost_profile") else {}),
         }
     retained = [goal]
     while retained[-1] != start:
         retained.append(parents[retained[-1]])
     retained.reverse()
+    profile: list[dict[str, float]] = []
+    if query.get("cost_profile"):
+        if len(retained) > _MAX_PATH_COST_PROFILE_CELLS:
+            raise SpatialValidationError(
+                "Path cost profile exceeds its retained-cell bound",
+                code="spatial_limit_exceeded", path="$.cost_profile",
+            )
+        # Reuse costs on this exact retained route, never solve a different prefix.
+        distance = 0.0
+        for index, cell in enumerate(retained):
+            if index:
+                previous = retained[index - 1]
+                distance += (
+                    math.hypot(cell[0] - previous[0], cell[1] - previous[1]) * scene.cell_size
+                )
+            profile.append({
+                "distance": _clean(distance), "cost": _clean(costs[cell]),
+                "terrain": scene.terrain.get(cell, 1.0),
+            })
     return {
         **_provenance(scene, "path"),
         "found": True,
@@ -945,16 +1066,19 @@ def _resolve_path(scene: _CompiledScene, query: Mapping[str, object]) -> dict[st
         "cost": _clean(costs[goal]),
         "expanded": expanded,
         "truncated": False,
+        **({"cost_profile": profile} if query.get("cost_profile") else {}),
     }
 
 
 def _inside_shape(shape: _Shape, point: Vec3) -> bool:
+    if shape.kind == "grid_cells":
+        return any(_inside_shape(part, point) for part in shape.parts)
     if not all(
         shape.lower[index] - _EPSILON <= point[index] <= shape.upper[index] + _EPSILON
         for index in range(3)
     ):
         return False
-    if shape.kind == "box":
+    if shape.kind in ("box", "grid_edge"):
         return True
     center = cast(Vec3, shape.center)
     radius = cast(float, shape.radius)
@@ -970,7 +1094,8 @@ def _resolve_zones(scene: _CompiledScene, query: Mapping[str, object]) -> dict[s
             start, end = path[index], path[index + 1]
             delta = (end[0] - start[0], end[1] - start[1], end[2] - start[2])
             length = math.sqrt(sum(value * value for value in delta))
-            interval = _shape_interval(zone.shape, start, delta)
+            intervals = [_shape_interval(part, start, delta) for part in (zone.shape.parts or (zone.shape,))]
+            interval = min((v for v in intervals if v is not None), default=None)
             if interval is not None:
                 parameter = 0.0 if index == 0 and _inside_shape(zone.shape, start) else interval[0]
                 if parameter >= -_EPSILON:
@@ -1023,7 +1148,7 @@ def _sphere_overlap(sphere: _Shape, body: _Shape) -> bool:
     """Measure to the nearest occupied point, including vertical body extent."""
     center = cast(Vec3, sphere.center)
     vertical = max(body.lower[2] - center[2], center[2] - body.upper[2], 0.0)
-    if body.kind == "box":
+    if body.kind in ("box", "grid_edge"):
         gaps = [max(body.lower[i] - center[i], center[i] - body.upper[i], 0.0) for i in range(2)]
         distance = math.hypot(*gaps, vertical)
     else:
@@ -1062,7 +1187,7 @@ def _cone_overlap(cone: _Shape, body: _Shape) -> bool:
         return point if sum(point[i] * direction[i] for i in range(3)) > 0 else (0.0, 0.0, 0.0)
 
     def body_support(direction: Vec3) -> Vec3:
-        if body.kind == "box":
+        if body.kind in ("box", "grid_edge"):
             return cast(Vec3, tuple(upper[i] if direction[i] >= 0 else lower[i] for i in range(3)))
         center = cast(Vec3, body.center)
         magnitude = math.hypot(direction[0], direction[1])
@@ -1117,7 +1242,7 @@ def _prism_overlap(prism: _Shape, body: _Shape) -> bool:
         return cast(Vec3, tuple(sum(signed[j] * basis[j][i] for j in range(3)) for i in range(3)))
 
     def body_support(direction: Vec3) -> Vec3:
-        if body.kind == "box":
+        if body.kind in ("box", "grid_edge"):
             return cast(Vec3, tuple(upper[i] if direction[i] >= 0 else lower[i] for i in range(3)))
         body_center = cast(Vec3, body.center)
         magnitude = math.hypot(direction[0], direction[1])
@@ -1134,17 +1259,21 @@ def _prism_overlap(prism: _Shape, body: _Shape) -> bool:
 
 
 def _overlap(first: _Shape, second: _Shape) -> bool:
+    if first.parts:
+        return any(_overlap(part, second) for part in first.parts)
+    if second.parts:
+        return any(_overlap(first, part) for part in second.parts)
     if first.kind == "sphere":
         return _sphere_overlap(first, second)
     if first.kind == "cone":
         return _cone_overlap(first, second)
     if first.kind == "prism":
         return _prism_overlap(first, second)
-    if first.kind == "box" and second.kind == "box":
+    if first.kind in ("box", "grid_edge") and second.kind in ("box", "grid_edge"):
         return _box_overlap(first, second)
-    if first.kind == "cylinder" and second.kind == "box":
+    if first.kind == "cylinder" and second.kind in ("box", "grid_edge"):
         return _cylinder_box_overlap(first, second)
-    if first.kind == "box" and second.kind == "cylinder":
+    if first.kind in ("box", "grid_edge") and second.kind == "cylinder":
         return _cylinder_box_overlap(second, first)
     if first.upper[2] < second.lower[2] or second.upper[2] < first.lower[2]:
         return False
@@ -1201,7 +1330,7 @@ def _sweep_enters_solid(
 ) -> bool:
     """Intersect whole translated bodies, clipping curved clearance to actual shared height."""
     lower_z, upper_z = solid.lower[2] - height, solid.upper[2]
-    if mover.kind == solid.kind == "box":
+    if mover.kind == "box" and solid.kind in ("box", "grid_edge"):
         return _segment_enters_box(
             origin,
             destination,
@@ -1220,7 +1349,7 @@ def _sweep_enters_solid(
             return False
     start = cast(Vec2, tuple(origin[i] + near * (destination[i] - origin[i]) for i in range(2)))
     end = cast(Vec2, tuple(origin[i] + far * (destination[i] - origin[i]) for i in range(2)))
-    if solid.kind == "box":
+    if solid.kind in ("box", "grid_edge"):
         lower, upper = solid.lower[:2], solid.upper[:2]
         radius = cast(float, mover.radius)
     else:
@@ -1715,7 +1844,7 @@ def _resolve_placement(scene: _CompiledScene, query: Mapping[str, object]) -> di
             continue
         if not _matches_metadata(item, selector):
             continue
-        if item.shape.kind != "box":
+        if item.shape.kind not in ("box", "grid_edge"):
             return {**result, "supported": False, "reason": "unsupported_geometry"}
         solid_lower, solid_upper = (
             _placement_box(rows[(item.kind, item.item_id)], item.kind)
@@ -1849,6 +1978,7 @@ class SpatialEngine:
         resolver = {
             "ray": _resolve_ray,
             "exposure": _resolve_exposure,
+            "exposure_path": resolve_exposure_path,
             "path": _resolve_path,
             "placement": _resolve_placement,
             "sweep": _resolve_sweep,
@@ -1856,6 +1986,9 @@ class SpatialEngine:
             "circle_overlap": _resolve_circle_overlap,
             "circle_route": _resolve_circle_route,
             "crossed_zones": _resolve_zones,
+            "grid_lane": lambda scene, query: {**_provenance(scene, "grid_lane"),
+                "zone": grid_lane_zone(
+                    scene.admitted.as_payload(), query["owner_id"], query["lane"])},
             "area": _resolve_area,
         }[query.kind]
         result = admit_spatial_result(admitted_scene, resolver(compiled, query_payload))

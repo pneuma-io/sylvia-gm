@@ -33,8 +33,8 @@ binary and payload identities and required notices. It excludes mutable settings
 credentials. Final rebuilt artifacts, installed notice delivery and clean-Windows qualification
 remain open. Older executable/provider evidence cannot validate changed source bytes.
 Preserve unique work and complete the separate disk-space sequence before clean-Windows tests;
-then reconcile acceptance for the next selected release. The repository is public and has four
-Alpha releases. A new release still requires separate approval.
+then reconcile acceptance for the next selected release. The repository is public and has five
+Alpha prereleases. A new release still requires separate approval.
 
 application/bundled_packages.py materializes exact Ruleset/reference/Setting closures.
 application/bundled_campaign_plans.py selects Plan bytes and checks containment before reads.

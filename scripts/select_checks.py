@@ -180,7 +180,10 @@ def select_checks(paths, *, source, base, diff_complete=True, full=False, root=N
                 ui.update(UI_JOURNEY)
                 reason = "Shipped frontend: JavaScript invariants and rendered browser journeys"
             elif path.startswith("src-tauri/") or path.startswith("scripts/build_"):
-                add("release-integrity", "interruption-and-recovery", "gm-turn")
+                add(
+                    "release-integrity", "interruption-and-recovery",
+                    "gm-turn", "gm-request-contracts",
+                )
                 ui.update(UI_JOURNEY)
                 plan["native"] = True
                 reason = "Native ownership/storage and release assembly boundaries"
@@ -208,6 +211,7 @@ def select_checks(paths, *, source, base, diff_complete=True, full=False, root=N
                     "builder-and-admission",
                     "interruption-and-recovery",
                     "gm-turn",
+                    "gm-request-contracts",
                 )
                 if path.startswith("rulesets/"):
                     add(
@@ -221,11 +225,11 @@ def select_checks(paths, *, source, base, diff_complete=True, full=False, root=N
                 reason = "Actual package admission/closures, supported mechanics and Plan lifecycle"
             elif path in GM_TURN_SOURCES:
                 groups["core-invariants"] = list(CORE)
-                add("gm-turn")
+                add("gm-turn", "gm-request-contracts")
                 reason = "GM provider/session behavior; expensive campaign cases remain risk-selected or full"
             elif path == "src/sylvia_gm/application/action_sequences.py":
                 groups["core-invariants"] = list(CORE)
-                add("gm-turn")
+                add("gm-turn", "gm-request-contracts")
                 groups["action-sequences"] = [
                     "tests/test_action_sequences.py", "tests/test_action_sequence_provider.py",
                 ]
@@ -235,6 +239,7 @@ def select_checks(paths, *, source, base, diff_complete=True, full=False, root=N
                 add(
                     "provider-contracts",
                     "gm-turn",
+                    "gm-request-contracts",
                     "campaign-play",
                     "builder-and-admission",
                     "interruption-and-recovery",
@@ -243,7 +248,7 @@ def select_checks(paths, *, source, base, diff_complete=True, full=False, root=N
                 reason = "Shipped agent instructions affect provider tools, gameplay and Builder"
             elif path.startswith("src/sylvia_gm/provider/"):
                 groups["core-invariants"] = list(CORE)
-                add("provider-contracts", "gm-turn")
+                add("provider-contracts", "gm-turn", "gm-request-contracts")
                 reason = "Provider privacy/wire contracts and GM/session recovery behavior"
             elif path.startswith("src/sylvia_gm/ruleset/"):
                 groups["core-invariants"] = list(CORE)
@@ -253,6 +258,7 @@ def select_checks(paths, *, source, base, diff_complete=True, full=False, root=N
                     "campaign-play",
                     "interruption-and-recovery",
                     "gm-turn",
+                    "gm-request-contracts",
                     "launch-lite-compatibility",
                     "lite-admitted-qa",
                 )
@@ -269,6 +275,7 @@ def select_checks(paths, *, source, base, diff_complete=True, full=False, root=N
                     "builder-and-admission",
                     "interruption-and-recovery",
                     "gm-turn",
+                    "gm-request-contracts",
                 )
                 if path.endswith("bundled_packages.py"):
                     add("launch-lite-compatibility", "lite-admitted-qa")
@@ -285,6 +292,7 @@ def select_checks(paths, *, source, base, diff_complete=True, full=False, root=N
                     "interruption-and-recovery",
                     "provider-contracts",
                     "gm-turn",
+                    "gm-request-contracts",
                 )
                 reason = "Application unit/composed journeys and durable owner boundaries"
             elif path.startswith("tests/") and path.endswith(".py"):

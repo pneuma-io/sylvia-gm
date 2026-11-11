@@ -7,7 +7,7 @@ import pytest
 
 from sylvia_gm.application.authority import AuthorityOwner
 from tests import test_player_actions as action_fixture
-from tests.test_player_action_availability import _checks, _route_controls
+from tests.control_availability_fixture import _checks, _route_controls
 from tests.test_player_actions import _create, _move, _request
 from tests.test_tactical_grid_ui import _scene
 
