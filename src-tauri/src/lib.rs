@@ -1933,6 +1933,20 @@ async fn chatgpt_connection(
 }
 
 #[tauri::command]
+async fn claude_connection(
+    window: WebviewWindow,
+    action: String,
+    options: Option<Value>,
+) -> Result<Value, String> {
+    owner_call_async(
+        window,
+        "claude_connection",
+        json!({"action": action, "options": options}),
+    )
+    .await
+}
+
+#[tauri::command]
 async fn admin_full_audit_record(window: WebviewWindow, index: u64) -> Result<Value, String> {
     trusted_audit_reader(&window)?;
     owner_request_async(window, "admin_full_audit_record", json!({"index": index})).await
@@ -3507,6 +3521,7 @@ pub fn run() {
             model_choices,
             provider_settings,
             chatgpt_connection,
+            claude_connection,
             admin_full_audit_status,
             admin_full_audit_record,
             open_admin_audit_window,

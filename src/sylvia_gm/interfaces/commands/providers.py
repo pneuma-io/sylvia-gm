@@ -63,6 +63,23 @@ def handle_chatgpt_connection(ctx: DispatchContext, params: Mapping[str, Any]) -
     return result
 
 
+def handle_claude_connection(ctx: DispatchContext, params: Mapping[str, Any]) -> Any:
+    from sylvia_gm.config.claude_settings import claude_settings_action
+    from sylvia_gm.provider._exceptions import ProviderConnectionError
+
+    if params.get("action") == "add_model" and ctx.reload_provider_resolver is None:
+        raise OwnerProtocolError("Provider settings reload is unavailable")
+    try:
+        result = claude_settings_action(
+            ctx.storage_root, params.get("action"), params.get("options"),
+        )
+    except ProviderConnectionError as error:
+        raise OwnerProtocolError(str(error)) from None
+    if params.get("action") == "add_model" and ctx.reload_provider_resolver is not None:
+        ctx.reload_provider_resolver()
+    return result
+
+
 def handle_admin_full_audit_status(ctx: DispatchContext, params: Mapping[str, Any]) -> Any:
     return ctx.application_owner.admin_full_audit_status()
 

@@ -14,6 +14,17 @@ the branches meet. Their desktop/native, merge and release qualifications contin
 
 ## 1. Current work
 
+**11 November 2026: user-owned Claude runtime.** The owner selected a new PR for the existing
+Dot Desk item `a420042f-c625-4f6e-aaa6-942519eaaa44`, including the future SylviaBench use of
+his own subscription. The implementation adds native executable/authentication controls, a separate
+provider and a tool handoff that retains Sylvia's deterministic authority. Opus 5.5 implemented
+the scoped Accounts presentation. Local synthetic transport, installed-binary protocol and
+existing-session checks qualify the source change. After the subscription allowance reset, a bounded
+live Sonnet 5.5 check completed one tool operation and fresh-process continuation successfully. The
+connection uses the current shared command router and preserves desktop-only native sign-in.
+Benchmark comparisons, packaged desktop acceptance and release remain separate; the unmerged
+benchmark framework is not imported here. [Setup and evidence](../research/claude-native-runtime-2026-11-11.md).
+
 **9 November 2026: optional onboarding and the complete tutorial suite.** The owner selected a new
 PR for all independently accessible lessons and a guided welcome, AI connection, Ready campaign
 and first-scene journey. Dot Desk work item **Build the tutorial suite and current new-player

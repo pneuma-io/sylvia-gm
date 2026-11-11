@@ -1,4 +1,4 @@
-"""Literal protocol and trust-boundary sets from the pre-refactor owner."""
+"""Literal protocol and trust-boundary sets, including native Claude setup."""
 
 from sylvia_gm.interfaces import _local_diagnostics, webui
 
@@ -21,6 +21,7 @@ DISPATCH = ('action_sequence',
  'campaign_sequel_context',
  'catalog',
  'chatgpt_connection',
+ 'claude_connection',
  'compare_package_candidates',
  'complete_campaign_construction',
  'complete_turn',
@@ -234,6 +235,7 @@ DIAGNOSTICS = ('action_sequence',
  'cancel_local_report',
  'catalog',
  'chatgpt_connection',
+ 'claude_connection',
  'compare_package_candidates',
  'complete_campaign_construction',
  'complete_turn',
@@ -349,7 +351,7 @@ def test_command_registry_preserves_exact_protocol_sets():
 
     names = {name for name, command in COMMAND_REGISTRY.items() if command.handler is not None}
     assert names == set(DISPATCH)
-    assert len(names) == 114
+    assert len(names) == 115
     assert webui.COMMANDS == frozenset(WEBUI)
     assert webui.EXPORTS == EXPORTS
     assert webui.WRAPPED == frozenset(WRAPPED)

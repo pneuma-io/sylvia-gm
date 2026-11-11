@@ -1149,6 +1149,31 @@ compatible configuration may be saved with an honest warning rather than misrepr
 agent-capable. Saving or removing a provider atomically rebuilds the in-memory provider resolver so
 model choices update without restarting the application.
 
+The `claude_runtime` provider uses the distinct `claude_code` transport. The owner selects the
+unmodified native executable and invokes its native authentication/status flow. No OAuth client,
+credential-file reader or subscription-token storage is part of Sylvia. Only native-reported safe
+account fields reach the renderer. Cancelling sign-in does not log out unrelated native sessions.
+Direct Anthropic API configuration remains separate, and native inference accepts no Sylvia API
+credentials or automatic fallback chain.
+
+Each provider step creates a disposable transcript/workspace and native process. Safe mode,
+empty built-in tools and strict MCP configuration isolate the request from user customizations.
+The SDK stdio MCP channel advertises only that step's current Sylvia schemas. The adapter waits
+for an admitted, correlated MCP call, preserves signed native continuation privately, and collects
+the process before yielding a game operation to Sylvia's existing validation/commit boundary.
+The next step reconstructs authoritative history and committed results; it does not replay native
+actions. Separate resolved sessions do not share a process or event-loop lock. Process cancellation
+and temporary-file cleanup never target unrelated Claude sessions.
+
+Native stdin cannot represent an appended typed tool result on its own. A tool-result continuation
+therefore uses the explicitly labelled `isSynthetic` `SYLVIA_GM_RUNTIME_CONTINUE` invocation after
+reconstructing the typed pair in the transcript. This is non-User application control, never saved
+player speech. Native resume framing also remains outside canonical history. Full Audit records
+the `claude_code_boundary` and labels downstream model input as not exposed. Output and native
+reasoning controls are runtime-managed; unknown account limits and CLI price estimates are not
+invented as usage facts. [Implementation evidence and limits](../research/claude-native-runtime-2026-11-11.md)
+remain separate from genuine-account and installed-app qualification.
+
 Saved API keys and private request headers use current-user Windows DPAPI at the owner-local
 configuration boundary. A versioned protected envelope reuses atomic settings replacement;
 decryption is confined to owner memory for provider operations. Legacy plaintext migration builds

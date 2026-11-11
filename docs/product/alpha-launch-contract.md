@@ -96,6 +96,19 @@ current provider compatibility and exact-candidate acceptance remain separate fr
 OpenAI API-key authentication remains supported. Additional provider sign-ins need their own
 supported route; undocumented subscription-token extraction is not selected.
 
+The selected Claude account route uses the user's installed, unmodified official Claude Code
+executable. Settings > Accounts provides installation checking, native sign-in/cancel and manual
+model registration. The binary owns authentication; Sylvia never implements Claude.ai OAuth or
+reads, copies or stores subscription tokens. Native subscription and separately selected Console
+billing remain distinct from the existing Anthropic API-key provider, with no silent fallback.
+Sylvia owns canonical GM/Builder history and executes validated game tools. It stops each native
+inference step before returning an admitted tool request to its normal game loop. Native-runtime
+processes are an explicit exception to the local inference-server lifecycle paragraph above.
+Missing/old runtimes, unavailable models, expired sign-in and quota failures retain saved work and
+give explicit outcomes. No automatic install/update, shared subscription service or Portal route
+is included. A source PR and synthetic/native-protocol checks do not establish genuine-account
+or installed-release acceptance. See the [native runtime evidence and setup guide](../research/claude-native-runtime-2026-11-11.md).
+
 ### 1.1 Release gates
 
 The durable roadmap is `alpha-03` through `alpha-10b` in the active plan:

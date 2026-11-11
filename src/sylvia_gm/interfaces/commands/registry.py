@@ -140,6 +140,7 @@ _COMMANDS = (
     Command('provider_settings', _handler('providers', 'handle_provider_settings'), True, True),
     Command('open_provider_setup', _handler('providers', 'handle_open_provider_setup'), True, True),
     Command('chatgpt_connection', _handler('providers', 'handle_chatgpt_connection'), False, True),
+    Command('claude_connection', _handler('providers', 'handle_claude_connection'), False, True),
     Command(
         'admin_full_audit_status', _handler('providers', 'handle_admin_full_audit_status'),
         True, True,
