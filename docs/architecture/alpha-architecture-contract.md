@@ -1320,6 +1320,20 @@ Provider errors distinguish actual overflow, requested compaction and explicitly
 exhaustion; unreported subscription limits remain unknown. Recovery resumes unresolved work without
 automatic provider fallback or replay after visible output.
 
+The Builder tool loop has no total-round cutoff. A loop guard ends a turn that has stopped making
+progress: three consecutive identical rounds in which every call failed, six consecutive rounds with
+identical calls and results, three failed reads of one selected source, or a structurally unreadable
+source. Stop, the Builder question tool and provider errors end the turn as before, and each
+further steering pass requires new player steering. When a Builder response reports output
+exhaustion, the loop keeps the readable text as an assistant message, executes none of that
+response's tool calls, saves no native continuation for it and appends a labelled
+`SYLVIA_GM_BUILDER_CONTINUE` user-role envelope, because Messages transports need a conversation
+turn after assistant text. The envelope is application-owned projection data: it is never saved as a
+player message and does not displace the latest player request during compaction. The loop
+continues up to three exhausted responses in a row; a fourth fails the turn with the output-limit
+error, and a completed response resets the count. The saved Builder outcome carries a reason code
+for each of these stops.
+
 For a structured DM session, the owner builds one knowledge catalog from the accepted Campaign
 Plan and its exact contained Campaign Setting. The optional fixed Setting artifact
 `setting-knowledge.json` contains bounded, canonically ordered facts with stable identity, source

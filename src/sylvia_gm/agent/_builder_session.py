@@ -81,7 +81,6 @@ from sylvia_gm.tools._spec import ToolSpec
 from sylvia_gm.tools._toolsets import ToolsetName
 
 _BUILDER_CANCEL_POLL_SECONDS = 0.05
-_BUILDER_STEERING_ROUNDS = 8
 
 
 @dataclass(frozen=True)
@@ -2137,7 +2136,6 @@ def _run_cancellable_stream(
             user_text,
             queue,
             between_iterations=take_between_iteration_steering,
-            retry_on_length=False,
             application_prompt=(
                 "Begin this saved Builder conversation from its launch or import-repair context. "
                 "Load the relevant skills and reference documents, continue the selected work, "
@@ -2652,26 +2650,27 @@ def stream_builder_turn(
     history_cursor = [initial_count]
     next_input = user_text
     accumulated_tool_calls: list[str] = []
-    for _round in range(_BUILDER_STEERING_ROUNDS + 1):
+    # Each further pass answers steering the user sent, so the user sets how many there are.
+    first_pass = True
+    while True:
         round_tool_calls = yield from _run_cancellable_stream(
             runner,
             next_input,
             control,
             message_id=message_id,
             history_cursor=history_cursor,
-            application_start=application_start and _round == 0,
+            application_start=application_start and first_pass,
             checkpoints=checkpoints,
             title_filter=title_filter,
         )
         accumulated_tool_calls.extend(round_tool_calls)
-        if _round == 0 and allow_public_web:
+        if first_pass and allow_public_web:
             runner.revoke_public_web()
+        first_pass = False
         steering = control.take_steering_or_close()
         if not steering:
             break
         next_input = _steering_prompt(steering)
-    else:  # pragma: no cover - defensive bound
-        raise CommandRejected("Builder steering continuation limit exceeded")
     complete(
         BuilderTurnResult(
             tool_calls_made=tuple(accumulated_tool_calls),

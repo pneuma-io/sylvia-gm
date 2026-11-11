@@ -68,6 +68,6 @@ async def test_builder_keeps_full_history_after_more_than_fifty_messages(tmp_pat
     runner = AgentRunner(
         AgentMode.BUILDER_FREEFORM, provider, None, initial_history=history, project_root=tmp_path,
     )
-    await runner.turn_stream("Continue.", asyncio.Queue(), retry_on_length=False)
+    await runner.turn_stream("Continue.", asyncio.Queue())
     assert runner.history_snapshot()[:60] == history
     assert len(runner.history_snapshot()) == 62

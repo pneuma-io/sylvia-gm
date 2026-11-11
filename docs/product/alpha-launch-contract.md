@@ -884,6 +884,17 @@ Exact counts are claimed only from authoritative usage or a supported authoritat
 and unavailable runtime controls remain visibly distinguished. Runtime rejection or a request for
 compaction preserves work and uses the explicit working-context recovery path, with no model fallback.
 
+A Builder turn keeps working until the request is done, as coding agents such as Codex do. There is
+no limit on the number of tool rounds and the player is never asked to send a message merely to let
+unfinished work carry on. The turn ends when the Builder finishes, asks the player a question, the
+player presses Stop, the provider fails, or the Builder has plainly stopped making progress: the
+same step repeated without change, or a selected source that cannot be read. When a Builder response
+is cut off by its response limit, Sylvia keeps the text already shown, runs none of that response's
+tool calls and has the model continue in smaller steps within the same turn. It does this up to
+three times in a row; a fourth cut-off in a row ends the turn with an explanation. Every stop keeps
+saved work and says why it stopped. This is continuation of the same request with the same model,
+not a retry of a failed request or a provider switch, and the GM rule below is unchanged.
+
 - readable reasoning supplied by the provider is saved with its turn and available only through a
   separately collapsed Thinking entry inside the activity group. Opening activity does not reveal
   thinking; no reasoning text appears in its collapsed label or preview. When the provider supplies
