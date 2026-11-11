@@ -2147,7 +2147,9 @@ def reconcile_tool_batch(
         audit = getattr(self._owner, "record_admin_full_audit", None)
         if callable(audit):
             audit({"kind": "gm_mechanic_receipt", "action_id": tool_result_event.action_id,
-                   "campaign_id": state.campaign_id, "result": result_payload})
+                   "campaign_id": state.campaign_id,
+                   "session_id": provider_input.session.session_id,
+                   "turn_id": turn_id, "result": result_payload})
         current_entities = _current_referenced_entities(
             state.mechanics_parameters[state.assembly.call_id], state.snapshot.state
         )

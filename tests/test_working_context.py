@@ -24,6 +24,7 @@ from sylvia_gm.provider._exceptions import (
     TokenLimitError,
 )
 from sylvia_gm.provider._hooks import HookContext
+from sylvia_gm.provider._openai_compat import OpenAICompatProvider
 from sylvia_gm.provider._token_estimate import token_estimator
 
 
@@ -447,26 +448,32 @@ def test_malformed_or_newer_checkpoints_rebuild_from_original_history():
 
 @pytest.mark.asyncio
 async def test_reported_usage_is_model_specific_shared_and_keeps_a_margin():
-    provider = Model()
+    model = replace(Model().model_info, id="openrouter/vendor/test-model",
+                    provider_key="openrouter", provider_model_id="vendor/test-model")
+    provider = OpenAICompatProvider(base_url="https://example.invalid/v1",
+                                    api_key="offline-test", model_info=model)
     estimator = token_estimator(provider)
     assert token_estimator(provider) is estimator
     request = {"messages": [{"role": "user", "content": "x" * 10000}]}
-    model = provider.model_info
     unknown_estimate = estimator.estimate(request, model)
-    await provider.hooks.fire_on_response(HookContext(
-        provider_key=model.provider_key, model_id=model.wire_model_id,
-        request_json=request,
-        response=ProviderResponse(usage=TokenUsage(prompt_tokens=8000), usage_reported=True),
+    request_context = provider._build_request_context(
+        request["messages"], None, stream=True, request_json=request,
+    )
+    await provider.hooks.fire_on_response(provider._enrich_context_response(
+        request_context,
+        ProviderResponse(usage=TokenUsage(prompt_tokens=8000), usage_reported=True),
+        0.0, 200, {},
     ))
     assert estimator.estimate(request, model) == 10032
     assert estimator.estimate(request, replace(model, id="another-model")) == unknown_estimate
     # A cheaper later sample must not erase the more conservative observation.
-    await provider.hooks.fire_on_response(HookContext(
-        provider_key=model.provider_key, model_id=model.wire_model_id,
-        request_json=request,
-        response=ProviderResponse(usage=TokenUsage(prompt_tokens=1000), usage_reported=True),
+    await provider.hooks.fire_on_response(provider._enrich_context_response(
+        request_context,
+        ProviderResponse(usage=TokenUsage(prompt_tokens=1000), usage_reported=True),
+        0.0, 200, {},
     ))
     assert estimator.estimate(request, model) == 10032
+    await provider.close()
 
 
 @pytest.mark.asyncio
@@ -477,8 +484,22 @@ async def test_unreported_usage_is_not_used_as_a_measurement():
     request = {"content": "x" * 1000}
     before = estimator.estimate(request, model)
     await provider.hooks.fire_on_response(HookContext(
-        provider_key=model.provider_key, model_id=model.wire_model_id,
+        provider_key=model.provider_key, model_id=model.id,
         request_json=request,
         response=ProviderResponse(usage=TokenUsage(prompt_tokens=8000)),
+    ))
+    assert estimator.estimate(request, model) == before
+
+
+@pytest.mark.asyncio
+async def test_runtime_usage_without_request_bytes_keeps_offline_planning_estimate():
+    provider = Model()
+    estimator = token_estimator(provider)
+    model = provider.model_info
+    request = {"content": "x" * 1000}
+    before = estimator.estimate(request, model)
+    await provider.hooks.fire_on_response(HookContext(
+        provider_key=model.provider_key, model_id=model.id, request_json=None,
+        response=ProviderResponse(usage=TokenUsage(prompt_tokens=8000), usage_reported=True),
     ))
     assert estimator.estimate(request, model) == before

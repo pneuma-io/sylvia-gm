@@ -282,7 +282,7 @@ class WorkingContextProvider(Provider):
         )]
         return pinned + [m for g in fixed for m in g.messages]
 
-    def _budgets(self, options: Mapping[str, Any]) -> tuple[int, int, int]:
+    def _budgets(self, options: Mapping[str, Any]) -> tuple[int, int]:
         from sylvia_gm.provider._output_policy import output_allowance
 
         capacity = getattr(self.model_info, "context_window", None) or 65_536
@@ -297,13 +297,13 @@ class WorkingContextProvider(Provider):
             )
         )
         input_budget = max(256, capacity - reserve - max(1024, capacity // 10))
-        return capacity, input_budget, int(input_budget * 0.42)
+        return capacity, input_budget
 
     async def prepare(self, messages, tools=None, *, force=False, **options):
         self._check_cancelled()
         self._source = messages
         projected = self.project(messages)
-        capacity, input_budget, _ = self._budgets(options)
+        capacity, input_budget = self._budgets(options)
         fixed = self._fixed_messages(projected)
         fixed_tokens = self._estimate([fixed, self._request_tools(tools)])
         # Fixed instructions and schemas consume space, but cannot be improved by summarising.

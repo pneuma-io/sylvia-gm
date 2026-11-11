@@ -1290,6 +1290,13 @@ def test_old_dialogue_shape_is_rejected_before_write_then_same_gm_corrects_it(
     assert len(provider.calls) == 2
     for messages, _tools in provider.calls:
         assert messages[0] == {"role": "system", "content": "UNCHANGED OLD GM"}
+        context_controls = [message for message in messages
+                            if str(message.get("content", "")).startswith(
+                                "SYLVIA_GM_CONTEXT_CONTRACT v97 "
+                            )]
+        assert len(context_controls) == 1
+        assert "GM-private facts are yours alone." in context_controls[0]["content"]
+        assert "prose is held as an unsettled draft" in context_controls[0]["content"]
         format_controls = [
             message for message in messages if message["role"] == "system"
             and str(message.get("content", "")).startswith("SYLVIA_GM_RESPONSE_FORMAT")

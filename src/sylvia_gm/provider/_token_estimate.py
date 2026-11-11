@@ -37,7 +37,7 @@ class TokenEstimateHook:
 
     def estimate(self, value: object, model: ModelInfo | None) -> int:
         """Reserve 25% above measured usage; absent usage retains the offline estimate."""
-        key = (model.provider_key, model.wire_model_id) if model else ("", "")
+        key = (model.provider_key, model.id) if model else ("", "")
         ratio = self._bytes_per_token.get(key)
         return math.ceil(_size(value) / (ratio / 1.25 if ratio else 3)) + 32
 
