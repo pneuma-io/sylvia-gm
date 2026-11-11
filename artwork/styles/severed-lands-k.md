@@ -1,9 +1,10 @@
 # Severed Lands anime fantasy art guide
 
-Version 3 uses the accepted Marla image as its rendering benchmark. The accepted first-party
+Version 3 uses the accepted Marla image as its rendering benchmark. The accepted starting
 character designs are V, Captain Harlan and the Cartographer in the three-character board, plus
-Marla. Every other earlier Severed Lands production image is non-canonical and supplies no
-inspiration, identity reference or appearance constraint for replacement catalogue art.
+Marla. The selected creature design is recorded below. Every other earlier Severed Lands
+production image is non-canonical and supplies no inspiration, identity reference or appearance
+constraint for replacement catalogue art.
 
 - [Accepted three-character board](../assets/styles/5cdb120726f94a8b73f8d1cd1bcc61ea9f804123dd7effa72fb641b44eb57e6f.png):
   V, Harlan and the Cartographer retain their own designs, including the Cartographer's concealment.
@@ -94,6 +95,15 @@ the pictured person supplies neither terrain geometry nor compulsory night light
 Both full-body and multiview references are required for a complete bundle. A selected concept
 image alone is not complete coverage. New references join production canon when selected against
 the authored facts and this guide. Individual creature studies remain outside canon until selected.
+
+### Selected Rift creature identity
+
+The owner selected C3 as the Death Hound's design: a living two-headed predator with convincing
+weight and impossible blue/violet interior depth. Retain that selected body's anatomy, dark pelt,
+recessed spatial structures and restrained luminous contours when deriving its other views.
+This adds one creature identity to the four previously accepted characters; its multiview and
+portrait still need preparation. Other species express Rift distortion through their own anatomy and
+materials rather than repeating the hound's interior architecture.
 
 ## Maps and Rift environments
 
