@@ -20,6 +20,26 @@
 
 const SylviaGMFrontend = (() => {
   'use strict';
+  let imageArtController = null;
+  function imageArt() {
+    if (!window.SylviaImageArt || !state.bridge?.image_art) return null;
+    if (!imageArtController) imageArtController = window.SylviaImageArt.create({
+      bridge: () => state.bridge,
+      context: () => ({session_id:state.activeSessionId,campaign_id:state.activeCampaignId}),
+      navigateSource: source => source.source_campaign_id
+        ? openCampaign(source.source_campaign_id,source.source_session_id)
+        : openBuilderChat(source.source_session_id),
+      changed: () => {
+        if (state.panelProjection) renderRulesetPanelProjection({...state.panelProjection,
+          image_art_revision:imageArtController.revision()});
+        document.querySelectorAll('[data-image-art-speaker]').forEach(element => {
+          element.innerHTML = imageArtController.portrait(element.dataset.imageArtSpeaker,
+            element.dataset.imageArtName);
+        });
+      },
+    });
+    return imageArtController;
+  }
 
   // ---- State: only authoritative projections; no secrets, no paths ----
   const state = {
@@ -85,6 +105,9 @@ const SylviaGMFrontend = (() => {
     pendingImportRepair: null,
     pendingCharacterCard: null,
     characterCardBusy: false,
+    pendingCharacterFile: null,
+    characterFileBusy: false,
+    characterExportBusy: false,
     hasDerivedCampaignPlan: false,
     activeCreationSubflow: null,
     builderLaunchPending: new Set(),
@@ -464,6 +487,13 @@ const SylviaGMFrontend = (() => {
       return { revision: snapshot.revision };
     }
     if (method === 'campaign_panels') return state.panelProjection;
+    if (method === 'image_art') {
+      if (!args || args.session_id !== scope.session_id ||
+          !['view','status','asset'].includes(args.action) ||
+          Object.keys(args).some(key=>!['action','session_id','sha256'].includes(key)))
+        throw new Error('This image read belongs to another session or is unavailable.');
+      return state.bridge.image_art(args);
+    }
     if (method === 'refresh') {
       await refreshSelectedCampaign();
       return null;
@@ -538,6 +568,7 @@ const SylviaGMFrontend = (() => {
     return {
       snapshot: () => request('snapshot', {}),
       campaign_panels: () => request('campaign_panels', {}),
+      image_art: (command) => request('image_art', command),
       player_action_availability: (command) => request('player_action_availability', command),
       preview_panel_action: (command) => request('preview_panel_action', command),
       queue_panel_action: (command) => request('queue_panel_action', command),
@@ -922,6 +953,7 @@ const SylviaGMFrontend = (() => {
         invoke('player_projection_page', { campaignId, afterSequence, loadId }),
       campaign_panels: (campaignId, afterRevision = null, loadId = null) =>
         invoke('campaign_panels', { campaignId, afterRevision, loadId }),
+      image_art: (params) => invoke('image_art', {params}),
       cancel_display_load: (loadId) => invoke('cancel_display_load', { loadId }),
       action_sequence: (command) => invoke('action_sequence', {sessionId:command.session_id, sequenceId:command.sequence_id || null}),
       compose_action_sequence: (command) => invoke('compose_action_sequence', {command}),
@@ -1204,6 +1236,12 @@ const SylviaGMFrontend = (() => {
       install_package_file: (installId) => invoke('install_package_file', { installId }),
       preview_character_card_file: () => invoke('preview_character_card_file'),
       confirm_character_card_import: (digest) => invoke('confirm_character_card_import', { sourceSha256: digest }),
+      preview_character_bundle_file: () => invoke('preview_character_bundle_file'),
+      confirm_character_bundle_import: (digest) => invoke('confirm_character_bundle_import', { sourceSha256: digest }),
+      cancel_character_bundle_import: (digest) => invoke('cancel_character_bundle_import', { sourceSha256: digest }),
+      export_character_file: (exportId, artifactId, expectedContentSha256, kind, suggestedName) => invoke(
+        'export_character_file', { exportId, artifactId, expectedContentSha256, kind, suggestedName }
+      ),
       start_import_repair: (command) => invoke('start_import_repair', {
         repairId: command.repair_id, operationId: command.operation_id,
         providerId: command.provider_id, modelId: command.model_id,
@@ -1476,12 +1514,15 @@ const SylviaGMFrontend = (() => {
       button.addEventListener('click', () => setTheme(button.dataset.theme));
     });
     $('open-settings-btn').addEventListener('click', () => openSettings());
+    $('image-art-btn')?.addEventListener('click', () => imageArt()?.open());
+    $('image-art-settings-btn')?.addEventListener('click', () => imageArt()?.open());
+    if ($('image-art-btn')) $('image-art-btn').hidden = !state.bridge?.image_art;
     $('close-settings-btn').addEventListener('click', closeSettings);
     document.querySelectorAll('[data-settings-tab]').forEach((button) => {
       button.addEventListener('click', () => {
         showSettingsTab(button.dataset.settingsTab);
         if (button.dataset.settingsTab === 'admin') void refreshAdminAudit();
-        if (button.dataset.settingsTab === 'packages') void refreshRulesetBrowser();
+        if (button.dataset.settingsTab === 'packages') { void refreshRulesetBrowser(); void refreshCharacterExportChoices(); }
       });
     });
     $('settings-overlay').addEventListener('click', (event) => {
@@ -1527,6 +1568,15 @@ const SylviaGMFrontend = (() => {
     $('cancel-character-card-btn').addEventListener('click', () => {
       if (state.characterCardBusy) return;
       state.pendingCharacterCard = null; $('character-card-preview').hidden = true;
+    });
+    $('import-character-file-btn').addEventListener('click', () => { void previewSelectedCharacterFile(); });
+    $('confirm-character-file-btn').addEventListener('click', () => { void confirmSelectedCharacterFile(); });
+    $('cancel-character-file-btn').addEventListener('click', () => { void cancelSelectedCharacterFile(); });
+    $('character-export-select').addEventListener('change', () => updateCharacterExportControls());
+    $('export-character-file-btn').addEventListener('click', () => {
+      void exportCharacterFile(selectedExportCharacter(), (message) => {
+        $('character-export-status').textContent = message;
+      });
     });
     $('repair-import-btn').addEventListener('click', () => { void startImportRepair(); });
     $('ruleset-refresh-btn').addEventListener('click', () => { void refreshRulesetBrowser(); });
@@ -1720,7 +1770,23 @@ const SylviaGMFrontend = (() => {
       );
       if (item) void deleteReusableLibraryEntry(item);
     });
+    $('export-reusable-player-btn').addEventListener('click', () => {
+      const item = (state.campaignPartyOptions?.player_archetypes || []).find(
+        (candidate) => candidate.id === $('rift-archetype').value
+      );
+      if (item) void exportCharacterFile(item, setupCharacterExportReporter());
+    });
     $('rift-companions').addEventListener('click', (event) => {
+      const exportButton = event.target.closest('[data-export-reusable-companion]');
+      if (exportButton) {
+        event.preventDefault();
+        event.stopPropagation();
+        const item = (state.campaignPartyOptions?.companions || []).find(
+          (candidate) => candidate.id === exportButton.dataset.exportReusableCompanion
+        );
+        if (item) void exportCharacterFile(item, setupCharacterExportReporter());
+        return;
+      }
       const button = event.target.closest('[data-delete-reusable-companion]');
       if (!button) return;
       event.preventDefault();
@@ -1739,6 +1805,11 @@ const SylviaGMFrontend = (() => {
       });
     });
     $('character-profile-select').addEventListener('change', updateCharacterProfileControls);
+    $('export-character-profile-btn').addEventListener('click', () => {
+      const profile = (state.campaignCreationCatalog || []).find((item) =>
+        item.kind === 'character_profile' && item.id === $('character-profile-select').value);
+      if (profile) void exportCharacterFile(profile, setupCharacterExportReporter());
+    });
     $('adapt-character-profile-btn').addEventListener('click', () => {
       void adaptSelectedCharacterProfile();
     });
@@ -1931,7 +2002,7 @@ const SylviaGMFrontend = (() => {
     showSettingsTab(selectedTab);
     document.querySelector('.settings-tab.active')?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
     $('close-settings-btn').focus();
-    if (selectedTab === 'packages') void refreshRulesetBrowser();
+    if (selectedTab === 'packages') { void refreshRulesetBrowser(); void refreshCharacterExportChoices(); }
   }
 
   let localSupportReport = null;
@@ -2036,6 +2107,212 @@ const SylviaGMFrontend = (() => {
       }
     } catch (error) { setPackageInstallStatus(friendlyCommandError('Character-card import failed', error)); }
     finally { setCharacterCardBusy(false); }
+  }
+
+  const CHARACTER_TRANSFER_KINDS = new Set(['character_profile', 'player_character', 'companion']);
+
+  function characterTransferKindLabel(kind) {
+    return kind === 'character_profile' ? 'Universal character card'
+      : kind === 'companion' ? 'Companion' : 'Player Character';
+  }
+
+  // Name a saved package binding as setup does, using an installed Setting title when known.
+  function characterBindingText(bindings) {
+    const ruleset = bindings?.ruleset, setting = bindings?.campaign_setting;
+    if (!ruleset?.id || !setting?.id) return 'its saved Ruleset and Setting';
+    const installed = (state.campaignCreationCatalog || []).find((item) =>
+      item.kind === 'campaign_setting' && item.id === setting.id && item.version === setting.version);
+    return `Ruleset ${rulesetPackageName(ruleset.id)} ${ruleset.version} and Setting ` +
+      `${installed?.title || setting.id} ${setting.version}`;
+  }
+
+  function setCharacterFileBusy(busy) {
+    state.characterFileBusy = busy;
+    for (const id of ['import-character-file-btn', 'confirm-character-file-btn', 'cancel-character-file-btn']) $(id).disabled = busy;
+  }
+
+  function renderCharacterFilePreview(preview) {
+    const unbound = preview.kind === 'character_profile';
+    const images = Number(preview.image_count) || 0;
+    $('character-file-preview-title').textContent =
+      `${preview.name} — ${characterTransferKindLabel(unbound ? 'character_profile' : preview.role)}`;
+    $('character-file-preview-status').textContent = unbound
+      ? 'Needs ruleset adaptations' : `Playable with ${characterBindingText(preview.bindings)}`;
+    $('character-file-preview-text').textContent = preview.summary || '';
+    $('character-file-preview-contents').textContent =
+      (images ? `Includes ${images} image${images === 1 ? '' : 's'}` : 'Includes no artwork') +
+      (preview.original_card_included ? ' and the original imported card.' : '.') +
+      ' Importing does not create new artwork.';
+    $('character-file-preview-guidance').textContent = unbound
+      ? 'It stays unbound. Choose it during campaign setup and adapt it to your selected ruleset.'
+      : 'Install exactly this Ruleset and Setting before importing. Sylvia keeps the character as exported and does not adapt it.';
+    $('character-file-preview').hidden = false;
+  }
+
+  // Preview the chosen file's exact bytes; nothing joins the library until Import character.
+  async function previewSelectedCharacterFile() {
+    if (state.characterFileBusy || !state.bridge?.preview_character_bundle_file) return;
+    setCharacterFileBusy(true);
+    try {
+      const result = await state.bridge.preview_character_bundle_file();
+      if (result.status === 'cancelled') return;
+      if (result.status !== 'preview' || !/^[0-9a-f]{64}$/.test(result.source_sha256 || '')) {
+        throw new Error('Invalid Character File preview');
+      }
+      const replaced = state.pendingCharacterFile;
+      state.pendingCharacterFile = result;
+      renderCharacterFilePreview(result);
+      // Retire a replaced preview so abandoned choices do not fill the owner's pending limit.
+      if (replaced && replaced.source_sha256 !== result.source_sha256) {
+        try { await state.bridge.cancel_character_bundle_import(replaced.source_sha256); }
+        catch (_) { /* The owner keeps it; a later preview or cancel can still retire it. */ }
+      }
+    } catch (error) { setPackageInstallStatus(uploadCommandError('Character File preview', error)); }
+    finally { setCharacterFileBusy(false); }
+  }
+
+  async function confirmSelectedCharacterFile() {
+    if (state.characterFileBusy || !state.pendingCharacterFile || !state.bridge?.confirm_character_bundle_import) return;
+    const preview = state.pendingCharacterFile; setCharacterFileBusy(true);
+    try {
+      const result = await state.bridge.confirm_character_bundle_import(preview.source_sha256);
+      const character = result?.character;
+      if (result?.status !== 'imported' || result.source_sha256 !== preview.source_sha256 || !character?.id) {
+        throw new Error('Character File import was not confirmed');
+      }
+      state.pendingCharacterFile = null; $('character-file-preview').hidden = true;
+      const message = character.kind === 'character_profile'
+        ? `Imported ${character.name} as a Universal character card. Needs ruleset adaptations. ` +
+          'Choose it during campaign setup and adapt it to your selected ruleset.'
+        : `Imported ${character.name} as a ${characterTransferKindLabel(character.kind)}. ` +
+          'Choose it during campaign setup with its saved Ruleset and Setting.';
+      setPackageInstallStatus(message);
+      try { await refreshCharacterLibrary({ party: true }); }
+      catch (_) { setPackageInstallStatus(`${message} Reopen Packages to refresh the character lists.`); }
+    } catch (error) {
+      // The owner keeps the verified preview, so the same choice can be imported after a fix.
+      setPackageInstallStatus(`${uploadCommandError('Character File import', error).replace(/\.?$/, '.')} ` +
+        'The preview is kept; import it again or cancel.');
+    } finally { setCharacterFileBusy(false); }
+  }
+
+  // Discard only Sylvia's temporary preview copy; the chosen file and the library are untouched.
+  async function cancelSelectedCharacterFile() {
+    if (state.characterFileBusy || !state.pendingCharacterFile || !state.bridge?.cancel_character_bundle_import) return;
+    const preview = state.pendingCharacterFile; setCharacterFileBusy(true);
+    try {
+      const result = await state.bridge.cancel_character_bundle_import(preview.source_sha256);
+      if (result?.status !== 'cancelled') throw new Error('Character File preview was not cancelled');
+      state.pendingCharacterFile = null; $('character-file-preview').hidden = true;
+      setPackageInstallStatus(`Cancelled importing ${preview.name}. Nothing was saved.`);
+    } catch (error) { setPackageInstallStatus(friendlyCommandError('Could not cancel the Character File preview', error)); }
+    finally { setCharacterFileBusy(false); }
+  }
+
+  // Setup, the Universal card picker and Saved characters all read the same library catalogue.
+  async function refreshCharacterLibrary({ party = false } = {}) {
+    if (!state.bridge?.campaign_creation_catalog) return;
+    state.campaignCreationCatalog = await state.bridge.campaign_creation_catalog() || [];
+    renderCharacterProfiles();
+    renderCharacterExportChoices();
+    if (party && !$('construction-panel').hidden && state.campaignPartyOptionsStatus !== 'loading' &&
+        state.campaignPartyOptionsKey === campaignPartyRequestKey()) {
+      void refreshCampaignPartyOptions();
+    }
+  }
+
+  async function refreshCharacterExportChoices() {
+    try { await refreshCharacterLibrary(); }
+    catch (error) { renderCharacterExportChoices(friendlyCommandError('Saved characters are unavailable', error)); }
+  }
+
+  function exportableCharacters() {
+    return (state.campaignCreationCatalog || []).filter((item) => CHARACTER_TRANSFER_KINDS.has(item.kind) &&
+      item.reusable === true && item.id && /^[0-9a-f]{64}$/.test(item.content_sha256 || ''));
+  }
+
+  const characterExportKey = (item) => `${item.kind}/${item.id}`;
+
+  function selectedExportCharacter() {
+    const key = $('character-export-select').value;
+    return exportableCharacters().find((item) => characterExportKey(item) === key) || null;
+  }
+
+  function renderCharacterExportChoices(problem = '') {
+    const select = $('character-export-select');
+    const previous = select.value;
+    const items = exportableCharacters();
+    const group = (kind, label) => {
+      const options = items.filter((item) => item.kind === kind).map((item) => {
+        const detail = kind === 'character_profile' ? 'Needs adaptation'
+          : [item.builtin_starter ? 'Built-in' : '', reusableCharacterTargetLabel(item)].filter(Boolean).join(' · ');
+        return `<option value="${escapeHtml(characterExportKey(item))}">${escapeHtml(item.name)}` +
+          `${detail ? ` — ${escapeHtml(detail)}` : ''}</option>`;
+      }).join('');
+      return options ? `<optgroup label="${escapeHtml(label)}">${options}</optgroup>` : '';
+    };
+    select.innerHTML = `<option value="">${items.length ? 'Choose a saved character' : 'No saved characters yet'}</option>` +
+      group('player_character', 'Player Characters') + group('companion', 'Companions') +
+      group('character_profile', 'Universal character cards');
+    select.value = items.some((item) => characterExportKey(item) === previous) ? previous : '';
+    updateCharacterExportControls(problem);
+  }
+
+  function updateCharacterExportControls(problem = '') {
+    const item = selectedExportCharacter(), available = exportableCharacters().length > 0;
+    const incomplete = item && item.kind !== 'character_profile' && item.profile_status && item.profile_status !== 'authored';
+    $('character-export-select').disabled = state.characterExportBusy || !available;
+    $('export-character-file-btn').disabled = state.characterExportBusy || !item || Boolean(incomplete) ||
+      !state.bridge?.export_character_file;
+    $('character-export-summary').textContent = problem ||
+      (!item ? (available ? 'Choose a character to export.' : 'Import a character or save one from a Builder chat first.')
+        : incomplete ? 'Open this character in Builder and complete its profile before exporting it.'
+          : item.kind === 'character_profile' ? `${item.summary} — Unbound; it needs adaptation before play.`
+            : `${item.summary} — Keeps its saved Ruleset and Setting.`);
+    $('export-reusable-player-btn').disabled = state.characterExportBusy;
+    $('rift-companions').querySelectorAll('[data-export-reusable-companion]').forEach((button) => {
+      button.disabled = state.characterExportBusy;
+    });
+    updateCharacterProfileControls();
+  }
+
+  // Report setup exports only while the same Interview is still shown.
+  function setupCharacterExportReporter() {
+    const sessionId = state.activeSessionId;
+    return (message) => {
+      if (sessionId === state.activeSessionId && !$('construction-panel').hidden) setInlineStatus(message, 'construction');
+    };
+  }
+
+  // Export the exact library entry the user selected; the owner refuses a changed or missing source.
+  async function exportCharacterFile(item, report) {
+    if (!item?.id || !item.content_sha256 || !CHARACTER_TRANSFER_KINDS.has(item.kind) ||
+        state.characterExportBusy || !state.bridge?.export_character_file) return;
+    state.characterExportBusy = true;
+    updateCharacterExportControls();
+    try {
+      const result = await state.bridge.export_character_file(
+        `export-character-${crypto.randomUUID()}`, item.id, item.content_sha256, item.kind, item.name,
+      );
+      if (result?.status === 'cancelled') { report(`Export of ${item.name} cancelled`); return; }
+      if (result?.status !== 'exported') throw new Error('Character export was not confirmed');
+      const receipt = result.export || {};
+      const images = Number(receipt.image_count) || 0;
+      report(`Exported ${item.name} with ${images ? `${images} image${images === 1 ? '' : 's'}` : 'no artwork'}` +
+        `${receipt.original_card_included ? ' and its original card' : ''}.` +
+        (item.kind === 'character_profile' ? '' : ' Whoever imports it needs the same Ruleset and Setting installed.'));
+    } catch (error) {
+      const message = friendlyCommandError(`Could not export ${item.name}`, error);
+      report(message);
+      // A changed or removed entry is refused; show the library as it is now.
+      try {
+        await refreshCharacterLibrary({ party: true });
+        report(`${message.replace(/\.?$/, '.')} Saved characters were refreshed.`);
+      } catch (_) { /* Keep the export failure visible. */ }
+    } finally {
+      state.characterExportBusy = false;
+      updateCharacterExportControls();
+    }
   }
 
   async function installSelectedPackage() {
@@ -4983,7 +5260,7 @@ const SylviaGMFrontend = (() => {
   function actorTokenMarkup(id, name) {
     const display = mapBodyForActor(id)?.display;
     return `<span class="panel-actor-token" data-tone="${entityTone(id, display)}"` +
-      `${display?.kind === 'drone' ? ' data-token-kind="drone"' : ''} aria-hidden="true">${escapeHtml(actorInitials(name || id))}</span>`;
+      `${display?.kind === 'drone' ? ' data-token-kind="drone"' : ''} aria-hidden="true">${imageArt()?.portrait(id,name || id) || escapeHtml(actorInitials(name || id))}</span>`;
   }
 
   // ---- Game panel suite (accepted mockup ebf068e6): shared presentation pieces. Every value comes from the
@@ -5490,6 +5767,7 @@ const SylviaGMFrontend = (() => {
         (role ? `<span class="panel-unit-role">${escapeHtml(panelIdentifierLabel(role))}</span>` : '') +
         (acting === participant.id ? '<span class="panel-tag" data-tone="ally">Acting</span>' : '') + `</div>` +
         `<div class="roster-vitals">${hpPanelMarkup(entity)}${personalResourceMarkup(entity)}</div>` +
+        (imageArt()?.button?.(participant.id, details.name || participant.id) || '') +
         droneStatusMarkup(entity, (id) => participants.find((member) => member.id === id)?.data?.name ||
           entities[id]?.name || mapBodyForActor(id)?.display?.label || displayIdentifier(id)) + conditionPanelMarkup(entity) +
         `<details class="roster-inspection" data-character-expansion="${escapeHtml(participant.id)}"${inspection.expanded.includes(participant.id) ? ' open' : ''}><summary aria-label="Details for ${escapeHtml(details.name || participant.id)}">Details</summary>` +
@@ -5610,6 +5888,7 @@ const SylviaGMFrontend = (() => {
     }).join('');
     if (!compact) return operatorMarkup(surface, actorId, { participant, entity, name, details, level, values });
     return `<div class="${compact ? 'character-expanded-details' : 'character-hero'}" data-character-details="${escapeHtml(actorId)}"${compact ? '' : ` ${participant ? 'data-panel-entity' : 'data-character-entity'}="${escapeHtml(actorId)}"`}>` +
+      (imageArt()?.button?.(actorId,name) || '') +
       (compact ? (description ? `<p class="character-description">${description}</p>` : '') : `<div class="character-identity">${actorTokenMarkup(actorId, name)}` +
       `<div><small>Inspecting</small><h3><strong>${escapeHtml(name)}</strong></h3>${description ? `<span class="character-description">${description}</span>` : ''}` +
       (details.party_role ? `<span class="panel-unit-role">${escapeHtml(panelIdentifierLabel(details.party_role))}</span>` : '') + '</div></div>') +
@@ -5696,7 +5975,8 @@ const SylviaGMFrontend = (() => {
     const saves = Array.isArray(details[savesKey]) ? details[savesKey] : [];
     const otherResources = Object.entries(entity.resources || {}).filter(([key]) => !familyKeys.has(key));
     return `<div class="character-hero grimoire" data-character-details="${escapeHtml(actorId)}" ${participant ? 'data-panel-entity' : 'data-character-entity'}="${escapeHtml(actorId)}">` +
-      `<header class="grim-head"><div class="grim-plinth" role="img" aria-label="${escapeHtml(name)}: initials (no portrait projected)"><b>${escapeHtml(actorInitials(name))}</b><small>no portrait · initials</small></div>` +
+      (imageArt()?.button?.(actorId,name) || '') +
+      `<header class="grim-head"><div class="grim-plinth" role="img" aria-label="${escapeHtml(name)}">${imageArt()?.portrait(actorId,name) || `<b>${escapeHtml(actorInitials(name))}</b><small>no portrait · initials</small>`}</div>` +
       `<div class="grim-id"><small class="op-kicker">Inspecting</small><h3><strong>${escapeHtml(name)}</strong></h3><p>${escapeHtml([lineage, classes].filter(Boolean).join(' · '))}</p>` +
       `<div class="grim-vitals">${flask}${shield}${speed}</div></div></header>` + conditionPanelMarkup(entity) +
       `<section class="grim-book"><span class="grim-sec">Prepared · choose, then target on the ${escapeHtml(map.title || 'map')}</span>${casts.map(spellCard).join('')}</section>` +
@@ -5745,8 +6025,8 @@ const SylviaGMFrontend = (() => {
     })();
     const chevrons = [classId ? panelIdentifierLabel(classId) : '', Number.isFinite(level) ? `L${level}` : ''].filter(Boolean);
     const description = [classId, Number.isFinite(level) ? `Level ${level}` : ''].filter(Boolean).map((value) => escapeHtml(panelIdentifierLabel(value))).join(' · ');
-    const hero = `<section class="op-hero"><div class="op-art no-art" role="img" aria-label="${escapeHtml(name)}: initials (no portrait projected)">` +
-      `<div class="op-monogram"><b>${escapeHtml(actorInitials(name))}</b><span>No portrait · initials</span></div>` +
+    const hero = `<section class="op-hero"><div class="op-art${imageArt()?.portrait(actorId,name) ? '' : ' no-art'}" role="img" aria-label="${escapeHtml(name)}">` +
+      (imageArt()?.portrait(actorId,name) || `<div class="op-monogram"><b>${escapeHtml(actorInitials(name))}</b><span>No portrait · initials</span></div>`) +
       (chevrons.length ? `<div class="op-chevrons">${chevrons.map((text) => `<span>${escapeHtml(text)}</span>`).join('')}</div>` : '') + '</div>' +
       `<div class="op-stats"><small class="op-kicker">Inspecting</small><h3><strong>${escapeHtml(name)}</strong></h3>` +
       (details.party_role ? `<span class="panel-unit-role">${escapeHtml(panelIdentifierLabel(details.party_role))}</span>` : '') +
@@ -5801,6 +6081,7 @@ const SylviaGMFrontend = (() => {
     const resources = entity?.resources ? `<div class="character-resources">${Object.entries(entity.resources).map(([key, value]) =>
       `<span>${escapeHtml(panelIdentifierLabel(key))}<b>${escapeHtml(value)}</b></span>`).join('')}</div>` : '';
     return `<div class="character-hero operator" data-character-details="${escapeHtml(actorId)}" ${participant ? 'data-panel-entity' : 'data-character-entity'}="${escapeHtml(actorId)}">` +
+      (imageArt()?.button?.(actorId,name) || '') +
       opSwitch + hero + conditionPanelMarkup(entity) + weaponSection + weaponSetMarkup(entity?.weapon_sets) + resources +
       (otherReady.length || otherRefused.length ? `<div class="character-action-groups" data-panel-id="${escapeHtml(surface.id)}">` +
         (otherReady.length ? `<div class="character-ready-actions"><span>Actions</span><div class="ruleset-panel-actions op-actions">${otherReady.map((action) => button(action, 'suite-act')).join('')}</div></div>` : '') +
@@ -6593,7 +6874,7 @@ const SylviaGMFrontend = (() => {
         `title="${escapeHtml(label)}${posture ? `, ${escapeHtml(posture)}` : ''}" ` +
         `aria-pressed="${actor || target}" style="${tacticalPositionStyle(
           item.position, dimensions, continuous ? null : undefined
-        )}${continuous ? coordinateBodyStyle(item, dimensions, view.zoom) : ''}">${mapTokenDecorations(surface, item)}<span class="map-token-label" aria-hidden="true">${escapeHtml(actorInitials(label))}</span>` +
+        )}${continuous ? coordinateBodyStyle(item, dimensions, view.zoom) : ''}">${mapTokenDecorations(surface, item)}<span class="map-token-label" aria-hidden="true">${imageArt()?.portrait(tacticalActorId(surface,item.id),label) || escapeHtml(actorInitials(label))}</span>` +
         `<span class="map-name-label" aria-hidden="true">${escapeHtml(label)}</span>` +
         (continuous && space?.status === 'unavailable' ?
           '<span class="coordinate-space-warning" aria-hidden="true">Space unknown</span>' : '') +
@@ -6677,7 +6958,7 @@ const SylviaGMFrontend = (() => {
        `<div class="tactical-world${continuous ? ' coordinate-world' : ''}${view.coverInfo ? ' show-cover-info' : ''}" ` +
       `style="width:${dimensions.width * 32}px;` +
       `height:${dimensions.height * 32}px;--tactical-zoom:${view.zoom}">` +
-       cells.join('') + terrain + zones + geometry + objectives + entities +
+       (imageArt()?.underlay(data.map) || '') + cells.join('') + terrain + zones + geometry + objectives + entities +
        (continuous && Array.isArray(selection.aim_point) ? `<span class="coordinate-point-marker" ` +
          `style="${tacticalPositionStyle(selection.aim_point, dimensions, 0.35)}" aria-hidden="true">+</span>` : '') +
       `<svg class="tactical-map-preview-overlay" data-tactical-map-preview-overlay ` +
@@ -7571,6 +7852,7 @@ const SylviaGMFrontend = (() => {
   }
 
   function renderRulesetPanelProjection(projection) {
+    imageArt()?.sync(`${projection?.revision ?? projection?.campaign_revision ?? ''}:${projection?.image_art_revision || ''}`, 'panels');
     projection = queueProjection(projection);
     if (window.__sylviaPanelContext && state.activeSessionId) ensureSessionActivity();
     const host = $('ruleset-panel-host');
@@ -7720,6 +8002,11 @@ const SylviaGMFrontend = (() => {
     });
     container.querySelectorAll('[data-character-action-panel]').forEach((button) => {
       button.addEventListener('click', () => void gamePanels().reveal(button.dataset.characterActionPanel));
+    });
+    container.querySelectorAll('[data-character-art]').forEach((button) => {
+      button.addEventListener('click', () => void imageArt()?.open({
+        target_id:button.dataset.characterArt, name:button.dataset.artName,
+      }));
     });
     container.querySelectorAll('[data-character-expansion]').forEach((details) => {
       details.addEventListener('toggle', () => {
@@ -9818,6 +10105,7 @@ const SylviaGMFrontend = (() => {
   }
 
   function renderBuilderHistory(activity, context) {
+    imageArt()?.sync(context?.messages?.length ?? '', 'history');
     const sessionId = activity.sessionId;
     const container = $('chronology');
     reconcileBuilderActivity(activity, context && context.activity);
@@ -10131,6 +10419,7 @@ const SylviaGMFrontend = (() => {
   }
 
   function renderDMHistory(activity, context, projections, displayStatus = null) {
+    imageArt()?.sync(context?.messages?.length ?? '', 'history');
     const campaignId = activity.campaignId;
     const container = $('chronology');
     if (!selectedActivityMatches(activity) || state.activeSessionRole !== 'dm' ||
@@ -10565,6 +10854,7 @@ const SylviaGMFrontend = (() => {
       (item) => item.id === $('rift-archetype').value
     );
     $('delete-reusable-player-btn').hidden = !(player?.reusable && player.content_sha256 && !player.builtin_starter);
+    $('export-reusable-player-btn').hidden = !(player?.reusable && player.content_sha256);
   }
 
   async function deleteReusableLibraryEntry(item) {
@@ -10919,6 +11209,7 @@ const SylviaGMFrontend = (() => {
     group.hidden = !allowed;
     select.disabled = busy || !profiles.length;
     button.disabled = !allowed || busy || !profile;
+    $('export-character-profile-btn').disabled = !profile || state.characterExportBusy;
     $('rift-create-companion').disabled = busy;
     summary.textContent = profile ? `${profile.summary} — Needs adaptation to this campaign.` :
       profiles.length ? 'Choose a source to adapt; the original will stay unchanged.' :
@@ -11753,6 +12044,10 @@ const SylviaGMFrontend = (() => {
         ? `<button type="button" class="btn btn-secondary btn-sm" ` +
           `data-delete-reusable-companion="${escapeHtml(item.id)}">Delete Saved Companion</button>`
         : '';
+      const exportButton = item.reusable && item.content_sha256
+        ? `<button type="button" class="btn btn-secondary btn-sm" ` +
+          `data-export-reusable-companion="${escapeHtml(item.id)}">Export Character File…</button>`
+        : '';
       return `<label class="companion-choice" for="rift-companion-${index}">` +
         `<input id="rift-companion-${index}" type="checkbox" value="${escapeHtml(item.id)}" ` +
         `data-profile-required="${profileRequired ? 'true' : 'false'}"` +
@@ -11762,7 +12057,7 @@ const SylviaGMFrontend = (() => {
         `<small>${escapeHtml(item.summary)}${status}` +
         `${item.source_profile ? ` · Adapted from ${escapeHtml(item.source_profile.name)}` : ''}` +
         `${reusableCharacterTargetLabel(item) ? `<br><span class="saved-character-target">${escapeHtml(reusableCharacterTargetLabel(item))}</span>` : ''}` +
-        `</small>${deleteButton}</label>`;
+        `</small>${exportButton}${deleteButton}</label>`;
     }).join('');
     $('rift-companions').querySelectorAll('input[type="checkbox"]').forEach((input) => {
       input.addEventListener('change', () => {
@@ -13020,6 +13315,7 @@ const SylviaGMFrontend = (() => {
     return blocks.map((block) => {
       if (block.kind === 'npc_dialogue') {
         return `<section class="response-block npc-dialogue" aria-label="NPC dialogue">` +
+          `<span data-image-art-speaker="${escapeHtml(block.speaker_id || '')}" data-image-art-name="${escapeHtml(block.speaker_label || '')}">${imageArt()?.portrait(block.speaker_id,block.speaker_label) || ''}</span>` +
           `<div class="response-label">${escapeHtml(block.speaker_label || 'Unknown speaker')}</div>` +
           `<div class="story-text">${renderNarrationMarkdown(block.text || '')}</div></section>`;
       }

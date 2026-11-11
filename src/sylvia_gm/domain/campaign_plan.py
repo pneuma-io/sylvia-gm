@@ -426,7 +426,7 @@ def validate_campaign_plan(
         plan,
         required_plan_fields,
         "Campaign Plan",
-        optional=frozenset({"opening_direction", "ending"}),
+        optional=frozenset({"opening_direction", "ending", "artwork_source_plan_id"}),
         path="$",
     )
     if (
@@ -435,6 +435,8 @@ def validate_campaign_plan(
     ):
         raise ValueError("Campaign Plan format is unsupported")
     plan_id = _identity(plan["id"], "Campaign Plan identity")
+    if "artwork_source_plan_id" in plan:
+        _identity(plan["artwork_source_plan_id"], "Campaign Plan artwork source identity")
     if (
         not isinstance(plan["revision"], int)
         or isinstance(plan["revision"], bool)

@@ -22,6 +22,27 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PYTHON_JOURNEYS = {
+    "image-art": [
+        "tests/test_image_art.py",
+        "tests/test_image_art_export.py",
+        "tests/test_image_subscription.py",
+        "tests/test_character_visuals.py",
+        "tests/test_character_art_import.py",
+        "tests/test_character_transfer.py",
+        "tests/test_character_art_editing.py",
+        "tests/test_character_art_pending_reuse.py",
+        "tests/test_character_art_workflow.py",
+        "tests/test_character_art_publication.py",
+        "tests/test_image_art_session_handoff.py",
+        "tests/test_ready_character_art.py",
+        "tests/test_character_art_handoff.py",
+        "tests/test_bundled_character_art.py",
+        "tests/test_prepared_enemy_art.py",
+        "tests/test_inherited_character_art.py",
+        "tests/test_plan_character_art.py",
+        "tests/test_authored_character_art.py",
+        "tests/test_image_hooks.py",
+    ],
     "launch-lite-compatibility": [
         "tests/test_launch_lite_safety.py",
         "tests/test_runtime_payload_cache.py",
@@ -135,6 +156,7 @@ PYTHON_JOURNEYS = {
         "tests/test_result_cards.py",
     ],
     "interruption-and-recovery": [
+        "tests/test_draft_candidate_recovery.py",
         "tests/test_fc_recovery_composition.py",
         "tests/test_session_history_pages.py",
         "tests/test_alpha_f6e_owner_session_transport.py::"
@@ -197,6 +219,7 @@ PYTHON_JOURNEYS = {
     ],
 }
 UI_JOURNEY = [
+    "tests/frontend_image_art_surfaces.browser.cjs",
     "tests/frontend_campaign_rules_update.browser.cjs",
     "tests/frontend_character_equipment.test.cjs",
     "tests/frontend_character_selection.test.cjs",

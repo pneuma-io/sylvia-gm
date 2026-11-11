@@ -58,7 +58,8 @@
     // Only small presentation state is compared; the projection itself advances at render boundaries.
     function presentationKey(value) {
       const preferences = value.effects?.preferences || effects.preferences();
-      return JSON.stringify([value.layout, value.busy, value.projection?.presentation_key, value.theme, value.tacticalSelections,
+      return JSON.stringify([value.layout, value.busy, value.projection?.presentation_key,
+        value.projection?.image_art_revision, value.theme, value.tacticalSelections,
         value.networkSelections, value.crossSurfaceFocus, value.characterInspection, preferences]);
     }
 

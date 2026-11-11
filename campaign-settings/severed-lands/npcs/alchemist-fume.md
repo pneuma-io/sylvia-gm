@@ -19,3 +19,15 @@ Consumables belong to future SRD Full.
 ## Personality
 
 Fume is enthusiastic, slightly unhinged, and deeply in love with his craft. He treats alchemy as art — every compound is an expression, every reaction is a conversation. He's blown up his stall three times. He's rebuilt it each time. The Crossroads regulars consider him a local treasure.
+
+## Appearance and artwork
+
+An adult humanoid man in his forties with olive-tan skin, lively brown eyes, a long hooked nose, a bald crown and wispy copper-gray hair at the sides. Thin healed pale burn scars on his forearms, intact skin. Brass work goggles pushed above the eyes, a soot-stained mustard tunic, worn dark work coat, brown leather apron, dark trousers and heavy practical boots. A scuffed leather reagent case held closed at his side and two small sealed opaque containers on the belt. Enthusiastic slightly wild smile. No glowing compounds or magical effects.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/b4234564413f65ee6c9f3524961accfe3144c01b999d203405992b3e6da22fc8.png)
+
+[Full-body reference](../assets/characters/c1ea5e720039fab6a737491d625911671653140dfe149f22fc1a274852d8fa90.png)
+
+[Multiview reference sheet](../assets/characters/be1fe36a65617bb9405682aa6f4c8386f7cff7055c970ca00f8f8ccb94507914.png)

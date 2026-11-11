@@ -141,6 +141,7 @@ from sylvia_gm.infrastructure import (
     sqlite_draft_history,
     sqlite_draft_lifecycle,
     sqlite_effort,
+    sqlite_images,
     sqlite_mechanics_choice,
     sqlite_packages,
     sqlite_reasoning,
@@ -166,7 +167,8 @@ _PRE_CONTINUITY_SCHEMA_VERSION = 8
 _PRE_DRAFT_LIFECYCLE_SCHEMA_VERSION = 9
 _PRE_REASONING_SCHEMA_VERSION = 10
 _PRE_EFFORT_SCHEMA_VERSION = 11
-_CAMPAIGN_SCHEMA_VERSION = 12
+_PRE_IMAGE_SCHEMA_VERSION = 12
+_CAMPAIGN_SCHEMA_VERSION = 13
 _APPLICATION_OWNER_GATE = object()
 _UNBOUND_CAMPAIGN_LOCK_HASH = "unbound"
 
@@ -690,6 +692,7 @@ def _expected_schema_identity(
     include_draft_lifecycle: bool = False,
     include_reasoning: bool = False,
     include_effort: bool = False,
+    include_images: bool = False,
     campaign_sql: str | None = None,
 ) -> tuple[tuple[str, str], ...]:
     connection = sqlite3.connect(":memory:")
@@ -721,6 +724,8 @@ def _expected_schema_identity(
             sqlite_reasoning.apply_migration(connection)
         if include_effort:
             sqlite_effort.apply_migration(connection)
+        if include_images:
+            sqlite_images.apply_migration(connection)
         return _schema_identity(connection)
     finally:
         connection.close()
@@ -854,6 +859,20 @@ _EXPECTED_EFFORT_SCHEMA_IDENTITY = _expected_schema_identity(
     include_draft_lifecycle=True,
     include_reasoning=True,
     include_effort=True,
+)
+_EXPECTED_IMAGE_SCHEMA_IDENTITY = _expected_schema_identity(
+    include_sessions=True,
+    include_campaign=True,
+    include_lifecycle=True,
+    include_recovery=True,
+    include_state_ownership=True,
+    include_mechanics_choice=True,
+    include_builder_chats=True,
+    include_continuity=True,
+    include_draft_lifecycle=True,
+    include_reasoning=True,
+    include_effort=True,
+    include_images=True,
 )
 _RECOVERY_EXTENSION_SCHEMA_IDENTITIES = frozenset(
     {_EXPECTED_W12_CAMPAIGN_SCHEMA_IDENTITY, _EXPECTED_PURGE_CAMPAIGN_SCHEMA_IDENTITY}
@@ -1056,6 +1075,7 @@ class SQLiteAuthorityStore:
             self._owner_lock.close()
             raise
         self._closed = False
+        self.images = sqlite_images.ImageStore(self._connect, self._ensure_campaign_schema)
 
     def prepare_new_campaign_storage(self) -> None:
         """Finish fresh-profile migrations before bundles make verified backups expensive."""
@@ -1294,7 +1314,7 @@ class SQLiteAuthorityStore:
             sqlite_recovery.plan_recovery(connection, staged)
             self._ensure_campaign_schema(connection)
             live_identity = _schema_identity(connection)
-            if live_identity != _EXPECTED_EFFORT_SCHEMA_IDENTITY:
+            if live_identity != _EXPECTED_IMAGE_SCHEMA_IDENTITY:
                 raise SchemaIdentityError("Portable recovery schema ownership is not exact")
             plan = sqlite_recovery.plan_recovery(connection, staged)
             # The migration and every semantic insert share this same transaction.
@@ -1926,7 +1946,7 @@ class SQLiteAuthorityStore:
 
         if (
             int(connection.execute("PRAGMA user_version").fetchone()[0]) != _CAMPAIGN_SCHEMA_VERSION
-            or _schema_identity(connection) != _EXPECTED_EFFORT_SCHEMA_IDENTITY
+            or _schema_identity(connection) != _EXPECTED_IMAGE_SCHEMA_IDENTITY
             or (
                 sqlite_state_ownership.trigger_identity(connection)
                 != sqlite_state_ownership.EXPECTED_TRIGGER_IDENTITY
@@ -1965,6 +1985,8 @@ class SQLiteAuthorityStore:
             "campaign_plans",
             "builder_dm_handoffs",
             "agent_sessions",
+            "image_requests",
+            "image_selections",
         )
         predicates: dict[str, tuple[str, tuple[object, ...]]] = dict.fromkeys(
             direct, ('"campaign_id" = ?', (campaign_id,))
@@ -1977,8 +1999,13 @@ class SQLiteAuthorityStore:
             "SELECT candidate_id FROM package_activations "
             "WHERE campaign_id = ? AND candidate_id IS NOT NULL "
             "UNION SELECT package_candidate_id FROM builder_dm_handoffs "
-            "WHERE campaign_id = ? AND package_candidate_id IS NOT NULL"
+            "WHERE campaign_id = ? AND package_candidate_id IS NOT NULL "
+            "UNION SELECT json_extract(semantic_payload_json, '$.package_candidate_id') "
+            "FROM campaign_operations WHERE campaign_id = ? "
+            "AND operation_kind = 'confirm_new_campaign' "
+            "AND json_type(semantic_payload_json, '$.package_candidate_id') = 'text'"
         )
+        candidate_parameters = (campaign_id, campaign_id, campaign_id)
         predicates["campaign_lock_memberships"] = (
             '"lock_id" IN (SELECT lock_id FROM campaign_locks WHERE campaign_id = ?)',
             (campaign_id,),
@@ -1988,16 +2015,16 @@ class SQLiteAuthorityStore:
             (campaign_id,),
         )
         candidate_predicate = f'"candidate_id" IN ({selected_candidates})'
-        predicates["package_candidates"] = (candidate_predicate, (campaign_id, campaign_id))
+        predicates["package_candidates"] = (candidate_predicate, candidate_parameters)
         predicates["package_candidate_memberships"] = (
             candidate_predicate,
-            (campaign_id, campaign_id),
+            candidate_parameters,
         )
         predicates["package_staging"] = (
             '"install_id" IN (SELECT install_id FROM package_candidates WHERE '
             + candidate_predicate
             + ")",
-            (campaign_id, campaign_id),
+            candidate_parameters,
         )
 
         def exact_identity(table: str, sha_column: str) -> tuple[str, tuple[object, ...]]:
@@ -2015,7 +2042,7 @@ class SQLiteAuthorityStore:
                 f'AND export_candidate_member.version = "{table}"."version" '
                 f'AND export_candidate_member.content_sha256 = "{table}"."{sha_column}"))'
             )
-            return where, (campaign_id, campaign_id, campaign_id)
+            return where, (campaign_id, *candidate_parameters)
 
         for table in (
             "package_manifests",
@@ -2033,8 +2060,9 @@ class SQLiteAuthorityStore:
         file_identity, file_parameters = exact_identity("package_manifest_files", "content_sha256")
         predicates["package_blobs"] = (
             '"blob_sha256" IN (SELECT "package_manifest_files"."blob_sha256" '
-            'FROM "package_manifest_files" WHERE ' + file_identity + ")",
-            file_parameters,
+            'FROM "package_manifest_files" WHERE ' + file_identity + ") "
+            'OR "blob_sha256" IN (SELECT result_sha256 FROM image_requests WHERE campaign_id = ?)',
+            (*file_parameters, campaign_id),
         )
         return {table: predicates[table] for table in campaign_archive.TABLES_IN_ORDER}
 
@@ -2507,6 +2535,7 @@ class SQLiteAuthorityStore:
             _PRE_DRAFT_LIFECYCLE_SCHEMA_VERSION,
             _PRE_REASONING_SCHEMA_VERSION,
             _PRE_EFFORT_SCHEMA_VERSION,
+            _PRE_IMAGE_SCHEMA_VERSION,
             _CAMPAIGN_SCHEMA_VERSION,
         }:
             raise SchemaIdentityError("Backup schema identity is unsupported")
@@ -2517,7 +2546,8 @@ class SQLiteAuthorityStore:
         has_recovery_extension = False
         has_purge_extension = False
         if version in (
-            _PRE_REASONING_SCHEMA_VERSION, _PRE_EFFORT_SCHEMA_VERSION, _CAMPAIGN_SCHEMA_VERSION,
+            _PRE_REASONING_SCHEMA_VERSION, _PRE_EFFORT_SCHEMA_VERSION,
+            _PRE_IMAGE_SCHEMA_VERSION, _CAMPAIGN_SCHEMA_VERSION,
         ):
             required_tables = (
                 _REQUIRED_TABLES
@@ -2530,8 +2560,11 @@ class SQLiteAuthorityStore:
             )
             if version >= _PRE_EFFORT_SCHEMA_VERSION:
                 required_tables |= {"provider_private_records"}
+            if version == _CAMPAIGN_SCHEMA_VERSION:
+                required_tables |= sqlite_images.TABLES
             expected_identity = (
-                _EXPECTED_EFFORT_SCHEMA_IDENTITY if version == _CAMPAIGN_SCHEMA_VERSION
+                _EXPECTED_IMAGE_SCHEMA_IDENTITY if version == _CAMPAIGN_SCHEMA_VERSION
+                else _EXPECTED_EFFORT_SCHEMA_IDENTITY if version == _PRE_IMAGE_SCHEMA_VERSION
                 else _EXPECTED_REASONING_SCHEMA_IDENTITY if version == _PRE_EFFORT_SCHEMA_VERSION
                 else _EXPECTED_DRAFT_LIFECYCLE_SCHEMA_IDENTITY
             )
@@ -2631,6 +2664,7 @@ class SQLiteAuthorityStore:
             _PRE_DRAFT_LIFECYCLE_SCHEMA_VERSION,
             _PRE_REASONING_SCHEMA_VERSION,
             _PRE_EFFORT_SCHEMA_VERSION,
+            _PRE_IMAGE_SCHEMA_VERSION,
             _CAMPAIGN_SCHEMA_VERSION,
         ) and (
             sqlite_state_ownership.trigger_identity(connection)
@@ -2658,6 +2692,7 @@ class SQLiteAuthorityStore:
             _PRE_DRAFT_LIFECYCLE_SCHEMA_VERSION,
             _PRE_REASONING_SCHEMA_VERSION,
             _PRE_EFFORT_SCHEMA_VERSION,
+            _PRE_IMAGE_SCHEMA_VERSION,
             _CAMPAIGN_SCHEMA_VERSION,
         ):
             supported_migrations = {
@@ -2674,6 +2709,7 @@ class SQLiteAuthorityStore:
                 _PRE_DRAFT_LIFECYCLE_SCHEMA_VERSION,
                 _PRE_REASONING_SCHEMA_VERSION,
                 _PRE_EFFORT_SCHEMA_VERSION,
+                _PRE_IMAGE_SCHEMA_VERSION,
                 _CAMPAIGN_SCHEMA_VERSION,
             ):
                 supported_migrations = {
@@ -2686,6 +2722,7 @@ class SQLiteAuthorityStore:
                 _PRE_DRAFT_LIFECYCLE_SCHEMA_VERSION,
                 _PRE_REASONING_SCHEMA_VERSION,
                 _PRE_EFFORT_SCHEMA_VERSION,
+                _PRE_IMAGE_SCHEMA_VERSION,
                 _CAMPAIGN_SCHEMA_VERSION,
             ):
                 supported_migrations = {
@@ -2697,6 +2734,7 @@ class SQLiteAuthorityStore:
                 _PRE_DRAFT_LIFECYCLE_SCHEMA_VERSION,
                 _PRE_REASONING_SCHEMA_VERSION,
                 _PRE_EFFORT_SCHEMA_VERSION,
+                _PRE_IMAGE_SCHEMA_VERSION,
                 _CAMPAIGN_SCHEMA_VERSION,
             ):
                 supported_migrations = {
@@ -2709,7 +2747,8 @@ class SQLiteAuthorityStore:
                     for item in supported_migrations
                 }
             if version in (
-            _PRE_REASONING_SCHEMA_VERSION, _PRE_EFFORT_SCHEMA_VERSION, _CAMPAIGN_SCHEMA_VERSION,
+            _PRE_REASONING_SCHEMA_VERSION, _PRE_EFFORT_SCHEMA_VERSION,
+            _PRE_IMAGE_SCHEMA_VERSION, _CAMPAIGN_SCHEMA_VERSION,
         ):
                 supported_migrations = {
                     (*item, (10, _MIGRATION_10_NAME, _MIGRATION_10_SHA256))
@@ -2721,12 +2760,18 @@ class SQLiteAuthorityStore:
                              sqlite_reasoning.MIGRATION_11_SHA256))
                     for item in supported_migrations
                 }
-            if version == _CAMPAIGN_SCHEMA_VERSION:
+            if version >= _PRE_IMAGE_SCHEMA_VERSION:
                 supported_migrations = {
                     (
                         *item,
                         (12, sqlite_effort.MIGRATION_12_NAME, sqlite_effort.MIGRATION_12_SHA256),
                     )
+                    for item in supported_migrations
+                }
+            if version == _CAMPAIGN_SCHEMA_VERSION:
+                supported_migrations = {
+                    (*item, (13, sqlite_images.MIGRATION_13_NAME,
+                             sqlite_images.MIGRATION_13_SHA256))
                     for item in supported_migrations
                 }
             if migration_rows not in supported_migrations:
@@ -2757,6 +2802,7 @@ class SQLiteAuthorityStore:
             _PRE_DRAFT_LIFECYCLE_SCHEMA_VERSION,
             _PRE_REASONING_SCHEMA_VERSION,
             _PRE_EFFORT_SCHEMA_VERSION,
+            _PRE_IMAGE_SCHEMA_VERSION,
             _CAMPAIGN_SCHEMA_VERSION,
         ):
             sqlite_campaign.verify_f5_campaign_authority(connection)
@@ -3428,6 +3474,7 @@ class SQLiteAuthorityStore:
             _PRE_DRAFT_LIFECYCLE_SCHEMA_VERSION,
             _PRE_REASONING_SCHEMA_VERSION,
             _PRE_EFFORT_SCHEMA_VERSION,
+            _PRE_IMAGE_SCHEMA_VERSION,
             _CAMPAIGN_SCHEMA_VERSION,
         ):
             raise SchemaIdentityError("Authority schema identity is incomplete")
@@ -3438,7 +3485,8 @@ class SQLiteAuthorityStore:
         has_recovery_extension = False
         has_purge_extension = False
         if version in (
-            _PRE_REASONING_SCHEMA_VERSION, _PRE_EFFORT_SCHEMA_VERSION, _CAMPAIGN_SCHEMA_VERSION,
+            _PRE_REASONING_SCHEMA_VERSION, _PRE_EFFORT_SCHEMA_VERSION,
+            _PRE_IMAGE_SCHEMA_VERSION, _CAMPAIGN_SCHEMA_VERSION,
         ):
             required_tables = (
                 _REQUIRED_TABLES
@@ -3451,8 +3499,11 @@ class SQLiteAuthorityStore:
             )
             if version >= _PRE_EFFORT_SCHEMA_VERSION:
                 required_tables |= {"provider_private_records"}
+            if version == _CAMPAIGN_SCHEMA_VERSION:
+                required_tables |= sqlite_images.TABLES
             expected_identity = (
-                _EXPECTED_EFFORT_SCHEMA_IDENTITY if version == _CAMPAIGN_SCHEMA_VERSION
+                _EXPECTED_IMAGE_SCHEMA_IDENTITY if version == _CAMPAIGN_SCHEMA_VERSION
+                else _EXPECTED_EFFORT_SCHEMA_IDENTITY if version == _PRE_IMAGE_SCHEMA_VERSION
                 else _EXPECTED_REASONING_SCHEMA_IDENTITY if version == _PRE_EFFORT_SCHEMA_VERSION
                 else _EXPECTED_DRAFT_LIFECYCLE_SCHEMA_IDENTITY
             )
@@ -3566,6 +3617,7 @@ class SQLiteAuthorityStore:
             _PRE_DRAFT_LIFECYCLE_SCHEMA_VERSION,
             _PRE_REASONING_SCHEMA_VERSION,
             _PRE_EFFORT_SCHEMA_VERSION,
+            _PRE_IMAGE_SCHEMA_VERSION,
             _CAMPAIGN_SCHEMA_VERSION,
         ):
             supported_campaign_migrations = {
@@ -3582,6 +3634,7 @@ class SQLiteAuthorityStore:
                 _PRE_DRAFT_LIFECYCLE_SCHEMA_VERSION,
                 _PRE_REASONING_SCHEMA_VERSION,
                 _PRE_EFFORT_SCHEMA_VERSION,
+                _PRE_IMAGE_SCHEMA_VERSION,
                 _CAMPAIGN_SCHEMA_VERSION,
             ):
                 supported_campaign_migrations = {
@@ -3594,6 +3647,7 @@ class SQLiteAuthorityStore:
                 _PRE_DRAFT_LIFECYCLE_SCHEMA_VERSION,
                 _PRE_REASONING_SCHEMA_VERSION,
                 _PRE_EFFORT_SCHEMA_VERSION,
+                _PRE_IMAGE_SCHEMA_VERSION,
                 _CAMPAIGN_SCHEMA_VERSION,
             ):
                 supported_campaign_migrations = {
@@ -3605,6 +3659,7 @@ class SQLiteAuthorityStore:
                 _PRE_DRAFT_LIFECYCLE_SCHEMA_VERSION,
                 _PRE_REASONING_SCHEMA_VERSION,
                 _PRE_EFFORT_SCHEMA_VERSION,
+                _PRE_IMAGE_SCHEMA_VERSION,
                 _CAMPAIGN_SCHEMA_VERSION,
             ):
                 supported_campaign_migrations = {
@@ -3617,7 +3672,8 @@ class SQLiteAuthorityStore:
                     for item in supported_campaign_migrations
                 }
             if version in (
-            _PRE_REASONING_SCHEMA_VERSION, _PRE_EFFORT_SCHEMA_VERSION, _CAMPAIGN_SCHEMA_VERSION,
+            _PRE_REASONING_SCHEMA_VERSION, _PRE_EFFORT_SCHEMA_VERSION,
+            _PRE_IMAGE_SCHEMA_VERSION, _CAMPAIGN_SCHEMA_VERSION,
         ):
                 supported_campaign_migrations = {
                     (*item, (10, _MIGRATION_10_NAME, _MIGRATION_10_SHA256))
@@ -3629,12 +3685,18 @@ class SQLiteAuthorityStore:
                              sqlite_reasoning.MIGRATION_11_SHA256))
                     for item in supported_campaign_migrations
                 }
-            if version == _CAMPAIGN_SCHEMA_VERSION:
+            if version >= _PRE_IMAGE_SCHEMA_VERSION:
                 supported_campaign_migrations = {
                     (
                         *item,
                         (12, sqlite_effort.MIGRATION_12_NAME, sqlite_effort.MIGRATION_12_SHA256),
                     )
+                    for item in supported_campaign_migrations
+                }
+            if version == _CAMPAIGN_SCHEMA_VERSION:
+                supported_campaign_migrations = {
+                    (*item, (13, sqlite_images.MIGRATION_13_NAME,
+                             sqlite_images.MIGRATION_13_SHA256))
                     for item in supported_campaign_migrations
                 }
             if migration_rows not in supported_campaign_migrations:
@@ -3661,6 +3723,7 @@ class SQLiteAuthorityStore:
                     _PRE_DRAFT_LIFECYCLE_SCHEMA_VERSION,
                     _PRE_REASONING_SCHEMA_VERSION,
                     _PRE_EFFORT_SCHEMA_VERSION,
+                    _PRE_IMAGE_SCHEMA_VERSION,
                     _CAMPAIGN_SCHEMA_VERSION,
                 )
                 and sqlite_state_ownership.trigger_identity(connection)
@@ -3728,6 +3791,13 @@ class SQLiteAuthorityStore:
                 self._preserve_pre_migration_source(version)
                 connection.execute("BEGIN IMMEDIATE")
                 self._apply_effort_migration(connection)
+                connection.commit()
+                version = _PRE_IMAGE_SCHEMA_VERSION
+            if version == _PRE_IMAGE_SCHEMA_VERSION:
+                self._verify_exact_schema_identity(connection, version=version)
+                self._preserve_pre_migration_source(version)
+                connection.execute("BEGIN IMMEDIATE")
+                self._apply_image_migration(connection)
                 connection.commit()
                 version = _CAMPAIGN_SCHEMA_VERSION
             if version == 0:
@@ -4025,6 +4095,17 @@ class SQLiteAuthorityStore:
             (12, sqlite_effort.MIGRATION_12_NAME, sqlite_effort.MIGRATION_12_SHA256),
         )
         connection.execute("PRAGMA user_version = 12")
+        self._verify_exact_schema_identity(connection, version=_PRE_IMAGE_SCHEMA_VERSION)
+
+    def _apply_image_migration(self, connection: sqlite3.Connection) -> None:
+        """Add image receipts and associations over the existing immutable content blobs."""
+        self._verify_exact_schema_identity(connection, version=_PRE_IMAGE_SCHEMA_VERSION)
+        sqlite_images.apply_migration(connection)
+        connection.execute(
+            "INSERT INTO schema_migrations(version, applied_name, sql_sha256) VALUES (?, ?, ?)",
+            (13, sqlite_images.MIGRATION_13_NAME, sqlite_images.MIGRATION_13_SHA256),
+        )
+        connection.execute("PRAGMA user_version = 13")
         self._verify_exact_schema_identity(connection, version=_CAMPAIGN_SCHEMA_VERSION)
 
     def _before_reasoning_migration_commit(self) -> None:
@@ -4077,6 +4158,7 @@ class SQLiteAuthorityStore:
             _STATE_OWNERSHIP_SCHEMA_VERSION,
             _PRE_REASONING_SCHEMA_VERSION,
             _PRE_EFFORT_SCHEMA_VERSION,
+            _PRE_IMAGE_SCHEMA_VERSION,
             _CAMPAIGN_SCHEMA_VERSION,
         ):
             sqlite_state_ownership.verify_authority(connection)
@@ -5941,6 +6023,7 @@ class SQLiteAuthorityStore:
                 _STATE_OWNERSHIP_SCHEMA_VERSION,
                 _PRE_REASONING_SCHEMA_VERSION,
                 _PRE_EFFORT_SCHEMA_VERSION,
+                _PRE_IMAGE_SCHEMA_VERSION,
                 _CAMPAIGN_SCHEMA_VERSION,
             ):
                 connection.rollback()
@@ -5982,6 +6065,9 @@ class SQLiteAuthorityStore:
             version = _PRE_EFFORT_SCHEMA_VERSION
         if version == _PRE_EFFORT_SCHEMA_VERSION:
             self._apply_effort_migration(connection)
+            version = _PRE_IMAGE_SCHEMA_VERSION
+        if version == _PRE_IMAGE_SCHEMA_VERSION:
+            self._apply_image_migration(connection)
             return
         if version == _SCHEMA_VERSION:
             for statement in _MIGRATION_4.split(";"):
@@ -6075,6 +6161,7 @@ class SQLiteAuthorityStore:
         connection.execute("PRAGMA user_version = 10")
         self._apply_reasoning_migration(connection)
         self._apply_effort_migration(connection)
+        self._apply_image_migration(connection)
 
     def _ensure_purge_schema(self, connection: sqlite3.Connection) -> None:
         """Install purge authority inside the caller-owned current transaction."""
@@ -6082,7 +6169,7 @@ class SQLiteAuthorityStore:
         if int(connection.execute("PRAGMA user_version").fetchone()[0]) != _CAMPAIGN_SCHEMA_VERSION:
             raise SchemaIdentityError("Campaign purge requires state ownership authority")
         live_identity = _schema_identity(connection)
-        if live_identity != _EXPECTED_EFFORT_SCHEMA_IDENTITY:
+        if live_identity != _EXPECTED_IMAGE_SCHEMA_IDENTITY:
             raise SchemaIdentityError("Campaign purge predecessor schema identity is not exact")
         if connection.execute(
             "SELECT 1 FROM authority_schema_extensions WHERE extension_name = ?",
@@ -12154,6 +12241,17 @@ class SQLiteAuthorityStore:
 
     def snapshot(self, campaign_id: str) -> CampaignSnapshot:
         return cast(CampaignSnapshot, self._read_snapshot(campaign_id))
+
+    def campaign_continuity_view(self, campaign_id: str) -> CampaignContinuityView:
+        """Read narrative identities without materializing the campaign's mechanics state."""
+        connection = self._connect_read_only()
+        try:
+            connection.execute("BEGIN")
+            return sqlite_continuity.read_view(connection, campaign_id)
+        finally:
+            if connection.in_transaction:
+                connection.rollback()
+            connection.close()
 
     def pending_player_response(self, campaign_id: str) -> SafePayload | None:
         """Read the latest unanswered player action since the last saved GM narration."""

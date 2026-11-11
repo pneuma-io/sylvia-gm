@@ -182,6 +182,26 @@ Safely readable invalid package and Plan imports can open a separate repair copy
 through Fix with Builder. `check_import_repair` and `publish_import_repair` retain
 normal admission. Archive safety failures cannot be bypassed by repair.
 
+## Standalone character transfers
+
+`.sylvia-gm-character` is a version 1 `sylvia-gm-character-bundle` ZIP. It has at most six
+regular Store/Deflate members and a 64 MiB outer limit: `manifest.json` (32 KiB),
+`character.json` (256 KiB), up to three used `assets/characters/<sha256>.png` files
+(16 MiB each), and an optional `original-card.bin` (16 MiB). The manifest closes the file
+inventory with hashes and byte counts and records source provenance, character kind/role and
+exact Ruleset/Setting bindings for playable files. Duplicate, unsafe, missing and unreferenced
+members are refused; no archive path is extracted. Imported-card originals must match the
+profile's existing source descriptor. Artwork references become recipient-local selections;
+crop, appearance and incomplete-stage markers remain. A legacy v1 profile keeps its original
+canonical JSON and carries artwork in the manifest. These transfers do not carry dependencies:
+install matching packages for a bound character, or adapt an unbound profile through Builder.
+
+The owner protocol provides `export_character_file` (exact artifact ID, kind and content hash),
+`preview_character_bundle_file`, `confirm_character_bundle_import` and
+`cancel_character_bundle_import`. Confirmation uses the preview's `source_sha256`; changes to
+the user's chosen file cannot change the captured preview. The WebUI uses its selected-file
+upload route `character_bundle` and the ordinary export/download route.
+
 ## Rich unbound profiles
 
 V1 and v2 have distinct published definitions. A v1 source keeps its original

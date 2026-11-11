@@ -27,6 +27,7 @@ def payloads():
         "README-PORTABLE.txt": PORTABLE_README,
         "SRD-Lite.sylvia-gm-package": b"synthetic rules",
         "Severed-Lands.sylvia-gm-package": b"synthetic setting",
+        "artwork/character-art.json": b'{"format":1,"characters":[]}',
     }
     for name in ("LICENSE", "COPYRIGHT", "LICENSING-STATUS.md", "SYLVIA-ADDITIONAL-PERMISSIONS.md"):
         result[name] = result["licenses/" + name] = b"synthetic required notice"
@@ -114,6 +115,15 @@ def test_actual_source_notice_map_and_current_packages_are_collected(tmp_path):
     assert files["SRD-Lite.sylvia-gm-package"].startswith(b"PK")
     assert files["Severed-Lands.sylvia-gm-package"].startswith(b"PK")
     assert not any(name.startswith("isolated-data/") for name in files)
+    identity = assemble(tmp_path / "actual-art.zip", files)
+    assert verify_portable_zip(tmp_path / "actual-art.zip") == identity
+
+
+def test_artwork_inventory_refuses_missing_or_unlisted_shared_pngs(tmp_path):
+    files = payloads()
+    files["artwork/assets/characters/" + "a" * 64 + ".png"] = b"unlisted image"
+    with pytest.raises(ReleaseArtifactError, match="artwork resource inventory"):
+        assemble(tmp_path / "extra-art.zip", files)
 
 
 def test_verifier_refuses_mutable_payload_even_with_consistent_internal_hashes(tmp_path):

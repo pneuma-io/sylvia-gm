@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from sylvia_gm.domain.image_art import CHARACTER_VISUALS_SCHEMA
+
 CHARACTER_FILE_SCHEMA: dict[str, object] = {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "urn:sylvia-gm:content:character-file:2",
@@ -75,6 +77,7 @@ CHARACTER_FILE_SCHEMA: dict[str, object] = {
                 "shared encoded-size limit rather than a prose word limit."
             ),
         },
+        "visuals": CHARACTER_VISUALS_SCHEMA,
         "participant": {
             "type": "object",
             "description": (

@@ -21,3 +21,15 @@ Thatch is gruff, honest, and unexpectedly sentimental about the routes. He's nam
 ## Hook
 
 Thatch's retirement is triggering a Guild election — reformer versus traditionalist, expansion versus preservation. He's staying neutral publicly but privately favors the traditionalist. The reformer has been meeting with Lady Trask. If Trask absorbs the Guild into House operations, the independent merchants vanish. Thatch is looking for someone to investigate what the reformer promised Trask — and what Trask promised in return.
+
+## Appearance and artwork
+
+An adult settled Human man appearing in his early sixties, with a lean broad-shouldered working build, sun-weathered medium-brown skin, deep-set brown eyes, thinning short black-and-gray curls and heavy short gray stubble. A gruff honest measuring expression, slightly tired eyes and grounded competent posture. A worn reddish-brown canvas travel coat with plain leather shoulder patches over a faded olive waistcoat and gray linen shirt, charcoal work trousers and dusty sturdy brown leather calf boots. A closed plain canvas travel satchel hangs at his anatomical LEFT hip from a strap over his RIGHT shoulder; a small closed leather repair pouch sits at his opposite hip. Empty relaxed hands. His experienced route merchant's bearing follows the authored profile; age, physical features and exact clothes are editable visual defaults. He is an ordinary Human Route Warden, with no ancient Warden armor, metal body, glowing runes, invented guild crest, noble regalia, election badge, revealed private preference, readable route map, wagon, weapon, invented scars or invented family history.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/910d57352819de179fa23eeee3144f326e626c0a83cd0332237267b0953a5a4f.png)
+
+[Full-body reference](../assets/characters/0298dfe80cc6aaaeb55469d254811b74604aad6088e5d477a2be64c531f7cb33.png)
+
+[Multiview reference sheet](../assets/characters/465abdba624dd4f43bde011686b0678f0e40246056008271bd2b56341fc25f18.png)

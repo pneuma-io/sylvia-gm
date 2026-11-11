@@ -17,3 +17,15 @@ She's lost patrol members. She remembers every one. Their names are in a noteboo
 ## Personality
 
 Stern is disciplined, unsentimental, and carrying her losses privately. She treats patrol leadership as a sacred responsibility. The patrol comes back. That's the only metric that matters.
+
+## Appearance and artwork
+
+A humanlike adult Riftborn woman in her late forties with dark brown skin, a strong lean build, short salt-and-pepper hair, dark eyes and one healed claw scar across her jaw. Quiet vigilant expression. Practical patched dark olive patrol leathers over a charcoal shirt, plain trousers, sturdy worn boots and a compact belt kit. A closed personal notebook stays inside a closed belt pouch. No emblems, medals, exposed notebook pages or visible magical effects.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/458e6a0aa402aff8fb22d1ea9ce48c1f1f26c6daed1b908f6b20951bc786205a.png)
+
+[Full-body reference](../assets/characters/9d83f6c5bedeeaa58f1eb9e25520bd8324e7cd8c84eb9eb38ac45b1bbc9f8ef7.png)
+
+[Multiview reference sheet](../assets/characters/6b6fd5ec67d9643a6d968cf570d3f69ace954dcf1801926f439ede375baad89e.png)

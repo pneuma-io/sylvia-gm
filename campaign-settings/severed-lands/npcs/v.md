@@ -40,3 +40,15 @@ V's true nature is left deliberately ambiguous. Possible truths include:
 - V's home world was destroyed by whatever created the Rift. V isn't trying to go home. V is trying to make sure it doesn't happen here.
 
 The truth is for the DM to decide. The ambiguity is the point.
+
+## Appearance and artwork
+
+A humanlike androgynous adult Riftborn field researcher with apparent age styling in their early sixties, a lean medium-height frame, warm copper-brown skin, gray-green eyes, a long softly lined clean-shaven face and straight silver-gray neck-length hair held back in a loose plain half-tie. Patient methodical guarded expression, quiet attentive upright posture and empty relaxed hands. A plain weathered brown knee-length travel coat over a muted sage-green linen tunic, charcoal trousers and worn dark brown leather boots. One small closed canvas field bag hangs at their anatomical LEFT hip from a strap over their RIGHT shoulder; one small closed plain notebook is secured at their anatomical RIGHT belt, with no writing or symbol on the cover. Their patient competent guarded bearing follows the authored sources; apparent age, physical features, clothing and field equipment are editable visual defaults. Use they/them pronouns. Their actual age, home world and underlying identity remain for the selected campaign and DM to establish. No weapon, armor, crown, divine or immortal appearance, Warden symbol, circle bisected by a line, identifying badge, visible Door fragment, open notebook, readable writing, glowing eyes, halo, portal, home-world scenery or revealed history.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/05651541a780198d28a1558a3dd5253e6078c5df9d34f279cb5b8151e9a0c803.png)
+
+[Full-body reference](../assets/characters/b71f4e1189e2a549be128030cf3e312bfc6cefee63bc8c72c6eddaa03dd019d2.png)
+
+[Multiview reference sheet](../assets/characters/ba2a67b5000634ad41bbd307690675dd58e300ddff7f76965a2123c0b7af6b11.png)

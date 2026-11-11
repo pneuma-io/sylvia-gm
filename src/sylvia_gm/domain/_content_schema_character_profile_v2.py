@@ -1,5 +1,7 @@
 """Rich unbound sources. All foreign controls are inert reference data."""
 
+from sylvia_gm.domain.image_art import CHARACTER_VISUALS_SCHEMA
+
 TEXT = {"type": "string", "maxLength": 65536, "pattern": r"^[^\u0000]*$"}
 SHORT = {**TEXT, "maxLength": 500}
 ID = {"type": "string", "minLength": 1, "maxLength": 160, "pattern": r"^[A-Za-z0-9_.:-]+$"}
@@ -112,6 +114,7 @@ CHARACTER_PROFILE_V2_SCHEMA = {
                     "modification_date": {"type": "number"},
                 }
             ),
+            "visuals": CHARACTER_VISUALS_SCHEMA,
             "assets": {
                 "type": "array",
                 "maxItems": 64,

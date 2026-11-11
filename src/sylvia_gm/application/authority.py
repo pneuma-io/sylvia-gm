@@ -18,9 +18,12 @@ from contextlib import contextmanager, suppress
 from dataclasses import dataclass, replace
 from pathlib import Path
 from types import MappingProxyType
-from typing import BinaryIO, TypeVar, cast
+from typing import TYPE_CHECKING, Any, BinaryIO, TypeVar, cast
 
 import yaml
+
+if TYPE_CHECKING:
+    from sylvia_gm.application.image_art import ImageArt
 
 from sylvia_gm.application.actor_decisions import (
     ActorDecisionRequest,
@@ -233,6 +236,7 @@ from sylvia_gm.domain.package_library import (
     ActivationResult,
     PackageBlobReadReceipt,
     PackageCandidate,
+    PackageFile,
     PackageLockRecord,
     PackageStagingRecord,
     PackageSurfaceProjection,
@@ -685,6 +689,8 @@ class AuthorityOwner:
         ):
             raise ValueError("Disconnect grace must be positive and finite")
         self._store = store
+        self._image_art: ImageArt | None = None
+        self._image_art_lock = threading.RLock()
         self._content_storage_root = content_storage_root
         self._owner_id = owner_id
         self._owner_session_id = f"owner-session-{uuid.uuid4()}"
@@ -919,6 +925,249 @@ class AuthorityOwner:
             )
             self._tools[identity] = materialized
             return materialized
+
+    def image_art_service(self) -> ImageArt:
+        """Build the optional image service over this owner's existing storage and sign-in."""
+        from sylvia_gm.application.image_art import ImageArt
+        from sylvia_gm.config.image_settings import ImageSettings
+        from sylvia_gm.provider._image_subscription import SubscriptionImageAdapter
+
+        with self._image_art_lock:
+            self._require_open()
+            if self._image_art is None:
+                root = self._content_storage_root
+                if root is None:
+                    self._image_art = ImageArt(self)
+                else:
+                    preferences = ImageSettings(root)
+                    self._image_art = ImageArt(
+                        self,
+                        adapters=(
+                            SubscriptionImageAdapter(
+                                root / "chatgpt-runtime",
+                                "gpt-6.1-sol",
+                                audit=self.record_admin_full_audit,
+                            ),
+                        ),
+                        settings=preferences.read,
+                    )
+            return self._image_art
+
+    def character_visuals(self, campaign_id: str) -> dict[str, Any]:
+        """Read prepared artwork and overlay this campaign's selected images and framing."""
+        from sylvia_gm.application.bundled_character_art import (
+            bundled_plan_visuals,
+            bundled_source_visuals,
+        )
+        from sylvia_gm.domain.image_art import (
+            character_visuals_from_selections,
+            validate_character_visuals,
+        )
+        from sylvia_gm.domain.package_library import validate_portable_path
+
+        result: dict[str, Any] = {}
+        with self._operation():
+            try:
+                construction = self._store.campaign_construction_basis(campaign_id)
+            except CommandRejected:
+                construction = None
+            if construction is not None:
+                party = construction.canonical_input.get("selected_party")
+                for selected in (
+                    party
+                    if (
+                        isinstance(party, Sequence)
+                        and not isinstance(party, (str, bytes, bytearray))
+                    )
+                    else ()
+                ):
+                    if not isinstance(selected, Mapping):
+                        continue
+                    character = selected.get("character_file", {})
+                    if not isinstance(character, Mapping):
+                        continue
+                    visuals = validate_character_visuals(character.get("visuals"))
+                    source_id = character.get("source_id")
+                    source_sha = character.get("source_content_sha256") or character.get(
+                        "content_sha256"
+                    )
+                    if isinstance(source_id, str) and isinstance(source_sha, str):
+                        visuals = self._store.images.published_visuals(
+                            source_id, source_sha
+                        ) or visuals
+                    identity = selected.get("participant_id")
+                    if visuals is not None and isinstance(identity, str):
+                        result[identity] = visuals
+            continuity = self._store.campaign_continuity_view(campaign_id)
+            entities = {
+                record.record_id: record for record in continuity.records
+                if record.kind == "entity"
+            }
+            source_packages: list[tuple[PackageLockEntry, dict[str, PackageFile]]] | None = None
+            setting_ids: frozenset[str] = frozenset()
+            plan_source: Mapping[str, object] | None = None
+            plan_source_loaded = False
+            for identity, record in entities.items():
+                source = record.payload.get("source_ref")
+                if (
+                    identity in result
+                    or record.status != "active"
+                    or record.payload.get("visibility") != "player_known"
+                    or not isinstance(source, str)
+                ):
+                    continue
+                try:
+                    portable = validate_portable_path(source.partition("#/")[0])
+                except ValueError:
+                    continue
+                if source_packages is None:
+                    package_lock = self._store.current_package_lock(campaign_id).package_lock
+                    available_settings = frozenset(
+                        entry.package_id for entry in campaign_setting_entries(package_lock)
+                    )
+                    selected_setting = (
+                        construction.canonical_input.get("setting_id")
+                        if construction is not None else None
+                    )
+                    if isinstance(selected_setting, str):
+                        setting_ids = frozenset({selected_setting}) & available_settings
+                    elif len(available_settings) == 1:
+                        setting_ids = available_settings
+                    source_packages = []
+                    for entry in package_lock.entries:
+                        manifest = self._store.exact_package_manifest(
+                            entry.package_id, entry.version, entry.sha256,
+                        )
+                        source_packages.append((
+                            entry, {item.path: item for item in manifest.files},
+                        ))
+                name = record.payload.get("name")
+                if source.startswith("campaign_plan#/"):
+                    if not plan_source_loaded:
+                        accepted = self._store.accepted_campaign_plan(campaign_id)
+                        structured = (
+                            accepted.content.get("campaign_plan") if accepted is not None else None
+                        )
+                        if (
+                            isinstance(structured, Mapping)
+                            and isinstance(structured.get("id"), str)
+                        ):
+                            plan_source = structured
+                        plan_source_loaded = True
+                    if plan_source is not None:
+                        visuals = bundled_plan_visuals(
+                            plan_source, source,
+                            subject_name=name if isinstance(name, str) else None,
+                            campaign_setting_ids=setting_ids,
+                        )
+                        if visuals is not None:
+                            result[identity] = visuals
+                    continue
+                for entry, files in source_packages:
+                    descriptor = files.get(source) or files.get(portable)
+                    if descriptor is None:
+                        continue
+                    visuals = bundled_source_visuals(
+                        entry.package_id, source, descriptor,
+                        subject_name=name if isinstance(name, str) else None,
+                        campaign_setting_ids=setting_ids,
+                    )
+                    if visuals is not None:
+                        result[identity] = visuals
+                        break
+                    if "#/" in source and descriptor.path != source:
+                        continue
+                    try:
+                        raw = self._store.package_file_bytes(
+                            entry.package_id, entry.version, entry.sha256, descriptor.path,
+                            maximum_bytes=256 * 1024,
+                        )
+                    except CommandRejected as error:
+                        if error.code == "package_file_oversized":
+                            continue
+                        raise
+                    if raw is not None:
+                        name = record.payload.get("name")
+                        visuals = bundled_source_visuals(
+                            entry.package_id, portable, raw,
+                            subject_name=name if isinstance(name, str) else None,
+                            campaign_setting_ids=setting_ids,
+                        )
+                        if visuals is not None:
+                            result[identity] = visuals
+                            break
+            rows = self._store.images.list_selections(campaign_id)
+            for target in {row["target_id"] for row in rows if row["purpose"] != "map_underlay"}:
+                visuals = character_visuals_from_selections(rows, target)
+                if visuals is not None:
+                    local = [row for row in rows if row["target_id"] == target]
+                    edited = any(
+                        not (row["metadata"].get("source_operation_id")
+                             or row["metadata"].get("source_path"))
+                        for row in local
+                    )
+                    if target not in result or edited:
+                        result[target] = visuals
+                    elif (
+                        "frame" in visuals and "portrait" in visuals
+                        and visuals["portrait"]["sha256"]
+                        == result[target].get("portrait", {}).get("sha256")
+                    ):
+                        result[target]["frame"] = visuals["frame"]
+        return result
+
+    def image_art_action(self, params: dict[str, Any]) -> dict[str, Any]:
+        """Expose image commands without giving the renderer provider or filesystem access."""
+        from sylvia_gm.config.image_settings import ImageSettings
+
+        action = params.get("action", "view")
+        if action in {"settings", "save_settings"}:
+            if self._content_storage_root is None:
+                raise CommandRejected("Image settings are unavailable")
+            preferences = ImageSettings(self._content_storage_root)
+            return (
+                preferences.save(params.get("mode"))
+                if action == "save_settings"
+                else preferences.read()
+            )
+        service = self.image_art_service()
+        session_id = params.get("session_id")
+        if action == "view":
+            return service.view(session_id)
+        if action == "status":
+            result = service.view(session_id, include_targets=False)
+            result.pop("targets", None)
+            return result
+        if action == "request":
+            return service.request(
+                session_id,
+                **{
+                    key: value
+                    for key, value in params.items()
+                    if key in {
+                        "operation_id", "target_id", "purpose", "brief", "appearance", "name",
+                        "map_scene", "edit_sha256",
+                    }
+                },
+            )
+        if action == "generate":
+            return service.generate(session_id, params.get("operation_id"))
+        if action == "adopt":
+            return service.adopt(
+                session_id,
+                params.get("operation_id"),
+                expected_sha256=params.get("expected_sha256"),
+            )
+        if action == "cancel":
+            return service.cancel(session_id, params.get("operation_id"))
+        if action == "frame":
+            service.frame(
+                session_id, params.get("target_id"), params.get("sha256"), params.get("frame", {})
+            )
+            return service.view(session_id)
+        if action == "asset":
+            return service.asset(session_id, params.get("sha256"))
+        raise CommandRejected("This image command is unavailable")
 
     def create_agent_session(
         self,
@@ -6145,6 +6394,9 @@ class AuthorityOwner:
                         else {}
                     ),
                 }
+                visuals = self.character_visuals(campaign_id).get(participant.participant_id)
+                if visuals is not None:
+                    character_file["visuals"] = visuals
                 bookkeeping = self._character_update_tool(campaign_id)
                 if bookkeeping is not None:
                     target = bookkeeping.input_schema["x-sylvia-gm-character-update"]
@@ -7866,6 +8118,13 @@ class AuthorityOwner:
         validate_authority_identity(operation_id, "Operation id")
         validate_authority_identity(campaign_id, "Campaign id")
         with self._operation():
+            from sylvia_gm.application.image_art import ImageArt
+
+            art = ImageArt(self)
+            try:
+                art.retain_campaign_visuals(campaign_id)
+            finally:
+                art.close()
             return self._store.export_campaign(
                 campaign_id, target, include_thinking=include_thinking,
             )
@@ -9455,6 +9714,10 @@ class AuthorityOwner:
                     self._lifecycle_condition.wait()
                 return
             self._lifecycle = "closing"
+        with self._image_art_lock:
+            if self._image_art is not None:
+                self._image_art.close()
+        with self._lifecycle_condition:
             while self._active_operations:
                 self._lifecycle_condition.wait()
         try:

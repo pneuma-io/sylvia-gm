@@ -80,7 +80,7 @@ PORTABLE_CAMPAIGN_EXPORT_MANIFEST_SCHEMA: dict[str, Any] = {
         "format_version": {"const": 1},
         "product_id": {"const": "sylvia-gm"},
         "product_generation": {"const": "alpha"},
-        "source_authority_schema_version": {"enum": [9, 10, 11, 12]},
+        "source_authority_schema_version": {"enum": [9, 10, 11, 12, 13]},
         "source_authority_schema_identity_sha256": _SHA,
         "migration_provenance": {
             "type": "object",
@@ -195,7 +195,7 @@ PORTABLE_CAMPAIGN_EXPORT_EXAMPLE = {
     "format_version": 1,
     "product_id": "sylvia-gm",
     "product_generation": "alpha",
-    "source_authority_schema_version": 12,
+    "source_authority_schema_version": 13,
     "source_authority_schema_identity_sha256": "0" * 64,
     "migration_provenance": {"schema_migrations": [], "schema_extensions": []},
     "campaign_id": "example-campaign",

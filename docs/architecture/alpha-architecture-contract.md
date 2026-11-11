@@ -1039,6 +1039,146 @@ For Alpha, validated package and dependency bytes are immutable content-addresse
 
 This selection avoids a cross-store publication split. An external content-addressed store is considered only after measured package/media volume materially harms backup, integrity, update, or runtime behavior.
 
+### 11.2.1 Managed image art
+
+The authority owner admits image requests and saves their lifecycle receipts and selected art in
+normalized SQLite records. Image bytes reuse the existing immutable hash-verified blob storage.
+Schema 13 adds image requests and selections through the ordinary verified migration path.
+Campaign export/recovery includes the campaign's image receipts, selections, framing and exact
+image bytes, while retaining support for pre-image export schema inventories.
+
+GM and Builder can inspect art and submit a stable request identity. User-only commands control
+Off/Review/Auto, Generate, Adopt, Cancel and portrait framing. Admission precedes network work;
+one background worker runs generation outside database transactions. Replaying a request does
+not dispatch it twice. Reopening marks an unknown pending result interrupted, without retrying.
+Selection adoption compares the prior asset hash. Cancellation is persisted before transport
+interruption, and late results cannot replace selected art.
+Executing a saved request uses the currently authorized campaign scope while retaining its
+original session provenance and runtime identity. Another active chat in that campaign can
+generate and adopt it after the originating chat stops. Further character workflow stages use
+that active chat's authority while retaining the original stage identities and request hashes;
+replaying adoption from another chat cannot create duplicate stages. The original session must
+belong to the same campaign.
+
+The ChatGPT adapter uses the existing managed runtime profile and an isolated ephemeral image
+turn with image generation enabled and shell, environments, user skills and application tools
+disabled. It checks the subscription account and runtime image capability, submits supplied PNG
+references and accepts bounded PNG output. It does not read credential files, fall back to an
+API connection or let model-supplied paths escape the runtime workspace. Admin Full Audit records
+the selected image application's input/output and image protocol boundaries when enabled.
+
+Canonical full-body and multi-view references are bound to a stable character target and supplied
+to later generations. Optional Character File/profile `visuals` data retains their hashes,
+operation identities or portable package PNG paths, appearance and framing. The owner restores
+locally retained references or reads hash-matching assets from the selected admitted package.
+Campaign archives carry the bytes; an isolated JSON Character File still needs its referenced
+asset files. Selected imported PNG cards supply usable portraits and generation references with
+card text metadata stripped; the unchanged original remains in the import library. This local
+image reuse works with generation Off. Supported PNG input includes grayscale, palette, RGB/RGBA,
+16-bit and interlaced images within the bounded artwork limits.
+
+Prepared first-party artwork is listed by exact PNG hash in the shared `artwork/character-art.json`
+catalogue. Installer and portable resources carry its declared PNGs beside the owner executable;
+they are outside the onefile sidecar and its per-launch extraction. Source execution uses the
+same `artwork` directory in the checkout. Resource inventories include only the declared library.
+Setting and Plan packages retain portable hash/path references to shared art without embedding
+the whole catalogue. Custom character artwork remains embedded in those packages. The public
+content-package archive and expansion limits remain unchanged.
+Standalone `.sylvia-gm-character` transfers use a closed, bounded ZIP containing one canonical
+Character File/profile, a hash/byte-count manifest, at most three referenced PNGs and the selected
+imported card's original when applicable. No package closure or campaign/chat history is included.
+The owner validates every member before import, resolves exact installed package/schema bindings
+for playable files and uses the existing immutable character libraries and image store. Local
+request identities are rebound on import. Legacy v1 profile text remains unchanged; its artwork
+travels alongside it rather than forcing a lossy v2 conversion. Previews retain the selected bytes
+under an owned digest, with at most four pending archives; confirmation retires that temporary
+archive and retains a small idempotent receipt. Replays revalidate the saved library entry.
+Browser uploads and downloads use server-owned temporary paths and expose no host file paths.
+Starter Character Files retain the same portable visual records as user-created characters.
+The owner may resolve these listed assets from the installed catalogue when a retained Plan's
+older Setting does not contain them. This does not change that Plan's package pin. Restored bytes
+become campaign-owned selections and travel in its archive; a recipient does not need the catalogue.
+Export retains all used character artwork even when no artwork view was opened. This local copy
+does not submit an image request to a provider or require an active agent session. Missing shared
+or custom bytes produce a repair instruction instead of silently regenerating an image.
+These local copy receipts use the campaign scope as their owner. Archive verification admits
+that explicit local-copy source only with its deterministic campaign/target/purpose/hash identity,
+succeeded status and copy-request hash; provider requests still require their recorded session.
+Known NPCs and enemies use their committed Setting source reference. Catalogue lookup requires
+the exact package ID, path and normalized source hash; display names alone do not bind artwork. Private
+or retired identities do not acquire prepared art. Normal image status restores these selections
+with generation Off, without requiring the user or GM to submit an image request.
+The lookup reads continuity and exact package metadata without loading mechanics state. Saved
+framing overrides a prepared default only when the selected portrait hash still matches.
+For a source containing several subjects, an optional catalogue `subject_name` selects one
+declared subject inside that same package/path/hash match. Subject comparison ignores casing and
+surrounding whitespace. A specific subject binding takes precedence over a common archetype
+binding. Conflicting matches are refused; an unknown subject uses only an explicit common
+binding, when one exists. This keeps named groups from collapsing to the first catalogue entry.
+An indexed creature/form uses `source_ref` as its admitted file path followed by a JSON Pointer
+(`content/non-beast-form-index.json#/forms/aboleth`, for example). Its catalogue binding uses the
+whole source file's exact admitted hash. Optional `campaign_setting_id` selects that Setting's
+rendition and takes precedence over an unscoped image. The selected construction Setting controls
+this scope; without a selected construction Setting, only a sole admitted Setting is inferred.
+Ambiguous Setting context does not select a scoped image. Lookup uses the installed manifest
+without reading or parsing large definition files. `scripts/inventory_inherited_artwork.py`
+prepares Severed Lands subject bindings from current Lite and retained Plan source records,
+checking retained file hashes and preserving each distinct source edition. It generates no art
+and changes no gameplay data.
+`scripts/inventory_authored_artwork.py` prepares the separate authored NPC/monster sources.
+It preserves exact current/retained documents and checks retained member hashes. Declared group
+members receive separate subject bindings; differing source editions remain separate for review.
+The snapshot's opposition guide is recorded as guidance, rather than a creature to illustrate.
+This preparation emits source material only; the shared catalogue still lists actual complete art.
+For cast members authored only in a Plan, `campaign_plan#/...` identifies a prose passage in
+the accepted structured Plan. Catalogue sources use `plan_id`, the cited prose passage's canonical
+hash and declared subject name; a source cannot claim both Plan and package identity.
+The owner reads the accepted Plan once per refresh and preserves the same Setting scope and
+public/active entity filters. Display names alone do not connect different Plans or changed
+character passages. Accepted interview preferences and party placement preserve art when the
+cited character passage is unchanged.
+Optional Plan metadata `artwork_source_plan_id` retains that visual identity when a generalized
+reusable copy receives a new story ID. Save-as preserves the earliest declared artwork source
+through further copies; normal Plan validation checks the identity. The same passage hash,
+subject and Setting checks still apply. This metadata travels inside the existing Plan file
+and bundle, without changing package pins, archive limits or gameplay identity.
+`artwork/plan-cast.json` records reviewed prose-only subjects for production, while
+`scripts/inventory_plan_artwork.py` checks each source passage against current Plan bytes and
+emits bindings. This roster supplies no runtime images and is not an alternate Plan or art store.
+Existing NPC profiles remain the preferred source when the Setting already declares the person.
+
+The character artwork workflow composes the existing image requests rather than adding a second
+job store. Each persisted request records its workflow and stage. Adoption prepares the next
+missing stage; Auto may dispatch it, while Review waits for Generate. Reopen never dispatches
+work. Setting and Plan draft checks/publication resolve explicit Character File PNG references
+through the publishing session's scoped image reader and include custom bytes and content
+declarations. Exact shared-library references remain references; an explicit character export
+includes its used shared images as well. Publication does not generate art, fetch external assets
+or change the source workspace.
+Partial visual bundles explicitly list unfinished purposes while retaining usable bytes/framing.
+Owner-published source identity/hash pairs are associated with the existing image request receipts.
+Those associations are preserved when dispatch binds inputs and when later workflow stages are
+admitted. Only adopted results project into linked sources. Campaign materialization captures
+available art and its exact source identity; subsequent reads restore later adopted stages into
+campaign-owned selections. Imported selections do not inherit the source publication links, so
+editing a campaign copy does not update the original. This uses the existing schema and blob store.
+Builder edits retain the exact source opened for a Character File or profile, including across
+turns and restart. Artwork preparation and publication use that source target before considering
+a display name. A rename reuses its references and crop; it cannot attach another same-named
+character's workflow or automatically replace a complete bundle with a new generation request.
+When the opened source has unfinished artwork, its exact identity/hash links the new saved copy
+to that existing request. Saving elsewhere neither resubmits nor retries it; later adopted stages
+reach both sources. The linked status identifies the original Builder chat without granting
+generation/adoption actions across unrelated chats. Provider status takes precedence over local
+asset-copy receipts, so copying usable partial art cannot hide a failed stage. This reuses the
+existing publication links and admission transaction, without another job store or migration.
+A deleted source chat produces an unavailable status and an explicit-new-request recovery path;
+it does not cause an automatic replacement generation.
+
+Underlay references are rendered from the existing player projection's static map geometry and
+terrain, without tokens, labels or hidden geometry. The selected image retains bounds and a
+layout digest. The renderer hides stale art and draws the existing mechanical overlays above it.
+
 ### 11.3 Install and candidate states
 
 **Install Package** performs:
@@ -1052,13 +1192,18 @@ This selection avoids a cross-store publication split. An external content-addre
 
 Installation never activates or repins a campaign.
 
-Installed candidates remain immutable package-library and recovery records; Alpha does not expose
-individual candidate removal. Guided campaign creation projects one candidate per logical Ruleset:
+Installed candidates retain their exact validated package identity in library and recovery records.
+Alpha does not expose individual candidate removal. Guided creation projects one candidate per logical Ruleset:
 the highest semantic version wins, and the most recently completed successful installation wins
 within the same package ID and version. Installation recency is durable publication order, never
 the lexical order of an opaque candidate ID. Failed or invalid staging attempts are not campaign
 choices. Exact-candidate activation and retained campaign locks continue to use their recorded
 identities rather than this convenience projection.
+
+Portable export includes the candidate named by campaign confirmation before any activation or
+Builder handoff exists. Recovery can reuse a matching installed candidate while preserving the
+recipient's current validated/activated use marker. Every other candidate field must match exactly;
+incompatible candidates are rejected before import.
 
 Bundled, Builder-created, and third-party content use the same compact portable package format. Alpha may import that format through the file picker or a controlled developer discovery surface, but discovery is candidate preparation—not activation. Sylvia GM hosts no Alpha marketplace/catalog and validates technical compatibility rather than rights ownership. Source/provenance metadata supports reproducibility; the user remains responsible for material shared through third-party channels. Exhaustive document forensics is an optional certified-source conversion and release-qualification path, not a requirement for ordinary ruleset authors or installed runtime packages. A certified package carries the useful semantic source map and compact hash-bound receipt; detailed extraction and review evidence remains build/release evidence unless a measured runtime or audit requirement selects it.
 

@@ -4,7 +4,7 @@
 >
 > **Endpoint:** A Windows Alpha candidate accepted by the project owner; publication requires separate approval.
 >
-> **Updated:** 2026-10-17
+> **Updated:** 2026-11-11
 
 PES-06 scope correction, 2026-09-15: the project owner permits starting a new campaign for current panel
 verification. Existing-campaign rules updates, including preserving layout when new panels are
@@ -16,6 +16,434 @@ decision source). Completed detail belongs in Git history and focused tests. His
 handoffs and checkout-specific records do not activate work.
 
 ## 1. Current work
+
+**10 November 2026: GPT Images phase one (PL-10).** The owner selected generation/editing through
+the managed ChatGPT subscription connection, Off/Review/Auto permissions, saved full-body and
+multi-view character references, shared adjustable portrait framing and map-data-guided underlays.
+GM and Builder receive autonomous art discovery and request tools. Separate scene illustrations
+and ambient backgrounds remain deferred. PR #34 contains the hook, persistence and shared-display
+implementation. The owner clarified that phase one must also cover the overall ordinary user
+experience: prepared art throughout the shipped character/enemy catalogue, discoverable creation
+and editing, imported-card artwork, Builder interview integration and reuse throughout later play.
+The initial ready-to-merge claim does not cover that outcome and is withdrawn. Hold merge while
+these gaps are completed. The current implementation adds portable, hash-checked package PNG
+references and actively restores selected imported card portraits in Builder, including their use
+as later generation references. Local portrait reuse also works with generation Off. Focused checks cover fresh-owner restore,
+crop persistence, corrupt-asset rollback, common PNG inputs and card reference reuse. The next
+increment adds a complete character artwork request, Review/Auto stage progression, Party and
+character Artwork actions, and automatic image inclusion in Setting/Plan publication. Source
+checks cover staged creation, failure/cancellation, the WebUI, GM export and fresh-recipient
+package restoration. Follow-up work adds explicit partial-art records, saved-source links for
+later adopted stages, library/campaign materialization and portrait-only reuse with generation Off.
+Saving a character now prepares its artwork workflow under Review/Auto; conversation-model image
+tool calls are optional. Focused source checks cover those handoffs and campaign-copy isolation.
+All twelve SRD starters now have complete prepared art: Mara Flint, Neri Vale, Oren Reed,
+Sela Moss, Bram Alder, Iri Swift, Tess Rowan, Kest Wren, Pip Venn, Luma Ash, Veya Quill and
+Eli Penn each have a generated full-body image, multi-view sheet and portrait. Their starter files retain the shared visual
+records; the installed catalogue also supplies these assets to retained Plan editions. Real-PNG
+checks cover crop, reopen and export/recovery without the catalogue. Reopening resolves retained
+images for the same campaign, character, purpose and hash before looking for original assets.
+Anchor Sentinel also has a prepared nonhumanoid bundle and source profile links. Known entities
+reuse it through their exact Setting source reference during normal status refresh; names alone
+do not select art. The Cartographer and flesh-fused Anchor Guardian now have complete bundles
+and source profile links too. The Cartographer's hood conceals their entire face in all three
+assets. Tessa, Miri, Captain Harlan, Auntie Salt, Fume and Saffron also have complete bundles.
+Their original biographies and mechanics are preserved, including Miri's concealed ring and
+Fume's narrative-only supplies under Lite. Original and artwork-annotated source editions retain
+exact catalogue bindings.
+Rift Death Hound, Rift Basilisk, Rift Darkmantle, Rift Cube, Rift Ankheg and Rift Behir now
+also have full-body references, multiview sheets and portraits. Original source text is unchanged.
+The hound retains both heads, and faceless creatures use their full silhouette. The Basilisk
+has a saved tighter crop; all six crops were inspected through the actual portrait renderer,
+including dialogue circles and map-sized tokens. Incorrect generated variants were rejected
+before adoption. These renders are source checks, not installed or live-provider acceptance.
+Stern, Linden, Marla, Henna, Anvil and the Quartermaster also have complete prepared bundles.
+Their existing profiles and pronouns are unchanged; unspecified appearances are editable defaults.
+Three initial portraits with painted circular cutouts were corrected before adoption. All six
+selected square images were inspected in dialogue circles and map-sized crops using the actual
+portrait module/CSS. Runtime portrait instructions now require continuous square backgrounds
+and explicitly exclude painted masks, leaving the circular crop to the UI. The mixed enemy/NPC
+journey also verifies the Basilisk's saved default crop,
+independent instance adjustments and Miri's exact source-bound artwork despite a different display
+name, followed by offline campaign export/recovery without the shared library. The final composed
+case passed in 70.71 seconds; two direct source-resolution checks also passed. Its earlier
+no-art assumption for Miri and a missing Setting scope in the updated fixture were corrected.
+Pike, Old Crane, Iro, Rigg, Kit and Lorn now have complete prepared bundles too. Their original
+profiles and the preceding 33 bundles are unchanged. Kit retains their authored age of twelve;
+Crane's unknown origin remains unknown. All six saved crops were inspected through the actual
+portrait renderer in square, dialogue-circle and map-sized forms.
+Two focused checks passed in 122.95 seconds for all 117 real images/resources/source aliases
+and all 218 authored subjects/246 current and retained source editions. Earlier owner, frontend
+and live acceptance layers were not replayed for this artwork-only addition.
+The other NPCs, companions and remaining enemies still need artwork.
+Thread, Hook and Needle now each have a separate full-body reference, multiview sheet and portrait.
+Their shared Lace Brothers profile retains its original text and adds all three editable visual
+defaults together. Each binding uses the exact shared file hash plus the individual subject, so
+an unnamed group reference remains ambiguous. The prior fifty bundles and their bindings are
+unchanged. Actual square, dialogue-circle and map-token crops were inspected for all three.
+The Lace Brothers increment brought the catalogue to 53 complete bundles. Its nine-image/resource check and
+the 218-subject/249-edition roster check pass. The group transfer's initial full-record assertion
+found expected recipient-local operation IDs after recovery; image hashes/paths, appearance and
+crop were unchanged. The corrected case passed in 41.66 seconds, checking all portable fields
+and exact image bytes with no catalogue readers or image requests. Touched Ruff, docs-index and
+diff checks pass. Completed frontend/native matrices were not repeated.
+Madame Thistle, Grim and Shrike now also have complete full-body, multiview and portrait bundles.
+Their original profile prefixes and the preceding 53 bundles/bindings are unchanged. All nine new
+PNG bytes, hashes/dimensions, installer resources and six current/retained source editions pass
+offline verification, including refusal outside the selected Setting and lookup from actual
+current Lite Setting payloads. All three square/dialogue/map-token crops were inspected. The
+authored roster check passed in 2.63 seconds for 218 subjects/252 source editions. This data-only
+addition reuses earlier lifecycle/owner/frontend qualifications; no completed matrix was replayed.
+Maw, Tallow and Drum now each have a full-body reference, multiview sheet and portrait, bringing
+the shared catalogue to 59 complete bundles. Their original profile prefixes and the preceding
+56 bundles/bindings are unchanged. All nine exact PNGs, hashes/dimensions, external installer
+resources and six current/retained source editions pass offline verification, including Setting
+scope and lookup from actual current Lite payloads. Their square/dialogue/map-token crops were
+inspected through the actual portrait module and CSS. The authored roster check passed in
+3.05 seconds for 218 subjects/255 source editions. Unspecified appearances remain editable
+defaults; Maw and Tallow's unknown origins and secrets remain unknown. Earlier completed
+owner/frontend/native matrices were not replayed for this artwork-only increment.
+Brother Ash, Mother Wick and Old Finch now also have full-body references, multiview sheets and
+portraits, bringing the catalogue to 62 complete bundles. Ash retains his authored age, battered
+armor and closed ledger; Wick retains her small stature; Finch remains seated in his reference
+views to respect his limited mobility. Other appearance choices are editable defaults and their
+home worlds remain unknown. The nine exact PNGs, external resources and six current/retained
+source editions pass offline verification against actual current Lite payloads and Setting scope.
+Their original profile prefixes and the previous 59 bundles/bindings are unchanged. Actual
+square/dialogue/map-token crops passed visual review. The authored roster check passed in
+2.61 seconds for 218 subjects/258 source editions; completed owner/frontend/native matrices
+were not replayed.
+Gavin Thatch, Dame Maris and Soot now have complete full-body, multiview and portrait bundles,
+bringing the catalogue to 65 complete bundles. Their workwear and bearing follow the authored
+profiles; unspecified appearance details remain editable defaults. All nine exact PNGs, external
+resources and six current/retained source editions pass offline verification, including actual
+current Lite payload lookup and Setting scope. Original profile prefixes and the previous 62
+bundles/bindings are unchanged. Their square/dialogue/map-token crops passed visual review.
+The authored roster check passed in 2.80 seconds for 218 subjects/261 source editions.
+Completed owner/frontend/native matrices were not replayed for this artwork-only increment.
+Thorn, Wren and Wick the chandler now have complete full-body, multiview and portrait bundles,
+bringing the catalogue to 68 complete bundles. Thorn's they/them pronouns remain unchanged and
+the chandler keeps a distinct appearance from Mother Wick. Saved individual crop settings tighten
+the generated upper-body portraits for consistent face framing without altering PNG bytes.
+Actual square/dialogue/map-token crops passed visual review. All nine exact PNGs, external
+resources and six current/retained source editions pass offline verification against actual current
+Lite payloads and Setting scope. Original profile prefixes and the previous 65 bundles/bindings
+are unchanged. The authored roster check passed in 2.71 seconds for 218 subjects/264 source editions.
+Completed owner/frontend/native matrices were not replayed.
+Kale, Hennick and Lace the tailor now have complete full-body, multiview and portrait bundles,
+bringing the catalogue to 71 complete bundles. Their market roles and personalities remain
+authoritative; unspecified appearance details are editable defaults. Lace stays unrelated to
+the Lace Brothers. All nine exact PNGs, external resources and six current/retained source
+editions pass offline verification, including actual current Lite payload lookup and Setting
+scope. Original profile prefixes and the previous 68 bundles/bindings are unchanged. Actual
+square/dialogue/map-token crops passed visual review. The authored roster check passed in
+2.68 seconds for 218 subjects/267 source editions. Completed owner/frontend/native matrices
+were not replayed for this artwork-only increment.
+Old Vesper, Corin and Davith now have complete full-body, multiview and portrait bundles,
+bringing the catalogue to 74 complete bundles. The innkeeper stays distinct from the other
+Vespers, and Davith's unmarked guard appearance does not disclose his private loyalties.
+Unspecified appearance details remain editable defaults. All nine exact PNGs, external resources
+and six current/retained source editions pass offline verification, including actual current Lite
+payload lookup and Setting scope. Original profile prefixes and the previous 71 bundles/bindings
+are unchanged. Actual square/dialogue/map-token crops passed visual review. The authored roster
+check passed in 2.61 seconds for 218 subjects/270 source editions. Completed owner/frontend/native
+matrices were not replayed for this artwork-only increment.
+Lady Sera Kael, Lady Maren Trask and Lord Harren Dorn now have complete full-body, multiview and
+portrait bundles, bringing the catalogue to 77 complete bundles. Their public council and merchant
+roles guide the artwork; private motives and plot secrets stay unshown. Unspecified appearance
+details remain editable defaults. All nine exact PNGs, external resources and six current/retained
+source editions pass offline verification, including actual current Lite payload lookup and Setting
+scope. Original profile prefixes and the previous 74 bundles/bindings are unchanged. Actual
+square/dialogue/map-token crops passed visual review. The authored roster check passed in
+2.70 seconds for 218 subjects/273 source editions. Completed owner/frontend/native matrices
+were not replayed for this artwork-only increment.
+Lord Silas Merrick, Lord Aldric Voss and Castellan Voss now have complete full-body, multiview and
+portrait bundles, bringing the catalogue to 80 complete bundles. All five Thornwall councillors
+now have prepared bundles. The unrelated Voss characters stay distinct; the Castellan's right-hand
+gauntlet, left-arm shield and sheathed sword remain consistent through his reference views, with
+no visual disclosure of private illness. All nine exact PNGs, external resources and six current/
+retained source editions pass offline verification against actual current Lite payloads and Setting
+scope. Original profile prefixes and the previous 77 bundles/bindings are unchanged. Actual square/
+dialogue/map-token crops passed visual review. The authored roster check passed in 3.53 seconds for
+218 subjects/276 source editions. Completed owner/frontend/native matrices were not replayed.
+Iron Mother Hest, Joss and Kell now have complete full-body, multiview and portrait bundles,
+bringing the catalogue to 83 complete bundles. Hest retains Dwarf proportions, Joss's they/them
+pronouns remain unchanged and Kell retains her authored age. Saved crop adjustments for Hest and
+Joss align face framing without changing PNG bytes. Actual square/dialogue/map-token crops passed
+visual review. All nine exact PNGs, external resources and six current/retained source editions
+pass offline verification against actual current Lite payloads and Setting scope. Original profile
+prefixes and the previous 80 bundles/bindings are unchanged. The authored roster check passed in
+2.77 seconds for 218 subjects/279 source editions. Completed owner/frontend/native matrices
+were not replayed for this artwork-only increment.
+Councillor Merrow, Deacon Ash and Doctor Cipher now have complete full-body, multiview and portrait
+bundles, bringing the catalogue to 86 complete bundles. Their original profile prefixes and the
+previous 83 bundles/bindings are unchanged. Unspecified appearances remain editable defaults;
+Merrow's home world stays unknown, Ash's sheathed sword stays on his left hip through the
+turnaround, and Cipher retains her personable scholarly bearing. Actual square/dialogue/map-token
+crops passed visual review. All nine exact PNGs, external resources and six current/retained
+source editions pass offline verification against actual current Lite payloads and Setting scope.
+The authored roster check passed in 2.68 seconds for 218 subjects/282 source editions. Completed
+owner/frontend/native matrices were not replayed for this artwork-only increment.
+Father Glass, The Mirror and Gareth now have complete full-body, multiview and portrait bundles,
+bringing the catalogue to 89 complete bundles. Glass retains his ordinary Human identity, The
+Mirror retains violet-flecked natural eyes without added mutations, and Gareth's sword and pouch
+stay on their respective anatomical sides through the turnaround. Unspecified appearances remain
+editable defaults. Original profile prefixes and the previous 86 bundles/bindings are unchanged.
+Actual square/dialogue/map-token crops passed visual review. All nine exact PNGs, external resources
+and six current/retained source editions pass offline verification against actual current Lite
+payloads and Setting scope. The authored roster check passed in 2.53 seconds for 218 subjects/285
+source editions. Completed owner/frontend/native matrices were not replayed for this artwork-only
+increment.
+Cassian, the Prophet of Four Corners and Athenaeum librarian Vesper now have complete full-body,
+multiview and portrait bundles, bringing the catalogue to 92 complete bundles. Cassian uses
+adapted working clothes without recovered original medical equipment, and the Prophet retains the
+Hollowed source's Speaker-stage violet eyes and still listening bearing. Librarian Vesper stays
+separate from Siren's Vesper and Old Vesper: a bounded resolver check returns each source's own
+portrait even with the same requested name and refuses mismatched source paths. That check reuses
+Siren's existing admitted descriptor; playable conversion and party/Builder qualification remain
+pending.
+Unspecified appearances remain editable defaults. Original profile prefixes and the previous 89
+bundles/bindings are unchanged. Actual square/dialogue/map-token crops passed visual review.
+All nine exact PNGs, external resources and six current/retained source editions pass offline
+verification against actual current Lite payloads and Setting scope. The authored roster check
+passed in 2.61 seconds for 218 subjects/288 source editions. Completed owner/frontend/native
+matrices were not replayed for this artwork-only increment.
+Briar, Kestrel and Guildmaster Vance now have complete full-body, multiview and portrait bundles,
+bringing the catalogue to 95 complete bundles. Briar's foraging bag and braid remain consistent
+through the turnaround; Kestrel retains her controlled theatrical bearing and Vance his polished
+merchant's bearing. Unspecified appearances remain editable defaults. Original profile prefixes
+and the previous 92 bundles/bindings are unchanged. Actual square/dialogue/map-token crops passed
+visual review. All nine exact PNGs, external resources and six current/retained source editions
+pass offline verification against actual current Lite payloads and Setting scope. The authored
+roster check passed in 6.66 seconds for 218 subjects/291 source editions. Completed owner/frontend/
+native matrices were not replayed for this artwork-only increment.
+Palla, Orin Thatch and Rook now have complete full-body, multiview and portrait bundles, bringing
+the catalogue to 98 complete bundles. Palla's apron ties and silver hair streak, Orin's satchel
+placement, and each character's face and clothing remain consistent through the references.
+Rook's home world remains unknown; unspecified appearances stay editable defaults. Original
+profile prefixes and the previous 95 bundles/bindings are unchanged. Actual square/dialogue/
+map-token crops passed visual review. All nine exact PNGs, external resources and six current/
+retained source editions pass offline verification against actual current Lite payloads and
+Setting scope. The authored roster check passed in 12.30 seconds for 218 subjects/294 source
+editions. Completed owner/frontend/native matrices were not replayed for this artwork-only
+increment. The broader catalogue, everyday journeys and deferred acceptance remain unfinished.
+Salt-Ash, Reef and Quill now have complete full-body, multiview and portrait bundles, bringing
+the catalogue to 101 complete bundles. Salt-Ash retains Speaker-stage violet eyes; Reef retains
+her faction's reptilian identity, one complete tail per view and consistent knife/pouch sides;
+Quill retains her locally born second-generation identity. Unspecified features and clothes stay
+editable defaults. Reef's saved crop aligns her face framing without changing PNG bytes. Actual
+square/dialogue/map-token crops passed visual review. Original profile prefixes and the previous
+98 bundles/bindings are unchanged. All nine exact PNGs, external resources and six current/retained
+source editions pass offline verification against actual current Lite payloads and Setting scope.
+The authored roster check passed in 6.76 seconds for 218 subjects/297 source editions. Completed
+owner/frontend/native matrices were not replayed for this artwork-only increment. The broader
+catalogue, everyday journeys and deferred acceptance remain unfinished.
+At 29042e4, Rift Doppelganger, Dust, Earth, Ettercap, Ettin and Fire gained full-body, multiview
+and portrait bundles, bringing the catalogue to 140 complete bundles. Doppelganger has an editable
+representative appearance, without declaring a canonical true form or impersonation. Dust, Earth
+and Fire retain their distinct faceless forms; Ettercap retains its selected four-eye arrangement.
+Both Ettin heads remain visible in the revised portrait's dialogue circle, with source equipment
+preserved in its body/sheet. The initial portrait and framing repair remain recorded. Unspecified
+details remain editable visual defaults. Original profile prefixes and the previous 134 bundles
+and bindings are unchanged. Actual square/dialogue/map-token crops passed visual review. All 18
+exact PNGs, external resources and twelve current/retained authored source editions pass offline
+verification against actual current Lite payloads and Setting scope. The authored roster check
+passed in 3.09 seconds for 218 subjects/336 source editions.
+At c96fb18, Rift Flameskull, Forge, Fungus, Violet Fungus, Ghast and Ghost gained full-body,
+multiview and portrait bundles, bringing the catalogue to 146 bundles/438 PNGs. Forge's selected
+body framing preserves its complete flame crown and hammer. Violet Fungus's selected sheet
+repair preserves five caps in each view; both original prompts and corrective edits remain
+recorded. Faceless fungi keep their complete silhouettes in portrait/token crops. Ghast and
+Ghost retain anonymous editable appearances without invented life histories. All six actual
+square/dialogue/map-token crops passed visual review. All eighteen exact assets/resources and
+twelve current/retained authored editions pass offline verification against current Lite Setting
+payloads, with the prior 140 bundles and original profile prefixes preserved. The authored roster
+check passed in 10.79 seconds for 218 subjects/342 editions. This is artwork preparation only;
+broader workflows and native/live acceptance remain unfinished.
+Rift Cloud, Fire, Frost, Hill, Stone and Storm Giants now have complete full-body, multiview and
+portrait bundles, bringing the catalogue to 152 bundles/456 PNGs. Each retains its authored
+equipment and Rift traits. The selected Frost sheet framing keeps the full axe visible; the
+selected Stone sheet inset shows one continuous club. Original and corrective prompts remain
+recorded. Saved crop metadata aligns the six portraits without altering their PNG bytes; actual
+square/dialogue/map-token crops passed visual review. All eighteen exact assets/resources and
+twelve current/retained authored editions pass actual Lite Setting lookup, with prior 146
+bundles/bindings and original profile prefixes preserved. The authored roster passed in 9.27
+seconds for 218 subjects/348 editions. All 82 authored NPCs and 47 authored monsters are prepared;
+89 authored monsters and the wider catalogue remain unfinished. No completed owner/frontend/native
+matrix was replayed. At f85bbcb, all 82 authored NPCs across
+80 current profile files
+and 165 source editions resolved complete artwork, with all 246 NPC PNGs/resources and actual
+Lite lookup verified. That unchanged preparation remains qualified. The wider monster, inherited
+form, Plan-only and companion catalogue remains unfinished. Completed owner/frontend/native
+matrices were not replayed. Broader everyday journeys and deferred acceptance remain unfinished.
+Anchor Trap's existing stone-lore/rug-mechanics inconsistency remains unresolved; its artwork
+depicts the activated stone mechanism only, with mechanics unchanged.
+The owner selected a shared app artwork library: whole Setting/Plan exports omit unused premade
+PNGs, while custom art stays portable and character/campaign exports carry used artwork. The
+source now maps the catalogue and PNGs as external installer/portable resources, outside the
+onefile sidecar. Campaign export retains used art before any artwork view has been opened.
+The prepared PNG pool now totals 1,051,395,477 bytes across 456 images, beyond the content-package cap.
+The current Setting omits those PNGs; its existing content-package limits remain unchanged.
+Focused checks cover shared/custom publication, external resource inventory, portable ZIP assembly,
+and exact campaign art transfer before opening an image view. Local-copy receipts also transfer
+without creating an agent session, while provider requests retain their session requirement.
+Standalone character/profile transfer now has a bounded `.sylvia-gm-character` format, exact
+package checks, preview/confirm/cancel and owner/WebUI upload/download endpoints. It carries
+used art, crop and imported originals through the existing libraries and image store, preserving
+legacy v1 text. Focused checks cover an imported card's crop/edit/re-export/reference journey and
+actual Lite exact-package restoration with generation Off. Library now offers Character File
+import with preview, confirm/cancel and a saved-character export list. Setup can export the exact
+selected Player Character, Companion or Universal card. Imports refresh the lists; refused imports
+retain their preview, and stale exports preserve setup choices and refresh the source list.
+Native chooser/save commands and browser upload/download wiring are implemented. Source WebUI
+checks cover actual Lite package refusal/recovery, portable artwork/original cards and zero image
+requests, plus desktop/mobile layouts. Compiled Rust checks cover verified handoff and safe names.
+Owner startup now retires abandoned temporary preview copies while retaining import receipts and
+the user's chosen files, so closing the app cannot permanently exhaust the four-preview limit.
+The following ordinary-edit audit confirmed that renaming a saved character could propose fresh
+art despite its complete references. Builder publication now uses the opened source target for
+preparation, reuse and links, with retained profile-open receipts across restart. Explicit sources
+do not fall back to an unrelated same-named target. Four local edit checks pass, including actual
+Lite, an independent Ruleset, restart and Auto isolation; eighteen direct consumers also pass.
+The unfinished-art copy audit also confirmed duplicate proposals when a saved source was edited
+in another Builder chat. Source identity/hash now retains the original pending/failed workflow
+and links later adopted results to the copy, without cross-chat action authority. Local copy
+receipts no longer mask a provider failure. Four local checks cover pending/failed/partial art,
+Auto without submission, permission refusal and deleted-chat recovery; twenty-one direct consumers
+also pass, including actual Lite. Live and installed acceptance remain deferred.
+The following source audit found 80 NPC files and 136 authored monster files; the Lace Brothers
+file contains three distinct named siblings. Shared-source lookup now supports an explicit subject
+inside an exact package/path/hash match and refuses ambiguous bindings. The owner clarified that
+premade coverage includes the Severed Lands inherited versions of SRD creatures/forms. Those
+inherited identities, prose-only Plan casts and remaining authored subjects still need artwork.
+The inherited inventory now identifies 330 Severed Lands subjects (90 beasts and 240 other forms)
+across the current and retained Lite sources. Exact file/JSON Pointer/hash bindings are scoped
+to the selected Setting. Portrait lookup uses admitted metadata without parsing the large
+definition files. Producer and owner composition checks cover these bindings and used-art
+transfer with generation Off; these fixtures do not supply the missing production artwork.
+At 04f9e5f, seventeen inherited forms reused their prepared Severed Lands renditions: Ankheg, Basilisk,
+Darkmantle, Death Dog, Gelatinous Cube, Doppelganger, Dust Mephit, Earth Elemental, Ettercap, Ettin
+and Fire Elemental, plus Air Elemental, Behir, Bulette, Cockatrice, Flesh Golem and Magmin. Flesh
+Golem uses the prepared Anchor Guardian look; Magmin uses Rift Cinder. These are Setting-specific
+artwork choices; mechanical payloads and runtime identities are unchanged. Exact Ruleset
+file/hash/JSON Pointer plus Setting scope selects the existing complete bundle. Those six added
+bindings pass actual current Lite byte/metadata lookup and wrong Setting/hash/package/pointer
+refusal. All 140 visual records, prompts and crops and all earlier bindings are preserved; the
+eighteen reused PNGs pass exact-byte/hash lookup. No images were created or copied, and external
+resources remained unchanged. This qualifies artwork lookup only; inherited form execution remains
+unqualified by this check.
+At c96fb18, four further inherited records reused the prepared renditions: Azer Sentinel uses Rift
+Forge; Violet Fungus, Ghast and Ghost use their matching Rift renditions. Actual current Lite
+file bytes and admitted hash/size metadata resolve all four exact records; wrong Setting, hash,
+package, pointer and changed bytes are refused. The previous 140 bundles remain unchanged. This
+brings inherited coverage to 21 forms, without extra image copies or mechanical payload changes.
+It qualifies artwork lookup, not inherited form execution. No missing Flameskull/Myconid entry
+was invented, and the walking Rift Fungus was not bound to the distinct Shrieker Fungus.
+The six inherited Giant records now reuse their matching Rift Giant bundles, bringing inherited
+coverage to 27 forms. All six exact source records resolve through current Lite bytes and admitted
+file metadata; wrong Setting/hash/package/pointer/changed-byte lookups are refused. All eighteen
+reused PNGs pass runtime byte/hash lookup. The selected Cloud morningstar is a rigid spiked mace;
+the inherited Thunderous Mace attack and all other mechanical payloads remain unchanged. These
+Setting artwork choices do not qualify inherited form execution or change participant identities.
+Other Settings do not inherit those renditions. The mixed NPC/creature journey selects one
+Basilisk through its inherited form and another through its authored Rift profile, preserving
+independent crops and offline used-art recovery. The remaining 303 inherited forms still need art.
+At 3b7cc8a, the original five-form actual-image/resource/alias check passed in 84.91 seconds,
+including refusal outside Severed Lands; the mixed authored/inherited/NPC offline journey passed
+in 73.42 seconds. All 33 then-current visual bundles and previous bindings were preserved. Those
+source checks were not replayed for the current six-binding data addition.
+Review of all eighteen shipped/retained Plan narratives identified seventy-two prose-only named
+subjects, including side-story cast and the Vigilant Engine. The production roster preserves
+separate identities for same-named people in different Plans. Exact accepted-Plan ID, cited prose,
+subject and Setting bindings now restore their prepared art through normal status and
+used-art campaign export. Source checks use synthetic PNGs; production of these images remains
+open, alongside the remaining Setting, inherited and selected TD art.
+The subsequent reuse audit found that generalized Plan copies received new story IDs and lost
+their prepared cast binding. Copies now preserve a separate artwork source ID through repeated
+save-as and ordinary Plan transfer. Exact cited prose still controls reuse. The actual Lite
+composition check covers two copies, Plan export/import, Builder-to-GM handoff and offline used-art
+campaign recovery with generation Off; no new production images are supplied by those fixtures.
+The TD integration audit at `9968614adc97eddebb5a97f2cfccb772ee889cf1` found compiled mechanics
+and synthetic conformance characters. The owner selected clean Siren Protocol content for the
+trailer and corrected that README's blanket private-content label. Legacy private campaign notes
+remain excluded; test fixtures do not become premade release characters.
+The selected Siren repository's current main at `c7a9587b94f8e5125ea5818a9f708ec32d0bab01`
+contains eleven authored profiles and runtime build inputs. Its historical repository/profile names do
+not make the clean Siren material private; source preparation follows the owner's correction.
+The eleven locked originals have now been delivered locally. Independent checks confirm the
+normalized master archive hash, exact internal image bytes/checksums and browser decoding of all
+eleven at 1024×1536. Ten historical registry hashes differ from that master; the discrepancy is
+retained without an invented cause. All eleven original sheets are now retained byte for byte in
+the prepared catalogue, alongside separate full-body and square-portrait derivatives. Each complete
+bundle records its original filename/hash, archive identity and historical registry discrepancy;
+generated sheet writing does not change the clean profile's narrative authority. The shared library
+contained fifty complete bundles after that increment. All eleven portraits were inspected through the actual square,
+dialogue-circle and map-sized crop renderer. Fifty-one exact source bindings cover the selected
+upstream profiles and the delivered Siren Protocol 0.2.0 package source. Raw and normalized hashes
+are retained where they differ, and other Settings do not select this cast. The twelve selected
+source files were compared directly; existing visual identity and runtime character identities are
+preserved. The delivered package source is separate from TD PR #6's checked head
+`882103eee8d511d08d31d9d0b4fe4d9d67b813f8`, which does not contain that Setting. Actual TD party
+and Builder handoff remains open. No other work item's source was modified.
+The active TD owner subsequently confirmed that the retained Siren 0.2.0 adapter is explicitly
+`included_nonmechanical` / `NOT_COMPLETE`, with no participant artifacts or converted Character
+File envelopes. Sixteen selected immutable source blobs were checked independently; the twelve
+clean character files match the retained artwork source copy after line-ending normalization.
+This verifies provenance without establishing a TD 0.1.29 playable composition. Real conversion
+and its party/Builder qualification require explicit reconciliation of the separate Siren
+composition scope. The existing `visuals` field can carry prepared art through the generic
+Character File and party path while preserving source identities and campaign participant IDs.
+No adapter build, TD checkout write, guest use or native/live check was performed for this handoff.
+Two focused checks passed in 122.04 seconds: all 150 real PNGs/resources/source bindings and a
+real Siren bundle exported/imported through fresh owner libraries without the shared image reader.
+The transfer retains all three exact PNGs, including the original sheet, and the adjusted crop,
+with no image adapter or request. Its Universal fixture qualifies image transfer, not a TD build.
+The previous 39 bundles and their bindings are unchanged. Touched Ruff, docs-index and diff checks
+pass; previous frontend/Rust and broader campaign matrices were not repeated for this data addition.
+The originals' standard PNG background-color hint exposed an overly narrow image
+validator. Bounded `bKGD` support now preserves original bytes while refusing malformed or misplaced
+hints. The six minimal failure cases pass after the repair; 78 related source checks pass in
+120.81 seconds, including saved-owner restoration/reopen and actual Lite image lifecycle. Strict
+module typing and touched Ruff pass; all eleven originals pass the repaired validator. This is
+source qualification only, with native/live acceptance still pending.
+The authored-source producer now covers 218 subjects (82 individual NPCs and 136 monsters),
+retaining 318 source editions across current content and Plan snapshots. Thread, Hook and Needle
+remain distinct; V and Anchor Sentinel variants and the artwork-annotated profiles retain
+their original editions. The
+snapshot-only opposition guide is explicitly excluded as encounter guidance. A composed source
+check verifies every declared binding through the runtime resolver; this supplies no new images.
+The subsequent local handoff check found and fixed an execution dependency on a stopped source
+chat, including admission of the next character reference stage. An active chat in the same
+campaign can now generate/adopt an existing individual request or continue the whole character
+workflow with its original provenance and stable stage identities. Replays from another active
+chat reuse those stages; unrelated chats remain refused. Nine local handoff/workflow checks pass,
+including exact reference order and export/recovery. The owner clarified that model delegation
+applies to visual design and frontend work. Backend design and implementation continue here.
+The original Opus handoff failed before launch (`thread_credential_required`). After the owner
+selected Opus 5.5 and resumed following the app update, the direct handoff executed successfully
+with Fast mode off. Its transfer frontend is committed locally at `465d2fa`, including correction
+of accidental test-file line-ending churn. Parent review covers source, screenshots and the two
+bounded backend recovery findings. Artwork production continues through GPT Images; the remaining
+catalogue and broader everyday journeys are unfinished. Live in-app checks remain deferred.
+The nine prepared Ready character editions now carry the existing shared visual records for
+their exact authored starter identities. Their builds, equipment, prose and retained Plan
+bindings are unchanged; only visuals, character hashes and artwork provenance were added.
+Customize also passes those visual records into saved editable Character Files. The actual
+Lite Ready-party resolve/customize check passes, including immutable source/build comparisons.
+Broader everyday journey
+qualification remains open. The unfinished-draft `candidate_unavailable` finding is fixed for new
+exports: confirmation references now retain their candidate and package closure. Recovery checks
+cover fresh/shared libraries, differing local activation markers, continuation and reopen. Shared
+candidate reuse preserves recipient metadata and rejects different content. Image handoff and
+actual Lite prepared-art transfer checks now retain the normal candidate reference. Older incomplete
+archives that omitted it require a fresh export from the source dataset.
+These source/scripted checks do not establish completion of the ordinary
+workflows. The owner's latest selection keeps live in-app checks pending. Of the 366 prepared assets,
+355 were produced with the built-in GPT Images tool and eleven are the unchanged supplied Siren
+master sheets. Asset preparation is separate from Sylvia's deferred native check.
+Live Sylvia subscription, installed-app
+and TD trailer acceptance remain unverified. Merge follows the Pneuma IO rulebook's delivery and
+cleanup sequence.
 
 **9 November 2026: optional onboarding and the complete tutorial suite.** The owner selected a new
 PR for all independently accessible lessons and a guided welcome, AI connection, Ready campaign

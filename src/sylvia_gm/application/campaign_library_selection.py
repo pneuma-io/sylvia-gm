@@ -455,6 +455,11 @@ def materialize_library_party(
         )
         if item.source_migration is not None:
             selected_party[-1]["character_file"]["source_migration"] = item.source_migration
+        visuals = owner._store.images.published_visuals(
+            item.artifact_id, item.content_sha256
+        ) or item.visuals
+        if visuals is not None:
+            selected_party[-1]["character_file"]["visuals"] = visuals
     state = materialize_starting_world(
         selection.plan.plan,
         entity_reference=selection.entity_reference,

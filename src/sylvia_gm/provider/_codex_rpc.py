@@ -85,11 +85,13 @@ class CodexConnection:
         executable: Path | None = None,
         *,
         dynamic_tools: frozenset[str] = frozenset(),
+        image_generation: bool = False,
     ) -> None:
         self.home = home.resolve()
         self.workspace = self.home / "workspace"
         self.executable = executable
         self.dynamic_tools = dynamic_tools
+        self.image_generation = image_generation
         self._overflow = False
         self._process: subprocess.Popen[str] | None = None
         self._write_lock = threading.Lock()
@@ -179,7 +181,9 @@ class CodexConnection:
             "-c",
             "features.shell_tool=false",
             "-c",
-            "features.code_mode_host=true",
+            "features.image_generation=" + str(self.image_generation).lower(),
+            "-c",
+            "features.code_mode_host=" + str(not self.image_generation).lower(),
             "-c",
             'features.code_mode.direct_only_tool_namespaces=["sylvia"]',
             "-c",

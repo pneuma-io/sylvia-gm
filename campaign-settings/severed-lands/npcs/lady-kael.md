@@ -29,3 +29,15 @@ She genuinely likes people — she's not cold or calculating in the way Lord Mer
 ## Hook
 
 Kael's daughter has started remembering. Fragments — a name, a color, a feeling of water. She wants to find her home world. Kael needs information that only the Returners have, and the Returners need funding that only Kael can provide. The arrangement is delicate. Something is about to break it.
+
+## Appearance and artwork
+
+An adult settled Human woman appearing in her mid-fifties, with a slender medium build, warm medium-brown skin, hazel-brown eyes and wavy chestnut hair graying at the temples, gathered into a neat low coil. A warm measured expression and composed open posture. A well-made but restrained deep teal wool overdress over a dark navy long-sleeved underdress, a narrow plain leather belt, small simple gold hoop earrings and neat dark leather shoes. Empty relaxed hands. Her measured merchant-councillor bearing follows the authored profile; age, physical features and clothing are editable visual defaults. No crown, invented house crest, ceremonial scepter, private family clues, research documents, symbolic Door imagery, magical effects or visual disclosure of hidden motives.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/973732d84f4d2f3e7afd616ac3f2e774c1aed27942cc5ccd5b2311ce45a3aa1a.png)
+
+[Full-body reference](../assets/characters/be3ecee37a19f9e622da4806ab48202b4ce585bc609ec6a2e03af3a9af63146b.png)
+
+[Multiview reference sheet](../assets/characters/bd227fd98e1203016f718920a93d062423c3ba1a868c94c8cea3ba11964fdbdd.png)

@@ -46,3 +46,15 @@ A grotesque fusion of Warden construction and Rift-touched flesh — an Anchor D
 ## Actions
 **Multiattack.** Two slam attacks.
 **Slam.** +7 to hit, 13 (2d8 + 4) bludgeoning.
+
+## Appearance and artwork
+
+A hulking roughly human-shaped Warden stone guardian with a broad heavy torso, thick asymmetrical stone limbs and blunt stony hands, fused with sealed muted gray-brown organic tissue along joints and cracks. Worn pale-gray carved stone plates, restrained angular Warden masonry and small sickly violet Rift glimmers inside a few seams. Heavy impassive carved stone brow and narrow dim eye slits, no human face. Ancient precise construction mixed with an uneasy living posture. No exposed organs, gore, armor, clothing, weapons or faction heraldry.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/c6bea40d00c94b47af7e4ec8b85042c9f1e87fde898220468d6728755ade5450.png)
+
+[Full-body reference](../../assets/characters/490bec00a1aa0a8ed147116aac054609ac745c1ea464dbe5c8dde1cf17381409.png)
+
+[Multiview reference sheet](../../assets/characters/3b0657c5968e06687cbe3149b7e4ff81659be4a7038b008285e5c074230ec589.png)

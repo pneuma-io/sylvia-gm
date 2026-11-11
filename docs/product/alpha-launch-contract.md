@@ -1059,6 +1059,86 @@ replacement without overwriting saves, installed/portable coexistence, same-data
 and credential re-entry on another Windows account. `alpha-10b` publishes only those exact
 qualified artifacts through GitHub Releases after direct approval.
 
+### 8.1 Optional GPT Images: phase one
+
+The selected image-generation increment supports GPT Images generation and editing through the
+managed ChatGPT subscription connection. It consumes subscription usage and eligible credits;
+there is no automatic API-billed fallback. Image settings are Off, Review and Auto, with Review
+as the default. Review saves a proposal, requires Generate, then previews the result for Adopt.
+Auto authorizes GM and Builder to recognize missing art, generate it and adopt the result.
+Failed, refused, cancelled and interrupted requests never automatically retry.
+
+Complete character artwork is one user-facing request. Sylvia prepares the missing reference
+and portrait stages in order, retaining the established appearance and existing usable images.
+Review requires Generate and Adopt at each stage; Auto continues after adoption. Cancelling,
+changing permissions or a failed stage stops further generation. Party and character views offer
+an Artwork action for the selected character; users do not enter internal target identities.
+
+Character art includes a complete appearance description, a canonical full-body reference and
+a multi-view reference sheet; both reference formats are required for the visual bundle. A
+portrait uses both references. Character Files and unbound character profiles can retain the
+managed asset references in their optional `visuals` data. Saved portraits use one adjustable
+focal point and zoom across Map, Party, character details and speaker-labelled dialogue.
+An explicitly marked partial visual record retains usable portraits/references and identifies
+unfinished stages. Partial art never satisfies the completed reference requirement. It can be
+saved, reused and transferred while generation is Off or a requested stage remains unfinished.
+
+The phase-one experience applies throughout ordinary use. Shipped premade characters, companions,
+named NPCs and enemy archetypes include prepared artwork and references, with coverage across the
+supported content catalogues. Reusing shipped art requires no generation request. Multiple
+mechanical editions of the same identity reuse its art unless an authored appearance change
+requires a different version. Blank character templates obtain art when their appearance is known.
+Coverage for Severed Lands includes the Setting's versions of inherited SRD creatures and forms.
+When a source describes several named characters, each retains its own references and portrait.
+
+Premade artwork ships once in Sylvia's shared app artwork library. Sharing a whole Setting or
+Plan retains its references to that library without duplicating unused premade PNGs. Custom
+art remains portable with the content that uses it. Character and campaign exports carry their
+used artwork, including premade images, so those exports retain the selected appearance and crop.
+The shared catalogue does not raise the existing content-package size limits.
+
+A standalone `.sylvia-gm-character` transfer carries one selected Character File or unbound
+profile, its used images, crop and any retained original imported card. Import previews the
+selected bytes and requires confirmation. A playable file keeps its exact Ruleset and Setting
+bindings; missing matching packages require installation, without silently adapting the build.
+An unbound profile remains unbound and needs the ordinary Builder adaptation for playable use.
+
+New characters and companions, imported cards, adaptations and later GM-created NPCs or enemies
+have discoverable artwork controls in their normal creation and character views. The Builder
+interview handles missing art within the character workflow, respecting Off/Review/Auto. Users
+are not required to supply internal IDs, choose reference formats or discover a separate technical
+image form. Existing usable artwork is reused; an imported card's embedded portrait can become
+an explicit appearance reference without silently fetching external assets. Missing images have
+a clear creation path. Changes, regeneration and crop adjustments preserve the established identity
+and appear consistently wherever that character is shown.
+
+Character information and its selected artwork remain associated through publication, library
+reuse, campaign creation, save/reopen and supported content transfers. The same common visual
+record serves the supported Character File/profile/card paths and displayed character views.
+Saving through Builder prepares missing artwork under Review/Auto without requiring an image-tool
+call from the conversation model. The saved source is linked to that requested workflow; later
+adopted results follow it into a campaign without republishing the character. Campaigns show linked
+generation/approval status and can return to the owning Builder chat. Reusing a character never
+retries failed art automatically or changes the original character source.
+Failures, sign-in requirements, usage limits and interrupted work give an actionable recovery
+path while preserving usable art. The user remains able to continue without generating images.
+
+Release acceptance includes representative ordinary journeys for prepared and custom characters,
+companions, imported cards with and without usable art, and enemies added during play. Check SRD
+Lite with Severed Lands and the selected Trigger Discipline release content. Verify creation,
+reuse, editing/framing, persistence and failure recovery with the actual image connection before
+crediting trailer readiness. Available tools and instructions alone do not establish these outcomes.
+
+Map underlays use a raster reference rendered from the actual player-known map geometry and
+terrain. Bounds and orientation match the playable map. Tokens, labels and secret geometry are
+excluded from the reference. Artwork sits beneath the authoritative mechanical overlays and
+cannot change collision, visibility, movement or other rules. A changed layout requires a new
+underlay; token movement alone does not. GM and Builder receive the same purpose, format,
+reference-order and reuse guidance and owner-controlled request tools.
+
+Separate scene illustrations, app-wide ambient backgrounds and additional image providers are
+deferred. Source or scripted-provider checks do not establish installed or live-provider readiness.
+
 ## 9. Explicitly post-Alpha
 
 - incompatible rules-update migrations and player-resolved conflict handling beyond the
@@ -1069,7 +1149,7 @@ qualified artifacts through GitHub Releases after direct approval.
 - Windows 10 qualification, installer formats other than NSIS, and elevated MSI qualification;
 - third-party executable plugins and Unsafe Mode execution;
 - importing unreleased predecessor-prototype campaign state;
-- campaign cloning, marketplace, visual map editor, and image generation;
+- campaign cloning, marketplace, visual map editor, and image generation beyond section 8.1;
 - a large bundled campaign library;
 - Sylvia-hosted monetization/subscription infrastructure, billing, quotas, and telemetry;
 - general-purpose software-development promises for Builder;

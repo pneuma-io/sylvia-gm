@@ -106,6 +106,7 @@ def _generalized_rift_payload(
     value = json.loads(canonical_json_bytes(payload))
     if not isinstance(value, dict):
         raise ValueError("Campaign Plan payload is invalid")
+    value.setdefault("artwork_source_plan_id", value.get("id"))
     value["id"] = plan_id
     value["revision"] = 1
     value["title"] = title

@@ -11,7 +11,7 @@ import struct
 import tempfile
 import threading
 import zlib
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
 from urllib.parse import urlsplit
 
@@ -184,9 +184,26 @@ class CardPreview:
     profile: dict
     source_sha256: str
     conversion: dict
+    portrait: bytes | None = field(default=None, repr=False)
 
     def report(self):
         return dict(self.conversion)
+
+
+def card_portrait(source: bytes) -> bytes:
+    """Read a local card image, stripping its text and foreign configuration from model inputs."""
+    from sylvia_gm.application.image_hooks import ImageData
+
+    _ = ImageData(source).dimensions
+    chunks = [source[:8]]
+    offset = 8
+    while offset < len(source):
+        size, kind = struct.unpack_from(">I4s", source, offset)
+        end = offset + size + 12
+        if kind in (b"IHDR", b"PLTE", b"tRNS", b"IDAT", b"IEND", b"sRGB", b"gAMA"):
+            chunks.append(source[offset:end])
+        offset = end
+    return b"".join(chunks)
 
 
 def preview_character_card(source: bytes) -> CardPreview:
@@ -379,6 +396,7 @@ def preview_character_card(source: bytes) -> CardPreview:
             "assets: inert references; embedded/data URIs identify retained original content"
         )
         # Retain full descriptors (including unknown asset metadata) as preserved-only.
+    portrait = None
     if container == "png":
         p.setdefault("assets", []).append(
             {
@@ -388,10 +406,18 @@ def preview_character_card(source: bytes) -> CardPreview:
                 "status": "reference_only",
             }
         )
-        report["preserved_only"].append(
-            "PNG portrait and auxiliary chunks retained in original; no"
-            " image decode or asset loading"
-        )
+        from sylvia_gm.application.image_hooks import ImageHookError
+
+        try:
+            portrait = card_portrait(source)
+        except ImageHookError:
+            report["unsupported"].append(
+                "Card portrait exceeds the supported PNG artwork limits (16 MiB / 4 megapixels). "
+                "The original is retained; use a smaller PNG or create new artwork."
+            )
+        else:
+            report["imported"].append("PNG portrait: usable artwork and a generation reference")
+        report["preserved_only"].append("Original PNG metadata retained separately from artwork")
     foreign = {k: v for k, v in data.items() if k not in consumed}
     report["preserved_only"].extend(
         ("data." if version > 1 and outer else "") + key for key in sorted(foreign)
@@ -428,10 +454,10 @@ def preview_character_card(source: bytes) -> CardPreview:
         )
     report["omitted"] = ["No source bytes discarded; unsupported behavior is not activated."]
     validate_character_profile(canonical_json_bytes(p))
-    return CardPreview(p, digest, report)
+    return CardPreview(p, digest, report, portrait)
 
 
-def _original_path(storage_root, digest):
+def _original_path(storage_root: Path, digest: str) -> Path:
     if not isinstance(digest, str) or re.fullmatch("[0-9a-f]{64}", digest) is None:
         raise ValueError("Invalid import source identity")
     root = storage_root / "character-card-imports"
@@ -465,16 +491,22 @@ def load_import_original(storage_root: Path, digest: str) -> bytes:
     return source
 
 
-def save_character_card_import(storage_root: Path, *, operation_id: str, source: bytes) -> dict:
-    preview = preview_character_card(source)
-    target = _original_path(storage_root, preview.source_sha256)
+def retain_import_original(storage_root: Path, source: bytes, *, expected_sha256: str) -> None:
+    """Retain one already-validated selected card without publishing a second profile."""
+    if (
+        not source
+        or len(source) > MAX_CARD_BYTES
+        or hashlib.sha256(source).hexdigest() != expected_sha256
+    ):
+        raise ValueError("Original-source identity is invalid")
+    target = _original_path(storage_root, expected_sha256)
     if target.exists():
-        if load_import_original(storage_root, preview.source_sha256) != source:
+        if load_import_original(storage_root, expected_sha256) != source:
             raise ValueError("Original-source conflict") from None
     else:
         target.parent.mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory(prefix=".card-import-", dir=storage_root) as temporary:
-            staged = Path(temporary) / preview.source_sha256
+            staged = Path(temporary) / expected_sha256
             staged.mkdir()
             for name, data in [
                 ("source.bin", source),
@@ -484,7 +516,7 @@ def save_character_card_import(storage_root: Path, *, operation_id: str, source:
                         {
                             "format_id": "sylvia-gm-character-card-source",
                             "format_version": 1,
-                            "sha256": preview.source_sha256,
+                            "sha256": expected_sha256,
                             "byte_count": len(source),
                         }
                     ),
@@ -497,8 +529,13 @@ def save_character_card_import(storage_root: Path, *, operation_id: str, source:
             try:
                 staged.rename(target)
             except FileExistsError:
-                if load_import_original(storage_root, preview.source_sha256) != source:
+                if load_import_original(storage_root, expected_sha256) != source:
                     raise ValueError("Original-source conflict") from None
+
+
+def save_character_card_import(storage_root: Path, *, operation_id: str, source: bytes) -> dict:
+    preview = preview_character_card(source)
+    retain_import_original(storage_root, source, expected_sha256=preview.source_sha256)
     saved = save_character_profile(
         storage_root, operation_id=operation_id, source=canonical_json_bytes(preview.profile)
     )

@@ -34,13 +34,14 @@ from sylvia_gm.domain.errors import (
     MechanicsValidationIssue,
     RulesetDiagnostic,
 )
+from sylvia_gm.domain.image_art import validate_character_visuals
 from sylvia_gm.domain.package_library import (
     ParticipantArtifactDeclaration,
     canonical_json_bytes,
 )
 
 REUSABLE_PARTICIPANT_FORMAT_ID = "sylvia-gm-reusable-participant"
-REUSABLE_PARTICIPANT_FORMAT_VERSION = 5
+REUSABLE_PARTICIPANT_FORMAT_VERSION = 6
 SETTING_CHARACTER_FORMAT_ID = "sylvia-gm-character-file"
 SETTING_CHARACTER_FORMAT_VERSION = 2
 _MAX_LIBRARY_PARTICIPANTS = 256
@@ -81,6 +82,7 @@ class ReusableParticipant:
     source_profile: SafePayload | None = None
     source_migration: SafePayload | None = None
     builtin_starter: bool = False
+    visuals: SafePayload | None = None
 
     @property
     def profile_status(self) -> str:
@@ -135,6 +137,7 @@ class ReusableParticipant:
             "participant": json.loads(canonical_json_bytes(self.participant)),
             "entity_state": json.loads(canonical_json_bytes(self.entity_state)),
             "setting_data": json.loads(canonical_json_bytes(self.setting_data)),
+            **({"visuals": self.visuals} if self.visuals is not None else {}),
         }
 
 
@@ -303,6 +306,8 @@ def parse_setting_character(
     if format_version == SETTING_CHARACTER_FORMAT_VERSION:
         validate_content_shape("character_file", envelope)
         fields.add("setting_data")
+        if "visuals" in envelope:
+            fields.add("visuals")
     if (
         not isinstance(envelope, Mapping)
         or set(envelope) != fields
@@ -343,7 +348,9 @@ def parse_setting_character(
     source_migration = None
     if legacy_declaration is not None:
         from sylvia_gm.application.srd_lite_weapon_set_migration import (
-            MIGRATION_ID, PACKAGE_ID, migrate_state,
+            MIGRATION_ID,
+            PACKAGE_ID,
+            migrate_state,
         )
         _, validated_old = _validated_payload(
             role=role, participant=cast(SafePayload, envelope.get("participant")),
@@ -369,6 +376,7 @@ def parse_setting_character(
     name = participant.get("name")
     if not isinstance(name, str) or not name or name != name.strip() or len(name) > 160:
         raise ValueError("Setting Character File name is invalid")
+    visuals = validate_character_visuals(envelope.get("visuals"))
     canonical_envelope = {
         "format_id": SETTING_CHARACTER_FORMAT_ID,
         "format_version": format_version,
@@ -384,6 +392,8 @@ def parse_setting_character(
     }
     if format_version == SETTING_CHARACTER_FORMAT_VERSION:
         canonical_envelope["setting_data"] = setting_data
+    if visuals is not None:
+        canonical_envelope["visuals"] = visuals
     if source_migration is not None:
         canonical_envelope["source_migration"] = source_migration
     encoded = canonical_json_bytes(canonical_envelope)
@@ -408,6 +418,7 @@ def parse_setting_character(
         entity_state=cast(SafePayload, entity_state),
         setting_data=cast(SafePayload, setting_data),
         source_migration=source_migration,
+        visuals=visuals,
     )
 
 
@@ -474,6 +485,7 @@ def save_reusable_participant(
     setting_data: SafePayload | None = None,
     setting_character_schema: SafePayload | None = None,
     source_profile: SafePayload | None = None,
+    visuals: SafePayload | None = None,
 ) -> ReusableParticipant:
     """Validate and persist one immutable owner-local participant artifact."""
 
@@ -491,6 +503,9 @@ def save_reusable_participant(
     payload = {
         "participant": participant_value, "entity_state": state_value, "setting_data": setting_value
     }
+    visuals = validate_character_visuals(visuals)
+    if visuals is not None:
+        payload["visuals"] = visuals
     identity = {
         "role": role,
         "source_profile": source_profile,
@@ -511,7 +526,7 @@ def save_reusable_participant(
     artifact_id = f"participant-{operation_suffix}-{content_sha256[:16]}"
     record = {
         "format_id": REUSABLE_PARTICIPANT_FORMAT_ID,
-        "format_version": REUSABLE_PARTICIPANT_FORMAT_VERSION,
+        "format_version": REUSABLE_PARTICIPANT_FORMAT_VERSION if visuals is not None else 5,
         "artifact_id": artifact_id,
         "source_profile": source_profile,
         "role": role,
@@ -643,8 +658,8 @@ def load_reusable_participant(
     if format_version == 1:
         if set(record) != common_fields or legacy_campaign_setting != campaign_setting:
             raise ValueError("Reusable participant record is incompatible")
-    elif format_version in {2, 3, 4, REUSABLE_PARTICIPANT_FORMAT_VERSION}:
-        provenance_fields = {"source_profile"} if format_version == 5 else set()
+    elif format_version in {2, 3, 4, 5, REUSABLE_PARTICIPANT_FORMAT_VERSION}:
+        provenance_fields = {"source_profile"} if format_version in {5, 6} else set()
         if set(record) != common_fields | setting_fields | provenance_fields:
             raise ValueError("Reusable participant record is invalid")
         if (
@@ -667,8 +682,10 @@ def load_reusable_participant(
         raise ValueError("Reusable participant record is incompatible")
     payload = json.loads((root / "payload.json").read_text(encoding="utf-8"))
     payload_fields = {"participant", "entity_state"}
-    if format_version in {4, 5}:
+    if format_version in {4, 5, 6}:
         payload_fields.add("setting_data")
+    if format_version == 6:
+        payload_fields.add("visuals")
     if not isinstance(payload, dict) or set(payload) != payload_fields:
         raise ValueError("Reusable participant payload is invalid")
     setting_data = validate_setting_character_data(
@@ -684,7 +701,7 @@ def load_reusable_participant(
     )
     authored_profile = (
         _validated_authored_profile((root / "profile.md").read_bytes().decode("utf-8"))
-        if format_version in {3, 4, 5}
+        if format_version in {3, 4, 5, 6}
         else None
     )
     if authored_profile is not None and (
@@ -705,11 +722,14 @@ def load_reusable_participant(
     if authored_profile is not None:
         identity["authored_profile"] = authored_profile
     source_profile = validate_source_profile(record.get("source_profile"))
-    if format_version == 5:
+    if format_version in {5, 6}:
         identity["source_profile"] = source_profile
-    if format_version in {4, 5}:
+    if format_version in {4, 5, 6}:
         identity["payload"]["setting_data"] = setting_data
-    if format_version in {2, 3, 4, 5}:
+    visuals = validate_character_visuals(payload.get("visuals"))
+    if format_version == 6:
+        identity["payload"]["visuals"] = visuals
+    if format_version in {2, 3, 4, 5, 6}:
         identity.update(
             {
                 "campaign_setting_id": campaign_setting.package_id,
@@ -735,6 +755,7 @@ def load_reusable_participant(
         name=name,
         summary=str(record["summary"]),
         source_profile=source_profile,
+        visuals=visuals,
         authored_profile=authored_profile,
         content_sha256=content_sha256,
         package_id=package.package_id,

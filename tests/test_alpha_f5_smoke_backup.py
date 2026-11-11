@@ -403,7 +403,7 @@ def test_f5_smoke_migration_from_f3(tmp_path: Path) -> None:
         )
     finally:
         connection.close()
-        assert version == 12
+        assert version == 13
     assert (5, _MIGRATION_5_NAME, _MIGRATION_5_SHA256) in migrations
     assert (6, _MIGRATION_6_NAME, _MIGRATION_6_SHA256) in migrations
     assert (7, _MIGRATION_7_NAME, _MIGRATION_7_SHA256) in migrations
@@ -600,7 +600,7 @@ def test_material_migration_preserves_reopenable_predecessor_source(tmp_path: Pa
         ) == ((1,), (2,), (3,))
 
     with sqlite3.connect(database) as connection:
-        assert connection.execute("PRAGMA user_version").fetchone()[0] == 12
+        assert connection.execute("PRAGMA user_version").fetchone()[0] == 13
 
     with AuthorityOwner.open(preserved, "owner-reopen-preserved") as owner:
         assert owner.snapshot("campaign-preserve-source").display_name == (
@@ -700,7 +700,7 @@ def test_startup_v5_to_v6_preserves_reopenable_predecessor_source(tmp_path: Path
     with sqlite3.connect(preserved) as connection:
         assert connection.execute("PRAGMA user_version").fetchone()[0] == 5
     with sqlite3.connect(database) as connection:
-        assert connection.execute("PRAGMA user_version").fetchone()[0] == 12
+        assert connection.execute("PRAGMA user_version").fetchone()[0] == 13
     print("F5 STARTUP MIGRATION SOURCE", "live=8", "preserved=5")
 
 
@@ -737,6 +737,7 @@ def test_portable_recovery_binds_path_free_migration_provenance(tmp_path: Path) 
         10,
         11,
         12,
+        13,
     ]
     assert [item["extension_name"] for item in provenance["schema_extensions"]] == sorted(
         [
@@ -812,7 +813,7 @@ def test_portable_export_rejects_re_signed_migration_provenance(tmp_path: Path) 
 
 
 @pytest.mark.parametrize("matching_migration_history", [True, False])
-@pytest.mark.parametrize("source_version", [9, 10, 11])
+@pytest.mark.parametrize("source_version", [9, 10, 11, 12])
 def test_prior_portable_archive_preserves_its_source_version_on_recovery(
     tmp_path: Path, matching_migration_history: bool, source_version: int,
 ) -> None:
@@ -844,7 +845,7 @@ def test_prior_portable_archive_preserves_its_source_version_on_recovery(
     prior_rows = []
     for line in dict(members)["authority.jsonl"].splitlines():
         record = json.loads(line)
-        if record["table"] == "agent_sessions":
+        if record["table"] == "agent_sessions" and source_version < 12:
             del record["row"]["reasoning_effort"]
             del record["row"]["reasoning_effort_once"]
         prior_rows.append(
@@ -854,6 +855,10 @@ def test_prior_portable_archive_preserves_its_source_version_on_recovery(
     manifest["non_manifest_members"][0]["byte_count"] = len(authority_bytes)
     manifest["non_manifest_members"][0]["sha256"] = hashlib.sha256(authority_bytes).hexdigest()
     manifest["source_authority_schema_version"] = source_version
+    manifest["table_row_counts"] = {
+        table: manifest["table_row_counts"][table]
+        for table in campaign_archive.authority_tables(source_version)
+    }
     manifest["source_authority_schema_identity_sha256"] = (
         campaign_archive.source_authority_schema_claim_sha256(source_version)
     )

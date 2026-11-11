@@ -203,6 +203,7 @@
           <span class="view-label-wide">Story</span><span class="view-label-narrow">Story</span>
         </button>
       </div>
+      <button class="btn btn-secondary btn-sm" id="image-art-btn" type="button" aria-haspopup="dialog">Images</button>
       <button class="sidebar-icon-button" id="toggle-right-sidebar-btn" type="button"
               aria-label="Hide game panels" aria-expanded="true" aria-controls="right-sidebar" title="Hide game panels">
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/></svg>
@@ -314,6 +315,8 @@
                       data-start-creation-subflow="player_character">Create New Player Character</button>
               <button type="button" class="btn btn-secondary btn-sm"
                       id="delete-reusable-player-btn" hidden>Delete Saved Character</button>
+              <button type="button" class="btn btn-secondary btn-sm"
+                      id="export-reusable-player-btn" hidden>Export Character File…</button>
               <fieldset class="companion-picker">
                 <legend>Companions <span id="rift-companion-policy"></span></legend>
                 <div id="rift-companions"></div>
@@ -327,6 +330,8 @@
                 <p class="construction-summary" id="character-profile-summary" aria-live="polite"></p>
                 <button type="button" class="btn btn-secondary btn-sm"
                         id="adapt-character-profile-btn" disabled>Adapt as Companion</button>
+                <button type="button" class="btn btn-secondary btn-sm"
+                        id="export-character-profile-btn" disabled>Export Character File…</button>
               </div>
               <button type="button" class="btn btn-secondary btn-sm"
                       id="complete-required-characters-btn" hidden
@@ -931,6 +936,7 @@
           <header class="settings-page-head">
             <h2>ChatGPT account</h2>
             <p class="settings-lead">Use your ChatGPT subscription in Sylvia. You sign in through your browser; no API key is needed.</p>
+            <button type="button" class="btn btn-secondary" id="image-art-settings-btn">Image generation settings</button>
           </header>
           <div class="tutorial-entry"><button type="button" class="btn btn-secondary btn-sm" data-tutorial-offer="subscription">Need help connecting your ChatGPT subscription?</button></div>
           <p class="settings-note">Codex manages the sign-in. Messages and relevant campaign or Builder content go to OpenAI
@@ -1070,6 +1076,38 @@
                   <button class="btn btn-secondary" id="cancel-character-card-btn" type="button">Cancel</button>
                 </div>
               </section>
+              <div class="settings-row">
+                <div>
+                  <strong>Character file</strong>
+                  <p>A character exported from Sylvia, with its artwork and framing. You preview it before anything is saved.</p>
+                </div>
+                <button class="btn btn-secondary" id="import-character-file-btn" type="button">Import Character File…</button>
+              </div>
+              <section id="character-file-preview" class="character-card-preview" aria-labelledby="character-file-preview-title" hidden>
+                <h4 id="character-file-preview-title"></h4>
+                <p id="character-file-preview-status" class="character-card-preview-status"></p>
+                <p id="character-file-preview-text"></p>
+                <p id="character-file-preview-contents"></p>
+                <p id="character-file-preview-guidance"></p>
+                <div class="character-card-preview-actions">
+                  <button class="btn btn-primary" id="confirm-character-file-btn" type="button">Import character</button>
+                  <button class="btn btn-secondary" id="cancel-character-file-btn" type="button">Cancel</button>
+                </div>
+              </section>
+            </div>
+          </section>
+          <section class="settings-section" aria-labelledby="saved-characters-heading">
+            <h3 class="settings-eyebrow" id="saved-characters-heading">Saved characters</h3>
+            <div class="settings-card settings-action-list">
+              <p>Export a saved character to share it or use it on another computer. The file keeps its artwork and
+                framing. Playable characters keep their exact Ruleset and Setting.</p>
+              <label for="character-export-select">Character</label>
+              <select id="character-export-select" aria-describedby="character-export-summary" disabled>
+                <option value="">Loading saved characters…</option>
+              </select>
+              <p class="settings-help" id="character-export-summary" aria-live="polite"></p>
+              <button class="btn btn-secondary" id="export-character-file-btn" type="button" disabled>Export Character File…</button>
+              <p class="settings-help" id="character-export-status" role="status" aria-live="polite"></p>
             </div>
           </section>
           <section class="settings-section" aria-labelledby="ruleset-browser-title">
@@ -1379,6 +1417,8 @@
 <script src="tutorials.js"></script>
 <script src="desktop-updates.js"></script>
 <script src="desktop-drafts.js"></script>
+<link rel="stylesheet" href="image-art.css">
+<script src="image-art.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

@@ -36,3 +36,15 @@ A massive, many-legged serpent that crawled through the Rift from a storm-wracke
 **Constrict.** +10 to hit, reach 5 ft., 17 (2d10 + 6) bludgeoning + 17 (5d6) lightning. Large or smaller grappled (escape DC 16). Restrained until grapple ends. Can only constrict one creature at a time.
 **Lightning Breath.** 20-foot line, DC 16 DEX, 66 (12d10) lightning (half on success). Recharges 5-6.
 **Swallow.** Bite attack against Medium or smaller grappled creature. Swallowed: blinded, restrained, 42 (12d6) acid at start of each rift behir turn. If rift behir takes 30+ damage from inside in a single turn, DC 20 CON save or regurgitate.
+
+## Appearance and artwork
+
+A massive long-bodied serpent with many matched pairs of short powerful clawed legs, an elongated horned reptilian head, two amber eyes and a long tapering tail. Deep storm-blue overlapping scales, paler blue-gray belly plates and restrained violet Rift glimmers along a few scale seams. One long continuous body follows a gentle curve from the single head to a single tapering tail, with the successive leg pairs clearly readable. No wings, humanoid limbs, jewelry, lightning breath or prey.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/676d8272d09e390ea706df5254008f420607f76efe86ff401c338c00c1734cb5.png)
+
+[Full-body reference](../../assets/characters/db34e46a9ebd559642eb53b9025d0503606eceaa93646c656fcb6716e3007cd5.png)
+
+[Multiview reference sheet](../../assets/characters/5523462b3a2d377467e82df71a405c177c4dea502bd5701a79faa5ee3f516e8c.png)

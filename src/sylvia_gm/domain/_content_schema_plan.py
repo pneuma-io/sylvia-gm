@@ -61,6 +61,13 @@ CAMPAIGN_PLAN_SCHEMA: dict[str, object] = {
             "$ref": "#/$defs/identity",
             "description": "Stable logical Plan identity used to derive the saved artifact ID.",
         },
+        "artwork_source_plan_id": {
+            "$ref": "#/$defs/identity",
+            "description": (
+                "Optional original Plan identity for unchanged cast artwork in a reusable copy. "
+                "Exact source passage, subject and Setting must still match the prepared art."
+            ),
+        },
         "revision": {
             "type": "integer",
             "minimum": 1,

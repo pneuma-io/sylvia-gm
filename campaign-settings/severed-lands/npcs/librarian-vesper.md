@@ -17,3 +17,15 @@ She's also the Athenaeum's unofficial archivist of forbidden research. When a sc
 ## Personality
 
 Vesper is quiet, precise, and utterly devoted to the collection. She treats books like living things. She treats dangerous books like dangerous animals — respect them, don't provoke them, know when to back away.
+
+## Appearance and artwork
+
+An adult settled Human woman appearing in her late sixties, with a compact medium build, warm light olive skin, dark green-brown eyes, a narrow gently lined face and silver-gray hair neatly secured in a low bun. Plain rectangular bronze-rim reading spectacles with clear lenses and visible eyes. A quiet precise attentive expression and composed careful posture. A well-kept muted sage wool cardigan-jacket over a cream high-collared blouse, a plain rust-brown ankle-length skirt and practical dark brown leather shoes. A simple narrow leather belt carries one small closed pouch; empty relaxed hands. Her experienced librarian's care and precision follow the authored profile; age, features, spectacles and clothing are editable visual defaults. No invented Athenaeum insignia, hidden research, forbidden notes, readable book or document, keys to dangerous shelves, magical effects, invented history, uniform from another setting or revealing private knowledge.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/78f98f458093f90301ef53c9597896a187230191dc27e398688bb8e346d2a7be.png)
+
+[Full-body reference](../assets/characters/363c11ebda42dfd42a0004bebd47eaa83e0ba005b48a3f1276789d273ffe82a2.png)
+
+[Multiview reference sheet](../assets/characters/9d3dea1c220f655cae1ec4b6599f8ec883c4e072126fdd7114e63f8cf49fa5be.png)

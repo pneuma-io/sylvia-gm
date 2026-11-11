@@ -477,6 +477,7 @@ def _narrative_input_schema(
                     "minLength": 1,
                     "description": (
                         "Optional admitted Setting or participant source path for this identity. "
+                        "Keep the exact source path to reuse prepared NPC/enemy artwork. "
                         "Omit when there is no admitted source; never send an empty string."
                     ),
                 },

@@ -1549,6 +1549,10 @@ def reclaim(connection: sqlite3.Connection) -> ReclamationResult:
         str(row[0]) for row in connection.execute("SELECT blob_sha256 FROM package_recovery_roots")
     )
     all_blobs = {str(row[0]) for row in connection.execute("SELECT blob_sha256 FROM package_blobs")}
+    if connection.execute("SELECT 1 FROM sqlite_master WHERE name='image_requests'").fetchone():
+        rooted_blobs.update(str(row[0]) for row in connection.execute(
+            "SELECT result_sha256 FROM image_requests WHERE result_sha256 IS NOT NULL"
+        ))
     deletable = all_blobs - rooted_blobs
     for blob in sorted(deletable):
         connection.execute("DELETE FROM package_blobs WHERE blob_sha256 = ?", (blob,))

@@ -19,6 +19,7 @@ from dataclasses import dataclass
 from typing import Any, cast
 
 from sylvia_gm.agent._campaign_memory import select_campaign_memory
+from sylvia_gm.agent._image_art_tools import call_image_art_tool, image_art_model_tools
 from sylvia_gm.agent._inference_identity import inference_context_id
 from sylvia_gm.agent._native_continuation import attach_chat_metadata
 from sylvia_gm.agent._provider_runtime import _PROVIDER_ASYNC_RUNTIME
@@ -2177,6 +2178,7 @@ class ProviderSessionAdapter:
             discovery_id = f"mcp-discovery-{uuid.uuid4().hex}"
             current_catalog = provider_input.current_catalog(discovery_id)
             if provider_input.session.role is WriterRole.DM:
+                current_catalog = (*current_catalog, *image_art_model_tools(self._owner))
                 queue_tools = action_sequence_model_tools(self._owner)
                 if queue_tools and self._owner.snapshot(campaign_id).package_lock.entries:
                     current_catalog = (
@@ -2187,7 +2189,7 @@ class ProviderSessionAdapter:
             if participant_ooc_only:
                 current_catalog = tuple(
                     tool for tool in current_catalog
-                    if tool.category in {"reference", "narrative_state"}
+                    if tool.category in {"reference", "narrative_state", "image_generation"}
                 )
             if provider_input.control.cancelled:
                 raise CommandRejected("Agent session provider work was cancelled")
@@ -3322,6 +3324,18 @@ class ProviderSessionAdapter:
                         "instruction": "Retry this tool with every required argument.",
                     }
                     local_tool_failures.add(assembly.call_id)
+                    continue
+                if (catalog_tool.package_id == "sylvia.application"
+                        and catalog_tool.capability.startswith("image_art.")):
+                    try:
+                        local_tool_results[assembly.call_id] = call_image_art_tool(
+                            self._owner, provider_input.session.session_id,
+                            catalog_tool.name, parameters,
+                        )
+                    except ValueError as error:
+                        local_tool_results[assembly.call_id] = {
+                            "success": False, "error": str(error),
+                        }
                     continue
                 if (catalog_tool.package_id == "sylvia.application"
                         and catalog_tool.capability.startswith("action_sequence.")):

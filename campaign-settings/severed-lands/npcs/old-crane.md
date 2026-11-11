@@ -21,3 +21,15 @@ Crane is distant, amused, and evasive when asked direct questions. He speaks in 
 ## Hook
 
 Crane is signaling Waystation — three mirrored flashes, the emergency code. He hasn't signaled in years. The last time he did, a Rift surge reshaped the eastern Cairnfields. Whatever he's seen from the Spire, it's worse.
+
+## Appearance and artwork
+
+An extremely elderly Human man with a very lean stooped build, weathered light bronze skin, deeply lined face, long white eyebrows, a narrow wispy white beard and thin white hair tied in a small loose topknot. Dark gray eyes and a faint amused distant expression. Layered threadbare ash-gray monk robes with faded indigo patches, a simple cloth waist tie and worn flat cloth shoes. Empty relaxed hands; no weapon. One clearly readable physical silhouette in a still pose; do not show motion echoes, copies, ghost bodies or an invented revealed origin. No symbols, text, magic rays or jewelry.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/0020e49bd1a0cc445ab8b7fbd2b998012263f721ebc7cef6768fcf72c1c62426.png)
+
+[Full-body reference](../assets/characters/1da585647c41b00eccb6188973e04cf53f8825cc8e64af60114fa5bb8a78e3cd.png)
+
+[Multiview reference sheet](../assets/characters/669f48e57ed4636c180c382286068505ec90be597d4ec1aa83c3844a1f815d9b.png)
