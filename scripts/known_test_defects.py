@@ -167,27 +167,12 @@ KNOWN_DEFECTS: dict[str, KnownDefect] = {
         "Cast valid Mage Armor with carried Materials and contact facts, then inspect its saved source/lifetime before the case's equip, unprepare, rest or reopen continuation.",
         category='suspected retained contract discrepancy',
     ),
-    'tests/test_srd_lite_defenses.py::test_mage_real_armor_equip_permanently_retires_and_old_retry_cannot_retire_new_cast': KnownDefect(
-        'The admitted Mage Armor effect lacks the retained preparation-source or until-Long-Rest lifetime contract',
-        "Cast valid Mage Armor with carried Materials and contact facts, then inspect its saved source/lifetime before the case's equip, unprepare, rest or reopen continuation.",
-        category='suspected retained contract discrepancy',
-    ),
     'tests/test_srd_lite_defenses.py::test_mage_real_far_target_rejects_before_spend_even_with_touch_claim[cast_spell_outside_combat]': KnownDefect(
         'A free-exploration Mage Armor cast accepts a false touch claim for an actual distant recipient',
         'Place the validated companion 30 feet away, claim distance zero/touch true, then attempt the public free-exploration Mage Armor cast and compare payment/state.',
         category='suspected retained contract discrepancy',
     ),
     'tests/test_srd_lite_defenses.py::test_mage_same_caster_two_real_grants_do_not_lose_independent_ownership': KnownDefect(
-        'The admitted Mage Armor effect lacks the retained preparation-source or until-Long-Rest lifetime contract',
-        "Cast valid Mage Armor with carried Materials and contact facts, then inspect its saved source/lifetime before the case's equip, unprepare, rest or reopen continuation.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_defenses.py::test_mage_trained_shield_and_stronger_real_unarmored_base_feed_attack[False]': KnownDefect(
-        'The admitted Mage Armor effect lacks the retained preparation-source or until-Long-Rest lifetime contract',
-        "Cast valid Mage Armor with carried Materials and contact facts, then inspect its saved source/lifetime before the case's equip, unprepare, rest or reopen continuation.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_defenses.py::test_mage_trained_shield_and_stronger_real_unarmored_base_feed_attack[True]': KnownDefect(
         'The admitted Mage Armor effect lacks the retained preparation-source or until-Long-Rest lifetime contract',
         "Cast valid Mage Armor with carried Materials and contact facts, then inspect its saved source/lifetime before the case's equip, unprepare, rest or reopen continuation.",
         category='suspected retained contract discrepancy',
@@ -416,6 +401,11 @@ KNOWN_DEFECTS: dict[str, KnownDefect] = {
         'The admitted utility spell behavior differs from retained self/range/source/lifetime boundaries',
         "Cast Darkvision or Speak with Animals through the actual admitted owner using the case's target boundary, paid cast, death, unprepare or earned-rest flow.",
         category='suspected retained contract discrepancy',
+    ),
+    'tests/test_integrated_worker_seams.py::test_guardian_entry_damage_does_not_repeat_on_exit_or_reentry': KnownDefect(
+        "Ending a turn after creating Guardian of Faith rejects its saved actor as absent",
+        "Cast Guardian of Faith at an admitted position, start combat, then end the caster turn. The occupied-space resolver calls query_srd_creature_space_pair and rejects faith_guardian as missing before the entry-damage assertions.",
+        "suspected retained contract discrepancy",
     ),
 }
 

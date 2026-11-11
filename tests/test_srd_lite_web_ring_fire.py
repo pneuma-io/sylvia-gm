@@ -24,7 +24,7 @@ def web_runtime():
         data = yaml.load(archive.read('packages/' + NAMESPACE + '/runtime/ruleset.yaml'), Loader=yaml.CSafeLoader)
     pool = data.get('parameter_declarations', {})
     for tool in data['tools'].values():
-        tool['parameters'] = [deepcopy(pool[row]) if isinstance(row, str) else row for row in tool['parameters']]
+        tool['parameters'] = [deepcopy(pool[row]) if isinstance(row, str) else row for row in tool.get("parameters", [])]
     if os.environ.get('SRD_LITE_PATCH_WEB_RING') == '1':
         from scripts.srd_retained_web_fire_v2 import _expose_tool, _observe_tool
         from scripts.srd_spell_magic_zones import _when

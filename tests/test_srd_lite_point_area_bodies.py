@@ -25,7 +25,7 @@ def bodies_runtime():
         data = yaml.load(archive.read('packages/' + NAMESPACE + '/runtime/ruleset.yaml'), Loader=yaml.CSafeLoader)
     pool = data.get('parameter_declarations', {})
     for tool in data['tools'].values():
-        tool['parameters'] = [deepcopy(pool[item]) if isinstance(item, str) else item for item in tool['parameters']]
+        tool['parameters'] = [deepcopy(pool[item]) if isinstance(item, str) else item for item in tool.get("parameters", [])]
     if os.environ.get('POINT_BODIES_PATCH') == '1':
         from scripts.srd_spell_summoning import _area_cover_tools
         from scripts.srd_sunburst_geometry import _sphere_tool, _point_cover
