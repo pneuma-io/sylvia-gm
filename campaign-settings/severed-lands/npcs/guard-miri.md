@@ -24,8 +24,8 @@ An adult Human woman in her early thirties with an athletic lean build, deep war
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/8141b920c712b0d5d72688a85f7eed35fb1eccb106fd17eed9dc4de75c499d97.png)
+[Portrait](../assets/characters/2add8e2553704d0bd238cdedfd245dc9fbad5e12f93b45f28ca430911b2b651c.png)
 
-[Full-body reference](../assets/characters/34091fd6cff0927bf288ec9b978842150d8291f4ae4f0d0cc9dbd6a028e209dc.png)
+[Full-body reference](../assets/characters/93464ffbf4e84beb6063766a7aa12763924ad1bb980989850d638546a8c9a748.png)
 
-[Multiview reference sheet](../assets/characters/9cd209a98c5f24059c56693ac8d51bb143af2194b600a25111e7c7924bee91a1.png)
+[Multiview reference sheet](../assets/characters/39ac7c23ed419fa8cae85c4e229a0fab2fec1a31e325d691de0bfb9a902de9f3.png)

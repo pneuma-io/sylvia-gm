@@ -37,10 +37,10 @@ A minor construct left behind by the Wardens to watch over a dormant Anchor Door
 
 A Medium hovering orb of weathered dark stone and dull iron plates, with one large amber slit-pupil eye, four smaller amber perimeter eyes, a compact toothed split jaw, narrow pale-blue luminous seams, worn iron braces and age cracks. It has no humanoid limbs or clothing.
 
-This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/bc07a201d8c8e751c51ec483b22700f386c665dfddcec7264e58d72725414e31.png)
+[Portrait](../../assets/characters/e83de72b16ac1bbc0e1601db5fee838f7498217e7b934ace2cd2367c87ff6374.png)
 
-[Full-body reference](../../assets/characters/b5d89a10fe76c5cb60806910ee0ebd815725358fdeb72e1b2cec422e3010f2da.png)
+[Full-body reference](../../assets/characters/68bc860fc1162725b1924c6634b297f4de1a7bf6f6904bedadf24fc7a3a5f4d2.png)
 
-[Multiview reference sheet](../../assets/characters/4ab1179654199dd3a6c0221e1fb2811bafcb00d6c024a579f026d77b77b31433.png)
+[Multiview reference sheet](../../assets/characters/0819e543b4d067d45e1ed30bf034400510f05da905dc5e067b2073fa766a1568.png)

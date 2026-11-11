@@ -22,8 +22,8 @@ An adult Human woman in her late forties with medium brown skin, dark brown eyes
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/2579873c5819ffcbd7bc80990b74b1b6b784ff96a1a34a32f17ba881450a885e.png)
+[Portrait](../assets/characters/16ece7ec04a00e334dc76e0b918f70c7c58eadf70a0ddbb3d93f37202372acdc.png)
 
-[Full-body reference](../assets/characters/45993c405459111af401793a20b5ca08ccebb635a77f4d8f01942d1abe59797e.png)
+[Full-body reference](../assets/characters/6da6cdf2cf2355e9d6959afc86b1e0fca1721fc3d15308c07a45365746662dbb.png)
 
-[Multiview reference sheet](../assets/characters/d1e7f8041f038b1d20778dfc72e4ddcb4fc3f0850324165e1f1c734957473a7f.png)
+[Multiview reference sheet](../assets/characters/bf04707534d379f1c446acb8667127e1af67b29d661ec4634b9a4b6cedc9cfc4.png)

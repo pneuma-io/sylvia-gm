@@ -163,50 +163,56 @@
           "package_id": "pneuma.severed-lands",
           "path": "content/monsters/anchor-sentinel.md",
           "sha256": "d10357126413034ddd09484db8b213a3ea1de8bb6533a0ed13c61146a8f43558"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/anchor-sentinel.md",
+          "sha256": "0e14e019e1cb82a44926211c522ff2a03eba488a62d545f97a9a2148635951e9"
         }
       ],
       "visuals": {
         "appearance": "A Medium hovering orb of weathered dark stone and dull iron plates, with one large amber slit-pupil eye, four smaller amber perimeter eyes, a compact toothed split jaw, narrow pale-blue luminous seams, worn iron braces and age cracks. It has no humanoid limbs or clothing.",
         "frame": {
           "x": 0.5,
-          "y": 0.45,
+          "y": 0.5,
           "zoom": 1
         },
         "full_body": {
-          "path": "assets/characters/b5d89a10fe76c5cb60806910ee0ebd815725358fdeb72e1b2cec422e3010f2da.png",
-          "sha256": "b5d89a10fe76c5cb60806910ee0ebd815725358fdeb72e1b2cec422e3010f2da"
+          "path": "assets/characters/68bc860fc1162725b1924c6634b297f4de1a7bf6f6904bedadf24fc7a3a5f4d2.png",
+          "sha256": "68bc860fc1162725b1924c6634b297f4de1a7bf6f6904bedadf24fc7a3a5f4d2"
         },
         "reference_sheet": {
-          "path": "assets/characters/4ab1179654199dd3a6c0221e1fb2811bafcb00d6c024a579f026d77b77b31433.png",
-          "sha256": "4ab1179654199dd3a6c0221e1fb2811bafcb00d6c024a579f026d77b77b31433"
+          "path": "assets/characters/0819e543b4d067d45e1ed30bf034400510f05da905dc5e067b2073fa766a1568.png",
+          "sha256": "0819e543b4d067d45e1ed30bf034400510f05da905dc5e067b2073fa766a1568"
         },
         "portrait": {
-          "path": "assets/characters/bc07a201d8c8e751c51ec483b22700f386c665dfddcec7264e58d72725414e31.png",
-          "sha256": "bc07a201d8c8e751c51ec483b22700f386c665dfddcec7264e58d72725414e31"
+          "path": "assets/characters/e83de72b16ac1bbc0e1601db5fee838f7498217e7b934ace2cd2367c87ff6374.png",
+          "sha256": "e83de72b16ac1bbc0e1601db5fee838f7498217e7b934ace2cd2367c87ff6374"
         }
       },
       "outputs": {
         "full_body": {
           "width": 1024,
           "height": 1536,
-          "bytes": 2201395
+          "bytes": 2169507
         },
         "reference_sheet": {
           "width": 1536,
           "height": 1024,
-          "bytes": 2318446
+          "bytes": 2068286
         },
         "portrait": {
           "width": 1254,
           "height": 1254,
-          "bytes": 2261626
+          "bytes": 2143895
         }
       },
       "prompt_set": {
-        "full_body": "Use case: stylized-concept. Asset type: canonical full-body RPG enemy reference, one portrait-orientation PNG 1024x1536. The input image is STYLE ONLY: match its polished naturalistic digital RPG illustration, material detail, soft natural light and plain light neutral backdrop; do not copy its human subject, face, body, clothes or equipment. Subject: an Anchor Sentinel, a Medium hovering ancient guardian from the Severed Lands, with NO human body or limbs. Its editable public visual default is a compact floating orb assembled from weathered dark stone and dull iron plates around one large amber glassy eye. Four smaller lens-like eyes sit around the perimeter; a compact toothed split jaw beneath the central eye suits its bite. Subtle pale-blue light in narrow seams, worn surfaces, asymmetrical age cracks, coherent constructed anatomy. A watchful wary presence, practical ancient fantasy craft rather than modern electronics. Show the entire single creature hovering just above an unobtrusive ground shadow, near-front three-quarter view, all perimeter eyes and the jaw clearly readable, comfortable blank margins. Keep the appearance self-contained: no environment, lore scenes, portal, other creatures, weapons, humanoid hands, legs, clothing, text, labels, UI, frame, faction insignia or magical attack effects. This image shows only visible physical appearance and reveals no identity or backstory.",
-        "reference_sheet": "Use case: stylized-concept. Asset type: canonical multi-view RPG enemy reference sheet, one LANDSCAPE PNG 1536x1024. Input image 1 is the authoritative identity, material, proportions and color reference for the Anchor Sentinel; preserve this exact nonhumanoid creature. Show three separated complete views at common scale: front, exact side profile and back; also one enlarged central-eye-and-jaw detail. The same hovering orb of weathered dark stone and dull iron plates, one large amber slit-pupil eye, four smaller amber perimeter eyes in the same mounts, compact toothed split jaw, narrow pale-blue glowing seams, matching age cracks and plate construction. Respect physical rotation: the back has the same stone shell and iron braces, never an extra front face, and only features genuinely visible from the side appear in profile. Entire creature visible in each view with margins and soft floating shadows on one plain light neutral backdrop. Match the reference's polished naturalistic digital RPG illustration and soft natural lighting. No humanoid bodies or limbs, weapons, clothing, portal, scenery, other species, labels, text, captions, UI, border, faction insignia or attack effects. This is a consistent visual turn-around of one creature, not variants.",
-        "portrait": "Use case: stylized-concept. Asset type: reusable RPG enemy portrait, one SQUARE PNG 1024x1024. Images 1 and 2 are the authoritative full-body and multiview identity references for this exact Anchor Sentinel. Preserve its weathered dark stone and dull iron shell, central amber slit-pupil eye, four smaller amber perimeter eyes in their existing mounts, toothed split jaw, cracks, braces and narrow pale-blue seams. It is a nonhumanoid hovering orb, not a person: never add a human face, neck, shoulders, limbs, clothing or equipment. Show the entire frontal face of this same creature directly toward the viewer, centered and at consistent scale, its large central eye roughly 35 percent down the square and the jaw below. Include sufficient neutral background margin around the complete orb so the perimeter eyes, top shell and jaw survive a circular portrait crop; no tight edge clipping. Match the references' polished naturalistic digital RPG illustration, soft natural light and plain light neutral background. No redesign, extra eyes, repeated faces, text, labels, UI, border, scenery, portal, faction marks or attack effects."
-      }
+        "full_body": "Use case: style-transfer. Asset type: canonical full-body character reference for Sylvia GM's Severed Lands. Create ONE vertical 1024x1536 image of Anchor Sentinel ONLY. The supplied K board is RENDERING STYLE ONLY: do not copy any pictured character's face, body type, costume, hair, props or pose. This new subject's identity follows the written appearance below.\nEstablished appearance (editable visual default; authored canon controls): A Medium hovering orb of weathered dark stone and dull iron plates, with one large amber slit-pupil eye, four smaller amber perimeter eyes, a compact toothed split jaw, narrow pale-blue luminous seams, worn iron braces and age cracks. It has no humanoid limbs or clothing.\nSubject invariants: This is a MEDIUM NONHUMAN HOVERING ORB, not a person, not a humanoid in armor. Keep the exact stone/iron orb anatomy: ONE large amber slit-pupil central eye, FOUR smaller amber perimeter eyes (five total), compact toothed split jaw, narrow pale-blue seams and worn braces. Eyes are embedded in the orb, not long tentacles. No arms, legs, clothing, hair, face transplant, weapons or extra eyes. Show an inert reference pose, no eye-ray attack, food/water spell, portal, fragment or scenery. The existing aberration stat classification and Warden-construct narrative are preserved without resolving them through visual art.\nRendering: original dark heroic tabletop-fantasy painting with recognizable anime-influenced character drawing, designed expressive eyes and grouped hair appropriate to THIS subject's age and species. Deep cool colored shadows, focused warm ivory light, substantial cloth/metal/leather/stone, selective sharp highlights, oil-like painted volume and soft lost edges. Preserve all stated skin, hair and costume colors. No photographic skin, 3D render, glossy merchandise finish or copied franchise design.\nComposition: exactly ONE complete figure or orb, near-front three-quarter reference stance, both hands and every item clearly readable. Complete crown, hems, boots or entire orb inside the frame with generous 7% top/bottom and side margins. Plain deep charcoal neutral ground, enough edge contrast to inspect the silhouette, no scenery. Coherent anatomy and gear construction. No text, writing, labels, logo, border, panels, inset portraits, extra people or extra views. This image will be the canonical identity input for subsequent multiview and portrait references.",
+        "reference_sheet": "Use case: identity-preserve. Create a canonical FOUR-VIEW reference sheet of Anchor Sentinel, the ONE subject in the supplied full-body reference. Image 1 is authoritative identity AND accepted K rendering. Preserve this EXACT face/head, age, build, hair, skin colors, costume layers, equipment topology and material colors. No redesign, new face, new gear or mirrored anatomical item placement.\nEstablished appearance: A Medium hovering orb of weathered dark stone and dull iron plates, with one large amber slit-pupil eye, four smaller amber perimeter eyes, a compact toothed split jaw, narrow pale-blue luminous seams, worn iron braces and age cracks. It has no humanoid limbs or clothing.\nSubject invariants: This is a MEDIUM NONHUMAN HOVERING ORB, not a person, not a humanoid in armor. Keep the exact stone/iron orb anatomy: ONE large amber slit-pupil central eye, FOUR smaller amber perimeter eyes (five total), compact toothed split jaw, narrow pale-blue seams and worn braces. Eyes are embedded in the orb, not long tentacles. No arms, legs, clothing, hair, face transplant, weapons or extra eyes. Show an inert reference pose, no eye-ray attack, food/water spell, portal, fragment or scenery. The existing aberration stat classification and Warden-construct narrative are preserved without resolving them through visual art.\nOne LANDSCAPE 1536x1024 image: four COMPLETE views at equal scale, left to right FRONT, THREE-QUARTER, SIDE and BACK. Keep tops, hands, hems/boots or entire orb fully inside generous margins; coherent body scale, believable rotation and unchanged anatomy. For a humanoid, preserve the face/hair in visible angles, each clothing layer and the same props held naturally. For the Anchor Sentinel, show ONLY the same limb-free orb rotated: its front has one central and four smaller perimeter eyes plus compact jaw, with those same features becoming occluded as the orb turns; do not duplicate the front eye or jaw on the back, add limbs/tentacles, or invent extra eyes. Each orb view is the same full unit.\nMatch the supplied dark heroic fantasy painting: anime-influenced drawing appropriate to this subject's age/species, warm ivory light, cool colored shadows, oil-like painted material weight and selective edges. Plain charcoal neutral ground, enough silhouette contrast to inspect each complete view. No scenery, attacks, magic effects, text, labels, numbers, borders, inset portraits or extra characters.",
+        "portrait": "Use case: identity-preserve. Create ONE SQUARE 1024x1024 reusable portrait of Anchor Sentinel. Input 1 is the canonical full-body design; input 2 is the canonical multiview identity reference. These show ONE subject. Preserve its exact face/head, age, skin/eye/hair colors, build and upper costume/gear.\nEstablished appearance: A Medium hovering orb of weathered dark stone and dull iron plates, with one large amber slit-pupil eye, four smaller amber perimeter eyes, a compact toothed split jaw, narrow pale-blue luminous seams, worn iron braces and age cracks. It has no humanoid limbs or clothing.\nSubject invariants: This is a MEDIUM NONHUMAN HOVERING ORB, not a person, not a humanoid in armor. Keep the exact stone/iron orb anatomy: ONE large amber slit-pupil central eye, FOUR smaller amber perimeter eyes (five total), compact toothed split jaw, narrow pale-blue seams and worn braces. Eyes are embedded in the orb, not long tentacles. No arms, legs, clothing, hair, face transplant, weapons or extra eyes. Show an inert reference pose, no eye-ray attack, food/water spell, portal, fragment or scenery. The existing aberration stat classification and Warden-construct narrative are preserved without resolving them through visual art.\nFor humanoids: head and upper shoulders only, facing gently toward viewer, calm character-appropriate expression. Complete hair/head silhouette inside the square with comfortable top/side margins; center horizontally, eye line near 40% image height, chin near 65-70%, shoulders in the lower quarter. Do not raise cups, loaves, herbs, hands or cases across the face. Fume's goggles remain above his visible eyes; Miri's necklace stays fully hidden by her CLOSED collar; Auntie Salt remains elderly. For Anchor Sentinel: the full FRONT orb is its portrait, complete outline inside generous circular-crop-safe margins, one central eye, four smaller perimeter eyes and compact jaw readable; no human shoulders or invented head/hair.\nRendering: match the same K dark heroic fantasy painting with recognizable anime-influenced character drawing, warm ivory focal light and deep cool shadows. Keep distinct ages/features legible at 64-pixel UI size, painted surfaces and true complexion/colors; no photoreal skin or 3D rendering. Plain charcoal ground, enough outline contrast. One portrait only, no extra panels, scene, border, lettering, labels, watermark or effects."
+      },
+      "style_id": "severed-lands-dark-heroic-fantasy-k-v1"
     },
     {
       "id": "srd-starter-druid",
@@ -797,50 +803,57 @@
           "path": "npcs/baker-tessa.md",
           "sha256": "b47fe274668368992046981bf044e05a46214f37890ef709a5473c70bff0e087",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/baker-tessa.md",
+          "sha256": "ca4aa588b06f101478ee901d3651d43560ecb11485fc0b5dd169303e9a0c2ea6",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
         "appearance": "An adult Human woman in her late thirties with a sturdy build, fair warm skin with freckles, blue-green eyes, a round friendly face and thick auburn hair braided and pinned back. A rust-brown rolled-sleeve work dress, cream flour-dusted apron, plain leather belt and practical brown boots. Bare forearms with a light dusting of flour, a small linen cloth and one simple round loaf in her hands. Warm, practical expression.",
-        "full_body": {
-          "path": "assets/characters/a4677d0ef84b76e8ca6c5935d3b837fadab5d19b8511a592e727366d2995a4c2.png",
-          "sha256": "a4677d0ef84b76e8ca6c5935d3b837fadab5d19b8511a592e727366d2995a4c2"
-        },
-        "reference_sheet": {
-          "path": "assets/characters/b3c0bd4232cfeee3e47bfda305cb6ecba81865cd1a9ddd53fb50a7cd57530177.png",
-          "sha256": "b3c0bd4232cfeee3e47bfda305cb6ecba81865cd1a9ddd53fb50a7cd57530177"
-        },
-        "portrait": {
-          "path": "assets/characters/f6d66aee896b350693861e4a95fddca13d39af59990d0576435cdfe067b4b89b.png",
-          "sha256": "f6d66aee896b350693861e4a95fddca13d39af59990d0576435cdfe067b4b89b"
-        },
         "frame": {
           "x": 0.5,
           "y": 0.35,
           "zoom": 1
+        },
+        "full_body": {
+          "path": "assets/characters/c0e8ad7b98d15ba18096922e96e2ba2541ffccad3ba3bf8a4edf63d0b3c4e9de.png",
+          "sha256": "c0e8ad7b98d15ba18096922e96e2ba2541ffccad3ba3bf8a4edf63d0b3c4e9de"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/79a4cd276fe4ecb03e2e49ab71640c1e7f2aac36fb440aa47be6dd12bc256b05.png",
+          "sha256": "79a4cd276fe4ecb03e2e49ab71640c1e7f2aac36fb440aa47be6dd12bc256b05"
+        },
+        "portrait": {
+          "path": "assets/characters/9a47dd0f5fc1746bd3b31de3a743745396356e1a400bc4993924eaaaa54f38d1.png",
+          "sha256": "9a47dd0f5fc1746bd3b31de3a743745396356e1a400bc4993924eaaaa54f38d1"
         }
       },
       "outputs": {
         "full_body": {
           "width": 1024,
           "height": 1536,
-          "bytes": 2189605
+          "bytes": 2226129
         },
         "reference_sheet": {
           "width": 1536,
           "height": 1024,
-          "bytes": 2725069
+          "bytes": 2338554
         },
         "portrait": {
           "width": 1254,
           "height": 1254,
-          "bytes": 2602875
+          "bytes": 2420607
         }
       },
       "prompt_set": {
-        "full_body": "Use case: stylized-concept. Production canonical full-body reference for Sylvia GM's Severed Lands premade catalogue. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG character illustration, plain light neutral background, soft natural studio light and subtle grounding shadow. Exactly one complete standing figure, top of hair to boot or shoe soles, inside comfortable margins; relaxed near-front three-quarter pose, clear face and physically sound anatomy. Character: Tessa. Authored requirements: Thornwall baker; a practical, warm community craftswoman from a family of bakers. Her food is ordinary food, without magical or mechanical effects. Appearance: An adult Human woman in her late thirties with a sturdy build, fair warm skin with freckles, blue-green eyes, a round friendly face and thick auburn hair braided and pinned back. A rust-brown rolled-sleeve work dress, cream flour-dusted apron, plain leather belt and practical brown boots. Bare forearms with a light dusting of flour, a small linen cloth and one simple round loaf in her hands. Warm, practical expression. Details not specified by the authored text are editable visual defaults, without changing biography, mechanics or secrets. No invented home, faction heraldry, religious symbols, labels or game statistics. No text, writing, borders, montage, UI, environment, scenery, magic effects or additional figures. Keep carried items modest and recognizable.",
-        "reference_sheet": "Use case: identity-preserve. Production canonical multi-view reference sheet for Tessa in Sylvia GM's Severed Lands. Input image 1 is the authoritative full-body identity reference. One landscape PNG, 1536x1024. Polished naturalistic digital RPG illustration, plain light neutral background, soft natural studio light. Three complete figures at identical scale: straight front, exact side profile, straight back; plus one enlarged directly forward head detail. Preserve the exact face, apparent adult age, body proportions, skin, eye color, hair arrangement, costume construction, colors, wear and equipment of input image 1. An adult Human woman in her late thirties with a sturdy build, fair warm skin with freckles, blue-green eyes, a round friendly face and thick auburn hair braided and pinned back. A rust-brown rolled-sleeve work dress, cream flour-dusted apron, plain leather belt and practical brown boots. Bare forearms with a light dusting of flour, a small linen cloth and one simple round loaf in her hands. Warm, practical expression. Authored requirements: Thornwall baker; a practical, warm community craftswoman from a family of bakers. Her food is ordinary food, without magical or mechanical effects. Outfit and props must remain physically consistent between views, with complete head and boot/shoe soles inside comfortable margins. Keep the face readable and unobstructed. No new accessories, new powers, character redesign, extra people, captions, writing, labels, borders, UI, scenery, symbols or magical effects.",
-        "portrait": "Use case: identity-preserve. Aligned reusable square portrait of Tessa for Sylvia GM. Input image 1 is the canonical full-body identity, and image 2 is this character's canonical multi-view sheet. One square PNG, 1024x1024. Polished naturalistic digital RPG illustration, plain light neutral background and soft natural studio light. Preserve the exact face, apparent adult age, skin, eye color, hair arrangement and upper clothing from these references. An adult Human woman in her late thirties with a sturdy build, fair warm skin with freckles, blue-green eyes, a round friendly face and thick auburn hair braided and pinned back. A rust-brown rolled-sleeve work dress, cream flour-dusted apron, plain leather belt and practical brown boots. Bare forearms with a light dusting of flour, a small linen cloth and one simple round loaf in her hands. Warm, practical expression. Authored constraints: Thornwall baker; a practical, warm community craftswoman from a family of bakers. Her food is ordinary food, without magical or mechanical effects. Composition: head and upper shoulders only, directly forward, upright head without tilt, level eyes facing viewer. Center the face with the eye line at 35 percent of image height, consistent head scale, and comfortable space above all hair and at both sides for adjustable circular cropping. Keep the face unobstructed. Preserve the referenced character's characteristic restrained expression; no exaggerated expression or redesign. No hands or carried props, weapons, cup, loaf, herbs, case, satchel or medicine inside the crop.  No text, labels, borders, UI, scenery, symbols or magic."
-      }
+        "full_body": "Use case: style-transfer. Asset type: canonical full-body character reference for Sylvia GM's Severed Lands. Create ONE vertical 1024x1536 image of Tessa ONLY. The supplied K board is RENDERING STYLE ONLY: do not copy any pictured character's face, body type, costume, hair, props or pose. This new subject's identity follows the written appearance below.\nEstablished appearance (editable visual default; authored canon controls): An adult Human woman in her late thirties with a sturdy build, fair warm skin with freckles, blue-green eyes, a round friendly face and thick auburn hair braided and pinned back. A rust-brown rolled-sleeve work dress, cream flour-dusted apron, plain leather belt and practical brown boots. Bare forearms with a light dusting of flour, a small linen cloth and one simple round loaf in her hands. Warm, practical expression.\nSubject invariants: A working baker, sturdy adult in her late thirties, friendly round freckled face. Keep her round loaf and plain work clothes, no weapon, jewelry emblem or magical baking. Her age and build must remain distinct from the youthful figures in the style board.\nRendering: original dark heroic tabletop-fantasy painting with recognizable anime-influenced character drawing, designed expressive eyes and grouped hair appropriate to THIS subject's age and species. Deep cool colored shadows, focused warm ivory light, substantial cloth/metal/leather/stone, selective sharp highlights, oil-like painted volume and soft lost edges. Preserve all stated skin, hair and costume colors. No photographic skin, 3D render, glossy merchandise finish or copied franchise design.\nComposition: exactly ONE complete figure or orb, near-front three-quarter reference stance, both hands and every item clearly readable. Complete crown, hems, boots or entire orb inside the frame with generous 7% top/bottom and side margins. Plain deep charcoal neutral ground, enough edge contrast to inspect the silhouette, no scenery. Coherent anatomy and gear construction. No text, writing, labels, logo, border, panels, inset portraits, extra people or extra views. This image will be the canonical identity input for subsequent multiview and portrait references.",
+        "reference_sheet": "Use case: identity-preserve. Create a canonical FOUR-VIEW reference sheet of Tessa, the ONE subject in the supplied full-body reference. Image 1 is authoritative identity AND accepted K rendering. Preserve this EXACT face/head, age, build, hair, skin colors, costume layers, equipment topology and material colors. No redesign, new face, new gear or mirrored anatomical item placement.\nEstablished appearance: An adult Human woman in her late thirties with a sturdy build, fair warm skin with freckles, blue-green eyes, a round friendly face and thick auburn hair braided and pinned back. A rust-brown rolled-sleeve work dress, cream flour-dusted apron, plain leather belt and practical brown boots. Bare forearms with a light dusting of flour, a small linen cloth and one simple round loaf in her hands. Warm, practical expression.\nSubject invariants: A working baker, sturdy adult in her late thirties, friendly round freckled face. Keep her round loaf and plain work clothes, no weapon, jewelry emblem or magical baking. Her age and build must remain distinct from the youthful figures in the style board.\nOne LANDSCAPE 1536x1024 image: four COMPLETE views at equal scale, left to right FRONT, THREE-QUARTER, SIDE and BACK. Keep tops, hands, hems/boots or entire orb fully inside generous margins; coherent body scale, believable rotation and unchanged anatomy. For a humanoid, preserve the face/hair in visible angles, each clothing layer and the same props held naturally. For the Anchor Sentinel, show ONLY the same limb-free orb rotated: its front has one central and four smaller perimeter eyes plus compact jaw, with those same features becoming occluded as the orb turns; do not duplicate the front eye or jaw on the back, add limbs/tentacles, or invent extra eyes. Each orb view is the same full unit.\nMatch the supplied dark heroic fantasy painting: anime-influenced drawing appropriate to this subject's age/species, warm ivory light, cool colored shadows, oil-like painted material weight and selective edges. Plain charcoal neutral ground, enough silhouette contrast to inspect each complete view. No scenery, attacks, magic effects, text, labels, numbers, borders, inset portraits or extra characters.",
+        "portrait": "Use case: identity-preserve. Create ONE SQUARE 1024x1024 reusable portrait of Tessa. Input 1 is the canonical full-body design; input 2 is the canonical multiview identity reference. These show ONE subject. Preserve its exact face/head, age, skin/eye/hair colors, build and upper costume/gear.\nEstablished appearance: An adult Human woman in her late thirties with a sturdy build, fair warm skin with freckles, blue-green eyes, a round friendly face and thick auburn hair braided and pinned back. A rust-brown rolled-sleeve work dress, cream flour-dusted apron, plain leather belt and practical brown boots. Bare forearms with a light dusting of flour, a small linen cloth and one simple round loaf in her hands. Warm, practical expression.\nSubject invariants: A working baker, sturdy adult in her late thirties, friendly round freckled face. Keep her round loaf and plain work clothes, no weapon, jewelry emblem or magical baking. Her age and build must remain distinct from the youthful figures in the style board.\nFor humanoids: head and upper shoulders only, facing gently toward viewer, calm character-appropriate expression. Complete hair/head silhouette inside the square with comfortable top/side margins; center horizontally, eye line near 40% image height, chin near 65-70%, shoulders in the lower quarter. Do not raise cups, loaves, herbs, hands or cases across the face. Fume's goggles remain above his visible eyes; Miri's necklace stays fully hidden by her CLOSED collar; Auntie Salt remains elderly. For Anchor Sentinel: the full FRONT orb is its portrait, complete outline inside generous circular-crop-safe margins, one central eye, four smaller perimeter eyes and compact jaw readable; no human shoulders or invented head/hair.\nRendering: match the same K dark heroic fantasy painting with recognizable anime-influenced character drawing, warm ivory focal light and deep cool shadows. Keep distinct ages/features legible at 64-pixel UI size, painted surfaces and true complexion/colors; no photoreal skin or 3D rendering. Plain charcoal ground, enough outline contrast. One portrait only, no extra panels, scene, border, lettering, labels, watermark or effects."
+      },
+      "style_id": "severed-lands-dark-heroic-fantasy-k-v1"
     },
     {
       "id": "severed-npc-guard-miri",
@@ -857,50 +870,57 @@
           "path": "npcs/guard-miri.md",
           "sha256": "0904b3092f4cb5d6a98aa05d2eff8e93e470d088f24fc8b429df4951afaf429c",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/guard-miri.md",
+          "sha256": "8be820b8559fca34f288e4c5e54a16138c04883108da720110054b6e5b26677d",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
         "appearance": "An adult Human woman in her early thirties with an athletic lean build, deep warm brown skin, dark brown eyes, a long oval face and tightly braided dark hair gathered behind her head. Plain muted blue-gray guard tunic, closed collar, practical steel mail shirt under a simple dark leather jerkin, dark trousers, brown boots, plain belt and sheathed short sidearm. No helmet so her face is clear. Quiet, composed, sympathetic expression. Her brother's ring and chain remain completely hidden beneath her closed uniform.",
-        "full_body": {
-          "path": "assets/characters/34091fd6cff0927bf288ec9b978842150d8291f4ae4f0d0cc9dbd6a028e209dc.png",
-          "sha256": "34091fd6cff0927bf288ec9b978842150d8291f4ae4f0d0cc9dbd6a028e209dc"
-        },
-        "reference_sheet": {
-          "path": "assets/characters/9cd209a98c5f24059c56693ac8d51bb143af2194b600a25111e7c7924bee91a1.png",
-          "sha256": "9cd209a98c5f24059c56693ac8d51bb143af2194b600a25111e7c7924bee91a1"
-        },
-        "portrait": {
-          "path": "assets/characters/8141b920c712b0d5d72688a85f7eed35fb1eccb106fd17eed9dc4de75c499d97.png",
-          "sha256": "8141b920c712b0d5d72688a85f7eed35fb1eccb106fd17eed9dc4de75c499d97"
-        },
         "frame": {
           "x": 0.5,
           "y": 0.35,
           "zoom": 1
+        },
+        "full_body": {
+          "path": "assets/characters/93464ffbf4e84beb6063766a7aa12763924ad1bb980989850d638546a8c9a748.png",
+          "sha256": "93464ffbf4e84beb6063766a7aa12763924ad1bb980989850d638546a8c9a748"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/39ac7c23ed419fa8cae85c4e229a0fab2fec1a31e325d691de0bfb9a902de9f3.png",
+          "sha256": "39ac7c23ed419fa8cae85c4e229a0fab2fec1a31e325d691de0bfb9a902de9f3"
+        },
+        "portrait": {
+          "path": "assets/characters/2add8e2553704d0bd238cdedfd245dc9fbad5e12f93b45f28ca430911b2b651c.png",
+          "sha256": "2add8e2553704d0bd238cdedfd245dc9fbad5e12f93b45f28ca430911b2b651c"
         }
       },
       "outputs": {
         "full_body": {
           "width": 1024,
           "height": 1536,
-          "bytes": 1913594
+          "bytes": 1929923
         },
         "reference_sheet": {
           "width": 1536,
           "height": 1024,
-          "bytes": 2444054
+          "bytes": 2032162
         },
         "portrait": {
           "width": 1254,
           "height": 1254,
-          "bytes": 2414748
+          "bytes": 2162143
         }
       },
       "prompt_set": {
-        "full_body": "Use case: stylized-concept. Production canonical full-body reference for Sylvia GM's Severed Lands premade catalogue. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG character illustration, plain light neutral background, soft natural studio light and subtle grounding shadow. Exactly one complete standing figure, top of hair to boot or shoe soles, inside comfortable margins; relaxed near-front three-quarter pose, clear face and physically sound anatomy. Character: Miri. Authored requirements: Thornwall gate guard with three years on duty, dutiful and quietly sympathetic. Her brother's ring is worn on a chain UNDER her uniform; do not expose it or illustrate her private grief as an overt emblem. Appearance: An adult Human woman in her early thirties with an athletic lean build, deep warm brown skin, dark brown eyes, a long oval face and tightly braided dark hair gathered behind her head. Plain muted blue-gray guard tunic, closed collar, practical steel mail shirt under a simple dark leather jerkin, dark trousers, brown boots, plain belt and sheathed short sidearm. No helmet so her face is clear. Quiet, composed, sympathetic expression. Her brother's ring and chain remain completely hidden beneath her closed uniform. Details not specified by the authored text are editable visual defaults, without changing biography, mechanics or secrets. No invented home, faction heraldry, religious symbols, labels or game statistics. No text, writing, borders, montage, UI, environment, scenery, magic effects or additional figures. Keep carried items modest and recognizable.",
-        "reference_sheet": "Use case: identity-preserve. Production canonical multi-view reference sheet for Miri in Sylvia GM's Severed Lands. Input image 1 is the authoritative full-body identity reference. One landscape PNG, 1536x1024. Polished naturalistic digital RPG illustration, plain light neutral background, soft natural studio light. Three complete figures at identical scale: straight front, exact side profile, straight back; plus one enlarged directly forward head detail. Preserve the exact face, apparent adult age, body proportions, skin, eye color, hair arrangement, costume construction, colors, wear and equipment of input image 1. An adult Human woman in her early thirties with an athletic lean build, deep warm brown skin, dark brown eyes, a long oval face and tightly braided dark hair gathered behind her head. Plain muted blue-gray guard tunic, closed collar, practical steel mail shirt under a simple dark leather jerkin, dark trousers, brown boots, plain belt and sheathed short sidearm. No helmet so her face is clear. Quiet, composed, sympathetic expression. Her brother's ring and chain remain completely hidden beneath her closed uniform. Authored requirements: Thornwall gate guard with three years on duty, dutiful and quietly sympathetic. Her brother's ring is worn on a chain UNDER her uniform; do not expose it or illustrate her private grief as an overt emblem. Outfit and props must remain physically consistent between views, with complete head and boot/shoe soles inside comfortable margins. Keep the face readable and unobstructed. No new accessories, new powers, character redesign, extra people, captions, writing, labels, borders, UI, scenery, symbols or magical effects.",
-        "portrait": "Use case: identity-preserve. Aligned reusable square portrait of Miri for Sylvia GM. Input image 1 is the canonical full-body identity, and image 2 is this character's canonical multi-view sheet. One square PNG, 1024x1024. Polished naturalistic digital RPG illustration, plain light neutral background and soft natural studio light. Preserve the exact face, apparent adult age, skin, eye color, hair arrangement and upper clothing from these references. An adult Human woman in her early thirties with an athletic lean build, deep warm brown skin, dark brown eyes, a long oval face and tightly braided dark hair gathered behind her head. Plain muted blue-gray guard tunic, closed collar, practical steel mail shirt under a simple dark leather jerkin, dark trousers, brown boots, plain belt and sheathed short sidearm. No helmet so her face is clear. Quiet, composed, sympathetic expression. Her brother's ring and chain remain completely hidden beneath her closed uniform. Authored constraints: Thornwall gate guard with three years on duty, dutiful and quietly sympathetic. Her brother's ring is worn on a chain UNDER her uniform; do not expose it or illustrate her private grief as an overt emblem. Composition: head and upper shoulders only, directly forward, upright head without tilt, level eyes facing viewer. Center the face with the eye line at 35 percent of image height, consistent head scale, and comfortable space above all hair and at both sides for adjustable circular cropping. Keep the face unobstructed. Preserve the referenced character's characteristic restrained expression; no exaggerated expression or redesign. No hands or carried props, weapons, cup, loaf, herbs, case, satchel or medicine inside the crop.  No text, labels, borders, UI, scenery, symbols or magic."
-      }
+        "full_body": "Use case: style-transfer. Asset type: canonical full-body character reference for Sylvia GM's Severed Lands. Create ONE vertical 1024x1536 image of Miri ONLY. The supplied K board is RENDERING STYLE ONLY: do not copy any pictured character's face, body type, costume, hair, props or pose. This new subject's identity follows the written appearance below.\nEstablished appearance (editable visual default; authored canon controls): An adult Human woman in her early thirties with an athletic lean build, deep warm brown skin, dark brown eyes, a long oval face and tightly braided dark hair gathered behind her head. Plain muted blue-gray guard tunic, closed collar, practical steel mail shirt under a simple dark leather jerkin, dark trousers, brown boots, plain belt and sheathed short sidearm. No helmet so her face is clear. Quiet, composed, sympathetic expression. Her brother's ring and chain remain completely hidden beneath her closed uniform.\nSubject invariants: A quiet sympathetic professional gate guard. Her brother's ring and its chain stay COMPLETELY HIDDEN beneath the CLOSED collar and uniform in every view: no necklace, pendant or ring visible anywhere. No invented badge or faction crest. One sheathed sidearm only, no exposed blade.\nRendering: original dark heroic tabletop-fantasy painting with recognizable anime-influenced character drawing, designed expressive eyes and grouped hair appropriate to THIS subject's age and species. Deep cool colored shadows, focused warm ivory light, substantial cloth/metal/leather/stone, selective sharp highlights, oil-like painted volume and soft lost edges. Preserve all stated skin, hair and costume colors. No photographic skin, 3D render, glossy merchandise finish or copied franchise design.\nComposition: exactly ONE complete figure or orb, near-front three-quarter reference stance, both hands and every item clearly readable. Complete crown, hems, boots or entire orb inside the frame with generous 7% top/bottom and side margins. Plain deep charcoal neutral ground, enough edge contrast to inspect the silhouette, no scenery. Coherent anatomy and gear construction. No text, writing, labels, logo, border, panels, inset portraits, extra people or extra views. This image will be the canonical identity input for subsequent multiview and portrait references.",
+        "reference_sheet": "Use case: identity-preserve. Create a canonical FOUR-VIEW reference sheet of Miri, the ONE subject in the supplied full-body reference. Image 1 is authoritative identity AND accepted K rendering. Preserve this EXACT face/head, age, build, hair, skin colors, costume layers, equipment topology and material colors. No redesign, new face, new gear or mirrored anatomical item placement.\nEstablished appearance: An adult Human woman in her early thirties with an athletic lean build, deep warm brown skin, dark brown eyes, a long oval face and tightly braided dark hair gathered behind her head. Plain muted blue-gray guard tunic, closed collar, practical steel mail shirt under a simple dark leather jerkin, dark trousers, brown boots, plain belt and sheathed short sidearm. No helmet so her face is clear. Quiet, composed, sympathetic expression. Her brother's ring and chain remain completely hidden beneath her closed uniform.\nSubject invariants: A quiet sympathetic professional gate guard. Her brother's ring and its chain stay COMPLETELY HIDDEN beneath the CLOSED collar and uniform in every view: no necklace, pendant or ring visible anywhere. No invented badge or faction crest. One sheathed sidearm only, no exposed blade.\nOne LANDSCAPE 1536x1024 image: four COMPLETE views at equal scale, left to right FRONT, THREE-QUARTER, SIDE and BACK. Keep tops, hands, hems/boots or entire orb fully inside generous margins; coherent body scale, believable rotation and unchanged anatomy. For a humanoid, preserve the face/hair in visible angles, each clothing layer and the same props held naturally. For the Anchor Sentinel, show ONLY the same limb-free orb rotated: its front has one central and four smaller perimeter eyes plus compact jaw, with those same features becoming occluded as the orb turns; do not duplicate the front eye or jaw on the back, add limbs/tentacles, or invent extra eyes. Each orb view is the same full unit.\nMatch the supplied dark heroic fantasy painting: anime-influenced drawing appropriate to this subject's age/species, warm ivory light, cool colored shadows, oil-like painted material weight and selective edges. Plain charcoal neutral ground, enough silhouette contrast to inspect each complete view. No scenery, attacks, magic effects, text, labels, numbers, borders, inset portraits or extra characters.",
+        "portrait": "Use case: identity-preserve. Create ONE SQUARE 1024x1024 reusable portrait of Miri. Input 1 is the canonical full-body design; input 2 is the canonical multiview identity reference. These show ONE subject. Preserve its exact face/head, age, skin/eye/hair colors, build and upper costume/gear.\nEstablished appearance: An adult Human woman in her early thirties with an athletic lean build, deep warm brown skin, dark brown eyes, a long oval face and tightly braided dark hair gathered behind her head. Plain muted blue-gray guard tunic, closed collar, practical steel mail shirt under a simple dark leather jerkin, dark trousers, brown boots, plain belt and sheathed short sidearm. No helmet so her face is clear. Quiet, composed, sympathetic expression. Her brother's ring and chain remain completely hidden beneath her closed uniform.\nSubject invariants: A quiet sympathetic professional gate guard. Her brother's ring and its chain stay COMPLETELY HIDDEN beneath the CLOSED collar and uniform in every view: no necklace, pendant or ring visible anywhere. No invented badge or faction crest. One sheathed sidearm only, no exposed blade.\nFor humanoids: head and upper shoulders only, facing gently toward viewer, calm character-appropriate expression. Complete hair/head silhouette inside the square with comfortable top/side margins; center horizontally, eye line near 40% image height, chin near 65-70%, shoulders in the lower quarter. Do not raise cups, loaves, herbs, hands or cases across the face. Fume's goggles remain above his visible eyes; Miri's necklace stays fully hidden by her CLOSED collar; Auntie Salt remains elderly. For Anchor Sentinel: the full FRONT orb is its portrait, complete outline inside generous circular-crop-safe margins, one central eye, four smaller perimeter eyes and compact jaw readable; no human shoulders or invented head/hair.\nRendering: match the same K dark heroic fantasy painting with recognizable anime-influenced character drawing, warm ivory focal light and deep cool shadows. Keep distinct ages/features legible at 64-pixel UI size, painted surfaces and true complexion/colors; no photoreal skin or 3D rendering. Plain charcoal ground, enough outline contrast. One portrait only, no extra panels, scene, border, lettering, labels, watermark or effects."
+      },
+      "style_id": "severed-lands-dark-heroic-fantasy-k-v1"
     },
     {
       "id": "severed-npc-captain-harlan",
@@ -984,50 +1004,57 @@
           "path": "npcs/auntie-salt.md",
           "sha256": "1dc1fb98b9917dc75f59aa8f1b0dc25bbcb06025827a7d8777197ccf3df7d8d9",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/auntie-salt.md",
+          "sha256": "d15da612fd6bb5e3f396eb03a23606eb49b93f8f96c6416926875d3ba3aea680",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
         "appearance": "A short stocky older Human woman in her seventies with warm brown skin, pale gray eyes, a softly lined broad face and white hair pinned into a tidy bun. Layers of practical burgundy clothing, a worn deep teal shawl, plain brown skirt, comfortable leather shoes, a small waist pouch and simple brass earrings. Carries one plain ceramic tea cup and saucer. A cheerful grandmotherly smile and sharp observant eyes.",
-        "full_body": {
-          "path": "assets/characters/2e64fd5f33cd1e550a037597da7b9bf36d8491e095adb0f0eb6dfa04c3fb84cc.png",
-          "sha256": "2e64fd5f33cd1e550a037597da7b9bf36d8491e095adb0f0eb6dfa04c3fb84cc"
-        },
-        "reference_sheet": {
-          "path": "assets/characters/2feec661eab81aed24c3ddf5024902b0223cc8ab5f96eccb4e71cf9bba63dc98.png",
-          "sha256": "2feec661eab81aed24c3ddf5024902b0223cc8ab5f96eccb4e71cf9bba63dc98"
-        },
-        "portrait": {
-          "path": "assets/characters/e8d4361182d44f74ca5835af1ea007bf4528e29510e0b1587563d596f9cacc6a.png",
-          "sha256": "e8d4361182d44f74ca5835af1ea007bf4528e29510e0b1587563d596f9cacc6a"
-        },
         "frame": {
           "x": 0.5,
           "y": 0.35,
           "zoom": 1
+        },
+        "full_body": {
+          "path": "assets/characters/3efc36fe371eba004a90ce7361bf33ad55969ee0c3079a6d22fc392107091229.png",
+          "sha256": "3efc36fe371eba004a90ce7361bf33ad55969ee0c3079a6d22fc392107091229"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/176fdec3768ac7aa0c1cdb76c2fdb6758e832ea304f1cdd01ed57e6823fc7cfe.png",
+          "sha256": "176fdec3768ac7aa0c1cdb76c2fdb6758e832ea304f1cdd01ed57e6823fc7cfe"
+        },
+        "portrait": {
+          "path": "assets/characters/8ec8f4f5ebd8140ed832ef5eea3023e91000f681d9c2dbd2cd14c71a0c9c0afd.png",
+          "sha256": "8ec8f4f5ebd8140ed832ef5eea3023e91000f681d9c2dbd2cd14c71a0c9c0afd"
         }
       },
       "outputs": {
         "full_body": {
           "width": 1024,
           "height": 1536,
-          "bytes": 2249735
+          "bytes": 2161693
         },
         "reference_sheet": {
           "width": 1536,
           "height": 1024,
-          "bytes": 2761032
+          "bytes": 2334907
         },
         "portrait": {
           "width": 1254,
           "height": 1254,
-          "bytes": 2644178
+          "bytes": 2469765
         }
       },
       "prompt_set": {
-        "full_body": "Use case: stylized-concept. Production canonical full-body reference for Sylvia GM's Severed Lands premade catalogue. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG character illustration, plain light neutral background, soft natural studio light and subtle grounding shadow. Exactly one complete standing figure, top of hair to boot or shoe soles, inside comfortable margins; relaxed near-front three-quarter pose, clear face and physically sound anatomy. Character: Auntie Salt. Authored requirements: Cheerful grandmotherly Warrens information broker, always offers tea, sells knowledge without loyalty to a faction. Do not put secrets, faction marks, poison effects or readable information into the image. Appearance: A short stocky older Human woman in her seventies with warm brown skin, pale gray eyes, a softly lined broad face and white hair pinned into a tidy bun. Layers of practical burgundy clothing, a worn deep teal shawl, plain brown skirt, comfortable leather shoes, a small waist pouch and simple brass earrings. Carries one plain ceramic tea cup and saucer. A cheerful grandmotherly smile and sharp observant eyes. Details not specified by the authored text are editable visual defaults, without changing biography, mechanics or secrets. No invented home, faction heraldry, religious symbols, labels or game statistics. No text, writing, borders, montage, UI, environment, scenery, magic effects or additional figures. Keep carried items modest and recognizable.",
-        "reference_sheet": "Use case: identity-preserve. Production canonical multi-view reference sheet for Auntie Salt in Sylvia GM's Severed Lands. Input image 1 is the authoritative full-body identity reference. One landscape PNG, 1536x1024. Polished naturalistic digital RPG illustration, plain light neutral background, soft natural studio light. Three complete figures at identical scale: straight front, exact side profile, straight back; plus one enlarged directly forward head detail. Preserve the exact face, apparent adult age, body proportions, skin, eye color, hair arrangement, costume construction, colors, wear and equipment of input image 1. A short stocky older Human woman in her seventies with warm brown skin, pale gray eyes, a softly lined broad face and white hair pinned into a tidy bun. Layers of practical burgundy clothing, a worn deep teal shawl, plain brown skirt, comfortable leather shoes, a small waist pouch and simple brass earrings. Carries one plain ceramic tea cup and saucer. A cheerful grandmotherly smile and sharp observant eyes. Authored requirements: Cheerful grandmotherly Warrens information broker, always offers tea, sells knowledge without loyalty to a faction. Do not put secrets, faction marks, poison effects or readable information into the image. Outfit and props must remain physically consistent between views, with complete head and boot/shoe soles inside comfortable margins. Keep the face readable and unobstructed. No new accessories, new powers, character redesign, extra people, captions, writing, labels, borders, UI, scenery, symbols or magical effects.",
-        "portrait": "Use case: identity-preserve. Aligned reusable square portrait of Auntie Salt for Sylvia GM. Input image 1 is the canonical full-body identity, and image 2 is this character's canonical multi-view sheet. One square PNG, 1024x1024. Polished naturalistic digital RPG illustration, plain light neutral background and soft natural studio light. Preserve the exact face, apparent adult age, skin, eye color, hair arrangement and upper clothing from these references. A short stocky older Human woman in her seventies with warm brown skin, pale gray eyes, a softly lined broad face and white hair pinned into a tidy bun. Layers of practical burgundy clothing, a worn deep teal shawl, plain brown skirt, comfortable leather shoes, a small waist pouch and simple brass earrings. Carries one plain ceramic tea cup and saucer. A cheerful grandmotherly smile and sharp observant eyes. Authored constraints: Cheerful grandmotherly Warrens information broker, always offers tea, sells knowledge without loyalty to a faction. Do not put secrets, faction marks, poison effects or readable information into the image. Composition: head and upper shoulders only, directly forward, upright head without tilt, level eyes facing viewer. Center the face with the eye line at 35 percent of image height, consistent head scale, and comfortable space above all hair and at both sides for adjustable circular cropping. Keep the face unobstructed. Preserve the referenced character's characteristic restrained expression; no exaggerated expression or redesign. No hands or carried props, weapons, cup, loaf, herbs, case, satchel or medicine inside the crop.  No text, labels, borders, UI, scenery, symbols or magic."
-      }
+        "full_body": "Use case: style-transfer. Asset type: canonical full-body character reference for Sylvia GM's Severed Lands. Create ONE vertical 1024x1536 image of Auntie Salt ONLY. The supplied K board is RENDERING STYLE ONLY: do not copy any pictured character's face, body type, costume, hair, props or pose. This new subject's identity follows the written appearance below.\nEstablished appearance (editable visual default; authored canon controls): A short stocky older Human woman in her seventies with warm brown skin, pale gray eyes, a softly lined broad face and white hair pinned into a tidy bun. Layers of practical burgundy clothing, a worn deep teal shawl, plain brown skirt, comfortable leather shoes, a small waist pouch and simple brass earrings. Carries one plain ceramic tea cup and saucer. A cheerful grandmotherly smile and sharp observant eyes.\nSubject invariants: An unmistakably elderly, short stocky grandmother in her seventies, white hair in a tidy bun, lined broad face, cheerful sharp eyes. Do not de-age, make tall/slender or use the board's youthful faces. One plain ceramic cup resting on its saucer held near waist level, coherent two hands.\nRendering: original dark heroic tabletop-fantasy painting with recognizable anime-influenced character drawing, designed expressive eyes and grouped hair appropriate to THIS subject's age and species. Deep cool colored shadows, focused warm ivory light, substantial cloth/metal/leather/stone, selective sharp highlights, oil-like painted volume and soft lost edges. Preserve all stated skin, hair and costume colors. No photographic skin, 3D render, glossy merchandise finish or copied franchise design.\nComposition: exactly ONE complete figure or orb, near-front three-quarter reference stance, both hands and every item clearly readable. Complete crown, hems, boots or entire orb inside the frame with generous 7% top/bottom and side margins. Plain deep charcoal neutral ground, enough edge contrast to inspect the silhouette, no scenery. Coherent anatomy and gear construction. No text, writing, labels, logo, border, panels, inset portraits, extra people or extra views. This image will be the canonical identity input for subsequent multiview and portrait references.",
+        "reference_sheet": "Use case: identity-preserve. Create a canonical FOUR-VIEW reference sheet of Auntie Salt, the ONE subject in the supplied full-body reference. Image 1 is authoritative identity AND accepted K rendering. Preserve this EXACT face/head, age, build, hair, skin colors, costume layers, equipment topology and material colors. No redesign, new face, new gear or mirrored anatomical item placement.\nEstablished appearance: A short stocky older Human woman in her seventies with warm brown skin, pale gray eyes, a softly lined broad face and white hair pinned into a tidy bun. Layers of practical burgundy clothing, a worn deep teal shawl, plain brown skirt, comfortable leather shoes, a small waist pouch and simple brass earrings. Carries one plain ceramic tea cup and saucer. A cheerful grandmotherly smile and sharp observant eyes.\nSubject invariants: An unmistakably elderly, short stocky grandmother in her seventies, white hair in a tidy bun, lined broad face, cheerful sharp eyes. Do not de-age, make tall/slender or use the board's youthful faces. One plain ceramic cup resting on its saucer held near waist level, coherent two hands.\nOne LANDSCAPE 1536x1024 image: four COMPLETE views at equal scale, left to right FRONT, THREE-QUARTER, SIDE and BACK. Keep tops, hands, hems/boots or entire orb fully inside generous margins; coherent body scale, believable rotation and unchanged anatomy. For a humanoid, preserve the face/hair in visible angles, each clothing layer and the same props held naturally. For the Anchor Sentinel, show ONLY the same limb-free orb rotated: its front has one central and four smaller perimeter eyes plus compact jaw, with those same features becoming occluded as the orb turns; do not duplicate the front eye or jaw on the back, add limbs/tentacles, or invent extra eyes. Each orb view is the same full unit.\nMatch the supplied dark heroic fantasy painting: anime-influenced drawing appropriate to this subject's age/species, warm ivory light, cool colored shadows, oil-like painted material weight and selective edges. Plain charcoal neutral ground, enough silhouette contrast to inspect each complete view. No scenery, attacks, magic effects, text, labels, numbers, borders, inset portraits or extra characters.",
+        "portrait": "Use case: identity-preserve. Create ONE SQUARE 1024x1024 reusable portrait of Auntie Salt. Input 1 is the canonical full-body design; input 2 is the canonical multiview identity reference. These show ONE subject. Preserve its exact face/head, age, skin/eye/hair colors, build and upper costume/gear.\nEstablished appearance: A short stocky older Human woman in her seventies with warm brown skin, pale gray eyes, a softly lined broad face and white hair pinned into a tidy bun. Layers of practical burgundy clothing, a worn deep teal shawl, plain brown skirt, comfortable leather shoes, a small waist pouch and simple brass earrings. Carries one plain ceramic tea cup and saucer. A cheerful grandmotherly smile and sharp observant eyes.\nSubject invariants: An unmistakably elderly, short stocky grandmother in her seventies, white hair in a tidy bun, lined broad face, cheerful sharp eyes. Do not de-age, make tall/slender or use the board's youthful faces. One plain ceramic cup resting on its saucer held near waist level, coherent two hands.\nFor humanoids: head and upper shoulders only, facing gently toward viewer, calm character-appropriate expression. Complete hair/head silhouette inside the square with comfortable top/side margins; center horizontally, eye line near 40% image height, chin near 65-70%, shoulders in the lower quarter. Do not raise cups, loaves, herbs, hands or cases across the face. Fume's goggles remain above his visible eyes; Miri's necklace stays fully hidden by her CLOSED collar; Auntie Salt remains elderly. For Anchor Sentinel: the full FRONT orb is its portrait, complete outline inside generous circular-crop-safe margins, one central eye, four smaller perimeter eyes and compact jaw readable; no human shoulders or invented head/hair.\nRendering: match the same K dark heroic fantasy painting with recognizable anime-influenced character drawing, warm ivory focal light and deep cool shadows. Keep distinct ages/features legible at 64-pixel UI size, painted surfaces and true complexion/colors; no photoreal skin or 3D rendering. Plain charcoal ground, enough outline contrast. One portrait only, no extra panels, scene, border, lettering, labels, watermark or effects."
+      },
+      "style_id": "severed-lands-dark-heroic-fantasy-k-v1"
     },
     {
       "id": "severed-npc-alchemist-fume",
@@ -1044,50 +1071,57 @@
           "path": "npcs/alchemist-fume.md",
           "sha256": "b6d1a8593051093e1b122aa442e89e1d3c47f99e0be1772c1665e802227bc817",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/alchemist-fume.md",
+          "sha256": "d347555d987160f4965865b62cdb197937c8823673e3edf5a1db3a56de976fd6",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
-        "appearance": "An adult humanoid man in his forties with olive-tan skin, lively brown eyes, a long hooked nose, a bald crown and wispy copper-gray hair at the sides. Thin healed pale burn scars on his forearms, intact skin. Brass work goggles pushed above the eyes, a soot-stained mustard tunic, worn dark work coat, brown leather apron, dark trousers and heavy practical boots. A scuffed leather reagent case held closed at his side and two small sealed opaque containers on the belt. Enthusiastic slightly wild smile. No glowing compounds or magical effects.",
-        "full_body": {
-          "path": "assets/characters/c1ea5e720039fab6a737491d625911671653140dfe149f22fc1a274852d8fa90.png",
-          "sha256": "c1ea5e720039fab6a737491d625911671653140dfe149f22fc1a274852d8fa90"
-        },
-        "reference_sheet": {
-          "path": "assets/characters/be1fe36a65617bb9405682aa6f4c8386f7cff7055c970ca00f8f8ccb94507914.png",
-          "sha256": "be1fe36a65617bb9405682aa6f4c8386f7cff7055c970ca00f8f8ccb94507914"
-        },
-        "portrait": {
-          "path": "assets/characters/b4234564413f65ee6c9f3524961accfe3144c01b999d203405992b3e6da22fc8.png",
-          "sha256": "b4234564413f65ee6c9f3524961accfe3144c01b999d203405992b3e6da22fc8"
-        },
+        "appearance": "An adult humanoid man in his forties with olive-tan skin, lively brown eyes, a long hooked nose, a bald crown and wispy copper-gray hair at the sides. Thin healed pale burn scars on his forearms, intact skin. Brass work goggles pushed above the eyes, a soot-stained mustard tunic, worn dark work coat, brown leather apron, dark trousers and heavy practical boots. A scuffed leather reagent case held closed at his side and two small sealed opaque containers on the belt. Enthusiastic slightly wild smile. No glowing compounds or magical effects. A small brown moustache and short chin goatee remain consistent across the selected references.",
         "frame": {
           "x": 0.5,
           "y": 0.35,
           "zoom": 1
+        },
+        "full_body": {
+          "path": "assets/characters/4118af345fa9a7cb13081f6d41edb89dd13b8c5349c9ea61318a999734dc5af1.png",
+          "sha256": "4118af345fa9a7cb13081f6d41edb89dd13b8c5349c9ea61318a999734dc5af1"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/308534d87829039e266d072abae3484fa2b6fb0f223e47649f71abe9438e3b63.png",
+          "sha256": "308534d87829039e266d072abae3484fa2b6fb0f223e47649f71abe9438e3b63"
+        },
+        "portrait": {
+          "path": "assets/characters/0812f6c77a30ca40689cd2ce358e7de258bb76dca80a3c192208aa17471eea48.png",
+          "sha256": "0812f6c77a30ca40689cd2ce358e7de258bb76dca80a3c192208aa17471eea48"
         }
       },
       "outputs": {
         "full_body": {
           "width": 1024,
           "height": 1536,
-          "bytes": 2038961
+          "bytes": 2010439
         },
         "reference_sheet": {
           "width": 1536,
           "height": 1024,
-          "bytes": 2628641
+          "bytes": 2152758
         },
         "portrait": {
           "width": 1254,
           "height": 1254,
-          "bytes": 2516454
+          "bytes": 2216489
         }
       },
       "prompt_set": {
-        "full_body": "Use case: stylized-concept. Production canonical full-body reference for Sylvia GM's Severed Lands premade catalogue. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG character illustration, plain light neutral background, soft natural studio light and subtle grounding shadow. Exactly one complete standing figure, top of hair to boot or shoe soles, inside comfortable margins; relaxed near-front three-quarter pose, clear face and physically sound anatomy. Character: Fume. Authored requirements: A Riftborn alchemist from an alchemical home world; the narrative supplies enthusiasm, healed experiment burns and a case of formulas, but no fixed biological species or new powers. This illustration's humanoid appearance is an editable default. For current SRD Lite his supplies are narrative props, not usable consumables. No implied healing, light or mechanical effect. Appearance: An adult humanoid man in his forties with olive-tan skin, lively brown eyes, a long hooked nose, a bald crown and wispy copper-gray hair at the sides. Thin healed pale burn scars on his forearms, intact skin. Brass work goggles pushed above the eyes, a soot-stained mustard tunic, worn dark work coat, brown leather apron, dark trousers and heavy practical boots. A scuffed leather reagent case held closed at his side and two small sealed opaque containers on the belt. Enthusiastic slightly wild smile. No glowing compounds or magical effects. Details not specified by the authored text are editable visual defaults, without changing biography, mechanics or secrets. No invented home, faction heraldry, religious symbols, labels or game statistics. No text, writing, borders, montage, UI, environment, scenery, magic effects or additional figures. Keep carried items modest and recognizable.",
-        "reference_sheet": "Use case: identity-preserve. Production canonical multi-view reference sheet for Fume in Sylvia GM's Severed Lands. Input image 1 is the authoritative full-body identity reference. One landscape PNG, 1536x1024. Polished naturalistic digital RPG illustration, plain light neutral background, soft natural studio light. Three complete figures at identical scale: straight front, exact side profile, straight back; plus one enlarged directly forward head detail. Preserve the exact face, apparent adult age, body proportions, skin, eye color, hair arrangement, costume construction, colors, wear and equipment of input image 1. An adult humanoid man in his forties with olive-tan skin, lively brown eyes, a long hooked nose, a bald crown and wispy copper-gray hair at the sides. Thin healed pale burn scars on his forearms, intact skin. Brass work goggles pushed above the eyes, a soot-stained mustard tunic, worn dark work coat, brown leather apron, dark trousers and heavy practical boots. A scuffed leather reagent case held closed at his side and two small sealed opaque containers on the belt. Enthusiastic slightly wild smile. No glowing compounds or magical effects. Authored requirements: A Riftborn alchemist from an alchemical home world; the narrative supplies enthusiasm, healed experiment burns and a case of formulas, but no fixed biological species or new powers. This illustration's humanoid appearance is an editable default. For current SRD Lite his supplies are narrative props, not usable consumables. No implied healing, light or mechanical effect. Outfit and props must remain physically consistent between views, with complete head and boot/shoe soles inside comfortable margins. Keep the face readable and unobstructed. No new accessories, new powers, character redesign, extra people, captions, writing, labels, borders, UI, scenery, symbols or magical effects.",
-        "portrait": "Use case: identity-preserve. Aligned reusable square portrait of Fume for Sylvia GM. Input image 1 is the canonical full-body identity, and image 2 is this character's canonical multi-view sheet. One square PNG, 1024x1024. Polished naturalistic digital RPG illustration, plain light neutral background and soft natural studio light. Preserve the exact face, apparent adult age, skin, eye color, hair arrangement and upper clothing from these references. An adult humanoid man in his forties with olive-tan skin, lively brown eyes, a long hooked nose, a bald crown and wispy copper-gray hair at the sides. Thin healed pale burn scars on his forearms, intact skin. Brass work goggles pushed above the eyes, a soot-stained mustard tunic, worn dark work coat, brown leather apron, dark trousers and heavy practical boots. A scuffed leather reagent case held closed at his side and two small sealed opaque containers on the belt. Enthusiastic slightly wild smile. No glowing compounds or magical effects. Authored constraints: A Riftborn alchemist from an alchemical home world; the narrative supplies enthusiasm, healed experiment burns and a case of formulas, but no fixed biological species or new powers. This illustration's humanoid appearance is an editable default. For current SRD Lite his supplies are narrative props, not usable consumables. No implied healing, light or mechanical effect. Composition: head and upper shoulders only, directly forward, upright head without tilt, level eyes facing viewer. Center the face with the eye line at 35 percent of image height, consistent head scale, and comfortable space above all hair and at both sides for adjustable circular cropping. Keep the face unobstructed. Preserve the referenced character's characteristic restrained expression; no exaggerated expression or redesign. No hands or carried props, weapons, cup, loaf, herbs, case, satchel or medicine inside the crop. Retain the goggles on the forehead above the eyes. No text, labels, borders, UI, scenery, symbols or magic."
-      }
+        "full_body": "Use case: style-transfer. Asset type: canonical full-body character reference for Sylvia GM's Severed Lands. Create ONE vertical 1024x1536 image of Fume ONLY. The supplied K board is RENDERING STYLE ONLY: do not copy any pictured character's face, body type, costume, hair, props or pose. This new subject's identity follows the written appearance below.\nEstablished appearance (editable visual default; authored canon controls): An adult humanoid man in his forties with olive-tan skin, lively brown eyes, a long hooked nose, a bald crown and wispy copper-gray hair at the sides. Thin healed pale burn scars on his forearms, intact skin. Brass work goggles pushed above the eyes, a soot-stained mustard tunic, worn dark work coat, brown leather apron, dark trousers and heavy practical boots. A scuffed leather reagent case held closed at his side and two small sealed opaque containers on the belt. Enthusiastic slightly wild smile. No glowing compounds or magical effects.\nSubject invariants: A middle-aged humanlike Riftborn alchemist, bald crown with wispy copper-grey side hair, long hooked nose, enthusiastic eccentric smile. Brass goggles stay pushed up above the eyes. Thin HEALED pale forearm scars, intact skin. Closed reagent case and small opaque sealed belt containers only: no readable formulas, glowing potions, smoke, explosions or activated magical/consumable effects. No assumption about his unknown original home world beyond authored alchemical background.\nRendering: original dark heroic tabletop-fantasy painting with recognizable anime-influenced character drawing, designed expressive eyes and grouped hair appropriate to THIS subject's age and species. Deep cool colored shadows, focused warm ivory light, substantial cloth/metal/leather/stone, selective sharp highlights, oil-like painted volume and soft lost edges. Preserve all stated skin, hair and costume colors. No photographic skin, 3D render, glossy merchandise finish or copied franchise design.\nComposition: exactly ONE complete figure or orb, near-front three-quarter reference stance, both hands and every item clearly readable. Complete crown, hems, boots or entire orb inside the frame with generous 7% top/bottom and side margins. Plain deep charcoal neutral ground, enough edge contrast to inspect the silhouette, no scenery. Coherent anatomy and gear construction. No text, writing, labels, logo, border, panels, inset portraits, extra people or extra views. This image will be the canonical identity input for subsequent multiview and portrait references.",
+        "reference_sheet": "Use case: identity-preserve. Create a canonical FOUR-VIEW reference sheet of Fume, the ONE subject in the supplied full-body reference. Image 1 is authoritative identity AND accepted K rendering. Preserve this EXACT face/head, age, build, hair, skin colors, costume layers, equipment topology and material colors. No redesign, new face, new gear or mirrored anatomical item placement.\nEstablished appearance: An adult humanoid man in his forties with olive-tan skin, lively brown eyes, a long hooked nose, a bald crown and wispy copper-gray hair at the sides. Thin healed pale burn scars on his forearms, intact skin. Brass work goggles pushed above the eyes, a soot-stained mustard tunic, worn dark work coat, brown leather apron, dark trousers and heavy practical boots. A scuffed leather reagent case held closed at his side and two small sealed opaque containers on the belt. Enthusiastic slightly wild smile. No glowing compounds or magical effects.\nSubject invariants: A middle-aged humanlike Riftborn alchemist, bald crown with wispy copper-grey side hair, long hooked nose, enthusiastic eccentric smile. Brass goggles stay pushed up above the eyes. Thin HEALED pale forearm scars, intact skin. Closed reagent case and small opaque sealed belt containers only: no readable formulas, glowing potions, smoke, explosions or activated magical/consumable effects. No assumption about his unknown original home world beyond authored alchemical background.\nOne LANDSCAPE 1536x1024 image: four COMPLETE views at equal scale, left to right FRONT, THREE-QUARTER, SIDE and BACK. Keep tops, hands, hems/boots or entire orb fully inside generous margins; coherent body scale, believable rotation and unchanged anatomy. For a humanoid, preserve the face/hair in visible angles, each clothing layer and the same props held naturally. For the Anchor Sentinel, show ONLY the same limb-free orb rotated: its front has one central and four smaller perimeter eyes plus compact jaw, with those same features becoming occluded as the orb turns; do not duplicate the front eye or jaw on the back, add limbs/tentacles, or invent extra eyes. Each orb view is the same full unit.\nMatch the supplied dark heroic fantasy painting: anime-influenced drawing appropriate to this subject's age/species, warm ivory light, cool colored shadows, oil-like painted material weight and selective edges. Plain charcoal neutral ground, enough silhouette contrast to inspect each complete view. No scenery, attacks, magic effects, text, labels, numbers, borders, inset portraits or extra characters.",
+        "portrait": "Use case: identity-preserve. Create ONE SQUARE 1024x1024 reusable portrait of Fume. Input 1 is the canonical full-body design; input 2 is the canonical multiview identity reference. These show ONE subject. Preserve its exact face/head, age, skin/eye/hair colors, build and upper costume/gear.\nEstablished appearance: An adult humanoid man in his forties with olive-tan skin, lively brown eyes, a long hooked nose, a bald crown and wispy copper-gray hair at the sides. Thin healed pale burn scars on his forearms, intact skin. Brass work goggles pushed above the eyes, a soot-stained mustard tunic, worn dark work coat, brown leather apron, dark trousers and heavy practical boots. A scuffed leather reagent case held closed at his side and two small sealed opaque containers on the belt. Enthusiastic slightly wild smile. No glowing compounds or magical effects.\nSubject invariants: A middle-aged humanlike Riftborn alchemist, bald crown with wispy copper-grey side hair, long hooked nose, enthusiastic eccentric smile. Brass goggles stay pushed up above the eyes. Thin HEALED pale forearm scars, intact skin. Closed reagent case and small opaque sealed belt containers only: no readable formulas, glowing potions, smoke, explosions or activated magical/consumable effects. No assumption about his unknown original home world beyond authored alchemical background.\nFor humanoids: head and upper shoulders only, facing gently toward viewer, calm character-appropriate expression. Complete hair/head silhouette inside the square with comfortable top/side margins; center horizontally, eye line near 40% image height, chin near 65-70%, shoulders in the lower quarter. Do not raise cups, loaves, herbs, hands or cases across the face. Fume's goggles remain above his visible eyes; Miri's necklace stays fully hidden by her CLOSED collar; Auntie Salt remains elderly. For Anchor Sentinel: the full FRONT orb is its portrait, complete outline inside generous circular-crop-safe margins, one central eye, four smaller perimeter eyes and compact jaw readable; no human shoulders or invented head/hair.\nRendering: match the same K dark heroic fantasy painting with recognizable anime-influenced character drawing, warm ivory focal light and deep cool shadows. Keep distinct ages/features legible at 64-pixel UI size, painted surfaces and true complexion/colors; no photoreal skin or 3D rendering. Plain charcoal ground, enough outline contrast. One portrait only, no extra panels, scene, border, lettering, labels, watermark or effects."
+      },
+      "style_id": "severed-lands-dark-heroic-fantasy-k-v1"
     },
     {
       "id": "severed-npc-herbalist-saffron",
@@ -1104,50 +1138,57 @@
           "path": "npcs/herbalist-saffron.md",
           "sha256": "980e36d5c56806b5d3a482938d889cabcd75e720dff7ec7286a8ec0d0d867e37",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/herbalist-saffron.md",
+          "sha256": "a40edefc6a478c2ce0f3771af5ce72a5966052eec8923ee6bc77a058e8b3339c",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
         "appearance": "An adult Human woman in her late forties with medium brown skin, dark brown eyes, a narrow softly lined face and straight black hair with gray strands, center-parted and tied in a long practical braid. A muted forest-green wrap tunic, beige linen work apron, plain brown belt, long dark skirt and comfortable dark leather shoes. A small plain linen medical shoulder bag and a tied bundle of dried herbs held at waist level. Steady posture, tired compassionate expression and clear attentive eyes.",
-        "full_body": {
-          "path": "assets/characters/45993c405459111af401793a20b5ca08ccebb635a77f4d8f01942d1abe59797e.png",
-          "sha256": "45993c405459111af401793a20b5ca08ccebb635a77f4d8f01942d1abe59797e"
-        },
-        "reference_sheet": {
-          "path": "assets/characters/d1e7f8041f038b1d20778dfc72e4ddcb4fc3f0850324165e1f1c734957473a7f.png",
-          "sha256": "d1e7f8041f038b1d20778dfc72e4ddcb4fc3f0850324165e1f1c734957473a7f"
-        },
-        "portrait": {
-          "path": "assets/characters/2579873c5819ffcbd7bc80990b74b1b6b784ff96a1a34a32f17ba881450a885e.png",
-          "sha256": "2579873c5819ffcbd7bc80990b74b1b6b784ff96a1a34a32f17ba881450a885e"
-        },
         "frame": {
           "x": 0.5,
           "y": 0.35,
           "zoom": 1
+        },
+        "full_body": {
+          "path": "assets/characters/6da6cdf2cf2355e9d6959afc86b1e0fca1721fc3d15308c07a45365746662dbb.png",
+          "sha256": "6da6cdf2cf2355e9d6959afc86b1e0fca1721fc3d15308c07a45365746662dbb"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/bf04707534d379f1c446acb8667127e1af67b29d661ec4634b9a4b6cedc9cfc4.png",
+          "sha256": "bf04707534d379f1c446acb8667127e1af67b29d661ec4634b9a4b6cedc9cfc4"
+        },
+        "portrait": {
+          "path": "assets/characters/16ece7ec04a00e334dc76e0b918f70c7c58eadf70a0ddbb3d93f37202372acdc.png",
+          "sha256": "16ece7ec04a00e334dc76e0b918f70c7c58eadf70a0ddbb3d93f37202372acdc"
         }
       },
       "outputs": {
         "full_body": {
           "width": 1024,
           "height": 1536,
-          "bytes": 1855767
+          "bytes": 2121833
         },
         "reference_sheet": {
           "width": 1536,
           "height": 1024,
-          "bytes": 2692272
+          "bytes": 2328518
         },
         "portrait": {
           "width": 1254,
           "height": 1254,
-          "bytes": 2549157
+          "bytes": 2269077
         }
       },
       "prompt_set": {
-        "full_body": "Use case: stylized-concept. Production canonical full-body reference for Sylvia GM's Severed Lands premade catalogue. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG character illustration, plain light neutral background, soft natural studio light and subtle grounding shadow. Exactly one complete standing figure, top of hair to boot or shoe soles, inside comfortable margins; relaxed near-front three-quarter pose, clear face and physically sound anatomy. Character: Saffron. Authored requirements: Thornwall herbalist and Warrens volunteer healer, settled Human woman; tired, compassionate, practical and quietly determined. Ordinary medical and herbal props only. No glowing medicine, healing effect, divine symbol or invented magic. Appearance: An adult Human woman in her late forties with medium brown skin, dark brown eyes, a narrow softly lined face and straight black hair with gray strands, center-parted and tied in a long practical braid. A muted forest-green wrap tunic, beige linen work apron, plain brown belt, long dark skirt and comfortable dark leather shoes. A small plain linen medical shoulder bag and a tied bundle of dried herbs held at waist level. Steady posture, tired compassionate expression and clear attentive eyes. Details not specified by the authored text are editable visual defaults, without changing biography, mechanics or secrets. No invented home, faction heraldry, religious symbols, labels or game statistics. No text, writing, borders, montage, UI, environment, scenery, magic effects or additional figures. Keep carried items modest and recognizable.",
-        "reference_sheet": "Use case: identity-preserve. Production canonical multi-view reference sheet for Saffron in Sylvia GM's Severed Lands. Input image 1 is the authoritative full-body identity reference. One landscape PNG, 1536x1024. Polished naturalistic digital RPG illustration, plain light neutral background, soft natural studio light. Three complete figures at identical scale: straight front, exact side profile, straight back; plus one enlarged directly forward head detail. Preserve the exact face, apparent adult age, body proportions, skin, eye color, hair arrangement, costume construction, colors, wear and equipment of input image 1. An adult Human woman in her late forties with medium brown skin, dark brown eyes, a narrow softly lined face and straight black hair with gray strands, center-parted and tied in a long practical braid. A muted forest-green wrap tunic, beige linen work apron, plain brown belt, long dark skirt and comfortable dark leather shoes. A small plain linen medical shoulder bag and a tied bundle of dried herbs held at waist level. Steady posture, tired compassionate expression and clear attentive eyes. Authored requirements: Thornwall herbalist and Warrens volunteer healer, settled Human woman; tired, compassionate, practical and quietly determined. Ordinary medical and herbal props only. No glowing medicine, healing effect, divine symbol or invented magic. Outfit and props must remain physically consistent between views, with complete head and boot/shoe soles inside comfortable margins. Keep the face readable and unobstructed. No new accessories, new powers, character redesign, extra people, captions, writing, labels, borders, UI, scenery, symbols or magical effects.",
-        "portrait": "Use case: identity-preserve. Aligned reusable square portrait of Saffron for Sylvia GM. Input image 1 is the canonical full-body identity, and image 2 is this character's canonical multi-view sheet. One square PNG, 1024x1024. Polished naturalistic digital RPG illustration, plain light neutral background and soft natural studio light. Preserve the exact face, apparent adult age, skin, eye color, hair arrangement and upper clothing from these references. An adult Human woman in her late forties with medium brown skin, dark brown eyes, a narrow softly lined face and straight black hair with gray strands, center-parted and tied in a long practical braid. A muted forest-green wrap tunic, beige linen work apron, plain brown belt, long dark skirt and comfortable dark leather shoes. A small plain linen medical shoulder bag and a tied bundle of dried herbs held at waist level. Steady posture, tired compassionate expression and clear attentive eyes. Authored constraints: Thornwall herbalist and Warrens volunteer healer, settled Human woman; tired, compassionate, practical and quietly determined. Ordinary medical and herbal props only. No glowing medicine, healing effect, divine symbol or invented magic. Composition: head and upper shoulders only, directly forward, upright head without tilt, level eyes facing viewer. Center the face with the eye line at 35 percent of image height, consistent head scale, and comfortable space above all hair and at both sides for adjustable circular cropping. Keep the face unobstructed. Preserve the referenced character's characteristic restrained expression; no exaggerated expression or redesign. No hands or carried props, weapons, cup, loaf, herbs, case, satchel or medicine inside the crop.  No text, labels, borders, UI, scenery, symbols or magic."
-      }
+        "full_body": "Use case: style-transfer. Asset type: canonical full-body character reference for Sylvia GM's Severed Lands. Create ONE vertical 1024x1536 image of Saffron ONLY. The supplied K board is RENDERING STYLE ONLY: do not copy any pictured character's face, body type, costume, hair, props or pose. This new subject's identity follows the written appearance below.\nEstablished appearance (editable visual default; authored canon controls): An adult Human woman in her late forties with medium brown skin, dark brown eyes, a narrow softly lined face and straight black hair with gray strands, center-parted and tied in a long practical braid. A muted forest-green wrap tunic, beige linen work apron, plain brown belt, long dark skirt and comfortable dark leather shoes. A small plain linen medical shoulder bag and a tied bundle of dried herbs held at waist level. Steady posture, tired compassionate expression and clear attentive eyes.\nSubject invariants: A tired compassionate working herbalist in her late forties, narrow softly lined face, medium brown complexion, straight black-and-grey hair in a practical braid. Plain medical bag and tied dry herb bundle. No religious icon, healer magic, luminous herbs or new faction symbolism.\nRendering: original dark heroic tabletop-fantasy painting with recognizable anime-influenced character drawing, designed expressive eyes and grouped hair appropriate to THIS subject's age and species. Deep cool colored shadows, focused warm ivory light, substantial cloth/metal/leather/stone, selective sharp highlights, oil-like painted volume and soft lost edges. Preserve all stated skin, hair and costume colors. No photographic skin, 3D render, glossy merchandise finish or copied franchise design.\nComposition: exactly ONE complete figure or orb, near-front three-quarter reference stance, both hands and every item clearly readable. Complete crown, hems, boots or entire orb inside the frame with generous 7% top/bottom and side margins. Plain deep charcoal neutral ground, enough edge contrast to inspect the silhouette, no scenery. Coherent anatomy and gear construction. No text, writing, labels, logo, border, panels, inset portraits, extra people or extra views. This image will be the canonical identity input for subsequent multiview and portrait references.",
+        "reference_sheet": "Use case: identity-preserve. Create a canonical FOUR-VIEW reference sheet of Saffron, the ONE subject in the supplied full-body reference. Image 1 is authoritative identity AND accepted K rendering. Preserve this EXACT face/head, age, build, hair, skin colors, costume layers, equipment topology and material colors. No redesign, new face, new gear or mirrored anatomical item placement.\nEstablished appearance: An adult Human woman in her late forties with medium brown skin, dark brown eyes, a narrow softly lined face and straight black hair with gray strands, center-parted and tied in a long practical braid. A muted forest-green wrap tunic, beige linen work apron, plain brown belt, long dark skirt and comfortable dark leather shoes. A small plain linen medical shoulder bag and a tied bundle of dried herbs held at waist level. Steady posture, tired compassionate expression and clear attentive eyes.\nSubject invariants: A tired compassionate working herbalist in her late forties, narrow softly lined face, medium brown complexion, straight black-and-grey hair in a practical braid. Plain medical bag and tied dry herb bundle. No religious icon, healer magic, luminous herbs or new faction symbolism.\nOne LANDSCAPE 1536x1024 image: four COMPLETE views at equal scale, left to right FRONT, THREE-QUARTER, SIDE and BACK. Keep tops, hands, hems/boots or entire orb fully inside generous margins; coherent body scale, believable rotation and unchanged anatomy. For a humanoid, preserve the face/hair in visible angles, each clothing layer and the same props held naturally. For the Anchor Sentinel, show ONLY the same limb-free orb rotated: its front has one central and four smaller perimeter eyes plus compact jaw, with those same features becoming occluded as the orb turns; do not duplicate the front eye or jaw on the back, add limbs/tentacles, or invent extra eyes. Each orb view is the same full unit.\nMatch the supplied dark heroic fantasy painting: anime-influenced drawing appropriate to this subject's age/species, warm ivory light, cool colored shadows, oil-like painted material weight and selective edges. Plain charcoal neutral ground, enough silhouette contrast to inspect each complete view. No scenery, attacks, magic effects, text, labels, numbers, borders, inset portraits or extra characters.",
+        "portrait": "Use case: identity-preserve. Create ONE SQUARE 1024x1024 reusable portrait of Saffron. Input 1 is the canonical full-body design; input 2 is the canonical multiview identity reference. These show ONE subject. Preserve its exact face/head, age, skin/eye/hair colors, build and upper costume/gear.\nEstablished appearance: An adult Human woman in her late forties with medium brown skin, dark brown eyes, a narrow softly lined face and straight black hair with gray strands, center-parted and tied in a long practical braid. A muted forest-green wrap tunic, beige linen work apron, plain brown belt, long dark skirt and comfortable dark leather shoes. A small plain linen medical shoulder bag and a tied bundle of dried herbs held at waist level. Steady posture, tired compassionate expression and clear attentive eyes.\nSubject invariants: A tired compassionate working herbalist in her late forties, narrow softly lined face, medium brown complexion, straight black-and-grey hair in a practical braid. Plain medical bag and tied dry herb bundle. No religious icon, healer magic, luminous herbs or new faction symbolism.\nFor humanoids: head and upper shoulders only, facing gently toward viewer, calm character-appropriate expression. Complete hair/head silhouette inside the square with comfortable top/side margins; center horizontally, eye line near 40% image height, chin near 65-70%, shoulders in the lower quarter. Do not raise cups, loaves, herbs, hands or cases across the face. Fume's goggles remain above his visible eyes; Miri's necklace stays fully hidden by her CLOSED collar; Auntie Salt remains elderly. For Anchor Sentinel: the full FRONT orb is its portrait, complete outline inside generous circular-crop-safe margins, one central eye, four smaller perimeter eyes and compact jaw readable; no human shoulders or invented head/hair.\nRendering: match the same K dark heroic fantasy painting with recognizable anime-influenced character drawing, warm ivory focal light and deep cool shadows. Keep distinct ages/features legible at 64-pixel UI size, painted surfaces and true complexion/colors; no photoreal skin or 3D rendering. Plain charcoal ground, enough outline contrast. One portrait only, no extra panels, scene, border, lettering, labels, watermark or effects."
+      },
+      "style_id": "severed-lands-dark-heroic-fantasy-k-v1"
     },
     {
       "id": "severed-monster-rift-death-hound",
@@ -12755,6 +12796,53 @@
       "campaign_setting_id": "pneuma.severed-lands",
       "document": "---\nname: \"V\"\nrole: \"Founder of the Returners\"\ndisposition: \"Ally, potentially antagonist\"\nspecies: \"Riftborn (home world unknown)\"\nlocation: \"Waystation (when present), field (usually)\"\n---\n\n# V\n\nV is the oldest known Riftborn — a figure who arrived through the Rift decades ago and has been searching for a way back ever since. Unlike most Riftborn, V retained memories of their original world: a place V describes only as \"green\" and \"quiet\" and \"gone.\" Those three words are the most personal information V has ever shared about themself.\n\nV founded the Returners not as an army but as a support network — Riftborn helping Riftborn, pooling knowledge and resources toward a shared goal. Over the decades, the Returners grew into something larger: a research organization, a political force, and the closest thing the Severed Lands has to a Riftborn advocacy group. V didn't plan any of that. V just kept working, and people kept joining.\n\nV is rarely at Waystation. They spend most of their time in the field — tracking leads on Warden fragments, investigating the two unaccounted-for Doors, following Rift surge patterns that might reveal something about the Doors' decline. When V returns, decisions get made. When V is gone, the senior Returners keep things running.\n\n## Personality\n\nV is patient, methodical, and carrying the weight of decades. They don't inspire through charisma — they inspire through competence. Every Returner knows that V has given their entire life to this mission. That kind of commitment is hard to argue with, and V rarely needs to argue.\n\nV is not cold, but they are guarded. They've lost too many people — Returners who died on patrol, Riftborn who gave up and left, friends who became Hollowed and stopped recognizing them. V doesn't form new attachments easily. When they do, it's significant.\n\nV's defining trait is patience bordering on obsession. They've been working on the Door problem for longer than most Returners have been alive. They believe the answer exists — in a Warden inscription they haven't found yet, in a Door fragment they haven't recovered, in a surge pattern they haven't mapped. The belief is not faith. It's the conclusion of decades of evidence. V is not guessing. V is waiting.\n\n## Role in a Campaign\n\n**As ally:** V is the quest-giver, the mentor, the voice of experience. They send the party after Warden fragments, Door leads, and Rift surge data. They provide context, resources, and the occasional warning that goes unheeded until it's too late.\n\n**As antagonist:** V's patience has a dark side. If the party discovers a way to force the Door open — a method V considers too dangerous, too uncertain, too likely to bring something through first — V will oppose them. Not with violence. V doesn't do violence. But with obstruction, with withheld information, with the full weight of the Returners' loyalty. The party wants to force the Door. V has spent decades trying to open it safely. Neither side is wrong. The conflict writes itself.\n\n**As mystery:** V knows more than they share. About their home world. About the Wardens. About what they've seen in the deep Cairnfields and the unaccounted-for Door sites. A campaign that earns V's trust might eventually learn the full story. A campaign that doesn't might never know what V was really looking for.\n\n## Behind the Screen\n\nV's true nature is left deliberately ambiguous. Possible truths include:\n\n- V is exactly what they appear to be: a Riftborn who remembers home and wants to return.\n- V was part of the Wardens — not metaphorically, literally. V's \"decades\" of searching might be centuries. The Wardens' symbol — a circle bisected by a line — appears in V's personal notes.\n- V knows why the Doors are dying. They're not trying to open the Door. They're trying to prevent something from coming through.\n- V's home world was destroyed by whatever created the Rift. V isn't trying to go home. V is trying to make sure it doesn't happen here.\n\nThe truth is for the DM to decide. The ambiguity is the point.\n\n## Appearance and artwork\n\nA humanlike androgynous adult Riftborn field researcher with apparent age styling in their early sixties, a lean medium-height frame, warm copper-brown skin, gray-green eyes, a long softly lined clean-shaven face and straight silver-gray neck-length hair held back in a loose plain half-tie. Patient methodical guarded expression, quiet attentive upright posture and empty relaxed hands. A plain weathered brown knee-length travel coat over a muted sage-green linen tunic, charcoal trousers and worn dark brown leather boots. One small closed canvas field bag hangs at their anatomical LEFT hip from a strap over their RIGHT shoulder; one small closed plain notebook is secured at their anatomical RIGHT belt, with no writing or symbol on the cover. Their patient competent guarded bearing follows the authored sources; apparent age, physical features, clothing and field equipment are editable visual defaults. Use they/them pronouns. Their actual age, home world and underlying identity remain for the selected campaign and DM to establish. No weapon, armor, crown, divine or immortal appearance, Warden symbol, circle bisected by a line, identifying badge, visible Door fragment, open notebook, readable writing, glowing eyes, halo, portal, home-world scenery or revealed history.\n\nThis prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.\n\n[Portrait](../assets/characters/05651541a780198d28a1558a3dd5253e6078c5df9d34f279cb5b8151e9a0c803.png)\n\n[Full-body reference](../assets/characters/b71f4e1189e2a549be128030cf3e312bfc6cefee63bc8c72c6eddaa03dd019d2.png)\n\n[Multiview reference sheet](../assets/characters/ba2a67b5000634ad41bbd307690675dd58e300ddff7f76965a2123c0b7af6b11.png)\n",
       "source_commit": "c8da35000ab5b4c44dbcd60279c5f78da288de93"
+    },
+    {
+      "package_id": "pneuma.severed-lands",
+      "path": "content/monsters/anchor-sentinel.md",
+      "sha256": "d10357126413034ddd09484db8b213a3ea1de8bb6533a0ed13c61146a8f43558",
+      "document": "---\nname: \"Anchor Sentinel\"\nsize: Medium\ntype: aberration\ncr: '3'\nxp: 700\nac: 14\nhp: 39\nhit_dice: 6d8 + 12\nspeed: 0 ft., fly 30 ft. (hover)\nstats:\n  str: 8\n  dex: 14\n  con: 14\n  int: 13\n  wis: 14\n  cha: 11\nsaves: {}\nskills:\n  perception: 6\nsenses:\n  darkvision: 120 ft.\n  passive_perception: 16\nlanguages: Deep Speech, Undercommon, telepathy 120 ft.\nhabitat:\n- underdark\ncondition_immunities:\n- prone\n---\nA minor construct left behind by the Wardens to watch over a dormant Anchor Door fragment. Unlike greater Warden constructs, these sentinels were designed to observe rather than engage. Centuries of isolation and Rift exposure have degraded their protocols, and many now attack anything that approaches their charge.\n## Actions\n**Bite.** +1 to hit, 2 (1d6 - 1) piercing.\n**Eye Rays.** The sentinel shoots up to two of the following magical eye rays at one or two creatures within 90 feet: 1. Confusion Ray (WIS save or can't take reactions, roll d8 for behavior). 2. Paralyzing Ray (CON save or paralyzed 1 min). 3. Fear Ray (WIS save or frightened 1 min). 4. Wounding Ray (CON save or 16 (3d10) necrotic). Recharges 5-6.\n**Create Food and Water.** The sentinel magically creates enough food and water to sustain one Medium creature for 24 hours.\n\n## Appearance and artwork\n\nA Medium hovering orb of weathered dark stone and dull iron plates, with one large amber slit-pupil eye, four smaller amber perimeter eyes, a compact toothed split jaw, narrow pale-blue luminous seams, worn iron braces and age cracks. It has no humanoid limbs or clothing.\n\nThis prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.\n\n[Portrait](../../assets/characters/bc07a201d8c8e751c51ec483b22700f386c665dfddcec7264e58d72725414e31.png)\n\n[Full-body reference](../../assets/characters/b5d89a10fe76c5cb60806910ee0ebd815725358fdeb72e1b2cec422e3010f2da.png)\n\n[Multiview reference sheet](../../assets/characters/4ab1179654199dd3a6c0221e1fb2811bafcb00d6c024a579f026d77b77b31433.png)\n",
+      "source_commit": "690fe7811f3e131850fc30710cb9e265bc714860"
+    },
+    {
+      "package_id": "pneuma.severed-lands",
+      "path": "npcs/baker-tessa.md",
+      "sha256": "b47fe274668368992046981bf044e05a46214f37890ef709a5473c70bff0e087",
+      "campaign_setting_id": "pneuma.severed-lands",
+      "document": "---\nname: \"Tessa\"\nrole: \"Thornwall baker\"\ndisposition: \"Ally\"\nspecies: \"Human (settled)\"\nlocation: \"Thornwall market\"\n---\n\n# Tessa\n\nTessa runs the best bakery in Thornwall. Her bread is the reason the morning market has a line before sunrise. She's been baking since she could reach the oven — her mother ran the bakery before her, and her grandmother before that. The recipes haven't changed in three generations. The quality hasn't either.\n\nTessa doesn't care about Riftborn politics. She cares about flour prices. The council's grain tariffs — controlled by House Voss — directly affect her margins. She's been quietly vocal about this at market gatherings. \"Quietly vocal\" in Thornwall means she says things that sound like complaints about the weather but everyone knows are complaints about Lord Voss.\n\nShe'll sell to anyone. She'll also slip an extra roll to the Warrens kids who hang around the market at closing time. She doesn't make a thing of it. The rolls just happen to be \"leftover.\"\n\n## Personality\n\nWarm, practical, and politically aware in the way that small business owners have to be. Tessa treats baking as craft and community — the bakery feeds Thornwall, and Thornwall takes care of the bakery. That's how it's always worked. She doesn't see why Riftborn should be any different.\n\n## Appearance and artwork\n\nAn adult Human woman in her late thirties with a sturdy build, fair warm skin with freckles, blue-green eyes, a round friendly face and thick auburn hair braided and pinned back. A rust-brown rolled-sleeve work dress, cream flour-dusted apron, plain leather belt and practical brown boots. Bare forearms with a light dusting of flour, a small linen cloth and one simple round loaf in her hands. Warm, practical expression.\n\nThis prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.\n\n[Portrait](../assets/characters/f6d66aee896b350693861e4a95fddca13d39af59990d0576435cdfe067b4b89b.png)\n\n[Full-body reference](../assets/characters/a4677d0ef84b76e8ca6c5935d3b837fadab5d19b8511a592e727366d2995a4c2.png)\n\n[Multiview reference sheet](../assets/characters/b3c0bd4232cfeee3e47bfda305cb6ecba81865cd1a9ddd53fb50a7cd57530177.png)\n",
+      "source_commit": "690fe7811f3e131850fc30710cb9e265bc714860"
+    },
+    {
+      "package_id": "pneuma.severed-lands",
+      "path": "npcs/guard-miri.md",
+      "sha256": "0904b3092f4cb5d6a98aa05d2eff8e93e470d088f24fc8b429df4951afaf429c",
+      "campaign_setting_id": "pneuma.severed-lands",
+      "document": "---\nname: \"Miri\"\nrole: \"Thornwall gate guard\"\ndisposition: \"Neutral (sympathetic)\"\nspecies: \"Human (settled)\"\nlocation: \"Thornwall (the Gate)\"\n---\n\n# Miri\n\nMiri is a gate guard — one of the men and women who check everyone entering Thornwall. She's been on gate duty for three years. She's seen every kind of arrival: merchants with caravans, Returners with supply requests, Riftborn with hope and fear in equal measure.\n\nMiri processes Riftborn registrations by the book — name, origin if known, purpose of visit. She asks the required questions. She doesn't ask the ones the book doesn't require. A Riftborn who stammers on the \"origin\" question gets a moment to collect themselves. A Riftborn who looks like they haven't eaten gets directions to the Warrens. Miri doesn't break policy. She just administers it with the most humanity the policy allows.\n\nHer brother was Riftborn — arrived ten years ago, no memories, died in a Hollows scavenging accident before Miri ever got to know him. She wears his ring on a chain under her uniform. She doesn't talk about it.\n\n## Personality\n\nQuiet, dutiful, and carrying a private grief. Miri does her job. She doesn't make waves. She just makes sure the Gate is slightly less terrifying than it could be.\n\n## Appearance and artwork\n\nAn adult Human woman in her early thirties with an athletic lean build, deep warm brown skin, dark brown eyes, a long oval face and tightly braided dark hair gathered behind her head. Plain muted blue-gray guard tunic, closed collar, practical steel mail shirt under a simple dark leather jerkin, dark trousers, brown boots, plain belt and sheathed short sidearm. No helmet so her face is clear. Quiet, composed, sympathetic expression. Her brother's ring and chain remain completely hidden beneath her closed uniform.\n\nThis prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.\n\n[Portrait](../assets/characters/8141b920c712b0d5d72688a85f7eed35fb1eccb106fd17eed9dc4de75c499d97.png)\n\n[Full-body reference](../assets/characters/34091fd6cff0927bf288ec9b978842150d8291f4ae4f0d0cc9dbd6a028e209dc.png)\n\n[Multiview reference sheet](../assets/characters/9cd209a98c5f24059c56693ac8d51bb143af2194b600a25111e7c7924bee91a1.png)\n",
+      "source_commit": "690fe7811f3e131850fc30710cb9e265bc714860"
+    },
+    {
+      "package_id": "pneuma.severed-lands",
+      "path": "npcs/auntie-salt.md",
+      "sha256": "1dc1fb98b9917dc75f59aa8f1b0dc25bbcb06025827a7d8777197ccf3df7d8d9",
+      "campaign_setting_id": "pneuma.severed-lands",
+      "document": "---\nname: \"Auntie Salt\"\nrole: \"Warrens Court information broker\"\ndisposition: \"Neutral (sells to anyone)\"\nspecies: \"Human (settled)\"\nlocation: \"Thornwall Warrens\"\n---\n\n# Auntie Salt\n\nAuntie Salt runs the Warrens' information network — a web of barkeeps, merchants, street kids, and domestic servants who feed her everything they see and hear. She's the Warrens Court's intelligence arm, but she's not loyal to the Court. She's loyal to the information trade, and she sells to anyone who can pay.\n\nSalt has no territory and no gang. Her currency is knowledge, and she's the richest person in the Warrens — not in gold, but in leverage. She knows about Kael's daughter. She knows about Trask's Nexus negotiations. She knows which Warrens resident has been cultivating a Rift pool in their basement. She's known that last one for weeks. She hasn't told anyone yet. She's waiting for the right buyer.\n\nSalt's network extends beyond the Warrens — she has informants in Thornwall proper, in the Hollows Crews, and (rumor has it) in the Athenaeum. The extent of her reach is unknown. The accuracy of her information is frighteningly consistent.\n\n## Personality\n\nSalt is cheerful, grandmotherly, and utterly amoral about the information trade. She treats secrets like produce — some are fresh, some are past their sell-by date, all of them have a price. She genuinely likes people. She just likes knowing things about them more. She keeps a pot of tea going at all hours. Visitors are always offered a cup. No one knows if the tea is safe. Everyone drinks it anyway.\n\n## Appearance and artwork\n\nA short stocky older Human woman in her seventies with warm brown skin, pale gray eyes, a softly lined broad face and white hair pinned into a tidy bun. Layers of practical burgundy clothing, a worn deep teal shawl, plain brown skirt, comfortable leather shoes, a small waist pouch and simple brass earrings. Carries one plain ceramic tea cup and saucer. A cheerful grandmotherly smile and sharp observant eyes.\n\nThis prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.\n\n[Portrait](../assets/characters/e8d4361182d44f74ca5835af1ea007bf4528e29510e0b1587563d596f9cacc6a.png)\n\n[Full-body reference](../assets/characters/2e64fd5f33cd1e550a037597da7b9bf36d8491e095adb0f0eb6dfa04c3fb84cc.png)\n\n[Multiview reference sheet](../assets/characters/2feec661eab81aed24c3ddf5024902b0223cc8ab5f96eccb4e71cf9bba63dc98.png)\n",
+      "source_commit": "690fe7811f3e131850fc30710cb9e265bc714860"
+    },
+    {
+      "package_id": "pneuma.severed-lands",
+      "path": "npcs/alchemist-fume.md",
+      "sha256": "b6d1a8593051093e1b122aa442e89e1d3c47f99e0be1772c1665e802227bc817",
+      "campaign_setting_id": "pneuma.severed-lands",
+      "document": "---\nname: \"Fume\"\nrole: \"Nexus alchemist (Crossroads market)\"\ndisposition: \"Neutral (mercenary)\"\nspecies: \"Riftborn (home world — alchemical)\"\nlocation: \"Nexus (Crossroads)\"\n---\n\n# Fume\n\nFume sells alchemical supplies in the Crossroads market — reagents and the occasional Rift-touched compound that the Athenaeum would classify as hazardous. He arrived through the Rift with a case of alchemical formulas and the burns to prove he'd tested most of them. His stall smells of sulfur and something sweeter that lingers in the sinuses.\n\nFume is the go-to for anyone who needs something unstable. Returner patrols buy his Rift-burn salve. Hollows scavengers buy his glow-paste — a compound that emits light for hours without heat, essential for navigating the ruins without attracting riftbeasts. The Athenaeum buys his more exotic compounds through intermediaries. Fume doesn't ask what they're for. He just provides the materials.\n\nFor SRD Lite, this stock is narrative setting detail. The stall offers no usable consumables,\nand its salves and compounds apply no automatic healing, light or other mechanical effect.\nConsumables belong to future SRD Full.\n\n## Personality\n\nFume is enthusiastic, slightly unhinged, and deeply in love with his craft. He treats alchemy as art — every compound is an expression, every reaction is a conversation. He's blown up his stall three times. He's rebuilt it each time. The Crossroads regulars consider him a local treasure.\n\n## Appearance and artwork\n\nAn adult humanoid man in his forties with olive-tan skin, lively brown eyes, a long hooked nose, a bald crown and wispy copper-gray hair at the sides. Thin healed pale burn scars on his forearms, intact skin. Brass work goggles pushed above the eyes, a soot-stained mustard tunic, worn dark work coat, brown leather apron, dark trousers and heavy practical boots. A scuffed leather reagent case held closed at his side and two small sealed opaque containers on the belt. Enthusiastic slightly wild smile. No glowing compounds or magical effects.\n\nThis prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.\n\n[Portrait](../assets/characters/b4234564413f65ee6c9f3524961accfe3144c01b999d203405992b3e6da22fc8.png)\n\n[Full-body reference](../assets/characters/c1ea5e720039fab6a737491d625911671653140dfe149f22fc1a274852d8fa90.png)\n\n[Multiview reference sheet](../assets/characters/be1fe36a65617bb9405682aa6f4c8386f7cff7055c970ca00f8f8ccb94507914.png)\n",
+      "source_commit": "690fe7811f3e131850fc30710cb9e265bc714860"
+    },
+    {
+      "package_id": "pneuma.severed-lands",
+      "path": "npcs/herbalist-saffron.md",
+      "sha256": "980e36d5c56806b5d3a482938d889cabcd75e720dff7ec7286a8ec0d0d867e37",
+      "campaign_setting_id": "pneuma.severed-lands",
+      "document": "---\nname: \"Saffron\"\nrole: \"Thornwall herbalist, Warrens healer\"\ndisposition: \"Ally\"\nspecies: \"Human (settled)\"\nlocation: \"Thornwall market, Warrens\"\n---\n\n# Saffron\n\nSaffron runs a herbalist stall in the Thornwall market by day and a free clinic in the Warrens by night. She's settled — born in Thornwall, never been through the Rift — but she's spent enough time in the Warrens to know that the council's policies are killing people. She doesn't make a political statement about it. She just keeps showing up with medicine.\n\nHer knowledge of Rift-touched conditions is largely self-taught — the Athenaeum's medical texts don't cover Warrens-level care, and Saffron has had to figure out on her own what helps and what makes things worse. She's made mistakes. She's learned from them. She's saved more lives than Thornwall's official healers.\n\n## Personality\n\nSaffron is tired, compassionate, and quietly furious at the system she works within. She doesn't waste energy on anger. She uses it on patients. Her hands are steady. Her diagnostic eye is sharp. Her supply of Rift-burn salve is always running low.\n\n## Appearance and artwork\n\nAn adult Human woman in her late forties with medium brown skin, dark brown eyes, a narrow softly lined face and straight black hair with gray strands, center-parted and tied in a long practical braid. A muted forest-green wrap tunic, beige linen work apron, plain brown belt, long dark skirt and comfortable dark leather shoes. A small plain linen medical shoulder bag and a tied bundle of dried herbs held at waist level. Steady posture, tired compassionate expression and clear attentive eyes.\n\nThis prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.\n\n[Portrait](../assets/characters/2579873c5819ffcbd7bc80990b74b1b6b784ff96a1a34a32f17ba881450a885e.png)\n\n[Full-body reference](../assets/characters/45993c405459111af401793a20b5ca08ccebb635a77f4d8f01942d1abe59797e.png)\n\n[Multiview reference sheet](../assets/characters/d1e7f8041f038b1d20778dfc72e4ddcb4fc3f0850324165e1f1c734957473a7f.png)\n",
+      "source_commit": "690fe7811f3e131850fc30710cb9e265bc714860"
     }
   ],
   "retained_assets": [
@@ -12793,6 +12881,78 @@
     {
       "path": "assets/characters/05651541a780198d28a1558a3dd5253e6078c5df9d34f279cb5b8151e9a0c803.png",
       "sha256": "05651541a780198d28a1558a3dd5253e6078c5df9d34f279cb5b8151e9a0c803"
+    },
+    {
+      "path": "assets/characters/b5d89a10fe76c5cb60806910ee0ebd815725358fdeb72e1b2cec422e3010f2da.png",
+      "sha256": "b5d89a10fe76c5cb60806910ee0ebd815725358fdeb72e1b2cec422e3010f2da"
+    },
+    {
+      "path": "assets/characters/4ab1179654199dd3a6c0221e1fb2811bafcb00d6c024a579f026d77b77b31433.png",
+      "sha256": "4ab1179654199dd3a6c0221e1fb2811bafcb00d6c024a579f026d77b77b31433"
+    },
+    {
+      "path": "assets/characters/bc07a201d8c8e751c51ec483b22700f386c665dfddcec7264e58d72725414e31.png",
+      "sha256": "bc07a201d8c8e751c51ec483b22700f386c665dfddcec7264e58d72725414e31"
+    },
+    {
+      "path": "assets/characters/a4677d0ef84b76e8ca6c5935d3b837fadab5d19b8511a592e727366d2995a4c2.png",
+      "sha256": "a4677d0ef84b76e8ca6c5935d3b837fadab5d19b8511a592e727366d2995a4c2"
+    },
+    {
+      "path": "assets/characters/b3c0bd4232cfeee3e47bfda305cb6ecba81865cd1a9ddd53fb50a7cd57530177.png",
+      "sha256": "b3c0bd4232cfeee3e47bfda305cb6ecba81865cd1a9ddd53fb50a7cd57530177"
+    },
+    {
+      "path": "assets/characters/f6d66aee896b350693861e4a95fddca13d39af59990d0576435cdfe067b4b89b.png",
+      "sha256": "f6d66aee896b350693861e4a95fddca13d39af59990d0576435cdfe067b4b89b"
+    },
+    {
+      "path": "assets/characters/34091fd6cff0927bf288ec9b978842150d8291f4ae4f0d0cc9dbd6a028e209dc.png",
+      "sha256": "34091fd6cff0927bf288ec9b978842150d8291f4ae4f0d0cc9dbd6a028e209dc"
+    },
+    {
+      "path": "assets/characters/9cd209a98c5f24059c56693ac8d51bb143af2194b600a25111e7c7924bee91a1.png",
+      "sha256": "9cd209a98c5f24059c56693ac8d51bb143af2194b600a25111e7c7924bee91a1"
+    },
+    {
+      "path": "assets/characters/8141b920c712b0d5d72688a85f7eed35fb1eccb106fd17eed9dc4de75c499d97.png",
+      "sha256": "8141b920c712b0d5d72688a85f7eed35fb1eccb106fd17eed9dc4de75c499d97"
+    },
+    {
+      "path": "assets/characters/2e64fd5f33cd1e550a037597da7b9bf36d8491e095adb0f0eb6dfa04c3fb84cc.png",
+      "sha256": "2e64fd5f33cd1e550a037597da7b9bf36d8491e095adb0f0eb6dfa04c3fb84cc"
+    },
+    {
+      "path": "assets/characters/2feec661eab81aed24c3ddf5024902b0223cc8ab5f96eccb4e71cf9bba63dc98.png",
+      "sha256": "2feec661eab81aed24c3ddf5024902b0223cc8ab5f96eccb4e71cf9bba63dc98"
+    },
+    {
+      "path": "assets/characters/e8d4361182d44f74ca5835af1ea007bf4528e29510e0b1587563d596f9cacc6a.png",
+      "sha256": "e8d4361182d44f74ca5835af1ea007bf4528e29510e0b1587563d596f9cacc6a"
+    },
+    {
+      "path": "assets/characters/c1ea5e720039fab6a737491d625911671653140dfe149f22fc1a274852d8fa90.png",
+      "sha256": "c1ea5e720039fab6a737491d625911671653140dfe149f22fc1a274852d8fa90"
+    },
+    {
+      "path": "assets/characters/be1fe36a65617bb9405682aa6f4c8386f7cff7055c970ca00f8f8ccb94507914.png",
+      "sha256": "be1fe36a65617bb9405682aa6f4c8386f7cff7055c970ca00f8f8ccb94507914"
+    },
+    {
+      "path": "assets/characters/b4234564413f65ee6c9f3524961accfe3144c01b999d203405992b3e6da22fc8.png",
+      "sha256": "b4234564413f65ee6c9f3524961accfe3144c01b999d203405992b3e6da22fc8"
+    },
+    {
+      "path": "assets/characters/45993c405459111af401793a20b5ca08ccebb635a77f4d8f01942d1abe59797e.png",
+      "sha256": "45993c405459111af401793a20b5ca08ccebb635a77f4d8f01942d1abe59797e"
+    },
+    {
+      "path": "assets/characters/d1e7f8041f038b1d20778dfc72e4ddcb4fc3f0850324165e1f1c734957473a7f.png",
+      "sha256": "d1e7f8041f038b1d20778dfc72e4ddcb4fc3f0850324165e1f1c734957473a7f"
+    },
+    {
+      "path": "assets/characters/2579873c5819ffcbd7bc80990b74b1b6b784ff96a1a34a32f17ba881450a885e.png",
+      "sha256": "2579873c5819ffcbd7bc80990b74b1b6b784ff96a1a34a32f17ba881450a885e"
     }
   ]
 }

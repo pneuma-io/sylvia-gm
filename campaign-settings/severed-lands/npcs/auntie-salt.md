@@ -24,8 +24,8 @@ A short stocky older Human woman in her seventies with warm brown skin, pale gra
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/e8d4361182d44f74ca5835af1ea007bf4528e29510e0b1587563d596f9cacc6a.png)
+[Portrait](../assets/characters/8ec8f4f5ebd8140ed832ef5eea3023e91000f681d9c2dbd2cd14c71a0c9c0afd.png)
 
-[Full-body reference](../assets/characters/2e64fd5f33cd1e550a037597da7b9bf36d8491e095adb0f0eb6dfa04c3fb84cc.png)
+[Full-body reference](../assets/characters/3efc36fe371eba004a90ce7361bf33ad55969ee0c3079a6d22fc392107091229.png)
 
-[Multiview reference sheet](../assets/characters/2feec661eab81aed24c3ddf5024902b0223cc8ab5f96eccb4e71cf9bba63dc98.png)
+[Multiview reference sheet](../assets/characters/176fdec3768ac7aa0c1cdb76c2fdb6758e832ea304f1cdd01ed57e6823fc7cfe.png)

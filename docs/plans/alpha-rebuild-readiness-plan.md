@@ -24,11 +24,13 @@ Builder requests capture it through the existing image lifecycle; the style is r
 reference/portrait stages and restart, while explicit user style instructions take precedence.
 Actual Lite and independent-setting checks cover selection, replay-safe Review progression,
 canonical references and map-reference ordering. Live style fidelity remains unqualified.
-V, Captain Harlan and the Cartographer are the first three complete K bundles (nine new PNGs).
-Their fixed designs, character-source aliases and narrative prefixes are retained. The earlier
-source editions and nine prior PNGs remain addressable for existing saved references. The other
-197 bundles are unchanged: the 200-bundle/600-active-PNG catalogue is a technical coverage
-checkpoint, not completion of the selected K direction. Wider K production and the remaining
+V, Captain Harlan and the Cartographer were the first three complete K bundles. Tessa, Miri,
+Auntie Salt, Fume, Saffron and the Anchor Sentinel now add six more, bringing selected K coverage
+to nine bundles and 27 active PNGs. The latest 18 assets preserve distinct ages, Miri's hidden
+necklace and the Sentinel's nonhuman anatomy. Exact source aliases and narrative/mechanics
+prefixes are retained; earlier source editions and 27 prior PNGs remain addressable for saved
+references. The other 191 bundles retain their prior art. The 200-bundle/600-active-PNG catalogue
+is a technical coverage checkpoint, not completion of K. Wider K production and the remaining
 catalogue are open. Live/in-app checks and separately owned Siren playable conversion remain
 deferred; this increment does not select merge or release.
 

@@ -24,8 +24,8 @@ An adult Human woman in her late thirties with a sturdy build, fair warm skin wi
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/f6d66aee896b350693861e4a95fddca13d39af59990d0576435cdfe067b4b89b.png)
+[Portrait](../assets/characters/9a47dd0f5fc1746bd3b31de3a743745396356e1a400bc4993924eaaaa54f38d1.png)
 
-[Full-body reference](../assets/characters/a4677d0ef84b76e8ca6c5935d3b837fadab5d19b8511a592e727366d2995a4c2.png)
+[Full-body reference](../assets/characters/c0e8ad7b98d15ba18096922e96e2ba2541ffccad3ba3bf8a4edf63d0b3c4e9de.png)
 
-[Multiview reference sheet](../assets/characters/b3c0bd4232cfeee3e47bfda305cb6ecba81865cd1a9ddd53fb50a7cd57530177.png)
+[Multiview reference sheet](../assets/characters/79a4cd276fe4ecb03e2e49ab71640c1e7f2aac36fb440aa47be6dd12bc256b05.png)
