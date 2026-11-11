@@ -28,10 +28,8 @@ def native():
     return data, capture, restore, pool
 
 
-def _project(native, *, repaired, modifier=4, amount=32):
+def _project(native, *, modifier=4, amount=32):
     data, original_capture, restore, pool = deepcopy(native)
-    if repaired:
-        _capture_healing_totals(data)
     capture = next(e for rows in _lists(data['tools']['cast_spell']['effects']) for e in rows
         if e.get('set', {}).get('field') == '_retained_cast_tail_context')
     wanted = {'_spell_healing', '_spell_healing_modifier', '_spell_healing_amount'}
@@ -49,16 +47,16 @@ def _project(native, *, repaired, modifier=4, amount=32):
     return card, parent.vars, frame.vars
 
 
-def test_uncaptured_native_healing_totals_reproduce_missing_card(native):
-    card, _, frame = _project(native, repaired=False)
-    assert frame['_spell_card_summary'][0]['equation']['modifier'] == '_spell_healing_modifier'
-    assert frame['_spell_card_summary'][0]['equation']['total'] == '_spell_healing_amount'
-    assert card is None
+def test_committed_native_healing_totals_form_a_valid_card(native):
+    card, _, frame = _project(native)
+    assert frame['_spell_card_summary'][0]['equation']['modifier'] == 4
+    assert frame['_spell_card_summary'][0]['equation']['total'] == 32
+    assert card is not None
 
 
 @pytest.mark.parametrize(('modifier', 'amount'), ((4,32), (0,28), (-2,26)))
 def test_original_d8_faces_and_native_totals_survive_final_cast_transport(native, modifier, amount):
-    card, parent, frame = _project(native, repaired=True, modifier=modifier, amount=amount)
+    card, parent, frame = _project(native, modifier=modifier, amount=amount)
     assert card is not None
     equation = card['summary'][0]['equation']
     assert equation == {'die_sides':8, 'rolls':[7,7,1,5,8], 'roll':28,
@@ -68,6 +66,13 @@ def test_original_d8_faces_and_native_totals_survive_final_cast_transport(native
 
 def test_healing_capture_preserves_all_original_runtime_owners(native):
     data = deepcopy(native[0])
+    capture = next(e for rows in _lists(data['tools']['cast_spell']['effects']) for e in rows
+        if e.get('set', {}).get('field') == '_retained_cast_tail_context')
+    # Isolate this binder's two descriptors; the committed package already has them.
+    fields = {'_spell_healing_modifier', '_spell_healing_amount'}
+    previous = capture['set']['value']
+    capture['set']['value'] = [row for row in previous if row['key'][1:-1] not in fields]
+    assert len(previous) - len(capture['set']['value']) == 2
     before = deepcopy(data)
     assert _capture_healing_totals(data) == ('_spell_healing_modifier', '_spell_healing_amount')
     capture = next(e for rows in _lists(data['tools']['cast_spell']['effects']) for e in rows

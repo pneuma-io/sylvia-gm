@@ -70,7 +70,8 @@ def test_actual_lite_phase_one_shell(tmp_path, monkeypatch, private):
                     "node", "--test", "tests/weekend_candidate_lite.cjs",
                     env={**os.environ, "SYLVIA_TEST_WEBUI_BACKEND": backend,
                          "SYLVIA_TEST_WEBUI_ORIGIN": ORIGIN if private else backend,
-                         "SYLVIA_TEST_WEBUI_PRIVATE": str(int(private))},
+                         "SYLVIA_TEST_WEBUI_PRIVATE": str(int(private)),
+                         "SYLVIA_WEBUI_QA_OUTPUT": str(tmp_path / "browser-screenshots")},
                     stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT,
                 )
                 output, _ = await process.communicate()

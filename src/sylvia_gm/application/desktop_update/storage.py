@@ -5,35 +5,199 @@ from __future__ import annotations
 import os
 import re
 import uuid
+from collections.abc import Mapping
+from enum import StrEnum
 from pathlib import Path
+from typing import Final
 
 from .manifest import MANIFEST_LIMIT, UpdateError, bounded_json, canonical_bytes
 
-PHASES = frozenset(
-    {
-        "checking",
-        "available",
-        "current",
-        "downloading",
-        "verified",
-        "deferred",
-        "cancelled",
-        "interrupted",
-        "error",
-        "preparing",
-        "prepared",
-        "closing",
-        "applying",
-        "awaiting_restart",
-        "recovery_required",
-        "rolling_back",
-        "rollback_ready",
-        "rollback_awaiting_restart",
-        "confirmed",
-        "rolled_back",
-    }
+
+class UpdatePhase(StrEnum):
+    CHECKING = "checking"
+    AVAILABLE = "available"
+    CURRENT = "current"
+    DOWNLOADING = "downloading"
+    VERIFIED = "verified"
+    DEFERRED = "deferred"
+    CANCELLED = "cancelled"
+    INTERRUPTED = "interrupted"
+    ERROR = "error"
+    PREPARING = "preparing"
+    PREPARED = "prepared"
+    CLOSING = "closing"
+    APPLYING = "applying"
+    AWAITING_RESTART = "awaiting_restart"
+    RECOVERY_REQUIRED = "recovery_required"
+    ROLLING_BACK = "rolling_back"
+    ROLLBACK_READY = "rollback_ready"
+    ROLLBACK_AWAITING_RESTART = "rollback_awaiting_restart"
+    CONFIRMED = "confirmed"
+    ROLLED_BACK = "rolled_back"
+    IDLE = "idle"
+
+
+class UpdateViewPhase(StrEnum):
+    UNAVAILABLE = "unavailable"
+    RECOVERING = "recovering"
+
+
+UPDATE_MOVES: Final[Mapping[UpdatePhase, frozenset[UpdatePhase]]] = {
+    UpdatePhase.IDLE: frozenset(
+        {
+            UpdatePhase.CHECKING,
+            UpdatePhase.AVAILABLE,
+            UpdatePhase.CURRENT,
+            UpdatePhase.VERIFIED,
+            UpdatePhase.DEFERRED,
+            UpdatePhase.CANCELLED,
+            UpdatePhase.INTERRUPTED,
+            UpdatePhase.ERROR,
+            UpdatePhase.RECOVERY_REQUIRED,
+            UpdatePhase.CONFIRMED,
+            UpdatePhase.ROLLED_BACK,
+        }
+    ),
+    UpdatePhase.CHECKING: frozenset(
+        {
+            UpdatePhase.CHECKING,
+            UpdatePhase.AVAILABLE,
+            UpdatePhase.CURRENT,
+            UpdatePhase.CANCELLED,
+            UpdatePhase.ERROR,
+            UpdatePhase.INTERRUPTED,
+        }
+    ),
+    UpdatePhase.AVAILABLE: frozenset(
+        {
+            UpdatePhase.AVAILABLE,
+            UpdatePhase.CHECKING,
+            UpdatePhase.DOWNLOADING,
+            UpdatePhase.DEFERRED,
+            UpdatePhase.ERROR,
+            UpdatePhase.CANCELLED,
+        }
+    ),
+    UpdatePhase.CURRENT: frozenset(
+        {UpdatePhase.CURRENT, UpdatePhase.CHECKING, UpdatePhase.ERROR, UpdatePhase.CANCELLED}
+    ),
+    UpdatePhase.DOWNLOADING: frozenset(
+        {
+            UpdatePhase.DOWNLOADING,
+            UpdatePhase.CHECKING,
+            UpdatePhase.VERIFIED,
+            UpdatePhase.CANCELLED,
+            UpdatePhase.ERROR,
+            UpdatePhase.INTERRUPTED,
+        }
+    ),
+    UpdatePhase.VERIFIED: frozenset(
+        {
+            UpdatePhase.VERIFIED,
+            UpdatePhase.CHECKING,
+            UpdatePhase.PREPARING,
+            UpdatePhase.DEFERRED,
+            UpdatePhase.ERROR,
+            UpdatePhase.CANCELLED,
+        }
+    ),
+    UpdatePhase.DEFERRED: frozenset(
+        {
+            UpdatePhase.DEFERRED,
+            UpdatePhase.CHECKING,
+            UpdatePhase.DOWNLOADING,
+            UpdatePhase.PREPARING,
+            UpdatePhase.ERROR,
+        }
+    ),
+    UpdatePhase.CANCELLED: frozenset(
+        {UpdatePhase.CANCELLED, UpdatePhase.CHECKING, UpdatePhase.ERROR}
+    ),
+    UpdatePhase.INTERRUPTED: frozenset({UpdatePhase.INTERRUPTED, UpdatePhase.CHECKING}),
+    UpdatePhase.ERROR: frozenset({UpdatePhase.ERROR, UpdatePhase.CHECKING, UpdatePhase.PREPARING}),
+    UpdatePhase.PREPARING: frozenset(
+        {
+            UpdatePhase.PREPARING,
+            UpdatePhase.PREPARED,
+            UpdatePhase.VERIFIED,
+            UpdatePhase.CANCELLED,
+            UpdatePhase.ERROR,
+            UpdatePhase.RECOVERY_REQUIRED,
+        }
+    ),
+    UpdatePhase.PREPARED: frozenset(
+        {
+            UpdatePhase.PREPARED,
+            UpdatePhase.DEFERRED,
+            UpdatePhase.CLOSING,
+            UpdatePhase.APPLYING,
+            UpdatePhase.VERIFIED,
+            UpdatePhase.ROLLING_BACK,
+            UpdatePhase.CANCELLED,
+            UpdatePhase.ERROR,
+            UpdatePhase.RECOVERY_REQUIRED,
+        }
+    ),
+    UpdatePhase.CLOSING: frozenset(
+        {
+            UpdatePhase.CLOSING,
+            UpdatePhase.APPLYING,
+            UpdatePhase.ROLLING_BACK,
+            UpdatePhase.RECOVERY_REQUIRED,
+        }
+    ),
+    UpdatePhase.APPLYING: frozenset(
+        {
+            UpdatePhase.APPLYING,
+            UpdatePhase.AWAITING_RESTART,
+            UpdatePhase.ROLLING_BACK,
+            UpdatePhase.RECOVERY_REQUIRED,
+        }
+    ),
+    UpdatePhase.AWAITING_RESTART: frozenset(
+        {
+            UpdatePhase.AWAITING_RESTART,
+            UpdatePhase.APPLYING,
+            UpdatePhase.CONFIRMED,
+            UpdatePhase.ROLLING_BACK,
+            UpdatePhase.RECOVERY_REQUIRED,
+        }
+    ),
+    UpdatePhase.RECOVERY_REQUIRED: frozenset(
+        {UpdatePhase.RECOVERY_REQUIRED, UpdatePhase.ROLLING_BACK}
+    ),
+    UpdatePhase.ROLLING_BACK: frozenset(
+        {UpdatePhase.ROLLING_BACK, UpdatePhase.ROLLBACK_READY, UpdatePhase.RECOVERY_REQUIRED}
+    ),
+    UpdatePhase.ROLLBACK_READY: frozenset(
+        {
+            UpdatePhase.ROLLBACK_READY,
+            UpdatePhase.ROLLBACK_AWAITING_RESTART,
+            UpdatePhase.RECOVERY_REQUIRED,
+        }
+    ),
+    UpdatePhase.ROLLBACK_AWAITING_RESTART: frozenset(
+        {
+            UpdatePhase.ROLLBACK_AWAITING_RESTART,
+            UpdatePhase.ROLLED_BACK,
+            UpdatePhase.RECOVERY_REQUIRED,
+        }
+    ),
+    UpdatePhase.CONFIRMED: frozenset(
+        {UpdatePhase.CONFIRMED, UpdatePhase.CHECKING, UpdatePhase.ROLLING_BACK}
+    ),
+    UpdatePhase.ROLLED_BACK: frozenset({UpdatePhase.ROLLED_BACK, UpdatePhase.CHECKING}),
+}
+
+
+# Idle exists only in controller memory, never in a persistent receipt.
+PHASES = frozenset(UpdatePhase) - {UpdatePhase.IDLE}
+
+# Existing callers can initialize a fresh operation at any valid saved phase.
+UPDATE_INITIAL_PHASES: Final[frozenset[UpdatePhase]] = PHASES
+EMPTY_TERMINAL_PHASES = frozenset(
+    {UpdatePhase.CURRENT, UpdatePhase.ERROR, UpdatePhase.CANCELLED, UpdatePhase.INTERRUPTED}
 )
-EMPTY_TERMINAL_PHASES = frozenset({"current", "error", "cancelled", "interrupted"})
 
 
 def operation_id(value: object) -> str:
@@ -168,6 +332,12 @@ class UpdateStore:
     def save(
         self, identity: str, phase: str, version: str | None, error_code: str | None = None
     ) -> None:
+        self._move_update(identity, phase, version, error_code)
+
+    def _move_update(
+        self, identity: str, phase: str, version: str | None, error_code: str | None = None
+    ) -> None:
+        phase = phase.value if isinstance(phase, UpdatePhase) else phase
         self.stage(identity)
         if phase not in PHASES or (
             error_code is not None and re.fullmatch(r"[a-z_]{1,64}", error_code) is None
@@ -217,8 +387,11 @@ class UpdateStore:
     def prune_empty_terminal(self, identity: str) -> None:
         """Remove only this operation's empty terminal directory, never any retained bytes."""
         row = self.load()
-        if (row is None or row["operation_id"] != operation_id(identity)
-                or row["phase"] not in EMPTY_TERMINAL_PHASES):
+        if (
+            row is None
+            or row["operation_id"] != operation_id(identity)
+            or row["phase"] not in EMPTY_TERMINAL_PHASES
+        ):
             return
         stage = self.root / identity
         if not stage.exists() and not stage.is_symlink():

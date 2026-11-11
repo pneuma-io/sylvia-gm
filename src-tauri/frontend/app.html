@@ -643,7 +643,7 @@
                 role="tab" data-settings-tab="accounts" aria-selected="false"
                 aria-controls="settings-panel-accounts">
           <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="7" r="3.2"/><path d="M3.8 17c.9-3.2 3.3-4.8 6.2-4.8s5.3 1.6 6.2 4.8"/></svg>
-          <span>ChatGPT account</span>
+          <span>Accounts</span>
         </button>
         <div class="settings-nav-group" aria-hidden="true">Preferences</div>
         <button class="settings-tab" id="settings-tab-appearance" type="button"
@@ -740,6 +740,7 @@
             <p class="settings-eyebrow">Connect a service</p>
             <div class="model-connection-choices">
               <button class="model-connection-choice" id="open-account-signin-btn" type="button"><strong>ChatGPT subscription</strong><span>Sign in with your account. No API key.</span></button>
+              <button class="model-connection-choice" id="open-claude-signin-btn" type="button"><strong>Claude subscription</strong><span>Use Claude Code on this computer, signed in with your own account. No API key.</span></button>
               <button class="model-connection-choice" type="button" data-model-route="api"><strong>API service</strong><span>A hosted service such as OpenAI or OpenRouter, or a custom endpoint. Uses an API key.</span></button>
               <button class="model-connection-choice" type="button" data-model-route="local"><strong>Local model server</strong><span>A model server you already run, on this or another computer.</span></button>
             </div>
@@ -929,9 +930,14 @@
                  aria-labelledby="settings-tab-accounts" data-settings-panel="accounts" hidden>
           <button class="settings-back" id="account-models-btn" type="button">Back to your models</button>
           <header class="settings-page-head">
-            <h2>ChatGPT account</h2>
-            <p class="settings-lead">Use your ChatGPT subscription in Sylvia. You sign in through your browser; no API key is needed.</p>
+            <h2>Accounts</h2>
+            <p class="settings-lead">Use a subscription you already have. Each account signs in through its own official app and your browser; no API key is needed.</p>
           </header>
+          <div class="account-switch" role="group" aria-label="Account">
+            <button type="button" data-account-view="chatgpt" aria-pressed="true">ChatGPT</button>
+            <button type="button" data-account-view="claude" aria-pressed="false">Claude</button>
+          </div>
+          <div class="account-view" id="account-view-chatgpt" data-account-panel="chatgpt">
           <div class="tutorial-entry"><button type="button" class="btn btn-secondary btn-sm" data-tutorial-offer="subscription">Need help connecting your ChatGPT subscription?</button></div>
           <p class="settings-note">Codex manages the sign-in. Messages and relevant campaign or Builder content go to OpenAI
             through Codex. Data use and retention depend on your ChatGPT plan and account or workspace settings; API data
@@ -976,6 +982,87 @@
               <p class="provider-field-help">Saving returns you to Your models, where you can make it the default for new chats.</p>
             </div>
           </section>
+          </div>
+
+          <div class="account-view" id="account-view-claude" data-account-panel="claude" hidden>
+          <p class="settings-note">Claude Code, Anthropic&rsquo;s official app on this computer, manages the sign-in. Sylvia runs it
+            as installed and never reads or stores its sign-in details. Messages and relevant campaign or Builder content go to
+            Anthropic through Claude Code, and usage counts against the account Claude Code is signed in with.</p>
+          <section class="settings-section" aria-labelledby="claude-signin-step">
+            <h3 class="settings-eyebrow" id="claude-signin-step">1. Find Claude Code</h3>
+            <div class="settings-card" id="claude-connection-card">
+              <div class="model-status settings-status-line" id="claude-connection-status" role="status" aria-live="polite">Not checked yet. Sylvia looks for Claude Code only when you ask.</div>
+              <p class="provider-field-help" id="claude-connection-detail" hidden></p>
+              <dl class="account-facts" id="claude-runtime-facts" hidden>
+                <div><dt>Claude Code</dt><dd id="claude-fact-version"></dd></div>
+                <div><dt>Signed in with</dt><dd id="claude-fact-auth"></dd></div>
+                <div><dt>Billing</dt><dd id="claude-fact-billing"></dd></div>
+              </dl>
+              <p class="settings-note" id="claude-billing-note" role="status" hidden></p>
+              <div class="provider-actions">
+                <button class="btn btn-primary btn-sm" type="button" data-claude-action="status">Check for Claude Code</button>
+                <button class="btn btn-primary btn-sm" type="button" data-claude-action="login" hidden>Sign in with Claude Code</button>
+                <button class="btn btn-secondary btn-sm" type="button" data-claude-action="cancel" hidden>Cancel sign-in</button>
+                <button class="btn btn-secondary btn-sm" type="button" id="claude-install-guide-btn" hidden>Open install guide</button>
+              </div>
+              <p class="provider-field-help" id="claude-login-help" hidden>Claude Code opens Anthropic&rsquo;s sign-in page in your
+                browser for your subscription. To use a Console API account instead, sign in through Claude Code first, then check here.</p>
+              <p class="provider-field-help" id="claude-cancel-help" hidden>Cancel stops only the sign-in Sylvia started. Other
+                Claude Code sessions stay signed in.</p>
+              <p class="provider-field-help" id="claude-signout-help" hidden>To sign out or switch accounts, use Claude Code itself.
+                Sylvia never signs you out.</p>
+              <p class="provider-field-help" id="claude-install-help" hidden>Sylvia never installs or updates Claude Code. Follow
+                Anthropic&rsquo;s guide, then check again.</p>
+              <details id="claude-runtime-advanced" class="provider-advanced-fields">
+                <summary>Use a specific Claude Code app</summary>
+                <label for="claude-executable">Claude Code location (optional)</label>
+                <input id="claude-executable" type="text" spellcheck="false" autocomplete="off"
+                       placeholder="Found automatically" maxlength="1024">
+                <p class="provider-field-help">Leave empty to use the Claude Code found on this computer. Otherwise enter the
+                  full path to the claude program, for example C:\Users\you\.local\bin\claude.exe.</p>
+              </details>
+            </div>
+          </section>
+          <section class="settings-section" id="claude-model-card" aria-labelledby="claude-model-heading" hidden>
+            <h3 class="settings-eyebrow" id="claude-model-heading">2. Add a model</h3>
+            <div class="settings-card">
+              <label for="claude-model-id">Model alias or exact model ID</label>
+              <input id="claude-model-id" type="text" spellcheck="false" autocomplete="off" maxlength="200"
+                     placeholder="For example: sonnet" aria-describedby="claude-model-help">
+              <div class="account-suggestions" role="group" aria-label="Claude Code aliases">
+                <button class="btn btn-secondary btn-sm" type="button" data-claude-alias="opus">opus</button>
+                <button class="btn btn-secondary btn-sm" type="button" data-claude-alias="sonnet">sonnet</button>
+                <button class="btn btn-secondary btn-sm" type="button" data-claude-alias="fable">fable</button>
+              </div>
+              <p class="provider-field-help" id="claude-model-help">Aliases follow Claude Code&rsquo;s current model for that name.
+                Sylvia doesn&rsquo;t fetch a model list: Claude Code checks access when the model first runs, so saving a model
+                doesn&rsquo;t confirm your account can use it.</p>
+              <details id="claude-model-advanced" class="provider-advanced-fields">
+                <summary>Advanced model settings</summary>
+                <label for="claude-model-context">Context allowance (tokens, optional)</label>
+                <input id="claude-model-context" type="number" min="1" max="10000000" step="1" placeholder="Managed by Claude Code">
+                <p class="provider-field-help">Only guides Sylvia&rsquo;s context planning. Claude Code manages reply length;
+                  Sylvia shows no token, cost or usage figures for this account.</p>
+              </details>
+              <p id="claude-model-status" class="inline-feedback" role="status"></p>
+              <div class="provider-actions">
+                <button class="btn btn-primary btn-sm" type="button" data-claude-action="add_model">Add model</button>
+              </div>
+              <p class="provider-field-help">Saving returns you to Your models, where you can make it the default for new chats.</p>
+            </div>
+          </section>
+          <section class="settings-section" aria-labelledby="claude-api-heading">
+            <h3 class="settings-eyebrow" id="claude-api-heading">Paying per use instead</h3>
+            <div class="settings-card settings-row">
+              <div>
+                <strong>Anthropic API</strong>
+                <p>A separate connection that uses a Claude Console API key and bills that Console account. Sylvia never
+                  switches between your subscription and the API on its own.</p>
+              </div>
+              <button class="btn btn-secondary btn-sm" type="button" id="claude-api-route-btn">Set up Anthropic API</button>
+            </div>
+          </section>
+          </div>
         </section>
 
         <section class="settings-panel" id="settings-panel-appearance" role="tabpanel"

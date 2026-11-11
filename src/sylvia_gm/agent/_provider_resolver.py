@@ -238,7 +238,8 @@ def _configured_provider_models(
         )
         context_window = capacity.effective_context_window
         selected_output = row.get("max_output_tokens")
-        if selected_output is None and row.get("transport") != "codex_app_server":
+        if (selected_output is None
+                and row.get("transport") not in ("codex_app_server", "claude_code")):
             selected_output = (
                 known_model.max_output_tokens if known_model is not None
                 else min(DEFAULT_OUTPUT_ALLOWANCE, context_window or DEFAULT_OUTPUT_ALLOWANCE)
@@ -249,7 +250,8 @@ def _configured_provider_models(
             minimum=1,
         )
         if (max_output_tokens is not None and context_window is not None
-                and row.get("transport") != "codex_app_server" and max_output_tokens > context_window):
+                and row.get("transport") not in ("codex_app_server", "claude_code")
+                and max_output_tokens > context_window):
             raise ConfigError("Configured model max_output_tokens is outside the supported range")
         declared_output = _optional_model_integer(
             row.get("declared_max_output_tokens"), field="declared_max_output_tokens", minimum=1,
@@ -272,11 +274,15 @@ def _configured_provider_models(
             "responses",
             "anthropic_messages",
             "codex_app_server",
+            "claude_code",
             "gemini_generate_content",
         }:
             raise ConfigError("Configured model transport is unsupported")
         transport = cast(
-            Literal["chat_completions", "responses", "anthropic_messages", "codex_app_server", "gemini_generate_content"],
+            Literal[
+                "chat_completions", "responses", "anthropic_messages", "codex_app_server",
+                "gemini_generate_content", "claude_code",
+            ],
             transport_value,
         )
         streaming_value = row.get(
@@ -427,9 +433,13 @@ class ConfiguredProviderResolver:
                 base_url=definition.base_url,
                 api_key=credential,
                 headers=headers,
+                runtime_executable=definition.runtime_executable,
                 runtime_home=(
-                    str(self._user_config_path.resolve().parent / "chatgpt-runtime")
-                    if provider_key == "chatgpt_subscription" and self._user_config_path is not None
+                    str(self._user_config_path.resolve().parent / (
+                        "claude-runtime" if provider_key == "claude_runtime" else "chatgpt-runtime"
+                    ))
+                    if (provider_key in {"chatgpt_subscription", "claude_runtime"}
+                        and self._user_config_path is not None)
                     else ""
                 ),
             )
@@ -537,7 +547,8 @@ class ConfiguredProviderResolver:
                 "max_output_tokens": model.max_output_tokens,
                 "builder_output_tokens": output_allowance(model, builder=True),
                 "output_budget_mode": (
-                    "runtime_managed" if model.transport == "codex_app_server" else "enforced"
+                    "runtime_managed"
+                    if model.transport in {"codex_app_server", "claude_code"} else "enforced"
                 ),
                 "transport": model.transport,
                 "supports_streaming": model.supports_streaming,

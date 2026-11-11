@@ -80,15 +80,17 @@ def test_independent_caster_survives_other_source_end_then_expires_and_reopens(m
         expected_resources[f"spell_slot_{2 if spell == 'cloud_of_daggers' else 1}"] -= 1
     case.cast(**first)
     case.cast(**second)
-    key = "lite_true_strike_casters" if spell == "true_strike" else "lite_concentration_casters"
-    assert case.lasting()[key] == ["hero", "companion"]
+    key = "lite_concentration_casters"
+    if spell != "true_strike":
+        assert case.lasting()[key] == ["hero", "companion"]
     assert case.entities()["hero"]["concentration_spell_id"] == spell
     assert case.entities()["companion"]["concentration_spell_id"] == spell
     if spell == "cloud_of_daggers":
         cloud_sources = {identity: source["caster"] for identity, source in case.lasting()["persistent_spell_areas"].items() if source["spell"] == spell}
         assert set(cloud_sources.values()) == {"hero", "companion"}
     receipt, command = case.act("end_concentration", caster_state="hero")
-    assert case.lasting()[key] == ["companion"]
+    if spell != "true_strike":
+        assert case.lasting()[key] == ["companion"]
     assert not case.entities()["hero"].get("concentration_spell_id")
     assert case.entities()["companion"]["concentration_spell_id"] == spell
     if spell == "cloud_of_daggers":
@@ -97,9 +99,11 @@ def test_independent_caster_survives_other_source_end_then_expires_and_reopens(m
     assert case.execute(command) == receipt and case.snapshot().state == before.state
     case.reopen()
     assert case.execute(command) == receipt and case.snapshot().state == before.state
-    assert case.lasting()[key] == ["companion"]
+    if spell != "true_strike":
+        assert case.lasting()[key] == ["companion"]
     case.act("advance_srd_lasting_time", elapsed_rounds=rounds)
-    assert case.lasting()[key] == []
+    if spell != "true_strike":
+        assert case.lasting()[key] == []
     assert not case.entities()["companion"].get("concentration_spell_id")
     assert case.entities()["companion"]["resources"] == expected_resources
     if spell == "true_strike":

@@ -12,7 +12,7 @@ from sylvia_gm import __version__
 from .controller import UpdateController
 from .launch import Installation
 from .manifest import KeyRing, UpdateError, Version
-from .storage import operation_id
+from .storage import UpdatePhase, UpdateViewPhase, operation_id
 from .transport import HttpsTransport
 
 # Release bootstrap pins approved public keys here. Never load trust or private keys from IPC,
@@ -44,6 +44,7 @@ class DesktopUpdateService:
 
     def _restore(self, target: str, distribution: str, keyring: KeyRing) -> None:
         generation = self._generation
+
         def initialize() -> None:
             try:
                 controller = UpdateController(
@@ -147,7 +148,7 @@ class DesktopUpdateService:
                 raise UpdateError(code, message)
             return {
                 **base_state,
-                "phase": "unavailable",
+                "phase": UpdateViewPhase.UNAVAILABLE.value,
                 "busy": False,
                 "error_code": code,
                 "message": message,
@@ -161,7 +162,7 @@ class DesktopUpdateService:
                 error = self._restore_error
                 return {
                     **base_state,
-                    "phase": "error" if error else "recovering",
+                    "phase": UpdatePhase.ERROR.value if error else UpdateViewPhase.RECOVERING.value,
                     "busy": error is None,
                     "error_code": error.code if error else None,
                     "message": str(error)
@@ -178,7 +179,11 @@ class DesktopUpdateService:
             result = self._prepare(controller, identity, keyring, target, distribution)
         elif action == "handoff":
             return self._handoff(
-                controller, operation_id(params["operation_id"]), keyring, target, distribution,
+                controller,
+                operation_id(params["operation_id"]),
+                keyring,
+                target,
+                distribution,
             )
         else:
             identity = operation_id(params["operation_id"])
@@ -193,8 +198,12 @@ class DesktopUpdateService:
             self._release(identity)
 
     def _prepare(
-        self, controller: UpdateController, identity: str, keyring: KeyRing,
-        target: str, distribution: str,
+        self,
+        controller: UpdateController,
+        identity: str,
+        keyring: KeyRing,
+        target: str,
+        distribution: str,
     ) -> dict[str, object]:
         from .preparation import PreparedUpdate, new_attempt
         from .runtime import child_environment
@@ -215,9 +224,14 @@ class DesktopUpdateService:
 
         def action() -> str:
             update = PreparedUpdate(
-                self._storage, installation.live, identity, new_attempt(),
-                current=Version.parse(__version__), target=target,
-                distribution=distribution, verify=keyring.verify,
+                self._storage,
+                installation.live,
+                identity,
+                new_attempt(),
+                current=Version.parse(__version__),
+                target=target,
+                distribution=distribution,
+                verify=keyring.verify,
             )
             update.prepare(backup, quiesced)
             return update.attempt
@@ -232,12 +246,16 @@ class DesktopUpdateService:
             state = controller.state()
             if state["busy"]:
                 raise UpdateError("update_busy", "Wait for update preparation to finish.")
-            if state["operation_id"] == identity and state["phase"] == "prepared":
+            if state["operation_id"] == identity and state["phase"] == UpdatePhase.PREPARED:
                 controller.defer(identity)
 
     def _handoff(
-        self, controller: UpdateController, identity: str, keyring: KeyRing,
-        target: str, distribution: str,
+        self,
+        controller: UpdateController,
+        identity: str,
+        keyring: KeyRing,
+        target: str,
+        distribution: str,
     ) -> dict[str, object]:
         """Private owner-pipe metadata; never a renderer-selected path or executable."""
         from .preparation import PreparedUpdate
@@ -246,8 +264,11 @@ class DesktopUpdateService:
         state = controller.state()
         installation = self._installation
         if (
-            installation is None or self._reserved is None or not self._reserved(identity)
-            or state["operation_id"] != identity or state["phase"] != "prepared"
+            installation is None
+            or self._reserved is None
+            or not self._reserved(identity)
+            or state["operation_id"] != identity
+            or state["phase"] != UpdatePhase.PREPARED
             or state["busy"]
         ):
             raise UpdateError("update_busy", "A matching prepared owner reservation is required.")
@@ -255,14 +276,22 @@ class DesktopUpdateService:
         child_environment()
         attempt = operation_id(state["prepared_attempt"])
         prepared = PreparedUpdate(
-            self._storage, installation.live, identity, attempt,
-            current=Version.parse(__version__), target=target, distribution=distribution,
+            self._storage,
+            installation.live,
+            identity,
+            attempt,
+            current=Version.parse(__version__),
+            target=target,
+            distribution=distribution,
             verify=keyring.verify,
         )
         prepared.require_selected()
         _, helper = prepared.replacement().helper_payload()
-        return {"operation_id": identity, "attempt": attempt,
-                "helper": {"size": helper.size, "sha256": helper.sha256}}
+        return {
+            "operation_id": identity,
+            "attempt": attempt,
+            "helper": {"size": helper.size, "sha256": helper.sha256},
+        }
 
     def preparing(self) -> bool:
         with self._lock:
@@ -288,7 +317,10 @@ class DesktopUpdateService:
             raise UpdateError("invalid_phase", "The update is not prepared for shutdown.")
         state = controller.state()
         self._handoff(
-            controller, identity, KeyRing(PUBLIC_KEYS), str(state["target"]),
+            controller,
+            identity,
+            KeyRing(PUBLIC_KEYS),
+            str(state["target"]),
             str(state["distribution"]),
         )
         controller.arm_shutdown(identity)

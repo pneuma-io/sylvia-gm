@@ -31,7 +31,7 @@ test('Plan browsing keeps selection across filters and separates exact same-titl
         });
         window.fixture = { state, widget }; widget.update(state);
       }, catalogue);
-      assert.equal(await page.locator('[data-plan-choice]').count(), 19);
+      assert.equal(await page.locator('[data-plan-choice]').count(), catalogue.length + 3);
       const riftPreview = await page.locator('[data-plan-choice="rift-awakening"]').innerText();
       assert.match(riftPreview, /woodland clearing/);
       assert.match(riftPreview, /Thornwall/);

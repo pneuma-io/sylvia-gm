@@ -4,18 +4,95 @@ from __future__ import annotations
 
 import sys
 import threading
-from collections.abc import Callable
-from typing import Any, Protocol
+from collections.abc import Callable, Mapping
+from enum import StrEnum
+from typing import Any, Final, Protocol
 
 from .manifest import UpdateError
 
+
+class ProgressPhase(StrEnum):
+    WAITING = "waiting"
+    APPLYING = "applying"
+    RESTORING = "restoring"
+    VERIFYING = "verifying"
+    STARTING = "starting"
+    CONFIRMING = "confirming"
+
+
+PROGRESS_MOVES: Final[Mapping[ProgressPhase, frozenset[ProgressPhase]]] = {
+    ProgressPhase.WAITING: frozenset(
+        {
+            ProgressPhase.WAITING,
+            ProgressPhase.APPLYING,
+            ProgressPhase.RESTORING,
+            ProgressPhase.VERIFYING,
+            ProgressPhase.STARTING,
+            ProgressPhase.CONFIRMING,
+        }
+    ),
+    ProgressPhase.APPLYING: frozenset(
+        {
+            ProgressPhase.WAITING,
+            ProgressPhase.APPLYING,
+            ProgressPhase.RESTORING,
+            ProgressPhase.VERIFYING,
+            ProgressPhase.STARTING,
+            ProgressPhase.CONFIRMING,
+        }
+    ),
+    ProgressPhase.RESTORING: frozenset(
+        {
+            ProgressPhase.WAITING,
+            ProgressPhase.APPLYING,
+            ProgressPhase.RESTORING,
+            ProgressPhase.VERIFYING,
+            ProgressPhase.STARTING,
+            ProgressPhase.CONFIRMING,
+        }
+    ),
+    ProgressPhase.VERIFYING: frozenset(
+        {
+            ProgressPhase.WAITING,
+            ProgressPhase.APPLYING,
+            ProgressPhase.RESTORING,
+            ProgressPhase.VERIFYING,
+            ProgressPhase.STARTING,
+            ProgressPhase.CONFIRMING,
+        }
+    ),
+    ProgressPhase.STARTING: frozenset(
+        {
+            ProgressPhase.WAITING,
+            ProgressPhase.APPLYING,
+            ProgressPhase.RESTORING,
+            ProgressPhase.VERIFYING,
+            ProgressPhase.STARTING,
+            ProgressPhase.CONFIRMING,
+        }
+    ),
+    ProgressPhase.CONFIRMING: frozenset(
+        {
+            ProgressPhase.WAITING,
+            ProgressPhase.APPLYING,
+            ProgressPhase.RESTORING,
+            ProgressPhase.VERIFYING,
+            ProgressPhase.STARTING,
+            ProgressPhase.CONFIRMING,
+        }
+    ),
+}
+
+
 STAGES = {
-    "waiting": "Waiting for Sylvia and its owned background work to close.",
-    "applying": "Applying the verified application update.",
-    "restoring": "Recovering the previous application using your selected data option.",
-    "verifying": "Checking the application and its saved-data compatibility.",
-    "starting": "Starting the selected Sylvia application.",
-    "confirming": "Waiting for Sylvia to confirm usable startup and saved data.",
+    ProgressPhase.WAITING.value: "Waiting for Sylvia and its owned background work to close.",
+    ProgressPhase.APPLYING.value: "Applying the verified application update.",
+    ProgressPhase.RESTORING.value: (
+        "Recovering the previous application using your selected data option."
+    ),
+    ProgressPhase.VERIFYING.value: "Checking the application and its saved-data compatibility.",
+    ProgressPhase.STARTING.value: "Starting the selected Sylvia application.",
+    ProgressPhase.CONFIRMING.value: "Waiting for Sylvia to confirm usable startup and saved data.",
 }
 _ERRORS = {
     "file_access": "An application file could not be replaced. Close programs using this "
@@ -46,7 +123,9 @@ class ProgressWindow:
         self.ready = threading.Event()
         self.done = threading.Event()
         self._lock = threading.Lock()
-        self._phase, self._finished = "waiting", False
+        _next_phase, _next_finished = (ProgressPhase.WAITING.value, False)
+        self._move_phase(_next_phase)
+        self._finished = _next_finished
         self._failure: str | None = None
         self._created = False
         self._thread = threading.Thread(target=self._run, args=(runner,), name="update-status")
@@ -66,8 +145,8 @@ class ProgressWindow:
         if not self._created or self.done.is_set():
             self._thread.join()
             raise UpdateError(
-                "progress_unavailable", "The update status window could not open. "
-                "Sylvia stays open.",
+                "progress_unavailable",
+                "The update status window could not open. Sylvia stays open.",
             )
         return self
 
@@ -76,12 +155,13 @@ class ProgressWindow:
         self.ready.set()
 
     def stage(self, phase: str) -> None:
+        phase = phase.value if isinstance(phase, ProgressPhase) else phase
         if phase not in STAGES:
             raise ValueError("Unknown update stage")
         if self.done.is_set():
             raise UpdateError("progress_lost", "The update status window is no longer available.")
         with self._lock:
-            self._phase = phase
+            self._move_phase(phase)
 
     def snapshot(self) -> tuple[str, bool, bool]:
         with self._lock:
@@ -89,7 +169,9 @@ class ProgressWindow:
                 text = _ERRORS.get(self._failure, "The update did not finish successfully.")
                 return (
                     text + " Saved data and recovery files are retained. Close this window and "
-                    "open Sylvia again for update recovery.", True, False,
+                    "open Sylvia again for update recovery.",
+                    True,
+                    False,
                 )
             return STAGES[self._phase], False, self._finished
 
@@ -103,13 +185,22 @@ class ProgressWindow:
             self._failure = code
         self._thread.join()  # The error remains visible until its own Close button is chosen.
 
+    def _move_phase(self, phase: str) -> None:
+        """Set memory only, preserving the caller's existing save boundary."""
+        self._phase = phase
+
 
 def _dialog_types() -> tuple[Any, Any, Any]:
     """Commctrl task-dialog structures use one-byte packing, including on x64."""
     import ctypes as c
 
     callback = c.WINFUNCTYPE(
-        c.c_int32, c.c_void_p, c.c_uint32, c.c_size_t, c.c_ssize_t, c.c_ssize_t,
+        c.c_int32,
+        c.c_void_p,
+        c.c_uint32,
+        c.c_size_t,
+        c.c_ssize_t,
+        c.c_ssize_t,
     )
 
     class Button(c.Structure):
@@ -119,16 +210,30 @@ def _dialog_types() -> tuple[Any, Any, Any]:
     class Config(c.Structure):
         _pack_ = 1
         _fields_ = [
-            ("size", c.c_uint32), ("parent", c.c_void_p), ("instance", c.c_void_p),
-            ("flags", c.c_uint32), ("common_buttons", c.c_uint32), ("title", c.c_wchar_p),
-            ("icon", c.c_void_p), ("instruction", c.c_wchar_p), ("content", c.c_wchar_p),
-            ("button_count", c.c_uint32), ("buttons", c.POINTER(Button)),
-            ("default_button", c.c_int32), ("radio_count", c.c_uint32), ("radios", c.c_void_p),
-            ("default_radio", c.c_int32), ("verification", c.c_wchar_p),
-            ("expanded", c.c_wchar_p), ("expand_label", c.c_wchar_p),
+            ("size", c.c_uint32),
+            ("parent", c.c_void_p),
+            ("instance", c.c_void_p),
+            ("flags", c.c_uint32),
+            ("common_buttons", c.c_uint32),
+            ("title", c.c_wchar_p),
+            ("icon", c.c_void_p),
+            ("instruction", c.c_wchar_p),
+            ("content", c.c_wchar_p),
+            ("button_count", c.c_uint32),
+            ("buttons", c.POINTER(Button)),
+            ("default_button", c.c_int32),
+            ("radio_count", c.c_uint32),
+            ("radios", c.c_void_p),
+            ("default_radio", c.c_int32),
+            ("verification", c.c_wchar_p),
+            ("expanded", c.c_wchar_p),
+            ("expand_label", c.c_wchar_p),
             ("collapse_label", c.c_wchar_p),
-            ("footer_icon", c.c_void_p), ("footer", c.c_wchar_p), ("callback", callback),
-            ("callback_data", c.c_ssize_t), ("width", c.c_uint32),
+            ("footer_icon", c.c_void_p),
+            ("footer", c.c_wchar_p),
+            ("callback", callback),
+            ("callback_data", c.c_ssize_t),
+            ("width", c.c_uint32),
         ]
 
     return Config, Button, callback
@@ -141,7 +246,10 @@ def _windows_dialog(state: ProgressWindow) -> None:
     controls = c.WinDLL("comctl32", use_last_error=True)
     user = c.WinDLL("user32", use_last_error=True)
     controls.TaskDialogIndirect.argtypes = [
-        c.POINTER(config_type), c.POINTER(c.c_int32), c.c_void_p, c.c_void_p,
+        c.POINTER(config_type),
+        c.POINTER(c.c_int32),
+        c.c_void_p,
+        c.c_void_p,
     ]
     controls.TaskDialogIndirect.restype = c.c_int32
     user.SendMessageW.argtypes = [c.c_void_p, c.c_uint32, c.c_size_t, c.c_ssize_t]
@@ -190,7 +298,8 @@ def _windows_dialog(state: ProgressWindow) -> None:
     chosen = c.c_int32()
     if controls.TaskDialogIndirect(c.byref(config), c.byref(chosen), None, None) < 0:
         raise UpdateError(
-            "progress_unavailable", "The Windows update status dialog could not open.",
+            "progress_unavailable",
+            "The Windows update status dialog could not open.",
         )
 
 

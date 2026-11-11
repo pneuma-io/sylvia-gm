@@ -12,6 +12,10 @@ import pytest
 from sylvia_gm.application.desktop_update.controller import UpdateController
 from sylvia_gm.application.desktop_update.manifest import OFFICIAL_RELEASES, UpdateError, Version
 from sylvia_gm.application.desktop_update.storage import UpdateStore
+from tests.desktop_update_move_checks import (
+    assert_desktop_update_moves as assert_desktop_update_moves,
+    seed_update_phase as seed_update_phase,
+)
 from tests.test_desktop_update_manifest import accept_stub, envelope, manifest_fixture
 
 
@@ -212,7 +216,9 @@ def test_repeated_current_checks_do_not_exhaust_retention_limit_or_lose_recovery
     assert len(fixture.calls) == 100
 
 
-def test_empty_failed_checks_can_retry_beyond_cap_but_download_partials_are_preserved(tmp_path):
+def test_empty_failed_checks_can_retry_beyond_cap_but_download_partials_are_preserved(
+    tmp_path, seed_update_phase,
+):
     fixture = ReleaseFixture()
     fixture.index[0]["assets"] = []
     update = controller(tmp_path, fixture)
@@ -225,7 +231,7 @@ def test_empty_failed_checks_can_retry_beyond_cap_but_download_partials_are_pres
     update.store.save(identity, "cancelled", None)
     update.store.prune_empty_terminal(identity)
     assert (stage / "artifact.partial").read_bytes() == b"never execute this retained partial"
-    update.store.save(identity, "recovery_required", "0.3.0-alpha.2")
+    seed_update_phase(update.store, identity, "recovery_required", "0.3.0-alpha.2")
     update.store.prune_empty_terminal(identity)
     assert stage.exists()
     with pytest.raises(UpdateError) as refused:

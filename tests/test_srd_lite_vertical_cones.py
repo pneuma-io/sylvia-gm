@@ -12,7 +12,7 @@ from sylvia_gm.application.package_runtime import AuthorityMemoryStateBridge
 from sylvia_gm.runtime import RulesetRuntime
 from sylvia_gm.runtime._tool_executor import execute_tool
 from sylvia_gm.runtime._types import ExecutionBudget
-from tests.test_srd_lite_mass_cure_geometry import NAMESPACE, _calls, _scene_entity, _wall
+from tests.srd_lite_mass_cure_geometry_fixtures import NAMESPACE, _calls, _scene_entity, _wall
 
 COLLECT = 'collect_srd_cone_creature_targets'
 COVER = 'collect_srd_spell_area_cover_targets'
@@ -31,7 +31,7 @@ def cones():
         name = pending.pop()
         if name not in closure:
             tool = deepcopy(data['tools'][name])
-            tool['parameters'] = [deepcopy(pool[row]) if isinstance(row, str) else row for row in tool['parameters']]
+            tool['parameters'] = [deepcopy(pool[row]) if isinstance(row, str) else row for row in tool.get("parameters", [])]
             closure[name] = tool
             pending.extend(_calls(tool['effects']))
     subset = {key: value for key, value in data.items() if key not in {'tools', 'procedures'}}
@@ -114,11 +114,18 @@ def test_selected_vertical_apex_stays_in_the_actual_source(cones):
 
 
 @pytest.mark.parametrize(('direction', 'apex'), [
-    ([1, 0, 1], []), ([0, 0, 0], []), ([0, 0, 1], [0, 0, 7])])
+    ([0, 0, 0], []), ([0, 0, 1], [0, 0, 7])])
 def test_unsupported_or_invalid_intent_fails_before_mutation(cones, direction, apex):
     result = run(cones, state_for([0, 0, 10]), COLLECT,
         {'source_state': 'hero', 'length_feet': 15, 'direction': direction, 'apex': apex})
     assert not result.success
+
+
+def test_tilted_direction_uses_the_current_three_dimensional_cone(cones):
+    result = run(cones, state_for([8, 0, 8]), COLLECT,
+        {'source_state': 'hero', 'length_feet': 15, 'direction': [1, 0, 1]})
+    assert result.success, result.error
+    assert 'guard' in result.context['_srd_cone_targets']
 
 
 def test_non_creature_scenery_is_not_a_breath_target(cones):

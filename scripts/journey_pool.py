@@ -12,6 +12,16 @@ import threading
 import time
 import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+
+
+if __package__:
+    from .check_catalog import qualification_cases
+    from .known_test_defects import accepted_case
+else:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    from scripts.check_catalog import qualification_cases
+    from scripts.known_test_defects import accepted_case
 
 
 def case_key(nodeid):
@@ -79,11 +89,7 @@ def partition_reports(expected, reports, processes_ok):
             and not unexpected
             and len(keys) == len(expected[name])
             and set(keys) == expected[name]
-            and not any(
-                case.find(tag) is not None
-                for case in cases
-                for tag in ("failure", "error", "skipped")
-            )
+            and all(accepted_case(case) for case in cases)
         )
     return rows, passed, unexpected
 
@@ -103,6 +109,7 @@ def run_balanced_gate(
     *,
     deadline=None,
     scheduler="case",
+    include_historical=False,
 ):
     """All collected cases execute once. Only mutable data is isolated per worker."""
     environment = dict(os.environ)
@@ -112,10 +119,7 @@ def run_balanced_gate(
         [str(root / "src"), str(root), environment.get("PYTHONPATH", "")]
     )
     environment["SYLVIA_QA_FIXTURE_ROOT"] = str(destination.resolve())
-    environment.setdefault(
-        "SRD_LITE_CANDIDATE",
-        str(root / "tests/fixtures/SRD-Lite-117-QA-Legacy-Contract-Clean.sylvia-gm-package"),
-    )
+    environment["SYLVIA_RUNTIME_CACHE_DIR"] = str(destination.resolve() / "runtime-cache")
     temporary = destination / "temporary" / "shared-pool"
     temporary.mkdir(parents=True, exist_ok=True)
     for variable in ("TEMP", "TMP", "TMPDIR"):
@@ -159,12 +163,22 @@ def run_balanced_gate(
             raise ValueError(
                 "Required collection failed: " + (result.stdout + result.stderr)[-4000:]
             )
+        collected_count = len(nodeids)
+        if len(set(nodeids)) != collected_count:
+            raise ValueError("Required collection contains duplicate cases")
+        nodeids, excluded = qualification_cases(nodeids, include_historical=include_historical)
+        (destination / f"{name}-excluded-cases.json").write_text(
+            json.dumps(excluded, indent=2), encoding="utf-8",
+        )
+        if not nodeids:
+            raise ValueError("Required collection contains no product cases")
         keys = {case_key(nodeid) for nodeid in nodeids}
         collection_seconds = time.monotonic() - collection_started
         print(f"COLLECTED {name}: {len(nodeids)} cases in {collection_seconds:.2f}s", flush=True)
         with (destination / "collection-timings.jsonl").open("a", encoding="utf-8") as stream:
             stream.write(
-                json.dumps({"group": name, "seconds": collection_seconds, "cases": len(nodeids)})
+                json.dumps({"group": name, "seconds": collection_seconds, "cases": len(nodeids),
+                            "collected_cases": collected_count, "excluded_cases": len(excluded)})
                 + "\n"
             )
         if len(keys) != len(nodeids):

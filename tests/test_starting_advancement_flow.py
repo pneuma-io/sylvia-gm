@@ -12,14 +12,20 @@ from sylvia_gm.application.reusable_participants import save_reusable_participan
 from sylvia_gm.domain.authority import ActionStatus, AwaitingChoiceReceipt, WriterRole
 from sylvia_gm.domain.errors import CommandRejected
 from sylvia_gm.domain.package_library import canonical_json_bytes
-from tests.test_reusable_participants import _participant, _participant_authority, _starting_state
+from tests.test_reusable_participants import _participant, _starting_state
 
 PACKAGE = "sylvia.srd-lite.bg3"
 
 
 def _seed(owner, root, target=2, companions=1):
-    package, declaration = _participant_authority()
     setting = bundled_rift_authority().setting
+    selected = resolve_campaign_library_selection(owner, root, candidate_id=PACKAGE,
+                setting_id=setting.package_id, plan_id="the-sparring-debt")
+    package = next(entry for entry in selected.candidate.package_lock.entries
+                   if entry.package_id == PACKAGE)
+    declaration, = owner.exact_participant_declarations(
+        package.package_id, package.version, package.sha256)
+    setting = selected.sources.setting
     saved = tuple(save_reusable_participant(
         root, operation_id=f"card-{i}", role="player_character" if i == 0 else "companion",
         summary="A synthetic base-level fighter.", authored_profile="A harbor fighter preparing for an exhibition.",

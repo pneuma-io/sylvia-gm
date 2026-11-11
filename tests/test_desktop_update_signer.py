@@ -6,6 +6,10 @@ from pathlib import Path
 
 import pytest
 
+from tests.desktop_update_move_checks import (
+    assert_desktop_update_moves as assert_desktop_update_moves,
+)
+
 
 def signer():
     source = Path(__file__).resolve().parents[1] / "scripts/sign_desktop_update.py"

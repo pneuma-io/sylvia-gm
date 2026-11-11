@@ -7,6 +7,7 @@ it triggers on_effect_expired procedures via ctx.procedure_executor.
 
 from __future__ import annotations
 
+import contextlib
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -164,10 +165,8 @@ class DurationTracker:
                 ctx.vars["_expired_effect_id"] = entry.effect_id
                 ctx.vars["_expired_effect_name"] = entry.effect_name
                 ctx.vars["_expired_target_entity"] = entry.target_entity_id
-                try:
+                with contextlib.suppress(Exception):
                     ctx.procedure_executor("on_effect_expired", ctx)
-                except Exception:
-                    pass
 
         # Clean up fully-expired entries
         for entry in expired:

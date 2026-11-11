@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ast
 import json
 import re
 from collections.abc import AsyncIterator, Mapping
@@ -588,14 +589,31 @@ def test_frontend_contains_no_32k_capacity_substitution() -> None:
 
 
 def test_every_live_builder_and_gm_path_uses_one_context_fit_wrapper() -> None:
-    root = Path(__file__).parents[1]
-    source = (root / "src/sylvia_gm/interfaces/owner_process.py").read_text(
-        encoding="utf-8"
-    )
-    # One constructor is centralized in the helper; guided Start preflight, ordinary Builder/GM
-    # input, first-GM opening, and narration Retry all call that helper.
-    assert source.count("ContextFittingProvider(") == 1
-    assert source.count("_context_fitted_provider(") == 5
+    root = Path(__file__).parents[1] / "src/sylvia_gm/interfaces"
+    paths = [root / "owner_process.py", *sorted((root / "commands").glob("*.py"))]
+    constructors, callers = [], []
+    for path in paths:
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        parents = {child: parent for parent in ast.walk(tree) for child in ast.iter_child_nodes(parent)}
+        for call in ast.walk(tree):
+            if not isinstance(call, ast.Call):
+                continue
+            callee = (call.func.id if isinstance(call.func, ast.Name)
+                      else call.func.attr if isinstance(call.func, ast.Attribute) else None)
+            if callee not in {"ContextFittingProvider", "_context_fitted_provider"}:
+                continue
+            owner, names = call, []
+            while owner in parents:
+                owner = parents[owner]
+                if isinstance(owner, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                    names.insert(0, owner.name)
+            destination = constructors if callee == "ContextFittingProvider" else callers
+            destination.append((path.name, ".".join(names)))
+    # The shared constructor and all four entry paths remain covered after relocation.
+    assert constructors == [("owner_process.py", "_context_fitted_provider")]
+    assert len(callers) == len(set(callers)) == 4
+    assert ("owner_process.py", "_preflight_guided_start") in callers
+    assert sum(module == "sessions.py" for module, _ in callers) == 3
 
 
 @pytest.mark.parametrize("runtime", [None, 130_999])

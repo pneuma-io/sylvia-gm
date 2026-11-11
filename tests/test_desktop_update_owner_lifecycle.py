@@ -6,6 +6,9 @@ import time
 import pytest
 
 from sylvia_gm.interfaces import owner_process
+from tests.desktop_update_move_checks import (
+    assert_desktop_update_moves as assert_desktop_update_moves,
+)
 from tests.test_alpha_f6e_owner_session_transport import _OwnerHarness
 
 OPERATION = "a" * 32

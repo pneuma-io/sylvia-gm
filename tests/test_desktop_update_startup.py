@@ -14,6 +14,9 @@ from sylvia_gm.application.desktop_update.launch import Installation
 from sylvia_gm.application.desktop_update.manifest import UpdateError, Version
 from sylvia_gm.application.desktop_update.startup import authorize_startup
 from sylvia_gm.application.desktop_update.storage import UpdateStore, directory_identity
+from tests.desktop_update_move_checks import (
+    assert_desktop_update_moves as assert_desktop_update_moves,
+)
 from tests.test_desktop_update_manifest import accept_stub
 from tests.test_desktop_update_preparation import fixture
 

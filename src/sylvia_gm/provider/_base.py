@@ -148,7 +148,8 @@ class ModelInfo:
     """Sylvia's completion allowance; None is valid for runtime-managed output.
 
     GM requests use this allowance; Builder has its separate capped allowance below.
-    Admission reserves only an enforceable request allowance. Codex manages its own output budget.
+    Admission reserves only an enforceable request allowance.
+    Native runtimes own their output budget.
     This value never changes the context capacity or substitutes for a missing capacity fact.
     """
     builder_output_tokens: int = 32_000
@@ -156,7 +157,7 @@ class ModelInfo:
     cost_per_1k_tokens: float = 0.0
     transport: Literal[
         "chat_completions", "responses", "anthropic_messages", "codex_app_server",
-        "gemini_generate_content"
+        "gemini_generate_content", "claude_code"
     ] = "chat_completions"
     """Wire protocol needed to reach this model.
 
@@ -295,6 +296,7 @@ class ProviderConfig:
     transport: str  # "chat_completions" | "responses" | "anthropic_messages"
     base_url: str  # endpoint URL
     runtime_home: str = ""  # owner-selected private profile for managed subscription runtime
+    runtime_executable: str = ""  # selected native executable; never a shell command
     default_headers: dict[str, str] = field(default_factory=dict)
     credentials_list: list[dict[str, str]] = field(default_factory=list)
     # credentials_list elements: {"type": "api_key", "value": "sk-..."}

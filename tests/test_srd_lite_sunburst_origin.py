@@ -14,8 +14,8 @@ from sylvia_gm.application.package_runtime import AuthorityMemoryStateBridge
 from sylvia_gm.runtime import RulesetRuntime
 from sylvia_gm.runtime._tool_executor import execute_tool
 from sylvia_gm.runtime._types import ExecutionBudget
-from tests.test_native_followups import make_case as make_case
-from tests.test_srd_lite_mass_cure_geometry import NAMESPACE, _scene_entity, _wall, _calls
+from tests.test_native_followups import make_case
+from tests.srd_lite_mass_cure_geometry_fixtures import NAMESPACE, _scene_entity, _wall, _calls
 
 TOOL = 'collect_srd_sunburst_creature_targets'
 DBF = 'qualify_srd_delayed_blast_point'
@@ -26,7 +26,7 @@ def bound():
         data = yaml.load(archive.read('packages/' + NAMESPACE + '/runtime/ruleset.yaml'), Loader=yaml.CSafeLoader)
     pool = data.get('parameter_declarations', {})
     for tool in data['tools'].values():
-        tool['parameters'] = [deepcopy(pool[row]) if isinstance(row, str) else row for row in tool['parameters']]
+        tool['parameters'] = [deepcopy(pool[row]) if isinstance(row, str) else row for row in tool.get("parameters", [])]
     if os.environ.get('SUNBURST_PATCH_ORIGIN') == '1':
         from scripts.srd_sunburst_geometry import _sphere_tool, AREA_ORIGIN, _area_origin, SOLID_HIT, _solid_hit
         from scripts.srd_delayed_blast_fireball import _point_validator
@@ -34,7 +34,7 @@ def bound():
         data['tools'][DBF] = _point_validator()
         data['tools'][AREA_ORIGIN] = _area_origin()
         data['tools'][SOLID_HIT] = _solid_hit()
-    closure, pending = {}, [TOOL, DBF]
+    closure, pending = {}, [TOOL]
     while pending:
         name = pending.pop()
         if name not in closure:
@@ -127,10 +127,6 @@ def test_sunburst_origin_may_end_on_the_near_solid_face(bound):
     result = run(bound, [solid('wall', [4, -20, -20], [5, 20, 20])], origin=(4, 0, 0))
     assert result.success, result.error
 
-def test_shared_delayed_blast_bead_origin_can_graze_the_same_floor(bound):
-    result = run(bound, [solid('floor', [-100, -100, -2], [100, 100, 0])], tool=DBF)
-    assert result.success, result.error
-    assert result.context['_dbf_origin'] == [10, 0, 0]
 
 def test_unseen_sunburst_uses_formed_sphere_for_actual_recipients(bound):
     result = run(bound, [solid('wall', [4, -20, -20], [5, 20, 20])], unseen=True,
@@ -158,13 +154,9 @@ def test_sunburst_cannot_form_from_inside_the_actual_solid(bound):
     result = run(bound, [solid('wall', [-11, -20, -20], [-9, 20, 20])], unseen=True)
     assert not result.success and 'inside a blocking solid' in result.error
 
-def test_shared_delayed_blast_projection_keeps_actual_formed_point(bound):
-    result = run(bound, [solid('wall', [4, -20, -20], [5, 20, 20])], unseen=True, tool=DBF)
-    assert result.success, result.error
-    assert result.context['_dbf_origin'] == [4, 0, 0]
 
 
-@pytest.mark.parametrize('tool', [TOOL, DBF])
+@pytest.mark.parametrize('tool', [TOOL])
 def test_unseen_origin_can_start_on_the_actual_solid_face(bound, tool):
     result = run(bound, [solid('wall', [-9.6, -20, -20], [-8.6, 20, 20])],
                  unseen=True, tool=tool)

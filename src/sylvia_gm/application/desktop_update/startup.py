@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, TypedDict
 from .launch import Installation
 from .manifest import UpdateError, Version, bounded_json
 from .restart import RestartHandshake
-from .storage import UpdateStore, checked_file, operation_id
+from .storage import UpdatePhase, UpdateStore, checked_file, operation_id
 
 if TYPE_CHECKING:
     from .preparation import PreparedUpdate
@@ -26,9 +26,17 @@ class _RestartContext(TypedDict):
     distribution: str
     storage_compatibility: int
 
+
 _UNSAFE_ORDINARY_START = frozenset(
-    {"closing", "applying", "awaiting_restart", "recovery_required", "rolling_back",
-     "rollback_ready", "rollback_awaiting_restart"}
+    {
+        UpdatePhase.CLOSING,
+        UpdatePhase.APPLYING,
+        UpdatePhase.AWAITING_RESTART,
+        UpdatePhase.RECOVERY_REQUIRED,
+        UpdatePhase.ROLLING_BACK,
+        UpdatePhase.ROLLBACK_READY,
+        UpdatePhase.ROLLBACK_AWAITING_RESTART,
+    }
 )
 
 
@@ -47,9 +55,12 @@ class AuthorizedStartup:
 
     def _context(self) -> _RestartContext:
         return {
-            "nonce": self.nonce, "live": self.installation.live,
-            "desktop_version": self.desktop_version, "owner_version": self.version,
-            "target": self.installation.target, "distribution": self.installation.distribution,
+            "nonce": self.nonce,
+            "live": self.installation.live,
+            "desktop_version": self.desktop_version,
+            "owner_version": self.version,
+            "target": self.installation.target,
+            "distribution": self.installation.distribution,
             "storage_compatibility": self.compatibility,
         }
 
@@ -65,14 +76,15 @@ class AuthorizedStartup:
         row = self.prepared.store.load()
         if row is None or row["operation_id"] != self.prepared.identity:
             raise UpdateError("changed_restart", "The startup operation changed before completion.")
-        if row["phase"] == ("rolled_back" if self.recovery else "confirmed"):
+        if row["phase"] == (UpdatePhase.ROLLED_BACK if self.recovery else UpdatePhase.CONFIRMED):
             self.completed = True
             return True
         error = self.handshake.error_receipt
         if error.exists() or error.is_symlink():
             checked_file(error, maximum=4096)
             raise UpdateError(
-                "update_completion_failed", "The update helper could not finish. Use recovery.",
+                "update_completion_failed",
+                "The update helper could not finish. Use recovery.",
             )
         return False
 
@@ -106,8 +118,9 @@ def authorize_startup(
     recovery = isinstance(request, dict) and request.get("recovery") is True
     request_keys = {"operation_id", "attempt", "nonce"} | ({"recovery"} if recovery else set())
     permitted_phases = (
-        {"rollback_awaiting_restart", "rolled_back"} if recovery
-        else {"awaiting_restart", "recovery_required", "confirmed"}
+        {UpdatePhase.ROLLBACK_AWAITING_RESTART, UpdatePhase.ROLLED_BACK}
+        if recovery
+        else {UpdatePhase.AWAITING_RESTART, UpdatePhase.RECOVERY_REQUIRED, UpdatePhase.CONFIRMED}
     )
     if (
         not isinstance(request, dict)
@@ -136,8 +149,14 @@ def authorize_startup(
     from .replacement import file_matches
 
     prepared = PreparedUpdate(
-        data, installation.live, identity, attempt, current=old, target=installation.target,
-        distribution=installation.distribution, verify=verify,
+        data,
+        installation.live,
+        identity,
+        attempt,
+        current=old,
+        target=installation.target,
+        distribution=installation.distribution,
+        verify=verify,
     )
     prepared.require_selected(checkpoint_compatibility=old_compatibility)
     expected_version = old.text if recovery else prepared.manifest.version.text
@@ -147,7 +166,8 @@ def authorize_startup(
         prepared.replacement().verify_rollback()
         if storage_compatibility != old_compatibility:
             raise UpdateError(
-                "wrong_restart", "The restored owner's data contract is inconsistent.",
+                "wrong_restart",
+                "The restored owner's data contract is inconsistent.",
             )
     else:
         for payload in prepared.manifest.files:
@@ -155,8 +175,15 @@ def authorize_startup(
                 raise UpdateError("application_changed", "The updated application is incomplete.")
     handshake = RestartHandshake(data, identity, attempt, recovery=recovery)
     result = AuthorizedStartup(
-        prepared, handshake, nonce, installation, running.text, desktop_version,
-        storage_compatibility, old_compatibility, recovery=recovery,
+        prepared,
+        handshake,
+        nonce,
+        installation,
+        running.text,
+        desktop_version,
+        storage_compatibility,
+        old_compatibility,
+        recovery=recovery,
     )
     handshake.authorize(**result._context())
     return result
@@ -183,8 +210,12 @@ def owner_startup_context(
         with suppress(UpdateError):
             installation = Installation.from_launch(native, data)
     start = authorize_startup(
-        data, installation, launch.get("desktop_update_start"),
-        running=Version.parse(__version__), desktop_version=__version__,
-        storage_compatibility=STORAGE_COMPATIBILITY, verify=KeyRing(PUBLIC_KEYS).verify,
+        data,
+        installation,
+        launch.get("desktop_update_start"),
+        running=Version.parse(__version__),
+        desktop_version=__version__,
+        storage_compatibility=STORAGE_COMPATIBILITY,
+        verify=KeyRing(PUBLIC_KEYS).verify,
     )
     return installation, start

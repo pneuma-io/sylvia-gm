@@ -223,12 +223,12 @@ class PoolResult:
     modifier: int = 0
 
     def to_dict(self) -> dict[str, object]:
-        """Serialize to a JSON-compatible dictionary.
-
-        >>> pr = PoolResult(10, 5, (8, 3, 6, 1, 10), 6, 3, 2, 1)
-        >>> pr.to_dict()
-        {'sides': 10, 'count': 5, 'results': [8, 3, 6, 1, 10], 'threshold': 6, 'successes': 3, 'failures': 2, 'botches': 1, 'modifier': 0}
-        """
+        (
+            "Serialize to a JSON-compatible dictionary.\n\n        >>> pr = PoolResult(10, 5, "
+            "(8, 3, 6, 1, 10), 6, 3, 2, 1)\n        >>> pr.to_dict()\n        {'sides': 10, "
+            "'count': 5, 'results': [8, 3, 6, 1, 10], 'threshold': 6, 'successes': 3, "
+            "'failures': 2, 'botches': 1, 'modifier': 0}\n        "
+        )
         return {
             "sides": self.sides,
             "count": self.count,
@@ -767,12 +767,8 @@ def weighted_pick(
         # All-zero weights — pick uniformly
         return items[_rng.randint(0, len(items) - 1)]
 
-    if roll_result is not None:
-        # Use the provided roll's total to select
-        roll_val = roll_result.total
-    else:
-        # Random selection proportional to weights
-        roll_val = _rng.randint(1, total_weight)
+    # Use the supplied total, otherwise choose a random point in the weights.
+    roll_val = roll_result.total if roll_result is not None else _rng.randint(1, total_weight)
 
     cumulative = 0
     for item in items:

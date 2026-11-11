@@ -74,14 +74,16 @@ def test_every_preset_saves_reopens_new_model_without_numeric_input(
     assert row["declared_max_output_tokens"] == facts.get("max_output_tokens")
     if metadata != "rich":
         assert row["output_allowance_source"] == (
-            "runtime_managed" if preset == "chatgpt_subscription" else "application_default"
+            "runtime_managed"
+            if preset in {"chatgpt_subscription", "claude_runtime"} else "application_default"
         )
     assert first["default_model"] is None
     assert len(ConfiguredProviderResolver(path).model_choices()) == 1
 
 
 @pytest.mark.parametrize(
-    "preset", [key for key in settings._PROVIDER_PRESETS if key != "chatgpt_subscription"]
+    "preset", [key for key, preset in settings._PROVIDER_PRESETS.items()
+               if preset["default_transport"] not in {"codex_app_server", "claude_code"}]
 )
 def test_every_http_preset_discovers_sparse_models_and_preserves_default_across_switch(
     tmp_path, monkeypatch, preset
@@ -169,7 +171,9 @@ class RecordingProvider(Provider):
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
-    "transport", ["chat_completions", "responses", "anthropic_messages", "codex_app_server"]
+    "transport", [
+        "chat_completions", "responses", "anthropic_messages", "codex_app_server", "claude_code",
+    ]
 )
 async def test_unknown_capacity_is_deferred_without_fabricated_model_maximum(transport):
     raw = RecordingProvider(transport)
@@ -179,7 +183,7 @@ async def test_unknown_capacity_is_deferred_without_fabricated_model_maximum(tra
     assert measurement.effective_context_capacity is None
     await provider.generate([{"role": "user", "content": "Hello"}])
     assert len(raw.sent) == 1
-    if transport == "codex_app_server":
+    if transport in {"codex_app_server", "claude_code"}:
         assert measurement.output_token_reserve == 0
         assert "max_tokens" not in raw.sent[0] and "max_output_tokens" not in raw.sent[0]
     else:

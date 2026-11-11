@@ -117,7 +117,7 @@ def _provider_capability(provider: Provider, name: str) -> object | None:
 
 
 class ContextFittingProvider(Provider):
-    """Check ordinary transports locally; let Codex admit its own assembled requests."""
+    """Check ordinary transports locally; defer native runtimes' final assembled requests."""
 
     def __init__(
         self,
@@ -134,9 +134,9 @@ class ContextFittingProvider(Provider):
 
     @property
     def runtime_managed(self) -> bool:
-        """Codex owns output controls and the final input representation."""
+        """Native runtimes own output controls and the final input representation."""
 
-        return getattr(self.model_info, "transport", None) == "codex_app_server"
+        return getattr(self.model_info, "transport", None) in {"codex_app_server", "claude_code"}
 
     def set_audit_context(self, context: Mapping[str, object]) -> None:
         self._audit_context = {str(key): value for key, value in context.items()}
@@ -253,7 +253,8 @@ class ContextFittingProvider(Provider):
         )
         required = required_tokens if required_tokens is not None else required_upper_bound
         decision: Literal["admitted", "rejected", "runtime_deferred"] = (
-            "runtime_deferred" if self.runtime_managed or valid_context_window is None else "admitted"
+            "runtime_deferred"
+            if self.runtime_managed or valid_context_window is None else "admitted"
             if required is not None
             and valid_context_window is not None
             and required <= valid_context_window

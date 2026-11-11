@@ -105,9 +105,9 @@ def test_saved_act_reference_keeps_conditions_and_source_identity_on_reopen(tmp_
         reference = owner.read_campaign_reference(
             campaign, source="campaign_plan", path="structured/structure/act-1",
         )
-        whole = json.loads(owner.read_campaign_reference(
-            campaign, source="campaign_plan", path="structured", maximum_bytes=262144,
-        )["content"])
+        whole = json.loads(canonical_json_bytes(
+            owner.accepted_campaign_plan(campaign).content["campaign_plan"]
+        ))
         body = json.loads(reference["content"])
         assert body["act"] == whole["structure"][0]
         required = set(body["act"]["objectives"])

@@ -22,6 +22,7 @@ import yaml
 from pydantic import ValidationError
 
 from sylvia_gm.application._yaml_bounds import YamlShapeError, validate_yaml_graph
+from sylvia_gm.application._runtime_cache import cached_runtime
 from sylvia_gm.application.player_actions import (
     PlayerActionChecker,
     PlayerActionPreviewer,
@@ -903,7 +904,14 @@ def _parse_runtime(
         if cached is not None:
             _PARSED_RUNTIMES.move_to_end(key)
             return cached
-    runtime = _load_runtime(package_id=package_id, runtime_bytes=runtime_bytes, authoring=authoring)
+    runtime = cached_runtime(
+        package_id=package_id,
+        runtime_bytes=runtime_bytes,
+        authoring=authoring,
+        load=lambda: _load_runtime(
+            package_id=package_id, runtime_bytes=runtime_bytes, authoring=authoring
+        ),
+    )
     with _PARSED_RUNTIMES_LOCK:
         _PARSED_RUNTIMES[key] = runtime
         _PARSED_RUNTIMES.move_to_end(key)

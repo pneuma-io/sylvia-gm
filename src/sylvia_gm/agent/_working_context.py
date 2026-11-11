@@ -265,7 +265,7 @@ class WorkingContextProvider(Provider):
         from sylvia_gm.provider._output_policy import output_allowance
 
         capacity = getattr(self.model_info, "context_window", None) or 65_536
-        runtime = getattr(self.model_info, "transport", None) == "codex_app_server"
+        runtime = getattr(self.model_info, "transport", None) in {"codex_app_server", "claude_code"}
         reserve = (
             0
             if runtime
@@ -356,7 +356,9 @@ class WorkingContextProvider(Provider):
                 summary_options: dict[str, Any] = self._context_options(compaction=True)
                 from sylvia_gm.provider._output_policy import output_allowance
 
-                if getattr(self.model_info, "transport", None) != "codex_app_server":
+                if getattr(self.model_info, "transport", None) not in {
+                    "codex_app_server", "claude_code",
+                }:
                     summary_options["max_tokens"] = min(
                         8192,
                         output_allowance(self.model_info),
