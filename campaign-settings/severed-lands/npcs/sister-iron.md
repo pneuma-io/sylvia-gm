@@ -29,3 +29,15 @@ She's aware that the Church is growing faster than she can guide it. She's aware
 ## Hook
 
 Iron has announced that the Doors will speak again — within the year. She doesn't know to whom or where. She only knows what the fragment told her. Every faction is watching. Some are already positioning to be the recipient. Some are positioning to prevent it.
+
+## Appearance and artwork
+
+An elderly settled Human woman with age styling in her late seventies, a short stocky former smith's frame, deep brown weathered skin, dark brown eyes, a broad deeply lined face and white-gray hair gathered into one long plain braid down her back. Gentle patient expression, steady attentive eyes, slightly stooped but composed standing posture and broad aged work-worn hands hanging relaxed with gently flexed fingers. A plain oatmeal-colored long wool robe under a muted charcoal-gray sleeveless overcoat, a simple brown leather belt with one small closed pouch and practical worn brown leather shoes. Her old age, gentle certainty and former smith's broad hands follow the authored profile; exact age, other features and clothing are editable visual defaults. No metal body or skin, construct anatomy, current forge apron, oversized hammer, real-world religious icon, invented Anchor Church badge, crown, halo, glowing Door fragment, visible revelation, confirmed prophecy, magical effects or invented scars. Both hands remain clearly visible, without motion blur or exaggerated effects.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/3741aa84592a82aa85d674b698a34d2ac4d46209ec957a8d643e4d7e57ea34c9.png)
+
+[Full-body reference](../assets/characters/326820142183f5fd67dbe17bb8c51f8148dc644be541ac7613c311ac74061d87.png)
+
+[Multiview reference sheet](../assets/characters/d62fc684b1a7913cac01424f9b5e3a91bc14f8995fb46077a5e0470a517515f4.png)

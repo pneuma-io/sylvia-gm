@@ -21,3 +21,15 @@ Candle is intense, focused, and very young. She's been a Rememberer for less tha
 ## Hook
 
 Candle found the pack — denning near an Anchor Clearing in the deep Margin. She's asking for help. She's not asking for mercy. The pack leader is an advanced riftwolf — larger than any she's seen, with phase-step capability and Rift-touched intelligence. She thinks it remembers her. She thinks it's been waiting.
+
+## Appearance and artwork
+
+A humanlike young adult Riftborn woman appearing in her early twenties, with a lean athletic build, warm medium-brown skin, dark brown eyes, a youthful angular face and dark reddish-brown hair in two short practical braids secured behind her neck. An intense focused unsmiling hunter's expression and controlled upright stance. Worn plain steel breastplate and small shoulder plates over a dark gray quilted gambeson with mail at the elbows, a muted forest-green cloak, charcoal work trousers and scuffed brown leather calf boots. One ordinary straight sword stays fully sheathed at her anatomical LEFT hip. A small closed hand-bound leather ledger is visibly secured in plain leather straps at her anatomical RIGHT hip, its blank cover and closed page edges visible, no readable writing. Empty relaxed hands. Her youth, focused hunter bearing and Rememberer's ledger follow the authored profile and order source; exact age, features, armor and weapon design are editable visual defaults. Her home world remains unknown. No Anchor Church affiliation or insignia, invented Rememberer crest, candle or flame anatomy, glowing eyes, halo, magical effects, blood, invented scars, open ledger, readable names, trophies, wolf companion or revealed pack encounter.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/5d846c3c40686e5aae5c5385c2febedf0d514e68eed80d5736b3033202f3955b.png)
+
+[Full-body reference](../assets/characters/676bbe96d8e3dc5bb46b96224e4c5a5818841b74905e9f4cb1457a8b882ccd3c.png)
+
+[Multiview reference sheet](../assets/characters/91e03d0e992a5e088e9a1592391906ec3a57b1c67327c2dcac911c5b6041e0d9.png)

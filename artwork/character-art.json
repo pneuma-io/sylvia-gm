@@ -6376,6 +6376,186 @@
         "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Quill from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin or scales, eyes, hair where present, clothing, equipment, colors and wear. Appearance: A humanlike young adult second-generation Riftborn woman appearing in her early twenties, with a slight medium-height build, warm medium-brown skin, dark brown eyes, a soft oval face and straight black hair in a practical chin-length bob tucked behind the ears. An earnest, curious, carefully attentive expression and slightly forward-focused upright posture. A plain dusty teal sleeveless wool over-tunic over an ivory long-sleeved linen blouse with sleeves neatly rolled to the forearms, a lead-gray ankle-length skirt and simple closed brown leather ankle boots. A narrow plain leather belt carries a small closed leather writing-tool case at her anatomical RIGHT hip. Empty relaxed hands, a light ordinary ink smudge near one fingertip. Her earnest meticulous apprentice bearing follows the authored profile; age, features, clothes and ink smudge are editable visual defaults. She was born in the Severed Lands and has never crossed the Rift. No invented home-world memories, arrival scars, bird anatomy, feathers, giant quill, readable text, Warden records, revealed findings, forbidden inscription, magic, invented Athenaeum badge, noble heraldry or invented parental origin. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views; entire head, hands, feet, equipment and any tail tip within all margins. The same single character repeated as turnaround views. Keep pouches, knife sheath, writing-tool case and clothing fastenings on the same anatomical sides through the turn. Change viewing angle only, keeping costume and identity. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, extra characters or revealed secrets.",
         "portrait": "Use case: identity-preserve. Production square app portrait for Quill from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, species, skin or scale pattern, eyes, hairstyle where present, expression and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above the complete head and any hair. Consistent face scale for a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin or scales and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, border, caption, text, UI, scenery, new costume, magical effects, invented crest, animal or extra person. One 1024x1024 PNG."
       }
+    },
+    {
+      "id": "severed-npc-sister-candle",
+      "name": "Sister Candle",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/sister-candle.md",
+          "sha256": "f42f689a5af35538d56ccef2a3e11dfed066a736c28dd1386b54f3c4cc895374",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/sister-candle.md",
+          "sha256": "5c1873e379144ccd74e4a54eb55836f02356e1b28c7af5a0e76e411cf85d2672",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A humanlike young adult Riftborn woman appearing in her early twenties, with a lean athletic build, warm medium-brown skin, dark brown eyes, a youthful angular face and dark reddish-brown hair in two short practical braids secured behind her neck. An intense focused unsmiling hunter's expression and controlled upright stance. Worn plain steel breastplate and small shoulder plates over a dark gray quilted gambeson with mail at the elbows, a muted forest-green cloak, charcoal work trousers and scuffed brown leather calf boots. One ordinary straight sword stays fully sheathed at her anatomical LEFT hip. A small closed hand-bound leather ledger is visibly secured in plain leather straps at her anatomical RIGHT hip, its blank cover and closed page edges visible, no readable writing. Empty relaxed hands. Her youth, focused hunter bearing and Rememberer's ledger follow the authored profile and order source; exact age, features, armor and weapon design are editable visual defaults. Her home world remains unknown. No Anchor Church affiliation or insignia, invented Rememberer crest, candle or flame anatomy, glowing eyes, halo, magical effects, blood, invented scars, open ledger, readable names, trophies, wolf companion or revealed pack encounter.",
+        "full_body": {
+          "path": "assets/characters/676bbe96d8e3dc5bb46b96224e4c5a5818841b74905e9f4cb1457a8b882ccd3c.png",
+          "sha256": "676bbe96d8e3dc5bb46b96224e4c5a5818841b74905e9f4cb1457a8b882ccd3c"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/91e03d0e992a5e088e9a1592391906ec3a57b1c67327c2dcac911c5b6041e0d9.png",
+          "sha256": "91e03d0e992a5e088e9a1592391906ec3a57b1c67327c2dcac911c5b6041e0d9"
+        },
+        "portrait": {
+          "path": "assets/characters/5d846c3c40686e5aae5c5385c2febedf0d514e68eed80d5736b3033202f3955b.png",
+          "sha256": "5d846c3c40686e5aae5c5385c2febedf0d514e68eed80d5736b3033202f3955b"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1998051
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2331172
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2482975
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Sister Candle in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth, leather and worn metal where applicable, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person in a near-front three-quarter standing pose. Whole head, both hands, clothing, footwear and equipment comfortably inside all margins. Appearance: A humanlike young adult Riftborn woman appearing in her early twenties, with a lean athletic build, warm medium-brown skin, dark brown eyes, a youthful angular face and dark reddish-brown hair in two short practical braids secured behind her neck. An intense focused unsmiling hunter's expression and controlled upright stance. Worn plain steel breastplate and small shoulder plates over a dark gray quilted gambeson with mail at the elbows, a short muted forest-green cloak, charcoal work trousers and scuffed brown leather calf boots. One ordinary straight sword stays fully sheathed at her anatomical LEFT hip. A small closed hand-bound leather ledger is visibly secured in plain leather straps at her anatomical RIGHT hip, its blank cover and closed page edges visible, no readable writing. Empty relaxed hands. Her youth, focused hunter bearing and Rememberer's ledger follow the authored profile and order source; exact age, features, armor and weapon design are editable visual defaults. Her home world remains unknown. No Anchor Church affiliation or insignia, invented Rememberer crest, candle or flame anatomy, glowing eyes, halo, magical effects, blood, invented scars, open ledger, readable names, trophies, wolf companion or revealed pack encounter. Preserve authored identity, species, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Sister Candle from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin, eyes, hair, clothing, equipment, colors and material wear. Appearance: A humanlike young adult Riftborn woman appearing in her early twenties, with a lean athletic build, warm medium-brown skin, dark brown eyes, a youthful angular face and dark reddish-brown hair in two short practical braids secured behind her neck. An intense focused unsmiling hunter's expression and controlled upright stance. Worn plain steel breastplate and small shoulder plates over a dark gray quilted gambeson with mail at the elbows, a short muted forest-green cloak, charcoal work trousers and scuffed brown leather calf boots. One ordinary straight sword stays fully sheathed at her anatomical LEFT hip. A small closed hand-bound leather ledger is visibly secured in plain leather straps at her anatomical RIGHT hip, its blank cover and closed page edges visible, no readable writing. Empty relaxed hands. Her youth, focused hunter bearing and Rememberer's ledger follow the authored profile and order source; exact age, features, armor and weapon design are editable visual defaults. Her home world remains unknown. No Anchor Church affiliation or insignia, invented Rememberer crest, candle or flame anatomy, glowing eyes, halo, magical effects, blood, invented scars, open ledger, readable names, trophies, wolf companion or revealed pack encounter. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views; entire hair, hands, footwear and equipment within all margins. The same single character repeated as turnaround views. Keep pouches, ledger, sword, travel bag, hair details and clothing fastenings on the same anatomical sides through the turn. Keep the CLOSED ledger at anatomical RIGHT hip and the fully sheathed sword at LEFT hip. No writing on or inside the book. Change viewing angle only, keeping costume and identity. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, extra characters or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Sister Candle from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, skin, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, border, caption, text, UI, scenery, new costume, magical effects, invented crest, animal or extra person. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-sister-iron",
+      "name": "Sister Iron",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/sister-iron.md",
+          "sha256": "d8ea79351084595771df433305749312281c265c3d713544f22df360641e0d6c",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/sister-iron.md",
+          "sha256": "fc40e59b87a4e9b7b7b64d146189cc73b6e6594fe612eb0e0e998687880d7daa",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An elderly settled Human woman with age styling in her late seventies, a short stocky former smith's frame, deep brown weathered skin, dark brown eyes, a broad deeply lined face and white-gray hair gathered into one long plain braid down her back. Gentle patient expression, steady attentive eyes, slightly stooped but composed standing posture and broad aged work-worn hands hanging relaxed with gently flexed fingers. A plain oatmeal-colored long wool robe under a muted charcoal-gray sleeveless overcoat, a simple brown leather belt with one small closed pouch and practical worn brown leather shoes. Her old age, gentle certainty and former smith's broad hands follow the authored profile; exact age, other features and clothing are editable visual defaults. No metal body or skin, construct anatomy, current forge apron, oversized hammer, real-world religious icon, invented Anchor Church badge, crown, halo, glowing Door fragment, visible revelation, confirmed prophecy, magical effects or invented scars. Both hands remain clearly visible, without motion blur or exaggerated effects.",
+        "full_body": {
+          "path": "assets/characters/326820142183f5fd67dbe17bb8c51f8148dc644be541ac7613c311ac74061d87.png",
+          "sha256": "326820142183f5fd67dbe17bb8c51f8148dc644be541ac7613c311ac74061d87"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/d62fc684b1a7913cac01424f9b5e3a91bc14f8995fb46077a5e0470a517515f4.png",
+          "sha256": "d62fc684b1a7913cac01424f9b5e3a91bc14f8995fb46077a5e0470a517515f4"
+        },
+        "portrait": {
+          "path": "assets/characters/3741aa84592a82aa85d674b698a34d2ac4d46209ec957a8d643e4d7e57ea34c9.png",
+          "sha256": "3741aa84592a82aa85d674b698a34d2ac4d46209ec957a8d643e4d7e57ea34c9"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2276011
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2705952
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2767568
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Sister Iron in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth, leather and worn metal where applicable, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person in a near-front three-quarter standing pose. Whole head, both hands, clothing, footwear and equipment comfortably inside all margins. Appearance: An elderly settled Human woman with age styling in her late seventies, a short stocky former smith's frame, deep brown weathered skin, dark brown eyes, a broad deeply lined face and white-gray hair gathered into one long plain braid down her back. Gentle patient expression, steady attentive eyes, slightly stooped but composed standing posture and broad aged work-worn hands hanging relaxed with gently flexed fingers. A plain oatmeal-colored long wool robe under a muted charcoal-gray sleeveless overcoat, a simple brown leather belt with one small closed pouch and practical worn brown leather shoes. Her old age, gentle certainty and former smith's broad hands follow the authored profile; exact age, other features and clothing are editable visual defaults. No metal body or skin, construct anatomy, current forge apron, oversized hammer, real-world religious icon, invented Anchor Church badge, crown, halo, glowing Door fragment, visible revelation, confirmed prophecy, magical effects or invented scars. Both hands remain clearly visible, without motion blur or exaggerated effects. Preserve authored identity, species, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Sister Iron from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin, eyes, hair, clothing, equipment, colors and material wear. Appearance: An elderly settled Human woman with age styling in her late seventies, a short stocky former smith's frame, deep brown weathered skin, dark brown eyes, a broad deeply lined face and white-gray hair gathered into one long plain braid down her back. Gentle patient expression, steady attentive eyes, slightly stooped but composed standing posture and broad aged work-worn hands hanging relaxed with gently flexed fingers. A plain oatmeal-colored long wool robe under a muted charcoal-gray sleeveless overcoat, a simple brown leather belt with one small closed pouch and practical worn brown leather shoes. Her old age, gentle certainty and former smith's broad hands follow the authored profile; exact age, other features and clothing are editable visual defaults. No metal body or skin, construct anatomy, current forge apron, oversized hammer, real-world religious icon, invented Anchor Church badge, crown, halo, glowing Door fragment, visible revelation, confirmed prophecy, magical effects or invented scars. Both hands remain clearly visible, without motion blur or exaggerated effects. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views; entire hair, hands, footwear and equipment within all margins. The same single character repeated as turnaround views. Keep pouches, ledger, sword, travel bag, hair details and clothing fastenings on the same anatomical sides through the turn. Change viewing angle only, keeping costume and identity. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, extra characters or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Sister Iron from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, skin, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Preserve her visibly elderly face and gentle patient expression; do not de-age or beautify away her lines. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, border, caption, text, UI, scenery, new costume, magical effects, invented crest, animal or extra person. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-tavern-bard-echo",
+      "name": "Echo",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/tavern-bard-echo.md",
+          "sha256": "7e499f51344b7269d67565f58e914d42ab8f8e0f0c216f9b9731cf1cb4e8209d",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/tavern-bard-echo.md",
+          "sha256": "8f82acab829ba6261350b8db7aa4895367a9b58caca6eb5b4f99573f5be82540",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A humanlike adult Riftborn performer appearing in their early thirties, with a slender medium-height build, dusky olive skin, dark gray eyes, a softly angular clean-shaven androgynous face and wavy black hair reaching the shoulders, loosely held back in a plain half-tie. A gentle melancholy expression and quiet open posture. A plain deep indigo short travel coat over a gray linen tunic, a soft faded moss-green neck scarf, worn brown trousers and dark brown leather ankle boots. A small closed canvas travel bag hangs at their anatomical LEFT hip from a simple strap over their RIGHT shoulder. Empty relaxed hands. Their gentle melancholy performer bearing follows the authored profile; age, physical features and clothing are editable visual defaults. Use they/them pronouns. Their home world remains unknown. No invented home-world imagery, stage costume, instrument, readable sheet music, floating music notes, ghost faces, duplicate bodies, portal, magical effects, glowing eyes, invented College crest, real-world insignia or revealed origin.",
+        "full_body": {
+          "path": "assets/characters/1c58634699da2df24fbce776f0f6b87f8a74b455e3175a1e1b50b58446c5b61c.png",
+          "sha256": "1c58634699da2df24fbce776f0f6b87f8a74b455e3175a1e1b50b58446c5b61c"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/795c4eadd91b2d41686cf9aa02534a457fa7e01419e80fcb91bf87296e3d8aa4.png",
+          "sha256": "795c4eadd91b2d41686cf9aa02534a457fa7e01419e80fcb91bf87296e3d8aa4"
+        },
+        "portrait": {
+          "path": "assets/characters/a9446b01d47ce0ffda36adee02357a9d54366a5747089673f4ba1c1252f10757.png",
+          "sha256": "a9446b01d47ce0ffda36adee02357a9d54366a5747089673f4ba1c1252f10757"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1879007
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2159732
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2478750
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Echo in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth, leather and worn metal where applicable, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person in a near-front three-quarter standing pose. Whole head, both hands, clothing, footwear and equipment comfortably inside all margins. Appearance: A humanlike adult Riftborn performer appearing in their early thirties, with a slender medium-height build, dusky olive skin, dark gray eyes, a softly angular clean-shaven androgynous face and wavy black hair reaching the shoulders, loosely held back in a plain half-tie. A gentle melancholy expression and quiet open posture. A plain deep indigo short travel coat over a gray linen tunic, a soft faded moss-green neck scarf, worn brown trousers and dark brown leather ankle boots. A small closed canvas travel bag hangs at their anatomical LEFT hip from a simple strap over their RIGHT shoulder. Empty relaxed hands. Their gentle melancholy performer bearing follows the authored profile; age, physical features and clothing are editable visual defaults. Use they/them pronouns. Their home world remains unknown. No invented home-world imagery, stage costume, instrument, readable sheet music, floating music notes, ghost faces, duplicate bodies, portal, magical effects, glowing eyes, invented College crest, real-world insignia or revealed origin. Preserve authored identity, species, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Echo from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin, eyes, hair, clothing, equipment, colors and material wear. Appearance: A humanlike adult Riftborn performer appearing in their early thirties, with a slender medium-height build, dusky olive skin, dark gray eyes, a softly angular clean-shaven androgynous face and wavy black hair reaching the shoulders, loosely held back in a plain half-tie. A gentle melancholy expression and quiet open posture. A plain deep indigo short travel coat over a gray linen tunic, a soft faded moss-green neck scarf, worn brown trousers and dark brown leather ankle boots. A small closed canvas travel bag hangs at their anatomical LEFT hip from a simple strap over their RIGHT shoulder. Empty relaxed hands. Their gentle melancholy performer bearing follows the authored profile; age, physical features and clothing are editable visual defaults. Use they/them pronouns. Their home world remains unknown. No invented home-world imagery, stage costume, instrument, readable sheet music, floating music notes, ghost faces, duplicate bodies, portal, magical effects, glowing eyes, invented College crest, real-world insignia or revealed origin. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views; entire hair, hands, footwear and equipment within all margins. The same single character repeated as turnaround views. Keep pouches, ledger, sword, travel bag, hair details and clothing fastenings on the same anatomical sides through the turn. Keep the travel bag at anatomical LEFT hip with the strap over RIGHT shoulder. Preserve the androgynous face and gentle melancholy bearing; use they/them pronouns. Change viewing angle only, keeping costume and identity. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, extra characters or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Echo from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, skin, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Preserve the androgynous face and gentle melancholy expression; use they/them pronouns. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, border, caption, text, UI, scenery, new costume, magical effects, invented crest, animal or extra person. One 1024x1024 PNG."
+      }
     }
   ]
 }
