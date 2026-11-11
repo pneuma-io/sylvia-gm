@@ -25,12 +25,12 @@ def test_successful_sunburst_repeat_save_removes_its_actual_blindness_source(mak
         rolls = context['_timed_condition_end_turn_rolls']
         assert len(rolls) == 1, 'The actual saved Sunburst source earns one end-turn save'
         end_card = save_card(tmp_path, 'sunburst-repeat-' + str(turn), receipt)
-        assert any('vs DC' in row['value'] and ('source remains' in row['value'] or 'source ended' in row['value'])
+        assert any('DC ' in row['value'] and ('source remains' in row['value'] or 'source ended' in row['value'])
                    for row in end_card['details'])
         assert case.entities()['hero']['resources'] == resources
         assert case.entities()['guard']['hp'] == hp
         if 'blinded' not in case.entities()['guard']['conditions']:
-            assert any(': success; source ended' in row['value'] for row in end_card['details'])
+            assert any(' \u00b7 success \u00b7 source ended' in row['value'] for row in end_card['details'])
             assert source_id not in case.entities()['guard']['timed_condition_source_ids']
             assert case.lasting()['timed_condition_sources'][source_id]['installed'] is False
             break
