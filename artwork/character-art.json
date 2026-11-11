@@ -7282,6 +7282,366 @@
         "reference_sheet": "Use case: identity-preserve. Production multiview enemy reference sheet for Cave Hollowed from Severed Lands. Input image 1 is the canonical complete reference. Preserve this exact anatomy or mechanism, proportions, materials, colors, distinctive details and equipment. Appearance: A single adult humanlike Cave Hollowed of medium size with a strong lean climbing build, gaunt angular face, pale sightless clouded eye orbs with no colored irises, sparse short white hair and gray-ashen translucent flesh. Subdued violet Veil-light is visible as a branching vein network under the translucent skin of the face, neck, arms and shins, without exposed organs or gore. Thickened skin at shoulders and forearms, two muscular arms, five long claw-tipped digits per hand, two legs and broad bare clawed feet. A closed-mouth intent expression with head slightly angled as if sensing, shoulders held forward and a low balanced standing stance. A ragged plain slate-gray sleeveless cloth tunic covers chest and hips, with worn dark cloth waist and thigh wraps; limbs remain visible. Their pale sightless eyes, translucent flesh and visible Veil-lit veins follow the authored profile, with claws following its attacks. Detailed anatomy, features, vein pattern and clothing are editable visual defaults. No violet irises, normal seeing eyes, extra eyes, animal fur, quaggoth or ape head, huge fangs, crystal or glass statue, skeleton, fresh wounds, organs, gore, extra limbs, weapon, jewelry, insignia, victim, cave scenery or readable text. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete views, FRONT, SIDE PROFILE and BACK, plus one smaller close detail at far right. Consistent scale across the three complete views, with every part comfortably within margins. The same single subject repeated as turnaround views. Change viewing angle only. Preserve pale SIGHTLESS pupil-free eye orbs, translucent gray-ashen skin, the subdued violet vein pattern, five claw-tipped digits per hand and bare clawed feet. Keep one complete adult body, the same tunic/wraps and sparse white hair. No normal irises, animal fur, crystal body, gore or weapon. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, additional subjects or revealed secrets.",
         "portrait": "Use case: identity-preserve. Production square app portrait/token image for Cave Hollowed from Severed Lands. Input image 1 is the canonical complete reference; input image 2 is its matching multiview sheet. Preserve this exact subject, materials, colors and distinctive features. Change framing only. CLOSE HEAD AND UPPER SHOULDERS, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for RPG dialogue portraits. Preserve the same gaunt adult face, PALE SIGHTLESS CLOUDY ORBS WITH NO PUPILS OR COLORED IRISES, sparse white hair, translucent gray-ashen flesh and subdued branching violet veins. No seeing eyes, normal irises, animal fur, crystal body, gore or new anatomy. No hands, waist, weapon, javelin or full torso. Polished naturalistic digital RPG illustration, tactile materials, plain light neutral gray background and soft natural studio light matching references. Continuous full-bleed square background to all edges. No painted circle, cutout, vignette, faded image edge, border, caption, text, UI, scenery, new costume or geometry, invented crest, animal or extra subject. One 1024x1024 PNG."
       }
+    },
+    {
+      "id": "severed-monster-cavern-hollowed",
+      "name": "Cavern Hollowed",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/cavern-hollowed.md",
+          "sha256": "52be95c1f5b8d501fbd1f25959c1ca063d8342ff24c2791cca27af8928dbe0e2",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/cavern-hollowed.md",
+          "sha256": "beea0a62d379d6038291766d382007e6bce8997b27887641a4784e394346d2f3",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A single adult humanlike Cavern Hollowed of Medium size with a broad heavy bloated frame, thick neck, distended belly and swollen shoulders. Mottled slate-gray and dark moss-green skin, fully violet irises, sparse short dark hair, a heavy broad-jawed face and an intent wary expression. Two arms with five claw-tipped digits per hand, two thick legs and broad bare clawed feet. A ragged dark brown woven shoulder wrap covers the chest, with plain worn dark waist and thigh wraps. Their anatomical RIGHT hand holds one ordinary wooden javelin upright beside the body, its full point and shaft inside the frame; the LEFT hand hangs relaxed. Their bloated Rift-saturated humanoid form follows the Setting lore, with claws, bite and javelin following the source attacks. Detailed features, skin mottling, clothing and equipment design are editable visual defaults. No Cave Hollowed's sightless white eyes or translucent flesh, extra limbs, animal fur, reptile head, open wounds, gore, visible captive, ritual sacrifice, jewelry, insignia, pool or cave scenery, readable text or revealed shrine.",
+        "full_body": {
+          "path": "assets/characters/d4e24902c6c013c90f607d23abc556e5680ae39915c522412e0780efe1fbdde5.png",
+          "sha256": "d4e24902c6c013c90f607d23abc556e5680ae39915c522412e0780efe1fbdde5"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/c323dd0a20fd323319793583a9094298f38bc97726a97b40177b56dda4455bf3.png",
+          "sha256": "c323dd0a20fd323319793583a9094298f38bc97726a97b40177b56dda4455bf3"
+        },
+        "portrait": {
+          "path": "assets/characters/d414aa6229ee6ae74b8be3d06736ca2e6b48e502b277b0e3a2c0dfdb619c8bac.png",
+          "sha256": "d414aa6229ee6ae74b8be3d06736ca2e6b48e502b277b0e3a2c0dfdb619c8bac"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2309939
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2479830
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2725479
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body enemy reference for Cavern Hollowed in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile materials, plain light neutral gray background, soft natural studio light and a subtle grounding shadow. Exactly one complete subject in a near-front three-quarter standing view. Whole head, all limbs, feet, antennae if present, and every weapon tip comfortably inside the margins. Appearance: A single adult humanlike Cavern Hollowed of Medium size with a broad heavy bloated frame, thick neck, distended belly and swollen shoulders. Mottled slate-gray and dark moss-green skin, fully violet irises, sparse short dark hair, a heavy broad-jawed face and an intent wary expression. Two arms with five claw-tipped digits per hand, two thick legs and broad bare clawed feet. A ragged dark brown woven shoulder wrap covers the chest, with plain worn dark waist and thigh wraps. Their anatomical RIGHT hand holds one ordinary wooden javelin upright beside the body, its full point and shaft inside the frame; the LEFT hand hangs relaxed. Their bloated Rift-saturated humanoid form follows the Setting lore, with claws, bite and javelin following the source attacks. Detailed features, skin mottling, clothing and equipment design are editable visual defaults. No Cave Hollowed's sightless white eyes or translucent flesh, extra limbs, animal fur, reptile head, open wounds, gore, visible captive, ritual sacrifice, jewelry, insignia, pool or cave scenery, readable text or revealed shrine. Preserve authored anatomy and equipment. No additional beings, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview enemy reference sheet for Cavern Hollowed from Severed Lands. Input image 1 is the canonical full-body reference. Preserve the exact anatomy, face or sensor head, proportions, materials, colors, equipment and wear. Appearance: A single adult humanlike Cavern Hollowed of Medium size with a broad heavy bloated frame, thick neck, distended belly and swollen shoulders. Mottled slate-gray and dark moss-green skin, fully violet irises, sparse short dark hair, a heavy broad-jawed face and an intent wary expression. Two arms with five claw-tipped digits per hand, two thick legs and broad bare clawed feet. A ragged dark brown woven shoulder wrap covers the chest, with plain worn dark waist and thigh wraps. Their anatomical RIGHT hand holds one ordinary wooden javelin upright beside the body, its full point and shaft inside the frame; the LEFT hand hangs relaxed. Their bloated Rift-saturated humanoid form follows the Setting lore, with claws, bite and javelin following the source attacks. Detailed features, skin mottling, clothing and equipment design are editable visual defaults. No Cave Hollowed's sightless white eyes or translucent flesh, extra limbs, animal fur, reptile head, open wounds, gore, visible captive, ritual sacrifice, jewelry, insignia, pool or cave scenery, readable text or revealed shrine. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete views, FRONT, SIDE PROFILE and BACK, plus one smaller close head detail at far right. Consistent scale across the three complete views; every limb, foot, head, antenna and weapon tip comfortably inside margins. The same single subject repeated as turnaround views. Change viewing angle only, keeping anatomy and costume. Keep the bloated Medium humanoid build, mottled skin, fully violet irises, clawed hands/feet, same chest/waist wraps and one full javelin in anatomical RIGHT hand, LEFT hand relaxed. Do not use Cave Hollowed's pale sightless eyes or translucent body. No labels, text, captions, borders, logos, UI, scenery, extra creatures, invented insignia or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Cavern Hollowed from Severed Lands. Input image 1 is the canonical full-body reference; input image 2 is the matching multiview sheet. Preserve this exact head, apparent age, species, materials or skin, eyes or sensors, hair or antennae, expression and upper clothing/plates. Change framing only. CLOSE HEAD AND UPPER SHOULDERS, ending across upper chest. Head centered, eyes/sensors near 35 percent down, chin or lower jaw near 65 percent down, comfortable headroom above hair, crown or antennae. Consistent head scale for RPG dialogue portraits. Preserve the heavy bloated face, mottled slate/moss skin, fully VIOLET IRISES with normal pupils, sparse dark hair and wary expression. No Cave Hollowed's sightless white eyes or translucent skin. Polished naturalistic digital RPG illustration with tactile materials, plain light neutral gray background and soft natural studio light matching references. Continuous full-bleed square background and upper shoulders to every edge. No hands, waist, weapon, javelin, shield, equipment, full torso, painted circle, cutout, vignette, faded image edge, border, caption, text, UI, scenery, new costume or anatomy, invented crest, extra being or animal. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-monster-chitin-riftborn",
+      "name": "Chitin Riftborn",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/chitin-riftborn.md",
+          "sha256": "8581d981422b9ca52465f4cb020f22c9e8ebbc464c9db32276f4b1f751d5429d",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/chitin-riftborn.md",
+          "sha256": "bde8030078a91e3aa335f692cca8d8a6990ab01076e2da1fa67ffe3dcf5cfed7",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A single intelligent adult insectile Chitin Riftborn of Medium size, encased in layered dark umber chitin plates tinged violet with restrained crystalline Veil-stuff facets. A compact insect head with two dark amber compound eyes, one pair of short slender antennae and two articulated mandibles, no human face. Exactly FOUR arms: two strong upper arms at the shoulders and two smaller lower arms attached at the lower ribs. Exactly TWO powerful jointed hind legs with broad three-clawed feet, six limbs total. The two upper hands hold one long gythka polearm diagonally in front of the body, with a plain dark shaft and a slashing blade at each end, both complete tips safely inside the frame. The lower RIGHT hand rests against the lower shaft, and the lower LEFT hand hangs empty. One simple angular chatkcha throwing blade is secured in a plain belt sheath at the anatomical LEFT hip. No clothes beyond a plain dark leather utility belt and simple weapon straps; opaque chitin fully covers the body. Their intelligent insectile form and violet-tinged crystallized chitin follow the Setting lore; arm arrangement, eye color, plate pattern, exact weapon shape and other details are editable visual defaults. No extra limbs, human skin or hair, human face, wings, stinger, extra antennae, duplicate weapon, gore, glowing eyes, magic beams, hive scenery, other insects, insignia or readable text.",
+        "full_body": {
+          "path": "assets/characters/ae52b92b59c549b71bd2412ce8d57ea0dfd440ced3e89687384a6f99c13e53cc.png",
+          "sha256": "ae52b92b59c549b71bd2412ce8d57ea0dfd440ced3e89687384a6f99c13e53cc"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/22b15ff7dea06cf86faca282432fa6494bbdbb4ed2e5390bda8e05b00ad1f426.png",
+          "sha256": "22b15ff7dea06cf86faca282432fa6494bbdbb4ed2e5390bda8e05b00ad1f426"
+        },
+        "portrait": {
+          "path": "assets/characters/4293d4c12e2e604cf96e51b7ffc51a623f33d02415661cebb836cfd04ff7a59d.png",
+          "sha256": "4293d4c12e2e604cf96e51b7ffc51a623f33d02415661cebb836cfd04ff7a59d"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2071934
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2309966
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2393165
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body enemy reference for Chitin Riftborn in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile materials, plain light neutral gray background, soft natural studio light and a subtle grounding shadow. Exactly one complete subject in a near-front three-quarter standing view. Whole head, all limbs, feet, antennae if present, and every weapon tip comfortably inside the margins. Appearance: A single intelligent adult insectile Chitin Riftborn of Medium size, encased in layered dark umber chitin plates tinged violet with restrained crystalline Veil-stuff facets. A compact insect head with two dark amber compound eyes, one pair of short slender antennae and two articulated mandibles, no human face. Exactly FOUR arms: two strong upper arms at the shoulders and two smaller lower arms attached at the lower ribs. Exactly TWO powerful jointed hind legs with broad three-clawed feet, six limbs total. The two upper hands hold one long gythka polearm diagonally in front of the body, with a plain dark shaft and a slashing blade at each end, both complete tips safely inside the frame. The two lower hands hang open and empty. One simple angular chatkcha throwing blade is secured in a plain belt sheath at the anatomical LEFT hip. No clothes beyond a plain dark leather utility belt and simple weapon straps; opaque chitin fully covers the body. Their intelligent insectile form and violet-tinged crystallized chitin follow the Setting lore; arm arrangement, eye color, plate pattern, exact weapon shape and other details are editable visual defaults. No extra limbs, human skin or hair, human face, wings, stinger, extra antennae, duplicate weapon, gore, glowing eyes, magic beams, hive scenery, other insects, insignia or readable text. Preserve authored anatomy and equipment. No additional beings, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview enemy reference sheet for Chitin Riftborn from Severed Lands. Input image 1 is the canonical full-body reference. Preserve the exact anatomy, face or sensor head, proportions, materials, colors, equipment and wear. Appearance: A single intelligent adult insectile Chitin Riftborn of Medium size, encased in layered dark umber chitin plates tinged violet with restrained crystalline Veil-stuff facets. A compact insect head with two dark amber compound eyes, one pair of short slender antennae and two articulated mandibles, no human face. Exactly FOUR arms: two strong upper arms at the shoulders and two smaller lower arms attached at the lower ribs. Exactly TWO powerful jointed hind legs with broad three-clawed feet, six limbs total. The two upper hands hold one long gythka polearm diagonally in front of the body, with a plain dark shaft and a slashing blade at each end, both complete tips safely inside the frame. The lower RIGHT hand rests against the lower shaft, and the lower LEFT hand hangs empty. One simple angular chatkcha throwing blade is secured in a plain belt sheath at the anatomical LEFT hip. No clothes beyond a plain dark leather utility belt and simple weapon straps; opaque chitin fully covers the body. Their intelligent insectile form and violet-tinged crystallized chitin follow the Setting lore; arm arrangement, eye color, plate pattern, exact weapon shape and other details are editable visual defaults. No extra limbs, human skin or hair, human face, wings, stinger, extra antennae, duplicate weapon, gore, glowing eyes, magic beams, hive scenery, other insects, insignia or readable text. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete views, FRONT, SIDE PROFILE and BACK, plus one smaller close head detail at far right. Consistent scale across the three complete views; every limb, foot, head, antenna and weapon tip comfortably inside margins. The same single subject repeated as turnaround views. Change viewing angle only, keeping anatomy and costume. Exactly FOUR arms and TWO hind legs in each complete view, six limbs total, two antennae and paired mandibles. Preserve the same upper/lower arm attachments and crystalline violet-tinged chitin. Upper hands support the complete double-ended gythka; lower RIGHT hand rests against the lower shaft, lower LEFT hangs empty. Keep the sheathed chatkcha at anatomical LEFT hip. No new limbs or wings. No labels, text, captions, borders, logos, UI, scenery, extra creatures, invented insignia or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Chitin Riftborn from Severed Lands. Input image 1 is the canonical full-body reference; input image 2 is the matching multiview sheet. Preserve this exact head, apparent age, species, materials or skin, eyes or sensors, hair or antennae, expression and upper clothing/plates. Change framing only. CLOSE HEAD AND UPPER SHOULDERS, ending across upper chest. Head centered, eyes/sensors near 35 percent down, chin or lower jaw near 65 percent down, comfortable headroom above hair, crown or antennae. Consistent head scale for RPG dialogue portraits. Preserve the exact insectile head, two amber COMPOUND eyes, two slender antennae, paired mandibles and violet-tinged chitin facets. Entire antennae within comfortable headroom; face remains large and readable. No human face, hair, nose, normal irises, wings or extra antennae. Polished naturalistic digital RPG illustration with tactile materials, plain light neutral gray background and soft natural studio light matching references. Continuous full-bleed square background and upper shoulders to every edge. No hands, waist, weapon, javelin, shield, equipment, full torso, painted circle, cutout, vignette, faded image edge, border, caption, text, UI, scenery, new costume or anatomy, invented crest, extra being or animal. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-monster-deep-dwarf",
+      "name": "Deep Dwarf",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/deep-dwarf.md",
+          "sha256": "597702b089dc965ffa62230d042dca3b75916bcffe2970f9157096b613b4bc12",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/deep-dwarf.md",
+          "sha256": "42154d4e1840a9574a2515ab69d046b8639a866dd0bc135d03224378a4c88b66",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A single adult male Deep Dwarf in his ordinary unenlarged form, with a short compact dwarven frame made gaunt by Rift exposure, pale ash-gray skin, deeply set dark gray eyes, hollow cheeks and a stern obsessive expression. A receding crown with thin white hair at the sides and a sparse long white beard in one plain narrow braid. Worn dark Warden-alloy scale mail over a charcoal padded tunic, plain dark trousers and practical brown leather boots. His anatomical RIGHT hand holds one ordinary war pick low beside his body with its full head and shaft visible; his LEFT forearm carries one plain round dark metal shield. One simple javelin is strapped diagonally to his back with its point above the anatomical LEFT shoulder. His gaunt pale dwarven identity follows the Setting lore, with scale mail, shield, pick and javelin following source equipment. Age styling, features, colors, beard and equipment design are editable visual defaults. No giant enlarged form, glowing eyes, horns, goblin or orc face, ornate crown, invented clan crest, readable runes, open wound, gore, captive, Warden chamber, scenery or other character.",
+        "full_body": {
+          "path": "assets/characters/ac56bcf0cb984ca9ef1d7cea736a799a7e34fe4d9b50c834447992afaac47a3b.png",
+          "sha256": "ac56bcf0cb984ca9ef1d7cea736a799a7e34fe4d9b50c834447992afaac47a3b"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/973a7019da295449e9a40dd7bfd853fb9826434928079bdfaaa1ba18b3ae52a8.png",
+          "sha256": "973a7019da295449e9a40dd7bfd853fb9826434928079bdfaaa1ba18b3ae52a8"
+        },
+        "portrait": {
+          "path": "assets/characters/a86bfa4b6d2fa6813960adde7606158b0d63384e917a4b9905e8eda21c6acfd0.png",
+          "sha256": "a86bfa4b6d2fa6813960adde7606158b0d63384e917a4b9905e8eda21c6acfd0"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2228397
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2497687
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2839856
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body enemy reference for Deep Dwarf in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile materials, plain light neutral gray background, soft natural studio light and a subtle grounding shadow. Exactly one complete subject in a near-front three-quarter standing view. Whole head, all limbs, feet, antennae if present, and every weapon tip comfortably inside the margins. Appearance: A single adult male Deep Dwarf in his ordinary unenlarged form, with a short compact dwarven frame made gaunt by Rift exposure, pale ash-gray skin, deeply set dark gray eyes, hollow cheeks and a stern obsessive expression. A receding crown with thin white hair at the sides and a sparse long white beard in one plain narrow braid. Worn dark Warden-alloy scale mail over a charcoal padded tunic, plain dark trousers and practical brown leather boots. His anatomical RIGHT hand holds one ordinary war pick low beside his body with its full head and shaft visible; his LEFT forearm carries one plain round dark metal shield. One simple javelin is strapped diagonally to his back with its point above the anatomical LEFT shoulder. His gaunt pale dwarven identity follows the Setting lore, with scale mail, shield, pick and javelin following source equipment. Age styling, features, colors, beard and equipment design are editable visual defaults. No giant enlarged form, glowing eyes, horns, goblin or orc face, ornate crown, invented clan crest, readable runes, open wound, gore, captive, Warden chamber, scenery or other character. Preserve authored anatomy and equipment. No additional beings, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview enemy reference sheet for Deep Dwarf from Severed Lands. Input image 1 is the canonical full-body reference. Preserve the exact anatomy, face or sensor head, proportions, materials, colors, equipment and wear. Appearance: A single adult male Deep Dwarf in his ordinary unenlarged form, with a short compact dwarven frame made gaunt by Rift exposure, pale ash-gray skin, deeply set dark gray eyes, hollow cheeks and a stern obsessive expression. A receding crown with thin white hair at the sides and a sparse long white beard in one plain narrow braid. Worn dark Warden-alloy scale mail over a charcoal padded tunic, plain dark trousers and practical brown leather boots. His anatomical RIGHT hand holds one ordinary war pick low beside his body with its full head and shaft visible; his LEFT forearm carries one plain round dark metal shield. One simple javelin is strapped diagonally to his back with its point above the anatomical LEFT shoulder. His gaunt pale dwarven identity follows the Setting lore, with scale mail, shield, pick and javelin following source equipment. Age styling, features, colors, beard and equipment design are editable visual defaults. No giant enlarged form, glowing eyes, horns, goblin or orc face, ornate crown, invented clan crest, readable runes, open wound, gore, captive, Warden chamber, scenery or other character. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete views, FRONT, SIDE PROFILE and BACK, plus one smaller close head detail at far right. Consistent scale across the three complete views; every limb, foot, head, antenna and weapon tip comfortably inside margins. The same single subject repeated as turnaround views. Change viewing angle only, keeping anatomy and costume. Preserve the short compact gaunt pale dwarf, receding white hair and single sparse beard braid. Keep war pick in anatomical RIGHT hand, round metal shield on LEFT forearm, and javelin across back with tip above LEFT shoulder in every view. Same unenlarged form, no giant version. No labels, text, captions, borders, logos, UI, scenery, extra creatures, invented insignia or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Deep Dwarf from Severed Lands. Input image 1 is the canonical full-body reference; input image 2 is the matching multiview sheet. Preserve this exact head, apparent age, species, materials or skin, eyes or sensors, hair or antennae, expression and upper clothing/plates. Change framing only. CLOSE HEAD AND UPPER SHOULDERS, ending across upper chest. Head centered, eyes/sensors near 35 percent down, chin or lower jaw near 65 percent down, comfortable headroom above hair, crown or antennae. Consistent head scale for RPG dialogue portraits. Preserve the gaunt pale dwarven face, deep-set dark eyes, receding white hair and narrow white beard braid. Do not fill out or humanize his gaunt dwarven face. Beard can continue below the bottom edge so the face scale remains consistent. Polished naturalistic digital RPG illustration with tactile materials, plain light neutral gray background and soft natural studio light matching references. Continuous full-bleed square background and upper shoulders to every edge. No hands, waist, weapon, javelin, shield, equipment, full torso, painted circle, cutout, vignette, faded image edge, border, caption, text, UI, scenery, new costume or anatomy, invented crest, extra being or animal. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-monster-door-guardian",
+      "name": "Door Guardian",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/door-guardian.md",
+          "sha256": "86d8b806d0ce1a5b2e0f38aa5cb7ce4ca466d0b4bb50ce6311e954415537394f",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/door-guardian.md",
+          "sha256": "094effb8a5c04c057db8e7f0e89477e01631588e9f7ce678f83e13b6de0b08d6",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A single Large colossus-like Warden Door Guardian, a broad massively built bipedal construct with a heavy basalt-gray stone body and worn dark bronze-alloy joint fittings. Two immense arms ending in empty five-digit stone-and-alloy hands, two thick pillar-like legs and broad blocky feet. A blunt angular carved stone head with a heavy brow and two narrow dim amber sensor slits, no flesh or expressive human face. Restrained geometric masonry panels, interlocking shoulder blocks, thick chest plates and visible ancient articulated joints. Calm immovable protective stance, hands relaxed at its sides. Its huge custom-forged Warden construct identity and fists follow the authored source; exact body architecture, materials, panel geometry and sensor design are editable visual defaults for one Door Guardian. No amulet or command-rod on its body, invented Door identity, readable symbol, face of a living person, hair, biological skin, wings, extra limbs, handheld shield, weapon, crown, glowing chest reactor, beams, portal, actual Door, scenery, victim or additional creature.",
+        "full_body": {
+          "path": "assets/characters/d8c6e9bc197f170210396db442eccd87f82b8ad1af38c4bfe9cefbd8698d62b5.png",
+          "sha256": "d8c6e9bc197f170210396db442eccd87f82b8ad1af38c4bfe9cefbd8698d62b5"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/fadaf479c4d16138a5412547a3014a21e6356a7957e768cafb3c0324beeaeaf2.png",
+          "sha256": "fadaf479c4d16138a5412547a3014a21e6356a7957e768cafb3c0324beeaeaf2"
+        },
+        "portrait": {
+          "path": "assets/characters/3ed738ec6377675d5fc853e1226636c7a23a13e042df293038c859fd7ad56a54.png",
+          "sha256": "3ed738ec6377675d5fc853e1226636c7a23a13e042df293038c859fd7ad56a54"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2627265
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2544804
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2893549
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body enemy reference for Door Guardian in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile materials, plain light neutral gray background, soft natural studio light and a subtle grounding shadow. Exactly one complete subject in a near-front three-quarter standing view. Whole head, all limbs, feet, antennae if present, and every weapon tip comfortably inside the margins. Appearance: A single Large colossus-like Warden Door Guardian, a broad massively built bipedal construct with a heavy basalt-gray stone body and worn dark bronze-alloy joint fittings. Two immense arms ending in empty five-digit stone-and-alloy hands, two thick pillar-like legs and broad blocky feet. A blunt angular carved stone head with a heavy brow and two narrow dim amber sensor slits, no flesh or expressive human face. Restrained geometric masonry panels, interlocking shoulder blocks, thick chest plates and visible ancient articulated joints. Calm immovable protective stance, hands relaxed at its sides. Its huge custom-forged Warden construct identity and fists follow the authored source; exact body architecture, materials, panel geometry and sensor design are editable visual defaults for one Door Guardian. No amulet or command-rod on its body, invented Door identity, readable symbol, face of a living person, hair, biological skin, wings, extra limbs, handheld shield, weapon, crown, glowing chest reactor, beams, portal, actual Door, scenery, victim or additional creature. Preserve authored anatomy and equipment. No additional beings, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview enemy reference sheet for Door Guardian from Severed Lands. Input image 1 is the canonical full-body reference. Preserve the exact anatomy, face or sensor head, proportions, materials, colors, equipment and wear. Appearance: A single Large colossus-like Warden Door Guardian, a broad massively built bipedal construct with a heavy basalt-gray stone body and worn dark bronze-alloy joint fittings. Two immense arms ending in empty five-digit stone-and-alloy hands, two thick pillar-like legs and broad blocky feet. A blunt angular carved stone head with a heavy brow and two narrow dim amber sensor slits, no flesh or expressive human face. Restrained geometric masonry panels, interlocking shoulder blocks, thick chest plates and visible ancient articulated joints. Calm immovable protective stance, hands relaxed at its sides. Its huge custom-forged Warden construct identity and fists follow the authored source; exact body architecture, materials, panel geometry and sensor design are editable visual defaults for one Door Guardian. No amulet or command-rod on its body, invented Door identity, readable symbol, face of a living person, hair, biological skin, wings, extra limbs, handheld shield, weapon, crown, glowing chest reactor, beams, portal, actual Door, scenery, victim or additional creature. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete views, FRONT, SIDE PROFILE and BACK, plus one smaller close head detail at far right. Consistent scale across the three complete views; every limb, foot, head, antenna and weapon tip comfortably inside margins. The same single subject repeated as turnaround views. Change viewing angle only, keeping anatomy and costume. Preserve the broad colossal stone-and-bronze architecture, heavy joints, two narrow amber sensor slits, two empty five-digit hands and two blocky feet. Match panel placements and material wear through the turn. No amulet, command-rod, shield, flesh or chest reactor. No labels, text, captions, borders, logos, UI, scenery, extra creatures, invented insignia or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Door Guardian from Severed Lands. Input image 1 is the canonical full-body reference; input image 2 is the matching multiview sheet. Preserve this exact head, apparent age, species, materials or skin, eyes or sensors, hair or antennae, expression and upper clothing/plates. Change framing only. CLOSE HEAD AND UPPER SHOULDERS, ending across upper chest. Head centered, eyes/sensors near 35 percent down, chin or lower jaw near 65 percent down, comfortable headroom above hair, crown or antennae. Consistent head scale for RPG dialogue portraits. Preserve the exact heavy carved STONE head, angular basalt plates, dark bronze joints and TWO narrow amber sensor slits. Close head/shoulder framing, no huge chest or whole body. No biological human face, hair, eyes, mouth, amulet or chest reactor. Polished naturalistic digital RPG illustration with tactile materials, plain light neutral gray background and soft natural studio light matching references. Continuous full-bleed square background and upper shoulders to every edge. No hands, waist, weapon, javelin, shield, equipment, full torso, painted circle, cutout, vignette, faded image edge, border, caption, text, UI, scenery, new costume or anatomy, invented crest, extra being or animal. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-monster-field-warden",
+      "name": "Field Warden",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/field-warden.md",
+          "sha256": "f0cdf525c26f55afa31cd9f800398506317c75465e5f5f9fea6279b30a590c0f",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/field-warden.md",
+          "sha256": "4c677622222feb23e6328d9c6de8c5e6962c189bd5fd4acac35ea67874d2a9b2",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A single Medium Warden Field Warden patrol construct with a lean upright bipedal frame of weathered pale limestone plates and dark recessed stone joints. A small angular stone head with one narrow recessed cool blue-green sensor lens, no biological eyes or mouth. Two long articulated arms each ending in a three-pronged stone claw, two sturdy jointed legs and broad stone feet. Simple worn geometric plate segments, small mineral accents and an alert balanced scanning stance. Both claw hands are empty, open and held low, showing three digits each. Its silent stone joints, Rift-signature sensors and claws follow the source; exact frame, plate layout, mineral colors and sensor design are editable visual defaults. No straw, fabric stuffing, farming scarecrow, flesh, human face, hair, extra limbs, additional claws, hand weapon, shield, invented Warden crest, readable runes, glowing beams, captive, Returner target, riftbeast, landscape or scenery.",
+        "full_body": {
+          "path": "assets/characters/2cdd2ba93a69677aeda830992ce33d7e7a9ac192986244d023ecde2420396f80.png",
+          "sha256": "2cdd2ba93a69677aeda830992ce33d7e7a9ac192986244d023ecde2420396f80"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/d5ee0e8c54d36118c08449b80e57730579e0ecf069141d8a7d9fd78b8e6627db.png",
+          "sha256": "d5ee0e8c54d36118c08449b80e57730579e0ecf069141d8a7d9fd78b8e6627db"
+        },
+        "portrait": {
+          "path": "assets/characters/f0501856d7ee221818f3b33cbd682a8bd91c4bfca97d8bfad54d178e78e8f6cf.png",
+          "sha256": "f0501856d7ee221818f3b33cbd682a8bd91c4bfca97d8bfad54d178e78e8f6cf"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1.1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1883142
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2022071
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2606516
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body enemy reference for Field Warden in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile materials, plain light neutral gray background, soft natural studio light and a subtle grounding shadow. Exactly one complete subject in a near-front three-quarter standing view. Whole head, all limbs, feet, antennae if present, and every weapon tip comfortably inside the margins. Appearance: A single Medium Warden Field Warden patrol construct with a lean upright bipedal frame of weathered pale limestone plates and dark recessed stone joints. A small angular stone head with one narrow recessed cool blue-green sensor lens, no biological eyes or mouth. Two long articulated arms each ending in a three-pronged stone claw, two sturdy jointed legs and broad stone feet. Simple worn geometric plate segments, small mineral accents and an alert balanced scanning stance. Both claw hands are empty, open and held low, showing three digits each. Its silent stone joints, Rift-signature sensors and claws follow the source; exact frame, plate layout, mineral colors and sensor design are editable visual defaults. No straw, fabric stuffing, farming scarecrow, flesh, human face, hair, extra limbs, additional claws, hand weapon, shield, invented Warden crest, readable runes, glowing beams, captive, Returner target, riftbeast, landscape or scenery. Preserve authored anatomy and equipment. No additional beings, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview enemy reference sheet for Field Warden from Severed Lands. Input image 1 is the canonical full-body reference. Preserve the exact anatomy, face or sensor head, proportions, materials, colors, equipment and wear. Appearance: A single Medium Warden Field Warden patrol construct with a lean upright bipedal frame of weathered pale limestone plates and dark recessed stone joints. A small angular stone head with one narrow recessed cool blue-green sensor lens, no biological eyes or mouth. Two long articulated arms each ending in a three-pronged stone claw, two sturdy jointed legs and broad stone feet. Simple worn geometric plate segments, small mineral accents and an alert balanced scanning stance. Both claw hands are empty, open and held low, showing three digits each. Its silent stone joints, Rift-signature sensors and claws follow the source; exact frame, plate layout, mineral colors and sensor design are editable visual defaults. No straw, fabric stuffing, farming scarecrow, flesh, human face, hair, extra limbs, additional claws, hand weapon, shield, invented Warden crest, readable runes, glowing beams, captive, Returner target, riftbeast, landscape or scenery. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete views, FRONT, SIDE PROFILE and BACK, plus one smaller close head detail at far right. Consistent scale across the three complete views; every limb, foot, head, antenna and weapon tip comfortably inside margins. The same single subject repeated as turnaround views. Change viewing angle only, keeping anatomy and costume. Preserve the lean pale limestone patrol frame, single recessed blue-green sensor lens, stone joints and exactly three claw digits on each of its two hands. Both claws empty and held low, same long limbs and stone feet. No straw, flesh, additional sensor eye or weapon. No labels, text, captions, borders, logos, UI, scenery, extra creatures, invented insignia or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Field Warden from Severed Lands. Input image 1 is the canonical full-body reference; input image 2 is the matching multiview sheet. Preserve this exact head, apparent age, species, materials or skin, eyes or sensors, hair or antennae, expression and upper clothing/plates. Change framing only. CLOSE HEAD AND UPPER SHOULDERS, ending across upper chest. Head centered, eyes/sensors near 35 percent down, chin or lower jaw near 65 percent down, comfortable headroom above hair, crown or antennae. Consistent head scale for RPG dialogue portraits. Preserve the exact small angular PALE LIMESTONE head and ONE recessed blue-green sensor lens, with the same stone plates and dark neck joints. Close head/shoulder framing, no huge chest or whole body. No human face, biological eyes, mouth, hair, extra lens or straw. Polished naturalistic digital RPG illustration with tactile materials, plain light neutral gray background and soft natural studio light matching references. Continuous full-bleed square background and upper shoulders to every edge. No hands, waist, weapon, javelin, shield, equipment, full torso, painted circle, cutout, vignette, faded image edge, border, caption, text, UI, scenery, new costume or anatomy, invented crest, extra being or animal. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-monster-hollow-brute",
+      "name": "Hollow Brute",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/hollow-brute.md",
+          "sha256": "fcb3ed660f40fc50b2ca32c85acafed613be45187ea40dc1489ace5e7d0e3f9a",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/hollow-brute.md",
+          "sha256": "b79e24d69cec08f1db1eef966544a9d6dd5b85373decbe19cddbdc22a57d5a68",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A single adult human Hollow Brute of Medium size, with a hulking swollen muscular frame, massive warped shoulders and arms, a thick neck and a recognizably human heavy-browed face carrying dim painful awareness. Patchy dull gray-brown skin, fully violet irises, short ragged black hair and a broad tense mouth. Exactly two arms with normal five-digit human hands and two strong legs. Rough plain brown hide armor covers the chest and shoulders over a dark cloth tunic, ragged dark trousers and battered brown leather boots. Their anatomical RIGHT hand holds one ordinary morningstar low beside the body, with its full spiked head and shaft visible; the LEFT arm carries one plain dented round wooden shield. One ordinary javelin is strapped diagonally across their back with its point above the anatomical LEFT shoulder. Their swollen warped human form follows the Setting lore, with hide armor, shield, morningstar and javelin following source equipment. Detailed anatomy, features, skin color and equipment design are editable visual defaults. No bugbear or goblin head, animal fur, tusks, horns, extra limbs, claws instead of hands, giant size, fresh injury, exposed organs, gore, spikes grown from flesh, captives, warlord insignia, scenery or readable text.",
+        "full_body": {
+          "path": "assets/characters/59804809800bfcd5481155b9553835d71c749967c6026dd0144320c8397a197b.png",
+          "sha256": "59804809800bfcd5481155b9553835d71c749967c6026dd0144320c8397a197b"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/2e83e9b996a586c05ed999bbbd7c9465ecef8ebe8b783ac5c4ad8d2cb060ff35.png",
+          "sha256": "2e83e9b996a586c05ed999bbbd7c9465ecef8ebe8b783ac5c4ad8d2cb060ff35"
+        },
+        "portrait": {
+          "path": "assets/characters/09c270ecd7d83cf3affc97e493ebfcaa3249465aa7e31c90208c1907eec7f069.png",
+          "sha256": "09c270ecd7d83cf3affc97e493ebfcaa3249465aa7e31c90208c1907eec7f069"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2304521
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2366672
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2580966
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body enemy reference for Hollow Brute in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile materials, plain light neutral gray background, soft natural studio light and a subtle grounding shadow. Exactly one complete subject in a near-front three-quarter standing view. Whole head, all limbs, feet, antennae if present, and every weapon tip comfortably inside the margins. Appearance: A single adult human Hollow Brute of Medium size, with a hulking swollen muscular frame, massive warped shoulders and arms, a thick neck and a recognizably human heavy-browed face carrying dim painful awareness. Patchy dull gray-brown skin, fully violet irises, short ragged black hair and a broad tense mouth. Exactly two arms with normal five-digit human hands and two strong legs. Rough plain brown hide armor covers the chest and shoulders over a dark cloth tunic, ragged dark trousers and battered brown leather boots. Their anatomical RIGHT hand holds one ordinary morningstar low beside the body, with its full spiked head and shaft visible; the LEFT arm carries one plain dented round wooden shield. One ordinary javelin is strapped diagonally across their back with its point above the anatomical LEFT shoulder. Their swollen warped human form follows the Setting lore, with hide armor, shield, morningstar and javelin following source equipment. Detailed anatomy, features, skin color and equipment design are editable visual defaults. No bugbear or goblin head, animal fur, tusks, horns, extra limbs, claws instead of hands, giant size, fresh injury, exposed organs, gore, spikes grown from flesh, captives, warlord insignia, scenery or readable text. Preserve authored anatomy and equipment. No additional beings, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview enemy reference sheet for Hollow Brute from Severed Lands. Input image 1 is the canonical full-body reference. Preserve the exact anatomy, face or sensor head, proportions, materials, colors, equipment and wear. Appearance: A single adult human Hollow Brute of Medium size, with a hulking swollen muscular frame, massive warped shoulders and arms, a thick neck and a recognizably human heavy-browed face carrying dim painful awareness. Patchy dull gray-brown skin, fully violet irises, short ragged black hair and a broad tense mouth. Exactly two arms with normal five-digit human hands and two strong legs. Rough plain brown hide armor covers the chest and shoulders over a dark cloth tunic, ragged dark trousers and battered brown leather boots. Their anatomical RIGHT hand holds one ordinary morningstar low beside the body, with its full spiked head and shaft visible; the LEFT arm carries one plain dented round wooden shield. One ordinary javelin is strapped diagonally across their back with its point above the anatomical LEFT shoulder. Their swollen warped human form follows the Setting lore, with hide armor, shield, morningstar and javelin following source equipment. Detailed anatomy, features, skin color and equipment design are editable visual defaults. No bugbear or goblin head, animal fur, tusks, horns, extra limbs, claws instead of hands, giant size, fresh injury, exposed organs, gore, spikes grown from flesh, captives, warlord insignia, scenery or readable text. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete views, FRONT, SIDE PROFILE and BACK, plus one smaller close head detail at far right. Consistent scale across the three complete views; every limb, foot, head, antenna and weapon tip comfortably inside margins. The same single subject repeated as turnaround views. Change viewing angle only, keeping anatomy and costume. Preserve the warped swollen muscular HUMAN body, dim painful expression and violet irises. Keep morningstar in anatomical RIGHT hand, round wooden shield on LEFT arm and javelin across back with tip above LEFT shoulder. No fur, goblin head, tusks, claws or giant version. No labels, text, captions, borders, logos, UI, scenery, extra creatures, invented insignia or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Hollow Brute from Severed Lands. Input image 1 is the canonical full-body reference; input image 2 is the matching multiview sheet. Preserve this exact head, apparent age, species, materials or skin, eyes or sensors, hair or antennae, expression and upper clothing/plates. Change framing only. CLOSE HEAD AND UPPER SHOULDERS, ending across upper chest. Head centered, eyes/sensors near 35 percent down, chin or lower jaw near 65 percent down, comfortable headroom above hair, crown or antennae. Consistent head scale for RPG dialogue portraits. Preserve the exact warped heavy-browed HUMAN face, short dark hair, violet irises and dim painful expression. Keep the same massive shoulder outline and hide armor collar. No goblin head, fur, tusks, horns, open wounds or new anatomy. Polished naturalistic digital RPG illustration with tactile materials, plain light neutral gray background and soft natural studio light matching references. Continuous full-bleed square background and upper shoulders to every edge. No hands, waist, weapon, javelin, shield, equipment, full torso, painted circle, cutout, vignette, faded image edge, border, caption, text, UI, scenery, new costume or anatomy, invented crest, extra being or animal. One 1024x1024 PNG."
+      }
     }
   ]
 }

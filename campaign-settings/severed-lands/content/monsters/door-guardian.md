@@ -38,3 +38,15 @@ The greatest of the Warden constructs still active — a colossus built to prote
 **Multiattack.** Two fist attacks.
 **Fist.** +7 to hit, reach 5 ft., one target. 11 (2d6 + 4) bludgeoning.
 **Shield.** When a creature makes an attack against the wearer of the amulet, the guardian grants a +2 bonus to AC if within 5 ft.
+
+## Appearance and artwork
+
+A single Large colossus-like Warden Door Guardian, a broad massively built bipedal construct with a heavy basalt-gray stone body and worn dark bronze-alloy joint fittings. Two immense arms ending in empty five-digit stone-and-alloy hands, two thick pillar-like legs and broad blocky feet. A blunt angular carved stone head with a heavy brow and two narrow dim amber sensor slits, no flesh or expressive human face. Restrained geometric masonry panels, interlocking shoulder blocks, thick chest plates and visible ancient articulated joints. Calm immovable protective stance, hands relaxed at its sides. Its huge custom-forged Warden construct identity and fists follow the authored source; exact body architecture, materials, panel geometry and sensor design are editable visual defaults for one Door Guardian. No amulet or command-rod on its body, invented Door identity, readable symbol, face of a living person, hair, biological skin, wings, extra limbs, handheld shield, weapon, crown, glowing chest reactor, beams, portal, actual Door, scenery, victim or additional creature.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/3ed738ec6377675d5fc853e1226636c7a23a13e042df293038c859fd7ad56a54.png)
+
+[Full-body reference](../../assets/characters/d8c6e9bc197f170210396db442eccd87f82b8ad1af38c4bfe9cefbd8698d62b5.png)
+
+[Multiview reference sheet](../../assets/characters/fadaf479c4d16138a5412547a3014a21e6356a7957e768cafb3c0324beeaeaf2.png)
