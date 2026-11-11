@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+from dataclasses import replace
 
 import pytest
 
@@ -10,12 +11,20 @@ from sylvia_gm.agent._working_context import (
     WorkingContextProvider,
     durable_tool_result,
 )
-from sylvia_gm.provider._base import FakeProvider, ModelInfo, ProviderResponse, ProviderStreamChunk
+from sylvia_gm.provider._base import (
+    FakeProvider,
+    ModelInfo,
+    ProviderResponse,
+    ProviderStreamChunk,
+    TokenUsage,
+)
 from sylvia_gm.provider._exceptions import (
     ContextCompactionError,
     InvalidResponseError,
     TokenLimitError,
 )
+from sylvia_gm.provider._hooks import HookContext
+from sylvia_gm.provider._token_estimate import token_estimator
 
 
 class Model(FakeProvider):
@@ -80,6 +89,48 @@ def working(model=None, records=(), cancelled=lambda: False):
         progress=progress.append,
     )
     return wrapper, saved, progress
+
+
+@pytest.mark.asyncio
+async def test_fixed_tool_load_does_not_trigger_ineffective_compaction():
+    model = Model()
+    wrapper, saved, _ = working(model)
+    tools = [{"schema": "x" * 280_000}]
+    messages = history()
+    assert await wrapper.prepare(messages, tools) == messages
+    assert not saved and not model.calls
+
+
+@pytest.mark.asyncio
+async def test_fixed_material_too_large_fails_before_any_summary_call():
+    model = Model()
+    wrapper, saved, _ = working(model)
+    with pytest.raises(TokenLimitError, match="cannot be shortened further"):
+        await wrapper.prepare(history(), [{"schema": "x" * 400_000}])
+    assert not saved and not model.calls
+
+
+@pytest.mark.asyncio
+async def test_gm_checkpoint_reopens_with_only_note_and_current_action():
+    model = Model(responses=[ProviderResponse(content="The opening action is already complete.")])
+    saved = []
+
+    async def save(record):
+        saved.append(record)
+
+    messages = [
+        {"role": "user", "content": "Open the door."},
+        {"role": "assistant", "content": "The door opens."},
+        {"role": "user", "content": "Walk through it."},
+    ]
+    wrapper = WorkingContextProvider(model, save=save, pin_first_user=False)
+    projected = await wrapper.prepare(messages, force=True)
+    assert len(projected) == 2
+    assert projected[0]["content"].startswith("SYLVIA_CONTINUATION_NOTE ")
+    assert projected[1] == messages[-1]
+    reopened = WorkingContextProvider(model, save=save, records=saved, pin_first_user=False)
+    assert reopened.project(messages) == projected
+    assert "Open the door." in saved[0]["source_archive"]
 
 
 @pytest.mark.asyncio
@@ -392,3 +443,42 @@ def test_malformed_or_newer_checkpoints_rebuild_from_original_history():
     )
     assert not wrapper.records
     assert wrapper.project(history()) == history()
+
+
+@pytest.mark.asyncio
+async def test_reported_usage_is_model_specific_shared_and_keeps_a_margin():
+    provider = Model()
+    estimator = token_estimator(provider)
+    assert token_estimator(provider) is estimator
+    request = {"messages": [{"role": "user", "content": "x" * 10000}]}
+    model = provider.model_info
+    unknown_estimate = estimator.estimate(request, model)
+    await provider.hooks.fire_on_response(HookContext(
+        provider_key=model.provider_key, model_id=model.wire_model_id,
+        request_json=request,
+        response=ProviderResponse(usage=TokenUsage(prompt_tokens=8000), usage_reported=True),
+    ))
+    assert estimator.estimate(request, model) == 10032
+    assert estimator.estimate(request, replace(model, id="another-model")) == unknown_estimate
+    # A cheaper later sample must not erase the more conservative observation.
+    await provider.hooks.fire_on_response(HookContext(
+        provider_key=model.provider_key, model_id=model.wire_model_id,
+        request_json=request,
+        response=ProviderResponse(usage=TokenUsage(prompt_tokens=1000), usage_reported=True),
+    ))
+    assert estimator.estimate(request, model) == 10032
+
+
+@pytest.mark.asyncio
+async def test_unreported_usage_is_not_used_as_a_measurement():
+    provider = Model()
+    estimator = token_estimator(provider)
+    model = provider.model_info
+    request = {"content": "x" * 1000}
+    before = estimator.estimate(request, model)
+    await provider.hooks.fire_on_response(HookContext(
+        provider_key=model.provider_key, model_id=model.wire_model_id,
+        request_json=request,
+        response=ProviderResponse(usage=TokenUsage(prompt_tokens=8000)),
+    ))
+    assert estimator.estimate(request, model) == before

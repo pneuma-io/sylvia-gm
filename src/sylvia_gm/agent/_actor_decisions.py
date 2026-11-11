@@ -124,6 +124,7 @@ def run_actor_decision(
         save=keep_checkpoint,
         record_owner={"kind": "participant", "context_id": context_id},
         request_context_id="sylvia-" + context_id,
+        pin_first_user=False,
         cancelled=lambda: provider_input.control.cancelled,
         progress=provider_input.control.set_status_hint,
         prepare_continuation=prepare_native,

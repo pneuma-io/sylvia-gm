@@ -291,7 +291,8 @@ def test_same_batch_prose_and_tool_results_restore_checkpoint_without_repeating_
         )
 
 
-def test_gm_compaction_preserves_current_state_and_enforced_output(tmp_path):
+@pytest.mark.parametrize("provider_key", ["chatgpt_subscription", "openrouter", "local"])
+def test_gm_compaction_preserves_current_state_and_enforced_output(tmp_path, provider_key):
     from sylvia_gm.agent._provider_session import ProviderSessionAdapter
     from sylvia_gm.agent._session_loop import ProviderControl, SessionProviderInput
     from sylvia_gm.application.authority import CampaignCreate
@@ -311,6 +312,7 @@ def test_gm_compaction_preserves_current_state_and_enforced_output(tmp_path):
     provider = GM(
         responses=[ProviderResponse(content="Historical guess AP=100; villain is secret")] * 10
     )
+    provider.model_info.provider_key = provider_key
     with AuthorityOwner.open(tmp_path / "gm.db", "owner") as owner:
         owner.create_campaign(
             CampaignCreate(
@@ -354,6 +356,14 @@ def test_gm_compaction_preserves_current_state_and_enforced_output(tmp_path):
                 )
             )
         assert owner.snapshot("campaign") == before
+        compacted = provider.requests[-1][0]
+        assert messages[1] not in compacted
+        assert messages[-1] in compacted
+        if provider_key in {"chatgpt_subscription", "openrouter"}:
+            marker = next(m for m in compacted if str(m.get("content", "")).startswith(
+                "SYLVIA_GM_CURRENT_ACTION "
+            ))
+            assert json.loads(marker["content"].split("\n", 1)[1]) == messages[-1]["content"]
         assert provider.requests[-1][0][0] == messages[0]
         assert not any("AP=4" in str(m) for m in provider.requests[-1][0])
         assert provider.requests[-1][2]["max_tokens"] == 4096

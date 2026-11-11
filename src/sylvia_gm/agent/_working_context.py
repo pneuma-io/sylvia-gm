@@ -22,6 +22,7 @@ from sylvia_gm.provider._exceptions import (
     ProviderOutputLimitError,
     TokenLimitError,
 )
+from sylvia_gm.provider._token_estimate import token_estimator
 
 CHECKPOINT_KIND = "working_context_checkpoint"
 _SUMMARY_LIMIT = 12_000
@@ -196,6 +197,7 @@ class WorkingContextProvider(Provider):
         prepare_continuation: Callable | None = None,
         record_owner: Mapping[str, object] | None = None,
         request_context_id: str | None = None,
+        pin_first_user: bool = True,
     ) -> None:
         super().__init__()
         self._provider = provider
@@ -210,6 +212,11 @@ class WorkingContextProvider(Provider):
         self._source: list[dict[str, Any]] = []
         self.history_retrieval_enabled = False
         self.request_context_id = request_context_id
+        self._pin_first_user = pin_first_user
+        self._token_estimator = token_estimator(provider)
+
+    def _estimate(self, value: object) -> int:
+        return self._token_estimator.estimate(value, self.model_info)
 
     def _context_options(self, *, compaction: bool = False) -> dict[str, object]:
         if (self.request_context_id
@@ -250,16 +257,30 @@ class WorkingContextProvider(Provider):
                 "reread current files before edits.\n" + str(record["summary"])
             ),
         }
-        # The earliest objective and latest user correction stay exact even during a long tool loop.
+        # Builder keeps its original objective; play keeps only the current player action exact.
         user_groups = [g for g in groups if any(
             m.get("role") == "user" and not m.get("_application_data") for m in g.messages
         )]
         retained = [g for index, g in enumerate(groups) if (
             index >= covered
-            or (user_groups and g in (user_groups[0], user_groups[-1]))
+            or (user_groups and (
+                g is user_groups[-1] or (self._pin_first_user and g is user_groups[0])
+            ))
             or any(m.get("_fresh_application_data") for m in g.messages)
         )]
         return pinned + [note] + [m for g in retained for m in g.messages]
+
+    def _fixed_messages(self, messages):
+        """Identify material a continuation note cannot shorten."""
+        pinned, groups = _groups(messages)
+        users = [g for g in groups if any(
+            m.get("role") == "user" and not m.get("_application_data") for m in g.messages
+        )]
+        fixed = [g for g in groups if (
+            (users and (g is users[-1] or (self._pin_first_user and g is users[0])))
+            or any(m.get("_fresh_application_data") for m in g.messages)
+        )]
+        return pinned + [m for g in fixed for m in g.messages]
 
     def _budgets(self, options: Mapping[str, Any]) -> tuple[int, int, int]:
         from sylvia_gm.provider._output_policy import output_allowance
@@ -275,21 +296,33 @@ class WorkingContextProvider(Provider):
                 or output_allowance(self.model_info)
             )
         )
-        threshold = max(
-            256, min(int(capacity * 0.70), capacity - reserve - max(1024, capacity // 10))
-        )
-        return capacity, threshold, max(128, min(int(capacity * 0.42), int(threshold * 0.7)))
+        input_budget = max(256, capacity - reserve - max(1024, capacity // 10))
+        return capacity, input_budget, int(input_budget * 0.42)
 
     async def prepare(self, messages, tools=None, *, force=False, **options):
         self._check_cancelled()
         self._source = messages
         projected = self.project(messages)
-        capacity, threshold, target = self._budgets(options)
+        capacity, input_budget, _ = self._budgets(options)
+        fixed = self._fixed_messages(projected)
+        fixed_tokens = self._estimate([fixed, self._request_tools(tools)])
+        # Fixed instructions and schemas consume space, but cannot be improved by summarising.
+        # Apply the compaction threshold to the remaining history allowance.
+        if self.model_info is not None and fixed_tokens >= input_budget:
+            raise TokenLimitError(
+                "Context cannot be shortened further: instructions, tools or the latest "
+                "exchange are too large. Saved work is intact; use a larger context model or "
+                "a bounded source read."
+            )
+        history_tokens = self._estimate([m for m in projected if m not in fixed])
+        remaining = max(256, input_budget - fixed_tokens)
+        threshold = int(remaining * 0.70)
+        target = int(remaining * 0.42)
         if not force and (
-            self.model_info is None or estimate_tokens([projected, tools]) < threshold
+            self.model_info is None or history_tokens < threshold
         ):
             return projected
-        pinned, groups = _groups(messages)
+        _, groups = _groups(messages)
         previous, start = self._matching(groups)
         # Always keep the last complete exchange verbatim, including native thinking continuity.
         if len(groups) - start < 2:
@@ -303,12 +336,13 @@ class WorkingContextProvider(Provider):
         stop = start + 1
         while (
             stop < len(groups) - 1
-            and estimate_tokens([pinned, [m for g in groups[stop:] for m in g.messages], tools])
+            and self._estimate([m for g in groups[stop:] for m in g.messages if m not in fixed])
             > target
         ):
             stop += 1
         if force:
-            stop = max(stop, start + max(1, (len(groups) - start) // 2))
+            stop = (len(groups) - 1 if not self._pin_first_user
+                    else max(stop, start + max(1, (len(groups) - start) // 2)))
             stop = min(stop, len(groups) - 1)
         source = [_safe_message(m) for g in groups[start:stop] for m in g.messages]
         summary = str(previous["summary"]) if previous else ""
@@ -583,6 +617,7 @@ def compact_saved_messages(provider, context, messages, control):
         save=bridge.save,
         cancelled=lambda: control.cancelled,
         progress=control.set_status_hint,
+        pin_first_user=context.session.role.value == "builder",
     )
     future = control.admit(
         lambda: asyncio.run_coroutine_threadsafe(
