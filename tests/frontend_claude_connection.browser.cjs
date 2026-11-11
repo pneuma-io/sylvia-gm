@@ -166,6 +166,8 @@ test('Sylvia installs its own copy with visible progress and offers an update wh
     assert.match(await page.locator('#claude-connection-detail').innerText(), /2\.1\.322 is installed for Sylvia/);
     assert.equal(await page.locator('#claude-fact-version').innerText(), '2.1.322');
     assert.equal(await page.locator('[data-claude-action="install"]').innerText(), 'Check for a newer version');
+    await page.locator('[data-claude-action="status"]').click();
+    await page.waitForFunction(() => !/installed for Sylvia/.test(document.getElementById('claude-connection-detail').textContent));
     const settled = (await claudeCalls()).length;
     await page.waitForTimeout(1700);
     assert.equal((await claudeCalls()).length, settled, 'a finished download does not keep polling');

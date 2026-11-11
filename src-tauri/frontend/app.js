@@ -2958,6 +2958,7 @@ const SylviaGMFrontend = (() => {
   let claudePageVisible = false;
   let claudeStatusTimer = null;
   let claudeAccountStatus = null;
+  let claudeInstallOutcome = false;
 
   // The Accounts page shows one subscription flow at a time. Opening the Claude view never starts
   // Claude Code; only its buttons do, plus the read-only poll while a download or sign-in is unfinished.
@@ -3060,7 +3061,8 @@ const SylviaGMFrontend = (() => {
     } else {
       progress.removeAttribute('value');
     }
-    const outcome = !installing && ['failed', 'ready', 'idle'].includes(install.state) && install.message;
+    // A finished setup's result is shown until the next button press, then normal status returns.
+    const outcome = claudeInstallOutcome && !installing && install.message;
     const detail = String(outcome || (checked && typeof result.message === 'string' ? result.message : '')).trim();
     $('claude-connection-detail').textContent = installing ? '' : detail;
     $('claude-connection-detail').hidden = installing || !detail || detail === $('claude-connection-status').textContent;
@@ -3137,6 +3139,8 @@ const SylviaGMFrontend = (() => {
     const buttons = [...document.querySelectorAll('[data-claude-action], #claude-terms-btn')];
     buttons.forEach((button) => { button.disabled = true; });
     const quietPoll = action === 'status' && (claudeAccountStatus?.login_pending || claudeInstalling(claudeAccountStatus));
+    if (action === 'install') claudeInstallOutcome = true;
+    else if (!quietPoll && action !== 'cancel') claudeInstallOutcome = false;
     if (!quietPoll) {
       status.textContent = action === 'status' ? 'Checking Claude Code…' : action === 'login' ? 'Starting sign-in…'
         : action === 'install' ? 'Starting setup…' : action === 'logout' ? 'Signing out…'
