@@ -6736,6 +6736,186 @@
         "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for The Inkwell from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin, eyes, hair, clothing, equipment, colors, material wear and any partial phasing. Appearance: A thin hollow-eyed settled Human adult appearing in their fifties, with light olive skin, an angular tired clean-shaven face, fully violet irises and untidy dark graying hair loosely tied at the nape with plain cloth. Distracted weary expression, slightly stooped posture and thin hands held relaxed with gently flexed fingers. A faded charcoal-brown long travel coat over a sand-colored linen tunic, worn dark trousers and scuffed brown boots. A small closed cylindrical leather map case hangs at their anatomical LEFT hip from a strap over their RIGHT shoulder; one small closed dark ink bottle is secured at their anatomical RIGHT belt. Their thin hollow-eyed appearance and Speaker-stage violet eyes follow the authored profile and Hollowed source; apparent age, other features and clothing are editable visual defaults. Use they/them pronouns. No readable map, route, Warden Door location, invented prophecy, glowing eyes, exposed ink spilling, ink-body transformation, exaggerated trembling, motion blur, open scroll, weapon, crest, scenery or revealed discoveries. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views; entire head, hands, feet and equipment within all margins. The same single character repeated as turnaround views. Change viewing angle only, keeping costume and identity. Keep the CLOSED map case at anatomical LEFT hip with strap over RIGHT shoulder and the CLOSED ink bottle at anatomical RIGHT belt in every view. Preserve their thin hollow-eyed face and fully violet irises; use they/them pronouns. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, additional characters or revealed secrets.",
         "portrait": "Use case: identity-preserve. Production square app portrait for The Inkwell from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, species, skin, eyes, hairstyle, expression, upper clothing and any partial phasing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Preserve their thin hollow-eyed tired face, fully violet irises and untidy dark graying tied hair. Polished naturalistic digital RPG illustration with tactile skin and fabric where not phased, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded image edge, border, caption, text, UI, scenery, new costume, invented crest, animal or extra person. One 1024x1024 PNG."
       }
+    },
+    {
+      "id": "severed-npc-the-silent",
+      "name": "The Silent",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/the-silent.md",
+          "sha256": "c5e39a74289f47181b4cee530064c3a4a9fc32509057ca2dbbb0b28bcde9da4d",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/the-silent.md",
+          "sha256": "39a0437c47b182fcb46eb3194b97e44a9c7f8a94344609f02c7d1963ce46e8d0",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A humanlike androgynous adult Riftborn paladin appearing in their late fifties, with a sturdy medium-height frame, warm medium-brown skin, dark brown eyes, a softly lined clean-shaven face and short silver-gray curls. A patient watchful expression with a subtle closed-mouth warmth, balanced upright posture. A plain worn steel breastplate over a charcoal quilted gambeson, a dark blue travel cloak, practical dark trousers and scuffed brown leather boots. Their anatomical LEFT hand holds a small rectangular wooden-framed blank dark slate by its lower corner at hip height; one short piece of white chalk is visibly secured to that slate's frame by a simple cord. A small CLOSED hand-bound leather ledger is secured in straps at their anatomical RIGHT hip, its blank cover and closed page edges visible. Their right hand hangs relaxed. Their slate, chalk, ledger and patient silent bearing follow the authored sources; apparent age, physical features, armor and clothing are editable visual defaults. Use they/them pronouns. Their home world and original name remain unknown. No writing or names, open ledger, speaking pose, open mouth, gag, sewn lips, muzzle, Anchor Church symbol, invented Rememberer crest, weapon, glow, halo, magical effects, scenery or revealed council danger.",
+        "full_body": {
+          "path": "assets/characters/31e984e3d8ac5a131f89e2fc7a3ee52545c7e3971f2d6caf27769ae6ae7e5087.png",
+          "sha256": "31e984e3d8ac5a131f89e2fc7a3ee52545c7e3971f2d6caf27769ae6ae7e5087"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/e6ec0275a7ebfc88c268202df3be81d0fabe4a12b5da296901d0295db68a7f57.png",
+          "sha256": "e6ec0275a7ebfc88c268202df3be81d0fabe4a12b5da296901d0295db68a7f57"
+        },
+        "portrait": {
+          "path": "assets/characters/fb4d8e20685de128b75f92b3266830f3ce1a3b82628012e5cf0cb55fcb2c445f.png",
+          "sha256": "fb4d8e20685de128b75f92b3266830f3ce1a3b82628012e5cf0cb55fcb2c445f"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2047130
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2397779
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2552243
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for The Silent in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin or scales, cloth, leather and worn metal where applicable. Plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person in a near-front three-quarter standing pose. Whole head, both hands, clothing, footwear or bare feet and all equipment comfortably inside all margins. Appearance: A humanlike androgynous adult Riftborn paladin appearing in their late fifties, with a sturdy medium-height frame, warm medium-brown skin, dark brown eyes, a softly lined clean-shaven face and short silver-gray curls. A patient watchful expression with a subtle closed-mouth warmth, balanced upright posture. A plain worn steel breastplate over a charcoal quilted gambeson, a dark blue travel cloak, practical dark trousers and scuffed brown leather boots. Their anatomical LEFT hand holds a small rectangular wooden-framed blank dark slate by its lower corner at hip height; one short piece of white chalk is visibly secured to that slate's frame by a simple cord. A small CLOSED hand-bound leather ledger is secured in straps at their anatomical RIGHT hip, its blank cover and closed page edges visible. Their right hand hangs relaxed. Their slate, chalk, ledger and patient silent bearing follow the authored sources; apparent age, physical features, armor and clothing are editable visual defaults. Use they/them pronouns. Their home world and original name remain unknown. No writing or names, open ledger, speaking pose, open mouth, gag, sewn lips, muzzle, Anchor Church symbol, invented Rememberer crest, weapon, glow, halo, magical effects, scenery or revealed council danger. Preserve authored identity, species, personality and pronouns. No extra people, duplicate limbs, animals, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for The Silent from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin or scales, eyes, hair, clothing, equipment, colors and material wear. Appearance: A humanlike androgynous adult Riftborn paladin appearing in their late fifties, with a sturdy medium-height frame, warm medium-brown skin, dark brown eyes, a softly lined clean-shaven face and short silver-gray curls. A patient watchful expression with a subtle closed-mouth warmth, balanced upright posture. A plain worn steel breastplate over a charcoal quilted gambeson, a dark blue travel cloak, practical dark trousers and scuffed brown leather boots. Their anatomical LEFT hand holds a small rectangular wooden-framed blank dark slate by its lower corner at hip height; one short piece of white chalk is visibly secured to that slate's frame by a simple cord. A small CLOSED hand-bound leather ledger is secured in straps at their anatomical RIGHT hip, its blank cover and closed page edges visible. Their right hand hangs relaxed. Their slate, chalk, ledger and patient silent bearing follow the authored sources; apparent age, physical features, armor and clothing are editable visual defaults. Use they/them pronouns. Their home world and original name remain unknown. No writing or names, open ledger, speaking pose, open mouth, gag, sewn lips, muzzle, Anchor Church symbol, invented Rememberer crest, weapon, glow, halo, magical effects, scenery or revealed council danger. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at far right. Consistent scale across body views; entire head, hands, feet and equipment within all margins. The same single character repeated as turnaround views. Change viewing angle only, keeping costume and identity. Keep the small BLANK slate held in anatomical LEFT hand, its chalk secured to its frame, and the CLOSED ledger secured at anatomical RIGHT hip through the turn. Preserve their closed-mouth patient warmth; use they/them pronouns. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, additional characters or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for The Silent from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, species, skin or scales, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a CLOSE HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair or scaled cranium. Consistent face scale for a standard RPG dialogue portrait. Preserve their softly lined mature face, silver curls and subtle warm CLOSED-mouth expression. No speaking pose or writing. Polished naturalistic digital RPG illustration with tactile skin or scales and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, spear, slate, ledger, lantern, rope, full torso, painted circle, cutout, vignette, faded image edge, border, caption, text, UI, scenery, new costume, invented crest, animal or extra person. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-tide-mother",
+      "name": "Tide-Mother",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/tide-mother.md",
+          "sha256": "8eaafa6e08f0828766afd8e7158745f76ca4f7a8e249d1ebdec9557c7e506f60",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/tide-mother.md",
+          "sha256": "61f12f1ad9fae0f9727f411789cb78358dd842197ed197b970cad058676c8a6b",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An ancient adult female reptilian Riftborn of the Verdant Scaled, the oldest living Scale-Elder, with a strong weathered bipedal hunter's frame and patient cautious expression. Clearly reptilian lizard head with a modest elongated blunt snout, heavy aged scaled brow ridges, amber-brown eyes with narrow vertical pupils, small rounded external ear openings and no human hair. Fine aged dark olive and gray-green scales over head, arms and legs, paler ochre scales along lower jaw, throat and underside. Several old healed Rift-burn scars across the scaled face and forearms have a very faint violet glow, without fresh injury. Two arms with five claw-tipped digits per hand, two strong plantigrade legs with broad bare clawed feet, and ONE long strong tapering scaled tail, naturally curving behind her with its complete tip inside the frame. A plain faded dark teal woven sleeveless wrap tunic reaching mid-thigh over muted brown cloth leg wraps, simple leather forearm guards and a worn brown leather belt. Her anatomical RIGHT hand loosely holds one upright Rift-touched spear beside her body, with a worn wooden shaft and a dark gray pointed head with restrained faint violet veins; her LEFT hand hangs relaxed. Her ancient reptilian identity, healed Rift-burn scars, patient bearing and spear follow the authored profile and faction source; detailed anatomy, scale colors, features and clothes are editable visual defaults. Her home world remains unknown. No human skin, human face, hair, mammalian ears, feathers, wings, antlers, oversized horns, extra limbs, extra tails, crown, invented tribal emblem, fresh wounds, gore, broad magical aura, landscape, prey, trophies or animal companion.",
+        "full_body": {
+          "path": "assets/characters/42b11da9e4120ca0c464132ea34cba34022e824ae38b2ef2a1209dc1e53d7562.png",
+          "sha256": "42b11da9e4120ca0c464132ea34cba34022e824ae38b2ef2a1209dc1e53d7562"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/b9e97e42a261101929d73a5b1ec36e2a674d75b78975e9afa60b0e19df087c83.png",
+          "sha256": "b9e97e42a261101929d73a5b1ec36e2a674d75b78975e9afa60b0e19df087c83"
+        },
+        "portrait": {
+          "path": "assets/characters/a3ef6b8ccd5a862122fc2fd90b6881712ef9554ebf9b7814b3e34ab7bcacb28c.png",
+          "sha256": "a3ef6b8ccd5a862122fc2fd90b6881712ef9554ebf9b7814b3e34ab7bcacb28c"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0,
+          "zoom": 1.3
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2188873
+        },
+        "reference_sheet": {
+          "width": 1752,
+          "height": 897,
+          "bytes": 2366329
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2777556
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Tide-Mother in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin or scales, cloth, leather and worn metal where applicable. Plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person in a near-front three-quarter standing pose. Whole head, both hands, clothing, footwear or bare feet and all equipment comfortably inside all margins. Appearance: An ancient adult female reptilian Riftborn of the Verdant Scaled, the oldest living Scale-Elder, with a strong weathered bipedal hunter's frame and patient cautious expression. Clearly reptilian lizard head with a modest elongated blunt snout, heavy aged scaled brow ridges, amber-brown eyes with narrow vertical pupils, small rounded external ear openings and no human hair. Fine aged dark olive and gray-green scales over head, arms and legs, paler ochre scales along lower jaw, throat and underside. Several old healed Rift-burn scars across the scaled face and forearms have a very faint violet glow, without fresh injury. Two arms with five claw-tipped digits per hand, two strong plantigrade legs with broad bare clawed feet, and ONE long strong tapering scaled tail, naturally curving behind her with its complete tip inside the frame. A plain faded dark teal woven sleeveless wrap tunic reaching mid-thigh over muted brown cloth leg wraps, simple leather forearm guards and a worn brown leather belt. Her anatomical RIGHT hand loosely holds one upright Rift-touched spear beside her body, with a worn wooden shaft and a dark gray pointed head with restrained faint violet veins; her LEFT hand hangs relaxed. Her ancient reptilian identity, healed Rift-burn scars, patient bearing and spear follow the authored profile and faction source; detailed anatomy, scale colors, features and clothes are editable visual defaults. Her home world remains unknown. No human skin, human face, hair, mammalian ears, feathers, wings, antlers, oversized horns, extra limbs, extra tails, crown, invented tribal emblem, fresh wounds, gore, broad magical aura, landscape, prey, trophies or animal companion. Preserve authored identity, species, personality and pronouns. No extra people, duplicate limbs, animals, captions, text, labels, logos, borders or UI. Leave extra space for the complete tail tip and spear head; do not crop either.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Tide-Mother from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin or scales, eyes, hair, clothing, equipment, colors and material wear. Appearance: An ancient adult female reptilian Riftborn of the Verdant Scaled, the oldest living Scale-Elder, with a strong weathered bipedal hunter's frame and patient cautious expression. Clearly reptilian lizard head with a modest elongated blunt snout, heavy aged scaled brow ridges, amber-brown eyes with narrow vertical pupils, small rounded external ear openings and no human hair. Fine aged dark olive and gray-green scales over head, arms and legs, paler ochre scales along lower jaw, throat and underside. Several old healed Rift-burn scars across the scaled face and forearms have a very faint violet glow, without fresh injury. Two arms with five claw-tipped digits per hand, two strong plantigrade legs with broad bare clawed feet, and ONE long strong tapering scaled tail, naturally curving behind her with its complete tip inside the frame. A plain faded dark teal woven sleeveless wrap tunic reaching mid-thigh over muted brown cloth leg wraps, simple leather forearm guards and a worn brown leather belt. Her anatomical RIGHT hand loosely holds one upright Rift-touched spear beside her body, with a worn wooden shaft and a dark gray pointed head with restrained faint violet veins; her LEFT hand hangs relaxed. Her ancient reptilian identity, healed Rift-burn scars, patient bearing and spear follow the authored profile and faction source; detailed anatomy, scale colors, features and clothes are editable visual defaults. Her home world remains unknown. No human skin, human face, hair, mammalian ears, feathers, wings, antlers, oversized horns, extra limbs, extra tails, crown, invented tribal emblem, fresh wounds, gore, broad magical aura, landscape, prey, trophies or animal companion. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at far right. Consistent scale across body views; entire head, hands, feet and equipment within all margins. The same single character repeated as turnaround views. Change viewing angle only, keeping costume and identity. Every one of the three body views must have exactly ONE continuous complete tail, from lower spine to tapered tip, comfortably inside its own space with no overlap with another view. Keep one complete spear loosely held in anatomical RIGHT hand and the LEFT hand relaxed. Preserve her reptilian aged scales, healed faintly glowing Rift-burn scars, clawed bare feet, no human hair or face. Leave enough space for all three full tails and spear tips. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, additional characters or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Tide-Mother from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, species, skin or scales, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a CLOSE HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair or scaled cranium. Consistent face scale for a standard RPG dialogue portrait. Preserve her exact ANCIENT REPTILIAN lizard head, blunt elongated snout, aged olive-gray scales, amber narrow-pupil eyes, small ear openings and the same healed faint violet Rift-burn scar pattern. Tight face framing, no long neck or whole torso. No human face, hair, mammalian ears, horns or added glow. Polished naturalistic digital RPG illustration with tactile skin or scales and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, spear, slate, ledger, lantern, rope, full torso, painted circle, cutout, vignette, faded image edge, border, caption, text, UI, scenery, new costume, invented crest, animal or extra person. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-undercroft-guide",
+      "name": "Vale",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/undercroft-guide.md",
+          "sha256": "9da9d284b6f579c5fccf1e8982f0ddabbf01c29009262a7a058b8d7f239d2813",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/undercroft-guide.md",
+          "sha256": "7494e6866c534a265106c0c963a1cf2b4e6c984f6c789340cd9db3a0864023ee",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A humanlike androgynous adult Riftborn tunnel guide appearing in their mid-thirties, with a tall wiry build, deep brown skin, dark brown eyes, a broad-cheeked clean-shaven face and short tightly curled black hair. A professional guarded expression and quiet alert upright stance, with empty relaxed hands. A plain worn gray canvas thigh-length coat over a muted olive linen shirt, dark charcoal trousers and practical scuffed brown calf boots. A compact coil of ordinary rope is secured at their anatomical LEFT hip; one small closed unlit hooded metal lantern hangs at their anatomical RIGHT hip from a plain leather belt. Their guarded professional bearing follows the authored profile; apparent age, physical features, clothing and ordinary guide equipment are editable visual defaults. Use they/them pronouns. Their home world remains unknown. No revealed route or map, writing, client names, smuggler insignia, invented faction badge, magical lantern, visible flame, weapon, scars, cave scenery, animal, extra person or revealed lost clients.",
+        "full_body": {
+          "path": "assets/characters/81a7d5262438fd6a3161a05233b22f22c0c5945b4e11cd57c52d14a71e40992f.png",
+          "sha256": "81a7d5262438fd6a3161a05233b22f22c0c5945b4e11cd57c52d14a71e40992f"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/2d8d51d92046fb0c2ba05f8c3f4a0c0f335eee251fc1ac8f5cad6b0bd6a1602c.png",
+          "sha256": "2d8d51d92046fb0c2ba05f8c3f4a0c0f335eee251fc1ac8f5cad6b0bd6a1602c"
+        },
+        "portrait": {
+          "path": "assets/characters/2986b76be8ad03fa36ec23314e12733c9295902ab76fb2a125ca39d49fdad312.png",
+          "sha256": "2986b76be8ad03fa36ec23314e12733c9295902ab76fb2a125ca39d49fdad312"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1952319
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2286866
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2369770
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Vale in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin or scales, cloth, leather and worn metal where applicable. Plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person in a near-front three-quarter standing pose. Whole head, both hands, clothing, footwear or bare feet and all equipment comfortably inside all margins. Appearance: A humanlike androgynous adult Riftborn tunnel guide appearing in their mid-thirties, with a tall wiry build, deep brown skin, dark brown eyes, a broad-cheeked clean-shaven face and short tightly curled black hair. A professional guarded expression and quiet alert upright stance, with empty relaxed hands. A plain worn gray canvas thigh-length coat over a muted olive linen shirt, dark charcoal trousers and practical scuffed brown calf boots. A compact coil of ordinary rope is secured at their anatomical LEFT hip; one small closed unlit hooded metal lantern hangs at their anatomical RIGHT hip from a plain leather belt. Their guarded professional bearing follows the authored profile; apparent age, physical features, clothing and ordinary guide equipment are editable visual defaults. Use they/them pronouns. Their home world remains unknown. No revealed route or map, writing, client names, smuggler insignia, invented faction badge, magical lantern, visible flame, weapon, scars, cave scenery, animal, extra person or revealed lost clients. Preserve authored identity, species, personality and pronouns. No extra people, duplicate limbs, animals, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Vale from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin or scales, eyes, hair, clothing, equipment, colors and material wear. Appearance: A humanlike androgynous adult Riftborn tunnel guide appearing in their mid-thirties, with a tall wiry build, deep brown skin, dark brown eyes, a broad-cheeked clean-shaven face and short tightly curled black hair. A professional guarded expression and quiet alert upright stance, with empty relaxed hands. A plain worn gray canvas thigh-length coat over a muted olive linen shirt, dark charcoal trousers and practical scuffed brown calf boots. A compact coil of ordinary rope is secured at their anatomical LEFT hip; one small closed unlit hooded metal lantern hangs at their anatomical RIGHT hip from a plain leather belt. Their guarded professional bearing follows the authored profile; apparent age, physical features, clothing and ordinary guide equipment are editable visual defaults. Use they/them pronouns. Their home world remains unknown. No revealed route or map, writing, client names, smuggler insignia, invented faction badge, magical lantern, visible flame, weapon, scars, cave scenery, animal, extra person or revealed lost clients. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at far right. Consistent scale across body views; entire head, hands, feet and equipment within all margins. The same single character repeated as turnaround views. Change viewing angle only, keeping costume and identity. Keep the rope coil at anatomical LEFT hip and the CLOSED UNLIT lantern at anatomical RIGHT hip in every view. Preserve their professional guarded face; use they/them pronouns. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, additional characters or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Vale from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, species, skin or scales, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a CLOSE HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair or scaled cranium. Consistent face scale for a standard RPG dialogue portrait. Preserve their exact deep-brown face, dark eyes, short tight curls and professional guarded expression. Polished naturalistic digital RPG illustration with tactile skin or scales and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, spear, slate, ledger, lantern, rope, full torso, painted circle, cutout, vignette, faded image edge, border, caption, text, UI, scenery, new costume, invented crest, animal or extra person. One 1024x1024 PNG."
+      }
     }
   ]
 }
