@@ -2137,6 +2137,19 @@ def reconcile_tool_batch(
             elif _committed_tool_resolves_player_boundary(state):
                 round_resolves_player_intent = True
         result_payload = _plain_json(tool_result_event.safe_payload.get("result", {}))
+        # Narration facts below use the full receipt. Model history needs the outcome/card,
+        # while the canonical engine event and private Full Audit retain diagnostic context.
+        committed = terminal_event.event_type is CanonicalEventType.ACTION_COMMITTED
+        model_result = (
+            {key: value for key, value in result_payload.items() if key != "context"}
+            if committed and isinstance(result_payload, Mapping) else result_payload
+        )
+        audit = getattr(self._owner, "record_admin_full_audit", None)
+        if callable(audit):
+            audit({"kind": "gm_mechanic_receipt", "action_id": tool_result_event.action_id,
+                   "campaign_id": state.campaign_id,
+                   "session_id": provider_input.session.session_id,
+                   "turn_id": turn_id, "result": result_payload})
         current_entities = _current_referenced_entities(
             state.mechanics_parameters[state.assembly.call_id], state.snapshot.state
         )
@@ -2145,7 +2158,7 @@ def reconcile_tool_batch(
             "action_id": tool_result_event.action_id,
             "campaign_revision": state.snapshot.revision,
             "safe_payload": _plain_json(terminal_event.safe_payload),
-            "result": result_payload,
+            "result": model_result,
             "current_entities": current_entities,
         }
         if terminal_event.event_type is CanonicalEventType.ACTION_COMMITTED:

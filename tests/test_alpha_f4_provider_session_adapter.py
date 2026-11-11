@@ -1290,6 +1290,13 @@ def test_old_dialogue_shape_is_rejected_before_write_then_same_gm_corrects_it(
     assert len(provider.calls) == 2
     for messages, _tools in provider.calls:
         assert messages[0] == {"role": "system", "content": "UNCHANGED OLD GM"}
+        context_controls = [message for message in messages
+                            if str(message.get("content", "")).startswith(
+                                "SYLVIA_GM_CONTEXT_CONTRACT v97 "
+                            )]
+        assert len(context_controls) == 1
+        assert "GM-private facts are yours alone." in context_controls[0]["content"]
+        assert "prose is held as an unsettled draft" in context_controls[0]["content"]
         format_controls = [
             message for message in messages if message["role"] == "system"
             and str(message.get("content", "")).startswith("SYLVIA_GM_RESPONSE_FORMAT")
@@ -3567,7 +3574,10 @@ def test_player_wording_never_forces_an_available_mechanic() -> None:
     assert owner.revision == 4
 
 
-def test_exact_narration_facts_survive_followup_tool_rounds() -> None:
+def test_exact_narration_facts_survive_followup_tool_rounds(monkeypatch) -> None:
+    audits = []
+    monkeypatch.setattr(_OwnerProjection, "record_admin_full_audit",
+                        lambda self, payload: audits.append(payload), raising=False)
     provider = _ScriptedProvider(
         [
             [
@@ -3620,8 +3630,10 @@ def test_exact_narration_facts_survive_followup_tool_rounds() -> None:
                 "status": "committed",
                 "result": {
                     "status": "committed",
+                    "result_card": {"title": "Attack", "outcome": "miss"},
                     "context": {
                         "_attack_outcome": "miss",
+                        "_internal_blob": "diagnostics" * 10000,
                         "_attack_roll": {"total": 4, "modifier": 3},
                         "_target_id": "rift-player-character",
                     },
@@ -3678,6 +3690,19 @@ def test_exact_narration_facts_survive_followup_tool_rounds() -> None:
     assert exact_facts[-1].count('"tool":"advance"') == 2
     assert "Continue this same GM turn from these committed results" in exact_facts[-1]
     assert "finish with the Campaign File disposition" in exact_facts[-1]
+
+    mechanic = next(m for m in final_messages if m.get("tool_call_id") == "call-attack")
+    receipt = json.loads(mechanic["content"])
+    assert receipt["action_id"] == first_action.action_command.action_id
+    assert receipt["result"] == {"status": "committed", "result_card": {
+        "title": "Attack", "outcome": "miss",
+    }}
+    assert len(mechanic["content"].encode()) < 4096
+    assert "_internal_blob" not in json.dumps(final_messages)
+    audit = next(a for a in audits if a["action_id"] == receipt["action_id"])
+    assert audit["result"]["context"]["_internal_blob"] == "diagnostics" * 10000
+    canonical = owner.events[0].safe_payload["result"]
+    assert audit["result"] == canonical
 
 
 def test_later_mechanic_failure_never_denies_an_earlier_commit() -> None:
