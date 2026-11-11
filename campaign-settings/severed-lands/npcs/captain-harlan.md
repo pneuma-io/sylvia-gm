@@ -20,12 +20,12 @@ Harlan is professional, conflicted, and increasingly uncomfortable with his role
 
 ## Appearance and artwork
 
-A broad-shouldered adult Human man in his early fifties with weathered medium fair skin, brown eyes, short dark hair graying at the temples, a neatly trimmed salt-and-pepper beard and a square tired face. Practical worn steel breastplate over a muted blue-gray guard tunic, plain dark shoulder cloak, leather gloves, dark trousers and brown boots. A sheathed service sword and an ordinary belt pouch. Head uncovered, calm professional but troubled expression.
+A mature broad-shouldered Human man serving as Thornwall guard captain, with warm fair skin, brown eyes, short swept copper-red hair and a clean-shaven strong adult face. Navy studded brigandine, shaped silver shoulder and forearm armor, a deep-red officer shoulder sash, brown belts and boots, and an ordinary sword sheathed at his left hip. Head uncovered, capable observant professionalism and weary courtesy. Twenty years of guard service, five as captain. Use he/him pronouns. No beard, extra weapons, crown, royal status or invented faction insignia.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/318d9862e76a38f725e7576507ca36116548e6c047fcf53999598c8e17eaa08f.png)
+[Portrait](../assets/characters/8a3a2f8a87cf198000acef1328f40ac1af534c9bf3d131dd7ef4d776e1ab413b.png)
 
-[Full-body reference](../assets/characters/92b92797be29ccae49f12646a78e29208ff083048fbe19a532477887b2d3c1d9.png)
+[Full-body reference](../assets/characters/0df5c93e69cdc19368ccef726da9d0210d72595252a27c3a2050ec1922d54f2c.png)
 
-[Multiview reference sheet](../assets/characters/cf1c300f328040e9a1ad976a93e2f60d39a485089f25d3699d0071660836a47f.png)
+[Multiview reference sheet](../assets/characters/f9df794db8a64220abb830fd63d9cc9d5561378663a8bdaf76f73445e32c3b01.png)

@@ -43,12 +43,12 @@ The truth is for the DM to decide. The ambiguity is the point.
 
 ## Appearance and artwork
 
-A humanlike androgynous adult Riftborn field researcher with apparent age styling in their early sixties, a lean medium-height frame, warm copper-brown skin, gray-green eyes, a long softly lined clean-shaven face and straight silver-gray neck-length hair held back in a loose plain half-tie. Patient methodical guarded expression, quiet attentive upright posture and empty relaxed hands. A plain weathered brown knee-length travel coat over a muted sage-green linen tunic, charcoal trousers and worn dark brown leather boots. One small closed canvas field bag hangs at their anatomical LEFT hip from a strap over their RIGHT shoulder; one small closed plain notebook is secured at their anatomical RIGHT belt, with no writing or symbol on the cover. Their patient competent guarded bearing follows the authored sources; apparent age, physical features, clothing and field equipment are editable visual defaults. Use they/them pronouns. Their actual age, home world and underlying identity remain for the selected campaign and DM to establish. No weapon, armor, crown, divine or immortal appearance, Warden symbol, circle bisected by a line, identifying badge, visible Door fragment, open notebook, readable writing, glowing eyes, halo, portal, home-world scenery or revealed history.
+A mature humanlike androgynous adult Riftborn field researcher with olive-gold skin, grey-green eyes, short wavy dark-indigo hair and a pale cream forelock, small plain ear studs, and a lean medium-height build. A pearl half-cape with green lining and fine woven trim covers layered indigo and forest-green scholar travel clothes, loose indigo trousers and brown lace-up boots. A closed brown folio is held against the torso; a small brown field pouch hangs at the belt. Patient, methodical, guarded competence and quiet attentive authority. Use they/them pronouns. Actual age, original world and underlying identity remain unknown. No weapon, armor, magic, Warden mark, bisected-circle symbol, Door fragment, glowing eyes or immortal/divine revelation.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/05651541a780198d28a1558a3dd5253e6078c5df9d34f279cb5b8151e9a0c803.png)
+[Portrait](../assets/characters/a8d9d0953d1d95abc5f8466684b382d3bd5a51d45e0a5fc5818ab7e16014eeeb.png)
 
-[Full-body reference](../assets/characters/b71f4e1189e2a549be128030cf3e312bfc6cefee63bc8c72c6eddaa03dd019d2.png)
+[Full-body reference](../assets/characters/db3a6071f69c4914e9cae1260fb1680bce4808b76d033b5f8f2a81857b6fdfa9.png)
 
-[Multiview reference sheet](../assets/characters/ba2a67b5000634ad41bbd307690675dd58e300ddff7f76965a2123c0b7af6b11.png)
+[Multiview reference sheet](../assets/characters/2c4d45e616870dea52ec1d0aad0e15c55415f96802c69ffee4e66b295b23a6d5.png)

@@ -33,6 +33,21 @@ def _source_documents() -> Iterator[tuple[str, str, str, bytes]]:
                 (path.relative_to(ROOT).as_posix()),
                 path.read_bytes(),
             )
+    catalogue_path = ROOT / "artwork/character-art.json"
+    if catalogue_path.is_file():
+        for index, source in enumerate(json.loads(catalogue_path.read_bytes()).get(
+            "retained_sources", []
+        )):
+            raw = source["document"].encode("utf-8")
+            if (
+                source["package_id"] != package_id or not _is_cast_path(source["path"])
+                or hashlib.sha256(raw).hexdigest() != source["sha256"]
+            ):
+                raise ValueError("Retained artwork source identity differs from its document")
+            yield (
+                package_id, source["path"],
+                f"artwork/character-art.json#/retained_sources/{index}", raw,
+            )
     for archive_path in sorted((ROOT / "campaign-plans").glob("*/setting.sylvia-gm-package")):
         with zipfile.ZipFile(archive_path) as archive:
             records = json.loads(archive.read("manifest.json"))["packages"]

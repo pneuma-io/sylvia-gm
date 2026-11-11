@@ -1081,6 +1081,15 @@ Prepared first-party artwork is listed by exact PNG hash in the shared `artwork/
 catalogue. Installer and portable resources carry its declared PNGs beside the owner executable;
 they are outside the onefile sidecar and its per-launch extraction. Source execution uses the
 same `artwork` directory in the checkout. Resource inventories include only the declared library.
+The catalogue's optional `styles` records bind rendering defaults to exact selected Setting IDs
+and content-addressed style PNGs. GM uses the current selected package closure; standalone Builder
+uses its validated captured source selection. The request and complete character flow capture
+the default once, retaining it across stages and restart. The style image follows canonical
+character or map references and is identified as rendering guidance only. Explicit user style
+instructions in the art brief take precedence. Legacy requests without a style remain unchanged.
+When prepared appearances change, `retained_assets` keeps earlier declared PNGs addressable and
+`retained_sources` preserves hash-verified historical authored editions for producer checks and
+exact source aliases. These records do not mutate existing saved image selections or package pins.
 Setting and Plan packages retain portable hash/path references to shared art without embedding
 the whole catalogue. Custom character artwork remains embedded in those packages. The public
 content-package archive and expansion limits remain unchanged.

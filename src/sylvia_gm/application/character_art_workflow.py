@@ -135,6 +135,7 @@ class CharacterArtWorkflow:
             "steps": missing,
             "brief": brief,
             "appearance": appearance,
+            "style": self.art.default_style(session_id),
             "publications": publications,
         }
         return self._propose(session_id, flow, missing[0], edit_sha256=edit_sha256)

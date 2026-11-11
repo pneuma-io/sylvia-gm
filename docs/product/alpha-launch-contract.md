@@ -1068,6 +1068,12 @@ as the default. Review saves a proposal, requires Generate, then previews the re
 Auto authorizes GM and Builder to recognize missing art, generate it and adopt the result.
 Failed, refused, cancelled and interrupted requests never automatically retry.
 
+The selected Setting may supply a rendering default and a separate style reference. Explicit
+user style choices take precedence; style references never replace a subject's canonical
+appearance, anatomy or map geometry. Severed Lands uses the owner-selected dark heroic fantasy
+painting with anime-influenced character drawing. A changed default does not regenerate existing
+artwork or retry an old request.
+
 Complete character artwork is one user-facing request. Sylvia prepares the missing reference
 and portrait stages in order, retaining the established appearance and existing usable images.
 Review requires Generate and Adopt at each stage; Auto continues after adoption. Cancelling,

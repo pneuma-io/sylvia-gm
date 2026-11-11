@@ -4,7 +4,7 @@
 >
 > **Endpoint:** A Windows Alpha candidate accepted by the project owner; publication requires separate approval.
 >
-> **Updated:** 2026-11-11
+> **Updated:** 2026-11-12
 
 PES-06 scope correction, 2026-09-15: the project owner permits starting a new campaign for current panel
 verification. Existing-campaign rules updates, including preserving layout when new panels are
@@ -16,6 +16,21 @@ decision source). Completed detail belongs in Git history and focused tests. His
 handoffs and checkout-specific records do not activate work.
 
 ## 1. Current work
+
+**12 November 2026: selected Severed Lands art direction.** Daniel selected K, dark heroic
+fantasy painting with anime-influenced character drawing. The shared catalogue now declares
+that Setting default and its immutable rendering reference. GM and independently launched
+Builder requests capture it through the existing image lifecycle; the style is retained across
+reference/portrait stages and restart, while explicit user style instructions take precedence.
+Actual Lite and independent-setting checks cover selection, replay-safe Review progression,
+canonical references and map-reference ordering. Live style fidelity remains unqualified.
+V, Captain Harlan and the Cartographer are the first three complete K bundles (nine new PNGs).
+Their fixed designs, character-source aliases and narrative prefixes are retained. The earlier
+source editions and nine prior PNGs remain addressable for existing saved references. The other
+197 bundles are unchanged: the 200-bundle/600-active-PNG catalogue is a technical coverage
+checkpoint, not completion of the selected K direction. Wider K production and the remaining
+catalogue are open. Live/in-app checks and separately owned Siren playable conversion remain
+deferred; this increment does not select merge or release.
 
 **10 November 2026: GPT Images phase one (PL-10).** The owner selected generation/editing through
 the managed ChatGPT subscription connection, Off/Review/Auto permissions, saved full-body and

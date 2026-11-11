@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from sylvia_gm.application.image_hooks import MAX_IMAGE_BYTES, ImageData
+from sylvia_gm.domain.art_styles import catalogue_art_styles
 from sylvia_gm.domain.image_art import validate_character_visuals
 from sylvia_gm.domain.package_library import PackageFile, canonical_json_bytes
 
@@ -35,6 +36,19 @@ def artwork_payload_paths(catalogue_bytes: bytes) -> frozenset[str]:
     ):
         raise ValueError("The shared artwork catalogue is invalid")
     paths = {"artwork/character-art.json"}
+    paths.update("artwork/" + style.reference_path for style in catalogue_art_styles(catalogue))
+    retained = catalogue.get("retained_assets", [])
+    if not isinstance(retained, list):
+        raise ValueError("Retained artwork references are invalid")
+    for reference in retained:
+        if (
+            not isinstance(reference, dict) or set(reference) != {"path", "sha256"}
+            or not isinstance(reference["sha256"], str)
+            or re.fullmatch(r"[0-9a-f]{64}", reference["sha256"]) is None
+            or reference["path"] != f"assets/characters/{reference['sha256']}.png"
+        ):
+            raise ValueError("Retained artwork references are invalid")
+        paths.add("artwork/" + reference["path"])
     for character in catalogue["characters"]:
         visuals = validate_character_visuals(character["visuals"])
         if visuals is None or visuals.get("status") == "partial":

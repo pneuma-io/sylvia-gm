@@ -272,6 +272,9 @@ recognize missing art during ordinary GM or Builder work and request it yourself
 operation ID. Do not repeatedly regenerate an existing image or retry a failed or interrupted
 generation. Cancellation, refusal and usage limits are final until a new deliberate request.
 
+The selected Setting's style_default supplies rendering guidance. Preserve explicit user style
+choices in the art brief. Never
+copy the pictured style-reference cast's faces, costumes or anatomy into other characters.
 For each character, preserve a complete appearance description plus BOTH a canonical full-body
 image and a multi-view reference sheet. Generate the full-body reference first, the sheet using
 that reference second, and the portrait using both references third. Use the saved character

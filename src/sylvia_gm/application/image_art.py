@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 from uuid import NAMESPACE_URL, uuid5
 
+from sylvia_gm.application.bundled_art_styles import selected_art_style, style_reference
 from sylvia_gm.application.bundled_character_art import bundled_character_image
 from sylvia_gm.application.character_art_workflow import CharacterArtWorkflow
 from sylvia_gm.application.image_hooks import (
@@ -94,6 +95,10 @@ class ImageArt:
         context = self._context(session_id)
         campaign_id = context.session.campaign_id
         return campaign_id or session_id, campaign_id
+
+    def default_style(self, session_id: str) -> dict[str, Any] | None:
+        """Expose the selected Setting's rendering default to both GM and Builder."""
+        return selected_art_style(self.owner, session_id)
 
     def restore_visuals(
         self,
@@ -672,6 +677,7 @@ class ImageArt:
                 needs.append({"target_id": target["id"], "purposes": missing})
         return {
             "settings": self.settings(),
+            "style_default": self.default_style(session_id),
             "capabilities": [
                 {
                     "adapter_id": adapter.capabilities.adapter_id,
@@ -812,6 +818,10 @@ class ImageArt:
         value = {
             "brief": brief,
             "appearance": appearance,
+            "style": (
+                character_flow.get("style") if character_flow is not None
+                else self.default_style(session_id)
+            ),
             "metadata": metadata,
             "map_projection": projection,
             "edit_sha256": edit_sha256,
@@ -962,6 +972,22 @@ class ImageArt:
                 raise ValueError("The image selected for editing is no longer current")
             original = ImageData(self.store.image(value["edit_sha256"]))
         width, height = IMAGE_SIZES[row["purpose"]]
+        style = value.get("style")
+        style_prompt = ""
+        if style is not None:
+            references.append(style_reference(style))
+            style_prompt = (
+                "\n\nSelected Setting's default rendering style:\n" + style["brief"]
+                + "\nThe LAST supplied reference is for rendering style ONLY, not this "
+                "subject's identity, costume, species, equipment or map layout. Preserve the "
+                "subject's own established appearance and canonical references. For maps, "
+                "the map-data reference controls exact geometry; do not force a night scene "
+                "or portrait lighting. Any explicit different style in the art brief takes "
+                "precedence over this default. Keep portraits readable at small UI sizes."
+            )
+            metadata["style"] = {
+                "id": style["id"], "reference_sha256": style["reference"]["sha256"],
+            }
         request_value = ImageRequest(
             runtime.session_id,
             operation_id,
@@ -972,6 +998,7 @@ class ImageArt:
             PURPOSE_INSTRUCTIONS[row["purpose"]]
             + "\n\nEstablished appearance:\n"
             + value["appearance"]
+            + style_prompt
             + "\n\nArt brief:\n"
             + value["brief"],
             input_image=original,
