@@ -101,9 +101,13 @@ the authored facts and this guide. Individual creature studies remain outside ca
 The owner selected C3 as the Death Hound's design: a living two-headed predator with convincing
 weight and impossible blue/violet interior depth. Retain that selected body's anatomy, dark pelt,
 recessed spatial structures and restrained luminous contours when deriving its other views.
-This adds one creature identity to the four previously accepted characters; its multiview and
-portrait still need preparation. Other species express Rift distortion through their own anatomy and
-materials rather than repeating the hound's interior architecture.
+This adds one creature identity to the four previously accepted characters. Its matching multiview
+and crop-safe portrait are prepared in the shared catalogue. Other species express Rift distortion
+through their own anatomy and materials rather than repeating the hound's interior architecture.
+
+- [Selected full body](../assets/characters/ed251f986771223104d15c00a2963da513e97c6ea401ef70e71fcf3e69b8a046.png)
+- [Matching multiview](../assets/characters/1821b447254c3a9c23e93cb545671538cb59eee3178251885ee9c04df0a48029.png)
+- [Portrait](../assets/characters/a8e5b5f3f36636364a96db16ed0a3755f3a6fc388110a297b8adaec896a65e3b.png)
 
 ## Maps and Rift environments
 
