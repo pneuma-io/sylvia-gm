@@ -13,11 +13,12 @@ contracts listed in docs/INDEX.md for that decision.
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from sylvia_gm.agent._runner import AgentRunner as SessionRunner, AgentTurnResult as TurnResult
+    from sylvia_gm.agent._runner import AgentRunner as SessionRunner
+    from sylvia_gm.agent._runner import AgentTurnResult as TurnResult
 
 
 # ── DivergenceResult ─────────────────────────────────────────────────────

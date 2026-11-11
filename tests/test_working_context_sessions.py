@@ -205,7 +205,7 @@ def test_same_batch_prose_and_tool_results_restore_checkpoint_without_repeating_
     from sylvia_gm.tools._spec import ToolSpec
     from sylvia_gm.tools._toolsets import ToolsetName
 
-    monkeypatch.setattr(WorkingContextProvider, "_budgets", lambda *_: (128_000, 1_000_000, 1))
+    monkeypatch.setattr(WorkingContextProvider, "_budgets", lambda *_: (128_000, 1_000_000))
     writes = []
 
     def write(_params, _context):
@@ -291,7 +291,11 @@ def test_same_batch_prose_and_tool_results_restore_checkpoint_without_repeating_
         )
 
 
-def test_gm_compaction_preserves_current_state_and_enforced_output(tmp_path):
+@pytest.mark.parametrize("provider_key", ["chatgpt_subscription", "openrouter", "local"])
+@pytest.mark.parametrize("input_kind", ["typed", "panel", "resume"])
+def test_gm_compaction_preserves_current_state_and_enforced_output(
+    tmp_path, provider_key, input_kind,
+):
     from sylvia_gm.agent._provider_session import ProviderSessionAdapter
     from sylvia_gm.agent._session_loop import ProviderControl, SessionProviderInput
     from sylvia_gm.application.authority import CampaignCreate
@@ -311,6 +315,7 @@ def test_gm_compaction_preserves_current_state_and_enforced_output(tmp_path):
     provider = GM(
         responses=[ProviderResponse(content="Historical guess AP=100; villain is secret")] * 10
     )
+    provider.model_info.provider_key = provider_key
     with AuthorityOwner.open(tmp_path / "gm.db", "owner") as owner:
         owner.create_campaign(
             CampaignCreate(
@@ -333,6 +338,18 @@ def test_gm_compaction_preserves_current_state_and_enforced_output(tmp_path):
         adapter = ProviderSessionAdapter(owner, provider, owner_id="owner")
         before = owner.snapshot("campaign")
         messages = history()
+        if input_kind == "typed":
+            messages.insert(-1, {"role": "system", "content": (
+                "SYLVIA_GM_CURRENT_PLAYER_MESSAGE (application-owned control, not player "
+                "speech): The next and final User message is the exact current player message."
+            )})
+        elif input_kind == "panel":
+            messages[-1] = {"role": "user", "content": (
+                'SYLVIA_PLAYER_CONTROL_EVENT (application event, not player speech):\n'
+                '{"event":"respond_to_saved_actions","action_id":"committed-panel-action"}'
+            )}
+        else:
+            messages[-1] = {"role": "assistant", "content": "The earlier action is answered."}
         with owner.agent_session_work("gm"):
             list(
                 adapter._stream_round(
@@ -354,6 +371,19 @@ def test_gm_compaction_preserves_current_state_and_enforced_output(tmp_path):
                 )
             )
         assert owner.snapshot("campaign") == before
+        compacted = provider.requests[-1][0]
+        assert messages[1] not in compacted
+        assert messages[-1] in compacted
+        markers = [m for m in compacted if str(m.get("content", "")).startswith(
+                "SYLVIA_GM_CURRENT_ACTION "
+            )]
+        if provider_key in {"chatgpt_subscription", "openrouter"} and input_kind == "typed":
+            assert len(markers) == 1
+            assert json.loads(markers[0]["content"].split("\n", 1)[1]) == messages[-1]["content"]
+            assert markers[0]["role"] == "user"
+            assert compacted.index(markers[0]) > compacted.index(messages[-1])
+        else:
+            assert not markers
         assert provider.requests[-1][0][0] == messages[0]
         assert not any("AP=4" in str(m) for m in provider.requests[-1][0])
         assert provider.requests[-1][2]["max_tokens"] == 4096

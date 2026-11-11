@@ -109,6 +109,24 @@ class ProviderFactory:
 
         base_url = inference_base_url(config.base_url, transport)
 
+        if transport == "claude_code":
+            from pathlib import Path
+
+            from sylvia_gm.provider._claude import ClaudeProvider
+
+            if (config.provider_key != "claude_runtime" or not config.runtime_home
+                    or config.default_headers
+                    or any(c.get("value") for c in config.credentials_list)
+                    or config.fallback_providers):
+                raise ValueError(
+                    "Claude requires its native runtime connection "
+                    "without API credentials or fallback"
+                )
+            return ClaudeProvider(
+                Path(config.runtime_home), model_info,
+                executable=Path(config.runtime_executable) if config.runtime_executable else None,
+            )
+
         if transport == "codex_app_server":
             from pathlib import Path
 

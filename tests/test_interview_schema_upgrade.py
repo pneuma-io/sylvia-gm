@@ -4,7 +4,7 @@ import sqlite3
 
 from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.domain.authority import PackageLock
-from sylvia_gm.infrastructure import sqlite_campaign
+from sylvia_gm.infrastructure import sqlite_authority, sqlite_campaign
 from tests.test_interview_lifecycle import finish_interview, new_draft
 
 
@@ -48,7 +48,12 @@ def test_owner_upgrades_v9_campaign_and_independent_chat_without_changing_histor
         for table in ("campaign_operations", "campaign_constructions"):
             connection.execute(f"INSERT INTO {table} SELECT * FROM old_{table}")
             connection.execute(f"DROP TABLE old_{table}")
-        connection.execute("DELETE FROM schema_migrations WHERE version = 10")
+        # Remove the later additive schema too: the fixture must really be v9.
+        connection.execute("DROP TABLE provider_private_records")
+        for table in ("agent_sessions", "standalone_builder_chats"):
+            for column in ("reasoning_effort", "reasoning_effort_once"):
+                connection.execute(f"ALTER TABLE {table} DROP COLUMN {column}")
+        connection.execute("DELETE FROM schema_migrations WHERE version > 9")
         connection.execute("PRAGMA user_version = 9")
 
     with AuthorityOwner.open(database, "upgrade") as owner:
@@ -56,7 +61,7 @@ def test_owner_upgrades_v9_campaign_and_independent_chat_without_changing_histor
         assert owner.session_context(draft.builder_session_id) == before_interview
         assert owner.session_context(chat.child_session_id) == before_chat
     with sqlite3.connect(database) as connection:
-        assert connection.execute("PRAGMA user_version").fetchone()[0] == 10
+        assert connection.execute("PRAGMA user_version").fetchone()[0] == sqlite_authority._CAMPAIGN_SCHEMA_VERSION
         assert connection.execute("PRAGMA foreign_key_check").fetchone() is None
     preserved = tmp_path / "migration-sources/upgrade.pre-migration-v9.sqlite3"
     assert preserved.is_file()

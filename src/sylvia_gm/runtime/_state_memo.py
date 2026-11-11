@@ -1,19 +1,14 @@
-"""State Memo Builder — compact [STATE] block injection for LLM prompts.
-
-Builds a human-readable state block injected at the top of every LLM turn
-during both simulation AND exploration modes. The LLM always knows where it is.
-
-Block format:
-    [STATE] Location: Fortress Inn, Thornwall | Present: Old Vesper | HP: 18/21 | Gold: 45 | Day 3, Evening | Conditions: none [/STATE]
-
-Reads from:
-    - SceneManager  → current scene/location
-    - StateBridge   → HP, gold, conditions
-    - TimeManager   → day, time (via get_current_datestamp)
-    - ExecutionContext → vars, extras, combat_state, state_bridge
-
-Optional fields: if a field resolves to None/empty, it is omitted from the block.
-"""
+(
+    "State Memo Builder — compact [STATE] block injection for LLM prompts.\n\nBuilds a "
+    "human-readable state block injected at the top of every LLM turn\nduring both simulation "
+    "AND exploration modes. The LLM always knows where it is.\n\nBlock format:\n    [STATE] "
+    "Location: Fortress Inn, Thornwall | Present: Old Vesper | HP: 18/21 | Gold: 45 | Day 3, "
+    "Evening | Conditions: none [/STATE]\n\nReads from:\n    - SceneManager  → current "
+    "scene/location\n    - StateBridge   → HP, gold, conditions\n    - TimeManager   → day, time "
+    "(via get_current_datestamp)\n    - ExecutionContext → vars, extras, combat_state, "
+    "state_bridge\n\nOptional fields: if a field resolves to None/empty, it is omitted from the "
+    "block.\n"
+)
 
 from __future__ import annotations
 
@@ -21,18 +16,14 @@ from typing import Any
 
 
 class StateMemoBuilder:
-    """Reads current engine state and formats a compact [STATE] block.
-
-    The block is injected at the top of every LLM prompt so the model
-    always has current context: location, present NPCs, HP, gold, time,
-    and active conditions.
-
-    Usage::
-
-        builder = StateMemoBuilder(scene_manager, state_bridge)
-        memo = builder.build(ctx, active_entity_id="sample_player")
-        # → "[STATE] Location: Fortress Inn | HP: 18/21 | Gold: 45 | Day 3, Evening | Conditions: none [/STATE]"
-    """
+    (
+        "Reads current engine state and formats a compact [STATE] block.\n\n    The block is "
+        "injected at the top of every LLM prompt so the model\n    always has current context: "
+        "location, present NPCs, HP, gold, time,\n    and active conditions.\n\n    Usage::\n\n  "
+        "      builder = StateMemoBuilder(scene_manager, state_bridge)\n        memo = "
+        "builder.build(ctx, active_entity_id=\"sample_player\")\n        # → \"[STATE] Location: "
+        "Fortress Inn | HP: 18/21 | Gold: 45 | Day 3, Evening | Conditions: none [/STATE]\"\n    "
+    )
 
     # Recognised paths for gold/currency on the active entity.
     # Checked in order; the first that returns a non-None value wins.
@@ -67,17 +58,15 @@ class StateMemoBuilder:
         active_entity_id: str | None = None,
         extra_present: list[str] | None = None,
     ) -> str:
-        """Build the [STATE] memo block from current engine state.
-
-        Args:
-            ctx: ExecutionContext with vars, extras, combat_state, state_bridge.
-            active_entity_id: The primary entity to read HP / gold / conditions from.
-            extra_present: Additional names to include in the Present field.
-
-        Returns:
-            A string like:
-            ``[STATE] Location: ... | Present: ... | HP: 18/21 | Gold: 45 | Day 3, Evening | Conditions: none [/STATE]``
-        """
+        (
+            "Build the [STATE] memo block from current engine state.\n\n        Args:\n          "
+            "  ctx: ExecutionContext with vars, extras, combat_state, state_bridge.\n            "
+            "active_entity_id: The primary entity to read HP / gold / conditions from.\n         "
+            "   extra_present: Additional names to include in the Present field.\n\n        "
+            "Returns:\n            A string like:\n            ``[STATE] Location: ... | "
+            "Present: ... | HP: 18/21 | Gold: 45 | Day 3, Evening | Conditions: none "
+            "[/STATE]``\n        "
+        )
         parts: list[str] = []
 
         # ── Location ──────────────────────────────────────────────────

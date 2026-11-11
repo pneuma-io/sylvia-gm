@@ -58,6 +58,7 @@ class RulesetRuntime:
         self._procedures: dict[str, ProcedureDef] = {}
         self._combat_state: dict[str, Any] = {}
         self._mode_state = ModeState()
+        self.permanently_refused_tool_names: frozenset[str] = frozenset()
 
         if ruleset_dict:
             self._parse_ruleset(ruleset_dict)
@@ -451,6 +452,15 @@ class RulesetRuntime:
                     metadata=defn.get("metadata", {}) or {},
                     range=defn.get("range"),  # T5.10: distance range annotation
                 )
+
+        # Only an initial literal-false require proves an operation can never run.
+        self.permanently_refused_tool_names = frozenset(
+            name for name, tool in self._tools.items()
+            if tool.effects
+            and isinstance(tool.effects[0].get("require"), dict)
+            and (tool.effects[0]["require"].get("condition") is False
+                 or tool.effects[0]["require"].get("condition") == "false")
+        )
 
         # Parse procedures
         procedures_raw = data.get("procedures", {})

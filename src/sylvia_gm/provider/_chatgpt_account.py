@@ -5,8 +5,8 @@ from __future__ import annotations
 import threading
 from urllib.parse import urlsplit
 
-from sylvia_gm.provider._codex_rpc import CodexConnection, CodexConnectionError
 from sylvia_gm.provider._chatgpt_model_facts import subscription_model_facts
+from sylvia_gm.provider._codex_rpc import CodexConnection, CodexConnectionError
 
 
 class ChatGPTAccount:

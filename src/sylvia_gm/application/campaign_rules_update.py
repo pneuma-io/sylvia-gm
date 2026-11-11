@@ -7,8 +7,12 @@ owns the transaction, exact pins, lineage, retry receipt and failure recovery.
 from __future__ import annotations
 
 import hashlib
+import io
 import json
+import zipfile
+from collections import Counter
 from collections.abc import Callable, Mapping, Sequence
+from dataclasses import replace
 from typing import TYPE_CHECKING, Any
 
 import yaml
@@ -18,6 +22,7 @@ from sylvia_gm.application.package_runtime import (
     PACKAGE_RUNTIME_BYTE_LIMIT,
     PACKAGE_RUNTIME_PATH,
     _BoundedRuntimeLoader,
+    package_tool_permanently_refused,
 )
 from sylvia_gm.application.plan_state_admission import validate_starting_declarations
 from sylvia_gm.domain.authority import (
@@ -31,6 +36,7 @@ from sylvia_gm.domain.authority import (
     TurnStatus,
     WriterRole,
     owned_payload,
+    thaw_json_value,
 )
 from sylvia_gm.domain.content_validation import ContentShapeError
 from sylvia_gm.domain.errors import CommandRejected
@@ -44,17 +50,83 @@ from sylvia_gm.domain.package_library import (
     CampaignSettingKnowledge,
     PackageContentDeclarations,
     PackageManifest,
+    ToolDeclaration,
     campaign_setting_entries,
     canonical_json_bytes,
     parse_campaign_setting_knowledge_bytes,
     parse_content_declarations_bytes,
     parse_gameplay_support_bytes,
 )
+from sylvia_gm.domain.session import SessionMessageKind
 
 if TYPE_CHECKING:
     from sylvia_gm.application.authority import AuthorityOwner
 
 Report = Callable[[str, str], None]
+
+
+def _offer_bundled_update(owner: AuthorityOwner, campaign_id: str) -> None:
+    """Offer shipped rules with the campaign's own exact Setting files, without activating."""
+    from sylvia_gm.application.bundled_packages import bundled_ruleset_update_archive
+    from sylvia_gm.application.package_materialization import materialize_package_archive
+    from sylvia_gm.builder._package_snapshots import (
+        rebind_ruleset_snapshot,
+        retained_package_drafts,
+    )
+
+    current = owner._store.current_package_lock(campaign_id)
+    primary, settings = _ownership(current.package_lock)
+    if primary is None:
+        return
+    raw = bundled_ruleset_update_archive(primary)
+    if raw is None:
+        return
+    old = _manifests(owner, current.package_lock)
+    with zipfile.ZipFile(io.BytesIO(raw)) as archive:
+        records = json.loads(archive.read("manifest.json"))["packages"]
+    incoming = next(r for r in records if r["role"] == "primary")
+    if (incoming["id"], incoming["version"], incoming["content_sha256"]) == old[primary].identity:
+        return
+    candidates = owner._store.package_candidates()
+    identities = {(r["id"], r["version"], r["content_sha256"]) for r in records}
+    bundled = next(
+        (
+            c
+            for c in candidates
+            if {(e.package_id, e.version, e.sha256) for e in c.package_lock.entries} == identities
+        ),
+        None,
+    )
+    if bundled is None:
+        bundled = owner.install_package_archive(
+            io.BytesIO(raw),
+            install_id="bundled-update-" + hashlib.sha256(raw).hexdigest(),
+        )
+    if not settings:
+        return
+    install_id = (
+        "rules-update-"
+        + hashlib.sha256(
+            f"{current.closure_sha256}:{bundled.closure_sha256}".encode("ascii")
+        ).hexdigest()
+    )
+    if any(c.install_id == install_id for c in candidates):
+        return
+    source = next((c for c in candidates if c.closure_sha256 == current.closure_sha256), None)
+    if source is None:
+        raise CommandRejected("The campaign's retained package source is unavailable")
+    original = retained_package_drafts(owner, source.candidate_id, include_setting=True)
+    rules = retained_package_drafts(owner, bundled.candidate_id, include_setting=False)
+    drafts = rebind_ruleset_snapshot(original, rules)
+    with materialize_package_archive(drafts) as result:
+        for identity in settings:
+            retained = old[identity]
+            replacement = next(m for m in result.manifests if m.package_id == identity)
+            if {f.path: f.sha256 for f in retained.files} != {
+                f.path: f.sha256 for f in replacement.files
+            }:
+                raise CommandRejected("The update must preserve every owned Setting file")
+        owner.install_package_archive(result.archive, install_id=install_id)
 
 
 def _ownership(lock: PackageLock) -> tuple[str | None, tuple[str, ...]]:
@@ -80,6 +152,8 @@ def _label(manifests: Mapping[str, PackageManifest]) -> str:
 
 def options(owner: AuthorityOwner, campaign_id: str) -> SafePayload:
     """Offer installed exact closures with the same Ruleset and Setting ownership."""
+    with owner._operation():
+        _offer_bundled_update(owner, campaign_id)
     with owner._operation(), owner._lane(campaign_id):
         current = owner._store.current_package_lock(campaign_id)
         current_manifests = _manifests(owner, current.package_lock)
@@ -128,6 +202,7 @@ def _removed_keys(
     report: Report,
     *,
     retain_references: bool = False,
+    retired_tools: frozenset[str] = frozenset(),
 ) -> None:
     """Conservatively flag removed runtime records/fields, without exposing their values."""
     if isinstance(old, Sequence) and not isinstance(old, (str, bytes)):
@@ -150,12 +225,17 @@ def _removed_keys(
                     path,
                     report,
                     retain_references=retain_references,
+                    retired_tools=retired_tools,
                 )
                 return
+        references = set(old) if all(isinstance(item, str) for item in old) else set()
+        if path.endswith(".links.tools"):
+            references -= retired_tools
         if (
             retain_references
             and all(isinstance(item, str) for item in old)
-            and (not isinstance(new, Sequence) or not set(old) <= set(new))
+            and references
+            and (not isinstance(new, Sequence) or not references <= set(new))
         ):
             report(path, "An existing structured content reference is removed.")
         return
@@ -169,7 +249,14 @@ def _removed_keys(
         if key not in new:
             report(child, "An existing content record or field is removed.")
         elif isinstance(value, (Mapping, list)):
-            _removed_keys(value, new[key], child, report, retain_references=retain_references)
+            _removed_keys(
+                value,
+                new[key],
+                child,
+                report,
+                retain_references=retain_references,
+                retired_tools=retired_tools,
+            )
 
 
 def _compare_structured(
@@ -177,6 +264,8 @@ def _compare_structured(
     old: PackageManifest,
     new: PackageManifest,
     report: Report,
+    *,
+    retired_tools: frozenset[str] = frozenset(),
 ) -> None:
     """Retain declared content identities, knowledge audiences and reference edges."""
     if old.content_declarations_path != new.content_declarations_path:
@@ -214,6 +303,7 @@ def _compare_structured(
                 label,
                 report,
                 retain_references=True,
+                retired_tools=retired_tools,
             )
             if isinstance(prior, CampaignSettingKnowledge) and isinstance(
                 incoming, CampaignSettingKnowledge
@@ -260,9 +350,86 @@ def _compare_structured(
             report(label, f"Structured content cannot be compared safely: {type(error).__name__}.")
 
 
-def _compare(old: PackageManifest, new: PackageManifest, report: Report) -> None:
+def _tool_input_change(prior: ToolDeclaration, incoming: ToolDeclaration) -> str | None:
+    """Review model guidance and string-choice changes without changing execution authority."""
+    if replace(incoming, input_schema=prior.input_schema) != prior:
+        return None
+    before = thaw_json_value(prior.input_schema)
+    after = thaw_json_value(incoming.input_schema)
+    if not isinstance(before, dict) or not isinstance(after, dict):
+        return None
+    metadata = {
+        "x-sylvia-gm-model-required",
+        "x-sylvia-gm-castable-spells",
+        "x-sylvia-gm-value-aliases",
+    }
+    old_properties, new_properties = before.get("properties"), after.get("properties")
+    if (
+        not isinstance(old_properties, dict)
+        or not isinstance(new_properties, dict)
+        or old_properties.keys() != new_properties.keys()
+    ):
+        return None
+    choices_changed = False
+    for name in old_properties:
+        left, right = old_properties[name], new_properties[name]
+        if not isinstance(left, dict) or not isinstance(right, dict):
+            return None
+        for child in (left, right):
+            if "description" in child and not isinstance(child.pop("description"), str):
+                return None
+            for key in metadata:
+                value = child.pop(key, None)
+                if value is not None and (
+                    (
+                        key.endswith("value-aliases")
+                        and not (
+                            isinstance(value, dict)
+                            and all(
+                                isinstance(k, str) and isinstance(v, str) for k, v in value.items()
+                            )
+                        )
+                    )
+                    or (not key.endswith("value-aliases") and not isinstance(value, bool))
+                ):
+                    return None
+        if left.get("enum") != right.get("enum"):
+            if left.get("type") != "string" or right.get("type") != "string":
+                return None
+            choices: list[frozenset[str] | None] = []
+            for child in (left, right):
+                values = child.pop("enum", None)
+                if values is None:
+                    choices.append(None)
+                elif (
+                    isinstance(values, list) and values and all(isinstance(v, str) for v in values)
+                ):
+                    choices.append(frozenset(values))
+                else:
+                    return None
+            first, second = choices
+            if (
+                first is not None
+                and second is not None
+                and not (first <= second or second <= first)
+            ):
+                return None
+            choices_changed = True
+    if before != after:
+        return None
+    return "changed_input_choices" if choices_changed else "changed_model_guidance"
+
+
+def _compare(
+    old: PackageManifest,
+    new: PackageManifest,
+    report: Report,
+    *,
+    retired_tools: frozenset[str] = frozenset(),
+) -> list[str]:
     """Keep existing ownership, state/character contracts and panel bindings intact."""
     path = old.package_id
+    reviewed = []
     if old.role != new.role or old.format_version != new.format_version:
         report(path, "Package role or snapshot format changes.")
     old_edges = {(e.package_id, e.kind, e.namespace) for e in old.dependencies}
@@ -278,6 +445,15 @@ def _compare(old: PackageManifest, new: PackageManifest, report: Report) -> None
         for prior in getattr(old, field):
             identity = getattr(prior, key)
             if incoming.get(identity) != prior:
+                if field == "tools":
+                    if identity in retired_tools and identity not in incoming:
+                        reviewed.append("retired_unavailable_actions")
+                        continue
+                    other = incoming.get(identity)
+                    change = _tool_input_change(prior, other) if other is not None else None
+                    if change is not None:
+                        reviewed.append(change)
+                        continue
                 report(
                     f"{path}.{field}.{identity}",
                     "An existing contract changes or is removed; explicit adaptation is required.",
@@ -325,6 +501,7 @@ def _compare(old: PackageManifest, new: PackageManifest, report: Report) -> None
             and "docked" not in surface.allowed_placements
         ):
             report(f"{path}.panels.{surface.identity}", "A new panel must allow sidebar placement.")
+    return reviewed
 
 
 def _preview(owner: AuthorityOwner, campaign_id: str, candidate_id: str) -> SafePayload:
@@ -349,6 +526,28 @@ def _preview(owner: AuthorityOwner, campaign_id: str, candidate_id: str) -> Safe
         )
     if owner._store.pending_mechanics_action(campaign_id) is not None:
         report("session", "Resolve the pending rules decision before updating.")
+    for context in owner._store.campaign_session_contexts(campaign_id):
+        queue = next(
+            (
+                m.content
+                for m in reversed(context.messages)
+                if m.kind is SessionMessageKind.EVIDENCE
+                and m.content.get("kind") == "action_sequence"
+            ),
+            None,
+        )
+        if queue is not None:
+            steps = queue.get("steps")
+            if (
+                not isinstance(steps, Sequence)
+                or isinstance(steps, (str, bytes))
+                or any(
+                    not isinstance(step, Mapping) or step.get("status") != "committed"
+                    for step in steps
+                )
+            ):
+                report("session", "Clear or finish the current action sequence before updating.")
+                break
     if _ownership(current.package_lock) != _ownership(candidate.package_lock):
         report("snapshot", "Select a snapshot of this campaign's Ruleset and Campaign Setting.")
     if any(e.package_id in ARCHIVED_RULESET_IDS for e in candidate.package_lock.entries):
@@ -356,14 +555,38 @@ def _preview(owner: AuthorityOwner, campaign_id: str, candidate_id: str) -> Safe
     if current.closure_sha256 == candidate.closure_sha256:
         report("snapshot", "This campaign already uses the selected exact version.")
     changes = []
+    tool_changes = []
     added_panels: list[str] = []
     for package_id, prior in old.items():
         incoming = new.get(package_id)
         if incoming is None:
             report(package_id, "An existing package is removed.")
             continue
-        _compare(prior, incoming, report)
-        _compare_structured(owner, prior, incoming, report)
+        old_raw = (
+            owner._store.package_file_bytes(
+                *prior.identity,
+                PACKAGE_RUNTIME_PATH,
+                maximum_bytes=PACKAGE_RUNTIME_BYTE_LIMIT,
+            )
+            if any(f.path == PACKAGE_RUNTIME_PATH for f in prior.files)
+            else None
+        )
+        incoming_names = {t.name for t in incoming.tools}
+        retired = frozenset(
+            t.name
+            for t in prior.tools
+            if t.name not in incoming_names
+            and old_raw is not None
+            and package_tool_permanently_refused(
+                package_id=package_id,
+                declaration=t,
+                runtime_bytes=old_raw,
+            )
+        )
+        reviewed = _compare(prior, incoming, report, retired_tools=retired)
+        if reviewed:
+            tool_changes.append({"package_id": package_id, **Counter(reviewed)})
+        _compare_structured(owner, prior, incoming, report, retired_tools=retired)
         before = {f.path: f.sha256 for f in prior.files}
         after = {f.path: f.sha256 for f in incoming.files}
         if prior.content_sha256 != incoming.content_sha256:
@@ -392,7 +615,17 @@ def _preview(owner: AuthorityOwner, campaign_id: str, candidate_id: str) -> Safe
                 )
                 return yaml.load(raw, Loader=_BoundedRuntimeLoader) if raw else {}
 
-            _removed_keys(runtime(prior), runtime(incoming), f"{package_id}.runtime", report)
+            previous = runtime(prior)
+            if isinstance(previous, dict) and isinstance(previous.get("tools"), dict):
+                previous = {
+                    **previous,
+                    "tools": {
+                        name: body
+                        for name, body in previous["tools"].items()
+                        if name not in retired
+                    },
+                }
+            _removed_keys(previous, runtime(incoming), f"{package_id}.runtime", report)
     for package_id in new.keys() - old.keys():
         report(package_id, "Adding a package requires an explicit ownership migration.")
     for participant in snapshot.participants:
@@ -469,6 +702,11 @@ def _preview(owner: AuthorityOwner, campaign_id: str, candidate_id: str) -> Safe
                     f"{manifest.package_id}:{diagnostic.path}",
                     diagnostic.message.replace("Starting field", "Saved field"),
                 )
+    review_notice = ""
+    if any(c.get("changed_input_choices") or c.get("changed_model_guidance") for c in tool_changes):
+        review_notice += "Action input guidance is updated. "
+    if any(c.get("retired_unavailable_actions") for c in tool_changes):
+        review_notice += "Actions that always refused are removed. "
     result = {
         "campaign_id": campaign_id,
         "campaign_name": snapshot.display_name,
@@ -479,10 +717,12 @@ def _preview(owner: AuthorityOwner, campaign_id: str, candidate_id: str) -> Safe
         "selected_label": _label(new),
         "closure_sha256": candidate.closure_sha256,
         "changes": changes,
+        "tool_changes": tool_changes,
         "added_panels": added_panels,
         "conflicts": conflicts,
         "compatible": not conflicts,
-        "recovery": "Previous versions stay retained. Returning to one requires another "
+        "recovery": review_notice
+        + "Previous versions stay retained. Returning to one requires another "
         "compatibility preview and keeps your current progress.",
     }
     result["confirmation"] = hashlib.sha256(canonical_json_bytes(result)).hexdigest()

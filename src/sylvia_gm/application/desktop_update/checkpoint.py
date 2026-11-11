@@ -7,9 +7,10 @@ import os
 import sqlite3
 import stat
 import uuid
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
+from enum import StrEnum
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Final
 
 from .identity import STORAGE_COMPATIBILITY
 from .manifest import (
@@ -29,6 +30,18 @@ from .storage import (
     operation_id,
 )
 
+
+class RestorePhase(StrEnum):
+    RESTORING = "restoring"
+    RESTORED = "restored"
+
+
+RESTORE_MOVES: Final[Mapping[RestorePhase, frozenset[RestorePhase]]] = {
+    RestorePhase.RESTORING: frozenset({RestorePhase.RESTORED}),
+    RestorePhase.RESTORED: frozenset(),
+}
+
+
 RESTORE_CONFIRMATION = "Restore pre-update data"
 
 if TYPE_CHECKING:
@@ -45,7 +58,8 @@ def acquire_update_data_lock(database: Path) -> DatabaseOwnerLock:
     if path.exists() or path.is_symlink():
         value = path.lstat()
         if (
-            not stat.S_ISREG(value.st_mode) or value.st_nlink != 1
+            not stat.S_ISREG(value.st_mode)
+            or value.st_nlink != 1
             or getattr(value, "st_file_attributes", 0) & 0x400
         ):
             raise UpdateError("unsafe_data_lock", "The selected data ownership lock is unsafe.")
@@ -243,7 +257,9 @@ class DataCheckpoint:
         return value
 
     def require_compatible(
-        self, started_storage_compatibility: int, *,
+        self,
+        started_storage_compatibility: int,
+        *,
         expected_storage_compatibility: int = STORAGE_COMPATIBILITY,
     ) -> None:
         row = self._load(expected_storage_compatibility=expected_storage_compatibility)
@@ -296,7 +312,7 @@ class DataCheckpoint:
             or set(row) != {"format_version", "phase", "generation", "before"}
             or type(row["format_version"]) is not int
             or row["format_version"] != 1
-            or row["phase"] not in ("restoring", "restored")
+            or row["phase"] not in (RestorePhase.RESTORING, RestorePhase.RESTORED)
             or not isinstance(row["before"], dict)
             or set(row["before"]) != self._paths().keys()
         ):
@@ -312,7 +328,7 @@ class DataCheckpoint:
     def restore_pending(self) -> bool:
         """Inspection may resume a recorded restore without opening a temporarily retained DB."""
         row = self._restore_receipt()
-        return row is not None and row["phase"] == "restoring"
+        return row is not None and row["phase"] == RestorePhase.RESTORING
 
     def _restore_locked(self, processes_exited: Callable[[], bool]) -> None:
         checkpoint = self._load()
@@ -321,19 +337,23 @@ class DataCheckpoint:
         row = self._restore_receipt()
         if row is not None:
             generation = operation_id(row["generation"])
-            if row["phase"] == "restored":
+            if row["phase"] == RestorePhase.RESTORED:
                 return  # A duplicate request must never discard subsequent player progress.
         else:
             generation = uuid.uuid4().hex
-            row = {
-                "format_version": 1,
-                "phase": "restoring",
-                "generation": generation,
-                "before": {
-                    key: _record(_fingerprint(path)) if path.exists() or path.is_symlink() else None
-                    for key, path in paths.items()
-                },
-            }
+            row = {"format_version": 1}
+            _move_restore(row, RestorePhase.RESTORING)
+            row.update(
+                {
+                    "generation": generation,
+                    "before": {
+                        key: _record(_fingerprint(path))
+                        if path.exists() or path.is_symlink()
+                        else None
+                        for key, path in paths.items()
+                    },
+                }
+            )
             atomic_receipt(receipt, row)
         before = row["before"]
         assert isinstance(before, dict)
@@ -389,5 +409,10 @@ class DataCheckpoint:
             if not processes_exited() or target.exists() or target.is_symlink():
                 raise UpdateError("checkpoint_changed", "The intended restore location changed.")
             os.replace(temporary, target)
-        row["phase"] = "restored"
+        _move_restore(row, RestorePhase.RESTORED)
         atomic_receipt(receipt, row)
+
+
+def _move_restore(row: dict[str, object], new: RestorePhase) -> None:
+    """The sole phase write for this record; store its plain wire value."""
+    row["phase"] = new.value

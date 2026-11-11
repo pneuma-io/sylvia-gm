@@ -139,7 +139,8 @@ def prepare_tool_context(
         **{
             parameter.name: deepcopy(parameter.default)
             for parameter in tool_def.parameters
-            if parameter.name not in params and (parameter.default is not None or not parameter.required)
+            if parameter.name not in params
+            and (parameter.default is not None or not parameter.required)
         },
         **params,
     }
@@ -184,6 +185,8 @@ def prepare_tool_context(
     # T5.10: Inject distance tracking vars for range pre-conditions
     _inject_distance_vars(tool_def, params, ctx, state_bridge)
 
+    failures: list[str] = []
+    evaluation_error: str | None = None
     for pc in tool_def.pre_conditions:
         if isinstance(pc, str):
             cond_expr = pc
@@ -203,24 +206,26 @@ def prepare_tool_context(
             )
             if not eval_ok:
                 error_msg = resolve_template(str(error_template), ctx)
-                return ToolResult(
-                    tool_name=tool_name,
-                    success=False,
-                    error=error_msg,
-                    failure_kind="precondition",
-                    context=ctx.vars,
-                    narrative_hooks=_collect_narrative(ctx),
-                    narrative_directives=_collect_narrative_directives(ctx),
-                    logs=ctx.vars.get("_logs", []),
-                )
+                if error_msg not in failures and len(failures) < 64:
+                    failures.append(error_msg)
         except Exception as e:
-            return ToolResult(
-                tool_name=tool_name,
-                success=False,
-                error=f"Pre-condition evaluation error: {e}",
-                failure_kind="precondition_evaluation",
-            )
+            if evaluation_error is None:
+                evaluation_error = f"Pre-condition evaluation error: {e}"
 
+    if failures:
+        if evaluation_error is not None and len(failures) < 64:
+            failures.append("The Ruleset could not evaluate another precondition. "
+                            "If the declared inputs are complete, report a Ruleset defect.")
+        return ToolResult(
+            tool_name=tool_name, success=False, error=failures[0],
+            failure_kind="precondition", failure_reasons=tuple(failures), context=ctx.vars,
+            narrative_hooks=_collect_narrative(ctx),
+            narrative_directives=_collect_narrative_directives(ctx),
+            logs=ctx.vars.get("_logs", []),
+        )
+    if evaluation_error is not None:
+        return ToolResult(tool_name=tool_name, success=False, error=evaluation_error,
+                          failure_kind="precondition_evaluation")
     return ctx
 
 

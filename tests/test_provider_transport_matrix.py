@@ -15,7 +15,8 @@ from sylvia_gm.provider._context_fit import ContextFittingProvider
 from sylvia_gm.provider._factory import ProviderFactory
 from sylvia_gm.provider._tool_delta import parse_tool_call_delta
 
-PRESETS = [preset for preset in settings._PROVIDER_PRESETS if preset != "chatgpt_subscription"]
+PRESETS = [key for key, preset in settings._PROVIDER_PRESETS.items()
+           if preset["default_transport"] not in {"codex_app_server", "claude_code"}]
 
 
 def event_stream(protocol, *, tools=False):

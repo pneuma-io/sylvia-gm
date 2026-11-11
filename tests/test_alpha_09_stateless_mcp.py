@@ -27,9 +27,12 @@ from sylvia_gm.domain.authority import (
     ActionReceipt,
     ActionStatus,
     AwaitingChoiceReceipt,
+    CampaignDisplaySnapshot,
+    LifecycleState,
     MechanicOutcome,
     MechanicsChoiceOption,
     MechanicsChoiceRequest,
+    PackageLock,
     TurnStatus,
     WriterRole,
 )
@@ -94,14 +97,20 @@ class _OwnerProjection:
             resulting_revision=command.expected_revision + 1,
         )
 
-    def snapshot(self, campaign_id: str) -> object:
+    def snapshot(self, campaign_id: str) -> CampaignDisplaySnapshot:
         assert campaign_id == "campaign-stateless"
-        return SimpleNamespace(
+        return CampaignDisplaySnapshot(
+            campaign_id=campaign_id, display_name="Synthetic stateless campaign",
+            lifecycle=LifecycleState.ACTIVE, package_lock=PackageLock(entries=()),
+            participants=(), actions=(), events=(),
             revision=4,
             writer=WriterRole.DM,
             turns={"turn-stateless": TurnStatus.OPEN},
             state={"synthetic.stateless.combat": {"phase": "signal"}},
         )
+
+    def model_context_snapshot(self, campaign_id: str) -> tuple[CampaignDisplaySnapshot, None]:
+        return self.snapshot(campaign_id), None
 
     def record_admin_full_audit(self, payload: object) -> None:
         self.audit.append(payload)
@@ -164,13 +173,14 @@ def test_legacy_http_and_pywebview_applications_are_absent() -> None:
 
 def test_canonical_model_path_has_no_direct_or_duplicate_mechanics_dispatch() -> None:
     session_loop = (ROOT / "src/sylvia_gm/agent/_session_loop.py").read_text(encoding="utf-8")
-    provider_adapter = (ROOT / "src/sylvia_gm/agent/_provider_session.py").read_text(
-        encoding="utf-8"
-    )
+    agent = ROOT / "src/sylvia_gm/agent"
+    adapter_paths = [agent / "_provider_session.py", *sorted(agent.glob("_provider_turn_*.py"))]
     assert "_owner.catalog(" not in session_loop
     assert "_owner.execute_action(" not in session_loop
-    assert "_owner.catalog(" not in provider_adapter
-    assert "_owner.execute_action(" not in provider_adapter
+    for path in adapter_paths:
+        source = path.read_text(encoding="utf-8")
+        assert "_owner.catalog(" not in source, path.name
+        assert "_owner.execute_action(" not in source, path.name
     assert not (ROOT / "src/sylvia_gm/tools/_mcp_server.py").exists()
     assert not (ROOT / "src/sylvia_gm/server/_mcp_server.py").exists()
 

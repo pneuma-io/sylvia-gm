@@ -30,7 +30,9 @@ class DatabaseOwnerLock:
             self._lock()
         except OSError as error:
             self._file.close()
-            raise OwnerConflict("The Sylvia GM SQLite authority already has a live owner") from error
+            raise OwnerConflict(
+                "The Sylvia GM SQLite authority already has a live owner"
+            ) from error
         self._closed = False
 
     def _lock(self) -> None:

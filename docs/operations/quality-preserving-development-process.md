@@ -52,10 +52,20 @@ When work moves between the host and VM:
 - replace or remove the handoff after its useful facts have been incorporated into the plan.
 
 Do not create chains of phase reports, verifier reports, evidence packets, or session summaries.
-Project Desk holds current planning decisions; Git history and the synchronized active plan
+Dot Desk (formerly Project Desk) holds current work items and decisions; Git history and the synchronized active plan
 preserve repository evidence.
 
 ## 4. Test in proportion to risk
+
+The supported-journey gate runs locally; the GitHub workflow is manual-only. A PR is ready for review when its description records the locally checked head commit, commands, results, elapsed time and checks not run.
+
+Recorded defects in `scripts/known_test_defects.py` still execute as strict expected failures.
+The gate lists them separately from passes; they do not prove that the affected feature works.
+An unexpected pass, an unregistered skip or a missing required case fails the gate.
+
+The Python quality group runs `ruff check src` and `mypy src`. The explicit legacy type-debt
+list in `pyproject.toml` may only shrink; new modules stay under strict checking. Broad source
+formatting waits while another open PR changes `src`, to keep its integration review manageable.
 
 Wan's replacement for the cancelled AR-01 marathon is a comprehensive automated framework plus
 short targeted real-model and installed acceptance checks. Preserve continuity, progression,
@@ -64,7 +74,7 @@ deterministic development gate has no whole-run wall-time cutoff; let healthy pr
 finish. The 1,800-second allowance applies only to future post-launch CI before pull requests,
 selected explicitly with --ci. The removed package-generation timeout is separate. Record actual
 coverage and gaps without treating historical runs as current proof. Current tasks select their
-own affected checks; this maintenance pass starts no additional framework or live-test scope.
+own affected checks; each task selects its own additional framework or live-test scope.
 
 Start with the smallest authentic proof of the changed behavior:
 

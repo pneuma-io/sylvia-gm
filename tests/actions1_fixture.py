@@ -5,7 +5,7 @@ import json
 import os
 from pathlib import Path
 
-from tests import test_srd_magic_jar as jar
+from tests import srd_magic_jar_fixtures as jar
 from tests import test_srd_public_spell_casting as public
 
 

@@ -78,6 +78,21 @@ exclude = [".venv", ".git", "__pycache__", "data", "campaigns"]
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP", "B", "C4", "SIM"]
 
+[tool.ruff.lint.per-file-ignores]
+# Temporary: PR6 owns these files; recheck and remove after its merge.
+"src/sylvia_gm/agent/_builder_session.py" = ["B023", "E501"]
+"src/sylvia_gm/application/authority.py" = ["E501"]
+"src/sylvia_gm/application/package_runtime.py" = ["E501", "I001"]
+"src/sylvia_gm/application/player_actions.py" = ["E501"]
+"src/sylvia_gm/application/tactical_grid.py" = ["E501"]
+"src/sylvia_gm/domain/_content_schema_map_card.py" = ["E501"]
+"src/sylvia_gm/domain/_content_schema_panel.py" = ["E501"]
+"src/sylvia_gm/infrastructure/sqlite_authority.py" = ["F401"]
+"src/sylvia_gm/runtime/_effect_executor.py" = ["E501"]
+"src/sylvia_gm/runtime/_schema_validator.py" = ["E501"]
+"src/sylvia_gm/spatial/_engine.py" = ["B905", "E501"]
+"src/sylvia_gm/spatial/_interface.py" = ["E501"]
+
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
@@ -88,6 +103,126 @@ python_version = "3.11"
 strict = true
 ignore_missing_imports = true
 exclude = ["tests/"]
+
+
+# NumPy's installed stubs use newer syntax than the supported Python target.
+[[tool.mypy.overrides]]
+module = ["numpy", "numpy.*"]
+follow_imports = "skip"
+follow_imports_for_stubs = true
+
+# Measured legacy debt; this exact-module list may only shrink. New modules remain strict.
+[[tool.mypy.overrides]]
+module = [
+    "sylvia_gm.agent._builder_question_answers",
+    "sylvia_gm.agent._builder_session",
+    "sylvia_gm.agent._builder_source_tool",
+    "sylvia_gm.agent._character_profile_tools",
+    "sylvia_gm.agent._content_definition_tool",
+    "sylvia_gm.agent._library_source_tool",
+    "sylvia_gm.agent._provider_session",
+    "sylvia_gm.agent._ruleset_test_coverage",
+    "sylvia_gm.agent._ruleset_test_provider",
+    "sylvia_gm.agent._ruleset_test_runner",
+    "sylvia_gm.agent._runner",
+    "sylvia_gm.agent._session_loop",
+    "sylvia_gm.agent._stateless_mcp",
+    "sylvia_gm.agent._working_context",
+    "sylvia_gm.application.action_sequences",
+    "sylvia_gm.application.authority",
+    "sylvia_gm.application.builder_references",
+    "sylvia_gm.application.builder_session_migration",
+    "sylvia_gm.application.builder_source_selection",
+    "sylvia_gm.application.bundled_campaign_plans",
+    "sylvia_gm.application.bundled_packages",
+    "sylvia_gm.application.campaign_library_selection",
+    "sylvia_gm.application.campaign_plan_sources",
+    "sylvia_gm.application.campaign_starting_world",
+    "sylvia_gm.application.character_card_import",
+    "sylvia_gm.application.character_profiles",
+    "sylvia_gm.application.character_rules",
+    "sylvia_gm.application.initial_character_state",
+    "sylvia_gm.application.interview_content",
+    "sylvia_gm.application.launch_compatibility",
+    "sylvia_gm.application.library_sources",
+    "sylvia_gm.application.map_segment_preview",
+    "sylvia_gm.application.package_library",
+    "sylvia_gm.application.package_materialization",
+    "sylvia_gm.application.package_runtime",
+    "sylvia_gm.application.plan_bundle",
+    "sylvia_gm.application.plan_snapshot",
+    "sylvia_gm.application.player_actions",
+    "sylvia_gm.application.reusable_participants",
+    "sylvia_gm.application.reusable_plans",
+    "sylvia_gm.application.ruleset_testing",
+    "sylvia_gm.application.setting_character_requirements",
+    "sylvia_gm.application.spatial_preview",
+    "sylvia_gm.application.srd_lite_weapon_set_migration",
+    "sylvia_gm.application.tactical_grid",
+    "sylvia_gm.builder",
+    "sylvia_gm.builder._interview_manifest",
+    "sylvia_gm.builder._package_snapshots",
+    "sylvia_gm.builder._plan_draft_check",
+    "sylvia_gm.builder._plan_snapshot_materializer",
+    "sylvia_gm.builder._prompts",
+    "sylvia_gm.builder._ruleset_source",
+    "sylvia_gm.campaign.rift",
+    "sylvia_gm.config.chatgpt_settings",
+    "sylvia_gm.config.provider_settings",
+    "sylvia_gm.dice",
+    "sylvia_gm.domain._content_schema_campaign_export",
+    "sylvia_gm.domain._content_schema_character_profile_v2",
+    "sylvia_gm.domain._content_schema_ruleset",
+    "sylvia_gm.domain.authority",
+    "sylvia_gm.domain.campaign_plan",
+    "sylvia_gm.domain.package_library",
+    "sylvia_gm.domain.panel_layout",
+    "sylvia_gm.infrastructure.package_archive",
+    "sylvia_gm.infrastructure.participant_history",
+    "sylvia_gm.infrastructure.sqlite_authority",
+    "sylvia_gm.infrastructure.sqlite_builder_launch",
+    "sylvia_gm.infrastructure.sqlite_interview_navigation",
+    "sylvia_gm.infrastructure.sqlite_packages",
+    "sylvia_gm.interfaces.owner_process",
+    "sylvia_gm.interfaces.ruleset_test_worker",
+    "sylvia_gm.interfaces.webui",
+    "sylvia_gm.portable_artifact",
+    "sylvia_gm.provider",
+    "sylvia_gm.provider._base",
+    "sylvia_gm.provider._chat_metadata",
+    "sylvia_gm.provider._context_fit",
+    "sylvia_gm.provider._gemini",
+    "sylvia_gm.provider._native_output",
+    "sylvia_gm.provider._openai_compat",
+    "sylvia_gm.provider._protocol_routes",
+    "sylvia_gm.provider._reasoning",
+    "sylvia_gm.runtime._aoe_resolver",
+    "sylvia_gm.runtime._companion_registry",
+    "sylvia_gm.runtime._content_registry",
+    "sylvia_gm.runtime._distance_tracker",
+    "sylvia_gm.runtime._expression_parser",
+    "sylvia_gm.runtime._initiative",
+    "sylvia_gm.runtime._parameter_declarations",
+    "sylvia_gm.runtime._scene_awareness",
+    "sylvia_gm.runtime._state_bridge",
+    "sylvia_gm.runtime._state_memo",
+    "sylvia_gm.runtime._turn_system",
+    "sylvia_gm.session",
+    "sylvia_gm.session._divergence",
+    "sylvia_gm.session._narrative_scanner",
+    "sylvia_gm.session._prompt_assembler",
+    "sylvia_gm.spatial._engine",
+    "sylvia_gm.spatial._interface",
+    "sylvia_gm.state._changelog",
+    "sylvia_gm.state._schema",
+    "sylvia_gm.state._snapshot",
+    "sylvia_gm.state._store",
+    "sylvia_gm.state.state_api",
+    "sylvia_gm.tools._dm_campaign_handlers",
+    "sylvia_gm.tools._registry",
+    "sylvia_gm.tools._toolsets",
+]
+ignore_errors = true
 
 [tool.pytest.ini_options]
 minversion = "7.0"

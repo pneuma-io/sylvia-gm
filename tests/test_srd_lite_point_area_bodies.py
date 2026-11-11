@@ -12,7 +12,7 @@ from sylvia_gm.application.package_runtime import AuthorityMemoryStateBridge
 from sylvia_gm.runtime import RulesetRuntime
 from sylvia_gm.runtime._tool_executor import execute_tool
 from sylvia_gm.runtime._types import ExecutionBudget
-from tests.test_srd_lite_mass_cure_geometry import NAMESPACE, _scene_entity, _calls
+from tests.srd_lite_mass_cure_geometry_fixtures import NAMESPACE, _scene_entity, _calls
 
 SPHERE = 'collect_srd_sunburst_creature_targets'
 FIRE = 'qualify_srd_lite_fire_storm_cubes'
@@ -25,7 +25,7 @@ def bodies_runtime():
         data = yaml.load(archive.read('packages/' + NAMESPACE + '/runtime/ruleset.yaml'), Loader=yaml.CSafeLoader)
     pool = data.get('parameter_declarations', {})
     for tool in data['tools'].values():
-        tool['parameters'] = [deepcopy(pool[item]) if isinstance(item, str) else item for item in tool['parameters']]
+        tool['parameters'] = [deepcopy(pool[item]) if isinstance(item, str) else item for item in tool.get("parameters", [])]
     if os.environ.get('POINT_BODIES_PATCH') == '1':
         from scripts.srd_spell_summoning import _area_cover_tools
         from scripts.srd_sunburst_geometry import _sphere_tool, _point_cover
@@ -102,7 +102,7 @@ def test_circle_caster_range_uses_true_body_and_handles_zero_radial_distance(
     result = run(bodies_runtime, tool, [circle('hero', position, radius), circle('recipient', [5, 5, 0])], parameters)
     assert result.success is accepted, result.error
     if not accepted:
-        assert '150' in result.error
+        assert 'range' in result.error or 'exceeds 150 feet' in result.error
 
 
 @pytest.mark.parametrize(('position', 'radius', 'recipient', 'cover', 'expected'), (

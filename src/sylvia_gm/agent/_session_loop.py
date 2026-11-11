@@ -31,7 +31,11 @@ from sylvia_gm.domain.authority import (
     SafePayload,
     WriterRole,
 )
-from sylvia_gm.domain.errors import CommandRejected, IdempotencyConflict, MechanicsRejected
+from sylvia_gm.domain.errors import (
+    CommandRejected,
+    IdempotencyConflict,
+    MechanicsRejected,
+)
 from sylvia_gm.domain.provider_records import ProviderPrivateRecord
 from sylvia_gm.domain.session import (
     BuilderChatRecord,
@@ -57,7 +61,8 @@ def resolve_retry_basis_message(
         for message in context.messages
         if message.content.get("attempt_id") == failed_attempt_id
         and message.kind in {SessionMessageKind.USER, SessionMessageKind.EVIDENCE}
-        and message.content.get("kind") not in {"session_attempt_terminal", "player_action_response_retry"}
+        and message.content.get(
+        "kind") not in {"session_attempt_terminal", "player_action_response_retry"}
     )
     if len(direct) == 1:
         return direct[0]
@@ -81,7 +86,8 @@ def resolve_retry_basis_message(
         for message in context.messages
         if message.message_id == original_message_id
         and message.kind in {SessionMessageKind.USER, SessionMessageKind.EVIDENCE}
-        and message.content.get("kind") not in {"session_attempt_terminal", "player_action_response_retry"}
+        and message.content.get(
+        "kind") not in {"session_attempt_terminal", "player_action_response_retry"}
     )
     if len(original) != 1:
         raise CommandRejected("Retry input identity is unavailable or ambiguous")
@@ -187,16 +193,21 @@ def _mechanics_rejection_feedback(error: MechanicsRejected) -> SafePayload:
     validation: dict[str, object] = {"field_paths": list(error.field_paths)}
     if error.validation_issues:
         validation["issues"] = [issue.as_payload() for issue in error.validation_issues]
+    correction_source = (
+        "validation.issues" if error.validation_issues
+        else "the refusal reasons and validation.field_paths"
+    )
     return cast(
         SafePayload,
         {
             "status": "rejected",
             "code": error.code,
             "reason": str(error),
+            **({"reasons": list(error.refusal_reasons)} if len(error.refusal_reasons) > 1 else {}),
             "validation": validation,
             "state_changed": error.state_changed,
             "instruction": (
-                "Use validation.issues and the current tool schemas to correct every declared "
+                f"Use {correction_source} and the current tool schemas to correct every declared "
                 "field. If this operation cannot represent the intended action, choose a "
                 "different currently exposed operation that can. Do not repeat an identical "
                 "rejected call."
@@ -1062,7 +1073,8 @@ class CampaignSessionLoop:
                         "player_action_id": request.player_action_id,
                         "player_action_ids": [record["action_id"] for record in
                             self._owner.player_action_context(
-                                self._owner.session_context(request.session_id).session.campaign_id)],
+                                self._owner.session_context(
+                                request.session_id).session.campaign_id)],
                         "automatic_response": request.automatic_response,
                     } if request.input_kind is SessionInputKind.PLAYER_ACTION_RESPONSE else {}),
                     "canonical_start_sequence": initial_high_water,

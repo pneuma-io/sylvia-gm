@@ -7,6 +7,9 @@ import pytest
 from sylvia_gm import __version__
 from sylvia_gm.application.desktop_update import service
 from sylvia_gm.application.desktop_update.manifest import UpdateError
+from tests.desktop_update_move_checks import (
+    assert_desktop_update_moves as assert_desktop_update_moves,
+)
 
 PUBLIC_VECTOR = bytes.fromhex("d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a")
 

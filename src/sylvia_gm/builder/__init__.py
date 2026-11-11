@@ -25,12 +25,12 @@ def __getattr__(name: str):
     if name in _BUILDER_LAZY:
         import importlib
         mod = importlib.import_module(_BUILDER_LAZY[name])
-        if name == "BuilderLoopError":
-            return getattr(mod, "AgentLoopError")
+        if name == "BuilderLoopError":  # noqa: SIM116 - preserve lazy lookup and fallthrough.
+            return mod.AgentLoopError
         elif name == "BuilderRunner":
-            return getattr(mod, "AgentRunner")
+            return mod.AgentRunner
         elif name == "BuilderTurnResult":
-            return getattr(mod, "AgentTurnResult")
+            return mod.AgentTurnResult
     raise AttributeError(f"module 'sylvia_gm.builder' has no attribute {name!r}")
 
 

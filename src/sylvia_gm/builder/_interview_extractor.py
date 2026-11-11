@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -22,41 +22,26 @@ logger = logging.getLogger(__name__)
 
 # ── Extraction System Prompt ──────────────────────────────────────
 
-EXTRACTION_SYSTEM_PROMPT = """You are an interview answer extractor. Given a transcript of a TTRPG campaign
-builder interview, extract the following structured information as JSON:
-
-{
-  "version": "1.0",
-  "campaign_id": "provided by caller",
-  "extracted_at": "ISO timestamp provided by caller",
-  "genre": "high fantasy | dark fantasy | sci-fi | cyberpunk | post-apocalyptic | horror | ...",
-  "setting": "2-3 sentence description of the world",
-  "tone": "dark | heroic | whimsical | gritty | mysterious | mixed",
-  "world_name": "name of the world",
-  "content_boundaries": ["list", "of", "things", "to", "avoid"],
-  "difficulty": "easy | normal | hard | deadly",
-  "character_concept": "the player's character concept as described",
-  "character_block": {
-    "name": "...",
-    "species": "...",
-    "archetype": "...",
-    "max_hp": 18,
-    "hp": 18,
-    "ac": 10,
-    "abilities": {"str": 10, "dex": 10, "wil": 10},
-    "traits": [],
-    "backstory": "...",
-    "personality": "..."
-  },
-  "raw_answers": {"question_id": "user's answer", ...}
-}
-
-RULES:
-1. genre, setting, tone, character_concept are REQUIRED and non-empty.
-2. If the interview doesn't specify a value, use reasonable defaults.
-3. tone MUST be one of: dark, heroic, whimsical, gritty, mysterious, mixed.
-4. difficulty MUST be one of: easy, normal, hard, deadly.
-5. Output ONLY valid JSON. No markdown wrappers. No code blocks."""
+EXTRACTION_SYSTEM_PROMPT = (
+    "You are an interview answer extractor. Given a transcript of a TTRPG campaign\nbuilder "
+    "interview, extract the following structured information as JSON:\n\n{\n  \"version\": "
+    "\"1.0\",\n  \"campaign_id\": \"provided by caller\",\n  \"extracted_at\": \"ISO timestamp "
+    "provided by caller\",\n  \"genre\": \"high fantasy | dark fantasy | sci-fi | cyberpunk | "
+    "post-apocalyptic | horror | ...\",\n  \"setting\": \"2-3 sentence description of the "
+    "world\",\n  \"tone\": \"dark | heroic | whimsical | gritty | mysterious | mixed\",\n  "
+    "\"world_name\": \"name of the world\",\n  \"content_boundaries\": [\"list\", \"of\", "
+    "\"things\", \"to\", \"avoid\"],\n  \"difficulty\": \"easy | normal | hard | deadly\",\n  "
+    "\"character_concept\": \"the player's character concept as described\",\n  "
+    "\"character_block\": {\n    \"name\": \"...\",\n    \"species\": \"...\",\n    "
+    "\"archetype\": \"...\",\n    \"max_hp\": 18,\n    \"hp\": 18,\n    \"ac\": 10,\n    "
+    "\"abilities\": {\"str\": 10, \"dex\": 10, \"wil\": 10},\n    \"traits\": [],\n    "
+    "\"backstory\": \"...\",\n    \"personality\": \"...\"\n  },\n  \"raw_answers\": "
+    "{\"question_id\": \"user's answer\", ...}\n}\n\nRULES:\n1. genre, setting, tone, "
+    "character_concept are REQUIRED and non-empty.\n2. If the interview doesn't specify a value, "
+    "use reasonable defaults.\n3. tone MUST be one of: dark, heroic, whimsical, gritty, "
+    "mysterious, mixed.\n4. difficulty MUST be one of: easy, normal, hard, deadly.\n5. Output "
+    "ONLY valid JSON. No markdown wrappers. No code blocks."
+)
 
 
 class ExtractionError(RuntimeError):
@@ -211,7 +196,9 @@ class InterviewExtractor:
         lines.append("RAW ANSWERS COLLECTED:")
         lines.append(json.dumps(raw_answers, indent=2))
         lines.append("")
-        lines.append("Extract the structured campaign manifest from the above interview transcript.")
+        lines.append(
+            "Extract the structured campaign manifest from the above interview transcript."
+        )
         lines.append("Output ONLY valid JSON matching the schema described in the system prompt.")
 
         return "\n".join(lines)
@@ -327,7 +314,7 @@ class InterviewExtractor:
 
         # Enrich with caller-provided metadata
         manifest.campaign_id = campaign_id
-        manifest.extracted_at = datetime.now(timezone.utc).isoformat()
+        manifest.extracted_at = datetime.now(UTC).isoformat()
         manifest.raw_answers = raw_answers
 
         return manifest
