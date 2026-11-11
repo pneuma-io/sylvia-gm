@@ -7,7 +7,7 @@ from collections import Counter
 from pathlib import Path
 
 VARIANT_ID = "sylvia.srd-lite.bg3"
-VARIANT_VERSION = "0.3.17"
+VARIANT_VERSION = "0.3.19"
 ROOT = Path(__file__).resolve().parents[1]
 LITE = ROOT / "rulesets/srd-lite"
 HISTORICAL_CATALOGUE = ROOT / "historical/spell-research/spell-catalogue.json"

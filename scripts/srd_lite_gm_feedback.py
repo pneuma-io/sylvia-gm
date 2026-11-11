@@ -71,10 +71,19 @@ def bind_gm_feedback(runtime):
     aliases = definitions.get("srd_lite_aliases", {})
     single = []
     multiple = []
+    # These operations derive recipients before the generic damage family runs.
+    recipient_owners = {
+        "sunburst": "cast_srd_sunburst",
+        "fire_storm": "qualify_srd_lite_fire_storm_cubes",
+    }
     for spell, profile in definitions["spells"].items():
         family = profile["family"]
         names = ("cast_" + family, "cast_spell_" + family)
-        owner = next((tools[name] for name in names if name in tools), None)
+        owner = (
+            tools[recipient_owners[spell]]
+            if spell in recipient_owners
+            else next((tools[name] for name in names if name in tools), None)
+        )
         required = {p["name"] for p in _parameters(runtime, owner or {}) if p.get("required", True)}
         if "target" in required:
             single.append(spell)

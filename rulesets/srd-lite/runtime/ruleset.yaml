@@ -32867,7 +32867,6 @@ definitions:
   - cone_of_cold
   - enhance_ability
   - fire_shield
-  - fire_storm
   - fireball
   - flame_strike
   - foresight
@@ -32884,7 +32883,6 @@ definitions:
   - meteor_swarm
   - shatter
   - shillelagh
-  - sunburst
   - thunderwave
   - vitriolic_sphere
 narrative: {}
