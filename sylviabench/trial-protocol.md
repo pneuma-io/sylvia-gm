@@ -1,3 +1,9 @@
+# Historical protocol 1 selection
+
+This is the 10 November 2026 pilot plan, retained as history. Its API-only Claude route,
+fixture and scoring rules are superseded for new work by [protocol v2](README.md). Original
+trial records retain their original source and grades. Do not execute this old plan as a new run.
+
 # First live comparison
 
 Selected on 10 November 2026. This is a developer pilot on the three implemented gameplay

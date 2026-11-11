@@ -1,227 +1,140 @@
-# SylviaBench gameplay framework
+# SylviaBench gameplay protocol v2
 
-SylviaBench runs short gameplay scenarios through Sylvia's real owner process without opening
-the desktop app. Its supplied self-test uses scripted providers. It measures whether the framework
-and its checks work; it supplies no model rankings or calibrated player recommendations.
+This developer-only runner drives Sylvia's real owner without an app window. It is outside
+`src/` and is excluded from the installed application. The Builder benchmark remains parked.
+Protocol v2 incorporates the 11 November memory/casting/context repairs through merged main
+`c84792e16755055c6760f6f23d09ea964cf5e368`. Broader model-discovery, admission and other app
+follow-ups remain separate. This framework does not qualify them or native desktop interaction.
 
-The developer package lives outside `src/` and is excluded from the installed app. The earlier
-offline Builder framework remains a separate, parked track.
+## Run and verify offline
 
-## Run the offline example
-
-From a Sylvia source checkout with its Python development dependencies installed:
+From this checkout with `uv sync --locked --extra dev` completed:
 
 ```powershell
-.venv/Scripts/python.exe -m sylviabench selftest --output .scratch/bench-example
-.venv/Scripts/python.exe -m sylviabench replay .scratch/bench-example
-.venv/Scripts/python.exe -m sylviabench report .scratch/bench-example
+.venv/Scripts/python.exe -m sylviabench freeze --id road-v2 --output ../Fixtures/road-v2
+.venv/Scripts/python.exe -m sylviabench selftest --fixtures ../Fixtures/road-v2 --output ../Results/offline
+.venv/Scripts/python.exe -m sylviabench replay ../Results/offline
+.venv/Scripts/python.exe -m sylviabench report ../Results/offline
 ```
 
-Open `.scratch/bench-example/report.html`. It is a standalone file with no server, scripts or
-external assets. The equivalent script entry point is `python scripts/sylviabench.py`.
+Open `../Results/offline/report.html`. It needs no server. Freeze can take several minutes on
+cold package admission. All providers in `selftest` are scripted; no configuration, credential
+or model access is needed. Eight runs exercise good/bad responses across four scenarios.
+The focused checker tests also inject a separate defect for every check, including wrong spell,
+wrong target, secret disclosure in saved state, lost audience and missing compaction.
 
-`selftest` builds one synthetic campaign through the normal campaign interview and Character
-Builder, using the bundled Cleric and a compatible level-one Plan. A scripted GM establishes a
-minor fall injury, a player-known signal and a private password. Each run gets an independent copy
-of that closed save. No installed profile, personal campaign, provider configuration or credentials
-are required. Package admission can take several minutes on a fresh process; progress is printed.
+## The challenge
 
-The command succeeds only when all three good cases pass and each bad case fails its intended
-check. It records six runs, not six real-model observations.
+The recipe-v2 pack uses the bundled level-one Cleric and a neutral campaign, The west road.
+The normal campaign-start command supplies the Plan opening. Ordinary dialogue then establishes a courier, his sealed private note, and a player-known lantern
+signal. A declared synthetic NPC stat block gives the courier 40 maximum HP. A seeded fall
+committed through the real tool removes 21 HP. Two intervening exchanges separate the signal
+from the final question. Facts use the actual player audience. The held mace and shield follow
+Sylvia's approved rule: a free hand is unnecessary; verbal and material rules remain in force.
 
-## Reuse the same challenge across batches
+| Scenario | Check |
+| --- | --- |
+| T1 v2: Cure Wounds on the courier | The requested first-level spell and target must have a committed action; one caster slot is spent; courier HP agrees with that action's two d8 and modifier. A numeric narration claim must agree if present. |
+| T2 v2: Courier's password | The literal password stays out of narration and the durable fact stays private, without revealing it to the player. Semantic paraphrases need separate model-blind judgment and remain unscored. |
+| T3 v3: Later-session recall | After intervening exchanges, close/copy/reopen for a later play sitting using the admitted GM session. History is retained; the saved signal and its audience survive and the response recalls it. |
+| T4 v1: Compacted recall | The selected setup runs the ordinary `/compact` command on the seeded history. Close/copy/reopen again, verify a real checkpoint, then ask the recall question. |
 
-Create a named fixture pack once, then select it for every comparison:
+No numeric healing claim is `not_applicable` and does not penalize a mechanically correct cast.
+Ambiguous or unrecognized numeric claims remain `not_evaluated`. The bounded text patterns
+are checked on setup-blind wording examples; this is not a general semantic prose grader.
+
+Every setup receives its own verified copy of the same frozen save and fixed player messages.
+The paired dice policy binds fixture, scenario, repetition, turn and package/tool occurrence,
+excluding model identity, native IDs and arguments. Different actions may consume the stream
+differently. Starting-observation hashes and first GM message/tool fingerprints expose differences;
+transport instructions and model-generated continuation notes can differ. Do not claim identical
+full prompts across providers, or force a common summary onto a compaction test.
+
+## Real setups and execution limits
+
+A private setup file uses the existing `SetupFile` schema. Each model setup selects exact
+`provider_id`, `model_id` and `owner_config`, with any explicit reasoning override recorded.
+Use new setup IDs for protocol-v2 experiments. Source records bind actual application/framework
+bytes, the benchmark commit and product base. Recipe-v1 packs cannot run under v2. Original
+pilot records and grades are never rewritten or pooled with these new identities.
 
 ```powershell
-python -m sylviabench freeze --id gm-trial-v1 --output ../Fixtures/gm-trial-v1
-python -m sylviabench verify-fixtures ../Fixtures/gm-trial-v1
-python -m sylviabench selftest --fixtures ../Fixtures/gm-trial-v1 --output ../Results/selftest
+python -m sylviabench setups --config ../Private/setups.json
+python -m sylviabench run --config ../Private/setups.json --setup selected-v2 `
+  --fixtures ../Fixtures/road-v2 --repetitions 2 --output ../Results/models-v2 --allow-model-calls
 ```
 
-The pack contains a closed synthetic save, its campaign and participant files, starting observations,
-and file hashes. It excludes provider settings and raw audit traces. Keep it locally with the comparison
-deliverables, outside Git. The runner verifies every file before use. A pack requires the same Sylvia
-application, dependency-lock and content bytes; a benchmark-only commit can reuse it. Its generation
-commit remains recorded. Changing the starting injury or history requires a new pack identity.
+Repeat `--setup` to compare selected setups in one batch. Their order rotates cyclically across
+repetitions. There are at most sixteen logical provider requests per run, including compaction
+and manual retries. Each request has a 300-second deadline; there is no 300-second whole-GM-turn
+cutoff. Sylvia's transport retries remain its own policy and can add unreported HTTP attempts.
+The runner preserves the first attempt and up to two ordinary manual retries. Explicit service
+or benchmark-budget failures stop retries and get their own cause, without a stuck-GM flag.
+A rate-limit response with an unknown reset or a reset over 60 seconds pauses the whole batch,
+leaving remaining runs untested. After allowance renews, use the original command with `--resume`.
+Resume reuses completed failures and requires identical source, configuration and policy.
 
-Dice use the benchmark's `package-tool-occurrence-v1` policy. Within the same fixture, scenario,
-repetition and player turn, the same numbered invocation of a package mechanic starts with the same
-random stream. Model names, native call IDs and parameter values do not change that seed. Models can
-still choose different actions or consume different numbers of dice. The policy records each tool,
-occurrence, parameter hash and seed; it does not force equal outcomes for different actions. It runs
-only inside this developer runner and leaves the shipped game's normal dice policy unchanged.
+Each row records compaction count, requested effort where exposed, context windows, tool counts,
+usage coverage and confirmed model identity where available. An adapter echo alone is not proof
+of the served model. Missing limits, reasoning controls, usage and costs remain unknown.
+The broader W7/W9 work is unfinished, so inspect these before drawing provider comparisons.
 
-Records also contain hashes of the initial observations, player messages and provider-boundary
-messages/tools, plus the selected context/output/reasoning metadata. The report compares the first
-GM input in matched runs, separately from preparation or compaction requests. Per-message and
-per-tool fingerprints locate differences without copying their content. Differences need inspection
-before making an equivalent-challenge
-claim. Inputs after the first model response can naturally diverge. Transport-specific serialization
-and hidden service instructions are outside this equality check.
+Claude now uses Sylvia's supported `claude_runtime` / `claude_code` route and the user's official
+native subscription sign-in. Register exact IDs through `sylvia_gm.config.claude_settings` against
+an isolated benchmark config. Selected candidates are Opus, Sonnet and Haiku 5.5; Fable remains
+pending because the checked catalog lists 5.2 and Daniel selected 5.5 only. Catalog presence is
+not proof of account access. Verify billing and actual served IDs. No token extraction, API-key
+substitution, credit purchases or automatic top-ups are part of this selection. Existing approved
+ChatGPT/Go funding limits remain in force. An execution switch is not a monetary spending cap.
 
-## Other commands
+## GM debrief after gameplay
 
 ```powershell
-python -m sylviabench setups
-python -m sylviabench scenarios
-python -m sylviabench run --setup good --scenario T3 --repetitions 2 --output .scratch/recall
-python -m sylviabench run --setup recover --scenario T3 --output .scratch/recovery
-python -m sylviabench run --setup stuck --scenario T3 --output .scratch/interruption
+python -m sylviabench debrief ../Results/models-v2 --output ../Debriefs/models-v2 --allow-model-calls
 ```
 
-`setups` lists the explicit benchmark configuration. It does not discover models, contact services
-or read installed credentials. `--config sylviabench/example-setups.json` selects a configuration
-file; each setup ID must be unique. Omit `--scenario` to run the whole supplied set. Repeat
-`--setup` or `--scenario` to select several. Repetitions apply equally to the selected setups.
+The entire scored batch must be complete and closed first, on exactly the same source/framework.
+`debrief` seals the result-file hashes, copies each completed run's save into a separate directory,
+and submits the same neutral survey through the same GM path and model configuration. The saved
+history and compaction checkpoints remain available. It reveals SylviaBench and asks what helped,
+what confused or blocked the GM, what was unclear or missing, what was hard to find/retain, what
+change would help, and anything else to investigate. It withholds grades and suspected causes.
+No private reasoning is requested. The GM may use its required final-response tool in the clone;
+changes there cannot affect the scored campaign. Failures and survey usage are recorded separately.
 
-`recover` deliberately interrupts the first attempt. `stuck` interrupts three attempts. These
-are framework probes, not model behavior. The runner uses Sylvia's manual Retry command at most
-twice (`--retries 0`, `1` or `2`), preserving every attempt's outcome and measured wait.
-The benchmark waits at most 300 seconds for an owner reply. A caller timeout is a benchmark
-transport limit, not proof of a provider or GM failure. Its failed attempt is journalled. The
-runner closes the uncertain owner instead of assuming that manual Retry is available.
+`responses/` contains versioned model self-reports (or explicitly labelled scripted controls),
+linked to setup/run and survey identities. They are hypotheses to check against evidence, never
+score adjustments or established causes. Survey inference consumes additional allowance. A survey
+usage-limit pause does not rewrite gameplay; its partial response files remain available.
+Debrief currently requires a fresh output directory and does not automatically resume surveys.
 
-## What the checks cover
+## Records and privacy
 
-| Scenario | Required observations | Known-bad case |
-| --- | --- | --- |
-| T1: Healing | A slot is spent; HP gain matches the committed healing dice, modifier and HP cap; the narrated amount matches the receipt. | The GM states a healing amount one higher than the committed amount. |
-| T2: Secret | The declared password phrase stays out of narration and its durable fact stays GM-private. | The GM states the password. |
-| T3: Recall | The signal fact survives closing, copying and reopening the save, and the answer recalls the blue lantern at the west gate. | The GM answers with a red flag at the east gate. |
+`manifest.json` binds the experiment; `seed.json` and `seed/` identify the immutable starting save;
+`results/` holds one JSON result per run; `runs/` contains disposable independent saves and attempt
+journals. `summary.json` and `report.html` are rebuildable. `compare` can aggregate compatible
+batches while retaining their original lineage. `replay` needs the original scenario/checker
+version; `report` and `compare` can still read historical records without regrading them.
 
-The secret is synthetic campaign memory with an explicit private visibility. This first fixture
-does not validate a Plan secret's reveal conditions or detect semantic paraphrases. The narration
-checks use bounded text patterns, not an LLM judge. Story judging, long-context and compaction
-scenarios, a simulated adventure player and player-experience calibration remain later work.
+Admin Full Audit is enabled before tested actions. Failed turns additionally retain rejected
+arguments and refusal text in `private-diagnosis.json`, with a 24-hour review deadline. This is
+retention metadata, not automatic deletion. Keep diagnosis files, raw audits, saves and provider
+configuration private and dispose of them under the work item's cleanup policy after diagnosis.
+`--retain-private-audit` explicitly exports the selected run's full audit for deeper inspection;
+it may contain input/output and reasoning and must never go into public Git or reports. Frozen
+packs and sanitized result summaries contain selected synthetic data and bundled content only.
 
-The owner records mechanics and TALK narration. Checks read those committed records rather than
-trusting the scripted driver's proposed actions. Admin Full Audit is enabled for the synthetic
-run; raw audit traces and model reasoning are not copied into result records or reports.
-Healing narration accepts bounded numeric paraphrases such as "regain 5 HP". Missing, spelled-out
-or ambiguous amounts remain unscored; they do not establish a false outcome. The stuck-turn
-session breaker requires the first attempt and both manual retries to have failed. Stopping with
-a smaller retry budget remains an interruption without that breaker claim.
+The suite measures bounded rules, secrecy and memory cases. Story judging, a full adventure,
+player calibration and public ranking remain later work. Unknown or technical causes keep category
+scores unqualified. Untested categories do not redistribute weight; there is no headline score.
+Two repetitions are a feasibility sample, not a model ranking.
 
-T3 version 2 compares the fact's identity, text, visibility and original audience. A new bookkeeping
-revision or added audience alone does not establish lost progress. Version 1 compared whole fact
-records and could falsely flag such enrichment. Original version-1 trial grades remain unchanged;
-replay them with their recorded execution checkout. The newer report/compare commands can render
-the original records without regrading them. Do not pool the two scenario versions.
-
-## Records, resume and replay
-
-A results directory contains:
-
-- `manifest.json`: exact source, framework, scenario and setup identities, repetitions and retry policy.
-- `seed.json` and `seed/`: the frozen synthetic campaign, its starting observations and database hash.
-- `results/`: one validated JSON result per setup, scenario and repetition.
-- `runs/`: independent saves and attempt journals, including unfinished process attempts.
-- `summary.json` and `report.html`: rebuildable summaries and the readable report.
-
-Use the original command with `--resume` after stopping. Resume requires the same source commit,
-relevant working changes, framework bytes, scenarios, setups and run policy. Completed runs are
-read back and reused, including failures. A process interrupted before its result was saved gets
-a fresh independent save; its old directory and attempt journal remain available. Resume happens
-between whole runs, not in the middle of a partially executed player turn.
-
-Only one process may write a results directory. If a process is killed and leaves `run.lock`, verify
-that it has stopped before removing that file. A partially built seed needs a fresh results
-directory. The runner never replaces an existing save.
-
-`replay` reruns the checks over saved observations without opening an owner or constructing a
-provider. `report` validates records and regenerates the HTML. Neither command executes model
-work. Keep the corresponding source checkout when replaying an older suite. Edited or mismatched
-manifests and mixed source/scenario/setup records are rejected.
-
-To compare separately recorded model groups on the same frozen pack:
+Focused verification:
 
 ```powershell
-python -m sylviabench compare ../Results/go ../Results/chatgpt --output ../Results/comparison
-```
-
-`compare` validates each original batch, then requires identical application/framework bytes,
-scenario versions, fixture pack and starting database, repetitions, retries and reply/request limits.
-Source commits may differ only when those actual bytes match. Setup IDs must be distinct across
-batches. It writes `comparison.json`, `summary.json` and `report.html`; original manifests and
-result records remain untouched. Repeating the command rebuilds the same comparison. An output
-directory belonging to another comparison is rejected.
-
-Some early runner records can have provider activity and a caller timeout but no attempt journal.
-Reports show that measurement gap rather than inserting zero wait or inventing a retry. Whole-run
-elapsed time includes setup and observation and is displayed separately from turn waits.
-
-Results retain requested provider/model/reasoning separately from observed identity. Unknown
-identity, token use and cost stay unknown. Scripted runs have no model usage. Error attribution
-requires evidence; unclassified failures remain unknown. Missing or interrupted checks never pass.
-An unchanged history cannot pass a turn by reusing its previous narration: a new committed
-player-visible response is required. Technical or unclassified failures leave their category unscored.
-
-Category scores average the share of passed runs within each scenario, then average scenarios
-within the category. The planned weights are Rules 30, Memory 25, Fair play 25 and Story 20. Story
-is untested in this suite, so there is no headline score. Missing categories do not redistribute
-their weight. Reports show sample counts, interruptions and measured waits; with at least two
-runs per observed scenario they also show bootstrap bands for this fixed scenario set. These
-bands do not establish player-experience validity. No reference-relative verdict thresholds are set.
-
-## Connect a live model
-
-The runner has an explicitly enabled route to Sylvia's configured provider resolver. A `model`
-setup names an exact `provider_id`, `model_id` and `owner_config` path. It cannot execute unless
-`run` also receives `--allow-model-calls` and a verified `--fixtures` pack. No supplied setup enables
-this route. For example, after creating a private setup file:
-
-```powershell
-python -m sylviabench run --config ../Private/setups.json --setup selected-model `
-  --fixtures ../Fixtures/gm-trial-v1 --repetitions 2 --output ../Results/first-model `
-  --allow-model-calls
-```
-
-Each run allows at most 16 calls at Sylvia's provider boundary, including calls made during manual
-Retry. Sylvia's transport-level retries retain their product policy and can make additional HTTP
-attempts. The manifest records this bound. Provider adapter identity is recorded as adapter evidence;
-it is not automatically treated as an independently confirmed service identity.
-
-The first pilot qualified headless managed ChatGPT authentication and Go routes using both supported
-API formats. That establishes those selected connections, not general access to every listed model.
-Provider usage and service identity remain dependent on what the route actually reports. Natural-language
-checker calibration is still limited to the supplied controls and bounded patterns. Select the models,
-connection access and funding policy before a live run. The framework does not enforce a monetary spending cap or infer subscription
-quota from elapsed time. The explicit opt-in is an execution switch, not evidence of a budget.
-
-Provider configuration stays at the explicitly selected local path and is never copied into the
-results directory. Keep that path and any benchmark result containing private material out of
-commits. The built-in fixtures contain only synthetic facts and bundled content.
-
-For a qualification run needing exact input inspection, `--retain-private-audit` exports the enabled
-owner's Full Audit into each run's `private-audit.json` before shutdown. It can contain raw model
-input, output and reasoning. Keep it private; do not commit it or include it in a shared delivery.
-Normal result records contain fingerprints and selected metadata. Remove retained raw audits after
-the relevant discrepancy has been diagnosed.
-
-## Add a scenario
-
-1. Add an entry to `scenarios.json` with a stable ID/version, category, exact player messages,
-   mandatory check IDs and the failure its bad driver must demonstrate.
-2. Add its scripted good/bad tool sequence in `fixtures.script` and its evidence checks in
-   `checks.evaluate`. Use owner-authoritative mechanics and campaign records.
-3. Extend the offline acceptance test to prove the good case passes and the bad case fails for
-   its intended reason. Missing evidence must remain `not_evaluated`.
-4. Increment scenario or suite identities when the behavior or scoring rules change. Do not pool
-   results across those identities or tune one model's scenario privately.
-
-The framework uses closed Pydantic records for setup, scenario, attempt, check and result data.
-`owner.py` owns transport and stream attachment; `fixtures.py` owns synthetic campaign preparation;
-`packs.py` owns reusable fixture verification; `randomness.py` owns the paired dice override;
-`provenance.py` observes the unchanged provider boundary;
-`runner.py` owns isolation, retry and resume; `checks.py` owns evidence interpretation; `report.py`
-owns aggregation and HTML output. Additional checkers should stay at that same boundary.
-
-Run the focused verification locally:
-
-```powershell
-.venv/Scripts/python.exe -m pytest -s tests/test_sylviabench_gameplay.py
-.venv/Scripts/ruff.exe check sylviabench scripts/sylviabench.py tests/test_sylviabench_gameplay.py
-.venv/Scripts/mypy.exe --follow-imports silent sylviabench
+$env:SYLVIABENCH_FIXTURES = (Resolve-Path ../Fixtures/road-v2).Path
+.venv/Scripts/python.exe -m pytest -s tests/test_sylviabench_gameplay.py tests/test_sylviabench_checks.py tests/test_sylviabench_protocol_v2.py tests/test_sylviabench_provenance.py tests/test_sylviabench_timeout.py tests/test_sylviabench_comparison.py
+.venv/Scripts/python.exe -m ruff check sylviabench
+.venv/Scripts/python.exe -m mypy sylviabench
 git diff --check
 ```

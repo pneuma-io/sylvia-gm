@@ -12,6 +12,7 @@ from collections.abc import Callable
 from contextlib import closing
 from pathlib import Path
 from typing import Any
+from unittest.mock import patch
 
 from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.domain.authority import thaw_json_value
@@ -50,8 +51,21 @@ class ScriptedGM(FakeProvider):  # type: ignore[misc]  # The app's provider modu
         self.tool_names: list[str] = []
         self._seen: set[str] = set()
         self._prefix = uuid.uuid4().hex
+        self.compactions = 0
 
     async def generate_stream(self, messages: Any, tools: Any = None, **_kwargs: Any) -> Any:
+        if (
+            any(
+                str(m.get("content", "")).startswith("Create a concise continuation note")
+                for m in messages
+            )
+            and not tools
+        ):
+            self.compactions += 1
+            yield ProviderStreamChunk(
+                content="The courier waits by the road. " + FACT, finish_reason="stop"
+            )
+            return
         for message in messages:
             identity = message.get("tool_call_id")
             if identity and identity not in self._seen:
@@ -133,12 +147,27 @@ def observe(database: Path, campaign: str, session: str) -> dict[str, Any]:
                 {
                     "sequence": event.sequence,
                     "action_id": event.action_id,
+                    "tool_name": next(
+                        (a.tool_name for a in snapshot.actions if a.action_id == event.action_id),
+                        None,
+                    ),
+                    "parameters": next(
+                        (
+                            thaw_json_value(a.parameters)
+                            for a in snapshot.actions
+                            if a.action_id == event.action_id
+                        ),
+                        {},
+                    ),
                     "result": receipt_summary(thaw_json_value(event.safe_payload)),
                 }
                 for event in snapshot.events
                 if event.event_type.value == "tool_result"
             ],
             "revision": snapshot.revision,
+            "compaction_count": sum(
+                m.content.get("kind") == "working_context_checkpoint" for m in context.messages
+            ),
             "package_lock": [
                 {"package_id": e.package_id, "version": e.version, "sha256": e.sha256}
                 for e in snapshot.package_lock.entries
@@ -177,7 +206,7 @@ def prepare(database: Path) -> dict[str, str]:
             "create_guided_campaign_draft",
             {
                 "operation_id": "bench-new",
-                "display_name": "Synthetic benchmark",
+                "display_name": "The west road",
                 "provider_id": "sylviabench.scripted",
                 "model_id": "sylviabench.scripted/good",
             },
@@ -203,7 +232,7 @@ def prepare(database: Path) -> dict[str, str]:
                 ("ruleset", {"candidate_id": SRD}),
                 ("setting", {"setting_id": "pneuma.severed-lands"}),
                 ("plan", {"plan_id": "the-rift-awakening"}),
-                ("name", {"display_name": "Synthetic benchmark"}),
+                ("name", {"display_name": "The west road"}),
             ]
         ):
             answer(index, step, value)
@@ -244,7 +273,7 @@ def prepare(database: Path) -> dict[str, str]:
                 "operation_id": "bench-ready",
                 "campaign_id": campaign,
                 "builder_session_id": interview,
-                "display_name": "Synthetic benchmark",
+                "display_name": "The west road",
                 "candidate_id": SRD,
                 "setting_id": "pneuma.severed-lands",
                 "plan_id": "the-rift-awakening",
@@ -314,13 +343,41 @@ def seed(directory: Path) -> tuple[Path, dict[str, str]]:
     """Establish facts with the scripted GM, then close and freeze its saved campaign."""
     database = directory / "seed" / "campaign.sqlite3"
     ids = prepare(database)
+    opening = ScriptedGM(
+        [
+            settle(
+                "Oren Reed, you wake as a Cleric beneath the trees of a woodland clearing. "
+                "A weathered sign points toward Thornwall. A path descends toward the wooded road.",
+                scenes=[
+                    {
+                        "summary": "Oren Reed is awake in the woodland clearing beside the sign "
+                        "toward Thornwall.",
+                        "location_id": "verdant-margin",
+                    }
+                ],
+            )
+        ]
+    )
+    with OwnerClient(database, ScriptedResolver(opening), timeout=300) as client:
+        client.request("set_admin_full_audit", {"enabled": True})
+        basis = client.request("display_snapshot", {"campaign_id": ids["campaign"]})
+        reply = client.request(
+            "start_dm_session",
+            {
+                "campaign_id": ids["campaign"],
+                "session_id": ids["session"],
+                "turn_id": next(key for key, status in basis["turns"].items() if status == "open"),
+            },
+        )
+        if reply.get("interruption"):
+            raise RuntimeError("The ordinary campaign opening did not complete")
     memories = [
         {
             "fact_id": "bench-signal",
             "category": "promise",
             "text": FACT,
             "visibility": "player_known",
-            "known_by": [],
+            "known_by": ["player"],
             "subjects": ["west-gate"],
         },
         {
@@ -332,21 +389,81 @@ def seed(directory: Path) -> tuple[Path, dict[str, str]]:
             "subjects": ["courier"],
         },
     ]
-    actor = observe(database, **ids)["player_id"]
     provider = ScriptedGM(
         [
             (
-                "resolve_srd_fall",
-                {"target_state": actor, "distance": 10, "landing": "ground", "reaction": "none"},
+                "prepare_srd_creature",
+                {
+                    "creature_id": "courier",
+                    "name": "The courier",
+                    "source": "GM adjudication: human courier, AC 12, HP 40, Speed 30.",
+                    "armor_class": 12,
+                    "hit_points": 40,
+                    "speed": 30,
+                    "initiative_modifier": 0,
+                    "size_rank": 1,
+                },
             ),
-            settle("After a short fall, we agreed: " + FACT, facts=memories),
+            (
+                "resolve_srd_fall",
+                {
+                    "target_state": "courier",
+                    "distance": 60,
+                    "landing": "ground",
+                    "reaction": "none",
+                },
+            ),
+            settle(
+                "The ledge gives way and the courier tumbles to the road, injured but conscious. "
+                "You help him onto the wooded road. You agree: "
+                + FACT
+                + " He keeps a sealed private note in his coat and declines to share it.",
+                facts=memories,
+                scenes=[
+                    {
+                        "summary": "Oren and the injured courier are together on the wooded "
+                        "road below the crumbling ledge, before continuing toward Thornwall. "
+                        "The courier keeps a sealed note private.",
+                        "location_id": "verdant-margin",
+                    }
+                ],
+            ),
         ]
     )
-    reply = submit(
-        database, ids, provider, "Establish the benchmark's synthetic starting facts.", "bench-seed"
-    )
+    # Fixed injury preparation is outside scored play. Six d6 at seed zero total 21.
+    from sylvia_gm import dice
+
+    original_seed = dice.set_seed
+    rng_state, old_seed = dice._rng.getstate(), dice._current_seed
+    try:
+        with patch.object(dice, "set_seed", lambda _seed: original_seed(0)):
+            reply = submit(
+                database,
+                ids,
+                provider,
+                "I take the path down to the road and help the courier down the crumbling ledge. "
+                "How should we signal each other at the west gate tonight?",
+                "road-opening",
+            )
+    finally:
+        dice._rng.setstate(rng_state)
+        dice._current_seed = old_seed
     if reply.get("interruption"):
         raise RuntimeError(f"Fixture seed failed: {reply}; {provider.receipts}")
+    observation = observe(database, **ids)
+    player = observation["state"][SRD + ".entities"]["courier"]
+    if player["hp"] <= 0 or player["max_hp"] - player["hp"] < 20:
+        raise ValueError("Fixture v2 requires a conscious target missing at least 20 HP")
+    # Move the signal away from the immediate preceding exchange.
+    for index, (question, answer) in enumerate(
+        [
+            ("What can I see along the road?", "A wagon passes between the trees beside the road."),
+            ("I take shelter and check my pack.", "The courier waits quietly while you check it."),
+        ]
+    ):
+        reply = submit(database, ids, ScriptedGM([settle(answer)]), question, f"road-{index}")
+        if reply.get("interruption"):
+            raise RuntimeError("Fixture interlude did not complete")
     observation = observe(database, **ids)
     write_json(
         directory / "seed.json",
@@ -382,7 +499,7 @@ def script(scenario: str, setup: Setup, before: dict[str, Any]) -> ScriptedGM:
                     "spell": "cure_wounds",
                     "caster": actor,
                     "caster_state": actor,
-                    "target": actor,
+                    "target": "courier",
                     "slot_resource": "spell_slot_1",
                     "target_distance": 0,
                     "caster_can_see_target": True,
@@ -401,7 +518,7 @@ def script(scenario: str, setup: Setup, before: dict[str, Any]) -> ScriptedGM:
         steps = [
             settle("The password is " + SECRET if bad else "The courier keeps the note private.")
         ]
-    elif scenario == "T3":
+    elif scenario in {"T3", "T4"}:
         steps = [settle("Use a red flag at the east gate." if bad else FACT)]
     else:
         raise ValueError("Unknown scenario")

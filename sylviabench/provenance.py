@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import asyncio
+import json
 import re
 from contextvars import ContextVar
 from dataclasses import asdict
@@ -12,6 +14,16 @@ from urllib.parse import urlsplit, urlunsplit
 from .contracts import Setup, digest
 
 MAX_REQUESTS = 16
+REQUEST_SECONDS = 300
+LONG_RESET_SECONDS = 60
+
+
+class BenchmarkRequestLimitError(RuntimeError):
+    """The benchmark's logical request budget ended, independently of Sylvia or the model."""
+
+
+class BenchmarkRequestTimeoutError(TimeoutError):
+    """One logical provider request exceeded the benchmark's configured deadline."""
 
 
 def configuration(setup: Setup) -> dict[str, Any] | None:
@@ -53,7 +65,25 @@ class ObservedProvider:
 
     def request(self, messages: Any, tools: Any, kwargs: Any) -> dict[str, Any]:
         if len(self.observer.requests) >= MAX_REQUESTS:
-            raise RuntimeError("SylviaBench per-run provider request limit reached")
+            error = BenchmarkRequestLimitError("SylviaBench per-run provider request limit reached")
+            self.observer.failure(error)
+            raise error
+        calls = {c.get("id"): c for m in messages for c in m.get("tool_calls", [])}
+        for message in messages:
+            if message.get("role") != "tool":
+                continue
+            try:
+                payload = json.loads(message.get("content", "{}"))
+            except (ValueError, TypeError):
+                continue
+            if isinstance(payload, dict) and (
+                payload.get("status") in {"rejected", "refused", "error"}
+                or payload.get("code")
+                or payload.get("error")
+            ):
+                record = {"call": calls.get(message.get("tool_call_id")), "refusal": payload}
+                if record not in self.observer.rejections:
+                    self.observer.rejections.append(record)
         tool_schemas = {
             tool.get("function", tool).get("name", str(index)): digest(tool)
             for index, tool in enumerate(tools or [])
@@ -66,6 +96,11 @@ class ObservedProvider:
             )
             else "preparation"
         )
+        if any(
+            str(m.get("content", "")).startswith("Create a concise continuation note")
+            for m in messages
+        ):
+            stage = "compaction"
         first_gm = stage == "gm" and not any(r["stage"] == "gm" for r in self.observer.requests)
         row = {
             "stage": stage,
@@ -100,9 +135,16 @@ class ObservedProvider:
         row = self.request(messages, tools, kwargs)
         token = self.observer.active.set(row)
         try:
-            response = await self.provider.generate(messages, tools=tools, **kwargs)
+            timer = asyncio.timeout(self.observer.request_seconds)
+            async with timer:
+                response = await self.provider.generate(messages, tools=tools, **kwargs)
             self.response(row, response)
             return response
+        except Exception as error:
+            if isinstance(error, TimeoutError) and timer.expired():
+                error = BenchmarkRequestTimeoutError("Benchmark per-request deadline reached")
+            self.observer.failure(error)
+            raise error
         finally:
             self.observer.active.reset(token)
 
@@ -111,14 +153,20 @@ class ObservedProvider:
         token = self.observer.active.set(row)
         stream = self.provider.generate_stream(messages, tools=tools, **kwargs)
         try:
-            async for chunk in stream:
-                # Streaming chunks do not report model identity or token usage in Sylvia's API.
-                effort = getattr(chunk, "provider_reported_reasoning_effort", None)
-                if effort is not None:
-                    row["observed_reasoning"] = effort
-                if chunk.finish_reason is not None:
-                    row["finish_reason"] = chunk.finish_reason
-                yield chunk
+            timer = asyncio.timeout(self.observer.request_seconds)
+            async with timer:
+                async for chunk in stream:
+                    effort = getattr(chunk, "provider_reported_reasoning_effort", None)
+                    if effort is not None:
+                        row["observed_reasoning"] = effort
+                    if chunk.finish_reason is not None:
+                        row["finish_reason"] = chunk.finish_reason
+                    yield chunk
+        except Exception as error:
+            if isinstance(error, TimeoutError) and timer.expired():
+                error = BenchmarkRequestTimeoutError("Benchmark per-request deadline reached")
+            self.observer.failure(error)
+            raise error
         finally:
             try:
                 await stream.aclose()
@@ -131,12 +179,39 @@ class ObservedResolver:
         self.resolver = resolver
         self.requests: list[dict[str, Any]] = []
         self.selections: list[dict[str, Any]] = []
+        self.request_seconds = REQUEST_SECONDS
+        self.failures: list[dict[str, Any]] = []
+        self.rejections: list[dict[str, Any]] = []
         self.active: ContextVar[dict[str, Any] | None] = ContextVar(
             "sylviabench_provider_request", default=None
         )
 
     def model_choices(self) -> Any:
         return self.resolver.model_choices()
+
+    def failure(self, error: Exception) -> None:
+        """Keep safe cause metadata; never persist arbitrary provider exception messages."""
+        from sylvia_gm.provider._exceptions import AuthenticationError, RateLimitError
+
+        category = getattr(getattr(error, "category", None), "value", None)
+        budget = isinstance(error, (BenchmarkRequestLimitError, BenchmarkRequestTimeoutError))
+        retry_after = getattr(error, "retry_after", None)
+        self.failures.append(
+            {
+                "type": type(error).__name__,
+                "cause": "benchmark_fault"
+                if budget
+                else "service_failure"
+                if isinstance(error, (AuthenticationError, RateLimitError))
+                or category in {"provider_unavailable", "transient"}
+                else "unknown",
+                "retry_after_seconds": retry_after
+                if isinstance(retry_after, (int, float))
+                else None,
+                "pause_batch": isinstance(error, RateLimitError)
+                and (retry_after is None or retry_after > LONG_RESET_SECONDS),
+            }
+        )
 
     def __call__(self, session: Any) -> ObservedProvider:
         provider = self.resolver(session)
@@ -169,12 +244,23 @@ class ObservedResolver:
             if isinstance(model, str) and model:
                 row["confirmed_model"] = model
                 row["identity_source"] = "Codex app-server thread/start result"
+        if (
+            context.provider_key == "claude_runtime"
+            and payload.get("method") == "claude/native_step"
+        ):
+            row["identity_source"] = "Claude native runtime validated model ID"
 
     async def on_response(self, context: Any) -> None:
         """Sylvia's existing response hook includes streaming usage when the adapter reports it."""
         row = self.active.get()
         if row is not None and context.response is not None:
             ObservedProvider.response(row, context.response)
+            if context.provider_key == "claude_runtime" and context.response.model:
+                row["confirmed_model"] = context.response.model
+
+    async def on_error(self, context: Any) -> None:
+        if context.error is not None:
+            self.failure(context.error)
 
     def confirmed(self, field: str) -> str | None:
         values = [r.get(field) for r in self.requests]
@@ -207,6 +293,8 @@ class ObservedResolver:
             ],
             "requests": self.requests,
             "max_requests": MAX_REQUESTS,
+            "request_deadline_seconds": self.request_seconds,
+            "failures": self.failures,
             "boundary": "Sylvia provider API, before transport serialization",
             "transport_retries": "Sylvia provider retry policy; not counted as new requests",
         }

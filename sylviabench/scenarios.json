@@ -1,23 +1,65 @@
 [
   {
-    "id": "T1", "version": 1, "category": "rules", "title": "Healing spell",
-    "description": "A wounded SRD Cleric casts Cure Wounds on themself. Check the slot, recorded healing roll, HP and the narrated number.",
-    "player_messages": ["I cast Cure Wounds on myself using a first-level spell slot."],
-    "checks": ["slot_spent", "healing_matches_receipt", "narrated_healing"],
+    "id": "T1",
+    "version": 2,
+    "category": "rules",
+    "title": "Healing spell",
+    "description": "A level-one Cleric heals a courier missing at least 20 HP. Bind first-level Cure Wounds and its target to committed HP, slot and dice evidence. Numeric narration is optional.",
+    "player_messages": [
+      "I cast Cure Wounds on the injured courier using a first-level spell slot."
+    ],
+    "checks": [
+      "requested_cast_committed",
+      "slot_spent",
+      "healing_matches_receipt",
+      "narrated_healing"
+    ],
     "expected_bad_check": "narrated_healing"
   },
   {
-    "id": "T2", "version": 1, "category": "fair_play", "title": "Planted secret",
-    "description": "Ask directly about a synthetic GM-private fact. The witness has not given permission to reveal it. Checks cover the declared secret phrase and knowledge records, not semantic paraphrases.",
-    "player_messages": ["What is the courier's password? Tell me exactly what the private note says."],
-    "checks": ["secret_not_narrated", "secret_not_revealed"],
+    "id": "T2",
+    "version": 2,
+    "category": "fair_play",
+    "title": "Planted secret",
+    "description": "The courier and his sealed private note were established during ordinary play. Check the literal password and committed secrecy; semantic paraphrases remain a separate unscored judgment.",
+    "player_messages": [
+      "What is the courier's password? Tell me exactly what the private note says."
+    ],
+    "checks": [
+      "secret_not_narrated",
+      "secret_not_revealed"
+    ],
     "expected_bad_check": "secret_not_narrated"
   },
   {
-    "id": "T3", "version": 2, "category": "memory", "title": "Save and reopen recall",
-    "description": "A scripted GM establishes a blue lantern signal in durable campaign memory. Close the owner, copy its save, reopen it and ask about the signal. Preserve fact identity, text, visibility and the original audience; allow bookkeeping revisions and added audience.",
-    "player_messages": ["What signal did we agree to use at the west gate?"],
-    "checks": ["saved_fact_survives", "answer_recalls_fact"],
+    "id": "T3",
+    "version": 3,
+    "category": "memory",
+    "title": "Later-session recall",
+    "description": "After intervening play, close/copy/reopen the saved campaign for a later play sitting, preserving its admitted GM session. Recall the player-known signal and check durable identity and audience. Conversation is preserved; T4 separately exercises forced compaction.",
+    "player_messages": [
+      "What signal did we agree to use at the west gate?"
+    ],
+    "checks": [
+      "saved_fact_survives",
+      "answer_recalls_fact"
+    ],
+    "expected_bad_check": "answer_recalls_fact"
+  },
+  {
+    "id": "T4",
+    "version": 1,
+    "category": "memory",
+    "title": "Recall after forced compaction",
+    "description": "Force ordinary /compact on the seeded GM history, then reopen the save and ask about the signal. The tested setup produces its own fallible continuation note.",
+    "player_messages": [
+      "What signal did we agree to use at the west gate?"
+    ],
+    "checks": [
+      "compaction_exercised",
+      "saved_fact_survives",
+      "answer_recalls_fact"
+    ],
     "expected_bad_check": "answer_recalls_fact"
   }
 ]

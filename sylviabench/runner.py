@@ -6,7 +6,7 @@ import hashlib
 import subprocess
 import time
 import uuid
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -14,6 +14,7 @@ from sylvia_gm.application.authority import AuthorityOwner
 
 from .checks import breakers, evaluate
 from .contracts import (
+    PROTOCOL,
     ROOT,
     Attempt,
     Check,
@@ -29,7 +30,7 @@ from .contracts import (
 from .fixtures import ScriptedResolver, copy_save, observe, receipt_summary, script
 from .owner import OwnerClient, OwnerError
 from .packs import freeze, verify
-from .provenance import MAX_REQUESTS, ObservedResolver, configuration
+from .provenance import MAX_REQUESTS, REQUEST_SECONDS, ObservedResolver, configuration
 from .randomness import POLICY, PairedDice
 
 OWNER_REPLY_SECONDS = 300
@@ -58,6 +59,8 @@ def source_identity() -> dict[str, Any]:
     app_files = git("ls-files", "--", *app_paths).splitlines()
     return {
         "commit": git("rev-parse", "HEAD"),
+        "product_commit": git("log", "-1", "--format=%H", "--", *app_paths),
+        "product_base_commit": git("merge-base", "HEAD", "origin/main"),
         "application_sha256": digest(
             {
                 p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest()
@@ -112,6 +115,7 @@ def execute(
     retain_private_audit: bool = False,
 ) -> Result:
     """A run owns a fresh save; retries go through Sylvia's manual Retry command."""
+    ids = dict(ids)
     started = datetime.now(UTC).isoformat()
     begin = time.monotonic()
     directory.mkdir(parents=True, exist_ok=False)
@@ -121,7 +125,7 @@ def execute(
     if expected_baseline is not None and before != expected_baseline:
         raise ValueError("Copied starting observations differ from the frozen fixture")
     observations: dict[str, Any] = {"before": before, "saved": before}
-    if scenario.id == "T3":
+    if scenario.id in {"T3", "T4"}:
         reopened = directory / "reopened" / "campaign.sqlite3"
         copy_save(database, reopened)
         database = reopened
@@ -140,6 +144,30 @@ def execute(
     observed: ObservedResolver | None = None
     try:
         observed = ObservedResolver(_resolver(setup, provider))
+        if scenario.id == "T4":
+            with OwnerClient(database, observed, timeout=OWNER_REPLY_SECONDS) as compact_client:
+                compact_client.request("set_admin_full_audit", {"enabled": True})
+                basis = compact_client.request("display_snapshot", {"campaign_id": ids["campaign"]})
+                compact_reply = compact_client.request(
+                    "submit_session_input",
+                    {
+                        "session_id": ids["session"],
+                        "attempt_id": "bench-force-compact",
+                        "message_id": "bench-force-compact",
+                        "user_text": "/compact",
+                        "turn_id": next(
+                            (key for key, status in basis["turns"].items() if status == "open"),
+                            "bench-compaction-turn",
+                        ),
+                        "expected_revision": basis["revision"],
+                    },
+                )
+                if compact_reply.get("interruption"):
+                    raise RuntimeError("Forced compaction did not complete")
+            compacted = directory / "compacted" / "campaign.sqlite3"
+            copy_save(database, compacted)
+            database = compacted
+            observations["reopened"] = observe(database, **ids)
         with pairing, OwnerClient(database, observed, timeout=OWNER_REPLY_SECONDS) as client:
             client.request("set_admin_full_audit", {"enabled": True})
             for turn_number, message in enumerate(scenario.player_messages):
@@ -179,7 +207,7 @@ def execute(
                                     "failed_attempt_id": identity,
                                 },
                             )
-                            if not retry.get("retryable"):
+                            if not isinstance(retry, dict) or not retry.get("retryable"):
                                 interruption = (
                                     "Owner reports that this interruption is not retryable"
                                 )
@@ -221,6 +249,11 @@ def execute(
                         raise fatal_error
                     if succeeded:
                         break
+                    if any(
+                        f["cause"] in {"service_failure", "benchmark_fault"}
+                        for f in observed.failures
+                    ):
+                        break
                 if not succeeded:
                     completed = False
                     break
@@ -235,12 +268,21 @@ def execute(
         completed = False
         error = caught
     observations["after"] = observe(database, **ids)
+    observations["session_ids"] = ids
+    observations["database_relative_path"] = database.relative_to(directory).as_posix()
     observations["provider"] = observed.summary() if observed else None
     observations["randomness"] = {"policy": POLICY, "trace": pairing.trace}
     observations["challenge"] = {
         "baseline_sha256": digest(before),
         "player_messages_sha256": digest(scenario.player_messages),
     }
+    observations["setup_identity"] = digest(
+        {
+            "setup": setup.model_dump(),
+            "protocol": PROTOCOL,
+            "application_sha256": source.get("application_sha256"),
+        }
+    )
     observations["receipts"] = (
         [{"id": row["id"], **receipt_summary(row["result"])} for row in provider.receipts]
         if provider
@@ -263,11 +305,15 @@ def execute(
             for identity in scenario.checks
         ]
     )
-    passed = completed and all(c.status == "pass" for c in checks)
+    passed = completed and all(c.status in {"pass", "not_applicable"} for c in checks)
     outcome: Outcome = (
         ("error" if error else "incomplete") if not completed else ("pass" if passed else "fail")
     )
-    if completed and any(check.status == "not_evaluated" for check in checks):
+    if (
+        completed
+        and not any(check.status == "fail" for check in checks)
+        and any(check.status == "not_evaluated" for check in checks)
+    ):
         outcome = "incomplete"
     injected = setup.kind == "scripted" and (
         (
@@ -287,6 +333,51 @@ def execute(
         and str(error) == "Owner command exceeded its configured timeout"
     ):
         cause = "benchmark_fault"
+    if not completed and observed and observed.failures:
+        if any(f["cause"] == "benchmark_fault" for f in observed.failures):
+            cause = "benchmark_fault"
+        elif any(f["cause"] == "service_failure" for f in observed.failures):
+            cause = "service_failure"
+    observations["diagnostics"] = {
+        "compaction_count": observations["after"].get("compaction_count", 0)
+        - before.get("compaction_count", 0),
+        "requested_effort": sorted(
+            {
+                str(r["requested"]["reasoning_effort"])
+                for r in observed.requests
+                if r["requested"].get("reasoning_effort") is not None
+            }
+        )
+        if observed
+        else [],
+        "effort_override": setup.reasoning,
+        "provider_requests": len(observed.requests) if observed else 0,
+        "tool_counts": [r["tool_count"] for r in observed.requests] if observed else [],
+        "context_windows": [
+            s.get("effective_context_window", s.get("context_window")) for s in observed.selections
+        ]
+        if observed
+        else [],
+    }
+    if not passed and observed:
+        write_json(
+            directory / "private-diagnosis.json",
+            {
+                "private": True,
+                "expires_at": (datetime.now(UTC) + timedelta(days=1)).isoformat(),
+                "rejections": observed.rejections,
+                "failures": observed.failures,
+                "note": "Selected synthetic run only; remove after diagnosis, within 24 hours.",
+            },
+        )
+    observations["closed_database_sha256"] = hashlib.sha256(database.read_bytes()).hexdigest()
+    if scenario.id == "T2":
+        observations["unscored_judgments"] = {
+            "secret_paraphrase": {
+                "status": "not_evaluated",
+                "reason": "Literal matching cannot judge semantic leakage. Review blind to setup.",
+            }
+        }
     return Result(
         run_id=directory.name,
         suite_id=suite_id,
@@ -312,15 +403,18 @@ def execute(
         else (
             "The selected scripted behavior injected the observed failure."
             if cause == "scripted_driver"
-            else f"The benchmark's {OWNER_REPLY_SECONDS}-second owner reply limit was reached; "
+            else "A benchmark request budget or transport deadline was reached; "
             "a provider or GM failure was not established."
             if cause == "benchmark_fault"
+            else "The provider reported an authentication, quota or service failure."
+            if cause == "service_failure"
             else "Execution or checker evidence is insufficient to assign a specific cause."
         ),
         session_breakers=breakers(
             checks,
             completed,
             retries_exhausted=any(a.number == 2 and not a.completed for a in attempts),
+            cause=cause,
         )
         if not error
         else [],
@@ -363,8 +457,11 @@ def run(
     if any(s.kind == "model" for s in selected) and fixtures is None:
         raise ValueError("Model comparisons require an explicitly selected --fixtures pack")
     pack = verify(fixtures, source) if fixtures is not None else None
+    if pack is not None and pack["recipe_version"] != 2:
+        raise ValueError("Protocol v2 requires a newly frozen recipe-v2 fixture, not an old trial")
     specification: dict[str, Any] = {
         "schema_version": 1,
+        "protocol": PROTOCOL,
         "source": source,
         "setups": [s.model_dump() for s in selected],
         "scenarios": [s.model_dump() for s in suite],
@@ -373,6 +470,8 @@ def run(
         "randomness_policy": POLICY,
         "provider_requests_per_run": MAX_REQUESTS,
         "owner_reply_timeout_seconds": OWNER_REPLY_SECONDS,
+        "provider_request_deadline_seconds": REQUEST_SECONDS,
+        "ordering": "cyclic-setup-order-by-repetition-v1",
         "retain_private_audit": retain_private_audit,
         "provider_configuration": {s.id: configuration(s) for s in selected},
         "fixture_pack_sha256": pack["sha256"] if pack else None,
@@ -430,7 +529,7 @@ def run(
         else:
             print("Preparing the synthetic campaign through Sylvia's owner...", flush=True)
             if pack is None:
-                pack = freeze(output / "fixtures", "selftest-v1", source)
+                pack = freeze(output / "fixtures", "selftest-v2", source)
                 fixtures = output / "fixtures"
             assert fixtures is not None
             copy_save(fixtures / "save" / "campaign.sqlite3", seed_path)
@@ -444,6 +543,15 @@ def run(
                     "fixture_pack_sha256": pack["sha256"],
                 },
             )
+        setup_order = {s.id: i for i, s in enumerate(selected)}
+        scenario_order = {s.id: i for i, s in enumerate(suite)}
+        pending.sort(
+            key=lambda p: (
+                p[2],
+                (setup_order[p[0].id] - p[2]) % len(selected),
+                scenario_order[p[1].id],
+            )
+        )
         for setup, scenario, repetition, key, result_path in pending:
             if configuration(setup) != specification["provider_configuration"][setup.id]:
                 raise ValueError("Selected provider configuration changed during the experiment")
@@ -469,6 +577,18 @@ def run(
             )
             write_json(result_path, result.model_dump())
             results.append(result)
+            failures = (result.observations.get("provider") or {}).get("failures", [])
+            if any(f.get("pause_batch") for f in failures):
+                write_json(
+                    output / "pause.json",
+                    {
+                        "reason": "provider_usage_reset",
+                        "run_id": result.run_id,
+                        "failures": failures,
+                        "next_step": "Wait for allowance reset, then explicitly resume this batch.",
+                    },
+                )
+                raise ValueError("Batch paused for provider usage reset; remaining runs untested")
         return results
     finally:
         lock.unlink()

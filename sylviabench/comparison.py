@@ -40,6 +40,9 @@ def comparison(directories: list[Path], output: Path) -> Path:
                     "randomness_policy",
                     "provider_requests_per_run",
                     "fixture_pack_sha256",
+                    "protocol",
+                    "provider_request_deadline_seconds",
+                    "ordering",
                 )
             },
             "owner_reply_timeout_seconds": manifest.get("owner_reply_timeout_seconds", 300),

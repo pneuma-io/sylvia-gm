@@ -51,7 +51,7 @@ def test_caller_timeout_is_journalled_and_does_not_retry_an_uncertain_owner(tmp_
     monkeypatch.setattr(runner, "OwnerClient", Client)
     directory = tmp_path / "run"
     result = runner.execute(
-        next(s for s in scenarios() if s.id == "T3"),
+        next(s for s in scenarios() if s.id == "T2"),
         setups()[0],
         0,
         directory,

@@ -285,6 +285,12 @@ def render(
             f"<p>Whole run elapsed: {number(row.elapsed_seconds)} seconds, including "
             "setup and observation. This is separate from the recorded turn waits.</p>"
         )
+        if "diagnostics" in row.observations:
+            body.append(
+                "<p>Context and request diagnostics:</p><pre>"
+                + escape(json_text(row.observations["diagnostics"]))
+                + "</pre>"
+            )
         body.append(
             "<table border='1' cellpadding='4'><tr><th>Check</th>"
             "<th>Outcome</th><th>Evidence</th></tr>"

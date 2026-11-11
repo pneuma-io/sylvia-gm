@@ -101,7 +101,8 @@ class OwnerClient:
         """Keep an active GM request attached until its ordinary owner reply arrives."""
         identity = uuid.uuid4().hex
         self._send({"id": identity, "method": method, "params": params or {}})
-        deadline = time.monotonic() + self.timeout
+        # Gameplay is bounded per provider request, not by one whole-turn wall limit.
+        deadline = None if campaign and attempt else time.monotonic() + self.timeout
         heartbeat = time.monotonic()
         generation = None
         heartbeat_ids: set[str] = set()
@@ -121,9 +122,13 @@ class OwnerClient:
                 )
                 heartbeat = time.monotonic() + 1
             try:
-                reply = self._replies.get(timeout=min(0.2, max(0.001, deadline - time.monotonic())))
+                reply = self._replies.get(
+                    timeout=0.2
+                    if deadline is None
+                    else min(0.2, max(0.001, deadline - time.monotonic()))
+                )
             except queue.Empty:
-                if time.monotonic() >= deadline:
+                if deadline is not None and time.monotonic() >= deadline:
                     raise TimeoutError("Owner command exceeded its configured timeout") from None
                 continue
             if isinstance(reply, BaseException):

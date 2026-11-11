@@ -11,7 +11,8 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 Category = Literal["rules", "memory", "fair_play", "story"]
-Status = Literal["pass", "fail", "not_evaluated"]
+Status = Literal["pass", "fail", "not_evaluated", "not_applicable"]
+PROTOCOL = "sylviabench-gameplay-v2"
 Outcome = Literal["pass", "fail", "incomplete", "error"]
 FailureCause = Literal[
     "gm_behavior", "scripted_driver", "sylvia_bug", "service_failure", "benchmark_fault", "unknown"
@@ -152,7 +153,7 @@ class Result(Record):
             if attempt.completed:
                 finished.add(attempt.turn)
         if self.outcome == "pass" and (
-            any(c.status != "pass" for c in self.checks)
+            any(c.status not in {"pass", "not_applicable"} for c in self.checks)
             or not self.attempts
             or any(not a.completed for a in self._final_attempts())
         ):

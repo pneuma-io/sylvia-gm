@@ -42,7 +42,7 @@ def freeze(output: Path, identity: str, source: dict[str, Any]) -> dict[str, Any
     descriptor = {
         "schema_version": 1,
         "id": identity,
-        "recipe_version": 1,
+        "recipe_version": 2,
         "source": source,
         "ids": ids,
         "observation": read_json(output / "preparation" / "seed.json")["observation"],
@@ -65,7 +65,7 @@ def verify(directory: Path, source: dict[str, Any]) -> dict[str, Any]:
     descriptor = read_json(directory / "fixture.json")
     if not isinstance(descriptor, dict):
         raise ValueError("Fixture descriptor must be an object")
-    if descriptor.get("schema_version") != 1 or descriptor.get("recipe_version") != 1:
+    if descriptor.get("schema_version") != 1 or descriptor.get("recipe_version") not in {1, 2}:
         raise ValueError("Unsupported fixture pack version")
     specification = {k: v for k, v in descriptor.items() if k != "sha256"}
     if digest(specification) != descriptor.get("sha256"):

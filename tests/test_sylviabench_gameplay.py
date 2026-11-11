@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import os
+from pathlib import Path
+
 import pytest
 from pydantic import ValidationError
 from sylviabench.__main__ import main
@@ -32,13 +35,14 @@ def experiment(tmp_path_factory):
         patch.setattr(owner_process, "ConfiguredProviderResolver", forbidden)
         output = tmp_path_factory.mktemp("sylviabench") / "selftest"
         selected = [s for s in setups() if s.id in {"good", "bad"}]
-        rows = run(output, selected, scenarios())
+        pack = os.environ.get("SYLVIABENCH_FIXTURES")
+        rows = run(output, selected, scenarios(), fixtures=Path(pack) if pack else None)
         yield output, rows
 
 
 def test_real_owner_good_and_bad_cases_fail_for_the_intended_reason(experiment):
     output, rows = experiment
-    assert len(rows) == 6
+    assert len(rows) == 2 * len(scenarios())
     for scenario in scenarios():
         good = next(r for r in rows if r.scenario_id == scenario.id and r.setup.id == "good")
         bad = next(r for r in rows if r.scenario_id == scenario.id and r.setup.id == "bad")
@@ -53,6 +57,18 @@ def test_real_owner_good_and_bad_cases_fail_for_the_intended_reason(experiment):
     assert proof["after_hp"] > proof["before_hp"]
     assert proof["dice_total"] == sum(proof["dice"])
     assert len(proof["dice"]) == 2
+
+
+def test_every_check_rejects_a_mutation_of_the_real_owner_observation(experiment):
+    from sylviabench.controls import verify_controls
+
+    output, rows = experiment
+    controls = verify_controls(rows, scenarios())
+    for scenario in scenarios():
+        assert {r["check"] for r in controls if r["scenario_id"] == scenario.id} == set(
+            scenario.checks
+        )
+    assert all(c["status"] == "fail" for c in controls)
     assert main(["replay", str(output)]) == 0
 
 
@@ -60,7 +76,7 @@ def test_frozen_pack_reuses_identical_challenge_and_dice_in_a_later_batch(experi
     from sylviabench.packs import verify
 
     output, rows = experiment
-    pack = output / "fixtures"
+    pack = Path(os.environ.get("SYLVIABENCH_FIXTURES", str(output / "fixtures")))
     descriptor = verify(pack, source_identity())
     assert not (pack / "preparation").exists()
     assert any(path.startswith("participants/") for path in descriptor["files"])
@@ -141,7 +157,13 @@ def test_resume_is_offline_and_refuses_changed_source(experiment, monkeypatch):
 
     monkeypatch.setattr(runner, "freeze", lambda *_: pytest.fail("Completed runs must not rebuild"))
     resumed = run(
-        output, [s for s in setups() if s.id in {"good", "bad"}], scenarios(), resume=True
+        output,
+        [s for s in setups() if s.id in {"good", "bad"}],
+        scenarios(),
+        resume=True,
+        fixtures=Path(os.environ["SYLVIABENCH_FIXTURES"])
+        if os.environ.get("SYLVIABENCH_FIXTURES")
+        else None,
     )
     assert sorted(r.run_id for r in resumed) == sorted(r.run_id for r in original)
     changed = {**source_identity(), "commit": "different-source"}

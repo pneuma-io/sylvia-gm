@@ -11,7 +11,7 @@ from pydantic import ValidationError
 
 from .checks import evaluate
 from .comparison import comparison
-from .contracts import scenarios, setups
+from .contracts import scenarios, setups, write_json
 from .packs import freeze, verify
 from .report import load_results, report
 from .runner import run, source_identity
@@ -33,6 +33,10 @@ def main(argv: list[str] | None = None) -> int:
     compare = commands.add_parser("compare", help="Report compatible batches without model calls")
     compare.add_argument("directories", type=Path, nargs="+")
     compare.add_argument("--output", type=Path, required=True)
+    survey = commands.add_parser("debrief", help="Reveal the benchmark after a completed batch")
+    survey.add_argument("directory", type=Path)
+    survey.add_argument("--output", required=True, type=Path)
+    survey.add_argument("--allow-model-calls", action="store_true")
     for name in ("run", "selftest"):
         command = commands.add_parser(name)
         command.add_argument("--output", required=True, type=Path)
@@ -73,6 +77,10 @@ def main(argv: list[str] | None = None) -> int:
             print(report(args.directory))
         elif args.command == "compare":
             print(comparison(args.directories, args.output))
+        elif args.command == "debrief":
+            from .debrief import collect
+
+            print(collect(args.directory, args.output, allow_model_calls=args.allow_model_calls))
         elif args.command == "replay":
             _manifest, rows = load_results(args.directory)
             replay_suite = {s.id: s for s in scenarios()}
@@ -109,7 +117,14 @@ def main(argv: list[str] | None = None) -> int:
                         raise ValueError(
                             f"Known-bad {row.scenario_id} did not fail its intended check"
                         )
-                print(f"Self-test passed: {len(rows)} genuine owner runs; no model inference.")
+                from .controls import verify_controls
+
+                controls = verify_controls(rows, suite)
+                write_json(args.output / "controls.json", controls)
+                print(
+                    f"Self-test passed: {len(rows)} owner runs and {len(controls)} checker "
+                    "controls; no model inference."
+                )
             else:
                 available = {s.id: s for s in setups(args.config)}
                 if len(set(args.setup)) != len(args.setup) or set(args.setup) - available.keys():
