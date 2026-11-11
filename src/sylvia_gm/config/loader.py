@@ -79,7 +79,6 @@ class ProviderDef(BaseModel):
     mode: str = ""  # "byok" | "ollama"
     name: str = ""
     base_url: str = ""
-    runtime_executable: str = ""
     api_key: SecretStr = SecretStr("")
     headers: dict[str, SecretStr] = Field(default_factory=dict)
     protected_credentials: SecretStr | None = Field(default=None, repr=False, exclude=True)

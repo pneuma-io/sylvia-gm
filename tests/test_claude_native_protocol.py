@@ -1,24 +1,67 @@
-"""Installed official CLI against local scripted inference; no real account or vendor calls."""
+"""Published Claude Code binary in Sylvia's own layout against local scripted inference.
+
+No real account or vendor call is made. The binary runs with Sylvia's separate profile, and
+the test proves that nothing is written to the person's own home while it runs.
+"""
 
 from __future__ import annotations
 
 import json
+import os
+import shutil
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
 from typing import Any
 
 import pytest
 
-from sylvia_gm.provider import _claude_runtime
+from sylvia_gm.provider import _claude, _claude_install, _claude_runtime
 from sylvia_gm.provider._base import ModelInfo
 from sylvia_gm.provider._claude import ClaudeProvider
+from sylvia_gm.provider._exceptions import ProviderConnectionError
+
+
+def published_binary() -> Path:
+    """Borrow an unmodified published binary for copying; Sylvia itself never looks here."""
+    chosen = os.environ.get("SYLVIA_TEST_CLAUDE_CODE")
+    binary = Path(chosen) if chosen else (
+        Path.home() / ".local" / "bin" / _claude_runtime.executable_name()
+    )
+    if not binary.is_file():
+        pytest.skip("No published Claude Code binary is available to copy for this check")
+    return binary
+
+
+@pytest.mark.skipif(os.name != "nt", reason="Windows code signatures")
+def test_publisher_check_accepts_anthropic_and_rejects_other_files(tmp_path):
+    _claude_install.verify_publisher(published_binary())
+    signed_by_another_publisher = Path(os.environ["SYSTEMROOT"]) / "System32" / "cmd.exe"
+    unsigned = tmp_path / "plain.exe"
+    unsigned.write_bytes(b"not a signed program")
+    for other in [signed_by_another_publisher, unsigned]:
+        with pytest.raises(ProviderConnectionError, match="not signed by Anthropic"):
+            _claude_install.verify_publisher(other)
 
 
 @pytest.mark.asyncio
-async def test_installed_claude_returns_tools_and_replays_committed_results(tmp_path, monkeypatch):
-    executable = _claude_runtime.find_runtime()
-    if executable is None:
-        pytest.skip("Official native Claude Code is not installed")
+async def test_sylvias_copy_returns_tools_replays_results_and_leaves_the_person_alone(
+    tmp_path, monkeypatch
+):
+    source = published_binary()
+    home = tmp_path / "claude-runtime"
+    person = tmp_path / "person"
+    for folder in [person / "AppData" / "Roaming", person / "AppData" / "Local"]:
+        folder.mkdir(parents=True)
+    monkeypatch.setenv("USERPROFILE", str(person))
+    monkeypatch.setenv("HOME", str(person))
+    monkeypatch.setenv("APPDATA", str(person / "AppData" / "Roaming"))
+    monkeypatch.setenv("LOCALAPPDATA", str(person / "AppData" / "Local"))
+    copied = home / "install" / _claude_runtime.MINIMUM_VERSION_TEXT
+    copied.mkdir(parents=True)
+    shutil.copyfile(source, copied / _claude_runtime.executable_name())
+    executable = _claude_runtime.find_runtime(home)
+    assert executable == copied / _claude_runtime.executable_name()
     requests: list[dict[str, Any]] = []
     errors: list[BaseException] = []
 
@@ -111,16 +154,19 @@ async def test_installed_claude_returns_tools_and_replays_committed_results(tmp_
 
     server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
     threading.Thread(target=server.serve_forever, daemon=True).start()
-    environment = _claude_runtime.native_environment()
-    environment.update(
-        {
-            "ANTHROPIC_API_KEY": "synthetic-local-only",
-            "ANTHROPIC_BASE_URL": f"http://127.0.0.1:{server.server_port}",
-            "CLAUDE_CONFIG_DIR": str(tmp_path / "synthetic-native-profile"),
-            "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
-        }
-    )
-    monkeypatch.setattr(_claude_runtime, "native_environment", lambda: dict(environment))
+    sylvias_environment = _claude_runtime.native_environment
+
+    def scripted_environment(runtime_home):
+        # Only the inference endpoint is substituted; the profile is the one Sylvia selects.
+        environment = sylvias_environment(runtime_home)
+        environment["ANTHROPIC_API_KEY"] = "synthetic-local-only"
+        environment["ANTHROPIC_BASE_URL"] = f"http://127.0.0.1:{server.server_port}"
+        return environment
+
+    # A fresh copy has its own sign-in: nothing is inherited from any other Claude Code.
+    assert _claude_runtime.authentication_status(executable, home)["signed_in"] is False
+    monkeypatch.setattr(_claude_runtime, "native_environment", scripted_environment)
+    monkeypatch.setattr(_claude, "native_environment", scripted_environment)
     selected = ModelInfo(
         "claude-runtime/claude-sonnet-4-6",
         "Synthetic native CLI",
@@ -149,7 +195,7 @@ async def test_installed_claude_returns_tools_and_replays_committed_results(tmp_
         {"role": "system", "content": "You are Sylvia."},
         {"role": "user", "content": "Open the door."},
     ]
-    adapter = ClaudeProvider(tmp_path / "runtime", selected, executable=executable)
+    adapter = ClaudeProvider(home, selected)
     try:
         first = await adapter.generate(canonical, tools, timeout=15)
         assert len(first.tool_calls) == 1
@@ -180,12 +226,15 @@ async def test_installed_claude_returns_tools_and_replays_committed_results(tmp_
             ]
         )
         # A fresh provider proves that continuation depends on Sylvia history, not a live process.
-        reopened = ClaudeProvider(tmp_path / "runtime", selected, executable=executable)
+        reopened = ClaudeProvider(home, selected)
         chunks = [chunk async for chunk in reopened.generate_stream(canonical, tools, timeout=15)]
         assert "".join(c.content for c in chunks) == "The door opens."
         assert chunks[-1].finish_reason == "stop"
         assert len(requests) == 2 and not errors
-        assert not list((tmp_path / "runtime").iterdir())
+        assert not list(home.glob("turn-*"))
+        # Settings and sessions belong to Sylvia's profile; the person's home stays untouched.
+        assert (home / "profile" / ".claude.json").is_file()
+        assert [p for p in person.rglob("*") if p.is_file()] == []
         assert [t["name"] for t in requests[0]["tools"]] == ["mcp__sylvia__open_door"]
         final_history = requests[1]["messages"]
         assert final_history[0] == {"role": "user", "content": "Open the door."}

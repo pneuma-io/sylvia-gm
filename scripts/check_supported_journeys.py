@@ -313,7 +313,7 @@ PYTHON_JOURNEYS = {
         "tests/test_alpha_f6e_owner_session_transport.py::"
         "test_builder_steering_reaches_the_next_provider_call_after_a_tool_boundary",
         "tests/test_alpha_f6e_owner_session_transport.py::"
-        "test_builder_truncation_drops_incomplete_prose_without_automatic_retry",
+        "test_builder_truncation_keeps_shown_prose_and_continues_the_same_turn",
         "tests/test_alpha_f5_campaign_lifecycle.py::"
         "test_probe_10_backup_database_produces_coherent_copy",
         "tests/test_alpha_f5_campaign_lifecycle.py::"
@@ -377,6 +377,7 @@ PYTHON_JOURNEYS = {
         'tests/test_session_reasoning_preferences.py',
         'tests/test_alpha_admin_full_audit.py',
         'tests/test_builder_native_thinking.py',
+        'tests/test_claude_install.py',
         'tests/test_claude_native_protocol.py',
         'tests/test_claude_runtime.py',
     ],

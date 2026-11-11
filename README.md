@@ -29,11 +29,13 @@ For ChatGPT account connections, Sylvia requires the supported
 and account access depend on your provider; a connection option does not guarantee compatibility
 with every account or model.
 
-The Claude account connection uses your separately installed, unmodified Claude Code app
-(version 2.1.322 or later). In Settings > Accounts > Claude, check the installation, use its native
-sign-in and add a model. Usage follows the account selected in Claude Code; the Anthropic API-key
-connection stays separate. See the [setup guide and current verification limits](docs/research/claude-native-runtime-2026-11-11.md),
-including headless configuration for SylviaBench.
+The Claude account connection needs no separate install. In Settings > Accounts > Claude, Sylvia
+downloads its own copy of Claude Code from Anthropic, unmodified, and keeps that copy, its
+settings and its sign-in in Sylvia's own data folder. A Claude Code you already use is never
+changed. Sign in there and add a model. Usage follows the account you sign in with; the Anthropic
+API-key connection stays separate. Automatic setup is Windows only for now. See
+[how setup works, Anthropic's terms and the current verification limits](docs/research/claude-dedicated-instance-2026-11-12.md),
+including headless setup for SylviaBench.
 
 ## Included content
 

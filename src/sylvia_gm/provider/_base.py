@@ -315,7 +315,6 @@ class ProviderConfig:
     transport: str  # "chat_completions" | "responses" | "anthropic_messages"
     base_url: str  # endpoint URL
     runtime_home: str = ""  # owner-selected private profile for managed subscription runtime
-    runtime_executable: str = ""  # selected native executable; never a shell command
     default_headers: dict[str, str] = field(default_factory=dict)
     credentials_list: list[dict[str, str]] = field(default_factory=list)
     # credentials_list elements: {"type": "api_key", "value": "sk-..."}

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -117,11 +118,12 @@ class Connection:
 def provider(tmp_path, monkeypatch, events):
     connection = Connection(events)
     monkeypatch.setattr(_claude, "find_runtime", lambda _: Path(sys.executable))
-    monkeypatch.setattr(_claude, "runtime_version", lambda _: "2.1.322")
+    monkeypatch.setattr(_claude, "runtime_version", lambda *_: "2.1.322")
 
-    def factory(executable, workspace, arguments):
+    def factory(executable, workspace, arguments, environment):
         connection.arguments = arguments
         connection.workspace = workspace
+        connection.environment = environment
         return connection
 
     return ClaudeProvider(tmp_path / "runtime", model(), connection_factory=factory), connection
@@ -373,23 +375,52 @@ def test_runtime_eof_and_timeout_close_ephemeral_state(tmp_path, monkeypatch):
         assert connection.closed and not connection.workspace.exists()
 
 
-def test_environment_carries_native_home_but_no_tokens_or_harness_overrides(monkeypatch):
+def test_environment_selects_sylvias_profile_and_no_tokens_or_harness_overrides(
+    tmp_path, monkeypatch
+):
     monkeypatch.setenv("ANTHROPIC_API_KEY", "do-not-forward")
     monkeypatch.setenv("CLAUDE_CODE_OAUTH_TOKEN", "do-not-forward")
-    monkeypatch.setenv("CLAUDE_CONFIG_DIR", "other-agent")
+    monkeypatch.setenv("ANTHROPIC_PROFILE", "do-not-forward")
+    monkeypatch.setenv("CLAUDE_CONFIG_DIR", "the-persons-own-profile")
+    monkeypatch.setenv("ANTHROPIC_CONFIG_DIR", "the-persons-own-console-profile")
     monkeypatch.setenv("CLAUDE_CODE_SIMPLE", "1")
-    monkeypatch.setenv("USERPROFILE", "native-home")
-    environment = _claude_runtime.native_environment()
-    assert environment["USERPROFILE"] == "native-home"
+    environment = _claude_runtime.native_environment(tmp_path)
+    assert environment["CLAUDE_CONFIG_DIR"] == str(tmp_path / "profile")
+    assert environment["ANTHROPIC_CONFIG_DIR"] == str(tmp_path / "anthropic")
+    assert environment["CLAUDE_CODE_TMPDIR"] == str(tmp_path / "temp")
+    # Claude Code's own updater writes to the shared per-user installation.
+    assert environment["DISABLE_UPDATES"] == environment["DISABLE_AUTOUPDATER"] == "1"
     assert (
         not {
             "ANTHROPIC_API_KEY",
             "CLAUDE_CODE_OAUTH_TOKEN",
-            "CLAUDE_CONFIG_DIR",
+            "ANTHROPIC_PROFILE",
             "CLAUDE_CODE_SIMPLE",
         }
         & environment.keys()
     )
+
+
+def test_only_sylvias_installed_copy_is_found(tmp_path, monkeypatch):
+    name = _claude_runtime.executable_name()
+    elsewhere = tmp_path / "person" / ".local" / "bin"
+    elsewhere.mkdir(parents=True)
+    (elsewhere / name).write_bytes(b"the person's own Claude Code")
+    monkeypatch.setenv("PATH", str(elsewhere))
+    monkeypatch.setenv("USERPROFILE", str(tmp_path / "person"))
+    monkeypatch.setenv("HOME", str(tmp_path / "person"))
+    home = tmp_path / "claude-runtime"
+    assert _claude_runtime.find_runtime(home) is None
+    for folder in ["2.1.322", "2.1.1000", "2.1.999.partial", "notes"]:
+        (home / "install" / folder).mkdir(parents=True)
+        (home / "install" / folder / name).write_bytes(b"copy")
+    assert _claude_runtime.find_runtime(home) == home / "install" / "2.1.1000" / name
+
+
+def test_missing_copy_asks_for_setup_instead_of_using_another(tmp_path):
+    adapter = ClaudeProvider(tmp_path / "runtime", model())
+    with pytest.raises(ProviderConnectionError, match="Set up Claude Code for Sylvia"):
+        asyncio.run(adapter.generate([{"role": "user", "content": "Check"}]))
 
 
 @pytest.mark.parametrize("version", ["2.1.100 (Claude Code)", "not an official runtime"])
@@ -398,7 +429,7 @@ def test_unsupported_runtime_is_not_used(monkeypatch, version):
         subprocess, "run", lambda *a, **k: subprocess.CompletedProcess(a, 0, version, "")
     )
     with pytest.raises(ProviderConnectionError):
-        _claude_runtime.runtime_version(Path(sys.executable))
+        _claude_runtime.runtime_version(Path(sys.executable), Path("runtime"))
 
 
 def test_status_discards_private_fields(monkeypatch):
@@ -420,15 +451,16 @@ def test_status_discards_private_fields(monkeypatch):
             "",
         ),
     )
-    assert _claude_runtime.authentication_status(Path(sys.executable)) == {
+    assert _claude_runtime.authentication_status(Path(sys.executable), Path("runtime")) == {
         "signed_in": True,
         "auth_method": "claude.ai",
         "billing": "subscription",
     }
 
 
-def test_native_login_and_cancel_preserve_auth_choices_and_other_sessions(tmp_path, monkeypatch):
+def test_native_login_cancel_and_logout_stay_in_sylvias_profile(tmp_path, monkeypatch):
     commands = []
+    environments = []
 
     class LoginChild:
         ended = False
@@ -446,21 +478,28 @@ def test_native_login_and_cancel_preserve_auth_choices_and_other_sessions(tmp_pa
 
     def launch(command, **options):
         commands.append(command)
+        environments.append(options["env"])
         assert options["stdin"] == options["stdout"] == options["stderr"] == subprocess.DEVNULL
         return child
 
+    def run(command, **options):
+        commands.append(command)
+        environments.append(options["env"])
+        return subprocess.CompletedProcess(command, 0)
+
     monkeypatch.setattr(claude_settings, "find_runtime", lambda _: Path(sys.executable))
-    monkeypatch.setattr(claude_settings, "runtime_version", lambda _: "2.1.322")
+    monkeypatch.setattr(claude_settings, "runtime_version", lambda *_: "2.1.322")
     monkeypatch.setattr(
         claude_settings,
         "authentication_status",
-        lambda _: {
+        lambda *_: {
             "signed_in": False,
             "auth_method": "none",
             "billing": "unknown",
         },
     )
     monkeypatch.setattr(subprocess, "Popen", launch)
+    monkeypatch.setattr(subprocess, "run", run)
     pending = claude_settings.claude_settings_action(tmp_path, "login", {"account_type": "api"})
     assert pending["login_pending"] is True
     assert commands[0][-3:] == ["auth", "login", "--console"]
@@ -468,6 +507,21 @@ def test_native_login_and_cancel_preserve_auth_choices_and_other_sessions(tmp_pa
     cancelled = claude_settings.claude_settings_action(tmp_path, "cancel")
     assert cancelled["login_pending"] is False and child.ended
     assert len(commands) == 1 and not (tmp_path / "config.yaml").exists()
+    claude_settings.claude_settings_action(tmp_path, "logout")
+    assert commands[1][-2:] == ["auth", "logout"]
+    profile = str(tmp_path.resolve() / "claude-runtime" / "profile")
+    assert [e["CLAUDE_CONFIG_DIR"] for e in environments] == [profile, profile]
+    with pytest.raises(ProviderConnectionError, match="options are invalid"):
+        claude_settings.claude_settings_action(tmp_path, "status", {"executable": sys.executable})
+
+
+def test_setup_is_required_before_sign_in_or_models(tmp_path):
+    status = claude_settings.claude_settings_action(tmp_path, "status")
+    assert status["installed"] is False and status["install"]["state"] == "idle"
+    assert "own copy of Claude Code" in status["message"]
+    for action in ["login", "logout", "add_model"]:
+        with pytest.raises(ProviderConnectionError, match="own copy of Claude Code"):
+            claude_settings.claude_settings_action(tmp_path, action)
 
 
 def test_cancelling_a_waiting_native_stream_collects_the_child(tmp_path, monkeypatch):
@@ -481,13 +535,13 @@ def test_cancelling_a_waiting_native_stream_collects_the_child(tmp_path, monkeyp
     )
     connections = []
 
-    def factory(executable, workspace, arguments):
-        connection = ClaudeConnection(Path(sys.executable), workspace, [str(script)])
+    def factory(executable, workspace, arguments, environment):
+        connection = ClaudeConnection(Path(sys.executable), workspace, [str(script)], environment)
         connections.append(connection)
         return connection
 
     monkeypatch.setattr(_claude, "find_runtime", lambda _: Path(sys.executable))
-    monkeypatch.setattr(_claude, "runtime_version", lambda _: "2.1.322")
+    monkeypatch.setattr(_claude, "runtime_version", lambda *_: "2.1.322")
     adapter = ClaudeProvider(tmp_path / "runtime", model(), connection_factory=factory)
 
     async def cancel():
@@ -507,11 +561,11 @@ def test_cancelling_a_waiting_native_stream_collects_the_child(tmp_path, monkeyp
 
 def test_setup_saves_separate_runtime_and_resolves_after_reopen(tmp_path, monkeypatch):
     monkeypatch.setattr(claude_settings, "find_runtime", lambda _: Path(sys.executable))
-    monkeypatch.setattr(claude_settings, "runtime_version", lambda _: "2.1.322")
+    monkeypatch.setattr(claude_settings, "runtime_version", lambda *_: "2.1.322")
     monkeypatch.setattr(
         claude_settings,
         "authentication_status",
-        lambda _: {
+        lambda *_: {
             "signed_in": True,
             "auth_method": "claude.ai",
             "billing": "subscription",
@@ -532,6 +586,7 @@ def test_setup_saves_separate_runtime_and_resolves_after_reopen(tmp_path, monkey
     settings = provider_settings(tmp_path / "config.yaml")
     assert settings["configured"][0]["preset_id"] == "claude_runtime"
     assert settings["configured"][0]["credential_configured"] is False
+    assert "executable" not in (tmp_path / "config.yaml").read_text(encoding="utf-8")
     resolver = ConfiguredProviderResolver(tmp_path / "config.yaml")
     choice = resolver.model_choices()[0]
     assert choice["output_budget_mode"] == "runtime_managed"
@@ -586,7 +641,7 @@ def test_owned_process_cancellation_does_not_touch_unrelated_process(tmp_path):
     script = tmp_path / "runtime.py"
     script.write_text("import time\ntime.sleep(60)\n", encoding="utf-8")
     other = subprocess.Popen([sys.executable, str(script)], **_claude_runtime.process_options())
-    connection = ClaudeConnection(Path(sys.executable), tmp_path, [str(script)])
+    connection = ClaudeConnection(Path(sys.executable), tmp_path, [str(script)], dict(os.environ))
     try:
         connection.start()
         process = connection._process
@@ -602,7 +657,7 @@ def test_owned_process_cancellation_does_not_touch_unrelated_process(tmp_path):
 def test_malformed_native_process_stream_is_rejected(tmp_path):
     script = tmp_path / "runtime.py"
     script.write_text("print('not JSON', flush=True)\n", encoding="utf-8")
-    connection = ClaudeConnection(Path(sys.executable), tmp_path, [str(script)])
+    connection = ClaudeConnection(Path(sys.executable), tmp_path, [str(script)], dict(os.environ))
     try:
         connection.start()
         with pytest.raises(InvalidResponseError):
@@ -693,7 +748,7 @@ def test_game_tool_commit_survives_interruption_and_reopen(tmp_path, monkeypatch
                 self.events = iter([ProviderTimeoutError("Synthetic narration interruption")])
 
     monkeypatch.setattr(_claude, "find_runtime", lambda _: Path(sys.executable))
-    monkeypatch.setattr(_claude, "runtime_version", lambda _: "2.1.322")
+    monkeypatch.setattr(_claude, "runtime_version", lambda *_: "2.1.322")
     database = tmp_path / "campaign.sqlite3"
     calls = []
     with AuthorityOwner.open(database, "owner-claude", disconnect_grace_seconds=1.0) as owner:

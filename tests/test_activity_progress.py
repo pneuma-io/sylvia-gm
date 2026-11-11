@@ -95,7 +95,7 @@ def test_builder_runner_reports_actual_provider_and_tool_boundaries(tmp_path, st
 
     async def run():
         if streaming:
-            await runner.turn_stream("Read the notes.", asyncio.Queue(), retry_on_length=False)
+            await runner.turn_stream("Read the notes.", asyncio.Queue())
         else:
             await runner.turn("Read the notes.")
 

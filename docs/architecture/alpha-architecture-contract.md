@@ -1149,10 +1149,18 @@ compatible configuration may be saved with an honest warning rather than misrepr
 agent-capable. Saving or removing a provider atomically rebuilds the in-memory provider resolver so
 model choices update without restarting the application.
 
-The `claude_runtime` provider uses the distinct `claude_code` transport. The owner selects the
-unmodified native executable and invokes its native authentication/status flow. No OAuth client,
+The `claude_runtime` provider uses the distinct `claude_code` transport. The owner keeps its own
+unmodified copy under `claude-runtime/install/<version>/` in the owner data directory and resolves
+only that copy; `PATH`, `~/.local` and saved executable paths are never consulted.
+`provider/_claude_install.py` downloads Anthropic's published binary on request and keeps it only
+after the manifest checksum, the Windows code signature (`Anthropic, PBC`) and the reported
+version all match. Setup moves through the `InstallState` table beside it. Every native process
+receives `CLAUDE_CONFIG_DIR`, `ANTHROPIC_CONFIG_DIR` and `CLAUDE_CODE_TMPDIR` inside
+`claude-runtime/`, with Claude Code's own updater disabled, so settings, sessions and sign-in
+stay separate from any other Claude Code on the computer. The owner invokes the binary's native
+authentication, status and sign-out flow. No OAuth client,
 credential-file reader or subscription-token storage is part of Sylvia. Only native-reported safe
-account fields reach the renderer. Cancelling sign-in does not log out unrelated native sessions.
+account fields reach the renderer. Cancelling sign-in or signing out affects Sylvia's profile only.
 Direct Anthropic API configuration remains separate, and native inference accepts no Sylvia API
 credentials or automatic fallback chain.
 
@@ -1172,6 +1180,7 @@ player speech. Native resume framing also remains outside canonical history. Ful
 the `claude_code_boundary` and labels downstream model input as not exposed. Output and native
 reasoning controls are runtime-managed; unknown account limits and CLI price estimates are not
 invented as usage facts. [Implementation evidence and limits](../research/claude-native-runtime-2026-11-11.md)
+and the [dedicated copy's setup and isolation](../research/claude-dedicated-instance-2026-11-12.md)
 remain separate from genuine-account and installed-app qualification.
 
 Saved API keys and private request headers use current-user Windows DPAPI at the owner-local
@@ -1323,6 +1332,20 @@ fragments also fit conservative admission. These are tuning defaults for the def
 Provider errors distinguish actual overflow, requested compaction and explicitly reported output
 exhaustion; unreported subscription limits remain unknown. Recovery resumes unresolved work without
 automatic provider fallback or replay after visible output.
+
+The Builder tool loop has no total-round cutoff. A loop guard ends a turn that has stopped making
+progress: three consecutive identical rounds in which every call failed, six consecutive rounds with
+identical calls and results, three failed reads of one selected source, or a structurally unreadable
+source. Stop, the Builder question tool and provider errors end the turn as before, and each
+further steering pass requires new player steering. When a Builder response reports output
+exhaustion, the loop keeps the readable text as an assistant message, executes none of that
+response's tool calls, saves no native continuation for it and appends a labelled
+`SYLVIA_GM_BUILDER_CONTINUE` user-role envelope, because Messages transports need a conversation
+turn after assistant text. The envelope is application-owned projection data: it is never saved as a
+player message and does not displace the latest player request during compaction. The loop
+continues up to three exhausted responses in a row; a fourth fails the turn with the output-limit
+error, and a completed response resets the count. The saved Builder outcome carries a reason code
+for each of these stops.
 
 For a structured DM session, the owner builds one knowledge catalog from the accepted Campaign
 Plan and its exact contained Campaign Setting. The optional fixed Setting artifact

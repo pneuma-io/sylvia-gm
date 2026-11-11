@@ -116,18 +116,26 @@ current provider compatibility and exact-candidate acceptance remain separate fr
 OpenAI API-key authentication remains supported. Additional provider sign-ins need their own
 supported route; undocumented subscription-token extraction is not selected.
 
-The selected Claude account route uses the user's installed, unmodified official Claude Code
-executable. Settings > Accounts provides installation checking, native sign-in/cancel and manual
-model registration. The binary owns authentication; Sylvia never implements Claude.ai OAuth or
+The selected Claude account route uses Sylvia's own copy of the unmodified official Claude Code
+executable (version 0.5 requirement, 12 November 2026). Settings > Accounts downloads that copy
+from Anthropic's release channel, checks Anthropic's published checksum and Windows code
+signature, and provides sign-in, cancel, sign-out and manual model registration. The copy, its
+profile and its sign-in stay in the owner data directory; Sylvia never uses, replaces or changes
+a Claude Code the person already has, and no setting selects another executable. The binary owns
+authentication; Sylvia never implements Claude.ai OAuth or
 reads, copies or stores subscription tokens. Native subscription and separately selected Console
 billing remain distinct from the existing Anthropic API-key provider, with no silent fallback.
 Sylvia owns canonical GM/Builder history and executes validated game tools. It stops each native
 inference step before returning an admitted tool request to its normal game loop. Native-runtime
 processes are an explicit exception to the local inference-server lifecycle paragraph above.
 Missing/old runtimes, unavailable models, expired sign-in and quota failures retain saved work and
-give explicit outcomes. No automatic install/update, shared subscription service or Portal route
-is included. A source PR and synthetic/native-protocol checks do not establish genuine-account
-or installed-release acceptance. See the [native runtime evidence and setup guide](../research/claude-native-runtime-2026-11-11.md).
+give explicit outcomes. Sylvia does not bundle or redistribute Claude Code and updates its copy
+only when the person asks; Claude Code's own installer and updater are never run. No shared
+subscription service or Portal route is included. Automatic setup is Windows only. Agreeing to
+Anthropic's terms for products that run Claude Code remains an owner decision before release.
+A source PR and synthetic/native-protocol checks do not establish genuine-account
+or installed-release acceptance. See the [setup, terms and evidence note](../research/claude-dedicated-instance-2026-11-12.md)
+and the earlier [native runtime evidence](../research/claude-native-runtime-2026-11-11.md).
 
 ### 1.1 Release gates
 
@@ -895,6 +903,17 @@ overflow. Other transports retain pre-send fit checks with authoritative countin
 Exact counts are claimed only from authoritative usage or a supported authoritative counter; estimates
 and unavailable runtime controls remain visibly distinguished. Runtime rejection or a request for
 compaction preserves work and uses the explicit working-context recovery path, with no model fallback.
+
+A Builder turn keeps working until the request is done, as coding agents such as Codex do. There is
+no limit on the number of tool rounds and the player is never asked to send a message merely to let
+unfinished work carry on. The turn ends when the Builder finishes, asks the player a question, the
+player presses Stop, the provider fails, or the Builder has plainly stopped making progress: the
+same step repeated without change, or a selected source that cannot be read. When a Builder response
+is cut off by its response limit, Sylvia keeps the text already shown, runs none of that response's
+tool calls and has the model continue in smaller steps within the same turn. It does this up to
+three times in a row; a fourth cut-off in a row ends the turn with an explanation. Every stop keeps
+saved work and says why it stopped. This is continuation of the same request with the same model,
+not a retry of a failed request or a provider switch, and the GM rule below is unchanged.
 
 - readable reasoning supplied by the provider is saved with its turn and available only through a
   separately collapsed Thinking entry inside the activity group. Opening activity does not reveal

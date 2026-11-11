@@ -10,7 +10,7 @@ import queue
 import re
 from collections.abc import AsyncIterator, Callable, Mapping, Sequence
 from concurrent.futures import Future
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any
 from uuid import uuid4
 
@@ -567,6 +567,9 @@ class WorkingContextProvider(Provider):
                         if chunk.finish_reason == "context_length":
                             raise TokenLimitError.provider_rejection()
                         if chunk.finish_reason in {"length", "max_tokens"}:
+                            # Some transports send their last output with the cut-off signal.
+                            if chunk.content or chunk.reasoning_content or chunk.tool_call_delta:
+                                yield replace(chunk, finish_reason=None)
                             raise ProviderOutputLimitError("The model reached its response limit")
                         emitted = emitted or bool(
                             chunk.content or chunk.reasoning_content or chunk.tool_call_delta

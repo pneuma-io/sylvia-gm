@@ -14,6 +14,16 @@ the branches meet. Their desktop/native, merge and release qualifications contin
 
 ## 1. Current work
 
+**12 November 2026: Sylvia's own copy of Claude Code.** The owner selected a PR for the
+version 0.5 requirement on Dot Desk item `749794ae-d27b-458e-b0d1-8578d66e9a1b`: a dedicated,
+unmodified Claude Code installation, profile and sign-in provided by Sylvia setup. Settings now
+downloads Anthropic's published binary into the owner data directory, checks its checksum and
+Windows code signature, and runs it with its own profile. The earlier executable selection and
+use of an existing sign-in are removed. Local installer, real-binary, runtime and Settings checks
+qualify the source change; packaged desktop acceptance, release and Anthropic's terms for
+products remain separate. The ChatGPT connection still needs the separately installed Codex
+runtime. [Setup, terms and evidence](../research/claude-dedicated-instance-2026-11-12.md).
+
 **11 November 2026: user-owned Claude runtime.** The owner selected a new PR for the existing
 Dot Desk item `a420042f-c625-4f6e-aaa6-942519eaaa44`, including the future SylviaBench use of
 his own subscription. The implementation adds native executable/authentication controls, a separate
