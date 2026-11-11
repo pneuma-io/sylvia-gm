@@ -5836,6 +5836,186 @@
         "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Vesper from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin, eyes, hair, spectacles where present, clothing, equipment, colors and wear. Appearance: An adult settled Human woman appearing in her late sixties, with a compact medium build, warm light olive skin, dark green-brown eyes, a narrow gently lined face and silver-gray hair neatly secured in a low bun. Plain rectangular bronze-rim reading spectacles with clear lenses and visible eyes. A quiet precise attentive expression and composed careful posture. A well-kept muted sage wool cardigan-jacket over a cream high-collared blouse, a plain rust-brown ankle-length skirt and practical dark brown leather shoes. A simple narrow leather belt carries one small closed pouch; empty relaxed hands. Her experienced librarian's care and precision follow the authored profile; age, features, spectacles and clothing are editable visual defaults. No invented Athenaeum insignia, hidden research, forbidden notes, readable book or document, keys to dangerous shelves, magical effects, invented history, uniform from another setting or revealing private knowledge. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views; entire hair, hands, footwear and equipment within all margins. The same single character repeated as turnaround views. Keep bags, pouches and clothing fastenings on the same anatomical sides through the turn. Change viewing angle only, keeping costume and identity. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, extra characters or revealed secrets.",
         "portrait": "Use case: identity-preserve. Production square app portrait for Vesper from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, skin, eyes, hairstyle, expression, spectacles where present and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, border, caption, text, UI, scenery, new costume, magical effects, invented crest, animal or extra person. One 1024x1024 PNG."
       }
+    },
+    {
+      "id": "severed-npc-margin-herbalist",
+      "name": "Briar",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/margin-herbalist.md",
+          "sha256": "9677ca6cf09d7aca515c7b0fb8e6bdce13e228b5d007ac07674d624a78550803",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/margin-herbalist.md",
+          "sha256": "6afa255fe2f08fc864f0b82046d0920e81ba54cbbe4c546a8d0d009fc95e4b4a",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult settled Human woman appearing in her late thirties, with a sturdy wiry working build, warm brown skin, faint freckles over a broad nose, hazel-brown eyes and thick dark brown hair secured in one practical braid down her back. An alert, grounded, matter-of-fact expression and relaxed balanced stance. A weathered muted moss-green short hooded wool cape with the hood DOWN, over a brown linen waistcoat and beige shirt with rolled sleeves, dark earth-brown trousers and muddy sturdy leather ankle boots. A closed plain canvas foraging bag hangs at her anatomical LEFT hip from a strap over her RIGHT shoulder; a small closed leather pouch sits at her opposite hip. Both hands relaxed and empty. Her practical independent borderland-forager bearing follows the authored profile; age, physical features and clothing are editable visual defaults. No Scaled anatomy, druid costume, antlers, floral crown, deep-forest affiliation, invented emblem, glowing herbs, magical effects, weapon, animal companion, invented scars, transformed skin or invented forest powers.",
+        "full_body": {
+          "path": "assets/characters/59c0f419a8995c9176eba7349728e39f683bb544fd161cf39f1bbd0e2210d42a.png",
+          "sha256": "59c0f419a8995c9176eba7349728e39f683bb544fd161cf39f1bbd0e2210d42a"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/80fff7c7d2722036e4e1797aee1256021c7d81589bd54b9f37b74e369e658c39.png",
+          "sha256": "80fff7c7d2722036e4e1797aee1256021c7d81589bd54b9f37b74e369e658c39"
+        },
+        "portrait": {
+          "path": "assets/characters/90ff44bee1f075fa16efdb3e25a8b4d1ca97361d07dbdca1560428eb9c9b5c4a.png",
+          "sha256": "90ff44bee1f075fa16efdb3e25a8b4d1ca97361d07dbdca1560428eb9c9b5c4a"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1962491
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2394736
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2548013
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Briar in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person in a near-front three-quarter standing pose. Whole hair, both hands, clothing, footwear and equipment comfortably inside all margins. Appearance: An adult settled Human woman appearing in her late thirties, with a sturdy wiry working build, warm brown skin, faint freckles over a broad nose, hazel-brown eyes and thick dark brown hair secured in one practical braid down her back. An alert, grounded, matter-of-fact expression and relaxed balanced stance. A weathered muted moss-green short hooded wool cape with the hood DOWN, over a brown linen waistcoat and beige shirt with rolled sleeves, dark earth-brown trousers and muddy sturdy leather ankle boots. A closed plain canvas foraging bag hangs at her anatomical LEFT hip from a strap over her RIGHT shoulder; a small closed leather pouch sits at her opposite hip. Both hands relaxed and empty. Her practical independent borderland-forager bearing follows the authored profile; age, physical features and clothing are editable visual defaults. No Scaled anatomy, druid costume, antlers, floral crown, deep-forest affiliation, invented emblem, glowing herbs, magical effects, weapon, animal companion, invented scars, transformed skin or invented forest powers. Preserve authored identity, species, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Briar from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin, eyes, hair, clothing, equipment, colors and wear. Appearance: An adult settled Human woman appearing in her late thirties, with a sturdy wiry working build, warm brown skin, faint freckles over a broad nose, hazel-brown eyes and thick dark brown hair secured in one practical braid down her back. An alert, grounded, matter-of-fact expression and relaxed balanced stance. A weathered muted moss-green short hooded wool cape with the hood DOWN, over a brown linen waistcoat and beige shirt with rolled sleeves, dark earth-brown trousers and muddy sturdy leather ankle boots. A closed plain canvas foraging bag hangs at her anatomical LEFT hip from a strap over her RIGHT shoulder; a small closed leather pouch sits at her opposite hip. Both hands relaxed and empty. Her practical independent borderland-forager bearing follows the authored profile; age, physical features and clothing are editable visual defaults. No Scaled anatomy, druid costume, antlers, floral crown, deep-forest affiliation, invented emblem, glowing herbs, magical effects, weapon, animal companion, invented scars, transformed skin or invented forest powers. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views; entire hair, hands, footwear and equipment within all margins. The same single character repeated as turnaround views. Keep bags, pouches, braid, clothing fastenings and hair details on the same anatomical sides through the turn. Briar's foraging bag, where present, stays on anatomical LEFT with the strap over RIGHT shoulder and hood down. Change viewing angle only, keeping costume and identity. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, extra characters or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Briar from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, skin, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, border, caption, text, UI, scenery, new costume, magical effects, invented crest, animal or extra person. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-market-barker-kestrel",
+      "name": "Kestrel",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/market-barker-kestrel.md",
+          "sha256": "fbffa52bd5f5f5513fdbd86b2f130a1ccd78997ce8888905e429bbc1dc0a05cb",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/market-barker-kestrel.md",
+          "sha256": "bb07201ab0bbd6989a713d1a1cfa341abfbc19271571879bd20cbb4887d9656a",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult settled Human woman appearing in her late forties, with a compact energetic build, rich medium-brown skin, dark green-brown eyes, a round expressive face and tightly curled auburn-brown hair pinned into a tidy high updo. A sharp, theatrical, confident expression with a lively raised eyebrow and poised commanding stance. A well-kept deep burgundy long waistcoat over a cream puff-sleeved linen blouse, charcoal tailored trousers and polished dark burgundy leather ankle boots. A plain narrow leather belt carries one small closed pouch; a simple brass pin fastens the waistcoat without any emblem. Both hands relaxed and empty. Her experienced controlled auctioneer's bearing follows the authored profile; age, physical features and clothing are editable visual defaults. No bird anatomy, feathers, falcon, invented faction insignia, noble crest, crown, auction lot, stolen or magical artifact, readable ledger, gavel, microphone, futuristic clothing, magical effects or invented secret history.",
+        "full_body": {
+          "path": "assets/characters/a42c9232b472ddf1e4f406fae665a7141132618a8b9f88ff3dfc3563f36c6d48.png",
+          "sha256": "a42c9232b472ddf1e4f406fae665a7141132618a8b9f88ff3dfc3563f36c6d48"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/7c2501c539c4c67d0a9293318d31598871e703cc80eb39311747848a50df7647.png",
+          "sha256": "7c2501c539c4c67d0a9293318d31598871e703cc80eb39311747848a50df7647"
+        },
+        "portrait": {
+          "path": "assets/characters/f499e701c49a64bc500d025ff227108d82fe5bdbe865f07d7181e33bdb138cf8.png",
+          "sha256": "f499e701c49a64bc500d025ff227108d82fe5bdbe865f07d7181e33bdb138cf8"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2018928
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2311079
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2583560
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Kestrel in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person in a near-front three-quarter standing pose. Whole hair, both hands, clothing, footwear and equipment comfortably inside all margins. Appearance: An adult settled Human woman appearing in her late forties, with a compact energetic build, rich medium-brown skin, dark green-brown eyes, a round expressive face and tightly curled auburn-brown hair pinned into a tidy high updo. A sharp, theatrical, confident expression with a lively raised eyebrow and poised commanding stance. A well-kept deep burgundy long waistcoat over a cream puff-sleeved linen blouse, charcoal tailored trousers and polished dark burgundy leather ankle boots. A plain narrow leather belt carries one small closed pouch; a simple brass pin fastens the waistcoat without any emblem. Both hands relaxed and empty. Her experienced controlled auctioneer's bearing follows the authored profile; age, physical features and clothing are editable visual defaults. No bird anatomy, feathers, falcon, invented faction insignia, noble crest, crown, auction lot, stolen or magical artifact, readable ledger, gavel, microphone, futuristic clothing, magical effects or invented secret history. Preserve authored identity, species, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Kestrel from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin, eyes, hair, clothing, equipment, colors and wear. Appearance: An adult settled Human woman appearing in her late forties, with a compact energetic build, rich medium-brown skin, dark green-brown eyes, a round expressive face and tightly curled auburn-brown hair pinned into a tidy high updo. A sharp, theatrical, confident expression with a lively raised eyebrow and poised commanding stance. A well-kept deep burgundy long waistcoat over a cream puff-sleeved linen blouse, charcoal tailored trousers and polished dark burgundy leather ankle boots. A plain narrow leather belt carries one small closed pouch; a simple brass pin fastens the waistcoat without any emblem. Both hands relaxed and empty. Her experienced controlled auctioneer's bearing follows the authored profile; age, physical features and clothing are editable visual defaults. No bird anatomy, feathers, falcon, invented faction insignia, noble crest, crown, auction lot, stolen or magical artifact, readable ledger, gavel, microphone, futuristic clothing, magical effects or invented secret history. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views; entire hair, hands, footwear and equipment within all margins. The same single character repeated as turnaround views. Keep bags, pouches, braid, clothing fastenings and hair details on the same anatomical sides through the turn. Change viewing angle only, keeping costume and identity. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, extra characters or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Kestrel from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, skin, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, border, caption, text, UI, scenery, new costume, magical effects, invented crest, animal or extra person. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-nexus-guildmaster",
+      "name": "Guildmaster Vance",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/nexus-guildmaster.md",
+          "sha256": "6eab9317c46350f063ee63dedfd2527a2c83a629693333e0292c2366e4f470e6",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/nexus-guildmaster.md",
+          "sha256": "9d5fc891a7dcce702df0a293f383e0a267d1fbded7f600a5b20b7a5cea9db930",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "An adult settled Human man appearing in his early sixties, with a stocky well-fed build, light olive skin, dark brown eyes, a broad lined clean-shaven face and short sleek black hair graying at the temples and combed neatly back. A smooth, calculating, courteous expression with a restrained half-smile and assured upright posture. A finely made dark bottle-green wool frock coat with plain bronze buttons, over a muted ochre waistcoat and cream high-collared shirt, blue-gray tailored trousers and polished dark brown leather shoes. A simple dark leather belt supports one small closed pouch. Empty relaxed hands. His polished experienced merchant's bearing follows the authored profile; age, physical features and exact clothing are editable visual defaults. No council regalia, elected-office badge, noble heraldry, invented guild emblem, crown, contract, map, ledger, tariff scheme, magical effects, threatening villain pose or disclosure of private negotiations.",
+        "full_body": {
+          "path": "assets/characters/cebaeebfc573bb9b1a2a6282b5abe91d6d7f6c18078aca05bdbbd60e84f5ff80.png",
+          "sha256": "cebaeebfc573bb9b1a2a6282b5abe91d6d7f6c18078aca05bdbbd60e84f5ff80"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/32b1e3347819f4ee086defaf57cb340c2e5f026043800dcf59ac65241e0e4590.png",
+          "sha256": "32b1e3347819f4ee086defaf57cb340c2e5f026043800dcf59ac65241e0e4590"
+        },
+        "portrait": {
+          "path": "assets/characters/e1a2834873c1691fce0ebb6de1b7ff3d3ae42023b059e08a29473cd18bb4a834.png",
+          "sha256": "e1a2834873c1691fce0ebb6de1b7ff3d3ae42023b059e08a29473cd18bb4a834"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1982986
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2275717
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2464027
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for Guildmaster Vance in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile skin, cloth and worn materials, plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person in a near-front three-quarter standing pose. Whole hair, both hands, clothing, footwear and equipment comfortably inside all margins. Appearance: An adult settled Human man appearing in his early sixties, with a stocky well-fed build, light olive skin, dark brown eyes, a broad lined clean-shaven face and short sleek black hair graying at the temples and combed neatly back. A smooth, calculating, courteous expression with a restrained half-smile and assured upright posture. A finely made dark bottle-green wool frock coat with plain bronze buttons, over a muted ochre waistcoat and cream high-collared shirt, blue-gray tailored trousers and polished dark brown leather shoes. A simple dark leather belt supports one small closed pouch. Empty relaxed hands. His polished experienced merchant's bearing follows the authored profile; age, physical features and exact clothing are editable visual defaults. No council regalia, elected-office badge, noble heraldry, invented guild emblem, crown, contract, map, ledger, tariff scheme, magical effects, threatening villain pose or disclosure of private negotiations. Preserve authored identity, species, personality and pronouns. No extra people, duplicate limbs, animals, scenery, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Guildmaster Vance from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin, eyes, hair, clothing, equipment, colors and wear. Appearance: An adult settled Human man appearing in his early sixties, with a stocky well-fed build, light olive skin, dark brown eyes, a broad lined clean-shaven face and short sleek black hair graying at the temples and combed neatly back. A smooth, calculating, courteous expression with a restrained half-smile and assured upright posture. A finely made dark bottle-green wool frock coat with plain bronze buttons, over a muted ochre waistcoat and cream high-collared shirt, blue-gray tailored trousers and polished dark brown leather shoes. A simple dark leather belt supports one small closed pouch. Empty relaxed hands. His polished experienced merchant's bearing follows the authored profile; age, physical features and exact clothing are editable visual defaults. No council regalia, elected-office badge, noble heraldry, invented guild emblem, crown, contract, map, ledger, tariff scheme, magical effects, threatening villain pose or disclosure of private negotiations. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views; entire hair, hands, footwear and equipment within all margins. The same single character repeated as turnaround views. Keep bags, pouches, braid, clothing fastenings and hair details on the same anatomical sides through the turn. Change viewing angle only, keeping costume and identity. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, extra characters or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for Guildmaster Vance from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, skin, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, border, caption, text, UI, scenery, new costume, magical effects, invented crest, animal or extra person. One 1024x1024 PNG."
+      }
     }
   ]
 }
