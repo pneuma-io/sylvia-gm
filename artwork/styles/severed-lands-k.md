@@ -89,6 +89,10 @@ the pictured person supplies neither terrain geometry nor compulsory night light
 6. Portrait: selected body and multiview first, style last. Keep the head centred and eye line
    around 40% of height where anatomy permits; keep the full head/hair silhouette inside margins.
    Save one adjustable crop for Map, Party and dialogue instead of altering the original images.
+   Retain the full square illustration and check a closer head crop at small avatar sizes.
+   The prepared cast uses approximately 1.5x zoom for visible faces and 1.4x with adjusted focal
+   points for the hood and two-headed hound. Choose framing per subject, preserving concealment
+   and every required head. Compare at 64 and 96 pixels before accepting the avatar crop.
 7. Edits: identify the target separately and retain selected canonical references. An explicit
    new-design experiment can start again from authored facts, then establish its new references.
 

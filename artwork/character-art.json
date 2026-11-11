@@ -688,8 +688,8 @@
         "appearance": "A concealed figure in a deep teal hooded cloak with ochre stitching and worn edges, a cream scarf and layered map-patterned ivory cloth panels. The raised hood's opening is featureless shadow-black, revealing no eyes, skin, face, mask, gender or species. Both hands remain gloved. Brown leather straps support clustered rolled map tubes and a right-side satchel; a rolled scroll is held at the chest. Dark practical boots and loose lower garments. The identity remains unknown in every view.",
         "frame": {
           "x": 0.5,
-          "y": 0.4,
-          "zoom": 1
+          "y": 0.35,
+          "zoom": 1.4
         },
         "full_body": {
           "path": "assets/characters/5d8d852a39d9600759f5333e11f3397a289aabb133cb3a55cf8fe1e5d7fdc25d.png",
@@ -978,8 +978,8 @@
         "appearance": "A mature Human man with light warm skin, a strong clean-shaven face, green-grey eyes and short tousled copper-red hair. Navy quilted and studded long guard tunic, engraved steel shoulder plates and forearm guards, muted red cloth over the right shoulder and down that side, brown belts, dark trousers and brown strapped boots. The sword stays sheathed at his left hip. Professional, watchful bearing; no helmet or additional insignia.",
         "frame": {
           "x": 0.5,
-          "y": 0.4,
-          "zoom": 1
+          "y": 0.35,
+          "zoom": 1.5
         },
         "full_body": {
           "path": "assets/characters/8f2f290cd552a3111dd2d499e9c728d53aa5672726d18b5f5e71b81e2ba1d4b1.png",
@@ -1262,8 +1262,8 @@
         "appearance": "An athletic, long-bodied four-legged hound with exactly two separate wolf-like heads on two necks joining one substantial canine chest and shoulder girdle. Dark charcoal and navy-black pelt, pale grey-brown muzzles, yellow-green eyes, tall triangular ears, strong grounded paws and one long bushy tail. The two heads watch at different angles, one held higher than the other. Broad parts of the necks, chest and flanks contain recessed blue and violet impossible interior depth: layered organic arch-like spaces recede farther than the intact living body could contain, edged by restrained blue and lime contours. Keep a convincing solid predator silhouette and living weight. These are spatial distortions within its anatomy, not literal masonry, wounds, exposed organs, machinery or detached ribbons. No collar, armor, extra heads or extra legs.",
         "frame": {
           "x": 0.5,
-          "y": 0.4,
-          "zoom": 1
+          "y": 0.35,
+          "zoom": 1.4
         },
         "full_body": {
           "path": "assets/characters/ed251f986771223104d15c00a2963da513e97c6ea401ef70e71fcf3e69b8a046.png",
@@ -1810,7 +1810,7 @@
         "frame": {
           "x": 0.5,
           "y": 0.4,
-          "zoom": 1
+          "zoom": 1.5
         },
         "full_body": {
           "path": "assets/characters/c2b3187410bae93589ca6c4bbca4ba6407a6e882b6953c40dff7c74986eeea95.png",
@@ -7131,7 +7131,7 @@
         "frame": {
           "x": 0.5,
           "y": 0.4,
-          "zoom": 1
+          "zoom": 1.5
         },
         "full_body": {
           "path": "assets/characters/5730eecd94e15c5872c1752de9a4ccc0a67dbe584595d5148848a46487781946.png",
