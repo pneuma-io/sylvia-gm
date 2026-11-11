@@ -37,3 +37,15 @@ A cloud giant whose floating citadel fell through the Rift intact, crashing into
 **Multiattack.** Two morningstar attacks.
 **Morningstar.** +12 to hit, 21 (3d8 + 8) piercing.
 **Rock.** +12 to hit, range 60/240 ft., 30 (4d10 + 8) bludgeoning.
+
+## Appearance and artwork
+
+One Huge Rift Cloud Giant in an editable anonymous mature adult female appearance: very tall broad-shouldered proportions, cool pale lavender-gray skin, a long proud angular face with high cheekbones, two silver-gray eyes and swept-back silver-white hair gathered in one thick braid. A composed aristocratic expression. Layered plain pearl-gray and muted lavender long robes, a simple silver waist clasp, a short draped shoulder mantle and sturdy pale leather boots, with both separate feet visible. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one long-handled morningstar low beside the body: a single solid iron spiked mace head on a rigid handle, no chain; the LEFT hand is open and empty. Restrained violet-tinted mist curls close to the hem without hiding the boots. The giant form, aristocratic bearing, cloud magic tinged with Veil energy and morningstar follow the authored source. This representative face, gender presentation, hair, clothes, palette and mist pattern are editable visual defaults, not the identity of a named survivor. No crown, named heraldry, fallen citadel, homeworld memory scene, floating landscape, extra beings, flail, wings or text.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/7193a8dab48260516f71a42ea0421b99d01b66295c91088b0053a72f8541dc0e.png)
+
+[Full-body reference](../../assets/characters/5cdf47ea4ab5cfacc769fb0b37e2be2e99c7aec5fcaa168f3e6a7ace54d0db1b.png)
+
+[Multiview reference sheet](../../assets/characters/f7d995fee984c35315c7226a68bbecc3ac29749edca4facf35e44ab036270c9d.png)

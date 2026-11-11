@@ -9178,6 +9178,402 @@
         "reference_sheet": "Use case: identity-preserve. Asset: production multiview reference sheet for Rift Ghost from Severed Lands. Input image1 is the selected canonical complete reference. Preserve its exact identity, anatomy or fungal/spectral form, materials, palette and source equipment. Appearance: One Medium Rift Ghost in an editable anonymous adult humanlike personality-imprint appearance, not a named character or a declared historical identity. A mature middle-aged face with a concerned preoccupied expression, mouth closed, two pale silver-gray eyes, short neat gray hair and light gray stubble. A complete upright hovering humanlike figure with exactly two arms, five fingers on each open relaxed hand, two separate legs and two soft boots. Cool gray-lavender translucent skin and muted slate-blue spectral clothing: a plain high-collared long-sleeved coat, simple waist belt and dark plain trousers. Clothing and lower limbs fade gently at their edges while the complete figure remains readable. The detailed personality-imprint and incorporeal hovering form follow authored source; anonymous features, outfit, colors and age styling are editable visual defaults. No elven ears, banshee wail, gown dissolving into a single tail, skeleton, chains, weapon, horror wound, actual death scene, possessed victim, aged victim, home-world memory, named identity, Rift pool, text or scenery. Landscape 1536x1024 PNG with three clearly separated COMPLETE front, side-profile and back views at consistent scale, plus a smaller close detail panel at far right. Match input's polished naturalistic digital RPG illustration, light neutral gray background and soft studio lighting. Every cap, flame, limb, claw, foot, tendril and hammer tip must be comfortably inside margins. Change viewing angle only. Preserve the same anonymous mature humanlike face, short neat gray hair/stubble, concerned expression, TWO arms/five-digit hands/TWO separate legs/boots, slate-blue high-collared coat/belt and softly translucent violet-gray edges. No new identity, banshee gown, single tail, elf ears or death scene. No labels, text, captions, logos, borders around the whole page, UI, scenery, extra entities or revealed history.",
         "portrait": "Use case: identity-preserve. Asset: production portrait for Rift Ghost from Severed Lands. Input image1 is the selected canonical complete reference; input image2 is the reviewed multiview sheet. Reframe the same selected subject for one portrait; retain its exact identity, anatomy, materials, colors and expression. Appearance: One Medium Rift Ghost in an editable anonymous adult humanlike personality-imprint appearance, not a named character or a declared historical identity. A mature middle-aged face with a concerned preoccupied expression, mouth closed, two pale silver-gray eyes, short neat gray hair and light gray stubble. A complete upright hovering humanlike figure with exactly two arms, five fingers on each open relaxed hand, two separate legs and two soft boots. Cool gray-lavender translucent skin and muted slate-blue spectral clothing: a plain high-collared long-sleeved coat, simple waist belt and dark plain trousers. Clothing and lower limbs fade gently at their edges while the complete figure remains readable. The detailed personality-imprint and incorporeal hovering form follow authored source; anonymous features, outfit, colors and age styling are editable visual defaults. No elven ears, banshee wail, gown dissolving into a single tail, skeleton, chains, weapon, horror wound, actual death scene, possessed victim, aged victim, home-world memory, named identity, Rift pool, text or scenery. Portrait framing overrides the complete-reference layout: Square 1024x1024 PNG: one near-front head-and-shoulders portrait, upper chest visible. Head centered x50%, eyes near35% from top, crown near10% and chin/beard comfortably within the lower half. Keep the entire head/ears/hair or flame crown inside a generous circular safe area. Do not draw a circle. Hands, feet and weapons stay outside this portrait. Preserve the same anonymous mature face, short neat gray hair/stubble, pale silver-gray eyes, concerned expression, translucent edging and slate-blue high collar. No invented named identity or banshee transformation. Match the references' polished naturalistic digital RPG illustration, plain light neutral gray full-bleed background and soft studio light. No labels, captions, logos, borders, UI, detail panels, scenery, additional beings or revealed history."
       }
+    },
+    {
+      "id": "severed-monster-rift-giant-cloud",
+      "name": "Rift Cloud Giant",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-giant-cloud.md",
+          "sha256": "934414da366de1b1bb26c47152e6e20be5fa7f47de1e78a2ca535ae823a7754f",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-giant-cloud.md",
+          "sha256": "c1f440a72044cef6ae89b127e1572787e7a54b09fbe932e355c4a8f0ee5cb0ba",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/cloud_giant",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Huge Rift Cloud Giant in an editable anonymous mature adult female appearance: very tall broad-shouldered proportions, cool pale lavender-gray skin, a long proud angular face with high cheekbones, two silver-gray eyes and swept-back silver-white hair gathered in one thick braid. A composed aristocratic expression. Layered plain pearl-gray and muted lavender long robes, a simple silver waist clasp, a short draped shoulder mantle and sturdy pale leather boots, with both separate feet visible. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one long-handled morningstar low beside the body: a single solid iron spiked mace head on a rigid handle, no chain; the LEFT hand is open and empty. Restrained violet-tinted mist curls close to the hem without hiding the boots. The giant form, aristocratic bearing, cloud magic tinged with Veil energy and morningstar follow the authored source. This representative face, gender presentation, hair, clothes, palette and mist pattern are editable visual defaults, not the identity of a named survivor. No crown, named heraldry, fallen citadel, homeworld memory scene, floating landscape, extra beings, flail, wings or text.",
+        "full_body": {
+          "path": "assets/characters/5cdf47ea4ab5cfacc769fb0b37e2be2e99c7aec5fcaa168f3e6a7ace54d0db1b.png",
+          "sha256": "5cdf47ea4ab5cfacc769fb0b37e2be2e99c7aec5fcaa168f3e6a7ace54d0db1b"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/f7d995fee984c35315c7226a68bbecc3ac29749edca4facf35e44ab036270c9d.png",
+          "sha256": "f7d995fee984c35315c7226a68bbecc3ac29749edca4facf35e44ab036270c9d"
+        },
+        "portrait": {
+          "path": "assets/characters/7193a8dab48260516f71a42ea0421b99d01b66295c91088b0053a72f8541dc0e.png",
+          "sha256": "7193a8dab48260516f71a42ea0421b99d01b66295c91088b0053a72f8541dc0e"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0,
+          "zoom": 1.6
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2062068
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2432341
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2617363
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical full-body enemy reference for Rift Cloud Giant in Sylvia GM's Severed Lands. Portrait-orientation 1024x1536 PNG, ONE complete single giant in a near-front three-quarter view, plain light neutral gray background, polished naturalistic digital RPG illustration matching a production character catalogue, soft studio lighting and restrained grounding shadow. Keep the complete hair, shoulders, cloak, both hands, weapon head/blade/tip and both feet comfortably inside all margins with real headroom and foot room. A relaxed standing reference pose, no attack scene. Appearance: One Huge Rift Cloud Giant in an editable anonymous mature adult female appearance: very tall broad-shouldered proportions, cool pale lavender-gray skin, a long proud angular face with high cheekbones, two silver-gray eyes and swept-back silver-white hair gathered in one thick braid. A composed aristocratic expression. Layered plain pearl-gray and muted lavender long robes, a simple silver waist clasp, a short draped shoulder mantle and sturdy pale leather boots, with both separate feet visible. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one long-handled morningstar low beside the body: a single solid iron spiked mace head on a rigid handle, no chain; the LEFT hand is open and empty. Restrained violet-tinted mist curls close to the hem without hiding the boots. The giant form, aristocratic bearing, cloud magic tinged with Veil energy and morningstar follow the authored source. This representative face, gender presentation, hair, clothes, palette and mist pattern are editable visual defaults, not the identity of a named survivor. No crown, named heraldry, fallen citadel, homeworld memory scene, floating landscape, extra beings, flail, wings or text. Preserve the specified anatomical weapon-hand side; no other weapons or extra limbs. No scale-reference people, environmental scenery, text, labels, captions, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Asset: production multiview character reference sheet for Rift Cloud Giant from Severed Lands. Input image1 is the selected canonical full-body reference. Make a landscape 1536x1024 PNG showing exactly THREE separated complete views of this SAME giant: front, side, back; include a narrow separate right-hand column of face, clothing/material and weapon detail insets. Keep every complete view inside generous margins, including complete hair, cloak, hands, full weapon head/blade/tip and both separate feet. Preserve the selected body's exact face, proportions, hair/braids, clothing/armor, colors and handedness across all views. Appearance: One Huge Rift Cloud Giant in an editable anonymous mature adult female appearance: very tall broad-shouldered proportions, cool pale lavender-gray skin, a long proud angular face with high cheekbones, two silver-gray eyes and swept-back silver-white hair gathered in one thick braid. A composed aristocratic expression. Layered plain pearl-gray and muted lavender long robes, a simple silver waist clasp, a short draped shoulder mantle and sturdy pale leather boots, with both separate feet visible. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one long-handled morningstar low beside the body: a single solid iron spiked mace head on a rigid handle, no chain; the LEFT hand is open and empty. Restrained violet-tinted mist curls close to the hem without hiding the boots. The giant form, aristocratic bearing, cloud magic tinged with Veil energy and morningstar follow the authored source. This representative face, gender presentation, hair, clothes, palette and mist pattern are editable visual defaults, not the identity of a named survivor. No crown, named heraldry, fallen citadel, homeworld memory scene, floating landscape, extra beings, flail, wings or text. The RIGHT hand retains the one specified weapon; the LEFT stays empty except the Storm Giant's selected local finger lightning. Do not mirror the weapon onto the other hand. Each complete figure has exactly two arms and two legs; do not add tools or equipment. Match the reference's polished naturalistic digital RPG illustration, soft studio light and plain light neutral gray background. No scenery, memory scene, extra beings, text, labels, captions, logos, borders or UI.",
+        "portrait": "Use case: identity-preserve. Asset: one reusable square 1024x1024 portrait of Rift Cloud Giant from Severed Lands. Input image1 is the selected canonical complete body; image2 is its reviewed multiview sheet. Keep the SAME selected face, apparent age, proportions, skin and eye colors, hair, expression and shoulder clothing. Reframe for a near-front HEAD-AND-SHOULDERS portrait at eye-level; portrait framing overrides the full-body reference layout. One centered head, upper chest visible, eyes near35% from the top, crown near10%, chin comfortably inside the lower half, generous room for complete head/ears/hair in a circular crop. No drawn circle. No hands, held weapons, feet or full-body figure in this portrait. Appearance reference: One Huge Rift Cloud Giant in an editable anonymous mature adult female appearance: very tall broad-shouldered proportions, cool pale lavender-gray skin, a long proud angular face with high cheekbones, two silver-gray eyes and swept-back silver-white hair gathered in one thick braid. A composed aristocratic expression. Layered plain pearl-gray and muted lavender long robes, a simple silver waist clasp, a short draped shoulder mantle and sturdy pale leather boots, with both separate feet visible. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one long-handled morningstar low beside the body: a single solid iron spiked mace head on a rigid handle, no chain; the LEFT hand is open and empty. Restrained violet-tinted mist curls close to the hem without hiding the boots. The giant form, aristocratic bearing, cloud magic tinged with Veil energy and morningstar follow the authored source. This representative face, gender presentation, hair, clothes, palette and mist pattern are editable visual defaults, not the identity of a named survivor. No crown, named heraldry, fallen citadel, homeworld memory scene, floating landscape, extra beings, flail, wings or text. Keep only the head/shoulder details relevant to this close portrait, without adding equipment, history or markings. Match the references' polished naturalistic digital RPG illustration, soft studio lighting and plain full-bleed light neutral gray background. No low-angle hero shot, named identity, scenery, extra beings, detail panels, labels, text, logos, borders or UI."
+      }
+    },
+    {
+      "id": "severed-monster-rift-giant-fire",
+      "name": "Rift Fire Giant",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-giant-fire.md",
+          "sha256": "34b88caf8f294228354a64b3a1a3c5827dd409a3f305800c413f59d992a7c33d",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-giant-fire.md",
+          "sha256": "01fb7d3a4ac2bda0e0bded5f60a763803dd2565cb24b04a20c5b69c50947d065",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/fire_giant",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Huge Rift Fire Giant in an editable anonymous mature adult male appearance: towering heavily muscled build, dark charcoal-gray intact skin with subdued warm ember undertones, a broad stern face, two copper-orange eyes, coarse short dark red hair and a thick short copper-red beard. Heavy plain blackened iron plate armor over charcoal fabric, articulated shoulder plates, a dark leather belt and complete heavy iron boots. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one enormous straight two-edged greatsword low with its complete blade and tip visible beside the body; the LEFT hand is open and empty. Sparse small violet Rift-energy flickers mingle with faint heat shimmer immediately above the armor and sword edge. The giant form, plate, greatsword, forge bearing, unnatural heat and Rift flickers follow authored source. Facial features, hair, exact armor construction and colors are editable visual defaults. No bronze dwarf body, flame hair/crown, forge/anvil scene, hammer replacing the sword, Rift pool, rune writing, crest, wounds, victim, additional beings or text.",
+        "full_body": {
+          "path": "assets/characters/1685eb01fd4d2dda27088685b304d96624017601ba90b00f82d3120b21a0c94c.png",
+          "sha256": "1685eb01fd4d2dda27088685b304d96624017601ba90b00f82d3120b21a0c94c"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/fd7a331d25f091f352c052ff5d5dc36f865a069373b303804b2f485771647606.png",
+          "sha256": "fd7a331d25f091f352c052ff5d5dc36f865a069373b303804b2f485771647606"
+        },
+        "portrait": {
+          "path": "assets/characters/b04bd0c3a50eb72c5cf378c7987e90b2bbaee02656857fe664ec65dc6db8eebc.png",
+          "sha256": "b04bd0c3a50eb72c5cf378c7987e90b2bbaee02656857fe664ec65dc6db8eebc"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0,
+          "zoom": 1.3
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2113680
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2376535
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2551321
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical full-body enemy reference for Rift Fire Giant in Sylvia GM's Severed Lands. Portrait-orientation 1024x1536 PNG, ONE complete single giant in a near-front three-quarter view, plain light neutral gray background, polished naturalistic digital RPG illustration matching a production character catalogue, soft studio lighting and restrained grounding shadow. Keep the complete hair, shoulders, cloak, both hands, weapon head/blade/tip and both feet comfortably inside all margins with real headroom and foot room. A relaxed standing reference pose, no attack scene. Appearance: One Huge Rift Fire Giant in an editable anonymous mature adult male appearance: towering heavily muscled build, dark charcoal-gray intact skin with subdued warm ember undertones, a broad stern face, two copper-orange eyes, coarse short dark red hair and a thick short copper-red beard. Heavy plain blackened iron plate armor over charcoal fabric, articulated shoulder plates, a dark leather belt and complete heavy iron boots. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one enormous straight two-edged greatsword low with its complete blade and tip visible beside the body; the LEFT hand is open and empty. Sparse small violet Rift-energy flickers mingle with faint heat shimmer immediately above the armor and sword edge. The giant form, plate, greatsword, forge bearing, unnatural heat and Rift flickers follow authored source. Facial features, hair, exact armor construction and colors are editable visual defaults. No bronze dwarf body, flame hair/crown, forge/anvil scene, hammer replacing the sword, Rift pool, rune writing, crest, wounds, victim, additional beings or text. Preserve the specified anatomical weapon-hand side; no other weapons or extra limbs. No scale-reference people, environmental scenery, text, labels, captions, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Asset: production multiview character reference sheet for Rift Fire Giant from Severed Lands. Input image1 is the selected canonical full-body reference. Make a landscape 1536x1024 PNG showing exactly THREE separated complete views of this SAME giant: front, side, back; include a narrow separate right-hand column of face, clothing/material and weapon detail insets. Keep every complete view inside generous margins, including complete hair, cloak, hands, full weapon head/blade/tip and both separate feet. Preserve the selected body's exact face, proportions, hair/braids, clothing/armor, colors and handedness across all views. Appearance: One Huge Rift Fire Giant in an editable anonymous mature adult male appearance: towering heavily muscled build, dark charcoal-gray intact skin with subdued warm ember undertones, a broad stern face, two copper-orange eyes, coarse short dark red hair and a thick short copper-red beard. Heavy plain blackened iron plate armor over charcoal fabric, articulated shoulder plates, a dark leather belt and complete heavy iron boots. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one enormous straight two-edged greatsword low with its complete blade and tip visible beside the body; the LEFT hand is open and empty. Sparse small violet Rift-energy flickers mingle with faint heat shimmer immediately above the armor and sword edge. The giant form, plate, greatsword, forge bearing, unnatural heat and Rift flickers follow authored source. Facial features, hair, exact armor construction and colors are editable visual defaults. No bronze dwarf body, flame hair/crown, forge/anvil scene, hammer replacing the sword, Rift pool, rune writing, crest, wounds, victim, additional beings or text. The RIGHT hand retains the one specified weapon; the LEFT stays empty except the Storm Giant's selected local finger lightning. Do not mirror the weapon onto the other hand. Each complete figure has exactly two arms and two legs; do not add tools or equipment. Match the reference's polished naturalistic digital RPG illustration, soft studio light and plain light neutral gray background. No scenery, memory scene, extra beings, text, labels, captions, logos, borders or UI.",
+        "portrait": "Use case: identity-preserve. Asset: one reusable square 1024x1024 portrait of Rift Fire Giant from Severed Lands. Input image1 is the selected canonical complete body; image2 is its reviewed multiview sheet. Keep the SAME selected face, apparent age, proportions, skin and eye colors, hair, expression and shoulder clothing. Reframe for a near-front HEAD-AND-SHOULDERS portrait at eye-level; portrait framing overrides the full-body reference layout. One centered head, upper chest visible, eyes near35% from the top, crown near10%, chin comfortably inside the lower half, generous room for complete head/ears/hair in a circular crop. No drawn circle. No hands, held weapons, feet or full-body figure in this portrait. Appearance reference: One Huge Rift Fire Giant in an editable anonymous mature adult male appearance: towering heavily muscled build, dark charcoal-gray intact skin with subdued warm ember undertones, a broad stern face, two copper-orange eyes, coarse short dark red hair and a thick short copper-red beard. Heavy plain blackened iron plate armor over charcoal fabric, articulated shoulder plates, a dark leather belt and complete heavy iron boots. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one enormous straight two-edged greatsword low with its complete blade and tip visible beside the body; the LEFT hand is open and empty. Sparse small violet Rift-energy flickers mingle with faint heat shimmer immediately above the armor and sword edge. The giant form, plate, greatsword, forge bearing, unnatural heat and Rift flickers follow authored source. Facial features, hair, exact armor construction and colors are editable visual defaults. No bronze dwarf body, flame hair/crown, forge/anvil scene, hammer replacing the sword, Rift pool, rune writing, crest, wounds, victim, additional beings or text. Keep only the head/shoulder details relevant to this close portrait, without adding equipment, history or markings. Match the references' polished naturalistic digital RPG illustration, soft studio lighting and plain full-bleed light neutral gray background. No low-angle hero shot, named identity, scenery, extra beings, detail panels, labels, text, logos, borders or UI."
+      }
+    },
+    {
+      "id": "severed-monster-rift-giant-frost",
+      "name": "Rift Frost Giant",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-giant-frost.md",
+          "sha256": "cd66ac87e70e1d373e5d7f7d6ced819f58ad648897f773d67b4852440b615bff",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-giant-frost.md",
+          "sha256": "f9162215c36f9c61a1eae1460c5528afdebbec596530fb4d28c53e017e346050",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/frost_giant",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Huge Rift Frost Giant in an editable anonymous mature adult female appearance: towering powerful broad build, cold pale ice-blue intact skin with small embedded ice crystals glowing violet from within, a strong broad face, two pale gray-blue eyes, long white hair in two heavy braids and a stern tightly closed mouth. Rough patchwork armor of worn dark iron plates and thick brown-gray leather, a restrained gray fur shoulder mantle, dark layered trousers and complete fur-lined heavy boots. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one long-handled iron greataxe low at the side with the entire axe head and handle visible; the LEFT hand is open and empty. A small thin puff of cold breath stays close to the mouth without hiding the face. The giant form, patchwork armor, greataxe and violet Rift-frost follow the authored source. Face, hair, gender presentation, outfit details and palette are editable visual defaults. No horns, helmet, ice-citadel scene, giant bow, actual attack, frozen victim, exposed injury, additional beings or readable text.",
+        "full_body": {
+          "path": "assets/characters/5d8faa428e37108524c79b0f7fadd9578f78623626c110c578c37b6601d6c68b.png",
+          "sha256": "5d8faa428e37108524c79b0f7fadd9578f78623626c110c578c37b6601d6c68b"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/c8f19185f8dce7a95a00c659683d4216f0ddb669f9f30b6ec0aca3f1569dcf93.png",
+          "sha256": "c8f19185f8dce7a95a00c659683d4216f0ddb669f9f30b6ec0aca3f1569dcf93"
+        },
+        "portrait": {
+          "path": "assets/characters/c1f8b6e504962ffe215e04361a3e35f90e43bcfe45883da495006f5bd7b8ca5d.png",
+          "sha256": "c1f8b6e504962ffe215e04361a3e35f90e43bcfe45883da495006f5bd7b8ca5d"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0,
+          "zoom": 1.35
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2408790
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2386470
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2918880
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical full-body enemy reference for Rift Frost Giant in Sylvia GM's Severed Lands. Portrait-orientation 1024x1536 PNG, ONE complete single giant in a near-front three-quarter view, plain light neutral gray background, polished naturalistic digital RPG illustration matching a production character catalogue, soft studio lighting and restrained grounding shadow. Keep the complete hair, shoulders, cloak, both hands, weapon head/blade/tip and both feet comfortably inside all margins with real headroom and foot room. A relaxed standing reference pose, no attack scene. Appearance: One Huge Rift Frost Giant in an editable anonymous mature adult female appearance: towering powerful broad build, cold pale ice-blue intact skin with small embedded ice crystals glowing violet from within, a strong broad face, two pale gray-blue eyes, long white hair in two heavy braids and a stern tightly closed mouth. Rough patchwork armor of worn dark iron plates and thick brown-gray leather, a restrained gray fur shoulder mantle, dark layered trousers and complete fur-lined heavy boots. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one long-handled iron greataxe low at the side with the entire axe head and handle visible; the LEFT hand is open and empty. A small thin puff of cold breath stays close to the mouth without hiding the face. The giant form, patchwork armor, greataxe and violet Rift-frost follow the authored source. Face, hair, gender presentation, outfit details and palette are editable visual defaults. No horns, helmet, ice-citadel scene, giant bow, actual attack, frozen victim, exposed injury, additional beings or readable text. Preserve the specified anatomical weapon-hand side; no other weapons or extra limbs. No scale-reference people, environmental scenery, text, labels, captions, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Asset: production multiview character reference sheet for Rift Frost Giant from Severed Lands. Input image1 is the selected canonical full-body reference. Make a landscape 1536x1024 PNG showing exactly THREE separated complete views of this SAME giant: front, side, back; include a narrow separate right-hand column of face, clothing/material and weapon detail insets. Keep every complete view inside generous margins, including complete hair, cloak, hands, full weapon head/blade/tip and both separate feet. Preserve the selected body's exact face, proportions, hair/braids, clothing/armor, colors and handedness across all views. Appearance: One Huge Rift Frost Giant in an editable anonymous mature adult female appearance: towering powerful broad build, cold pale ice-blue intact skin with small embedded ice crystals glowing violet from within, a strong broad face, two pale gray-blue eyes, long white hair in two heavy braids and a stern tightly closed mouth. Rough patchwork armor of worn dark iron plates and thick brown-gray leather, a restrained gray fur shoulder mantle, dark layered trousers and complete fur-lined heavy boots. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one long-handled iron greataxe low at the side with the entire axe head and handle visible; the LEFT hand is open and empty. A small thin puff of cold breath stays close to the mouth without hiding the face. The giant form, patchwork armor, greataxe and violet Rift-frost follow the authored source. Face, hair, gender presentation, outfit details and palette are editable visual defaults. No horns, helmet, ice-citadel scene, giant bow, actual attack, frozen victim, exposed injury, additional beings or readable text. The RIGHT hand retains the one specified weapon; the LEFT stays empty except the Storm Giant's selected local finger lightning. Do not mirror the weapon onto the other hand. Each complete figure has exactly two arms and two legs; do not add tools or equipment. Match the reference's polished naturalistic digital RPG illustration, soft studio light and plain light neutral gray background. No scenery, memory scene, extra beings, text, labels, captions, logos, borders or UI.\n\nSelected corrective edit:\nUse case: precise-object-edit. Edit target image1, the selected Rift Frost Giant multiview sheet; image2 is the canonical complete body for identity and weapon shape. Correct ONLY the full-view framing: the first view's axe blade is cut at the left canvas edge. Slightly reduce the THREE complete figure views together to about90% of their current size, keeping matching heights and a shared baseline, and center them in the full-view area with at least40pixels of plain gray margin around the entire leftmost axe blade. Keep the separate right-hand detail column and all its content. Preserve the same mature face, ice-blue skin, embedded violet Rift-frost crystals, two white braids, patchwork iron/leather/fur armor, complete boots and the ONE complete greataxe held in the anatomical RIGHT hand in every view, LEFT hand empty. No weapon-side swap, extra limb, duplicate weapon, change of identity, new equipment or scenery. All three complete heads, hands, axe heads/handles and feet must be fully visible. Match the existing naturalistic RPG rendering and neutral gray background; no text, labels, captions, borders or UI.",
+        "portrait": "Use case: identity-preserve. Asset: one reusable square 1024x1024 portrait of Rift Frost Giant from Severed Lands. Input image1 is the selected canonical complete body; image2 is its reviewed multiview sheet. Keep the SAME selected face, apparent age, proportions, skin and eye colors, hair, expression and shoulder clothing. Reframe for a near-front HEAD-AND-SHOULDERS portrait at eye-level; portrait framing overrides the full-body reference layout. One centered head, upper chest visible, eyes near35% from the top, crown near10%, chin comfortably inside the lower half, generous room for complete head/ears/hair in a circular crop. No drawn circle. No hands, held weapons, feet or full-body figure in this portrait. Appearance reference: One Huge Rift Frost Giant in an editable anonymous mature adult female appearance: towering powerful broad build, cold pale ice-blue intact skin with small embedded ice crystals glowing violet from within, a strong broad face, two pale gray-blue eyes, long white hair in two heavy braids and a stern tightly closed mouth. Rough patchwork armor of worn dark iron plates and thick brown-gray leather, a restrained gray fur shoulder mantle, dark layered trousers and complete fur-lined heavy boots. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one long-handled iron greataxe low at the side with the entire axe head and handle visible; the LEFT hand is open and empty. A small thin puff of cold breath stays close to the mouth without hiding the face. The giant form, patchwork armor, greataxe and violet Rift-frost follow the authored source. Face, hair, gender presentation, outfit details and palette are editable visual defaults. No horns, helmet, ice-citadel scene, giant bow, actual attack, frozen victim, exposed injury, additional beings or readable text. Keep only the head/shoulder details relevant to this close portrait, without adding equipment, history or markings. Match the references' polished naturalistic digital RPG illustration, soft studio lighting and plain full-bleed light neutral gray background. No low-angle hero shot, named identity, scenery, extra beings, detail panels, labels, text, logos, borders or UI."
+      }
+    },
+    {
+      "id": "severed-monster-rift-giant-hill",
+      "name": "Rift Hill Giant",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-giant-hill.md",
+          "sha256": "ac46e8f7dd489fcd3b61142bf8313b1b553dc0fe92b1691eddf9b17a31b68348",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-giant-hill.md",
+          "sha256": "f3b829eb980c0b4fdc9e30f9aef3633c6c1ef25d620363e4cca194797cfe6f71",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/hill_giant",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Huge Rift Hill Giant in an editable anonymous mature adult male appearance: towering very broad heavy-bodied build with thick limbs, rough muted tan-gray intact skin carrying the authored faint violet pallor, a wide blunt face, heavy brow, two dark brown eyes, short coarse brown hair thinning at the crown and sparse brown stubble. A wary scowling closed-mouth expression. A plain worn earth-brown sleeveless coarse tunic reaching mid-thigh, dark leather waist belt, rough trousers and simple strapped leather foot coverings, both separate feet complete. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one massive roughly shaped tree-trunk greatclub low beside the body with the whole blunt wooden head and handle visible; the LEFT hand is open and empty. The giant form, inherited Rift exposure, violet pallor and greatclub follow the authored source. Face, hair, body proportions, clothing and colors are editable visual defaults. No farm/caravan raid scene, victim, food, exposed nudity, bone trophies, extra beings, named identity or readable text.",
+        "full_body": {
+          "path": "assets/characters/427705b2735e4273d92bfa187d7e05addd77aa565d875547873bb49f7d9a43b3.png",
+          "sha256": "427705b2735e4273d92bfa187d7e05addd77aa565d875547873bb49f7d9a43b3"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/b06db0c47b06321d537053fb7b0ab6828fee894f68c4dd498a3d1600ceaf3f2c.png",
+          "sha256": "b06db0c47b06321d537053fb7b0ab6828fee894f68c4dd498a3d1600ceaf3f2c"
+        },
+        "portrait": {
+          "path": "assets/characters/a0522774ab9d9cf5b61d9120a3cd18930edcb1e576a3ff81d8a916170da0a368.png",
+          "sha256": "a0522774ab9d9cf5b61d9120a3cd18930edcb1e576a3ff81d8a916170da0a368"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0,
+          "zoom": 1.15
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2199470
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2367255
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2570187
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical full-body enemy reference for Rift Hill Giant in Sylvia GM's Severed Lands. Portrait-orientation 1024x1536 PNG, ONE complete single giant in a near-front three-quarter view, plain light neutral gray background, polished naturalistic digital RPG illustration matching a production character catalogue, soft studio lighting and restrained grounding shadow. Keep the complete hair, shoulders, cloak, both hands, weapon head/blade/tip and both feet comfortably inside all margins with real headroom and foot room. A relaxed standing reference pose, no attack scene. Appearance: One Huge Rift Hill Giant in an editable anonymous mature adult male appearance: towering very broad heavy-bodied build with thick limbs, rough muted tan-gray intact skin carrying the authored faint violet pallor, a wide blunt face, heavy brow, two dark brown eyes, short coarse brown hair thinning at the crown and sparse brown stubble. A wary scowling closed-mouth expression. A plain worn earth-brown sleeveless coarse tunic reaching mid-thigh, dark leather waist belt, rough trousers and simple strapped leather foot coverings, both separate feet complete. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one massive roughly shaped tree-trunk greatclub low beside the body with the whole blunt wooden head and handle visible; the LEFT hand is open and empty. The giant form, inherited Rift exposure, violet pallor and greatclub follow the authored source. Face, hair, body proportions, clothing and colors are editable visual defaults. No farm/caravan raid scene, victim, food, exposed nudity, bone trophies, extra beings, named identity or readable text. Preserve the specified anatomical weapon-hand side; no other weapons or extra limbs. No scale-reference people, environmental scenery, text, labels, captions, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Asset: production multiview character reference sheet for Rift Hill Giant from Severed Lands. Input image1 is the selected canonical full-body reference. Make a landscape 1536x1024 PNG showing exactly THREE separated complete views of this SAME giant: front, side, back; include a narrow separate right-hand column of face, clothing/material and weapon detail insets. Keep every complete view inside generous margins, including complete hair, cloak, hands, full weapon head/blade/tip and both separate feet. Preserve the selected body's exact face, proportions, hair/braids, clothing/armor, colors and handedness across all views. Appearance: One Huge Rift Hill Giant in an editable anonymous mature adult male appearance: towering very broad heavy-bodied build with thick limbs, rough muted tan-gray intact skin carrying the authored faint violet pallor, a wide blunt face, heavy brow, two dark brown eyes, short coarse brown hair thinning at the crown and sparse brown stubble. A wary scowling closed-mouth expression. A plain worn earth-brown sleeveless coarse tunic reaching mid-thigh, dark leather waist belt, rough trousers and simple strapped leather foot coverings, both separate feet complete. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one massive roughly shaped tree-trunk greatclub low beside the body with the whole blunt wooden head and handle visible; the LEFT hand is open and empty. The giant form, inherited Rift exposure, violet pallor and greatclub follow the authored source. Face, hair, body proportions, clothing and colors are editable visual defaults. No farm/caravan raid scene, victim, food, exposed nudity, bone trophies, extra beings, named identity or readable text. The RIGHT hand retains the one specified weapon; the LEFT stays empty except the Storm Giant's selected local finger lightning. Do not mirror the weapon onto the other hand. Each complete figure has exactly two arms and two legs; do not add tools or equipment. Match the reference's polished naturalistic digital RPG illustration, soft studio light and plain light neutral gray background. No scenery, memory scene, extra beings, text, labels, captions, logos, borders or UI.",
+        "portrait": "Use case: identity-preserve. Asset: one reusable square 1024x1024 portrait of Rift Hill Giant from Severed Lands. Input image1 is the selected canonical complete body; image2 is its reviewed multiview sheet. Keep the SAME selected face, apparent age, proportions, skin and eye colors, hair, expression and shoulder clothing. Reframe for a near-front HEAD-AND-SHOULDERS portrait at eye-level; portrait framing overrides the full-body reference layout. One centered head, upper chest visible, eyes near35% from the top, crown near10%, chin comfortably inside the lower half, generous room for complete head/ears/hair in a circular crop. No drawn circle. No hands, held weapons, feet or full-body figure in this portrait. Appearance reference: One Huge Rift Hill Giant in an editable anonymous mature adult male appearance: towering very broad heavy-bodied build with thick limbs, rough muted tan-gray intact skin carrying the authored faint violet pallor, a wide blunt face, heavy brow, two dark brown eyes, short coarse brown hair thinning at the crown and sparse brown stubble. A wary scowling closed-mouth expression. A plain worn earth-brown sleeveless coarse tunic reaching mid-thigh, dark leather waist belt, rough trousers and simple strapped leather foot coverings, both separate feet complete. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one massive roughly shaped tree-trunk greatclub low beside the body with the whole blunt wooden head and handle visible; the LEFT hand is open and empty. The giant form, inherited Rift exposure, violet pallor and greatclub follow the authored source. Face, hair, body proportions, clothing and colors are editable visual defaults. No farm/caravan raid scene, victim, food, exposed nudity, bone trophies, extra beings, named identity or readable text. Keep only the head/shoulder details relevant to this close portrait, without adding equipment, history or markings. Match the references' polished naturalistic digital RPG illustration, soft studio lighting and plain full-bleed light neutral gray background. No low-angle hero shot, named identity, scenery, extra beings, detail panels, labels, text, logos, borders or UI."
+      }
+    },
+    {
+      "id": "severed-monster-rift-giant-stone",
+      "name": "Rift Stone Giant",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-giant-stone.md",
+          "sha256": "bc64e9fc8bb8391e723e5ed2f89af925fced8d51f03b3a5ee5098dd8571b786e",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-giant-stone.md",
+          "sha256": "ce7f7e22be960e8a1f870777f6046deec8d7cb239f7ca7cb38c2578f7f70b9b9",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/stone_giant",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Huge Rift Stone Giant in an editable anonymous mature adult female appearance: exceptionally tall lean muscular long-limbed build, smooth slate-gray intact skin with subtle natural granite-like speckling, a bald elongated head, a broad straight nose, two muted quartz-gray eyes and a watchful reserved closed-mouth expression. A plain dark gray woven sleeveless knee-length wrap tunic tied with one simple brown leather waist belt, a short subdued brown shoulder drape and plain soft dark boots. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one long plain stone greatclub low beside the body: a blunt elongated carved rock head continuous with a narrow stone grip, with the entire club visible; the LEFT hand is open and empty. The giant form, rock camouflage, memory-gallery guardian bearing and greatclub follow the authored source. The face, gender presentation, baldness, outfit and exact stone texture are editable visual defaults. No mechanical golem joints, cracked wounds, carved body runes, writing, memory-gallery scene, newly revealed lost city, extra beings or readable text.",
+        "full_body": {
+          "path": "assets/characters/288b6a0a872ceed319f2ee9b5d9f940c05b3a218e5ca24a9471ce07e00c151c9.png",
+          "sha256": "288b6a0a872ceed319f2ee9b5d9f940c05b3a218e5ca24a9471ce07e00c151c9"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/8a97e359f76b4ecf8afbb7ed2c4b459c2f2125368e2b3cd2c7b077e8613e9071.png",
+          "sha256": "8a97e359f76b4ecf8afbb7ed2c4b459c2f2125368e2b3cd2c7b077e8613e9071"
+        },
+        "portrait": {
+          "path": "assets/characters/fb3f871b15c020dc6bbf692ce54b92197df1169142f68ad10e0767974bde761f.png",
+          "sha256": "fb3f871b15c020dc6bbf692ce54b92197df1169142f68ad10e0767974bde761f"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0,
+          "zoom": 1.45
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1796439
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2219119
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2366971
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical full-body enemy reference for Rift Stone Giant in Sylvia GM's Severed Lands. Portrait-orientation 1024x1536 PNG, ONE complete single giant in a near-front three-quarter view, plain light neutral gray background, polished naturalistic digital RPG illustration matching a production character catalogue, soft studio lighting and restrained grounding shadow. Keep the complete hair, shoulders, cloak, both hands, weapon head/blade/tip and both feet comfortably inside all margins with real headroom and foot room. A relaxed standing reference pose, no attack scene. Appearance: One Huge Rift Stone Giant in an editable anonymous mature adult female appearance: exceptionally tall lean muscular long-limbed build, smooth slate-gray intact skin with subtle natural granite-like speckling, a bald elongated head, a broad straight nose, two muted quartz-gray eyes and a watchful reserved closed-mouth expression. A plain dark gray woven sleeveless knee-length wrap tunic tied with one simple brown leather waist belt, a short subdued brown shoulder drape and plain soft dark boots. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one long plain stone greatclub low beside the body: a blunt elongated carved rock head continuous with a narrow stone grip, with the entire club visible; the LEFT hand is open and empty. The giant form, rock camouflage, memory-gallery guardian bearing and greatclub follow the authored source. The face, gender presentation, baldness, outfit and exact stone texture are editable visual defaults. No mechanical golem joints, cracked wounds, carved body runes, writing, memory-gallery scene, newly revealed lost city, extra beings or readable text. Preserve the specified anatomical weapon-hand side; no other weapons or extra limbs. No scale-reference people, environmental scenery, text, labels, captions, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Asset: production multiview character reference sheet for Rift Stone Giant from Severed Lands. Input image1 is the selected canonical full-body reference. Make a landscape 1536x1024 PNG showing exactly THREE separated complete views of this SAME giant: front, side, back; include a narrow separate right-hand column of face, clothing/material and weapon detail insets. Keep every complete view inside generous margins, including complete hair, cloak, hands, full weapon head/blade/tip and both separate feet. Preserve the selected body's exact face, proportions, hair/braids, clothing/armor, colors and handedness across all views. Appearance: One Huge Rift Stone Giant in an editable anonymous mature adult female appearance: exceptionally tall lean muscular long-limbed build, smooth slate-gray intact skin with subtle natural granite-like speckling, a bald elongated head, a broad straight nose, two muted quartz-gray eyes and a watchful reserved closed-mouth expression. A plain dark gray woven sleeveless knee-length wrap tunic tied with one simple brown leather waist belt, a short subdued brown shoulder drape and plain soft dark boots. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one long plain stone greatclub low beside the body: a blunt elongated carved rock head continuous with a narrow stone grip, with the entire club visible; the LEFT hand is open and empty. The giant form, rock camouflage, memory-gallery guardian bearing and greatclub follow the authored source. The face, gender presentation, baldness, outfit and exact stone texture are editable visual defaults. No mechanical golem joints, cracked wounds, carved body runes, writing, memory-gallery scene, newly revealed lost city, extra beings or readable text. The RIGHT hand retains the one specified weapon; the LEFT stays empty except the Storm Giant's selected local finger lightning. Do not mirror the weapon onto the other hand. Each complete figure has exactly two arms and two legs; do not add tools or equipment. Match the reference's polished naturalistic digital RPG illustration, soft studio light and plain light neutral gray background. No scenery, memory scene, extra beings, text, labels, captions, logos, borders or UI.\n\nSelected corrective edit:\nUse case: precise-object-edit. Edit target image1, the selected Rift Stone Giant multiview sheet; image2 is the canonical complete body. Change ONLY the bottom-right weapon-detail inset: it currently shows two disconnected stone pieces. Replace those with ONE complete continuous stone greatclub matching the one in the three main views: a narrow solid stone grip that blends without a break into one long blunt stone head. Lay the single club diagonally within that inset so it fits completely, with gray space around it. Keep every other part of the sheet unchanged: all THREE full-body views, bald mature face and quartz-gray eyes, slate-gray skin, simple dark wrap tunic, belt, brown shoulder drape, boots and weapon handedness. The anatomical RIGHT hand retains ONE stone club in each main view; LEFT hand stays empty. No disassembled parts, extra weapon, added chisel, runes, named identity or scenery. Match the naturalistic RPG rendering and gray background; no writing, labels, captions, borders or UI.",
+        "portrait": "Use case: identity-preserve. Asset: one reusable square 1024x1024 portrait of Rift Stone Giant from Severed Lands. Input image1 is the selected canonical complete body; image2 is its reviewed multiview sheet. Keep the SAME selected face, apparent age, proportions, skin and eye colors, hair, expression and shoulder clothing. Reframe for a near-front HEAD-AND-SHOULDERS portrait at eye-level; portrait framing overrides the full-body reference layout. One centered head, upper chest visible, eyes near35% from the top, crown near10%, chin comfortably inside the lower half, generous room for complete head/ears/hair in a circular crop. No drawn circle. No hands, held weapons, feet or full-body figure in this portrait. Appearance reference: One Huge Rift Stone Giant in an editable anonymous mature adult female appearance: exceptionally tall lean muscular long-limbed build, smooth slate-gray intact skin with subtle natural granite-like speckling, a bald elongated head, a broad straight nose, two muted quartz-gray eyes and a watchful reserved closed-mouth expression. A plain dark gray woven sleeveless knee-length wrap tunic tied with one simple brown leather waist belt, a short subdued brown shoulder drape and plain soft dark boots. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one long plain stone greatclub low beside the body: a blunt elongated carved rock head continuous with a narrow stone grip, with the entire club visible; the LEFT hand is open and empty. The giant form, rock camouflage, memory-gallery guardian bearing and greatclub follow the authored source. The face, gender presentation, baldness, outfit and exact stone texture are editable visual defaults. No mechanical golem joints, cracked wounds, carved body runes, writing, memory-gallery scene, newly revealed lost city, extra beings or readable text. Keep only the head/shoulder details relevant to this close portrait, without adding equipment, history or markings. Match the references' polished naturalistic digital RPG illustration, soft studio lighting and plain full-bleed light neutral gray background. No low-angle hero shot, named identity, scenery, extra beings, detail panels, labels, text, logos, borders or UI."
+      }
+    },
+    {
+      "id": "severed-monster-rift-giant-storm",
+      "name": "Rift Storm Giant",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-giant-storm.md",
+          "sha256": "a82a275b40a07bd1cc3688c574baa5acfe8635845a45618b7b7f70d27a52f1f6",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-giant-storm.md",
+          "sha256": "1a51ea8f9d3cb4f3408a104e64ba59f59d046b9b74f4f3aa073eb8337b07fd07",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/storm_giant",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Huge Rift Storm Giant in an editable anonymous mature adult male appearance: towering powerful long-proportioned build, cool deep gray-violet intact skin, a broad dignified stern face, two pale silver-gray eyes, long wavy deep blue-gray hair and a neatly divided short silver-gray beard. Plain silver-gray chest and shoulder armor over a dark sea-blue long-sleeved tunic, a simple broad belt, layered dark trousers, a short plain sea-blue cloak and complete dark boots. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one enormous straight two-edged greatsword low beside the body, complete blade and tip visible; the LEFT hand is open at waist height with a few small violet lightning arcs only between its five fingers. The giant form, remembered royal bearing, greatsword and violet finger-lightning follow authored source. The anonymous face, hair, outfit, armor construction and colors are editable visual defaults. No named royal identity, crown or heraldry, actual final-storm memory, lightning striking a target, trident, wings, second sword, extra beings or text.",
+        "full_body": {
+          "path": "assets/characters/7186bcc432957330fe4014416c47271a33295de22540f5c3b2a5f9ff4514ae79.png",
+          "sha256": "7186bcc432957330fe4014416c47271a33295de22540f5c3b2a5f9ff4514ae79"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/71ff51f0150324b4cdfb562f87512275b5b5b04cf99ba8194d864b0667dcba67.png",
+          "sha256": "71ff51f0150324b4cdfb562f87512275b5b5b04cf99ba8194d864b0667dcba67"
+        },
+        "portrait": {
+          "path": "assets/characters/d9beaea2ba2b751d63933c2f95047001ee9cd1aa6757dff86a13ac4582db3b58.png",
+          "sha256": "d9beaea2ba2b751d63933c2f95047001ee9cd1aa6757dff86a13ac4582db3b58"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0,
+          "zoom": 1.22
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1861241
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2241566
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2810376
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical full-body enemy reference for Rift Storm Giant in Sylvia GM's Severed Lands. Portrait-orientation 1024x1536 PNG, ONE complete single giant in a near-front three-quarter view, plain light neutral gray background, polished naturalistic digital RPG illustration matching a production character catalogue, soft studio lighting and restrained grounding shadow. Keep the complete hair, shoulders, cloak, both hands, weapon head/blade/tip and both feet comfortably inside all margins with real headroom and foot room. A relaxed standing reference pose, no attack scene. Appearance: One Huge Rift Storm Giant in an editable anonymous mature adult male appearance: towering powerful long-proportioned build, cool deep gray-violet intact skin, a broad dignified stern face, two pale silver-gray eyes, long wavy deep blue-gray hair and a neatly divided short silver-gray beard. Plain silver-gray chest and shoulder armor over a dark sea-blue long-sleeved tunic, a simple broad belt, layered dark trousers, a short plain sea-blue cloak and complete dark boots. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one enormous straight two-edged greatsword low beside the body, complete blade and tip visible; the LEFT hand is open at waist height with a few small violet lightning arcs only between its five fingers. The giant form, remembered royal bearing, greatsword and violet finger-lightning follow authored source. The anonymous face, hair, outfit, armor construction and colors are editable visual defaults. No named royal identity, crown or heraldry, actual final-storm memory, lightning striking a target, trident, wings, second sword, extra beings or text. Preserve the specified anatomical weapon-hand side; no other weapons or extra limbs. No scale-reference people, environmental scenery, text, labels, captions, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Asset: production multiview character reference sheet for Rift Storm Giant from Severed Lands. Input image1 is the selected canonical full-body reference. Make a landscape 1536x1024 PNG showing exactly THREE separated complete views of this SAME giant: front, side, back; include a narrow separate right-hand column of face, clothing/material and weapon detail insets. Keep every complete view inside generous margins, including complete hair, cloak, hands, full weapon head/blade/tip and both separate feet. Preserve the selected body's exact face, proportions, hair/braids, clothing/armor, colors and handedness across all views. Appearance: One Huge Rift Storm Giant in an editable anonymous mature adult male appearance: towering powerful long-proportioned build, cool deep gray-violet intact skin, a broad dignified stern face, two pale silver-gray eyes, long wavy deep blue-gray hair and a neatly divided short silver-gray beard. Plain silver-gray chest and shoulder armor over a dark sea-blue long-sleeved tunic, a simple broad belt, layered dark trousers, a short plain sea-blue cloak and complete dark boots. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one enormous straight two-edged greatsword low beside the body, complete blade and tip visible; the LEFT hand is open at waist height with a few small violet lightning arcs only between its five fingers. The giant form, remembered royal bearing, greatsword and violet finger-lightning follow authored source. The anonymous face, hair, outfit, armor construction and colors are editable visual defaults. No named royal identity, crown or heraldry, actual final-storm memory, lightning striking a target, trident, wings, second sword, extra beings or text. The RIGHT hand retains the one specified weapon; the LEFT stays empty except the Storm Giant's selected local finger lightning. Do not mirror the weapon onto the other hand. Each complete figure has exactly two arms and two legs; do not add tools or equipment. Match the reference's polished naturalistic digital RPG illustration, soft studio light and plain light neutral gray background. No scenery, memory scene, extra beings, text, labels, captions, logos, borders or UI.",
+        "portrait": "Use case: identity-preserve. Asset: one reusable square 1024x1024 portrait of Rift Storm Giant from Severed Lands. Input image1 is the selected canonical complete body; image2 is its reviewed multiview sheet. Keep the SAME selected face, apparent age, proportions, skin and eye colors, hair, expression and shoulder clothing. Reframe for a near-front HEAD-AND-SHOULDERS portrait at eye-level; portrait framing overrides the full-body reference layout. One centered head, upper chest visible, eyes near35% from the top, crown near10%, chin comfortably inside the lower half, generous room for complete head/ears/hair in a circular crop. No drawn circle. No hands, held weapons, feet or full-body figure in this portrait. Appearance reference: One Huge Rift Storm Giant in an editable anonymous mature adult male appearance: towering powerful long-proportioned build, cool deep gray-violet intact skin, a broad dignified stern face, two pale silver-gray eyes, long wavy deep blue-gray hair and a neatly divided short silver-gray beard. Plain silver-gray chest and shoulder armor over a dark sea-blue long-sleeved tunic, a simple broad belt, layered dark trousers, a short plain sea-blue cloak and complete dark boots. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one enormous straight two-edged greatsword low beside the body, complete blade and tip visible; the LEFT hand is open at waist height with a few small violet lightning arcs only between its five fingers. The giant form, remembered royal bearing, greatsword and violet finger-lightning follow authored source. The anonymous face, hair, outfit, armor construction and colors are editable visual defaults. No named royal identity, crown or heraldry, actual final-storm memory, lightning striking a target, trident, wings, second sword, extra beings or text. Keep only the head/shoulder details relevant to this close portrait, without adding equipment, history or markings. Match the references' polished naturalistic digital RPG illustration, soft studio lighting and plain full-bleed light neutral gray background. No low-angle hero shot, named identity, scenery, extra beings, detail panels, labels, text, logos, borders or UI."
+      }
     }
   ]
 }
