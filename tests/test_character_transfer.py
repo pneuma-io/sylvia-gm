@@ -44,9 +44,26 @@ def export(owner, root, source):
     return stream.getvalue(), result
 
 
-def test_real_owner_and_browser_transfer_selected_character_bytes_without_host_paths(tmp_path):
+@pytest.mark.parametrize(
+    ("name", "filename"),
+    [
+        (LEGACY["name"], "Vela.sylvia-gm-character"),
+        ("Élise /../ d'Arc\r\nX:1", "Élise-dArc-X1.sylvia-gm-character"),
+        ("<>:/|?*", "character.sylvia-gm-character"),
+        ("x" * 160, "x" * 64 + ".sylvia-gm-character"),
+        pytest.param("COM¹", "character-COM¹.sylvia-gm-character", id="unicode-device"),
+    ],
+)
+def test_real_owner_and_browser_transfer_selected_character_bytes_without_host_paths(
+    tmp_path, name, filename
+):
     profile = save_character_profile(
-        tmp_path, operation_id="source", source=canonical_json_bytes(LEGACY)
+        tmp_path, operation_id="source", source=canonical_json_bytes({**LEGACY, "name": name})
+    )
+    other = save_character_profile(
+        tmp_path,
+        operation_id="other-source",
+        source=canonical_json_bytes({**LEGACY, "name": "CON"}),
     )
 
     async def check():
@@ -62,12 +79,15 @@ def test_real_owner_and_browser_transfer_selected_character_bytes_without_host_p
             }
             result = await browser.call("export_character_file", params)
             assert "artifact_path" not in result and str(tmp_path) not in json.dumps(result)
+            assert result["filename"] == result["file_name"] == filename
             response = await browser.client.get(browser.url + result["download"])
             raw = await response.read()
             assert response.status == 200
-            assert ".sylvia-gm-character" in response.headers["Content-Disposition"]
+            assert response.content_disposition.filename == filename
+            assert "\r" not in response.headers["Content-Disposition"]
+            assert "\n" not in response.headers["Content-Disposition"]
             bundle = read_character_bundle(io.BytesIO(raw))
-            assert bundle.character["name"] == LEGACY["name"]
+            assert bundle.character["name"] == name
             exported_path = tmp_path / "exports/selected-character.sylvia-gm-character"
             assert exported_path.read_bytes() == raw
 
@@ -76,6 +96,24 @@ def test_real_owner_and_browser_transfer_selected_character_bytes_without_host_p
             )
             assert (await response.json())["ok"] is False
             assert exported_path.read_bytes() == raw
+
+            # Reusing an export destination keeps each download's original name and bytes.
+            replacement = await browser.call(
+                "export_character_file",
+                {
+                    **params,
+                    "artifactId": other.artifact_id,
+                    "expectedContentSha256": other.content_sha256,
+                },
+            )
+            assert replacement["filename"] == "character-CON.sylvia-gm-character"
+            response = await browser.client.get(browser.url + replacement["download"])
+            assert response.content_disposition.filename == replacement["filename"]
+            replaced = read_character_bundle(io.BytesIO(await response.read()))
+            assert replaced.character["name"] == "CON"
+            response = await browser.client.get(browser.url + result["download"])
+            assert response.content_disposition.filename == filename
+            assert await response.read() == raw
 
             async def upload():
                 form = aiohttp.FormData()
