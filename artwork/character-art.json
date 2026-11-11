@@ -9970,6 +9970,402 @@
         "reference_sheet": "Use case: identity-preserve. Asset: production multiview reference sheet for Rift Hippogriff from Severed Lands. Input image1 is the selected canonical complete reference; preserve its exact face/head, anatomy, proportions, materials, colors, clothing/equipment and handedness. Landscape 1536x1024 PNG. Use a roomy 2x2 layout: THREE separated COMPLETE views (front three-quarter, side and rear three-quarter), plus one panel of head/material detail insets. Each main view shows the whole creature, with normal anatomical occlusion but no clipped outline. Keep every complete silhouette inside generous gray margins, including horns, hands/tentacles, club, feet/hooves, tail and folded wing tips. Appearance: One Large Rift Hippogriff: a complete eagle-and-horse hybrid with one warm russet-feathered eagle head and neck, small pale cream brow accents, one dark gray hooked beak and two amber eyes; exactly two ocher-brown scaly eagle forelegs ending in dark talons; a chestnut equine torso and exactly two horse hindlegs ending in single solid black hooves; one long dark horsehair tail with no lion tuft; and exactly TWO broad russet-brown feathered wings attached above the shoulders. Wings are folded in a relaxed resting pose, complete outer contours and primary tips visible, flight feathers shimmering with restrained silver-violet trapped Veil-light. A watchful grounded near-front three-quarter standing pose with all four feet and the full tail visible. The hippogriff form and Veil-light flight feathers follow authored source; exact plumage, fur, eyes, colors and posture are editable visual defaults. This is an untacked representative, with no rider or selected cavalry ownership. No lion paws on the hindlegs, lion tail tuft, extra wings or legs, human face or arms, saddle, harness, ritual scene, victim, named history, text or scenery. Preserve exactly FOUR legs (TWO eagle forelegs with talons and TWO horse hindlegs with single solid black hooves), TWO folded feathered wings and ONE long horsehair tail. No lion hind paws, lion tail tuft, extra wings or legs. Match the selected reference's polished naturalistic RPG illustration, soft studio light and plain light neutral gray background. No added anatomy, other beings, scenery, attack/memory scene, text, labels, captions, logos, borders or UI.",
         "portrait": "Use case: identity-preserve. Asset: one reusable square 1024x1024 portrait for Rift Hippogriff from Severed Lands. Input image1 is the selected complete canonical reference; image2 is the reviewed multiview sheet. Keep this SAME subject's exact selected identity, anatomy, colors, expression, materials and head details. Portrait framing overrides the full-body layout. One near-front three-quarter EAGLE HEAD AND UPPER FEATHERED CHEST portrait, preserve the selected warm russet head/neck feathers, small cream brow accents, amber eye placement and dark gray hooked beak. Keep the entire crest, feather tips and whole beak inside a generous central80% circular safe area, head centered with gray space above the crown and beyond the beak. A hint of the russet/silver-violet wing roots may appear near the lower shoulders. No white griffon head, human face, horse head, full body, hooves or added horns. Do not draw a circle. Appearance reference: One Large Rift Hippogriff: a complete eagle-and-horse hybrid with one warm russet-feathered eagle head and neck, small pale cream brow accents, one dark gray hooked beak and two amber eyes; exactly two ocher-brown scaly eagle forelegs ending in dark talons; a chestnut equine torso and exactly two horse hindlegs ending in single solid black hooves; one long dark horsehair tail with no lion tuft; and exactly TWO broad russet-brown feathered wings attached above the shoulders. Wings are folded in a relaxed resting pose, complete outer contours and primary tips visible, flight feathers shimmering with restrained silver-violet trapped Veil-light. A watchful grounded near-front three-quarter standing pose with all four feet and the full tail visible. The hippogriff form and Veil-light flight feathers follow authored source; exact plumage, fur, eyes, colors and posture are editable visual defaults. This is an untacked representative, with no rider or selected cavalry ownership. No lion paws on the hindlegs, lion tail tuft, extra wings or legs, human face or arms, saddle, harness, ritual scene, victim, named history, text or scenery. Include only the details relevant to the head/upper-body crop. Match the selected references' polished naturalistic digital RPG illustration, soft studio light and plain full-bleed light neutral gray background. No scenery, attack, extra beings, memory scene, panels, labels, captions, text, logos, borders or UI."
       }
+    },
+    {
+      "id": "severed-monster-rift-hydra",
+      "name": "Rift Hydra",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-hydra.md",
+          "sha256": "bbeac706bf6fca33b5cf0adae5e6fd6db67851b2b8ee0ff392e53b12732f7451",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-hydra.md",
+          "sha256": "732d88074e8e669deb970e14b2f22bc6ebf56830936b821702b32b15aa26e802",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/hydra",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Huge uninjured baseline Rift Hydra: ONE powerful low reptilian torso, exactly FOUR short muscular clawed legs, ONE long tapering reptilian tail and EXACTLY FIVE separate long necks, each ending in ONE complete reptilian head. Fan the five necks apart so all FIVE heads are easy to count, with no overlapping heads or hidden extra head; each has two small amber-yellow eyes and a single mostly closed tooth-lined mouth. Mottled dark olive and charcoal scales with restrained muted violet Rift sheen near the neck bases. A quiet alert near-front three-quarter grounded stance, complete feet and tail tip visible. The five-head baseline and regenerative hydra form follow authored source. Exact scales, colors and uninjured head shapes are editable defaults; this reference does not portray the later warped regrowth state. No severed head, missing head, wounds, blood, gore, sixth head, wings, horns, extra limbs, victim, swamp scenery, labels or text.",
+        "full_body": {
+          "path": "assets/characters/bbeda38393fbb7784db3fccb39b18d6ad2fc33e90642ee2853aa63ccf0412330.png",
+          "sha256": "bbeda38393fbb7784db3fccb39b18d6ad2fc33e90642ee2853aa63ccf0412330"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/278c3527dc7c1cbcc8a7c5eedba9b7dc2a32c1d7179e435035686d9d574e8c8d.png",
+          "sha256": "278c3527dc7c1cbcc8a7c5eedba9b7dc2a32c1d7179e435035686d9d574e8c8d"
+        },
+        "portrait": {
+          "path": "assets/characters/8631b25f398ccab915d7aec448aeb9d0b53301d557e56d1b7ef715cfeeda8fb7.png",
+          "sha256": "8631b25f398ccab915d7aec448aeb9d0b53301d557e56d1b7ef715cfeeda8fb7"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2204834
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2289304
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2515416
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete creature reference for Rift Hydra in Sylvia GM's Severed Lands. Landscape 1536x1024 PNG. ONE complete single subject in a clear near-front three-quarter reference view, plain light neutral gray background, polished naturalistic digital RPG illustration matching a production catalogue, soft studio light and a restrained grounding shadow if appropriate. Every head, hornless crown, neck, limb, claw branch, tail/tendril/tentacle tip and dagger blade must fit comfortably inside generous margins with real space on all sides. Appearance: One Huge uninjured baseline Rift Hydra: ONE powerful low reptilian torso, exactly FOUR short muscular clawed legs, ONE long tapering reptilian tail and EXACTLY FIVE separate long necks, each ending in ONE complete reptilian head. Fan the five necks apart so all FIVE heads are easy to count, with no overlapping heads or hidden extra head; each has two small amber-yellow eyes and a single mostly closed tooth-lined mouth. Mottled dark olive and charcoal scales with restrained muted violet Rift sheen near the neck bases. A quiet alert near-front three-quarter grounded stance, complete feet and tail tip visible. The five-head baseline and regenerative hydra form follow authored source. Exact scales, colors and uninjured head shapes are editable defaults; this reference does not portray the later warped regrowth state. No severed head, missing head, wounds, blood, gore, sixth head, wings, horns, extra limbs, victim, swamp scenery, labels or text. Keep the stated exact counts and any weapon-hand side. No extra beings, action scene, environmental scenery, labels, captions, text, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Asset: production multiview reference sheet for Rift Hydra from Severed Lands. Input image1 is its selected canonical complete reference. Landscape1536x1024 PNG. A roomy2x2 layout with exactly THREE separated COMPLETE views (front three-quarter, side, rear three-quarter) and ONE panel of head/material detail insets. Keep every whole silhouette, head, claw/hand, foot, tail/tendril/tentacle tip and any dagger comfortably within generous gray margins. Preserve the same selected shape, face/head, materials, colors, clothing, resting pose and handedness across views. Appearance: One Huge uninjured baseline Rift Hydra: ONE powerful low reptilian torso, exactly FOUR short muscular clawed legs, ONE long tapering reptilian tail and EXACTLY FIVE separate long necks, each ending in ONE complete reptilian head. Fan the five necks apart so all FIVE heads are easy to count, with no overlapping heads or hidden extra head; each has two small amber-yellow eyes and a single mostly closed tooth-lined mouth. Mottled dark olive and charcoal scales with restrained muted violet Rift sheen near the neck bases. A quiet alert near-front three-quarter grounded stance, complete feet and tail tip visible. The five-head baseline and regenerative hydra form follow authored source. Exact scales, colors and uninjured head shapes are editable defaults; this reference does not portray the later warped regrowth state. No severed head, missing head, wounds, blood, gore, sixth head, wings, horns, extra limbs, victim, swamp scenery, labels or text. Keep exactly FIVE complete heads on FIVE necks in every main view, one torso, FOUR legs and ONE tail. Fan the five heads apart with visible separate silhouettes; no severed/mutated regrowth state, sixth head or wings. Match the reference's polished naturalistic digital RPG rendering, soft studio light and plain neutral gray background. No other beings, attack/injury/memory scene, scenery, text, captions, labels, logos, borders or UI.",
+        "portrait": "Use case: identity-preserve. Asset: one square1024x1024 reusable portrait for Rift Hydra from Severed Lands. Input image1 is the selected complete canonical reference, image2 the reviewed multiview sheet. Preserve this SAME subject's exact selected anatomy, face/head, materials, colors and expression. Portrait framing overrides the complete-body layout. Show ONE upper-body portrait of the SAME Hydra with EXACTLY FIVE complete heads and their five necks fanned apart, all five heads clearly countable inside a central75-80% circular safe area. Keep complete snouts, crowns and neck outlines with generous neutral gray space above and beside every head. The neck bases and a little upper chest may extend toward the lower edge; no full-body layout. No sixth head, injury/regrowth state or wings. Do not draw a circle. Appearance reference: One Huge uninjured baseline Rift Hydra: ONE powerful low reptilian torso, exactly FOUR short muscular clawed legs, ONE long tapering reptilian tail and EXACTLY FIVE separate long necks, each ending in ONE complete reptilian head. Fan the five necks apart so all FIVE heads are easy to count, with no overlapping heads or hidden extra head; each has two small amber-yellow eyes and a single mostly closed tooth-lined mouth. Mottled dark olive and charcoal scales with restrained muted violet Rift sheen near the neck bases. A quiet alert near-front three-quarter grounded stance, complete feet and tail tip visible. The five-head baseline and regenerative hydra form follow authored source. Exact scales, colors and uninjured head shapes are editable defaults; this reference does not portray the later warped regrowth state. No severed head, missing head, wounds, blood, gore, sixth head, wings, horns, extra limbs, victim, swamp scenery, labels or text. Include only details relevant to the portrait framing. Match the references' polished naturalistic digital RPG illustration, soft studio light and plain full-bleed light neutral gray background. No other beings, scenery, attack/memory scene, panels, labels, captions, text, borders, logos or UI."
+      }
+    },
+    {
+      "id": "severed-monster-rift-ice",
+      "name": "Rift Ice",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-ice.md",
+          "sha256": "c1e334a20a86c759eac3078a93b16b3eda86cbd2957d98d789d0709137be2849",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-ice.md",
+          "sha256": "183d7c364b6e074179c3ebccd7c0d0bcfb625cc1e09c0f2cf0dd2ade839caac9",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/ice_mephit",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Small active Rift Ice elemental: a single floating upright jagged formation of translucent cold blue-white ice, violet frost along its ridges, with one broad faceted central ice core tapering downward. Exactly TWO short branching ice-claw arms extend low to either side, each ending in three sharp crystal points. A small scatter of attached ice facets and dim inner violet glow, with the entire formation clearly readable. FACELESS: no eyes, face, mouth, humanoid head, ears, horns, legs, feet, wings or tail. The moving jagged violet-frosted ice and claws follow authored source; the active shard outline, two claw branches and colors are editable visual defaults. It levitates without wings. No ordinary imp/gargoyle body, frozen inhabitant, settlement, victim, death burst, detached shards, actual breath attack, scenery or text.",
+        "full_body": {
+          "path": "assets/characters/fad601c71ba35d75f0e07c358cf2f95e3735f75d8d1ffa32e6003f59f8d71895.png",
+          "sha256": "fad601c71ba35d75f0e07c358cf2f95e3735f75d8d1ffa32e6003f59f8d71895"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/212caecace9f9674044a2a3bbefabc6f6cc50e49595c35cc6b69534b0f181a54.png",
+          "sha256": "212caecace9f9674044a2a3bbefabc6f6cc50e49595c35cc6b69534b0f181a54"
+        },
+        "portrait": {
+          "path": "assets/characters/b2d4b6502292245a7af9dfce514fb1269a8c2dafcf95913262e547535441d694.png",
+          "sha256": "b2d4b6502292245a7af9dfce514fb1269a8c2dafcf95913262e547535441d694"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1745971
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2010416
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 1683663
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete creature reference for Rift Ice in Sylvia GM's Severed Lands. Portrait-orientation 1024x1536 PNG. ONE complete single subject in a clear near-front three-quarter reference view, plain light neutral gray background, polished naturalistic digital RPG illustration matching a production catalogue, soft studio light and a restrained grounding shadow if appropriate. Every head, hornless crown, neck, limb, claw branch, tail/tendril/tentacle tip and dagger blade must fit comfortably inside generous margins with real space on all sides. Appearance: One Small active Rift Ice elemental: a single floating upright jagged formation of translucent cold blue-white ice, violet frost along its ridges, with one broad faceted central ice core tapering downward. Exactly TWO short branching ice-claw arms extend low to either side, each ending in three sharp crystal points. A small scatter of attached ice facets and dim inner violet glow, with the entire formation clearly readable. FACELESS: no eyes, face, mouth, humanoid head, ears, horns, legs, feet, wings or tail. The moving jagged violet-frosted ice and claws follow authored source; the active shard outline, two claw branches and colors are editable visual defaults. It levitates without wings. No ordinary imp/gargoyle body, frozen inhabitant, settlement, victim, death burst, detached shards, actual breath attack, scenery or text. Keep the stated exact counts and any weapon-hand side. No extra beings, action scene, environmental scenery, labels, captions, text, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Asset: production multiview reference sheet for Rift Ice from Severed Lands. Input image1 is its selected canonical complete reference. Landscape1536x1024 PNG. Exactly THREE separated COMPLETE views (front, side, back) across the main area plus a narrow separate right-hand column of face/material detail insets; faceless subjects get surface and glow details, never invented faces. Keep every whole silhouette, head, claw/hand, foot, tail/tendril/tentacle tip and any dagger comfortably within generous gray margins. Preserve the same selected shape, face/head, materials, colors, clothing, resting pose and handedness across views. Appearance: One Small active Rift Ice elemental: a single floating upright jagged formation of translucent cold blue-white ice, violet frost along its ridges, with one broad faceted central ice core tapering downward. Exactly TWO short branching ice-claw arms extend low to either side, each ending in three sharp crystal points. A small scatter of attached ice facets and dim inner violet glow, with the entire formation clearly readable. FACELESS: no eyes, face, mouth, humanoid head, ears, horns, legs, feet, wings or tail. The moving jagged violet-frosted ice and claws follow authored source; the active shard outline, two claw branches and colors are editable visual defaults. It levitates without wings. No ordinary imp/gargoyle body, frozen inhabitant, settlement, victim, death burst, detached shards, actual breath attack, scenery or text. Keep the ONE faceless floating ice-shard core and exactly TWO branching claw arms with THREE points per claw. No eyes, face, humanoid head, wings, legs, feet or imp body. Match the reference's polished naturalistic digital RPG rendering, soft studio light and plain neutral gray background. No other beings, attack/injury/memory scene, scenery, text, captions, labels, logos, borders or UI.",
+        "portrait": "Use case: identity-preserve. Asset: one square1024x1024 reusable portrait for Rift Ice from Severed Lands. Input image1 is the selected complete canonical reference, image2 the reviewed multiview sheet. Preserve this SAME subject's exact selected anatomy, face/head, materials, colors and expression. Portrait framing overrides the complete-body layout. Show the ONE COMPLETE FACELESS ice-shard formation, including the whole pointed core and BOTH three-point branching claw arms, centered at x50%/y50%, fitting inside a central75-80% circular safe area. Keep the entire top/bottom crystal tips and both claw outlines comfortably within the frame. No eyes, face, humanoid head, legs, wings or additional shards. Do not draw a circle. Appearance reference: One Small active Rift Ice elemental: a single floating upright jagged formation of translucent cold blue-white ice, violet frost along its ridges, with one broad faceted central ice core tapering downward. Exactly TWO short branching ice-claw arms extend low to either side, each ending in three sharp crystal points. A small scatter of attached ice facets and dim inner violet glow, with the entire formation clearly readable. FACELESS: no eyes, face, mouth, humanoid head, ears, horns, legs, feet, wings or tail. The moving jagged violet-frosted ice and claws follow authored source; the active shard outline, two claw branches and colors are editable visual defaults. It levitates without wings. No ordinary imp/gargoyle body, frozen inhabitant, settlement, victim, death burst, detached shards, actual breath attack, scenery or text. Include only details relevant to the portrait framing. Match the references' polished naturalistic digital RPG illustration, soft studio light and plain full-bleed light neutral gray background. No other beings, scenery, attack/memory scene, panels, labels, captions, text, borders, logos or UI."
+      }
+    },
+    {
+      "id": "severed-monster-rift-jelly",
+      "name": "Rift Jelly",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-jelly.md",
+          "sha256": "1d8fb40dcf338532ef9f96d6cc8ceefaf406ad22c563776bd4a79bace414e06c",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-jelly.md",
+          "sha256": "eb6e11eb7cd1682a7bb17ac92c1453b07d36272f5e9e61ed69269328ae319df8",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/ochre_jelly",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Large Rift Jelly: ONE drifting semi-translucent violet Rift-stuff mass shaped like a soft rounded jellyfish-like bell, dim sickly violet light diffused within it, with EXACTLY SIX long thin flowing tendrils of condensed Veil energy trailing beneath. The six tendrils have distinct visible tips, spaced gently apart; the bell is one continuous amorphous mass with no rigid shell. Suspended in a quiet resting reference state. FACELESS: no eyes, face, mouth, head, hands, legs, skeleton or trapped object. Violet drifting mass, buoyancy and energy tendrils follow authored source. The bell outline, six-tendril resting arrangement, glow pattern and exact shades are editable visual defaults, not a limitation on its amorphous movement or splitting. No ochre/yellow recolor, extra creature, victim, engulfed body, literal sea water, floor puddle, attack, scenery or readable text.",
+        "full_body": {
+          "path": "assets/characters/f375c2b943ffa1d3bd8f5e84d10cdb9dbcc53ff148b8b4e5f7b75fbc3f2ee66e.png",
+          "sha256": "f375c2b943ffa1d3bd8f5e84d10cdb9dbcc53ff148b8b4e5f7b75fbc3f2ee66e"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/5f1b46ea4ab1378bb7739934565dba252e98d5f72bccfe268e386bed2739104e.png",
+          "sha256": "5f1b46ea4ab1378bb7739934565dba252e98d5f72bccfe268e386bed2739104e"
+        },
+        "portrait": {
+          "path": "assets/characters/56b01e1cf5ae598d404502e9a8e3aea1446ec382003b6cd0d76dfe9eff866eb7.png",
+          "sha256": "56b01e1cf5ae598d404502e9a8e3aea1446ec382003b6cd0d76dfe9eff866eb7"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1471068
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 1732824
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 1456507
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete creature reference for Rift Jelly in Sylvia GM's Severed Lands. Portrait-orientation 1024x1536 PNG. ONE complete single subject in a clear near-front three-quarter reference view, plain light neutral gray background, polished naturalistic digital RPG illustration matching a production catalogue, soft studio light and a restrained grounding shadow if appropriate. Every head, hornless crown, neck, limb, claw branch, tail/tendril/tentacle tip and dagger blade must fit comfortably inside generous margins with real space on all sides. Appearance: One Large Rift Jelly: ONE drifting semi-translucent violet Rift-stuff mass shaped like a soft rounded jellyfish-like bell, dim sickly violet light diffused within it, with EXACTLY SIX long thin flowing tendrils of condensed Veil energy trailing beneath. The six tendrils have distinct visible tips, spaced gently apart; the bell is one continuous amorphous mass with no rigid shell. Suspended in a quiet resting reference state. FACELESS: no eyes, face, mouth, head, hands, legs, skeleton or trapped object. Violet drifting mass, buoyancy and energy tendrils follow authored source. The bell outline, six-tendril resting arrangement, glow pattern and exact shades are editable visual defaults, not a limitation on its amorphous movement or splitting. No ochre/yellow recolor, extra creature, victim, engulfed body, literal sea water, floor puddle, attack, scenery or readable text. Keep the stated exact counts and any weapon-hand side. No extra beings, action scene, environmental scenery, labels, captions, text, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Asset: production multiview reference sheet for Rift Jelly from Severed Lands. Input image1 is its selected canonical complete reference. Landscape1536x1024 PNG. Exactly THREE separated COMPLETE views (front, side, back) across the main area plus a narrow separate right-hand column of face/material detail insets; faceless subjects get surface and glow details, never invented faces. Keep every whole silhouette, head, claw/hand, foot, tail/tendril/tentacle tip and any dagger comfortably within generous gray margins. Preserve the same selected shape, face/head, materials, colors, clothing, resting pose and handedness across views. Appearance: One Large Rift Jelly: ONE drifting semi-translucent violet Rift-stuff mass shaped like a soft rounded jellyfish-like bell, dim sickly violet light diffused within it, with EXACTLY SIX long thin flowing tendrils of condensed Veil energy trailing beneath. The six tendrils have distinct visible tips, spaced gently apart; the bell is one continuous amorphous mass with no rigid shell. Suspended in a quiet resting reference state. FACELESS: no eyes, face, mouth, head, hands, legs, skeleton or trapped object. Violet drifting mass, buoyancy and energy tendrils follow authored source. The bell outline, six-tendril resting arrangement, glow pattern and exact shades are editable visual defaults, not a limitation on its amorphous movement or splitting. No ochre/yellow recolor, extra creature, victim, engulfed body, literal sea water, floor puddle, attack, scenery or readable text. Keep ONE violet translucent resting bell and exactly SIX separate trailing energy tendrils with complete tips. The resting form stays consistent across views; no face, eyes, rigid anatomy, ochre recolor or split state. Match the reference's polished naturalistic digital RPG rendering, soft studio light and plain neutral gray background. No other beings, attack/injury/memory scene, scenery, text, captions, labels, logos, borders or UI.",
+        "portrait": "Use case: identity-preserve. Asset: one square1024x1024 reusable portrait for Rift Jelly from Severed Lands. Input image1 is the selected complete canonical reference, image2 the reviewed multiview sheet. Preserve this SAME subject's exact selected anatomy, face/head, materials, colors and expression. Portrait framing overrides the complete-body layout. Show the ONE COMPLETE FACELESS violet floating bell and ALL SIX trailing energy tendrils, all six distinct tips visible, centered and fitting inside a central75-80% circular safe area. Keep generous gray room around the whole soft silhouette. No eyes, mouth, human head, limbs, yellow recolor or split state. Do not draw a circle. Appearance reference: One Large Rift Jelly: ONE drifting semi-translucent violet Rift-stuff mass shaped like a soft rounded jellyfish-like bell, dim sickly violet light diffused within it, with EXACTLY SIX long thin flowing tendrils of condensed Veil energy trailing beneath. The six tendrils have distinct visible tips, spaced gently apart; the bell is one continuous amorphous mass with no rigid shell. Suspended in a quiet resting reference state. FACELESS: no eyes, face, mouth, head, hands, legs, skeleton or trapped object. Violet drifting mass, buoyancy and energy tendrils follow authored source. The bell outline, six-tendril resting arrangement, glow pattern and exact shades are editable visual defaults, not a limitation on its amorphous movement or splitting. No ochre/yellow recolor, extra creature, victim, engulfed body, literal sea water, floor puddle, attack, scenery or readable text. Include only details relevant to the portrait framing. Match the references' polished naturalistic digital RPG illustration, soft studio light and plain full-bleed light neutral gray background. No other beings, scenery, attack/memory scene, panels, labels, captions, text, borders, logos or UI."
+      }
+    },
+    {
+      "id": "severed-monster-rift-kraken",
+      "name": "Rift Kraken",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-kraken.md",
+          "sha256": "ab20ab2ac4051c8e62d8c9cfadb0d3ba6a6bdb036659eaf9215aa88117c9cf26",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-kraken.md",
+          "sha256": "97005daa12e459e07669439ccbd2f6888c83e7891c1b29a956025db37bae97b4",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/kraken",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Gargantuan Rift Kraken: one immense cephalopod-like leviathan with a broad oval dark slate-violet mantle, ONE head region with TWO warm amber-copper eyes, and EXACTLY TEN long muscular suckered tentacles attached around the mantle base, FIVE fanning to each side. All TEN discrete tapered tips must be visible and countable, with gentle separated curves and no tangled overlaps or extra appendages. A small closed dark beak is recessed beneath the head, with no visible prey. Restrained cool violet luminous speckling along the wet-looking skin and subtle Rift sheen, a calm suspended swimming reference pose on neutral background. The leviathan, tentacles and Rift touch follow authored source; ten tentacles match the inherited record. Cephalopod shape, colors, sucker pattern and warm eye glint are editable defaults; the fisherfolk's sunrise story remains a rumor, with no actual world scene in the eyes. No horns, wings, human limbs, extra tentacle, ship, sailor, victim, swallowed being, accompanying marine life, ocean scene, attack lightning, writing or scenery.",
+        "full_body": {
+          "path": "assets/characters/ed5e5f975c2f656d255cf881ad11d82c09b51701bdc3481e67292e5b2b6e2bb9.png",
+          "sha256": "ed5e5f975c2f656d255cf881ad11d82c09b51701bdc3481e67292e5b2b6e2bb9"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/31d32d060e3e96a6805764b69879d55ac7d38777c489addd50a398cc092196d8.png",
+          "sha256": "31d32d060e3e96a6805764b69879d55ac7d38777c489addd50a398cc092196d8"
+        },
+        "portrait": {
+          "path": "assets/characters/01382f7a3b2fe2a4453379e3d75a189e318e38f398bc655168658b6600ee511f.png",
+          "sha256": "01382f7a3b2fe2a4453379e3d75a189e318e38f398bc655168658b6600ee511f"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2109336
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2195230
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2676114
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete creature reference for Rift Kraken in Sylvia GM's Severed Lands. Landscape 1536x1024 PNG. ONE complete single subject in a clear near-front three-quarter reference view, plain light neutral gray background, polished naturalistic digital RPG illustration matching a production catalogue, soft studio light and a restrained grounding shadow if appropriate. Every head, hornless crown, neck, limb, claw branch, tail/tendril/tentacle tip and dagger blade must fit comfortably inside generous margins with real space on all sides. Appearance: One Gargantuan Rift Kraken: one immense cephalopod-like leviathan with a broad oval dark slate-violet mantle, ONE head region with TWO warm amber-copper eyes, and EXACTLY TEN long muscular suckered tentacles attached around the mantle base, FIVE fanning to each side. All TEN discrete tapered tips must be visible and countable, with gentle separated curves and no tangled overlaps or extra appendages. A small closed dark beak is recessed beneath the head, with no visible prey. Restrained cool violet luminous speckling along the wet-looking skin and subtle Rift sheen, a calm suspended swimming reference pose on neutral background. The leviathan, tentacles and Rift touch follow authored source; ten tentacles match the inherited record. Cephalopod shape, colors, sucker pattern and warm eye glint are editable defaults; the fisherfolk's sunrise story remains a rumor, with no actual world scene in the eyes. No horns, wings, human limbs, extra tentacle, ship, sailor, victim, swallowed being, accompanying marine life, ocean scene, attack lightning, writing or scenery. Keep the stated exact counts and any weapon-hand side. No extra beings, action scene, environmental scenery, labels, captions, text, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Asset: production multiview reference sheet for Rift Kraken from Severed Lands. Input image1 is its selected canonical complete reference. Landscape1536x1024 PNG. A roomy2x2 layout with exactly THREE separated COMPLETE views (front three-quarter, side, rear three-quarter) and ONE panel of head/material detail insets. Keep every whole silhouette, head, claw/hand, foot, tail/tendril/tentacle tip and any dagger comfortably within generous gray margins. Preserve the same selected shape, face/head, materials, colors, clothing, resting pose and handedness across views. Appearance: One Gargantuan Rift Kraken: one immense cephalopod-like leviathan with a broad oval dark slate-violet mantle, ONE head region with TWO warm amber-copper eyes, and EXACTLY TEN long muscular suckered tentacles attached around the mantle base, FIVE fanning to each side. All TEN discrete tapered tips must be visible and countable, with gentle separated curves and no tangled overlaps or extra appendages. A small closed dark beak is recessed beneath the head, with no visible prey. Restrained cool violet luminous speckling along the wet-looking skin and subtle Rift sheen, a calm suspended swimming reference pose on neutral background. The leviathan, tentacles and Rift touch follow authored source; ten tentacles match the inherited record. Cephalopod shape, colors, sucker pattern and warm eye glint are editable defaults; the fisherfolk's sunrise story remains a rumor, with no actual world scene in the eyes. No horns, wings, human limbs, extra tentacle, ship, sailor, victim, swallowed being, accompanying marine life, ocean scene, attack lightning, writing or scenery. Keep ONE mantle/head region and exactly TEN discrete suckered tentacles, five to each side. Use a fanned reference arrangement so all TEN tapered tips are fully visible in each complete view; no extra hidden tentacles, duplicated mantle or other limbs. Match the reference's polished naturalistic digital RPG rendering, soft studio light and plain neutral gray background. No other beings, attack/injury/memory scene, scenery, text, captions, labels, logos, borders or UI.",
+        "portrait": "Use case: identity-preserve. Asset: one square1024x1024 reusable portrait for Rift Kraken from Severed Lands. Input image1 is the selected complete canonical reference, image2 the reviewed multiview sheet. Preserve this SAME subject's exact selected anatomy, face/head, materials, colors and expression. Portrait framing overrides the complete-body layout. Show ONE near-front three-quarter HEAD AND UPPER MANTLE portrait of the SAME Kraken. Keep its two amber-copper eyes, closed recessed beak, dark slate-violet skin and Rift speckling clear. Head centered, eyes near40% from top, whole crown/mantle silhouette inside a generous circular safe area. Only the proximal tentacle bases enter the lower edge and continue outside the crop; do not squeeze the whole ten-tentacle fan into the portrait. No new appendages, human face, horns, open attack mouth or prey. Do not draw a circle. Appearance reference: One Gargantuan Rift Kraken: one immense cephalopod-like leviathan with a broad oval dark slate-violet mantle, ONE head region with TWO warm amber-copper eyes, and EXACTLY TEN long muscular suckered tentacles attached around the mantle base, FIVE fanning to each side. All TEN discrete tapered tips must be visible and countable, with gentle separated curves and no tangled overlaps or extra appendages. A small closed dark beak is recessed beneath the head, with no visible prey. Restrained cool violet luminous speckling along the wet-looking skin and subtle Rift sheen, a calm suspended swimming reference pose on neutral background. The leviathan, tentacles and Rift touch follow authored source; ten tentacles match the inherited record. Cephalopod shape, colors, sucker pattern and warm eye glint are editable defaults; the fisherfolk's sunrise story remains a rumor, with no actual world scene in the eyes. No horns, wings, human limbs, extra tentacle, ship, sailor, victim, swallowed being, accompanying marine life, ocean scene, attack lightning, writing or scenery. Include only details relevant to the portrait framing. Match the references' polished naturalistic digital RPG illustration, soft studio light and plain full-bleed light neutral gray background. No other beings, scenery, attack/memory scene, panels, labels, captions, text, borders, logos or UI."
+      }
+    },
+    {
+      "id": "severed-monster-rift-lamia",
+      "name": "Rift Lamia",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-lamia.md",
+          "sha256": "7fda16e41526beef34f2fe97620487a2e3667fb30fa0370483b617254e3daa10",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-lamia.md",
+          "sha256": "9bab4c2a03cedcef12795117f73535b43d3e692b398019fddd426143ca246b77",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/lamia",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Large Rift Lamia, an anonymous mature adult lion-bodied enchantress as the authored source describes her. A humanlike mature female upper torso and head with warm tan-brown intact skin, two muted silver-gray eyes, long wavy black hair, ordinary rounded ears and a composed guarded closed-mouth expression. A plain opaque smoked-violet long-sleeved wrap robe fully covers the chest and torso, tied with a simple dark belt where the upper body joins ONE sandy-ochre lion lower torso. Exactly TWO humanlike arms with five fingers per hand, exactly FOUR lion legs with broad feline clawed paws, and ONE long lion tail ending in a dark brown tuft. The anatomical RIGHT hand holds ONE plain short steel dagger low beside the body, complete blade/tip visible; LEFT hand open and empty. No human legs, wings, horns or snake tail. Lion body, enchantress form and dagger follow authored source; face, hair, clothes and palette are editable defaults without a named identity or illusion scene. No nudity, sexualized pose, victim, life-draining scene, false paradise, jewelry insignia, readable text or scenery.",
+        "full_body": {
+          "path": "assets/characters/b33d10a944266e80be1704dba43b6c079f6e7a7b7b836f5509622f343d87cc8a.png",
+          "sha256": "b33d10a944266e80be1704dba43b6c079f6e7a7b7b836f5509622f343d87cc8a"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/253a95f97cea86c65eb4769d71280d43000d57ea9aca3c5b1d3f0835a933651d.png",
+          "sha256": "253a95f97cea86c65eb4769d71280d43000d57ea9aca3c5b1d3f0835a933651d"
+        },
+        "portrait": {
+          "path": "assets/characters/acb7daa1b3e094569b2cc070c1d0ef23fa191db17a87b18ad01f14904ee0a1c4.png",
+          "sha256": "acb7daa1b3e094569b2cc070c1d0ef23fa191db17a87b18ad01f14904ee0a1c4"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0,
+          "zoom": 1.15
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 1654449
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2083440
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2511201
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete creature reference for Rift Lamia in Sylvia GM's Severed Lands. Landscape 1536x1024 PNG. ONE complete single subject in a clear near-front three-quarter reference view, plain light neutral gray background, polished naturalistic digital RPG illustration matching a production catalogue, soft studio light and a restrained grounding shadow if appropriate. Every head, hornless crown, neck, limb, claw branch, tail/tendril/tentacle tip and dagger blade must fit comfortably inside generous margins with real space on all sides. Appearance: One Large Rift Lamia, an anonymous mature adult lion-bodied enchantress as the authored source describes her. A humanlike mature female upper torso and head with warm tan-brown intact skin, two muted silver-gray eyes, long wavy black hair, ordinary rounded ears and a composed guarded closed-mouth expression. A plain opaque smoked-violet long-sleeved wrap robe fully covers the chest and torso, tied with a simple dark belt where the upper body joins ONE sandy-ochre lion lower torso. Exactly TWO humanlike arms with five fingers per hand, exactly FOUR lion legs with broad feline clawed paws, and ONE long lion tail ending in a dark brown tuft. The anatomical RIGHT hand holds ONE plain short steel dagger low beside the body, complete blade/tip visible; LEFT hand open and empty. No human legs, wings, horns or snake tail. Lion body, enchantress form and dagger follow authored source; face, hair, clothes and palette are editable defaults without a named identity or illusion scene. No nudity, sexualized pose, victim, life-draining scene, false paradise, jewelry insignia, readable text or scenery. Keep the stated exact counts and any weapon-hand side. No extra beings, action scene, environmental scenery, labels, captions, text, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Asset: production multiview reference sheet for Rift Lamia from Severed Lands. Input image1 is its selected canonical complete reference. Landscape1536x1024 PNG. A roomy2x2 layout with exactly THREE separated COMPLETE views (front three-quarter, side, rear three-quarter) and ONE panel of head/material detail insets. Keep every whole silhouette, head, claw/hand, foot, tail/tendril/tentacle tip and any dagger comfortably within generous gray margins. Preserve the same selected shape, face/head, materials, colors, clothing, resting pose and handedness across views. Appearance: One Large Rift Lamia, an anonymous mature adult lion-bodied enchantress as the authored source describes her. A humanlike mature female upper torso and head with warm tan-brown intact skin, two muted silver-gray eyes, long wavy black hair, ordinary rounded ears and a composed guarded closed-mouth expression. A plain opaque smoked-violet long-sleeved wrap robe fully covers the chest and torso, tied with a simple dark belt where the upper body joins ONE sandy-ochre lion lower torso. Exactly TWO humanlike arms with five fingers per hand, exactly FOUR lion legs with broad feline clawed paws, and ONE long lion tail ending in a dark brown tuft. The anatomical RIGHT hand holds ONE plain short steel dagger low beside the body, complete blade/tip visible; LEFT hand open and empty. No human legs, wings, horns or snake tail. Lion body, enchantress form and dagger follow authored source; face, hair, clothes and palette are editable defaults without a named identity or illusion scene. No nudity, sexualized pose, victim, life-draining scene, false paradise, jewelry insignia, readable text or scenery. Keep the selected mature female humanlike upper torso with TWO arms, ONE lion lower torso with FOUR feline legs and ONE tufted lion tail. Anatomical RIGHT hand holds ONE complete dagger, LEFT empty; no human legs, wings, snake tail or added anatomy. Match the reference's polished naturalistic digital RPG rendering, soft studio light and plain neutral gray background. No other beings, attack/injury/memory scene, scenery, text, captions, labels, logos, borders or UI.",
+        "portrait": "Use case: identity-preserve. Asset: one square1024x1024 reusable portrait for Rift Lamia from Severed Lands. Input image1 is the selected complete canonical reference, image2 the reviewed multiview sheet. Preserve this SAME subject's exact selected anatomy, face/head, materials, colors and expression. Portrait framing overrides the complete-body layout. Show ONE near-front humanlike HEAD-AND-SHOULDERS portrait at eye level, upper opaque smoked-violet robe visible, head centered, eyes near35% from top, crown near10%, complete head/ears/black hair inside a generous circular safe area. Preserve her selected mature face, warm tan-brown skin, silver-gray eyes, wavy black hair and composed closed-mouth expression. No hands, dagger, lion lower torso, added horns, wings or full-body layout. Do not draw a circle. Appearance reference: One Large Rift Lamia, an anonymous mature adult lion-bodied enchantress as the authored source describes her. A humanlike mature female upper torso and head with warm tan-brown intact skin, two muted silver-gray eyes, long wavy black hair, ordinary rounded ears and a composed guarded closed-mouth expression. A plain opaque smoked-violet long-sleeved wrap robe fully covers the chest and torso, tied with a simple dark belt where the upper body joins ONE sandy-ochre lion lower torso. Exactly TWO humanlike arms with five fingers per hand, exactly FOUR lion legs with broad feline clawed paws, and ONE long lion tail ending in a dark brown tuft. The anatomical RIGHT hand holds ONE plain short steel dagger low beside the body, complete blade/tip visible; LEFT hand open and empty. No human legs, wings, horns or snake tail. Lion body, enchantress form and dagger follow authored source; face, hair, clothes and palette are editable defaults without a named identity or illusion scene. No nudity, sexualized pose, victim, life-draining scene, false paradise, jewelry insignia, readable text or scenery. Include only details relevant to the portrait framing. Match the references' polished naturalistic digital RPG illustration, soft studio light and plain full-bleed light neutral gray background. No other beings, scenery, attack/memory scene, panels, labels, captions, text, borders, logos or UI."
+      }
+    },
+    {
+      "id": "severed-monster-rift-lich",
+      "name": "Rift Lich",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-lich.md",
+          "sha256": "2842c28b93b7651c0c8720107f939ef2eb1662428bb76317eecb4f232c5c5560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-lich.md",
+          "sha256": "ec8e7f8f1581de5ead37d17693744d436b26f20b6543eb530f7ff8a14633a356",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/lich",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Medium Rift Lich in an editable anonymous mature adult humanlike spellcaster appearance, reflecting the authored partly remembered consciousness rather than a conventional decaying corpse. A complete upright lean figure with exactly TWO arms, five fingers on each relaxed empty hand, TWO separate legs and complete plain dark boots. A mature angular face, intact muted olive-gray skin, two pale violet-gray eyes, shoulder-length silver-gray hair brushed back and a composed calculating closed-mouth expression. Plain layered deep slate-blue long-sleeved robes with restrained violet-gray trim, a simple dark waist belt and one unmarked small cloth component pouch. The face, hands and robe edges fade slightly into a soft violet translucent outline while one complete figure remains readable. The deliberate spellcaster Echo and partial Rift existence follow authored source; anonymous features, hair, outfit, pouch and palette are editable visual defaults. No skull face, exposed bones, wounds, rotting flesh, horned crown, wings, tail, duplicate figure/face, named original identity, phylactery/spirit jar or its location, victim, spell attack, readable runes, text or scenery.",
+        "full_body": {
+          "path": "assets/characters/2d65363a48962a063cbc76e6ea7818aafbeac9f7e100192edbbf88959a16c441.png",
+          "sha256": "2d65363a48962a063cbc76e6ea7818aafbeac9f7e100192edbbf88959a16c441"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/4c0d940a263b59220dd397a334ca063ea6908544d98e77789c7be42b5e198cf2.png",
+          "sha256": "4c0d940a263b59220dd397a334ca063ea6908544d98e77789c7be42b5e198cf2"
+        },
+        "portrait": {
+          "path": "assets/characters/532bdf6e69f17cdc5ede6b3c58a991f2e64344c4222adc306fd2cb9bcd5f18cc.png",
+          "sha256": "532bdf6e69f17cdc5ede6b3c58a991f2e64344c4222adc306fd2cb9bcd5f18cc"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0,
+          "zoom": 1.15
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1593871
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2088460
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2349725
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete creature reference for Rift Lich in Sylvia GM's Severed Lands. Portrait-orientation 1024x1536 PNG. ONE complete single subject in a clear near-front three-quarter reference view, plain light neutral gray background, polished naturalistic digital RPG illustration matching a production catalogue, soft studio light and a restrained grounding shadow if appropriate. Every head, hornless crown, neck, limb, claw branch, tail/tendril/tentacle tip and dagger blade must fit comfortably inside generous margins with real space on all sides. Appearance: One Medium Rift Lich in an editable anonymous mature adult humanlike spellcaster appearance, reflecting the authored partly remembered consciousness rather than a conventional decaying corpse. A complete upright lean figure with exactly TWO arms, five fingers on each relaxed empty hand, TWO separate legs and complete plain dark boots. A mature angular face, intact muted olive-gray skin, two pale violet-gray eyes, shoulder-length silver-gray hair brushed back and a composed calculating closed-mouth expression. Plain layered deep slate-blue long-sleeved robes with restrained violet-gray trim, a simple dark waist belt and one unmarked small cloth component pouch. The face, hands and robe edges fade slightly into a soft violet translucent outline while one complete figure remains readable. The deliberate spellcaster Echo and partial Rift existence follow authored source; anonymous features, hair, outfit, pouch and palette are editable visual defaults. No skull face, exposed bones, wounds, rotting flesh, horned crown, wings, tail, duplicate figure/face, named original identity, phylactery/spirit jar or its location, victim, spell attack, readable runes, text or scenery. Keep the stated exact counts and any weapon-hand side. No extra beings, action scene, environmental scenery, labels, captions, text, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Asset: production multiview reference sheet for Rift Lich from Severed Lands. Input image1 is its selected canonical complete reference. Landscape1536x1024 PNG. Exactly THREE separated COMPLETE views (front, side, back) across the main area plus a narrow separate right-hand column of face/material detail insets; faceless subjects get surface and glow details, never invented faces. Keep every whole silhouette, head, claw/hand, foot, tail/tendril/tentacle tip and any dagger comfortably within generous gray margins. Preserve the same selected shape, face/head, materials, colors, clothing, resting pose and handedness across views. Appearance: One Medium Rift Lich in an editable anonymous mature adult humanlike spellcaster appearance, reflecting the authored partly remembered consciousness rather than a conventional decaying corpse. A complete upright lean figure with exactly TWO arms, five fingers on each relaxed empty hand, TWO separate legs and complete plain dark boots. A mature angular face, intact muted olive-gray skin, two pale violet-gray eyes, shoulder-length silver-gray hair brushed back and a composed calculating closed-mouth expression. Plain layered deep slate-blue long-sleeved robes with restrained violet-gray trim, a simple dark waist belt and one unmarked small cloth component pouch. The face, hands and robe edges fade slightly into a soft violet translucent outline while one complete figure remains readable. The deliberate spellcaster Echo and partial Rift existence follow authored source; anonymous features, hair, outfit, pouch and palette are editable visual defaults. No skull face, exposed bones, wounds, rotting flesh, horned crown, wings, tail, duplicate figure/face, named original identity, phylactery/spirit jar or its location, victim, spell attack, readable runes, text or scenery. Keep the SAME mature intact humanlike face and shoulder-length silver-gray hair, TWO empty five-fingered hands, TWO separate booted feet, robes and plain pouch. Preserve gentle violet translucent edges without losing any complete limb; no corpse/skull transformation, duplicate figure, phylactery or revealed identity. Match the reference's polished naturalistic digital RPG rendering, soft studio light and plain neutral gray background. No other beings, attack/injury/memory scene, scenery, text, captions, labels, logos, borders or UI.",
+        "portrait": "Use case: identity-preserve. Asset: one square1024x1024 reusable portrait for Rift Lich from Severed Lands. Input image1 is the selected complete canonical reference, image2 the reviewed multiview sheet. Preserve this SAME subject's exact selected anatomy, face/head, materials, colors and expression. Portrait framing overrides the complete-body layout. Show ONE near-front HEAD-AND-SHOULDERS portrait at eye level, upper slate-blue/violet robes visible, head centered, eyes near35% from top and crown near10%, complete head/ears/silver-gray hair inside a generous circular safe area. Preserve the SAME mature intact olive-gray humanlike face, pale violet-gray eyes, calculating closed-mouth expression and soft translucent violet edge. No skull, corpse face, rotting flesh, crown, named identity, duplicate face, hands, pouch or full-body layout. Do not draw a circle. Appearance reference: One Medium Rift Lich in an editable anonymous mature adult humanlike spellcaster appearance, reflecting the authored partly remembered consciousness rather than a conventional decaying corpse. A complete upright lean figure with exactly TWO arms, five fingers on each relaxed empty hand, TWO separate legs and complete plain dark boots. A mature angular face, intact muted olive-gray skin, two pale violet-gray eyes, shoulder-length silver-gray hair brushed back and a composed calculating closed-mouth expression. Plain layered deep slate-blue long-sleeved robes with restrained violet-gray trim, a simple dark waist belt and one unmarked small cloth component pouch. The face, hands and robe edges fade slightly into a soft violet translucent outline while one complete figure remains readable. The deliberate spellcaster Echo and partial Rift existence follow authored source; anonymous features, hair, outfit, pouch and palette are editable visual defaults. No skull face, exposed bones, wounds, rotting flesh, horned crown, wings, tail, duplicate figure/face, named original identity, phylactery/spirit jar or its location, victim, spell attack, readable runes, text or scenery. Include only details relevant to the portrait framing. Match the references' polished naturalistic digital RPG illustration, soft studio light and plain full-bleed light neutral gray background. No other beings, scenery, attack/memory scene, panels, labels, captions, text, borders, logos or UI."
+      }
     }
   ]
 }

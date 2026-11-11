@@ -271,7 +271,7 @@ bundles/bindings and original profile prefixes preserved. The authored roster pa
 seconds for 218 subjects/348 editions. All 82 authored NPCs and 47 authored monsters are prepared;
 89 authored monsters and the wider catalogue remain unfinished. No completed owner/frontend/native
 matrix was replayed.
-Rift Ghoul, Gorgon, Grick, Griffon, Harpy and Hippogriff now have complete full-body, multiview
+At 8548f71, Rift Ghoul, Gorgon, Grick, Griffon, Harpy and Hippogriff gained full-body, multiview
 and portrait bundles, bringing the catalogue to 158 bundles/474 PNGs. The selected Ghoul body
 correction removes unsupported horns/wings/tail; the selected Gorgon portrait framing retains
 both complete horns in the dialogue circle. Harpy's saved crop aligns its face without changing
@@ -280,7 +280,20 @@ horse hind hooves/tail. Actual square/dialogue/map-token crops passed visual rev
 exact assets/resources and twelve current/retained authored editions pass actual Lite Setting
 lookup, with prior 152 bundles/bindings and original profile prefixes preserved. The authored
 roster passed in 9.16 seconds for 218 subjects/354 editions. All 82 authored NPCs and 53 authored
-monsters are prepared; 83 authored monsters and wider catalogue/workflow acceptance remain open.
+monsters were prepared; 83 authored monsters and wider catalogue/workflow acceptance remained open.
+Rift Hydra, Ice, Jelly, Kraken, Lamia and Lich now have complete full-body, multiview and portrait
+bundles, bringing the catalogue to 164 bundles/492 PNGs. Hydra retains five intact baseline heads;
+Kraken retains ten tentacles in its complete references. Ice remains a faceless active shard,
+Jelly the authored violet drifting mass, and Lich an anonymous partly remembered spellcaster.
+Actual square/dialogue/map-token crops passed visual review, including all five Hydra heads.
+Lamia and Lich use aligned saved framing without changing portrait PNG bytes. All eighteen
+exact assets/resources and twelve current/retained authored editions pass actual Lite Setting
+lookup, preserving prior 158 bundles/bindings and original profile prefixes. The authored roster
+passed in 3.26 seconds for 218 subjects/360 editions. All 82 authored NPCs and 59 authored monsters
+are prepared; 77 authored monsters and the wider catalogue/workflow acceptance remain unfinished.
+Anchor Sentinel's existing older catalogue ID still resolves both current/retained editions;
+its artwork was reused without a duplicate bundle. No completed owner/frontend/native matrix
+was replayed.
 At f85bbcb, all 82 authored NPCs across
 80 current profile files
 and 165 source editions resolved complete artwork, with all 246 NPC PNGs/resources and actual
@@ -293,7 +306,7 @@ The owner selected a shared app artwork library: whole Setting/Plan exports omit
 PNGs, while custom art stays portable and character/campaign exports carry used artwork. The
 source now maps the catalogue and PNGs as external installer/portable resources, outside the
 onefile sidecar. Campaign export retains used art before any artwork view has been opened.
-The prepared PNG pool now totals 1,090,885,631 bytes across 474 images, beyond the content-package cap.
+The prepared PNG pool now totals 1,127,257,460 bytes across 492 images, beyond the content-package cap.
 The current Setting omits those PNGs; its existing content-package limits remain unchanged.
 Focused checks cover shared/custom publication, external resource inventory, portable ZIP assembly,
 and exact campaign art transfer before opening an image view. Local-copy receipts also transfer
@@ -356,7 +369,7 @@ file metadata; wrong Setting/hash/package/pointer/changed-byte lookups are refus
 reused PNGs pass runtime byte/hash lookup. The selected Cloud morningstar is a rigid spiked mace;
 the inherited Thunderous Mace attack and all other mechanical payloads remain unchanged. These
 Setting artwork choices do not qualify inherited form execution or change participant identities.
-Six further inherited records now reuse Ghoul, Gorgon, Grick, Griffon, Harpy and Hippogriff art,
+At 8548f71, six further inherited records reused Ghoul, Gorgon, Grick, Griffon, Harpy and Hippogriff art,
 bringing inherited coverage to 33 forms. Exact current Lite bytes and admitted metadata resolve
 all six; wrong Setting/hash/package/pointer/changed-byte lookups are refused. All eighteen reused
 PNGs pass runtime byte/hash lookup. Authored Gorgon and Grick remain monstrosities; their inherited
@@ -364,9 +377,17 @@ records remain construct and aberration respectively. Compatible physical artwor
 without changing either source type. Harpy retains its authored club without adding an inherited
 attack. Mechanical payloads and participant identities are unchanged; form execution remains
 unqualified by these artwork checks.
+Six further inherited records reuse the prepared Hydra, Ice Mephit, Ochre Jelly, Kraken, Lamia
+and Lich renditions, bringing inherited coverage to 39 forms. Exact current Lite bytes and admitted
+metadata resolve all six; wrong Setting/hash/package/pointer/changed-byte lookups are refused.
+All eighteen reused PNGs pass runtime byte/hash lookup. Lamia retains authored monstrosity and
+inherited fiend labels, and her authored dagger adds no inherited attack. The shard, floating
+Jelly and partly remembered Lich are Setting-specific artwork choices; no movement, flight,
+regeneration, combat payload or participant identity changes are introduced. These checks qualify
+artwork lookup only, with inherited form execution and native/live acceptance still unqualified.
 Other Settings do not inherit those renditions. The mixed NPC/creature journey selects one
 Basilisk through its inherited form and another through its authored Rift profile, preserving
-independent crops and offline used-art recovery. The remaining 297 inherited forms still need art.
+independent crops and offline used-art recovery. The remaining 291 inherited forms still need art.
 At 3b7cc8a, the original five-form actual-image/resource/alias check passed in 84.91 seconds,
 including refusal outside Severed Lands; the mixed authored/inherited/NPC offline journey passed
 in 73.42 seconds. All 33 then-current visual bundles and previous bindings were preserved. Those

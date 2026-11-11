@@ -47,3 +47,15 @@ A Rift-touched leviathan from a drowned world that fell through the Rift into th
 **Tentacle.** +18 to hit, reach 30 ft., 20 (3d6 + 10) bludgeoning. Grappled (escape DC 20).
 **Fling.** Large or smaller creatures grappled are thrown up to 60 feet in a random direction and knocked prone. If striking a solid surface, target takes 1d6 bludgeoning per 10 feet thrown.
 **Lightning Storm.** Magically creates three bolts of lightning, each striking a point the rift kraken can see within 120 feet. Each creature within 10 feet must make DC 23 DEX save, taking 22 (4d10) lightning (half on success). Recharges 5-6.
+
+## Appearance and artwork
+
+One Gargantuan Rift Kraken: one immense cephalopod-like leviathan with a broad oval dark slate-violet mantle, ONE head region with TWO warm amber-copper eyes, and EXACTLY TEN long muscular suckered tentacles attached around the mantle base, FIVE fanning to each side. All TEN discrete tapered tips must be visible and countable, with gentle separated curves and no tangled overlaps or extra appendages. A small closed dark beak is recessed beneath the head, with no visible prey. Restrained cool violet luminous speckling along the wet-looking skin and subtle Rift sheen, a calm suspended swimming reference pose on neutral background. The leviathan, tentacles and Rift touch follow authored source; ten tentacles match the inherited record. Cephalopod shape, colors, sucker pattern and warm eye glint are editable defaults; the fisherfolk's sunrise story remains a rumor, with no actual world scene in the eyes. No horns, wings, human limbs, extra tentacle, ship, sailor, victim, swallowed being, accompanying marine life, ocean scene, attack lightning, writing or scenery.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/01382f7a3b2fe2a4453379e3d75a189e318e38f398bc655168658b6600ee511f.png)
+
+[Full-body reference](../../assets/characters/ed5e5f975c2f656d255cf881ad11d82c09b51701bdc3481e67292e5b2b6e2bb9.png)
+
+[Multiview reference sheet](../../assets/characters/31d32d060e3e96a6805764b69879d55ac7d38777c489addd50a398cc092196d8.png)
