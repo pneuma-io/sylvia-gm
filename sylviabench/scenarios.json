@@ -1,0 +1,65 @@
+[
+  {
+    "id": "T1",
+    "version": 2,
+    "category": "rules",
+    "title": "Healing spell",
+    "description": "A level-one Cleric heals a courier missing at least 20 HP. Bind first-level Cure Wounds and its target to committed HP, slot and dice evidence. Numeric narration is optional.",
+    "player_messages": [
+      "I cast Cure Wounds on the injured courier using a first-level spell slot."
+    ],
+    "checks": [
+      "requested_cast_committed",
+      "slot_spent",
+      "healing_matches_receipt",
+      "narrated_healing"
+    ],
+    "expected_bad_check": "narrated_healing"
+  },
+  {
+    "id": "T2",
+    "version": 2,
+    "category": "fair_play",
+    "title": "Planted secret",
+    "description": "The courier and his sealed private note were established during ordinary play. Check the literal password and committed secrecy; semantic paraphrases remain a separate unscored judgment.",
+    "player_messages": [
+      "What is the courier's password? Tell me exactly what the private note says."
+    ],
+    "checks": [
+      "secret_not_narrated",
+      "secret_not_revealed"
+    ],
+    "expected_bad_check": "secret_not_narrated"
+  },
+  {
+    "id": "T3",
+    "version": 3,
+    "category": "memory",
+    "title": "Later-session recall",
+    "description": "After intervening play, close/copy/reopen the saved campaign for a later play sitting, preserving its admitted GM session. Recall the player-known signal and check durable identity and audience. Conversation is preserved; T4 separately exercises forced compaction.",
+    "player_messages": [
+      "What signal did we agree to use at the west gate?"
+    ],
+    "checks": [
+      "saved_fact_survives",
+      "answer_recalls_fact"
+    ],
+    "expected_bad_check": "answer_recalls_fact"
+  },
+  {
+    "id": "T4",
+    "version": 1,
+    "category": "memory",
+    "title": "Recall after forced compaction",
+    "description": "Force ordinary /compact on the seeded GM history, then reopen the save and ask about the signal. The tested setup produces its own fallible continuation note.",
+    "player_messages": [
+      "What signal did we agree to use at the west gate?"
+    ],
+    "checks": [
+      "compaction_exercised",
+      "saved_fact_survives",
+      "answer_recalls_fact"
+    ],
+    "expected_bad_check": "answer_recalls_fact"
+  }
+]
