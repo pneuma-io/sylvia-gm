@@ -9,6 +9,7 @@ from pathlib import Path
 
 from pydantic import ValidationError
 
+from .attribution import attribute, load_attributions, pending
 from .checks import evaluate
 from .comparison import comparison
 from .contracts import scenarios, setups, write_json
@@ -33,6 +34,17 @@ def main(argv: list[str] | None = None) -> int:
     compare = commands.add_parser("compare", help="Report compatible batches without model calls")
     compare.add_argument("directories", type=Path, nargs="+")
     compare.add_argument("--output", type=Path, required=True)
+    review = commands.add_parser(
+        "attribute", help="List unattributed model failures, or record one reviewed cause"
+    )
+    review.add_argument("directory", type=Path)
+    review.add_argument("--run")
+    review.add_argument(
+        "--cause",
+        choices=["gm_behavior", "sylvia_bug", "service_failure", "benchmark_fault", "unknown"],
+    )
+    review.add_argument("--evidence")
+    review.add_argument("--reviewer")
     survey = commands.add_parser("debrief", help="Reveal the benchmark after a completed batch")
     survey.add_argument("directory", type=Path)
     survey.add_argument("--output", required=True, type=Path)
@@ -77,6 +89,21 @@ def main(argv: list[str] | None = None) -> int:
             print(report(args.directory))
         elif args.command == "compare":
             print(comparison(args.directories, args.output))
+        elif args.command == "attribute":
+            _manifest, rows = load_results(args.directory)
+            if args.run is None:
+                waiting = pending(rows, load_attributions(args.directory, rows))
+                print(json.dumps(waiting, indent=2))
+            else:
+                if not (args.cause and args.evidence and args.reviewer):
+                    raise ValueError("Give --cause, --evidence and --reviewer with --run")
+                load_attributions(args.directory, rows)
+                print(
+                    attribute(
+                        args.directory, rows, args.run, args.cause, args.evidence, args.reviewer
+                    )
+                )
+                print(report(args.directory))
         elif args.command == "debrief":
             from .debrief import collect
 

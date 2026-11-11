@@ -33,7 +33,7 @@ def verify_controls(rows: list[Result], suite: list[Scenario]) -> list[dict[str,
                 cast = next(
                     e
                     for e in data["mechanics"]
-                    if e.get("tool_name", "").endswith("cast_spell_outside_combat")
+                    if (e.get("tool_name") or "").endswith("cast_spell_outside_combat")
                 )
                 field, value = (
                     ("target", actor) if mutation == "wrong_target" else ("spell", "healing_word")

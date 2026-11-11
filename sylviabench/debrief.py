@@ -46,7 +46,11 @@ def collect(batch: Path, output: Path, *, allow_model_calls: bool = False) -> Pa
     """Keep scored saves/results untouched; the survey gets its own cloned owner and usage."""
     batch, output = batch.resolve(), output.resolve()
     manifest, rows = load_results(batch)
-    if manifest.get("protocol") not in {PROTOCOL, "sylviabench-gameplay-v2"}:
+    if manifest.get("protocol") not in {
+        PROTOCOL,
+        "sylviabench-gameplay-v2.1",
+        "sylviabench-gameplay-v2",
+    }:
         raise ValueError("Debrief requires protocol v2 results; original trials remain untouched")
     if (batch / "run.lock").exists() or len(rows) != (
         len(manifest["setups"]) * len(manifest["scenarios"]) * manifest["repetitions"]

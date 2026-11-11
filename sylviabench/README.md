@@ -1,10 +1,14 @@
-# SylviaBench gameplay protocol v2.1
+# SylviaBench gameplay protocol v2.2
 
 This developer-only runner drives Sylvia's real owner without an app window. It is outside
 `src/` and is excluded from the installed application. The Builder benchmark remains parked.
 Protocol v2 incorporates the 11 November context repair through merged main
 `c84792e16755055c6760f6f23d09ea964cf5e368`. Broader model-discovery, admission and other app
 follow-ups remain separate. This framework does not qualify them or native desktop interaction.
+
+Protocol v2.2 adds reviewed failure causes, retries a run that a usage limit interrupted and
+stops unrelated numbers from unscoring a healing turn. Records made under v2.1 stay readable.
+They are never resumed or pooled with v2.2 batches.
 
 ## Run and verify offline
 
@@ -35,13 +39,15 @@ Sylvia's approved rule: a free hand is unnecessary; verbal and material rules re
 
 | Scenario | Check |
 | --- | --- |
-| T1 v2: Cure Wounds on the courier | The requested first-level spell and target must have a committed action; one caster slot is spent; courier HP agrees with that action's two d8 and modifier. A numeric narration claim must agree if present. |
+| T1 v3: Cure Wounds on the courier | The requested first-level spell and target must have a committed action; one caster slot is spent; courier HP agrees with that action's two d8 and modifier. A numeric narration claim must agree if present. |
 | T2 v2: Courier's password | The literal password stays out of narration and the durable fact stays private, without revealing it to the player. Semantic paraphrases need separate model-blind judgment and remain unscored. |
 | T3 v3: Later-session recall | After intervening exchanges, close/copy/reopen for a later play sitting using the admitted GM session. History is retained; the saved signal and its audience survive and the response recalls it. |
 | T4 v1: Compacted recall | The selected setup runs the ordinary `/compact` command on the seeded history. Close/copy/reopen again, verify a real checkpoint, then ask the recall question. |
 
 No numeric healing claim is `not_applicable` and does not penalize a mechanically correct cast.
-Ambiguous or unrecognized numeric claims remain `not_evaluated`. The bounded text patterns
+Ambiguous or unrecognized numeric claims remain `not_evaluated`. Slot levels, dice notation,
+slot counts, distances and durations are not healing amounts and are ignored; a stated HP
+total is still treated as an unrecognized claim. The bounded text patterns
 are checked on setup-blind wording examples; this is not a general semantic prose grader.
 
 Every setup receives its own verified copy of the same frozen save and fixed player messages.
@@ -56,7 +62,7 @@ full prompts across providers, or force a common summary onto a compaction test.
 A private setup file uses the existing `SetupFile` schema. Each model setup selects exact
 `provider_id`, `model_id` and `owner_config`, with any explicit reasoning override recorded.
 Use new setup IDs for protocol-v2 experiments. Source records bind actual application/framework
-bytes, the benchmark commit and product base. Earlier fixture recipes cannot run under v2.1. Original
+bytes, the benchmark commit and product base. Earlier fixture recipes cannot run under v2.2. Original
 pilot records and grades are never rewritten or pooled with these new identities.
 
 ```powershell
@@ -72,8 +78,10 @@ cutoff. Sylvia's transport retries remain its own policy and can add unreported 
 The runner preserves the first attempt and up to two ordinary manual retries. Explicit service
 or benchmark-budget failures stop retries and get their own cause, without a stuck-GM flag.
 A rate-limit response with an unknown reset or a reset over 60 seconds pauses the whole batch,
-leaving remaining runs untested. After allowance renews, use the original command with `--resume`.
-Resume reuses completed failures and requires identical source, configuration and policy.
+leaving remaining runs untested. The record of a run the limit interrupted moves to `paused/`
+as evidence and is not a result. After allowance renews, use the original command with
+`--resume`. It retries that run, reuses every other completed record, failures included, and
+requires identical source, configuration and policy.
 
 Each row records compaction count, requested effort where exposed, context windows, tool counts,
 usage coverage and confirmed model identity where available. An adapter echo alone is not proof
@@ -87,6 +95,27 @@ pending because the checked catalog lists 5.2 and Daniel selected 5.5 only. Cata
 not proof of account access. Verify billing and actual served IDs. No token extraction, API-key
 substitution, credit purchases or automatic top-ups are part of this selection. Existing approved
 ChatGPT/Go funding limits remain in force. An execution switch is not a monetary spending cap.
+
+## Attributing failures
+
+The runner records a failed model run with cause `unknown`, because a wrong outcome can come
+from the GM, from Sylvia, from the service or from this benchmark. An unknown cause keeps that
+run's category untested for the setup. A failure counts against a setup only after a recorded
+review attributes it to GM behaviour.
+
+```powershell
+python -m sylviabench attribute ../Results/models-v2
+python -m sylviabench attribute ../Results/models-v2 --run RUN_ID --cause gm_behavior `
+  --evidence "The answer named a red flag at the east gate." --reviewer "Name or method"
+```
+
+The first form lists the model runs still waiting. The second writes
+`attributions/RUN_ID.json` and rebuilds the report. Causes are `gm_behavior`, `sylvia_bug`,
+`service_failure`, `benchmark_fault` and `unknown`; only `gm_behavior` is scored. It needs a
+failed check or the stuck-turn breaker in the record. A decision is bound to the exact result
+bytes, names its reviewer and evidence, and is never silently replaced: move the file aside to
+decide again. Results are not rewritten, and `compare` reads each batch's decisions in place.
+Review the evidence without knowing the setup where that is practical.
 
 ## GM debrief after gameplay
 
@@ -118,7 +147,8 @@ answers the questionnaire. A story continuation is a survey non-answer, even if 
 
 `manifest.json` binds the experiment; `seed.json` and `seed/` identify the immutable starting save;
 `results/` holds one JSON result per run; `runs/` contains disposable independent saves and attempt
-journals. `summary.json` and `report.html` are rebuildable. `compare` can aggregate compatible
+journals. `attributions/` holds reviewed failure causes and `paused/` the records of runs a usage
+limit interrupted. `summary.json` and `report.html` are rebuildable. `compare` can aggregate compatible
 batches while retaining their original lineage. `replay` needs the original scenario/checker
 version; `report` and `compare` can still read historical records without regrading them.
 

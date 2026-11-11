@@ -1,10 +1,10 @@
 [
   {
     "id": "T1",
-    "version": 2,
+    "version": 3,
     "category": "rules",
     "title": "Healing spell",
-    "description": "A level-one Cleric heals a courier missing at least 20 HP. Bind first-level Cure Wounds and its target to committed HP, slot and dice evidence. Numeric narration is optional.",
+    "description": "A level-one Cleric heals a courier missing at least 20 HP. Bind first-level Cure Wounds and its target to committed HP, slot and dice evidence. Numeric narration is optional; slot levels, dice notation and other numbers that are not a healing amount are ignored.",
     "player_messages": [
       "I cast Cure Wounds on the injured courier using a first-level spell slot."
     ],
