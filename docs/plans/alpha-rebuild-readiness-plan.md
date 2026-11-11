@@ -98,6 +98,22 @@ or turn-clock rule is added here.
 Portrait references, committed movement cues, class lane grants and final combined 1:1
 mock-up/Opus acceptance retain their separate contracts. Mechanics proof does not close them.
 
+**Cover correction on integration resumption, selected 11 November 2026.** Cover follows actual
+height, stance and firing direction. Standing upper bodies remain exposed above low walls;
+crouching close behind one can shelter the body from the opposite side. A full-height wall can
+obstruct a distant shot. Do not add a blanket adjacency rule. Five source geometry probes passed,
+including clear upper-body paths over low walls, crouched protection from the opposite side only,
+and a full-height wall blocking a distant shot. These are not final native projectile checks.
+
+The retained demo labels its struck barrier half-height and scripts cover/penetration contacts
+where the matching geometry gives a clear upper-body path. Daniel selected correcting this when
+integration recommences. Reconcile the demonstration with the frontend owner: distant standing
+actors need an actual full-height obstruction for the shown wall contacts, or a different scene
+with physically valid low-cover poses and firing angles. Relabelling alone is insufficient;
+verify every shown contact against geometry and the resolved shot. Qualify these directional
+cover cases and the resulting stop/penetration cues in the final app before balancing. This
+correction and native qualification remain open; no demo or runtime repair is claimed here.
+
 The public compiler accepts optional private notes as an input. Public packages omit
 `references/canon/`; private local builds may include it. TD vault notes and Siren remain
 private. Public GM/Builder reads use compiled reference guides/catalogues and runtime
