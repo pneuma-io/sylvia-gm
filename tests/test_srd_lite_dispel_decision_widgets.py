@@ -11,9 +11,9 @@ from pathlib import Path
 import pytest
 from scripts.srd_lite_profiles import lists
 from scripts.srd_timed_actor_defenses import _load_runtime
-from tests.test_srd_lite_exploration_dispel import fiction, light
-from tests.test_srd_lite_exploration_objects import invoke
-from tests.test_srd_lite_mass_cure_geometry import NAMESPACE, _calls
+from tests.srd_lite_exploration_dispel_fixtures import fiction, light
+from tests.srd_lite_exploration_objects_fixtures import invoke
+from tests.srd_lite_mass_cure_geometry_fixtures import NAMESPACE, _calls
 
 from sylvia_gm.application.result_cards import project_result_card
 from sylvia_gm.runtime import RulesetRuntime

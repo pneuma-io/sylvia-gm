@@ -10,13 +10,13 @@ behavior where any handler can be called directly.
 from __future__ import annotations
 
 import logging
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from sylvia_gm.agent._mode import AgentMode
 
 from sylvia_gm.tools._converter import tool_spec_to_openai
-from sylvia_gm.tools._spec import ToolSpec, Toolset
+from sylvia_gm.tools._spec import Toolset, ToolSpec
 from sylvia_gm.tools._toolsets import ToolsetName, resolve_mode_toolsets
 
 logger = logging.getLogger(__name__)
@@ -41,9 +41,11 @@ class ToolRegistry:
         self._tools: dict[str, ToolSpec] = {}
         self._toolsets: dict[str, Toolset] = {
             ToolsetName.DM_TOOLS: Toolset(ToolsetName.DM_TOOLS, "DM ruleset tools"),
-            ToolsetName.CAMPAIGN_TOOLS: Toolset(ToolsetName.CAMPAIGN_TOOLS, "DM campaign-file tools (R2)"),
+            ToolsetName.CAMPAIGN_TOOLS: Toolset(
+            ToolsetName.CAMPAIGN_TOOLS, "DM campaign-file tools (R2)"),
             ToolsetName.BUILDER_TOOLS: Toolset(ToolsetName.BUILDER_TOOLS, "Builder file I/O tools"),
-            ToolsetName.INTERVIEW_TOOLS: Toolset(ToolsetName.INTERVIEW_TOOLS, "Builder interview widget tools"),
+            ToolsetName.INTERVIEW_TOOLS: Toolset(
+            ToolsetName.INTERVIEW_TOOLS, "Builder interview widget tools"),
             ToolsetName.COMMON_TOOLS: Toolset(ToolsetName.COMMON_TOOLS, "All-mode shared tools"),
         }
         self._context: Any = context
@@ -77,7 +79,7 @@ class ToolRegistry:
     # ── Querying ──
 
     def get_definitions(
-        self, mode: "AgentMode", context: Any = None
+        self, mode: AgentMode, context: Any = None
     ) -> list[dict[str, Any]]:
         """Return OpenAI function-calling JSON for all available tools in mode.
 
@@ -125,7 +127,7 @@ class ToolRegistry:
         """Return a tool by name, or None if not registered."""
         return self._tools.get(name)
 
-    def list_tools(self, mode: "AgentMode | None" = None) -> list[ToolSpec]:
+    def list_tools(self, mode: AgentMode | None = None) -> list[ToolSpec]:
         """List all registered tools, optionally filtered by mode.
 
         Args:
@@ -152,7 +154,7 @@ class ToolRegistry:
     # ── Execution ──
 
     def execute(
-        self, name: str, params: dict[str, Any], mode: "AgentMode"
+        self, name: str, params: dict[str, Any], mode: AgentMode
     ) -> dict[str, Any]:
         """Dispatch tool by name. Returns dict with at least {"success": bool}.
 
@@ -240,7 +242,7 @@ class ToolRegistry:
         except Exception:
             return False
 
-    def get_combat_tool_names(self, mode: "AgentMode | None" = None) -> set[str]:
+    def get_combat_tool_names(self, mode: AgentMode | None = None) -> set[str]:
         """Return the set of tool names whose metadata marks them as combat-only.
 
         Used by ``_build_tools`` to strip combat tools from the non-combat

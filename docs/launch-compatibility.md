@@ -24,7 +24,7 @@ Plan closures and installed the package without changing an existing synthetic 0
 repairs are recorded in Git history and their delivery receipt. Existing user saves stay intact.
 
 The collated final sprint covers documentation, reproducible portable/installer packaging,
-proportionate CI, generic procedure/modifier failures, shipping optimization, dataset-safe
+proportionate local checks, generic procedure/modifier failures, shipping optimization, dataset-safe
 launches and invocation-owned build cleanup. The Lite package's procedures remain empty;
 the generic correction does not select another full spell replay.
 
@@ -33,8 +33,8 @@ binary and payload identities and required notices. It excludes mutable settings
 credentials. Final rebuilt artifacts, installed notice delivery and clean-Windows qualification
 remain open. Older executable/provider evidence cannot validate changed source bytes.
 Preserve unique work and complete the separate disk-space sequence before clean-Windows tests;
-then reconcile acceptance and pause for go-live planning. The repository remains private.
-Public publication requires separate approval.
+then reconcile acceptance for the next selected release. The repository is public and has five
+Alpha prereleases. A new release still requires separate approval.
 
 application/bundled_packages.py materializes exact Ruleset/reference/Setting closures.
 application/bundled_campaign_plans.py selects Plan bytes and checks containment before reads.
@@ -57,17 +57,17 @@ See [licensing status](../LICENSING-STATUS.md) and
 [dependency notice status](../licenses/DEPENDENCY-NOTICES-STATUS.md). Required notice delivery
 and legal rights/adoption decisions are separate. The [documentation index](INDEX.md) links the current product, architecture,
 development process and readiness plan. Historical build records retain their original limits.
-Current private Git delivery is not public release or final installed acceptance.
+Current source delivery does not establish final installed acceptance for a newer candidate.
 
 
 ## Development and release checks
 
-PRs and pushes to main select checks from the complete source diff and retain the source/base
-identities and reasons. Documentation-only edits check links and copy without campaign replay or
+Run checks locally against the complete source diff and retain the source/base identities and
+reasons. The GitHub workflow is dispatch-only; pushes and PRs do not start Actions. Documentation-only edits check links and copy without campaign replay or
 owner compilation. Runtime, frontend, package, native, licensing and build changes select their
 affected boundaries and composed journeys. Unknown or incomplete diffs select broad coverage;
 runner/selector edits verify selection itself. Affected checks do not prove whole-product acceptance.
-Branch pushes do not duplicate PR executions. No healthy existing run is cancelled.
+Record the locally checked PR head, results, elapsed time and gaps in the PR description.
 
 Explicit `qualification: full` workflow dispatch retains every supported Python/JS journey and the
 separate Windows sidecar/Cargo job for combined-candidate qualification. Missing, failed or skipped
@@ -76,7 +76,7 @@ has no whole-run quota. Only explicit full `post_launch_ci_budget: true` selects
 post-launch 1,800-second allowance; no complete-gate latency guarantee has been established.
 GitHub platform limits remain separate constraints.
 
-The standard private Windows runner uses two Python workers with measured case balancing; browser
+The local Windows runner uses two Python workers with measured case balancing; browser
 journeys run before the heavy Python pool. Case progress, collection, pytest phases, package seed
 preparation, database copying and optional archival have separate receipts. Group case durations
 sum worker time, not shared wall time. The explicit `benchmark` dispatch compares identical work

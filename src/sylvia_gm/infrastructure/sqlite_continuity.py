@@ -421,7 +421,8 @@ def read_act_markers(
     replay identity, so displaying a chapter never writes state or advances the story.
     """
     structure = [act for row in adventure_rows(connection, campaign_id)
-                 for act in json.loads(row['content_json']).get('campaign_plan', {}).get('structure', ())]
+                 for act in json.loads(
+                 row['content_json']).get('campaign_plan', {}).get('structure', ())]
     if not isinstance(structure, list):
         return ()
     ordinals = {
@@ -488,7 +489,8 @@ def read_campaign_ending(
         if not adventures:
             return None
         plan_row = adventures[-1]
-        act_offset = sum(len(json.loads(row['content_json']).get('campaign_plan', {}).get('structure', ()))
+        act_offset = sum(
+            len(json.loads(row['content_json']).get('campaign_plan', {}).get('structure', ()))
                          for row in adventures[:-1])
     plan = json.loads(plan_row['content_json']).get('campaign_plan')
     if not isinstance(plan, dict):
@@ -523,7 +525,8 @@ def read_campaign_ending(
     ).fetchone()
     return owned_payload({
         "ending_id": ending["id"], "after_message_id": anchor,
-        "act_number": act_offset + len(plan["structure"]) if required_story_items(plan) <= resolved else None,
+        "act_number": act_offset + len(
+        plan["structure"]) if required_story_items(plan) <= resolved else None,
         "plan_title": plan["title"],
         "open_world": ending["open_world"], "has_after_story": ending["after_story"] is not None,
         "choice": choice_row[0] if choice_row is not None else None,

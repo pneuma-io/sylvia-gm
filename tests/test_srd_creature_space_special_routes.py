@@ -6,11 +6,11 @@ import pytest
 
 from scripts.srd_timed_actor_defenses import _load_runtime
 from sylvia_gm.runtime import RulesetRuntime
-from tests.test_srd_lite_mass_cure_geometry import _calls
-from tests import test_srd_lite_steed_mount as mount
-from tests import test_srd_lite_steed_fey_step as fey
-from tests import test_srd_lite_steed_turns as turns
-from tests.test_srd_lite_steed_mount import _position
+from tests.srd_lite_mass_cure_geometry_fixtures import _calls
+from tests import srd_lite_steed_mount_fixtures as mount
+from tests import srd_lite_steed_fey_step_fixtures as fey
+from tests import srd_lite_steed_turns_fixtures as turns
+from tests.srd_lite_steed_mount_fixtures import _position
 
 
 @pytest.fixture(scope='module')
@@ -30,7 +30,7 @@ def compiled():
 
 
 def test_paid_mount_uses_actual_initialized_turn_and_preserves_rider_budget(compiled):
-    turns.test_actual_mid_turn_mount_preserves_paid_rider_movement_and_initializes_steed_once(compiled)
+    turns.check_actual_mid_turn_mount_preserves_paid_rider_movement_and_initializes_steed_once(compiled)
 
 
 def test_paid_controlled_steed_carries_rider_without_spending_rider_movement(compiled):
@@ -57,4 +57,4 @@ def test_fey_teleport_keeps_its_wall_crossing_exception(compiled):
 
 
 def test_saved_rider_teleport_keeps_both_bodies_and_one_bonus_action(compiled):
-    fey.test_native_saved_rider_moves_with_saddle_offset_and_receipt(compiled)
+    fey.check_native_saved_rider_moves_with_saddle_offset_and_receipt(compiled)

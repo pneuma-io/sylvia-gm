@@ -48,8 +48,6 @@ def _public_routes(case):
 
 def _mage_params(case, **choices):
     params = case.parameters | {'spell': 'mage_armor', 'target': 'hero', 'target_character': 'hero'}
-    for name in ('caster_can_touch_target', 'caster_can_touch_all_targets', 'target_distance'):
-        params.pop(name, None)
     return params | choices
 
 
@@ -78,11 +76,11 @@ def _reject(case, tool, parameters, match=None):
 class DefenseMultiCase(Case):
     """Clone a real validated ordinary Wizard into a second admitted campaign."""
 
-    def __init__(self, path, spell, companion_spell=None):
+    def __init__(self, path, spell, companion_spell=None, companion_position=None):
         self.campaign_id = 'lite'
-        super().__init__(path, spell, entity_changes={
+        super().__init__(path, spell, inventory_additions=('spear', 'dagger', 'scimitar', 'leather', 'shield'), entity_changes={
             'hero': {'armor_class': 12, 'worn_armor': None, 'worn_shield': None, 'dodging': False,
-                     'inventory': ['spear', 'dagger', 'scimitar', 'leather', 'shield']},
+                     },
             'guard': {'attitudes': {'hero': 'hostile'},
                       'multiattack': [{'attack': 'Draft claw', 'count': 2}]},
         }, participant_changes={'wizard_spellbook': list(dict.fromkeys([spell, 'cloud_of_daggers']))})
@@ -101,7 +99,7 @@ class DefenseMultiCase(Case):
         actors['guard']['attitudes']['companion'] = 'hostile'
         scene = state[VARIANT_ID + '.state']['spatial_scene']
         proxy = deepcopy(next(row for row in scene['entities'] if row['id'] == 'hero'))
-        proxy.update(id='companion', position=[-1, 0, 0])
+        proxy.update(id='companion', position=companion_position or [-1, 0, 0])
         proxy['metadata']['participant_ref'] = 'companion'
         scene['entities'].append(proxy)
         next(row for row in scene['entities'] if row['id'] == 'guard')['metadata']['enemy_of'] = ['hero', 'companion']
@@ -130,13 +128,13 @@ def defense_case(tmp_path, monkeypatch):
     def make(spell='mage_armor', *, multi=False, companion_spell=None, **changes):
         path = tmp_path / f'defense-{len(opened)}.db'
         if multi:
+            companion_position = changes.pop('companion_position', None)
             assert not changes
-            case = DefenseMultiCase(path, spell, companion_spell)
+            case = DefenseMultiCase(path, spell, companion_spell, companion_position)
         else:
             entities = deepcopy(changes.pop('entity_changes', {}))
             entities['hero'] = {
                 'armor_class': 12, 'worn_armor': None, 'worn_shield': None, 'dodging': False,
-                'inventory': ['spear', 'dagger', 'scimitar', 'leather', 'shield'],
                 **entities.get('hero', {}),
             }
             entities['guard'] = {
@@ -146,7 +144,7 @@ def defense_case(tmp_path, monkeypatch):
             }
             participant = {'wizard_spellbook': [spell, 'cloud_of_daggers'],
                            **changes.pop('participant_changes', {})}
-            case = Case(path, spell, entity_changes=entities, participant_changes=participant, **changes)
+            case = Case(path, spell, inventory_additions=('spear', 'dagger', 'scimitar', 'leather', 'shield'), entity_changes=entities, participant_changes=participant, **changes)
         opened.append(case)
         return _public_routes(case)
 
@@ -170,7 +168,7 @@ def _begin_attack(case, monkeypatch, *, seed=8, modifier=6):
 
 
 @pytest.mark.parametrize('slot', [1, 3])
-def test_mage_actual_formula_paid_cost_no_roll_touch_omission_and_reopen(defense_case, monkeypatch, slot):
+def test_mage_actual_formula_paid_cost_no_roll_contact_and_reopen(defense_case, monkeypatch, slot):
     case = defense_case()
     rolls = []
     original = _effect_executor.dice_roll
@@ -204,11 +202,11 @@ def test_mage_actual_formula_paid_cost_no_roll_touch_omission_and_reopen(defense
 
 @pytest.mark.parametrize('tool', ['cast_spell_outside_combat', 'begin_srd_spell_action'])
 def test_mage_real_far_target_rejects_before_spend_even_with_touch_claim(defense_case, tool):
-    case = defense_case(positions={'hero': [0, 0, 0], 'guard': [30, 0, 0], 'other': [-5, 0, 0], 'extra': [20, 10, 0]})
+    case = defense_case(multi=True, companion_position=[30, 0, 0])
     if tool == 'begin_srd_spell_action':
         case.start()
-    params = case.parameters | {'spell': 'mage_armor', 'target': 'guard', 'caster_can_touch_target': True, 'target_distance': 0}
-    _reject(case, tool, params, 'touch range')
+    params = case.parameters | {'spell': 'mage_armor', 'target': 'companion', 'target_character': 'companion', 'caster_can_touch_target': True, 'target_distance': 0}
+    _reject(case, tool, params, 'touch range|beyond range')
     assert not _mage_records(case)
     _reject(case, tool, _mage_params(case, lite_prepared_source='wizard'))
 

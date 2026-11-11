@@ -20,6 +20,7 @@ from sylvia_gm.domain.session import SessionContext, SessionMessageKind
 
 if TYPE_CHECKING:
     from sylvia_gm.application.authority import AuthorityOwner
+    from sylvia_gm.domain.package_library import PackageCandidate
 
 
 class BuilderSourceSelection:
@@ -70,7 +71,7 @@ class BuilderSourceSelection:
         self.references = references
         return {"success": True, "references": references}
 
-    def candidate(self):
+    def candidate(self) -> PackageCandidate | None:
         """Resolve the exact chosen package closure for validation and publication."""
         return candidate_for_references(self.owner, self.references)
 

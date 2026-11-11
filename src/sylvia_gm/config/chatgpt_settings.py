@@ -109,14 +109,20 @@ def chatgpt_settings_action(
             prior_runtime = prior.get("runtime_context_window")
             if isinstance(prior_runtime, int) and (
                 runtime is None
-                or prior.get("runtime_context_source") == "runtime_reported" and prior_runtime < runtime
+                or prior.get(
+                "runtime_context_source") == "runtime_reported" and prior_runtime < runtime
             ):
                 runtime = prior_runtime
                 runtime_source = prior.get("runtime_context_source")
                 runtime_observed = prior.get("runtime_context_observed_at")
-            output_reference = selected.get("output_reference_tokens") or prior.get("declared_max_output_tokens")
+            output_reference = (
+                selected.get("output_reference_tokens") or prior.get("declared_max_output_tokens")
+            )
             capacity = model["context_window"] if model["context_window"] is not None else runtime
-            output = model["max_output_tokens"] if model["max_output_tokens"] is not None else output_reference
+            output = (
+                model[
+                "max_output_tokens"] if model["max_output_tokens"] is not None else output_reference
+            )
             if (
                 model["context_window"] is not None and (
                     isinstance(model["context_window"], bool)

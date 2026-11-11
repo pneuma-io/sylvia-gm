@@ -9,6 +9,9 @@ from pathlib import Path
 import pytest
 
 from sylvia_gm.application.desktop_update import helper, progress
+from tests.desktop_update_move_checks import (
+    assert_desktop_update_moves as assert_desktop_update_moves,
+)
 
 
 def test_closed_parent_pipe_preserves_handled_helper_exit():

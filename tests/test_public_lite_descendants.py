@@ -3,6 +3,7 @@
 import io
 import json
 import zipfile
+from pathlib import Path
 from copy import deepcopy
 
 import pytest
@@ -41,7 +42,11 @@ def test_every_public_lite_plan_selects_current_exact_mechanics(tmp_path):
         runtime = source.read(f"packages/{NS}/runtime/ruleset.yaml")
         spells = source.read(f"packages/{NS}/content/spell-status-inventory.json")
     assert len(json.loads(spells)["spells"]) == 117
-    assert primary["version"] == "0.3.15"
+    source_record = json.loads(
+        (Path(__file__).resolve().parents[1] / "rulesets/srd-lite/package-record.json")
+        .read_text(encoding="utf-8")
+    )
+    assert primary["version"] == source_record["version"]
     surface = next(row for row in primary["ui_surfaces"] if row["id"] == MAP)
     assert "occupied_space" in surface["source"]["fields"]
     public = read_plan_catalogue(bundled_plans_root())

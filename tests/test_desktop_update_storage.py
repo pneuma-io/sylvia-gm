@@ -4,6 +4,9 @@ import json
 from pathlib import Path
 
 from sylvia_gm.application.desktop_update.storage import atomic_receipt
+from tests.desktop_update_move_checks import (
+    assert_desktop_update_moves as assert_desktop_update_moves,
+)
 
 
 def test_recovery_ack_temporary_name_does_not_overflow_a_valid_windows_path(

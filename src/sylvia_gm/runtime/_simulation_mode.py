@@ -13,6 +13,7 @@ entity; the manager itself is stored in ``ctx.extras["tool_gating"]``.
 
 from __future__ import annotations
 
+import contextlib
 import logging
 from dataclasses import dataclass, field
 from typing import Any
@@ -143,12 +144,10 @@ class ToolGatingManager:
         """Persist active modes to ``_campaign.active_modes``."""
         if self._state_bridge is None:
             return
-        try:
+        with contextlib.suppress(Exception):
             self._state_bridge.write_field(
                 "_campaign", "active_modes", sorted(self._active_modes)
             )
-        except Exception:
-            pass
 
     # ── Mode management ────────────────────────────────────────────────
 
@@ -216,24 +215,26 @@ class ToolGatingManager:
 
         for mode in self._mode_defs.values():
             # Activate on matching trigger
-            if mode.trigger != "always_active" and mode.trigger == trigger_name:
-                if mode.name not in self._active_modes:
-                    self._active_modes.add(mode.name)
-                    changes[mode.name] = True
-                    logger.debug("mode_activated mode=%s trigger=%s", mode.name, trigger_name)
+            if (
+                mode.trigger != "always_active"
+                and mode.trigger == trigger_name
+                and mode.name not in self._active_modes
+            ):
+                self._active_modes.add(mode.name)
+                changes[mode.name] = True
+                logger.debug("mode_activated mode=%s trigger=%s", mode.name, trigger_name)
 
             # Deactivate on matching deactivation trigger
             if (
                 mode.deactivate_trigger is not None
                 and mode.deactivate_trigger == trigger_name
-            ):
-                if mode.name in self._active_modes and mode.name != "exploration":
-                    self._active_modes.discard(mode.name)
-                    changes[mode.name] = False
-                    logger.debug(
-                        "mode_deactivated mode=%s deactivate_trigger=%s",
-                        mode.name, trigger_name,
-                    )
+            ) and mode.name in self._active_modes and mode.name != "exploration":
+                self._active_modes.discard(mode.name)
+                changes[mode.name] = False
+                logger.debug(
+                    "mode_deactivated mode=%s deactivate_trigger=%s",
+                    mode.name, trigger_name,
+                )
 
         if changes:
             self._save()

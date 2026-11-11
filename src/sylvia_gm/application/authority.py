@@ -80,8 +80,8 @@ from sylvia_gm.application.package_runtime import (
     package_tool_decision_title,
     package_tool_description,
     package_tool_model_behavior,
-    package_tool_player_controls,
     package_tool_permanently_refused,
+    package_tool_player_controls,
 )
 from sylvia_gm.application.piece_table import (
     PieceTableError,
@@ -5250,7 +5250,11 @@ class AuthorityOwner:
                     maximum_bytes=PACKAGE_RUNTIME_BYTE_LIMIT,
                 )
                 if runtime_bytes is not None:
-                    runtime = yaml.safe_load(runtime_bytes.decode("utf-8"))
+                    from sylvia_gm.application.package_runtime import _BoundedRuntimeLoader
+
+                    runtime = yaml.load(
+                        runtime_bytes.decode("utf-8"), Loader=_BoundedRuntimeLoader
+                    )
                     if isinstance(runtime, Mapping):
                         runtime_tools = runtime.get("tools")
                         public = {tool.name for tool in manifest.tools}

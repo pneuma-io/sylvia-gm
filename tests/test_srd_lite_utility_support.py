@@ -206,7 +206,7 @@ def test_animals_exploration_ritual_actual_beast_dialogue_nonstacking_and_unprep
     case = _animals_case(tmp_path / "animals-ritual.db")
     try:
         speech = {"listener_state": "hero", "speaker_state": "guard", "language": "beast"}
-        case.reject("communicate_srd_spell", speech, match="cannot understand")
+        case.reject("communicate_srd_spell", speech, match="cannot understand|requires an active Speak with Animals grant")
         slots = dict(case.entities()["hero"]["resources"])
         params = case.parameters | {"target": "hero", "targets": ["hero"], "target_distance": 0, "spell_grant": "druid"}
         case.reject("cast_spell_outside_combat", params | {"target": "guard", "targets": ["guard"]}, match="self|caster")
@@ -227,7 +227,7 @@ def test_animals_exploration_ritual_actual_beast_dialogue_nonstacking_and_unprep
         assert _context(spoken)["_language_understands"] is True
         assert _context(spoken)["_language_can_reply"] is True
         for choices in ({"perceived": False}, {"channel": "signs"}, {"speaker_state": "extra"}, {"speaker_state": "other"}):
-            case.reject("communicate_srd_spell", speech | choices, match="cannot understand")
+            case.reject("communicate_srd_spell", speech | choices, match="cannot understand|requires an active Speak with Animals grant")
         case.reject("communicate_srd_spell", speech | {"purpose": "nearby_monsters"}, match="cannot guarantee")
         influenced, _ = _speech(case, purpose="influence", actor="hero", influence_skill="persuasion", target_number=0)
         assert _context(influenced)["_language_influence_total"] is not None
@@ -246,7 +246,7 @@ def test_animals_exploration_ritual_actual_beast_dialogue_nonstacking_and_unprep
         assert case.lasting()["lite_utility_effects"] == []
         assert "speak_with_animals" not in case.entities()["hero"]["prepared_spells"]
         case.reject("cast_spell_outside_combat", params | {"casting_mode": "ritual", "slot_resource": "ritual"}, match="prepared|grant|source|available")
-        case.reject("communicate_srd_spell", speech, match="cannot understand")
+        case.reject("communicate_srd_spell", speech, match="cannot understand|requires an active Speak with Animals grant")
         after = case.snapshot()
         assert case.execute(remove_command) == remove and case.snapshot() == after
         assert case.execute(second_command) == second and case.snapshot() == after
@@ -265,7 +265,7 @@ def test_animals_combat_paid_pending_cast_speech_action_and_real_rest(tmp_path):
         params = case.parameters | {"target": "hero", "targets": ["hero"], "target_distance": 0, "spell_grant": "bard"}
         slots = dict(case.entities()["hero"]["resources"])
         case.start()
-        case.reject("begin_srd_spell_action", params | {"casting_mode": "ritual", "slot_resource": "ritual"}, match="free exploration")
+        case.reject("begin_srd_spell_action", params | {"casting_mode": "ritual", "slot_resource": "ritual"}, match="Action, Bonus Action or Reaction spell")
         begin, begin_command = case.act("begin_srd_spell_action", **params)
         assert case.entities()["hero"]["resources"] == slots
         assert case.snapshot().state[VARIANT_ID + ".combat"]["action_available"] is False

@@ -8,7 +8,7 @@ import yaml
 
 from sylvia_gm.runtime import RulesetRuntime
 from tests.test_srd_lite_vertical_cones import run, state_for
-from tests.test_srd_lite_mass_cure_geometry import NAMESPACE, _calls, _scene_entity
+from tests.srd_lite_mass_cure_geometry_fixtures import NAMESPACE, _calls, _scene_entity
 
 TOOL = 'measure_srd_guardian_distance'
 
@@ -26,7 +26,7 @@ def guardian_body():
         name = pending.pop()
         if name not in closure:
             tool = deepcopy(data['tools'][name])
-            tool['parameters'] = [deepcopy(pool[row]) if isinstance(row, str) else row for row in tool['parameters']]
+            tool['parameters'] = [deepcopy(pool[row]) if isinstance(row, str) else row for row in tool.get("parameters", [])]
             closure[name] = tool
             pending.extend(_calls(tool['effects']))
     subset = {key: value for key, value in data.items() if key not in {'tools', 'procedures'}}

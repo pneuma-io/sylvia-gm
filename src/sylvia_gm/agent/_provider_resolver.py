@@ -249,7 +249,8 @@ def _configured_provider_models(
             minimum=1,
         )
         if (max_output_tokens is not None and context_window is not None
-                and row.get("transport") != "codex_app_server" and max_output_tokens > context_window):
+                and row.get(
+                "transport") != "codex_app_server" and max_output_tokens > context_window):
             raise ConfigError("Configured model max_output_tokens is outside the supported range")
         declared_output = _optional_model_integer(
             row.get("declared_max_output_tokens"), field="declared_max_output_tokens", minimum=1,
@@ -276,7 +277,9 @@ def _configured_provider_models(
         }:
             raise ConfigError("Configured model transport is unsupported")
         transport = cast(
-            Literal["chat_completions", "responses", "anthropic_messages", "codex_app_server", "gemini_generate_content"],
+            Literal[
+            "chat_completions",
+            "responses", "anthropic_messages", "codex_app_server", "gemini_generate_content"],
             transport_value,
         )
         streaming_value = row.get(

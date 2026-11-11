@@ -333,7 +333,10 @@ def test_setting_selection_retains_its_rules_and_builder_sources_after_catalog_r
                     "content_sha256": primary.content_sha256,
                     "selection_id": updated.candidate_id,
                     "compatible_settings": [
-                        {"id": setting_id, "candidate_id": updated.candidate_id}
+                        {"id": setting_id, "candidate_id": updated.candidate_id,
+                         "version": "0.2.0",
+                         "content_sha256": next(entry.sha256 for entry in updated.package_lock.entries
+                                                if entry.package_id == setting_id)}
                     ],
                 }
             ],

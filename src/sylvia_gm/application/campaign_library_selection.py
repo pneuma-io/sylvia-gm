@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from sylvia_gm.application.launch_compatibility import require_active_ruleset
-
 import hashlib
 import io
 import json
@@ -20,10 +18,12 @@ from sylvia_gm.application.campaign_plan_sources import (
     validate_retained_campaign_plan,
 )
 from sylvia_gm.application.campaign_starting_world import materialize_starting_world
-from sylvia_gm.application.initial_character_state import (
-    initialize_campaign_character_state, verify_placed_character,
-)
 from sylvia_gm.application.character_rules import campaign_character_state
+from sylvia_gm.application.initial_character_state import (
+    initialize_campaign_character_state,
+    verify_placed_character,
+)
+from sylvia_gm.application.launch_compatibility import require_active_ruleset
 from sylvia_gm.application.package_runtime import (
     PACKAGE_RUNTIME_BYTE_LIMIT,
     PACKAGE_RUNTIME_PATH,

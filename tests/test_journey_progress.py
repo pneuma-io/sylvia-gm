@@ -6,7 +6,7 @@ from scripts import journey_progress
 
 def test_timing_keeps_original_result_exception_and_records_real_phase(tmp_path, monkeypatch):
     target = tmp_path / "fixture-timings.jsonl"
-    monkeypatch.setenv("SYLVIA_JOURNEY_FIXTURE_TIMINGS", str(target))
+    monkeypatch.setitem(journey_progress._TIMING_PATHS, "SYLVIA_JOURNEY_FIXTURE_TIMINGS", str(target))
 
     @journey_progress.timed("prepare")
     def success():
@@ -59,3 +59,36 @@ def test_explicit_fixture_archival_still_verifies_complete_restore(tmp_path, mon
             restored += archive.read(block["member"])
     assert restored == original
     assert receipt["original_sha256"] == hashlib.sha256(original).hexdigest()
+
+
+def test_worker_progress_does_not_read_environment_inside_guarded_case(tmp_path, monkeypatch):
+    import importlib.util
+    import os
+    from pathlib import Path
+    from types import SimpleNamespace
+
+    target = tmp_path / "worker-timings.jsonl"
+    fixture_target = tmp_path / "fixture-timings.jsonl"
+    monkeypatch.setenv("SYLVIA_JOURNEY_TIMINGS", str(target))
+    monkeypatch.setenv("SYLVIA_JOURNEY_FIXTURE_TIMINGS", str(fixture_target))
+    spec = importlib.util.spec_from_file_location(
+        "guarded_worker_progress", Path(journey_progress.__file__)
+    )
+    progress = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(progress)
+
+    class NoEnvironment(dict):
+        def get(self, *args, **kwargs):
+            raise AssertionError("Worker telemetry read the guarded environment")
+
+    progress.pytest_runtest_logstart("synthetic::guarded", None)
+    with monkeypatch.context() as guard:
+        guard.setattr(os, "environ", NoEnvironment())
+        with progress.phase("guarded fixture"):
+            pass
+        progress.pytest_runtest_logreport(SimpleNamespace(
+            nodeid="synthetic::guarded", when="call", duration=0.25,
+            outcome="passed", failed=False, skipped=False,
+        ))
+    assert json.loads(target.read_text())["case"] == "synthetic::guarded"
+    assert json.loads(fixture_target.read_text())["case"] == "synthetic::guarded"
