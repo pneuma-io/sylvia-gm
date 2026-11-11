@@ -32818,73 +32818,223 @@ definitions:
   - revivify
   - shield_of_faith
   - suggestion
-  srd_lite_single_target_spells:
-  - acid_arrow
-  - befuddlement
-  - blight
-  - chill_touch
-  - chromatic_orb
-  - cure_wounds
-  - death_ward
-  - disintegrate
-  - dissonant_whispers
-  - finger_of_death
-  - fire_bolt
-  - guidance
-  - guiding_bolt
-  - harm
-  - heal
-  - healing_word
-  - ice_knife
-  - inflict_wounds
-  - lesser_restoration
-  - magic_missile
-  - poison_spray
-  - power_word_heal
-  - power_word_kill
-  - power_word_stun
-  - protection_from_energy
-  - ray_of_frost
-  - ray_of_sickness
-  - sacred_flame
-  - shield_of_faith
-  - shocking_grasp
-  - spare_the_dying
-  - starry_wisp
-  - stoneskin
-  - vicious_mockery
-  srd_lite_multiple_target_spells:
-  - acid_splash
-  - aid
-  - bane
-  - beacon_of_hope
-  - bless
-  - blindness_deafness
-  - burning_hands
-  - chain_lightning
-  - charm_monster
-  - circle_of_death
-  - cone_of_cold
-  - enhance_ability
-  - fire_shield
-  - fireball
-  - flame_strike
-  - foresight
-  - freedom_of_movement
-  - freezing_sphere
-  - hold_monster
-  - hold_person
-  - ice_knife
-  - ice_storm
-  - lightning_bolt
-  - longstrider
-  - mass_cure_wounds
-  - mass_healing_word
-  - meteor_swarm
-  - shatter
-  - shillelagh
-  - thunderwave
-  - vitriolic_sphere
+  srd_lite_recipient_contracts:
+    r0:
+      in_combat: false
+      field: target
+      caller_inputs:
+      - target
+      nonempty: true
+      when: not ((disintegrate_source_kind != 'creature'))
+      spells:
+      - disintegrate
+    r1:
+      in_combat: false
+      field: target
+      caller_inputs:
+      - target
+      nonempty: true
+      when: not ((object_target_id != ''))
+      spells:
+      - fire_bolt
+    r2:
+      in_combat: false
+      field: target
+      caller_inputs:
+      - target
+      nonempty: true
+      when: 'true'
+      spells:
+      - acid_arrow
+      - befuddlement
+      - blight
+      - chill_touch
+      - chromatic_orb
+      - cure_wounds
+      - death_ward
+      - dissonant_whispers
+      - finger_of_death
+      - guidance
+      - guiding_bolt
+      - harm
+      - heal
+      - healing_word
+      - ice_knife
+      - inflict_wounds
+      - lesser_restoration
+      - magic_missile
+      - poison_spray
+      - power_word_heal
+      - power_word_kill
+      - power_word_stun
+      - protection_from_energy
+      - ray_of_frost
+      - ray_of_sickness
+      - sacred_flame
+      - shield_of_faith
+      - shocking_grasp
+      - spare_the_dying
+      - starry_wisp
+      - stoneskin
+      - vicious_mockery
+    r3:
+      in_combat: false
+      field: targets
+      caller_inputs:
+      - target
+      - targets
+      nonempty: true
+      when: 'true'
+      spells:
+      - beacon_of_hope
+      - foresight
+      - freedom_of_movement
+    r4:
+      in_combat: false
+      field: targets
+      caller_inputs:
+      - targets
+      nonempty: false
+      when: 'true'
+      spells:
+      - acid_splash
+      - burning_hands
+      - chain_lightning
+      - circle_of_death
+      - cone_of_cold
+      - fireball
+      - flame_strike
+      - freezing_sphere
+      - lightning_bolt
+      - meteor_swarm
+      - shatter
+      - thunderwave
+      - vitriolic_sphere
+    r5:
+      in_combat: false
+      field: targets
+      caller_inputs:
+      - targets
+      nonempty: true
+      when: 'true'
+      spells:
+      - aid
+      - bane
+      - bless
+      - blindness_deafness
+      - charm_monster
+      - enhance_ability
+      - hold_monster
+      - hold_person
+      - ice_knife
+      - longstrider
+      - mass_cure_wounds
+      - mass_healing_word
+    r6:
+      in_combat: true
+      field: target
+      caller_inputs:
+      - target
+      nonempty: true
+      when: not ((disintegrate_source_kind != 'creature'))
+      spells:
+      - disintegrate
+    r7:
+      in_combat: true
+      field: target
+      caller_inputs:
+      - target
+      nonempty: true
+      when: not ((object_target_id != ''))
+      spells:
+      - fire_bolt
+    r8:
+      in_combat: true
+      field: target
+      caller_inputs:
+      - target
+      nonempty: true
+      when: 'true'
+      spells:
+      - acid_arrow
+      - befuddlement
+      - blight
+      - chill_touch
+      - chromatic_orb
+      - cure_wounds
+      - death_ward
+      - dissonant_whispers
+      - finger_of_death
+      - guidance
+      - guiding_bolt
+      - harm
+      - heal
+      - healing_word
+      - ice_knife
+      - inflict_wounds
+      - lesser_restoration
+      - magic_missile
+      - poison_spray
+      - power_word_heal
+      - power_word_kill
+      - power_word_stun
+      - protection_from_energy
+      - ray_of_frost
+      - ray_of_sickness
+      - sacred_flame
+      - shield_of_faith
+      - shocking_grasp
+      - spare_the_dying
+      - starry_wisp
+      - stoneskin
+      - vicious_mockery
+    r9:
+      in_combat: true
+      field: targets
+      caller_inputs:
+      - target
+      - targets
+      nonempty: true
+      when: 'true'
+      spells:
+      - beacon_of_hope
+      - foresight
+      - freedom_of_movement
+    r10:
+      in_combat: true
+      field: targets
+      caller_inputs:
+      - targets
+      nonempty: false
+      when: 'true'
+      spells:
+      - chain_lightning
+      - cone_of_cold
+      - freezing_sphere
+      - meteor_swarm
+      - shatter
+      - thunderwave
+      - vitriolic_sphere
+    r11:
+      in_combat: true
+      field: targets
+      caller_inputs:
+      - targets
+      nonempty: true
+      when: 'true'
+      spells:
+      - aid
+      - bane
+      - bless
+      - blindness_deafness
+      - charm_monster
+      - enhance_ability
+      - hold_monster
+      - hold_person
+      - ice_knife
+      - longstrider
+      - mass_cure_wounds
+      - mass_healing_word
 narrative: {}
 tools:
   prepare_srd_creature_space_route:
@@ -73517,12 +73667,47 @@ tools:
         in caster_state.spellcasting_profile.component_exemptions) or material_component_available ==
         null or material_component_available == true
       error: Input 'material_component_available' is unavailable for this spell.
-    - condition: spell not in definitions.srd_lite_single_target_spells or target != null or (targets
-        != null and len(targets) > 0) or object_target_id != ''
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r0.spells or combat.encounter_active
+        == true or not (not ((disintegrate_source_kind != 'creature'))) or (target != null)
       error: Missing input 'target'. Select the actual recipient. Self-touch is automatic; touching another
         creature requires caster_can_touch_target=true.
-    - condition: spell not in definitions.srd_lite_multiple_target_spells or (targets != null and len(targets)
-        > 0)
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r1.spells or combat.encounter_active
+        == true or not (not ((object_target_id != ''))) or (target != null)
+      error: Missing input 'target'. Select the actual recipient. Self-touch is automatic; touching another
+        creature requires caster_can_touch_target=true.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r2.spells or combat.encounter_active
+        == true or not (true) or (target != null)
+      error: Missing input 'target'. Select the actual recipient. Self-touch is automatic; touching another
+        creature requires caster_can_touch_target=true.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r3.spells or combat.encounter_active
+        == true or not (true) or (target != null) or (targets != null and len(targets) > 0)
+      error: Missing input 'targets'. Select the actual recipients for this spell.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r4.spells or combat.encounter_active
+        == true or not (true) or (targets != null)
+      error: Missing input 'targets'. Select the actual recipients for this spell.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r5.spells or combat.encounter_active
+        == true or not (true) or (targets != null and len(targets) > 0)
+      error: Missing input 'targets'. Select the actual recipients for this spell.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r6.spells or combat.encounter_active
+        != true or not (not ((disintegrate_source_kind != 'creature'))) or (target != null)
+      error: Missing input 'target'. Select the actual recipient. Self-touch is automatic; touching another
+        creature requires caster_can_touch_target=true.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r7.spells or combat.encounter_active
+        != true or not (not ((object_target_id != ''))) or (target != null)
+      error: Missing input 'target'. Select the actual recipient. Self-touch is automatic; touching another
+        creature requires caster_can_touch_target=true.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r8.spells or combat.encounter_active
+        != true or not (true) or (target != null)
+      error: Missing input 'target'. Select the actual recipient. Self-touch is automatic; touching another
+        creature requires caster_can_touch_target=true.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r9.spells or combat.encounter_active
+        != true or not (true) or (target != null) or (targets != null and len(targets) > 0)
+      error: Missing input 'targets'. Select the actual recipients for this spell.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r10.spells or combat.encounter_active
+        != true or not (true) or (targets != null)
+      error: Missing input 'targets'. Select the actual recipients for this spell.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r11.spells or combat.encounter_active
+        != true or not (true) or (targets != null and len(targets) > 0)
       error: Missing input 'targets'. Select the actual recipients for this spell.
     - condition: spell in definitions.srd_lite_catalogue or spell in definitions.srd_lite_aliases
       error: This spell is excluded from the SRD Lite normal-player catalogue.
@@ -86512,7 +86697,12 @@ tools:
         in caster_state.spellcasting_profile.component_exemptions) or material_component_available ==
         null or material_component_available == true
       error: Input 'material_component_available' is unavailable for this spell.
-    - condition: spell not in definitions.srd_lite_single_target_spells or target != null
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r2.spells or combat.encounter_active
+        == true or not (true) or (target != null)
+      error: Missing input 'target'. Select the actual recipient. Self-touch is automatic; touching another
+        creature requires caster_can_touch_target=true.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r8.spells or combat.encounter_active
+        != true or not (true) or (target != null)
       error: Missing input 'target'. Select the actual recipient. Self-touch is automatic; touching another
         creature requires caster_can_touch_target=true.
     - condition: spell in definitions.srd_lite_catalogue or spell in definitions.srd_lite_aliases
@@ -97581,12 +97771,47 @@ tools:
         in caster_state.spellcasting_profile.component_exemptions) or material_component_available ==
         null or material_component_available == true
       error: Input 'material_component_available' is unavailable for this spell.
-    - condition: spell not in definitions.srd_lite_single_target_spells or target != null or (targets
-        != null and len(targets) > 0) or object_target_id != ''
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r0.spells or combat.encounter_active
+        == true or not (not ((disintegrate_source_kind != 'creature'))) or (target != null)
       error: Missing input 'target'. Select the actual recipient. Self-touch is automatic; touching another
         creature requires caster_can_touch_target=true.
-    - condition: spell not in definitions.srd_lite_multiple_target_spells or (targets != null and len(targets)
-        > 0)
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r1.spells or combat.encounter_active
+        == true or not (not ((object_target_id != ''))) or (target != null)
+      error: Missing input 'target'. Select the actual recipient. Self-touch is automatic; touching another
+        creature requires caster_can_touch_target=true.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r2.spells or combat.encounter_active
+        == true or not (true) or (target != null)
+      error: Missing input 'target'. Select the actual recipient. Self-touch is automatic; touching another
+        creature requires caster_can_touch_target=true.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r3.spells or combat.encounter_active
+        == true or not (true) or (target != null) or (targets != null and len(targets) > 0)
+      error: Missing input 'targets'. Select the actual recipients for this spell.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r4.spells or combat.encounter_active
+        == true or not (true) or (targets != null)
+      error: Missing input 'targets'. Select the actual recipients for this spell.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r5.spells or combat.encounter_active
+        == true or not (true) or (targets != null and len(targets) > 0)
+      error: Missing input 'targets'. Select the actual recipients for this spell.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r6.spells or combat.encounter_active
+        != true or not (not ((disintegrate_source_kind != 'creature'))) or (target != null)
+      error: Missing input 'target'. Select the actual recipient. Self-touch is automatic; touching another
+        creature requires caster_can_touch_target=true.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r7.spells or combat.encounter_active
+        != true or not (not ((object_target_id != ''))) or (target != null)
+      error: Missing input 'target'. Select the actual recipient. Self-touch is automatic; touching another
+        creature requires caster_can_touch_target=true.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r8.spells or combat.encounter_active
+        != true or not (true) or (target != null)
+      error: Missing input 'target'. Select the actual recipient. Self-touch is automatic; touching another
+        creature requires caster_can_touch_target=true.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r9.spells or combat.encounter_active
+        != true or not (true) or (target != null) or (targets != null and len(targets) > 0)
+      error: Missing input 'targets'. Select the actual recipients for this spell.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r10.spells or combat.encounter_active
+        != true or not (true) or (targets != null)
+      error: Missing input 'targets'. Select the actual recipients for this spell.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r11.spells or combat.encounter_active
+        != true or not (true) or (targets != null and len(targets) > 0)
       error: Missing input 'targets'. Select the actual recipients for this spell.
     - condition: spell in definitions.srd_lite_catalogue or spell in definitions.srd_lite_aliases
       error: This spell is excluded from the SRD Lite normal-player catalogue.
@@ -103972,12 +104197,47 @@ tools:
         in caster_state.spellcasting_profile.component_exemptions) or material_component_available ==
         null or material_component_available == true
       error: Input 'material_component_available' is unavailable for this spell.
-    - condition: spell not in definitions.srd_lite_single_target_spells or target != null or (targets
-        != null and len(targets) > 0) or object_target_id != ''
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r0.spells or combat.encounter_active
+        == true or not (not ((disintegrate_source_kind != 'creature'))) or (target != null)
       error: Missing input 'target'. Select the actual recipient. Self-touch is automatic; touching another
         creature requires caster_can_touch_target=true.
-    - condition: spell not in definitions.srd_lite_multiple_target_spells or (targets != null and len(targets)
-        > 0)
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r1.spells or combat.encounter_active
+        == true or not (not ((object_target_id != ''))) or (target != null)
+      error: Missing input 'target'. Select the actual recipient. Self-touch is automatic; touching another
+        creature requires caster_can_touch_target=true.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r2.spells or combat.encounter_active
+        == true or not (true) or (target != null)
+      error: Missing input 'target'. Select the actual recipient. Self-touch is automatic; touching another
+        creature requires caster_can_touch_target=true.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r3.spells or combat.encounter_active
+        == true or not (true) or (target != null) or (targets != null and len(targets) > 0)
+      error: Missing input 'targets'. Select the actual recipients for this spell.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r4.spells or combat.encounter_active
+        == true or not (true) or (targets != null)
+      error: Missing input 'targets'. Select the actual recipients for this spell.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r5.spells or combat.encounter_active
+        == true or not (true) or (targets != null and len(targets) > 0)
+      error: Missing input 'targets'. Select the actual recipients for this spell.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r6.spells or combat.encounter_active
+        != true or not (not ((disintegrate_source_kind != 'creature'))) or (target != null)
+      error: Missing input 'target'. Select the actual recipient. Self-touch is automatic; touching another
+        creature requires caster_can_touch_target=true.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r7.spells or combat.encounter_active
+        != true or not (not ((object_target_id != ''))) or (target != null)
+      error: Missing input 'target'. Select the actual recipient. Self-touch is automatic; touching another
+        creature requires caster_can_touch_target=true.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r8.spells or combat.encounter_active
+        != true or not (true) or (target != null)
+      error: Missing input 'target'. Select the actual recipient. Self-touch is automatic; touching another
+        creature requires caster_can_touch_target=true.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r9.spells or combat.encounter_active
+        != true or not (true) or (target != null) or (targets != null and len(targets) > 0)
+      error: Missing input 'targets'. Select the actual recipients for this spell.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r10.spells or combat.encounter_active
+        != true or not (true) or (targets != null)
+      error: Missing input 'targets'. Select the actual recipients for this spell.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r11.spells or combat.encounter_active
+        != true or not (true) or (targets != null and len(targets) > 0)
       error: Missing input 'targets'. Select the actual recipients for this spell.
     - condition: spell in definitions.srd_lite_catalogue or spell in definitions.srd_lite_aliases
       error: This spell is excluded from the SRD Lite normal-player catalogue.
@@ -116133,7 +116393,12 @@ tools:
         in caster_state.spellcasting_profile.component_exemptions) or material_component_available ==
         null or material_component_available == true
       error: Input 'material_component_available' is unavailable for this spell.
-    - condition: spell not in definitions.srd_lite_single_target_spells or target != null
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r2.spells or combat.encounter_active
+        == true or not (true) or (target != null)
+      error: Missing input 'target'. Select the actual recipient. Self-touch is automatic; touching another
+        creature requires caster_can_touch_target=true.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r8.spells or combat.encounter_active
+        != true or not (true) or (target != null)
       error: Missing input 'target'. Select the actual recipient. Self-touch is automatic; touching another
         creature requires caster_can_touch_target=true.
     - condition: spell in definitions.srd_lite_catalogue or spell in definitions.srd_lite_aliases
@@ -292262,12 +292527,47 @@ tools:
         in caster_state.spellcasting_profile.component_exemptions) or material_component_available ==
         null or material_component_available == true
       error: Input 'material_component_available' is unavailable for this spell.
-    - condition: spell not in definitions.srd_lite_single_target_spells or target != null or (targets
-        != null and len(targets) > 0) or object_target_id != ''
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r0.spells or combat.encounter_active
+        == true or not (not ((disintegrate_source_kind != 'creature'))) or (target != null)
       error: Missing input 'target'. Select the actual recipient. Self-touch is automatic; touching another
         creature requires caster_can_touch_target=true.
-    - condition: spell not in definitions.srd_lite_multiple_target_spells or (targets != null and len(targets)
-        > 0)
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r1.spells or combat.encounter_active
+        == true or not (not ((object_target_id != ''))) or (target != null)
+      error: Missing input 'target'. Select the actual recipient. Self-touch is automatic; touching another
+        creature requires caster_can_touch_target=true.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r2.spells or combat.encounter_active
+        == true or not (true) or (target != null)
+      error: Missing input 'target'. Select the actual recipient. Self-touch is automatic; touching another
+        creature requires caster_can_touch_target=true.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r3.spells or combat.encounter_active
+        == true or not (true) or (target != null) or (targets != null and len(targets) > 0)
+      error: Missing input 'targets'. Select the actual recipients for this spell.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r4.spells or combat.encounter_active
+        == true or not (true) or (targets != null)
+      error: Missing input 'targets'. Select the actual recipients for this spell.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r5.spells or combat.encounter_active
+        == true or not (true) or (targets != null and len(targets) > 0)
+      error: Missing input 'targets'. Select the actual recipients for this spell.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r6.spells or combat.encounter_active
+        != true or not (not ((disintegrate_source_kind != 'creature'))) or (target != null)
+      error: Missing input 'target'. Select the actual recipient. Self-touch is automatic; touching another
+        creature requires caster_can_touch_target=true.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r7.spells or combat.encounter_active
+        != true or not (not ((object_target_id != ''))) or (target != null)
+      error: Missing input 'target'. Select the actual recipient. Self-touch is automatic; touching another
+        creature requires caster_can_touch_target=true.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r8.spells or combat.encounter_active
+        != true or not (true) or (target != null)
+      error: Missing input 'target'. Select the actual recipient. Self-touch is automatic; touching another
+        creature requires caster_can_touch_target=true.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r9.spells or combat.encounter_active
+        != true or not (true) or (target != null) or (targets != null and len(targets) > 0)
+      error: Missing input 'targets'. Select the actual recipients for this spell.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r10.spells or combat.encounter_active
+        != true or not (true) or (targets != null)
+      error: Missing input 'targets'. Select the actual recipients for this spell.
+    - condition: spell not in definitions.srd_lite_recipient_contracts.r11.spells or combat.encounter_active
+        != true or not (true) or (targets != null and len(targets) > 0)
       error: Missing input 'targets'. Select the actual recipients for this spell.
     - condition: spell in definitions.srd_lite_catalogue or spell in definitions.srd_lite_aliases
       error: This spell is excluded from the SRD Lite normal-player catalogue.
