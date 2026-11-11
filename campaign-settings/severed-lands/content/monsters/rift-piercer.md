@@ -34,3 +34,15 @@ A Rift-touched piercer — a stalactite-like ambush predator that has absorbed c
 
 ## Actions
 **Drop.** +3 to hit, one target directly below. 14 (3d6 + 4) piercing per 10 ft. fallen, up to 21 (6d6 + 4). Miss: half damage. rift piercer lands prone after, regardless.
+
+## Appearance and artwork
+
+One Medium Rift Piercer as a complete faceless calcite stalactite-shaped predator: ONE elongated tapering stone cone, broad uneven top and ONE sharp downward point, irregular pale gray calcite ridges with violet Rift-mineral veins and a restrained violet shimmer. Quiet suspended point-down reference state, no cave ceiling or attached rock, whole silhouette with margins. The cone, calcite and violet minerals follow authored source; exact ridges and veins are editable visual defaults. No eyes, mouth, face, arms, legs, wings, tentacles, exposed slug, victim, falling attack, Anchor Door, rune writing or environmental scenery.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/02e3e5eeb2e7c9ea246fc2c1648ebbb96231215eba7bb9d25d999e2ade67b9e5.png)
+
+[Full-body reference](../../assets/characters/0d1c58da6a682890d9e37e8166e25238251852aa8cdacf57a5edb5cb07bfd6b6.png)
+
+[Multiview reference sheet](../../assets/characters/32bdcf174e85a25051e7952c5248ff214c6af43e824ae3ee782a75679d5ab99b.png)

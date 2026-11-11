@@ -11152,6 +11152,774 @@
         "reference_sheet": "Use case: character reference sheet. Edit the supplied approved full-body artwork into one clean LANDSCAPE 1536x1024 PNG multiview reference sheet. Preserve this EXACT subject's face, anatomy, markings, clothes, materials, palette and equipment. Three clearly separated equally scaled COMPLETE views, front, anatomical right side, and rear, left-to-right on a plain light neutral gray background, soft studio light, matching polished naturalistic RPG illustration. Each view has its own complete subject, comfortable outer margins and gap from its neighbors; no touching or cropped body/weapon/tail tips. Do not mirror handedness between views. No labels, writing, borders, scenery, extra poses, inset faces or fourth view. Appearance to preserve in EACH view: One Large Rift Owlbear: ONE broad powerful bear torso with exactly FOUR stout bear legs and broad clawed paws, ONE short bear-tail stub, and ONE large round owl head with a cream-gray feathered facial disc, TWO amber-gold eyes and ONE short dark hooked beak. Dark brown fur and feathers are mottled with the authored violet patches, with dense feathering around the neck and shoulders. A calm watchful grounded near-front three-quarter pose, all four feet and tail stub visible. Owl/bear combination and violet markings follow authored source; exact feathers, fur, colors and resting posture are editable defaults. No wings, long lion/horse tail, eagle forelegs, human arms/face, horns, saddle, rider, prey, attack, forest scene or readable text.",
         "portrait": "Use case: portrait asset. Using BOTH supplied approved references, create a SQUARE 1024x1024 PNG portrait for Rift Owlbear. Preserve this exact selected creature's identity, anatomy, face where present, materials, markings and palette. ONE close near-front owl head and upper bear-shoulder bust, with the complete cream-gray facial disc, both amber eyes, dark beak and violet-mottled feather crown visible. Eye line about 35% down, centered face, generous room around the feather crown for a circle crop. No horns, giant ear tufts, wings, human body or hands. Match the source's naturalistic polished RPG illustration and soft studio light on plain light neutral gray. Portrait only, one subject, no sheet/multiple views, text, labels, borders, circular frame drawn into the image, environment, attack or other being. The following complete-body description is IDENTITY guidance only; show only the requested portrait composition: One Large Rift Owlbear: ONE broad powerful bear torso with exactly FOUR stout bear legs and broad clawed paws, ONE short bear-tail stub, and ONE large round owl head with a cream-gray feathered facial disc, TWO amber-gold eyes and ONE short dark hooked beak. Dark brown fur and feathers are mottled with the authored violet patches, with dense feathering around the neck and shoulders. A calm watchful grounded near-front three-quarter pose, all four feet and tail stub visible. Owl/bear combination and violet markings follow authored source; exact feathers, fur, colors and resting posture are editable defaults. No wings, long lion/horse tail, eagle forelegs, human arms/face, horns, saddle, rider, prey, attack, forest scene or readable text."
       }
+    },
+    {
+      "id": "severed-monster-rift-peryton",
+      "name": "Rift Peryton",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-peryton.md",
+          "sha256": "2247718ae598383fae7807f63896acca52b37e84b0ec17742b163b7058f04403",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-peryton.md",
+          "sha256": "73c9179cd1bab561a645594ee98cbbd7cbefdaefe4c4aeebe06a2737a3630abf",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Medium Rift Peryton in an editable stag-headed raptor appearance: ONE compact eagle-like feathered torso, ONE stag head with brown fur, TWO amber eyes, TWO ears and TWO branching antlers in the selected reference shape. EXACTLY TWO broad feathered wings, TWO bird legs ending in taloned feet, and ONE short fan of tail feathers; no deer legs, human limbs or extra head. Deep charcoal-brown feathers carry restrained violet Veil-light streaks; muted bone antlers. Calm standing near-front three-quarter pose with wings half-open so both complete wings and all primary tips are visible, antlers fully inside margins. Stag/raptor features, palette and antler pattern are editable visual defaults; no previous victim, heart, consumed creature or shadow identity is revealed. No distinct cast silhouette or recognizable animal/humanoid shadow, kill, blood, mountain or night scene.",
+        "full_body": {
+          "path": "assets/characters/6a2ef862ab7d832ce96eca4f37677bfb61f28415960075836c76d249dbb2b4fa.png",
+          "sha256": "6a2ef862ab7d832ce96eca4f37677bfb61f28415960075836c76d249dbb2b4fa"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/4ff91f545cedf7d34e56fb5af157e785ba671b31b852073876349209d72999ba.png",
+          "sha256": "4ff91f545cedf7d34e56fb5af157e785ba671b31b852073876349209d72999ba"
+        },
+        "portrait": {
+          "path": "assets/characters/431494e0265aff9ec43a654b14d53f46a22d145f310f7e3a194690b8cc6e8055.png",
+          "sha256": "431494e0265aff9ec43a654b14d53f46a22d145f310f7e3a194690b8cc6e8055"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 1798476
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 1709772
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2096094
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete creature reference for Rift Peryton in Sylvia GM's Severed Lands. Landscape 1536x1024 PNG. ONE complete single subject, near-front three-quarter view on a plain light neutral gray backdrop, matching naturalistic polished RPG digital illustration, soft studio lighting. Whole silhouette including every horn, wing, leg, tendril, tail, antenna and weapon tip must fit comfortably inside generous outer margins. One Medium Rift Peryton in an editable stag-headed raptor appearance: ONE compact eagle-like feathered torso, ONE stag head with brown fur, TWO amber eyes, TWO ears and TWO simple branching antlers with three major points each. EXACTLY TWO broad feathered wings, TWO bird legs ending in taloned feet, and ONE short fan of tail feathers; no deer legs, human limbs or extra head. Deep charcoal-brown feathers carry restrained violet Veil-light streaks; muted bone antlers. Calm standing near-front three-quarter pose with wings half-open so both complete wings and all primary tips are visible, antlers fully inside margins. Stag/raptor features, palette and antler pattern are editable visual defaults; no previous victim, heart, consumed creature or shadow identity is revealed. No distinct cast silhouette or recognizable animal/humanoid shadow, kill, blood, mountain or night scene. Preserve exact appendage counts and any weapon-hand side. No additional creatures, text, labels, borders, UI or scenery. Selected visual detail: retain the reviewed branching antler shapes; a fixed tine count is not declared by the source or selected appearance.",
+        "reference_sheet": "Use case: character reference sheet. Edit this supplied selected full-body artwork into one clean LANDSCAPE 1536x1024 PNG multiview reference sheet. Preserve this EXACT subject, face where present, anatomy, appendage attachment pattern/count, material, markings, clothes, colors and weapon-hand side. Three clearly separated COMPLETE views, front, anatomical right side, and rear, left-to-right on plain light neutral gray, matching naturalistic RPG illustration and soft studio light. Scale views to fit with outer margins and space between them; every wing, leg, tail, tendril, antenna and weapon tip must fit within its view. No merging/touching between views, duplicate or extra appendages, labels, text, insets, borders or scenery. Appearance to preserve in EACH view: One Medium Rift Peryton in an editable stag-headed raptor appearance: ONE compact eagle-like feathered torso, ONE stag head with brown fur, TWO amber eyes, TWO ears and TWO branching antlers in the selected reference shape. EXACTLY TWO broad feathered wings, TWO bird legs ending in taloned feet, and ONE short fan of tail feathers; no deer legs, human limbs or extra head. Deep charcoal-brown feathers carry restrained violet Veil-light streaks; muted bone antlers. Calm standing near-front three-quarter pose with wings half-open so both complete wings and all primary tips are visible, antlers fully inside margins. Stag/raptor features, palette and antler pattern are editable visual defaults; no previous victim, heart, consumed creature or shadow identity is revealed. No distinct cast silhouette or recognizable animal/humanoid shadow, kill, blood, mountain or night scene.",
+        "portrait": "Use case: portrait asset. Using BOTH selected references (image 1 complete body, image 2 multiview sheet), create ONE SQUARE 1024x1024 PNG portrait for Rift Peryton. Preserve this exact subject's selected identity, face where present, anatomy, markings, palette and materials. ONE close near-front stag head and feathered shoulder bust. Keep both ears and BOTH complete antlers inside the central inscribed-circle-safe area, with generous background around every antler tip. Face centered, eye line near y=0.36, complete muzzle near y=0.60. Preserve the reference's antler branch shapes and violet feathers; omit full wings/feet. No cast victim shadow. Naturalistic polished RPG digital illustration matching the sources, soft studio lighting on plain light neutral gray. Leave real margins for circular display. Do not draw a circle, border, label, writing, other being or scene. The following complete-body description gives identity details only; show ONLY the requested portrait composition: One Medium Rift Peryton in an editable stag-headed raptor appearance: ONE compact eagle-like feathered torso, ONE stag head with brown fur, TWO amber eyes, TWO ears and TWO branching antlers in the selected reference shape. EXACTLY TWO broad feathered wings, TWO bird legs ending in taloned feet, and ONE short fan of tail feathers; no deer legs, human limbs or extra head. Deep charcoal-brown feathers carry restrained violet Veil-light streaks; muted bone antlers. Calm standing near-front three-quarter pose with wings half-open so both complete wings and all primary tips are visible, antlers fully inside margins. Stag/raptor features, palette and antler pattern are editable visual defaults; no previous victim, heart, consumed creature or shadow identity is revealed. No distinct cast silhouette or recognizable animal/humanoid shadow, kill, blood, mountain or night scene."
+      }
+    },
+    {
+      "id": "severed-monster-rift-phase-spider",
+      "name": "Rift Phase Spider",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-phase-spider.md",
+          "sha256": "3ef5e48e09445e46e5a8113084c65d53aa8ef2f8924784191c8a7d88bf1ad989",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-phase-spider.md",
+          "sha256": "2e06b9920f7b67fa42a7939e171440a6cff505404e06fcc03ffcd0fd8b24581e",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/phase_spider",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Large Rift Phase Spider: ONE joined two-part arachnid body, a low slate-blue cephalothorax and oval violet-gray abdomen, EXACTLY EIGHT long jointed walking legs, FOUR on each side with all eight tips separated and countable. EIGHT small pale-violet eyes in four paired clusters on one front head, TWO short mouth palps distinct from walking legs, and TWO small closed dark fangs. Subtle violet Rift veins and thin vapor wisps close to the carapace. Calm fully material resting reference pose, slightly elevated near-front three-quarter view, eight legs spread enough to count without tangled overlaps. Colors, eye arrangement and vapor pattern are editable visual defaults. No humanoid body, wings, extra walking leg, duplicate spider, portal, actual planar transition, webbed victim, bite scene, exposed organs, scenery or text.",
+        "full_body": {
+          "path": "assets/characters/2d15146e9b13313ec59b9fb4d74c0901bcb603360e24833087a37aecc8c10780.png",
+          "sha256": "2d15146e9b13313ec59b9fb4d74c0901bcb603360e24833087a37aecc8c10780"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/c41a2f6005722ae76a0b1ceff141d59d11e3c9c8eaf4365a43384a964683321d.png",
+          "sha256": "c41a2f6005722ae76a0b1ceff141d59d11e3c9c8eaf4365a43384a964683321d"
+        },
+        "portrait": {
+          "path": "assets/characters/f5c6394f246740e003bdec55977150e3aa4a42e7c7f3ca30146783b34bc64298.png",
+          "sha256": "f5c6394f246740e003bdec55977150e3aa4a42e7c7f3ca30146783b34bc64298"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2131644
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 1592279
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2468473
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete creature reference for Rift Phase Spider in Sylvia GM's Severed Lands. Landscape 1536x1024 PNG. ONE complete single subject, near-front three-quarter view on a plain light neutral gray backdrop, matching naturalistic polished RPG digital illustration, soft studio lighting. Whole silhouette including every horn, wing, leg, tendril, tail, antenna and weapon tip must fit comfortably inside generous outer margins. One Large Rift Phase Spider: ONE joined two-part arachnid body, a low slate-blue cephalothorax and oval violet-gray abdomen, EXACTLY EIGHT long jointed walking legs, FOUR on each side with all eight tips separated and countable. EIGHT small pale-violet eyes in four paired clusters on one front head, TWO short mouth palps distinct from walking legs, and TWO small closed dark fangs. Subtle violet Rift veins and thin vapor wisps close to the carapace. Calm fully material resting reference pose, slightly elevated near-front three-quarter view, eight legs spread enough to count without tangled overlaps. Colors, eye arrangement and vapor pattern are editable visual defaults. No humanoid body, wings, extra walking leg, duplicate spider, portal, actual planar transition, webbed victim, bite scene, exposed organs, scenery or text. Preserve exact appendage counts and any weapon-hand side. No additional creatures, text, labels, borders, UI or scenery.",
+        "reference_sheet": "Use case: character reference sheet. Edit this supplied selected full-body artwork into one clean LANDSCAPE 1536x1024 PNG multiview reference sheet. Preserve this EXACT subject, face where present, anatomy, appendage attachment pattern/count, material, markings, clothes, colors and weapon-hand side. Three clearly separated COMPLETE views, front, anatomical right side, and rear, left-to-right on plain light neutral gray, matching naturalistic RPG illustration and soft studio light. Scale views to fit with outer margins and space between them; every wing, leg, tail, tendril, antenna and weapon tip must fit within its view. No merging/touching between views, duplicate or extra appendages, labels, text, insets, borders or scenery. Appearance to preserve in EACH view: One Large Rift Phase Spider: ONE joined two-part arachnid body, a low slate-blue cephalothorax and oval violet-gray abdomen, EXACTLY EIGHT long jointed walking legs, FOUR on each side with all eight tips separated and countable. EIGHT small pale-violet eyes in four paired clusters on one front head, TWO short mouth palps distinct from walking legs, and TWO small closed dark fangs. Subtle violet Rift veins and thin vapor wisps close to the carapace. Calm fully material resting reference pose, slightly elevated near-front three-quarter view, eight legs spread enough to count without tangled overlaps. Colors, eye arrangement and vapor pattern are editable visual defaults. No humanoid body, wings, extra walking leg, duplicate spider, portal, actual planar transition, webbed victim, bite scene, exposed organs, scenery or text.",
+        "portrait": "Use case: portrait asset. Using BOTH selected references (image 1 complete body, image 2 multiview sheet), create ONE SQUARE 1024x1024 PNG portrait for Rift Phase Spider. Preserve this exact subject's selected identity, face where present, anatomy, markings, palette and materials. ONE close near-front arachnid head and upper cephalothorax portrait, all EIGHT small eyes visible in the same four paired clusters with their center near y=0.35. Keep BOTH short mouth palps and BOTH closed dark fangs complete within the circle-safe middle. Omit full body, abdomen and long walking legs; no invented extra eyes, human features or planar transition. Naturalistic polished RPG digital illustration matching the sources, soft studio lighting on plain light neutral gray. Leave real margins for circular display. Do not draw a circle, border, label, writing, other being or scene. The following complete-body description gives identity details only; show ONLY the requested portrait composition: One Large Rift Phase Spider: ONE joined two-part arachnid body, a low slate-blue cephalothorax and oval violet-gray abdomen, EXACTLY EIGHT long jointed walking legs, FOUR on each side with all eight tips separated and countable. EIGHT small pale-violet eyes in four paired clusters on one front head, TWO short mouth palps distinct from walking legs, and TWO small closed dark fangs. Subtle violet Rift veins and thin vapor wisps close to the carapace. Calm fully material resting reference pose, slightly elevated near-front three-quarter view, eight legs spread enough to count without tangled overlaps. Colors, eye arrangement and vapor pattern are editable visual defaults. No humanoid body, wings, extra walking leg, duplicate spider, portal, actual planar transition, webbed victim, bite scene, exposed organs, scenery or text."
+      }
+    },
+    {
+      "id": "severed-monster-rift-piercer",
+      "name": "Rift Piercer",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-piercer.md",
+          "sha256": "8a77bcafe220f166f6a3a08fdae473790c3d8900fee0794dde90945c9dbb69df",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-piercer.md",
+          "sha256": "14115def510bf289a89c34e304ee37c0ca0ef1f97bf330a0f180b41ba22534e8",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Medium Rift Piercer as a complete faceless calcite stalactite-shaped predator: ONE elongated tapering stone cone, broad uneven top and ONE sharp downward point, irregular pale gray calcite ridges with violet Rift-mineral veins and a restrained violet shimmer. Quiet suspended point-down reference state, no cave ceiling or attached rock, whole silhouette with margins. The cone, calcite and violet minerals follow authored source; exact ridges and veins are editable visual defaults. No eyes, mouth, face, arms, legs, wings, tentacles, exposed slug, victim, falling attack, Anchor Door, rune writing or environmental scenery.",
+        "full_body": {
+          "path": "assets/characters/0d1c58da6a682890d9e37e8166e25238251852aa8cdacf57a5edb5cb07bfd6b6.png",
+          "sha256": "0d1c58da6a682890d9e37e8166e25238251852aa8cdacf57a5edb5cb07bfd6b6"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/32bdcf174e85a25051e7952c5248ff214c6af43e824ae3ee782a75679d5ab99b.png",
+          "sha256": "32bdcf174e85a25051e7952c5248ff214c6af43e824ae3ee782a75679d5ab99b"
+        },
+        "portrait": {
+          "path": "assets/characters/02e3e5eeb2e7c9ea246fc2c1648ebbb96231215eba7bb9d25d999e2ade67b9e5.png",
+          "sha256": "02e3e5eeb2e7c9ea246fc2c1648ebbb96231215eba7bb9d25d999e2ade67b9e5"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1539132
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 1745755
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 1426838
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete creature reference for Rift Piercer in Sylvia GM's Severed Lands. Portrait-orientation 1024x1536 PNG. ONE complete single subject, near-front three-quarter view on a plain light neutral gray backdrop, matching naturalistic polished RPG digital illustration, soft studio lighting. Whole silhouette including every horn, wing, leg, tendril, tail, antenna and weapon tip must fit comfortably inside generous outer margins. One Medium Rift Piercer as a complete faceless calcite stalactite-shaped predator: ONE elongated tapering stone cone, broad uneven top and ONE sharp downward point, irregular pale gray calcite ridges with violet Rift-mineral veins and a restrained violet shimmer. Quiet suspended point-down reference state, no cave ceiling or attached rock, whole silhouette with margins. The cone, calcite and violet minerals follow authored source; exact ridges and veins are editable visual defaults. No eyes, mouth, face, arms, legs, wings, tentacles, exposed slug, victim, falling attack, Anchor Door, rune writing or environmental scenery. Preserve exact appendage counts and any weapon-hand side. No additional creatures, text, labels, borders, UI or scenery.",
+        "reference_sheet": "Use case: character reference sheet. Edit this supplied selected full-body artwork into one clean LANDSCAPE 1536x1024 PNG multiview reference sheet. Preserve this EXACT subject, face where present, anatomy, appendage attachment pattern/count, material, markings, clothes, colors and weapon-hand side. Three clearly separated COMPLETE views, front, anatomical right side, and rear, left-to-right on plain light neutral gray, matching naturalistic RPG illustration and soft studio light. Scale views to fit with outer margins and space between them; every wing, leg, tail, tendril, antenna and weapon tip must fit within its view. No merging/touching between views, duplicate or extra appendages, labels, text, insets, borders or scenery. Appearance to preserve in EACH view: One Medium Rift Piercer as a complete faceless calcite stalactite-shaped predator: ONE elongated tapering stone cone, broad uneven top and ONE sharp downward point, irregular pale gray calcite ridges with violet Rift-mineral veins and a restrained violet shimmer. Quiet suspended point-down reference state, no cave ceiling or attached rock, whole silhouette with margins. The cone, calcite and violet minerals follow authored source; exact ridges and veins are editable visual defaults. No eyes, mouth, face, arms, legs, wings, tentacles, exposed slug, victim, falling attack, Anchor Door, rune writing or environmental scenery.",
+        "portrait": "Use case: portrait asset. Using BOTH selected references (image 1 complete body, image 2 multiview sheet), create ONE SQUARE 1024x1024 PNG portrait for Rift Piercer. Preserve this exact subject's selected identity, face where present, anatomy, markings, palette and materials. ONE COMPLETE faceless point-down stalactite cone, all calcite ridges and the downward tip within the central 68% of the square. Generous neutral background around every side for a circular crop. No invented eye, face, mouth, arms, legs, cave ceiling or Anchor Door. Naturalistic polished RPG digital illustration matching the sources, soft studio lighting on plain light neutral gray. Leave real margins for circular display. Do not draw a circle, border, label, writing, other being or scene. The following complete-body description gives identity details only; show ONLY the requested portrait composition: One Medium Rift Piercer as a complete faceless calcite stalactite-shaped predator: ONE elongated tapering stone cone, broad uneven top and ONE sharp downward point, irregular pale gray calcite ridges with violet Rift-mineral veins and a restrained violet shimmer. Quiet suspended point-down reference state, no cave ceiling or attached rock, whole silhouette with margins. The cone, calcite and violet minerals follow authored source; exact ridges and veins are editable visual defaults. No eyes, mouth, face, arms, legs, wings, tentacles, exposed slug, victim, falling attack, Anchor Door, rune writing or environmental scenery."
+      }
+    },
+    {
+      "id": "severed-monster-rift-pudding",
+      "name": "Rift Pudding",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-pudding.md",
+          "sha256": "282aca07e44329e2f8211afebb3ed6b3f47b9319288882e1de6ecdf86d286ed8",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-pudding.md",
+          "sha256": "27b0c51c05cc1531f24164ef02bc59ce3bed54ab3b40c3c0a31e03459e77040f",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/black_pudding",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Large Rift Pudding: ONE thick opaque near-black plum-violet corrosive sludge mass, a broad low continuous puddled base with ONE raised rounded central mound and TWO short blunt pseudopod lobes in a quiet resting arrangement. Glossy heavy surface, faint violet internal seams and a restrained iridescent Rift sheen, no transparent contents. FACELESS: no eyes, mouth, humanoid head, fingers, skeleton or trapped objects. The sludge, pool origin and pseudopods follow authored source; precise outline, lobe arrangement and color are editable resting defaults, not fixed limits on its amorphous form or splitting. No victims, dissolving equipment, acid attack, landscape, writing or other beings.",
+        "full_body": {
+          "path": "assets/characters/6afa2918f671bfb58d45ab4e95106276a12abdc3c4e43b013928958281a3a555.png",
+          "sha256": "6afa2918f671bfb58d45ab4e95106276a12abdc3c4e43b013928958281a3a555"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/67df1b110063d09e8577c90e1b32db528811ae895e8540d9650cd751f0824dd8.png",
+          "sha256": "67df1b110063d09e8577c90e1b32db528811ae895e8540d9650cd751f0824dd8"
+        },
+        "portrait": {
+          "path": "assets/characters/311b4f5a9c8546767cb72724e3bcca3cd506eccfc3c97dae1f6b57e75922b9e7.png",
+          "sha256": "311b4f5a9c8546767cb72724e3bcca3cd506eccfc3c97dae1f6b57e75922b9e7"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 1570556
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 1391317
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 1499353
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete creature reference for Rift Pudding in Sylvia GM's Severed Lands. Landscape 1536x1024 PNG. ONE complete single subject, near-front three-quarter view on a plain light neutral gray backdrop, matching naturalistic polished RPG digital illustration, soft studio lighting. Whole silhouette including every horn, wing, leg, tendril, tail, antenna and weapon tip must fit comfortably inside generous outer margins. One Large Rift Pudding: ONE thick opaque near-black plum-violet corrosive sludge mass, a broad low continuous puddled base with ONE raised rounded central mound and TWO short blunt pseudopod lobes in a quiet resting arrangement. Glossy heavy surface, faint violet internal seams and a restrained iridescent Rift sheen, no transparent contents. FACELESS: no eyes, mouth, humanoid head, fingers, skeleton or trapped objects. The sludge, pool origin and pseudopods follow authored source; precise outline, lobe arrangement and color are editable resting defaults, not fixed limits on its amorphous form or splitting. No victims, dissolving equipment, acid attack, landscape, writing or other beings. Preserve exact appendage counts and any weapon-hand side. No additional creatures, text, labels, borders, UI or scenery.",
+        "reference_sheet": "Use case: character reference sheet. Edit this supplied selected full-body artwork into one clean LANDSCAPE 1536x1024 PNG multiview reference sheet. Preserve this EXACT subject, face where present, anatomy, appendage attachment pattern/count, material, markings, clothes, colors and weapon-hand side. Three clearly separated COMPLETE views, front, anatomical right side, and rear, left-to-right on plain light neutral gray, matching naturalistic RPG illustration and soft studio light. Scale views to fit with outer margins and space between them; every wing, leg, tail, tendril, antenna and weapon tip must fit within its view. No merging/touching between views, duplicate or extra appendages, labels, text, insets, borders or scenery. Appearance to preserve in EACH view: One Large Rift Pudding: ONE thick opaque near-black plum-violet corrosive sludge mass, a broad low continuous puddled base with ONE raised rounded central mound and TWO short blunt pseudopod lobes in a quiet resting arrangement. Glossy heavy surface, faint violet internal seams and a restrained iridescent Rift sheen, no transparent contents. FACELESS: no eyes, mouth, humanoid head, fingers, skeleton or trapped objects. The sludge, pool origin and pseudopods follow authored source; precise outline, lobe arrangement and color are editable resting defaults, not fixed limits on its amorphous form or splitting. No victims, dissolving equipment, acid attack, landscape, writing or other beings.",
+        "portrait": "Use case: portrait asset. Using BOTH selected references (image 1 complete body, image 2 multiview sheet), create ONE SQUARE 1024x1024 PNG portrait for Rift Pudding. Preserve this exact subject's selected identity, face where present, anatomy, markings, palette and materials. ONE COMPLETE faceless opaque sludge mound, its continuous puddled base and TWO short blunt pseudopod lobes within the central 68% of the square. Generous gray background around every side for a circular crop. No invented face, eyes, transparent contents, victims or objects. Naturalistic polished RPG digital illustration matching the sources, soft studio lighting on plain light neutral gray. Leave real margins for circular display. Do not draw a circle, border, label, writing, other being or scene. The following complete-body description gives identity details only; show ONLY the requested portrait composition: One Large Rift Pudding: ONE thick opaque near-black plum-violet corrosive sludge mass, a broad low continuous puddled base with ONE raised rounded central mound and TWO short blunt pseudopod lobes in a quiet resting arrangement. Glossy heavy surface, faint violet internal seams and a restrained iridescent Rift sheen, no transparent contents. FACELESS: no eyes, mouth, humanoid head, fingers, skeleton or trapped objects. The sludge, pool origin and pseudopods follow authored source; precise outline, lobe arrangement and color are editable resting defaults, not fixed limits on its amorphous form or splitting. No victims, dissolving equipment, acid attack, landscape, writing or other beings."
+      }
+    },
+    {
+      "id": "severed-monster-rift-purple-worm",
+      "name": "Rift Purple Worm",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-purple-worm.md",
+          "sha256": "f92dd1921809329c5fab9e83fc63551df1459ab6aa202c924f11971c0b5862f8",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-purple-worm.md",
+          "sha256": "db99fe9d085c0d2985af9d0cfa8a3c2715d21ae0b1f44088f51bbf8618854b0c",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/purple_worm",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Gargantuan Rift Purple Worm: ONE complete massive continuous segmented purple worm body in a loose open S-shaped resting coil, head raised on the left, ONE tapering tail ending in ONE dark pointed stinger visible on the right. ONE circular swallowing maw with several orderly rings of small pale teeth, empty and slightly open, no eyes or separate humanoid face. Heavy dark-purple hide studded with violet crystals and faint violet charge along the tooth roots. Every body segment, crystal tip and the single stinger fits inside generous margins; no coil closes into an ouroboros or conceals a second end. Crystals, maw and stinger follow authored source; palette, segment pattern and coil pose are editable defaults. No legs, wings, antennae, tentacles, victims, swallowed beings, cavern scene, attack or text.",
+        "full_body": {
+          "path": "assets/characters/af5d35637b279cb4e258ece06c4371437ad28073861458be487474a9a7132c22.png",
+          "sha256": "af5d35637b279cb4e258ece06c4371437ad28073861458be487474a9a7132c22"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/fab49cc24abce9e2eb0ca76d3a9316822a6f0f99e66367dc821780d6514e37fc.png",
+          "sha256": "fab49cc24abce9e2eb0ca76d3a9316822a6f0f99e66367dc821780d6514e37fc"
+        },
+        "portrait": {
+          "path": "assets/characters/57d01f8bf21a870358bef762c27fd035e92f200f87c4548610b1505914bb36d5.png",
+          "sha256": "57d01f8bf21a870358bef762c27fd035e92f200f87c4548610b1505914bb36d5"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2271196
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 1781682
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2286553
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete creature reference for Rift Purple Worm in Sylvia GM's Severed Lands. Landscape 1536x1024 PNG. ONE complete single subject, near-front three-quarter view on a plain light neutral gray backdrop, matching naturalistic polished RPG digital illustration, soft studio lighting. Whole silhouette including every horn, wing, leg, tendril, tail, antenna and weapon tip must fit comfortably inside generous outer margins. One Gargantuan Rift Purple Worm: ONE complete massive continuous segmented purple worm body in a loose open S-shaped resting coil, head raised on the left, ONE tapering tail ending in ONE dark pointed stinger visible on the right. ONE circular swallowing maw with several orderly rings of small pale teeth, empty and slightly open, no eyes or separate humanoid face. Heavy dark-purple hide studded with violet crystals and faint violet charge along the tooth roots. Every body segment, crystal tip and the single stinger fits inside generous margins; no coil closes into an ouroboros or conceals a second end. Crystals, maw and stinger follow authored source; palette, segment pattern and coil pose are editable defaults. No legs, wings, antennae, tentacles, victims, swallowed beings, cavern scene, attack or text. Preserve exact appendage counts and any weapon-hand side. No additional creatures, text, labels, borders, UI or scenery.",
+        "reference_sheet": "Use case: character reference sheet. Edit this supplied selected full-body artwork into one clean LANDSCAPE 1536x1024 PNG multiview reference sheet. Preserve this EXACT subject, face where present, anatomy, appendage attachment pattern/count, material, markings, clothes, colors and weapon-hand side. Three clearly separated COMPLETE views, front, anatomical right side, and rear, left-to-right on plain light neutral gray, matching naturalistic RPG illustration and soft studio light. Scale views to fit with outer margins and space between them; every wing, leg, tail, tendril, antenna and weapon tip must fit within its view. No merging/touching between views, duplicate or extra appendages, labels, text, insets, borders or scenery. Appearance to preserve in EACH view: One Gargantuan Rift Purple Worm: ONE complete massive continuous segmented purple worm body in a loose open S-shaped resting coil, head raised on the left, ONE tapering tail ending in ONE dark pointed stinger visible on the right. ONE circular swallowing maw with several orderly rings of small pale teeth, empty and slightly open, no eyes or separate humanoid face. Heavy dark-purple hide studded with violet crystals and faint violet charge along the tooth roots. Every body segment, crystal tip and the single stinger fits inside generous margins; no coil closes into an ouroboros or conceals a second end. Crystals, maw and stinger follow authored source; palette, segment pattern and coil pose are editable defaults. No legs, wings, antennae, tentacles, victims, swallowed beings, cavern scene, attack or text.",
+        "portrait": "Use case: portrait asset. Using BOTH selected references (image 1 complete body, image 2 multiview sheet), create ONE SQUARE 1024x1024 PNG portrait for Rift Purple Worm. Preserve this exact subject's selected identity, face where present, anatomy, markings, palette and materials. ONE close near-front circular maw and upper worm-segment portrait. The ONE empty circular tooth-ringed maw is centered, and its COMPLETE outer crystal-studded rim fits inside the middle circle-safe area with generous margins. Preserve the ordered tooth rings, violet crystal details and purple hide. No eyes, human face, extra mouth, victim, tongue, tendrils or swallowing scene; the full tail and coil are outside this close portrait. Naturalistic polished RPG digital illustration matching the sources, soft studio lighting on plain light neutral gray. Leave real margins for circular display. Do not draw a circle, border, label, writing, other being or scene. The following complete-body description gives identity details only; show ONLY the requested portrait composition: One Gargantuan Rift Purple Worm: ONE complete massive continuous segmented purple worm body in a loose open S-shaped resting coil, head raised on the left, ONE tapering tail ending in ONE dark pointed stinger visible on the right. ONE circular swallowing maw with several orderly rings of small pale teeth, empty and slightly open, no eyes or separate humanoid face. Heavy dark-purple hide studded with violet crystals and faint violet charge along the tooth roots. Every body segment, crystal tip and the single stinger fits inside generous margins; no coil closes into an ouroboros or conceals a second end. Crystals, maw and stinger follow authored source; palette, segment pattern and coil pose are editable defaults. No legs, wings, antennae, tentacles, victims, swallowed beings, cavern scene, attack or text."
+      }
+    },
+    {
+      "id": "severed-monster-rift-raider",
+      "name": "Rift Raider",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-raider.md",
+          "sha256": "49a13e8deb62c5dbae5da2bf3704569a33b7cc21b1362540c0d9b9f3fd5b635d",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-raider.md",
+          "sha256": "86dc6e888e9f30d319cff28fd61f873a2aa281c3300c40bc8f9592424665a255",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Medium Rift Raider, an anonymous mature adult androgynous Riftborn humanoid with an athletic build, warm brown intact skin with subtle violet striations, TWO dark amber eyes, ordinary rounded ears, black undercut hair with one short braid and a composed wary closed-mouth expression. EXACTLY TWO arms, five fingers per hand, TWO legs and complete dark boots. Practical patchwork gray Warden-alloy half plate over opaque charcoal shirt and trousers, plain belt, one small unmarked salvaged metal token and a torn patrol-cloth strip as non-graphic trophies, with no named owner or readable insignia. Anatomical RIGHT hand holds ONE complete plain gray-violet alloy greatsword low beside the body with its blade/tip visible; LEFT hand empty. Riftborn identity, Warden-alloy weapon, half plate and trophies follow authored source; face, gender presentation, hair, token and palette are editable defaults without declaring a named person or ancestry. No bodily trophies, gore, victim, magical attack, camp scene or text.",
+        "full_body": {
+          "path": "assets/characters/0c734c50e86569c00f49eafd2a742a8fb9b5bdd0353ba1653aff76863718e3f9.png",
+          "sha256": "0c734c50e86569c00f49eafd2a742a8fb9b5bdd0353ba1653aff76863718e3f9"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/65923d35eb5e159c4f8c675337b72940d5b982145552101a1ecd628d9391d60b.png",
+          "sha256": "65923d35eb5e159c4f8c675337b72940d5b982145552101a1ecd628d9391d60b"
+        },
+        "portrait": {
+          "path": "assets/characters/ac97305d721d1bb7fc796ca8a6711762bb7a51e2c0e479b91bd34521bc98f5f3.png",
+          "sha256": "ac97305d721d1bb7fc796ca8a6711762bb7a51e2c0e479b91bd34521bc98f5f3"
+        },
+        "frame": {
+          "x": 0.65,
+          "y": 0,
+          "zoom": 1.2
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1667046
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 1847436
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2329996
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete creature reference for Rift Raider in Sylvia GM's Severed Lands. Portrait-orientation 1024x1536 PNG. ONE complete single subject, near-front three-quarter view on a plain light neutral gray backdrop, matching naturalistic polished RPG digital illustration, soft studio lighting. Whole silhouette including every horn, wing, leg, tendril, tail, antenna and weapon tip must fit comfortably inside generous outer margins. One Medium Rift Raider, an anonymous mature adult androgynous Riftborn humanoid with an athletic build, warm brown intact skin with subtle violet striations, TWO dark amber eyes, ordinary rounded ears, black undercut hair with one short braid and a composed wary closed-mouth expression. EXACTLY TWO arms, five fingers per hand, TWO legs and complete dark boots. Practical patchwork gray Warden-alloy half plate over opaque charcoal shirt and trousers, plain belt, one small unmarked salvaged metal token and a torn patrol-cloth strip as non-graphic trophies, with no named owner or readable insignia. Anatomical RIGHT hand holds ONE complete plain gray-violet alloy greatsword low beside the body with its blade/tip visible; LEFT hand empty. Riftborn identity, Warden-alloy weapon, half plate and trophies follow authored source; face, gender presentation, hair, token and palette are editable defaults without declaring a named person or ancestry. No bodily trophies, gore, victim, magical attack, camp scene or text. Preserve exact appendage counts and any weapon-hand side. No additional creatures, text, labels, borders, UI or scenery.",
+        "reference_sheet": "Use case: character reference sheet. Edit this supplied selected full-body artwork into one clean LANDSCAPE 1536x1024 PNG multiview reference sheet. Preserve this EXACT subject, face where present, anatomy, appendage attachment pattern/count, material, markings, clothes, colors and weapon-hand side. Three clearly separated COMPLETE views, front, anatomical right side, and rear, left-to-right on plain light neutral gray, matching naturalistic RPG illustration and soft studio light. Scale views to fit with outer margins and space between them; every wing, leg, tail, tendril, antenna and weapon tip must fit within its view. No merging/touching between views, duplicate or extra appendages, labels, text, insets, borders or scenery. Appearance to preserve in EACH view: One Medium Rift Raider, an anonymous mature adult androgynous Riftborn humanoid with an athletic build, warm brown intact skin with subtle violet striations, TWO dark amber eyes, ordinary rounded ears, black undercut hair with one short braid and a composed wary closed-mouth expression. EXACTLY TWO arms, five fingers per hand, TWO legs and complete dark boots. Practical patchwork gray Warden-alloy half plate over opaque charcoal shirt and trousers, plain belt, one small unmarked salvaged metal token and a torn patrol-cloth strip as non-graphic trophies, with no named owner or readable insignia. Anatomical RIGHT hand holds ONE complete plain gray-violet alloy greatsword low beside the body with its blade/tip visible; LEFT hand empty. Riftborn identity, Warden-alloy weapon, half plate and trophies follow authored source; face, gender presentation, hair, token and palette are editable defaults without declaring a named person or ancestry. No bodily trophies, gore, victim, magical attack, camp scene or text.",
+        "portrait": "Use case: portrait asset. Using BOTH selected references (image 1 complete body, image 2 multiview sheet), create ONE SQUARE 1024x1024 PNG portrait for Rift Raider. Preserve this exact subject's selected identity, face where present, anatomy, markings, palette and materials. ONE close near-front head-and-shoulders bust, the exact same mature adult face, undercut/short braid, violet skin striations and half-plate shoulders. Face centered, eye line around y=0.34, complete hair and ears above/alongside with real margins, chin around y=0.64, shoulders continuing to the lower edge. No weapon or hands in frame, no named identity or ancestry assertion. Naturalistic polished RPG digital illustration matching the sources, soft studio lighting on plain light neutral gray. Leave real margins for circular display. Do not draw a circle, border, label, writing, other being or scene. The following complete-body description gives identity details only; show ONLY the requested portrait composition: One Medium Rift Raider, an anonymous mature adult androgynous Riftborn humanoid with an athletic build, warm brown intact skin with subtle violet striations, TWO dark amber eyes, ordinary rounded ears, black undercut hair with one short braid and a composed wary closed-mouth expression. EXACTLY TWO arms, five fingers per hand, TWO legs and complete dark boots. Practical patchwork gray Warden-alloy half plate over opaque charcoal shirt and trousers, plain belt, one small unmarked salvaged metal token and a torn patrol-cloth strip as non-graphic trophies, with no named owner or readable insignia. Anatomical RIGHT hand holds ONE complete plain gray-violet alloy greatsword low beside the body with its blade/tip visible; LEFT hand empty. Riftborn identity, Warden-alloy weapon, half plate and trophies follow authored source; face, gender presentation, hair, token and palette are editable defaults without declaring a named person or ancestry. No bodily trophies, gore, victim, magical attack, camp scene or text."
+      }
+    },
+    {
+      "id": "severed-monster-rift-remorhaz",
+      "name": "Rift Remorhaz",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-remorhaz.md",
+          "sha256": "2fe6573608d03e6ab8fbe57388e688b1be14caa092a756b526924883b0438ab5",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-remorhaz.md",
+          "sha256": "fd8dc4fd3467f6156347d41addd1f9a289f3a767e57b9e6708129a34d9a5c1d7",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/remorhaz",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Huge Rift Remorhaz in an editable centipede-like reference appearance: ONE long continuous segmented armored body, curved into a low open S with the raised front on the left and tapered tail on the right. EXACTLY SIX paired sets of jointed walking legs, TWELVE legs total, six on each side, spaced so all twelve feet/tips are visible and countable. ONE insectoid head with TWO small amber eyes and TWO curved dark mandibles around a closed mouth; no antennae, wings or separate humanoid limbs. Slate-blue shell plates glow violet-hot along their undersides, with restrained violet-white Veil discharge at the mandibles. Stony armor, violet heat and mandible discharge follow authored source; segmentation, twelve-leg reference arrangement, colors and coil are editable visual defaults, not newly asserted mechanics. Whole creature including all legs and tail visible. No swallowed prey, victim, visible digestive contents, melted landscape, ice scene, attack or writing.",
+        "full_body": {
+          "path": "assets/characters/b4c6f168e27627150a344dbc930c49bf0624ff47242fe379cd66e8dd6ee86686.png",
+          "sha256": "b4c6f168e27627150a344dbc930c49bf0624ff47242fe379cd66e8dd6ee86686"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/19aa518f6fa9a3493cf8a1f1ff1b5bc8b377edc6a3833b4074af035480c523b7.png",
+          "sha256": "19aa518f6fa9a3493cf8a1f1ff1b5bc8b377edc6a3833b4074af035480c523b7"
+        },
+        "portrait": {
+          "path": "assets/characters/a8a8daf9170047c3b3c0b40492f4c6327eaf91d893f13c74612a2f29b87e01e7.png",
+          "sha256": "a8a8daf9170047c3b3c0b40492f4c6327eaf91d893f13c74612a2f29b87e01e7"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2123785
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 1753492
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2327309
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete creature reference for Rift Remorhaz in Sylvia GM's Severed Lands. Landscape 1536x1024 PNG. ONE complete single subject, near-front three-quarter view on a plain light neutral gray backdrop, matching naturalistic polished RPG digital illustration, soft studio lighting. Whole silhouette including every horn, wing, leg, tendril, tail, antenna and weapon tip must fit comfortably inside generous outer margins. One Huge Rift Remorhaz in an editable centipede-like reference appearance: ONE long continuous segmented armored body, curved into a low open S with the raised front on the left and tapered tail on the right. EXACTLY SIX paired sets of jointed walking legs, TWELVE legs total, six on each side, spaced so all twelve feet/tips are visible and countable. ONE insectoid head with TWO small amber eyes and TWO curved dark mandibles around a closed mouth; no antennae, wings or separate humanoid limbs. Slate-blue shell plates glow violet-hot along their undersides, with restrained violet-white Veil discharge at the mandibles. Stony armor, violet heat and mandible discharge follow authored source; segmentation, twelve-leg reference arrangement, colors and coil are editable visual defaults, not newly asserted mechanics. Whole creature including all legs and tail visible. No swallowed prey, victim, visible digestive contents, melted landscape, ice scene, attack or writing. Preserve exact appendage counts and any weapon-hand side. No additional creatures, text, labels, borders, UI or scenery. Anatomy correction applied to the initial output: Use case: precise-object-edit. Change ONLY the walking-leg layout/count on this exact Remorhaz. Keep its existing head, two eyes, two mandibles, armor, violet heat, tail, single continuous body and colors unchanged. Give it EXACTLY SIX LEG PAIRS: SIX clearly separated near-side legs and SIX clearly separated far-side legs, twelve in total, one pair at each of six body attachment stations. Remove any extra legs or unattached foot-like stumps. Space legs so all twelve discrete pointed feet can be counted; a slightly elevated camera is allowed only as needed to expose the far-side feet. Keep the same complete body S-curve and every tip comfortably within the landscape frame. No labels, digits, diagram, other being or scene.",
+        "reference_sheet": "Use case: character reference sheet. Edit this supplied selected full-body artwork into one clean LANDSCAPE 1536x1024 PNG multiview reference sheet. Preserve this EXACT subject, face where present, anatomy, appendage attachment pattern/count, material, markings, clothes, colors and weapon-hand side. Three clearly separated COMPLETE views, front, anatomical right side, and rear, left-to-right on plain light neutral gray, matching naturalistic RPG illustration and soft studio light. Scale views to fit with outer margins and space between them; every wing, leg, tail, tendril, antenna and weapon tip must fit within its view. No merging/touching between views, duplicate or extra appendages, labels, text, insets, borders or scenery. Appearance to preserve in EACH view: One Huge Rift Remorhaz in an editable centipede-like reference appearance: ONE long continuous segmented armored body, curved into a low open S with the raised front on the left and tapered tail on the right. EXACTLY SIX paired sets of jointed walking legs, TWELVE legs total, six on each side, spaced so all twelve feet/tips are visible and countable. ONE insectoid head with TWO small amber eyes and TWO curved dark mandibles around a closed mouth; no antennae, wings or separate humanoid limbs. Slate-blue shell plates glow violet-hot along their undersides, with restrained violet-white Veil discharge at the mandibles. Stony armor, violet heat and mandible discharge follow authored source; segmentation, twelve-leg reference arrangement, colors and coil are editable visual defaults, not newly asserted mechanics. Whole creature including all legs and tail visible. No swallowed prey, victim, visible digestive contents, melted landscape, ice scene, attack or writing.",
+        "portrait": "Use case: portrait asset. Using BOTH selected references (image 1 complete body, image 2 multiview sheet), create ONE SQUARE 1024x1024 PNG portrait for Rift Remorhaz. Preserve this exact subject's selected identity, face where present, anatomy, markings, palette and materials. ONE close near-front armored head and short upper-neck portrait. Keep BOTH amber eyes near y=0.35 and BOTH complete curved mandibles inside the circular-safe area, along with the whole shell crown and restrained violet discharge. Same selected slate-blue armor and violet heat. Omit long body and walking legs; no extra mandible, antennae, wings, humanoid face or prey. Naturalistic polished RPG digital illustration matching the sources, soft studio lighting on plain light neutral gray. Leave real margins for circular display. Do not draw a circle, border, label, writing, other being or scene. The following complete-body description gives identity details only; show ONLY the requested portrait composition: One Huge Rift Remorhaz in an editable centipede-like reference appearance: ONE long continuous segmented armored body, curved into a low open S with the raised front on the left and tapered tail on the right. EXACTLY SIX paired sets of jointed walking legs, TWELVE legs total, six on each side, spaced so all twelve feet/tips are visible and countable. ONE insectoid head with TWO small amber eyes and TWO curved dark mandibles around a closed mouth; no antennae, wings or separate humanoid limbs. Slate-blue shell plates glow violet-hot along their undersides, with restrained violet-white Veil discharge at the mandibles. Stony armor, violet heat and mandible discharge follow authored source; segmentation, twelve-leg reference arrangement, colors and coil are editable visual defaults, not newly asserted mechanics. Whole creature including all legs and tail visible. No swallowed prey, victim, visible digestive contents, melted landscape, ice scene, attack or writing."
+      }
+    },
+    {
+      "id": "severed-monster-rift-revenant",
+      "name": "Rift Revenant",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-revenant.md",
+          "sha256": "1a6e1d59f2ed4fae9697c8d7ac26925c25987059f15e9a38799d4ccff2ca3205",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-revenant.md",
+          "sha256": "98121dc0464f597bd7f6278d8dacdd0a17d9e11d125f67c886c1b8c3120d0328",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Medium Rift Revenant as an anonymous mature adult humanlike Rift Echo, an upright lean androgynous figure with intact muted gray-beige skin, TWO pale violet-silver eyes, short black hair with one gray streak, ordinary rounded ears and a focused closed-mouth expression. EXACTLY TWO arms with five fingers on each relaxed EMPTY hand, TWO legs and complete charcoal boots. Worn plain dark leather armor over opaque slate tunic and trousers, simple belt and an unmarked charcoal shoulder cloak; faint violet translucence only along the intact silhouette. Leather armor and purposeful vengeful Echo follow authored source; face, hair, clothes, palette and gender presentation are editable defaults without establishing an original identity, killer or descendant. No exposed bones, wounds, decomposition, weapon, victim, revenge scene, readable insignia or writing.",
+        "full_body": {
+          "path": "assets/characters/1a1d5aed9a2a038cf4eb72c4cd2f466379e450d9e5fc43cd23590e14cc9723f3.png",
+          "sha256": "1a1d5aed9a2a038cf4eb72c4cd2f466379e450d9e5fc43cd23590e14cc9723f3"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/d495dc836fa6acf33fcf6672e3d9b89fca3be30abbf92e2e6fb5fdb67b11ebb4.png",
+          "sha256": "d495dc836fa6acf33fcf6672e3d9b89fca3be30abbf92e2e6fb5fdb67b11ebb4"
+        },
+        "portrait": {
+          "path": "assets/characters/3a3205d19107101526d20e41ed52b954ec827ded376f1e64480bfd755bc14616.png",
+          "sha256": "3a3205d19107101526d20e41ed52b954ec827ded376f1e64480bfd755bc14616"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0,
+          "zoom": 1.1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1522567
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 1733859
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2228586
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete creature reference for Rift Revenant in Sylvia GM's Severed Lands. Portrait-orientation 1024x1536 PNG. ONE complete single subject, near-front three-quarter view on a plain light neutral gray backdrop, matching naturalistic polished RPG digital illustration, soft studio lighting. Whole silhouette including every horn, wing, leg, tendril, tail, antenna and weapon tip must fit comfortably inside generous outer margins. One Medium Rift Revenant as an anonymous mature adult humanlike Rift Echo, an upright lean androgynous figure with intact muted gray-beige skin, TWO pale violet-silver eyes, short black hair with one gray streak, ordinary rounded ears and a focused closed-mouth expression. EXACTLY TWO arms with five fingers on each relaxed EMPTY hand, TWO legs and complete charcoal boots. Worn plain dark leather armor over opaque slate tunic and trousers, simple belt and an unmarked charcoal shoulder cloak; faint violet translucence only along the intact silhouette. Leather armor and purposeful vengeful Echo follow authored source; face, hair, clothes, palette and gender presentation are editable defaults without establishing an original identity, killer or descendant. No exposed bones, wounds, decomposition, weapon, victim, revenge scene, readable insignia or writing. Preserve exact appendage counts and any weapon-hand side. No additional creatures, text, labels, borders, UI or scenery.",
+        "reference_sheet": "Use case: character reference sheet. Edit this supplied selected full-body artwork into one clean LANDSCAPE 1536x1024 PNG multiview reference sheet. Preserve this EXACT subject, face where present, anatomy, appendage attachment pattern/count, material, markings, clothes, colors and weapon-hand side. Three clearly separated COMPLETE views, front, anatomical right side, and rear, left-to-right on plain light neutral gray, matching naturalistic RPG illustration and soft studio light. Scale views to fit with outer margins and space between them; every wing, leg, tail, tendril, antenna and weapon tip must fit within its view. No merging/touching between views, duplicate or extra appendages, labels, text, insets, borders or scenery. Appearance to preserve in EACH view: One Medium Rift Revenant as an anonymous mature adult humanlike Rift Echo, an upright lean androgynous figure with intact muted gray-beige skin, TWO pale violet-silver eyes, short black hair with one gray streak, ordinary rounded ears and a focused closed-mouth expression. EXACTLY TWO arms with five fingers on each relaxed EMPTY hand, TWO legs and complete charcoal boots. Worn plain dark leather armor over opaque slate tunic and trousers, simple belt and an unmarked charcoal shoulder cloak; faint violet translucence only along the intact silhouette. Leather armor and purposeful vengeful Echo follow authored source; face, hair, clothes, palette and gender presentation are editable defaults without establishing an original identity, killer or descendant. No exposed bones, wounds, decomposition, weapon, victim, revenge scene, readable insignia or writing.",
+        "portrait": "Use case: portrait asset. Using BOTH selected references (image 1 complete body, image 2 multiview sheet), create ONE SQUARE 1024x1024 PNG portrait for Rift Revenant. Preserve this exact subject's selected identity, face where present, anatomy, markings, palette and materials. ONE close near-front head-and-shoulders bust, preserving the exact same anonymous mature adult face, violet-silver eyes, short black hair/gray streak, leather armor and cloak collar. Face centered, eye line around y=0.34, complete hair/ears with margins, chin near y=0.64, shoulders continuing to lower edge. Faint violet edge only; no weapon, exposed bones, wound or invented original identity. Naturalistic polished RPG digital illustration matching the sources, soft studio lighting on plain light neutral gray. Leave real margins for circular display. Do not draw a circle, border, label, writing, other being or scene. The following complete-body description gives identity details only; show ONLY the requested portrait composition: One Medium Rift Revenant as an anonymous mature adult humanlike Rift Echo, an upright lean androgynous figure with intact muted gray-beige skin, TWO pale violet-silver eyes, short black hair with one gray streak, ordinary rounded ears and a focused closed-mouth expression. EXACTLY TWO arms with five fingers on each relaxed EMPTY hand, TWO legs and complete charcoal boots. Worn plain dark leather armor over opaque slate tunic and trousers, simple belt and an unmarked charcoal shoulder cloak; faint violet translucence only along the intact silhouette. Leather armor and purposeful vengeful Echo follow authored source; face, hair, clothes, palette and gender presentation are editable defaults without establishing an original identity, killer or descendant. No exposed bones, wounds, decomposition, weapon, victim, revenge scene, readable insignia or writing."
+      }
+    },
+    {
+      "id": "severed-monster-rift-roc",
+      "name": "Rift Roc",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-roc.md",
+          "sha256": "05aac2bd36f1724909060a3278a849faf54e651aa313587aea980fda92540112",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-roc.md",
+          "sha256": "73bcd6ea828dbcb4789fca0ebbb21b814a2b79be29668ed737edc4296387c5a7",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/roc",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Gargantuan Rift Roc: ONE colossal eagle-like bird with one hooked dark beak, TWO amber eyes, EXACTLY TWO broad feathered wings, TWO strong bird legs with complete taloned feet, and ONE short feathered tail fan. Dark slate-brown plumage is streaked with luminous violet Veil-light, especially across flight feathers and shoulders. Calm standing near-front three-quarter reference pose with both wings half-open and every wingtip, tail feather and talon inside generous margins. The enormous bird and Veil-light plumage follow authored source; eagle-like proportions, colors and feather pattern are editable defaults. No humanoid torso, antlers, horns, extra legs/wings, wagon, rider, prey, mountain, sky scene, shadow covering a settlement, attack or text.",
+        "full_body": {
+          "path": "assets/characters/06174dc7f76584369192317d43f67a53aed5245397a612aed8834c3aa42e0e85.png",
+          "sha256": "06174dc7f76584369192317d43f67a53aed5245397a612aed8834c3aa42e0e85"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/bf6ceb1bb9730698e4a408e9b6c363968e803ccdf505ba62a2fb640881c69da5.png",
+          "sha256": "bf6ceb1bb9730698e4a408e9b6c363968e803ccdf505ba62a2fb640881c69da5"
+        },
+        "portrait": {
+          "path": "assets/characters/9dae2cf6d51fca44e0ddd89be75a8aae8f57bce89731e97894083aa21adee6d8.png",
+          "sha256": "9dae2cf6d51fca44e0ddd89be75a8aae8f57bce89731e97894083aa21adee6d8"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0,
+          "zoom": 1.12
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2151597
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 1599384
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2291696
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete creature reference for Rift Roc in Sylvia GM's Severed Lands. Landscape 1536x1024 PNG. ONE complete single subject, near-front three-quarter view on a plain light neutral gray backdrop, matching naturalistic polished RPG digital illustration, soft studio lighting. Whole silhouette including every horn, wing, leg, tendril, tail, antenna and weapon tip must fit comfortably inside generous outer margins. One Gargantuan Rift Roc: ONE colossal eagle-like bird with one hooked dark beak, TWO amber eyes, EXACTLY TWO broad feathered wings, TWO strong bird legs with complete taloned feet, and ONE short feathered tail fan. Dark slate-brown plumage is streaked with luminous violet Veil-light, especially across flight feathers and shoulders. Calm standing near-front three-quarter reference pose with both wings half-open and every wingtip, tail feather and talon inside generous margins. The enormous bird and Veil-light plumage follow authored source; eagle-like proportions, colors and feather pattern are editable defaults. No humanoid torso, antlers, horns, extra legs/wings, wagon, rider, prey, mountain, sky scene, shadow covering a settlement, attack or text. Preserve exact appendage counts and any weapon-hand side. No additional creatures, text, labels, borders, UI or scenery.",
+        "reference_sheet": "Use case: character reference sheet. Edit this supplied selected full-body artwork into one clean LANDSCAPE 1536x1024 PNG multiview reference sheet. Preserve this EXACT subject, face where present, anatomy, appendage attachment pattern/count, material, markings, clothes, colors and weapon-hand side. Three clearly separated COMPLETE views, front, anatomical right side, and rear, left-to-right on plain light neutral gray, matching naturalistic RPG illustration and soft studio light. Scale views to fit with outer margins and space between them; every wing, leg, tail, tendril, antenna and weapon tip must fit within its view. No merging/touching between views, duplicate or extra appendages, labels, text, insets, borders or scenery. Appearance to preserve in EACH view: One Gargantuan Rift Roc: ONE colossal eagle-like bird with one hooked dark beak, TWO amber eyes, EXACTLY TWO broad feathered wings, TWO strong bird legs with complete taloned feet, and ONE short feathered tail fan. Dark slate-brown plumage is streaked with luminous violet Veil-light, especially across flight feathers and shoulders. Calm standing near-front three-quarter reference pose with both wings half-open and every wingtip, tail feather and talon inside generous margins. The enormous bird and Veil-light plumage follow authored source; eagle-like proportions, colors and feather pattern are editable defaults. No humanoid torso, antlers, horns, extra legs/wings, wagon, rider, prey, mountain, sky scene, shadow covering a settlement, attack or text. Framing correction applied: Use case: precise-object-edit. Correct ONLY framing on this exact Roc multiview sheet: the leftmost view's outer wingtip is clipped at the canvas edge. Zoom ALL THREE complete bird views out slightly, about 88% of their current scale, keeping them equally scaled, separately centered in three columns with generous outer margins and clear gaps. Include every feather tip, beak, talon and tail in every view, especially the far-left wing. Preserve each exact bird's face, two wings/two legs, feather pattern, palette, poses, style and plain gray background. No extra views, text, labels, borders or scenery.",
+        "portrait": "Use case: portrait asset. Using BOTH selected references (image 1 complete body, image 2 multiview sheet), create ONE SQUARE 1024x1024 PNG portrait for Rift Roc. Preserve this exact subject's selected identity, face where present, anatomy, markings, palette and materials. ONE close near-front eagle-like head and upper feathered shoulders, the exact hooked dark beak, TWO amber eyes and violet-streaked feather crown. Eyes near y=0.35, face centered, beak and whole crown inside circle-safe middle with generous margin. Omit full wings and talons; no horns, antlers, human features, prey or wagon. Naturalistic polished RPG digital illustration matching the sources, soft studio lighting on plain light neutral gray. Leave real margins for circular display. Do not draw a circle, border, label, writing, other being or scene. The following complete-body description gives identity details only; show ONLY the requested portrait composition: One Gargantuan Rift Roc: ONE colossal eagle-like bird with one hooked dark beak, TWO amber eyes, EXACTLY TWO broad feathered wings, TWO strong bird legs with complete taloned feet, and ONE short feathered tail fan. Dark slate-brown plumage is streaked with luminous violet Veil-light, especially across flight feathers and shoulders. Calm standing near-front three-quarter reference pose with both wings half-open and every wingtip, tail feather and talon inside generous margins. The enormous bird and Veil-light plumage follow authored source; eagle-like proportions, colors and feather pattern are editable defaults. No humanoid torso, antlers, horns, extra legs/wings, wagon, rider, prey, mountain, sky scene, shadow covering a settlement, attack or text."
+      }
+    },
+    {
+      "id": "severed-monster-rift-roper",
+      "name": "Rift Roper",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-roper.md",
+          "sha256": "dfdc0fc8db6d93cc907a6a19f9774fb27817d6f1627f80de24b55e983acc7e4b",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-roper.md",
+          "sha256": "b4b629f4391fe36bb7739d94c10f337e893b1252b1420d6bffb8f26179e45edb",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/roper",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Large Rift Roper: ONE squat tapering stalagmite-like Anchor-stone body with a broad continuous rock base, ONE small amber eye and ONE horizontal tooth-lined mouth on the front. EXACTLY SIX long flexible tendrils, THREE attached to each side, spread in distinct gentle resting curves with all SIX discrete tips visible and countable. The tendrils have small violet crystallized Rift-shard barbs; stony body is charcoal-gray with restrained violet mineral seams. No humanoid head, arms, hands, legs, wings or separate tail. Anchor-stone camouflage, barbed tendrils and bite follow authored source; eye appearance, stone texture and six-tendril resting arrangement are editable visual defaults. No grappled creature, victim, cave, identified Anchor Door/artifact, attack, readable rune or text.",
+        "full_body": {
+          "path": "assets/characters/65b9802ea6599ebe2fa944c45f1527304fdedc8099d27e805c0e2fe499ced1a6.png",
+          "sha256": "65b9802ea6599ebe2fa944c45f1527304fdedc8099d27e805c0e2fe499ced1a6"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/e3eb7700ead517269b27ccf6d3f6fcea7e2994dd415c5c1e1b2712628b56dc00.png",
+          "sha256": "e3eb7700ead517269b27ccf6d3f6fcea7e2994dd415c5c1e1b2712628b56dc00"
+        },
+        "portrait": {
+          "path": "assets/characters/b93f2699b6f3befcd4f83c845bf450341577ca768c793c2c77cfae81c23dc53c.png",
+          "sha256": "b93f2699b6f3befcd4f83c845bf450341577ca768c793c2c77cfae81c23dc53c"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2092162
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 1734143
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2682239
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete creature reference for Rift Roper in Sylvia GM's Severed Lands. Landscape 1536x1024 PNG. ONE complete single subject, near-front three-quarter view on a plain light neutral gray backdrop, matching naturalistic polished RPG digital illustration, soft studio lighting. Whole silhouette including every horn, wing, leg, tendril, tail, antenna and weapon tip must fit comfortably inside generous outer margins. One Large Rift Roper: ONE squat tapering stalagmite-like Anchor-stone body with a broad continuous rock base, ONE small amber eye and ONE horizontal tooth-lined mouth on the front. EXACTLY SIX long flexible tendrils, THREE attached to each side, spread in distinct gentle resting curves with all SIX discrete tips visible and countable. The tendrils have small violet crystallized Rift-shard barbs; stony body is charcoal-gray with restrained violet mineral seams. No humanoid head, arms, hands, legs, wings or separate tail. Anchor-stone camouflage, barbed tendrils and bite follow authored source; eye appearance, stone texture and six-tendril resting arrangement are editable visual defaults. No grappled creature, victim, cave, identified Anchor Door/artifact, attack, readable rune or text. Preserve exact appendage counts and any weapon-hand side. No additional creatures, text, labels, borders, UI or scenery.",
+        "reference_sheet": "Use case: character reference sheet. Edit this supplied selected full-body artwork into one clean LANDSCAPE 1536x1024 PNG multiview reference sheet. Preserve this EXACT subject, face where present, anatomy, appendage attachment pattern/count, material, markings, clothes, colors and weapon-hand side. Three clearly separated COMPLETE views, front, anatomical right side, and rear, left-to-right on plain light neutral gray, matching naturalistic RPG illustration and soft studio light. Scale views to fit with outer margins and space between them; every wing, leg, tail, tendril, antenna and weapon tip must fit within its view. No merging/touching between views, duplicate or extra appendages, labels, text, insets, borders or scenery. Appearance to preserve in EACH view: One Large Rift Roper: ONE squat tapering stalagmite-like Anchor-stone body with a broad continuous rock base, ONE small amber eye and ONE horizontal tooth-lined mouth on the front. EXACTLY SIX long flexible tendrils, THREE attached to each side, spread in distinct gentle resting curves with all SIX discrete tips visible and countable. The tendrils have small violet crystallized Rift-shard barbs; stony body is charcoal-gray with restrained violet mineral seams. No humanoid head, arms, hands, legs, wings or separate tail. Anchor-stone camouflage, barbed tendrils and bite follow authored source; eye appearance, stone texture and six-tendril resting arrangement are editable visual defaults. No grappled creature, victim, cave, identified Anchor Door/artifact, attack, readable rune or text.",
+        "portrait": "Use case: portrait asset. Using BOTH selected references (image 1 complete body, image 2 multiview sheet), create ONE SQUARE 1024x1024 PNG portrait for Rift Roper. Preserve this exact subject's selected identity, face where present, anatomy, markings, palette and materials. ONE near-front close upper-stone-body portrait. Its SINGLE amber eye centered near y=0.35, ONE tooth-lined mouth below, complete stone crown above. Include all SIX short resting tendrils, three each side, curling close beside the upper body with every violet-shard-barbed tip inside the central circle-safe area. Lower rock base may extend beyond the bottom crop. No extra eye, hand, leg, identified artifact or captured creature. Naturalistic polished RPG digital illustration matching the sources, soft studio lighting on plain light neutral gray. Leave real margins for circular display. Do not draw a circle, border, label, writing, other being or scene. The following complete-body description gives identity details only; show ONLY the requested portrait composition: One Large Rift Roper: ONE squat tapering stalagmite-like Anchor-stone body with a broad continuous rock base, ONE small amber eye and ONE horizontal tooth-lined mouth on the front. EXACTLY SIX long flexible tendrils, THREE attached to each side, spread in distinct gentle resting curves with all SIX discrete tips visible and countable. The tendrils have small violet crystallized Rift-shard barbs; stony body is charcoal-gray with restrained violet mineral seams. No humanoid head, arms, hands, legs, wings or separate tail. Anchor-stone camouflage, barbed tendrils and bite follow authored source; eye appearance, stone texture and six-tendril resting arrangement are editable visual defaults. No grappled creature, victim, cave, identified Anchor Door/artifact, attack, readable rune or text."
+      }
+    },
+    {
+      "id": "severed-monster-rift-rust-monster",
+      "name": "Rift Rust Monster",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-rust-monster.md",
+          "sha256": "252249492a45e67172c2790b33b12f45b4e9d8d9332bb0da5702566b634f244f",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-rust-monster.md",
+          "sha256": "f7415907f1af8a89d603c8c3dfb408822442d88f923123311eeb5a2b75f4330a",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/rust_monster",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Medium Rift Rust Monster in an editable armored insect-like appearance: ONE low oval segmented russet-charcoal shell body with a small front head, TWO dark eyes and ONE small closed mandible mouth. EXACTLY FOUR jointed walking legs, TWO on each side. EXACTLY TWO long feathery antennae rise from the snout and glow violet at their tips, each tip distinct and visible; ONE tapering tail ends in a flat broad paddle-like plate. Violet Rift flecks along the shell. Calm near-front three-quarter resting pose with all four feet, both antennae and complete tail/paddle inside margins. Metal-consuming creature and violet antennae follow authored source; shell anatomy, colors and paddle shape are editable defaults. No six/eight insect legs, wings, human limbs, extra antennae, metal scraps, ruined equipment, delver, feeding/attack scene, writing or scenery.",
+        "full_body": {
+          "path": "assets/characters/e7c36f131c1ad9d0eb3bbf643c75805a4e67be409ceddec01c46f2454c350b25.png",
+          "sha256": "e7c36f131c1ad9d0eb3bbf643c75805a4e67be409ceddec01c46f2454c350b25"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/9f596062185c958bf5146ebedfb8986808a61e83135f7fee335fabbdee7c9481.png",
+          "sha256": "9f596062185c958bf5146ebedfb8986808a61e83135f7fee335fabbdee7c9481"
+        },
+        "portrait": {
+          "path": "assets/characters/a730d1250f94b4c8e81ab0c2b0758035de89d23e2d4e86118c071db15cbf6ae2.png",
+          "sha256": "a730d1250f94b4c8e81ab0c2b0758035de89d23e2d4e86118c071db15cbf6ae2"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 1956271
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 1658650
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2236791
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete creature reference for Rift Rust Monster in Sylvia GM's Severed Lands. Landscape 1536x1024 PNG. ONE complete single subject, near-front three-quarter view on a plain light neutral gray backdrop, matching naturalistic polished RPG digital illustration, soft studio lighting. Whole silhouette including every horn, wing, leg, tendril, tail, antenna and weapon tip must fit comfortably inside generous outer margins. One Medium Rift Rust Monster in an editable armored insect-like appearance: ONE low oval segmented russet-charcoal shell body with a small front head, TWO dark eyes and ONE small closed mandible mouth. EXACTLY FOUR jointed walking legs, TWO on each side. EXACTLY TWO long feathery antennae rise from the snout and glow violet at their tips, each tip distinct and visible; ONE tapering tail ends in a flat broad paddle-like plate. Violet Rift flecks along the shell. Calm near-front three-quarter resting pose with all four feet, both antennae and complete tail/paddle inside margins. Metal-consuming creature and violet antennae follow authored source; shell anatomy, colors and paddle shape are editable defaults. No six/eight insect legs, wings, human limbs, extra antennae, metal scraps, ruined equipment, delver, feeding/attack scene, writing or scenery. Preserve exact appendage counts and any weapon-hand side. No additional creatures, text, labels, borders, UI or scenery. Anatomy correction applied to the initial output: Use case: precise-object-edit. Change ONLY the walking legs on this exact Rust Monster. It must have EXACTLY FOUR walking legs, one front pair and one rear pair, TWO on each side. Remove the extra middle legs completely, including their attachment stumps. Show all FOUR separate feet clearly. Keep the exact existing shell, small face, two eyes, TWO violet feathery antennae and single paddle-ended tail unchanged; preserve the naturalistic style, palette, pose, gray background and complete silhouette. No new appendages, writing, diagram, other being or scenery.",
+        "reference_sheet": "Use case: character reference sheet. Edit this supplied selected full-body artwork into one clean LANDSCAPE 1536x1024 PNG multiview reference sheet. Preserve this EXACT subject, face where present, anatomy, appendage attachment pattern/count, material, markings, clothes, colors and weapon-hand side. Three clearly separated COMPLETE views, front, anatomical right side, and rear, left-to-right on plain light neutral gray, matching naturalistic RPG illustration and soft studio light. Scale views to fit with outer margins and space between them; every wing, leg, tail, tendril, antenna and weapon tip must fit within its view. No merging/touching between views, duplicate or extra appendages, labels, text, insets, borders or scenery. Appearance to preserve in EACH view: One Medium Rift Rust Monster in an editable armored insect-like appearance: ONE low oval segmented russet-charcoal shell body with a small front head, TWO dark eyes and ONE small closed mandible mouth. EXACTLY FOUR jointed walking legs, TWO on each side. EXACTLY TWO long feathery antennae rise from the snout and glow violet at their tips, each tip distinct and visible; ONE tapering tail ends in a flat broad paddle-like plate. Violet Rift flecks along the shell. Calm near-front three-quarter resting pose with all four feet, both antennae and complete tail/paddle inside margins. Metal-consuming creature and violet antennae follow authored source; shell anatomy, colors and paddle shape are editable defaults. No six/eight insect legs, wings, human limbs, extra antennae, metal scraps, ruined equipment, delver, feeding/attack scene, writing or scenery.",
+        "portrait": "Use case: portrait asset. Using BOTH selected references (image 1 complete body, image 2 multiview sheet), create ONE SQUARE 1024x1024 PNG portrait for Rift Rust Monster. Preserve this exact subject's selected identity, face where present, anatomy, markings, palette and materials. ONE close near-front small head and upper-shell portrait. Keep BOTH complete violet-glowing feathery antennae including tips curved near the head inside the central circle-safe area with generous margins. Both dark eyes near y=0.38, single closed mandible mouth, same russet/charcoal shell and violet flecks. Omit whole walking legs and tail; no third antenna, wings, human face or metal object. Naturalistic polished RPG digital illustration matching the sources, soft studio lighting on plain light neutral gray. Leave real margins for circular display. Do not draw a circle, border, label, writing, other being or scene. The following complete-body description gives identity details only; show ONLY the requested portrait composition: One Medium Rift Rust Monster in an editable armored insect-like appearance: ONE low oval segmented russet-charcoal shell body with a small front head, TWO dark eyes and ONE small closed mandible mouth. EXACTLY FOUR jointed walking legs, TWO on each side. EXACTLY TWO long feathery antennae rise from the snout and glow violet at their tips, each tip distinct and visible; ONE tapering tail ends in a flat broad paddle-like plate. Violet Rift flecks along the shell. Calm near-front three-quarter resting pose with all four feet, both antennae and complete tail/paddle inside margins. Metal-consuming creature and violet antennae follow authored source; shell anatomy, colors and paddle shape are editable defaults. No six/eight insect legs, wings, human limbs, extra antennae, metal scraps, ruined equipment, delver, feeding/attack scene, writing or scenery."
+      }
+    },
+    {
+      "id": "severed-monster-rift-salamander",
+      "name": "Rift Salamander",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-salamander.md",
+          "sha256": "14ade52a5c67774a395ddd150d1c1475e13e930061ca7fe540c2c5830f3441d0",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-salamander.md",
+          "sha256": "acbcc18d5c1a6bbdf60d159e419c1761ed5097a5dff7c145e989a39158714917",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/salamander",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Large Rift Salamander: ONE serpentine elemental body, a continuous long coiled tail of cooling charcoal Anchor-stone surrounded by close violet-white fire, with ONE hornless angular serpent-like head and TWO pale violet eyes. TWO humanoid stone arms with five stone fingers per hand; NO human legs, wings, hair or separate tails. Upper torso and arms are nonbiological cooling stone with restrained violet-white flame along seams, no nudity or human anatomy details. Anatomical RIGHT hand grips ONE simple complete metal spear upright beside the body, full spearhead/tip/butt visible; LEFT hand empty. Calm near-front three-quarter reference pose with one open coil and visible tail tip. Serpentine fire/Anchor-stone core, spear and tail follow authored source; head, arms, palette details and coil pose are editable visual defaults. No lava landscape, victims, grappling, attack, readable runes, identified artifact or scenery.",
+        "full_body": {
+          "path": "assets/characters/1c9c539972716d4c582b04955b01bc1816b2e6f26b8b6fed176088d2d8bc10a4.png",
+          "sha256": "1c9c539972716d4c582b04955b01bc1816b2e6f26b8b6fed176088d2d8bc10a4"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/ace5beaa4c7936ed91c81a441c96a852becbeaf0982310ade9ee82f3c43379f1.png",
+          "sha256": "ace5beaa4c7936ed91c81a441c96a852becbeaf0982310ade9ee82f3c43379f1"
+        },
+        "portrait": {
+          "path": "assets/characters/131dd1b2f3eef06affb0ef75e51b837ad2329c3298bb45b47d35c94def2cb35d.png",
+          "sha256": "131dd1b2f3eef06affb0ef75e51b837ad2329c3298bb45b47d35c94def2cb35d"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0,
+          "zoom": 1.25
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 1913875
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2015915
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2384368
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete creature reference for Rift Salamander in Sylvia GM's Severed Lands. Landscape 1536x1024 PNG. ONE complete single subject, near-front three-quarter view on a plain light neutral gray backdrop, matching naturalistic polished RPG digital illustration, soft studio lighting. Whole silhouette including every horn, wing, leg, tendril, tail, antenna and weapon tip must fit comfortably inside generous outer margins. One Large Rift Salamander: ONE serpentine elemental body, a continuous long coiled tail of cooling charcoal Anchor-stone surrounded by close violet-white fire, with ONE hornless angular serpent-like head and TWO pale violet eyes. TWO humanoid stone arms with five stone fingers per hand; NO human legs, wings, hair or separate tails. Upper torso and arms are nonbiological cooling stone with restrained violet-white flame along seams, no nudity or human anatomy details. Anatomical RIGHT hand grips ONE simple complete metal spear upright beside the body, full spearhead/tip/butt visible; LEFT hand empty. Calm near-front three-quarter reference pose with one open coil and visible tail tip. Serpentine fire/Anchor-stone core, spear and tail follow authored source; head, arms, palette details and coil pose are editable visual defaults. No lava landscape, victims, grappling, attack, readable runes, identified artifact or scenery. Preserve exact appendage counts and any weapon-hand side. No additional creatures, text, labels, borders, UI or scenery.",
+        "reference_sheet": "Use case: character reference sheet. Edit this supplied selected full-body artwork into one clean LANDSCAPE 1536x1024 PNG multiview reference sheet. Preserve this EXACT subject, face where present, anatomy, appendage attachment pattern/count, material, markings, clothes, colors and weapon-hand side. Three clearly separated COMPLETE views, front, anatomical right side, and rear, left-to-right on plain light neutral gray, matching naturalistic RPG illustration and soft studio light. Scale views to fit with outer margins and space between them; every wing, leg, tail, tendril, antenna and weapon tip must fit within its view. No merging/touching between views, duplicate or extra appendages, labels, text, insets, borders or scenery. Appearance to preserve in EACH view: One Large Rift Salamander: ONE serpentine elemental body, a continuous long coiled tail of cooling charcoal Anchor-stone surrounded by close violet-white fire, with ONE hornless angular serpent-like head and TWO pale violet eyes. TWO humanoid stone arms with five stone fingers per hand; NO human legs, wings, hair or separate tails. Upper torso and arms are nonbiological cooling stone with restrained violet-white flame along seams, no nudity or human anatomy details. Anatomical RIGHT hand grips ONE simple complete metal spear upright beside the body, full spearhead/tip/butt visible; LEFT hand empty. Calm near-front three-quarter reference pose with one open coil and visible tail tip. Serpentine fire/Anchor-stone core, spear and tail follow authored source; head, arms, palette details and coil pose are editable visual defaults. No lava landscape, victims, grappling, attack, readable runes, identified artifact or scenery.",
+        "portrait": "Use case: portrait asset. Using BOTH selected references (image 1 complete body, image 2 multiview sheet), create ONE SQUARE 1024x1024 PNG portrait for Rift Salamander. Preserve this exact subject's selected identity, face where present, anatomy, markings, palette and materials. ONE close near-front hornless serpent-like stone head and upper elemental torso portrait. TWO pale violet eyes near y=0.35, exact same charcoal Anchor-stone plate pattern, close violet-white flame seams, complete head/flame crown with room inside a circle-safe area. Face centered, jaw near y=0.60, stone shoulders continuing below. Omit spear and hands; no human head, hair, horns, extra flames taking a creature's form or scenery. Naturalistic polished RPG digital illustration matching the sources, soft studio lighting on plain light neutral gray. Leave real margins for circular display. Do not draw a circle, border, label, writing, other being or scene. The following complete-body description gives identity details only; show ONLY the requested portrait composition: One Large Rift Salamander: ONE serpentine elemental body, a continuous long coiled tail of cooling charcoal Anchor-stone surrounded by close violet-white fire, with ONE hornless angular serpent-like head and TWO pale violet eyes. TWO humanoid stone arms with five stone fingers per hand; NO human legs, wings, hair or separate tails. Upper torso and arms are nonbiological cooling stone with restrained violet-white flame along seams, no nudity or human anatomy details. Anatomical RIGHT hand grips ONE simple complete metal spear upright beside the body, full spearhead/tip/butt visible; LEFT hand empty. Calm near-front three-quarter reference pose with one open coil and visible tail tip. Serpentine fire/Anchor-stone core, spear and tail follow authored source; head, arms, palette details and coil pose are editable visual defaults. No lava landscape, victims, grappling, attack, readable runes, identified artifact or scenery."
+      }
     }
   ]
 }

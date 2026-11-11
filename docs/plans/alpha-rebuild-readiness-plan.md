@@ -294,17 +294,28 @@ were prepared; 77 authored monsters and wider catalogue/workflow acceptance rema
 Anchor Sentinel's existing older catalogue ID still resolves both current/retained editions;
 its artwork was reused without a duplicate bundle. No completed owner/frontend/native matrix
 was replayed.
-Rift Magma, Medusa, Merrow, Mimic, Minotaur, Mud, Mummy, Mummy Lord, Ogre, Oni, Ooze and
-Owlbear now have complete full-body, multiview and portrait bundles. The catalogue totals
+At 9338f6f, Rift Magma, Medusa, Merrow, Mimic, Minotaur, Mud, Mummy, Mummy Lord, Ogre, Oni,
+Ooze and Owlbear received complete full-body, multiview and portrait bundles. The catalogue reached
 176 bundles/528 PNGs, including all 82 authored NPCs and 71 authored monsters. All twelve actual
 square/dialogue/map-token crops passed visual review after three portrait framing corrections
 for Medusa, Minotaur and Oni; the other saved crops retain the selected PNG bytes. Complete
 faceless silhouettes, six serpent heads and both Minotaur horns remain visible in the circles.
 All 36 assets/resources, 24 current/retained authored editions and actual current Lite Setting
 lookup pass, preserving prior 164 bundles/bindings and original profile prefixes. The authored
-roster passed in 5.01 seconds for all 218 subjects/372 editions. There are 65 authored monsters
-left; wider catalogue and ordinary workflow acceptance remain unfinished. No completed
+roster passed in 5.01 seconds for all 218 subjects/372 editions. There were 65 authored monsters
+left; wider catalogue and ordinary workflow acceptance remained unfinished. No completed
 owner/frontend/native matrix was replayed.
+Rift Peryton, Phase Spider, Piercer, Pudding, Purple Worm, Raider, Remorhaz, Revenant,
+Roc, Roper, Rust Monster and Salamander now have complete full-body, multiview and portrait art.
+The catalogue totals 188 bundles/564 PNGs, including all 82 authored NPCs and 83 authored monsters.
+Remorhaz and Rust Monster body anatomy and Roc sheet margins were corrected. All twelve saved
+crops and square/dialogue/map-token views passed visual review. All 36 assets/resources and 24
+current/retained authored editions pass exact checks and actual Lite Setting lookup. Prior 176
+bundles/bindings and original profile prefixes remain unchanged. The roster passed in 5.54 seconds
+for all 218 subjects/384 editions.
+There are 53 authored monsters left, with wider catalogue and ordinary workflows unfinished.
+Phase Spider's material resting reference preserves its vapor without resolving the existing
+Veil-lore/Ethereal-Jaunt trait wording. No mechanics or planar execution were qualified by art.
 At f85bbcb, all 82 authored NPCs across
 80 current profile files
 and 165 source editions resolved complete artwork, with all 246 NPC PNGs/resources and actual
@@ -317,7 +328,7 @@ The owner selected a shared app artwork library: whole Setting/Plan exports omit
 PNGs, while custom art stays portable and character/campaign exports carry used artwork. The
 source now maps the catalogue and PNGs as external installer/portable resources, outside the
 onefile sidecar. Campaign export retains used art before any artwork view has been opened.
-The prepared PNG pool now totals 1,202,379,442 bytes across 528 images, beyond the content-package cap.
+The prepared PNG pool now totals 1,271,939,729 bytes across 564 images, beyond the content-package cap.
 The current Setting omits those PNGs; its existing content-package limits remain unchanged.
 Focused checks cover shared/custom publication, external resource inventory, portable ZIP assembly,
 and exact campaign art transfer before opening an image view. Local-copy receipts also transfer
@@ -396,7 +407,7 @@ inherited fiend labels, and her authored dagger adds no inherited attack. The sh
 Jelly and partly remembered Lich are Setting-specific artwork choices; no movement, flight,
 regeneration, combat payload or participant identity changes are introduced. These checks qualify
 artwork lookup only, with inherited form execution and native/live acceptance still unqualified.
-Eleven new inherited records reuse the prepared Magma Mephit, Medusa, Merrow, Mimic,
+At 9338f6f, eleven inherited records reused the prepared Magma Mephit, Medusa, Merrow, Mimic,
 Minotaur of Baphomet, Mummy, Mummy Lord, Ogre, Oni, Gray Ooze and Owlbear renditions, bringing
 coverage to 50 forms. Exact current Lite bytes/admitted metadata, wrong scope/hash/package/
 pointer/changed-byte refusals and all 33 reused runtime PNG byte/hash lookups pass. Oni retains
@@ -405,9 +416,16 @@ Minotaur has a greataxe and Oni a glaive; their inherited attack records remain 
 Mud Mephit is absent from the current inherited index and was not fabricated; the separate
 Minotaur Skeleton was not bound to living Minotaur artwork. These are artwork lookup checks,
 with no mechanical execution or equipped-loadout qualification and no extra image copies.
+Eight new inherited records reuse Phase Spider, Black Pudding, Purple Worm, Remorhaz,
+Roc, Roper, Rust Monster and Salamander artwork, bringing coverage to 58 forms. Current Lite
+bytes/admitted metadata, wrong scope/hash/package/pointer/changed-byte refusals and all 24 reused
+runtime PNG byte/hash checks pass. Roper retains authored monstrosity and inherited aberration
+labels. Inherited attacks, including Salamander's empty admitted attack mapping, remain unchanged;
+its authored spear image does not qualify combat execution. Peryton, Piercer, Raider and Revenant
+receive authored art without fabricated inherited records. No extra image copies are introduced.
 Other Settings do not inherit those renditions. The mixed NPC/creature journey selects one
 Basilisk through its inherited form and another through its authored Rift profile, preserving
-independent crops and offline used-art recovery. The remaining 280 inherited forms still need art.
+independent crops and offline used-art recovery. The remaining 272 inherited forms still need art.
 At 3b7cc8a, the original five-form actual-image/resource/alias check passed in 84.91 seconds,
 including refusal outside Severed Lands; the mixed authored/inherited/NPC offline journey passed
 in 73.42 seconds. All 33 then-current visual bundles and previous bindings were preserved. Those
