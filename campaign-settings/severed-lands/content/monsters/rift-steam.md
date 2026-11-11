@@ -38,3 +38,15 @@ A scalding cloud formed where Rift water meets extreme heat — geothermal vents
 ## Actions
 **Claws.** +2 to hit, 2 (1d4) slashing + 2 (1d4) fire.
 **Steam Breath.** 15-foot cone, DC 10 DEX, 4 (1d8) fire. Recharges 6.
+
+## Appearance and artwork
+
+One Small Rift Steam: ONE rounded upright scalding-vapor cloud, pale gray-white billows with restrained warm highlights and thin violet Rift glints, tapered misty base. TWO short steam side-arm lobes each end in THREE small condensed claw tips, all six tips visible, in a quiet resting arrangement. FACELESS, no eyes, mouth, humanoid head, legs, wings or tail. Cloud, steam and claw lobes follow authored source; exact billows and palette are editable resting defaults. This selected quiet state contains no falling-creature silhouettes or other beings. No breath cone, victims, burned flesh, geothermal landscape, fire, machinery, hallucinatory scene, writing or text.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/d1d1522bcd8e130003c2a0f91735cc4296db094d5db524c01307c8f340baee53.png)
+
+[Full-body reference](../../assets/characters/be1d46ed52cd4e69ebc532b69bc95fa10b5f26f5340b09817a377c6575382a4b.png)
+
+[Multiview reference sheet](../../assets/characters/a6b97555b0404d13696e563e9ae76dca4d0b07daa57f34ab4dd9a3ed7efed4dc.png)

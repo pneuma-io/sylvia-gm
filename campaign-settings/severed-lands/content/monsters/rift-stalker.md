@@ -47,3 +47,15 @@ A Rift-touched predator that hunts by sensing the Veil-residue in its prey — e
 ## Actions
 **Multiattack.** Two slam attacks.
 **Slam.** +6 to hit, 10 (2d6 + 3) bludgeoning.
+
+## Appearance and artwork
+
+One Medium Rift Stalker REFERENCE VISUALIZATION, not a visible true body: ONE almost-clear upright air-distortion mass with a suggestion of a featureless oval head, faint shoulder arc and TWO arm-like curling air currents, ending in blunt indistinct empty lobes. Lower form tapers into ONE loose open spiral wisp, no legs or feet. Fine cool violet-gray refractive ripple highlights make only the contour legible against neutral gray; the interior is nearly absent. No face, eyes, mouth, bones, flesh, opaque skin, clothes, fingers, wings, weapon, quarry or revealed identity. This editable symbolic reference aid does not remove Invisibility, establish a true anatomy or qualify visibility/footprint/combat; authored rules and unknown appearance remain authoritative. Quiet complete resting visualization with generous margins, no tracking trail, portal, attack, scenery or text.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/9f922535e1251d92999f7c1f1502997704c046e5731afe87876df10016b3cdea.png)
+
+[Full-body reference](../../assets/characters/6305035142cd60eff2f6641aab6456334eb245114ccfa8855a472fa5f71793ba.png)
+
+[Multiview reference sheet](../../assets/characters/b92295e10d8ffddf3403780f00c8160d53bd5358c32b71880c7940a29ddaa142.png)

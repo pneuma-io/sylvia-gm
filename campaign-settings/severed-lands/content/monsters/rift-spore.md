@@ -38,3 +38,15 @@ A floating, gas-filled fungal orb native to the deeper reaches of the Hollows. I
 
 ## Actions
 **Touch.** +0 to hit, 1 poison damage.
+
+## Appearance and artwork
+
+One Large Rift Spore, a floating gas-filled fungal orb: ONE pale gray-lilac spheroid with mottled leathery fungal membrane, one large central circular violet faux-eye patch and one closed crease below it resembling a mouth. EXACTLY SIX short curved flexible fungal stalks, THREE fanning from each side, each ending in ONE small rounded cap with a violet bead-like faux-eye spot; all SIX tips visible and countable. The central patch and six cap spots are fungal resemblance markings, not real beholder eyes or added eye-ray powers. No humanoid head, arms, legs, separate tail or exposed interior. Calm suspended state without released spore clouds. Orb and beholder-like resemblance follow source; six-stalk layout, false-face pattern, membrane and colors are editable visual defaults. No actual beholder, beams, infection scene, victim, corpse, falling-world vision, city, scenery or writing.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/b2b85867bee8b042a01d6bcf8395957051cadf76a7bd538c57a84e278add6dd6.png)
+
+[Full-body reference](../../assets/characters/bb8f986eeb2299d724b9fe4e025c5c618714a10f53615083ddd7217d4d467b41.png)
+
+[Multiview reference sheet](../../assets/characters/43878282a7797d870e67c3d597399fcf28cf9f6fc5da9b8f8dbb91501ccdd4bd.png)

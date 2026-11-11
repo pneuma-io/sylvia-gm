@@ -305,17 +305,28 @@ lookup pass, preserving prior 164 bundles/bindings and original profile prefixes
 roster passed in 5.01 seconds for all 218 subjects/372 editions. There were 65 authored monsters
 left; wider catalogue and ordinary workflow acceptance remained unfinished. No completed
 owner/frontend/native matrix was replayed.
-Rift Peryton, Phase Spider, Piercer, Pudding, Purple Worm, Raider, Remorhaz, Revenant,
-Roc, Roper, Rust Monster and Salamander now have complete full-body, multiview and portrait art.
-The catalogue totals 188 bundles/564 PNGs, including all 82 authored NPCs and 83 authored monsters.
+At e6b7820, Rift Peryton, Phase Spider, Piercer, Pudding, Purple Worm, Raider, Remorhaz, Revenant,
+Roc, Roper, Rust Monster and Salamander received complete full-body, multiview and portrait art.
+The catalogue reached 188 bundles/564 PNGs, including all 82 authored NPCs and 83 authored monsters.
 Remorhaz and Rust Monster body anatomy and Roc sheet margins were corrected. All twelve saved
 crops and square/dialogue/map-token views passed visual review. All 36 assets/resources and 24
 current/retained authored editions pass exact checks and actual Lite Setting lookup. Prior 176
 bundles/bindings and original profile prefixes remain unchanged. The roster passed in 5.54 seconds
 for all 218 subjects/384 editions.
-There are 53 authored monsters left, with wider catalogue and ordinary workflows unfinished.
+There were 53 authored monsters left, with wider catalogue and ordinary workflows unfinished.
 Phase Spider's material resting reference preserves its vapor without resolving the existing
 Veil-lore/Ethereal-Jaunt trait wording. No mechanics or planar execution were qualified by art.
+Rift Seeker, Shadow, Shrieker, Skeleton, Smoke, Specter, Spore, Stalker, Steam, the Elder
+Riftbeast, Treant and Troll now have full-body, multiview and portrait sets. The catalogue totals
+200 bundles/600 PNGs, including all 82 authored NPCs and 95 authored monsters. All twelve actual
+square/dialogue/map-token crops were reviewed, including the faint outlines and faceless forms.
+Shadow/Stalker portrait contrast and Treant crown margins were corrected before adoption.
+All 36 selected assets/resources and 24 current/retained authored editions pass exact checks and
+actual Lite Setting lookup; prior 188 bundles/bindings and original profile prefixes remain
+unchanged. The roster passed in 7.88 seconds for all 218 subjects/396 editions.
+There are 41 authored monsters left, with wider catalogue and ordinary workflows unfinished.
+Stalker is an editable reference visualization, not a revealed true body or Invisibility change.
+Shrieker's existing mile-lore/300-foot action wording remains unresolved by the fungus artwork.
 At f85bbcb, all 82 authored NPCs across
 80 current profile files
 and 165 source editions resolved complete artwork, with all 246 NPC PNGs/resources and actual
@@ -328,7 +339,7 @@ The owner selected a shared app artwork library: whole Setting/Plan exports omit
 PNGs, while custom art stays portable and character/campaign exports carry used artwork. The
 source now maps the catalogue and PNGs as external installer/portable resources, outside the
 onefile sidecar. Campaign export retains used art before any artwork view has been opened.
-The prepared PNG pool now totals 1,271,939,729 bytes across 564 images, beyond the content-package cap.
+The prepared PNG pool now totals 1,339,919,189 bytes across 600 images, beyond the content-package cap.
 The current Setting omits those PNGs; its existing content-package limits remain unchanged.
 Focused checks cover shared/custom publication, external resource inventory, portable ZIP assembly,
 and exact campaign art transfer before opening an image view. Local-copy receipts also transfer
@@ -416,16 +427,24 @@ Minotaur has a greataxe and Oni a glaive; their inherited attack records remain 
 Mud Mephit is absent from the current inherited index and was not fabricated; the separate
 Minotaur Skeleton was not bound to living Minotaur artwork. These are artwork lookup checks,
 with no mechanical execution or equipped-loadout qualification and no extra image copies.
-Eight new inherited records reuse Phase Spider, Black Pudding, Purple Worm, Remorhaz,
+At e6b7820, eight inherited records reused Phase Spider, Black Pudding, Purple Worm, Remorhaz,
 Roc, Roper, Rust Monster and Salamander artwork, bringing coverage to 58 forms. Current Lite
 bytes/admitted metadata, wrong scope/hash/package/pointer/changed-byte refusals and all 24 reused
 runtime PNG byte/hash checks pass. Roper retains authored monstrosity and inherited aberration
 labels. Inherited attacks, including Salamander's empty admitted attack mapping, remain unchanged;
 its authored spear image does not qualify combat execution. Peryton, Piercer, Raider and Revenant
 receive authored art without fabricated inherited records. No extra image copies are introduced.
+Nine new inherited records reuse Shadow, Shrieker Fungus, Skeleton, Specter, Invisible
+Stalker, Steam Mephit, Tarrasque, Treant and Troll art, bringing coverage to 67 forms. Actual Lite
+bytes/admitted metadata, wrong scope/hash/package/pointer/changed-byte refusals and all 27 reused
+runtime PNG byte/hash checks pass. Stalker retains authored Medium and inherited Large sizes;
+unscaled reference art does not qualify footprint, Invisibility or combat behavior. The Elder
+Riftbeast's authored name is preserved. Seeker, Smoke and Spore receive authored art without
+fabricated inherited forms. Bugbear Stalker, the separate skeleton variants and Troll Limb are
+not bound to this batch's art. No attacks, mechanical source declarations or extra image copies change.
 Other Settings do not inherit those renditions. The mixed NPC/creature journey selects one
 Basilisk through its inherited form and another through its authored Rift profile, preserving
-independent crops and offline used-art recovery. The remaining 272 inherited forms still need art.
+independent crops and offline used-art recovery. The remaining 263 inherited forms still need art.
 At 3b7cc8a, the original five-form actual-image/resource/alias check passed in 84.91 seconds,
 including refusal outside Severed Lands; the mixed authored/inherited/NPC offline journey passed
 in 73.42 seconds. All 33 then-current visual bundles and previous bindings were preserved. Those

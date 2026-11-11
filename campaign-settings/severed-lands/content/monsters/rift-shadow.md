@@ -54,3 +54,15 @@ A Rift Echo thin enough to be nearly transparent — a death-memory so faint tha
 
 ## Actions
 **Strength Drain.** +4 to hit, 9 (2d6 + 2) necrotic. Target's STR score reduced by 1d4. Target dies if STR reaches 0. Reduction lasts until short or long rest. If a non-evil humanoid dies from this, a new rift shadow rises from the corpse 1d4 hours later.
+
+## Appearance and artwork
+
+One Medium Rift Shadow: a nearly transparent anonymous adult person OUTLINE, ONE featureless oval head, simple shoulders and torso, TWO long arms ending in faint five-fingered empty hand outlines, TWO separate legs with indistinct complete feet. Only a thin dark violet-gray death-memory contour and faint internal haze remain; the light neutral background is clearly visible through almost all of the form. No readable facial features, eyes, mouth, bones, flesh, clothing details, named identity, weapon or victim. A quiet upright resting reference pose. The thin outline follows source; its contour/pose and subtle violet-gray tint are editable visualization defaults, without revealing the original person or changing any darkness/stealth mechanic. Keep the outline readable while nearly transparent; no additional figures, life-drain scene, corpse, scenery or text.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/62603130224d43d9bc6be9ce9994a4e4a037418fff00deb0a06243b1004ce936.png)
+
+[Full-body reference](../../assets/characters/87888d2092918509140e0fbffb6bca0147972cce2f9565cb3a388bf9d049760a.png)
+
+[Multiview reference sheet](../../assets/characters/b8330f39230b64841adfb150aacb3c2dd3a3e444402093dbf606d5cc2a454b86.png)
