@@ -238,19 +238,18 @@ source editions pass offline verification against actual current Lite payloads a
 The authored roster check passed in 6.76 seconds for 218 subjects/297 source editions. Completed
 owner/frontend/native matrices were not replayed for this artwork-only increment. The broader
 catalogue, everyday journeys and deferred acceptance remain unfinished.
-Cavern Hollowed, Chitin Riftborn, Deep Dwarf, Door Guardian, Field Warden and Hollow Brute now
-have complete full-body, multiview and portrait bundles, bringing the catalogue to 122 complete
-bundles. The bloated Cavern Hollowed remains distinct from Cave Hollowed; Chitin Riftborn retains
-four arms and two legs; Deep Dwarf remains gaunt and unenlarged; the two Warden constructs retain
-distinct frames/sensors; Hollow Brute remains a warped human. Source equipment and anatomical
-sides are preserved. Unspecified details stay editable visual defaults. Chitin's selected pose
-wording was aligned to its reference without changing the original prompt or PNGs. Field Warden's
-saved 1.1 crop aligns head scale without changing PNG bytes. Original profile prefixes and the
-previous 116 bundles/bindings are unchanged. Actual square/dialogue/map-token crops passed visual
-review. All 18 exact PNGs, external resources and twelve current/retained source editions pass
-offline verification against actual current Lite payloads and Setting scope. The authored roster
-check passed in 2.98 seconds for 218 subjects/318 source editions. At f85bbcb, all 82 authored
-NPCs across 80 current profile files
+Hollowed Enforcer, Hollowling, Pack Hollowed, Pond Hollowed, Rift Air and Rift Banshee now have
+complete full-body, multiview and portrait bundles, bringing the catalogue to 128 complete bundles.
+The Enforcer retains disciplined soldier framing; the Small Hollowling has a mature human-derived
+face; Pack Hollowed is one listening pack member; Pond Hollowed retains wet translucent flesh.
+Their source equipment and anatomical sides are preserved. Rift Air remains a complete faceless
+wind vortex, including in its centered portrait. Rift Banshee remains an adult elven death-imprint
+with pointed ears, a mournful wail and a gown dissolving into wisps. Unspecified details remain
+editable visual defaults. Original profile prefixes and the previous 122 bundles/bindings are
+unchanged. Actual square/dialogue/map-token crops passed visual review. All 18 exact PNGs,
+external resources and twelve current/retained source editions pass offline verification against
+actual current Lite payloads and Setting scope. The authored roster check passed in 4.70 seconds
+for 218 subjects/324 source editions. At f85bbcb, all 82 authored NPCs across 80 current profile files
 and 165 source editions resolved complete artwork, with all 246 NPC PNGs/resources and actual
 Lite lookup verified. That unchanged preparation remains qualified. The wider monster, inherited
 form, Plan-only and companion catalogue remains unfinished. Completed owner/frontend/native
@@ -261,7 +260,7 @@ The owner selected a shared app artwork library: whole Setting/Plan exports omit
 PNGs, while custom art stays portable and character/campaign exports carry used artwork. The
 source now maps the catalogue and PNGs as external installer/portable resources, outside the
 onefile sidecar. Campaign export retains used art before any artwork view has been opened.
-The prepared PNG pool now totals 850,311,651 bytes across 366 images, beyond the content-package cap.
+The prepared PNG pool now totals 889,786,938 bytes across 384 images, beyond the content-package cap.
 The current Setting omits those PNGs; its existing content-package limits remain unchanged.
 Focused checks cover shared/custom publication, external resource inventory, portable ZIP assembly,
 and exact campaign art transfer before opening an image view. Local-copy receipts also transfer

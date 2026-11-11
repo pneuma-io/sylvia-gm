@@ -7642,6 +7642,366 @@
         "reference_sheet": "Use case: identity-preserve. Production multiview enemy reference sheet for Hollow Brute from Severed Lands. Input image 1 is the canonical full-body reference. Preserve the exact anatomy, face or sensor head, proportions, materials, colors, equipment and wear. Appearance: A single adult human Hollow Brute of Medium size, with a hulking swollen muscular frame, massive warped shoulders and arms, a thick neck and a recognizably human heavy-browed face carrying dim painful awareness. Patchy dull gray-brown skin, fully violet irises, short ragged black hair and a broad tense mouth. Exactly two arms with normal five-digit human hands and two strong legs. Rough plain brown hide armor covers the chest and shoulders over a dark cloth tunic, ragged dark trousers and battered brown leather boots. Their anatomical RIGHT hand holds one ordinary morningstar low beside the body, with its full spiked head and shaft visible; the LEFT arm carries one plain dented round wooden shield. One ordinary javelin is strapped diagonally across their back with its point above the anatomical LEFT shoulder. Their swollen warped human form follows the Setting lore, with hide armor, shield, morningstar and javelin following source equipment. Detailed anatomy, features, skin color and equipment design are editable visual defaults. No bugbear or goblin head, animal fur, tusks, horns, extra limbs, claws instead of hands, giant size, fresh injury, exposed organs, gore, spikes grown from flesh, captives, warlord insignia, scenery or readable text. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete views, FRONT, SIDE PROFILE and BACK, plus one smaller close head detail at far right. Consistent scale across the three complete views; every limb, foot, head, antenna and weapon tip comfortably inside margins. The same single subject repeated as turnaround views. Change viewing angle only, keeping anatomy and costume. Preserve the warped swollen muscular HUMAN body, dim painful expression and violet irises. Keep morningstar in anatomical RIGHT hand, round wooden shield on LEFT arm and javelin across back with tip above LEFT shoulder. No fur, goblin head, tusks, claws or giant version. No labels, text, captions, borders, logos, UI, scenery, extra creatures, invented insignia or revealed secrets.",
         "portrait": "Use case: identity-preserve. Production square app portrait for Hollow Brute from Severed Lands. Input image 1 is the canonical full-body reference; input image 2 is the matching multiview sheet. Preserve this exact head, apparent age, species, materials or skin, eyes or sensors, hair or antennae, expression and upper clothing/plates. Change framing only. CLOSE HEAD AND UPPER SHOULDERS, ending across upper chest. Head centered, eyes/sensors near 35 percent down, chin or lower jaw near 65 percent down, comfortable headroom above hair, crown or antennae. Consistent head scale for RPG dialogue portraits. Preserve the exact warped heavy-browed HUMAN face, short dark hair, violet irises and dim painful expression. Keep the same massive shoulder outline and hide armor collar. No goblin head, fur, tusks, horns, open wounds or new anatomy. Polished naturalistic digital RPG illustration with tactile materials, plain light neutral gray background and soft natural studio light matching references. Continuous full-bleed square background and upper shoulders to every edge. No hands, waist, weapon, javelin, shield, equipment, full torso, painted circle, cutout, vignette, faded image edge, border, caption, text, UI, scenery, new costume or anatomy, invented crest, extra being or animal. One 1024x1024 PNG."
       }
+    },
+    {
+      "id": "severed-monster-hollowed-enforcer",
+      "name": "Hollowed Enforcer",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/hollowed-enforcer.md",
+          "sha256": "85ba788af1014c588796906ed10c8bfbab5d88530ae482a3a39b710b9743c09f",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/hollowed-enforcer.md",
+          "sha256": "c59fc4392654aa0b131e85fa0aa3d2891c0213a71d9a377ba48d312e6d8397df",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A single adult humanlike Hollowed Enforcer of Medium size with a lean disciplined soldier's frame, weathered slate-brown skin, fully violet irises, a lined angular clean-shaven face and cropped dark hair with gray at the temples. An alert assessing expression and controlled upright military stance. Worn plain dark chain mail over a charcoal padded tunic, dark trousers and practical brown leather boots. Their anatomical RIGHT hand holds one ordinary straight longsword low beside the body, its whole blade and point visible; their LEFT arm carries one plain round wood-and-metal shield. One wooden longbow is secured across their back with its upper tip above the anatomical RIGHT shoulder, and a plain quiver is secured at the LEFT rear hip. Their retained military discipline and Hollowed identity follow the Setting lore, with mail, shield, sword and bow following source equipment. Age styling, features, colors and equipment details are editable visual defaults. No hobgoblin face, goblin ears, tusks, animal fur, extra limbs, invented army crest, rank text, glowing armor, gore, fresh wound, captive, old home-world scene or revealed history.",
+        "full_body": {
+          "path": "assets/characters/6a0f8bcf40219556a10d3e5fe1ec08d0874510a14231ab81edcde5e975f3b4be.png",
+          "sha256": "6a0f8bcf40219556a10d3e5fe1ec08d0874510a14231ab81edcde5e975f3b4be"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/9e88fe311a3738910150a234caca39d6e7f42a0e2ebdc054b92313e3d9137c30.png",
+          "sha256": "9e88fe311a3738910150a234caca39d6e7f42a0e2ebdc054b92313e3d9137c30"
+        },
+        "portrait": {
+          "path": "assets/characters/9c2b0842d972c5c236b8a3174f6e30d4640210b892c3847fcfb1b64934321ecb.png",
+          "sha256": "9c2b0842d972c5c236b8a3174f6e30d4640210b892c3847fcfb1b64934321ecb"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2147320
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2547269
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2416223
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body enemy reference for Hollowed Enforcer in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile or spectral materials as appropriate, plain light neutral gray background, soft natural studio light and subtle grounding shadow beneath the single subject. One complete humanoid in a near-front three-quarter standing pose, with whole head, hands, feet and every weapon tip comfortably inside every margin. Appearance: A single adult humanlike Hollowed Enforcer of Medium size with a lean disciplined soldier's frame, weathered slate-brown skin, fully violet irises, a lined angular clean-shaven face and cropped dark hair with gray at the temples. An alert assessing expression and controlled upright military stance. Worn plain dark chain mail over a charcoal padded tunic, dark trousers and practical brown leather boots. Their anatomical RIGHT hand holds one ordinary straight longsword low beside the body, its whole blade and point visible; their LEFT arm carries one plain round wood-and-metal shield. One wooden longbow is secured across their back with its upper tip above the anatomical RIGHT shoulder, and a plain quiver is secured at the LEFT rear hip. Their retained military discipline and Hollowed identity follow the Setting lore, with mail, shield, sword and bow following source equipment. Age styling, features, colors and equipment details are editable visual defaults. No hobgoblin face, goblin ears, tusks, animal fur, extra limbs, invented army crest, rank text, glowing armor, gore, fresh wound, captive, old home-world scene or revealed history. Preserve authored anatomy and equipment. No additional beings, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview enemy reference sheet for Hollowed Enforcer from Severed Lands. Input image 1 is the canonical complete reference. Preserve exact anatomy or elemental form, head if present, proportions, materials, colors, equipment and distinctive details. Appearance: A single adult humanlike Hollowed Enforcer of Medium size with a lean disciplined soldier's frame, weathered slate-brown skin, fully violet irises, a lined angular clean-shaven face and cropped dark hair with gray at the temples. An alert assessing expression and controlled upright military stance. Worn plain dark chain mail over a charcoal padded tunic, dark trousers and practical brown leather boots. Their anatomical RIGHT hand holds one ordinary straight longsword low beside the body, its whole blade and point visible; their LEFT arm carries one plain round wood-and-metal shield. One wooden longbow is secured across their back with its upper tip above the anatomical RIGHT shoulder, and a plain quiver is secured at the LEFT rear hip. Their retained military discipline and Hollowed identity follow the Setting lore, with mail, shield, sword and bow following source equipment. Age styling, features, colors and equipment details are editable visual defaults. No hobgoblin face, goblin ears, tusks, animal fur, extra limbs, invented army crest, rank text, glowing armor, gore, fresh wound, captive, old home-world scene or revealed history. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete views, FRONT, SIDE PROFILE and BACK, plus one smaller close detail at far right. Consistent scale across the three complete views, every limb, foot, hair tip, trailing wisp and weapon tip comfortably inside margins. The same single subject repeated as turnaround views. Change viewing angle only. Keep longsword in anatomical RIGHT hand, round shield on LEFT arm, longbow across back with tip above RIGHT shoulder, and quiver at LEFT rear hip. Preserve the disciplined adult face, violet irises, cropped hair and chain mail. No labels, text, captions, borders, logos, UI, scenery, additional beings, invented insignia or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Asset: production portrait for Hollowed Enforcer from Severed Lands. Input image 1 is the selected canonical full-body reference; input image 2 is its reviewed multiview reference sheet. Change framing to a single portrait only, preserving this identity and visual default. Appearance: A single adult humanlike Hollowed Enforcer of Medium size with a lean disciplined soldier's frame, weathered slate-brown skin, fully violet irises, a lined angular clean-shaven face and cropped dark hair with gray at the temples. An alert assessing expression and controlled upright military stance. Worn plain dark chain mail over a charcoal padded tunic, dark trousers and practical brown leather boots. Their anatomical RIGHT hand holds one ordinary straight longsword low beside the body, its whole blade and point visible; their LEFT arm carries one plain round wood-and-metal shield. One wooden longbow is secured across their back with its upper tip above the anatomical RIGHT shoulder, and a plain quiver is secured at the LEFT rear hip. Their retained military discipline and Hollowed identity follow the Setting lore, with mail, shield, sword and bow following source equipment. Age styling, features, colors and equipment details are editable visual defaults. No hobgoblin face, goblin ears, tusks, animal fur, extra limbs, invented army crest, rank text, glowing armor, gore, fresh wound, captive, old home-world scene or revealed history. Square 1024x1024 PNG, one forward-facing head-and-shoulders portrait, upper chest visible. Consistent face framing for Map/Party/dialogue: face centered horizontally at 50%, eye line around 36% from top, top of head/hair near 10%, chin around 72%, shoulders fill the bottom. Natural face proportions, no stretched anatomy. Keep crown, ears and hair silhouette inside comfortable margins. Preserve the exact mature face, species anatomy, eye color, hair, expression, skin material and upper clothing of the two references. Weapons and hands remain outside the portrait. No circular cutout, border, text, head detail panels or scenery. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio lighting matching both references. No UI, logo, labels, extra beings, invented insignia, revealed secrets or background memories."
+      }
+    },
+    {
+      "id": "severed-monster-hollowling",
+      "name": "Hollowling",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/hollowling.md",
+          "sha256": "51340f1a0a0f94319f2f539fae062df193144a318e718b3ebaedc35b5f0cc508",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/hollowling.md",
+          "sha256": "665846068a6e93234e7b57746018eedd1fb1f8a7f37cc76ac2e6553aa5134db6",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A single Small Hollowling, a human-derived adult reduced to child-sized stature by Rift exposure, with a short hunched wiry frame and a clearly mature weathered lined human face. Ash-gray skin, fully violet irises, sparse untidy brown hair, hollow cheeks and a wary distracted scavenger's expression. Two arms with ordinary five-digit human hands and two short legs, with adult facial proportions. Ragged plain brown leather armor over a faded gray cloth tunic, dark cropped trousers and worn small leather boots. Their anatomical RIGHT hand holds one short ordinary curved scimitar low at their side, its full blade visible; their LEFT arm carries one small plain wooden shield. One small shortbow is secured across their back with its upper tip above the anatomical RIGHT shoulder; a small plain quiver sits at the LEFT rear hip. Their small regressed human form and scavenging bearing follow the Setting lore, with leather armor, shield, scimitar and shortbow following source equipment. Mature age styling, features and equipment details are editable visual defaults. No actual child or infant face, juvenile proportions, goblin head or pointed ears, giant teeth, animal fur, extra limbs, malicious grin, stolen personal names, gore, injury, captive, pack of other creatures, scenery or readable text.",
+        "full_body": {
+          "path": "assets/characters/e0722e84fc82b11263dad4392d791f3acde7eb1e60e46cb229b9bf9b0c130b51.png",
+          "sha256": "e0722e84fc82b11263dad4392d791f3acde7eb1e60e46cb229b9bf9b0c130b51"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/fea969195bc2954698ec52997d712a670a7e9965a4ab10bc9362942e40a5c7fa.png",
+          "sha256": "fea969195bc2954698ec52997d712a670a7e9965a4ab10bc9362942e40a5c7fa"
+        },
+        "portrait": {
+          "path": "assets/characters/4d29a7b693ec7cdb8f32bb4664b75720fa3d7588b3eac43e2f455c0c394ba355.png",
+          "sha256": "4d29a7b693ec7cdb8f32bb4664b75720fa3d7588b3eac43e2f455c0c394ba355"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2226792
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2561403
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2703568
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body enemy reference for Hollowling in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile or spectral materials as appropriate, plain light neutral gray background, soft natural studio light and subtle grounding shadow beneath the single subject. One complete humanoid in a near-front three-quarter standing pose, with whole head, hands, feet and every weapon tip comfortably inside every margin. Appearance: A single Small Hollowling, a human-derived adult reduced to child-sized stature by Rift exposure, with a short hunched wiry frame and a clearly mature weathered lined human face. Ash-gray skin, fully violet irises, sparse untidy brown hair, hollow cheeks and a wary distracted scavenger's expression. Two arms with ordinary five-digit human hands and two short legs, with adult facial proportions. Ragged plain brown leather armor over a faded gray cloth tunic, dark cropped trousers and worn small leather boots. Their anatomical RIGHT hand holds one short ordinary curved scimitar low at their side, its full blade visible; their LEFT arm carries one small plain wooden shield. One small shortbow is secured across their back with its upper tip above the anatomical RIGHT shoulder; a small plain quiver sits at the LEFT rear hip. Their small regressed human form and scavenging bearing follow the Setting lore, with leather armor, shield, scimitar and shortbow following source equipment. Mature age styling, features and equipment details are editable visual defaults. No actual child or infant face, juvenile proportions, goblin head or pointed ears, giant teeth, animal fur, extra limbs, malicious grin, stolen personal names, gore, injury, captive, pack of other creatures, scenery or readable text. Preserve authored anatomy and equipment. No additional beings, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview enemy reference sheet for Hollowling from Severed Lands. Input image 1 is the canonical complete reference. Preserve exact anatomy or elemental form, head if present, proportions, materials, colors, equipment and distinctive details. Appearance: A single Small Hollowling, a human-derived adult reduced to child-sized stature by Rift exposure, with a short hunched wiry frame and a clearly mature weathered lined human face. Ash-gray skin, fully violet irises, sparse untidy brown hair, hollow cheeks and a wary distracted scavenger's expression. Two arms with ordinary five-digit human hands and two short legs, with adult facial proportions. Ragged plain brown leather armor over a faded gray cloth tunic, dark cropped trousers and worn small leather boots. Their anatomical RIGHT hand holds one short ordinary curved scimitar low at their side, its full blade visible; their LEFT arm carries one small plain wooden shield. One small shortbow is secured across their back with its upper tip above the anatomical RIGHT shoulder; a small plain quiver sits at the LEFT rear hip. Their small regressed human form and scavenging bearing follow the Setting lore, with leather armor, shield, scimitar and shortbow following source equipment. Mature age styling, features and equipment details are editable visual defaults. No actual child or infant face, juvenile proportions, goblin head or pointed ears, giant teeth, animal fur, extra limbs, malicious grin, stolen personal names, gore, injury, captive, pack of other creatures, scenery or readable text. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete views, FRONT, SIDE PROFILE and BACK, plus one smaller close detail at far right. Consistent scale across the three complete views, every limb, foot, hair tip, trailing wisp and weapon tip comfortably inside margins. The same single subject repeated as turnaround views. Change viewing angle only. Preserve the Small short hunched human-derived adult, mature lined face, violet irises and wary scavenger expression. Keep scimitar in anatomical RIGHT hand, small shield on LEFT arm, shortbow with tip above RIGHT shoulder and quiver at LEFT rear hip. No child face, juvenile proportions or goblin anatomy. No labels, text, captions, borders, logos, UI, scenery, additional beings, invented insignia or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Asset: production portrait for Hollowling from Severed Lands. Input image 1 is the selected canonical full-body reference; input image 2 is its reviewed multiview reference sheet. Change framing to a single portrait only, preserving this identity and visual default. Appearance: A single Small Hollowling, a human-derived adult reduced to child-sized stature by Rift exposure, with a short hunched wiry frame and a clearly mature weathered lined human face. Ash-gray skin, fully violet irises, sparse untidy brown hair, hollow cheeks and a wary distracted scavenger's expression. Two arms with ordinary five-digit human hands and two short legs, with adult facial proportions. Ragged plain brown leather armor over a faded gray cloth tunic, dark cropped trousers and worn small leather boots. Their anatomical RIGHT hand holds one short ordinary curved scimitar low at their side, its full blade visible; their LEFT arm carries one small plain wooden shield. One small shortbow is secured across their back with its upper tip above the anatomical RIGHT shoulder; a small plain quiver sits at the LEFT rear hip. Their small regressed human form and scavenging bearing follow the Setting lore, with leather armor, shield, scimitar and shortbow following source equipment. Mature age styling, features and equipment details are editable visual defaults. No actual child or infant face, juvenile proportions, goblin head or pointed ears, giant teeth, animal fur, extra limbs, malicious grin, stolen personal names, gore, injury, captive, pack of other creatures, scenery or readable text. Square 1024x1024 PNG, one forward-facing head-and-shoulders portrait, upper chest visible. Consistent face framing for Map/Party/dialogue: face centered horizontally at 50%, eye line around 36% from top, top of head/hair near 10%, chin around 72%, shoulders fill the bottom. Natural face proportions, no stretched anatomy. Keep crown, ears and hair silhouette inside comfortable margins. Preserve the exact mature face, species anatomy, eye color, hair, expression, skin material and upper clothing of the two references. Weapons and hands remain outside the portrait. No circular cutout, border, text, head detail panels or scenery. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio lighting matching both references. No UI, logo, labels, extra beings, invented insignia, revealed secrets or background memories."
+      }
+    },
+    {
+      "id": "severed-monster-pack-hollowed",
+      "name": "Pack Hollowed",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/pack-hollowed.md",
+          "sha256": "d5a4779df44b4cb3700cc01203fdd2b2074013e3e4de80d15f40897251e7086b",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/pack-hollowed.md",
+          "sha256": "345b93783e53e807dbfce98815de3bbe5f332cc57c3dff53da294d4baf57fba4",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A single adult humanlike member of the Pack Hollowed of Medium size, with a lean sinewy frame, dull gray-olive skin, fully violet irises, a narrow angular clean-shaven face and coarse dark shoulder-length hair loosely tied back. An intent listening predatory expression with mouth closed and head slightly tilted, quiet balanced upright posture. Worn plain dark brown hide armor over a faded black cloth tunic, rough charcoal trousers and scuffed leather boots. Their anatomical RIGHT hand holds one ordinary wooden spear upright beside them with the complete tip visible; their LEFT arm carries one plain round hide-covered shield. One wooden longbow is strapped across their back with its upper tip above the anatomical LEFT shoulder, with a plain quiver at the RIGHT rear hip. Their coordinated hunting bearing and Hollowed identity follow the Setting lore, with hide armor, shield, spear and bow following source equipment. Detailed anatomy, age styling, features and equipment are editable visual defaults for one pack member. No gnoll or hyena head, muzzle, fur, animal ears, extra limbs, psychic strings connecting figures, duplicate person, other pack members, victim, gore, village memories, scenery or readable text.",
+        "full_body": {
+          "path": "assets/characters/c303373792ae9e379dec74f1478e60f09a8028df336331f1c5338333e87d731e.png",
+          "sha256": "c303373792ae9e379dec74f1478e60f09a8028df336331f1c5338333e87d731e"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/012c3b85018a485778df7a6b8ee7e01f5faa120e606efe53a62e3dd95adb557e.png",
+          "sha256": "012c3b85018a485778df7a6b8ee7e01f5faa120e606efe53a62e3dd95adb557e"
+        },
+        "portrait": {
+          "path": "assets/characters/1d1044f87621ed581b03a0ab74b9743a729c2e0fe562dbe2086368c940b4c984.png",
+          "sha256": "1d1044f87621ed581b03a0ab74b9743a729c2e0fe562dbe2086368c940b4c984"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1964792
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2464250
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2451633
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body enemy reference for Pack Hollowed in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile or spectral materials as appropriate, plain light neutral gray background, soft natural studio light and subtle grounding shadow beneath the single subject. One complete humanoid in a near-front three-quarter standing pose, with whole head, hands, feet and every weapon tip comfortably inside every margin. Appearance: A single adult humanlike member of the Pack Hollowed of Medium size, with a lean sinewy frame, dull gray-olive skin, fully violet irises, a narrow angular clean-shaven face and coarse dark shoulder-length hair loosely tied back. An intent listening predatory expression with mouth closed and head slightly tilted, quiet balanced upright posture. Worn plain dark brown hide armor over a faded black cloth tunic, rough charcoal trousers and scuffed leather boots. Their anatomical RIGHT hand holds one ordinary wooden spear upright beside them with the complete tip visible; their LEFT arm carries one plain round hide-covered shield. One wooden longbow is strapped across their back with its upper tip above the anatomical LEFT shoulder, with a plain quiver at the RIGHT rear hip. Their coordinated hunting bearing and Hollowed identity follow the Setting lore, with hide armor, shield, spear and bow following source equipment. Detailed anatomy, age styling, features and equipment are editable visual defaults for one pack member. No gnoll or hyena head, muzzle, fur, animal ears, extra limbs, psychic strings connecting figures, duplicate person, other pack members, victim, gore, village memories, scenery or readable text. Preserve authored anatomy and equipment. No additional beings, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview enemy reference sheet for Pack Hollowed from Severed Lands. Input image 1 is the canonical complete reference. Preserve exact anatomy or elemental form, head if present, proportions, materials, colors, equipment and distinctive details. Appearance: A single adult humanlike member of the Pack Hollowed of Medium size, with a lean sinewy frame, dull gray-olive skin, fully violet irises, a narrow angular clean-shaven face and coarse dark shoulder-length hair loosely tied back. An intent listening predatory expression with mouth closed and head slightly tilted, quiet balanced upright posture. Worn plain dark brown hide armor over a faded black cloth tunic, rough charcoal trousers and scuffed leather boots. Their anatomical RIGHT hand holds one ordinary wooden spear upright beside them with the complete tip visible; their LEFT arm carries one plain round hide-covered shield. One wooden longbow is strapped across their back with its upper tip above the anatomical LEFT shoulder, with a plain quiver at the RIGHT rear hip. Their coordinated hunting bearing and Hollowed identity follow the Setting lore, with hide armor, shield, spear and bow following source equipment. Detailed anatomy, age styling, features and equipment are editable visual defaults for one pack member. No gnoll or hyena head, muzzle, fur, animal ears, extra limbs, psychic strings connecting figures, duplicate person, other pack members, victim, gore, village memories, scenery or readable text. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete views, FRONT, SIDE PROFILE and BACK, plus one smaller close detail at far right. Consistent scale across the three complete views, every limb, foot, hair tip, trailing wisp and weapon tip comfortably inside margins. The same single subject repeated as turnaround views. Change viewing angle only. One adult humanlike pack member, not a group. Keep spear in anatomical RIGHT hand, hide-covered shield on LEFT arm, longbow tip above LEFT shoulder and quiver at RIGHT rear hip. Preserve violet irises and intent listening face, without hyena or gnoll anatomy. No labels, text, captions, borders, logos, UI, scenery, additional beings, invented insignia or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Asset: production portrait for Pack Hollowed from Severed Lands. Input image 1 is the selected canonical full-body reference; input image 2 is its reviewed multiview reference sheet. Change framing to a single portrait only, preserving this identity and visual default. Appearance: A single adult humanlike member of the Pack Hollowed of Medium size, with a lean sinewy frame, dull gray-olive skin, fully violet irises, a narrow angular clean-shaven face and coarse dark shoulder-length hair loosely tied back. An intent listening predatory expression with mouth closed and head slightly tilted, quiet balanced upright posture. Worn plain dark brown hide armor over a faded black cloth tunic, rough charcoal trousers and scuffed leather boots. Their anatomical RIGHT hand holds one ordinary wooden spear upright beside them with the complete tip visible; their LEFT arm carries one plain round hide-covered shield. One wooden longbow is strapped across their back with its upper tip above the anatomical LEFT shoulder, with a plain quiver at the RIGHT rear hip. Their coordinated hunting bearing and Hollowed identity follow the Setting lore, with hide armor, shield, spear and bow following source equipment. Detailed anatomy, age styling, features and equipment are editable visual defaults for one pack member. No gnoll or hyena head, muzzle, fur, animal ears, extra limbs, psychic strings connecting figures, duplicate person, other pack members, victim, gore, village memories, scenery or readable text. Square 1024x1024 PNG, one forward-facing head-and-shoulders portrait, upper chest visible. Consistent face framing for Map/Party/dialogue: face centered horizontally at 50%, eye line around 36% from top, top of head/hair near 10%, chin around 72%, shoulders fill the bottom. Natural face proportions, no stretched anatomy. Keep crown, ears and hair silhouette inside comfortable margins. Preserve the exact mature face, species anatomy, eye color, hair, expression, skin material and upper clothing of the two references. Weapons and hands remain outside the portrait. No circular cutout, border, text, head detail panels or scenery. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio lighting matching both references. No UI, logo, labels, extra beings, invented insignia, revealed secrets or background memories."
+      }
+    },
+    {
+      "id": "severed-monster-pond-hollowed",
+      "name": "Pond Hollowed",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/pond-hollowed.md",
+          "sha256": "12ce35bd8d9bb01657a1677328f3397779d6970b92a173a8d61f23a7b18d3eca",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/pond-hollowed.md",
+          "sha256": "8ed269c16344567e1ad95fe81e9a7dea5609c08b7001ff82fbe7f7a1cc697a6e",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A single adult humanlike Pond Hollowed of Medium size, with a lean waterlogged frame, pale slate-blue spongy translucent flesh, fully violet irises, a long gaunt face and wet dark hair hanging in thin short strands. Their skin and clothing are perpetually wet, with individual drops of faintly violet Rift-water beading and dripping from skin and hems. No exposed organs or wounds. Two arms with five lightly webbed humanlike digits per hand, two legs and broad bare lightly webbed feet. A ragged dark olive hide vest covers the chest and waist, with a plain soaked dark cloth hip wrap. Their anatomical RIGHT hand holds one ordinary wooden spear upright beside the body with its full tip visible; their LEFT arm carries one plain round water-worn wooden shield. Their wet spongy translucent form follows the Setting lore, with hide armor, shield and spear following source equipment. Detailed anatomy, webbing, features, colors and clothing are editable visual defaults. No frog or toad head, giant frog mouth, fish face, normal opaque dry skin, sightless white Cave Hollowed eyes, extra limbs, actual drowning victim, gore, fresh injury, captive, pool scenery, splash background, animal companion, insignia or readable text.",
+        "full_body": {
+          "path": "assets/characters/ea7bc3f325eedee7c0ddbea5a7e9bef0c45d721d20abc132f09ade826a83dcab.png",
+          "sha256": "ea7bc3f325eedee7c0ddbea5a7e9bef0c45d721d20abc132f09ade826a83dcab"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/e48a8d06de7f380a4631cebc6ae6b6e9eb94c3f03c3c58ce5c57b07327cb9d61.png",
+          "sha256": "e48a8d06de7f380a4631cebc6ae6b6e9eb94c3f03c3c58ce5c57b07327cb9d61"
+        },
+        "portrait": {
+          "path": "assets/characters/d3dad2f472c2c0108794507f898858b0a91089c0cfc752e594d776f24214e24e.png",
+          "sha256": "d3dad2f472c2c0108794507f898858b0a91089c0cfc752e594d776f24214e24e"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1809481
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2325138
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2315993
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body enemy reference for Pond Hollowed in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile or spectral materials as appropriate, plain light neutral gray background, soft natural studio light and subtle grounding shadow beneath the single subject. One complete humanoid in a near-front three-quarter standing pose, with whole head, hands, feet and every weapon tip comfortably inside every margin. Appearance: A single adult humanlike Pond Hollowed of Medium size, with a lean waterlogged frame, pale slate-blue spongy translucent flesh, fully violet irises, a long gaunt face and wet dark hair hanging in thin short strands. Their skin and clothing are perpetually wet, with individual drops of faintly violet Rift-water beading and dripping from skin and hems. No exposed organs or wounds. Two arms with five lightly webbed humanlike digits per hand, two legs and broad bare lightly webbed feet. A ragged dark olive hide vest covers the chest and waist, with a plain soaked dark cloth hip wrap. Their anatomical RIGHT hand holds one ordinary wooden spear upright beside the body with its full tip visible; their LEFT arm carries one plain round water-worn wooden shield. Their wet spongy translucent form follows the Setting lore, with hide armor, shield and spear following source equipment. Detailed anatomy, webbing, features, colors and clothing are editable visual defaults. No frog or toad head, giant frog mouth, fish face, normal opaque dry skin, sightless white Cave Hollowed eyes, extra limbs, actual drowning victim, gore, fresh injury, captive, pool scenery, splash background, animal companion, insignia or readable text. Preserve authored anatomy and equipment. No additional beings, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview enemy reference sheet for Pond Hollowed from Severed Lands. Input image 1 is the canonical complete reference. Preserve exact anatomy or elemental form, head if present, proportions, materials, colors, equipment and distinctive details. Appearance: A single adult humanlike Pond Hollowed of Medium size, with a lean waterlogged frame, pale slate-blue spongy translucent flesh, fully violet irises, a long gaunt face and wet dark hair hanging in thin short strands. Their skin and clothing are perpetually wet, with individual drops of faintly violet Rift-water beading and dripping from skin and hems. No exposed organs or wounds. Two arms with five lightly webbed humanlike digits per hand, two legs and broad bare lightly webbed feet. A ragged dark olive hide vest covers the chest and waist, with a plain soaked dark cloth hip wrap. Their anatomical RIGHT hand holds one ordinary wooden spear upright beside the body with its full tip visible; their LEFT arm carries one plain round water-worn wooden shield. Their wet spongy translucent form follows the Setting lore, with hide armor, shield and spear following source equipment. Detailed anatomy, webbing, features, colors and clothing are editable visual defaults. No frog or toad head, giant frog mouth, fish face, normal opaque dry skin, sightless white Cave Hollowed eyes, extra limbs, actual drowning victim, gore, fresh injury, captive, pool scenery, splash background, animal companion, insignia or readable text. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete views, FRONT, SIDE PROFILE and BACK, plus one smaller close detail at far right. Consistent scale across the three complete views, every limb, foot, hair tip, trailing wisp and weapon tip comfortably inside margins. The same single subject repeated as turnaround views. Change viewing angle only. Preserve perpetually wet spongy translucent flesh, violet irises, thin wet hair, lightly webbed hands/feet and individual violet water drops. Keep spear in anatomical RIGHT hand and water-worn shield on LEFT arm. No frog head, dry opaque skin or sightless Cave Hollowed eyes. No labels, text, captions, borders, logos, UI, scenery, additional beings, invented insignia or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Asset: production portrait for Pond Hollowed from Severed Lands. Input image 1 is the selected canonical full-body reference; input image 2 is its reviewed multiview reference sheet. Change framing to a single portrait only, preserving this identity and visual default. Appearance: A single adult humanlike Pond Hollowed of Medium size, with a lean waterlogged frame, pale slate-blue spongy translucent flesh, fully violet irises, a long gaunt face and wet dark hair hanging in thin short strands. Their skin and clothing are perpetually wet, with individual drops of faintly violet Rift-water beading and dripping from skin and hems. No exposed organs or wounds. Two arms with five lightly webbed humanlike digits per hand, two legs and broad bare lightly webbed feet. A ragged dark olive hide vest covers the chest and waist, with a plain soaked dark cloth hip wrap. Their anatomical RIGHT hand holds one ordinary wooden spear upright beside the body with its full tip visible; their LEFT arm carries one plain round water-worn wooden shield. Their wet spongy translucent form follows the Setting lore, with hide armor, shield and spear following source equipment. Detailed anatomy, webbing, features, colors and clothing are editable visual defaults. No frog or toad head, giant frog mouth, fish face, normal opaque dry skin, sightless white Cave Hollowed eyes, extra limbs, actual drowning victim, gore, fresh injury, captive, pool scenery, splash background, animal companion, insignia or readable text. Square 1024x1024 PNG, one forward-facing head-and-shoulders portrait, upper chest visible. Consistent face framing for Map/Party/dialogue: face centered horizontally at 50%, eye line around 36% from top, top of head/hair near 10%, chin around 72%, shoulders fill the bottom. Natural face proportions, no stretched anatomy. Keep crown, ears and hair silhouette inside comfortable margins. Preserve the exact mature face, species anatomy, eye color, hair, expression, skin material and upper clothing of the two references. Weapons and hands remain outside the portrait. No circular cutout, border, text, head detail panels or scenery. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio lighting matching both references. No UI, logo, labels, extra beings, invented insignia, revealed secrets or background memories."
+      }
+    },
+    {
+      "id": "severed-monster-rift-air",
+      "name": "Rift Air",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-air.md",
+          "sha256": "bc05ad0695c1fd8457120bd46b8aa7a12a04f7aa61e68488eb3ea4079c118c08",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-air.md",
+          "sha256": "cb202b14facf279be76014bdd8d03e6f1aa9381ee074ef75e279eafeacfee241",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A single Large Rift Air elemental: a complete hovering vertical vortex of dimensional wind with no solid body. Cool gray-blue translucent spiraling wind ribbons and fine mist curl around an empty dark central core, with restrained thin violet Rift filaments threaded through the spiral. A broad turbulent upper coil narrows into a tapering lower funnel that hovers just above the ground; the outer wisps remain part of the same continuous single vortex. Its dimensional wind-vortex form follows the Setting lore; exact coil arrangement, density, palette and filament pattern are editable visual defaults. This is a faceless elemental, not a humanoid. No eyes, face, mouth, head, torso, arms, fists, legs, feet, solid rock or ice body, storm landscape, debris, victims, visions of dead worlds, lightning bolts, portal, magical circle, readable text or additional vortex.",
+        "full_body": {
+          "path": "assets/characters/c086e70aacda7b213d3faa03b93106db8c7e4b24085182212cc5705451450c0b.png",
+          "sha256": "c086e70aacda7b213d3faa03b93106db8c7e4b24085182212cc5705451450c0b"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/14930ce95b06e50b30e4a3fd9d46d0d8e70e3525a0c59ad677acd5d2e3f9f985.png",
+          "sha256": "14930ce95b06e50b30e4a3fd9d46d0d8e70e3525a0c59ad677acd5d2e3f9f985"
+        },
+        "portrait": {
+          "path": "assets/characters/de41d21183c59259afa6c536727445ec89f62fa4a23442a43febc388a70627ee.png",
+          "sha256": "de41d21183c59259afa6c536727445ec89f62fa4a23442a43febc388a70627ee"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1794961
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 1908778
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 1721350
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body enemy reference for Rift Air in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile or spectral materials as appropriate, plain light neutral gray background, soft natural studio light and subtle grounding shadow beneath the single subject. One complete FACELESS WIND VORTEX, its full upper coil, tapering base and all outer wisps comfortably inside every margin. Appearance: A single Large Rift Air elemental: a complete hovering vertical vortex of dimensional wind with no solid body. Cool gray-blue translucent spiraling wind ribbons and fine mist curl around an empty dark central core, with restrained thin violet Rift filaments threaded through the spiral. A broad turbulent upper coil narrows into a tapering lower funnel that hovers just above the ground; the outer wisps remain part of the same continuous single vortex. Its dimensional wind-vortex form follows the Setting lore; exact coil arrangement, density, palette and filament pattern are editable visual defaults. This is a faceless elemental, not a humanoid. No eyes, face, mouth, head, torso, arms, fists, legs, feet, solid rock or ice body, storm landscape, debris, victims, visions of dead worlds, lightning bolts, portal, magical circle, readable text or additional vortex. Preserve authored anatomy and equipment. No additional beings, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview enemy reference sheet for Rift Air from Severed Lands. Input image 1 is the canonical complete reference. Preserve exact anatomy or elemental form, head if present, proportions, materials, colors, equipment and distinctive details. Appearance: A single Large Rift Air elemental: a complete hovering vertical vortex of dimensional wind with no solid body. Cool gray-blue translucent spiraling wind ribbons and fine mist curl around an empty dark central core, with restrained thin violet Rift filaments threaded through the spiral. A broad turbulent upper coil narrows into a tapering lower funnel that hovers just above the ground; the outer wisps remain part of the same continuous single vortex. Its dimensional wind-vortex form follows the Setting lore; exact coil arrangement, density, palette and filament pattern are editable visual defaults. This is a faceless elemental, not a humanoid. No eyes, face, mouth, head, torso, arms, fists, legs, feet, solid rock or ice body, storm landscape, debris, victims, visions of dead worlds, lightning bolts, portal, magical circle, readable text or additional vortex. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete views, FRONT, SIDE PROFILE and BACK, plus one smaller close detail at far right. Consistent scale across the three complete views, every limb, foot, hair tip, trailing wisp and weapon tip comfortably inside margins. The same single subject repeated as turnaround views. Change viewing angle only. Three complete viewing angles of the SAME FACELESS WIND VORTEX. Preserve the characteristic upper coil, tapering hovering base, empty dark core, cool gray-blue ribbons and violet filaments. Detail view shows a matching spiral/filament section, never a head or face. No humanoid anatomy, eyes, fists, legs, solid rock or extra vortices. No labels, text, captions, borders, logos, UI, scenery, additional beings, invented insignia or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Asset: production portrait for Rift Air from Severed Lands. Input image 1 is the selected canonical full-body reference; input image 2 is its reviewed multiview reference sheet. Change framing to a single portrait only, preserving this identity and visual default. Appearance: A single Large Rift Air elemental: a complete hovering vertical vortex of dimensional wind with no solid body. Cool gray-blue translucent spiraling wind ribbons and fine mist curl around an empty dark central core, with restrained thin violet Rift filaments threaded through the spiral. A broad turbulent upper coil narrows into a tapering lower funnel that hovers just above the ground; the outer wisps remain part of the same continuous single vortex. Its dimensional wind-vortex form follows the Setting lore; exact coil arrangement, density, palette and filament pattern are editable visual defaults. This is a faceless elemental, not a humanoid. No eyes, face, mouth, head, torso, arms, fists, legs, feet, solid rock or ice body, storm landscape, debris, victims, visions of dead worlds, lightning bolts, portal, magical circle, readable text or additional vortex. Square 1024x1024 PNG for a faceless elemental portrait/token. Show ONE complete hovering vortex centered at x=50%, y=50%, occupying about 80% of the square. Preserve the characteristic upper coil, tapering hovering base, empty dark core, cool gray-blue wind ribbons and thin violet filaments. Keep all outer wisps inside generous margins and legible at map-token size. This is a faceless vortex: do not invent a head, eyes, face, humanoid torso, limbs, or fists. No detail panel, second vortex, caption or scenery. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio lighting matching both references. No UI, logo, labels, extra beings, invented insignia, revealed secrets or background memories."
+      }
+    },
+    {
+      "id": "severed-monster-rift-banshee",
+      "name": "Rift Banshee",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-banshee.md",
+          "sha256": "b4a3521006f0de58207aefdfba27036ef81c228a059d1dc0f0926cd40447e6b9",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-banshee.md",
+          "sha256": "12df15de52e43b3b30406ab35f6c429437c47631d780949ff8a7fc1170f96a75",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A single adult elven woman's Rift Echo, a Medium incorporeal death-imprint with a mature ageless angular elven face, long pointed ears, pale cool gray-lavender translucent skin and faint lavender eyes. Long silver-dark hair floats loosely around her head and shoulders. A profound mournful expression, mouth slightly open in an endless grief-filled wail, no blood or distorted jaws. Two slender recognizable arms with five delicate fingers per hand, hands open and held low. A plain opaque high-necked long-sleeved pale gray spectral gown covers chest and body; the long lower skirt dissolves into soft violet-gray trailing wisps instead of visible solid feet. Her elven womanhood, grief, hovering incorporeal nature and captured wail follow the authored source. Features, apparent adult age, clothing, colors and wisp pattern are editable visual defaults. No living solid human body, child, skeleton, skull face, exposed organs, gore, fresh injury, chains, weapon, captive, additional ghost, spectral faces, sound-wave symbols, readable text, Rift pool, forest, home-world memory or revealed identity.",
+        "full_body": {
+          "path": "assets/characters/2ab96da2d878476f06ea8d786b7e069366c0da1e0a0dbdb7545d2399f80d9895.png",
+          "sha256": "2ab96da2d878476f06ea8d786b7e069366c0da1e0a0dbdb7545d2399f80d9895"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/7cab92f245773a841ef52de8514d0fe991f1f965c2a4137ad0c4d75e57f4b96c.png",
+          "sha256": "7cab92f245773a841ef52de8514d0fe991f1f965c2a4137ad0c4d75e57f4b96c"
+        },
+        "portrait": {
+          "path": "assets/characters/c8e0340385d6fca1986ac9d45581d0eecee52212f376fbf2a32ec80726680890.png",
+          "sha256": "c8e0340385d6fca1986ac9d45581d0eecee52212f376fbf2a32ec80726680890"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1786409
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2052672
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2277255
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body enemy reference for Rift Banshee in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile or spectral materials as appropriate, plain light neutral gray background, soft natural studio light and subtle grounding shadow beneath the single subject. One complete hovering adult elven Echo, with all hair, hands, gown and trailing wisps comfortably inside every margin. Appearance: A single adult elven woman's Rift Echo, a Medium incorporeal death-imprint with a mature ageless angular elven face, long pointed ears, pale cool gray-lavender translucent skin and faint lavender eyes. Long silver-dark hair floats loosely around her head and shoulders. A profound mournful expression, mouth slightly open in an endless grief-filled wail, no blood or distorted jaws. Two slender recognizable arms with five delicate fingers per hand, hands open and held low. A plain opaque high-necked long-sleeved pale gray spectral gown covers chest and body; the long lower skirt dissolves into soft violet-gray trailing wisps instead of visible solid feet. Her elven womanhood, grief, hovering incorporeal nature and captured wail follow the authored source. Features, apparent adult age, clothing, colors and wisp pattern are editable visual defaults. No living solid human body, child, skeleton, skull face, exposed organs, gore, fresh injury, chains, weapon, captive, additional ghost, spectral faces, sound-wave symbols, readable text, Rift pool, forest, home-world memory or revealed identity. Preserve authored anatomy and equipment. No additional beings, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview enemy reference sheet for Rift Banshee from Severed Lands. Input image 1 is the canonical complete reference. Preserve exact anatomy or elemental form, head if present, proportions, materials, colors, equipment and distinctive details. Appearance: A single adult elven woman's Rift Echo, a Medium incorporeal death-imprint with a mature ageless angular elven face, long pointed ears, pale cool gray-lavender translucent skin and faint lavender eyes. Long silver-dark hair floats loosely around her head and shoulders. A profound mournful expression, mouth slightly open in an endless grief-filled wail, no blood or distorted jaws. Two slender recognizable arms with five delicate fingers per hand, hands open and held low. A plain opaque high-necked long-sleeved pale gray spectral gown covers chest and body; the long lower skirt dissolves into soft violet-gray trailing wisps instead of visible solid feet. Her elven womanhood, grief, hovering incorporeal nature and captured wail follow the authored source. Features, apparent adult age, clothing, colors and wisp pattern are editable visual defaults. No living solid human body, child, skeleton, skull face, exposed organs, gore, fresh injury, chains, weapon, captive, additional ghost, spectral faces, sound-wave symbols, readable text, Rift pool, forest, home-world memory or revealed identity. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete views, FRONT, SIDE PROFILE and BACK, plus one smaller close detail at far right. Consistent scale across the three complete views, every limb, foot, hair tip, trailing wisp and weapon tip comfortably inside margins. The same single subject repeated as turnaround views. Change viewing angle only. Preserve the same adult elven woman's face and pointed ears, mournful open-mouth wail, pale translucent lavender-gray skin, floating silver-dark hair, two arms/five fingers per hand and plain high-necked spectral gown dissolving into trailing wisps. Every hair/wisp tip remains inside margins. No new ghost, skull face, child or solid feet. No labels, text, captions, borders, logos, UI, scenery, additional beings, invented insignia or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Asset: production portrait for Rift Banshee from Severed Lands. Input image 1 is the selected canonical full-body reference; input image 2 is its reviewed multiview reference sheet. Change framing to a single portrait only, preserving this identity and visual default. Appearance: A single adult elven woman's Rift Echo, a Medium incorporeal death-imprint with a mature ageless angular elven face, long pointed ears, pale cool gray-lavender translucent skin and faint lavender eyes. Long silver-dark hair floats loosely around her head and shoulders. A profound mournful expression, mouth slightly open in an endless grief-filled wail, no blood or distorted jaws. Two slender recognizable arms with five delicate fingers per hand, hands open and held low. A plain opaque high-necked long-sleeved pale gray spectral gown covers chest and body; the long lower skirt dissolves into soft violet-gray trailing wisps instead of visible solid feet. Her elven womanhood, grief, hovering incorporeal nature and captured wail follow the authored source. Features, apparent adult age, clothing, colors and wisp pattern are editable visual defaults. No living solid human body, child, skeleton, skull face, exposed organs, gore, fresh injury, chains, weapon, captive, additional ghost, spectral faces, sound-wave symbols, readable text, Rift pool, forest, home-world memory or revealed identity. Square 1024x1024 PNG, one forward-facing head-and-shoulders portrait, upper chest visible. Consistent face framing for Map/Party/dialogue: face centered horizontally at 50%, eye line around 36% from top, top of head/hair near 10%, chin around 72%, shoulders fill the bottom. Natural face proportions, no stretched anatomy. Keep crown, ears and hair silhouette inside comfortable margins. Preserve the exact mature face, species anatomy, eye color, hair, expression, skin material and upper clothing of the two references. Weapons and hands remain outside the portrait. No circular cutout, border, text, head detail panels or scenery. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio lighting matching both references. No UI, logo, labels, extra beings, invented insignia, revealed secrets or background memories."
+      }
     }
   ]
 }
