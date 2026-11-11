@@ -8002,6 +8002,366 @@
         "reference_sheet": "Use case: identity-preserve. Production multiview enemy reference sheet for Rift Banshee from Severed Lands. Input image 1 is the canonical complete reference. Preserve exact anatomy or elemental form, head if present, proportions, materials, colors, equipment and distinctive details. Appearance: A single adult elven woman's Rift Echo, a Medium incorporeal death-imprint with a mature ageless angular elven face, long pointed ears, pale cool gray-lavender translucent skin and faint lavender eyes. Long silver-dark hair floats loosely around her head and shoulders. A profound mournful expression, mouth slightly open in an endless grief-filled wail, no blood or distorted jaws. Two slender recognizable arms with five delicate fingers per hand, hands open and held low. A plain opaque high-necked long-sleeved pale gray spectral gown covers chest and body; the long lower skirt dissolves into soft violet-gray trailing wisps instead of visible solid feet. Her elven womanhood, grief, hovering incorporeal nature and captured wail follow the authored source. Features, apparent adult age, clothing, colors and wisp pattern are editable visual defaults. No living solid human body, child, skeleton, skull face, exposed organs, gore, fresh injury, chains, weapon, captive, additional ghost, spectral faces, sound-wave symbols, readable text, Rift pool, forest, home-world memory or revealed identity. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete views, FRONT, SIDE PROFILE and BACK, plus one smaller close detail at far right. Consistent scale across the three complete views, every limb, foot, hair tip, trailing wisp and weapon tip comfortably inside margins. The same single subject repeated as turnaround views. Change viewing angle only. Preserve the same adult elven woman's face and pointed ears, mournful open-mouth wail, pale translucent lavender-gray skin, floating silver-dark hair, two arms/five fingers per hand and plain high-necked spectral gown dissolving into trailing wisps. Every hair/wisp tip remains inside margins. No new ghost, skull face, child or solid feet. No labels, text, captions, borders, logos, UI, scenery, additional beings, invented insignia or revealed secrets.",
         "portrait": "Use case: identity-preserve. Asset: production portrait for Rift Banshee from Severed Lands. Input image 1 is the selected canonical full-body reference; input image 2 is its reviewed multiview reference sheet. Change framing to a single portrait only, preserving this identity and visual default. Appearance: A single adult elven woman's Rift Echo, a Medium incorporeal death-imprint with a mature ageless angular elven face, long pointed ears, pale cool gray-lavender translucent skin and faint lavender eyes. Long silver-dark hair floats loosely around her head and shoulders. A profound mournful expression, mouth slightly open in an endless grief-filled wail, no blood or distorted jaws. Two slender recognizable arms with five delicate fingers per hand, hands open and held low. A plain opaque high-necked long-sleeved pale gray spectral gown covers chest and body; the long lower skirt dissolves into soft violet-gray trailing wisps instead of visible solid feet. Her elven womanhood, grief, hovering incorporeal nature and captured wail follow the authored source. Features, apparent adult age, clothing, colors and wisp pattern are editable visual defaults. No living solid human body, child, skeleton, skull face, exposed organs, gore, fresh injury, chains, weapon, captive, additional ghost, spectral faces, sound-wave symbols, readable text, Rift pool, forest, home-world memory or revealed identity. Square 1024x1024 PNG, one forward-facing head-and-shoulders portrait, upper chest visible. Consistent face framing for Map/Party/dialogue: face centered horizontally at 50%, eye line around 36% from top, top of head/hair near 10%, chin around 72%, shoulders fill the bottom. Natural face proportions, no stretched anatomy. Keep crown, ears and hair silhouette inside comfortable margins. Preserve the exact mature face, species anatomy, eye color, hair, expression, skin material and upper clothing of the two references. Weapons and hands remain outside the portrait. No circular cutout, border, text, head detail panels or scenery. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio lighting matching both references. No UI, logo, labels, extra beings, invented insignia, revealed secrets or background memories."
       }
+    },
+    {
+      "id": "severed-monster-rift-boulder",
+      "name": "Rift Boulder",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-boulder.md",
+          "sha256": "1c0ef2133e56830271ade953e90071cf8a70f664015ba8c773672f9d65af4257",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-boulder.md",
+          "sha256": "85b27403a0a0a5347566f0b95fc493ee9ac85a35372f44ceb7a9699e01bb03df",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Medium Rift Boulder elemental in its active state: a single complete irregular rounded mass of weathered dark basalt, broad at its base with rough natural facets and a few asymmetrical protruding stones, resting on the ground. Narrow shifting violet fissures thread through the rock surface like liquid Rift energy, restrained and legible against the dense stone. Its silhouette remains a believable rollable boulder. No head, face, eyes, mouth, limbs or humanoid anatomy. The active stone body and violet cracks follow the authored Setting lore; exact rock shape, palette and crack pattern are editable visual defaults. Its dormant False Appearance is not being depicted. No separate animated boulders, secondary creature, carved runes, crystal throne, victim, terrain or scenery.",
+        "full_body": {
+          "path": "assets/characters/944605f706d81feaa94da86d4471f63230c1b46bb821231603abb4bc04b5a91a.png",
+          "sha256": "944605f706d81feaa94da86d4471f63230c1b46bb821231603abb4bc04b5a91a"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/4b4ee0c82c64ec8ec0fc35705b72026bf1a4761170b6ef8e3199e4154bb9a226.png",
+          "sha256": "4b4ee0c82c64ec8ec0fc35705b72026bf1a4761170b6ef8e3199e4154bb9a226"
+        },
+        "portrait": {
+          "path": "assets/characters/45b40ca8d81549b2c7b80ecbfd978eb4a00427dace08ff9be7b0db8d19192199.png",
+          "sha256": "45b40ca8d81549b2c7b80ecbfd978eb4a00427dace08ff9be7b0db8d19192199"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2177639
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 1886953
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2288450
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete enemy reference for Rift Boulder in Sylvia GM's Severed Lands. Portrait-orientation 1024x1536 PNG, polished naturalistic digital RPG illustration, tactile or elemental materials as appropriate, plain light neutral gray backdrop, soft natural studio light with subtle grounding shadow. One complete single subject in a near-front three-quarter view. Every head, limb, hoof, tail tip, weapon tip, outer stone edge or ash wisp must stay comfortably inside all margins. Appearance: One Medium Rift Boulder elemental in its active state: a single complete irregular rounded mass of weathered dark basalt, broad at its base with rough natural facets and a few asymmetrical protruding stones, resting on the ground. Narrow shifting violet fissures thread through the rock surface like liquid Rift energy, restrained and legible against the dense stone. Its silhouette remains a believable rollable boulder. No head, face, eyes, mouth, limbs or humanoid anatomy. The active stone body and violet cracks follow the authored Setting lore; exact rock shape, palette and crack pattern are editable visual defaults. Its dormant False Appearance is not being depicted. No separate animated boulders, secondary creature, carved runes, crystal throne, victim, terrain or scenery. Preserve the authored anatomy and equipment; show no additional beings, captions, labels, logos, borders, UI or narrative secrets.",
+        "reference_sheet": "Use case: identity-preserve. Asset: production multiview reference sheet for Rift Boulder from Severed Lands. Input image 1 is the selected canonical complete reference. Preserve its exact identity, anatomy or elemental form, palette, materials and equipment. Appearance: One Medium Rift Boulder elemental in its active state: a single complete irregular rounded mass of weathered dark basalt, broad at its base with rough natural facets and a few asymmetrical protruding stones, resting on the ground. Narrow shifting violet fissures thread through the rock surface like liquid Rift energy, restrained and legible against the dense stone. Its silhouette remains a believable rollable boulder. No head, face, eyes, mouth, limbs or humanoid anatomy. The active stone body and violet cracks follow the authored Setting lore; exact rock shape, palette and crack pattern are editable visual defaults. Its dormant False Appearance is not being depicted. No separate animated boulders, secondary creature, carved runes, crystal throne, victim, terrain or scenery. Landscape 1536x1024 PNG, plain light neutral gray background, matching naturalistic digital RPG illustration and soft studio lighting. Three clearly separated COMPLETE front, side-profile and back views at consistent scale, with one smaller close detail panel at far right. Every limb, hoof, tail, crest, weapon tip, stone edge and ash wisp must remain comfortably inside each view's margins. Change viewing angle only. Three complete views of the same active FACELESS basalt boulder; preserve overall facets/proportions and violet fissures. Detail panel is stone/fissures only. No face, eyes, mouth or limbs. No labels, text, logos, captions, scenery, extra entities or revealed history.",
+        "portrait": "Use case: identity-preserve. Asset: production portrait for Rift Boulder from Severed Lands. Input image1 is the selected canonical complete reference; input image2 is its reviewed multiview sheet. Change framing to a single portrait only, keeping this exact identity, materials and selected appearance. Appearance: One Medium Rift Boulder elemental in its active state: a single complete irregular rounded mass of weathered dark basalt, broad at its base with rough natural facets and a few asymmetrical protruding stones, resting on the ground. Narrow shifting violet fissures thread through the rock surface like liquid Rift energy, restrained and legible against the dense stone. Its silhouette remains a believable rollable boulder. No head, face, eyes, mouth, limbs or humanoid anatomy. The active stone body and violet cracks follow the authored Setting lore; exact rock shape, palette and crack pattern are editable visual defaults. Its dormant False Appearance is not being depicted. No separate animated boulders, secondary creature, carved runes, crystal throne, victim, terrain or scenery. Square 1024x1024 PNG of ONE COMPLETE FACELESS ENTITY centered x50%/y50%, about 80% of square width/height. Keep every outer stone edge or ash wisp inside comfortable margins and readable at map-token size. Do not invent eyes, a face, mouth, head or humanoid limbs. Plain light neutral gray background and matching polished naturalistic digital RPG illustration with soft studio light. No circular cutout, border, labels, detail panels, UI, scenery, additional beings, text or revealed secrets."
+      }
+    },
+    {
+      "id": "severed-monster-rift-bulette",
+      "name": "Rift Bulette",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-bulette.md",
+          "sha256": "0fc93593b6e0e6b2ddff9c6b4d6ae1a5562f8aa23326b41d89d06ce3d48bcb86",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-bulette.md",
+          "sha256": "db2dc1f9fe42572e596039cae87e7b594edc25992b771fabe7774c86949c763a",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Large Rift-touched land-shark with a low broad powerful quadrupedal body, short massive wedge-shaped armored head, closed heavy jaws, two small deep-set dark amber eyes, exactly four muscular clawed legs and one long tapering armored tail. Overlapping slate-gray armored plates are fused with restrained violet crystalline Rift-mineral seams. A prominent angular dorsal crest runs along the spine, with subtle regular geometric ridges that evoke Warden architectural motifs without any inscription or proof of origin. All four feet support a grounded near-front three-quarter stance and the tail curves out to one side fully visible. Armored land-shark form, crystallized Rift minerals and patterned crest follow the authored lore. Specific anatomy, colors and plate arrangement are editable visual defaults. No extra legs, fin-only fish body, humanoid arms, rider, actual Warden structure, symbols, caption, prey, gore, eruption or landscape.",
+        "full_body": {
+          "path": "assets/characters/91544113aa67cff3471bd559d152cc24835c9c847400090283ed3f8aec54cb0e.png",
+          "sha256": "91544113aa67cff3471bd559d152cc24835c9c847400090283ed3f8aec54cb0e"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/fea507422280f59b096bb8a38d32b0f1fcbbf0f1b45ce43b719cc3e60dcc9699.png",
+          "sha256": "fea507422280f59b096bb8a38d32b0f1fcbbf0f1b45ce43b719cc3e60dcc9699"
+        },
+        "portrait": {
+          "path": "assets/characters/f9048188a3c3a7b10a226e0dd9f8c0c00a7903ea1c46cdd16936fa65d9e87dce.png",
+          "sha256": "f9048188a3c3a7b10a226e0dd9f8c0c00a7903ea1c46cdd16936fa65d9e87dce"
+        },
+        "frame": {
+          "x": 0.04,
+          "y": 0.58,
+          "zoom": 1.8
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1914507
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2555326
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2529255
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete enemy reference for Rift Bulette in Sylvia GM's Severed Lands. Portrait-orientation 1024x1536 PNG, polished naturalistic digital RPG illustration, tactile or elemental materials as appropriate, plain light neutral gray backdrop, soft natural studio light with subtle grounding shadow. One complete single subject in a near-front three-quarter view. Every head, limb, hoof, tail tip, weapon tip, outer stone edge or ash wisp must stay comfortably inside all margins. Appearance: One Large Rift-touched land-shark with a low broad powerful quadrupedal body, short massive wedge-shaped armored head, closed heavy jaws, two small deep-set dark amber eyes, exactly four muscular clawed legs and one long tapering armored tail. Overlapping slate-gray armored plates are fused with restrained violet crystalline Rift-mineral seams. A prominent angular dorsal crest runs along the spine, with subtle regular geometric ridges that evoke Warden architectural motifs without any inscription or proof of origin. All four feet support a grounded near-front three-quarter stance and the tail curves out to one side fully visible. Armored land-shark form, crystallized Rift minerals and patterned crest follow the authored lore. Specific anatomy, colors and plate arrangement are editable visual defaults. No extra legs, fin-only fish body, humanoid arms, rider, actual Warden structure, symbols, caption, prey, gore, eruption or landscape. Preserve the authored anatomy and equipment; show no additional beings, captions, labels, logos, borders, UI or narrative secrets.",
+        "reference_sheet": "Use case: identity-preserve. Asset: production multiview reference sheet for Rift Bulette from Severed Lands. Input image 1 is the selected canonical complete reference. Preserve its exact identity, anatomy or elemental form, palette, materials and equipment. Appearance: One Large Rift-touched land-shark with a low broad powerful quadrupedal body, short massive wedge-shaped armored head, closed heavy jaws, two small deep-set dark amber eyes, exactly four muscular clawed legs and one long tapering armored tail. Overlapping slate-gray armored plates are fused with restrained violet crystalline Rift-mineral seams. A prominent angular dorsal crest runs along the spine, with subtle regular geometric ridges that evoke Warden architectural motifs without any inscription or proof of origin. All four feet support a grounded near-front three-quarter stance and the tail curves out to one side fully visible. Armored land-shark form, crystallized Rift minerals and patterned crest follow the authored lore. Specific anatomy, colors and plate arrangement are editable visual defaults. No extra legs, fin-only fish body, humanoid arms, rider, actual Warden structure, symbols, caption, prey, gore, eruption or landscape. Landscape 1536x1024 PNG, plain light neutral gray background, matching naturalistic digital RPG illustration and soft studio lighting. Three clearly separated COMPLETE front, side-profile and back views at consistent scale, with one smaller close detail panel at far right. Every limb, hoof, tail, crest, weapon tip, stone edge and ash wisp must remain comfortably inside each view's margins. Change viewing angle only. Preserve the same wedge-shaped land-shark head, two amber eyes, closed heavy jaws, exactly FOUR clawed legs, ONE complete tail, overlapping mineral armor and geometric dorsal crest. No extra legs or fins; all feet and tail tip fully visible in each complete view. No labels, text, logos, captions, scenery, extra entities or revealed history.",
+        "portrait": "Use case: identity-preserve. Asset: production portrait for Rift Bulette from Severed Lands. Input image1 is the selected canonical complete reference; input image2 is its reviewed multiview sheet. Change framing to a single portrait only, keeping this exact identity, materials and selected appearance. Appearance: One Large Rift-touched land-shark with a low broad powerful quadrupedal body, short massive wedge-shaped armored head, closed heavy jaws, two small deep-set dark amber eyes, exactly four muscular clawed legs and one long tapering armored tail. Overlapping slate-gray armored plates are fused with restrained violet crystalline Rift-mineral seams. A prominent angular dorsal crest runs along the spine, with subtle regular geometric ridges that evoke Warden architectural motifs without any inscription or proof of origin. All four feet support a grounded near-front three-quarter stance and the tail curves out to one side fully visible. Armored land-shark form, crystallized Rift minerals and patterned crest follow the authored lore. Specific anatomy, colors and plate arrangement are editable visual defaults. No extra legs, fin-only fish body, humanoid arms, rider, actual Warden structure, symbols, caption, prey, gore, eruption or landscape. Square 1024x1024 PNG, one complete head-and-shoulders portrait with upper chest/forebody visible. Center the head horizontally at50%, eye line around36% from top, head/crest/comb top near10%, chin/lower jaw around72%; natural proportions. Keep all ears, comb tips, beak tip and head silhouette inside comfortable margins. Preserve the exact face/species anatomy, eyes, hair/feathers/plates, colors and expression. No hands or weapons in frame. Preserve the broad armored wedge-shaped land-shark head, TWO amber eyes, closed jaw, violet crystalline seams and the beginning of its geometric dorsal crest. No mammalian ears, humanoid head or new horns. Plain light neutral gray background and matching polished naturalistic digital RPG illustration with soft studio light. No circular cutout, border, labels, detail panels, UI, scenery, additional beings, text or revealed secrets."
+      }
+    },
+    {
+      "id": "severed-monster-rift-centaur",
+      "name": "Rift Centaur",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-centaur.md",
+          "sha256": "200930d9bf980ef8b0199cd96d69c9337a485bdea2b65d09a6f3becc48d6d28b",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-centaur.md",
+          "sha256": "be686f989503405d95d8feca8720dbd6a4d823e449531ca045f5084d416aa7e6",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Large adult Rift Centaur with a mature humanlike upper torso and face joined naturally at the waist to a complete powerful charcoal-gray horse body. Exactly two human arms and four equine legs ending in hooves, with one long black horse tail. Weathered warm gray-tan skin, a serious watchful expression, muted hazel eyes and long black hair tied in a practical braid. A plain dark brown hide vest fully covers the human chest, with simple leather belts at the join to the horse body. Their anatomical RIGHT hand holds one long plain pike upright beside the body, its entire shaft and point visible; one longbow is secured diagonally behind the upper torso with its upper tip above the LEFT shoulder, and one plain quiver sits on the LEFT rear flank. Subtle translucent violet Veil edging along the outer silhouette suggests partial phasing while all four legs remain clearly visible and solid enough to read. Centaur form, Veil phasing, territorial bearing, pike and longbow follow the authored source; face, colors, clothing and equipment details are editable visual defaults. No additional human legs, detached horse, rider, extra arms, second creature, missing hooves, nudity, crest, readable text, herd, victim or grassland scenery.",
+        "full_body": {
+          "path": "assets/characters/a6af9086a23274b7fdfafc5be1286306f611b3c38ec7c4994d6e21c52e28c4bf.png",
+          "sha256": "a6af9086a23274b7fdfafc5be1286306f611b3c38ec7c4994d6e21c52e28c4bf"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/9aead633db5fe425c623a3290fe9b967781b168fc9676906bb0c6ff53a47640f.png",
+          "sha256": "9aead633db5fe425c623a3290fe9b967781b168fc9676906bb0c6ff53a47640f"
+        },
+        "portrait": {
+          "path": "assets/characters/ebe8c7a73f0c753119afabf543d118e8c108aba1894751bbecd4ba1fc3a46596.png",
+          "sha256": "ebe8c7a73f0c753119afabf543d118e8c108aba1894751bbecd4ba1fc3a46596"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.05,
+          "zoom": 1.4
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2062441
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2267132
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2267865
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete enemy reference for Rift Centaur in Sylvia GM's Severed Lands. Portrait-orientation 1024x1536 PNG, polished naturalistic digital RPG illustration, tactile or elemental materials as appropriate, plain light neutral gray backdrop, soft natural studio light with subtle grounding shadow. One complete single subject in a near-front three-quarter view. Every head, limb, hoof, tail tip, weapon tip, outer stone edge or ash wisp must stay comfortably inside all margins. Appearance: One Large adult Rift Centaur with a mature humanlike upper torso and face joined naturally at the waist to a complete powerful charcoal-gray horse body. Exactly two human arms and four equine legs ending in hooves, with one long black horse tail. Weathered warm gray-tan skin, a serious watchful expression, muted hazel eyes and long black hair tied in a practical braid. A plain dark brown hide vest fully covers the human chest, with simple leather belts at the join to the horse body. Their anatomical RIGHT hand holds one long plain pike upright beside the body, its entire shaft and point visible; one longbow is secured diagonally behind the upper torso with its upper tip above the LEFT shoulder, and one plain quiver sits on the RIGHT rear flank. Subtle translucent violet Veil edging along the outer silhouette suggests partial phasing while all four legs remain clearly visible and solid enough to read. Centaur form, Veil phasing, territorial bearing, pike and longbow follow the authored source; face, colors, clothing and equipment details are editable visual defaults. No additional human legs, detached horse, rider, extra arms, second creature, missing hooves, nudity, crest, readable text, herd, victim or grassland scenery. Preserve the authored anatomy and equipment; show no additional beings, captions, labels, logos, borders, UI or narrative secrets.",
+        "reference_sheet": "Use case: identity-preserve. Asset: production multiview reference sheet for Rift Centaur from Severed Lands. Input image 1 is the selected canonical complete reference. Preserve its exact identity, anatomy or elemental form, palette, materials and equipment. Appearance: One Large adult Rift Centaur with a mature humanlike upper torso and face joined naturally at the waist to a complete powerful charcoal-gray horse body. Exactly two human arms and four equine legs ending in hooves, with one long black horse tail. Weathered warm gray-tan skin, a serious watchful expression, muted hazel eyes and long black hair tied in a practical braid. A plain dark brown hide vest fully covers the human chest, with simple leather belts at the join to the horse body. Their anatomical RIGHT hand holds one long plain pike upright beside the body, its entire shaft and point visible; one longbow is secured diagonally behind the upper torso with its upper tip above the LEFT shoulder, and one plain quiver sits on the LEFT rear flank. Subtle translucent violet Veil edging along the outer silhouette suggests partial phasing while all four legs remain clearly visible and solid enough to read. Centaur form, Veil phasing, territorial bearing, pike and longbow follow the authored source; face, colors, clothing and equipment details are editable visual defaults. No additional human legs, detached horse, rider, extra arms, second creature, missing hooves, nudity, crest, readable text, herd, victim or grassland scenery. Landscape 1536x1024 PNG, plain light neutral gray background, matching naturalistic digital RPG illustration and soft studio lighting. Three clearly separated COMPLETE front, side-profile and back views at consistent scale, with one smaller close detail panel at far right. Every limb, hoof, tail, crest, weapon tip, stone edge and ash wisp must remain comfortably inside each view's margins. Change viewing angle only. Preserve the same mature face and black braid, TWO human arms, FOUR horse legs with FOUR hooves, and ONE complete horse tail. Pike in anatomical RIGHT hand; longbow behind upper torso with upper tip above LEFT shoulder; quiver on anatomical LEFT rear flank as selected in the input. Preserve subtle violet Veil edging without losing limbs. No extra human legs, rider or detached horse. No labels, text, logos, captions, scenery, extra entities or revealed history.",
+        "portrait": "Use case: identity-preserve. Asset: production portrait for Rift Centaur from Severed Lands. Input image1 is the selected canonical complete reference; input image2 is its reviewed multiview sheet. Change framing to a single portrait only, keeping this exact identity, materials and selected appearance. Appearance: One Large adult Rift Centaur with a mature humanlike upper torso and face joined naturally at the waist to a complete powerful charcoal-gray horse body. Exactly two human arms and four equine legs ending in hooves, with one long black horse tail. Weathered warm gray-tan skin, a serious watchful expression, muted hazel eyes and long black hair tied in a practical braid. A plain dark brown hide vest fully covers the human chest, with simple leather belts at the join to the horse body. Their anatomical RIGHT hand holds one long plain pike upright beside the body, its entire shaft and point visible; one longbow is secured diagonally behind the upper torso with its upper tip above the LEFT shoulder, and one plain quiver sits on the LEFT rear flank. Subtle translucent violet Veil edging along the outer silhouette suggests partial phasing while all four legs remain clearly visible and solid enough to read. Centaur form, Veil phasing, territorial bearing, pike and longbow follow the authored source; face, colors, clothing and equipment details are editable visual defaults. No additional human legs, detached horse, rider, extra arms, second creature, missing hooves, nudity, crest, readable text, herd, victim or grassland scenery. Square 1024x1024 PNG, one complete head-and-shoulders portrait with upper chest/forebody visible. Center the head horizontally at50%, eye line around36% from top, head/crest/comb top near10%, chin/lower jaw around72%; natural proportions. Keep all ears, comb tips, beak tip and head silhouette inside comfortable margins. Preserve the exact face/species anatomy, eyes, hair/feathers/plates, colors and expression. No hands or weapons in frame. Preserve the mature HUMANLIKE face, black braid, muted hazel eyes, plain hide vest and restrained violet Veil edging. No equine head or extra ears. Plain light neutral gray background and matching polished naturalistic digital RPG illustration with soft studio light. No circular cutout, border, labels, detail panels, UI, scenery, additional beings, text or revealed secrets."
+      }
+    },
+    {
+      "id": "severed-monster-rift-cinder",
+      "name": "Rift Cinder",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-cinder.md",
+          "sha256": "c142da39fbdeffcaf21e1335bbdb871262c63278e2e4b90804f1dbc6692b4e37",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-cinder.md",
+          "sha256": "ea7447184811de61c60de651750550ad23d382b9aeb6bfdd3715797046dfeadd",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Small Rift Cinder elemental: a single complete irregular drifting haze of hot charcoal-gray ash and fine smoke, with many distinct dull orange and amber embers suspended through it and a restrained small violet Rift spark near its center. A loose broad cloud silhouette with uneven soft edges, ash wisps and a few glowing coals trailing immediately beneath as part of the same entity. The hot ash-and-ember haze animated by a Rift spark follows the authored Setting lore; exact plume shape, ember pattern, colors and density are editable visual defaults. This is a faceless nonhumanoid cloud, with no solid body, head, face, eyes, mouth, arms, fists, legs, wings or feet. No fire imp, humanoid flame, skull in the smoke, tornado funnel, separate elemental, burning house, battlefield, victims, explosion, symbols, dead-language text or scenery.",
+        "full_body": {
+          "path": "assets/characters/a7b0da5a7a39815258cee7c98c2de91a3d20609641dd871b02848d4121351b63.png",
+          "sha256": "a7b0da5a7a39815258cee7c98c2de91a3d20609641dd871b02848d4121351b63"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/326de97a865e62d186cd082d93e8f872cbf448d8e8ab6ecfe0b9a45fe3bbea35.png",
+          "sha256": "326de97a865e62d186cd082d93e8f872cbf448d8e8ab6ecfe0b9a45fe3bbea35"
+        },
+        "portrait": {
+          "path": "assets/characters/39712cd2b8aef9e8361435c20a8b7050d4ad1231feaa1f5e2dfa52d715a25e25.png",
+          "sha256": "39712cd2b8aef9e8361435c20a8b7050d4ad1231feaa1f5e2dfa52d715a25e25"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1939893
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 1964942
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 1815699
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete enemy reference for Rift Cinder in Sylvia GM's Severed Lands. Portrait-orientation 1024x1536 PNG, polished naturalistic digital RPG illustration, tactile or elemental materials as appropriate, plain light neutral gray backdrop, soft natural studio light with subtle grounding shadow. One complete single subject in a near-front three-quarter view. Every head, limb, hoof, tail tip, weapon tip, outer stone edge or ash wisp must stay comfortably inside all margins. Appearance: One Small Rift Cinder elemental: a single complete irregular drifting haze of hot charcoal-gray ash and fine smoke, with many distinct dull orange and amber embers suspended through it and a restrained small violet Rift spark near its center. A loose broad cloud silhouette with uneven soft edges, ash wisps and a few glowing coals trailing immediately beneath as part of the same entity. The hot ash-and-ember haze animated by a Rift spark follows the authored Setting lore; exact plume shape, ember pattern, colors and density are editable visual defaults. This is a faceless nonhumanoid cloud, with no solid body, head, face, eyes, mouth, arms, fists, legs, wings or feet. No fire imp, humanoid flame, skull in the smoke, tornado funnel, separate elemental, burning house, battlefield, victims, explosion, symbols, dead-language text or scenery. Preserve the authored anatomy and equipment; show no additional beings, captions, labels, logos, borders, UI or narrative secrets.",
+        "reference_sheet": "Use case: identity-preserve. Asset: production multiview reference sheet for Rift Cinder from Severed Lands. Input image 1 is the selected canonical complete reference. Preserve its exact identity, anatomy or elemental form, palette, materials and equipment. Appearance: One Small Rift Cinder elemental: a single complete irregular drifting haze of hot charcoal-gray ash and fine smoke, with many distinct dull orange and amber embers suspended through it and a restrained small violet Rift spark near its center. A loose broad cloud silhouette with uneven soft edges, ash wisps and a few glowing coals trailing immediately beneath as part of the same entity. The hot ash-and-ember haze animated by a Rift spark follows the authored Setting lore; exact plume shape, ember pattern, colors and density are editable visual defaults. This is a faceless nonhumanoid cloud, with no solid body, head, face, eyes, mouth, arms, fists, legs, wings or feet. No fire imp, humanoid flame, skull in the smoke, tornado funnel, separate elemental, burning house, battlefield, victims, explosion, symbols, dead-language text or scenery. Landscape 1536x1024 PNG, plain light neutral gray background, matching naturalistic digital RPG illustration and soft studio lighting. Three clearly separated COMPLETE front, side-profile and back views at consistent scale, with one smaller close detail panel at far right. Every limb, hoof, tail, crest, weapon tip, stone edge and ash wisp must remain comfortably inside each view's margins. Change viewing angle only. Three complete angles of the SAME FACELESS ash-and-ember haze, never a humanoid. Preserve charcoal ash, orange embers, central small violet spark, broad irregular plume and trailing coals. Detail panel shows ash/embers only. No eyes, face, head, arms, legs, tornado funnel, skull or second creature. No labels, text, logos, captions, scenery, extra entities or revealed history.",
+        "portrait": "Use case: identity-preserve. Asset: production portrait for Rift Cinder from Severed Lands. Input image1 is the selected canonical complete reference; input image2 is its reviewed multiview sheet. Change framing to a single portrait only, keeping this exact identity, materials and selected appearance. Appearance: One Small Rift Cinder elemental: a single complete irregular drifting haze of hot charcoal-gray ash and fine smoke, with many distinct dull orange and amber embers suspended through it and a restrained small violet Rift spark near its center. A loose broad cloud silhouette with uneven soft edges, ash wisps and a few glowing coals trailing immediately beneath as part of the same entity. The hot ash-and-ember haze animated by a Rift spark follows the authored Setting lore; exact plume shape, ember pattern, colors and density are editable visual defaults. This is a faceless nonhumanoid cloud, with no solid body, head, face, eyes, mouth, arms, fists, legs, wings or feet. No fire imp, humanoid flame, skull in the smoke, tornado funnel, separate elemental, burning house, battlefield, victims, explosion, symbols, dead-language text or scenery. Square 1024x1024 PNG of ONE COMPLETE FACELESS ENTITY centered x50%/y50%, about 80% of square width/height. Keep every outer stone edge or ash wisp inside comfortable margins and readable at map-token size. Do not invent eyes, a face, mouth, head or humanoid limbs. Plain light neutral gray background and matching polished naturalistic digital RPG illustration with soft studio light. No circular cutout, border, labels, detail panels, UI, scenery, additional beings, text or revealed secrets."
+      }
+    },
+    {
+      "id": "severed-monster-rift-cockatrice",
+      "name": "Rift Cockatrice",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-cockatrice.md",
+          "sha256": "b9f7ea16a57134121c11f2a4abf3fd681b03774fbcb6720b3e1d41caabd2055d",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-cockatrice.md",
+          "sha256": "998eaaee6cd84d07969155815ecb9f0fdcb76a096fe8dd26bd6b07b713628f68",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Small Rift Cockatrice, a bird-and-reptile hybrid in a low alert standing stance. A roosterlike head with a small muted rust-red comb, closed hooked horn-colored beak and two alert amber eyes; short copper-brown feathers cover its neck and forebody. Slate-green reptilian scales cover the underside, two scaly clawed bird legs and a long tapering serpentine tail that curves to the side with its complete tip visible. Exactly two folded leathery wings lie against the body, with dark copper membranes and visible supporting wing bones; no additional arms or forelegs. Tiny pale violet mineral flecks around the beak and throat hint at crystallized Veil-stuff without depicting an attack. The avian/reptilian hybrid and crystallized venom follow the authored source; specific anatomy, colors, comb, feather pattern and wing design are editable visual defaults. No mammal head, four-legged dragon body, extra wings, detached tail, living or petrified victim, stone statue, egg nest, Warden ruins, readable text or scenery.",
+        "full_body": {
+          "path": "assets/characters/c42943995404acf3ebe2e2480cd38964ce4d970c7deeb3f8c8167b0513ab8637.png",
+          "sha256": "c42943995404acf3ebe2e2480cd38964ce4d970c7deeb3f8c8167b0513ab8637"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/2a6c8ad6c4e7ca570c371df10ba9ca105727a5e3bbee91d0a64949e3db7814a8.png",
+          "sha256": "2a6c8ad6c4e7ca570c371df10ba9ca105727a5e3bbee91d0a64949e3db7814a8"
+        },
+        "portrait": {
+          "path": "assets/characters/5b21d9a282de936b7f9ca42444f6f701aca01548cab036a491b7dd3340062f8f.png",
+          "sha256": "5b21d9a282de936b7f9ca42444f6f701aca01548cab036a491b7dd3340062f8f"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1979575
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2303406
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2373853
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete enemy reference for Rift Cockatrice in Sylvia GM's Severed Lands. Portrait-orientation 1024x1536 PNG, polished naturalistic digital RPG illustration, tactile or elemental materials as appropriate, plain light neutral gray backdrop, soft natural studio light with subtle grounding shadow. One complete single subject in a near-front three-quarter view. Every head, limb, hoof, tail tip, weapon tip, outer stone edge or ash wisp must stay comfortably inside all margins. Appearance: One Small Rift Cockatrice, a bird-and-reptile hybrid in a low alert standing stance. A roosterlike head with a small muted rust-red comb, closed hooked horn-colored beak and two alert amber eyes; short copper-brown feathers cover its neck and forebody. Slate-green reptilian scales cover the underside, two scaly clawed bird legs and a long tapering serpentine tail that curves to the side with its complete tip visible. Exactly two folded leathery wings lie against the body, with dark copper membranes and visible supporting wing bones; no additional arms or forelegs. Tiny pale violet mineral flecks around the beak and throat hint at crystallized Veil-stuff without depicting an attack. The avian/reptilian hybrid and crystallized venom follow the authored source; specific anatomy, colors, comb, feather pattern and wing design are editable visual defaults. No mammal head, four-legged dragon body, extra wings, detached tail, living or petrified victim, stone statue, egg nest, Warden ruins, readable text or scenery. Preserve the authored anatomy and equipment; show no additional beings, captions, labels, logos, borders, UI or narrative secrets.",
+        "reference_sheet": "Use case: identity-preserve. Asset: production multiview reference sheet for Rift Cockatrice from Severed Lands. Input image 1 is the selected canonical complete reference. Preserve its exact identity, anatomy or elemental form, palette, materials and equipment. Appearance: One Small Rift Cockatrice, a bird-and-reptile hybrid in a low alert standing stance. A roosterlike head with a small muted rust-red comb, closed hooked horn-colored beak and two alert amber eyes; short copper-brown feathers cover its neck and forebody. Slate-green reptilian scales cover the underside, two scaly clawed bird legs and a long tapering serpentine tail that curves to the side with its complete tip visible. Exactly two folded leathery wings lie against the body, with dark copper membranes and visible supporting wing bones; no additional arms or forelegs. Tiny pale violet mineral flecks around the beak and throat hint at crystallized Veil-stuff without depicting an attack. The avian/reptilian hybrid and crystallized venom follow the authored source; specific anatomy, colors, comb, feather pattern and wing design are editable visual defaults. No mammal head, four-legged dragon body, extra wings, detached tail, living or petrified victim, stone statue, egg nest, Warden ruins, readable text or scenery. Landscape 1536x1024 PNG, plain light neutral gray background, matching naturalistic digital RPG illustration and soft studio lighting. Three clearly separated COMPLETE front, side-profile and back views at consistent scale, with one smaller close detail panel at far right. Every limb, hoof, tail, crest, weapon tip, stone edge and ash wisp must remain comfortably inside each view's margins. Change viewing angle only. Preserve the same roosterlike head, small rust-red comb, closed hooked beak, amber eyes, copper feather pattern, slate-green scales, exactly TWO clawed legs, TWO folded leathery wings and ONE complete serpentine tail. No extra forelegs/arms or extra wings. All comb, wing, claw and tail tips inside margins. No labels, text, logos, captions, scenery, extra entities or revealed history.",
+        "portrait": "Use case: identity-preserve. Asset: production portrait for Rift Cockatrice from Severed Lands. Input image1 is the selected canonical complete reference; input image2 is its reviewed multiview sheet. Change framing to a single portrait only, keeping this exact identity, materials and selected appearance. Appearance: One Small Rift Cockatrice, a bird-and-reptile hybrid in a low alert standing stance. A roosterlike head with a small muted rust-red comb, closed hooked horn-colored beak and two alert amber eyes; short copper-brown feathers cover its neck and forebody. Slate-green reptilian scales cover the underside, two scaly clawed bird legs and a long tapering serpentine tail that curves to the side with its complete tip visible. Exactly two folded leathery wings lie against the body, with dark copper membranes and visible supporting wing bones; no additional arms or forelegs. Tiny pale violet mineral flecks around the beak and throat hint at crystallized Veil-stuff without depicting an attack. The avian/reptilian hybrid and crystallized venom follow the authored source; specific anatomy, colors, comb, feather pattern and wing design are editable visual defaults. No mammal head, four-legged dragon body, extra wings, detached tail, living or petrified victim, stone statue, egg nest, Warden ruins, readable text or scenery. Square 1024x1024 PNG, one complete head-and-shoulders portrait with upper chest/forebody visible. Center the head horizontally at50%, eye line around36% from top, head/crest/comb top near10%, chin/lower jaw around72%; natural proportions. Keep all ears, comb tips, beak tip and head silhouette inside comfortable margins. Preserve the exact face/species anatomy, eyes, hair/feathers/plates, colors and expression. No hands or weapons in frame. Preserve its avian/reptilian head, rust-red comb, closed hooked beak, amber eyes and copper feathers with subtle violet throat flecks. No human face. Plain light neutral gray background and matching polished naturalistic digital RPG illustration with soft studio light. No circular cutout, border, labels, detail panels, UI, scenery, additional beings, text or revealed secrets."
+      }
+    },
+    {
+      "id": "severed-monster-rift-cyclops",
+      "name": "Rift Cyclops",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-cyclops.md",
+          "sha256": "8a1f14c014d77526378c692426e4db7fe33ff2fbb97eab1ba865cd07ab0474b7",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-cyclops.md",
+          "sha256": "452bd95afe440633c8cca9768d2fc660c677847a1a04554606005733fbff71bb",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Huge adult Riftborn Cyclops giant with a massive broad weathered humanlike body, charcoal-gray skin, two powerful arms and two sturdy legs, ordinary five-digit hands and bare feet. A mature lined face with exactly ONE large central eye, a muted pale violet iris and a single heavy central brow; no paired eye sockets or hidden second eye. Sparse coarse dark hair and a short rough dark-gray beard. A troubled contemplative oracle's expression with mouth closed. A plain rough brown open hide sleeveless vest and knee-length dark hide kilt clothe the torso and hips. The anatomical RIGHT hand holds one thick plain wooden greatclub low beside the body with its complete end visible; the LEFT hand holds one ordinary rough throwing rock at waist height. One-eyed giant anatomy, Veil-seeing bearing, greatclub and rock follow the authored Setting source; age styling, features, palette, clothing and equipment details are editable visual defaults. No extra eyes, face on the rock, extra limbs, pupil symbols, prophecy text, crown, dead-language writing, captive, gore, injury, coastal scenery or revealed vision.",
+        "full_body": {
+          "path": "assets/characters/68da25fa1c1743cb534b6748453a2a64dbeb95dea9e03fa92844eb0ca63b26cb.png",
+          "sha256": "68da25fa1c1743cb534b6748453a2a64dbeb95dea9e03fa92844eb0ca63b26cb"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/0111f191a9d1dda01d5ecb5eda80869230a5b1f0bb6f04c3ff8671c12222878a.png",
+          "sha256": "0111f191a9d1dda01d5ecb5eda80869230a5b1f0bb6f04c3ff8671c12222878a"
+        },
+        "portrait": {
+          "path": "assets/characters/1fc6349f25e2ec3cb6e2a9f148a5155da2f1fc46bb22583f231e393ac36695a3.png",
+          "sha256": "1fc6349f25e2ec3cb6e2a9f148a5155da2f1fc46bb22583f231e393ac36695a3"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2139988
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2405097
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2684220
+        }
+      },
+      "prompt_set": {
+        "full_body": "Original full-body generation:\nUse case: stylized-concept. Asset: canonical complete enemy reference for Rift Cyclops in Sylvia GM's Severed Lands. Portrait-orientation 1024x1536 PNG, polished naturalistic digital RPG illustration, tactile or elemental materials as appropriate, plain light neutral gray backdrop, soft natural studio light with subtle grounding shadow. One complete single subject in a near-front three-quarter view. Every head, limb, hoof, tail tip, weapon tip, outer stone edge or ash wisp must stay comfortably inside all margins. Appearance: One Huge adult Riftborn Cyclops giant with a massive broad weathered humanlike body, charcoal-gray skin, two powerful arms and two sturdy legs, ordinary five-digit hands and bare feet. A mature lined face with exactly ONE large central eye, a muted pale violet iris and a single heavy central brow; no paired eye sockets or hidden second eye. Sparse coarse dark hair and a short rough dark-gray beard. A troubled contemplative oracle's expression with mouth closed. A plain rough brown hide sleeveless vest and knee-length dark hide kilt cover chest and hips. The anatomical RIGHT hand holds one thick plain wooden greatclub low beside the body with its complete end visible; the LEFT hand holds one ordinary rough throwing rock at waist height. One-eyed giant anatomy, Veil-seeing bearing, greatclub and rock follow the authored Setting source; age styling, features, palette, clothing and equipment details are editable visual defaults. No extra eyes, face on the rock, extra limbs, pupil symbols, prophecy text, crown, dead-language writing, captive, gore, injury, coastal scenery or revealed vision. Preserve the authored anatomy and equipment; show no additional beings, captions, labels, logos, borders, UI or narrative secrets.\n\nSelected corrective edit:\nUse case: precise-object-edit. Correct ONLY the extra ordinary eye/socket in this Cyclops reference. The subject must have exactly ONE eye: retain the existing large CENTRAL pale-violet eye and its central brow. Remove every ordinary left/right human eye, lateral eyelid, extra eyebrow and lateral socket. Replace the small errant eye visible to the viewer's left of the central eye with continuous natural charcoal-gray skin, merging smoothly between the central brow, nose bridge, cheek and temple. Both sides of the central eye must be natural unbroken skin, not closed extra eyes. This is anatomically a one-eyed Cyclops, never a human with a third forehead eye. Preserve the rest of the image exactly: mature contemplative face, nose, mouth, beard, hair, massive body, two arms, two legs, fingers/toes, open hide vest, hide kilt, wooden greatclub in anatomical RIGHT hand, rock in LEFT hand, composition, whole body, plain gray background and lighting. No additional features, beings or text. Output portrait PNG.",
+        "reference_sheet": "Use case: identity-preserve. Asset: production multiview reference sheet for Rift Cyclops from Severed Lands. Input image 1 is the selected canonical complete reference. Preserve its exact identity, anatomy or elemental form, palette, materials and equipment. Appearance: One Huge adult Riftborn Cyclops giant with a massive broad weathered humanlike body, charcoal-gray skin, two powerful arms and two sturdy legs, ordinary five-digit hands and bare feet. A mature lined face with exactly ONE large central eye, a muted pale violet iris and a single heavy central brow; no paired eye sockets or hidden second eye. Sparse coarse dark hair and a short rough dark-gray beard. A troubled contemplative oracle's expression with mouth closed. A plain rough brown open hide sleeveless vest and knee-length dark hide kilt clothe the torso and hips. The anatomical RIGHT hand holds one thick plain wooden greatclub low beside the body with its complete end visible; the LEFT hand holds one ordinary rough throwing rock at waist height. One-eyed giant anatomy, Veil-seeing bearing, greatclub and rock follow the authored Setting source; age styling, features, palette, clothing and equipment details are editable visual defaults. No extra eyes, face on the rock, extra limbs, pupil symbols, prophecy text, crown, dead-language writing, captive, gore, injury, coastal scenery or revealed vision. Landscape 1536x1024 PNG, plain light neutral gray background, matching naturalistic digital RPG illustration and soft studio lighting. Three clearly separated COMPLETE front, side-profile and back views at consistent scale, with one smaller close detail panel at far right. Every limb, hoof, tail, crest, weapon tip, stone edge and ash wisp must remain comfortably inside each view's margins. Change viewing angle only. Preserve exactly ONE central pale-violet eye and its single central brow in every head view. There are NO normal left/right human eyes, lateral sockets, lateral eyelids or paired eyebrows, including in the detail panel. Preserve mature face/beard, massive body, TWO arms and TWO legs, open hide vest, kilt, wooden greatclub in anatomical RIGHT hand and throwing rock in LEFT hand. No labels, text, logos, captions, scenery, extra entities or revealed history.",
+        "portrait": "Use case: identity-preserve. Asset: production portrait for Rift Cyclops from Severed Lands. Input image1 is the selected canonical complete reference; input image2 is its reviewed multiview sheet. Change framing to a single portrait only, keeping this exact identity, materials and selected appearance. Appearance: One Huge adult Riftborn Cyclops giant with a massive broad weathered humanlike body, charcoal-gray skin, two powerful arms and two sturdy legs, ordinary five-digit hands and bare feet. A mature lined face with exactly ONE large central eye, a muted pale violet iris and a single heavy central brow; no paired eye sockets or hidden second eye. Sparse coarse dark hair and a short rough dark-gray beard. A troubled contemplative oracle's expression with mouth closed. A plain rough brown open hide sleeveless vest and knee-length dark hide kilt clothe the torso and hips. The anatomical RIGHT hand holds one thick plain wooden greatclub low beside the body with its complete end visible; the LEFT hand holds one ordinary rough throwing rock at waist height. One-eyed giant anatomy, Veil-seeing bearing, greatclub and rock follow the authored Setting source; age styling, features, palette, clothing and equipment details are editable visual defaults. No extra eyes, face on the rock, extra limbs, pupil symbols, prophecy text, crown, dead-language writing, captive, gore, injury, coastal scenery or revealed vision. Square 1024x1024 PNG, one complete head-and-shoulders portrait with upper chest/forebody visible. Center the head horizontally at50%, eye line around36% from top, head/crest/comb top near10%, chin/lower jaw around72%; natural proportions. Keep all ears, comb tips, beak tip and head silhouette inside comfortable margins. Preserve the exact face/species anatomy, eyes, hair/feathers/plates, colors and expression. No hands or weapons in frame. Exactly ONE LARGE CENTRAL pale-violet eye and ONE central brow. Both lateral eye positions are continuous natural charcoal-gray skin, no ordinary paired human eyes, closed extra eyes, lateral eyelids, sockets or eyebrows. Preserve the corrected reference anatomy, mature face, beard and expression. Plain light neutral gray background and matching polished naturalistic digital RPG illustration with soft studio light. No circular cutout, border, labels, detail panels, UI, scenery, additional beings, text or revealed secrets."
+      }
     }
   ]
 }
