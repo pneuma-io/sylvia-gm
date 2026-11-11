@@ -376,6 +376,8 @@ PYTHON_JOURNEYS = {
         'tests/test_session_reasoning_preferences.py',
         'tests/test_alpha_admin_full_audit.py',
         'tests/test_builder_native_thinking.py',
+        'tests/test_claude_native_protocol.py',
+        'tests/test_claude_runtime.py',
     ],
     "bundled-content": [
         "tests/test_plan_snapshot_cache.py",
@@ -623,6 +625,7 @@ UI_JOURNEY = [
     'tests/frontend_campaign_sequel.browser.cjs',
     'tests/frontend_campaign_start.test.cjs',
     'tests/frontend_character_target.test.cjs',
+    'tests/frontend_claude_connection.browser.cjs',
     'tests/frontend_compact_queue.test.cjs',
     'tests/frontend_content_security.browser.cjs',
     'tests/frontend_coordinate_zone_legend.cjs',
