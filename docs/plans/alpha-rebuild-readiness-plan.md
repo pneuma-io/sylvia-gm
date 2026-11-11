@@ -238,7 +238,7 @@ source editions pass offline verification against actual current Lite payloads a
 The authored roster check passed in 6.76 seconds for 218 subjects/297 source editions. Completed
 owner/frontend/native matrices were not replayed for this artwork-only increment. The broader
 catalogue, everyday journeys and deferred acceptance remain unfinished.
-Rift Doppelganger, Dust, Earth, Ettercap, Ettin and Fire now have complete full-body, multiview
+At 29042e4, Rift Doppelganger, Dust, Earth, Ettercap, Ettin and Fire gained full-body, multiview
 and portrait bundles, bringing the catalogue to 140 complete bundles. Doppelganger has an editable
 representative appearance, without declaring a canonical true form or impersonation. Dust, Earth
 and Fire retain their distinct faceless forms; Ettercap retains its selected four-eye arrangement.
@@ -299,18 +299,24 @@ across the current and retained Lite sources. Exact file/JSON Pointer/hash bindi
 to the selected Setting. Portrait lookup uses admitted metadata without parsing the large
 definition files. Producer and owner composition checks cover these bindings and used-art
 transfer with generation Off; these fixtures do not supply the missing production artwork.
-Eleven inherited forms now reuse their prepared Severed Lands renditions: Ankheg, Basilisk,
+Seventeen inherited forms now reuse their prepared Severed Lands renditions: Ankheg, Basilisk,
 Darkmantle, Death Dog, Gelatinous Cube, Doppelganger, Dust Mephit, Earth Elemental, Ettercap, Ettin
-and Fire Elemental. Exact Ruleset file/hash/JSON Pointer plus Setting scope selects the existing
-complete bundle, with no copied images or changed mechanics. The six new bindings pass actual
-current Lite byte/metadata lookup and wrong Setting/hash/package/pointer refusal. This qualifies
-artwork lookup only; it does not qualify inherited form execution.
+and Fire Elemental, plus Air Elemental, Behir, Bulette, Cockatrice, Flesh Golem and Magmin. Flesh
+Golem uses the prepared Anchor Guardian look; Magmin uses Rift Cinder. These are Setting-specific
+artwork choices; mechanical payloads and runtime identities are unchanged. Exact Ruleset
+file/hash/JSON Pointer plus Setting scope selects the existing complete bundle. The six new
+bindings pass actual current Lite byte/metadata lookup and wrong Setting/hash/package/pointer
+refusal. All 140 visual records, prompts and crops and all earlier bindings are preserved; the
+eighteen reused PNGs pass exact-byte/hash lookup. No images were created or copied, and external
+resources remain unchanged. This qualifies artwork lookup only; inherited form execution remains
+unqualified by this check.
 Other Settings do not inherit those renditions. The mixed NPC/creature journey selects one
 Basilisk through its inherited form and another through its authored Rift profile, preserving
-independent crops and offline used-art recovery. The remaining 325 inherited forms still need art.
-The current actual-image/resource/alias check passed in 84.91 seconds, including refusal outside
-Severed Lands; the mixed authored/inherited/NPC offline journey passed in 73.42 seconds. All
-33 visual bundles and their previous bindings are unchanged. These are source checks only.
+independent crops and offline used-art recovery. The remaining 313 inherited forms still need art.
+At 3b7cc8a, the original five-form actual-image/resource/alias check passed in 84.91 seconds,
+including refusal outside Severed Lands; the mixed authored/inherited/NPC offline journey passed
+in 73.42 seconds. All 33 then-current visual bundles and previous bindings were preserved. Those
+source checks were not replayed for the current six-binding data addition.
 Review of all eighteen shipped/retained Plan narratives identified seventy-two prose-only named
 subjects, including side-story cast and the Vigilant Engine. The production roster preserves
 separate identities for same-named people in different Plans. Exact accepted-Plan ID, cited prose,

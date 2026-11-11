@@ -724,6 +724,12 @@
           "path": "content/monsters/anchor-guardian-flesh.md",
           "sha256": "a1d130d4a909a23e5a875874631ddaac7db01b88cdd4b31ee4df6a1683be88da",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/flesh_golem",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -1473,6 +1479,12 @@
           "package_id": "pneuma.severed-lands",
           "path": "content/monsters/rift-behir.md",
           "sha256": "b50dea23ff2836746a0a2b1eb533112776be2262eee235c642d6fed9bc6562b9",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/behir",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -7898,6 +7910,12 @@
           "path": "content/monsters/rift-air.md",
           "sha256": "cb202b14facf279be76014bdd8d03e6f1aa9381ee074ef75e279eafeacfee241",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/air_elemental",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -8078,6 +8096,12 @@
           "path": "content/monsters/rift-bulette.md",
           "sha256": "db2dc1f9fe42572e596039cae87e7b594edc25992b771fabe7774c86949c763a",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/bulette",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -8198,6 +8222,12 @@
           "path": "content/monsters/rift-cinder.md",
           "sha256": "ea7447184811de61c60de651750550ad23d382b9aeb6bfdd3715797046dfeadd",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/magmin",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -8257,6 +8287,12 @@
           "package_id": "pneuma.severed-lands",
           "path": "content/monsters/rift-cockatrice.md",
           "sha256": "998eaaee6cd84d07969155815ecb9f0fdcb76a096fe8dd26bd6b07b713628f68",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/cockatrice",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
