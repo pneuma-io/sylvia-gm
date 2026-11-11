@@ -97,6 +97,22 @@ or turn-clock rule is added here.
 Portrait references, committed movement cues, class lane grants and final combined 1:1
 mock-up/Opus acceptance retain their separate contracts. Mechanics proof does not close them.
 
+**Cover correction on integration resumption, selected 11 November 2026.** Cover follows actual
+height, stance and firing direction. Standing upper bodies remain exposed above low walls;
+crouching close behind one can shelter the body from the opposite side. A full-height wall can
+obstruct a distant shot. Do not add a blanket adjacency rule. Five source geometry probes passed,
+including clear upper-body paths over low walls, crouched protection from the opposite side only,
+and a full-height wall blocking a distant shot. These are not final native projectile checks.
+
+The retained demo labels its struck barrier half-height and scripts cover/penetration contacts
+where the matching geometry gives a clear upper-body path. Daniel selected correcting this when
+integration recommences. Reconcile the demonstration with the frontend owner: distant standing
+actors need an actual full-height obstruction for the shown wall contacts, or a different scene
+with physically valid low-cover poses and firing angles. Relabelling alone is insufficient;
+verify every shown contact against geometry and the resolved shot. Qualify these directional
+cover cases and the resulting stop/penetration cues in the final app before balancing. This
+correction and native qualification remain open; no demo or runtime repair is claimed here.
+
 The public compiler accepts optional private notes as an input. Public packages omit
 `references/canon/`; private local builds may include it. TD vault notes and Siren remain
 private. Public GM/Builder reads use compiled reference guides/catalogues and runtime
@@ -138,7 +154,7 @@ history and old release source archives; this work does not rewrite history.
 | Work | Current boundary |
 |---|---|
 | Frontend overhaul, PR #28 | Merged on main `6526904` before PR #6. PR #6 owns its composed TD qualification; source/browser evidence does not by itself establish final installed acceptance. |
-| Trigger Discipline integration, PR #6 | Separate active owner; draft `34eb451` changes documentation only after source-checked `573b015`, which combines TD `72522a8` and main-targeted hotfix `11c279d` with no conflict. All code and package bytes are identical. Daniel deferred Round display and its counter to the later frontend pass; neither blocks this integration. TD package/frontend/Rust bytes retain native-tested `4b438d7` provenance; build 17 and its native replay are separate evidence. Eight final source checks and Full/AP2 owner-process plus loopback narration checks pass at `573b015`. Host desktop control, balancing, merge and release remain held. Privacy removal is complete; public packages exclude canonical vault text, and full public-session adequacy without private prose/future Rulebook remains unproven. The final combined refactor/hotfix candidate needs rebuilding and its own selected native qualification. |
+| Trigger Discipline integration, PR #6 | Separate active owner; draft `98861e0` changes documentation only after source-checked `573b015`, which combines TD `72522a8` and main-targeted hotfix `11c279d` with no conflict. All code and package bytes are identical. Daniel deferred Round display and its counter to the later frontend pass; neither blocks this integration. TD package/frontend/Rust bytes retain native-tested `4b438d7` provenance; build 17 and its native replay are separate evidence. Eight final source checks and Full/AP2 owner-process plus loopback narration checks pass at `573b015`. Host desktop control, balancing, merge and release remain held. Privacy removal is complete; public packages exclude canonical vault text, and full public-session adequacy without private prose/future Rulebook remains unproven. The final combined refactor/hotfix candidate needs rebuilding and its own selected native qualification. |
 | Refactor, [PR #33](https://github.com/pneuma-io/sylvia-gm/pull/33) | Stages 1-8, including stage 7A, are implemented and undergoing final local qualification. The PR records exact checked heads, commands, outcomes, strict suspected defects and remaining baseline gaps. Independent acceptance and the final combined candidate remain open. Stage 9 (`app.js` and WebUI script policy) waits for PR #6 to merge; PR #28 is already merged. Broad formatting remains deferred while open PRs change source. |
 | SRD Full, PR #3 | Parked, inactive work; it does not expand the 117-spell Lite launch roster. |
 | GM memory and casting hotfix | Separate draft [PR #36](https://github.com/pneuma-io/sylvia-gm/pull/36), corrected checked main-source `6de3c9c`; GitHub main remains `6526904`. The prior `11c279d` staged Sunburst/Fire Storm recipient refusals are repaired; the owner records both original witnesses plus recipient-ownership/refusal, GM, upgrade and package checks passing across 55 unique final cases per source variant. Main supplies Lite 0.3.20; the separate Alpha4 backport supplies source 0.3.19. Existing `e543957` native evidence covers older 0.3.17 bytes and does not qualify this correction. The current refactor/TD composition is being reconciled against exact `6de3c9c`; no stable full/build/native/genuine-provider acceptance, merge or release is inferred. |
