@@ -17,11 +17,11 @@ if TYPE_CHECKING:
     from sylvia_gm.application.authority import AuthorityOwner
 
 
-def _styles() -> tuple[ArtStyle, ...]:
+def _styles(*, include_retained: bool = False) -> tuple[ArtStyle, ...]:
     path = _art_root() / "character-art.json"
     if not path.is_file():
         return ()
-    return catalogue_art_styles(json.loads(path.read_bytes()))
+    return catalogue_art_styles(json.loads(path.read_bytes()), include_retained=include_retained)
 
 
 def selected_art_style(owner: AuthorityOwner, session_id: str) -> dict[str, Any] | None:
@@ -55,7 +55,7 @@ def selected_art_style(owner: AuthorityOwner, session_id: str) -> dict[str, Any]
 def style_reference(value: object) -> ImageData:
     """Read only a declared content-addressed style image with matching original bytes."""
     style = parse_art_style(value)
-    if style not in _styles():
+    if style not in _styles(include_retained=True):
         raise ValueError("The saved artwork style is unavailable; restore Sylvia's artwork library")
     root = _art_root().resolve()
     path = root / style.reference_path

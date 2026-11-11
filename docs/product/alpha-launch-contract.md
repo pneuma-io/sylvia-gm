@@ -1071,7 +1071,8 @@ Failed, refused, cancelled and interrupted requests never automatically retry.
 The selected Setting may supply a rendering default and a separate style reference. Explicit
 user style choices take precedence; style references never replace a subject's canonical
 appearance, anatomy or map geometry. Severed Lands uses the owner-selected dark heroic fantasy
-painting with anime-influenced character drawing. A changed default does not regenerate existing
+illustration defined by the [K art guide](../../artwork/styles/severed-lands-k.md), with anime
+drawing as its foundation and selective painted depth. A changed default does not regenerate existing
 artwork or retry an old request.
 
 Complete character artwork is one user-facing request. Sylvia prepares the missing reference

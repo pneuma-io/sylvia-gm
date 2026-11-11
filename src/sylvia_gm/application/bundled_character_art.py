@@ -36,7 +36,9 @@ def artwork_payload_paths(catalogue_bytes: bytes) -> frozenset[str]:
     ):
         raise ValueError("The shared artwork catalogue is invalid")
     paths = {"artwork/character-art.json"}
-    paths.update("artwork/" + style.reference_path for style in catalogue_art_styles(catalogue))
+    paths.update("artwork/" + style.reference_path for style in catalogue_art_styles(
+        catalogue, include_retained=True,
+    ))
     retained = catalogue.get("retained_assets", [])
     if not isinstance(retained, list):
         raise ValueError("Retained artwork references are invalid")

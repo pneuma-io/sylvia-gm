@@ -39,8 +39,12 @@ Daniel's subsequent portrait comparison reopened visual fidelity. The prepared K
 pass technical source/resource checks, but their drawing, texture and colour treatment are not
 accepted as a match to his supplied reference. Catalogue expansion now follows one controlled
 Marla portrait correction with her design fixed and the exact comparison image supplied separately
-for style. That local preview is not adopted into the catalogue; illustration style versus broader
-character-design feedback remains open. The selected K default and existing saved assets are unchanged.
+for style. Daniel clarified that the loss of anime influence is the concern and requested a more
+comprehensive guide. The K guide now specifies anime facial/eye/hair construction, deliberate
+shadow shapes, colour separation and selective materials, with the exact benchmark supplied at
+every stage. New requests use this versioned brief; retained earlier styles keep admitted flows
+usable. A complete fixed-design Marla calibration is under review. Existing character artwork is
+unchanged, and no calibration preview has been adopted into the catalogue.
 
 **10 November 2026: GPT Images phase one (PL-10).** The owner selected generation/editing through
 the managed ChatGPT subscription connection, Off/Review/Auto permissions, saved full-body and

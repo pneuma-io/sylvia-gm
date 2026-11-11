@@ -56,10 +56,29 @@ def test_lite_builder_gm_reopen_and_map_use_the_same_setting_style(tmp_path, mon
     )
     service = ImageArt(owner, adapters=(provider,), settings=lambda: {"mode": "review"})
     style = service.default_style(session_id)
-    assert style["id"] == "severed-lands-dark-heroic-fantasy-k-v1"
+    assert style["id"] == "severed-lands-anime-heroic-k-v2"
+    guide = (ROOT / "artwork/styles/severed-lands-k.md").read_text(encoding="utf-8")
+    assert style["brief"] == guide.split("## Rendering brief\n\n", 1)[1].split(
+        "\n## Reference workflow", 1,
+    )[0].strip()
     assert service.default_style("gm-style") == style
     assert service.view(session_id)["style_default"] == style
     assert provider.calls == []
+
+    # A request admitted under v1 must finish after the library moves to the new guide.
+    catalogue = json.loads((ROOT / "artwork/character-art.json").read_bytes())
+    old_style = catalogue["retained_styles"][0]
+    art_root = tmp_path / "artwork"
+    for declared in catalogue_art_styles(catalogue, include_retained=True):
+        path = art_root / declared.reference_path
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes((ROOT / "artwork" / declared.reference_path).read_bytes())
+    catalogue_path = art_root / "character-art.json"
+    catalogue_path.write_text(json.dumps({
+        **catalogue, "styles": [old_style], "retained_styles": [],
+    }), encoding="utf-8")
+    monkeypatch.setattr(bundled_art_styles, "_art_root", lambda: art_root)
+    assert service.default_style(session_id) == old_style
     row = service.request(
         session_id, operation_id="new-character", purpose="character", name="Synthetic scout",
         appearance="Adult scout, green eyes, plain red coat, no armor",
@@ -68,7 +87,9 @@ def test_lite_builder_gm_reopen_and_map_use_the_same_setting_style(tmp_path, mon
     assert provider.calls == []
     adopted = _run(service, session_id, row)
     row = adopted["next_request"]
-    assert json.loads(service.store.get(row["operation_id"])["request_json"])["style"] == style
+    assert json.loads(service.store.get(row["operation_id"])["request_json"])["style"] == old_style
+    catalogue_path.write_text(json.dumps(catalogue), encoding="utf-8")
+    assert service.default_style(session_id) == style
     service.close()
     owner.close()
 
@@ -80,13 +101,14 @@ def test_lite_builder_gm_reopen_and_map_use_the_same_setting_style(tmp_path, mon
         for stage in ("reference_sheet", "portrait"):
             assert row["purpose"] == stage
             saved = json.loads(service.store.get(row["operation_id"])["request_json"])
-            assert saved["style"] == style
+            assert saved["style"] == old_style
             adopted = _run(service, session_id, row)
             if stage == "reference_sheet":
                 row = adopted["next_request"]
         assert [len(call.reference_images) for call in provider.calls] == [1, 2, 3]
-        assert all(call.reference_images[-1].sha256 == style["reference"]["sha256"]
+        assert all(call.reference_images[-1].sha256 == old_style["reference"]["sha256"]
                    for call in provider.calls)
+        assert old_style["brief"] in provider.calls[0].prompt
         assert all(
             "Adult scout, green eyes, plain red coat" in call.prompt for call in provider.calls
         )
@@ -110,6 +132,7 @@ def test_lite_builder_gm_reopen_and_map_use_the_same_setting_style(tmp_path, mon
         ]
         assert "do not force a night scene" in request.prompt
         assert "daytime ruined courtyard" in request.prompt
+        assert style["brief"] in request.prompt
     finally:
         service.close()
         owner.close()
@@ -153,6 +176,19 @@ def test_style_reference_and_resource_inventory_refuse_tampering(tmp_path, monke
     assert "artwork/" + style.reference_path in artwork_payload_paths(raw)
     assert resources["../artwork/" + style.reference_path] == "artwork/" + style.reference_path
     assert image.sha256 == style.reference_sha256
+    previous = catalogue_art_styles(catalogue, include_retained=True)[1]
+    assert bundled_art_styles.style_reference(previous.as_payload()).sha256 == (
+        previous.reference_sha256
+    )
+    assert "artwork/" + previous.reference_path in artwork_payload_paths(raw)
+    assert previous not in catalogue_art_styles(catalogue)
+    assert resources["../artwork/" + previous.reference_path] == (
+        "artwork/" + previous.reference_path
+    )
+    with pytest.raises(ValueError, match="conflicting"):
+        catalogue_art_styles({"styles": [style.as_payload()], "retained_styles": [
+            style.as_payload(),
+        ]})
     retained = catalogue["retained_assets"][0]
     assert bundled_character_image(retained["path"], retained["sha256"]) is not None
     assert "artwork/" + retained["path"] in artwork_payload_paths(raw)

@@ -1087,6 +1087,9 @@ uses its validated captured source selection. The request and complete character
 the default once, retaining it across stages and restart. The style image follows canonical
 character or map references and is identified as rendering guidance only. Explicit user style
 instructions in the art brief take precedence. Legacy requests without a style remain unchanged.
+`retained_styles` preserves complete earlier style records and their immutable PNGs when a new
+default is introduced. They remain usable by saved requests/flows but are never selected as new
+defaults. Changing a rendering brief therefore does not invalidate an admitted request's snapshot.
 When prepared appearances change, `retained_assets` keeps earlier declared PNGs addressable and
 `retained_sources` preserves hash-verified historical authored editions for producer checks and
 exact source aliases. These records do not mutate existing saved image selections or package pins.

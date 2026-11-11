@@ -12802,15 +12802,15 @@
   ],
   "styles": [
     {
-      "id": "severed-lands-dark-heroic-fantasy-k-v1",
-      "name": "Severed Lands — Dark heroic fantasy",
+      "id": "severed-lands-anime-heroic-k-v2",
+      "name": "Severed Lands K: anime illustration",
       "campaign_setting_ids": [
         "pneuma.severed-lands"
       ],
-      "brief": "Original dark heroic tabletop-fantasy painting with anime-influenced character drawing. Deep cool colored shadows, focused warm ivory light, substantial cloth/metal/leather, selective sharp highlights, oil-like painted volume and soft lost edges. Preserve the subject's own canonical identity, species, anatomy, age, appearance and equipment. Use the approved K board for rendering style only; use that subject's own references for visual identity. No photographic skin, 3D rendering, copied franchise character or glossy merchandise finish. Character studies may use a deep charcoal ground; keep portrait faces readable. Environment and map lighting follow their actual scene and purpose rather than forcing darkness. Explicit user style choices override this default.",
+      "brief": "Draw original heroic fantasy characters with a clearly anime foundation and a controlled painted\nfinish. Use the supplied style image to judge drawing, edge control and shading. Each subject's\nown references determine identity, age, species, build, complexion, hair and costume.\n\nFaces: construct a deliberate stylized face with clean cheek/jaw silhouettes and readable eye\nshapes. Give the upper eyelid a confident dark edge; design the iris, pupil and small catchlight\nas graphic shapes. Make brows and mouth economical expressive marks. Describe the nose through\na small designed contour and broad light/shadow shapes. Keep the face recognizable through\nshape and expression, with restrained surface detail.\n\nAge and anatomy: retain the actual subject's age, proportions and distinctive features. Older\nanime faces use mature silhouettes and a few intentional age lines; children retain their own\nproportions. Scars keep their established side and shape. Species and creatures retain their\nauthored anatomy. The reference character's youth, face and body are never a template for others.\n\nHair: design large interlocking locks and ribbon-like groups with a clear silhouette. Use\nselective interior lines, curved highlights and a few flyaways to explain those groups. Preserve\nthe subject's own cut, colour and hair texture; braids, curls and cropped hair remain distinct.\n\nShading: begin with broad, intentional shadow shapes that keep the drawing legible. Use controlled\nsoft transitions within those shapes to give painted depth; keep key facial and hair edges crisp.\nWarm ivory key light and cool coloured shadows support the drawing. Keep skin smooth at normal\nviewing size, with age marks chosen deliberately. Surface grain, pores, dirt and scratches are\nsecondary local details rather than a finish covering the entire face or costume.\n\nColour: preserve distinct local colours and the subject's natural complexion. Pale linen reads\nas pale linen; charcoal, plum, olive and auburn remain distinguishable under the same light.\nUse coloured shadows and selective accents to keep dark fantasy readable. Restrict amber light\nto illuminated planes instead of washing every material in a bronze filter. Never borrow the\nstyle character's skin or hair colour to achieve the match.\n\nMaterials: explain cloth folds, leather seams and metal edges with selected shapes and highlights.\nPlace texture where it describes a particular material or authored wear. Ornament belongs to\nthe subject's established design. A cook's apron and a guard's practical uniform receive the same\ncareful illustration as a scholar's cape without gaining its embroidery, jewellery or silhouette.\n\nComposition: give the subject a clear silhouette and character-appropriate expression. Keep\ncomplete heads, hair and equipment inside usable margins. Portraits retain recognizable eyes,\nface shape and expression at small UI sizes. Plain dark grounds suit reference studies; actual\nenvironment and lighting follow the requested asset. The final image must retain the benchmark's\nanime drawing even when its colour, age, species or clothing is very different.",
       "reference": {
-        "path": "assets/styles/5cdb120726f94a8b73f8d1cd1bcc61ea9f804123dd7effa72fb641b44eb57e6f.png",
-        "sha256": "5cdb120726f94a8b73f8d1cd1bcc61ea9f804123dd7effa72fb641b44eb57e6f"
+        "path": "assets/styles/61d44432da90c18380df603ff7dfce646a1c3d21253ca02b8251e669c9b53ffe.png",
+        "sha256": "61d44432da90c18380df603ff7dfce646a1c3d21253ca02b8251e669c9b53ffe"
       }
     }
   ],
@@ -13115,6 +13115,20 @@
     {
       "path": "assets/characters/9e69568b684f9a5a43b3f49160b909e53fc407479596ad234050185e6470673e.png",
       "sha256": "9e69568b684f9a5a43b3f49160b909e53fc407479596ad234050185e6470673e"
+    }
+  ],
+  "retained_styles": [
+    {
+      "id": "severed-lands-dark-heroic-fantasy-k-v1",
+      "name": "Severed Lands — Dark heroic fantasy",
+      "campaign_setting_ids": [
+        "pneuma.severed-lands"
+      ],
+      "brief": "Original dark heroic tabletop-fantasy painting with anime-influenced character drawing. Deep cool colored shadows, focused warm ivory light, substantial cloth/metal/leather, selective sharp highlights, oil-like painted volume and soft lost edges. Preserve the subject's own canonical identity, species, anatomy, age, appearance and equipment. Use the approved K board for rendering style only; use that subject's own references for visual identity. No photographic skin, 3D rendering, copied franchise character or glossy merchandise finish. Character studies may use a deep charcoal ground; keep portrait faces readable. Environment and map lighting follow their actual scene and purpose rather than forcing darkness. Explicit user style choices override this default.",
+      "reference": {
+        "path": "assets/styles/5cdb120726f94a8b73f8d1cd1bcc61ea9f804123dd7effa72fb641b44eb57e6f.png",
+        "sha256": "5cdb120726f94a8b73f8d1cd1bcc61ea9f804123dd7effa72fb641b44eb57e6f"
+      }
     }
   ]
 }

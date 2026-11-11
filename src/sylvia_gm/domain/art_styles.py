@@ -63,14 +63,21 @@ def parse_art_style(value: object) -> ArtStyle:
     )
 
 
-def catalogue_art_styles(catalogue: Mapping[str, Any]) -> tuple[ArtStyle, ...]:
-    """Legacy catalogues have no default; duplicate identities or defaults are refused."""
+def catalogue_art_styles(
+    catalogue: Mapping[str, Any], *, include_retained: bool = False,
+) -> tuple[ArtStyle, ...]:
+    """Retain immutable prior styles for saved requests without selecting them as defaults."""
     values = catalogue.get("styles", [])
-    if not isinstance(values, list) or len(values) > 64:
+    retained_values = catalogue.get("retained_styles", [])
+    if (
+        not isinstance(values, list) or not isinstance(retained_values, list)
+        or len(values) + len(retained_values) > 64
+    ):
         raise ValueError("The shared artwork styles are invalid")
     styles = tuple(parse_art_style(value) for value in values)
-    identities = [style.style_id for style in styles]
+    retained = tuple(parse_art_style(value) for value in retained_values)
+    identities = [style.style_id for style in (*styles, *retained)]
     settings = [setting for style in styles for setting in style.campaign_setting_ids]
     if len(set(identities)) != len(identities) or len(set(settings)) != len(settings):
         raise ValueError("The shared artwork styles have conflicting defaults")
-    return styles
+    return (*styles, *retained) if include_retained else styles
