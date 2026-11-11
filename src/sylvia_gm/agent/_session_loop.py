@@ -44,7 +44,7 @@ from sylvia_gm.domain.session import (
     SessionMessageKind,
     SessionRecord,
 )
-from sylvia_gm.provider._exceptions import ProviderError
+from sylvia_gm.provider._exceptions import ProviderError, ProviderOutputLimitError
 
 _AdmissionResult = TypeVar("_AdmissionResult")
 _MAX_PROVISIONAL_SESSION_CHARS = 256_000
@@ -842,8 +842,9 @@ class CampaignSessionLoop:
                 record_terminal(
                     "stopped" if active.control.cancelled else "interrupted",
                     reason_code=(
-                        loop_error.reason
-                        if isinstance(loop_error, AgentLoopError) and not active.control.cancelled
+                        None if active.control.cancelled
+                        else loop_error.reason if isinstance(loop_error, AgentLoopError)
+                        else "output_limit" if isinstance(error, ProviderOutputLimitError)
                         else None
                     ),
                 )

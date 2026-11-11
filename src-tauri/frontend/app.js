@@ -10221,6 +10221,10 @@ const SylviaGMFrontend = (() => {
           if (content.status === 'completed') return '';
           const explanation = content.status === 'interrupted' && content.reason_code === 'tool_limit'
             ? 'Builder reached its work limit after automatic continuation. Saved work is retained. Send a message to continue.'
+            : content.status === 'interrupted' && content.reason_code === 'repeated_step'
+            ? 'Builder stopped because it kept repeating the same step without making progress. Saved work is retained. Send a message to redirect it.'
+            : content.status === 'interrupted' && content.reason_code === 'output_limit'
+            ? 'Builder stopped because the model kept reaching its response limit. Saved work is retained. Ask for smaller steps or raise the Builder output token limit in Settings, then send a message to continue.'
             : content.status === 'interrupted' && content.reason_code === 'repeated_tool_failure'
             ? 'Builder stopped after repeated identical tool failures. Saved work is retained. Review the last tool error before continuing.'
             : content.status === 'interrupted' && content.reason_code === 'required_reference_unavailable'

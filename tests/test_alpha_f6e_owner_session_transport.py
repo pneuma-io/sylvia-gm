@@ -530,13 +530,14 @@ class _TruncatedBuilderProvider(_ScriptedProvider):
         timeout: float = 120.0,
         **kwargs: object,
     ) -> AsyncIterator[ProviderStreamChunk]:
-        del messages, tools, timeout, kwargs
+        del tools, timeout, kwargs
         self.calls += 1
+        self.last_messages = [dict(message) for message in messages]
         yield ProviderStreamChunk(
             content=(
-                "TRUNCATED BUILDER PROSE MUST NOT PERSIST"
+                "CUT-OFF BUILDER PROSE STAYS,"
                 if self.calls == 1
-                else "AUTOMATIC RETRY MUST NOT RUN"
+                else " AND THE REPLY IS FINISHED."
             ),
             reasoning_content="PRIVATE TRUNCATED REASONING",
             finish_reason="length" if self.calls == 1 else "stop",
@@ -2856,7 +2857,7 @@ def test_builder_steering_reaches_the_next_provider_call_after_a_tool_boundary(
         harness.close()
 
 
-def test_builder_truncation_drops_incomplete_prose_without_automatic_retry(
+def test_builder_truncation_keeps_shown_prose_and_continues_the_same_turn(
     tmp_path: Path,
 ) -> None:
     provider = _TruncatedBuilderProvider()
@@ -2878,8 +2879,14 @@ def test_builder_truncation_drops_incomplete_prose_without_automatic_retry(
         )
         reply = harness.read()
         assert reply["id"] == "submit-builder-truncation"
-        assert reply["ok"] is False
-        assert provider.calls == 1
+        assert reply["ok"] is True
+        assert provider.calls == 2
+        # The continuing request carries the cut-off text and the application's signal.
+        assert [message["role"] for message in provider.last_messages[-2:]] == [
+            "assistant", "user",
+        ]
+        assert provider.last_messages[-2]["content"] == "CUT-OFF BUILDER PROSE STAYS,"
+        assert provider.last_messages[-1]["content"].startswith("SYLVIA_GM_BUILDER_CONTINUE ")
 
         context = harness.request(
             "context-builder-truncation",
@@ -2887,11 +2894,17 @@ def test_builder_truncation_drops_incomplete_prose_without_automatic_retry(
             {"session_id": session_id},
         )
         assert context["provisional"] == []
-        assert [message["kind"] for message in context["messages"]] == ["user", "evidence"]
+        assert [message["kind"] for message in context["messages"]] == [
+            "user", "talk", "talk", "evidence",
+        ]
+        assert [
+            message["content"]["text"] for message in context["messages"]
+            if message["kind"] == "talk"
+        ] == ["CUT-OFF BUILDER PROSE STAYS,", " AND THE REPLY IS FINISHED."]
+        assert context["messages"][-1]["content"]["status"] == "completed"
         serialized = json.dumps(context)
-        assert "TRUNCATED BUILDER PROSE" not in serialized
         assert "PRIVATE TRUNCATED REASONING" not in serialized
-        assert "AUTOMATIC RETRY" not in serialized
+        assert "SYLVIA_GM_BUILDER_CONTINUE" not in serialized
     finally:
         harness.close()
 
