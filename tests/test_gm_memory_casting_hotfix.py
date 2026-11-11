@@ -50,39 +50,55 @@ SRD = "sylvia.srd-lite.bg3"
 @pytest.fixture(scope="module")
 def recipient_preflight_contract():
     runtime = yaml.load(
-        (Path(__file__).resolve().parents[1] / "rulesets/srd-lite/runtime/ruleset.yaml")
-        .read_bytes(),
+        (
+            Path(__file__).resolve().parents[1] / "rulesets/srd-lite/runtime/ruleset.yaml"
+        ).read_bytes(),
         Loader=yaml.CSafeLoader,
     )
     return runtime
 
 
+@pytest.mark.parametrize("tool_name", ("begin_srd_spell_action", "cast_spell_outside_combat"))
+@pytest.mark.parametrize("in_combat", (False, True))
 @pytest.mark.parametrize(
-    "tool_name", ("begin_srd_spell_action", "cast_spell_outside_combat")
-)
-@pytest.mark.parametrize(
-    "spell,targets,accepted",
+    "spell,target,targets,accepted_modes",
     (
-        ("sunburst", None, True),
-        ("fire_storm", [], True),
-        ("bless", None, False),
-        ("bless", [], False),
-        ("bless", ["hero"], True),
-        ("mass_cure_wounds", None, False),
-        ("fireball", None, False),
-        ("fireball", ["hero"], True),
+        ("sunburst", None, None, (True, True)),
+        ("fire_storm", None, [], (True, True)),
+        ("bless", None, None, (False, False)),
+        ("bless", "hero", None, (False, False)),
+        ("bless", None, [], (False, False)),
+        ("bless", None, ["hero"], (True, True)),
+        ("hold_person", "hero", None, (False, False)),
+        ("longstrider", "hero", None, (False, False)),
+        ("fire_shield", "hero", None, (True, True)),
+        ("beacon_of_hope", "hero", None, (True, True)),
+        ("mass_cure_wounds", None, None, (False, False)),
+        ("fireball", None, None, (False, True)),
+        ("fireball", None, [], (True, True)),
+        ("fireball", None, ["hero"], (True, True)),
+        ("shatter", None, [], (True, True)),
+        ("ice_storm", None, None, (True, True)),
+        ("burning_hands", None, None, (False, True)),
+        ("flame_strike", None, None, (False, True)),
+        ("acid_splash", None, None, (False, True)),
+        ("circle_of_death", None, None, (False, True)),
+        ("lightning_bolt", None, None, (False, True)),
+        ("cure_wounds", None, ["hero"], (False, False)),
+        ("magic_missile", None, ["hero"], (False, False)),
+        ("cure_wounds", "hero", None, (True, True)),
     ),
 )
 def test_recipient_preflight_preserves_engine_and_caller_ownership(
-    recipient_preflight_contract, tool_name, spell, targets, accepted
+    recipient_preflight_contract, tool_name, in_combat, spell, target, targets, accepted_modes
 ):
     runtime = recipient_preflight_contract
     checks = [
         check
         for check in runtime["tools"][tool_name]["pre_conditions"]
-        if check["error"].startswith("Missing input 'targets'.")
+        if check["error"].startswith(("Missing input 'target'.", "Missing input 'targets'."))
     ]
-    assert len(checks) == 1
+    assert checks
     gate = ToolDef(
         name="recipient-preflight",
         pre_conditions=checks,
@@ -90,32 +106,225 @@ def test_recipient_preflight_preserves_engine_and_caller_ownership(
     )
     result = execute_tool(
         gate.name,
-        {"spell": spell, "targets": targets},
+        {
+            "spell": spell,
+            "target": target,
+            "targets": targets,
+            "combat": {"encounter_active": in_combat},
+            "object_target_id": "",
+            "disintegrate_source_kind": "creature",
+        },
         {gate.name: gate},
         None,
         {},
         runtime["definitions"],
     )
+    accepted = accepted_modes[in_combat]
     assert result.success is accepted
     if accepted:
         assert result.context["_admitted"] is True
     else:
-        assert result.failure_reasons == (
-            "Missing input 'targets'. Select the actual recipients for this spell.",
-        )
+        assert len(result.failure_reasons) == 1
+        assert result.failure_reasons[0].startswith("Missing input '")
         assert "_admitted" not in result.context
 
 
-def test_staged_caller_selected_recipients_still_refuse_before_spending(tmp_path, monkeypatch):
+def test_recipient_ownership_follows_bindings_with_unrelated_spell_names():
+    from scripts.srd_lite_recipient_contract import recipient_contracts, recipient_requirements
+
+    runtime = {
+        "definitions": {
+            "srd_lite_implemented": ["novel_area", "novel_chosen", "novel_self"],
+            "srd_lite_aliases": {"novel_alias": "novel_chosen"},
+            "spells": {
+                "novel_area": {"family": "area", "range_kind": "distance"},
+                "novel_chosen": {"family": "selection", "range_kind": "distance"},
+                "novel_self": {"family": "selection", "range_kind": "self"},
+            },
+        },
+        "tools": {
+            "cast_spell": {
+                "parameters": [{"name": name} for name in ("spell", "target", "targets")],
+                "effects": [
+                    {"set": {"field": "_area_values", "value": "targets"}},
+                    {
+                        "condition": (
+                            "combat.encounter_active == true and _spell_definition.family == 'area'"
+                        ),
+                        "on_true": [
+                            {"set": {"field": "_area_values", "value": ["'scene-recipient'"]}}
+                        ],
+                    },
+                    {"set": {"field": "_chosen_values", "value": []}},
+                    {
+                        "condition": "targets != null",
+                        "on_true": [{"set": {"field": "_chosen_values", "value": "targets"}}],
+                    },
+                    {
+                        "condition": "target != null",
+                        "on_true": [
+                            {"list_push": {"list": "_chosen_values", "value": "_target_id"}}
+                        ],
+                    },
+                    {
+                        "condition": "_spell_definition.range_kind == 'self'",
+                        "on_true": [
+                            {"set": {"field": "_chosen_values", "value": ["_caster_state_id"]}}
+                        ],
+                    },
+                    {
+                        "condition": "_spell_definition.family == 'selection'",
+                        "on_true": [
+                            {"call": "cast_selection", "params": {"targets": "{_chosen_values}"}}
+                        ],
+                    },
+                    {
+                        "condition": "_spell_definition.family == 'area'",
+                        "on_true": [{"call": "cast_area", "params": {"targets": "{_area_values}"}}],
+                    },
+                ],
+            },
+            "cast_selection": {
+                "parameters": [{"name": "targets", "required": True}],
+                "effects": [
+                    {"require": {"condition": "len(targets) > 0", "error": "Choose recipients"}}
+                ],
+            },
+            "cast_area": {"parameters": [{"name": "targets", "required": True}], "effects": []},
+        },
+    }
+    assert recipient_requirements(runtime, "novel_area", False) == [
+        ("targets", ("targets",), False, "true")
+    ]
+    assert recipient_requirements(runtime, "novel_area", True) == []
+    for in_combat in (False, True):
+        assert recipient_requirements(runtime, "novel_chosen", in_combat) == [
+            ("targets", ("target", "targets"), True, "true")
+        ]
+        assert recipient_requirements(runtime, "novel_self", in_combat) == []
+    groups = recipient_contracts(runtime).values()
+    assert all(
+        "novel_alias" in group["spells"] for group in groups if "novel_chosen" in group["spells"]
+    )
+
+
+@pytest.mark.parametrize("normalize_before_call", (False, True))
+def test_recipient_derivation_uses_call_time_and_family_normalization(normalize_before_call):
+    from scripts.srd_lite_recipient_contract import recipient_requirements
+
+    bind = {"set": {"field": "_bound", "value": "targets"}}
+    engine = {"set": {"field": "_bound", "value": ["'engine-owned'"]}}
+    call = {"call": "cast_new_family", "params": {"targets": "{_bound}"}}
+    runtime = {
+        "definitions": {"spells": {"new_spell": {"family": "new_family"}}},
+        "tools": {
+            "cast_spell": {
+                "parameters": [{"name": "targets"}],
+                "effects": [bind, engine, call] if normalize_before_call else [bind, call, engine],
+            },
+            "cast_new_family": {
+                "parameters": [{"name": "targets", "required": True}],
+                "effects": [
+                    {
+                        "condition": "len(targets) == 0",
+                        "on_true": [
+                            {"set": {"field": "targets", "value": ["'derived-recipient'"]}}
+                        ],
+                    },
+                    {"require": {"condition": "len(targets) > 0", "error": "Recipients"}},
+                ],
+            },
+        },
+    }
+    expected = [] if normalize_before_call else [("targets", ("targets",), False, "true")]
+    assert recipient_requirements(runtime, "new_spell", False) == expected
+
+
+def test_recipient_presence_invariant_covers_every_implemented_spell_and_root(
+    recipient_preflight_contract,
+):
+    from scripts.srd_lite_gm_feedback import CAST_ROOTS
+
+    runtime = recipient_preflight_contract
+    assert len(runtime["definitions"]["srd_lite_implemented"]) == 117
+    for root in CAST_ROOTS:
+        checks = [
+            p
+            for p in runtime["tools"][root]["pre_conditions"]
+            if p["error"].startswith(("Missing input 'target'.", "Missing input 'targets'."))
+        ]
+        gate = ToolDef(name="recipient-presence", pre_conditions=checks, effects=[])
+        for spell in runtime["definitions"]["srd_lite_implemented"]:
+            for combat in (False, True):
+                result = execute_tool(
+                    gate.name,
+                    {
+                        "spell": spell,
+                        "target": "primary",
+                        "targets": ["primary"],
+                        "combat": {"encounter_active": combat},
+                        "object_target_id": "",
+                        "disintegrate_source_kind": "creature",
+                    },
+                    {gate.name: gate},
+                    None,
+                    {},
+                    runtime["definitions"],
+                )
+                assert result.success, (root, spell, combat, result.failure_reasons)
+
+
+@pytest.mark.parametrize(
+    "spell,selector,value,accepted",
+    (
+        ("fire_bolt", "object_target_id", "practice-door", True),
+        ("fire_bolt", "object_target_id", "", False),
+        ("disintegrate", "disintegrate_source_kind", "wall_of_force", True),
+        ("disintegrate", "disintegrate_source_kind", "creature", False),
+    ),
+)
+def test_recipient_check_preserves_noncreature_routes(
+    recipient_preflight_contract, spell, selector, value, accepted
+):
+    runtime = recipient_preflight_contract
+    checks = [
+        p
+        for p in runtime["tools"]["cast_spell_outside_combat"]["pre_conditions"]
+        if p["error"].startswith("Missing input 'target'.")
+    ]
+    gate = ToolDef(name="recipient-route", pre_conditions=checks, effects=[])
+    parameters = {
+        "spell": spell,
+        "target": None,
+        "targets": None,
+        "combat": {"encounter_active": False},
+        "object_target_id": "",
+        "disintegrate_source_kind": "creature",
+        selector: value,
+    }
+    result = execute_tool(
+        gate.name, parameters, {gate.name: gate}, None, {}, runtime["definitions"]
+    )
+    assert result.success is accepted
+
+
+@pytest.mark.parametrize(
+    "spell,caster", (("bless", "cleric"), ("hold_person", "wizard"), ("longstrider", "wizard"))
+)
+@pytest.mark.parametrize("in_combat", (False, True))
+def test_staged_caller_selected_recipients_still_refuse_before_spending(
+    tmp_path, monkeypatch, spell, caster, in_combat
+):
     archive = tmp_path / "current-lite.sylvia-gm-package"
     archive.write_bytes(bundled_srd_archive())
     monkeypatch.setenv("SRD_LITE_CANDIDATE", str(archive))
     from tests import test_srd_lite_foundation as support
 
     monkeypatch.setattr(support, "ARCHIVE", archive)
-    case = support.Case(tmp_path / "manual-targets.sqlite3", "bless", casting_source="cleric")
+    case = support.Case(tmp_path / "manual-targets.sqlite3", spell, casting_source=caster)
     try:
-        case.start()
+        if in_combat:
+            case.start()
         samples = []
         randint = dice._rng.randint
 
@@ -125,12 +334,87 @@ def test_staged_caller_selected_recipients_still_refuse_before_spending(tmp_path
 
         # An action reseeds normally; refusal must not sample that generator.
         monkeypatch.setattr(dice._rng, "randint", observed_sample)
-        case.reject("begin_srd_spell_action", case.parameters, match="Missing input 'targets'")
+        root = "begin_srd_spell_action" if in_combat else "cast_spell_outside_combat"
+        case.reject(root, case.parameters, match="Missing input 'targets'")
         assert samples == []
-        assert case.entities()["hero"]["resources"]["spell_slot_1"] == 3
-        assert case.snapshot().state[case.record["id"] + ".combat"]["action_available"]
+        assert case.entities()["hero"]["resources"][case.parameters["slot_resource"]] == 3
+        assert case.snapshot().state[case.record["id"] + ".combat"]["action_available"] is in_combat
     finally:
         case.close()
+
+
+@pytest.fixture(scope="module")
+def recipient_archive_pair(tmp_path_factory):
+    current = tmp_path_factory.mktemp("recipient-archive") / "current.sylvia-gm-package"
+    current.write_bytes(bundled_srd_archive())
+    baseline = Path(__file__).resolve().parent / "fixtures/alpha4-lite.sylvia-gm-package"
+    return baseline, current
+
+
+@pytest.mark.parametrize(
+    "spell,in_combat,case_options,choices,drop_target",
+    (
+        ("fire_shield", False, {}, {"target": "hero"}, False),
+        ("beacon_of_hope", False, {"casting_source": "cleric"}, {}, False),
+        ("ice_storm", False, {}, {"environment_origin": [5, 0, 0]}, False),
+        ("ice_storm", True, {}, {"environment_origin": [5, 0, 0]}, False),
+        (
+            "burning_hands",
+            True,
+            {},
+            {"environment_origin": [0, 0, 0], "instant_area_direction": [1, 0, 0]},
+            False,
+        ),
+        (
+            "flame_strike",
+            True,
+            {"casting_source": "cleric"},
+            {"environment_origin": [5, 0, 0]},
+            False,
+        ),
+        ("fireball", False, {}, {"targets": [], "origin_distance": 25}, True),
+        ("shatter", False, {}, {"targets": [], "origin_distance": 25}, True),
+    ),
+)
+def test_recipient_contract_keeps_baseline_accepted_casts(
+    tmp_path,
+    monkeypatch,
+    recipient_archive_pair,
+    spell,
+    in_combat,
+    case_options,
+    choices,
+    drop_target,
+):
+    """Each baseline-accepted call crosses its real casting root in both packages."""
+    baseline, current = recipient_archive_pair
+    monkeypatch.setenv("SRD_LITE_CANDIDATE", str(current))
+    from tests import test_srd_lite_foundation as support
+
+    for label, archive in (("baseline", baseline), ("hotfix", current)):
+        monkeypatch.setattr(support, "ARCHIVE", archive)
+        case = support.Case(tmp_path / (label + ".sqlite3"), spell, **case_options)
+        try:
+            parameters = case.parameters | choices
+            if drop_target:
+                parameters.pop("target")
+            if in_combat:
+                case.start()
+            root = "begin_srd_spell_action" if in_combat else "cast_spell_outside_combat"
+            result = case.execute(case.command(root, parameters))
+            assert result.status.value == "committed"
+            assert case.entities()["hero"]["resources"][case.parameters["slot_resource"]] == (
+                3 if in_combat else 2
+            )
+            if in_combat:
+                assert not case.snapshot().state[case.record["id"] + ".combat"]["action_available"]
+                assert result.result["context"]["_pending_action_id"]
+            elif choices.get("targets") == []:
+                assert case.entities()["guard"]["hp"] == 1000
+                assert case.entities()["other"]["hp"] == 1000
+                assert case.entities()["extra"]["hp"] == 1000
+        finally:
+            case.close()
 
 
 def test_all_top_level_refusals_are_reported_before_effects():
