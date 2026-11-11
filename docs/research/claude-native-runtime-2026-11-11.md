@@ -1,5 +1,12 @@
 # Claude native runtime connection
 
+**Superseded in part, 12 November 2026.** Sylvia now installs and runs its own copy of Claude
+Code with its own profile and sign-in. The statements below about using the user's installed
+executable, the optional executable path, the existing native account, "neither bundles nor
+installs", the absent logout action and the `--executable` command are historical. See
+[Sylvia's own copy of Claude Code](claude-dedicated-instance-2026-11-12.md). The transport, tool
+boundary, audit and billing descriptions remain current.
+
 Checked 11 November 2026 for the selected "Connect user-owned Claude runtime" work item.
 This implements the user's installed, unmodified Claude Code executable as a separate Sylvia
 provider. It uses the executable's stdio SDK control channel, without adding the Agent SDK package

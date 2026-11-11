@@ -2885,6 +2885,8 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
 .account-facts dd { margin: 2px 0 0; color: var(--text-bright); font-size: 13px; overflow-wrap: anywhere; }
 #claude-connection-card > .settings-note { margin: 12px 0 0; }
 #claude-connection-card > .provider-actions { margin-top: 12px; }
+#claude-install-progress { display: block; width: 100%; margin-top: 8px; }
+#claude-install-progress[hidden] { display: none; }
 .account-suggestions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .settings-content .account-suggestions .btn { min-height: 28px; padding: 3px 10px; font-family: var(--font-mono, monospace); font-size: 12px; }
 .settings-content .account-suggestions .btn[aria-pressed="true"] { border-color: var(--brand); color: var(--text-bright); }

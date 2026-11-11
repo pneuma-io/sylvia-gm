@@ -1149,10 +1149,18 @@ compatible configuration may be saved with an honest warning rather than misrepr
 agent-capable. Saving or removing a provider atomically rebuilds the in-memory provider resolver so
 model choices update without restarting the application.
 
-The `claude_runtime` provider uses the distinct `claude_code` transport. The owner selects the
-unmodified native executable and invokes its native authentication/status flow. No OAuth client,
+The `claude_runtime` provider uses the distinct `claude_code` transport. The owner keeps its own
+unmodified copy under `claude-runtime/install/<version>/` in the owner data directory and resolves
+only that copy; `PATH`, `~/.local` and saved executable paths are never consulted.
+`provider/_claude_install.py` downloads Anthropic's published binary on request and keeps it only
+after the manifest checksum, the Windows code signature (`Anthropic, PBC`) and the reported
+version all match. Setup moves through the `InstallState` table beside it. Every native process
+receives `CLAUDE_CONFIG_DIR`, `ANTHROPIC_CONFIG_DIR` and `CLAUDE_CODE_TMPDIR` inside
+`claude-runtime/`, with Claude Code's own updater disabled, so settings, sessions and sign-in
+stay separate from any other Claude Code on the computer. The owner invokes the binary's native
+authentication, status and sign-out flow. No OAuth client,
 credential-file reader or subscription-token storage is part of Sylvia. Only native-reported safe
-account fields reach the renderer. Cancelling sign-in does not log out unrelated native sessions.
+account fields reach the renderer. Cancelling sign-in or signing out affects Sylvia's profile only.
 Direct Anthropic API configuration remains separate, and native inference accepts no Sylvia API
 credentials or automatic fallback chain.
 
@@ -1172,6 +1180,7 @@ player speech. Native resume framing also remains outside canonical history. Ful
 the `claude_code_boundary` and labels downstream model input as not exposed. Output and native
 reasoning controls are runtime-managed; unknown account limits and CLI price estimates are not
 invented as usage facts. [Implementation evidence and limits](../research/claude-native-runtime-2026-11-11.md)
+and the [dedicated copy's setup and isolation](../research/claude-dedicated-instance-2026-11-12.md)
 remain separate from genuine-account and installed-app qualification.
 
 Saved API keys and private request headers use current-user Windows DPAPI at the owner-local

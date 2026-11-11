@@ -204,7 +204,6 @@ class ProviderRegistry:
         api_key: str,
         headers: dict[str, str] | None = None,
         runtime_home: str = "",
-        runtime_executable: str = "",
     ) -> None:
         """Register connection details for a provider.
 
@@ -225,7 +224,6 @@ class ProviderRegistry:
             "api_key": api_key,
             "headers": dict(headers or {}),
             "runtime_home": runtime_home,
-            "runtime_executable": runtime_executable,
         }
 
     def configure_providers(self, configs: dict[str, dict[str, object]]) -> None:
@@ -326,7 +324,6 @@ class ProviderRegistry:
             transport=model_info.transport,  # API shape selected by this model's metadata
             base_url=str(cfg["base_url"]),
             runtime_home=str(cfg.get("runtime_home", "")),
-            runtime_executable=str(cfg.get("runtime_executable", "")),
             default_headers={str(key): str(value) for key, value in header_items},
             credentials_list=[{"type": "api_key", "value": str(cfg["api_key"])}],
             models=[model_info],

@@ -122,10 +122,7 @@ class ProviderFactory:
                     "Claude requires its native runtime connection "
                     "without API credentials or fallback"
                 )
-            return ClaudeProvider(
-                Path(config.runtime_home), model_info,
-                executable=Path(config.runtime_executable) if config.runtime_executable else None,
-            )
+            return ClaudeProvider(Path(config.runtime_home), model_info)
 
         if transport == "codex_app_server":
             from pathlib import Path
