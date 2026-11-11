@@ -9574,6 +9574,402 @@
         "reference_sheet": "Use case: identity-preserve. Asset: production multiview character reference sheet for Rift Storm Giant from Severed Lands. Input image1 is the selected canonical full-body reference. Make a landscape 1536x1024 PNG showing exactly THREE separated complete views of this SAME giant: front, side, back; include a narrow separate right-hand column of face, clothing/material and weapon detail insets. Keep every complete view inside generous margins, including complete hair, cloak, hands, full weapon head/blade/tip and both separate feet. Preserve the selected body's exact face, proportions, hair/braids, clothing/armor, colors and handedness across all views. Appearance: One Huge Rift Storm Giant in an editable anonymous mature adult male appearance: towering powerful long-proportioned build, cool deep gray-violet intact skin, a broad dignified stern face, two pale silver-gray eyes, long wavy deep blue-gray hair and a neatly divided short silver-gray beard. Plain silver-gray chest and shoulder armor over a dark sea-blue long-sleeved tunic, a simple broad belt, layered dark trousers, a short plain sea-blue cloak and complete dark boots. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one enormous straight two-edged greatsword low beside the body, complete blade and tip visible; the LEFT hand is open at waist height with a few small violet lightning arcs only between its five fingers. The giant form, remembered royal bearing, greatsword and violet finger-lightning follow authored source. The anonymous face, hair, outfit, armor construction and colors are editable visual defaults. No named royal identity, crown or heraldry, actual final-storm memory, lightning striking a target, trident, wings, second sword, extra beings or text. The RIGHT hand retains the one specified weapon; the LEFT stays empty except the Storm Giant's selected local finger lightning. Do not mirror the weapon onto the other hand. Each complete figure has exactly two arms and two legs; do not add tools or equipment. Match the reference's polished naturalistic digital RPG illustration, soft studio light and plain light neutral gray background. No scenery, memory scene, extra beings, text, labels, captions, logos, borders or UI.",
         "portrait": "Use case: identity-preserve. Asset: one reusable square 1024x1024 portrait of Rift Storm Giant from Severed Lands. Input image1 is the selected canonical complete body; image2 is its reviewed multiview sheet. Keep the SAME selected face, apparent age, proportions, skin and eye colors, hair, expression and shoulder clothing. Reframe for a near-front HEAD-AND-SHOULDERS portrait at eye-level; portrait framing overrides the full-body reference layout. One centered head, upper chest visible, eyes near35% from the top, crown near10%, chin comfortably inside the lower half, generous room for complete head/ears/hair in a circular crop. No drawn circle. No hands, held weapons, feet or full-body figure in this portrait. Appearance reference: One Huge Rift Storm Giant in an editable anonymous mature adult male appearance: towering powerful long-proportioned build, cool deep gray-violet intact skin, a broad dignified stern face, two pale silver-gray eyes, long wavy deep blue-gray hair and a neatly divided short silver-gray beard. Plain silver-gray chest and shoulder armor over a dark sea-blue long-sleeved tunic, a simple broad belt, layered dark trousers, a short plain sea-blue cloak and complete dark boots. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one enormous straight two-edged greatsword low beside the body, complete blade and tip visible; the LEFT hand is open at waist height with a few small violet lightning arcs only between its five fingers. The giant form, remembered royal bearing, greatsword and violet finger-lightning follow authored source. The anonymous face, hair, outfit, armor construction and colors are editable visual defaults. No named royal identity, crown or heraldry, actual final-storm memory, lightning striking a target, trident, wings, second sword, extra beings or text. Keep only the head/shoulder details relevant to this close portrait, without adding equipment, history or markings. Match the references' polished naturalistic digital RPG illustration, soft studio lighting and plain full-bleed light neutral gray background. No low-angle hero shot, named identity, scenery, extra beings, detail panels, labels, text, logos, borders or UI."
       }
+    },
+    {
+      "id": "severed-monster-rift-ghoul",
+      "name": "Rift Ghoul",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-ghoul.md",
+          "sha256": "c400d169e9cbbcf5c3be7100f3b58ca95730f8b377a10a83ea685c6aabf217eb",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-ghoul.md",
+          "sha256": "aaa2fe179d4448444a2d123a5327127515894b84c725549af9f747ef0711c7db",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/ghoul",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Medium Rift Ghoul in an editable anonymous mature adult female humanlike hunger-Echo appearance. A lean angular intact ash-blue-gray body, long sinewy forearms, exactly two arms and two legs, five fingers per hand ending in long dark claws, and complete bare feet. A narrow hollow-cheeked mature face, two dim icy blue-gray eyes, short uneven black hair with one loose forelock, and a tense wary expression with lips slightly parted to show a few ordinary pointed teeth. A plain frayed slate-gray long-sleeved tunic, sleeves above the wrists, dark worn trousers and a simple cloth waist tie. A low balanced listening stance, both empty clawed hands held away from the body. The hunger-Echo, claws and Rift-chilled bite follow the authored source; anonymous identity, gender presentation, face, hair, outfit and palette are editable visual defaults. No exposed injury, blood, gore, fresh corpse, feeding victim, actual starving person, death scene, green fumes, weapon, named history, scenery or text. No horns, wings, tail or pointed ears.",
+        "full_body": {
+          "path": "assets/characters/85143b98fe640c9a711b6ec61c5ff5731b28a19f3e7f1ab92d3037ddd0a7de4e.png",
+          "sha256": "85143b98fe640c9a711b6ec61c5ff5731b28a19f3e7f1ab92d3037ddd0a7de4e"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/32a4ff590a68cb6107b65a3bd9339dc0b2f7c23b7e5f4bbfce967b9ef72f0de1.png",
+          "sha256": "32a4ff590a68cb6107b65a3bd9339dc0b2f7c23b7e5f4bbfce967b9ef72f0de1"
+        },
+        "portrait": {
+          "path": "assets/characters/1c19f0098c0fa244e3d7f99b4abe61f2cb3352e4d5e392ddd5476a663748a8c4.png",
+          "sha256": "1c19f0098c0fa244e3d7f99b4abe61f2cb3352e4d5e392ddd5476a663748a8c4"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.4,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1882250
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 1911835
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2417031
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete creature reference for Rift Ghoul in Sylvia GM's Severed Lands. Portrait-orientation 1024x1536 PNG, ONE complete single subject in a clear near-front three-quarter view on a plain light neutral gray background. Polished naturalistic digital RPG illustration, soft studio lighting and subtle grounding shadow, matching a production character catalogue. Keep the entire silhouette inside generous margins: complete head/hair/horns, hands or tentacles, held club, every foot, full tail and folded wing tips, with real headroom and space around the feet. Appearance: One Medium Rift Ghoul in an editable anonymous mature adult female humanlike hunger-Echo appearance. A lean angular intact ash-blue-gray body, long sinewy forearms, exactly two arms and two legs, five fingers per hand ending in long dark claws, and complete bare feet. A narrow hollow-cheeked mature face, two dim icy blue-gray eyes, short uneven black hair with one loose forelock, and a tense wary expression with lips slightly parted to show a few ordinary pointed teeth. A plain frayed slate-gray long-sleeved tunic, sleeves above the wrists, dark worn trousers and a simple cloth waist tie. A low balanced listening stance, both empty clawed hands held away from the body. The hunger-Echo, claws and Rift-chilled bite follow the authored source; anonymous identity, gender presentation, face, hair, outfit and palette are editable visual defaults. No exposed injury, blood, gore, fresh corpse, feeding victim, actual starving person, death scene, green fumes, weapon, named history, scenery or text. Preserve the specified anatomy and any weapon-hand side. No extra entities, attack scene, environmental scenery, text, labels, captions, logos, borders or UI.\n\nSelected corrective edit:\nUse case: precise-object-edit. Edit the supplied full-body Rift Ghoul reference. Correct ONLY the unsupported extra anatomy: completely REMOVE both head horns, both bat wings and the entire tail. Remove their bases too; the back has the same plain torn tunic and the head has ordinary short black hair. Change the pointed ear tips to ordinary rounded humanlike ears. The selected ghoul is a humanlike hunger-Echo with exactly TWO arms and TWO legs, five clawed fingers on each hand and complete bare humanlike feet, with NO horns, NO wings, NO tail and NO other appendages. Preserve the exact mature angular face, dim icy blue-gray eyes, short uneven black hair/forelock, ash-blue-gray intact skin, tense slightly parted mouth, long clawed hands, frayed slate-gray tunic, cloth waist tie, dark trousers, low balanced stance and complete framing. Fill vacated space with the same light neutral gray background. Do not change identity, outfit, proportions, pose, style or lighting; no added objects, gore, victim, writing or scenery.",
+        "reference_sheet": "Use case: identity-preserve. Asset: production multiview reference sheet for Rift Ghoul from Severed Lands. Input image1 is the selected canonical complete reference; preserve its exact face/head, anatomy, proportions, materials, colors, clothing/equipment and handedness. Landscape 1536x1024 PNG. Arrange exactly THREE separated COMPLETE views across the main area: front, side and back, plus a narrow separate right-hand column of face/material/equipment detail insets. Keep every complete silhouette inside generous gray margins, including horns, hands/tentacles, club, feet/hooves, tail and folded wing tips. Appearance: One Medium Rift Ghoul in an editable anonymous mature adult female humanlike hunger-Echo appearance. A lean angular intact ash-blue-gray body, long sinewy forearms, exactly two arms and two legs, five fingers per hand ending in long dark claws, and complete bare feet. A narrow hollow-cheeked mature face, two dim icy blue-gray eyes, short uneven black hair with one loose forelock, and a tense wary expression with lips slightly parted to show a few ordinary pointed teeth. A plain frayed slate-gray long-sleeved tunic, sleeves above the wrists, dark worn trousers and a simple cloth waist tie. A low balanced listening stance, both empty clawed hands held away from the body. The hunger-Echo, claws and Rift-chilled bite follow the authored source; anonymous identity, gender presentation, face, hair, outfit and palette are editable visual defaults. No exposed injury, blood, gore, fresh corpse, feeding victim, actual starving person, death scene, green fumes, weapon, named history, scenery or text. No horns, wings, tail or pointed ears. Preserve exactly TWO humanlike arms and TWO legs, five clawed fingers per hand, ordinary rounded ears and bare humanlike feet. NO horns, wings, tail, extra limbs or pointed ears. Match the selected reference's polished naturalistic RPG illustration, soft studio light and plain light neutral gray background. No added anatomy, other beings, scenery, attack/memory scene, text, labels, captions, logos, borders or UI.",
+        "portrait": "Use case: identity-preserve. Asset: one reusable square 1024x1024 portrait for Rift Ghoul from Severed Lands. Input image1 is the selected complete canonical reference; image2 is the reviewed multiview sheet. Keep this SAME subject's exact selected identity, anatomy, colors, expression, materials and head details. Portrait framing overrides the full-body layout. One near-front head-and-shoulders portrait at eye level, upper chest visible, eyes near35% from top, crown near10%. Keep the whole head, rounded ears and short black hair in a generous circular safe area. Preserve the selected mature anonymous face, icy blue-gray eyes, intact ash-blue-gray skin and tense slightly parted mouth. NO horns, wings, tail, pointed ears, hands or weapon. Do not draw a circle. Appearance reference: One Medium Rift Ghoul in an editable anonymous mature adult female humanlike hunger-Echo appearance. A lean angular intact ash-blue-gray body, long sinewy forearms, exactly two arms and two legs, five fingers per hand ending in long dark claws, and complete bare feet. A narrow hollow-cheeked mature face, two dim icy blue-gray eyes, short uneven black hair with one loose forelock, and a tense wary expression with lips slightly parted to show a few ordinary pointed teeth. A plain frayed slate-gray long-sleeved tunic, sleeves above the wrists, dark worn trousers and a simple cloth waist tie. A low balanced listening stance, both empty clawed hands held away from the body. The hunger-Echo, claws and Rift-chilled bite follow the authored source; anonymous identity, gender presentation, face, hair, outfit and palette are editable visual defaults. No exposed injury, blood, gore, fresh corpse, feeding victim, actual starving person, death scene, green fumes, weapon, named history, scenery or text. No horns, wings, tail or pointed ears. Include only the details relevant to the head/upper-body crop. Match the selected references' polished naturalistic digital RPG illustration, soft studio light and plain full-bleed light neutral gray background. No scenery, attack, extra beings, memory scene, panels, labels, captions, text, logos, borders or UI."
+      }
+    },
+    {
+      "id": "severed-monster-rift-gorgon",
+      "name": "Rift Gorgon",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-gorgon.md",
+          "sha256": "cad45754a8e836c357097283fa37f74173836b26e2b705b11f4dbf680f89e28f",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-gorgon.md",
+          "sha256": "7eeafcd75c6ff6c68c4536f0110756152cf447832be90ce31e7f1b20fbbf0bbe",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/gorgon",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Large Rift Gorgon: a powerful complete bull-shaped creature clad in overlapping dull iron plates, heavy shoulders, a broad bovine head and muzzle, exactly two thick outward-and-upward curved dark iron horns, two ears, two dim violet-gray eyes, four sturdy legs ending in cloven iron hooves, and one long flexible plated bull tail ending in a dark rough brush. Intact layered iron surfaces have restrained weathering and subtle violet glints in the plate seams. A small faint violet Veil-stuff wisp stays close to the nostrils without obscuring the muzzle; a calm alert standing reference pose. The iron-plated bull, horns and Veil breath follow the authored source; exact plating, horn curve, eyes and palette are editable visual defaults. The visual reference does not choose between creature-type labels in source editions. No human face, Medusa snakes, wings, extra horns or legs, rider, saddle, victim, standing-stone victim, petrification scene, mechanical gears, writing or scenery.",
+        "full_body": {
+          "path": "assets/characters/2663464b266d5de05d4ba04bdf4f381886e99e2c11b0c8856790bfaadda791b2.png",
+          "sha256": "2663464b266d5de05d4ba04bdf4f381886e99e2c11b0c8856790bfaadda791b2"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/36ce25a2b621e63a5dd830ee9cbec82d5711c5fe1e962b540d17a2bb18395fd3.png",
+          "sha256": "36ce25a2b621e63a5dd830ee9cbec82d5711c5fe1e962b540d17a2bb18395fd3"
+        },
+        "portrait": {
+          "path": "assets/characters/a11ffcc64a62af2a8d53f0d2999506fbc63338317bcddacf8b70f2eace2d1491.png",
+          "sha256": "a11ffcc64a62af2a8d53f0d2999506fbc63338317bcddacf8b70f2eace2d1491"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.4,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 1968148
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2208468
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2158449
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete creature reference for Rift Gorgon in Sylvia GM's Severed Lands. Landscape 1536x1024 PNG, ONE complete single subject in a clear near-front three-quarter view on a plain light neutral gray background. Polished naturalistic digital RPG illustration, soft studio lighting and subtle grounding shadow, matching a production character catalogue. Keep the entire silhouette inside generous margins: complete head/hair/horns, hands or tentacles, held club, every foot, full tail and folded wing tips, with real headroom and space around the feet. Appearance: One Large Rift Gorgon: a powerful complete bull-shaped creature clad in overlapping dull iron plates, heavy shoulders, a broad bovine head and muzzle, exactly two thick outward-and-upward curved dark iron horns, two ears, two dim violet-gray eyes, four sturdy legs ending in cloven iron hooves, and one long flexible plated bull tail ending in a dark rough brush. Intact layered iron surfaces have restrained weathering and subtle violet glints in the plate seams. A small faint violet Veil-stuff wisp stays close to the nostrils without obscuring the muzzle; a calm alert standing reference pose. The iron-plated bull, horns and Veil breath follow the authored source; exact plating, horn curve, eyes and palette are editable visual defaults. The visual reference does not choose between creature-type labels in source editions. No human face, Medusa snakes, wings, extra horns or legs, rider, saddle, victim, standing-stone victim, petrification scene, mechanical gears, writing or scenery. Preserve the specified anatomy and any weapon-hand side. No extra entities, attack scene, environmental scenery, text, labels, captions, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Asset: production multiview reference sheet for Rift Gorgon from Severed Lands. Input image1 is the selected canonical complete reference; preserve its exact face/head, anatomy, proportions, materials, colors, clothing/equipment and handedness. Landscape 1536x1024 PNG. Use a roomy 2x2 layout: THREE separated COMPLETE views (front three-quarter, side and rear three-quarter), plus one panel of head/material detail insets. Each main view shows the whole creature, with normal anatomical occlusion but no clipped outline. Keep every complete silhouette inside generous gray margins, including horns, hands/tentacles, club, feet/hooves, tail and folded wing tips. Appearance: One Large Rift Gorgon: a powerful complete bull-shaped creature clad in overlapping dull iron plates, heavy shoulders, a broad bovine head and muzzle, exactly two thick outward-and-upward curved dark iron horns, two ears, two dim violet-gray eyes, four sturdy legs ending in cloven iron hooves, and one long flexible plated bull tail ending in a dark rough brush. Intact layered iron surfaces have restrained weathering and subtle violet glints in the plate seams. A small faint violet Veil-stuff wisp stays close to the nostrils without obscuring the muzzle; a calm alert standing reference pose. The iron-plated bull, horns and Veil breath follow the authored source; exact plating, horn curve, eyes and palette are editable visual defaults. The visual reference does not choose between creature-type labels in source editions. No human face, Medusa snakes, wings, extra horns or legs, rider, saddle, victim, standing-stone victim, petrification scene, mechanical gears, writing or scenery. Preserve exactly TWO bovine horns, TWO ears, FOUR cloven-hoofed bull legs and ONE complete plated bull tail. No extra horns, human face, wings, gears or extra legs. Match the selected reference's polished naturalistic RPG illustration, soft studio light and plain light neutral gray background. No added anatomy, other beings, scenery, attack/memory scene, text, labels, captions, logos, borders or UI.",
+        "portrait": "Use case: identity-preserve. Asset: one reusable square 1024x1024 portrait for Rift Gorgon from Severed Lands. Input image1 is the selected complete canonical reference; image2 is the reviewed multiview sheet. Keep this SAME subject's exact selected identity, anatomy, colors, expression, materials and head details. Portrait framing overrides the full-body layout. One near-front three-quarter bovine HEAD AND UPPER CHEST portrait. Include BOTH complete curved iron horns, BOTH ears and the entire muzzle with small violet nostril wisps; their whole outline fits comfortably within the central80% circular safe area, with extra gray space beyond the horn tips. Keep the face centered and large enough to read at map-token size; preserve bovine eye placement and the selected iron plate pattern. No full body, human face, Medusa snakes, added horns, hands or victim. Do not draw a circle. Appearance reference: One Large Rift Gorgon: a powerful complete bull-shaped creature clad in overlapping dull iron plates, heavy shoulders, a broad bovine head and muzzle, exactly two thick outward-and-upward curved dark iron horns, two ears, two dim violet-gray eyes, four sturdy legs ending in cloven iron hooves, and one long flexible plated bull tail ending in a dark rough brush. Intact layered iron surfaces have restrained weathering and subtle violet glints in the plate seams. A small faint violet Veil-stuff wisp stays close to the nostrils without obscuring the muzzle; a calm alert standing reference pose. The iron-plated bull, horns and Veil breath follow the authored source; exact plating, horn curve, eyes and palette are editable visual defaults. The visual reference does not choose between creature-type labels in source editions. No human face, Medusa snakes, wings, extra horns or legs, rider, saddle, victim, standing-stone victim, petrification scene, mechanical gears, writing or scenery. Include only the details relevant to the head/upper-body crop. Match the selected references' polished naturalistic digital RPG illustration, soft studio light and plain full-bleed light neutral gray background. No scenery, attack, extra beings, memory scene, panels, labels, captions, text, logos, borders or UI.\n\nSelected corrective edit:\nUse case: precise-object-edit. Edit target image1, the selected Rift Gorgon portrait; image2 is its canonical complete body for identity. Correct ONLY the framing: in a circular portrait mask, the upper horn tips are clipped. Widen the camera framing so the same head and both COMPLETE curved iron horns are about25% smaller within the square image, with generous neutral gray headroom and side space. All horn tips, horn curves, ears and muzzle must fit INSIDE the central75-80% circular safe area. Do not draw a circle. Keep the bull face readable and centered, and continue the upper plated chest naturally toward the lower edge. Preserve exactly TWO horns, TWO ears, the same bovine face, violet-gray eyes, iron plate pattern/weathering, small violet nostril wisps, colors, expression, lighting and naturalistic RPG style. Do not change the horn shape or identity, add anatomy, show a full bull body, add labels/borders/text, or introduce scenery."
+      }
+    },
+    {
+      "id": "severed-monster-rift-grick",
+      "name": "Rift Grick",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-grick.md",
+          "sha256": "76044c4d90a840eb8fb0d3ac33e3a44efc8af15205a7fce84486cd7dbde259a8",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-grick.md",
+          "sha256": "d91be0a06260678a9c11e9c936513337bf6ecd337dd71059fc71a64581e67a14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/grick",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Medium Rift Grick: one complete elongated worm-like ambush predator with a thick stone-gray subtly segmented leathery body, a gently curved tapering tail and mottled gray-brown stone camouflage carrying restrained muted violet speckles. At the raised front is one hard dark hooked beak surrounded by EXACTLY FOUR short thick muscular gray tentacles, two curling to each side, with every tentacle tip distinct and visible. The beak sits at the center of the four tentacle bases. No eyes, face, human head, arms, hands, legs, wings or second mouth. A quiet coiled S-shaped reference posture with the full tail tip visible. The worm body, beak, tentacles and stone camouflage follow authored source; four tentacles also match the inherited source. Surface pattern, palette and exact tail/tentacle curves are editable visual defaults. No injured prey, blood, gore, wounds, actual Rift-burn demonstration, Warden ruin, named story, readable text or scenery.",
+        "full_body": {
+          "path": "assets/characters/9dbcd54b0c3d0b9695085ae7aa49c96516ecf7af54405fdad85eaa2114ecef5d.png",
+          "sha256": "9dbcd54b0c3d0b9695085ae7aa49c96516ecf7af54405fdad85eaa2114ecef5d"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/bd6ddd72136e5b3b7ef47203ac73f4861356ac3cd4983fb0031d7e3551b7edad.png",
+          "sha256": "bd6ddd72136e5b3b7ef47203ac73f4861356ac3cd4983fb0031d7e3551b7edad"
+        },
+        "portrait": {
+          "path": "assets/characters/8d1a5c667b35d3867e5f89551539810d237fb38d5007d61b7213fe0839e6a7e2.png",
+          "sha256": "8d1a5c667b35d3867e5f89551539810d237fb38d5007d61b7213fe0839e6a7e2"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.5,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 1965487
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2101194
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2018203
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete creature reference for Rift Grick in Sylvia GM's Severed Lands. Landscape 1536x1024 PNG, ONE complete single subject in a clear near-front three-quarter view on a plain light neutral gray background. Polished naturalistic digital RPG illustration, soft studio lighting and subtle grounding shadow, matching a production character catalogue. Keep the entire silhouette inside generous margins: complete head/hair/horns, hands or tentacles, held club, every foot, full tail and folded wing tips, with real headroom and space around the feet. Appearance: One Medium Rift Grick: one complete elongated worm-like ambush predator with a thick stone-gray subtly segmented leathery body, a gently curved tapering tail and mottled gray-brown stone camouflage carrying restrained muted violet speckles. At the raised front is one hard dark hooked beak surrounded by EXACTLY FOUR short thick muscular gray tentacles, two curling to each side, with every tentacle tip distinct and visible. The beak sits at the center of the four tentacle bases. No eyes, face, human head, arms, hands, legs, wings or second mouth. A quiet coiled S-shaped reference posture with the full tail tip visible. The worm body, beak, tentacles and stone camouflage follow authored source; four tentacles also match the inherited source. Surface pattern, palette and exact tail/tentacle curves are editable visual defaults. No injured prey, blood, gore, wounds, actual Rift-burn demonstration, Warden ruin, named story, readable text or scenery. Preserve the specified anatomy and any weapon-hand side. No extra entities, attack scene, environmental scenery, text, labels, captions, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Asset: production multiview reference sheet for Rift Grick from Severed Lands. Input image1 is the selected canonical complete reference; preserve its exact face/head, anatomy, proportions, materials, colors, clothing/equipment and handedness. Landscape 1536x1024 PNG. Use a roomy 2x2 layout: THREE separated COMPLETE views (front three-quarter, side and rear three-quarter), plus one panel of head/material detail insets. Each main view shows the whole creature, with normal anatomical occlusion but no clipped outline. Keep every complete silhouette inside generous gray margins, including horns, hands/tentacles, club, feet/hooves, tail and folded wing tips. Appearance: One Medium Rift Grick: one complete elongated worm-like ambush predator with a thick stone-gray subtly segmented leathery body, a gently curved tapering tail and mottled gray-brown stone camouflage carrying restrained muted violet speckles. At the raised front is one hard dark hooked beak surrounded by EXACTLY FOUR short thick muscular gray tentacles, two curling to each side, with every tentacle tip distinct and visible. The beak sits at the center of the four tentacle bases. No eyes, face, human head, arms, hands, legs, wings or second mouth. A quiet coiled S-shaped reference posture with the full tail tip visible. The worm body, beak, tentacles and stone camouflage follow authored source; four tentacles also match the inherited source. Surface pattern, palette and exact tail/tentacle curves are editable visual defaults. No injured prey, blood, gore, wounds, actual Rift-burn demonstration, Warden ruin, named story, readable text or scenery. Preserve exactly FOUR head tentacles around ONE dark beak, ONE continuous worm body and ONE tapering tail. No eyes, humanoid face, limbs, second beak or extra tentacle. Match the selected reference's polished naturalistic RPG illustration, soft studio light and plain light neutral gray background. No added anatomy, other beings, scenery, attack/memory scene, text, labels, captions, logos, borders or UI.",
+        "portrait": "Use case: identity-preserve. Asset: one reusable square 1024x1024 portrait for Rift Grick from Severed Lands. Input image1 is the selected complete canonical reference; image2 is the reviewed multiview sheet. Keep this SAME subject's exact selected identity, anatomy, colors, expression, materials and head details. Portrait framing overrides the full-body layout. One near-front close portrait of the raised HEAD AND FOUR TENTACLES, with ONE dark beak at the center. Show all FOUR separate curled tentacles and their complete tips within a central80% circular safe area, two on each side; the neck/body base can curve behind the head and leave the lower frame. Keep the head centered at x50%/y50%, with generous gray space around every tip. NO eyes, human face, fifth tentacle, second beak, limbs or full-length worm layout. Do not draw a circle. Appearance reference: One Medium Rift Grick: one complete elongated worm-like ambush predator with a thick stone-gray subtly segmented leathery body, a gently curved tapering tail and mottled gray-brown stone camouflage carrying restrained muted violet speckles. At the raised front is one hard dark hooked beak surrounded by EXACTLY FOUR short thick muscular gray tentacles, two curling to each side, with every tentacle tip distinct and visible. The beak sits at the center of the four tentacle bases. No eyes, face, human head, arms, hands, legs, wings or second mouth. A quiet coiled S-shaped reference posture with the full tail tip visible. The worm body, beak, tentacles and stone camouflage follow authored source; four tentacles also match the inherited source. Surface pattern, palette and exact tail/tentacle curves are editable visual defaults. No injured prey, blood, gore, wounds, actual Rift-burn demonstration, Warden ruin, named story, readable text or scenery. Include only the details relevant to the head/upper-body crop. Match the selected references' polished naturalistic digital RPG illustration, soft studio light and plain full-bleed light neutral gray background. No scenery, attack, extra beings, memory scene, panels, labels, captions, text, logos, borders or UI."
+      }
+    },
+    {
+      "id": "severed-monster-rift-griffon",
+      "name": "Rift Griffon",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-griffon.md",
+          "sha256": "646f2edff232a3ba986932a62d6079b3637e076062ba53bbdfa07094cc7b371a",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-griffon.md",
+          "sha256": "1bd65fdd1fac01ff5a615ade1ef48cce9f5679a0451aa75c455ee5b5f55f60b5",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/griffon",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Large Rift Griffon: a complete eagle-and-lion hybrid with one pale ivory-feathered eagle head and neck, one dark hooked eagle beak and two amber eyes; exactly two scaly ocher eagle forelegs with dark talons; a tawny golden lion torso and exactly two muscular lion hindlegs with broad feline paws; one long tawny lion tail ending in a dark brown fur tuft; and exactly TWO broad brown feathered wings attached above the shoulders. Wings are folded in a relaxed resting pose, their complete outer contours and dark primary tips visible; their feathers carry the authored faint violet shimmer. A watchful grounded near-front three-quarter standing pose, all four feet and the full tail visible. The eagle/lion combination, feather shimmer and predatory bearing follow authored source; exact feathers, fur, eyes, colors and folded-wing posture are editable visual defaults. No horse hooves or horse tail, human arms or face, extra wings or legs, antlers, collar, saddle, rider, goat/prey, nest scene, scenery, labels or text.",
+        "full_body": {
+          "path": "assets/characters/b3e34bf6daf7e34b7121b7dc8beb872f9b7047f7a1ada5ef0c7b9ee2bfc7020b.png",
+          "sha256": "b3e34bf6daf7e34b7121b7dc8beb872f9b7047f7a1ada5ef0c7b9ee2bfc7020b"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/42aaf3b20a074ed4585ce7baf59dc1f6b6b46795b02420977ff96994a088b03b.png",
+          "sha256": "42aaf3b20a074ed4585ce7baf59dc1f6b6b46795b02420977ff96994a088b03b"
+        },
+        "portrait": {
+          "path": "assets/characters/e793e5d8218ecd962263f956ca07d0496cf6901fcb862ab5b9754cf014ae122b.png",
+          "sha256": "e793e5d8218ecd962263f956ca07d0496cf6901fcb862ab5b9754cf014ae122b"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.4,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2130513
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2187344
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2602326
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete creature reference for Rift Griffon in Sylvia GM's Severed Lands. Landscape 1536x1024 PNG, ONE complete single subject in a clear near-front three-quarter view on a plain light neutral gray background. Polished naturalistic digital RPG illustration, soft studio lighting and subtle grounding shadow, matching a production character catalogue. Keep the entire silhouette inside generous margins: complete head/hair/horns, hands or tentacles, held club, every foot, full tail and folded wing tips, with real headroom and space around the feet. Appearance: One Large Rift Griffon: a complete eagle-and-lion hybrid with one pale ivory-feathered eagle head and neck, one dark hooked eagle beak and two amber eyes; exactly two scaly ocher eagle forelegs with dark talons; a tawny golden lion torso and exactly two muscular lion hindlegs with broad feline paws; one long tawny lion tail ending in a dark brown fur tuft; and exactly TWO broad brown feathered wings attached above the shoulders. Wings are folded in a relaxed resting pose, their complete outer contours and dark primary tips visible; their feathers carry the authored faint violet shimmer. A watchful grounded near-front three-quarter standing pose, all four feet and the full tail visible. The eagle/lion combination, feather shimmer and predatory bearing follow authored source; exact feathers, fur, eyes, colors and folded-wing posture are editable visual defaults. No horse hooves or horse tail, human arms or face, extra wings or legs, antlers, collar, saddle, rider, goat/prey, nest scene, scenery, labels or text. Preserve the specified anatomy and any weapon-hand side. No extra entities, attack scene, environmental scenery, text, labels, captions, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Asset: production multiview reference sheet for Rift Griffon from Severed Lands. Input image1 is the selected canonical complete reference; preserve its exact face/head, anatomy, proportions, materials, colors, clothing/equipment and handedness. Landscape 1536x1024 PNG. Use a roomy 2x2 layout: THREE separated COMPLETE views (front three-quarter, side and rear three-quarter), plus one panel of head/material detail insets. Each main view shows the whole creature, with normal anatomical occlusion but no clipped outline. Keep every complete silhouette inside generous gray margins, including horns, hands/tentacles, club, feet/hooves, tail and folded wing tips. Appearance: One Large Rift Griffon: a complete eagle-and-lion hybrid with one pale ivory-feathered eagle head and neck, one dark hooked eagle beak and two amber eyes; exactly two scaly ocher eagle forelegs with dark talons; a tawny golden lion torso and exactly two muscular lion hindlegs with broad feline paws; one long tawny lion tail ending in a dark brown fur tuft; and exactly TWO broad brown feathered wings attached above the shoulders. Wings are folded in a relaxed resting pose, their complete outer contours and dark primary tips visible; their feathers carry the authored faint violet shimmer. A watchful grounded near-front three-quarter standing pose, all four feet and the full tail visible. The eagle/lion combination, feather shimmer and predatory bearing follow authored source; exact feathers, fur, eyes, colors and folded-wing posture are editable visual defaults. No horse hooves or horse tail, human arms or face, extra wings or legs, antlers, collar, saddle, rider, goat/prey, nest scene, scenery, labels or text. Preserve exactly FOUR legs (TWO eagle forelegs with talons and TWO lion hindlegs with feline paws), TWO folded feathered wings and ONE tufted lion tail. No horse hooves, horse tail, extra wings or legs. Match the selected reference's polished naturalistic RPG illustration, soft studio light and plain light neutral gray background. No added anatomy, other beings, scenery, attack/memory scene, text, labels, captions, logos, borders or UI.",
+        "portrait": "Use case: identity-preserve. Asset: one reusable square 1024x1024 portrait for Rift Griffon from Severed Lands. Input image1 is the selected complete canonical reference; image2 is the reviewed multiview sheet. Keep this SAME subject's exact selected identity, anatomy, colors, expression, materials and head details. Portrait framing overrides the full-body layout. One near-front three-quarter EAGLE HEAD AND UPPER FEATHERED CHEST portrait, preserve the selected ivory head/neck feathers, amber eye placement and dark hooked beak. Keep the entire crest, swept feather tips and whole beak within a generous central80% circular safe area, head centered with a little neutral gray space above the crown and beyond the beak. A hint of the brown/violet wing roots may appear near the lower shoulders. No human face, horse head, full body, paws, feet or added horns. Do not draw a circle. Appearance reference: One Large Rift Griffon: a complete eagle-and-lion hybrid with one pale ivory-feathered eagle head and neck, one dark hooked eagle beak and two amber eyes; exactly two scaly ocher eagle forelegs with dark talons; a tawny golden lion torso and exactly two muscular lion hindlegs with broad feline paws; one long tawny lion tail ending in a dark brown fur tuft; and exactly TWO broad brown feathered wings attached above the shoulders. Wings are folded in a relaxed resting pose, their complete outer contours and dark primary tips visible; their feathers carry the authored faint violet shimmer. A watchful grounded near-front three-quarter standing pose, all four feet and the full tail visible. The eagle/lion combination, feather shimmer and predatory bearing follow authored source; exact feathers, fur, eyes, colors and folded-wing posture are editable visual defaults. No horse hooves or horse tail, human arms or face, extra wings or legs, antlers, collar, saddle, rider, goat/prey, nest scene, scenery, labels or text. Include only the details relevant to the head/upper-body crop. Match the selected references' polished naturalistic digital RPG illustration, soft studio light and plain full-bleed light neutral gray background. No scenery, attack, extra beings, memory scene, panels, labels, captions, text, logos, borders or UI."
+      }
+    },
+    {
+      "id": "severed-monster-rift-harpy",
+      "name": "Rift Harpy",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-harpy.md",
+          "sha256": "e0e502795d8f517f524b71c16b6c96826deedcd4f50b275c32d6463a8638db01",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-harpy.md",
+          "sha256": "ed54db12242f087e70bbd33d7fc0177b2e460c3017b2e36f41b61075075b9eb6",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/harpy",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Medium Rift Harpy in an editable mature adult female appearance: a weathered humanlike face with two dark brown eyes, medium warm brown intact skin, shoulder-length rough black hair and a guarded alert closed-mouth expression. Exactly two humanlike arms with five-fingered hands, exactly TWO separate gray-brown feathered wings attached behind the shoulders, and exactly two feathered bird legs ending in dark raptor talon feet. A plain opaque rough brown sleeveless wrap vest fully covers the chest and torso; a dark gray woven knee-length wrap skirt covers the pelvis and upper legs. Wings rest folded behind the body, with their complete feathered outer tips visible and a restrained muted violet sheen. The anatomical RIGHT hand holds ONE simple short wooden club low beside the body, fully visible; the LEFT hand is empty. The harpy form, lure-song bearing and club follow the authored source. The face, hair, outfit, gender presentation, feather arrangement and palette are editable defaults. No bare chest, nudity, sexualized pose, human bare feet, wing-arms replacing the club hand, beak instead of the humanlike face, extra limbs, listener/victim, lost-memory scene, named identity, writing or scenery. One long feathered tail trails behind the skirt as an editable visual default.",
+        "full_body": {
+          "path": "assets/characters/324af3050e4e80e6d9cf5133f76825cb8349381653ab42a8860344f177fce070.png",
+          "sha256": "324af3050e4e80e6d9cf5133f76825cb8349381653ab42a8860344f177fce070"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/c4fa0cda1c8c7100490e50c04a5ceade1cfc2c7d3e4672f6dad139a0845ecc43.png",
+          "sha256": "c4fa0cda1c8c7100490e50c04a5ceade1cfc2c7d3e4672f6dad139a0845ecc43"
+        },
+        "portrait": {
+          "path": "assets/characters/6b44f33def8c24688385034e495b2697a529bf46c863ea1610dba13e7ebfe4b1.png",
+          "sha256": "6b44f33def8c24688385034e495b2697a529bf46c863ea1610dba13e7ebfe4b1"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0,
+          "zoom": 1.2
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 2042135
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2500339
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2733717
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete creature reference for Rift Harpy in Sylvia GM's Severed Lands. Portrait-orientation 1024x1536 PNG, ONE complete single subject in a clear near-front three-quarter view on a plain light neutral gray background. Polished naturalistic digital RPG illustration, soft studio lighting and subtle grounding shadow, matching a production character catalogue. Keep the entire silhouette inside generous margins: complete head/hair/horns, hands or tentacles, held club, every foot, full tail and folded wing tips, with real headroom and space around the feet. Appearance: One Medium Rift Harpy in an editable mature adult female appearance: a weathered humanlike face with two dark brown eyes, medium warm brown intact skin, shoulder-length rough black hair and a guarded alert closed-mouth expression. Exactly two humanlike arms with five-fingered hands, exactly TWO separate gray-brown feathered wings attached behind the shoulders, and exactly two feathered bird legs ending in dark raptor talon feet. A plain opaque rough brown sleeveless wrap vest fully covers the chest and torso; a dark gray woven knee-length wrap skirt covers the pelvis and upper legs. Wings rest folded behind the body, with their complete feathered outer tips visible and a restrained muted violet sheen. The anatomical RIGHT hand holds ONE simple short wooden club low beside the body, fully visible; the LEFT hand is empty. The harpy form, lure-song bearing and club follow the authored source. The face, hair, outfit, gender presentation, feather arrangement and palette are editable defaults. No bare chest, nudity, sexualized pose, human bare feet, wing-arms replacing the club hand, beak instead of the humanlike face, extra limbs, listener/victim, lost-memory scene, named identity, writing or scenery. Preserve the specified anatomy and any weapon-hand side. No extra entities, attack scene, environmental scenery, text, labels, captions, logos, borders or UI.\n\nSelected editable visual detail: one long feathered tail trails behind the skirt.",
+        "reference_sheet": "Use case: identity-preserve. Asset: production multiview reference sheet for Rift Harpy from Severed Lands. Input image1 is the selected canonical complete reference; preserve its exact face/head, anatomy, proportions, materials, colors, clothing/equipment and handedness. Landscape 1536x1024 PNG. Arrange exactly THREE separated COMPLETE views across the main area: front, side and back, plus a narrow separate right-hand column of face/material/equipment detail insets. Keep every complete silhouette inside generous gray margins, including horns, hands/tentacles, club, feet/hooves, tail and folded wing tips. Appearance: One Medium Rift Harpy in an editable mature adult female appearance: a weathered humanlike face with two dark brown eyes, medium warm brown intact skin, shoulder-length rough black hair and a guarded alert closed-mouth expression. Exactly two humanlike arms with five-fingered hands, exactly TWO separate gray-brown feathered wings attached behind the shoulders, and exactly two feathered bird legs ending in dark raptor talon feet. A plain opaque rough brown sleeveless wrap vest fully covers the chest and torso; a dark gray woven knee-length wrap skirt covers the pelvis and upper legs. Wings rest folded behind the body, with their complete feathered outer tips visible and a restrained muted violet sheen. The anatomical RIGHT hand holds ONE simple short wooden club low beside the body, fully visible; the LEFT hand is empty. The harpy form, lure-song bearing and club follow the authored source. The face, hair, outfit, gender presentation, feather arrangement and palette are editable defaults. No bare chest, nudity, sexualized pose, human bare feet, wing-arms replacing the club hand, beak instead of the humanlike face, extra limbs, listener/victim, lost-memory scene, named identity, writing or scenery. One long feathered tail trails behind the skirt as an editable visual default. Preserve TWO humanlike arms separate from TWO folded feathered wings, TWO bird talon legs and ONE feathered tail. The anatomical RIGHT hand holds ONE complete club; LEFT hand empty. No human bare feet or added limbs. Match the selected reference's polished naturalistic RPG illustration, soft studio light and plain light neutral gray background. No added anatomy, other beings, scenery, attack/memory scene, text, labels, captions, logos, borders or UI.",
+        "portrait": "Use case: identity-preserve. Asset: one reusable square 1024x1024 portrait for Rift Harpy from Severed Lands. Input image1 is the selected complete canonical reference; image2 is the reviewed multiview sheet. Keep this SAME subject's exact selected identity, anatomy, colors, expression, materials and head details. Portrait framing overrides the full-body layout. One near-front head-and-shoulders portrait at eye level, upper vest visible, eyes near35% from top and crown near10%. Keep the whole selected mature humanlike head, ears and shoulder-length rough black hair in a generous circular safe area. Preserve warm brown skin, dark brown eyes, guarded closed-mouth expression, opaque brown vest and subtle gray-brown/violet feathered wing roots at the shoulders. No hands, club, feet, full-body figure, beak or additional wings. Do not draw a circle. Appearance reference: One Medium Rift Harpy in an editable mature adult female appearance: a weathered humanlike face with two dark brown eyes, medium warm brown intact skin, shoulder-length rough black hair and a guarded alert closed-mouth expression. Exactly two humanlike arms with five-fingered hands, exactly TWO separate gray-brown feathered wings attached behind the shoulders, and exactly two feathered bird legs ending in dark raptor talon feet. A plain opaque rough brown sleeveless wrap vest fully covers the chest and torso; a dark gray woven knee-length wrap skirt covers the pelvis and upper legs. Wings rest folded behind the body, with their complete feathered outer tips visible and a restrained muted violet sheen. The anatomical RIGHT hand holds ONE simple short wooden club low beside the body, fully visible; the LEFT hand is empty. The harpy form, lure-song bearing and club follow the authored source. The face, hair, outfit, gender presentation, feather arrangement and palette are editable defaults. No bare chest, nudity, sexualized pose, human bare feet, wing-arms replacing the club hand, beak instead of the humanlike face, extra limbs, listener/victim, lost-memory scene, named identity, writing or scenery. One long feathered tail trails behind the skirt as an editable visual default. Include only the details relevant to the head/upper-body crop. Match the selected references' polished naturalistic digital RPG illustration, soft studio light and plain full-bleed light neutral gray background. No scenery, attack, extra beings, memory scene, panels, labels, captions, text, logos, borders or UI."
+      }
+    },
+    {
+      "id": "severed-monster-rift-hippogriff",
+      "name": "Rift Hippogriff",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-hippogriff.md",
+          "sha256": "bf7bcaeec87ef9da0e6b93be809ae97299f84c395333cc54cbead93561714ae1",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "content/monsters/rift-hippogriff.md",
+          "sha256": "b0fe5bc9096f91819dcb1ce1d714d26ca09a7b2d3c0ae04f5622b9f6d3efdd4d",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "content/non-beast-form-index.json#/forms/hippogriff",
+          "sha256": "604dca2bc591dcce6d024150b57a4b7f597e13e6b30c8cc037ffad7093cb8f14",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "One Large Rift Hippogriff: a complete eagle-and-horse hybrid with one warm russet-feathered eagle head and neck, small pale cream brow accents, one dark gray hooked beak and two amber eyes; exactly two ocher-brown scaly eagle forelegs ending in dark talons; a chestnut equine torso and exactly two horse hindlegs ending in single solid black hooves; one long dark horsehair tail with no lion tuft; and exactly TWO broad russet-brown feathered wings attached above the shoulders. Wings are folded in a relaxed resting pose, complete outer contours and primary tips visible, flight feathers shimmering with restrained silver-violet trapped Veil-light. A watchful grounded near-front three-quarter standing pose with all four feet and the full tail visible. The hippogriff form and Veil-light flight feathers follow authored source; exact plumage, fur, eyes, colors and posture are editable visual defaults. This is an untacked representative, with no rider or selected cavalry ownership. No lion paws on the hindlegs, lion tail tuft, extra wings or legs, human face or arms, saddle, harness, ritual scene, victim, named history, text or scenery.",
+        "full_body": {
+          "path": "assets/characters/eac9815f0c3f33db2750ff3a881682b898c1f2d6a473efd0f8dded3e2c90303e.png",
+          "sha256": "eac9815f0c3f33db2750ff3a881682b898c1f2d6a473efd0f8dded3e2c90303e"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/bf73d085cfaad4f676f5aab6617994ed82338c3aaec91e66fb07fa20b3c8cfbc.png",
+          "sha256": "bf73d085cfaad4f676f5aab6617994ed82338c3aaec91e66fb07fa20b3c8cfbc"
+        },
+        "portrait": {
+          "path": "assets/characters/2f1e69ef8482cef9d630fa4e13c70b5ceb93560c48aab49c044000aac87cbb5b.png",
+          "sha256": "2f1e69ef8482cef9d630fa4e13c70b5ceb93560c48aab49c044000aac87cbb5b"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.4,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 1981703
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2233859
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2447153
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Asset: canonical complete creature reference for Rift Hippogriff in Sylvia GM's Severed Lands. Landscape 1536x1024 PNG, ONE complete single subject in a clear near-front three-quarter view on a plain light neutral gray background. Polished naturalistic digital RPG illustration, soft studio lighting and subtle grounding shadow, matching a production character catalogue. Keep the entire silhouette inside generous margins: complete head/hair/horns, hands or tentacles, held club, every foot, full tail and folded wing tips, with real headroom and space around the feet. Appearance: One Large Rift Hippogriff: a complete eagle-and-horse hybrid with one warm russet-feathered eagle head and neck, small pale cream brow accents, one dark gray hooked beak and two amber eyes; exactly two ocher-brown scaly eagle forelegs ending in dark talons; a chestnut equine torso and exactly two horse hindlegs ending in single solid black hooves; one long dark horsehair tail with no lion tuft; and exactly TWO broad russet-brown feathered wings attached above the shoulders. Wings are folded in a relaxed resting pose, complete outer contours and primary tips visible, flight feathers shimmering with restrained silver-violet trapped Veil-light. A watchful grounded near-front three-quarter standing pose with all four feet and the full tail visible. The hippogriff form and Veil-light flight feathers follow authored source; exact plumage, fur, eyes, colors and posture are editable visual defaults. This is an untacked representative, with no rider or selected cavalry ownership. No lion paws on the hindlegs, lion tail tuft, extra wings or legs, human face or arms, saddle, harness, ritual scene, victim, named history, text or scenery. Preserve the specified anatomy and any weapon-hand side. No extra entities, attack scene, environmental scenery, text, labels, captions, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Asset: production multiview reference sheet for Rift Hippogriff from Severed Lands. Input image1 is the selected canonical complete reference; preserve its exact face/head, anatomy, proportions, materials, colors, clothing/equipment and handedness. Landscape 1536x1024 PNG. Use a roomy 2x2 layout: THREE separated COMPLETE views (front three-quarter, side and rear three-quarter), plus one panel of head/material detail insets. Each main view shows the whole creature, with normal anatomical occlusion but no clipped outline. Keep every complete silhouette inside generous gray margins, including horns, hands/tentacles, club, feet/hooves, tail and folded wing tips. Appearance: One Large Rift Hippogriff: a complete eagle-and-horse hybrid with one warm russet-feathered eagle head and neck, small pale cream brow accents, one dark gray hooked beak and two amber eyes; exactly two ocher-brown scaly eagle forelegs ending in dark talons; a chestnut equine torso and exactly two horse hindlegs ending in single solid black hooves; one long dark horsehair tail with no lion tuft; and exactly TWO broad russet-brown feathered wings attached above the shoulders. Wings are folded in a relaxed resting pose, complete outer contours and primary tips visible, flight feathers shimmering with restrained silver-violet trapped Veil-light. A watchful grounded near-front three-quarter standing pose with all four feet and the full tail visible. The hippogriff form and Veil-light flight feathers follow authored source; exact plumage, fur, eyes, colors and posture are editable visual defaults. This is an untacked representative, with no rider or selected cavalry ownership. No lion paws on the hindlegs, lion tail tuft, extra wings or legs, human face or arms, saddle, harness, ritual scene, victim, named history, text or scenery. Preserve exactly FOUR legs (TWO eagle forelegs with talons and TWO horse hindlegs with single solid black hooves), TWO folded feathered wings and ONE long horsehair tail. No lion hind paws, lion tail tuft, extra wings or legs. Match the selected reference's polished naturalistic RPG illustration, soft studio light and plain light neutral gray background. No added anatomy, other beings, scenery, attack/memory scene, text, labels, captions, logos, borders or UI.",
+        "portrait": "Use case: identity-preserve. Asset: one reusable square 1024x1024 portrait for Rift Hippogriff from Severed Lands. Input image1 is the selected complete canonical reference; image2 is the reviewed multiview sheet. Keep this SAME subject's exact selected identity, anatomy, colors, expression, materials and head details. Portrait framing overrides the full-body layout. One near-front three-quarter EAGLE HEAD AND UPPER FEATHERED CHEST portrait, preserve the selected warm russet head/neck feathers, small cream brow accents, amber eye placement and dark gray hooked beak. Keep the entire crest, feather tips and whole beak inside a generous central80% circular safe area, head centered with gray space above the crown and beyond the beak. A hint of the russet/silver-violet wing roots may appear near the lower shoulders. No white griffon head, human face, horse head, full body, hooves or added horns. Do not draw a circle. Appearance reference: One Large Rift Hippogriff: a complete eagle-and-horse hybrid with one warm russet-feathered eagle head and neck, small pale cream brow accents, one dark gray hooked beak and two amber eyes; exactly two ocher-brown scaly eagle forelegs ending in dark talons; a chestnut equine torso and exactly two horse hindlegs ending in single solid black hooves; one long dark horsehair tail with no lion tuft; and exactly TWO broad russet-brown feathered wings attached above the shoulders. Wings are folded in a relaxed resting pose, complete outer contours and primary tips visible, flight feathers shimmering with restrained silver-violet trapped Veil-light. A watchful grounded near-front three-quarter standing pose with all four feet and the full tail visible. The hippogriff form and Veil-light flight feathers follow authored source; exact plumage, fur, eyes, colors and posture are editable visual defaults. This is an untacked representative, with no rider or selected cavalry ownership. No lion paws on the hindlegs, lion tail tuft, extra wings or legs, human face or arms, saddle, harness, ritual scene, victim, named history, text or scenery. Include only the details relevant to the head/upper-body crop. Match the selected references' polished naturalistic digital RPG illustration, soft studio light and plain full-bleed light neutral gray background. No scenery, attack, extra beings, memory scene, panels, labels, captions, text, logos, borders or UI."
+      }
     }
   ]
 }
