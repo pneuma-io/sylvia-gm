@@ -4,7 +4,7 @@
 >
 > **Endpoint:** A Windows Alpha candidate accepted by the project owner; publication requires separate approval.
 >
-> **Updated:** 2026-10-17
+> **Updated:** 2026-11-11
 
 PES-06 scope correction, 2026-09-15: the project owner permits starting a new campaign for current panel
 verification. Existing-campaign rules updates, including preserving layout when new panels are
@@ -16,6 +16,16 @@ decision source). Completed detail belongs in Git history and focused tests. His
 handoffs and checkout-specific records do not activate work.
 
 ## 1. Current work
+
+**11 November 2026: user-owned Claude runtime.** The owner selected a new PR for the existing
+Project Desk item `a420042f-c625-4f6e-aaa6-942519eaaa44`, including the future SylviaBench use of
+his own subscription. The implementation adds native executable/authentication controls, a separate
+provider and a tool handoff that retains Sylvia's deterministic authority. Opus 5.5 implemented
+the scoped Accounts presentation. Local synthetic transport, installed-binary protocol and
+existing-session checks qualify the source change. A bounded real subscription attempt reported the native usage
+limit and stopped without API fallback. Successful subscription generation, benchmark comparisons,
+packaged desktop acceptance, merge and release remain separate; the unmerged framework is not
+imported here. [Setup and evidence](../research/claude-native-runtime-2026-11-11.md).
 
 **9 November 2026: optional onboarding and the complete tutorial suite.** The owner selected a new
 PR for all independently accessible lessons and a guided welcome, AI connection, Ready campaign

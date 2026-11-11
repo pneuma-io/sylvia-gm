@@ -33,7 +33,8 @@ from sylvia_gm.provider._model_defaults import documented_model_defaults, docume
 from sylvia_gm.provider._protocol_routes import model_protocol
 
 ProviderTransport = Literal[
-    "chat_completions", "responses", "anthropic_messages", "codex_app_server", "gemini_generate_content"
+    "chat_completions", "responses", "anthropic_messages", "codex_app_server",
+    "gemini_generate_content", "claude_code",
 ]
 
 _DISCOVERY_RESPONSE_LIMIT = 32 * 1024 * 1024
@@ -43,13 +44,24 @@ _HEADER_COUNT_LIMIT = 16
 _HEADER_NAME = re.compile(r"^[A-Za-z0-9!#$%&'*+.^_`|~-]{1,80}$")
 _PROFILE_ID = re.compile(r"^[a-z][a-z0-9_]{0,63}$")
 _TRANSPORTS: frozenset[str] = frozenset(
-    {"chat_completions", "responses", "anthropic_messages", "codex_app_server", "gemini_generate_content"}
+    {"chat_completions", "responses", "anthropic_messages", "codex_app_server",
+     "gemini_generate_content", "claude_code"}
 )
 _CONFIG_LOCK = CONFIG_LOCK
 _P = ParamSpec("_P")
 _R = TypeVar("_R")
 
 _PROVIDER_PRESETS: dict[str, dict[str, object]] = {
+    "claude_runtime": {
+        "name": "Claude (local runtime)",
+        "mode": "subscription",
+        "base_url": "https://claude.ai",
+        "credential_required": False,
+        "endpoint_editable": False,
+        "default_transport": "claude_code",
+        "setup_hint": "Use Accounts to select the official Claude Code app and its native sign-in.",
+        "setup_url": "https://code.claude.com/docs/en/setup",
+    },
     "chatgpt_subscription": {
         "name": "ChatGPT subscription",
         "mode": "subscription",
@@ -662,7 +674,8 @@ def _project_configured_model(
         "documented_at": row.get("documented_at"),
         "builder_output_tokens": row.get("builder_output_tokens"),
         "output_budget_mode": (
-            "runtime_managed" if row.get("transport", default_transport) == "codex_app_server"
+            "runtime_managed"
+            if row.get("transport", default_transport) in ("codex_app_server", "claude_code")
             else "enforced"
         ),
         "transport": row.get("transport", default_transport),
@@ -702,6 +715,7 @@ def provider_settings(config_path: Path) -> dict[str, object]:
                 "name": definition.name or preset["name"],
                 "mode": definition.mode or preset["mode"],
                 "base_url": definition.base_url,
+                "runtime_executable": definition.runtime_executable,
                 "credential_configured": credential_configured,
                 "header_count": header_count,
                 "credential_error": credential_error,
@@ -1235,6 +1249,10 @@ def discover_provider_models(
         else (existing[3] if existing is not None else requested_id)
     )
     preset_key, preset = _preset(selected_preset_id)
+    if preset_key == "claude_runtime":
+        raise ConfigError(
+            "Use the Claude runtime controls in Accounts; HTTP discovery is unavailable"
+        )
     if preset_key == "chatgpt_subscription":
         raise ConfigError("Use the ChatGPT subscription controls to discover models")
     endpoint = _base_url(
@@ -1421,6 +1439,10 @@ def validate_provider_model(
         else (existing[3] if existing is not None else requested_id)
     )
     preset_key, preset = _preset(selected_preset_id)
+    if preset_key == "claude_runtime":
+        raise ConfigError(
+            "Use the Claude runtime connection; an HTTP probe cannot verify this model"
+        )
     if preset_key == "chatgpt_subscription":
         raise ConfigError("Use the ChatGPT subscription connection for model verification")
     endpoint = _base_url(
@@ -1738,6 +1760,7 @@ def save_provider_settings(
     declared_context_observed_at: object = None,
     runtime_context_observed_at: object = None,
     configured_context_observed_at: object = None,
+    runtime_executable: object = None,
 ) -> dict[str, object]:
     """Atomically add or update one model without replacing its provider catalog."""
 
@@ -1778,7 +1801,7 @@ def save_provider_settings(
     model_transport = _transport(
         transport, fallback=_model_transport_for_preset(preset_key, upstream_model_id),
     )
-    if output is None and model_transport != "codex_app_server":
+    if output is None and model_transport not in {"codex_app_server", "claude_code"}:
         from sylvia_gm.provider._output_policy import DEFAULT_OUTPUT_ALLOWANCE
 
         output = DEFAULT_OUTPUT_ALLOWANCE
@@ -1790,6 +1813,23 @@ def save_provider_settings(
         raise ConfigError(
             "Use managed ChatGPT sign-in; API keys and private headers are not accepted"
         )
+    if (model_transport == "claude_code") != (preset_key == "claude_runtime"):
+        raise ConfigError("Claude requires its native runtime connection")
+    if preset_key == "claude_runtime":
+        if credential or headers or profile_id != "claude_runtime":
+            raise ConfigError(
+                "Use Claude's native sign-in; API keys, headers and alternate profiles "
+                "are not accepted"
+            )
+        if configured_output is not None:
+            raise ConfigError("The Claude runtime manages the output allowance")
+        selected_executable = (
+            runtime_executable if runtime_executable is not None
+            else existing_raw.get("runtime_executable", "")
+        )
+        if (not isinstance(selected_executable, str)
+                or selected_executable and not Path(selected_executable).is_absolute()):
+            raise ConfigError("Choose an absolute path to the native Claude executable")
     supplied = credential.strip() if isinstance(credential, str) else ""
 
     existing = providers.get(profile_id, {})
@@ -1879,7 +1919,8 @@ def save_provider_settings(
             and capacity.effective_context_window is not None):
         output = min(output, max(1, capacity.effective_context_window // 4))
     if (capacity.effective_context_window is not None and output is not None
-            and model_transport != "codex_app_server" and output > capacity.effective_context_window):
+            and model_transport not in {"codex_app_server", "claude_code"}
+            and output > capacity.effective_context_window):
         raise ConfigError("Provider model output limit exceeds its effective context capacity")
     previous_builder_budget = prior.get("builder_output_tokens") if prior is not None else None
     if previous_builder_budget is not None:
@@ -1900,7 +1941,8 @@ def save_provider_settings(
         "output_allowance_source": (
             "user_configured" if configured_output is not None else
             "provider_metadata" if declared_output is not None else
-            "runtime_managed" if model_transport == "codex_app_server" else "application_default"
+            "runtime_managed"
+            if model_transport in {"codex_app_server", "claude_code"} else "application_default"
         ),
         "documented_source": defaults.get("documented_source"),
         "documented_at": defaults.get("documented_at"),
@@ -1949,6 +1991,8 @@ def save_provider_settings(
         "headers": dict(stored_headers),
         "models": updated_models,
     }
+    if preset_key == "claude_runtime":
+        providers[profile_id]["runtime_executable"] = selected_executable
     _write_user_config(config_path, document)
     return {
         "provider_id": profile_id,

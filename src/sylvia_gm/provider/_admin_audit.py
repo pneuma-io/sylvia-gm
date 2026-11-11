@@ -125,11 +125,15 @@ class _CompletedResponseObserver:
         self.retry_attempt = context.retry_attempt
         if self._exchange_id is not None and context.request_json is not None:
             request = _plain(context.request_json)
-            runtime = context.provider_key == "chatgpt_subscription"
+            runtime = context.provider_key in {"chatgpt_subscription", "claude_runtime"}
+            runtime_layer = (
+                "claude_code_boundary" if context.provider_key == "claude_runtime"
+                else "codex_app_server_boundary"
+            )
             self._sink(
                 {
                     "kind": "provider_runtime_exchange" if runtime else "provider_wire_request",
-                    "input_stage": "codex_app_server_boundary"
+                    "input_stage": runtime_layer
                     if runtime
                     else "provider_specific_wire_request",
                     "exchange_id": self._exchange_id,
@@ -139,7 +143,7 @@ class _CompletedResponseObserver:
                     "request": request,
                     "serialization": _serialization_projection(
                         request,
-                        layer="codex_app_server_boundary"
+                        layer=runtime_layer
                         if runtime
                         else "provider_client_request_representation",
                     ),

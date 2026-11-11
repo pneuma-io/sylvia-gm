@@ -32,7 +32,7 @@ def selected_model_info(
     transport = choice.get("transport", "chat_completions")
     if transport not in (
         "chat_completions", "responses", "anthropic_messages", "codex_app_server",
-        "gemini_generate_content",
+        "gemini_generate_content", "claude_code",
     ):
         raise ValueError("Configured model transport is unsupported")
     control = choice.get("reasoning_control")

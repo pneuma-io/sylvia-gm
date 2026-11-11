@@ -65,6 +65,7 @@ const SylviaGMFrontend = (() => {
     modelEditor: { route: 'api', providerId: null, modelId: null, step: 'connection' },
     savedModelNotice: null,
     pendingChatGPTModelId: null,
+    pendingClaudeModel: null,
     adminAuditEnabled: false,
     adminAuditTraces: [],
     adminAuditRawTraceCount: 0,
@@ -1061,6 +1062,7 @@ const SylviaGMFrontend = (() => {
       provider_settings: () => invoke('provider_settings'),
       open_provider_setup: (presetId) => invoke('open_provider_setup', { presetId }),
       chatgpt_connection: (action, model = null) => invoke('chatgpt_connection', { action, model }),
+      claude_connection: (action, options = null) => invoke('claude_connection', { action, options }),
       admin_full_audit_status: () => invoke('admin_full_audit_status'),
       admin_full_audit_record: (index) => invoke('admin_full_audit_record', { index }),
       open_admin_audit_window: () => invoke('open_admin_audit_window'),
@@ -1575,7 +1577,37 @@ const SylviaGMFrontend = (() => {
     });
     $('open-account-signin-btn').addEventListener('click', () => {
       state.pendingChatGPTModelId = '';
+      accountView = 'chatgpt';
       showSettingsTab('accounts');
+    });
+    $('open-claude-signin-btn').addEventListener('click', () => {
+      state.pendingClaudeModel = { id: '', context_window: null };
+      accountView = 'claude';
+      showSettingsTab('accounts');
+    });
+    document.querySelectorAll('[data-account-view]').forEach((button) => {
+      button.addEventListener('click', () => showAccountView(button.dataset.accountView));
+    });
+    document.querySelectorAll('[data-claude-action]').forEach((button) => {
+      button.addEventListener('click', () => updateClaudeConnection(button.dataset.claudeAction));
+    });
+    document.querySelectorAll('[data-claude-alias]').forEach((button) => {
+      button.addEventListener('click', () => {
+        $('claude-model-id').value = button.dataset.claudeAlias;
+        selectClaudeModel();
+        $('claude-model-id').focus();
+      });
+    });
+    $('claude-model-id').addEventListener('input', selectClaudeModel);
+    $('claude-install-guide-btn').addEventListener('click', () => { void openClaudeInstallGuide(); });
+    $('claude-api-route-btn').addEventListener('click', () => {
+      resetModelsPage();
+      showSettingsTab('models');
+      beginModelConnection('api');
+      if ([...$('provider-preset').options].some(option => option.value === 'anthropic')) {
+        $('provider-preset').value = 'anthropic';
+        $('provider-preset').dispatchEvent(new Event('change'));
+      }
     });
     $('account-models-btn').addEventListener('click', () => showModelsOverview());
     $('chatgpt-model-choice').addEventListener('change', selectChatGPTModel);
@@ -1896,8 +1928,10 @@ const SylviaGMFrontend = (() => {
     // Each tab starts at its own top; another panel's scroll offset never applies.
     const content = document.querySelector('.settings-content');
     if (content) content.scrollTop = 0;
-    chatgptPageVisible = tab === 'accounts';
+    chatgptPageVisible = tab === 'accounts' && accountView === 'chatgpt';
+    claudePageVisible = tab === 'accounts' && accountView === 'claude';
     clearTimeout(chatgptStatusTimer);
+    clearTimeout(claudeStatusTimer);
     document.querySelectorAll('[data-settings-tab]').forEach((button) => {
       const selected = button.dataset.settingsTab === tab;
       button.classList.toggle('active', selected);
@@ -1910,7 +1944,9 @@ const SylviaGMFrontend = (() => {
       panel.classList.toggle('active', selected);
       panel.hidden = !selected;
     });
+    if (tab === 'accounts') renderAccountView();
     if (chatgptPageVisible) void updateChatGPTConnection('status');
+    if (claudePageVisible) resumeClaudeConnection();
     state.desktopUpdater?.setVisible(tab === 'about');
     tutorials?.refresh();
     if (tab === 'dictation' && !dictationModelJob) {
@@ -1943,7 +1979,9 @@ const SylviaGMFrontend = (() => {
     resetModelsPage();
     state.desktopUpdater?.setVisible(false);
     chatgptPageVisible = false;
+    claudePageVisible = false;
     clearTimeout(chatgptStatusTimer);
+    clearTimeout(claudeStatusTimer);
     if (settingsReturnFocus && typeof settingsReturnFocus.focus === 'function') {
       settingsReturnFocus.focus();
     }
@@ -2396,6 +2434,14 @@ const SylviaGMFrontend = (() => {
     const provider = state.providerSettings?.configured?.find(item => item.provider_id === providerId);
     if (provider?.preset_id === 'chatgpt_subscription') {
       state.pendingChatGPTModelId = modelId;
+      accountView = 'chatgpt';
+      showSettingsTab('accounts');
+      return;
+    }
+    if (provider?.preset_id === CLAUDE_RUNTIME_PRESET) {
+      const saved = provider.models?.find(item => item.id === modelId);
+      state.pendingClaudeModel = { id: saved?.id || '', context_window: saved?.configured_context_window || null };
+      accountView = 'claude';
       showSettingsTab('accounts');
       return;
     }
@@ -2404,7 +2450,7 @@ const SylviaGMFrontend = (() => {
     $('model-add-choices').hidden = true;
     $('provider-editor').hidden = false;
     const presets = (state.providerSettings?.presets || []).filter(preset =>
-      preset.provider_id !== 'chatgpt_subscription' &&
+      preset.provider_id !== 'chatgpt_subscription' && preset.provider_id !== CLAUDE_RUNTIME_PRESET &&
       (preset.provider_id === 'custom' || (route === 'local' ? preset.mode === 'local' : preset.mode !== 'local')));
     $('provider-preset').innerHTML = presets.map(preset =>
       `<option value="${escapeHtml(preset.provider_id)}">${escapeHtml(preset.name)}</option>`).join('');
@@ -2906,6 +2952,217 @@ const SylviaGMFrontend = (() => {
     }
   }
 
+  const CLAUDE_RUNTIME_PRESET = 'claude_runtime';
+  let accountView = 'chatgpt';
+  let claudeRequestBusy = false;
+  let claudePageVisible = false;
+  let claudeStatusTimer = null;
+  let claudeAccountStatus = null;
+
+  // The Accounts page shows one subscription flow at a time. Opening the Claude view never starts
+  // Claude Code; only its buttons do, plus the read-only poll while a sign-in is unfinished.
+  function showAccountView(view) {
+    if (view !== 'chatgpt' && view !== 'claude') return;
+    accountView = view;
+    if (!$('settings-panel-accounts').hidden) showSettingsTab('accounts');
+  }
+
+  function renderAccountView() {
+    document.querySelectorAll('[data-account-view]').forEach((button) =>
+      button.setAttribute('aria-pressed', button.dataset.accountView === accountView ? 'true' : 'false'));
+    document.querySelectorAll('[data-account-panel]').forEach((panel) => {
+      panel.hidden = panel.dataset.accountPanel !== accountView;
+    });
+    if (accountView === 'claude' && state.pendingClaudeModel) {
+      const savedRuntime = state.providerSettings?.configured?.find(item => item.preset_id === CLAUDE_RUNTIME_PRESET);
+      $('claude-executable').value = savedRuntime?.runtime_executable || '';
+      $('claude-model-id').value = state.pendingClaudeModel.id || '';
+      $('claude-model-context').value = state.pendingClaudeModel.context_window || '';
+      $('claude-model-advanced').open = false;
+      state.pendingClaudeModel = null;
+      selectClaudeModel();
+    }
+  }
+
+  function resumeClaudeConnection() {
+    renderClaudeStatus(claudeAccountStatus);
+    if (claudeAccountStatus?.login_pending) void updateClaudeConnection('status');
+  }
+
+  function savedClaudeModel(id) {
+    return state.providerSettings?.configured?.find(item => item.preset_id === CLAUDE_RUNTIME_PRESET)
+      ?.models?.find(item => item.id === id);
+  }
+
+  function selectClaudeModel() {
+    const id = $('claude-model-id').value.trim();
+    const saved = savedClaudeModel(id);
+    $('claude-model-heading').textContent = saved ? '2. Model settings' : '2. Add a model';
+    document.querySelector('[data-claude-action="add_model"]').textContent = saved ? 'Save model changes' : 'Add model';
+    document.querySelectorAll('[data-claude-alias]').forEach((button) =>
+      button.setAttribute('aria-pressed', button.dataset.claudeAlias === id ? 'true' : 'false'));
+    $('claude-model-status').textContent = '';
+  }
+
+  function claudeAuthLabel(method) {
+    const labels = { 'claude.ai': 'Claude account', claude_ai: 'Claude account', subscription: 'Claude account',
+      console: 'Anthropic Console', api_key: 'API key', oauth_token: 'Long-lived token' };
+    return method ? labels[method] || String(method) : 'Not reported';
+  }
+
+  // Billing is stated exactly as Claude Code reports it; Sylvia never chooses or changes it.
+  function claudeBillingNote(billing) {
+    if (billing === 'subscription') return ['Uses your Claude subscription. Your plan’s usage limits apply, ' +
+      'and Sylvia never moves this account to API billing.', false];
+    if (billing === 'api') return ['Claude Code is signed in with an Anthropic Console account, so usage is billed to ' +
+      'that Console account, not a subscription. To use your subscription instead, sign in again in Claude Code.', true];
+    return ['Claude Code didn’t report how this sign-in is billed. Check in Claude Code before relying on it.', true];
+  }
+
+  // Renders the last explicit check; null means Claude Code has not been contacted yet.
+  function renderClaudeStatus(result) {
+    const checked = Boolean(result);
+    const installed = checked && result.installed === true;
+    const supported = installed && result.supported === true;
+    const pending = supported && result.login_pending === true;
+    const signedIn = supported && result.signed_in === true && !pending;
+    $('claude-signin-step').textContent = !checked ? '1. Find Claude Code' : !installed ? '1. Install Claude Code'
+      : !supported ? '1. Update Claude Code' : signedIn ? '1. Claude connected'
+        : pending ? '1. Finish sign-in in your browser' : '1. Sign in to Claude';
+    if (checked) {
+      $('claude-connection-status').textContent = !installed ? 'Claude Code wasn’t found on this computer.'
+        : !supported ? `This version of Claude Code${result.version ? ` (${result.version})` : ''} isn’t supported. Update it, then check again.`
+          : signedIn ? 'Claude Code is signed in.'
+            : pending ? 'Finish sign-in in your browser. This page will update automatically.'
+              : 'Claude Code is ready. Sign in to use your account.';
+    }
+    const detail = checked && typeof result.message === 'string' ? result.message.trim() : '';
+    $('claude-connection-detail').textContent = detail;
+    $('claude-connection-detail').hidden = !detail || detail === $('claude-connection-status').textContent;
+    $('claude-runtime-facts').hidden = !installed;
+    if (installed) {
+      $('claude-fact-version').textContent = (result.version || 'Version not reported') + (supported ? '' : ' · unsupported');
+      $('claude-fact-version').title = result.executable || '';
+      $('claude-fact-auth').textContent = signedIn ? claudeAuthLabel(result.auth_method) : pending ? 'Signing in…' : 'Not signed in';
+      $('claude-fact-billing').textContent = !signedIn ? '—' : result.billing === 'subscription' ? 'Claude subscription'
+        : result.billing === 'api' ? 'Anthropic Console API' : 'Not reported';
+    }
+    const [billingText, billingWarn] = claudeBillingNote(result?.billing);
+    $('claude-billing-note').hidden = !signedIn;
+    $('claude-billing-note').textContent = signedIn ? billingText : '';
+    $('claude-billing-note').classList.toggle('settings-note-warn', signedIn && billingWarn);
+    const statusButton = document.querySelector('[data-claude-action="status"]');
+    statusButton.textContent = checked ? 'Check again' : 'Check for Claude Code';
+    statusButton.classList.toggle('btn-primary', !supported);
+    statusButton.classList.toggle('btn-secondary', supported);
+    const loginButton = document.querySelector('[data-claude-action="login"]');
+    loginButton.hidden = !supported || pending;
+    loginButton.textContent = signedIn ? 'Sign in again with Claude Code' : 'Sign in with Claude Code';
+    document.querySelector('[data-claude-action="cancel"]').hidden = !pending;
+    $('claude-install-guide-btn').hidden = !checked || supported;
+    $('claude-install-help').hidden = !checked || supported;
+    $('claude-login-help').hidden = !supported || signedIn;
+    $('claude-cancel-help').hidden = !pending;
+    $('claude-signout-help').hidden = !signedIn;
+    $('claude-model-card').hidden = !signedIn;
+  }
+
+  function claudeExecutableOption() {
+    const value = $('claude-executable').value.trim();
+    if (!value) return null;
+    if (!/^(?:[A-Za-z]:[\\/]|\\\\|\/)/.test(value)) {
+      throw new Error('Enter the full path to Claude Code, or leave the location empty to find it automatically.');
+    }
+    return value;
+  }
+
+  // Each call follows a button press on this page, or polls read-only status while sign-in is unfinished.
+  async function updateClaudeConnection(action) {
+    const status = $(action === 'add_model' ? 'claude-model-status' : 'claude-connection-status');
+    const options = {};
+    try {
+      const executable = claudeExecutableOption();
+      if (executable) options.executable = executable;
+    } catch (error) {
+      $('claude-connection-status').textContent = error.message;
+      $('claude-runtime-advanced').open = true;
+      $('claude-executable').focus();
+      return;
+    }
+    if (action === 'add_model') {
+      const id = $('claude-model-id').value.trim();
+      if (!id) {
+        status.textContent = 'Enter a Claude Code alias such as sonnet, or an exact model ID.';
+        $('claude-model-id').focus();
+        return;
+      }
+      if (!/^[A-Za-z0-9][A-Za-z0-9._:@/\[\]-]*$/.test(id)) {
+        status.textContent = 'A model ID has no spaces. Use an alias such as sonnet or the exact ID from Anthropic.';
+        $('claude-model-id').focus();
+        return;
+      }
+      const context = $('claude-model-context').value.trim();
+      if (context && !positiveIntegerOrNull(context)) {
+        status.textContent = 'Enter a positive whole number or leave the field empty.';
+        $('claude-model-advanced').open = true;
+        $('claude-model-context').focus();
+        return;
+      }
+      options.model = { id, context_window: positiveIntegerOrNull(context), max_output_tokens: null };
+    }
+    if (claudeRequestBusy) return;
+    claudeRequestBusy = true;
+    clearTimeout(claudeStatusTimer);
+    const buttons = [...document.querySelectorAll('[data-claude-action], #claude-install-guide-btn')];
+    buttons.forEach((button) => { button.disabled = true; });
+    const quietPoll = action === 'status' && claudeAccountStatus?.login_pending;
+    if (!quietPoll) {
+      status.textContent = action === 'status' ? 'Checking Claude Code…' : action === 'login' ? 'Starting sign-in…'
+        : action === 'cancel' ? 'Cancelling sign-in…' : 'Saving…';
+    }
+    let pollAgain = false;
+    try {
+      if (!state.bridge?.claude_connection) throw new Error('Claude Code connection isn’t available in this copy of Sylvia.');
+      const result = await state.bridge.claude_connection(action, Object.keys(options).length ? options : null);
+      claudeAccountStatus = result;
+      pollAgain = Boolean(result.login_pending);
+      renderClaudeStatus(result);
+      if (result.saved_model) {
+        await refreshProviderSettings();
+        await refreshModelChoices();
+        const saved = state.modelChoices.find(choice => choice.model_id === result.saved_model);
+        showModelsOverview({ provider_id: saved?.provider_id, canonical_model_id: result.saved_model,
+          name: saved?.model_name || options.model?.id || 'Model' });
+        status.textContent = 'Model saved.';
+      } else if (action === 'add_model') {
+        status.textContent = result.message || 'The model wasn’t saved.';
+      } else if (action === 'cancel' && !result.login_pending && !result.signed_in) {
+        status.textContent = 'Sign-in cancelled.';
+      }
+    } catch (error) {
+      pollAgain = false;
+      status.textContent = String(error && error.message || error || 'Claude Code connection unavailable.');
+    } finally {
+      buttons.forEach((button) => { button.disabled = false; });
+      claudeRequestBusy = false;
+      if (claudePageVisible && pollAgain) {
+        claudeStatusTimer = setTimeout(() => void updateClaudeConnection('status'), 1500);
+      }
+    }
+  }
+
+  async function openClaudeInstallGuide() {
+    const status = $('claude-connection-detail');
+    status.hidden = false;
+    try {
+      const result = await state.bridge.open_provider_setup(CLAUDE_RUNTIME_PRESET);
+      status.textContent = result.opened ? 'Anthropic’s Claude Code guide opened in your browser. Check again when it’s ready.'
+        : `Could not open your browser. Visit ${result.url}`;
+    } catch (error) {
+      status.textContent = 'Could not open the Claude Code guide. Visit https://code.claude.com/docs/en/setup';
+    }
+  }
+
   async function refreshProviderSettings() {
     if (!state.bridge || !state.bridge.provider_settings) return;
     const status = $('models-action-status');
@@ -2923,7 +3180,7 @@ const SylviaGMFrontend = (() => {
     const provider = configured.find((item) => item.provider_id === providerId);
     if (!provider) return;
     beginModelConnection(provider.mode === 'local' ? 'local' : 'api', provider.provider_id, provider.models?.[0]?.id);
-    if (provider.preset_id === 'chatgpt_subscription') return;
+    if (provider.preset_id === 'chatgpt_subscription' || provider.preset_id === CLAUDE_RUNTIME_PRESET) return;
     showModelEditorStep('connection');
     $('provider-settings-status').textContent = provider.credential_error || (provider.header_count
       ? `${provider.header_count} private headers saved. Leave them blank to keep them.`
@@ -3888,7 +4145,11 @@ const SylviaGMFrontend = (() => {
           openSettings('models');
           // Retain an already-open editor and anything the player has entered.
           if ($('provider-editor').hidden || state.modelEditor.route !== route) beginModelConnection(route);
-        } else openSettings(route);
+        } else {
+          // Account guides target the ChatGPT flow, so the switch shows it.
+          if (route === 'accounts') accountView = 'chatgpt';
+          openSettings(route);
+        }
       },
     });
   }

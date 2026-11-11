@@ -29,6 +29,12 @@ For ChatGPT account connections, Sylvia requires the supported
 and account access depend on your provider; a connection option does not guarantee compatibility
 with every account or model.
 
+The Claude account connection uses your separately installed, unmodified Claude Code app
+(version 2.1.322 or later). In Settings > Accounts > Claude, check the installation, use its native
+sign-in and add a model. Usage follows the account selected in Claude Code; the Anthropic API-key
+connection stays separate. See the [setup guide and current verification limits](docs/research/claude-native-runtime-2026-11-11.md),
+including headless configuration for SylviaBench.
+
 ## Included content
 
 SRD Lite is based on the D&D SRD 5.2.1, with 117 supported spells and a deliberately limited launch

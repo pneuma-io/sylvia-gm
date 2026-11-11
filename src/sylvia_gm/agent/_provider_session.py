@@ -5649,7 +5649,7 @@ class ProviderSessionAdapter:
                         # A sole required operation is a structured transaction, not a creative
                         # choice. Local runtimes also need deterministic required-tool handling.
                         output_budget["temperature"] = 0
-                if getattr(model_info, "transport", None) == "codex_app_server":
+                if getattr(model_info, "transport", None) in {"codex_app_server", "claude_code"}:
                     output_budget.pop("max_tokens", None)
                 control.progress.update("provider")
                 stream_or_awaitable: object = provider.generate_stream(

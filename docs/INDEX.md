@@ -2,7 +2,7 @@
 
 > **Status:** Active authority map
 >
-> **Last authority update:** 2026-10-16
+> **Last authority update:** 2026-11-11
 
 This is the sole human-maintained map of repository documents that may direct Sylvia GM operation
 or implementation. Project Desk is Wan's current planning and decision source; the contracts below
@@ -92,6 +92,7 @@ boundary and the latest direct human task determine what may be worked on now.
 | [`evidence/model-input-audit/README.md`](evidence/model-input-audit/README.md) | Public synthetic exact-input captures for prompt, MCP, provider-application, and provider-wire inspection. |
 | [`evidence/gcs-engineering-closeout-2026-09-07.md`](evidence/gcs-engineering-closeout-2026-09-07.md) | Dated GCS implementation, limit-correction and installed-candidate evidence, including the unqualified gameplay boundary. |
 | [`research/narrative-ai-prompt-context-comparison.md`](research/narrative-ai-prompt-context-comparison.md) | Supporting comparison of narrative-agent prompt, memory, retrieval, spoiler, and deterministic-tool patterns used by audit item 14. |
+| [`research/claude-native-runtime-2026-11-11.md`](research/claude-native-runtime-2026-11-11.md) | Native Claude setup, current official authentication boundary, transport decisions, synthetic/native-protocol evidence and future SylviaBench configuration; not installed-release or real-account acceptance. |
 | [`research/comparable-stateful-narrative-agent-architectures-2026-09-03.md`](research/comparable-stateful-narrative-agent-architectures-2026-09-03.md) | Supporting comparison of agent loops, authoritative world models, opportunity-based narrative, tiered context, and spoiler-safe observability. |
 | [`research/codex-model-selection-and-routing-2026-09-10.md`](research/codex-model-selection-and-routing-2026-09-10.md) | Practitioner preferences, usage rates, and model-switching options for Wan's personal Codex workflow discussion. |
 | [`research/astra-from-scratch-assessment-2026-09-12.md`](research/astra-from-scratch-assessment-2026-09-12.md) | Advisory assessment of how Astra would build Sylvia GM from scratch, grounded in current source and recorded findings; not an implementation selection. |

@@ -75,6 +75,7 @@ OPERATIONS = frozenset(
         "provider_settings",
         "open_provider_setup",
         "chatgpt_connection",
+        "claude_connection",
         "admin_full_audit_status",
         "admin_full_audit_record",
         "export_admin_full_audit",

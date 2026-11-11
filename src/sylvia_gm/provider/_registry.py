@@ -204,6 +204,7 @@ class ProviderRegistry:
         api_key: str,
         headers: dict[str, str] | None = None,
         runtime_home: str = "",
+        runtime_executable: str = "",
     ) -> None:
         """Register connection details for a provider.
 
@@ -224,6 +225,7 @@ class ProviderRegistry:
             "api_key": api_key,
             "headers": dict(headers or {}),
             "runtime_home": runtime_home,
+            "runtime_executable": runtime_executable,
         }
 
     def configure_providers(self, configs: dict[str, dict[str, object]]) -> None:
@@ -304,7 +306,7 @@ class ProviderRegistry:
         Routes through ProviderFactory instead of hardcoding OpenAICompatProvider.
         """
         cache_key = (provider_key, model_info.id)
-        if cache_key in self._providers:
+        if cache_key in self._providers and model_info.transport != "claude_code":
             return self._providers[cache_key]
 
         cfg = self._provider_configs.get(provider_key)
@@ -324,13 +326,17 @@ class ProviderRegistry:
             transport=model_info.transport,  # API shape selected by this model's metadata
             base_url=str(cfg["base_url"]),
             runtime_home=str(cfg.get("runtime_home", "")),
+            runtime_executable=str(cfg.get("runtime_executable", "")),
             default_headers={str(key): str(value) for key, value in header_items},
             credentials_list=[{"type": "api_key", "value": str(cfg["api_key"])}],
             models=[model_info],
             default_model=model_info.id,
         )
         provider = ProviderFactory.create(config)
-        self._providers[cache_key] = provider
+        # Native Claude steps own a process and an event-loop lock. Give each resolved
+        # session its own adapter so concurrent campaigns do not share that state.
+        if model_info.transport != "claude_code":
+            self._providers[cache_key] = provider
         return provider
 
     # ── auto-discovery ────────────────────────────────────────────────
