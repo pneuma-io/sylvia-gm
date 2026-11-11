@@ -1091,6 +1091,7 @@ class CampaignDisplaySnapshot(CampaignState):
     actions: tuple[ActionRecord, ...]
     events: tuple[CanonicalEvent, ...]
     turns: Mapping[str, TurnStatus]
+    continuity: CampaignContinuityView = field(default_factory=CampaignContinuityView)
 
 
 @dataclass(frozen=True)

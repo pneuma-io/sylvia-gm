@@ -30,6 +30,7 @@ from sylvia_gm.domain.authority import (
     ActionReceipt,
     ActionStatus,
     AwaitingChoiceReceipt,
+    CampaignDisplaySnapshot,
     MechanicsChoiceOption,
     MechanicsChoiceRequest,
     ModelToolBehavior,
@@ -309,6 +310,7 @@ def _model_input_schema(
     schema: Mapping[str, object],
     *,
     participant_ids: Sequence[str],
+    castable_spell_ids: frozenset[str] | None = None,
 ) -> tuple[dict[str, object], dict[str, Mapping[str, object]]]:
     """Project one executable model contract and its authority-owned argument derivations."""
 
@@ -338,6 +340,10 @@ def _model_input_schema(
             model_required.add(name)
         if child.get("x-sylvia-gm-reference") == "participant":
             child["enum"] = list(participant_ids)
+        enum = child.get("enum")
+        if (child.get("x-sylvia-gm-castable-spells") is True
+                and isinstance(enum, list) and castable_spell_ids is not None):
+            child["enum"] = [value for value in enum if value in castable_spell_ids]
         properties[name] = child
     raw_required = projected.get("required", ())
     required = (
@@ -349,6 +355,25 @@ def _model_input_schema(
     projected["properties"] = properties
     projected["required"] = sorted(required | model_required)
     return projected, derivations
+
+
+def _castable_spell_ids(snapshot: CampaignDisplaySnapshot) -> frozenset[str]:
+    """Narrow a package's declared spell choices to admitted characters and prepared creatures."""
+    choices: set[str] = set()
+    for participant in snapshot.participants:
+        book = participant.data.get("wizard_spellbook", ())
+        if isinstance(book, Sequence) and not isinstance(book, (str, bytes)):
+            choices.update(value for value in book if isinstance(value, str))
+    for key, entities in snapshot.state.items():
+        if not key.endswith(".entities") or not isinstance(entities, Mapping):
+            continue
+        for entity in entities.values():
+            if not isinstance(entity, Mapping):
+                continue
+            prepared = entity.get("prepared_spells", ())
+            if isinstance(prepared, Sequence) and not isinstance(prepared, (str, bytes)):
+                choices.update(value for value in prepared if isinstance(value, str))
+    return frozenset(choices)
 
 
 def _narrative_input_schema(
@@ -1239,6 +1264,8 @@ def _safe_error(error: AuthorityError) -> types.CallToolResult:
         "status": "rejected",
         "code": code,
         "reason": reason,
+        **({"reasons": list(error.refusal_reasons)}
+           if isinstance(error, MechanicsRejected) and len(error.refusal_reasons) > 1 else {}),
         "validation": validation,
         "state_changed": (
             error.state_changed if isinstance(error, MechanicsRejected) else False
@@ -1315,11 +1342,12 @@ def build_stateless_mcp_server(owner: AuthorityOwner) -> Server[Any]:
             _require_protocol(context)
             meta = _request_meta(context)
             campaign_id = _meta_text(meta, "campaign_id")
-            snapshot = owner.snapshot(campaign_id)
+            snapshot, _boundary = owner.model_context_snapshot(campaign_id)
             participant_ids = tuple(
                 participant.participant_id
                 for participant in getattr(snapshot, "participants", ())
             )
+            castable_spell_ids = _castable_spell_ids(snapshot)
             projected: list[types.Tool] = []
             for tool in owner.catalog(campaign_id):
                 schema = _plain_json(tool.input_schema)
@@ -1328,7 +1356,12 @@ def build_stateless_mcp_server(owner: AuthorityOwner) -> Server[Any]:
                 model_schema, parameter_derivations = _model_input_schema(
                     schema,
                     participant_ids=participant_ids,
+                    castable_spell_ids=castable_spell_ids,
                 )
+                properties = cast(Mapping[str, object], model_schema["properties"])
+                spell_schema = properties.get("spell")
+                if isinstance(spell_schema, Mapping) and spell_schema.get("enum") == []:
+                    continue
                 projected.append(
                     types.Tool(
                         name=tool.name,
@@ -2155,6 +2188,7 @@ class StatelessMcpMechanics:
                 field_paths=field_paths,
                 validation_issues=_validation_issues_from_payload(raw_issues),
                 state_changed=False,
+                refusal_reasons=_string_sequence(payload.get("reasons", ())),
             )
         return cast(Mapping[str, object], _plain_json(payload))
 
@@ -2595,6 +2629,7 @@ class StatelessMcpMechanics:
                 field_paths=field_paths,
                 validation_issues=_validation_issues_from_payload(raw_issues),
                 state_changed=payload.get("state_changed") is True,
+                refusal_reasons=_string_sequence(payload.get("reasons", ())),
             )
         if payload.get("status") == "awaiting_choice":
             try:

@@ -74,10 +74,11 @@ source to bypass an unavailable feature. The offered executable spell catalogue 
 runnable effects; a saved grant does not implement a missing spell effect.
 
 For a Verbal component, supply `verbal_component_available` from the current scene: the caster
-must be able to speak normally, without a gag or magical silence. For a Somatic component,
-supply `somatic_component_available`: the caster needs a hand able to make the gestures. A hand
-accessing that spell's materials can also gesture. The engine reads which components the spell
-requires; omission does not mean a required component is available.
+must be able to speak normally, without a gag or magical silence. Somatic availability defaults
+to true: held weapons, shields and other items never prevent spell gestures, in or out of combat.
+Set `somatic_component_available` to false only when the current scene prevents the caster from
+moving enough to gesture. Verbal and material component requirements are unchanged; supply their
+current scene facts and actual materials rather than treating omission as availability.
 
 Record spell materials with carried inventory using `character_updates`: include the current
 `inventory` and its `spell_materials` supplies. Each supply has a stable `id`, an exact carried

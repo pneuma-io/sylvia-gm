@@ -1783,7 +1783,10 @@ def execute_tool_batch(
             state.local_tool_results[state.assembly.call_id] = {
                 "status": "rejected",
                 "code": error.code,
-                "field_paths": [],
+                "reason": str(error),
+                "field_paths": (
+                    list(error.field_paths) if isinstance(error, MechanicsRejected) else []
+                ),
                 "state_changed": False,
                 "instruction": (
                     "Correct the selected participant or operation fields and retry once."

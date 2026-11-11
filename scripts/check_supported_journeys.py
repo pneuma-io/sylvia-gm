@@ -59,6 +59,7 @@ PYTHON_JOURNEYS = {
     ],
     "command-registry": ["tests/test_command_registry.py"],
     "campaign-play": [
+        "tests/test_gm_hotfix_upgrade.py",
         "tests/test_campaign_rules_update.py",
         "tests/test_campaign_rules_update_bindings.py",
         "tests/test_campaign_rules_update_knowledge.py",
@@ -336,6 +337,9 @@ PYTHON_JOURNEYS = {
         "tests/test_alpha_f4_provider_session_adapter.py",
         "tests/test_alpha_f4_generic_sessions.py",
         "tests/test_provider_turn_state.py",
+    ],
+    "gm-request-contracts": [
+        "tests/test_gm_memory_casting_hotfix.py",
     ],
     "provider-contracts": [
         "tests/test_provider_session_transport_projection.py",
