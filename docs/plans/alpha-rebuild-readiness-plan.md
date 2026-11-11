@@ -112,7 +112,20 @@ actors need an actual full-height obstruction for the shown wall contacts, or a 
 with physically valid low-cover poses and firing angles. Relabelling alone is insufficient;
 verify every shown contact against geometry and the resolved shot. Qualify these directional
 cover cases and the resulting stop/penetration cues in the final app before balancing. This
-correction and native qualification remain open; no demo or runtime repair is claimed here.
+native qualification remains open. On resumption, a separate corrected demo candidate removes
+the first shot's fabricated cover/penetration contacts and material deduction: its upper-body
+path clears the one-metre wall. The frozen donor and published reel remain unchanged. The
+reproducible copy helper is `scripts/qa/correct_td_cover_demo.py`; media stay external to Git.
+Its independent browser-fixture state key avoids restoring the donor's saved fixture.
+
+Six real-owner checks now cover clear upper-body/same-side contacts and ordinary direct-fire
+refusal at fully concealed targets, preserving resources, duplicate receipts and reopen state.
+This also exposed a separate gap: the refusal refers to a GM through-material firing solution,
+but the admitted TD package has no separate control for it. The retained rules permit such a
+shot only with a plausible positional firing solution; the current ordinary Fire path refuses
+both resistant and penetrable full walls. Daniel has been asked whether to integrate that missing
+GM path now or explicitly defer it. Do not invent a hidden-target hit rule or claim that full-wall
+penetration is qualified. This scope decision and final combined/native checks remain open.
 
 The public compiler accepts optional private notes as an input. Public packages omit
 `references/canon/`; private local builds may include it. TD vault notes and Siren remain
