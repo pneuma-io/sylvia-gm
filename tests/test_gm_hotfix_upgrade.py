@@ -190,7 +190,7 @@ def test_saved_pending_queue_invalidates_review_without_rewriting_it(prepared):
 
 def test_upgrade_keeps_custom_setting_files_and_records(tmp_path):
     fixture = Path(__file__).parent / "fixtures"
-    origin = "alpha4" if bundled_srd_version() == "0.3.19" else "integration"
+    origin = "alpha4" if bundled_srd_version() == "0.3.21" else "integration"
     with zipfile.ZipFile(fixture / "alpha4-lite.sylvia-gm-package") as published:
         world_record = next(
             r
@@ -278,8 +278,8 @@ def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state
             for r in json.loads(bundle.read("manifest.json"))["packages"]
             if r["role"] == "primary"
         )
-    assert current_version in {"0.3.19", "0.3.20"}
-    if current_version == "0.3.19" and origin == "integration":
+    assert current_version in {"0.3.21", "0.3.22"}
+    if current_version == "0.3.21" and origin == "integration":
         # Alpha4's schema refuses newer main-only panel metadata before it can be installed.
         with pytest.raises(CommandRejected, match="manifest fields are invalid"):
             create_cleric_save(database, archive)
@@ -333,7 +333,7 @@ def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state
         assert options["candidates"], options
         candidate = options["candidates"][0]["candidate_id"]
         preview = owner.preview_campaign_rules_update("casting", candidate)
-        if current_version != ("0.3.19" if origin == "alpha4" else "0.3.20"):
+        if current_version != ("0.3.21" if origin == "alpha4" else "0.3.22"):
             assert not preview["compatible"]
             assert any(".panels." in c["path"] for c in preview["conflicts"])
             with pytest.raises(CommandRejected, match="conflicts"):
