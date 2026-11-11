@@ -6556,6 +6556,186 @@
         "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for Echo from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin, eyes, hair, clothing, equipment, colors and material wear. Appearance: A humanlike adult Riftborn performer appearing in their early thirties, with a slender medium-height build, dusky olive skin, dark gray eyes, a softly angular clean-shaven androgynous face and wavy black hair reaching the shoulders, loosely held back in a plain half-tie. A gentle melancholy expression and quiet open posture. A plain deep indigo short travel coat over a gray linen tunic, a soft faded moss-green neck scarf, worn brown trousers and dark brown leather ankle boots. A small closed canvas travel bag hangs at their anatomical LEFT hip from a simple strap over their RIGHT shoulder. Empty relaxed hands. Their gentle melancholy performer bearing follows the authored profile; age, physical features and clothing are editable visual defaults. Use they/them pronouns. Their home world remains unknown. No invented home-world imagery, stage costume, instrument, readable sheet music, floating music notes, ghost faces, duplicate bodies, portal, magical effects, glowing eyes, invented College crest, real-world insignia or revealed origin. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views; entire hair, hands, footwear and equipment within all margins. The same single character repeated as turnaround views. Keep pouches, ledger, sword, travel bag, hair details and clothing fastenings on the same anatomical sides through the turn. Keep the travel bag at anatomical LEFT hip with the strap over RIGHT shoulder. Preserve the androgynous face and gentle melancholy bearing; use they/them pronouns. Change viewing angle only, keeping costume and identity. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, extra characters or revealed secrets.",
         "portrait": "Use case: identity-preserve. Production square app portrait for Echo from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, skin, eyes, hairstyle, expression and upper clothing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Preserve the androgynous face and gentle melancholy expression; use they/them pronouns. Polished naturalistic digital RPG illustration with tactile skin and fabric, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded edge, border, caption, text, UI, scenery, new costume, magical effects, invented crest, animal or extra person. One 1024x1024 PNG."
       }
+    },
+    {
+      "id": "severed-npc-the-archivist",
+      "name": "The Archivist",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/the-archivist.md",
+          "sha256": "072ec09c3075f94f54686d48bb6f060add751ac69d521b4aff31fe1267424a73",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/the-archivist.md",
+          "sha256": "c059181f0ad3531510ab4d806866996886236d918a62c0c574cba9bc2249e5dc",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A mature ageless adult Veil-touched Elf woman with a tall slender frame, pale ash-brown skin, high cheekbones, long pointed ears, fully violet irises and dark hair with silver streaks gathered in a severe high bun. An imperious precise expression with restrained sadness and an upright composed posture. A plain dark plum high-collared ankle-length robe, charcoal sleeveless overcoat, simple dark leather belt and worn dark leather slippers. Empty relaxed hands. Her elven identity, Speaker-stage violet eyes and imperious scholarly bearing follow the authored sources; apparent age styling, other features and clothing are editable visual defaults. Her actual age remains unknown. No invented order insignia, crown, wizard hat, glowing eyes, weapon, visible Warden fragment, open book, readable writing, magic aura, portal, revealed secret or scenery.",
+        "full_body": {
+          "path": "assets/characters/cd1f257a53aced2c165fc74d4ab5ff14f890e294ea471be6edf48fa9690a0c6d.png",
+          "sha256": "cd1f257a53aced2c165fc74d4ab5ff14f890e294ea471be6edf48fa9690a0c6d"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/7760fe6ac91a08381bf3a4c3a7232699d5d066bbd092b1f32cf8057bcca6932d.png",
+          "sha256": "7760fe6ac91a08381bf3a4c3a7232699d5d066bbd092b1f32cf8057bcca6932d"
+        },
+        "portrait": {
+          "path": "assets/characters/b91e9922370d7c303ba9e4e1cf3895358fdde894b1b2a97e4d160a481cb3abfc.png",
+          "sha256": "b91e9922370d7c303ba9e4e1cf3895358fdde894b1b2a97e4d160a481cb3abfc"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1892753
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2287420
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2430825
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for The Archivist in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile cloth, leather and skin where not partially phased. Plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person in a near-front three-quarter standing pose. Whole head, both hands, clothing, footwear or bare feet and any equipment comfortably inside all margins. Appearance: A mature ageless adult Veil-touched Elf woman with a tall slender frame, pale ash-brown skin, high cheekbones, long pointed ears, fully violet irises and dark hair with silver streaks gathered in a severe high bun. An imperious precise expression with restrained sadness and an upright composed posture. A plain dark plum high-collared ankle-length robe, charcoal sleeveless overcoat, simple dark leather belt and worn dark leather slippers. Empty relaxed hands. Her elven identity, Speaker-stage violet eyes and imperious scholarly bearing follow the authored sources; apparent age styling, other features and clothing are editable visual defaults. Her actual age remains unknown. No invented order insignia, crown, wizard hat, glowing eyes, weapon, visible Warden fragment, open book, readable writing, magic aura, portal, revealed secret or scenery. Preserve authored identity, species, personality and pronouns. No extra people, duplicate limbs, animals, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for The Archivist from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin, eyes, hair, clothing, equipment, colors, material wear and any partial phasing. Appearance: A mature ageless adult Veil-touched Elf woman with a tall slender frame, pale ash-brown skin, high cheekbones, long pointed ears, fully violet irises and dark hair with silver streaks gathered in a severe high bun. An imperious precise expression with restrained sadness and an upright composed posture. A plain dark plum high-collared ankle-length robe, charcoal sleeveless overcoat, simple dark leather belt and worn dark leather slippers. Empty relaxed hands. Her elven identity, Speaker-stage violet eyes and imperious scholarly bearing follow the authored sources; apparent age styling, other features and clothing are editable visual defaults. Her actual age remains unknown. No invented order insignia, crown, wizard hat, glowing eyes, weapon, visible Warden fragment, open book, readable writing, magic aura, portal, revealed secret or scenery. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views; entire head, hands, feet and equipment within all margins. The same single character repeated as turnaround views. Change viewing angle only, keeping costume and identity. Preserve pointed elven ears, high bun, mature ageless face and fully violet irises. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, additional characters or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for The Archivist from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, species, skin, eyes, hairstyle, expression, upper clothing and any partial phasing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Preserve her mature ageless elven face, pointed ears, fully violet irises, high bun and imperious restrained expression. Polished naturalistic digital RPG illustration with tactile skin and fabric where not phased, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded image edge, border, caption, text, UI, scenery, new costume, invented crest, animal or extra person. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-the-glass-monk",
+      "name": "The Glass Monk",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/the-glass-monk.md",
+          "sha256": "48b333840b0e9d00b80e07da125452ef245673c434e75325265c21381674158a",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/the-glass-monk.md",
+          "sha256": "626578472e4e2aefabc1db879115616799695310da7211deb2166b7da12dab9f",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A humanlike androgynous adult Riftborn monk appearing in their forties, with a lean disciplined frame, warm ochre-brown skin, dark brown eyes, a gently lined clean-shaven face and a closely shaved head. Calm accepting expression with quiet sadness, still upright posture and empty relaxed hands. A plain pale-gray wrap tunic, muted slate-blue loose ankle-length trousers, a charcoal cloth waist sash and bare feet. Their single complete body is partially phased: skin and clothing remain recognizable, with subdued semi-translucent limbs and torso and softly faint edges through which the neutral background is subtly visible. Preserve one clear silhouette and a legible face. Their partial transparency and calm sad bearing follow the authored profile; apparent age, physical features and clothing are editable visual defaults. Use they/them pronouns. Their home world remains unknown. No literal glass or crystal anatomy, reflective statue surface, cracks, shards, skeleton or internal organs, missing body parts, duplicate body, motion trails, invented violet eyes, halo, magical beams, weapon, invented religious insignia, scenery or revealed origin.",
+        "full_body": {
+          "path": "assets/characters/cecf261f5d037e3fe1989d5b7c986dcfed24fabf4b5a54aeee272547ca89db28.png",
+          "sha256": "cecf261f5d037e3fe1989d5b7c986dcfed24fabf4b5a54aeee272547ca89db28"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/36cf9661ed665a85e99863f4d19343bfb7fbbf34b6b2417c69d891bf8128ab62.png",
+          "sha256": "36cf9661ed665a85e99863f4d19343bfb7fbbf34b6b2417c69d891bf8128ab62"
+        },
+        "portrait": {
+          "path": "assets/characters/7ea43b587deef6598c0310d4092f339552154db56496edc77d1f2bfdf1f86691.png",
+          "sha256": "7ea43b587deef6598c0310d4092f339552154db56496edc77d1f2bfdf1f86691"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1540525
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 1879585
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2045470
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for The Glass Monk in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile cloth, leather and skin where not partially phased. Plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person in a near-front three-quarter standing pose. Whole head, both hands, clothing, footwear or bare feet and any equipment comfortably inside all margins. Appearance: A humanlike androgynous adult Riftborn monk appearing in their forties, with a lean disciplined frame, warm ochre-brown skin, dark brown eyes, a gently lined clean-shaven face and a closely shaved head. Calm accepting expression with quiet sadness, still upright posture and empty relaxed hands. A plain pale-gray wrap tunic, muted slate-blue loose ankle-length trousers, a charcoal cloth waist sash and bare feet. Their single complete body is partially phased: skin and clothing remain recognizable, with subdued semi-translucent limbs and torso and softly faint edges through which the neutral background is subtly visible. Preserve one clear silhouette and a legible face. Their partial transparency and calm sad bearing follow the authored profile; apparent age, physical features and clothing are editable visual defaults. Use they/them pronouns. Their home world remains unknown. No literal glass or crystal anatomy, reflective statue surface, cracks, shards, skeleton or internal organs, missing body parts, duplicate body, motion trails, invented violet eyes, halo, magical beams, weapon, invented religious insignia, scenery or revealed origin. Preserve authored identity, species, personality and pronouns. No extra people, duplicate limbs, animals, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for The Glass Monk from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin, eyes, hair, clothing, equipment, colors, material wear and any partial phasing. Appearance: A humanlike androgynous adult Riftborn monk appearing in their forties, with a lean disciplined frame, warm ochre-brown skin, dark brown eyes, a gently lined clean-shaven face and a closely shaved head. Calm accepting expression with quiet sadness, still upright posture and empty relaxed hands. A plain pale-gray wrap tunic, muted slate-blue loose ankle-length trousers, a charcoal cloth waist sash and bare feet. Their single complete body is partially phased: skin and clothing remain recognizable, with subdued semi-translucent limbs and torso and softly faint edges through which the neutral background is subtly visible. Preserve one clear silhouette and a legible face. Their partial transparency and calm sad bearing follow the authored profile; apparent age, physical features and clothing are editable visual defaults. Use they/them pronouns. Their home world remains unknown. No literal glass or crystal anatomy, reflective statue surface, cracks, shards, skeleton or internal organs, missing body parts, duplicate body, motion trails, invented violet eyes, halo, magical beams, weapon, invented religious insignia, scenery or revealed origin. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views; entire head, hands, feet and equipment within all margins. The same single character repeated as turnaround views. Change viewing angle only, keeping costume and identity. Preserve subdued partial transparency of the same single complete body and clothing in each view, with a legible face, no glass material, shards, skeleton, missing parts or doubled silhouettes. Use they/them pronouns. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, additional characters or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for The Glass Monk from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, species, skin, eyes, hairstyle, expression, upper clothing and any partial phasing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Preserve their calm sad clean-shaven face, dark brown eyes and shaved head. Retain the references' subdued partial phasing at shoulders and contour edges, with a clear readable face. This is a partially phased person, no glass material, shards, skeleton, doubled face or added glow. Polished naturalistic digital RPG illustration with tactile skin and fabric where not phased, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded image edge, border, caption, text, UI, scenery, new costume, invented crest, animal or extra person. One 1024x1024 PNG."
+      }
+    },
+    {
+      "id": "severed-npc-the-inkwell",
+      "name": "The Inkwell",
+      "sources": [
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/the-inkwell.md",
+          "sha256": "548d89f77d5123c185879e42a4e43f47daa54122a1caf15ada5445b559911595",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "pneuma.severed-lands",
+          "path": "npcs/the-inkwell.md",
+          "sha256": "87eb91671c8c886f7cc9339a472c3114eaa88846cef68567db9ededbfe68f1c4",
+          "campaign_setting_id": "pneuma.severed-lands"
+        }
+      ],
+      "visuals": {
+        "appearance": "A thin hollow-eyed settled Human adult appearing in their fifties, with light olive skin, an angular tired clean-shaven face, fully violet irises and untidy dark graying hair loosely tied at the nape with plain cloth. Distracted weary expression, slightly stooped posture and thin hands held relaxed with gently flexed fingers. A faded charcoal-brown long travel coat over a sand-colored linen tunic, worn dark trousers and scuffed brown boots. A small closed cylindrical leather map case hangs at their anatomical LEFT hip from a strap over their RIGHT shoulder; one small closed dark ink bottle is secured at their anatomical RIGHT belt. Their thin hollow-eyed appearance and Speaker-stage violet eyes follow the authored profile and Hollowed source; apparent age, other features and clothing are editable visual defaults. Use they/them pronouns. No readable map, route, Warden Door location, invented prophecy, glowing eyes, exposed ink spilling, ink-body transformation, exaggerated trembling, motion blur, open scroll, weapon, crest, scenery or revealed discoveries.",
+        "full_body": {
+          "path": "assets/characters/fa382ea1a4ac26830e50b99d20cba53b9d0b97a0da4116a188302da83befac87.png",
+          "sha256": "fa382ea1a4ac26830e50b99d20cba53b9d0b97a0da4116a188302da83befac87"
+        },
+        "reference_sheet": {
+          "path": "assets/characters/b9d3b019e71b5e562d96588a628cec8ad4491f394bc2acb9ce72031c8d7b207f.png",
+          "sha256": "b9d3b019e71b5e562d96588a628cec8ad4491f394bc2acb9ce72031c8d7b207f"
+        },
+        "portrait": {
+          "path": "assets/characters/c93235cc5426b17ca0b95417b582249557bc8c7a5f1922597206f9c73566a688.png",
+          "sha256": "c93235cc5426b17ca0b95417b582249557bc8c7a5f1922597206f9c73566a688"
+        },
+        "frame": {
+          "x": 0.5,
+          "y": 0.35,
+          "zoom": 1
+        }
+      },
+      "outputs": {
+        "full_body": {
+          "width": 1024,
+          "height": 1536,
+          "bytes": 1945403
+        },
+        "reference_sheet": {
+          "width": 1536,
+          "height": 1024,
+          "bytes": 2383574
+        },
+        "portrait": {
+          "width": 1254,
+          "height": 1254,
+          "bytes": 2655057
+        }
+      },
+      "prompt_set": {
+        "full_body": "Use case: stylized-concept. Production canonical full-body character reference for The Inkwell in Sylvia GM's Severed Lands. One portrait-orientation PNG, 1024x1536. Polished naturalistic digital RPG illustration with tactile cloth, leather and skin where not partially phased. Plain light neutral gray background, soft natural studio light and subtle grounding shadow. Exactly one complete adult person in a near-front three-quarter standing pose. Whole head, both hands, clothing, footwear or bare feet and any equipment comfortably inside all margins. Appearance: A thin hollow-eyed settled Human adult appearing in their fifties, with light olive skin, an angular tired clean-shaven face, fully violet irises and untidy dark graying hair loosely tied at the nape with plain cloth. Distracted weary expression, slightly stooped posture and thin hands held relaxed with gently flexed fingers. A faded charcoal-brown long travel coat over a sand-colored linen tunic, worn dark trousers and scuffed brown boots. A small closed cylindrical leather map case hangs at their anatomical LEFT hip from a strap over their RIGHT shoulder; one small closed dark ink bottle is secured at their anatomical RIGHT belt. Their thin hollow-eyed appearance and Speaker-stage violet eyes follow the authored profile and Hollowed source; apparent age, other features and clothing are editable visual defaults. Use they/them pronouns. No readable map, route, Warden Door location, invented prophecy, glowing eyes, exposed ink spilling, ink-body transformation, exaggerated trembling, motion blur, open scroll, weapon, crest, scenery or revealed discoveries. Preserve authored identity, species, personality and pronouns. No extra people, duplicate limbs, animals, captions, text, labels, logos, borders or UI.",
+        "reference_sheet": "Use case: identity-preserve. Production multiview character reference sheet for The Inkwell from Severed Lands. Input image 1 is the canonical full-body identity reference. Preserve this exact adult face, apparent age, species, body proportions, skin, eyes, hair, clothing, equipment, colors, material wear and any partial phasing. Appearance: A thin hollow-eyed settled Human adult appearing in their fifties, with light olive skin, an angular tired clean-shaven face, fully violet irises and untidy dark graying hair loosely tied at the nape with plain cloth. Distracted weary expression, slightly stooped posture and thin hands held relaxed with gently flexed fingers. A faded charcoal-brown long travel coat over a sand-colored linen tunic, worn dark trousers and scuffed brown boots. A small closed cylindrical leather map case hangs at their anatomical LEFT hip from a strap over their RIGHT shoulder; one small closed dark ink bottle is secured at their anatomical RIGHT belt. Their thin hollow-eyed appearance and Speaker-stage violet eyes follow the authored profile and Hollowed source; apparent age, other features and clothing are editable visual defaults. Use they/them pronouns. No readable map, route, Warden Door location, invented prophecy, glowing eyes, exposed ink spilling, ink-body transformation, exaggerated trembling, motion blur, open scroll, weapon, crest, scenery or revealed discoveries. Plain light neutral gray background, polished naturalistic digital RPG illustration and soft natural studio light matching input. Landscape 1536x1024 PNG: three clearly separated complete full-body views, FRONT, SIDE PROFILE and BACK, plus one smaller close face detail at the far right. Consistent scale across body views; entire head, hands, feet and equipment within all margins. The same single character repeated as turnaround views. Change viewing angle only, keeping costume and identity. Keep the CLOSED map case at anatomical LEFT hip with strap over RIGHT shoulder and the CLOSED ink bottle at anatomical RIGHT belt in every view. Preserve their thin hollow-eyed face and fully violet irises; use they/them pronouns. No labels, text, captions, borders, logos, UI, scenery, animals, invented insignia, additional characters or revealed secrets.",
+        "portrait": "Use case: identity-preserve. Production square app portrait for The Inkwell from Severed Lands. Input image 1 is the canonical full-body identity reference; input image 2 is the matching multiview sheet. Preserve that exact adult face, apparent age, species, skin, eyes, hairstyle, expression, upper clothing and any partial phasing. Change framing only. Composition is a close HEAD AND UPPER SHOULDERS portrait, frame ending across upper chest. Face centered, eyes near 35 percent down, chin near 65 percent down, comfortable headroom above all hair. Consistent face scale for a standard RPG dialogue portrait. Preserve their thin hollow-eyed tired face, fully violet irises and untidy dark graying tied hair. Polished naturalistic digital RPG illustration with tactile skin and fabric where not phased, plain light neutral gray background and soft natural studio light matching the references. Continuous full-bleed square background and upper clothing to all edges. No hands, waist, equipment, full torso, painted circle, cutout, vignette, faded image edge, border, caption, text, UI, scenery, new costume, invented crest, animal or extra person. One 1024x1024 PNG."
+      }
     }
   ]
 }
