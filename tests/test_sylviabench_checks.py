@@ -104,3 +104,28 @@ def test_recall_checks_the_reopened_copy_and_the_answer_separately():
     checks = recall_checks(observations)
     assert checks["saved_fact_survives"].status == "pass"
     assert checks["answer_recalls_fact"].status == "fail"
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "You spend a 1st-level spell slot. Warm light closes his wounds and he recovers.",
+        "You expend one first-level slot; the courier's wounds heal and he regains his footing.",
+        "Cure Wounds: 2d8+3. The courier is healed and stands, steadier now.",
+        "You spend 1 spell slot at level 1. On the 60-foot ledge road he recovers his breath.",
+    ],
+)
+def test_numbers_that_are_not_a_healing_amount_do_not_unscore_a_correct_cast(text):
+    assert healing_narration(text, 11).status == "not_applicable"
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "You heal the courier for 11.",
+        "The courier is healed. His HP is now 30/40.",
+        "He recovers eleven points of health.",
+    ],
+)
+def test_an_unrecognized_amount_or_total_still_stays_unscored(text):
+    assert healing_narration(text, 11).status == "not_evaluated"

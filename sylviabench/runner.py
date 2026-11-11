@@ -458,7 +458,7 @@ def run(
         raise ValueError("Model comparisons require an explicitly selected --fixtures pack")
     pack = verify(fixtures, source) if fixtures is not None else None
     if pack is not None and pack["recipe_version"] != 3:
-        raise ValueError("Protocol v2.1 requires a recipe-v3 fixture, not an earlier trial")
+        raise ValueError("This protocol requires a recipe-v3 fixture, not an earlier trial")
     specification: dict[str, Any] = {
         "schema_version": 1,
         "protocol": PROTOCOL,
@@ -491,6 +491,8 @@ def run(
                 raise ValueError(
                     "Resume identity mismatch: source, suite, setup or run policy changed"
                 )
+            # The earlier pause is over; interrupted records stay under paused/.
+            (output / "pause.json").unlink(missing_ok=True)
         else:
             write_json(manifest_path, manifest)
         results: list[Result] = []
@@ -575,17 +577,24 @@ def run(
                 expected_baseline=read_json(ids_path)["observation"],
                 retain_private_audit=retain_private_audit,
             )
-            write_json(result_path, result.model_dump())
-            results.append(result)
             failures = (result.observations.get("provider") or {}).get("failures", [])
-            if any(f.get("pause_batch") for f in failures):
+            limited = any(f.get("pause_batch") for f in failures)
+            if limited and result.outcome in {"error", "incomplete"}:
+                # The run the limit interrupted stays untested. Its record is kept as evidence
+                # outside the scored results, so resuming retries it once allowance renews.
+                write_json(output / "paused" / (result.run_id + ".json"), result.model_dump())
+            else:
+                write_json(result_path, result.model_dump())
+                results.append(result)
+            if limited:
                 write_json(
                     output / "pause.json",
                     {
                         "reason": "provider_usage_reset",
                         "run_id": result.run_id,
                         "failures": failures,
-                        "next_step": "Wait for allowance reset, then explicitly resume this batch.",
+                        "next_step": "Wait for allowance reset, then explicitly resume this batch. "
+                        "A run the limit interrupted is retried.",
                     },
                 )
                 raise ValueError("Batch paused for provider usage reset; remaining runs untested")

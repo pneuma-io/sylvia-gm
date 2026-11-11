@@ -152,16 +152,25 @@ class ObservedProvider:
         row = self.request(messages, tools, kwargs)
         token = self.observer.active.set(row)
         stream = self.provider.generate_stream(messages, tools=tools, **kwargs)
+        iterator = stream.__aiter__()
+        deadline = asyncio.get_running_loop().time() + self.observer.request_seconds
+        timer = asyncio.timeout_at(deadline)
         try:
-            timer = asyncio.timeout(self.observer.request_seconds)
-            async with timer:
-                async for chunk in stream:
-                    effort = getattr(chunk, "provider_reported_reasoning_effort", None)
-                    if effort is not None:
-                        row["observed_reasoning"] = effort
-                    if chunk.finish_reason is not None:
-                        row["finish_reason"] = chunk.finish_reason
-                    yield chunk
+            while True:
+                # Enter the deadline only around each wait for the provider. One timeout held
+                # open across a yield would cancel the consumer instead of ending this request.
+                timer = asyncio.timeout_at(deadline)
+                try:
+                    async with timer:
+                        chunk = await anext(iterator)
+                except StopAsyncIteration:
+                    break
+                effort = getattr(chunk, "provider_reported_reasoning_effort", None)
+                if effort is not None:
+                    row["observed_reasoning"] = effort
+                if chunk.finish_reason is not None:
+                    row["finish_reason"] = chunk.finish_reason
+                yield chunk
         except Exception as error:
             if isinstance(error, TimeoutError) and timer.expired():
                 error = BenchmarkRequestTimeoutError("Benchmark per-request deadline reached")

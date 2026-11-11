@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 from typing import Any
 
+from .attribution import Attribution, load_attributions
 from .contracts import ROOT, Result, digest, read_json, write_json
 from .report import load_results, render
 
@@ -56,6 +57,10 @@ def comparison(directories: list[Path], output: Path) -> Path:
         raise ValueError("Comparison starting database mismatch")
     selected: dict[str, Any] = {}
     rows: list[Result] = []
+    # Each batch keeps its own reviewed causes; the comparison only reads them.
+    reviewed: dict[str, Attribution] = {}
+    for directory, (_manifest, records) in zip(inputs, batches, strict=True):
+        reviewed.update(load_attributions(directory, records))
     for manifest, records in batches:
         for setup in manifest["setups"]:
             if setup["id"] in selected:
@@ -88,4 +93,4 @@ def comparison(directories: list[Path], output: Path) -> Path:
         "repetitions": batches[0][0]["repetitions"],
         "source": {"comparison_policy": common, "original_batches": descriptor["inputs"]},
     }
-    return render(output, manifest, rows)
+    return render(output, manifest, rows, attributions=reviewed)

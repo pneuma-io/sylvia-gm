@@ -303,5 +303,52 @@ def test_batch_rotates_order_and_pauses_before_using_another_setup(tmp_path, mon
     with pytest.raises(ValueError, match="Batch paused"):
         runner.run(tmp_path / "paused", selected, [scenario], fixtures=fixture)
     assert calls == [("a", 0)]
-    assert len(list((tmp_path / "paused/results").glob("*.json"))) == 1
+    # The run the limit interrupted is evidence, not a result, so resuming retries it.
+    assert not list((tmp_path / "paused/results").glob("*.json"))
+    assert len(list((tmp_path / "paused/paused").glob("*.json"))) == 1
     assert read_json(tmp_path / "paused/pause.json")["reason"] == "provider_usage_reset"
+    calls.clear()
+    pause = False
+    resumed = runner.run(tmp_path / "paused", selected, [scenario], fixtures=fixture, resume=True)
+    assert calls == [("a", 0), ("b", 0), ("c", 0)]
+    assert len(resumed) == len(list((tmp_path / "paused/results").glob("*.json"))) == 3
+    assert not (tmp_path / "paused/pause.json").exists()
+    assert len(list((tmp_path / "paused/paused").glob("*.json"))) == 1
+
+
+def test_deadline_passing_between_chunks_is_a_benchmark_timeout_not_a_cancellation():
+    class Provider:
+        async def generate_stream(self, *_args, **_kwargs):
+            yield ProviderStreamChunk(content="first")
+            await asyncio.sleep(10)
+            yield ProviderStreamChunk(content="late")
+
+    class Resolver:
+        def __call__(self, _session):
+            return Provider()
+
+        def model_choices(self):
+            return ()
+
+    observer = ObservedResolver(Resolver())
+    observer.request_seconds = 0.05
+    provider = observer(SimpleNamespace())
+    seen = []
+
+    async def consume():
+        async for chunk in provider.generate_stream([]):
+            seen.append(chunk.content)
+            await asyncio.sleep(0.2)  # The consumer is busy when the deadline passes.
+
+    with pytest.raises(BenchmarkRequestTimeoutError):
+        asyncio.run(consume())
+    assert seen == ["first"]
+    assert observer.failures[-1]["cause"] == "benchmark_fault"
+
+
+def test_a_tool_result_without_a_matched_action_is_ignored_not_fatal():
+    data = observation()
+    data["mechanics"].insert(
+        0, {"action_id": "orphan", "tool_name": None, "parameters": {}, "result": {}}
+    )
+    assert all(c.status == "pass" for c in evaluate(scenarios()[0], data))

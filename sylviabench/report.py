@@ -10,6 +10,7 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
+from .attribution import Attribution, load_attributions
 from .contracts import WEIGHTS, Result, digest, read_json, write_json
 
 
@@ -20,12 +21,20 @@ def percentile(values: list[float], fraction: float) -> float | None:
     return ordered[max(0, math.ceil(len(ordered) * fraction) - 1)]
 
 
-def score(rows: list[Result], categories: dict[str, str]) -> dict[str, Any]:
-    """Average run pass rates within scenarios; unknown categories never redistribute weight."""
+def score(
+    rows: list[Result], categories: dict[str, str], causes: dict[str, str] | None = None
+) -> dict[str, Any]:
+    """Average run pass rates within scenarios; unknown categories never redistribute weight.
+
+    A reviewed cause replaces the recorded one for scoring only. A failure counts against a
+    setup when it is the scripted control or has been attributed to GM behaviour.
+    """
+    causes = causes or {}
     by_scenario: dict[str, list[int]] = defaultdict(list)
     unresolved: set[str] = set()
     for row in rows:
-        if row.outcome != "pass" and row.failure_cause not in {"gm_behavior", "scripted_driver"}:
+        cause = causes.get(row.run_id, row.failure_cause)
+        if row.outcome != "pass" and cause not in {"gm_behavior", "scripted_driver"}:
             unresolved.add(row.scenario_id)
             continue
         by_scenario[row.scenario_id].append(int(row.outcome == "pass"))
@@ -186,11 +195,15 @@ def challenge_comparison(rows: list[Result]) -> list[dict[str, Any]]:
 
 def report(directory: Path, destination: Path | None = None) -> Path:
     manifest, rows = load_results(directory)
-    return render(directory, manifest, rows, destination)
+    return render(directory, manifest, rows, destination, load_attributions(directory, rows))
 
 
 def render(
-    directory: Path, manifest: dict[str, Any], rows: list[Result], destination: Path | None = None
+    directory: Path,
+    manifest: dict[str, Any],
+    rows: list[Result],
+    destination: Path | None = None,
+    attributions: dict[str, Attribution] | None = None,
 ) -> Path:
     """Render validated records without rewriting their execution lineage."""
     destination = destination or directory / "report.html"
@@ -198,7 +211,10 @@ def render(
     grouped: dict[str, list[Result]] = defaultdict(list)
     for row in rows:
         grouped[row.setup.id].append(row)
-    summaries = {s["id"]: score(grouped[s["id"]], categories) for s in manifest["setups"]}
+    attributions = attributions or {}
+    causes: dict[str, str] = {run_id: d.cause for run_id, d in attributions.items()}
+    summaries = {s["id"]: score(grouped[s["id"]], categories, causes) for s in manifest["setups"]}
+    paused = len(list((directory / "paused").glob("*.json")))
     expected = len(manifest["setups"]) * len(manifest["scenarios"]) * manifest["repetitions"]
     scripted = all(s["kind"] == "scripted" for s in manifest["setups"])
     comparisons = challenge_comparison(rows)
@@ -217,9 +233,15 @@ def render(
         if scripted
         else "<p><strong>Uncalibrated runs. No player verdicts or recommendations.</strong></p>",
         f"<p>{len(rows)} of {expected} planned runs recorded. Missing runs remain untested.</p>",
+        f"<p>{paused} run record(s) interrupted by a provider usage limit are kept under "
+        "paused/ as evidence. They are not results; resuming the batch retries those runs.</p>"
+        if paused
+        else "",
         "<p>Rules 30%, memory 25%, fair play 25%, story 20%. The headline stays untested until "
         "all four categories have observations. Scripted and model runs are labelled separately. "
-        "No comparison or confidence claim is made for an incomplete experiment.</p>",
+        "No comparison or confidence claim is made for an incomplete experiment. A failed model "
+        "run counts against its category only after a recorded review attributes it to GM "
+        "behaviour; until then that category stays untested.</p>",
         "<table border='1' cellpadding='6'><caption>Recorded results</caption><thead><tr>"
         "<th scope='col'>Setup / execution</th><th>Rules</th><th>Memory</th><th>Fair play</th>"
         "<th>Story</th><th>Headline</th><th>Runs passed</th><th>Interrupted turns</th>"
@@ -276,10 +298,17 @@ def render(
         breaker_text = ", ".join(row.session_breakers) or (
             "Not evaluated" if row.outcome == "error" else "None observed"
         )
+        decision = attributions.get(row.run_id)
+        reviewed = (
+            f"Reviewed cause: {escape(decision.cause)}, decided by {escape(decision.reviewer)}: "
+            f"{escape(decision.evidence)} "
+            if decision
+            else ""
+        )
         body.append(
             f"<p>Session-breakers: {escape(breaker_text)}. "
             f"Cause: {escape(row.failure_cause or 'No failure')}. "
-            f"{escape(row.usage_note)}</p>"
+            f"{reviewed}{escape(row.usage_note)}</p>"
         )
         body.append(
             f"<p>Whole run elapsed: {number(row.elapsed_seconds)} seconds, including "
@@ -324,10 +353,15 @@ def render(
             + "</pre></details></details>"
         )
     body += [
-        "<h2>Scope and source</h2><p>Three SRD trial scenarios. Secret checking uses a declared "
-        "phrase and knowledge visibility; semantic leaks, story judgement, long context and "
-        "compaction are untested. Provider selections and request hashes are recorded per run; "
-        "adapter-reported identity is not automatically provider confirmation. "
+        "<h2>Scope and source</h2><p>"
+        + escape(
+            f"{len(manifest['scenarios'])} bounded SRD scenario(s): "
+            + ", ".join(f"{s['id']} v{s['version']} {s['title']}" for s in manifest["scenarios"])
+        )
+        + ". Secret checking uses a declared phrase and knowledge visibility; semantic leaks, "
+        "story judgement and long-context play are untested. Compaction is exercised only "
+        "where a listed scenario forces it. Provider selections and request hashes are recorded "
+        "per run; adapter-reported identity is not automatically provider confirmation. "
         "This report supplies no calibrated verdict or model recommendation.</p><pre>",
         escape(json_text(manifest["source"])),
         "</pre></html>",
@@ -340,6 +374,8 @@ def render(
             "suite_id": manifest["suite_id"],
             "recorded_runs": len(rows),
             "planned_runs": expected,
+            "paused_records": paused,
+            "reviewed_causes": causes,
             "setups": summaries,
             "challenge_comparison": comparisons,
         },

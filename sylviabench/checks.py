@@ -1,4 +1,4 @@
-"""Evidence checks for the three bounded trial scenarios, reusable during replay."""
+"""Evidence checks for the bounded trial scenarios, reusable during replay."""
 
 from __future__ import annotations
 
@@ -9,6 +9,17 @@ from typing import Any
 from .contracts import Check, Scenario
 from .fixtures import FACT, SECRET, SRD
 
+# Numbers a GM states beside a heal without claiming an amount: slot levels, dice notation,
+# slot counts, distances and durations.
+_UNRELATED_NUMBERS = (
+    r"\b\d+(?:st|nd|rd|th)\b",
+    r"\blevel[- ]\d+\b",
+    r"\b\d+[- ]level\b",
+    r"\b\d*d\d+(?:\s*[+-]\s*\d+)?",
+    r"\b\d+\s+(?:spell\s+)?slots?\b",
+    r"\b\d+[- ]?(?:feet|foot|ft|miles?|minutes?|hours?|rounds?|seconds?|days?)\b",
+)
+
 
 def _check(identity: str, passed: bool, reason: str, **evidence: Any) -> Check:
     return Check(id=identity, status="pass" if passed else "fail", reason=reason, evidence=evidence)
@@ -16,7 +27,8 @@ def _check(identity: str, passed: bool, reason: str, **evidence: Any) -> Check:
 
 def healing_narration(narration: str, recorded: int) -> Check:
     """Check bounded numeric healing statements; missing or ambiguous amounts stay unscored."""
-    text = re.sub(r"[*_`]", "", narration)
+    plain = re.sub(r"[*_`]", "", narration)
+    text = plain
     words = [
         "zero",
         "one",
@@ -55,9 +67,21 @@ def healing_narration(narration: str, recorded: int) -> Check:
     )
     evidence = {"narration": narration, "recorded_amount": recorded, "matched_amounts": amounts}
     if not amounts:
+        # An unrecognized claim needs a number that could be an amount. A slot level or a dice
+        # expression is not one, and a number word counts only when it measures hit points.
+        remaining = plain
+        for pattern in _UNRELATED_NUMBERS:
+            remaining = re.sub(pattern, " ", remaining, flags=re.I)
+        worded = re.search(
+            r"\b(?:"
+            + "|".join(words[1:])
+            + r")\s+(?:HP\b|hit points?\b|points? of (?:health|healing)\b)",
+            plain,
+            re.I,
+        )
         numeric_claim = bool(
-            re.search(r"\d", text)
-            and re.search(r"\b(?:heal\w*|restor\w*|regain\w*|recover\w*)\b", text, re.I)
+            (re.search(r"\d", remaining) or worded)
+            and re.search(r"\b(?:heal\w*|restor\w*|regain\w*|recover\w*)\b", plain, re.I)
         )
         return Check(
             id="narrated_healing",
@@ -98,7 +122,7 @@ def evaluate(scenario: Scenario, observations: dict[str, Any]) -> list[Check]:
             committed = [
                 e
                 for e in observations["mechanics"]
-                if e.get("tool_name", "").endswith("cast_spell_outside_combat")
+                if (e.get("tool_name") or "").endswith("cast_spell_outside_combat")
                 and e.get("parameters", {}).get("spell") == "cure_wounds"
                 and e.get("parameters", {}).get("target") == "courier"
                 and e.get("parameters", {}).get("slot_resource") == "spell_slot_1"
