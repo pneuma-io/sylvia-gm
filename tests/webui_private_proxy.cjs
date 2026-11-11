@@ -57,8 +57,11 @@ test('private login, owner workflows and sign-out at desktop and phone sizes',
           assert.equal(await page.evaluate(() => document.cookie.includes('__Host-sylvia_webui')), false);
           assert.equal(await page.evaluate(() => JSON.stringify(localStorage).includes('synthetic-private-route-key')), false);
           assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), viewport.width);
-          await page.locator('#home-tutorial').waitFor({ state: 'visible' });
-          await page.keyboard.press('Escape'); // Dismiss the ordinary first-visit Home tutorial.
+          await page.locator('#connecting-overlay').waitFor({ state: 'hidden' });
+          await page.locator('#home-view').waitFor({ state: 'visible' });
+          await page.keyboard.press('Escape');
+          await page.locator('#home-tutorial').waitFor({ state: 'hidden' });
+          await page.locator('#tutorial-welcome').waitFor({ state: 'hidden' });
           await page.locator('#home-settings-btn').click();
           await page.locator('#settings-overlay').waitFor({ state: 'visible' });
           const bar = await page.locator('.webui-session-bar').boundingBox();

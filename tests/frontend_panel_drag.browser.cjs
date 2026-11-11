@@ -1,5 +1,5 @@
 // Run explicitly with Playwright available: node --test tests/frontend_panel_drag.browser.cjs.
-// Browser input proves event delivery; the native observer/window boundary remains simulated here.
+// Browser input proves in-workspace event delivery; native IPC remains simulated here.
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -29,7 +29,7 @@ async function createScene(browser, width = 350) {
     });
     await page.goto('https://sylvia-drag.test/');
     await page.evaluate(async () => {
-      window.dragTest = { calls: [], statuses: [], released: false };
+      window.dragTest = { calls: [], statuses: [] };
       for (const type of ['dragstart', 'dragend']) document.addEventListener(type,
         () => console.log(`panel-input:${type}`), true);
       document.addEventListener('drag', () => { window.dragTest.moved = true; }, true);
@@ -40,8 +40,6 @@ async function createScene(browser, width = 350) {
             window.dragTest.context = args.context;
             return { failed_window_ids: [] };
           }
-          if (command === 'finish_panel_drag') return args.cancelled || !window.dragTest.released
-            ? null : { x: 1300, y: 200, width: 500, height: 500 };
         },
       } };
       const state = { activeCampaignId: 'test', activeSessionId: 'gm', activeSessionRole: 'dm',
@@ -73,6 +71,7 @@ test('showing panel drop targets does not cancel a real browser drag before rele
     const { page, errors, events } = await createScene(browser);
     const tab = page.locator('[data-workspace-panel="party"]');
     const before = await tab.boundingBox();
+    const layoutBefore = await page.evaluate(() => window.dragTest.host.snapshot());
     assert.equal(await page.locator('.panel-workspace-drop-destinations').isVisible(), false);
     await page.mouse.move(before.x + before.width / 2, before.y + before.height / 2);
     await page.mouse.down();
@@ -85,11 +84,12 @@ test('showing panel drop targets does not cancel a real browser drag before rele
     await page.waitForFunction(() => window.dragTest.moved, undefined, { timeout: 2000 });
     assert.equal(await page.locator('.panel-workspace-drop-destinations').isVisible(), true);
     const started = await page.evaluate(() => window.dragTest.calls);
-    assert.equal(started.filter(command => command === 'begin_panel_drag').length, 1);
-    await page.evaluate(() => { window.dragTest.released = true; });
-    // Release with no HTML destination; the fake observer supplies outside-window placement.
+    assert.equal(started.filter(command => command === 'begin_panel_drag').length, 0);
+    // Release outside the workspace: the current candidate leaves the arrangement intact.
     await page.mouse.up();
-    await page.waitForFunction(() => window.dragTest.host.snapshot().windows.length === 1);
+    await page.waitForFunction(() => !document.querySelector('.panel-workspace-dragging'));
+    assert.deepEqual(await page.evaluate(() => window.dragTest.host.snapshot()), layoutBefore);
+    assert.equal((await page.evaluate(() => window.dragTest.calls)).includes('finish_panel_drag'), false);
     assert.deepEqual(events, ['dragstart', 'dragend']);
     assert.deepEqual(await page.evaluate(() => window.dragTest.statuses), []);
     assert.deepEqual(errors, []);
@@ -169,14 +169,18 @@ test('hover changes and Escape clear the preview without moving panels', { timeo
   } finally { await browser.close(); }
 });
 
-test('return from a separate window previews and commits one vertical stack, rejecting stale campaign drops', { timeout: 20000 }, async () => {
+test('separate windows stay disabled and transferred drops reject stale campaigns before stacking', { timeout: 20000 }, async () => {
   const browser = await launch();
   try {
     const { page, errors } = await createScene(browser, 220);
+    const initial = await page.evaluate(() => window.dragTest.host.snapshot());
     await page.evaluate(() => window.dragTest.host.changed({ type: 'move', panelId: 'party', destination: { windowId: 'new' } }));
-    assert.equal((await page.evaluate(() => window.dragTest.host.snapshot())).windows.length, 1);
-    // Cross-native-window delivery is unavailable here. Exercise a transferred payload through
-    // the actual receiver DOM; the same-context and single-owner checks must still apply.
+    assert.deepEqual(await page.evaluate(() => window.dragTest.host.snapshot()), initial);
+    assert.deepEqual(await page.evaluate(() => window.dragTest.statuses), [
+      'This candidate keeps panels in the main workspace. Arrange panels here instead.',
+    ]);
+    // Exercise a transferred payload through the actual receiver DOM; the same-context
+    // and single-owner checks still apply to the supported main workspace.
     const send = async (type, stale = false) => page.evaluate(({ type, stale }) => {
       const target = document.querySelector('[data-panel-drop="inventory"]');
       const rect = target.getBoundingClientRect();

@@ -90,7 +90,10 @@ def _source_file(root: Path, relative: str) -> bytes:
 
 
 def portable_payloads(root: Path, *, desktop: Path, owner: Path) -> dict[str, bytes]:
-    """Use explicit binaries, declared notices and current bundled closures; never walk user data."""
+    (
+        "Use explicit binaries, declared notices and current bundled closures; never walk user "
+        "data."
+    )
     from sylvia_gm.application.bundled_packages import bundled_rift_archive, bundled_srd_archive
 
     root = root.resolve(strict=True)
@@ -149,7 +152,7 @@ def assemble_portable_zip(
 ) -> dict[str, object]:
     files = dict(payloads)
     if (
-        not REQUIRED_PAYLOADS <= files.keys()
+        not files.keys() >= REQUIRED_PAYLOADS
         or files[MARKER] != b'{"version":1}\n'
         or not source_files
     ):
@@ -195,7 +198,7 @@ def verify_portable_zip(path: Path) -> dict[str, object]:
             raise ReleaseArtifactError("Portable archive inventory/CRC is invalid")
         for name in names:
             _validate_payload_path(name, metadata=True)
-        if not REQUIRED_PAYLOADS <= set(names):
+        if not set(names) >= REQUIRED_PAYLOADS:
             raise ReleaseArtifactError("Portable archive required payload is incomplete")
         entries = json.loads(archive.read(ENTRY_MANIFEST))
         if set(names) != set(entries) | {ENTRY_MANIFEST}:

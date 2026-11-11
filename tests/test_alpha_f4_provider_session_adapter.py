@@ -159,6 +159,10 @@ class _ScriptedProvider(Provider):
 
 
 class _BlockingProvider(_ScriptedProvider):
+    def __init__(self, rounds: list[list[ProviderStreamChunk]]) -> None:
+        super().__init__(rounds)
+        self.started = threading.Event()
+
     async def generate_stream(
         self,
         messages: list[dict[str, Any]],
@@ -167,11 +171,30 @@ class _BlockingProvider(_ScriptedProvider):
         **kwargs: object,
     ) -> AsyncIterator[ProviderStreamChunk]:
         self.calls.append((messages.copy(), tools))
+        self.started.set()
         try:
             await asyncio.sleep(10)
             yield ProviderStreamChunk(content="MUST NOT ARRIVE")
         finally:
             self.cancelled.set()
+
+
+class _ControlledTimeoutLoop(asyncio.SelectorEventLoop):
+    """Exercise real asyncio deadlines with virtual time, independent of host load."""
+
+    def __init__(self, clock: SimpleNamespace) -> None:
+        self._test_clock = clock
+        super().__init__()
+
+    def time(self) -> float:
+        return self._test_clock.now
+
+    def _run_once(self) -> None:
+        if not self._ready:
+            deadlines = [handle.when() for handle in self._scheduled if not handle.cancelled()]
+            if deadlines:
+                self._test_clock.now = max(self.time(), min(deadlines))
+        super()._run_once()
 
 
 def _next_action_event(events: object) -> ProviderEvent:
@@ -12521,17 +12544,26 @@ def test_stream_adapter_cancels_blocked_async_provider_without_fallback() -> Non
         owner_id="owner-provider",
     )
 
+    cancellation_started: list[float] = []
+    missing_start: list[str] = []
+
     def cancel() -> None:
-        time.sleep(0.08)
+        if not provider.started.wait(5):
+            missing_start.append("Provider did not reach admission")
+        cancellation_started.append(time.monotonic())
         control.cancel()
 
     canceller = threading.Thread(target=cancel)
     canceller.start()
-    started = time.monotonic()
-    with pytest.raises(CommandRejected, match="cancelled"):
-        tuple(adapter.for_turn("turn-provider")(_provider_input(control)))
-    canceller.join()
-    assert time.monotonic() - started < 2.0
+    try:
+        with pytest.raises(CommandRejected, match="cancelled"):
+            tuple(adapter.for_turn("turn-provider")(_provider_input(control)))
+    finally:
+        control.cancel()
+        canceller.join(5)
+    assert not canceller.is_alive()
+    assert not missing_start
+    assert time.monotonic() - cancellation_started[0] < 2.0
     assert provider.cancelled.wait(1.0)
     assert len(provider.calls) == 1
     print("F4 PROVIDER ADAPTER", "stop=cancelled", "fallback=none")
@@ -13537,7 +13569,11 @@ def test_openai_stream_captures_usage_from_final_chunk_without_choices() -> None
     }
 
 
-def test_openai_compatible_timeout_detects_stream_inactivity() -> None:
+def test_openai_compatible_timeout_detects_stream_inactivity(monkeypatch) -> None:
+    from sylvia_gm.provider import _openai_compat
+
+    clock = SimpleNamespace(now=0.0)
+    monkeypatch.setattr(_openai_compat, "_time", SimpleNamespace(monotonic=lambda: clock.now))
     class SlowStream:
         def __aiter__(self) -> SlowStream:
             return self
@@ -13578,17 +13614,23 @@ def test_openai_compatible_timeout_detects_stream_inactivity() -> None:
                 _ = [
                     chunk
                     async for chunk in provider.generate_stream(
-                        [{"role": "user", "content": "Hello"}], timeout=0.01
+                        [{"role": "user", "content": "Hello"}], timeout=1.0
                     )
                 ]
         finally:
             await provider.close()
 
-    asyncio.run(exercise())
+    with asyncio.Runner(loop_factory=lambda: _ControlledTimeoutLoop(clock)) as runner:
+        runner.run(exercise())
+    assert clock.now == pytest.approx(1.0)
 
 
 @pytest.mark.parametrize("terminal", [True, False])
-def test_openai_compatible_timeout_resets_when_stream_chunks_arrive(terminal) -> None:
+def test_openai_compatible_timeout_resets_when_stream_chunks_arrive(terminal, monkeypatch) -> None:
+    from sylvia_gm.provider import _openai_compat
+
+    clock = SimpleNamespace(now=0.0)
+    monkeypatch.setattr(_openai_compat, "_time", SimpleNamespace(monotonic=lambda: clock.now))
     class ActiveStream:
         def __init__(self) -> None:
             self._remaining = 4
@@ -13600,7 +13642,7 @@ def test_openai_compatible_timeout_resets_when_stream_chunks_arrive(terminal) ->
             if self._remaining == 0:
                 raise StopAsyncIteration
             self._remaining -= 1
-            await asyncio.sleep(0.04)
+            await asyncio.sleep(4.0)
             return SimpleNamespace(
                 choices=[
                     SimpleNamespace(
@@ -13646,19 +13688,22 @@ def test_openai_compatible_timeout_resets_when_stream_chunks_arrive(terminal) ->
             return [
                 chunk.content
                 async for chunk in provider.generate_stream(
-                    [{"role": "user", "content": "Hello"}], timeout=0.1
+                    [{"role": "user", "content": "Hello"}], timeout=10.0
                 )
             ]
         finally:
             await provider.close()
 
-    # The whole stream lasts longer than 0.1s, but no individual chunk does.
-    if terminal:
-        assert asyncio.run(exercise()) == ["token"] * 4
-    else:
-        from sylvia_gm.provider._exceptions import IncompleteProviderStreamError
-        with pytest.raises(IncompleteProviderStreamError):
-            asyncio.run(exercise())
+    # Sixteen virtual seconds exceed a total deadline of ten. Each four-second
+    # gap remains below the inactivity deadline; missing terminal evidence still fails.
+    with asyncio.Runner(loop_factory=lambda: _ControlledTimeoutLoop(clock)) as runner:
+        if terminal:
+            assert runner.run(exercise()) == ["token"] * 4
+        else:
+            from sylvia_gm.provider._exceptions import IncompleteProviderStreamError
+            with pytest.raises(IncompleteProviderStreamError):
+                runner.run(exercise())
+    assert clock.now == pytest.approx(16.0)
 
 
 @pytest.mark.parametrize(

@@ -24,18 +24,17 @@ Usage::
 from __future__ import annotations
 
 import logging
-from pathlib import Path
 from typing import Any
-
-logger = logging.getLogger(__name__)
 
 from sylvia_gm.runtime._cs_loader import CSLoader
 from sylvia_gm.runtime._frontmatter import (
+    parse_item_file,
     parse_monster_file,
     parse_npc_file,
     parse_spell_file,
-    parse_item_file,
 )
+
+logger = logging.getLogger(__name__)
 
 # Entity type → (parser function, description)
 _ENTITY_PARSERS: dict[str, Any] = {
@@ -203,10 +202,7 @@ class ContentRegistry:
             logger.warning("Cannot inject %s: no StateBridge", slug)
             return None
 
-        if entity_type:
-            data = self._load_entity(entity_type, slug)
-        else:
-            data = self.resolve(slug)
+        data = self._load_entity(entity_type, slug) if entity_type else self.resolve(slug)
 
         if data is None:
             logger.debug("Cannot inject unknown entity: %s", slug)

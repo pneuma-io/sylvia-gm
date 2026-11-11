@@ -5,8 +5,8 @@ the existing labelled synthetic control; this does not expose a new Lite player
 control or claim a real Lite panel/card choice journey.
 """
 
-import json
 import io
+import json
 import os
 import threading
 import zipfile
@@ -29,11 +29,13 @@ from sylvia_gm.domain.authority import (
 )
 from sylvia_gm.domain.errors import CommandRejected, StaleRevision
 from sylvia_gm.spatial import SpatialEngine
+from tests.action_sequence_move_checks import (
+    assert_action_sequence_moves as assert_action_sequence_moves,
+)
 from tests.admitted_library_fixture import CANDIDATE_ID, prepare_library_database
 from tests.lite_imported_fixture import ImportedCase
-from tests.test_lite_panel_combat import MAP, NS
+from tests.test_lite_panel_combat import MAP, NS, _native_lite_archive
 from tests.test_lite_panel_combat import case as lite_combat_case
-from tests.test_lite_panel_combat import _native_lite_archive
 from tests.test_player_actions import _create as create_synthetic_control
 
 TD = "pneuma-io.trigger-discipline"
@@ -1746,3 +1748,49 @@ def test_actual_lite_staged_npc_concentration_receipt_is_saved_once(
         assert d20_effects == dice_before_replay
     finally:
         value.close()
+
+
+def test_sequence_states_have_one_plain_string_writer_and_no_production_move_check():
+    import ast
+    import inspect
+
+    from sylvia_gm.application import action_sequences as sequences
+
+    tree = ast.parse(inspect.getsource(sequences))
+    parents = {child: parent for parent in ast.walk(tree) for child in ast.iter_child_nodes(parent)}
+
+    def owner(node, kind):
+        while node in parents:
+            node = parents[node]
+            if isinstance(node, kind):
+                return node.name
+        return None
+
+    states = {item.value for item in (*sequences.QueueStatus, *sequences.StepStatus)}
+    for node in ast.walk(tree):
+        if (isinstance(node, ast.Name) and isinstance(node.ctx, ast.Load)
+                and node.id in {"QUEUE_MOVES", "STEP_MOVES"}):
+            raise AssertionError("Production must not enforce the move table in this stage")
+        if (isinstance(node, ast.Subscript) and isinstance(node.ctx, ast.Store)
+                and isinstance(node.slice, ast.Constant) and node.slice.value == "status"):
+            assert owner(node, ast.FunctionDef) in {"_move_queue", "_move_step"}
+        if isinstance(node, ast.Dict):
+            for key in node.keys:
+                if isinstance(key, ast.Constant) and key.value == "status":
+                    # This is a native receipt projection, not a queue or step transition.
+                    assert owner(node, ast.FunctionDef) == "_receipt"
+        if isinstance(node, ast.Constant) and isinstance(node.value, str) and node.value in states:
+            assert owner(node, ast.ClassDef) in {"QueueStatus", "StepStatus"}
+        if isinstance(node, ast.Compare):
+            assert not any(
+                isinstance(part, ast.Attribute) and part.attr == "value"
+                and isinstance(part.value, ast.Attribute)
+                and isinstance(part.value.value, ast.Name)
+                and part.value.value.id in {"QueueStatus", "StepStatus"}
+                for part in ast.walk(node)
+            ), "Compare against the named member; .value belongs in stored data"
+    for name in ("_move_queue", "_move_step"):
+        writer = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == name)
+        body = writer.body[1:]  # Docstring, then the sole write of new.value.
+        assert len(body) == 1 and isinstance(body[0], ast.Assign)
+        assert isinstance(body[0].value, ast.Attribute) and body[0].value.attr == "value"

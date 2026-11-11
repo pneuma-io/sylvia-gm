@@ -9,13 +9,23 @@ from .identity import STORAGE_COMPATIBILITY
 from .manifest import UpdateError, bounded_json
 from .preparation import PreparedUpdate
 from .restart import RestartHandshake
-from .storage import atomic_receipt, checked_file
+from .storage import UpdatePhase, atomic_receipt, checked_file
 
 KEEP_DATA = "Keep current data"
-_RECOVERABLE = frozenset({
-    "prepared", "closing", "applying", "awaiting_restart", "recovery_required", "confirmed",
-    "rolling_back", "rollback_ready", "rollback_awaiting_restart", "rolled_back",
-})
+_RECOVERABLE = frozenset(
+    {
+        UpdatePhase.PREPARED,
+        UpdatePhase.CLOSING,
+        UpdatePhase.APPLYING,
+        UpdatePhase.AWAITING_RESTART,
+        UpdatePhase.RECOVERY_REQUIRED,
+        UpdatePhase.CONFIRMED,
+        UpdatePhase.ROLLING_BACK,
+        UpdatePhase.ROLLBACK_READY,
+        UpdatePhase.ROLLBACK_AWAITING_RESTART,
+        UpdatePhase.ROLLED_BACK,
+    }
+)
 
 
 class RecoveryOperation:
@@ -29,7 +39,10 @@ class RecoveryOperation:
         self.compatibility = compatibility
         self.choice = prepared.stage / "recovery-choice.json"
         self.handshake = RestartHandshake(
-            prepared.root, prepared.identity, prepared.attempt, recovery=True,
+            prepared.root,
+            prepared.identity,
+            prepared.attempt,
+            recovery=True,
         )
 
     def _phase(self) -> str:
@@ -37,13 +50,16 @@ class RecoveryOperation:
         row = self.prepared.store.load()
         if row is None or row["phase"] not in _RECOVERABLE:
             raise UpdateError(
-                "invalid_phase", "This update does not have a recoverable preparation.",
+                "invalid_phase",
+                "This update does not have a recoverable preparation.",
             )
         return str(row["phase"])
 
     def _started_compatibility(self) -> int:
         original = RestartHandshake(
-            self.prepared.root, self.prepared.identity, self.prepared.attempt,
+            self.prepared.root,
+            self.prepared.identity,
+            self.prepared.attempt,
         )
         if original.ticket.exists() or original.ticket.is_symlink():
             row = original._load()
@@ -72,8 +88,8 @@ class RecoveryOperation:
             try:
                 restart_nonce = None
                 started = self._started_compatibility()
-                if phase == "rollback_awaiting_restart" or (
-                    phase == "rollback_ready" and self.handshake.exists()
+                if phase == UpdatePhase.ROLLBACK_AWAITING_RESTART or (
+                    phase == UpdatePhase.ROLLBACK_READY and self.handshake.exists()
                 ):
                     restart_nonce = self.handshake._load()["nonce"]
                     # Retry opens restored data; it never restores again.
@@ -83,14 +99,17 @@ class RecoveryOperation:
                         expected_storage_compatibility=self.compatibility,
                     )
                     expected = {
-                        "format_version": 1, "operation_id": self.prepared.identity,
-                        "attempt": self.prepared.attempt, "choice": RESTORE_CONFIRMATION,
+                        "format_version": 1,
+                        "operation_id": self.prepared.identity,
+                        "attempt": self.prepared.attempt,
+                        "choice": RESTORE_CONFIRMATION,
                         "checkpoint_version": checkpoint["app_version"],
                         "started_storage_compatibility": started,
                     }
-                    if phase != "rolling_back" or bounded_json(
-                        checked_file(self.choice, maximum=4096)
-                    ) != expected:
+                    if (
+                        phase != UpdatePhase.ROLLING_BACK
+                        or bounded_json(checked_file(self.choice, maximum=4096)) != expected
+                    ):
                         raise UpdateError(
                             "invalid_checkpoint", "The interrupted restore choice changed."
                         )
@@ -109,7 +128,8 @@ class RecoveryOperation:
                             raise
                         compatible = False
                 return {
-                    "operation_id": self.prepared.identity, "phase": phase,
+                    "operation_id": self.prepared.identity,
+                    "phase": phase,
                     "previous_version": self.prepared.current.text,
                     "can_keep_data": compatible,
                     "restart_nonce": restart_nonce,
@@ -137,10 +157,15 @@ class RecoveryOperation:
             raise UpdateError("restore_choice_required", "Choose how to preserve or restore data.")
         if self.compatibility != STORAGE_COMPATIBILITY:
             raise UpdateError(
-                "wrong_recovery_helper", "Use the retained helper matching this checkpoint.",
+                "wrong_recovery_helper",
+                "Use the retained helper matching this checkpoint.",
             )
         phase = self._phase()
-        if phase in {"rolled_back", "rollback_ready", "rollback_awaiting_restart"}:
+        if phase in {
+            UpdatePhase.ROLLED_BACK,
+            UpdatePhase.ROLLBACK_READY,
+            UpdatePhase.ROLLBACK_AWAITING_RESTART,
+        }:
             self.prepared.replacement().verify_rollback()
             return  # An acknowledged or pending restart must not roll back later player progress.
         if not processes_exited():
@@ -151,42 +176,50 @@ class RecoveryOperation:
             checkpoint = self.checkpoint._load()
             started = self._started_compatibility()
             expected = {
-                "format_version": 1, "operation_id": self.prepared.identity,
-                "attempt": self.prepared.attempt, "choice": choice,
+                "format_version": 1,
+                "operation_id": self.prepared.identity,
+                "attempt": self.prepared.attempt,
+                "choice": choice,
                 "checkpoint_version": checkpoint["app_version"],
                 "started_storage_compatibility": started,
             }
             if self.choice.exists() or self.choice.is_symlink():
                 if bounded_json(checked_file(self.choice, maximum=4096)) != expected:
                     raise UpdateError(
-                        "changed_recovery_choice", "The interrupted recovery choice is preserved.",
+                        "changed_recovery_choice",
+                        "The interrupted recovery choice is preserved.",
                     )
             else:
                 if choice == KEEP_DATA:
                     self.checkpoint.require_compatible(started)
                 atomic_receipt(self.choice, expected)
             self.prepared.store.save(
-                self.prepared.identity, "rolling_back", self.prepared.manifest.version.text,
+                self.prepared.identity,
+                UpdatePhase.ROLLING_BACK.value,
+                self.prepared.manifest.version.text,
             )
             if choice == RESTORE_CONFIRMATION:
                 self.checkpoint._restore_locked(processes_exited)
-            compatibility = checkpoint["storage_compatibility"] if (
-                choice == RESTORE_CONFIRMATION
-            ) else started
+            compatibility = (
+                checkpoint["storage_compatibility"] if (choice == RESTORE_CONFIRMATION) else started
+            )
             assert type(compatibility) is int
             self.prepared.replacement().rollback(
-                processes_exited, lambda: self.checkpoint.require_compatible(compatibility),
+                processes_exited,
+                lambda: self.checkpoint.require_compatible(compatibility),
             )
             self.prepared.replacement().verify_rollback()
             self.prepared.store.save(
-                self.prepared.identity, "rollback_ready", self.prepared.manifest.version.text,
+                self.prepared.identity,
+                UpdatePhase.ROLLBACK_READY.value,
+                self.prepared.manifest.version.text,
             )
         finally:
             data_lock.close()
 
     def create_restart(self, owner_identity: object) -> RestartHandshake:
         """Probe only the restored fixed sidecar before issuing a separate one-shot intent."""
-        if self._phase() != "rollback_ready":
+        if self._phase() != UpdatePhase.ROLLBACK_READY:
             raise UpdateError("invalid_phase", "Finish application recovery before restarting.")
         self.prepared.replacement().verify_rollback()
         compatibility = self._owner_compatibility(owner_identity)
@@ -195,12 +228,15 @@ class RecoveryOperation:
             # reused by a later launch, even when this intent still says pending.
             raise UpdateError("recovery_required", "Review the earlier recovery restart first.")
         self.handshake.create(
-            live=self.prepared.live, version=self.prepared.current, target=self.prepared.target,
+            live=self.prepared.live,
+            version=self.prepared.current,
+            target=self.prepared.target,
             distribution=self.prepared.distribution,
             owner_storage_compatibility=compatibility,
         )
         self.prepared.store.save(
-            self.prepared.identity, "rollback_awaiting_restart",
+            self.prepared.identity,
+            UpdatePhase.ROLLBACK_AWAITING_RESTART.value,
             self.prepared.manifest.version.text,
         )
         return self.handshake
@@ -209,30 +245,41 @@ class RecoveryOperation:
         checkpoint = self.checkpoint._load()
         if (
             not isinstance(owner_identity, dict)
-            or owner_identity != {
-                "format_version": 1, "product": "Sylvia GM", "component": "owner",
-                "version": self.prepared.current.text, "target": self.prepared.target,
+            or owner_identity
+            != {
+                "format_version": 1,
+                "product": "Sylvia GM",
+                "component": "owner",
+                "version": self.prepared.current.text,
+                "target": self.prepared.target,
                 "storage_compatibility": checkpoint["storage_compatibility"],
             }
             or type(owner_identity.get("format_version")) is not int
             or type(owner_identity.get("storage_compatibility")) is not int
         ):
             raise UpdateError(
-                "wrong_owner_identity", "The restored owner identity is inconsistent.",
+                "wrong_owner_identity",
+                "The restored owner identity is inconsistent.",
             )
         compatibility = checkpoint["storage_compatibility"]
         assert type(compatibility) is int
         return compatibility
 
     def retry_restart(
-        self, expected_nonce: str, owner_identity: object, processes_exited: Callable[[], bool],
+        self,
+        expected_nonce: str,
+        owner_identity: object,
+        processes_exited: Callable[[], bool],
     ) -> RestartHandshake:
         """An explicit consent fences the old startup under the same lock used before migrations."""
         if not processes_exited():
             raise UpdateError("application_busy", "Close the owned application before retrying.")
         lock = acquire_update_data_lock(self.checkpoint.database)
         try:
-            if self._phase() not in {"rollback_ready", "rollback_awaiting_restart"}:
+            if self._phase() not in {
+                UpdatePhase.ROLLBACK_READY,
+                UpdatePhase.ROLLBACK_AWAITING_RESTART,
+            }:
                 raise UpdateError("stale_restart", "The reviewed recovery is no longer pending.")
             self.prepared.replacement().verify_rollback()
             compatibility = self._owner_compatibility(owner_identity)
@@ -241,7 +288,8 @@ class RecoveryOperation:
                 raise UpdateError("application_busy", "An owned process is still active.")
             self.handshake.retry_recovery(expected_nonce)
             self.prepared.store.save(
-                self.prepared.identity, "rollback_awaiting_restart",
+                self.prepared.identity,
+                UpdatePhase.ROLLBACK_AWAITING_RESTART.value,
                 self.prepared.manifest.version.text,
             )
         finally:
@@ -249,11 +297,13 @@ class RecoveryOperation:
         return self.handshake
 
     def confirm(self) -> None:
-        if self._phase() not in {"rollback_awaiting_restart", "rolled_back"}:
+        if self._phase() not in {UpdatePhase.ROLLBACK_AWAITING_RESTART, UpdatePhase.ROLLED_BACK}:
             raise UpdateError("invalid_phase", "Recovery is no longer awaiting confirmation.")
         self.prepared.replacement().verify_rollback()
         if not self.handshake.confirmed():
             raise UpdateError("startup_unconfirmed", "The restored app has not confirmed its data.")
         self.prepared.store.save(
-            self.prepared.identity, "rolled_back", self.prepared.manifest.version.text,
+            self.prepared.identity,
+            UpdatePhase.ROLLED_BACK.value,
+            self.prepared.manifest.version.text,
         )

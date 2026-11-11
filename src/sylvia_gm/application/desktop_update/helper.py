@@ -21,11 +21,11 @@ from .identity import runtime_identity
 from .manifest import KeyRing, UpdateError, Version, bounded_json
 from .preparation import PreparedUpdate
 from .processes import OwnedProcesses, ProcessReceipt, WindowsHandles
-from .progress import Progress, start_progress
+from .progress import Progress, ProgressPhase, start_progress
 from .recovery import KEEP_DATA, RecoveryOperation
 from .restart import RestartHandshake
 from .runtime import child_environment, system_child_libraries
-from .storage import atomic_receipt, operation_id
+from .storage import UpdatePhase, atomic_receipt, operation_id
 
 
 class Child(Protocol):
@@ -88,12 +88,22 @@ def apply_and_restart(
     child_environment()
     prepared.require_selected()
     row = prepared.store.load()
-    if row is None or row["phase"] not in {"closing", "applying", "awaiting_restart", "confirmed"}:
+    if row is None or row["phase"] not in {
+        UpdatePhase.CLOSING,
+        UpdatePhase.APPLYING,
+        UpdatePhase.AWAITING_RESTART,
+        UpdatePhase.CONFIRMED,
+    }:
         raise UpdateError("recovery_required", "The native owner has not armed this update.")
     lock = acquire_update_data_lock(prepared.stage / "helper-runtime")
     try:
         _apply_and_restart_locked(
-            prepared, processes, probe=probe, launch=launch, pause=pause, notify=notify,
+            prepared,
+            processes,
+            probe=probe,
+            launch=launch,
+            pause=pause,
+            notify=notify,
         )
     finally:
         lock.close()
@@ -111,32 +121,32 @@ def _apply_and_restart_locked(
     child_environment()
     prepared.require_selected()
     row = prepared.store.load()
-    if row is not None and row["phase"] in {"awaiting_restart", "confirmed"}:
+    if row is not None and row["phase"] in {UpdatePhase.AWAITING_RESTART, UpdatePhase.CONFIRMED}:
         handshake = RestartHandshake(prepared.root, prepared.identity, prepared.attempt)
         if handshake.ticket.exists() and handshake.confirmed():
-            if row["phase"] != "confirmed":
+            if row["phase"] != UpdatePhase.CONFIRMED:
                 prepared.confirm()
             return
         raise UpdateError(
             "recovery_required", "Reconcile the previous startup before another launch."
         )
-    if row is None or row["phase"] not in {"closing", "applying"}:
+    if row is None or row["phase"] not in {UpdatePhase.CLOSING, UpdatePhase.APPLYING}:
         raise UpdateError(
             "recovery_required", "Choose an explicit recovery for this interrupted update."
         )
-    notify("waiting")
+    notify(ProgressPhase.WAITING.value)
     while not processes.all_exited():
         pause(0.05)  # No kill, unrelated process search or artificial whole-update cutoff.
-    notify("applying")
+    notify(ProgressPhase.APPLYING.value)
     prepared.apply(processes.all_exited)
-    notify("verifying")
+    notify(ProgressPhase.VERIFYING.value)
     handshake = prepared.create_restart(probe(prepared.live / "sylvia-gm-owner.exe"))
     executable = prepared.live / (
         "Sylvia GM.exe" if prepared.distribution == "portable" else "sylvia-gm.exe"
     )
-    notify("starting")
+    notify(ProgressPhase.STARTING.value)
     child = handshake.launch_once(lambda arguments: launch(executable, arguments))
-    notify("confirming")
+    notify(ProgressPhase.CONFIRMING.value)
     while not handshake.confirmed():
         if child.poll() is not None:
             raise UpdateError(
@@ -169,8 +179,14 @@ def recover_and_restart(
     lock = acquire_update_data_lock(prepared.stage / "helper-runtime")
     try:
         _recover_and_restart_locked(
-            prepared, processes, choice, probe=probe, launch=launch, pause=pause,
-            restart_nonce=restart_nonce, notify=notify,
+            prepared,
+            processes,
+            choice,
+            probe=probe,
+            launch=launch,
+            pause=pause,
+            restart_nonce=restart_nonce,
+            notify=notify,
         )
     finally:
         lock.close()
@@ -190,38 +206,44 @@ def _recover_and_restart_locked(
     child_environment()
     recovery = RecoveryOperation(prepared)
     phase = recovery._phase()
-    if phase in {"rollback_awaiting_restart", "rolled_back"} or (
-        phase == "rollback_ready" and recovery.handshake.exists()
+    if phase in {UpdatePhase.ROLLBACK_AWAITING_RESTART, UpdatePhase.ROLLED_BACK} or (
+        phase == UpdatePhase.ROLLBACK_READY and recovery.handshake.exists()
     ):
-        if restart_nonce is None and phase != "rollback_ready" and recovery.handshake.confirmed():
-            if phase != "rolled_back":
+        if (
+            restart_nonce is None
+            and phase != UpdatePhase.ROLLBACK_READY
+            and recovery.handshake.confirmed()
+        ):
+            if phase != UpdatePhase.ROLLED_BACK:
                 recovery.confirm()
             return
-        if restart_nonce is None or phase == "rolled_back":
+        if restart_nonce is None or phase == UpdatePhase.ROLLED_BACK:
             raise UpdateError("recovery_required", "Reconcile the earlier recovery startup.")
     elif restart_nonce is not None:
         raise UpdateError("stale_restart", "The reviewed recovery restart changed.")
-    notify("waiting")
+    notify(ProgressPhase.WAITING.value)
     while not processes.all_exited():
         pause(0.05)
     if restart_nonce is not None:
         if choice != KEEP_DATA:
             raise UpdateError("invalid_restart", "A restart retry cannot restore data again.")
-        notify("verifying")
+        notify(ProgressPhase.VERIFYING.value)
         handshake = recovery.retry_restart(
-            restart_nonce, probe(prepared.live / "sylvia-gm-owner.exe"), processes.all_exited,
+            restart_nonce,
+            probe(prepared.live / "sylvia-gm-owner.exe"),
+            processes.all_exited,
         )
     else:
-        notify("restoring")
+        notify(ProgressPhase.RESTORING.value)
         recovery._rollback_locked(choice, processes.all_exited)
-        notify("verifying")
+        notify(ProgressPhase.VERIFYING.value)
         handshake = recovery.create_restart(probe(prepared.live / "sylvia-gm-owner.exe"))
     executable = prepared.live / (
         "Sylvia GM.exe" if prepared.distribution == "portable" else "sylvia-gm.exe"
     )
-    notify("starting")
+    notify(ProgressPhase.STARTING.value)
     child = handshake.launch_once(lambda arguments: launch(executable, arguments))
-    notify("confirming")
+    notify(ProgressPhase.CONFIRMING.value)
     while not handshake.confirmed():
         if child.poll() is not None:
             raise UpdateError("startup_failed", "The restored app did not confirm startup.")
@@ -254,7 +276,9 @@ def _failure_code(error: Exception) -> str:
 
 
 def main(
-    input_stream: BinaryIO | None = None, output_stream: TextIO | None = None, *,
+    input_stream: BinaryIO | None = None,
+    output_stream: TextIO | None = None,
+    *,
     presentation_factory: Callable[[], Progress] = start_progress,
 ) -> int:
     # Only the packaged public pin supplies trust. No CLI/env/IPC key override exists.
@@ -280,14 +304,21 @@ def main(
             or set(row) != keys | ({"choice", "restart_nonce"} if recovering else set())
             or not isinstance(row["type"], str)
             or row["type"] not in {"desktop_update_apply", "desktop_update_recover"}
-            or (recovering and (
-                not isinstance(row["choice"], str)
-                or row["choice"] not in {KEEP_DATA, RESTORE_CONFIRMATION}
-            ))
-            or (recovering and row["restart_nonce"] is not None and (
-                not isinstance(row["restart_nonce"], str)
-                or re.fullmatch(r"[0-9a-f]{32}", row["restart_nonce"]) is None
-            ))
+            or (
+                recovering
+                and (
+                    not isinstance(row["choice"], str)
+                    or row["choice"] not in {KEEP_DATA, RESTORE_CONFIRMATION}
+                )
+            )
+            or (
+                recovering
+                and row["restart_nonce"] is not None
+                and (
+                    not isinstance(row["restart_nonce"], str)
+                    or re.fullmatch(r"[0-9a-f]{32}", row["restart_nonce"]) is None
+                )
+            )
             or not isinstance(row["distribution"], str)
             or row["distribution"] not in {"installed", "portable"}
             or not isinstance(row["processes"], list)
@@ -344,7 +375,10 @@ def main(
         if recovering:
             restart_nonce = row["restart_nonce"] if isinstance(row["restart_nonce"], str) else None
             _recover_and_restart_locked(
-                prepared, processes, str(row["choice"]), restart_nonce=restart_nonce,
+                prepared,
+                processes,
+                str(row["choice"]),
+                restart_nonce=restart_nonce,
                 notify=presentation.stage,
             )
         else:
@@ -358,10 +392,15 @@ def main(
                 # Failure belongs to this attempt. Never overwrite a newer global selection
                 # after an explicit recovery has fenced this helper or prepared a new attempt.
                 handshake = RestartHandshake(
-                    prepared.root, prepared.identity, prepared.attempt, recovery=recovering,
+                    prepared.root,
+                    prepared.identity,
+                    prepared.attempt,
+                    recovery=recovering,
                 )
-                path = handshake.error_receipt if not recovering or handshake.exists() else (
-                    prepared.stage / "rollback-helper-error.json"
+                path = (
+                    handshake.error_receipt
+                    if not recovering or handshake.exists()
+                    else (prepared.stage / "rollback-helper-error.json")
                 )
                 atomic_receipt(path, {"code": code})
         # The old app may have closed its reply pipe. The durable status does not depend on it.

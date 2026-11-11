@@ -319,7 +319,10 @@ def parse_setting_character(
     ):
         raise ValueError("Setting Character File schema is incompatible")
     legacy_declaration = None
-    if schema.get("id") != declaration.schema_id or schema.get("content_sha256") != declaration.schema_sha256:
+    if (
+        schema.get(
+        "id") != declaration.schema_id or schema.get("content_sha256") != declaration.schema_sha256
+    ):
         from sylvia_gm.application.srd_lite_character_compatibility import (
             retained_equipment_character_contract,
         )
@@ -343,7 +346,9 @@ def parse_setting_character(
     source_migration = None
     if legacy_declaration is not None:
         from sylvia_gm.application.srd_lite_weapon_set_migration import (
-            MIGRATION_ID, PACKAGE_ID, migrate_state,
+            MIGRATION_ID,
+            PACKAGE_ID,
+            migrate_state,
         )
         _, validated_old = _validated_payload(
             role=role, participant=cast(SafePayload, envelope.get("participant")),
@@ -351,7 +356,9 @@ def parse_setting_character(
         )
         definitions = declaration.initial_state_validation.get("definitions", {})
         namespace = PACKAGE_ID + ".entities"
-        migrated = migrate_state({namespace: {character_id: validated_old}}, definitions["saved_weapons"])
+        migrated = (
+            migrate_state({namespace: {character_id: validated_old}}, definitions["saved_weapons"])
+        )
         source_state = migrated[namespace][character_id]
         source_migration = {
             "migration_id": MIGRATION_ID,

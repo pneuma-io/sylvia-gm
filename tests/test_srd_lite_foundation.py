@@ -1,10 +1,8 @@
 """Final archive proof through ordinary admitted mechanics and SQLite campaign receipts."""
 
-import io
 import json
 import os
 import zipfile
-from collections.abc import Mapping
 from copy import deepcopy
 from dataclasses import replace
 from functools import lru_cache
@@ -112,7 +110,7 @@ def _replay_event_consumer(case, name, parameters, action_id, monkeypatch):
 
 
 class Case:
-    def __init__(self, path, spell, *, guard_ac=1, positions=None, entity_changes=None, participant_changes=None, lighting="bright", casting_source=None, geometry=None, scene_override=None):
+    def __init__(self, path, spell, *, guard_ac=1, positions=None, entity_changes=None, participant_changes=None, lighting="bright", casting_source=None, geometry=None, scene_override=None, inventory_additions=()):
         self.path = path
         self.manager = None
         with zipfile.ZipFile(ARCHIVE) as package:
@@ -182,6 +180,8 @@ class Case:
                 death_failures=0,
                 stable_recovery_hours_remaining=0,
             )
+        entities["hero"]["inventory"] += [item for item in inventory_additions
+                                        if item not in entities["hero"]["inventory"]]
         materials = [
             {
                 "id": f"material_{index}",

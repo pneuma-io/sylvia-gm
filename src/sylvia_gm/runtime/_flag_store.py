@@ -7,6 +7,7 @@ ctx.vars["_flag_X"] = True (LOCK-2).
 
 from __future__ import annotations
 
+import contextlib
 from typing import Any
 
 
@@ -54,10 +55,8 @@ class FlagStore:
         """Persist flags to _campaign entity via write_field."""
         if self._state_bridge is None:
             return
-        try:
+        with contextlib.suppress(Exception):
             self._state_bridge.write_field("_campaign", "flags", dict(self._flags))
-        except Exception:
-            pass
 
     def set(self, flag: str, value: bool = True) -> None:
         """Set a campaign flag. Persisted through StateBridge.

@@ -104,18 +104,18 @@ def _validate_hp(state: dict[str, Any]) -> list[str]:
                 continue
             hp = entity.get("hp")
             max_hp = entity.get("max_hp")
-            if hp is not None and max_hp is not None:
-                if isinstance(hp, int) and isinstance(max_hp, int):
-                    if hp < 0:
-                        errors.append(f"{label} {eid!r}: hp cannot be negative")
-                    if hp > max_hp:
-                        errors.append(
-                            f"{label} {eid!r}: hp ({hp}) exceeds max_hp ({max_hp})"
-                        )
-                    if max_hp <= 0:
-                        errors.append(
-                            f"{label} {eid!r}: max_hp must be positive"
-                        )
+            if (
+                hp is not None and max_hp is not None
+                and isinstance(hp, int) and isinstance(max_hp, int)
+            ):
+                if hp < 0:
+                    errors.append(f"{label} {eid!r}: hp cannot be negative")
+                if hp > max_hp:
+                    errors.append(
+                        f"{label} {eid!r}: hp ({hp}) exceeds max_hp ({max_hp})"
+                    )
+                if max_hp <= 0:
+                    errors.append(f"{label} {eid!r}: max_hp must be positive")
 
     return errors
 

@@ -132,7 +132,11 @@ def test_affected_runtime_and_content_keep_security_and_composed_boundaries(path
     assert group in plan["python"]
     assert "core-invariants" in plan["python"]
     assert "tests/test_private_provider_records.py" in plan["python"]["core-invariants"]
-    assert any("recovery" in name for name in plan["python"])
+    if path.startswith("src/sylvia_gm/provider/"):
+        assert "gm-turn" in plan["python"]
+        assert "tests/test_alpha_f4_generic_sessions.py" in plan["python"]["gm-turn"]
+    else:
+        assert any("recovery" in name for name in plan["python"])
 
 
 @pytest.mark.parametrize(
@@ -179,6 +183,61 @@ def test_combined_selection_has_no_repeated_or_overlapping_selectors():
     for item in selectors:
         if "::" in item:
             assert item.split("::")[0] not in selectors
+
+
+def test_slow_files_are_selected_only_for_explicit_full_qualification():
+    from scripts.check_supported_journeys import FULL_ONLY_JOURNEYS, PYTHON_JOURNEYS
+
+    slow = {
+        item.split("::")[0]
+        for group in FULL_ONLY_JOURNEYS for item in PYTHON_JOURNEYS[group]
+    }
+    assert slow
+    for plan in (choose(["unmapped.file"]), choose([sorted(slow)[0]])):
+        selected = {
+            item.split("::")[0] for values in plan["python"].values() for item in values
+        }
+        assert selected and not selected & slow
+    full = choose([], full=True)
+    assert slow <= {
+        item.split("::")[0] for values in full["python"].values() for item in values
+    }
+
+
+def test_browser_fixture_helpers_select_their_python_backend():
+    from scripts.check_supported_journeys import FULL_ONLY_JOURNEYS, PYTHON_JOURNEYS
+    from scripts.test_inventory import JAVASCRIPT_HARNESSES
+
+    for helper, owner in JAVASCRIPT_HARNESSES.items():
+        plan = choose([helper])
+        assert helper not in plan["ui"]
+        selected = [item for values in plan["python"].values() for item in values]
+        full_only = {item for group in FULL_ONLY_JOURNEYS for item in PYTHON_JOURNEYS[group]}
+        if owner in full_only:
+            assert owner not in selected
+            assert any(row["selection"] == "explicit --full only" for row in plan["reasons"])
+        else:
+            assert owner in selected
+        full = choose([helper], full=True)
+        assert owner in [item for values in full["python"].values() for item in values]
+
+
+def test_local_cli_accepts_an_explicit_base_without_a_github_event(tmp_path, monkeypatch):
+    import json
+    import subprocess
+    import sys
+
+    root = Path(__file__).resolve().parents[1]
+    output = tmp_path / "selection.json"
+    monkeypatch.delenv("GITHUB_EVENT_PATH", raising=False)
+    result = subprocess.run(
+        [sys.executable, "scripts/select_checks.py", "--base", "HEAD", "--output", str(output)],
+        cwd=root, capture_output=True, text=True, check=False,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    plan = json.loads(output.read_text())
+    assert plan["diff_complete"] and plan["base"] == plan["source"]
+    assert plan["python"]  # An empty diff still cannot silently select zero work.
 
 
 def test_all_selected_current_tests_exist():
@@ -328,3 +387,178 @@ def test_rust_python_discovery_reuses_project_venv_without_a_managed_python_cach
     assert result.returncode == 0, result.stderr
     assert Path(result.stdout.strip()).samefile(sys._base_executable)
     assert (tmp_path / "uv.lock").read_bytes() == lock
+
+
+@pytest.mark.parametrize("path", [
+    "src/sylvia_gm/agent/_provider_session.py",
+    "src/sylvia_gm/agent/_provider_turn_phases.py",
+    "src/sylvia_gm/agent/_provider_turn_state.py",
+    "src/sylvia_gm/agent/_provider_turn_decisions.py",
+    "src/sylvia_gm/agent/_session_loop.py",
+])
+def test_gm_edits_select_full_behavioral_modules_without_campaign_replay(path):
+    plan = choose([path])
+    assert not plan["broad_fallback"] and not plan["native"] and not plan["ui"]
+    assert plan["python"]["gm-turn"] == [
+        "tests/test_alpha_f4_provider_session_adapter.py",
+        "tests/test_alpha_f4_generic_sessions.py",
+        "tests/test_provider_turn_state.py",
+    ]
+    assert "campaign-play" not in plan["python"]
+    assert not any("test_action_sequence" in selector or "test_fc_campaign" in selector
+                   for paths in plan["python"].values() for selector in paths)
+
+
+def test_queue_edits_select_their_expensive_behavior_and_fast_provider_consumer():
+    plan = choose(["src/sylvia_gm/application/action_sequences.py"])
+    assert "gm-turn" in plan["python"]
+    assert plan["python"]["action-sequences"] == [
+        "tests/test_action_sequences.py", "tests/test_action_sequence_provider.py",
+    ]
+    assert "campaign-play" not in plan["python"]
+
+
+@pytest.mark.parametrize("path", [
+    "src-tauri/src/lib.rs",
+    "scripts/build_windows_prerelease.py",
+    "rulesets/srd-lite.sylvia-gm-package",
+    "campaign-settings/severed-lands/setting.json",
+    "campaign-plans/riichi-quick-test/plan.json",
+    "src/sylvia_gm/ruleset/runtime/procedure_executor.py",
+    "src/sylvia_gm/application/bundled_packages.py",
+    "src/sylvia_gm/application/bundled_campaign_plans.py",
+    "src/sylvia_gm/application/builder.py",
+    "src/sylvia_gm/agent/skills/game-master/SKILL.md",
+])
+def test_session_dependencies_keep_behavioral_coverage_after_group_move(path):
+    plan = choose([path])
+    selectors = [item for values in plan["python"].values() for item in values]
+    assert not plan["broad_fallback"]
+    assert "interruption-and-recovery" in plan["python"]
+    assert selectors.count("tests/test_alpha_f4_generic_sessions.py") == 1
+    assert selectors.count("tests/test_alpha_f4_provider_session_adapter.py") == 1
+
+
+def test_combined_session_dependency_diff_selects_each_module_once():
+    plan = choose([
+        "src-tauri/src/lib.rs", "rulesets/srd-lite.sylvia-gm-package",
+        "src/sylvia_gm/ruleset/runtime/procedure_executor.py",
+        "src/sylvia_gm/application/bundled_packages.py",
+        "src/sylvia_gm/application/builder.py",
+    ])
+    selectors = [item for values in plan["python"].values() for item in values]
+    assert len(selectors) == len(set(selectors))
+    assert selectors.count("tests/test_alpha_f4_generic_sessions.py") == 1
+
+
+@pytest.mark.parametrize("removed", ["tests/test_removed_behavior.py", "tests/removed_helper.py"])
+def test_deleted_tests_select_existing_consumers_without_missing_required_paths(tmp_path, removed):
+    import json
+    from scripts.select_checks import load_selection
+
+    root = Path(__file__).resolve().parents[1]
+    assert not (root / removed).exists()
+    plan = choose([removed], root=root)
+    selectors = [item for values in plan["python"].values() for item in values]
+    assert plan["broad_fallback"]
+    assert removed not in selectors
+    assert "tests/test_alpha_f4_generic_sessions.py" in selectors
+    assert any("Removed test" in row["reason"] for row in plan["reasons"])
+    manifest = tmp_path / "selection.json"
+    manifest.write_text(json.dumps(plan))
+    assert load_selection(manifest, revision="a" * 40, root=root) == plan
+
+
+def test_guide_uses_one_plugin_loading_policy_for_standalone_and_runner_commands():
+    root = Path(__file__).resolve().parents[1]
+    guide = (root / "docs/operations/local-checks-and-release.md").read_text()
+    block = guide.split("```powershell", 1)[1].split("```", 1)[0]
+    standalone = block.index(".venv/Scripts/python.exe -m pytest")
+    runner = block.index(".venv/Scripts/python.exe scripts/check_supported_journeys.py")
+    assert block.index("$env:PYTHONDONTWRITEBYTECODE=1") < standalone < runner
+    assert block.index("$env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=$null") < standalone
+    assert "-p pytest_asyncio.plugin" not in block
+    assert "$env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=1" not in block
+
+
+@pytest.mark.parametrize("document", ["README.md", "docs/INDEX.md", "docs/operations/local-checks-and-release.md"])
+def test_check_guide_edits_do_not_select_gm_or_campaign_runtime(document):
+    plan = choose([document])
+    assert set(plan["python"]) == {"copy-and-links"}
+    assert not plan["ui"] and not plan["native"]
+    assert plan["documents"] == [document]
+
+
+def test_full_has_unique_whole_gm_modules_and_each_historical_campaign_module():
+    from scripts.check_catalog import HISTORICAL_CHECKS
+    plan = choose([], full=True)
+    selectors = [selector for values in plan["python"].values() for selector in values]
+    for paths in HISTORICAL_CHECKS["gm-turn-checkpoint"].values():
+        for path in paths:
+            assert selectors.count(path) == 1
+    assert not any(selector.startswith("tests/test_alpha_f4_provider_session_adapter.py::")
+                   for selector in selectors)
+    assert selectors.count("tests/test_provider_turn_state.py") == 1
+    assert "tests/test_provider_turn_state.py" in plan["python"]["gm-turn"]
+    assert "tests/test_provider_turn_state.py" not in plan["python"]["provider-contracts"]
+
+
+def test_product_exclusion_preserves_other_and_future_cases_and_historical_selection():
+    from scripts.check_catalog import PRODUCT_CASE_EXCLUSIONS, qualification_cases
+    historical = next(iter(PRODUCT_CASE_EXCLUSIONS))
+    existing = "tests/test_alpha_f4_generic_sessions.py::test_existing_behavior"
+    future = "tests/test_alpha_f4_generic_sessions.py::test_future_behavior[new-parameter]"
+    required, excluded = qualification_cases([existing, historical, future])
+    assert required == [existing, future]
+    assert excluded == [{"nodeid": historical, "reason": PRODUCT_CASE_EXCLUSIONS[historical]}]
+    assert qualification_cases([existing, historical, future], include_historical=True) == (
+        [existing, historical, future], [],
+    )
+
+
+def test_historical_gm_check_keeps_original_modules_and_expected_failure(tmp_path):
+    import json
+    from scripts.check_catalog import HISTORICAL_CHECKS
+    from scripts.known_test_defects import KNOWN_DEFECTS
+    from scripts.select_checks import historical_check, load_selection
+
+    plan = historical_check("gm-turn-checkpoint", source="a" * 40)
+    assert plan["qualification_kind"] == "historical" and plan["mode"] == "affected"
+    assert plan["python"] == HISTORICAL_CHECKS["gm-turn-checkpoint"]
+    campaign = plan["python"]["campaign-play"]
+    assert campaign == [
+        "tests/test_campaign_rules_update.py", "tests/test_campaign_rules_update_bindings.py",
+        "tests/test_campaign_rules_update_knowledge.py", "tests/test_action_sequences.py",
+        "tests/test_action_sequence_provider.py", "tests/test_td_native_panel_repairs.py",
+        "tests/test_fc_campaign_journey.py", "tests/test_fc_party_combat.py",
+        "tests/test_fc_campaign_progress.py", "tests/test_migrated_plan_lifecycle.py",
+        "tests/test_riichi_quick_test_plan.py", "tests/test_no_rules_interview.py",
+    ]
+    known = "tests/test_migrated_plan_lifecycle.py::test_retained_rift_legacy_reusable_copy_resolves_its_exact_available_snapshot"
+    assert known in KNOWN_DEFECTS and known.split("::")[0] in campaign
+    for paths in plan["python"].values():
+        for relative in paths:
+            path = tmp_path / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("", encoding="utf-8")
+    manifest = tmp_path / "selection.json"
+    manifest.write_text(json.dumps(plan))
+    assert load_selection(manifest, revision="a" * 40, root=tmp_path) == plan
+    plan["python"]["turn-provider-contracts"].pop()
+    manifest.write_text(json.dumps(plan))
+    with pytest.raises(ValueError, match="complete declared selection"):
+        load_selection(manifest, revision="a" * 40, root=tmp_path)
+
+
+def test_readme_resets_explicit_plugin_environment_before_runner_commands():
+    import re
+
+    root = Path(__file__).resolve().parents[1]
+    readme = (root / "README.md").read_text()
+    blocks = re.findall(r"```powershell\s+(.*?)```", readme, flags=re.DOTALL)
+    standalone = next(block for block in blocks if "-m pytest" in block)
+    runner = next(block for block in blocks if "scripts/check_supported_journeys.py" in block)
+    assert standalone.index("$env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=1") < standalone.index("-p pytest_asyncio.plugin")
+    assert runner.index("$env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=$null") < runner.index("scripts/select_checks.py")
+    assert "$env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=1" not in runner
+    assert "-p pytest_asyncio.plugin" not in runner

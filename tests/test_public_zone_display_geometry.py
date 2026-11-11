@@ -3,7 +3,7 @@
 from copy import deepcopy
 
 import pytest
-from test_tactical_grid_ui import _scene
+from tests.test_tactical_grid_ui import _scene
 
 from sylvia_gm.application import tactical_grid
 from sylvia_gm.domain.authority import thaw_json_value

@@ -164,13 +164,14 @@ def test_legacy_http_and_pywebview_applications_are_absent() -> None:
 
 def test_canonical_model_path_has_no_direct_or_duplicate_mechanics_dispatch() -> None:
     session_loop = (ROOT / "src/sylvia_gm/agent/_session_loop.py").read_text(encoding="utf-8")
-    provider_adapter = (ROOT / "src/sylvia_gm/agent/_provider_session.py").read_text(
-        encoding="utf-8"
-    )
+    agent = ROOT / "src/sylvia_gm/agent"
+    adapter_paths = [agent / "_provider_session.py", *sorted(agent.glob("_provider_turn_*.py"))]
     assert "_owner.catalog(" not in session_loop
     assert "_owner.execute_action(" not in session_loop
-    assert "_owner.catalog(" not in provider_adapter
-    assert "_owner.execute_action(" not in provider_adapter
+    for path in adapter_paths:
+        source = path.read_text(encoding="utf-8")
+        assert "_owner.catalog(" not in source, path.name
+        assert "_owner.execute_action(" not in source, path.name
     assert not (ROOT / "src/sylvia_gm/tools/_mcp_server.py").exists()
     assert not (ROOT / "src/sylvia_gm/server/_mcp_server.py").exists()
 

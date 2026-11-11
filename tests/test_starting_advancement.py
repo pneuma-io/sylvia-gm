@@ -4,19 +4,29 @@ from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.application.bundled_packages import bundled_rift_authority
 from sylvia_gm.application.campaign_library_selection import materialize_library_party, resolve_campaign_library_selection
 from sylvia_gm.application.reusable_participants import save_reusable_participant, load_reusable_participant
-from tests.test_reusable_participants import _participant, _participant_authority, _starting_state
+from sylvia_gm.domain.authority import PackageRole
+from tests.test_reusable_participants import _participant, _starting_state
 
 
 def test_level_one_cards_queue_the_plan_start_for_player_and_companion_without_mutation(tmp_path):
-    package, declaration = _participant_authority()
-    setting = bundled_rift_authority().setting
-    saved = tuple(save_reusable_participant(
-        tmp_path, operation_id=role, role=role, summary="A synthetic fighter.",
-        authored_profile="A voluntary exhibition fighter.", participant=_participant(role),
-        entity_state=_starting_state(), package=package, declaration=declaration,
-        campaign_setting=setting,
-    ) for role in ("player_character", "companion"))
     with AuthorityOwner.open(tmp_path / "campaign.db", "test") as owner:
+        current = bundled_rift_authority()
+        selected = resolve_campaign_library_selection(owner, tmp_path,
+            candidate_id=current.ruleset.package_id, setting_id=current.setting.package_id,
+            plan_id="the-sparring-debt")
+        package = next(entry for entry in selected.candidate.package_lock.entries
+                       if entry.role is PackageRole.PRIMARY)
+        declaration = next(item for item in owner.exact_participant_declarations(
+            package.package_id, package.version, package.sha256)
+            if item.kind == "player_character")
+        setting = selected.sources.setting
+        # Author against this Plan's retained contract, just as the Builder does.
+        saved = tuple(save_reusable_participant(
+            tmp_path, operation_id=role, role=role, summary="A synthetic fighter.",
+            authored_profile="A voluntary exhibition fighter.", participant=_participant(role),
+            entity_state=_starting_state(), package=package, declaration=declaration,
+            campaign_setting=setting,
+        ) for role in ("player_character", "companion"))
         selection = resolve_campaign_library_selection(owner, tmp_path,
             candidate_id=package.package_id, setting_id=setting.package_id, plan_id="the-sparring-debt")
         party, state, _ = materialize_library_party(owner, selection, operation_id="start",

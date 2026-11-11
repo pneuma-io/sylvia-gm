@@ -12,7 +12,6 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
-
 # ── Entity ID pattern ─────────────────────────────────────────────────────
 
 _ENTITY_ID_FIELD = Field(

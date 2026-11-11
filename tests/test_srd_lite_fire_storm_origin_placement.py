@@ -6,6 +6,7 @@ from pathlib import Path
 import zipfile
 
 import pytest
+from sylvia_gm.domain.authority import thaw_json_value
 import yaml
 
 from tests.test_native_followups import make_case
@@ -15,7 +16,7 @@ from sylvia_gm.application.package_runtime import AuthorityMemoryStateBridge
 from sylvia_gm.runtime import RulesetRuntime
 from sylvia_gm.runtime._tool_executor import execute_tool
 from sylvia_gm.runtime._types import ExecutionBudget
-from tests.test_srd_lite_mass_cure_geometry import NAMESPACE, _scene_entity, _wall, _calls
+from tests.srd_lite_mass_cure_geometry_fixtures import NAMESPACE, _scene_entity, _wall, _calls
 
 QUALIFY = 'qualify_srd_lite_fire_storm_cubes'
 PLACE = 'place_srd_lite_fire_storm_cubes'
@@ -26,7 +27,7 @@ def bound():
         data = yaml.load(archive.read('packages/' + NAMESPACE + '/runtime/ruleset.yaml'), Loader=yaml.CSafeLoader)
     pool = data.get('parameter_declarations', {})
     for tool in data['tools'].values():
-        tool['parameters'] = [deepcopy(pool[row]) if isinstance(row, str) else row for row in tool['parameters']]
+        tool['parameters'] = [deepcopy(pool[row]) if isinstance(row, str) else row for row in tool.get("parameters", [])]
     if os.environ.get('FIRE_STORM_PATCH_PLACEMENT') == '1':
         from scripts.srd_lite_fire_storm_geometry import _qualifier, _placement
         from scripts.srd_sunburst_geometry import _point_cover

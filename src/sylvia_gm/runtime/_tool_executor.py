@@ -139,7 +139,8 @@ def prepare_tool_context(
         **{
             parameter.name: deepcopy(parameter.default)
             for parameter in tool_def.parameters
-            if parameter.name not in params and (parameter.default is not None or not parameter.required)
+            if parameter.name not in params
+            and (parameter.default is not None or not parameter.required)
         },
         **params,
     }

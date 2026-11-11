@@ -5229,7 +5229,11 @@ class AuthorityOwner:
                     maximum_bytes=PACKAGE_RUNTIME_BYTE_LIMIT,
                 )
                 if runtime_bytes is not None:
-                    runtime = yaml.safe_load(runtime_bytes.decode("utf-8"))
+                    from sylvia_gm.application.package_runtime import _BoundedRuntimeLoader
+
+                    runtime = yaml.load(
+                        runtime_bytes.decode("utf-8"), Loader=_BoundedRuntimeLoader
+                    )
                     if isinstance(runtime, Mapping):
                         runtime_tools = runtime.get("tools")
                         public = {tool.name for tool in manifest.tools}
