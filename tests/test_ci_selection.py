@@ -625,6 +625,18 @@ def test_real_gm_request_contracts_have_one_full_owner_and_separate_quick_group(
     assert full["python"]["gm-turn"] == PYTHON_JOURNEYS["gm-turn"]
 
 
+def test_complete_full_selection_loads_against_the_actual_checkout(tmp_path):
+    import json
+    from scripts.select_checks import load_selection
+
+    plan = choose(["README.md"], full=True)
+    manifest = tmp_path / "full-selection.json"
+    manifest.write_text(json.dumps(plan), encoding="utf-8")
+    root = Path(__file__).resolve().parents[1]
+
+    assert load_selection(manifest, revision="a" * 40, root=root) == plan
+
+
 def test_real_gm_request_contracts_are_unique_in_a_combined_affected_diff():
     module = "tests/test_gm_memory_casting_hotfix.py"
     plan = choose([

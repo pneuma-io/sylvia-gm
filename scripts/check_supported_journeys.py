@@ -331,7 +331,6 @@ PYTHON_JOURNEYS = {
         'tests/test_local_diagnostics_owner.py',
         'tests/test_package_archive_streaming.py',
         'tests/test_private_records_archive.py',
-        'tests/test_private_session_reopen.py',
         'tests/test_saved_builder_sessions.py',
         'tests/test_working_context_sessions.py',
     ],
