@@ -18,12 +18,12 @@ Blunt, skilled, and allergic to politics. Anvil doesn't care about the Returner 
 
 ## Appearance and artwork
 
-An adult Human woman in her early forties with sun-browned freckled skin, a muscular broad-shouldered build, brown hair tied into a short practical ponytail, a square face and gray-green eyes. A blunt level appraising expression. Charcoal rolled-sleeve shirt, a heavy worn brown leather smith's apron, plain dark trousers and reinforced work boots; a small plain hammer rests in a belt loop. Faint soot on forearms and apron. No house crest, political symbol, weapon, jewelry or magic.
+A broad-shouldered muscular Human woman with dark warm brown skin, a square face, amber-brown eyes, very short tightly curled black hair and strong intact forearms. Charcoal short-sleeve linen shirt, heavy russet leather apron below the knees, muted olive trousers, plain brown work belt and sturdy closed-toe dark boots. A small forging hammer is held low in her right hand and closed tongs are secured at the left belt. Selected soot and wear mark her tools and apron. Blunt steady expression and practical work clothes.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/89f5e376f42931de86837a7c750c907eaa3f511edc41658b7f12271494104b8c.png)
+[Portrait](../assets/characters/33f441ea125290963e4c5ec774ff6bf0a9fbaed645262bb10d8e005515d508d4.png)
 
-[Full-body reference](../assets/characters/7154ed9699296993673c26a3ec3a9feb27f0949201c5b3267f83c1148db4a2f9.png)
+[Full-body reference](../assets/characters/d8153a3c6691bbde04111628f6bfdf6246bce417d4f916b47cd20b1fb53e73dc.png)
 
-[Multiview reference sheet](../assets/characters/50a6ccdad7fc876a840e59e7f579205fb4b93be8d9195b574dffc81174e6209e.png)
+[Multiview reference sheet](../assets/characters/342d66a4157194c9affddb2fcbffcb6b17e64b22f3d6bfbf4f4b3ee191bff99f.png)

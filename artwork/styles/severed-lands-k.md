@@ -109,6 +109,22 @@ the authored facts and this guide. Individual creature studies remain outside ca
 | The Cartographer | [Body](../assets/characters/5d8d852a39d9600759f5333e11f3397a289aabb133cb3a55cf8fe1e5d7fdc25d.png) | [Sheet](../assets/characters/bb4be3b3ac29858af47f061806118183ce2aa5a50e02cdf2e5b30216f49a5442.png) | [Portrait](../assets/characters/6209621496d366252629053860089fef16915e89fa687a5e7cc2f6c2f68c9fe5.png) |
 | Marla | [Body](../assets/characters/c2b3187410bae93589ca6c4bbca4ba6407a6e882b6953c40dff7c74986eeea95.png) | [Sheet](../assets/characters/25c4568a26c048a3c1bd151b84c0061e0f7407bb5e54d59f0b87c9916e4d5d3f.png) | [Portrait](../assets/characters/112d0c99d1fcee3c196e0622d4fb3592847070c7b889632507619d8d12665552.png) |
 
+### Prepared supporting character references
+
+These six fresh designs use authored-only identity text and the accepted Marla rendering
+benchmark, then their new body/sheet references. They are prepared catalogue defaults under the
+approved continuation, available for review rather than individually owner-approved identities.
+Iro is the named pacifist NPC; do not merge him with the generic memory-hunting Rift Seeker.
+
+| Character | Full body | Multiview | Portrait |
+|---|---|---|---|
+| Henna | [Body](../assets/characters/c5e23316eafc3d8ef9259a5aa259416059c6bc5c2c322f808642e3bd3aac2c55.png) | [Sheet](../assets/characters/f2fb2e879dbac99c30073c37818f265714ec47e174d01fbfd97ab44667daf5c0.png) | [Portrait](../assets/characters/6782f2b51e1cedbc73edfa7fa4504320c6c9a664bd5cc75d46e7a7d3a6b73960.png) |
+| Anvil | [Body](../assets/characters/d8153a3c6691bbde04111628f6bfdf6246bce417d4f916b47cd20b1fb53e73dc.png) | [Sheet](../assets/characters/342d66a4157194c9affddb2fcbffcb6b17e64b22f3d6bfbf4f4b3ee191bff99f.png) | [Portrait](../assets/characters/33f441ea125290963e4c5ec774ff6bf0a9fbaed645262bb10d8e005515d508d4.png) |
+| The Quartermaster | [Body](../assets/characters/834536dc2f9f4c3d79918c6b0477994972e102be03f9a7f6ddf48804b8f01a2a.png) | [Sheet](../assets/characters/24b7557fbb508859e85370dc8895684b40a5ddf4114030ec07e1daea81031434.png) | [Portrait](../assets/characters/859b91e39bc702819d3254d94537d37089c2c5e918479b7194b788f353f9f441.png) |
+| Pike | [Body](../assets/characters/512d9510bb71939983fa49ecf2b7fda517b2805583633701993893764af72873.png) | [Sheet](../assets/characters/475954e5a10d328ab2ccd0826af3528e3c5b32455f1a94b2db8c66274a417f0b.png) | [Portrait](../assets/characters/ef2df556b3c76765f28a7cf578c234a4ad480e5cf2da73081334f1dde84174c1.png) |
+| Old Crane | [Body](../assets/characters/9c5f3257e5897bfc4f6b6e96c5ed734d97f47c6e1efc3790ed7bcfb16f7ae66c.png) | [Sheet](../assets/characters/aa890198faf3d9802ea6c408d2f4d42eec645278d3d562f292cd3b95d8c5aecd.png) | [Portrait](../assets/characters/861e3e6d34d55a4aad51f678751b77c35600e11169a8672cf76084b586334a77.png) |
+| Iro | [Body](../assets/characters/e5136a64ae35b2a54728bb3c00425a21f5d452f778d62d2212ccf4bc45c757b3.png) | [Sheet](../assets/characters/e1cc99b916a5156128f1d9dbc25f061426fbf5bc54a7ec80f1b19418bd77f93f.png) | [Portrait](../assets/characters/74250fd3d19e2ffa06bdd0b91be1f634dae2b33f7d3f5e444dd9c59126bdc4cd.png) |
+
 ### Selected Rift creature identity
 
 The owner selected C3 as the Death Hound's design: a living two-headed predator with convincing
@@ -121,6 +137,12 @@ through their own anatomy and materials rather than repeating the hound's interi
 - [Selected full body](../assets/characters/ed251f986771223104d15c00a2963da513e97c6ea401ef70e71fcf3e69b8a046.png)
 - [Matching multiview](../assets/characters/1821b447254c3a9c23e93cb545671538cb59eee3178251885ee9c04df0a48029.png)
 - [Portrait](../assets/characters/a8e5b5f3f36636364a96db16ed0a3755f3a6fc388110a297b8adaec896a65e3b.png)
+
+### Anchor Trap visual interpretation
+
+The owner selected an activated stone construct of interlocking rings and rune-plates.
+Its normal-rug appearance is the motionless disguise. Preserve that distinction in its artwork;
+this visual decision does not rewrite its existing traits or mechanics.
 
 ## Maps and Rift environments
 

@@ -18,12 +18,12 @@ Eager, brave, and dangerously inexperienced. Pike represents the best and worst 
 
 ## Appearance and artwork
 
-A humanlike adult Riftborn man about twenty years old with a slim wiry build, medium brown skin, short unruly reddish-brown curls, bright brown eyes and an earnest clean-shaven face. An eager confident expression. A patched russet cloth patrol jacket over a plain oatmeal shirt, charcoal trousers, stout work boots and a small belt pouch. Holds one plain practical spear upright at his side, tip comfortably inside the frame. No medals, veteran scars, faction emblems, modern military gear or magical effects.
+A lanky young adult Riftborn man with fair warm freckled skin, hazel eyes, an open eager face and messy straw-blond hair with a cowlick. Patched moss-green field jacket over an undyed linen shirt, a simple brown leather guard on the left shoulder, tan work trousers and worn brown lace-up boots. Plain belt with a small right-side field pouch and rolled muted rust shoulder cloth. He holds a plain hardwood spear upright in his right hand. Earnest proud bearing and modest patrol gear; no veteran insignia or riftwolf trophy.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/bf485af80c1a09436f83a6237239c02390e44a0982c8ab28ba4b12a23e5e6766.png)
+[Portrait](../assets/characters/ef2df556b3c76765f28a7cf578c234a4ad480e5cf2da73081334f1dde84174c1.png)
 
-[Full-body reference](../assets/characters/53925e0cb00e474ac5c608848488c99b1c5628ee229e1a6ecb859e8028f8de1b.png)
+[Full-body reference](../assets/characters/512d9510bb71939983fa49ecf2b7fda517b2805583633701993893764af72873.png)
 
-[Multiview reference sheet](../assets/characters/c00ac3c36fc52d8ff6de3d25df55c2b60c4a12da4b7fe229cd9cc789efd6e574.png)
+[Multiview reference sheet](../assets/characters/475954e5a10d328ab2ccd0826af3528e3c5b32455f1a94b2db8c66274a417f0b.png)

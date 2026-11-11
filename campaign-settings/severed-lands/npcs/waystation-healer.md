@@ -20,12 +20,12 @@ Henna is calm, competent, and carrying the weight of everyone who's died on her 
 
 ## Appearance and artwork
 
-A humanlike adult Riftborn woman in her early fifties with deep brown skin, an average sturdy build, short silver-streaked braids and calm dark eyes. A patient composed expression. Plain undyed linen clinic tunic with rolled sleeves, muted blue-gray trousers, practical shoes and a small cloth pouch holding a visible clean folded bandage. Empty relaxed hands. No surgical instruments, magical glow, blood, faction emblems or modern medical logos.
+A lean mature Riftborn woman with deep warm brown skin, a long thoughtful face, dark brown eyes and selected tired eye lines. Short dense salt-and-pepper curls are held back by a plain muted blue cloth headband. Cream work tunic and long divided skirt beneath a worn slate-blue sleeveless overcoat, faded ochre waist wrap, soft closed brown shoes and pale cloth cuffs. A small worn leather medical satchel at the left hip carries a rolled bandage and dried herbs; she holds a closed wooden supply case. Calm reassuring expression. Her medical equipment is improvised rather than restored home-world instruments.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/c527bf1ee36cfabab3c32112fec057b30d2bbd099f7f85624ae9672b13141b47.png)
+[Portrait](../assets/characters/6782f2b51e1cedbc73edfa7fa4504320c6c9a664bd5cc75d46e7a7d3a6b73960.png)
 
-[Full-body reference](../assets/characters/b5ec6ef3dfc14186c798fd946ba980d7ef048b8f8e33e6d16a99298e4e0271f5.png)
+[Full-body reference](../assets/characters/c5e23316eafc3d8ef9259a5aa259416059c6bc5c2c322f808642e3bd3aac2c55.png)
 
-[Multiview reference sheet](../assets/characters/791011d6613d614914d9cb20d4803b3df2d09f902334d08d65f00ba623e53639.png)
+[Multiview reference sheet](../assets/characters/f2fb2e879dbac99c30073c37818f265714ec47e174d01fbfd97ab44667daf5c0.png)

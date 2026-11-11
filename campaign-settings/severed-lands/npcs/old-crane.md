@@ -24,12 +24,12 @@ Crane is signaling Waystation — three mirrored flashes, the emergency code. He
 
 ## Appearance and artwork
 
-An extremely elderly Human man with a very lean stooped build, weathered light bronze skin, deeply lined face, long white eyebrows, a narrow wispy white beard and thin white hair tied in a small loose topknot. Dark gray eyes and a faint amused distant expression. Layered threadbare ash-gray monk robes with faded indigo patches, a simple cloth waist tie and worn flat cloth shoes. Empty relaxed hands; no weapon. One clearly readable physical silhouette in a still pose; do not show motion echoes, copies, ghost bodies or an invented revealed origin. No symbols, text, magic rays or jewelry.
+A very elderly tall spare Human man with weathered warm bronze skin, selected deep age lines, small amused dark eyes, a bald crown with sparse white side hair and a narrow short white beard. Slightly stooped but intact, with long bony hands. Faded ash-brown and muted saffron travelling robes, patched hems, a simple dark cord, charcoal cloth shoes and a plain supply pouch. He lightly carries a plain wooden walking staff in his left hand. A restrained offset teal-violet edge trace around a sleeve and robe hem suggests the authored phase-lag of the same body; it is not another limb or person. His exact age and settled/Riftborn origin remain unknown.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/0020e49bd1a0cc445ab8b7fbd2b998012263f721ebc7cef6768fcf72c1c62426.png)
+[Portrait](../assets/characters/861e3e6d34d55a4aad51f678751b77c35600e11169a8672cf76084b586334a77.png)
 
-[Full-body reference](../assets/characters/1da585647c41b00eccb6188973e04cf53f8825cc8e64af60114fa5bb8a78e3cd.png)
+[Full-body reference](../assets/characters/9c5f3257e5897bfc4f6b6e96c5ed734d97f47c6e1efc3790ed7bcfb16f7ae66c.png)
 
-[Multiview reference sheet](../assets/characters/669f48e57ed4636c180c382286068505ec90be597d4ec1aa83c3844a1f815d9b.png)
+[Multiview reference sheet](../assets/characters/aa890198faf3d9802ea6c408d2f4d42eec645278d3d562f292cd3b95d8c5aecd.png)

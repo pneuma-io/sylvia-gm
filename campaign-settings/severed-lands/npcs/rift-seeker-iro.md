@@ -18,12 +18,12 @@ Iro is calm, melancholy, and carrying the weight of his people's choices. He lov
 
 ## Appearance and artwork
 
-A humanlike adult Riftborn man in his early forties with warm brown skin, a lean sturdy build, a long oval face, dark eyes, close-cropped black hair and a short neatly kept black beard. A calm melancholy expression. Simple sand-colored travel robes with a faded blue shoulder wrap, plain cloth belt, weathered soft boots and a small unadorned travel satchel. Empty open relaxed hands and no weapon. No Raider war paint, faction insignia, battle pose, glowing features or invented nonhuman anatomy.
+A lean mature Riftborn man with deep teak-brown skin, an angular long face, quietly sad dark brown eyes, a clean-shaven jaw and a closely shaved head. Ordinary humanoid proportions and rounded ears are editable visual defaults, not a biological ancestry claim. Worn midnight-blue wrap vest over a pale sand tunic, muted sage shoulder scarf, loose dark slate trousers, cloth ankle wraps and dark walking boots. A water flask and small cloth travel bundle rest at the left hip. Hands empty and relaxed, with composed melancholy bearing. This is the named pacifist Iro, not the generic memory-hunting Rift Seeker creature.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/b18357baadb1293a40723e515f41d8cd8ae29e85cf1210879aab14cd4c215c6e.png)
+[Portrait](../assets/characters/74250fd3d19e2ffa06bdd0b91be1f634dae2b33f7d3f5e444dd9c59126bdc4cd.png)
 
-[Full-body reference](../assets/characters/0c802bfca7d8cb7ba6b92aa416d457c8cce5465894299e3769f6d2cf1e73086e.png)
+[Full-body reference](../assets/characters/e5136a64ae35b2a54728bb3c00425a21f5d452f778d62d2212ccf4bc45c757b3.png)
 
-[Multiview reference sheet](../assets/characters/650da0633afa0f987288b3197ab15b976714705fc5d754e36db072725afe6cbe.png)
+[Multiview reference sheet](../assets/characters/e1cc99b916a5156128f1d9dbc25f061426fbf5bc54a7ec80f1b19418bd77f93f.png)

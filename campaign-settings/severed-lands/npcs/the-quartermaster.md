@@ -22,12 +22,12 @@ Equipment has been going missing from the armory — small items, impossible to 
 
 ## Appearance and artwork
 
-A humanlike androgynous adult Riftborn in their late fifties with medium brown skin, a compact strong build, close-cropped gray hair, a broad angular face and steady dark eyes. A reserved exacting expression. A meticulously maintained but repeatedly repaired slate-blue field jacket, charcoal trousers, plain leather belt, stout boots and a small crossbody inventory pouch. Holds one closed plain ledger at the side. No rank insignia, faction crest, visible writing, parade medals or active weapon.
+A compact strong Riftborn adult of androgynous appearance with medium tawny-brown skin, a broad weathered face, heavy straight brows, slate-grey eyes and close-cropped coarse dark hair evenly flecked with grey. High-collared dark blue-grey wool coat with a split hem, taupe work vest, charcoal trousers and scuffed heavy boots. A plain leather belt carries a small iron key ring at the right hip and a repair-tool pouch at the left. A closed flat inventory ledger is held low under one arm. Severe composed bearing; no assigned regiment, medal or revealed home-world ancestry. Narrow intersecting scars mark the right cheek; no cause is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/0539b9a591bc59c82b4adf82d50e5cd7950b526e938ec607ad204a94d2919e41.png)
+[Portrait](../assets/characters/859b91e39bc702819d3254d94537d37089c2c5e918479b7194b788f353f9f441.png)
 
-[Full-body reference](../assets/characters/6c2bc244d71e7678ba002ff478e0ddd13e84c586c3c3f3891edbcbc8e537292d.png)
+[Full-body reference](../assets/characters/834536dc2f9f4c3d79918c6b0477994972e102be03f9a7f6ddf48804b8f01a2a.png)
 
-[Multiview reference sheet](../assets/characters/e7c9ff192d73463a730eb95da6c8f0f0dd7dc6a62ebe919d1e04b0be6096fbc5.png)
+[Multiview reference sheet](../assets/characters/24b7557fbb508859e85370dc8895684b40a5ddf4114030ec07e1daea81031434.png)
