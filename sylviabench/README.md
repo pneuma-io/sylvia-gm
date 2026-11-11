@@ -1,8 +1,8 @@
-# SylviaBench gameplay protocol v2
+# SylviaBench gameplay protocol v2.1
 
 This developer-only runner drives Sylvia's real owner without an app window. It is outside
 `src/` and is excluded from the installed application. The Builder benchmark remains parked.
-Protocol v2 incorporates the 11 November memory/casting/context repairs through merged main
+Protocol v2 incorporates the 11 November context repair through merged main
 `c84792e16755055c6760f6f23d09ea964cf5e368`. Broader model-discovery, admission and other app
 follow-ups remain separate. This framework does not qualify them or native desktop interaction.
 
@@ -25,8 +25,9 @@ wrong target, secret disclosure in saved state, lost audience and missing compac
 
 ## The challenge
 
-The recipe-v2 pack uses the bundled level-one Cleric and a neutral campaign, The west road.
-The normal campaign-start command supplies the Plan opening. Ordinary dialogue then establishes a courier, his sealed private note, and a player-known lantern
+The recipe-v3 pack uses the bundled level-one Cleric and a neutral campaign, The west road.
+The normal campaign-start command preserves the accepted standing-in-the-clearing footing.
+Exploration then establishes a road and courier, his sealed private note, and a player-known lantern
 signal. A declared synthetic NPC stat block gives the courier 40 maximum HP. A seeded fall
 committed through the real tool removes 21 HP. Two intervening exchanges separate the signal
 from the final question. Facts use the actual player audience. The held mace and shield follow
@@ -55,7 +56,7 @@ full prompts across providers, or force a common summary onto a compaction test.
 A private setup file uses the existing `SetupFile` schema. Each model setup selects exact
 `provider_id`, `model_id` and `owner_config`, with any explicit reasoning override recorded.
 Use new setup IDs for protocol-v2 experiments. Source records bind actual application/framework
-bytes, the benchmark commit and product base. Recipe-v1 packs cannot run under v2. Original
+bytes, the benchmark commit and product base. Earlier fixture recipes cannot run under v2.1. Original
 pilot records and grades are never rewritten or pooled with these new identities.
 
 ```powershell
@@ -93,8 +94,11 @@ ChatGPT/Go funding limits remain in force. An execution switch is not a monetary
 python -m sylviabench debrief ../Results/models-v2 --output ../Debriefs/models-v2 --allow-model-calls
 ```
 
-The entire scored batch must be complete and closed first, on exactly the same source/framework.
-`debrief` seals the result-file hashes, copies each completed run's save into a separate directory,
+The entire scored batch must be complete and closed first, with exactly the same Sylvia application/content bytes.
+Survey versions may change independently of gameplay, with both source identities recorded.
+Survey v3 marks prior scripted history as inherited, identifies the tested player messages,
+and labels the survey's fresh state as post-gameplay rather than evidence of earlier input;
+models must distinguish their own decisions from inherited context. `debrief` seals the result-file hashes, copies each completed run's save into a separate directory,
 and submits the same neutral survey through the same GM path and model configuration. The saved
 history and compaction checkpoints remain available. It reveals SylviaBench and asks what helped,
 what confused or blocked the GM, what was unclear or missing, what was hard to find/retain, what
@@ -107,6 +111,8 @@ linked to setup/run and survey identities. They are hypotheses to check against 
 score adjustments or established causes. Survey inference consumes additional allowance. A survey
 usage-limit pause does not rewrite gameplay; its partial response files remain available.
 Debrief currently requires a fresh output directory and does not automatically resume surveys.
+A completed status means the GM turn finished; read the response to check that it actually
+answers the questionnaire. A story continuation is a survey non-answer, even if the turn closed.
 
 ## Records and privacy
 

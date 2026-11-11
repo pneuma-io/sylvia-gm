@@ -184,10 +184,40 @@ def test_survey_is_neutral_and_old_trials_cannot_receive_a_reveal(tmp_path, monk
 
     assert "scored gameplay has concluded" in SURVEY
     assert all(f"{i}. " in SURVEY for i in range(1, 7))
+    assert "not your authored" in SURVEY
+    assert "Do not assess this survey reply as gameplay" in SURVEY
+    assert "after the tested gameplay" in SURVEY
     monkeypatch.setattr(debrief, "load_results", lambda _: ({"protocol": "old"}, []))
     with pytest.raises(ValueError, match="original trials"):
         collect(tmp_path / "old", tmp_path / "survey")
     assert not (tmp_path / "survey").exists()
+
+
+def test_copying_a_frozen_wal_database_does_not_write_to_its_directory(tmp_path):
+    import sqlite3
+    from contextlib import closing
+
+    from sylviabench.fixtures import copy_save
+    from sylviabench.packs import inventory
+
+    source = tmp_path / "frozen/campaign.sqlite3"
+    source.parent.mkdir()
+    with closing(sqlite3.connect(source)) as connection:
+        connection.execute("pragma journal_mode=wal")
+        connection.execute("create table witness (value integer)")
+        connection.execute("insert into witness values (17)")
+        connection.commit()
+    before = inventory(source.parent)
+    target = tmp_path / "run/campaign.sqlite3"
+    copy_save(source, target)
+    assert inventory(source.parent) == before
+    with closing(sqlite3.connect(target)) as copied:
+        assert copied.execute("select value from witness").fetchone() == (17,)
+    wal = source.with_name(source.name + "-wal")
+    wal.write_bytes(b"uncheckpointed")
+    with pytest.raises(ValueError, match="checkpoint"):
+        copy_save(source, tmp_path / "unsafe/campaign.sqlite3")
+    assert not (tmp_path / "unsafe").exists()
 
 
 def test_survey_rejects_incomplete_batches_and_requires_live_opt_in(tmp_path, monkeypatch):
@@ -225,7 +255,7 @@ def test_batch_rotates_order_and_pauses_before_using_another_setup(tmp_path, mon
         connection.commit()
     source = {"application_sha256": "app", "framework_sha256": "frame", "commit": "source"}
     descriptor = {
-        "recipe_version": 2,
+        "recipe_version": 3,
         "sha256": "pack",
         "ids": {"campaign": "campaign", "session": "session"},
         "observation": {},

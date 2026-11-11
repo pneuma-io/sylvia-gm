@@ -457,8 +457,8 @@ def run(
     if any(s.kind == "model" for s in selected) and fixtures is None:
         raise ValueError("Model comparisons require an explicitly selected --fixtures pack")
     pack = verify(fixtures, source) if fixtures is not None else None
-    if pack is not None and pack["recipe_version"] != 2:
-        raise ValueError("Protocol v2 requires a newly frozen recipe-v2 fixture, not an old trial")
+    if pack is not None and pack["recipe_version"] != 3:
+        raise ValueError("Protocol v2.1 requires a recipe-v3 fixture, not an earlier trial")
     specification: dict[str, Any] = {
         "schema_version": 1,
         "protocol": PROTOCOL,

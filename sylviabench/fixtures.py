@@ -141,6 +141,11 @@ def observe(database: Path, campaign: str, session: str) -> dict[str, Any]:
         return {
             "state": thaw_json_value(snapshot.state),
             "facts": thaw_json_value(snapshot.continuity.facts),
+            "narrative_entities": [
+                thaw_json_value(item)
+                for item in snapshot.continuity.facts
+                if item.get("record_kind") == "entity"
+            ],
             "reveals": thaw_json_value(snapshot.continuity.reveals),
             "talks": talks,
             "mechanics": [
@@ -330,8 +335,16 @@ def copy_save(source: Path, target: Path) -> None:
     """Use SQLite backup after the owner closes; include the campaign's ordinary local files."""
     if target.exists():
         raise ValueError("Refusing to replace an existing scenario save")
+    wal = source.with_name(source.name + "-wal")
+    if wal.exists() and wal.stat().st_size:
+        raise ValueError("Close and checkpoint the source save before copying it")
     target.parent.mkdir(parents=True, exist_ok=True)
-    with closing(sqlite3.connect(source)) as saved, closing(sqlite3.connect(target)) as copied:
+    # Ordinary WAL opens can create sidecars in a frozen pack, breaking another batch's
+    # inventory check. Closed, checkpointed sources can be read without writing any bytes.
+    with (
+        closing(sqlite3.connect(source.resolve().as_uri() + "?immutable=1", uri=True)) as saved,
+        closing(sqlite3.connect(target)) as copied,
+    ):
         saved.backup(copied)
     for name in ("campaigns", "participants"):
         authored = source.parent / name
@@ -346,12 +359,13 @@ def seed(directory: Path) -> tuple[Path, dict[str, str]]:
     opening = ScriptedGM(
         [
             settle(
-                "Oren Reed, you wake as a Cleric beneath the trees of a woodland clearing. "
-                "A weathered sign points toward Thornwall. A path descends toward the wooded road.",
+                "Oren Reed, you stand alone in the bare Anchor Clearing. You are a Cleric. "
+                "Weathered stone fragments mark its stable boundary. Dense growth surrounds "
+                "the clearing, with no obvious route through it. What do you do?",
                 scenes=[
                     {
-                        "summary": "Oren Reed is awake in the woodland clearing beside the sign "
-                        "toward Thornwall.",
+                        "summary": "Oren Reed stands alone in the bare Anchor Clearing, "
+                        "surrounded by dense growth with no obvious route.",
                         "location_id": "verdant-margin",
                     }
                 ],
@@ -371,6 +385,29 @@ def seed(directory: Path) -> tuple[Path, dict[str, str]]:
         )
         if reply.get("interruption"):
             raise RuntimeError("The ordinary campaign opening did not complete")
+    reply = submit(
+        database,
+        ids,
+        ScriptedGM(
+            [
+                settle(
+                    "Looking between the trees, you find a passage down to a wooded road. "
+                    "A human courier is descending a crumbling sixty-foot ledge beside it.",
+                    scenes=[
+                        {
+                            "summary": "Oren has found a passage to the wooded road. A courier is "
+                            "descending a sixty-foot ledge beside the road.",
+                            "location_id": "verdant-margin",
+                        }
+                    ],
+                )
+            ]
+        ),
+        "I look carefully for a way through the growth toward Thornwall.",
+        "road-exploration",
+    )
+    if reply.get("interruption"):
+        raise RuntimeError("The fixture exploration did not complete")
     memories = [
         {
             "fact_id": "bench-signal",
@@ -415,10 +452,24 @@ def seed(directory: Path) -> tuple[Path, dict[str, str]]:
             ),
             settle(
                 "The ledge gives way and the courier tumbles to the road, injured but conscious. "
-                "You help him onto the wooded road. You agree: "
+                "You approach him on the wooded road. You agree: "
                 + FACT
                 + " He keeps a sealed private note in his coat and declines to share it.",
                 facts=memories,
+                entities=[
+                    {
+                        "entity_id": "courier",
+                        "entity_kind": "person",
+                        "name": "The courier",
+                        "attributes": {
+                            "location": "wooded road",
+                            "condition": "injured after a fall",
+                            "visible_possessions": ["sealed private note"],
+                        },
+                        "visibility": "player_known",
+                        "known_by": ["player"],
+                    }
+                ],
                 scenes=[
                     {
                         "summary": "Oren and the injured courier are together on the wooded "
@@ -441,8 +492,8 @@ def seed(directory: Path) -> tuple[Path, dict[str, str]]:
                 database,
                 ids,
                 provider,
-                "I take the path down to the road and help the courier down the crumbling ledge. "
-                "How should we signal each other at the west gate tonight?",
+                "I stay clear while the courier climbs down the ledge. When he reaches the road, "
+                "I approach him and ask how we should signal at the west gate tonight.",
                 "road-opening",
             )
     finally:

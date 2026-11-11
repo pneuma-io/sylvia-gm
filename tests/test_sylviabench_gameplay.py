@@ -59,6 +59,17 @@ def test_real_owner_good_and_bad_cases_fail_for_the_intended_reason(experiment):
     assert len(proof["dice"]) == 2
 
 
+def test_fixture_keeps_initial_footing_and_admits_the_npc_speaker(experiment):
+    _output, rows = experiment
+    before = rows[0].observations["before"]
+    assert "stand alone in the bare Anchor Clearing" in before["talks"][0]
+    assert "wake" not in before["talks"][0].lower()
+    assert any(
+        e.get("record_id") == "courier" and e.get("visibility") == "player_known"
+        for e in before["narrative_entities"]
+    )
+
+
 def test_every_check_rejects_a_mutation_of_the_real_owner_observation(experiment):
     from sylviabench.controls import verify_controls
 
