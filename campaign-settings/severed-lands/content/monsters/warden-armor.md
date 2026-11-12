@@ -49,3 +49,15 @@ A suit of articulated plate armor forged by the Wardens to guard their most sens
 
 **Multiattack.** The armor makes two melee attacks.
 **Slam.** Melee Weapon Attack: +4 to hit, reach 5 ft., one target. Hit: 5 (1d6 + 2) bludgeoning damage.
+
+## Appearance and artwork
+
+An empty adult-proportioned articulated suit of weathered grey steel plate with aged brass edging, a closed angular helmet, dark visor and hollow joint gaps. Two arms end in empty five-fingered gauntlets; two legs in broad sabatons. Fine geometric border engravings remain flat in the metal. No wearer, glowing eyes, weapon, shield or insignia is assigned.
+
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/ad47e02b45762b1e6159818652fe83e0c51d6b89cbe11acdbf6adcf031ff83a5.png)
+
+[Full-body reference](../../assets/characters/78ae1b642cafbc0639aa6371524113b5c808e9b64d3ca28917257a1fe48888c2.png)
+
+[Multiview reference sheet](../../assets/characters/1d6854fb5e349fafdf62355587e48d08caf29b549680498d0f070e44df71c2c4.png)

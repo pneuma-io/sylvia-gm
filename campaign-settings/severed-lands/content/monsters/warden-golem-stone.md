@@ -50,3 +50,15 @@ A massive humanoid shape carved from Anchor-stone — the same material as the D
 **Multiattack.** The golem makes two slam attacks.
 **Slam.** Melee Weapon Attack: +10 to hit, reach 5 ft., one target. Hit: 19 (3d8 + 6) bludgeoning damage.
 **Slow.** The golem targets one or more creatures it can see within 10 feet. Each target must make a DC 17 Wisdom saving throw. On a failed save, the target can't use reactions, its speed is halved, and it can make only one attack on its turn. In addition, the target can take either an action or a bonus action, not both. These effects last for 1 minute. The target can repeat the save at the end of each of its turns. Recharges on 5-6.
+
+## Appearance and artwork
+
+A massive pale ash-grey Anchor-stone humanoid construct with dark mineral veins, simple rectangular sculpted head and two thick arms and legs. Broad five-fingered hands rest open. Ritual inscription bands and nested angular incisions retain violet-grey inner shadows within solid fixed geometry. No clockwork, bound elemental, doorway cavity or new weapon is assigned.
+
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/230570c10c4e605b5aaace40be3dd9e30cf0fdf5b64eb078f6b132b8fe330c2e.png)
+
+[Full-body reference](../../assets/characters/830167452f6e64b8176c8d1e2d28c303dc6fc51d254db0e3b64ca0256b84d862.png)
+
+[Multiview reference sheet](../../assets/characters/249a99e7be83617ef8db270cc8549863a739024399b09b60cda8bf14f84ce0b6.png)

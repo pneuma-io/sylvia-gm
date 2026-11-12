@@ -47,3 +47,15 @@ A Warden construct sculpted from clay imbued with Veil-suppressant compounds, de
 **Multiattack.** Two slam attacks.
 **Slam.** +8 to hit, 16 (2d10 + 5) bludgeoning. DC 15 CON save or max HP reduced by damage taken until greater restoration or similar. Dies if max HP reaches 0.
 **Haste.** Until end of its next turn, magically gains +2 AC, advantage on DEX saves, and additional slam attack as bonus action. Recharges 5-6.
+
+## Appearance and artwork
+
+A massive swollen terracotta humanoid construct with one blunt mask-like head, two heavy arms, broad five-digit sculpted hands and two short thick legs. Grey suppressant mottling, shallow dry crazing and nested pressed clay ridges sit within an intact fixed silhouette. Eye grooves and a closed mouth line remain sculpted clay. Both hands are empty.
+
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/f0959f0470b9257ec96d6ecbf1352e3b7bb130c8db21e69e77f2e1eb841443ff.png)
+
+[Full-body reference](../../assets/characters/bfd2b530847823c15f8cca027d92d718f7cec4fb5bae326cc9c1451f1f713d81.png)
+
+[Multiview reference sheet](../../assets/characters/3575c46dbb9f11b561fddaf0f54e834f174e7ec6eaf8ae9ea77199113f6817c2.png)
