@@ -51539,6 +51539,8 @@ tools:
       type: number
       minimum: 0
       maximum: 5
+      description: Current distance to the selected target in feet for a distance-range spell. Supply
+        the established scene distance; self-targeting is distance zero.
     - param_time_stop_state_ffde41c75687f2dd
     - param_lasting_state_f791c68f01bb49c8
     - param_known_spell_effect_c456f907323fe8b9
@@ -73709,6 +73711,18 @@ tools:
     - condition: spell not in definitions.srd_lite_recipient_contracts.r11.spells or combat.encounter_active
         != true or not (true) or (targets != null and len(targets) > 0)
       error: Missing input 'targets'. Select the actual recipients for this spell.
+    - condition: spell not in definitions.spells or definitions.spells[spell].range_kind != 'touch' or
+        target == null or _caster_state_id == _target_id or caster_can_touch_target != null
+      error: Missing input 'caster_can_touch_target'. Supply true if the caster can touch this other creature
+        now; otherwise select a reachable target. Self-touch is automatic.
+    - condition: spell not in definitions.spells or definitions.spells[spell].range_kind != 'touch' or
+        target == null or _caster_state_id == _target_id or caster_can_touch_target != false
+      error: 'Input ''caster_can_touch_target'' is false: the selected target is out of touch reach. Select
+        a reachable target; do not claim contact.'
+    - condition: spell not in definitions.spells or definitions.spells[spell].range_kind != 'distance'
+        or target == null or _caster_state_id == _target_id or target_distance != null
+      error: Missing input 'target_distance'. Supply the current distance to the target in feet from established
+        scene facts.
     - condition: spell in definitions.srd_lite_catalogue or spell in definitions.srd_lite_aliases
       error: This spell is excluded from the SRD Lite normal-player catalogue.
     - condition: spell in definitions.srd_lite_implemented or (spell in definitions.srd_lite_aliases and
@@ -74731,7 +74745,12 @@ tools:
     - param_use_prone_reaction_to_stand_fe24cb0994c7c245
     - param_caster_can_see_target_6be67dbb977ac28a
     - param_caster_can_hear_target_fce8ac4b557eb022
-    - param_caster_can_touch_target_71953654d9afa0bf
+    - name: caster_can_touch_target
+      type: boolean
+      required: false
+      default: null
+      description: For a Touch spell on another creature, supply true only when the caster can touch that
+        target now; false means it is out of touch reach. Self-touch is automatic.
     - param_advantage_7420eb3f5bdf3b75
     - param_disadvantage_7044b43c2412113b
     - param_target_can_see_caster_06e8ed4b1ecb533f
@@ -80434,7 +80453,9 @@ tools:
       error: Ordinary spell healing cannot restore a dead creature.
     - condition: (range_kind == 'touch' and (caster_can_touch_target == true or _caster_state_id == _target_id))
         or (range_kind == 'distance' and target_distance <= range_feet)
-      error: The selected target does not satisfy the spell's range.
+      error: The selected target is outside this spell's range. For Touch, caster_can_touch_target must
+        be true for another creature; self-touch is automatic. For distance range, supply target_distance
+        in feet within range_feet.
     - condition: requires_sight == false or caster_can_see_target == true
       error: The caster cannot see the selected target.
     - condition: cover != 'total'
@@ -80613,7 +80634,9 @@ tools:
       error: This spell requires an authoritative creature type for its automatic-save rule.
     - condition: (range_kind == 'touch' and (caster_can_touch_target == true or _caster_state_id == _target_id))
         or (range_kind == 'distance' and target_distance <= range_feet)
-      error: The selected target does not satisfy the spell's range.
+      error: The selected target is outside this spell's range. For Touch, caster_can_touch_target must
+        be true for another creature; self-touch is automatic. For distance range, supply target_distance
+        in feet within range_feet.
     - condition: targeting_sense == 'none' or caster_can_see_target == true or (targeting_sense == 'sight_or_hearing'
         and caster_can_hear_target == true)
       error: The caster can neither see nor hear the selected target as required.
@@ -83066,7 +83089,9 @@ tools:
       error: A restoration Reaction offer needs authoritative target Reaction state.
     - condition: (range_kind == 'touch' and range_feet == 0 and (caster_can_touch_target == true or _caster_state_id
         == _target_id)) or (range_kind == 'distance' and target_distance <= range_feet)
-      error: The selected target does not satisfy the spell's range.
+      error: The selected target is outside this spell's range. For Touch, caster_can_touch_target must
+        be true for another creature; self-touch is automatic. For distance range, supply target_distance
+        in feet within range_feet.
     - condition: requires_sight == false or caster_can_see_target == true
       error: The caster cannot see the selected target.
     - condition: cover != 'total'
@@ -97813,6 +97838,18 @@ tools:
     - condition: spell not in definitions.srd_lite_recipient_contracts.r11.spells or combat.encounter_active
         != true or not (true) or (targets != null and len(targets) > 0)
       error: Missing input 'targets'. Select the actual recipients for this spell.
+    - condition: spell not in definitions.spells or definitions.spells[spell].range_kind != 'touch' or
+        target == null or _caster_state_id == _target_id or caster_can_touch_target != null
+      error: Missing input 'caster_can_touch_target'. Supply true if the caster can touch this other creature
+        now; otherwise select a reachable target. Self-touch is automatic.
+    - condition: spell not in definitions.spells or definitions.spells[spell].range_kind != 'touch' or
+        target == null or _caster_state_id == _target_id or caster_can_touch_target != false
+      error: 'Input ''caster_can_touch_target'' is false: the selected target is out of touch reach. Select
+        a reachable target; do not claim contact.'
+    - condition: spell not in definitions.spells or definitions.spells[spell].range_kind != 'distance'
+        or target == null or _caster_state_id == _target_id or target_distance != null
+      error: Missing input 'target_distance'. Supply the current distance to the target in feet from established
+        scene facts.
     - condition: spell in definitions.srd_lite_catalogue or spell in definitions.srd_lite_aliases
       error: This spell is excluded from the SRD Lite normal-player catalogue.
     - condition: spell in definitions.srd_lite_implemented or (spell in definitions.srd_lite_aliases and
@@ -102351,7 +102388,12 @@ tools:
     - param_use_prone_reaction_to_stand_fe24cb0994c7c245
     - param_caster_can_see_target_6be67dbb977ac28a
     - param_caster_can_hear_target_fce8ac4b557eb022
-    - param_caster_can_touch_target_71953654d9afa0bf
+    - name: caster_can_touch_target
+      type: boolean
+      required: false
+      default: null
+      description: For a Touch spell on another creature, supply true only when the caster can touch that
+        target now; false means it is out of touch reach. Self-touch is automatic.
     - param_advantage_7420eb3f5bdf3b75
     - param_disadvantage_7044b43c2412113b
     - param_target_can_see_caster_06e8ed4b1ecb533f
@@ -104239,6 +104281,18 @@ tools:
     - condition: spell not in definitions.srd_lite_recipient_contracts.r11.spells or combat.encounter_active
         != true or not (true) or (targets != null and len(targets) > 0)
       error: Missing input 'targets'. Select the actual recipients for this spell.
+    - condition: spell not in definitions.spells or definitions.spells[spell].range_kind != 'touch' or
+        target == null or _caster_state_id == _target_id or caster_can_touch_target != null
+      error: Missing input 'caster_can_touch_target'. Supply true if the caster can touch this other creature
+        now; otherwise select a reachable target. Self-touch is automatic.
+    - condition: spell not in definitions.spells or definitions.spells[spell].range_kind != 'touch' or
+        target == null or _caster_state_id == _target_id or caster_can_touch_target != false
+      error: 'Input ''caster_can_touch_target'' is false: the selected target is out of touch reach. Select
+        a reachable target; do not claim contact.'
+    - condition: spell not in definitions.spells or definitions.spells[spell].range_kind != 'distance'
+        or target == null or _caster_state_id == _target_id or target_distance != null
+      error: Missing input 'target_distance'. Supply the current distance to the target in feet from established
+        scene facts.
     - condition: spell in definitions.srd_lite_catalogue or spell in definitions.srd_lite_aliases
       error: This spell is excluded from the SRD Lite normal-player catalogue.
     - condition: spell in definitions.srd_lite_implemented or (spell in definitions.srd_lite_aliases and
@@ -104414,7 +104468,12 @@ tools:
     - param_use_prone_reaction_to_stand_fe24cb0994c7c245
     - param_caster_can_see_target_6be67dbb977ac28a
     - param_caster_can_hear_target_fce8ac4b557eb022
-    - param_caster_can_touch_target_71953654d9afa0bf
+    - name: caster_can_touch_target
+      type: boolean
+      required: false
+      default: null
+      description: For a Touch spell on another creature, supply true only when the caster can touch that
+        target now; false means it is out of touch reach. Self-touch is automatic.
     - param_advantage_7420eb3f5bdf3b75
     - param_disadvantage_7044b43c2412113b
     - param_target_can_see_caster_06e8ed4b1ecb533f
@@ -124398,6 +124457,8 @@ tools:
       type: number
       required: false
       default: 0
+      description: Current distance to the selected target in feet for a distance-range spell. Supply
+        the established scene distance; self-targeting is distance zero.
     - name: targets_max_distance
       type: number
       required: false
@@ -254537,7 +254598,9 @@ tools:
       error: Ordinary spell healing cannot restore a dead creature.
     - condition: (range_kind == 'touch' and (caster_can_touch_target == true or _caster_state_id == _target_id))
         or (range_kind == 'distance' and target_distance <= range_feet)
-      error: The selected target does not satisfy the spell's range.
+      error: The selected target is outside this spell's range. For Touch, caster_can_touch_target must
+        be true for another creature; self-touch is automatic. For distance range, supply target_distance
+        in feet within range_feet.
     - condition: requires_sight == false or caster_can_see_target == true
       error: The caster cannot see the selected target.
     - condition: cover != 'total'
@@ -292569,6 +292632,18 @@ tools:
     - condition: spell not in definitions.srd_lite_recipient_contracts.r11.spells or combat.encounter_active
         != true or not (true) or (targets != null and len(targets) > 0)
       error: Missing input 'targets'. Select the actual recipients for this spell.
+    - condition: spell not in definitions.spells or definitions.spells[spell].range_kind != 'touch' or
+        target == null or _caster_state_id == _target_id or caster_can_touch_target != null
+      error: Missing input 'caster_can_touch_target'. Supply true if the caster can touch this other creature
+        now; otherwise select a reachable target. Self-touch is automatic.
+    - condition: spell not in definitions.spells or definitions.spells[spell].range_kind != 'touch' or
+        target == null or _caster_state_id == _target_id or caster_can_touch_target != false
+      error: 'Input ''caster_can_touch_target'' is false: the selected target is out of touch reach. Select
+        a reachable target; do not claim contact.'
+    - condition: spell not in definitions.spells or definitions.spells[spell].range_kind != 'distance'
+        or target == null or _caster_state_id == _target_id or target_distance != null
+      error: Missing input 'target_distance'. Supply the current distance to the target in feet from established
+        scene facts.
     - condition: spell in definitions.srd_lite_catalogue or spell in definitions.srd_lite_aliases
       error: This spell is excluded from the SRD Lite normal-player catalogue.
     - condition: spell in definitions.srd_lite_implemented or (spell in definitions.srd_lite_aliases and
@@ -297521,7 +297596,12 @@ tools:
     - param_use_prone_reaction_to_stand_fe24cb0994c7c245
     - param_caster_can_see_target_6be67dbb977ac28a
     - param_caster_can_hear_target_fce8ac4b557eb022
-    - param_caster_can_touch_target_71953654d9afa0bf
+    - name: caster_can_touch_target
+      type: boolean
+      required: false
+      default: null
+      description: For a Touch spell on another creature, supply true only when the caster can touch that
+        target now; false means it is out of touch reach. Self-touch is automatic.
     - param_advantage_7420eb3f5bdf3b75
     - param_disadvantage_7044b43c2412113b
     - param_target_can_see_caster_06e8ed4b1ecb533f
@@ -301752,6 +301832,8 @@ tools:
       type: number
       required: false
       minimum: 0
+      description: Current distance to the selected target in feet for a distance-range spell. Supply
+        the established scene distance; self-targeting is distance zero.
     - name: caster_can_see_target
       type: boolean
       required: false
@@ -311645,6 +311727,10 @@ tools:
     - param_lasting_state_f791c68f01bb49c8
     - param_established_target_distance_cdd9879589df35a8
     - param_established_same_plane_0679feb34410f136
+    pre_conditions:
+    - condition: steed_state.created_caster_state_id != null
+      error: Select an actual Otherworldly Steed with its saved caster reference (created_caster_state_id);
+        an ordinary creature cannot use this operation.
   qualify_srd_lite_steed_bonus_owner:
     effects:
     - require:
@@ -312067,6 +312153,10 @@ tools:
       type: boolean
       required: false
       default: false
+    pre_conditions:
+    - condition: steed_state.created_caster_state_id != null
+      error: Select an actual Otherworldly Steed with its saved caster reference (created_caster_state_id);
+        an ordinary creature cannot use this operation.
   qualify_srd_lite_steed_glare_range:
     effects:
     - call: srd_information_scene_entity
@@ -312644,6 +312734,10 @@ tools:
       items:
         type: string
       max_items: 32
+    pre_conditions:
+    - condition: steed_state.created_caster_state_id != null
+      error: Select an actual Otherworldly Steed with its saved caster reference (created_caster_state_id);
+        an ordinary creature cannot use this operation.
   qualify_srd_lite_steed_fey_rider:
     effects:
     - require:
@@ -313153,6 +313247,10 @@ tools:
     - param_dismount_ground_supported_88c4e2cab508c73e
     - param_mount_guardian_speed_halved_6c942dccbafde562
     - param_known_spell_effect_c456f907323fe8b9
+    pre_conditions:
+    - condition: steed_state.created_caster_state_id != null
+      error: Select an actual Otherworldly Steed with its saved caster reference (created_caster_state_id);
+        an ordinary creature cannot use this operation.
   dismount_srd_otherworldly_steed:
     description: Dismount the actual Otherworldly Steed to an unoccupied supported space within five feet.
       Outside combat, supply the actual current mount_placement, mount_current_plane, mount_same_plane=true,
@@ -313597,6 +313695,10 @@ tools:
     - param_dismount_ground_supported_88c4e2cab508c73e
     - param_mount_guardian_speed_halved_6c942dccbafde562
     - param_known_spell_effect_c456f907323fe8b9
+    pre_conditions:
+    - condition: steed_state.created_caster_state_id != null
+      error: Select an actual Otherworldly Steed with its saved caster reference (created_caster_state_id);
+        an ordinary creature cannot use this operation.
   spend_srd_otherworldly_mount_movement:
     effects:
     - require:
@@ -339860,6 +339962,10 @@ tools:
       - disengage
       - dodge
     - param_known_spell_effect_c456f907323fe8b9
+    pre_conditions:
+    - condition: steed_state.created_caster_state_id != null
+      error: Select an actual Otherworldly Steed with its saved caster reference (created_caster_state_id);
+        an ordinary creature cannot use this operation.
   begin_srd_otherworldly_native_turn_body:
     pre_conditions:
     - condition: combat.turn_active != true
@@ -342661,6 +342767,10 @@ tools:
     - param_steed_state_ad99a8b5d4f3226b
     - param_destination_897e99fd4c074a9d
     - param_lasting_state_7bff8d20c3cf7d0f
+    pre_conditions:
+    - condition: steed_state.created_caster_state_id != null
+      error: Select an actual Otherworldly Steed with its saved caster reference (created_caster_state_id);
+        an ordinary creature cannot use this operation.
   read_srd_otherworldly_pending_save_feedback:
     effects:
     - set:
@@ -356852,6 +356962,8 @@ tools:
       type: integer
       minimum: 0
       maximum: 1000
+      description: Current distance to the selected target in feet for a distance-range spell. Supply
+        the established scene distance; self-targeting is distance zero.
     - param_caster_can_see_target_1f2cfcd0b546bac1
     - param_advantage_1bc980e86d23955c
     - param_disadvantage_55ed3fc7c0f2b749
@@ -368604,6 +368716,8 @@ parameter_declarations:
     type: boolean
     required: false
     default: false
+    description: For a Touch spell on another creature, supply true only when the caster can touch that
+      target now; false means it is out of touch reach. Self-touch is automatic.
   param_choking_b993450c869d8f6d:
     name: choking
     type: boolean
@@ -371989,6 +372103,8 @@ parameter_declarations:
     type: number
     minimum: 0
     maximum: 1000
+    description: Current distance to the selected target in feet for a distance-range spell. Supply the
+      established scene distance; self-targeting is distance zero.
   param_targets_max_distance_c204b04d4bd36cf7:
     name: targets_max_distance
     type: number
@@ -372414,10 +372530,14 @@ parameter_declarations:
     type: number
     minimum: 0
     required: false
+    description: Current distance to the selected target in feet for a distance-range spell. Supply the
+      established scene distance; self-targeting is distance zero.
   param_target_distance_d4930880ea0adbad:
     name: target_distance
     type: number
     minimum: 0
+    description: Current distance to the selected target in feet for a distance-range spell. Supply the
+      established scene distance; self-targeting is distance zero.
   param_target_number_2de61081399c3134:
     name: target_number
     type: integer
@@ -372795,6 +372915,8 @@ parameter_declarations:
   param_caster_can_touch_target_89df77ed264867d1:
     name: caster_can_touch_target
     type: boolean
+    description: For a Touch spell on another creature, supply true only when the caster can touch that
+      target now; false means it is out of touch reach. Self-touch is automatic.
   param_caster_id_4f503644c31d7b6e:
     name: caster_id
   param_caster_state_4b5c896405a7fd31:
@@ -373415,9 +373537,13 @@ parameter_declarations:
     name: target_distance
     type: number
     required: false
+    description: Current distance to the selected target in feet for a distance-range spell. Supply the
+      established scene distance; self-targeting is distance zero.
   param_target_distance_5548d2cb11121e1f:
     name: target_distance
     type: number
+    description: Current distance to the selected target in feet for a distance-range spell. Supply the
+      established scene distance; self-targeting is distance zero.
   param_target_id_2f903d791e4b6766:
     name: target_id
   param_target_is_charmer_228b42c64eae6976:

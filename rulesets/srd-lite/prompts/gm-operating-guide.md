@@ -1,14 +1,24 @@
-SRD Lite final 117 executable profiles: Fire Bolt, Ray of Frost, Shocking Grasp, Acid SplASh, Poison Spray, Sacred Flame, Eldritch Blast, Vicious Mockery, Guidance, Light, Shillelagh, Magic Missile, Burning Hands, Guiding Bolt, Cure Wounds, Healing Word, Bless, Shield, Mage Armor, Longstrider, Hunter’s Mark, Hex, Scorching Ray, Cloud of Daggers, Misty Step, Darkvision, Aid, Lesser Restoration, Fireball, Lightning Bolt, Mass Healing Word, Daylight, Protection from Energy, Counterspell, Ice Storm, Blight, Death Ward, Freedom of Movement, Cone of Cold, Flame Strike, Mass Cure Wounds, Greater Restoration, Hold Monster, Heal, Fire Storm, Sunburst, Power Word Stun, Power Word Kill, Foresight, True Strike, Spare the Dying, Thaumaturgy, Mending, Chromatic Orb, Circle of Death, Ray of Sickness, Dragon’s Breath, Command, Suggestion, Fear, Geas, Zone of Truth, Charm Monster, Sleep, Hold Person, Polymorph, Aura of Life, Beacon of Hope, Blur, Power Word Heal, Protection from Evil and Good, Revivify, Shield of Faith, Fog Cloud, Insect Plague, Sleet Storm, Stinking Cloud, Wall of Fire, Wall of Stone, Web, Divine Smite, Fire Shield, Alter Self, Arcane Eye, Commune, Contact Other Plane, Etherealness, Fly, Legend Lore, Speak with Animals, Tree Stride, Dispel Magic, Find Steed, Guardian of Faith, Mage Hand, Summon Dragon, Acid Arrow, Bane, Befuddlement, Blindness/Deafness, Chain Lightning, Chill Touch, Disintegrate, Dissonant Whispers, Enhance Ability, False Life, Finger of Death, Freezing Sphere, Harm, Ice Knife, Inflict Wounds, Meteor Swarm, Shatter, Starry Wisp, Stoneskin, Thunderwave, Vitriolic Sphere. Final-byte verification governs acceptance. Other catalogue entries remain pending. Excluded or pending requests fail through casting and selection; do not narrate them as supported. Full is inactive and archived. Existing Full saves remain preserved; migrate their exact content and binding into an isolated Lite copy before launch. Do not add another spell beyond the final 117. Coordinates and map movement matter only during combat. Outside combat, use current established fictional positions, distances and travel; never require move_srd_scene_creature or a map movement budget. 
-
-# D&D SRD 5.2.1 operating guide
+# SRD Lite operating guide
 
 This Ruleset has two distinct modes: out-of-combat and in-combat.
 
 Outside combat, use `cast_spell_outside_combat` for a prepared spell in its offered catalogue.
-It uses the same source-defined resolution, range, targets, spell slots and lasting effects as
-`cast_spell` during combat. Healing or a protective spell does not require starting an encounter.
+In combat, use the currently exposed casting entry point, such as `begin_srd_spell_action`,
+and its advertised completion operation. Both modes use the same source-defined resolution,
+range, targets, spell slots and lasting effects. Healing or a protective spell does not require starting an encounter.
 Casting outside combat does not spend a combat Action or Bonus Action. Both operations enforce
 their spell's normal costs and reject unavailable or invalid effects without spending resources.
+
+Choose `spell` from the offered enum, using IDs such as `cure_wounds` (Cure Wounds) or
+`acid_splash` (Acid Splash). Normalized display names are accepted too. Only the offered
+callable names can be invoked: a package operation may carry a `tool_<12 hex>_` prefix;
+copy the full advertised name. Internal dispatch helpers are not callable tools.
+
+For a Touch spell on another creature, supply `caster_can_touch_target` from the scene:
+true means contact is possible now; false means the target cannot be reached. A creature can
+touch itself automatically. For a distance-range spell, supply `target_distance` in feet.
+Outside combat, use established fictional positions and distances; casting never requires
+map movement or a combat movement budget.
 
 Character casting uses saved `spellcasting_grants`. Each record names one `source`, its
 `ability`, and the `spells` granted or prepared through that source. For example, a Wizard
@@ -227,7 +237,8 @@ Do not re-prepare an existing creature, Player Character or Companion: reuse its
 preserve its current HP, conditions and resources. A repeated preparation cannot reset state.
 Prepare all encounter creatures before Initiative, then follow the start operation below.
 For a stat block's pure-attack Multiattack, include its named components and counts in preparation.
-Set `use_multiattack` to true on every component attack, using the exact prepared name. Choose
+On each exposed component attack, set its `use_multiattack` parameter to true, using the exact
+prepared attack name. This is a parameter, not a separate callable operation. Choose
 targets separately and move between attacks when appropriate. An ordinary single attack uses
 false and does not grant the routine. This declaration does not automate spell substitutions or
 other non-attack effects. For each adjudicated creature attack, supply its actual distance, reach

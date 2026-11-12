@@ -278,7 +278,7 @@ def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state
             for r in json.loads(bundle.read("manifest.json"))["packages"]
             if r["role"] == "primary"
         )
-    assert current_version in {"0.3.21", "0.3.22"}
+    assert current_version == bundled_srd_version()
     if current_version == "0.3.21" and origin == "integration":
         # Alpha4's schema refuses newer main-only panel metadata before it can be installed.
         with pytest.raises(CommandRejected, match="manifest fields are invalid"):
@@ -333,7 +333,7 @@ def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state
         assert options["candidates"], options
         candidate = options["candidates"][0]["candidate_id"]
         preview = owner.preview_campaign_rules_update("casting", candidate)
-        if current_version != ("0.3.21" if origin == "alpha4" else "0.3.22"):
+        if origin == "alpha4" and current_version != "0.3.21":
             assert not preview["compatible"]
             assert any(".panels." in c["path"] for c in preview["conflicts"])
             with pytest.raises(CommandRejected, match="conflicts"):

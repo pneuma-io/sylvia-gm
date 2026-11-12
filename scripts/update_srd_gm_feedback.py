@@ -94,8 +94,13 @@ def update(version):
                 expanded["tools"][tool["name"]],
                 tool["input_schema"],
             )
+        # Refresh shared guidance without recopying unrelated executable schemas.
         for parameter in expanded["tools"][tool["name"]].get("parameters", []):
-            if parameter["name"] == "somatic_component_available":
+            if parameter["name"] in {
+                "somatic_component_available",
+                "caster_can_touch_target",
+                "target_distance",
+            }:
                 tool["input_schema"]["properties"][parameter["name"]]["description"] = parameter[
                     "description"
                 ]
