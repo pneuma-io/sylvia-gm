@@ -51,12 +51,12 @@ A grinding, shifting mass of stone and soil animated by Rift energy pooled in th
 
 ## Appearance and artwork
 
-One Large Rift Earth elemental: a tall broad irregular grinding mass of rough gray-brown stone slabs, rubble and dark compacted soil animated as one continuous entity. Heavy angular layered rock masses rise around a dense craggy core, with two broad blunt asymmetrical lateral outcrops and a low shifting segmented base of stone and soil. Fine restrained violet Rift-energy seams run between slabs and through soil. Its silhouette is an uneven moving stone-and-soil mass rather than one rounded solid boulder. Faceless, with no distinct head, eyes, mouth, humanoid torso, sculpted hands or feet. The shifting stone/soil body and Rift animation follow the authored source; exact structure, outcrops, colors and seam pattern are editable visual defaults. No carved face, Warden armor, runes, separate rock creatures, crystal crown, skeleton, fused bone, victim, crushed structure, dungeon, landscape or text.
+A hulking asymmetrical mass of ironstone, pale feldspar and compact charcoal soil, with two blunt arm formations, two short supporting pillars and a low crag ridge continuous with the shoulders. It has no human face. Muted teal mineral glass and amber quartz lie within fracture seams. Stone strata fold around deep nested shoulder and chest cavities with impossible internal distance, while the whole mass remains connected and heavy. This is an editable visual form, without assigning a manufactured origin.
 
-This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/8ba64be78cad7525964144d9fbe3928e40058e16e1a08d6b591113575935c2fb.png)
+[Portrait](../../assets/characters/47741902436bdd4d8578fb4635331e94e6ae291c6e591fde9092846f9b2f4b71.png)
 
-[Full-body reference](../../assets/characters/d6be1ad8e69c1f26fff20534d55bc570318cd2ffbe2f6a4bd8e9cb1c7d923162.png)
+[Full-body reference](../../assets/characters/840023615c3f160826354f26fa95bb08f977f0a3bf697fa0eece9961d903a66d.png)
 
-[Multiview reference sheet](../../assets/characters/266c91f5c6666e5a79e34a9dbf8e4280fb9e5a65506573d3fe74f7ad7953c898.png)
+[Multiview reference sheet](../../assets/characters/c02a194886198f88d15eac15a5594f30782efec7862d62dc0d559299bf077414.png)

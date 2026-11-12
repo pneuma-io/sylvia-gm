@@ -37,12 +37,12 @@ A Rift-touched land-shark whose armored plates have fused with crystallized Rift
 
 ## Appearance and artwork
 
-One Large Rift-touched land-shark with a low broad powerful quadrupedal body, short massive wedge-shaped armored head, closed heavy jaws, two small deep-set dark amber eyes, exactly four muscular clawed legs and one long tapering armored tail. Overlapping slate-gray armored plates are fused with restrained violet crystalline Rift-mineral seams. A prominent angular dorsal crest runs along the spine, with subtle regular geometric ridges that evoke Warden architectural motifs without any inscription or proof of origin. All four feet support a grounded near-front three-quarter stance and the tail curves out to one side fully visible. Armored land-shark form, crystallized Rift minerals and patterned crest follow the authored lore. Specific anatomy, colors and plate arrangement are editable visual defaults. No extra legs, fin-only fish body, humanoid arms, rider, actual Warden structure, symbols, caption, prey, gore, eruption or landscape.
+A heavy four-legged land-shark with a broad wedge-shaped armored head, small amber eyes, hinged tooth-lined mouth, angular dorsal crest and one tapering armored tail. Blue-grey slate plates are fused with jade and smoky quartz. Folded concentric mineral shelves surround deep geode apertures within the shoulder and back armor, producing impossible apparent depth inside a coherent outer body. Its Warden origin remains a rumor.
 
-This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/f9048188a3c3a7b10a226e0dd9f8c0c00a7903ea1c46cdd16936fa65d9e87dce.png)
+[Portrait](../../assets/characters/36f6435256b3342704cccc154c9c0dfa27d4479a409384e4d151d54fe8cc85c2.png)
 
-[Full-body reference](../../assets/characters/91544113aa67cff3471bd559d152cc24835c9c847400090283ed3f8aec54cb0e.png)
+[Full-body reference](../../assets/characters/6df5367045fdc8b44dba6b036823740666b843898b68b3b8dcf0cdf251dfeb7f.png)
 
-[Multiview reference sheet](../../assets/characters/fea507422280f59b096bb8a38d32b0f1fcbbf0f1b45ce43b719cc3e60dcc9699.png)
+[Multiview reference sheet](../../assets/characters/59088505f048f10377bec195038ca527f9fd08cf20a5754d2cbc6f00726463ff.png)

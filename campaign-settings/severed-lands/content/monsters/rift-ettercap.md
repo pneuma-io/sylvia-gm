@@ -41,12 +41,12 @@ A Rift-touched spider-herder whose bond with arachnids has been twisted into a p
 
 ## Appearance and artwork
 
-One adult Medium Rift Ettercap with a hunched upright spiderlike humanoid form, a broad pear-shaped abdomen, leathery gray-lavender skin and dull dark chitin plates. Exactly two long arms ending in three curved black claw digits on each hand, and two stout bent legs with three clawed toes on each foot. A short arachnid head with four dark violet-black eyes in a compact front-facing cluster, two larger upper eyes and two smaller lower eyes, and two short curved biting fangs around the closed mouth. No additional spider legs. Dense pale gray silk webbing is integrated across the abdomen, torso and joints, threaded with faintly pulsing violet fibers; the body is fully opaque and intact, with no open wounds or exposed organs. A wary patient predatory bearing and low open claw pose. Its arachnid bond and Rift-warped webbing follow the authored lore; detailed anatomy, eye arrangement, colors and silk pattern are editable visual defaults. No extra limbs, human face, ordinary human hands, duplicate body, spider swarm, separate spiders, captured victim, gore, webbed forest, readable text or scenery.
+A hunched spider-like monstrosity with a rounded head, pear-shaped moss-grey abdomen, two long four-clawed arms and two bent hind legs. Muted mauve-grey chitin and charcoal joints frame eight dark facial eyes: two larger central eyes and three smaller eyes on each side, above paired mandibles. Pale blue-green silk grows through the cuticle and nested abdominal funnels, forming repeating impossible inner depth. Chitin nodules suggest its hive merger without separate animals or added limbs.
 
-This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/bace83ce43c5bff349f303421b14a71a50c6101f66c1d5ceea04e558d35a1c20.png)
+[Portrait](../../assets/characters/9e09bdcd3344be7d137b60df6c41fc0e2e39c27a04518564dc6c9584c181a7a0.png)
 
-[Full-body reference](../../assets/characters/01040b37dbbd2133c43f640838a4ddabb9b1243fddc569b81265185db3360a25.png)
+[Full-body reference](../../assets/characters/d61ce823f3f9a0a7f01163cf0df4a5554a2d64254f74b45db61e418f0f367107.png)
 
-[Multiview reference sheet](../../assets/characters/adca75e4de6df721b38b539def303d7d2b8266ed4bd5f024bbc07c3fc0c58679.png)
+[Multiview reference sheet](../../assets/characters/dbe189b100328bf815663f38a4c876ae62e9c72c2f71f17fe7da3edfe068ec8f.png)

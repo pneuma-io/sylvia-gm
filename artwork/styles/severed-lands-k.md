@@ -192,6 +192,25 @@ They are prepared defaults available for review, without individual owner accept
 | Rift Cube | [Body](../assets/characters/2a6adcced7f7d5d03a7c8a6362e39e707d9bd4a191a670eeb4390c717d6c430e.png) | [Sheet](../assets/characters/1884600784a64fdc47c7c700e51fdfc8d9722c29251e1661ee55c41258ded459.png) | [Portrait](../assets/characters/682a75c0c3a07e5c666ee892ecec2e60098a02438119cc96ef4badc4fed37479.png) |
 | Rift Darkmantle | [Body](../assets/characters/1e9be53c6bc4264f5933491aa2b25b29f4d7e6d146eab69eb3d89c96c11e9fdb.png) | [Sheet](../assets/characters/b9f198ff5533163d14b0fce79838fc5c0cf5cdf66b4cc9796e9084b3285ab64f.png) | [Portrait](../assets/characters/6b83e456528e569725a8363b539a91f70a2f035ec85b5a18132488dcbe06e8e9.png) |
 
+### Prepared Rift bestiary references
+
+These six bundles use species-specific mineral, silk and feather structures for their Rift
+distortion. The Bulette remains four-legged; Cockatrice wings are distinct from its two legs;
+Grick retains four tentacles and no eyes; Griffon retains four walking legs and two wings.
+Rift Earth remains faceless and uses its whole silhouette in the portrait. The selected Ettercap
+default has eight facial eyes and four claw digits on each hand; these are visual details, not
+new mechanics. Authored origins and abilities remain unchanged. Prepared defaults are available
+for review without separate individual owner acceptance.
+
+| Creature | Full body | Multiview | Portrait |
+|---|---|---|---|
+| Rift Bulette | [Body](../assets/characters/6df5367045fdc8b44dba6b036823740666b843898b68b3b8dcf0cdf251dfeb7f.png) | [Sheet](../assets/characters/59088505f048f10377bec195038ca527f9fd08cf20a5754d2cbc6f00726463ff.png) | [Portrait](../assets/characters/36f6435256b3342704cccc154c9c0dfa27d4479a409384e4d151d54fe8cc85c2.png) |
+| Rift Cockatrice | [Body](../assets/characters/034e5f46e0ca7405bb0357d4ed639fa32cc32715526eeb0237adb0f8899b9490.png) | [Sheet](../assets/characters/ef6e0a4ab0dc4182826404b3ecbf775819caa45fa8598486a34bcfc1fd6bd2bb.png) | [Portrait](../assets/characters/aaaaa5853761e2059496061facfed3836fdfbfa062f850a544785c5faeb0fc61.png) |
+| Rift Earth | [Body](../assets/characters/840023615c3f160826354f26fa95bb08f977f0a3bf697fa0eece9961d903a66d.png) | [Sheet](../assets/characters/c02a194886198f88d15eac15a5594f30782efec7862d62dc0d559299bf077414.png) | [Portrait](../assets/characters/47741902436bdd4d8578fb4635331e94e6ae291c6e591fde9092846f9b2f4b71.png) |
+| Rift Ettercap | [Body](../assets/characters/d61ce823f3f9a0a7f01163cf0df4a5554a2d64254f74b45db61e418f0f367107.png) | [Sheet](../assets/characters/dbe189b100328bf815663f38a4c876ae62e9c72c2f71f17fe7da3edfe068ec8f.png) | [Portrait](../assets/characters/9e09bdcd3344be7d137b60df6c41fc0e2e39c27a04518564dc6c9584c181a7a0.png) |
+| Rift Grick | [Body](../assets/characters/1c1d4006238d5582ec179ceb6d203991a289e5adaaeaa5713eb9a91751041aa5.png) | [Sheet](../assets/characters/4fc218f5c2fa71a48ee11cec9c28544bfa633b99aa2dd77d5e1fad3b62f8b259.png) | [Portrait](../assets/characters/1d0b2fba1a6713d784c6760ab93a5b449a604967f2d2f090073a9097a8b4a58b.png) |
+| Rift Griffon | [Body](../assets/characters/20411ed29642455552d4065a5bf7cad332b2732a3409a04f71635e22cfe780cc.png) | [Sheet](../assets/characters/68b199b1932ca82283f933a07b207bc866cef394c6213987cef5b0f47a6a2c8d.png) | [Portrait](../assets/characters/c7710cf287d1db46dd536bb92ef2f52f69d4d659ff89347f57b8c4321b9433c6.png) |
+
 ### Selected Rift creature identity
 
 The owner selected C3 as the Death Hound's design: a living two-headed predator with convincing

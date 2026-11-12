@@ -36,12 +36,12 @@ A Rift-touched griffon — eagle and lion fused, then further altered by decades
 
 ## Appearance and artwork
 
-One Large Rift Griffon: a complete eagle-and-lion hybrid with one pale ivory-feathered eagle head and neck, one dark hooked eagle beak and two amber eyes; exactly two scaly ocher eagle forelegs with dark talons; a tawny golden lion torso and exactly two muscular lion hindlegs with broad feline paws; one long tawny lion tail ending in a dark brown fur tuft; and exactly TWO broad brown feathered wings attached above the shoulders. Wings are folded in a relaxed resting pose, their complete outer contours and dark primary tips visible; their feathers carry the authored faint violet shimmer. A watchful grounded near-front three-quarter standing pose, all four feet and the full tail visible. The eagle/lion combination, feather shimmer and predatory bearing follow authored source; exact feathers, fur, eyes, colors and folded-wing posture are editable visual defaults. No horse hooves or horse tail, human arms or face, extra wings or legs, antlers, collar, saddle, rider, goat/prey, nest scene, scenery, labels or text.
+An eagle-lion griffon with one ivory-feathered head, charcoal hooked beak, amber eyes, two taloned eagle forelegs, two tawny lion hind legs, two broad feathered wings and a tufted lion tail. Ivory chest feathers grade into umber wing coverts above deep tawny hindquarters. A faint violet shimmer catches selected feathers. A few primary vanes fold into recursive nested fans around narrow hollows before rejoining the main feather shape, giving impossible depth within otherwise living wings.
 
-This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/e793e5d8218ecd962263f956ca07d0496cf6901fcb862ab5b9754cf014ae122b.png)
+[Portrait](../../assets/characters/c7710cf287d1db46dd536bb92ef2f52f69d4d659ff89347f57b8c4321b9433c6.png)
 
-[Full-body reference](../../assets/characters/b3e34bf6daf7e34b7121b7dc8beb872f9b7047f7a1ada5ef0c7b9ee2bfc7020b.png)
+[Full-body reference](../../assets/characters/20411ed29642455552d4065a5bf7cad332b2732a3409a04f71635e22cfe780cc.png)
 
-[Multiview reference sheet](../../assets/characters/42aaf3b20a074ed4585ce7baf59dc1f6b6b46795b02420977ff96994a088b03b.png)
+[Multiview reference sheet](../../assets/characters/68b199b1932ca82283f933a07b207bc866cef394c6213987cef5b0f47a6a2c8d.png)
