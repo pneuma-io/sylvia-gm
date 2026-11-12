@@ -125,6 +125,22 @@ Iro is the named pacifist NPC; do not merge him with the generic memory-hunting 
 | Old Crane | [Body](../assets/characters/9c5f3257e5897bfc4f6b6e96c5ed734d97f47c6e1efc3790ed7bcfb16f7ae66c.png) | [Sheet](../assets/characters/aa890198faf3d9802ea6c408d2f4d42eec645278d3d562f292cd3b95d8c5aecd.png) | [Portrait](../assets/characters/861e3e6d34d55a4aad51f678751b77c35600e11169a8672cf76084b586334a77.png) |
 | Iro | [Body](../assets/characters/e5136a64ae35b2a54728bb3c00425a21f5d452f778d62d2212ccf4bc45c757b3.png) | [Sheet](../assets/characters/e1cc99b916a5156128f1d9dbc25f061426fbf5bc54a7ec80f1b19418bd77f93f.png) | [Portrait](../assets/characters/74250fd3d19e2ffa06bdd0b91be1f634dae2b33f7d3f5e444dd9c59126bdc4cd.png) |
 
+### Prepared Margin and Thornwall character references
+
+Stern, Linden, Rigg, Kit, Lorn and Tessa use fresh authored-only designs and the accepted rendering
+benchmark. Preserve Kit's explicit age twelve and youthful proportions; Linden, Lorn and Kit retain
+they/them pronouns. Stern's authored jaw scar remains on the selected anatomical side across views.
+These are prepared editable defaults available for review, without individual owner sign-off claimed.
+
+| Character | Full body | Multiview | Portrait |
+|---|---|---|---|
+| Stern | [Body](../assets/characters/454000c64fd9cf2bb1e67b98d0f0c3bceaef49368db5d6241ec4baca9ff9fc96.png) | [Sheet](../assets/characters/6d70bff09f1fd374f6abf332985c20dee01875b6be0c61ca587347b6dbb13e94.png) | [Portrait](../assets/characters/f64358acf2a78c07d0583ad380bed8e0a2b4ede0e1fd87fe3bc03941fb4f718c.png) |
+| Linden | [Body](../assets/characters/9cf4c497d16131c9f27d2f8654e38ff1743d63ac0b7c229757ed53700c14b3b5.png) | [Sheet](../assets/characters/274d408073ba972a47faa8c80fe30fc0dcf370e86f595d0e9eec3abd2a75bedc.png) | [Portrait](../assets/characters/1b7f183f0b41a600457709f180fb1fbca7f97916d162f0091a59e2700c4d5a54.png) |
+| Rigg | [Body](../assets/characters/7cd1f33a8d7fef7e9a6699d24ea75eaa4280ea7311110ffa656215f86172997c.png) | [Sheet](../assets/characters/a994711e67c9bbefede3d3d7e367aca77f7e1b6e3028bff9112d9cf14b245edf.png) | [Portrait](../assets/characters/976e3e8f9d0e8b0a5b80f5cc3e76e0c481d7d6a102ed22cae8144f204301d9ef.png) |
+| Kit | [Body](../assets/characters/e9d640b3bcd45f0b2e35a55ba14710362542d39265f60d589d507c9aadde2c28.png) | [Sheet](../assets/characters/9b1094fcf2bc86cf18649dded103f18024ca4678ea1dee9e850c4270449f48b3.png) | [Portrait](../assets/characters/6cd3514847f4fc2b1016e9bceab80e0ac4987353b91f639374865133515d298a.png) |
+| Lorn | [Body](../assets/characters/f055059b5eb451b5ceb68b5ba7e50c18a7c49dfab896bcc32022a3a3a5b62cfc.png) | [Sheet](../assets/characters/7243c142bbc7280e0553c1814b83ee350b0786b75520af3907b32d74f09d5666.png) | [Portrait](../assets/characters/838cfdd0b712e0a60d1d58a778d67e99eb52a6420668e3d61c34aacea3d76da1.png) |
+| Tessa | [Body](../assets/characters/5d5c4c677488469ecd9495641b56692bf41a20de4b9c601cd417fdeaaae41308.png) | [Sheet](../assets/characters/1ee1c992f1c53e3ac6f48fd8c8327b9d4ef584cd696017605f506be582c848aa.png) | [Portrait](../assets/characters/df7b2aa9e566fb87f56cfb6086f503496ffaf4d2c6d9b30ce6ef7c4639ce0fbc.png) |
+
 ### Prepared Rift creature references
 
 These six fresh creature bundles extend the current rendering direction from authored-only facts.

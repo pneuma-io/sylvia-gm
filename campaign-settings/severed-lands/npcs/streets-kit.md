@@ -20,12 +20,12 @@ Smart, watchful, and old before their time. Kit doesn't act like a child because
 
 ## Appearance and artwork
 
-A humanlike twelve-year-old Riftborn child with an age-appropriate slight build and youthful facial proportions, warm brown skin, short choppy dark hair, brown eyes and a guarded friendly expression. Androgynous presentation. Fully clothed in a plain oversized patched gray-brown jacket with its hood down, a muted green shirt, practical dark trousers and worn closed shoes. A small cloth messenger bag crosses the chest. Ordinary relaxed standing pose with empty hands. No weapon, adult proportions, makeup, jewelry, injuries or magical effects.
+A slight twelve-year-old Riftborn child with deep warm brown skin, a round youthful face, quick dark eyes and short dense black coils cropped close at the sides. Tawny-ochre shoulder cape with the hood down, patched blue-grey long-sleeve tunic, pale undershirt, loose brown trousers and flat closed brown shoes. A small messenger pouch rests at the left hip on a cross-body strap; a cord-tied rolled message is held in the right hand. Watchful guarded friendliness. Kit retains they/them pronouns, explicit age twelve and a fully practical child-sized design.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/0a857916c94b175cb571e6f5071a0bae5040d1f508e93627bba252648ce49737.png)
+[Portrait](../assets/characters/6cd3514847f4fc2b1016e9bceab80e0ac4987353b91f639374865133515d298a.png)
 
-[Full-body reference](../assets/characters/306a283a0c8668f66d03b1e7b602008815629baacdd34d1a7043bd0ae2ba538b.png)
+[Full-body reference](../assets/characters/e9d640b3bcd45f0b2e35a55ba14710362542d39265f60d589d507c9aadde2c28.png)
 
-[Multiview reference sheet](../assets/characters/26517a4671714b0880b3656c459de1e6754fd3a4ff7dd3d36f20bb80f7d672ba.png)
+[Multiview reference sheet](../assets/characters/9b1094fcf2bc86cf18649dded103f18024ca4678ea1dee9e850c4270449f48b3.png)

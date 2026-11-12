@@ -18,12 +18,12 @@ Obsessive, brilliant, and perpetually sleep-deprived. Linden treats the Door lik
 
 ## Appearance and artwork
 
-A humanlike androgynous adult Riftborn in their late thirties with light olive skin, a slender build, untidy short dark curls, hazel eyes and visible sleep shadows. An absorbed thoughtful expression. A worn moss-gray research coat over a muted plum shirt, charcoal trousers, scuffed ankle boots and a small shoulder satchel. Holds one closed plain notebook. No glowing eyes, readable notes, magical effects or invented faction symbols.
+A tall slender Riftborn adult of androgynous appearance with pale olive skin, a long narrow oval face, tired blue-green eyes and thin round steel spectacles. Straight ash-blond chin-length hair is tucked behind ordinary rounded ears and gathered at the nape. Cream work coat over a russet sleeveless wrap vest, loose grey trousers, plain belt and dark ankle boots. One closed slate-blue notebook under the left arm and a short charcoal pencil in the right hand. Intent sleep-deprived bearing, without assigned ancestry or magical powers.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/85d11fab752b0c2aa91f750d0a46900945bfaf8123d8f4712774c31f9a1aa53e.png)
+[Portrait](../assets/characters/1b7f183f0b41a600457709f180fb1fbca7f97916d162f0091a59e2700c4d5a54.png)
 
-[Full-body reference](../assets/characters/82265788dd8a89bf193732116f02ac8917c821ed626e198cf7922280a92491bd.png)
+[Full-body reference](../assets/characters/9cf4c497d16131c9f27d2f8654e38ff1743d63ac0b7c229757ed53700c14b3b5.png)
 
-[Multiview reference sheet](../assets/characters/e8debb2cdc85947670b6621ff21534874c9b66a040b51e1dbde54ce178ed31d1.png)
+[Multiview reference sheet](../assets/characters/274d408073ba972a47faa8c80fe30fc0dcf370e86f595d0e9eec3abd2a75bedc.png)

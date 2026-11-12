@@ -20,12 +20,12 @@ Stern is disciplined, unsentimental, and carrying her losses privately. She trea
 
 ## Appearance and artwork
 
-A humanlike adult Riftborn woman in her late forties with dark brown skin, a strong lean build, short salt-and-pepper hair, dark eyes and one healed claw scar across her jaw. Quiet vigilant expression. Practical patched dark olive patrol leathers over a charcoal shirt, plain trousers, sturdy worn boots and a compact belt kit. A closed personal notebook stays inside a closed belt pouch. No emblems, medals, exposed notebook pages or visible magical effects.
+A compact strongly built mature Riftborn woman with olive-tan skin, broad rectangular face, dark hazel eyes and cropped straight iron-grey hair. An old diagonal claw scar crosses her left jaw. Brick-burgundy quilted field coat, charcoal hardened leather breastplate, grey sleeves, leather forearm guards, dark brown trousers and heavy boots. Short sword sheathed at the left hip and closed notebook pouch at the right. Empty relaxed hands and disciplined balanced posture; no assigned regiment or new rank.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/95ebeafa41c9a664b1a534684fc66036c80a32b88988693825c2a0718365f9dd.png)
+[Portrait](../assets/characters/f64358acf2a78c07d0583ad380bed8e0a2b4ede0e1fd87fe3bc03941fb4f718c.png)
 
-[Full-body reference](../assets/characters/4b7d14dcf70d152d64747fcd2c124739c017855507f0a07903889129b1710428.png)
+[Full-body reference](../assets/characters/454000c64fd9cf2bb1e67b98d0f0c3bceaef49368db5d6241ec4baca9ff9fc96.png)
 
-[Multiview reference sheet](../assets/characters/5419fb40b1ca39843c5c3330849015cffd10fdb57c616e33cfdc5d5e37d70a60.png)
+[Multiview reference sheet](../assets/characters/6d70bff09f1fd374f6abf332985c20dee01875b6be0c61ca587347b6dbb13e94.png)

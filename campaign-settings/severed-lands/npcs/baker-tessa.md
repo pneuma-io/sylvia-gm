@@ -20,12 +20,12 @@ Warm, practical, and politically aware in the way that small business owners hav
 
 ## Appearance and artwork
 
-An adult Human woman in her late thirties with a sturdy build, fair warm skin with freckles, blue-green eyes, a round friendly face and thick auburn hair braided and pinned back. A rust-brown rolled-sleeve work dress, cream flour-dusted apron, plain leather belt and practical brown boots. Bare forearms with a light dusting of flour, a small linen cloth and one simple round loaf in her hands. Warm, practical expression.
+A stout mature Human woman with light rose-beige skin, a round full-cheeked face, bright blue eyes and a broad warm smile. Short chestnut curls are mostly covered by a cream triangular headscarf tied at the nape. Coral-red work dress, cream rolled-sleeve blouse, pale-blue cross-back apron, tan waist tie and sturdy closed brown shoes. She supports a modest woven bread basket with both hands at the waist, cream cloth partly covering a plain loaf. Warm practical bearing and a distinct face, hair and outfit from Marla.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/9a47dd0f5fc1746bd3b31de3a743745396356e1a400bc4993924eaaaa54f38d1.png)
+[Portrait](../assets/characters/df7b2aa9e566fb87f56cfb6086f503496ffaf4d2c6d9b30ce6ef7c4639ce0fbc.png)
 
-[Full-body reference](../assets/characters/c0e8ad7b98d15ba18096922e96e2ba2541ffccad3ba3bf8a4edf63d0b3c4e9de.png)
+[Full-body reference](../assets/characters/5d5c4c677488469ecd9495641b56692bf41a20de4b9c601cd417fdeaaae41308.png)
 
-[Multiview reference sheet](../assets/characters/79a4cd276fe4ecb03e2e49ab71640c1e7f2aac36fb440aa47be6dd12bc256b05.png)
+[Multiview reference sheet](../assets/characters/1ee1c992f1c53e3ac6f48fd8c8327b9d4ef584cd696017605f506be582c848aa.png)

@@ -20,12 +20,12 @@ Lorn is quiet, solitary, and carrying the weight of every partner they've lost. 
 
 ## Appearance and artwork
 
-An androgynous adult Human in their early forties with a lean athletic build, weathered dark olive skin, deep-set gray eyes, long dark brown hair gathered in a single practical braid and several old healed scars on the exposed forearms. A quiet watchful reserved expression. A worn muted forest-green hunting coat with the hood folded down, charcoal shirt, plain brown trousers, sturdy leather boots and a modest closed belt kit. Empty relaxed hands. No trophies, partner mementos, faction emblems, extravagant weapon, blood or magical effects.
+A rangy athletic Human adult of androgynous appearance with sun-worn beige skin, a long angular face, grey eyes and dark auburn hair cropped at the temples and tied into a small rear ponytail. A narrow old scar marks the left cheek, with selected healed forearm scars. Deep-teal sleeveless field coat with hood down, grey linen shirt, leather bracers, olive-brown trousers and dark hiking boots. Plain longbow carried low in the left hand, quiver on the right back and closed belt pouch. Quiet solitary composure; they/them pronouns and no faction badge.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/6670579d085ecff6786a9b617b2cca0d8745481a65caeafb4054df14a623f307.png)
+[Portrait](../assets/characters/838cfdd0b712e0a60d1d58a778d67e99eb52a6420668e3d61c34aacea3d76da1.png)
 
-[Full-body reference](../assets/characters/bd8e9a03d84ff3aafe4bae71f9b78c501a4ea92984231c8c7607e5a2902bb0b0.png)
+[Full-body reference](../assets/characters/f055059b5eb451b5ceb68b5ba7e50c18a7c49dfab896bcc32022a3a3a5b62cfc.png)
 
-[Multiview reference sheet](../assets/characters/1417ccd2d84365507454ace5394232cc3ee08d47864bf2dcf0cd78297b263893.png)
+[Multiview reference sheet](../assets/characters/7243c142bbc7280e0553c1814b83ee350b0786b75520af3907b32d74f09d5666.png)
