@@ -608,7 +608,9 @@ def test_readme_resets_explicit_plugin_environment_before_runner_commands():
 def test_real_gm_request_contracts_follow_relevant_changes(path):
     plan = choose([path])
     module = "tests/test_gm_memory_casting_hotfix.py"
-    assert plan["python"]["gm-request-contracts"] == [module]
+    assert plan["python"]["gm-request-contracts"] == [
+        module, "tests/test_gm_schema_minimal_refusals.py",
+    ]
     selectors = [item for values in plan["python"].values() for item in values]
     assert sum(item.split("::")[0] == module for item in selectors) == 1
 
@@ -623,17 +625,21 @@ def test_real_gm_request_contracts_are_not_selected_for_copy_or_harness_only_edi
     assert "gm-request-contracts" not in plan["python"]
 
 
-def test_real_gm_request_contracts_have_one_full_owner_and_separate_quick_group():
+@pytest.mark.parametrize("module", [
+    "tests/test_gm_memory_casting_hotfix.py", "tests/test_gm_schema_minimal_refusals.py",
+])
+def test_real_gm_request_contracts_have_one_full_owner_and_separate_quick_group(module):
     from scripts.check_supported_journeys import FULL_ONLY_JOURNEYS, PYTHON_JOURNEYS
 
-    module = "tests/test_gm_memory_casting_hotfix.py"
     owners = [(group, item) for group, items in PYTHON_JOURNEYS.items()
               for item in items if item.split("::")[0] == module]
     assert owners == [("gm-request-contracts", module)]
     assert module not in PYTHON_JOURNEYS["gm-turn"]
     assert "gm-request-contracts" not in FULL_ONLY_JOURNEYS
     full = choose(["README.md"], full=True)
-    assert full["python"]["gm-request-contracts"] == [module]
+    assert full["python"]["gm-request-contracts"] == [
+        "tests/test_gm_memory_casting_hotfix.py", "tests/test_gm_schema_minimal_refusals.py",
+    ]
     assert full["python"]["gm-turn"] == PYTHON_JOURNEYS["gm-turn"]
 
 
@@ -649,8 +655,10 @@ def test_complete_full_selection_loads_against_the_actual_checkout(tmp_path):
     assert load_selection(manifest, revision="a" * 40, root=root) == plan
 
 
-def test_real_gm_request_contracts_are_unique_in_a_combined_affected_diff():
-    module = "tests/test_gm_memory_casting_hotfix.py"
+@pytest.mark.parametrize("module", [
+    "tests/test_gm_memory_casting_hotfix.py", "tests/test_gm_schema_minimal_refusals.py",
+])
+def test_real_gm_request_contracts_are_unique_in_a_combined_affected_diff(module):
     plan = choose([
         "src/sylvia_gm/agent/_provider_session.py",
         "src/sylvia_gm/provider/_base.py",

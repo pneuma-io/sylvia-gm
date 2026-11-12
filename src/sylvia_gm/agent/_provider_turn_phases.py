@@ -803,6 +803,7 @@ def execute_action_sequence_call(
                 )
     except AuthorityError as error:
         feedback = cast(dict[str, object], _safe_error(error).structured_content)
+        code = str(getattr(error, "code", "authority_rejected"))
         if state.catalog_tool.name == "execute_action_sequence":
             # The service may have persisted a prefix before its reply failed.
             # Recover receipts by reading; never retry execution implicitly.
@@ -816,7 +817,7 @@ def execute_action_sequence_call(
                 "operation": state.catalog_tool.name,
                 "result": _plain_json(saved),
                 "execution_stopped": True,
-                "delivery_error": {"code": error.code, "reason": feedback["reason"]},
+                "delivery_error": {"code": code, "reason": feedback["reason"]},
             }
             if isinstance(saved, Mapping):
                 state.facts = _action_sequence_narration_facts(
@@ -841,7 +842,7 @@ def execute_action_sequence_call(
         else:
             state.local_tool_results[state.assembly.call_id] = {
                 "status": "rejected",
-                "code": error.code,
+                "code": code,
                 "reason": feedback["reason"],
                 "validation": feedback["validation"],
                 "state_changed": False,
