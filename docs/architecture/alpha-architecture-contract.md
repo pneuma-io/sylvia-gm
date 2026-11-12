@@ -1487,6 +1487,8 @@ Saved scenarios supply scripted GM decisions and simple narration completion thr
 session/adapter path. The script supplies inputs when requested; it must not reproduce the logic
 that decides when those inputs are required or allowed. Scenarios can control dice results and
 span several actions/turns; test randomness must stay isolated from live campaign randomness.
+A scenario observes each committed action's whole engine result, taken from that action's receipt.
+The copy of a result kept in model history omits engine context and is not the test's source.
 The local test worker composes CampaignSessionLoop, ProviderSessionAdapter and AuthorityOwner;
 direct player steps use AuthorityOwner.player_action and its ordinary response path.
 Reusable Ruleset test cases cover mechanics and
