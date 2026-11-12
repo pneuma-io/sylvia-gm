@@ -1089,6 +1089,10 @@ def test_schema_minimal_provider_only_tools_have_explanatory_feedback(lite_save,
     if payload.get("status") == "rejected":
         assert isinstance(payload.get("reason"), str) and payload["reason"].strip()
         assert after.state == before.state and after.revision == before.revision
+    if "delivery_error" in payload:
+        assert isinstance(payload["delivery_error"].get("reason"), str)
+        assert payload["delivery_error"]["reason"].strip()
+        assert after.state == before.state and after.revision == before.revision
 
 
 def play(owner, provider, *, campaign="memory", session="gm", turn="turn", user_text="I wait."):
