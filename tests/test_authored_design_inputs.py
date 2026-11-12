@@ -39,7 +39,7 @@ def test_actual_roster_retains_every_binding_and_separates_editable_defaults():
                 seen.add(edition["source"]["sha256"])
         assert seen == expected.keys() and len(selected) == 1
         assert any(edition["current"] for edition in selected[0]["source_editions"])
-    assert editions == 505 and omitted == 286
+    assert editions == 511 and omitted == 292
     marla = prepared["severed-npc-marla-cook"]["design_variants"][0]["authored_document"]
     assert "Marla treats feeding people as a form of care" in marla
     assert "## Personality" in marla

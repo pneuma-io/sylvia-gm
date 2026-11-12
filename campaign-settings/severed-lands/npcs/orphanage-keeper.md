@@ -20,12 +20,12 @@ Maris is fierce, exhausted, and absolutely immovable. She treats the orphanage l
 
 ## Appearance and artwork
 
-An adult humanlike Riftborn woman appearing in her late fifties, with a sturdy medium-tall build, fair freckled skin, gray-green eyes and dark brown hair threaded with gray and pinned into a practical bun. Deep tired lines beneath alert eyes, a firm protective expression and an upright grounded stance. A faded muted plum blouse, long charcoal wool skirt, patched natural linen work apron and worn plain brown shoes. Empty hands rest loosely at her sides. Her exhausted protective bearing follows the authored profile; physical features, age styling and clothing are editable visual defaults. Her home world remains unknown. No aristocratic gown, crown, weapons, invented insignia, shown children, sentimental scene or invented origin.
+A solidly built mature human-like default with medium brown skin, broad cheekboned face, tired brown eyes and short chestnut waves silvering at the temples. A practical ochre dress, dusky blue pocketed vest, plain belt and flat boots accompany her grounded protective stance. Both hands are empty. The prepared design adds no noble rank, ancestry, power or depiction of the children's private losses.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/f8f534e3fb4315f588e0dfc8a45d3d5bb4911c7938d02bd129da46d5a95a90ee.png)
+[Portrait](../assets/characters/faf881c8951626fd4166890a8dcaa492bf53fd15643acf157d1ec95a4752ab38.png)
 
-[Full-body reference](../assets/characters/6ebaa551287f058b16b9fe9cf46bbf3688e3d9db1ce07db007517ca63efc50e4.png)
+[Full-body reference](../assets/characters/0ea5b4d5979f3a2f2c3359ac22c0a75964ea0454e56f1852a6edca72247c1f99.png)
 
-[Multiview reference sheet](../assets/characters/fa00077d7311238cf39db7c90e45cfe2ec5644ec5e0ca49174f72a1a228633f3.png)
+[Multiview reference sheet](../assets/characters/edb4c74288e3b42baaac0bd189c5c50f48203cadf8f2233989fa15139ab741f5.png)

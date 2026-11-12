@@ -20,12 +20,12 @@ Thorn is bright, anxious, and desperately dedicated. They represent the Returner
 
 ## Appearance and artwork
 
-A young adult humanlike Riftborn scholar appearing in their early twenties, with a slim build, warm medium-brown skin, hazel eyes, short tousled dark brown hair and an androgynous face. An anxious attentive expression, faint tired shadows beneath the eyes and a slightly tense earnest posture. A plain undyed linen shirt beneath a faded ink-blue sleeveless scholar's vest, practical brown trousers, soft dark leather ankle boots and one small plain belt pouch. They hold a slim closed worn notes folio against their torso with both hands. Their scholarly and overworked bearing follows the authored profile; age styling, physical features and clothing are editable visual defaults. Use they/them pronouns. Their academic home world remains unnamed. No invented school crest, magical eyes, glowing Door diagrams, readable notes, heroic armor or invented answers to their research.
+A young adult androgynous human-like default with light-brown skin, a narrow soft triangular face, tired dark brown eyes, a straight dark chin-length bob and plain bronze round glasses. Indigo and pale grey scholar layers, charcoal trousers and flat boots remain practical. Their right hand holds one closed plain notebook; their left is empty, with a closed ink pouch at the back belt. The image reveals no private correlations and assigns no binary gender, new ancestry or named home world.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/f1d8853a6e8348361574ee41e9304ed4c4dcc2a76598f0631fd43eb396b65051.png)
+[Portrait](../assets/characters/852a60a4af2de80b460f850094fdce039ab2fd53a2e89a1396eb0c2fd560e63f.png)
 
-[Full-body reference](../assets/characters/b4aadffba1f5e847f2c118594d78dbe4d12778bdba960611f5323729cac815e0.png)
+[Full-body reference](../assets/characters/6a0286504bf19d53797c01c93b52938620d7d0a82bf7c5096d44003ddfca33bb.png)
 
-[Multiview reference sheet](../assets/characters/952f399bbffd71400aaa9e632c98b2d0fc70d4e615df107988611a7c430c26d1.png)
+[Multiview reference sheet](../assets/characters/ba5301faa5cb8a141857c59cfa73195024efbdde9f7b243b0ac6bd072917f5b1.png)

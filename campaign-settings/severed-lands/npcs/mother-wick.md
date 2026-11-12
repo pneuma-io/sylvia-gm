@@ -20,12 +20,12 @@ Wick is gentle, tired, and fiercely protective of her congregation. She doesn't 
 
 ## Appearance and artwork
 
-A small humanlike Riftborn woman appearing in her early sixties, with a slight build, medium olive skin, dark brown eyes, soft facial lines and tired but protective warmth. Gray hair is gathered in a simple low bun. A plain muted clay-brown ankle-length robe, faded blue-gray wool shawl, narrow unadorned cloth belt and worn dark leather shoes. Empty hands rest quietly together. Her small stature and gentle tired bearing follow the authored profile; other appearance details are editable visual defaults. Her home world remains unknown. No candles growing from her body, flames, glowing eyes, invented Church symbols, elaborate vestments, exposed private records or invented origin.
+A small middle-aged human-like default with medium olive skin, rounded lined face, dark hazel eyes and greying short black waves under a plain cream headkerchief. Muted plum, oatmeal and dark teal practical layers, a plain belt and flat boots suit the shrine keeper's daily work. Both hands are empty. Her namebook remains under the altar and no new religious emblem or power is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/48cc4ada082e4bd68b746dd737559d634c45abdd678234eb33bdcd5b481ffaf8.png)
+[Portrait](../assets/characters/e842fcd8d43bb2959007449c83f7b7f3290fb3ef85ea5eda310b2092bfb6ee79.png)
 
-[Full-body reference](../assets/characters/ab94aec5d29135248f5dff655ec86953be948386e8ba031b2413602539eac169.png)
+[Full-body reference](../assets/characters/466eab97ccb7e51e35cc03e080dd6cb2af72067390fcc5443c15b0cf0e7ae31c.png)
 
-[Multiview reference sheet](../assets/characters/af54c08682e7c00c729005f083b52554de07033d317875ffddb25ad63e5b2498.png)
+[Multiview reference sheet](../assets/characters/c1410b5bb7b66c3b53871dda02201235bb44625d2e79f5915b8efeee89fa954d.png)

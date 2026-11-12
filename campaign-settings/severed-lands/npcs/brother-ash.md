@@ -22,12 +22,12 @@ Ash's ledger has been stolen — taken from his quarters while he was responding
 
 ## Appearance and artwork
 
-An eighty-year-old humanlike Riftborn man with a lean, age-worn build, warm brown skin, kind dark brown eyes, short thin white hair and a close white beard. His face is deeply lined and patient. Battered dull steel armor with mismatched repaired plates over a faded charcoal padded coat, plain dark trousers and scuffed brown boots. He cradles a thick closed leather-bound ledger with yellowed page edges in one arm; the book is treasured and unlabelled. His posture is gently stooped but steady. Age, battered armor and the ledger follow the authored profile; other appearance details are editable visual defaults. His home world remains unknown. No glowing magic, religious insignia, youthful physique, grand ceremonial armor, readable names or invented origin.
+An elderly human-like default showing Ash's authored eighty years: deep brown skin, long lined face, hooded dark eyes, short white hair and close white beard. Battered unmarked steel armor, sage sleeves and a faded cream tabard keep his ordinary protector role clear. His left forearm carries the closed brick-thick ledger with yellowed pages as an everyday pre-theft reference; his right hand is empty. No deity, new ancestry or hook resolution is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/0e37e601e59867fc6dc631afed193f64aa197ae1323a14654d4c11c67666e7af.png)
+[Portrait](../assets/characters/d71cf2115cc449187df20aa9d2da8c7b1daf99cc50f8d0802196f62ff5442964.png)
 
-[Full-body reference](../assets/characters/666110908fad7f65a8e1c528e6960478b156270651715a1f55db7d24f09394b0.png)
+[Full-body reference](../assets/characters/1e5eb8b0a523c53a0dd7d172bb303c8485011a77aa2e8bbd7d806c8cd8667314.png)
 
-[Multiview reference sheet](../assets/characters/2dc5caeb6c518283f271c9acdbd088de871a655e689103d7c803211d03bdbea2.png)
+[Multiview reference sheet](../assets/characters/df02a6ca3a327a9c4d44533d385784ad34f96a48227f5e3aafca8afca0255b1f.png)

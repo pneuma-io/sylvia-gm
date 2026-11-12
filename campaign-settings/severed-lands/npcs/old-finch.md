@@ -18,12 +18,12 @@ Finch is cranky, warm, and full of stories. He'll talk for hours if you let him.
 
 ## Appearance and artwork
 
-An elderly humanlike Riftborn man appearing in his late seventies, with a thin frail build, pale weathered skin, hazel eyes, sparse swept-back silver hair and a short uneven white beard. A cranky but warm expression with alert storytelling eyes. A faded rust-brown wool vest over a plain cream shirt, soft charcoal trousers and worn dark shoes. He sits comfortably in a simple sturdy wooden armchair, legs resting naturally and both age-worn hands loosely supported on his lap or the chair arms. His reduced leg mobility and shaky hands follow the authored profile; age styling, chair and other appearance details are editable visual defaults. His home world remains unknown. No bird anatomy, wings, youthful adventurer pose, forced unsupported standing, magical disability cure, invented medals or origin.
+An elderly human-like default with fair weathered ruddy skin, narrow cheekboned face, grey-blue eyes, receding wispy grey hair and a small uneven moustache. Faded rust, olive and oatmeal layers and soft shoes accompany an ordinary wooden armchair. The complete reference stays seated with relaxed hands and feet resting, respecting his authored limited mobility without inventing a diagnosis, missing limb or restored patrol ability.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/6efdedc822e541239a931f35b66e9acd5e3a282bcf8b0ab3f916b3d72efe42e7.png)
+[Portrait](../assets/characters/ce225e39b0d1aa7231ff2d892fd869e72f1cae1533c262a5574562133782183c.png)
 
-[Full-body reference](../assets/characters/c81e712a246729154846bb96d43eb13e54fff30426a0cbb231e5b62c690bd575.png)
+[Full-body reference](../assets/characters/99ebb79d318e70242b808288cbb11425cd212cb06256e9ea80261a97fe1029be.png)
 
-[Multiview reference sheet](../assets/characters/9fb44e360041c09740696a7222a1ed080b412fda91bc663b1c1368e98934715d.png)
+[Multiview reference sheet](../assets/characters/d88568d0b683377d79705b17aca48df938fd9062f2fe0fc9afcd1f94e2dbe99d.png)
