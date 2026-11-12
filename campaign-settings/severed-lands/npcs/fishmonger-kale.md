@@ -14,12 +14,12 @@ Kale's stall is where Thornwall gossips. Everyone buys fish eventually. Everyone
 
 ## Appearance and artwork
 
-An adult settled Human man appearing in his early forties, with a broad stocky working build, warm golden-beige skin, dark brown eyes, short straight black hair graying slightly at the sides and short dark stubble. A quiet contented expression and an unhurried grounded posture. A plain cream linen shirt with rolled sleeves, a worn deep navy cloth cap, a faded blue-gray waxed-canvas work apron with ordinary water marks, dark brown practical trousers and sturdy worn leather boots. Empty relaxed hands, no fish or knife displayed. His practical fishmonger workwear and uninterested-in-gossip bearing reflect the authored profile; age, features and clothing details are editable visual defaults. No fish anatomy, scales on skin, magical effects, modern rubber apron, logos, readable labels, invented secrets or aristocratic finery.
+A broad stocky human default with warm tan skin, a round heavy-cheeked face, brown eyes, short black curls and close rounded beard. Teal, navy and cream work layers and practical boots fit his trade. A small scaling knife stays sheathed at his right belt; both hands are empty. The image adds no secret allegiance, powers or fish preparation scene.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/6ae1c560e9680c450f06e0b225af8e749beda5394c7038ffda54a65bfd4f762c.png)
+[Portrait](../assets/characters/0e2316792a0bd4bf3ac014f69b41afa29367a50837f1010bde6898140b22578e.png)
 
-[Full-body reference](../assets/characters/c0e518e93359b79fc66f3bfb4d5f7c648600413c7894b88233a1dbaffbe8d019.png)
+[Full-body reference](../assets/characters/fa7c3edcaf789e6cd3105ad1f5e098c7d508d8a5f8b9ebb9f82862bc1f5b0d22.png)
 
-[Multiview reference sheet](../assets/characters/3ff081f4d02f790f93174988488e0ffea85582f408775a2928978330bde14a2b.png)
+[Multiview reference sheet](../assets/characters/68f14c0136cb933a9fa27f5710d8fbd9401a51991595165510a1a19a3d47875f.png)

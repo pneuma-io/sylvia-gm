@@ -20,12 +20,12 @@ Davith is conflicted, frightened, and in over his head. He genuinely wants to he
 
 ## Appearance and artwork
 
-A young adult settled Human man appearing in his early twenties, with a lean athletic build, warm beige skin, hazel eyes, short straight ash-brown hair and a clean-shaven youthful face. An earnest expression with a slightly worried brow, held within an attentive restrained guard posture. Plain worn chainmail over a charcoal quilted gambeson, practical brown leather belt and bracers, dark trousers and scuffed calf-high boots. A modest sheathed short sword at his hip, empty visible hands and no helmet covering his face. His youth and uneasy earnest bearing follow the authored profile; physical features, age styling and unmarked uniform are editable visual defaults. No ideological or secret faction symbols, incriminating papers, readable orders, invented city crest, magical effects or visual disclosure of private loyalties.
+A young adult human default with medium warm-brown skin, a narrow long face, amber-brown eyes, short side-swept dark hair and clean-shaven chin. Dull chain beneath a high-collared navy-grey/russet guard coat, charcoal trousers and flat boots remain plain. His hands are empty and expression slightly tense. No secret allegiance, incriminating document, invented rank or resolved choice is shown.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/d4326e30a427d3667221d12d282a892127a5a86b0c6f4f58f70716311d2f88b9.png)
+[Portrait](../assets/characters/bf8e556c33c6b64f5da4dee015bc5622e7ebe19980d43af0f04b3d4b8ab1e1d0.png)
 
-[Full-body reference](../assets/characters/67d177ee75294dbdf6f8bf6d495d72590c4469d227c1ea0f1f63f10ee699fc53.png)
+[Full-body reference](../assets/characters/473ad61b04cb8efa206b34f0724b366d53e55737065d012d29c7345d9fa6cb40.png)
 
-[Multiview reference sheet](../assets/characters/c6909e247c6ed59689bd60220ef5a27dbecaea5036a3b660c0f721dbb4587fd2.png)
+[Multiview reference sheet](../assets/characters/3d71a392d8d6ccc5772db5a39e80b86e547f5cb1b883dcef815378188d5d44ad.png)

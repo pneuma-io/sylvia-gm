@@ -20,12 +20,12 @@ Vesper is sharp, observant, and completely uninterested in taking sides. She tre
 
 ## Appearance and artwork
 
-An elderly settled Human woman appearing in her late sixties, with a sturdy medium build, warm tawny skin, a deeply lined face, keen dark green eyes and thick silver-gray hair gathered into a practical rolled bun. A sharp observant expression, calm closed mouth and composed upright bearing. A plain dark burgundy ankle-length wool dress, worn charcoal sleeveless waistcoat, practical natural linen apron and sturdy dark brown shoes. One small unlabelled iron key ring at her belt. Empty relaxed hands. Her experienced observant innkeeper bearing follows the authored profile; age styling, physical features and clothing are editable visual defaults. She is Old Vesper of the Fortress Inn. No noble finery, faction insignia, readable tabs, private testimony, magical effects or invented history.
+An elderly human default with cool weathered light skin, a long rectangular face, sharp pale-blue gaze and straight steel-grey hair in a neat low bun. Burgundy, charcoal and oatmeal innkeeping layers, a plain beige half apron and flat boots accompany her composed upright stance. Both hands are empty. This Fortress Inn keeper is separate from Siren Protocol's Vesper and gains no magical memory or rank.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/3eacc5ff991896fb6975720bdc10635a42574e6032def1064586d5572dd38cf5.png)
+[Portrait](../assets/characters/fc6cc93615c8b302428952f33a7dcea80fa1b448fb6644b69144e4d7a04851fd.png)
 
-[Full-body reference](../assets/characters/9498423da0cb8e757135612ce011a293f5ac3117fc881237e52e9d0ea213f179.png)
+[Full-body reference](../assets/characters/d1ffd5976f87145b1f9a7d8ef83a5e956a2890afa8834c4c2f391a525f42a0d2.png)
 
-[Multiview reference sheet](../assets/characters/0de94a31215221295de3da3f2ecd68c0f1e272292cb2b5d8dc8025ee94db46e8.png)
+[Multiview reference sheet](../assets/characters/ef1baa098d321b76bd5deed916e5f93a7cc6b84950ae915a13df88834697e2ee.png)

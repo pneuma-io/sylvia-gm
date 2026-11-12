@@ -16,12 +16,12 @@ Her Rift-touched candles are her specialty. They burn longer than normal wax, an
 
 ## Appearance and artwork
 
-An adult humanlike Riftborn woman appearing in her late forties, with a medium sturdy working build, warm tan skin, muted green eyes and chestnut-brown hair threaded with gray, braided beneath a plain cream linen head kerchief. A composed quiet expression and practiced relaxed posture. A faded ochre-brown long-sleeved work dress, a patched gray linen apron with a few small pale wax flecks, and worn brown work shoes. She holds a small ordinary bundle of unlit cream beeswax taper candles at waist height in one hand, the other relaxed. Her candle-making work and quiet bearing follow the authored profile; age, physical features and costume are editable visual defaults. Her home world remains forgotten and unnamed. She is the market chandler, distinct from Mother Wick. No candle body, head flame, invented warding powers, religious insignia, glowing eyes, burning candles, readable labels or invented origin.
+A middle-aged human-like default with cool fair skin, angular face, grey-green eyes and a blunt auburn bob with short fringe. Moss workshirt, charcoal skirt, russet wax-marked apron and flat boots suit the chandler. Her left hand holds one ordinary unlit beeswax candle and her right is empty. Rumored warding is not depicted as fact, and she is distinct from Mother Wick.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/8b60a54464ad1faf4d3eaa53f96936151269f303c2f621a36ecc10c74c7b019e.png)
+[Portrait](../assets/characters/3aa185d2054f573a64891154511f17b11e8238a1176cac85014355675703024e.png)
 
-[Full-body reference](../assets/characters/258ee995c96efdc2200004e2a0d273b5a3d403ed3a34223ff0eba6916b9d0145.png)
+[Full-body reference](../assets/characters/38d52f473a424b1298d643e0367a86b5ed878eedd4c3916e6b5eb03ba529c1ce.png)
 
-[Multiview reference sheet](../assets/characters/9c109d36033b8150746956762a646efc8ab259c50fd837402a0251d75a640a44.png)
+[Multiview reference sheet](../assets/characters/6ed8818bf27222fedeeb0d9c8fe20ae6583aa41121066816b59e82ca8d38acc6.png)

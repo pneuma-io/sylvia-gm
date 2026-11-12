@@ -18,12 +18,12 @@ Hennick is cheerful, unflappable, and aggressively neutral. He's learned that th
 
 ## Appearance and artwork
 
-An adult settled Human man appearing in his early sixties, with a comfortable round build, light olive skin, blue-gray eyes, a rounded lined face, thinning curly silver hair, bushy gray eyebrows and a close short gray beard. A cheerful unflappable expression and easy upright posture. A plain faded brown short coat over an ochre wool waistcoat and an undyed collared shirt, charcoal trousers, practical brown leather shoes and an ordinary belt with one closed money pouch. Empty relaxed hands. His cheerful ordinary-merchant bearing follows the authored profile; age, features and clothing are editable visual defaults. No noble finery, gang or faction insignia, suspicious contraband, readable accounts, modern merchandise, magical effects or invented personal history.
+An older heavyset human default with rich dark-brown skin, a round smiling face, bald crown, short greying side hair and tidy moustache. Deep teal, cinnamon and oatmeal everyday merchant layers, a plain belt and flat shoes keep the design practical. A closed goods pouch sits at his right hip; his hands are empty. No faction or hidden business is visually assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/8fd0445352922f7d3cc128275de6b2c3b4bb6fde8b722d962a074aea5c59c6ef.png)
+[Portrait](../assets/characters/b4cf9b8c55208706e39c51c8b16f3d72b77de65111ef6c0b3d09c3e3f9483194.png)
 
-[Full-body reference](../assets/characters/083a867202a14fe53be1fe0c241bfa4617db9cd5837fc23160c55f614e4418e1.png)
+[Full-body reference](../assets/characters/357026d679c0772b5a63a5c3d7468c488b87caf06fd29876117c53452a9eb327.png)
 
-[Multiview reference sheet](../assets/characters/5f248cb52af95070a3da22967a85a717a320c0aa74aecc8d24dfa0a7dda2bee5.png)
+[Multiview reference sheet](../assets/characters/bf89abd9d080ff6dbaf07efc2f9a4558c8651c3ac3cfd4ccfe555e7cca185f49.png)
