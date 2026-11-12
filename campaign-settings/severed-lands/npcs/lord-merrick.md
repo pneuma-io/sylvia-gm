@@ -26,12 +26,12 @@ Merrick's Hollowed informant has gone silent — three weeks with no contact. Th
 
 ## Appearance and artwork
 
-An adult settled Human man appearing in his early sixties, with a lean medium build, light brown skin, dark hazel eyes, fine lined features, straight black hair graying at the temples and neatly side-parted, and a tidy short dark mustache with gray strands. A quiet patient curious expression and contained upright posture. A restrained well-made deep ink-blue merchant's coat over a muted umber waistcoat and pale gray linen collared shirt, dark tailored trousers and neat brown leather shoes. One plain closed belt pouch, empty relaxed hands. His patient merchant-councillor bearing follows the authored profile; age, physical features and costume are editable visual defaults. No spy gadgets, secret files, readable papers, hidden-network symbols, assassin costume, villainous glow, invented house crest or visual disclosure of private knowledge.
+A tall slender mature human default with cool medium-brown skin, long narrow face, aquiline nose, attentive dark eyes and smooth swept-back dark hair silvering at the temples. Ink-blue, plum and pale grey tailored layers remain understated. His hands are empty and expression patient and curious. No private files, informants, blackmail or supernatural knowledge are revealed.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/9cd42556589f2725b317d1f80bf2193ed92e810d7e3932656290997924e58b9d.png)
+[Portrait](../assets/characters/9bcf0054da185b48889674f594103cf3f884eb0c1ff997959d50fd584a8d5532.png)
 
-[Full-body reference](../assets/characters/f0b9ca8cb0a188f4a5e35a3fd11a268873f64057a8d133034c72655fe0b21758.png)
+[Full-body reference](../assets/characters/5612d3d1b0ee447114849f9ec3de2b7d51c22174c6f9af40369a88fa56a01a02.png)
 
-[Multiview reference sheet](../assets/characters/6666cd1bdb68a4359cc58f7fe34b4c6749e04a0e381dd98577462e2623314ebb.png)
+[Multiview reference sheet](../assets/characters/bd7cb0911868ef99e8aceac4e9acea45ac38c5bf8e9a95746cd1e65545958dc9.png)

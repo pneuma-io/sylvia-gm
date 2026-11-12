@@ -32,12 +32,12 @@ Kael's daughter has started remembering. Fragments — a name, a color, a feelin
 
 ## Appearance and artwork
 
-An adult settled Human woman appearing in her mid-fifties, with a slender medium build, warm medium-brown skin, hazel-brown eyes and wavy chestnut hair graying at the temples, gathered into a neat low coil. A warm measured expression and composed open posture. A well-made but restrained deep teal wool overdress over a dark navy long-sleeved underdress, a narrow plain leather belt, small simple gold hoop earrings and neat dark leather shoes. Empty relaxed hands. Her measured merchant-councillor bearing follows the authored profile; age, physical features and clothing are editable visual defaults. No crown, invented house crest, ceremonial scepter, private family clues, research documents, symbolic Door imagery, magical effects or visual disclosure of hidden motives.
+A mature human default with warm medium-brown skin, a broad oval face, dark eyes and dark hair subtly greying at the temples in a low twist. Plum, teal and cream finely woven layers, simple bronze fastenings and flat shoes express her public merchant role. Both hands are empty. Her daughter's identity, research funding and private negotiations remain concealed; no new house crest is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/973732d84f4d2f3e7afd616ac3f2e774c1aed27942cc5ccd5b2311ce45a3aa1a.png)
+[Portrait](../assets/characters/ef7d6d89bc7dc90bbf01eb93f10a15cb400037daeb132c891ff3431773578fe7.png)
 
-[Full-body reference](../assets/characters/be3ecee37a19f9e622da4806ab48202b4ce585bc609ec6a2e03af3a9af63146b.png)
+[Full-body reference](../assets/characters/6dce691db93b57a032f5847dc53bbc135956436175a8f659a870d47f04fcaa2f.png)
 
-[Multiview reference sheet](../assets/characters/bd227fd98e1203016f718920a93d062423c3ba1a868c94c8cea3ba11964fdbdd.png)
+[Multiview reference sheet](../assets/characters/693082b081939fb3198c8967edf1b8b2c01e5cd1c4ebf74d3b0b8dfd6452800e.png)

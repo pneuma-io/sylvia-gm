@@ -26,12 +26,12 @@ Voss's successor must be elected by the sworn knights. Two candidates have emerg
 
 ## Appearance and artwork
 
-An adult settled Human man appearing in his mid-fifties, with a strong sinewy build, medium-deep brown skin, hazel-gray eyes, close-cropped dark hair graying at the sides and a short close salt-and-pepper beard. A stern direct expression with attentive warmth and a steady experienced warrior's stance. Worn plain steel plate-and-mail armor over a desaturated burgundy padded gambeson, practical dark trousers and armored brown boots. A distinctive heavy layered steel gauntlet fully covers his right hand and wrist and stays on; a plain oval metal-rimmed shield rests on his left arm beside his body, and a sheathed sword at his left hip keeps its hilt visible near the waist. The sword, shield and ever-worn gauntlet follow the authored profile; their uninscribed shapes and materials, age styling and other physical details are editable visual defaults. He is the Warden Lodge's Knight-Commander, unrelated to House Voss. No invented heraldry, readable inscriptions, visible illness, lung-condition clues, glowing artifacts, bare right hand, crown or invented family resemblance.
+A mature strong human default with deep weathered tan skin, a broad angular face, dark eyes, cropped greying hair and a short coarse beard. Worn steel and muted teal armor layers accompany a bronze Warden gauntlet worn on his right hand, a sheathed sword at his left hip and a shield strapped to his back. Both hands hold nothing. The artifact designs add no ability or translated inscription; his illness stays private and he is distinct from House Voss.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/2bd637ea35934d09c2289fd497795d101de056e3d64bcc5503a22b5a33ce22c5.png)
+[Portrait](../assets/characters/b1b2c697cfdfc9f005589815bf1f72a3e7b485e59ad1940db748dc3c71eb414a.png)
 
-[Full-body reference](../assets/characters/b8ef7bab26c055e6bf61d35594a5b404e3edb8411a787ba6cd2d3fe8952d448f.png)
+[Full-body reference](../assets/characters/9fe93fafceaf7ce508eb7e57421850589feb4f028f915131992355013e0a56df.png)
 
-[Multiview reference sheet](../assets/characters/81b497deae72052e193563156ae9897896be304a5197bc73a3457f3320fa56b1.png)
+[Multiview reference sheet](../assets/characters/a1604826e477bcbdaa8a555556bd19715f57830df05cf075c92d27c97c8c60d8.png)

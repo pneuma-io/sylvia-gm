@@ -32,12 +32,12 @@ Voss's anti-Riftborn policies are genuine, but they're also politically useful. 
 
 ## Appearance and artwork
 
-An elderly settled Human man appearing in his mid-seventies, with a broad upright build, weathered light olive skin, pale blue-gray eyes, thinning silver-white hair neatly combed back and a short carefully trimmed white beard. A formal deliberate composed expression and dignified erect posture. A fine plain dark forest-green wool coat over a muted brown-gold waistcoat and ivory collared shirt, dark brown tailored trousers, an ordinary leather belt and polished dark brown shoes. Empty relaxed hands. His senior formal council bearing follows the authored profile; age styling, physical features and clothing are editable visual defaults. No crown, invented house crest, hostile political banners, readable policies, memorial clues, monstrous features, magical effects or visual disclosure of private grief.
+An elderly human default with fair aged skin, a broad long rectangular face, heavy white brows, grey-blue eyes and neatly combed receding white hair with clean sideburns. Forest-green, gold-brown and ivory fine formal layers and flat shoes convey his public status. Both hands are empty; his expression is formal and patient. No private grief, new house emblem or relation to Castellan Voss is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/d3d69f5042e0b55a956d21df4690767adceef7d935b6d481b389736e7f963d72.png)
+[Portrait](../assets/characters/089a253bc56c34e991e9924fcac71517a137f9069975332a733e710e4c0987d3.png)
 
-[Full-body reference](../assets/characters/7e9d9b184aa23cb319fd6d7bbb3977485667ec6e9bcf11002c7cb2165466c63b.png)
+[Full-body reference](../assets/characters/4138ae482571e711fe134164d44389424032679d3222a894fefdf8c6f6139e3d.png)
 
-[Multiview reference sheet](../assets/characters/2ed7e5d3f835e5238927c6d3aeafbab63b8a4177c7f4b7146e8bf311e741c8b5.png)
+[Multiview reference sheet](../assets/characters/d8d5d609d6de9bd52d36490c9d31dffc7d83e83e45360fd9b915d614cd119301.png)

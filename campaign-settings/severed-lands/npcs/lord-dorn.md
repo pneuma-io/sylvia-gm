@@ -22,12 +22,12 @@ Dorn's foremen have been reporting theft — Warden-grade metals disappearing fr
 
 ## Appearance and artwork
 
-An adult settled Human man appearing in his late fifties, with a broad heavy working build, weathered tan skin, dark brown eyes, thick dark hair graying at the sides and combed back, and a full neatly squared salt-and-pepper beard. A practical appraising expression and steady grounded posture. A sturdy well-made charcoal wool merchant's coat with plain copper buttons over a muted rust-brown waistcoat and cream linen shirt, dark trousers, a plain leather belt and good worn brown boots. Empty relaxed hands. His practical industrial merchant bearing follows the authored profile; age, physical features and clothing are editable visual defaults. No dwarf anatomy, crown, smith's apron, hammer, invented house crest, stolen metal, readable accounts, magical forge effects or visual disclosure of plot secrets.
+A heavy-built mature human default with light olive skin, a broad square face, blunt nose, brown eyes, receding dark hair and a short square greying beard. Charcoal, russet and cream merchant layers and sturdy flat boots convey practical prosperity. Both hands are empty. The image reveals no metal-theft evidence, new artifact or invented house heraldry.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/8add00a8166bcaf8c9887353851e30a93b09244c3dc717b33a73aabc522291a8.png)
+[Portrait](../assets/characters/9b7cd5e63c12a730076d9d959053ba621a717b5eec8863834c437c34f4e03af7.png)
 
-[Full-body reference](../assets/characters/ae451ad0cc82984a48a00ddcd5cf7d7665d13ba6d05dfce1547f2edbc900dd3a.png)
+[Full-body reference](../assets/characters/66dd0f5cacc14eed7ab20ee4e4d6925368196ad920a73f0615bfa5c22c4578cc.png)
 
-[Multiview reference sheet](../assets/characters/0491f63bdf838557790b473c7f8a5ec4747c9dfa6c715ca2bfa2f2a423857644.png)
+[Multiview reference sheet](../assets/characters/f9e026a2e24ddc23dd555ca6993d9a04d518e403c9ee71d46c766d7ee501f53b.png)
