@@ -37,3 +37,15 @@ Once a wizard who gazed too long into the Veil, seeking forbidden knowledge. One
 **Claw.** +4 to hit, 6 (1d6 + 3) slashing.
 **Rotting Gaze.** One creature within 30 feet must succeed on DC 12 CON save or take 10 (3d6) necrotic damage.
 **Weird Insight.** One creature within 30 feet must contest its Charisma (Deception) against the gazer's Wisdom (Insight). If the gazer wins, it magically learns one fact or secret about the target. The target automatically wins if immune to being charmed.
+
+## Appearance and artwork
+
+A gaunt mature adult humanoid aberration default with grey-olive skin, long angular face and sparse swept-back charcoal-grey hair. Exactly two eyes retain ordinary sockets: pale blue right and deep violet left, with contrasting inward recurrence. Long dark claw-nails and nested intact temple/hand folds accompany an opaque midnight-blue robe, lowered hood, brown cord and soft boots. Both hands are empty. No former wizard identity, school or new item is assigned.
+
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/a13ae7a5910160be4ba2c9f91d0e6cf9d60b239c36cf0097870f03f0bd3ac7b5.png)
+
+[Full-body reference](../../assets/characters/4c9ca1a6ad589bc5072496c626eacb367f5bf18a6ce9a8f9f1682b681996d24b.png)
+
+[Multiview reference sheet](../../assets/characters/3c03b061a6a340b2ae7a6e6a71fc47eedcebfa44af03e2db4a5d34b29b4f69aa.png)

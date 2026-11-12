@@ -33,3 +33,15 @@ A failed pilgrim who attempted to cross the Veil, their body now covered in weep
 **Multiattack.** Bite + blinding spittle.
 **Bites.** +2 to hit, 17 (5d6) piercing. If Medium or smaller, grappled (escape DC 10), speed 0, and restrained. At start of each mouther's turn, grappled target takes 17 (5d6) piercing.
 **Blinding Spittle.** Ranged Weapon Attack: range 15/30 ft., one creature. DC 10 DEX save or blinded until end of its next turn.
+
+## Appearance and artwork
+
+An anonymous adult-derived aberration default: one low grey-mauve continuous body, slumped humanoid head/shoulders, two supporting forelimbs and a fused folded lower mass. The primary face retains two grey eyes and a mouth; additional intact-lipped mouths occupy neck, shoulder and body folds, with clear tears and restrained teeth. Recurring violet-green inner arches distort the tissue without wounds. Ochre travelling-cloak remnants cover the shoulders/back. No victim, original world or personal history is assigned.
+
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/2bad39983ee74e2f355cbaf51ea8ed3863c542f8ea7098fc04020f21ae2e509e.png)
+
+[Full-body reference](../../assets/characters/c94121a9234570a4f053e893a88212c2c668847530f86e2d6119490d34661c5c.png)
+
+[Multiview reference sheet](../../assets/characters/9606199178ed82268f6ddace3fc620adee14c8d1e622f13eead44dd43bce4846.png)

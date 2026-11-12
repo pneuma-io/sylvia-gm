@@ -35,3 +35,15 @@ An elf who spent too long in proximity to the Veil, their innate fey sensitivity
 ## Actions
 **Shortsword.** +4 to hit, 5 (1d6 + 2) piercing.
 **Hand Crossbow.** +4 to hit, range 30/120 ft., 5 (1d6 + 2) piercing. DC 13 CON save or poisoned for 1 hour. If failed by 5+, unconscious while poisoned.
+
+## Appearance and artwork
+
+An anonymous mature adult male elf default with dark-brown skin, a long rectangular face, pale lilac eyes, pointed ears and short dense black curls. Nested ear/skin contours carry restrained teal-violet inner depth. A dull chain shirt covers a deep-green tunic with charcoal trousers and worn boots. The right hand holds a lowered shortsword, left hand is empty and the hand crossbow stays at the left hip. No specific elf ancestry, world or personal biography is assigned.
+
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/1c15117ecc37612b5556cdee61fb4e39af409d536ab10517104029e410db54db.png)
+
+[Full-body reference](../../assets/characters/478ef1f9984be386925b8384f6c04fd9a07c0eff28cff9760d21f6fbc7377367.png)
+
+[Multiview reference sheet](../../assets/characters/e6f79cc517745c06619581c921e4b283ce9e40e3da329d207da5cd63ff6f612e.png)
