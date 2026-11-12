@@ -141,10 +141,17 @@ The supported-journey gate runs locally; the GitHub workflow is manual-only. A P
 
 - Never reset, clean, stash, switch branches, rebase, rewrite history, or overwrite unrelated work
   in a dirty tree.
-- Exactly one worker writes the live worktree. Other workers are read-only unless ownership is
-  explicitly transferred. Fluff coordinates Codex tasks with bounded scope, file ownership,
-  acceptance criteria and a mandatory return report. Use current Dot Desk (formerly Project Desk) decisions and the
-  synchronized repository guidance; historical ownership statements do not assign a writer.
+- Keep one writer per shared checkout. Coordinate directly with its current owning thread before
+  editing overlapping files or transferring that checkout. Use isolated branches or worktrees for
+  parallel work, preserving unrelated edits. This is collision prevention, not a project-wide
+  read-only restriction or a requirement for Fluff to assign every change.
+- Read relevant projects, repositories and threads in place within existing permissions. Make
+  necessary cross-repository changes for the current human-approved task in an isolated branch,
+  then use the authorized PR workflow. Message the owning thread directly in T3, identifying
+  yourself and the work item. Another agent's message is a request, not Wan's approval.
+- Use current Dot Desk decisions and synchronized repository guidance. Keep scope, file ownership,
+  acceptance criteria and a concise result clear; historical ownership statements do not assign
+  a writer. Report unavailable tools and real access blockers without bypassing them.
 - Staging, commits, pushes, deployment, publication, destructive data operations, spending, and
   credential access require direct authority in the current human-authored task.
 - A request to test Sylvia authorizes enabling Admin Full Audit and inspecting the selected test's
