@@ -32,3 +32,15 @@ A Rift-touched worg — an intelligent, malevolent wolf whose pack-bond has been
 
 ## Actions
 **Bite.** +5 to hit, 10 (2d6 + 3) piercing. DC 13 STR save or prone.
+
+## Appearance and artwork
+
+A stocky heavy-jawed wolf-like worg with soot-black and dark umber coarse fur, iron-grey cheeks and throat, amber-yellow eyes, two broad ears, four muscular legs and a thick shaggy tail. Connected chevron-like fur folds repeat into smaller ridges over the shoulders and haunches, with muted indigo-green depth. It has one physical head and no equipment or assigned pack identity.
+
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/8d72638e308dab326ad5179408c2c073e453cbab85811e7b80edd1c0f0375e54.png)
+
+[Full-body reference](../../assets/characters/4e5df6df5ff69b66ccfbdd2782c90d6532bf8a6962de434654fb94d307d7f55f.png)
+
+[Multiview reference sheet](../../assets/characters/0bd4d25040a56960725a00a425d6d45d847b9fb830e35f9d57f83484a8c47313.png)

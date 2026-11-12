@@ -36,3 +36,15 @@ A Rift-touched winter wolf whose frost breath carries the absolute cold of the V
 ## Actions
 **Bite.** +6 to hit, 11 (2d6 + 4) piercing. If the target is a creature, DC 14 STR save or prone.
 **Cold Breath.** 15-foot cone, DC 12 DEX, 18 (4d8) cold (half on success). Recharges 5-6.
+
+## Appearance and artwork
+
+A large white and cool-grey arctic wolf with long legs, a broad chest, alert neck, one long head, pale ice-blue eyes, dark nose, two erect ears and a full bushy tail. Nested branching frost-fronds in the ruff and shoulder fur create impossible internal depth with restrained blue-lilac reflections, while retaining one complete living wolf and four paws. No equipment, rider or personal identity is assigned.
+
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/3bfdb35ade4cfd6406d6911705b16d085acfb7ba4e7c9f26afc69f4367df0d78.png)
+
+[Full-body reference](../../assets/characters/ce46cf3a552fb842ef5d5fcd619b40f0c7abdd74d0e4ea839d8f97de0d15990f.png)
+
+[Multiview reference sheet](../../assets/characters/080d6593838f1005fe109a93e90f82f54dc272b2c23f25823e1e48310ee6b947.png)
