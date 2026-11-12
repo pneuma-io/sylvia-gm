@@ -71,13 +71,14 @@ def bind_gm_feedback(runtime):
             parameter.update(default=True, description=somatic_guidance)
         elif parameter.get("name") == "caster_can_touch_target":
             parameter["description"] = (
-                "For a Touch spell on another creature, supply true only when the caster "
+                "For a Touch spell on another creature without engine-derived combat range, "
+                "supply true only when the caster "
                 "can touch that target now; false means it is out of touch reach. "
                 "Self-touch is automatic."
             )
         elif parameter.get("name") == "target_distance":
             parameter["description"] = (
-                "Current distance to the selected target in feet for a distance-range spell. "
+                "Current target distance in feet when not supplied by saved combat geometry. "
                 "Supply the established scene distance; self-targeting is distance zero."
             )
     implemented = sorted(set(definitions["srd_lite_implemented"]))
@@ -169,11 +170,19 @@ def bind_gm_feedback(runtime):
                 else "Select the actual recipient. Self-touch is automatic; touching another "
                 "creature requires caster_can_touch_target=true.",
             )
+        # The existing combat projector owns scalar geometry before staging or
+        # payment. Its qualifier must run before asking a caller for those facts.
+        geometry_exempt = (
+            "combat.encounter_active == true and "
+            "spell in definitions.srd_lite_scalar_geometry_spells"
+        )
+        if "targets" in by_name:
+            geometry_exempt += " and (targets == null or len(targets) == 0)"
         if {"caster_state", "target", "caster_can_touch_target"} <= by_name.keys():
             touch_exempt = (
-                "spell not in definitions.spells or "
+                "spell not in definitions.srd_lite_scalar_geometry_spells or "
                 "definitions.spells[spell].range_kind != 'touch' or target == null or "
-                "_caster_state_id == _target_id"
+                f"_caster_state_id == _target_id or ({geometry_exempt})"
             )
             missing(
                 f"{touch_exempt} or caster_can_touch_target != null",
@@ -190,9 +199,9 @@ def bind_gm_feedback(runtime):
             )
         if {"caster_state", "target", "target_distance"} <= by_name.keys():
             missing(
-                "spell not in definitions.spells or "
+                "spell not in definitions.srd_lite_scalar_geometry_spells or "
                 "definitions.spells[spell].range_kind != 'distance' or target == null or "
-                "_caster_state_id == _target_id or target_distance != null",
+                f"_caster_state_id == _target_id or ({geometry_exempt}) or target_distance != null",
                 "target_distance",
                 "Supply the current distance to the target in feet from established scene facts.",
             )

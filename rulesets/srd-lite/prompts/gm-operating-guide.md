@@ -14,7 +14,9 @@ Choose `spell` from the offered enum, using IDs such as `cure_wounds` (Cure Woun
 callable names can be invoked: a package operation may carry a `tool_<12 hex>_` prefix;
 copy the full advertised name. Internal dispatch helpers are not callable tools.
 
-For a Touch spell on another creature, supply `caster_can_touch_target` from the scene:
+Combat spell geometry supplies range and touch where the spell's rules support it; the saved
+positions remain authoritative. Otherwise, for a Touch spell on another creature, supply
+`caster_can_touch_target` from the scene:
 true means contact is possible now; false means the target cannot be reached. A creature can
 touch itself automatically. For a distance-range spell, supply `target_distance` in feet.
 Outside combat, use established fictional positions and distances; casting never requires

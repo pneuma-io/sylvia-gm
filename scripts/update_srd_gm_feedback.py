@@ -49,6 +49,15 @@ def _replace_entry(text, section, name, value):
     return text[:start] + body + text[end:]
 
 
+def _without_descriptions(schema):
+    """Compare executable input claims separately from model guidance."""
+    if isinstance(schema, dict):
+        return {k: _without_descriptions(v) for k, v in schema.items() if k != "description"}
+    if isinstance(schema, list):
+        return [_without_descriptions(v) for v in schema]
+    return schema
+
+
 def update(version):
     root = Path(__file__).resolve().parents[1]
     package = root / "rulesets/srd-lite"
@@ -57,6 +66,11 @@ def update(version):
     runtime = yaml.load(original, Loader=yaml.CSafeLoader)
     record_path = package / "package-record.json"
     record = json.loads(record_path.read_bytes())
+    expanded_before = resolve_parameter_declarations(runtime)
+    inputs_before = {
+        tool["name"]: _tool_schema(expanded_before["tools"][tool["name"]], tool["input_schema"])
+        for tool in record["tools"]
+    }
     before = {name: json.dumps(tool, sort_keys=True) for name, tool in runtime["tools"].items()}
     before_parameters = json.dumps(runtime["parameter_declarations"], sort_keys=True)
     retired, removed = retire_refusal_stubs(runtime, record)
@@ -89,11 +103,11 @@ def update(version):
 
     expanded = resolve_parameter_declarations(runtime)
     for tool in record["tools"]:
-        if tool["name"] in changed:
-            tool["input_schema"] = _tool_schema(
-                expanded["tools"][tool["name"]],
-                tool["input_schema"],
-            )
+        incoming = _tool_schema(expanded["tools"][tool["name"]], tool["input_schema"])
+        # A precondition or description edit must not recopy unrelated schema
+        # claims from an older runtime declaration.
+        if _without_descriptions(inputs_before[tool["name"]]) != _without_descriptions(incoming):
+            tool["input_schema"] = incoming
         # Refresh shared guidance without recopying unrelated executable schemas.
         for parameter in expanded["tools"][tool["name"]].get("parameters", []):
             if parameter["name"] in {

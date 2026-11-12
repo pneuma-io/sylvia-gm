@@ -51539,7 +51539,7 @@ tools:
       type: number
       minimum: 0
       maximum: 5
-      description: Current distance to the selected target in feet for a distance-range spell. Supply
+      description: Current target distance in feet when not supplied by saved combat geometry. Supply
         the established scene distance; self-targeting is distance zero.
     - param_time_stop_state_ffde41c75687f2dd
     - param_lasting_state_f791c68f01bb49c8
@@ -73711,16 +73711,22 @@ tools:
     - condition: spell not in definitions.srd_lite_recipient_contracts.r11.spells or combat.encounter_active
         != true or not (true) or (targets != null and len(targets) > 0)
       error: Missing input 'targets'. Select the actual recipients for this spell.
-    - condition: spell not in definitions.spells or definitions.spells[spell].range_kind != 'touch' or
-        target == null or _caster_state_id == _target_id or caster_can_touch_target != null
+    - condition: spell not in definitions.srd_lite_scalar_geometry_spells or definitions.spells[spell].range_kind
+        != 'touch' or target == null or _caster_state_id == _target_id or (combat.encounter_active ==
+        true and spell in definitions.srd_lite_scalar_geometry_spells and (targets == null or len(targets)
+        == 0)) or caster_can_touch_target != null
       error: Missing input 'caster_can_touch_target'. Supply true if the caster can touch this other creature
         now; otherwise select a reachable target. Self-touch is automatic.
-    - condition: spell not in definitions.spells or definitions.spells[spell].range_kind != 'touch' or
-        target == null or _caster_state_id == _target_id or caster_can_touch_target != false
+    - condition: spell not in definitions.srd_lite_scalar_geometry_spells or definitions.spells[spell].range_kind
+        != 'touch' or target == null or _caster_state_id == _target_id or (combat.encounter_active ==
+        true and spell in definitions.srd_lite_scalar_geometry_spells and (targets == null or len(targets)
+        == 0)) or caster_can_touch_target != false
       error: 'Input ''caster_can_touch_target'' is false: the selected target is out of touch reach. Select
         a reachable target; do not claim contact.'
-    - condition: spell not in definitions.spells or definitions.spells[spell].range_kind != 'distance'
-        or target == null or _caster_state_id == _target_id or target_distance != null
+    - condition: spell not in definitions.srd_lite_scalar_geometry_spells or definitions.spells[spell].range_kind
+        != 'distance' or target == null or _caster_state_id == _target_id or (combat.encounter_active
+        == true and spell in definitions.srd_lite_scalar_geometry_spells and (targets == null or len(targets)
+        == 0)) or target_distance != null
       error: Missing input 'target_distance'. Supply the current distance to the target in feet from established
         scene facts.
     - condition: spell in definitions.srd_lite_catalogue or spell in definitions.srd_lite_aliases
@@ -74749,8 +74755,9 @@ tools:
       type: boolean
       required: false
       default: null
-      description: For a Touch spell on another creature, supply true only when the caster can touch that
-        target now; false means it is out of touch reach. Self-touch is automatic.
+      description: For a Touch spell on another creature without engine-derived combat range, supply true
+        only when the caster can touch that target now; false means it is out of touch reach. Self-touch
+        is automatic.
     - param_advantage_7420eb3f5bdf3b75
     - param_disadvantage_7044b43c2412113b
     - param_target_can_see_caster_06e8ed4b1ecb533f
@@ -97838,16 +97845,22 @@ tools:
     - condition: spell not in definitions.srd_lite_recipient_contracts.r11.spells or combat.encounter_active
         != true or not (true) or (targets != null and len(targets) > 0)
       error: Missing input 'targets'. Select the actual recipients for this spell.
-    - condition: spell not in definitions.spells or definitions.spells[spell].range_kind != 'touch' or
-        target == null or _caster_state_id == _target_id or caster_can_touch_target != null
+    - condition: spell not in definitions.srd_lite_scalar_geometry_spells or definitions.spells[spell].range_kind
+        != 'touch' or target == null or _caster_state_id == _target_id or (combat.encounter_active ==
+        true and spell in definitions.srd_lite_scalar_geometry_spells and (targets == null or len(targets)
+        == 0)) or caster_can_touch_target != null
       error: Missing input 'caster_can_touch_target'. Supply true if the caster can touch this other creature
         now; otherwise select a reachable target. Self-touch is automatic.
-    - condition: spell not in definitions.spells or definitions.spells[spell].range_kind != 'touch' or
-        target == null or _caster_state_id == _target_id or caster_can_touch_target != false
+    - condition: spell not in definitions.srd_lite_scalar_geometry_spells or definitions.spells[spell].range_kind
+        != 'touch' or target == null or _caster_state_id == _target_id or (combat.encounter_active ==
+        true and spell in definitions.srd_lite_scalar_geometry_spells and (targets == null or len(targets)
+        == 0)) or caster_can_touch_target != false
       error: 'Input ''caster_can_touch_target'' is false: the selected target is out of touch reach. Select
         a reachable target; do not claim contact.'
-    - condition: spell not in definitions.spells or definitions.spells[spell].range_kind != 'distance'
-        or target == null or _caster_state_id == _target_id or target_distance != null
+    - condition: spell not in definitions.srd_lite_scalar_geometry_spells or definitions.spells[spell].range_kind
+        != 'distance' or target == null or _caster_state_id == _target_id or (combat.encounter_active
+        == true and spell in definitions.srd_lite_scalar_geometry_spells and (targets == null or len(targets)
+        == 0)) or target_distance != null
       error: Missing input 'target_distance'. Supply the current distance to the target in feet from established
         scene facts.
     - condition: spell in definitions.srd_lite_catalogue or spell in definitions.srd_lite_aliases
@@ -102392,8 +102405,9 @@ tools:
       type: boolean
       required: false
       default: null
-      description: For a Touch spell on another creature, supply true only when the caster can touch that
-        target now; false means it is out of touch reach. Self-touch is automatic.
+      description: For a Touch spell on another creature without engine-derived combat range, supply true
+        only when the caster can touch that target now; false means it is out of touch reach. Self-touch
+        is automatic.
     - param_advantage_7420eb3f5bdf3b75
     - param_disadvantage_7044b43c2412113b
     - param_target_can_see_caster_06e8ed4b1ecb533f
@@ -104281,16 +104295,22 @@ tools:
     - condition: spell not in definitions.srd_lite_recipient_contracts.r11.spells or combat.encounter_active
         != true or not (true) or (targets != null and len(targets) > 0)
       error: Missing input 'targets'. Select the actual recipients for this spell.
-    - condition: spell not in definitions.spells or definitions.spells[spell].range_kind != 'touch' or
-        target == null or _caster_state_id == _target_id or caster_can_touch_target != null
+    - condition: spell not in definitions.srd_lite_scalar_geometry_spells or definitions.spells[spell].range_kind
+        != 'touch' or target == null or _caster_state_id == _target_id or (combat.encounter_active ==
+        true and spell in definitions.srd_lite_scalar_geometry_spells and (targets == null or len(targets)
+        == 0)) or caster_can_touch_target != null
       error: Missing input 'caster_can_touch_target'. Supply true if the caster can touch this other creature
         now; otherwise select a reachable target. Self-touch is automatic.
-    - condition: spell not in definitions.spells or definitions.spells[spell].range_kind != 'touch' or
-        target == null or _caster_state_id == _target_id or caster_can_touch_target != false
+    - condition: spell not in definitions.srd_lite_scalar_geometry_spells or definitions.spells[spell].range_kind
+        != 'touch' or target == null or _caster_state_id == _target_id or (combat.encounter_active ==
+        true and spell in definitions.srd_lite_scalar_geometry_spells and (targets == null or len(targets)
+        == 0)) or caster_can_touch_target != false
       error: 'Input ''caster_can_touch_target'' is false: the selected target is out of touch reach. Select
         a reachable target; do not claim contact.'
-    - condition: spell not in definitions.spells or definitions.spells[spell].range_kind != 'distance'
-        or target == null or _caster_state_id == _target_id or target_distance != null
+    - condition: spell not in definitions.srd_lite_scalar_geometry_spells or definitions.spells[spell].range_kind
+        != 'distance' or target == null or _caster_state_id == _target_id or (combat.encounter_active
+        == true and spell in definitions.srd_lite_scalar_geometry_spells and (targets == null or len(targets)
+        == 0)) or target_distance != null
       error: Missing input 'target_distance'. Supply the current distance to the target in feet from established
         scene facts.
     - condition: spell in definitions.srd_lite_catalogue or spell in definitions.srd_lite_aliases
@@ -104472,8 +104492,9 @@ tools:
       type: boolean
       required: false
       default: null
-      description: For a Touch spell on another creature, supply true only when the caster can touch that
-        target now; false means it is out of touch reach. Self-touch is automatic.
+      description: For a Touch spell on another creature without engine-derived combat range, supply true
+        only when the caster can touch that target now; false means it is out of touch reach. Self-touch
+        is automatic.
     - param_advantage_7420eb3f5bdf3b75
     - param_disadvantage_7044b43c2412113b
     - param_target_can_see_caster_06e8ed4b1ecb533f
@@ -124457,7 +124478,7 @@ tools:
       type: number
       required: false
       default: 0
-      description: Current distance to the selected target in feet for a distance-range spell. Supply
+      description: Current target distance in feet when not supplied by saved combat geometry. Supply
         the established scene distance; self-targeting is distance zero.
     - name: targets_max_distance
       type: number
@@ -292632,16 +292653,22 @@ tools:
     - condition: spell not in definitions.srd_lite_recipient_contracts.r11.spells or combat.encounter_active
         != true or not (true) or (targets != null and len(targets) > 0)
       error: Missing input 'targets'. Select the actual recipients for this spell.
-    - condition: spell not in definitions.spells or definitions.spells[spell].range_kind != 'touch' or
-        target == null or _caster_state_id == _target_id or caster_can_touch_target != null
+    - condition: spell not in definitions.srd_lite_scalar_geometry_spells or definitions.spells[spell].range_kind
+        != 'touch' or target == null or _caster_state_id == _target_id or (combat.encounter_active ==
+        true and spell in definitions.srd_lite_scalar_geometry_spells and (targets == null or len(targets)
+        == 0)) or caster_can_touch_target != null
       error: Missing input 'caster_can_touch_target'. Supply true if the caster can touch this other creature
         now; otherwise select a reachable target. Self-touch is automatic.
-    - condition: spell not in definitions.spells or definitions.spells[spell].range_kind != 'touch' or
-        target == null or _caster_state_id == _target_id or caster_can_touch_target != false
+    - condition: spell not in definitions.srd_lite_scalar_geometry_spells or definitions.spells[spell].range_kind
+        != 'touch' or target == null or _caster_state_id == _target_id or (combat.encounter_active ==
+        true and spell in definitions.srd_lite_scalar_geometry_spells and (targets == null or len(targets)
+        == 0)) or caster_can_touch_target != false
       error: 'Input ''caster_can_touch_target'' is false: the selected target is out of touch reach. Select
         a reachable target; do not claim contact.'
-    - condition: spell not in definitions.spells or definitions.spells[spell].range_kind != 'distance'
-        or target == null or _caster_state_id == _target_id or target_distance != null
+    - condition: spell not in definitions.srd_lite_scalar_geometry_spells or definitions.spells[spell].range_kind
+        != 'distance' or target == null or _caster_state_id == _target_id or (combat.encounter_active
+        == true and spell in definitions.srd_lite_scalar_geometry_spells and (targets == null or len(targets)
+        == 0)) or target_distance != null
       error: Missing input 'target_distance'. Supply the current distance to the target in feet from established
         scene facts.
     - condition: spell in definitions.srd_lite_catalogue or spell in definitions.srd_lite_aliases
@@ -297600,8 +297627,9 @@ tools:
       type: boolean
       required: false
       default: null
-      description: For a Touch spell on another creature, supply true only when the caster can touch that
-        target now; false means it is out of touch reach. Self-touch is automatic.
+      description: For a Touch spell on another creature without engine-derived combat range, supply true
+        only when the caster can touch that target now; false means it is out of touch reach. Self-touch
+        is automatic.
     - param_advantage_7420eb3f5bdf3b75
     - param_disadvantage_7044b43c2412113b
     - param_target_can_see_caster_06e8ed4b1ecb533f
@@ -301832,7 +301860,7 @@ tools:
       type: number
       required: false
       minimum: 0
-      description: Current distance to the selected target in feet for a distance-range spell. Supply
+      description: Current target distance in feet when not supplied by saved combat geometry. Supply
         the established scene distance; self-targeting is distance zero.
     - name: caster_can_see_target
       type: boolean
@@ -356962,7 +356990,7 @@ tools:
       type: integer
       minimum: 0
       maximum: 1000
-      description: Current distance to the selected target in feet for a distance-range spell. Supply
+      description: Current target distance in feet when not supplied by saved combat geometry. Supply
         the established scene distance; self-targeting is distance zero.
     - param_caster_can_see_target_1f2cfcd0b546bac1
     - param_advantage_1bc980e86d23955c
@@ -368716,8 +368744,9 @@ parameter_declarations:
     type: boolean
     required: false
     default: false
-    description: For a Touch spell on another creature, supply true only when the caster can touch that
-      target now; false means it is out of touch reach. Self-touch is automatic.
+    description: For a Touch spell on another creature without engine-derived combat range, supply true
+      only when the caster can touch that target now; false means it is out of touch reach. Self-touch
+      is automatic.
   param_choking_b993450c869d8f6d:
     name: choking
     type: boolean
@@ -372103,7 +372132,7 @@ parameter_declarations:
     type: number
     minimum: 0
     maximum: 1000
-    description: Current distance to the selected target in feet for a distance-range spell. Supply the
+    description: Current target distance in feet when not supplied by saved combat geometry. Supply the
       established scene distance; self-targeting is distance zero.
   param_targets_max_distance_c204b04d4bd36cf7:
     name: targets_max_distance
@@ -372530,13 +372559,13 @@ parameter_declarations:
     type: number
     minimum: 0
     required: false
-    description: Current distance to the selected target in feet for a distance-range spell. Supply the
+    description: Current target distance in feet when not supplied by saved combat geometry. Supply the
       established scene distance; self-targeting is distance zero.
   param_target_distance_d4930880ea0adbad:
     name: target_distance
     type: number
     minimum: 0
-    description: Current distance to the selected target in feet for a distance-range spell. Supply the
+    description: Current target distance in feet when not supplied by saved combat geometry. Supply the
       established scene distance; self-targeting is distance zero.
   param_target_number_2de61081399c3134:
     name: target_number
@@ -372915,8 +372944,9 @@ parameter_declarations:
   param_caster_can_touch_target_89df77ed264867d1:
     name: caster_can_touch_target
     type: boolean
-    description: For a Touch spell on another creature, supply true only when the caster can touch that
-      target now; false means it is out of touch reach. Self-touch is automatic.
+    description: For a Touch spell on another creature without engine-derived combat range, supply true
+      only when the caster can touch that target now; false means it is out of touch reach. Self-touch
+      is automatic.
   param_caster_id_4f503644c31d7b6e:
     name: caster_id
   param_caster_state_4b5c896405a7fd31:
@@ -373537,12 +373567,12 @@ parameter_declarations:
     name: target_distance
     type: number
     required: false
-    description: Current distance to the selected target in feet for a distance-range spell. Supply the
+    description: Current target distance in feet when not supplied by saved combat geometry. Supply the
       established scene distance; self-targeting is distance zero.
   param_target_distance_5548d2cb11121e1f:
     name: target_distance
     type: number
-    description: Current distance to the selected target in feet for a distance-range spell. Supply the
+    description: Current target distance in feet when not supplied by saved combat geometry. Supply the
       established scene distance; self-targeting is distance zero.
   param_target_id_2f903d791e4b6766:
     name: target_id

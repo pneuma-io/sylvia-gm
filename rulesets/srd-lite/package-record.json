@@ -35,7 +35,7 @@
   },
   "content_declarations": "content/content-declarations.json",
   "content_kind": "ruleset",
-  "content_sha256": "0ae933c310ff83017b581e251aeed04f4887082967f3b65869da57f4d0ad9a53",
+  "content_sha256": "6076e4b10909f7a773b699b7ed264dd09ebc0416b5b1d51310a43c08a2a946b9",
   "dependencies": [
     {
       "content_sha256": "ad3da5b65b26ed1fb5076ef30ffd764713bc52deadfe5d5ae6e83b8078651461",
@@ -192,9 +192,9 @@
       "sha256": "2f1c5c4d878c2de79cb3157351d3697dc2fa73140ea9afbc6fedc2de914e38fe"
     },
     {
-      "bytes": 25786,
+      "bytes": 25922,
       "path": "prompts/gm-operating-guide.md",
-      "sha256": "134aa2f527102b352bf279491b8bc379bc14f49d86c670bd0d5793736f449719"
+      "sha256": "8d6de3c0e5c6c7a85a7a9f5f8b0ef95e0323f5be77eb188306c2b84c115bb4ba"
     },
     {
       "bytes": 753326,
@@ -212,9 +212,9 @@
       "sha256": "e99cb13cdf36dca41c67b9041bf91a536c8b49c730bb27a8909eb4385a8908e3"
     },
     {
-      "bytes": 14466422,
+      "bytes": 14468818,
       "path": "runtime/ruleset.yaml",
-      "sha256": "e25a5195c2d5dbc2298a0b79ed63fafa4ad7cd1de37a5bff0f2fb6320d72cb1c"
+      "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127"
     },
     {
       "bytes": 59661,
@@ -16991,7 +16991,7 @@
             "type": "boolean"
           },
           "caster_can_touch_target": {
-            "description": "For a Touch spell on another creature, supply true only when the caster can touch that target now; false means it is out of touch reach. Self-touch is automatic.",
+            "description": "For a Touch spell on another creature without engine-derived combat range, supply true only when the caster can touch that target now; false means it is out of touch reach. Self-touch is automatic.",
             "type": "boolean"
           },
           "caster_state": {
@@ -19816,7 +19816,7 @@
             "x-sylvia-gm-reference": "participant"
           },
           "target_distance": {
-            "description": "Current distance to the selected target in feet for a distance-range spell. Supply the established scene distance; self-targeting is distance zero.",
+            "description": "Current target distance in feet when not supplied by saved combat geometry. Supply the established scene distance; self-targeting is distance zero.",
             "minimum": 0,
             "type": "number"
           },
@@ -21632,7 +21632,7 @@
             "type": "boolean"
           },
           "caster_can_touch_target": {
-            "description": "For a Touch spell on another creature, supply true only when the caster can touch that target now; false means it is out of touch reach. Self-touch is automatic.",
+            "description": "For a Touch spell on another creature without engine-derived combat range, supply true only when the caster can touch that target now; false means it is out of touch reach. Self-touch is automatic.",
             "type": "boolean"
           },
           "caster_state": {
@@ -24545,7 +24545,7 @@
             "x-sylvia-gm-reference": "participant"
           },
           "target_distance": {
-            "description": "Current distance to the selected target in feet for a distance-range spell. Supply the established scene distance; self-targeting is distance zero.",
+            "description": "Current target distance in feet when not supplied by saved combat geometry. Supply the established scene distance; self-targeting is distance zero.",
             "minimum": 0,
             "type": "number"
           },
@@ -25886,7 +25886,7 @@
             "type": "boolean"
           },
           "caster_can_touch_target": {
-            "description": "For a Touch spell on another creature, supply true only when the caster can touch that target now; false means it is out of touch reach. Self-touch is automatic.",
+            "description": "For a Touch spell on another creature without engine-derived combat range, supply true only when the caster can touch that target now; false means it is out of touch reach. Self-touch is automatic.",
             "type": "boolean"
           },
           "caster_state": {
@@ -28679,7 +28679,7 @@
             "x-sylvia-gm-reference": "participant"
           },
           "target_distance": {
-            "description": "Current distance to the selected target in feet for a distance-range spell. Supply the established scene distance; self-targeting is distance zero.",
+            "description": "Current target distance in feet when not supplied by saved combat geometry. Supply the established scene distance; self-targeting is distance zero.",
             "minimum": 0,
             "type": "number"
           },
@@ -29565,7 +29565,7 @@
             "type": "boolean"
           },
           "caster_can_touch_target": {
-            "description": "For a Touch spell on another creature, supply true only when the caster can touch that target now; false means it is out of touch reach. Self-touch is automatic.",
+            "description": "For a Touch spell on another creature without engine-derived combat range, supply true only when the caster can touch that target now; false means it is out of touch reach. Self-touch is automatic.",
             "type": "boolean"
           },
           "caster_state": {
@@ -32485,7 +32485,7 @@
             "x-sylvia-gm-reference": "participant"
           },
           "target_distance": {
-            "description": "Current distance to the selected target in feet for a distance-range spell. Supply the established scene distance; self-targeting is distance zero.",
+            "description": "Current target distance in feet when not supplied by saved combat geometry. Supply the established scene distance; self-targeting is distance zero.",
             "minimum": 0,
             "type": "number"
           },
@@ -33355,7 +33355,7 @@
             "type": "boolean"
           },
           "caster_can_touch_target": {
-            "description": "For a Touch spell on another creature, supply true only when the caster can touch that target now; false means it is out of touch reach. Self-touch is automatic.",
+            "description": "For a Touch spell on another creature without engine-derived combat range, supply true only when the caster can touch that target now; false means it is out of touch reach. Self-touch is automatic.",
             "type": "boolean"
           },
           "caster_state": {
@@ -36180,7 +36180,7 @@
             "x-sylvia-gm-reference": "participant"
           },
           "target_distance": {
-            "description": "Current distance to the selected target in feet for a distance-range spell. Supply the established scene distance; self-targeting is distance zero.",
+            "description": "Current target distance in feet when not supplied by saved combat geometry. Supply the established scene distance; self-targeting is distance zero.",
             "minimum": 0,
             "type": "number"
           },
@@ -36991,7 +36991,7 @@
             "type": "boolean"
           },
           "target_distance": {
-            "description": "Current distance to the selected target in feet for a distance-range spell. Supply the established scene distance; self-targeting is distance zero.",
+            "description": "Current target distance in feet when not supplied by saved combat geometry. Supply the established scene distance; self-targeting is distance zero.",
             "minimum": 0,
             "type": "number"
           }
@@ -38632,7 +38632,7 @@
             "x-sylvia-gm-reference": "entity"
           },
           "target_distance": {
-            "description": "Current distance to the selected target in feet for a distance-range spell. Supply the established scene distance; self-targeting is distance zero.",
+            "description": "Current target distance in feet when not supplied by saved combat geometry. Supply the established scene distance; self-targeting is distance zero.",
             "maximum": 5,
             "minimum": 0,
             "type": "number"
@@ -45587,7 +45587,7 @@
             "x-sylvia-gm-reference": "entity"
           },
           "target_distance": {
-            "description": "Current distance to the selected target in feet for a distance-range spell. Supply the established scene distance; self-targeting is distance zero.",
+            "description": "Current target distance in feet when not supplied by saved combat geometry. Supply the established scene distance; self-targeting is distance zero.",
             "minimum": 0,
             "type": "number"
           },

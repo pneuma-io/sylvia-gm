@@ -1095,6 +1095,67 @@ def test_schema_minimal_provider_only_tools_have_explanatory_feedback(lite_save,
         assert after.state == before.state and after.revision == before.revision
 
 
+@pytest.mark.parametrize("spell", ("cure_wounds", "healing_word"))
+@pytest.mark.parametrize("near", (True, False))
+def test_staged_combat_range_is_owned_by_saved_geometry(tmp_path, monkeypatch, spell, near):
+    archive = tmp_path / "current.sylvia-gm-package"
+    archive.write_bytes(bundled_srd_archive())
+    monkeypatch.setenv("SRD_LITE_CANDIDATE", str(archive))
+    from tests import test_srd_lite_foundation as support
+
+    monkeypatch.setattr(support, "ARCHIVE", archive)
+    positions = (
+        None
+        if near
+        else {
+            "hero": [0, 0, 0],
+            "guard": [80, 0, 0],
+            "other": [10, 0, 0],
+            "extra": [15, 0, 0],
+        }
+    )
+    case = support.Case(
+        tmp_path / "geometry.sqlite3",
+        spell,
+        casting_source="cleric",
+        positions=positions,
+    )
+    try:
+        case.start()
+        parameters = {
+            k: v
+            for k, v in case.parameters.items()
+            if k not in {"caster_can_touch_target", "target_distance"}
+        }
+        if not near:
+            case.reject("begin_srd_spell_action", parameters, match="actual combat recipient")
+            return
+        result = case.execute(case.command("begin_srd_spell_action", parameters))
+        assert result.status.value == "committed", result.result
+        assert result.result["context"]["_pending_action_id"]
+        assert case.entities()["hero"]["resources"][parameters["slot_resource"]] == 3
+    finally:
+        case.close()
+
+
+def test_group_recipient_cast_does_not_require_unused_scalar_range(tmp_path, monkeypatch):
+    archive = tmp_path / "current.sylvia-gm-package"
+    archive.write_bytes(bundled_srd_archive())
+    monkeypatch.setenv("SRD_LITE_CANDIDATE", str(archive))
+    from tests import test_srd_lite_foundation as support
+
+    monkeypatch.setattr(support, "ARCHIVE", archive)
+    case = support.Case(tmp_path / "group-range.sqlite3", "bless", casting_source="cleric")
+    try:
+        parameters = {k: v for k, v in case.parameters.items() if k != "target_distance"}
+        parameters["targets"] = ["guard"]
+        receipt = case.execute(case.command("cast_spell_outside_combat", parameters))
+        assert receipt.status.value == "committed", receipt.result
+        assert case.entities()["hero"]["resources"][parameters["slot_resource"]] == 2
+    finally:
+        case.close()
+
+
 def play(owner, provider, *, campaign="memory", session="gm", turn="turn", user_text="I wait."):
     adapter = ProviderSessionAdapter(owner, provider, owner_id="hotfix-owner")
     result = CampaignSessionLoop(owner).run(
