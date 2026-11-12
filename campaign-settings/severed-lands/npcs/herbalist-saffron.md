@@ -18,12 +18,12 @@ Saffron is tired, compassionate, and quietly furious at the system she works wit
 
 ## Appearance and artwork
 
-An adult Human woman in her late forties with medium brown skin, dark brown eyes, a narrow softly lined face and straight black hair with gray strands, center-parted and tied in a long practical braid. A muted forest-green wrap tunic, beige linen work apron, plain brown belt, long dark skirt and comfortable dark leather shoes. A small plain linen medical shoulder bag and a tied bundle of dried herbs held at waist level. Steady posture, tired compassionate expression and clear attentive eyes.
+A lean mature Human woman with warm golden-brown skin, an oval high-cheekboned face, tired dark amber eyes and close dark braids gathered in a compact high bun. Cream sleeveless wrap-coat over a moss-grey high-neck tunic, muted ochre trousers, pale ankle wraps and closed brown shoes. Olive supply satchel at the left hip holds rolled bandage; the right hand carries a small tied bundle of dried herbs. Quiet attentive bearing and steady hands. Her settled origin, compassion and authored clinic work remain authoritative without added magical effects.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/16ece7ec04a00e334dc76e0b918f70c7c58eadf70a0ddbb3d93f37202372acdc.png)
+[Portrait](../assets/characters/26d54f8ab0872c2c2bf30bf5abecb64164942a1ac2ec457bd4e947ddd56e630c.png)
 
-[Full-body reference](../assets/characters/6da6cdf2cf2355e9d6959afc86b1e0fca1721fc3d15308c07a45365746662dbb.png)
+[Full-body reference](../assets/characters/d6202b6f88dde33ae05b41f91fd8e08fc99cb491c9f8b14ef6a9b392430f66fc.png)
 
-[Multiview reference sheet](../assets/characters/bf04707534d379f1c446acb8667127e1af67b29d661ec4634b9a4b6cedc9cfc4.png)
+[Multiview reference sheet](../assets/characters/ebab3d3e238a19d56d813c59db493f6843182d32d9a10e933d6968eb822ed30d.png)

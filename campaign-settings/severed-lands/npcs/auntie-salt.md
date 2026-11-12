@@ -20,12 +20,12 @@ Salt is cheerful, grandmotherly, and utterly amoral about the information trade.
 
 ## Appearance and artwork
 
-A short stocky older Human woman in her seventies with warm brown skin, pale gray eyes, a softly lined broad face and white hair pinned into a tidy bun. Layers of practical burgundy clothing, a worn deep teal shawl, plain brown skirt, comfortable leather shoes, a small waist pouch and simple brass earrings. Carries one plain ceramic tea cup and saucer. A cheerful grandmotherly smile and sharp observant eyes.
+A short stout elderly Human woman with cool light olive skin, a broad rounded face, selected soft age lines, pale green eyes and silver-grey curls in a low bun. A warm knowing smile. Auburn-brown wrap dress, muted lavender shawl, dark closed button shoes, copper stud earrings and a closed purse at the left waist. She carries a plain cream cup and saucer with both hands. The tea's safety and the full extent of her information network remain unresolved.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/8ec8f4f5ebd8140ed832ef5eea3023e91000f681d9c2dbd2cd14c71a0c9c0afd.png)
+[Portrait](../assets/characters/f0b2d699cb53c40df749f67ad09c12d7c657cba6acc818b84cd1defc876171b6.png)
 
-[Full-body reference](../assets/characters/3efc36fe371eba004a90ce7361bf33ad55969ee0c3079a6d22fc392107091229.png)
+[Full-body reference](../assets/characters/1d7408f4571b8982d4d9089b7bc16fde80ca1a8bec8861596b191fc71e56040a.png)
 
-[Multiview reference sheet](../assets/characters/176fdec3768ac7aa0c1cdb76c2fdb6758e832ea304f1cdd01ed57e6823fc7cfe.png)
+[Multiview reference sheet](../assets/characters/22ce57eedeb3c007ef5e5094bdf025a56dd971082b1e893533e01350215b387f.png)

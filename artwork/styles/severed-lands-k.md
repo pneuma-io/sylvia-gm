@@ -141,6 +141,23 @@ These are prepared editable defaults available for review, without individual ow
 | Lorn | [Body](../assets/characters/f055059b5eb451b5ceb68b5ba7e50c18a7c49dfab896bcc32022a3a3a5b62cfc.png) | [Sheet](../assets/characters/7243c142bbc7280e0553c1814b83ee350b0786b75520af3907b32d74f09d5666.png) | [Portrait](../assets/characters/838cfdd0b712e0a60d1d58a778d67e99eb52a6420668e3d61c34aacea3d76da1.png) |
 | Tessa | [Body](../assets/characters/5d5c4c677488469ecd9495641b56692bf41a20de4b9c601cd417fdeaaae41308.png) | [Sheet](../assets/characters/1ee1c992f1c53e3ac6f48fd8c8327b9d4ef584cd696017605f506be582c848aa.png) | [Portrait](../assets/characters/df7b2aa9e566fb87f56cfb6086f503496ffaf4d2c6d9b30ce6ef7c4639ce0fbc.png) |
 
+### Prepared Warrens and Crossroads references
+
+Auntie Salt, Fume, Saffron and each Lace sibling have separate complete bundles. The siblings
+share one authored source file; keep the exact subject name with each source binding so Thread,
+Hook and Needle retain their own faces, builds and equipment. Their home world, chosen names and
+unidentified artifact remain unexplained. Fume's closed stock containers are narrative detail,
+with no usable consumable effects in Lite. These are prepared defaults available for review.
+
+| Character | Full body | Multiview | Portrait |
+|---|---|---|---|
+| Auntie Salt | [Body](../assets/characters/1d7408f4571b8982d4d9089b7bc16fde80ca1a8bec8861596b191fc71e56040a.png) | [Sheet](../assets/characters/22ce57eedeb3c007ef5e5094bdf025a56dd971082b1e893533e01350215b387f.png) | [Portrait](../assets/characters/f0b2d699cb53c40df749f67ad09c12d7c657cba6acc818b84cd1defc876171b6.png) |
+| Fume | [Body](../assets/characters/7adeb5f56df011aeb039618aeda55d65fa85cb2b618decb5688dbfa97d01b9ba.png) | [Sheet](../assets/characters/379d30d12ff9957efc70d0c415f51a5fa390256f36e78c51e109579632cd3824.png) | [Portrait](../assets/characters/3da1dcb3d3658b7293de1f0b5a801f4e94722fb516dfe00b7baca7587a5c11ea.png) |
+| Saffron | [Body](../assets/characters/d6202b6f88dde33ae05b41f91fd8e08fc99cb491c9f8b14ef6a9b392430f66fc.png) | [Sheet](../assets/characters/ebab3d3e238a19d56d813c59db493f6843182d32d9a10e933d6968eb822ed30d.png) | [Portrait](../assets/characters/26d54f8ab0872c2c2bf30bf5abecb64164942a1ac2ec457bd4e947ddd56e630c.png) |
+| Thread | [Body](../assets/characters/f3c1cde7c6bc3856fa81d7471c24a443102598026bece1341f748ca45583de9c.png) | [Sheet](../assets/characters/4743e24b3b368db2ee2ecd28f03230c755845148c3eb8eeb7bb5c3f958a0838a.png) | [Portrait](../assets/characters/8efa238611a77a74648e616434cfaf26c099c83953a98edd832cfb9321d4d16b.png) |
+| Hook | [Body](../assets/characters/a01102d62072bc88e9fd159cc383ab8ada20e31ff4ee3a02ba94ca52ed08cafa.png) | [Sheet](../assets/characters/a4479f93e91030ab4c7bd6cdc6123a3e9c304e324200fb78548dfecacc21d3f8.png) | [Portrait](../assets/characters/61688566029273fdfbac865ba4526aa789d47a4b92eb43a6c8d284c635ed7c47.png) |
+| Needle | [Body](../assets/characters/04c787dcd52be42131889df90e0c8f3ed7a79d60fba234458ff9192940420330.png) | [Sheet](../assets/characters/44ead24cdc5f19081c241c9ed62b97bc012d1560261f796d0fb9e3cbe3471a6d.png) | [Portrait](../assets/characters/3d871b12ab8b0b194a7a92b4f3542a186a79defb8deea9f708150eb7b354d951.png) |
+
 ### Prepared Rift creature references
 
 These six fresh creature bundles extend the current rendering direction from authored-only facts.

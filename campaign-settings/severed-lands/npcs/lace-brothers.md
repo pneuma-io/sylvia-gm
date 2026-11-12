@@ -28,30 +28,30 @@ These separate prepared appearances are editable visual defaults. The authored s
 
 ### Thread
 
-A young adult humanlike Riftborn man in his mid-twenties, medium warm brown skin, lean build, dark hazel eyes, a broad brow and narrow chin, soft black curls swept neatly back, clean-shaven. A warm, practiced charming smile and relaxed open posture. Worn but carefully kept muted-plum knee-length coat, oatmeal shirt, charcoal trousers, soft brown ankle boots and a plain belt. Empty hands, no weapon displayed. He shares a subtle family resemblance with his two brothers, who remain separate people. No revealed home world, unusual anatomy, faction symbols or invented rank.
+A slender young Riftborn adult of male-presenting appearance with warm copper-olive skin, narrow refined face, straight nose, grey eyes and glossy black shoulder-length hair swept to one side. Clean-shaven with an easy charming smile. Plum merchant vest, cream shirt, warm grey short-tail coat, short burgundy neck cloth, charcoal trousers and polished brown boots. A plain coin purse rests at the right hip; hands are empty and open. Thread remains the negotiator, distinct from his siblings, with no revealed home-world ancestry or explanation for his chosen name.
 
-[Portrait](../assets/characters/e51b745e0fac50f6bd9da4ea5a68373ed4415ed58b3a6578d6d9d91b8e44abd8.png)
+[Portrait](../assets/characters/8efa238611a77a74648e616434cfaf26c099c83953a98edd832cfb9321d4d16b.png)
 
-[Full-body reference](../assets/characters/336f25ce6b740eb1f481e2f46e5a2ec9da73e06dfc1784c75d1c6fb4101f8926.png)
+[Full-body reference](../assets/characters/f3c1cde7c6bc3856fa81d7471c24a443102598026bece1341f748ca45583de9c.png)
 
-[Multiview reference sheet](../assets/characters/e7458bcf94306776c42f827657fa55e92cb2480cc77bc13492018ddf32337398.png)
+[Multiview reference sheet](../assets/characters/4743e24b3b368db2ee2ecd28f03230c755845148c3eb8eeb7bb5c3f958a0838a.png)
 
 ### Hook
 
-A young adult humanlike Riftborn man in his late twenties, medium warm brown skin, compact sturdy athletic build, dark hazel eyes, a broad brow and narrow chin, close-cropped black hair and short rough black stubble. Quiet watchful expression and still balanced posture. Weathered dark charcoal short coat, moss-gray shirt, dark brown work trousers, practical black boots and a simple sheathed short knife at the belt. Empty hands kept close to the belt. He shares a subtle family resemblance with his two brothers, who remain separate people. No literal hook hand, revealed home world, unusual anatomy, faction symbols or invented rank.
+A broad-shouldered athletic young Riftborn adult of male-presenting appearance with warm copper-olive skin, square jaw, straight nose, thick brows, grey eyes and short brushed-back black hair. Quiet watchful expression. Charcoal padded jacket with leather shoulder reinforcement and a plum inner collar, brown belts, slate trousers, dark boots and plain leather gloves. Short sword sheathed at the left hip and a closed pouch at the right. Both hands are intact. Hook remains the enforcer; his name and home world remain unexplained.
 
-[Portrait](../assets/characters/b04507d6e0f0acca127826a8aa918b0f99372a66ec70e7b3d9cc61ba9186dd9c.png)
+[Portrait](../assets/characters/61688566029273fdfbac865ba4526aa789d47a4b92eb43a6c8d284c635ed7c47.png)
 
-[Full-body reference](../assets/characters/3fc80d77a433618dc4a336d620615c5d21271de8e53c76378225f7ebeb1dbac7.png)
+[Full-body reference](../assets/characters/a01102d62072bc88e9fd159cc383ab8ada20e31ff4ee3a02ba94ca52ed08cafa.png)
 
-[Multiview reference sheet](../assets/characters/b4ac12399f1132bf5b79a2e03360f109115c622ff2f4d59d0d0b542d5a3ef377.png)
+[Multiview reference sheet](../assets/characters/a4479f93e91030ab4c7bd6cdc6123a3e9c304e324200fb78548dfecacc21d3f8.png)
 
 ### Needle
 
-A young adult humanlike Riftborn man in his early twenties, medium warm brown skin, slim slightly tall build, dark hazel eyes, a broad brow and narrow chin, straight black hair tied in one short neat braid at the nape, clean-shaven. Focused observant expression and an upright attentive posture. Faded slate-blue waistcoat over an oatmeal shirt with rolled sleeves, charcoal trousers, simple brown lace-up shoes, a plain belt with a small document pouch. Holds a modest closed worn brown ledger at his side; no readable writing or weapon displayed. He shares a subtle family resemblance with his two brothers, who remain separate people. No revealed home world, unusual anatomy, faction symbols or invented rank.
+A lean wiry young Riftborn adult of male-presenting appearance with warm copper-olive skin, an elongated angular face, straight nose, grey eyes and centre-parted straight black hair in a small low nape knot. Focused calculating expression. Petrol-blue sleeveless merchant coat with restrained plum facing, taupe high-collared shirt, stone-grey trousers and plain dark boots. Closed inventory ledger under the left arm, charcoal stylus in the right hand and closed supply pouch at the right hip. Needle remains the logistics sibling, without a literalized name or revealed home world.
 
-[Portrait](../assets/characters/b79eb2d7513460191cd80f469534877caef81c21e324d453582017c4a9c260b3.png)
+[Portrait](../assets/characters/3d871b12ab8b0b194a7a92b4f3542a186a79defb8deea9f708150eb7b354d951.png)
 
-[Full-body reference](../assets/characters/c1642c3bb956d8520f12e990d8e0f9e5789565fd7d230ddfbe0b13862b1f5c7e.png)
+[Full-body reference](../assets/characters/04c787dcd52be42131889df90e0c8f3ed7a79d60fba234458ff9192940420330.png)
 
-[Multiview reference sheet](../assets/characters/9abf71064b730d699496fea7fb94a42084f6bc4cb4c7497525186710c99a1948.png)
+[Multiview reference sheet](../assets/characters/44ead24cdc5f19081c241c9ed62b97bc012d1560261f796d0fb9e3cbe3471a6d.png)

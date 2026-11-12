@@ -22,12 +22,12 @@ Fume is enthusiastic, slightly unhinged, and deeply in love with his craft. He t
 
 ## Appearance and artwork
 
-An adult humanoid man in his forties with olive-tan skin, lively brown eyes, a long hooked nose, a bald crown and wispy copper-gray hair at the sides. Thin healed pale burn scars on his forearms, intact skin. Brass work goggles pushed above the eyes, a soot-stained mustard tunic, worn dark work coat, brown leather apron, dark trousers and heavy practical boots. A scuffed leather reagent case held closed at his side and two small sealed opaque containers on the belt. Enthusiastic slightly wild smile. No glowing compounds or magical effects. A small brown moustache and short chin goatee remain consistent across the selected references.
+A wiry adult Riftborn man with warm medium-brown skin, long narrow face, expressive brows, russet-brown eyes and messy upswept black hair and a small pointed goatee. Plain brass protective goggles sit on the forehead. Subtle healed burn patches mark the right forearm and left hand. Charcoal-green rolled-sleeve work coat, pale high-collared shirt, aubergine waistcoat, ochre tool belt, brown trousers and closed boots. A closed amber bottle is held low in the right hand, with other sealed containers protected at the belt. These containers are visual narrative stock, not usable Lite consumables or new mechanical effects.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/0812f6c77a30ca40689cd2ce358e7de258bb76dca80a3c192208aa17471eea48.png)
+[Portrait](../assets/characters/3da1dcb3d3658b7293de1f0b5a801f4e94722fb516dfe00b7baca7587a5c11ea.png)
 
-[Full-body reference](../assets/characters/4118af345fa9a7cb13081f6d41edb89dd13b8c5349c9ea61318a999734dc5af1.png)
+[Full-body reference](../assets/characters/7adeb5f56df011aeb039618aeda55d65fa85cb2b618decb5688dbfa97d01b9ba.png)
 
-[Multiview reference sheet](../assets/characters/308534d87829039e266d072abae3484fa2b6fb0f223e47649f71abe9438e3b63.png)
+[Multiview reference sheet](../assets/characters/379d30d12ff9957efc70d0c415f51a5fa390256f36e78c51e109579632cd3824.png)
