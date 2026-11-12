@@ -41,3 +41,15 @@ A great cat Hollowed by Rift exposure, its natural stealth enhanced to supernatu
 **Claw (Tiger or Hybrid Form Only).** +5 to hit, reach 5 ft., one target. 7 (1d8 + 3) slashing.
 **Scimitar (Humanoid or Hybrid Form Only).** +5 to hit, reach 5 ft., one target. 6 (1d6 + 3) slashing.
 **Longbow (Humanoid or Hybrid Form Only).** +4 to hit, range 150/600 ft., one target. 6 (1d8 + 2) piercing.
+
+## Appearance and artwork
+
+The selected default is an agile adult tiger-humanoid hybrid with copper-orange fur, black stripes, white cheeks/throat, pale green eyes, rounded ears and a long ringed tail. Two arms with empty clawed hands and two digitigrade legs retain a coherent tiger-like body. Nested stripe contours carry faint violet-opal reflections within the fur. Plain dark wrap-trousers and a woven sash cover the hips; no weapon or individual human biography is assigned. The other authored forms and abilities remain unchanged.
+
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/eb053675daf11d2f3d95aae01e2b5fc69c59126c3f677b6848b9a7af08877a04.png)
+
+[Full-body reference](../../assets/characters/0dbe2368f48537ef12bc708d2e1c59d5407eb3fdeba10df94d4f9f878450fe03.png)
+
+[Multiview reference sheet](../../assets/characters/6bdd068d6ab677559f1e71efa2092edae269dc5cfa777e5dae55c33022913f1c.png)

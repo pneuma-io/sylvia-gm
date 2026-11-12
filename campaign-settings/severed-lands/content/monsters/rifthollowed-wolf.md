@@ -36,3 +36,15 @@ A wolf pack that crossed through a Rift surge together and emerged as something 
 ## Actions
 **Multiattack.** In humanoid form: two greatclub or longbow attacks. In hybrid/wolf: bite + claws.
 **Bite.** +4 to hit, 6 (1d8 + 2) piercing. DC 12 CON save or cursed with Rift-touch.
+
+## Appearance and artwork
+
+The selected default is a rangy adult wolf-humanoid hybrid with cool slate-grey fur, charcoal crown/back, pale throat, long muzzle, pointed ears and pale grey-green eyes. Two long arms and digitigrade legs retain empty clawed hands and broad canine paws, with one bushy tail. Major neck, shoulder and upper-chest fur masses fold inward into receding smaller arches, with grey-teal, indigo and violet inner planes. Rough blue-grey trousers cover the hips. No named pack, former human identity or weapon is assigned; the other authored forms remain unchanged.
+
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/7d6ec40c83ed1a6632d2afca72e192a22cee95bc609d78a73b1de43afbf47c75.png)
+
+[Full-body reference](../../assets/characters/9ee8b34e5a119995c0bd30bf4f204d768209910944a54e5ec7633ebf3f66a69a.png)
+
+[Multiview reference sheet](../../assets/characters/aed5d48a0c2eb517c8d18c742c46badabb9b15ef1dfc52966702560acfb043d9.png)
