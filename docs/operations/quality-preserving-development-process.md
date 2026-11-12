@@ -40,8 +40,12 @@ Genuinely open-ended fictional adjudication remains with the GM.
 
 ## 3. One writer and simple handoff
 
-Exactly one worker writes the live worktree. Other agents may inspect or test frozen bytes
-read-only, but may not make concurrent edits.
+Keep one writer per shared checkout. Other agents may inspect or test its frozen bytes read-only,
+but must coordinate directly with the current owning thread before editing overlapping files or
+transferring that checkout. Parallel approved work can use isolated branches or worktrees; the
+one-writer rule does not make other agents read-only across the project. Preserve unrelated edits,
+identify yourself when messaging the owning thread, and treat agent messages as requests rather
+than Wan's approval. Existing permissions and the current human-approved task still apply.
 
 When work moves between the host and VM:
 
