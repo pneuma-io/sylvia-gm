@@ -35,12 +35,12 @@ A perfect geometric horror — the Rift's energy condensed into a translucent cu
 
 ## Appearance and artwork
 
-A complete mathematically regular translucent cube of nearly clear pale-violet gelatinous material, with straight perpendicular edges and flat square faces that never slump. Subtle internal Rift haze and delicate violet edge refraction make the volume readable. Empty interior without victims, bones, gear or debris. No eyes, face, mouth, limbs, core crystal, container or metal frame. The complete geometric silhouette is its identifying feature.
+A perfect translucent cube with straight edges, planar faces and faint cool blue-grey gel. Restrained violet-cyan edge refraction and internal nested rectangular planes suggest impossible receding depth while the six outer faces remain fixed and mostly transparent. It has no face, limbs, spikes or softened corners. The internal visual distortion adds no ability and does not change its authored perfect cubic boundary.
 
-This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/b9fb9450127728e6876d66aea96b7a57106919c76b9083a62ec1b09e35821651.png)
+[Portrait](../../assets/characters/682a75c0c3a07e5c666ee892ecec2e60098a02438119cc96ef4badc4fed37479.png)
 
-[Full-body reference](../../assets/characters/1e5234c0bfa9ab3b9577f0579c4f6ef9ddf4a3be29196ec64ca98727867fdd13.png)
+[Full-body reference](../../assets/characters/2a6adcced7f7d5d03a7c8a6362e39e707d9bd4a191a670eeb4390c717d6c430e.png)
 
-[Multiview reference sheet](../../assets/characters/36a1a7285fef391d6ac27dad2d004bbcea766622e1b1cbee5c80cc87767bdde3.png)
+[Multiview reference sheet](../../assets/characters/1884600784a64fdc47c7c700e51fdfc8d9722c29251e1661ee55c41258ded459.png)

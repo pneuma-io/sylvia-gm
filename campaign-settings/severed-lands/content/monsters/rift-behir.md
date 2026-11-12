@@ -39,12 +39,12 @@ A massive, many-legged serpent that crawled through the Rift from a storm-wracke
 
 ## Appearance and artwork
 
-A massive long-bodied serpent with many matched pairs of short powerful clawed legs, an elongated horned reptilian head, two amber eyes and a long tapering tail. Deep storm-blue overlapping scales, paler blue-gray belly plates and restrained violet Rift glimmers along a few scale seams. One long continuous body follows a gentle curve from the single head to a single tapering tail, with the successive leg pairs clearly readable. No wings, humanoid limbs, jewelry, lightning breath or prey.
+A long muscular storm-blue serpent with six pairs of short bent clawed legs, one horned saurian head and one tapering tail. Pale blue-grey belly plates, two short swept-back horns and narrow lilac eyes. Overlapping scales form nested wave bands with restrained cyan-violet misregistration along selected ridges, suggesting an afterimage within the material rather than a second body. Its mouth holds a faint contained violet gleam. The chosen twelve-leg anatomy is a visual default, not a new gameplay trait.
 
-This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/676d8272d09e390ea706df5254008f420607f76efe86ff401c338c00c1734cb5.png)
+[Portrait](../../assets/characters/cd7c41e78ab5a0b23b28afd46da4bcca51fb9fd44f502910cf87f19db47702c5.png)
 
-[Full-body reference](../../assets/characters/db34e46a9ebd559642eb53b9025d0503606eceaa93646c656fcb6716e3007cd5.png)
+[Full-body reference](../../assets/characters/a82c78acd12d4f9e703b918248f0847ba22c2e1b063d3aea8ab2d3cc1800edde.png)
 
-[Multiview reference sheet](../../assets/characters/5523462b3a2d377467e82df71a405c177c4dea502bd5701a79faa5ee3f516e8c.png)
+[Multiview reference sheet](../../assets/characters/76f2273d22cf7d139900bb2354b2c6ea988b1511a90facfd6302d92450e6def3.png)

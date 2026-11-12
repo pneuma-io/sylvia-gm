@@ -125,6 +125,23 @@ Iro is the named pacifist NPC; do not merge him with the generic memory-hunting 
 | Old Crane | [Body](../assets/characters/9c5f3257e5897bfc4f6b6e96c5ed734d97f47c6e1efc3790ed7bcfb16f7ae66c.png) | [Sheet](../assets/characters/aa890198faf3d9802ea6c408d2f4d42eec645278d3d562f292cd3b95d8c5aecd.png) | [Portrait](../assets/characters/861e3e6d34d55a4aad51f678751b77c35600e11169a8672cf76084b586334a77.png) |
 | Iro | [Body](../assets/characters/e5136a64ae35b2a54728bb3c00425a21f5d452f778d62d2212ccf4bc45c757b3.png) | [Sheet](../assets/characters/e1cc99b916a5156128f1d9dbc25f061426fbf5bc54a7ec80f1b19418bd77f93f.png) | [Portrait](../assets/characters/74250fd3d19e2ffa06bdd0b91be1f634dae2b33f7d3f5e444dd9c59126bdc4cd.png) |
 
+### Prepared Rift creature references
+
+These six fresh creature bundles extend the current rendering direction from authored-only facts.
+Overhead/underside views make the selected limb layouts explicit. The Cube retains a rigid cubic
+outer boundary; the Anchor Trap uses the selected activated stone form. Portrait crops follow
+the subject: close living heads, complete faceless geometry and the Darkmantle mantle silhouette.
+They are prepared defaults available for review, without individual owner acceptance claimed.
+
+| Creature | Full body | Multiview | Portrait |
+|---|---|---|---|
+| Anchor Trap | [Body](../assets/characters/4c0d2031fc9b7512af712071dbe9017d24410cfb775c61faaab90f5bcc9d54cb.png) | [Sheet](../assets/characters/5cc1704a02441cdb6fb3d16e31873327fad36d706c070aca605774bf43e5a28e.png) | [Portrait](../assets/characters/5ec7c6184ee61f8c88b90dcdda68f5c47b11f90cbfa7efc128560ead786ddf24.png) |
+| Rift Ankheg | [Body](../assets/characters/75da64bfa85b64298468ae3ee6574b6f37a1539a2c89737c305ad4b862f72e2d.png) | [Sheet](../assets/characters/434f0b5e4691338f35db46c9bff6aaf68be634aff33551d0c23e246afc9262ea.png) | [Portrait](../assets/characters/ae9f07ef11f22c7cafe9d63c62049e9c25a240147d4e2a00aa9fe4c1c5e32c3d.png) |
+| Rift Basilisk | [Body](../assets/characters/b18e7d0fc23682f762cedf742426549d808b1c99ff1484eea4af81284d9ef79d.png) | [Sheet](../assets/characters/558e1cfdd7f40d586f3057dd598837d677e52ec4979019ca975b43755f2779d4.png) | [Portrait](../assets/characters/d4acc50174e717788b062d63dce8e5f3c701db6fbac0100586aca95fee465fdb.png) |
+| Rift Behir | [Body](../assets/characters/a82c78acd12d4f9e703b918248f0847ba22c2e1b063d3aea8ab2d3cc1800edde.png) | [Sheet](../assets/characters/76f2273d22cf7d139900bb2354b2c6ea988b1511a90facfd6302d92450e6def3.png) | [Portrait](../assets/characters/cd7c41e78ab5a0b23b28afd46da4bcca51fb9fd44f502910cf87f19db47702c5.png) |
+| Rift Cube | [Body](../assets/characters/2a6adcced7f7d5d03a7c8a6362e39e707d9bd4a191a670eeb4390c717d6c430e.png) | [Sheet](../assets/characters/1884600784a64fdc47c7c700e51fdfc8d9722c29251e1661ee55c41258ded459.png) | [Portrait](../assets/characters/682a75c0c3a07e5c666ee892ecec2e60098a02438119cc96ef4badc4fed37479.png) |
+| Rift Darkmantle | [Body](../assets/characters/1e9be53c6bc4264f5933491aa2b25b29f4d7e6d146eab69eb3d89c96c11e9fdb.png) | [Sheet](../assets/characters/b9f198ff5533163d14b0fce79838fc5c0cf5cdf66b4cc9796e9084b3285ab64f.png) | [Portrait](../assets/characters/6b83e456528e569725a8363b539a91f70a2f035ec85b5a18132488dcbe06e8e9.png) |
+
 ### Selected Rift creature identity
 
 The owner selected C3 as the Death Hound's design: a living two-headed predator with convincing

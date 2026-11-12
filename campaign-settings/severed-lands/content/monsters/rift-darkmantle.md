@@ -36,12 +36,12 @@ A Rift-touched cave-dweller that clings to ceilings in the tunnels beneath the C
 
 ## Appearance and artwork
 
-A small eyeless cave predator with a tall pointed stone-gray leathery conical mantle and eight tapering flexible arms around its underside, forming a stalactite-like silhouette when gathered. A few faint violet Rift-nodules stud the irregular mantle. Dark pliable folds and a subtle underside beak-like opening, no visible eyes or humanoid face. Arms spread enough to make their structure readable. No wings, legs, clothing or active darkness sphere.
+A compact cave creature with a tapered grey-brown rocklike mantle and a webbed skirt of eight short muscular tentacles. Two small dark eyes lie low under the mantle rim. Layered folded hide gives a stalactite-like silhouette; small faint violet Rift nodules have nested mineral interiors. A charcoal-plum membrane joins the tentacle roots. The selected eight-tentacle anatomy remains visible in its reference views; its activated darkness sphere is omitted from identity art.
 
-This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/d0b8971c381e20f7bc2e7797ebeac1be29e471f1ee0188014d033c6be835847b.png)
+[Portrait](../../assets/characters/6b83e456528e569725a8363b539a91f70a2f035ec85b5a18132488dcbe06e8e9.png)
 
-[Full-body reference](../../assets/characters/f25d9c5cacc0fa9f5e393063ba646f185738155a95d6cc997235208874471ae4.png)
+[Full-body reference](../../assets/characters/1e9be53c6bc4264f5933491aa2b25b29f4d7e6d146eab69eb3d89c96c11e9fdb.png)
 
-[Multiview reference sheet](../../assets/characters/f46e12824efe455b724501797495bf1c255134556cfe1cca50b697e30bcb72bc.png)
+[Multiview reference sheet](../../assets/characters/b9f198ff5533163d14b0fce79838fc5c0cf5cdf66b4cc9796e9084b3285ab64f.png)

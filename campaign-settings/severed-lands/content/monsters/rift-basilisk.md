@@ -33,12 +33,12 @@ A Rift-touched reptile whose petrifying gaze channels the Veil's boundary-lockin
 
 ## Appearance and artwork
 
-A heavy low-slung reptile with eight short strong legs in four pairs, a thick curling tapering tail, a broad blunt crocodilian head and two large pale yellow-green eyes. Pebbled slate-green scales, dusty gray spinal ridges and faint violet coloration around eyes and scale seams. A wary grounded posture with a closed mouth. No wings, human features, victims or active gaze effects.
+A squat eight-legged reptile with four pairs of short stout clawed legs, a low continuous lizard torso, one broad blunt head and a heavy tapered tail. Moss-olive and slate scales contrast with a dull ochre underside. Two amber eyes have nested angular gold-violet iris structure beneath a heavy brow. Stepped keratin chevrons along neck and spine give the living growth a recursive rhythm. This is a living reptile; its gaze ability is not represented by an added beam or power.
 
-This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/527bdfd7fa63799b99f5f018b65937b3d704b46316d894ae25d44f1586459b08.png)
+[Portrait](../../assets/characters/d4acc50174e717788b062d63dce8e5f3c701db6fbac0100586aca95fee465fdb.png)
 
-[Full-body reference](../../assets/characters/a5a5703fbf78aa46c88773ab065eb0252f7fe64f2cfeffe1af97b3e633a5bb1a.png)
+[Full-body reference](../../assets/characters/b18e7d0fc23682f762cedf742426549d808b1c99ff1484eea4af81284d9ef79d.png)
 
-[Multiview reference sheet](../../assets/characters/7dbaa4e6d5e31f32db8b6393bccee4e7b29dc16ced6980af06d4225f6649ba22.png)
+[Multiview reference sheet](../../assets/characters/558e1cfdd7f40d586f3057dd598837d677e52ec4979019ca975b43755f2779d4.png)

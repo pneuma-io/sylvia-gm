@@ -39,12 +39,12 @@ A defensive mechanism installed around Anchor Doors by the Wardens — a constru
 
 ## Appearance and artwork
 
-An ACTIVATED Large non-humanoid Warden defensive construct made of interlocking stone rings and rune-plates. Several thick worn pale-gray stone hoops interlock around a hollow central space, with broad irregular dark-gray stone plates attached along the hoops, the articulated pieces arranged as an open enclosing mechanism. Restrained shallow abstract geometric rune-like carvings on the plates, no legible script. Heavy ancient masonry, chipped stone edges and subtle cool mineral accents, a single self-contained mechanism resting lightly on its lowest ring. No person is inside it. Its stone ring-and-plate construction and enclosing purpose follow the authored Setting lore; exact ring/plate count, geometry, material colors and carving pattern are editable visual defaults. This reference depicts its activated stone mechanism only and does not define its dormant disguise. No humanoid torso, head, face, eyes, arms, hands, feet, teeth, cloth body, creature occupant, prison victim, blood, readable rune, real-world religious symbol, invented Warden badge, beams, portal, Door, room, scenery or UI.
+An activated low, broad stone cage construct with a heavy base ring and two thick interlocking arched hoops around an empty capture space. Pale weathered grey masonry, squared rune-plates and restrained worn bronze joints. Recessed angular incisions suggest recursive violet-blue depth within the stone surfaces. It has no humanoid head, face or limbs. Its normal-rug motionless disguise is distinct from this activated form.
 
-This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/59c32a44636a8fa23fb9acc7199927f7cc819ef91764fb3fb72fe12882df0985.png)
+[Portrait](../../assets/characters/5ec7c6184ee61f8c88b90dcdda68f5c47b11f90cbfa7efc128560ead786ddf24.png)
 
-[Full-body reference](../../assets/characters/285aad677a3c2cfbfd87bdda5d20d43896d95d6a781cac40b5eeac8b175b6519.png)
+[Full-body reference](../../assets/characters/4c0d2031fc9b7512af712071dbe9017d24410cfb775c61faaab90f5bcc9d54cb.png)
 
-[Multiview reference sheet](../../assets/characters/de59286a26d0b1cebe728a4b92b114b778b539483c5c0407e0f0f344f161e674.png)
+[Multiview reference sheet](../../assets/characters/5cc1704a02441cdb6fb3d16e31873327fad36d706c070aca605774bf43e5a28e.png)

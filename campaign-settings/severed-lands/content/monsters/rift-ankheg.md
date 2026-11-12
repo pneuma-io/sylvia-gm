@@ -33,12 +33,12 @@ A burrowing insectoid predator that came through the Rift from an alien world, n
 
 ## Appearance and artwork
 
-A large burrowing insectoid with six strong articulated legs in three pairs, a long segmented low body, a heavy wedge-shaped insect head and two massive opposing mandibles. Dark brown mineralized chitin has an iridescent violet sheen. Compact black compound eyes, short paired antennae and broad digging forelegs. The rear abdomen tapers naturally. No wings, humanoid torso, extra legs, acid spray or prey.
+A heavy six-legged insectoid predator with a broad armoured head, opposed crushing mandibles, short antennae, ribbed thorax and tapered segmented abdomen. Three pairs of articulated legs include powerful front digging limbs. Layered umber-violet chitin carries a violet mineral sheen, nested stepped plate growth and a few recessed cool-violet seams. Tiny dark eyes sit below the brow. This body anatomy and surface treatment are editable visual defaults; the authored burrowing and acid mechanics remain authoritative.
 
-This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/d58b63c805ea3abf5aeb538d291a5e56ddef01e46796904ab66d602c2b3fd89e.png)
+[Portrait](../../assets/characters/ae9f07ef11f22c7cafe9d63c62049e9c25a240147d4e2a00aa9fe4c1c5e32c3d.png)
 
-[Full-body reference](../../assets/characters/dfcd0a0b67574e52821b7aa2e563c56fe602c8f299de86082d7b52334744ca09.png)
+[Full-body reference](../../assets/characters/75da64bfa85b64298468ae3ee6574b6f37a1539a2c89737c305ad4b862f72e2d.png)
 
-[Multiview reference sheet](../../assets/characters/bb634005aa7776725185203984cfc7b200fe51cdcb4cb35f887796da14f3c24d.png)
+[Multiview reference sheet](../../assets/characters/434f0b5e4691338f35db46c9bff6aaf68be634aff33551d0c23e246afc9262ea.png)
