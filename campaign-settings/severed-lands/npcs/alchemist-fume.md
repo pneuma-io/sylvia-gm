@@ -30,4 +30,4 @@ This prepared appearance is an editable visual default; the character's authored
 
 [Full-body reference](../assets/characters/7adeb5f56df011aeb039618aeda55d65fa85cb2b618decb5688dbfa97d01b9ba.png)
 
-[Multiview reference sheet](../assets/characters/379d30d12ff9957efc70d0c415f51a5fa390256f36e78c51e109579632cd3824.png)
+[Multiview reference sheet](../assets/characters/7a17f839ed226adf90a57ceb8dab6fb39e792115a2f3814ce8a5853484918dfb.png)

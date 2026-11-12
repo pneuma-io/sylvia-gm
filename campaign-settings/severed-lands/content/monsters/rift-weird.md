@@ -36,3 +36,15 @@ The rarest and most dangerous of Rift elementals — a fusion of multiple elemen
 
 ## Actions
 **Constrict.** +5 to hit, reach 10 ft., one target. 13 (3d6 + 3) bludgeoning. If Medium or smaller, grappled (escape DC 13) and restrained. Can grapple only one.
+
+## Appearance and artwork
+
+A faceless dark teal elemental whorl partially emerged from, and continuously attached to, a small dark pool. Silt, charcoal stone laminae, muted amber filaments and pale vapor folds lie inside the same coiling liquid body around a recessed pale-violet Veil core. Nested conflicting folds seem to turn inside out and rejoin. This is a visible partially emerged reference state, not a free-standing or fully immersed form; no eyes, mouth or limbs are assigned.
+
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/e805e301816d43d6df7f02f9fd969d8f00ac372a1b3ca3deb388eba92a901dc4.png)
+
+[Full-body reference](../../assets/characters/6eb09c991df20250160e6936513213b85723d4fb24abb0068b38e403a8268718.png)
+
+[Multiview reference sheet](../../assets/characters/4b0c160920bbe62198ccf762f1282b2fa6e5fcbd2b5251ad5b0e0221c1da5361.png)

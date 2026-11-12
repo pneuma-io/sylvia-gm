@@ -86,6 +86,11 @@ the pictured person supplies neither terrain geometry nor compulsory night light
    and creature structure before deriving later views.
 5. Multiview: selected full body first, style last. Preserve the same identity across front,
    three-quarter, side and back views, including anatomical sides, concealment and gear placement.
+   In a front view, anatomical right appears image-left; in a rear view it appears image-right.
+   A profile facing image-right shows the subject's anatomical right side; a profile facing
+   image-left shows its anatomical left. Check asymmetric equipment against the body master.
+   Captured production prompts are historical provenance; any reversed side wording is
+   superseded by this convention, not a direction to repeat the error.
 6. Portrait: selected body and multiview first, style last. Keep the head centred and eye line
    around 40% of height where anatomy permits; keep the full head/hair silhouette inside margins.
    Save one adjustable crop for Map, Party and dialogue instead of altering the original images.
@@ -154,7 +159,7 @@ with no usable consumable effects in Lite. These are prepared defaults available
 | Character | Full body | Multiview | Portrait |
 |---|---|---|---|
 | Auntie Salt | [Body](../assets/characters/1d7408f4571b8982d4d9089b7bc16fde80ca1a8bec8861596b191fc71e56040a.png) | [Sheet](../assets/characters/22ce57eedeb3c007ef5e5094bdf025a56dd971082b1e893533e01350215b387f.png) | [Portrait](../assets/characters/f0b2d699cb53c40df749f67ad09c12d7c657cba6acc818b84cd1defc876171b6.png) |
-| Fume | [Body](../assets/characters/7adeb5f56df011aeb039618aeda55d65fa85cb2b618decb5688dbfa97d01b9ba.png) | [Sheet](../assets/characters/379d30d12ff9957efc70d0c415f51a5fa390256f36e78c51e109579632cd3824.png) | [Portrait](../assets/characters/3da1dcb3d3658b7293de1f0b5a801f4e94722fb516dfe00b7baca7587a5c11ea.png) |
+| Fume | [Body](../assets/characters/7adeb5f56df011aeb039618aeda55d65fa85cb2b618decb5688dbfa97d01b9ba.png) | [Sheet](../assets/characters/7a17f839ed226adf90a57ceb8dab6fb39e792115a2f3814ce8a5853484918dfb.png) | [Portrait](../assets/characters/3da1dcb3d3658b7293de1f0b5a801f4e94722fb516dfe00b7baca7587a5c11ea.png) |
 | Saffron | [Body](../assets/characters/d6202b6f88dde33ae05b41f91fd8e08fc99cb491c9f8b14ef6a9b392430f66fc.png) | [Sheet](../assets/characters/ebab3d3e238a19d56d813c59db493f6843182d32d9a10e933d6968eb822ed30d.png) | [Portrait](../assets/characters/26d54f8ab0872c2c2bf30bf5abecb64164942a1ac2ec457bd4e947ddd56e630c.png) |
 | Thread | [Body](../assets/characters/f3c1cde7c6bc3856fa81d7471c24a443102598026bece1341f748ca45583de9c.png) | [Sheet](../assets/characters/4743e24b3b368db2ee2ecd28f03230c755845148c3eb8eeb7bb5c3f958a0838a.png) | [Portrait](../assets/characters/8efa238611a77a74648e616434cfaf26c099c83953a98edd832cfb9321d4d16b.png) |
 | Hook | [Body](../assets/characters/a01102d62072bc88e9fd159cc383ab8ada20e31ff4ee3a02ba94ca52ed08cafa.png) | [Sheet](../assets/characters/a4479f93e91030ab4c7bd6cdc6123a3e9c304e324200fb78548dfecacc21d3f8.png) | [Portrait](../assets/characters/61688566029273fdfbac865ba4526aa789d47a4b92eb43a6c8d284c635ed7c47.png) |
@@ -168,12 +173,12 @@ These editable defaults preserve authored roles and mysteries and remain availab
 
 | Character | Full body | Multiview | Portrait |
 |---|---|---|---|
-| Corin | [Body](../assets/characters/2a4d2d443b87bcf9af9aabb6fa99ec32bf92c79cc48d733aea2fd84e84ad3ac2.png) | [Sheet](../assets/characters/47e091857008e42c38bb0058f1762ba7426a7af55e264108c757af254e75b810.png) | [Portrait](../assets/characters/557fa3e09fde31c19e34759cd2806240254148b076713ae31560654a4159e7aa.png) |
+| Corin | [Body](../assets/characters/2a4d2d443b87bcf9af9aabb6fa99ec32bf92c79cc48d733aea2fd84e84ad3ac2.png) | [Sheet](../assets/characters/a7f21c72ee07a2691ae06e268b6dd9a1ce2ee195e218ca1801120aef20bf76be.png) | [Portrait](../assets/characters/557fa3e09fde31c19e34759cd2806240254148b076713ae31560654a4159e7aa.png) |
 | Echo | [Body](../assets/characters/cb2ba1c1b6679867f867d2f435409664ac67333b3c1c159639c5ee5bccb56a56.png) | [Sheet](../assets/characters/278770c6ef5676298ebcf1f8a3a1721115770103707e3aa03a6ff80d1789bb7b.png) | [Portrait](../assets/characters/56229e06c029526f6715c05a081be32d17d1adbf5f14272f72db766555d77ccb.png) |
-| Kestrel | [Body](../assets/characters/e742ad9bf271c3307dad88dec3e9f6fcf378a340f6609aa28aca89ff30a1b0d5.png) | [Sheet](../assets/characters/1da54e5785908d45166fa8edd08d41445399b0d59e488e27642d9b56a60b39f5.png) | [Portrait](../assets/characters/bf25b41704ca837b145c19d05d4bd5efbc212d06b552bc722d83bbed71c127a7.png) |
-| Drum | [Body](../assets/characters/bd4db183e005dfd0489e2f06ba5dc16aa9ba2c224e83f2ddfa45224af83f575f.png) | [Sheet](../assets/characters/8ef8efaa0b05a1caae3c278b7f37960712fa615d97ec1db2d7b46e878787448b.png) | [Portrait](../assets/characters/4bd658ef27d4d1cb7040e3d0de05ba7902497e272732042606708c14b14fe2a3.png) |
-| Soot | [Body](../assets/characters/ca96d98a80dab4c3157367f79197cdad6255e10d23760162d221787c7c3db9fe.png) | [Sheet](../assets/characters/211434f2defe9f62cc1835599b9a25bc852eb320f4d2d7eb5df1b6ce7e89479f.png) | [Portrait](../assets/characters/e3939bfa9b9a322a477842ee7795013302cce1adebb304850f56d4cfbd01e3f2.png) |
-| Lace | [Body](../assets/characters/7a92c7b5d911d3edced4400f1a74e8b2f62acd7257e3b77977397b2a3394ee8f.png) | [Sheet](../assets/characters/e21262d307d6e62ba0b520e53e707d34dba4f108d0033d5671fd55d74faeafbf.png) | [Portrait](../assets/characters/c553bfd8195eb2cdabf919f9625c3a75ded8144304dd1fccfdb90f65c17750ca.png) |
+| Kestrel | [Body](../assets/characters/e742ad9bf271c3307dad88dec3e9f6fcf378a340f6609aa28aca89ff30a1b0d5.png) | [Sheet](../assets/characters/ea1e41b31751e59818fb34a59fdf5975a8e7c567e6118221849e37fb9fad383c.png) | [Portrait](../assets/characters/bf25b41704ca837b145c19d05d4bd5efbc212d06b552bc722d83bbed71c127a7.png) |
+| Drum | [Body](../assets/characters/bd4db183e005dfd0489e2f06ba5dc16aa9ba2c224e83f2ddfa45224af83f575f.png) | [Sheet](../assets/characters/4119c2a35cc92bb5cffe039ffd242ccc99cd5e29beaf739c39f6efcb21cefc5e.png) | [Portrait](../assets/characters/4bd658ef27d4d1cb7040e3d0de05ba7902497e272732042606708c14b14fe2a3.png) |
+| Soot | [Body](../assets/characters/ca96d98a80dab4c3157367f79197cdad6255e10d23760162d221787c7c3db9fe.png) | [Sheet](../assets/characters/71edf9bdc18bf5bfd18f88bbfb319ed52fe3a180677c55651452c7396809e748.png) | [Portrait](../assets/characters/e3939bfa9b9a322a477842ee7795013302cce1adebb304850f56d4cfbd01e3f2.png) |
+| Lace | [Body](../assets/characters/7a92c7b5d911d3edced4400f1a74e8b2f62acd7257e3b77977397b2a3394ee8f.png) | [Sheet](../assets/characters/0e532d837e3914f55352d612195f17ae0cddc4d1d83bee0cf0f19b7b5cb755f8.png) | [Portrait](../assets/characters/c553bfd8195eb2cdabf919f9625c3a75ded8144304dd1fccfdb90f65c17750ca.png) |
 
 ### Prepared Rift creature references
 
@@ -263,3 +268,20 @@ Compare at the same display size with the accepted benchmark and selected subjec
 File hashes, dimensions and packaging checks establish integrity. Style, design and canon still
 need visual judgement. Record an unsuccessful study as open visual work, correct the cause, then
 compare again before extending its treatment to a batch.
+
+### Prepared Rift Echo and elemental references
+
+These six fresh editable defaults preserve the authored forms without assigning biographies.
+Vampire lore and Bite text differ about spawn formation; neither mechanism is depicted.
+Rift Warhorse retains its intact shimmering coat and binds only to the undead inherited form.
+Rift Weird is shown partially emerged and connected to its bound water; there is no matching
+actual Lite inherited entry, so its artwork binds only to the authored Setting profile.
+
+| Creature | Full body | Multiview | Portrait |
+|---|---|---|---|
+| Rift Vampire | [Body](../assets/characters/b794dfc0c4904b47aeabdc6c9d280cd6aa1c6c3d9ac98c24c19b89adc62a5206.png) | [Sheet](../assets/characters/4aef0809aaab2e1a5c958f87294a1971e23cc87fab2ad3d7efa4df9ae90b7a0b.png) | [Portrait](../assets/characters/f15b7b646a7424a894a5ad63642a09bf5c3a244379d29c8bfdee8aed297e6983.png) |
+| Rift Vampire Spawn | [Body](../assets/characters/2b39aa9e82457f74da57af15c94ef70bf0470a86c52fabc55ce5374b374af6d1.png) | [Sheet](../assets/characters/743b791f5fa81fc3b863dd16479f4059f40d85d744af3db57ca2ddf41bab4855.png) | [Portrait](../assets/characters/f169af848af765013f36c594487ac98f7ef79e13604ff64247249b8d19f92860.png) |
+| Rift Warhorse | [Body](../assets/characters/e52de762bb6c0797ea5cce740190023092a950842176d0138f2c69a999b2cadb.png) | [Sheet](../assets/characters/b96b6f1eafee14b78b0cf921927b7abb757b04aa5d98df28ccd70013a4a9119e.png) | [Portrait](../assets/characters/8a45a057b8bf28a09a8a5cd79dfc8467d6b8c33f8b62e88732c6bf9207cf4e3c.png) |
+| Rift Water | [Body](../assets/characters/22f366ae6ebc9e09c118edb79af38c07a24f610ef62ee0d20cfe28512720a105.png) | [Sheet](../assets/characters/c78db882a39948824258994b9354ae30606c48b4fe83200e4ded537270e85c8b.png) | [Portrait](../assets/characters/a897be46d36be3b6571dfaf6dffde61571d19eb4ea6d7df2e4a73358f8d86609.png) |
+| Rift Weird | [Body](../assets/characters/6eb09c991df20250160e6936513213b85723d4fb24abb0068b38e403a8268718.png) | [Sheet](../assets/characters/4b0c160920bbe62198ccf762f1282b2fa6e5fcbd2b5251ad5b0e0221c1da5361.png) | [Portrait](../assets/characters/e805e301816d43d6df7f02f9fd969d8f00ac372a1b3ca3deb388eba92a901dc4.png) |
+| Rift Wight | [Body](../assets/characters/28e824d364fc1adce08c0c2949c557452521ada0dba063edfb137cc555294cf9.png) | [Sheet](../assets/characters/c23052399de962ccddc5992290f08b4448752e1190bef8a8a76c31193955540f.png) | [Portrait](../assets/characters/d0031a3f11a283f315fefa8fc19b9bb5402eee11356706da3f0aeb12edcdda45.png) |

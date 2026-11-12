@@ -28,4 +28,4 @@ This prepared appearance is an editable visual default; the character's authored
 
 [Full-body reference](../assets/characters/ca96d98a80dab4c3157367f79197cdad6255e10d23760162d221787c7c3db9fe.png)
 
-[Multiview reference sheet](../assets/characters/211434f2defe9f62cc1835599b9a25bc852eb320f4d2d7eb5df1b6ce7e89479f.png)
+[Multiview reference sheet](../assets/characters/71edf9bdc18bf5bfd18f88bbfb319ed52fe3a180677c55651452c7396809e748.png)
