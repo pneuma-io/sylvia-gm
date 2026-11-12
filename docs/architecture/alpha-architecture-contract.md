@@ -1212,6 +1212,19 @@ budgets or service tiers. Audit distinguishes requested options from provider-co
 absence of confirmation is not proof of application. Effort never changes canonical tool outcomes
 or the private-reasoning storage/inspection rules in §9.2.
 
+New-chat defaults and speed use the same boundary. The owner-local settings document holds the
+default effort and speed beside the default model, and each chat's saved speed. None of these
+enters campaign data, exports or backups. Every command that creates a Builder or GM session
+settles its start once: a value named in the command, otherwise the saved default where that
+session's model supports it. An unsupported named value is rejected before anything is created.
+The settled effort and speed are saved on the new session before the command returns, so the first
+provider turn, including an automatic opening, reads them exactly as any later turn does. Speed
+capability is a model-catalog fact bound to an exact endpoint, transport and model, or advertised
+by the ChatGPT runtime's model list. The selection is snapshotted with effort for the whole
+provider turn. A saved tier that the answering model does not offer is not sent, and a permanent
+model switch clears it. Audit records the requested tier and, where the provider reports one, the
+tier it says it used.
+
 The standalone left-sidebar Builder entry creates an ordinary top-level Builder session and
 workspace without creating or selecting a campaign. It uses the same owner, SQLite authority,
 stream lifecycle, and generic session substrate as other conversations; it does not create a

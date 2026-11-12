@@ -54,7 +54,7 @@ for (const configured of [true, false]) {
     const context={state:{constructionAnswers:{},constructionDraftId:'draft',activeSessionId:'interview',bridge:{start_guided_campaign:async command=>{calls.push(command);return {campaign_id:'campaign',builder_session_id:'interview'};}}},
       $:id=>nodes[id],selectedModelChoice:()=>configured?{provider_id:'chatgpt_subscription',model_id:'chatgpt-subscription/gpt-6.1-sol'}:null,
       defaultModelChoice:()=>{throw new Error('No global default must be required');},setInlineStatus:(text)=>feedback.push(text),campaignPartySelectionProblem:()=>null,
-      usesBundledCampaignSetup:()=>false,selectedCampaignPlan:()=>({id:'a-debt-in-iron'}),hideConstructionPanel(){},refreshCampaignIndex:async()=>{},openCampaign:async()=>{},finalizeSelectedConstruction:async()=>calls.push('finalize'),friendlyCommandError:(_label,e)=>e.message,updateCampaignPartyActionAvailability(){}};
+      usesBundledCampaignSetup:()=>false,selectedCampaignPlan:()=>({id:'a-debt-in-iron'}),hideConstructionPanel(){},refreshCampaignIndex:async()=>{},openCampaign:async()=>{},finalizeSelectedConstruction:async()=>calls.push('finalize'),chooseChatStart:async request=>({provider_id:request.model.provider_id,model_id:request.model.model_id}),friendlyCommandError:(_label,e)=>e.message,updateCampaignPartyActionAvailability(){}};
     vm.runInNewContext(source.slice(start,end),context);await context.beginConstruction();
     if(configured){assert.equal(calls.length,2);assert.equal(calls[0].player_character_id,'tavin-bell');assert.equal(calls[1],'finalize');assert.ok(!feedback.includes('No configured models'));}
     else {assert.equal(calls.length,0);assert.ok(feedback.includes('No configured models'));}

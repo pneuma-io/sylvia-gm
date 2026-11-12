@@ -40,6 +40,7 @@ from sylvia_gm.application.reusable_plans import (
     save_reusable_rift_plan,
 )
 from sylvia_gm.campaign.rift import rift_public_template
+from sylvia_gm.config.provider_settings import require_configured_model
 from sylvia_gm.domain.authority import (
     PackageLock,
     PackageRole,
@@ -56,6 +57,12 @@ from sylvia_gm.infrastructure.builder_source_ingestion import (
     stage_builder_sources_for_purge,
 )
 
+from .._chat_start import (
+    apply_chat_start,
+    chat_start_for,
+    chat_start_projection,
+    session_exists,
+)
 from ..owner_process import (
     _MAX_USER_TEXT_CHARS,
     OwnerProtocolError,
@@ -112,13 +119,23 @@ def handle_customize_ready_campaign(ctx: DispatchContext, params: Mapping[str, A
     }
     if ctx.method == "customize_ready_campaign":
         return customize_ready_campaign(ctx.application_owner, ctx.storage_root, **ready_arguments)
-    return start_ready_campaign(
+    provider_id = _required_text(params, "provider_id")
+    model_id = _required_text(params, "model_id")
+    start = chat_start_for(
+        ctx, role="dm", provider_id=provider_id, model_id=model_id, params=params,
+    )
+    result = start_ready_campaign(
         ctx.application_owner, ctx.storage_root, **ready_arguments,
         display_name=_required_text(params, "display_name"),
-        provider_id=_required_text(params, "provider_id"),
-        model_id=_required_text(params, "model_id"),
+        provider_id=provider_id,
+        model_id=model_id,
         model_guidance_override=_optional_bool(params, "model_guidance_override"),
     )
+    # A model capability warning returns before any Game Master chat exists.
+    if result.get("local_ready") and isinstance(result.get("dm_session_id"), str):
+        apply_chat_start(ctx, result["dm_session_id"], start)
+        result = {**result, "chat_start": chat_start_projection(start)}
+    return result
 
 
 def handle_delete_reusable_library_entry(ctx: DispatchContext, params: Mapping[str, Any]) -> Any:
@@ -458,13 +475,21 @@ def handle_create_guided_campaign_draft(ctx: DispatchContext, params: Mapping[st
     builder_session_id = (
         "session-guided-" + hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]
     )
+    provider_id = _required_text(params, "provider_id")
+    model_id = _required_text(params, "model_id")
+    start = chat_start_for(
+        ctx, role="builder", provider_id=provider_id, model_id=model_id, params=params,
+    )
+    replayed = session_exists(ctx, builder_session_id)
     draft = ctx.bus.create_guided_campaign_draft(
         operation_id=operation_id,
         display_name=_required_text(params, "display_name"),
         builder_session_id=builder_session_id,
-        builder_provider_id=_required_text(params, "provider_id"),
-        builder_model_id=_required_text(params, "model_id"),
+        builder_provider_id=provider_id,
+        builder_model_id=model_id,
     )
+    if not replayed:
+        apply_chat_start(ctx, draft.builder_session_id, start)
     return {
         "campaign_id": draft.campaign_id,
         "builder_session_id": draft.builder_session_id,
@@ -755,6 +780,23 @@ def handle_start_guided_creation_subflow(ctx: DispatchContext, params: Mapping[s
                     "name": source.name,
                 },
             }
+    parent_session = ctx.application_owner.session_context(
+        _required_text(params, "parent_session_id")
+    ).session
+    child_provider_id = _optional_text(params, "provider_id") or parent_session.provider_id
+    child_model_id = _optional_text(params, "model_id") or parent_session.model_id
+    if (child_provider_id, child_model_id) != (
+        parent_session.provider_id, parent_session.model_id,
+    ):
+        require_configured_model(
+            ctx.storage_root / "config.yaml",
+            provider_id=child_provider_id, model_id=child_model_id,
+        )
+    start = chat_start_for(
+        ctx, role="builder", provider_id=child_provider_id, model_id=child_model_id,
+        params=params,
+    )
+    replayed = session_exists(ctx, child_session_id)
     subflow = launch(
         operation_id=operation_id,
         campaign_id=_required_text(params, "campaign_id"),
@@ -768,6 +810,15 @@ def handle_start_guided_creation_subflow(ctx: DispatchContext, params: Mapping[s
         trigger_message_id=_optional_text(params, "trigger_message_id"),
         **reference_options,
     )
+    if replayed:
+        return _json_value(subflow)
+    # The new Builder chat is created on its parent's model; nothing has been sent yet.
+    child = ctx.application_owner.session_context(child_session_id).session
+    if (child.provider_id, child.model_id) != (child_provider_id, child_model_id):
+        ctx.application_owner.update_agent_session_model(
+            child_session_id, provider_id=child_provider_id, model_id=child_model_id,
+        )
+    apply_chat_start(ctx, child_session_id, start)
     return _json_value(subflow)
 
 
@@ -799,6 +850,12 @@ def handle_confirm_new_campaign(ctx: DispatchContext, params: Mapping[str, Any])
         package_lock = _candidate_package_lock(ctx.bus, candidate_id)
     else:
         raise OwnerProtocolError("candidate_id must be a nonempty string or null")
+    provider_id = _required_text(params, "provider_id")
+    model_id = _required_text(params, "model_id")
+    start = chat_start_for(
+        ctx, role="builder", provider_id=provider_id, model_id=model_id, params=params,
+    )
+    replayed = session_exists(ctx, builder_session_id)
     confirmation = ctx.bus.confirm_new_campaign(
         operation_id=operation_id,
         display_name=_required_text(params, "display_name"),
@@ -806,12 +863,14 @@ def handle_confirm_new_campaign(ctx: DispatchContext, params: Mapping[str, Any])
         turn_id=_required_text(params, "turn_id"),
         package_candidate_id=candidate_id,
         builder_session_id=builder_session_id,
-        builder_provider_id=_required_text(params, "provider_id"),
-        builder_model_id=_required_text(params, "model_id"),
+        builder_provider_id=provider_id,
+        builder_model_id=model_id,
         builder_selected_skill=(
             _optional_text(params, "builder_skill") or "BUILD CAMPAIGN PLAN"
         ),
     )
+    if not replayed:
+        apply_chat_start(ctx, builder_session_id, start)
     return {
         "campaign_id": confirmation.campaign_id,
         "resulting_revision": confirmation.resulting_revision,
@@ -875,6 +934,11 @@ def handle_finalize_campaign_construction(ctx: DispatchContext, params: Mapping[
     dm_model_id = _required_text(params, "dm_model_id")
     plan_text = _campaign_plan_text(ctx.storage_root, campaign_id)
     structured_plan = _campaign_plan_payload(ctx.storage_root, campaign_id)
+    # Settle the Game Master effort and speed before the handoff commits, so an
+    # unsupported choice is refused while the Interview is still the active chat.
+    start = chat_start_for(
+        ctx, role="dm", provider_id=dm_provider_id, model_id=dm_model_id, params=params,
+    )
     _preflight_guided_start(
         application_owner=ctx.application_owner,
         bus=ctx.bus,
@@ -886,6 +950,7 @@ def handle_finalize_campaign_construction(ctx: DispatchContext, params: Mapping[
         plan_text=plan_text,
         structured_plan=structured_plan,
         gm_system_prompt=ctx.gm_system_prompt,
+        reasoning_effort=start.reasoning_effort,
     )
     construction, plan, handoff = ctx.bus.finalize_campaign_construction(
         campaign_id=campaign_id,
@@ -898,6 +963,8 @@ def handle_finalize_campaign_construction(ctx: DispatchContext, params: Mapping[
             "model_guidance_override",
         ),
     )
+    # Saved before this command returns, so the opening call that follows uses it.
+    apply_chat_start(ctx, handoff.dm_session_id, start)
     dm_turn_id = ctx.application_owner.current_open_turn(campaign_id)
     if dm_turn_id is None:
         suffix = hashlib.sha256(campaign_id.encode("utf-8")).hexdigest()[:24]
@@ -907,6 +974,7 @@ def handle_finalize_campaign_construction(ctx: DispatchContext, params: Mapping[
         "construction": construction,
         "plan": plan,
         "handoff": handoff,
+        "chat_start": chat_start_projection(start),
         "dm_turn_id": dm_turn_id,
         "dm_attempt_id": (
             "attempt-campaign-start-"

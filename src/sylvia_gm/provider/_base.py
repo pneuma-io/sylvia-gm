@@ -87,6 +87,8 @@ class ProviderResponse:
     """Private signed/tool continuation fields, never canonical conversation history."""
     provider_reported_reasoning_effort: str | None = None
     """Response metadata reported by the provider, never copied from our request."""
+    provider_reported_service_tier: str | None = None
+    """The speed tier the provider says it used; it may differ from the one requested."""
 
 
 @dataclass
@@ -102,6 +104,7 @@ class ProviderStreamChunk:
     chat_completion_metadata: dict[str, Any] | None = field(default=None, repr=False)
     """Private signed/tool continuation fields, never canonical conversation history."""
     provider_reported_reasoning_effort: str | None = None
+    provider_reported_service_tier: str | None = None
 
 
 @asynccontextmanager
@@ -113,6 +116,18 @@ async def closing_provider_stream(stream: AsyncIterator[ProviderStreamChunk]):
         close = getattr(stream, "aclose", None)
         if close is not None:
             await close()
+
+
+@dataclass(frozen=True)
+class SpeedOption:
+    """One provider-native speed tier a model advertises, with the provider's own wording."""
+
+    id: str
+    name: str
+    description: str = ""
+
+    def projection(self) -> dict[str, str]:
+        return {"id": self.id, "name": self.name, "description": self.description}
 
 
 @dataclass
@@ -174,6 +189,10 @@ class ModelInfo:
     default_reasoning_effort: str | None = None
     reasoning_control: str | None = None
     reasoning_source: str = "unknown"
+    speed_options: tuple[SpeedOption, ...] | None = None
+    """Native speed tiers this route documents or advertises; None means no known choice."""
+    speed_control: str | None = None
+    speed_source: str = "unknown"
 
     def __post_init__(self) -> None:
         """Keep legacy constructors honest without pretending their value was runtime-detected."""

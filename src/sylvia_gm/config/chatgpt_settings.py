@@ -76,7 +76,11 @@ def chatgpt_settings_action(
     status = account.status()
     if action in {"models", "add_model"}:
         models = account.models()
-        refresh_subscription_reasoning(storage_root / "config.yaml", models)
+        # True when saved models gained newly advertised effort or speed options, so the
+        # owner can reload its model catalog without the user re-adding anything.
+        status["saved_models_refreshed"] = refresh_subscription_reasoning(
+            storage_root / "config.yaml", models,
+        )
         status["models"] = models
         if action == "add_model":
             if not isinstance(model, dict) or set(model) != {
@@ -159,6 +163,7 @@ def chatgpt_settings_action(
                 supports_tools=True,
                 supported_reasoning_efforts=selected.get("supported_reasoning_efforts"),
                 default_reasoning_effort=selected.get("default_reasoning_effort"),
+                service_tiers=selected.get("service_tiers"),
             )
             status["saved_model"] = saved["canonical_model_id"]
     return status

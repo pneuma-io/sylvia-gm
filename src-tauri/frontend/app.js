@@ -58,6 +58,7 @@ const SylviaGMFrontend = (() => {
     displayHistory: null, // only the selected session's loaded display pages
     selectedTheme: 'slate',
     pendingModelGuidance: null,
+    pendingChatStart: null, // the Game Master start chosen before a model capability warning
     pendingModelMode: null,
     providerDiscovery: { offset: 0, total: 0, hasMore: false, models: [] },
     providerCapacity: null,
@@ -693,6 +694,7 @@ const SylviaGMFrontend = (() => {
   let settingsReturnFocus = null;
   let tutorials = null;
   let readyCampaigns = null;
+  let chatStart = null;
 
   // Keep every provider turn's renderer-owned lifecycle under its session identity.
   function ensureSessionActivity({
@@ -910,6 +912,8 @@ const SylviaGMFrontend = (() => {
         providerId: command.provider_id,
         modelId: command.model_id,
         displayName: command.display_name,
+        reasoningEffort: command.reasoning_effort || null,
+        speed: command.speed || null,
       }),
       rename_builder_chat: (sessionId, displayName) =>
         invoke('rename_builder_chat', { sessionId, displayName }),
@@ -1049,6 +1053,10 @@ const SylviaGMFrontend = (() => {
         characterProfileSha256: command.character_profile_sha256 || null,
         characterArtifactId: command.character_artifact_id || null,
         characterArtifactSha256: command.character_artifact_sha256 || null,
+        providerId: command.provider_id || null,
+        modelId: command.model_id || null,
+        reasoningEffort: command.reasoning_effort || null,
+        speed: command.speed || null,
       }),
       return_guided_creation_subflow: (command) => invoke('return_guided_creation_subflow', {
         operationId: command.operation_id,
@@ -1128,9 +1136,19 @@ const SylviaGMFrontend = (() => {
         effort: command.effort,
         mode: command.mode,
       }),
+      switch_session_speed: (command) => invoke('switch_session_speed', {
+        sessionId: command.session_id,
+        speed: command.speed,
+      }),
       set_default_model: (providerId, modelId) => invoke('set_default_model', {
         providerId,
         modelId,
+      }),
+      set_chat_defaults: (command) => invoke('set_chat_defaults', {
+        providerId: command.provider_id,
+        modelId: command.model_id,
+        reasoningEffort: command.reasoning_effort,
+        speed: command.speed,
       }),
       submit_session_input: (command) => invoke('submit_session_input', {
         sessionId: command.session_id,
@@ -1209,6 +1227,7 @@ const SylviaGMFrontend = (() => {
       start_import_repair: (command) => invoke('start_import_repair', {
         repairId: command.repair_id, operationId: command.operation_id,
         providerId: command.provider_id, modelId: command.model_id,
+        reasoningEffort: command.reasoning_effort || null, speed: command.speed || null,
       }),
       create_guided_campaign_draft: (command) => invoke('create_guided_campaign_draft', {
         operationId: command.operation_id,
@@ -1264,13 +1283,15 @@ const SylviaGMFrontend = (() => {
         'model_guidance', { campaignId, modelId, overrideAccepted }
       ),
       finalize_campaign_construction: (
-        campaignId, dmProviderId, dmModelId, modelGuidanceOverride
+        campaignId, dmProviderId, dmModelId, modelGuidanceOverride, start = null
       ) => invoke(
         'finalize_campaign_construction', {
           campaignId,
           dmProviderId,
           dmModelId,
           modelGuidanceOverride,
+          reasoningEffort: start?.reasoning_effort || null,
+          speed: start?.speed || null,
         }
       ),
       catalog: (campaignId) => invoke('catalog', { campaignId }),
@@ -1570,6 +1591,7 @@ const SylviaGMFrontend = (() => {
         choice.model_id === saved?.canonical_model_id);
       if (index < 0) return;
       $('model-choice').value = String(index);
+      renderChatDefaultChoices();
       void setSelectedDefaultModel();
     });
     document.querySelectorAll('[data-chatgpt-action]').forEach((button) => {
@@ -1687,12 +1709,23 @@ const SylviaGMFrontend = (() => {
     $('home-new-campaign-btn').addEventListener('click', () => {
       void startCampaignBuilder();
     });
+    chatStart = window.SylviaChatStart?.create({
+      document, models: () => state.modelChoices,
+      defaults: () => state.providerSettings?.chat_defaults || {},
+    }) || null;
     readyCampaigns = window.SylviaReadyCampaigns?.create({
       document, storage: window.localStorage, uuid: () => crypto.randomUUID(),
       catalog: () => state.bridge.ready_campaign_catalog(),
       start: command => state.bridge.start_ready_campaign(command),
       customize: command => state.bridge.customize_ready_campaign(command),
-      model: () => selectedModelChoice() || defaultModelChoice(),
+      // The Game Master's opening follows the start, so its settings are chosen first.
+      model: async () => {
+        const model = selectedModelChoice() || defaultModelChoice();
+        if (!model) return null;
+        return await chooseChatStart({
+          role: 'dm', title: 'Start Game Master', action: 'Start campaign', model,
+        }) || { cancelled: true };
+      },
       customizationModel: () => defaultModelChoice(),
       error: friendlyCommandError, guidance: guidanceWarningText,
       onStarted: openReadyCampaign,
@@ -1803,7 +1836,14 @@ const SylviaGMFrontend = (() => {
     });
     $('dismiss-model-guidance-btn').addEventListener('click', clearModelGuidanceWarning);
     $('model-choice').addEventListener('change', () => {
+      renderChatDefaultChoices();
       updateModelSwitchButtons();
+    });
+    ['default-effort-choice', 'default-speed-choice'].forEach((id) => {
+      $(id).addEventListener('change', () => {
+        renderChatDefaultChoices();
+        updateModelSwitchButtons();
+      });
     });
     $('chat-model-choice').addEventListener('change', () => {
       void switchSelectedSessionModel('current');
@@ -1858,6 +1898,9 @@ const SylviaGMFrontend = (() => {
         void switchSessionReasoning(mode, value === '' || (mode === 'current' && value === 'mode_default')
           ? null : value);
       });
+    });
+    $('chat-speed-current').addEventListener('change', () => {
+      void switchSessionSpeed($('chat-speed-current').value);
     });
     $('set-default-model-btn').addEventListener('click', () => {
       void setSelectedDefaultModel();
@@ -1968,6 +2011,8 @@ const SylviaGMFrontend = (() => {
     document.querySelector('.settings-tab.active')?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
     $('close-settings-btn').focus();
     if (selectedTab === 'packages') void refreshRulesetBrowser();
+    // Models is where a default speed is chosen, so saved ChatGPT models learn their tiers here.
+    if (selectedTab === 'models') void refreshSavedSubscriptionCapabilities();
   }
 
   let localSupportReport = null;
@@ -2130,11 +2175,20 @@ const SylviaGMFrontend = (() => {
       openSettings('models');
       return;
     }
+    // The repair Builder's first call starts by itself, so its settings are chosen first.
+    const start = await chooseChatStart({
+      role: 'builder', title: 'Start repair Builder', action: 'Start repair', model: selected,
+    });
+    if (!start) {
+      setPackageInstallStatus('Repair not started. Nothing was sent to the model.');
+      return;
+    }
     $('repair-import-btn').disabled = true;
     try {
       const chat = await state.bridge.start_import_repair({
         repair_id: repair.repair_id, operation_id: `repair-${crypto.randomUUID()}`,
-        provider_id: selected.provider_id, model_id: selected.model_id,
+        provider_id: start.provider_id, model_id: start.model_id,
+        reasoning_effort: start.reasoning_effort, speed: start.speed,
       });
       state.pendingImportRepair = null;
       $('repair-import-btn').hidden = true;
@@ -2897,6 +2951,11 @@ const SylviaGMFrontend = (() => {
       refreshPendingLogin = Boolean(result.login_pending);
       if (result.signed_in && !result.models) {
         result = { ...result, ...await state.bridge.chatgpt_connection('models') };
+      }
+      if (result.saved_models_refreshed) {
+        // Saved models just learned new effort or speed options from the runtime's list.
+        await refreshProviderSettings();
+        await refreshModelChoices();
       }
       chatgptAccountStatus = result;
       $('chatgpt-model-card').hidden = !result.signed_in;
@@ -3820,11 +3879,98 @@ const SylviaGMFrontend = (() => {
     chatSelect.value = chatIndex >= 0 ? String(chatIndex) : '';
     select.disabled = false;
     modelRequiredCreationButtons.forEach((button) => { button.disabled = false; });
+    renderChatDefaultChoices(true);
     updateModelSwitchButtons();
     renderChatModelPicker();
     status.textContent = defaultIndex >= 0
-      ? `New chats use ${state.modelChoices[defaultIndex].model_name || configuredDefault.model_id}.`
+      ? `New chats use ${chatDefaultsSummary(state.modelChoices[defaultIndex])}.`
       : 'Choose a default for new Builder and Game Master chats.';
+  }
+
+  // What new chats start with, in the words the Settings card uses.
+  function chatDefaultsSummary(choice) {
+    const start = window.SylviaChatStart;
+    if (!start) return choice.model_name || choice.model_id;
+    return start.summary(choice, start.inherited(choice, state.providerSettings?.chat_defaults || {}), null);
+  }
+
+  // Default effort and speed follow the model picked above; options come only from that
+  // model's capabilities. `reset` shows the saved defaults again.
+  function renderChatDefaultChoices(reset = false) {
+    const start = window.SylviaChatStart;
+    const effortSelect = $('default-effort-choice');
+    const speedSelect = $('default-speed-choice');
+    if (!effortSelect || !speedSelect) return;
+    const choice = selectedModelChoice('default');
+    if (!choice || !start) {
+      effortSelect.innerHTML = '';
+      speedSelect.innerHTML = '';
+      effortSelect.disabled = true;
+      speedSelect.disabled = true;
+      speedSelect.title = '';
+      $('default-speed-note').textContent = '';
+      return;
+    }
+    const saved = state.providerSettings?.chat_defaults || {};
+    const efforts = start.effortOptions(choice, null);
+    const speeds = start.speedOptions(choice);
+    let effort = reset ? saved.reasoning_effort || start.MODE_DEFAULT : effortSelect.value || start.MODE_DEFAULT;
+    let speed = reset ? saved.speed || start.STANDARD : speedSelect.value || start.STANDARD;
+    if (!efforts.some(([value]) => value === effort)) {
+      // A saved default this model lacks stays visible with what new chats do instead.
+      if (reset) efforts.push([effort, `${start.effortLabel(effort)} (not on this model: new chats use Mode default)`]);
+      else effort = start.MODE_DEFAULT;
+    }
+    if (!speeds.some(([value]) => value === speed)) {
+      if (reset) speeds.push([speed, `${speed} (not on this model: new chats use Standard)`]);
+      else speed = start.STANDARD;
+    }
+    const optionHtml = ([value, label]) =>
+      `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`;
+    effortSelect.innerHTML = efforts.map(optionHtml).join('');
+    effortSelect.value = effort;
+    speedSelect.innerHTML = speeds.map(optionHtml).join('');
+    speedSelect.value = speed;
+    effortSelect.disabled = false;
+    speedSelect.disabled = speeds.length < 2;
+    // The explanation is always on the control; a chosen tier also shows it in the card,
+    // because that is the choice that changes what a reply costs.
+    const note = start.speedNote(choice, speed);
+    speedSelect.title = note;
+    $('default-speed-note').textContent = speed === start.STANDARD ? '' : note;
+  }
+
+  // Models saved before speed tiers were recorded gain them from one model-list read, the
+  // first time Models settings opens. This asks the signed-in ChatGPT runtime which tiers
+  // it offers; it never calls a model and is kept out of application startup.
+  async function refreshSavedSubscriptionCapabilities() {
+    if (state.subscriptionCapabilitiesChecked || !state.bridge?.chatgpt_connection) return;
+    const provider = state.providerSettings?.configured?.find(
+      (item) => item.provider_id === 'chatgpt_subscription');
+    if (!provider?.models?.some((model) =>
+      model.transport === 'codex_app_server' && model.service_tiers == null)) return;
+    state.subscriptionCapabilitiesChecked = true;
+    try {
+      const status = await state.bridge.chatgpt_connection('status');
+      if (!status.signed_in) return;
+      const listed = await state.bridge.chatgpt_connection('models');
+      if (listed.saved_models_refreshed) {
+        await refreshProviderSettings();
+        await refreshModelChoices();
+      }
+    } catch (_) { /* Speed stays unavailable until the ChatGPT account page is opened. */ }
+  }
+
+  // Offer a new chat's model, effort and speed before a first model call that would
+  // otherwise start by itself. Returns null only when the person cancels; nothing has
+  // been sent. With no configured model there is nothing to choose, so the start goes
+  // ahead unchanged and the usual missing-provider handling applies.
+  async function chooseChatStart(request) {
+    const model = request.model || defaultModelChoice() || state.modelChoices[0] || null;
+    if (!model) return {};
+    // Without the chooser the chat still starts from the saved Settings defaults.
+    if (!chatStart) return { provider_id: model.provider_id, model_id: model.model_id };
+    return chatStart.choose({ ...request, model });
   }
 
   function chatModelModeLabel() {
@@ -3905,8 +4051,11 @@ const SylviaGMFrontend = (() => {
     const hasIdleSession = Boolean(state.activeSessionId) && !selectedSessionIsWorking() &&
       !state.reasoningPending;
     const savedDefault = state.providerSettings?.default_model;
+    const savedStart = state.providerSettings?.chat_defaults || {};
     $('set-default-model-btn').disabled = !chosenDefault ||
-      (chosenDefault.provider_id === savedDefault?.provider_id && chosenDefault.model_id === savedDefault?.model_id);
+      (chosenDefault.provider_id === savedDefault?.provider_id && chosenDefault.model_id === savedDefault?.model_id &&
+        ($('default-effort-choice')?.value || 'mode_default') === (savedStart.reasoning_effort || 'mode_default') &&
+        ($('default-speed-choice')?.value || 'standard') === (savedStart.speed || 'standard'));
     $('chat-model-choice').disabled = !state.modelChoices.length || !hasIdleSession;
     $('chat-model-picker-btn').disabled = !state.modelChoices.length || !hasIdleSession;
     if ($('chat-model-picker-btn').disabled) closeChatModelPicker();
@@ -3942,6 +4091,7 @@ const SylviaGMFrontend = (() => {
     $('chat-reasoning-current').disabled = disabled;
     $('chat-reasoning-once').disabled = disabled;
     if (disabled) closeReasoningPicker();
+    const speedName = renderSpeedPicker(reasoning ? saved : null, disabled);
     if (!reasoning) {
       $('chat-reasoning-btn').textContent = 'Reasoning unavailable';
       $('chat-reasoning-btn').title = 'Reasoning unavailable';
@@ -3973,15 +4123,72 @@ const SylviaGMFrontend = (() => {
     const scope = reasoning.scope === 'once' ? 'next reply' : reasoning.scope === 'session' ? 'this chat' : 'mode default';
     const actual = reasoningLabel(reasoning.effective_request);
     $('chat-reasoning-btn').textContent = reasoning.valid
-      ? `${actual}${reasoning.scope === 'once' ? ' · next reply' : ''}` : 'Choose a supported level';
+      ? `${actual}${reasoning.scope === 'once' ? ' · next reply' : ''}${speedName ? ` · ${speedName}` : ''}`
+      : 'Choose a supported level';
     const nextModel = saved.modelState?.once ? ` Next reply model: ${reasoning.model_id}.` : '';
     $('chat-reasoning-hint').textContent = reasoning.valid
       ? `Next reply requests ${actual} (${scope}).${nextModel} ` +
         (reasoning.supported === null ? 'Supported levels are unknown; the provider manages reasoning.' :
           'Next-reply choices clear after an attempted reply, including a stopped or failed reply.')
       : 'The saved level is unavailable for this model. Choose an available level or Mode default.';
-    $('chat-reasoning-btn').title = $('chat-reasoning-hint').textContent;
-    $('chat-reasoning-btn').setAttribute('aria-label', `Reasoning: ${$('chat-reasoning-hint').textContent}`);
+    $('chat-reasoning-btn').title = $('chat-reasoning-hint').textContent +
+      (speedName ? ` Speed: ${speedName}.` : '');
+    $('chat-reasoning-btn').setAttribute('aria-label',
+      `Reasoning: ${$('chat-reasoning-hint').textContent}${speedName ? ` Speed: ${speedName}.` : ''}`);
+  }
+
+  // This chat's speed sits with its effort. Tiers come from the answering model's
+  // capabilities; returns the requested tier's name, or '' for standard speed.
+  function renderSpeedPicker(saved, disabled) {
+    const select = $('chat-speed-current');
+    const hint = $('chat-speed-hint');
+    if (!select || !hint) return '';
+    const start = window.SylviaChatStart;
+    const speed = saved?.speed || null;
+    const choice = { speed_options: Array.isArray(speed?.supported) ? speed.supported : [] };
+    const options = start ? start.speedOptions(choice) : [['standard', 'Standard']];
+    const current = speed?.current || 'standard';
+    if (!options.some(([value]) => value === current)) {
+      options.push([current, `${current} (not offered by this reply's model)`]);
+    }
+    select.innerHTML = options.map(([value, label]) =>
+      `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`).join('');
+    select.value = current;
+    select.disabled = disabled || !speed || options.length < 2;
+    if (!speed || !start) {
+      hint.textContent = '';
+      return '';
+    }
+    hint.textContent = speed.current && !speed.effective_request
+      ? 'The next reply\'s model does not offer this chat\'s speed, so that reply uses standard speed.'
+      : start.speedNote(choice, speed.effective_request || 'standard');
+    return speed.effective_request ? start.speedLabel(choice, speed.effective_request) : '';
+  }
+
+  async function switchSessionSpeed(speed) {
+    const sessionId = state.activeSessionId;
+    const saved = state.sessionReasoning;
+    if (!sessionId || saved?.sessionId !== sessionId || selectedSessionIsWorking() ||
+        state.reasoningPending || !state.bridge?.switch_session_speed) return;
+    state.reasoningPending = sessionId;
+    updateModelSwitchButtons();
+    let failed = false;
+    try {
+      const result = await state.bridge.switch_session_speed({ session_id: sessionId, speed });
+      if (state.sessionReasoning?.sessionId === sessionId && state.activeSessionId === sessionId)
+        state.sessionReasoning.speed = result.speed_state;
+    } catch (_) {
+      failed = true;
+    } finally {
+      state.reasoningPending = null;
+      updateModelSwitchButtons();
+    }
+    if (state.sessionReasoning !== saved || state.activeSessionId !== sessionId) return;
+    if (failed) {
+      $('chat-speed-hint').textContent = 'Speed could not be changed. Wait for the reply to finish, then choose an available speed.';
+    }
+    $('chat-reasoning-popover').hidden = false;
+    $('chat-reasoning-btn').setAttribute('aria-expanded', 'true');
   }
 
   async function switchSessionReasoning(mode, effort) {
@@ -4012,16 +4219,27 @@ const SylviaGMFrontend = (() => {
 
   async function setSelectedDefaultModel() {
     const selected = selectedModelChoice('default');
-    if (!selected || !state.bridge || !state.bridge.set_default_model) return;
+    if (!selected || !state.bridge ||
+        !(state.bridge.set_chat_defaults || state.bridge.set_default_model)) return;
     const status = $('model-status');
     try {
-      await state.bridge.set_default_model(selected.provider_id, selected.model_id);
+      if (state.bridge.set_chat_defaults) {
+        await state.bridge.set_chat_defaults({
+          provider_id: selected.provider_id,
+          model_id: selected.model_id,
+          reasoning_effort: $('default-effort-choice').value || 'mode_default',
+          speed: $('default-speed-choice').value || 'standard',
+        });
+      } else {
+        await state.bridge.set_default_model(selected.provider_id, selected.model_id);
+      }
       await refreshProviderSettings();
       await refreshModelChoices();
-      status.textContent = 'New Builder and Game Master chats will use this model.';
+      status.textContent = `New Builder and Game Master chats will use ${chatDefaultsSummary(selected)}. ` +
+        'Chats you already have keep their own settings.';
       $('set-added-model-default-btn').hidden = true;
     } catch (e) {
-      status.textContent = 'The default model could not be changed.';
+      status.textContent = friendlyCommandError('The defaults for new chats could not be changed', e);
     }
   }
 
@@ -4054,9 +4272,10 @@ const SylviaGMFrontend = (() => {
         await renderPlayerProjection(activity.campaignId, sessionId);
       }
       if (!selectedActivityMatches(activity)) return result;
-      status.textContent = mode === 'once'
+      status.textContent = (mode === 'once'
         ? `Next model turn will use ${selected.model_name || selected.model_id}.`
-        : `This chat now uses ${selected.model_name || selected.model_id}.`;
+        : `This chat now uses ${selected.model_name || selected.model_id}.`) +
+        (result?.speed_cleared ? ' Speed is back to Standard: this model does not offer the previous speed.' : '');
       closeChatModelPicker();
       renderChatModelPicker();
       return result;
@@ -8772,7 +8991,8 @@ const SylviaGMFrontend = (() => {
   function renderSessionModelState(context) {
     const modelState = context && context.model_state;
     state.sessionReasoning = { sessionId: state.activeSessionId,
-      value: context?.reasoning_state || null, modelState };
+      value: context?.reasoning_state || null, modelState,
+      speed: context?.speed_state || null };
     renderReasoningPicker();
     const current = modelState && modelState.current;
     if (!current) return;
@@ -11853,8 +12073,21 @@ const SylviaGMFrontend = (() => {
     if (state.builderLaunchPending.has(parentSessionId)) return;
     state.builderLaunchPending.add(parentSessionId);
     updateCharacterProfileControls();
-    setInlineStatus('Opening Builder chat…', 'construction');
     try {
+      // These purposes open an independent Builder chat whose first call starts by
+      // itself, so its settings are chosen first. Other Builder chats wait for a message.
+      let start = null;
+      if (['ruleset', 'setting', 'plan', 'player_character', 'companion'].includes(purpose)) {
+        start = await chooseChatStart({
+          role: 'builder', title: 'Start Builder chat', action: 'Start Builder',
+          model: selectedModelChoice() || defaultModelChoice(),
+        });
+        if (!start) {
+          setInlineStatus('Builder chat not started. Nothing was sent to the model.', 'construction');
+          return;
+        }
+      }
+      setInlineStatus('Opening Builder chat…', 'construction');
       const result = await state.bridge.start_guided_creation_subflow({
         operation_id: `guided-subflow-${crypto.randomUUID()}`,
         campaign_id: state.constructionDraftId,
@@ -11863,6 +12096,8 @@ const SylviaGMFrontend = (() => {
         purpose,
         visible_answer: visibleAnswer,
         trigger_message_id: triggerMessageId,
+        ...(start?.provider_id ? { provider_id: start.provider_id, model_id: start.model_id,
+          reasoning_effort: start.reasoning_effort, speed: start.speed } : {}),
         ...(profile ? { character_profile_id: profile.id,
           character_profile_sha256: profile.content_sha256 } : {}),
         ...(character ? { character_artifact_id: character.id,
@@ -12556,6 +12791,16 @@ const SylviaGMFrontend = (() => {
       return;
     }
     if (state.campaignConfirmationPending) return;
+    // The Game Master's opening follows this confirmation, so its settings are chosen
+    // first. Cancelling here leaves the Interview exactly as it was.
+    const gameMasterStart = await chooseChatStart({
+      role: 'dm', title: 'Start Game Master', action: 'Begin adventure', model: selected,
+    });
+    if (!gameMasterStart) {
+      setInlineStatus('Not started. Nothing was sent to the model.', 'construction');
+      return;
+    }
+    if (state.campaignConfirmationPending) return;
     state.campaignConfirmationPending = true;
     const confirmationControls = [
       $('begin-construction-btn'),
@@ -12612,8 +12857,8 @@ const SylviaGMFrontend = (() => {
           archetype_id: playerCharacterId,
           companion_ids: companionIds,
           customization_notes: lane === 'customize' ? premise : '',
-          provider_id: selected.provider_id,
-          model_id: selected.model_id,
+          provider_id: gameMasterStart.provider_id,
+          model_id: gameMasterStart.model_id,
           construction_intent: constructionIntent,
         });
       } else {
@@ -12636,7 +12881,7 @@ const SylviaGMFrontend = (() => {
       await refreshCampaignIndex();
       await openCampaign(begun.campaign_id, begun.builder_session_id || null);
       setInlineStatus('Guided campaign construction started · Builder active', 'construction');
-      await finalizeSelectedConstruction();
+      await finalizeSelectedConstruction(false, gameMasterStart);
     } catch (e) {
       setInlineStatus(friendlyCommandError(
         'Construction could not start',
@@ -12651,7 +12896,8 @@ const SylviaGMFrontend = (() => {
     }
   }
 
-  async function finalizeSelectedConstruction(modelGuidanceOverride = false) {
+  // `chosenStart` is the Game Master start already chosen for this handoff, if any.
+  async function finalizeSelectedConstruction(modelGuidanceOverride = false, chosenStart = null) {
     if (!state.activeCampaignId || !state.bridge ||
         !state.bridge.finalize_campaign_construction) return;
     const openingCampaignId = state.activeCampaignId;
@@ -12659,7 +12905,7 @@ const SylviaGMFrontend = (() => {
     let openingActivity = null;
     const stillInInterview = () => state.activeCampaignId === openingCampaignId &&
       state.activeSessionId === interviewSessionId;
-    const selected = selectedModelChoice();
+    let selected = selectedModelChoice();
     if (!selected) {
       setInlineStatus('No configured DM model', 'construction');
       return;
@@ -12674,6 +12920,26 @@ const SylviaGMFrontend = (() => {
     const handoffControlStates = handoffControls.map((control) => control.disabled);
     handoffControls.forEach((control) => { control.disabled = true; });
     try {
+    // Settle the Game Master's model, effort and speed before anything is committed.
+    // "Continue anyway" after a capability warning reuses the start chosen before it.
+    let start = chosenStart;
+    if (!start && modelGuidanceOverride && state.pendingChatStart?.campaign_id === openingCampaignId) {
+      start = state.pendingChatStart.start;
+    }
+    if (!start && !modelGuidanceOverride) {
+      start = await chooseChatStart({
+        role: 'dm', title: 'Start Game Master', action: 'Begin adventure', model: selected,
+      });
+      if (!start) {
+        if (stillInInterview()) setInlineStatus('Not started. Nothing was sent to the model.', 'construction');
+        return;
+      }
+    }
+    if (start?.provider_id) {
+      selected = state.modelChoices.find((choice) => choice.provider_id === start.provider_id &&
+        choice.model_id === start.model_id) || { provider_id: start.provider_id, model_id: start.model_id };
+    }
+    state.pendingChatStart = null;
     if (modelGuidanceOverride) {
       const pending = state.pendingModelGuidance;
       if (!pending || pending.campaign_id !== state.activeCampaignId ||
@@ -12693,6 +12959,7 @@ const SylviaGMFrontend = (() => {
         );
         if (!stillInInterview()) return;
         if (guidance.warning_required) {
+          state.pendingChatStart = start ? { campaign_id: openingCampaignId, start } : null;
           showModelGuidanceWarning(guidance, selected);
           setInlineStatus('Review the model capability warning', 'construction');
           return;
@@ -12709,7 +12976,8 @@ const SylviaGMFrontend = (() => {
         openingCampaignId,
         selected.provider_id,
         selected.model_id,
-        modelGuidanceOverride
+        modelGuidanceOverride,
+        start
       );
       handoffCommitted = true;
       // The Ready panel is rendered inside chronology. Restore it before polling can

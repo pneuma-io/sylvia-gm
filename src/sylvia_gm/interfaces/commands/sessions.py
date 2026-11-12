@@ -68,6 +68,7 @@ from sylvia_gm.config.provider_settings import (
     clear_session_model_once_settings,
     provider_settings,
     session_model_once_settings,
+    session_speed_settings,
 )
 from sylvia_gm.domain.authority import PackageRole, SafePayload, WriterRole
 from sylvia_gm.domain.campaign_plan import PackageBinding
@@ -78,7 +79,7 @@ from sylvia_gm.domain.package_library import (
     canonical_json_bytes,
 )
 from sylvia_gm.domain.session import SessionMessageKind
-from sylvia_gm.interfaces._session_reasoning import reasoning_state
+from sylvia_gm.interfaces._session_reasoning import reasoning_state, speed_state
 from sylvia_gm.provider._admin_audit import AdminAuditedProvider
 from sylvia_gm.provider._reasoning import bind_session_reasoning
 
@@ -104,6 +105,7 @@ from ..owner_process import (
     _selection_from_reference,
     _switch_session_model,
     _switch_session_reasoning,
+    _switch_session_speed,
 )
 from . import DispatchContext
 
@@ -117,6 +119,17 @@ def handle_switch_session_reasoning(ctx: DispatchContext, params: Mapping[str, A
         session_id=_required_text(params, "session_id"),
         effort=params["effort"], mode=_optional_text(params, "mode") or "current",
         choices=ctx.model_choices(),
+    )
+
+
+def handle_switch_session_speed(ctx: DispatchContext, params: Mapping[str, Any]) -> Any:
+    if "speed" not in params:
+        raise OwnerProtocolError("Speed selection requires speed")
+    return _switch_session_speed(
+        application_owner=ctx.application_owner, session_loop=ctx.session_loop,
+        config_path=ctx.storage_root / "config.yaml",
+        session_id=_required_text(params, "session_id"),
+        speed=params["speed"], choices=ctx.model_choices(),
     )
 
 
@@ -164,6 +177,11 @@ def handle_session_context(ctx: DispatchContext, params: Mapping[str, Any]) -> A
         "activity_progress": ctx.session_loop.activity_progress(session_id),
         "context_status_hint": ctx.session_loop.context_status_hint(session_id),
         "reasoning_state": reasoning_state(display_session, ctx.model_choices(), pending_model),
+        "speed_state": speed_state(
+            display_session, ctx.model_choices(),
+            session_speed_settings(ctx.storage_root / "config.yaml", session_id=session_id),
+            pending_model,
+        ),
         "model_state": {
             "current": {
                 "provider_id": display_session.provider_id,
@@ -171,6 +189,7 @@ def handle_session_context(ctx: DispatchContext, params: Mapping[str, Any]) -> A
             },
             "once": pending_model,
             "default_model": settings.get("default_model"),
+            "chat_defaults": settings.get("chat_defaults"),
         },
     }
 
@@ -306,7 +325,10 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
             selection_mode="once" if pending_once is not None else "session",
         )
     provider = _context_fitted_provider(
-        bind_session_reasoning(provider, effective_session),
+        bind_session_reasoning(
+            provider, effective_session,
+            session_speed_settings(ctx.storage_root / "config.yaml", session_id=session_id),
+        ),
         gm_mode=effective_session.role is WriterRole.DM,
     )
     if user_text.strip() == "/compact" and ooc_text is None:
@@ -1195,7 +1217,10 @@ def handle_manual_retry_session(ctx: DispatchContext, params: Mapping[str, Any])
             selection_mode="once" if pending_once is not None else "session",
         )
     provider = _context_fitted_provider(
-        bind_session_reasoning(provider, effective_session),
+        bind_session_reasoning(
+            provider, effective_session,
+            session_speed_settings(ctx.storage_root / "config.yaml", session_id=session_id),
+        ),
         gm_mode=effective_session.role is WriterRole.DM,
     )
     control = ProviderControl()
@@ -1337,7 +1362,11 @@ def handle_start_dm_session(ctx: DispatchContext, params: Mapping[str, Any]) -> 
             selection_mode="session",
         )
     provider = _context_fitted_provider(
-        bind_session_reasoning(provider, dm_context.session), gm_mode=True,
+        bind_session_reasoning(
+            provider, dm_context.session,
+            session_speed_settings(ctx.storage_root / "config.yaml", session_id=session_id),
+        ),
+        gm_mode=True,
     )
     opening_plan_text, opening_plan = _admitted_dm_campaign_plan(
         ctx.application_owner,

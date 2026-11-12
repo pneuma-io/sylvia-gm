@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import dataclasses
 import hashlib
 from collections.abc import Mapping
 from pathlib import Path
@@ -18,6 +19,7 @@ from sylvia_gm.infrastructure.builder_source_ingestion import (
     rollback_builder_source_batch,
 )
 
+from .._chat_start import ChatStart, apply_chat_start, chat_start_for, session_exists
 from ..owner_process import (
     OwnerProtocolError,
     _builder_workspace,
@@ -26,6 +28,21 @@ from ..owner_process import (
     _required_text,
 )
 from . import DispatchContext
+
+
+def _started_builder_chat(
+    ctx: DispatchContext, chat: Any, start: ChatStart, *, replayed: bool,
+) -> Any:
+    """Save a new Builder chat's start settings and return the chat as it now stands."""
+    if replayed:
+        return chat
+    apply_chat_start(ctx, chat.session.session_id, start)
+    if start.reasoning_effort is None:
+        return chat
+    return dataclasses.replace(
+        chat,
+        session=dataclasses.replace(chat.session, reasoning_effort=start.reasoning_effort),
+    )
 
 
 def handle_builder_chat_index(ctx: DispatchContext, params: Mapping[str, Any]) -> Any:
@@ -41,11 +58,18 @@ def handle_start_import_repair(ctx: DispatchContext, params: Mapping[str, Any]) 
             raise CommandRejected("Configure a default model before creating a chat")
         provider_id = _required_text(default, "provider_id")
         model_id = _required_text(default, "model_id")
-    return start_import_repair_chat(
+    start = chat_start_for(
+        ctx, role="builder", provider_id=provider_id, model_id=model_id, params=params,
+    )
+    existing = {chat.session.session_id for chat in ctx.application_owner.builder_chat_index()}
+    chat = start_import_repair_chat(
         ctx.application_owner, ctx.storage_root,
         repair_id=_required_text(params, "repair_id"),
         operation_id=_required_text(params, "operation_id"),
         provider_id=provider_id, model_id=model_id,
+    )
+    return _started_builder_chat(
+        ctx, chat, start, replayed=chat.session.session_id in existing,
     )
 
 
@@ -62,12 +86,17 @@ def handle_create_builder_chat(ctx: DispatchContext, params: Mapping[str, Any]) 
             raise CommandRejected("Configure a default model before creating a chat")
         provider_id = _required_text(default, "provider_id")
         model_id = _required_text(default, "model_id")
-    return ctx.application_owner.create_builder_chat(
+    start = chat_start_for(
+        ctx, role="builder", provider_id=provider_id, model_id=model_id, params=params,
+    )
+    replayed = session_exists(ctx, session_id)
+    chat = ctx.application_owner.create_builder_chat(
         session_id=session_id,
         provider_id=provider_id,
         model_id=model_id,
         display_name=_optional_text(params, "display_name") or "New chat",
     )
+    return _started_builder_chat(ctx, chat, start, replayed=replayed)
 
 
 def handle_rename_builder_chat(ctx: DispatchContext, params: Mapping[str, Any]) -> Any:

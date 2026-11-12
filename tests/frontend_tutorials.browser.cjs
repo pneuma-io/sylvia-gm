@@ -160,6 +160,10 @@ test('optional tutorial suite in the shipped shell', { timeout: 120000 }, async 
       assert.equal(await page.locator('#tutorial-next-btn').isDisabled(), true);
       assert.deepEqual(await page.evaluate(() => window.commandCalls), []);
       await page.locator('#ready-campaign-start').click();
+      // Start first offers the Game Master's model, effort and speed; nothing is sent yet.
+      assert.equal(await page.locator('#chat-start-dialog').isVisible(), true);
+      assert.deepEqual(await page.evaluate(() => window.commandCalls), []);
+      await page.locator('#chat-start-confirm').click();
       assert.deepEqual(await page.evaluate(() => window.commandCalls), ['start']);
       assert.match(await page.locator('#ready-campaign-status').innerText(), /retry resumes the same copy/i);
       assert.match(await page.locator('#tutorial-title').innerText(), /Start when/);

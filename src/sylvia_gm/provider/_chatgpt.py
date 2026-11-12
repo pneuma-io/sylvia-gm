@@ -323,6 +323,9 @@ class ChatGPTProvider(Provider):
                 }
                 if kwargs.get("reasoning_effort") is not None:
                     turn["effort"] = kwargs["reasoning_effort"]
+                if kwargs.get("service_tier") is not None:
+                    # A tier id advertised by model/list; absent keeps the runtime default.
+                    turn["serviceTier"] = kwargs["service_tier"]
                 await self._audit("turn/start", turn)
                 with timing.measure("turn_start"):
                     started = await asyncio.to_thread(connection.call, "turn/start", turn)

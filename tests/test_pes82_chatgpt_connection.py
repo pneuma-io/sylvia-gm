@@ -212,7 +212,8 @@ def test_managed_login_status_and_logout_exclude_tokens(tmp_path: Path) -> None:
     assert account.models() == [{"id": "gpt-5.6-sol", "name": "GPT-5.6 Sol",
                                  "verified": False, "unavailable_reason": None,
                                  "supported_reasoning_efforts": ["medium"],
-                                 "default_reasoning_effort": None}]
+                                 "default_reasoning_effort": None,
+                                 "service_tiers": []}]
     assert account.logout()["signed_in"] is False
 
 

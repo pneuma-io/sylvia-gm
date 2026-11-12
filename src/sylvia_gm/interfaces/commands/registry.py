@@ -178,12 +178,17 @@ _COMMANDS = (
         True, True,
     ),
     Command('set_default_model', _handler('providers', 'handle_set_default_model'), True, True),
+    Command('set_chat_defaults', _handler('providers', 'handle_set_chat_defaults'), True, True),
     Command(
         'switch_session_model', _handler('providers', 'handle_switch_session_model'),
         True, True,
     ),
     Command(
         'switch_session_reasoning', _handler('sessions', 'handle_switch_session_reasoning'),
+        True, True,
+    ),
+    Command(
+        'switch_session_speed', _handler('sessions', 'handle_switch_session_speed'),
         True, True,
     ),
     Command(

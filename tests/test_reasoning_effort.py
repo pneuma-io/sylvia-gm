@@ -214,18 +214,25 @@ def test_saved_subscription_discovery_reaches_picker_and_refresh_preserves_setti
     assert choice["supported_reasoning_efforts"] == ["high", "xhigh", "ultra"]
     assert choice["default_reasoning_effort"] == "high"
     assert choice["reasoning_mode_defaults"] == {"dm": "high", "builder": "xhigh"}
+    assert choice["speed_options"] is None
     advertised[0]["supported_reasoning_efforts"] = ["low", "high"]
-    chatgpt_settings.chatgpt_settings_action(tmp_path, "models")
+    fast = {"id": "priority", "name": "Fast", "description": "2x speed, increased usage"}
+    advertised[0]["service_tiers"] = [fast]
+    refreshed = chatgpt_settings.chatgpt_settings_action(tmp_path, "models")
+    assert refreshed["saved_models_refreshed"] is True
     after = yaml.safe_load(path.read_text())
-    before["providers"]["chatgpt_subscription"]["models"][0]["supported_reasoning_efforts"] = [
-        "low",
-        "high",
-    ]
+    before["providers"]["chatgpt_subscription"]["models"][0].update(
+        supported_reasoning_efforts=["low", "high"], service_tiers=[fast],
+    )
     assert after == before
-    assert ConfiguredProviderResolver(path).model_choices()[0]["reasoning_mode_defaults"] == {
-        "dm": "high",
-        "builder": "high",
-    }
+    choice = ConfiguredProviderResolver(path).model_choices()[0]
+    assert choice["reasoning_mode_defaults"] == {"dm": "high", "builder": "high"}
+    # Speed tiers reach the picker exactly as the runtime advertised them.
+    assert choice["speed_options"] == [fast]
+    assert (choice["speed_control"], choice["speed_source"]) == ("codex", "model/list")
+    again = chatgpt_settings.chatgpt_settings_action(tmp_path, "models")
+    assert again["saved_models_refreshed"] is False
+    assert yaml.safe_load(path.read_text()) == after
 
 
 class RecordingProvider(Provider):

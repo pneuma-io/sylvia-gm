@@ -19,6 +19,7 @@ from sylvia_gm.provider._base import (
     closing_provider_stream,
 )
 from sylvia_gm.provider._model_defaults import documented_model_defaults
+from sylvia_gm.provider._speed import SpeedSelection, select_speed
 
 
 def reasoning_values(
@@ -261,33 +262,48 @@ def select_reasoning(
 
 
 class TurnReasoningProvider(Provider):
-    """Apply one immutable selection to every provider call in a reply, including continuations."""
+    """Apply one immutable effort and speed selection to every provider call in a reply.
 
-    def __init__(self, provider: Provider, selection: ReasoningSelection) -> None:
+    Tool continuations and retries inside the reply reuse the same selections.
+    """
+
+    def __init__(
+        self,
+        provider: Provider,
+        selection: ReasoningSelection,
+        speed: SpeedSelection | None = None,
+    ) -> None:
         super().__init__()
         self._provider = provider
         self.selection = selection
+        self.speed = speed or SpeedSelection(None, None, None, "provider_default")
         self.model_info = getattr(provider, "model_info", None)
         self.hooks = provider.hooks
         self._base_url = getattr(provider, "_base_url", None)
         self.set_audit_context({})
 
+    def _selections(self) -> dict[str, object]:
+        return {
+            "reasoning_selection": self.selection.projection(),
+            "speed_selection": self.speed.projection(),
+        }
+
     def set_audit_context(self, context: Mapping[str, object]) -> None:
-        """Keep the turn's requested effort visible alongside ordinary request correlation."""
+        """Keep the turn's requested effort and speed visible beside request correlation."""
         setter = getattr(self._provider, "set_audit_context", None)
         if callable(setter):
-            setter({**context, "reasoning_selection": self.selection.projection()})
+            setter({**context, **self._selections()})
 
     def record_context_fit(self, context: Mapping[str, object]) -> None:
-        """Forward preflight evidence without losing the selected native effort."""
+        """Forward preflight evidence without losing the selected native options."""
         recorder = getattr(self._provider, "record_context_fit", None)
         if callable(recorder):
-            recorder({**context, "reasoning_selection": self.selection.projection()})
+            recorder({**context, **self._selections()})
 
     def _options(self, options: Mapping[str, object]) -> dict[str, object]:
         """A snapshotted choice wins over call-local reasoning defaults, without shared mutation."""
         result = deepcopy(dict(options))
-        for key in ("reasoning_effort", "thinking"):
+        for key in ("reasoning_effort", "thinking", "service_tier", "speed"):
             result.pop(key, None)
         for key in ("reasoning", "output_config"):
             value = result.get(key)
@@ -305,6 +321,7 @@ class TurnReasoningProvider(Provider):
                 existing.update(value)
             else:
                 result[key] = value
+        result.update(self.speed.options())
         return result
 
     def provider_request_representation(
@@ -353,11 +370,20 @@ class TurnReasoningProvider(Provider):
         await self._provider.close()
 
 
-def bind_session_reasoning(provider: Provider, session: SessionRecord) -> TurnReasoningProvider:
-    """Resolve preferences once for all calls in this session's next provider turn."""
+def bind_session_reasoning(
+    provider: Provider, session: SessionRecord, speed: str | None = None,
+) -> TurnReasoningProvider:
+    """Resolve preferences once for all calls in this session's next provider turn.
+
+    ``speed`` is the chat's saved speed tier. It is validated against the model that
+    actually answers this turn, so a tier that model does not offer is simply not sent.
+    """
     requested = session.reasoning_effort_once or session.reasoning_effort
     scope = ("once" if session.reasoning_effort_once is not None else
              "session" if session.reasoning_effort is not None else "mode_default")
-    return TurnReasoningProvider(provider, select_reasoning(
-        getattr(provider, "model_info", None), session.role.value, requested, scope=scope,
-    ))
+    model = getattr(provider, "model_info", None)
+    return TurnReasoningProvider(
+        provider,
+        select_reasoning(model, session.role.value, requested, scope=scope),
+        select_speed(model, speed, strict=False),
+    )

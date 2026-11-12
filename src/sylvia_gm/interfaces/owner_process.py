@@ -98,8 +98,10 @@ from sylvia_gm.config.provider_settings import (
     provider_settings,
     require_configured_model,
     session_model_once_settings,
+    session_speed_settings,
     set_default_model_settings,
     set_session_model_once_settings,
+    set_session_speed_settings,
 )
 from sylvia_gm.domain.authority import (
     PackageLock,
@@ -143,6 +145,7 @@ from sylvia_gm.interfaces._local_diagnostics import LocalDiagnostics
 from sylvia_gm.interfaces._session_reasoning import (
     reasoning_state,
     selected_model_info,
+    speed_state,
     validate_model_preferences,
 )
 from sylvia_gm.interfaces.commands import DispatchContext
@@ -1538,11 +1541,21 @@ def _switch_session_model(
             expected_provider_id=pending["provider_id"],
             expected_model_id=pending["model_id"],
         )
+    # Speed tiers belong to a model. A tier the new model does not offer is cleared here,
+    # visibly, rather than left saved and silently unsent.
+    saved_speed = session_speed_settings(config_path, session_id=session_id)
+    speed = speed_state(updated, choices, saved_speed)
+    speed_cleared = saved_speed is not None and not speed["valid"]
+    if speed_cleared:
+        set_session_speed_settings(config_path, session_id=session_id, speed=None)
+        speed = speed_state(updated, choices, None)
     return {
         "status": "switched_global" if mode == "global" else "switched",
         "session": updated,
         "once": None,
         "default_model": provider_settings(config_path).get("default_model"),
+        "speed_state": speed,
+        "speed_cleared": speed_cleared,
     }
 
 
@@ -1580,6 +1593,27 @@ def _switch_session_reasoning(
     result = application_owner.update_agent_session_reasoning(session_id, effort=saved, once=once)
     return {"status": "staged_once" if mode == "once" else "switched",
             "session": result, "reasoning_state": state}
+
+
+def _switch_session_speed(
+    *, application_owner: AuthorityOwner, session_loop: CampaignSessionLoop,
+    config_path: Path, session_id: str, speed: object,
+    choices: Sequence[Mapping[str, object]],
+) -> dict[str, object]:
+    """Save one chat's speed at the same idle-session boundary as its model and effort."""
+    from sylvia_gm.provider._speed import select_speed
+
+    session_loop.assert_idle(session_id)
+    if speed is not None and not isinstance(speed, str):
+        raise OwnerProtocolError("Speed must be a native setting, standard, or null")
+    session = application_owner.session_context(session_id).session
+    chosen = select_speed(selected_model_info(session, choices), speed).effective
+    set_session_speed_settings(config_path, session_id=session_id, speed=chosen)
+    pending_model = session_model_once_settings(config_path, session_id=session_id)
+    return {
+        "status": "switched",
+        "speed_state": speed_state(session, choices, chosen, pending_model),
+    }
 
 
 def _model_slash_command(user_text: str) -> tuple[str | None, str] | None:
@@ -1633,6 +1667,7 @@ def _preflight_guided_start(
     plan_text: str,
     structured_plan: SafePayload | None,
     gm_system_prompt: str | None = None,
+    reasoning_effort: str | None = None,
 ) -> None:
     """Prove the mandatory opening request fits before a guided handoff commits."""
 
@@ -1668,6 +1703,7 @@ def _preflight_guided_start(
         provider_id=provider_id,
         model_id=model_id,
         status=SessionStatus.ACTIVE,
+        reasoning_effort=reasoning_effort,
     )
     preflight_history = SessionContext(
         session=preflight_session,

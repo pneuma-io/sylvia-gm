@@ -88,6 +88,26 @@ the mode default on future replies, including existing chats; do not rewrite or 
 Preserve valid explicit preferences and make unsupported selections actionable rather than
 silently ignoring them. This is AR-20's selected requirement, not an implemented-capability claim.
 
+Settings holds one set of defaults for new Builder and GM chats: the model, a reasoning effort and
+a speed. A new chat copies them once, when it is created. A default that the chat's model does not
+support falls back to the mode default effort or to standard speed. Changing Settings later never
+changes an existing chat, and changing a chat never changes Settings, apart from the explicit
+`--global` model switch above. Where a new chat's first model call would start by itself (the GM
+opening after campaign setup or a ready campaign, import repair, and the independent Builder chats
+the Interview opens for a Ruleset, Setting, Plan, Player Character or Companion), the player is
+first shown the model, effort and speed and may change them or cancel; nothing is sent until they
+confirm. Every other new chat waits for its first message, where the message-box controls serve
+the same purpose.
+
+Speed is a provider's own processing tier, separate from effort, model identity and token
+allowance. Offer it only where the exact connection documents or advertises it: the tiers the
+ChatGPT runtime lists for a subscription model, OpenAI API Fast and Flex, and Anthropic API fast
+mode, each for the listed models only. Everywhere else, say that the connection has no speed
+choice. Send the provider's own value, show what was requested, and never promise a faster reply or
+claim the provider used that tier. A chat's speed belongs to this device's settings rather than to
+campaign data, and a model change clears a speed the new model does not offer. Daniel selected
+these defaults and the choice before a first model call on 11 November 2026.
+
 The ChatGPT account connection is implemented through the owner-side Codex app-server route.
 The earlier post-Alpha/planning-only description is historical: PES-82 selected implementation
 while preserving Sylvia's tool and content authority. Capture the subscription-runtime audit
