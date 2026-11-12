@@ -20,12 +20,12 @@ Ash is quiet, watchful, and carrying the tension of a man who used to enforce la
 
 ## Appearance and artwork
 
-An adult settled Human man appearing in his early forties, with a lean strong former guard's build, medium olive skin, dark brown eyes, close-cropped black hair graying slightly at the temples and a short neatly trimmed black beard. Quiet watchful expression, shoulders back and balanced guarded posture. A practical slate-gray quilted gambeson under a sleeveless worn dark brown leather jerkin, plain leather bracers, dark wool trousers and scuffed sturdy calf-high boots. One ordinary straight sword hangs fully sheathed at his anatomical LEFT hip on a plain reddish-brown leather belt; his left hand hangs near the hilt without gripping it, right hand relaxed and empty. His former-guard bearing follows the authored profile; age, features, clothing and exact weapon design are editable visual defaults. No current Thornwall uniform, invented Church symbol, real-world religious icon, militant faction badge, glowing Door fragment, magical effects, drawn blade, shield, invented scar or public revelation of private sympathies.
+An adult human default with medium olive skin, long broad-jawed face, alert grey-green eyes, cropped dark hair and short beard. Plain chain beneath a muted teal padded coat, an oatmeal collar, charcoal trousers and flat boots retain his guard-trained practicality. A sword stays sheathed at his left hip; both hands are empty. No new religious emblem or secret allegiance is assigned, and he is distinct from Brother Ash.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/7815154e478b0ca033a45681287635cbabcd25d6364b8172a558cfd700ce7487.png)
+[Portrait](../assets/characters/9c56df6d802bfaa28b46fd5f4627452473fca275a8b4a42aa253d8b6349f79b8.png)
 
-[Full-body reference](../assets/characters/eaadc4369be7222f7e2d65c122555df63f64369116c414520ff282f014d09518.png)
+[Full-body reference](../assets/characters/98d1108726a9fc84a584bd401a934d16a7b950f8ad78bd46ec7c670c98fc8a2e.png)
 
-[Multiview reference sheet](../assets/characters/43880674696f2e8bcbd18516cd2a7362010a4b7d05a6d31967476c01a17e3f14.png)
+[Multiview reference sheet](../assets/characters/376a22225158b597c9b817054079179a51cbe0e406774f54fba73dd7e93bfda5.png)

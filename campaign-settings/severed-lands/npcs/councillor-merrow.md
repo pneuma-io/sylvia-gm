@@ -24,12 +24,12 @@ The Thornwall Council is debating a Riftborn Quarter proposal modeled on Nexus. 
 
 ## Appearance and artwork
 
-A humanlike adult Riftborn woman appearing in her early fifties, with a sturdy medium build, tawny brown skin, dark brown eyes, a softly square lined face and black hair threaded with silver arranged in a tidy braided crown. Calm, persistent, quietly tired but attentive expression and composed upright posture. A well-kept warm gray wool long coat over a muted teal waistcoat and cream high-collared blouse, plain dark trousers and practical polished brown ankle boots. Small plain brass coat fastenings and one closed leather belt pouch. Empty relaxed hands. Her steady experienced civic and merchant bearing follows the authored profile; apparent age, features and clothes are editable visual defaults. Her home world and lost past remain unknown. No invented species traits, crown, noble heraldry, council crest, faction badge, magical effects, readable documents, invented memories or revealed origin.
+A mature human-like default with deep brown skin, a wide oval face, thoughtful dark eyes and short rounded natural greying curls. Burgundy, cream and indigo well-made council layers and flat shoes suit her public representative role. Both hands are empty. Tired eye lines retain her long practical struggle without assigning a new ancestry, home world, emblem or vote outcome.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/fc957cdf5a61ff54505e0ce8f4255179f52529642bb9cf6d202c60e5464d8f54.png)
+[Portrait](../assets/characters/4e8f9cb4c57910ef92931f2738bf1f9b15ff49ba99a09c05131c70287c1b279f.png)
 
-[Full-body reference](../assets/characters/5cb7f5146f64d7dd9072d47fe5dfc17a2327361060397fa8895bd0ebf8a24e38.png)
+[Full-body reference](../assets/characters/048b7bbaffebb1ebc97a9573e65f08313eab362b1130905c9d9e60fdb8252528.png)
 
-[Multiview reference sheet](../assets/characters/5fc7d4a572b5458adba47ca033cb8b2eeebd080656b30edcea0915305a892911.png)
+[Multiview reference sheet](../assets/characters/eda9aa34ffbbea194053133dc1c543aa0c3d7e214a4d14d547c1f789ba28fefe.png)

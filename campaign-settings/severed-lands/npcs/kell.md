@@ -24,12 +24,12 @@ Kell's Iron found a sealed Warden chamber beneath the northern sector — sigils
 
 ## Appearance and artwork
 
-A humanlike Riftborn woman in her fifties, with a broad-shouldered athletic working build, deep olive skin, dark brown eyes and black hair streaked with iron gray pulled into a tight practical knot. A blunt fair-minded expression, tired watchful eyes and disciplined upright posture. A weathered slate-blue wool work jacket over a brown waistcoat and neutral linen shirt, plain leather wrist guards, dark practical trousers and scuffed calf-high work boots. A plain belt has one small closed pouch and a short neatly coiled work rope. Empty relaxed hands. Her age, professional crew-leader bearing and tired steadiness follow the authored profile; other features and costume details are editable visual defaults. Her home world and reasons for leaving the Returners remain unknown. No invented crew logo, revealed past, glowing sigils, sealed-chamber keys, dramatic villain costume, magical effects or invented origin.
+A sturdy human-like default visibly in her fifties, with weathered copper-brown skin, an angular square-jawed face, green-brown eyes and a short ash-blonde buzz crop. Moss and slate work layers, tan reinforced trousers and sturdy boots suit professional scavenging. A closed pouch sits at her left hip and an ordinary rope coil at her right; both hands are empty. Her unknown ancestry and unresolved past remain unassigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/b8d2d4cfc13253210a9328a74e98d4ad3bf989279344db4bfc1356cfbcf1ad78.png)
+[Portrait](../assets/characters/c9ac1e96df704956bbf986a7cc1ac69080d1ad84196a0a928f11529644fead21.png)
 
-[Full-body reference](../assets/characters/39d4c2142c11bb8f9868f9a0b75ee2f4a55847509e7a061c357aa07fe9ea3dcf.png)
+[Full-body reference](../assets/characters/4c3690115be7a55bf17e0b8bbd3c6406dd9a09713eca0b7c4bccfb08f5da5e76.png)
 
-[Multiview reference sheet](../assets/characters/7717bfaa1731262a12b04c45d526898cebe14e35b279b1bd08d64fe6d9024bd5.png)
+[Multiview reference sheet](../assets/characters/37350e0cd42f76ab4642dd4deaf2fa2f6fc5069b4933e8760a6597e1cbea1b19.png)

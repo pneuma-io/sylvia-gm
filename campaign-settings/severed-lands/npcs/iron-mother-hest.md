@@ -20,12 +20,12 @@ Hest is direct, profane, and deeply invested in the Lodge's future. She's been f
 
 ## Appearance and artwork
 
-An older adult settled Dwarf woman, visibly short and broad with substantial Dwarf proportions, a deep chest, powerful forearms and a sturdy muscular build. Ruddy medium-brown skin, dark brown eyes, a broad lined face and thick copper-red hair threaded with gray, secured into two short practical braids. A clean-shaven face, direct unsentimental expression and grounded smith's posture. A dense faded ochre work shirt with sleeves rolled to the elbows, worn dark brown leather forge apron, charcoal work trousers and heavy scuffed leather boots. A small ordinary smith's hammer is secured in a belt loop at her right hip, with a closed tool pouch at the other side; empty relaxed hands. Her Dwarf identity and experienced smith bearing follow the authored profile; age styling, features and clothing are editable visual defaults. No human-height proportions, metal body, construct anatomy, oversized warhammer, glowing runes, invented insignia, readable inscriptions, modern welding gear or invented past.
+A mature stout dwarf default with short broad powerful proportions, tawny-brown skin, wide blunt-nosed face, amber-brown eyes and two short practical silver-grey braids. Rust linen, charcoal trousers, a worn split leather apron and steel-toed flat boots suit decades of smithing. A mundane hammer hangs at her right hip and closed tongs at her left; both hands are empty. No magical tool or translated inscription is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/1d08d1845e4ba83ceaf57726c8de3719d2fd9f02fd8eec473a7d061b6f74f449.png)
+[Portrait](../assets/characters/0226a6d127df18c8e68975d2edd383eb8ae70ceb4e3e8d873d039bc3a178fd9e.png)
 
-[Full-body reference](../assets/characters/6d80574d08ae3c18e322b3585c9856abd2d3bdd77a5256c4b0bbac8a91eae62d.png)
+[Full-body reference](../assets/characters/4902ff53183310ea33de4b009e45867bfaa0d558a9136f818a0dcee5b8c003fe.png)
 
-[Multiview reference sheet](../assets/characters/60ce7d0b6f64a2bcffc7fe045b98c23b2c5fae2137047fff691dd0f6a2ffa1ba.png)
+[Multiview reference sheet](../assets/characters/55e068b0d2fc2ef68848391a26fdaceb950bec14acfaa6c42dd4f5fc98b16c38.png)

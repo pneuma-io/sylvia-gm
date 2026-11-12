@@ -20,12 +20,12 @@ Joss is pragmatic, self-interested, and refreshingly honest about both. They don
 
 ## Appearance and artwork
 
-An adult settled Human prospector appearing in their early forties, with a lean sinewy build, sandy-brown skin, dark hazel eyes, short cropped sandy-blond hair and an androgynous weathered face. A pragmatic measuring expression and relaxed self-contained posture. A worn charcoal work coat over a muted olive waistcoat and brown linen shirt, practical dark trousers and sturdy dusty brown boots. A plain belt supports one small closed tool pouch and a modest canvas shoulder bag hangs closed at their side. Empty relaxed hands. Their practical independent scavenger bearing follows the authored profile; age, physical features and clothing are editable visual defaults. Use they/them pronouns. No guild or crew insignia, glowing fragments, invented relic powers, readable maps, heroic finery, sinister villain costume, oversized mining tools or invented history.
+An androgynous adult human default with weathered reddish-tan skin, a narrow oblong face, grey-brown eyes and a shaggy short dark bob. Clay-brown and sage travel layers, charcoal trousers and sturdy boots stay practical. A small ordinary hammer hangs at their right hip and a closed finds pouch at their left; both hands are empty. No faction, binary gender or artifact power is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/82bbc8c66777470563aceb0a727c3dd8cfffb073e332966a6dbe67a143199ea3.png)
+[Portrait](../assets/characters/e47a9cbb100e669dfd3f67ec5559bec21f92464370a3eaa2da425ebb89d9a037.png)
 
-[Full-body reference](../assets/characters/b37431f6d6fa3bd27a31fef4805a0aaa3a8db349a7504f5fba7323f633d1301e.png)
+[Full-body reference](../assets/characters/f79367179a7de26450c55cc347d667c285e563dbb6dc752efa900fdb87c635f2.png)
 
-[Multiview reference sheet](../assets/characters/77348cf87eddf93ab7a8e4729066b90e46522a9c3678560c4837b082f0ee30ab.png)
+[Multiview reference sheet](../assets/characters/e0f497f14c1bd2dcd585bc12252041e234b1614e32aecaa71f6c5850a3014b3d.png)

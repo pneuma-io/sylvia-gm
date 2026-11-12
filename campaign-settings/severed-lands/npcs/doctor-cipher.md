@@ -26,12 +26,12 @@ Cipher's Pool Stabilizer is ready for a full test. She needs a Rift pool large e
 
 ## Appearance and artwork
 
-An adult settled Human woman appearing in her mid fifties, with a tall lean build, light brown skin, dark hazel eyes, a long expressive face and dark hair streaked with gray secured in a neat coiled bun. Small plain round metal spectacles with clear lenses and visible eyes. An engaged, charming and self-assured scholarly expression, open relaxed posture. A worn charcoal-plum long scholar's coat over a dark sage layered tunic and cream collar, practical dark trousers and brown leather ankle boots. A plain brown belt carries one small closed leather tool pouch; both hands empty and relaxed. Her personable scholarly bearing follows the authored profile; age, physical features, spectacles and clothes are editable visual defaults. No invented affiliation insignia, Athenaeum badge, magical effects, visible Pool Stabilizer, subjects or experiments, syringe, modern lab coat, medical cross, villain costume, glowing eyes or invented past.
+A mature slender human default with cool medium-dark brown skin, a long angular face, grey eyes, sleek black hair with scattered silver in a short low ponytail and plain clear rectangular glasses. Mauve and slate scholar layers, charcoal trousers and flat boots remain practical. A closed notebook pouch sits at the back belt; both hands are empty. The design depicts no victim, successful Pool Stabilizer, new mutation or power.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/138bbda0595e744a44b8f9d3d62c6f6f975ba008dafaf029078aa4476da32b33.png)
+[Portrait](../assets/characters/764723ba2beec5f4258396dec6c5dfbe08f7a3f501f2c739b323994315808ce8.png)
 
-[Full-body reference](../assets/characters/2023e964b804a17059817a18f8f016b2660c0dd8ce589e0708d7709ae8426834.png)
+[Full-body reference](../assets/characters/a9938a723f0ee5954c966ddc3a3f0662322d2fdee5e80507232319b90adef5b4.png)
 
-[Multiview reference sheet](../assets/characters/16b8a9dd5797fd2cfa24e01817ceaba02053dc0bf26b0fab2eb163c0033cf6cf.png)
+[Multiview reference sheet](../assets/characters/5dfe13456fbb54f51f253810209db991fa743593d121956b7ec3cd3b0766464b.png)
