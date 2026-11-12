@@ -20,12 +20,12 @@ Vesper is quiet, precise, and utterly devoted to the collection. She treats book
 
 ## Appearance and artwork
 
-An adult settled Human woman appearing in her late sixties, with a compact medium build, warm light olive skin, dark green-brown eyes, a narrow gently lined face and silver-gray hair neatly secured in a low bun. Plain rectangular bronze-rim reading spectacles with clear lenses and visible eyes. A quiet precise attentive expression and composed careful posture. A well-kept muted sage wool cardigan-jacket over a cream high-collared blouse, a plain rust-brown ankle-length skirt and practical dark brown leather shoes. A simple narrow leather belt carries one small closed pouch; empty relaxed hands. Her experienced librarian's care and precision follow the authored profile; age, features, spectacles and clothing are editable visual defaults. No invented Athenaeum insignia, hidden research, forbidden notes, readable book or document, keys to dangerous shelves, magical effects, invented history, uniform from another setting or revealing private knowledge.
+A mature spare human default with pale olive skin, a narrow oval face, brown eyes, clear round glasses and a neat dark bob finely greying at the temples. Blue-grey, umber and cream practical scholar layers and flat shoes suit her library role. Her left forearm carries one closed unmarked ordinary book; her right hand is empty. She remains distinct from the other Vesper profiles and her private archive is not revealed.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/78f98f458093f90301ef53c9597896a187230191dc27e398688bb8e346d2a7be.png)
+[Portrait](../assets/characters/5ff207ed1c190b8a3be972cbe06fe1b7eebe8544e20984abe979765e968d476e.png)
 
-[Full-body reference](../assets/characters/363c11ebda42dfd42a0004bebd47eaa83e0ba005b48a3f1276789d273ffe82a2.png)
+[Full-body reference](../assets/characters/ecc17300cea28f39456f8d3aa4e8d82cf9cda5f72ae81ecf93cbe9167f5ceedc.png)
 
-[Multiview reference sheet](../assets/characters/9d3dea1c220f655cae1ec4b6599f8ec883c4e072126fdd7114e63f8cf49fa5be.png)
+[Multiview reference sheet](../assets/characters/9daec9c8bc76a963ccb8dfa7d487725f6a4c5b45d9682905cd02ae8155013458.png)

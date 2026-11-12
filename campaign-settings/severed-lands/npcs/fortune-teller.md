@@ -20,12 +20,12 @@ The Mirror is theatrical, shrewd, and surprisingly honest about her own limitati
 
 ## Appearance and artwork
 
-A humanlike adult Riftborn woman appearing in her late thirties, with a slender medium-height build, deep umber-brown skin, a long angular face, dark eyebrows and dark chestnut hair gathered into a loose high knot with a few curls at the temples. Natural human eyes with clearly visible subtle VIOLET FLECKS in brown-hazel irises, normal round pupils and white sclera; the violet flecks are the only visible Hollowing sign. A shrewd, theatrical yet candid expression and self-possessed open posture. A layered muted indigo shawl over a faded mustard long-sleeved tunic, a plain russet sash, dark practical trousers and soft brown ankle boots. Small plain brass ear studs and two simple rings; empty relaxed hands. Her violet-flecked eyes and theatrical practical bearing follow the authored profile; age, other features and clothes are editable visual defaults. Her home world remains unspecified, and prophetic certainty is not established. No mirror face or body, crystals, tarot cards, glass sphere, glowing eyes, full violet irises, extra eyes, veins, lesions, mutations, magic effects, invented powers, faction symbols or revealed future.
+An adult human-like default with warm brown skin, a heart-shaped face, hazel eyes containing small violet flecks, and a dark wavy bob with a teal headband. Terracotta, cream and teal practical layered clothes and flat boots frame an expressive shrewd smile. Both hands are empty. The Touched-stage eye flecks do not glow; the image asserts no prophecy, new ancestry or advanced transformation.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/2990cafb00453ccb364e18253e9efb9502afe821e93630c17dce143f281d55e0.png)
+[Portrait](../assets/characters/3304380714b6309a5cb66f7f753e47ea3409ee95d5da6db7bc88191e0de17e5a.png)
 
-[Full-body reference](../assets/characters/8e6826b6a907e6c11a2c35a4320631ed688e8f4b1e29aaa002ac3d4144072990.png)
+[Full-body reference](../assets/characters/80c1d138ca8e2ebf99565aa4f791f5e33a7d9cdb1b6e80f21389265e85fb033a.png)
 
-[Multiview reference sheet](../assets/characters/405141b186d5476f4b53c1254a028e69b77c01c4615eece1ec2953d828aeeffd.png)
+[Multiview reference sheet](../assets/characters/c17924d35e046cf8a48b39e254780630ec6396d1f3ad99abb42799a1f1f85415.png)

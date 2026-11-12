@@ -24,12 +24,12 @@ Gareth has called a moot — a gathering of all Jackal bands. He wants to unite 
 
 ## Appearance and artwork
 
-An adult settled Human man appearing in his late forties, with a broad athletic former guard captain's build, dark brown skin, deep-set brown eyes, close-cropped black hair with salt-gray temples and short dark stubble. A firm unsmiling appraising expression, straight shoulders and controlled disciplined posture. A weathered plain dark iron breastplate over a brown quilted riding coat, a short faded brick-red wool shoulder cloak secured with a simple unmarked iron clasp, dark leather bracers, charcoal riding trousers and scuffed brown knee-high riding boots. A plain belt supports one ordinary straight sword fully sheathed at his anatomical LEFT hip and one small closed pouch at the opposite hip. Both hands relaxed and empty. His military bearing and practical hard-used equipment follow the authored profile; age, physical features and exact clothes are editable visual defaults. No current Thornwall uniform, invented crest or military rank badge, crown, flag, banner, horse, trophies, skulls, blood, drawn weapon, supernatural effects, invented scars or sadistic expression.
+A stocky mature human default with warm brown skin, square heavy jaw, brown eyes, a shaved scalp and short auburn beard. Worn mail and brown riding leathers, a plain muted red sash and flat riding boots keep his disciplined public role clear. A sword stays sheathed at his left hip and both hands are empty. The design depicts no violence, invented heraldry or moot outcome.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/2cf341e95058fffd645192906c9766601fe07f7accca1ca9d67b9f41fac5156e.png)
+[Portrait](../assets/characters/43dbb9d1d66d32b1225c8dba07c92784ea6a1f682e1ac0146229ee75382b80c9.png)
 
-[Full-body reference](../assets/characters/720f002d5eae50a2a11e014ab1616ac79585a88be4eea208769e4f0242eb59ca.png)
+[Full-body reference](../assets/characters/f1429453050d4fbe618a54bb84edf6bcb228cf83598d93cc45b1ea21dee8a5e7.png)
 
-[Multiview reference sheet](../assets/characters/8effa8214fc1fc6b54e5cee7b08746c0c637e434873cec0e8fcd7fbbe4e5863e.png)
+[Multiview reference sheet](../assets/characters/f47cedd06e0ffc380397f0dad9940ff1391ae68b4569af8e8e6d45d53fdee114.png)

@@ -20,12 +20,12 @@ Brilliant, brusque, and deeply committed to his patients despite his terrible so
 
 ## Appearance and artwork
 
-A humanlike adult Riftborn man appearing in his early forties, with a lean medium-height frame, dark brown skin, a shaved head, dark brown eyes and a short close-trimmed black beard. A direct, analytical, unsmiling expression and brisk upright working posture. A plain faded blue-gray knee-length linen work coat over a clean cream collarless shirt, sleeves neatly rolled to the forearms, dark olive trousers and practical dark brown leather boots. A simple brown leather belt with one small closed pouch and a compact closed worn canvas shoulder bag at his side. Empty relaxed hands. His practical adapted physician's bearing follows the authored profile; age, physical features and clothing are editable visual defaults. His original medical equipment was lost on arrival, and the image does not establish his home world's appearance. No stethoscope, syringe, modern medical device, white lab coat, medical cross, hospital logo, invented Athenaeum insignia, glowing healing effects, injury, invented scars, futuristic clothing or recovered original equipment.
+A mature slender human-like default with cool light-brown skin, an angular long face, brown eyes, a prominent narrow nose and close-cropped black hair. Ivory linen and slate-blue local physician layers, charcoal trousers and flat shoes remain practical. A closed supply pouch sits at the back belt and both hands are empty. His original equipment remains lost; no futuristic device, cure, home world or ancestry is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/fa4d135f59fc0a113e245084e19477ea039a16e78c0705ced9aa8bc1573d8373.png)
+[Portrait](../assets/characters/16434109ac1d5ea57e8034bfabf657552b69250f3845011aa54d155c559d8c0a.png)
 
-[Full-body reference](../assets/characters/9b306d56162561a9336a8c4765455d2785a2f91ef0f52863455c7973ae1f0d11.png)
+[Full-body reference](../assets/characters/3a089295447d4b3fa7dafb41d5e83c999345a8395215a11b99e695664965e6ed.png)
 
-[Multiview reference sheet](../assets/characters/c2f3ae23e00842b0534c6efaed1638f536df917f800920c5f2f1acaa77da681c.png)
+[Multiview reference sheet](../assets/characters/706bd87cf93f81156b24e48cb092a56bac7a09fa415342f0ab4f285f7b011c64.png)

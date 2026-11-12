@@ -20,12 +20,12 @@ The Prophet is beyond normal conversation. He responds to questions with fragmen
 
 ## Appearance and artwork
 
-An adult Human man at the Hollowed Speaker stage, appearing in his early seventies, with a tall gaunt frame, weathered pale copper skin, a long lined face, untidy shoulder-length white hair and a sparse white beard. Both eyes have uniformly VIOLET irises with dark round pupils and natural white sclera, fully violet eye color rather than mere flecks; no glow. Distant listening expression, eyes attentive and lips slightly parted as if speaking quietly. An utterly still upright stance with both feet grounded and both empty hands hanging naturally. A patched gray-brown long wool coat over a faded unbleached linen tunic, a plain cord belt, dark loose trousers and worn closed brown leather shoes. His stationary presence, speaking/listening bearing and Speaker-stage violet eye color follow the authored profile and Hollowed source; age, other physical features and clothes are editable visual defaults. No threatening pose, staff, weapon, throne, restraints, deformities, transparent body, glowing eyes, magical aura, floating runes, curse imagery, readable prophecy or invented cause of the guards' tragedies.
+An adult human default with deep warm-brown skin, a broad oblong face, short dense black coils and clean chin. Both irises are fully violet, with ordinary pupils and natural white sclera, without glow. Ochre, faded blue and olive simple clothes and flat shoes accompany an utterly still attentive listening stance with empty hands. His Speaker stage is preserved without inventing prophecy imagery or a curse.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/4a31ca0ef09e7463bb4b82ea8f13e8ddec7982c4ea96fe274d673cbc6d5728e6.png)
+[Portrait](../assets/characters/a399b671f1f0602e3e176b241ee7516062152eaea126e6eb15b37193dc325c54.png)
 
-[Full-body reference](../assets/characters/c98b0409cb61db269f32b3fb02556cf96b93bafe81c0154babea6966b1b81a9a.png)
+[Full-body reference](../assets/characters/9b7c9074a84a681592e1f8014eb3fa3397dd36916cf03a50f523ce200dc2adc4.png)
 
-[Multiview reference sheet](../assets/characters/f6bd2c2339a375a0c4a428779c74f3e1ecae58ce1ea6fc88060addbd2d8c15ec.png)
+[Multiview reference sheet](../assets/characters/97f8eb8728bca26d3f4f878a4a8e2b1c1ba3cd0873e9434e8cbdc37e2d827f34.png)
