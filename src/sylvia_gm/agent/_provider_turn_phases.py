@@ -41,7 +41,11 @@ from typing import cast
 
 from sylvia_gm.agent._native_continuation import attach_chat_metadata
 from sylvia_gm.agent._session_loop import ProviderActionFeedback
-from sylvia_gm.agent._stateless_mcp import action_sequence_model_tools, call_action_sequence_tool
+from sylvia_gm.agent._stateless_mcp import (
+    _safe_error,
+    action_sequence_model_tools,
+    call_action_sequence_tool,
+)
 from sylvia_gm.application.authority import ActionCommand
 from sylvia_gm.domain.authority import (
     CanonicalEventType,
@@ -52,7 +56,7 @@ from sylvia_gm.domain.authority import (
     WriterRole,
     validate_response_blocks,
 )
-from sylvia_gm.domain.errors import CommandRejected, MechanicsRejected
+from sylvia_gm.domain.errors import AuthorityError, CommandRejected, MechanicsRejected
 from sylvia_gm.domain.session import SessionMessageKind
 from sylvia_gm.provider._tool_delta import parse_tool_call_delta
 
@@ -797,7 +801,9 @@ def execute_action_sequence_call(
                         ),
                     }
                 )
-    except (CommandRejected, MechanicsRejected) as error:
+    except AuthorityError as error:
+        feedback = cast(dict[str, object], _safe_error(error).structured_content)
+        code = str(getattr(error, "code", "authority_rejected"))
         if state.catalog_tool.name == "execute_action_sequence":
             # The service may have persisted a prefix before its reply failed.
             # Recover receipts by reading; never retry execution implicitly.
@@ -811,7 +817,7 @@ def execute_action_sequence_call(
                 "operation": state.catalog_tool.name,
                 "result": _plain_json(saved),
                 "execution_stopped": True,
-                "delivery_error": {"code": error.code},
+                "delivery_error": {"code": code, "reason": feedback["reason"]},
             }
             if isinstance(saved, Mapping):
                 state.facts = _action_sequence_narration_facts(
@@ -836,7 +842,9 @@ def execute_action_sequence_call(
         else:
             state.local_tool_results[state.assembly.call_id] = {
                 "status": "rejected",
-                "code": error.code,
+                "code": code,
+                "reason": feedback["reason"],
+                "validation": feedback["validation"],
                 "state_changed": False,
             }
             state.local_tool_failures.add(state.assembly.call_id)

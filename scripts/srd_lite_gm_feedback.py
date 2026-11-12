@@ -69,6 +69,18 @@ def bind_gm_feedback(runtime):
     for parameter in parameters:
         if parameter.get("name") == "somatic_component_available":
             parameter.update(default=True, description=somatic_guidance)
+        elif parameter.get("name") == "caster_can_touch_target":
+            parameter["description"] = (
+                "For a Touch spell on another creature without engine-derived combat range, "
+                "supply true only when the caster "
+                "can touch that target now; false means it is out of touch reach. "
+                "Self-touch is automatic."
+            )
+        elif parameter.get("name") == "target_distance":
+            parameter["description"] = (
+                "Current target distance in feet when not supplied by saved combat geometry. "
+                "Supply the established scene distance; self-targeting is distance zero."
+            )
     implemented = sorted(set(definitions["srd_lite_implemented"]))
     aliases = definitions.get("srd_lite_aliases", {})
     definitions.pop("srd_lite_single_target_spells", None)
@@ -80,9 +92,13 @@ def bind_gm_feedback(runtime):
         parameters = deepcopy(_parameters(runtime, tool))
         by_name = {p["name"]: p for p in parameters}
         by_name["spell"].update(type="enum", enum_values=implemented + sorted(aliases))
+        # Preserve omission separately from an explicit inability to reach the target.
+        # Internal range checks still fail closed for either value.
+        if "caster_can_touch_target" in by_name:
+            by_name["caster_can_touch_target"]["default"] = None
         # Inline spell choices while reusing the other parameter declarations.
         tool["parameters"] = [
-            by_name["spell"] if p["name"] == "spell" else old
+            by_name[p["name"]] if p["name"] in {"spell", "caster_can_touch_target"} else old
             for old, p in zip(tool["parameters"], parameters, strict=True)
         ]
         checks = []
@@ -154,6 +170,41 @@ def bind_gm_feedback(runtime):
                 else "Select the actual recipient. Self-touch is automatic; touching another "
                 "creature requires caster_can_touch_target=true.",
             )
+        # The existing combat projector owns scalar geometry before staging or
+        # payment. Its qualifier must run before asking a caller for those facts.
+        geometry_exempt = (
+            "combat.encounter_active == true and "
+            "spell in definitions.srd_lite_scalar_geometry_spells"
+        )
+        if "targets" in by_name:
+            geometry_exempt += " and (targets == null or len(targets) == 0)"
+        if {"caster_state", "target", "caster_can_touch_target"} <= by_name.keys():
+            touch_exempt = (
+                "spell not in definitions.srd_lite_scalar_geometry_spells or "
+                "definitions.spells[spell].range_kind != 'touch' or target == null or "
+                f"_caster_state_id == _target_id or ({geometry_exempt})"
+            )
+            missing(
+                f"{touch_exempt} or caster_can_touch_target != null",
+                "caster_can_touch_target",
+                "Supply true if the caster can touch this other creature now; "
+                "otherwise select a reachable target. Self-touch is automatic.",
+            )
+            checks.append(
+                {
+                    "condition": f"{touch_exempt} or caster_can_touch_target != false",
+                    "error": "Input 'caster_can_touch_target' is false: the selected target is "
+                    "out of touch reach. Select a reachable target; do not claim contact.",
+                }
+            )
+        if {"caster_state", "target", "target_distance"} <= by_name.keys():
+            missing(
+                "spell not in definitions.srd_lite_scalar_geometry_spells or "
+                "definitions.spells[spell].range_kind != 'distance' or target == null or "
+                f"_caster_state_id == _target_id or ({geometry_exempt}) or target_distance != null",
+                "target_distance",
+                "Supply the current distance to the target in feet from established scene facts.",
+            )
         # Idempotence permits the same binder during ordinary package regeneration.
         old = [
             pc
@@ -176,6 +227,15 @@ def bind_gm_feedback(runtime):
                             "caster_can_touch_target == true",
                             "(caster_can_touch_target == true or _caster_state_id == _target_id)",
                         )
+                if isinstance(check, dict) and check.get("error") == (
+                    "The selected target does not satisfy the spell's range."
+                ):
+                    check["error"] = (
+                        "The selected target is outside this spell's range. For Touch, "
+                        "caster_can_touch_target must be true for another creature; "
+                        "self-touch is automatic. For distance range, supply target_distance "
+                        "in feet within range_feet."
+                    )
 
     # Bracket indexing rejects missing keys before the authored refusal can be returned.
     tools["restore_srd_resource"]["pre_conditions"][1]["condition"] = (
@@ -185,6 +245,27 @@ def bind_gm_feedback(runtime):
     source = tools["check_srd_contingency_source"]["effects"]
     if not any(e.get("set", {}).get("field") == "_contingency_record" for e in source):
         source.insert(0, {"set": {"field": "_contingency_record", "value": None}})
+
+    # These operations already pass the Steed's saved creator to their owner
+    # helper. Reject a non-Steed before that missing reference reaches a callee.
+    for name in (
+        "mount_srd_otherworldly_steed",
+        "dismount_srd_otherworldly_steed",
+        "take_srd_otherworldly_steed_action",
+        "begin_srd_otherworldly_forced_movement",
+        "use_srd_steed_fell_glare",
+        "use_srd_steed_fey_step",
+        "use_srd_steed_healing_touch",
+    ):
+        tool = tools[name]
+        check = {
+            "condition": "steed_state.created_caster_state_id != null",
+            "error": "Select an actual Otherworldly Steed with its saved caster reference "
+            "(created_caster_state_id); an ordinary creature cannot use this operation.",
+        }
+        previous = tool.get("pre_conditions", []) or []
+        if check not in previous:
+            tool["pre_conditions"] = [check, *previous]
 
     for name in (
         "study_srd_appearance",

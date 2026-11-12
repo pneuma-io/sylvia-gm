@@ -14,6 +14,18 @@ the branches meet. Their desktop/native, merge and release qualifications contin
 
 ## 1. Current work
 
+**12 November 2026: casting contracts and refusals.** The owner selected the casting,
+refusal and Ruleset-guide follow-up in its own isolated checkout from main `ecfb8cf`.
+PR33 and PR36 are merged; their caster filling, spell enums/normalization, memory,
+stub filtering, complete common-input feedback, somatic default and self-touch are
+retained. This follow-up adds actionable other-creature touch/distance refusals and
+early invalid-Steed feedback, corrects the guide, and versions SRD Lite as `0.3.23`.
+Real-owner regressions and a schema-minimal MCP sweep belong to the local runner.
+Exact offline Evidence-script results and checked source/package identities accompany
+the PR. Independent offline review remains required before merge. Installed/native,
+real-provider, benchmark comparison and release acceptance are separate and unselected.
+The older PR33/36 status rows below are historical and superseded by this paragraph.
+
 **12 November 2026: Sylvia's own copy of Claude Code.** The owner selected a PR for the
 version 0.5 requirement on Dot Desk item `749794ae-d27b-458e-b0d1-8578d66e9a1b`: a dedicated,
 unmodified Claude Code installation, profile and sign-in provided by Sylvia setup. Settings now

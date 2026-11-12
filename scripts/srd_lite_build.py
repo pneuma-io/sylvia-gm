@@ -778,21 +778,9 @@ def compose(runtime, root, output, progress):
             b" selection remains unverified pending final-byte gameplay and UI checks.\n"
         )
         guide = "prompts/gm-operating-guide.md"
-        names = [row['name'] for row in catalogue['profiles'] if row['identity'] in SELECTED]
-        selected_control_notes = []
-        if 'blindness_deafness' in SELECTED:
-            selected_control_notes.append('For Blindness/Deafness, partition every chosen target exactly once between blinded_targets and deafened_targets; Blindness uses the blinded partition.')
-        if 'irresistible_dance' in SELECTED:
-            selected_control_notes.append('Irresistible Dance retains its public collect_srd_irresistible_dance action-save consumer.')
-        payloads[guide] = (
-            'SRD Lite selected executable profiles: ' + ', '.join(names) + '. '
-            'Final-byte verification governs acceptance. Other catalogue entries remain pending. '
-            'Excluded or pending requests fail through casting and selection; do not narrate them as supported. '
-            'Existing full-SRD saves are not repinned. '
-            'Coordinates and map movement matter only during combat. Outside combat, use current established '
-            'fictional positions, distances and travel; never require move_srd_scene_creature or a map movement budget. '
-            + ' '.join(selected_control_notes) + '\n\n'
-        ).encode('utf-8') + payloads[guide]
+        # The checked-in operating guide owns GM guidance; build/release notes do
+        # not belong in each play request or in a reconstructed older guide.
+        payloads[guide] = (root / "source/rulesets/srd-lite" / guide).read_bytes()
         (output / "package-record.json").write_text(json.dumps(record, indent=2))
         drafts = [NormalizedPackageDraft(record, payloads, 4)]
         for reference in original:

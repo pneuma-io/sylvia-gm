@@ -446,11 +446,20 @@ def test_missing_derivation_source_names_the_input_and_uses_actual_feedback_fiel
     assert "validation.issues" not in feedback["instruction"]
 
 
-@pytest.mark.parametrize("display", ["Cure Wounds", "CURE-WOUNDS", "cure_wounds"])
-def test_spell_name_forms_and_exact_participant_fill_preserve_authorization(display):
+@pytest.mark.parametrize(
+    "display,canonical",
+    [
+        ("Cure Wounds", "cure_wounds"),
+        ("CURE-WOUNDS", "cure_wounds"),
+        (" cure_wounds ", "cure_wounds"),
+        ("Hunter's Mark", "hunters_mark"),
+        ("Hunter\u2019s Mark", "hunters_mark"),
+    ],
+)
+def test_spell_name_forms_and_exact_participant_fill_preserve_authorization(display, canonical):
     schema = {
         "properties": {
-            "spell": {"type": "string", "enum": ["cure_wounds"]},
+            "spell": {"type": "string", "enum": [canonical]},
             "caster": {"type": "string", "x-sylvia-gm-reference": "participant", "enum": ["hero"]},
             "caster_state": {"type": "string"},
         }
@@ -461,7 +470,7 @@ def test_spell_name_forms_and_exact_participant_fill_preserve_authorization(disp
     ) == {
         "caster_state": "hero",
         "caster": "hero",
-        "spell": "cure_wounds",
+        "spell": canonical,
     }
     assert "caster" not in _normalize_state_references({"caster_state": "monster"}, schema, state)
     assert _normalize_state_references(
@@ -605,10 +614,61 @@ def test_actual_gm_catalog_excludes_permanent_refusals_and_preserves_lock(lite_s
     shutil.copyfile(lite_save, database)
     with AuthorityOwner.open(database, "hotfix-owner", disconnect_grace_seconds=1.0) as owner:
         before = owner.current_package_lock("casting")
+        owner.append_agent_message(
+            session_id="gm",
+            message_id="golden-basis",
+            kind=SessionMessageKind.USER,
+            content={"text": "Remember the established bell."},
+        )
+        owner.update_campaign_file(
+            session_id="gm",
+            update_id="golden-fact",
+            turn_id="casting-turn",
+            basis_message_ids=("golden-basis",),
+            updates=(
+                {
+                    "operation": "record_memory",
+                    "fact_id": "golden-bell",
+                    "category": "continuity",
+                    "text": "The north bell rings in pairs.",
+                    "visibility": "player_known",
+                    "known_by": ["hero"],
+                },
+            ),
+        )
         request = play(owner, CaptureGM(), campaign="casting", turn="casting-turn")
         assert owner.current_package_lock("casting") == before
+        for entry in before.package_lock.entries:
+            if entry.role is PackageRole.PRIMARY:
+                from sylvia_gm.application.package_runtime import _parse_runtime
+
+                runtime = _parse_runtime(
+                    package_id=entry.package_id,
+                    runtime_bytes=owner._store.package_file_bytes(
+                        entry.package_id,
+                        entry.version,
+                        entry.sha256,
+                        "runtime/ruleset.yaml",
+                        maximum_bytes=30_000_000,
+                    ),
+                )
     tools = request["tools"]
     names = [tool["function"]["name"] for tool in tools]
+    assert not any(
+        re.sub(r"^tool_[0-9a-f]{12}_", "", name) in runtime.permanently_refused_tool_names
+        for name in names
+    )
+    fresh = next(
+        m
+        for m in request["messages"]
+        if str(m.get("content", "")).startswith("SYLVIA_GM_FRESH_CAMPAIGN_STATE")
+    )
+    assert "golden-bell" in json.dumps(
+        json.loads(fresh["content"].split("\n", 1)[1])["PLAYER_KNOWN"]
+    )
+    # Frozen Cleric request was 413,576 bytes after stub removal. Allow the measured
+    # casting descriptions and enums, while catching a return to 549,640 stub bytes.
+    assert len(json.dumps(tools).encode("utf-8")) < 450_000
     assert not any(name.endswith("_select_srd_clone_body") for name in names)
     assert any(name.endswith("_cast_spell_outside_combat") for name in names)
     assert any(name.endswith("_read_campaign_reference") for name in names)
@@ -880,9 +940,14 @@ def test_explicitly_unavailable_somatic_component_refuses_without_spending(lite_
     shutil.copyfile(lite_save, database)
     provider = DefectGM(
         "cast_spell_outside_combat",
-        {"caster_state": "hero", "spell": "Cure Wounds", "target": "hero",
-         "slot_resource": "spell_slot_1", "verbal_component_available": True,
-         "somatic_component_available": False},
+        {
+            "caster_state": "hero",
+            "spell": "Cure Wounds",
+            "target": "hero",
+            "slot_resource": "spell_slot_1",
+            "verbal_component_available": True,
+            "somatic_component_available": False,
+        },
     )
     with AuthorityOwner.open(database, "hotfix-owner", disconnect_grace_seconds=1.0) as owner:
         before = owner.snapshot("casting")
@@ -892,6 +957,203 @@ def test_explicitly_unavailable_somatic_component_refuses_without_spending(lite_
     assert provider.receipt["state_changed"] is False
     assert "somatic_component_available" in json.dumps(provider.receipt)
     assert after.state == before.state and after.revision == before.revision
+
+
+class TouchHealingGM(HealingGM):
+    """Replay the other-creature touch omission, obeying only the returned correction."""
+
+    def __init__(self):
+        super().__init__()
+        self.arguments = {
+            "caster_state": "hero",
+            "spell": "Cure Wounds",
+            "target": "guard",
+            "slot_resource": "spell_slot_1",
+            "verbal_component_available": True,
+        }
+
+
+def test_other_creature_touch_refusal_corrects_once_with_exact_effects(lite_save, tmp_path):
+    database = tmp_path / "touch-correction.sqlite3"
+    shutil.copyfile(lite_save, database)
+    provider = TouchHealingGM()
+    with AuthorityOwner.open(database, "hotfix-owner", disconnect_grace_seconds=1.0) as owner:
+        before = owner.snapshot("casting")
+        provider.observe_state = lambda: (
+            owner.snapshot("casting").revision,
+            owner.snapshot("casting").state,
+        )
+        play(
+            owner,
+            provider,
+            campaign="casting",
+            turn="casting-turn",
+            user_text="I cast Cure Wounds on the guard.",
+        )
+        after = owner.snapshot("casting")
+    assert provider.cast_calls == 2
+    assert provider.observations[0] == provider.observations[1]
+    assert len(provider.refusals) == 1
+    refused = provider.refusals[0]
+    assert refused["state_changed"] is False
+    assert set(re.findall(r"Missing input '([^']+)'", json.dumps(refused))) == {
+        "caster_can_touch_target"
+    }
+    assert "true" in refused["reason"]
+    assert provider.arguments["caster_can_touch_target"] is True
+    cast = next(
+        t["function"]
+        for t in provider.requests[0]["tools"]
+        if t["function"]["name"].endswith("_cast_spell_outside_combat")
+    )
+    assert "touch" in cast["parameters"]["properties"]["caster_can_touch_target"]["description"]
+    assert after.state[f"{SRD}.entities"]["hero"]["hp"] == 4
+    assert after.state[f"{SRD}.entities"]["guard"]["hp"] == 9
+    assert after.state[f"{SRD}.entities"]["hero"]["resources"]["spell_slot_1"] == 1
+    committed = [a for a in after.actions if a.tool_name == "cast_spell_outside_combat"]
+    assert len(committed) == 1
+    assert committed[0].parameters["spell"] == "cure_wounds"
+    assert committed[0].parameters["target"] == "guard"
+    assert before.state[f"{SRD}.entities"]["guard"]["hp"] == 7
+
+
+@pytest.mark.parametrize(
+    "spell,scene,field",
+    (
+        ("cure_wounds", {"caster_can_touch_target": False}, "caster_can_touch_target"),
+        (
+            "healing_word",
+            {"target_distance": 120, "caster_can_see_target": True},
+            "target_distance",
+        ),
+        ("healing_word", {"caster_can_see_target": True}, "target_distance"),
+    ),
+)
+def test_range_refusals_name_scene_inputs_and_preserve_state(
+    lite_save, tmp_path, spell, scene, field
+):
+    database = tmp_path / "range-refused.sqlite3"
+    shutil.copyfile(lite_save, database)
+    provider = DefectGM(
+        "cast_spell_outside_combat",
+        {
+            "caster_state": "hero",
+            "spell": spell,
+            "target": "guard",
+            "slot_resource": "spell_slot_1",
+            "verbal_component_available": True,
+            **scene,
+        },
+    )
+    with AuthorityOwner.open(database, "hotfix-owner", disconnect_grace_seconds=1.0) as owner:
+        before = owner.snapshot("casting")
+        play(owner, provider, campaign="casting", turn="casting-turn")
+        after = owner.snapshot("casting")
+    assert provider.receipt["status"] == "rejected"
+    assert provider.receipt["code"] == "ruleset_precondition_failed"
+    assert provider.receipt["state_changed"] is False
+    assert field in provider.receipt["reason"]
+    assert after.state == before.state and after.revision == before.revision
+
+
+@pytest.mark.parametrize(
+    "name",
+    (
+        "read_action_sequence_controls",
+        "read_action_sequence",
+        "compose_action_sequence",
+        "execute_action_sequence",
+    ),
+)
+def test_schema_minimal_provider_only_tools_have_explanatory_feedback(lite_save, tmp_path, name):
+    from sylvia_gm.agent._stateless_mcp import action_sequence_model_tools
+    from tests.test_gm_schema_minimal_refusals import minimal_value
+
+    database = tmp_path / "provider-only.sqlite3"
+    shutil.copyfile(lite_save, database)
+    with AuthorityOwner.open(database, "hotfix-owner", disconnect_grace_seconds=1.0) as owner:
+        tool = next(t for t in action_sequence_model_tools(owner) if t.name == name)
+        schema = tool.input_schema
+        arguments = {
+            key: minimal_value(key, schema["properties"][key]) for key in schema.get("required", [])
+        }
+        before = owner.snapshot("casting")
+        provider = DefectGM(name, arguments)
+        play(owner, provider, campaign="casting", turn="casting-turn")
+        after = owner.snapshot("casting")
+    payload = provider.receipt
+    assert payload is not None
+    assert not re.search(
+        r"Missing required parameter|Parameter validation failed|Traceback", json.dumps(payload)
+    )
+    if payload.get("status") == "rejected":
+        assert isinstance(payload.get("reason"), str) and payload["reason"].strip()
+        assert after.state == before.state and after.revision == before.revision
+    if "delivery_error" in payload:
+        assert isinstance(payload["delivery_error"].get("reason"), str)
+        assert payload["delivery_error"]["reason"].strip()
+        assert after.state == before.state and after.revision == before.revision
+
+
+@pytest.mark.parametrize("spell", ("cure_wounds", "healing_word"))
+@pytest.mark.parametrize("near", (True, False))
+def test_staged_combat_range_is_owned_by_saved_geometry(tmp_path, monkeypatch, spell, near):
+    archive = tmp_path / "current.sylvia-gm-package"
+    archive.write_bytes(bundled_srd_archive())
+    monkeypatch.setenv("SRD_LITE_CANDIDATE", str(archive))
+    from tests import test_srd_lite_foundation as support
+
+    monkeypatch.setattr(support, "ARCHIVE", archive)
+    positions = (
+        None
+        if near
+        else {
+            "hero": [0, 0, 0],
+            "guard": [80, 0, 0],
+            "other": [10, 0, 0],
+            "extra": [15, 0, 0],
+        }
+    )
+    case = support.Case(
+        tmp_path / "geometry.sqlite3",
+        spell,
+        casting_source="cleric",
+        positions=positions,
+    )
+    try:
+        case.start()
+        parameters = {
+            k: v
+            for k, v in case.parameters.items()
+            if k not in {"caster_can_touch_target", "target_distance"}
+        }
+        if not near:
+            case.reject("begin_srd_spell_action", parameters, match="actual combat recipient")
+            return
+        result = case.execute(case.command("begin_srd_spell_action", parameters))
+        assert result.status.value == "committed", result.result
+        assert result.result["context"]["_pending_action_id"]
+        assert case.entities()["hero"]["resources"][parameters["slot_resource"]] == 3
+    finally:
+        case.close()
+
+
+def test_group_recipient_cast_does_not_require_unused_scalar_range(tmp_path, monkeypatch):
+    archive = tmp_path / "current.sylvia-gm-package"
+    archive.write_bytes(bundled_srd_archive())
+    monkeypatch.setenv("SRD_LITE_CANDIDATE", str(archive))
+    from tests import test_srd_lite_foundation as support
+
+    monkeypatch.setattr(support, "ARCHIVE", archive)
+    case = support.Case(tmp_path / "group-range.sqlite3", "bless", casting_source="cleric")
+    try:
+        parameters = {k: v for k, v in case.parameters.items() if k != "target_distance"}
+        parameters["targets"] = ["guard"]
+        receipt = case.execute(case.command("cast_spell_outside_combat", parameters))
+        assert receipt.status.value == "committed", receipt.result
+        assert case.entities()["hero"]["resources"][parameters["slot_resource"]] == 2
+    finally:
+        case.close()
 
 
 def play(owner, provider, *, campaign="memory", session="gm", turn="turn", user_text="I wait."):
