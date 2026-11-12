@@ -20,12 +20,12 @@ Corin is gruff, gentle with animals, and allergic to politics. He treats every c
 
 ## Appearance and artwork
 
-An adult settled Human man appearing in his early fifties, with a strong sinewy working build, deep brown skin, dark amber-brown eyes, short tightly curled black hair graying at the temples and a short dense salt-and-pepper beard. A gruff thoughtful expression softened by attentive eyes, with a relaxed capable posture. A plain cream work shirt with rolled sleeves, faded tan wool waistcoat, worn brown leather stable apron with a short split front, deep olive work trousers and mud-marked sturdy leather boots. An ordinary belt has one small closed work pouch. Empty relaxed hands. His practical stablemaster bearing follows the authored profile; age, features and costume are editable visual defaults. No horse anatomy, animal companion, magical healing, modern veterinary equipment, noble finery, faction insignia, readable records or invented origin.
+A tall broad mature Human man with weathered tan skin, long rectangular face, calm dark brown eyes, close-cropped black hair greying at the temples and a short squared salt-and-pepper beard. Faded teal rolled-sleeve linen shirt, ochre leather work vest, charcoal canvas trousers and brown work boots. A plain grooming brush is held in the right hand; a short lead-rope coil rests at the left hip. Gruff steady expression and relaxed bearing.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/cd7c40c7af05f7a7db8024cb827d444c7f399601d8330d8edb8c8a26f2b19023.png)
+[Portrait](../assets/characters/557fa3e09fde31c19e34759cd2806240254148b076713ae31560654a4159e7aa.png)
 
-[Full-body reference](../assets/characters/d9b39a2f77b897022aaf602439c030a919a3ad115991285f8ce82d522c29092f.png)
+[Full-body reference](../assets/characters/2a4d2d443b87bcf9af9aabb6fa99ec32bf92c79cc48d733aea2fd84e84ad3ac2.png)
 
-[Multiview reference sheet](../assets/characters/bf876acc5c19715619f93c4c4ef71d9771f076a4d94d66276a173a639253efb8.png)
+[Multiview reference sheet](../assets/characters/47e091857008e42c38bb0058f1762ba7426a7af55e264108c757af254e75b810.png)

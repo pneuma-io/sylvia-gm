@@ -20,12 +20,12 @@ Echo is gentle, melancholy, and carrying the weight of everyone they've performe
 
 ## Appearance and artwork
 
-A humanlike adult Riftborn performer appearing in their early thirties, with a slender medium-height build, dusky olive skin, dark gray eyes, a softly angular clean-shaven androgynous face and wavy black hair reaching the shoulders, loosely held back in a plain half-tie. A gentle melancholy expression and quiet open posture. A plain deep indigo short travel coat over a gray linen tunic, a soft faded moss-green neck scarf, worn brown trousers and dark brown leather ankle boots. A small closed canvas travel bag hangs at their anatomical LEFT hip from a simple strap over their RIGHT shoulder. Empty relaxed hands. Their gentle melancholy performer bearing follows the authored profile; age, physical features and clothing are editable visual defaults. Use they/them pronouns. Their home world remains unknown. No invented home-world imagery, stage costume, instrument, readable sheet music, floating music notes, ghost faces, duplicate bodies, portal, magical effects, glowing eyes, invented College crest, real-world insignia or revealed origin.
+A slender androgynous Riftborn adult with deep umber skin, a long soft oval face, thoughtful dark hazel eyes and dense short black curls. Muted blue-green traveling cloak, clay-rose cross-wrap tunic, faded gold woven collar band, loose indigo trousers and soft brown boots. A small closed pouch sits at the left hip; the right hand rests lightly near the upper chest. Quiet melancholy expression. Their home world and ancestry remain unrevealed.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/a9446b01d47ce0ffda36adee02357a9d54366a5747089673f4ba1c1252f10757.png)
+[Portrait](../assets/characters/56229e06c029526f6715c05a081be32d17d1adbf5f14272f72db766555d77ccb.png)
 
-[Full-body reference](../assets/characters/1c58634699da2df24fbce776f0f6b87f8a74b455e3175a1e1b50b58446c5b61c.png)
+[Full-body reference](../assets/characters/cb2ba1c1b6679867f867d2f435409664ac67333b3c1c159639c5ee5bccb56a56.png)
 
-[Multiview reference sheet](../assets/characters/795c4eadd91b2d41686cf9aa02534a457fa7e01419e80fcb91bf87296e3d8aa4.png)
+[Multiview reference sheet](../assets/characters/278770c6ef5676298ebcf1f8a3a1721115770103707e3aa03a6ff80d1789bb7b.png)

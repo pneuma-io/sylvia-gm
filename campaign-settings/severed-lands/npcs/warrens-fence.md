@@ -18,12 +18,12 @@ Drum is nervous, meticulous, and very good at staying invisible. He treats fenci
 
 ## Appearance and artwork
 
-An unassuming adult Human man appearing in his early fifties, with a lean medium build, light olive skin, brown eyes, short neatly combed dark hair graying at the temples, a clean-shaven face and modest round wire-rim spectacles. A restrained cautious expression with a slightly worried brow; tidy contained posture. A plain faded olive-brown short coat over a light gray collared shirt and dark gray waistcoat, practical brown trousers, worn brown leather shoes and an ordinary belt. Empty hands and no displayed valuables. These are editable visual defaults. No drum or musical instrument, gang symbols, noble finery, weapon, branded goods, readable ledgers, exposed contraband or invented identifying history.
+A short slight middle-aged Human man with pale sallow skin, narrow pointed face, watchful grey eyes, thin round spectacles and neatly side-parted receding ash-brown hair. Clean-shaven, with selected fine eye lines. Dull umber short coat over a blue-grey high-neck tunic, dark brown trousers and modest dark boots. A small closed document pouch sits at the right waist; empty hands clasp low in front. Nervous attentive bearing, with no merchandise or known artifact displayed.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/7232fbc14281a27a6caa5bd552f7444eecc3e99af03e2b44d783cd5ff98e6450.png)
+[Portrait](../assets/characters/4bd658ef27d4d1cb7040e3d0de05ba7902497e272732042606708c14b14fe2a3.png)
 
-[Full-body reference](../assets/characters/3dc6638629249248442a29fbd0d250993ae1bdb2ecaa09316997e1ca1a245aeb.png)
+[Full-body reference](../assets/characters/bd4db183e005dfd0489e2f06ba5dc16aa9ba2c224e83f2ddfa45224af83f575f.png)
 
-[Multiview reference sheet](../assets/characters/6781953f652ba8a346778dd7f9faeaf89ed18cece0d960b6294523c0b39612e9.png)
+[Multiview reference sheet](../assets/characters/8ef8efaa0b05a1caae3c278b7f37960712fa615d97ec1db2d7b46e878787448b.png)

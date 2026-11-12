@@ -20,12 +20,12 @@ Soot is quiet, grimy, and more connected than anyone realizes. He treats his wor
 
 ## Appearance and artwork
 
-An adult settled Human man appearing in his late forties, with a lean wiry build, medium tan skin, dark brown eyes, short uneven dark hair under a faded charcoal cloth cap and short dark stubble. A quiet watchful sympathetic expression, slight forward working stoop and natural grime on face, hands and clothing. A patched brown leather work coat over a dull gray shirt, dark practical trousers, mud-marked sturdy leather boots and a closed plain canvas shoulder bag. Empty hands. His quiet grimy ratcatcher appearance follows the authored profile; age, features and costume details are editable visual defaults. No rat anatomy, animal ears or tail, actual rats, gruesome remains, plague sores, visible medicine, readable private messages, weapons or invented history.
+A compact broad mature Human man with medium-deep brown skin, close dark eyes, a broad nose, cropped tight black curls and rough short stubble. Faded taupe rolled-sleeve shirt, charcoal-grey sleeveless work coat, olive trousers, mustard neck cloth and scuffed closed boots. A closed wicker trap is carried in the left hand; a small unmarked supply pouch rests at the right hip. Restrained soot smudges mark the hands and cuffs. Quiet patient expression and slightly stooped shoulders.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/4aae467b7e5824da3b34925b49aad632081bae584a40e62c0bb33a785e81f953.png)
+[Portrait](../assets/characters/e3939bfa9b9a322a477842ee7795013302cce1adebb304850f56d4cfbd01e3f2.png)
 
-[Full-body reference](../assets/characters/65bf74de6367d269664a6966043e8d23d03bffc86d9113389bf8b70a4fef85ea.png)
+[Full-body reference](../assets/characters/ca96d98a80dab4c3157367f79197cdad6255e10d23760162d221787c7c3db9fe.png)
 
-[Multiview reference sheet](../assets/characters/3014f79cc53a38b66930e429e7ea0c6533cd35a310e5f74d6441894cfeccafd3.png)
+[Multiview reference sheet](../assets/characters/211434f2defe9f62cc1835599b9a25bc852eb320f4d2d7eb5df1b6ce7e89479f.png)

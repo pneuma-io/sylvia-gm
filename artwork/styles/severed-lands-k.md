@@ -90,9 +90,11 @@ the pictured person supplies neither terrain geometry nor compulsory night light
    around 40% of height where anatomy permits; keep the full head/hair silhouette inside margins.
    Save one adjustable crop for Map, Party and dialogue instead of altering the original images.
    Retain the full square illustration and check a closer head crop at small avatar sizes.
-   The prepared cast uses approximately 1.5x zoom for visible faces and 1.4x with adjusted focal
+   The starting cast uses approximately 1.5x zoom for visible faces and 1.4x with adjusted focal
    points for the hood and two-headed hound. Choose framing per subject, preserving concealment
-   and every required head. Compare at 64 and 96 pixels before accepting the avatar crop.
+   and every required head. Match the actual head size rather than forcing one zoom value;
+   smaller faces within a square illustration may need a closer crop. Compare at 64 and 96
+   pixels before accepting the avatar crop.
 7. Edits: identify the target separately and retain selected canonical references. An explicit
    new-design experiment can start again from authored facts, then establish its new references.
 
@@ -157,6 +159,21 @@ with no usable consumable effects in Lite. These are prepared defaults available
 | Thread | [Body](../assets/characters/f3c1cde7c6bc3856fa81d7471c24a443102598026bece1341f748ca45583de9c.png) | [Sheet](../assets/characters/4743e24b3b368db2ee2ecd28f03230c755845148c3eb8eeb7bb5c3f958a0838a.png) | [Portrait](../assets/characters/8efa238611a77a74648e616434cfaf26c099c83953a98edd832cfb9321d4d16b.png) |
 | Hook | [Body](../assets/characters/a01102d62072bc88e9fd159cc383ab8ada20e31ff4ee3a02ba94ca52ed08cafa.png) | [Sheet](../assets/characters/a4479f93e91030ab4c7bd6cdc6123a3e9c304e324200fb78548dfecacc21d3f8.png) | [Portrait](../assets/characters/61688566029273fdfbac865ba4526aa789d47a4b92eb43a6c8d284c635ed7c47.png) |
 | Needle | [Body](../assets/characters/04c787dcd52be42131889df90e0c8f3ed7a79d60fba234458ff9192940420330.png) | [Sheet](../assets/characters/44ead24cdc5f19081c241c9ed62b97bc012d1560261f796d0fb9e3cbe3471a6d.png) | [Portrait](../assets/characters/3d871b12ab8b0b194a7a92b4f3542a186a79defb8deea9f708150eb7b354d951.png) |
+
+### Prepared market and caravan references
+
+Corin, Echo, Kestrel, Drum, Soot and Lace have separate complete prepared bundles. Echo retains
+they/them pronouns and an unknown home world. The tailor Lace is unrelated to the Lace Brothers.
+These editable defaults preserve authored roles and mysteries and remain available for review.
+
+| Character | Full body | Multiview | Portrait |
+|---|---|---|---|
+| Corin | [Body](../assets/characters/2a4d2d443b87bcf9af9aabb6fa99ec32bf92c79cc48d733aea2fd84e84ad3ac2.png) | [Sheet](../assets/characters/47e091857008e42c38bb0058f1762ba7426a7af55e264108c757af254e75b810.png) | [Portrait](../assets/characters/557fa3e09fde31c19e34759cd2806240254148b076713ae31560654a4159e7aa.png) |
+| Echo | [Body](../assets/characters/cb2ba1c1b6679867f867d2f435409664ac67333b3c1c159639c5ee5bccb56a56.png) | [Sheet](../assets/characters/278770c6ef5676298ebcf1f8a3a1721115770103707e3aa03a6ff80d1789bb7b.png) | [Portrait](../assets/characters/56229e06c029526f6715c05a081be32d17d1adbf5f14272f72db766555d77ccb.png) |
+| Kestrel | [Body](../assets/characters/e742ad9bf271c3307dad88dec3e9f6fcf378a340f6609aa28aca89ff30a1b0d5.png) | [Sheet](../assets/characters/1da54e5785908d45166fa8edd08d41445399b0d59e488e27642d9b56a60b39f5.png) | [Portrait](../assets/characters/bf25b41704ca837b145c19d05d4bd5efbc212d06b552bc722d83bbed71c127a7.png) |
+| Drum | [Body](../assets/characters/bd4db183e005dfd0489e2f06ba5dc16aa9ba2c224e83f2ddfa45224af83f575f.png) | [Sheet](../assets/characters/8ef8efaa0b05a1caae3c278b7f37960712fa615d97ec1db2d7b46e878787448b.png) | [Portrait](../assets/characters/4bd658ef27d4d1cb7040e3d0de05ba7902497e272732042606708c14b14fe2a3.png) |
+| Soot | [Body](../assets/characters/ca96d98a80dab4c3157367f79197cdad6255e10d23760162d221787c7c3db9fe.png) | [Sheet](../assets/characters/211434f2defe9f62cc1835599b9a25bc852eb320f4d2d7eb5df1b6ce7e89479f.png) | [Portrait](../assets/characters/e3939bfa9b9a322a477842ee7795013302cce1adebb304850f56d4cfbd01e3f2.png) |
+| Lace | [Body](../assets/characters/7a92c7b5d911d3edced4400f1a74e8b2f62acd7257e3b77977397b2a3394ee8f.png) | [Sheet](../assets/characters/e21262d307d6e62ba0b520e53e707d34dba4f108d0033d5671fd55d74faeafbf.png) | [Portrait](../assets/characters/c553bfd8195eb2cdabf919f9625c3a75ded8144304dd1fccfdb90f65c17750ca.png) |
 
 ### Prepared Rift creature references
 

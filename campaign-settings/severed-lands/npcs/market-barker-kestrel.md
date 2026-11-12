@@ -20,12 +20,12 @@ Kestrel is sharp, theatrical, and absolutely in control of her auction floor. Sh
 
 ## Appearance and artwork
 
-An adult settled Human woman appearing in her late forties, with a compact energetic build, rich medium-brown skin, dark green-brown eyes, a round expressive face and tightly curled auburn-brown hair pinned into a tidy high updo. A sharp, theatrical, confident expression with a lively raised eyebrow and poised commanding stance. A well-kept deep burgundy long waistcoat over a cream puff-sleeved linen blouse, charcoal tailored trousers and polished dark burgundy leather ankle boots. A plain narrow leather belt carries one small closed pouch; a simple brass pin fastens the waistcoat without any emblem. Both hands relaxed and empty. Her experienced controlled auctioneer's bearing follows the authored profile; age, physical features and clothing are editable visual defaults. No bird anatomy, feathers, falcon, invented faction insignia, noble crest, crown, auction lot, stolen or magical artifact, readable ledger, gavel, microphone, futuristic clothing, magical effects or invented secret history.
+A tall full-figured Human woman with copper skin, angular cheekbones, blue-grey eyes, arched brows and long jet-black hair in a high ponytail falling behind the right shoulder. Mustard-ochre tailored merchant vest over charcoal-green sleeves and a matching long skirt, rust-red woven waist sash and polished dark shoes. A plain brass handbell is carried in the left hand; the right hand makes a controlled open auctioneer gesture. Assured theatrical half smile.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/f499e701c49a64bc500d025ff227108d82fe5bdbe865f07d7181e33bdb138cf8.png)
+[Portrait](../assets/characters/bf25b41704ca837b145c19d05d4bd5efbc212d06b552bc722d83bbed71c127a7.png)
 
-[Full-body reference](../assets/characters/a42c9232b472ddf1e4f406fae665a7141132618a8b9f88ff3dfc3563f36c6d48.png)
+[Full-body reference](../assets/characters/e742ad9bf271c3307dad88dec3e9f6fcf378a340f6609aa28aca89ff30a1b0d5.png)
 
-[Multiview reference sheet](../assets/characters/7c2501c539c4c67d0a9293318d31598871e703cc80eb39311747848a50df7647.png)
+[Multiview reference sheet](../assets/characters/1da54e5785908d45166fa8edd08d41445399b0d59e488e27642d9b56a60b39f5.png)
