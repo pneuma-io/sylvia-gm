@@ -1056,6 +1056,41 @@ def test_range_refusals_name_scene_inputs_and_preserve_state(
     assert after.state == before.state and after.revision == before.revision
 
 
+@pytest.mark.parametrize(
+    "name",
+    (
+        "read_action_sequence_controls",
+        "read_action_sequence",
+        "compose_action_sequence",
+        "execute_action_sequence",
+    ),
+)
+def test_schema_minimal_provider_only_tools_have_explanatory_feedback(lite_save, tmp_path, name):
+    from sylvia_gm.agent._stateless_mcp import action_sequence_model_tools
+    from tests.test_gm_schema_minimal_refusals import minimal_value
+
+    database = tmp_path / "provider-only.sqlite3"
+    shutil.copyfile(lite_save, database)
+    with AuthorityOwner.open(database, "hotfix-owner", disconnect_grace_seconds=1.0) as owner:
+        tool = next(t for t in action_sequence_model_tools(owner) if t.name == name)
+        schema = tool.input_schema
+        arguments = {
+            key: minimal_value(key, schema["properties"][key]) for key in schema.get("required", [])
+        }
+        before = owner.snapshot("casting")
+        provider = DefectGM(name, arguments)
+        play(owner, provider, campaign="casting", turn="casting-turn")
+        after = owner.snapshot("casting")
+    payload = provider.receipt
+    assert payload is not None
+    assert not re.search(
+        r"Missing required parameter|Parameter validation failed|Traceback", json.dumps(payload)
+    )
+    if payload.get("status") == "rejected":
+        assert isinstance(payload.get("reason"), str) and payload["reason"].strip()
+        assert after.state == before.state and after.revision == before.revision
+
+
 def play(owner, provider, *, campaign="memory", session="gm", turn="turn", user_text="I wait."):
     adapter = ProviderSessionAdapter(owner, provider, owner_id="hotfix-owner")
     result = CampaignSessionLoop(owner).run(
