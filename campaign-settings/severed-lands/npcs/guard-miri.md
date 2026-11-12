@@ -20,12 +20,12 @@ Quiet, dutiful, and carrying a private grief. Miri does her job. She doesn't mak
 
 ## Appearance and artwork
 
-An adult Human woman in her early thirties with an athletic lean build, deep warm brown skin, dark brown eyes, a long oval face and tightly braided dark hair gathered behind her head. Plain muted blue-gray guard tunic, closed collar, practical steel mail shirt under a simple dark leather jerkin, dark trousers, brown boots, plain belt and sheathed short sidearm. No helmet so her face is clear. Quiet, composed, sympathetic expression. Her brother's ring and chain remain completely hidden beneath her closed uniform.
+An adult human default with warm olive skin, broad face, brown eyes and neatly cropped dark curls. Plain navy-grey wool over a dull chain shirt, high closed collar, belt, charcoal trousers and flat brown boots suit her gate work. Both hands are empty. Her brother's ring and chain remain concealed under the uniform; no insignia or new rank is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/2add8e2553704d0bd238cdedfd245dc9fbad5e12f93b45f28ca430911b2b651c.png)
+[Portrait](../assets/characters/70fce1498520ff8f15f70dafa1b57e7217193ce53f7012d787cfcddd56445d05.png)
 
-[Full-body reference](../assets/characters/93464ffbf4e84beb6063766a7aa12763924ad1bb980989850d638546a8c9a748.png)
+[Full-body reference](../assets/characters/6b2c5c96713949d3aec33c7fb326dca0341f8328fd839caafb1ac3c37a4565cd.png)
 
-[Multiview reference sheet](../assets/characters/39ac7c23ed419fa8cae85c4e229a0fab2fec1a31e325d691de0bfb9a902de9f3.png)
+[Multiview reference sheet](../assets/characters/9c087b9ea3463b8784c6dd8e8f6df5c19e18df4ed06974cbbc59557a4c5a6d85.png)

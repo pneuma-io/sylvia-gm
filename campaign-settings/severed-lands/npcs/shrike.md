@@ -20,12 +20,12 @@ Shrike is professional, calculating, and utterly unsentimental about her work. B
 
 ## Appearance and artwork
 
-An adult Human woman appearing in her early thirties, with a lean athletic build, warm olive-brown skin, dark brown eyes, short practical dark brown hair tucked behind her ears, and a focused measured expression. Balanced relaxed stance, professional rather than threatening. Worn charcoal-gray travel jacket over a muted slate shirt, practical dark brown trousers, soft scuffed leather boots, plain belt and a small closed utility pouch. Empty hands with no weapon displayed. These are editable visual defaults. No bird features or feathered costume, gang insignia, killer trophies, blood, glamorous armor, magical powers or invented campaign history.
+An adult human woman default with warm medium-brown skin, angular cheek/jaw shape, dark grey eyes and short asymmetrical black hair. A dark leather jerkin, rust-plum shirt, olive short cape, charcoal trousers and flat calf boots accompany a right-hip sheathed utility knife. Both hands remain empty. Her professional restraint is retained without canine traits, band trophies or a borrowed faction emblem.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/52048bb26cabcc3801b869d453145a4283f49595f697be7ec8e2db895e30c94e.png)
+[Portrait](../assets/characters/dc51b6a6ff4c132b3cd981039eb94df541e6d4d9b53b2495787d4926c3918139.png)
 
-[Full-body reference](../assets/characters/9eb71f267f6eeda9dc516f27c78940f322a647a6f338d29535d6ad79e3f81a77.png)
+[Full-body reference](../assets/characters/6a8218b3f3acbeda91a1f2a4de34b377864b10d6305e2a76edae77fa69ec9795.png)
 
-[Multiview reference sheet](../assets/characters/92b0c454a80c544657a35ed2cbbc23b80d6ea6a6d21798c6b7cd5f589471d32d.png)
+[Multiview reference sheet](../assets/characters/7cf82a72d6ff354d8ce0042748120d125790838c9e8e1708770801f15e45475d.png)

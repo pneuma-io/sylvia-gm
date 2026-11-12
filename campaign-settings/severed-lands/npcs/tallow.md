@@ -20,12 +20,12 @@ Tallow is intense, articulate, and frightened in a way she's trying very hard to
 
 ## Appearance and artwork
 
-An adult humanlike Riftborn woman appearing in her mid-thirties, with a slender athletic build, warm bronze skin, dark brown eyes, and dark brown hair pulled back into one practical long braid. An intent articulate expression, with a slight tension around the eyes, held beneath a composed attentive posture. Simple indigo traveling robes with divided layered hems suitable for movement, a faded slate waist sash, plain cloth wrist wraps and soft dark ankle boots. Empty relaxed hands, no weapon. These are editable visual defaults. Her home world and the hidden nature of what she sensed remain unknown. No literal wax or candle features, magical portals, glowing eyes, invented religious insignia or revealed otherworldly identity.
+A clearly adult human-like female Riftborn default with pale-gold freckled skin, oval face, grey-blue eyes and short ash-blonde curls. Deep teal travel layers, off-white linen, a sage wrap, slate trousers, cloth sash and flat shoes accompany a closed right-hip bag. Both hands are empty. Her intensity and concealed fear remain expressive traits; no original world, prophecy or new magical effect is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/1a50829269808f9f2eef07dc17f43f877713e030a7626b225ec954c2f9bb13f4.png)
+[Portrait](../assets/characters/ffd06a4f1a5865f8d42f5bcf19d8ec97394798bdac6663b50353239ae6774699.png)
 
-[Full-body reference](../assets/characters/64e9ceb163c25caed078cb3d83a9cdf2da3d8590cc98bf535dd387f39893bd00.png)
+[Full-body reference](../assets/characters/432eaa3ef0eac3627ea7c7c6351bfaf13d9d7bdf64fb246b5eea5ca0ba7ad961.png)
 
-[Multiview reference sheet](../assets/characters/8f69db623030ea30cc8c29b7954a501d4b5738bd5adf5de8578e238d2572472c.png)
+[Multiview reference sheet](../assets/characters/058788e861af3e134ba17bff04559be7ac35c52cb73b9d7d11bdb6c6c4b6600e.png)

@@ -24,12 +24,12 @@ Thistle is ready to name her successor — but she wants something first. A Rift
 
 ## Appearance and artwork
 
-An elderly humanlike Riftborn woman appearing in her late seventies, with a thin frail build, deeply lined warm brown skin, gray-green eyes, silver-gray hair arranged in a practical loose bun, and a tired, faintly amused expression. Slightly stooped but composed, with quiet dignity. A well-kept faded mulberry wool shawl over a simple dark olive ankle-length dress, plain leather shoes, and one small unadorned brass shawl pin. One hand rests lightly on a plain wooden walking stick; the other relaxed. These are editable visual defaults. Her unknown home world remains unknown. No crown, gang insignia, magical aura, invented anatomy, exposed illness effects or modern medical equipment.
+An elderly human-like Riftborn default with warm pale skin, a narrow lined face, gently bent nose, grey-green eyes and cropped silver curls. A mulberry shawl, slate coat, ivory blouse, dark skirt and low shoes accompany an ordinary left-hand wooden cane. Her tired, wry composure remains; the unidentified lung condition and original world are not visually diagnosed.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/7369bd10e9a72038aadad5746f2847e13ce7f291f6af55ac30c5b53d5ed793d7.png)
+[Portrait](../assets/characters/408cfda5afba104eb1ea44069f898c507f65205af419d04cb1957adaa6617522.png)
 
-[Full-body reference](../assets/characters/bb3c52d4141528d7636270ebb7c2d7de5b592af1f463b00f0047d8dceb33ee57.png)
+[Full-body reference](../assets/characters/3d5bb9b60967b0c3f2a4fc1c8e2d05231eecf53c032fcc78e3dfc211a2f698b4.png)
 
-[Multiview reference sheet](../assets/characters/9bb74835f0dad1c11b72582c03b505ec8a6650ae97fa2571a970faa6194eaf35.png)
+[Multiview reference sheet](../assets/characters/0496fd6ebb7fbbbdf049212bc5f9c1d42061221a96bee0c21ee6fd52302d1c3d.png)

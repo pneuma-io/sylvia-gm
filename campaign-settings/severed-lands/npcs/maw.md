@@ -24,12 +24,12 @@ Maw and the Breathless are overdue — three days past their expected return fro
 
 ## Appearance and artwork
 
-A compact, slightly short adult humanlike Riftborn woman appearing in her early forties, with a wiry practical build, deep brown skin, dark amber-brown eyes, and close-cropped black hair with a few gray strands. A calm, direct, untroubled expression and a steady commanding posture despite her small stature. A worn dark teal neck scarf, ash-brown fitted travel coat, muted charcoal shirt, practical brown trousers, scuffed leather work boots and a plain belt with one small closed pouch. Empty relaxed hands. These are editable visual defaults. Her home world and the reasons for her survival remain unknown. No monstrous mouth, fangs, oversized body, visible mutation, supernatural glow, faction insignia or revealed secret powers.
+A small-stature mature human-like Riftborn woman default with deep umber skin, high cheekbones, copper-brown eyes and close-cut black hair. An ash-grey scavenger jacket and teal wrap shirt accompany brown trousers, treaded work boots, a right-hip rope coil and left-hip pouch. Both hands are empty. Her calm presence, unexplained survival and unresolved tracks hook gain no invented anatomy or origin.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/7d8f2d4139f54fbebbf7648ff66dfd298184923512a93701ba705fc28b64cda2.png)
+[Portrait](../assets/characters/f8fddf7ffdbf0a581f37589c2987551993349828e52c55d6aa9d62d32aa071c5.png)
 
-[Full-body reference](../assets/characters/8ee8318eef80dd777a186aaafbd25e95a676da99abc7ed34e37398863e7e5858.png)
+[Full-body reference](../assets/characters/94167cce6aece563250181e44107509075c448afdebc2d7f410f1fb78dbf9a3f.png)
 
-[Multiview reference sheet](../assets/characters/9b319c046f102ed513f9c75096e2e52c3a4cc5f22c2c4ab9d4599ed7bc0c4b4d.png)
+[Multiview reference sheet](../assets/characters/d11cc5b2257f0e1204f48130bcb28a1d21a0b770ac9ef59a0f2654495a8ff8cc.png)
