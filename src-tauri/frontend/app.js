@@ -1422,7 +1422,6 @@ const SylviaGMFrontend = (() => {
       await refreshProviderSettings();
       await refreshModelChoices();
       await refreshNavigationIndexes();
-      void refreshSavedSubscriptionCapabilities();
     } catch (error) {
       if (!updateStartup.pending) throw error;
       $('connecting-overlay').classList.remove('hidden');
@@ -2012,6 +2011,8 @@ const SylviaGMFrontend = (() => {
     document.querySelector('.settings-tab.active')?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
     $('close-settings-btn').focus();
     if (selectedTab === 'packages') void refreshRulesetBrowser();
+    // Models is where a default speed is chosen, so saved ChatGPT models learn their tiers here.
+    if (selectedTab === 'models') void refreshSavedSubscriptionCapabilities();
   }
 
   let localSupportReport = null;
@@ -2950,6 +2951,11 @@ const SylviaGMFrontend = (() => {
       refreshPendingLogin = Boolean(result.login_pending);
       if (result.signed_in && !result.models) {
         result = { ...result, ...await state.bridge.chatgpt_connection('models') };
+      }
+      if (result.saved_models_refreshed) {
+        // Saved models just learned new effort or speed options from the runtime's list.
+        await refreshProviderSettings();
+        await refreshModelChoices();
       }
       chatgptAccountStatus = result;
       $('chatgpt-model-card').hidden = !result.signed_in;
@@ -3934,8 +3940,9 @@ const SylviaGMFrontend = (() => {
     $('default-speed-note').textContent = speed === start.STANDARD ? '' : note;
   }
 
-  // Models saved before speed tiers were recorded gain them from one model-list read.
-  // This asks the signed-in ChatGPT runtime which tiers it offers; it never calls a model.
+  // Models saved before speed tiers were recorded gain them from one model-list read, the
+  // first time Models settings opens. This asks the signed-in ChatGPT runtime which tiers
+  // it offers; it never calls a model and is kept out of application startup.
   async function refreshSavedSubscriptionCapabilities() {
     if (state.subscriptionCapabilitiesChecked || !state.bridge?.chatgpt_connection) return;
     const provider = state.providerSettings?.configured?.find(

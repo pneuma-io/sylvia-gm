@@ -482,3 +482,32 @@ test('the chat footer names the requested speed and explains an unavailable one'
   assert.equal(context.renderSpeedPicker(null, true), '');
   assert.equal(nodes['chat-speed-hint'].textContent, '');
 });
+
+test('saved ChatGPT models learn their speed tiers once, when Models settings opens', async () => {
+  const code = slice('  async function refreshSavedSubscriptionCapabilities() {', '  // Offer a new chat');
+  const make = ({ models, signedIn = true, refreshed = true }) => {
+    const calls = [];
+    const context = { calls, state: { providerSettings: { configured: [
+      { provider_id: 'chatgpt_subscription', models }] }, bridge: {
+      chatgpt_connection: async (action) => { calls.push(action);
+        return action === 'status' ? { signed_in: signedIn } : { saved_models_refreshed: refreshed }; } } },
+      refreshProviderSettings: async () => calls.push('settings'), refreshModelChoices: async () => calls.push('choices') };
+    vm.runInNewContext(code, context);
+    return context;
+  };
+  const legacy = [{ id: 'gpt-6.1-sol', transport: 'codex_app_server' }];
+  const known = [{ id: 'gpt-6.1-sol', transport: 'codex_app_server', service_tiers: [] }];
+  const first = make({ models: legacy });
+  await first.refreshSavedSubscriptionCapabilities();
+  await first.refreshSavedSubscriptionCapabilities();
+  assert.deepEqual(first.calls, ['status', 'models', 'settings', 'choices'], 'one read, then the pickers refresh');
+  const recorded = make({ models: known });
+  await recorded.refreshSavedSubscriptionCapabilities();
+  assert.deepEqual(recorded.calls, [], 'recorded tiers, even an empty list, need no further read');
+  const signedOut = make({ models: legacy, signedIn: false });
+  await signedOut.refreshSavedSubscriptionCapabilities();
+  assert.deepEqual(signedOut.calls, ['status'], 'a signed-out account is never asked to list models');
+  const unchanged = make({ models: legacy, refreshed: false });
+  await unchanged.refreshSavedSubscriptionCapabilities();
+  assert.deepEqual(unchanged.calls, ['status', 'models']);
+});

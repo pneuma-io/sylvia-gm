@@ -1704,7 +1704,10 @@ class TestUI001Frame:
         assert 'data-campaign-plan-id="${escapeHtml(presentation.campaignPlanId || \'\')}"' in js
         assert "wireBuilderResultActions" in js
         assert "JSON.stringify(content.result || content" not in js
-        assert "async function finalizeSelectedConstruction(modelGuidanceOverride = false)" in js
+        assert (
+            "async function finalizeSelectedConstruction(modelGuidanceOverride = false, "
+            "chosenStart = null)"
+        ) in js
         assert "model_guidance: (campaignId, modelId, overrideAccepted)" in js
         assert "'model_guidance'" in js
         assert 'id="model-guidance-warning"' in html
