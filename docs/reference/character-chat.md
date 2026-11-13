@@ -33,8 +33,17 @@ Every send carries an operation identity and the expected message count, so a re
 returns the saved chat instead of asking the model twice, and a send based on an older copy is
 refused. One reply per chat runs at a time.
 
-Limits: 256 chats, 1,000 messages per chat, 8,000 characters per player message. If the card is
-removed from the library the chat stays readable but cannot continue.
+Every save is first read back with the same checks a reopen uses, so a chat is never written in a
+form that cannot open again. Player text containing NUL characters or unpaired surrogates is refused
+before the model is asked; replies have them removed or replaced. Reads and writes share one lock in
+the owner, and the atomic replace retries briefly while another program holds the file.
+
+Limits: 256 chats, 1,000 messages per chat, 8,000 characters per player message, 65,536 per reply.
+If the card is removed from the library the chat stays readable but cannot continue. Importing the
+identical card again (same content hash) lets it continue.
+
+In the dialog, an unconfirmed send says so and is resent under the same identity. A chat changed in
+another window, or whose card was removed, is reloaded with the typed text kept.
 
 ## Not included yet
 
