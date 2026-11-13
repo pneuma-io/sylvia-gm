@@ -41,12 +41,12 @@ A scalding cloud formed where Rift water meets extreme heat — geothermal vents
 
 ## Appearance and artwork
 
-One Small Rift Steam: ONE rounded upright scalding-vapor cloud, pale gray-white billows with restrained warm highlights and thin violet Rift glints, tapered misty base. TWO short steam side-arm lobes each end in THREE small condensed claw tips, all six tips visible, in a quiet resting arrangement. FACELESS, no eyes, mouth, humanoid head, legs, wings or tail. Cloud, steam and claw lobes follow authored source; exact billows and palette are editable resting defaults. This selected quiet state contains no falling-creature silhouettes or other beings. No breath cone, victims, burned flesh, geothermal landscape, fire, machinery, hallucinatory scene, writing or text.
+An editable Steam default is one white/pearl-grey connected cloud with broad upper billows, two clawlike side curls and wispy lower condensation. Nested cool opalescent billow depths may suggest indistinct anonymous falling shadow-marks, without identifying a creature, world or victim. No solid mephit anatomy, face or new visibility/attack effect is established.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/d1d1522bcd8e130003c2a0f91735cc4296db094d5db524c01307c8f340baee53.png)
+[Portrait](../../assets/characters/0b183ecbe59d453c6bd62e25d983d019f0a8cde0e5af50ff66ed96eb85e43b19.png)
 
-[Full-body reference](../../assets/characters/be1d46ed52cd4e69ebc532b69bc95fa10b5f26f5340b09817a377c6575382a4b.png)
+[Full-body reference](../../assets/characters/60afb5fd083263d0e89fce0ae3cd4d430d1c9fd2d176a8646b7548c46fa9586f.png)
 
-[Multiview reference sheet](../../assets/characters/a6b97555b0404d13696e563e9ae76dca4d0b07daa57f34ab4dd9a3ed7efed4dc.png)
+[Multiview reference sheet](../../assets/characters/1b84516b0b6f7a1a31421c6bb34417ac45f3f10fb3f0f4fd98c68ffec9bf2e7a.png)

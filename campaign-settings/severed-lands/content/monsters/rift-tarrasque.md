@@ -53,12 +53,12 @@ The Elder Riftbeast — a living cataclysm born from the Rift itself, or perhaps
 
 ## Appearance and artwork
 
-One Gargantuan Elder Riftbeast, an editable armored reptilian titan appearance: ONE massive deep charcoal-brown continuous body with a reflective stony carapace, low jagged dorsal plates and restrained violet Rift seams. ONE broad horned reptilian head, TWO heavy forward-curving bone-gray horns, TWO amber-violet eyes and a closed tooth-edged mouth. TWO shorter muscular forelimbs with FOUR clawed digits each, TWO powerful hindlegs with FOUR heavy clawed toes each, and ONE long tapering armored tail with its single pointed tip fully visible. Calm weight-bearing semi-upright near-front three-quarter stance, head toward left, tail curved toward right, every limb/horn/plate/tail tip inside margins. Carapace, claws, horns and tail follow authored source; exact titan anatomy and palette are editable visual defaults, without resolving whether it was born from or fell through the Rift. No extra limb/tail, wings, person, victim, city, destruction, spell reflection, portal, attack scene, letters or text.
+An editable Elder Riftbeast default is a huge charcoal/grey-olive reptilian predator with old-gold eyes, one tooth-lined jaw, two swept dark-ivory horns, two four-digit clawed forearms, two three-toed hind legs and one heavy tail. Dark umber/olive-black layered reflective carapace has bronze edges and nested inward lamellae/reflections between selected plates. No origin, named world, god identity, extra head/limb or new power is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/fad198234271fd878384e78b8b08a1c5de6a28b1e9466f3e8b8d7d7ffc74826c.png)
+[Portrait](../../assets/characters/3827c53b3bcaf3f0ab89a33a3de11203fe574b21433c7ea47167c169a18652ea.png)
 
-[Full-body reference](../../assets/characters/b4c5a497b7a0f05ba380307ba412f3253577243ffd26c91eefbebd0e0b6f9634.png)
+[Full-body reference](../../assets/characters/3897a0c6f9b75aac829d635d47ed33656e5a3f6328ac326c03442ebe8e400b86.png)
 
-[Multiview reference sheet](../../assets/characters/919e74d495129f9ce93a3c54f38ea512e1855f68e2d0468fbe2a681f06caf074.png)
+[Multiview reference sheet](../../assets/characters/ac9362fb88f46f86bad8575b04d02f40da11e0564441177640ae1bd6e80feec0.png)

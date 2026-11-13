@@ -44,12 +44,12 @@ A Riftborn troll whose regenerative abilities have been twisted by Rift exposure
 
 ## Appearance and artwork
 
-One Large Rift Troll, an anonymous mature adult androgynous giant-kin with a lanky heavy-shouldered build, long arms, intact muted gray-green skin with clearly healed violet scars, ONE long-nosed rough face with TWO amber eyes, TWO pointed ears and TWO small lower tusks. Shoulder-length tangled black rope-like hair. EXACTLY TWO arms with five long clawed fingers on each empty hand, TWO legs and complete broad bare feet with five toes each. Plain opaque tattered dark-brown wrap trousers tied with a simple rope belt, no armor or weapon. Calm slightly hunched near-front three-quarter resting pose with all hands/feet visible. Troll form and healed violet scarring follow source; face, hair, clothes and palette are editable defaults. The body is intact; no detached/regrowing limb, wound, blood, victim, pool scene, attack, regeneration demonstration or writing.
+An editable intact Troll default has moss-green/blue-grey leathery skin, amber-yellow eyes, heavy brow/hooked nose, sparse ragged near-black hair, two long five-digit clawed arms and two strong four-toed legs. Healed violet scar ridges repeat inward on selected skin areas, without gore or a known injury cause. Plain brown hide waist wrap/cord belt, empty hands; no extra regenerating limb, weapon or new ability.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/092c53fa26e16c222e0e4e9670eb366ac57bedb2276f8911ccde38db831766d1.png)
+[Portrait](../../assets/characters/327b06b8adb7683b68e9f9b473ab3a543dfd4d52cdc8f3a64ae40ef9a9ec2b84.png)
 
-[Full-body reference](../../assets/characters/714d5fab07afac7f6b28389463221f4f6fc362519298a7a7f8c6cd1f22f36d76.png)
+[Full-body reference](../../assets/characters/8f59bff0d1e284363676ee4e3271aa29036dc2160928d574849c4f06e453f30a.png)
 
-[Multiview reference sheet](../../assets/characters/1bceb90474e379bca96a28bcdd6ce556d64560a30ced8aba965fcdb1aaccb650.png)
+[Multiview reference sheet](../../assets/characters/698cba9fb5652a6ad935ab63ad49bf49bd00101d1df2f9a55ad5606f787f4cc1.png)

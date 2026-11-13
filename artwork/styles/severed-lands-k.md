@@ -641,3 +641,14 @@ Six historical bundles are replaced from authored-only facts. Fungal disguise, m
 | Rift Specter | [Body](../assets/characters/76a04d4fa657e42f6f13c09b706d9d2f53765c8f9c6df76c0eb77a1cb37f959e.png) | [Sheet](../assets/characters/91515fe572e39ee4e6bc97de775d00e7021ec08f93c420211de923f912241293.png) | [Portrait](../assets/characters/a3c3f274253f6b90bba846b1c7c3c0496d8968fffab1506d5e809e91bf77d21d.png) |
 | Rift Spore | [Body](../assets/characters/f17144708c4c0e54e7a0766c3b034ed10da7394d1731dc590b07f9aa6f6e511c.png) | [Sheet](../assets/characters/89054e87f2d566c0e45152e3b4d4077d5ad58211fb73981405a2022c5c47d918.png) | [Portrait](../assets/characters/c1952b84dda5959d5b1baf90e50998c448ec0ba48e753c11f9c5c2cc6b830206.png) |
 | Rift Stalker | [Body](../assets/characters/c912e1fc62eda77e3de04c72a4a725128a9963b657504053a71601506ba0b959.png) | [Sheet](../assets/characters/97e135caacf992cabcb86eb108963616ae417352799ba87f12d08807fe783ecb.png) | [Portrait](../assets/characters/c624f309cde9a6a55baff77f7d2124fe98e6928c0a93260e77a2c7ec4b62781c.png) |
+
+### Prepared steam, carapace, tree and regenerative-giant references
+
+Four historical monster bundles are replaced from authored-only facts. Pale cloud, unknown-origin carapaced predator, active tree with ordinary disguise and intact scarred Troll retain their own materials/anatomy. Prior identities/resources retained; no known victim, new lore or mechanics, and no individual owner sign-off claimed.
+
+| Character | Full body | Multiview | Portrait |
+|---|---|---|---|
+| Rift Steam | [Body](../assets/characters/60afb5fd083263d0e89fce0ae3cd4d430d1c9fd2d176a8646b7548c46fa9586f.png) | [Sheet](../assets/characters/1b84516b0b6f7a1a31421c6bb34417ac45f3f10fb3f0f4fd98c68ffec9bf2e7a.png) | [Portrait](../assets/characters/0b183ecbe59d453c6bd62e25d983d019f0a8cde0e5af50ff66ed96eb85e43b19.png) |
+| Elder Riftbeast | [Body](../assets/characters/3897a0c6f9b75aac829d635d47ed33656e5a3f6328ac326c03442ebe8e400b86.png) | [Sheet](../assets/characters/ac9362fb88f46f86bad8575b04d02f40da11e0564441177640ae1bd6e80feec0.png) | [Portrait](../assets/characters/3827c53b3bcaf3f0ab89a33a3de11203fe574b21433c7ea47167c169a18652ea.png) |
+| Rift Treant | [Body](../assets/characters/c6fa62836d2c1334c3777543b4ebb91ec944453cb3e1ea9704fe8ec325e22b62.png) | [Sheet](../assets/characters/76c62ab2663f4aec054f432a99b1dc9e8fb79089b7405afb159c3ebe2111f8bf.png) | [Portrait](../assets/characters/b7834c72f4cf92db515e72cb0ed096d5a8a371b362b444ce606b7db2844a3299.png) |
+| Rift Troll | [Body](../assets/characters/8f59bff0d1e284363676ee4e3271aa29036dc2160928d574849c4f06e453f30a.png) | [Sheet](../assets/characters/698cba9fb5652a6ad935ab63ad49bf49bd00101d1df2f9a55ad5606f787f4cc1.png) | [Portrait](../assets/characters/327b06b8adb7683b68e9f9b473ab3a543dfd4d52cdc8f3a64ae40ef9a9ec2b84.png) |
