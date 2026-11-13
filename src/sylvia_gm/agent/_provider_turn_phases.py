@@ -84,7 +84,6 @@ from ._provider_session import (
     _missing_required_arguments,
     _native_content_for_text_operation,
     _normalize_state_references,
-    _participant_display_names,
     _persisted_campaign_file_mutation_attempted,
     _persisted_selected_party_roles,
     _plain_json,
@@ -96,7 +95,7 @@ from ._provider_session import (
     _require_checked_campaign_file_narration,
     _resolve_provider_tool_alias,
     _saved_action_sequence_results,
-    _saved_mechanics_narration_facts,
+    _saved_round_narration_facts,
     _ToolCallAssembly,
     _unsupported_response_speaker_ids,
     _validated_raw_response_blocks,
@@ -2216,6 +2215,13 @@ def reconcile_tool_batch(
                     JsonValue,
                     _plain_json(tool_messages),
                 ),
+                # Model results omit engine context; a resumed turn restores these exact
+                # facts instead. This field is evidence only and is never sent as history.
+                **(
+                    {"narration_facts": cast(JsonValue, _plain_json(round_narration_facts))}
+                    if round_has_any_commit and round_narration_facts
+                    else {}
+                ),
             },
         )
     provider_input.control.progress.update("working")
@@ -2407,7 +2413,6 @@ def prepare_turn_recovery(
         )
     )
     state.participants = tuple(getattr(self._owner.snapshot(state.campaign_id), "participants", ()))
-    state.entity_display_names = _participant_display_names(state.participants)
     state.opening_footing = (
         self._opening_footing_payload(provider_input) if state.opening_request else None
     )
@@ -2430,21 +2435,22 @@ def prepare_turn_recovery(
         else None
     )
     state.saved_sequence_results = _saved_action_sequence_results(provider_input, self._owner)
-    state.pending_narration_facts = [
+    # The live rounds saved their exact facts with their tool results, in commit order.
+    state.pending_narration_facts = _saved_round_narration_facts(
+        provider_input, state.basis_message_id
+    )
+    saved_sequence_ids = {
+        fact.get("sequence_id")
+        for fact in state.pending_narration_facts
+        if fact.get("tool") == "execute_action_sequence"
+    }
+    # A queue receipt saved without its round's evidence is still read canonically.
+    state.pending_narration_facts.extend(
         facts
         for result in state.saved_sequence_results
-        if (facts := _action_sequence_narration_facts(self._owner, state.campaign_id, result))
+        if result.get("sequence_id") not in saved_sequence_ids
+        and (facts := _action_sequence_narration_facts(self._owner, state.campaign_id, result))
         is not None
-    ]
-    # A resumed turn's saved tool results carry the card but not engine context, so its
-    # exact facts are rebuilt from the canonical receipts, as the live round built them.
-    state.pending_narration_facts.extend(
-        _saved_mechanics_narration_facts(
-            provider_input,
-            self._owner,
-            state.campaign_id,
-            state.entity_display_names,
-        )
     )
     state.obligations.provisional_tool_prose_pending = False
     state.obligations.player_intent_pending = False

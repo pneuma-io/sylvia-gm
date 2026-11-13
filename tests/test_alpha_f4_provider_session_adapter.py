@@ -29,6 +29,7 @@ from sylvia_gm.agent._provider_session import (
     _missing_required_arguments,
     _native_content_for_text_operation,
     _normalize_state_references,
+    _plain_json,
     _project_response_blocks,
     _require_checked_campaign_file_narration,
     _resolve_provider_tool_alias,
@@ -66,7 +67,6 @@ from sylvia_gm.domain.authority import (
     ModelDecisionBoundary,
     ModelDecisionOwner,
     ModelToolBehavior,
-    MutationRecord,
     NarrationStream,
     PackageLock,
     ProseChannel,
@@ -12835,148 +12835,114 @@ def test_post_mechanics_recovery_continues_same_gm_through_campaign_file_before_
     assert provider.request_kwargs[0]["tool_choice"] == "required"
 
 
-def test_post_mechanics_recovery_rebuilds_exact_facts_for_every_committed_mechanic() -> None:
-    """Saved model results omit engine context, so Retry reads the exact rolls canonically."""
+def test_post_mechanics_recovery_restores_the_live_rounds_exact_narration_facts() -> None:
+    """Saved model results omit engine context, so Retry restores the live round's facts."""
 
-    source = _provider_input(user_text="I check the hound, then strike it.")
+    source = _provider_input(user_text="I check the clock, then push it on.")
     user = source.history.messages[0]
-    entities_key = "sylvia.srd-lite.bg3.entities"
-    player = {"hp": 12, "armor_class": 16}
-    hound_before = {"hp": 12, "armor_class": 13}
-    hound_after = {"hp": 4, "armor_class": 13}
-    calls = {
-        "action-retry-check": {"steps": 1, "actor": "rift-player-character",
-                               "actor_state": "ready"},
-        "action-retry-attack": {"steps": 1, "actor": "rift-scarred-hound",
-                                "actor_state": "ready"},
-    }
-    results: dict[str, dict[str, object]] = {
-        "action-retry-check": {
-            "status": "committed",
-            "result_card": {"title": "Check"},
-            "context": {"_d20_test": 8, "_modifier": 5, "_adjusted_total": 13,
-                        "_outcome": "success"},
-        },
-        "action-retry-attack": {
-            "status": "committed",
-            "result_card": {"title": "Attack"},
-            "context": {"_attack_roll": 13, "_attack_adjusted_total": 18,
-                        "_damage_roll": [2, 3], "_damage_modifier": 3,
-                        "_target_id": "rift-scarred-hound"},
-        },
-    }
-    saved_entities = {
-        "action-retry-check": {"rift-player-character": player},
-        "action-retry-attack": {"rift-scarred-hound": hound_after},
-    }
-    history = [user]
-    events: list[CanonicalEvent] = []
-    for ordinal, (action_id, parameters) in enumerate(calls.items()):
-        call_id = f"call-{action_id}"
-        history.append(SessionMessage(
-            session_id=source.session.session_id, sequence=len(history) + 1,
-            message_id=f"{action_id}-calls", kind=SessionMessageKind.EVIDENCE,
-            content={
-                "kind": "provider_tool_calls", "turn_id": "turn-provider",
-                "inference_id": f"inference-{ordinal}", "basis_message_id": user.message_id,
-                "assistant": {"role": "assistant", "content": None, "tool_calls": [{
-                    "id": call_id, "type": "function",
-                    "function": {"name": "advance", "arguments": json.dumps(parameters)},
-                }]},
-            },
-        ))
-        trimmed = {key: value for key, value in results[action_id].items() if key != "context"}
-        history.append(SessionMessage(
-            session_id=source.session.session_id, sequence=len(history) + 1,
-            message_id=f"{action_id}-results", kind=SessionMessageKind.EVIDENCE,
-            content={
-                "kind": "provider_tool_results", "turn_id": "turn-provider",
-                "inference_id": f"inference-{ordinal}", "basis_message_id": user.message_id,
-                "results": [{"role": "tool", "tool_call_id": call_id, "name": "advance",
-                             "content": json.dumps({
-                                 "status": "action_committed", "action_id": action_id,
-                                 "campaign_revision": 3 + ordinal, "safe_payload": {},
-                                 "result": trimmed,
-                                 "current_entities": saved_entities[action_id],
-                             })}],
-            },
-        ))
-        for event_type, payload in (
-            (CanonicalEventType.TOOL_CALL,
-             {"package_id": "synthetic.clock", "tool_name": "advance", "parameters": parameters}),
-            (CanonicalEventType.TOOL_RESULT, {"status": "committed", "result": results[action_id]}),
-            (CanonicalEventType.ACTION_COMMITTED, {"status": "committed"}),
-        ):
-            events.append(CanonicalEvent(
-                sequence=len(events) + 1, event_type=event_type, turn_id="turn-provider",
-                action_id=action_id, safe_payload=payload,
-            ))
+    rolls = [
+        {"_d20_test": 8, "_modifier": 5, "_adjusted_total": 13, "_outcome": "success"},
+        {"_attack_roll": 13, "_attack_adjusted_total": 18, "_damage_roll": [2, 3],
+         "_damage_modifier": 3},
+    ]
 
-    class _OwnerWithMutations(_OwnerProjection):
-        def snapshot(self, campaign_id: str) -> object:
-            return SimpleNamespace(
-                **vars(super().snapshot(campaign_id)),
-                mutations=(MutationRecord(
-                    action_id="action-retry-attack", ordinal=0,
-                    namespace="sylvia.srd-lite.bg3", key="entities",
-                    before={"rift-player-character": player, "rift-scarred-hound": hound_before},
-                    after={"rift-player-character": player, "rift-scarred-hound": hound_after},
-                ),),
+    def call(index: int) -> list[ProviderStreamChunk]:
+        return [ProviderStreamChunk(
+            tool_call_delta={"index": 0, "id": f"call-live-{index}", "function": {
+                "name": "advance",
+                "arguments": '{"steps":1,"actor":"rift-player-character","actor_state":"ready"}',
+            }},
+            finish_reason="tool_calls",
+        )]
+
+    owner = _OwnerProjection()
+    live = ProviderSessionAdapter(
+        cast(AuthorityOwner, owner),
+        _ScriptedProvider([call(0), call(1), [
+            ProviderStreamChunk(content="The clock ticks on.", finish_reason="stop"),
+        ]]),
+        owner_id="owner-provider",
+    ).for_turn("turn-provider")(source)
+    saved: list[SessionMessage] = [user]
+    committed: list[str] = []
+    for event in live:
+        if event.kind is ProviderEventKind.ACTION:
+            assert event.action_command is not None
+            action_id = event.action_command.action_id
+            context = rolls[len(committed)]
+            committed.append(action_id)
+            owner.events = (
+                *owner.events,
+                CanonicalEvent(
+                    sequence=len(owner.events) + 1, event_type=CanonicalEventType.TOOL_RESULT,
+                    turn_id="turn-provider", action_id=action_id,
+                    safe_payload={"status": "committed",
+                                  "result": {"status": "committed", "context": context}},
+                    visibility=EventVisibility.PLAYER_SAFE,
+                ),
+                CanonicalEvent(
+                    sequence=len(owner.events) + 2,
+                    event_type=CanonicalEventType.ACTION_COMMITTED,
+                    turn_id="turn-provider", action_id=action_id,
+                    safe_payload={"status": "committed"},
+                    visibility=EventVisibility.PLAYER_SAFE,
+                ),
             )
+        elif event.evidence is not None and event.evidence.get("kind") in {
+            "provider_tool_calls", "provider_tool_results",
+        }:
+            saved.append(SessionMessage(
+                session_id=source.session.session_id, sequence=len(saved) + 1,
+                message_id=f"evidence-{len(saved)}", kind=SessionMessageKind.EVIDENCE,
+                content=cast(dict[str, object], _plain_json(event.evidence)),
+            ))
+            if len(committed) == len(rolls) and event.evidence["kind"] == "provider_tool_results":
+                break  # The provider is lost after both mechanics committed.
 
-    owner = _OwnerWithMutations(
-        state={entities_key: {"rift-player-character": player, "rift-scarred-hound": hound_after}},
-    )
-    owner.events = tuple(events)
+    live_facts = [
+        fact
+        for message in saved
+        for fact in cast(list[dict[str, object]], message.content.get("narration_facts", []))
+    ]
+    assert [fact["tool"] for fact in live_facts] == ["advance", "advance"]
+    assert live_facts[0]["d20_test"] == 8 and live_facts[1]["damage_roll"] == [2, 3]
+    saved_rows = [
+        str(row["content"])
+        for message in saved
+        if message.content.get("kind") == "provider_tool_results"
+        for row in cast(list[dict[str, object]], message.content["results"])
+    ]
+    assert len(saved_rows) == 2 and all('"context"' not in row for row in saved_rows)
+
     provider = _ScriptedProvider(
-        [[ProviderStreamChunk(content="The hound staggers.", finish_reason="stop")]]
+        [[ProviderStreamChunk(content="The clock settles.", finish_reason="stop")]]
     )
-    provider_input = SessionProviderInput(
+    resumed = ProviderSessionAdapter(
+        cast(AuthorityOwner, owner), provider, owner_id="owner-provider",
+    ).for_turn("turn-provider")(SessionProviderInput(
         session=source.session,
-        history=SessionContext(session=source.session, messages=tuple(history)),
+        history=SessionContext(session=source.session, messages=tuple(saved)),
         catalog=(*source.catalog, _campaign_file_tool(allow_unchanged=True)),
         control=source.control,
         basis_message_id=user.message_id,
         recovery_kind="post_mechanics_narration",
         retry_action_receipt=ActionReceipt(
-            campaign_id="campaign-provider", action_id="action-retry-attack",
-            status=ActionStatus.COMMITTED, result=results["action-retry-attack"],
-            resulting_revision=4,
+            campaign_id="campaign-provider", action_id=committed[-1],
+            status=ActionStatus.COMMITTED,
+            result={"status": "committed", "context": rolls[-1]}, resulting_revision=4,
         ),
-    )
-
-    turn = ProviderSessionAdapter(
-        cast(AuthorityOwner, owner), provider, owner_id="owner-provider",
-    ).for_turn("turn-provider")(provider_input)
-    for _event in turn:
+    ))
+    for _event in resumed:
         if provider.calls:
             break
 
-    messages, _tools = provider.calls[0]
     marker = "SYLVIA_GM_EXACT_NARRATION_FACTS "
     facts_text = next(
-        str(message["content"]) for message in messages
+        str(message["content"]) for message in provider.calls[0][0]
         if str(message.get("content", "")).startswith(marker)
     )
-    facts = json.loads(facts_text.split("\n")[1])
-    assert [fact["tool"] for fact in facts] == ["advance", "advance"]
-    check, attack = facts
-    assert (check["d20_test"], check["modifier"], check["adjusted_total"], check["outcome"]) == (
-        8, 5, 13, "success",
-    )
-    assert check["current_entities"] == {"rift-player-character": player}
-    assert attack["attack_roll"] == 13 and attack["attack_adjusted_total"] == 18
-    assert attack["damage_roll"] == [2, 3] and attack["damage_modifier"] == 3
-    assert (
-        attack["target_hit_points_before"],
-        attack["target_hit_points_after"],
-        attack["hit_point_change"],
-    ) == (12, 4, -8)
     # The earlier check's die is no longer only in its replayed card.
-    replayed = [
-        str(message.get("content")) for message in messages if message.get("role") == "tool"
-    ]
-    assert len(replayed) == 2 and all('"context"' not in content for content in replayed)
+    assert json.loads(facts_text.split("\n")[1]) == live_facts
 
 
 def test_retry_adapter_reconstructs_authoritative_context_and_never_exposes_tools() -> None:
