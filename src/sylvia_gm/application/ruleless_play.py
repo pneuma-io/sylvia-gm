@@ -154,10 +154,22 @@ _MECHANICS_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
 _NEGATION = re.compile(r"\b(?:no|not|never|without|nor|instead\s+of)\b|n't\b", re.IGNORECASE)
 
 
+def has_no_ruleset(snapshot: object) -> bool:
+    """Return whether a campaign snapshot carries the admitted empty No Ruleset closure.
+
+    A projection without a package lock (such as a narrow test owner) is never treated as
+    No Ruleset, so the rule-less policy only applies where the lock is actually known.
+    """
+
+    lock = getattr(snapshot, "package_lock", None)
+    entries = getattr(lock, "entries", None)
+    return entries is not None and not entries
+
+
 def is_ruleless_play(snapshot: CampaignState) -> bool:
     """Return whether *snapshot* is an admitted No Ruleset campaign under DM authority."""
 
-    return snapshot.writer is WriterRole.DM and not snapshot.package_lock.entries
+    return snapshot.writer is WriterRole.DM and has_no_ruleset(snapshot)
 
 
 def ruleless_gm_guide(snapshot: CampaignState) -> str | None:

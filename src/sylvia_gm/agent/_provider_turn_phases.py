@@ -881,16 +881,22 @@ def reject_invalid_revision(
     state.local_tool_failures.add(state.assembly.call_id)
 
 
-def reject_ruleless_mechanics(self: ProviderSessionAdapter, state: ProviderTurnState) -> bool:
+def reject_ruleless_mechanics(
+    self: ProviderSessionAdapter,
+    state: ProviderTurnState,
+    provider_input: SessionProviderInput,
+) -> bool:
     """Hold back a No Ruleset response that resolves or requests game mechanics."""
 
     from sylvia_gm.application.ruleless_play import (
-        is_ruleless_play,
+        has_no_ruleset,
         mechanics_in_response,
         ruleless_mechanics_rejection,
     )
 
-    if not is_ruleless_play(self._owner.snapshot(state.campaign_id)):
+    if provider_input.session.role is not WriterRole.DM or not has_no_ruleset(
+        self._owner.snapshot(state.campaign_id)
+    ):
         return False
     held_text = (
         state.buffered_narration
@@ -1992,7 +1998,7 @@ def execute_tool_batch(
             ):
                 reject_invalid_revision(self, state, provider_input, turn_id=turn_id)
                 continue
-            if reject_ruleless_mechanics(self, state):
+            if reject_ruleless_mechanics(self, state, provider_input):
                 continue
             settle_campaign_file_narration(self, state, provider_input, turn_id=turn_id)
             if state.empty_collection_paths:
