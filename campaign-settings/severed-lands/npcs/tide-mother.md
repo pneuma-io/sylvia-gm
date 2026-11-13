@@ -24,12 +24,12 @@ Tide-Mother has requested a meeting with the Returners — something she hasn't 
 
 ## Appearance and artwork
 
-An ancient adult female reptilian Riftborn of the Verdant Scaled, the oldest living Scale-Elder, with a strong weathered bipedal hunter's frame and patient cautious expression. Clearly reptilian lizard head with a modest elongated blunt snout, heavy aged scaled brow ridges, amber-brown eyes with narrow vertical pupils, small rounded external ear openings and no human hair. Fine aged dark olive and gray-green scales over head, arms and legs, paler ochre scales along lower jaw, throat and underside. Several old healed Rift-burn scars across the scaled face and forearms have a very faint violet glow, without fresh injury. Two arms with five claw-tipped digits per hand, two strong plantigrade legs with broad bare clawed feet, and ONE long strong tapering scaled tail, naturally curving behind her with its complete tip inside the frame. A plain faded dark teal woven sleeveless wrap tunic reaching mid-thigh over muted brown cloth leg wraps, simple leather forearm guards and a worn brown leather belt. Her anatomical RIGHT hand loosely holds one upright Rift-touched spear beside her body, with a worn wooden shaft and a dark gray pointed head with restrained faint violet veins; her LEFT hand hangs relaxed. Her ancient reptilian identity, healed Rift-burn scars, patient bearing and spear follow the authored profile and faction source; detailed anatomy, scale colors, features and clothes are editable visual defaults. Her home world remains unknown. No human skin, human face, hair, mammalian ears, feathers, wings, antlers, oversized horns, extra limbs, extra tails, crown, invented tribal emblem, fresh wounds, gore, broad magical aura, landscape, prey, trophies or animal companion.
+An ancient sturdy reptilian editable default with heavy olive bark-like scales, a broad snout, amber eyes and one thick tapering tail. Worn skull ridges, five clawed fingers and three prominent forward toes remain consistent. Old scars on her left cheek and left forearm have a faint blue-violet sheen. Plain russet, cream and grey-green layers accompany the spear held loosely in her right hand. Consensus leadership gains no crown or new power.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/a3ef6b8ccd5a862122fc2fd90b6881712ef9554ebf9b7814b3e34ab7bcacb28c.png)
+[Portrait](../assets/characters/a7f225e518e47e9a3e879f1456c98ab3ef79e0b14391b1a5eae507a741e5bcab.png)
 
-[Full-body reference](../assets/characters/42b11da9e4120ca0c464132ea34cba34022e824ae38b2ef2a1209dc1e53d7562.png)
+[Full-body reference](../assets/characters/86daeea4d49bb5915f2a9c7d97f36ffe28b41579d988322f23f97e1701139902.png)
 
-[Multiview reference sheet](../assets/characters/b9e97e42a261101929d73a5b1ec36e2a674d75b78975e9afa60b0e19df087c83.png)
+[Multiview reference sheet](../assets/characters/6b2bc23e52fcb3f7d33fd6f18fabc48e1a3559559fad197167be09d839457c63.png)

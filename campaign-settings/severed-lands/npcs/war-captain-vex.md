@@ -24,12 +24,12 @@ Vex's scouts found something in the deep Cairnfields — a Warden structure, int
 
 ## Appearance and artwork
 
-A humanlike adult female Riftborn aerial war-captain appearing in her early forties, with a lean athletic frame, warm dark copper skin, slate-gray eyes, high cheekbones, a firm angular jaw and dark auburn hair gathered into a short tight plain braid. Silent observant self-assured expression with mouth closed, still balanced upright posture and empty relaxed hands. A fitted charcoal leather-and-mail protective jacket with a plain high cloth collar, simple worn brown leather riding-harness straps over the jacket, fingerless dark leather gloves, muted slate trousers and practical dark brown leather riding boots. One ordinary short curved saber stays fully sheathed at her anatomical LEFT hip; one small closed plain pouch is secured at her anatomical RIGHT hip. Her disciplined silent aerial-commander bearing follows the authored profile; apparent age, physical features, clothing, equipment and weapon design are editable visual defaults. No invented throat injury or scar, bandage, gag, muzzle, sewn lips, speaking pose, open mouth, wings, feathers, bird anatomy, Silent Wing insignia, crown, readable orders, glowing eyes, Warden weapon or structure, magic aura, mount, extra creature, scenery or revealed discovery.
+An adult human-like editable default with cool-brown skin, an elongated oval face, amber-brown eyes and close auburn hair brushed back. A lean athletic build wears plain slate-grey half-plate, navy riding layers, covered throat and ordinary harness straps. Her greatsword stays sheathed on her back, hilt above the left shoulder. A closed-mouth watchful expression preserves silence without revealing the private structure or assigning ancestry.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/a109c982aeae0b372856e93e8e57ad1d29bdfe33d0614e9306dc8126057f4674.png)
+[Portrait](../assets/characters/2d5c3771215ef8a04c19052c129cd9e769236500d5ad4ea2fb26d854f7514f65.png)
 
-[Full-body reference](../assets/characters/54542a3685238e2afd04ab42a0ba2ef91cf2d8ff32b80e45b34033cc3ef16bcd.png)
+[Full-body reference](../assets/characters/ca70eaec4b2486775db9a27d8d27dbb0aace8c5bec91ec7d0bc4f43baa59d992.png)
 
-[Multiview reference sheet](../assets/characters/bd738b5dd2b79a19ad584f418ef2e4cc769f8ba551279eb63199e012b9c6477e.png)
+[Multiview reference sheet](../assets/characters/0281182996c461fb383767731cee3da08367253bc1cbf263eecc680589abc41f.png)

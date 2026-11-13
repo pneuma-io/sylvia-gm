@@ -20,12 +20,12 @@ The Archivist is imperious, precise, and carrying a sadness she doesn't discuss.
 
 ## Appearance and artwork
 
-A mature ageless adult Veil-touched Elf woman with a tall slender frame, pale ash-brown skin, high cheekbones, long pointed ears, fully violet irises and dark hair with silver streaks gathered in a severe high bun. An imperious precise expression with restrained sadness and an upright composed posture. A plain dark plum high-collared ankle-length robe, charcoal sleeveless overcoat, simple dark leather belt and worn dark leather slippers. Empty relaxed hands. Her elven identity, Speaker-stage violet eyes and imperious scholarly bearing follow the authored sources; apparent age styling, other features and clothing are editable visual defaults. Her actual age remains unknown. No invented order insignia, crown, wizard hat, glowing eyes, weapon, visible Warden fragment, open book, readable writing, magic aura, portal, revealed secret or scenery.
+A visibly mature elf editable default with warm brown skin, an angular lined face, pointed ears, fully violet irises and straight silver-grey hair tucked behind the ears. Burgundy, cream and pine-green scholarly layers retain a spare upright silhouette. A closed ochre book rests in her left hand; the right is empty. Subtle displaced outer contours suggest Veil instability without revealing her order, age, books or Spire secrets.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/b91e9922370d7c303ba9e4e1cf3895358fdde894b1b2a97e4d160a481cb3abfc.png)
+[Portrait](../assets/characters/caa3317d5c4d6a1c9849ff5a83735b7dc371155425e6033c607b22068fa64845.png)
 
-[Full-body reference](../assets/characters/cd1f257a53aced2c165fc74d4ab5ff14f890e294ea471be6edf48fa9690a0c6d.png)
+[Full-body reference](../assets/characters/7915f869f11238a77961d400053516b9b57565eeecf3327f6e0b857109f5620c.png)
 
-[Multiview reference sheet](../assets/characters/7760fe6ac91a08381bf3a4c3a7232699d5d066bbd092b1f32cf8057bcca6932d.png)
+[Multiview reference sheet](../assets/characters/99fb1da6ca1ae3ba06977fbad986d9e2ada2f301fd3b1a5b06c93121887aaa3d.png)
