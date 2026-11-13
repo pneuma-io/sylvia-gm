@@ -2219,7 +2219,7 @@ def reconcile_tool_batch(
                 # facts instead. This field is evidence only and is never sent as history.
                 **(
                     {"narration_facts": cast(JsonValue, _plain_json(round_narration_facts))}
-                    if round_has_any_commit and round_narration_facts
+                    if round_narration_facts
                     else {}
                 ),
             },
@@ -2439,16 +2439,17 @@ def prepare_turn_recovery(
     state.pending_narration_facts = _saved_round_narration_facts(
         provider_input, state.basis_message_id
     )
-    saved_sequence_ids = {
-        fact.get("sequence_id")
+    narrated_queue_actions: set[object] = {
+        action.get("action_id")
         for fact in state.pending_narration_facts
-        if fact.get("tool") == "execute_action_sequence"
+        for action in cast(Sequence[Mapping[str, object]], fact.get("committed_actions", ()))
     }
-    # A queue receipt saved without its round's evidence is still read canonically.
+    # A queue receipt saved without its round's facts is still read canonically, after them.
     state.pending_narration_facts.extend(
         facts
         for result in state.saved_sequence_results
-        if result.get("sequence_id") not in saved_sequence_ids
+        if not set(cast(Sequence[str], result.get("committed_action_ids", ())))
+        <= narrated_queue_actions
         and (facts := _action_sequence_narration_facts(self._owner, state.campaign_id, result))
         is not None
     )
