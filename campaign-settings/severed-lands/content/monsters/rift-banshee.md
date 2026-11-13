@@ -59,12 +59,12 @@ A Rift Echo — the death-imprint of an elven woman whose grief was so profound 
 
 ## Appearance and artwork
 
-A single adult elven woman's Rift Echo, a Medium incorporeal death-imprint with a mature ageless angular elven face, long pointed ears, pale cool gray-lavender translucent skin and faint lavender eyes. Long silver-dark hair floats loosely around her head and shoulders. A profound mournful expression, mouth slightly open in an endless grief-filled wail, no blood or distorted jaws. Two slender recognizable arms with five delicate fingers per hand, hands open and held low. A plain opaque high-necked long-sleeved pale gray spectral gown covers chest and body; the long lower skirt dissolves into soft violet-gray trailing wisps instead of visible solid feet. Her elven womanhood, grief, hovering incorporeal nature and captured wail follow the authored source. Features, apparent adult age, clothing, colors and wisp pattern are editable visual defaults. No living solid human body, child, skeleton, skull face, exposed organs, gore, fresh injury, chains, weapon, captive, additional ghost, spectral faces, sound-wave symbols, readable text, Rift pool, forest, home-world memory or revealed identity.
+An adult elven woman editable Rift Echo default with long silver-white hair, sorrowful pale-violet eyes and a narrow spectral grey-lavender face. A full teal dress, grey shawl and wrapped feet float above an ordinary shadow. Selected background-visible translucent edges and nested cloth-contour echoes suggest incorporeal memory without duplicating her face or revealing the loss that created her.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/c8e0340385d6fca1986ac9d45581d0eecee52212f376fbf2a32ec80726680890.png)
+[Portrait](../../assets/characters/ae051830664f82b6ef97d3472e048239976f98a714554c8b39ff124c56621d03.png)
 
-[Full-body reference](../../assets/characters/2ab96da2d878476f06ea8d786b7e069366c0da1e0a0dbdb7545d2399f80d9895.png)
+[Full-body reference](../../assets/characters/61a14a5d88a58f0068c0594eae9d6867429c4209619d33d5f21da66c3eb3f497.png)
 
-[Multiview reference sheet](../../assets/characters/7cab92f245773a841ef52de8514d0fe991f1f965c2a4137ad0c4d75e57f4b96c.png)
+[Multiview reference sheet](../../assets/characters/b2b561499f3b1fdf74d4dea8247f5076faa723d5f34f8cf5118f9c68e91182d9.png)

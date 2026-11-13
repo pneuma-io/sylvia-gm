@@ -36,12 +36,12 @@ A centaur whose herd was caught in a Rift surge that fused them partially with t
 
 ## Appearance and artwork
 
-One Large adult Rift Centaur with a mature humanlike upper torso and face joined naturally at the waist to a complete powerful charcoal-gray horse body. Exactly two human arms and four equine legs ending in hooves, with one long black horse tail. Weathered warm gray-tan skin, a serious watchful expression, muted hazel eyes and long black hair tied in a practical braid. A plain dark brown hide vest fully covers the human chest, with simple leather belts at the join to the horse body. Their anatomical RIGHT hand holds one long plain pike upright beside the body, its entire shaft and point visible; one longbow is secured diagonally behind the upper torso with its upper tip above the LEFT shoulder, and one plain quiver sits on the LEFT rear flank. Subtle translucent violet Veil edging along the outer silhouette suggests partial phasing while all four legs remain clearly visible and solid enough to read. Centaur form, Veil phasing, territorial bearing, pike and longbow follow the authored source; face, colors, clothing and equipment details are editable visual defaults. No additional human legs, detached horse, rider, extra arms, second creature, missing hooves, nudity, crest, readable text, herd, victim or grassland scenery.
+An adult centaur editable default with umber-brown humanlike upper body, dark-grey eyes and dark ponytail, wearing forest-green/ivory practical clothes. One charcoal-bay horse body has four solid legs/hooves and one tail. Nested Veil-like contour refraction marks the right rear flank. A left-held pike and back longbow/quiver above the right shoulder remain ordinary gear. This visual does not reveal herd rank, ancestry, rider, new mechanic or an obstacle-crossing event.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/ebe8c7a73f0c753119afabf543d118e8c108aba1894751bbecd4ba1fc3a46596.png)
+[Portrait](../../assets/characters/a4c00bc3eb65c6c34800a5fef86e9c03081292290d2efd6612353110d967f1a5.png)
 
-[Full-body reference](../../assets/characters/a6af9086a23274b7fdfafc5be1286306f611b3c38ec7c4994d6e21c52e28c4bf.png)
+[Full-body reference](../../assets/characters/6bd26e0586b35291221cf2abeeaa5feeb1c1d74d9648fa7cb5f22abb47c46732.png)
 
-[Multiview reference sheet](../../assets/characters/9aead633db5fe425c623a3290fe9b967781b168fc9676906bb0c6ff53a47640f.png)
+[Multiview reference sheet](../../assets/characters/d122a374a5f705c7b10425ff17da0d70a64bea330ce82b78a39f28e443fedaa4.png)

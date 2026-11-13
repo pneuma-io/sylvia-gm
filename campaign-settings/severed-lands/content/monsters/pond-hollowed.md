@@ -38,12 +38,12 @@ A Hollowed formed from someone who fell into a Rift pool and was not consumed bu
 
 ## Appearance and artwork
 
-A single adult humanlike Pond Hollowed of Medium size, with a lean waterlogged frame, pale slate-blue spongy translucent flesh, fully violet irises, a long gaunt face and wet dark hair hanging in thin short strands. Their skin and clothing are perpetually wet, with individual drops of faintly violet Rift-water beading and dripping from skin and hems. No exposed organs or wounds. Two arms with five lightly webbed humanlike digits per hand, two legs and broad bare lightly webbed feet. A ragged dark olive hide vest covers the chest and waist, with a plain soaked dark cloth hip wrap. Their anatomical RIGHT hand holds one ordinary wooden spear upright beside the body with its full tip visible; their LEFT arm carries one plain round water-worn wooden shield. Their wet spongy translucent form follows the Setting lore, with hide armor, shield and spear following source equipment. Detailed anatomy, webbing, features, colors and clothing are editable visual defaults. No frog or toad head, giant frog mouth, fish face, normal opaque dry skin, sightless white Cave Hollowed eyes, extra limbs, actual drowning victim, gore, fresh injury, captive, pool scenery, splash background, animal companion, insignia or readable text.
+A broad adult humanoid editable Pond Hollowed default with bald head, violet irises and spongy translucent sea-grey flesh containing nested wet cellular channels. Unbroken skin and modest Rift-water droplets remain distinct from gore or camouflage paint. Brown hide over teal/charcoal clothes, left shield, right spear and partly webbed five-digit hands/feet stay consistent. No frog ancestry, gill or extra mechanic is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/d3dad2f472c2c0108794507f898858b0a91089c0cfc752e594d776f24214e24e.png)
+[Portrait](../../assets/characters/05eabefa629cfe113591853be7d1a8ef175c922c80d62d54416e4373f5385b2a.png)
 
-[Full-body reference](../../assets/characters/ea7bc3f325eedee7c0ddbea5a7e9bef0c45d721d20abc132f09ade826a83dcab.png)
+[Full-body reference](../../assets/characters/8a6387a086df9d53cc7c1932fedca74c1fa3e99505bc685be9480aa7b341aad6.png)
 
-[Multiview reference sheet](../../assets/characters/e48a8d06de7f380a4631cebc6ae6b6e9eb94c3f03c3c58ce5c57b07327cb9d61.png)
+[Multiview reference sheet](../../assets/characters/2f63171e4c642d363cb7429d61e0a8e9f619772d51540bb54fe76b9384f0cca3.png)

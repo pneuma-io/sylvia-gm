@@ -41,12 +41,12 @@ A Rift elemental that has bound itself to a boulder or rock formation, using the
 
 ## Appearance and artwork
 
-One Medium Rift Boulder elemental in its active state: a single complete irregular rounded mass of weathered dark basalt, broad at its base with rough natural facets and a few asymmetrical protruding stones, resting on the ground. Narrow shifting violet fissures thread through the rock surface like liquid Rift energy, restrained and legible against the dense stone. Its silhouette remains a believable rollable boulder. No head, face, eyes, mouth, limbs or humanoid anatomy. The active stone body and violet cracks follow the authored Setting lore; exact rock shape, palette and crack pattern are editable visual defaults. Its dormant False Appearance is not being depicted. No separate animated boulders, secondary creature, carved runes, crystal throne, victim, terrain or scenery.
+An editable active Rift Boulder default: one intact rounded grey-brown rock with a sloping upper plane, low bevel and shallow lower notch. Violet liquid-energy fissures reveal nested inward mineral depth without a face, limbs or detached stones. Motionless normal-boulder disguise remains authoritative; no additional animated boulders or new ability is depicted.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/45b40ca8d81549b2c7b80ecbfd978eb4a00427dace08ff9be7b0db8d19192199.png)
+[Portrait](../../assets/characters/9cfda1dbcff7198d2df0e23025044f8c5ede76d4613fa3ad0bbd1d28423ca3c6.png)
 
-[Full-body reference](../../assets/characters/944605f706d81feaa94da86d4471f63230c1b46bb821231603abb4bc04b5a91a.png)
+[Full-body reference](../../assets/characters/375e2af90fbfbe3df346d771b968bb60e31ae270af2ca25292e3ebdf66aa5925.png)
 
-[Multiview reference sheet](../../assets/characters/4b4ee0c82c64ec8ec0fc35705b72026bf1a4761170b6ef8e3199e4154bb9a226.png)
+[Multiview reference sheet](../../assets/characters/2837528920c60cc30669e64f352fd1d84eca7095bdfacdcf97938ec8bd999d54.png)

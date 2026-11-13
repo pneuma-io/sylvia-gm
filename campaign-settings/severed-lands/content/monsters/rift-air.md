@@ -54,12 +54,12 @@ A howling vortex of Rift-touched wind that tears across the open plains between 
 
 ## Appearance and artwork
 
-A single Large Rift Air elemental: a complete hovering vertical vortex of dimensional wind with no solid body. Cool gray-blue translucent spiraling wind ribbons and fine mist curl around an empty dark central core, with restrained thin violet Rift filaments threaded through the spiral. A broad turbulent upper coil narrows into a tapering lower funnel that hovers just above the ground; the outer wisps remain part of the same continuous single vortex. Its dimensional wind-vortex form follows the Setting lore; exact coil arrangement, density, palette and filament pattern are editable visual defaults. This is a faceless elemental, not a humanoid. No eyes, face, mouth, head, torso, arms, fists, legs, feet, solid rock or ice body, storm landscape, debris, victims, visions of dead worlds, lightning bolts, portal, magical circle, readable text or additional vortex.
+A limbless editable Rift Air default formed from one hovering fluted wind vortex, narrow below and broad above. Attached translucent slate/ivory ribbons fold through nested inward loops with restrained violet/sea-green refraction. There is no face, hand, foot, portal, named sky or depicted victim. The visual adds no new power.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/de41d21183c59259afa6c536727445ec89f62fa4a23442a43febc388a70627ee.png)
+[Portrait](../../assets/characters/21f6c7046c5c765d478301be2ce22d70e6f24a081605d5afe44ff6eb0caf2023.png)
 
-[Full-body reference](../../assets/characters/c086e70aacda7b213d3faa03b93106db8c7e4b24085182212cc5705451450c0b.png)
+[Full-body reference](../../assets/characters/4e1f8738b4bc4e6cc80ace2b9989325ddec941476a98bc3e71fc757fcd27f41e.png)
 
-[Multiview reference sheet](../../assets/characters/14930ce95b06e50b30e4a3fd9d46d0d8e70e3525a0c59ad677acd5d2e3f9f985.png)
+[Multiview reference sheet](../../assets/characters/32a2cc65aed875437e273eb629902ec132daf50e4c77ea1b2a230083f2e2cdee.png)
