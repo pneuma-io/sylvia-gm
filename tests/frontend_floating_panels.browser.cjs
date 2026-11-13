@@ -238,12 +238,209 @@ test('narrow WebUI screens show saved floating windows inline and offer no float
   try {
     const { page, errors } = await scene(browser);
     await page.locator(`[data-panel-float="${MAP}"]`).click();
-    await win(page, MAP).waitFor();
+    const map = win(page, MAP);
+    await map.waitFor();
+    const identity = await map.getAttribute('data-floating-window');
+    const saved = await savedFrames(page);
+    // Resizing alone (no game update) switches layouts.
     await page.setViewportSize({ width: 600, height: 900 });
-    await page.evaluate(() => window.floatingTest.renderRulesetPanelProjection(window.floatingTest.state.panelProjection));
+    await page.locator('[data-floating-inline]').waitFor({ state: 'attached' });
     assert.equal(await page.locator('[data-floating-window], .floating-panel-dock, [data-panel-float]').count(), 0);
     assert.equal(await page.locator(`[data-floating-inline] [data-panel-id="${MAP}"]`).count(), 1);
     await assertSingleIdentity(page);
+    // Narrow screens show one pane at a time; the inline map is in the Game panels pane.
+    await page.getByRole('button', { name: 'Game panels', exact: true }).click();
+    assert.equal(await page.locator(`[data-floating-inline] [data-panel-id="${MAP}"]`).isVisible(), true);
+    if (evidence) await shot(page, '10-narrow-600-inline-map');
+    await page.setViewportSize({ width: 1600, height: 1000 });
+    await map.waitFor();
+    assert.equal(await map.getAttribute('data-floating-window'), identity);
+    assert.deepEqual(await savedFrames(page), saved, 'the narrow round trip saves nothing');
+    assert.equal(await page.locator('[data-floating-inline]').count(), 0);
+    await assertSingleIdentity(page);
+    assert.deepEqual(errors, []);
+  } finally { await browser.close(); }
+});
+
+const savedFrames = (page) => page.evaluate(() =>
+  window.floatingTest.gamePanels().snapshot().windows.map((item) => ({ id: item.id, frame: item.frame })));
+const activeControl = (page) => page.evaluate(() => {
+  const active = document.activeElement;
+  return { dock: active?.dataset?.floatingDockView || null, tab: active?.dataset?.workspacePanel || null,
+    inWindow: active?.closest?.('[data-floating-window]')?.dataset.floatingWindow || null };
+});
+
+// Exactly one view is in front, minimized windows are absent, and the dock agrees with the windows.
+async function assertCoherent(page) {
+  const view = await page.evaluate(() => ({
+    windows: [...document.querySelectorAll('[data-floating-window]')].map((node) =>
+      ({ id: node.dataset.floatingWindow, state: node.dataset.windowState, z: Number(node.style.zIndex),
+        painted: [node, ...node.querySelectorAll('*')].filter((child) => getComputedStyle(child).visibility === 'visible').length })),
+    dock: [...document.querySelectorAll('[data-floating-dock-view]')].map((node) =>
+      ({ id: node.dataset.floatingDockView, state: node.dataset.windowState, pressed: node.getAttribute('aria-pressed') })),
+    saved: window.floatingTest.gamePanels().snapshot().windows.map((item) => ({ id: item.id, minimized: item.frame.minimized })),
+  }));
+  const fronts = view.dock.filter((item) => item.state === 'front');
+  assert.equal(fronts.length, 1, `one front view ${JSON.stringify(view.dock)}`);
+  assert.deepEqual(view.dock.filter((item) => item.pressed === 'true').map((item) => item.id), [fronts[0].id]);
+  for (const saved of view.saved) {
+    const rendered = view.windows.find((item) => item.id === saved.id);
+    const docked = view.dock.find((item) => item.id === saved.id);
+    assert.equal(Boolean(rendered), !saved.minimized, `${saved.id} rendered only when not minimized`);
+    assert.equal(docked.state === 'minimized', saved.minimized);
+    if (rendered) assert.equal(rendered.state, docked.state);
+    if (rendered?.state === 'covered') assert.equal(rendered.painted, 0, `nothing in covered ${saved.id} is painted over the game view`);
+  }
+  if (fronts[0].id !== 'main') {
+    const top = view.windows.find((item) => item.id === fronts[0].id);
+    assert.ok(view.windows.every((item) => item.id === top.id || item.z < top.z), 'the front window is topmost');
+  }
+  await assertSingleIdentity(page);
+}
+
+test('keyboard window controls keep focus and Tab brings a covered-by-window panel forward', { timeout: 60000 }, async () => {
+  const browser = await launch();
+  try {
+    const { page, errors } = await scene(browser);
+    await page.locator(`[data-panel-float="${MAP}"]`).focus();
+    await page.keyboard.press('Enter');
+    const map = win(page, MAP);
+    await map.waitFor();
+    assert.equal((await activeControl(page)).tab, MAP, 'floating moves focus to the panel in its new window');
+    const mapId = await map.getAttribute('data-floating-window');
+
+    await map.locator('[data-floating-minimize]').focus();
+    await page.keyboard.press('Enter');
+    assert.equal((await activeControl(page)).dock, mapId, 'minimizing moves focus to the window\'s dock item');
+    await page.keyboard.press('Enter');
+    assert.equal(await map.getAttribute('data-window-state'), 'front');
+    assert.equal((await activeControl(page)).dock, mapId, 'restoring keeps focus on the dock item');
+    await page.keyboard.press('Enter');
+    assert.equal(await dockItem(page, 'Tactical map').getAttribute('data-window-state'), 'minimized', 'Enter on the front window minimizes it');
+    assert.equal((await activeControl(page)).dock, mapId);
+    await page.keyboard.press('Enter');
+    await assertCoherent(page);
+
+    // A second window over the map; keyboard focus entering the map raises it.
+    await dockItem(page, 'Game view').click();
+    await page.locator(`[data-panel-float="${PARTY}"]`).click();
+    const party = win(page, PARTY);
+    await party.waitFor();
+    await dockItem(page, 'Tactical map').click();
+    await dockItem(page, 'Squad').click();
+    assert.equal(await map.getAttribute('data-window-state'), 'open');
+    await map.locator(`[data-workspace-panel="${MAP}"]`).focus();
+    assert.equal(await map.getAttribute('data-window-state'), 'front', 'focus raises the window holding it');
+    assert.equal(await party.getAttribute('data-window-state'), 'open');
+    await assertCoherent(page);
+
+    await map.locator('[data-floating-return]').focus();
+    await page.keyboard.press('Enter');
+    assert.equal(await win(page, MAP).count(), 0);
+    const returned = await activeControl(page);
+    assert.equal(returned.tab, MAP, 'returning focuses the panel\'s tab in the column');
+    assert.equal(returned.inWindow, null);
+    await assertCoherent(page);
+    assert.deepEqual(errors, []);
+  } finally { await browser.close(); }
+});
+
+test('viewport changes keep title bars reachable without saving clamped geometry', { timeout: 60000 }, async () => {
+  const browser = await launch();
+  try {
+    const { page, errors } = await scene(browser);
+    await page.locator(`[data-panel-float="${MAP}"]`).click();
+    const map = win(page, MAP);
+    await map.waitFor();
+    await drag(page, map, 1450, 900);
+    const saved = await savedFrames(page);
+    for (const viewport of [{ width: 1100, height: 700 }, { width: 800, height: 500 }]) {
+      await page.setViewportSize(viewport);
+      await page.waitForFunction(({ width, height }) => {
+        const bar = document.querySelector('[data-floating-window] .floating-panel-titlebar')?.getBoundingClientRect();
+        return bar && bar.left < width - 40 && bar.right > 40 && bar.top >= 0 && bar.bottom <= height;
+      }, viewport);
+      const bar = await map.locator('.floating-panel-titlebar').boundingBox();
+      const dock = await page.locator('.floating-panel-dock').boundingBox();
+      assert.ok(bar.y + bar.height <= dock.y + 0.5, `title bar above the dock at ${viewport.width}x${viewport.height}`);
+      const windowBox = await map.boundingBox();
+      assert.ok(windowBox.width <= viewport.width && windowBox.height <= dock.y, 'the window fits the visible area');
+      assert.deepEqual(await savedFrames(page), saved, 'clamping to the viewport saves nothing');
+      assert.equal(await dockItem(page, 'Tactical map').isVisible(), true);
+      if (evidence) await shot(page, `8-viewport-${viewport.width}x${viewport.height}`);
+    }
+    // Moving in the small viewport saves the new position but keeps the saved size.
+    const bar = await map.locator('.floating-panel-titlebar').boundingBox();
+    await drag(page, map, bar.x + 20, bar.y - 40 + bar.height / 2);
+    const moved = await savedFrames(page);
+    assert.notEqual(moved[0].frame.top, saved[0].frame.top);
+    assert.equal(moved[0].frame.width, saved[0].frame.width);
+    assert.equal(moved[0].frame.height, saved[0].frame.height);
+    await page.setViewportSize({ width: 1600, height: 1000 });
+    await page.waitForFunction((height) => Math.round(document.querySelector('[data-floating-window]').getBoundingClientRect().height) === height,
+      saved[0].frame.height);
+    assert.deepEqual(errors, []);
+  } finally { await browser.close(); }
+});
+
+test('repeated minimize and restore of overlapping windows stays coherent through hiding the column and reload', { timeout: 90000 }, async () => {
+  const browser = await launch();
+  try {
+    const { page, errors } = await scene(browser);
+    await page.locator(`[data-panel-float="${MAP}"]`).click();
+    const map = win(page, MAP);
+    await map.waitFor();
+    await dockItem(page, 'Game view').click();
+    await page.locator(`[data-panel-float="${PARTY}"]`).click();
+    const party = win(page, PARTY);
+    await party.waitFor();
+    await drag(page, party, 900, 300);
+    const geometry = await savedFrames(page);
+    const strip = (frames) => frames.map(({ id, frame }) => ({ id, left: frame.left, top: frame.top, width: frame.width, height: frame.height }));
+    // Each round starts and ends with Squad in front and the map covered by the game view.
+    const steps = [
+      ['dock map: covered map comes forward', () => dockItem(page, 'Tactical map').click()],
+      ['title-bar minimize map', () => map.locator('[data-floating-minimize]').click()],
+      ['dock Squad: front Squad minimizes', () => dockItem(page, 'Squad').click()],
+      ['dock map: minimized map restores', () => dockItem(page, 'Tactical map').click()],
+      ['dock map: front map minimizes', () => dockItem(page, 'Tactical map').click()],
+      ['dock Squad: restores', () => dockItem(page, 'Squad').click()],
+      ['dock map: restores over Squad', () => dockItem(page, 'Tactical map').click()],
+      ['game view click covers both', () => page.locator('#session-title').click()],
+      ['dock Squad: comes forward alone', () => dockItem(page, 'Squad').click()],
+    ];
+    assert.equal(await map.getAttribute('data-window-state'), 'covered');
+    assert.equal(await party.getAttribute('data-window-state'), 'front');
+    for (let round = 0; round < 2; round += 1) {
+      for (const [label, step] of steps) {
+        await step();
+        await assertCoherent(page).catch((error) => { throw new Error(`round ${round + 1}, ${label}: ${error.message}`); });
+        assert.deepEqual(strip(await savedFrames(page)), strip(geometry), `${label}: minimize and restore never move or resize`);
+      }
+      assert.equal(await map.getAttribute('data-window-state'), 'covered');
+      assert.equal(await party.getAttribute('data-window-state'), 'front');
+      // The second round runs with the panel column hidden.
+      if (round === 0) {
+        await page.locator('#toggle-right-sidebar-btn').click();
+        await dockItem(page, 'Squad').click();
+        assert.equal(await page.locator('#session-frame.right-sidebar-collapsed').count(), 1);
+      }
+    }
+    if (evidence) await shot(page, '9-after-repeated-cycles-column-hidden');
+    await page.locator('#toggle-right-sidebar-btn').click();
+    await dockItem(page, 'Squad').click();
+    await party.locator('[data-floating-minimize]').click();
+    const beforeReload = await savedFrames(page);
+    await page.reload();
+    await open(page);
+    assert.deepEqual(await savedFrames(page), beforeReload);
+    assert.equal(await dockItem(page, 'Squad').getAttribute('data-window-state'), 'minimized');
+    assert.equal(await map.getAttribute('data-window-state'), 'front');
+    await assertCoherent(page);
+    await dockItem(page, 'Squad').click();
+    await assertCoherent(page);
+    assert.equal(await party.getAttribute('data-window-state'), 'front');
+    assert.deepEqual(strip(await savedFrames(page)), strip(geometry));
     assert.deepEqual(errors, []);
   } finally { await browser.close(); }
 });

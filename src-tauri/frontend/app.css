@@ -4775,8 +4775,9 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
   box-shadow: 0 18px 48px #000a, 0 0 0 1px #0006;
 }
 .floating-panel-window[data-window-state="front"] { border-color: color-mix(in srgb, var(--brand) 60%, var(--border-color)); }
+/* No transition: a running transition outranks !important and would leave controls painted over the game view. */
 .floating-panel-window[data-window-state="covered"],
-.floating-panel-window[data-window-state="covered"] * { visibility: hidden !important; }
+.floating-panel-window[data-window-state="covered"] * { visibility: hidden !important; transition: none !important; }
 .floating-panel-titlebar {
   display: flex;
   flex: 0 0 auto;

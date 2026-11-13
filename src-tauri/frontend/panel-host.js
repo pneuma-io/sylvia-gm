@@ -962,10 +962,11 @@
       event.preventDefault();
       endFrameDrag();
       const rect = element.getBoundingClientRect();
+      // Moving keeps the saved size; the rendered size may only be clamped to a small viewport.
       frameDrag = { windowId: bar.dataset.floatingDrag, pointerId: event.pointerId, context: { ...context },
         dx: event.clientX - rect.left, dy: event.clientY - rect.top,
-        frame: { ...(frameOf(bar.dataset.floatingDrag) || {}), left: rect.left, top: rect.top,
-          width: Number(element.dataset.frameWidth) || rect.width, height: Number(element.dataset.frameHeight) || rect.height } };
+        frame: { width: rect.width, height: rect.height, ...(frameOf(bar.dataset.floatingDrag) || {}),
+          left: rect.left, top: rect.top } };
       element.classList.add('floating-panel-moving');
       window.addEventListener('pointermove', moveFrameDrag);
       window.addEventListener('pointerup', endFrameDrag);
@@ -988,8 +989,7 @@
       window.removeEventListener('pointerup', endFrameDrag);
       window.removeEventListener('pointercancel', endFrameDrag);
       document.querySelector(`[data-floating-window="${CSS.escape(drag.windowId)}"]`)?.classList.remove('floating-panel-moving');
-      if (event && sameContext(drag.context))
-        setFrame(drag.windowId, { left: drag.frame.left, top: drag.frame.top, width: drag.frame.width, height: drag.frame.height }, false);
+      if (event && sameContext(drag.context)) setFrame(drag.windowId, { left: drag.frame.left, top: drag.frame.top }, false);
     }
 
     // A pointer press raises the window under it; a plain click elsewhere in the game view raises the view.
@@ -1009,21 +1009,78 @@
             target.closest('[data-floating-window], .floating-panel-dock, dialog')) return;
         raise('main');
       }, true);
+      // Keyboard focus entering a window behind another brings it forward, like a press does.
+      document.addEventListener('focusin', (event) => {
+        const element = event.target.closest?.('[data-floating-window]');
+        if (element && floatingShown() && windowState(element.dataset.floatingWindow) === 'open')
+          raise(element.dataset.floatingWindow);
+      });
+      let resizeFrame = null;
+      window.addEventListener('resize', () => {
+        if (resizeFrame !== null) return;
+        resizeFrame = window.requestAnimationFrame(() => {
+          resizeFrame = null;
+          fitViewport();
+        });
+      });
+    }
+
+    // Crossing the narrow breakpoint switches between floating and inline windows; otherwise
+    // rendered windows are re-clamped in place so title bars stay reachable. Nothing is saved.
+    function fitViewport() {
+      if (!context || !layout?.windows.length || state.panelProjection?.loading) return;
+      if (Boolean(document.querySelector('.floating-panel-dock')) !== floatingShown()) {
+        render();
+        return;
+      }
+      if (frameDrag) return;
+      document.querySelectorAll('[data-floating-window]').forEach((element) => {
+        const index = layout.windows.findIndex((item) => item.id === element.dataset.floatingWindow);
+        if (index < 0) return;
+        const frame = clampFrame(layout.windows[index].frame || defaultFrame(index));
+        element.dataset.frameWidth = frame.width;
+        element.dataset.frameHeight = frame.height;
+        Object.assign(element.style, { left: `${frame.left}px`, top: `${frame.top}px`,
+          width: `${frame.width}px`, height: `${frame.height}px` });
+      });
+    }
+
+    // Window controls re-render; keep keyboard focus on the control that now represents the window.
+    function refocus(selector) {
+      document.querySelector(selector)?.focus({ preventScroll: true });
     }
 
     function wireFloating(container) {
       frameObserver?.disconnect();
       frameObserver = null;
+      if (browserWindows()) wireViewFocus();
       if (!floatingShown()) return;
-      wireViewFocus();
+      const css = (value) => CSS.escape(value);
       container.querySelectorAll('[data-panel-float]').forEach((button) =>
-        button.addEventListener('click', () => detach(button.dataset.panelFloat)));
+        button.addEventListener('click', () => {
+          const panelId = button.dataset.panelFloat;
+          detach(panelId);
+          refocus(`[data-floating-window] [data-workspace-panel="${css(panelId)}"]`);
+        }));
       container.querySelectorAll('[data-floating-minimize]').forEach((button) =>
-        button.addEventListener('click', () => setFrame(button.dataset.floatingMinimize, { minimized: true })));
+        button.addEventListener('click', () => {
+          const windowId = button.dataset.floatingMinimize;
+          setFrame(windowId, { minimized: true });
+          refocus(`[data-floating-dock-view="${css(windowId)}"]`);
+        }));
       container.querySelectorAll('[data-floating-return]').forEach((button) =>
-        button.addEventListener('click', () => changed({ type: 'close-window', windowId: button.dataset.floatingReturn })));
+        button.addEventListener('click', () => {
+          const tree = ownerTree(button.dataset.floatingReturn);
+          const panelId = tree?.kind === 'tabs' ? tree.active : panelIds(tree)[0];
+          changed({ type: 'close-window', windowId: button.dataset.floatingReturn });
+          if (panelId) refocus(`#ruleset-panels > .panel-workspace-tree [data-workspace-panel="${css(panelId)}"]`);
+        }));
       container.querySelectorAll('[data-floating-dock-view]').forEach((button) =>
-        button.addEventListener('click', () => dockSelect(button.dataset.floatingDockView)));
+        button.addEventListener('click', () => {
+          const view = button.dataset.floatingDockView;
+          dockSelect(view);
+          if (!button.isConnected) refocus(`[data-floating-dock-view="${css(view)}"]`);
+        }));
       container.querySelectorAll('[data-floating-drag]').forEach((bar) =>
         bar.addEventListener('pointerdown', (event) => startFrameDrag(event, bar)));
       // Save a user resize (the native corner grip); renders that merely clamp to the viewport are not saved.
