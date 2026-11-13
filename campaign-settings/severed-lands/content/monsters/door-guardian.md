@@ -41,12 +41,12 @@ The greatest of the Warden constructs still active — a colossus built to prote
 
 ## Appearance and artwork
 
-A single Large colossus-like Warden Door Guardian, a broad massively built bipedal construct with a heavy basalt-gray stone body and worn dark bronze-alloy joint fittings. Two immense arms ending in empty five-digit stone-and-alloy hands, two thick pillar-like legs and broad blocky feet. A blunt angular carved stone head with a heavy brow and two narrow dim amber sensor slits, no flesh or expressive human face. Restrained geometric masonry panels, interlocking shoulder blocks, thick chest plates and visible ancient articulated joints. Calm immovable protective stance, hands relaxed at its sides. Its huge custom-forged Warden construct identity and fists follow the authored source; exact body architecture, materials, panel geometry and sensor design are editable visual defaults for one Door Guardian. No amulet or command-rod on its body, invented Door identity, readable symbol, face of a living person, hair, biological skin, wings, extra limbs, handheld shield, weapon, crown, glowing chest reactor, beams, portal, actual Door, scenery, victim or additional creature.
+A towering Large editable Warden construct default with pale dressed-stone slabs, dark aged-bronze braces, one rectangular head and two amber eye slits. Two heavy fists and broad column-like legs stay grounded. Nested inward chest arches suggest architectural depth inside an intact body. No held weapon, command-rod, amulet wearer, specific Door or new ability is introduced.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/3ed738ec6377675d5fc853e1226636c7a23a13e042df293038c859fd7ad56a54.png)
+[Portrait](../../assets/characters/e2ca4820aa4b939a616d896cb32a7d7a524df354f2453700d4ab631be283fbb0.png)
 
-[Full-body reference](../../assets/characters/d8c6e9bc197f170210396db442eccd87f82b8ad1af38c4bfe9cefbd8698d62b5.png)
+[Full-body reference](../../assets/characters/c906d371a6119f52245905661ea12875362f8a3a6472a652c3d0e08ebb88161a.png)
 
-[Multiview reference sheet](../../assets/characters/fadaf479c4d16138a5412547a3014a21e6356a7957e768cafb3c0324beeaeaf2.png)
+[Multiview reference sheet](../../assets/characters/fd0816bd02ea9a7aebbaf462e8ced3566562f15ad70e4e30983af0f0fdb311e1.png)

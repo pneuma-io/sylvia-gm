@@ -43,12 +43,12 @@ Hollowlings are the smallest and most numerous of the Hollowed — humans warped
 
 ## Appearance and artwork
 
-A single Small Hollowling, a human-derived adult reduced to child-sized stature by Rift exposure, with a short hunched wiry frame and a clearly mature weathered lined human face. Ash-gray skin, fully violet irises, sparse untidy brown hair, hollow cheeks and a wary distracted scavenger's expression. Two arms with ordinary five-digit human hands and two short legs, with adult facial proportions. Ragged plain brown leather armor over a faded gray cloth tunic, dark cropped trousers and worn small leather boots. Their anatomical RIGHT hand holds one short ordinary curved scimitar low at their side, its full blade visible; their LEFT arm carries one small plain wooden shield. One small shortbow is secured across their back with its upper tip above the anatomical RIGHT shoulder; a small plain quiver sits at the LEFT rear hip. Their small regressed human form and scavenging bearing follow the Setting lore, with leather armor, shield, scimitar and shortbow following source equipment. Mature age styling, features and equipment details are editable visual defaults. No actual child or infant face, juvenile proportions, goblin head or pointed ears, giant teeth, animal fur, extra limbs, malicious grin, stolen personal names, gore, injury, captive, pack of other creatures, scenery or readable text.
+A Small adult human-origin editable scavenger default with grey-brown skin, mature lined face, violet irises and uneven smoke-grey hair. Wiry limbs and nested closed neck/wrist folds show Rift warping without infant or goblin anatomy. Patched brown leather over ochre and grey clothes, a left round shield, lowered right scimitar and back shortbow/quiver remain ordinary. No past life, child age, ancestry or new power is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/4d29a7b693ec7cdb8f32bb4664b75720fa3d7588b3eac43e2f455c0c394ba355.png)
+[Portrait](../../assets/characters/3a38ce0d7f032f7f50470b0767e4b9fbfb4dbf9f570375be66e385949bd829e9.png)
 
-[Full-body reference](../../assets/characters/e0722e84fc82b11263dad4392d791f3acde7eb1e60e46cb229b9bf9b0c130b51.png)
+[Full-body reference](../../assets/characters/8d2af210222b02171325baf8561983a508d4507e22d2f6b4f518f20a1bb745d6.png)
 
-[Multiview reference sheet](../../assets/characters/fea969195bc2954698ec52997d712a670a7e9965a4ab10bc9362942e40a5c7fa.png)
+[Multiview reference sheet](../../assets/characters/1e686360dcb396fb32b9b4d9f4b4c318bb1fe2d6f24310b325dec77d568639e8.png)

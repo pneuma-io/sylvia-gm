@@ -42,12 +42,12 @@ A human exposed to so much Rift energy that their body has swollen and warped in
 
 ## Appearance and artwork
 
-A single adult human Hollow Brute of Medium size, with a hulking swollen muscular frame, massive warped shoulders and arms, a thick neck and a recognizably human heavy-browed face carrying dim painful awareness. Patchy dull gray-brown skin, fully violet irises, short ragged black hair and a broad tense mouth. Exactly two arms with normal five-digit human hands and two strong legs. Rough plain brown hide armor covers the chest and shoulders over a dark cloth tunic, ragged dark trousers and battered brown leather boots. Their anatomical RIGHT hand holds one ordinary morningstar low beside the body, with its full spiked head and shaft visible; the LEFT arm carries one plain dented round wooden shield. One ordinary javelin is strapped diagonally across their back with its point above the anatomical LEFT shoulder. Their swollen warped human form follows the Setting lore, with hide armor, shield, morningstar and javelin following source equipment. Detailed anatomy, features, skin color and equipment design are editable visual defaults. No bugbear or goblin head, animal fur, tusks, horns, extra limbs, claws instead of hands, giant size, fresh injury, exposed organs, gore, spikes grown from flesh, captives, warlord insignia, scenery or readable text.
+A swollen adult human-origin editable brute default with olive-grey skin, violet irises, short dark hair and a broad weary face. Nested closed tissue folds distort neck and wrists without extra limbs. Brown hide over charcoal and muted-plum clothes covers the body. Left shield, right morningstar and back javelin are ordinary equipment; no bugbear anatomy, new ancestry or power is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/09c270ecd7d83cf3affc97e493ebfcaa3249465aa7e31c90208c1907eec7f069.png)
+[Portrait](../../assets/characters/21155888faeae424eaf7e048a1888ccb8d0b319e423a2aadca8f51c6d4bd160a.png)
 
-[Full-body reference](../../assets/characters/59804809800bfcd5481155b9553835d71c749967c6026dd0144320c8397a197b.png)
+[Full-body reference](../../assets/characters/983f016ef05df0248a95bbbce67d5c133bc18ba7564e893ffa80be60a956bbe5.png)
 
-[Multiview reference sheet](../../assets/characters/2e83e9b996a586c05ed999bbbd7c9465ecef8ebe8b783ac5c4ad8d2cb060ff35.png)
+[Multiview reference sheet](../../assets/characters/94b9112424d2d72404071fdba1aec42aa058fc5b29a948555f73407effe91e50.png)

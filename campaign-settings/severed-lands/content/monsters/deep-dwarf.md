@@ -39,12 +39,12 @@ A dwarf whose clan delved too deep and broke into a sealed Rift chamber buried b
 
 ## Appearance and artwork
 
-A single adult male Deep Dwarf in his ordinary unenlarged form, with a short compact dwarven frame made gaunt by Rift exposure, pale ash-gray skin, deeply set dark gray eyes, hollow cheeks and a stern obsessive expression. A receding crown with thin white hair at the sides and a sparse long white beard in one plain narrow braid. Worn dark Warden-alloy scale mail over a charcoal padded tunic, plain dark trousers and practical brown leather boots. His anatomical RIGHT hand holds one ordinary war pick low beside his body with its full head and shaft visible; his LEFT forearm carries one plain round dark metal shield. One simple javelin is strapped diagonally to his back with its point above the anatomical LEFT shoulder. His gaunt pale dwarven identity follows the Setting lore, with scale mail, shield, pick and javelin following source equipment. Age styling, features, colors, beard and equipment design are editable visual defaults. No giant enlarged form, glowing eyes, horns, goblin or orc face, ornate crown, invented clan crest, readable runes, open wound, gore, captive, Warden chamber, scenery or other character.
+An adult gaunt pale-grey dwarf editable default with grey-violet eyes, short tousled ash-brown hair and a short beard. Charcoal scale mail over burgundy, brown trousers and heavy boots remain practical. A plain shield is on the left forearm, a lowered war pick in the right hand and one javelin secured on the back. Nested alloy lamination adds material depth without a named alloy, clan mark or new power.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/a86bfa4b6d2fa6813960adde7606158b0d63384e917a4b9905e8eda21c6acfd0.png)
+[Portrait](../../assets/characters/0db87cce651ecc7737ab82db17a7239d4d4ef1d2f5fef07407092329a0500032.png)
 
-[Full-body reference](../../assets/characters/ac56bcf0cb984ca9ef1d7cea736a799a7e34fe4d9b50c834447992afaac47a3b.png)
+[Full-body reference](../../assets/characters/0f8e0e12640f65779bfd2cddb8d9338a51c6f821a2ba36060956da038c558901.png)
 
-[Multiview reference sheet](../../assets/characters/973a7019da295449e9a40dd7bfd853fb9826434928079bdfaaa1ba18b3ae52a8.png)
+[Multiview reference sheet](../../assets/characters/58a194f36b8c94dce42675a1eab9ab3c6bd3c2e4775e41137edfc536da874ba5.png)

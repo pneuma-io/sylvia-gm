@@ -39,12 +39,12 @@ A Warden construct programmed to patrol the Cairnfields and eliminate riftbeasts
 
 ## Appearance and artwork
 
-A single Medium Warden Field Warden patrol construct with a lean upright bipedal frame of weathered pale limestone plates and dark recessed stone joints. A small angular stone head with one narrow recessed cool blue-green sensor lens, no biological eyes or mouth. Two long articulated arms each ending in a three-pronged stone claw, two sturdy jointed legs and broad stone feet. Simple worn geometric plate segments, small mineral accents and an alert balanced scanning stance. Both claw hands are empty, open and held low, showing three digits each. Its silent stone joints, Rift-signature sensors and claws follow the source; exact frame, plate layout, mineral colors and sensor design are editable visual defaults. No straw, fabric stuffing, farming scarecrow, flesh, human face, hair, extra limbs, additional claws, hand weapon, shield, invented Warden crest, readable runes, glowing beams, captive, Returner target, riftbeast, landscape or scenery.
+A slender Medium editable patrol-construct default with a narrow carved head, two amber inset sensors, weathered sage/ochre stone plates and polished stone joints. Two three-clawed arms and long legs preserve a light silhouette. Nested attached chest arches and mineral grooves carry restrained inward depth. At rest it reads as an old field statue, with no added scan beam, weapon or disguise mechanic.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/f0501856d7ee221818f3b33cbd682a8bd91c4bfca97d8bfad54d178e78e8f6cf.png)
+[Portrait](../../assets/characters/f821d25e92becd7e19db9059390eeea7fa6426f33b3843c809388c4ca6a51c6b.png)
 
-[Full-body reference](../../assets/characters/2cdd2ba93a69677aeda830992ce33d7e7a9ac192986244d023ecde2420396f80.png)
+[Full-body reference](../../assets/characters/833a79059ce08fa661bdef38875fc4ce8b27b1b7894bc9ab56fbdeceea08ced2.png)
 
-[Multiview reference sheet](../../assets/characters/d5ee0e8c54d36118c08449b80e57730579e0ecf069141d8a7d9fd78b8e6627db.png)
+[Multiview reference sheet](../../assets/characters/5462b3272577a6c046e08c7f9b54836cc834f0a50db21951b280203659c8b6a6.png)
