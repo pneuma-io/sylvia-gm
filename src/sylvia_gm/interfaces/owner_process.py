@@ -2368,6 +2368,7 @@ def run(
                 "ready_campaign_catalog",
                 "start_ready_campaign",
                 "customize_ready_campaign",
+                "send_character_chat_message",
             }:
                 preparation = ExitStack()
                 try:
