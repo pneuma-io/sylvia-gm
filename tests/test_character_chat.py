@@ -428,3 +428,55 @@ def test_reopen_reads_while_a_reply_is_saved(tmp_path):
         thread.join(10)
     assert failures == []
     assert len(load_chat(tmp_path, chat.chat_id).messages) == 31
+
+
+def test_webui_delivers_the_frontend_bridge_parameters_to_the_owner(tmp_path):
+    """The browser path renames app.js's camelCase arguments to the owner's own names."""
+    import asyncio
+
+    from tests.test_webui import Browser
+
+    class RecordingOwner:
+        data_root = tmp_path
+
+        def __init__(self):
+            self.calls = []
+
+        async def call(self, method, params=None):
+            self.calls.append((method, params))
+            return {"status": "recorded"}
+
+        async def close(self):
+            pass
+
+    owner = RecordingOwner()
+
+    async def check():
+        browser = await Browser().open(owner)
+        try:
+            await browser.call("character_chat", {"action": "catalog"})
+            await browser.call("character_chat", {
+                "action": "create", "operationId": "op", "artifactId": "card",
+                "expectedContentSha256": "a" * 64, "providerId": "p", "modelId": "m",
+                "userName": "Mira",
+            })
+            await browser.call("character_chat", {"action": "open", "chatId": "c"})
+            await browser.call("send_character_chat_message", {
+                "chatId": "c", "operationId": "m1", "text": "Hi", "expectedMessageCount": 3,
+            })
+        finally:
+            await browser.close()
+
+    asyncio.run(check())
+    assert owner.calls == [
+        ("character_chat", {"action": "catalog"}),
+        ("character_chat", {
+            "action": "create", "operation_id": "op", "artifact_id": "card",
+            "expected_content_sha256": "a" * 64, "provider_id": "p", "model_id": "m",
+            "user_name": "Mira",
+        }),
+        ("character_chat", {"action": "open", "chat_id": "c"}),
+        ("send_character_chat_message", {
+            "chat_id": "c", "operation_id": "m1", "text": "Hi", "expected_message_count": 3,
+        }),
+    ]
