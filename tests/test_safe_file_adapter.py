@@ -377,6 +377,7 @@ def test_linux_refuses_link_targets_and_hardlink_aliases(workspace: Path) -> Non
     linked_parent = workspace / "linked-parent"
     linked_parent.symlink_to(workspace, target_is_directory=True)
     with AuthorityOwner.open(database, "source") as owner:
+        owner.prepare_new_campaign_storage()
         _campaign(owner, "links")
         hardlink = workspace / "hardlink.db"
         os.link(database, hardlink)
@@ -405,6 +406,7 @@ def test_linux_refuses_tmpfs_destinations(workspace: Path) -> None:
     ) != "tmpfs":
         pytest.skip("/dev/shm is not tmpfs in this environment")
     with AuthorityOwner.open(workspace / "source.db", "source") as owner:
+        owner.prepare_new_campaign_storage()
         _campaign(owner, "volatile")
         with pytest.raises(CommandRejected) as rejected:
             owner.backup_database(shm / f"sylvia-{os.getpid()}.db")
@@ -485,11 +487,12 @@ def test_linux_publication_syncs_the_pinned_directory(
         synced.append((held.st_dev, held.st_ino))
         real_sync(files, directory)
 
-    monkeypatch.setattr(safe_file._LinuxFiles, "_sync_directory", sync)
     exports = workspace / "exports"
     exports.mkdir()
     with AuthorityOwner.open(workspace / "source.db", "source") as owner:
+        owner.prepare_new_campaign_storage()
         _campaign(owner, "durable")
+        monkeypatch.setattr(safe_file._LinuxFiles, "_sync_directory", sync)
         owner.backup_database(exports / "backup.db")
         owner.export_campaign(
             operation_id="durable", campaign_id="durable", target=exports / "durable.zip",
