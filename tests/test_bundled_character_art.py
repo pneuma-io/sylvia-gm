@@ -3,6 +3,7 @@
 import hashlib
 import json
 import sys
+import zipfile
 from pathlib import Path
 
 import pytest
@@ -48,12 +49,34 @@ def test_prepared_bundles_match_starter_data_package_payloads_and_frozen_invento
         )
         for item in inherited_artwork_subjects()["source_files"]
     }
+    setting_character_sources = {}
+    for archive_path in (ROOT / "campaign-plans").glob("*/setting.sylvia-gm-package"):
+        with zipfile.ZipFile(archive_path) as archive:
+            for package in json.loads(archive.read("manifest.json"))["packages"]:
+                for descriptor in package["files"]:
+                    path = descriptor["path"]
+                    if not (path.startswith("characters/") and path.endswith(".json")):
+                        continue
+                    raw = archive.read(f"packages/{package['id']}/{path}")
+                    assert hashlib.sha256(raw).hexdigest() == descriptor["sha256"]
+                    assert len(raw) == descriptor["bytes"]
+                    setting_character_sources[package["id"], path, descriptor["sha256"]] = raw
     assert catalogue["characters"]
     for entry in catalogue["characters"]:
         visuals = validate_character_visuals(entry["visuals"])
         if entry["id"].startswith("srd-starter-"):
             source = next(row for row in starters if row["participant"]["name"] == entry["name"])
             assert source["visuals"] == visuals
+        elif entry["id"].startswith("severed-party-"):
+            for source in entry["sources"]:
+                raw = setting_character_sources[
+                    source["package_id"], source["path"], source["sha256"]
+                ]
+                assert json.loads(raw)["format_id"] == "sylvia-gm-character-file"
+                assert bundled_source_visuals(
+                    source["package_id"], source["path"], raw, subject_name=entry["name"],
+                    campaign_setting_ids=frozenset({source["campaign_setting_id"]}),
+                ) == visuals
         elif entry["id"].startswith("severed-plan-"):
             for source in entry["sources"]:
                 assert "package_id" not in source

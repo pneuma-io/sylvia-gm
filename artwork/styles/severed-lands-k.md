@@ -691,3 +691,11 @@ Corren, Eda Venn, Kellin, Myr, Quarterkeeper Ysra and this Plan's Rusk have edit
 | Myr | [Body](../assets/characters/17dcfaa4d0cc688a93c804f171b4811aba0fc801ab7bb0693e24edb34391d83a.png) | [Sheet](../assets/characters/55d34e6a84458482407c1a3a5e66b2bc75dc139d9f262ce331be8a424d0ba382.png) | [Portrait](../assets/characters/634212dc53b655ab0c2d467068e027e2cbc38ba18141ad8367f548ce9c9f9e10.png) |
 | Quarterkeeper Ysra | [Body](../assets/characters/f1455eb1e1b8ab0506d9c78a7799cbaf1e7e0a67f3c326a4c39b0b6334626744.png) | [Sheet](../assets/characters/a7a60c324ab1f767dbd789bf4d7e5e3df61fbe8d9b6a0802b38d4685aec09f64.png) | [Portrait](../assets/characters/13a5e83a3ed360a1279b9c83f49355c823ad16b0a7e90f315a4cdba13206c70a.png) |
 | Rusk | [Body](../assets/characters/fc5a8caf63d05fb61b5792ef6b5e966d244be22f51d6103fd50becd8c4656d09.png) | [Sheet](../assets/characters/a75c30cc7094626f649636ac875666a35d48614073251a79d5cf09c8b7d9dd5d.png) | [Portrait](../assets/characters/575bc618c5a1876ddb22e301801e376159a70fce5b7eba9d2de46ebcf105c4cf.png) |
+
+### Prepared optional Tavin Bell references
+
+Tavin has an optional editable Human appearance for the fixed player role in A Debt in Iron. The player still chooses pronouns, appearance and story responses. The exact admitted Character File, package pins and mechanics stay unchanged; embedded or selected art takes precedence. No individual owner sign-off claimed.
+
+| Character | Full body | Multiview | Portrait |
+|---|---|---|---|
+| Tavin Bell | [Body](../assets/characters/d3187ad3597856f92aac6252e144e9d6f5f46bab6ed6e1c4801bf8e915ec01c7.png) | [Sheet](../assets/characters/69b4cb26bd707763c40bbd71bd7b0dabc02a6289780ff856f405643a298bcde4.png) | [Portrait](../assets/characters/c98a959eb5c4a9e0b9883afe7e628704d86ef13f555523eba4dbc0f239ec0f1b.png) |
