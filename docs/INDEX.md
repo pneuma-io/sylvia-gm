@@ -114,6 +114,7 @@ the complete documentation set. Their original dates and evidence limits remain 
 
 - [`agents/triage-labels.md`](agents/triage-labels.md): repository triage conventions.
 - [`reference/character-card-import.md`](reference/character-card-import.md): implemented character import reference.
+- [`reference/character-chat.md`](reference/character-chat.md): implemented direct character chat reference.
 - [`incidents/2026-08-20-context-window-capacity-postmortem-and-implementation-plan.md`](incidents/2026-08-20-context-window-capacity-postmortem-and-implementation-plan.md): historical incident evidence.
 - [`incidents/2026-08-20-new-campaign-selector-postmortem-and-fix.md`](incidents/2026-08-20-new-campaign-selector-postmortem-and-fix.md): historical selector incident evidence.
 - [`research/provider-spec-2026-10-16/LOCAL-CUSTOM-SUBSCRIPTION.md`](research/provider-spec-2026-10-16/LOCAL-CUSTOM-SUBSCRIPTION.md): local, custom and subscription provider boundaries.
