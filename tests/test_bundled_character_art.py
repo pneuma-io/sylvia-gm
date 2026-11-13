@@ -5,6 +5,7 @@ import json
 import sys
 from pathlib import Path
 
+import pytest
 from scripts.inventory_authored_artwork import authored_artwork_subjects
 from scripts.inventory_inherited_artwork import inherited_artwork_subjects
 
@@ -140,14 +141,15 @@ def test_bundled_lookup_never_uses_unknown_hashes_or_a_checkout_fallback(tmp_pat
     assert bundled_character_image(portrait["path"], portrait["sha256"]) is None
 
 
+@pytest.mark.parametrize("starter_name", ("Luma Ash", "Mara Flint"))
 def test_prepared_starter_reuses_art_offline_through_campaign_crop_reopen_and_transfer(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch, starter_name
 ):
     database = tmp_path / "owner.db"
     archive = tmp_path / "campaign.zip"
     with AuthorityOwner.open(database, "prepared-starter") as owner:
         selected = selection(owner, tmp_path)
-        starter = next(item for item in selected.participants if item.name == "Luma Ash")
+        starter = next(item for item in selected.participants if item.name == starter_name)
         source_visuals = json.loads(json.dumps(starter.visuals))
         # The retained Plan remains pinned to its original Setting, without these new PNGs.
         world = selected.sources.setting
