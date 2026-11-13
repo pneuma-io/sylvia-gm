@@ -38,12 +38,12 @@ A cluster of violet-capped mushrooms that sprout exclusively near active Rift po
 
 ## Appearance and artwork
 
-One Medium Rift Violet Fungus: a single connected cluster of five violet-capped mushrooms at varied heights, all rooted into one compact pale gray-lavender mycelial base. Broad fleshy violet caps with soft dull lilac edge glow and pale ribbed gills, slender uneven gray-lavender stalks. Exactly four flexible blunt violet-gray touch tendrils grow from the connected base, two curling low to each side; every tendril tip remains visible. A gathered active reference state with restrained cap glow, no attack cloud. No face, eyes, mouth, humanoid torso, arms, hands, legs or feet. The violet-capped cluster and reactive Rift glow follow authored lore; cap number, size arrangement, tendrils, textures and palette are editable visual defaults. No separate beings, mushroom face, fairy, living target, alchemical container, corruption wounds, actual Rift pool, poison fog, readable text or scenery.
+An editable active Violet Fungus default: one connected cluster of plum-violet caps on pale-lilac stems, two larger front caps, smaller rear growth and a shared hyphal base. Nested under-cap lamellae give inward Rift depth; active glow/movement does not replace its normal motionless fungus disguise. No eyes, humanoid limbs, extra attack or harvesting outcome is added.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/fd2a0ca83aacee71d2bf6e472e03d3e33ffecba8f107b166a6bcbab82c07c0fd.png)
+[Portrait](../../assets/characters/a13d96012a15cd4439fba70ff8161377f9332d60b06e0a96147da7468b127430.png)
 
-[Full-body reference](../../assets/characters/d7aeeee50b8111341c5d43fd3a95dd4ff36dbbbb3dea0c90d1bef8615d244486.png)
+[Full-body reference](../../assets/characters/9814fb1e359d0f4d3f35434f770525adc0a43cfe8b6abe4a211735d7f4991405.png)
 
-[Multiview reference sheet](../../assets/characters/b874fad8ced623f45b24a240a6d73be4250d8baf3cc5147fce87e0dc72eea46d.png)
+[Multiview reference sheet](../../assets/characters/762ef02bc49bab91d597e4ae5ba34319c084b19f5964ac2329cf1d7d83960492.png)

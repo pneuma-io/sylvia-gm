@@ -61,12 +61,12 @@ The most complete form of Rift Echo — a personality imprint so detailed it bel
 
 ## Appearance and artwork
 
-One Medium Rift Ghost in an editable anonymous adult humanlike personality-imprint appearance, not a named character or a declared historical identity. A mature middle-aged face with a concerned preoccupied expression, mouth closed, two pale silver-gray eyes, short neat gray hair and light gray stubble. A complete upright hovering humanlike figure with exactly two arms, five fingers on each open relaxed hand, two separate legs and two soft boots. Cool gray-lavender translucent skin and muted slate-blue spectral clothing: a plain high-collared long-sleeved coat, simple waist belt and dark plain trousers. Clothing and lower limbs fade gently at their edges while the complete figure remains readable. The detailed personality-imprint and incorporeal hovering form follow authored source; anonymous features, outfit, colors and age styling are editable visual defaults. No elven ears, banshee wail, gown dissolving into a single tail, skeleton, chains, weapon, horror wound, actual death scene, possessed victim, aged victim, home-world memory, named identity, Rift pool, text or scenery.
+One editable mature humanlike Ghost presentation with a rounded medium-brown face, brown eyes, salt-and-pepper curls and short greying beard. Cream/cerulean/brown practical clothes and two booted feet remain complete above a soft hover shadow. Fading outer edges and nested coat-contour echoes suggest an imperfect personality imprint, without naming a prior identity, death event, alignment or possession host.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/93c251f84b4c0169cd6cf13eb4314d28e53a3c2c20bec93c09de44153af2500a.png)
+[Portrait](../../assets/characters/c571a5169fff5da5cc19f3d60f0f3612e809743ea36d0295c42311e84fafc42c.png)
 
-[Full-body reference](../../assets/characters/11bbacae8c7dafa2cdd3f503363fc1b2510368b4e815f65ae34279b6e3139e65.png)
+[Full-body reference](../../assets/characters/1b1a64ba3304c5f546c4c15ce4e9c296137b179b9e784b5d930a0726ea0fbe69.png)
 
-[Multiview reference sheet](../../assets/characters/10e863a8bab856f92fc2ec82ba3ac1abfad2218f184716e18399af0c11b58e7e.png)
+[Multiview reference sheet](../../assets/characters/19d1c9c55a70809b65a548332eb638f13cfef9edc9dfd74917201d5526bcde2d.png)

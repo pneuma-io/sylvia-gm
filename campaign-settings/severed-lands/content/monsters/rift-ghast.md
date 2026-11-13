@@ -47,12 +47,12 @@ An older, more degraded Rift Echo of hunger — a rift-ghoul that has absorbed s
 
 ## Appearance and artwork
 
-One adult Medium Rift Ghast hunger-Echo in an editable humanlike appearance: a very gaunt mature body with long bony forearms, two arms and two legs, five-digit hands ending in long dark clawlike nails. An aged angular hollow-cheeked face, two deep-set dim violet-gray eyes, a slightly lengthened jaw with mouth narrowly parted and dry ordinary sharp teeth, sparse short gray hair and thin gray stubble. Muted cool ash-gray skin has faint violet translucent edging but is intact. A worn plain charcoal long-sleeved tunic with sleeves ending above the wrists, ragged dark trousers and bare gaunt feet. A tense hungry listening expression and low slightly hunched balanced stance, hands held away from the body so every claw is visible. The degraded hunger-imprint, claws and psychic decay follow authored lore; identity, face, age styling, clothing and palette are editable defaults. Its nausea aura is psychic, with no visible physical stench. No green rot fumes, exposed organs, wounds, blood, gore, actual starving person, feeding victim, corpse, captive, extra limbs, revealed life-history, text or scenery.
+A mature gaunt humanlike editable Ghast Echo default with ashen grey-brown skin, hollow cheeks, dull brown-grey eyes and patchy dark-grey hair. Nested closed cheek/neck/wrist contours suggest a degraded hunger-imprint; five long clawed digits per hand stay attached to one body. Worn indigo/brown clothes cover the figure. Psychic stench is not drawn as physical fumes; no corpse, victim, past identity or new mechanic is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/eb7da87ce690db4a0a74495a52409c5c5be107cc199430a6e83909cfdbc2623d.png)
+[Portrait](../../assets/characters/655af68e0495629b9685cf7fcf5003e9d4a5415d29f10303faf650d87b06c844.png)
 
-[Full-body reference](../../assets/characters/6a689246bbe5f7709844811e46057688d4fce31f0a47dad6c883495bf3ead3f0.png)
+[Full-body reference](../../assets/characters/bb69b3e11d772ad985491104ed8574839bd109b39dbadb9ce0933a3219ae2a55.png)
 
-[Multiview reference sheet](../../assets/characters/68ac4789cf171685f700d1013a747f511e968f85e98cd8c7d19656c5ac7a0674.png)
+[Multiview reference sheet](../../assets/characters/1a0c9f3a6f4e6e26befcde8ce32ad70abc6536e1278a53d9cde3c220fd5b256b.png)

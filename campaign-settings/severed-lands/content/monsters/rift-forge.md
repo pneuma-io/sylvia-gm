@@ -41,12 +41,12 @@ A Rift expression shaped like a dwarf of living bronze and violet flame — not 
 
 ## Appearance and artwork
 
-One Medium Rift Forge elemental shaped like a mature stocky adult dwarf of living bronze and violet flame. A broad lined bronze face with a heavy brow, two small pale violet-white glowing eyes, a short strong nose and a thick sculpted bronze beard; short violet flame tongues rise from the crown and between a few beard strands. Exactly two broad arms with five-digit bronze hands and two short powerful legs with fully visible feet. A plain charcoal leather smith's apron covers the chest and hips over dark rough trousers, with a simple plain waist tie and sturdy dark work boots. The anatomical RIGHT hand holds one ordinary iron-headed wooden-handled warhammer low beside the body, its complete head visible; the LEFT hand is open and empty. An intent craftsman's expression and balanced grounded stance. Living bronze, dwarf-like shape, violet flame, forge bearing and warhammer follow the authored source; facial features, beard, outfit and hammer details are editable visual defaults. No orange fire, shield, extra tool, extra limbs, inscribed crest, smithy/anvil scene, Warden ruin, named identity, victim or readable text.
+A Medium editable forge-expression default shaped like a sturdy adult dwarf, with living bronze skin/face, violet eye apertures, bronze beard ridges and attached violet head/chin flame. Nested hammered-metal folds, a charcoal smith's apron, plain trousers/boots and right warhammer remain practical. It is not assigned Azer ancestry, a clan, a remembered artifact or cold-flame mechanics.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/c7d77e8c2cc9b5075e79c6102d817f2982cf23d20cf17019e7a6f8fa3a506434.png)
+[Portrait](../../assets/characters/00b8558bc9db42a624beb6a591d59ebe078591bc3c24303a8bc2753a31c2373d.png)
 
-[Full-body reference](../../assets/characters/a98a147e6f230480b835e0f4c3079ef7ce427362bea97cd1f175b2139f96901d.png)
+[Full-body reference](../../assets/characters/c54ae8da904867ffad34542a0f7c1c383e38c66a08b4ec262e0690bf97038cef.png)
 
-[Multiview reference sheet](../../assets/characters/38f2c2c1dd378fdb748ce88cdc147350a55b51dfb02b60ed029075e63dbb1e28.png)
+[Multiview reference sheet](../../assets/characters/bd3b6cbecfc774a09df08ed3924d929ee98099146a46d635f5db5fceab0a23c1.png)

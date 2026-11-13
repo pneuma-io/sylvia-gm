@@ -52,12 +52,12 @@ A Rift Echo of a spellcaster consumed by their own magic — the skull and resid
 
 ## Appearance and artwork
 
-One Tiny hovering Rift Flameskull: a single complete dry adult humanlike skull, aged ivory bone with restrained gray-brown weathering, two eye sockets, one nasal cavity and one complete lower jaw with ordinary intact teeth. The skull is intact and recognizable, with no attached spine or body. Dim cold violet-white Rift spellfire curls continuously around the skull and flickers within the eye sockets; the bone remains clearly readable through the flame. The floating skull and residual cold spellfire follow the authored source; skull proportions, surface wear, flame color and tongue pattern are editable visual defaults, with no claim to a named spellcaster's identity. No living flesh, blood, gore, fresh injury, severed neck, second skull, skeleton body, horns, crown, runic spell labels, spell beams, victim, death scene, Rift pool or scenery.
+An editable Tiny Flameskull default with one clean ivory-grey humanoid-like skull, attached jaw, two empty orbital sockets and diffuse violet-white cold flame. Nested cranial seams and attached inward flame folds remain within one skull/flame silhouette. No caster ancestry, identity, last spell, body or new power is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/77b628a9c3a68a7e847965611421e47c62a369635e568bc853ceb85e2e63c7c8.png)
+[Portrait](../../assets/characters/f48d3108b6b11e2e1bec528b7f25687e57acd650b4a3ab6f3f1a36a457c8c881.png)
 
-[Full-body reference](../../assets/characters/89819dcf8890214eef2305563c1437c7212c53b74ebf6ba919dbf81920f20ad2.png)
+[Full-body reference](../../assets/characters/c4102e5becfea75365db642ecdb7d467fcbaf17ebd70e589e5dc07ef78b84fea.png)
 
-[Multiview reference sheet](../../assets/characters/0a6a7884ec9ca4ca723d2c731bb02619486d0747ac1d1b9a037ccf2a3d8cf804.png)
+[Multiview reference sheet](../../assets/characters/e88cf3174da0b9552b3048b9cc0f14374529bb62c21554172da711ed94899439.png)
