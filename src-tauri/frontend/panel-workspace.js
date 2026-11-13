@@ -175,6 +175,8 @@
       if (!tree) return null;
       const result = { id: uniqueId(window.id, 'window', windowIds), title: String(window.title || 'Panels'), tree };
       if (window.placement && typeof window.placement === 'object') result.placement = copy(window.placement);
+      const frame = cleanFrame(window.frame);
+      if (frame) result.frame = frame;
       return result;
     }).filter(Boolean);
     const hidden = [];
@@ -217,6 +219,19 @@
         ? view.selectedGeometry.slice(0, 512) : null;
     }
     return safe;
+  }
+
+  // In-page (browser WebUI) window geometry and minimized state. Native windows use placement instead.
+  function cleanFrame(frame) {
+    if (!frame || typeof frame !== 'object' || Array.isArray(frame)) return null;
+    const number = (value, low, high) => {
+      const result = Number(value);
+      return Number.isFinite(result) ? Math.round(Math.max(low, Math.min(high, result))) : null;
+    };
+    const left = number(frame.left, -10000, 10000), top = number(frame.top, -10000, 10000);
+    const width = number(frame.width, 240, 10000), height = number(frame.height, 160, 10000);
+    if ([left, top, width, height].includes(null)) return null;
+    return { left, top, width, height, minimized: frame.minimized === true };
   }
 
   // Saved inspection is presentation only and remains isolated to its campaign/Ruleset.
@@ -383,9 +398,11 @@
         current.hidden = current.hidden.filter((id) => id !== command.panelId);
         if (destination.windowId === 'new') {
           const surface = context.surfaces.find((item) => item.id === command.panelId);
+          const frame = cleanFrame(destination.frame);
           current.windows.push({ id: makeId('window'), title: surface?.title || 'Panels',
             tree: tabs(makeId('tabs'), [command.panelId]),
-            ...(destination.placement ? { placement: copy(destination.placement) } : {}) });
+            ...(destination.placement ? { placement: copy(destination.placement) } : {}),
+            ...(frame ? { frame } : {}) });
         } else if (destination.windowId === 'sidebar') {
           current.sidebar = addAt(current.sidebar, command.panelId, destination, makeId);
         } else {
@@ -430,6 +447,11 @@
       } else if (command.type === 'placement') {
         const window = current.windows.find((item) => item.id === command.windowId);
         if (window && command.placement && typeof command.placement === 'object') window.placement = copy(command.placement);
+      } else if (command.type === 'frame') {
+        const window = current.windows.find((item) => item.id === command.windowId);
+        const frame = window && command.frame && typeof command.frame === 'object' &&
+          cleanFrame({ ...window.frame, ...command.frame });
+        if (frame) window.frame = frame;
       }
       current = reconcile(current, context.surfaces);
       persist();

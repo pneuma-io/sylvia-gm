@@ -27,7 +27,12 @@
     let loadingLayout = false;
     let activeDrag = null;
     let dropPreview = null;
+    let stack = [];
+    let frameDrag = null;
+    let frameObserver = null;
+    let viewFocusWired = false;
     const EFFECTS_READY_TIMEOUT_MS = 2000;
+    const FLOATING_BASE_Z = 400;
     const escape = (value) => String(value ?? '').replace(/[&<>"']/g,
       (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
     const sameContext = (value) => context && value &&
@@ -39,6 +44,108 @@
     const ownerTree = (windowId) => windowId === 'sidebar' ? layout?.sidebar :
       layout?.windows.find((item) => item.id === windowId)?.tree;
     const owns = (windowId, panelId) => panelIds(ownerTree(windowId)).includes(panelId);
+    // The browser WebUI manages detached panels as in-page windows; the native host keeps its own path.
+    const browserWindows = () => !child && !window.__TAURI__ && Boolean(window.__sylviaBrowserInvoke);
+    const floatingShown = () => browserWindows() && !window.matchMedia?.('(max-width: 760px)').matches;
+    const frameOf = (windowId) => layout?.windows.find((item) => item.id === windowId)?.frame || null;
+    const minimized = (windowId) => Boolean(frameOf(windowId)?.minimized);
+
+    // The visible game area below the WebUI bar and above the window dock.
+    function workArea() {
+      const frame = document.getElementById('session-frame')?.getBoundingClientRect();
+      const dock = document.querySelector('.floating-panel-dock')?.getBoundingClientRect();
+      const top = frame?.height ? Math.max(0, frame.top) : 0;
+      const bottom = Math.min(frame?.height ? frame.bottom : window.innerHeight, dock?.height ? dock.top : window.innerHeight);
+      return { top, bottom, width: window.innerWidth, height: Math.max(160, bottom - top) };
+    }
+
+    // New windows open over the game view, cascading so two windows never exactly coincide.
+    function defaultFrame(index = layout?.windows.length || 0) {
+      const area = workArea();
+      const offset = (index % 6) * 28;
+      return { left: Math.round(Math.max(16, area.width * 0.14) + offset),
+        top: Math.round(area.top + Math.max(16, area.height * 0.08) + offset),
+        width: Math.round(Math.min(760, Math.max(320, area.width * 0.48))),
+        height: Math.round(Math.min(720, Math.max(240, area.height * 0.8))), minimized: false };
+    }
+
+    // Keep the title bar reachable: on screen vertically and at least partly on screen horizontally.
+    function clampFrame(frame) {
+      const area = workArea();
+      const width = Math.min(frame.width, Math.max(240, area.width - 16));
+      const height = Math.min(frame.height, Math.max(160, area.height));
+      return { ...frame, width, height,
+        left: Math.round(Math.max(96 - width, Math.min(area.width - 96, frame.left))),
+        top: Math.round(Math.max(area.top, Math.min(area.bottom - 36, frame.top))) };
+    }
+
+    // Window order, back to front. 'main' is the game view; windows behind it are fully covered.
+    function syncStack() {
+      const ids = (layout?.windows || []).map((item) => item.id);
+      stack = stack.filter((id) => id === 'main' || ids.includes(id));
+      if (!stack.includes('main')) stack.unshift('main');
+      ids.forEach((id) => { if (!stack.includes(id)) stack.push(id); });
+    }
+
+    function frontView() {
+      for (let index = stack.length - 1; index >= 0; index -= 1)
+        if (stack[index] === 'main' || !minimized(stack[index])) return stack[index];
+      return 'main';
+    }
+
+    function windowState(windowId) {
+      if (windowId === 'main') return frontView() === 'main' ? 'front' : 'open';
+      if (minimized(windowId)) return 'minimized';
+      if (frontView() === windowId) return 'front';
+      return stack.indexOf(windowId) < stack.indexOf('main') ? 'covered' : 'open';
+    }
+
+    const stateLabels = { front: 'in front', open: 'open', covered: 'behind the game view', minimized: 'minimized' };
+
+    // Restack the rendered windows and dock without re-rendering, so the click that raised a
+    // window still reaches the control under the pointer.
+    function applyStack() {
+      syncStack();
+      document.querySelectorAll('[data-floating-window]').forEach((element) => {
+        const id = element.dataset.floatingWindow, current = windowState(id);
+        element.style.zIndex = String(FLOATING_BASE_Z + Math.max(0, stack.indexOf(id)));
+        element.dataset.windowState = current;
+        element.inert = current === 'covered';
+      });
+      document.querySelectorAll('[data-floating-dock-view]').forEach((button) => {
+        const current = windowState(button.dataset.floatingDockView);
+        button.dataset.windowState = current;
+        button.setAttribute('aria-pressed', String(current === 'front'));
+        button.setAttribute('aria-label', `${button.dataset.floatingDockTitle} · ${stateLabels[current]}`);
+      });
+    }
+
+    function setFrame(windowId, patch, rerender = true) {
+      const index = layout?.windows.findIndex((item) => item.id === windowId);
+      if (!context || loadingLayout || index == null || index < 0) return;
+      layout = store.change({ type: 'frame', windowId, frame: { ...(frameOf(windowId) || defaultFrame(index)), ...patch } });
+      if (rerender) render();
+    }
+
+    // Bring a window (restoring it if minimized) or the game view to the front.
+    function raise(view) {
+      if (!floatingShown() || !context) return;
+      syncStack();
+      if (!stack.includes(view)) return;
+      stack = [...stack.filter((id) => id !== view), view];
+      if (view !== 'main' && minimized(view)) setFrame(view, { minimized: false });
+      else applyStack();
+    }
+
+    // Taskbar behaviour: the front window minimizes; any other window comes forward.
+    function dockSelect(view) {
+      if (view !== 'main' && windowState(view) === 'front') setFrame(view, { minimized: true });
+      else raise(view);
+    }
+
+    function detach(panelId) {
+      void changed({ type: 'move', panelId, destination: { windowId: 'new', frame: defaultFrame() } });
+    }
 
     function clearReadiness() {
       if (readinessTimer !== null) clearTimeout(readinessTimer);
@@ -76,6 +183,8 @@
     }
 
     function childEffectOwners(records) {
+      // In-page windows draw in this document, so no separate window has to report readiness.
+      if (browserWindows()) return new Set();
       const mapIds = new Set(records.flatMap((record) => Array.isArray(record?.shots) ? record.shots : [])
         .map((shot) => shot?.map_id).filter((id) => typeof id === 'string' && id));
       const surfaces = state.panelProjection?.surfaces || [];
@@ -171,6 +280,10 @@
       pendingEffects = null;
       presentationSequence += 1;
       layout = null;
+      stack = [];
+      endFrameDrag();
+      frameObserver?.disconnect();
+      frameObserver = null;
       loadingLayout = false;
       restoreWindows = false;
       effects.leave();
@@ -197,7 +310,7 @@
         leave();
         context = { campaign_id: campaignId, session_id: sessionId, generation: crypto.randomUUID() };
         layout = store.restore(campaignId);
-        returnWindowsInline();
+        if (!browserWindows()) returnWindowsInline();
         effects.enter(context.generation, 0);
       }
       loadingLayout = true;
@@ -229,7 +342,10 @@
       layout = store.select({ campaignId: projection.campaign_id,
         rulesetId: projection.ruleset_id || 'no-rules', surfaces: projection.surfaces,
         original: projection.layout || null });
-      returnWindowsInline();
+      if (!browserWindows()) returnWindowsInline();
+      else layout.windows.forEach((item, index) => {
+        if (!item.frame) layout = store.change({ type: 'frame', windowId: item.id, frame: defaultFrame(index) });
+      });
       state.characterInspection ||= layout.inspection;
       state.tacticalViewScenes ||= {};
       projection.surfaces.filter((surface) =>
@@ -330,13 +446,16 @@
     function changed(command) {
       if (child) return request('layout', command);
       if (!context) return;
-      if (command?.type === 'move' &&
-          command.destination?.windowId !== 'sidebar') {
+      const destination = command?.type === 'move' ? command.destination?.windowId : 'sidebar';
+      if (destination !== 'sidebar' && !(destination === 'new' ? floatingShown() : browserWindows())) {
         status('This candidate keeps panels in the main workspace. Arrange panels here instead.');
         return;
       }
       if (loadingLayout && !['placement', 'close-window'].includes(command?.type)) return;
+      if (destination === 'new' && !command.destination.frame)
+        command = { ...command, destination: { ...command.destination, frame: defaultFrame() } };
       layout = store.change(command);
+      syncStack();
       render();
     }
 
@@ -389,6 +508,7 @@
       const windowId = layout.windows.find((item) => owns(item.id, surfaceId))?.id || 'sidebar';
       const groupId = find(ownerTree(windowId));
       if (groupId) changed({ type: 'tab', groupId, panelId: surfaceId });
+      if (windowId !== 'sidebar') raise(windowId);
       const captured = { ...context };
       if (initialized && window.__TAURI__) void nativeQueue.then(() => {
         if (sameContext(captured)) return native('focus_panel_window', { context: captured, windowId });
@@ -578,10 +698,10 @@
       }
     }
 
-    function treeMarkup(tree, surfaces) {
+    function treeMarkup(tree, surfaces, floatable = false) {
       if (!tree) return '';
       if (tree.kind === 'split') {
-        const first = treeMarkup(tree.first, surfaces), second = treeMarkup(tree.second, surfaces);
+        const first = treeMarkup(tree.first, surfaces, floatable), second = treeMarkup(tree.second, surfaces, floatable);
         if (!first || !second) return first || second;
         const axis = tree.axis === 'row' ? 'row' : 'column';
         return `<div class="panel-split panel-split-${axis}" data-panel-split="${escape(tree.id)}" ` +
@@ -603,7 +723,11 @@
         `aria-selected="${surface.id === selected.id}">${surface.icon ? `<span class="panel-glyph" aria-hidden="true">${escape(surface.icon)}</span>` : ''}` +
         `${escape(surface.title || surface.id)}</button>`).join('');
       return `<section class="panel-tab-group" data-renderer="${escape(selected.renderer)}" data-panel-drop="${escape(selected.id)}">` +
-        `<div class="ruleset-panel-tabs" role="tablist" aria-label="Panel tabs">${tabs}<button type="button" class="panel-menu-button" ` +
+        `<div class="ruleset-panel-tabs" role="tablist" aria-label="Panel tabs">${tabs}` +
+        (floatable && floatingShown() ? `<button type="button" class="panel-menu-button panel-float-button" ` +
+          `data-panel-float="${escape(selected.id)}" title="Float ${escape(selected.title || selected.id)} in its own window" ` +
+          `aria-label="Float ${escape(selected.title || selected.id)} in its own window">⧉</button>` : '') +
+        `<button type="button" class="panel-menu-button" ` +
         `data-panel-menu="${escape(selected.id)}" title="Arrange ${escape(selected.title || selected.id)}" ` +
         `aria-label="Arrange ${escape(selected.title || selected.id)}">⋯</button>` +
         `</div>${renderPanel(selected, false)}</section>`;
@@ -620,7 +744,8 @@
         const selected = available.find((item) => item.id === tree.active) || available[0];
         if (selected) shown.add(selected.id);
       })(ownerTree('sidebar'));
-      const labels = { shown: 'showing', tab: 'behind a tab', window: 'in its own window', hidden: 'hidden' };
+      const labels = { shown: 'showing', tab: 'behind a tab', hidden: 'hidden',
+        window: floatingShown() ? 'in a floating window' : 'in its own window' };
       return '<div class="panel-strip-chips">' + surfaces.filter((surface) =>
         current.known.includes(surface.id) && (visible(surface) || current.hidden.includes(surface.id))).map((surface) => {
         const placement = current.hidden.includes(surface.id) ? 'hidden'
@@ -656,12 +781,59 @@
           const surface = projection.surfaces.find((item) => item.id === id);
           return surface ? `<button type="button" data-panel-show="${escape(id)}">Show ${escape(surface.title || id)}</button>` : '';
         }).join('') + '</div></details></div>';
-      const contents = treeMarkup(tree, projection.surfaces);
+      // Narrow browser screens show saved floating windows inline until there is room to float them.
+      const inline = browserWindows() && !floatingShown() ? current.windows.map((item) =>
+        `<div class="floating-panel-inline" data-floating-inline="${escape(item.id)}">` +
+        `${treeMarkup(item.tree, projection.surfaces)}</div>`).join('') : '';
+      const contents = treeMarkup(tree, projection.surfaces, !child) + inline;
       const dropDestinations = `<div class="panel-workspace-drop-destinations" aria-label="Panel drop destinations">` +
         `<div class="panel-workspace-drop-destination" data-panel-workspace-destination="sidebar">Return to sidebar</div>` +
           `</div>`;
       return controls + dropDestinations + `<div class="panel-workspace-tree">${contents || (child
-        ? '<p class="panel-empty">No panels are available in the current game state.</p>' : '')}</div>`;
+        ? '<p class="panel-empty">No panels are available in the current game state.</p>' : '')}</div>` +
+        (floatingShown() ? floatingMarkup(current, projection.surfaces) : '');
+    }
+
+    function windowTitle(item, surfaces) {
+      const shown = panelIds(item.tree).map((id) => surfaces.find((surface) => surface.id === id))
+        .filter((surface) => surface && visible(surface));
+      return shown.length === 1 ? shown[0].title || shown[0].id : item.title;
+    }
+
+    // In-page windows plus the dock that keeps every one of them reachable over the game view.
+    function floatingMarkup(current, surfaces) {
+      if (!current.windows.length) return '';
+      syncStack();
+      const dock = [`<button type="button" class="floating-dock-item" data-floating-dock-view="main" ` +
+        `data-floating-dock-title="Game view" data-window-state="${windowState('main')}" ` +
+        `aria-pressed="${windowState('main') === 'front'}" aria-label="Game view · ${stateLabels[windowState('main')]}" ` +
+        `title="Bring the game view to the front">Game view</button>`];
+      const windows = current.windows.map((item, index) => {
+        const title = windowTitle(item, surfaces), id = escape(item.id), state = windowState(item.id);
+        const only = panelIds(item.tree).length === 1 && surfaces.find((surface) => surface.id === panelIds(item.tree)[0]);
+        dock.push(`<button type="button" class="floating-dock-item" data-floating-dock-view="${id}" ` +
+          `data-floating-dock-title="${escape(title)}" data-window-state="${state}" aria-pressed="${state === 'front'}" ` +
+          `aria-label="${escape(title)} · ${stateLabels[state]}" title="${escape(title)}: bring to front, or minimize when in front">` +
+          `${only?.icon ? `<span class="panel-glyph" aria-hidden="true">${escape(only.icon)}</span>` : ''}` +
+          `<span class="floating-dock-title">${escape(title)}</span></button>`);
+        if (state === 'minimized') return '';
+        const frame = clampFrame(frameDrag?.windowId === item.id ? frameDrag.frame : item.frame || defaultFrame(index));
+        const contents = treeMarkup(item.tree, surfaces, panelIds(item.tree).length > 1) ||
+          '<p class="panel-empty">No panels are available in the current game state.</p>';
+        return `<section class="floating-panel-window" data-floating-window="${id}" data-window-state="${state}" ` +
+          `role="group" aria-label="${escape(title)} window" data-frame-width="${frame.width}" data-frame-height="${frame.height}" ` +
+          `style="left:${frame.left}px;top:${frame.top}px;width:${frame.width}px;height:${frame.height}px;` +
+          `z-index:${FLOATING_BASE_Z + stack.indexOf(item.id)}"${state === 'covered' ? ' inert' : ''}>` +
+          `<header class="floating-panel-titlebar" data-floating-drag="${id}" title="Drag to move ${escape(title)}">` +
+          `<span class="floating-panel-title">${escape(title)}</span>` +
+          `<button type="button" class="floating-panel-control" data-floating-minimize="${id}" ` +
+          `aria-label="Minimize ${escape(title)} to the window dock" title="Minimize to the window dock">–</button>` +
+          `<button type="button" class="floating-panel-control" data-floating-return="${id}" ` +
+          `aria-label="Return ${escape(title)} to the panel column" title="Return to the panel column">⇲</button></header>` +
+          `<div class="floating-panel-body panel-window-host"><div class="panel-workspace-tree">${contents}</div></div></section>`;
+      }).join('');
+      return windows + `<nav class="floating-panel-dock" aria-label="Window dock">` +
+        `<span class="floating-dock-label" aria-hidden="true">Windows</span>${dock.join('')}</nav>`;
     }
 
     function menu(panelId) {
@@ -671,8 +843,7 @@
       const menuContext = { ...context };
       const destinations = [
         ['Return to sidebar', { windowId: 'sidebar' }],
-
-
+        ...(floatingShown() ? [['Float in its own window', { windowId: 'new' }]] : []),
       ];
       for (const item of surfaces) {
         if (item.id === panelId || layout.hidden.includes(item.id)) continue;
@@ -685,7 +856,8 @@
       const dialog = document.createElement('dialog');
       dialog.className = 'player-action-dialog';
       dialog.innerHTML = `<h2>Arrange ${escape(surface.title || panelId)}</h2>` +
-        '<p>This candidate keeps panels in the main workspace.</p>' +
+        (floatingShown() ? '<p>Floating windows stay reachable from the window dock at the bottom of the page.</p>'
+          : '<p>This candidate keeps panels in the main workspace.</p>') +
         `<label>Move panel<select data-panel-destination>${destinations.map(([label], i) =>
           `<option value="${i}">${escape(label)}</option>`).join('')}</select></label>` +
         `<form method="dialog"><button class="btn btn-secondary" value="cancel">Cancel</button>` +
@@ -783,6 +955,90 @@
       drag.preview?.remove();
     }
 
+    // Title-bar moves follow window-level pointer events, so a re-render mid-drag cannot strand them.
+    function startFrameDrag(event, bar) {
+      const element = bar.closest('[data-floating-window]');
+      if (event.button !== 0 || event.target.closest('button') || !element || !context) return;
+      event.preventDefault();
+      endFrameDrag();
+      const rect = element.getBoundingClientRect();
+      frameDrag = { windowId: bar.dataset.floatingDrag, pointerId: event.pointerId, context: { ...context },
+        dx: event.clientX - rect.left, dy: event.clientY - rect.top,
+        frame: { ...(frameOf(bar.dataset.floatingDrag) || {}), left: rect.left, top: rect.top,
+          width: Number(element.dataset.frameWidth) || rect.width, height: Number(element.dataset.frameHeight) || rect.height } };
+      element.classList.add('floating-panel-moving');
+      window.addEventListener('pointermove', moveFrameDrag);
+      window.addEventListener('pointerup', endFrameDrag);
+      window.addEventListener('pointercancel', endFrameDrag);
+    }
+
+    function moveFrameDrag(event) {
+      if (!frameDrag || event.pointerId !== frameDrag.pointerId) return;
+      const next = clampFrame({ ...frameDrag.frame, left: event.clientX - frameDrag.dx, top: event.clientY - frameDrag.dy });
+      frameDrag.frame = { ...frameDrag.frame, left: next.left, top: next.top };
+      const element = document.querySelector(`[data-floating-window="${CSS.escape(frameDrag.windowId)}"]`);
+      if (element) Object.assign(element.style, { left: `${next.left}px`, top: `${next.top}px` });
+    }
+
+    function endFrameDrag(event) {
+      if (!frameDrag || (event && event.pointerId !== frameDrag.pointerId)) return;
+      const drag = frameDrag;
+      frameDrag = null;
+      window.removeEventListener('pointermove', moveFrameDrag);
+      window.removeEventListener('pointerup', endFrameDrag);
+      window.removeEventListener('pointercancel', endFrameDrag);
+      document.querySelector(`[data-floating-window="${CSS.escape(drag.windowId)}"]`)?.classList.remove('floating-panel-moving');
+      if (event && sameContext(drag.context))
+        setFrame(drag.windowId, { left: drag.frame.left, top: drag.frame.top, width: drag.frame.width, height: drag.frame.height }, false);
+    }
+
+    // A pointer press raises the window under it; a plain click elsewhere in the game view raises the view.
+    // Click (not press) keeps a panel drag that starts in the view from hiding its destination windows.
+    function wireViewFocus() {
+      if (viewFocusWired) return;
+      viewFocusWired = true;
+      document.addEventListener('pointerdown', (event) => {
+        const element = event.target.closest?.('[data-floating-window]');
+        if (element && floatingShown() && windowState(element.dataset.floatingWindow) !== 'front')
+          raise(element.dataset.floatingWindow);
+      }, true);
+      document.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!floatingShown() || !layout?.windows.length || frontView() === 'main' ||
+            !target.closest?.('#session-frame') ||
+            target.closest('[data-floating-window], .floating-panel-dock, dialog')) return;
+        raise('main');
+      }, true);
+    }
+
+    function wireFloating(container) {
+      frameObserver?.disconnect();
+      frameObserver = null;
+      if (!floatingShown()) return;
+      wireViewFocus();
+      container.querySelectorAll('[data-panel-float]').forEach((button) =>
+        button.addEventListener('click', () => detach(button.dataset.panelFloat)));
+      container.querySelectorAll('[data-floating-minimize]').forEach((button) =>
+        button.addEventListener('click', () => setFrame(button.dataset.floatingMinimize, { minimized: true })));
+      container.querySelectorAll('[data-floating-return]').forEach((button) =>
+        button.addEventListener('click', () => changed({ type: 'close-window', windowId: button.dataset.floatingReturn })));
+      container.querySelectorAll('[data-floating-dock-view]').forEach((button) =>
+        button.addEventListener('click', () => dockSelect(button.dataset.floatingDockView)));
+      container.querySelectorAll('[data-floating-drag]').forEach((bar) =>
+        bar.addEventListener('pointerdown', (event) => startFrameDrag(event, bar)));
+      // Save a user resize (the native corner grip); renders that merely clamp to the viewport are not saved.
+      if (!window.ResizeObserver) return;
+      frameObserver = new ResizeObserver((entries) => entries.forEach(({ target }) => {
+        const width = Math.round(target.offsetWidth), height = Math.round(target.offsetHeight);
+        if (frameDrag || !target.isConnected || (Math.abs(width - Number(target.dataset.frameWidth)) < 2 &&
+            Math.abs(height - Number(target.dataset.frameHeight)) < 2)) return;
+        target.dataset.frameWidth = width;
+        target.dataset.frameHeight = height;
+        setFrame(target.dataset.floatingWindow, { width, height }, false);
+      }));
+      container.querySelectorAll('[data-floating-window]').forEach((element) => frameObserver.observe(element));
+    }
+
     function wire(container) {
       if (state.panelProjection?.loading) return;
       // wire() runs after each render; properties replace listeners on the persistent container.
@@ -856,8 +1112,10 @@
           catch (_) { return; }
           if (!sameContext(value?.context) || !layout.known.includes(value?.panelId) ||
               value.panelId === target.dataset.panelDrop) return;
+          const owner = target.closest('[data-floating-window]')?.dataset.floatingWindow ||
+            target.closest('[data-floating-inline]')?.dataset.floatingInline;
           void changed({ type: 'move', panelId: value.panelId, destination: {
-            windowId: child?.window_id || 'sidebar', targetPanelId: target.dataset.panelDrop, position } });
+            windowId: child?.window_id || owner || 'sidebar', targetPanelId: target.dataset.panelDrop, position } });
         });
       });
       container.querySelectorAll('[data-panel-workspace-destination]').forEach((target) => {
@@ -892,6 +1150,7 @@
         button.addEventListener('click', () => changed({ type: 'show', panelId: button.dataset.panelShow })));
       container.querySelectorAll('[data-panel-close-window]').forEach((button) =>
         button.addEventListener('click', () => changed({ type: 'close-window', windowId: button.dataset.panelCloseWindow })));
+      wireFloating(container);
       container.querySelectorAll('[data-panel-split]').forEach((split) => {
         const handle = split.querySelector(':scope > .panel-split-handle');
         let dragging = false, ratio = Number(split.style.getPropertyValue('--panel-ratio')) || 0.5;
