@@ -56,12 +56,12 @@ A deliberate Rift Echo — not an imprint of death but a spellcaster who chose t
 
 ## Appearance and artwork
 
-One Medium Rift Lich in an editable anonymous mature adult humanlike spellcaster appearance, reflecting the authored partly remembered consciousness rather than a conventional decaying corpse. A complete upright lean figure with exactly TWO arms, five fingers on each relaxed empty hand, TWO separate legs and complete plain dark boots. A mature angular face, intact muted olive-gray skin, two pale violet-gray eyes, shoulder-length silver-gray hair brushed back and a composed calculating closed-mouth expression. Plain layered deep slate-blue long-sleeved robes with restrained violet-gray trim, a simple dark waist belt and one unmarked small cloth component pouch. The face, hands and robe edges fade slightly into a soft violet translucent outline while one complete figure remains readable. The deliberate spellcaster Echo and partial Rift existence follow authored source; anonymous features, hair, outfit, pouch and palette are editable visual defaults. No skull face, exposed bones, wounds, rotting flesh, horned crown, wings, tail, duplicate figure/face, named original identity, phylactery/spirit jar or its location, victim, spell attack, readable runes, text or scenery.
+An editable mature older-looking humanlike Lich Echo default with a narrow medium-brown face, grey-violet eyes, short tousled silver hair and pale ash/indigo robes. Two empty five-fingered hands and two booted feet remain attached to one figure; nested fading robe contours suggest remembered presence. No skeleton origin, named caster, phylactery form/location, binding event or added movement power is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/532bdf6e69f17cdc5ede6b3c58a991f2e64344c4222adc306fd2cb9bcd5f18cc.png)
+[Portrait](../../assets/characters/07c212ed5a5327ac1b6e720bdf1f56ed0af27c1cfc10f03cc947dabc97e81687.png)
 
-[Full-body reference](../../assets/characters/2d65363a48962a063cbc76e6ea7818aafbeac9f7e100192edbbf88959a16c441.png)
+[Full-body reference](../../assets/characters/21f76a72a9e68df985654f4a2df854f4a5689c31176ff9630580a1e6d9581f9b.png)
 
-[Multiview reference sheet](../../assets/characters/4c0d940a263b59220dd397a334ca063ea6908544d98e77789c7be42b5e198cf2.png)
+[Multiview reference sheet](../../assets/characters/ae3c3d146ce6ba6cc518cb715ddafa2a53fd087734d929660d2d3b5f4c04bd39.png)

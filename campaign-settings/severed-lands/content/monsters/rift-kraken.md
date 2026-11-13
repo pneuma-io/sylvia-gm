@@ -50,12 +50,12 @@ A Rift-touched leviathan from a drowned world that fell through the Rift into th
 
 ## Appearance and artwork
 
-One Gargantuan Rift Kraken: one immense cephalopod-like leviathan with a broad oval dark slate-violet mantle, ONE head region with TWO warm amber-copper eyes, and EXACTLY TEN long muscular suckered tentacles attached around the mantle base, FIVE fanning to each side. All TEN discrete tapered tips must be visible and countable, with gentle separated curves and no tangled overlaps or extra appendages. A small closed dark beak is recessed beneath the head, with no visible prey. Restrained cool violet luminous speckling along the wet-looking skin and subtle Rift sheen, a calm suspended swimming reference pose on neutral background. The leviathan, tentacles and Rift touch follow authored source; ten tentacles match the inherited record. Cephalopod shape, colors, sucker pattern and warm eye glint are editable defaults; the fisherfolk's sunrise story remains a rumor, with no actual world scene in the eyes. No horns, wings, human limbs, extra tentacle, ship, sailor, victim, swallowed being, accompanying marine life, ocean scene, attack lightning, writing or scenery.
+An editable cephalopod-like Kraken default: one blue-black/slate mantle and head with two warm amber eyes, eight connected arms with sucker rows and nested inward organic/ring structures. Eight arms and two eyes define this visual presentation only. The wake ecosystem remains authored context; no fauna identity, victim, named drowned world or proof of the eye rumour is invented.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/01382f7a3b2fe2a4453379e3d75a189e318e38f398bc655168658b6600ee511f.png)
+[Portrait](../../assets/characters/760edf4b40397e549abaadf3838cb68f9b042b8930ec92de487f76aa8a19c6ec.png)
 
-[Full-body reference](../../assets/characters/ed5e5f975c2f656d255cf881ad11d82c09b51701bdc3481e67292e5b2b6e2bb9.png)
+[Full-body reference](../../assets/characters/6e2ecda5fb7ff571e2be57881c856f6bbe209d08c49ad2b1a61b4d64623956c6.png)
 
-[Multiview reference sheet](../../assets/characters/31d32d060e3e96a6805764b69879d55ac7d38777c489addd50a398cc092196d8.png)
+[Multiview reference sheet](../../assets/characters/95424548b9156919c642b77fd6852ef985ef3b2f4b67c2559f22722927b66e48.png)

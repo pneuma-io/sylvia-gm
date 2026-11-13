@@ -37,12 +37,12 @@ A drifting mass of semi-translucent Rift-stuff that pulses with a sickly violet 
 
 ## Appearance and artwork
 
-One Large Rift Jelly: ONE drifting semi-translucent violet Rift-stuff mass shaped like a soft rounded jellyfish-like bell, dim sickly violet light diffused within it, with EXACTLY SIX long thin flowing tendrils of condensed Veil energy trailing beneath. The six tendrils have distinct visible tips, spaced gently apart; the bell is one continuous amorphous mass with no rigid shell. Suspended in a quiet resting reference state. FACELESS: no eyes, face, mouth, head, hands, legs, skeleton or trapped object. Violet drifting mass, buoyancy and energy tendrils follow authored source. The bell outline, six-tendril resting arrangement, glow pattern and exact shades are editable visual defaults, not a limitation on its amorphous movement or splitting. No ochre/yellow recolor, extra creature, victim, engulfed body, literal sea water, floor puddle, attack, scenery or readable text.
+One selected semi-translucent smoky-violet Jelly bell with four prominent long ribbon tendrils and one shorter, thicker hanging pseudopod lobe. Short fine fringes belong to the bell. Nested fluid lamellae recede inside a continuous membrane with violet/blue-green depth. This arrangement is an editable visual default, not an authored count; no face, split event, confirmed origin or new movement mechanic is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/56b01e1cf5ae598d404502e9a8e3aea1446ec382003b6cd0d76dfe9eff866eb7.png)
+[Portrait](../../assets/characters/97c12067c28e6981cb747a1f3a49e08d5491ce3e095ce8c5a0fe5b9704cf0750.png)
 
-[Full-body reference](../../assets/characters/f375c2b943ffa1d3bd8f5e84d10cdb9dbcc53ff148b8b4e5f7b75fbc3f2ee66e.png)
+[Full-body reference](../../assets/characters/2af0befe7fbfe3f096dee6360e3dfe488309868e9cadc12c784d1723f2a4b841.png)
 
-[Multiview reference sheet](../../assets/characters/5f1b46ea4ab1378bb7739934565dba252e98d5f72bccfe268e386bed2739104e.png)
+[Multiview reference sheet](../../assets/characters/43d72a6d5b819f15b58f45ea2fca3e4c6abc238e7472e6945b01915764750a1f.png)

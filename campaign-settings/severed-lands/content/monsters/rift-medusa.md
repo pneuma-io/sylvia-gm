@@ -36,12 +36,12 @@ A Rift-touched medusa whose serpentine hair is shot through with writhing Veil-e
 
 ## Appearance and artwork
 
-One Medium Rift Medusa in an editable mature adult female appearance: intact muted olive-gray skin, a composed angular humanlike face with two pale gold-gray eyes, and EXACTLY SIX separate serpent-shaped hair locks infused with luminous violet Veil-energy, each ending in one small serpent head. No ordinary mammal hair. Exactly TWO humanlike arms with five fingers per hand and TWO humanlike legs in complete plain dark boots. An opaque charcoal long-sleeved wrap tunic, dark trousers and a simple belt. The anatomical RIGHT hand holds ONE plain steel shortsword low, full blade/tip visible; LEFT empty. Her Veil-infused serpentine hair and shortsword follow authored source; face, six-lock arrangement, clothing and palette are editable defaults. No snake lower body, extra snakes, horns, wings, exposed skin below the opaque outfit, victim/statue, petrification scene, readable markings or scenery.
+An editable adult Medusa default with cool olive-brown skin, pale-jade eyes and a connected crown of serpentine locks folded through translucent violet Veil channels. Hair-lock count is not a rule; the selected crown arrangement guides later views. Wine/indigo layers cover two humanlike arms and two booted legs; a shortsword stays in the right hand, left empty. No victim, prior identity, mirror power or origin is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/8e60687b67fd19447ece78cec4785f0975bbfeaa12ed179ef9a5ffddf5ba7f11.png)
+[Portrait](../../assets/characters/a7631a43006c9cbdd7b9b246b4d3b5392bbe038e381a6411fabcb95c2e246fce.png)
 
-[Full-body reference](../../assets/characters/4eb381cdb8dcdde6f869ae6b3e56b7522cf0d61abd7da8ebc9dc1d35c3591c67.png)
+[Full-body reference](../../assets/characters/e3938c3e0b7c131b3e969c5cd665e2363919e0ea688c46d10e3de840c7f44f77.png)
 
-[Multiview reference sheet](../../assets/characters/b3961c2f1cccc48e3abe1fcdcf70cd9426bf454f2ab8e63ec91d48e8aa98ac8d.png)
+[Multiview reference sheet](../../assets/characters/9a1125d26876dab5c5b6aa519bcdefb3cac27e541e522133a0810e6feb25b3d6.png)

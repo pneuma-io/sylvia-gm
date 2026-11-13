@@ -44,12 +44,12 @@ Rift energy bonded with molten stone in the volcanic vents beneath the Severed L
 
 ## Appearance and artwork
 
-One Small active Rift Magma elemental: ONE compact floating mound of molten stone with irregular black glassy Rift-glass crust, warm orange-red lava showing between crust plates and a faint violet Rift sheen. Exactly TWO short branching rock arms end in THREE jagged claw points each. FACELESS, with no eyes, mouth, humanoid head, legs, feet, wings or tail. The molten stone, Rift-glass and claws follow authored source; the resting outline, two claw branches and colors are editable defaults. No victim, visible body within it, eruption, death burst, fortress scene, flame crown, writing or scenery.
+An editable active Magma default: one connected faceless molten-stone formation with black glassy cooling folds, orange channels, restrained inner violet Rift depth and two attached hooked glass edges. Nested material lamellae express distortion without humanoid anatomy. The ordinary motionless lava disguise remains unchanged; no victim, named echoed world or new power is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/9e995047ac3e58f135ae7e822510ef623dfe7abff8a78d6b54227ed77a2a71f9.png)
+[Portrait](../../assets/characters/1e8c705bf636de8746aac99a055e8374633569be5d1de0f40b16f330f88d09f2.png)
 
-[Full-body reference](../../assets/characters/02bccd449e036110e6a8d975264f0efcb449af2b5a86cc7867451e4ac0dcc713.png)
+[Full-body reference](../../assets/characters/6cde28e8cae1e4495d5f589cda764050953f7933d5c29cd04e00f6364c5b85ca.png)
 
-[Multiview reference sheet](../../assets/characters/dc87098efc7d4287a09e64baa4d02e9afda9dcce2c6f8561e80fa02b2179e45f.png)
+[Multiview reference sheet](../../assets/characters/5bd7597d9687c13ff7f2fa81745060670845f1513376ececec46b26cc3e068a8.png)
