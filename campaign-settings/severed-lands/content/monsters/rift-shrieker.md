@@ -37,12 +37,12 @@ A Rift-touched fungal sentinel that grows in clusters near Anchor Door fragments
 
 ## Appearance and artwork
 
-One Medium Rift Shrieker as a single stout fungal specimen: ONE broad umbrella-like pale gray-mauve cap, ONE thick short ivory-gray stem, folded violet-gray gills under the cap, and ONE continuous small rootlike mycelial base. Muted violet Rift-mineral veins and faint glow along the gills, irregular weathered cap edge. FACELESS: no eyes, mouth, head, arms, legs or teeth. Calm resting fungus, isolated whole cap/stem/base with margins. Fungal sentinel follows source; exact cap, gill pattern and palette are editable defaults. No other mushroom specimens, Anchor Door fragment, screaming mouth, sound ring, alerted creature, range visualization, cave scene, writing or text.
+An editable single Shrieker default remains ordinary-looking fungus: low umber/mauve dome cap with cream scalloped rim, pale buff thick stalk and connected mycelial base. Natural subdued violet-grey gills repeat inward. No face, limbs, visible alarm effect or added trait; its authored fungal disguise remains.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/ef748ab198ccf0e7296ee2bf2355756885a7b050ed231b0fe317dd5be4f5b1b9.png)
+[Portrait](../../assets/characters/48d506740664c87b9c65e36c9b0770d61159aac06f01e617f9cee6f7f492d2a0.png)
 
-[Full-body reference](../../assets/characters/573cd512dee49cff9e825cdbae07b9ca3aa4839e9a71eccc21a1f149171d862e.png)
+[Full-body reference](../../assets/characters/5229a0e30f464ca8c9bc16c7aa120e2e5cb09ba56cfbfe520e6dad8e09844537.png)
 
-[Multiview reference sheet](../../assets/characters/e35c9b2ccb709eabb99fb92ddd19c92176643e16e1521cf37b8612568f94b1f6.png)
+[Multiview reference sheet](../../assets/characters/b1655f6293a01f1bc21466db35be980cfb60c1f29f71ee4c660b8185274b19f1.png)

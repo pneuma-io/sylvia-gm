@@ -41,12 +41,12 @@ A floating, gas-filled fungal orb native to the deeper reaches of the Hollows. I
 
 ## Appearance and artwork
 
-One Large Rift Spore, a floating gas-filled fungal orb: ONE pale gray-lilac spheroid with mottled leathery fungal membrane, one large central circular violet faux-eye patch and one closed crease below it resembling a mouth. EXACTLY SIX short curved flexible fungal stalks, THREE fanning from each side, each ending in ONE small rounded cap with a violet bead-like faux-eye spot; all SIX tips visible and countable. The central patch and six cap spots are fungal resemblance markings, not real beholder eyes or added eye-ray powers. No humanoid head, arms, legs, separate tail or exposed interior. Calm suspended state without released spore clouds. Orb and beholder-like resemblance follow source; six-stalk layout, false-face pattern, membrane and colors are editable visual defaults. No actual beholder, beams, infection scene, victim, corpse, falling-world vision, city, scenery or writing.
+An editable gas-filled fungal Spore default: one ochre/cream inflated orb with russet peeling fungal plates, one central folded eye-like fungal cup and several short rounded cup-ended stalk buds. Nested mycelial lamellae suggest Rift depth and beholder resemblance without functional eyes, rays or new powers. No threatened spore burst or hallucination scene is depicted.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/b2b85867bee8b042a01d6bcf8395957051cadf76a7bd538c57a84e278add6dd6.png)
+[Portrait](../../assets/characters/c1952b84dda5959d5b1baf90e50998c448ec0ba48e753c11f9c5c2cc6b830206.png)
 
-[Full-body reference](../../assets/characters/bb8f986eeb2299d724b9fe4e025c5c618714a10f53615083ddd7217d4d467b41.png)
+[Full-body reference](../../assets/characters/f17144708c4c0e54e7a0766c3b034ed10da7394d1731dc590b07f9aa6f6e511c.png)
 
-[Multiview reference sheet](../../assets/characters/43878282a7797d870e67c3d597399fcf28cf9f6fc5da9b8f8dbb91501ccdd4bd.png)
+[Multiview reference sheet](../../assets/characters/89054e87f2d566c0e45152e3b4d4077d5ad58211fb73981405a2022c5c47d918.png)

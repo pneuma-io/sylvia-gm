@@ -40,12 +40,12 @@ The simplest Rift Echo — bones animated by residual Veil energy with no memory
 
 ## Appearance and artwork
 
-One Medium Rift Skeleton with anonymous mature adult humanlike dry ivory bone proportions, ONE complete skull with TWO faint violet-lit empty eye sockets, complete rib cage/pelvis/spine, TWO arms with five bone fingers on each hand and TWO legs with complete bony feet. Weathered unmarked armor scraps: a small dull rust-gray shoulder plate, worn brown leather straps, plain belt and a ragged opaque charcoal waist cloth. Anatomical RIGHT hand holds ONE plain complete steel shortsword low at the side; LEFT hand holds ONE complete strung wooden shortbow low and inactive. A small plain quiver on the back, no arrow nocked. Dry animated bones, armor scraps, shortsword and shortbow follow source; bone proportions and scrap arrangement are editable defaults without an original identity or memory imprint. No flesh, blood, wound, grave, victim, dismemberment, crown, extra limbs, attack or text.
+An editable anonymous humanoid bone default: warm ivory/ash skeleton with empty eye sockets, dark rusted chest/left-shoulder armour scraps and ragged brown waist cloth. Right-hand shortsword, left-hand undrawn shortbow and plain back arrow carrier. Restrained residual Veil energy and nested negative-space contours between bones add no bones, memory, named identity or ability.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/512e20761a59f490abc9ca9b4a358993ca63ed0d93dd3a7c6c2a0650a1944af4.png)
+[Portrait](../../assets/characters/885a222bf53df952c70b7dd2412dbfede1d465c704ba93c0fc4240cb2158b38c.png)
 
-[Full-body reference](../../assets/characters/5fe9b12ad22eca3defc9a40c5e2e7205dc6d88e1cc7d8a421a8854472355dbf4.png)
+[Full-body reference](../../assets/characters/0daaa358621b3847c125ae8c557e9f7edc834e8d379545b3be206c35e290b9ba.png)
 
-[Multiview reference sheet](../../assets/characters/e85696fbae0e70de9df77adf9ef643ffeb22c9092fc6cea901178f0f5616661b.png)
+[Multiview reference sheet](../../assets/characters/c9b47ff68da0825589a1bf6f372d6abaab9a09507be7acdf0d325b29455aa00c.png)

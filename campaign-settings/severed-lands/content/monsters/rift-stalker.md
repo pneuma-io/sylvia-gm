@@ -50,12 +50,12 @@ A Rift-touched predator that hunts by sensing the Veil-residue in its prey — e
 
 ## Appearance and artwork
 
-One Medium Rift Stalker REFERENCE VISUALIZATION, not a visible true body: ONE almost-clear upright air-distortion mass with a suggestion of a featureless oval head, faint shoulder arc and TWO arm-like curling air currents, ending in blunt indistinct empty lobes. Lower form tapers into ONE loose open spiral wisp, no legs or feet. Fine cool violet-gray refractive ripple highlights make only the contour legible against neutral gray; the interior is nearly absent. No face, eyes, mouth, bones, flesh, opaque skin, clothes, fingers, wings, weapon, quarry or revealed identity. This editable symbolic reference aid does not remove Invisibility, establish a true anatomy or qualify visibility/footprint/combat; authored rules and unknown appearance remain authoritative. Quiet complete resting visualization with generous margins, no tracking trail, portal, attack, scenery or text.
+Owner-selected nonliteral GM reference: one abstract almost-clear air/Veil envelope with faint nested eddy contours and restrained grey-violet/blue-green edge glints. This does not define underlying anatomy or depict an in-world visibility effect. The Stalker remains permanently invisible, without a known face, body or new ability.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/9f922535e1251d92999f7c1f1502997704c046e5731afe87876df10016b3cdea.png)
+[Portrait](../../assets/characters/c624f309cde9a6a55baff77f7d2124fe98e6928c0a93260e77a2c7ec4b62781c.png)
 
-[Full-body reference](../../assets/characters/6305035142cd60eff2f6641aab6456334eb245114ccfa8855a472fa5f71793ba.png)
+[Full-body reference](../../assets/characters/c912e1fc62eda77e3de04c72a4a725128a9963b657504053a71601506ba0b959.png)
 
-[Multiview reference sheet](../../assets/characters/b92295e10d8ffddf3403780f00c8160d53bd5358c32b71880c7940a29ddaa142.png)
+[Multiview reference sheet](../../assets/characters/97e135caacf992cabcb86eb108963616ae417352799ba87f12d08807fe783ecb.png)

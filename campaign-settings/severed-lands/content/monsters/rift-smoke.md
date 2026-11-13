@@ -38,12 +38,12 @@ A writhing column of dark smoke shot through with violet threads — Rift discha
 
 ## Appearance and artwork
 
-One Small Rift Smoke: ONE writhing upright column of dark gray smoke threaded with violet Rift filaments, broad curling top billows and a tapered misty base. TWO short smoky side-arm lobes each end in THREE small coalesced claw tips, all tips visible; no separate fingers elsewhere. FACELESS, no eyes, mouth, humanoid head, legs, wings or tail. Quiet suspended active reference state with no breath cone. Column, smoke and violet threads follow source and the claw lobes support its authored claws; exact billows/lobe arrangement are editable resting defaults. No fire scene, burning engine, pyre, corpse, trapped silhouette, lungs, victim, attack or text.
+An editable Smoke reference is one connected dark blue-grey/charcoal column with violet threads, rounded upper billow, two connected clawlike side curl-lobes and tapered lower plume. Nested smoke folds remain smoke, with thin translucent edges. No eyes, solid body or wings; ordinary motionless smoke disguise remains.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/37fbb100a87d2b4b51ca6f9bf97aa235a152ff036dc35d64d71d369003ad2dac.png)
+[Portrait](../../assets/characters/5d06ade6a7b9c06f5971ad44e4bc9ec5fd9bda7efd71c3de5b936a896044b5b6.png)
 
-[Full-body reference](../../assets/characters/cc3b1a3b0664fcdfe9a342d0a50cca1d6cf07a258aa24900385f57e8e92db547.png)
+[Full-body reference](../../assets/characters/5e59b6aebb5196a1e61dfe40c57148d6d8f7c63d862a02657d9adeb9fff7b14c.png)
 
-[Multiview reference sheet](../../assets/characters/22ecddf87890afd5230f517d6a998dc5cf92517ba407aa445a5041fe64c72d8c.png)
+[Multiview reference sheet](../../assets/characters/3dfdf18be81cca0b1ef7cda1d9f2707e46f99a589f00f196390192c8ed235895.png)
