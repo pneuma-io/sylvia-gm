@@ -153,6 +153,22 @@ def seed_initial_state(
             operation_id=None,
             admitted_revision=admitted_revision,
         )
+    from sylvia_gm.domain.no_ruleset_plan import is_no_ruleset_plan, no_ruleset_world_records
+
+    if is_no_ruleset_plan(plan):
+        for record_id, entity_payload in no_ruleset_world_records(plan):
+            append_record(
+                connection,
+                campaign_id=campaign_id,
+                entry_id=_initial_entry_id(campaign_id, record_id, "entity"),
+                record_id=record_id,
+                kind="entity",
+                status="active",
+                payload=entity_payload,
+                basis_message_ids=(),
+                operation_id=None,
+                admitted_revision=admitted_revision,
+            )
     initial_state = plan.get("initial_state")
     facts = initial_state.get("facts") if isinstance(initial_state, Mapping) else None
     if not isinstance(facts, Sequence) or isinstance(facts, (str, bytes, bytearray)):

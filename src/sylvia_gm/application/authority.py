@@ -200,7 +200,7 @@ from sylvia_gm.domain.campaign_ending import (
     ending_progress_id,
     intended_endings,
 )
-from sylvia_gm.domain.campaign_plan import CAMPAIGN_PLAN_FORMAT_VERSION
+from sylvia_gm.domain.campaign_plan import CAMPAIGN_PLAN_FORMAT_VERSION, validate_campaign_plan
 from sylvia_gm.domain.errors import (
     CommandRejected,
     IdempotencyConflict,
@@ -4216,6 +4216,21 @@ class AuthorityOwner:
                 or bindings.get("package_closure_sha256") != lock.closure_sha256
             ):
                 raise CommandRejected("Structured Campaign Plan package bindings are stale")
+            if primary is None:
+                try:
+                    validate_campaign_plan(
+                        captured_plan,
+                        readable_markdown=plan_artifact_text,
+                        expected_ruleset=None,
+                        expected_setting=None,
+                        expected_closure_sha256=lock.closure_sha256,
+                        setting_paths=frozenset(),
+                    )
+                except ValueError as error:
+                    raise CommandRejected(
+                        f"No Ruleset Campaign Plan is invalid: {error}",
+                        code="invalid_campaign_plan",
+                    ) from error
             plan_content = owned_payload(
                 {
                     "artifact_content_sha256": hashlib.sha256(
