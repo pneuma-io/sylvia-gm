@@ -4491,7 +4491,9 @@ class AuthorityOwner:
             return self._catalog(campaign_id)
 
     def ruleset_gm_operating_guide(self, campaign_id: str) -> str | None:
-        """Read the exact optional GM operating guide from the locked primary Ruleset."""
+        """Read the locked primary Ruleset's GM guide, or Sylvia's No Ruleset guide."""
+
+        from sylvia_gm.application.ruleless_play import ruleless_gm_guide
 
         with self._operation():
             snapshot = self._store.snapshot(campaign_id)
@@ -4504,7 +4506,7 @@ class AuthorityOwner:
                 None,
             )
             if primary is None:
-                return None
+                return ruleless_gm_guide(snapshot)
             value = self._store.package_file_bytes(
                 primary.package_id,
                 primary.version,
