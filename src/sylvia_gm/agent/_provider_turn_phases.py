@@ -84,6 +84,7 @@ from ._provider_session import (
     _missing_required_arguments,
     _native_content_for_text_operation,
     _normalize_state_references,
+    _participant_display_names,
     _persisted_campaign_file_mutation_attempted,
     _persisted_selected_party_roles,
     _plain_json,
@@ -95,6 +96,7 @@ from ._provider_session import (
     _require_checked_campaign_file_narration,
     _resolve_provider_tool_alias,
     _saved_action_sequence_results,
+    _saved_mechanics_narration_facts,
     _ToolCallAssembly,
     _unsupported_response_speaker_ids,
     _validated_raw_response_blocks,
@@ -2405,6 +2407,7 @@ def prepare_turn_recovery(
         )
     )
     state.participants = tuple(getattr(self._owner.snapshot(state.campaign_id), "participants", ()))
+    state.entity_display_names = _participant_display_names(state.participants)
     state.opening_footing = (
         self._opening_footing_payload(provider_input) if state.opening_request else None
     )
@@ -2433,6 +2436,16 @@ def prepare_turn_recovery(
         if (facts := _action_sequence_narration_facts(self._owner, state.campaign_id, result))
         is not None
     ]
+    # A resumed turn's saved tool results carry the card but not engine context, so its
+    # exact facts are rebuilt from the canonical receipts, as the live round built them.
+    state.pending_narration_facts.extend(
+        _saved_mechanics_narration_facts(
+            provider_input,
+            self._owner,
+            state.campaign_id,
+            state.entity_display_names,
+        )
+    )
     state.obligations.provisional_tool_prose_pending = False
     state.obligations.player_intent_pending = False
     state.committed_action_ids = {

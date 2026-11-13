@@ -1414,6 +1414,127 @@ def _campaign_opening_task_message(opening_footing: Mapping[str, object]) -> dic
     }
 
 
+def _saved_input_basis_id(provider_input: SessionProviderInput) -> str | None:
+    """Name the saved GM input whose interrupted work a resumed turn continues."""
+
+    if provider_input.basis_message_id is not None:
+        return provider_input.basis_message_id
+    basis = next(
+        (message for message in reversed(provider_input.history.messages)
+         if message.kind is SessionMessageKind.USER or (
+             message.kind is SessionMessageKind.EVIDENCE
+             and message.content.get("kind") in {"campaign_start", "player_action_response"})),
+        None,
+    )
+    return None if basis is None else basis.message_id
+
+
+def _saved_mechanics_narration_facts(
+    provider_input: SessionProviderInput,
+    owner: AuthorityOwner,
+    campaign_id: str,
+    entity_display_names: Mapping[str, str],
+) -> list[dict[str, object]]:
+    """Rebuild a resumed turn's exact narration facts from its committed canonical actions.
+
+    Saved model-facing tool results omit engine context, so the call, full result and
+    pre-action entity values come from the canonical log, as the live round read them
+    from memory. Nothing is executed or rerolled here.
+    """
+
+    if provider_input.session.role is not WriterRole.DM:
+        return []
+    basis_id = _saved_input_basis_id(provider_input)
+    if basis_id is None:
+        return []
+    committed_rows: list[tuple[str, Mapping[str, object]]] = []
+    seen: set[str] = set()
+    for message in provider_input.history.messages:
+        if (message.kind is not SessionMessageKind.EVIDENCE
+                or message.content.get("kind") != "provider_tool_results"
+                or message.content.get("basis_message_id") != basis_id):
+            continue
+        for row in message.content.get("results", ()):
+            if not isinstance(row, Mapping) or not isinstance(row.get("content"), str):
+                continue
+            try:
+                payload = json.loads(row["content"])
+            except (ValueError, TypeError):
+                continue
+            if not isinstance(payload, Mapping):
+                continue
+            action_id = payload.get("action_id")
+            current_entities = payload.get("current_entities")
+            if (payload.get("status") != CanonicalEventType.ACTION_COMMITTED.value
+                    or not isinstance(action_id, str) or not action_id
+                    # Isolated participant receipts stay private to their participant.
+                    or action_id.startswith("actor-action-")
+                    or action_id in seen
+                    or not isinstance(current_entities, Mapping)):
+                continue
+            seen.add(action_id)
+            committed_rows.append((action_id, current_entities))
+    if not committed_rows:
+        return []
+    snapshot = owner.snapshot(campaign_id)
+    calls: dict[str, Mapping[str, object]] = {}
+    results: dict[str, Mapping[str, object]] = {}
+    for event in snapshot.events:
+        if event.action_id not in seen:
+            continue
+        if event.event_type is CanonicalEventType.TOOL_CALL:
+            calls[event.action_id] = event.safe_payload
+        elif event.event_type is CanonicalEventType.TOOL_RESULT:
+            results[event.action_id] = event.safe_payload
+    # The first mutation of each entity table in an action holds its pre-action value.
+    entity_tables: dict[str, dict[str, tuple[object, object]]] = {}
+    for mutation in sorted(getattr(snapshot, "mutations", ()), key=lambda item: item.ordinal):
+        state_key = f"{mutation.namespace}.{mutation.key}"
+        if mutation.action_id in seen and state_key.endswith(".entities"):
+            entity_tables.setdefault(mutation.action_id, {}).setdefault(
+                state_key, (mutation.before, mutation.after)
+            )
+    combat = _current_combat_state(snapshot.state)
+    facts: list[dict[str, object]] = []
+    for action_id, current_entities in committed_rows:
+        call = calls.get(action_id)
+        tool_result = results.get(action_id)
+        tool_name = call.get("tool_name") if call is not None else None
+        if not isinstance(tool_name, str) or not tool_name or tool_result is None:
+            continue
+        parameters = call.get("parameters") if call is not None else None
+        # An entity table this action did not change already held its saved value.
+        previous_entities = cast(dict[str, object], _plain_json(current_entities))
+        for before, after in entity_tables.get(action_id, {}).values():
+            for entity_id in current_entities:
+                if isinstance(before, Mapping) and entity_id in before:
+                    previous_entities[entity_id] = _plain_json(before[entity_id])
+                elif isinstance(after, Mapping) and entity_id in after:
+                    previous_entities.pop(entity_id, None)
+        facts.append(
+            _mechanics_narration_facts(
+                tool_name,
+                _plain_json(tool_result.get("result", {})),
+                current_entities,
+                previous_entities,
+                parameters if isinstance(parameters, Mapping) else {},
+                combat,
+                entity_display_names,
+            )
+        )
+    return facts
+
+
+def _participant_display_names(participants: Sequence[object]) -> dict[str, str]:
+    """Map each named participant to the display name narration facts use."""
+
+    return {
+        str(cast(Any, participant).participant_id): str(data["name"])
+        for participant in participants
+        if (data := _participant_data(participant)).get("name") is not None
+    }
+
+
 def _saved_action_sequence_results(
     provider_input: SessionProviderInput, owner: AuthorityOwner | None = None,
 ) -> tuple[Mapping[str, object], ...]:
@@ -1424,16 +1545,7 @@ def _saved_action_sequence_results(
         or provider_input.session.campaign_id is None
     ):
         return ()
-    basis_id = provider_input.basis_message_id
-    if basis_id is None:
-        basis = next(
-            (message for message in reversed(provider_input.history.messages)
-             if message.kind is SessionMessageKind.USER or (
-                 message.kind is SessionMessageKind.EVIDENCE
-                 and message.content.get("kind") in {"campaign_start", "player_action_response"})),
-            None,
-        )
-        basis_id = None if basis is None else basis.message_id
+    basis_id = _saved_input_basis_id(provider_input)
     results = []
     for message in provider_input.history.messages:
         if (message.kind is not SessionMessageKind.EVIDENCE
@@ -1759,11 +1871,6 @@ class ProviderSessionAdapter:
                 state.buffered_narration, response_blocks=state.buffered_response_blocks
             )
             return
-        state.entity_display_names = {
-            str(participant.participant_id): str(data["name"])
-            for participant in state.participants
-            if (data := _participant_data(participant)).get("name") is not None
-        }
         # Useful tool work continues until completion or cancellation. Engine bookkeeping
         # does not consume a model request, and neither has an arbitrary total-round cutoff.
         state.provider_round = 0
