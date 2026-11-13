@@ -84,6 +84,9 @@
       node('character-chat-status').dataset.kind = kind;
     };
     const fail = (fallback, error) => status(options.error(fallback, error), 'error');
+    // WebUI errors carry a code; desktop errors arrive as "code: message" text.
+    const errorCode = error => error?.code ||
+      (/^(?:Error:\s*)?([a-z][a-z0-9_]*):\s/.exec(String(error))?.[1] ?? '');
     const bridge = () => {
       const value = options.bridge();
       if (!value?.character_chat) throw new Error('Character chat is not available in this window');
@@ -260,7 +263,14 @@
         status('');
         node('character-chat-input').focus();
       } catch (error) {
-        fail('Could not start the chat', error);
+        const code = errorCode(error);
+        if (code === 'character_profile_unavailable' || code === 'stale_character_profile') {
+          pendingStart = null;
+          try { await refresh(); } catch (_) { /* The message below still says what to do. */ }
+          status('That character card changed or was removed. The list is refreshed; choose a card and start again.', 'error');
+        } else {
+          fail('Could not start the chat', error);
+        }
       } finally {
         busy = false; lock();
       }
@@ -297,7 +307,22 @@
         renderChat();
       } catch (error) {
         draft.remove();
-        fail('Your message was not sent. Your text is still here, so you can send it again', error);
+        const code = errorCode(error);
+        if (code === 'outcome_unknown') {
+          // Keep the same identity: if the message was saved, sending again returns it unrepeated.
+          status('Sylvia could not confirm whether your message was saved. Send it again: if it was saved, it will not be repeated.', 'error');
+        } else if (code === 'character_chat_stale' || code === 'character_card_unavailable') {
+          pendingSend = null;
+          try {
+            chat = await bridge().character_chat({ action: 'open', chat_id: chat.chat_id });
+            renderChat();
+          } catch (_) { /* The message below still says what to do. */ }
+          status(code === 'character_chat_stale'
+            ? 'This chat changed in another window. It now shows the saved messages, and your text is still here.'
+            : 'This character card is no longer in your library, so the chat is read-only. Your text is still here.', 'error');
+        } else {
+          fail('Your message was not sent. Your text is still here, so you can send it again', error);
+        }
       } finally {
         node('character-chat-typing').hidden = true;
         busy = false; lock();

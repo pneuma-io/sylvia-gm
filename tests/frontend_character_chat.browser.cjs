@@ -34,6 +34,10 @@ async function openApp(browser,viewport){
   const hostile={artifact_id:'character-profile-'+'2'.repeat(24)+'-'+'b'.repeat(16),content_sha256:'b'.repeat(64),
    name:'<img src=x onerror="window.pwned=1">',summary:'<b>not bold</b>',has_greeting:false};
   const chats=new Map();const calls=[];window.calls=calls;window.failNext=false;
+  // Like the owner: applied operations are remembered, removed cards stop chats, and
+  // desktop errors arrive as 'code: message' text.
+  const applied=new Set();window.chatStore=chats;window.cardsGone=new Set();window.loseReplyNext=false;
+  const desktopError=(code,message)=>`${code}: ${message}`;
   const copy=value=>JSON.parse(JSON.stringify(value));
   const summary=chat=>({chat_id:chat.chat_id,character_name:chat.character.name,artifact_id:chat.character.artifact_id,
    message_count:chat.messages.length,updated_at:'2026-11-13T00:00:00+00:00',preview:chat.messages.at(-1)?.text||''});
@@ -43,8 +47,11 @@ async function openApp(browser,viewport){
   state.bridge={
    character_chat:async command=>{
     calls.push(['character_chat',copy(command)]);
-    if(command.action==='catalog')return {cards:[vela,hostile],chats:[...chats.values()].map(summary),unreadable_count:0};
-    if(command.action==='open')return copy(chats.get(command.chat_id));
+    if(command.action==='catalog')return {cards:[vela,hostile].filter(card=>!window.cardsGone.has(card.artifact_id)),
+     chats:[...chats.values()].map(summary),unreadable_count:0};
+    if(command.action==='open'){const chat=copy(chats.get(command.chat_id));
+     if(window.cardsGone.has(chat.character.artifact_id))chat.card_available=false;return chat;}
+    if(window.cardsGone.has(command.artifact_id))throw desktopError('character_profile_unavailable','Refresh the library and select a saved profile');
     const card=[vela,hostile].find(item=>item.artifact_id===command.artifact_id);
     const id='character-chat-'+String(chats.size+1).padStart(24,'0');
     const user=command.user_name||'You';
@@ -58,9 +65,12 @@ async function openApp(browser,viewport){
     await new Promise(resolve=>setTimeout(resolve,150));
     if(window.failNext){window.failNext=false;throw Object.assign(new Error('The selected provider timed out while responding'),{code:'provider_error'});}
     const chat=chats.get(command.chat_id);
-    if(chat.messages.length!==command.expected_message_count)throw new Error('stale');
-    const n=chat.messages.length;
+    if(applied.has(command.operation_id))return copy(chat);
+    if(chat.messages.length!==command.expected_message_count)throw desktopError('character_chat_stale','This chat changed elsewhere. Reopen it to see the latest messages');
+    if(window.cardsGone.has(chat.character.artifact_id))throw desktopError('character_card_unavailable','This character card is no longer in your library, so the chat is read-only');
+    const n=chat.messages.length;applied.add(command.operation_id);
     chat.messages.push({sequence:n+1,role:'user',text:command.text},{sequence:n+2,role:'character',text:`You said "${command.text}". *taps the ledger*`});
+    if(window.loseReplyNext){window.loseReplyNext=false;throw Object.assign(new Error('The local connection was interrupted.'),{code:'outcome_unknown'});}
     return copy(chat);
    },
   };
@@ -162,6 +172,72 @@ test('narrow windows switch between the list and the chat, and a removed card is
   await page.locator('#character-chat-back').click();
   assert.equal(await page.locator('#character-chat-side').isVisible(),true);
   assert.equal(await page.locator('#character-chat-conversation').isVisible(),false);
+  assert.deepEqual(errors,[]);
+ }finally{await browser.close();}
+});
+
+
+test('lost replies, another window, a removed card and a stale card list all recover without losing text',async()=>{
+ const browser=await chromium.launch({headless:true,channel:'msedge',args:['--disable-gpu']});
+ const shots=process.env.SYLVIA_QA_SCREENSHOTS;
+ try{
+  const {page,errors}=await openApp(browser,{width:1280,height:860});
+  const vela='character-profile-'+'1'.repeat(24)+'-'+'a'.repeat(16);
+  await page.locator('#home-character-chat-btn').click();
+  await page.waitForFunction(()=>document.querySelectorAll('#character-chat-card option').length===2);
+  await page.locator('#character-chat-start').click();
+  await page.waitForFunction(()=>document.querySelectorAll('#character-chat-log .cc-message').length===1);
+  const input=page.locator('#character-chat-input');
+  const sends=()=>page.evaluate(()=>window.calls.filter(call=>call[0]==='send').map(call=>call[1]));
+
+  // 1. The owner saved the message but the reply was lost: say so, keep the text, and an
+  //    unchanged resend returns the saved messages once.
+  await page.evaluate(()=>{window.loseReplyNext=true;});
+  await input.fill('Did you get this?');
+  await input.press('Enter');
+  await page.waitForFunction(()=>/could not confirm/.test(document.getElementById('character-chat-status').textContent));
+  assert.equal(await input.inputValue(),'Did you get this?');
+  assert.equal((await texts(page)).length,1);
+  await page.locator('#character-chat-send').click();
+  await page.waitForFunction(()=>document.querySelectorAll('#character-chat-log .cc-message').length===3);
+  let sent=await sends();
+  assert.equal(sent[0].operation_id,sent[1].operation_id);
+  assert.deepEqual((await texts(page)).slice(1),['Did you get this?','You said "Did you get this?". taps the ledger']);
+  assert.equal(await page.evaluate(()=>[...window.chatStore.values()][0].messages.length),3);
+  assert.equal(await input.inputValue(),'');
+
+  // 2. Another window added messages: the send is refused, the chat reloads, the text stays.
+  await page.evaluate(()=>{const chat=[...window.chatStore.values()][0];
+   chat.messages.push({sequence:4,role:'user',text:'From the other window'},{sequence:5,role:'character',text:'Hello again.'});});
+  await input.fill('Still there?');
+  await page.locator('#character-chat-send').click();
+  await page.waitForFunction(()=>/changed in another window/.test(document.getElementById('character-chat-status').textContent));
+  assert.deepEqual((await texts(page)).slice(3),['From the other window','Hello again.']);
+  assert.equal(await input.inputValue(),'Still there?');
+  await page.locator('#character-chat-send').click();
+  await page.waitForFunction(()=>document.querySelectorAll('#character-chat-log .cc-message').length===7);
+  sent=await sends();
+  assert.equal(sent.at(-1).expected_message_count,5);
+  assert.notEqual(sent.at(-1).operation_id,sent.at(-2).operation_id);
+
+  // 3. The card was removed while the chat was open: the chat turns read-only, text kept.
+  await page.evaluate(id=>window.cardsGone.add(id),vela);
+  await input.fill('Are you still here?');
+  await page.locator('#character-chat-send').click();
+  await page.waitForFunction(()=>/no longer in your library/.test(document.getElementById('character-chat-status').textContent));
+  assert.equal(await input.inputValue(),'Are you still here?');
+  assert.equal(await input.isDisabled(),true);
+  assert.equal(await page.locator('#character-chat-send').isDisabled(),true);
+  assert.match(await page.locator('#character-chat-summary').innerText(),/no longer in your library/);
+  assert.equal((await texts(page)).length,7);
+  if(shots)await page.locator('#character-chat-dialog').screenshot({path:path.join(shots,'character-chat-card-removed.png')});
+
+  // 4. Starting from a stale card list: the list refreshes and the removed card is gone.
+  await page.locator('#character-chat-card').selectOption(vela);
+  await page.locator('#character-chat-start').click();
+  await page.waitForFunction(()=>/changed or was removed/.test(document.getElementById('character-chat-status').textContent));
+  assert.deepEqual(await page.locator('#character-chat-card option').allInnerTexts(),['<img src=x onerror="window.pwned=1">']);
+  assert.equal(await page.evaluate(()=>window.chatStore.size),1);
   assert.deepEqual(errors,[]);
  }finally{await browser.close();}
 });

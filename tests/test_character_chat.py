@@ -311,3 +311,120 @@ def test_a_chat_too_large_to_read_back_is_never_written(tmp_path, monkeypatch):
                      expected_message_count=1, generate=lambda *_: "y" * 500)
     assert large.value.code == "character_chat_limit"
     assert load_chat(tmp_path, chat.chat_id) == chat
+
+
+def test_unsaveable_text_is_refused_or_cleaned_so_every_chat_reopens(tmp_path):
+    chat = _chat(tmp_path)
+    for bad in ("Hi\x00there", "Hi \ud800"):
+        with pytest.raises(CommandRejected) as refused:
+            send_message(tmp_path, chat_id=chat.chat_id, operation_id="bad", text=bad,
+                         expected_message_count=1, generate=lambda *_: pytest.fail("no call"))
+        assert refused.value.code == "character_chat_message_invalid"
+    # A model reply with characters JSON text can't round-trip is cleaned before saving.
+    updated = send_message(tmp_path, chat_id=chat.chat_id, operation_id="ok", text="Hello",
+                           expected_message_count=1, generate=lambda *_: "Fine\x00 \udc80thanks")
+    assert updated.messages[-1].text == "Fine ?thanks"
+    assert load_chat(tmp_path, chat.chat_id) == updated
+
+
+def test_a_long_greeting_that_grows_with_the_name_still_reopens(tmp_path):
+    card = {**V2_CARD, "name": "V" * 160,
+            "greetings": {"default": "{{char}} " * 200 + "x" * (65536 - 9 * 200)}}
+    chat = _chat(tmp_path, card)
+    assert len(chat.messages[0].text) > chat_module.MAX_REPLY_TEXT
+    assert load_chat(tmp_path, chat.chat_id) == chat
+    assert [row["chat_id"] for row in chat_catalog(tmp_path)["chats"]] == [chat.chat_id]
+    # A greeting that expands past even the stored limit is refused, never saved unreadable.
+    extreme = {**card, "greetings": {"default": "{{char}} " * 7000}}
+    with pytest.raises(CommandRejected) as refused:
+        _chat(tmp_path / "extreme", extreme)
+    assert refused.value.code == "character_chat_unsaveable"
+    assert not list((tmp_path / "extreme" / "character-chats").glob("*"))
+
+
+def test_nothing_unreadable_is_ever_written(tmp_path, monkeypatch):
+    chat = _chat(tmp_path)
+    monkeypatch.setattr(chat_module, "clean_reply", lambda text, **_: text)
+    with pytest.raises(CommandRejected) as refused:
+        send_message(tmp_path, chat_id=chat.chat_id, operation_id="nul", text="Hello",
+                     expected_message_count=1, generate=lambda *_: "bad\x00reply")
+    assert refused.value.code == "character_chat_unsaveable"
+    assert load_chat(tmp_path, chat.chat_id) == chat
+    assert not list((tmp_path / "character-chats").glob(".*.tmp"))
+
+
+def test_a_briefly_locked_file_is_retried_and_a_failed_save_leaves_the_last_chat(
+    tmp_path, monkeypatch,
+):
+    chat = _chat(tmp_path)
+    real_replace, calls = chat_module.os.replace, []
+
+    def flaky(source, target):
+        calls.append(target)
+        if len(calls) < 3:
+            raise PermissionError("in use")
+        return real_replace(source, target)
+
+    monkeypatch.setattr(chat_module.os, "replace", flaky)
+    monkeypatch.setattr(chat_module.time, "sleep", lambda _seconds: None)
+    updated = send_message(tmp_path, chat_id=chat.chat_id, operation_id="a", text="Hello",
+                           expected_message_count=1, generate=lambda *_: "Hi.")
+    assert len(calls) == 3 and load_chat(tmp_path, chat.chat_id) == updated
+
+    def locked(*_):
+        raise PermissionError("in use")
+
+    monkeypatch.setattr(chat_module.os, "replace", locked)
+    with pytest.raises(PermissionError):
+        send_message(tmp_path, chat_id=chat.chat_id, operation_id="b", text="Again",
+                     expected_message_count=3, generate=lambda *_: "Hi again.")
+    assert load_chat(tmp_path, chat.chat_id) == updated
+    assert not list((tmp_path / "character-chats").glob(".*.tmp"))
+
+
+def test_deleted_card_reimported_with_identical_content_lets_the_chat_continue(tmp_path):
+    chat = _chat(tmp_path)
+    shutil.rmtree(tmp_path / "character-profiles" / chat.artifact_id)
+    assert chat_projection(tmp_path, load_chat(tmp_path, chat.chat_id))["card_available"] is False
+    reimported, digest = _card(tmp_path, operation="reimport")
+    assert reimported != chat.artifact_id and digest == chat.content_sha256
+    projection = chat_projection(tmp_path, load_chat(tmp_path, chat.chat_id))
+    assert projection["card_available"] is True
+    assert projection["character"]["artifact_id"] == chat.artifact_id
+    seen = []
+    send_message(tmp_path, chat_id=chat.chat_id, operation_id="s", text="Back again",
+                 expected_message_count=1,
+                 generate=lambda _chat, profile, messages: seen.append(profile) or "Welcome back.")
+    assert seen[0].artifact_id == reimported
+    # A different card under the same name never stands in for the original.
+    shutil.rmtree(tmp_path / "character-profiles" / reimported)
+    _card(tmp_path, {**V2_CARD, "summary": "Someone else."}, operation="other")
+    assert chat_projection(tmp_path, load_chat(tmp_path, chat.chat_id))["card_available"] is False
+
+
+def test_reopen_reads_while_a_reply_is_saved(tmp_path):
+    chat = _chat(tmp_path)
+    stop, failures = threading.Event(), []
+
+    def reader():
+        while not stop.is_set():
+            try:
+                chat_catalog(tmp_path)
+                load_chat(tmp_path, chat.chat_id)
+            except Exception as error:  # noqa: BLE001 - any failure is the finding
+                failures.append(error)
+
+    thread = threading.Thread(target=reader)
+    thread.start()
+    try:
+        current = chat
+        for index in range(15):
+            current = send_message(
+                tmp_path, chat_id=chat.chat_id, operation_id=f"r{index}", text=f"Line {index}",
+                expected_message_count=len(current.messages), generate=lambda *_: "Noted.",
+            )
+    finally:
+        stop.set()
+        thread.join(10)
+    assert failures == []
+    assert len(load_chat(tmp_path, chat.chat_id).messages) == 31

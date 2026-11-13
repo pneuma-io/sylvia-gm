@@ -15,6 +15,7 @@ import os
 import re
 import tempfile
 import threading
+import time
 from collections.abc import AsyncIterator, Awaitable, Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from dataclasses import dataclass
@@ -38,13 +39,17 @@ MAX_CHATS = 256
 MAX_MESSAGES = 1000
 MAX_USER_TEXT = 8000
 MAX_REPLY_TEXT = 65536
+# Saved messages may be longer than a reply: a card greeting grows when placeholders expand.
+MAX_STORED_TEXT = 4 * 65536
 MAX_USER_NAME = 60
 MAX_FILE_BYTES = 48 * 1024 * 1024
 HISTORY_BUDGET_CHARS = 24000
 DEFAULT_USER_NAME = "You"
 _MACRO = re.compile(r"\{\{\s*(char|user)\s*\}\}|<(BOT|USER)>", re.IGNORECASE)
 _SHA256 = re.compile(r"[0-9a-f]{64}")
-_STORE_LOCK = threading.Lock()
+# One owner process serves every window, so reads and writes share this lock; Windows refuses
+# to replace a file another handle has open.
+_STORE_LOCK = threading.RLock()
 _BUSY: set[str] = set()
 
 
@@ -142,7 +147,7 @@ def _decode(data: bytes) -> CharacterChat:
         ):
             raise ValueError("Character chat message is invalid")
         messages.append(ChatMessage(
-            index + 1, item["role"], _text(item.get("text"), limit=MAX_REPLY_TEXT), operation,
+            index + 1, item["role"], _text(item.get("text"), limit=MAX_STORED_TEXT), operation,
         ))
     return CharacterChat(
         chat_id=value["chat_id"],
@@ -213,6 +218,13 @@ def _write(storage_root: Path, chat: CharacterChat) -> None:
             "This chat is too large to save more. Start a new chat to continue",
             code="character_chat_limit",
         )
+    try:
+        _decode(data)
+    except ValueError as error:
+        raise CommandRejected(
+            "This message could not be saved in a form the chat can reopen. Nothing was saved",
+            code="character_chat_unsaveable",
+        ) from error
     temporary: Path | None = None
     try:
         with tempfile.NamedTemporaryFile(
@@ -222,7 +234,16 @@ def _write(storage_root: Path, chat: CharacterChat) -> None:
             handle.write(data)
             handle.flush()
             os.fsync(handle.fileno())
-        os.replace(temporary, _chat_path(storage_root, chat.chat_id))
+        target = _chat_path(storage_root, chat.chat_id)
+        for attempt in range(6):
+            try:
+                os.replace(temporary, target)
+                break
+            except PermissionError:
+                # Another program (often a virus scanner) briefly holds the file open.
+                if attempt == 5:
+                    raise
+                time.sleep(0.05 * (attempt + 1))
     except BaseException:
         if temporary is not None:
             temporary.unlink(missing_ok=True)
@@ -230,19 +251,32 @@ def _write(storage_root: Path, chat: CharacterChat) -> None:
 
 
 def load_chat(storage_root: Path, chat_id: str) -> CharacterChat:
-    path = _chat_path(storage_root, chat_id)
-    if not path.exists():
-        raise CommandRejected(
-            "That character chat is no longer saved", code="character_chat_unavailable",
-        )
-    return _read(path)
+    with _STORE_LOCK:
+        path = _chat_path(storage_root, chat_id)
+        if not path.exists():
+            raise CommandRejected(
+                "That character chat is no longer saved", code="character_chat_unavailable",
+            )
+        return _read(path)
 
 
 def _profile(storage_root: Path, chat: CharacterChat) -> CharacterProfile | None:
+    """Find the chat's exact card, including an identical re-import under a new library entry.
+
+    Profile identity includes the import operation, so deleting a card and importing the same
+    file again gives a new entry. Its content hash still matches, so the chat can continue.
+    """
     try:
         return load_character_profile(storage_root, chat.artifact_id, chat.content_sha256)
     except (OSError, UnicodeError, ValueError, CommandRejected):
+        pass
+    try:
+        library = character_profile_catalog(storage_root, on_invalid=lambda *_: None)
+    except (OSError, ValueError):
         return None
+    return next(
+        (item for item in library if item.content_sha256 == chat.content_sha256), None,
+    )
 
 
 def card_projection(profile: CharacterProfile) -> dict[str, object]:
@@ -510,8 +544,14 @@ def request_messages(
 
 
 def clean_reply(text: str, *, character_name: str) -> str:
-    """Drop a leading 'Name:' label that some models add; keep everything else as written."""
-    reply = text.strip()
+    """Drop a leading 'Name:' label that some models add; keep everything else as written.
+
+    NUL characters are removed and unpaired surrogates replaced, because neither can be saved
+    and read back as chat text.
+    """
+    reply = (
+        text.replace("\x00", "").encode("utf-8", "replace").decode("utf-8").strip()
+    )
     prefix = f"{character_name}:"
     if reply.casefold().startswith(prefix.casefold()):
         reply = reply[len(prefix):].lstrip()
@@ -578,6 +618,17 @@ def send_message(
     if not isinstance(text, str) or not text.strip() or len(text) > MAX_USER_TEXT:
         raise CommandRejected(
             f"Write a message of 1 to {MAX_USER_TEXT:,} characters",
+            code="character_chat_message_invalid",
+        )
+    try:
+        text.encode("utf-8")
+    except UnicodeError:
+        valid = False
+    else:
+        valid = "\x00" not in text
+    if not valid:
+        raise CommandRejected(
+            "Your message contains characters that can't be saved. Remove them and send again",
             code="character_chat_message_invalid",
         )
     if type(expected_message_count) is not int:
