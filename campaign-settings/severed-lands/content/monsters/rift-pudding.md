@@ -47,12 +47,12 @@ Born from a deep, stagnant Rift pool where the dimensional wound's energy has th
 
 ## Appearance and artwork
 
-One Large Rift Pudding: ONE thick opaque near-black plum-violet corrosive sludge mass, a broad low continuous puddled base with ONE raised rounded central mound and TWO short blunt pseudopod lobes in a quiet resting arrangement. Glossy heavy surface, faint violet internal seams and a restrained iridescent Rift sheen, no transparent contents. FACELESS: no eyes, mouth, humanoid head, fingers, skeleton or trapped objects. The sludge, pool origin and pseudopods follow authored source; precise outline, lobe arrangement and color are editable resting defaults, not fixed limits on its amorphous form or splitting. No victims, dissolving equipment, acid attack, landscape, writing or other beings.
+An editable large faceless Pudding default: one dense opaque black/plum sludge mound with a single raised blunt curled pseudopod lobe and broad pooled rim. Nested deep tar channels carry restrained violet/blue-green Rift depth. No named dissolved matter, victim, age/intelligence claim or extra ordinary-pool disguise trait.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/311b4f5a9c8546767cb72724e3bcca3cd506eccfc3c97dae1f6b57e75922b9e7.png)
+[Portrait](../../assets/characters/ad3e681d3a816fac36e526e539660be38d2ddf1674578c0058178a4c61eaa4d3.png)
 
-[Full-body reference](../../assets/characters/6afa2918f671bfb58d45ab4e95106276a12abdc3c4e43b013928958281a3a555.png)
+[Full-body reference](../../assets/characters/dcf44d942c297f1182fa1c1739f1ca2286591af8120e4e8c1383ce72a400ce19.png)
 
-[Multiview reference sheet](../../assets/characters/67df1b110063d09e8577c90e1b32db528811ae895e8540d9650cd751f0824dd8.png)
+[Multiview reference sheet](../../assets/characters/3c117d33605c2e5603568322c40e9d16f4948d8cd36101ec19a70ac3acc5ca39.png)

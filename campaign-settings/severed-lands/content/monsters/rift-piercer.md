@@ -37,12 +37,12 @@ A Rift-touched piercer — a stalactite-like ambush predator that has absorbed c
 
 ## Appearance and artwork
 
-One Medium Rift Piercer as a complete faceless calcite stalactite-shaped predator: ONE elongated tapering stone cone, broad uneven top and ONE sharp downward point, irregular pale gray calcite ridges with violet Rift-mineral veins and a restrained violet shimmer. Quiet suspended point-down reference state, no cave ceiling or attached rock, whole silhouette with margins. The cone, calcite and violet minerals follow authored source; exact ridges and veins are editable visual defaults. No eyes, mouth, face, arms, legs, wings, tentacles, exposed slug, victim, falling attack, Anchor Door, rune writing or environmental scenery.
+An editable faceless Piercer default: one long cream/grey calcite stalactite cone with a broad upper attachment crown and single pointed lower tip. A small retractable pale muscular rim at the top supports the active presentation; violet mineral veins and inward nested lamellae remain within calcite. Ordinary motionless ceiling-stalactite disguise remains, no extra limbs or sensory face.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/02e3e5eeb2e7c9ea246fc2c1648ebbb96231215eba7bb9d25d999e2ade67b9e5.png)
+[Portrait](../../assets/characters/37eeb84e8817ab1a7acc6090c59ffc3700fab3f4dd0b92aca8f58c3422d38831.png)
 
-[Full-body reference](../../assets/characters/0d1c58da6a682890d9e37e8166e25238251852aa8cdacf57a5edb5cb07bfd6b6.png)
+[Full-body reference](../../assets/characters/7b6ad9536c9732606f06a98c59868ae41f4596ad066235dd86242e2adc3e6a5f.png)
 
-[Multiview reference sheet](../../assets/characters/32bdcf174e85a25051e7952c5248ff214c6af43e824ae3ee782a75679d5ab99b.png)
+[Multiview reference sheet](../../assets/characters/49ee98c3d40be3a1e64a32ed44494531a8f8a17fa00b0cb2066b72cedb29c861.png)

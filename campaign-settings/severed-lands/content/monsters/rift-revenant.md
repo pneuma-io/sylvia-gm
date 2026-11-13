@@ -53,12 +53,12 @@ A Rift Echo of vengeance — formed when someone was murdered unjustly near a Ri
 
 ## Appearance and artwork
 
-One Medium Rift Revenant as an anonymous mature adult humanlike Rift Echo, an upright lean androgynous figure with intact muted gray-beige skin, TWO pale violet-silver eyes, short black hair with one gray streak, ordinary rounded ears and a focused closed-mouth expression. EXACTLY TWO arms with five fingers on each relaxed EMPTY hand, TWO legs and complete charcoal boots. Worn plain dark leather armor over opaque slate tunic and trousers, simple belt and an unmarked charcoal shoulder cloak; faint violet translucence only along the intact silhouette. Leather armor and purposeful vengeful Echo follow authored source; face, hair, clothes, palette and gender presentation are editable defaults without establishing an original identity, killer or descendant. No exposed bones, wounds, decomposition, weapon, victim, revenge scene, readable insignia or writing.
+An editable mature woman-like Revenant Echo default: ash medium-brown broad-nosed face, grey-green eyes, short black/grey curls and determined expression. Oxblood leather armour over ash padding, charcoal trousers/dark boots; both empty hands in loose fists. Inward repeated cloth/leather contours suggest one focused manifest figure. No named deceased, killer, descendants, wound or murder weapon is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/3a3205d19107101526d20e41ed52b954ec827ded376f1e64480bfd755bc14616.png)
+[Portrait](../../assets/characters/8a209d761b22215b1572ef629aa6d322a0aef12d7372fe9129d444df74236091.png)
 
-[Full-body reference](../../assets/characters/1a1d5aed9a2a038cf4eb72c4cd2f466379e450d9e5fc43cd23590e14cc9723f3.png)
+[Full-body reference](../../assets/characters/7ee02c01215400f43f3f2381d88bee8acd80481385452ae0576aaa39482f0e8b.png)
 
-[Multiview reference sheet](../../assets/characters/d495dc836fa6acf33fcf6672e3d9b89fca3be30abbf92e2e6fb5fdb67b11ebb4.png)
+[Multiview reference sheet](../../assets/characters/946a9c112f399a17bbcc409384e1c2bbf5a8746a7604076a9fe9e27c2754a2b2.png)

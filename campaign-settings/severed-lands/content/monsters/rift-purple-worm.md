@@ -37,12 +37,12 @@ A Rift-touched purple worm — already one of the most feared predators undergro
 
 ## Appearance and artwork
 
-One Gargantuan Rift Purple Worm: ONE complete massive continuous segmented purple worm body in a loose open S-shaped resting coil, head raised on the left, ONE tapering tail ending in ONE dark pointed stinger visible on the right. ONE circular swallowing maw with several orderly rings of small pale teeth, empty and slightly open, no eyes or separate humanoid face. Heavy dark-purple hide studded with violet crystals and faint violet charge along the tooth roots. Every body segment, crystal tip and the single stinger fits inside generous margins; no coil closes into an ouroboros or conceals a second end. Crystals, maw and stinger follow authored source; palette, segment pattern and coil pose are editable defaults. No legs, wings, antennae, tentacles, victims, swallowed beings, cavern scene, attack or text.
+An editable complete Purple Worm default: one thick plum-purple segmented legless tube bent in a broad U, one raised circular tooth-ringed maw and one opposite tapering stinger tail. Jagged violet crystal clusters stud its hide and contain nested inward facets; restrained Rift-charge lies between teeth. No eyes, extra body, swallow victim or new power.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/57d01f8bf21a870358bef762c27fd035e92f200f87c4548610b1505914bb36d5.png)
+[Portrait](../../assets/characters/8cb618b23af5aee848489344a32a34e3e9106445f5bfd1d58c54724dc2212108.png)
 
-[Full-body reference](../../assets/characters/af5d35637b279cb4e258ece06c4371437ad28073861458be487474a9a7132c22.png)
+[Full-body reference](../../assets/characters/2f5162dfdeeb734ab744995a652d247415e4baf8cf4c74499ec539fdc74b42c1.png)
 
-[Multiview reference sheet](../../assets/characters/fab49cc24abce9e2eb0ca76d3a9316822a6f0f99e66367dc821780d6514e37fc.png)
+[Multiview reference sheet](../../assets/characters/c1d4d27ae45266bf30c11c8b24259fe69729464ceafebdef6c118517b7f0d0d7.png)
