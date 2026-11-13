@@ -259,11 +259,11 @@ test('Home archive, restore, keyboard focus and narrow layout', { timeout: 60000
     // tutorial suite), then the Continue card.
     await page.locator('#home-new-campaign-btn').focus();
     const order = [];
-    for (let i = 0; i < 7; i += 1) {
+    for (let i = 0; i < 8; i += 1) {
       if (i) await page.keyboard.press('Tab');
       order.push(await page.evaluate(() => document.activeElement.id || document.activeElement.className));
     }
-    assert.deepEqual(order, ['home-new-campaign-btn', 'home-ready-campaign-btn', 'home-build-btn',
+    assert.deepEqual(order, ['home-new-campaign-btn', 'home-ready-campaign-btn', 'home-character-chat-btn', 'home-build-btn',
       'home-settings-btn', 'home-tutorials-btn', 'home-get-started-btn', 'btn btn-primary home-continue']);
     assert.notEqual(await page.locator('.home-continue').evaluate((node) => getComputedStyle(node).outlineStyle), 'none',
       'focused controls show a visible outline');
