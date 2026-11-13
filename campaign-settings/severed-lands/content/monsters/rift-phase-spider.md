@@ -36,12 +36,12 @@ A Rift-touched phase spider whose natural ability to shift between planes has me
 
 ## Appearance and artwork
 
-One Large Rift Phase Spider: ONE joined two-part arachnid body, a low slate-blue cephalothorax and oval violet-gray abdomen, EXACTLY EIGHT long jointed walking legs, FOUR on each side with all eight tips separated and countable. EIGHT small pale-violet eyes in four paired clusters on one front head, TWO short mouth palps distinct from walking legs, and TWO small closed dark fangs. Subtle violet Rift veins and thin vapor wisps close to the carapace. Calm fully material resting reference pose, slightly elevated near-front three-quarter view, eight legs spread enough to count without tangled overlaps. Colors, eye arrangement and vapor pattern are editable visual defaults. No humanoid body, wings, extra walking leg, duplicate spider, portal, actual planar transition, webbed victim, bite scene, exposed organs, scenery or text.
+An editable Phase Spider default: one ivory/slate cephalothorax and oval opaline abdomen with cobalt joints, eight walking legs, eight small amber eyes and two short fangs. Nested inward chitin layers create violet/cobalt depth; restrained vapor remains behind one complete body. No detached ghost limbs, induced victim vision or new plane/ability is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/f5c6394f246740e003bdec55977150e3aa4a42e7c7f3ca30146783b34bc64298.png)
+[Portrait](../../assets/characters/c9f16853d7f474354655da8ea0b1dfb67145a0792540fb1644b705fcbcdac4f9.png)
 
-[Full-body reference](../../assets/characters/2d15146e9b13313ec59b9fb4d74c0901bcb603360e24833087a37aecc8c10780.png)
+[Full-body reference](../../assets/characters/88479c2d6110df0644c31a9c51d6f81d06d6be6f880d614f466c0d89b5799fbe.png)
 
-[Multiview reference sheet](../../assets/characters/c41a2f6005722ae76a0b1ceff141d59d11e3c9c8eaf4365a43384a964683321d.png)
+[Multiview reference sheet](../../assets/characters/5c71d793c9b3c46a2d3a0fa62f45ec61c14aecc3857446f53d8a68e853115fc2.png)

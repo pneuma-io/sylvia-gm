@@ -48,12 +48,12 @@ The most common Rift-born seepage: raw, violet-tinged protoplasm that pools wher
 
 ## Appearance and artwork
 
-One Medium Rift Ooze: ONE low irregular oily pool of silvery dark gray protoplasm with faint violet Rift-light, a rounded low central mound and THREE shallow flowing edge lobes in this quiet resting arrangement. The whole continuous wet outline is visible, with subtle translucent rim and oily highlights. FACELESS: no eyes, face, mouth, head, hands, legs, rigid shell or trapped object. Violet-tinged seepage and oily-pool resemblance follow authored source; exact resting outline, three lobes and shimmer pattern are editable defaults that do not restrict its amorphous movement. No visible victim, corpse, engulfed equipment, corrosion demonstration, wet-rock cave scene, writing or scenery.
+An editable faceless violet-protoplasm Ooze default: one low oily pool with a single raised blunt attached ridge, smoky aubergine/lilac translucence and nested inward fluid shelves beneath wet slate skin. No animal face/limbs, victim or memory-erasure demonstration; ordinary oily-pool/wet-rock disguise while motionless remains.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/c8e062eea2a98c359017ebd8f5df35f585418b744fae49dfa2ddbac8f3c10c15.png)
+[Portrait](../../assets/characters/fdf10834c9e6b262bca07faaf18e4e2baca5ffe548af557c6540a9e45194e749.png)
 
-[Full-body reference](../../assets/characters/ff892846a8d337a0e555e8b1cfa814b73a4777ca2e9f944558550e9e889f1cfa.png)
+[Full-body reference](../../assets/characters/c70b34b3abec0aaff482dc0fbdc58f6ec4640340071d2a773d0d3264952faa7e.png)
 
-[Multiview reference sheet](../../assets/characters/e18bd7b0abfac9a005a657c627d3b8121a00cff116ec1585e15ee4f3abb23644.png)
+[Multiview reference sheet](../../assets/characters/0a4ac36c4418ecc3d809e271b6755b436b88ee446fd63fce8cbb2b84c28bcd51.png)

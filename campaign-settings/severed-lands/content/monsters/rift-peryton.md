@@ -39,12 +39,12 @@ A Rift-touched peryton whose shadow has been severed from its body by Veil expos
 
 ## Appearance and artwork
 
-One Medium Rift Peryton in an editable stag-headed raptor appearance: ONE compact eagle-like feathered torso, ONE stag head with brown fur, TWO amber eyes, TWO ears and TWO branching antlers in the selected reference shape. EXACTLY TWO broad feathered wings, TWO bird legs ending in taloned feet, and ONE short fan of tail feathers; no deer legs, human limbs or extra head. Deep charcoal-brown feathers carry restrained violet Veil-light streaks; muted bone antlers. Calm standing near-front three-quarter pose with wings half-open so both complete wings and all primary tips are visible, antlers fully inside margins. Stag/raptor features, palette and antler pattern are editable visual defaults; no previous victim, heart, consumed creature or shadow identity is revealed. No distinct cast silhouette or recognizable animal/humanoid shadow, kill, blood, mountain or night scene.
+An editable Peryton default: one russet stag-like head with golden eyes, pointed ears and two branched dark antlers on a charcoal/russet avian body, cream throat, two feathered wings, two taloned raptor legs and one feather tail. Nested inward antler grain and secondary-feather arcs carry structural Rift detail. Projected shadow is omitted to avoid inventing the unidentified last prey; the authored severed-shadow rule remains.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/431494e0265aff9ec43a654b14d53f46a22d145f310f7e3a194690b8cc6e8055.png)
+[Portrait](../../assets/characters/1347931694edc171cdc0d3b2fb47dcf8918a040cf5c31a925324b516f7c2a1e8.png)
 
-[Full-body reference](../../assets/characters/6a2ef862ab7d832ce96eca4f37677bfb61f28415960075836c76d249dbb2b4fa.png)
+[Full-body reference](../../assets/characters/3a2ec3c4b85cdf163757d42641b285547718c4462a5eb292f024402d82677d6d.png)
 
-[Multiview reference sheet](../../assets/characters/4ff91f545cedf7d34e56fb5af157e785ba671b31b852073876349209d72999ba.png)
+[Multiview reference sheet](../../assets/characters/44f5d5aac10c59fbba49fb53fa87c1a8ce32de5ecde7d98764b6ad4471bfc2dd.png)

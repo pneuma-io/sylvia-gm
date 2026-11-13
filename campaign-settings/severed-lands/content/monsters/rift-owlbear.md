@@ -41,12 +41,12 @@ A Rift-touched owlbear — a creature that was already an unnatural hybrid befor
 
 ## Appearance and artwork
 
-One Large Rift Owlbear: ONE broad powerful bear torso with exactly FOUR stout bear legs and broad clawed paws, ONE short bear-tail stub, and ONE large round owl head with a cream-gray feathered facial disc, TWO amber-gold eyes and ONE short dark hooked beak. Dark brown fur and feathers are mottled with the authored violet patches, with dense feathering around the neck and shoulders. A calm watchful grounded near-front three-quarter pose, all four feet and tail stub visible. Owl/bear combination and violet markings follow authored source; exact feathers, fur, colors and resting posture are editable defaults. No wings, long lion/horse tail, eagle forelegs, human arms/face, horns, saddle, rider, prey, attack, forest scene or readable text.
+An editable heavy quadruped Owlbear default: one cream/tawny owl disk with amber eyes/hooked dark beak above a brown bear body, four clawed bear paws and a short fur tail. Irregular violet patches affect both feathers and fur; nested shoulder-feather rosettes and inward flank whorls carry the Rift structure. No wings or added psychic effect.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/442791deda02e0880a4d8a0113cf2c12234b493a4afa13aa8d5c8c6d7371ee2a.png)
+[Portrait](../../assets/characters/bf58b573d0b4d81c500cb1378cc7307bb7dfb4966b239df085e26be5ca0d2905.png)
 
-[Full-body reference](../../assets/characters/6af5bcaed265f5de44eca8c5c72f619602bf4c2c1f373f618ffd37cb4537aa96.png)
+[Full-body reference](../../assets/characters/d98ba1f86c81746bfc194bcbf9b092946a0a4952ba822a777e93289ab73a750a.png)
 
-[Multiview reference sheet](../../assets/characters/90d4d771c44dc23babc76ba8f970d40d49085182d36ad07ef83f1afc30bac22f.png)
+[Multiview reference sheet](../../assets/characters/4dcdbe86a106223ba167273ed8ae984f8c63e13f2253585f9e5c89d0a354a79b.png)

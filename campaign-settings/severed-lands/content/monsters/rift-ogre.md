@@ -36,12 +36,12 @@ A brutish Riftborn giant-kin whose ancestors tumbled through the Rift generation
 
 ## Appearance and artwork
 
-One Large Rift Ogre in an editable mature adult masculine appearance: a very broad heavy muscular giant-kin body with intact muted ocher-gray skin permanently mottled with irregular violet pigmentation, a blunt heavy-browed face, TWO dark amber eyes, sparse short black hair and a stern closed mouth with two small lower tusks. Exactly TWO arms with five-fingered hands, TWO legs and complete rough leather boots. Worn plain brown hide armor over dark coarse trousers, simple waist belt. Anatomical RIGHT hand holds ONE massive rough wooden greatclub low, entire head/handle visible; LEFT empty. Giant-kin, violet patches, hide armor and greatclub follow authored source; face, hair and outfit details are editable defaults. No added horns, wings, extra limbs, skull trophies, raid scene, victim or text.
+An editable broad olive-brown Ogre default with amber-brown eyes, close dark bristly hair, heavy jaw/two lower tusks and irregular violet skin patches. Nested grain lies inside pigmentation, with a coherent giant-kin body. Stitched umber hide armour and flax wraps, bare feet, right-hand wooden greatclub and one javelin secured on left back; left hand empty. No named lineage, band or new ability.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/76dd77039ef36a5a66ae887192d8fab58bf1def2a5b42c1f36b7171d274cf6dc.png)
+[Portrait](../../assets/characters/c13b1ed254c457da6c5927f2facd485de49bd6a71cc769f7759b19aa0332262d.png)
 
-[Full-body reference](../../assets/characters/9ea59a18c26fac9061d6056c8694b0edbbef3e41a4cae2be66b385471df5b2ca.png)
+[Full-body reference](../../assets/characters/c61499617f31352215e88406a72d24394ed01a79206582ad9c1df033674d8201.png)
 
-[Multiview reference sheet](../../assets/characters/77e03d76017b687d4f77e3572a5c62e566e72ce2f7cbd804dffdeea3521b1d47.png)
+[Multiview reference sheet](../../assets/characters/9790b5301655e7e99d5473f27f37a3f84b8c4bd09a65e55dfad5f623dab5f26f.png)
