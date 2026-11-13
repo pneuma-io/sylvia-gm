@@ -207,6 +207,12 @@ def _write(storage_root: Path, chat: CharacterChat) -> None:
     root = _root(storage_root)
     root.mkdir(parents=True, exist_ok=True)
     data = _encode(chat)
+    if len(data) > MAX_FILE_BYTES:
+        # Refuse rather than save a file that could no longer be read back.
+        raise CommandRejected(
+            "This chat is too large to save more. Start a new chat to continue",
+            code="character_chat_limit",
+        )
     temporary: Path | None = None
     try:
         with tempfile.NamedTemporaryFile(

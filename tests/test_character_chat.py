@@ -300,3 +300,14 @@ def test_owner_protocol_select_converse_restart_and_reopen(tmp_path, monkeypatch
                        .read_text(encoding="utf-8"))
     assert saved["format_id"] == "sylvia-gm-character-chat"
     assert saved["character"]["artifact_id"] == artifact_id
+
+
+def test_a_chat_too_large_to_read_back_is_never_written(tmp_path, monkeypatch):
+    chat = _chat(tmp_path)
+    monkeypatch.setattr(chat_module, "MAX_FILE_BYTES", len(
+        (tmp_path / "character-chats" / f"{chat.chat_id}.json").read_bytes()) + 50)
+    with pytest.raises(CommandRejected) as large:
+        send_message(tmp_path, chat_id=chat.chat_id, operation_id="big", text="Hello",
+                     expected_message_count=1, generate=lambda *_: "y" * 500)
+    assert large.value.code == "character_chat_limit"
+    assert load_chat(tmp_path, chat.chat_id) == chat

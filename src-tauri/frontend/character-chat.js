@@ -102,6 +102,7 @@
       node('character-chat-start').disabled = busy || !selectedCard() || !selectedModel();
       node('character-chat-input').disabled = !composerReady;
       node('character-chat-send').disabled = !composerReady;
+      node('character-chat-back').disabled = busy;
       for (const button of node('character-chat-saved').querySelectorAll('button')) button.disabled = busy;
     }
 
