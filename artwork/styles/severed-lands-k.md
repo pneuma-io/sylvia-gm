@@ -11,8 +11,8 @@ constraint for replacement catalogue art.
 - [Accepted Marla benchmark](../assets/styles/264bae18256a83fd10bea91715fb1aed8fa2ce8c309d8d122fe83c120fa660dc.png):
   use this exact image for drawing and painted finish, and for Marla's identity.
 
-The four starting designs now have prepared body/sheet/portrait bundles linked below. The wider
-historical catalogue still needs replacement. Siren Protocol has its separate supplied references.
+The four starting designs have prepared body/sheet/portrait bundles linked below. Catalogue
+coverage continues for Plan casts and inherited creatures. Siren Protocol has its separate supplied references.
 
 ## Rendering brief
 
@@ -699,3 +699,16 @@ Tavin has an optional editable Human appearance for the fixed player role in A D
 | Character | Full body | Multiview | Portrait |
 |---|---|---|---|
 | Tavin Bell | [Body](../assets/characters/d3187ad3597856f92aac6252e144e9d6f5f46bab6ed6e1c4801bf8e915ec01c7.png) | [Sheet](../assets/characters/69b4cb26bd707763c40bbd71bd7b0dabc02a6289780ff856f405643a298bcde4.png) | [Portrait](../assets/characters/c98a959eb5c4a9e0b9883afe7e628704d86ef13f555523eba4dbc0f239ec0f1b.png) |
+
+### Prepared Dead Inventory and Hold the Rope references
+
+Doss, Fara, Iven Pell, Edda Sorn, Pell and Sena have editable physical references based on authored Plan roles. Edda's sling represents her authored temporary shoulder injury; no rescue, permanent disability, negotiated outcome or extra mechanic is implied. Exact Plan/passage/name/Setting identity is retained. Individual owner sign-off is not claimed.
+
+| Character | Full body | Multiview | Portrait |
+|---|---|---|---|
+| Doss | [Body](../assets/characters/02959fcc742f74d68feeda613170ed5c68eb92d2b549f7fba7bf88aa3198f607.png) | [Sheet](../assets/characters/9ac09362a9910c0bd7051fd9209255508640cbfce8def3c8f7c45171f25f4aa0.png) | [Portrait](../assets/characters/22d61e7ba6d659294d738f0a1d9e1bda5d63e4517bb450ab0c6384a3a28de102.png) |
+| Fara | [Body](../assets/characters/48e0392c7cb70b894ccbf323678b2f3c698f7d6061fdd9071cbf6c2decde1432.png) | [Sheet](../assets/characters/041048cad30a02c1e5af98ba84a02b6914d158ed0d7aeec4d664acaca979d9af.png) | [Portrait](../assets/characters/fcac40a6223f74e62d52028df246e68451bbfb528cfc7aa5cddc8668d290f209.png) |
+| Iven Pell | [Body](../assets/characters/3adfea415018662142b3910e1951d15a4cd9dda6c1f27da62cbc1c468d7dcec3.png) | [Sheet](../assets/characters/17bef22e84a908a9d50ef852d88f8b36256528c7f6527868815e079f2e35d86f.png) | [Portrait](../assets/characters/a48419396d622f9ecd643e66dbfd2bb5b87f1a1015e38b7a8c9bf01838529e19.png) |
+| Edda Sorn | [Body](../assets/characters/726870362606986dad145870e5b50a7e6e445eec72dd751aca2e262363601662.png) | [Sheet](../assets/characters/791c55e0b9e54a5e51146d4ca468d96b64c24d26deca3c7d0ad484b112138e53.png) | [Portrait](../assets/characters/f7197ce53bbf938ac50214d032dadcf593c3b6d59865522c1fe6d06af7f5a4e7.png) |
+| Pell | [Body](../assets/characters/7107085d4ae52426f35c18e320e0b12324e6930b35e3b2398953cf950f80d466.png) | [Sheet](../assets/characters/1db505868f16fc948594a799feb1268ea4faffe44c8904dd06cc3547df7affc2.png) | [Portrait](../assets/characters/f3bf39f0a763272ebf358e5e4b3b53292538491fe6cbeb11f506a8dfc667813d.png) |
+| Sena | [Body](../assets/characters/3aaef614320bbc43b92581581eb824d82f162822b909ccaf883eada741cb30ea.png) | [Sheet](../assets/characters/f936e4bb4866b9d5824a18790094388267395831bb6adf849801a5247aaa7b03.png) | [Portrait](../assets/characters/1cb9fcb8c1e2c8764fabc2a0b3c1c61c9e06e21568ca8066b9ea5a56d9a39e13.png) |
