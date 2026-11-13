@@ -1108,23 +1108,23 @@
       }
     },
     "visuals": {
-      "appearance": "Adult Human in their mid thirties, tall sturdy build, warm medium-brown skin, gray-brown eyes and long dark wavy hair in one practical braid; earnest steady expression and a few flyaway hairs. Worn chain mail over a simple padded tunic, muted cream tabard with no heraldry, plain dark trousers and sturdy boots. Bareheaded. Holds a plain longsword lowered in the right hand and a weathered steel-rimmed wooden shield on the left arm, with a small plain geometric holy-symbol pendant without deity or faction insignia. A compact healer's pouch at the belt.",
+      "appearance": "Editable adult Human with rich dark-brown skin, broad square full-cheeked face, hazel-brown eyes, close black coils and earnest smile. Dark teal unmarked tabard over long-sleeved knee-length chain mail, cream padded layer, charcoal trousers and brown boots. One longsword and plain wooden shield; small wrapped unmarked symbol.",
+      "frame": {
+        "x": 0.55,
+        "y": 0,
+        "zoom": 1.1
+      },
       "full_body": {
-        "path": "assets/characters/d44b40ba43d11dbc0ae3ceea6141b0143242645185df0db5a0b613650da63e9e.png",
-        "sha256": "d44b40ba43d11dbc0ae3ceea6141b0143242645185df0db5a0b613650da63e9e"
+        "path": "assets/characters/2081418ddffe0ac9b975a5c7f22edfa745686e4b5476e56355f80418e4dbe7cc.png",
+        "sha256": "2081418ddffe0ac9b975a5c7f22edfa745686e4b5476e56355f80418e4dbe7cc"
       },
       "reference_sheet": {
-        "path": "assets/characters/5c7fab92a7af5ec796b949e46008ea852109db5e6dae174def7c7c9542791bb3.png",
-        "sha256": "5c7fab92a7af5ec796b949e46008ea852109db5e6dae174def7c7c9542791bb3"
+        "path": "assets/characters/eec1cd6fcf873f0ac294c794bbff6b1b7b688962ec62d28f9e260e32e0971a9f.png",
+        "sha256": "eec1cd6fcf873f0ac294c794bbff6b1b7b688962ec62d28f9e260e32e0971a9f"
       },
       "portrait": {
-        "path": "assets/characters/592088eee4f92f240f34baaa708b5c6c450f485c65d85b732eaa6a61a888e9bc.png",
-        "sha256": "592088eee4f92f240f34baaa708b5c6c450f485c65d85b732eaa6a61a888e9bc"
-      },
-      "frame": {
-        "x": 0.5,
-        "y": 0.35,
-        "zoom": 1
+        "path": "assets/characters/415cdd1c21c0a5c4d8dd09213ea95024c04bac17d69faf29334e51fd34244c23.png",
+        "sha256": "415cdd1c21c0a5c4d8dd09213ea95024c04bac17d69faf29334e51fd34244c23"
       }
     }
   },
@@ -1280,23 +1280,23 @@
       }
     },
     "visuals": {
-      "appearance": "Adult Human in their late thirties, lean rangy build, weathered olive-tan skin, green-hazel eyes, straight shoulder-length dark-brown hair tied back at the nape, no beard, a thin healed scar by the eyebrow and down one cheek; composed watchful expression. Worn brown studded leather armor over a muted gray-green shirt, dark travel trousers, practical leather bracers and boots, and a short moss-green hood-down cloak. Holds an unstrung longbow upright to one side, clear of the face; quiver of arrows on the back, a sheathed scimitar and sheathed shortsword at opposite hips, a small plain carved-wood Druidic Focus tied to the belt. No shield.",
+      "appearance": "Editable wiry adult Human with olive skin, narrow long-nosed face, light-brown eyes, smile lines and short sandy-brown hair. Moss linen and ochre neckerchief under russet studded leather, slate trousers and soft brown boots. One tall longbow held relaxed with both hands, quiver and sheathed short blades.",
+      "frame": {
+        "x": 0.6,
+        "y": 0,
+        "zoom": 1.1
+      },
       "full_body": {
-        "path": "assets/characters/ea3ccf9bf9855b6737ed9e6b0a94aa8a26360f93ee323151d2f8b826ce49f35d.png",
-        "sha256": "ea3ccf9bf9855b6737ed9e6b0a94aa8a26360f93ee323151d2f8b826ce49f35d"
+        "path": "assets/characters/3621997132bfaac3f547b345c546abc3f62eefb4fafabc529ff1011e519d3758.png",
+        "sha256": "3621997132bfaac3f547b345c546abc3f62eefb4fafabc529ff1011e519d3758"
       },
       "reference_sheet": {
-        "path": "assets/characters/a128bc78628b785208bbc4a19c1cd8c1c85b8d4029aaabc35c43a30bb9e251ad.png",
-        "sha256": "a128bc78628b785208bbc4a19c1cd8c1c85b8d4029aaabc35c43a30bb9e251ad"
+        "path": "assets/characters/31181c3c18d8c33bc86eb9ab318c1565982e01aba2eca647b8299d0d88749a2e.png",
+        "sha256": "31181c3c18d8c33bc86eb9ab318c1565982e01aba2eca647b8299d0d88749a2e"
       },
       "portrait": {
-        "path": "assets/characters/57f85048e5e055ebc4383911b91694cffb70523df4c302ea72a1f28ebe44892b.png",
-        "sha256": "57f85048e5e055ebc4383911b91694cffb70523df4c302ea72a1f28ebe44892b"
-      },
-      "frame": {
-        "x": 0.5,
-        "y": 0.35,
-        "zoom": 1
+        "path": "assets/characters/ca2716260c64510fe4d19cf0362db37d36dd34d9d2ec7300cc3daaca0b35838e.png",
+        "sha256": "ca2716260c64510fe4d19cf0362db37d36dd34d9d2ec7300cc3daaca0b35838e"
       }
     }
   },
@@ -1431,23 +1431,23 @@
       }
     },
     "visuals": {
-      "appearance": "Adult Human in their early twenties, short wiry build, fair freckled skin, hazel eyes and short tousled reddish-brown curls with one stubborn forelock; bright curious eyes and a restrained mischievous smile. Worn dark-brown leather armor over a plain muted plum shirt, charcoal trousers, soft dark boots, a simple belt and fingerless leather gloves. Holds a shortbow lowered at one side without drawing it; a small quiver of arrows on the back, a sheathed shortsword and dagger at the belt and a practical closed thieves'-tools pouch. No shield, mask or hood across the face.",
+      "appearance": "Editable short adult Human with rosy-brown skin, amber eyes, small angular chin, broad nose, uneven near-black bob/fringe and quick grin. Lilac shirt under plain brown leather, dove-grey trousers and ankle boots. One shortbow held low, spare sheathed shortsword and closed tools pouch.",
+      "frame": {
+        "x": 0.6,
+        "y": 0,
+        "zoom": 1.1
+      },
       "full_body": {
-        "path": "assets/characters/484b5b0b84402411f1a9f4c5ab011aefa8af978588e4f494afff27e3fe46f4e7.png",
-        "sha256": "484b5b0b84402411f1a9f4c5ab011aefa8af978588e4f494afff27e3fe46f4e7"
+        "path": "assets/characters/54c90ff6b7917e82397e5c64953f575295af58b726b1140f682d295dc2b98200.png",
+        "sha256": "54c90ff6b7917e82397e5c64953f575295af58b726b1140f682d295dc2b98200"
       },
       "reference_sheet": {
-        "path": "assets/characters/88af2223a0426ee70da3a7bbfe01480de58d1ee6d9a17a2fa224dda68d5ba62d.png",
-        "sha256": "88af2223a0426ee70da3a7bbfe01480de58d1ee6d9a17a2fa224dda68d5ba62d"
+        "path": "assets/characters/bcd6e765b1701717c07d5bad6002a8f36fefd4affe857d5770f5a7274b027377.png",
+        "sha256": "bcd6e765b1701717c07d5bad6002a8f36fefd4affe857d5770f5a7274b027377"
       },
       "portrait": {
-        "path": "assets/characters/10d5029db3dbcdbb7f36526b7a95a8e738855e05b22ffa5ba5ec464f637ae821.png",
-        "sha256": "10d5029db3dbcdbb7f36526b7a95a8e738855e05b22ffa5ba5ec464f637ae821"
-      },
-      "frame": {
-        "x": 0.5,
-        "y": 0.35,
-        "zoom": 1
+        "path": "assets/characters/7e39ee1d1a6174ab699846afeb9f9d0f4606e07db700cb38dadfbb892b2efa25.png",
+        "sha256": "7e39ee1d1a6174ab699846afeb9f9d0f4606e07db700cb38dadfbb892b2efa25"
       }
     }
   },
@@ -1593,23 +1593,23 @@
       }
     },
     "visuals": {
-      "appearance": "Adult Human with warm olive-tan freckled skin, brown eyes, shoulder-length dark brown curls with a light golden streak at the front, and a lively warm expression. Practical plum hooded robe over a cream laced shirt, plain brown belt, loose dark trousers and brown lace-up boots. An unlit purple orb focus in a brass-colored cage hangs at their belt. Carries a plain wooden spear; no armor or shield.",
-      "full_body": {
-        "path": "assets/characters/6773011d1deed4dd8b46ef552d51d74ff285783d063bb859899d7e5ea3067916.png",
-        "sha256": "6773011d1deed4dd8b46ef552d51d74ff285783d063bb859899d7e5ea3067916"
-      },
-      "reference_sheet": {
-        "path": "assets/characters/453b7f7533820f579bac825e406a650b6d2446c692630864ea7d62cf95689c1a.png",
-        "sha256": "453b7f7533820f579bac825e406a650b6d2446c692630864ea7d62cf95689c1a"
-      },
-      "portrait": {
-        "path": "assets/characters/38e6b01ec980efd570ef006a55f983976ea0081ffb99ca32821ee4b665e0f9c8.png",
-        "sha256": "38e6b01ec980efd570ef006a55f983976ea0081ffb99ca32821ee4b665e0f9c8"
-      },
+      "appearance": "Editable adult Human with medium golden skin, softly round face, honey-brown upturned eyes, short round black curls and bright open smile. Coral-pink cloth robe, deep-plum tunic, cream trousers and teal woven sash, all unarmored. One plain spear, small nonemissive stone focus, plain book pouch.",
       "frame": {
         "x": 0.5,
-        "y": 0.35,
-        "zoom": 1
+        "y": 0,
+        "zoom": 1.1
+      },
+      "full_body": {
+        "path": "assets/characters/512f075aee4775912a2a226937e830973ea04536a7d9929802c1fe9efaca359e.png",
+        "sha256": "512f075aee4775912a2a226937e830973ea04536a7d9929802c1fe9efaca359e"
+      },
+      "reference_sheet": {
+        "path": "assets/characters/146b06c053ef5fe758cad6589a93ede42d94b37d612ce009cdec87ff565bf774.png",
+        "sha256": "146b06c053ef5fe758cad6589a93ede42d94b37d612ce009cdec87ff565bf774"
+      },
+      "portrait": {
+        "path": "assets/characters/1cc3202e75b82421749083166dbf4f24a9b369612c82730801d67aaf627f14b5.png",
+        "sha256": "1cc3202e75b82421749083166dbf4f24a9b369612c82730801d67aaf627f14b5"
       }
     }
   },
@@ -1757,23 +1757,23 @@
       }
     },
     "visuals": {
-      "appearance": "Adult Human in their forties with deep warm brown skin, dark brown eyes, a narrow angular face, straight black chin-length hair with a side part, and a calm courteous expression. Plain brown leather cuirass and shoulder guards over a moss-green robe with cream collar and cuffs, dark trousers, brown belt and worn brown calf boots. Carries a closed leather notebook, a sheathed dagger and a small unlit round focus at the belt; no shield or supernatural body traits.",
+      "appearance": "Editable adult Human with cool medium-brown skin, long oval face, steel-blue eyes, smooth ash-grey chin bob/short bangs and courteous smile. Long indigo leather coat over wine-red linen, ochre sash and dark trousers. One lowered plain dagger, closed tan notebook, plain rod focus and book pouch; no patron iconography.",
+      "frame": {
+        "x": 0.6,
+        "y": 0,
+        "zoom": 1.1
+      },
       "full_body": {
-        "path": "assets/characters/a03a2047445aaaf685b515688f778a9feb18e70e7a8e11e172cb7d8792f36aa5.png",
-        "sha256": "a03a2047445aaaf685b515688f778a9feb18e70e7a8e11e172cb7d8792f36aa5"
+        "path": "assets/characters/70afb25d27939dcdb96478be708f0f38a2c82ea595a01e97acbc77eee7ccffa9.png",
+        "sha256": "70afb25d27939dcdb96478be708f0f38a2c82ea595a01e97acbc77eee7ccffa9"
       },
       "reference_sheet": {
-        "path": "assets/characters/d53de14fe01d6860b9ac76c7d5e82b6fb558b17ac986b3f10165517e92119138.png",
-        "sha256": "d53de14fe01d6860b9ac76c7d5e82b6fb558b17ac986b3f10165517e92119138"
+        "path": "assets/characters/e591601ea0d1c64b792e75d2838669899c4393cb3658894dac856dbcc2e973f0.png",
+        "sha256": "e591601ea0d1c64b792e75d2838669899c4393cb3658894dac856dbcc2e973f0"
       },
       "portrait": {
-        "path": "assets/characters/a6aa03f22b1c3b04db9eaf3481f35f5f814eba6a8f47219d4f643567d345d9ac.png",
-        "sha256": "a6aa03f22b1c3b04db9eaf3481f35f5f814eba6a8f47219d4f643567d345d9ac"
-      },
-      "frame": {
-        "x": 0.5,
-        "y": 0.35,
-        "zoom": 1
+        "path": "assets/characters/17085bfff9e0721770d70841c4ec4d72d5e7c953a4610680a05af719645ec14e.png",
+        "sha256": "17085bfff9e0721770d70841c4ec4d72d5e7c953a4610680a05af719645ec14e"
       }
     }
   },
@@ -1927,23 +1927,23 @@
       }
     },
     "visuals": {
-      "appearance": "Tall slim adult Human in their sixties with lightly weathered medium fair skin, gray-blue eyes, silver-gray hair tied at the nape, a short neatly trimmed gray beard and mustache, and a kind patient expression. A modest navy-blue robe over a cream buttoned shirt, plain brown belt, loose dark trousers and brown lace-up boots. Carries a plain wooden quarterstaff and a closed worn brown spellbook; no armor, shield, hat or jewelry.",
+      "appearance": "Editable elderly Human with deep-brown skin, broad build, bald crown/silver side curls, short silver moustache/chin beard, half-moon spectacles and kind lined face. Cream unarmored robe with azure edging and rust shoulder shawl. Plain wooden quarterstaff-focus, closed dark-blue spellbook and compact scholar pack.",
+      "frame": {
+        "x": 0.6,
+        "y": 0,
+        "zoom": 1.1
+      },
       "full_body": {
-        "path": "assets/characters/d4b3c80c92a4dfae74e39abdf80a2667d86ce5455d27ffba90310dbfc1a8066e.png",
-        "sha256": "d4b3c80c92a4dfae74e39abdf80a2667d86ce5455d27ffba90310dbfc1a8066e"
+        "path": "assets/characters/aae40560804d23f2e53ad1d180f8e886e647e1196586130a8bde0c94438aaf9c.png",
+        "sha256": "aae40560804d23f2e53ad1d180f8e886e647e1196586130a8bde0c94438aaf9c"
       },
       "reference_sheet": {
-        "path": "assets/characters/612d7a4de0392d7d2553b8f86d027e28bd3164008f0e5083e514c1288b394575.png",
-        "sha256": "612d7a4de0392d7d2553b8f86d027e28bd3164008f0e5083e514c1288b394575"
+        "path": "assets/characters/2adc7370771eb176fd044e81e802b68416ae29d758c95c4ad8ce40c584595498.png",
+        "sha256": "2adc7370771eb176fd044e81e802b68416ae29d758c95c4ad8ce40c584595498"
       },
       "portrait": {
-        "path": "assets/characters/33ed2655f8642e5b4d7e4d2dfe29fde5a37fc0fdf814624353f69d59986bdc15.png",
-        "sha256": "33ed2655f8642e5b4d7e4d2dfe29fde5a37fc0fdf814624353f69d59986bdc15"
-      },
-      "frame": {
-        "x": 0.5,
-        "y": 0.35,
-        "zoom": 1
+        "path": "assets/characters/f21bb36b1823ec36ba1ac9a26b3cba7eb4521b714d8b923fb617f9b0cacfe175.png",
+        "sha256": "f21bb36b1823ec36ba1ac9a26b3cba7eb4521b714d8b923fb617f9b0cacfe175"
       }
     }
   }
