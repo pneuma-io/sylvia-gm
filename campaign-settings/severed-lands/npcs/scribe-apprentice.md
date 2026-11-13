@@ -18,12 +18,12 @@ Earnest, curious, and dangerously well-informed. Quill represents the next gener
 
 ## Appearance and artwork
 
-A humanlike young adult second-generation Riftborn woman appearing in her early twenties, with a slight medium-height build, warm medium-brown skin, dark brown eyes, a soft oval face and straight black hair in a practical chin-length bob tucked behind the ears. An earnest, curious, carefully attentive expression and slightly forward-focused upright posture. A plain dusty teal sleeveless wool over-tunic over an ivory long-sleeved linen blouse with sleeves neatly rolled to the forearms, a lead-gray ankle-length skirt and simple closed brown leather ankle boots. A narrow plain leather belt carries a small closed leather writing-tool case at her anatomical RIGHT hip. Empty relaxed hands, a light ordinary ink smudge near one fingertip. Her earnest meticulous apprentice bearing follows the authored profile; age, features, clothes and ink smudge are editable visual defaults. She was born in the Severed Lands and has never crossed the Rift. No invented home-world memories, arrival scars, bird anatomy, feathers, giant quill, readable text, Warden records, revealed findings, forbidden inscription, magic, invented Athenaeum badge, noble heraldry or invented parental origin.
+A clearly adult human-like editable default with warm tawny freckled skin, an oval face, green eyes and short sandy curls held back with a plain dark band. Sky-blue, oatmeal and charcoal practical scriptorium layers accompany an earnest expression. Her left hand carries one closed copying book; her right is empty. Unspecified ancestry and private discoveries remain unassigned or hidden.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/b959c77cd346f06f1d4de88d8c8e531eb509ea8dacfaff0d466eb391ea1dda65.png)
+[Portrait](../assets/characters/4870063e172232c9a57bba844a29380248f72422f2ececf3ff0c7c4e129db9bd.png)
 
-[Full-body reference](../assets/characters/803bb27d956a46ed16db10fdeb7fe57b7cf8807ae3ecfbaf424db27ff5ab3db1.png)
+[Full-body reference](../assets/characters/ccfa2c9337c388c735cc52514972d1215a87e69fed4b561f062e1494b22fcc07.png)
 
-[Multiview reference sheet](../assets/characters/5e88d923d8606f9e5a41efc7a32237969f45a3a2b68f1ef268244905d3cfea69.png)
+[Multiview reference sheet](../assets/characters/2bbb6ebfd544a5c52a3b07a85a95ddc238af4ad493750b70dd442fb103fd5bb3.png)

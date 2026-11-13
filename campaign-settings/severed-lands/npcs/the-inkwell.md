@@ -20,12 +20,12 @@ The Inkwell is distracted, brilliant, and increasingly difficult to communicate 
 
 ## Appearance and artwork
 
-A thin hollow-eyed settled Human adult appearing in their fifties, with light olive skin, an angular tired clean-shaven face, fully violet irises and untidy dark graying hair loosely tied at the nape with plain cloth. Distracted weary expression, slightly stooped posture and thin hands held relaxed with gently flexed fingers. A faded charcoal-brown long travel coat over a sand-colored linen tunic, worn dark trousers and scuffed brown boots. A small closed cylindrical leather map case hangs at their anatomical LEFT hip from a strap over their RIGHT shoulder; one small closed dark ink bottle is secured at their anatomical RIGHT belt. Their thin hollow-eyed appearance and Speaker-stage violet eyes follow the authored profile and Hollowed source; apparent age, other features and clothing are editable visual defaults. Use they/them pronouns. No readable map, route, Warden Door location, invented prophecy, glowing eyes, exposed ink spilling, ink-body transformation, exaggerated trembling, motion blur, open scroll, weapon, crest, scenery or revealed discoveries.
+An older androgynous human editable default with a thin stooped build, cool olive skin, a long hollow-cheeked face, fully violet irises and short iron-grey hair around a high balding crown. Faded midnight-blue, dull orange, olive and grey clothes remain ordinary. A closed map case sits at their left hip and a tightly rolled blank-backed sheet in their right hand reveals no route or private discovery.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/c93235cc5426b17ca0b95417b582249557bc8c7a5f1922597206f9c73566a688.png)
+[Portrait](../assets/characters/3c5e95421cb21fb01be29bf91a485dd484afeeecad0344ed43584782dbc7d5ea.png)
 
-[Full-body reference](../assets/characters/fa382ea1a4ac26830e50b99d20cba53b9d0b97a0da4116a188302da83befac87.png)
+[Full-body reference](../assets/characters/e8a2d9559987d194bc46be8d51d08a8e69e0141be9e4ff8a79d1fc3f090facf1.png)
 
-[Multiview reference sheet](../assets/characters/b9d3b019e71b5e562d96588a628cec8ad4491f394bc2acb9ce72031c8d7b207f.png)
+[Multiview reference sheet](../assets/characters/c80c35080c9e0bf62c372452b56d835114182d1fdd43725f7212685ba1871aca.png)

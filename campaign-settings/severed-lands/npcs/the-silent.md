@@ -24,12 +24,12 @@ The Silent has been seen near Thornwall — unusual, they rarely come this far e
 
 ## Appearance and artwork
 
-A humanlike androgynous adult Riftborn paladin appearing in their late fifties, with a sturdy medium-height frame, warm medium-brown skin, dark brown eyes, a softly lined clean-shaven face and short silver-gray curls. A patient watchful expression with a subtle closed-mouth warmth, balanced upright posture. A plain worn steel breastplate over a charcoal quilted gambeson, a dark blue travel cloak, practical dark trousers and scuffed brown leather boots. Their anatomical LEFT hand holds a small rectangular wooden-framed blank dark slate by its lower corner at hip height; one short piece of white chalk is visibly secured to that slate's frame by a simple cord. A small CLOSED hand-bound leather ledger is secured in straps at their anatomical RIGHT hip, its blank cover and closed page edges visible. Their right hand hangs relaxed. Their slate, chalk, ledger and patient silent bearing follow the authored sources; apparent age, physical features, armor and clothing are editable visual defaults. Use they/them pronouns. Their home world and original name remain unknown. No writing or names, open ledger, speaking pose, open mouth, gag, sewn lips, muzzle, Anchor Church symbol, invented Rememberer crest, weapon, glow, halo, magical effects, scenery or revealed council danger.
+An older androgynous human-like editable default with deep brown skin, a broad-cheeked face, kind brown eyes and short silver hair around a bald crown. A strong build wears battered plain steel over russet and navy travel layers. Their left hand carries a blank slate with chalk kept at the left belt, and their ledger stays closed at the right hip. A warm closed-mouth expression preserves the vow without revealing their identity or method.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/fb4d8e20685de128b75f92b3266830f3ce1a3b82628012e5cf0cb55fcb2c445f.png)
+[Portrait](../assets/characters/101ec3f3f1486eacdf883d43b81b822fca3ca8f848c96cd371c07c062917f708.png)
 
-[Full-body reference](../assets/characters/31e984e3d8ac5a131f89e2fc7a3ee52545c7e3971f2d6caf27769ae6ae7e5087.png)
+[Full-body reference](../assets/characters/a4156bb0b2237c1a093ef158543a8579f9f7f5dfdaa27e6a3a67dbbbb12aa3c5.png)
 
-[Multiview reference sheet](../assets/characters/e6ec0275a7ebfc88c268202df3be81d0fabe4a12b5da296901d0295db68a7f57.png)
+[Multiview reference sheet](../assets/characters/156889307dd2dfa09197c5860a1c48b59f6351019c3defb516a567ecece8e9f5.png)

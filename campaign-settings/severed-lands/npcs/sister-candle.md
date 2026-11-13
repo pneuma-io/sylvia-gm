@@ -24,12 +24,12 @@ Candle found the pack — denning near an Anchor Clearing in the deep Margin. Sh
 
 ## Appearance and artwork
 
-A humanlike young adult Riftborn woman appearing in her early twenties, with a lean athletic build, warm medium-brown skin, dark brown eyes, a youthful angular face and dark reddish-brown hair in two short practical braids secured behind her neck. An intense focused unsmiling hunter's expression and controlled upright stance. Worn plain steel breastplate and small shoulder plates over a dark gray quilted gambeson with mail at the elbows, a muted forest-green cloak, charcoal work trousers and scuffed brown leather calf boots. One ordinary straight sword stays fully sheathed at her anatomical LEFT hip. A small closed hand-bound leather ledger is visibly secured in plain leather straps at her anatomical RIGHT hip, its blank cover and closed page edges visible, no readable writing. Empty relaxed hands. Her youth, focused hunter bearing and Rememberer's ledger follow the authored profile and order source; exact age, features, armor and weapon design are editable visual defaults. Her home world remains unknown. No Anchor Church affiliation or insignia, invented Rememberer crest, candle or flame anatomy, glowing eyes, halo, magical effects, blood, invented scars, open ledger, readable names, trophies, wolf companion or revealed pack encounter.
+A clearly adult human-like editable default with deep copper-brown skin, a compact athletic build, an angular face, grey eyes and close-cropped black coils. Plain worn steel over burgundy travel layers and an ochre scarf frame a tired focused expression. Her sword stays sheathed at her left hip and her small hand-bound ledger closed at her right. Private names and the hunt's outcome remain unseen.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/5d846c3c40686e5aae5c5385c2febedf0d514e68eed80d5736b3033202f3955b.png)
+[Portrait](../assets/characters/d2bc90d6035676978db7e86282b65c39d1e17624ce59863cc42ed1b3331d782a.png)
 
-[Full-body reference](../assets/characters/676bbe96d8e3dc5bb46b96224e4c5a5818841b74905e9f4cb1457a8b882ccd3c.png)
+[Full-body reference](../assets/characters/ae643e74e854575ca9dc8a6532ea119bec1416feb0cc07d398f82f8e10870e42.png)
 
-[Multiview reference sheet](../assets/characters/91e03d0e992a5e088e9a1592391906ec3a57b1c67327c2dcac911c5b6041e0d9.png)
+[Multiview reference sheet](../assets/characters/6bbad9b62a3296f7b00b355059d44ded06ea86938465918013b87e0afdc2d78a.png)
