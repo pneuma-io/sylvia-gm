@@ -49,12 +49,12 @@ A grotesque fusion of Warden construction and Rift-touched flesh — an Anchor D
 
 ## Appearance and artwork
 
-A hulking roughly human-shaped Warden stone guardian with a broad heavy torso, thick asymmetrical stone limbs and blunt stony hands, fused with sealed muted gray-brown organic tissue along joints and cracks. Worn pale-gray carved stone plates, restrained angular Warden masonry and small sickly violet Rift glimmers inside a few seams. Heavy impassive carved stone brow and narrow dim eye slits, no human face. Ancient precise construction mixed with an uneasy living posture. No exposed organs, gore, armor, clothing, weapons or faction heraldry.
+A human-sized stocky stone-and-organic editable default with one carved basalt head, two amber eye sockets, two blunt-fisted arms and two broad-footed legs. Closed mauve-grey tissue bridges warm-grey slabs in nested folds and vein channels with a restrained sickly internal pulse. The left shoulder is larger; the right forearm has more organic folds. No weapon, open wound, victim or new power is added.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/afee425aa4271a6e4af2b2d509ae6cc6a171d2467bc4a112832ff08f1c676702.png)
+[Portrait](../../assets/characters/dffbf56f8343d1e8296be710d74c20f2b1599e12a38455c5c9f6a7b3fe2d9817.png)
 
-[Full-body reference](../../assets/characters/8d5ca4ef4348d3fd6bbc806212ee59a3f1a0d98280fcf5924fd5b5b99a78c789.png)
+[Full-body reference](../../assets/characters/a8183d8fae6bf6157d477d3463076cf9975487f4da9092f37fc7320b18e9acae.png)
 
-[Multiview reference sheet](../../assets/characters/49e9bbbaa3c1e3f527b6d5f1fd7b6549a4795efc9cb3bb38a1fe2d2769a3c14e.png)
+[Multiview reference sheet](../../assets/characters/78ceeeeb05f6c5f03a81bd584f92fa5c5d9c6463e1d588a38243ab4931f9f33e.png)

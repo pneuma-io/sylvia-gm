@@ -38,12 +38,12 @@ A Hollowed adapted to the darkness of the underdeep — their eyes have atrophie
 
 ## Appearance and artwork
 
-A single adult humanlike Cave Hollowed of medium size with a strong lean climbing build, gaunt angular face, pale sightless clouded eye orbs with no colored irises, sparse short white hair and gray-ashen translucent flesh. Subdued violet Veil-light is visible as a branching vein network under the translucent skin of the face, neck, arms and shins, without exposed organs or gore. Thickened skin at shoulders and forearms, two muscular arms, five long claw-tipped digits per hand, two legs and broad bare clawed feet. A closed-mouth intent expression with head slightly angled as if sensing, shoulders held forward and a low balanced standing stance. A ragged plain slate-gray sleeveless cloth tunic covers chest and hips, with worn dark cloth waist and thigh wraps; limbs remain visible. Their pale sightless eyes, translucent flesh and visible Veil-lit veins follow the authored profile, with claws following its attacks. Detailed anatomy, features, vein pattern and clothing are editable visual defaults. No violet irises, normal seeing eyes, extra eyes, animal fur, quaggoth or ape head, huge fangs, crystal or glass statue, skeleton, fresh wounds, organs, gore, extra limbs, weapon, jewelry, insignia, victim, cave scenery or readable text.
+A powerful stooped humanoid editable default with a bald blunt head, two pale sightless orbs and long clawed arms. Milky translucent skin reveals fine violet-cyan vein loops beneath it. Plain charcoal and grey-brown cloth keeps torso and pelvis covered; broad clawed feet remain grounded. Its specific eyes stay pupil-less, without assigning a new ancestry, victim or supernatural ability.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/13a59bea878b8e00e6f6f5374bcd9b3aecfb07b31fe366ed509c13d52cfdf16b.png)
+[Portrait](../../assets/characters/c501ad2377e63a0887c039f6e81717c6ca91065f781236e80f6c08e61c379062.png)
 
-[Full-body reference](../../assets/characters/2356df30e5c6d83c55874962ab81ca93b5f4eebaf90090ee8da010102417b1ef.png)
+[Full-body reference](../../assets/characters/01ded4b53c97f191b8135c977a20a1c0854dc8c137e89e91e2142f29c7bdda76.png)
 
-[Multiview reference sheet](../../assets/characters/660240126543e2b788de391f2feacd8e2d809241ad87016424b713a4e1aa5b1a.png)
+[Multiview reference sheet](../../assets/characters/eb0acb6b170db07c791df9cfc8b46b0c2bb6e8de4bf0f172f0bfd2a96c564b54.png)

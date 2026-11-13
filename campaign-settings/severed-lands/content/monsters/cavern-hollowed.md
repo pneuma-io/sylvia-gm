@@ -39,12 +39,12 @@ A Hollowed found in the vast natural caverns beneath the Severed Lands, where Ri
 
 ## Appearance and artwork
 
-A single adult humanlike Cavern Hollowed of Medium size with a broad heavy bloated frame, thick neck, distended belly and swollen shoulders. Mottled slate-gray and dark moss-green skin, fully violet irises, sparse short dark hair, a heavy broad-jawed face and an intent wary expression. Two arms with five claw-tipped digits per hand, two thick legs and broad bare clawed feet. A ragged dark brown woven shoulder wrap covers the chest, with plain worn dark waist and thigh wraps. Their anatomical RIGHT hand holds one ordinary wooden javelin upright beside the body, its full point and shaft inside the frame; the LEFT hand hangs relaxed. Their bloated Rift-saturated humanoid form follows the Setting lore, with claws, bite and javelin following the source attacks. Detailed features, skin mottling, clothing and equipment design are editable visual defaults. No Cave Hollowed's sightless white eyes or translucent flesh, extra limbs, animal fur, reptile head, open wounds, gore, visible captive, ritual sacrifice, jewelry, insignia, pool or cave scenery, readable text or revealed shrine.
+A broad bloated humanoid editable default with a flattened bald head, small violet irises and opaque mottled moss, grey-brown and dusky-violet skin. Nested tissue folds along flanks and arms retain a stable two-armed silhouette. Plain umber and charcoal clothing covers the body; the left hand holds one ordinary javelin and the right is empty. No Hollowing stage, ancestry, captive or new transformation is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/d414aa6229ee6ae74b8be3d06736ca2e6b48e502b277b0e3a2c0dfdb619c8bac.png)
+[Portrait](../../assets/characters/b007233deb2d09c97151d41a7c32e571388077ca9b22060585924dddb517306a.png)
 
-[Full-body reference](../../assets/characters/d4e24902c6c013c90f607d23abc556e5680ae39915c522412e0780efe1fbdde5.png)
+[Full-body reference](../../assets/characters/c2559189cc5829922a74e126924b5bd17ac3ab9b4f6adae2fe80bbb4b1d994b8.png)
 
-[Multiview reference sheet](../../assets/characters/c323dd0a20fd323319793583a9094298f38bc97726a97b40177b56dda4455bf3.png)
+[Multiview reference sheet](../../assets/characters/604027acc13019db4c44cb5ae8997004c6204c8a11a40c0c745305888eeaf91f.png)

@@ -41,12 +41,12 @@ A humanoid who fell through the Veil and was shattered in the passage — body a
 
 ## Appearance and artwork
 
-A single adult humanlike Broken One with a medium-sized strong frame, weathered muted brown skin, dull gray eyes, a gaunt clean-shaven face and untidy short dark hair. Their body is fractured by the Veil into subtly overlapping contradictory pieces: small offset translucent contour fragments along the cheek, shoulders and forearms, while retaining one legible face, one torso, exactly two arms and two legs. A distracted strained expression and tense unbalanced but standing posture. Ragged plain brown hide armor over a dark cloth tunic, worn charcoal trousers and rough brown leather boots. Their anatomical RIGHT hand holds one ordinary worn greataxe low beside the body with its full head and handle visible; one plain javelin is secured diagonally across their back with its point safely visible above the anatomical LEFT shoulder. Their fractured humanoid appearance follows the authored Setting lore, while hide armor, greataxe and javelin follow the source equipment. Age styling, features, clothing details and exact fracture pattern are editable visual defaults. No extra complete person, duplicate head, additional complete limbs, exposed organs, dismemberment, gore, open wounds, orc tusks, invented stone anatomy, glowing eyes, identity from an old world, readable text, insignia, scenery or captive.
+An adult humanoid editable default with olive-brown skin, grey eyes, short tangled dark hair and worn brown hide over charcoal and rust clothes. Overlapping misregistered cheek, torso and forearm planes contradict each other within a single two-armed, two-legged silhouette. Restrained refraction follows those seams. A lowered greataxe is in the right hand and a javelin secured on the back; no ancestry, homeworld or new power is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/13501ab03ef8ce0004c31ef850cca44dd4ea3a86377a989c405f1011649b3cfe.png)
+[Portrait](../../assets/characters/00361b1663484055a6bd012e29da98c4492be2b2dcd91e030ddcf188ab1557dd.png)
 
-[Full-body reference](../../assets/characters/0a723bc3180ec8d98f65d3a188ee3d360cbea1a443a1c844ffc1c410f93b66a4.png)
+[Full-body reference](../../assets/characters/9717b84167ec13ff90e50629f548698a9dc7b0ea86aad02923f41a22c998a377.png)
 
-[Multiview reference sheet](../../assets/characters/72cf2b5cef6f182b8fff8d3b3b95235071bb338d9ba95c59c2df3b48127f5108.png)
+[Multiview reference sheet](../../assets/characters/6e794bc707ad8ecb04df4d3f3bfb61dec90dc51d578f496ad689df847377f052.png)

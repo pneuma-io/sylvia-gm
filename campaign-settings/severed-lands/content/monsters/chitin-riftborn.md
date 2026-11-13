@@ -40,12 +40,12 @@ A Riftborn creature whose body is encased in violet-tinged chitin plates grown f
 
 ## Appearance and artwork
 
-A single intelligent adult insectile Chitin Riftborn of Medium size, encased in layered dark umber chitin plates tinged violet with restrained crystalline Veil-stuff facets. A compact insect head with two dark amber compound eyes, one pair of short slender antennae and two articulated mandibles, no human face. Exactly FOUR arms: two strong upper arms at the shoulders and two smaller lower arms attached at the lower ribs. Exactly TWO powerful jointed hind legs with broad three-clawed feet, six limbs total. The two upper hands hold one long gythka polearm diagonally in front of the body, with a plain dark shaft and a slashing blade at each end, both complete tips safely inside the frame. The lower RIGHT hand rests against the lower shaft, and the lower LEFT hand hangs empty. One simple angular chatkcha throwing blade is secured in a plain belt sheath at the anatomical LEFT hip. No clothes beyond a plain dark leather utility belt and simple weapon straps; opaque chitin fully covers the body. Their intelligent insectile form and violet-tinged crystallized chitin follow the Setting lore; arm arrangement, eye color, plate pattern, exact weapon shape and other details are editable visual defaults. No extra limbs, human skin or hair, human face, wings, stinger, extra antennae, duplicate weapon, gore, glowing eyes, magic beams, hive scenery, other insects, insignia or readable text.
+An intelligent insectile editable default with one mantis-like head, two compound eyes, paired mandibles and two antennae. Four arms and two legs give a six-limbed silhouette; three-clawed hands and feet stay consistent. Violet-tinged crystalline chitin forms nested mineral lamellae. The primary right hand holds one gythka at the right side, a chatkcha stays sheathed at the left belt, and the other three hands are empty. This adds no mechanic or named origin.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/4293d4c12e2e604cf96e51b7ffc51a623f33d02415661cebb836cfd04ff7a59d.png)
+[Portrait](../../assets/characters/873dfdc5c0bbe7b4f30d3a9f23a2753d95e8d90a3e7a0e15b81b8b633ed51342.png)
 
-[Full-body reference](../../assets/characters/ae52b92b59c549b71bd2412ce8d57ea0dfd440ced3e89687384a6f99c13e53cc.png)
+[Full-body reference](../../assets/characters/f3dacdcf4bc1fe5efe7ba4b2cdaf1d1a66bbde033daab041dad847e980b11b12.png)
 
-[Multiview reference sheet](../../assets/characters/22b15ff7dea06cf86faca282432fa6494bbdbb4ed2e5390bda8e05b00ad1f426.png)
+[Multiview reference sheet](../../assets/characters/8813f94f636cb0f82aa6122698900703ebb749344da47a2e347b00f20fa326c4.png)
