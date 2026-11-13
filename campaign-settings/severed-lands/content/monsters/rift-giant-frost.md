@@ -41,12 +41,12 @@ A frost giant from a Rift-consumed world of eternal winter. Its skin is ingraine
 
 ## Appearance and artwork
 
-One Huge Rift Frost Giant in an editable anonymous mature adult female appearance: towering powerful broad build, cold pale ice-blue intact skin with small embedded ice crystals glowing violet from within, a strong broad face, two pale gray-blue eyes, long white hair in two heavy braids and a stern tightly closed mouth. Rough patchwork armor of worn dark iron plates and thick brown-gray leather, a restrained gray fur shoulder mantle, dark layered trousers and complete fur-lined heavy boots. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one long-handled iron greataxe low at the side with the entire axe head and handle visible; the LEFT hand is open and empty. A small thin puff of cold breath stays close to the mouth without hiding the face. The giant form, patchwork armor, greataxe and violet Rift-frost follow the authored source. Face, hair, gender presentation, outfit details and palette are editable visual defaults. No horns, helmet, ice-citadel scene, giant bow, actual attack, frozen victim, exposed injury, additional beings or readable text.
+An editable adult Frost Giant default: broad blue-grey living face, cold-blue eyes, white left-shoulder braid and inset skin ice with violet-lit nested facets. Unmatched iron/leather patchwork, dark fur, teal wool and wrapped boots cover a powerful huge figure. A greataxe stays in the right hand, left empty. The imagery adds no breath attack, named clan or resolved memory.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/c1f8b6e504962ffe215e04361a3e35f90e43bcfe45883da495006f5bd7b8ca5d.png)
+[Portrait](../../assets/characters/e3217f9320340d1e13f63b12f0c0e4e9ca8e42e68e68716e90df0970c8b5deec.png)
 
-[Full-body reference](../../assets/characters/5d8faa428e37108524c79b0f7fadd9578f78623626c110c578c37b6601d6c68b.png)
+[Full-body reference](../../assets/characters/a17c418a5d7059305a004cebb37ab72decd7900b0f7552a8e12cc3b649b38af5.png)
 
-[Multiview reference sheet](../../assets/characters/c8f19185f8dce7a95a00c659683d4216f0ddb669f9f30b6ec0aca3f1569dcf93.png)
+[Multiview reference sheet](../../assets/characters/0b496c1803c399b95bd3c36ada3b222499e6e82cf7dc9249581d5151c882b0f3.png)

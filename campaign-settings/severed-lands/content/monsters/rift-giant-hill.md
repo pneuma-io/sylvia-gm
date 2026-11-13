@@ -34,12 +34,12 @@ A hill giant whose ancestors fell through the Rift from a dying giant-world cent
 
 ## Appearance and artwork
 
-One Huge Rift Hill Giant in an editable anonymous mature adult male appearance: towering very broad heavy-bodied build with thick limbs, rough muted tan-gray intact skin carrying the authored faint violet pallor, a wide blunt face, heavy brow, two dark brown eyes, short coarse brown hair thinning at the crown and sparse brown stubble. A wary scowling closed-mouth expression. A plain worn earth-brown sleeveless coarse tunic reaching mid-thigh, dark leather waist belt, rough trousers and simple strapped leather foot coverings, both separate feet complete. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one massive roughly shaped tree-trunk greatclub low beside the body with the whole blunt wooden head and handle visible; the LEFT hand is open and empty. The giant form, inherited Rift exposure, violet pallor and greatclub follow the authored source. Face, hair, body proportions, clothing and colors are editable visual defaults. No farm/caravan raid scene, victim, food, exposed nudity, bone trophies, extra beings, named identity or readable text.
+An editable mature Hill Giant default with a barrel build, warm grey-brown skin carrying faint violet pallor, hazel eyes, brown topknot and chin stubble. Nested knuckle/forearm skin contours supply restrained Rift distortion. Ochre cloth, plain hide waist layers, trousers and boots cover the figure. A greatclub stays in the right hand, left empty. No personal ancient memory, raid outcome, victim or clan is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/a0522774ab9d9cf5b61d9120a3cd18930edcb1e576a3ff81d8a916170da0a368.png)
+[Portrait](../../assets/characters/eb1f513bf450c8b929eb8169fb1a2f9938148f85fa34be613ce3e739e4d6b971.png)
 
-[Full-body reference](../../assets/characters/427705b2735e4273d92bfa187d7e05addd77aa565d875547873bb49f7d9a43b3.png)
+[Full-body reference](../../assets/characters/cbf865e58dccd4d103a6ab0127206efdf179e7459e78548821750cf09a1e4f42.png)
 
-[Multiview reference sheet](../../assets/characters/b06db0c47b06321d537053fb7b0ab6828fee894f68c4dd498a3d1600ceaf3f2c.png)
+[Multiview reference sheet](../../assets/characters/1e95329f58f56487100eba8f0a3110adfa514703bf2b8e286953facaf82c3b62.png)

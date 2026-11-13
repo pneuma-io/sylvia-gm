@@ -40,12 +40,12 @@ A Rift Echo of hunger — formed when someone starved near a Rift pool, their fi
 
 ## Appearance and artwork
 
-One Medium Rift Ghoul in an editable anonymous mature adult female humanlike hunger-Echo appearance. A lean angular intact ash-blue-gray body, long sinewy forearms, exactly two arms and two legs, five fingers per hand ending in long dark claws, and complete bare feet. A narrow hollow-cheeked mature face, two dim icy blue-gray eyes, short uneven black hair with one loose forelock, and a tense wary expression with lips slightly parted to show a few ordinary pointed teeth. A plain frayed slate-gray long-sleeved tunic, sleeves above the wrists, dark worn trousers and a simple cloth waist tie. A low balanced listening stance, both empty clawed hands held away from the body. The hunger-Echo, claws and Rift-chilled bite follow the authored source; anonymous identity, gender presentation, face, hair, outfit and palette are editable visual defaults. No exposed injury, blood, gore, fresh corpse, feeding victim, actual starving person, death scene, green fumes, weapon, named history, scenery or text. No horns, wings, tail or pointed ears.
+An editable adult gaunt humanlike Ghoul Echo default: ash-olive complexion, angular face, pale ochre eyes and short uneven black hair. Closed nested throat/collarbone/wrist contours suggest a repeated hunger imprint. Rust-brown vest, cream shirt, moss-dark trousers and boots cover one complete figure with five attached clawed digits per hand. No former identity, death event, victim, mandatory corpse decay or new power is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/1c19f0098c0fa244e3d7f99b4abe61f2cb3352e4d5e392ddd5476a663748a8c4.png)
+[Portrait](../../assets/characters/2f6cecbda0a5ac3a3af50209d21c2cfa44ce9a9b9e4c5c81966b0cd17561b2cc.png)
 
-[Full-body reference](../../assets/characters/85143b98fe640c9a711b6ec61c5ff5731b28a19f3e7f1ab92d3037ddd0a7de4e.png)
+[Full-body reference](../../assets/characters/b9c4d953c7d058b86683b1c0eb3ffb6945437d7a9847cd60e37f869e16839afc.png)
 
-[Multiview reference sheet](../../assets/characters/32a4ff590a68cb6107b65a3bd9339dc0b2f7c23b7e5f4bbfce967b9ef72f0de1.png)
+[Multiview reference sheet](../../assets/characters/3832b20675f4f499dd844e70d9f754d0f01176fb680d7207104c7bc5cf237cd4.png)

@@ -42,12 +42,12 @@ A fire giant Riftborn from a world of volcanic forge-cities. Its body radiates u
 
 ## Appearance and artwork
 
-One Huge Rift Fire Giant in an editable anonymous mature adult male appearance: towering heavily muscled build, dark charcoal-gray intact skin with subdued warm ember undertones, a broad stern face, two copper-orange eyes, coarse short dark red hair and a thick short copper-red beard. Heavy plain blackened iron plate armor over charcoal fabric, articulated shoulder plates, a dark leather belt and complete heavy iron boots. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one enormous straight two-edged greatsword low with its complete blade and tip visible beside the body; the LEFT hand is open and empty. Sparse small violet Rift-energy flickers mingle with faint heat shimmer immediately above the armor and sword edge. The giant form, plate, greatsword, forge bearing, unnatural heat and Rift flickers follow authored source. Facial features, hair, exact armor construction and colors are editable visual defaults. No bronze dwarf body, flame hair/crown, forge/anvil scene, hammer replacing the sword, Rift pool, rune writing, crest, wounds, victim, additional beings or text.
+An editable adult Fire Giant default with warm dark copper-brown living skin, amber eyes, a square mature face and copper hair/beard. Blackened plate with copper edging, a dark red tabard and nested inward metal fluting surrounds a solid giant body; small violet heat flickers stay at selected armor gaps. A greatsword stays in the right hand, left empty. No recovered craft, new weapon power or named homeworld is revealed.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/b04bd0c3a50eb72c5cf378c7987e90b2bbaee02656857fe664ec65dc6db8eebc.png)
+[Portrait](../../assets/characters/5bb5f62119852d3d00d5c019f481a19d31599291c2e92628f920759c76cf64fc.png)
 
-[Full-body reference](../../assets/characters/1685eb01fd4d2dda27088685b304d96624017601ba90b00f82d3120b21a0c94c.png)
+[Full-body reference](../../assets/characters/da607ee0ed4d71562b7539b9291805a3cd36cbbfbabda526bb2d4e12e770e720.png)
 
-[Multiview reference sheet](../../assets/characters/fd7a331d25f091f352c052ff5d5dc36f865a069373b303804b2f485771647606.png)
+[Multiview reference sheet](../../assets/characters/692962fd4aae392c6e0eb5f65d95166c0808747f0fec69a6619b37f46860b2b6.png)
