@@ -40,12 +40,12 @@ A Riftborn entity that hunts not for flesh but for knowledge — it fell from a 
 
 ## Appearance and artwork
 
-One Medium Rift Seeker, an anonymous mature adult androgynous Riftborn scholar with a lean build, intact pale olive-gray skin, TWO deep plum-gray eyes, ordinary rounded ears, dark auburn hair in a neat low bun and one silver temple streak. A faint violet striation below the right eye. EXACTLY TWO arms with five fingers on each relaxed EMPTY hand, TWO legs and complete soft dark boots. Plain ivory-and-slate layered scholar tunic over opaque trousers, a muted violet sash, hand wraps, a belt pouch holding a closed unmarked notebook and one plain scroll tube; no readable writing or faction badge. Riftborn scholar and unarmed combat follow source; face, hair, clothes, gender presentation and gear details are editable defaults without naming an ancestry, person or stolen memory. No weapon, open book in hands, victim, psychic attack, library scene, letters or text.
+An editable mature humanoid Seeker default: narrow light-olive face, grey-violet eyes, oval wire spectacles and short receding ash-brown hair. Ink-blue/teal coat over parchment linen, dark trousers/brown boots; closed document wallets and one closed dark book secured at left waist, both hands empty. Inward paperlike coat folds remain material style; no species, named library, readable record, victim or new storage power.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/48139283ebec421ef2b3a958106387b2d900cd99e36ac4208d21f6327cc4f0df.png)
+[Portrait](../../assets/characters/ae3b94d2505aa2e10eac3cbc3fdecd3043d129ddddcb326ce4905e15cfd7c036.png)
 
-[Full-body reference](../../assets/characters/2637ee7410f8914080fc6e3c5d56819bfa5532a48fe15d790e4f15dd30c66bae.png)
+[Full-body reference](../../assets/characters/478ef920b5baa941b345af7f29b948148df488ecb88db0039b8976479ed904ee.png)
 
-[Multiview reference sheet](../../assets/characters/45da04065d86c5da2885b6f27b9aea24225d3560b7a71936edb012ed4ab270cb.png)
+[Multiview reference sheet](../../assets/characters/b10133b40af5e63b222380daec851b45bdae953109a9d13571407d97851dd2a0.png)

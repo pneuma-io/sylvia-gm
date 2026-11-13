@@ -41,12 +41,12 @@ A serpentine Rift manifestation of heat and hunger, its body a coil of violet-wh
 
 ## Appearance and artwork
 
-One Large Rift Salamander: ONE serpentine elemental body, a continuous long coiled tail of cooling charcoal Anchor-stone surrounded by close violet-white fire, with ONE hornless angular serpent-like head and TWO pale violet eyes. TWO humanoid stone arms with five stone fingers per hand; NO human legs, wings, hair or separate tails. Upper torso and arms are nonbiological cooling stone with restrained violet-white flame along seams, no nudity or human anatomy details. Anatomical RIGHT hand grips ONE simple complete metal spear upright beside the body, full spearhead/tip/butt visible; LEFT hand empty. Calm near-front three-quarter reference pose with one open coil and visible tail tip. Serpentine fire/Anchor-stone core, spear and tail follow authored source; head, arms, palette details and coil pose are editable visual defaults. No lava landscape, victims, grappling, attack, readable runes, identified artifact or scenery.
+An editable Salamander elemental default: one nonhuman serpent head/two pale eyes, one coiled cooling Anchor-stone core and tapering tail sheathed in violet-white fire. Two stone/fire arms carry a right-hand spear; left empty, no walking legs or wings. Nested inward flame whorls preserve one coherent body. No flesh-lizard origin, named place or new power is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/131dd1b2f3eef06affb0ef75e51b837ad2329c3298bb45b47d35c94def2cb35d.png)
+[Portrait](../../assets/characters/4b905386e269f0b2b58ca884220fdc91634828efd6c3a86d6817e4da46584731.png)
 
-[Full-body reference](../../assets/characters/1c9c539972716d4c582b04955b01bc1816b2e6f26b8b6fed176088d2d8bc10a4.png)
+[Full-body reference](../../assets/characters/7ccbf2ffca0efccc734d5b76de0eb2a080d886f402ce5143b5891a46524a6720.png)
 
-[Multiview reference sheet](../../assets/characters/ace5beaa4c7936ed91c81a441c96a852becbeaf0982310ade9ee82f3c43379f1.png)
+[Multiview reference sheet](../../assets/characters/09f72be657ef6f2a80648cc965b75bbc9be099a13607eb02987172f38aaa6ca1.png)

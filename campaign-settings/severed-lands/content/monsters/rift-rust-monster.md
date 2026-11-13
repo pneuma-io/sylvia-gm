@@ -35,12 +35,12 @@ A Rift-touched rust monster whose metal-consuming ability has been corrupted to 
 
 ## Appearance and artwork
 
-One Medium Rift Rust Monster in an editable armored insect-like appearance: ONE low oval segmented russet-charcoal shell body with a small front head, TWO dark eyes and ONE small closed mandible mouth. EXACTLY FOUR jointed walking legs, TWO on each side. EXACTLY TWO long feathery antennae rise from the snout and glow violet at their tips, each tip distinct and visible; ONE tapering tail ends in a flat broad paddle-like plate. Violet Rift flecks along the shell. Calm near-front three-quarter resting pose with all four feet, both antennae and complete tail/paddle inside margins. Metal-consuming creature and violet antennae follow authored source; shell anatomy, colors and paddle shape are editable defaults. No six/eight insect legs, wings, human limbs, extra antennae, metal scraps, ruined equipment, delver, feeding/attack scene, writing or scenery.
+An editable Rust Monster default: rust-orange/brown organic chitin body, two black eyes, two brushlike sensory antennae, four walking legs and one long segmented paddle tail. Nested scalloped chitin pits carry restrained Rift structure. Antennae are unlit in this no-metal neutral reference; violet glow remains conditional on nearby metal. No construct identity, eaten object or new ability.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/a730d1250f94b4c8e81ab0c2b0758035de89d23e2d4e86118c071db15cbf6ae2.png)
+[Portrait](../../assets/characters/f999d60c42f71e0bf71e2408857c16607b35ca9edb2b0f2314ba4ea137469894.png)
 
-[Full-body reference](../../assets/characters/e7c36f131c1ad9d0eb3bbf643c75805a4e67be409ceddec01c46f2454c350b25.png)
+[Full-body reference](../../assets/characters/a10887a8f7eac60110d901ba852bf4f2fa5ebb4c6847638f61e32e839b6765a4.png)
 
-[Multiview reference sheet](../../assets/characters/9f596062185c958bf5146ebedfb8986808a61e83135f7fee335fabbdee7c9481.png)
+[Multiview reference sheet](../../assets/characters/b846bf5a6ab0daa19b07dcb8064742a2fec960835da22e67512b10098be61728.png)
