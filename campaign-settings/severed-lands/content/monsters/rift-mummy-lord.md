@@ -56,12 +56,12 @@ A Rift Echo of royal death — the imprint of a ruler whose burial was catastrop
 
 ## Appearance and artwork
 
-One Medium anonymous adult humanlike Rift Mummy Lord royal Echo, fully wrapped in carefully layered aged ivory-gray funerary linen. Exactly TWO arms with five wrapped fingers per hand, TWO separate legs and complete wrapped feet. Head and mouth remain covered; TWO clear violet eye glints shine through narrow dark gaps, identity unrevealed. A plain age-dark bronze band circlet, unmarked bronze collar, long muted plum ceremonial mantle and simple dark belt distinguish royal bearing; no real dynasty or named monarch is declared. Soft violet remembered edges around the linen/mantle. Royal-death Echo follows authored source; wraps, circlet, clothes and colors are editable defaults. Both hands empty. No exposed corpse/bones, wounds, heart or canopic jar/location, subjects/court, victim, tomb scene, hieroglyphs or readable text.
+An editable generic royal-death Echo default: mature dark-umber partly visible face, pale jade eyes, ash funerary linen, low stepped bronze diadem and long petrol-teal ceremonial robe with bronze edging/clasp. Two empty wrapped hands and feet remain one coherent figure; nested inward fabric layers suggest Veil-scarring. No named ruler, culture, heart/jar identity or location is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/cf8e517367e24ffb34735bf443be91a2cda2a85611173fe899705c2f08a92187.png)
+[Portrait](../../assets/characters/d476cf697781d4492ed6fb0e6749b6f67d1a3d57ea99070cdd2ed53429455053.png)
 
-[Full-body reference](../../assets/characters/bdb4759c418c26ff6e390231ca901099d96e12206c69fa367c22078795e24161.png)
+[Full-body reference](../../assets/characters/ab55d70679b12853f1863f3e59eb5f770f303dbfe52a395825488e0f60390166.png)
 
-[Multiview reference sheet](../../assets/characters/fa48fc45408a6ecaaace733bd06c775a8edefe1438c5601bc1faa57fefd7aa01.png)
+[Multiview reference sheet](../../assets/characters/f8dd1c87262e5f8d535a2d9823c3bbad957b775e4b7be2baa1dd66feec15bb5a.png)

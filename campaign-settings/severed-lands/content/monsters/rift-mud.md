@@ -37,12 +37,12 @@ A sluggish but relentless elemental formed where Rift pools saturate soil after 
 
 ## Appearance and artwork
 
-One Small active Rift Mud elemental: ONE low dense opaque mound of dark brown viscous mud with wet ridges, a faint muted violet sheen and exactly TWO short side lobes ending in rounded fist-like masses without separate human fingers. A single continuous base with an irregular puddled outline. FACELESS: no eyes, mouth, head, human limbs, legs, wings or tail. The saturated-soil mud and fists follow authored source; mound outline, two fist lobes and surface pattern are editable defaults. No visible contained body, corpse, preserved victim, skeleton, clothing, swallowed traveler, death burst, scenery or readable text.
+An editable small faceless mud elemental default: one wet brown/olive clay-and-peat mound with two blunt attached slurry lobes and a pooled base. Nested sediment folds recede into dark inner chambers, with restrained cool-violet seams. No victims, organs, face or winged mephit anatomy; ordinary motionless mud-mound disguise remains.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/ea7011e6e2265419ee192e8e9c3cf4fff66f855677f96e387ce71de17ed278ea.png)
+[Portrait](../../assets/characters/7936b97574b42192794556870ec6372af5c2dddfbe8f559229afdb877f328549.png)
 
-[Full-body reference](../../assets/characters/2492e3114749b3269794f1d90e475bf8881d0556a091c594e719adc64013218b.png)
+[Full-body reference](../../assets/characters/a27b2a60faeb1bb151733660fb9fd157d9653da353af303f9c931cc91a339547.png)
 
-[Multiview reference sheet](../../assets/characters/b2f5995a6219a0decdba7514797d30d4cd789ce0e1d0e457d309f7081ba11970.png)
+[Multiview reference sheet](../../assets/characters/53b37c7a701ca72e30db82b8e6ba091b815a89c79b775373b5d54ad56f485e5b.png)

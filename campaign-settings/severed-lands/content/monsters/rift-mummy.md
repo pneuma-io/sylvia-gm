@@ -50,12 +50,12 @@ A Rift Echo of ritual death — formed when a burial ceremony was interrupted by
 
 ## Appearance and artwork
 
-One Medium anonymous adult humanlike Rift Mummy Echo, completely wrapped in aged gray-beige funerary linen. Mature upright proportions, exactly TWO arms with individually wrapped five-fingered hands and TWO separate legs with complete linen-wrapped feet. The entire head and mouth stay covered; TWO dim violet glints show through narrow dark eye gaps, with no revealed identity. A plain worn outer burial shroud and simple linen waist tie, a restrained violet translucent edge around some linen folds. Funerary linens and unfinished-rite Echo follow authored source; exact wrap folds, outline and colors are editable defaults. Both hands empty. No exposed bone, skull face, wounds, blood, gore, crown, weapons, named deceased, tomb/ritual scene, victim or text.
+An editable gaunt humanlike ritual-Echo mummy default: grey-brown partly visible mature face and ochre eyes under undyed flax funerary wrappings, two empty wrapped hands and two wrapped feet. Receding repeated linen folds suggest an interrupted rite within one figure. No individual identity, culture, royal rank, curse-origin rewrite or death scene is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/571c60f4b063e4c6456283dcd3fa0d16c36ddb97223d529179844f74203e4c5f.png)
+[Portrait](../../assets/characters/1b5ae3b46d62f0d947644db57ba0a9a817b5e18bbae771ed1e63cf7547e307f7.png)
 
-[Full-body reference](../../assets/characters/f363162a311b170143c1c3dc8ac2a0aeaa790f47c4062f8e29b14ce02e5b5d35.png)
+[Full-body reference](../../assets/characters/ddd989d3b1dacbc0b2e2b08c62ac495688ee60204c6cca5c3617ef08b3fd1ab2.png)
 
-[Multiview reference sheet](../../assets/characters/947d350a938bd23c2dbfbb226480b6b254367bf9302da21ab23b33a52345fdaf.png)
+[Multiview reference sheet](../../assets/characters/5e3615e6281a174666660e70397a3954a21c519003006fd100e30456374bbecb.png)

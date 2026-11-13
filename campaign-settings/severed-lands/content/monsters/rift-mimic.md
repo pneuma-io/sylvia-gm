@@ -42,12 +42,12 @@ A Rift-touched shapechanger that has adapted to the Severed Lands by mimicking W
 
 ## Appearance and artwork
 
-One Medium Rift Mimic in an editable ACTIVE Warden-artifact cache form: ONE squat rectangular dark stone reliquary-like body with aged bronze edge bands and simple unmarked geometric reliefs. Two hinged stone/bronze lid plates part slightly to reveal ONE dark tooth-lined mouth along the front seam, with no victim or object inside. Exactly TWO thick violet-gray pseudopods curl from the lower side seams, all tips visible. FACELESS apart from this mouth: no eyes, human head, legs or wings. The Warden-artifact disguise, pseudopods and bite follow authored source; this active cache shape, two-pseudopod arrangement and materials are editable representative defaults, not a declared universal true form or identified relic. No ordinary wooden furniture, actual Anchor Door, readable runes, treasure pile, victim, gore or scenery.
+An editable activated artifact-mimic default: one squat grey stone cache with dull bronze clamps and stepped arch relief, a single tooth-lined violet mouth at the lid join, and two attached blunt plum pseudopods. Nested offset arch lamellae recede inside the mouth. No eyes, readable script, named artifact or new mechanics; ordinary motionless-object disguise remains.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/03d3d4cc0ed2ade137cdb84117ed0692b380579bb0b9b73990f3d34ff1a25c0c.png)
+[Portrait](../../assets/characters/fcc810b8f6f220bbd1f15162155555ca1870576d751da346498635034804b8b7.png)
 
-[Full-body reference](../../assets/characters/e48c31b1fc167692152798f87eafa7eac80be73a959e53e2bf2d78aa79691929.png)
+[Full-body reference](../../assets/characters/a7c061b23437285c16da0ca5124a50cbb28eff8aaadfbb93a3446ddb12fb50b0.png)
 
-[Multiview reference sheet](../../assets/characters/30199fe2c9762cd6f3387739f4e18e302a9747ecea797bebe9da110d5476b12e.png)
+[Multiview reference sheet](../../assets/characters/ab1a8ce6068a58b91f4447de952c2c1ca1679c3a5561b2495a06b87bb4b31a06.png)

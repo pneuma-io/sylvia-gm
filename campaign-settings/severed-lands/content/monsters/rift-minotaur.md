@@ -36,12 +36,12 @@ A Rift-touched minotaur whose labyrinth-sense has been warped by Veil exposure i
 
 ## Appearance and artwork
 
-One Large Rift Minotaur in an editable mature adult masculine bull-headed appearance: broad dark brown bovine head with TWO complete thick outward/upward curved horns, TWO ears, TWO amber eyes and a closed muzzle. Powerful biped body with short brown fur and subtle muted violet Rift patches; exactly TWO arms with five-fingered hands and TWO legs ending in complete cloven hooves. Plain dark hide vest, rough brown trousers and a simple belt. Anatomical RIGHT hand holds ONE large iron greataxe low, complete axe head/handle visible; LEFT empty. Bull form, Veil-touched bearing and greataxe follow authored source; face, horn curve, clothes and palette are editable defaults. No wings, extra horns/limbs, skull body, deity insignia, maze/path diagram, phase-through-stone scene, victim or text. One long brown bovine tail with a dark tuft trails behind the legs; its shape and placement are editable visual defaults.
+An editable bull-headed minotaur default: charcoal-umber fur, pale broad muzzle, copper-brown eyes, two outward/upward horns with nested inward labyrinth grain, short black mane, two arms, two hoofed legs and one tufted tail. Plain dark leather/ochre-grey wraps; one iron greataxe held with both hands. No deity, rank or new traversal ability is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/69ed32a693324b2a35db8c42038117eaa5512f5b681c0b6c1f5ac5f124377b9b.png)
+[Portrait](../../assets/characters/5534986e26b7e68b9d6a7e19a2967f91eaf68621b1efab9fcb12bcf522211d2d.png)
 
-[Full-body reference](../../assets/characters/329467058aeec33f12fb29381cf150b3f7b8effa975c868e66285e1dcbde4c55.png)
+[Full-body reference](../../assets/characters/d467bc0961385932adfe4425e03ad906dc4b1d2816d907f3a5a626d6da4d6748.png)
 
-[Multiview reference sheet](../../assets/characters/57d616aa1b1c3d176812b9bc662786b5f12a7ad33f6f6d00bc705a35f8f01d71.png)
+[Multiview reference sheet](../../assets/characters/5113182ba98f4f0d8ccb965875c25469569fd35260f61f859de6f2dc778967a0.png)

@@ -38,12 +38,12 @@ A Rift-touched merrow — an aquatic ogre-kin adapted to the Severed Lands' Rift
 
 ## Appearance and artwork
 
-One Large Rift Merrow in an editable mature adult masculine aquatic ogre-kin appearance: broad heavy ogre-like head with two dull silver-gray eyes, two small lower-jaw tusks, dark teal-gray scales and violet-luminous gill slits along the neck. Exactly TWO strong arms with five webbed clawed fingers per hand; lower body is ONE thick scaled fish tail ending in ONE broad two-lobed caudal fin, no human legs or feet. A plain ragged slate sleeveless vest covers the torso. Anatomical RIGHT hand holds ONE simple wooden-shafted steel harpoon low, entire tip/shaft visible; LEFT empty. The aquatic ogre-kin, glowing gills and harpoon follow authored source; face, tail arrangement, clothes and palette are editable defaults. No wings, extra arms/tail, rider, Anchor Door, water scene, victim or text. Long black rope-like hair includes two simple thin braids.
+An editable aquatic ogre-kin default: broad grey-green face with amber eyes, short dark hair and two lower tusks; two clawed arms above a single dark-teal fish tail with a forked fin. Nested violet gill arches recede inside neck/rib tissue. Plain brown harness and flax waist wrap; a simple harpoon stays in the right hand, left empty. Tail and digit arrangement define this visual only.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/97f5683d1e9e6b59fdcbeb87744bbd5921f8127ec5b4bccb14140c9b8e30f539.png)
+[Portrait](../../assets/characters/2b1b5028a88aa2e6c93cdc86fd7b57a8dc7937520045fa017f1a4cf08485fbeb.png)
 
-[Full-body reference](../../assets/characters/f2659b489bd0563fe0176bd1fa153599b678450bcfaa71a61279f2adaba5e4c8.png)
+[Full-body reference](../../assets/characters/fb039fc435143293d7350a35c2d2e8edbdd5a0929b6f523d7ade22fa9d8be901.png)
 
-[Multiview reference sheet](../../assets/characters/1e444a13a3361f0a2f6b4dec51469e504b4827645a2094788b56de87e9ed042d.png)
+[Multiview reference sheet](../../assets/characters/c0286f567f7f2de34a96bb4da6da961b1754ba54428ab2fd7de7e9df36bc9fd7.png)
