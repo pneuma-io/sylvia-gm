@@ -36,12 +36,12 @@ A Rift-touched hippogriff whose flight feathers shimmer with trapped Veil-light.
 
 ## Appearance and artwork
 
-One Large Rift Hippogriff: a complete eagle-and-horse hybrid with one warm russet-feathered eagle head and neck, small pale cream brow accents, one dark gray hooked beak and two amber eyes; exactly two ocher-brown scaly eagle forelegs ending in dark talons; a chestnut equine torso and exactly two horse hindlegs ending in single solid black hooves; one long dark horsehair tail with no lion tuft; and exactly TWO broad russet-brown feathered wings attached above the shoulders. Wings are folded in a relaxed resting pose, complete outer contours and primary tips visible, flight feathers shimmering with restrained silver-violet trapped Veil-light. A watchful grounded near-front three-quarter standing pose with all four feet and the full tail visible. The hippogriff form and Veil-light flight feathers follow authored source; exact plumage, fur, eyes, colors and posture are editable visual defaults. This is an untacked representative, with no rider or selected cavalry ownership. No lion paws on the hindlegs, lion tail tuft, extra wings or legs, human face or arms, saddle, harness, ritual scene, victim, named history, text or scenery.
+An editable Hippogriff default with an ivory eagle head/forequarters, amber eyes and dark hooked beak; two four-toed eagle forelegs, chestnut equine hindquarters with two solid-hoofed hindlegs, two brown feathered wings and one horsehair tail. Nested flight-feather structure holds restrained Veil-light. No rider, bond or ritual outcome is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/2f1e69ef8482cef9d630fa4e13c70b5ceb93560c48aab49c044000aac87cbb5b.png)
+[Portrait](../../assets/characters/597e987e608dd4b7759394b6a8bbfd98ac011743776ec56441fdde0e9a0cc2d2.png)
 
-[Full-body reference](../../assets/characters/eac9815f0c3f33db2750ff3a881682b898c1f2d6a473efd0f8dded3e2c90303e.png)
+[Full-body reference](../../assets/characters/d3f9ef31a3d792d6f007c726052157ea6e5f3c5c9fe68f8d2c7ab9b52cff3fbe.png)
 
-[Multiview reference sheet](../../assets/characters/bf73d085cfaad4f676f5aab6617994ed82338c3aaec91e66fb07fa20b3c8cfbc.png)
+[Multiview reference sheet](../../assets/characters/721b52ac5a1d6157c8ffaed1aae6f14ed2746f5b16d8a9fbeac65af21464ad51.png)

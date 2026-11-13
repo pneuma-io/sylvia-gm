@@ -45,12 +45,12 @@ Where the Rift meets deep cold, it crystallizes into a jagged, moving glacier of
 
 ## Appearance and artwork
 
-One Small active Rift Ice elemental: a single floating upright jagged formation of translucent cold blue-white ice, violet frost along its ridges, with one broad faceted central ice core tapering downward. Exactly TWO short branching ice-claw arms extend low to either side, each ending in three sharp crystal points. A small scatter of attached ice facets and dim inner violet glow, with the entire formation clearly readable. FACELESS: no eyes, face, mouth, humanoid head, ears, horns, legs, feet, wings or tail. The moving jagged violet-frosted ice and claws follow authored source; the active shard outline, two claw branches and colors are editable visual defaults. It levitates without wings. No ordinary imp/gargoyle body, frozen inhabitant, settlement, victim, death burst, detached shards, actual breath attack, scenery or text.
+An editable active Ice default: one connected faceless jagged glacier shard of pale blue-grey ice, violet active frost and nested translucent internal facets. Two attached hooked material edges suggest claws without humanoid anatomy. It hovers as one complete mass; the normal motionless ice-shard disguise and authored mechanics remain unchanged. No trapped victim, wings or new ability is added.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/b2d4b6502292245a7af9dfce514fb1269a8c2dafcf95913262e547535441d694.png)
+[Portrait](../../assets/characters/69062a285c7822da967a34aff6615da8bf20d6d85658148249de3794b999bdd0.png)
 
-[Full-body reference](../../assets/characters/fad601c71ba35d75f0e07c358cf2f95e3735f75d8d1ffa32e6003f59f8d71895.png)
+[Full-body reference](../../assets/characters/9b618c41b97f945f38fed5ce7132945bd8efade56dcbc0f9dd21ebd378754d33.png)
 
-[Multiview reference sheet](../../assets/characters/212caecace9f9674044a2a3bbefabc6f6cc50e49595c35cc6b69534b0f181a54.png)
+[Multiview reference sheet](../../assets/characters/fe95d5b5d1a8ca66ee6bccc878f40caee14faf603ef38279fb67c562a2ad4975.png)

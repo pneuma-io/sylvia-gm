@@ -48,12 +48,12 @@ A storm giant Riftborn, the mightiest of the giant-kin who fell. Its voice carri
 
 ## Appearance and artwork
 
-One Huge Rift Storm Giant in an editable anonymous mature adult male appearance: towering powerful long-proportioned build, cool deep gray-violet intact skin, a broad dignified stern face, two pale silver-gray eyes, long wavy deep blue-gray hair and a neatly divided short silver-gray beard. Plain silver-gray chest and shoulder armor over a dark sea-blue long-sleeved tunic, a simple broad belt, layered dark trousers, a short plain sea-blue cloak and complete dark boots. Exactly two arms, two legs and five fingers on each hand. The anatomical RIGHT hand holds one enormous straight two-edged greatsword low beside the body, complete blade and tip visible; the LEFT hand is open at waist height with a few small violet lightning arcs only between its five fingers. The giant form, remembered royal bearing, greatsword and violet finger-lightning follow authored source. The anonymous face, hair, outfit, armor construction and colors are editable visual defaults. No named royal identity, crown or heraldry, actual final-storm memory, lightning striking a target, trident, wings, second sword, extra beings or text.
+An editable mature Storm Giant default with lavender-blue living skin, violet eyes, long loose silver hair and chest-length silver beard. Sea-green/slate layers have nested inward stormlike folds. A greatsword stays in the right hand; small authored violet arcs bridge the empty left hand's fingertips. No named lost world, recovered storm memory, emblem or new ability is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/d9beaea2ba2b751d63933c2f95047001ee9cd1aa6757dff86a13ac4582db3b58.png)
+[Portrait](../../assets/characters/e77a9bf4aa638b4fc9898c1cba359a47f040c92f573bd6dfecb23c9dbe955886.png)
 
-[Full-body reference](../../assets/characters/7186bcc432957330fe4014416c47271a33295de22540f5c3b2a5f9ff4514ae79.png)
+[Full-body reference](../../assets/characters/183d1ef16beaf6d465373b1bedb99ac0dc1d57ef2f73a9c46f60eb886a9de939.png)
 
-[Multiview reference sheet](../../assets/characters/71ff51f0150324b4cdfb562f87512275b5b5b04cf99ba8194d864b0667dcba67.png)
+[Multiview reference sheet](../../assets/characters/dec93ed804c8a60eceb2964b3b04dd74eb15dc86328a19332acee6b545b56b57.png)

@@ -33,12 +33,12 @@ A Rift-touched harpy whose lure-song carries the echo of the Veil itself — lis
 
 ## Appearance and artwork
 
-One Medium Rift Harpy in an editable mature adult female appearance: a weathered humanlike face with two dark brown eyes, medium warm brown intact skin, shoulder-length rough black hair and a guarded alert closed-mouth expression. Exactly two humanlike arms with five-fingered hands, exactly TWO separate gray-brown feathered wings attached behind the shoulders, and exactly two feathered bird legs ending in dark raptor talon feet. A plain opaque rough brown sleeveless wrap vest fully covers the chest and torso; a dark gray woven knee-length wrap skirt covers the pelvis and upper legs. Wings rest folded behind the body, with their complete feathered outer tips visible and a restrained muted violet sheen. The anatomical RIGHT hand holds ONE simple short wooden club low beside the body, fully visible; the LEFT hand is empty. The harpy form, lure-song bearing and club follow the authored source. The face, hair, outfit, gender presentation, feather arrangement and palette are editable defaults. No bare chest, nudity, sexualized pose, human bare feet, wing-arms replacing the club hand, beak instead of the humanlike face, extra limbs, listener/victim, lost-memory scene, named identity, writing or scenery. One long feathered tail trails behind the skirt as an editable visual default.
+An editable adult avian humanoid Harpy default with olive-brown skin, amber eyes, short burgundy hair, teal/leather coverings, two separate humanlike arms, two feathered back wings and two four-toed bird legs. Nested throat/wing feather vanes suggest inward Veil depth. A club stays in the right hand, left empty. The image assigns no victim, memory, prior identity or new song effect.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/6b44f33def8c24688385034e495b2697a529bf46c863ea1610dba13e7ebfe4b1.png)
+[Portrait](../../assets/characters/97939e00e05ee1a34c158b165ce050039f11f9d988e9cd233db7b7bfe1a1a2a6.png)
 
-[Full-body reference](../../assets/characters/324af3050e4e80e6d9cf5133f76825cb8349381653ab42a8860344f177fce070.png)
+[Full-body reference](../../assets/characters/157db8859f5c8c82a21699c4136b8012c5e6d930236bb4573d8f2d3e71e093f2.png)
 
-[Multiview reference sheet](../../assets/characters/c4fa0cda1c8c7100490e50c04a5ceade1cfc2c7d3e4672f6dad139a0845ecc43.png)
+[Multiview reference sheet](../../assets/characters/df89c37708bccadfa1fcae6ae58b5df827d03677afea420fbd1f4ccdd7b0f4e6.png)

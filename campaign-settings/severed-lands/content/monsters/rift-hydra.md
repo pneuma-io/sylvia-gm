@@ -37,12 +37,12 @@ A Rift-touched hydra whose regenerative heads have been accelerated by Rift expo
 
 ## Appearance and artwork
 
-One Huge uninjured baseline Rift Hydra: ONE powerful low reptilian torso, exactly FOUR short muscular clawed legs, ONE long tapering reptilian tail and EXACTLY FIVE separate long necks, each ending in ONE complete reptilian head. Fan the five necks apart so all FIVE heads are easy to count, with no overlapping heads or hidden extra head; each has two small amber-yellow eyes and a single mostly closed tooth-lined mouth. Mottled dark olive and charcoal scales with restrained muted violet Rift sheen near the neck bases. A quiet alert near-front three-quarter grounded stance, complete feet and tail tip visible. The five-head baseline and regenerative hydra form follow authored source. Exact scales, colors and uninjured head shapes are editable defaults; this reference does not portray the later warped regrowth state. No severed head, missing head, wounds, blood, gore, sixth head, wings, horns, extra limbs, victim, swamp scenery, labels or text.
+An editable baseline Hydra default with exactly five distinct heads/long necks on one broad green/slate reptilian body, four clawed legs and one tail. Each selected head keeps two amber eyes and one mouth; nested inward scale whorls provide Rift depth. Its possible warped regrowth remains authoritative without depicting a severing, past regeneration event or extra starting head.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/8631b25f398ccab915d7aec448aeb9d0b53301d557e56d1b7ef715cfeeda8fb7.png)
+[Portrait](../../assets/characters/99de76735df6f147af90097931588de1b63b6043f67605f49d16859f6af476bd.png)
 
-[Full-body reference](../../assets/characters/bbeda38393fbb7784db3fccb39b18d6ad2fc33e90642ee2853aa63ccf0412330.png)
+[Full-body reference](../../assets/characters/1f9f2b7a532e1645d0e05ca3f79da1fa8208ef8f3f7411257122d71b0acfda44.png)
 
-[Multiview reference sheet](../../assets/characters/278c3527dc7c1cbcc8a7c5eedba9b7dc2a32c1d7179e435035686d9d574e8c8d.png)
+[Multiview reference sheet](../../assets/characters/0961441b3f5f26c9591be6fc8f691404cc5ce6beb32ebc06ae7dc26fac39d530.png)

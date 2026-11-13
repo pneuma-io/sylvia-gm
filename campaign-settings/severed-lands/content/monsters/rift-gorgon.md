@@ -39,12 +39,12 @@ A Rift-touched iron-plated bull whose petrifying breath is a concentrated burst 
 
 ## Appearance and artwork
 
-One Large Rift Gorgon: a powerful complete bull-shaped creature clad in overlapping dull iron plates, heavy shoulders, a broad bovine head and muzzle, exactly two thick outward-and-upward curved dark iron horns, two ears, two dim violet-gray eyes, four sturdy legs ending in cloven iron hooves, and one long flexible plated bull tail ending in a dark rough brush. Intact layered iron surfaces have restrained weathering and subtle violet glints in the plate seams. A small faint violet Veil-stuff wisp stays close to the nostrils without obscuring the muzzle; a calm alert standing reference pose. The iron-plated bull, horns and Veil breath follow the authored source; exact plating, horn curve, eyes and palette are editable visual defaults. The visual reference does not choose between creature-type labels in source editions. No human face, Medusa snakes, wings, extra horns or legs, rider, saddle, victim, standing-stone victim, petrification scene, mechanical gears, writing or scenery.
+An editable iron-plated bull default with olive-gold eyes, two curved horns, four cloven-hoofed legs and one dark tufted tail. Nested inward iron ribs and restrained violet seam depth alter the plating while the bull's outer anatomy remains clear. No rider, machine mechanism, victim identity or added power is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/a11ffcc64a62af2a8d53f0d2999506fbc63338317bcddacf8b70f2eace2d1491.png)
+[Portrait](../../assets/characters/6e5995af9048b0e96bba2cba593b5a5c4b51d3c8438328b45a895c72646b0653.png)
 
-[Full-body reference](../../assets/characters/2663464b266d5de05d4ba04bdf4f381886e99e2c11b0c8856790bfaadda791b2.png)
+[Full-body reference](../../assets/characters/cdcd7e99dd9431ae158ab3e72bb97a0f4c05d77f003ab061ef2a24758a7b99f2.png)
 
-[Multiview reference sheet](../../assets/characters/36ce25a2b621e63a5dd830ee9cbec82d5711c5fe1e962b540d17a2bb18395fd3.png)
+[Multiview reference sheet](../../assets/characters/40741eac3b15e54a93c24ae1c48a95b1138ea1efb3419128fd723ddeb58321d8.png)
