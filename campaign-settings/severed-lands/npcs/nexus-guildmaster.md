@@ -20,12 +20,12 @@ Vance is smooth, calculating, and genuinely believes that trade solves more prob
 
 ## Appearance and artwork
 
-An adult settled Human man appearing in his early sixties, with a stocky well-fed build, light olive skin, dark brown eyes, a broad lined clean-shaven face and short sleek black hair graying at the temples and combed neatly back. A smooth, calculating, courteous expression with a restrained half-smile and assured upright posture. A finely made dark bottle-green wool frock coat with plain bronze buttons, over a muted ochre waistcoat and cream high-collared shirt, blue-gray tailored trousers and polished dark brown leather shoes. A simple dark leather belt supports one small closed pouch. Empty relaxed hands. His polished experienced merchant's bearing follows the authored profile; age, physical features and exact clothing are editable visual defaults. No council regalia, elected-office badge, noble heraldry, invented guild emblem, crown, contract, map, ledger, tariff scheme, magical effects, threatening villain pose or disclosure of private negotiations.
+An adult human default with warm brown skin, a high forehead, long straight nose, brown eyes and neat swept-back black hair. Deep aqua, cinnamon and cream tailored merchant clothes and flat shoes accompany a smooth measured smile. Both hands are empty. His representative role gains no council office, new emblem or revealed negotiation.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/e1a2834873c1691fce0ebb6de1b7ff3d3ae42023b059e08a29473cd18bb4a834.png)
+[Portrait](../assets/characters/37afb5f104275701bbcc4f9156ec5c436a89cfc3e542839ae76c3c3c3f333866.png)
 
-[Full-body reference](../assets/characters/cebaeebfc573bb9b1a2a6282b5abe91d6d7f6c18078aca05bdbbd60e84f5ff80.png)
+[Full-body reference](../assets/characters/fa2959900f45c7671261bcf9cbd09005c57c683b5afebf1704df7c2289b90616.png)
 
-[Multiview reference sheet](../assets/characters/32b1e3347819f4ee086defaf57cb340c2e5f026043800dcf59ac65241e0e4590.png)
+[Multiview reference sheet](../assets/characters/191c3931b139096ea3e06457ccc8e7d6a3752bb8e31df5be2e2fd1eea6b6cc6e.png)

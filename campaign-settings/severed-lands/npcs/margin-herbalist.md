@@ -18,12 +18,12 @@ Briar is practical, independent, and completely comfortable in the Margin's bord
 
 ## Appearance and artwork
 
-An adult settled Human woman appearing in her late thirties, with a sturdy wiry working build, warm brown skin, faint freckles over a broad nose, hazel-brown eyes and thick dark brown hair secured in one practical braid down her back. An alert, grounded, matter-of-fact expression and relaxed balanced stance. A weathered muted moss-green short hooded wool cape with the hood DOWN, over a brown linen waistcoat and beige shirt with rolled sleeves, dark earth-brown trousers and muddy sturdy leather ankle boots. A closed plain canvas foraging bag hangs at her anatomical LEFT hip from a strap over her RIGHT shoulder; a small closed leather pouch sits at her opposite hip. Both hands relaxed and empty. Her practical independent borderland-forager bearing follows the authored profile; age, physical features and clothing are editable visual defaults. No Scaled anatomy, druid costume, antlers, floral crown, deep-forest affiliation, invented emblem, glowing herbs, magical effects, weapon, animal companion, invented scars, transformed skin or invented forest powers.
+A lean adult human default with bronze-brown skin, a long cheekboned face, hazel eyes and two slim dark braids down her back. Olive, ochre and grey-brown practical layers and flat boots suit edge foraging. A closed canvas bag sits at her left hip and a small knife stays sheathed at her right; both hands are empty. No specific herb, deeper expedition or magical trait is assigned.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/90ff44bee1f075fa16efdb3e25a8b4d1ca97361d07dbdca1560428eb9c9b5c4a.png)
+[Portrait](../assets/characters/caefe90ec95a044ae7e0238c5c47ae1b5840a27125be4beb6eae6f7ce2925f94.png)
 
-[Full-body reference](../assets/characters/59c0f419a8995c9176eba7349728e39f683bb544fd161cf39f1bbd0e2210d42a.png)
+[Full-body reference](../assets/characters/b447f9d200432620ed11291b171bb03664aa59784ed900d8c95fa2e01dbb8f7e.png)
 
-[Multiview reference sheet](../assets/characters/80fff7c7d2722036e4e1797aee1256021c7d81589bd54b9f37b74e369e658c39.png)
+[Multiview reference sheet](../assets/characters/0d1c3422f95b8c72ae8e7e5d126b1d9424cb507b72e1d75a6cd709ae2c21b499.png)

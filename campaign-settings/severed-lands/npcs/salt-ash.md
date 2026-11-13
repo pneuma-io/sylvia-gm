@@ -20,12 +20,12 @@ Salt-Ash is intense, fragmented, and fighting to stay coherent. The Hollowing is
 
 ## Appearance and artwork
 
-An adult Human woman at the Hollowed Speaker stage, appearing in her late forties, with a lean angular build, tawny brown skin, an expressive narrow lined face and short black hair threaded with gray, loosely waved and slightly disheveled. Both eyes have uniformly VIOLET irises, dark round pupils and natural white sclera; violet eye color throughout each iris, with no glow. An intense searching scholarly expression, visibly concentrating, alert upright posture and empty relaxed hands. A careworn charcoal-blue knee-length wool scholar's coat over a gray linen shirt, muted brick-brown work trousers and scuffed dark leather ankle boots. A plain belt carries one small closed pouch. Her Speaker-stage violet eyes and intense scholarly concentration follow the authored profile and Hollowed source; age, other physical features and clothes are editable visual defaults. No invented Unbound or Athenaeum badge, readable notes or Warden inscription, magical effects, glowing eyes, cursed veins, lesions, deformity, weapon, revealed warning or invented conclusions about the last Door.
+A mature human default with cool deep-brown skin, a long fine-cheekboned face, short white natural hair and fully violet irises without glow. Plum, pale grey and navy practical scholar layers and flat shoes retain ordinary human anatomy. Her right hand carries one closed plain notebook and her left is empty. The image adds no readable research, resolved warning, prophecy or new transformation.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../assets/characters/9823ac30ac6011d35c2099afc9742106b7828d5f52bec7dedafb2807924e1f0c.png)
+[Portrait](../assets/characters/3da661c514ba7bf9253e75d4a04c7ee4b375701cbcc0625249edbe968de588c2.png)
 
-[Full-body reference](../assets/characters/28db251053a742ae760ddc2806d3651bd8b346c9fed40f8cc2c7b481eeb1a913.png)
+[Full-body reference](../assets/characters/f0ae4e3a3b66a47925d29d87dafad9635e5088c481d07f56f670436ba46699b6.png)
 
-[Multiview reference sheet](../assets/characters/6c3fb94da99ab3e7f3f82784d575e3f5fc3985f72d69b6caf029709c6cb70e13.png)
+[Multiview reference sheet](../assets/characters/36c24c513a04bfb62153dff67a06fff27f88c3df94a83e6e6b9356650ffbb80f.png)
