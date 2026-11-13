@@ -2,7 +2,7 @@
 
 > **Status:** Active planning and handoff authority
 >
-> **Updated:** 2026-11-11
+> **Updated:** 2026-11-13
 
 This is the repository status surface synchronized with Dot Desk (formerly Project Desk).
 The latest owner-selected work item determines scope. The product contract owns requirements,
@@ -24,6 +24,13 @@ Focused source checks and a real-WebUI journey with a synthetic provider qualify
 PR. Independent review, acceptance and merge remain with Fluff; installed/native-input,
 genuine-provider and release acceptance are separate and unselected. Artwork PR #34,
 SylviaBench, Trigger Discipline and Media work remain outside this integration.
+
+**13 November 2026: GM tool surface (W8 stage 1).** The owner selected showing the GM only
+the SRD Lite tools the current campaign can use, from main `9090dd8`. Presentation-only
+exposure conditions and casting-tool spell scopes are new in SRD Lite `0.3.24`; engine
+admission is unchanged. The starter Cleric's first request falls from 154 tools and 420,975
+tool bytes to 93 and 263,655. Per-spell casting inputs (W8 stage 2) and entry-point
+consolidation (stage 3) remain unselected. Real-provider and benchmark checks are separate.
 
 **12 November 2026: casting contracts and refusals.** The owner selected the casting,
 refusal and Ruleset-guide follow-up in its own isolated checkout from main `ecfb8cf`.

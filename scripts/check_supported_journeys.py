@@ -359,6 +359,7 @@ PYTHON_JOURNEYS = {
     "gm-request-contracts": [
         "tests/test_gm_memory_casting_hotfix.py",
         "tests/test_gm_schema_minimal_refusals.py",
+        "tests/test_gm_tool_exposure.py",
     ],
     "provider-contracts": [
         "tests/test_provider_session_transport_projection.py",

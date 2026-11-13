@@ -666,13 +666,21 @@ def test_actual_gm_catalog_excludes_permanent_refusals_and_preserves_lock(lite_s
     assert "golden-bell" in json.dumps(
         json.loads(fresh["content"].split("\n", 1)[1])["PLAYER_KNOWN"]
     )
-    # Frozen Cleric request was 413,576 bytes after stub removal. Allow the measured
-    # casting descriptions and enums, while catching a return to 549,640 stub bytes.
-    assert len(json.dumps(tools).encode("utf-8")) < 450_000
+    # SRD Lite 0.3.24 exposure: 154 tools and 420,975 bytes became 93 tools and 263,655
+    # bytes for this Cleric. Catch a return of the hidden follow-up and casting tools.
+    assert len(json.dumps(tools).encode("utf-8")) < 290_000
     assert not any(name.endswith("_select_srd_clone_body") for name in names)
     assert any(name.endswith("_cast_spell_outside_combat") for name in names)
     assert any(name.endswith("_read_campaign_reference") for name in names)
-    assert len(tools) == 154
+    for hidden in (
+        "_cast_srd_reaction_spell",
+        "_begin_srd_after_hit_smite",
+        "_mount_srd_otherworldly_steed",
+        "_use_srd_second_wind",
+        "_record_srd_magic_jar_container",
+    ):
+        assert not any(name.endswith(hidden) for name in names), hidden
+    assert len(tools) == 93
     casting = next(
         t["function"] for t in tools if t["function"]["name"].endswith("_cast_spell_outside_combat")
     )
