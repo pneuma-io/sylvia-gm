@@ -37,12 +37,12 @@ A one-eyed Riftborn giant whose single eye sees into the Veil itself. Cyclopes w
 
 ## Appearance and artwork
 
-One Huge adult Riftborn Cyclops giant with a massive broad weathered humanlike body, charcoal-gray skin, two powerful arms and two sturdy legs, ordinary five-digit hands and bare feet. A mature lined face with exactly ONE large central eye, a muted pale violet iris and a single heavy central brow; no paired eye sockets or hidden second eye. Sparse coarse dark hair and a short rough dark-gray beard. A troubled contemplative oracle's expression with mouth closed. A plain rough brown open hide sleeveless vest and knee-length dark hide kilt clothe the torso and hips. The anatomical RIGHT hand holds one thick plain wooden greatclub low beside the body with its complete end visible; the LEFT hand holds one ordinary rough throwing rock at waist height. One-eyed giant anatomy, Veil-seeing bearing, greatclub and rock follow the authored Setting source; age styling, features, palette, clothing and equipment details are editable visual defaults. No extra eyes, face on the rock, extra limbs, pupil symbols, prophecy text, crown, dead-language writing, captive, gore, injury, coastal scenery or revealed vision.
+A Huge mature editable Cyclops default with slate-brown skin, one central violet eye, rough dark-grey hair and short beard and a heavy square face. Nested temple/shoulder creases provide restrained Rift refraction without a second eye. Ochre/slate practical clothes, right greatclub and left ordinary rock add no prophecy, oracle rank, homeworld or power.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/1fc6349f25e2ec3cb6e2a9f148a5155da2f1fc46bb22583f231e393ac36695a3.png)
+[Portrait](../../assets/characters/42769a87b6cebb141af719757996cc6f3a4feb8101f8de704ac712970d41d381.png)
 
-[Full-body reference](../../assets/characters/68da25fa1c1743cb534b6748453a2a64dbeb95dea9e03fa92844eb0ca63b26cb.png)
+[Full-body reference](../../assets/characters/2738c89335b99dc2e16740caa8bb3eba99586f53fef2a1c77715f760e05de7c6.png)
 
-[Multiview reference sheet](../../assets/characters/0111f191a9d1dda01d5ecb5eda80869230a5b1f0bb6f04c3ff8671c12222878a.png)
+[Multiview reference sheet](../../assets/characters/1c73fd7706d1e38ecb35a6c295d1d5b7523909cbbd50649f890e14391bf3329b.png)

@@ -42,12 +42,12 @@ A two-headed giant Riftborn whose twin minds have been driven in opposite direct
 
 ## Appearance and artwork
 
-One Large adult two-headed Riftborn Ettin giant with one massive broad gray-brown body, exactly TWO separate heads on TWO necks rising from the same shoulders, TWO arms and TWO sturdy legs. Each mature giant head has two ordinary eyes, a nose and mouth. The anatomical RIGHT head has a broad blunt face, short matted dark hair and patchy bristling beard, with an angry heavy-browed scowl; the anatomical LEFT head has a narrower face, a dark side braid and short rough beard, with a calculating sidelong expression. A plain rough brown hide vest covers the broad chest, with a knee-length dark hide wrap and simple leather wrist bands; bare feet with five toes each. The anatomical RIGHT hand holds one plain iron battleaxe low beside the body, its entire blade visible; the LEFT hand holds one short wooden-handled iron morningstar with one spiked metal head, kept low with its full outline visible. The two heads' contrasting temperaments, shared giant body, battleaxe and morningstar follow the authored source; features, head styling, palette, clothing and weapon details are editable visual defaults. No third head, merged faces, one cyclopean eye, extra necks, arms or legs, twin separate giants, flail chain, crests, prophecy text, home-world memory, captive, gore or scenery.
+An editable Large Ettin default with two mature slate-blue/grey heads on one stocky body. The slightly higher right head is broad and hostile with cropped hair; the lower left is narrower and calculating with swept-back hair. Each has two violet eyes. Opposed nested neck/arm folds retain restrained Rift depth. Plain brown/charcoal clothes, right battleaxe and left rigid-haft morningstar reveal no homeworld memory or new ability.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/b974ea290c8b022fedb0de1fb25f704f19d1c69105bd886cbc0886a28481e670.png)
+[Portrait](../../assets/characters/9951a0e292f1923e3a4415b2efcc2983a7f764ef1fa16c3f704e541f39181465.png)
 
-[Full-body reference](../../assets/characters/cb0d5f343ea3b1274cdea170f9181ce9dcadc5a833ceb86107e977f94d0629c8.png)
+[Full-body reference](../../assets/characters/a7acc04897b8572d2dc463f7e1173bc368d45f92a13965fd9f20642ca9396556.png)
 
-[Multiview reference sheet](../../assets/characters/d0068a085565ce1bd5e87a61c998ffdbd1afa9dcfd4600bdcb1203264187c7cb.png)
+[Multiview reference sheet](../../assets/characters/caeb4750e7a598dabffe7e53f93f065235e1fe36a8c626bdff66e41dfee94379.png)

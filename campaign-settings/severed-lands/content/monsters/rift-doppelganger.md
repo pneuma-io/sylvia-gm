@@ -39,12 +39,12 @@ A Rift-touched shapeshifter that fell through the Veil from a world where identi
 
 ## Appearance and artwork
 
-One Medium adult Rift Doppelganger in an editable representative unassumed humanoid appearance, not a declared canonical true form or an impersonation of any known character. A slender androgynous gray-skinned humanoid with a mature smooth narrow face, shallow nose, two quiet muted violet-gray eyes, small ordinary ears and a bald head. Two arms, two legs and ordinary five-digit hands, held relaxed and empty. A plain high-neck long-sleeved charcoal cloth tunic, gray trousers and soft dark boots cover the body. A restrained uncertain attentive expression, with a very faint translucent violet ripple along the face's outer edge while the complete single face remains clear and stable. The shapeshifting identity follows the authored source; this specific neutral appearance, features, outfit and palette are editable defaults only. No stolen named identity, overlapping faces, extra eyes, duplicate head, mirror image, weapon, crest, exposed body, victim, gore, readable text, home-world scene or scenery.
+One editable neutral adult humanoid presentation for Rift Doppelganger: pearl-grey/lilac skin, bald head, pale-violet eyes and a long calm face with shallow inward soft contour folds. Plain grey/plum/charcoal clothes and empty five-fingered hands identify no named victim, disguise or homeland. This reference does not claim the shapeshifter's biological true form.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/77be4851b8f1228070758134ad4f87066ebe2bd3bd7f1a7147876906cc687f46.png)
+[Portrait](../../assets/characters/5a74d24d8c163f3b6b4e7ff75c98cf8bedf2c24dda767ae07e7b1c19a831e33b.png)
 
-[Full-body reference](../../assets/characters/71c54c110811088b2ff9a8c731275a9829440d004e4c273f6f4077df739bc7f8.png)
+[Full-body reference](../../assets/characters/a6c8ce01fb2b0adf40c6f237aa6ca339408abb14759e4e34dead4a7c0fcfd774.png)
 
-[Multiview reference sheet](../../assets/characters/e56fad88bce98dcd80bfd52eb2c7523222f5dd24cedc8d5e3f3f8d8cc6d85e91.png)
+[Multiview reference sheet](../../assets/characters/920ea531c1eb3de71743358468db9545c044f78520675c83e461eda116051ec0.png)

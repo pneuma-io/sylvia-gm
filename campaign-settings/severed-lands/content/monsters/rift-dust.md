@@ -43,12 +43,12 @@ A choking, sentient dust storm that accumulates where the Rift has ground stone 
 
 ## Appearance and artwork
 
-One Small Rift Dust elemental in a gathered hovering state: a complete faceless sentient dust cloud made from fine pale ocher and gray-beige ground-stone grains. A broad irregular suspended billow with a denser dark sandy center, drifting soft curled edges and thin trails of fine grains beneath it. Restrained faint violet Rift glints and threads appear among the particles, without a bright eye-like core. The sentient dust storm and Veil-tainted sand follow the authored Setting lore; precise cloud shape, density, palette and grain pattern are editable visual defaults. No attack is depicted. No rigid humanoid body, face, head, eyes, mouth, arms, legs, feet, wings, mephit anatomy, flame, glowing embers, violet fire column, gray-blue wind vortex, skull, inhaling victim, lung imagery, ruined building, readable text or scenery.
+A faceless editable Small Rift Dust default: one broad ochre-grey particulate cloud with nested eroded laminae and cool mineral refraction. Two attached hooked edge lobes end in irregular hooked grain points, a visual expression of its authored claws without a humanoid body or added mechanic. No ember, flame, wing or inhalation victim is depicted.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/d91c122be28faad832822676a0ae290152d4a775ec5d5fb175532dcce91e960c.png)
+[Portrait](../../assets/characters/29a7058cc9f1d287de3ec68204fccfb8db402ba5f41249d30f36c2215d3206c0.png)
 
-[Full-body reference](../../assets/characters/8193c0db7017a4eee26f585d0792664a9886bdea5142e342a874cbcce96bb32a.png)
+[Full-body reference](../../assets/characters/4aafd6509f6915ac5d841b120282f49ef63576562bfe204df8b8e911ab5bb41c.png)
 
-[Multiview reference sheet](../../assets/characters/6da4627499bb883088c52069c0c22d10b8c3e505d7a2c449c67c8db3c978b26e.png)
+[Multiview reference sheet](../../assets/characters/ebbeed246877ee202bbbf487e0077743efa5d2a368dda342e76c61b5fcc3ee0c.png)

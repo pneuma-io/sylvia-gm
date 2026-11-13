@@ -53,12 +53,12 @@ A column of violet-white flame that burns cold — the Rift's energy expressing 
 
 ## Appearance and artwork
 
-One Large Rift Fire elemental: a complete upright column of cold-burning violet-white flame with an intense pale white-lavender inner column, vivid violet flame edges and many distinct upward leaping tongues. Its base narrows into an irregular hovering flame root just above the ground, with a few tiny ash flecks shimmering like trapped starlight close to the base. The single continuous flame column has an irregular natural fire silhouette, not a spiral tornado. No solid body, face, head, eyes, mouth, arms, fists, legs, wings or feet. Violet-white cold-burning flame and starlit ash follow the authored Setting lore; exact plume shape, palette intensity and ash pattern are editable visual defaults. No orange/red/yellow fire, ice body, burning human, fire imp, gray smoke creature, dust storm, lightning bolt, portal, victim, burning house, Anchor Door, readable text or scenery.
+A faceless editable Large Rift Fire default: one upright violet-white flame column with a pale core, deep violet/blue shadows and inward-folded flame chambers. Attached tongues and sparse shimmering ash stay within one volume. Its cold-flame lore, fire-damage mechanics and water susceptibility remain unchanged; no humanoid body, named Door or new power is added.
 
 This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
 
-[Portrait](../../assets/characters/1cf37e7cd72f6f4d0620335304a5894f409dceae5e25346ae067697c441022a6.png)
+[Portrait](../../assets/characters/8cc6d28e7c6e209d58582c36325edf06af1414fcd9aabc9d65538e518f8e34ee.png)
 
-[Full-body reference](../../assets/characters/3c06113adb898236867c7a0189c25180a68eddf4d4644c871f043bf8537939ea.png)
+[Full-body reference](../../assets/characters/7b2b9dac507fbc4c8cbc75ee624b1fbd81275836ec154eeb100993897df3a61e.png)
 
-[Multiview reference sheet](../../assets/characters/19a62f662c683c64d9647d03ffe824ca8e2e7b80b596f4b826ccfb94c14d8b7d.png)
+[Multiview reference sheet](../../assets/characters/29b4ff040e7909af8e7fe57ca702b6f5fa039e3b37b4f36481660c309c7a0f98.png)
